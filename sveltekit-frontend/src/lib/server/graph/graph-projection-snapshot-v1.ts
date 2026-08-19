@@ -1,34 +1,34 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import {
+	GraphSnapshotParityArtifactPathsSchema,
+	GraphSnapshotParityManifestSchema,
+} from '../atlas/graph/graph-snapshot-parity-contract.js';
 import { GraphProjectionManifestV3Schema } from './graph-projection-manifest.js';
 
-export const GraphProjectionSnapshotNodeV1Schema = z
-	.object({
-		ordinal: z.number().int().nonnegative(),
-		canonicalId: z.string().min(1),
-		packetKey: z.string().min(1).nullable(),
-	})
-	.strict();
-
-export const GraphProjectionSnapshotEdgeV1Schema = z
-	.object({
-		sourceOrdinal: z.number().int().nonnegative(),
-		targetOrdinal: z.number().int().nonnegative(),
-		relationshipType: z.string().min(1),
-		weight: z.number().finite().nonnegative().nullable(),
-	})
-	.strict();
-
+/**
+ * Projection-qualified descriptor for the existing GRAPH_SNAPSHOT_PARITY
+ * parquet artifacts. The parquet exporter remains the physical snapshot
+ * owner; this contract only binds those immutable table hashes to a V3
+ * projection manifest so PageRank executors can prove they consumed the
+ * same graph semantics without duplicating the 162k-node edge list in JSON.
+ */
 function snapshotContentHash(input: {
 	projectionHash: string;
-	nodes: readonly z.infer<typeof GraphProjectionSnapshotNodeV1Schema>[];
-	edges: readonly z.infer<typeof GraphProjectionSnapshotEdgeV1Schema>[];
+	graphRevision: string;
+	nodeTableHash: string;
+	edgeTableHash: string;
+	nodeCount: number;
+	edgeCount: number;
 }): string {
 	return createHash('sha256')
 		.update(JSON.stringify({
 			projectionHash: input.projectionHash,
-			nodes: input.nodes,
-			edges: input.edges,
+			graphRevision: input.graphRevision,
+			nodeTableHash: input.nodeTableHash,
+			edgeTableHash: input.edgeTableHash,
+			nodeCount: input.nodeCount,
+			edgeCount: input.edgeCount,
 		}))
 		.digest('hex');
 }
@@ -37,70 +37,73 @@ export const GraphProjectionSnapshotV1Schema = z
 	.object({
 		schema: z.literal('atlas.graph-projection-snapshot.v1'),
 		projection: GraphProjectionManifestV3Schema,
-		materialization: z.literal('DIRECTED_EDGE_LIST'),
-		nodes: z.array(GraphProjectionSnapshotNodeV1Schema).min(1),
-		edges: z.array(GraphProjectionSnapshotEdgeV1Schema),
+		parityManifest: GraphSnapshotParityManifestSchema,
+		artifactPaths: GraphSnapshotParityArtifactPathsSchema,
+		materialization: z.literal('PARQUET_DIRECTED_EDGE_LIST'),
+		edgeWeightColumn: z.literal('weight'),
 		contentHash: z.string().min(1),
 		producerRevision: z.string().min(1),
 		createdAt: z.string().datetime(),
 	})
 	.strict()
 	.superRefine((snapshot, ctx) => {
-		const nodeIds = new Set<string>();
-		for (const [index, node] of snapshot.nodes.entries()) {
-			if (node.ordinal !== index) {
-				ctx.addIssue({
-					code: z.ZodIssueCode.custom,
-					path: ['nodes', index, 'ordinal'],
-					message: `node ordinals must be contiguous and sorted; expected ${index}`,
-				});
-			}
-			if (nodeIds.has(node.canonicalId)) {
-				ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nodes', index, 'canonicalId'], message: 'duplicate canonicalId' });
-			}
-			nodeIds.add(node.canonicalId);
-		}
-		if (snapshot.projection.nodeCount !== snapshot.nodes.length) {
+		if (snapshot.projection.graphRevision !== snapshot.parityManifest.graphRevision) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
-				path: ['nodes'],
-				message: `snapshot node count ${snapshot.nodes.length} does not match projection nodeCount ${snapshot.projection.nodeCount}`,
+				path: ['parityManifest', 'graphRevision'],
+				message: 'parity artifact graphRevision does not match V3 projection graphRevision',
 			});
 		}
-		for (const [index, edge] of snapshot.edges.entries()) {
-			if (edge.sourceOrdinal >= snapshot.nodes.length || edge.targetOrdinal >= snapshot.nodes.length) {
-				ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['edges', index], message: 'edge ordinal is outside node range' });
-			}
-			if (!snapshot.projection.relationships[edge.relationshipType]) {
+		if (snapshot.projection.nodeCount !== snapshot.parityManifest.nodeCount) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['parityManifest', 'nodeCount'],
+				message: 'parity artifact nodeCount does not match V3 projection nodeCount',
+			});
+		}
+		if (snapshot.projection.relationshipCount !== snapshot.parityManifest.edgeCount) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['parityManifest', 'edgeCount'],
+				message: 'parity artifact edgeCount does not match V3 projection relationshipCount',
+			});
+		}
+
+		for (const [relationshipType, relationship] of Object.entries(snapshot.projection.relationships)) {
+			if (relationship.orientation !== 'NATURAL') {
 				ctx.addIssue({
 					code: z.ZodIssueCode.custom,
-					path: ['edges', index, 'relationshipType'],
-					message: `edge relationship '${edge.relationshipType}' is absent from projection`,
+					path: ['projection', 'relationships', relationshipType, 'orientation'],
+					message: 'GRAPH_SNAPSHOT_PARITY v1 parquet rows encode NATURAL directed edges only; re-export for other orientations',
 				});
 			}
 		}
-		if (snapshot.projection.relationshipCount !== snapshot.edges.length) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				path: ['edges'],
-				message: `snapshot edge count ${snapshot.edges.length} does not match projection relationshipCount ${snapshot.projection.relationshipCount}`,
-			});
-		}
+
 		const expectedHash = snapshotContentHash({
 			projectionHash: snapshot.projection.projectionHash,
-			nodes: snapshot.nodes,
-			edges: snapshot.edges,
+			graphRevision: snapshot.parityManifest.graphRevision,
+			nodeTableHash: snapshot.parityManifest.nodeTableHash,
+			edgeTableHash: snapshot.parityManifest.edgeTableHash,
+			nodeCount: snapshot.parityManifest.nodeCount,
+			edgeCount: snapshot.parityManifest.edgeCount,
 		});
 		if (snapshot.contentHash !== expectedHash) {
-			ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['contentHash'], message: `contentHash mismatch: expected ${expectedHash}` });
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['contentHash'],
+				message: `contentHash mismatch: expected ${expectedHash}`,
+			});
 		}
 	});
 export type GraphProjectionSnapshotV1 = z.infer<typeof GraphProjectionSnapshotV1Schema>;
 
 export function computeGraphProjectionSnapshotHashV1(input: {
 	projectionHash: string;
-	nodes: readonly z.infer<typeof GraphProjectionSnapshotNodeV1Schema>[];
-	edges: readonly z.infer<typeof GraphProjectionSnapshotEdgeV1Schema>[];
+	graphRevision: string;
+	nodeTableHash: string;
+	edgeTableHash: string;
+	nodeCount: number;
+	edgeCount: number;
 }): string {
 	return snapshotContentHash(input);
 }
