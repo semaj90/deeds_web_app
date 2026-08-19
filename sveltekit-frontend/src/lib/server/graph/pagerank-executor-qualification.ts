@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import { GraphSnapshotParityReceiptSchema } from '../atlas/graph/graph-snapshot-parity-contract.js';
 import { GraphProjectionSnapshotV1Schema } from './graph-projection-snapshot-v1.js';
+import {
+	PageRankCrossExecutorParityReceiptV2Schema,
+	assertPageRankParityReceiptMatchesSnapshot,
+} from './pagerank-cross-executor-parity.js';
 import { PageRankExecutorIdSchema } from './pagerank-execution-contract.js';
 
 export const PageRankExecutorQualificationStatusSchema = z.enum([
@@ -19,12 +23,12 @@ export const PageRankExecutorQualificationV1Schema = z
 		projectionRevision: z.string().min(1),
 		projectionHash: z.string().min(1),
 		projectionSnapshotHash: z.string().min(1),
-		mathParity: z.object({
+		legacyMathParity: z.object({
 			topKOverlap: z.number().min(0).max(1),
 			spearmanCorrelation: z.number().min(-1).max(1),
 			maxL1Delta: z.number().nonnegative(),
 		}).strict(),
-		thresholds: z.object({
+		legacyThresholds: z.object({
 			minTopKOverlap: z.number().min(0).max(1),
 			minSpearmanCorrelation: z.number().min(-1).max(1),
 			maxL1Delta: z.number().nonnegative(),
@@ -32,6 +36,7 @@ export const PageRankExecutorQualificationV1Schema = z
 		legacyParityReceiptGeneratedAt: z.string().datetime(),
 		legacyParityReceiptGraphRevision: z.string().min(1),
 		projectionLineageMatched: z.boolean(),
+		canonicalReferenceParityReceipt: PageRankCrossExecutorParityReceiptV2Schema.nullable(),
 		canonicalReferenceParityProven: z.boolean(),
 		status: PageRankExecutorQualificationStatusSchema,
 		reasons: z.array(z.string().min(1)),
@@ -42,50 +47,67 @@ export const PageRankExecutorQualificationV1Schema = z
 export type PageRankExecutorQualificationV1 = z.infer<typeof PageRankExecutorQualificationV1Schema>;
 
 /**
- * Reconcile the existing NetworkX↔cuGraph frozen-snapshot parity proof with
- * the new V3 projection lineage. This deliberately does NOT make cuGraph
- * canonical from the legacy PASS alone: canonical promotion additionally
- * requires parity against the canonical reference executor (currently
- * NEO4J_GDS) on the same V3-qualified snapshot.
+ * The older NetworkX↔cuGraph PASS proves GPU PageRank math on an immutable
+ * artifact. Canonical eligibility is stronger: a PASS receipt from the
+ * current canonical reference executor (NEO4J_GDS) must carry the exact V3
+ * projection and snapshot hashes. No boolean proof shortcut is accepted.
  */
 export function qualifyCugraphFromFrozenParity(input: {
 	snapshot: unknown;
 	legacyParityReceipt: unknown;
-	canonicalReferenceParityProven?: boolean;
+	canonicalReferenceParityReceipt?: unknown;
 	producerRevision: string;
 	createdAt?: string;
 }): PageRankExecutorQualificationV1 {
 	const snapshot = GraphProjectionSnapshotV1Schema.parse(input.snapshot);
-	const receipt = GraphSnapshotParityReceiptSchema.parse(input.legacyParityReceipt);
-	const thresholds = {
+	const legacy = GraphSnapshotParityReceiptSchema.parse(input.legacyParityReceipt);
+	const legacyThresholds = {
 		minTopKOverlap: 1,
 		minSpearmanCorrelation: 0.99,
 		maxL1Delta: 1e-8,
 	};
 	const reasons: string[] = [];
 
-	const mathParity = {
-		topKOverlap: receipt.pagerankTopKOverlap,
-		spearmanCorrelation: receipt.pagerankCorrelation,
-		maxL1Delta: receipt.pagerankMaxDelta,
+	const legacyMathParity = {
+		topKOverlap: legacy.pagerankTopKOverlap,
+		spearmanCorrelation: legacy.pagerankCorrelation,
+		maxL1Delta: legacy.pagerankMaxDelta,
 	};
 	const mathPass =
-		receipt.status === 'PASS' &&
-		mathParity.topKOverlap >= thresholds.minTopKOverlap &&
-		mathParity.spearmanCorrelation >= thresholds.minSpearmanCorrelation &&
-		mathParity.maxL1Delta <= thresholds.maxL1Delta;
+		legacy.status === 'PASS' &&
+		legacyMathParity.topKOverlap >= legacyThresholds.minTopKOverlap &&
+		legacyMathParity.spearmanCorrelation >= legacyThresholds.minSpearmanCorrelation &&
+		legacyMathParity.maxL1Delta <= legacyThresholds.maxL1Delta;
 	if (!mathPass) reasons.push('legacy frozen-snapshot PageRank parity thresholds are not satisfied');
 
 	const projectionLineageMatched =
-		receipt.graphRevision === snapshot.projection.graphRevision &&
-		receipt.manifest.graphRevision === snapshot.parityManifest.graphRevision &&
-		receipt.manifest.nodeTableHash === snapshot.parityManifest.nodeTableHash &&
-		receipt.manifest.edgeTableHash === snapshot.parityManifest.edgeTableHash &&
-		receipt.manifest.nodeCount === snapshot.parityManifest.nodeCount &&
-		receipt.manifest.edgeCount === snapshot.parityManifest.edgeCount;
+		legacy.graphRevision === snapshot.projection.graphRevision &&
+		legacy.manifest.graphRevision === snapshot.parityManifest.graphRevision &&
+		legacy.manifest.nodeTableHash === snapshot.parityManifest.nodeTableHash &&
+		legacy.manifest.edgeTableHash === snapshot.parityManifest.edgeTableHash &&
+		legacy.manifest.nodeCount === snapshot.parityManifest.nodeCount &&
+		legacy.manifest.edgeCount === snapshot.parityManifest.edgeCount;
 	if (!projectionLineageMatched) reasons.push('legacy parity artifact does not match the V3-qualified projection snapshot');
 
-	const canonicalReferenceParityProven = input.canonicalReferenceParityProven ?? false;
+	let canonicalReferenceParityReceipt: z.infer<typeof PageRankCrossExecutorParityReceiptV2Schema> | null = null;
+	let canonicalReferenceParityProven = false;
+	if (input.canonicalReferenceParityReceipt != null) {
+		try {
+			canonicalReferenceParityReceipt = assertPageRankParityReceiptMatchesSnapshot({
+				receipt: input.canonicalReferenceParityReceipt,
+				snapshot,
+			});
+			canonicalReferenceParityProven =
+				canonicalReferenceParityReceipt.status === 'PASS' &&
+				canonicalReferenceParityReceipt.referenceExecutorId === 'NEO4J_GDS' &&
+				canonicalReferenceParityReceipt.challengerExecutorId === 'CUGRAPH';
+			if (!canonicalReferenceParityProven) {
+				reasons.push('canonical parity receipt is not a PASS for NEO4J_GDS↔CUGRAPH');
+			}
+		} catch (error) {
+			reasons.push(error instanceof Error ? error.message : 'canonical parity receipt failed lineage validation');
+		}
+	}
 	if (!canonicalReferenceParityProven) {
 		reasons.push('NEO4J_GDS↔CUGRAPH parity on the same V3-qualified snapshot is not yet proven');
 	}
@@ -106,14 +128,15 @@ export function qualifyCugraphFromFrozenParity(input: {
 		projectionRevision: snapshot.projection.projectionRevision,
 		projectionHash: snapshot.projection.projectionHash,
 		projectionSnapshotHash: snapshot.contentHash,
-		mathParity,
-		thresholds,
-		legacyParityReceiptGeneratedAt: receipt.generatedAt,
-		legacyParityReceiptGraphRevision: receipt.graphRevision,
+		legacyMathParity,
+		legacyThresholds,
+		legacyParityReceiptGeneratedAt: legacy.generatedAt,
+		legacyParityReceiptGraphRevision: legacy.graphRevision,
 		projectionLineageMatched,
+		canonicalReferenceParityReceipt,
 		canonicalReferenceParityProven,
 		status,
-		reasons,
+		reasons: [...new Set(reasons)],
 		producerRevision: input.producerRevision,
 		createdAt: input.createdAt ?? new Date().toISOString(),
 	});
