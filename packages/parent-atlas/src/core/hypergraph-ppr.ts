@@ -5,6 +5,10 @@ export type HypergraphPprConfigV1 = {
   /** Edge-follow damping factor; aligned with cuGraph/PageRank semantics. */
   alpha?: number;
   maximum_iterations?: number;
+  /**
+   * cuGraph-style epsilon. Convergence is reached when the L1 change between
+   * consecutive PageRank vectors is less than node_count * tolerance.
+   */
   tolerance?: number;
 };
 
@@ -18,7 +22,11 @@ export type HypergraphPprReceiptV1 = {
   teleport_probability: number;
   iterations: number;
   converged: boolean;
+  /** cuGraph-compatible epsilon. */
   tolerance: number;
+  /** Actual L1 threshold = node_count * tolerance. */
+  convergence_threshold: number;
+  final_l1_delta: number;
   node_count: number;
   incidence_edge_count: number;
   relationship_scores: Record<string, number>;
@@ -32,9 +40,14 @@ function normalizeDistribution(scores: Map<string, number>): void {
 }
 
 /**
- * CPU reference PPR over the lossless bipartite incidence graph.
- * `alpha` matches cuGraph: probability of following an outgoing edge.
+ * CPU reference personalized PageRank over the lossless bipartite incidence
+ * graph. `alpha` matches cuGraph: probability of following an outgoing edge.
  * Teleport probability is therefore `1 - alpha`.
+ *
+ * Important parity rule: cuGraph's C/C++ convergence definition checks whether
+ * the sum of absolute PageRank changes is smaller than V * epsilon. The prior
+ * reference compared the L1 delta directly with epsilon and was therefore more
+ * strict than the GPU implementation it was intended to validate.
  */
 export function runHypergraphPersonalizedPageRank(input: {
   query_id: string;
@@ -46,7 +59,7 @@ export function runHypergraphPersonalizedPageRank(input: {
   const alpha = input.config?.alpha ?? 0.85;
   const teleportProbability = 1 - alpha;
   const maximumIterations = input.config?.maximum_iterations ?? 100;
-  const tolerance = input.config?.tolerance ?? 1e-10;
+  const tolerance = input.config?.tolerance ?? 1e-5;
   if (!(alpha > 0 && alpha < 1)) throw new RangeError('alpha must be between 0 and 1');
   if (!Number.isInteger(maximumIterations) || maximumIterations < 1) throw new RangeError('maximum_iterations must be positive');
   if (!(tolerance > 0)) throw new RangeError('tolerance must be positive');
@@ -77,6 +90,7 @@ export function runHypergraphPersonalizedPageRank(input: {
   }
 
   const nodes = [...adjacency.keys()].sort((a, b) => a.localeCompare(b));
+  const convergenceThreshold = nodes.length * tolerance;
   const seedNodeIds = nodes.filter((nodeId) => {
     const canonicalId = entityCanonicalIds.get(nodeId);
     return canonicalId != null && input.seed_entity_ids.includes(canonicalId);
@@ -87,7 +101,8 @@ export function runHypergraphPersonalizedPageRank(input: {
       source_snapshot_revision: input.source_snapshot_revision,
       seed_entity_ids: [...new Set(input.seed_entity_ids)].sort(),
       alpha, teleport_probability: teleportProbability, iterations: 0, converged: true,
-      tolerance, node_count: nodes.length, incidence_edge_count: incidenceEdgeCount,
+      tolerance, convergence_threshold: convergenceThreshold, final_l1_delta: 0,
+      node_count: nodes.length, incidence_edge_count: incidenceEdgeCount,
       relationship_scores: {}, entity_scores: {},
     };
   }
@@ -99,6 +114,7 @@ export function runHypergraphPersonalizedPageRank(input: {
   let scores = new Map(personalization);
   let converged = false;
   let iterations = 0;
+  let finalL1Delta = Number.POSITIVE_INFINITY;
 
   for (let iteration = 1; iteration <= maximumIterations; iteration += 1) {
     const next = new Map<string, number>(
@@ -126,7 +142,8 @@ export function runHypergraphPersonalizedPageRank(input: {
     );
     scores = next;
     iterations = iteration;
-    if (delta <= tolerance) { converged = true; break; }
+    finalL1Delta = delta;
+    if (delta < convergenceThreshold) { converged = true; break; }
   }
 
   const relationshipScores: Record<string, number> = {};
@@ -144,6 +161,7 @@ export function runHypergraphPersonalizedPageRank(input: {
     source_snapshot_revision: input.source_snapshot_revision,
     seed_entity_ids: [...new Set(input.seed_entity_ids)].sort(), alpha,
     teleport_probability: teleportProbability, iterations, converged, tolerance,
+    convergence_threshold: convergenceThreshold, final_l1_delta: finalL1Delta,
     node_count: nodes.length, incidence_edge_count: incidenceEdgeCount,
     relationship_scores: relationshipScores, entity_scores: entityScores,
   };
