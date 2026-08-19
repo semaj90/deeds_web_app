@@ -2,7 +2,9 @@ import { ATLAS_CANONICAL_SEMANTIC_DIMENSION } from './qdrant-semantic-projection
 
 export interface AtlasSemantic512CorpusRowV1 {
   packetKey: string;
-  sourceRevision: string;
+  /** Live atlas_packets currently has no canonical source_revision column. */
+  sourceRevision?: string | null;
+  sourceRef?: string | null;
   symbolVersionId?: string | null;
   treeNodeId?: string | null;
   featureLabel?: string | null;
@@ -24,7 +26,8 @@ export interface AtlasSemantic512ExactHitV1 {
   rank: number;
   rowIndex: number;
   packetKey: string;
-  sourceRevision: string;
+  sourceRevision: string | null;
+  sourceRef: string | null;
   symbolVersionId: string | null;
   treeNodeId: string | null;
   featureLabel: string | null;
@@ -58,11 +61,12 @@ function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
   }
   const seen = new Set<string>();
   for (const [index, row] of input.corpus.entries()) {
-    if (!row.packetKey?.trim() || !row.sourceRevision?.trim()) throw new Error(`ATLAS_SEMANTIC512_IDENTITY:${index}`);
+    // packet_key is enough to keep GPU row identity deterministic. Source
+    // freshness is a separate mutation-awareness proof, not a KNN prerequisite.
+    if (!row.packetKey?.trim()) throw new Error(`ATLAS_SEMANTIC512_IDENTITY:${index}`);
     if (row.vector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) throw new Error(`ATLAS_SEMANTIC512_CORPUS_DIMENSION:${index}`);
-    const identity = `${row.packetKey}\u0000${row.sourceRevision}`;
-    if (seen.has(identity)) throw new Error(`ATLAS_SEMANTIC512_DUPLICATE_IDENTITY:${row.packetKey}`);
-    seen.add(identity);
+    if (seen.has(row.packetKey)) throw new Error(`ATLAS_SEMANTIC512_DUPLICATE_IDENTITY:${row.packetKey}`);
+    seen.add(row.packetKey);
   }
 }
 
