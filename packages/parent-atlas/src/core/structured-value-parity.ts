@@ -122,6 +122,8 @@ export const structuredValueCrossRuntimeProofSchema = z.object({
   }
 }).strict();
 export type StructuredValueCrossRuntimeProofV1 = z.infer<typeof structuredValueCrossRuntimeProofSchema>;
+export const structuredValueCrossRuntimeReceiptSchema = structuredValueCrossRuntimeProofSchema;
+export type StructuredValueCrossRuntimeReceiptV1 = StructuredValueCrossRuntimeProofV1;
 
 export function deriveStructuredValueProofStatus(input: {
   node_tree_sitter_available: boolean;
@@ -141,6 +143,116 @@ export function deriveStructuredValueProofStatus(input: {
   if (!input.arrow_ipc_passed) return 'ARROW_IPC_WRITE_FAILED';
   if (!input.pyarrow_mmap_passed) return 'PYARROW_MMAP_FAILED';
   return 'FIXTURE_ROUNDTRIP_PROVEN';
+}
+
+export type BuildStructuredValueCrossRuntimeReceiptInput = {
+  receipt_id: string;
+  fixture_source_ref: string;
+  fixture_source_revision: string;
+  workspace_revision: string;
+  node_tree_sitter_revision: string | null;
+  node_grammar_revision: string | null;
+  treesitter_chunker_revision: string | null;
+  ts_morph_revision: string | null;
+  typescript_revision: string | null;
+  arrow_js_revision: string | null;
+  pyarrow_revision: string | null;
+  node_tree_sitter_available: boolean;
+  treesitter_chunker_available: boolean;
+  compared_chunk_count: number;
+  span_match_count: number;
+  node_type_match_count: number;
+  source_span_checksum_match_count?: number;
+  upstream_id_match_count: number;
+  object_value_extracted: boolean;
+  object_value_root_kind?: string | null;
+  object_value_entry_count: number;
+  computed_entry_count: number;
+  spread_entry_count: number;
+  object_span_only_identity?: boolean;
+  ts_morph_exact_span_match: boolean;
+  ts_morph_resolved_signature: boolean;
+  unicode_offset_roundtrip_observed?: boolean;
+  arrow_row_count: number;
+  arrow_row_identity_checksum: string | null;
+  arrow_structure_checksum: string | null;
+  arrow_ipc_checksum: string | null;
+  arrow_nested_provenance_struct?: boolean;
+  arrow_nested_members_list_struct?: boolean;
+  arrow_nested_entries_list_struct?: boolean;
+  pyarrow_mmap_row_identity_checksum: string | null;
+  pyarrow_mmap_structure_checksum: string | null;
+  pyarrow_reconstruction_checksum: string | null;
+  status: StructuredValueProofStatusV1;
+  diagnostics: string[];
+  producer_revision: string;
+};
+
+/** Build the nested proof receipt used by the executable TS/Python fixture harness. */
+export function buildStructuredValueCrossRuntimeReceipt(input: BuildStructuredValueCrossRuntimeReceiptInput): StructuredValueCrossRuntimeProofV1 {
+  const targetChunkFound = input.compared_chunk_count > 0;
+  const chunkEvaluated = targetChunkFound;
+  const sourceChecksumMatches = (input.source_span_checksum_match_count ?? input.span_match_count) === input.compared_chunk_count && targetChunkFound;
+  return structuredValueCrossRuntimeProofSchema.parse({
+    fixture_id: input.receipt_id,
+    source_ref: input.fixture_source_ref,
+    source_revision: input.fixture_source_revision,
+    workspace_revision: input.workspace_revision,
+    node_tree_sitter: {
+      available: input.node_tree_sitter_available,
+      parser_revision: input.node_tree_sitter_revision,
+      grammar_revision: input.node_grammar_revision,
+    },
+    treesitter_chunker: {
+      available: input.treesitter_chunker_available,
+      package_revision: input.treesitter_chunker_revision,
+      target_chunk_found: targetChunkFound,
+    },
+    chunk_boundary: {
+      evaluated: chunkEvaluated,
+      byte_span_match: chunkEvaluated && input.span_match_count === input.compared_chunk_count,
+      node_type_match: chunkEvaluated && input.node_type_match_count === input.compared_chunk_count,
+      source_span_checksum_match: sourceChecksumMatches,
+      upstream_identity_attached_by_exact_span: chunkEvaluated && input.upstream_id_match_count === input.compared_chunk_count,
+      ordered_child_parity_evaluated: false,
+    },
+    structured_value: {
+      evaluated: input.object_value_extracted,
+      exact_byte_range_match: input.object_value_extracted,
+      root_kind: input.object_value_root_kind ?? (input.object_value_extracted ? 'OBJECT' : null),
+      computed_entry_observed: input.computed_entry_count > 0,
+      spread_entry_observed: input.spread_entry_count > 0,
+      span_only_identity: input.object_span_only_identity ?? input.object_value_extracted,
+    },
+    ts_morph: {
+      evaluated: input.ts_morph_revision !== null,
+      object_exact_span_enriched: input.ts_morph_exact_span_match,
+      call_exact_span_enriched: input.ts_morph_exact_span_match,
+      resolved_call_signature_observed: input.ts_morph_resolved_signature,
+      unicode_offset_roundtrip_observed: input.unicode_offset_roundtrip_observed ?? input.ts_morph_exact_span_match,
+    },
+    arrow_ipc: {
+      evaluated: input.arrow_js_revision !== null,
+      file_written: input.arrow_ipc_checksum !== null,
+      nested_provenance_struct: input.arrow_nested_provenance_struct ?? input.arrow_ipc_checksum !== null,
+      nested_members_list_struct: input.arrow_nested_members_list_struct ?? input.arrow_ipc_checksum !== null,
+      nested_entries_list_struct: input.arrow_nested_entries_list_struct ?? input.arrow_ipc_checksum !== null,
+      row_identity_checksum: input.arrow_row_identity_checksum,
+      structure_checksum: input.arrow_structure_checksum,
+      ipc_file_checksum: input.arrow_ipc_checksum,
+    },
+    pyarrow_mmap: {
+      evaluated: input.pyarrow_revision !== null || input.pyarrow_mmap_row_identity_checksum !== null || input.pyarrow_mmap_structure_checksum !== null,
+      available: input.pyarrow_revision !== null,
+      readback_succeeded: input.pyarrow_mmap_row_identity_checksum !== null && input.pyarrow_mmap_structure_checksum !== null,
+      row_identity_checksum_match: input.arrow_row_identity_checksum !== null && input.pyarrow_mmap_row_identity_checksum === input.arrow_row_identity_checksum,
+      structure_checksum_match: input.arrow_structure_checksum !== null && input.pyarrow_mmap_structure_checksum === input.arrow_structure_checksum,
+    },
+    proof_status: input.status,
+    diagnostics: input.diagnostics,
+    canonical_authority: false,
+    producer_revision: input.producer_revision,
+  });
 }
 
 export function describeStructuredValueCrossRuntimeProof(): string {
