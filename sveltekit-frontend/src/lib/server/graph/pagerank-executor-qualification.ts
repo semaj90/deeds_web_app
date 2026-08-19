@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { GraphSnapshotParityReceiptSchema } from '../atlas/graph/graph-snapshot-parity-contract.js';
 import { GraphProjectionSnapshotV1Schema } from './graph-projection-snapshot-v1.js';
 import {
-	PageRankCrossExecutorParityReceiptV2Schema,
-	assertPageRankParityReceiptMatchesSnapshot,
-	computePageRankParityParameterHash,
-} from './pagerank-cross-executor-parity.js';
+	PageRankCrossExecutorProofV1Schema,
+	assertPageRankCrossExecutorProofMatches,
+} from './pagerank-cross-executor-proof.js';
+import { computePageRankParityParameterHash } from './pagerank-cross-executor-parity.js';
 import {
 	PageRankExecutionPlanV1Schema,
 	PageRankExecutorIdSchema,
@@ -43,7 +43,7 @@ export const PageRankExecutorQualificationV1Schema = z
 		legacyParityReceiptGeneratedAt: z.string().datetime(),
 		legacyParityReceiptGraphRevision: z.string().min(1),
 		projectionLineageMatched: z.boolean(),
-		canonicalReferenceParityReceipt: PageRankCrossExecutorParityReceiptV2Schema.nullable(),
+		canonicalReferenceParityProof: PageRankCrossExecutorProofV1Schema.nullable(),
 		canonicalReferenceParityProven: z.boolean(),
 		status: PageRankExecutorQualificationStatusSchema,
 		reasons: z.array(z.string().min(1)),
@@ -54,15 +54,16 @@ export const PageRankExecutorQualificationV1Schema = z
 export type PageRankExecutorQualificationV1 = z.infer<typeof PageRankExecutorQualificationV1Schema>;
 
 /**
- * Legacy NetworkX↔cuGraph evidence remains useful backend/math evidence, but
- * canonical eligibility is parameter-specific. A typed NEO4J_GDS↔CUGRAPH
- * receipt must match the exact V3 snapshot AND exact PageRank plan.
+ * The legacy NetworkX↔cuGraph receipt is retained as historical backend/math
+ * evidence. Canonical eligibility requires a stronger proof envelope that
+ * binds exact PageRank parameters, the V3 snapshot, both worker execution
+ * receipts, both raw score-file hashes, and the derived GDS↔cuGraph metrics.
  */
 export function qualifyCugraphFromFrozenParity(input: {
 	plan: unknown;
 	snapshot: unknown;
 	legacyParityReceipt: unknown;
-	canonicalReferenceParityReceipt?: unknown;
+	canonicalReferenceParityProof?: unknown;
 	producerRevision: string;
 	createdAt?: string;
 }): PageRankExecutorQualificationV1 {
@@ -74,20 +75,14 @@ export function qualifyCugraphFromFrozenParity(input: {
 	}
 	const parameterHash = computePageRankParityParameterHash(plan.parameters);
 	const legacy = GraphSnapshotParityReceiptSchema.parse(input.legacyParityReceipt);
-	const legacyThresholds = {
-		minTopKOverlap: 1,
-		minSpearmanCorrelation: 0.99,
-		maxL1Delta: 1e-8,
-	};
+	const legacyThresholds = { minTopKOverlap: 1, minSpearmanCorrelation: 0.99, maxL1Delta: 1e-8 };
 	const reasons: string[] = [];
-
 	const legacyMathParity = {
 		topKOverlap: legacy.pagerankTopKOverlap,
 		spearmanCorrelation: legacy.pagerankCorrelation,
 		maxL1Delta: legacy.pagerankMaxDelta,
 	};
-	const mathPass =
-		legacy.status === 'PASS' &&
+	const mathPass = legacy.status === 'PASS' &&
 		legacyMathParity.topKOverlap >= legacyThresholds.minTopKOverlap &&
 		legacyMathParity.spearmanCorrelation >= legacyThresholds.minSpearmanCorrelation &&
 		legacyMathParity.maxL1Delta <= legacyThresholds.maxL1Delta;
@@ -102,30 +97,31 @@ export function qualifyCugraphFromFrozenParity(input: {
 		legacy.manifest.edgeCount === snapshot.parityManifest.edgeCount;
 	if (!projectionLineageMatched) reasons.push('legacy parity artifact does not match the V3-qualified projection snapshot');
 
-	let canonicalReferenceParityReceipt: z.infer<typeof PageRankCrossExecutorParityReceiptV2Schema> | null = null;
+	let canonicalReferenceParityProof: z.infer<typeof PageRankCrossExecutorProofV1Schema> | null = null;
 	let canonicalReferenceParityProven = false;
-	if (input.canonicalReferenceParityReceipt != null) {
+	if (input.canonicalReferenceParityProof != null) {
 		try {
-			canonicalReferenceParityReceipt = assertPageRankParityReceiptMatchesSnapshot({
-				receipt: input.canonicalReferenceParityReceipt,
-				snapshot,
+			canonicalReferenceParityProof = assertPageRankCrossExecutorProofMatches({
+				proof: input.canonicalReferenceParityProof,
 				plan,
+				snapshot,
 			});
+			const parity = canonicalReferenceParityProof.parityReceipt;
 			canonicalReferenceParityProven =
-				canonicalReferenceParityReceipt.status === 'PASS' &&
-				canonicalReferenceParityReceipt.referenceExecutorId === 'NEO4J_GDS' &&
-				canonicalReferenceParityReceipt.challengerExecutorId === 'CUGRAPH' &&
-				canonicalReferenceParityReceipt.algorithmRevision === plan.algorithmRevision &&
-				canonicalReferenceParityReceipt.parameterHash === parameterHash;
+				parity.status === 'PASS' &&
+				parity.referenceExecutorId === 'NEO4J_GDS' &&
+				parity.challengerExecutorId === 'CUGRAPH' &&
+				parity.algorithmRevision === plan.algorithmRevision &&
+				parity.parameterHash === parameterHash;
 			if (!canonicalReferenceParityProven) {
-				reasons.push('canonical parity receipt is not a parameter-qualified PASS for NEO4J_GDS↔CUGRAPH');
+				reasons.push('execution-bound parity proof is not a parameter-qualified PASS for NEO4J_GDS↔CUGRAPH');
 			}
 		} catch (error) {
-			reasons.push(error instanceof Error ? error.message : 'canonical parity receipt failed plan/snapshot lineage validation');
+			reasons.push(error instanceof Error ? error.message : 'canonical parity proof failed plan/snapshot/execution validation');
 		}
 	}
 	if (!canonicalReferenceParityProven) {
-		reasons.push('NEO4J_GDS↔CUGRAPH parity on the same V3 snapshot and PageRank parameter set is not yet proven');
+		reasons.push('execution-bound NEO4J_GDS↔CUGRAPH parity on the same V3 snapshot and PageRank parameter set is not yet proven');
 	}
 
 	const status = !mathPass
@@ -151,7 +147,7 @@ export function qualifyCugraphFromFrozenParity(input: {
 		legacyParityReceiptGeneratedAt: legacy.generatedAt,
 		legacyParityReceiptGraphRevision: legacy.graphRevision,
 		projectionLineageMatched,
-		canonicalReferenceParityReceipt,
+		canonicalReferenceParityProof,
 		canonicalReferenceParityProven,
 		status,
 		reasons: [...new Set(reasons)],
@@ -163,9 +159,7 @@ export function qualifyCugraphFromFrozenParity(input: {
 export function assertCanonicalPageRankExecutorQualified(input: unknown): PageRankExecutorQualificationV1 {
 	const qualification = PageRankExecutorQualificationV1Schema.parse(input);
 	if (qualification.status !== 'CANONICAL_ELIGIBLE') {
-		throw new Error(
-			`${qualification.executorId} is not canonical-eligible: ${qualification.status}; ${qualification.reasons.join('; ')}`,
-		);
+		throw new Error(`${qualification.executorId} is not canonical-eligible: ${qualification.status}; ${qualification.reasons.join('; ')}`);
 	}
 	return qualification;
 }
