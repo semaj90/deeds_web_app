@@ -97,13 +97,15 @@ Tags are metadata/filter hints, not independent retrieval votes.
 
 - [x] ORF-0 — Existing owners audited: OKF registry, ontology-linked tuples, legacy FeatureMatrix, multicore MCP boundary, external-doc Qdrant scripts.
 - [x] ORF-1 — `ObservationFeatureProjectionV1` implemented: fixed ontology/AST masks, grounded structural booleans, LangExtract classes, flattened tags, evidence refs, source/representation lineage.
-- [ ] ORF-1P — Run deterministic unit tests for ORF-1 and prove input/output digest stability.
+- [ ] ORF-1P — Run deterministic unit tests for ORF-1 and prove input/output digest stability. Tests are written, not yet executed in this GitHub-only session.
 - [ ] ORF-2 — Postgres materializer. Persist projection rows with source/version receipts and selective B-tree/GIN indexes; benchmark filtered exact scans before adding pgvector ANN duplication.
 - [ ] ORF-2P — PostgreSQL 18 proof: EXPLAIN/ANALYZE representative filters; capture bitmap/index/heap plan and AIO settings in receipt.
-- [ ] ORF-3 — Qdrant payload projection. One programming-doc evidence family, selective keyword/integer indexes, flattened tags, cluster/community fields as derived hints.
+- [x] ORF-3C — `ExternalDocProjectionV1` target contract implemented for one programming-doc evidence family: semantic_512 lineage, selective indexed fields, flattened tags, cluster/community/PageRank payload hints.
+- [ ] ORF-3 — Qdrant collection/materializer implementation after migration dry-run proves the target is safe.
 - [ ] ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply.
 - [ ] ORF-3P — Qdrant payload-index benchmark: indexed selective fields vs unindexed/nested variants; record memory/storage cost and latency.
-- [ ] ORF-4 — `ClusterFeatureProjectionV1`: KMeans/SOM/community revisions + probabilities/distances; routing-only and rebuildable.
+- [x] ORF-4 — `ClusterFeatureProjectionV1` implemented: semantic_512/latent_64 lineage, KMeans/SOM/community revisions, probability/distance values, `evidenceAuthority=false`.
+- [ ] ORF-4P — Run deterministic cluster-projection tests and prove KMeans/SOM/community revisions cannot become packet identity.
 - [x] ORF-5 — `RetrievalRouterFeatureRowV1` implemented as representation-explicit semantic_512 + optional latent_64 + structure/ontology/lexical/graph/cluster/temporal/evidence signals.
 - [ ] ORF-5P — Run router-row contract tests; freeze stable numeric flattening order for PyTorch/XGBoost input tensor.
 - [x] ORF-6A — Protocol-neutral `.okf` MCP resource catalog implemented with stable `atlas://okf/...` URIs and intended cache policies.
@@ -164,6 +166,15 @@ Do not add pgvector HNSW here by default. Existing Qdrant/cached GPU semantic ex
 ## Qdrant target (ORF-3)
 
 Do not split collections by tag or KMeans cell.
+
+Target collection contract:
+
+```text
+external_programming_docs_hybrid_512_v1
+representation_id = semantic_512
+native_model_dimension = 768
+projection_method = embeddinggemma-mrl-prefix-renorm
+```
 
 Target payload shape:
 
