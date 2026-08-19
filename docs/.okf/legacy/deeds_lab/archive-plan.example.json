@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.legacy-repository-archive-plan.v1",
+  "plan_revision": "deeds-lab-cold-archive-r1",
+  "repository_full_name": "semaj90/deeds_lab",
+  "repository_commit_sha": "eea39639334ac3509c76ab27acb1dfdfb9ff8195",
+  "source_revision": "eea39639334ac3509c76ab27acb1dfdfb9ff8195",
+  "source_branch": "main",
+  "source_pinned": true,
+  "okf_namespace": "docs/.okf/legacy/deeds_lab",
+  "target": {
+    "backend": "SEAWEEDFS_S3",
+    "bucket": "atlas-repos",
+    "archive_object_key": "legacy/deeds_lab/eea39639334ac3509c76ab27acb1dfdfb9ff8195/repo.tar.zst",
+    "file_index_object_key": "legacy/deeds_lab/eea39639334ac3509c76ab27acb1dfdfb9ff8195/file-index.arrow"
+  },
+  "include_paths": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.py",
+    "**/*.md",
+    "**/*.txt",
+    "**/*.json",
+    "**/*.sql",
+    "**/*.svelte"
+  ],
+  "exclude_paths": [
+    ".git/**",
+    "node_modules/**",
+    ".svelte-kit/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "**/.cache/**"
+  ],
+  "indexing": {
+    "domain_classification": true,
+    "ontology_classification": true,
+    "lexical_owner": "QDRANT_BM25_IDF",
+    "semantic_projection": "semantic_768",
+    "ast_when_supported": true,
+    "hydrate_on_demand": true,
+    "exact_source_promotion_required": true
+  },
+  "status": "SOURCE_PINNED_UPLOAD_PENDING",
+  "notes": [
+    "This file pins the source revision and intended object keys only; it does not claim that SeaweedFS objects already exist.",
+    "After upload, materialize atlas.legacy-repository-archive-manifest.v1 with observed SHA-256 checksums and content lengths.",
+    "The archived repository is historical evidence and must not become current-worktree canonical authority."
+  ],
+  "canonical_authority": false
+}
