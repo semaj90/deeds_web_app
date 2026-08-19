@@ -47,6 +47,7 @@ export type RepairEvidenceEvaluation = {
     graphRevision: string;
     featureRevision: string;
     fullyRevisionAlignedExactEvidence: boolean;
+    revisionAlignedExactPacketKeys: string[];
     unresolvedRevisionFields: string[];
   };
   dryRunAllowed: boolean;
@@ -363,11 +364,16 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
           sourceRef: candidate.sourceRef,
         })))
       : [];
-    const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
-      && exactEvidenceResolutions.some((resolution) =>
+    const revisionAlignedExactPacketKeys = [...new Set(exactEvidenceResolutions
+      .filter((resolution) =>
         (resolution.status === 'EXACT_PACKET_KEY' || resolution.status === 'UNIQUE_SOURCE_REF')
-        && resolution.sourceRevision === observedSourceRevision,
-      );
+        && resolution.sourceRevision === observedSourceRevision
+        && resolution.packetKey != null,
+      )
+      .map((resolution) => resolution.packetKey as string))]
+      .sort((a, b) => a.localeCompare(b));
+    const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
+      && revisionAlignedExactPacketKeys.length > 0;
     const unresolvedRevisionFields = [
       ['workspaceRevision', observedWorkspaceRevision],
       ['sourceRevision', observedSourceRevision],
@@ -389,7 +395,10 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ...(fullyRevisionAlignedExactEvidence
         ? ['EXACT_EVIDENCE_CANONICAL_REVISION_PROOF_ALIGNED']
         : ['EXACT_EVIDENCE_CANONICAL_REVISION_PROOF_NOT_ALIGNED']),
-      `EXACT_EVIDENCE_CANONICAL_REVISION_PROOFS:${exactEvidenceResolutions.length}`,
+      `EXACT_EVIDENCE_CANONICAL_REVISION_PROOFS:${revisionAlignedExactPacketKeys.length}`,
+      ...(revisionAlignedExactPacketKeys.length
+        ? [`EXACT_EVIDENCE_REVISION_ALIGNED_PACKET_KEYS:${revisionAlignedExactPacketKeys.join(',')}`]
+        : []),
       ...(unresolvedRevisionFields.length
         ? [`UNRESOLVED_REVISIONS:${unresolvedRevisionFields.join(',')}`]
         : ['ALL_REQUEST_REVISIONS_RESOLVED']),
@@ -442,6 +451,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         graphRevision: observedGraphRevision,
         featureRevision: observedFeatureRevision,
         fullyRevisionAlignedExactEvidence,
+        revisionAlignedExactPacketKeys,
         unresolvedRevisionFields,
       },
       dryRunAllowed,
