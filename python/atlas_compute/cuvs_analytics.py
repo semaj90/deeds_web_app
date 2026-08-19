@@ -39,6 +39,8 @@ class CuvsPairwiseReceipt:
     rows_b: int
     dimensions: int
     metric: str
+    cuvs_metric: str
+    postprocess: str
     distances_checksum: str
     canonical_authority: bool
 
@@ -135,6 +137,13 @@ def run_cuvs_pairwise_distance(
     *,
     metric: Metric = "sqeuclidean",
 ):
+    """Compute cuVS pairwise distances with an explicit Atlas metric mapping.
+
+    The stable Python pairwise API documents ``euclidean`` rather than a
+    ``sqeuclidean`` spelling. Atlas therefore computes Euclidean through cuVS
+    and squares it when the higher-level contract requests squared L2.
+    """
+
     import cupy as cp
     from cuvs.distance import pairwise_distance
 
@@ -144,7 +153,10 @@ def run_cuvs_pairwise_distance(
         raise ValueError("pairwise matrices must share dimensions")
     left_gpu = cp.asarray(left)
     right_gpu = cp.asarray(right)
-    distances = pairwise_distance(left_gpu, right_gpu, metric=metric)
+    cuvs_metric = "euclidean" if metric == "sqeuclidean" else metric
+    distances = pairwise_distance(left_gpu, right_gpu, metric=cuvs_metric)
+    if metric == "sqeuclidean":
+        distances = distances * distances
     cp.cuda.Stream.null.synchronize()
     host = cp.asnumpy(distances).astype(np.float32, copy=False)
     receipt = CuvsPairwiseReceipt(
@@ -153,6 +165,8 @@ def run_cuvs_pairwise_distance(
         rows_b=int(right.shape[0]),
         dimensions=int(left.shape[1]),
         metric=metric,
+        cuvs_metric=cuvs_metric,
+        postprocess="square_distance" if metric == "sqeuclidean" else "none",
         distances_checksum=_checksum(host),
         canonical_authority=False,
     )
@@ -178,13 +192,20 @@ def run_cuvs_all_neighbors(
     params = all_neighbors.AllNeighborsParams(algo=algorithm, metric=metric)
     indices_buffer = cp.empty((source.shape[0], top_k), dtype=cp.int64)
     distances_buffer = cp.empty((source.shape[0], top_k), dtype=cp.float32)
-    indices, distances, _ = all_neighbors.build(
+    result = all_neighbors.build(
         x,
         top_k,
         params,
         indices=indices_buffer,
         distances=distances_buffer,
     )
+    # Current Python builds return indices/distances/core_distances, while the
+    # caller-provided buffers are the durable output contract. Prefer returned
+    # objects when present but remain compatible with an in-place wrapper.
+    if isinstance(result, tuple) and len(result) >= 2:
+        indices, distances = result[0], result[1]
+    else:
+        indices, distances = indices_buffer, distances_buffer
     cp.cuda.Stream.null.synchronize()
     neighbors_host = cp.asnumpy(indices).astype(np.int64, copy=False)
     distances_host = cp.asnumpy(distances).astype(np.float32, copy=False)
