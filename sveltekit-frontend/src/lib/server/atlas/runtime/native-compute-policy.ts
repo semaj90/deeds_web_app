@@ -25,6 +25,10 @@ export type NativeOperation =
   | 'PCA'
   | 'PAGERANK'
   | 'PPR'
+  | 'GRAPH_BFS'
+  | 'GRAPH_SSSP'
+  | 'GRAPH_GREEDY_BEST_FIRST'
+  | 'GRAPH_ASTAR_REFERENCE'
   | 'KNN_EXACT'
   | 'KNN_ANN'
   | 'GNN_INFER'
@@ -89,6 +93,17 @@ function denseDtype(req: NativeComputeRequest): Pick<NativeComputeDecision, 'dty
  *
  * Runtime choice is operational only. Windows and WSL2 must consume the same
  * revisioned inputs and are judged against the same independent reference.
+ *
+ * Graph-search rule:
+ * - cuGraph owns accelerated BFS/SSSP/PageRank/PPR on bounded graph projections.
+ * - Greedy best-first and A* remain reference/helper algorithms unless a dedicated
+ *   accelerated implementation is separately proven.
+ * - A* may only be selected by the higher-level graph-search policy when its
+ *   heuristic is proven admissible for the optimized path cost.
+ *
+ * Semantic-search rule:
+ * - KNN_EXACT/cuVS brute force is a smoke/parity oracle only. Production semantic
+ *   seeding is owned by Qdrant or a proven CAGRA hot shard outside this function.
  */
 export function chooseNativeComputeExecutor(
   req: NativeComputeRequest,
@@ -98,25 +113,74 @@ export function chooseNativeComputeExecutor(
   const wsl = envs.find((env) => env.runtime === 'wsl2');
   const dense = denseDtype(req);
 
-  if (req.operation === 'PAGERANK' || req.operation === 'PPR') {
+  if (req.operation === 'PAGERANK' || req.operation === 'PPR' || req.operation === 'GRAPH_BFS' || req.operation === 'GRAPH_SSSP') {
     if (fits(wsl, req.requiredGpuBytes) && wsl.cugraph) {
-      return { runtime: 'wsl2', executor: 'cugraph', dtype: 'fp32', accumulationDtype: 'fp32', environmentReceiptId: wsl.receiptId, reason: 'bounded GPU graph execution via cuGraph; NetworkX/CPU remains oracle' };
+      return {
+        runtime: 'wsl2',
+        executor: 'cugraph',
+        dtype: 'fp32',
+        accumulationDtype: 'fp32',
+        environmentReceiptId: wsl.receiptId,
+        reason: `${req.operation} uses bounded cuGraph execution; NetworkX/CPU remains the readable oracle`,
+      };
     }
-    return { runtime: 'cpu-only', executor: 'cpu', dtype: 'fp64', accumulationDtype: 'fp64', environmentReceiptId: null, reason: 'graph GPU environment not proven; fall back to reference-compatible CPU graph path' };
+    return {
+      runtime: 'cpu-only',
+      executor: 'cpu',
+      dtype: 'fp64',
+      accumulationDtype: 'fp64',
+      environmentReceiptId: null,
+      reason: `${req.operation} GPU environment not proven; use reference-compatible CPU/NetworkX graph path`,
+    };
+  }
+
+  if (req.operation === 'GRAPH_GREEDY_BEST_FIRST') {
+    return {
+      runtime: 'cpu-only',
+      executor: 'cpu',
+      dtype: 'fp64',
+      accumulationDtype: 'fp64',
+      environmentReceiptId: null,
+      reason: 'greedy best-first is a deterministic relevance helper over an already-bounded frontier; no dedicated GPU owner is proven',
+    };
+  }
+
+  if (req.operation === 'GRAPH_ASTAR_REFERENCE') {
+    return {
+      runtime: 'cpu-only',
+      executor: 'cpu',
+      dtype: 'fp64',
+      accumulationDtype: 'fp64',
+      environmentReceiptId: null,
+      reason: 'A* remains a reference-only shortest-path helper and requires an independently proven admissible heuristic',
+    };
   }
 
   if (req.operation === 'KNN_EXACT') {
     if (fits(wsl, req.requiredGpuBytes) && wsl.cuvs) {
-      return { runtime: 'wsl2', executor: 'cuvs-exact', ...dense, environmentReceiptId: wsl.receiptId, reason: 'cuVS brute force exact executor available in WSL2' };
+      return {
+        runtime: 'wsl2',
+        executor: 'cuvs-exact',
+        ...dense,
+        environmentReceiptId: wsl.receiptId,
+        reason: 'cuVS brute force exact oracle available for smoke/parity/Recall@K tests only; not a production semantic seed executor',
+      };
     }
-    return { runtime: 'cpu-only', executor: 'cpu', dtype: 'fp32', accumulationDtype: 'fp32', environmentReceiptId: null, reason: 'cuVS exact unavailable; use CPU exact oracle' };
+    return {
+      runtime: 'cpu-only',
+      executor: 'cpu',
+      dtype: 'fp32',
+      accumulationDtype: 'fp32',
+      environmentReceiptId: null,
+      reason: 'cuVS exact unavailable; use CPU exact oracle for tests only',
+    };
   }
 
   if (req.operation === 'KNN_ANN') {
     if (fits(wsl, req.requiredGpuBytes) && wsl.cuvs) {
-      return { runtime: 'wsl2', executor: 'cagra', ...dense, environmentReceiptId: wsl.receiptId, reason: 'CAGRA is the proven hot GPU ANN executor' };
+      return { runtime: 'wsl2', executor: 'cagra', ...dense, environmentReceiptId: wsl.receiptId, reason: 'CAGRA is an ANN executor for a proven resident hot shard; higher-level seed policy decides whether that shard is eligible' };
     }
-    return { runtime: 'cpu-only', executor: 'cpu', dtype: 'fp32', accumulationDtype: 'fp32', environmentReceiptId: null, reason: 'GPU ANN unavailable; external persistent/cold search owner must handle the semantic lane' };
+    return { runtime: 'cpu-only', executor: 'cpu', dtype: 'fp32', accumulationDtype: 'fp32', environmentReceiptId: null, reason: 'GPU ANN unavailable; Qdrant/external persistent search owner must handle the production semantic lane' };
   }
 
   if (req.operation === 'GNN_INFER') {
