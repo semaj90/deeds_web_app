@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeRelationshipProjectionHashV3 } from './graph-projection-manifest.js';
 import { computeGraphProjectionSnapshotHashV1 } from './graph-projection-snapshot-v1.js';
-import { buildPageRankCrossExecutorParityReceiptV2 } from './pagerank-cross-executor-parity.js';
+import { buildPageRankCrossExecutorProofV1 } from './pagerank-cross-executor-proof.js';
 import {
 	assertCanonicalPageRankExecutorQualified,
 	qualifyCugraphFromFrozenParity,
@@ -16,9 +16,8 @@ function fixture() {
 	};
 	const projectionHash = computeRelationshipProjectionHashV3(relationships);
 	const projection = {
-		schema: 'atlas.graph-projection-manifest.v3' as const,
-		projectionRevision: 'projection-v3-test', graphRevision: 'graph-rev-test', projectionName: 'atlas_dependency_test',
-		nodeLabels: ['CodebaseFile'], relationships, projectionHash, nodeCount: 3, relationshipCount: 2,
+		schema: 'atlas.graph-projection-manifest.v3' as const, projectionRevision: 'projection-v3-test', graphRevision: 'graph-rev-test',
+		projectionName: 'atlas_dependency_test', nodeLabels: ['CodebaseFile'], relationships, projectionHash, nodeCount: 3, relationshipCount: 2,
 		createdAt: '2026-08-19T20:00:00.000Z',
 	};
 	const parityManifest = {
@@ -64,6 +63,44 @@ const identicalScores = [
 	{ parityNodeKey: 'tree:a', score: 0.6 }, { parityNodeKey: 'tree:b', score: 0.3 }, { parityNodeKey: 'packet:c', score: 0.1 },
 ] as const;
 
+function executionReceipt(
+	executorId: 'NEO4J_GDS' | 'CUGRAPH',
+	snapshot: ReturnType<typeof fixture>['snapshot'],
+	rawOutputHash: string,
+) {
+	const common = {
+		algorithm: 'pagerank' as const, parityCoordinate: 'graph_node_key' as const,
+		graphRevision: snapshot.projection.graphRevision, projectionRevision: snapshot.projection.projectionRevision,
+		projectionHash: snapshot.projection.projectionHash, projectionName: snapshot.projection.projectionName,
+		projectionSnapshotHash: snapshot.contentHash, nodeCount: 3, relationshipCount: 2, relationshipTypes: ['IMPORTS'],
+		weighted: true, dampingFactor: 0.85, maxIterations: 100, tolerance: 1e-8,
+		convergenceStatus: 'CONVERGED', ranIterations: null, rawOutputHash, readMillis: 1, computeMillis: 2, scoresOut: 'scores.ndjson',
+	};
+	const data = executorId === 'NEO4J_GDS'
+		? { ...common, executorId, role: 'REFERENCE_EXECUTOR' as const, executionMode: 'STREAM_ON_CONSTRUCTED_DATAFRAME_GRAPH' as const, graphConstructMillis: 1 }
+		: { ...common, executorId, role: 'GPU_CHALLENGER' as const, failOnNonconvergence: false, graphBuildMillis: 1 };
+	return {
+		receipt_id: `receipt-${executorId.toLowerCase()}`, receipt_kind: executorId === 'NEO4J_GDS' ? 'GRAPH_PAGERANK_NEO4J_GDS_EXECUTED' as const : 'GRAPH_PAGERANK_CUGRAPH_EXECUTED' as const,
+		producer_id: 'run_fabric_benchmark.py' as const, producer_revision: '2026-08-19.graph-pagerank-v3',
+		started_at: '2026-08-19T20:02:00Z', completed_at: '2026-08-19T20:03:00Z', input_hash: '1'.repeat(64), output_hash: '2'.repeat(64),
+		workspace_revision: null, source_revision: null, graph_revision: snapshot.projection.graphRevision,
+		representation_revision: 'graph-pagerank-raw-v2' as const, status: 'EXECUTED' as const, data,
+	};
+}
+
+function verifiedProof(plan: ReturnType<typeof fixture>['plan'], snapshot: ReturnType<typeof fixture>['snapshot']) {
+	const referenceHash = 'a'.repeat(64);
+	const challengerHash = 'b'.repeat(64);
+	return buildPageRankCrossExecutorProofV1({
+		plan, snapshot,
+		referenceExecutionReceipt: executionReceipt('NEO4J_GDS', snapshot, referenceHash),
+		challengerExecutionReceipt: executionReceipt('CUGRAPH', snapshot, challengerHash),
+		referenceScoreSet: { scores: [...identicalScores], rawOutputHash: referenceHash, rowCount: 3 },
+		challengerScoreSet: { scores: [...identicalScores], rawOutputHash: challengerHash, rowCount: 3 },
+		producerRevision: 'proof-test-v1', generatedAt: '2026-08-19T20:04:00.000Z',
+	});
+}
+
 describe('cuGraph PageRank qualification', () => {
 	it('does not promote the legacy NetworkX↔cuGraph PASS by itself', () => {
 		const { snapshot, plan } = fixture();
@@ -72,40 +109,38 @@ describe('cuGraph PageRank qualification', () => {
 		expect(() => assertCanonicalPageRankExecutorQualified(qualification)).toThrow(/not canonical-eligible/);
 	});
 
-	it('promotes only with derived exact-plan Neo4j↔cuGraph parity', () => {
+	it('promotes only with the execution-bound exact-plan proof', () => {
 		const { snapshot, plan } = fixture();
-		const parity = buildPageRankCrossExecutorParityReceiptV2({
-			plan, snapshot, referenceExecutorId: 'NEO4J_GDS', challengerExecutorId: 'CUGRAPH',
-			referenceScores: identicalScores, challengerScores: identicalScores, topK: 3,
-			producerRevision: 'parity-test-v2', generatedAt: '2026-08-19T20:03:00.000Z',
-		});
+		const proof = verifiedProof(plan, snapshot);
 		const qualification = qualifyCugraphFromFrozenParity({
-			plan, snapshot, legacyParityReceipt: legacyReceipt(snapshot), canonicalReferenceParityReceipt: parity, producerRevision: 'test-v1',
+			plan, snapshot, legacyParityReceipt: legacyReceipt(snapshot), canonicalReferenceParityProof: proof, producerRevision: 'test-v1',
 		});
-		expect(parity.status).toBe('PASS');
-		expect(parity.parityCoordinate).toBe('graph_node_key');
+		expect(proof.parityReceipt.status).toBe('PASS');
 		expect(qualification.status).toBe('CANONICAL_ELIGIBLE');
-		expect(qualification.parameterHash).toBe(parity.parameterHash);
+		expect(qualification.parameterHash).toBe(proof.parameterHash);
 	});
 
-	it('rejects reusing a PASS for changed PageRank parameters', () => {
+	it('rejects reusing a proof for changed PageRank parameters', () => {
 		const { snapshot, plan } = fixture();
-		const parity = buildPageRankCrossExecutorParityReceiptV2({
-			plan, snapshot, referenceExecutorId: 'NEO4J_GDS', challengerExecutorId: 'CUGRAPH',
-			referenceScores: identicalScores, challengerScores: identicalScores, producerRevision: 'parity-test-v2',
-		});
+		const proof = verifiedProof(plan, snapshot);
 		const changedPlan = { ...plan, parameters: { ...plan.parameters, dampingFactor: 0.9 } };
 		const qualification = qualifyCugraphFromFrozenParity({
-			plan: changedPlan, snapshot, legacyParityReceipt: legacyReceipt(snapshot), canonicalReferenceParityReceipt: parity, producerRevision: 'test-v1',
+			plan: changedPlan, snapshot, legacyParityReceipt: legacyReceipt(snapshot), canonicalReferenceParityProof: proof, producerRevision: 'test-v1',
 		});
 		expect(qualification.status).toBe('PROJECTION_LINEAGE_PROVEN');
 		expect(qualification.canonicalReferenceParityProven).toBe(false);
 	});
 
-	it('keeps legacy math parity separate from V3 lineage', () => {
+	it('rejects a score artifact whose raw bytes do not match its worker receipt', () => {
 		const { snapshot, plan } = fixture();
-		const legacy = { ...legacyReceipt(snapshot), graphRevision: 'other-graph-revision' };
-		const qualification = qualifyCugraphFromFrozenParity({ plan, snapshot, legacyParityReceipt: legacy, producerRevision: 'test-v1' });
-		expect(qualification.status).toBe('MATH_PARITY_PROVEN');
+		const referenceHash = 'a'.repeat(64);
+		expect(() => buildPageRankCrossExecutorProofV1({
+			plan, snapshot,
+			referenceExecutionReceipt: executionReceipt('NEO4J_GDS', snapshot, referenceHash),
+			challengerExecutionReceipt: executionReceipt('CUGRAPH', snapshot, 'b'.repeat(64)),
+			referenceScoreSet: { scores: [...identicalScores], rawOutputHash: 'c'.repeat(64), rowCount: 3 },
+			challengerScoreSet: { scores: [...identicalScores], rawOutputHash: 'b'.repeat(64), rowCount: 3 },
+			producerRevision: 'proof-test-v1',
+		})).toThrow(/artifact hash/);
 	});
 });
