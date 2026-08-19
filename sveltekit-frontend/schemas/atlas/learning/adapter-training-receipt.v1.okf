@@ -1,0 +1,66 @@
+schema_id: atlas.adapter-training-receipt
+schema_version: 1
+schema_kind: model_training_receipt
+status: ACTIVE
+
+description: >
+  Receipt for an offline PEFT/LoRA/QLoRA adapter training run. The receipt binds
+  the adapter artifact to its exact base model, tokenizer, dataset snapshot,
+  trainable modules/ranks, memory envelope, and observed metrics.
+
+fields:
+  schema: { type: literal, value: atlas.adapter-training-receipt.v1 }
+  receiptId: { type: string, required: true }
+  adapterId: { type: string, required: true }
+  adapterRevision: { type: string, required: true }
+  adapterChecksum: { type: string, required: true }
+  status:
+    type: enum
+    values: [SUCCEEDED, FAILED, BLOCKED]
+  trainingObjective:
+    type: enum
+    values: [SFT, DPO, PPO, REWARD_MODELING]
+  peftMethod:
+    type: enum
+    values: [LORA, QLORA, OTHER]
+  baseModel:
+    type: object
+    fields:
+      modelId: { type: string, required: true }
+      modelRevision: { type: string, required: true }
+      architecture: { type: string, required: true }
+      trainableCheckpointChecksum: { type: string, required: true }
+      servedGgufChecksum: { type: string, nullable: true }
+      tokenizerRevision: { type: string, required: true }
+      chatTemplateRevision: { type: string, required: true }
+  datasetSnapshotId: { type: string, required: true }
+  datasetChecksum: { type: string, required: true }
+  seed: { type: string, required: true }
+  selectedModules: { type: string_array, default: [] }
+  actualRanks: { type: integer_array, default: [] }
+  trainableParameterCount: { type: integer, minimum: 0 }
+  quantizationMode: { type: string, required: true }
+  gradientCheckpointingMode: { type: string, required: true }
+  runtimeExecutor:
+    type: enum
+    values: [TRANSFORMERS_PEFT, DEEPSPEED]
+  runtimeConfigRef: { type: string, nullable: true }
+  environmentReceiptId: { type: string, required: true }
+  memory:
+    type: object
+    fields:
+      peakGpuBytes: { type: integer, minimum: 0, nullable: true }
+      peakHostBytes: { type: integer, minimum: 0, nullable: true }
+      nvmeOffloadBytes: { type: integer, minimum: 0, nullable: true }
+  trainingMetrics: { type: json, required: true }
+  validationMetrics: { type: json, required: true }
+  startedAt: { type: datetime, required: true }
+  finishedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - the served GGUF checksum is inference provenance only and MUST NOT be used as the trainable checkpoint checksum
+  - QLORA requires a compatible trainable checkpoint plus quantized frozen base weights and trainable adapter parameters
+  - selectedModules and actualRanks must correspond to the proved base architecture
+  - DEEPSPEED is an executor choice only; it does not change the training objective or adapter identity
+  - a SUCCEEDED receipt requires a non-empty adapterChecksum, datasetChecksum, and trainableCheckpointChecksum
