@@ -1,0 +1,47 @@
+schema_id: atlas.mtp-state-policy
+schema_version: 1
+schema_kind: decode_policy
+status: EXPERIMENTAL
+
+description: >
+  Tang-inspired adaptive decode policy for speculative/MTP execution. Uses
+  observed acceptance/reuse/resource signals to choose draft depth and cache
+  residency/codec hints. Target verification remains authoritative.
+
+fields:
+  schema: { type: literal, value: atlas.mtp-state-policy.v1 }
+  policyRevision: { type: string, required: true }
+  requestId: { type: string, required: true }
+  executor:
+    type: enum
+    values: [llama-server, tensorrt-llm, other]
+  observed:
+    type: object
+    fields:
+      acceptanceEma: { type: number, minimum: 0, maximum: 1 }
+      recentZeroAcceptStreak: { type: integer, minimum: 0 }
+      contextTokens: { type: integer, minimum: 0 }
+      batchSize: { type: integer, minimum: 1 }
+      freeGpuBytes: { type: integer, minimum: 0 }
+      draftLatencyMs: { type: number, minimum: 0, nullable: true }
+      verifyLatencyMs: { type: number, minimum: 0, nullable: true }
+  decision:
+    type: object
+    fields:
+      enabled: { type: boolean }
+      draftLength: { type: integer, minimum: 0 }
+      draftKvTier:
+        type: enum
+        values: [FP16, BF16, Q8, ISOQUANT_4, ISOQUANT_3, TURBOQUANT, POLARQUANT, EVICTABLE]
+      targetKvTier:
+        type: enum
+        values: [FP16, BF16, Q8]
+      reason: { type: string, required: true }
+  canonicalWrites: { type: literal, value: false }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - target-model verification remains authoritative regardless of draft codec or draft length
+  - this policy changes execution cost only; it does not change canonical token semantics
+  - experimental codecs require separate numerical/perplexity/acceptance receipts before production use
+  - Tang theorem runtime claims are forbidden unless l2-sampling and low-rank assumptions are proven
