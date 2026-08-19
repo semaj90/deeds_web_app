@@ -1,8 +1,10 @@
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
-import { embedQueryForLane } from '$lib/server/retrieval/embedding-service.js';
+import { embedSemantic512 } from './semantic-512.js';
 import {
-  QDRANT_SEMANTIC_768_COLLECTION,
-  QDRANT_SEMANTIC_768_VECTOR_NAME,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION,
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+  QDRANT_SEMANTIC_COLLECTION,
+  QDRANT_SEMANTIC_VECTOR_NAME,
 } from './qdrant-semantic-projection.js';
 
 export interface QdrantSemanticScoreV1 {
@@ -15,10 +17,10 @@ export interface QdrantSemanticScoreV1 {
 
 export interface QdrantSemanticScoreReceiptV1 {
   schema: 'atlas.qdrant-semantic-score-receipt.v1';
-  collection: typeof QDRANT_SEMANTIC_768_COLLECTION;
-  vectorName: typeof QDRANT_SEMANTIC_768_VECTOR_NAME;
-  representationId: 'semantic_768';
-  dimension: 768;
+  collection: typeof QDRANT_SEMANTIC_COLLECTION;
+  vectorName: null;
+  representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
+  dimension: typeof ATLAS_CANONICAL_SEMANTIC_DIMENSION;
   requestedPacketKeys: number;
   returnedPacketKeys: number;
   embeddingModel: string;
@@ -30,6 +32,9 @@ export interface QdrantSemanticScoreReceiptV1 {
 /**
  * Score an already-identified bounded candidate set. This function never uses
  * Qdrant point IDs as canonical identity; every result must carry packet_key.
+ * `codebase_chunks_512` is an unnamed-vector collection, so no `using` field is
+ * sent. Query vectors are EmbeddingGemma MRL-512 prefixes with explicit L2
+ * re-normalization before either Qdrant or cuVS sees them.
  */
 export async function scoreQdrantSemanticCandidatesV1(
   query: string,
@@ -40,10 +45,10 @@ export async function scoreQdrantSemanticCandidatesV1(
   if (uniquePacketKeys.length === 0) {
     return {
       schema: 'atlas.qdrant-semantic-score-receipt.v1',
-      collection: QDRANT_SEMANTIC_768_COLLECTION,
-      vectorName: QDRANT_SEMANTIC_768_VECTOR_NAME,
-      representationId: 'semantic_768',
-      dimension: 768,
+      collection: QDRANT_SEMANTIC_COLLECTION,
+      vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
+      representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+      dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
       requestedPacketKeys: 0,
       returnedPacketKeys: 0,
       embeddingModel: 'not-run',
@@ -53,11 +58,10 @@ export async function scoreQdrantSemanticCandidatesV1(
     };
   }
 
-  const embedding = await embedQueryForLane(query, 'dense_768');
+  const embedding = await embedSemantic512(query);
   const client = getQdrantClient();
-  const response = (await client.query(QDRANT_SEMANTIC_768_COLLECTION, {
+  const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {
     query: Array.from(embedding.vector),
-    using: QDRANT_SEMANTIC_768_VECTOR_NAME,
     filter: {
       must: [
         { key: 'packet_key', match: { any: uniquePacketKeys } },
@@ -86,10 +90,10 @@ export async function scoreQdrantSemanticCandidatesV1(
 
   return {
     schema: 'atlas.qdrant-semantic-score-receipt.v1',
-    collection: QDRANT_SEMANTIC_768_COLLECTION,
-    vectorName: QDRANT_SEMANTIC_768_VECTOR_NAME,
-    representationId: 'semantic_768',
-    dimension: 768,
+    collection: QDRANT_SEMANTIC_COLLECTION,
+    vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
+    representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+    dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
     requestedPacketKeys: uniquePacketKeys.length,
     returnedPacketKeys: scores.length,
     embeddingModel: embedding.model,
