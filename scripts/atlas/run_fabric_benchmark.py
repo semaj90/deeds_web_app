@@ -1,19 +1,11 @@
 #!/usr/bin/env python3
-"""
-run_fabric_benchmark.py — Single GPU / graph validation worker
+"""Single GPU / graph validation worker for Parent Atlas.
 
-Supported modes:
-  fp32_exact
-  kmeans_runtime_eval
-  ampere_int4_cache_eval
-  som_runtime_eval
-  graph_pagerank_cugraph
-  graph_pagerank_neo4j_gds
-
-The two graph PageRank modes consume the same GRAPH_SNAPSHOT_PARITY Parquet
-artifact. They emit the same parity-coordinate score shape keyed by
-`graph_node_key`. `graph_node_key` is a deterministic graph coordinate, not a
-canonical packet/symbol identity. Neither mode writes canonical authority.
+Existing benchmark modes remain owned here alongside the two graph PageRank
+parity modes. The graph modes consume the same frozen GRAPH_SNAPSHOT_PARITY
+Parquet artifact and emit score rows keyed by deterministic `graph_node_key`.
+That key is an executor-parity coordinate, not canonical packet/symbol identity.
+Neither graph mode writes canonical authority or source graph data to Neo4j.
 """
 
 import argparse
@@ -21,15 +13,23 @@ import hashlib
 import json
 import os
 import time
+from importlib.metadata import PackageNotFoundError, version as package_version
 
 import numpy as np
 
-from ampere_quantization import pack_int4, unpack_int4, SEMANTIC_DIMENSION
+from ampere_quantization import SEMANTIC_DIMENSION, pack_int4, unpack_int4
 
 
 def sha256_data(data) -> str:
     serialized = json.dumps(data, sort_keys=True).encode("utf-8")
     return hashlib.sha256(serialized).hexdigest()
+
+
+def package_version_or_unknown(name: str) -> str:
+    try:
+        return package_version(name)
+    except PackageNotFoundError:
+        return "UNKNOWN"
 
 
 def get_lineage_envelope(
@@ -63,25 +63,29 @@ def get_lineage_envelope(
     }
 
 
-def run_fp32_exact(reports_dir: str):
+def write_receipt(path: str, receipt: dict) -> None:
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
+
+
+def run_fp32_exact(reports_dir: str) -> None:
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:fp32_exact] Running FP32 exact recovery benchmark...")
     num_packets = 1000
     np.random.seed(42)
     embeddings = np.random.randn(num_packets, SEMANTIC_DIMENSION).astype(np.float32)
-    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-    embeddings = embeddings / np.maximum(norms, 1e-9)
+    embeddings /= np.maximum(np.linalg.norm(embeddings, axis=1, keepdims=True), 1e-9)
     packet_keys = [f"packet:{i:012x}" for i in range(num_packets)]
     query_vec = embeddings[42] + np.random.randn(SEMANTIC_DIMENSION).astype(np.float32) * 0.01
     query_vec /= np.linalg.norm(query_vec)
     sims = np.dot(embeddings, query_vec)
     top_idx = int(np.argmax(sims))
-    recovered_key = packet_keys[top_idx]
     domain_data = {
         "num_packets": num_packets,
         "dimension": SEMANTIC_DIMENSION,
         "target_packet_key": packet_keys[42],
-        "recovered_packet_key": recovered_key,
+        "recovered_packet_key": packet_keys[top_idx],
         "t3a_parity_matched": top_idx == 42,
         "t3a_exact_score": float(sims[top_idx]),
         "brute_force_latency_ms": 1.45,
@@ -96,12 +100,11 @@ def run_fp32_exact(reports_dir: str):
         domain_data,
     )
     out_file = os.path.join(reports_dir, "gpu-fp32-exact-receipt.json")
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
+    write_receipt(out_file, receipt)
     print(f"[run_fabric_benchmark:fp32_exact] SUCCESS! Receipt written to {out_file}")
 
 
-def run_kmeans_eval(reports_dir: str):
+def run_kmeans_eval(reports_dir: str) -> None:
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:kmeans_eval] Running KMeans runtime routing evaluation...")
     domain_data = {
@@ -122,12 +125,11 @@ def run_kmeans_eval(reports_dir: str):
         domain_data,
     )
     out_file = os.path.join(reports_dir, "gpu-kmeans-runtime-receipt.json")
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
+    write_receipt(out_file, receipt)
     print(f"[run_fabric_benchmark:kmeans_eval] SUCCESS! Receipt written to {out_file}")
 
 
-def run_int4_eval(reports_dir: str):
+def run_int4_eval(reports_dir: str) -> None:
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:int4_eval] Running Ampere INT4 pack/dequant evaluation...")
     np.random.seed(42)
@@ -154,12 +156,11 @@ def run_int4_eval(reports_dir: str):
         domain_data,
     )
     out_file = os.path.join(reports_dir, "gpu-ampere-int4-receipt.json")
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
+    write_receipt(out_file, receipt)
     print(f"[run_fabric_benchmark:int4_eval] SUCCESS! Receipt written to {out_file}")
 
 
-def run_som_eval(reports_dir: str):
+def run_som_eval(reports_dir: str) -> None:
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:som_eval] Running SOM 20x20 recall and coverage evaluation...")
     domain_data = {
@@ -183,12 +184,11 @@ def run_som_eval(reports_dir: str):
         domain_data,
     )
     out_file = os.path.join(reports_dir, "gpu-som-runtime-receipt.json")
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
+    write_receipt(out_file, receipt)
     print(f"[run_fabric_benchmark:som_eval] SUCCESS! Receipt written to {out_file}")
 
 
-def validate_graph_args(args, mode: str):
+def validate_graph_args(args, mode: str) -> None:
     required = {
         "nodes": args.nodes,
         "edges": args.edges,
@@ -231,7 +231,7 @@ def open_score_output(path):
     return open(path, "w", encoding="utf-8")
 
 
-def write_parity_score(handle, score_hash, parity_node_key: str, node_ordinal: int, score: float):
+def write_parity_score(handle, score_hash, parity_node_key: str, node_ordinal: int, score: float) -> None:
     if not parity_node_key:
         raise ValueError(f"missing graph_node_key for ordinal {node_ordinal}")
     if not np.isfinite(score) or score < 0.0:
@@ -247,7 +247,14 @@ def write_parity_score(handle, score_hash, parity_node_key: str, node_ordinal: i
         handle.write(encoded + "\n")
 
 
-def build_graph_receipt(args, reports_dir: str, receipt_kind: str, executor_id: str, started_at: str, domain_data: dict):
+def build_graph_receipt(
+    args,
+    reports_dir: str,
+    receipt_kind: str,
+    executor_id: str,
+    started_at: str,
+    domain_data: dict,
+) -> None:
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     receipt = get_lineage_envelope(
         receipt_kind,
@@ -259,17 +266,46 @@ def build_graph_receipt(args, reports_dir: str, receipt_kind: str, executor_id: 
         graph_revision=args.graph_revision,
         representation_revision="graph-pagerank-raw-v2",
         status="EXECUTED",
-        producer_revision="2026-08-19.graph-pagerank-v3",
+        producer_revision="2026-08-19.graph-pagerank-v4",
     )
     default_name = f"graph-pagerank-{executor_id.lower().replace('_', '-')}-execution-receipt.json"
     out_file = args.receipt_out or os.path.join(reports_dir, default_name)
-    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
+    write_receipt(out_file, receipt)
     print(json.dumps(receipt, sort_keys=True))
 
 
-def run_graph_pagerank_cugraph(args, reports_dir: str):
+def validate_frozen_tables(nodes, edges, *, pandas_mode: bool) -> tuple[int, int]:
+    node_count = len(nodes)
+    edge_count = len(edges)
+    if node_count <= 0:
+        raise ValueError("frozen projection contains no nodes")
+
+    if pandas_mode:
+        nodes.sort_values("gpu_node_id", inplace=True)
+        nodes.reset_index(drop=True, inplace=True)
+        expected_ids = np.arange(node_count, dtype=np.int64)
+        actual_ids = nodes["gpu_node_id"].to_numpy(dtype=np.int64)
+        if not np.array_equal(actual_ids, expected_ids):
+            raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
+        if nodes["graph_node_key"].isna().any() or nodes["graph_node_key"].nunique() != node_count:
+            raise ValueError("graph_node_key must be present and unique for every parity node")
+    else:
+        ids = nodes["gpu_node_id"]
+        if int(ids.nunique()) != node_count or int(ids.min()) != 0 or int(ids.max()) != node_count - 1:
+            raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
+        if nodes["graph_node_key"].isnull().any() or int(nodes["graph_node_key"].nunique()) != node_count:
+            raise ValueError("graph_node_key must be present and unique for every parity node")
+
+    if edge_count <= 0:
+        raise ValueError("selected relationshipTypes produced no edges; fail closed")
+    if int(edges["src_gpu_node_id"].min()) < 0 or int(edges["dst_gpu_node_id"].min()) < 0:
+        raise ValueError("negative edge endpoint")
+    if int(edges["src_gpu_node_id"].max()) >= node_count or int(edges["dst_gpu_node_id"].max()) >= node_count:
+        raise ValueError("edge endpoint outside node range")
+    return node_count, edge_count
+
+
+def run_graph_pagerank_cugraph(args, reports_dir: str) -> None:
     validate_graph_args(args, "graph_pagerank_cugraph")
     try:
         import cudf
@@ -286,29 +322,14 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     )
     edges = edges[edges["edge_type"].isin(args.relationship_type)]
     read_ms = (time.perf_counter() - read_started) * 1000.0
-
-    node_count = len(nodes)
-    edge_count = len(edges)
-    if node_count <= 0:
-        raise ValueError("frozen projection contains no nodes")
-    ids = nodes["gpu_node_id"]
-    if int(ids.nunique()) != node_count or int(ids.min()) != 0 or int(ids.max()) != node_count - 1:
-        raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
-    if int(nodes["graph_node_key"].nunique()) != node_count:
-        raise ValueError("graph_node_key must be present and unique for every parity node")
-    if edge_count <= 0:
-        raise ValueError("selected relationshipTypes produced no edges; fail closed")
-    if int(edges["src_gpu_node_id"].min()) < 0 or int(edges["dst_gpu_node_id"].min()) < 0:
-        raise ValueError("negative edge endpoint")
-    if int(edges["src_gpu_node_id"].max()) >= node_count or int(edges["dst_gpu_node_id"].max()) >= node_count:
-        raise ValueError("edge endpoint outside node range")
+    node_count, edge_count = validate_frozen_tables(nodes, edges, pandas_mode=False)
 
     build_started = time.perf_counter()
     graph = cugraph.Graph(directed=True)
     graph_kwargs = {
         "source": "src_gpu_node_id",
         "destination": "dst_gpu_node_id",
-        "vertices": ids,
+        "vertices": nodes["gpu_node_id"],
         "renumber": False,
         "store_transposed": True,
     }
@@ -341,11 +362,19 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     score_hash = hashlib.sha256()
     output_handle = open_score_output(args.scores_out)
     try:
-        for expected_ordinal, (score_row, node_row) in enumerate(zip(scores_pdf.itertuples(index=False), nodes_pdf.itertuples(index=False))):
+        for expected_ordinal, (score_row, node_row) in enumerate(
+            zip(scores_pdf.itertuples(index=False), nodes_pdf.itertuples(index=False))
+        ):
             node_ordinal = int(score_row.vertex)
             if node_ordinal != expected_ordinal or int(node_row.gpu_node_id) != expected_ordinal:
                 raise ValueError(f"cuGraph/node table ordinal mismatch at {expected_ordinal}")
-            write_parity_score(output_handle, score_hash, str(node_row.graph_node_key), node_ordinal, float(score_row.pagerank))
+            write_parity_score(
+                output_handle,
+                score_hash,
+                str(node_row.graph_node_key),
+                node_ordinal,
+                float(score_row.pagerank),
+            )
     finally:
         if output_handle:
             output_handle.close()
@@ -354,7 +383,12 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
         "executorId": "CUGRAPH",
         "role": "GPU_CHALLENGER",
         "algorithm": "pagerank",
+        "executionMode": "CUGRAPH_HIGH_LEVEL_PAGERANK",
         "parityCoordinate": "graph_node_key",
+        "runtime": {
+            "cugraphVersion": package_version_or_unknown("cugraph-cu13"),
+            "cudfVersion": package_version_or_unknown("cudf-cu13"),
+        },
         "graphRevision": args.graph_revision,
         "projectionRevision": args.projection_revision,
         "projectionHash": args.projection_hash,
@@ -386,7 +420,7 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     )
 
 
-def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
+def run_graph_pagerank_neo4j_gds(args, reports_dir: str) -> None:
     validate_graph_args(args, "graph_pagerank_neo4j_gds")
     try:
         import pandas as pd
@@ -403,24 +437,7 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
     )
     edges = edges[edges["edge_type"].isin(args.relationship_type)].copy()
     read_ms = (time.perf_counter() - read_started) * 1000.0
-
-    nodes = nodes.sort_values("gpu_node_id").reset_index(drop=True)
-    node_count = len(nodes)
-    edge_count = len(edges)
-    if node_count <= 0:
-        raise ValueError("frozen projection contains no nodes")
-    expected_ids = np.arange(node_count, dtype=np.int64)
-    actual_ids = nodes["gpu_node_id"].to_numpy(dtype=np.int64)
-    if not np.array_equal(actual_ids, expected_ids):
-        raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
-    if nodes["graph_node_key"].isna().any() or nodes["graph_node_key"].nunique() != node_count:
-        raise ValueError("graph_node_key must be present and unique for every parity node")
-    if edge_count <= 0:
-        raise ValueError("selected relationshipTypes produced no edges; fail closed")
-    if int(edges["src_gpu_node_id"].min()) < 0 or int(edges["dst_gpu_node_id"].min()) < 0:
-        raise ValueError("negative edge endpoint")
-    if int(edges["src_gpu_node_id"].max()) >= node_count or int(edges["dst_gpu_node_id"].max()) >= node_count:
-        raise ValueError("edge endpoint outside node range")
+    node_count, edge_count = validate_frozen_tables(nodes, edges, pandas_mode=True)
 
     neo4j_uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
     neo4j_user = os.environ.get("NEO4J_USER") or os.environ.get("NEO4J_USERNAME")
@@ -439,6 +456,7 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
         relationship_df["weight"] = edges["weight"].astype(float)
 
     graph_name = f"atlas_parity_{hashlib.sha256(args.projection_snapshot_hash.encode('utf-8')).hexdigest()[:20]}"
+    mutate_property = f"atlas_pr_{hashlib.sha256(graph_input_hash(args).encode('utf-8')).hexdigest()[:16]}"
     graph = None
     try:
         try:
@@ -451,8 +469,7 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
         graph = gds.graph.construct(graph_name, node_df, relationship_df)
         graph_construct_ms = (time.perf_counter() - construct_started) * 1000.0
 
-        compute_started = time.perf_counter()
-        stream_kwargs = {
+        pagerank_kwargs = {
             "dampingFactor": args.damping,
             "maxIterations": args.max_iterations,
             "tolerance": args.tolerance,
@@ -460,24 +477,44 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
             "scaler": "None",
         }
         if args.weighted:
-            stream_kwargs["relationshipWeightProperty"] = "weight"
-        scores = gds.pageRank.stream(graph, **stream_kwargs)
+            pagerank_kwargs["relationshipWeightProperty"] = "weight"
+
+        compute_started = time.perf_counter()
+        mutate_result = gds.pageRank.mutate(
+            graph,
+            mutateProperty=mutate_property,
+            **pagerank_kwargs,
+        )
         compute_ms = (time.perf_counter() - compute_started) * 1000.0
 
-        if "nodeId" not in scores.columns or "score" not in scores.columns:
-            raise ValueError(f"GDS PageRank stream returned unexpected columns: {list(scores.columns)}")
-        scores = scores[["nodeId", "score"]].sort_values("nodeId").reset_index(drop=True)
+        did_converge = bool(mutate_result["didConverge"])
+        ran_iterations = int(mutate_result["ranIterations"])
+        if ran_iterations <= 0:
+            raise ValueError(f"GDS reported invalid ranIterations={ran_iterations}")
+
+        scores = gds.graph.nodeProperty.stream(graph, node_property=mutate_property)
+        if "nodeId" not in scores.columns or "propertyValue" not in scores.columns:
+            raise ValueError(f"GDS nodeProperty.stream returned unexpected columns: {list(scores.columns)}")
+        scores = scores[["nodeId", "propertyValue"]].sort_values("nodeId").reset_index(drop=True)
         if len(scores) != node_count:
             raise ValueError(f"GDS returned {len(scores)} scores for {node_count} nodes")
 
         score_hash = hashlib.sha256()
         output_handle = open_score_output(args.scores_out)
         try:
-            for expected_ordinal, (score_row, node_row) in enumerate(zip(scores.itertuples(index=False), nodes.itertuples(index=False))):
+            for expected_ordinal, (score_row, node_row) in enumerate(
+                zip(scores.itertuples(index=False), nodes.itertuples(index=False))
+            ):
                 node_ordinal = int(score_row.nodeId)
                 if node_ordinal != expected_ordinal or int(node_row.gpu_node_id) != expected_ordinal:
                     raise ValueError(f"GDS/node table ordinal mismatch at {expected_ordinal}")
-                write_parity_score(output_handle, score_hash, str(node_row.graph_node_key), node_ordinal, float(score_row.score))
+                write_parity_score(
+                    output_handle,
+                    score_hash,
+                    str(node_row.graph_node_key),
+                    node_ordinal,
+                    float(score_row.propertyValue),
+                )
         finally:
             if output_handle:
                 output_handle.close()
@@ -486,8 +523,13 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
             "executorId": "NEO4J_GDS",
             "role": "REFERENCE_EXECUTOR",
             "algorithm": "pagerank",
-            "executionMode": "STREAM_ON_CONSTRUCTED_DATAFRAME_GRAPH",
+            "executionMode": "MUTATE_ON_CONSTRUCTED_DATAFRAME_GRAPH",
             "parityCoordinate": "graph_node_key",
+            "runtime": {
+                "graphdatascienceClientVersion": package_version_or_unknown("graphdatascience"),
+                "gdsServerVersion": str(gds.server_version()),
+                "neo4jDatabase": neo4j_database,
+            },
             "graphRevision": args.graph_revision,
             "projectionRevision": args.projection_revision,
             "projectionHash": args.projection_hash,
@@ -500,8 +542,11 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
             "dampingFactor": args.damping,
             "maxIterations": args.max_iterations,
             "tolerance": args.tolerance,
-            "convergenceStatus": "UNKNOWN_STREAM_MODE",
-            "ranIterations": None,
+            "convergenceStatus": "CONVERGED" if did_converge else "NON_CONVERGED",
+            "ranIterations": ran_iterations,
+            "preProcessingMillis": float(mutate_result.get("preProcessingMillis", 0)),
+            "postProcessingMillis": float(mutate_result.get("postProcessingMillis", 0)),
+            "mutateMillis": float(mutate_result.get("mutateMillis", 0)),
             "rawOutputHash": score_hash.hexdigest(),
             "readMillis": read_ms,
             "graphConstructMillis": graph_construct_ms,
@@ -528,7 +573,7 @@ def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
             pass
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Single GPU / graph validation fabric worker")
     parser.add_argument(
         "--mode",
