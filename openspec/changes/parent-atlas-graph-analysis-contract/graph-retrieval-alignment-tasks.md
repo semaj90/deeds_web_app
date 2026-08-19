@@ -73,9 +73,20 @@ This tranche hardens PageRank and graph fanout around the existing Graph Analysi
 - [x] Use the official GDS Python Client DataFrame construction path instead of reconstructing the reference graph from live Neo4j database state.
 - [x] Extend the existing single execution owner `scripts/atlas/run_fabric_benchmark.py`; do not create standalone PageRank GPU/GDS worker scripts.
 - [x] Add `graph_pagerank_cugraph`: read exact frozen parquet, filter selected relationship types, enforce dense ordinals/endpoints, run weighted/unweighted cuGraph PageRank, emit raw score artifact + `EXECUTED` receipt.
-- [x] Add `graph_pagerank_neo4j_gds`: read the same frozen parquet, construct an in-memory GDS graph from pandas `nodeId/sourceNodeId/targetNodeId/relationshipType` frames, run `pageRank.stream`, emit the same parity-coordinate score shape, and drop the in-memory graph in `finally`.
+- [x] Add `graph_pagerank_neo4j_gds`: read the same frozen parquet, construct an in-memory GDS graph from pandas `nodeId/sourceNodeId/targetNodeId/relationshipType` frames, run PageRank `mutate` exactly once, capture `didConverge`/`ranIterations`, stream the temporary mutated property, and drop the in-memory graph in `finally`.
+- [x] Keep GDS mutation inside the temporary graph catalog only; do not use PageRank `write` mode or mutate source Neo4j nodes.
+- [x] Record GDS client version, GDS server version, Neo4j database, cuGraph version, and cuDF version in execution receipts.
+- [x] Require GDS reference convergence before cross-executor proof; reject explicit cuGraph non-convergence.
+- [x] Verify current cuGraph 26.06 semantics: `max_iter` is an enforced maximum-iteration parameter and `fail_on_nonconvergence=false` returns `(pagerank, converged)`; the ignored NetworkX-compatibility parameter is `dangling`, not `max_iter`.
 - [x] Neither graph mode writes Postgres, source Neo4j graph data, Qdrant, or canonical authority.
 - [x] Keep GPU PPR blocked: `graph_node_key` is a parity coordinate, not a canonical PPR seed identity contract.
+
+### Runtime version compatibility
+
+- [x] Audit current Neo4j/GDS compatibility documentation instead of assuming Python-client and server versions map numerically.
+- [x] Current `graphdatascience` client 1.22 supports GDS `>=2.6,<2.28` and `<2026.6`; the repo production compose remains `neo4j:5-community`, whose supported modern GDS line is 2.x (Neo4j 5.26 ↔ GDS 2.13 in the current compatibility matrix).
+- [x] Treat runtime version strings as receipt evidence; do not infer compatibility from package names alone.
+- [ ] Live worker preflight must confirm the installed workstation Python client and server GDS versions are a supported pair before accepting a parity proof.
 
 ### Matched fabric requests
 
@@ -119,12 +130,13 @@ This tranche hardens PageRank and graph fanout around the existing Graph Analysi
 
 - [x] Contract/unit tests now cover projection qualification, algorithm parameters, PPR/global mismatch, executor capability boundaries, legacy simulation rejection, projection-hash sensitivity, fanout qualification, authority normalization, `[C,25]` graph-feature projection, matched fabric request compilation, execution-bound parity proof, and qualification policy.
 - [x] Historical Aug-12 NetworkX↔cuGraph runtime receipt remains valid as backend/math evidence only.
+- [x] Current upstream APIs re-verified on 2026-08-19: GDS DataFrame graph construction, PageRank mutate telemetry, graph node-property streaming, graph drop, `server_version()`, Python-client compatibility matrix, and cuGraph 26.06 PageRank iteration/convergence semantics.
 - [ ] Vitest/tsgo execution of the 2026-08-19 tranche is still required in a checkout with repository dependencies available; this connector session cannot execute the workstation checkout.
 - [ ] Apply/test `graph_analysis_projection_hash_v2.sql` against live Postgres.
 - [ ] Live Neo4j global PageRank plan smoke test.
 - [ ] Live Neo4j personalized PageRank smoke test.
 - [ ] Live bounded fanout receipt proof.
-- [ ] Live GDS DataFrame-construction worker mode proof.
-- [ ] Live cuGraph worker mode proof on the same V3 snapshot/parameters.
+- [ ] Live GDS DataFrame-construction/mutate worker proof, including installed client/server version compatibility.
+- [ ] Live cuGraph worker proof on the same V3 snapshot/parameters.
 - [ ] Live `PageRankCrossExecutorProofV1` + qualification artifact.
 - [ ] Retrieval ablation before any weighting/policy change.
