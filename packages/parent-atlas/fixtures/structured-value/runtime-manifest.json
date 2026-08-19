@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.structured-value-proof-runtime.v1",
+  "node": {
+    "tree-sitter": "0.25.1",
+    "tree-sitter-typescript": "0.23.2",
+    "grammar": "typescript"
+  },
+  "python": {
+    "treesitter-chunker": "4.0.0",
+    "minimum_python": "3.11",
+    "pyarrow_required": true
+  },
+  "policy": {
+    "exact_versions_required_for_proof": true,
+    "missing_runtime_is_blocked_not_failed": true,
+    "regex_fallback_allowed": false,
+    "node_may_mint_consiliency_ids": false,
+    "arrow_is_canonical": false
+  }
+}
