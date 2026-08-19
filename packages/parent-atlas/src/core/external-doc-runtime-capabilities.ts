@@ -61,30 +61,19 @@ export type ExternalDocsHybridProofGateV1 = z.infer<typeof externalDocsHybridPro
 export type ParsedSemver = { major: number; minor: number; patch: number };
 
 export type ExternalDocsShadowCollectionConfigV1 = {
-  vectors: {
-    semantic_768: {
-      size: 768;
-      distance: 'Cosine';
-      memory?: 'cold';
-      on_disk?: true;
-    };
-  };
-  sparse_vectors: {
-    lexical_bm25: {
-      modifier: 'idf';
-      index: {
-        memory?: 'pinned';
-        on_disk?: false;
-      };
-    };
-  };
-  hnsw_config: {
-    memory?: 'cold';
-    on_disk?: true;
-  };
+  vectors: { semantic_768: { size: 768; distance: 'Cosine'; memory?: 'cold'; on_disk?: true } };
+  sparse_vectors: { lexical_bm25: { modifier: 'idf'; index: { memory?: 'pinned'; on_disk?: false } } };
+  hnsw_config: { memory?: 'cold'; on_disk?: true };
   payload?: { memory: 'cold' };
   on_disk_payload?: true;
 };
+
+export type ExternalDocsPayloadIndexPlanV1 = Array<{
+  field_name: 'source_id' | 'source_revision' | 'domain_class' | 'ontology_classes' |
+    'ast_observation_kinds' | 'langextract_classes' | 'language' | 'kmeans_cluster' |
+    'som_cell' | 'document_checksum' | 'chunk_checksum' | 'tags';
+  field_schema: 'keyword' | 'integer' | { type: 'keyword' | 'integer'; memory: 'pinned' | 'cached' };
+}>;
 
 export function parseSemver(value: string): ParsedSemver {
   const match = /^v?(\d+)\.(\d+)\.(\d+)/.exec(value);
@@ -111,11 +100,7 @@ export function deriveQdrantVersionCapabilities(version: string) {
   } as const;
 }
 
-/**
- * Qdrant 1.19+ uses per-structure memory tiers. Atlas keeps the original
- * semantic vectors/HNSW/payload cold and the exact sparse inverted index
- * pinned. Pre-1.19 deployments receive the documented legacy equivalents.
- */
+/** Qdrant 1.19+ uses per-structure memory tiers; older deployments receive legacy equivalents. */
 export function buildExternalDocsShadowCollectionConfig(
   profile: Pick<QdrantExternalDocsCapabilityProfileV1,
     'qdrant_version' | 'supports_sparse_vectors' | 'supports_idf_modifier' | 'supports_memory_tiers_v119'>,
@@ -123,30 +108,50 @@ export function buildExternalDocsShadowCollectionConfig(
   if (!profile.supports_sparse_vectors || !profile.supports_idf_modifier) {
     throw new Error(`QDRANT_SHADOW_UNSUPPORTED:${profile.qdrant_version}`);
   }
-
   if (profile.supports_memory_tiers_v119) {
     return {
-      vectors: {
-        semantic_768: { size: 768, distance: 'Cosine', memory: 'cold' },
-      },
-      sparse_vectors: {
-        lexical_bm25: { modifier: 'idf', index: { memory: 'pinned' } },
-      },
+      vectors: { semantic_768: { size: 768, distance: 'Cosine', memory: 'cold' } },
+      sparse_vectors: { lexical_bm25: { modifier: 'idf', index: { memory: 'pinned' } } },
       hnsw_config: { memory: 'cold' },
       payload: { memory: 'cold' },
     };
   }
-
   return {
-    vectors: {
-      semantic_768: { size: 768, distance: 'Cosine', on_disk: true },
-    },
-    sparse_vectors: {
-      lexical_bm25: { modifier: 'idf', index: { on_disk: false } },
-    },
+    vectors: { semantic_768: { size: 768, distance: 'Cosine', on_disk: true } },
+    sparse_vectors: { lexical_bm25: { modifier: 'idf', index: { on_disk: false } } },
     hnsw_config: { on_disk: true },
     on_disk_payload: true,
   };
+}
+
+/**
+ * Physical payload indexes for filters Atlas actually plans to issue. 1.19+
+ * keeps restrictive identity/revision/checksum indexes pinned and broad tag/class
+ * indexes cached; older servers receive the equivalent un-tiered schemas.
+ */
+export function buildExternalDocsPayloadIndexPlan(
+  profile: Pick<QdrantExternalDocsCapabilityProfileV1, 'supports_memory_tiers_v119'>,
+): ExternalDocsPayloadIndexPlanV1 {
+  const fields: Array<{ field_name: ExternalDocsPayloadIndexPlanV1[number]['field_name']; type: 'keyword' | 'integer'; hot: boolean }> = [
+    { field_name: 'source_id', type: 'keyword', hot: true },
+    { field_name: 'source_revision', type: 'keyword', hot: true },
+    { field_name: 'domain_class', type: 'keyword', hot: false },
+    { field_name: 'ontology_classes', type: 'keyword', hot: false },
+    { field_name: 'ast_observation_kinds', type: 'keyword', hot: false },
+    { field_name: 'langextract_classes', type: 'keyword', hot: false },
+    { field_name: 'language', type: 'keyword', hot: false },
+    { field_name: 'kmeans_cluster', type: 'integer', hot: true },
+    { field_name: 'som_cell', type: 'keyword', hot: true },
+    { field_name: 'document_checksum', type: 'keyword', hot: true },
+    { field_name: 'chunk_checksum', type: 'keyword', hot: true },
+    { field_name: 'tags', type: 'keyword', hot: false },
+  ];
+  return fields.map((field) => ({
+    field_name: field.field_name,
+    field_schema: profile.supports_memory_tiers_v119
+      ? { type: field.type, memory: field.hot ? 'pinned' : 'cached' }
+      : field.type,
+  }));
 }
 
 export function buildExternalDocsHybridProofGate(input: {
