@@ -52,7 +52,7 @@ const GRAPH_DISPATCHER_REGISTRY: readonly GraphDispatcherRegistryEntry[] = [
 	{
 		algorithm: 'pagerank',
 		dispatchKind: 'pagerank-adapter',
-		algorithmRevision: 'neo4j-gds-pagerank-mutate-v1',
+		algorithmRevision: 'neo4j-gds-pagerank-mutate-v2',
 		proofState: 'wired',
 		skipReason: null,
 	},
@@ -65,10 +65,10 @@ const GRAPH_DISPATCHER_REGISTRY: readonly GraphDispatcherRegistryEntry[] = [
 	},
 	{
 		algorithm: 'personalized_pagerank',
-		dispatchKind: 'fail-closed',
-		algorithmRevision: 'unsupported-personalized-pagerank-v1',
-		proofState: 'skipped',
-		skipReason: 'No live dispatcher is wired for personalized_pagerank; fail closed until a concrete adapter exists.',
+		dispatchKind: 'pagerank-adapter',
+		algorithmRevision: 'neo4j-gds-personalized-pagerank-mutate-v1',
+		proofState: 'wired',
+		skipReason: null,
 	},
 	{
 		algorithm: 'louvain',
@@ -131,10 +131,7 @@ export function buildGraphDispatcherRegistrySnapshot(): GraphDispatcherRegistryS
 		extra,
 		duplicateAlgorithms,
 	};
-	const receiptSeed = {
-		entries,
-		completeness,
-	};
+	const receiptSeed = { entries, completeness };
 	return {
 		generatedAt: new Date(0).toISOString(),
 		algorithms: [...algorithms],
