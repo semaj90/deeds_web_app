@@ -49,6 +49,8 @@ export * from './core/structured-value-arrow.js';
 export * from './core/structured-value-parity.js';
 export * from './core/temporal-indexing-fabric.js';
 export * from './core/observation-feature-compiler.js';
+export * from './core/observation-feature-repository.js';
+export * from './core/retrieval-executor-policy.js';
 export * from './core/okf-mcp-surface.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
