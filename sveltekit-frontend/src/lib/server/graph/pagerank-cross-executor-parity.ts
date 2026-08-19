@@ -5,9 +5,13 @@ import { PageRankExecutorIdSchema } from './pagerank-execution-contract.js';
 
 export const PageRankCrossExecutorParityStatusSchema = z.enum(['PASS', 'FAIL']);
 
+/**
+ * Executor-parity coordinate only. `parityNodeKey` is the frozen snapshot's
+ * deterministic `graph_node_key`; it is NOT canonical packet/symbol identity.
+ */
 export const PageRankParityScoreV2Schema = z
 	.object({
-		canonicalId: z.string().min(1),
+		parityNodeKey: z.string().min(1),
 		score: z.number().finite().nonnegative(),
 	})
 	.strict();
@@ -24,6 +28,7 @@ export const PageRankCrossExecutorParityReceiptV2Schema = z
 		projectionHash: z.string().min(1),
 		projectionName: z.string().min(1),
 		projectionSnapshotHash: z.string().min(1),
+		parityCoordinate: z.literal('graph_node_key'),
 		nodeCount: z.number().int().positive(),
 		referenceRawOutputHash: z.string().min(1),
 		challengerRawOutputHash: z.string().min(1),
@@ -84,14 +89,14 @@ export interface PageRankParityThresholdsV2 {
 	maxMeanAbsolutePercentileDelta: number;
 }
 
-function canonicalScores(input: readonly unknown[]): PageRankParityScoreV2[] {
+function parityScores(input: readonly unknown[]): PageRankParityScoreV2[] {
 	const rows = input.map((row) => PageRankParityScoreV2Schema.parse(row));
 	const ids = new Set<string>();
 	for (const row of rows) {
-		if (ids.has(row.canonicalId)) throw new Error(`duplicate PageRank parity canonicalId '${row.canonicalId}'`);
-		ids.add(row.canonicalId);
+		if (ids.has(row.parityNodeKey)) throw new Error(`duplicate PageRank parityNodeKey '${row.parityNodeKey}'`);
+		ids.add(row.parityNodeKey);
 	}
-	return [...rows].sort((a, b) => a.canonicalId.localeCompare(b.canonicalId));
+	return [...rows].sort((a, b) => a.parityNodeKey.localeCompare(b.parityNodeKey));
 }
 
 function hashScores(rows: readonly PageRankParityScoreV2[]): string {
@@ -101,31 +106,31 @@ function hashScores(rows: readonly PageRankParityScoreV2[]): string {
 function l1ById(rows: readonly PageRankParityScoreV2[]): Map<string, number> {
 	const total = rows.reduce((sum, row) => sum + row.score, 0);
 	if (!(total > 0)) throw new Error('PageRank parity requires a positive score sum');
-	return new Map(rows.map((row) => [row.canonicalId, row.score / total]));
+	return new Map(rows.map((row) => [row.parityNodeKey, row.score / total]));
 }
 
 function rankById(rows: readonly PageRankParityScoreV2[]): Map<string, number> {
-	const ordered = [...rows].sort((a, b) => a.score - b.score || a.canonicalId.localeCompare(b.canonicalId));
+	const ordered = [...rows].sort((a, b) => a.score - b.score || a.parityNodeKey.localeCompare(b.parityNodeKey));
 	const ranks = new Map<string, number>();
 	for (let start = 0; start < ordered.length; ) {
 		let end = start + 1;
 		while (end < ordered.length && ordered[end].score === ordered[start].score) end += 1;
 		const averageRank = (start + end - 1) / 2 + 1;
-		for (let index = start; index < end; index += 1) ranks.set(ordered[index].canonicalId, averageRank);
+		for (let index = start; index < end; index += 1) ranks.set(ordered[index].parityNodeKey, averageRank);
 		start = end;
 	}
 	return ranks;
 }
 
 function percentileById(rows: readonly PageRankParityScoreV2[]): Map<string, number> {
-	const ordered = [...rows].sort((a, b) => a.score - b.score || a.canonicalId.localeCompare(b.canonicalId));
+	const ordered = [...rows].sort((a, b) => a.score - b.score || a.parityNodeKey.localeCompare(b.parityNodeKey));
 	const denominator = Math.max(ordered.length - 1, 1);
 	const percentiles = new Map<string, number>();
 	for (let start = 0; start < ordered.length; ) {
 		let end = start + 1;
 		while (end < ordered.length && ordered[end].score === ordered[start].score) end += 1;
 		const percentile = ((start + end - 1) / 2) / denominator;
-		for (let index = start; index < end; index += 1) percentiles.set(ordered[index].canonicalId, percentile);
+		for (let index = start; index < end; index += 1) percentiles.set(ordered[index].parityNodeKey, percentile);
 		start = end;
 	}
 	return percentiles;
@@ -134,7 +139,7 @@ function percentileById(rows: readonly PageRankParityScoreV2[]): Map<string, num
 function spearman(reference: readonly PageRankParityScoreV2[], challenger: readonly PageRankParityScoreV2[]): number {
 	const referenceRanks = rankById(reference);
 	const challengerRanks = rankById(challenger);
-	const ids = reference.map((row) => row.canonicalId);
+	const ids = reference.map((row) => row.parityNodeKey);
 	const xs = ids.map((id) => referenceRanks.get(id) as number);
 	const ys = ids.map((id) => challengerRanks.get(id) as number);
 	const mean = (values: readonly number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
@@ -158,9 +163,9 @@ function spearman(reference: readonly PageRankParityScoreV2[], challenger: reado
 function topKOverlap(reference: readonly PageRankParityScoreV2[], challenger: readonly PageRankParityScoreV2[], topK: number): number {
 	const top = (rows: readonly PageRankParityScoreV2[]) =>
 		[...rows]
-			.sort((a, b) => b.score - a.score || a.canonicalId.localeCompare(b.canonicalId))
+			.sort((a, b) => b.score - a.score || a.parityNodeKey.localeCompare(b.parityNodeKey))
 			.slice(0, topK)
-			.map((row) => row.canonicalId);
+			.map((row) => row.parityNodeKey);
 	const referenceTop = new Set(top(reference));
 	const challengerTop = top(challenger);
 	return challengerTop.filter((id) => referenceTop.has(id)).length / challengerTop.length;
@@ -178,16 +183,16 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 	thresholds?: PageRankParityThresholdsV2;
 }): PageRankCrossExecutorParityReceiptV2 {
 	const snapshot = GraphProjectionSnapshotV1Schema.parse(input.snapshot);
-	const reference = canonicalScores(input.referenceScores);
-	const challenger = canonicalScores(input.challengerScores);
+	const reference = parityScores(input.referenceScores);
+	const challenger = parityScores(input.challengerScores);
 	if (reference.length !== snapshot.projection.nodeCount || challenger.length !== snapshot.projection.nodeCount) {
 		throw new Error(
 			`PageRank parity requires full snapshot coverage: expected ${snapshot.projection.nodeCount}, got reference=${reference.length}, challenger=${challenger.length}`,
 		);
 	}
 	for (let index = 0; index < reference.length; index += 1) {
-		if (reference[index].canonicalId !== challenger[index].canonicalId) {
-			throw new Error(`PageRank parity identity mismatch at sorted index ${index}`);
+		if (reference[index].parityNodeKey !== challenger[index].parityNodeKey) {
+			throw new Error(`PageRank parity coordinate mismatch at sorted index ${index}`);
 		}
 	}
 
@@ -199,7 +204,7 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 	let maxL1Delta = 0;
 	let percentileDeltaSum = 0;
 	for (const row of reference) {
-		const id = row.canonicalId;
+		const id = row.parityNodeKey;
 		maxL1Delta = Math.max(maxL1Delta, Math.abs((referenceL1.get(id) as number) - (challengerL1.get(id) as number)));
 		percentileDeltaSum += Math.abs((referencePercentile.get(id) as number) - (challengerPercentile.get(id) as number));
 	}
@@ -228,6 +233,7 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 		projectionHash: snapshot.projection.projectionHash,
 		projectionName: snapshot.projection.projectionName,
 		projectionSnapshotHash: snapshot.contentHash,
+		parityCoordinate: 'graph_node_key',
 		nodeCount: snapshot.projection.nodeCount,
 		referenceRawOutputHash: hashScores(reference),
 		challengerRawOutputHash: hashScores(challenger),
