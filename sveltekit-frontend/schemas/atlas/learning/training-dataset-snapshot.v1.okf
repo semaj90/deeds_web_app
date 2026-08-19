@@ -1,0 +1,54 @@
+schema_id: atlas.training-dataset-snapshot
+schema_version: 1
+schema_kind: learning_dataset_snapshot
+status: ACTIVE
+
+description: >
+  Immutable, revision-qualified manifest of ExecutionLearningRecordV1 references
+  used for offline SFT/QLoRA, preference, reward-model or RL evaluation. The
+  snapshot owns partition membership, not the underlying execution evidence.
+
+fields:
+  schema: { type: literal, value: atlas.training-dataset-snapshot.v1 }
+  snapshotId: { type: string, required: true }
+  purpose:
+    type: enum
+    values: [SFT, QLORA, DPO, PPO, REWARD_MODEL, ROUTER_TRAINING, HELDOUT_EVAL]
+  workspaceRevisionRange: { type: string, required: true }
+  sourceCorpusRevision: { type: string, required: true }
+  recordRefs: { type: string_array, default: [] }
+  partitions:
+    type: object
+    fields:
+      train: { type: string_array, default: [] }
+      validation: { type: string_array, default: [] }
+      heldout: { type: string_array, default: [] }
+  splitStrategy:
+    type: object
+    fields:
+      strategy: { type: string, required: true }
+      groupKeys: { type: string_array, default: [] }
+      seed: { type: string, required: true }
+  statistics:
+    type: object
+    fields:
+      totalRecords: { type: integer, minimum: 0 }
+      successful: { type: integer, minimum: 0 }
+      failed: { type: integer, minimum: 0 }
+      blocked: { type: integer, minimum: 0 }
+      rejected: { type: integer, minimum: 0 }
+      taskFamilyCounts: { type: json, required: true }
+      errorClassCounts: { type: json, required: true }
+  eligibilityPolicyRevision: { type: string, required: true }
+  privacyPolicyRevision: { type: string, required: true }
+  generatedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - every partition member must also occur in recordRefs
+  - train, validation and heldout membership sets must be pairwise disjoint
+  - split grouping must prevent the same canonical task/repair lineage or near-duplicate revision family from leaking into heldout
+  - record order and checksum generation must be canonicalized before hashing
+  - a snapshot is immutable; changed membership creates a new snapshotId/checksum
+  - HELDOUT_EVAL snapshots cannot be reused as training partitions
