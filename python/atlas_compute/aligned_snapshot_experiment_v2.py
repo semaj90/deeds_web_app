@@ -1,9 +1,9 @@
 """Parent Atlas aligned snapshot experiment v2.
 
-V2 fixes the context-order boundary: semantic rows stay canonical-ID ordered,
-while contextual windows require an explicit permutation representing source,
-AST, workflow, or temporal order. Derived context is scattered back to canonical
-ordinals before feature alignment.
+Semantic rows stay canonical-ID ordered. Contextual windows require an explicit
+source/AST/workflow/temporal permutation and are scattered back to canonical
+ordinals before feature alignment. Snapshot lineage identity and cross-block
+canonical row-order identity are carried as distinct checksums.
 """
 
 from __future__ import annotations
@@ -46,7 +46,8 @@ class AlignedSnapshotExperimentV2Receipt:
     experiment_revision: str
     semantic_snapshot_revision: str
     representation_revision: str
-    semantic_row_identity_checksum: str
+    semantic_versioned_row_identity_checksum: str
+    semantic_canonical_order_checksum: str
     semantic_tensor_checksum: str
     row_count: int
     semantic_dimensions: int
@@ -106,6 +107,20 @@ def _rank_som(coords: np.ndarray, query_ordinals: list[int], k: int) -> list[lis
 
 def _mean_overlap(a: list[list[int]], b: list[list[int]], k: int) -> float:
     return float(np.mean([len(set(x[:k]) & set(y[:k])) / float(k) for x, y in zip(a, b, strict=True)]))
+
+
+def _recommend_hnsw(sweep: list[dict[str, Any]], minimum_recall: float) -> dict[str, Any] | None:
+    eligible = [row for row in sweep if float(row.get("recall_at_k", 0.0)) >= minimum_recall]
+    if not eligible:
+        return None
+    return min(
+        eligible,
+        key=lambda row: (
+            float(row.get("mean_latency_ms", float("inf"))),
+            float(row.get("p95_latency_ms", float("inf"))),
+            int(row.get("hnsw_ef", 0)),
+        ),
+    )
 
 
 def run_aligned_snapshot_experiment_v2(
@@ -176,21 +191,28 @@ def run_aligned_snapshot_experiment_v2(
         try:
             qdrant = _run_qdrant_sweep(semantic, canonical_ids, query_ordinals, config=qdrant_cfg, k=k)
             qdrant_best = max((float(row["recall_at_k"]) for row in qdrant["sweep"]), default=0.0)
+            recall_floor = float(qdrant_cfg.get("minimum_recall_at_k") or 0.95)
+            recommended = _recommend_hnsw(qdrant["sweep"], recall_floor)
+            qdrant = {
+                **qdrant,
+                "minimum_recall_at_k": recall_floor,
+                "recommended_hnsw_ef": int(recommended["hnsw_ef"]) if recommended else None,
+                "recommendation_status": "ELIGIBLE" if recommended else "NO_SWEEP_POINT_MEETS_RECALL_FLOOR",
+            }
             stages["qdrant_hnsw"] = asdict(StageStatus("PASS", None, qdrant))
         except Exception as error:
             stages["qdrant_hnsw"] = asdict(StageStatus("ERROR", f"{type(error).__name__}:{error}", None))
     else:
         stages["qdrant_hnsw"] = asdict(StageStatus("SKIPPED", "not enabled", None))
 
-    blocks = []
-    blocks.append(make_feature_block(
+    blocks = [make_feature_block(
         block_id="semantic_768",
         revision=str(manifest["representation_revision"]),
         canonical_ids=canonical_ids,
         values=semantic,
         column_names=[f"semantic_{i}" for i in range(semantic.shape[1])],
         normalizations=["l2_row"] * semantic.shape[1],
-    ))
+    )]
 
     if bool(spec.get("enable_binary_quantization", True)):
         try:
@@ -206,16 +228,16 @@ def run_aligned_snapshot_experiment_v2(
     if bool(spec.get("enable_kmeans", True)):
         try:
             clusters = int(spec.get("kmeans_clusters") or min(20, max(2, round(math.sqrt(len(canonical_ids))))))
-            labels1, _c1, probs1, r1 = run_cuvs_soft_kmeans(
-                semantic, n_clusters=clusters,
+            kmeans_args = dict(
+                n_clusters=clusters,
                 temperature=float(spec.get("kmeans_temperature") or 1.0),
-                input_normalization="l2_row", device=device,
+                input_normalization="l2_row",
+                streaming_batch_size=int(spec.get("kmeans_streaming_batch_size") or 0),
+                prediction_batch_size=int(spec.get("kmeans_prediction_batch_size") or 0),
+                device=device,
             )
-            labels2, _c2, probs2, r2 = run_cuvs_soft_kmeans(
-                semantic, n_clusters=clusters,
-                temperature=float(spec.get("kmeans_temperature") or 1.0),
-                input_normalization="l2_row", device=device,
-            )
+            labels1, _c1, probs1, r1 = run_cuvs_soft_kmeans(semantic, **kmeans_args)
+            labels2, _c2, probs2, r2 = run_cuvs_soft_kmeans(semantic, **kmeans_args)
             cluster_entropy = r1.mean_assignment_entropy
             cluster_stability = float(np.mean(labels1 == labels2))
             blocks.append(make_feature_block(
@@ -226,8 +248,9 @@ def run_aligned_snapshot_experiment_v2(
             ))
             stages["soft_kmeans"] = asdict(StageStatus("PASS", None, {
                 "first": r1.to_dict(), "replay": r2.to_dict(),
-                "label_agreement": cluster_stability,
+                "replay_label_agreement": cluster_stability,
                 "probability_max_abs_replay_error": float(np.max(np.abs(probs1 - probs2))),
+                "stability_scope": "deterministic_replay_only_not_perturbation_robustness",
             }))
         except Exception as error:
             stages["soft_kmeans"] = asdict(StageStatus("ERROR", f"{type(error).__name__}:{error}", None))
@@ -348,12 +371,17 @@ def run_aligned_snapshot_experiment_v2(
         nary_retrieval = {"status": "SKIPPED"}
 
     aligned, alignment = align_feature_blocks(blocks)
+    canonical_order_checksum = str(manifest.get("canonical_order_checksum") or alignment.row_identity_checksum)
+    if canonical_order_checksum != alignment.row_identity_checksum:
+        raise ValueError("SEMANTIC_CANONICAL_ORDER_CHECKSUM_MISMATCH")
+
     payload = {
         "schema": "atlas.aligned-snapshot-experiment.v2",
         "experiment_revision": revision,
         "semantic_snapshot_revision": str(manifest["snapshot_revision"]),
         "representation_revision": str(manifest["representation_revision"]),
-        "semantic_row_identity_checksum": str(manifest["row_identity_checksum"]),
+        "semantic_versioned_row_identity_checksum": str(manifest["row_identity_checksum"]),
+        "semantic_canonical_order_checksum": canonical_order_checksum,
         "semantic_tensor_checksum": str(manifest["tensor_checksum"]),
         "row_count": int(semantic.shape[0]),
         "semantic_dimensions": int(semantic.shape[1]),
