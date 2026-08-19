@@ -1,9 +1,9 @@
 """Deterministic feature-block alignment for Parent Atlas tensors.
 
 Continuous, binary and derived feature blocks may only be concatenated after
-proving identical canonical row identity/order. Normalization is column-scoped
-and explicit; binary masks remain exactly 0/1. The output is a derived feature
-matrix and never canonical application truth.
+proving identical canonical row identity/order. Normalization is column/block
+scoped and explicit; binary masks remain exactly 0/1. The output is a derived
+feature matrix and never canonical application truth.
 """
 
 from __future__ import annotations
@@ -16,7 +16,16 @@ from typing import Any, Literal, Sequence
 import numpy as np
 
 
-Normalization = Literal["none", "minmax", "zscore", "log1p_minmax", "binary"]
+Normalization = Literal[
+    "none",
+    "minmax",
+    "zscore",
+    "log1p_minmax",
+    "binary",
+    "l2_row",
+    "softmax_row",
+    "sparse_softmax_row",
+]
 
 
 @dataclass(frozen=True)
@@ -96,7 +105,38 @@ def _normalize_column(values: np.ndarray, mode: Normalization) -> np.ndarray:
         if std <= 1e-12:
             return np.zeros_like(x, dtype=np.float32)
         return ((x - mean) / std).astype(np.float32, copy=False)
+    if mode in {"l2_row", "softmax_row", "sparse_softmax_row"}:
+        # These are matrix-scope normalizations and are applied in
+        # align_feature_blocks before column receipts are generated.
+        return x
     raise ValueError(f"unsupported normalization: {mode}")
+
+
+def _apply_matrix_scope_normalization(values: np.ndarray, modes: Sequence[Normalization]) -> np.ndarray:
+    matrix = values.astype(np.float32, copy=True)
+    unique = set(modes)
+    matrix_modes = unique & {"l2_row", "softmax_row", "sparse_softmax_row"}
+    if not matrix_modes:
+        return matrix
+    if len(unique) != 1:
+        raise ValueError("matrix-scope normalization must apply to every column in a block")
+    mode = next(iter(matrix_modes))
+    if mode == "l2_row":
+        norms = np.linalg.norm(matrix.astype(np.float64), axis=1, keepdims=True)
+        return (matrix / np.maximum(norms, 1e-12)).astype(np.float32)
+    if mode in {"softmax_row", "sparse_softmax_row"}:
+        if mode == "sparse_softmax_row":
+            support = matrix != 0.0
+            logits = np.where(support, matrix, -np.inf)
+        else:
+            support = np.ones_like(matrix, dtype=bool)
+            logits = matrix
+        maxima = np.max(logits, axis=1, keepdims=True)
+        maxima = np.where(np.isfinite(maxima), maxima, 0.0)
+        exp = np.where(support, np.exp(logits - maxima), 0.0)
+        denom = exp.sum(axis=1, keepdims=True)
+        return np.divide(exp, denom, out=np.zeros_like(exp, dtype=np.float32), where=denom > 0).astype(np.float32)
+    return matrix
 
 
 def make_feature_block(
@@ -151,6 +191,7 @@ def align_feature_blocks(blocks: Sequence[FeatureBlock]) -> tuple[np.ndarray, Fe
             raise ValueError(f"FEATURE_ROW_ALIGNMENT_MISMATCH:{block.block_id}")
         if block.values.shape[0] != len(reference_ids):
             raise ValueError(f"FEATURE_ROW_COUNT_MISMATCH:{block.block_id}")
+        scoped = _apply_matrix_scope_normalization(block.values, block.normalizations)
         normalized_columns: list[np.ndarray] = []
         for index, (name, mode) in enumerate(zip(block.column_names, block.normalizations, strict=True)):
             qualified_name = f"{block.block_id}:{name}"
@@ -158,7 +199,7 @@ def align_feature_blocks(blocks: Sequence[FeatureBlock]) -> tuple[np.ndarray, Fe
                 raise ValueError(f"duplicate qualified feature column: {qualified_name}")
             seen_names.add(qualified_name)
             source = block.values[:, index]
-            output = _normalize_column(source, mode)
+            output = _normalize_column(scoped[:, index], mode)
             normalized_columns.append(output)
             column_receipts.append(FeatureColumnReceipt(
                 column_index=global_column,
@@ -175,7 +216,7 @@ def align_feature_blocks(blocks: Sequence[FeatureBlock]) -> tuple[np.ndarray, Fe
 
     matrix = np.ascontiguousarray(np.concatenate(aligned, axis=1), dtype=np.float32)
     receipt = FeatureMatrixAlignmentReceipt(
-        schema="atlas.feature-matrix-alignment-receipt.v1",
+        schema="atlas.feature-matrix-alignment-receipt.v2",
         row_count=int(matrix.shape[0]),
         column_count=int(matrix.shape[1]),
         block_ids=[block.block_id for block in blocks],
