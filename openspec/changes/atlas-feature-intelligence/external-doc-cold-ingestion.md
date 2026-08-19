@@ -20,17 +20,19 @@ EDC-1  SeaweedFS artifact/citation/hydration contracts    WRITTEN_UNPROVEN
 EDC-2  content-addressed upload + checksum hydration       WRITTEN_UNPROVEN
 EDC-3  SvelteKit SeaweedFS runtime adapter                 WRITTEN_UNPROVEN
 EDC-4  Firecrawl v2 multi-format capture                   WRITTEN_UNPROVEN
-EDC-5  shadow Qdrant semantic_768 + BM25 collection        WRITTEN_UNPROVEN
+EDC-5  Qdrant capability + shadow collection proof         WRITTEN_UNPROVEN
 EDC-6  current-corpus shadow population                    PENDING
-EDC-7  dense exact/top-k parity                            PENDING
-EDC-8  BM25 retrieval evaluation                          PENDING
-EDC-9  hybrid retrieval evaluation                        PENDING
-EDC-10 retrieval-owner cutover receipt                     PENDING
+EDC-7  dense exact/top-k proof receipt                     WRITTEN_UNPROVEN
+EDC-8  BM25 retrieval proof receipt                        WRITTEN_UNPROVEN
+EDC-9  hybrid RRF retrieval proof receipt                  WRITTEN_UNPROVEN
+EDC-10 retrieval-owner cutover gate                        WRITTEN_UNPROVEN
 EDC-11 old Qdrant collection snapshot -> SeaweedFS         PENDING
 EDC-12 cold hydration query fallback                       PENDING
 EDC-13 deeds_lab archive upload + file-index Arrow          PENDING
 EDC-14 Graphify daily incremental docs refresh             PENDING
 ```
+
+`WRITTEN_UNPROVEN` means the typed contract/reference runtime/test exists but the workstation/live proof has not been executed.
 
 ## Firecrawl capture invariant
 
@@ -47,6 +49,8 @@ Firecrawl v2 scrape
 
 The normalized Markdown checksum is the document-text identity used by the external-doc chunker. Screenshot-only changes do not force semantic re-embedding when Markdown text is unchanged.
 
+Logical capture identity is deterministic over `source_id + source_revision + resolved_url + document_checksum`. Observation time (`fetched_at`) is telemetry and MUST NOT create a new logical identity for identical source content.
+
 ## Hydration invariant
 
 ```text
@@ -58,6 +62,23 @@ ColdArtifactHydrationRequestV1
 ```
 
 An S3 ETag is transport metadata only and cannot substitute for the SHA-256 evidence checksum.
+
+## Qdrant compatibility invariant
+
+Atlas uses Qdrant `1.10.0` as the minimum baseline for this specific production hybrid path because the path depends on sparse IDF plus Universal Query API hybrid fusion. Sparse-vector support in an older server is not sufficient by itself.
+
+For Qdrant 1.19 and newer, the shadow collection uses per-structure memory tiers:
+
+```text
+semantic_768 vectors  -> cold
+HNSW                  -> cold
+lexical_bm25 index    -> pinned
+payload               -> cold
+```
+
+For older supported servers, the collection builder uses the documented legacy equivalents (`on_disk` / `on_disk_payload`). Qdrant collection metadata is not used as Atlas ownership evidence; ownership/revisions live in Atlas manifests and receipts.
+
+Version detection alone is not enough to admit BM25. `probeNativeBm25Inference()` MUST exercise an ephemeral shadow-only BM25 point/query and delete the point before the capability gate can report `READY`.
 
 ## Qdrant migration invariant
 
@@ -75,28 +96,55 @@ external_programming_docs_768
                                      |
                         +------------+------------+
                         v            v            v
-                    dense parity   BM25 eval   hybrid eval
+                    dense proof    BM25 proof   hybrid RRF proof
                         +------------+------------+
                                      v
-                              CUTOVER RECEIPT
+                         ExternalDocsCutoverGateV1
 ```
 
 Every changed point in the shadow collection MUST be written with both `semantic_768` and `lexical_bm25` in the same point operation. Unchanged points are not rewritten during incremental refresh.
 
+## Retrieval proof invariant
+
+EDC-7, EDC-8 and EDC-9 use one frozen `ExternalDocRetrievalFixtureSetV1`. Each query carries its expected relevant chunk IDs and source snapshot revision. Proof receipts record ranked chunk IDs, Recall@K and reciprocal rank.
+
+All three cutover inputs MUST share:
+
+```text
+fixture_checksum
+source_snapshot_revision
+projection_revision
+```
+
+The cutover gate blocks when any configured recall floor fails or when hybrid Recall@K is worse than the better single lane. The source collection remains non-deletable and must be snapshotted before any later retirement.
+
+## Bounded runtime probe
+
+`scripts/docs-atlas/probe-external-doc-hybrid-runtime.mts` has three modes:
+
+```text
+(no flags)          READ_ONLY
+--ensure-shadow     create shadow collection only if missing
+--exercise-bm25     create/verify shadow + temporary BM25 probe point
+```
+
+The script never mutates `external_programming_docs_768` and writes a revisioned JSON capability report. A blocked BM25 proof exits non-zero.
+
 ## Required live proof artifacts
 
-Before EDC-10 can become `DONE`, record:
+Before EDC-10 can become runtime-proven, record:
 
-- Qdrant server version and collection schema probe.
+- Qdrant server version and collection schema/capability probe.
+- successful native BM25 shadow-only execution proof.
 - SeaweedFS S3 endpoint/version capability probe.
 - Firecrawl API/version used for capture.
 - source snapshot revision.
 - current and shadow point counts.
 - dense Top-K overlap/Recall@K against the existing owner and/or exact semantic oracle.
-- BM25 lexical fixture accuracy/Recall@K.
-- hybrid evaluation metrics.
+- BM25 lexical fixture Recall@K / MRR.
+- hybrid RRF Recall@K / MRR on the identical frozen fixture.
 - observed SeaweedFS artifact checksums after roundtrip hydration.
 - retrieval owner before/after.
-- rollback path.
+- rollback path and old-collection snapshot artifact.
 
 No test, upload, Qdrant mutation, or cutover is `DONE` merely because its contract exists.
