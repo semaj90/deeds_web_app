@@ -11,7 +11,15 @@ export interface QdrantSemanticScoreV1 {
   packetKey: string;
   score: number;
   pointId: string | number;
+  sourceRef: string | null;
+  /** Legacy/optional only; live atlas_packets has no canonical source_revision owner. */
   sourceRevision: string | null;
+  sourceVersionReceiptId: string | null;
+  reconciliationReceiptId: string | null;
+  workspaceRevision: number | null;
+  representationRevision: number | null;
+  sourceRepresentationId: string | null;
+  sourceDimension: number | null;
   symbolVersionId: string | null;
   treeNodeId: string | null;
   featureLabel: string | null;
@@ -21,7 +29,7 @@ export interface QdrantSemanticScoreV1 {
 }
 
 export interface QdrantSemanticScoreReceiptV1 {
-  schema: 'atlas.qdrant-semantic-score-receipt.v1';
+  schema: 'atlas.qdrant-semantic-score-receipt.v2';
   collection: typeof QDRANT_SEMANTIC_COLLECTION;
   vectorName: null;
   representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
@@ -32,17 +40,25 @@ export interface QdrantSemanticScoreReceiptV1 {
   embeddingModel: string;
   embeddingCached: boolean;
   embeddingExecMs: number;
-  /** Kept server-side for the immediately-following exact cuVS rerank. */
   queryVector: number[];
   scores: QdrantSemanticScoreV1[];
 }
 
+function nullableString(value: unknown): string | null {
+  return value == null ? null : String(value);
+}
+
+function nullableInt(value: unknown): number | null {
+  if (value == null) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
+}
+
 /**
- * Score an already-identified bounded candidate set. This function never uses
- * Qdrant point IDs as canonical identity; every result must carry packet_key.
- * `codebase_chunks_512` is an unnamed-vector collection, so no `using` field is
- * sent. Query vectors are EmbeddingGemma MRL-512 prefixes with explicit L2
- * re-normalization before either Qdrant or cuVS sees them.
+ * Score an already-identified bounded candidate set. Qdrant remains a
+ * rebuildable semantic projection; packet_key is the canonical join key.
+ * Reconciled payload lineage is surfaced when available so cuVS/KMeans/DAG
+ * receipts can preserve it without treating payload metadata as source truth.
  */
 export async function scoreQdrantSemanticCandidatesV1(
   query: string,
@@ -52,7 +68,7 @@ export async function scoreQdrantSemanticCandidatesV1(
   const uniquePacketKeys = [...new Set(packetKeys.filter(Boolean))].slice(0, Math.max(1, Math.min(512, limit)));
   if (uniquePacketKeys.length === 0) {
     return {
-      schema: 'atlas.qdrant-semantic-score-receipt.v1',
+      schema: 'atlas.qdrant-semantic-score-receipt.v2',
       collection: QDRANT_SEMANTIC_COLLECTION,
       vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
       representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
@@ -73,9 +89,7 @@ export async function scoreQdrantSemanticCandidatesV1(
   const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {
     query: Array.from(embedding.vector),
     filter: {
-      must: [
-        { key: 'packet_key', match: { any: uniquePacketKeys } },
-      ],
+      must: [{ key: 'packet_key', match: { any: uniquePacketKeys } }],
     },
     limit: uniquePacketKeys.length,
     with_payload: true,
@@ -85,6 +99,7 @@ export async function scoreQdrantSemanticCandidatesV1(
   const points = Array.isArray(response?.points) ? response.points : [];
   const scores: QdrantSemanticScoreV1[] = [];
   const projectionRevisions = new Set<string>();
+  const representationRevisions = new Set<string>();
   for (const point of points) {
     const packetKey = point?.payload?.packet_key;
     if (typeof packetKey !== 'string' || !packetKey) continue;
@@ -94,39 +109,46 @@ export async function scoreQdrantSemanticCandidatesV1(
         ? Object.values(point.vector)[0]
         : null;
     if (!Array.isArray(rawVector) || rawVector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) continue;
-    const projectionRevision = point?.payload?.projection_revision == null
-      ? null
-      : String(point.payload.projection_revision);
+
+    const projectionRevision = nullableString(point?.payload?.projection_revision);
+    const representationRevision = nullableInt(point?.payload?.representation_revision);
     if (projectionRevision) projectionRevisions.add(projectionRevision);
+    if (representationRevision != null) representationRevisions.add(String(representationRevision));
+
     scores.push({
       packetKey,
       score: Number(point.score),
       pointId: point.id,
-      sourceRevision:
-        point?.payload?.source_revision == null ? null : String(point.payload.source_revision),
-      symbolVersionId:
-        point?.payload?.symbol_version_id == null ? null : String(point.payload.symbol_version_id),
-      treeNodeId:
-        point?.payload?.tree_node_id == null ? null : String(point.payload.tree_node_id),
-      featureLabel:
-        point?.payload?.feature_label == null ? null : String(point.payload.feature_label),
+      sourceRef: nullableString(point?.payload?.source_ref),
+      sourceRevision: nullableString(point?.payload?.source_revision),
+      sourceVersionReceiptId: nullableString(point?.payload?.source_version_receipt_id),
+      reconciliationReceiptId: nullableString(point?.payload?.reconciliation_receipt_id),
+      workspaceRevision: nullableInt(point?.payload?.workspace_revision),
+      representationRevision,
+      sourceRepresentationId: nullableString(point?.payload?.source_representation_id),
+      sourceDimension: nullableInt(point?.payload?.source_dimension),
+      symbolVersionId: nullableString(point?.payload?.symbol_version_id),
+      treeNodeId: nullableString(point?.payload?.tree_node_id),
+      featureLabel: nullableString(point?.payload?.feature_label),
       projectionRevision,
       vector: rawVector.map(Number),
     });
   }
 
-  const representationRevision = projectionRevisions.size === 1
+  const semanticRevision = projectionRevisions.size === 1
     ? [...projectionRevisions][0]
-    : projectionRevisions.size === 0
-      ? 'unversioned-qdrant-projection'
-      : 'mixed-projection-revisions';
+    : representationRevisions.size === 1
+      ? `representation-revision:${[...representationRevisions][0]}`
+      : projectionRevisions.size === 0 && representationRevisions.size === 0
+        ? 'unversioned-qdrant-projection'
+        : 'mixed-projection-revisions';
 
   return {
-    schema: 'atlas.qdrant-semantic-score-receipt.v1',
+    schema: 'atlas.qdrant-semantic-score-receipt.v2',
     collection: QDRANT_SEMANTIC_COLLECTION,
     vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
     representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
-    representationRevision,
+    representationRevision: semanticRevision,
     dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
     requestedPacketKeys: uniquePacketKeys.length,
     returnedPacketKeys: scores.length,
