@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   archiveExternalDocCapture,
   externalDocPageCaptureSchema,
@@ -38,6 +39,24 @@ type FirecrawlScrapeData = {
 function requireFirecrawlKey(): string {
   if (!ENV.FIRECRAWL_API_KEY) throw new Error('FIRECRAWL_API_KEY is not configured');
   return ENV.FIRECRAWL_API_KEY;
+}
+
+function deterministicCaptureId(input: {
+  sourceId: string;
+  sourceRevision: string;
+  resolvedUrl: string;
+  markdown: string;
+}): string {
+  const documentChecksum = createHash('sha256').update(input.markdown, 'utf8').digest('hex');
+  const identity = createHash('sha256')
+    .update(JSON.stringify({
+      source_id: input.sourceId,
+      source_revision: input.sourceRevision,
+      resolved_url: input.resolvedUrl,
+      document_checksum: documentChecksum,
+    }), 'utf8')
+    .digest('hex');
+  return `firecrawl:${input.sourceId}:${identity.slice(0, 32)}`;
 }
 
 function screenshotMediaType(bytes: Uint8Array): string {
@@ -100,9 +119,15 @@ export async function captureExternalDocWithFirecrawlV2(options: FirecrawlV2Capt
   const changeStatus = data.changeTracking && typeof data.changeTracking === 'object'
     ? ('changeStatus' in data.changeTracking && typeof data.changeTracking.changeStatus === 'string' ? data.changeTracking.changeStatus : null)
     : null;
+  const captureId = deterministicCaptureId({
+    sourceId: options.sourceId,
+    sourceRevision: options.sourceRevision,
+    resolvedUrl,
+    markdown: data.markdown,
+  });
 
   const capture = externalDocPageCaptureSchema.parse({
-    capture_id: `firecrawl:${options.sourceId}:${options.sourceRevision}:${Date.now()}`,
+    capture_id: captureId,
     source_id: options.sourceId,
     source_revision: options.sourceRevision,
     requested_url: options.url,
