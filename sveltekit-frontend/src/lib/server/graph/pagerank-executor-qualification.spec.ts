@@ -61,11 +61,7 @@ function fixtureSnapshot() {
 		schema: 'atlas.graph-projection-snapshot.v1' as const,
 		projection,
 		parityManifest,
-		artifactPaths: {
-			nodesParquet: 'nodes.parquet',
-			edgesParquet: 'edges.parquet',
-			manifestJson: 'manifest.json',
-		},
+		artifactPaths: { nodesParquet: 'nodes.parquet', edgesParquet: 'edges.parquet', manifestJson: 'manifest.json' },
 		materialization: 'PARQUET_DIRECTED_EDGE_LIST' as const,
 		edgeWeightColumn: 'weight' as const,
 		contentHash,
@@ -95,6 +91,12 @@ function legacyReceipt(snapshot = fixtureSnapshot()) {
 	};
 }
 
+const identicalScores = [
+	{ canonicalId: 'node:a', score: 0.6 },
+	{ canonicalId: 'node:b', score: 0.3 },
+	{ canonicalId: 'node:c', score: 0.1 },
+] as const;
+
 describe('cuGraph PageRank qualification', () => {
 	it('does not promote the legacy NetworkX↔cuGraph PASS by itself', () => {
 		const snapshot = fixtureSnapshot();
@@ -109,22 +111,19 @@ describe('cuGraph PageRank qualification', () => {
 		expect(() => assertCanonicalPageRankExecutorQualified(qualification)).toThrow(/not canonical-eligible/);
 	});
 
-	it('promotes only with a PASS Neo4j↔cuGraph receipt on the exact V3 snapshot', () => {
+	it('promotes only with a derived PASS Neo4j↔cuGraph receipt on the exact V3 snapshot', () => {
 		const snapshot = fixtureSnapshot();
 		const parity = buildPageRankCrossExecutorParityReceiptV2({
 			snapshot,
 			referenceExecutorId: 'NEO4J_GDS',
 			challengerExecutorId: 'CUGRAPH',
-			referenceRawOutputHash: 'neo4j-output',
-			challengerRawOutputHash: 'cugraph-output',
-			topK: 50,
-			topKOverlap: 1,
-			spearmanCorrelation: 0.999999,
-			maxL1Delta: 1e-10,
-			meanAbsolutePercentileDelta: 1e-6,
+			referenceScores: identicalScores,
+			challengerScores: identicalScores,
+			topK: 3,
 			producerRevision: 'cross-executor-test-v2',
 			generatedAt: '2026-08-19T20:03:00.000Z',
 		});
+		expect(parity.status).toBe('PASS');
 		const qualification = qualifyCugraphFromFrozenParity({
 			snapshot,
 			legacyParityReceipt: legacyReceipt(snapshot),
