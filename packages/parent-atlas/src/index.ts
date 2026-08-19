@@ -1,82 +1,3 @@
-// Gates
-export { runIdentityGate } from './gates/identity.js';
-export { runReplayGate } from './gates/replay.js';
-export { runLineageGate, runChr97Gate } from './gates/lineage.js';
-export { runFinalGate, runProductionReadinessGate } from './gates/final.js';
-
-// Core canonical packet bridge / validator
-export {
-  extractPacketIdentityFromRow,
-  validatePacketIdentityFromRow,
-  verifyPacketIdentityConsistency,
-  createEnvelopeFromRow,
-  PacketIdentitySchema,
-  verifyPacketTriple,
-  bitfrostKey,
-  createMemoryEnvelope,
-  AtlasMemoryEnvelopeSchema,
-  GlyphRecordSchema,
-} from './core/canonical-packet-bridge.js';
-
-export {
-  buildSummaryContext,
-  classifyDomain,
-  classifyOntology,
-  classifyTopology,
-  formatSummaryContext,
-} from './core/summary-context.js';
-
-export {
-  makeGemma4SummaryPacket,
-  makeChrom97Packet,
-  toNdjsonLine,
-} from './pipelines/summary-packets.js';
-
-export { PacketValidator } from './core/packet-validator-materializer.js';
-export {
-  canonicalServiceNames,
-  canonicalServiceProbeDefaults,
-  serviceProbeStatuses,
-  serviceProbeTransports,
-} from './core/service-contract.js';
-
-// Adapters
-export { createPostgresAdapter, withPostgres } from './adapters/postgres.js';
-export { createQdrantAdapter } from './adapters/qdrant.js';
-export { createValkeyAdapter, withValkey } from './adapters/valkey.js';
-export { createNeo4jAdapter } from './adapters/neo4j.js';
-export { createDuckDbAdapter, isDuckDbAvailable } from './adapters/duckdb.js';
-
-// Mirrored Atlas contracts
-export * from './core/temporal-packet.js';
-export * from './core/processing-pass.js';
-export * from './core/qdrant-semantic-payload-envelope.js';
-export * from './core/graph-snapshot-manifest.js';
-export * from './core/contextual-tree-snapshot.js';
-export * from './core/graph-snapshot-v2.js';
-export * from './core/atlas-event-flow.js';
-export * from './core/multi-hop-retrieval.js';
-export * from './core/qdrant-collection-registry.js';
-export * from './core/feature-intelligence.js';
-
-// Feature intelligence / HyperGraphRAG surfaces
-export * from './core/structural-symbol.js';
-export * from './core/structural-extraction-fabric.js';
-export * from './core/treesitter-chunker-evidence-adapter.js';
-export * from './core/ast-grep-observation-adapter.js';
-export * from './core/langextract-grounding-adapter.js';
-export * from './core/langextract-sidecar-metadata-adapter.js';
-export * from './core/symbol-registry-repository.js';
-export * from './core/schema-object-registry.js';
-export * from './core/postgres-schema-introspector.js';
-export * from './core/test-case-registry.js';
-export * from './core/vitest-test-evidence-compiler.js';
-export * from './core/openspec-evidence-compiler.js';
-export * from './core/openspec-repository-ingestion.js';
-export * from './core/workflow-action-event.js';
-export * from './core/workflow-action-adapters.js';
-export * from './core/structural-reference-resolver.js';
-export * from './core/evidence-ledger-repository.js';
 export * from './core/evidence-entity-repository.js';
 export * from './core/evidence-entity-backfill.js';
 export * from './core/evidence-entity-extractors.js';
@@ -112,6 +33,7 @@ export * from './core/external-doc-knowledge-fabric.js';
 export * from './core/contextual-prefill-fabric.js';
 export * from './core/prefill-cache-runtime.js';
 export * from './core/inference-prefill-runtime.js';
+export * from './core/inference-runtime-selection.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
