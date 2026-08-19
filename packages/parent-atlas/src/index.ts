@@ -103,6 +103,7 @@ export * from './core/compute-dag-policy.js';
 export * from './core/tensor-snapshot.js';
 export * from './core/artifact-transport.js';
 export * from './core/ace-synthesis-graph.js';
+export * from './core/agentic-file-mutation.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
