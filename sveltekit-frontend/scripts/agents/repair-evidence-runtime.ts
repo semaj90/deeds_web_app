@@ -306,12 +306,24 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       );
     }
 
+    // Re-resolve source lineage for exact-evidence packets at the final execution
+    // gate. This deliberately does not trust candidate.sourceRevision alone: the
+    // core evidence gate historically accepted a request-revision fallback during
+    // candidate merge, and request constraints are not provenance observations.
+    const exactEvidenceCandidates = result.candidates.filter((candidate) =>
+      candidate.exactEvidence && candidate.packetKey != null,
+    );
+    const exactEvidenceResolutions = exactEvidenceCandidates.length
+      ? await resolveSourceRevisionsFromPostgres(exactEvidenceCandidates.map((candidate) => ({
+          candidateId: candidate.candidateId,
+          packetKey: candidate.packetKey,
+          sourceRef: candidate.sourceRef,
+        })))
+      : [];
     const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
-      && result.candidates.some((candidate) =>
-        candidate.exactEvidence
-        && candidate.packetKey != null
-        && candidate.sourceRevision != null
-        && candidate.sourceRevision === observedSourceRevision,
+      && exactEvidenceResolutions.some((resolution) =>
+        (resolution.status === 'EXACT_PACKET_KEY' || resolution.status === 'UNIQUE_SOURCE_REF')
+        && resolution.sourceRevision === observedSourceRevision,
       );
     const unresolvedRevisionFields = [
       ['workspaceRevision', observedWorkspaceRevision],
@@ -332,8 +344,9 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         ? ['REQUIRED_LIBRARY_READINESS_READY']
         : [`REQUIRED_LIBRARY_READINESS_${result.readiness.gate}`]),
       ...(fullyRevisionAlignedExactEvidence
-        ? ['EXACT_EVIDENCE_REVISION_ALIGNED']
-        : ['EXACT_EVIDENCE_REVISION_ALIGNMENT_NOT_PROVEN']),
+        ? ['EXACT_EVIDENCE_CANONICAL_REVISION_PROOF_ALIGNED']
+        : ['EXACT_EVIDENCE_CANONICAL_REVISION_PROOF_NOT_ALIGNED']),
+      `EXACT_EVIDENCE_CANONICAL_REVISION_PROOFS:${exactEvidenceResolutions.length}`,
       ...(unresolvedRevisionFields.length
         ? [`UNRESOLVED_REVISIONS:${unresolvedRevisionFields.join(',')}`]
         : ['ALL_REQUEST_REVISIONS_RESOLVED']),
@@ -353,6 +366,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         ? ['SEMANTIC_PROMOTION_INVALIDATED_STALE_MATRIX_DIAGNOSTICS']
         : []),
       'SOURCE_REVISION_FROM_CANONICAL_POSTGRES_METADATA',
+      'REQUEST_REVISION_IS_CONSTRAINT_NOT_EVIDENCE_PROVENANCE',
       'CONTENT_HASH_NEVER_SUBSTITUTES_FOR_SOURCE_REVISION',
       'SEMANTIC_EXACT_DISTANCE_IS_OBSERVATION_NOT_SIMILARITY',
       'SEMANTIC_PROMOTION_DOES_NOT_CREATE_SOURCE_EXACT_EVIDENCE',
