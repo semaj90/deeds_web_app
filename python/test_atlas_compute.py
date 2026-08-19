@@ -11,6 +11,7 @@ try:
     from atlas_compute.hypergraph_tensor import run_tensor_ppr
     from atlas_compute.interpolation import interpolate_topology_field
     from atlas_compute.low_rank import compare_low_rank_recommendations
+    from atlas_compute.rapids_matrix import deterministic_farthest_first_ordinals
     TORCH_AVAILABLE = True
 except Exception:
     TORCH_AVAILABLE = False
@@ -71,6 +72,21 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         self.assertEqual(first.length_square_sample_ordinals, second.length_square_sample_ordinals)
         self.assertGreaterEqual(first.top_k_overlap, 0.8)
         self.assertFalse(first.canonical_authority)
+
+    def test_farthest_first_initialization_is_deterministic_and_tie_stable(self) -> None:
+        matrix = np.array([
+            [0.0, 0.0],
+            [2.0, 0.0],
+            [-2.0, 0.0],
+            [0.0, 3.0],
+        ], dtype=np.float32)
+        first = deterministic_farthest_first_ordinals(matrix, 3)
+        second = deterministic_farthest_first_ordinals(matrix, 3)
+        self.assertEqual(first, second)
+        self.assertEqual(first[0], 0)
+        self.assertEqual(first[1], 3)
+        # Rows 1 and 2 are symmetric after selecting 0 and 3; ordinal 1 wins.
+        self.assertEqual(first[2], 1)
 
 
 if __name__ == "__main__":
