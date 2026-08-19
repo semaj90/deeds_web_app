@@ -41,6 +41,8 @@ export interface AtlasSemantic512ExactReceiptV1 {
   backend: 'cuvs.neighbors.brute_force';
   metric: 'cosine';
   algorithmRevision: string;
+  identityRequirement?: 'packet_key';
+  sourceFreshnessAuthority?: 'external-mutation-awareness-receipt';
   representationId: 'semantic_512';
   representationRevision: string;
   dimension: 512;
@@ -61,8 +63,6 @@ function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
   }
   const seen = new Set<string>();
   for (const [index, row] of input.corpus.entries()) {
-    // packet_key is enough to keep GPU row identity deterministic. Source
-    // freshness is a separate mutation-awareness proof, not a KNN prerequisite.
     if (!row.packetKey?.trim()) throw new Error(`ATLAS_SEMANTIC512_IDENTITY:${index}`);
     if (row.vector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) throw new Error(`ATLAS_SEMANTIC512_CORPUS_DIMENSION:${index}`);
     if (seen.has(row.packetKey)) throw new Error(`ATLAS_SEMANTIC512_DUPLICATE_IDENTITY:${row.packetKey}`);
@@ -76,7 +76,7 @@ export function createAtlasRapidsSemantic512Client(
   return {
     exactKnn: async (input: AtlasSemantic512ExactRequestV1): Promise<AtlasSemantic512ExactReceiptV1> => {
       assertExactRequest(input);
-      const response = await fetch(`${baseUrl}/v1/semantic512/knn/exact`, {
+      const response = await fetch(`${baseUrl}/v1/semantic512/knn/exact-v2`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(input),
