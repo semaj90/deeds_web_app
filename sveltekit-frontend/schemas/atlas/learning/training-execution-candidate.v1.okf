@@ -1,0 +1,68 @@
+schema_id: atlas.training-execution-candidate
+schema_version: 1
+schema_kind: training_execution_candidate
+status: ACTIVE
+
+description: >
+  One exact Parent Atlas training configuration candidate. Categorical execution
+  choices such as ZeRO stage, optimizer implementation, and offload placement are
+  never interpolated. Continuous/semi-continuous coordinates may later participate
+  in a measured surrogate surface, but every candidate must be executed and receipted
+  before it can be considered proven.
+
+fields:
+  schema: { type: literal, value: atlas.training-execution-candidate.v1 }
+  candidateId: { type: string, required: true }
+  baseModelRevision: { type: string, required: true }
+  datasetSnapshotId: { type: string, required: true }
+  objective:
+    type: enum
+    values: [SFT, DPO, PPO, REWARD_MODELING]
+  peftMethod:
+    type: enum
+    values: [LORA, QLORA, LORA_FA]
+  zeroStage:
+    type: enum
+    values: [0, 1, 2, 3]
+  optimizer:
+    type: enum
+    values: [ADAMW, PAGED_ADAMW_8BIT, DEEPSPEED_CPU_ADAM]
+  optimizerPlacement:
+    type: enum
+    values: [GPU, CPU, NVME]
+  parameterPlacement:
+    type: enum
+    values: [GPU, CPU, NVME]
+  gradientCheckpointing:
+    type: enum
+    values: [NONE, SELECTIVE, FULL]
+  microBatch: { type: integer, minimum: 1 }
+  gradientAccumulation: { type: integer, minimum: 1 }
+  effectiveBatch: { type: integer, minimum: 1 }
+  learningRate: { type: number, minimumExclusive: 0 }
+  loraRank: { type: integer, minimum: 1 }
+  loraAlpha: { type: number, minimumExclusive: 0 }
+  targetModuleSetId: { type: string, required: true }
+  targetModules: { type: string_array, required: true }
+  precision:
+    type: enum
+    values: [FP32, BF16, FP16]
+  quantizationMode: { type: string, required: true }
+  requestedGpuBytes: { type: integer, minimum: 0 }
+  requestedHostBytes: { type: integer, minimum: 0 }
+  requestedNvmeBytes: { type: integer, minimum: 0 }
+  environmentReceiptId: { type: string, required: true }
+  seed: { type: string, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - zeroStage is categorical; values between 0, 1, 2, and 3 are invalid
+  - optimizer offload to CPU/NVME requires zeroStage >= 1
+  - parameterPlacement CPU/NVME requires zeroStage == 3
+  - DEEPSPEED_CPU_ADAM requires optimizerPlacement CPU or NVME and a DeepSpeed execution plan
+  - PAGED_ADAMW_8BIT is a bitsandbytes optimizer choice and is not equivalent to DeepSpeedCPUAdam
+  - QLORA requires a compatible trainable checkpoint plus a frozen quantized base and trainable adapter parameters
+  - GGUF inference artifacts must never be used as the trainable checkpoint identity
+  - targetModules must be proved against the actual model architecture
+  - a surrogate proposal does not become a training candidate result until an AdapterTrainingReceiptV1 exists
