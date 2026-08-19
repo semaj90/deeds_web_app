@@ -5,6 +5,7 @@ revision-qualified tensors and emit derived rankings/proof receipts.
 """
 
 from .ann_compare import AnnComparisonReceipt, compare_cuvs_exact_and_cagra
+from .cugraph_ppr import CuGraphPprParityReceipt, run_cugraph_ppr_parity
 from .determinism import TorchDeterminismReceipt, configure_torch_determinism
 from .exact_semantic import ExactSemanticSearchReceipt, exact_semantic_search
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
@@ -21,6 +22,8 @@ from .rapids_matrix import (
 __all__ = [
     "AnnComparisonReceipt",
     "compare_cuvs_exact_and_cagra",
+    "CuGraphPprParityReceipt",
+    "run_cugraph_ppr_parity",
     "TorchDeterminismReceipt",
     "configure_torch_determinism",
     "ExactSemanticSearchReceipt",
