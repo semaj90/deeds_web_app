@@ -109,6 +109,7 @@ export * from './core/claim-verification.js';
 export * from './core/remote-adapter-lifecycle.js';
 export * from './core/adaptive-memory-runtime.js';
 export * from './core/external-doc-knowledge-fabric.js';
+export * from './core/contextual-prefill-fabric.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
