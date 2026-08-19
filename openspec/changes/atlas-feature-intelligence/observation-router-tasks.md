@@ -28,8 +28,9 @@ OBSERVATION PLANE
   |
   v
 FEATURE COMPILER
-  exact binary masks
-  ontology masks
+  AST binary masks
+  ontology binary masks
+  grounded LangExtract binary masks
   graph scalars
   cluster/context features
   + semantic latent_64/128 kept separate
@@ -69,7 +70,7 @@ import type { SgNode } from '@ast-grep/napi'
 const { parse } = await import('@ast-grep/napi')
 ```
 
-Do not add a duplicate ast-grep JS package. Before upgrading to a newer upstream release, update the lockfile and run structural/provenance parity tests.
+Do not add a duplicate ast-grep JS package. Before upgrading, update the lockfile and run structural/provenance parity tests.
 
 ### Python observation runtime
 
@@ -79,7 +80,7 @@ Pinned file:
 python/requirements-atlas-observation.txt
 ```
 
-Install into the existing Atlas/NLP Python environment, not a fresh environment that replaces the validated CUDA/PyTorch build:
+Install into the existing Atlas/NLP Python environment:
 
 ```bash
 python -m pip install -r python/requirements-atlas-observation.txt
@@ -94,19 +95,14 @@ langextract==1.6.0
 stanza==1.14.0
 ```
 
-Probe imports only:
+Probe:
 
 ```bash
 python python/probe_atlas_observation_runtime.py
-```
-
-Probe imports plus already-downloaded English Stanza models:
-
-```bash
 python python/probe_atlas_observation_runtime.py --check-stanza-models
 ```
 
-Stanza model download remains an explicit operator action because model files are large external artifacts:
+Stanza model download remains explicit:
 
 ```bash
 python -c "import stanza; stanza.download('en', processors='tokenize,pos,lemma,depparse')"
@@ -121,8 +117,8 @@ ORF-2  LangExtract source-grounding adapter             DONE
 ORF-3  observation feature registry/compiler            IMPLEMENTED_UNPROVEN
 ORF-4  router tensor (latent + exact feature lanes)     IMPLEMENTED_UNPROVEN
 ORF-5  Python LangExtract/Stanza runtime probe          IMPLEMENTED_UNPROVEN
-ORF-6  PostgreSQL observation/materialization schema    PENDING
-ORF-7  Qdrant payload/tag projection                    PENDING
+ORF-6  PostgreSQL observation/materialization schema    IMPLEMENTED_UNPROVEN
+ORF-7  Qdrant payload/tag projection                    IMPLEMENTED_UNPROVEN
 ORF-8  .okf MCP resource manifest                       IMPLEMENTED_UNPROVEN
 ORF-9  MCP read-tool manifest                           IMPLEMENTED_UNPROVEN
 ORF-10 MCP mutation authorization manifest              IMPLEMENTED_UNPROVEN
@@ -132,22 +128,30 @@ ORF-13 exact-promotion end-to-end fixture                PENDING
 ORF-14 measured router evaluation                        PENDING
 ```
 
+Executor/cache proof details continue in:
+
+```text
+openspec/changes/atlas-feature-intelligence/retrieval-executor-tasks.md
+```
+
 ## ORF-3 / ORF-4 invariants
 
-`ObservationFeatureRowV1` must preserve exact and grounded evidence outside the semantic autoencoder:
+`ObservationFeatureRowV1` preserves separate feature families:
 
 ```text
 semantic_768
   -> latent_128
   -> latent_64
 
-ast/ontology binary features
-  -> separate sparse/binary feature lane
+AST_BINARY
+ONTOLOGY_BINARY
+LANGEXTRACT_BINARY
+  -> separate exact/grounded sparse binary lanes
 
-graph features
+GRAPH_CONTINUOUS
   -> separate continuous lane
 
-cluster assignments
+CLUSTER_CATEGORICAL
   -> separate categorical lane
 ```
 
@@ -159,7 +163,7 @@ JSON.stringify(ast + langextract + pagerank + clusters)
   -> call resulting vector exact structural evidence
 ```
 
-Router tensor must require:
+Router tensor requires:
 
 ```text
 exact_semantic_promotion_required = true
@@ -167,18 +171,28 @@ exact_source_promotion_required   = true
 canonical_authority               = false
 ```
 
-## ORF-6 PostgreSQL 18 target
+## ORF-6 PostgreSQL 18 implementation
 
-PostgreSQL owns exact materialization and relational filtering. Target logical tables:
+Migration:
 
 ```text
-atlas_observations
-atlas_observation_feature_rows
-atlas_observation_feature_values
-atlas_router_feature_snapshots
+sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows_v1.sql
 ```
 
-Required identity fields:
+Repository:
+
+```text
+packages/parent-atlas/src/core/observation-feature-repository.ts
+```
+
+Materialized tables:
+
+```text
+atlas_observation_records
+atlas_observation_feature_rows
+```
+
+Identity fields:
 
 ```text
 candidate_id
@@ -190,59 +204,66 @@ row_identity_checksum
 registry_revision
 ```
 
-Recommended indexes after workload proof:
+Indexes:
 
 ```text
-BTREE(source_ref, source_revision)
-BTREE(domain_class)
-BTREE(kmeans_cluster)
-BTREE(som_cell)
+BTREE(source_ref, source_revision, workspace_revision)
+BTREE(kmeans_cluster, workspace_revision)
+BTREE(som_cell, workspace_revision)
 GIN(ontology_classes)
 GIN(ast_observation_kinds)
 GIN(langextract_classes)
+GIN(tags)
+GIN(observation_refs)
+pgvector HNSW(semantic_768) challenger/fallback
 ```
 
-`semantic_768` may be mirrored through pgvector for exact/filtered vector joins, but PostgreSQL ANN must not become another independent semantic vote by default.
+The repository exposes exact candidate filtering plus an exact pgvector cosine search path. PostgreSQL HNSW must not become an independent semantic vote.
 
-## ORF-7 Qdrant target
+## ORF-7 Qdrant implementation
 
-Use the hybrid external-doc/code collection family with named representations:
+The existing hybrid collection remains the only external-doc retrieval projection:
 
 ```text
+external_programming_docs_hybrid_768
+
 semantic_768
 lexical_bm25
 ```
 
-Payload should carry only useful filter/routing fields, for example:
+Payload now includes:
 
 ```text
 source_id
 source_revision
 domain_class
-ontology_classes
+ontology_classes[]
+ast_observation_kinds[]
+langextract_classes[]
 language
 kmeans_cluster
 som_cell
 document_checksum
 chunk_checksum
 tags[]
+embedding_revision
+producer_revision
 ```
 
-Open-ended tags use flattened exact values such as:
+Open-ended tags remain flattened exact values:
 
 ```text
 ast=database_write
 ast_rule=route_handler_write
 langextract=algorithm
 ontology=api
-vendor=qdrant
 ```
 
-Do not create one Qdrant collection per ontology class, KMeans cluster, SOM cell, ast-grep rule, or LangExtract extraction class.
+Do not create one Qdrant collection per ontology class, cluster, ast-grep rule, or LangExtract class.
 
 ## ORF-8..10 MCP surface
 
-`.okf` and other revisioned context are modeled as MCP Resources:
+`.okf` and revisioned context are MCP Resource descriptors:
 
 ```text
 atlas://okf/domains/retrieval
@@ -252,55 +273,13 @@ atlas://snapshot/source/<revision>
 atlas://evidence/claim/<id>
 ```
 
-Actions are modeled as MCP Tools:
-
-```text
-atlas.search
-atlas.evidence.get
-atlas.graph.expand
-atlas.source.read
-atlas.artifact.hydrate
-atlas.claim.verify
-atlas.feature.inspect
-atlas.cluster.inspect
-
-atlas.patch.propose
-atlas.patch.validate
-atlas.patch.apply
-```
-
-Mutation invariant:
-
-```text
-atlas.patch.apply
-  requires validator receipt
-  requires explicit mutation authorization
-  cannot be authorized by the model, MCP transport, or retrieval score itself
-```
+Read/action tools remain separate from mutators. `atlas.patch.apply` requires a validator receipt and explicit mutation authorization.
 
 ## ORF-11 MCP protocol migration audit
 
-Current application code still imports the v1 SDK surface:
+The current application still uses `@modelcontextprotocol/sdk@1.22.0` and the legacy HTTP bridge. Do not claim MCP `2026-07-28` compliance yet.
 
-```text
-@modelcontextprotocol/sdk@1.22.0
-```
-
-and the HTTP route manually exposes a legacy SSE/JSON-RPC bridge. Do not claim MCP `2026-07-28` compliance from the protocol-neutral manifests above.
-
-Migration proof must separately establish:
-
-```text
-new TypeScript MCP v2 server/client packages installed and lockfile updated
-resources registered through the supported v2 server API
-stateless protocol core behavior
-header-based routing where used
-resource/list cache semantics
-JSON Schema 2020-12 tool schemas
-existing tool-call telemetry/authorization invariants preserved
-```
-
-Until that proof passes:
+Until the separate migration proof passes:
 
 ```text
 AtlasMcpSurfaceManifestV1.transport_binding = PROTOCOL_NEUTRAL
@@ -309,38 +288,18 @@ current_server_migration_required = true
 
 ## ORF-12 Ornith boundary
 
-Ornith may receive:
+Ornith may receive ContextManifest, promoted source spans, observation refs, Postgres exact rows, Qdrant candidate IDs, graph paths and `.okf` resource content.
 
-```text
-ContextManifest
-promoted source spans
-AST evidence refs
-LangExtract grounded tuples
-Postgres exact rows
-Qdrant candidate IDs
-lossless graph paths
-.okf resource content
-```
-
-Ornith must not own:
-
-```text
-semantic_768 persistence
-ast-grep identity
-LangExtract source identity
-canonical relationship promotion
-source mutation authorization
-```
-
-LangExtract using a local Ornith/Ollama-compatible provider is a challenger runtime configuration only; the resulting extraction must pass the same grounding adapter and validators as any other provider.
+Ornith must not own semantic persistence, observation identity, canonical promotion, or mutation authorization.
 
 ## Required bounded tests
 
-```text
+```bash
 npm --prefix packages/parent-atlas run build
 node --test packages/parent-atlas/test/observation-feature-compiler.test.mjs
-
+node --test packages/parent-atlas/test/retrieval-executor-policy.test.mjs
+node --test packages/parent-atlas/test/external-doc-qdrant-hybrid.test.mjs
 python python/probe_atlas_observation_runtime.py
 ```
 
-A proof receipt may move ORF-3/4/5/8/9/10 to `PROVEN` only after these execute on the workstation with the pinned dependency/runtime revisions recorded.
+Database proof is separate and must use the existing migration lint/pre-apply/post-apply workflow. File existence alone cannot move any `IMPLEMENTED_UNPROVEN` item to `PROVEN`.
