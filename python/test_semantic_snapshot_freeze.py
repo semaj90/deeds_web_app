@@ -37,16 +37,20 @@ class FrozenSemanticSnapshotTests(unittest.TestCase):
                 manifest_path=root / "snapshot.json",
                 snapshot_revision="workspace:742",
                 representation_revision="semantic_768:r109",
-                producer_revision="test:v1",
+                producer_revision="test:v2",
             )
+            self.assertEqual(receipt.schema, "atlas.frozen-semantic-snapshot.v2")
             self.assertEqual([row.canonical_id for row in receipt.rows], ["entity:a", "entity:b"])
             self.assertEqual([row.ordinal for row in receipt.rows], [0, 1])
             self.assertEqual(receipt.dimensions, 768)
+            self.assertEqual(len(receipt.canonical_order_checksum), 64)
+            self.assertNotEqual(receipt.row_identity_checksum, receipt.canonical_order_checksum)
             matrix, manifest = load_and_verify_frozen_snapshot(root / "snapshot.json")
             self.assertEqual(matrix.shape, (2, 768))
             self.assertTrue(np.all(matrix[0] == 1.0))
             self.assertTrue(np.all(matrix[1] == 2.0))
             self.assertEqual(manifest["tensor_checksum"], receipt.tensor_checksum)
+            self.assertEqual(manifest["canonical_order_checksum"], receipt.canonical_order_checksum)
 
     def test_duplicate_canonical_identity_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -66,7 +70,7 @@ class FrozenSemanticSnapshotTests(unittest.TestCase):
                     manifest_path=root / "snapshot.json",
                     snapshot_revision="workspace:742",
                     representation_revision="semantic_768:r109",
-                    producer_revision="test:v1",
+                    producer_revision="test:v2",
                 )
 
     def test_non_768_embedding_is_rejected(self) -> None:
@@ -83,7 +87,7 @@ class FrozenSemanticSnapshotTests(unittest.TestCase):
                     manifest_path=root / "snapshot.json",
                     snapshot_revision="workspace:742",
                     representation_revision="semantic_768:r109",
-                    producer_revision="test:v1",
+                    producer_revision="test:v2",
                 )
 
 
