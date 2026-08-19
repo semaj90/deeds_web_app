@@ -1,20 +1,23 @@
 /**
- * BM42 Sparse Vector Generator (standalone — no framework imports)
+ * Legacy hashed sparse lexical vector generator (standalone — no framework imports).
  *
- * Generates vocabulary-free sparse vectors using FNV-1a token hashing.
- * Used by:
- *   - qdrant-manager.ts (query-time hybrid search)
- *   - constitution-pipeline.ts (ingestion-time Qdrant upsert)
- *   - scripts/ingest-govinfo-federal.ts (standalone ingestion)
+ * IMPORTANT: despite this historical filename, this is NOT the BM42 algorithm
+ * described by Qdrant. Qdrant BM42 combines transformer attention-derived token
+ * importance with IDF. This compatibility codec instead hashes tokens with
+ * FNV-1a, applies log(1 + TF), an Atlas legal-token boost, then L2 normalizes.
  *
- * Algorithm matches the Go search service's queryToBM42Sparse() in main.go
- * so that ingestion and query sparse vectors are hash-compatible.
+ * Keep this implementation only so previously indexed sparse vectors and the Go
+ * search service remain query-compatible while Atlas migrates to explicitly
+ * versioned BM25/BM42 sparse representations.
  */
 
 export interface SparseVector {
 	indices: number[];
 	values: number[];
 }
+
+export const LEGACY_HASHED_SPARSE_ALGORITHM = 'atlas.legacy_hash_sparse.v1' as const;
+export const LEGACY_HASHED_SPARSE_PROOF_STATE = 'DEGRADED_COMPATIBILITY' as const;
 
 const STOP_WORDS = new Set([
 	'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -31,20 +34,20 @@ const STOP_WORDS = new Set([
 
 /** Hash a token string to a stable uint32 index (FNV-1a, vocabulary-free). */
 function tokenToIndex(token: string): number {
-	let h = 0x811c9dc5; // FNV-1a offset basis
+	let h = 0x811c9dc5;
 	for (let i = 0; i < token.length; i++) {
 		h ^= token.charCodeAt(i);
-		h = Math.imul(h, 0x01000193); // FNV prime
+		h = Math.imul(h, 0x01000193);
 	}
-	return (h >>> 0) % 2_000_000; // Cap at 2M vocabulary slots
+	return (h >>> 0) % 2_000_000;
 }
 
 /**
- * Generate a BM42-style sparse vector from text.
- * Tokens are hashed to vocabulary indices; values are log(1 + TF) normalized.
- * Legal tokens (§, U.S.C., CFR) get 2x weight boost.
+ * Generate the historical Atlas hashed sparse representation.
+ *
+ * This function intentionally does not claim BM25 or BM42 semantics.
  */
-export function generateSparseVector(text: string): SparseVector {
+export function generateLegacyHashedSparseVector(text: string): SparseVector {
 	const tokens = text
 		.toLowerCase()
 		.replace(/[^\w\s§./-]/g, ' ')
@@ -53,7 +56,6 @@ export function generateSparseVector(text: string): SparseVector {
 
 	if (tokens.length === 0) return { indices: [], values: [] };
 
-	// Count term frequencies
 	const tf = new Map<number, { count: number; isLegal: boolean }>();
 	for (const token of tokens) {
 		const idx = tokenToIndex(token);
@@ -67,16 +69,13 @@ export function generateSparseVector(text: string): SparseVector {
 		}
 	}
 
-	// Build sparse vector with log(1+TF) weighting
 	const indices: number[] = [];
 	const values: number[] = [];
 	for (const [idx, { count, isLegal }] of tf) {
 		indices.push(idx);
-		const weight = Math.log(1 + count) * (isLegal ? 2.0 : 1.0);
-		values.push(weight);
+		values.push(Math.log(1 + count) * (isLegal ? 2.0 : 1.0));
 	}
 
-	// L2-normalize values
 	const norm = Math.sqrt(values.reduce((s, v) => s + v * v, 0));
 	if (norm > 0) {
 		for (let i = 0; i < values.length; i++) values[i] /= norm;
@@ -84,3 +83,9 @@ export function generateSparseVector(text: string): SparseVector {
 
 	return { indices, values };
 }
+
+/**
+ * @deprecated Historical compatibility alias. Callers must not interpret the
+ * returned vector as true BM42 evidence.
+ */
+export const generateSparseVector = generateLegacyHashedSparseVector;
