@@ -1,12 +1,12 @@
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import {
-  QDRANT_SEMANTIC_768_COLLECTION,
+  QDRANT_SEMANTIC_COLLECTION,
   ATLAS_QDRANT_FILTER_FIELDS_V1,
 } from './qdrant-semantic-projection.js';
 
 export interface QdrantSemanticIndexEnsureReceiptV1 {
   schema: 'atlas.qdrant-semantic-index-ensure-receipt.v1';
-  collection: typeof QDRANT_SEMANTIC_768_COLLECTION;
+  collection: typeof QDRANT_SEMANTIC_COLLECTION;
   requestedFields: readonly string[];
   ensured: string[];
   failed: Array<{ field: string; error: string }>;
@@ -17,7 +17,7 @@ export interface QdrantSemanticIndexEnsureReceiptV1 {
   };
 }
 
-const INTEGER_FIELDS = new Set(['representation_revision']);
+const INTEGER_FIELDS = new Set(['representation_revision', 'native_model_dimension', 'kmeans_cluster_id']);
 
 /**
  * Idempotently ensure exact-match payload indexes used by the graph/semantic
@@ -26,13 +26,13 @@ const INTEGER_FIELDS = new Set(['representation_revision']);
  */
 export async function ensureQdrantSemanticPayloadIndexesV1(): Promise<QdrantSemanticIndexEnsureReceiptV1> {
   const client = getQdrantClient();
-  const info = (await client.getCollection(QDRANT_SEMANTIC_768_COLLECTION)) as any;
+  const info = (await client.getCollection(QDRANT_SEMANTIC_COLLECTION)) as any;
   const ensured: string[] = [];
   const failed: Array<{ field: string; error: string }> = [];
 
   for (const field of ATLAS_QDRANT_FILTER_FIELDS_V1) {
     try {
-      await client.createPayloadIndex(QDRANT_SEMANTIC_768_COLLECTION, {
+      await client.createPayloadIndex(QDRANT_SEMANTIC_COLLECTION, {
         field_name: field,
         field_schema: INTEGER_FIELDS.has(field) ? 'integer' : 'keyword',
         wait: true,
@@ -40,8 +40,6 @@ export async function ensureQdrantSemanticPayloadIndexesV1(): Promise<QdrantSema
       ensured.push(field);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      // Qdrant clients/versions phrase already-existing indexes differently; an
-      // existing field index is an idempotent success, not a migration failure.
       if (/already|exists|same schema/i.test(message)) ensured.push(field);
       else failed.push({ field, error: message });
     }
@@ -49,16 +47,18 @@ export async function ensureQdrantSemanticPayloadIndexesV1(): Promise<QdrantSema
 
   const params = info?.config?.params ?? info?.result?.config?.params ?? {};
   const hnsw = info?.config?.hnsw_config ?? info?.result?.config?.hnsw_config ?? {};
-  const contentVector = params?.vectors?.content ?? params?.vectors ?? {};
+  // codebase_chunks_512 is an unnamed single-vector collection, so params.vectors
+  // itself is the vector config rather than params.vectors.content.
+  const vectorConfig = params?.vectors ?? {};
 
   return {
     schema: 'atlas.qdrant-semantic-index-ensure-receipt.v1',
-    collection: QDRANT_SEMANTIC_768_COLLECTION,
+    collection: QDRANT_SEMANTIC_COLLECTION,
     requestedFields: ATLAS_QDRANT_FILTER_FIELDS_V1,
     ensured,
     failed,
     collectionMemory: {
-      vectorsOnDisk: typeof contentVector?.on_disk === 'boolean' ? contentVector.on_disk : null,
+      vectorsOnDisk: typeof vectorConfig?.on_disk === 'boolean' ? vectorConfig.on_disk : null,
       hnswOnDisk: typeof hnsw?.on_disk === 'boolean' ? hnsw.on_disk : null,
       payloadOnDisk: typeof params?.on_disk_payload === 'boolean' ? params.on_disk_payload : null,
     },
