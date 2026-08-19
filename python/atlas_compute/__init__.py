@@ -10,6 +10,13 @@ from .exact_semantic import ExactSemanticSearchReceipt, exact_semantic_search
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
 from .interpolation import TensorInterpolationReceipt, interpolate_topology_field
 from .low_rank import LowRankComparisonReceipt, compare_low_rank_recommendations
+from .rapids_matrix import (
+    RapidsKMeansReceipt,
+    RapidsPcaReceipt,
+    deterministic_farthest_first_ordinals,
+    run_cuvs_kmeans,
+    run_cuvs_pca,
+)
 
 __all__ = [
     "AnnComparisonReceipt",
@@ -24,4 +31,9 @@ __all__ = [
     "interpolate_topology_field",
     "LowRankComparisonReceipt",
     "compare_low_rank_recommendations",
+    "RapidsKMeansReceipt",
+    "RapidsPcaReceipt",
+    "deterministic_farthest_first_ordinals",
+    "run_cuvs_kmeans",
+    "run_cuvs_pca",
 ]
