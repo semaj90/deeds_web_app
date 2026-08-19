@@ -129,6 +129,23 @@ export type {
   RepairContextManifestV2,
   SemanticPromotionFeedbackResultV1,
 } from './semantic-promotion-feedback.js';
+export {
+  MatrixDiagnosticsAlgorithmSchema,
+  MatrixDiagnosticsMeasurementPolicyV1Schema,
+  DEFAULT_MATRIX_DIAGNOSTICS_POLICY,
+  MeasuredMatrixDiagnosticsReceiptV1Schema,
+  MeasuredTangPolicyReceiptV1Schema,
+  stableReceiptSha256,
+  searchPolicyMatrixSha256,
+  measureSearchPolicyMatrixDiagnostics,
+  buildMeasuredTangPolicyReceipt,
+} from './measured-matrix-diagnostics.js';
+export type {
+  MatrixDiagnosticsAlgorithm,
+  MatrixDiagnosticsMeasurementPolicyV1,
+  MeasuredMatrixDiagnosticsReceiptV1,
+  MeasuredTangPolicyReceiptV1,
+} from './measured-matrix-diagnostics.js';
 
 import type { Reranker, RerankRequest, RerankResult, RerankResultItem } from './reranker.js';
 import { randomUUID } from 'node:crypto';
