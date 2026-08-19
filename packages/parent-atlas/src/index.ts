@@ -31,6 +31,7 @@ export * from './core/atlas-kernel-session.js';
 export * from './core/claim-verification.js';
 export * from './core/remote-adapter-lifecycle.js';
 export * from './core/adaptive-memory-runtime.js';
+export * from './core/adaptive-semantic-memory.js';
 export * from './core/external-doc-knowledge-fabric.js';
 export * from './core/contextual-prefill-fabric.js';
 export * from './core/prefill-cache-runtime.js';
