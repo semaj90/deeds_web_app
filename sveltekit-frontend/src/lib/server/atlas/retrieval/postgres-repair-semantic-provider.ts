@@ -24,6 +24,7 @@ import {
  * - source_representation_id = semantic_768
  * - source_dimension = 768
  * - representation_revision > 0
+ * - encoder_revision is explicit and non-empty
  * - vector contains exactly 768 finite values
  */
 
@@ -32,11 +33,9 @@ function representationRevision(row: {
   encoderRevision: string | null;
 }): string | null {
   const revision = Number(row.representationRevision);
-  if (!Number.isInteger(revision) || revision <= 0) return null;
   const encoder = row.encoderRevision?.trim();
-  return encoder
-    ? `${SEMANTIC_REPRESENTATION_ID}:r${revision}:${encoder}`
-    : `${SEMANTIC_REPRESENTATION_ID}:r${revision}`;
+  if (!Number.isInteger(revision) || revision <= 0 || !encoder) return null;
+  return `${SEMANTIC_REPRESENTATION_ID}:r${revision}:${encoder}`;
 }
 
 function vectorArray(value: unknown): number[] | null {
