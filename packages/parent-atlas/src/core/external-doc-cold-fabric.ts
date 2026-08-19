@@ -246,7 +246,7 @@ export function contentAddressedObjectKey(input: {
   checksum: string;
   filename: string;
 }): string {
-  const parsedChecksum = checksum.parse(input.checksum);
+  const parsedChecksum = z.string().regex(/^[a-f0-9]{64}$/).parse(input.checksum);
   const namespace = input.namespace.replace(/^\/+|\/+$/g, '');
   const filename = input.filename.replace(/^\/+/, '');
   if (!namespace || namespace.includes('../') || filename.includes('../') || filename.includes('..\\')) {
