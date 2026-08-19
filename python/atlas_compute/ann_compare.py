@@ -2,7 +2,8 @@
 
 The evaluator compares identity sets rather than raw tie ordering. cuVS documents
 that brute-force is exact but equal-distance neighbors can be ordered differently
-between runs, especially near k.
+between runs, especially near k. In-corpus query rows can explicitly provide
+their corpus ordinals so self-neighbors are removed before Recall@K is scored.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ Metric = Literal["cosine", "inner_product", "sqeuclidean"]
 @dataclass(frozen=True)
 class AnnQueryComparison:
     query_ordinal: int
+    corpus_ordinal: int | None
     recall_at_k: float
     exact_ordinals: list[int]
     cagra_ordinals: list[int]
@@ -33,6 +35,8 @@ class AnnComparisonReceipt:
     corpus_rows: int
     query_rows: int
     k: int
+    search_k: int
+    self_exclusion_applied: bool
     graph_degree: int
     intermediate_graph_degree: int
     build_algo: str
@@ -70,12 +74,20 @@ def _host_rows(cp: Any, value: Any) -> np.ndarray:
     return np.asarray(cp.asnumpy(value))
 
 
+def _filter_self(row: np.ndarray, self_ordinal: int | None, k: int) -> list[int]:
+    values = [int(v) for v in row.tolist() if self_ordinal is None or int(v) != self_ordinal]
+    if len(values) < k:
+        raise RuntimeError("ANN result did not contain enough non-self neighbors")
+    return values[:k]
+
+
 def compare_cuvs_exact_and_cagra(
     corpus_vectors: Sequence[Sequence[float]] | np.ndarray,
     query_vectors: Sequence[Sequence[float]] | np.ndarray,
     *,
     metric: Metric = "cosine",
     k: int = 10,
+    query_corpus_ordinals: Sequence[int] | None = None,
     graph_degree: int = 64,
     intermediate_graph_degree: int = 128,
     build_algo: str = "ivf_pq",
@@ -95,15 +107,26 @@ def compare_cuvs_exact_and_cagra(
         raise ValueError("corpus/query must be non-empty")
     if corpus_np.shape[0] < 3:
         raise ValueError("CAGRA comparison requires at least 3 corpus rows; use brute-force only for smaller fixtures")
-    if not (1 <= k <= corpus_np.shape[0]):
-        raise ValueError("k out of range")
+
+    self_ordinals: list[int | None]
+    if query_corpus_ordinals is None:
+        self_ordinals = [None] * query_np.shape[0]
+    else:
+        if len(query_corpus_ordinals) != query_np.shape[0]:
+            raise ValueError("query_corpus_ordinals length must equal query rows")
+        self_ordinals = [int(v) for v in query_corpus_ordinals]
+        if any(v < 0 or v >= corpus_np.shape[0] for v in self_ordinals):
+            raise ValueError("query_corpus_ordinals out of range")
+
+    exclude_self = any(value is not None for value in self_ordinals)
+    maximum_k = corpus_np.shape[0] - (1 if exclude_self else 0)
+    if not (1 <= k <= maximum_k):
+        raise ValueError(f"k out of range; maximum={maximum_k}")
+    search_k = min(corpus_np.shape[0], k + (1 if exclude_self else 0))
 
     graph_degree = max(2, min(int(graph_degree), corpus_np.shape[0] - 1))
-    intermediate_graph_degree = max(
-        graph_degree,
-        min(int(intermediate_graph_degree), corpus_np.shape[0]),
-    )
-    itopk_size = max(int(itopk_size), k)
+    intermediate_graph_degree = max(graph_degree, min(int(intermediate_graph_degree), corpus_np.shape[0]))
+    itopk_size = max(int(itopk_size), search_k)
     search_width = max(1, int(search_width))
 
     corpus = cp.asarray(corpus_np, dtype=cp.float32)
@@ -116,7 +139,7 @@ def compare_cuvs_exact_and_cagra(
     exact_build_ms = (time.perf_counter() - t0) * 1000.0
 
     t0 = time.perf_counter()
-    exact_dist, exact_idx = brute_force.search(exact_index, queries, k=k)
+    exact_dist, exact_idx = brute_force.search(exact_index, queries, k=search_k)
     cp.cuda.Stream.null.synchronize()
     exact_search_ms = (time.perf_counter() - t0) * 1000.0
 
@@ -133,7 +156,7 @@ def compare_cuvs_exact_and_cagra(
 
     search_params = cagra.SearchParams(search_width=search_width, itopk_size=itopk_size)
     t0 = time.perf_counter()
-    cagra_dist, cagra_idx = cagra.search(search_params, cagra_index, queries, k=k)
+    cagra_dist, cagra_idx = cagra.search(search_params, cagra_index, queries, k=search_k)
     cp.cuda.Stream.null.synchronize()
     cagra_search_ms = (time.perf_counter() - t0) * 1000.0
 
@@ -144,34 +167,37 @@ def compare_cuvs_exact_and_cagra(
 
     comparisons: list[AnnQueryComparison] = []
     recalls: list[float] = []
+    exact_rows: list[str] = []
+    cagra_rows: list[str] = []
     for query_ordinal in range(query_np.shape[0]):
-        exact_ordinals = [int(v) for v in exact_idx_host[query_ordinal].tolist()]
-        challenger_ordinals = [int(v) for v in cagra_idx_host[query_ordinal].tolist()]
+        self_ordinal = self_ordinals[query_ordinal]
+        exact_ordinals = _filter_self(exact_idx_host[query_ordinal], self_ordinal, k)
+        challenger_ordinals = _filter_self(cagra_idx_host[query_ordinal], self_ordinal, k)
         recall = len(set(exact_ordinals) & set(challenger_ordinals)) / float(k)
         recalls.append(recall)
         comparisons.append(AnnQueryComparison(
             query_ordinal=query_ordinal,
+            corpus_ordinal=self_ordinal,
             recall_at_k=recall,
             exact_ordinals=exact_ordinals,
             cagra_ordinals=challenger_ordinals,
         ))
-
-    exact_rows = [
-        f"{q}\0{rank}\0{int(exact_idx_host[q, rank])}\0{exact_dist_host[q, rank]:.17g}"
-        for q in range(query_np.shape[0]) for rank in range(k)
-    ]
-    cagra_rows = [
-        f"{q}\0{rank}\0{int(cagra_idx_host[q, rank])}\0{cagra_dist_host[q, rank]:.17g}"
-        for q in range(query_np.shape[0]) for rank in range(k)
-    ]
+        for rank, ordinal in enumerate(exact_ordinals, start=1):
+            source_rank = next(index for index, value in enumerate(exact_idx_host[query_ordinal].tolist()) if int(value) == ordinal)
+            exact_rows.append(f"{query_ordinal}\0{rank}\0{ordinal}\0{exact_dist_host[query_ordinal, source_rank]:.17g}")
+        for rank, ordinal in enumerate(challenger_ordinals, start=1):
+            source_rank = next(index for index, value in enumerate(cagra_idx_host[query_ordinal].tolist()) if int(value) == ordinal)
+            cagra_rows.append(f"{query_ordinal}\0{rank}\0{ordinal}\0{cagra_dist_host[query_ordinal, source_rank]:.17g}")
 
     return AnnComparisonReceipt(
-        schema="atlas.ann-comparison-receipt.v1",
+        schema="atlas.ann-comparison-receipt.v2",
         metric=metric,
         dimensions=int(corpus_np.shape[1]),
         corpus_rows=int(corpus_np.shape[0]),
         query_rows=int(query_np.shape[0]),
         k=k,
+        search_k=search_k,
+        self_exclusion_applied=exclude_self,
         graph_degree=graph_degree,
         intermediate_graph_degree=intermediate_graph_degree,
         build_algo=build_algo,
