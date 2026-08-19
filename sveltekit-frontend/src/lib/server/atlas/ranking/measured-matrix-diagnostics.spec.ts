@@ -39,6 +39,7 @@ describe('measured N×16 matrix diagnostics', () => {
     expect(diagnostics.matrixSha256).toBe(searchPolicyMatrixSha256(matrix));
     expect(diagnostics.algorithm).toBe('ATA_SYMMETRIC_JACOBI_SVD_V1');
     expect(diagnostics.transform).toBe('NONE');
+    expect(diagnostics.conditionNumberDefinition).toBe('NUMERICAL_ACTIVE_SUBSPACE');
     expect(diagnostics.converged).toBe(true);
     expect(diagnostics.sampleSufficientForColumnRank).toBe(true);
     expect(diagnostics.numericalRank).toBe(16);
@@ -69,6 +70,38 @@ describe('measured N×16 matrix diagnostics', () => {
     expect(tang.stochasticExecutionRequired).toBe(true);
     expect(tang.proposalOnly).toBe(true);
     expect(tang.canonicalWritesAllowed).toBe(false);
+  });
+
+  it('allows measured numerical rank deficiency to support the low-rank hypothesis without circular rejection', () => {
+    const matrix = diagonalMatrix(16, [1, ...Array(4).fill(0.02), ...Array(11).fill(0)]);
+    const diagnostics = measureSearchPolicyMatrixDiagnostics(matrix, {
+      requestId: 'req-rank-deficient',
+      producerRevision: 'test',
+    });
+
+    expect(diagnostics.sampleSufficientForColumnRank).toBe(true);
+    expect(diagnostics.rankDeficient).toBe(true);
+    expect(diagnostics.numericalRank).toBe(5);
+    expect(diagnostics.conditionNumberDefinition).toBe('NUMERICAL_ACTIVE_SUBSPACE');
+    expect(diagnostics.conditionNumber).toBeGreaterThan(40);
+    expect(diagnostics.conditionNumber).toBeLessThan(60);
+
+    const tang = buildMeasuredTangPolicyReceipt({
+      requestId: 'req-rank-deficient',
+      matrix,
+      diagnostics,
+      policy: {
+        maxEffectiveRankRatio: 0.35,
+        minRetainedEnergyPercent: 80,
+        maxConditionNumber: 100,
+        promotionCount: 4,
+      },
+      producerRevision: 'test',
+    });
+
+    expect(tang.recommendation.status).toBe('ELIGIBLE');
+    expect(tang.qualified).toBe(true);
+    expect(tang.qualificationReasonCodes).toContain('NUMERICAL_RANK_DEFICIENT_ACTIVE_SUBSPACE_CONDITION_USED');
   });
 
   it('does not qualify apparent low rank when N is smaller than the 16-feature width', () => {
