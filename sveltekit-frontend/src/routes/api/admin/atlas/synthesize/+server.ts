@@ -5,6 +5,7 @@ import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-featur
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 import { scoreQdrantSemanticCandidatesV1 } from '$lib/server/atlas/retrieval/qdrant-semantic-scorer.js';
+import { scorePostgresLexicalCandidatesV1 } from '$lib/server/atlas/retrieval/postgres-lexical-scorer.js';
 import {
   chooseCandidateBucket,
   type AtlasSynthesisRequestV1,
@@ -30,6 +31,8 @@ function compareCandidates(a: CandidateFeatureRowV1, b: CandidateFeatureRowV1): 
   if (a.exactSymbolMatch !== b.exactSymbolMatch) return b.exactSymbolMatch - a.exactSymbolMatch;
   const semantic = nullableScore(b.semanticCosine) - nullableScore(a.semanticCosine);
   if (Number.isFinite(semantic) && semantic !== 0) return semantic;
+  const lexical = nullableScore(b.lexicalScore) - nullableScore(a.lexicalScore);
+  if (Number.isFinite(lexical) && lexical !== 0) return lexical;
   const ppr = nullableScore(b.personalizedPageRank) - nullableScore(a.personalizedPageRank);
   if (Number.isFinite(ppr) && ppr !== 0) return ppr;
   const pr = nullableScore(b.globalPageRank) - nullableScore(a.globalPageRank);
@@ -93,23 +96,36 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     }
 
-    const semanticErrors: string[] = [];
-    let semanticReceipt: Awaited<ReturnType<typeof scoreQdrantSemanticCandidatesV1>> | null = null;
-    if (packetKeys.length > 0) {
-      try {
-        semanticReceipt = await scoreQdrantSemanticCandidatesV1(body.query.trim(), packetKeys, candidateLimit);
-      } catch (error) {
-        semanticErrors.push(error instanceof Error ? error.message : String(error));
-      }
-    }
+    const [semanticResult, lexicalResult] = await Promise.allSettled([
+      packetKeys.length > 0
+        ? scoreQdrantSemanticCandidatesV1(body.query.trim(), packetKeys, candidateLimit)
+        : Promise.resolve(null),
+      packetKeys.length > 0
+        ? scorePostgresLexicalCandidatesV1(body.query.trim(), packetKeys, candidateLimit)
+        : Promise.resolve(null),
+    ]);
+
+    const semanticReceipt = semanticResult.status === 'fulfilled' ? semanticResult.value : null;
+    const semanticErrors = semanticResult.status === 'rejected'
+      ? [semanticResult.reason instanceof Error ? semanticResult.reason.message : String(semanticResult.reason)]
+      : [];
+    const lexicalReceipt = lexicalResult.status === 'fulfilled' ? lexicalResult.value : null;
+    const lexicalErrors = lexicalResult.status === 'rejected'
+      ? [lexicalResult.reason instanceof Error ? lexicalResult.reason.message : String(lexicalResult.reason)]
+      : [];
+
     const semanticByPacket = new Map(
       (semanticReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
+    );
+    const lexicalByPacket = new Map(
+      (lexicalReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
     );
 
     const seedSet = new Set(body.seedNodeKeys);
     const candidates: CandidateFeatureRowV1[] = graph.nodes.map((node, candidateOrdinal) => {
       const staticGraph = node.packetKey ? graphFeatures.get(node.packetKey) : undefined;
       const semantic = node.packetKey ? semanticByPacket.get(node.packetKey) : undefined;
+      const lexical = node.packetKey ? lexicalByPacket.get(node.packetKey) : undefined;
       return {
         candidateOrdinal,
         canonicalId: `${body.snapshotId}:${node.id}`,
@@ -117,7 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
         nodeKey: node.id,
         sourceRef: node.sourceRef,
         semanticCosine: semantic?.score ?? null,
-        lexicalScore: null,
+        lexicalScore: lexical?.score ?? null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
         astMatch: null,
         personalizedPageRank: staticGraph?.personalizedPageRank ?? null,
@@ -132,9 +148,6 @@ export const POST: RequestHandler = async ({ request }) => {
 
     candidates.sort(compareCandidates);
 
-    // If GPU pressure cannot admit the requested bucket, use the strongest
-    // revision-qualified prefix that fits. If no GPU lease exists, keep the
-    // full bounded set and route scoring to Qdrant/CPU instead of dropping data.
     const executionCandidateLimit =
       gpuBudget.executionTarget === 'gpu' && gpuBudget.maxCandidateBucket != null
         ? Math.min(candidates.length, gpuBudget.maxCandidateBucket)
@@ -159,7 +172,7 @@ export const POST: RequestHandler = async ({ request }) => {
       evidenceRefs: executionCandidates
         .filter((candidate) => candidate.sourceRef)
         .map((candidate) => `${candidate.sourceRef}#${candidate.nodeKey}`),
-      producerRevision: 'atlas.graph-synthesis-prep.v3',
+      producerRevision: 'atlas.graph-synthesis-prep.v4',
     };
 
     return json({
@@ -179,12 +192,10 @@ export const POST: RequestHandler = async ({ request }) => {
         degraded: gpuBudget.degraded,
         reason: gpuBudget.reason,
         residency: gpuBudget,
-        stages: ['semantic_768', 'graph_features', 'exact_promotion', 'context_manifest'],
+        stages: ['semantic_768', 'lexical', 'graph_features', 'exact_promotion', 'context_manifest'],
       },
-      semantic: {
-        receipt: semanticReceipt,
-        errors: semanticErrors,
-      },
+      semantic: { receipt: semanticReceipt, errors: semanticErrors },
+      lexical: { receipt: lexicalReceipt, errors: lexicalErrors },
       graphFeatures: {
         graphRevision: body.graphRevision?.trim() || null,
         hydrated: graphFeatures.size,
@@ -192,19 +203,21 @@ export const POST: RequestHandler = async ({ request }) => {
       },
       retrievalPlan: {
         dense: 'codebase_chunks_768_v2/content (canonical semantic_768 cold/warm projection)',
-        bm25: 'canonical lexical lane outside Qdrant semantic ownership',
+        lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',
         bm42: 'codebase_chunks_384_hybrid/bm42 experimental challenger only',
         fallback: gpuBudget.executionTarget === 'qdrant' ? 'qdrant' : null,
       },
       next: {
         semantic: semanticReceipt
-          ? 'semanticCosine is now hydrated from the canonical semantic_768 Qdrant projection for the bounded graph candidate identities.'
-          : 'Qdrant semantic enrichment failed open; keep graph candidates but do not fabricate semanticCosine.',
+          ? 'semanticCosine is hydrated from the canonical semantic_768 Qdrant projection for bounded graph candidate identities.'
+          : 'Qdrant semantic enrichment failed open; do not fabricate semanticCosine.',
+        lexical: lexicalReceipt
+          ? 'lexicalScore is hydrated by the existing canonical PostgreSQL FTS semantics; BM42 remains challenger-only.'
+          : 'PostgreSQL lexical enrichment failed open; BM42 must not silently become the canonical lexical score.',
         graph: body.graphRevision
           ? 'Static graph metrics were read only from the requested graphRevision; query-time PPR may overwrite personalizedPageRank only with its own receipt.'
           : 'Provide graphRevision to hydrate persisted PageRank/community features; do not infer it from snapshotId.',
-        lexical: 'Keep BM25 canonical; treat BM42 as challenger evidence without an independent identity vote.',
-        cache: 'Populate bitfrostHotness from revision-qualified Redis/Valkey hot state.',
+        cache: 'bitfrostHotness remains null until live invalidation/residency semantics are proven; key existence is not relevance.',
         promotion: 'Hydrate exact source/AST/type evidence before invoking the synthesis model.',
       },
     });
