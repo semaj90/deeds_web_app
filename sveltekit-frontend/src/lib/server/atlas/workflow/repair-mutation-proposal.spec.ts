@@ -13,6 +13,8 @@ function proposal() {
     requestId: 'req-1',
     workflowId: 'repair:req-1',
     workflowRevision: 1,
+    workspaceRevision: 'workspace-742',
+    graphRevision: 'graph-338',
     sourceRef: 'src/routes/example/+server.ts',
     sourceRevision: 'git:abc123',
     mutationIntent: 'PATCH_SOURCE',
@@ -40,9 +42,12 @@ function proposal() {
 
 describe('repair mutation proposal workflow boundary', () => {
   it('emits a proposal-only WorkflowActionEvent with canonical writes disabled', () => {
-    const bundle = compileRepairProposalWorkflow(proposal(), 'test');
+    const value = proposal();
+    const bundle = compileRepairProposalWorkflow(value, 'test');
     expect(bundle.canonicalWritesAllowed).toBe(false);
     expect(bundle.dag.canonicalWritesAllowed).toBe(false);
+    expect(bundle.dag.workspaceRevision).toBe(value.workspaceRevision);
+    expect(bundle.dag.graphRevision).toBe(value.graphRevision);
     expect(bundle.dag.nodes.map((node) => node.kind)).toEqual([
       'EXACT_PROMOTION',
       'VALIDATE',
@@ -117,6 +122,8 @@ describe('repair mutation proposal workflow boundary', () => {
 
     expect(bundle.operatorAuthorized).toBe(true);
     expect(bundle.canonicalWritesAllowed).toBe(true);
+    expect(bundle.dag.workspaceRevision).toBe(value.workspaceRevision);
+    expect(bundle.dag.graphRevision).toBe(value.graphRevision);
     expect(bundle.dag.nodes.find((node) => node.nodeId === 'apply-patch')?.dependsOn)
       .toEqual(['validate-authorized-repair']);
     expect(bundle.action.toolName).toBe('ops.apply_patch');
