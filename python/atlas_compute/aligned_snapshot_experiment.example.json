@@ -28,6 +28,7 @@
     "vector_name": "semantic_768",
     "canonical_payload_key": "canonical_id",
     "hnsw_ef": [32, 64, 128, 256],
+    "minimum_exact_overlap_at_k": 0.95,
     "minimum_recall_at_k": 0.95,
     "timeout_seconds": 15
   },
