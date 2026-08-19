@@ -1,0 +1,68 @@
+schema_id: atlas.training-configuration-surface
+schema_version: 1
+schema_kind: training_configuration_surface
+status: ACTIVE
+
+description: >
+  Measured surrogate surface over already-executed Parent Atlas training runs.
+  Categorical choices such as ZeRO stage/offload strategy/optimizer family remain
+  separate strata. Within one stratum, a tensor-product cubic surrogate may be
+  fit over normalized continuous/semi-continuous coordinates after enough exact
+  measurements exist. Surrogate output is proposal-only and must be verified by
+  a real training execution receipt.
+
+fields:
+  schema: { type: literal, value: atlas.training-configuration-surface.v1 }
+  surfaceId: { type: string, required: true }
+  surfaceRevision: { type: string, required: true }
+  baseModelRevision: { type: string, required: true }
+  datasetSnapshotId: { type: string, required: true }
+  categoricalStratum:
+    type: object
+    fields:
+      zeroStage: { type: enum, values: [0, 1, 2, 3] }
+      optimizer: { type: enum, values: [ADAMW, PAGED_ADAMW_8BIT, DEEPSPEED_CPU_ADAM] }
+      optimizerPlacement: { type: enum, values: [GPU, CPU, NVME] }
+      parameterPlacement: { type: enum, values: [GPU, CPU, NVME] }
+      checkpointing: { type: enum, values: [NONE, SELECTIVE, FULL] }
+      peftMethod: { type: enum, values: [LORA, QLORA, LORA_FA] }
+      targetModuleSetId: { type: string, required: true }
+      precision: { type: enum, values: [FP32, BF16, FP16] }
+  axes:
+    type: object
+    fields:
+      log10LearningRate: { type: number_array, required: true }
+      loraRank: { type: number_array, required: true }
+      effectiveBatchOrResource: { type: number_array, required: true }
+      effectiveBatchOrResourceMeaning: { type: enum, values: [EFFECTIVE_BATCH, NORMALIZED_MEMORY_BUDGET, GRADIENT_ACCUMULATION] }
+  measuredPointRefs: { type: string_array, required: true }
+  metric:
+    type: enum
+    values: [HELDOUT_QUALITY, SAMPLES_PER_SECOND, QUALITY_PER_SECOND, QUALITY_PER_GPU_GB, PARETO_UTILITY]
+  interpolation:
+    type: object
+    fields:
+      method: { type: enum, values: [NONE, LINEAR, CUBIC] }
+      implementation: { type: enum, values: [SCIPY_REGULAR_GRID_INTERPOLATOR, OTHER] }
+      axesNormalized: { type: boolean }
+      minimumPointsPerAxis: { type: integer, minimum: 1 }
+  proposedPoints:
+    type: array
+    default: []
+    items:
+      learningRate: { type: number, minimumExclusive: 0 }
+      loraRank: { type: integer, minimum: 1 }
+      effectiveBatchOrResource: { type: number, minimumExclusive: 0 }
+      predictedMetric: { type: number, required: true }
+      status: { type: literal, value: UNPROVEN_PROPOSAL }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - zeroStage and offload placement are categorical strata and MUST NOT be interpolated
+  - cubic interpolation requires at least four measured coordinates on every interpolated axis
+  - axes with substantially different scales must be normalized/rescaled before cubic interpolation
+  - no extrapolated/surrogate point is considered PROVEN without a real AdapterTrainingReceiptV1
+  - measuredPointRefs must refer to exact executed configurations and observed metrics
+  - held-out quality and resource metrics are preferred over train loss alone
+  - surface proposals may guide the next experiment but cannot activate an adapter or runtime configuration directly
