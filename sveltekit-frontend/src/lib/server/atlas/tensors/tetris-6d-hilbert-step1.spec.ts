@@ -3,6 +3,7 @@ import {
   buildDerivedHilbertLocalityEdges,
   buildTetris6DKeyValue,
   defaultTetris6DBounds,
+  eulerZYXToCanonicalQuaternion,
   hilbertIndexND,
   planHilbertDomain,
 } from './tetris-6d-hilbert-step1.js';
@@ -15,8 +16,6 @@ describe('Tetris 6DoF Hilbert step 1', () => {
       producerRevision: 'test',
     });
 
-    // ceil(log2(100,000,000) / 6) = 5 bits/axis.
-    // Six axes therefore produce a 30-bit Hilbert keyspace: 2^30 > 100M.
     expect(plan.bitsPerAxis).toBe(5);
     expect(plan.binsPerAxis).toBe(32);
     expect(plan.keyBits).toBe(30);
@@ -25,7 +24,7 @@ describe('Tetris 6DoF Hilbert step 1', () => {
     expect(plan.localityOnly).toBe(true);
   });
 
-  it('encodes a 6DoF pose into compact locality/member keys while leaving SOM/KMeans unset', () => {
+  it('encodes Euler locality coordinates plus a physical quaternion/SE3 feature', () => {
     const row = buildTetris6DKeyValue({
       canonicalId: 'piece:T:0001',
       piece: 'T',
@@ -36,11 +35,16 @@ describe('Tetris 6DoF Hilbert step 1', () => {
       producerRevision: 'test',
     });
 
+    expect(row.eulerPose6D).toHaveLength(6);
     expect(row.quantizedPose6D).toHaveLength(6);
     expect(row.clusterVector6).toHaveLength(6);
+    expect(row.physicalRotationQuaternion).toHaveLength(4);
+    expect(Math.hypot(...row.physicalRotationQuaternion)).toBeCloseTo(1, 10);
+    expect(row.se3PhysicalFeature7).toHaveLength(7);
     expect(row.somFixtureVector64).toHaveLength(64);
+    expect(row.somQuaternionFixtureVector64).toHaveLength(64);
     expect(row.somFixtureVector64.slice(0, 6)).toEqual(row.clusterVector6);
-    expect(row.somFixtureVector64.slice(6).every((value) => value === 0)).toBe(true);
+    expect(row.somQuaternionFixtureVector64.slice(0, 7)).toEqual(row.se3PhysicalFeature7);
     expect(row.somAssignment).toBeNull();
     expect(row.kmeansCluster).toBeNull();
     expect(row.canonicalGraphRelation).toBe(false);
@@ -48,7 +52,7 @@ describe('Tetris 6DoF Hilbert step 1', () => {
     expect(row.memberKey).toContain('piece:T:0001');
   });
 
-  it('wraps periodic roll/pitch/yaw instead of treating angles as unbounded scalars', () => {
+  it('wraps periodic Euler locality coordinates while physical quaternions remain equivalent', () => {
     const bounds = defaultTetris6DBounds();
     const a = buildTetris6DKeyValue({
       canonicalId: 'piece:I:a', piece: 'I',
@@ -63,6 +67,14 @@ describe('Tetris 6DoF Hilbert step 1', () => {
 
     expect(a.quantizedPose6D).toEqual(b.quantizedPose6D);
     expect(a.hilbertIndexDecimal).toBe(b.hilbertIndexDecimal);
+    expect(a.physicalRotationQuaternion).toEqual(expect.arrayContaining(b.physicalRotationQuaternion));
+  });
+
+  it('uses a canonical q/-q sign for physical quaternion fixture vectors', () => {
+    const q = eulerZYXToCanonicalQuaternion(0, 0, Math.PI);
+    const firstNonZero = q.find((value) => Math.abs(value) > 1e-12) ?? 0;
+    expect(firstNonZero).toBeGreaterThan(0);
+    expect(Math.hypot(...q)).toBeCloseTo(1, 10);
   });
 
   it('keeps Hilbert collisions safe by making member identity compound', () => {
