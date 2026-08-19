@@ -101,6 +101,8 @@ function findSmallestContainingNode(sourceFile: SourceFile, startChar: number, e
   return best;
 }
 
+type NameNodeReadable = Node & { getNameNode?: () => Node | undefined };
+
 function findSemanticAnchor(node: Node): Node {
   if (Node.isIdentifier(node)) return node;
   const exactIdentifier = node.getDescendantsOfKind(SyntaxKind.Identifier)
@@ -109,10 +111,8 @@ function findSemanticAnchor(node: Node): Node {
 
   let cursor: Node | undefined = node;
   while (cursor) {
-    if (Node.isNamedNode(cursor) && 'getNameNode' in cursor) {
-      const nameNode = (cursor as Node & { getNameNode?: () => Node | undefined }).getNameNode?.();
-      if (nameNode) return nameNode;
-    }
+    const nameNode = (cursor as NameNodeReadable).getNameNode?.();
+    if (nameNode) return nameNode;
     cursor = cursor.getParent();
   }
   return node;
