@@ -10,13 +10,14 @@
 
 #include "vendor/simdjson.h"
 
+#include <algorithm>
 #include <cstdint>
-#include <iomanip>
 #include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace atlas::structured_value {
@@ -102,6 +103,7 @@ static Value materialize_object(simdjson::ondemand::object object, const std::st
       throw std::runtime_error(
           std::string("object field parse failed: ") + simdjson::error_message(field_result.error()));
     }
+
     auto field = field_result.value();
     std::string_view key_view;
     auto key_error = field.unescaped_key().get(key_view);
@@ -111,9 +113,8 @@ static Value materialize_object(simdjson::ondemand::object object, const std::st
     }
 
     keys.emplace_back(key_view);
-    auto field_value = field.value();
     result.entry_values.push_back(
-        materialize(field_value, child_id(value_id, "entry", ordinal)));
+        materialize(field.value(), child_id(value_id, "entry", ordinal)));
     ++ordinal;
   }
 
@@ -122,6 +123,37 @@ static Value materialize_object(simdjson::ondemand::object object, const std::st
     result.entries.push_back(Entry{i, std::move(keys[i]), &result.entry_values[i]});
   }
   return result;
+}
+
+static Value materialize_number(simdjson::ondemand::value value, const std::string& value_id) {
+  auto number_result = value.get_number();
+  if (number_result.error()) {
+    throw std::runtime_error(
+        std::string("number parse failed: ") + simdjson::error_message(number_result.error()));
+  }
+
+  auto number = number_result.value();
+  Value result;
+  result.value_id = value_id;
+
+  switch (number.get_number_type()) {
+    case simdjson::ondemand::number_type::signed_integer:
+      result.kind = Kind::Int;
+      result.int_decimal = std::to_string(number.get_int64());
+      return result;
+
+    case simdjson::ondemand::number_type::unsigned_integer:
+      result.kind = Kind::Int;
+      result.int_decimal = std::to_string(number.get_uint64());
+      return result;
+
+    case simdjson::ondemand::number_type::floating_point_number:
+      result.kind = Kind::Float;
+      result.float_value = number.get_double();
+      return result;
+  }
+
+  throw std::runtime_error("unsupported simdjson number type");
 }
 
 static Value materialize(simdjson::ondemand::value value, const std::string& value_id) {
@@ -152,31 +184,8 @@ static Value materialize(simdjson::ondemand::value value, const std::string& val
       return result;
     }
 
-    case simdjson::ondemand::json_type::number: {
-      // Preserve integer precision when the token is integer-shaped. On-Demand
-      // exposes both signed/unsigned integer accessors and double fallback.
-      std::int64_t signed_value = 0;
-      if (!value.get_int64().get(signed_value)) {
-        result.kind = Kind::Int;
-        result.int_decimal = std::to_string(signed_value);
-        return result;
-      }
-
-      std::uint64_t unsigned_value = 0;
-      if (!value.get_uint64().get(unsigned_value)) {
-        result.kind = Kind::Int;
-        result.int_decimal = std::to_string(unsigned_value);
-        return result;
-      }
-
-      double parsed = 0.0;
-      if (auto error = value.get_double().get(parsed); error) {
-        throw std::runtime_error(std::string("number parse failed: ") + simdjson::error_message(error));
-      }
-      result.kind = Kind::Float;
-      result.float_value = parsed;
-      return result;
-    }
+    case simdjson::ondemand::json_type::number:
+      return materialize_number(value, value_id);
 
     case simdjson::ondemand::json_type::string: {
       std::string_view parsed;
@@ -204,6 +213,85 @@ static Value materialize(simdjson::ondemand::value value, const std::string& val
   throw std::runtime_error("unsupported JSON value type");
 }
 
+static Value materialize_document(simdjson::ondemand::document& document, const std::string& value_id) {
+  auto type_result = document.type();
+  if (type_result.error()) {
+    throw std::runtime_error(
+        std::string("document type parse failed: ") + simdjson::error_message(type_result.error()));
+  }
+
+  switch (type_result.value()) {
+    case simdjson::ondemand::json_type::object: {
+      auto object_result = document.get_object();
+      if (object_result.error()) throw std::runtime_error("root object materialization failed");
+      return materialize_object(object_result.value(), value_id);
+    }
+    case simdjson::ondemand::json_type::array: {
+      auto array_result = document.get_array();
+      if (array_result.error()) throw std::runtime_error("root array materialization failed");
+      return materialize_array(array_result.value(), value_id);
+    }
+    case simdjson::ondemand::json_type::string: {
+      std::string_view parsed;
+      if (auto error = document.get_string().get(parsed); error) {
+        throw std::runtime_error(std::string("root string parse failed: ") + simdjson::error_message(error));
+      }
+      Value result;
+      result.value_id = value_id;
+      result.kind = Kind::String;
+      result.string_value = std::string(parsed);
+      return result;
+    }
+    case simdjson::ondemand::json_type::boolean: {
+      bool parsed = false;
+      if (auto error = document.get_bool().get(parsed); error) {
+        throw std::runtime_error(std::string("root bool parse failed: ") + simdjson::error_message(error));
+      }
+      Value result;
+      result.value_id = value_id;
+      result.kind = Kind::Bool;
+      result.bool_value = parsed;
+      return result;
+    }
+    case simdjson::ondemand::json_type::number: {
+      auto value_result = document.get_value();
+      // Some simdjson revisions only expose get_value() for object/array roots;
+      // use document.get_number() directly for scalar numeric documents.
+      (void)value_result;
+      auto number_result = document.get_number();
+      if (number_result.error()) {
+        throw std::runtime_error(
+            std::string("root number parse failed: ") + simdjson::error_message(number_result.error()));
+      }
+      auto number = number_result.value();
+      Value result;
+      result.value_id = value_id;
+      if (number.get_number_type() == simdjson::ondemand::number_type::floating_point_number) {
+        result.kind = Kind::Float;
+        result.float_value = number.get_double();
+      } else if (number.get_number_type() == simdjson::ondemand::number_type::signed_integer) {
+        result.kind = Kind::Int;
+        result.int_decimal = std::to_string(number.get_int64());
+      } else {
+        result.kind = Kind::Int;
+        result.int_decimal = std::to_string(number.get_uint64());
+      }
+      return result;
+    }
+    case simdjson::ondemand::json_type::null: {
+      if (auto error = document.get_null(); error) {
+        throw std::runtime_error(std::string("root null parse failed: ") + simdjson::error_message(error));
+      }
+      Value result;
+      result.value_id = value_id;
+      result.kind = Kind::Null;
+      return result;
+    }
+  }
+
+  throw std::runtime_error("unsupported root JSON type");
+}
+
 static Value parse_document(std::string& json, const std::string& root_id = "json:root") {
   simdjson::ondemand::parser parser;
   auto document_result = parser.iterate(json);
@@ -211,7 +299,8 @@ static Value parse_document(std::string& json, const std::string& root_id = "jso
     throw std::runtime_error(
         std::string("simdjson parse failed: ") + simdjson::error_message(document_result.error()));
   }
-  return materialize(document_result.value(), root_id);
+  auto document = document_result.value();
+  return materialize_document(document, root_id);
 }
 
 static std::vector<Value> parse_jsonl(std::string& jsonl, std::size_t batch_size = 1 * 1024 * 1024) {
@@ -230,7 +319,8 @@ static std::vector<Value> parse_jsonl(std::string& jsonl, std::size_t batch_size
       throw std::runtime_error(
           std::string("JSONL document failed: ") + simdjson::error_message(doc_result.error()));
     }
-    values.push_back(materialize(doc_result.value(), child_id("jsonl", "document", ordinal)));
+    auto document = doc_result.value();
+    values.push_back(materialize_document(document, child_id("jsonl", "document", ordinal)));
     ++ordinal;
   }
   return values;
