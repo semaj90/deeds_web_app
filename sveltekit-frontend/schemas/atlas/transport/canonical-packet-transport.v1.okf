@@ -1,0 +1,66 @@
+schema_id: atlas.canonical-packet-transport
+schema_version: 1
+schema_kind: transport_envelope
+status: ACTIVE
+
+description: >
+  Transport-neutral envelope for an already-materialized Parent Atlas packet or
+  evidence bundle. Canonical packet identity/revisions are carried independently
+  from the selected wire/storage representation (JSON, MessagePack, protobuf,
+  Arrow IPC, mmap reference, ACP or A2A projection). Transport representation is
+  never allowed to mint or mutate canonical identity.
+
+fields:
+  schema: { type: literal, value: atlas.canonical-packet-transport.v1 }
+  transportId: { type: string, required: true }
+  requestId: { type: string, nullable: true }
+  packetKey: { type: string, required: true }
+  sourceRef: { type: string, required: true }
+  canonicalId: { type: string, nullable: true }
+  workspaceRevision: { type: string, required: true }
+  sourceRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  featureRevision: { type: string, nullable: true }
+  graphRevision: { type: string, nullable: true }
+  ontologyRevision: { type: string, nullable: true }
+  contextManifestId: { type: string, nullable: true }
+  objectStorageRef:
+    type: object
+    nullable: true
+    fields:
+      scheme: { type: enum, values: [SEAWEEDFS_S3, S3] }
+      bucket: { type: string, required: true }
+      key: { type: string, required: true }
+      contentChecksum: { type: string, required: true }
+      byteLength: { type: integer, minimum: 0 }
+      mediaType: { type: string, nullable: true }
+  payload:
+    type: object
+    fields:
+      mode:
+        type: enum
+        values: [JSON_INLINE, MSGPACK_INLINE, PROTOBUF_INLINE, ARROW_IPC_REF, MMAP_REF, OBJECT_REF, PACKET_REF_ONLY]
+      mediaType: { type: string, required: true }
+      byteLength: { type: integer, minimum: 0 }
+      contentChecksum: { type: string, required: true }
+      dataRefId: { type: string, nullable: true }
+      inlineJson: { type: object, nullable: true }
+      inlineBytesBase64: { type: string, nullable: true }
+  evidenceRefs: { type: string_array, default: [] }
+  ontologyIds: { type: string_array, default: [] }
+  conceptIds: { type: string_array, default: [] }
+  hyperedgeRefs: { type: string_array, default: [] }
+  validationReceiptId: { type: string, nullable: true }
+  materializationReceiptId: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - packetKey/sourceRef/revisions come from the canonical packet/materialization owner and are invariant across transports
+  - JSON, MessagePack, protobuf, Arrow IPC, mmap, ACP and A2A are representations/adapters, not packet identity sources
+  - large numeric tensors and large packet batches SHOULD use ARROW_IPC_REF or MMAP_REF rather than JSON or base64
+  - MessagePack bytes are transport bytes and MUST NOT be used as canonical packet identity unless a separately versioned canonical encoding profile is defined
+  - objectStorageRef points to immutable original/derived bytes; object storage never replaces Postgres packet/revision identity
+  - ontologyIds/conceptIds are enrichment references; canonical n-ary relation truth remains in hyperedge/evidence owners
+  - payload mode PACKET_REF_ONLY is preferred for ACP/A2A/tool calls when the receiver can hydrate through packetKey/dataRefId/objectStorageRef
+  - payload contentChecksum verifies bytes; envelope checksum verifies canonical field ordering/versioned envelope content
