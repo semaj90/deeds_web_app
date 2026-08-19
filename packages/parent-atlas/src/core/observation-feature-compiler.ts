@@ -76,6 +76,7 @@ export const observationFeatureRowSchema = z.object({
   registry_revision: revision,
   ast_features: z.array(observationFeatureValueSchema),
   ontology_features: z.array(observationFeatureValueSchema),
+  langextract_features: z.array(observationFeatureValueSchema).default([]),
   graph_features: z.array(observationFeatureValueSchema),
   cluster_features: z.array(observationFeatureValueSchema),
   context_features: z.array(observationFeatureValueSchema),
@@ -105,6 +106,14 @@ export const routerFeatureTensorSchema = z.object({
 });
 export type RouterFeatureTensorV1 = z.infer<typeof routerFeatureTensorSchema>;
 
+const POSTGRES_INDEXED_ARRAYS = ['ontology_classes', 'ast_observation_kinds', 'langextract_classes'] as const;
+const POSTGRES_INDEXED_SCALARS = ['source_id', 'source_revision', 'domain_class', 'kmeans_cluster', 'som_cell'] as const;
+const QDRANT_PAYLOAD_INDEXES = [
+  'source_id', 'source_revision', 'domain_class', 'ontology_classes', 'language',
+  'ast_observation_kinds', 'langextract_classes', 'kmeans_cluster', 'som_cell',
+  'document_checksum', 'chunk_checksum', 'tags',
+] as const;
+
 export const observationStorageProjectionSchema = z.object({
   schema: z.literal('atlas.observation-storage-projection.v1').default('atlas.observation-storage-projection.v1'),
   projection_revision: revision,
@@ -115,8 +124,8 @@ export const observationStorageProjectionSchema = z.object({
     vector_column: z.literal('semantic_768'),
     vector_dimension: z.literal(768),
     vector_index_role: z.literal('FILTERED_EXACT_OR_BOUNDED_ANN'),
-    indexed_arrays: z.array(z.enum(['ontology_classes', 'ast_observation_kinds', 'langextract_classes'])).default(['ontology_classes', 'ast_observation_kinds', 'langextract_classes']),
-    indexed_scalars: z.array(z.enum(['source_id', 'source_revision', 'domain_class', 'kmeans_cluster', 'som_cell'])).default(['source_id', 'source_revision', 'domain_class', 'kmeans_cluster', 'som_cell']),
+    indexed_arrays: z.array(z.enum(POSTGRES_INDEXED_ARRAYS)).default([...POSTGRES_INDEXED_ARRAYS]),
+    indexed_scalars: z.array(z.enum(POSTGRES_INDEXED_SCALARS)).default([...POSTGRES_INDEXED_SCALARS]),
   }).strict(),
   qdrant: z.object({
     retrieval_projection_only: z.literal(true),
@@ -124,7 +133,7 @@ export const observationStorageProjectionSchema = z.object({
     dense_vector: z.literal('semantic_768'),
     sparse_vector: z.literal('lexical_bm25'),
     semantic_lane_votes: z.literal(1),
-    payload_indexes: z.array(z.enum(['source_id', 'source_revision', 'domain_class', 'ontology_classes', 'language', 'kmeans_cluster', 'som_cell', 'document_checksum', 'chunk_checksum', 'tags'])),
+    payload_indexes: z.array(z.enum(QDRANT_PAYLOAD_INDEXES)),
   }).strict(),
   canonical_authority: z.literal(false).default(false),
 }).strict();
@@ -156,11 +165,10 @@ export function buildObservationFeatureRegistry(input: {
   const definitions = [...input.definitions]
     .sort((a, b) => a.feature_id.localeCompare(b.feature_id))
     .map((definition, ordinal) => observationFeatureDefinitionSchema.parse({ ...definition, ordinal }));
-  const logical = { registry_revision: input.registryRevision, definitions };
   return observationFeatureRegistrySchema.parse({
     registry_revision: input.registryRevision,
     definitions,
-    registry_checksum: observationFeatureChecksum(logical),
+    registry_checksum: observationFeatureChecksum({ registry_revision: input.registryRevision, definitions }),
     canonical_authority: false,
   });
 }
@@ -180,10 +188,17 @@ function binaryFeature(definition: ObservationFeatureDefinitionV1, evidenceRefs:
   });
 }
 
-/**
- * Compile exact/grounded observations into discrete feature signals. This does
- * not embed observation JSON and does not promote any observation to truth.
- */
+function compileBinaryMap(source: Map<string, string[]>, definitions: Map<string, ObservationFeatureDefinitionV1>): ObservationFeatureValueV1[] {
+  return [...source.entries()]
+    .map(([featureId, refs]) => {
+      const definition = definitions.get(featureId);
+      return definition ? binaryFeature(definition, refs) : null;
+    })
+    .filter((value): value is ObservationFeatureValueV1 => value !== null)
+    .sort((a, b) => a.feature_ordinal - b.feature_ordinal);
+}
+
+/** Compile exact/grounded observations into discrete feature signals; raw observation JSON is never appended to embedding text. */
 export function compileObservationFeatures(input: {
   candidateId: string;
   rowOrdinal: number;
@@ -201,10 +216,9 @@ export function compileObservationFeatures(input: {
 }): ObservationFeatureRowV1 {
   const registry = observationFeatureRegistrySchema.parse(input.registry);
   const definitions = registryMap(registry);
-  const observations = [
-    ...(input.astObservations ?? []).map((value) => astGrepObservationSchema.parse(value)),
-    ...(input.langExtractObservations ?? []).map((value) => groundedLangExtractObservationSchema.parse(value)),
-  ];
+  const astObservations = (input.astObservations ?? []).map((value) => astGrepObservationSchema.parse(value));
+  const langExtractObservations = (input.langExtractObservations ?? []).map((value) => groundedLangExtractObservationSchema.parse(value));
+  const observations = [...astObservations, ...langExtractObservations];
   for (const observation of observations) {
     if (observation.source_ref !== input.sourceRef || observation.source_revision !== input.sourceRevision) {
       throw new Error('OBSERVATION_FEATURE_SOURCE_REVISION_MISMATCH');
@@ -213,44 +227,33 @@ export function compileObservationFeatures(input: {
 
   const astByFeature = new Map<string, string[]>();
   const ontologyByFeature = new Map<string, string[]>();
+  const langExtractByFeature = new Map<string, string[]>();
   const qdrantTags = new Set<string>();
+  const allEvidenceRefs = new Set<string>();
 
-  for (const observation of input.astObservations ?? []) {
-    const parsed = astGrepObservationSchema.parse(observation);
-    const featureId = `ast.${normalizeFeatureToken(parsed.observation_kind)}`;
-    const refs = astByFeature.get(featureId) ?? [];
-    refs.push(parsed.observation_id);
-    astByFeature.set(featureId, refs);
-    qdrantTags.add(`ast=${normalizeFeatureToken(parsed.observation_kind)}`);
+  for (const parsed of astObservations) {
+    const token = normalizeFeatureToken(parsed.observation_kind);
+    const featureId = `ast.${token}`;
+    astByFeature.set(featureId, [...(astByFeature.get(featureId) ?? []), parsed.observation_id]);
+    allEvidenceRefs.add(parsed.observation_id);
+    qdrantTags.add(`ast=${token}`);
     qdrantTags.add(`ast_rule=${normalizeFeatureToken(parsed.rule_id)}`);
   }
-  for (const observation of input.langExtractObservations ?? []) {
-    const parsed = groundedLangExtractObservationSchema.parse(observation);
-    const featureId = `langextract.${normalizeFeatureToken(parsed.extraction_class)}`;
-    const refs = ontologyByFeature.get(featureId) ?? [];
-    refs.push(parsed.extraction_id);
-    ontologyByFeature.set(featureId, refs);
-    qdrantTags.add(`langextract=${normalizeFeatureToken(parsed.extraction_class)}`);
+  for (const parsed of langExtractObservations) {
+    const token = normalizeFeatureToken(parsed.extraction_class);
+    const featureId = `langextract.${token}`;
+    langExtractByFeature.set(featureId, [...(langExtractByFeature.get(featureId) ?? []), parsed.extraction_id]);
+    allEvidenceRefs.add(parsed.extraction_id);
+    qdrantTags.add(`langextract=${token}`);
     qdrantTags.add(`alignment=${parsed.alignment_exact ? 'exact' : 'grounded_nonexact'}`);
   }
   for (const ontologyClass of input.ontologyClasses ?? []) {
     const normalized = normalizeFeatureToken(ontologyClass);
+    const evidenceRef = `ontology-class:${normalized}`;
     const featureId = `ontology.${normalized}`;
-    const refs = ontologyByFeature.get(featureId) ?? [];
-    refs.push(`ontology-class:${normalized}`);
-    ontologyByFeature.set(featureId, refs);
+    ontologyByFeature.set(featureId, [...(ontologyByFeature.get(featureId) ?? []), evidenceRef]);
+    allEvidenceRefs.add(evidenceRef);
     qdrantTags.add(`ontology=${normalized}`);
-  }
-
-  const astFeatures: ObservationFeatureValueV1[] = [];
-  const ontologyFeatures: ObservationFeatureValueV1[] = [];
-  for (const [featureId, refs] of astByFeature) {
-    const definition = definitions.get(featureId);
-    if (definition) astFeatures.push(binaryFeature(definition, refs));
-  }
-  for (const [featureId, refs] of ontologyByFeature) {
-    const definition = definitions.get(featureId);
-    if (definition) ontologyFeatures.push(binaryFeature(definition, refs));
   }
 
   const graphFeatures: ObservationFeatureValueV1[] = [];
@@ -258,13 +261,9 @@ export function compileObservationFeatures(input: {
     if (raw == null) continue;
     const definition = definitions.get(`graph.${suffix}`);
     if (!definition || definition.value_kind !== 'CONTINUOUS') continue;
-    graphFeatures.push(observationFeatureValueSchema.parse({
-      feature_id: definition.feature_id,
-      feature_ordinal: definition.ordinal,
-      family: definition.family,
-      continuous_value: raw,
-      evidence_refs: [`graph:${suffix}:${input.sourceRevision}`],
-    }));
+    const ref = `graph:${suffix}:${input.sourceRevision}`;
+    allEvidenceRefs.add(ref);
+    graphFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, continuous_value: raw, evidence_refs: [ref] }));
   }
 
   const clusterFeatures: ObservationFeatureValueV1[] = [];
@@ -272,13 +271,9 @@ export function compileObservationFeatures(input: {
     if (raw == null) continue;
     const definition = definitions.get(`cluster.${suffix}`);
     if (!definition || definition.value_kind !== 'CATEGORICAL') continue;
-    clusterFeatures.push(observationFeatureValueSchema.parse({
-      feature_id: definition.feature_id,
-      feature_ordinal: definition.ordinal,
-      family: definition.family,
-      categorical_value: String(raw),
-      evidence_refs: [`cluster:${suffix}:${input.sourceRevision}`],
-    }));
+    const ref = `cluster:${suffix}:${input.sourceRevision}`;
+    allEvidenceRefs.add(ref);
+    clusterFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, categorical_value: String(raw), evidence_refs: [ref] }));
     qdrantTags.add(`${suffix}=${normalizeFeatureToken(String(raw))}`);
   }
 
@@ -287,27 +282,20 @@ export function compileObservationFeatures(input: {
     if (raw == null) continue;
     const definition = definitions.get(`context.${suffix}`);
     if (!definition || definition.value_kind !== 'CONTINUOUS') continue;
-    contextFeatures.push(observationFeatureValueSchema.parse({
-      feature_id: definition.feature_id,
-      feature_ordinal: definition.ordinal,
-      family: definition.family,
-      continuous_value: raw,
-      evidence_refs: [`context:${suffix}:${input.sourceRevision}`],
-    }));
+    const ref = `context:${suffix}:${input.sourceRevision}`;
+    allEvidenceRefs.add(ref);
+    contextFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, continuous_value: raw, evidence_refs: [ref] }));
   }
   if (input.context?.validationPassed != null) {
     const definition = definitions.get('context.validation_passed');
     if (definition) {
-      contextFeatures.push(observationFeatureValueSchema.parse({
-        feature_id: definition.feature_id,
-        feature_ordinal: definition.ordinal,
-        family: definition.family,
-        binary_value: input.context.validationPassed ? 1 : 0,
-        evidence_refs: [`validation:${input.sourceRevision}`],
-      }));
+      const ref = `validation:${input.sourceRevision}`;
+      allEvidenceRefs.add(ref);
+      contextFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, binary_value: input.context.validationPassed ? 1 : 0, evidence_refs: [ref] }));
     }
   }
 
+  if (allEvidenceRefs.size === 0) throw new Error('OBSERVATION_FEATURE_ROW_REQUIRES_EVIDENCE');
   const byOrdinal = <T extends ObservationFeatureValueV1>(values: T[]) => values.sort((a, b) => a.feature_ordinal - b.feature_ordinal);
   return observationFeatureRowSchema.parse({
     candidate_id: input.candidateId,
@@ -317,23 +305,21 @@ export function compileObservationFeatures(input: {
     workspace_revision: input.workspaceRevision,
     row_identity_checksum: input.rowIdentityChecksum,
     registry_revision: registry.registry_revision,
-    ast_features: byOrdinal(astFeatures),
-    ontology_features: byOrdinal(ontologyFeatures),
+    ast_features: compileBinaryMap(astByFeature, definitions),
+    ontology_features: compileBinaryMap(ontologyByFeature, definitions),
+    langextract_features: compileBinaryMap(langExtractByFeature, definitions),
     graph_features: byOrdinal(graphFeatures),
     cluster_features: byOrdinal(clusterFeatures),
     context_features: byOrdinal(contextFeatures),
     qdrant_tags: [...qdrantTags].sort(),
-    observation_refs: [...new Set(observations.map((observation) => 'observation_id' in observation ? observation.observation_id : observation.extraction_id))].sort(),
+    observation_refs: [...allEvidenceRefs].sort(),
     canonical_authority: false,
   });
 }
 
-export function buildRouterFeatureTensor(input: {
-  row: ObservationFeatureRowV1;
-  semanticLatent: number[];
-}): RouterFeatureTensorV1 {
+export function buildRouterFeatureTensor(input: { row: ObservationFeatureRowV1; semanticLatent: number[] }): RouterFeatureTensorV1 {
   const row = observationFeatureRowSchema.parse(input.row);
-  const binary = [...row.ast_features, ...row.ontology_features, ...row.context_features]
+  const binary = [...row.ast_features, ...row.ontology_features, ...row.langextract_features, ...row.context_features]
     .filter((feature) => feature.binary_value === 1)
     .map((feature) => feature.feature_ordinal)
     .sort((a, b) => a - b);
@@ -362,8 +348,8 @@ export function buildRouterFeatureTensor(input: {
 
 export function describeObservationFeatureCompiler(): string {
   return [
-    'ast-grep, LangExtract and ontology observations compile into discrete revision-qualified feature signals; their raw JSON is never appended to semantic embedding text by this contract.',
-    'semantic_768 and latent_128/64 remain separate semantic representations; rare exact binary AST/ontology evidence is preserved outside the autoencoder bottleneck.',
+    'ast-grep, LangExtract and ontology observations compile into separate discrete revision-qualified feature families; raw observation JSON is never appended to semantic embedding text.',
+    'semantic_768 and latent_128/64 remain separate semantic representations; rare exact binary AST, ontology and grounded LangExtract evidence is preserved outside the autoencoder bottleneck.',
     'PostgreSQL owns exact identity/observation materialization and filtered relational/vector joins; Qdrant is a dense+BM25 retrieval projection with one semantic-family vote.',
     'KMeans, SOM and graph metrics are derived features and payload hints, never collection identity or canonical relationship truth.',
     'Ornith consumes promoted evidence and router outputs through ContextManifest/MCP surfaces; it does not become the persistent embedding or observation identity owner.',
