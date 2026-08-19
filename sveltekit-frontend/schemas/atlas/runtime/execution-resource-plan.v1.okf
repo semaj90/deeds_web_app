@@ -1,0 +1,50 @@
+schema_id: atlas.execution-resource-plan
+schema_version: 1
+schema_kind: execution_resource_plan
+status: ACTIVE
+
+description: >
+  Request-scoped plan for selecting compute executor, memory tier, transport and
+  bounded concurrency. This composes with NativeComputePlanV1 and GpuLeaseV1;
+  it does not create new retrieval votes or canonical state.
+
+fields:
+  schema: { type: literal, value: atlas.execution-resource-plan.v1 }
+  planId: { type: string, required: true }
+  operation: { type: string, required: true }
+  selectedRuntime:
+    type: enum
+    values: [windows-native, wsl2, cpu-only]
+  selectedExecutor: { type: string, required: true }
+  inputRefs: { type: string_array, default: [] }
+  outputTier:
+    type: enum
+    values: [GPU_VRAM, PINNED_HOST, HOST_RAM, REDIS_VALKEY, NVME_MMAP, DUCKDB, POSTGRES, QDRANT, NEO4J]
+  transport:
+    type: enum
+    values: [IN_PROCESS, NAPI, GRPC, QUIC_STREAM, PROTOBUF, MSGPACK, ARROW_IPC, MMAP_REF, REDIS_KEY, DATABASE_REF]
+  budgets:
+    type: object
+    fields:
+      maxGpuBytes: { type: integer, minimum: 0 }
+      gpuSafetyReserveBytes: { type: integer, minimum: 0 }
+      maxHostBytes: { type: integer, minimum: 0 }
+      maxNvmeBytes: { type: integer, minimum: 0 }
+      maxPayloadBytes: { type: integer, minimum: 0 }
+      maxLatencyMs: { type: integer, minimum: 0 }
+      maxCpuWorkers: { type: integer, minimum: 1 }
+      maxIoWorkers: { type: integer, minimum: 1 }
+      maxRpcInflight: { type: integer, minimum: 1 }
+  gpuLeaseId: { type: string, nullable: true }
+  environmentReceiptId: { type: string, nullable: true }
+  fallbackExecutors: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - one RTX device means one shared GPU lease envelope across Windows-native and WSL2
+  - large immutable tensor/matrix payloads should use a reference transport rather than JSON copies
+  - gRPC is the default reliable cross-language worker transport; QUIC is optional for independently streamable traffic and never changes operation semantics
+  - CPU and IO concurrency are separate budgets; increasing worker count must not implicitly increase GPU leases
+  - NVMe/Arrow/mmap and DuckDB are overflow/analysis tiers, not canonical identity owners
+  - already-calculated revision-matching inputs should be reused instead of recomputed
