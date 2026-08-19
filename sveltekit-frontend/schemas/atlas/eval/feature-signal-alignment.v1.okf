@@ -1,0 +1,76 @@
+schema_id: atlas.feature-signal-alignment
+schema_version: 1
+schema_kind: evaluation_snapshot
+status: ACTIVE
+
+description: >
+  Revision-frozen alignment of semantic, topology, n-ary, and ordered-context
+  feature signals for one comparison/rerank experiment. This contract aligns
+  already-computed representations by canonical ordinal/identity; it does not
+  create a new retrieval lane or canonical feature owner.
+
+fields:
+  schema: { type: literal, value: atlas.feature-signal-alignment.v1 }
+  alignmentId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  sourceRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  featureRevision: { type: string, required: true }
+  graphRevision: { type: string, required: true }
+  canonicalOrdinalSnapshotRef: { type: string, required: true }
+  semanticSnapshot:
+    type: object
+    fields:
+      semantic768Ref: { type: string, required: true }
+      cuvsExactTopKRef: { type: string, nullable: true }
+      cagraTopKRef: { type: string, nullable: true }
+      qdrantHnswTopKRef: { type: string, nullable: true }
+      kmeansDistributionRef: { type: string, nullable: true }
+      binaryHammingProjectionRef: { type: string, nullable: true }
+      somCoordinateRef: { type: string, nullable: true }
+  narySnapshot:
+    type: object
+    fields:
+      hyperedgeSnapshotRef: { type: string, required: true }
+      incidence01Ref: { type: string, required: true }
+      sparseSoftmaxRef: { type: string, nullable: true }
+      sparseSpmmRef: { type: string, nullable: true }
+  contextSnapshot:
+    type: object
+    fields:
+      orderedSourceRef: { type: string, required: true }
+      slidingWindowTensorRef: { type: string, required: true }
+      windowSize: { type: integer, minimum: 1 }
+      stride: { type: integer, minimum: 1 }
+  alignedRowCount: { type: integer, minimum: 1 }
+  observedSignalLabels: { type: string_array, default: [] }
+  missingSignalLabels: { type: string_array, default: [] }
+  alignedMatrixRef: { type: string, required: true }
+  alignedMatrixChecksum: { type: string, required: true }
+  producerRevision: { type: string, required: true }
+
+metrics:
+  exactTopKOverlap: { type: number, nullable: true }
+  cagraRecallAtK: { type: number, nullable: true }
+  qdrantRecallAtK: { type: number, nullable: true }
+  clusterEntropy: { type: number, nullable: true }
+  clusterStability: { type: number, nullable: true }
+  somQuantizationError: { type: number, nullable: true }
+  somNeighborhoodPreservation: { type: number, nullable: true }
+  sparseDenseLatencyRatio: { type: number, nullable: true }
+  sparseDensity: { type: number, nullable: true }
+  sparseRowIrregularity: { type: number, nullable: true }
+  contextWindowRetrievalLift: { type: number, nullable: true }
+  naryEvidenceRecallAtK: { type: number, nullable: true }
+  naryEvidenceMrr: { type: number, nullable: true }
+  peakGpuBytes: { type: integer, nullable: true }
+  latencyMs: { type: number, nullable: true }
+
+invariants:
+  - all rows align through the same canonical ordinal snapshot and revision set
+  - semantic_768 remains canonical; CAGRA, Qdrant and cuVS exact are executors/comparison outputs of one semantic lane
+  - cuVS brute force is an exact/parity oracle, not a production retrieval vote
+  - KMeans, Hamming and SOM are derived topology/routing features and not semantic truth
+  - n-ary incidence and sparse propagation are derived views; canonical hyperedges retain relation/member-role truth
+  - missing signals remain explicitly missing and are never converted into negative evidence
+  - the aligned matrix checksum must be computed from a canonical field/order representation, not non-canonical protobuf or raw floating-point object serialization
