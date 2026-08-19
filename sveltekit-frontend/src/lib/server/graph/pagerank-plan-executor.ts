@@ -23,14 +23,45 @@ function canonicalNodeExpression(variable: string): string {
 	return `coalesce(${variable}.canonicalId, ${variable}.canonical_id, ${variable}.packetKey, ${variable}.packet_key, ${variable}.stableKey, ${variable}.id, ${variable}.sourceRef, ${variable}.source_ref, toString(id(${variable})))`;
 }
 
+async function resolvePersonalizationSourceNodes(
+	session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>,
+	plan: PageRankExecutionPlanV1,
+): Promise<Array<[number, number]>> {
+	if (plan.parameters.personalization.mode !== 'PERSONALIZED') return [];
+	const seeds = plan.parameters.personalization.seeds;
+	const canonicalIds = seeds.map((seed) => seed.canonicalId);
+	const result = await session.run(
+		`MATCH (n)
+		 WITH n, ${canonicalNodeExpression('n')} AS canonicalId
+		 WHERE canonicalId IN $canonicalIds
+		 RETURN canonicalId, id(n) AS nodeId
+		 ORDER BY canonicalId ASC`,
+		{ canonicalIds },
+	);
+	const idsByCanonical = new Map<string, number[]>();
+	for (const record of result.records) {
+		const canonicalId = String(record.get('canonicalId'));
+		const nodeId = Number(record.get('nodeId'));
+		const ids = idsByCanonical.get(canonicalId) ?? [];
+		ids.push(nodeId);
+		idsByCanonical.set(canonicalId, ids);
+	}
+	for (const seed of seeds) {
+		const matches = idsByCanonical.get(seed.canonicalId) ?? [];
+		if (matches.length !== 1) {
+			throw new Error(
+				`personalized PageRank seed '${seed.canonicalId}' resolved to ${matches.length} Neo4j nodes; expected exactly one`,
+			);
+		}
+	}
+	return seeds.map((seed) => [idsByCanonical.get(seed.canonicalId)![0], seed.weight]);
+}
+
 export async function executeNeo4jPageRankPlan(input: unknown): Promise<PageRankPlanExecutionV1> {
 	const plan = PageRankExecutionPlanV1Schema.parse(input);
 	assertPageRankDispatchable(plan);
 	if (plan.executor.executorId !== 'NEO4J_GDS') {
 		throw new Error(`executeNeo4jPageRankPlan requires NEO4J_GDS, got ${plan.executor.executorId}`);
-	}
-	if (plan.algorithm !== 'pagerank') {
-		throw new Error(`algorithm '${plan.algorithm}' is not yet wired to the Neo4j plan executor`);
 	}
 	return executeValidatedNeo4jPageRankPlan(plan);
 }
@@ -40,7 +71,6 @@ async function executeValidatedNeo4jPageRankPlan(plan: PageRankExecutionPlanV1):
 	const session = driver.session();
 	const projectionName = plan.projection.projectionName;
 	const mutateProperty = `atlas_pr_${createHash('sha256').update(plan.runId).digest('hex').slice(0, 16)}`;
-	const startedAt = Date.now();
 
 	try {
 		const graphResult = await session.run(
@@ -77,6 +107,9 @@ async function executeValidatedNeo4jPageRankPlan(plan: PageRankExecutionPlanV1):
 		};
 		if (plan.parameters.weighted && plan.parameters.relationshipWeightProperty) {
 			config.relationshipWeightProperty = plan.parameters.relationshipWeightProperty;
+		}
+		if (plan.parameters.personalization.mode === 'PERSONALIZED') {
+			config.sourceNodes = await resolvePersonalizationSourceNodes(session, plan);
 		}
 
 		const mutateResult = await session.run(
@@ -144,6 +177,5 @@ async function executeValidatedNeo4jPageRankPlan(plan: PageRankExecutionPlanV1):
 			{ graphName: projectionName, mutateProperty },
 		).catch(() => undefined);
 		await session.close();
-		void startedAt;
 	}
 }
