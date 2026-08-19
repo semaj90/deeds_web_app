@@ -86,7 +86,7 @@ describe('AlgorithmExecutionManifestV1', () => {
   });
 
   it('does not permit Hilbert locality ordering to masquerade as a semantic search geometry', () => {
-    const value = baseManifest();
+    const value: any = baseManifest();
     value.geometry = {
       kind: 'HILBERT_2D_LOCALITY_ORDER',
       role: 'SEARCH_SPACE',
@@ -94,14 +94,14 @@ describe('AlgorithmExecutionManifestV1', () => {
       metric: 'NONE',
       relationshipDegree: null,
       notes: [],
-    } as never;
+    };
     value.algorithm.algorithmId = 'HILBERT_2D_SORT';
     value.algorithm.family = 'LOCALITY_ORDER';
     expect(() => AlgorithmExecutionManifestV1Schema.parse(value)).toThrow(/locality ordering/);
   });
 
   it('requires explicit model MoE topology for MODEL_MOE_ROUTING', () => {
-    const value = baseManifest();
+    const value: any = baseManifest();
     value.algorithm.algorithmId = 'MODEL_MOE_ROUTING';
     value.algorithm.family = 'MODEL_ROUTING';
     value.model.routerKind = 'EXTERNAL_SOFTMAX';
