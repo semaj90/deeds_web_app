@@ -72,6 +72,9 @@ export function renderOkfProjectionV1(value: OkfProjectionV1): OkfRenderedArtifa
   const input = OkfProjectionV1Schema.parse(value);
   const evidenceRefs = [...new Set(input.evidenceRefs)].sort();
   const tags = [...new Set(input.tags)].sort();
+  const evidenceLines = evidenceRefs.length > 0
+    ? ['evidence_refs:', ...evidenceRefs.map((ref) => `  - ${yamlString(ref)}`)]
+    : ['evidence_refs: []'];
   const frontmatter = [
     '---',
     `type: ${yamlString(`Parent Atlas ${input.knowledgeType}`)}`,
@@ -85,8 +88,7 @@ export function renderOkfProjectionV1(value: OkfProjectionV1): OkfRenderedArtifa
     'canonical_authority: false',
     'canonical_writes_allowed: false',
     `tags: [${tags.map(yamlString).join(', ')}]`,
-    'evidence_refs:',
-    ...(evidenceRefs.length > 0 ? evidenceRefs.map((ref) => `  - ${yamlString(ref)}`) : ['  []']),
+    ...evidenceLines,
     '---',
   ].join('\n');
 
