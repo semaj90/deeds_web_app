@@ -2,9 +2,9 @@
 /**
  * Export revision-pure ORF routing labels for the spectral live fixture.
  *
- * Input node parquet remains the graph/parity owner. This script reads only
- * gpu_node_id + packet_key from it, chooses ONE ORF feature_revision, joins
- * atlas_observation_feature_rows by packet_key, and writes NDJSON keyed by
+ * Input node parquet remains the graph/fixture identity owner. This script
+ * reads gpu_node_id + packet_key, chooses ONE ORF feature_revision, joins
+ * atlas_observation_feature_rows by packet_key, and writes Parquet keyed by
  * gpu_node_id. It never manufactures labels and never treats cluster IDs as
  * identity.
  */
@@ -26,11 +26,11 @@ function parseArgs(argv) {
     return index >= 0 ? argv[index + 1] : undefined;
   };
   const nodes = read('--nodes');
-  if (!nodes) throw new Error('Usage: --nodes <nodes.parquet> [--feature-revision REV] [--out labels.ndjson]');
+  if (!nodes) throw new Error('Usage: --nodes <fixture nodes.parquet> [--feature-revision REV] [--out labels.parquet]');
   return {
     nodes: path.resolve(nodes),
     featureRevision: read('--feature-revision') ?? process.env.ATLAS_FEATURE_REVISION ?? null,
-    out: path.resolve(read('--out') ?? path.join(ROOT, 'docs', 'reports', 'spectral-live-fixture-routing-labels.ndjson')),
+    out: path.resolve(read('--out') ?? path.join(ROOT, 'docs', 'reports', 'spectral-live-fixture-routing-labels.parquet')),
   };
 }
 
@@ -95,7 +95,7 @@ async function chooseFeatureRevision(client, packetKeys, requested) {
       [requested, packetKeys],
     );
     if ((rows[0]?.coverage ?? 0) === 0) throw new Error(`feature_revision '${requested}' has zero fixture coverage`);
-    return { featureRevision: requested, coverage: rows[0].coverage, selection: 'EXPLICIT' };
+    return { featureRevision: requested, coverage: Number(rows[0].coverage), selection: 'EXPLICIT' };
   }
 
   const { rows } = await client.query(
@@ -107,7 +107,7 @@ async function chooseFeatureRevision(client, packetKeys, requested) {
      LIMIT 1`,
     [packetKeys],
   );
-  if (!rows.length) throw new Error('no atlas_observation_feature_rows match the frozen graph packet keys');
+  if (!rows.length) throw new Error('no atlas_observation_feature_rows match the frozen fixture packet keys');
   return {
     featureRevision: String(rows[0].feature_revision),
     coverage: Number(rows[0].coverage),
@@ -115,11 +115,31 @@ async function chooseFeatureRevision(client, packetKeys, requested) {
   };
 }
 
+async function writeLabelsParquet(labels, outPath) {
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  const ndjson = `${outPath}.tmp-${process.pid}.ndjson`;
+  fs.writeFileSync(ndjson, labels.map((row) => JSON.stringify(row)).join('\n') + (labels.length ? '\n' : ''), 'utf8');
+  const duck = await createAtlasDuckDB({ databasePath: ':memory:' });
+  try {
+    await duck.connection.run(`
+      CREATE TABLE spectral_labels AS
+      SELECT * FROM read_ndjson_auto('${sqlPath(ndjson)}');
+    `);
+    await duck.connection.run(`
+      COPY spectral_labels TO '${sqlPath(outPath)}'
+      (FORMAT PARQUET, COMPRESSION ZSTD);
+    `);
+  } finally {
+    await duck.close();
+    fs.rmSync(ndjson, { force: true });
+  }
+}
+
 async function main() {
   loadEnv();
   const args = parseArgs(process.argv.slice(2));
   const identities = await readNodeIdentity(args.nodes);
-  if (!identities.length) throw new Error('nodes parquet has no packet_key rows to join against ORF');
+  if (!identities.length) throw new Error('fixture nodes parquet has no packet_key rows to join against ORF');
   const byPacket = new Map(identities.map((row) => [row.packet_key, row]));
   const packetKeys = [...byPacket.keys()];
 
@@ -162,8 +182,8 @@ async function main() {
       }
     }
     labels.sort((a, b) => a.gpu_node_id - b.gpu_node_id);
-    fs.mkdirSync(path.dirname(args.out), { recursive: true });
-    fs.writeFileSync(args.out, labels.map((row) => JSON.stringify(row)).join('\n') + (labels.length ? '\n' : ''), 'utf8');
+    if (!labels.length) throw new Error(`feature_revision '${selected.featureRevision}' produced zero label rows`);
+    await writeLabelsParquet(labels, args.out);
     console.log(JSON.stringify({
       status: 'EXPORTED_UNPROVEN',
       nodes_with_packet_identity: identities.length,
@@ -174,6 +194,7 @@ async function main() {
       export_coverage: labels.length / identities.length,
       validator_success_available: false,
       repair_success_available: false,
+      output_format: 'PARQUET_ZSTD',
       output: args.out,
     }, null, 2));
   } finally {
