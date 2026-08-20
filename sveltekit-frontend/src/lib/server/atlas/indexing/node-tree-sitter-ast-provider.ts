@@ -126,8 +126,15 @@ function routeFor(node: SyntaxNodeLike): string[] {
   return route.reverse();
 }
 
+function firstDeclaredName(node: SyntaxNodeLike): string | null {
+  for (const child of node.namedChildren ?? []) {
+    if (DECLARATION_KINDS.has(child.type)) return nodeName(child);
+  }
+  return null;
+}
+
 function chunkForNode(node: SyntaxNodeLike, kind: string): AtlasStructuralEvidenceChunk {
-  const name = nodeName(node);
+  const name = kind === 'FILE' ? null : nodeName(node);
   const imports: string[] = [];
   const exports: string[] = [];
   const calls: string[] = [];
@@ -145,10 +152,15 @@ function chunkForNode(node: SyntaxNodeLike, kind: string): AtlasStructuralEviden
       const callee = field(current, 'function')?.text?.trim();
       if (callee) calls.push(callee);
     }
-    if (current.type === 'export_statement' && name) exports.push(name);
+    if (current.type === 'export_statement') {
+      const exported = firstDeclaredName(current);
+      if (exported) exports.push(exported);
+    }
     for (const child of current.namedChildren ?? []) visitEvidence(child);
   };
   visitEvidence(node);
+
+  if (name && node.parent?.type === 'export_statement') exports.push(name);
 
   return {
     node_type: node.type,
@@ -183,23 +195,9 @@ function collectEvidence(tree: TreeLike): { chunks: AtlasStructuralEvidenceChunk
   };
   visit(tree.rootNode);
 
-  // Always expose one FILE unit so empty-but-valid modules remain observable.
-  chunks.unshift({
-    node_type: tree.rootNode.type,
-    kind: 'FILE',
-    name: null,
-    parent_route: [],
-    parent_context: null,
-    start_byte: tree.rootNode.startIndex,
-    end_byte: tree.rootNode.endIndex,
-    start_line: tree.rootNode.startPosition.row,
-    start_column: tree.rootNode.startPosition.column,
-    end_line: tree.rootNode.endPosition.row,
-    end_column: tree.rootNode.endPosition.column,
-    calls: [],
-    imports: [],
-    exports: [],
-  });
+  // Always expose one FILE unit so empty modules remain observable while also
+  // preserving whole-file imports/exports/call evidence for parity analysis.
+  chunks.unshift(chunkForNode(tree.rootNode, 'FILE'));
 
   return {
     chunks: chunks.sort((a, b) => a.start_byte - b.start_byte || a.end_byte - b.end_byte || a.kind.localeCompare(b.kind)),
