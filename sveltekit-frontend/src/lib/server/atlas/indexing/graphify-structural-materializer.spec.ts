@@ -24,15 +24,12 @@ function provider(
     async materialize(input) {
       if (status === 'FAILED') return { provider: 'treesitter-chunker-8095', status, diagnostics: ['sidecar unavailable'] };
       const native = options.native ?? true;
-      const parserRevision = input.sourceRevisionAuthority === 'PROVEN'
-        ? input.sourceRevision!
-        : `anchor:${input.sourceVersionAnchor}`;
       return {
         provider: 'treesitter-chunker-8095',
         status,
         diagnostics: status === 'PROVEN' ? [] : ['Tree-sitter ERROR at line 1'],
         evidence: {
-          schema: 'atlas.ast.evidence.v1', engine: 'treesitter-chunker', engine_version: 'test', language: 'typescript', file_path: input.sourceRef, source_revision: parserRevision,
+          schema: 'atlas.ast.evidence.v1', engine: 'treesitter-chunker', engine_version: 'test', language: 'typescript', file_path: input.sourceRef, source_revision: input.sourceRevision,
           chunks: [{
             upstream_chunk_id: native ? 'chunk-1' : undefined,
             upstream_node_id: native ? 'node-1' : undefined,
@@ -69,6 +66,7 @@ describe('GraphifyStructuralMaterializer', () => {
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
     expect(result.sourceRevision).toBeNull();
     expect(result.parserSourceRevisionToken).toBe('anchor:content:test-anchor');
+    expect(result.normalized?.sourceRevision).toBe('anchor:content:test-anchor');
     expect(result.diagnostics).toContain('SOURCE_REVISION_AUTHORITY_UNPROVEN');
   });
 
@@ -79,6 +77,7 @@ describe('GraphifyStructuralMaterializer', () => {
     expect(result.provenanceReadiness.sourceRevisionAuthorityReady).toBe(true);
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(true);
     expect(result.sourceRevision).toBe('source-r1');
+    expect(result.parserSourceRevisionToken).toBe('source-r1');
   });
 
   it('blocks GIS promotion when only compatibility provenance is available', async () => {
