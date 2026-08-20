@@ -18,7 +18,7 @@ import hashlib
 import numpy as np
 
 from ampere_quantization import pack_int4, unpack_int4, SEMANTIC_DIMENSION
-from spectral_live_fixture import run_spectral_live_fixture
+from spectral_fixture_benchmark import run_spectral_live_fixture
 
 
 def sha256_data(data) -> str:
@@ -160,9 +160,9 @@ def main():
         ],
         help="Benchmark execution mode",
     )
-    parser.add_argument("--nodes", help="Frozen graph nodes.parquet")
-    parser.add_argument("--edges", help="Frozen graph edges.parquet")
-    parser.add_argument("--labels", help="Optional routing-label parquet keyed by gpu_node_id")
+    parser.add_argument("--nodes", help="Built spectral fixture nodes.parquet")
+    parser.add_argument("--edges", help="Built spectral fixture edges.parquet")
+    parser.add_argument("--labels", help="Optional ORF routing labels parquet keyed by gpu_node_id")
     parser.add_argument("--candidate-size", action="append", type=int, help="Candidate fixture size; repeat flag for multiple sizes")
     parser.add_argument("--edge-type", action="append", default=[], help="Optional edge type allowlist")
     parser.add_argument("--recall-k", action="append", type=int, help="Recall cutoff; repeat flag for multiple K")
