@@ -1,6 +1,13 @@
+import {
+  EMBEDDINGGEMMA_MODEL_ID,
+  EMBEDDINGGEMMA_PROMPT_REVISION_V1,
+  embeddingGemmaTaskRepresentationIdV1,
+  projectEmbeddingGemmaMrlV1,
+  type EmbeddingGemmaMrlDimension,
+} from '../embedding/embeddinggemma-task-representation-v1.js';
 import { buildClassificationObservationV1, type ClassificationObservationV1, type ClassificationTaskV1 } from './classification-observation-v1.js';
 
-export type MrlDimension = 128 | 256 | 512 | 768;
+export type MrlDimension = EmbeddingGemmaMrlDimension;
 
 export interface PrototypeLabel {
   label: string;
@@ -28,10 +35,10 @@ export const DEFAULT_EMBEDDINGGEMMA_MRL_CLASSIFIER_POLICY_V1: MrlClassifierPolic
     768: 0.86,
   },
   marginThreshold: 0.08,
-  modelId: 'embeddinggemma-300m',
+  modelId: EMBEDDINGGEMMA_MODEL_ID,
   modelRevision: 'UNBOUND',
   representationRevision: 'UNBOUND',
-  promptRevision: 'embeddinggemma-classification-prompt.v1',
+  promptRevision: EMBEDDINGGEMMA_PROMPT_REVISION_V1,
   classifierHeadRevision: 'atlas.prototype-cosine-head.v1',
   calibrationRevision: 'UNBOUND',
 };
@@ -44,11 +51,7 @@ export function truncateAndRenormalizeMrl(
   vector: readonly number[] | Float32Array,
   dimension: MrlDimension,
 ): number[] {
-  if (vector.length !== 768) throw new Error(`EMBEDDINGGEMMA_MRL_EXPECTED_768 got=${vector.length}`);
-  const sliced = Array.from(vector.slice(0, dimension));
-  const magnitude = norm(sliced);
-  if (!Number.isFinite(magnitude) || magnitude <= 0) throw new Error('EMBEDDINGGEMMA_MRL_ZERO_OR_INVALID_NORM');
-  return sliced.map((value) => value / magnitude);
+  return Array.from(projectEmbeddingGemmaMrlV1(vector, dimension));
 }
 
 function cosineUnit(left: readonly number[], right: readonly number[]): number {
@@ -129,7 +132,7 @@ export function classifyEmbeddingGemmaMrlV1(input: {
     packetKey: input.packetKey,
     treeNodeId: input.treeNodeId,
     symbolVersionId: input.symbolVersionId,
-    representationId: `semantic_${chosen}_mrl`,
+    representationId: embeddingGemmaTaskRepresentationIdV1('classification', chosen),
     representationRevision: policy.representationRevision,
     outputDimension: chosen,
     modelId: policy.modelId,
