@@ -2,11 +2,15 @@ import type { EncoderTrainingManifestV1 } from './encoder-manifest.js';
 
 /**
  * Challenger only: does not replace DEFAULT_INTENT_ENCODER_MANIFEST until
- * classifier-specific MRL/calibration metrics pass.
+ * classifier-specific MRL/calibration metrics pass. Classification embeddings
+ * share the EmbeddingGemma model artifact with retrieval embeddings but use a
+ * distinct task prompt and representation identity.
  */
 export const EMBEDDINGGEMMA_INTENT_CLASSIFIER_CHALLENGER_MANIFEST: EncoderTrainingManifestV1 & {
-  representationId: 'semantic_768';
+  nativeRepresentationId: 'classification_768';
+  preferredRouterRepresentationId: 'classification_mrl_128';
   mrlDimensions: readonly [128, 256, 512, 768];
+  persistedSemanticAuthorityChanged: false;
   canonicalDefaultChanged: false;
 } = {
   schemaVersion: 'atlas.encoder-training-manifest.v1',
@@ -16,7 +20,7 @@ export const EMBEDDINGGEMMA_INTENT_CLASSIFIER_CHALLENGER_MANIFEST: EncoderTraini
   adaptation: 'lora',
   trainSplitRevision: 'UNBOUND',
   validationSplitRevision: 'UNBOUND',
-  featureContractRevision: 'atlas.candidate-feature-matrix.v1',
+  featureContractRevision: 'atlas.retrieval-router-tensor.v1',
   toolRegistryRevision: 'UNBOUND',
   maxSequenceLength: 512,
   batchSize: 16,
@@ -32,7 +36,9 @@ export const EMBEDDINGGEMMA_INTENT_CLASSIFIER_CHALLENGER_MANIFEST: EncoderTraini
     maxEce: 0.05,
     maxRegressionRate: 0.02,
   },
-  representationId: 'semantic_768',
+  nativeRepresentationId: 'classification_768',
+  preferredRouterRepresentationId: 'classification_mrl_128',
   mrlDimensions: [128, 256, 512, 768],
+  persistedSemanticAuthorityChanged: false,
   canonicalDefaultChanged: false,
 };
