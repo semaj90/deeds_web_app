@@ -50,7 +50,11 @@ export async function escalateAmbiguousCandidatesV1(input: {
   }
 
   const scores = await rerankWithMarco(input.query, ambiguous.map((row) => row.document));
-  const valid = scores.length === ambiguous.length && scores.every(Number.isFinite);
+  // The existing reranker deliberately returns an all-zero array on transport/model failure.
+  // Treat that sentinel as unavailable so classification escalation remains fail-open.
+  const valid = scores.length === ambiguous.length
+    && scores.every(Number.isFinite)
+    && scores.some((score) => Math.abs(score) > 1e-12);
   if (!valid) {
     return {
       schema: 'atlas.cross-encoder-escalation.v1',
