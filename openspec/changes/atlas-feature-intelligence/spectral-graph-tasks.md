@@ -3,7 +3,7 @@
 Status vocabulary:
 
 - `DONE`: existing behavior/ownership already present and inspected.
-- `IMPLEMENTED_UNPROVEN`: code/test exists, but no live workstation receipt has been produced.
+- `IMPLEMENTED_UNPROVEN`: code/test/probe exists, but no live workstation receipt has been produced.
 - `PENDING`: implementation or runtime proof remains.
 - `BLOCKED`: an explicit prerequisite prevents promotion.
 
@@ -64,14 +64,18 @@ SGC-1  spectral graph edge recipe contract                IMPLEMENTED_UNPROVEN
 SGC-2  cuGraph spectral clustering plan                   IMPLEMENTED_UNPROVEN
 SGC-3  deterministic assignment checksum                  IMPLEMENTED_UNPROVEN
 SGC-4  bounded subgraph synthesis request                 IMPLEMENTED_UNPROVEN
-SGC-5  live cuGraph balanced-cut executor                 PENDING
-SGC-6  live cuGraph modularity executor                   PENDING
-SGC-7  analyzer receipts: modularity/edge-cut/ratio-cut   PENDING
-SGC-8  spectral vs Leiden/KMeans/SOM evaluation           PENDING
+SGC-5  live cuGraph balanced-cut executor                 IMPLEMENTED_UNPROVEN
+SGC-6  live cuGraph modularity executor                   IMPLEMENTED_UNPROVEN
+SGC-7  analyzer receipts: modularity/edge-cut/ratio-cut   IMPLEMENTED_UNPROVEN
+SGC-8  spectral vs Leiden/KMeans/SOM evaluation           IMPLEMENTED_UNPROVEN
 SGC-9  Qdrant/Valkey routing projection                   PENDING
 SGC-10 workflow/A2A artifact receipt wiring               PENDING
 SGC-11 agentic file-repair subgraph fixture               PENDING
+SGC-12 Nsight Systems CUDA/NVTX/cuBLAS trace              IMPLEMENTED_UNPROVEN
+SGC-13 Nsight Compute Tensor Core/precision proof         IMPLEMENTED_UNPROVEN
 ```
+
+`IMPLEMENTED_UNPROVEN` for SGC-5..8 and SGC-12..13 means the executable runner/wrapper exists, not that RAPIDS/Nsight has run successfully on the workstation.
 
 ## Edge authority
 
@@ -87,7 +91,7 @@ or:
 derived_similarity = true
 ```
 
-Never both.
+Never both. `SEMANTIC_KNN` is always derived similarity and cannot mint a relationship.
 
 Reference edge families:
 
@@ -102,7 +106,59 @@ LEXICAL_COOCCURRENCE  derived similarity
 WORKFLOW_DEPENDENCY   workflow-state projection
 ```
 
-Semantic-KNN proximity must never mint canonical relationships.
+## Live fixture construction
+
+The live fixture is built from revisioned PostgreSQL rows, not a synthetic graph:
+
+```text
+atlas_observation_feature_rows
+  candidate_id
+  source_ref/source_revision
+  semantic_768
+  KMeans/SOM/community features
+        |
+        +-- selected deterministic 500..5000 candidates
+        |
+atlas_relationships + atlas_relationship_members
+        |
+        +-- loss-preserving relationship IDs retained
+        +-- bounded pairwise compute view only
+        |
+        v
+base fixture JSON
+        |
+        v
+cuVS all-neighbors algo=brute_force
+semantic_768 top-K
+        |
+        +-- SEMANTIC_KNN derived edges
+        v
+augmented frozen fixture
+```
+
+The pairwise relationship edges are a compute projection. Canonical N-ary relationship identity remains in PostgreSQL.
+
+Build commands:
+
+```bash
+node scripts/atlas/build-live-graph-fixture.mjs \
+  --workspace-revision=<workspace-revision> \
+  --source-snapshot-revision=<source-snapshot-revision> \
+  --graph-revision=<graph-revision> \
+  --feature-revision=<feature-revision> \
+  --workflow-id=<workflow-id> \
+  --workflow-revision=<workflow-revision> \
+  --limit=1000 \
+  --clusters=20 \
+  --semantic-top-k=16 \
+  --output=.tmp/atlas/live-graph/live-graph-base.json
+
+python python/augment_live_graph_semantic_knn.py \
+  --fixture=.tmp/atlas/live-graph/live-graph-base.json \
+  --output=.tmp/atlas/live-graph/live-graph.json
+```
+
+The cuVS semantic graph augmentation records the exact source fixture checksum, 768-dimensional input, K, family weight, and executor (`CUVS_ALL_NEIGHBORS_BRUTE_FORCE`).
 
 ## Spectral execution parameters
 
@@ -113,6 +169,7 @@ workflow_id
 workflow_revision
 source_snapshot_revision
 graph_revision
+feature_revision
 row_identity_checksum
 
 method
@@ -129,24 +186,95 @@ random_seed
 executor revision
 ```
 
-The initial executor owner is:
+The initial executor owner is `CUGRAPH_SINGLE_GPU` with methods `BALANCED_CUT` and `MODULARITY_MAXIMIZATION`. Cluster count remains an explicit policy input. Eigengap/Leiden estimation remains a challenger.
 
-```text
-CUGRAPH_SINGLE_GPU
+Execute:
+
+```bash
+python python/prove_live_graph_fixture.py \
+  --fixture=.tmp/atlas/live-graph/live-graph.json \
+  --output=.tmp/atlas/live-graph/live-graph-fixture-receipt.json
 ```
 
-Methods:
+The Python runner creates an undirected weighted cuGraph projection, then runs the same frozen graph through:
 
 ```text
-BALANCED_CUT
-MODULARITY_MAXIMIZATION
+PageRank
+spectral balanced cut
+spectral modularity maximization
+Leiden
+optional existing KMeans baseline
+optional existing SOM baseline
 ```
 
-Cluster count remains an explicit policy input. Future eigengap/Leiden estimation is a challenger and must produce its own receipt.
+Spectral and Leiden stability is measured with a second seed and reported as adjusted Rand index. When evaluation cases are supplied, cluster-constrained PageRank expansion reports Recall@K, source coverage and historical repair-success coverage.
+
+## Analyzer proof
+
+Where the installed cuGraph Python surface exposes the functions, execute:
+
+```text
+analyzeClustering_modularity
+analyzeClustering_edge_cut
+analyzeClustering_ratio_cut
+```
+
+against the exact returned assignment DataFrame and record their values. Missing API support must remain null/blocked; it must not be synthesized.
+
+## GPU execution evidence
+
+GPU execution proof is separate from graph-quality proof.
+
+```text
+LiveGraphFixtureReceiptV1
+       |
+       +--> canonical graph/result checksums
+       |
+       v
+NVTX: parent-atlas@atlas.graph_fixture
+       |
+       +--> Nsight Systems
+       |      CUDA
+       |      NVTX
+       |      cuBLAS
+       |      cuBLAS verbose
+       |      .nsys-rep       CANONICAL TRACE ARTIFACT
+       |      JSONLines       derived inspection export
+       |      SQLite          derived inspection export
+       |
+       +--> Nsight Compute
+              same NVTX range
+              .ncu-rep
+              raw CSV metrics
+              Tensor Core/precision evidence
+```
+
+Run:
+
+```bash
+bash scripts/atlas/profile-live-graph-fixture.sh \
+  .tmp/atlas/live-graph/live-graph.json \
+  .tmp/atlas/live-graph/profile
+```
+
+The profiling wrapper uses:
+
+```text
+nsys --trace=cuda,nvtx,cublas,cublas-verbose
+nsys --capture-range=nvtx
+nsys --nvtx-capture=atlas.graph_fixture@parent-atlas
+
+ncu --nvtx
+ncu --nvtx-include=parent-atlas@atlas.graph_fixture/
+```
+
+The `.nsys-rep` checksum is the durable execution-trace identity. JSONLines/SQLite are derived because export schemas/tooling can evolve.
+
+`GpuExecutionEvidenceReceiptV1` must never infer Tensor Core use from a cuBLAS/cuBLASLt API or kernel name alone. `tensor_core_used=true` requires a non-zero Nsight Compute tensor/HMMA/IMMA/MMA metric observation and an NCU artifact.
 
 ## Evaluation
 
-A verified receipt should record as applicable:
+A verified graph receipt should record as applicable:
 
 ```text
 vertex_count
@@ -156,11 +284,15 @@ assignments_checksum
 modularity_score
 edge_cut_score
 ratio_cut_score
+stability_ari
+retrieval_recall_at_k
+source_coverage_at_k
+historical_repair_success_at_k
 runtime_ms
 peak_gpu_bytes
 ```
 
-Evaluation must compare spectral assignments against existing derived views rather than declare one algorithm universally superior:
+Evaluation compares rather than assumes superiority:
 
 ```text
 spectral balanced cut
@@ -170,27 +302,14 @@ KMeans semantic clusters
 SOM topology
 ```
 
-Useful downstream metrics:
-
-```text
-retrieval Recall@K
-MRR
-subgraph source coverage
-canonical-evidence promotion rate
-validator success rate
-repair success rate
-tokens/context bytes
-GPU/host bytes
-latency
-cluster stability across revisions
-```
+Useful later workflow metrics include MRR, canonical-evidence promotion, validator success, repair success, context bytes/tokens, host/GPU bytes, latency, and cluster stability across revisions.
 
 ## Retrieval executor relationship
 
 Spectral clusters are routing hints, not separate evidence votes.
 
 ```text
-BM25_QDRANT_IDF    lexical evidence lane
+QDRANT_BM25_IDF    lexical evidence lane
 
 semantic family:
   QDRANT_HNSW
@@ -204,11 +323,9 @@ semantic family:
 semantic_lane_votes = 1
 ```
 
-For CPU/GPU portability, FAISS+cuVS is a challenger. Direct cuVS CAGRA→HNSW serialization must remain version-qualified because its save/load format is experimental.
+For CPU/GPU portability, FAISS+cuVS is a challenger. Direct cuVS CAGRA→HNSW serialization remains version-qualified because its save/load format is experimental.
 
 ## Agentic workflow integration
-
-Reference repair workflow:
 
 ```text
 validation failure receipt
@@ -250,6 +367,8 @@ Spectral cluster IDs cannot authorize mutation.
 ```bash
 npm --prefix packages/parent-atlas run build
 node --test packages/parent-atlas/test/spectral-graph-clustering.test.mjs
+node --test packages/parent-atlas/test/gpu-trace-evidence.test.mjs
+python python/test_live_graph_fixture.py
 ```
 
-Live cuGraph proof must additionally record the RAPIDS/cuGraph/CUDA versions, graph input checksum, random seed, GPU-resource receipt, output assignment checksum, and analyzer scores before SGC-5/6/7 can be marked `PROVEN`.
+No SGC item moves to `PROVEN` from file/test existence. SGC-5/6/7/8 require a live RAPIDS receipt from the bounded graph; SGC-12 requires the `.nsys-rep`; SGC-13 requires Nsight Compute metric evidence. Daily Graphify adoption remains blocked until the live fixture shows useful quality/repair signal within the GPU resource envelope.
