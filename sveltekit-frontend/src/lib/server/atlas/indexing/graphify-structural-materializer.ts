@@ -3,6 +3,7 @@ import { normalizeAtlasAstEvidence, type NormalizedAtlasStructuralEvidence } fro
 
 export type SourceRevisionAuthorityV1 = 'PROVEN' | 'CONTENT_ANCHOR_ONLY' | 'UNPROVEN';
 
+/** Input accepted by the Graphify materializer owner. */
 export type StructuralSourceInputV1 = {
   sourceRef: string;
   sourceRevision: string | null;
@@ -12,8 +13,16 @@ export type StructuralSourceInputV1 = {
   source: string;
 };
 
-/** @deprecated Prefer StructuralSourceInputV1. */
-export type CanonicalSourceRef = StructuralSourceInputV1;
+/**
+ * Legacy parser-provider request shape. `sourceRevision` here is an opaque
+ * parser correlation token; it is NOT canonical revision authority by itself.
+ */
+export type CanonicalSourceRef = {
+  sourceRef: string;
+  sourceRevision: string;
+  language: string;
+  source: string;
+};
 
 export type AstProviderId = 'treesitter-chunker-8095' | 'node-tree-sitter-challenger';
 
@@ -26,7 +35,7 @@ export type AstProviderResult = {
 };
 
 export interface AstProvider {
-  materialize(input: StructuralSourceInputV1): Promise<AstProviderResult>;
+  materialize(input: CanonicalSourceRef): Promise<AstProviderResult>;
 }
 
 export function parserSourceRevisionToken(input: StructuralSourceInputV1): string {
@@ -45,7 +54,7 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
           source: input.source,
           language: input.language,
           filePath: input.sourceRef,
-          sourceRevision: parserSourceRevisionToken(input),
+          sourceRevision: input.sourceRevision,
         });
         const diagnostics = evidence.diagnostics ?? [];
         return {
@@ -174,9 +183,7 @@ export type StructuralMaterializationResult = {
   parserSourceRevisionToken: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
-  /** Raw structural evidence retained for the downstream Parent Atlas fabric. */
   evidence: AtlasStructuralEvidence | null;
-  /** Legacy normalized structural view retained for current Graphify consumers. */
   normalized: NormalizedAtlasStructuralEvidence | null;
   provenanceReadiness: StructuralProvenanceReadiness;
   diagnostics: string[];
@@ -185,13 +192,9 @@ export type StructuralMaterializationResult = {
 };
 
 /**
- * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
- * the selected AstProvider owns structural parsing evidence. The default live
- * provider remains 8095. Challenger providers may be injected for parity tests.
- *
- * `canonicalPromotionAllowed=true` requires native structural provenance, a
- * PROVEN parse, and PROVEN canonical source_revision authority. A content hash
- * may be used as a noncanonical sourceVersionAnchor but never as revision proof.
+ * Canonical Graphify owner boundary. Parser providers receive only an opaque
+ * string correlation token. Atlas separately records whether a canonical
+ * source revision exists and who owns it.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
@@ -206,7 +209,12 @@ export class GraphifyStructuralMaterializer {
     }
 
     const parserToken = parserSourceRevisionToken(input);
-    const result = await this.astProvider.materialize(input);
+    const result = await this.astProvider.materialize({
+      sourceRef: input.sourceRef,
+      sourceRevision: parserToken,
+      language: input.language,
+      source: input.source,
+    });
     const evidence = result.evidence && result.status !== 'FAILED' ? result.evidence : null;
     const normalized = evidence ? normalizeAtlasAstEvidence(evidence) : null;
     const provenanceReadiness = evaluateProvenanceReadiness(normalized, result.status, input);
