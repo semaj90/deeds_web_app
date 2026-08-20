@@ -8,8 +8,10 @@ export type CanonicalSourceRef = {
   source: string;
 };
 
+export type AstProviderId = 'treesitter-chunker-8095' | 'node-tree-sitter-challenger';
+
 export type AstProviderResult = {
-  provider: 'treesitter-chunker-8095';
+  provider: AstProviderId;
   status: 'PROVEN' | 'RECOVERED_WITH_ERRORS' | 'FAILED';
   evidence?: AtlasStructuralEvidence;
   errorTag?: string;
@@ -129,7 +131,7 @@ export type StructuralMaterializationResult = {
   sourceRevision: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
-  /** Raw 8095 evidence retained for the downstream Parent Atlas fabric. */
+  /** Raw structural evidence retained for the downstream Parent Atlas fabric. */
   evidence: AtlasStructuralEvidence | null;
   /** Legacy normalized structural view retained for current Graphify consumers. */
   normalized: NormalizedAtlasStructuralEvidence | null;
@@ -141,8 +143,10 @@ export type StructuralMaterializationResult = {
 
 /**
  * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
- * 8095 owns structural parsing evidence. Identity persistence and projections
- * remain downstream and are intentionally not performed here.
+ * the selected AstProvider owns structural parsing evidence. The default live
+ * provider remains 8095. Challenger providers may be injected for parity tests,
+ * but identity persistence and projections remain downstream and are never
+ * authorized by provider selection alone.
  *
  * `canonicalPromotionAllowed=true` means only that native structural provenance
  * is complete and the provider parse is PROVEN. GIS must still resolve/promote
