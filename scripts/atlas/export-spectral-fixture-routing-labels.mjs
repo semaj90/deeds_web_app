@@ -1,21 +1,12 @@
 #!/usr/bin/env node
-/**
- * Export revision-pure ORF routing labels for the spectral live fixture.
- *
- * Input node parquet remains the graph/fixture identity owner. This script
- * reads gpu_node_id + packet_key, chooses ONE ORF feature_revision, joins
- * atlas_observation_feature_rows by packet_key, and writes Parquet keyed by
- * gpu_node_id. It never manufactures labels and never treats cluster IDs as
- * identity.
- */
+/** Export one revision-pure ORF routing-label Parquet for the spectral fixture. */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
-import { DuckDBResultReader } from '@duckdb/node-api';
-import { createAtlasDuckDB } from '../../sveltekit-frontend/packages/atlas-duckdb/src/index.js';
+import duckdb from 'duckdb';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -55,22 +46,31 @@ function databaseUrl() {
   return `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${db}`;
 }
 
-async function duckRows(connection, sql) {
-  const result = await connection.run(sql);
-  const reader = new DuckDBResultReader(result);
-  await reader.readAll();
-  return reader.getRowObjectsJS();
-}
-
 function sqlPath(value) {
   return value.replace(/\\/g, '/').replace(/'/g, "''");
 }
 
+function openDuckDB() {
+  return new duckdb.Database(':memory:');
+}
+
+function duckAll(db, sql) {
+  return new Promise((resolve, reject) => db.all(sql, (error, rows) => error ? reject(error) : resolve(rows)));
+}
+
+function duckRun(db, sql) {
+  return new Promise((resolve, reject) => db.run(sql, (error) => error ? reject(error) : resolve()));
+}
+
+function duckClose(db) {
+  return new Promise((resolve, reject) => db.close((error) => error ? reject(error) : resolve()));
+}
+
 async function readNodeIdentity(nodesPath) {
-  const duck = await createAtlasDuckDB({ databasePath: ':memory:' });
+  const db = openDuckDB();
   try {
-    const rows = await duckRows(
-      duck.connection,
+    const rows = await duckAll(
+      db,
       `SELECT CAST(gpu_node_id AS BIGINT) AS gpu_node_id, packet_key, source_ref
        FROM read_parquet('${sqlPath(nodesPath)}')
        WHERE packet_key IS NOT NULL
@@ -82,7 +82,7 @@ async function readNodeIdentity(nodesPath) {
       source_ref: row.source_ref == null ? null : String(row.source_ref),
     }));
   } finally {
-    await duck.close();
+    await duckClose(db);
   }
 }
 
@@ -97,7 +97,6 @@ async function chooseFeatureRevision(client, packetKeys, requested) {
     if ((rows[0]?.coverage ?? 0) === 0) throw new Error(`feature_revision '${requested}' has zero fixture coverage`);
     return { featureRevision: requested, coverage: Number(rows[0].coverage), selection: 'EXPLICIT' };
   }
-
   const { rows } = await client.query(
     `SELECT feature_revision, count(*)::int AS coverage, max(updated_at) AS newest
      FROM atlas_observation_feature_rows
@@ -118,19 +117,13 @@ async function chooseFeatureRevision(client, packetKeys, requested) {
 async function writeLabelsParquet(labels, outPath) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   const ndjson = `${outPath}.tmp-${process.pid}.ndjson`;
-  fs.writeFileSync(ndjson, labels.map((row) => JSON.stringify(row)).join('\n') + (labels.length ? '\n' : ''), 'utf8');
-  const duck = await createAtlasDuckDB({ databasePath: ':memory:' });
+  fs.writeFileSync(ndjson, labels.map((row) => JSON.stringify(row)).join('\n') + '\n', 'utf8');
+  const db = openDuckDB();
   try {
-    await duck.connection.run(`
-      CREATE TABLE spectral_labels AS
-      SELECT * FROM read_ndjson_auto('${sqlPath(ndjson)}');
-    `);
-    await duck.connection.run(`
-      COPY spectral_labels TO '${sqlPath(outPath)}'
-      (FORMAT PARQUET, COMPRESSION ZSTD);
-    `);
+    await duckRun(db, `CREATE TABLE spectral_labels AS SELECT * FROM read_json_auto('${sqlPath(ndjson)}', format='newline_delimited');`);
+    await duckRun(db, `COPY spectral_labels TO '${sqlPath(outPath)}' (FORMAT PARQUET, COMPRESSION ZSTD);`);
   } finally {
-    await duck.close();
+    await duckClose(db);
     fs.rmSync(ndjson, { force: true });
   }
 }
@@ -142,27 +135,17 @@ async function main() {
   if (!identities.length) throw new Error('fixture nodes parquet has no packet_key rows to join against ORF');
   const byPacket = new Map(identities.map((row) => [row.packet_key, row]));
   const packetKeys = [...byPacket.keys()];
-
   const pool = new pg.Pool({ connectionString: databaseUrl(), max: 2 });
   try {
     const selected = await chooseFeatureRevision(pool, packetKeys, args.featureRevision);
     const labels = [];
-    const chunkSize = 4000;
-    for (let start = 0; start < packetKeys.length; start += chunkSize) {
-      const chunk = packetKeys.slice(start, start + chunkSize);
+    for (let start = 0; start < packetKeys.length; start += 4000) {
+      const chunk = packetKeys.slice(start, start + 4000);
       const { rows } = await pool.query(
-        `SELECT
-           packet_key,
-           feature_revision,
-           kmeans_cluster_id,
-           som_row,
-           som_col,
-           community_id,
-           pagerank,
-           personalized_pagerank
+        `SELECT packet_key, feature_revision, kmeans_cluster_id, som_row, som_col,
+                community_id, pagerank, personalized_pagerank
          FROM atlas_observation_feature_rows
-         WHERE feature_revision = $1
-           AND packet_key = ANY($2::text[])`,
+         WHERE feature_revision = $1 AND packet_key = ANY($2::text[])`,
         [selected.featureRevision, chunk],
       );
       for (const row of rows) {
@@ -186,15 +169,14 @@ async function main() {
     await writeLabelsParquet(labels, args.out);
     console.log(JSON.stringify({
       status: 'EXPORTED_UNPROVEN',
-      nodes_with_packet_identity: identities.length,
       selected_feature_revision: selected.featureRevision,
       selection_policy: selected.selection,
-      selected_revision_fixture_coverage: selected.coverage,
+      nodes_with_packet_identity: identities.length,
       exported_rows: labels.length,
       export_coverage: labels.length / identities.length,
+      output_format: 'PARQUET_ZSTD',
       validator_success_available: false,
       repair_success_available: false,
-      output_format: 'PARQUET_ZSTD',
       output: args.out,
     }, null, 2));
   } finally {
