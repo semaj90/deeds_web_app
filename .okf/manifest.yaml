@@ -4,6 +4,7 @@
 version: 2
 created_at: 2026-07-11T17:37:00Z
 updated_at: 2026-08-17T14:10:00-07:00
+updated_at: 2026-08-18T19:36:00Z
 
 # Scope: This manifest defines the canonical schema for:
 # - Supported languages and their symbol extraction rules
@@ -27,6 +28,7 @@ registries:
       - cache.yaml
       - database.yaml
       - feature-intelligence.yaml
+      - parent-atlas-execution.yaml
 
   corpora:
     path: corpora/
