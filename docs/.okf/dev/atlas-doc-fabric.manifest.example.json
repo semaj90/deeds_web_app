@@ -1,0 +1,67 @@
+{
+  "manifest_revision": "okf-docs-manifest-r1",
+  "workspace_revision": "workspace-current",
+  "source_snapshot_revision": "external-docs-r1",
+  "producer_revision": "parent-atlas-okf-pipeline-r1",
+  "output_root": ".",
+  "embedding": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma-300m-f16.gguf"
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "external_programming_docs_768"
+  },
+  "features": {
+    "low_rank": 64,
+    "kmeans_clusters": 64,
+    "som": {
+      "rows": 20,
+      "columns": 20
+    }
+  },
+  "sources": [
+    {
+      "source_id": "qdrant",
+      "source_revision": "qdrant-docs-2026-08-19",
+      "title": "Qdrant Documentation",
+      "base_urls": [
+        "https://qdrant.tech/documentation/"
+      ],
+      "allowed_domains": [
+        "qdrant.tech"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "FIRECRAWL_V2",
+      "output_namespace": "docs/.okf/qdrant",
+      "maximum_pages": 16,
+      "maximum_depth": 2,
+      "pages": [
+        "https://qdrant.tech/documentation/concepts/points/",
+        "https://qdrant.tech/documentation/search/filtering/",
+        "https://qdrant.tech/documentation/manage-data/indexing/",
+        "https://qdrant.tech/documentation/manage-data/quantization/"
+      ]
+    },
+    {
+      "source_id": "firecrawl",
+      "source_revision": "firecrawl-v2-docs-2026-08-19",
+      "title": "Firecrawl v2 Documentation",
+      "base_urls": [
+        "https://docs.firecrawl.dev/"
+      ],
+      "allowed_domains": [
+        "docs.firecrawl.dev"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "FIRECRAWL_V2",
+      "output_namespace": "docs/.okf/firecrawl",
+      "maximum_pages": 12,
+      "maximum_depth": 2,
+      "pages": [
+        "https://docs.firecrawl.dev/api-reference/v2-introduction",
+        "https://docs.firecrawl.dev/api-reference/endpoint/crawl-post"
+      ]
+    }
+  ]
+}

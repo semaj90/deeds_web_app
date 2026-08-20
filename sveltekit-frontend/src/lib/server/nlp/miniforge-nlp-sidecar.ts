@@ -4,8 +4,8 @@
  * This wraps the Python FastAPI sidecar that combines:
  * - LangExtract-compatible text extraction
  * - spaCy/regex entity extraction
- * - tree-sitter chunking
- * - ast-grep structural features
+ * - Consiliency treesitter-chunker structural evidence
+ * - ast-grep structural observations
  * - optional PyTorch feature summaries
  */
 
@@ -53,11 +53,25 @@ export interface NlpChunk {
   language?: string;
 }
 
+/**
+ * `upstream_*` fields are Consiliency provenance when the Python 8095 sidecar
+ * exposes them. They are never Atlas canonical IDs by themselves.
+ *
+ * During the migration window only `upstream_chunk_id` is guaranteed by the
+ * currently deployed sidecar. Parent Atlas records compatibility provenance
+ * when richer native IDs are absent and must not promote those compatibility
+ * values to canonical symbol identity.
+ */
 export interface AtlasStructuralEvidenceChunk {
   upstream_chunk_id?: string;
+  upstream_node_id?: string;
+  upstream_file_id?: string;
+  upstream_symbol_id?: string;
   node_type: string;
   kind: string;
   name?: string | null;
+  parent_route?: string[];
+  parent_context?: string | null;
   start_byte: number;
   end_byte: number;
   start_line: number;
@@ -101,6 +115,10 @@ export interface NlpFeature {
   description: string;
   source: 'tree-sitter' | 'ast-grep' | 'langextract' | 'regex' | 'spacy' | 'torch';
   lineNumber?: number;
+  byteStart?: number;
+  byteEnd?: number;
+  ruleId?: string;
+  captures?: Record<string, string>;
   confidence?: number;
   rawText?: string;
 }
@@ -159,6 +177,7 @@ export interface NlpHealthResponse {
     spacy?: boolean;
     langextract?: boolean;
     tree_sitter?: boolean;
+    treesitter_chunker?: boolean;
     ast_grep?: boolean;
     torch?: boolean;
   };
@@ -348,9 +367,14 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         source_revision: String(raw.source_revision ?? req.sourceRevision),
         chunks: raw.chunks.map((chunk) => ({
           upstream_chunk_id: chunk.upstream_chunk_id,
+          upstream_node_id: chunk.upstream_node_id,
+          upstream_file_id: chunk.upstream_file_id,
+          upstream_symbol_id: chunk.upstream_symbol_id,
           node_type: String(chunk.node_type),
           kind: String(chunk.kind),
           name: chunk.name ?? null,
+          parent_route: Array.isArray(chunk.parent_route) ? chunk.parent_route.map(String) : undefined,
+          parent_context: chunk.parent_context ?? null,
           start_byte: Number(chunk.start_byte),
           end_byte: Number(chunk.end_byte),
           start_line: Number(chunk.start_line),

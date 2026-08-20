@@ -1,0 +1,63 @@
+// Parent Atlas deterministic semantic proof reference program.
+//
+// Every extensional relation carries evidence_id. Souffle provenance (`-t explain`)
+// can therefore explain a derived tuple in terms of exact source-grounded inputs.
+// These derived tuples remain non-canonical until the TypeScript host accepts a
+// ClaimVerificationReceiptV1.
+
+.type EvidenceId <: symbol
+.type EntityId <: symbol
+
+.decl FeatureRoute(feature:EntityId, route:EntityId, evidence_id:EvidenceId)
+.decl RouteHandler(route:EntityId, handler:EntityId, evidence_id:EvidenceId)
+.decl HandlerWritesTable(handler:EntityId, table:EntityId, evidence_id:EvidenceId)
+.decl TableOwnershipKey(table:EntityId, ownership_key:EntityId, evidence_id:EvidenceId)
+.decl HandlerChecksOwnership(handler:EntityId, ownership_key:EntityId, evidence_id:EvidenceId)
+.decl TestValidatesFeature(test:EntityId, feature:EntityId, evidence_id:EvidenceId)
+.decl AstCall(caller:EntityId, callee:EntityId, evidence_id:EvidenceId)
+
+.input FeatureRoute
+.input RouteHandler
+.input HandlerWritesTable
+.input TableOwnershipKey
+.input HandlerChecksOwnership
+.input TestValidatesFeature
+.input AstCall
+
+// A structural call claim requires an explicit AST-backed extensional fact.
+.decl VerifiedCall(caller:EntityId, callee:EntityId)
+VerifiedCall(caller, callee) :- AstCall(caller, callee, _).
+
+// A mutation is structurally authorized only when route, handler, storage target,
+// ownership-key declaration, and ownership check all join on canonical IDs.
+.decl AuthorizedMutation(
+    feature:EntityId,
+    route:EntityId,
+    handler:EntityId,
+    table:EntityId,
+    ownership_key:EntityId
+)
+AuthorizedMutation(feature, route, handler, table, ownership_key) :-
+    FeatureRoute(feature, route, _),
+    RouteHandler(route, handler, _),
+    HandlerWritesTable(handler, table, _),
+    TableOwnershipKey(table, ownership_key, _),
+    HandlerChecksOwnership(handler, ownership_key, _).
+
+// Validation is deliberately separate: structural authorization does not imply
+// that a regression test has demonstrated the feature behavior.
+.decl ValidatedAuthorizedMutation(
+    feature:EntityId,
+    route:EntityId,
+    handler:EntityId,
+    table:EntityId,
+    ownership_key:EntityId,
+    test:EntityId
+)
+ValidatedAuthorizedMutation(feature, route, handler, table, ownership_key, test) :-
+    AuthorizedMutation(feature, route, handler, table, ownership_key),
+    TestValidatesFeature(test, feature, _).
+
+.output VerifiedCall
+.output AuthorizedMutation
+.output ValidatedAuthorizedMutation

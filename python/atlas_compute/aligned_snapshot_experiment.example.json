@@ -1,0 +1,50 @@
+{
+  "experiment_revision": "aligned-snapshot:example",
+  "metric": "cosine",
+  "k": 10,
+  "query_canonical_ids": [],
+  "torch_device": "cuda",
+  "enable_cuvs": true,
+  "enable_binary_quantization": true,
+  "enable_kmeans": true,
+  "kmeans_clusters": 20,
+  "kmeans_temperature": 1.0,
+  "kmeans_streaming_batch_size": 0,
+  "kmeans_prediction_batch_size": 0,
+  "enable_som": true,
+  "som_grid_rows": 20,
+  "som_grid_columns": 20,
+  "som_epochs": 20,
+  "cagra_graph_degree": 64,
+  "cagra_intermediate_graph_degree": 128,
+  "cagra_build_algo": "ivf_pq",
+  "cagra_search_width": 1,
+  "cagra_itopk_size": 64,
+  "benchmark_repeats": 10,
+  "qdrant": {
+    "enabled": false,
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "vector_name": "semantic_768",
+    "canonical_payload_key": "canonical_id",
+    "hnsw_ef": [32, 64, 128, 256],
+    "minimum_exact_overlap_at_k": 0.95,
+    "minimum_recall_at_k": 0.95,
+    "timeout_seconds": 15
+  },
+  "nary": {
+    "snapshot_revision": "replace-with-canonical-relationship-snapshot-revision",
+    "temperature": 1.0,
+    "relationships": []
+  },
+  "context": {
+    "context_revision": "replace-with-source-ast-workflow-or-temporal-order-revision",
+    "order_kind": "source_order",
+    "ordered_canonical_ids": [],
+    "window_size": 9,
+    "causal": false,
+    "temperature": 1.0
+  },
+  "relevance": {},
+  "nary_relevance": {}
+}

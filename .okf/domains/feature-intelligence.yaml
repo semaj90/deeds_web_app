@@ -1,0 +1,121 @@
+# Parent Atlas OKF domain definition
+version: 1
+domain_id: atlas.feature-intelligence
+name: Parent Atlas Feature Intelligence
+status: active
+owner: parent-atlas
+
+purpose: >-
+  Derive revision-qualified application feature identity, evidence, relationships,
+  state, retrieval candidates, graph metrics, and Kanban projections from repository,
+  database, specification, test, and runtime evidence.
+
+canonical_authority:
+  ontology_source: .okf
+  behavioral_requirements: openspec
+  runtime_store: postgresql18
+  rule: >-
+    OKF defines stable domain vocabulary and classification policy; PostgreSQL stores
+    canonical materialized identities and facts; Qdrant, pgvector ANN indexes, Neo4j,
+    NetworkX, cuVS, cuGraph, caches, and Kanban are revisioned projections or executors.
+
+entity_types:
+  - feature
+  - requirement
+  - artifact
+  - source_file
+  - symbol
+  - route
+  - service
+  - package_capability
+  - table
+  - column
+  - database_policy
+  - test
+  - runtime_observation
+  - evidence
+  - task
+  - graph_snapshot
+  - vector_snapshot
+
+feature_classes:
+  capability:
+    description: User-visible or system-visible application capability.
+    acceptance_dimensions:
+      - specification
+      - implementation_owner
+      - dependency_evidence
+      - tests
+      - validation
+  authorization:
+    description: Authentication, authorization, ownership, or policy-enforced capability.
+    acceptance_dimensions:
+      - specification
+      - route_or_service_guard
+      - ownership_or_policy_evidence
+      - negative_test
+      - runtime_or_integration_validation
+  retrieval:
+    description: Exact, lexical, structural, semantic, graph, or association retrieval capability.
+    acceptance_dimensions:
+      - canonical_identity
+      - lane_contract
+      - correctness_oracle
+      - executor_parity
+      - retrieval_quality
+  data:
+    description: Schema-backed persistence or materialization capability.
+    acceptance_dimensions:
+      - schema
+      - migration
+      - writer
+      - reader
+      - integrity_validation
+  graph:
+    description: Canonical relationship projection and graph-analysis capability.
+    acceptance_dimensions:
+      - canonical_relationships
+      - snapshot_revision
+      - projection_parity
+      - algorithm_receipt
+
+classification:
+  deterministic_first: true
+  model_fallback:
+    allowed: true
+    authority: inferred_only
+    requires_confidence: true
+  evidence_priority:
+    - runtime_validation
+    - passing_test
+    - source_ast
+    - database_constraint
+    - openspec_requirement
+    - package_wiring
+    - package_presence
+    - markdown_claim
+    - model_inference
+
+identity:
+  feature_key_format: "domain/capability"
+  relationship_identity: canonical_relationship_id
+  projection_ids_are_canonical: false
+  aliases_are_identity: false
+
+state:
+  values:
+    - EVIDENCE_NEEDED
+    - MISSING
+    - SPECIFIED
+    - IMPLEMENTING
+    - VERIFY
+    - VERIFIED
+  completion_scale: [0, 100]
+  confidence_scale: [0, 100]
+  priority_is_completion: false
+
+source_refs:
+  - openspec/specs/atlas-feature-registry/spec.md
+  - openspec/specs/atlas-feature-evidence-graph/spec.md
+  - openspec/specs/atlas-feature-state/spec.md
+  - openspec/specs/atlas-retrieval-reconciliation/spec.md

@@ -37,4 +37,7 @@ EXPOSE 8095
 ENV MINIFORGE_SIDECAR_HOST=0.0.0.0 \
     MINIFORGE_SIDECAR_PORT=8095
 
-CMD ["python", "/app/python/miniforge_nlp_sidecar.py"]
+# v2 preserves native Consiliency IDs/hierarchy and LangExtract grounding while
+# reusing the legacy analysis implementation. Rollback is a one-line command
+# change to /app/python/miniforge_nlp_sidecar.py if the proof gates fail.
+CMD ["python", "/app/python/miniforge_nlp_sidecar_v2.py"]
