@@ -18,7 +18,10 @@ export type StructuralFabricCompilationStatus =
 export type GraphifyStructuralIntelligenceReceipt = {
   schema: 'atlas.graphify-structural-intelligence-receipt.v1';
   sourceRef: string;
-  sourceRevision: string;
+  sourceRevision: string | null;
+  sourceVersionAnchor: string;
+  sourceRevisionAuthority: StructuralMaterializationResult['sourceRevisionAuthority'];
+  parserSourceRevisionToken: string;
   workspaceRevision: string;
   status: StructuralFabricCompilationStatus;
   providerStatus: StructuralMaterializationResult['status'];
@@ -47,13 +50,10 @@ function unique(values: readonly string[]): string[] {
 }
 
 /**
- * Compile the existing Graphify/8095 structural evidence into the Parent Atlas
- * three-producer fabric. This is intentionally pre-GIS: it creates nominations
- * and reference facts only, never stable_symbol_id or symbol_version_id.
- *
- * `langExtractMetadata` is optional because grounded LangExtract may be an
- * expensive/explicit lane. When present, only char-grounded rows survive the
- * grounding adapter.
+ * Compile the existing Graphify structural evidence into the Parent Atlas
+ * three-producer fabric. Parser evidence retains its legacy string-valued
+ * `source_revision` correlation token, but the receipt separately records
+ * whether Atlas has proven canonical revision authority.
  */
 export function compileGraphifyStructuralIntelligence(input: {
   source: string;
@@ -77,6 +77,9 @@ export function compileGraphifyStructuralIntelligence(input: {
         schema: 'atlas.graphify-structural-intelligence-receipt.v1',
         sourceRef: materialization.sourceRef,
         sourceRevision: materialization.sourceRevision,
+        sourceVersionAnchor: materialization.sourceVersionAnchor,
+        sourceRevisionAuthority: materialization.sourceRevisionAuthority,
+        parserSourceRevisionToken: materialization.parserSourceRevisionToken,
         workspaceRevision: input.workspaceRevision,
         status: 'SKIPPED_NO_EVIDENCE',
         providerStatus: materialization.status,
@@ -97,8 +100,6 @@ export function compileGraphifyStructuralIntelligence(input: {
     };
   }
 
-  // First adapt chunks/XRefs so ast-grep observations can attach to exact
-  // overlapping Consiliency provenance.
   const strictNativeMode = materialization.provenanceReadiness.status === 'NATIVE_READY';
   const base = adaptAtlasAstEvidenceToStructuralInput({
     evidence: materialization.evidence,
@@ -155,6 +156,8 @@ export function compileGraphifyStructuralIntelligence(input: {
     + enriched.receipt.compatibility_chunk_id_count;
   const canonicalPromotionMayBeAttempted =
     materialization.provenanceReadiness.canonicalPromotionAllowed
+    && materialization.sourceRevisionAuthority === 'PROVEN'
+    && materialization.sourceRevision !== null
     && strictNativeMode
     && compatibilityCount === 0;
 
@@ -168,6 +171,9 @@ export function compileGraphifyStructuralIntelligence(input: {
       schema: 'atlas.graphify-structural-intelligence-receipt.v1',
       sourceRef: materialization.sourceRef,
       sourceRevision: materialization.sourceRevision,
+      sourceVersionAnchor: materialization.sourceVersionAnchor,
+      sourceRevisionAuthority: materialization.sourceRevisionAuthority,
+      parserSourceRevisionToken: materialization.parserSourceRevisionToken,
       workspaceRevision: input.workspaceRevision,
       status: canonicalPromotionMayBeAttempted ? 'COMPILED_NATIVE' : 'COMPILED_NONPROMOTABLE',
       providerStatus: materialization.status,
