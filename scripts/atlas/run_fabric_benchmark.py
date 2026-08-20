@@ -3,26 +3,28 @@
 run_fabric_benchmark.py — Single GPU Worker Benchmark Harness
 
 Supported Modes:
-  --mode fp32_exact            Real FP32 semantic_768 -> cuDF/cuVS brute_force -> packet_key recovery -> T3a parity receipt
-  --mode kmeans_runtime_eval   KMeans runtime routing evaluation (K=128, Top-C=8)
-  --mode ampere_int4_cache_eval   INT4 pack/dequant cache evaluation (uses ampere_quantization.py)
-  --mode som_runtime_eval      SOM 20x20 recall and coverage evaluation (Recall@10/100, candidate_fraction)
+  --mode fp32_exact              Real FP32 semantic_768 exact recovery receipt
+  --mode kmeans_runtime_eval     KMeans runtime routing evaluation
+  --mode ampere_int4_cache_eval  INT4 pack/dequant cache evaluation
+  --mode som_runtime_eval        SOM 20x20 recall and coverage evaluation
+  --mode spectral_live_fixture   Live 500/5000 graph routing/clustering ablation fixture
 """
 
 import os
-import sys
 import json
 import time
 import argparse
 import hashlib
 import numpy as np
 
-# Import INT4 quantization module from same directory
 from ampere_quantization import pack_int4, unpack_int4, SEMANTIC_DIMENSION
+from spectral_live_fixture import run_spectral_live_fixture
+
 
 def sha256_data(data) -> str:
     serialized = json.dumps(data, sort_keys=True).encode('utf-8')
     return hashlib.sha256(serialized).hexdigest()
+
 
 def get_lineage_envelope(receipt_kind: str, producer_id: str, started_at: str, completed_at: str, input_hash: str, domain_data: dict) -> dict:
     return {
@@ -33,7 +35,7 @@ def get_lineage_envelope(receipt_kind: str, producer_id: str, started_at: str, c
         "started_at": started_at,
         "completed_at": completed_at,
         "input_hash": input_hash,
-        "output_hash": sha256_data(domainData := domain_data),
+        "output_hash": sha256_data(domain_data),
         "workspace_revision": None,
         "source_revision": None,
         "graph_revision": None,
@@ -42,32 +44,24 @@ def get_lineage_envelope(receipt_kind: str, producer_id: str, started_at: str, c
         "data": domain_data
     }
 
+
 def run_fp32_exact(reports_dir: str):
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:fp32_exact] Running FP32 exact recovery benchmark...")
-
     num_packets = 1000
     np.random.seed(42)
     embeddings = np.random.randn(num_packets, SEMANTIC_DIMENSION).astype(np.float32)
     norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
     embeddings = embeddings / np.maximum(norms, 1e-9)
-
     packet_keys = [f"packet:{i:012x}" for i in range(num_packets)]
-
-    # Query matching packet #42
     query_vec = embeddings[42] + np.random.randn(SEMANTIC_DIMENSION).astype(np.float32) * 0.01
     query_vec /= np.linalg.norm(query_vec)
-
-    # Cosine similarity brute force
     sims = np.dot(embeddings, query_vec)
     top_idx = int(np.argmax(sims))
     recovered_key = packet_keys[top_idx]
-
-    parity_matched = (top_idx == 42)
+    parity_matched = top_idx == 42
     t3a_score = float(sims[top_idx])
-
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-
     domain_data = {
         "num_packets": num_packets,
         "dimension": SEMANTIC_DIMENSION,
@@ -77,19 +71,16 @@ def run_fp32_exact(reports_dir: str):
         "t3a_exact_score": t3a_score,
         "brute_force_latency_ms": 1.45
     }
-
     receipt = get_lineage_envelope("GPU_FP32_EXACT_REPLAY_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"num_packets": num_packets}), domain_data)
-
     out_file = os.path.join(reports_dir, "gpu-fp32-exact-receipt.json")
     with open(out_file, "w") as f:
         json.dump(receipt, f, indent=2)
-
     print(f"[run_fabric_benchmark:fp32_exact] SUCCESS! Receipt written to {out_file}")
+
 
 def run_kmeans_eval(reports_dir: str):
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:kmeans_eval] Running KMeans runtime routing evaluation...")
-
     domain_data = {
         "evaluated_k_list": [64, 128, 256],
         "runtime_k": 128,
@@ -98,30 +89,24 @@ def run_kmeans_eval(reports_dir: str):
         "pruned_candidate_fraction": 0.0625,
         "status": "COMPLETED"
     }
-
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     receipt = get_lineage_envelope("GPU_KMEANS_RUNTIME_ROUTING_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"runtime_k": 128}), domain_data)
-
     out_file = os.path.join(reports_dir, "gpu-kmeans-runtime-receipt.json")
     with open(out_file, "w") as f:
         json.dump(receipt, f, indent=2)
-
     print(f"[run_fabric_benchmark:kmeans_eval] SUCCESS! Receipt written to {out_file}")
+
 
 def run_int4_eval(reports_dir: str):
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:int4_eval] Running Ampere INT4 pack/dequant evaluation...")
-
     np.random.seed(42)
     sample_vec = np.random.randn(SEMANTIC_DIMENSION).astype(np.float32)
     sample_vec /= np.linalg.norm(sample_vec)
-
     packed = pack_int4(sample_vec)
     unpacked = unpack_int4(packed)
-
     reconstruction_mse = float(np.mean((sample_vec - unpacked) ** 2))
     packed_bytes = packed.nbytes
-
     domain_data = {
         "representation_id": "semantic_768",
         "dimension": SEMANTIC_DIMENSION,
@@ -131,20 +116,17 @@ def run_int4_eval(reports_dir: str):
         "reconstruction_mse": reconstruction_mse,
         "status": "COMPLETED"
     }
-
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     receipt = get_lineage_envelope("AMPERE_INT4_CACHE_EVAL_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"dimension": SEMANTIC_DIMENSION}), domain_data)
-
     out_file = os.path.join(reports_dir, "gpu-ampere-int4-receipt.json")
     with open(out_file, "w") as f:
         json.dump(receipt, f, indent=2)
-
     print(f"[run_fabric_benchmark:int4_eval] SUCCESS! Receipt written to {out_file}")
+
 
 def run_som_eval(reports_dir: str):
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     print("[run_fabric_benchmark:som_eval] Running SOM 20x20 recall and coverage evaluation...")
-
     domain_data = {
         "som_grid_width": 20,
         "som_grid_height": 20,
@@ -156,19 +138,37 @@ def run_som_eval(reports_dir: str):
         "winning_cell_coverage_radius_2": 0.976,
         "status": "COMPLETED"
     }
-
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     receipt = get_lineage_envelope("SOM_20X20_EVAL_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"grid": "20x20"}), domain_data)
-
     out_file = os.path.join(reports_dir, "gpu-som-runtime-receipt.json")
     with open(out_file, "w") as f:
         json.dump(receipt, f, indent=2)
-
     print(f"[run_fabric_benchmark:som_eval] SUCCESS! Receipt written to {out_file}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Single GPU Fabric Benchmark Worker")
-    parser.add_argument("--mode", required=True, choices=["fp32_exact", "kmeans_runtime_eval", "ampere_int4_cache_eval", "som_runtime_eval"], help="Benchmark execution mode")
+    parser.add_argument(
+        "--mode",
+        required=True,
+        choices=[
+            "fp32_exact",
+            "kmeans_runtime_eval",
+            "ampere_int4_cache_eval",
+            "som_runtime_eval",
+            "spectral_live_fixture",
+        ],
+        help="Benchmark execution mode",
+    )
+    parser.add_argument("--nodes", help="Frozen graph nodes.parquet")
+    parser.add_argument("--edges", help="Frozen graph edges.parquet")
+    parser.add_argument("--labels", help="Optional routing-label parquet keyed by gpu_node_id")
+    parser.add_argument("--candidate-size", action="append", type=int, help="Candidate fixture size; repeat flag for multiple sizes")
+    parser.add_argument("--edge-type", action="append", default=[], help="Optional edge type allowlist")
+    parser.add_argument("--recall-k", action="append", type=int, help="Recall cutoff; repeat flag for multiple K")
+    parser.add_argument("--repeats", type=int, default=3, help="Repeated partition runs for stability")
+    parser.add_argument("--random-seed", type=int, default=0x0A71A5)
+    parser.add_argument("--receipt-out")
     args = parser.parse_args()
 
     reports_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../docs/reports"))
@@ -182,6 +182,9 @@ def main():
         run_int4_eval(reports_dir)
     elif args.mode == "som_runtime_eval":
         run_som_eval(reports_dir)
+    elif args.mode == "spectral_live_fixture":
+        run_spectral_live_fixture(args, reports_dir)
+
 
 if __name__ == "__main__":
     main()
