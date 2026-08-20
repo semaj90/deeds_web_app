@@ -1,12 +1,19 @@
 import { createMiniforgeNlpSidecarClient, type AtlasStructuralEvidence } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 import { normalizeAtlasAstEvidence, type NormalizedAtlasStructuralEvidence } from '$lib/server/analysis/atlas-ast-evidence-normalizer.js';
 
-export type CanonicalSourceRef = {
+export type SourceRevisionAuthorityV1 = 'PROVEN' | 'CONTENT_ANCHOR_ONLY' | 'UNPROVEN';
+
+export type StructuralSourceInputV1 = {
   sourceRef: string;
-  sourceRevision: string;
+  sourceRevision: string | null;
+  sourceVersionAnchor: string;
+  sourceRevisionAuthority: SourceRevisionAuthorityV1;
   language: string;
   source: string;
 };
+
+/** @deprecated Prefer StructuralSourceInputV1. */
+export type CanonicalSourceRef = StructuralSourceInputV1;
 
 export type AstProviderId = 'treesitter-chunker-8095' | 'node-tree-sitter-challenger';
 
@@ -19,7 +26,14 @@ export type AstProviderResult = {
 };
 
 export interface AstProvider {
-  materialize(input: CanonicalSourceRef): Promise<AstProviderResult>;
+  materialize(input: StructuralSourceInputV1): Promise<AstProviderResult>;
+}
+
+export function parserSourceRevisionToken(input: StructuralSourceInputV1): string {
+  if (input.sourceRevisionAuthority === 'PROVEN' && input.sourceRevision?.trim()) {
+    return input.sourceRevision.trim();
+  }
+  return `anchor:${input.sourceVersionAnchor}`;
 }
 
 export function create8095AstProvider(baseUrl?: string): AstProvider {
@@ -31,7 +45,7 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
           source: input.source,
           language: input.language,
           filePath: input.sourceRef,
-          sourceRevision: input.sourceRevision,
+          sourceRevision: parserSourceRevisionToken(input),
         });
         const diagnostics = evidence.diagnostics ?? [];
         return {
@@ -60,6 +74,8 @@ export type StructuralProvenanceReadiness = {
   nativeSymbolIds: number;
   upstreamChunkIds: number;
   symbolCount: number;
+  sourceRevisionAuthority: SourceRevisionAuthorityV1;
+  sourceRevisionAuthorityReady: boolean;
   canonicalPromotionAllowed: boolean;
   reason: string;
 };
@@ -67,15 +83,18 @@ export type StructuralProvenanceReadiness = {
 function evaluateProvenanceReadiness(
   normalized: NormalizedAtlasStructuralEvidence | null,
   providerStatus: AstProviderResult['status'],
+  input: StructuralSourceInputV1,
 ): StructuralProvenanceReadiness {
+  const revisionAuthorityReady =
+    input.sourceRevisionAuthority === 'PROVEN'
+    && Boolean(input.sourceRevision?.trim());
+
   if (!normalized || normalized.symbols.length === 0) {
     return {
-      status: 'NO_EVIDENCE',
-      nativeNodeIds: 0,
-      nativeFileIds: 0,
-      nativeSymbolIds: 0,
-      upstreamChunkIds: 0,
-      symbolCount: 0,
+      status: 'NO_EVIDENCE', nativeNodeIds: 0, nativeFileIds: 0, nativeSymbolIds: 0,
+      upstreamChunkIds: 0, symbolCount: 0,
+      sourceRevisionAuthority: input.sourceRevisionAuthority,
+      sourceRevisionAuthorityReady: revisionAuthorityReady,
       canonicalPromotionAllowed: false,
       reason: 'No normalized structural symbols were produced.',
     };
@@ -96,6 +115,8 @@ function evaluateProvenanceReadiness(
       nativeSymbolIds: provenance.nativeSymbolIdCount,
       upstreamChunkIds: provenance.upstreamChunkIdCount,
       symbolCount,
+      sourceRevisionAuthority: input.sourceRevisionAuthority,
+      sourceRevisionAuthorityReady: revisionAuthorityReady,
       canonicalPromotionAllowed: false,
       reason: 'One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical.',
     };
@@ -109,8 +130,25 @@ function evaluateProvenanceReadiness(
       nativeSymbolIds: provenance.nativeSymbolIdCount,
       upstreamChunkIds: provenance.upstreamChunkIdCount,
       symbolCount,
+      sourceRevisionAuthority: input.sourceRevisionAuthority,
+      sourceRevisionAuthorityReady: revisionAuthorityReady,
       canonicalPromotionAllowed: false,
       reason: 'Native structural provenance is complete, but the parse was recovered/degraded; evidence may be searched but GIS promotion is blocked.',
+    };
+  }
+
+  if (!revisionAuthorityReady) {
+    return {
+      status: 'NATIVE_READY',
+      nativeNodeIds: provenance.nativeNodeIdCount,
+      nativeFileIds: provenance.nativeFileIdCount,
+      nativeSymbolIds: provenance.nativeSymbolIdCount,
+      upstreamChunkIds: provenance.upstreamChunkIdCount,
+      symbolCount,
+      sourceRevisionAuthority: input.sourceRevisionAuthority,
+      sourceRevisionAuthorityReady: false,
+      canonicalPromotionAllowed: false,
+      reason: 'Native structural provenance is complete and the parse is PROVEN, but canonical source_revision authority is not proven; GIS promotion is blocked.',
     };
   }
 
@@ -121,14 +159,19 @@ function evaluateProvenanceReadiness(
     nativeSymbolIds: provenance.nativeSymbolIdCount,
     upstreamChunkIds: provenance.upstreamChunkIdCount,
     symbolCount,
+    sourceRevisionAuthority: input.sourceRevisionAuthority,
+    sourceRevisionAuthorityReady: true,
     canonicalPromotionAllowed: true,
-    reason: 'All structural symbols retain native Consiliency node/file/chunk provenance and the provider is PROVEN; GIS may evaluate canonical promotion.',
+    reason: 'All structural symbols retain native Consiliency node/file/chunk provenance, the provider is PROVEN, and canonical source_revision authority is proven; GIS may evaluate canonical promotion.',
   };
 }
 
 export type StructuralMaterializationResult = {
   sourceRef: string;
-  sourceRevision: string;
+  sourceRevision: string | null;
+  sourceVersionAnchor: string;
+  sourceRevisionAuthority: SourceRevisionAuthorityV1;
+  parserSourceRevisionToken: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
   /** Raw structural evidence retained for the downstream Parent Atlas fabric. */
@@ -144,31 +187,44 @@ export type StructuralMaterializationResult = {
 /**
  * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
  * the selected AstProvider owns structural parsing evidence. The default live
- * provider remains 8095. Challenger providers may be injected for parity tests,
- * but identity persistence and projections remain downstream and are never
- * authorized by provider selection alone.
+ * provider remains 8095. Challenger providers may be injected for parity tests.
  *
- * `canonicalPromotionAllowed=true` means only that native structural provenance
- * is complete and the provider parse is PROVEN. GIS must still resolve/promote
- * the nomination and persistence must still prove the canonical identity.
+ * `canonicalPromotionAllowed=true` requires native structural provenance, a
+ * PROVEN parse, and PROVEN canonical source_revision authority. A content hash
+ * may be used as a noncanonical sourceVersionAnchor but never as revision proof.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
 
-  async materialize(input: CanonicalSourceRef): Promise<StructuralMaterializationResult> {
+  async materialize(input: StructuralSourceInputV1): Promise<StructuralMaterializationResult> {
+    if (!input.sourceVersionAnchor.trim()) throw new Error('SOURCE_VERSION_ANCHOR_REQUIRED');
+    if (input.sourceRevisionAuthority === 'PROVEN' && !input.sourceRevision?.trim()) {
+      throw new Error('PROVEN_SOURCE_REVISION_REQUIRED');
+    }
+    if (input.sourceRevisionAuthority !== 'PROVEN' && input.sourceRevision !== null) {
+      throw new Error('UNPROVEN_SOURCE_REVISION_MUST_BE_NULL');
+    }
+
+    const parserToken = parserSourceRevisionToken(input);
     const result = await this.astProvider.materialize(input);
     const evidence = result.evidence && result.status !== 'FAILED' ? result.evidence : null;
     const normalized = evidence ? normalizeAtlasAstEvidence(evidence) : null;
-    const provenanceReadiness = evaluateProvenanceReadiness(normalized, result.status);
+    const provenanceReadiness = evaluateProvenanceReadiness(normalized, result.status, input);
     const diagnostics = [...result.diagnostics];
+    if (evidence && evidence.source_revision !== parserToken) diagnostics.push('PARSER_SOURCE_REVISION_TOKEN_MISMATCH');
     if (provenanceReadiness.status === 'COMPATIBILITY_ONLY') {
       diagnostics.push('STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY');
     } else if (provenanceReadiness.status === 'NATIVE_RECOVERED') {
       diagnostics.push('STRUCTURAL_PROVENANCE_RECOVERED_NOT_PROMOTABLE');
     }
+    if (!provenanceReadiness.sourceRevisionAuthorityReady) diagnostics.push('SOURCE_REVISION_AUTHORITY_UNPROVEN');
+
     return {
       sourceRef: input.sourceRef,
       sourceRevision: input.sourceRevision,
+      sourceVersionAnchor: input.sourceVersionAnchor,
+      sourceRevisionAuthority: input.sourceRevisionAuthority,
+      parserSourceRevisionToken: parserToken,
       provider: result.provider,
       status: result.status,
       evidence,
