@@ -49,6 +49,20 @@ export default {
     '!atlas_structural_reference_resolutions', '!atlas_schema_object_registry',
     '!atlas_schema_object_aliases', '!atlas_schema_object_versions',
 
+    // Added 2026-08-02: library registry — manual sidecar migration
+    // (drizzle/manual/20260802_library_identities.sql) because generating
+    // against schema.ts also picked up unrelated pre-existing drift
+    // (recommendation_log, semantic_lifecycle_events, semantic_signals).
+    '!library_identities',
+    // Parent Atlas acquisition plane (drizzle/manual/20260802_atlas_acquisition.sql) —
+    // same reason as library_identities above: keep isolated from unrelated schema drift.
+    '!atlas_research_runs', '!atlas_fetches', '!atlas_fetch_attempts',
+    '!atlas_source_revisions', '!atlas_extractions',
+
+    // Added 2026-08-19: ORF observation feature exact-filter plane.
+    // Managed by drizzle/manual/20260819_atlas_observation_feature_rows.sql so
+    // this additive table can be proven independently of unrelated schema drift.
+    '!atlas_observation_feature_rows',
     // Parent Atlas test/assertion identity plane and reviewed continuity ledger.
     '!atlas_test_registry', '!atlas_test_aliases', '!atlas_test_versions', '!atlas_test_execution_receipts',
     '!atlas_assertion_registry', '!atlas_assertion_aliases', '!atlas_assertion_versions',

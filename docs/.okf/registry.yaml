@@ -28,12 +28,64 @@ contracts:
       - community_id
   - name: feature-matrix-schema
     owner: sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts
-    role: runtime FeatureMatrixRow schema
+    role: legacy runtime FeatureMatrixRow schema; broad 768 assumptions remain until separate migration proof
     notes:
       - packet_key
       - tree_node_id
       - naive_bayes_score
       - logistic_regression_score
+      - legacy_dense_768_contract
+  - name: observation-feature-projection-v1
+    owner: sveltekit-frontend/src/lib/server/atlas/contracts/observation-feature-projection-v1.ts
+    role: ORF-1 deterministic observation-to-mask/tag projection
+    notes:
+      - ast_pattern_mask_32
+      - ontology_mask_32
+      - flattened_key_value_tags
+      - source_version_receipt_id
+      - representation_explicit
+  - name: external-doc-projection-v1
+    owner: sveltekit-frontend/src/lib/server/atlas/contracts/external-doc-projection-v1.ts
+    role: ORF-3 target payload/index contract for one programming-doc evidence family
+    notes:
+      - external_programming_docs_hybrid_512_v1
+      - semantic_512
+      - flattened_key_value_tags
+      - kmeans_cluster_id
+      - community_id
+      - migration_proof_required
+  - name: cluster-feature-projection-v1
+    owner: sveltekit-frontend/src/lib/server/atlas/contracts/cluster-feature-projection-v1.ts
+    role: ORF-4 rebuildable KMeans/SOM/community routing projection
+    notes:
+      - semantic_512
+      - latent_64
+      - kmeans
+      - som
+      - community
+      - evidence_authority_false
+  - name: retrieval-router-feature-row-v1
+    owner: sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-router-feature-row-v1.ts
+    role: ORF-5 representation-explicit router feature row
+    notes:
+      - semantic_512
+      - latent_64
+      - bm25_score
+      - bm42_challenger_score
+      - pagerank
+      - ppr
+      - kmeans
+      - som
+      - mutation_status
+  - name: okf-mcp-resource-catalog-v1
+    owner: sveltekit-frontend/src/lib/server/mcp/okf-resource-catalog.mjs
+    role: ORF-6 stable atlas://okf resource identities plus protocol-neutral cache policy
+    notes:
+      - atlas://okf/registry
+      - atlas://okf/schema
+      - atlas://okf/feature-envelope/v3
+      - mcp_v1_registration_adapter
+      - mcp_2026_cache_hint_migration_pending
   - name: okf-topic-ingestion
     owner: sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts
     role: OKF packetization and domain classification wiring
@@ -80,3 +132,4 @@ contracts:
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.
+  - ORF contracts are additive and representation-explicit; they do not silently mutate the broad legacy FeatureMatrixRow owner.
