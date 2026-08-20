@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { compileApiContractObservationV1 } from './api-contract-observation-v1.js';
+import {
+  compileApiContractObservationV1,
+  type ApiContractEvidenceSourceV1,
+  type ApiContractNominationV1,
+} from './api-contract-observation-v1.js';
 
-function nomination(treeNodeId: string | null) {
+function nomination(treeNodeId: string | null): ApiContractNominationV1 {
+  const evidenceSources: ApiContractEvidenceSourceV1[] = ['TREE_SITTER', 'AST_GREP', 'TS_MORPH', 'ZOD'];
   return {
-    schema: 'atlas.api-contract-nomination.v1' as const,
+    schema: 'atlas.api-contract-nomination.v1',
     sourceRef: 'src/routes/api/search/+server.ts',
     workspaceRevision: 'workspace:742',
     sourceRevision: 'source:abc',
@@ -20,7 +25,7 @@ function nomination(treeNodeId: string | null) {
       treeNodeId,
       symbolVersionId: 'symbol-version:search-post',
     },
-    transport: 'HTTP' as const,
+    transport: 'HTTP',
     method: 'POST',
     route: '/api/search',
     handlerSymbol: 'POST',
@@ -28,7 +33,7 @@ function nomination(treeNodeId: string | null) {
     outputSchemaRefs: ['zod:SearchResponse'],
     authRequirements: ['session'],
     sideEffects: ['QDRANT_READ'],
-    evidenceSources: ['TREE_SITTER', 'AST_GREP', 'TS_MORPH', 'ZOD'] as const,
+    evidenceSources,
     evidenceRefs: ['src/routes/api/search/+server.ts#bytes=10-100'],
     grammarRevision: 'tree-sitter-typescript:test',
     semanticEngineRevision: 'ts-morph:test',
