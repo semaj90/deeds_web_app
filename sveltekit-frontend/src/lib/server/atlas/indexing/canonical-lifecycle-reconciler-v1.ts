@@ -8,7 +8,8 @@ export const CanonicalLifecycleResolutionV1Schema = z.object({
   packetKey: z.string().min(1),
   sourceRef: z.string().min(1),
   currentWorkspaceRevision: z.string().min(1),
-  currentSourceVersionAnchor: z.string().min(1),
+  currentSourceRevision: z.string().min(1).nullable(),
+  currentContentHash: z.string().min(1).nullable(),
   lifecycleState: z.enum(['ACTIVE', 'SUPERSEDED', 'DELETED']),
 }).strict();
 export type CanonicalLifecycleResolutionV1 = z.infer<typeof CanonicalLifecycleResolutionV1Schema>;
@@ -17,7 +18,8 @@ export const CanonicalLifecycleReconcileStatusV1Schema = z.enum([
   'READY_FOR_PERSISTENCE_OWNER',
   'BLOCKED_IDENTITY_UNRESOLVED',
   'BLOCKED_WORKSPACE_REVISION_MISMATCH',
-  'BLOCKED_SOURCE_VERSION_MISMATCH',
+  'BLOCKED_SOURCE_LINEAGE_UNAVAILABLE',
+  'BLOCKED_SOURCE_REVISION_MISMATCH',
   'ALREADY_TERMINAL',
 ]);
 export type CanonicalLifecycleReconcileStatusV1 = z.infer<typeof CanonicalLifecycleReconcileStatusV1Schema>;
@@ -35,17 +37,19 @@ export const CanonicalLifecycleReconcileReceiptV1Schema = z.object({
   status: CanonicalLifecycleReconcileStatusV1Schema,
   sourceRef: z.string().min(1),
   workspaceRevision: z.string().min(1),
-  observedSourceVersionAnchor: z.string().min(1),
+  deletionEventAnchor: z.string().min(1),
+  priorContentHash: z.string().min(1).nullable(),
   canonicalId: z.string().min(1).nullable(),
   packetKey: z.string().min(1).nullable(),
-  currentSourceVersionAnchor: z.string().min(1).nullable(),
+  currentSourceRevision: z.string().min(1).nullable(),
+  currentContentHash: z.string().min(1).nullable(),
   currentLifecycleState: z.enum(['ACTIVE', 'SUPERSEDED', 'DELETED']).nullable(),
   proposedLifecycleState: z.literal('SUPERSEDED').nullable(),
   invalidationTargets: z.array(CanonicalLifecycleInvalidationTargetV1Schema),
   tombstoneObserved: z.literal(true),
   canonicalIdentityValidated: z.boolean(),
   workspaceRevisionMatched: z.boolean(),
-  sourceVersionMatched: z.boolean(),
+  sourceLineageMatched: z.boolean(),
   observationIsMutationAuthority: z.literal(false),
   canonicalWritesAllowed: z.literal(false),
   persistenceOwnerRequired: z.literal(true),
@@ -78,12 +82,17 @@ function digest(value: unknown): string {
 }
 
 /**
- * Pure hand-off contract between structural DELETE observation and the future
- * canonical persistence/lifecycle owner.
+ * Pure hand-off contract between a structural DELETE observation and the
+ * future canonical persistence/lifecycle owner.
+ *
+ * `tombstone.sourceVersionAnchor` identifies the deletion observation itself;
+ * it is NOT assumed to be the prior canonical source revision. Freshness is
+ * therefore checked against `priorContentHash` when that evidence is present.
+ * If prior lineage is absent, the reconciler fails closed rather than guessing.
  *
  * This function never mutates Postgres, Qdrant, Neo4j, Valkey, Arrow, or any
- * canonical identity. A READY result is authorization evidence for a separate
- * persistence owner to evaluate; it is not itself a mutation.
+ * canonical identity. READY means only that a separate persistence owner may
+ * evaluate the proposed lifecycle transition and projection invalidations.
  */
 export function reconcileStructuralTombstoneV1(
   value: CanonicalLifecycleReconcileInputV1,
@@ -96,7 +105,7 @@ export function reconcileStructuralTombstoneV1(
   let status: CanonicalLifecycleReconcileStatusV1;
   let identityValidated = false;
   let workspaceMatched = false;
-  let sourceVersionMatched = false;
+  let sourceLineageMatched = false;
 
   if (!value.canonical) {
     status = 'BLOCKED_IDENTITY_UNRESOLVED';
@@ -107,14 +116,20 @@ export function reconcileStructuralTombstoneV1(
   } else {
     identityValidated = true;
     workspaceMatched = value.canonical.currentWorkspaceRevision === tombstone.workspaceRevision;
-    sourceVersionMatched = value.canonical.currentSourceVersionAnchor === tombstone.sourceVersionAnchor;
+
+    if (tombstone.priorContentHash && value.canonical.currentContentHash) {
+      sourceLineageMatched = tombstone.priorContentHash === value.canonical.currentContentHash;
+    }
 
     if (!workspaceMatched) {
       status = 'BLOCKED_WORKSPACE_REVISION_MISMATCH';
       diagnostics.push('STALE_DELETE_WORKSPACE_REVISION');
-    } else if (!sourceVersionMatched) {
-      status = 'BLOCKED_SOURCE_VERSION_MISMATCH';
-      diagnostics.push('STALE_DELETE_SOURCE_VERSION_ANCHOR');
+    } else if (!tombstone.priorContentHash || !value.canonical.currentContentHash) {
+      status = 'BLOCKED_SOURCE_LINEAGE_UNAVAILABLE';
+      diagnostics.push('PRIOR_CONTENT_HASH_REQUIRED_FOR_DELETE_FRESHNESS');
+    } else if (!sourceLineageMatched) {
+      status = 'BLOCKED_SOURCE_REVISION_MISMATCH';
+      diagnostics.push('STALE_DELETE_PRIOR_CONTENT_HASH_MISMATCH');
     } else if (value.canonical.lifecycleState === 'SUPERSEDED' || value.canonical.lifecycleState === 'DELETED') {
       status = 'ALREADY_TERMINAL';
       diagnostics.push('CANONICAL_ENTITY_ALREADY_TERMINAL');
@@ -129,17 +144,19 @@ export function reconcileStructuralTombstoneV1(
     status,
     sourceRef: tombstone.sourceRef,
     workspaceRevision: tombstone.workspaceRevision,
-    observedSourceVersionAnchor: tombstone.sourceVersionAnchor,
+    deletionEventAnchor: tombstone.sourceVersionAnchor,
+    priorContentHash: tombstone.priorContentHash,
     canonicalId: value.canonical?.canonicalId ?? null,
     packetKey: value.canonical?.packetKey ?? null,
-    currentSourceVersionAnchor: value.canonical?.currentSourceVersionAnchor ?? null,
+    currentSourceRevision: value.canonical?.currentSourceRevision ?? null,
+    currentContentHash: value.canonical?.currentContentHash ?? null,
     currentLifecycleState: value.canonical?.lifecycleState ?? null,
     proposedLifecycleState: status === 'READY_FOR_PERSISTENCE_OWNER' ? 'SUPERSEDED' as const : null,
     invalidationTargets: status === 'READY_FOR_PERSISTENCE_OWNER' ? targets : [],
     tombstoneObserved: true as const,
     canonicalIdentityValidated: identityValidated,
     workspaceRevisionMatched: workspaceMatched,
-    sourceVersionMatched,
+    sourceLineageMatched,
     observationIsMutationAuthority: false as const,
     canonicalWritesAllowed: false as const,
     persistenceOwnerRequired: true as const,
