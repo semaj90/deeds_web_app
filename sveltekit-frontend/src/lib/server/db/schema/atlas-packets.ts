@@ -36,6 +36,14 @@ export const atlasPackets = pgTable('atlas_packets', {
   // col 2: populated in 58,304/61,659 rows by ingest-qdrant-to-atlas-packets.mjs
   sourceRef: text('source_ref').notNull(),
   canonicalSourceRef: text('canonical_source_ref'),
+
+  // Source-version provenance. Nullable for legacy packets; every new canonical
+  // semantic_768 write must supply both fields through the EMB3B1 binding.
+  // source_revision is repository-version identity (for repository files, a git
+  // revision), never a content hash, workspace revision, or representation revision.
+  sourceRevision: text('source_revision'),
+  sourceVersionReceiptId: text('source_version_receipt_id'),
+
   directoryPath: text('directory_path').notNull(),
   filePath: text('file_path'),
   functionSymbol: text('function_symbol'),
@@ -50,7 +58,8 @@ export const atlasPackets = pgTable('atlas_packets', {
   conceptIds: text('concept_ids').array().default(sql`'{}'::text[]`),
   clusterId: integer('cluster_id'),
 
-  // Vector
+  // Canonical dense representation slot. Representation identity/dimension and
+  // encoder lineage below determine whether a row is valid semantic_768 evidence.
   embedding: vector('embedding', { dimensions: 768 }),
 
   // Content
@@ -103,7 +112,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   // Tracks representation contract version (e.g., v1 = 384d, v2 = 768d).
   // Prevents 384d vectors being re-used when schema upgrades to 768d.
 
-  // Representation lineage (cols 135-140 in live DB)
+  // Representation lineage (cols 135-140 in live DB before EMB3B1 additions)
   // source_representation_id: lane constant for raw embedding (e.g. 'semantic_768')
   // projection_representation_id: lane constant for compressed projection (e.g. 'latent_64')
   // Actively read/written by feature-tracking-layer.ts and trace-reranker.ts.
@@ -115,8 +124,8 @@ export const atlasPackets = pgTable('atlas_packets', {
   somRevision: text('som_revision'),
 
   embeddingDigest: text('embedding_digest'),
-  // SHA-256 of embedding vector (hex string). Immutable anchor.
-  // Computed once at insert; used for idempotency verification and cold-storage manifest.
+  // SHA-256 of the Float32 embedding bytes. Immutable anchor for the persisted
+  // pgvector representation; semantic writers must compute it before mutation.
 
   // Identity lane — which topology this packet belongs to
   // qdrant_chunk: vector-backed, qdrant_point_id is set
@@ -133,6 +142,8 @@ export const atlasPackets = pgTable('atlas_packets', {
 }, (table) => ({
   identityIdx: index('idx_atlas_packets_identity').on(table.packetKey, table.sourceRef, table.featureId, table.directoryPath),
   sourceRefIdx: index('idx_atlas_packets_source_feature').on(table.sourceRef, table.featureId),
+  sourceRevisionIdx: index('idx_atlas_packets_source_revision').on(table.sourceRevision),
+  sourceVersionReceiptIdx: index('idx_atlas_packets_source_version_receipt_id').on(table.sourceVersionReceiptId),
   packetUlidIdx: index('idx_atlas_packets_packet_ulid').on(table.packetUlid),
   titleIdIdx: index('idx_atlas_packets_title_id').on(table.titleId),
   canonicalSourceRefIdx: index('idx_atlas_packets_canonical_source_ref').on(table.canonicalSourceRef),
@@ -163,4 +174,3 @@ export const atlasPackets = pgTable('atlas_packets', {
 
 export type AtlasPacket = typeof atlasPackets.$inferSelect;
 export type NewAtlasPacket = typeof atlasPackets.$inferInsert;
-
