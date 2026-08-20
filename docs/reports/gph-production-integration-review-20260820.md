@@ -2,52 +2,127 @@
 
 ## Scope
 
-This review is the entry receipt for PROOF MODE after the 2026-08-20 merge of PR #9.
-It reconciles the current Graphify AST hardening gates with the merged repository and classifies the stray top-level scaffold package before any runtime import/move.
+This review is the PROOF MODE integration receipt for the current Graphify structural-owner migration. It reconciles the live startup wiring, the production-oriented batch/delta contract, the node-tree-sitter challenger work, and the EMB3A revision-owner audit.
+
+The central correction from this pass is that a content digest is a useful deterministic `sourceVersionAnchor`, but it is **not** canonical `source_revision` authority.
 
 ## Progress accounting
 
-Two percentages are intentionally reported:
+Two percentages remain intentionally separate:
 
-- **Strict canonical checklist completion: 44%** — 11 completed canonical tasks out of GPH-01..GPH-24 plus GPH-35 (25 tasks), excluding duplicate aliases GPH-25..GPH-34.
-- **Evidence-weighted readiness: ~56%** — gives partial credit to GPH-15/GPH-16 proof evidence and the now-present opt-in GPH-17 daily wiring. This is an engineering-readiness estimate, **not** a promotion/proof state.
-
-Never use duplicate alias checkboxes to claim lifecycle completion.
+- **Strict canonical checklist completion: 44%** — canonical checked GPH tasks only; duplicate aliases are excluded.
+- **Evidence-weighted implementation/proof readiness: ~56%** — gives partial credit to GPH-15/GPH-16 implementation and opt-in GPH-17 wiring. It is not equivalent to `PROVEN` or owner promotion.
 
 ## Current gate reconciliation
 
 | Gate | Current state | Evidence / next requirement |
 |---|---|---|
-| GPH-15 | PARTIAL_PROVEN | Sidecar 4-file isolation proof exists; production native materializer also catches per-file failures. New `graphify-structural-batch-v1` contract makes isolation explicit. Needs live production-owner invocation + receipt. |
-| GPH-16 | PARTIAL_PROVEN | Bounded skip/reextract/delete proof exists. New batch contract accepts explicit UPSERT/DELETE and emits tombstones. Production delta-manifest invocation + tombstone handoff/readback remain. |
-| GPH-17 | IMPLEMENTED_BEHIND_MIGRATION_FLAG | `run-graphify-daily-startup.mjs` now invokes `native-structural-materializer.mts` when `GRAPHIFY_NATIVE_STRUCTURAL=1`. Needs live reachability receipt, canonical-owner acceptance, and explicit fallback policy. |
-| GPH-18 | PARTIAL_IMPLEMENTED | `atlas.native-structural-materialization-run.v1` already records engine-facing status, counts, failures, evidence/symbol writes and checksum. Must be reconciled into the production Graphify receipt with projection/persistence evidence. |
-| GPH-19 | BLOCKED | Requires GPH-15/16 production proof + GPH-17/18 accepted live owner/receipt + parity/identity invariants. |
-| GPH-20 | BLOCKED | Legacy cannot become SUPERSEDED until every GPH-19 gate passes. |
-| GPH-21 | PARTIAL_PROVEN | Ownership audit can detect imports; dedicated CI regression guard remains pending and must only enforce after SUPERSEDED. |
-| GPH-22 | OPEN | Recommendation receipt must remain advisory and may not mutate canonical Graphify truth. |
-| GPH-35 | DEFERRED | Cleanup only after supersession recovery window, digest/reason evidence and rollback instructions. |
+| GPH-14R | IMPLEMENTED_UNPROVEN | Revision semantics now distinguish canonical `sourceRevision` from noncanonical `sourceVersionAnchor`; promotion fails closed while authority is unproven. Execute focused tests. |
+| GPH-15 | IMPLEMENTED_UNPROVEN | Production-oriented batch contract isolates per-file failures; existing sidecar isolation evidence exists. Needs focused tests + live 8095 batch receipt. |
+| GPH-16 | IMPLEMENTED_UNPROVEN | Same batch supports unchanged skip, changed re-extraction and explicit tombstones. Native old-tree reuse remains a later executor optimization. Needs focused tests + live 8095 delta receipt. |
+| GPH-17 | WIRED_BEHIND_FLAG / LIVE_UNPROVEN | `run-graphify-daily-startup.mjs` invokes the native structural stage when `GRAPHIFY_NATIVE_STRUCTURAL=1`. Reachability must be proven with APPLY disabled. |
+| GPH-18 | PARTIAL / BLOCKED | Production persistence/readback is still pending and canonical writes are now explicitly blocked while source-revision authority is unproven. |
+| GPH-19 | BLOCKED | Requires GPH-15/16, GPH-17 reachability, GPH-18 readback, canonical revision ownership, and identity invariants. |
+| GPH-20 | BLOCKED | Legacy cannot become `SUPERSEDED` before GPH-19 acceptance. |
+| GPH-21 | PARTIAL_PROVEN | Ownership audit can observe imports; CI supersession guard remains pending. |
+| GPH-22 | OPEN | Recommendation state remains advisory only. |
+| GPH-35 | DEFERRED | Cleanup only after supersession recovery-window proof. |
 
-## Important merged-code correction
+## Live startup correction
 
-The older 2026-08-14 note saying the replacement was not wired is stale relative to current `main`.
-The real startup wrapper now has an opt-in native structural stage:
+The old note that the replacement was not wired is stale. Current `graphify:daily` has an opt-in structural stage:
 
 ```text
 graphify:daily
   -> graphify:daily:chain
   -> if GRAPHIFY_NATIVE_STRUCTURAL=1
-       build @deeds/parent-atlas
        -> native-structural-materializer.mts
 ```
 
-`GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1` controls writes and
-`GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1` separately controls GIS symbol creation.
-This is migration wiring, not yet canonical-owner acceptance.
+The environment flags remain intentionally separate:
 
-## New proof implementation on agent/gph-production-integration-proof
+```text
+GRAPHIFY_NATIVE_STRUCTURAL=1
+  enables the stage
 
-Added live-owner-compatible orchestration:
+GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1
+  requests canonical writes
+
+GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1
+  additionally permits GIS symbol creation
+```
+
+This is migration wiring, not canonical-owner acceptance.
+
+## GPH-14R — revision authority correction
+
+The EMB3A lineage audit established that the representation/projection writers do not currently prove populated canonical workspace/source revision authority. That finding applies directly to Graphify.
+
+Before this correction the native structural script used:
+
+```text
+content:<sha256(source)>
+```
+
+as a value named `sourceRevision`, and the 8095 sidecar echoed the caller-supplied value into `atlas.ast.evidence.v1.source_revision`. The normalizer then preserved it. That round trip is parser correlation, not revision authority.
+
+The owner boundary now distinguishes:
+
+```text
+sourceVersionAnchor
+  deterministic correlation coordinate
+  may be content-derived
+  NONCANONICAL
+
+sourceRevision
+  canonical mutation/freshness lineage
+  nullable until owner is proven
+
+sourceRevisionAuthority
+  PROVEN | CONTENT_ANCHOR_ONLY | UNPROVEN
+```
+
+Parser providers still receive their legacy string request field. When authority is not proven, `GraphifyStructuralMaterializer` supplies an explicitly tagged parser token:
+
+```text
+anchor:<sourceVersionAnchor>
+```
+
+while retaining:
+
+```text
+sourceRevision = null
+sourceRevisionAuthority = CONTENT_ANCHOR_ONLY
+```
+
+The parser token may be echoed in raw/normalized parser evidence, but it cannot become canonical lineage merely because it completed a round trip through 8095 or the node-tree-sitter challenger.
+
+## Promotion invariant
+
+`canonicalPromotionAllowed=true` now requires all of:
+
+```text
+native structural provenance complete
+AND parser status = PROVEN
+AND sourceRevisionAuthority = PROVEN
+AND sourceRevision != null
+```
+
+Therefore the expected current dry-run state is:
+
+```text
+structural status              PROVEN
+provenance readiness           NATIVE_READY
+source revision authority      CONTENT_ANCHOR_ONLY
+sourceRevision                 null
+canonicalPromotionAllowed      false
+```
+
+This is an intended fail-closed state, not a failed parser proof.
+
+## Production batch contract
+
+`runGraphifyStructuralBatchV1` now makes both orchestration and revision state explicit:
 
 ```text
 GraphifyStructuralDeltaInputV1
@@ -57,73 +132,137 @@ GraphifyStructuralDeltaInputV1
 runGraphifyStructuralBatchV1
         |
         +-- unchanged hash -> SKIPPED_UNCHANGED
-        +-- changed source -> existing GraphifyStructuralMaterializer -> 8095
-        +-- parser/file error -> FAILED file receipt, batch continues
-        +-- DELETE -> explicit GraphifyStructuralTombstoneV1
+        +-- changed source -> GraphifyStructuralMaterializer
+        +-- parser/file error -> FAILED receipt; neighbors continue
+        +-- DELETE -> GraphifyStructuralTombstoneV1
         |
         v
-atlas.graphify-structural-batch.v1 receipt
+atlas.graphify-structural-batch.v1
+        |
+        +-- isolatedFailurePass
+        +-- incrementalDeltaPass
+        +-- revisionAuthorityPass
 ```
 
-The batch layer does **not** persist canonical identity and does not invent a deletion persistence owner.
-Tombstones are explicit downstream facts for the existing lifecycle/persistence owner to consume.
-
-Contract tests are written for:
-
-1. failed file between two valid files does not abort neighbors;
-2. one delta contains skip-unchanged + changed re-extraction + deletion tombstone;
-3. duplicate normalized source refs fail before double processing.
-
-Tests remain IMPLEMENTED_UNPROVEN until executed in the actual SvelteKit test environment.
-
-## Tree-sitter proof distinction
-
-GPH-16 has two distinct concepts:
-
-1. **Production delta orchestration** — changed/deleted source inputs reach the canonical Graphify structural owner, unchanged files can be skipped, and deletion is explicit. This is required for Graphify integration.
-2. **Native parser incremental reuse** — edit/reuse a prior Tree-sitter tree and inspect changed ranges. This is an executor optimization/proof and must not be confused with changed-file orchestration.
-
-Do not block correct deletion/tombstone semantics on implementation of parser-tree reuse.
-
-## Stray scaffold reconciliation
-
-Source pack:
-
-`parent-atlas-event-merkle-identity-pack/parent-atlas-event-merkle-identity-pack/`
-
-Its own MANIFEST states it is a scaffold/contract pack and is not evidence that the listed runtime files are missing. It must not be bulk-imported.
-
-| Scaffold area | Classification | Correct treatment |
-|---|---|---|
-| `src/contracts/events.ts` | OVERLAPS_LIVE_OWNER | Do not import wholesale. Live `WorkflowActionEventV1` exists in `sveltekit-frontend/src/lib/server/atlas/workflow` and `packages/parent-atlas/src/core`. Adapt only missing event-lineage concepts under those owners after contract review. |
-| `src/contracts/graph-identity.ts` | PROPOSAL_ONLY | Do not mint a second identity system. Reconcile useful inventory/audit fields against canonical chunk/GIS/symbol contracts first. |
-| `src/contracts/merkle.ts` | PROPOSAL_CANDIDATE | No exact live-name collision found in this review, but Merkle hashing must reuse existing stable/canonical hashing semantics before import. |
-| `src/daily/kanban-contracts.ts` | PROPOSAL_ONLY | Do not install as a parallel daily/Kanban owner. Map recommendation fields to existing Kanban/recommendation contracts. |
-| `src/daily/parent-atlas-daily-compiler.ts` | SUPERSEDED_BY_LIVE_ORCHESTRATION_SHAPE | Do not install. Current Graphify/startup/QAS flows already own daily orchestration. |
-| `sql/*.sql` | TEMPLATE_ONLY | Never apply directly. Reconcile against live schema/migration owners first. |
-| `docs/EXECUTION_ORDER.md` | HISTORICAL | Contains stale `semantic_768` assumptions; retain only as archive evidence. |
-| Merkle implementation/tests | REVIEW_REQUIRED | Potentially reusable only after stable-hash/RFC9162 collision and deterministic-vector review. |
-
-### Consolidation decision
-
-The scaffold package should be moved under the repository archive convention after its useful primitives are reconciled. It should not remain a second top-level pseudo-application root. Runtime imports must point only at the live `sveltekit-frontend/` or `packages/parent-atlas/` owners.
-
-No scaffold SQL or daily compiler is authorized for runtime promotion by this review.
-
-## Next proof order
+In the current content-anchor-only proof:
 
 ```text
-1. Execute graphify-structural-batch-v1.spec.ts
-2. Live 8095 production-batch isolation receipt (GPH-15)
-3. Wire/read explicit delta manifest through native structural script (GPH-16)
-4. Live graphify:daily with GRAPHIFY_NATIVE_STRUCTURAL=1, dry-run first (GPH-17 reachability)
-5. Reconcile structural receipt into existing Graphify production receipt (GPH-18)
-6. Apply/readback only after dry-run receipts pass
-7. GPH-19 ownership acceptance
-8. GPH-20/21 supersession + CI import guard
-9. GPH-22 advisory recommendation receipt
+isolatedFailurePass     may become true
+incrementalDeltaPass    may become true
+revisionAuthorityPass   expected false
+```
+
+The batch does not persist canonical identity and does not invent a deletion-persistence owner. Tombstones are downstream deletion observations with `sourceRevision=null` until the lifecycle/revision owner proves canonical deletion lineage.
+
+## Apply safety
+
+`native-structural-materializer.mts --apply` now fails before canonical evidence/entity writes unless:
+
+```text
+sourceRevisionAuthority == PROVEN
+AND sourceRevision != null
+```
+
+Current expected block:
+
+```text
+NATIVE_STRUCTURAL_APPLY_BLOCKED_SOURCE_REVISION_AUTHORITY_UNPROVEN
+```
+
+Do **not** enable `GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1` in the current repository state.
+
+## Provider challenger boundary
+
+The node-tree-sitter challenger remains a parser/executor experiment, not a revision or identity owner.
+
+Provider parity now runs with:
+
+```text
+sourceRevision = null
+sourceVersionAnchor = proof fixture anchor
+sourceRevisionAuthority = CONTENT_ANCHOR_ONLY
+```
+
+Both 8095 and node-tree-sitter receive the same tagged parser token. A parity PASS proves fixture syntax/span/diagnostic behavior only. It does not prove canonical revision identity or authorize provider promotion.
+
+Native Tree-sitter old-tree reuse remains separate from GPH-16 correctness:
+
+```text
+GPH-16A  production delta orchestration
+GPH-16B  Tree.edit + oldTree incremental reuse optimization
+```
+
+Correct changed/delete semantics must not wait for native tree reuse.
+
+## Scaffold reconciliation
+
+The archived `parent-atlas-event-merkle-identity-pack` remains reference material only. Its event family overlaps the stronger live `WorkflowActionEventV1`; its graph identity proposal must not replace GIS identity; its daily compiler is stale relative to current Graphify/QAS orchestration; SQL remains template-only; and the historical execution-order document contains older representation assumptions.
+
+The package was archived rather than imported as a second runtime application owner.
+
+## Exact next proof order
+
+From `sveltekit-frontend/`, with 8095 running:
+
+```bash
+npx vitest run \
+  src/lib/server/atlas/indexing/graphify-structural-materializer.spec.ts \
+  src/lib/server/atlas/indexing/graphify-structural-batch-v1.spec.ts \
+  src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.spec.ts
+```
+
+Then:
+
+```bash
+npx tsx scripts/atlas/prove-graphify-structural-batch-integration.mts
+```
+
+Required integration result:
+
+```text
+status                                DRY_RUN_PROVEN
+gph14rRevisionSemanticsFailClosed     true
+gph15ParseFailureIsolation            true
+gph16ProductionDeltaOrchestration     true
+sourceRevisionAuthorityProven         false
+productionPersistenceReadback         false
+graphifyDailyReachability              false
+```
+
+Only then run GPH-17 reachability:
+
+```bash
+GRAPHIFY_NATIVE_STRUCTURAL=1 \
+GRAPHIFY_NATIVE_STRUCTURAL_APPLY=0 \
+GRAPHIFY_NATIVE_STRUCTURAL_LIMIT=5 \
+npm run graphify:daily
+```
+
+Do not advance to apply/readback until a separate accepted proof establishes the canonical revision owner.
+
+## Promotion order after dry-run proof
+
+```text
+GPH-14R  fail-closed revision semantics
+   -> GPH-15 parse isolation
+   -> GPH-16 delta orchestration
+   -> GPH-17 live dry-run reachability
+          |
+          +--------------------------+
+          |                          |
+          v                          v
+       GPH-18                  revision-owner proof
+   persistence/readback               |
+          +-------------+-------------+
+                        v
+                     GPH-19
+              canonical owner acceptance
+                        |
+                        v
+                  GPH-20/GPH-21
+              supersession + import guard
 ```
 
 ## Promotion rule
 
-`IMPLEMENTED`, `WIRED`, `DRY_RUN_PROVEN`, `APPLY_PROVEN`, `READBACK_PROVEN`, and `PROMOTED` are separate states. Do not mark a checkbox complete merely because source code exists.
+`IMPLEMENTED`, `WIRED`, `DRY_RUN_PROVEN`, `LIVE_REACHABLE`, `APPLY_PROVEN`, `READBACK_PROVEN`, and `PROMOTED` are different states. Source code existence, parser success, or a content hash must never be used as a substitute for canonical revision authority.
