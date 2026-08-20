@@ -1,15 +1,17 @@
 # OpenSpec Knowledge Framework (OKF) Manifest
 # Versioned ontology and feature-classification contract for code analysis
 
-version: 1
+version: 2
 created_at: 2026-07-11T17:37:00Z
-updated_at: 2026-07-11T17:37:00Z
+updated_at: 2026-08-17T14:10:00-07:00
+updated_at: 2026-08-18T19:36:00Z
 
 # Scope: This manifest defines the canonical schema for:
 # - Supported languages and their symbol extraction rules
 # - Domain classifications and evidence paths
 # - Feature extraction hierarchy
 # - Ontology and relationship tuples
+# - Physical index/projection ownership without making projections canonical
 
 registries:
   languages:
@@ -25,6 +27,8 @@ registries:
       - retrieval.yaml
       - cache.yaml
       - database.yaml
+      - feature-intelligence.yaml
+      - parent-atlas-execution.yaml
 
   corpora:
     path: corpora/
@@ -50,6 +54,13 @@ registries:
     description: Ontology and relationship classification rules
     schemas:
       - ontology.yaml
+      - feature-relationships.yaml
+
+  indexes:
+    path: indexes/
+    description: Canonical store and rebuildable index/executor ownership policies
+    schemas:
+      - feature-intelligence.yaml
 
 # Extractor versions (bump on breaking changes)
 extractors:
@@ -103,9 +114,11 @@ pipeline:
   6: documentation_concept     # (docstring + comment extraction)
   7: domain_model              # (multi-evidence domain scoring)
   8: ontology_tuple_builder    # (feature relationships)
+  9: canonical_identity_promotion
+  10: projection_materialization
 
 # Parent Atlas contextual-graph projection policy. This is configuration only;
-# PostgreSQL remains the canonical graph snapshot store.
+# PostgreSQL remains the canonical graph snapshot and feature relationship store.
 relationships:
   - contains
   - materializes
@@ -114,19 +127,35 @@ relationships:
   - references
   - depends_on
   - implements
+  - specifies
   - uses_concept
+  - uses_table
+  - uses_column
+  - auth_guards
+  - validates
+  - blocks
+  - observed_at_runtime
   - participates_in
+  - authorized_resource_mutation
 
 graph_projection:
   node_types:
     - file
     - symbol
     - packet
+    - feature
+    - evidence
+    - relationship
   pagerank_edges:
     - imports
     - calls
     - references
     - depends_on
+    - implements
+    - uses_table
+    - uses_column
+    - auth_guards
+    - blocks
   traversal_edges:
     - contains
     - materializes
@@ -134,11 +163,38 @@ graph_projection:
     - calls
     - references
     - depends_on
+    - implements
+    - specifies
     - uses_concept
+    - uses_table
+    - uses_column
+    - auth_guards
+    - validates
+    - blocks
+    - observed_at_runtime
     - participates_in
+    - authorized_resource_mutation
   excluded_edges:
     - semantic_similar
   default_weight: 1.0
   minimum_confidence: 0.65
   max_hops: 2
   max_fanout: 20
+
+index_policy:
+  schema_ref: indexes/feature-intelligence.yaml
+  canonical_store: postgresql18
+  semantic_lane:
+    executors:
+      - pgvector_exact
+      - pgvector_hnsw
+      - pgvector_ivfflat
+      - qdrant
+      - cuvs_cagra
+    fusion_votes: 1
+  graph_lane:
+    executors:
+      - networkx
+      - neo4j
+      - cugraph
+    canonical_relationships: postgresql18

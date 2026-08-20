@@ -1,136 +1,71 @@
-// Gates
-export { runIdentityGate } from './gates/identity.js';
-export { runReplayGate } from './gates/replay.js';
-export { runLineageGate, runChr97Gate } from './gates/lineage.js';
-export { runFinalGate, runProductionReadinessGate } from './gates/final.js';
-
-// Core canonical packet bridge / validator
-export {
-  extractPacketIdentityFromRow,
-  validatePacketIdentityFromRow,
-  verifyPacketIdentityConsistency,
-  createEnvelopeFromRow,
-  PacketIdentitySchema,
-  verifyPacketTriple,
-  bitfrostKey,
-  createMemoryEnvelope,
-  AtlasMemoryEnvelopeSchema,
-  GlyphRecordSchema,
-} from './core/canonical-packet-bridge.js';
-
-export {
-  buildSummaryContext,
-  classifyDomain,
-  classifyOntology,
-  classifyTopology,
-  formatSummaryContext,
-} from './core/summary-context.js';
-
-export {
-  makeGemma4SummaryPacket,
-  makeChrom97Packet,
-  toNdjsonLine,
-} from './pipelines/summary-packets.js';
-
-export { PacketValidator } from './core/packet-validator-materializer.js';
-export {
-  canonicalServiceNames,
-  canonicalServiceProbeDefaults,
-  serviceProbeStatuses,
-  serviceProbeTransports,
-} from './core/service-contract.js';
-
-// Adapters
-export { createPostgresAdapter, withPostgres } from './adapters/postgres.js';
-export { createQdrantAdapter } from './adapters/qdrant.js';
-export { createValkeyAdapter, withValkey } from './adapters/valkey.js';
-export { createNeo4jAdapter } from './adapters/neo4j.js';
-export { createDuckDbAdapter, isDuckDbAvailable } from './adapters/duckdb.js';
-
-// Mirrored Atlas contracts
-export {
-  LOD_LEVEL_VALUES,
-  PACKET_KIND_VALUES,
-  describeTemporalPacketContract,
-  lodLevelSchema,
-  normalizeTemporalPacket,
-  packetKindSchema,
-  temporalPacketSchema,
-} from './core/temporal-packet.js';
-export {
-  PROCESSING_PASS_STATUS_VALUES,
-  describeProcessingPassContract,
-  normalizeProcessingPass,
-  processingPassSchema,
-  processingPassStatusSchema,
-} from './core/processing-pass.js';
-export {
-  buildFeatureEnvelopeObject,
-  buildSemanticPayloadEnvelope,
-  describeQdrantSemanticPayloadContract,
-  qdrantPayloadContractVersion,
-  semanticPayloadEnvelopeSchema,
-} from './core/qdrant-semantic-payload-envelope.js';
-export {
-  buildGraphSnapshotManifest,
-  describeGraphSnapshotContract,
-  graphSnapshotEdgeSchema,
-  graphSnapshotManifestSchema,
-  graphSnapshotStatusSchema,
-} from './core/graph-snapshot-manifest.js';
-export {
-  compileContextualTreeSnapshot,
-  contextualTreeEdgeSchema,
-  contextualTreeNodeSchema,
-  contextualTreePacketSchema,
-  ContextualTreeSnapshotError,
-} from './core/contextual-tree-snapshot.js';
-export {
-  GraphAuthorityRunV2Schema,
-  GraphResolutionIssueStatusSchema,
-  GraphResolutionIssueV2Schema,
-  GraphSnapshotV2Schema,
-  assertAuthorityRunCanPersist,
-  createGraphSnapshotV2Repository,
-  withGraphSnapshotV2Transaction,
-} from './core/graph-snapshot-v2.js';
-export {
-  ATLAS_EVENT_KIND_VALUES,
-  ATLAS_EVENT_SOURCE_VALUES,
-  ATLAS_EVENT_STATE_VALUES,
-  atlasEventFlowSchema,
-  atlasEventKindSchema,
-  atlasEventSchema,
-  atlasEventSourceSchema,
-  atlasEventStateSchema,
-  buildAtlasEventFlow,
-  hashAtlasEventFlow,
-  normalizeAtlasEvent,
-  summarizeAtlasEventFlow,
-} from './core/atlas-event-flow.js';
-export {
-  buildMultiHopRetrievalConfig,
-  buildMultiHopRetrievalQuery,
-  buildMultiHopRetrievalResult,
-  buildTemporalRetrievalPolicy,
-  multiHopRetrievalConfigSchema,
-  multiHopRetrievalQuerySchema,
-  multiHopRetrievalResultSchema,
-  retrievalLaneSchema,
-  temporalRetrievalModeSchema,
-  temporalRetrievalPolicySchema,
-} from './core/multi-hop-retrieval.js';
-export {
-  QDRANT_COLLECTION_REGISTRY,
-  QDRANT_SPARSE_VECTOR_NAME,
-  QDRANT_VECTOR_NAMES,
-  resolveAtlasQdrantDefaultCollection,
-  resolveAtlasQdrantDenseVectorName,
-  resolveAtlasQdrantLatentRouteVectorName,
-  resolveAtlasQdrantLegacySourceCollection,
-  resolveAtlasQdrantSparseVectorName,
-  resolveAtlasQdrantSummaryRouteVectorName,
-} from './core/qdrant-collection-registry.js';
+export * from './core/evidence-entity-repository.js';
+export * from './core/evidence-entity-backfill.js';
+export * from './core/evidence-entity-extractors.js';
+export * from './core/gis-canonicalization.js';
+export * from './core/structural-production-receipt.js';
+export * from './core/hypergraph-retrieval.js';
+export * from './core/hypergraph-query-policy.js';
+export * from './core/hypergraph-ppr.js';
+export * from './core/dynamic-hyperedge-sql.js';
+export * from './core/relationship-query-repository.js';
+export * from './core/feature-matrix.js';
+export * from './core/feature-matrix-materializer.js';
+export * from './core/feature-signal-alignment.js';
+export * from './core/aligned-snapshot-experiment.js';
+export * from './core/model-signal-receipt.js';
+export * from './core/adaptive-hypergraph-chain.js';
+export * from './core/retrieval-action-receipt.js';
+export * from './core/relationship-vector-projection.js';
+export * from './core/graph-projection-parity.js';
+export * from './core/semantic-executor-manifest.js';
+export * from './core/algorithm-execution-manifest.js';
+export * from './core/compute-comparison.js';
+export * from './core/compute-dag-policy.js';
+export * from './core/tensor-snapshot.js';
+export * from './core/artifact-transport.js';
+export * from './core/ace-synthesis-graph.js';
+export * from './core/agentic-file-mutation.js';
+export * from './core/agentic-workflow-control-plane.js';
+export * from './core/a2a-wire-v1.js';
+export * from './core/atlas-kernel-session.js';
+export * from './core/claim-verification.js';
+export * from './core/remote-adapter-lifecycle.js';
+export * from './core/adaptive-memory-runtime.js';
+export * from './core/adaptive-semantic-memory.js';
+export * from './core/external-doc-knowledge-fabric.js';
+export * from './core/external-doc-cold-fabric.js';
+export * from './core/external-doc-cold-runtime.js';
+export * from './core/external-doc-capture-runtime.js';
+export * from './core/external-doc-qdrant-hybrid.js';
+export * from './core/external-doc-runtime-capabilities.js';
+export * from './core/external-doc-retrieval-proof.js';
+export * from './core/external-doc-retrieval-runtime.js';
+export * from './core/contextual-prefill-fabric.js';
+export * from './core/prefill-cache-runtime.js';
+export * from './core/inference-prefill-runtime.js';
+export * from './core/inference-runtime-selection.js';
+export * from './core/structured-value-ast.js';
+export * from './core/structured-value-arrow.js';
+export * from './core/structured-value-parity.js';
+export * from './core/temporal-indexing-fabric.js';
+export * from './core/observation-feature-compiler.js';
+export * from './core/observation-feature-repository.js';
+export * from './core/retrieval-executor-policy.js';
+export * from './core/spectral-graph-clustering.js';
+export * from './core/okf-mcp-surface.js';
+export * from './core/hnsw-evaluation.js';
+export * from './core/gpu-resource-envelope.js';
+export * from './core/executor-plans.js';
+export * from './core/multiview-rerank.js';
+export * from './core/qlora-dataset-export.js';
+export * from './core/ace-hypergraph-payload.js';
+export * from './core/ace-packet-v2.js';
+export * from './core/ace-runtime-adapter.js';
+export * from './core/hyperrag-live-integration.js';
+export * from './core/proof-gates.js';
+export * from './core/hypergraph-fusion-facade.js';
+export { createFeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
+export type { FeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
 
 // Pipelines
 export { runIngest } from './pipelines/ingest.js';

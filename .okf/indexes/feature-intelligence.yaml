@@ -1,0 +1,352 @@
+# Parent Atlas physical index / projection ownership policy
+version: 2
+registry_id: atlas.feature-indexes
+status: active
+owner: parent-atlas
+
+principles:
+  - postgres_is_canonical
+  - okf_defines_vocabulary_not_runtime_rows
+  - openspec_defines_required_behavior
+  - lane_not_executor
+  - projections_are_revisioned_and_rebuildable
+  - exact_identity_before_cross_lane_fusion
+  - relationship_degree_is_not_graph_degree
+  - nary_fact_is_not_ann_graph_edge
+  - derived_signal_never_self_promotes_to_truth
+
+canonical_store:
+  engine: postgresql18
+  schema: configurable
+  role: canonical_identity_evidence_relationship_state_and_snapshot_store
+  id_representation:
+    sql_type: text
+    reason: semantic_stable_ids_and_generated_uuidv7_ids_may_coexist
+    generated_default: uuidv7_as_text
+  planned_tables:
+    - atlas_features
+    - atlas_feature_aliases
+    - atlas_evidence
+    - atlas_feature_evidence
+    - atlas_relationships
+    - atlas_relationship_members
+    - atlas_relationship_cardinality
+    - atlas_relationship_evidence
+    - atlas_feature_state_receipts
+    - atlas_relationship_embeddings
+    - atlas_feature_embeddings
+    - atlas_dynamic_hyperedge_candidates
+  identity_keys:
+    - feature_id
+    - feature_key
+    - evidence_id
+    - relationship_id
+    - state_revision
+  revision_keys:
+    - feature_revision
+    - evidence_revision
+    - relationship_revision
+    - source_revision
+    - evidence_snapshot_revision
+    - producer_revision
+
+postgres_indexes:
+  btree:
+    role: canonical_exact_lookup_ordering_and_fk_support
+    recommended:
+      - columns: [feature_key]
+        unique: true
+      - columns: [feature_revision]
+      - columns: [domain, status]
+      - columns: [relationship_type, relationship_degree]
+      - columns: [relationship_id, entity_type, entity_id]
+      - columns: [entity_type, entity_id, relationship_id]
+      - columns: [feature_id, evidence_snapshot_revision]
+      - columns: [source_ref, source_revision]
+  gin:
+    role: set_jsonb_and_full_text_acceleration
+    recommended:
+      - aliases
+      - tags
+      - structured_payload
+      - evidence_tsvector
+      - dynamic_hyperedge_participants
+  bitmap_planner:
+    role: query_execution_strategy
+    canonical_index_type: false
+    note: >-
+      PostgreSQL may combine eligible indexes into bitmap index/heap scans for selective
+      multi-predicate queries. Atlas must not model a bitmap scan as a separate logical
+      retrieval lane or semantic authority.
+  postgres18_aio:
+    role: storage_io_execution_optimization
+    canonical_index_type: false
+    note: >-
+      Asynchronous I/O may improve physical read execution. It changes neither canonical
+      identity nor the logical retrieval lane and must remain an operational tuning concern.
+
+lexical_projection:
+  logical_lane: lexical
+  canonical_source: postgresql18
+  executors:
+    postgres_full_text:
+      index_family: gin_tsvector
+      exact_identity_required: true
+    exact_btree:
+      index_family: btree
+      exact_identity_required: true
+  note: >-
+    BM25, ripgrep, FTS or trigram implementations may be separate executors/subsignals,
+    but logical-lane accounting must prevent accidental vote inflation.
+
+semantic_projection:
+  logical_lane: semantic
+  canonical_dimension: 768
+  canonical_identity: feature_id_or_evidence_id_or_relationship_id
+  candidate_families:
+    - entity
+    - relationship
+    - evidence
+  executors:
+    pgvector_exact:
+      role: relational_correctness_or_small_candidate_executor
+      canonical: false
+    pgvector_hnsw:
+      role: local_postgres_ann_executor
+      canonical: false
+      distance: cosine
+      preferred_for: online_ann_when_memory_and_build_cost_are_acceptable
+    pgvector_ivfflat:
+      role: local_postgres_ann_executor
+      canonical: false
+      distance: cosine
+      preferred_for: trained_snapshot_or_lower_build_cost_ann
+      deployment_rule: benchmark_before_creation
+    qdrant:
+      role: persistent_semantic_projection_and_filtering_executor
+      canonical: false
+      required_payload:
+        - canonical_id
+        - candidate_family
+        - feature_id
+        - evidence_id
+        - relationship_id
+        - source_revision
+        - projection_revision
+        - embedding_model_revision
+        - domain
+    cuvs_cagra:
+      role: gpu_ann_executor
+      canonical: false
+      source_snapshot: revisioned_postgres_semantic_snapshot
+      returns: candidate_ordinals_resolved_to_canonical_ids
+      required_receipt:
+        - projection_revision
+        - embedding_model_revision
+        - vector_count
+        - dimensions
+        - source_checksum
+        - index_checksum
+        - build_parameters
+    turbovec:
+      role: compact_prefilter_or_rerank_assist
+      canonical: false
+      may_create_extra_vote: false
+  fusion_rule: one_semantic_lane_one_vote
+  correctness_oracle: pgvector_exact_or_cuvs_bruteforce_exact
+
+relationship_semantic_projection:
+  canonical_source: atlas_relationships_plus_atlas_relationship_members
+  vector_table: atlas_relationship_embeddings
+  dimensions: 768
+  canonical: false
+  semantic_text_may_encode:
+    - relationship_type
+    - participant_roles
+    - participant_labels
+    - evidence_summary
+    - source_context
+  rule: vector_similarity_nominates_relationships_but_does_not_create_them
+
+relationship_graph_projection:
+  canonical_source: postgresql18
+  canonical_fact: atlas_relationships_plus_atlas_relationship_members
+  incidence_projection:
+    preferred: true
+    shape: bipartite_entity_relationship_graph
+    lossless: true
+    must_retain:
+      - relationship_id
+      - relationship_revision
+      - relationship_type
+      - participant_role
+      - entity_type
+      - entity_id
+  pairwise_projection:
+    allowed: true
+    purpose: algorithms_requiring_ordinary_edges
+    reversible: true
+    normalize_total_relation_mass: true
+    must_retain:
+      - relationship_id
+      - relationship_revision
+      - source_revision
+      - participant_role
+      - counterpart_role
+  executors:
+    networkx:
+      role: cpu_reference_and_parity_oracle
+      canonical: false
+    neo4j:
+      role: persistent_traversal_projection
+      canonical: false
+    cugraph:
+      role: gpu_graph_analysis_executor
+      canonical: false
+      bounded_snapshot: true
+      algorithms:
+        - pagerank
+        - personalized_pagerank
+        - bfs
+        - sssp
+        - community_detection
+  traversal_limits:
+    max_hops: 2
+    max_fanout: 20
+  derived_metrics:
+    - graph_degree
+    - in_degree
+    - out_degree
+    - fanout
+    - pagerank
+    - personalized_pagerank
+    - community_id
+    - shortest_path_distance
+  completion_authority: false
+
+hypergraph_retrieval:
+  first_stage: existing_candidate_fabric
+  second_stage:
+    sequence:
+      - promote_candidate_to_canonical_id
+      - retrieve_relationship_candidates
+      - traverse_entity_relationship_entity
+      - apply_query_conditioned_ppr_or_authority
+      - validate_evidence
+      - evaluate_sufficient_context
+      - emit_ace_hypergraph_payload_or_next_retrieval_action
+    candidate_families:
+      - entity
+      - relationship
+      - evidence
+  dynamic_hyperedges:
+    store: atlas_dynamic_hyperedge_candidates
+    source: canonical_sql_joins
+    persistence: query_scoped
+    promotable_by_default: false
+    promotion_requires_evidence_review: true
+  sufficient_context:
+    states:
+      - NEED_RELATIONSHIP
+      - NEED_DEFINITION
+      - NEED_SCHEMA
+      - NEED_RUNTIME
+      - NEED_TEST
+      - NEED_EVIDENCE
+      - ENOUGH_EVIDENCE
+    rule: ann_similarity_alone_cannot_mark_context_sufficient
+
+feature_matrix_projection:
+  row_identity: feature_id
+  canonical: false
+  source: canonical_feature_evidence_snapshot
+  columns_may_include:
+    - lexical_evidence_count
+    - semantic_768_ref
+    - ast_symbol_count
+    - route_count
+    - requirement_coverage
+    - schema_coverage
+    - test_coverage
+    - runtime_coverage
+    - graph_degree
+    - fanout
+    - pagerank
+    - personalized_pagerank
+    - uncertainty
+    - staleness
+    - domain_bits
+    - evidence_bits
+    - relationship_bits
+  derived_consumers:
+    - svd_association
+    - randomized_low_rank
+    - leverage_sampling
+    - turbovec_prefilter
+    - kmeans
+    - som
+    - xgboost
+    - crossencoder
+    - qlora_dataset_selection
+    - kanban_priority
+  low_rank_rule: associations_are_candidates_and_require_evidence_inspection
+  completion_authority: false
+
+multi_view_projection:
+  canonical: false
+  supported_views:
+    - semantic
+    - structural
+    - requirement
+    - runtime
+    - relationship
+    - token
+  fixed_dimensional_encoding:
+    status: optional_future_challenger
+    purpose: nominate_candidates_before_exact_multi_view_rerank
+  rule: do_not_flatten_independent_views_into_canonical_truth
+
+manifold_projection:
+  canonical: false
+  coordinate4:
+    components:
+      - som_x
+      - som_y
+      - semantic_z
+      - activity_w
+  rotations:
+    representation: so4_left_right_unit_quaternion_pair
+    purposes:
+      - routing
+      - visualization
+      - analysis
+    canonical_authority: false
+  rule: manifold_coordinates_and_rotations_never_mutate_identity_relationships_or_completion
+
+ace_hypergraph_payload:
+  required:
+    - canonical_packet_identity
+    - relationship_evidence
+    - typed_participants
+    - reasoning_chain
+    - sufficient_context_decision
+    - source_snapshot_revision
+    - projection_lineage
+  forbidden_as_explanation_only:
+    - raw_neighbor_ids_without_relationship_identity_or_roles
+
+projection_receipt:
+  required_fields:
+    - projection_type
+    - projection_revision
+    - canonical_snapshot_revision
+    - source_checksum
+    - record_count
+    - producer_revision
+    - created_at
+  optional_fields:
+    - executor_version
+    - parameters
+    - output_checksum
+    - peak_vram_bytes
+    - duration_ms

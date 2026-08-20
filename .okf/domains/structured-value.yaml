@@ -1,0 +1,138 @@
+version: 1
+domain_id: atlas.structured-value
+name: Parent Atlas Structured Values
+status: active
+owner: parent-atlas
+
+purpose: >-
+  Preserve ordered structured source values from native Tree-sitter evidence,
+  enrich TypeScript/JavaScript spans with compiler semantics, and project the
+  resulting immutable value graph into Arrow IPC without conflating parser,
+  semantic-enrichment, projection, or canonical-identity ownership.
+
+canonical_authority:
+  ontology_source: .okf
+  behavioral_requirements: openspec
+  runtime_store: postgresql18
+  rule: >-
+    Tree-sitter owns syntax spans, fields, child order and AST paths. ts-morph
+    contributes TypeScript compiler/type observations only. Consiliency
+    treesitter-chunker native identifiers remain upstream provenance and may not
+    be minted by the Node adapter. PostgreSQL owns promoted canonical facts;
+    Arrow, mmap arrays and Python/GPU consumers are immutable projections.
+
+value_kinds:
+  - NULL
+  - BOOLEAN
+  - NUMBER
+  - STRING
+  - SOURCE_EXPRESSION
+  - ARRAY
+  - TUPLE
+  - OBJECT
+  - ARGUMENT_LIST
+  - PARAMETER_LIST
+
+ordered_members:
+  member_roles:
+    - ELEMENT
+    - ARGUMENT
+    - PARAMETER
+    - SPREAD
+  invariant: ordinal_preserves_native_source_order
+
+object_entries:
+  entry_kinds:
+    - PROPERTY
+    - SHORTHAND
+    - SPREAD
+    - METHOD
+    - COMPUTED
+  invariant: >-
+    computed keys and spreads remain explicit ordered entries and are never
+    normalized into an unordered JavaScript dictionary.
+
+provenance:
+  syntax_owner: tree-sitter
+  required:
+    - source_ref
+    - source_revision
+    - workspace_revision
+    - language
+    - parser_revision
+    - grammar_revision
+    - node_type
+    - start_byte
+    - end_byte
+    - ast_path
+    - source_span_checksum
+  identity_rules:
+    - Node Tree-sitter may emit SPAN_ONLY observations without tree_node_id.
+    - Native upstream IDs may attach only after exact byte-span and content-checksum match.
+    - Consiliency-compatible identifiers must never be synthesized and labeled native.
+    - Byte offsets and lines are versioned location metadata, not stable semantic identity.
+
+semantic_enrichment:
+  owner: ts-morph
+  languages: [typescript, tsx, javascript, jsx]
+  facts:
+    - inferred_type
+    - apparent_type
+    - symbol
+    - declarations
+    - references
+    - resolved_call_signature
+    - parameter_names_and_types
+    - return_type
+  rules:
+    - Tree-sitter UTF-8 byte positions MUST be converted to TypeScript text positions before matching.
+    - Enrichment requires exact source_ref, source_revision, span and source_span_checksum equality.
+    - ts-morph observations are noncanonical evidence.
+  lsp:
+    role: optional_incremental_editor_executor
+    authority: inferred_only
+    use_for:
+      - diagnostics
+      - definitions
+      - references
+      - rename
+      - code_fixes
+      - open_buffer_incremental_state
+    rule: >-
+      TypeScript Language Service or tsserver may provide the same semantic
+      observation family for interactive sessions but does not replace
+      Tree-sitter structural provenance or canonical promotion.
+
+arrow_projection:
+  canonical: false
+  format: ARROW_IPC_FILE
+  mmap_intended: true
+  physical_model:
+    row: Struct
+    dense_key: value_ordinal
+    child_members: List<Struct<ordinal,role,field_name,child_value_ordinal>>
+    object_entries: List<Struct<ordinal,entry_kind,key_text,key_node_type,computed,spread,child_value_ordinal>>
+    provenance: Struct
+  rules:
+    - value_ordinal is dense snapshot-local identity, never canonical identity.
+    - Recursive values are flattened into rows; child lists reference dense ordinals.
+    - Logical row/structure checksums are distinct from IPC transport checksum.
+    - IPC file projection must roundtrip row count and nested physical schema before promotion to PROVEN.
+
+proof_sequence:
+  SV-0: DONE
+  SV-1: IMPLEMENTED_UNPROVEN
+  SV-2: CREATED
+  SV-3: IMPLEMENTED_UNPROVEN
+  SV-4: IMPLEMENTED_UNPROVEN
+  SV-5: CREATED
+  SV-6: IMPLEMENTED_UNPROVEN
+  SV-7: PENDING
+  SV-8: PENDING
+
+source_refs:
+  - openspec/changes/atlas-feature-intelligence/structured-value-tasks.md
+  - packages/parent-atlas/src/core/structured-value-ast.ts
+  - packages/parent-atlas/src/core/structured-value-arrow.ts
+  - sveltekit-frontend/src/lib/server/atlas/language/ts-morph-structured-value-enricher.ts
+  - scripts/atlas/write-structured-value-arrow.mjs
