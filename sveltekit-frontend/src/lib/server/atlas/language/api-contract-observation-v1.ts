@@ -55,19 +55,23 @@ function stable(value: unknown): string {
   return JSON.stringify(value) ?? 'null';
 }
 
+function sortedUnique(values: readonly string[]): string[] {
+  return [...new Set(values)].sort();
+}
+
+function canonicalizeInput(input: ApiContractObservationInputV1): ApiContractObservationInputV1 {
+  return {
+    ...input,
+    inputSchemaRefs: sortedUnique(input.inputSchemaRefs),
+    outputSchemaRefs: sortedUnique(input.outputSchemaRefs),
+    authRequirements: sortedUnique(input.authRequirements),
+    sideEffects: sortedUnique(input.sideEffects),
+    evidenceRefs: sortedUnique(input.evidenceRefs),
+  };
+}
+
 function stableId(input: ApiContractObservationInputV1): string {
-  const hash = createHash('sha256').update(stable({
-    sourceRef: input.sourceRef,
-    treeNodeId: input.treeNodeId,
-    symbolVersionId: input.symbolVersionId,
-    transport: input.transport,
-    method: input.method,
-    route: input.route,
-    handlerSymbol: input.handlerSymbol,
-    workspaceRevision: input.workspaceRevision,
-    sourceRevision: input.sourceRevision,
-    producerRevision: input.producerRevision,
-  }), 'utf8').digest('hex');
+  const hash = createHash('sha256').update(stable(input), 'utf8').digest('hex');
   return `apiobs:${hash}`;
 }
 
@@ -80,16 +84,12 @@ function stableId(input: ApiContractObservationInputV1): string {
 export function buildApiContractObservationV1(
   value: ApiContractObservationInputV1,
 ): ApiContractObservationV1 {
-  const input = ApiContractObservationInputV1Schema.parse(value);
+  const parsed = ApiContractObservationInputV1Schema.parse(value);
+  const input = canonicalizeInput(parsed);
   return ApiContractObservationV1Schema.parse({
     schema: 'atlas.api-contract-observation.v1',
     observationId: stableId(input),
     ...input,
-    inputSchemaRefs: [...new Set(input.inputSchemaRefs)].sort(),
-    outputSchemaRefs: [...new Set(input.outputSchemaRefs)].sort(),
-    authRequirements: [...new Set(input.authRequirements)].sort(),
-    sideEffects: [...new Set(input.sideEffects)].sort(),
-    evidenceRefs: [...new Set(input.evidenceRefs)].sort(),
     requiresCanonicalPromotion: true,
     canonicalWritesAllowed: false,
   });
