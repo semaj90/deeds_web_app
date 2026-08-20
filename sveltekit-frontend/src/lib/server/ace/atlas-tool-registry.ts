@@ -50,17 +50,63 @@ export type AtlasSearchOutput = z.infer<typeof AtlasSearchOutputSchema>;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const GraphExpandIntentSchema = z.enum([
+  'neighborhood',
+  'dependency_path',
+  'alternative_paths',
+  'authority',
+  'community_context',
+  'structural_core',
+  'similarity',
+  'explore',
+  'revision_lineage',
+]);
+
 const GraphExpandInputSchema = z.object({
   packetKey: z.string().min(1),
-  maxHops: z.number().int().min(1).max(5).default(2),
-  edgeTypes: z.array(z.string()).optional(),
+  intent: GraphExpandIntentSchema.default('neighborhood'),
+  targetPacketKey: z.string().min(1).optional(),
+  direction: z.enum(['out', 'in', 'both']).default('both'),
+  maxHops: z.number().int().min(0).max(5).default(2),
+  maxNodes: z.number().int().min(1).max(1000).default(64),
+  maxEdges: z.number().int().min(1).max(4000).default(128),
+  edgeTypes: z.array(z.string().min(1)).optional(),
+  hasPositiveEdgeWeights: z.boolean().optional(),
+  hasCommunityLabels: z.boolean().optional(),
+  gpuAvailable: z.boolean().optional(),
+  frozenSnapshotAvailable: z.boolean().optional(),
 });
 export type GraphExpandInput = z.infer<typeof GraphExpandInputSchema>;
+
+const GraphAlgorithmDecisionSchema = z.object({
+  schemaVersion: z.literal('atlas.graph-algorithm-decision.v1'),
+  algorithm: z.enum([
+    'bfs',
+    'reverse_bfs',
+    'sssp',
+    'yen',
+    'personalized_pagerank',
+    'leiden_filtered_bfs',
+    'kcore',
+    'jaccard',
+    'neighbor_sampling',
+    'k_best_viterbi',
+  ]),
+  backend: z.enum(['neo4j', 'cugraph', 'networkx', 'temporal_dp']),
+  reasonCodes: z.array(z.string()),
+  maxHops: z.number().int().nonnegative(),
+  maxCandidates: z.number().int().positive(),
+  deterministic: z.boolean(),
+});
 
 const GraphExpandOutputSchema = z.object({
   nodes: z.array(z.object({ id: z.string(), labels: z.array(z.string()) })),
   edges: z.array(z.object({ from: z.string(), to: z.string(), type: z.string() })),
-  hops: z.number().int(),
+  hops: z.number().int().nonnegative(),
+  status: z.enum(['PROVEN', 'BOUNDARY_EXHAUSTED', 'ALGORITHM_UNAVAILABLE']),
+  decision: GraphAlgorithmDecisionSchema,
+  truncated: z.boolean(),
+  reasonCodes: z.array(z.string()),
 });
 export type GraphExpandOutput = z.infer<typeof GraphExpandOutputSchema>;
 
@@ -244,9 +290,8 @@ export interface AtlasToolDefinition<TIn, TOut> {
 
 // ─── Registry (add new tools here; never invoke model-generated names) ────────
 
-// Placeholder execute stubs — replace with real implementations in their
-// respective modules. The registry owns the contract; the implementations live
-// in the adapter layer.
+// Remaining placeholder execute stubs should fail closed or be replaced by real
+// adapters. atlas.graph.expand is now wired to the bounded graph adapter below.
 
 async function atlasSearch(input: AtlasSearchInput, _grant: PermissionGrant): Promise<AtlasSearchOutput> {
   // Wire to retrieve-candidates.ts / search-runtime.ts
@@ -255,9 +300,8 @@ async function atlasSearch(input: AtlasSearchInput, _grant: PermissionGrant): Pr
 }
 
 async function expandGraph(input: GraphExpandInput, _grant: PermissionGrant): Promise<GraphExpandOutput> {
-  // Wire to graph/graph-centrality.ts or ace/graph-expander.ts
-  void input;
-  return { nodes: [], edges: [], hops: 0 };
+  const { expandAtlasGraph } = await import('$lib/server/atlas/graph/graph-expansion-adapter.js');
+  return expandAtlasGraph(input);
 }
 
 async function proposePatch(input: PatchProposalInput, _grant: PermissionGrant): Promise<PatchProposalOutput> {
