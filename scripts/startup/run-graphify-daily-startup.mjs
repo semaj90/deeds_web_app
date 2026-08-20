@@ -8,7 +8,9 @@
  * for problemMatcher.
  */
 
+import { createHash } from 'crypto';
 import { execSync } from 'child_process';
+import { mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-lock.mjs';
@@ -29,7 +31,44 @@ const nativeStructuralApply = process.env.GRAPHIFY_NATIVE_STRUCTURAL_APPLY === '
 const nativeStructuralAllowCreateSymbols = process.env.GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS === '1';
 const nativeStructuralLimit = process.env.GRAPHIFY_NATIVE_STRUCTURAL_LIMIT || '50';
 const nativeStructuralInclude = process.env.GRAPHIFY_NATIVE_STRUCTURAL_INCLUDE || '';
+const nativeStructuralReachabilityOut = process.env.GRAPHIFY_NATIVE_STRUCTURAL_REACHABILITY_OUT?.trim() || '';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
+
+function stable(value) {
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
+function sha256(value) {
+  return createHash('sha256').update(typeof value === 'string' ? value : stable(value), 'utf8').digest('hex');
+}
+
+function writeNativeStructuralReachability(state) {
+  if (!nativeStructuralReachabilityOut) return;
+  const outputPath = path.isAbsolute(nativeStructuralReachabilityOut)
+    ? nativeStructuralReachabilityOut
+    : path.resolve(ROOT, nativeStructuralReachabilityOut);
+  const payload = {
+    schema: 'atlas.graphify-native-structural-reachability.v1',
+    generatedAt: new Date().toISOString(),
+    wrapper: 'scripts/startup/run-graphify-daily-startup.mjs',
+    nativeStructuralEnabled: nativeStructural,
+    applyRequested: nativeStructuralApply,
+    allowCreateSymbolsRequested: nativeStructuralAllowCreateSymbols,
+    limit: Number(nativeStructuralLimit),
+    includePrefix: nativeStructuralInclude || null,
+    ...state,
+  };
+  const receipt = { ...payload, outputChecksum: sha256(payload) };
+  mkdirSync(path.dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
+}
 
 if (!acquireStartupLock(STARTUP_LOCK_FILE, { script: 'run-graphify-daily-startup.mjs' })) {
   if (!quiet) console.log('[graphify:daily] Another startup lock is active; backing off.');
@@ -81,9 +120,23 @@ try {
   // 8095 runtime and PostgreSQL readback gates are proven on the workstation.
   //
   // GRAPHIFY_NATIVE_STRUCTURAL=1                    -> dry-run (default)
-  // GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1              -> write atlas_evidence and canonical entity facts
-  // GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1 -> additionally permit GIS creation of new stable symbols
+  // GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1              -> requests canonical writes, which the
+  //                                                    child currently blocks while revision
+  //                                                    authority is unproven
+  // GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1 -> additionally request GIS symbol creation
+  // GRAPHIFY_NATIVE_STRUCTURAL_REACHABILITY_OUT=<path> -> write noncanonical GPH-17 reachability proof
   if (nativeStructural) {
+    const startedAt = new Date().toISOString();
+    writeNativeStructuralReachability({
+      status: 'ENTERED_NATIVE_STRUCTURAL_STAGE',
+      startedAt,
+      completedAt: null,
+      invoked: false,
+      completed: false,
+      childExitCode: null,
+      canonicalWritesProven: false,
+    });
+
     if (!quiet) console.log('[graphify:daily] Building Parent Atlas contracts for native structural owner...');
     execSync('npm run build', {
       cwd: PARENT_ATLAS,
@@ -104,13 +157,49 @@ try {
     if (!quiet) {
       console.log(`[graphify:daily] Native structural owner ${nativeStructuralApply ? 'APPLY' : 'DRY-RUN'} mode; symbol creation ${nativeStructuralAllowCreateSymbols ? 'ENABLED' : 'DISABLED'}.`);
     }
-    execSync(nativeArgs.join(' '), {
-      cwd: FRONTEND,
-      stdio: quiet ? 'ignore' : 'inherit',
-      timeout: 2 * 60 * 60 * 1000,
-      shell: true,
-      env: { ...process.env, ATLAS_NATIVE_STRUCTURAL_LIMIT: nativeStructuralLimit },
+
+    writeNativeStructuralReachability({
+      status: 'INVOKING_NATIVE_STRUCTURAL_CHILD',
+      startedAt,
+      completedAt: null,
+      invoked: true,
+      completed: false,
+      childExitCode: null,
+      canonicalWritesProven: false,
     });
+
+    try {
+      execSync(nativeArgs.join(' '), {
+        cwd: FRONTEND,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 2 * 60 * 60 * 1000,
+        shell: true,
+        env: { ...process.env, ATLAS_NATIVE_STRUCTURAL_LIMIT: nativeStructuralLimit },
+      });
+      writeNativeStructuralReachability({
+        status: nativeStructuralApply ? 'APPLY_CHILD_COMPLETED_UNPROVEN' : 'LIVE_REACHABLE_DRY_RUN',
+        startedAt,
+        completedAt: new Date().toISOString(),
+        invoked: true,
+        completed: true,
+        childExitCode: 0,
+        canonicalWritesProven: false,
+      });
+    } catch (nativeError) {
+      const childExitCode = Number.isInteger(nativeError?.status) ? nativeError.status : null;
+      writeNativeStructuralReachability({
+        status: 'NATIVE_STRUCTURAL_CHILD_FAILED',
+        startedAt,
+        completedAt: new Date().toISOString(),
+        invoked: true,
+        completed: false,
+        childExitCode,
+        canonicalWritesProven: false,
+        error: nativeError instanceof Error ? nativeError.message : String(nativeError),
+      });
+      throw nativeError;
+    }
+
     if (!quiet) console.log('[graphify:daily] Native structural owner step complete');
   }
 
