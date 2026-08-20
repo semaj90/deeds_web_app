@@ -15,25 +15,36 @@ const fixtures = [
   {
     id: 'valid-function',
     sourceRef: 'proof-fixtures/node-tree-sitter/valid-function.ts',
-    sourceRevision: 'proof:node-tree-sitter:valid:v1',
+    sourceVersionAnchor: 'proof:node-tree-sitter:valid:v1',
     language: 'typescript',
     source: 'export function alpha(value: number): number { return value + 1; }',
   },
   {
     id: 'valid-class',
     sourceRef: 'proof-fixtures/node-tree-sitter/valid-class.ts',
-    sourceRevision: 'proof:node-tree-sitter:class:v1',
+    sourceVersionAnchor: 'proof:node-tree-sitter:class:v1',
     language: 'typescript',
     source: 'export class Counter { inc(value: number) { return value + 1; } }',
   },
   {
     id: 'malformed',
     sourceRef: 'proof-fixtures/node-tree-sitter/malformed.ts',
-    sourceRevision: 'proof:node-tree-sitter:malformed:v1',
+    sourceVersionAnchor: 'proof:node-tree-sitter:malformed:v1',
     language: 'typescript',
     source: 'export function broken( { return 1; ',
   },
 ] as const;
+
+function materializerInput(fixture: (typeof fixtures)[number]) {
+  return {
+    sourceRef: fixture.sourceRef,
+    sourceRevision: null,
+    sourceVersionAnchor: fixture.sourceVersionAnchor,
+    sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
+    language: fixture.language,
+    source: fixture.source,
+  };
+}
 
 function symbolRows(result: Awaited<ReturnType<GraphifyStructuralMaterializer['materialize']>>) {
   return (result.evidence?.chunks ?? []).map((chunk) => ({
@@ -78,6 +89,7 @@ if (!runtime.available) {
     generatedAt: new Date().toISOString(),
     status: 'BLOCKED_RUNTIME_UNAVAILABLE',
     runtime,
+    sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
     canonicalOwnerChanged: false,
     persistenceAttempted: false,
     fixtures: [],
@@ -93,9 +105,10 @@ const node = new GraphifyStructuralMaterializer(createNodeTreeSitterAstProvider(
 const results = [];
 
 for (const fixture of fixtures) {
+  const input = materializerInput(fixture);
   const [sidecarResult, nodeResult] = await Promise.all([
-    sidecar.materialize(fixture),
-    node.materialize(fixture),
+    sidecar.materialize(input),
+    node.materialize(input),
   ]);
   const sidecarRows = symbolRows(sidecarResult);
   const nodeRows = symbolRows(nodeResult);
@@ -104,14 +117,24 @@ for (const fixture of fixtures) {
   const diagnosticParity = malformed
     ? sidecarResult.diagnostics.length > 0 && nodeResult.diagnostics.length > 0
     : sidecarResult.status === 'PROVEN' && nodeResult.status === 'PROVEN';
+  const revisionAuthorityNeutral =
+    sidecarResult.sourceRevision === null
+    && nodeResult.sourceRevision === null
+    && sidecarResult.sourceRevisionAuthority === 'CONTENT_ANCHOR_ONLY'
+    && nodeResult.sourceRevisionAuthority === 'CONTENT_ANCHOR_ONLY'
+    && !sidecarResult.provenanceReadiness.canonicalPromotionAllowed
+    && !nodeResult.provenanceReadiness.canonicalPromotionAllowed;
 
   results.push({
     id: fixture.id,
     sourceRef: fixture.sourceRef,
+    sourceVersionAnchor: fixture.sourceVersionAnchor,
     sidecar: {
       provider: sidecarResult.provider,
       status: sidecarResult.status,
       diagnostics: sidecarResult.diagnostics,
+      parserSourceRevisionToken: sidecarResult.parserSourceRevisionToken,
+      sourceRevisionAuthority: sidecarResult.sourceRevisionAuthority,
       promotionAllowed: sidecarResult.provenanceReadiness.canonicalPromotionAllowed,
       rows: sidecarRows,
     },
@@ -119,12 +142,15 @@ for (const fixture of fixtures) {
       provider: nodeResult.provider,
       status: nodeResult.status,
       diagnostics: nodeResult.diagnostics,
+      parserSourceRevisionToken: nodeResult.parserSourceRevisionToken,
+      sourceRevisionAuthority: nodeResult.sourceRevisionAuthority,
       promotionAllowed: nodeResult.provenanceReadiness.canonicalPromotionAllowed,
       rows: nodeRows,
     },
     comparison,
     diagnosticParity,
-    pass: diagnosticParity && (malformed || comparison.exactNamedSpanParity),
+    revisionAuthorityNeutral,
+    pass: diagnosticParity && revisionAuthorityNeutral && (malformed || comparison.exactNamedSpanParity),
   });
 }
 
@@ -134,11 +160,12 @@ const report = {
   generatedAt: new Date().toISOString(),
   status,
   runtime,
+  sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
   canonicalOwnerChanged: false,
   defaultGraphifyProvider: 'treesitter-chunker-8095',
   challengerProvider: 'node-tree-sitter-challenger',
   persistenceAttempted: false,
-  acceptanceRule: 'Node provider may not replace 8095 until fixture parity and production-corpus parity pass; no provider selection establishes canonical identity.',
+  acceptanceRule: 'Provider parity proves parser/span behavior only. It cannot establish canonical source_revision or canonical identity authority.',
   fixtures: results,
 };
 
@@ -152,11 +179,12 @@ await writeFile(mdPath, [
   `- status: **${status}**`,
   `- parser revision: ${runtime.parser_revision}`,
   `- grammar revision: ${runtime.grammar_revision}`,
+  '- source revision authority: CONTENT_ANCHOR_ONLY',
   '- canonical owner changed: NO',
   '- persistence attempted: NO',
   '- default Graphify provider remains: `treesitter-chunker-8095`',
   '',
-  ...results.map((item) => `- ${item.id}: ${item.pass ? 'PASS' : 'FAIL'}; exact-span=${item.comparison.exactNamedSpanParity}; diagnostics=${item.diagnosticParity}`),
+  ...results.map((item) => `- ${item.id}: ${item.pass ? 'PASS' : 'FAIL'}; exact-span=${item.comparison.exactNamedSpanParity}; diagnostics=${item.diagnosticParity}; revision-neutral=${item.revisionAuthorityNeutral}`),
   '',
 ].join('\n'), 'utf8');
 
