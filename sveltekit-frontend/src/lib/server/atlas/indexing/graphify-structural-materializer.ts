@@ -8,8 +8,10 @@ export type CanonicalSourceRef = {
   source: string;
 };
 
+export type AstProviderKind = 'treesitter-chunker-8095' | 'node-tree-sitter';
+
 export type AstProviderResult = {
-  provider: 'treesitter-chunker-8095';
+  provider: AstProviderKind;
   status: 'PROVEN' | 'RECOVERED_WITH_ERRORS' | 'FAILED';
   evidence?: AtlasStructuralEvidence;
   errorTag?: string;
@@ -129,9 +131,9 @@ export type StructuralMaterializationResult = {
   sourceRevision: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
-  /** Raw 8095 evidence retained for the downstream Parent Atlas fabric. */
+  /** Raw structural evidence retained for the downstream Parent Atlas fabric. */
   evidence: AtlasStructuralEvidence | null;
-  /** Legacy normalized structural view retained for current Graphify consumers. */
+  /** Normalized structural view retained for current Graphify consumers. */
   normalized: NormalizedAtlasStructuralEvidence | null;
   provenanceReadiness: StructuralProvenanceReadiness;
   diagnostics: string[];
@@ -140,13 +142,12 @@ export type StructuralMaterializationResult = {
 };
 
 /**
- * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
- * 8095 owns structural parsing evidence. Identity persistence and projections
- * remain downstream and are intentionally not performed here.
+ * Canonical Graphify orchestration boundary. Providers emit structural
+ * observations only; identity persistence and projections remain downstream.
  *
- * `canonicalPromotionAllowed=true` means only that native structural provenance
- * is complete and the provider parse is PROVEN. GIS must still resolve/promote
- * the nomination and persistence must still prove the canonical identity.
+ * The 8095 treesitter-chunker provider remains the default/current executor.
+ * Alternate providers may be injected for parity experiments without becoming
+ * canonical owners merely by satisfying this interface.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
