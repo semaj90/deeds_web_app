@@ -10,7 +10,10 @@ function result(
 ): StructuralMaterializationResult {
   return {
     sourceRef,
-    sourceRevision: `content:${sourceRef}`,
+    sourceRevision: null,
+    sourceVersionAnchor: `content:${sourceRef}`,
+    sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+    parserSourceRevisionToken: `anchor:content:${sourceRef}`,
     provider: 'treesitter-chunker-8095',
     status,
     evidence: null,
@@ -22,10 +25,12 @@ function result(
       nativeSymbolIds: status === 'PROVEN' ? 1 : 0,
       upstreamChunkIds: status === 'PROVEN' ? 1 : 0,
       symbolCount: 1,
-      canonicalPromotionAllowed: status === 'PROVEN',
-      reason: status === 'PROVEN' ? 'fixture native' : 'fixture recovered',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      sourceRevisionAuthorityReady: false,
+      canonicalPromotionAllowed: false,
+      reason: status === 'PROVEN' ? 'fixture native but revision authority unproven' : 'fixture recovered',
     },
-    diagnostics,
+    diagnostics: [...diagnostics, 'SOURCE_REVISION_AUTHORITY_UNPROVEN'],
     persistence: 'NOT_ATTEMPTED',
     fallback: 'NONE',
   };
@@ -58,16 +63,20 @@ describe('runGraphifyStructuralBatchV1', () => {
     expect(receipt.failedFiles).toBe(1);
     expect(receipt.provenFiles).toBe(2);
     expect(receipt.isolatedFailurePass).toBe(true);
+    expect(receipt.revisionAuthorityPass).toBe(false);
     expect(receipt.files.map((item) => [item.sourceRef, item.status])).toEqual([
       ['src/valid-a.ts', 'PROVEN'],
       ['src/broken.ts', 'FAILED'],
       ['src/valid-b.ts', 'PROVEN'],
     ]);
+    expect(receipt.files[0]?.canonicalPromotionAllowed).toBe(false);
+    expect(receipt.files[0]?.sourceRevision).toBeNull();
+    expect(receipt.files[0]?.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
     expect(receipt.files[1]?.diagnostics).toContain('fixture parser failure');
     expect(receipt.outputChecksum).toMatch(/^[a-f0-9]{64}$/);
   });
 
-  it('proves skip changed extraction and explicit deletion in one delta manifest', async () => {
+  it('proves skip changed extraction and explicit deletion without fabricating source revision authority', async () => {
     const changedSource = 'export const changed = 2;';
     const crypto = await import('node:crypto');
     const changedHash = crypto.createHash('sha256').update(changedSource).digest('hex');
@@ -104,6 +113,9 @@ describe('runGraphifyStructuralBatchV1', () => {
       {
         async materialize(input) {
           calls.push(input.sourceRef);
+          expect(input.sourceRevision).toBeNull();
+          expect(input.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
+          expect(input.sourceVersionAnchor).toContain('content:');
           return result(input.sourceRef);
         },
       },
@@ -114,10 +126,13 @@ describe('runGraphifyStructuralBatchV1', () => {
     expect(receipt.provenFiles).toBe(1);
     expect(receipt.tombstoneCount).toBe(1);
     expect(receipt.incrementalDeltaPass).toBe(true);
+    expect(receipt.revisionAuthorityPass).toBe(false);
     expect(receipt.tombstones[0]).toMatchObject({
       sourceRef: 'src/deleted.ts',
       reason: 'SOURCE_DELETED',
       priorContentHash: 'deleted-hash',
+      sourceRevision: null,
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
     });
     expect(receipt.files.map((item) => item.status)).toEqual([
       'SKIPPED_UNCHANGED',
