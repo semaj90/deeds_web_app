@@ -3,6 +3,15 @@ import { describe, expect, it } from 'vitest';
 import type { AstProvider } from './graphify-structural-materializer.js';
 import { GraphifyStructuralMaterializer } from './graphify-structural-materializer.js';
 
+const anchorOnly = (sourceRef: string, source: string) => ({
+  sourceRef,
+  sourceRevision: null,
+  sourceVersionAnchor: 'content:fixture',
+  sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
+  language: 'typescript',
+  source,
+});
+
 describe('Node Tree-sitter AstProvider challenger boundary', () => {
   it('accepts a challenger through the shared AstProvider interface without granting canonical promotion', async () => {
     const challenger: AstProvider = {
@@ -43,18 +52,19 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
       },
     };
 
-    const result = await new GraphifyStructuralMaterializer(challenger).materialize({
-      sourceRef: 'src/alpha.ts',
-      sourceRevision: 'content:fixture',
-      language: 'typescript',
-      source: 'export function alpha(){ return 1; }',
-    });
+    const result = await new GraphifyStructuralMaterializer(challenger).materialize(
+      anchorOnly('src/alpha.ts', 'export function alpha(){ return 1; }'),
+    );
 
     expect(result.provider).toBe('node-tree-sitter-challenger');
     expect(result.status).toBe('PROVEN');
     expect(result.provenanceReadiness.status).toBe('COMPATIBILITY_ONLY');
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
+    expect(result.sourceRevision).toBeNull();
+    expect(result.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
+    expect(result.parserSourceRevisionToken).toBe('anchor:content:fixture');
     expect(result.diagnostics).toContain('STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY');
+    expect(result.diagnostics).toContain('SOURCE_REVISION_AUTHORITY_UNPROVEN');
     expect(result.persistence).toBe('NOT_ATTEMPTED');
   });
 
@@ -70,18 +80,16 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
       },
     };
 
-    const result = await new GraphifyStructuralMaterializer(challenger).materialize({
-      sourceRef: 'src/broken.ts',
-      sourceRevision: 'content:fixture',
-      language: 'typescript',
-      source: 'export function broken( {',
-    });
+    const result = await new GraphifyStructuralMaterializer(challenger).materialize(
+      anchorOnly('src/broken.ts', 'export function broken( {'),
+    );
 
     expect(result.provider).toBe('node-tree-sitter-challenger');
     expect(result.status).toBe('FAILED');
     expect(result.evidence).toBeNull();
     expect(result.normalized).toBeNull();
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
+    expect(result.sourceRevision).toBeNull();
     expect(result.fallback).toBe('NONE');
   });
 });
