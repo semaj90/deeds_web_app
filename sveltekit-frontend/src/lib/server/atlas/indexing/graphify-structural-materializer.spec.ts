@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { GraphifyStructuralMaterializer, type AstProvider } from './graphify-structural-materializer.js';
 
-const input = {
+const authoritativeInput = {
   sourceRef: 'src/example.ts',
   sourceRevision: 'source-r1',
+  sourceVersionAnchor: 'content:test-anchor',
+  sourceRevisionAuthority: 'PROVEN' as const,
   language: 'typescript',
   source: 'export function example(){ return 1; }',
+};
+
+const anchorOnlyInput = {
+  ...authoritativeInput,
+  sourceRevision: null,
+  sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
 };
 
 function provider(
@@ -13,15 +21,18 @@ function provider(
   options: { native?: boolean } = {},
 ): AstProvider {
   return {
-    async materialize() {
+    async materialize(input) {
       if (status === 'FAILED') return { provider: 'treesitter-chunker-8095', status, diagnostics: ['sidecar unavailable'] };
       const native = options.native ?? true;
+      const parserRevision = input.sourceRevisionAuthority === 'PROVEN'
+        ? input.sourceRevision!
+        : `anchor:${input.sourceVersionAnchor}`;
       return {
         provider: 'treesitter-chunker-8095',
         status,
         diagnostics: status === 'PROVEN' ? [] : ['Tree-sitter ERROR at line 1'],
         evidence: {
-          schema: 'atlas.ast.evidence.v1', engine: 'treesitter-chunker', engine_version: 'test', language: 'typescript', file_path: input.sourceRef, source_revision: input.sourceRevision,
+          schema: 'atlas.ast.evidence.v1', engine: 'treesitter-chunker', engine_version: 'test', language: 'typescript', file_path: input.sourceRef, source_revision: parserRevision,
           chunks: [{
             upstream_chunk_id: native ? 'chunk-1' : undefined,
             upstream_node_id: native ? 'node-1' : undefined,
@@ -40,7 +51,7 @@ function provider(
 
 describe('GraphifyStructuralMaterializer', () => {
   it('normalizes 8095 evidence without assigning canonical persistence IDs', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('PROVEN')).materialize(input);
+    const result = await new GraphifyStructuralMaterializer(provider('PROVEN')).materialize(anchorOnlyInput);
     expect(result.status).toBe('PROVEN');
     expect(result.normalized?.symbols[0]?.symbolId).toBeNull();
     expect(result.normalized?.symbols[0]?.upstreamChunkId).toBe('chunk-1');
@@ -49,18 +60,29 @@ describe('GraphifyStructuralMaterializer', () => {
     expect(result.fallback).toBe('NONE');
   });
 
-  it('marks complete native provenance as eligible for GIS evaluation, not automatic promotion', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('PROVEN', { native: true })).materialize(input);
+  it('keeps native structural readiness but blocks promotion for content-anchor-only revision lineage', async () => {
+    const result = await new GraphifyStructuralMaterializer(provider('PROVEN', { native: true })).materialize(anchorOnlyInput);
 
     expect(result.provenanceReadiness.status).toBe('NATIVE_READY');
+    expect(result.provenanceReadiness.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
+    expect(result.provenanceReadiness.sourceRevisionAuthorityReady).toBe(false);
+    expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
+    expect(result.sourceRevision).toBeNull();
+    expect(result.parserSourceRevisionToken).toBe('anchor:content:test-anchor');
+    expect(result.diagnostics).toContain('SOURCE_REVISION_AUTHORITY_UNPROVEN');
+  });
+
+  it('allows GIS evaluation only when structural and source revision authority are both proven', async () => {
+    const result = await new GraphifyStructuralMaterializer(provider('PROVEN', { native: true })).materialize(authoritativeInput);
+
+    expect(result.provenanceReadiness.status).toBe('NATIVE_READY');
+    expect(result.provenanceReadiness.sourceRevisionAuthorityReady).toBe(true);
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(true);
-    expect(result.provenanceReadiness.nativeNodeIds).toBe(1);
-    expect(result.provenanceReadiness.nativeFileIds).toBe(1);
-    expect(result.normalized?.symbols[0]?.symbolId).toBeNull();
+    expect(result.sourceRevision).toBe('source-r1');
   });
 
   it('blocks GIS promotion when only compatibility provenance is available', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('PROVEN', { native: false })).materialize(input);
+    const result = await new GraphifyStructuralMaterializer(provider('PROVEN', { native: false })).materialize(authoritativeInput);
 
     expect(result.status).toBe('PROVEN');
     expect(result.provenanceReadiness.status).toBe('COMPATIBILITY_ONLY');
@@ -69,8 +91,8 @@ describe('GraphifyStructuralMaterializer', () => {
     expect(result.normalized?.symbols[0]?.symbolId).toBeNull();
   });
 
-  it('blocks GIS promotion for recovered parses even when native provenance is complete', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('RECOVERED_WITH_ERRORS', { native: true })).materialize(input);
+  it('blocks GIS promotion for recovered parses even when native provenance and revision authority are complete', async () => {
+    const result = await new GraphifyStructuralMaterializer(provider('RECOVERED_WITH_ERRORS', { native: true })).materialize(authoritativeInput);
 
     expect(result.status).toBe('RECOVERED_WITH_ERRORS');
     expect(result.provenanceReadiness.status).toBe('NATIVE_RECOVERED');
@@ -81,11 +103,20 @@ describe('GraphifyStructuralMaterializer', () => {
   });
 
   it('fails closed for sidecar failure without legacy fallback', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('FAILED')).materialize(input);
+    const result = await new GraphifyStructuralMaterializer(provider('FAILED')).materialize(anchorOnlyInput);
     expect(result.status).toBe('FAILED');
     expect(result.normalized).toBeNull();
     expect(result.provenanceReadiness.status).toBe('NO_EVIDENCE');
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
     expect(result.fallback).toBe('NONE');
+  });
+
+  it('rejects unproven non-null source revisions', async () => {
+    await expect(
+      new GraphifyStructuralMaterializer(provider('PROVEN')).materialize({
+        ...anchorOnlyInput,
+        sourceRevision: 'content:not-canonical',
+      }),
+    ).rejects.toThrow('UNPROVEN_SOURCE_REVISION_MUST_BE_NULL');
   });
 });
