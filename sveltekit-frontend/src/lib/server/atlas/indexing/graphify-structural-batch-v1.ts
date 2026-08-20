@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 
 import type {
-  CanonicalSourceRef,
   SourceRevisionAuthorityV1,
   StructuralMaterializationResult,
+  StructuralSourceInputV1,
 } from './graphify-structural-materializer.js';
 
 export type GraphifyStructuralDeltaActionV1 = 'UPSERT' | 'DELETE';
@@ -78,7 +78,7 @@ export interface GraphifyStructuralBatchReceiptV1 {
 }
 
 export interface GraphifyStructuralBatchPortsV1 {
-  materialize(input: CanonicalSourceRef): Promise<StructuralMaterializationResult>;
+  materialize(input: StructuralSourceInputV1): Promise<StructuralMaterializationResult>;
 }
 
 export interface RunGraphifyStructuralBatchInputV1 {
