@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.emb2.semantic-card-embedding-proof.v1",
+  "status": "PROVEN",
+  "inputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\emb1-semantic-card-corpus.jsonl",
+  "outputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\emb2-semantic-card-embeddings.jsonl",
+  "endpoint": "http://127.0.0.1:11434",
+  "model": "embeddinggemma:latest",
+  "representationId": "semantic_768",
+  "representationRevision": "embeddinggemma-native-768-v1",
+  "dimension": 768,
+  "sourceCardCount": 7,
+  "embeddedCardCount": 7,
+  "failedCardCount": 0,
+  "cards": [
+    {
+      "cardId": "sc_ad216a05718122b22d197ea2",
+      "status": "PROVEN",
+      "kind": "FILE",
+      "dimension": 768,
+      "l2Norm": 1.0000000280640449
+    },
+    {
+      "cardId": "sc_a95f875c799d833310428b38",
+      "status": "PROVEN",
+      "kind": "MODULE",
+      "dimension": 768,
+      "l2Norm": 0.9999999967073991
+    },
+    {
+      "cardId": "sc_41b3a0fb9e4afe5f365a33f4",
+      "status": "PROVEN",
+      "kind": "INTERFACE",
+      "dimension": 768,
+      "l2Norm": 0.9999999952379451
+    },
+    {
+      "cardId": "sc_7d005afba4b4c0dae9045e28",
+      "status": "PROVEN",
+      "kind": "TYPE",
+      "dimension": 768,
+      "l2Norm": 1.0000000313952384
+    },
+    {
+      "cardId": "sc_1baccabe5bf1e9192a0d7dc3",
+      "status": "PROVEN",
+      "kind": "CLASS",
+      "dimension": 768,
+      "l2Norm": 1.0000000156253457
+    },
+    {
+      "cardId": "sc_0d85147bef1b7c9476f0e365",
+      "status": "PROVEN",
+      "kind": "METHOD",
+      "dimension": 768,
+      "l2Norm": 0.9999999675478652
+    },
+    {
+      "cardId": "sc_6922547834123864c65c0e70",
+      "status": "PROVEN",
+      "kind": "FUNCTION",
+      "dimension": 768,
+      "l2Norm": 1.000000036910841
+    }
+  ],
+  "canonicalWrites": false,
+  "qdrantWrites": false,
+  "startedAt": "2026-08-20T19:32:18.290Z",
+  "completedAt": "2026-08-20T19:32:19.376Z",
+  "artifactPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\emb2-semantic-card-embeddings.jsonl"
+}

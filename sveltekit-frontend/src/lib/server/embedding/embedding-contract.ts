@@ -41,10 +41,12 @@ export const EMBEDDING_CONTRACT = {
   legacy_retrieval_embedding_dimension: 384,
 
   /**
-   * Legacy experimental projection from 768 to 384.
+   * Official EmbeddingGemma MRL truncation targets. 384 is not an
+   * EmbeddingGemma MRL target and remains legacy-only below.
    */
-  truncation_method: 'direct_slice',
-  truncation_position: 384,
+  truncation_method: 'mrl_prefix_truncate_renormalize',
+  supported_mrl_dimensions: [768, 512, 256, 128] as const,
+  truncation_position: 768,
 
   /**
    * L2 normalization status
@@ -82,7 +84,7 @@ export const EMBEDDING_CONTRACT = {
    */
   turbovec: {
     quantization: '4-bit',
-    reduction_dimension: 64, // 384 → 64 via autoencoder
+    reduction_dimension: 64, // 768 → 64 via a separate routing autoencoder
     prefilter_enabled: true,
   },
 
@@ -130,7 +132,7 @@ export const EMBEDDING_CONTRACT = {
    * Version identifier (for migrations + schema versioning)
    */
   version: '2.0',
-  schema_version: '768-canonical-plus-384-legacy-v4',
+  schema_version: '768-canonical-plus-mrl-512-256-128-v5',
 
   /**
    * Explicit representation lineage contract.
@@ -151,23 +153,23 @@ export const EMBEDDING_CONTRACT = {
     },
     semantic_384: {
       lane_id: 'dense_384',
-      role: 'legacy_experimental_retrieval',
+      role: 'legacy_external_model_retrieval',
       status: 'REFERENCE_ONLY',
-      source_dimension: 768,
+      source_dimension: 384,
       output_dimension: 384,
-      projection_method: 'direct_slice',
-      projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
+      projection_method: 'legacy_external_model',
+      projection_version: 'legacy-dense-384-v1',
       normalization: 'L2',
-      collection: 'codebase_chunks_768',
+      collection: 'codebase_chunks_384_hybrid',
     },
     latent_64: {
       lane_id: 'latent_64',
       role: 'routing_only',
       status: 'ACTIVE',
-      source_dimension: 384,
+      source_dimension: 768,
       output_dimension: 64,
       projection_method: 'autoencoder',
-      projection_version: 'atlas-ae-384x64-v3',
+      projection_version: 'atlas-ae-768x64-v1',
       normalization: 'L2',
       collection: 'codebase_topology_64',
     },

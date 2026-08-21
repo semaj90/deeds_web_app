@@ -256,7 +256,7 @@ function logOllamaDiagnostics(
   durationMs: number,
   status?: number,
   error?: unknown,
-  backend: 'llama-server' | 'turboquant' = 'llama-server'
+  backend: 'ollama' | 'llama-server' | 'turboquant' = 'llama-server'
 ): void {
   if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
 

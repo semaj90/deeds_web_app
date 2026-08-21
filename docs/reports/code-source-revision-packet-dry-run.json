@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.code-source-revision.packet-dry-run.v1",
+  "generatedAt": "2026-08-20T22:42:37.700Z",
+  "status": "DRY_RUN_CONTRACT_PROVEN_INPUT_BINDING_OPEN",
+  "canonicalWrites": false,
+  "livePacketBinding": false,
+  "result": {
+    "status": "READY_FOR_PERSISTENCE_REVIEW",
+    "canonicalWrites": false,
+    "packetKey": "packet:dry-run:code-source-revision",
+    "sourceRef": "src/atlas/dry-run.ts",
+    "revision": {
+      "schema": "atlas.code.source-revision.v1",
+      "algorithm": "sha256",
+      "sourceRevision": "sha256:50c3b757076fbe6151ecffe4ea46790b2a174eebf5490cc4d909718f88ee904f",
+      "contentDigest": "50c3b757076fbe6151ecffe4ea46790b2a174eebf5490cc4d909718f88ee904f",
+      "byteLength": 28
+    },
+    "existingDigestMatch": null,
+    "errors": []
+  }
+}

@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
-  SEMANTIC_REPRESENTATION_ID,
-  SEMANTIC_DIMENSION,
-} from '../embedding/embedding-contract-768.js';
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from './retrieval/qdrant-semantic-projection.js';
 
 export const PARENT_ATLAS_PHASE_LANE_IDS = [
   11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
@@ -425,7 +425,7 @@ function buildPhaseLane(seed: PhaseSeed): ParentAtlasPhaseLane {
     open_gaps: seed.openGaps,
     mock_artifacts: seed.mockArtifacts,
     receipt: buildReceipt(seed),
-  });
+  }) as ParentAtlasPhaseLane;
 }
 
 export function listParentAtlasPhaseLanes(): ParentAtlasPhaseLane[] {
@@ -455,7 +455,7 @@ export function getParentAtlasPhaseLaneSnapshot(): ParentAtlasPhaseLaneSnapshot 
     summary,
     phases,
     open_gaps: phases.flatMap((phase) => phase.open_gaps),
-  });
+  }) as ParentAtlasPhaseLaneSnapshot;
 }
 
 export function buildParentAtlasPhaseLaneReport(): string {

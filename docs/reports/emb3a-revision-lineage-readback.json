@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.emb3a.revision.lineage.readback.v1",
+  "generatedAt": "2026-08-20T19:08:42.412Z",
+  "readOnly": true,
+  "collection": "codebase_chunks_768",
+  "canonicalWrites": false,
+  "postgres": {
+    "status": "READ_ONLY_SAMPLE_PROVEN",
+    "rows": 50,
+    "nonZeroWorkspaceRevision": 0,
+    "nonZeroRepresentationRevision": 0,
+    "sourceRevisionPresent": 0
+  },
+  "qdrant": {
+    "status": "READ_ONLY_SAMPLE_PROVEN",
+    "rows": 50,
+    "revisionFields": {
+      "workspace_revision": 0,
+      "source_revision": 0,
+      "representation_revision": 0
+    }
+  },
+  "join": {
+    "status": "READ_ONLY_JOIN_COMPLETE",
+    "matches": 0,
+    "comparable": [],
+    "aligned": 0
+  },
+  "status": "LINEAGE_POPULATION_NOT_PROVEN"
+}

@@ -53,7 +53,7 @@ async function main() {
       indices: vector.indices,
       values: vector.values,
       vocabulary_revision: registry.vocabulary_revision,
-      weighting_revision: 'bm25_v1',
+      weighting_revision: 'legacy_code_aware_logtf_v1',
     };
   });
 

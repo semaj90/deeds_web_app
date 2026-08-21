@@ -1,8 +1,8 @@
 {
   "schema": "atlas.okf.runtime-ownership.v1",
-  "generatedAt": "2026-08-14T20:04:14.564Z",
+  "generatedAt": "2026-08-20T18:42:52.190Z",
   "status": "PROVEN_READ_ONLY_AUDIT",
-  "filesScanned": 26820,
+  "filesScanned": 27186,
   "policy": {
     "canonicalTruth": [
       "PostgreSQL",
@@ -61,6 +61,7 @@
         "sveltekit-frontend\\src\\lib\\server\\analytics\\analytics-fusion-bridge.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\evidence-locator-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.spec.ts",
@@ -99,6 +100,7 @@
         "sveltekit-frontend\\src\\lib\\server\\analytics\\analytics-fusion-bridge.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\evidence-locator-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.spec.ts",
@@ -112,8 +114,7 @@
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-fit.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-topic-ingestion.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\pos-concept-tagging-lane.spec.ts",
-        "sveltekit-frontend\\src\\lib\\server\\atlas\\pos-concept-tagging-lane.ts",
-        "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic-signal-routing.ts"
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\pos-concept-tagging-lane.ts"
       ]
     },
     {
@@ -130,6 +131,7 @@
         "sveltekit-frontend\\src\\lib\\server\\ace\\packet-io.ts",
         "sveltekit-frontend\\src\\lib\\server\\ace\\promotion-enrichment-service.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\evidence-locator-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\domain-taxonomy.spec.ts",
@@ -138,7 +140,12 @@
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-fit.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\phase109a-baseline-classifier.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\phase109a-mcp-tools.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\ranking\\feature-row-v1.test.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\representation\\term-domain-taxonomy.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\representation\\term-domain-taxonomy.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic-signal-routing.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\taxonomy\\entity-concept-taxonomy-v1.test.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\taxonomy\\entity-concept-taxonomy-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\classifier\\domain-classifier.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema-kag.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema-phase109a.ts",
@@ -149,6 +156,7 @@
         "sveltekit-frontend\\src\\lib\\server\\ace\\packet-io.ts",
         "sveltekit-frontend\\src\\lib\\server\\ace\\promotion-enrichment-service.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\board\\daily-graphify-board-recommendations.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\evidence-locator-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\okf-cross-domain-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\domain-taxonomy.spec.ts",
@@ -157,7 +165,12 @@
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-fit.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\phase109a-baseline-classifier.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\phase109a-mcp-tools.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\ranking\\feature-row-v1.test.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\representation\\term-domain-taxonomy.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\representation\\term-domain-taxonomy.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic-signal-routing.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\taxonomy\\entity-concept-taxonomy-v1.test.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\taxonomy\\entity-concept-taxonomy-v1.ts",
         "sveltekit-frontend\\src\\lib\\server\\classifier\\domain-classifier.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema-kag.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema-phase109a.ts",
@@ -235,7 +248,9 @@
         "sveltekit-frontend\\src\\lib\\server\\atlas\\feature-matrix-schema.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-topic-ingestion.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-feature-compiler.ts",
-        "sveltekit-frontend\\src\\lib\\server\\atlas\\tensors\\feature-matrix-contract.ts"
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\tensors\\feature-matrix-contract.ts",
+        "packages\\parent-atlas\\src\\core\\feature-matrix-materializer.ts",
+        "packages\\parent-atlas\\src\\core\\feature-matrix.ts"
       ],
       "importedOrUsedFiles": [
         "scripts\\atlas\\audit-qas-owner.mjs",
@@ -249,7 +264,9 @@
         "sveltekit-frontend\\src\\lib\\server\\atlas\\feature-matrix-schema.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\okf-topic-ingestion.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-feature-compiler.ts",
-        "sveltekit-frontend\\src\\lib\\server\\atlas\\tensors\\feature-matrix-contract.ts"
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\tensors\\feature-matrix-contract.ts",
+        "packages\\parent-atlas\\src\\core\\feature-matrix-materializer.ts",
+        "packages\\parent-atlas\\src\\core\\feature-matrix.ts"
       ]
     },
     {
@@ -265,6 +282,11 @@
         "scripts\\atlas\\audit-okf-runtime-ownership.mjs",
         "scripts\\atlas\\audit-qas-owner.mjs",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\contracts.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\materializer.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\neural-routing.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\training-example-builder.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\qas-neural-execution-bridge.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-dag5.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-feature-compiler.ts",
         "sveltekit-frontend\\src\\lib\\server\\retrieval\\retrieval-candidate-feature-matrix-v1.spec.ts",
@@ -273,6 +295,11 @@
       "importedOrUsedFiles": [
         "scripts\\atlas\\audit-qas-owner.mjs",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\contracts\\feature-extraction-v1.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\contracts.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\materializer.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\neural-routing.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\training-example-builder.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\qas-neural-execution-bridge.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-dag5.spec.ts",
         "sveltekit-frontend\\src\\lib\\server\\atlas\\retrieval\\query-adaptive-feature-compiler.ts",
         "sveltekit-frontend\\src\\lib\\server\\retrieval\\retrieval-candidate-feature-matrix-v1.spec.ts",
@@ -543,6 +570,7 @@
         "scripts\\audit-pg-aio-node.mjs",
         "scripts\\audit-pg18-aio.sql",
         "scripts\\postgres18-verify-optimizations.mjs",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic\\ontology-vector-execution-plan.spec.ts",
         "services\\rust-index-advisor\\src\\main.rs",
         "docker\\langgraph-synthesis\\.venv\\Lib\\site-packages\\google\\api\\client_pb2.py"
       ],
@@ -552,6 +580,7 @@
         "scripts\\audit-pg-aio-node.mjs",
         "scripts\\audit-pg18-aio.sql",
         "scripts\\postgres18-verify-optimizations.mjs",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic\\ontology-vector-execution-plan.spec.ts",
         "services\\rust-index-advisor\\src\\main.rs",
         "docker\\langgraph-synthesis\\.venv\\Lib\\site-packages\\google\\api\\client_pb2.py"
       ]
@@ -595,15 +624,15 @@
         "sveltekit-frontend\\src\\lib\\server\\ai\\llama-tool-definitions.ts",
         "sveltekit-frontend\\src\\lib\\server\\ai\\mcp-tool-bridge.ts",
         "sveltekit-frontend\\src\\lib\\server\\ai\\mcp-tool-dispatch.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\kernel\\atlas-skill-admission.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\language\\ast-query-rule-compiler.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic\\ontology-vector-execution-plan.spec.ts",
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\semantic\\ontology-vector-execution-plan.ts",
         "sveltekit-frontend\\src\\lib\\server\\auth\\tool-authorization.ts",
         "sveltekit-frontend\\src\\lib\\server\\cache\\packet-bitmap.ts",
         "sveltekit-frontend\\src\\lib\\server\\db\\schema\\admin-ai-skills.ts",
         "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts",
-        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ai\\gemma4-agent.ts",
-        "sveltekit-frontend\\src\\lib\\server\\ff1\\agent\\tool-registry.ts",
-        "sveltekit-frontend\\src\\lib\\server\\langgraph\\cache\\packet-bitmap.ts",
-        "sveltekit-frontend\\src\\lib\\server\\langgraph\\dispatcher-graph.ts",
-        "sveltekit-frontend\\src\\lib\\server\\langgraph\\dispatcher-nodes\\index.ts"
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ai\\gemma4-agent.ts"
       ],
       "importedOrUsedFiles": [
         "scripts\\api-cleanup\\reports\\backup-2025-12-14T20-51-26-276Z\\native\\som\\bitmap\\+server.ts",

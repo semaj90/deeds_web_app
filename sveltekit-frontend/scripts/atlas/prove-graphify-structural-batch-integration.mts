@@ -13,7 +13,7 @@ const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const repoRoot = resolve(appRoot, '..');
 const sha256 = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex');
 const workspaceRevision = process.env.ATLAS_WORKSPACE_REVISION?.trim() || 'proof:workspace-current';
-const producerRevision = 'atlas.gph15-gph16-live-proof.v1';
+const producerRevision = 'atlas.gph15-gph16-live-proof.v2';
 
 const unchangedSource = 'export function unchanged(){ return 1; }';
 const changedSource = 'export function changed(){ return 2; }';
@@ -88,6 +88,11 @@ const incrementalOrchestration = Boolean(
   && deleted?.status === 'TOMBSTONED'
   && receipt.tombstoneCount === 1,
 );
+const revisionAuthorityProven = receipt.revisionAuthorityPass;
+const promotionBlockedWithoutRevisionAuthority = receipt.files
+  .filter((item) => item.status === 'PROVEN' || item.status === 'RECOVERED_WITH_ERRORS')
+  .every((item) => item.canonicalPromotionAllowed === false)
+  && !revisionAuthorityProven;
 
 const report = {
   schema: 'atlas.graphify-structural-integration-proof.v1',
@@ -96,12 +101,16 @@ const report = {
   workspaceRevision,
   mode: 'READ_ONLY_NO_PERSISTENCE',
   gates: {
+    gph14rRevisionSemanticsFailClosed: promotionBlockedWithoutRevisionAuthority,
     gph15ParseFailureIsolation: malformedIsolated,
     gph16ProductionDeltaOrchestration: incrementalOrchestration,
+    sourceRevisionAuthorityProven: revisionAuthorityProven,
     productionPersistenceReadback: false,
     graphifyDailyReachability: false,
   },
-  status: malformedIsolated && incrementalOrchestration ? 'DRY_RUN_PROVEN' : 'FAIL',
+  status: malformedIsolated && incrementalOrchestration && promotionBlockedWithoutRevisionAuthority
+    ? 'DRY_RUN_PROVEN'
+    : 'FAIL',
   receipt,
 };
 
@@ -114,8 +123,10 @@ await writeFile(outputMd, [
   '',
   `- status: **${report.status}**`,
   `- mode: ${report.mode}`,
+  `- GPH-14R revision semantics fail-closed: ${promotionBlockedWithoutRevisionAuthority ? 'PASS' : 'FAIL'}`,
   `- GPH-15 parse-failure isolation: ${malformedIsolated ? 'PASS' : 'FAIL'}`,
   `- GPH-16 delta orchestration: ${incrementalOrchestration ? 'PASS' : 'FAIL'}`,
+  `- canonical source_revision authority: ${revisionAuthorityProven ? 'PROVEN' : 'UNPROVEN (expected in current EMB3A state)'}`,
   '- production persistence/readback: PENDING',
   '- graphify:daily reachability: PENDING',
   `- batch checksum: ${receipt.outputChecksum}`,
@@ -123,15 +134,17 @@ await writeFile(outputMd, [
   '## File receipts',
   '',
   ...receipt.files.map((item) =>
-    `- ${item.sourceRef}: ${item.status}; diagnostics=${item.diagnosticCount}; promotion=${item.canonicalPromotionAllowed}`,
+    `- ${item.sourceRef}: ${item.status}; sourceRevision=${item.sourceRevision ?? 'null'}; authority=${item.sourceRevisionAuthority}; diagnostics=${item.diagnosticCount}; promotion=${item.canonicalPromotionAllowed}`,
   ),
   '',
 ].join('\n'), 'utf8');
 
 console.log(JSON.stringify({
   status: report.status,
+  gph14r: promotionBlockedWithoutRevisionAuthority,
   gph15: malformedIsolated,
   gph16: incrementalOrchestration,
+  sourceRevisionAuthorityProven: revisionAuthorityProven,
   outputJson,
   outputMd,
   checksum: receipt.outputChecksum,

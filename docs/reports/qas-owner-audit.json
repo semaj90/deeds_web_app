@@ -1,6 +1,6 @@
 {
   "schema": "parent-atlas.qas.owner-audit.v2",
-  "generatedAt": "2026-08-14T19:21:32.024Z",
+  "generatedAt": "2026-08-21T03:45:40.642Z",
   "status": "OWNER_AUDIT_PARTIAL",
   "canonicalQasOwner": "sveltekit-frontend/src/lib/server/atlas/retrieval/query-adaptive-sampler.ts",
   "bundleReference": "REFERENCE_ONLY",
@@ -39,13 +39,20 @@
     },
     "candidateFeatureMatrixProducer": {
       "owner": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
-      "status": "DEFINITION_ONLY_NO_LIVE_CALLER",
-      "callers": []
+      "status": "CALLER_FOUND_UNPROVEN",
+      "callers": [
+        "sveltekit-frontend\\src\\lib\\server\\atlas\\neural-routing\\materializer.ts"
+      ]
+    },
+    "searchRuntimeQasCaller": {
+      "owner": "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts::searchWithQas",
+      "status": "WIRED_READ_ONLY_CALLER",
+      "liveInvocation": "NOT_PROVEN"
     }
   },
   "missingRequired": [
     "revision-qualified QAS candidate feature input",
-    "live CandidateFeatureMatrixRowV1 producer caller",
+    "live CandidateFeatureMatrixRowV1 producer invocation",
     "exact SearchRuntime promotion adapter and recall baseline",
     "SOM/domain route binding",
     "QAS receipt to existing Kanban recommendation linkage",

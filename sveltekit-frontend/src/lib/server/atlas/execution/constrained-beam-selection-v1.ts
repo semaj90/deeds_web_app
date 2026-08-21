@@ -32,8 +32,22 @@ export const beamCandidateSchema = z.object({
   entityType: z.string().min(1).optional(),
   relationshipId: z.string().min(1).optional(),
   executionClass: z.enum(BEAM_EXECUTION_CLASSES).default('EITHER'),
-  scores: beamCandidateScoresSchema.default({}),
-  cost: beamCandidateCostSchema.default({}),
+  scores: beamCandidateScoresSchema.default({
+    exact: 0,
+    reranker: 0,
+    ppr: 0,
+    pagerank: 0,
+    semantic: 0,
+    structural: 0,
+    incidenceConfidence: 0,
+  }),
+  cost: beamCandidateCostSchema.default({
+    candidateUnits: 1,
+    hyperedgeUnits: 0,
+    fanoutUnits: 0,
+    gpuBytes: 0,
+    hostBytes: 0,
+  }),
   evidenceRefs: z.array(z.string().min(1)).default([]),
 }).strict();
 
@@ -81,7 +95,15 @@ export const constrainedBeamSelectionInputSchema = z.object({
   explorationWeight: z.number().finite().min(0).max(0.25).default(0),
   envelope: ResourceEnvelopeV1Schema,
   gpu: gpuCapacitySnapshotSchema.optional(),
-  weights: beamSelectionWeightsSchema.default({}),
+  weights: beamSelectionWeightsSchema.default({
+    exact: 3,
+    reranker: 2,
+    ppr: 1.5,
+    pagerank: 0.75,
+    semantic: 1,
+    structural: 1,
+    incidenceConfidence: 1,
+  }),
   familyQuotas: z.array(beamFamilyQuotaSchema).max(BEAM_CANDIDATE_FAMILIES.length).default([]),
   candidates: z.array(beamCandidateSchema),
 }).strict();

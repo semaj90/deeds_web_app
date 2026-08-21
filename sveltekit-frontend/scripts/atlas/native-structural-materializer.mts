@@ -98,6 +98,8 @@ const report = {
   workspace_revision: workspace,
   apply: APPLY,
   allow_create_symbols: ALLOW_CREATE_SYMBOLS,
+  source_revision_authority: 'CONTENT_ANCHOR_ONLY' as const,
+  canonical_write_gate: 'BLOCKED_SOURCE_REVISION_AUTHORITY_UNPROVEN' as const,
   limit: LIMIT,
   include_prefix: INCLUDE_PREFIX || null,
   discovered_files: files.length,
@@ -121,8 +123,15 @@ for (const absolutePath of files) {
     const source = await readFile(absolutePath, 'utf8');
     if (!source.trim()) continue;
     const language = SUPPORTED[path.extname(absolutePath).toLowerCase()]!;
-    const sourceRevision = `content:${sha256(source)}`;
-    const structural = await materializer.materialize({ sourceRef: ref, sourceRevision, language, source });
+    const sourceVersionAnchor = `content:${sha256(source)}`;
+    const structural = await materializer.materialize({
+      sourceRef: ref,
+      sourceRevision: null,
+      sourceVersionAnchor,
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language,
+      source,
+    });
     report.processed_files += 1;
 
     if (structural.provenanceReadiness.status === 'NATIVE_READY') report.proven_native_files += 1;
@@ -153,17 +162,32 @@ for (const absolutePath of files) {
     report.symbol_nominations += compiled.fabric.symbol_nominations.length;
 
     const evidenceRevision = `structural:${sha256({
-      source_revision: sourceRevision,
+      source_version_anchor: sourceVersionAnchor,
+      source_revision_authority: structural.sourceRevisionAuthority,
       fabric_receipt: compiled.fabric.receipt,
       reference_facts: compiled.fabric.reference_facts,
       ast_grep_observations: compiled.fabric.ast_grep_observations,
     })}`;
-    const evidenceId = `evidence:structural:${sha256([ref, sourceRevision, evidenceRevision]).slice(0, 40)}`;
+    const evidenceId = `evidence:structural:${sha256([ref, sourceVersionAnchor, evidenceRevision]).slice(0, 40)}`;
 
     if (!APPLY) {
-      if (VERBOSE) console.log(JSON.stringify({ source_ref: ref, status: compiled.receipt.status, evidence_id: evidenceId, nominations: compiled.fabric.symbol_nominations.length }));
+      if (VERBOSE) console.log(JSON.stringify({
+        source_ref: ref,
+        status: compiled.receipt.status,
+        source_version_anchor: sourceVersionAnchor,
+        source_revision: null,
+        source_revision_authority: structural.sourceRevisionAuthority,
+        canonical_promotion_allowed: compiled.receipt.canonicalPromotionMayBeAttempted,
+        evidence_id: evidenceId,
+        nominations: compiled.fabric.symbol_nominations.length,
+      }));
       continue;
     }
+
+    if (structural.sourceRevisionAuthority !== 'PROVEN' || !structural.sourceRevision) {
+      throw new Error('NATIVE_STRUCTURAL_APPLY_BLOCKED_SOURCE_REVISION_AUTHORITY_UNPROVEN');
+    }
+    const sourceRevision = structural.sourceRevision;
 
     await evidenceLedger.upsert({
       schema: 'atlas.evidence-record.v1',
@@ -178,6 +202,8 @@ for (const absolutePath of files) {
         provider: structural.provider,
         provider_status: structural.status,
         provenance_readiness: structural.provenanceReadiness,
+        source_version_anchor: structural.sourceVersionAnchor,
+        source_revision_authority: structural.sourceRevisionAuthority,
         structural_receipt: compiled.fabric.receipt,
         reference_facts: compiled.fabric.reference_facts,
         ast_grep_observations: compiled.fabric.ast_grep_observations,
@@ -246,9 +272,9 @@ for (const absolutePath of files) {
 const status = report.failed_files > 0
   ? 'COMPLETED_WITH_FAILURES'
   : APPLY
-    ? 'APPLIED_UNPROVEN_DATABASE_BATCH'
+    ? 'APPLY_BLOCKED_REVISION_OWNER_UNPROVEN'
     : 'DRY_RUN_COMPLETE';
 const finalReceipt = { ...report, status, output_checksum: sha256(report), producer_revision: PRODUCER_REVISION };
 console.log(JSON.stringify(finalReceipt, null, 2));
 await pool.end();
-if (report.failed_files > 0) process.exitCode = 2;
+if (report.failed_files > 0 || APPLY) process.exitCode = 2;

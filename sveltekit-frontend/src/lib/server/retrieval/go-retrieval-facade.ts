@@ -737,7 +737,7 @@ export async function checkGoRetrievalHealth(): Promise<{
 
   // Check Ollama (embedding)
   try {
-    const res = await fetch('http://127.0.0.1:11434/api/tags', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/tags`, { signal: AbortSignal.timeout(2000) });
     services.ollama = res.ok;
     details.ollama = res.ok ? 'OK' : `HTTP ${res.status}`;
   } catch (err) {
@@ -747,7 +747,7 @@ export async function checkGoRetrievalHealth(): Promise<{
 
   // Check Qdrant
   try {
-    const res = await fetch('http://127.0.0.1:6333/collections', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${ENV.QDRANT_URL}/collections`, { signal: AbortSignal.timeout(2000) });
     services.qdrant = res.ok;
     details.qdrant = res.ok ? 'OK' : `HTTP ${res.status}`;
   } catch (err) {
@@ -757,7 +757,7 @@ export async function checkGoRetrievalHealth(): Promise<{
 
   // Check TurboVec
   try {
-    const res = await fetch('http://127.0.0.1:8791/health', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${process.env.TURBOVEC_HEALTH_URL?.trim() || 'http://127.0.0.1:8791'}/health`, { signal: AbortSignal.timeout(2000) });
     services.turbovec = res.ok;
     details.turbovec = res.ok ? 'OK' : `HTTP ${res.status}`;
   } catch (err) {
@@ -788,7 +788,7 @@ export async function checkGoRetrievalHealth(): Promise<{
 
   // Check Gemma4
   try {
-    const res = await fetch('http://127.0.0.1:8090/v1/models', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/models`, { signal: AbortSignal.timeout(2000) });
     services.gemma4 = res.ok;
     details.gemma4 = res.ok ? 'OK' : `HTTP ${res.status}`;
   } catch (err) {

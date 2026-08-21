@@ -1,6 +1,45 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-08-14
+Updated: 2026-08-20
+
+## Pasted Phase 6/85 claim reconciliation (2026-08-20)
+
+The supplied Phase 6/85 note describes a newer Query Routing V2/PyTorch
+EmbeddingGemma classifier tranche, but that tranche is not present in this
+checkout. No `query-routing-v2`, `classification_mrl_128`, PyTorch query-router
+trainer, or matching OpenSpec was found. The actual local owner remains the
+`query-routing-features-v1` neural-routing contract and its existing feature
+adapters. Focused validation passed 10/10 across the V1 query-routing,
+neural-routing, and RAPIDS capability-probe tests. This proves the existing
+feature contract only; it does not prove a PyTorch classifier, MRL classifier
+dataset, executor-policy training, or MiniLM retirement. No model training,
+Qdrant index creation, Postgres write, Valkey mutation, or retrieval-policy
+change occurred.
+
+The existing V1 owner now has a pure revision-qualified classification export
+contract. It emits `FEATURES_ONLY` rows until a real normalized 128-d
+`classification_mrl_128` vector is supplied, then marks rows
+`TRAINING_READY`. The dedicated exporter tests pass 4/4; the earlier combined
+exporter/query tranche passed 5/5. No live producer,
+training run, or MiniLM replacement is claimed.
+Verified tool-training examples can now enter this export only through an
+explicit-label adapter; domain, operation, retrieval-needs, and revision
+metadata are caller-supplied. Labels are not inferred from tool names or query
+text, and the live producer remains unproven.
+The fixture harness produced one revision-qualified `FEATURES_ONLY` row and
+zero `TRAINING_READY` rows; report:
+`docs/reports/query-routing-classification-export-proof.json`.
+
+The existing workflow-loop receipt is now supported by a pure classification
+adapter. It accepts only explicit labels/revisions and requires a successful
+receipt with schema, provenance, identity, and replay verification before a
+row can be marked verified. The workflow loop remains an execution-receipt
+owner, not a classifier or EmbeddingGemma inference owner; no live producer is
+wired and no training-ready row is claimed.
+The live error-agent route was audited separately; its current request contract
+does not carry classifier feature/model/prompt/label revisions or an
+EmbeddingGemma `classification_mrl_128` vector. Evidence is recorded in
+`docs/reports/query-routing-live-producer-audit.json`.
 
 The percentages below are planning estimates for the workstation roadmap. They are not substitutes for the explicit `PROVEN`, `PASS`, `DEGRADED`, or `NOT_PROVEN` gates in the OpenSpecs.
 
@@ -94,6 +133,74 @@ COLD  Postgres/source reconstruction, Arrow/mmap snapshots, broad evidence
 
 The current Qdrant collection is dense-only. The WARM sparse branch remains
 deferred until a sparse BM42 schema and identity round trip are proven.
+The latest read-only sparse source audit found 52,417 source rows and 52,380
+rows with text and dense embeddings, but no proven SPLADE/miniCOIL/BM42 runtime
+owner or sparse projection. Its status remains `RUNTIME_PROOF_PENDING`; this
+source census does not authorize a sparse collection or index write.
+The corrected sparse discovery scan found 823 keyword-bearing files, existing
+`lexical_v1`/BM42/Qdrant contract surfaces, and only reference-level
+miniCOIL/SPLADE mentions. The earlier zero-hit result was a scanner defect, not
+evidence that the repository was empty. Sparse owner consolidation must precede
+any new encoder or collection work.
+The duplicate Qdrant BM42 adapter was also corrected to identify its actual
+legacy hashed FNV-1a/log-TF codec. It now emits sparse-lane metadata with
+`is_true_qdrant_bm42: false`; the historical physical field name remains only
+for compatibility. No collection or retrieval policy changed.
+The sparse package commands were also corrected to point at their actual local
+stage owners. A read-only 500-row vocabulary sample now runs and produces
+4,369 `lexical_v1` tokens, but remains `RUNTIME_PROOF_PENDING`; it did not write
+the vocabulary table or any vector projection.
+The bounded sample also corrected a misleading `bm25_v1` weighting label: its
+actual implementation is hashed log-TF without IDF, now reported as
+`legacy_code_aware_logtf_v1`. It is not a BM25/BM42/SPLADE/miniCOIL proof.
+The bounded shadow collection plan also passes in dry-run mode for the
+allowlisted `codebase_chunks_sparse_test_v1` target with dense `content` 768
+and sparse `lexical_v1`; `apply=false`, so no Qdrant collection was created.
+The readback verifier was corrected to target the shadow collection and inspect
+bounded point vectors rather than the canonical dense collection. The existing
+shadow returned 10/10 dense and 10/10 `lexical_v1` sparse samples. This proves
+projection shape only; the sparse algorithm remains legacy log-TF, not proven
+BM42/SPLADE/miniCOIL.
+The self-query also returned 10 points, but this is execution evidence only;
+the corrected receipt records `QUERY_EXECUTED_QUALITY_NOT_PROVEN` because no
+ground-truth recall or MRR set was supplied.
+The RRF ablation command currently emits a pending evaluation ledger only;
+dense-only, sparse-only, RRF, recall, and NDCG values remain unmeasured. It does
+not change the canonical fusion owner or retrieval policy.
+The promotion command was hardened to fail closed while those metrics are
+pending. It now returns `BLOCKED_RRF_EVALUATION_PENDING` and does not mutate the
+supersession registry.
+The RRF scaffold now discovers the workspace-level 15-query keyword dataset;
+it still reports `RUNTIME_PROOF_PENDING` because those labels are not yet mapped
+to packet-level relevance and no dense/sparse/RRF comparison has run.
+The evaluation-input audit confirms stable query IDs and text but no packet-key,
+source-ref, or graded relevance judgments. It returns
+`MISSING_PACKET_LEVEL_GROUND_TRUTH` and writes only a local report, so quality
+metrics and sparse promotion remain blocked.
+The annotation-template command now exports 15 review rows with the existing
+keyword hints and empty packet/source judgments. Rows remain
+`NEEDS_HUMAN_REVIEW`; no relevance labels are invented and no runtime store is
+changed.
+The annotation validator now fail-closes until all 15 rows have reviewed
+packet/source judgments with no duplicate identities. Current status is
+`BLOCKED_REVIEW_PENDING`.
+The read-only proposal pass produced 271 keyword-based candidate suggestions
+from canonical source rows. They remain `PROPOSED_NOT_GROUND_TRUTH` and require
+review; they do not change packets, Qdrant, or retrieval policy.
+The proposal audit found 161 unique packet/source identities and 110 repeated
+identities across queries. This is acceptable for per-query review but is not a
+relevance judgment; sparse promotion remains blocked.
+The legacy-artifact supersession command is protected by the same gate and now
+returns `BLOCKED_RRF_EVALUATION_PENDING` without changing the registry.
+
+Embedding runtime correction (2026-08-20): FastEmbed is optional ONNX
+inference tooling, not a replacement for Ollama/EmbeddingGemma, TurboVec,
+Qdrant HNSW, or pgvector. The current official FastEmbed Python model table
+does not list EmbeddingGemma. Jina Embeddings v2 base-en and base-code can
+produce 768-dimensional vectors, but they are separate representation spaces
+and require their own parity/evaluation receipt before use. EmbeddingGemma
+MRL targets are 768/512/256/128; 384 remains legacy-only. `latent_64` is a
+separate routing autoencoder projection from the 768 source, not an MRL lane.
 
 TurboVec LOD clarification: the approximately 32 GB → 4 GB target is a
 quantization benchmark hypothesis, not a current workstation fact. Rust
@@ -195,6 +302,18 @@ Parent-Atlas `SemanticSnapshotV1`, ordinal map, or workload-specific index.
 Those benchmark files are reference evidence only; they do not prove
 EmbeddingGemma `semantic_768` recall, residency, or process working set.
 
+The merged read-only null-hash audit was executed against the real local
+Postgres/Qdrant owners with a 20-row sample. All 20 rows classified as
+`METADATA_REPAIR_CANDIDATE`: source content, finite 768-dim Postgres vectors,
+Qdrant points, matching source refs, and vector cosine agreement were present.
+This is sample evidence only; no metadata repair or re-embedding is authorized.
+
+Windows runtime readiness is currently strong: TurboVec `:8791`, Qdrant,
+the native bridge, cuVS compression capability, and the dense collection all
+passed the existing read-only audit at 100/100. WSL2 Ubuntu is installed on
+version 2 but stopped, and its Python environment lacks `cuvs`, `cugraph`,
+`cupy`, and `torch`; the native Windows/sidecar path remains the active owner.
+
 An existing candidate input was validated read-only at
 `.tmp/atlas-vector-snapshots/vector-snapshot-5k-turbovec-input.ndjson`:
 100/100 rows passed the `semantic_768`/768-finite-float and identity checks,
@@ -217,6 +336,64 @@ for LangChain/Deep Agents/OpenWiki/PyTorch/PostgreSQL AIO/pgvector, and
 evidence-linked Kanban recommendations. These are governance and proof tasks;
 they do not create a second truth store or authorize live migrations.
 
+Embedding lane update (2026-08-20): `EMB0` is now `PROVEN` by the read-only
+`docs/reports/emb0-embeddinggemma-writer-proof.{json,md}` receipt. The live
+Ollama EmbeddingGemma owner returned finite normalized 768-dimensional vectors
+for both document and query prompts, with `semantic_768`,
+`embeddinggemma-native-768-v1`, workspace/source revisions, and source-card
+identity. `EMB1` and `EMB2` are now proven on bounded read-only fixtures;
+`EMB3A` remains degraded by missing live lineage, not by vector shape. No
+canonical or projection data was modified.
+
+`EMB1` is now `PROVEN` as a bounded live sidecar corpus: seven deterministic
+semantic cards cover FILE, MODULE, CLASS, INTERFACE, FUNCTION, METHOD, and
+TYPE units. The corpus preserves exact spans, structural relationships, scope
+context, revisions, and upstream chunk provenance without creating embeddings
+or changing canonical/projection stores. `EMB2` is proven below and `EMB3A`
+Qdrant projection verification remains unstarted.
+
+`EMB2` is now `PROVEN` on the bounded EMB1 corpus: 7/7 structural cards were
+embedded by the live canonical EmbeddingGemma owner and passed 768-dimensional
+finite/normalized checks with lineage preserved. The vectors remain a
+disposable JSONL artifact; Qdrant projection work (`EMB3A`) is read-only and
+blocked only on upstream revision ownership.
+
+`EMB3A` inspection is now `PARTIAL_PROVEN`: the live
+`codebase_chunks_768` collection is reachable and confirmed 768/COSINE with
+identity payloads in the bounded sample. Revision payload coverage is absent
+in that sample and the EMB2 fixture is not indexed, so revision-filter and
+same-fixture round-trip proof remain blocked. No Qdrant points or collections
+were modified.
+
+The follow-up writer-lineage audit is also read-only and identified the live
+SvelteKit owner at `qdrant-sync-worker.ts` → `qdrant-sync-payload.ts` →
+`qdrant-payload-enricher.ts`. Its complete revision-lineage payload contract is
+present, but Qdrant population and non-zero upstream revision values remain
+unproven. Do not backfill or promote EMB3A until bounded readback proves those
+fields.
+
+Bounded EMB3A lineage readback (2026-08-20) sampled 50 PostgreSQL packet rows
+and 50 Qdrant points read-only. The packet sample had zero non-zero workspace,
+source, or representation revisions; the Qdrant sample had zero corresponding
+fields and no join. Status: `LINEAGE_POPULATION_NOT_PROVEN`. The next task is
+to establish the upstream revision source or document the migration prerequisite;
+no payload backfill has been applied.
+
+EMB3A v2 read-only proof update (2026-08-20): the live target is
+`codebase_chunks_768_v2` with physical dense vector `content` (768/COSINE),
+while the logical representation remains `semantic_768`. The proof now checks
+identity/revision coverage, functional filters versus payload-index presence,
+an explicit `_atlas_system_record=true` exclusion query, and the mutation
+guard. Current result: dense schema, sentinel exclusion, and mutation guard
+pass; identity/revision lineage, revision filters, and EMB2 fixture round-trip
+remain unproven. No projection writes occurred.
+
+Writer hardening now rejects missing/invalid revision lineage before a Qdrant
+sync payload is built; it no longer silently converts missing revisions to
+zero/null. Focused Vitest and full TypeScript validation were attempted but
+did not complete with diagnostics, so this hardening is not marked test-proven
+yet.
+
 OKF cross-domain status (2026-08-14): `DomainClassificationV1`, the derived
 4×6 mapping envelope, tuple lifecycle/source-span extensions, and
 `OkfRecommendationV1` are now CREATED and focused-test PROVEN. The existing
@@ -230,6 +407,14 @@ exists at `docs/reports/okf-runtime-ownership.json` and `.md`; it classifies
 canonical, derived, executor, projection, cache, recommendation, and optional
 orchestration surfaces, but does not prove live reachability. No runtime
 services or canonical data changed.
+
+Frontend dependency/render review (2026-08-20): Svelte 5.53.3, SvelteKit
+2.59.1, `drizzle-orm` 0.45.2, and `drizzle-kit` 0.31.10 are now declared and
+installed in `sveltekit-frontend`; `drizzle-kit check` passed. The local
+`/admin` page rendered with HTTP 200, `System Overview`, and zero browser
+console errors. Full `svelte-check` remains a separate pre-existing blocker
+(87 errors, 291 warnings) and is not represented as fixed by this smoke gate.
+Evidence: `docs/reports/okf-sveltekit-admin-smoke.json` and `.md`.
 
 DAG-4 / Query Adaptive Synthesis status (2026-08-14): the bounded sampler is
 `CREATED` and focused-test `PROVEN_FIXTURE`. It is wired as a non-blocking,
@@ -262,16 +447,17 @@ adapter, including process affinity, prior execution success, and reuse
 probability. Canonical symbol identity, graph revision, and task lineage remain
 explicit inputs to that adapter and are not inferred from `packetKey`. The live
 producer export still needs to bind those inputs before rows can be generated.
-Repository reachability review also found no live caller currently emitting
-`CandidateFeatureMatrixRowV1`; the schema and in-memory matrix builder exist,
-but producer wiring is not proven. This remains the next implementation gate,
+Repository reachability review found the existing matrix owner and an opt-in
+read-only `createAtlasSearchAdapter().searchWithQas()` caller. The caller
+composition is now wired and focused-tested, but no live invocation has yet
+emitted `CandidateFeatureMatrixRowV1` rows. This remains the next runtime gate,
 not a reason to create a second QAS feature store.
 The bounded producer function now calls the existing matrix builder and rejects
 incomplete presence-mask rows before QAS adaptation. A live SearchRuntime call
 site is still required; the producer function alone is not production proof.
-The existing Atlas SearchRuntime adapter now exposes a read-only projection
-helper for that call site; it still requires an external feature projection and
-identity/revision resolver.
+The existing Atlas SearchRuntime adapter now exposes both a read-only projection
+helper and an opt-in `searchWithQas()` caller; it still requires an external
+feature projection and identity/revision resolver.
 The projection result now includes accepted rows, categorized rejections, and
 the same-request exact baseline. Artifact emission remains in the existing
 QAS harness; the runtime adapter does not write files.
@@ -290,3 +476,334 @@ plus existing Graphify and feature-owner evidence produce revision-qualified
 JSONL audit rows. DuckDB is a later join backend, Arrow IPC a later compute
 artifact, and simdjson/GPU sampling/BitFrost residency/Kanban/ACE remain
 deferred until the CPU exact baseline is proven.
+
+The read-only EMB3A upstream revision-owner audit (2026-08-20) now returns
+`REVISION_OWNER_NOT_PROVEN`. `atlas_packets` exposes workspace and representation
+revision columns, but workspace values are all zero and only one representation
+value is non-zero; source revision and representation ID are absent.
+`atlas_ast_nodes.source_revision` exists but has zero populated values, and no
+representation-record owner was found. These columns are not treated as lineage
+authority until a real populated revision source is proven. No canonical or
+projection data was modified.
+
+Live packet lineage dry-run (2026-08-20):
+`npm run atlas:embedding:emb3a:packet-live-dry-run` reached the live PostgreSQL
+packet table and inspected 25 rows. None contained explicit source content;
+all 25 were blocked with `SOURCE_CONTENT_NOT_STORED_IN_PACKET_ROW`, producing
+`LIVE_INPUT_BLOCKED_SOURCE_CONTENT_UNAVAILABLE`. The dry-run adapter and live
+database binding are proven, but authoritative source-byte resolution remains
+open. Do not derive a code revision from summaries, paths, hashes, or Qdrant
+payloads. The next safe implementation is a read-only source snapshot/file
+content resolver keyed by `source_ref`, followed by the same dry-run receipt.
+No canonical, Qdrant, or Valkey writes occurred.
+
+The follow-up live resolver also checks `graphify_files` plus its
+`graphify_runs.repository_revision` owner and verifies current workspace bytes
+against `content_hash` before deriving a source revision. The current database
+does not expose `public.graphify_files` (`graphifySourceTableAvailable=false`),
+so the result remains `LIVE_INPUT_BLOCKED_SOURCE_CONTENT_UNAVAILABLE` with
+`graphifySourceRows=0`, `sourceContentRows=0`, `readyRows=0`, and
+`blockedRows=25`. No path, summary, hash-only value, or Qdrant payload was
+promoted to source content.
+
+The read-only source-lineage inventory
+(`npm run atlas:embedding:emb3a:source-lineage-audit`) returns
+`SOURCE_LINEAGE_OWNER_NOT_FOUND`: `public.graphify_files` is absent from the
+live database. `atlas_source_revisions` is present but remains an unrelated
+acquisition owner with no proven code-packet binding. Applying a migration is
+outside this proof gate; the next decision is to deploy or identify the
+existing canonical source-inventory owner, then rerun the dry-run.
+
+Migration reconciliation confirms `drizzle/001_graphify_lineage.sql` exists in
+the repository, but no `001_graphify_lineage` entry is present in either local
+Drizzle journal and `public.graphify_files` is absent from the live database.
+This is an unapplied-migration decision point. Do not use `drizzle-kit push`,
+direct SQL, or packet backfill to close EMB3A; schema deployment and its
+post-deployment source/hash readback require a separate authorized gate.
+
+The read-only schema checks add a separate repository gate: Drizzle migration
+consistency passes, but live drift comparison is `EXPECTED_SNAPSHOT_MISSING`
+because `_journal.json` points to `0040_snapshot.json` while `drizzle/meta`
+currently ends at `0039_snapshot.json`. The comparator now records this as a
+structured failure instead of throwing. Do not synthesize the snapshot or run
+a migration as part of the lineage proof.
+
+The 2026-08-20 candidate census adds bounded counts for likely source owners.
+The live database has no `atlas_packets`, `atlas_ast_nodes`, `graphify_files`,
+`analysis_pass_results`, or `codebase_chunk_index` tables in the active schema.
+`atlas_source_refs` has 22,487 content hashes but no source references or
+revisions; `atlas_source_revisions` has 2 content digests but no source
+references or revision columns; `file_index`, `storage_files`, and
+`uploaded_files` are empty or expose no usable lineage fields. The status
+remains `SOURCE_LINEAGE_OWNER_NOT_FOUND`; no table was promoted and no
+schema/data write occurred.
+
+GPH-17 local execution (2026-08-20): `graphify:daily` was run through the
+real startup wrapper with native structural-only mode, `APPLY=0`, symbol
+creation disabled, limit 5, and the indexing prefix. It completed
+`REACHABILITY_PROVEN_DRY_RUN`; 5 files were processed, 0 evidence rows were
+written, and 0 symbols were created/versioned. This closes wrapper reachability
+only. A non-fatal invalid canonical DB URL warning was emitted. The local
+checkout does not contain the separately claimed GPH-14R source-revision
+authority fields or GPH-18 persistence readback collector, so those gates
+remain open.
+
+GPH-14R hardening is now present locally: structural materialization exposes a
+nullable canonical `sourceRevision`, a SHA-256 `sourceVersionAnchor`, and
+explicit `sourceRevisionAuthority`; parser revision tokens remain opaque
+correlation metadata. Native parser provenance no longer authorizes promotion
+without proven revision authority. Focused materializer, batch, and adapter
+tests pass 11/11. The live Graphify dry-run remains nonpromotable with
+`CONTENT_ANCHOR_ONLY` and performed no writes.
+
+GPH-18 now has a read-only persistence-owner collector at
+`scripts/atlas/prove-graphify-structural-persistence-readback.mjs`. It
+identifies `PARENT_ATLAS_ATLAS_EVIDENCE_LEDGER` as the intended
+`atlas_evidence` owner but the live table is absent, so the receipt is
+`PERSISTENCE_OWNER_NOT_READY`. No canary row or other database mutation was
+attempted. Schema deployment and source-revision authority remain separate
+blocked gates.
+
+Retrieval collection contract freeze (2026-08-20): `codebase_chunks_768_v2`
+is modeled as dense-only `semantic_768`/EmbeddingGemma with physical vector
+`content`; sparse BM42/SPLADE/miniCOIL is not implied. `tree_node_id` and
+`symbol_version_id` remain payload identity/provenance, while domain tags,
+4D topology, KMeans/SOM/community labels, and PageRank remain filter/routing
+metadata. A pure blocked plan exists for future revision indexes, but no
+Qdrant index or payload migration is authorized while upstream revision
+lineage is unpopulated. KMeans and HNSW are rebuildable retrieval artifacts;
+Postgres remains canonical truth and Valkey remains hot routing/cache state.
+
+Graphify→Qdrant fanout alignment update (2026-08-20): the existing read-only
+fanout proof now applies the pure alignment gate to each Qdrant neighbor. The
+live run reached Postgres, Neo4j, and Qdrant; bounded fanout and canonical
+identity passed. The sampled Qdrant payload lacks workspace/graph revision and
+uses `embeddinggemma_768_native_v1`/`dense_768` rather than the frozen
+`semantic_768`/`content` contract, so lineage alignment is `DEGRADED`. No
+Qdrant, Postgres, Neo4j, or Valkey writes occurred.
+
+Qdrant payload propagation hardening (2026-08-20): the existing sync payload
+builder now accepts the database row's explicit representation aliases,
+requires canonical `semantic_768`, carries optional graph/identity lineage,
+and fails closed when `source_revision` is missing. This repairs the builder
+boundary only; it does not invent source revisions or authorize a backfill.
+
+The companion writer audit found 9 payload writers, with only the live
+SvelteKit payload path classified as a complete-lineage candidate; legacy and
+backfill scripts omit revision fields and remain blocked for alignment use.
+
+The upstream audit also found `atlas_source_revisions` with two populated
+content-digest rows. That table belongs to acquisition/web-source revisions;
+no proven binding exists to `atlas_packets` code identities, so it remains an
+adjacent owner rather than the code ingestion source-revision authority. The
+single apparent digest overlap is rejected as an untrusted empty-SHA collision
+on a generated Turbovec lock-file packet matched to `https://example.com`.
+
+`CodeSourceRevisionV1` now defines a pure UTF-8/SHA-256 code-content revision
+contract. It is tested but not persisted or wired into packet materialization;
+that ownership decision remains open.
+
+The packet lineage dry-run adapter and proof command are now implemented. The
+fixture receipt is `DRY_RUN_CONTRACT_PROVEN_INPUT_BINDING_OPEN`; it compares
+content digests and fails closed without canonical writes. Live packet input
+binding remains open.
+
+The existing `semantic-packet-writer.ts` is recorded as a representation
+writer candidate, while `qdrant-sync-worker.ts` remains the Qdrant projection
+writer. Neither currently proves populated workspace/source revision authority;
+do not make the projection worker infer revisions from mutable latest state.
+
+GPH bounded execution update (2026-08-20): focused Graphify structural
+materializer/adapter tests passed 7/7. Live 8095 failure isolation passed 4/4
+with valid files completing alongside malformed `ERROR` and missing-delimiter
+recovery cases. The bounded incremental proof returned `BOUNDED_PROVEN` for
+unchanged skip, changed-file re-extraction, and explicit deletion tombstone
+input. This proves executor contracts, not production `graphify:daily`
+reachability, persistence, projection readback, or fallback policy. Native
+Tree-sitter incremental reuse remains a separate optimization; no daily owner
+switch or legacy supersession is authorized.
+
+GPH production dry-run tranche (2026-08-20): the new
+`GraphifyStructuralBatchV1` wrapper and focused tests are present. Contract
+tests pass 3/3 and the live 8095 dry-run is `DRY_RUN_PROVEN`: 3 proven files,
+1 recovered malformed file, 1 unchanged skip, 1 changed re-extraction, and 1
+deletion tombstone. Persistence/readback and `graphify:daily` reachability are
+explicitly false; the native apply flag remains disabled and no canonical or
+projection stores were modified.
+
+GPH-17C reachability proof (2026-08-20): the existing startup wrapper now has
+an explicit proof-only mode, `GRAPHIFY_NATIVE_STRUCTURAL_ONLY=1`, which invokes
+the native materializer with `APPLY=0` while skipping the write-capable daily
+chain. A missing public export boundary in `@deeds/parent-atlas` was fixed for
+the existing evidence/symbol repositories. The limit-2 run returned
+`REACHABILITY_PROVEN_DRY_RUN` with zero writes. Both sampled files were
+`COMPATIBILITY_ONLY`, so reachability is proven but native provenance quality,
+persistence, and canonical owner acceptance remain open.
+
+GPH-17 verifier hardening (2026-08-20): the new read-only verifier checks the
+reachability receipt schema, dry-run-only flags, child completion, native
+receipt checksum, zero write counters, and skipped daily-chain state. The
+bounded rerun returned `GPH17_LIVE_REACHABILITY_PROVEN`. The native proof
+runner now uses a validated local `pg` pool instead of importing the full app
+DB client, removing the unrelated invalid-URL startup warning. No apply,
+symbol creation, persistence, or projection write was enabled.
+
+Node Tree-sitter challenger update (2026-08-20): added a separate
+`createNodeTreeSitterAstProvider()` behind the existing `AstProvider` seam.
+The locked Node parser/TypeScript grammar emits the existing structural
+evidence shape, preserves byte spans, and cannot persist or promote canonical
+identity. Focused challenger validation passed 1/1 and SvelteKit TypeScript
+validation passed. The 8095 sidecar remains the current migration executor;
+no provider switch or apply path was made.
+
+## Session 2026-08-20: branch merge consolidation, duplicate-owner cleanup, G11 localhost hardening
+
+**Branch merge audit.** 17 new `agent/*`/`atlas/*`/`feature/*`/`codex/*`/`parent-atlas-*`
+remote branches surveyed. Only 3 actually landed on `main` via PR (#6
+`agent/parent-atlas-aug16-integration`, #7 `agent/atlas-feature-intelligence-specs`,
+#8 `feature/parent-atlas-spectral-multihop`) — the remaining 14, including
+`agent/parent-atlas-integration-reconciliation-aug18`, are NOT merged and were
+never audited as if they were. `aug16` and `aug18` are divergent siblings (neither
+is an ancestor of the other), not sequential despite the naming; `aug16`'s content
+reached `main` only via `atlas-feature-intelligence-specs`. Local `main` was
+772 commits behind `origin/main` at session start and was fast-forwarded
+(local uncommitted WIP stashed first, restored after, one real merge conflict
+in `code-evidence-projection-worker.ts` resolved — duplicate type-import block,
+kept the upstream side).
+
+**Merkle-identity-pack import** (`parent-atlas-event-merkle-identity-pack/`,
+a stray doubled-directory scaffold drop at repo root, dated 2026-08-12, never
+wired into any workspace). Compared file-by-file against the live codebase
+before importing anything, per this doc's own duplication-prevention
+discipline: `contracts/events.ts` was `ALREADY_EXISTS` (`event-fabric.ts`
+already owns the same 6 envelope classes as Zod schemas) except `WorkCommandV1`,
+deliberately not ported (the pack's own `NEXT_AGENT_PROMPT.md` says command
+queues are not integration-event queues). `contracts/merkle.ts`'s envelope
+types were also not ported — `event-fabric.ts`'s `CheckpointCommitPayloadV1`
+already owns that shape; only the genuinely new RFC-9162 Merkle tree hashing
+primitives were ported, adapted to emit the existing payload type instead of
+a second one. Genuine gaps ported as-is: `graph-identity.ts` (branded
+`symbolId`/`symbolVersionId`/`treeNodeId`/`graphNodeKey` identity types,
+sitting beneath the existing `packet_key`/`source_ref` lineage contract, not
+duplicating it), `identity-audit.ts`, `kanban-contracts.ts` (a priority-scoring
+formula, not a competing task-board owner), `parent-atlas-daily-compiler.ts`.
+Landed at `sveltekit-frontend/src/lib/server/atlas/{merkle,identity,graph,daily}/`.
+`npx tsgo --noEmit` clean on all ported files. **Not applied**: the 3 SQL
+migration templates — the pack's own README says they need schema
+reconciliation first; per this repo's Drizzle Safety Rule they stay
+unreviewed/unapplied, archived alongside the rest of the pack (see
+`docs/archive-manifest.json`, 2026-08-20 entries).
+
+**Test coverage + live wiring proof added same session (2026-08-20).** Wrote
+the 4 spec files this port had zero coverage for; all 5 pass, 19/19 tests.
+Then wired `buildAnalyticsCheckpoint()` to a real caller — deliberately not
+the gated `graphify:daily` chain (GPH-17 `OWNER_SELECTION_BLOCKED`) and not
+`runParentAtlasDailyCompiler` (its GPU-feature/recommendation ports have no
+real backing anywhere in the repo yet). Investigation found
+`event-fabric-analytics-projection.ts`'s `projectCheckpointCommit()` was
+already wired to a real durable sink (`analytics-sink.ts` — Postgres
+`analytics_events` insert + Redis Streams `XADD`) with zero producers.
+New standalone proof script `sveltekit-frontend/scripts/atlas/merkle-checkpoint-demo.mts`
+(manually-invoked only, same class as `pagerank-authority-demo.mts`) pulls
+real `analytics_events` rows, builds a real checkpoint, emits it through
+that path, and reads the result back. Live run independently re-verified via
+direct `psql`: row `703eec9c-d659-4d93-b921-20cc68afb347`,
+`merkleRoot=51f5dddcb7c531254aa89afa7110b9be5418fd52693fd76aac0f325531d97ce0`
+confirmed landed. One bug fixed along the way: the script hung on exit
+(open `pg.Pool`/`ioredis` handles from imported singletons) — fixed with an
+explicit `process.exit()` in `.finally()`. Leaf-manifest persistence remains
+demo-scope only (no durable leaf-manifest table exists yet) — the checkpoint
+root and its real-infrastructure landing are proven; the per-leaf audit
+trail is not.
+
+**Top-level `src/` duplication cleanup.** A second, unregistered SvelteKit-shaped
+`src/` tree (196 files) at repo root, predating this merge wave by ~3 months
+(introduced commit `93c23afbf0`, mid-May), collides on 54 filenames with the
+real `sveltekit-frontend/src/`. Root-level `tests/`, `cypress/`, `__tests__/`
+that reference it are confirmed not wired into any CI or test runner (no root
+`package.json` test script, no `.github/workflows`, no `cypress.config.*`
+anywhere). Of the 54: 16 were confirmed as pure stubs relative to
+sveltekit-frontend (placeholder/no-op vs. sveltekit-frontend's real, tested
+implementation — e.g. `graph-retriever.ts` root was a 15-line stub returning
+`[]` vs. sveltekit-frontend's 130-line real retriever; `pagerank-promotion-gate.ts`
+root was additionally stale, still calling the PG18-removed `isfinite()`
+float overload) and were initially archived to
+`deeds_labs/archive/2026-08-20/root-src-stubs/` and removed from the working
+tree. **This was a mistaken archival, corrected same session.** The
+pre-archival check only verified zero *cross-tree* importers (root `src/` vs
+`sveltekit-frontend/src/`) and never checked whether other root-only files —
+with no sveltekit-frontend counterpart — depend on the archived files
+internally. Root `src/` turned out to be an internally-coherent mini-package
+(its own `contracts/index.ts`, `retrieval/index.ts`, `ranking/index.ts`,
+`context/index.ts` barrel files, enrichers, retrievers, rankers
+cross-importing each other), not scattered stray duplicates. Concretely,
+`scripts/atlas/pagerank-authority-demo.mts` (a legitimate manually-runnable
+demo script, not CI-wired but not dead) imports the archived
+`pagerank-authority-contract.ts`, which sits beside `pagerank-authority-builder.ts`
+(root-only, no sveltekit-frontend duplicate, never touched) — that file
+internally imports the one that got archived. A broader re-check found 11 of
+the 16 had real internal dependents within root `src/` itself. All 16
+restored to their original locations same session; manifest entries in
+`docs/archive-manifest.json` updated with `restored` timestamps and the
+corrected root-cause note, following this repo's own prior
+`phase101-parent-atlas-packetizer.js` incident precedent. **Whether root
+`src/` as a whole is scaffold-for-future-integration or dead weight remains
+an open, undecided question** — archival of any of it should not be
+attempted again without first mapping the tree's full internal dependency
+graph, not just its filename collisions with sveltekit-frontend.
+**~12 collisions are `COMPETING_REAL`** — both sides
+are genuine, differing implementations, left in place pending manual
+reconciliation, NOT archived: `ace-materializer.ts`, `centroid-compression.ts`,
+`ace-packet-reader.ts`, `ace-packet-validator.ts`, `ace-packet-writer.ts`
+(root does inline Postgres+Redis, sveltekit-frontend delegates to
+`ace-packet-store.ts` — check that file before deciding), `feature-tracking-layer.ts`
+(root uses raw `pg` Pool, sveltekit-frontend uses Drizzle — sveltekit-frontend
+matches convention), `cross_store_identity_verifier.ts`, `runtime-lease-manager.ts`,
+`domain-classifier.ts` (classifier/, not the archived indexing/ re-export),
+and a **live DB schema divergence** — `synthesis-logs.ts` schema + paired
+`synthesis-logger.ts` — root uses integer PK, sveltekit-frontend uses uuid PK
+with a materially different shape; do not touch either without an explicit
+schema-migration review. **1 `ROOT_ONLY_VALUE`** not yet ported:
+`topology-ontology.ts` root has 2 `TOPOLOGY_CLASSES` entries
+(`storage_boundary`, `inference_boundary`) and 2 `DOMAIN_CLUSTERS` entries
+(`documents-atlas`, `observability`) sveltekit-frontend's copy lacks — worth
+porting just those array entries. **15 collisions sized but not read**
+(same stub-pattern size skew as the confirmed 16, unverified): `cross-ranker.ts`,
+`embedding-cache.ts`, `embedding-contract-768.ts`, `embedding-service.ts`,
+`gpu-compute-pipeline.ts`, `ingest-packet-schema.ts`, `learning-loop.ts`
+(flagged — root is *bigger* than sveltekit-frontend's copy here, a possible
+reversal of the usual pattern, check this one first), `normalize-labels.ts`,
+`openai-facade.ts`, `redis-cache-aggressive.ts`, `search-lanes.ts`,
+`search-runtime.ts`, `shared-cache-api.ts`, `unified-orchestrator.ts`,
+`validation-result-v1.ts`.
+
+**G11 localhost-hardcoding hardening** (from a `/deep-audit` pass against the
+existing `codebase-graph.json` index, code tier gates G1-G26). Of 61 files the
+index flagged, 30 were false positives already using the correct
+`ENV.X ?? 'http://127.0.0.1:PORT'` fallback pattern (or, for `api-endpoints.ts`/
+`ollama-endpoint.ts`/`phase101-parent-atlas-packetizer.{js,mjs}`, ARE
+themselves the canonical resolver whose final-fallback literal is correct by
+design). The other 31 had at least one real unguarded hardcode; 19 files
+across 21 call sites were fixed — server-side via the existing `ENV` object
+in `env.server.ts` where a key existed, local `process.env.X ?? fallback`
+matching established repo style where it didn't (`POLICY_RERANKER_*`,
+`CRAWL4AI_URL`, `FEATURE_EXTRACTOR_URL`, `TURBOVEC_HEALTH_URL`,
+`POSTGRES_HEALTH_URL`, `REDIS_HEALTH_URL`), and `$env/dynamic/public` +
+`PUBLIC_*` vars for the 3 client-side `.svelte` call sites (browser code
+can't read server env). One real bug caught and fixed before it shipped:
+the first edit to `mcp/server.ts`'s TRACE MCP proxy would have dropped the
+required `/mcp` path suffix whenever `TRACE_MCP_URL` is actually set,
+breaking the request — caught by checking that env var's canonical usage
+elsewhere in the same file before assuming the fix was correct. `npx tsgo
+--noEmit` clean on all 19 touched files.
+
+**Still open, not started this session**:
+- G4 (44 API routes without `locals.user` auth check, 6 legitimately public
+  — auth/login/logout/register/reset-password/session, health — 38 real
+  gaps, 4 of them `api/admin/*` and highest-risk)
+- G5 (44 mutating routes without Zod body validation)
+- G20 (16 cyclic import pairs, not yet itemized)
+- The ~12 `COMPETING_REAL` src/ collisions above (needs manual reconciliation,
+  not mechanical)
+- `topology-ontology.ts` 4-entry port
+- The 15 unread src/ collisions (start with `learning-loop.ts`, the size-reversal flag)

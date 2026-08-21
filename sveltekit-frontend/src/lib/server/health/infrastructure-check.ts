@@ -15,6 +15,8 @@
  * PostHog for UI analytics.
  */
 
+import { ENV } from '$lib/server/env.server.js';
+
 interface ServiceHealth {
   name: string;
   port: number;
@@ -163,43 +165,43 @@ export async function checkInfrastructure(): Promise<InfrastructureSnapshot> {
   const checks = [
     {
       name: 'Gemma4 (Synthesis)',
-      url: 'http://127.0.0.1:8090/health',
+      url: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/health`,
       protocol: 'http' as const,
       critical: true,
     },
     {
       name: 'Go Retrieval',
-      url: 'http://127.0.0.1:8100/health',
+      url: `${ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100'}/health`,
       protocol: 'http' as const,
       critical: true,
     },
     {
       name: 'Ollama (Embeddings)',
-      url: 'http://127.0.0.1:11434/api/tags',
+      url: `${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/tags`,
       protocol: 'http' as const,
       critical: true,
     },
     {
       name: 'Qdrant',
-      url: 'http://127.0.0.1:6333/health',
+      url: `${ENV.QDRANT_URL}/health`,
       protocol: 'http' as const,
       critical: true,
     },
     {
       name: 'TurboVec',
-      url: 'http://127.0.0.1:8791/health',
+      url: `${process.env.TURBOVEC_HEALTH_URL?.trim() || 'http://127.0.0.1:8791'}/health`,
       protocol: 'http' as const,
       critical: false,
     },
     {
       name: 'Postgres',
-      url: 'http://127.0.0.1:5434/health',
+      url: `${process.env.POSTGRES_HEALTH_URL?.trim() || 'http://127.0.0.1:5434'}/health`,
       protocol: 'http' as const,
       critical: true,
     },
     {
       name: 'Valkey/Redis',
-      url: 'http://127.0.0.1:6379/health',
+      url: `${process.env.REDIS_HEALTH_URL?.trim() || 'http://127.0.0.1:6379'}/health`,
       protocol: 'http' as const,
       critical: false,
     },

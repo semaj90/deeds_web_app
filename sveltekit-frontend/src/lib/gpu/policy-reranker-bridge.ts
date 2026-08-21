@@ -78,7 +78,7 @@ async function loadViaGRPC(
 
   const policyProto = grpc.loadPackageDefinition(packageDefinition) as any;
   const client = new policyProto.policy.PolicyReranker(
-    'localhost:50055', // serve-policy-reranker.py gRPC port
+    process.env.POLICY_RERANKER_GRPC_URL?.trim() || 'localhost:50055', // serve-policy-reranker.py gRPC port
     grpc.credentials.createInsecure()
   );
 
@@ -93,7 +93,7 @@ async function loadViaHTTP(
   config: PolicyModelConfig
 ): Promise<PolicyRerankerModel> {
   // HTTP endpoint: serve-policy-reranker.py
-  const baseUrl = 'http://localhost:8334';
+  const baseUrl = process.env.POLICY_RERANKER_HTTP_URL?.trim() || 'http://127.0.0.1:8334';
 
   // Health check
   const health = await fetch(`${baseUrl}/health`);

@@ -194,13 +194,13 @@ export function validateAceSynthesisGraph(input: z.input<typeof aceSynthesisGrap
     if (node.kind === 'PREFILL_CACHE_LOOKUP') {
       if (node.execution_condition !== 'ALWAYS') throw new Error(`ACE_SYNTHESIS_LOOKUP_MUST_ALWAYS_RUN:${node.node_id}`);
       const required = new Set(['FEATURE_ALIGNMENT', 'EXACT_PROMOTION']);
-      const seen = new Set(upstream.map((parent) => parent.kind));
+      const seen = new Set<string>(upstream.map((parent) => parent.kind));
       for (const kind of required) if (!seen.has(kind)) throw new Error(`ACE_SYNTHESIS_LOOKUP_MISSING_${kind}:${node.node_id}`);
     }
 
     if (node.kind === 'PREFILL_COMPILE') {
       const required = new Set(['FEATURE_ALIGNMENT', 'EXACT_PROMOTION']);
-      const seen = new Set(upstream.map((parent) => parent.kind));
+      const seen = new Set<string>(upstream.map((parent) => parent.kind));
       for (const kind of required) if (!seen.has(kind)) throw new Error(`ACE_SYNTHESIS_PREFILL_MISSING_${kind}:${node.node_id}`);
       if (hasCacheBranch) {
         if (node.execution_condition !== 'PREFILL_CACHE_MISS') throw new Error(`ACE_SYNTHESIS_PREFILL_COMPILE_MUST_RUN_ON_MISS:${node.node_id}`);

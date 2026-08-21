@@ -1,0 +1,21 @@
+{
+  "canonical_authority": false,
+  "canonical_payload_key": "postgres_id",
+  "collection": "codebase_chunks_768_v2",
+  "corpus_sample_rows": 200,
+  "dimension": 768,
+  "k": 10,
+  "mean_overlap_at_k": 1.0,
+  "minimum_overlap_at_k": 0.95,
+  "minimum_query_overlap_at_k": 1.0,
+  "qdrant_mean_latency_ms": 3.8524340498042875,
+  "qdrant_result_checksum": "950afcc47630c58ef69840b470652a9b86c259f134287f39201afe9689a027c7",
+  "query_count": 20,
+  "representation_id": "semantic_768",
+  "schema": "atlas.sidecar-qdrant-exact-alignment-receipt.v1",
+  "sidecar_mean_latency_ms": 173.4407164505683,
+  "sidecar_result_checksum": "950afcc47630c58ef69840b470652a9b86c259f134287f39201afe9689a027c7",
+  "sidecar_url": "http://127.0.0.1:8098",
+  "status": "ALIGNED",
+  "vector_name": "content"
+}

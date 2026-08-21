@@ -9,7 +9,12 @@ import {
   buildPosConceptTaggingPacket,
   type PosConceptTaggingPacket,
 } from '../atlas/pos-concept-tagging-lane.js';
+import { CANONICAL_SEMANTIC_REPRESENTATION_ID } from '../atlas/contracts/feature-extraction-v1.js';
 
+// Kept as a literal revision label (not derived from CANONICAL_SEMANTIC_REPRESENTATION_ID)
+// — representationRevision is a free-form string, and renaming an already-issued
+// revision tag is a bigger behavioral change than this migration's scope. New
+// revisions of this envelope should use a semantic_512-prefixed tag.
 const DEFAULT_REPRESENTATION_REVISION = 'semantic_768@1';
 const DEFAULT_SEMANTIC_FEATURE_ENVELOPE_REVISION = 'semantic-feature-envelope.v1';
 const DEFAULT_PRODUCER_ID = 'pos-concept-source-adapter';
@@ -129,7 +134,7 @@ export const SemanticFeatureEnvelopeSchema = z
     titleId: z.string().nullable(),
     featureId: z.string().min(1),
     featureLabel: z.string().min(1),
-    representationId: z.literal('semantic_768'),
+    representationId: z.literal(CANONICAL_SEMANTIC_REPRESENTATION_ID),
     representationRevision: z.string().min(1),
     producerId: z.string().min(1),
     producerRevision: z.string().min(1),
@@ -374,7 +379,7 @@ export async function buildPosConceptTaggingPacketFromSource(
     jsonlRecordIndex: input.jsonlRecordIndex ?? 0,
     jsonlLineNumber: input.jsonlLineNumber ?? 0,
     jsonlParserRevision: input.jsonlParserRevision ?? 'jsonl-parser-v1',
-    representationId: 'semantic_768',
+    representationId: CANONICAL_SEMANTIC_REPRESENTATION_ID,
     representationRevision,
     producerId,
     producerRevision,
@@ -428,7 +433,7 @@ export async function buildPosConceptTaggingPacketFromSource(
     titleId: input.titleId ?? null,
     featureId,
     featureLabel,
-    representationId: 'semantic_768' as const,
+    representationId: CANONICAL_SEMANTIC_REPRESENTATION_ID,
     representationRevision,
     producerId,
     producerRevision,

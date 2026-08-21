@@ -73,7 +73,7 @@ export interface SearchResult {
 export interface ACPTool {
   name: string;
 	description: string;
-  category: 'search' | 'database' | 'storage' | 'llm' | 'external' | 'code' | 'fix' | 'error-analysis';
+  category: 'search' | 'database' | 'storage' | 'llm' | 'external' | 'code' | 'fix' | 'error-analysis' | 'graph-analysis';
   inputSchema: any;
 	outputSchema: any;
   examples: ToolExample[];

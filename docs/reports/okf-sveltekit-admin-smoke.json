@@ -1,0 +1,35 @@
+{
+  "status": "PROVEN_DEPENDENCIES_AND_ADMIN_RENDER",
+  "timestamp": "2026-08-20T17:43:00-07:00",
+  "workspace": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "frontend": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+  "dependencies": {
+    "svelte": { "version": "5.53.3", "declared": true },
+    "@sveltejs/kit": { "version": "2.59.1", "declared": true },
+    "drizzle-orm": { "version": "0.45.2", "declared": true },
+    "drizzle-kit": { "version": "0.31.10", "declared": true }
+  },
+  "checks": {
+    "npmInstall": "PASS",
+    "drizzleKitCheck": "PASS",
+    "adminHttp": { "url": "http://127.0.0.1:5173/admin", "status": 200 },
+    "adminBrowserRender": "PASS",
+    "adminVisibleHeading": "System Overview",
+    "adminConsoleErrors": 0,
+    "svelteCheck": "FAIL_EXISTING_87_ERRORS_291_WARNINGS"
+  },
+  "ownershipReview": {
+    "deepAgents": "OPTIONAL_ORCHESTRATION_OUTSIDE_CANONICAL_TRUTH",
+    "langChain": "OPTIONAL_ORCHESTRATION_OUTSIDE_CANONICAL_TRUTH",
+    "langGraph": "OPTIONAL_ORCHESTRATION_OUTSIDE_CANONICAL_TRUTH",
+    "openWiki": "OPTIONAL_DOCUMENTATION_SURFACE_OUTSIDE_CANONICAL_TRUTH",
+    "liveReachability": "NOT_PROVEN_BY_STATIC_OWNERSHIP_AUDIT",
+    "durablePersistence": "NOT_PROVEN_BY_STATIC_OWNERSHIP_AUDIT"
+  },
+  "canonicalWrites": false,
+  "notes": [
+    "Drizzle dependencies were physically installed but missing from the frontend manifest; declarations and lockfile entries were repaired.",
+    "The first dev-server probe required initial Vite/SvelteKit compilation; the subsequent browser render passed.",
+    "Full svelte-check remains blocked by pre-existing type errors outside this dependency repair."
+  ]
+}

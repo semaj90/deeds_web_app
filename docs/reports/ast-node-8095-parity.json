@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "atlas.ast.node.8095.parity.v1",
+  "generatedAt": "2026-08-20T20:20:21.145Z",
+  "status": "DEGRADED_COMPATIBILITY_GAP",
+  "currentExecutor": "treesitter-chunker-8095",
+  "challenger": "treesitter-node",
+  "endpoint": "http://127.0.0.1:8095",
+  "filesChecked": 6,
+  "canonicalWrites": false,
+  "canonicalPromotionAllowed": false,
+  "deferred": [
+    "typed edge parity",
+    "native provenance parity",
+    "canonical identity parity",
+    "provider switch"
+  ],
+  "results": [
+    {
+      "name": "functions",
+      "status": "DEGRADED",
+      "node": {
+        "status": "PROVEN",
+        "chunkCount": 4,
+        "names": [
+          "add",
+          "helper"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FILE",
+          "FUNCTION"
+        ],
+        "diagnostics": []
+      },
+      "sidecar8095": {
+        "status": "PROVEN",
+        "chunkCount": 3,
+        "names": [
+          "add",
+          "helper"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FUNCTION"
+        ],
+        "diagnostics": []
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [],
+      "spanMismatches": 0,
+      "edges": {
+        "node": 1,
+        "sidecar8095": 13
+      }
+    },
+    {
+      "name": "class-interface",
+      "status": "DEGRADED",
+      "node": {
+        "status": "PROVEN",
+        "chunkCount": 6,
+        "names": [
+          "Shape",
+          "Square",
+          "area"
+        ],
+        "kinds": [
+          "CLASS",
+          "EXPORT",
+          "FILE",
+          "INTERFACE",
+          "METHOD"
+        ],
+        "diagnostics": []
+      },
+      "sidecar8095": {
+        "status": "PROVEN",
+        "chunkCount": 6,
+        "names": [
+          "Shape",
+          "Square",
+          "area"
+        ],
+        "kinds": [
+          "CLASS",
+          "EXPORT",
+          "INTERFACE",
+          "METHOD"
+        ],
+        "diagnostics": []
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [],
+      "spanMismatches": 1,
+      "edges": {
+        "node": 2,
+        "sidecar8095": 12
+      }
+    },
+    {
+      "name": "imports-exports",
+      "status": "DEGRADED",
+      "node": {
+        "status": "PROVEN",
+        "chunkCount": 6,
+        "names": [
+          "run"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FILE",
+          "FUNCTION",
+          "IMPORT",
+          "VARIABLE"
+        ],
+        "diagnostics": []
+      },
+      "sidecar8095": {
+        "status": "PROVEN",
+        "chunkCount": 5,
+        "names": [
+          "run"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FRAGMENT",
+          "FUNCTION",
+          "IMPORT"
+        ],
+        "diagnostics": []
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [
+        "FRAGMENT"
+      ],
+      "spanMismatches": 0,
+      "edges": {
+        "node": 3,
+        "sidecar8095": 10
+      }
+    },
+    {
+      "name": "nested-callbacks",
+      "status": "DEGRADED",
+      "node": {
+        "status": "PROVEN",
+        "chunkCount": 3,
+        "names": [
+          "outer"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FILE",
+          "FUNCTION"
+        ],
+        "diagnostics": []
+      },
+      "sidecar8095": {
+        "status": "PROVEN",
+        "chunkCount": 3,
+        "names": [
+          "outer"
+        ],
+        "kinds": [
+          "EXPORT",
+          "FUNCTION"
+        ],
+        "diagnostics": []
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [],
+      "spanMismatches": 0,
+      "edges": {
+        "node": 1,
+        "sidecar8095": 10
+      }
+    },
+    {
+      "name": "test-file",
+      "status": "DEGRADED",
+      "node": {
+        "status": "PROVEN",
+        "chunkCount": 2,
+        "names": [],
+        "kinds": [
+          "FILE",
+          "IMPORT"
+        ],
+        "diagnostics": []
+      },
+      "sidecar8095": {
+        "status": "PROVEN",
+        "chunkCount": 3,
+        "names": [],
+        "kinds": [
+          "FUNCTION",
+          "IMPORT"
+        ],
+        "diagnostics": []
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [
+        "FUNCTION"
+      ],
+      "spanMismatches": 0,
+      "edges": {
+        "node": 1,
+        "sidecar8095": 15
+      }
+    },
+    {
+      "name": "malformed",
+      "status": "DEGRADED",
+      "node": {
+        "status": "RECOVERED_WITH_ERRORS",
+        "chunkCount": 1,
+        "names": [],
+        "kinds": [
+          "FILE"
+        ],
+        "diagnostics": [
+          "ERROR:1:7"
+        ]
+      },
+      "sidecar8095": {
+        "status": "RECOVERED_WITH_ERRORS",
+        "chunkCount": 1,
+        "names": [],
+        "kinds": [
+          "FRAGMENT"
+        ],
+        "diagnostics": [
+          "Tree-sitter ERROR at line 1, column 8: ERROR"
+        ]
+      },
+      "missingNames": [],
+      "extraNames": [],
+      "missingKinds": [
+        "FRAGMENT"
+      ],
+      "spanMismatches": 0,
+      "edges": {
+        "node": 0,
+        "sidecar8095": 0
+      }
+    }
+  ]
+}

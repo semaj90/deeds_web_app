@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { env as publicEnv } from '$env/dynamic/public';
 	import * as Bits from 'bits-ui';
 	import type {
 		AtlasNode,
@@ -498,7 +499,7 @@
 	async function loadTurboVec() {
 		tvLoading = true;
 		try {
-			const r = await fetch('http://localhost:8099/health');
+			const r = await fetch(`${publicEnv.PUBLIC_TURBOVEC_URL ?? 'http://localhost:8099'}/health`);
 			tvHealth = r.ok ? await r.json() : null;
 		} catch { tvHealth = null; } finally { tvLoading = false; }
 	}

@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.embeddinggemma.llama.runtime.proof.v1",
+  "generatedAt": "2026-08-20T21:58:17.880Z",
+  "executor": "llama.cpp",
+  "endpoint": "http://127.0.0.1:8081/v1/embeddings",
+  "representationId": "semantic_768",
+  "modelId": "google/embeddinggemma-300m",
+  "nativeDimension": 768,
+  "normalization": "L2",
+  "artifact": {
+    "path": "models\\embeddinggemma-300m-q8_0.gguf",
+    "bytes": 333590880,
+    "sha256": "4a2f0fe92d9326ed8cc69e543f997d748d806a2c534d48974350afa5a292d4bf"
+  },
+  "promptModes": [
+    "retrieval_query",
+    "code_query",
+    "document"
+  ],
+  "samples": [
+    {
+      "mode": "retrieval_query",
+      "inputDigest": "81bce09bb51171600b88a1b43ee53d81d8a9de1b89a8e6dec8e28ef99e66729a",
+      "first": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.0000000119909729,
+        "normalized": true,
+        "digest": "7e640d69217c717f06563e5ec517aa2e09befb38b8ae1d85e0480b7dd1a9841e"
+      },
+      "second": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.0000000119909729,
+        "normalized": true,
+        "digest": "7e640d69217c717f06563e5ec517aa2e09befb38b8ae1d85e0480b7dd1a9841e"
+      },
+      "sameDigest": true
+    },
+    {
+      "mode": "code_query",
+      "inputDigest": "7a63c927455d7a5677b8f3c206063d71e8e46cbe0c82597646256b72468a75ea",
+      "first": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.0000000322406633,
+        "normalized": true,
+        "digest": "2bdea7d841bad513212d458eb908dc1fe5ce4079bcf18bfa879360f011280c53"
+      },
+      "second": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.0000000322406633,
+        "normalized": true,
+        "digest": "2bdea7d841bad513212d458eb908dc1fe5ce4079bcf18bfa879360f011280c53"
+      },
+      "sameDigest": true
+    },
+    {
+      "mode": "document",
+      "inputDigest": "1a2ec95bb54309f19c1170ac1917a11cd2a72aa11e7ac88dbf03681c0a95850f",
+      "first": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.000000032214639,
+        "normalized": true,
+        "digest": "67dcfc6c202977877e78719dadab7d5b793e406d11178a84ecffb37b42e58b95"
+      },
+      "second": {
+        "dimension": 768,
+        "finite": true,
+        "l2Norm": 1.000000032214639,
+        "normalized": true,
+        "digest": "67dcfc6c202977877e78719dadab7d5b793e406d11178a84ecffb37b42e58b95"
+      },
+      "sameDigest": true
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "embeddingArtifacts": false
+  },
+  "status": "PROVEN"
+}

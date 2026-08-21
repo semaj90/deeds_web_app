@@ -1,6 +1,6 @@
 # QAS Owner Audit
 
-Generated: 2026-08-14T19:21:32.024Z
+Generated: 2026-08-21T03:45:40.642Z
 
 Status: **OWNER_AUDIT_PARTIAL**
 
@@ -15,11 +15,12 @@ Canonical QAS owner: `sveltekit-frontend/src/lib/server/atlas/retrieval/query-ad
 - **recommendationKanban** — EXISTS_LINKAGE_PENDING — `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts`
 - **aceBitfrost** — EXISTS_POLICY_PENDING — `sveltekit-frontend/src/lib/server/atlas/rlm/bitfrost-policy.ts`
 - **qasCandidateInput** — MISSING — `docs/reports/atlas-qas-candidate-features.jsonl`
-- **candidateFeatureMatrixProducer** — DEFINITION_ONLY_NO_LIVE_CALLER — `sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts`
+- **candidateFeatureMatrixProducer** — CALLER_FOUND_UNPROVEN — `sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts`
+- **searchRuntimeQasCaller** — WIRED_READ_ONLY_CALLER — `sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts::searchWithQas`
 
 ## Remaining gates
 - revision-qualified QAS candidate feature input
-- live CandidateFeatureMatrixRowV1 producer caller
+- live CandidateFeatureMatrixRowV1 producer invocation
 - exact SearchRuntime promotion adapter and recall baseline
 - SOM/domain route binding
 - QAS receipt to existing Kanban recommendation linkage

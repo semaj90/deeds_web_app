@@ -1,0 +1,4 @@
+# Live graph profiling add-on only.
+# RAPIDS/cuGraph/cuVS/CuPy remain owned by the existing Atlas RAPIDS environment.
+# Do not use this file to reinstall or resolve the CUDA/PyTorch/RAPIDS stack.
+nvtx==0.2.15

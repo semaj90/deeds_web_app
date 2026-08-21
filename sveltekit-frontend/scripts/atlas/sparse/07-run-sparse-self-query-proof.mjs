@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Pool } from 'pg';
 import path from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from '../load-atlas-env.mjs';
 import { assertSafeCollection } from './lib/collection-guard.mjs';
@@ -40,16 +41,36 @@ async function main() {
     limit: 10,
   });
 
-  console.log(JSON.stringify({
+  const points = response?.result?.points ?? [];
+  const summary = points.map((point) => ({
+    id: point.id,
+    score: point.score ?? null,
+    source_ref: point.payload?.source_ref ?? null,
+    content_hash: point.payload?.content_hash ?? null,
+    representation_id: point.payload?.representation_id ?? null,
+  }));
+  const payload = {
     artifact_id: 'atlas-sparse-self-query-v1',
-    status: 'RUNTIME_PROVEN',
+    status: 'QUERY_EXECUTED_QUALITY_NOT_PROVEN',
     qdrant_base_url: qdrantBaseUrl(),
     collection,
     query_text: queryText,
     sample_count: rows.length,
     sparse_terms: sparse.indices.length,
-    response: response?.result ?? response,
-  }, null, 2));
+    result_count: summary.length,
+    results: summary,
+    quality: {
+      recall_at_k: null,
+      mrr: null,
+      ground_truth: 'NOT_SUPPLIED',
+    },
+    writes: { postgres: false, qdrant: false, valkey: false },
+  };
+  const proofPath = path.join(REPO_ROOT, '.tmp', 'atlas-sparse-self-query-proof.json');
+  await mkdir(path.dirname(proofPath), { recursive: true });
+  await writeFile(proofPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+
+  console.log(JSON.stringify({ ...payload, proof_path: proofPath }, null, 2));
 }
 
 try {

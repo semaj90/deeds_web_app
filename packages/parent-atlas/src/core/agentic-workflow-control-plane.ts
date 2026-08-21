@@ -6,7 +6,7 @@ const id = z.string().min(1);
 const revision = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 
-export const A2A_PROTOCOL_VERSION = '1.0.0' as const;
+export const A2A_CONTROL_PLANE_PROTOCOL_VERSION = '1.0.0' as const;
 export const A2A_TASK_STATES = [
   'TASK_STATE_SUBMITTED',
   'TASK_STATE_WORKING',
@@ -35,7 +35,7 @@ export const atlasA2aArtifactSchema = z.object({
 export const a2aTaskProjectionSchema = z.object({
   schema: z.literal('atlas.a2a-task-projection.v1').default('atlas.a2a-task-projection.v1'),
   protocol: z.literal('A2A'),
-  protocol_version: z.literal(A2A_PROTOCOL_VERSION),
+  protocol_version: z.literal(A2A_CONTROL_PLANE_PROTOCOL_VERSION),
   task_id: id,
   context_id: id,
   workflow_id: id,
@@ -82,7 +82,7 @@ export const acpToA2aMigrationReceiptSchema = z.object({
   workflow_id: id,
   a2a_task_id: id,
   a2a_context_id: id,
-  target_protocol_version: z.literal(A2A_PROTOCOL_VERSION),
+  target_protocol_version: z.literal(A2A_CONTROL_PLANE_PROTOCOL_VERSION),
   payload_checksum: checksum,
   migration_checksum: checksum,
   canonical_authority: z.literal(false).default(false),
@@ -291,7 +291,7 @@ export function workflowEventToA2aTask(input: {
   const raw = {
     schema: 'atlas.a2a-task-projection.v1' as const,
     protocol: 'A2A' as const,
-    protocol_version: A2A_PROTOCOL_VERSION,
+    protocol_version: A2A_CONTROL_PLANE_PROTOCOL_VERSION,
     task_id: input.task_id,
     context_id: input.context_id,
     workflow_id: event.workflowId,

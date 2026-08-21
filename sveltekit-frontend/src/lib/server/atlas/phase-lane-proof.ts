@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
-  SEMANTIC_REPRESENTATION_ID,
-  SEMANTIC_DIMENSION,
-} from '../embedding/embedding-contract-768.js';
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from './retrieval/qdrant-semantic-projection.js';
 
 export const PARENT_ATLAS_PHASE_LANE_PROOF_IDS = [15] as const;
 

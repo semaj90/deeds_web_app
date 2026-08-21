@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 export const FabricLaneKindSchema = z.enum([
 	'gnn_graph_evidence',

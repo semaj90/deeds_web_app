@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { env as publicEnv } from '$env/dynamic/public';
   import Icon from '$lib/components/ui/Icon.svelte';
 
   // ── Scene inputs ──────────────────────────────────────────────────────────
@@ -59,7 +60,7 @@
   let selectedId   = $state<string | null>(null);
 
   // ── Service URL ───────────────────────────────────────────────────────────
-  const IMAGE_SVC = 'http://localhost:8092';
+  const IMAGE_SVC = publicEnv.PUBLIC_IMAGE_SVC_URL ?? 'http://localhost:8092';
 
   // ─────────────────────────────────────────────────────────────────────────
   // WebGPU Init

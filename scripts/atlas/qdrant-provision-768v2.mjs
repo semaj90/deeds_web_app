@@ -107,6 +107,7 @@ function buildVectorsConfig(contract) {
  * Build the sparse-vectors config for BM42 lane.
  */
 function buildSparseVectorsConfig(contract) {
+  if (!contract.sparseVectorKey) return undefined;
   return {
     [contract.sparseVectorKey]: {
       index: { on_disk: false },
@@ -125,6 +126,13 @@ const PAYLOAD_INDEXES = [
   { field: 'title_id',     schema: { type: 'keyword' } },
   { field: 'tags',         schema: { type: 'keyword' } },
   { field: 'updated_at',   schema: { type: 'datetime' } },
+  { field: 'workspace_revision', schema: { type: 'integer' } },
+  { field: 'source_revision', schema: { type: 'keyword' } },
+  { field: 'representation_id', schema: { type: 'keyword' } },
+  { field: 'representation_revision', schema: { type: 'integer' } },
+  { field: 'tree_node_id', schema: { type: 'keyword' } },
+  { field: 'symbol_version_id', schema: { type: 'keyword' } },
+  { field: '_atlas_system_record', schema: { type: 'bool' } },
 ];
 
 // ── Existence check ───────────────────────────────────────────────────────────
@@ -239,7 +247,6 @@ async function main() {
   // 4. Build creation payload
   const createBody = {
     vectors:        buildVectorsConfig(contract),
-    sparse_vectors: buildSparseVectorsConfig(contract),
     hnsw_config: {
       m:            16,
       ef_construct: 100,
@@ -249,6 +256,8 @@ async function main() {
     },
     on_disk_payload: false,
   };
+  const sparseVectors = buildSparseVectorsConfig(contract);
+  if (sparseVectors) createBody.sparse_vectors = sparseVectors;
 
   if (VERBOSE) {
     verb('Collection create body:', JSON.stringify(createBody, null, 2));

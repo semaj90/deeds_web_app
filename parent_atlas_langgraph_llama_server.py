@@ -59,7 +59,8 @@ NEO4J_PASSWORD     = os.environ.get("NEO4J_PASSWORD",   "password")
 SEARXNG_URL        = os.environ.get("SEARXNG_URL",      "http://searxng:8080")
 LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal-iq4xs-direct.gguf")
 EMBED_SERVER_URL   = os.environ.get("EMBED_SERVER_URL", "http://host.docker.internal:8081").rstrip("/")
-EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma-384")
+EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma:latest")
+EMBEDDING_DIMENSION = 768
 REPO_ROOT          = os.environ.get("REPO_ROOT",        "/workspace/repo")
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.65"))
 REDIS_L1_PREFIX    = "llm:exact:"
@@ -67,7 +68,7 @@ REDIS_L1_TTL       = 3600  # 1 hour — matches TS redis-exact-match.ts
 REDIS_KAG_PREFIX   = "langgraph:kag:neighbors:"  # pre-warm cache written by Colab Cell 11
 REDIS_KAG_TTL      = 86_400  # 24 h — refreshed by nightly Colab run
 BIFROST_THRESHOLD  = float(os.environ.get("BIFROST_THRESHOLD", "0.80"))
-CODE_COLLECTION    = os.environ.get("CODE_COLLECTION", "codebase_chunks_384_hybrid")
+CODE_COLLECTION    = os.environ.get("CODE_COLLECTION", "codebase_chunks_768")
 CODE_TOP_K         = int(os.environ.get("CODE_TOP_K", "12"))
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
@@ -180,7 +181,13 @@ async def embed_query(text: str) -> list[float]:
         data = response.json().get("data", [])
         if not data or "embedding" not in data[0]:
             raise RuntimeError("Embedding server returned no embedding")
-        return [float(value) for value in data[0]["embedding"]]
+        embedding = [float(value) for value in data[0]["embedding"]]
+        if len(embedding) != EMBEDDING_DIMENSION:
+            raise RuntimeError(
+                f"EmbeddingGemma semantic_768 requires {EMBEDDING_DIMENSION} dimensions; "
+                f"received {len(embedding)} from {EMBED_MODEL}"
+            )
+        return embedding
 
 
 async def llama_chat_completion(

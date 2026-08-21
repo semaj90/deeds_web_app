@@ -5,7 +5,7 @@
  * Validates that config/vector-lanes.json is valid and adheres to all schema constraints:
  * 1. JSON parses successfully
  * 2. Zod schema validates without error
- * 3. activeCanonicalLane is set to "atlas-retrieval-384-v1"
+ * 3. activeCanonicalLane is set to "atlas-semantic-768-v1"
  * 4. Exactly 1 lane has status = "canonical"
  * 5. All cosine-distance lanes use L2 normalization
  * 6. No duplicate laneIds across registry
@@ -290,13 +290,13 @@ test(2, 'Zod schema validates all lanes', () => {
 });
 
 // ============================================================================
-// Gate 3: activeCanonicalLane is atlas-retrieval-384-v1
+// Gate 3: activeCanonicalLane is atlas-semantic-768-v1
 // ============================================================================
 
-test(3, 'activeCanonicalLane is "atlas-retrieval-384-v1"', () => {
-  if (validatedRegistry.activeCanonicalLane !== 'atlas-retrieval-384-v1') {
+test(3, 'activeCanonicalLane is "atlas-semantic-768-v1"', () => {
+  if (validatedRegistry.activeCanonicalLane !== 'atlas-semantic-768-v1') {
     throw new Error(
-      `Expected "atlas-retrieval-384-v1", got "${validatedRegistry.activeCanonicalLane}"`
+      `Expected "atlas-semantic-768-v1", got "${validatedRegistry.activeCanonicalLane}"`
     );
   }
 });

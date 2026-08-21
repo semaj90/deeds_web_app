@@ -24,7 +24,10 @@ import neo4j, { type Session } from 'neo4j-driver';
 import { resolveCodebaseFilePacketKeys } from '../../src/lib/server/graph/graph-packet-key-resolver.js';
 import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import { resolveCanonicalIdentity } from '../../src/lib/server/ace/identity-contract.js';
-import { normalizeQdrantPayloadIdentity } from '../../src/lib/server/ace/retrieval/evidence-lanes.js';
+import {
+  evaluateGraphQdrantFanoutAlignment,
+  type GraphQdrantFanoutAlignmentResult,
+} from '../../src/lib/server/atlas/graph/graph-qdrant-fanout-alignment.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -59,6 +62,9 @@ const PREFERRED_RELATIONSHIP_TYPES = [
 dotenv.config({ path: ENV_FILE, override: false });
 dotenv.config({ path: ENV_LOCAL_FILE, override: true });
 loadRuntimeEnv({ cwd: REPO_ROOT, mode: 'development' });
+
+type NormalizeQdrantPayloadIdentity = typeof import('../../src/lib/server/ace/retrieval/evidence-lanes.js').normalizeQdrantPayloadIdentity;
+let normalizeQdrantPayloadIdentity: NormalizeQdrantPayloadIdentity;
 
 type StageStatus = 'PASS' | 'DEGRADED' | 'FAIL';
 
@@ -136,6 +142,7 @@ type CanonicalNeighbor = {
   atlas_packet: AtlasPacketRow | null;
   canonical_identity: ReturnType<typeof resolveCanonicalIdentity>;
   qdrant: QdrantProjectionHit | null;
+  qdrant_alignment: GraphQdrantFanoutAlignmentResult;
   graph_evidence: {
     seed_canonical_id: string;
     edge_type: string;
@@ -599,6 +606,7 @@ async function lookupQdrantProjection(
 }
 
 async function main(): Promise<void> {
+  ({ normalizeQdrantPayloadIdentity } = await import('../../src/lib/server/ace/retrieval/evidence-lanes.js'));
   const reportJson = readFlagValue('--report-json', DEFAULT_REPORT_JSON) ?? DEFAULT_REPORT_JSON;
   const reportMd = readFlagValue('--report-md', DEFAULT_REPORT_MD) ?? DEFAULT_REPORT_MD;
   const seedLimit = Number(readFlagValue('--seed-limit', '25') ?? '25');
@@ -618,6 +626,8 @@ async function main(): Promise<void> {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     max: 4,
+    connectionTimeoutMillis: Math.min(stageTimeouts.seed, 5000),
+    statement_timeout: Math.min(stageTimeouts.seed, 5000),
   });
   const driver = createNeo4jDriver();
   const session = driver.session();
@@ -813,6 +823,14 @@ async function main(): Promise<void> {
           atlas_packet: atlasPacket,
           canonical_identity: canonicalIdentity,
           qdrant: null,
+          qdrant_alignment: evaluateGraphQdrantFanoutAlignment({
+            packetKey: atlasPacket?.packet_key ?? packetKeyMap.get(normalizeGraphPath(neighbor.graph_key)) ?? neighbor.graph_key,
+            sourceRef: atlasPacket?.source_ref ?? null,
+            treeNodeId: atlasPacket?.tree_node_id ?? null,
+            workspaceRevision,
+            graphRevision: seed.candidate.graph_revision,
+            qdrantPayload: null,
+          }),
           graph_evidence: {
             seed_canonical_id: seed.atlasPacket.packet_key,
             edge_type: neighbor.edge_type,
@@ -845,9 +863,18 @@ async function main(): Promise<void> {
           treeNodeId: atlasPacket?.tree_node_id ?? null,
           qdrantPointId: atlasPacket?.qdrant_point_id ?? null,
         });
+        const qdrantAlignment = evaluateGraphQdrantFanoutAlignment({
+          packetKey: atlasPacket?.packet_key ?? packetKeyMap.get(normalizeGraphPath(neighbor.graph_key)) ?? neighbor.graph_key,
+          sourceRef: atlasPacket?.source_ref ?? null,
+          treeNodeId: atlasPacket?.tree_node_id ?? null,
+          workspaceRevision,
+          graphRevision: seed.candidate.graph_revision,
+          qdrantPayload: qdrant?.payload ?? null,
+        });
         enriched.push({
           ...neighbor,
           qdrant,
+          qdrant_alignment: qdrantAlignment,
         });
       }
       return enriched;
@@ -872,6 +899,7 @@ async function main(): Promise<void> {
         canonical_identity: neighbor.canonical_identity,
         qdrant_identity: neighbor.qdrant?.normalized_identity ?? null,
         qdrant_point_id: neighbor.qdrant?.point_id ?? null,
+        qdrant_alignment: neighbor.qdrant_alignment,
         process_ids: neighbor.qdrant?.process_ids ?? [],
       }));
     });
@@ -899,6 +927,10 @@ async function main(): Promise<void> {
     const canonicalNeighborCount = neighborsWithQdrant.filter((neighbor) => neighbor.canonical_identity.status === 'canonical').length;
     const degradedNeighborCount = neighborsWithQdrant.length - canonicalNeighborCount;
     const qdrantProjectionCount = neighborsWithQdrant.filter((neighbor) => neighbor.qdrant !== null).length;
+    const qdrantAlignmentResults = neighborsWithQdrant.map((neighbor) => neighbor.qdrant_alignment);
+    const qdrantIdentityMismatchCount = qdrantAlignmentResults.filter((result) => result.status === 'IDENTITY_MISMATCH').length;
+    const qdrantLineageGapCount = qdrantAlignmentResults.filter((result) => result.status === 'LINEAGE_GAP').length;
+    const qdrantFanoutAligned = qdrantProjectionCount > 0 && qdrantAlignmentResults.every((result) => result.status === 'ALIGNED');
     const qdrantContractOk = true;
     const seedCanonicalIdentity = seed.atlasPacket.packet_key;
     const seedCanonicalMatch =
@@ -920,15 +952,20 @@ async function main(): Promise<void> {
       GRAPH_FANOUT_BOUNDED: neighborsWithQdrant.length <= fanoutLimit,
       GRAPH_EVIDENCE_PRESERVED: neighborsWithQdrant.every((neighbor) => Boolean(neighbor.graph_evidence.graph_revision)),
       QDRANT_CONTENT_VECTOR_CONTRACT_768: qdrantContractOk,
+      QDRANT_FANOUT_IDENTITY_ALIGNED: qdrantIdentityMismatchCount === 0 && qdrantProjectionCount > 0,
+      QDRANT_FANOUT_LINEAGE_ALIGNED: qdrantFanoutAligned,
+      QDRANT_FANOUT_SEMANTIC_REPRESENTATION_ALIGNED: qdrantProjectionCount > 0 && qdrantAlignmentResults.every((result) => result.semanticRepresentationAligned),
+      QDRANT_FANOUT_IDENTITY_MISMATCH_COUNT: qdrantIdentityMismatchCount,
+      QDRANT_FANOUT_LINEAGE_GAP_COUNT: qdrantLineageGapCount,
       BM42_NOT_REQUIRED: true,
       PROCESS_PACKET_LANE_UNCHANGED: true,
       SEED_CANONICAL_MATCH: seedCanonicalMatch,
       NO_DUPLICATE_IDENTITY_RESOLVER: true,
     };
 
-    const status: ProofReport['status'] = !qdrantContractOk || !seedCanonicalMatch || !neighborsWithQdrant.length
+    const status: ProofReport['status'] = !qdrantContractOk || !seedCanonicalMatch || !neighborsWithQdrant.length || qdrantIdentityMismatchCount > 0
       ? 'FAIL'
-      : degradedNeighborCount > 0
+      : degradedNeighborCount > 0 || !qdrantFanoutAligned
         ? 'DEGRADED'
         : 'PROVEN';
 
@@ -978,6 +1015,9 @@ async function main(): Promise<void> {
         'GRAPH_FANOUT_BOUNDED',
         'GRAPH_EVIDENCE_PRESERVED',
         'QDRANT_CONTENT_VECTOR_CONTRACT_768',
+        'QDRANT_FANOUT_IDENTITY_ALIGNED',
+        'QDRANT_FANOUT_LINEAGE_ALIGNED',
+        'QDRANT_FANOUT_SEMANTIC_REPRESENTATION_ALIGNED',
         'BM42_NOT_REQUIRED',
         'PROCESS_PACKET_LANE_UNCHANGED',
       ],
@@ -1047,6 +1087,7 @@ async function main(): Promise<void> {
     process.exitCode = 1;
   } finally {
     await session.close().catch(() => {});
+    await driver.close().catch(() => {});
     await pool.end().catch(() => {});
   }
 }

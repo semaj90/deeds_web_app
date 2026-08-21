@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 export const GraphifyTaskCandidatePrioritySchema = z.enum(['P0', 'P1', 'P2', 'P3']);
 

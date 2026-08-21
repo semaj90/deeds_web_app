@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
+import { LanguageSourceCoordinateV1Schema } from './language-intelligence-plan.js';
+
 export const ApiContractTransportV1Schema = z.enum([
   'HTTP',
   'GRPC',
@@ -11,16 +13,33 @@ export const ApiContractTransportV1Schema = z.enum([
 ]);
 export type ApiContractTransportV1 = z.infer<typeof ApiContractTransportV1Schema>;
 
+export const ApiContractEvidenceSourceV1Schema = z.enum([
+  'TREE_SITTER',
+  'AST_GREP',
+  'TS_MORPH',
+  'OPENAPI',
+  'PROTOBUF',
+  'ZOD',
+  'JSON_SCHEMA',
+  'ROUTE_MANIFEST',
+]);
+export type ApiContractEvidenceSourceV1 = z.infer<typeof ApiContractEvidenceSourceV1Schema>;
+
 export const ApiContractObservationV1Schema = z.object({
   schema: z.literal('atlas.api-contract-observation.v1'),
   observationId: z.string().min(1),
   sourceRef: z.string().min(1),
   treeNodeId: z.string().min(1).nullable(),
+  workspaceRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  coordinate: LanguageSourceCoordinateV1Schema,
+  treeNodeId: z.string().min(1),
   symbolVersionId: z.string().min(1).nullable(),
   transport: ApiContractTransportV1Schema,
   method: z.string().min(1).nullable(),
   route: z.string().min(1).nullable(),
   handlerSymbol: z.string().min(1).nullable(),
+  handlerSymbol: z.string().min(1),
   inputSchemaRefs: z.array(z.string().min(1)),
   outputSchemaRefs: z.array(z.string().min(1)),
   authRequirements: z.array(z.string().min(1)),
@@ -50,6 +69,67 @@ function stable(value: unknown): string {
     return `{${Object.entries(value as Record<string, unknown>)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
+  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1),
+  evidenceRefs: z.array(z.string().min(1)).min(1),
+  grammarRevision: z.string().min(1).nullable(),
+  semanticEngineRevision: z.string().min(1).nullable(),
+  producerRevision: z.string().min(1),
+  requiresCanonicalPromotion: z.literal(true),
+  canonicalWritesAllowed: z.literal(false),
+  retrievalVoteAdded: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  if (value.coordinate.treeNodeId !== value.treeNodeId) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['treeNodeId'],
+      message: 'treeNodeId must be inherited from the canonical structural coordinate',
+    });
+  }
+  if (value.coordinate.symbolVersionId !== value.symbolVersionId) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['symbolVersionId'],
+      message: 'symbolVersionId must match the inherited structural coordinate',
+    });
+  }
+  if (value.coordinate.sourceRef !== value.sourceRef) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['sourceRef'],
+      message: 'sourceRef must match the inherited structural coordinate',
+    });
+  }
+});
+export type ApiContractObservationV1 = z.infer<typeof ApiContractObservationV1Schema>;
+
+export const ApiContractNominationV1Schema = z.object({
+  schema: z.literal('atlas.api-contract-nomination.v1'),
+  sourceRef: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  coordinate: LanguageSourceCoordinateV1Schema,
+  transport: ApiContractTransportV1Schema,
+  method: z.string().min(1).nullable(),
+  route: z.string().min(1).nullable(),
+  handlerSymbol: z.string().min(1),
+  inputSchemaRefs: z.array(z.string().min(1)).default([]),
+  outputSchemaRefs: z.array(z.string().min(1)).default([]),
+  authRequirements: z.array(z.string().min(1)).default([]),
+  sideEffects: z.array(z.string().min(1)).default([]),
+  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1),
+  evidenceRefs: z.array(z.string().min(1)).min(1),
+  grammarRevision: z.string().min(1).nullable(),
+  semanticEngineRevision: z.string().min(1).nullable(),
+  producerRevision: z.string().min(1),
+}).strict();
+export type ApiContractNominationV1 = z.infer<typeof ApiContractNominationV1Schema>;
+
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
       .join(',')}}`;
   }
   return JSON.stringify(value) ?? 'null';
@@ -92,5 +172,57 @@ export function buildApiContractObservationV1(
     ...input,
     requiresCanonicalPromotion: true,
     canonicalWritesAllowed: false,
+function observationId(value: ApiContractNominationV1, treeNodeId: string): string {
+  return `api-contract:${createHash('sha256').update(stableStringify({
+    sourceRef: value.sourceRef,
+    sourceRevision: value.sourceRevision,
+    treeNodeId,
+    transport: value.transport,
+    method: value.method,
+    route: value.route,
+    handlerSymbol: value.handlerSymbol,
+    inputSchemaRefs: [...value.inputSchemaRefs].sort(),
+    outputSchemaRefs: [...value.outputSchemaRefs].sort(),
+    producerRevision: value.producerRevision,
+  })).digest('hex')}`;
+}
+
+/**
+ * Promote an API nomination only after a canonical structural coordinate has
+ * been joined. ast-grep/ts-morph may help discover the contract, but neither is
+ * allowed to synthesize a treeNodeId or symbolVersionId here.
+ */
+export function compileApiContractObservationV1(
+  raw: ApiContractNominationV1,
+): ApiContractObservationV1 {
+  const input = ApiContractNominationV1Schema.parse(raw);
+  const treeNodeId = input.coordinate.treeNodeId;
+  if (!treeNodeId) throw new Error('API_CONTRACT_CANONICAL_TREE_NODE_REQUIRED');
+
+  return ApiContractObservationV1Schema.parse({
+    schema: 'atlas.api-contract-observation.v1',
+    observationId: observationId(input, treeNodeId),
+    sourceRef: input.sourceRef,
+    workspaceRevision: input.workspaceRevision,
+    sourceRevision: input.sourceRevision,
+    coordinate: input.coordinate,
+    treeNodeId,
+    symbolVersionId: input.coordinate.symbolVersionId,
+    transport: input.transport,
+    method: input.method,
+    route: input.route,
+    handlerSymbol: input.handlerSymbol,
+    inputSchemaRefs: [...new Set(input.inputSchemaRefs)].sort(),
+    outputSchemaRefs: [...new Set(input.outputSchemaRefs)].sort(),
+    authRequirements: [...new Set(input.authRequirements)].sort(),
+    sideEffects: [...new Set(input.sideEffects)].sort(),
+    evidenceSources: [...new Set(input.evidenceSources)],
+    evidenceRefs: [...new Set(input.evidenceRefs)].sort(),
+    grammarRevision: input.grammarRevision,
+    semanticEngineRevision: input.semanticEngineRevision,
+    producerRevision: input.producerRevision,
+    requiresCanonicalPromotion: true,
+    canonicalWritesAllowed: false,
+    retrievalVoteAdded: false,
   });
 }

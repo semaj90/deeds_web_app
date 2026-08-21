@@ -197,11 +197,12 @@ function buildCodeEvidencePersistedEvent(
 	const producerId = typeof provenance.producerId === 'string' ? provenance.producerId : null;
 	const producerRevision =
 		typeof provenance.producerRevision === 'string' ? provenance.producerRevision : null;
+	const createdAt: unknown = row.createdAt;
 	const occurredAt =
-		row.createdAt instanceof Date
-			? row.createdAt.toISOString()
-			: typeof row.createdAt === 'string'
-				? new Date(row.createdAt).toISOString()
+		createdAt instanceof Date
+			? createdAt.toISOString()
+			: typeof createdAt === 'string'
+				? new Date(createdAt).toISOString()
 				: new Date().toISOString();
 
 	if (!sourceRef || !sourceRevision || !schemaRevision || !producerId || !producerRevision) {

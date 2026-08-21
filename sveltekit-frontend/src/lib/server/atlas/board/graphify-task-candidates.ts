@@ -1,6 +1,6 @@
 import { buildGraphifyTaskCandidate, type GraphifyTaskCandidate } from '../contracts/graphify-task-candidate.js';
 import type { DailyGraphifyBoardData, DailyGraphifyTask } from './daily-graphify-board.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 export interface GraphifyTaskCandidateBuildContext {
 	producerId?: string;

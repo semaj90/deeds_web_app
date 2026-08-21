@@ -1,0 +1,752 @@
+{
+  "schema": "atlas.graphify.structural.integration.proof.v1",
+  "status": "DRY_RUN_PROVEN",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "gph15ParseFailureIsolation": true,
+  "gph16ProductionDeltaOrchestration": true,
+  "productionPersistenceReadback": false,
+  "graphifyDailyReachability": false,
+  "canonicalWrites": false,
+  "receipt": {
+    "schema": "atlas.graphify.structural.batch.v1",
+    "workspaceRevision": "gph-workspace-proof-r1",
+    "producerRevision": "gph-production-batch-v1",
+    "astEngine": "treesitter-chunker-8095",
+    "totalInputs": 6,
+    "upsertInputs": 5,
+    "deleteInputs": 1,
+    "processedFiles": 4,
+    "skippedUnchangedFiles": 1,
+    "provenFiles": 3,
+    "recoveredFiles": 1,
+    "failedFiles": 0,
+    "tombstoneCount": 1,
+    "isolatedFailurePass": true,
+    "incrementalDeltaPass": true,
+    "persistence": "NOT_ATTEMPTED",
+    "canonicalWrites": false,
+    "outputChecksum": "666e5d814484f3dd25ef6719252a66c80b5a2efef34dea33154ff5e571a79727",
+    "items": [
+      {
+        "action": "UPSERT",
+        "sourceRef": "src/valid-a.ts",
+        "sourceRevision": "gph-production-proof-r1",
+        "result": {
+          "sourceRef": "src/valid-a.ts",
+          "sourceRevision": null,
+          "sourceVersionAnchor": "sha256:777af91e13ded9fcc7a77f0171314ef91e37b7236858702c591c03b613935acf",
+          "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+          "provider": "treesitter-chunker-8095",
+          "status": "PROVEN",
+          "evidence": {
+            "schema": "atlas.ast.evidence.v1",
+            "engine": "treesitter-chunker",
+            "engine_version": "4.0.0",
+            "language": "typescript",
+            "file_path": "src/valid-a.ts",
+            "source_revision": "gph-production-proof-r1",
+            "chunks": [
+              {
+                "upstream_chunk_id": "1b5f6bf403a9784ea3a2e33c4f671d0641ffcddcc9f412df04e7296b7dfae541",
+                "node_type": "export_statement",
+                "kind": "export",
+                "name": null,
+                "parent_context": null,
+                "start_byte": 0,
+                "end_byte": 36,
+                "start_line": 1,
+                "start_column": 0,
+                "end_line": 1,
+                "end_column": 36,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              },
+              {
+                "upstream_chunk_id": "f0864da8ee8d33c23eff129ede28b3bd1311088ba13eb8845104307c9559c05d",
+                "node_type": "function_declaration",
+                "kind": "function",
+                "name": "alpha",
+                "parent_context": null,
+                "start_byte": 7,
+                "end_byte": 36,
+                "start_line": 1,
+                "start_column": 7,
+                "end_line": 1,
+                "end_column": 36,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              }
+            ],
+            "edges": [
+              {
+                "from_evidence_key": "file:src/valid-a.ts",
+                "to_evidence_key": "alpha",
+                "type": "EXPORTS",
+                "evidence_start_line": 1,
+                "evidence_start_column": 0,
+                "evidence_end_line": 1,
+                "evidence_end_column": 36,
+                "resolved": false,
+                "resolution": "syntax_only"
+              },
+              {
+                "from_evidence_key": "file:src/valid-a.ts",
+                "to_evidence_key": "f0864da8ee8d33c23eff129ede28b3bd1311088ba13eb8845104307c9559c05d",
+                "type": "DEFINES",
+                "evidence_start_line": 1,
+                "evidence_start_column": 7,
+                "evidence_end_line": 1,
+                "evidence_end_column": 36,
+                "resolved": true,
+                "resolution": "local_chunk"
+              }
+            ],
+            "diagnostics": [],
+            "error_tag": null,
+            "syntax_status": "CLEAN"
+          },
+          "normalized": {
+            "sourceRef": "src/valid-a.ts",
+            "sourceRevision": "gph-production-proof-r1",
+            "parserName": "treesitter-chunker",
+            "parserVersion": "4.0.0",
+            "symbols": [
+              {
+                "upstreamChunkId": "1b5f6bf403a9784ea3a2e33c4f671d0641ffcddcc9f412df04e7296b7dfae541",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "c1231d97bcc8e8b38582d5a4eaffe8d4271e745521f092ea5bafa7397ad363ed",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/valid-a.ts#export:",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "export",
+                "qualifiedSymbol": "",
+                "span": {
+                  "filePath": "src/valid-a.ts",
+                  "startByte": 0,
+                  "endByte": 36,
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 36
+                }
+              },
+              {
+                "upstreamChunkId": "f0864da8ee8d33c23eff129ede28b3bd1311088ba13eb8845104307c9559c05d",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "59448e0a655a5c44f631db81014a48ae073ef653a0dda9db5452aa4066965926",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/valid-a.ts#function:alpha",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "function",
+                "qualifiedSymbol": "alpha",
+                "span": {
+                  "filePath": "src/valid-a.ts",
+                  "startByte": 7,
+                  "endByte": 36,
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 36
+                }
+              }
+            ],
+            "edges": [
+              {
+                "fromEvidenceKey": "file:src/valid-a.ts",
+                "toEvidenceKey": "alpha",
+                "type": "EXPORTS",
+                "resolved": false,
+                "resolution": "syntax_only",
+                "evidence": {
+                  "filePath": "src/valid-a.ts",
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 36
+                }
+              },
+              {
+                "fromEvidenceKey": "file:src/valid-a.ts",
+                "toEvidenceKey": "f0864da8ee8d33c23eff129ede28b3bd1311088ba13eb8845104307c9559c05d",
+                "type": "DEFINES",
+                "resolved": true,
+                "resolution": "local_chunk",
+                "evidence": {
+                  "filePath": "src/valid-a.ts",
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 36
+                }
+              }
+            ],
+            "provenance": {
+              "nativeNodeIdCount": 0,
+              "nativeFileIdCount": 0,
+              "nativeSymbolIdCount": 0,
+              "upstreamChunkIdCount": 2,
+              "compatibilityTreeNodeIdCount": 2
+            },
+            "diagnostics": []
+          },
+          "provenanceReadiness": {
+            "status": "COMPATIBILITY_ONLY",
+            "nativeNodeIds": 0,
+            "nativeFileIds": 0,
+            "nativeSymbolIds": 0,
+            "upstreamChunkIds": 2,
+            "symbolCount": 2,
+            "canonicalPromotionAllowed": false,
+            "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+            "reason": "One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical."
+          },
+          "diagnostics": [
+            "STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY",
+            "SOURCE_REVISION_AUTHORITY_UNPROVEN"
+          ],
+          "persistence": "NOT_ATTEMPTED",
+          "fallback": "NONE"
+        }
+      },
+      {
+        "action": "UPSERT",
+        "sourceRef": "src/malformed.ts",
+        "sourceRevision": "gph-production-proof-r1",
+        "result": {
+          "sourceRef": "src/malformed.ts",
+          "sourceRevision": null,
+          "sourceVersionAnchor": "sha256:7b21271eba55189444aad3c96a679b3a99aa1f856c4912d781fc6be8db306807",
+          "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+          "provider": "treesitter-chunker-8095",
+          "status": "RECOVERED_WITH_ERRORS",
+          "evidence": {
+            "schema": "atlas.ast.evidence.v1",
+            "engine": "treesitter-chunker",
+            "engine_version": "4.0.0",
+            "language": "typescript",
+            "file_path": "src/malformed.ts",
+            "source_revision": "gph-production-proof-r1",
+            "chunks": [
+              {
+                "upstream_chunk_id": "a1f6cecaeae83073cae2ba2b21489d10f2b7975157b64166f0661aacc55fe6df",
+                "node_type": "expression_statement",
+                "kind": "fragment",
+                "name": null,
+                "parent_context": null,
+                "start_byte": 0,
+                "end_byte": 35,
+                "start_line": 1,
+                "start_column": 0,
+                "end_line": 1,
+                "end_column": 35,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              }
+            ],
+            "edges": [],
+            "diagnostics": [
+              "Tree-sitter ERROR at line 1, column 8: ERROR"
+            ],
+            "error_tag": "ChunkingError",
+            "syntax_status": "RECOVERED_WITH_ERRORS"
+          },
+          "normalized": {
+            "sourceRef": "src/malformed.ts",
+            "sourceRevision": "gph-production-proof-r1",
+            "parserName": "treesitter-chunker",
+            "parserVersion": "4.0.0",
+            "symbols": [
+              {
+                "upstreamChunkId": "a1f6cecaeae83073cae2ba2b21489d10f2b7975157b64166f0661aacc55fe6df",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "3152855dfedd9b53234c0bfb26fad3cf09047622f444f5052d4c974b91b6dd78",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/malformed.ts#file:",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "file",
+                "qualifiedSymbol": "",
+                "span": {
+                  "filePath": "src/malformed.ts",
+                  "startByte": 0,
+                  "endByte": 35,
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 35
+                }
+              }
+            ],
+            "edges": [],
+            "provenance": {
+              "nativeNodeIdCount": 0,
+              "nativeFileIdCount": 0,
+              "nativeSymbolIdCount": 0,
+              "upstreamChunkIdCount": 1,
+              "compatibilityTreeNodeIdCount": 1
+            },
+            "diagnostics": [
+              "Tree-sitter ERROR at line 1, column 8: ERROR"
+            ]
+          },
+          "provenanceReadiness": {
+            "status": "COMPATIBILITY_ONLY",
+            "nativeNodeIds": 0,
+            "nativeFileIds": 0,
+            "nativeSymbolIds": 0,
+            "upstreamChunkIds": 1,
+            "symbolCount": 1,
+            "canonicalPromotionAllowed": false,
+            "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+            "reason": "One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical."
+          },
+          "diagnostics": [
+            "Tree-sitter ERROR at line 1, column 8: ERROR",
+            "STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY",
+            "SOURCE_REVISION_AUTHORITY_UNPROVEN"
+          ],
+          "persistence": "NOT_ATTEMPTED",
+          "fallback": "NONE"
+        }
+      },
+      {
+        "action": "UPSERT",
+        "sourceRef": "src/valid-b.ts",
+        "sourceRevision": "gph-production-proof-r1",
+        "result": {
+          "sourceRef": "src/valid-b.ts",
+          "sourceRevision": null,
+          "sourceVersionAnchor": "sha256:db46b6172e7e553948516e1e80f6cd51b256e8a568abbeb564429734f3ce8743",
+          "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+          "provider": "treesitter-chunker-8095",
+          "status": "PROVEN",
+          "evidence": {
+            "schema": "atlas.ast.evidence.v1",
+            "engine": "treesitter-chunker",
+            "engine_version": "4.0.0",
+            "language": "typescript",
+            "file_path": "src/valid-b.ts",
+            "source_revision": "gph-production-proof-r1",
+            "chunks": [
+              {
+                "upstream_chunk_id": "d1951738a24d44dd197006e85723b9b83175f0a6b15a77bbdac348e9d5d0db93",
+                "node_type": "export_statement",
+                "kind": "export",
+                "name": null,
+                "parent_context": null,
+                "start_byte": 0,
+                "end_byte": 35,
+                "start_line": 1,
+                "start_column": 0,
+                "end_line": 1,
+                "end_column": 35,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              },
+              {
+                "upstream_chunk_id": "1a4faf8b497bec5611d4a0a870b4f54dd16c6fb258c1987de39ade891a364ff3",
+                "node_type": "function_declaration",
+                "kind": "function",
+                "name": "beta",
+                "parent_context": null,
+                "start_byte": 7,
+                "end_byte": 35,
+                "start_line": 1,
+                "start_column": 7,
+                "end_line": 1,
+                "end_column": 35,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              }
+            ],
+            "edges": [
+              {
+                "from_evidence_key": "file:src/valid-b.ts",
+                "to_evidence_key": "beta",
+                "type": "EXPORTS",
+                "evidence_start_line": 1,
+                "evidence_start_column": 0,
+                "evidence_end_line": 1,
+                "evidence_end_column": 35,
+                "resolved": false,
+                "resolution": "syntax_only"
+              },
+              {
+                "from_evidence_key": "file:src/valid-b.ts",
+                "to_evidence_key": "1a4faf8b497bec5611d4a0a870b4f54dd16c6fb258c1987de39ade891a364ff3",
+                "type": "DEFINES",
+                "evidence_start_line": 1,
+                "evidence_start_column": 7,
+                "evidence_end_line": 1,
+                "evidence_end_column": 35,
+                "resolved": true,
+                "resolution": "local_chunk"
+              }
+            ],
+            "diagnostics": [],
+            "error_tag": null,
+            "syntax_status": "CLEAN"
+          },
+          "normalized": {
+            "sourceRef": "src/valid-b.ts",
+            "sourceRevision": "gph-production-proof-r1",
+            "parserName": "treesitter-chunker",
+            "parserVersion": "4.0.0",
+            "symbols": [
+              {
+                "upstreamChunkId": "d1951738a24d44dd197006e85723b9b83175f0a6b15a77bbdac348e9d5d0db93",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "e531fd685e68c0412ca7658fae2cd8c0f9e42976fc3e0dc2780493d01da83b5a",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/valid-b.ts#export:",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "export",
+                "qualifiedSymbol": "",
+                "span": {
+                  "filePath": "src/valid-b.ts",
+                  "startByte": 0,
+                  "endByte": 35,
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 35
+                }
+              },
+              {
+                "upstreamChunkId": "1a4faf8b497bec5611d4a0a870b4f54dd16c6fb258c1987de39ade891a364ff3",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "726847071cefd647cf28e435f04c1b03edcb36d61b9c48649c3028fa9f513a66",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/valid-b.ts#function:beta",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "function",
+                "qualifiedSymbol": "beta",
+                "span": {
+                  "filePath": "src/valid-b.ts",
+                  "startByte": 7,
+                  "endByte": 35,
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 35
+                }
+              }
+            ],
+            "edges": [
+              {
+                "fromEvidenceKey": "file:src/valid-b.ts",
+                "toEvidenceKey": "beta",
+                "type": "EXPORTS",
+                "resolved": false,
+                "resolution": "syntax_only",
+                "evidence": {
+                  "filePath": "src/valid-b.ts",
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 35
+                }
+              },
+              {
+                "fromEvidenceKey": "file:src/valid-b.ts",
+                "toEvidenceKey": "1a4faf8b497bec5611d4a0a870b4f54dd16c6fb258c1987de39ade891a364ff3",
+                "type": "DEFINES",
+                "resolved": true,
+                "resolution": "local_chunk",
+                "evidence": {
+                  "filePath": "src/valid-b.ts",
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 35
+                }
+              }
+            ],
+            "provenance": {
+              "nativeNodeIdCount": 0,
+              "nativeFileIdCount": 0,
+              "nativeSymbolIdCount": 0,
+              "upstreamChunkIdCount": 2,
+              "compatibilityTreeNodeIdCount": 2
+            },
+            "diagnostics": []
+          },
+          "provenanceReadiness": {
+            "status": "COMPATIBILITY_ONLY",
+            "nativeNodeIds": 0,
+            "nativeFileIds": 0,
+            "nativeSymbolIds": 0,
+            "upstreamChunkIds": 2,
+            "symbolCount": 2,
+            "canonicalPromotionAllowed": false,
+            "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+            "reason": "One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical."
+          },
+          "diagnostics": [
+            "STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY",
+            "SOURCE_REVISION_AUTHORITY_UNPROVEN"
+          ],
+          "persistence": "NOT_ATTEMPTED",
+          "fallback": "NONE"
+        }
+      },
+      {
+        "action": "SKIPPED_UNCHANGED",
+        "sourceRef": "src/unchanged.ts",
+        "sourceRevision": "gph-production-proof-r1"
+      },
+      {
+        "action": "UPSERT",
+        "sourceRef": "src/changed.ts",
+        "sourceRevision": "gph-production-proof-r1",
+        "result": {
+          "sourceRef": "src/changed.ts",
+          "sourceRevision": null,
+          "sourceVersionAnchor": "sha256:d55307c3118f129c48952b2c92c7d34bc3eb0d019f9fad5699b207da18d6f392",
+          "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+          "provider": "treesitter-chunker-8095",
+          "status": "PROVEN",
+          "evidence": {
+            "schema": "atlas.ast.evidence.v1",
+            "engine": "treesitter-chunker",
+            "engine_version": "4.0.0",
+            "language": "typescript",
+            "file_path": "src/changed.ts",
+            "source_revision": "gph-production-proof-r1",
+            "chunks": [
+              {
+                "upstream_chunk_id": "ebacaf04961b4cd892391992b47bed7c87818d7fe2099e10567d2cf51dae1a0f",
+                "node_type": "export_statement",
+                "kind": "export",
+                "name": null,
+                "parent_context": null,
+                "start_byte": 0,
+                "end_byte": 38,
+                "start_line": 1,
+                "start_column": 0,
+                "end_line": 1,
+                "end_column": 38,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              },
+              {
+                "upstream_chunk_id": "e7dcdc12d2ca4a06fbb2a344afa3238063631fb2363489bc8609458a49f0ac19",
+                "node_type": "function_declaration",
+                "kind": "function",
+                "name": "changed",
+                "parent_context": null,
+                "start_byte": 7,
+                "end_byte": 38,
+                "start_line": 1,
+                "start_column": 7,
+                "end_line": 1,
+                "end_column": 38,
+                "calls": [],
+                "imports": [],
+                "exports": []
+              }
+            ],
+            "edges": [
+              {
+                "from_evidence_key": "file:src/changed.ts",
+                "to_evidence_key": "changed",
+                "type": "EXPORTS",
+                "evidence_start_line": 1,
+                "evidence_start_column": 0,
+                "evidence_end_line": 1,
+                "evidence_end_column": 38,
+                "resolved": false,
+                "resolution": "syntax_only"
+              },
+              {
+                "from_evidence_key": "file:src/changed.ts",
+                "to_evidence_key": "e7dcdc12d2ca4a06fbb2a344afa3238063631fb2363489bc8609458a49f0ac19",
+                "type": "DEFINES",
+                "evidence_start_line": 1,
+                "evidence_start_column": 7,
+                "evidence_end_line": 1,
+                "evidence_end_column": 38,
+                "resolved": true,
+                "resolution": "local_chunk"
+              }
+            ],
+            "diagnostics": [],
+            "error_tag": null,
+            "syntax_status": "CLEAN"
+          },
+          "normalized": {
+            "sourceRef": "src/changed.ts",
+            "sourceRevision": "gph-production-proof-r1",
+            "parserName": "treesitter-chunker",
+            "parserVersion": "4.0.0",
+            "symbols": [
+              {
+                "upstreamChunkId": "ebacaf04961b4cd892391992b47bed7c87818d7fe2099e10567d2cf51dae1a0f",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "14a377ebba28f9f60b3488e36087ceb563b30ccbff4175ed48ada7b130e5c66b",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/changed.ts#export:",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "export",
+                "qualifiedSymbol": "",
+                "span": {
+                  "filePath": "src/changed.ts",
+                  "startByte": 0,
+                  "endByte": 38,
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 38
+                }
+              },
+              {
+                "upstreamChunkId": "e7dcdc12d2ca4a06fbb2a344afa3238063631fb2363489bc8609458a49f0ac19",
+                "upstreamNodeId": null,
+                "upstreamFileId": null,
+                "upstreamSymbolId": null,
+                "parentRoute": [],
+                "parentContext": null,
+                "treeNodeId": "88526f6f38aace61a6026190a36c4ccfe8b65bb1c5b2d8349abdcd7bac84120d",
+                "treeNodeIdSource": "atlas_compatibility_hash",
+                "structuralKey": "deeds-web-app/src/changed.ts#function:changed",
+                "symbolId": null,
+                "symbolVersionId": null,
+                "packetKey": null,
+                "identityStatus": "structural_pending_canonical_persistence",
+                "language": "typescript",
+                "nodeKind": "function",
+                "qualifiedSymbol": "changed",
+                "span": {
+                  "filePath": "src/changed.ts",
+                  "startByte": 7,
+                  "endByte": 38,
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 38
+                }
+              }
+            ],
+            "edges": [
+              {
+                "fromEvidenceKey": "file:src/changed.ts",
+                "toEvidenceKey": "changed",
+                "type": "EXPORTS",
+                "resolved": false,
+                "resolution": "syntax_only",
+                "evidence": {
+                  "filePath": "src/changed.ts",
+                  "startLine": 1,
+                  "startColumn": 0,
+                  "endLine": 1,
+                  "endColumn": 38
+                }
+              },
+              {
+                "fromEvidenceKey": "file:src/changed.ts",
+                "toEvidenceKey": "e7dcdc12d2ca4a06fbb2a344afa3238063631fb2363489bc8609458a49f0ac19",
+                "type": "DEFINES",
+                "resolved": true,
+                "resolution": "local_chunk",
+                "evidence": {
+                  "filePath": "src/changed.ts",
+                  "startLine": 1,
+                  "startColumn": 7,
+                  "endLine": 1,
+                  "endColumn": 38
+                }
+              }
+            ],
+            "provenance": {
+              "nativeNodeIdCount": 0,
+              "nativeFileIdCount": 0,
+              "nativeSymbolIdCount": 0,
+              "upstreamChunkIdCount": 2,
+              "compatibilityTreeNodeIdCount": 2
+            },
+            "diagnostics": []
+          },
+          "provenanceReadiness": {
+            "status": "COMPATIBILITY_ONLY",
+            "nativeNodeIds": 0,
+            "nativeFileIds": 0,
+            "nativeSymbolIds": 0,
+            "upstreamChunkIds": 2,
+            "symbolCount": 2,
+            "canonicalPromotionAllowed": false,
+            "sourceRevisionAuthority": "CONTENT_ANCHOR_ONLY",
+            "reason": "One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical."
+          },
+          "diagnostics": [
+            "STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY",
+            "SOURCE_REVISION_AUTHORITY_UNPROVEN"
+          ],
+          "persistence": "NOT_ATTEMPTED",
+          "fallback": "NONE"
+        }
+      },
+      {
+        "action": "DELETE",
+        "tombstone": {
+          "sourceRef": "src/deleted.ts",
+          "sourceRevision": "gph-production-proof-r1",
+          "reason": "SOURCE_DELETED",
+          "observedBy": "GRAPHIFY_STRUCTURAL_MATERIALIZER"
+        }
+      }
+    ]
+  }
+}

@@ -18,6 +18,7 @@ import {
 	compileOntologyEventTuples,
 	judgeRecommendation,
 	type AtlasEvent,
+	type AtlasEventParticipant,
 	type EventBreadthFeatures,
 	type EventRecommendationFeatureRow,
 	type OntologyEventTuple,
@@ -455,7 +456,7 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 			passArtifacts?.symbol as string | undefined,
 			passResult.sourceRef,
 		);
-		const participants = [
+		const participants: AtlasEventParticipant[] = [
 			{ entityId: firstNonEmpty(passResult.sourceRef), entityKind: 'source_ref', role: 'actor' as const },
 			{ entityId: packetKey, entityKind: 'packet', role: 'packet' as const },
 			{ entityId: passResult.passName, entityKind: 'pass', role: 'tool' as const },

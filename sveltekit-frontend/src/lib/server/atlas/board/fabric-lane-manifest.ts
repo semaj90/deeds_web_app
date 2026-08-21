@@ -1,5 +1,5 @@
 import { buildFabricLaneManifest, type FabricLaneKind, type FabricLaneManifest } from '../contracts/fabric-lanes.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 export interface BoardFabricLaneContext {
 	workflowId: string;

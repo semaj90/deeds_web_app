@@ -3,11 +3,11 @@
   "_comment": "Canonical model registry. Every production-grade model used by the YorHA legal stack is declared here. rg-searchable — do NOT add to .gitignore. Binary GGUF/ONNX blobs are stored outside git (see pathEnv). Update this file when adding or removing models.",
   "_lastUpdated": "2026-07-17",
   "canonicalDimensions": {
-    "semantic": 384,
+    "semantic": 768,
     "latent": 64,
     "somRows": 20,
     "somColumns": 20,
-    "_note": "Project canonical is 384-dim (embeddinggemma). Legacy 768-dim inputs exist only in migration paths. latent64 is derived routing only, never canonical ANN."
+    "_note": "Project canonical is native EmbeddingGemma semantic_768. Truncated 512/256/128 lanes are derived routing/retrieval projections; latent64 is derived routing only, never canonical ANN."
   },
   "models": [
     {
@@ -56,9 +56,9 @@
       "tags": ["vlm", "sidecar", "vision"]
     },
     {
-      "id": "embeddinggemma-384d",
-      "displayName": "EmbeddingGemma 300M (Ollama, 384-dim canonical)",
-      "description": "Primary embedding model. 384-dimensional dense vectors — project canonical dimension. Used for content_384, summary_384, signature_384 vectors in codebase_chunks_384_hybrid.",
+      "id": "embeddinggemma-300m-768d",
+      "displayName": "EmbeddingGemma 300M (Ollama, semantic_768 canonical)",
+      "description": "Primary embedding model. Native 768-dimensional dense vectors — project canonical semantic representation used by codebase_chunks_768_v2.",
       "role": "embedding",
       "runtime": "ollama",
       "pathEnv": null,
@@ -66,15 +66,15 @@
       "localGGUF": "models/embeddinggemma-300m-f16.gguf",
       "filename": null,
       "normalize": "l2",
-      "embeddingDimension": 384,
+      "embeddingDimension": 768,
       "endpoint": "http://127.0.0.1:11434",
-      "notes": "Ollama pulls this at embeddinggemma:latest. Native output is 768-dim; project truncates/projects to 384 as canonical. Do NOT use 768-dim vectors in codebase_chunks_384_hybrid. Legacy codebase_chunks_768 collection is migration provenance only.",
-      "embeddingDim": 384,
+      "notes": "Ollama pulls this at embeddinggemma:latest. Native output is persisted as canonical semantic_768. Derived truncation lanes require separate representation revisions and exact-oracle proofs.",
+      "embeddingDim": 768,
       "port": 11434,
       "contextLen": null,
       "quantization": "f16",
       "canonical": true,
-      "tags": ["embeddings", "384d", "canonical", "primary"]
+      "tags": ["embeddings", "768d", "semantic_768", "canonical", "primary"]
     },
     {
       "id": "gemma3-270m-onnx",
@@ -93,21 +93,21 @@
     },
     {
       "id": "embeddinggemma-300m-onnx",
-      "displayName": "EmbeddingGemma 300M ONNX (client-side, 384-dim)",
-      "description": "Client-side embedding model for browser-local retrieval fallback. Raw output is 768-dim; client-embed.ts projects to 384 to match server canonical.",
+      "displayName": "EmbeddingGemma 300M ONNX (client-side, semantic_768)",
+      "description": "Client-side embedding model for browser-local retrieval fallback. Raw native output is preserved as semantic_768.",
       "role": "embedding-client-fallback",
       "runtime": "onnx-runtime-web",
       "pathEnv": null,
       "localPath": "sveltekit-frontend/static/embeddinggemma_300m_onnx/",
       "filename": null,
-      "notes": "Served from /embeddinggemma_300m_onnx/. client-embed.ts mean-pools + L2-norms then projects to 384-dim to match server vectors. Not gitignored — rg-searchable.",
-      "embeddingDim": 384,
+      "notes": "Served from /embeddinggemma_300m_onnx/. client-embed.ts mean-pools and L2-normalizes the native 768-dimensional output. Derived truncation lanes require separate contracts.",
+      "embeddingDim": 768,
       "rawModelDim": 768,
       "port": null,
       "contextLen": null,
       "quantization": "int8",
       "canonical": false,
-      "tags": ["client-side", "onnx", "embeddings", "384d", "fallback"]
+      "tags": ["client-side", "onnx", "embeddings", "768d", "semantic_768", "fallback"]
     },
     {
       "id": "gemma4-rotorquant:latest-vendor-gguf",
@@ -236,30 +236,30 @@
     }
   ],
   "retrieval": {
-    "canonicalCollection": "codebase_chunks_384_hybrid",
+    "canonicalCollection": "codebase_chunks_768_v2",
     "identityField": "packet_key",
     "fusionAuthority": "typescript-search-runtime",
-    "_legacyCollection": "codebase_chunks_768",
-    "_legacyNote": "codebase_chunks_768 is migration provenance only. All new retrieval uses codebase_chunks_384_hybrid.",
+    "_legacyCollection": "codebase_chunks_384_hybrid",
+    "_legacyNote": "384-dimensional collections and artifacts are migration/reference evidence only. All new semantic retrieval uses codebase_chunks_768_v2 with semantic_768.",
 
     "denseVectors": {
       "content": {
-        "name": "content_384",
-        "dimension": 384,
+        "name": "content",
+        "dimension": 768,
         "distance": "Cosine",
         "candidateTopK": 60,
         "purpose": "canonical semantic retrieval"
       },
       "summary": {
-        "name": "summary_384",
-        "dimension": 384,
+        "name": "summary",
+        "dimension": 768,
         "distance": "Cosine",
         "candidateTopK": 40,
         "purpose": "summary-level semantic retrieval"
       },
       "signature": {
-        "name": "signature_384",
-        "dimension": 384,
+        "name": "signature",
+        "dimension": 768,
         "distance": "Cosine",
         "candidateTopK": 30,
         "purpose": "symbol and API-shape retrieval"

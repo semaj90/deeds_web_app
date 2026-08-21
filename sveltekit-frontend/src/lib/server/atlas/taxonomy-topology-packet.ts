@@ -441,8 +441,11 @@ export async function buildTaxonomyTopologyPacket(
       labelSource: 'semantic_tagger',
       ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
       conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+      participants: [],
+      evidenceRefs: [],
       confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
       evidenceState: 'ACTIVE_VERIFIED',
+      lifecycle: 'OBSERVED',
       provenance: {
         sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
         labelerVersion: classifier.domainClassifierTier ?? null,

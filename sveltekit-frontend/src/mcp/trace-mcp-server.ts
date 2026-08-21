@@ -72,7 +72,7 @@ import { ensureOpenTelemetry } from '../lib/server/observability/opentelemetry.j
 import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.js';
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../lib/server/embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../lib/server/atlas/retrieval/qdrant-semantic-projection.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
@@ -9037,7 +9037,7 @@ server.registerTool(
   async ({ query, topClusters }) => {
     try {
       // Embed the query via Ollama embeddinggemma
-      const embRes = await fetch('http://127.0.0.1:11434/api/embeddings', {
+      const embRes = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),

@@ -1,8 +1,8 @@
 {
   "receipt_kind": "GRAPH_QDRANT_FANOUT_RUNTIME_PROOF",
-  "status": "PROVEN",
-  "generated_at": "2026-08-14T02:38:46.099Z",
-  "workspace_revision": "1e07a730addf5f853ca740bb3cbf2decddd5ad87",
+  "status": "DEGRADED",
+  "generated_at": "2026-08-20T22:25:48.280Z",
+  "workspace_revision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
   "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1",
   "seed": {
     "run_id": "0f4b783d-606d-4712-88f8-da0b900f779e",
@@ -51,32 +51,32 @@
   "stage_timings": [
     {
       "stage": "qdrant_contract",
-      "elapsed_ms": 64,
+      "elapsed_ms": 62,
       "status": "PASS"
     },
     {
       "stage": "seed_candidates",
-      "elapsed_ms": 1402,
+      "elapsed_ms": 1326,
       "status": "PASS"
     },
     {
       "stage": "seed_resolution",
-      "elapsed_ms": 846,
+      "elapsed_ms": 8080,
       "status": "PASS"
     },
     {
       "stage": "neo4j_fanout",
-      "elapsed_ms": 1579,
+      "elapsed_ms": 4169,
       "status": "PASS"
     },
     {
       "stage": "canonical_identity_resolution",
-      "elapsed_ms": 659,
+      "elapsed_ms": 678,
       "status": "PASS"
     },
     {
       "stage": "qdrant_projection_lookup",
-      "elapsed_ms": 177,
+      "elapsed_ms": 171,
       "status": "PASS"
     },
     {
@@ -108,6 +108,11 @@
     "GRAPH_FANOUT_BOUNDED": true,
     "GRAPH_EVIDENCE_PRESERVED": true,
     "QDRANT_CONTENT_VECTOR_CONTRACT_768": true,
+    "QDRANT_FANOUT_IDENTITY_ALIGNED": true,
+    "QDRANT_FANOUT_LINEAGE_ALIGNED": false,
+    "QDRANT_FANOUT_SEMANTIC_REPRESENTATION_ALIGNED": false,
+    "QDRANT_FANOUT_IDENTITY_MISMATCH_COUNT": 0,
+    "QDRANT_FANOUT_LINEAGE_GAP_COUNT": 1,
     "BM42_NOT_REQUIRED": true,
     "PROCESS_PACKET_LANE_UNCHANGED": true,
     "SEED_CANONICAL_MATCH": true,
@@ -132,99 +137,111 @@
         "hop_distance": 1
       },
       "atlas_packet": {
-        "packet_key": "ace:packet:40a61c73f51f",
-        "source_ref": "src/lib/server/queue/dispatch-inline.ts",
-        "canonical_source_ref": null,
-        "file_path": null,
-        "source_path": null,
-        "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
-        "qdrant_point_id": "4598",
+        "packet_key": "packet:92b57dc48fba",
+        "source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+        "canonical_source_ref": "src/lib/server/queue/dispatch-inline.ts",
+        "file_path": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+        "source_path": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+        "tree_node_id": "4f350731-4508-4823-ab38-a9e0a83b0632",
+        "qdrant_point_id": "fe85d05a-13c9-4ca9-87dc-4c4920ff03c7",
         "workspace_revision": "0",
         "representation_revision": "0",
         "source_representation_id": null,
         "projection_representation_id": null
       },
       "canonical_identity": {
-        "value": "ace:packet:40a61c73f51f",
+        "value": "packet:92b57dc48fba",
         "source": "packet_key",
         "status": "canonical",
         "backendLocalId": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:396016"
       },
       "qdrant": {
         "matched_on": "packet_key",
-        "point_id": "4598",
+        "point_id": "fe85d05a-13c9-4ca9-87dc-4c4920ff03c7",
         "payload": {
-          "chunk_id": null,
+          "packet_key": "packet:92b57dc48fba",
           "source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
-          "content_hash": null,
-          "representation_id": "semantic_768",
-          "dimension": 768,
-          "model_revision": "2026-07-29",
-          "embedding_model": "embeddinggemma",
-          "domain": null,
-          "symbol": "getDispatchStats",
-          "kind": "function",
-          "qdrant_point_id": "card:src/lib/server/queue/dispatch-inline.ts:null",
-          "postgres_id": "106fbc14-31e9-41bb-8300-201df16567e7",
-          "postgres_updated_at": "2026-07-04T09:39:17.786Z",
-          "packet_key": "ace:packet:40a61c73f51f",
+          "content_hash": "f54e34b8b2b79838",
+          "workspace_id": "phase108d-backfill",
+          "representation_id": "embeddinggemma_768_native_v1",
+          "vector_name": "dense_768",
+          "projection_hash": "ce555a571312b0a7b3b81f718489ca3b89fa0c6badd978a620ab96e570c35701",
+          "symbol": null,
+          "artifact_kind": null,
+          "summary": "This code block acts as a dispatcher, using a `switch` statement to route incoming data to specific, inlined utility functions based on a provided string case identifier. It handles various operational tasks such as document embedding, evidence processing, and analytics tracking.",
+          "domain_class": "utility",
+          "metadata": {
+            "provenance": {},
+            "tensor_stats": {},
+            "karpathy_debug": {}
+          },
+          "indexed_at": "2026-04-20T18:22:12.903Z",
           "canonical_source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
           "source_ref_key": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
-          "feature_id": "dispatch-inline",
-          "feature_label": "dispatch-inline",
+          "feature_id": "sveltekit-frontend.dispatch-inline",
+          "feature_label": "dispatch-inline.ts",
           "lane_ids": [
-            "0",
+            "38546",
             "atlas_feature_packets",
+            "canonical",
             "codebase_chunks_768",
-            "dispatch-inline",
-            "qdrant_chunk"
+            "qdrant_chunk",
+            "som20x20",
+            "sveltekit-frontend.dispatch-inline"
           ],
           "tags": [
+            "canonical",
             "codebase_chunks_768",
             "dispatch",
             "dispatch-inline",
+            "dispatch-inline.ts",
             "inline",
             "qdrant_chunk",
             "queue"
           ],
-          "bm25_text": "dispatch-inline sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "bm25_text": "This packet defines an exported type, `QueueName`, which enumerates various specific operational tasks within a system, such as embedding documents, indexing vectors, or generating synthesis, providing a controlled set of identifiers for workflow management. It serves as a centralized enumeration for specifying the intended function or processing queue within the application's backend services. dispatch-inline.ts sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
           "packet_kind": "qdrant_chunk",
           "ledger_type": "atlas_feature_packets",
-          "community_id": 0,
+          "community_id": 38546,
+          "community_conf": "0.70",
           "qdrant_vector_dim": 768,
-          "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
-          "embedding_ref": "codebase_chunks_768:4598",
-          "payload_backfilled_at": "2026-08-13T18:02:41.798Z",
-          "graphAuthorityScore": 0.45,
-          "communityId": "community:28085",
-          "communitySize": 0,
-          "pagerank": 0.15000000000000002,
-          "cluster_key": "unclassified:community-28085"
+          "chunk_id": "d6d1eaeb-50ec-4401-886e-94f4b5845e84",
+          "tree_node_id": "4f350731-4508-4823-ab38-a9e0a83b0632",
+          "embedding_ref": "codebase_chunks_768:fe85d05a-13c9-4ca9-87dc-4c4920ff03c7",
+          "payload_backfilled_at": "2026-08-13T18:02:55.053Z"
         },
         "normalized_identity": {
-          "backendLocalId": "card:src/lib/server/queue/dispatch-inline.ts:null",
+          "backendLocalId": null,
           "canonicalIdentity": {
-            "value": "ace:packet:40a61c73f51f",
+            "value": "packet:92b57dc48fba",
             "source": "packet_key",
             "status": "canonical",
-            "backendLocalId": "card:src/lib/server/queue/dispatch-inline.ts:null"
+            "backendLocalId": null
           },
           "identityStatus": "canonical",
-          "packetKey": "ace:packet:40a61c73f51f",
+          "packetKey": "packet:92b57dc48fba",
           "sourceRef": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
-          "contentHash": null,
-          "treeNodeId": "67282b31-9d5a-46e5-8a27-0d446435c11e",
-          "featureId": "dispatch-inline",
-          "featureLabel": "dispatch-inline",
+          "contentHash": "f54e34b8b2b79838",
+          "treeNodeId": "4f350731-4508-4823-ab38-a9e0a83b0632",
+          "featureId": "sveltekit-frontend.dispatch-inline",
+          "featureLabel": "dispatch-inline.ts",
           "workspaceRevision": null
         },
         "process_ids": []
+      },
+      "qdrant_alignment": {
+        "canonicalIdentityMatch": true,
+        "workspaceRevisionAligned": false,
+        "graphRevisionAligned": false,
+        "semanticRepresentationAligned": false,
+        "qdrantPayloadPresent": true,
+        "status": "LINEAGE_GAP"
       },
       "graph_evidence": {
         "seed_canonical_id": "ace:packet:4978fbe089ec",
         "edge_type": "IMPORTS",
         "hop_distance": 1,
-        "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
+        "tree_node_id": "4f350731-4508-4823-ab38-a9e0a83b0632",
         "neo4j_internal_id": 396016,
         "neo4j_element_id": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:396016",
         "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1"

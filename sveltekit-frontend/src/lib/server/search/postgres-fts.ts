@@ -19,6 +19,14 @@ export interface FTSResult {
   graph_authority_score: number;
   lexical_score: number;
   headline: string;
+  graph_revision?: string | null;
+  projection_revision?: string | null;
+  graph_degree?: number;
+  dependency_breadth?: number;
+  endpoint_affinity?: number;
+  cache_affinity?: number;
+  process_ids?: string[];
+  neighborhood_hash?: string | null;
 }
 
 export interface FTSOptions {

@@ -11,7 +11,7 @@ import { randomUUID } from 'crypto';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server';
-import { getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
 
 interface VideoVLMJob {
 	evidenceId: string;

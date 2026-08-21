@@ -28,7 +28,15 @@ export const clusterPacketPolicySchema = z.object({
     cacheHot: z.number().finite().min(0).max(1).default(0.05),
     topFileCount: z.number().finite().min(0).max(1).default(0.05),
     summaryRichness: z.number().finite().min(0).max(1).default(0.05),
-  }).default({}),
+  }).default({
+    authority: 0.35,
+    recency: 0.2,
+    retrievalFrequency: 0.15,
+    executionSuccessRate: 0.15,
+    cacheHot: 0.05,
+    topFileCount: 0.05,
+    summaryRichness: 0.05,
+  }),
 });
 
 export type ClusterPacketRuntimeSignals = z.infer<typeof clusterPacketRuntimeSignalsSchema>;
@@ -116,7 +124,7 @@ function parseTopFiles(packet: ClusterAcePacket): string[] {
   const topologyFiles = Array.isArray((packet.topology as Record<string, unknown> | undefined)?.filePaths)
     ? (packet.topology as Record<string, unknown>).filePaths
     : [];
-  const files = payloadFiles.length > 0 ? payloadFiles : topologyFiles;
+  const files: unknown[] = payloadFiles.length > 0 ? payloadFiles : (topologyFiles as unknown[]);
   return [...new Set(files.map((entry) => String(entry ?? '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 

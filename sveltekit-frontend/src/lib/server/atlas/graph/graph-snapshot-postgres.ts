@@ -212,7 +212,7 @@ function normalizePacketRow(row: DbRow): PacketRow {
     treeNodeId: readDbValue(row, 'treeNodeId', 'tree_node_id') ?? null,
     qdrantCollection: readDbValue(row, 'qdrantCollection', 'qdrant_collection') ?? null,
     qdrantVectorDim: readDbValue(row, 'qdrantVectorDim', 'qdrant_vector_dim') ?? null
-  };
+  } as PacketRow;
 }
 
 function readDbValue(row: DbRow, camelKey: string, snakeKey: string): unknown {

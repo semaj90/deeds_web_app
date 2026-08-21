@@ -72,6 +72,16 @@ cp deeds_labs/archive/2026-07-23/old-module.ts.bak src/old-module.ts
 
 ## 🧠 Embedding Dimensions Policy (CANONICAL — July 27, 2026)
 
+**STALE relative to a later, dated operator decision — see
+`openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md`.** Operator correction
+(2026-08-19): the persisted EmbeddingGemma corpus that actually exists is 512-dimensional; a
+production/canonical 768-dimensional Qdrant corpus was not created. Do not promote an assumed
+768 store merely because EmbeddingGemma's native output is 768. That doc's frozen contract makes
+`semantic_512` (native 768 → MRL prefix [0:512] → L2 renorm) the canonical persisted semantic
+representation. Section below has NOT yet been updated to match — it documents the pre-migration
+768-canonical state that the code (`embedding-contract-768.ts`) still implements as of this
+writing. Do not treat this section as current policy without checking that OpenSpec change first.
+
 **PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
 - **Canonical storage**: Qdrant `codebase_chunks_768` collection (40,568 points)
 - **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 40,568 rows populated)

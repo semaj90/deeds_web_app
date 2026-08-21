@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "atlas.query-routing-live-producer-audit.v1",
+  "status": "LIVE_PRODUCER_NOT_READY",
+  "owner": "sveltekit-frontend/src/routes/api/ai/error-agent/+server.ts",
+  "executionReceiptOwner": "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts",
+  "workflowReceiptAvailable": true,
+  "workflowReceiptVerifierAvailable": true,
+  "requiredClassifierInputs": {
+    "queryFeatures": "MISSING_LIVE_COMPILER_BINDING",
+    "featureRevision": "MISSING",
+    "embeddingRepresentationId": "MISSING",
+    "embeddingModelRevision": "MISSING",
+    "promptRevision": "MISSING",
+    "embeddingGemmaClassificationMrl128": "MISSING",
+    "domainLabel": "MISSING_APPROVED_LABEL_SOURCE",
+    "operationLabel": "MISSING_APPROVED_LABEL_SOURCE",
+    "retrievalNeeds": "MISSING_APPROVED_LABEL_SOURCE",
+    "candidateBudget": "MISSING_POLICY_OWNER",
+    "labelRevision": "MISSING_APPROVED_LABEL_SOURCE"
+  },
+  "safeAdapterAvailable": true,
+  "safeAdapter": "sveltekit-frontend/src/lib/server/atlas/neural-routing/dataset-export.ts::adaptWorkflowExecutionToClassificationExample",
+  "trainingReadyRows": 0,
+  "canonicalWrites": false,
+  "runtimeWrites": false,
+  "diagnostics": [
+    "The route currently accepts query, error class, workspace/model revisions, and source references only.",
+    "Workflow execution status is evidence, not a substitute for classifier labels or representation lineage.",
+    "No live producer may mark rows TRAINING_READY until EmbeddingGemma classification_mrl_128 output and label provenance are supplied."
+  ]
+}

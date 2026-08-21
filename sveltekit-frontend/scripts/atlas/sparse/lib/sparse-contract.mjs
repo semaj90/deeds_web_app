@@ -7,7 +7,7 @@ export const SPARSE_CONTRACT = Object.freeze({
   }),
   sparse: Object.freeze({
     name: 'lexical_v1',
-    encoderKind: 'code_aware_bm25',
+    encoderKind: 'legacy_code_aware_logtf',
     vocabularyRevision: null,
     weightingRevision: null,
     maxTerms: 256,

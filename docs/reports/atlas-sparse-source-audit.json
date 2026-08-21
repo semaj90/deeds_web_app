@@ -1,0 +1,22 @@
+{
+  "artifact_id": "atlas-sparse-source-audit-v1",
+  "status": "RUNTIME_PROOF_PENDING",
+  "table": "codebase_chunk_index",
+  "text_column": "content",
+  "summary": {
+    "eligible_rows": 52417,
+    "rows_with_text": 52380,
+    "rows_with_content_hash": 45472,
+    "rows_with_dense_embedding": 52380,
+    "empty_text_rows": 37,
+    "missing_content_hash": 6945
+  },
+  "sparseOwner": "NOT_PROVEN",
+  "sparseProjection": "NOT_PROVEN",
+  "canonicalWrites": false,
+  "diagnostics": [
+    "The source census proves available text and dense source rows only.",
+    "It does not prove SPLADE, miniCOIL, or BM42 runtime ownership.",
+    "No Qdrant sparse collection, payload index, or point mutation was performed."
+  ]
+}

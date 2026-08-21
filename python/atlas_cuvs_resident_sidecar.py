@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from atlas_rapids_sidecar import app, _CUVS_STATUS  # noqa: E402
 from atlas_cuvs_resident_registry import (  # noqa: E402
     CorpusIdentity,
+    Metric,
     PythonCuvsBackend,
     ResidentCuvsIndexRegistry,
     ResidentIndexBuildSpec,
@@ -191,6 +192,120 @@ def drop_resident_index(index_id: str) -> ResidentIndexDropResponse:
         raise
     except Exception as exc:
         raise _http_error(exc) from exc
+
+
+# ── Simple /search adapter over the resident-index registry ──────────────
+# This is a convenience shim for callers that just want "search this named
+# index" without carrying representationRevision/datasetChecksumSha256
+# themselves. It does NOT weaken the registry's own freshness/identity
+# checks: both values are read from the resident index's own current
+# metadata (the registry's source of truth), never accepted from the
+# caller, so ResidentCuvsIndexRegistry.search()'s staleness comparison is
+# always a same-value tautology here, not a bypassed check.
+#
+# There is deliberately no row-id filtering — the resident registry has no
+# concept of a per-query corpus subset (that's what /v1/knn/exact's inline
+# corpus is for). A caller that needs row-scoped search must build a scoped
+# resident index instead; asking for allowedRowIds here fails closed rather
+# than silently searching the full index.
+#
+# No caller of this adapter exists yet in the TypeScript codebase as of
+# 2026-08-21 (createCuvsSidecarClient had zero call sites) — this endpoint
+# is being stood up ahead of that client rewrite, not in response to a
+# live consumer.
+
+
+class SimpleSearchRequest(BaseModel):
+    operation: Literal["semantic_ann", "topology_ann"]
+    index: str  # resident indexId this search targets (1:1 naming, no aliasing)
+    vector: list[float]
+    topK: int = Field(gt=0)
+    allowedRowIds: list[int] | None = None
+
+
+class SimpleSearchHit(BaseModel):
+    rank: int
+    packetKey: str
+    sourceRevision: str
+    symbolVersionId: str | None = None
+    # Raw distance from the resident index's configured metric (sqeuclidean/
+    # cosine/inner_product per the index's own build spec) — lower is closer
+    # for sqeuclidean/cosine, higher is closer for inner_product. Deliberately
+    # NOT relabeled as "score" (which implies a single, metric-independent
+    # ranking direction) since no caller-side convention exists to normalize
+    # against.
+    distance: float
+
+
+class SimpleSearchResponse(BaseModel):
+    operation: str
+    index: str
+    metric: Metric
+    results: list[SimpleSearchHit]
+
+
+@app.post("/search", response_model=SimpleSearchResponse)
+def search_named_index(req: SimpleSearchRequest) -> SimpleSearchResponse:
+    if req.allowedRowIds:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "ALLOWED_ROW_IDS_NOT_SUPPORTED",
+                "message": "resident index search has no per-query row-id filter; build a scoped resident index instead",
+            },
+        )
+
+    try:
+        meta = _registry().get(req.index)
+    except KeyError:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "code": "NO_RESIDENT_INDEX",
+                "message": f"no resident index named {req.index!r}; build one via POST /v1/indexes/build first",
+            },
+        )
+
+    if len(req.vector) != meta["dimension"]:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "code": "DIMENSION_MISMATCH",
+                "message": f"query vector length {len(req.vector)} != index dimension {meta['dimension']}",
+            },
+        )
+
+    try:
+        result = _registry().search(
+            ResidentIndexSearchSpec(
+                index_id=req.index,
+                representation_revision=meta["representationRevision"],
+                dataset_checksum_sha256=meta["datasetChecksumSha256"],
+                top_k=req.topK,
+            ),
+            np.asarray([req.vector], dtype=np.float32),
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _http_error(exc) from exc
+
+    hits = result["results"][0] if result["results"] else []
+    return SimpleSearchResponse(
+        operation=req.operation,
+        index=req.index,
+        metric=meta["metric"],
+        results=[
+            SimpleSearchHit(
+                rank=h["rank"],
+                packetKey=h["packetKey"],
+                sourceRevision=h["sourceRevision"],
+                symbolVersionId=h["symbolVersionId"],
+                distance=h["distance"],
+            )
+            for h in hits
+        ],
+    )
 
 
 def main() -> None:

@@ -37,6 +37,10 @@ export const EncoderTrainingManifestV1Schema = z.object({
 
 export type EncoderTrainingManifestV1 = z.infer<typeof EncoderTrainingManifestV1Schema>;
 
+/**
+ * Historical MiniLM classifier kept only as a benchmark until NLP-10 proves the
+ * EmbeddingGemma feature router. It must not mint semantic Qdrant vectors.
+ */
 export const DEFAULT_INTENT_ENCODER_MANIFEST: EncoderTrainingManifestV1 = EncoderTrainingManifestV1Schema.parse({
   schemaVersion: 'atlas.encoder-training-manifest.v1',
   encoderId: 'parent-atlas-intent-domain-v1',
@@ -63,6 +67,11 @@ export const DEFAULT_INTENT_ENCODER_MANIFEST: EncoderTrainingManifestV1 = Encode
   },
 });
 
+/**
+ * Cross-encoder remains a separate joint query-document task. Dense MRL
+ * embeddings are not a functional substitute; promotion requires its own
+ * reranker evaluation/license gate.
+ */
 export const DEFAULT_TOOL_CROSS_ENCODER_MANIFEST: EncoderTrainingManifestV1 = EncoderTrainingManifestV1Schema.parse({
   schemaVersion: 'atlas.encoder-training-manifest.v1',
   encoderId: 'parent-atlas-tool-cross-encoder-v1',
@@ -88,3 +97,60 @@ export const DEFAULT_TOOL_CROSS_ENCODER_MANIFEST: EncoderTrainingManifestV1 = En
     maxRegressionRate: 0.02,
   },
 });
+
+export const QueryRouterTrainingManifestV1Schema = z.object({
+  schemaVersion: z.literal('atlas.query-router-training-manifest.v1'),
+  routerId: z.literal('parent-atlas-query-router-v1'),
+  status: z.enum(['IMPLEMENTED_UNPROVEN', 'SHADOW', 'PROVEN', 'PROMOTED']),
+  embedding: z.object({
+    modelId: z.literal('google/embeddinggemma-300m'),
+    promptMode: z.literal('classification'),
+    promptRevision: z.literal('embeddinggemma-classification-prompt-google-model-card-v1'),
+    sourceRepresentationId: z.literal('classification_768'),
+    representationId: z.literal('classification_mrl_128'),
+    sourceDimension: z.literal(768),
+    dimension: z.literal(128),
+    projectionMethod: z.literal('MRL_PREFIX_TRUNCATE_L2'),
+  }).strict(),
+  deterministicFeatureRevision: z.literal('atlas.query-feature-projection.v1'),
+  tensorRevision: z.literal('atlas.query-router-tensor.v1'),
+  tensorDimension: z.literal(154),
+  framework: z.literal('pytorch'),
+  architectureRevision: z.literal('atlas.query-router-mlp.v1'),
+  outputs: z.array(z.enum(['domain', 'operation', 'retrieval_needs', 'budget'])).length(4),
+  trainSplitRevision: z.string().min(1),
+  validationSplitRevision: z.string().min(1),
+  seed: z.number().int().nonnegative(),
+  evidenceAuthority: z.literal(false),
+  canonicalOwnerChanged: z.literal(false),
+}).strict();
+
+export type QueryRouterTrainingManifestV1 = z.infer<typeof QueryRouterTrainingManifestV1Schema>;
+
+export const DEFAULT_QUERY_ROUTER_TRAINING_MANIFEST: QueryRouterTrainingManifestV1 =
+  QueryRouterTrainingManifestV1Schema.parse({
+    schemaVersion: 'atlas.query-router-training-manifest.v1',
+    routerId: 'parent-atlas-query-router-v1',
+    status: 'IMPLEMENTED_UNPROVEN',
+    embedding: {
+      modelId: 'google/embeddinggemma-300m',
+      promptMode: 'classification',
+      promptRevision: 'embeddinggemma-classification-prompt-google-model-card-v1',
+      sourceRepresentationId: 'classification_768',
+      representationId: 'classification_mrl_128',
+      sourceDimension: 768,
+      dimension: 128,
+      projectionMethod: 'MRL_PREFIX_TRUNCATE_L2',
+    },
+    deterministicFeatureRevision: 'atlas.query-feature-projection.v1',
+    tensorRevision: 'atlas.query-router-tensor.v1',
+    tensorDimension: 154,
+    framework: 'pytorch',
+    architectureRevision: 'atlas.query-router-mlp.v1',
+    outputs: ['domain', 'operation', 'retrieval_needs', 'budget'],
+    trainSplitRevision: 'UNBOUND',
+    validationSplitRevision: 'UNBOUND',
+    seed: 42,
+    evidenceAuthority: false,
+    canonicalOwnerChanged: false,
+  });

@@ -1,5 +1,11 @@
 import type { VectorContract } from '$lib/server/embedding/knn-helper.js';
-import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+// NOTE: this file's SEMANTIC_DIMENSION usage represents EmbeddingGemma's native
+// model output width (used for both the "full768" contract and as the
+// pre-slice source dimension for the 384 prefix), not the canonical persisted
+// semantic_512 representation. Aliased to the native-dimension constant
+// (768) rather than the canonical-persisted constant (512) to preserve this
+// file's actual meaning — see CLAUDE.md task deviation note.
+import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from '$lib/server/atlas/retrieval/qdrant-semantic-projection.js';
 
 export interface EmbeddingGemmaProjectionContract extends VectorContract {
   sourceDimension: number;

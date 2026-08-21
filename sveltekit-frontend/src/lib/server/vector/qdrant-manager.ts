@@ -15,6 +15,7 @@ import {
   QDRANT_SPARSE_VECTOR_NAME,
 } from './retrieval-semantics.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
+import { buildAtlasQdrantFilter } from '$lib/server/retrieval/qdrant-filter-contract.js';
 import { fastJsonParse } from '../gpu/simdjson-bridge.js';
 import { traceVectorSearch } from '../observability/langfuse.js';
 import {
@@ -1689,20 +1690,7 @@ export class QdrantManager {
   }
 
   private buildQdrantFilter(filters: any) {
-    const conditions: any[] = [];
-    for (const [key, value] of Object.entries(filters)) {
-      if (Array.isArray(value)) {
-        conditions.push({
-          key,
-          match: {
-            any: value,
-          },
-        });
-      } else {
-        conditions.push({ key, match: { value } });
-      }
-    }
-    return { must: conditions };
+    return buildAtlasQdrantFilter(filters);
   }
 
   /**

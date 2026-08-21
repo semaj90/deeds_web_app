@@ -124,7 +124,10 @@ async function checkGraphifyStages(): Promise<GraphifyPipelineStage[]> {
   const gemma4Ok = await probeService(`${ENV.LOCAL_OPENAI_BASE_URL}/health`, 2000);
   const ollamaOk = await probeService(`${ENV.OLLAMA_BASE_URL}/api/tags`, 2000);
   const qdrantOk = await probeService(`${ENV.QDRANT_URL}`, 2000);
-  const postgresOk = await probeService(`http://127.0.0.1:5434`, 2000).catch(() => false);
+  const postgresOk = await probeService(
+    `http://${ENV.POSTGRES_HOST ?? '127.0.0.1'}:${ENV.POSTGRES_PORT ?? '5434'}`,
+    2000
+  ).catch(() => false);
 
   return [
     {

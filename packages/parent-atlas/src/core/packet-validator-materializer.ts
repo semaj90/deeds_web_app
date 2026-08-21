@@ -19,8 +19,8 @@
 
 import crypto from 'crypto';
 import type { QueryResultRow } from 'pg';
-import {
 import { fileURLToPath } from 'node:url';
+import {
   extractPacketIdentityFromRow,
   validatePacketIdentityFromRow,
   verifyPacketIdentityConsistency,

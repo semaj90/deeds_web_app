@@ -27,6 +27,7 @@ import type {
 	LoadGraphResult,
 	LoadKarpathyResult,
 	LoadClusterSummariesResult,
+	LoadClusterPacketsResult,
 	LoadFeaturesResult,
 	LoadActivityResult,
 	LoadPathAliasesResult,

@@ -1605,3 +1605,62 @@ summary ownership closes, the next lanes are populating real `trace_packet_event
 `execution_utility`, reaching T2 lineage 5/5, then `feature_matrix_5` with an explicit presence
 mask — all gated behind summary ownership per their own stated sequencing, not behind the
 topology work (which is already closed).
+
+## GS1.51 - GPU/RAPIDS sidecar: same-corpus Qdrant oracle comparison PROVEN; cuvs-sidecar-client.ts rewritten to match the real sidecar; /search adapter added (2026-08-21)
+
+Closes the workstation roadmap's GPU/RAPIDS sidecar next-step ("Same-corpus Qdrant oracle
+comparison; CAGRA remains quarantined" — CAGRA untouched, per that instruction).
+
+**`cuvs-sidecar-client.ts` was a dead stub, now fixed**: `src/lib/server/atlas/retrieval/
+cuvs-sidecar-client.ts` had zero call sites anywhere in the repo and pointed at a nonexistent
+`:8797 POST /search` endpoint — no server had ever implemented that contract. The real, live
+sidecar (`python/atlas_rapids_sidecar.py`, GS1.38) runs on `:8098` with `GET /health`,
+`POST /v1/knn/exact`, `POST /v1/knn/cagra` — a fundamentally different shape (no persistent
+server-side index; every call sends its own corpus inline and builds a fresh GPU index, matching
+the client's own "explicit large-batch prefilter passes" policy comment). Rewrote the client to
+match this real contract: port 8098, real `ExactKnnRequest`/`ExactKnnResponse` shapes with
+per-row `packetKey`/`sourceRevision` identity, honest health-response parsing (`gpu.available`,
+`packages.cuvs.available/version`, not the old fabricated `index_version` field). Dimension stays
+768 (native EmbeddingGemma, matching the sidecar's own `_EXPECTED_DIMENSION = 768`) — this is a
+separate, legitimate 768-dim usage from the `parent-atlas-semantic-512-canonicalization` migration
+happening in parallel this session; see that change's own tasks.md for why the two coexist.
+
+**`/search` adapter added to the resident-index sidecar** (`python/atlas_cuvs_resident_sidecar.py`,
+GS1.38's sibling extension): a `POST /search` convenience route over the resident-index registry
+(`atlas_cuvs_resident_registry.py`) for callers that want to search a named index without carrying
+`representationRevision`/`datasetChecksumSha256` themselves — both are read from the resident
+index's own current metadata (the registry's actual source of truth), never accepted from the
+caller, so this does not weaken the registry's staleness checks. Fails closed on missing index
+(404 `NO_RESIDENT_INDEX`), unsupported `allowedRowIds` (422 — the resident registry has no
+per-query row-id filter), and dimension mismatch (422). Smoke-tested end-to-end via FastAPI
+`TestClient` against a real 3-vector brute-force GPU index: correct nearest-neighbor ordering,
+all three fail-closed paths verified, then removed the scratch test file per this repo's
+archive-not-delete-but-scratch-is-fine convention (it was never committed).
+
+**Same-corpus Qdrant oracle comparison: PROVEN, `ALIGNED`.** New function
+`compare_sidecar_and_qdrant_exact()` in `python/atlas_compute/qdrant_exact_alignment.py`, added
+alongside the pre-existing `compare_pytorch_and_qdrant_exact` (GS1.-era; compares the cuVS
+*algorithm* in-process against Qdrant) — this new function instead proves the sidecar's actual
+*HTTP service boundary* agrees with Qdrant, which the roadmap specifically named as the open item.
+Reused the existing `_query_qdrant_exact()` helper (extended with an optional `restrict_to_ids`
+filter — without it, Qdrant would search its full 52,380-point collection while the sidecar only
+saw a small inline sample, an unfair non-same-corpus comparison). Method: fetched 200 real live
+points (vector + `postgres_id` identity) from `codebase_chunks_768_v2`; for 20 of them as queries,
+self-excluded, sent the remaining 199-row corpus inline to the sidecar's `POST /v1/knn/exact`
+(k=10) and queried Qdrant's own `exact: true` search filtered to that identical 199-row subset via
+`must: match.any`. Result, two independent runs: `status: ALIGNED`,
+`mean_overlap_at_k: 1.0`, `minimum_query_overlap_at_k: 1.0` — the top-10 rankings were
+byte-identical (not merely overlapping; checksums matched exactly) between the sidecar and Qdrant
+across all 20 queries, both runs. Sidecar latency ~173–191ms mean (rebuilds a fresh GPU index per
+call, no persistent state, by design) vs Qdrant's ~4–26ms (native local exact search) — expected
+overhead given the sidecar's documented offline-batch use case, not a per-query interactive path.
+Full receipt: `docs/reports/sidecar-qdrant-exact-alignment.{json,md}`.
+
+**What this does not prove**: CAGRA (ANN) recall — left quarantined per the recorded architecture
+decision, as instructed. Production-scale corpus alignment beyond the 200-row sample. Anything
+about the Atlas `semantic_512` canonical persisted lane — `codebase_chunks_768_v2` is the separate
+general codebase corpus.
+
+**GPU/RAPIDS sidecar workstation status**: was 55% ("Dedicated 8098 sidecar is live-proven for
+exact cuVS `semantic_768` on a revision-qualified fixture... Same-corpus Qdrant oracle comparison"
+listed as the next step). That next step is now closed with real, reproducible evidence.

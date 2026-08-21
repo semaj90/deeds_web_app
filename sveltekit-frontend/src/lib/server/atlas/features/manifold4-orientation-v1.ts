@@ -18,7 +18,8 @@ export const Manifold4OrientationV1Schema = z.object({
   source: z.enum(['som_projection', 'derived_feature', 'imported_rotation']),
   evidenceRefs: z.array(z.string().min(1)).default([]),
 }).superRefine((value, ctx) => {
-  const norm = Math.hypot(...value.quaternion);
+  const quaternion = value.quaternion as unknown as [number, number, number, number];
+  const norm = Math.hypot(...quaternion);
   if (!Number.isFinite(norm) || Math.abs(norm - 1) > 1e-5) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

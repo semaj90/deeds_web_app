@@ -80,7 +80,7 @@ const DEFAULT_CONFIG: Required<EmbeddingServiceConfig> = {
   embed_model_768: 'embeddinggemma:latest',
   embed_model_384: process.env.ATLAS_EMBED_MODEL_384 ?? '',
   ollama_url: ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434',
-  bifrost_url: 'http://127.0.0.1:3040/v1',
+  bifrost_url: ENV.BIFROST_URL ?? 'http://127.0.0.1:3040/v1',
   // Legacy default remains 768; lane-aware callers should use embedQueryForLane().
   target_dim: 768,
   enable_l1_cache: true,

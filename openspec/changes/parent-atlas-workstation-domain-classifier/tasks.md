@@ -1,5 +1,41 @@
 # Tasks — Parent Atlas Workstation Domain Classifier
 
+## Local claim reconciliation (2026-08-20)
+
+The supplied Phase 6/85 note describes Query Routing V2, an EmbeddingGemma
+`classification_mrl_128` tensor, and a PyTorch trainer, but those files and a
+matching OpenSpec are not present in this checkout. The local implementation
+remains the V1 neural-routing feature contract. Focused V1 query-routing,
+neural-routing, and RAPIDS capability-probe tests pass 10/10. This does not
+prove the claimed classifier, dataset, executor-policy training, or MiniLM
+retirement; no model training or runtime/index writes were performed.
+
+## Revision-qualified classification export (2026-08-20)
+
+- [x] Added a pure `EmbeddingGemmaClassificationExampleV1` exporter beside the
+      existing V1 dataset owner.
+- [x] Requires feature, model, prompt, and label revisions; supports explicit
+      `FEATURES_ONLY` rows and only marks a row `TRAINING_READY` when a finite,
+      normalized 128-d `classification_mrl_128` vector is supplied.
+- [x] Focused exporter/query tests pass 4/4 in the dedicated exporter lane. The exporter does not call Ollama,
+      train PyTorch, write JSONL, mutate retrieval policy, or write stores.
+- [ ] A live query/label producer and same-corpus EmbeddingGemma 128-d dataset
+      remain unproven; MiniLM retirement remains blocked.
+- [x] Added an explicit adapter from verified `ToolTrainingExampleV1` rows;
+      domain, operation, retrieval-needs, and all revision metadata remain
+      required inputs and are never inferred from `toolId` or query text.
+- [x] Added the local fixture harness `npm run atlas:embedding:classification:export:proof`;
+      it produced one `FEATURES_ONLY` row with zero training-ready rows and
+      reported `FIXTURE_PROVEN_LIVE_PRODUCER_NOT_WIRED` without store writes.
+- [x] Added a pure adapter from the existing workflow-loop execution receipt;
+      it requires an explicit successful, replay-stable receipt before a caller
+      may mark a row verified and unions receipt evidence into the export row.
+- [ ] The workflow loop still has no live classifier producer. It does not own
+      EmbeddingGemma inference, domain/operation labels, retrieval-needs labels,
+      or classifier policy revisions; no live wiring is claimed.
+- [x] Audited the live error-agent API route and recorded the missing producer
+      inputs in `docs/reports/query-routing-live-producer-audit.json`.
+
 ## Built this session (2026-08-12)
 
 - [x] New module: `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts`

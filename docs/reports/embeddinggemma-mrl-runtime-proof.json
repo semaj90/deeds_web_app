@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.embeddinggemma.mrl.runtime.proof.v1",
+  "generatedAt": "2026-08-21T02:31:16.720Z",
+  "executor": "llama.cpp",
+  "endpoint": "http://127.0.0.1:8081/v1/embeddings",
+  "sourceRepresentationId": "semantic_768",
+  "modelId": "google/embeddinggemma-300m",
+  "projectionMethod": "MRL_PREFIX_TRUNCATE_L2",
+  "dimensions": [
+    768,
+    512,
+    256,
+    128
+  ],
+  "input": "task: code retrieval query | query: locate the canonical Graphify materializer",
+  "outputs": [
+    {
+      "representationId": "semantic_768",
+      "sourceRepresentationId": null,
+      "dimension": 768,
+      "nativeDimension": 768,
+      "finite": true,
+      "l2Norm": 1.0000000000000009,
+      "normalized": true,
+      "vectorDigest": "8b59206f715d344696bdd40dce465926d5d148a6727a2365a762fe1f138ad4b7"
+    },
+    {
+      "representationId": "semantic_mrl_512",
+      "sourceRepresentationId": "semantic_768",
+      "dimension": 512,
+      "nativeDimension": 768,
+      "finite": true,
+      "l2Norm": 1.0000000000000002,
+      "normalized": true,
+      "vectorDigest": "d5122cc334cc30e44d606813ffc89af81e266c5346a3ed9597a74a5c7afbab6d"
+    },
+    {
+      "representationId": "semantic_mrl_256",
+      "sourceRepresentationId": "semantic_768",
+      "dimension": 256,
+      "nativeDimension": 768,
+      "finite": true,
+      "l2Norm": 1.0000000000000002,
+      "normalized": true,
+      "vectorDigest": "8ee5a1e02e177337ed91475c3d2cc978d0212afcabc6d532fbde2bf62b9c6241"
+    },
+    {
+      "representationId": "semantic_mrl_128",
+      "sourceRepresentationId": "semantic_768",
+      "dimension": 128,
+      "nativeDimension": 768,
+      "finite": true,
+      "l2Norm": 1.0000000000000002,
+      "normalized": true,
+      "vectorDigest": "15eb782cc3cfda8cb784ccf7265f0f4895f0450157c6669e22d0197a4dac8cb0"
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "embeddingArtifacts": false
+  },
+  "nativeNorm": 1.0000000295687823,
+  "nativeDigest": "8d44b7b06594912da50d8d07f5f2ce365eac769fef226777d46aa9a09854ff4b",
+  "status": "PROVEN"
+}

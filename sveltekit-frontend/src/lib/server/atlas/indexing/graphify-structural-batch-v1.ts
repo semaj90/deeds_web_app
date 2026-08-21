@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
 
 import type {
-  CanonicalSourceRef,
+  SourceRevisionAuthorityV1,
   StructuralMaterializationResult,
+  StructuralSourceInputV1,
 } from './graphify-structural-materializer.js';
 
 export type GraphifyStructuralDeltaActionV1 = 'UPSERT' | 'DELETE';
@@ -21,6 +22,8 @@ export interface GraphifyStructuralTombstoneV1 {
   schema: 'atlas.graphify-structural-tombstone.v1';
   sourceRef: string;
   workspaceRevision: string;
+  sourceRevision: null;
+  sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY';
   sourceVersionAnchor: string;
   reason: 'SOURCE_DELETED';
   priorContentHash: string | null;
@@ -38,6 +41,8 @@ export interface GraphifyStructuralBatchFileReceiptV1 {
   sourceRef: string;
   action: GraphifyStructuralDeltaActionV1;
   status: GraphifyStructuralBatchFileStatusV1;
+  sourceRevision: string | null;
+  sourceRevisionAuthority: SourceRevisionAuthorityV1;
   sourceVersionAnchor: string | null;
   contentHash: string | null;
   priorContentHash: string | null;
@@ -66,13 +71,14 @@ export interface GraphifyStructuralBatchReceiptV1 {
   tombstoneCount: number;
   isolatedFailurePass: boolean;
   incrementalDeltaPass: boolean;
+  revisionAuthorityPass: boolean;
   files: GraphifyStructuralBatchFileReceiptV1[];
   tombstones: GraphifyStructuralTombstoneV1[];
   outputChecksum: string;
 }
 
 export interface GraphifyStructuralBatchPortsV1 {
-  materialize(input: CanonicalSourceRef): Promise<StructuralMaterializationResult>;
+  materialize(input: StructuralSourceInputV1): Promise<StructuralMaterializationResult>;
 }
 
 export interface RunGraphifyStructuralBatchInputV1 {
@@ -132,12 +138,8 @@ function fileReceiptDigest(receipt: Omit<GraphifyStructuralBatchFileReceiptV1, '
 /**
  * GPH-15/GPH-16 orchestration contract.
  *
- * - A malformed/failed file is represented in its own receipt and never throws
- *   the neighboring inputs out of the batch.
- * - Unchanged UPSERT inputs are skipped when both hashes are known and equal.
- * - DELETE inputs emit explicit tombstones; no parser is called for them.
- * - This runner does not persist canonical identities. Persistence remains the
- *   responsibility of the existing Graphify/GIS evidence owners.
+ * Content hashes are deterministic noncanonical sourceVersionAnchor values.
+ * This batch never fabricates canonical sourceRevision authority.
  */
 export async function runGraphifyStructuralBatchV1(
   input: RunGraphifyStructuralBatchInputV1,
@@ -162,6 +164,8 @@ export async function runGraphifyStructuralBatchV1(
         schema: 'atlas.graphify-structural-tombstone.v1',
         sourceRef,
         workspaceRevision: input.workspaceRevision,
+        sourceRevision: null,
+        sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
         sourceVersionAnchor,
         reason: 'SOURCE_DELETED',
         priorContentHash: raw.priorContentHash ?? null,
@@ -172,14 +176,16 @@ export async function runGraphifyStructuralBatchV1(
         sourceRef,
         action: raw.action,
         status: 'TOMBSTONED' as const,
+        sourceRevision: null,
+        sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
         sourceVersionAnchor,
         contentHash: null,
         priorContentHash: raw.priorContentHash ?? null,
         provider: null,
         structuralStatus: null,
         canonicalPromotionAllowed: false,
-        diagnosticCount: 0,
-        diagnostics: ['SOURCE_DELETED'],
+        diagnosticCount: 1,
+        diagnostics: ['SOURCE_DELETED', 'SOURCE_REVISION_AUTHORITY_UNPROVEN'],
       };
       files.push({ ...partial, outputDigest: fileReceiptDigest(partial) });
       continue;
@@ -191,6 +197,8 @@ export async function runGraphifyStructuralBatchV1(
         sourceRef,
         action: raw.action,
         status: 'FAILED' as const,
+        sourceRevision: null,
+        sourceRevisionAuthority: 'UNPROVEN' as const,
         sourceVersionAnchor: null,
         contentHash: null,
         priorContentHash: raw.priorContentHash ?? null,
@@ -205,30 +213,33 @@ export async function runGraphifyStructuralBatchV1(
     }
 
     const contentHash = raw.currentContentHash ?? graphifyStructuralSha256(source);
+    const sourceVersionAnchor = inferSourceVersionAnchor(sourceRef, contentHash);
     if (raw.priorContentHash && raw.priorContentHash === contentHash) {
-      const sourceVersionAnchor = inferSourceVersionAnchor(sourceRef, contentHash);
       const partial = {
         sourceRef,
         action: raw.action,
         status: 'SKIPPED_UNCHANGED' as const,
+        sourceRevision: null,
+        sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
         sourceVersionAnchor,
         contentHash,
         priorContentHash: raw.priorContentHash,
         provider: null,
         structuralStatus: null,
         canonicalPromotionAllowed: false,
-        diagnosticCount: 0,
-        diagnostics: [] as string[],
+        diagnosticCount: 1,
+        diagnostics: ['SOURCE_REVISION_AUTHORITY_UNPROVEN'],
       };
       files.push({ ...partial, outputDigest: fileReceiptDigest(partial) });
       continue;
     }
 
-    const sourceVersionAnchor = inferSourceVersionAnchor(sourceRef, contentHash);
     try {
       const result = await ports.materialize({
         sourceRef,
-        sourceRevision: sourceVersionAnchor,
+        sourceRevision: null,
+        sourceVersionAnchor,
+        sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
         language: inferLanguage(sourceRef, raw.language),
         source,
       });
@@ -236,7 +247,9 @@ export async function runGraphifyStructuralBatchV1(
         sourceRef,
         action: raw.action,
         status: result.status,
-        sourceVersionAnchor,
+        sourceRevision: result.sourceRevision,
+        sourceRevisionAuthority: result.sourceRevisionAuthority,
+        sourceVersionAnchor: result.sourceVersionAnchor,
         contentHash,
         priorContentHash: raw.priorContentHash ?? null,
         provider: result.provider,
@@ -252,6 +265,8 @@ export async function runGraphifyStructuralBatchV1(
         sourceRef,
         action: raw.action,
         status: 'FAILED' as const,
+        sourceRevision: null,
+        sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
         sourceVersionAnchor,
         contentHash,
         priorContentHash: raw.priorContentHash ?? null,
@@ -290,6 +305,9 @@ export async function runGraphifyStructuralBatchV1(
       && files.some((item) => item.status === 'SKIPPED_UNCHANGED')
       && files.some((item) => item.status === 'PROVEN' || item.status === 'RECOVERED_WITH_ERRORS')
       && tombstones.length > 0,
+    revisionAuthorityPass: files
+      .filter((item) => item.status === 'PROVEN' || item.status === 'RECOVERED_WITH_ERRORS')
+      .every((item) => item.sourceRevisionAuthority === 'PROVEN' && item.sourceRevision !== null),
     files,
     tombstones,
   };

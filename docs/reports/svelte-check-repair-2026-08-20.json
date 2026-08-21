@@ -1,0 +1,84 @@
+{
+  "status": "PARTIAL_REPAIR",
+  "workspace": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "check": "npm run check",
+  "before": {
+    "reportedErrorLines": 87,
+    "exitCode": 1
+  },
+  "intermediateAfterBoundedRepair": {
+    "reportedErrorLines": 57,
+    "exitCode": 1
+  },
+  "latestSvelteCheck": {
+    "reportedErrors": 0,
+    "reportedWarnings": 291,
+    "filesWithProblems": 100,
+    "warningCategories": {
+      "a11y_label_has_associated_control": 121,
+      "a11y_click_events_have_key_events": 48,
+      "a11y_no_static_element_interactions": 34,
+      "a11y_consider_explicit_label": 20,
+      "a11y_interactive_supports_focus": 9,
+      "a11y_no_interactive_element_to_noninteractive_role": 1,
+      "other_svelte_hygiene": 58
+    },
+    "exitCode": 0
+  },
+  "latestTypeScriptCompiler": {
+    "command": "npx tsc --noEmit --pretty false",
+    "exitCode": 0,
+    "status": "PASS"
+  },
+  "parentAtlasPackageCompiler": {
+    "command": "npx tsc -p packages/parent-atlas/tsconfig.json",
+    "exitCode": 0,
+    "status": "PASS"
+  },
+  "rootWorkspaceBuild": {
+    "command": "npm run parent-atlas:build",
+    "status": "BLOCKED_WORKSPACE_SCRIPT_TOPOLOGY",
+    "detail": "Root npm script combines --no-workspaces with --workspace; direct package compiler passes."
+  },
+  "focusedTests": {
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/analysis/source-pos-concept-packet.spec.ts src/lib/server/atlas/retrieval/atlas-rapids-knn-client.spec.ts",
+    "passed": 2,
+    "failed": 0,
+    "status": "PASS"
+  },
+  "final": {
+    "exitCode": 0,
+    "status": "TYPECHECK_PASS_WARNINGS_REMAIN"
+  },
+  "fixedAreas": [
+    "llama-server cache/provider unions",
+    "inference observability backend union",
+    "analysis event participant typing",
+    "Postgres FTS derived fields",
+    "ACP graph-analysis category",
+    "event-fabric worker type imports",
+    "missing runtime imports for VLM/model/ENV constants",
+    "analysis worker semantic envelope preservation",
+    "daily board normalized task identity fields",
+    "Redis type and cluster policy defaults",
+    "ACE context source reference fallback",
+    "learning trainer canonical 768 projection dimension",
+    "regen loader result import and readonly tuple syntax",
+    "workflow loop default callback arity",
+    "packet vector validation boundary",
+    "ontology tuple required provenance fields"
+  ],
+  "canonicalWrites": false,
+  "remainingRepresentativeAreas": [
+    "analysis worker feature typing",
+    "ACE telemetry scope typing",
+    "policy training row contracts",
+    "graph snapshot row narrowing",
+    "phase-lane and ontology tuple contract drift",
+    "learning trainer and packet vector tuple contracts",
+    "external documentation ports",
+    "structural intelligence adapter exports",
+    "remaining graph dispatcher and route API contracts",
+    "291 Svelte accessibility and unused-CSS warnings across 100 files"
+  ]
+}

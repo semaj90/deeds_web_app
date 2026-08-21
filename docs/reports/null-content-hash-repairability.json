@@ -1,0 +1,170 @@
+{
+  "generated_at": "2026-08-21T03:49:29.391Z",
+  "sample_requested": 20,
+  "sample_actual": 20,
+  "counts": {
+    "METADATA_REPAIR_CANDIDATE": 20
+  },
+  "rows": [
+    {
+      "id": "e050f684-a32e-4b67-a58d-3a0229a97155",
+      "source_ref": "src/lib/server/docling.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "21c5ef4fee3d96bb",
+      "proposedChunkId": "card:src/lib/server/docling.ts:21c5ef4fee3d96bb",
+      "similarity": 0.9999999999990001
+    },
+    {
+      "id": "8b7f979a-e728-4670-940b-19b5d612ce82",
+      "source_ref": "src/lib/shims/worker-threads-browser-shim.js",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "7f42cca5e7127ce8",
+      "proposedChunkId": "card:src/lib/shims/worker-threads-browser-shim.js:7f42cca5e7127ce8",
+      "similarity": 0.999999999999
+    },
+    {
+      "id": "c67f38fc-9fd0-41f9-b417-aaa847b4e8a4",
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "417f92585d65f5c2",
+      "proposedChunkId": "card:src/lib/server/db/schema-postgres.ts:417f92585d65f5c2",
+      "similarity": 0.9999999999989988
+    },
+    {
+      "id": "abbc78da-930e-4dcf-ac02-dd5119a93200",
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "8cc160afc63ab114",
+      "proposedChunkId": "card:src/lib/server/db/schema-postgres.ts:8cc160afc63ab114",
+      "similarity": 0.9999999999990006
+    },
+    {
+      "id": "9211dad5-0041-4bff-9112-fc68fd2cc9d7",
+      "source_ref": "src/lib/services/error-analysis/types.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "ae6603b81aae04cb",
+      "proposedChunkId": "card:src/lib/services/error-analysis/types.ts:ae6603b81aae04cb",
+      "similarity": 0.9999999999989986
+    },
+    {
+      "id": "67012cf8-a48f-463e-9ee8-fcc22d79b376",
+      "source_ref": "src/lib/components/ui/context-menu.js",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "ca42472386e8391d",
+      "proposedChunkId": "card:src/lib/components/ui/context-menu.js:ca42472386e8391d",
+      "similarity": 0.9999999999989981
+    },
+    {
+      "id": "aa8d91f1-780c-4270-885f-0d8f0595f97a",
+      "source_ref": "src/lib/data/types.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "fb093aa1994fd22b",
+      "proposedChunkId": "card:src/lib/data/types.ts:fb093aa1994fd22b",
+      "similarity": 0.9999999999989988
+    },
+    {
+      "id": "91065059-cbb5-4b83-8238-60f07bce20f7",
+      "source_ref": "src/lib/db/queries/route-health-queries.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "88edbf87e27e0249",
+      "proposedChunkId": "card:src/lib/db/queries/route-health-queries.ts:88edbf87e27e0249",
+      "similarity": 0.9999999999989986
+    },
+    {
+      "id": "719e603e-4098-46b7-bef6-5ee80dfa3589",
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "ac2ef732717a733a",
+      "proposedChunkId": "card:src/lib/server/db/schema-postgres.ts:ac2ef732717a733a",
+      "similarity": 0.9999999999989981
+    },
+    {
+      "id": "842a3042-1238-4596-bc22-8882a50413b8",
+      "source_ref": "src/lib/server/observability/inference-log.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "34373ddea95f927d",
+      "proposedChunkId": "card:src/lib/server/observability/inference-log.ts:34373ddea95f927d",
+      "similarity": 0.9999999999989994
+    },
+    {
+      "id": "18054d04-b7ba-44f4-b9d3-ffba353c40e3",
+      "source_ref": "src/lib/server/analysis/hmm-ace-analyzer.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "edb773e26d1401fc",
+      "proposedChunkId": "card:src/lib/server/analysis/hmm-ace-analyzer.ts:edb773e26d1401fc",
+      "similarity": 0.9999999999989984
+    },
+    {
+      "id": "51f5181e-7392-4329-baa9-a9fb464a740d",
+      "source_ref": "src/lib/server/image/resize-for-vlm.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "bd21964fbc20f557",
+      "proposedChunkId": "card:src/lib/server/image/resize-for-vlm.ts:bd21964fbc20f557",
+      "similarity": 0.9999999999990004
+    },
+    {
+      "id": "2ea0bbc8-bed9-4aa9-b95f-7f846445024a",
+      "source_ref": "src/routes/api/cases/__tests__/cases-schemas.test.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "ed7f0a003f4e5e2c",
+      "proposedChunkId": "card:src/routes/api/cases/__tests__/cases-schemas.test.ts:ed7f0a003f4e5e2c",
+      "similarity": 0.9999999999989999
+    },
+    {
+      "id": "a9cd9ba3-821b-4dd4-b71e-c804934b8fc5",
+      "source_ref": "src/lib/server/ace/gemma4-codeintel.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "210848e8717e5b41",
+      "proposedChunkId": "card:src/lib/server/ace/gemma4-codeintel.ts:210848e8717e5b41",
+      "similarity": 0.9999999999990001
+    },
+    {
+      "id": "fd14a936-5af3-4fba-9126-5b3020dc7aed",
+      "source_ref": "src/lib/server/error-brain/feature-flags.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "3794558d2815c87a",
+      "proposedChunkId": "card:src/lib/server/error-brain/feature-flags.ts:3794558d2815c87a",
+      "similarity": 0.9999999999989999
+    },
+    {
+      "id": "de0ecc21-2910-49aa-b1df-0fba6cf3e14b",
+      "source_ref": "src/lib/types/evidence.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "05537b00eafd8d96",
+      "proposedChunkId": "card:src/lib/types/evidence.ts:05537b00eafd8d96",
+      "similarity": 0.9999999999990012
+    },
+    {
+      "id": "5331bf21-058c-4e07-84e2-c5cf3df158c1",
+      "source_ref": "src/routes/api/phase72/suggest-fix/+server.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "c68be5f7ed4eec39",
+      "proposedChunkId": "card:src/routes/api/phase72/suggest-fix/+server.ts:c68be5f7ed4eec39",
+      "similarity": 0.9999999999989997
+    },
+    {
+      "id": "4d55c5f2-f395-4a85-bd12-d5ff1bf8d042",
+      "source_ref": "src/lib/server/analytics/minified-research-cache.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "966d53dfe7361fd2",
+      "proposedChunkId": "card:src/lib/server/analytics/minified-research-cache.ts:966d53dfe7361fd2",
+      "similarity": 0.999999999998999
+    },
+    {
+      "id": "2fa63278-6f4d-4c2f-855d-bb69f33eec15",
+      "source_ref": "src/lib/components/cases/index.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "4474d51668fd9cfb",
+      "proposedChunkId": "card:src/lib/components/cases/index.ts:4474d51668fd9cfb",
+      "similarity": 0.9999999999990001
+    },
+    {
+      "id": "757539d8-e898-4eff-a853-bbcff30dbead",
+      "source_ref": "src/lib/server/ai/onnx-server.ts",
+      "classification": "METADATA_REPAIR_CANDIDATE",
+      "recomputedHash": "a6b246d75e7fffac",
+      "proposedChunkId": "card:src/lib/server/ai/onnx-server.ts:a6b246d75e7fffac",
+      "similarity": 0.9999999999989995
+    }
+  ]
+}

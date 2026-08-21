@@ -1,0 +1,267 @@
+{
+  "schema": "atlas.code-source-revision.packet-live-dry-run.v1",
+  "generatedAt": "2026-08-20T23:03:00.456Z",
+  "status": "LIVE_INPUT_BLOCKED_SOURCE_CONTENT_UNAVAILABLE",
+  "canonicalWrites": false,
+  "qdrantWrites": false,
+  "sampleLimit": 25,
+  "rowsSeen": 25,
+  "sourceContentRows": 0,
+  "readyRows": 0,
+  "blockedRows": 25,
+  "diagnostics": [],
+  "graphifySourceTableAvailable": false,
+  "graphifySourceRows": 0,
+  "rows": [
+    {
+      "packetKey": "0ba2345cd9c542fa",
+      "sourceRef": "proto:RetrievalService.Health",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "0bffe0382a0d44bb",
+      "sourceRef": "proto:ToolCallingService.ExecuteToolBatch",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "0ee918abc8c53e8d",
+      "sourceRef": "proto:TurboVecCudaService.Transform",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "1703d9c005252a62",
+      "sourceRef": "proto:LibrarySearchService.Health",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "175066b8a4ceee3c",
+      "sourceRef": "proto:TurboVecService.Transform",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "17dc1fe9f5f8a021",
+      "sourceRef": "proto:CodeIntelService.GetJobStatus",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "1d5eba7211dea6f9",
+      "sourceRef": "proto:ChatAssistantService.SendMessage",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "1dc5ac2b3cd9bfe8",
+      "sourceRef": "proto:LibrarySearchService.StreamLibrary",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "25c824811a2efd81",
+      "sourceRef": "proto:EmbeddingService.GenerateEmbeddings",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "271b5446f6a86a48",
+      "sourceRef": "proto:CyberElephantService.GetClusters",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "28e942decdcdb342",
+      "sourceRef": "proto:CodeIntelService.LookupChunk",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "313d57f685058b60",
+      "sourceRef": "proto:CodeIntelService.SummarizeCluster",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "322b9cf893125f07",
+      "sourceRef": "proto:RetrievalService.GetTopologyContext",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "32c7446a769f9c86",
+      "sourceRef": "proto:RetrievalService.SearchCodebase",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "35afe6ea3fdb17b8",
+      "sourceRef": "proto:TurboVecCudaService.Search",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "368c71501e9385c5",
+      "sourceRef": "proto:RetrievalService.StreamCodebase",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "38da098bc2c36c22",
+      "sourceRef": "proto:RetrievalService.SearchEvidence",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "3bf3bc0c64d433c0",
+      "sourceRef": "proto:LibrarySearchService.GetDocumentToc",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "3d0da82598d9064a",
+      "sourceRef": "proto:RetrievalService.SearchChunks",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "3edd306a02055c3a",
+      "sourceRef": "proto:ChatAssistantService.CreateSession",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "3f73ebb0336ae4f3",
+      "sourceRef": "proto:Chr97Agent.QueryTags",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "40ce2356b07edded",
+      "sourceRef": "proto:ToolCallingService.ExecuteTool",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "43f38d7b75868c7c",
+      "sourceRef": "proto:TurboVecService.Upsert",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "4439c492e016f9d3",
+      "sourceRef": "proto:CyberElephantService.UpdateClusters",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    },
+    {
+      "packetKey": "482abc5766b6f8ed",
+      "sourceRef": "proto:GpuBridgeService.AssignSom",
+      "status": "BLOCKED",
+      "errors": [
+        "GRAPHIFY_SOURCE_LINEAGE_NOT_FOUND"
+      ],
+      "existingDigestMatch": null,
+      "sourceContentPresent": false
+    }
+  ]
+}

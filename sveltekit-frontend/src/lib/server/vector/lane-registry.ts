@@ -1,4 +1,9 @@
-import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
+// NOTE: this registry's `source768` lane is explicitly the native 768-dim
+// EmbeddingGemma source lane on the general 'codebase_chunks_768' collection
+// (getActiveSemanticVectorLane() asserts dimension === 768 by invariant), not
+// the persisted canonical semantic_512 lane. Aliased to the native-dimension
+// constant to preserve this file's actual meaning.
+import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from '../atlas/retrieval/qdrant-semantic-projection.js';
 
 /**
  * Semantic vectors and latent topology projections are different contracts.

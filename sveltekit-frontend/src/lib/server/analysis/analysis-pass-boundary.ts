@@ -1,9 +1,9 @@
 import { db, pgRows } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import {
-	SEMANTIC_REPRESENTATION_ID,
-	SEMANTIC_DIMENSION,
-} from '../embedding/embedding-contract-768.js';
+	ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+	ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from '../atlas/retrieval/qdrant-semantic-projection.js';
 
 export interface AnalysisPassBoundaryProofSnapshot {
 	generatedAt: string;

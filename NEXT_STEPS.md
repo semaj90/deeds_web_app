@@ -87,7 +87,7 @@ npm run atlas:phase1:backfill:summary:embeddings:apply
 
 **Details**:
 - Read `atlas_packets.summary` from Postgres
-- Embed via Ollama `embeddinggemma:latest` (384-dim)
+- Embed via Ollama `embeddinggemma:latest` (`semantic_768`, 768-dim native; truncation lanes are derived only)
 - Write `summary_embedding` column
 - Time: ~30 minutes for ~58K packets
 

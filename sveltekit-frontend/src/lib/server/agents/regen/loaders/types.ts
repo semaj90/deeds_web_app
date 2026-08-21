@@ -96,7 +96,7 @@ export interface ClusterAcePacketSummary {
 	clusterId: number;
 	summary: string;
 	topFiles: readonly string[];
-	pageRankTop5: readonly Array<{
+	pageRankTop5: ReadonlyArray<{
 		filePath: string;
 		pageRank: number;
 		karpathyBlend: number;

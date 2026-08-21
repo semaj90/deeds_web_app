@@ -9,6 +9,10 @@ const frontend = path.join(root, 'sveltekit-frontend');
 const reportDir = path.join(root, 'docs', 'reports');
 const exists = (relative) => fs.existsSync(path.join(root, relative));
 const scriptText = fs.readFileSync(path.join(frontend, 'package.json'), 'utf8');
+const searchRuntimeAdapterPath = path.join(frontend, 'src', 'lib', 'server', 'atlas', 'retrieval', 'search-runtime-adapter.ts');
+const searchRuntimeAdapterText = fs.existsSync(searchRuntimeAdapterPath)
+  ? fs.readFileSync(searchRuntimeAdapterPath, 'utf8')
+  : '';
 
 function collectTypeScriptFiles(directory) {
   if (!fs.existsSync(directory)) return [];
@@ -67,6 +71,11 @@ const owners = {
     status: matrixCallers.length > 0 ? 'CALLER_FOUND_UNPROVEN' : 'DEFINITION_ONLY_NO_LIVE_CALLER',
     callers: matrixCallers.map((filePath) => path.relative(root, filePath)),
   },
+  searchRuntimeQasCaller: {
+    owner: 'sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts::searchWithQas',
+    status: /searchWithQas\s*\(/.test(searchRuntimeAdapterText) ? 'WIRED_READ_ONLY_CALLER' : 'MISSING',
+    liveInvocation: 'NOT_PROVEN',
+  },
 };
 
 const report = {
@@ -78,7 +87,7 @@ const report = {
   owners,
   missingRequired: [
     'revision-qualified QAS candidate feature input',
-    'live CandidateFeatureMatrixRowV1 producer caller',
+    'live CandidateFeatureMatrixRowV1 producer invocation',
     'exact SearchRuntime promotion adapter and recall baseline',
     'SOM/domain route binding',
     'QAS receipt to existing Kanban recommendation linkage',

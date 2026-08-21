@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.emb3a.upstream.revision.owner.audit.v1",
+  "generatedAt": "2026-08-20T22:35:33.003Z",
+  "readOnly": true,
+  "tables": [
+    {
+      "table": "atlas_packets",
+      "available": [
+        "packet_key",
+        "source_ref",
+        "sha256",
+        "workspace_revision",
+        "representation_revision"
+      ],
+      "missing": [
+        "source_revision",
+        "representation_id"
+      ],
+      "status": "PARTIAL_SCHEMA",
+      "coverage": {
+        "total_rows": 61660,
+        "packet_key_present": 61660,
+        "source_ref_present": 61660,
+        "sha256_present": 4715,
+        "workspace_revision_present": 61660,
+        "representation_revision_present": 61660,
+        "workspace_revision_nonzero": 0,
+        "representation_revision_nonzero": 1
+      }
+    },
+    {
+      "table": "atlas_ast_nodes",
+      "available": [
+        "source_ref_key",
+        "source_revision",
+        "workspace_id"
+      ],
+      "missing": [],
+      "status": "SCHEMA_PRESENT",
+      "coverage": {
+        "total_rows": 11067,
+        "source_ref_key_present": 7565,
+        "source_revision_present": 0,
+        "workspace_id_present": 0
+      }
+    },
+    {
+      "table": "atlas_source_revisions",
+      "available": [
+        "source_revision_id",
+        "final_url",
+        "content_digest",
+        "received_at"
+      ],
+      "missing": [
+        "packet_key",
+        "source_ref"
+      ],
+      "status": "PARTIAL_SCHEMA",
+      "coverage": {
+        "total_rows": 2,
+        "source_revision_id_present": 2,
+        "final_url_present": 2,
+        "content_digest_present": 2,
+        "received_at_present": 2
+      }
+    },
+    {
+      "table": "atlas_representation_records",
+      "available": [],
+      "missing": [
+        "packet_key",
+        "representation_id",
+        "representation_revision"
+      ],
+      "status": "NOT_FOUND_OR_INCOMPLETE"
+    }
+  ],
+  "writer": {
+    "representationOwnerCandidate": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+    "qdrantProjectionOwner": "sveltekit-frontend/src/lib/server/workers/qdrant-sync-worker.ts -> retrieval/qdrant-sync-payload.ts",
+    "upstreamRevisionOwner": "NOT_PROVEN",
+    "fallbackDefaults": {
+      "workspace_revision": 0,
+      "representation_revision": 0,
+      "source_revision": null
+    },
+    "sourceRevisionAdjacentOwner": "atlas_source_revisions",
+    "sourceRevisionBinding": "NOT_PROVEN_FOR_ATLAS_PACKETS"
+  },
+  "status": "REVISION_OWNER_NOT_PROVEN",
+  "canonicalWrites": false,
+  "sourceRevisionBindingAudit": {
+    "explicitPacketKeyField": false,
+    "explicitSourceRefField": false,
+    "digestJoinCandidate": true,
+    "status": "REJECTED_UNTRUSTED_DIGEST_COLLISION",
+    "packetDigestOverlap": 1,
+    "samples": [
+      {
+        "packet_key": "packet:010123f2218c",
+        "source_ref": "crates/turbovec-napi/target/debug/incremental/turbovec-3o369art68x7j/s-hjhrh6o90q-0yp6jje.lock",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_revision_id": "d6fe6d3c-b66b-4745-9d2b-ec360d93dd47",
+        "final_url": "https://example.com",
+        "content_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  }
+}

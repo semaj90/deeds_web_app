@@ -274,7 +274,10 @@ Rules:
 			for (const tc of toolCalls) {
 				if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
 				const toolName = tc.function?.name;
-				const toolArgs = tc.function?.arguments || {};
+				const rawToolArgs = tc.function?.arguments;
+				const toolArgs: Record<string, unknown> = rawToolArgs && typeof rawToolArgs === 'object' && !Array.isArray(rawToolArgs)
+					? rawToolArgs as Record<string, unknown>
+					: {};
 				if (!toolName) continue;
 
 				const tr = await executeTool(toolName, toolArgs);

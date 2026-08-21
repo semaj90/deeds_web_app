@@ -1,6 +1,6 @@
 export const QDRANT_COLLECTION_REGISTRY = {
-  canonical: 'codebase_chunks_384_hybrid',
-  legacySource: 'codebase_chunks_768',
+  canonical: 'codebase_chunks_768_v2',
+  legacySource: 'codebase_chunks_384_hybrid',
   graphProjection: 'codebase_graph_projection',
 } as const;
 

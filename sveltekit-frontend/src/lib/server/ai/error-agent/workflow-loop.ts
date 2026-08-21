@@ -403,11 +403,11 @@ export async function runWorkflowLoop(
 
   const repair = deps.repair
     ? await deps.repair(input, classification, scaffold)
-    : await defaultRepair(input, classification, scaffold);
+    : await defaultRepair(input, classification);
 
   const smoke = deps.smoke
     ? await deps.smoke(input, classification, repair, scaffold)
-    : await defaultSmoke(input, classification, scaffold);
+    : await defaultSmoke(input, classification);
   const receipt = buildExecutionReceipt(input, scaffold, repair, smoke, now());
   const verdict = computeVerdict(classification, receipt, smoke);
   const policyUpdate = computePolicyUpdate(scaffold, verdict, input);

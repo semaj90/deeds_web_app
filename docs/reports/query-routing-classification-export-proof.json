@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.query-routing.classification-export.proof.v1",
+  "generatedAt": "2026-08-21T02:30:37.523Z",
+  "status": "FIXTURE_PROVEN_LIVE_PRODUCER_NOT_WIRED",
+  "rows": 1,
+  "trainingReadyRows": 0,
+  "featuresOnlyRows": 1,
+  "row": {
+    "schemaVersion": "atlas.embeddinggemma-classification-example.v1",
+    "exampleId": "fixture:query-routing:classification:1",
+    "requestId": "fixture-request-1",
+    "queryText": "inspect the Graphify parser failure",
+    "featureRevision": "fixture.query-routing-features.r1",
+    "queryFeatures": [
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+    ],
+    "embeddingRepresentationId": "classification_mrl_128",
+    "embeddingModelRevision": "embeddinggemma-300m:r1",
+    "promptRevision": "embeddinggemma-classification:p1",
+    "embedding": null,
+    "domainLabel": "ast",
+    "operationLabel": "inspect",
+    "retrievalNeeds": [
+      "semantic",
+      "structural"
+    ],
+    "candidateBudget": 128,
+    "labelRevision": "fixture.labels.r1",
+    "evidenceRefs": [
+      "fixture:execution-receipt:1"
+    ],
+    "verified": true,
+    "status": "FEATURES_ONLY",
+    "checksum": "8357fda5f6a321e2903ddd23d7f038b92dccb0fe70f0b7ec1cbdc32028a9f9ac"
+  },
+  "liveProducer": "NOT_PROVEN",
+  "trainingRun": false,
+  "canonicalWrites": false
+}

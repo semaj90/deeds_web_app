@@ -270,7 +270,7 @@ export async function endToEndRetrieval(
   query: string,
   queryEmbedding: number[],
   goServiceUrl: string = ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
-  tensorrtUrl: string = 'http://localhost:8765',
+  tensorrtUrl: string = ENV.TENSORRT_URL ?? 'http://127.0.0.1:8765',
   gemma4Url: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
 ): Promise<{
   answer: GemmaAnswer;
