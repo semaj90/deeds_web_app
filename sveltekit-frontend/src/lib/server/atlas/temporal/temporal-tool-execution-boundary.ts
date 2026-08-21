@@ -8,6 +8,7 @@ import {
   executionRetryPolicySchema,
   temporalActionChecksum,
   type ActionCurrentProjectionV1,
+  type ActionExecutionDescriptorV1,
   type ExecutionReuseDecisionV1,
 } from '@deeds/parent-atlas';
 
@@ -60,6 +61,33 @@ function canonicalToolCall(call: { tool: string; args: unknown }) {
  */
 export function buildTemporalToolInputHash(call: { tool: string; args: unknown }): string {
   return temporalActionChecksum(canonicalToolCall(call));
+}
+
+/**
+ * Safe producer helper for revision-qualified workflow code.
+ *
+ * It computes input_hash from the concrete call rather than allowing a caller to
+ * accidentally pair an unrelated ActionExecutionDescriptorV1 with a tool call.
+ * Revision coordinates are still supplied explicitly by their real owner.
+ */
+export function buildTemporalToolExecutionContext(input: {
+  call: { tool: string; args: unknown };
+  descriptor: Omit<ActionExecutionDescriptorV1, 'input_hash'>;
+  retry_policy: z.input<typeof executionRetryPolicySchema>;
+  producer_revision: string;
+}): TemporalToolExecutionContextV1 {
+  const call = canonicalToolCall(input.call);
+  if (!call.tool) throw new Error('TEMPORAL_TOOL_NAME_REQUIRED');
+  return temporalToolExecutionContextSchema.parse({
+    schema: 'atlas.temporal-tool-execution-context.v1',
+    expected_tool: call.tool,
+    descriptor: {
+      ...input.descriptor,
+      input_hash: buildTemporalToolInputHash(call),
+    },
+    retry_policy: input.retry_policy,
+    producer_revision: input.producer_revision,
+  });
 }
 
 function dispositionForDecision(decision: ExecutionReuseDecisionV1): TemporalToolBoundaryDecisionV1['disposition'] {
