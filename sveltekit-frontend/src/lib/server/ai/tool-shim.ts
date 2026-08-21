@@ -106,12 +106,24 @@ export function parseToolCalls(text: string) {
   return [];
 }
 
+export type TemporalPostDispatchHookInput = {
+  call: { tool: string; args: any };
+  result: unknown;
+  temporalAction: unknown;
+  temporalBoundary: unknown;
+};
+
+export type TemporalPostDispatchHook = (
+  input: TemporalPostDispatchHookInput,
+) => Promise<void> | void;
+
 type ToolExecutionContext = {
   temporalAction?: unknown;
   temporalActionBoundary?: unknown;
   temporalAlternativePlan?: unknown;
   temporalAlternativeSelection?: unknown;
   temporalAlternativeDepth?: number;
+  temporalPostDispatch?: TemporalPostDispatchHook;
   [key: string]: unknown;
 };
 
@@ -119,6 +131,20 @@ type TemporalBoundaryOutcome =
   | { kind: 'SHORT_CIRCUIT'; result: unknown }
   | { kind: 'REPLACE'; call: { tool: string; args: any }; temporalAction: unknown; failedExecutionKey: string }
   | null;
+
+async function runTemporalPostDispatchHook(
+  call: { tool: string; args: any },
+  result: unknown,
+  context?: ToolExecutionContext,
+): Promise<void> {
+  if (!context?.temporalAction || !context.temporalPostDispatch) return;
+  await context.temporalPostDispatch({
+    call,
+    result,
+    temporalAction: context.temporalAction,
+    temporalBoundary: context.temporalActionBoundary ?? null,
+  });
+}
 
 /**
  * Optional temporal execution policy. Existing callers remain unchanged unless
@@ -234,20 +260,27 @@ async function executeToolAtDepth(
     case "rg_search":
       {
         const { tool_codebase_rg_search } = await import('./mcp-tool-dispatch.js');
-        return tool_codebase_rg_search(call.args);
+        const result = await tool_codebase_rg_search(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       }
 
     case "graph_expand":
       {
         const { tool_graph_expand_neighborhood } = await import('./mcp-tool-dispatch.js');
-        return tool_graph_expand_neighborhood(call.args);
+        const result = await tool_graph_expand_neighborhood(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       }
 
     case "atlas_lookup":
     case "search.hybrid":
       {
         const { tool_search_hybrid } = await import('./mcp-tool-dispatch.js');
-        return tool_search_hybrid ? tool_search_hybrid(call.args) : null;
+        if (!tool_search_hybrid) return null;
+        const result = await tool_search_hybrid(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       }
 
     case "terminal": {
@@ -265,20 +298,24 @@ async function executeToolAtDepth(
           windowsHide: true,
           env: process.env,
         });
-        return {
+        const result = {
           ok: true,
           tool: 'terminal',
           command,
           stdout: String(stdout ?? '').trim(),
           stderr: String(stderr ?? '').trim(),
         };
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       } catch (error: any) {
-        return {
+        const result = {
           ok: false,
           tool: 'terminal',
           command,
           error: String(error?.message ?? error),
         };
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       }
     }
 
