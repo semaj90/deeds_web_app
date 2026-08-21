@@ -17,24 +17,53 @@ export const retrievalEvaluationSchema = z.object({
   reason: z.string().optional(),
 }).passthrough();
 
-export const qdrantExactAlignmentSchema = z.object({
-  schema: z.literal('atlas.qdrant-exact-alignment-receipt.v1'),
+export const qdrantScopedSweepPointSchema = z.object({
+  hnsw_ef: z.number().int().positive(),
+  recall_at_k: z.number().finite().min(0).max(1),
+  mean_latency_ms: z.number().finite().nonnegative(),
+  p95_latency_ms: z.number().finite().nonnegative(),
+  result_checksum: checksum,
+}).strict();
+
+export const qdrantScopedAnnSchema = z.object({
+  schema: z.literal('atlas.qdrant-scoped-ann-receipt.v1'),
+  comparison_scope: z.enum(['snapshot_subset', 'full_collection']),
+  scoped_corpus_count: z.number().int().positive(),
+  scoped_corpus_checksum: checksum,
   collection: z.string().min(1),
   vector_name: z.string().min(1).nullable(),
   canonical_payload_key: z.string().min(1),
-  metric: z.string().min(1),
+  metric: z.enum(['cosine', 'inner_product', 'sqeuclidean']),
   k: z.number().int().positive(),
   query_count: z.number().int().positive(),
-  minimum_overlap_at_k: z.number().finite().min(0).max(1),
-  mean_overlap_at_k: z.number().finite().min(0).max(1),
-  minimum_query_overlap_at_k: z.number().finite().min(0).max(1),
+  minimum_exact_overlap_at_k: z.number().finite().min(0).max(1),
+  pytorch_qdrant_exact_mean_overlap_at_k: z.number().finite().min(0).max(1),
+  pytorch_qdrant_exact_minimum_query_overlap_at_k: z.number().finite().min(0).max(1),
+  exact_alignment_status: z.enum(['ALIGNED', 'EXACT_STORE_MISMATCH']),
   exact_mean_latency_ms: z.number().finite().nonnegative(),
   exact_p95_latency_ms: z.number().finite().nonnegative(),
-  pytorch_exact_checksum: checksum,
-  qdrant_exact_checksum: checksum,
-  status: z.enum(['ALIGNED', 'EXACT_STORE_MISMATCH']),
+  exact_result_checksum: checksum,
+  sweep: z.array(qdrantScopedSweepPointSchema),
+  minimum_hnsw_recall_at_k: z.number().finite().min(0).max(1),
+  recommended_hnsw_ef: z.number().int().positive().nullable(),
+  recommendation_status: z.enum([
+    'ELIGIBLE',
+    'BLOCKED_EXACT_STORE_MISMATCH',
+    'NO_SWEEP_POINT_MEETS_RECALL_FLOOR',
+  ]),
+  best_hnsw_recall_at_k: z.number().finite().min(0).max(1),
   canonical_authority: z.literal(false),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.exact_alignment_status !== 'ALIGNED' && value.sweep.length !== 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sweep'], message: 'HNSW sweep must be empty when the exact same-corpus gate fails' });
+  }
+  if (value.recommendation_status === 'ELIGIBLE' && value.recommended_hnsw_ef === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['recommended_hnsw_ef'], message: 'eligible HNSW recommendation requires an ef value' });
+  }
+  if (value.recommendation_status !== 'ELIGIBLE' && value.recommended_hnsw_ef !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['recommended_hnsw_ef'], message: 'ineligible HNSW result cannot recommend an ef value' });
+  }
+});
 
 export const alignedSnapshotExperimentV2Schema = z.object({
   schema: z.literal('atlas.aligned-snapshot-experiment.v2'),
@@ -95,9 +124,9 @@ export const alignedSnapshotProofEnvelopeV2Schema = z.object({
   experiment_output_path: z.string().min(1),
   experiment_output_file_checksum: checksum,
   experiment_output_checksum: checksum,
-  qdrant_exact_alignment: qdrantExactAlignmentSchema.nullable(),
-  qdrant_exact_alignment_file: z.string().min(1).nullable(),
-  qdrant_exact_alignment_file_checksum: checksum.nullable(),
+  qdrant_scoped_ann: qdrantScopedAnnSchema.nullable(),
+  qdrant_scoped_ann_file: z.string().min(1).nullable(),
+  qdrant_scoped_ann_file_checksum: checksum.nullable(),
   gpu_memory: z.object({
     schema: z.literal('atlas.gpu-memory-receipt.v1'),
     available: z.boolean(),
@@ -112,24 +141,25 @@ export const alignedSnapshotProofEnvelopeV2Schema = z.object({
   canonical_authority: z.literal(false),
   envelope_checksum: checksum,
 }).strict().superRefine((value, ctx) => {
-  const present = value.qdrant_exact_alignment !== null;
-  if (present !== (value.qdrant_exact_alignment_file !== null) || present !== (value.qdrant_exact_alignment_file_checksum !== null)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_exact_alignment'], message: 'Qdrant exact alignment receipt/file/checksum must be present or absent together' });
+  const present = value.qdrant_scoped_ann !== null;
+  if (present !== (value.qdrant_scoped_ann_file !== null) || present !== (value.qdrant_scoped_ann_file_checksum !== null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_scoped_ann'], message: 'Qdrant scoped receipt/file/checksum must be present or absent together' });
   }
-  if (value.qdrant_exact_alignment?.status === 'EXACT_STORE_MISMATCH') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_exact_alignment'], message: 'proof envelope cannot certify HNSW when Qdrant exact store mismatches frozen PyTorch exact' });
+  if (value.qdrant_scoped_ann?.exact_alignment_status === 'EXACT_STORE_MISMATCH') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_scoped_ann'], message: 'proof envelope cannot certify HNSW when the same-corpus exact store mismatches PyTorch exact' });
   }
 });
 
 export type AlignedSnapshotExperimentV2 = z.infer<typeof alignedSnapshotExperimentV2Schema>;
-export type QdrantExactAlignmentV1 = z.infer<typeof qdrantExactAlignmentSchema>;
+export type QdrantScopedAnnV1 = z.infer<typeof qdrantScopedAnnSchema>;
 export type AlignedSnapshotProofEnvelopeV2 = z.infer<typeof alignedSnapshotProofEnvelopeV2Schema>;
 
 export function describeAlignedSnapshotExperiment(): string {
   return [
     'One frozen semantic_768 snapshot owns canonical row ordinals for the experiment.',
     'Snapshot lineage identity and cross-block canonical row-order identity use separate checksums and must not be conflated.',
-    'PyTorch FP32 exact and cuVS brute-force compare exact Top-K; Qdrant exact must first align to frozen PyTorch exact before HNSW can be recommended.',
+    'PyTorch FP32 exact and cuVS brute-force compare exact Top-K.',
+    'Qdrant exact and HNSW must use one explicit corpus scope: the frozen snapshot subset or a proven full collection.',
     'CAGRA and Qdrant HNSW compare Recall@K only after their corresponding exact-oracle boundaries are valid.',
     'N-ary incidence remains canonical support while sparse softmax/SpMM are derived propagation.',
     'Context windows require an explicit source/AST/workflow/temporal ordering and scatter results back to canonical row ordinals.',
