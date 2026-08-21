@@ -4,118 +4,55 @@
 
 export { AtlasState, createAtlasRuntimeContext } from './atlas-runtime-context';
 export type { AtlasRuntimeContext, RuntimeObservation, HMMInference } from './atlas-runtime-context';
-
 export { estimateExecutionState, isTransitionAllowed } from './atlas-fsm-policy';
 export { buildRuntimeRegistryRecommendationDrafts } from './runtime-registry';
-
-export {
-  atlasRetrieveTool,
-  atlasValidateChangeTool,
-  atlasApplyChangeTool,
-  atlasBuildContextTool,
-  atlasDiscoverTool,
-  atlasInspectRuntimeTool,
-  atlasDelegateTool,
-  createAtlasRequestContext,
-  atlasToolCallProcessor,
-} from './atlas-mastra-adapter';
-
-export {
-  getRetrievalGrpcClient,
-  closeRetrievalGrpcClient,
-  retrieveFromGo,
-  buildContextFromGo,
-  validatePacketFromGo,
-} from './go-retrieval-grpc-client';
-
-export {
-  buildSpecRecommendation,
-  buildSpecRecommendations,
-} from './recommendations/spec-recommendation-bridge';
-
-export {
-  FabricLaneKindSchema,
-  FabricLaneManifestSchema,
-  buildFabricLaneManifest,
-} from './contracts/fabric-lanes';
-
+export { atlasRetrieveTool, atlasValidateChangeTool, atlasApplyChangeTool, atlasBuildContextTool, atlasDiscoverTool, atlasInspectRuntimeTool, atlasDelegateTool, createAtlasRequestContext, atlasToolCallProcessor } from './atlas-mastra-adapter';
+export { getRetrievalGrpcClient, closeRetrievalGrpcClient, retrieveFromGo, buildContextFromGo, validatePacketFromGo } from './go-retrieval-grpc-client';
+export { buildSpecRecommendation, buildSpecRecommendations } from './recommendations/spec-recommendation-bridge';
+export { FabricLaneKindSchema, FabricLaneManifestSchema, buildFabricLaneManifest } from './contracts/fabric-lanes';
 export { buildBoardFabricLaneManifest } from './board/fabric-lane-manifest';
 export { buildBoardGpuBenchmarkReceipt } from './board/fabric-gpu-benchmark';
 export { buildDailyGraphifyBoardRecommendations } from './board/daily-graphify-board-recommendations';
 export { buildDailyGraphifyTaskCandidates } from './board/graphify-task-candidates';
+export { buildParentAtlasPhaseLaneProofReport, getParentAtlasPhaseLaneProofSnapshot } from './phase-lane-proof';
+export { buildParentAtlasPhaseLaneReport, getParentAtlasPhaseLane, getParentAtlasPhaseLaneSnapshot, listParentAtlasPhaseLanes } from './phase-lane-registry';
+export { buildParentAtlasPassFabricProofReport, getParentAtlasPassFabricProofSnapshot } from './pass-fabric-proof';
+export { derivePacketInputsFromAceContext } from './packet-consumer-inputs';
+export { AtlasProcessPacketInputSchema, buildAtlasProcessPacket } from './process-packets';
+export { runPacketConsumerPipeline, hashPacketConsumerPipelineInput } from './packet-consumer-pipeline';
+export { PACKET_FEATURE_NAMES, PACKET_FEATURE_COUNT, buildPacketFeatureMatrix, buildPacketFeatureMatrixFromPackets, buildPacketFeatureRowsFromPackets, getPacketFeatureRow, normalizeDemandUtility } from './ranking/packet-feature-matrix';
+
 export {
-  buildParentAtlasPhaseLaneProofReport,
-  getParentAtlasPhaseLaneProofSnapshot,
-} from './phase-lane-proof';
+  AstNodeLocatorV1Schema,
+  StructuralIdentityV1Schema,
+  deriveAstNodeId,
+  deriveStructuralNodeId,
+  deriveSymbolId,
+  deriveSymbolVersionId,
+  buildStructuralIdentity,
+} from './structural/structural-identity-v1';
+export type { AstNodeLocatorV1, StructuralIdentityV1 } from './structural/structural-identity-v1';
+
 export {
-  buildParentAtlasPhaseLaneReport,
-  getParentAtlasPhaseLane,
-  getParentAtlasPhaseLaneSnapshot,
-  listParentAtlasPhaseLanes,
-} from './phase-lane-registry';
+  StructuralParticipantRoleSchema,
+  StructuralHyperedgeTypeSchema,
+  StructuralHyperedgeV1Schema,
+  RetrievalFanoutPlanV1Schema,
+  buildStructuralHyperedge,
+  buildRetrievalFanoutPlan,
+} from './structural/structural-hypergraph-fanout';
+export type { StructuralHyperedgeV1, RetrievalFanoutPlanV1 } from './structural/structural-hypergraph-fanout';
+
 export {
-  buildParentAtlasPassFabricProofReport,
-  getParentAtlasPassFabricProofSnapshot,
-} from './pass-fabric-proof';
+  RlmRoutingPrefillV1Schema,
+  RlmNavigationDecisionV1Schema,
+  AcePrefetchHintV1Schema,
+  RlmAceRoutingReceiptV1Schema,
+} from './rlm/rlm-ace-routing-contract';
+export { somNeighborhood, buildRlmRoutingPrefill, buildRlmNavigationDecision, buildAcePrefetchHints, buildRlmAceRoutingReceipt } from './rlm/rlm-ace-routing';
+
 export {
-  derivePacketInputsFromAceContext,
-} from './packet-consumer-inputs';
-export {
-  AtlasProcessPacketInputSchema,
-  buildAtlasProcessPacket,
-} from './process-packets';
-export {
-  runPacketConsumerPipeline,
-  hashPacketConsumerPipelineInput,
-} from './packet-consumer-pipeline';
-export {
-  PACKET_FEATURE_NAMES,
-  PACKET_FEATURE_COUNT,
-  buildPacketFeatureMatrix,
-  buildPacketFeatureMatrixFromPackets,
-  buildPacketFeatureRowsFromPackets,
-  getPacketFeatureRow,
-  normalizeDemandUtility,
-} from './ranking/packet-feature-matrix';
-export {
-  KanbanTaskLaneSchema,
-  KanbanTaskStatusSchema,
-  KanbanTaskSchema,
-  KanbanTaskListInputSchema,
-  KanbanTaskListOutputSchema,
-  KanbanTaskShowInputSchema,
-  KanbanTaskClaimInputSchema,
-  KanbanTaskBlockInputSchema,
-  KanbanTaskCompleteInputSchema,
-  KanbanTaskHeartbeatInputSchema,
-  KanbanTaskHeartbeatResultSchema,
-  KanbanTaskClaimResultSchema,
-  KanbanTaskReclaimInputSchema,
-  KanbanTaskRetryInputSchema,
-  KanbanTaskCreateChildInputSchema,
-  KanbanTaskCommentSchema,
-  KanbanTaskCommentsInputSchema,
-  KanbanTaskAttemptSchema,
-  KanbanTaskAttemptsInputSchema,
-  listKanbanTasks,
-  showKanbanTask,
-  claimKanbanTask,
-  blockKanbanTask,
-  completeKanbanTask,
-  heartbeatKanbanTask,
-  reclaimStaleKanbanTask,
-  retryKanbanTask,
-  createChildKanbanTask,
-  listKanbanTaskDependencies,
-  listKanbanTaskComments,
-  listKanbanTaskAttempts,
-  listKanbanTaskEvents,
-  recordKanbanTaskAttempt,
-  formatKanbanTaskSummary,
+  KanbanTaskLaneSchema, KanbanTaskStatusSchema, KanbanTaskSchema, KanbanTaskListInputSchema, KanbanTaskListOutputSchema, KanbanTaskShowInputSchema, KanbanTaskClaimInputSchema, KanbanTaskBlockInputSchema, KanbanTaskCompleteInputSchema, KanbanTaskHeartbeatInputSchema, KanbanTaskHeartbeatResultSchema, KanbanTaskClaimResultSchema, KanbanTaskReclaimInputSchema, KanbanTaskRetryInputSchema, KanbanTaskCreateChildInputSchema, KanbanTaskCommentSchema, KanbanTaskCommentsInputSchema, KanbanTaskAttemptSchema, KanbanTaskAttemptsInputSchema, listKanbanTasks, showKanbanTask, claimKanbanTask, blockKanbanTask, completeKanbanTask, heartbeatKanbanTask, reclaimStaleKanbanTask, retryKanbanTask, createChildKanbanTask, listKanbanTaskDependencies, listKanbanTaskComments, listKanbanTaskAttempts, listKanbanTaskEvents, recordKanbanTaskAttempt, formatKanbanTaskSummary,
 } from './kanban-task-board';
-export {
-  buildAnalysisPassCurrentProofSnapshot,
-} from '../analysis/analysis-pass-current';
-export {
-  buildAnalysisPassBoundaryProofSnapshot,
-} from '../analysis/analysis-pass-boundary';
+export { buildAnalysisPassCurrentProofSnapshot } from '../analysis/analysis-pass-current';
+export { buildAnalysisPassBoundaryProofSnapshot } from '../analysis/analysis-pass-boundary';
