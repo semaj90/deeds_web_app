@@ -117,8 +117,28 @@ export const actionWorkItemSchema = z.object({
 
 export type ActionWorkItemV1 = z.infer<typeof actionWorkItemSchema>;
 
+/**
+ * Durable result shape persisted in workflow_tasks.result for artifact work.
+ * It references immutable output bytes; it does not become an artifact owner.
+ */
+export const artifactWorkResultSchema = z.object({
+  schema: z.literal('atlas.action-work-result.v1'),
+  actionKey: z.string().min(16),
+  revisionSetHash: z.string().min(16),
+  artifact: artifactAddressSchema,
+  producerRevision: z.string().min(1),
+  fencingToken: z.string().regex(/^\d+$/),
+  receiptRef: z.string().min(1).optional(),
+});
+
+export type ArtifactWorkResultV1 = z.infer<typeof artifactWorkResultSchema>;
+
 export function parseActionWorkItem(raw: unknown): ActionWorkItemV1 {
   return actionWorkItemSchema.parse(raw);
+}
+
+export function parseArtifactWorkResult(raw: unknown): ArtifactWorkResultV1 {
+  return artifactWorkResultSchema.parse(raw);
 }
 
 export function isActionWorkItemFor(
