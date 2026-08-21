@@ -6,7 +6,6 @@ import {
   artifactAddressSchema,
   type ArtifactAddressV1,
 } from './artifact-work-item-v1.js';
-import { readPostgresJsonArtifact } from './postgres-json-artifact-v1.js';
 
 export type ArtifactVerificationGate =
   | 'ACTION_KEY_PRESENT'
@@ -147,6 +146,9 @@ async function verifyPostgresArtifact(input: {
   gates.STORAGE_VERIFIER_AVAILABLE = true;
 
   try {
+    // Keep the common MMAP/Arrow verifier import-safe for unit tests and CLI
+    // tooling that do not have DATABASE_URL configured.
+    const { readPostgresJsonArtifact } = await import('./postgres-json-artifact-v1.js');
     await readPostgresJsonArtifact(input.artifact);
     gates.ARTIFACT_EXISTS = true;
     gates.BYTE_LENGTH_MATCH = true;
