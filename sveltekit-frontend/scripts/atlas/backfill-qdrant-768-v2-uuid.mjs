@@ -14,6 +14,10 @@
 import { Pool } from 'pg';
 import fetch from 'node-fetch';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
+import {
+  buildQdrantPointMetadataV1,
+  validateQdrantProjectionMetadataV1,
+} from './qdrant-projection-metadata-v1.mjs';
 
 await loadAtlasEnv();
 
@@ -45,61 +49,32 @@ console.log('');
 const pool = new Pool({ connectionString: PG_URL });
 
 function parseHalfvec(text) {
-  if (typeof text !== 'string') {
-    throw new TypeError(`embedding must be a string, got ${typeof text}`);
-  }
+  if (typeof text !== 'string') throw new TypeError(`embedding must be a string, got ${typeof text}`);
   const body = text.trim();
-  if (!body.startsWith('[') || !body.endsWith(']')) {
-    throw new Error(`invalid halfvec format: ${body.substring(0, 50)}`);
-  }
+  if (!body.startsWith('[') || !body.endsWith(']')) throw new Error(`invalid halfvec format: ${body.substring(0, 50)}`);
   const arr = JSON.parse(body);
   if (!Array.isArray(arr)) throw new Error('parsed halfvec is not an array');
-  if (arr.length !== CANONICAL_DIMENSION) {
-    throw new Error(`dimension mismatch: expected ${CANONICAL_DIMENSION}, got ${arr.length}`);
-  }
+  if (arr.length !== CANONICAL_DIMENSION) throw new Error(`dimension mismatch: expected ${CANONICAL_DIMENSION}, got ${arr.length}`);
   for (let i = 0; i < arr.length; i++) {
     if (!Number.isFinite(arr[i])) throw new Error(`non-finite value at index ${i}: ${arr[i]}`);
   }
   return arr;
 }
 
-/**
- * Projection metadata is part of the durable Qdrant payload contract.
- * Never stringify SQL NULL into identifiers such as `card:<path>:null`.
- */
-function validateProjectionMetadata(row) {
-  if (typeof row.relative_path !== 'string' || row.relative_path.trim().length === 0) {
-    throw new Error('SOURCE_REF_REQUIRED');
-  }
-  if (typeof row.content_hash !== 'string' || row.content_hash.trim().length === 0) {
-    throw new Error('CONTENT_HASH_REQUIRED');
-  }
-  if (typeof row.chunk_id !== 'string' || row.chunk_id.trim().length === 0) {
-    throw new Error('CHUNK_ID_REQUIRED');
-  }
-}
-
 let scannedRows = 0;
 let insertedRows = 0;
 let skippedRows = 0;
 const rejectionCounts = {};
-
 const startTime = Date.now();
 let currentCursor = ZERO_UUID;
 
 try {
   while (scannedRows < LIMIT) {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - scannedRows);
-
     const query = `
-      SELECT
-        id,
-        relative_path,
-        chunk_id,
-        content_hash,
-        content_embedding::text AS embedding_text,
-        embedding_model,
-        updated_at
+      SELECT id, relative_path, chunk_id, content_hash,
+             content_embedding::text AS embedding_text,
+             embedding_model, updated_at
       FROM codebase_chunk_index
       WHERE content_embedding IS NOT NULL
         AND id > $1
@@ -109,8 +84,7 @@ try {
 
     let rows;
     try {
-      const result = await pool.query(query, [currentCursor, batchLimit]);
-      rows = result.rows;
+      rows = (await pool.query(query, [currentCursor, batchLimit])).rows;
     } catch (err) {
       console.error(`❌ FATAL: Postgres query failed: ${err.message}`);
       process.exit(1);
@@ -123,25 +97,24 @@ try {
 
     const points = [];
     let batchErrors = 0;
-
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
+    for (const row of rows) {
       let embedding;
-
       try {
-        validateProjectionMetadata(row);
+        validateQdrantProjectionMetadataV1(row);
         embedding = parseHalfvec(row.embedding_text);
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         console.error(`   Row ${row.id}: Projection rejected: ${reason}`);
         rejectionCounts[reason] = (rejectionCounts[reason] ?? 0) + 1;
-        batchErrors++;
-        skippedRows++;
+        batchErrors += 1;
+        skippedRows += 1;
         continue;
       }
 
-      // Actual Qdrant ID is the canonical Postgres UUID. qdrant_point_id is payload metadata only.
-      const qdrantPointId = `card:${row.relative_path}:${row.content_hash}`;
+      const qdrantPointId = buildQdrantPointMetadataV1({
+        relativePath: row.relative_path,
+        contentHash: row.content_hash,
+      });
       points.push({
         id: row.id,
         vector: { [QDRANT_VECTOR_NAME]: embedding },
@@ -163,9 +136,7 @@ try {
     }
 
     scannedRows += rows.length;
-    // Advance cursor even when all rows are rejected so a malformed row cannot stall the scan forever.
     currentCursor = rows[rows.length - 1].id;
-
     if (points.length === 0) {
       console.warn(`⚠️ Batch produced no writable points (${batchErrors} rejected); continuing after cursor ${currentCursor}`);
       continue;
@@ -181,7 +152,6 @@ try {
           body: JSON.stringify({ points }),
           timeout: 30000
         });
-
         if (!response.ok) {
           const body = await response.text();
           console.error(`❌ Qdrant upsert failed: HTTP ${response.status}: ${body.slice(0, 200)}`);
