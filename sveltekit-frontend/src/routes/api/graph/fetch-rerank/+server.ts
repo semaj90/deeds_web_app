@@ -3,8 +3,7 @@
  *
  * Resource-aware graph/semantic reranking. Qdrant remains the candidate source;
  * optional PageRank, n-ary hypergraph, AST, SOM/S3 evidence is admitted by a
- * finite recommendation budget. Exact promotion is a downstream proof gate: this
- * endpoint may plan it, but never claims to execute it.
+ * finite recommendation budget. Exact promotion is a downstream proof gate.
  */
 
 import { json } from '@sveltejs/kit';
@@ -17,7 +16,14 @@ import {
   type RecommendationBudget,
   type RecommendationLane,
 } from '$lib/server/ai/resource-aware-recommendation-policy.js';
-import { summarizeToolArgs } from '$lib/server/ai/recommendation-receipt.js';
+import {
+  buildRecommendationPlanReceipt,
+  summarizeToolArgs,
+} from '$lib/server/ai/recommendation-receipt.js';
+import {
+  buildExactPromotionCandidate,
+  buildExactPromotionHandoff,
+} from '$lib/server/ai/exact-promotion-handoff.js';
 import { mlaFusionRerank } from '$lib/server/search/mla-kv-compress.js';
 import {
   toStandardizedBiasedQuaternion,
@@ -26,10 +32,24 @@ import {
 } from '$lib/server/search/quaternion-manifold.js';
 import { hmmStateToGlyphSection } from '$lib/server/types/glyph.js';
 
+const PRODUCER_REVISION = 'fetch-rerank-resource-policy-v2';
+const POLICY_REVISION = 'resource-aware-recommendation-policy-v2';
+
 const qdrantHitSchema = z.object({
   chunkId: z.string().min(1).max(200),
   score: z.number().min(0).max(1),
   payload: z.object({
+    canonical_id: z.string().min(1).nullable().optional(),
+    canonicalId: z.string().min(1).nullable().optional(),
+    symbol_version_id: z.string().min(1).nullable().optional(),
+    symbolVersionId: z.string().min(1).nullable().optional(),
+    packet_key: z.string().min(1).nullable().optional(),
+    packetKey: z.string().min(1).nullable().optional(),
+    source_ref: z.string().min(1).nullable().optional(),
+    sourceRef: z.string().min(1).nullable().optional(),
+    source_revision: z.string().min(1).nullable().optional(),
+    sourceRevision: z.string().min(1).nullable().optional(),
+    qdrant_id: z.union([z.string(), z.number()]).nullable().optional(),
     som_bmu_row: z.number().int().nullable().optional(),
     som_bmu_col: z.number().int().nullable().optional(),
     manifold4: z.array(z.number()).length(4).nullable().optional(),
@@ -66,6 +86,10 @@ const budgetSchema = z.object({
 });
 
 const requestSchema = z.object({
+  requestId: z.string().min(1).max(200).optional(),
+  workspaceRevision: z.string().min(1).max(200).optional(),
+  graphRevision: z.string().min(1).max(200).nullable().optional(),
+  representationRevision: z.string().min(1).max(200).optional(),
   query: z.string().min(1).max(4000),
   qdrantHits: z.array(qdrantHitSchema).min(1).max(200),
   hmm: hmmSchema.optional(),
@@ -111,6 +135,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     query, qdrantHits, hmm, querySom, queryEmbedding, limit,
     queryKind, requiresExactEvidence, structuredTarget, requestedGraphHops, toolArgs,
   } = parsed.data;
+  const requestId = parsed.data.requestId ?? `fetch-rerank:${crypto.randomUUID()}`;
   const budget: RecommendationBudget = { ...DEFAULT_BUDGET, ...(parsed.data.budget ?? {}) };
   const admittedCandidateCount = Math.min(qdrantHits.length, budget.maxCandidates);
 
@@ -145,6 +170,27 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   const downstreamRequiredLanes = recommendationPlan.selected.filter(
     (lane) => !RERANK_CONSUMABLE_LANES.has(lane),
   );
+  const exactPromotionPlanned = plannedLanes.has('exact_promotion');
+  const exactPromotionRequired = Boolean(
+    requiresExactEvidence || queryKind === 'file_mutation' || queryKind === 'repair',
+  );
+
+  if (exactPromotionRequired) {
+    const missingRevisionFields = [
+      !parsed.data.workspaceRevision ? 'workspaceRevision' : null,
+      !parsed.data.representationRevision ? 'representationRevision' : null,
+    ].filter((value): value is string => Boolean(value));
+    if (missingRevisionFields.length > 0) {
+      return json({
+        error: {
+          code: 'exact_promotion_metadata_missing',
+          message: 'Required exact promotion needs revision-qualified request metadata',
+          missing: missingRevisionFields,
+        },
+        recommendationPlan,
+      }, { status: 422 });
+    }
+  }
 
   const t0 = Date.now();
   let enrichedHits: QdrantHit[] = qdrantHits.slice(0, admittedCandidateCount) as QdrantHit[];
@@ -222,11 +268,67 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     activeLanes: consumedEvidenceLanes,
     semanticScoreByChunk: mlaScoreByChunk ?? undefined,
   });
-
   const durationMs = Date.now() - t0;
+
+  const recommendationReceipt = buildRecommendationPlanReceipt({
+    receiptId: `recommendation:${requestId}`,
+    requestId,
+    policyRevision: POLICY_REVISION,
+    plan: recommendationPlan,
+    budget,
+    toolArgs,
+    observedCosts: {
+      durationMs,
+      inputCount: qdrantHits.length,
+      admittedInputCount: enrichedHits.length,
+      outputCount: results.length,
+    },
+    producerRevision: PRODUCER_REVISION,
+  });
+
+  let exactPromotionHandoff = null;
+  if (exactPromotionPlanned && parsed.data.workspaceRevision && parsed.data.representationRevision) {
+    const hitByChunkId = new Map(qdrantHits.map((hit) => [hit.chunkId, hit] as const));
+    exactPromotionHandoff = buildExactPromotionHandoff({
+      requestId,
+      workspaceRevision: parsed.data.workspaceRevision,
+      graphRevision: parsed.data.graphRevision ?? null,
+      representationRevision: parsed.data.representationRevision,
+      recommendationReceiptId: recommendationReceipt.receiptId,
+      required: exactPromotionRequired,
+      candidates: results.map((result, candidateOrdinal) => {
+        const hit = hitByChunkId.get(result.chunkId);
+        const payload = hit?.payload ?? {};
+        return buildExactPromotionCandidate({
+          candidateOrdinal,
+          payload,
+          semanticScore: hit?.score ?? result.scores.qdrant,
+          recommendationScore: result.score,
+          qdrantPointId: payload.qdrant_id == null ? null : String(payload.qdrant_id),
+        });
+      }),
+    });
+
+    if (exactPromotionRequired && exactPromotionHandoff.status !== 'READY_FOR_EXACT_PROMOTION') {
+      return json({
+        error: {
+          code: 'exact_promotion_identity_gap',
+          message: 'Required exact promotion cannot proceed with missing or degraded candidate identity',
+          unresolvedCandidateOrdinals: exactPromotionHandoff.unresolvedCandidateOrdinals,
+          degradedCandidateOrdinals: exactPromotionHandoff.degradedCandidateOrdinals,
+        },
+        recommendationPlan,
+        recommendationReceipt,
+        exactPromotionHandoff,
+      }, { status: 422 });
+    }
+  }
+
   return json({
     results,
     recommendationPlan,
+    recommendationReceipt,
+    exactPromotionHandoff,
     downstreamRequiredLanes,
     retrievalTrace: {
       graphSort: {
@@ -239,6 +341,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         plannedLanes: [...plannedLanes],
         consumedEvidenceLanes: [...consumedEvidenceLanes],
         downstreamRequiredLanes,
+        exactPromotionPlanned,
+        exactPromotionReady: exactPromotionHandoff?.status === 'READY_FOR_EXACT_PROMOTION',
         exactPromotionExecuted: false,
         querySomRow: querySom?.row ?? null,
         querySomCol: querySom?.col ?? null,
