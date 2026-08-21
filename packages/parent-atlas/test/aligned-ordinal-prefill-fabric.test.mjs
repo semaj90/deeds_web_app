@@ -7,8 +7,10 @@ import {
   buildGpuResidencyLease,
   buildSmartPacketCoordinateRef,
   canonicalStructuralCoordinateSchema,
+  compiledPrefillReceiptToCacheEntry,
 } from '../dist/core/aligned-ordinal-prefill-fabric.js';
 import { canonicalJsonChecksum } from '../dist/core/artifact-transport.js';
+import { canReusePrefillCache } from '../dist/core/contextual-prefill-fabric.js';
 import { buildTensorSnapshot } from '../dist/core/tensor-snapshot.js';
 
 const H = (value) => canonicalJsonChecksum(value);
@@ -40,6 +42,18 @@ function registry() {
       { projection_id: 'hypergraph:r1', projection_revision: 'r1', kind: 'HYPERGRAPH', artifact_id: 'hypergraph.csr', artifact_checksum: H('hypergraph'), row_identity_checksum: base.row_identity_checksum, row_count: base.row_count },
     ],
     producer_revision: 'ordinal-builder:r1',
+  });
+}
+
+function prefillReceipt() {
+  return buildCompiledPrefillReceipt({
+    receipt_id: 'prefill:r1', request_id: 'req:1', workspace_revision: 'ws:742', source_snapshot_revision: 'source:r11',
+    registry_revision: 'ord:r1', row_identity_checksum: registry().row_identity_checksum, context_manifest_checksum: H('context'),
+    instruction_set_checksum: H('instructions'), hydration_manifest_checksum: H('hydration'), feature_alignment_checksum: H('features'),
+    model_revision: 'model:r9', adapter_revision: null, tokenizer_revision: 'tokenizer:r2', prompt_template_revision: 'template:r4', tool_schema_revision: 'tools:r5',
+    evidence_artifact_checksums: [H('e2'), H('e1'), H('e1')], gpu_lease_checksums: [H('g2'), H('g1')],
+    compiled_prefill_artifact_id: 'prefill-artifact:1', compiled_prefill_checksum: H('prefill-bytes'), deterministic_context_required: true,
+    producer_revision: 'prefill-compiler:r1',
   });
 }
 
@@ -86,23 +100,38 @@ test('CUDA IPC is represented by an opaque lease reference, never tensor bytes',
   assert.equal(value.cuda_ipc_handle_ref, 'ipc-handle-store:lease:17');
   assert.equal(JSON.stringify(value).includes('embedding'), false);
   assert.throws(() => buildGpuResidencyLease({
-    ...value,
-    residency: 'PINNED_HOST',
+    lease_id: value.lease_id, source_artifact_id: value.source_artifact_id, source_artifact_checksum: value.source_artifact_checksum,
+    row_identity_checksum: value.row_identity_checksum, device_id: value.device_id, tile_id: value.tile_id, dtype: value.dtype,
+    shape: value.shape, byte_offset: value.byte_offset, byte_length: value.byte_length, residency: 'PINNED_HOST',
+    cuda_ipc_handle_ref: value.cuda_ipc_handle_ref, issued_at: value.issued_at, expires_at: value.expires_at, producer_revision: value.producer_revision,
   }), /CUDA IPC handle reference requires CUDA residency/);
 });
 
 test('compiled prefill identity is stable across evidence and GPU lease ordering', () => {
-  const base = {
-    receipt_id: 'prefill:r1', request_id: 'req:1', workspace_revision: 'ws:742', source_snapshot_revision: 'source:r11',
-    registry_revision: 'ord:r1', row_identity_checksum: registry().row_identity_checksum, context_manifest_checksum: H('context'),
-    instruction_set_checksum: H('instructions'), hydration_manifest_checksum: H('hydration'), feature_alignment_checksum: H('features'),
-    model_revision: 'model:r9', adapter_revision: null, tokenizer_revision: 'tokenizer:r2', prompt_template_revision: 'template:r4', tool_schema_revision: 'tools:r5',
-    evidence_artifact_checksums: [H('e2'), H('e1'), H('e1')], gpu_lease_checksums: [H('g2'), H('g1')],
-    compiled_prefill_artifact_id: 'prefill-artifact:1', compiled_prefill_checksum: H('prefill-bytes'), deterministic_context_required: true,
-    producer_revision: 'prefill-compiler:r1',
-  };
-  const a = buildCompiledPrefillReceipt(base);
-  const b = buildCompiledPrefillReceipt({ ...base, receipt_id: 'prefill:r2', evidence_artifact_checksums: [H('e1'), H('e2')], gpu_lease_checksums: [H('g1'), H('g2')] });
+  const a = prefillReceipt();
+  const b = buildCompiledPrefillReceipt({
+    receipt_id: 'prefill:r2', request_id: a.request_id, workspace_revision: a.workspace_revision, source_snapshot_revision: a.source_snapshot_revision,
+    registry_revision: a.registry_revision, row_identity_checksum: a.row_identity_checksum, context_manifest_checksum: a.context_manifest_checksum,
+    instruction_set_checksum: a.instruction_set_checksum, hydration_manifest_checksum: a.hydration_manifest_checksum, feature_alignment_checksum: a.feature_alignment_checksum,
+    model_revision: a.model_revision, adapter_revision: a.adapter_revision, tokenizer_revision: a.tokenizer_revision, prompt_template_revision: a.prompt_template_revision,
+    tool_schema_revision: a.tool_schema_revision, evidence_artifact_checksums: [...a.evidence_artifact_checksums].reverse(), gpu_lease_checksums: [...a.gpu_lease_checksums].reverse(),
+    compiled_prefill_artifact_id: a.compiled_prefill_artifact_id, compiled_prefill_checksum: a.compiled_prefill_checksum,
+    deterministic_context_required: true, producer_revision: a.producer_revision,
+  });
   assert.equal(a.prefill_identity_checksum, b.prefill_identity_checksum);
   assert.equal(a.canonical_authority, false);
+});
+
+test('compiled receipt feeds the existing deterministic prefill cache boundary', () => {
+  const receipt = prefillReceipt();
+  const entry = compiledPrefillReceiptToCacheEntry(receipt, 'context-compiler:r1');
+  assert.equal(canReusePrefillCache(entry, {
+    prefill_identity_checksum: receipt.prefill_identity_checksum,
+    instruction_set_checksum: receipt.instruction_set_checksum,
+    hydration_manifest_checksum: receipt.hydration_manifest_checksum,
+    feature_alignment_checksum: receipt.feature_alignment_checksum,
+    context_manifest_checksum: receipt.context_manifest_checksum,
+    compiler_revision: 'context-compiler:r1',
+  }), true);
+  assert.equal(entry.compiled_prefill_artifact_id, receipt.compiled_prefill_artifact_id);
 });
