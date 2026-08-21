@@ -5,6 +5,7 @@ import { buildCandidateFeatureMatrix } from '../../retrieval/retrieval-candidate
 import { CANDIDATE_FEATURE_NAMES } from '../contracts/feature-extraction-v1.js';
 import {
   buildTorchFeatureTensorV1,
+  encodeFloat32LittleEndianV1,
   validateTorchFeatureTensorArtifactV1,
 } from './torch-feature-tensor-v1.js';
 
@@ -25,7 +26,7 @@ function matrix() {
 }
 
 describe('TorchFeatureTensorV1', () => {
-  it('freezes row-major float32 features, uint8 mask, row identity and revision lineage', () => {
+  it('freezes row-major little-endian float32 features, uint8 mask, row identity and revision lineage', () => {
     const built = buildTorchFeatureTensorV1({
       matrix: matrix(),
       queryId: 'query:1',
@@ -40,6 +41,7 @@ describe('TorchFeatureTensorV1', () => {
     expect(built.artifact.rowKeys).toEqual(['packet:a', 'packet:b']);
     expect(built.artifact.layout).toBe('ROW_MAJOR_CONTIGUOUS');
     expect(built.artifact.dtype).toBe('float32');
+    expect(built.artifact.byteOrder).toBe('little-endian');
     expect(built.artifact.presenceMaskDtype).toBe('uint8');
     expect(built.features).toBeInstanceOf(Float32Array);
     expect(built.presenceMask).toBeInstanceOf(Uint8Array);
@@ -47,6 +49,11 @@ describe('TorchFeatureTensorV1', () => {
     expect(built.artifact.presenceMaskBytesSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(built.artifact.evidenceAuthority).toBe(false);
     expect(built.artifact.canonicalOwnerChanged).toBe(false);
+  });
+
+  it('encodes portable float32 bytes explicitly in little-endian order', () => {
+    const encoded = encodeFloat32LittleEndianV1(Float32Array.from([1, -2.5]));
+    expect(Array.from(encoded)).toEqual([0x00, 0x00, 0x80, 0x3f, 0x00, 0x00, 0x20, 0xc0]);
   });
 
   it('is deterministic for identical matrix bytes and lineage', () => {
