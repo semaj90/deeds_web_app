@@ -51,6 +51,14 @@ describe('WorkflowDagPlanV1', () => {
     expect(receipt.missingDependencies).toEqual(['PATCH']);
   });
 
+  it('rejects self and duplicate dependencies as malformed input', () => {
+    expect(() => validateWorkflowDag(plan([{ id: 'A', dependencies: ['A'] }]))).toThrow(/self dependency/);
+    expect(() => validateWorkflowDag(plan([
+      { id: 'A' },
+      { id: 'B', dependencies: ['A', 'A'] },
+    ]))).toThrow(/duplicate dependencies/);
+  });
+
   it('enforces width and tool budgets', () => {
     const receipt = validateWorkflowDag({
       ...plan([
