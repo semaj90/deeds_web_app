@@ -2,13 +2,15 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const boundaryCalls: Array<{ call: { tool: string; args: unknown }; temporal: unknown }> = [];
-const selectionCalls: Array<{ failed_boundary: any; plan: any }> = [];
-const dispatched: Array<unknown> = [];
+const mockState = vi.hoisted(() => ({
+  boundaryCalls: [] as Array<{ call: { tool: string; args: unknown }; temporal: unknown }>,
+  selectionCalls: [] as Array<{ failed_boundary: any; plan: any }>,
+  dispatched: [] as Array<unknown>,
+}));
 
 vi.mock('../atlas/temporal/temporal-tool-execution-boundary.js', () => ({
   decideTemporalToolExecutionFromPostgres: vi.fn(async (input: any) => {
-    boundaryCalls.push(input);
+    mockState.boundaryCalls.push(input);
     if (input.call.tool === 'search.hybrid') {
       return {
         execution_key: 'a'.repeat(64),
@@ -33,7 +35,7 @@ vi.mock('../atlas/temporal/temporal-tool-execution-boundary.js', () => ({
 
 vi.mock('../atlas/temporal/temporal-action-alternative-boundary.js', () => ({
   selectTemporalAlternativeToolFromPostgres: vi.fn(async (input: any) => {
-    selectionCalls.push(input);
+    mockState.selectionCalls.push(input);
     return {
       selected_call: { tool: 'rg_search', args: { pattern: 'resolveCanonicalCandidateId' } },
       selected_temporal: { schema: 'selected-temporal-context' },
@@ -45,7 +47,7 @@ vi.mock('../atlas/temporal/temporal-action-alternative-boundary.js', () => ({
 
 vi.mock('./mcp-tool-dispatch.js', () => ({
   tool_codebase_rg_search: vi.fn(async (args: unknown) => {
-    dispatched.push(args);
+    mockState.dispatched.push(args);
     return { ok: true, tool: 'rg_search', matches: ['hit:1'] };
   }),
   tool_graph_expand_neighborhood: vi.fn(),
@@ -53,9 +55,9 @@ vi.mock('./mcp-tool-dispatch.js', () => ({
 }));
 
 beforeEach(() => {
-  boundaryCalls.length = 0;
-  selectionCalls.length = 0;
-  dispatched.length = 0;
+  mockState.boundaryCalls.length = 0;
+  mockState.selectionCalls.length = 0;
+  mockState.dispatched.length = 0;
 });
 
 describe('tool shim temporal alternative orchestration', () => {
@@ -77,10 +79,10 @@ describe('tool shim temporal alternative orchestration', () => {
     );
 
     expect(result).toEqual({ ok: true, tool: 'rg_search', matches: ['hit:1'] });
-    expect(boundaryCalls.map(({ call }) => call.tool)).toEqual(['search.hybrid', 'rg_search']);
-    expect(selectionCalls).toHaveLength(1);
-    expect(selectionCalls[0]?.plan.excluded_execution_keys).toContain('a'.repeat(64));
-    expect(dispatched).toEqual([{ pattern: 'resolveCanonicalCandidateId' }]);
+    expect(mockState.boundaryCalls.map(({ call }) => call.tool)).toEqual(['search.hybrid', 'rg_search']);
+    expect(mockState.selectionCalls).toHaveLength(1);
+    expect(mockState.selectionCalls[0]?.plan.excluded_execution_keys).toContain('a'.repeat(64));
+    expect(mockState.dispatched).toEqual([{ pattern: 'resolveCanonicalCandidateId' }]);
     expect(context.temporalAction).toEqual({ schema: 'selected-temporal-context' });
     expect(context.temporalAlternativeDepth).toBe(1);
   });
@@ -94,6 +96,6 @@ describe('tool shim temporal alternative orchestration', () => {
 
     expect(result.temporalDisposition).toBe('SELECT_ALTERNATIVE');
     expect(result.executionKey).toBe('a'.repeat(64));
-    expect(dispatched).toHaveLength(0);
+    expect(mockState.dispatched).toHaveLength(0);
   });
 });
