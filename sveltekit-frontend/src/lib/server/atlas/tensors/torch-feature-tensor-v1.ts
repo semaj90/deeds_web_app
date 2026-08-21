@@ -8,7 +8,7 @@ const id = z.string().min(1);
 const CandidateFeatureNameSchema = z.enum(CANDIDATE_FEATURE_NAMES);
 
 export const TORCH_FEATURE_TENSOR_SCHEMA = 'atlas.torch-feature-tensor.v1' as const;
-export const TORCH_FEATURE_TENSOR_REVISION = 'atlas.torch-feature-tensor.row-major-f32-mask-v1' as const;
+export const TORCH_FEATURE_TENSOR_REVISION = 'atlas.torch-feature-tensor.row-major-f32le-mask-v2' as const;
 
 export const TorchFeatureTensorV1Schema = z.object({
   schema: z.literal(TORCH_FEATURE_TENSOR_SCHEMA),
@@ -23,6 +23,7 @@ export const TorchFeatureTensorV1Schema = z.object({
   rowKeys: z.array(id),
   layout: z.literal('ROW_MAJOR_CONTIGUOUS'),
   dtype: z.literal('float32'),
+  byteOrder: z.literal('little-endian'),
   presenceMaskDtype: z.literal('uint8'),
   featureBytesSha256: sha256,
   presenceMaskBytesSha256: sha256,
@@ -37,6 +38,13 @@ function digestBytes(view: ArrayBufferView): string {
   return createHash('sha256')
     .update(Buffer.from(view.buffer, view.byteOffset, view.byteLength))
     .digest('hex');
+}
+
+export function encodeFloat32LittleEndianV1(values: Float32Array): Uint8Array {
+  const out = new Uint8Array(values.length * 4);
+  const view = new DataView(out.buffer);
+  for (let i = 0; i < values.length; i += 1) view.setFloat32(i * 4, values[i], true);
+  return out;
 }
 
 function digestStrings(values: readonly string[]): string {
@@ -88,6 +96,7 @@ export function buildTorchFeatureTensorV1(input: {
 
   const features = matrix.candidate_features.slice();
   const presenceMask = matrix.presence_mask.slice();
+  const featureBytes = encodeFloat32LittleEndianV1(features);
   const artifact = validateTorchFeatureTensorArtifactV1({
     schema: TORCH_FEATURE_TENSOR_SCHEMA,
     tensorRevision: TORCH_FEATURE_TENSOR_REVISION,
@@ -101,8 +110,9 @@ export function buildTorchFeatureTensorV1(input: {
     rowKeys: [...matrix.candidate_packet_keys],
     layout: 'ROW_MAJOR_CONTIGUOUS',
     dtype: 'float32',
+    byteOrder: 'little-endian',
     presenceMaskDtype: 'uint8',
-    featureBytesSha256: digestBytes(features),
+    featureBytesSha256: digestBytes(featureBytes),
     presenceMaskBytesSha256: digestBytes(presenceMask),
     rowKeysSha256: digestStrings(matrix.candidate_packet_keys),
     evidenceAuthority: false,
