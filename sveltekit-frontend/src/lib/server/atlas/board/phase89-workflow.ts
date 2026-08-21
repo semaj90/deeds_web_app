@@ -6,7 +6,7 @@ import { buildBoardFabricLaneManifest } from './fabric-lane-manifest.js';
 import { buildBoardGpuBenchmarkReceipt, publishBoardGpuBenchmarkReceipt as _publishBoardGpuBenchmarkReceipt } from './fabric-gpu-benchmark.js';
 export { _publishBoardGpuBenchmarkReceipt as publishBoardGpuBenchmarkReceipt };
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 export type DailyGraphifyBoardTask = {
   id: string;

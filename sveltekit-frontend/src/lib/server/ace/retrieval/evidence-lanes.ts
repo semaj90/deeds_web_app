@@ -1,6 +1,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 import type { AceEvidence } from '../contracts/ace-context-packet.js';
 import {
   resolveCanonicalIdentity,
@@ -127,7 +128,7 @@ export class QdrantDenseLane {
     embedding: number[],
     limit: number = 20
   ): Promise<AceEvidence[]> {
-    const response = await fetch('http://127.0.0.1:6333/collections/codebase_chunks_768/points/search', {
+    const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

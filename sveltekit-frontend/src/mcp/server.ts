@@ -2179,7 +2179,7 @@ export function setupToolHandlers() {
         const { source_ref, feature_id, concept_id, summary_query, limit } =
           args as { source_ref?: string; feature_id?: string; concept_id?: string; summary_query?: string; limit?: number };
         try {
-          const res = await fetch('http://127.0.0.1:8788/mcp', {
+          const res = await fetch(`${(ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '')}/mcp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -2199,7 +2199,7 @@ export function setupToolHandlers() {
         // Proxy to TRACE MCP server for Phase 3I gate check
         const { verbose } = args as { verbose?: boolean };
         try {
-          const res = await fetch('http://127.0.0.1:8788/mcp', {
+          const res = await fetch(`${(ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '')}/mcp`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

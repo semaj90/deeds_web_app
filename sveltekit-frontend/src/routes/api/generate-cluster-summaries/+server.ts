@@ -17,6 +17,7 @@ import { sql } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 import { promisify } from 'util';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const execAsync = promisify(exec);
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;

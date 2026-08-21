@@ -30,6 +30,7 @@ import {
 import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { Client, Pool } from 'pg';
 import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pass-results.js';
+import type { ExtractedFeature } from './ast-langextract-bridge.js';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -109,7 +110,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 		const bridgedFeatures = await extractAstAndEntities(text.slice(0, 100_000), true);
 		const dependencyFeatures = await extractDependencyFeatures(text.slice(0, 100_000));
 		const complexityFeatures = await extractComplexityFeatures(text.slice(0, 100_000));
-		const extractedFeatures = dedupeExtractedFeatures([
+			const extractedFeatures: ExtractedFeature[] = dedupeExtractedFeatures([
 			...bridgedFeatures,
 			...dependencyFeatures,
 			...complexityFeatures,
@@ -198,6 +199,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 			posConceptPacketKey: synthesized?.packetKey ?? null,
 			posConceptPacketStatus: synthesized ? 'built' : 'missing_source_revision_or_packet_key',
 			codeEvidenceReceipt: synthesized?.receipt ?? null,
+			semanticFeatureEnvelope: synthesized?.semanticFeatureEnvelope ?? null,
 			codeEvidenceReceiptStatus: synthesized ? 'built' : 'missing_source_revision_or_packet_key',
 			fallback_used: false
 		};
@@ -218,23 +220,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 	}
 }
 
-function dedupeExtractedFeatures(features: Array<{
-	type: string;
-	name: string;
-	description: string;
-	source: 'ast-grep' | 'langextract' | 'pattern';
-	rawText?: string;
-	lineNumber?: number;
-	confidence?: number;
-}>): Array<{
-	type: string;
-	name: string;
-	description: string;
-	source: 'ast-grep' | 'langextract' | 'pattern';
-	rawText?: string;
-	lineNumber?: number;
-	confidence?: number;
-}> {
+function dedupeExtractedFeatures(features: ExtractedFeature[]): ExtractedFeature[] {
 	const deduped = new Map<string, typeof features[number]>();
 	for (const feature of features) {
 		const key = `${feature.source}:${feature.type}:${feature.name}:${feature.lineNumber ?? 0}`;
@@ -472,6 +458,7 @@ async function pollOnce(): Promise<void> {
 										packetKey: String(posConceptPacketKey),
 										extractedFeatures: [],
 										receipt: codeEvidenceReceipt as any,
+										semanticFeatureEnvelope: (result as Record<string, unknown>).semanticFeatureEnvelope as any,
 									},
 								});
 									if (codeLedgerInput) {

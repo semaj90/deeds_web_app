@@ -35,6 +35,14 @@ export interface AtlasSearchResponse {
   graphExpanded?: GraphCandidate[];
 }
 
+export interface AtlasSearchQasOptions {
+  requestId: string;
+  policyRevision: string;
+  workspaceRevision: string;
+  representationRevision: string;
+  sources: SearchRuntimeQasFeatureSources;
+}
+
 export interface SearchRuntimeQasProjectionResult {
   requestId: string;
   accepted: QueryAdaptiveFeatureRowV1[];
@@ -157,8 +165,12 @@ export function projectAtlasSearchResponseToQasFromSources(input: {
   });
 }
 
-export function createAtlasSearchAdapter(config?: { userId?: string; caseId?: string }) {
-  const runtime = new SearchRuntime(config ?? {});
+export function createAtlasSearchAdapter(config?: {
+  userId?: string;
+  caseId?: string;
+  runtime?: Pick<SearchRuntime, 'search'>;
+}) {
+  const runtime = config?.runtime ?? new SearchRuntime(config ?? {});
   return {
     async search(req: AtlasSearchRequest): Promise<AtlasSearchResponse> {
       const query: SearchQuery = {
@@ -203,6 +215,26 @@ export function createAtlasSearchAdapter(config?: { userId?: string; caseId?: st
         provenance: result.provenance,
         ...(graphExpanded !== undefined ? { graphExpanded } : {}),
       };
+    },
+    /**
+     * Opt-in read-only caller around canonical SearchRuntime retrieval.
+     * Normal retrieval/fusion remains authoritative; QAS receives the same
+     * response plus existing feature projections and exact-baseline metadata.
+     */
+    async searchWithQas(
+      req: AtlasSearchRequest,
+      qas: AtlasSearchQasOptions,
+    ): Promise<{ response: AtlasSearchResponse; qas: SearchRuntimeQasProjectionResult }> {
+      const response = await this.search(req);
+      const projection = projectAtlasSearchResponseToQasFromSources({
+        requestId: qas.requestId,
+        policyRevision: qas.policyRevision,
+        workspaceRevision: qas.workspaceRevision,
+        representationRevision: qas.representationRevision,
+        response,
+        sources: qas.sources,
+      });
+      return { response, qas: projection };
     },
   };
 }

@@ -88,7 +88,7 @@ export function rankPackets(
 	policy: Partial<PacketRankPolicy> = {}
 ): RankedPacket[] {
 	const weights = policy.weights ?? DEFAULT_PACKET_RANK_POLICY.weights;
-	const validated = inputs.map((input) => PacketRankInputSchema.parse(input));
+	const validated = inputs.map((input) => PacketRankInputSchema.parse(input) as unknown as PacketRankInput);
 	const scored = validated.map((input) => ({
 		...input,
 		score: scorePacketFeatures(input.vector, weights),

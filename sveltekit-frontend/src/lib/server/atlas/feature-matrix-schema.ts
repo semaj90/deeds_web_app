@@ -25,9 +25,9 @@
 import { z } from 'zod';
 import { DIMENSIONS } from './property-dimensions';
 import {
-  SEMANTIC_REPRESENTATION_ID,
-  SEMANTIC_DIMENSION,
-} from '../embedding/embedding-contract-768.js';
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from './retrieval/qdrant-semantic-projection.js';
 import {
   EvidenceStateSchema,
   KnowledgeResolutionSchema,
@@ -233,11 +233,11 @@ export const ClassifierFeatureManifestSchema = z
       end = Math.max(end, segmentEnd);
     }
 
-    if (manifest.semantic.width !== 768) {
+    if (manifest.semantic.width !== SEMANTIC_DIMENSION) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['semantic', 'width'],
-        message: 'Semantic segment width must be exactly 768',
+        message: `Semantic segment width must be exactly ${SEMANTIC_DIMENSION}`,
       });
     }
 

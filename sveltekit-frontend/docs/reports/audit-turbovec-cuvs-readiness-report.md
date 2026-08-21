@@ -1,15 +1,15 @@
 # TurboVec & cuVS Readiness Audit
 
-Generated: 2026-06-20T15:44:48.831Z
+Generated: 2026-08-21T03:48:35.547Z
 
-## Readiness Score: 80/100 ✅
+## Readiness Score: 100/100 ✅
 
 ## Checks
 
 ### 1. TurboVec Sidecar (:50062)
-❌ Not available
+✅ Available
+- Status: 200
 
-- Error: fetch failed
 
 ### 2. Qdrant (:6333)
 ✅ Available
@@ -28,7 +28,7 @@ Generated: 2026-06-20T15:44:48.831Z
 
 ### 5. Qdrant Collection (codebase_chunks_768)
 ✅ Available
-- Points: 52606
+- Points: 105762
 
 
 ### 6. Payload Structure
@@ -44,7 +44,7 @@ None ✅
 
 ## Warnings
 
-- TurboVec sidecar not available at :50062; N-API fallback remains available
+None ✅
 
 ## Status
 

@@ -17,6 +17,7 @@ import { rgKeywordSearch, normalizeRgScore, type RgMatch } from '$lib/server/ret
 import { extractBM25Scores, extractQueryTerms, type BM25ScoreMap } from '$lib/server/retrieval/bm25-score-extractor';
 import { rerankerBlend, type QdrantResult, type RerankerCandidate } from '$lib/server/retrieval/reranker-blend';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { ENV } from '$lib/server/env.server.js';
 import fetch from 'node-fetch';
 
 interface SearchRequest {
@@ -45,7 +46,7 @@ interface SearchResponse {
  */
 async function embedQuery(query: string): Promise<number[]> {
   try {
-    const response = await fetch('http://127.0.0.1:11434/api/embed', {
+    const response = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/embed`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({

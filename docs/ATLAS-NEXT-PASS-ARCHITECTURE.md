@@ -15,7 +15,7 @@
 ```
 User Query
   ↓ [Step 1: Intent Classification]
-Query embedding (384-dim, EmbeddingGemma)
+Query embedding (768-dim `semantic_768`, EmbeddingGemma)
   ↓ [Step 2: Tool Search]
 Qdrant dense search in tool_registry embeddings
   ↓ [Step 3: HMM Gate]

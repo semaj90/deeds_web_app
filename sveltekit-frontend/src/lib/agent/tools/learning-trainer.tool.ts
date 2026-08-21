@@ -82,7 +82,7 @@ registerTool('learning.trainer', async (args): Promise<ToolResult> => {
     if (request.type === 'embedding') {
       // Generate labels from hypergraph evidence
       const labels = generateLabelsFromHypergraph(
-        request.co_success_rates.map(rate => ({
+        Object.values(request.co_success_rates ?? {}).map(rate => ({
           packet_a: { packet_key: 'packet_a', source_ref: '', successful_runs: 100, failed_runs: 0 },
           packet_b: { packet_key: 'packet_b', source_ref: '', successful_runs: 100, failed_runs: 0 },
           co_success: rate,
@@ -101,7 +101,8 @@ registerTool('learning.trainer', async (args): Promise<ToolResult> => {
         batch_size: request.batch_size ?? 32,
         learning_rate: request.learning_rate ?? 1e-4,
         epochs: request.epochs ?? 10,
-        data_source: 'agent_runs',
+        projection_dims: [768],
+        data_source: 'agent_runs' as const,
       };
 
       const trainer = createEmbeddingTrainer(config);

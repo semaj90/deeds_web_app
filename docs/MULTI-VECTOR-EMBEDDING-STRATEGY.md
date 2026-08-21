@@ -2,7 +2,7 @@
 
 **Status**: Architecture documented, Phase 2B K-means ready  
 **Date**: July 5, 2026  
-**Decision**: EmbeddingGemma (384-dim canonical) not BERT (768-dim domain-generic)
+**Decision**: EmbeddingGemma native `semantic_768` canonical; lower dimensions are derived projections, not separate models.
 
 ---
 
@@ -10,14 +10,14 @@
 
 | Criterion | BERT | EmbeddingGemma | Winner |
 |-----------|------|---|---|
-| Dimensionality | 768-dim | 384-dim | EmbeddingGemma (storage, speed) |
+| Dimensionality | 768-dim | 768-dim native | EmbeddingGemma (model fit) |
 | Domain Tuning | Generic | Legal-optimized | EmbeddingGemma |
 | Inference Speed | 40-60ms | 10-15ms | EmbeddingGemma (4-6× faster) |
 | In-Project Context | Not available | Native in Ollama :11434 | EmbeddingGemma |
-| Re-embedding Cost | High (768d ANN) | Lower (384d ANN) | EmbeddingGemma |
+| Re-embedding Cost | High (768d ANN) | Shared canonical 768 source | EmbeddingGemma |
 | Compatibility | Requires custom pipeline | Direct Qdrant integration | EmbeddingGemma |
 
-**Decision**: Use EmbeddingGemma (384-dim) as canonical embedding model. BERT is NOT recommended.
+**Decision**: Use EmbeddingGemma native `semantic_768` as the canonical embedding model. BERT is NOT recommended. Derived 512/256/128 lanes require their own revision and oracle.
 
 ---
 
@@ -120,7 +120,7 @@ collection: codebase_chunks_768
 #### Stage 1: Vector ANN (Qdrant 384-dim)
 ```typescript
 async function stageOneAnn(queryVector: number[]): Promise<HyperRagPacket[]> {
-  // Embed query using EmbeddingGemma (384-dim output)
+  // Embed query using canonical EmbeddingGemma semantic_768 output
   const queryEmbedding = await ollama.embeddings({
     model: 'embeddinggemma:latest',
     prompt: userQuery
@@ -923,4 +923,3 @@ FROM atlas_packet_features
 
 -- ... repeat for entities, used_concepts, imports, exports, functions, classes, routes, permissions
 ```
-

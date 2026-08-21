@@ -2,22 +2,27 @@ import { z } from 'zod';
 import { validateFeatureVector5, type FeatureVector5 } from '../tensors/feature-matrix-contract.js';
 import { DomainClassificationV1Schema } from './semantic-signal-v1.js';
 import {
-  SEMANTIC_REPRESENTATION_ID,
-  SEMANTIC_DIMENSION,
-} from '../../embedding/embedding-contract-768.js';
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from '../retrieval/qdrant-semantic-projection.js';
 
 export { DomainClassificationV1Schema } from './semantic-signal-v1.js';
 
 export const FEATURE_EXTRACTION_SCHEMA_VERSION = 'atlas.feature-extraction.v1' as const;
 
 // Canonical semantic identity — re-exported (not redeclared) from
-// embedding-contract-768.ts, the real owner (already wired into the live
-// semantic-lineage.ts / semantic-packet-writer.ts production writer chain
-// per openspec/changes/parent-atlas-semantic-768-canonical-contract). This
-// file previously redeclared its own copy of these constants, which was
-// itself a duplicate-canonical-owner mistake — fixed same session it was
-// introduced. Every other contract in this repo (e.g. gpu-quantization-v1.ts)
-// must import from here or from embedding-contract-768.ts, never redeclare.
+// qdrant-semantic-projection.ts, the real owner for Atlas's own persisted
+// representation (already wired into the live semantic-lineage.ts /
+// semantic-packet-writer.ts production writer chain, which writes to
+// Postgres atlas_packets — per the 2026-08-19 operator correction recorded
+// in openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md,
+// superseding the reference below). This file previously redeclared its own
+// copy of these constants, which was itself a duplicate-canonical-owner
+// mistake — fixed same session it was introduced. Every other Atlas-scoped
+// contract in this repo (e.g. gpu-quantization-v1.ts) must import from here
+// or from qdrant-semantic-projection.ts, never redeclare. embedding-contract-768.ts
+// remains canonical for the separate, general (non-Atlas) codebase_chunks_768
+// corpus — do not conflate the two representations.
 export const CANONICAL_SEMANTIC_REPRESENTATION_ID = SEMANTIC_REPRESENTATION_ID;
 export const CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
 

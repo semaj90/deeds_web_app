@@ -92,7 +92,7 @@ export class Crawl4AIClient {
   private headers: Record<string, string>;
 
   constructor(config: Crawl4AIConfig) {
-    this.baseUrl = config.baseUrl || 'http://127.0.0.1:8000';
+    this.baseUrl = config.baseUrl || process.env.CRAWL4AI_URL?.trim() || 'http://127.0.0.1:8000';
     this.timeout = config.timeout || 30_000;
     this.retries = config.retries ?? 2;
     this.headers = config.headers || { 'Content-Type': 'application/json' };

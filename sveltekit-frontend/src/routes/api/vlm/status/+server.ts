@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getVlmState } from '$lib/server/inference/vlm-lifecycle.js';
+import { ENV } from '$lib/server/env.server.js';
 import { execSync } from 'node:child_process';
 
 function getTurboQuantPid(): number | null {
@@ -20,7 +21,7 @@ function getTurboQuantPid(): number | null {
 
 async function isTurboQuantHealthy(): Promise<boolean> {
   try {
-    const res = await fetch('http://127.0.0.1:8090/health', {
+    const res = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/health`, {
       signal: AbortSignal.timeout(1500),
     });
     return res.ok;

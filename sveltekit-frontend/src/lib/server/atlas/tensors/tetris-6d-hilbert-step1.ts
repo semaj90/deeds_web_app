@@ -142,10 +142,22 @@ export function quantizePose6D(
   Pose6DBoundsSchema.parse(bounds);
   if (!Number.isInteger(bitsPerAxis) || bitsPerAxis < 1 || bitsPerAxis > 31) throw new Error('bitsPerAxis must be in [1,31]');
   const bins = 2 ** bitsPerAxis;
-  const q = pose.map((value, index) => quantizeAxis(value, bounds[index], bins));
+  const q = [
+    quantizeAxis(pose[0], bounds[0], bins),
+    quantizeAxis(pose[1], bounds[1], bins),
+    quantizeAxis(pose[2], bounds[2], bins),
+    quantizeAxis(pose[3], bounds[3], bins),
+    quantizeAxis(pose[4], bounds[4], bins),
+    quantizeAxis(pose[5], bounds[5], bins),
+  ];
+  const quantized: QuantizedPose6D = [q[0].bin, q[1].bin, q[2].bin, q[3].bin, q[4].bin, q[5].bin];
+  const normalized: [number, number, number, number, number, number] = [
+    q[0].normalized, q[1].normalized, q[2].normalized,
+    q[3].normalized, q[4].normalized, q[5].normalized,
+  ];
   return {
-    quantized: QuantizedPose6DSchema.parse(q.map((entry) => entry.bin)),
-    normalized: q.map((entry) => entry.normalized) as [number, number, number, number, number, number],
+    quantized: QuantizedPose6DSchema.parse(quantized),
+    normalized,
   };
 }
 
@@ -279,11 +291,15 @@ export function buildTetris6DKeyValue(input: {
   const pose = Pose6DSchema.parse(input.pose);
   const { quantized, normalized } = quantizePose6D(pose, input.bounds, input.bitsPerAxis);
   const physicalRotationQuaternion = eulerZYXToCanonicalQuaternion(pose[3], pose[4], pose[5]);
-  const se3PhysicalFeature7 = [
+  const physicalQuaternion = physicalRotationQuaternion as unknown as [number, number, number, number];
+  const se3PhysicalFeature7: [number, number, number, number, number, number, number] = [
     normalized[0], normalized[1], normalized[2],
-    ...physicalRotationQuaternion,
-  ] as const;
-  const h = hilbertIndexND(quantized, input.bitsPerAxis);
+    physicalQuaternion[0], physicalQuaternion[1], physicalQuaternion[2], physicalQuaternion[3],
+  ];
+  const hilbertCoordinates: number[] = [
+    quantized[0], quantized[1], quantized[2], quantized[3], quantized[4], quantized[5],
+  ];
+  const h = hilbertIndexND(hilbertCoordinates, input.bitsPerAxis);
   const totalBits = input.bitsPerAxis * 6;
   const bucketBits = Math.max(0, Math.min(totalBits, input.localityBucketBits ?? Math.min(12, totalBits)));
   const bucketShift = BigInt(Math.max(0, totalBits - bucketBits));

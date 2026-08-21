@@ -271,13 +271,13 @@ function normalizeTask(task: z.infer<typeof RawTaskSchema>, fallbackId: string, 
     status: task.status,
     origin: task.origin ?? origin,
     recommendation_id: task.recommendation_id,
-    source_ref: task.source_ref ?? task.sourceRef ?? null,
-    title_id: task.title_id ?? task.titleId ?? null,
-    tree_node_id: task.tree_node_id ?? task.treeNodeId ?? null,
-    packet_key: task.packet_key ?? task.packetKey ?? null,
+    source_ref: typeof task.source_ref === 'string' ? task.source_ref : typeof task.sourceRef === 'string' ? task.sourceRef : null,
+    title_id: typeof task.title_id === 'string' ? task.title_id : typeof task.titleId === 'string' ? task.titleId : null,
+    tree_node_id: typeof task.tree_node_id === 'string' ? task.tree_node_id : typeof task.treeNodeId === 'string' ? task.treeNodeId : null,
+    packet_key: typeof task.packet_key === 'string' ? task.packet_key : typeof task.packetKey === 'string' ? task.packetKey : null,
     evidence_refs: task.evidence_refs ?? [],
     reason_codes: task.reason_codes ?? [],
-    confidence: task.confidence ?? null,
+    confidence: typeof task.confidence === 'number' ? task.confidence : null,
   };
 }
 

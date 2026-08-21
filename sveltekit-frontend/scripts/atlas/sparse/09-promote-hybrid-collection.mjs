@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import path from 'node:path';
+import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from '../load-atlas-env.mjs';
@@ -11,6 +13,45 @@ await loadAtlasEnv();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../../..');
 const outPath = path.join(REPO_ROOT, '.tmp', 'atlas-sparse-promotion.json');
+const rrfPath = path.join(REPO_ROOT, '.tmp', 'atlas-sparse-rrf-ablation.json');
+
+let rrf = null;
+if (existsSync(rrfPath)) {
+  try {
+    rrf = JSON.parse(await readFile(rrfPath, 'utf8'));
+  } catch {
+    rrf = null;
+  }
+}
+
+const checks = rrf?.checks ?? {};
+const evaluationProven = ['dense_only', 'sparse_only', 'rrf', 'recall_10', 'ndcg_10']
+  .every((key) => typeof checks[key] === 'number' || checks[key] === 'PROVEN');
+
+if (!evaluationProven) {
+  const blocked = {
+    artifact_id: 'atlas-sparse-promotion-v1',
+    status: 'BLOCKED_RRF_EVALUATION_PENDING',
+    output_path: outPath,
+    rrf_report_path: rrfPath,
+    registry_mutation: false,
+    checks,
+    diagnostics: ['Promotion requires measured dense-only, sparse-only, RRF, recall@10, and NDCG@10 evidence.'],
+  };
+  await writeProofLedger(outPath, buildProofLedgerEnvelope({
+    runId: randomUUID(),
+    artifactId: 'atlas-sparse-promotion-v1',
+    corpusRevision: 'unknown',
+    representationRevision: 'lexical_v1',
+    sourceCount: 0,
+    successCount: 0,
+    failureCount: 0,
+    checks: { evaluation_proven: false, registry_mutation: false },
+    notes: blocked.diagnostics,
+  }));
+  console.log(JSON.stringify(blocked, null, 2));
+  process.exit(0);
+}
 
 const registry = await markSupersededArtifact({
   artifact_id: 'phase108e-step6-sparse-bm42-backfill.mjs',

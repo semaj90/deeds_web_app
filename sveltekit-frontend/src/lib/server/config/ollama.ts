@@ -20,7 +20,6 @@ export interface OllamaConfig {
 	timeout: number;
 }
 
-const DEFAULT_OLLAMA_URL = getChatEndpoint();
 const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const DEFAULT_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma:7b';
 const DEFAULT_TIMEOUT = 30000;

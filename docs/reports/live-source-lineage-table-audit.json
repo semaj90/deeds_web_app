@@ -1,0 +1,1084 @@
+{
+  "schema": "atlas.live-source-lineage-table-audit.v1",
+  "generatedAt": "2026-08-21T01:53:53.046Z",
+  "status": "SOURCE_LINEAGE_OWNER_NOT_FOUND",
+  "canonicalWrites": false,
+  "tables": [
+    {
+      "table_schema": "public",
+      "table_name": "ace_context_sources"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "ace_sources"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "agent_context_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "agent_context_files_history"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_authority_runs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_authority_runs_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_authority_scores"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_authority_scores_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_edges_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_facts"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_nodes_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_relation_events_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_relation_participants_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_resolution_issues_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_snapshot_exclusions_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_snapshots_v2"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_source_refs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_source_revisions"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "enhanced_graph_mappings"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_file_edges"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "file_hotness_scores"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "file_index"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "file_summaries"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_analysis_runs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_communities"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_community_assignments"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_community_resolution_seeds"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_expansion_cache"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_node_metrics"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_audit_kanban"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "hypergraph_edge_members"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "hypergraph_edges"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "packet_source_features"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "phase89_file_timeline"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "spec_revisions"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "state_constitution_sources"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "storage_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "uploaded_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "warden_citation_graph"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "warden_file_locks"
+    }
+  ],
+  "candidateColumns": [
+    {
+      "table_schema": "public",
+      "table_name": "ace_chunks",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "ace_chunks",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "ace_sources",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "admin_ai_chat_messages",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "agent_context_files",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "agent_context_files_history",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "agent_tasks",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "analysis_pass_current",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "analysis_pass_results",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "analysis_pass_results",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_acp_audit",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_artifacts",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_artifacts",
+      "column_name": "content_hash",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_document_classification",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_extractions",
+      "column_name": "content_digest",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_facts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_envelopes",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_evidence",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_evidence",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_evidence",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_map",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_map_history",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_map_synthesized",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_packets",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_recommendation_index",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_feature_vectors",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_features",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_fetch_attempts",
+      "column_name": "content_digest",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_nodes_v2",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_nodes_v2",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_relation_events_v2",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_resolution_issues_v2",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_graph_snapshot_exclusions_v2",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_higher_hop_index",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_id_hierarchy_metadata",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_knowledge_objects",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_latent_fixture",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_latent_fixture",
+      "column_name": "content_digest",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_ontology_tuples",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packet_registry",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packets",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packets",
+      "column_name": "content_hash",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packets",
+      "column_name": "workspace_revision",
+      "data_type": "integer"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_registry_alignment",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_research_runs",
+      "column_name": "workspace_revision",
+      "data_type": "integer"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_retrieval_eval_times",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_rpc_packets",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_rpc_packets",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_semantic_diffs",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_source_refs",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_source_revisions",
+      "column_name": "content_digest",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_summary_layers",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_svg_glyphs",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tensor_artifacts",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tensor_artifacts",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tensor_artifacts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tensor_residency_events",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tensor_tiles",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_topology_eval_times",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_topology_features",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_tree_nodes",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_vector_registry",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_vector_registry",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "canonical_chunks",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "case_note_versions",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "case_notes",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "chat_messages",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "chrom97_packets",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "code_features",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "code_retrieval_chunks",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "codebase_chunk_index",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "codebase_chunk_index",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "codebase_chunk_index",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "codebase_chunk_index_backup",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "codebase_chunk_index_backup",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "document_chunks",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "documents",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "evaluation_evidence",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "evaluation_relevance_corrected",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "evaluation_relevance_corrected",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "evaluation_seed_queries",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_domain",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_domain_facts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_domain_facts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_file_edges",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_file_edges",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_implementations",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_implementations",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_lexical",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_lexical_facts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_lexical_facts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_ontology_tuples",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_packet_bindings",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_semantic_facts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_semantic_facts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_structural",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_structural_facts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "feature_structural_facts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_analysis_runs",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graph_analysis_runs",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "legal_documents",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "metadata_envelopes",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "packet_features",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "packet_qdrant_bridge",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "packet_source_features",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "parent_atlas_documents",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "parent_atlas_records",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "parent_atlas_vectors",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "phase89_kb_cards",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "promotion_outbox",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "promotion_outbox",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "rag_messages",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "recommendation_events",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "registry_enrichment_projection",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "report_versions",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "reports",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "route_runtime_packets",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "screenshot_artifacts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "semantic_lifecycle_events",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "semantic_memories",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "semantic_signals",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "spec_revisions",
+      "column_name": "content",
+      "data_type": "jsonb"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "spec_revisions",
+      "column_name": "content_hash",
+      "data_type": "character"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "statute_chunks",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "statutes",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "symbol_resolver",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "task_semantic_packets",
+      "column_name": "source_ref",
+      "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "tensor_analysis_cache",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "token_artifacts",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "token_artifacts",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "trace_packet_events",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "v_atlas_packets_multi_domain",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "vector_metadata",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "workspace_notes",
+      "column_name": "content",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "yorha_chat_messages",
+      "column_name": "content",
+      "data_type": "text"
+    }
+  ],
+  "candidateTableEvidence": [
+    {
+      "tableName": "atlas_packets",
+      "present": false
+    },
+    {
+      "tableName": "atlas_ast_nodes",
+      "present": false
+    },
+    {
+      "tableName": "atlas_source_refs",
+      "present": true,
+      "columns": [
+        "content_hash"
+      ],
+      "row_count": 22487,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 22487,
+      "content_digest_count": 0,
+      "source_content_count": 0,
+      "content_count": 0
+    },
+    {
+      "tableName": "atlas_source_revisions",
+      "present": true,
+      "columns": [
+        "content_digest"
+      ],
+      "row_count": 2,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 0,
+      "content_digest_count": 2,
+      "source_content_count": 0,
+      "content_count": 0
+    },
+    {
+      "tableName": "analysis_pass_results",
+      "present": false
+    },
+    {
+      "tableName": "codebase_chunk_index",
+      "present": false
+    },
+    {
+      "tableName": "file_index",
+      "present": true,
+      "columns": [],
+      "row_count": 0,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 0,
+      "content_digest_count": 0,
+      "source_content_count": 0,
+      "content_count": 0
+    },
+    {
+      "tableName": "storage_files",
+      "present": true,
+      "columns": [],
+      "row_count": 0,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 0,
+      "content_digest_count": 0,
+      "source_content_count": 0,
+      "content_count": 0
+    },
+    {
+      "tableName": "uploaded_files",
+      "present": true,
+      "columns": [],
+      "row_count": 0,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 0,
+      "content_digest_count": 0,
+      "source_content_count": 0,
+      "content_count": 0
+    },
+    {
+      "tableName": "graphify_files",
+      "present": false
+    }
+  ],
+  "diagnostics": []
+}

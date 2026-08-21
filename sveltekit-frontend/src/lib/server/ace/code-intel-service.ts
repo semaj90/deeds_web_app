@@ -18,6 +18,7 @@ import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { ensureQdrantCollection, batchUpsertPoints } from '../vector/qdrant-manager.js';
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
 import { LIBRARY_DOMAIN_MAP } from '../../phase72/routeGraphAdapter.js';
+import type Redis from 'ioredis';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 

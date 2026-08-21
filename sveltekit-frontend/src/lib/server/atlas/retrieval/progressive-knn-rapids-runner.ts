@@ -179,7 +179,7 @@ export async function runProgressiveRapidsKnn(input: {
       latent128Score: latent?.latent128Score ?? null,
       latent64Score: latent?.latent64Score ?? null,
       exactDistance: exactDistance.get(key) ?? null,
-      challengerDistance: challengerDistance.get(key) ?? null,
+      challengerDistance: typeof challengerDistance.get(key) === 'number' ? challengerDistance.get(key) as number : null,
       evidenceRefs: [...new Set([
         ...(row.evidenceRefs ?? []),
         `rapids:exact:${hitIdentity(row.packetKey, row.sourceRevision)}`,

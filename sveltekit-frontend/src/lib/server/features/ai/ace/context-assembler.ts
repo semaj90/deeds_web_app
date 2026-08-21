@@ -1766,7 +1766,7 @@ export async function assembleACEContext(opts: {
                   route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
                   query_hash: queryHash,
                   query_preview: opts.query.slice(0, 120),
-                  source_refs: telemetrySourceRefs.length > 0 ? telemetrySourceRefs : resolvedSourceRefs,
+                  source_refs: resolvedSourceRefs,
                   feature_ids: featureIds,
                   lane_ids: laneIds,
                   cluster_id: String(_p.cluster_id ?? ''),
@@ -1781,7 +1781,7 @@ export async function assembleACEContext(opts: {
             // Populate token map from this packet's source_refs (fire-and-forget)
             syncTokenMap(
               String(insertedId),
-              telemetrySourceRefs,
+              packet.source_refs,
               featureIds[0] ?? null
             );
           }
@@ -1791,7 +1791,7 @@ export async function assembleACEContext(opts: {
       return attachContextManifestToACE(parentAtlasContext, {
         request_id: opts.traceId ?? packet.query_hash ?? crypto.randomUUID(),
         feature_id: packet.feature_ids[0] ?? undefined,
-        source_refs: telemetrySourceRefs.length > 0 ? telemetrySourceRefs : packet.source_refs,
+        source_refs: packet.source_refs,
         processPackets: deriveProcessPacketsFromACEContext(parentAtlasContext),
         now: new Date(),
       });

@@ -70,7 +70,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ response: 'AI service unavailable. Please try again.', context: {} }, { status: 503 });
 		}
 
-		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const data = await res.json() as {
+			choices?: Array<{ message?: { content?: string } }>;
+			total_duration?: number;
+		};
 		const responseText = String(data.choices?.[0]?.message?.content ?? '');
 
 		// Extract basic context from the response

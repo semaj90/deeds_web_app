@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { EMBEDDING_CONTRACT } from '$lib/server/embedding/embedding-contract.js';
+import { PROMPT_REVISION_UNPROMPTED } from '$lib/server/embedding/embedding-contract-768.js';
 import {
-	SEMANTIC_DIMENSION,
-	SEMANTIC_REPRESENTATION_ID,
-} from '$lib/server/embedding/embedding-contract-768.js';
+	ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+	ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+} from '$lib/server/atlas/retrieval/qdrant-semantic-projection.js';
 
 export const CANONICAL_SEMANTIC_REPRESENTATION_ID = SEMANTIC_REPRESENTATION_ID;
 export const CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
@@ -17,12 +18,23 @@ export interface CanonicalSemanticLineage {
 	dimension: typeof CANONICAL_SEMANTIC_DIMENSION;
 	encoderRevision: string;
 	embeddingDigest: string;
+	/**
+	 * Which EmbeddingGemma task-prompt formatting (if any) produced the source
+	 * text this embedding came from. Defaults to PROMPT_REVISION_UNPROMPTED —
+	 * the entire existing corpus was embedded with raw, unformatted text. See
+	 * embedding-contract-768.ts (formatEmbeddingGemmaInput). Comparing
+	 * embeddings across different promptRevision values is not a like-for-like
+	 * representation match.
+	 */
+	promptRevision: string;
 }
 
 export interface CanonicalSemanticLineageInput {
 	vector: readonly number[] | Float32Array;
 	encoderRevision: string;
 	representationRevision?: number;
+	/** Defaults to PROMPT_REVISION_UNPROMPTED when omitted — matches current callers. */
+	promptRevision?: string;
 }
 
 function asFloat32LittleEndianBytes(vector: readonly number[] | Float32Array): Uint8Array {
@@ -68,9 +80,12 @@ export function buildCanonicalSemanticLineage(
 
 	assertCanonicalSemanticEmbedding(input.vector);
 
+	const promptRevision = input.promptRevision?.trim() || PROMPT_REVISION_UNPROMPTED;
+
 	return {
 		representationId: CANONICAL_SEMANTIC_REPRESENTATION_ID,
 		representationRevision: CANONICAL_SEMANTIC_REPRESENTATION_REVISION,
+		promptRevision,
 		dimension: CANONICAL_SEMANTIC_DIMENSION,
 		encoderRevision,
 		embeddingDigest: digestSemanticEmbedding(input.vector),

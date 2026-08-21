@@ -16,7 +16,7 @@ export const PolicyPatternInputV1Schema = z.object({
     margin: z.number().finite().min(0).max(1),
     abstain: z.boolean(),
   }).strict(),
-  hmmPosterior: z.record(z.enum(HMM_STATES), z.number().finite().min(0).max(1)).partial(),
+  hmmPosterior: z.record(z.enum(HMM_STATES), z.number().finite().min(0).max(1)),
   retrieval: z.object({
     bm25: z.number().finite().nullable(),
     bm42Experimental: z.number().finite().nullable(),

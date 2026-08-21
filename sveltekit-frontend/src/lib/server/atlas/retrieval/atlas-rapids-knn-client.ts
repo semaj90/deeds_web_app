@@ -1,4 +1,9 @@
-import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+// NOTE: this file operates on the native 768-dim EmbeddingGemma representation
+// (representationId is hardcoded to the literal 'semantic_768' throughout,
+// and callers pass 768-wide vectors), not the persisted canonical semantic_512
+// lane. Aliased to the native-dimension constant (768) rather than the
+// canonical-persisted constant (512) to preserve this file's actual meaning.
+import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
 
 export type AtlasKnnCorpusRow = {
   packetKey: string;

@@ -337,7 +337,14 @@ export async function loadRouteTraceTrainingRows(
       if (!line.trim()) continue;
       try {
         const parsed = RouteTraceTrainingRowSchema.parse(JSON.parse(line));
-        rows.push(parsed);
+        rows.push({
+          ...parsed,
+          executionId: parsed.executionId ?? null,
+          resultClass: parsed.resultClass ?? null,
+          resultCount: parsed.resultCount ?? null,
+          sourceRefCount: parsed.sourceRefCount ?? null,
+          sourceRefs: parsed.sourceRefs ?? [],
+        });
       } catch {
         // Skip malformed rows; replay loaders must be resilient to partial writes.
       }

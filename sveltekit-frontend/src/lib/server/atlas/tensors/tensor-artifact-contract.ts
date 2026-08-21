@@ -1,4 +1,7 @@
-import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '../../embedding/embedding-contract-768.js';
+import {
+  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
+  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
+} from '../retrieval/qdrant-semantic-projection.js';
 
 export type TensorArtifactType =
   | typeof SEMANTIC_REPRESENTATION_ID

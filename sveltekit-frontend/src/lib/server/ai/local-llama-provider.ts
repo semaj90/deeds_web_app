@@ -6,7 +6,7 @@ import { resolveLoadedLlamaModel, type ResolvedInferenceModel } from './llama-se
 function resolveLlamaServerBaseUrl(): string {
 	const raw =
 		ENV.TURBOQUANT_BASE_URL ??
-		ENV.TRTLLM_URL ??
+		ENV.TENSORRT_URL ??
 		ENV.TRITON_URL ??
 		'http://127.0.0.1:8090';
 	return String(raw).replace(/\/?$/, '');

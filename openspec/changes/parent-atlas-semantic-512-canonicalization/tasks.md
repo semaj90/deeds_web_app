@@ -204,3 +204,89 @@ synthesis
 ```
 
 No derived executor gets an independent RRF vote merely because it uses a different backend. Vector dimensionality is never a source mutation/version signal.
+
+## Clarification: native 768 is not discarded (2026-08-21)
+
+`semantic_512` being the canonical **persisted/searched** representation does not mean the native
+768-dim output stops mattering — it remains the required source vector that 512 (and 256/128) are
+derived from via MRL prefix + L2 renorm (`truncateEmbeddingGemmaMrl()`,
+`sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts`). Any embedding executor
+(Ollama, a local llama.cpp GGUF, SentenceTransformers, etc.) must still produce a valid, finite,
+correctly-normalized 768-dim native vector — that's the thing that gets validated for executor
+parity/swap-compatibility — before the 512-dim projection step ever runs. An executor that can't
+produce a trustworthy native 768 output can't produce a trustworthy semantic_512 either.
+
+Supporting evidence: a same-day proof session (see `memory/SESSION-201-EG-GGUF-PROOF-GATES-0-2.md`
+in the operator's Claude memory) independently validated a local Q8_0 GGUF executor's native
+768-dim output — determinism across repeated calls and cold restarts, ~0.999 cosine parity against
+a SentenceTransformers FP32 reference on 8 sample texts, and clean pass-through of a real
+GGUF-sourced vector into `buildCanonicalSemanticLineage()` +
+`deriveEmbeddingGemmaMrlProjection(vector, 512)` with zero disruption to representation identity —
+before this doc's 2026-08-19 correction was known to that session. That native-768 proof layer is
+orthogonal to, and does not need to be redone by, the semantic_512 canonicalization work above; it
+validates the input side of the MRL derivation, not the persisted-representation decision itself.
+
+## Code migration executed (2026-08-21)
+
+The actual constant migration this doc's earlier "STALE" warnings deferred is now done for
+Atlas's own scope. `qdrant-semantic-projection.ts` (`src/lib/server/atlas/retrieval/`) was already
+the correct owner (`ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = 'semantic_512'`,
+`ATLAS_CANONICAL_SEMANTIC_DIMENSION = 512`, `QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_512'`)
+— this session repointed the genuinely Atlas-scoped consumers of `embedding-contract-768.ts`'s
+shared 768 constants to import from there instead, via `as`-aliased imports so each file's own
+code needed zero further changes.
+
+**Deliberately did NOT flip `embedding-contract-768.ts` itself.** It is legitimately shared
+between Atlas and a separate, real, populated general-corpus codebase-RAG lane
+(`codebase_chunks_768` / `codebase_chunks_768_v2`, 52,380 points, used by `unified-orchestrator.ts`,
+the dual-lane RRF endpoint, etc. — documented as its own canonical lane in root `CLAUDE.md`'s
+Qdrant Collections table). Flipping the shared constants would have broken that separate lane.
+Same vector dimension never implies the same representation identity (per this repo's own
+duplication-prevention rule) — verified this directly via a 49-consumer read-only audit before
+touching anything: 26 files were genuinely Atlas-scoped and needed the 512 migration; 12 were
+correctly targeting the separate general 768 corpus and were left alone; 11 were already correct
+(native-768 lineage assertions, MRL-aware, or an unrelated fallback lane).
+
+**21 of the 26 flagged files were migrated** (one subagent, stopped by the operator partway
+through and completed by hand for the remainder — both produced identical, clean, minimal-diff
+import-aliasing edits, verified via `npx tsgo --noEmit` after every batch with zero regressions in
+any touched file):
+`semantic-lineage.ts`, `qdrant-sync-payload.ts`, `trace-mcp-server.ts`, `phase-lane-registry.ts`,
+`fabric-gpu-benchmark.ts`, `tensor-artifact-contract.ts`, `atlas-rapids-knn-client.ts` (+ its
+spec), `pass-fabric-proof.ts`, `embeddinggemma-prefix384.ts`, `cuvs-sidecar-client.ts` (import
+only — see the full rewrite in `parent-atlas-graph-retrieval-proof/tasks.md` GS1.51),
+`phase89-workflow.ts`, `graphify-task-candidates.ts`, `fabric-lane-manifest.ts`, `fabric-lanes.ts`,
+`lane-registry.ts`, `feature-matrix-schema.ts`, `graphify-task-candidate.ts`,
+`canonical-chunk-contract.ts`, `analysis-pass-boundary.ts`, `analysis-pass-current.ts`,
+`telemetry-breadth-contract.ts`, `phase-lane-proof.ts`, `feature-extraction-v1.ts` — plus a
+cascading fix in `source-pos-concept-packet.ts` (three hardcoded `'semantic_768'` string literals
+bypassing the type system entirely, only surfaced by the typecheck after the schema they fed into
+was correctly migrated).
+
+**2 of the 26 were false positives on the original audit — correctly left untouched, not
+migrated**: `redis-cache-aggressive.ts` (its `assertSemantic768()` calls and `semantic_768`-named
+cache keys genuinely cache native 768-dim artifacts — raw query embeddings, SOM centroids matching
+`som-routing.ts`'s real `SEMANTIC_768_EXPERIMENT` lineage value — not a canonical-representation
+claim) and `repository-provenance-workflow.ts` (its `representationName` field is written
+alongside a hardcoded `collectionName: 'codebase_chunks_768_v2'` — the separate general corpus —
+so 768 there is honest, not stale).
+
+**One real near-miss, caught by operator interrupt, not by the agent**: the first pass at
+`canonical-chunk-contract.ts` — the actual `CANONICAL_REPRESENTATIONS` registry object, not a
+single-value assertion site — collapsed its `semantic_768` entry into `semantic_512` entirely
+rather than adding 512 alongside it. This would have broken two real, live consumers: the cuVS
+exact-KNN sidecar (`python/atlas_rapids_sidecar.py` hardcodes `_EXPECTED_DIMENSION = 768`, proven
+live this same session — see `parent-atlas-graph-retrieval-proof/tasks.md` GS1.51) and
+`som-routing.ts`'s `trainedFrom: 'SEMANTIC_768_EXPERIMENT'` lineage value. Fixed: the registry now
+carries both entries — `semantic_512: ACTIVE` (canonical persisted), `semantic_768: EXPERIMENTAL`
+(real, live, native-source — not the persisted lane, but not fake either). **Lesson for future
+migrations touching this registry pattern**: a file that *enumerates* multiple coexisting
+representations needs individual per-entry judgment, not the same blanket import-aliasing template
+that's correct for every single-value assertion site. Checked all other 25 files for the same
+multi-enum-collapse risk before finishing (`z.enum([...SEMANTIC_REPRESENTATION_ID...])` grep across
+every touched file) — `canonical-chunk-contract.ts` was the only one with this shape.
+
+Remaining: no other Atlas-scoped consumer of `embedding-contract-768.ts`'s 768 constants is known
+to exist as of this session. `dataset-export.ts` and four other pre-existing typecheck errors
+surfaced during verification are unrelated pre-existing baseline issues (confirmed via `git diff`
+— none of those files were touched by this migration) and are out of this change's scope.

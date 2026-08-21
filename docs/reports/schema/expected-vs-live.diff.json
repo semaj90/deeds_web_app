@@ -1,0 +1,19 @@
+{
+  "status": "EXPECTED_SNAPSHOT_MISSING",
+  "comparisonMode": "expected_snapshot_vs_live",
+  "journalLastIndex": 40,
+  "journalLastTag": "0040_kanban_task_lifecycle",
+  "expectedSnapshotPath": "sveltekit-frontend\\drizzle\\meta\\0040_snapshot.json",
+  "availableSnapshotTail": [
+    "0035_snapshot.json",
+    "0036_snapshot.json",
+    "0037_snapshot.json",
+    "0038_snapshot.json",
+    "0039_snapshot.json"
+  ],
+  "generatedAt": "2026-08-21T01:55:39.801Z",
+  "canonicalWrites": false,
+  "diagnostics": [
+    "The Drizzle journal references a snapshot that is absent from drizzle/meta."
+  ]
+}

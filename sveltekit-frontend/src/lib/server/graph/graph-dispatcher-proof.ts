@@ -116,12 +116,12 @@ export async function buildLouvainPersistenceReceipt(db: Pool): Promise<LouvainP
 		replaySafe,
 	};
 
-	return LouvainPersistenceReceiptSchema.parse({
+  return LouvainPersistenceReceiptSchema.parse({
 		...receiptSeed,
 		algorithm: 'louvain' as const,
 		receiptId: `louvain-persistence-${createHash('sha256').update(JSON.stringify(receiptSeed)).digest('hex').slice(0, 16)}`,
 		createdAt: new Date(0).toISOString(),
-	});
+  }) as LouvainPersistenceReceipt;
 }
 
 export async function buildGraphDispatcherProofSnapshot(db: Pool): Promise<GraphDispatcherProofSnapshot> {

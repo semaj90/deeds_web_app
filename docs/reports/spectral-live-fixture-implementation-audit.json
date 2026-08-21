@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.spectral.live.fixture.implementation.audit.v1",
+  "generatedAt": "2026-08-20T19:38:38.226Z",
+  "readOnly": true,
+  "expectedFiles": [
+    {
+      "file": "scripts/atlas/build_spectral_live_fixture.py",
+      "exists": false
+    },
+    {
+      "file": "scripts/atlas/export_spectral_fixture_routing_labels.mjs",
+      "exists": false
+    },
+    {
+      "file": "scripts/atlas/run_fabric_benchmark.py",
+      "exists": true,
+      "bytes": 7434
+    },
+    {
+      "file": "docs/reports/spectral-live-fixture-receipt.json",
+      "exists": false
+    },
+    {
+      "file": "docs/reports/spectral-live-fixture-receipt.md",
+      "exists": false
+    }
+  ],
+  "existingBenchmarkOwner": true,
+  "runtimeReceiptPresent": false,
+  "status": "CLAIM_NOT_PRESENT_IN_WORKSPACE",
+  "missing": [
+    "scripts/atlas/build_spectral_live_fixture.py",
+    "scripts/atlas/export_spectral_fixture_routing_labels.mjs",
+    "docs/reports/spectral-live-fixture-receipt.json",
+    "docs/reports/spectral-live-fixture-receipt.md"
+  ],
+  "promotion": "BLOCKED_UNTIL_FIXTURE_AND_LIVE_RECEIPT_EXIST",
+  "canonicalWrites": false
+}

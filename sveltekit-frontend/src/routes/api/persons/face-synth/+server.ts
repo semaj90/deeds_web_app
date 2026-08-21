@@ -25,6 +25,7 @@ import { eq, sql, desc } from 'drizzle-orm';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const bodySchema = z.object({
   poiIds: z.array(z.string().max(500)).max(50).optional(),

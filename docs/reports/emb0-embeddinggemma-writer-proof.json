@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.emb0.embeddinggemma-writer-proof.v1",
+  "status": "PROVEN",
+  "startedAt": "2026-08-20T19:32:11.415Z",
+  "completedAt": "2026-08-20T19:32:11.842Z",
+  "endpoint": "http://127.0.0.1:11434",
+  "model": "embeddinggemma:latest",
+  "representationId": "semantic_768",
+  "representationRevision": "embeddinggemma-native-768-v1",
+  "dimension": 768,
+  "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+  "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+  "sourceCard": {
+    "cardId": "emb0-source-card-authentication-session-validation",
+    "kind": "FUNCTION",
+    "sourceRef": "fixtures/emb0/authentication-session-validation.ts",
+    "packetKey": "emb0:fixture:authentication-session-validation"
+  },
+  "promptModes": [
+    "document",
+    "query"
+  ],
+  "vectors": {
+    "document": {
+      "promptDigest": "f632a82fcc5b7af0fff0bd572e6643125a6238b3f21f988bacdb687406bb56e7",
+      "embeddingDigest": "cd29d6c4667d0ef9192468592ef8a54dede3f06acdef70cf608f12629f0f9c37",
+      "dimension": 768,
+      "dimensionPass": true,
+      "finite": true,
+      "normalized": true,
+      "l2Norm": 0.9999999733224254
+    },
+    "query": {
+      "promptDigest": "60e152413eefb81d19073fe1c916c4a0ae3ee35170b199ef5f6e384f43adaa4f",
+      "embeddingDigest": "dd1b4a1816718d6190283bacc2ee7b2e8793d6c16d5190fd1e0552e44a2ba16a",
+      "dimension": 768,
+      "dimensionPass": true,
+      "finite": true,
+      "normalized": true,
+      "l2Norm": 1.0000000023349533
+    }
+  },
+  "gates": {
+    "EMBEDDING_OWNER_REACHABLE": true,
+    "DOCUMENT_PROMPT_PROVEN": true,
+    "QUERY_PROMPT_PROVEN": true,
+    "SEMANTIC_768_FINITE_NORMALIZED": true,
+    "SOURCE_CARD_IDENTITY_PRESENT": true,
+    "REPRESENTATION_REVISION_PRESENT": true
+  },
+  "canonicalWrites": false,
+  "notes": [
+    "Read-only proof; no Postgres, Qdrant, Valkey, or embedding artifact writes."
+  ]
+}

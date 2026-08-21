@@ -15,6 +15,7 @@ import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch, getOllamaChatEndpoint } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import type { SimulationSession } from '../+server';
 
 const SESSION_PREFIX = 'sim:session:';

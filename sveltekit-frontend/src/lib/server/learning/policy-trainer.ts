@@ -250,6 +250,9 @@ export function generateTrainingExamples(
           changes: [],
         } : undefined,
       },
-      outcome: run.outcome,
+      outcome: {
+        ...run.outcome,
+        agent_run_id: run.run_id,
+      },
     }));
 }

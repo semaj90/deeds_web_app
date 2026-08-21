@@ -1,9 +1,9 @@
 /**
  * Qdrant BM42 Sparse Retriever Adapter
  *
- * Wraps Qdrant sparse vector search (BM42) as a Retriever.
- * BM42 is the "contextual lexical matching" lane — strongest for rare identifiers,
- * method names, and technical terminology that dense search underweights.
+ * Compatibility wrapper for the historical hashed sparse Qdrant lane.
+ * This is not true Qdrant BM42: it uses the legacy FNV-1a/log-TF codec until
+ * a separately proven BM42 model owner and collection projection exist.
  *
  * Uses QdrantManager.querySparse — a direct Universal Query API call with a single
  * sparse query vector. Single-input RRF (multiQuerySearch with one prefetch) was
@@ -12,12 +12,15 @@
  * Falls back to [] when the collection has no sparse vectors configured
  * (fail-closed, never throws). Sparse-support detection is handled inside querySparse.
  *
- * Section 7 of the Atlas spec: BM42 sits between BM25 (PostgreSQL FTS) and
- * dense (EmbeddingGemma) in the retrieval fan-out.
+ * The physical field may retain the historical `bm42` name, but this adapter
+ * reports the actual algorithm family so it cannot be mistaken for BM42.
  */
 
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
-import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
+import {
+  generateLegacyHashedSparseVector,
+  LEGACY_HASHED_SPARSE_ALGORITHM_ID,
+} from '$lib/server/vector/bm42-sparse.js';
 import { QDRANT_SPARSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
@@ -25,7 +28,7 @@ import { normalizeQdrantPoints } from './qdrant-dense-retriever.js';
 
 export interface QdrantBM42RetrieverConfig {
   collection: string;
-  /** Name of the sparse vector field in the collection (default: 'bm42' — canonical sparse vector name per qdrant-collection-contracts.ts) */
+  /** Historical physical field name; its presence does not prove BM42 semantics. */
   sparseVectorName?: string;
 }
 
@@ -38,7 +41,7 @@ export function createQdrantBM42Retriever(config: QdrantBM42RetrieverConfig): Re
     async retrieve(input: RetrievalInput): Promise<LaneCandidate[]> {
       const qdrant = getQdrantManager();
 
-      const sparseVector = generateSparseVector(input.query);
+      const sparseVector = generateLegacyHashedSparseVector(input.query);
       if (sparseVector.indices.length === 0) return [];
 
       let rawResponse: unknown;
@@ -76,8 +79,15 @@ export function createQdrantBM42Retriever(config: QdrantBM42RetrieverConfig): Re
           sourceRef,
           rank: i + 1,
           score: point.score ?? null,
-          lane: 'bm42',
-          metadata: payload,
+          lane: 'sparse',
+          metadata: {
+            ...payload,
+            retrieval_algorithm_id: LEGACY_HASHED_SPARSE_ALGORITHM_ID,
+            retrieval_algorithm_family: 'LEXICAL_SPARSE_HASHED',
+            historical_lane_name: 'bm42',
+            qdrant_sparse_vector_name: sparseVectorName,
+            is_true_qdrant_bm42: false,
+          },
         };
         const valid = validateCandidate(candidate);
         if (valid) candidates.push(valid);

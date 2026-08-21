@@ -147,6 +147,13 @@ any library, database feature, model, or accelerator into a canonical owner.
   PROJECTION | CACHE | RECOMMENDATION_SURFACE`. The static scanner is complete;
   live invocation, output consumption, persistence, and endpoint reachability
   remain separate proof gates.
+- [x] **OKF-06.5a Frontend dependency and admin smoke review** Svelte 5,
+  SvelteKit 2, `drizzle-orm`, and `drizzle-kit` are declared and installed;
+  `drizzle-kit check` passes; `/admin` rendered with HTTP 200, the expected
+  `System Overview` heading, and zero browser console errors. This proves the
+  local dependency/render lane only; it does not promote OKF runtime ownership
+  or prove durable work-item persistence. Evidence:
+  `docs/reports/okf-sveltekit-admin-smoke.json` and `.md`.
 - [x] **OKF-06.6 Recommendation linkage** Define a recommendation record that
   references one or more OKF evidence IDs, Graphify receipts, feature rows,
   and acceptance gates. Recommended work may create or update a Kanban task,

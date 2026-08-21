@@ -138,7 +138,7 @@ export function buildGraphDispatcherRegistrySnapshot(): GraphDispatcherRegistryS
 	return {
 		generatedAt: new Date(0).toISOString(),
 		algorithms: [...algorithms],
-		entries: entries.map((entry) => GraphDispatcherRegistryEntrySchema.parse(entry)),
+		entries: entries.map((entry) => GraphDispatcherRegistryEntrySchema.parse(entry) as GraphDispatcherRegistryEntry),
 		completeness,
 		receiptId: `graph-dispatcher-${createHash('sha256').update(JSON.stringify(receiptSeed)).digest('hex').slice(0, 16)}`,
 	};

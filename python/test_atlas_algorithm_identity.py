@@ -32,14 +32,14 @@ class ModelTopologyTests(unittest.TestCase):
     def test_manifest_audit_preserves_declared_dimensions(self) -> None:
         payload = {
             "schemaVersion": "test",
-            "canonicalDimensions": {"semantic": 384, "latent": 64},
+            "canonicalDimensions": {"semantic": 768, "latent": 64},
             "models": [{"id": "dense-unknown", "runtime": "llama-server"}],
         }
         with tempfile.TemporaryDirectory() as tmp:
             target = Path(tmp) / "manifest.json"
             target.write_text(json.dumps(payload), encoding="utf-8")
             report = audit_model_manifest(target)
-        self.assertEqual(report["declared_semantic_dimension"], 384)
+        self.assertEqual(report["declared_semantic_dimension"], 768)
         self.assertEqual(report["declared_latent_dimension"], 64)
         self.assertEqual(report["unproven_count"], 1)
 

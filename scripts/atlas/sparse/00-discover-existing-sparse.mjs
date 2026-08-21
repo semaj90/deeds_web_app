@@ -70,7 +70,7 @@ const results = {
 for (const term of SEARCH_TERMS) {
   try {
     const excludeFlags = EXCLUDE_PATTERNS.map(p => `--glob !**/${p}/**`).join(' ');
-    const cmd = `rg -i "${term}" ${excludeFlags} --files-with-matches --type ts --type js --type mjs ${PROJECT_ROOT} 2>/dev/null`;
+    const cmd = `rg -i "${term}" ${excludeFlags} --files-with-matches --glob "*.ts" --glob "*.js" --glob "*.mjs" "${PROJECT_ROOT}" 2>NUL`;
 
     const output = execSync(cmd, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] });
     const files = output.trim().split('\n').filter(Boolean);
@@ -88,8 +88,8 @@ for (const term of SEARCH_TERMS) {
       if (files.length > 3) console.log(`    ... and ${files.length - 3} more`);
     }
   } catch (err) {
-    results.error_count++;
-    // Silently skip errors (term not found)
+    // rg exits 1 for a clean no-match search; only count actual search errors.
+    if (err?.status !== 1) results.error_count++;
   }
 }
 
@@ -109,10 +109,25 @@ const canonicalPaths = [
 ];
 
 for (const pathPattern of canonicalPaths) {
-  const fullPath = path.join(PROJECT_ROOT, pathPattern);
+  const normalized = pathPattern.replaceAll('\\', '/');
+  if (normalized.includes('*')) {
+    const prefix = normalized.slice(0, normalized.indexOf('*'));
+    const directory = path.join(PROJECT_ROOT, prefix).replace(/[\\/]$/, '');
+    if (fs.existsSync(directory)) {
+      const matches = fs.readdirSync(directory)
+        .filter((entry) => entry.endsWith('.mjs'))
+        .map((entry) => path.join(prefix, entry).replaceAll('\\', '/'));
+      for (const match of matches) {
+        console.log(`   ✓ Found: ${match}`);
+        results.existing_tokenizers.push(match);
+      }
+    }
+    continue;
+  }
+  const fullPath = path.join(PROJECT_ROOT, normalized);
   if (fs.existsSync(fullPath)) {
-    console.log(`   ✓ Found: ${pathPattern}`);
-    results.existing_tokenizers.push(pathPattern);
+    console.log(`   ✓ Found: ${normalized}`);
+    results.existing_tokenizers.push(normalized);
   }
 }
 

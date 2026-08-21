@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.graphify.structural.persistence.readback.v1",
+  "generatedAt": "2026-08-21T01:44:35.029Z",
+  "status": "PERSISTENCE_OWNER_NOT_READY",
+  "persistenceOwner": "PARENT_ATLAS_ATLAS_EVIDENCE_LEDGER",
+  "canonicalTable": "atlas_evidence",
+  "tableExists": false,
+  "requiredColumnsPresent": false,
+  "sourceRevisionNotNull": false,
+  "sourceRevisionIndexPresent": false,
+  "structuralRowCount": 0,
+  "suspiciousPseudoRevisionCount": 0,
+  "sampleEvidenceId": null,
+  "repositoryReadbackStatus": "NOT_RUN",
+  "revisionOwnerProven": false,
+  "canonicalWriteAttempted": false,
+  "canonicalPersistenceAuthorized": false,
+  "diagnostics": []
+}

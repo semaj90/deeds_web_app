@@ -1,0 +1,220 @@
+{
+  "schema": "atlas.emb3a.qdrant-semantic-projection-proof.v1",
+  "status": "DEGRADED_FIXTURE_OR_PAYLOAD_GAP",
+  "endpoint": "http://127.0.0.1:6333",
+  "collection": "codebase_chunks_768_v2",
+  "expectedInput": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\emb2-semantic-card-embeddings.jsonl",
+  "expectedCards": 7,
+  "collectionInfo": {
+    "status": "green",
+    "optimizer_status": "ok",
+    "indexed_vectors_count": 52380,
+    "points_count": 52380,
+    "segments_count": 3,
+    "config": {
+      "params": {
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "shard_number": 1,
+        "replication_factor": 1,
+        "write_consistency_factor": 1,
+        "on_disk_payload": true
+      },
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 100,
+        "full_scan_threshold": 10000,
+        "max_indexing_threads": 0,
+        "on_disk": false
+      },
+      "optimizer_config": {
+        "deleted_threshold": 0.2,
+        "vacuum_min_vector_number": 1000,
+        "default_segment_number": 0,
+        "max_segment_size": null,
+        "memmap_threshold": null,
+        "indexing_threshold": 10000,
+        "flush_interval_sec": 5,
+        "max_optimization_threads": null,
+        "prevent_unoptimized": null
+      },
+      "wal_config": {
+        "wal_capacity_mb": 32,
+        "wal_segments_ahead": 0,
+        "wal_retain_closed": 1
+      },
+      "quantization_config": null
+    },
+    "payload_schema": {
+      "qdrant_point_id": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "source_ref": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "indexed_at": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "model_revision_state": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "embedding_model": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "postgres_id": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "chunk_id": {
+        "data_type": "keyword",
+        "points": 16805
+      },
+      "representation_name": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "content_hash": {
+        "data_type": "keyword",
+        "points": 45472
+      },
+      "projection_revision": {
+        "data_type": "keyword",
+        "points": 52380
+      }
+    },
+    "update_queue": {
+      "length": 0
+    }
+  },
+  "sampleCount": 100,
+  "payloadCoverage": {
+    "packet_key": 0,
+    "source_ref": 100,
+    "tree_node_id": 0,
+    "symbol_version_id": 0,
+    "workspace_revision": 0,
+    "source_revision": 0,
+    "representation_id": 0,
+    "representation_revision": 0
+  },
+  "filterChecks": {
+    "workspace_revision": {
+      "status": "NOT_PROVEN",
+      "reason": "No sampled payload value",
+      "payloadIndexPresent": false
+    },
+    "source_revision": {
+      "status": "NOT_PROVEN",
+      "reason": "No sampled payload value",
+      "payloadIndexPresent": false
+    },
+    "representation_revision": {
+      "status": "NOT_PROVEN",
+      "reason": "No sampled payload value",
+      "payloadIndexPresent": false
+    }
+  },
+  "identityRoundTrip": {
+    "status": "NOT_PROVEN_FIXTURE_NOT_INDEXED",
+    "matched": 0,
+    "missing": 7,
+    "details": [
+      {
+        "cardId": "sc_ad216a05718122b22d197ea2",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_a95f875c799d833310428b38",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_41b3a0fb9e4afe5f365a33f4",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_7d005afba4b4c0dae9045e28",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_1baccabe5bf1e9192a0d7dc3",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_0d85147bef1b7c9476f0e365",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      },
+      {
+        "cardId": "sc_6922547834123864c65c0e70",
+        "sourceRef": "fixtures/emb1/semantic-card-corpus.ts"
+      }
+    ]
+  },
+  "gates": {
+    "QDRANT_REACHABLE": true,
+    "SEMANTIC_768_SCHEMA": true,
+    "COSINE_SCHEMA": true,
+    "IDENTITY_PAYLOAD_OBSERVED": false,
+    "REVISION_PAYLOAD_OBSERVED": false,
+    "REVISION_FILTER_READABLE": false,
+    "EMB2_IDENTITY_ROUND_TRIP": false,
+    "SYSTEM_SENTINEL_EXCLUDED": true,
+    "MUTATION_GUARD": true
+  },
+  "writes": {
+    "qdrant": false,
+    "canonical": false
+  },
+  "payloadIndexes": {
+    "packet_key": false,
+    "source_ref": true,
+    "tree_node_id": false,
+    "symbol_version_id": false,
+    "workspace_revision": false,
+    "source_revision": false,
+    "representation_id": false,
+    "representation_revision": false
+  },
+  "sentinel": {
+    "sampledSystemRecords": 0,
+    "excludedQuery": {
+      "must_not": [
+        {
+          "key": "_atlas_system_record",
+          "match": {
+            "value": true
+          }
+        }
+      ]
+    },
+    "status": "FILTER_PROVEN_SAMPLE_CLEAN",
+    "excludedSampleCount": 100,
+    "excludedSentinels": 0
+  },
+  "revisionIndexStatus": {
+    "functional": false,
+    "indexedFields": [],
+    "missingIndexes": [
+      "workspace_revision",
+      "source_revision",
+      "representation_revision"
+    ],
+    "status": "NOT_PROVEN"
+  }
+}

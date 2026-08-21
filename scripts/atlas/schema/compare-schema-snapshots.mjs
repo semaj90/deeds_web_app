@@ -19,7 +19,7 @@
  *   node scripts/atlas/schema/compare-schema-snapshots.mjs --expected=A.json --actual=B.json
  */
 
-import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { resolve, join, dirname, relative } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -62,6 +62,28 @@ if (liveMode || (!expectedArg && !actualArg)) {
     const journal  = loadJson(JOURNAL);
     const lastIdx  = journal.entries.at(-1)?.idx ?? 0;
     const snapPath = join(SNAPSHOTS, `${String(lastIdx).padStart(4, '0')}_snapshot.json`);
+    if (!existsSync(snapPath)) {
+        mkdirSync(REPORT_DIR, { recursive: true });
+        const outPath = join(REPORT_DIR, 'expected-vs-live.diff.json');
+        const availableSnapshots = readdirSync(SNAPSHOTS)
+            .filter(name => /^\d{4}_snapshot\.json$/.test(name))
+            .sort();
+        const report = {
+            status: 'EXPECTED_SNAPSHOT_MISSING',
+            comparisonMode: 'expected_snapshot_vs_live',
+            journalLastIndex: lastIdx,
+            journalLastTag: journal.entries.at(-1)?.tag ?? null,
+            expectedSnapshotPath: relative(ROOT, snapPath),
+            availableSnapshotTail: availableSnapshots.slice(-5),
+            generatedAt: new Date().toISOString(),
+            canonicalWrites: false,
+            diagnostics: ['The Drizzle journal references a snapshot that is absent from drizzle/meta.'],
+        };
+        writeFileSync(outPath, JSON.stringify(report, null, 2));
+        console.error(`ERROR: expected Drizzle snapshot missing: ${relative(ROOT, snapPath)}`);
+        console.error(`Report: ${relative(ROOT, outPath)}`);
+        process.exit(1);
+    }
     const snap     = loadJson(snapPath);
     const live     = loadJson(liveReport);
 

@@ -56,6 +56,7 @@ export interface InferenceLogEntry {
   model?: string;
   backend?:
     | 'ollama'
+    | 'llama-server'
     | 'tensorrt'
     | 'triton'
     | 'turboquant'
@@ -186,7 +187,7 @@ export async function flushInferenceLog(): Promise<void> {
  */
 export function logLLMInference(params: {
 	model: string;
-	backend: 'ollama' | 'tensorrt' | 'triton' | 'turboquant' | 'bifrost' | 'litert' | 'vlm-hf';
+	backend: 'ollama' | 'llama-server' | 'tensorrt' | 'triton' | 'turboquant' | 'bifrost' | 'litert' | 'vlm-hf';
 	latencyMs: number;
 	tokenCount?: number;
 	cacheHit?: boolean;

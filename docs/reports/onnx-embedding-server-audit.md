@@ -1,6 +1,6 @@
 # ONNX Embedding Server Audit
 
-- generated_at: 2026-07-04T00:38:30.735Z
+- generated_at: 2026-08-20T21:35:12.695Z
 - url: http://127.0.0.1:8081
 - status: FAIL
 - backend: unknown

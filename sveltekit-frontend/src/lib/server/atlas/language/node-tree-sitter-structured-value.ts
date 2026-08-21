@@ -32,6 +32,12 @@ type LoadedRuntime = {
 	grammar_package: 'tree-sitter-typescript' | 'tree-sitter-javascript';
 };
 
+export type NodeTreeSitterParsedSource = {
+	rootNode: SyntaxNodeLike & { hasError?: boolean };
+	parser_revision: string;
+	grammar_revision: string;
+};
+
 function packageVersion(packageName: string): string {
 	const pkg = require(`${packageName}/package.json`) as { version?: string };
 	if (!pkg.version) throw new Error(`PACKAGE_VERSION_MISSING:${packageName}`);
@@ -60,6 +66,17 @@ function loadRuntime(language: NodeTreeSitterLanguage): LoadedRuntime {
 		parser_revision: packageVersion('tree-sitter'),
 		grammar_revision: packageVersion('tree-sitter-javascript'),
 		grammar_package: 'tree-sitter-javascript',
+	};
+}
+
+export function parseNodeTreeSitterSource(input: { source: string; language: NodeTreeSitterLanguage }): NodeTreeSitterParsedSource {
+	const runtime = loadRuntime(input.language);
+	const parser = new runtime.Parser();
+	parser.setLanguage(runtime.grammar);
+	return {
+		rootNode: parser.parse(input.source).rootNode,
+		parser_revision: runtime.parser_revision,
+		grammar_revision: runtime.grammar_revision,
 	};
 }
 

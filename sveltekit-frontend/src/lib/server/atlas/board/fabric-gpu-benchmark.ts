@@ -5,9 +5,9 @@ import { z } from 'zod';
 import { buildLatentRepresentationManifest, buildLowRankFeatureBlock } from '../tensors/latent-lod-contract.js';
 import type { FabricLaneManifest } from '../contracts/fabric-lanes.js';
 import { ENV } from '../../env.server.js';
-import { flattenBoardTasks, type DailyGraphifyBoardData } from './daily-graphify-board.js';
+import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
 import type { Phase89WorkflowPlan } from './phase89-workflow.js';
-import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
+import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
 const BenchmarkRowSchema = z
 	.object({
@@ -115,7 +115,7 @@ function normalizedSignal(value: number, scale: number): number {
 }
 
 function buildBenchmarkRows(board: DailyGraphifyBoardData, plan: Phase89WorkflowPlan): BoardGpuBenchmarkRow[] {
-	const tasks = flattenBoardTasks(board, board.generated);
+	const tasks = board.columns.flatMap((column) => column.tasks);
 	const selected = tasks.filter((task) => task.status !== 'done');
 	const rows = selected.map((task, index) => {
 		const evidenceCount = task.evidence_refs?.length ?? 0;

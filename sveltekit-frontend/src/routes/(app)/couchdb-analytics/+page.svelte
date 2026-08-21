@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Migrated to $effect
+	import { env as publicEnv } from '$env/dynamic/public';
 	import ClusterInspector from './ClusterInspector.svelte';
 	import DependencyChart from './DependencyChart.svelte';
 	import ErrorPropagationGraph from './ErrorPropagationGraph.svelte';
@@ -19,7 +20,7 @@
 	let error = $state<string | null>(null);
 	let activeTab = $state<'summaries' | 'dependencies' | 'errors' | 'clusters'>('summaries');
 
-	const API_BASE = 'http://localhost:8001/api/analytics';
+	const API_BASE = `${publicEnv.PUBLIC_COUCHDB_ANALYTICS_URL ?? 'http://localhost:8001'}/api/analytics`;
 
 	async function loadStats() {
 		try {

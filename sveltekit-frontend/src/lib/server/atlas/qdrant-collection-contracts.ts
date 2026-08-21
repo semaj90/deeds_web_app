@@ -58,6 +58,27 @@ const SHARED_NON_INDEXED_PAYLOAD_FIELDS = [
   'indexed_at',
 ] as const;
 
+/**
+ * Fields approved for a future revision-qualified projection migration.
+ *
+ * These are deliberately not included in indexedPayloadFields: the EMB3A
+ * read-only proof found that the live projection does not yet populate the
+ * revision lineage consistently. Keeping this list separate prevents a dry
+ * contract helper from being mistaken for authorization to create indexes.
+ */
+export const REVISION_FILTER_PAYLOAD_FIELDS = {
+  canonical_id: 'keyword',
+  tree_node_id: 'keyword',
+  symbol_version_id: 'keyword',
+  workspace_revision: 'keyword',
+  source_revision: 'keyword',
+  representation_id: 'keyword',
+  representation_revision: 'integer',
+  graph_revision: 'keyword',
+  ontology_revision: 'keyword',
+  source_root_authority: 'keyword',
+} as const;
+
 export const COLLECTION_CONTRACTS = {
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1' as const,
@@ -131,6 +152,37 @@ export const COLLECTION_CONTRACTS = {
     indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
     nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
   },
+  // EMB3A target contract. This is intentionally separate from the older
+  // source contract above: the live v2 collection is dense-only and uses the
+  // physical vector name `content`; sparse lanes require their own proof.
+  codebase_chunks_768_v2: {
+    contractVersion: 'atlas-qdrant-768-semantic-v2' as const,
+    vectors: {
+      content: {
+        size: 768,
+        distance: 'Cosine' as const,
+      },
+    },
+    sparseVectors: {},
+    requiredPayloadFields: [
+      'packet_key',
+      'source_ref',
+      'workspace_id',
+      'ontology_version',
+      'postgres_id',
+      'content_hash',
+      'contract_version',
+      'metadata_schema',
+      'metadata_version',
+      'file_path',
+      'language',
+      'embedding_model',
+      'embedding_dimension',
+    ] as const,
+    indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
+    nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
+    revisionFilterPayloadFields: REVISION_FILTER_PAYLOAD_FIELDS,
+  },
   codebase_topology_64: {
     contractVersion: 'atlas-qdrant-64-routing-v1' as const,
     vectors: {
@@ -155,7 +207,7 @@ export const COLLECTION_CONTRACTS = {
       'embedding_model',
       'embedding_dimension',
     ] as const,
-    indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
+  indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
     nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
   },
 } as const;
@@ -181,6 +233,17 @@ export interface QdrantChunkPayload {
   postgres_id: string;    // codebase_chunk_index.id (UUID as text)
   content_hash: string;
 
+  // Canonical identity and revision lineage. These remain optional in the
+  // projection type until EMB3A proves that the live writer populates them.
+  canonical_id?: string;
+  tree_node_id?: string;
+  symbol_version_id?: string;
+  workspace_revision?: string;
+  source_revision?: string;
+  graph_revision?: string;
+  ontology_revision?: string;
+  source_root_authority?: 'ACTIVE_RUNTIME' | 'QUARANTINED' | 'ARCHIVE' | 'GENERATED' | 'VENDOR';
+
   // Contract version — required, not indexed
   contract_version: string;
   metadata_schema:   'atlas-semantic-metadata-v1';
@@ -196,6 +259,11 @@ export interface QdrantChunkPayload {
   concepts?:      string[];
   som_cluster?:   number;
   kmeans_cluster?: number;
+  community_id?: number;
+  node_kind?: string;
+  taxonomy_tags?: string[];
+  topology_4d?: number[];
+  page_rank?: number;
 
   // Cluster provenance — not indexed
   kmeans_model_version?:   string;
@@ -349,5 +417,22 @@ export function buildFieldIndexRequests(
   return Object.entries(contract.indexedPayloadFields).map(([field, schema]) => ({
     field_name:   field,
     field_schema: schema,
+  }));
+}
+
+/**
+ * Read-only plan for the lineage indexes needed by a future populated
+ * projection. Callers must not send this result to Qdrant until the source,
+ * snapshot, outbox, and payload propagation gates are proven.
+ */
+export function buildRevisionFilterIndexPlan(): Array<{
+  field_name: string;
+  field_schema: string;
+  status: 'BLOCKED_UNTIL_LINEAGE_POPULATED';
+}> {
+  return Object.entries(REVISION_FILTER_PAYLOAD_FIELDS).map(([field, schema]) => ({
+    field_name: field,
+    field_schema: schema,
+    status: 'BLOCKED_UNTIL_LINEAGE_POPULATED' as const,
   }));
 }

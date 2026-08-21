@@ -1,19 +1,88 @@
 /**
  * SEMANTIC_768_RUNTIME_CUTOVER — canonical runtime contract.
  *
- * Active semantic embedding lane: semantic_768 (768-dim, EmbeddingGemma native).
+ * !! STALE relative to a later, dated operator decision — read before trusting !!
+ * Operator correction (2026-08-19, see
+ * openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md): "the
+ * persisted EmbeddingGemma test corpus that actually exists is 512-dimensional;
+ * a production/canonical 768-dimensional Qdrant corpus was not created. Do not
+ * promote an assumed 768 store merely because EmbeddingGemma's native output is
+ * 768." That doc's frozen representation contract makes semantic_512 (native
+ * 768 -> MRL prefix [0:512] -> L2 renorm) the CANONICAL PERSISTED SEMANTIC
+ * REPRESENTATION — this file's exported constants below (SEMANTIC_REPRESENTATION_ID
+ * = 'semantic_768', SEMANTIC_DIMENSION = 768, CANONICAL_QDRANT_COLLECTION =
+ * 'codebase_chunks_768') have NOT yet been migrated to match that correction.
+ * truncateEmbeddingGemmaMrl(vector, 512) already implements the correct
+ * derivation step. Do not silently "fix" this file's constants without doing
+ * the full migration the OpenSpec change describes (new assertSemantic512,
+ * updated CANONICAL_QDRANT_COLLECTION, semantic-lineage.ts re-exports, etc.) —
+ * this comment exists so the gap is visible, not to be quietly patched over.
+ *
+ * Active semantic embedding lane (as currently implemented in code, pre-migration):
+ * semantic_768 (768-dim, EmbeddingGemma native).
  * latent_128 / latent_64 are topology/routing projections — NOT embedding APIs
  * and never substitutable for semantic_768 at retrieval time.
  *
- * 384-dim and 512-dim are retired: no runtime code may read or write them.
+ * 384-dim is retired: no runtime code may read or write it. 512/256/128 are
+ * supported EmbeddingGemma MRL-derived representations; per the 2026-08-19
+ * correction above, 512 is meant to become the canonical persisted lane, but
+ * the code below still treats 768 as canonical pending that migration.
  * Migration-only tooling that still needs 384-dim access belongs in
  * `embedding/legacy-384-migration.ts` and must never be imported from
  * retrieval, ACE, cache, or reranking paths.
  */
 
+import { createHash } from 'node:crypto';
+
 export const SEMANTIC_REPRESENTATION_ID = 'semantic_768' as const;
 export const SEMANTIC_DIMENSION = 768 as const;
 export const CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768' as const;
+export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [768, 512, 256, 128] as const;
+
+/**
+ * Lineage revision markers for whether embedded text was passed through
+ * formatEmbeddingGemmaInput() before hitting the model. Neither live embedding
+ * call site (src/lib/server/retrieval/embedding-service.ts, embedViaOllama;
+ * src/lib/server/embeddings/ollama.ts) applies formatEmbeddingGemmaInput()
+ * today — both send raw text. So the entire existing corpus (Qdrant
+ * codebase_chunks_768, codebase_chunk_index.content_embedding) was embedded
+ * under PROMPT_REVISION_UNPROMPTED, not PROMPT_REVISION_TASK_PREFIX_V1.
+ * Do not wire formatEmbeddingGemmaInput() into a live query path without also
+ * re-embedding the document side to match — a formatted query compared
+ * against an unformatted document corpus is a silent representation
+ * mismatch, not a like-for-like comparison. See
+ * memory/SESSION-201-EG-GGUF-PROOF-GATES-0-2.md.
+ */
+export const PROMPT_REVISION_TASK_PREFIX_V1 = 'eg-task-prefix-v1' as const;
+export const PROMPT_REVISION_UNPROMPTED = 'unprompted-v0' as const;
+
+export type EmbeddingGemmaInputMode = 'retrieval_query' | 'code_query' | 'document';
+
+/**
+ * Canonical EmbeddingGemma prompt owner. Callers must not hand-build prompt
+ * strings because query/document prompting is part of representation lineage.
+ */
+export function formatEmbeddingGemmaInput(
+  mode: EmbeddingGemmaInputMode,
+  content: string,
+  title?: string,
+): string {
+  const normalizedContent = content.trim();
+  if (!normalizedContent) {
+    throw new Error('EMBEDDINGGEMMA_EMPTY_INPUT');
+  }
+
+  switch (mode) {
+    case 'retrieval_query':
+      return `task: search result | query: ${normalizedContent}`;
+    case 'code_query':
+      return `task: code retrieval query | query: ${normalizedContent}`;
+    case 'document':
+      return `title: ${title?.trim() || 'none'}\ntext: ${normalizedContent}`;
+  }
+}
+
+export type EmbeddingGemmaMrlDimension = (typeof EMBEDDINGGEMMA_MRL_DIMENSIONS)[number];
 
 export const TOPOLOGY_REPRESENTATIONS = {
   latent_128: 128,
@@ -36,6 +105,84 @@ export function assertSemantic768(
       `SEMANTIC_768_DIMENSION_MISMATCH: expected ${SEMANTIC_DIMENSION}, received ${vector.length}`,
     );
   }
+}
+
+/**
+ * Derive an EmbeddingGemma MRL representation from canonical semantic_768.
+ * This is intentionally not a generic dimension reducer: 384 and arbitrary
+ * widths fail closed, and every derived prefix is re-normalized for cosine.
+ */
+export function truncateEmbeddingGemmaMrl(
+  vector: readonly number[] | Float32Array,
+  dimension: EmbeddingGemmaMrlDimension,
+): Float32Array {
+  if (!(EMBEDDINGGEMMA_MRL_DIMENSIONS as readonly number[]).includes(dimension)) {
+    throw new Error(`UNSUPPORTED_EMBEDDINGGEMMA_MRL_DIMENSION: ${dimension}`);
+  }
+  assertSemantic768(vector);
+
+  const truncated = new Float32Array(vector.slice(0, dimension));
+  let normSquared = 0;
+  for (const value of truncated) {
+    if (!Number.isFinite(value)) {
+      throw new Error('SEMANTIC_MRL_NON_FINITE_VALUE');
+    }
+    normSquared += value * value;
+  }
+
+  const norm = Math.sqrt(normSquared);
+  if (!Number.isFinite(norm) || norm <= 0) {
+    throw new Error('SEMANTIC_MRL_ZERO_NORM');
+  }
+
+  for (let index = 0; index < truncated.length; index += 1) {
+    truncated[index] /= norm;
+  }
+  return truncated;
+}
+
+/**
+ * Deterministic digest of an already-truncated/renormalized MRL vector.
+ * Little-endian float32 byte layout matches semantic-lineage.ts's
+ * digestSemanticEmbedding() so digests are comparable in kind, even though
+ * that function is 768-only and this one accepts any EmbeddingGemma MRL
+ * width. Does not itself validate dimension membership — pair with
+ * truncateEmbeddingGemmaMrl() (or deriveEmbeddingGemmaMrlProjection() below)
+ * so only vetted, renormalized vectors ever get digested.
+ */
+export function digestEmbeddingGemmaMrl(vector: Float32Array | readonly number[]): string {
+  const bytes = new Uint8Array(vector.length * 4);
+  const view = new DataView(bytes.buffer);
+  for (let index = 0; index < vector.length; index += 1) {
+    const value = Number(vector[index]);
+    if (!Number.isFinite(value)) {
+      throw new Error(`SEMANTIC_MRL_DIGEST_NON_FINITE_VALUE: index ${index} is ${String(value)}`);
+    }
+    view.setFloat32(index * 4, value, true);
+  }
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+export interface EmbeddingGemmaMrlProjection {
+  dimension: EmbeddingGemmaMrlDimension;
+  vector: Float32Array;
+  digest: string;
+}
+
+/**
+ * EG-GGUF-5: derive one MRL projection (truncate + L2-renorm + digest) from a
+ * canonical semantic_768 source vector in a single call.
+ */
+export function deriveEmbeddingGemmaMrlProjection(
+  vector: readonly number[] | Float32Array,
+  dimension: EmbeddingGemmaMrlDimension,
+): EmbeddingGemmaMrlProjection {
+  const projected = truncateEmbeddingGemmaMrl(vector, dimension);
+  return {
+    dimension,
+    vector: projected,
+    digest: digestEmbeddingGemmaMrl(projected),
+  };
 }
 
 export interface SemanticLaneInput {

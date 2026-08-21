@@ -301,9 +301,9 @@ export function projectClusterAcePacket(packet: Pick<ClusterAcePacket, keyof Clu
             : null)
           : null,
       topFiles: Array.isArray((packet.metadata as Record<string, unknown> | undefined)?.filePaths)
-        ? (packet.metadata as Record<string, unknown>).filePaths
+        ? ((packet.metadata as Record<string, unknown>).filePaths as string[])
         : Array.isArray((packet.topology as Record<string, unknown> | undefined)?.filePaths)
-          ? (packet.topology as Record<string, unknown>).filePaths
+          ? ((packet.topology as Record<string, unknown>).filePaths as string[])
           : [],
       pageRankTop5: Array.isArray((packet.metadata as Record<string, unknown> | undefined)?.pageRankTop5)
         ? (packet.metadata as Record<string, unknown>).pageRankTop5
@@ -317,7 +317,7 @@ export function projectClusterAcePacket(packet: Pick<ClusterAcePacket, keyof Clu
     },
     bounds: {
       topFiles: Array.isArray((packet.metadata as Record<string, unknown> | undefined)?.filePaths)
-        ? (packet.metadata as Record<string, unknown>).filePaths.length
+        ? ((packet.metadata as Record<string, unknown>).filePaths as unknown[]).length
         : 0,
       summaryChars: packet.summary.trim().length,
     },

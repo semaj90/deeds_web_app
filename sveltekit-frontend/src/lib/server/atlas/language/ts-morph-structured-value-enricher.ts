@@ -92,8 +92,9 @@ export function findExactTsMorphNode(input: {
 function declarationRef(node: MorphNode): { source_ref: string; start_byte: number; end_byte: number; kind: string; name: string | null } {
 	const sourceFile = node.getSourceFile();
 	const sourceText = sourceFile.getFullText();
-	const name = typeof (node as { getName?: () => string | undefined }).getName === 'function'
-		? (node as { getName: () => string | undefined }).getName() ?? null
+	const namedNode = node as unknown as { getName?: () => string | undefined };
+	const name = typeof namedNode.getName === 'function'
+		? namedNode.getName() ?? null
 		: null;
 	return {
 		source_ref: normalizePath(sourceFile.getFilePath()),

@@ -5,6 +5,8 @@
  * Uses for: Gemma4, HForF, Qwen, and other models.
  */
 
+import { ENV } from '$lib/server/env.server.js';
+
 export type ModelIdentifier = 'gemma4-legal' | 'hforf-7b' | 'qwen3-7b' | 'unknown';
 
 export interface ModelCapabilities {
@@ -94,7 +96,7 @@ export function createClinetContract(model: ModelIdentifier): ClinetIntegrationC
 
   return {
     model,
-    baseUrl: 'http://127.0.0.1:8090/v1',
+    baseUrl: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1`,
     streaming: caps.supportsStreaming,
     toolCalling: caps.supportsToolCalls,
     kvCache: caps.nativeKvCacheSupport,
@@ -134,7 +136,7 @@ export function createCodeExtensionContract(model: ModelIdentifier): CodeExtensi
 
   return {
     model,
-    baseUrl: 'http://127.0.0.1:8090/v1',
+    baseUrl: `${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1`,
     streaming: caps.supportsStreaming,
     toolCalling: caps.supportsToolCalls,
     instructionFollowing: instructionFollowing[model],

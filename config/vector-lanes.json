@@ -1,6 +1,6 @@
 {
   "contractVersion": "atlas.vector-lane-registry.v1",
-  "activeCanonicalLane": "atlas-retrieval-384-v1",
+  "activeCanonicalLane": "atlas-semantic-768-v1",
   "lanes": [
     {
       "laneId": "embeddinggemma-source-768-v1",
@@ -17,19 +17,19 @@
       "purpose": "Native source embedding artifact from embeddinggemma:latest"
     },
     {
-      "laneId": "atlas-retrieval-384-v1",
+      "laneId": "atlas-semantic-768-v1",
       "status": "canonical",
       "role": "retrieval",
       "modelId": "embeddinggemma",
       "modelRevision": "pinned-revision",
       "sourceDimensions": 768,
-      "outputDimensions": 384,
-      "projection": "direct-slice",
+      "outputDimensions": 768,
+      "projection": "none",
       "normalization": "l2",
       "dtype": "float32",
       "distance": "cosine",
       "purpose": "Canonical Atlas code and documentation retrieval",
-      "collection": "codebase_chunks_384_hybrid"
+      "collection": "codebase_chunks_768_v2"
     },
     {
       "laneId": "atlas-topology-128-v1",
@@ -37,7 +37,7 @@
       "role": "topology",
       "modelId": "atlas-topology-projector",
       "modelRevision": "v1",
-      "sourceDimensions": 384,
+      "sourceDimensions": 768,
       "outputDimensions": 128,
       "projection": "graph-projection",
       "normalization": "l2",

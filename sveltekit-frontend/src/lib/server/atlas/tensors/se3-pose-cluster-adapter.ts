@@ -34,10 +34,10 @@ export function toPoseClusterInput(
 ): PoseClusterInputV1 {
   let vector: number[];
   switch (mode) {
-    case 'EULER6_FIXTURE': vector = [...row.clusterVector6]; break;
-    case 'SE3_QUATERNION7': vector = [...row.se3PhysicalFeature7]; break;
-    case 'SOM64_EULER_PADDED': vector = [...row.somFixtureVector64]; break;
-    case 'SOM64_QUATERNION_PADDED': vector = [...row.somQuaternionFixtureVector64]; break;
+    case 'EULER6_FIXTURE': vector = Array.from(row.clusterVector6, Number); break;
+    case 'SE3_QUATERNION7': vector = Array.from(row.se3PhysicalFeature7, Number); break;
+    case 'SOM64_EULER_PADDED': vector = Array.from(row.somFixtureVector64, Number); break;
+    case 'SOM64_QUATERNION_PADDED': vector = Array.from(row.somQuaternionFixtureVector64, Number); break;
   }
   return PoseClusterInputV1Schema.parse({
     canonicalId: row.canonicalId,
@@ -104,10 +104,12 @@ export function evaluatePoseClusterContinuity(input: {
       const right = input.rows[j];
       const rightCluster = input.clusterByCanonicalId[right.canonicalId];
       if (rightCluster === undefined) continue;
-      const translationDistance = euclidean3(left.clusterVector6, right.clusterVector6);
+      const leftClusterVector = left.clusterVector6 as unknown as [number, number, number, number, number, number];
+      const rightClusterVector = right.clusterVector6 as unknown as [number, number, number, number, number, number];
+      const translationDistance = euclidean3(leftClusterVector, rightClusterVector);
       const rotationDistance = rotationAngularDistance(
-        left.physicalRotationQuaternion as RotationQuaternion,
-        right.physicalRotationQuaternion as RotationQuaternion,
+        left.physicalRotationQuaternion as unknown as RotationQuaternion,
+        right.physicalRotationQuaternion as unknown as RotationQuaternion,
       );
       const distance = translationWeight * translationDistance + rotationWeight * rotationDistance;
       (leftCluster === rightCluster ? same : different).push(distance);

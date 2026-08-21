@@ -112,7 +112,7 @@ export const VECTOR_CONFIG = {
     codebase_chunks_384_hybrid: {
       vectors: ['content'],
       on_disk_payload: true,
-      sparse_vectors: ['bm42'], // Canonical sparse vector name per qdrant-collection-contracts.ts
+      sparse_vectors: ['bm42'], // Legacy projection metadata; not an active sparse owner
     },
     codebase_chunks_384: {
       vectors: ['content'],
@@ -176,16 +176,16 @@ export const VECTOR_LANES = {
   dense_384: {
     kind: 'dense',
     dimension: 384,
-    modelId: 'embeddinggemma-prefix384-v1',
+    modelId: 'legacy-dense-384',
     laneId: 'dense_384',
-    role: 'legacy_online_retrieval',
-    status: 'ACTIVE',
+    role: 'legacy_reference',
+    status: 'REFERENCE_ONLY',
     sourceDimension: 768,
-    projectionMethod: 'direct_slice',
-    projectionVersion: 'atlas-embeddinggemma-direct-slice384-v1',
+    projectionMethod: 'legacy_external_model',
+    projectionVersion: 'legacy-minilm-384-v1',
     normalization: 'L2',
     collections: ['codebase_chunks_384_hybrid', 'codebase_chunks_384'],
-    evidenceAuthority: true,
+    evidenceAuthority: false,
   },
   dense_768: {
     kind: 'dense',
@@ -193,7 +193,7 @@ export const VECTOR_LANES = {
     modelId: 'embeddinggemma:latest',
     laneId: 'dense_768',
     role: 'canonical_native_semantic',
-    status: 'REFERENCE_ONLY',
+    status: 'CANONICAL',
     sourceDimension: 768,
     projectionMethod: 'none',
     projectionVersion: 'embeddinggemma-full768-v1',
@@ -205,7 +205,7 @@ export const VECTOR_LANES = {
     kind: 'sparse',
     laneId: 'bm42', // Canonical sparse vector name per qdrant-collection-contracts.ts
     role: 'lexical_sparse',
-    status: 'ACTIVE',
+    status: 'DEFERRED',
     vectorName: 'bm42', // Canonical sparse vector name per qdrant-collection-contracts.ts
     evidenceAuthority: true,
   },
@@ -228,12 +228,12 @@ export const VECTOR_LANES = {
     dimension: 64,
     laneId: 'latent_64',
     role: 'routing_projection',
-    status: 'ACTIVE',
-    sourceDimension: 384,
+    status: 'REFERENCE_ONLY',
+    sourceDimension: 768,
     projectionMethod: 'autoencoder',
-    projectionVersion: 'atlas-ae-384x64-v3',
+    projectionVersion: 'atlas-ae-768x64-v1',
     normalization: 'L2',
-    projectionId: 'atlas-ae-384x64-v3',
+    projectionId: 'atlas-ae-768x64-v1',
     collections: ['codebase_topology_64'],
     evidenceAuthority: false,
   },
@@ -311,8 +311,6 @@ export function collectionForVector(vector: number[]): never {
 export const CODEBASE_QDRANT_COLLECTION_PRIORITY = [
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
-  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
-  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
 ] as const;
 
 export type CodebaseQdrantCollectionName = (typeof CODEBASE_QDRANT_COLLECTION_PRIORITY)[number];
@@ -321,20 +319,14 @@ export const CODEBASE_QDRANT_COLLECTIONS_BY_TIER: Record<SearchTier, readonly Co
   hot: [
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
   ],
   warm: [
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
   ],
   cold: [
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
   ],
 } as const;
 

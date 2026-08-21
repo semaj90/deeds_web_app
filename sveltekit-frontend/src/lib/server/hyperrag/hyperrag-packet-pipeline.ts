@@ -66,7 +66,7 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
    */
   async extractFeatures(sourcePath: string, text: string): Promise<string[]> {
     try {
-      const response = await fetch('http://127.0.0.1:9999/extract', {
+      const response = await fetch(`${process.env.FEATURE_EXTRACTOR_URL?.trim() || 'http://127.0.0.1:9999'}/extract`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source_path: sourcePath, text }),
@@ -296,7 +296,7 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
   private async summarizeChunk(chunk: string): Promise<string> {
     try {
       const model = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
-      const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
+      const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-06-20T15:44:48.831Z",
+  "generated_at": "2026-08-21T03:48:35.547Z",
   "checks": {
     "turbovec_http": {
-      "available": false,
-      "error": "fetch failed"
+      "available": true,
+      "status": 200,
+      "statusText": "OK"
     },
     "qdrant_http": {
       "available": true,
@@ -60,17 +61,13 @@
     },
     "qdrant_collection": {
       "available": true,
-      "points_count": 52606,
+      "points_count": 105762,
       "vectors_count": 0,
       "config": {
         "params": {
           "vectors": {
             "content": {
               "size": 768,
-              "distance": "Cosine"
-            },
-            "encoded_64": {
-              "size": 64,
               "distance": "Cosine"
             },
             "error": {
@@ -89,7 +86,7 @@
         },
         "hnsw_config": {
           "m": 16,
-          "ef_construct": 100,
+          "ef_construct": 200,
           "full_scan_threshold": 10000,
           "max_indexing_threads": 0,
           "on_disk": false
@@ -100,9 +97,10 @@
           "default_segment_number": 0,
           "max_segment_size": null,
           "memmap_threshold": null,
-          "indexing_threshold": 20000,
+          "indexing_threshold": 10000,
           "flush_interval_sec": 5,
-          "max_optimization_threads": null
+          "max_optimization_threads": null,
+          "prevent_unoptimized": null
         },
         "wal_config": {
           "wal_capacity_mb": 32,
@@ -112,11 +110,9 @@
         "quantization_config": {
           "scalar": {
             "type": "int8",
-            "always_ram": true
+            "quantile": 0.99,
+            "always_ram": false
           }
-        },
-        "strict_mode_config": {
-          "enabled": false
         }
       }
     },
@@ -127,88 +123,38 @@
       "has_tags": true,
       "has_community_id": true,
       "payload_fields": [
-        "packet_key",
-        "source_ref",
-        "feature_id",
-        "file_path",
-        "community_id",
-        "som_cluster",
-        "lineage_version",
         "chunk_id",
-        "sourceRef",
-        "root",
-        "area",
-        "kind",
-        "tags",
-        "agent_area",
-        "feature_status",
-        "centroid_id",
+        "source_ref",
         "content_hash",
-        "schema_version",
-        "phase_lane",
-        "dependency_cluster",
-        "hot_keyword_cluster",
-        "parent_atlas_card_id",
-        "file_name",
-        "extension",
-        "chunk_index",
-        "total_chunks",
-        "content",
-        "purpose",
-        "domain",
-        "complexity",
-        "indexed_at",
-        "gpuCluster",
-        "somRow",
-        "somCol",
-        "gpu_cluster",
-        "sourceRefs",
-        "source_refs",
-        "feature_ids",
-        "lane_ids",
-        "som_cell",
-        "route_path",
-        "concept_ids",
-        "cluster_k",
-        "som_bmu_row",
-        "som_bmu_col",
-        "vector64",
-        "indexed_at_som",
-        "canonicalSourceRef",
-        "sourceRefHash",
-        "encoded_at",
-        "community_conf",
-        "atlas_enriched",
-        "atlas_enriched_at",
-        "path",
-        "hash",
-        "mtime",
-        "packetKey",
-        "ontology",
-        "domain_confidence",
-        "domain_id",
-        "domain_parent",
+        "representation_id",
+        "packet_version",
+        "qdrant_point_id",
+        "packet_key",
         "canonical_source_ref",
-        "filePath",
+        "source_ref_key",
+        "feature_id",
         "feature_label",
-        "metadata",
-        "qdrant_payload_version",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
         "ledger_type",
-        "canonical",
-        "payload_unmatched",
+        "community_id",
+        "community_conf",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "embedding_ref",
         "payload_backfilled_at",
-        "featureId",
-        "featureLabel",
+        "graphAuthorityScore",
         "communityId",
-        "community_confidence",
-        "cluster_id"
+        "communitySize",
+        "pagerank",
+        "cluster_key"
       ]
     }
   },
   "blockers": [],
-  "warnings": [
-    "TurboVec sidecar not available at :50062; N-API fallback remains available"
-  ],
-  "readiness_score": 80,
+  "warnings": [],
+  "readiness_score": 100,
   "gates_pass": true
 }

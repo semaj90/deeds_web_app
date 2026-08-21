@@ -104,7 +104,7 @@ Packet identity is immutable. title_id is enrichment only. Verify Postgres truth
       'title_id',
       'domain classification',
       'semantic concepts',
-      'EmbeddingGemma 384',
+      'EmbeddingGemma semantic_768',
       'KMeans/SOM enrichment',
     ],
     authorization: {
@@ -113,7 +113,7 @@ Packet identity is immutable. title_id is enrichment only. Verify Postgres truth
       shellAccess: false,
     },
     prompt: `You are the Semantic Enrichment Agent.
-Own summary promotion, title_id enrichment, domain classification, semantic concepts, EmbeddingGemma 384, and KMeans/SOM enrichment.
+Own summary promotion, title_id enrichment, domain classification, semantic concepts, canonical EmbeddingGemma semantic_768, and KMeans/SOM enrichment. Truncated 512/256/128 projections are derived routing lanes only.
 Produce metadata only. Do not emit query-time rerank evidence.`,
   },
   graph: {

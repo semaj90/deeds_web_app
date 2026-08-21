@@ -9,6 +9,7 @@
 
 import type { DecomposedQuery, Subgoal } from './gemma4-policy-orchestrator';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const DECOMPOSITION_PROMPT = `You are an expert research assistant breaking down complex questions into focused search tasks.
 
@@ -83,7 +84,7 @@ Respond with ONLY valid JSON, no other text.`;
 
   try {
     // Try TurboQuant at :8090
-    const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
+    const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

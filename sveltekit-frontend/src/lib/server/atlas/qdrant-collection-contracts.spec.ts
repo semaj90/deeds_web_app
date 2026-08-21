@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   COLLECTION_CONTRACTS,
+  REVISION_FILTER_PAYLOAD_FIELDS,
+  buildRevisionFilterIndexPlan,
   PayloadValidationError,
   validateQdrantPayloadForCollection,
 } from './qdrant-collection-contracts.js';
@@ -155,5 +157,29 @@ describe('qdrant collection contract lineage', () => {
     expect(Object.keys(COLLECTION_CONTRACTS.codebase_chunks_768.vectors)).toEqual(
       expect.arrayContaining(['content', 'error', 'signature']),
     );
+  });
+
+  it('freezes the EMB3A v2 collection as dense-only with content as the physical vector', () => {
+    expect(COLLECTION_CONTRACTS.codebase_chunks_768_v2.vectors).toEqual({
+      content: { size: 768, distance: 'Cosine' },
+    });
+    expect(COLLECTION_CONTRACTS.codebase_chunks_768_v2.sparseVectors).toEqual({});
+    expect(COLLECTION_CONTRACTS.codebase_chunks_768_v2.contractVersion).toBe(
+      'atlas-qdrant-768-semantic-v2',
+    );
+  });
+
+  it('keeps revision index planning separate from live index creation', () => {
+    const plan = buildRevisionFilterIndexPlan();
+    expect(plan.map((entry) => entry.field_name)).toEqual(
+      expect.arrayContaining([
+        'workspace_revision',
+        'source_revision',
+        'representation_id',
+        'representation_revision',
+      ]),
+    );
+    expect(plan.every((entry) => entry.status === 'BLOCKED_UNTIL_LINEAGE_POPULATED')).toBe(true);
+    expect(REVISION_FILTER_PAYLOAD_FIELDS.tree_node_id).toBe('keyword');
   });
 });

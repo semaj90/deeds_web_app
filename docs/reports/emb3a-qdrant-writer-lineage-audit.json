@@ -1,0 +1,153 @@
+{
+  "schema": "atlas.emb3a.qdrant.writer.lineage.audit.v1",
+  "generatedAt": "2026-08-20T22:31:35.745Z",
+  "readOnly": true,
+  "collection": "codebase_chunks_768",
+  "requiredPayloadFields": [
+    "packet_key",
+    "source_ref",
+    "workspace_revision",
+    "source_revision",
+    "representation_revision"
+  ],
+  "canonicalIdentityOwner": "Parent Atlas / Postgres",
+  "projectionOwner": "Qdrant payload writer selected by Graphify retrieval projection",
+  "writers": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/workers/qdrant-sync-worker.ts",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": false,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
+      "exists": true,
+      "payloadLike": false,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": true,
+        "source_revision": true,
+        "representation_revision": true
+      },
+      "status": "LINEAGE_COMPLETE_CANDIDATE"
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": true,
+        "source_revision": true,
+        "representation_revision": true
+      },
+      "status": "LINEAGE_COMPLETE_CANDIDATE"
+    },
+    {
+      "file": "scripts/atlas/backfill-packets-to-qdrant.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/backfill-packets-to-qdrant-ollama.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/qdrant-upsert-worker.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/backfill-qdrant-payloads-from-postgres.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/backfill-qdrant-payload-upsert.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/backfill-qdrant-payload-complete.mjs",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    },
+    {
+      "file": "scripts/atlas/backfill-qdrant-identity-payload.mts",
+      "exists": true,
+      "payloadLike": true,
+      "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "status": "REVISION_FIELDS_MISSING"
+    }
+  ],
+  "writerCount": 9,
+  "completeWriterCount": 1,
+  "liveApplicationOwner": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
+  "status": "WRITER_CONTRACT_PRESENT_PROJECTION_POPULATION_OPEN",
+  "conclusion": "The live SvelteKit writer contains the EMB3A lineage fields; Qdrant population and non-zero upstream revision values still require proof.",
+  "canonicalWrites": false
+}
