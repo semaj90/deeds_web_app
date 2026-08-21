@@ -118,19 +118,49 @@ that mutation.
   `atlas.chunk-packet-identity-link.v1`, preserving candidate evidence without
   minting packet identity. `CONTENT_HASH_UNIQUE` cannot become `ADMITTED` by
   itself.
-- [ ] **S512-ID1B — Deterministic live candidate derivation** — produce one
-  read-only manifest over a bounded/full 512 corpus with candidate packet keys
-  and evidence refs from every available exact/span/structural/content join.
-- [ ] **S512-ID2 — Ambiguity and uniqueness proof** — report counts for
-  `EXACT`, `UNIQUE_DERIVATION`, `AMBIGUOUS`, and `NONE`; prove repeated runs on
-  the same Postgres snapshot produce identical classifications/checksum.
-- [ ] **S512-ID3 — Canonical packet linkage** — for rows admitted by ID1/ID2,
-  prove the selected key exists in `atlas_packets` and freeze the link in a
-  reviewed manifest. This gate still performs no packet minting and no Qdrant
-  mutation.
-- [ ] **S512-ID4 — Linkage read-back/determinism** — re-read every selected
-  `atlas_packets.packet_key`, source/ref evidence, and snapshot lineage; fail
-  closed on missing, changed, or ambiguous links.
+- [x] **S512-ID1B — Deterministic live candidate derivation implementation** —
+  `audit-s512-chunk-packet-identity.mts` now produces a read-only bounded/full
+  manifest with candidate packet keys, first-loss classification, Postgres
+  snapshot lineage, and a deterministic manifest checksum. **Live execution is
+  still pending.**
+- [ ] **S512-ID2 — Ambiguity and uniqueness proof** — execute ID1B twice against
+  an unchanged corpus and report `EXACT`, `UNIQUE_DERIVATION`, `AMBIGUOUS`, and
+  `NONE`; identical sorted manifests must have identical checksums.
+- [x] **S512-ID3 — Canonical packet linkage verifier implementation** —
+  `chunk-packet-identity-readback-v1.ts` plus
+  `verify-s512-chunk-packet-identity-readback.mts` accept only previously
+  `ADMITTED` links, re-read the selected packet, and re-prove the original exact
+  or unique evidence class. They cannot mint packets or broaden admission.
+  **Live verification is still pending.**
+- [x] **S512-ID4 — Linkage read-back/determinism implementation** — exact
+  canonical-ID, Qdrant-point, source/span, revision/span, and structural evidence
+  have explicit read-back semantics. Missing reproducing fields become
+  `UNVERIFIABLE`; changed/missing identities become `DRIFTED`; content-hash-only
+  links can never be grandfathered as verified. **Live proof/repeatability is
+  still pending.**
+
+## Read-back statuses
+
+`AtlasChunkPacketIdentityReadbackV1` is fail-closed:
+
+```text
+VERIFIED
+    original admitted evidence still reproduces
+
+DRIFTED
+    point/chunk/packet is missing, packet key changed, or original evidence no
+    longer matches
+
+UNVERIFIABLE
+    current schema/data no longer exposes the exact evidence needed to reproduce
+    the original admission
+
+NOT_ADMITTED
+    source link was never eligible for canonical read-back
+```
+
+Read-back does not accept an existing packet merely because its key still exists;
+it must reproduce the match class that caused admission.
 
 ## S512-10 correction
 
@@ -153,20 +183,37 @@ AMBIGUOUS / NONE / content-hash-only
 The unresolved majority can remain quarantined while downstream proofs operate
 on a smaller canonical subset. This is incremental proof, not a weaker gate.
 
-## Implementation owner
+## Implementation owners
 
-The pure classifier lives at:
+Pure identity classification:
 
 `src/lib/server/atlas/identity/chunk-packet-identity-link-v1.ts`
 
-Focused tests must cover:
+Live candidate audit:
+
+`scripts/atlas/audit-s512-chunk-packet-identity.mts`
+
+Pure read-back contract:
+
+`src/lib/server/atlas/identity/chunk-packet-identity-readback-v1.ts`
+
+Live read-back verifier:
+
+`scripts/atlas/verify-s512-chunk-packet-identity-readback.mts`
+
+Focused tests cover:
 
 - exact existing canonical packet -> `ADMITTED/EXACT`;
 - exact source/span unique packet -> `ADMITTED/UNIQUE_DERIVATION`;
 - content-hash-only unique candidate -> `REVIEW`, never `ADMITTED`;
 - no existing packet key -> `QUARANTINED/UNRESOLVED`;
 - equally strong competing packet keys -> `REVIEW/AMBIGUOUS`;
-- strong evidence lineage conflict -> `REVIEW/AMBIGUOUS`.
+- strong evidence lineage conflict -> `REVIEW/AMBIGUOUS`;
+- exact canonical-ID read-back -> `VERIFIED`;
+- exact Qdrant point read-back -> `VERIFIED`;
+- missing packet -> `DRIFTED`;
+- missing reproducing fields -> `UNVERIFIABLE`;
+- admitted content-hash-only row -> `DRIFTED`, never grandfathered.
 
 No Postgres, Qdrant, Valkey, Graphify, vector, packet, or canonical mutation is
-authorized by S512-ID0 through S512-ID2.
+authorized by S512-ID0 through S512-ID4.
