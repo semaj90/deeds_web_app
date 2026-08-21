@@ -55,6 +55,7 @@ export * from './core/structured-value-ast.js';
 export * from './core/structured-value-arrow.js';
 export * from './core/structured-value-parity.js';
 export * from './core/temporal-indexing-fabric.js';
+export * from './core/workflow-action-event.js';
 export * from './core/temporal-action-ledger.js';
 export * from './core/temporal-action-ledger-runtime.js';
 export * from './core/temporal-action-workflow-adapter.js';

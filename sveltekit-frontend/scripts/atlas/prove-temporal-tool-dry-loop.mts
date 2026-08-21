@@ -2,10 +2,27 @@ import { randomUUID } from 'node:crypto';
 import { readFile, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { buildTemporalToolExecutionContext } from '../../src/lib/server/atlas/temporal/temporal-tool-execution-boundary.js';
-import { recordTemporalToolDispatchOutcomeFromPostgres } from '../../src/lib/server/atlas/temporal/temporal-tool-post-dispatch-recorder.js';
-import { executeTool } from '../../src/lib/server/ai/tool-shim.js';
-import { closeConnections, pool } from '../../src/lib/server/db/client.js';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
+
+// $lib/server/db/client.js reads DATABASE_URL from ENV at module-import time
+// (top-level `new Pool(...)`). ES module evaluation runs every statically
+// imported module (recursively, depth-first) BEFORE this file's own top-level
+// code — so a static import of temporal-tool-post-dispatch-recorder.js here
+// would already have transitively evaluated db/client.js (via
+// postgres-json-artifact-v1.js, which imports `db` statically) before
+// loadAtlasEnv() below ever ran, no matter where that call is placed in this
+// file. Every DB-adjacent binding must therefore be imported dynamically,
+// after loadAtlasEnv() has actually run.
+loadAtlasEnv();
+
+const { buildTemporalToolExecutionContext } = await import(
+  '../../src/lib/server/atlas/temporal/temporal-tool-execution-boundary.js'
+);
+const { recordTemporalToolDispatchOutcomeFromPostgres } = await import(
+  '../../src/lib/server/atlas/temporal/temporal-tool-post-dispatch-recorder.js'
+);
+const { executeTool } = await import('../../src/lib/server/ai/tool-shim.js');
+const { closeConnections, pool } = await import('../../src/lib/server/db/client.js');
 
 const APPLY = process.env.ATLAS_TEMPORAL_DRY_LOOP_PROOF === '1';
 const PRODUCER_REVISION = 'atlas-temporal-dry-loop-proof-v1';
