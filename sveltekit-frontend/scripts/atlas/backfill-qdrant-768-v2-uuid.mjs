@@ -44,10 +44,6 @@ console.log('');
 
 const pool = new Pool({ connectionString: PG_URL });
 
-// ─────────────────────────────────────────────────────────────────────────
-// Parse halfvec text format
-// ─────────────────────────────────────────────────────────────────────────
-
 function parseHalfvec(text) {
   if (typeof text !== 'string') {
     throw new TypeError(`embedding must be a string, got ${typeof text}`);
@@ -57,27 +53,36 @@ function parseHalfvec(text) {
     throw new Error(`invalid halfvec format: ${body.substring(0, 50)}`);
   }
   const arr = JSON.parse(body);
-  if (!Array.isArray(arr)) {
-    throw new Error(`parsed halfvec is not an array`);
-  }
+  if (!Array.isArray(arr)) throw new Error('parsed halfvec is not an array');
   if (arr.length !== CANONICAL_DIMENSION) {
     throw new Error(`dimension mismatch: expected ${CANONICAL_DIMENSION}, got ${arr.length}`);
   }
   for (let i = 0; i < arr.length; i++) {
-    if (!Number.isFinite(arr[i])) {
-      throw new Error(`non-finite value at index ${i}: ${arr[i]}`);
-    }
+    if (!Number.isFinite(arr[i])) throw new Error(`non-finite value at index ${i}: ${arr[i]}`);
   }
   return arr;
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Main backfill loop
-// ─────────────────────────────────────────────────────────────────────────
+/**
+ * Projection metadata is part of the durable Qdrant payload contract.
+ * Never stringify SQL NULL into identifiers such as `card:<path>:null`.
+ */
+function validateProjectionMetadata(row) {
+  if (typeof row.relative_path !== 'string' || row.relative_path.trim().length === 0) {
+    throw new Error('SOURCE_REF_REQUIRED');
+  }
+  if (typeof row.content_hash !== 'string' || row.content_hash.trim().length === 0) {
+    throw new Error('CONTENT_HASH_REQUIRED');
+  }
+  if (typeof row.chunk_id !== 'string' || row.chunk_id.trim().length === 0) {
+    throw new Error('CHUNK_ID_REQUIRED');
+  }
+}
 
 let scannedRows = 0;
 let insertedRows = 0;
 let skippedRows = 0;
+const rejectionCounts = {};
 
 const startTime = Date.now();
 let currentCursor = ZERO_UUID;
@@ -86,7 +91,6 @@ try {
   while (scannedRows < LIMIT) {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - scannedRows);
 
-    // Fetch batch using keyset pagination
     const query = `
       SELECT
         id,
@@ -117,7 +121,6 @@ try {
       break;
     }
 
-    // Validate and build points
     const points = [];
     let batchErrors = 0;
 
@@ -126,21 +129,22 @@ try {
       let embedding;
 
       try {
+        validateProjectionMetadata(row);
         embedding = parseHalfvec(row.embedding_text);
       } catch (err) {
-        console.error(`   Row ${row.id}: Embedding parse failed: ${err.message}`);
+        const reason = err instanceof Error ? err.message : String(err);
+        console.error(`   Row ${row.id}: Projection rejected: ${reason}`);
+        rejectionCounts[reason] = (rejectionCounts[reason] ?? 0) + 1;
         batchErrors++;
         skippedRows++;
         continue;
       }
 
-      // UUID-based ID (Postgres UUID is the Qdrant ID, no integer allocation)
+      // Actual Qdrant ID is the canonical Postgres UUID. qdrant_point_id is payload metadata only.
       const qdrantPointId = `card:${row.relative_path}:${row.content_hash}`;
       points.push({
         id: row.id,
-        vector: {
-          [QDRANT_VECTOR_NAME]: embedding
-        },
+        vector: { [QDRANT_VECTOR_NAME]: embedding },
         payload: {
           postgres_id: row.id,
           chunk_id: row.chunk_id,
@@ -158,14 +162,15 @@ try {
       });
     }
 
+    scannedRows += rows.length;
+    // Advance cursor even when all rows are rejected so a malformed row cannot stall the scan forever.
+    currentCursor = rows[rows.length - 1].id;
+
     if (points.length === 0) {
-      console.error(`❌ Batch had no valid points (all ${batchErrors} skipped)`);
-      break;
+      console.warn(`⚠️ Batch produced no writable points (${batchErrors} rejected); continuing after cursor ${currentCursor}`);
+      continue;
     }
 
-    scannedRows += rows.length;
-
-    // Upsert (or dry-run)
     if (DRY_RUN) {
       insertedRows += points.length;
     } else {
@@ -182,7 +187,6 @@ try {
           console.error(`❌ Qdrant upsert failed: HTTP ${response.status}: ${body.slice(0, 200)}`);
           break;
         }
-
         insertedRows += points.length;
       } catch (err) {
         console.error(`❌ Qdrant upsert network error: ${err.message}`);
@@ -190,24 +194,21 @@ try {
       }
     }
 
-    currentCursor = rows[rows.length - 1].id;
-
     const elapsedSec = (Date.now() - startTime) / 1000;
     const rate = insertedRows > 0 ? (insertedRows / elapsedSec).toFixed(1) : '0';
     console.log(`   [${scannedRows}/${LIMIT}] Inserted: ${insertedRows}, Skipped: ${skippedRows}, Rate: ${rate} pts/sec`);
   }
 
-  // Final summary
   const elapsedMin = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
   console.log('');
-  console.log(`✅ Backfill v2 Summary:`);
+  console.log('✅ Backfill v2 Summary:');
   console.log(`   Scanned: ${scannedRows}`);
   console.log(`   Inserted: ${insertedRows}`);
   console.log(`   Skipped: ${skippedRows}`);
+  console.log(`   Rejections: ${JSON.stringify(rejectionCounts)}`);
   console.log(`   Duration: ${elapsedMin}m`);
   console.log(`   Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}`);
   console.log(`   Collection: ${QDRANT_COLLECTION}`);
-
 } finally {
   await pool.end();
 }
