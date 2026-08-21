@@ -63,6 +63,11 @@ export type GroundedContextManifestV1 = z.infer<typeof GroundedContextManifestV1
 export type GroundedExecutionReceiptV1 = z.infer<typeof GroundedExecutionReceiptV1Schema>;
 export type GroundedValidationObservationV1 = z.infer<typeof GroundedValidationObservationV1Schema>;
 
+type GroundedExecutionReceiptBuildInput = Omit<
+  GroundedExecutionReceiptV1,
+  'schema' | 'canonicalAuthority' | 'receiptChecksum'
+>;
+
 function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   if (value && typeof value === 'object') {
@@ -103,17 +108,30 @@ export function checksumGroundedContextManifestV1(manifest: GroundedContextManif
   return sha256GroundedExecutionValue(GroundedContextManifestV1Schema.parse(manifest));
 }
 
-export function buildGroundedExecutionReceiptV1(input: Omit<GroundedExecutionReceiptV1, 'schema' | 'canonicalAuthority' | 'receiptChecksum'>): GroundedExecutionReceiptV1 {
+function sanitizeReceiptBuildInput(input: GroundedExecutionReceiptBuildInput): GroundedExecutionReceiptBuildInput {
+  // Runtime callers may spread a previously persisted receipt back into the
+  // builder despite the TypeScript Omit<> contract. Strip envelope/checksum
+  // fields defensively so an old checksum can never become part of the new
+  // checksum preimage.
+  const value = { ...(input as GroundedExecutionReceiptBuildInput & Record<string, unknown>) };
+  delete value.schema;
+  delete value.canonicalAuthority;
+  delete value.receiptChecksum;
+  return value as GroundedExecutionReceiptBuildInput;
+}
+
+export function buildGroundedExecutionReceiptV1(input: GroundedExecutionReceiptBuildInput): GroundedExecutionReceiptV1 {
+  const cleanInput = sanitizeReceiptBuildInput(input);
   const payload = {
     schema: 'atlas.grounded-execution-receipt.v1' as const,
-    ...input,
+    ...cleanInput,
     canonicalAuthority: false as const,
   };
 
-  if (input.status === 'SUCCESS') {
-    const passed = input.validation.filter((item) => item.status === 'PASSED');
+  if (cleanInput.status === 'SUCCESS') {
+    const passed = cleanInput.validation.filter((item) => item.status === 'PASSED');
     if (passed.length === 0) throw new Error('EXECUTION_SUCCESS_REQUIRES_PASSED_VALIDATION');
-    if (input.validation.some((item) => item.status === 'FAILED' || item.status === 'ERROR')) {
+    if (cleanInput.validation.some((item) => item.status === 'FAILED' || item.status === 'ERROR')) {
       throw new Error('EXECUTION_SUCCESS_CONFLICTS_WITH_FAILED_VALIDATION');
     }
   }
