@@ -100,7 +100,7 @@ describe('ActionKey single-flight', () => {
     expect(mocks.execute).toHaveBeenCalledTimes(1);
   });
 
-  it('persists a receipt only while the current fenced lease is locked', async () => {
+  it('persists a receipt only while the current fenced lease is live according to Postgres', async () => {
     mocks.execute
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
@@ -109,6 +109,7 @@ describe('ActionKey single-flight', () => {
           lease_owner: 'worker-a',
           fencing_token: '3',
           lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
+          lease_is_live: true,
         }],
       })
       .mockResolvedValueOnce({
@@ -136,6 +137,7 @@ describe('ActionKey single-flight', () => {
           lease_owner: 'worker-new',
           fencing_token: '4',
           lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
+          lease_is_live: true,
         }],
       })
       .mockResolvedValueOnce({ rows: [] });
@@ -144,6 +146,29 @@ describe('ActionKey single-flight', () => {
       actionKey: 'action-key-00000001',
       leaseOwner: 'worker-stale',
       fencingToken: '2',
+      outputArtifact: artifact,
+      producerRevision: 'producer-v1',
+    })).rejects.toThrow(/STALE_ACTION_FENCE/);
+  });
+
+  it('rejects a lease that Postgres reports expired even if app clock differs', async () => {
+    mocks.execute
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({
+        rows: [{
+          action_key: 'action-key-00000001',
+          lease_owner: 'worker-a',
+          fencing_token: '3',
+          lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
+          lease_is_live: false,
+        }],
+      })
+      .mockResolvedValueOnce({ rows: [] });
+
+    await expect(completeActionWork({
+      actionKey: 'action-key-00000001',
+      leaseOwner: 'worker-a',
+      fencingToken: '3',
       outputArtifact: artifact,
       producerRevision: 'producer-v1',
     })).rejects.toThrow(/STALE_ACTION_FENCE/);
