@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
+const MAX_TEMPORAL_ALTERNATIVE_HOPS = 8;
 
 function stripToolMarkup(text: string): string {
   return text
@@ -105,7 +106,130 @@ export function parseToolCalls(text: string) {
   return [];
 }
 
-export async function executeTool(call: { tool: string; args: any }, context?: any) {
+type ToolExecutionContext = {
+  temporalAction?: unknown;
+  temporalActionBoundary?: unknown;
+  temporalAlternativePlan?: unknown;
+  temporalAlternativeSelection?: unknown;
+  temporalAlternativeDepth?: number;
+  [key: string]: unknown;
+};
+
+type TemporalBoundaryOutcome =
+  | { kind: 'SHORT_CIRCUIT'; result: unknown }
+  | { kind: 'REPLACE'; call: { tool: string; args: any }; temporalAction: unknown; failedExecutionKey: string }
+  | null;
+
+/**
+ * Optional temporal execution policy. Existing callers remain unchanged unless
+ * they explicitly supply `context.temporalAction`.
+ *
+ * Once supplied, the temporal gate is mandatory and fail-closed. A lookup or
+ * validation error is allowed to surface rather than silently re-running work.
+ */
+async function applyTemporalBoundary(
+  call: { tool: string; args: any },
+  context?: ToolExecutionContext,
+): Promise<TemporalBoundaryOutcome> {
+  if (!context?.temporalAction) return null;
+
+  const {
+    decideTemporalToolExecutionFromPostgres,
+    temporalBoundaryAllowsDispatch,
+  } = await import('../atlas/temporal/temporal-tool-execution-boundary.js');
+
+  const decision = await decideTemporalToolExecutionFromPostgres({
+    call,
+    temporal: context.temporalAction as never,
+  });
+  context.temporalActionBoundary = decision;
+
+  if (temporalBoundaryAllowsDispatch(decision)) return null;
+
+  if (decision.disposition === 'REUSE_RESULT') {
+    return {
+      kind: 'SHORT_CIRCUIT',
+      result: {
+        ok: true,
+        tool: call.tool,
+        temporalDisposition: 'REUSE_RESULT',
+        reused: true,
+        resultRef: decision.reused_result_ref,
+        executionKey: decision.execution_key,
+        priorEventId: decision.prior_event_id,
+        reason: decision.reason,
+        boundaryChecksum: decision.boundary_checksum,
+      },
+    };
+  }
+
+  if (decision.disposition !== 'SELECT_ALTERNATIVE') {
+    throw new Error(`TEMPORAL_NONDISPATCH_DISPOSITION_UNHANDLED:${decision.disposition}`);
+  }
+
+  if (context.temporalAlternativePlan) {
+    const { selectTemporalAlternativeToolFromPostgres } = await import(
+      '../atlas/temporal/temporal-action-alternative-boundary.js'
+    );
+    const plan = context.temporalAlternativePlan as Record<string, any>;
+    const exclusions = new Set<string>([
+      ...(Array.isArray(plan.excluded_execution_keys) ? plan.excluded_execution_keys : []),
+      decision.execution_key,
+    ]);
+    const selection = await selectTemporalAlternativeToolFromPostgres({
+      failed_boundary: decision,
+      plan: {
+        ...plan,
+        excluded_execution_keys: [...exclusions],
+      } as never,
+    });
+    context.temporalAlternativeSelection = selection;
+    context.temporalAlternativePlan = {
+      ...plan,
+      excluded_execution_keys: [...exclusions],
+    };
+    return {
+      kind: 'REPLACE',
+      call: selection.selected_call,
+      temporalAction: selection.selected_temporal,
+      failedExecutionKey: decision.execution_key,
+    };
+  }
+
+  return {
+    kind: 'SHORT_CIRCUIT',
+    result: {
+      ok: false,
+      tool: call.tool,
+      temporalDisposition: 'SELECT_ALTERNATIVE',
+      reused: false,
+      resultRef: null,
+      executionKey: decision.execution_key,
+      priorEventId: decision.prior_event_id,
+      reason: decision.reason,
+      boundaryChecksum: decision.boundary_checksum,
+    },
+  };
+}
+
+async function executeToolAtDepth(
+  call: { tool: string; args: any },
+  context: ToolExecutionContext | undefined,
+  depth: number,
+): Promise<unknown> {
+  if (depth > MAX_TEMPORAL_ALTERNATIVE_HOPS) {
+    throw new Error(`TEMPORAL_ALTERNATIVE_HOP_LIMIT_EXCEEDED:${MAX_TEMPORAL_ALTERNATIVE_HOPS}`);
+  }
+
+  const temporal = await applyTemporalBoundary(call, context);
+  if (temporal?.kind === 'SHORT_CIRCUIT') return temporal.result;
+  if (temporal?.kind === 'REPLACE') {
+    if (!context) throw new Error('TEMPORAL_ALTERNATIVE_CONTEXT_MISSING');
+    context.temporalAction = temporal.temporalAction;
+    context.temporalAlternativeDepth = depth + 1;
+    return executeToolAtDepth(temporal.call, context, depth + 1);
+  }
+
   switch (call.tool) {
     case "rg_search":
       {
@@ -161,4 +285,11 @@ export async function executeTool(call: { tool: string; args: any }, context?: a
     default:
       return null;
   }
+}
+
+export async function executeTool(call: { tool: string; args: any }, context?: ToolExecutionContext) {
+  const initialDepth = Number.isInteger(context?.temporalAlternativeDepth)
+    ? Number(context?.temporalAlternativeDepth)
+    : 0;
+  return executeToolAtDepth(call, context, initialDepth);
 }
