@@ -143,10 +143,7 @@ export const DerivedFeatureMatrixV1Schema = z.object({
   featureMappingRevision: z.string().min(1),
   rowCount: z.number().int().nonnegative(),
   columnCount: z.literal(25),
-  columnNames: z.tuple(CANDIDATE_FEATURE_NAMES.map((name) => z.literal(name)) as [
-    z.ZodLiteral<(typeof CANDIDATE_FEATURE_NAMES)[0]>,
-    ...z.ZodTypeAny[],
-  ]),
+  columnNames: z.array(z.enum(CANDIDATE_FEATURE_NAMES)).length(25),
   rowCanonicalIds: z.array(z.string().min(1)),
   rowPacketKeys: z.array(z.string().min(1)),
   rowOrdinals: z.array(z.number().int().nonnegative()),
@@ -156,7 +153,18 @@ export const DerivedFeatureMatrixV1Schema = z.object({
   matrixSha256: z.string().regex(/^[a-f0-9]{64}$/),
   evidenceAuthority: z.literal(false),
   canonicalWritesAllowed: z.literal(false),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.columnNames.some((name, index) => name !== CANDIDATE_FEATURE_NAMES[index])) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'columnNames must exactly match canonical CANDIDATE_FEATURE_NAMES order' });
+  }
+  const cells = value.rowCount * value.columnCount;
+  if (value.values.length !== cells || value.presenceMask.length !== cells || value.cellEvidenceRefs.length !== cells) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'matrix cell arrays must match rowCount * columnCount' });
+  }
+  if (value.rowCanonicalIds.length !== value.rowCount || value.rowPacketKeys.length !== value.rowCount || value.rowOrdinals.length !== value.rowCount) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'matrix row identity arrays must match rowCount' });
+  }
+});
 export type DerivedFeatureMatrixV1 = z.infer<typeof DerivedFeatureMatrixV1Schema>;
 
 function hashMatrix(values: Float32Array, presenceMask: Uint8Array, rowPacketKeys: readonly string[]): string {
@@ -212,8 +220,8 @@ export function compileDerivedFeatureMatrixV1(input: {
   if (featureRevisions.length > 1) throw new Error('OKF_MATRIX_MIXED_FEATURE_REVISION');
   if (mappingRevisions.length > 1) throw new Error('OKF_MATRIX_MIXED_FEATURE_MAPPING_REVISION');
 
-  const result: DerivedFeatureMatrixV1 = {
-    schema: 'atlas.derived-feature-matrix.v1',
+  const result = {
+    schema: 'atlas.derived-feature-matrix.v1' as const,
     matrixRevision: OKF_DERIVED_MATRIX_REVISION,
     queryId: input.queryId,
     workspaceRevision: workspaceRevisions[0] ?? 'empty',
@@ -221,8 +229,8 @@ export function compileDerivedFeatureMatrixV1(input: {
     featureRevision: featureRevisions[0] ?? 'empty',
     featureMappingRevision: mappingRevisions[0] ?? 'empty',
     rowCount,
-    columnCount: 25,
-    columnNames: [...CANDIDATE_FEATURE_NAMES] as DerivedFeatureMatrixV1['columnNames'],
+    columnCount: 25 as const,
+    columnNames: [...CANDIDATE_FEATURE_NAMES],
     rowCanonicalIds: rows.map((row) => row.candidateCanonicalId),
     rowPacketKeys: rows.map((row) => row.candidatePacketKey),
     rowOrdinals: rows.map((row) => row.rowOrdinal),
@@ -230,8 +238,8 @@ export function compileDerivedFeatureMatrixV1(input: {
     presenceMask,
     cellEvidenceRefs,
     matrixSha256: hashMatrix(values, presenceMask, rows.map((row) => row.candidatePacketKey)),
-    evidenceAuthority: false,
-    canonicalWritesAllowed: false,
+    evidenceAuthority: false as const,
+    canonicalWritesAllowed: false as const,
   };
   return DerivedFeatureMatrixV1Schema.parse(result);
 }
