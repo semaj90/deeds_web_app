@@ -3,10 +3,10 @@ import test from 'node:test';
 
 import {
   buildAlignedOrdinalRegistry,
+  buildCanonicalStructuralCoordinate,
   buildCompiledPrefillReceipt,
   buildGpuResidencyLease,
   buildSmartPacketCoordinateRef,
-  canonicalStructuralCoordinateSchema,
   compiledPrefillReceiptToCacheEntry,
 } from '../dist/core/aligned-ordinal-prefill-fabric.js';
 import { canonicalJsonChecksum } from '../dist/core/artifact-transport.js';
@@ -45,6 +45,20 @@ function registry() {
   });
 }
 
+function structuralReceipt(overrides = {}) {
+  return {
+    schema: 'atlas.structural-production-receipt.v1',
+    workspace_revision: 'ws:742', source_snapshot_revision: 'source:r11', chunker_engine: 'treesitter-chunker',
+    chunker_revision: 'chunker:r1', ast_grep_revision: 'astgrep:r1', langextract_revision: 'langextract:r1', gis_revision: 'gis:r1', symbol_registry_revision: 'symbols:r9',
+    files_seen: 2, files_succeeded: 2, files_recovered_with_errors: 0, files_failed: 0, chunk_count: 10, xref_edge_count: 4,
+    native_upstream_node_id_count: 10, compatibility_node_id_count: 0, symbol_nomination_count: 4, canonical_symbol_count: 4,
+    unresolved_symbol_count: 0, ambiguous_symbol_count: 0, canonical_reference_count: 8, evidence_entity_fact_count: 5,
+    grounded_langextract_count: 3, rejected_ungrounded_langextract_count: 0, persistence_status: 'readback_verified', graphify_daily_reachable: true,
+    fallback_policy: 'fail_closed', canonical_identity_created_by_extractors: false, source_checksum: H('source'), output_checksum: H('structural-output'),
+    diagnostics: [], producer_revision: 'structural-production:r1', ...overrides,
+  };
+}
+
 function prefillReceipt() {
   return buildCompiledPrefillReceipt({
     receipt_id: 'prefill:r1', request_id: 'req:1', workspace_revision: 'ws:742', source_snapshot_revision: 'source:r11',
@@ -68,27 +82,31 @@ test('aligned ordinal registry preserves one cheap row coordinate across project
 test('aligned ordinal registry rejects a projection with a different row identity', () => {
   const base = tensor();
   assert.throws(() => buildAlignedOrdinalRegistry({
-    registry_revision: 'ord:bad',
-    source_snapshot_revision: 'source:r11',
-    tensor_snapshot: base,
+    registry_revision: 'ord:bad', source_snapshot_revision: 'source:r11', tensor_snapshot: base,
     projections: [{ projection_id: 'bad', projection_revision: 'r1', kind: 'FEATURE', artifact_id: 'bad.arrow', artifact_checksum: H('bad'), row_identity_checksum: H('different-rows'), row_count: base.row_count }],
     producer_revision: 'ordinal-builder:r1',
   }), /row identity does not align/);
 });
 
-test('smart packet coordinate attaches only canonical-owner-attested structural coordinates', () => {
-  const structural = canonicalStructuralCoordinateSchema.parse({
+test('smart packet coordinate requires an ownership-eligible structural production receipt', () => {
+  const structural = buildCanonicalStructuralCoordinate({
     canonical_id: 'C517', packet_key: 'P992', source_ref: 'src/lib/example.ts', source_revision: 'src:r11',
     tree_node_id: 'T8421', symbol_version_id: 'S331', node_type: 'function_declaration', ast_path: [2, 1, 0], parent_ast_path: [2, 1],
-    start_byte: 10, end_byte: 80, grammar_revision: 'tree-sitter-typescript:r5', canonical_owner_attested: true, producer_revision: 'structural-owner:r3',
-  });
+    start_byte: 10, end_byte: 80, grammar_revision: 'tree-sitter-typescript:r5', producer_revision: 'coordinate:r1',
+  }, structuralReceipt());
   const coordinate = buildSmartPacketCoordinateRef({
     packet_key: 'P992', canonical_id: 'C517', registry: registry(), structural, producer_revision: 'smart-coordinate:r1',
   });
   assert.equal(coordinate.ordinal, 0);
   assert.equal(coordinate.structural.tree_node_id, 'T8421');
+  assert.equal(coordinate.structural.symbol_registry_revision, 'symbols:r9');
   assert.equal(coordinate.semantic_artifact_id, 'semantic.arrow');
   assert.equal(coordinate.hypergraph_artifact_id, 'hypergraph.csr');
+  assert.throws(() => buildCanonicalStructuralCoordinate({
+    canonical_id: 'C517', packet_key: 'P992', source_ref: 'src/lib/example.ts', source_revision: 'src:r11', tree_node_id: 'fake',
+    symbol_version_id: null, node_type: 'function_declaration', ast_path: [], parent_ast_path: [], start_byte: 10, end_byte: 80,
+    grammar_revision: null, producer_revision: 'coordinate:r1',
+  }, structuralReceipt({ compatibility_node_id_count: 1 })), /STRUCTURAL_RECEIPT_NOT_ELIGIBLE/);
 });
 
 test('CUDA IPC is represented by an opaque lease reference, never tensor bytes', () => {
