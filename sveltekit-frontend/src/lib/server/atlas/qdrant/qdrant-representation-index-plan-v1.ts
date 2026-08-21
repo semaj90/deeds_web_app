@@ -2,10 +2,12 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 export const QDRANT_REPRESENTATION_INDEX_PLAN_SCHEMA = 'atlas.qdrant-representation-index-plan.v1' as const;
-export const QDRANT_REPRESENTATION_INDEX_PLAN_REVISION = 'atlas.qdrant-representation-index-plan.2026-08-21.v1' as const;
+export const QDRANT_REPRESENTATION_INDEX_PLAN_REVISION = 'atlas.qdrant-representation-index-plan.2026-08-21.v2' as const;
 
 export const QdrantRepresentationRoleSchema = z.enum([
   'DENSE_SEMANTIC',
+  'DENSE_DIAGNOSTIC',
+  'DENSE_SIGNATURE',
   'DENSE_DERIVED_MRL',
   'SPARSE_LEXICAL',
   'SPARSE_CONTEXTUAL_LEXICAL',
@@ -14,6 +16,7 @@ export const QdrantRepresentationRoleSchema = z.enum([
 
 export const QdrantRepresentationPlanV1Schema = z.object({
   name: z.string().min(1),
+  logicalRepresentation: z.string().min(1),
   role: QdrantRepresentationRoleSchema,
   storage: z.enum(['DENSE_VECTOR', 'SPARSE_VECTOR']),
   dimensions: z.number().int().positive().nullable(),
@@ -24,6 +27,7 @@ export const QdrantRepresentationPlanV1Schema = z.object({
   derivedFrom: z.string().min(1).nullable(),
   activeByDefault: z.boolean(),
   challengerOnly: z.boolean(),
+  requiredForReady: z.boolean(),
   evidenceAuthority: z.literal(false),
 }).strict().superRefine((value, ctx) => {
   if (value.storage === 'DENSE_VECTOR' && (!value.dimensions || !value.distance)) {
@@ -43,6 +47,7 @@ export const QdrantPayloadIndexFieldV1Schema = z.object({
   purpose: z.string().min(1),
   requiredForCanonicalFilter: z.boolean(),
   indexByDefault: z.boolean(),
+  requiredForReady: z.boolean(),
 }).strict();
 
 export const QdrantRepresentationIndexPlanV1Schema = z.object({
@@ -56,6 +61,7 @@ export const QdrantRepresentationIndexPlanV1Schema = z.object({
   representations: z.array(QdrantRepresentationPlanV1Schema).min(1),
   payloadIndexes: z.array(QdrantPayloadIndexFieldV1Schema).min(1),
   forbiddenPayloadIndexPatterns: z.array(z.string().min(1)),
+  modelProvenanceRequiredBeforePromotion: z.literal(true),
   canonicalWritesAllowed: z.literal(false),
   qdrantWritesAllowed: z.literal(false),
 }).strict();
@@ -71,23 +77,26 @@ export const QDRANT_CODEBASE_768_INDEX_PLAN: QdrantRepresentationIndexPlanV1 = Q
   oneVotePerLogicalLane: true,
   laneExecutorSeparation: true,
   representations: [
-    { name: 'semantic_768', role: 'DENSE_SEMANTIC', storage: 'DENSE_VECTOR', dimensions: 768, distance: 'Cosine', modifier: null, modelFamily: 'google/embeddinggemma-300m', representationRevision: 'semantic_768.embeddinggemma.native.v1', derivedFrom: null, activeByDefault: true, challengerOnly: false, evidenceAuthority: false },
-    { name: 'semantic_mrl_512', role: 'DENSE_DERIVED_MRL', storage: 'DENSE_VECTOR', dimensions: 512, distance: 'Cosine', modifier: null, modelFamily: 'google/embeddinggemma-300m', representationRevision: 'semantic_mrl_512.prefix-l2.v1', derivedFrom: 'semantic_768', activeByDefault: false, challengerOnly: true, evidenceAuthority: false },
-    { name: 'bm25', role: 'SPARSE_LEXICAL', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: 'idf', modelFamily: 'qdrant/bm25', representationRevision: 'bm25.qdrant.idf.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, evidenceAuthority: false },
-    { name: 'minicoil', role: 'SPARSE_CONTEXTUAL_LEXICAL', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: 'idf', modelFamily: 'Qdrant/minicoil-v1', representationRevision: 'minicoil.qdrant.idf.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, evidenceAuthority: false },
-    { name: 'splade', role: 'SPARSE_EXPANSION', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: null, modelFamily: 'UNBOUND_SPLADE_MODEL', representationRevision: 'splade.unbound-model.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, evidenceAuthority: false },
+    { name: 'content', logicalRepresentation: 'semantic_768', role: 'DENSE_SEMANTIC', storage: 'DENSE_VECTOR', dimensions: 768, distance: 'Cosine', modifier: null, modelFamily: 'UNPROVEN_HISTORICAL_MODEL', representationRevision: 'semantic_768.historical-proven-shape.model-unproven.v1', derivedFrom: null, activeByDefault: true, challengerOnly: false, requiredForReady: true, evidenceAuthority: false },
+    { name: 'error', logicalRepresentation: 'diagnostic_768', role: 'DENSE_DIAGNOSTIC', storage: 'DENSE_VECTOR', dimensions: 768, distance: 'Cosine', modifier: null, modelFamily: 'UNPROVEN_HISTORICAL_MODEL', representationRevision: 'diagnostic_768.historical-proven-shape.model-unproven.v1', derivedFrom: null, activeByDefault: false, challengerOnly: false, requiredForReady: true, evidenceAuthority: false },
+    { name: 'signature', logicalRepresentation: 'signature_768', role: 'DENSE_SIGNATURE', storage: 'DENSE_VECTOR', dimensions: 768, distance: 'Cosine', modifier: null, modelFamily: 'UNPROVEN_HISTORICAL_MODEL', representationRevision: 'signature_768.historical-proven-shape.model-unproven.v1', derivedFrom: null, activeByDefault: false, challengerOnly: false, requiredForReady: true, evidenceAuthority: false },
+    { name: 'semantic_mrl_512', logicalRepresentation: 'semantic_mrl_512', role: 'DENSE_DERIVED_MRL', storage: 'DENSE_VECTOR', dimensions: 512, distance: 'Cosine', modifier: null, modelFamily: 'google/embeddinggemma-300m', representationRevision: 'semantic_mrl_512.prefix-l2.v1', derivedFrom: 'content', activeByDefault: false, challengerOnly: true, requiredForReady: false, evidenceAuthority: false },
+    { name: 'bm25', logicalRepresentation: 'bm25', role: 'SPARSE_LEXICAL', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: 'idf', modelFamily: 'qdrant/bm25', representationRevision: 'bm25.qdrant.idf.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, requiredForReady: true, evidenceAuthority: false },
+    { name: 'minicoil', logicalRepresentation: 'minicoil', role: 'SPARSE_CONTEXTUAL_LEXICAL', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: 'idf', modelFamily: 'Qdrant/minicoil-v1', representationRevision: 'minicoil.qdrant.idf.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, requiredForReady: false, evidenceAuthority: false },
+    { name: 'splade', logicalRepresentation: 'splade', role: 'SPARSE_EXPANSION', storage: 'SPARSE_VECTOR', dimensions: null, distance: null, modifier: null, modelFamily: 'UNBOUND_SPLADE_MODEL', representationRevision: 'splade.unbound-model.v1', derivedFrom: null, activeByDefault: false, challengerOnly: true, requiredForReady: false, evidenceAuthority: false },
   ],
   payloadIndexes: [
-    { fieldName: 'canonical_id', fieldSchema: 'keyword', purpose: 'canonical candidate projection lookup', requiredForCanonicalFilter: true, indexByDefault: true },
-    { fieldName: 'packet_key', fieldSchema: 'keyword', purpose: 'packet projection lookup', requiredForCanonicalFilter: true, indexByDefault: true },
-    { fieldName: 'workspace_revision', fieldSchema: 'keyword', purpose: 'workspace revision qualification', requiredForCanonicalFilter: true, indexByDefault: true },
-    { fieldName: 'source_revision', fieldSchema: 'keyword', purpose: 'source revision qualification', requiredForCanonicalFilter: true, indexByDefault: true },
-    { fieldName: 'domain_class', fieldSchema: 'keyword', purpose: 'domain restriction', requiredForCanonicalFilter: false, indexByDefault: true },
-    { fieldName: 'node_kind', fieldSchema: 'keyword', purpose: 'AST/node restriction', requiredForCanonicalFilter: false, indexByDefault: true },
-    { fieldName: 'document_id', fieldSchema: 'keyword', purpose: 'document-scoped retrieval', requiredForCanonicalFilter: false, indexByDefault: true },
-    { fieldName: 'evidence_kind', fieldSchema: 'keyword', purpose: 'evidence-kind restriction', requiredForCanonicalFilter: false, indexByDefault: true },
+    { fieldName: 'canonical_id', fieldSchema: 'keyword', purpose: 'canonical candidate projection lookup', requiredForCanonicalFilter: true, indexByDefault: true, requiredForReady: true },
+    { fieldName: 'packet_key', fieldSchema: 'keyword', purpose: 'packet projection lookup', requiredForCanonicalFilter: true, indexByDefault: true, requiredForReady: true },
+    { fieldName: 'workspace_revision', fieldSchema: 'keyword', purpose: 'workspace revision qualification', requiredForCanonicalFilter: true, indexByDefault: true, requiredForReady: false },
+    { fieldName: 'source_revision', fieldSchema: 'keyword', purpose: 'source revision qualification', requiredForCanonicalFilter: true, indexByDefault: true, requiredForReady: false },
+    { fieldName: 'domain_class', fieldSchema: 'keyword', purpose: 'domain restriction', requiredForCanonicalFilter: false, indexByDefault: true, requiredForReady: false },
+    { fieldName: 'node_kind', fieldSchema: 'keyword', purpose: 'AST/node restriction', requiredForCanonicalFilter: false, indexByDefault: true, requiredForReady: false },
+    { fieldName: 'document_id', fieldSchema: 'keyword', purpose: 'document-scoped retrieval', requiredForCanonicalFilter: false, indexByDefault: true, requiredForReady: false },
+    { fieldName: 'evidence_kind', fieldSchema: 'keyword', purpose: 'evidence-kind restriction', requiredForCanonicalFilter: false, indexByDefault: true, requiredForReady: false },
   ],
   forbiddenPayloadIndexPatterns: ['semantic_*', '*_score', '*_similarity', 'pagerank', 'personalized_pagerank', 'execution_utility', 'memory_utility', 'som_*', 'kmeans_*', 'cross_encoder_*'],
+  modelProvenanceRequiredBeforePromotion: true,
   canonicalWritesAllowed: false,
   qdrantWritesAllowed: false,
 });
@@ -100,50 +109,65 @@ export interface QdrantSchemaObservationV1 {
 
 export interface QdrantSchemaDriftV1 {
   status: 'READY' | 'MISSING' | 'EXTRA' | 'TYPE_DRIFT' | 'CONFIG_DRIFT';
-  missingRepresentations: string[];
+  missingRequiredRepresentations: string[];
+  missingOptionalRepresentations: string[];
   representationConfigDrift: string[];
-  missingPayloadIndexes: string[];
+  missingRequiredPayloadIndexes: string[];
+  missingOptionalPayloadIndexes: string[];
   payloadTypeDrift: string[];
   extraPayloadIndexes: string[];
   applyAllowed: false;
 }
 
 export function compareQdrantSchemaToPlan(observation: QdrantSchemaObservationV1, plan = QDRANT_CODEBASE_768_INDEX_PLAN): QdrantSchemaDriftV1 {
-  const missingRepresentations: string[] = [];
+  const missingRequiredRepresentations: string[] = [];
+  const missingOptionalRepresentations: string[] = [];
   const representationConfigDrift: string[] = [];
   for (const representation of plan.representations) {
+    const observed = representation.storage === 'DENSE_VECTOR'
+      ? observation.denseVectors[representation.name]
+      : observation.sparseVectors[representation.name];
+    if (!observed) {
+      (representation.requiredForReady ? missingRequiredRepresentations : missingOptionalRepresentations).push(representation.name);
+      continue;
+    }
     if (representation.storage === 'DENSE_VECTOR') {
-      const observed = observation.denseVectors[representation.name];
-      if (!observed) missingRepresentations.push(representation.name);
-      else if (observed.size !== representation.dimensions || observed.distance.toLowerCase() !== representation.distance?.toLowerCase()) representationConfigDrift.push(representation.name);
+      const dense = observed as { size: number; distance: string };
+      if (dense.size !== representation.dimensions || dense.distance.toLowerCase() !== representation.distance?.toLowerCase()) representationConfigDrift.push(representation.name);
     } else {
-      const observed = observation.sparseVectors[representation.name];
-      if (!observed) missingRepresentations.push(representation.name);
-      else if ((observed.modifier ?? null)?.toLowerCase() !== (representation.modifier ?? null)?.toLowerCase()) representationConfigDrift.push(representation.name);
+      const sparse = observed as { modifier: string | null };
+      if ((sparse.modifier ?? null)?.toLowerCase() !== (representation.modifier ?? null)?.toLowerCase()) representationConfigDrift.push(representation.name);
     }
   }
 
-  const expectedPayload = new Map(plan.payloadIndexes.filter((field) => field.indexByDefault).map((field) => [field.fieldName, field.fieldSchema]));
-  const missingPayloadIndexes: string[] = [];
+  const missingRequiredPayloadIndexes: string[] = [];
+  const missingOptionalPayloadIndexes: string[] = [];
   const payloadTypeDrift: string[] = [];
-  for (const [field, type] of expectedPayload) {
-    const observed = observation.payloadSchema[field];
-    if (!observed) missingPayloadIndexes.push(field);
-    else if (observed.toLowerCase() !== type.toLowerCase()) payloadTypeDrift.push(field);
+  const plannedFields = new Set<string>();
+  for (const field of plan.payloadIndexes.filter((entry) => entry.indexByDefault)) {
+    plannedFields.add(field.fieldName);
+    const observed = observation.payloadSchema[field.fieldName];
+    if (!observed) {
+      (field.requiredForReady ? missingRequiredPayloadIndexes : missingOptionalPayloadIndexes).push(field.fieldName);
+    } else if (observed.toLowerCase() !== field.fieldSchema.toLowerCase()) {
+      payloadTypeDrift.push(field.fieldName);
+    }
   }
-  const extraPayloadIndexes = Object.keys(observation.payloadSchema).filter((field) => !expectedPayload.has(field)).sort();
+  const extraPayloadIndexes = Object.keys(observation.payloadSchema).filter((field) => !plannedFields.has(field)).sort();
 
   let status: QdrantSchemaDriftV1['status'] = 'READY';
   if (representationConfigDrift.length) status = 'CONFIG_DRIFT';
   else if (payloadTypeDrift.length) status = 'TYPE_DRIFT';
-  else if (missingRepresentations.length || missingPayloadIndexes.length) status = 'MISSING';
+  else if (missingRequiredRepresentations.length || missingRequiredPayloadIndexes.length) status = 'MISSING';
   else if (extraPayloadIndexes.length) status = 'EXTRA';
 
   return {
     status,
-    missingRepresentations: missingRepresentations.sort(),
+    missingRequiredRepresentations: missingRequiredRepresentations.sort(),
+    missingOptionalRepresentations: missingOptionalRepresentations.sort(),
     representationConfigDrift: representationConfigDrift.sort(),
-    missingPayloadIndexes: missingPayloadIndexes.sort(),
+    missingRequiredPayloadIndexes: missingRequiredPayloadIndexes.sort(),
+    missingOptionalPayloadIndexes: missingOptionalPayloadIndexes.sort(),
     payloadTypeDrift: payloadTypeDrift.sort(),
     extraPayloadIndexes,
     applyAllowed: false,
