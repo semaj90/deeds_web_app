@@ -27,12 +27,40 @@ TORCH-01 MUST NOT silently replace invalid numeric values with zero. Zero is per
 
 ## TORCH-02 — Batched classifier / reranker execution
 
-Blocked on TORCH-01/TORCH-03 proof.
+Implementation status: `IMPLEMENTED_UNPROVEN`.
 
-* [ ] Define one execution manifest for PyTorch CPU, PyTorch CUDA, and LibTorch CUDA challengers.
-* [ ] Require the same tensor artifact checksum and row-key checksum for parity comparisons.
-* [ ] Keep model revision and executor revision separate.
-* [ ] Compare outputs numerically within explicit tolerance; do not require cross-runtime bit identity.
+TORCH-02 is still blocked from promotion on TORCH-01/TORCH-03 workstation proof, but its execution identity and capability boundaries are now defined.
+
+* [x] Define one `TorchModelExecutionManifestV1` for PyTorch CPU, PyTorch CUDA and LibTorch CUDA challengers.
+* [x] Bind execution to exact feature-byte checksum, ordered row-key checksum, feature/workspace/representation revisions and tensor revision.
+* [x] Keep `modelRevision`, `modelArtifactSha256` and `executorRevision` separate.
+* [x] Require explicit output role/width and float32 finite-output policy.
+* [x] Define checksummed `TorchModelExecutionReceiptV1` with requested executor vs actual executor.
+* [x] Keep `logicalLaneVoteAdded=false`, `evidenceAuthority=false`, `canonicalOwnerChanged=false`.
+* [x] Require same model/tensor identity before two execution receipts may be compared.
+* [x] Use explicit `atol`/`rtol`; do not require cross-device bit identity.
+* [x] Add deterministic 25→1 PyTorch linear parity probe using one serialized state-dict artifact for CPU and CUDA.
+* [x] Record PyTorch CUDA as `BLOCKED` when `torch.cuda.is_available()` is false instead of falling through and claiming CPU as CUDA.
+* [x] Harden receipt builder against stale spread-in checksum/schema fields.
+* [x] Audit current LibTorch N-API bridge for generic model execution capability.
+* [x] Current accepted LibTorch model status remains `CAPABILITY_NOT_PRESENT:TORCHSCRIPT_MODEL_LOADER`; existing specialized kernels do not count as a generic model executor.
+* [ ] Run TORCH-02 contract tests on workstation.
+* [ ] Run PyTorch CPU parity probe.
+* [ ] Run PyTorch CUDA parity probe with `--require-cuda`.
+* [ ] Run LibTorch capability audit against the installed native addon.
+* [ ] Add a real revisioned TorchScript loader before enabling `LIBTORCH_CUDA` for classifier/reranker models.
+* [ ] Replace parity probe with a trained, accepted model only after model-quality evaluation and TORCH-03 executor parity pass.
+
+Expected artifacts:
+
+```text
+docs/reports/torch02-model-execution-proof.json
+docs/reports/libtorch-model-execution-capability.json
+```
+
+Gate: `TORCH02_MODEL_EXECUTION_PARITY_PROVEN`
+
+A specialized LibTorch kernel (cosine/KMeans/PCA/PageRank/softmax/top-k) MUST NOT be represented as a generic TorchScript/model executor. A model executor must load an identified model artifact and execute that same model identity.
 
 ## TORCH-03 — JS / Python / LibTorch parity
 
