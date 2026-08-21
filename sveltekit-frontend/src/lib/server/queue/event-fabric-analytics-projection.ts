@@ -2,6 +2,8 @@ import { makeEvent, emit } from '$lib/server/analytics/analytics-sink.js';
 import type { AnalyticsEventEnvelope } from '$lib/server/analytics/analytics-event-envelope.js';
 import type {
 	AnalyticsObservationEventV1,
+	ArtifactFailedEventV1,
+	ArtifactMaterializedEventV1,
 	CheckpointCommitEventV1,
 	CodeEvidencePersistedEventV1,
 	FailureObservationEventV1,
@@ -142,6 +144,41 @@ function projectCheckpointCommit(event: CheckpointCommitEventV1): AnalyticsEvent
 	});
 }
 
+function projectArtifactMaterialized(event: ArtifactMaterializedEventV1): AnalyticsEventEnvelope {
+	return makeEvent({
+		eventType: 'lane.result',
+		traceId: event.traceId ?? `artifact:${event.eventId}`,
+		sourceRef: event.sourceRef,
+		laneId: 'artifact.materialized',
+		metadata: {
+			actionKey: event.payload.actionKey,
+			artifactId: event.payload.artifact.artifactId,
+			artifactHash: event.payload.artifact.artifactHash,
+			schemaId: event.payload.artifact.schemaId,
+			revisionSetHash: event.payload.artifact.revisionSetHash,
+			fencingToken: event.payload.fencingToken,
+			producerRevision: event.payload.producerRevision,
+		},
+	});
+}
+
+function projectArtifactFailed(event: ArtifactFailedEventV1): AnalyticsEventEnvelope {
+	return makeEvent({
+		eventType: 'error.occurred',
+		traceId: event.traceId ?? `artifact-failed:${event.eventId}`,
+		sourceRef: event.sourceRef,
+		metadata: {
+			actionKey: event.payload.actionKey,
+			expectedOutputSchema: event.payload.expectedOutputSchema,
+			fencingToken: event.payload.fencingToken ?? null,
+			producerRevision: event.payload.producerRevision,
+			failureClass: event.payload.failureClass,
+			retryable: event.payload.retryable,
+			errorHash: event.payload.errorHash,
+		},
+	});
+}
+
 export function projectEventFabricToAnalytics(event: EventFabricEventV1): AnalyticsEventEnvelope | null {
 	switch (event.eventType) {
 		case 'code.evidence.persisted':
@@ -156,6 +193,10 @@ export function projectEventFabricToAnalytics(event: EventFabricEventV1): Analyt
 			return projectPolicyDecisionReceipt(event);
 		case 'checkpoint.commit':
 			return projectCheckpointCommit(event);
+		case 'artifact.materialized':
+			return projectArtifactMaterialized(event);
+		case 'artifact.failed':
+			return projectArtifactFailed(event);
 	}
 }
 
