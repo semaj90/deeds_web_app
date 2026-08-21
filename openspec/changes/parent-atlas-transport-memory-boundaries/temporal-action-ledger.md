@@ -14,15 +14,17 @@ WorkflowActionEventV1
 AgentActionEventV1
   immutable execution-history envelope
             │
-            ▼
-actions.jsonl
-  append-only reference history
+            ├──► actions.jsonl
+            │       append-only reference history
+            │
+            ├──► atlas_agent_action_events
+            │       append-only Postgres durability implementation
             │
             ├──► ActionCurrentProjectionV1
             │       derived/rebuildable latest-state index
             │
-            ├──► future Arrow indexes
-            │       derived acceleration only
+            ├──► atlas.event.hypergraph.v1
+            │       downstream temporal-event projection only
             │
             └──► ActionFeatureRowV1
                     derived recommendation features
@@ -41,6 +43,26 @@ The action ledger MUST NOT replace or duplicate that source-delta planner.
 Result payloads remain in content-addressed artifacts/CAS-like stores. The action ledger stores `result_ref` / `artifact_refs`; it does not become the artifact byte store.
 
 OpenSpec remains intended work. `OpenSpecActionLinkV1` links task revisions to observed runtime actions; `tasks.md` is not an execution log.
+
+## Convergence decision — 2026-08-21
+
+A repo audit found two independently developed temporal-action surfaces using the same logical schema name:
+
+```text
+packages/parent-atlas/src/core/temporal-action-ledger.ts
+sveltekit-frontend/src/lib/server/atlas/temporal/agent-action-event-v1.ts
+```
+
+They are not wire-compatible. The package-level ledger is the convergence owner because it already preserves `WorkflowActionEventV1` identity, explicit revision authority, immutable event checksums, global ledger sequence, deterministic execution identity, JSONL reference replay, and fail-closed reuse semantics.
+
+Therefore:
+
+- `packages/parent-atlas` owns the temporal action contracts/runtime.
+- The independent `agent/temporal-action-index-v1-20260821` contract must **not** be merged as another canonical `atlas.agent-action-event.v1` owner.
+- SvelteKit may adapt/consume the package contract but must not redefine it.
+- `atlas.event.hypergraph.v1` remains the existing event/hypergraph projection owner.
+- Postgres is a durability implementation for immutable events, not a new workflow/action identity owner.
+- `ActionCurrentProjectionV1` remains derived/rebuildable; V1 does not add a second canonical current-state table.
 
 ## Contracts
 
@@ -98,6 +120,14 @@ Do not infer revision authority from:
 - symbol-version propagation,
 - event timestamps.
 
+The hypergraph adapter is stricter still because `atlas.event.hypergraph.v1` requires concrete workspace/source/representation revisions. It MUST:
+
+- require PROVEN non-null workspace revision,
+- require PROVEN non-null source revision,
+- receive representation revision explicitly from its canonical owner,
+- never substitute `parameter_revision` for representation revision,
+- never write sentinel strings such as `UNPROVEN` into revision identity fields.
+
 ## DRY policies
 
 ### DRY-01 — successful exact execution
@@ -150,6 +180,36 @@ revision coordinates
 ```
 
 V1 does not implement a full bitemporal database. The fields are present so later storage can support known-at-time versus valid-at-time queries without changing event identity semantics.
+
+## Durable Postgres implementation
+
+Manual migration:
+
+```text
+sveltekit-frontend/drizzle/manual/20260821_atlas_agent_action_events.sql
+```
+
+Repository:
+
+```text
+packages/parent-atlas/src/core/temporal-action-postgres-repository.ts
+```
+
+The table stores immutable `AgentActionEventV1` JSON plus indexed projection columns. `event_id` is the event key and `ledger_sequence` is globally unique for V1. Duplicate `event_id` insertion is idempotent only after persisted JSON is parsed and its checksum is recomputed successfully. A conflicting or tampered row fails readback.
+
+Indexed lookup surfaces include:
+
+```text
+execution_key
+target_canonical_id
+opcode
+outcome
+error_code
+workspace_revision + source_revision + graph_revision
+workflow_id + workflow_revision + action_id
+```
+
+`currentByExecutionKey()` reads immutable rows and rebuilds `ActionCurrentProjectionV1`; it does not persist another current truth table.
 
 ## Action relations
 
@@ -217,11 +277,11 @@ graphify-events/<ledger>/
     action-latest.json
 ```
 
-`actions.jsonl` is the append-only reference history.
+`actions.jsonl` remains the reference append-only history/oracle for parity work. PostgreSQL is a second durability implementation of the same immutable event contract, not a replacement identity owner.
 
 `action-latest.json` is derived and rebuildable from the log. It is not canonical history.
 
-The manifest already reserves:
+The manifest already reserves future Arrow materializations:
 
 ```text
 action_latest_arrow_ref
@@ -236,17 +296,23 @@ All are intentionally `null` in V1. Arrow materialization is a later acceleratio
 
 ## Proof gates
 
-- [ ] **ACT-01** Parent Atlas package build succeeds with the temporal action contracts/runtime exported.
+- [ ] **ACT-01** Parent Atlas package build succeeds with temporal action contracts/runtime/Postgres repository exported.
 - [ ] **ACT-02** Focused Vitest passes exact success reuse, exact failure avoidance, bounded transient retry, revision invalidation and evidence-frontier invalidation.
 - [ ] **ACT-03** Filesystem roundtrip proves append-only sequence, unique event IDs, canonical event checksum verification, deterministic latest projection and lookup.
 - [ ] **ACT-04** Tampered JSONL event is rejected by checksum verification.
 - [ ] **ACT-05** Current revision-owner proof remains upstream; no `UNPROVEN` revision result may be reused.
 - [ ] **ACT-06** Adapt one real `WorkflowActionEventV1` producer into the ledger without changing workflow/action identity ownership.
-- [ ] **ACT-07** Materialize Arrow indexes from the same JSONL history and prove exact lookup parity with the JSON reference projection.
+- [ ] **ACT-07** Materialize Arrow indexes from the same history and prove exact lookup parity with the JSON reference projection.
 - [ ] **ACT-08** Attach one OpenSpec task revision to actual execution/verification/failure actions using `OpenSpecActionLinkV1`.
 - [ ] **ACT-09** Feed historical action outcome aggregates into candidate `ActionFeatureRowV1` and compare deterministic full-scan recommendation against a future shortlist policy.
 - [ ] **ACT-10** Only after ACT-01..09, evaluate ACE procedural lessons from the same execution receipts; ACE policy cannot rewrite action history.
+- [ ] **ACT-PG-01** Apply `20260821_atlas_agent_action_events.sql` only in the intended test/non-production database and prove schema/readback before production adoption.
+- [ ] **ACT-PG-02** Append one event, read it back, recompute `event_checksum`, and prove duplicate identical `event_id` is idempotent while tampered/conflicting content is rejected.
+- [ ] **ACT-PG-03** Prove Postgres `currentByExecutionKey` has exact parity with the JSONL reference projection for a frozen event fixture.
+- [ ] **ACT-HG-01** Prove finalized revision-qualified temporal action projects through the existing `atlas.event.hypergraph.v1` contract.
+- [ ] **ACT-HG-02** Prove UNPROVEN workspace/source lineage and missing representation revision fail closed before hypergraph projection.
+- [ ] **ACT-CONV-01** Prevent the incompatible Svelte-only `atlas.agent-action-event.v1` contract from becoming a second canonical owner; reconcile or retire that branch before merge.
 
 ## No production promotion in this tranche
 
-No Postgres migration, Valkey owner change, Graphify canonical write, task-file mutation, workflow owner replacement, or action-history migration is authorized by this document.
+The manual Postgres migration is supplied but **not applied** by this tranche. No production Postgres mutation, Valkey owner change, Graphify canonical write, task-file mutation, workflow owner replacement, Arrow promotion, ACE learning policy, or action-history migration is claimed as proven.
