@@ -2,12 +2,12 @@
 
 A frozen snapshot may represent an entire Qdrant collection or only a bounded
 subset. ANN recall is only meaningful when Qdrant exact and HNSW search the same
-corpus as the frozen PyTorch/cuVS oracle. This module makes that scope explicit.
+corpus, vector dimension, and metric as the frozen PyTorch/cuVS oracle.
 
-`comparison_scope="snapshot_subset"` adds a payload `match.any` filter over the
-frozen canonical IDs to BOTH exact and HNSW queries. `full_collection` performs
-no inclusion filter and is valid only when the frozen snapshot is itself the
-full service corpus; the exact-alignment gate must prove that assumption.
+`snapshot_subset` adds a payload `match.any` filter over the frozen canonical IDs
+to BOTH exact and HNSW queries. `full_collection` performs no inclusion filter
+and is valid only when the exact-alignment gate proves the frozen snapshot is the
+service corpus.
 """
 
 from __future__ import annotations
@@ -45,6 +45,10 @@ class QdrantScopedAnnReceipt:
     vector_name: str | None
     canonical_payload_key: str
     metric: str
+    qdrant_distance: str | None
+    qdrant_vector_size: int | None
+    metric_alignment_status: str
+    distance_interpretation: str
     k: int
     query_count: int
     minimum_exact_overlap_at_k: float
@@ -77,6 +81,59 @@ def _post_json(url: str, payload: dict[str, Any], timeout: float) -> dict[str, A
     req = urllib_request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
     with urllib_request.urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
+
+
+def _get_json(url: str, timeout: float) -> dict[str, Any]:
+    req = urllib_request.Request(url, method="GET")
+    with urllib_request.urlopen(req, timeout=timeout) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def expected_qdrant_distance(metric: str) -> tuple[str, str]:
+    if metric == "cosine":
+        return "Cosine", "native_cosine"
+    if metric == "inner_product":
+        return "Dot", "native_dot_product"
+    if metric == "sqeuclidean":
+        # Qdrant stores Euclidean distance; x -> x^2 is monotonic for x>=0,
+        # therefore exact/ANN Top-K order is equivalent to squared Euclidean.
+        return "Euclid", "euclidean_rank_equivalent_to_sqeuclidean"
+    raise ValueError(f"unsupported Atlas metric: {metric}")
+
+
+def _collection_vector_config(
+    *,
+    base_url: str,
+    collection: str,
+    vector_name: str | None,
+    timeout: float,
+) -> tuple[int, str]:
+    response = _get_json(f"{base_url.rstrip('/')}/collections/{collection}", timeout)
+    result = response.get("result") or {}
+    vectors = (((result.get("config") or {}).get("params") or {}).get("vectors"))
+    if not isinstance(vectors, dict):
+        raise ValueError("Qdrant collection info has no config.params.vectors")
+
+    params: Any
+    if vector_name:
+        params = vectors.get(vector_name)
+        if not isinstance(params, dict):
+            raise ValueError(f"Qdrant named vector not found: {vector_name}")
+    else:
+        # Single-vector mode is the object itself; named-vector mode requires an
+        # explicit vector_name because each vector can have its own metric/size.
+        if "size" in vectors and "distance" in vectors:
+            params = vectors
+        else:
+            raise ValueError("Qdrant collection has named vectors; vector_name is required")
+
+    size = params.get("size")
+    distance = params.get("distance")
+    if not isinstance(size, int) or size <= 0:
+        raise ValueError("Qdrant vector size is invalid")
+    if not isinstance(distance, str) or not distance:
+        raise ValueError("Qdrant vector distance is invalid")
+    return size, distance
 
 
 def build_same_corpus_filter(
@@ -198,6 +255,45 @@ def evaluate_qdrant_scoped_ann(
     if not ef_values or any(value <= 0 for value in ef_values):
         raise ValueError("hnsw_ef values must be positive")
 
+    expected_distance, distance_interpretation = expected_qdrant_distance(metric)
+    qdrant_size, qdrant_distance = _collection_vector_config(
+        base_url=base_url,
+        collection=collection,
+        vector_name=vector_name,
+        timeout=timeout,
+    )
+    metric_aligned = qdrant_size == int(source.shape[1]) and qdrant_distance.lower() == expected_distance.lower()
+    if not metric_aligned:
+        return QdrantScopedAnnReceipt(
+            schema="atlas.qdrant-scoped-ann-receipt.v1",
+            comparison_scope=comparison_scope,
+            scoped_corpus_count=len(ids),
+            scoped_corpus_checksum=_stable_checksum(ids),
+            collection=collection,
+            vector_name=vector_name,
+            canonical_payload_key=payload_key,
+            metric=metric,
+            qdrant_distance=qdrant_distance,
+            qdrant_vector_size=qdrant_size,
+            metric_alignment_status="MISMATCH",
+            distance_interpretation=distance_interpretation,
+            k=k,
+            query_count=len(query_ordinals),
+            minimum_exact_overlap_at_k=minimum_exact_overlap,
+            pytorch_qdrant_exact_mean_overlap_at_k=0.0,
+            pytorch_qdrant_exact_minimum_query_overlap_at_k=0.0,
+            exact_alignment_status="METRIC_MISMATCH",
+            exact_mean_latency_ms=0.0,
+            exact_p95_latency_ms=0.0,
+            exact_result_checksum=_stable_checksum([]),
+            sweep=[],
+            minimum_hnsw_recall_at_k=minimum_hnsw_recall,
+            recommended_hnsw_ef=None,
+            recommendation_status="BLOCKED_METRIC_MISMATCH",
+            best_hnsw_recall_at_k=0.0,
+            canonical_authority=False,
+        )
+
     queries = source[np.asarray(query_ordinals, dtype=np.int64)]
     exact_reference = exact_semantic_search(
         source,
@@ -288,6 +384,10 @@ def evaluate_qdrant_scoped_ann(
         vector_name=vector_name,
         canonical_payload_key=payload_key,
         metric=metric,
+        qdrant_distance=qdrant_distance,
+        qdrant_vector_size=qdrant_size,
+        metric_alignment_status="ALIGNED",
+        distance_interpretation=distance_interpretation,
         k=k,
         query_count=len(query_ordinals),
         minimum_exact_overlap_at_k=minimum_exact_overlap,
