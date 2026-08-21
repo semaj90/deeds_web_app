@@ -31,7 +31,8 @@ function nodeIncrementCommand(path: string, shouldFail = false): string {
     "fs.writeFileSync(p,String(n+1))",
     shouldFail ? "process.exit(7)" : "process.stdout.write(String(n+1))",
   ].join(';');
-  return `node -e ${JSON.stringify(script)}`;
+  const encoded = Buffer.from(script, 'utf8').toString('base64');
+  return `node -e "eval(Buffer.from(process.argv[1],'base64').toString('utf8'))" ${encoded}`;
 }
 
 function temporalContext(call: { tool: string; args: unknown }, resource: string) {
