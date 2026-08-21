@@ -15,12 +15,20 @@
 - [x] QUEUE-02 Add `ActionWorkItemV1` so queue payloads carry artifact refs, revision-set hash, ordinal selection, budget and executor class instead of dense tensors.
 - [x] QUEUE-03 Route artifact work through `enqueueTask()` transactional outbox via `enqueueArtifactWorkItem()`.
 - [x] QUEUE-04 Fix event-fabric projection worker type ownership imports (`integration-events.ts` owns code-evidence; `event-fabric.ts` owns the control-loop event types).
-- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example `document.embed → vector.index`) with artifact references where profiling shows payload amplification.
-- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers.
-- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently.
-- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt.
-- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative.
-- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit.
+- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example `document.embed → vector.index`) with artifact references where profiling shows payload amplification. **AUDITED_INCOMPLETE** — legacy `rabbitmq-client.ts`/`dispatch-inline.ts` still expose raw text/vector convenience paths; no blind rewrite was made without consumer migration/profiling proof.
+- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers. **IMPLEMENTED_UNPROVEN** — schemas, dispatch, file checksum verification and analytics projection added; MMAP/ARROW_IPC are verified by bytes, non-file storage stays fail-closed until storage-specific verifiers exist.
+- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently. **IMPLEMENTED_UNPROVEN** — `atlas_action_leases` + acquire/renew/release primitive added with monotonic fencing token; migration and live contention proof still required.
+- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt. **PARTIAL_IMPLEMENTED_UNPROVEN** — typed `ArtifactWorkResultV1`, durable `workflow_tasks.result` reuse lookup, and bounded event replay guard exist; an artifact worker must wire the reuse lookup + lease around one real computation and replay it twice before proof.
+- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative. **STATIC_AUDIT_COMPLETE_RUNTIME_PROOF_PENDING** — `enqueueArtifactWorkItem()` imports only `enqueueTask()`; `outbox.ts` owns durable workflow_task/workflow_outbox publication. Legacy generic Rabbit helpers remain direct/non-authoritative convenience paths and must not dispatch artifact work.
+- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit. **IMPLEMENTED_UNPROVEN** — artifact dispatch measures UTF-8 JSON bytes, emits structured analytics, and rejects envelopes over 64 KiB before `enqueueTask()`.
+
+### QUEUE ownership invariants
+
+- Artifact bytes/storage are canonical outside the queue. `artifact.materialized` observes a verified materialization; the event does not create artifact truth.
+- `eventId` is event-occurrence identity; `actionKey` is computation identity; `artifactId`/`artifactHash` are artifact identities. Do not substitute them.
+- MMAP/ARROW_IPC may be filesystem verified. POSTGRES/QDRANT/VALKEY/GPU_RESIDENT must remain unproven until a storage-specific verifier exists.
+- Artifact-task durable publication is Postgres-first via `enqueueTask()` + `workflow_outbox`; generic direct Rabbit publication is not authoritative workflow durability.
+- The queue must not gain `QueueArtifactRegistryV1` or another artifact/ordinal owner.
 
 ## P1 — candidate feature fabric
 
@@ -86,9 +94,11 @@
 ```bash
 cd sveltekit-frontend
 npx vitest run \
-  src/lib/server/atlas/features/manifold4-orientation-v1.spec.ts \
   src/lib/server/queue/artifact-work-item-v1.spec.ts \
-  src/lib/server/queue/event-fabric-dispatch.spec.ts
+  src/lib/server/queue/artifact-work-dispatch-v1.spec.ts \
+  src/lib/server/queue/event-fabric.spec.ts \
+  src/lib/server/queue/event-fabric-dispatch.spec.ts \
+  src/lib/server/queue/artifact-materialization-event-processing.spec.ts
 ```
 
-Then run the targeted TypeScript check for queue + candidate-fabric contracts before wiring artifact materializers.
+Then run the targeted TypeScript check for queue contracts, apply `drizzle/manual/atlas_action_leases.sql` in the local proof database, and run one duplicate ActionKey contention/replay fixture. Do not open FEAT-01 until QUEUE-06..10 are proven or explicitly waived with receipts.
