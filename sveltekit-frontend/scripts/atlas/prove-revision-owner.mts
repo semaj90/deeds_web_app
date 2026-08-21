@@ -1,6 +1,5 @@
 #!/usr/bin/env tsx
 
-import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -67,25 +66,15 @@ async function columnStats(table: string, column: string, meaningfulSql: string)
   };
 }
 
-function writerFlags(text: string | null, createTokens: string[], passTokens: string[]) {
-  return {
-    writerPresent: text !== null,
-    writerCreatesRevision: Boolean(text && createTokens.some((token) => text.includes(token))),
-    writerPassesRevisionThrough: Boolean(text && passTokens.some((token) => text.includes(token))),
-  };
-}
-
 const semanticWriterPath = 'sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts';
 const symbolWriterPath = 'packages/parent-atlas/src/core/symbol-registry-repository.ts';
 const nativeStructuralPath = 'sveltekit-frontend/scripts/atlas/native-structural-materializer.mts';
-const astSchemaPath = 'sveltekit-frontend/src/lib/server/db/schema/atlas-ast-nodes.ts';
 const indexEnginePath = 'scripts/atlas/index-engine.ts';
 
-const [semanticWriter, symbolWriter, nativeStructuralWriter, astSchema, indexEngine] = await Promise.all([
+const [semanticWriter, symbolWriter, nativeStructuralWriter, indexEngine] = await Promise.all([
   fileText(semanticWriterPath),
   fileText(symbolWriterPath),
   fileText(nativeStructuralPath),
-  fileText(astSchemaPath),
   fileText(indexEnginePath),
 ]);
 
@@ -95,7 +84,6 @@ try {
 
   {
     const stats = await columnStats('atlas_packets', 'workspace_revision', '"workspace_revision" IS NOT NULL AND "workspace_revision" <> 0');
-    const flags = writerFlags(semanticWriter, ['workspaceRevision:'], ['workspaceRevision']);
     observations.push({
       surfaceId: 'workspace:atlas_packets.workspace_revision',
       table: 'atlas_packets',
@@ -103,9 +91,9 @@ try {
       role: 'DEFAULTED_SINK',
       ...stats,
       writerPath: semanticWriterPath,
-      ...flags,
-      // Even if another writer populates this column, the semantic packet writer inspected here does not originate it.
+      writerPresent: semanticWriter !== null,
       writerCreatesRevision: false,
+      writerPassesRevisionThrough: false,
       writerEvidence: [
         'schema default is 0',
         'semantic-packet-writer persists representation lineage but does not assign workspaceRevision',
@@ -132,9 +120,7 @@ try {
   }
 
   for (const column of ['source_revision', 'workspace_revision'] as const) {
-    const meaningful = column === 'workspace_revision'
-      ? '"workspace_revision" IS NOT NULL AND btrim("workspace_revision"::text) <> \'\''
-      : '"source_revision" IS NOT NULL AND btrim("source_revision"::text) <> \'\'';
+    const meaningful = `"${column}" IS NOT NULL AND btrim("${column}"::text) <> ''`;
     const stats = await columnStats('atlas_symbol_versions', column, meaningful);
     observations.push({
       surfaceId: `${column === 'workspace_revision' ? 'workspace' : 'source'}:atlas_symbol_versions.${column}`,
@@ -146,17 +132,13 @@ try {
       writerPresent: symbolWriter !== null,
       writerCreatesRevision: false,
       writerPassesRevisionThrough: Boolean(symbolWriter?.includes(`nomination.${column}`)),
-      writerEvidence: [
-        `symbol-registry-repository inserts nomination.${column}; it does not create the revision`,
-      ],
+      writerEvidence: [`symbol-registry-repository inserts nomination.${column}; it does not create the revision`],
       notes: ['Populated symbol-version rows therefore prove propagation, not origin authority.'],
     });
   }
 
   for (const column of ['commit_sha', 'corpus_version'] as const) {
     const stats = await columnStats('atlas_source_refs', column, `"${column}" IS NOT NULL AND btrim("${column}"::text) <> ''`);
-    const createsToken = column === 'commit_sha' ? ['commitSha:', 'commit_sha'] : ['corpusVersion:', 'corpus_version'];
-    const flags = writerFlags(astSchema, [], []);
     observations.push({
       surfaceId: `source:atlas_source_refs.${column}`,
       table: 'atlas_source_refs',
@@ -167,10 +149,7 @@ try {
       writerPresent: false,
       writerCreatesRevision: false,
       writerPassesRevisionThrough: false,
-      writerEvidence: [
-        `atlas_source_refs declares ${column}, but repository search did not identify a production writer that creates it`,
-        `schema-present=${flags.writerPresent}; tokens-reviewed=${createsToken.join(',')}`,
-      ],
+      writerEvidence: [`atlas_source_refs declares ${column}, but repository search did not identify a production writer that creates it`],
       notes: ['Candidate cannot pass until both a production origin writer and populated values are proven.'],
     });
   }
