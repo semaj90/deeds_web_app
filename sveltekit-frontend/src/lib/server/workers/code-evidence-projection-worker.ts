@@ -2,8 +2,8 @@
  * Event Fabric Projection Worker
  *
  * Consumes the event-fabric queue and dispatches by eventType. The code
- * evidence path is the first real handler; the remaining event classes
- * are registered now so the control-loop seam is explicit and typed.
+ * evidence and artifact lifecycle paths have real durable handlers; the
+ * remaining event classes keep explicit typed seams for the control loop.
  */
 
 import amqp from 'amqplib';
@@ -12,6 +12,7 @@ import { declareTopology, QUEUES } from '$lib/server/queue/topology.js';
 import {
 	verifyCodeEvidenceReadback,
 } from '$lib/server/queue/code-evidence-event-processing.js';
+import { persistArtifactLifecycleEvent } from '$lib/server/queue/artifact-event-processing.js';
 import type {
 	CodeEvidencePersistedEventV1,
 } from '$lib/server/queue/integration-events.js';
@@ -19,6 +20,8 @@ import {
 	createDefaultEventFabricHandlers,
 	parseEventFabricMessage,
 	type AnalyticsObservationEventV1,
+	type ArtifactFailedEventV1,
+	type ArtifactMaterializedEventV1,
 	type CheckpointCommitEventV1,
 	type EventFabricHandlerRegistry,
 	type FailureObservationEventV1,
@@ -42,6 +45,12 @@ function buildDefaultHandlers(): EventFabricProjectionHandlers {
 		...handlers,
 		'code.evidence.persisted': async (event: CodeEvidencePersistedEventV1) => {
 			await verifyCodeEvidenceReadback(event);
+		},
+		'artifact.materialized': async (event: ArtifactMaterializedEventV1) => {
+			await persistArtifactLifecycleEvent(event);
+		},
+		'artifact.failed': async (event: ArtifactFailedEventV1) => {
+			await persistArtifactLifecycleEvent(event);
 		},
 	};
 }
@@ -68,6 +77,12 @@ export async function dispatchEventFabricEvent(
 			return;
 		case 'checkpoint.commit':
 			await handlers['checkpoint.commit'](event as CheckpointCommitEventV1);
+			return;
+		case 'artifact.materialized':
+			await handlers['artifact.materialized'](event as ArtifactMaterializedEventV1);
+			return;
+		case 'artifact.failed':
+			await handlers['artifact.failed'](event as ArtifactFailedEventV1);
 			return;
 	}
 }
