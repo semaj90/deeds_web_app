@@ -54,6 +54,34 @@ The queue tranche adds:
 - `workflow_artifacts` migration table in `drizzle/manual/parent_atlas_artifact_transport_v1.sql`.
 - `artifact.materialized` / `artifact.failed` lifecycle events and replay-safe durable projection.
 - task-envelope size policy that rejects oversized `ActionWorkItemV1` payloads.
+- `artifact-transport-readiness-v1.ts`, a read-only deployment gate that proves the live `workflow_artifacts` table has the exact required columns, `artifact_id` primary key, and unique `artifact_hash` constraint.
+- `prove-artifact-transport-readiness.mts`, a read-only runtime proof that exits blocked until the manual migration is actually present and structurally compatible.
+
+Readiness proof command:
+
+```bash
+npx tsx scripts/atlas/prove-artifact-transport-readiness.mts
+```
+
+Expected pre-migration state:
+
+```text
+status: ARTIFACT_TRANSPORT_STORE_BLOCKED
+readOnly: true
+canonicalWriteAttempted: false
+readiness.status: TABLE_MISSING
+```
+
+Expected post-migration state:
+
+```text
+status: ARTIFACT_TRANSPORT_STORE_READY
+readOnly: true
+canonicalWriteAttempted: false
+readiness.status: READY
+```
+
+The proof is intentionally read-only. A green schema-readiness receipt permits the next compatibility-wiring tranche; it does not by itself prove artifact write/readback, Qdrant projection, or QUEUE-05 closure.
 
 ## Why QUEUE-05 is not checked off
 
@@ -61,11 +89,13 @@ Rewiring either raw path to `workflow_artifacts` before the manual migration is 
 
 Required completion sequence:
 
-1. Apply and verify `parent_atlas_artifact_transport_v1.sql` in the intended environment.
-2. Add a bounded compatibility reader/writer at both raw-vector paths.
-3. Publish only `ArtifactAddressV1` plus small identity/revision metadata between embedding and vector-index stages.
-4. Verify checksum/revision-set readback before Qdrant mutation.
-5. Run `audit-queue-large-payloads.mts` and classify every remaining raw routing hit.
-6. Benchmark message bytes and end-to-end latency before/after; only then check QUEUE-05 complete.
+1. Apply `parent_atlas_artifact_transport_v1.sql` in the intended environment.
+2. Run `prove-artifact-transport-readiness.mts`; require `ARTIFACT_TRANSPORT_STORE_READY` before changing producers.
+3. Run the existing artifact lifecycle/write-readback proof against the intended non-production/test database.
+4. Add a bounded compatibility reader/writer at both raw-vector paths.
+5. Publish only `ArtifactAddressV1` plus small identity/revision metadata between embedding and vector-index stages.
+6. Verify checksum/revision-set readback before Qdrant mutation.
+7. Run `audit-queue-large-payloads.mts` and classify every remaining raw routing hit.
+8. Benchmark message bytes and end-to-end latency before/after; only then check QUEUE-05 complete.
 
 No production migration or Qdrant data mutation is performed by this branch.
