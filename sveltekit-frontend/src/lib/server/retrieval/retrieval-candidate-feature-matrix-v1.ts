@@ -50,7 +50,7 @@ export function buildCandidateFeatureMatrix(
   candidates: CandidateProjectionInput[]
 ): RetrievalCandidateFeatureMatrixV1 {
   const C = candidates.length;
-  const F = 25;
+  const F = CANDIDATE_FEATURE_NAMES.length;
 
   const candidate_features = new Float32Array(C * F);
   const presence_mask = new Uint8Array(C * F);
@@ -58,10 +58,11 @@ export function buildCandidateFeatureMatrix(
 
   for (let i = 0; i < C; i++) {
     const c = candidates[i];
+    if (!c.packet_key?.trim()) throw new Error(`CANDIDATE_PACKET_KEY_REQUIRED:${i}`);
     candidate_packet_keys.push(c.packet_key);
     const rowOffset = i * F;
 
-    const featureValues: Array<number | undefined> = [
+    const featureValues: Array<number | undefined | null> = [
       c.semantic_similarity_768,
       c.lexical_score,
       c.exact_symbol_match,
@@ -91,13 +92,16 @@ export function buildCandidateFeatureMatrix(
 
     for (let f = 0; f < F; f++) {
       const val = featureValues[f];
-      if (val !== undefined && val !== null && !Number.isNaN(val)) {
-        candidate_features[rowOffset + f] = val;
-        presence_mask[rowOffset + f] = 1;
-      } else {
+      if (val === undefined || val === null) {
         candidate_features[rowOffset + f] = 0.0;
-        presence_mask[rowOffset + f] = 0; // Explicit presence mask 0 for missing features (e.g. execution_utility)
+        presence_mask[rowOffset + f] = 0;
+        continue;
       }
+      if (!Number.isFinite(val)) {
+        throw new Error(`CANDIDATE_FEATURE_NON_FINITE:${c.packet_key}:${CANDIDATE_FEATURE_NAMES[f]}`);
+      }
+      candidate_features[rowOffset + f] = val;
+      presence_mask[rowOffset + f] = 1;
     }
   }
 
