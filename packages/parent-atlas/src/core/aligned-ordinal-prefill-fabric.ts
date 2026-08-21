@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { canonicalJsonChecksum } from './artifact-transport.js';
+import { buildPrefillCacheEntry, type PrefillSynthesisCacheEntryV1 } from './contextual-prefill-fabric.js';
 import { tensorSnapshotSchema, type TensorSnapshotV1 } from './tensor-snapshot.js';
 
 const id = z.string().min(1);
@@ -257,5 +258,23 @@ export function buildCompiledPrefillReceipt(input: Omit<CompiledPrefillReceiptV1
     gpu_lease_checksums,
     prefill_identity_checksum: canonicalJsonChecksum(identity),
     canonical_authority: false,
+  });
+}
+
+export function compiledPrefillReceiptToCacheEntry(
+  receiptInput: CompiledPrefillReceiptV1,
+  compilerRevision: string,
+): PrefillSynthesisCacheEntryV1 {
+  const receipt = compiledPrefillReceiptSchema.parse(receiptInput);
+  return buildPrefillCacheEntry({
+    prefill_identity_checksum: receipt.prefill_identity_checksum,
+    instruction_set_checksum: receipt.instruction_set_checksum,
+    hydration_manifest_checksum: receipt.hydration_manifest_checksum,
+    feature_alignment_checksum: receipt.feature_alignment_checksum,
+    context_manifest_checksum: receipt.context_manifest_checksum,
+    compiler_revision: compilerRevision,
+    compiled_prefill_artifact_id: receipt.compiled_prefill_artifact_id,
+    compiled_prefill_checksum: receipt.compiled_prefill_checksum,
+    status: 'VALID',
   });
 }
