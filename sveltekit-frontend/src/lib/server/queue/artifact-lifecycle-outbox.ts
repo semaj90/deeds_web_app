@@ -1,4 +1,3 @@
-import type { db } from '$lib/server/db/client.js';
 import {
   artifactFailedPayloadSchema,
   artifactMaterializedPayloadSchema,
@@ -8,7 +7,7 @@ import {
 import { writeIntegrationEventOutboxRow } from './outbox.js';
 import { EVENT_ROUTING_KEYS } from './topology.js';
 
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type Transaction = Parameters<typeof writeIntegrationEventOutboxRow>[0];
 
 export async function writeArtifactMaterializedOutboxRow(
   tx: Transaction,
