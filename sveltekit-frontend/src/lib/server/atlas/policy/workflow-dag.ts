@@ -83,6 +83,19 @@ function sha256(value: unknown): string {
   return createHash('sha256').update(stableStringify(value)).digest('hex');
 }
 
+function assertInputShape(plan: WorkflowDagPlanV1): void {
+  for (const raw of plan.nodes) {
+    const id = raw.id.trim();
+    if (!id) throw new Error('Workflow node id is required');
+    const dependencies = (raw.dependencies ?? []).map((dep) => dep.trim());
+    if (dependencies.some((dep) => !dep)) throw new Error(`Node ${id}: dependency ids must be non-empty`);
+    if (new Set(dependencies).size !== dependencies.length) {
+      throw new Error(`Node ${id}: duplicate dependencies are not allowed`);
+    }
+    if (dependencies.includes(id)) throw new Error(`Node ${id}: self dependency is not allowed`);
+  }
+}
+
 function normalizePlan(plan: WorkflowDagPlanV1) {
   return {
     schema: plan.schema,
@@ -90,7 +103,7 @@ function normalizePlan(plan: WorkflowDagPlanV1) {
     nodes: plan.nodes
       .map((node) => ({
         id: node.id.trim(),
-        dependencies: [...new Set(node.dependencies ?? [])].map((id) => id.trim()).sort(),
+        dependencies: (node.dependencies ?? []).map((id) => id.trim()).sort(),
         kind: node.kind ?? 'task',
         logicalActionId: node.logicalActionId ?? null,
         attempt: Math.max(0, Math.trunc(node.attempt ?? 0)),
@@ -116,9 +129,9 @@ export function validateWorkflowDag(plan: WorkflowDagPlanV1): WorkflowDagReceipt
   if (plan.schema !== 'atlas.workflow-dag-plan.v1') {
     throw new Error('Unsupported workflow DAG schema');
   }
+  assertInputShape(plan);
 
   const normalized = normalizePlan(plan);
-  if (normalized.nodes.some((node) => !node.id)) throw new Error('Workflow node id is required');
   const ids = normalized.nodes.map((node) => node.id);
   if (new Set(ids).size !== ids.length) throw new Error('Workflow node ids must be unique');
 
@@ -133,7 +146,6 @@ export function validateWorkflowDag(plan: WorkflowDagPlanV1): WorkflowDagReceipt
   for (const node of normalized.nodes) {
     for (const dep of node.dependencies) {
       if (!byId.has(dep)) continue;
-      if (dep === node.id) continue;
       outgoing.get(dep)!.push(node.id);
       indegree.set(node.id, (indegree.get(node.id) ?? 0) + 1);
       edgeCount++;
