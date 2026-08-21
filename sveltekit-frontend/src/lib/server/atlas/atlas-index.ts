@@ -78,6 +78,26 @@ export {
   normalizeDemandUtility,
 } from './ranking/packet-feature-matrix';
 export {
+  RankProfileKindSchema,
+  RankProfileV1Schema,
+  GraphAuthoritySignalsV1Schema,
+  ImportanceRankInputV1Schema,
+  ImportanceRankResultV1Schema,
+  IMPORTANCE_RANKER_REVISION,
+  deriveRankProfile,
+  deriveGraphAuthority,
+  rankImportance,
+  rankImportanceBatch,
+  adaptQasRowToImportanceRankInput,
+} from './ranking/importance-ranker-v1';
+export type {
+  RankProfileKind,
+  RankProfileV1,
+  GraphAuthoritySignalsV1,
+  ImportanceRankInputV1,
+  ImportanceRankResultV1,
+} from './ranking/importance-ranker-v1';
+export {
   KanbanTaskLaneSchema,
   KanbanTaskStatusSchema,
   KanbanTaskSchema,
