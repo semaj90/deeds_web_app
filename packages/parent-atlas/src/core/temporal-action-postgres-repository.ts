@@ -39,6 +39,17 @@ export const temporalActionLookupReceiptSchema = z.object({
 }).strict();
 export type TemporalActionLookupReceiptV1 = z.infer<typeof temporalActionLookupReceiptSchema>;
 
+export const temporalActionHistoryReceiptSchema = z.object({
+  schema: z.literal('atlas.temporal-action-history-receipt.v1').default('atlas.temporal-action-history-receipt.v1'),
+  event_count: z.number().int().nonnegative(),
+  limit: z.number().int().positive().max(5000),
+  workflow_id: id.nullable(),
+  oldest_ledger_sequence: z.number().int().positive().nullable(),
+  newest_ledger_sequence: z.number().int().positive().nullable(),
+  producer_revision: z.string().min(1),
+}).strict();
+export type TemporalActionHistoryReceiptV1 = z.infer<typeof temporalActionHistoryReceiptSchema>;
+
 type EventRow = {
   event_id: string;
   event_checksum: string;
@@ -77,6 +88,50 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
       [executionKey],
     );
     return result.rows.map(parseEventRow);
+  }
+
+  async function listRecentFinalized(input: {
+    limit?: number;
+    workflow_id?: string | null;
+    producer_revision: string;
+  }): Promise<{ events: AgentActionEventV1[]; receipt: TemporalActionHistoryReceiptV1 }> {
+    const limit = z.number().int().positive().max(5000).parse(input.limit ?? 512);
+    const workflowId = input.workflow_id == null ? null : id.parse(input.workflow_id);
+    const result = workflowId === null
+      ? await queryable.query<EventRow>(
+          `SELECT event_id, event_checksum, event_json
+             FROM atlas_agent_action_events
+            WHERE state = 'FINALIZED'
+            ORDER BY ledger_sequence DESC, event_id DESC
+            LIMIT $1`,
+          [limit],
+        )
+      : await queryable.query<EventRow>(
+          `SELECT event_id, event_checksum, event_json
+             FROM atlas_agent_action_events
+            WHERE state = 'FINALIZED'
+              AND workflow_id = $1
+            ORDER BY ledger_sequence DESC, event_id DESC
+            LIMIT $2`,
+          [workflowId, limit],
+        );
+
+    const events = result.rows.map(parseEventRow).sort((a, b) =>
+      a.ledger_sequence - b.ledger_sequence || a.event_id.localeCompare(b.event_id));
+    if (events.some((event) => event.state !== 'FINALIZED')) {
+      throw new Error('TEMPORAL_HISTORY_NON_FINALIZED_READBACK');
+    }
+    return {
+      events,
+      receipt: temporalActionHistoryReceiptSchema.parse({
+        event_count: events.length,
+        limit,
+        workflow_id: workflowId,
+        oldest_ledger_sequence: events[0]?.ledger_sequence ?? null,
+        newest_ledger_sequence: events.at(-1)?.ledger_sequence ?? null,
+        producer_revision: input.producer_revision,
+      }),
+    };
   }
 
   return {
@@ -139,6 +194,7 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
     },
 
     listByExecutionKey,
+    listRecentFinalized,
 
     async currentByExecutionKey(executionKey: string, producerRevision: string): Promise<{
       current: ActionCurrentProjectionV1 | null;
@@ -166,5 +222,6 @@ export function describeTemporalActionPostgresRepository(): string {
     'WorkflowActionEventV1 remains canonical for workflow/action identity; temporal events add deterministic execution identity and observed outcome history.',
     'ActionCurrentProjectionV1 is rebuilt from immutable events and is not canonical history.',
     'Duplicate event_id inserts are accepted only when checksum-verified readback matches the immutable event.',
+    'Recommendation history reads are bounded and checksum-verified; they do not create a second history owner.',
   ].join(' ');
 }
