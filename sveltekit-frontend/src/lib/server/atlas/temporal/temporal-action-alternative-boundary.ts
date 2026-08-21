@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 import {
   actionFeatureCandidateInputSchema,
+  alternativeActionSelectionSchema,
   buildActionExecutionKey,
   createTemporalActionPostgresRepository,
   recommendAlternativeActionFromHistory,
   temporalActionChecksum,
   type AgentActionEventV1,
-  type AlternativeActionSelectionV1,
 } from '@deeds/parent-atlas';
 
 import {
@@ -15,7 +15,6 @@ import {
   temporalToolBoundaryDecisionSchema,
   temporalToolExecutionContextSchema,
   type TemporalToolBoundaryDecisionV1,
-  type TemporalToolExecutionContextV1,
 } from './temporal-tool-execution-boundary.js';
 
 const id = z.string().min(1);
@@ -58,7 +57,7 @@ export const temporalAlternativeBoundaryResultSchema = z.object({
   selection_checksum: checksum,
   history_event_count: z.number().int().nonnegative(),
   history_receipt_ref: id.nullable(),
-  package_selection: z.custom<AlternativeActionSelectionV1>(),
+  package_selection: alternativeActionSelectionSchema,
   boundary_checksum: checksum,
 }).strict();
 export type TemporalAlternativeBoundaryResultV1 = z.infer<typeof temporalAlternativeBoundaryResultSchema>;
