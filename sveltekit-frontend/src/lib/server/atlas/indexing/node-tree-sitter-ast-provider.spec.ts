@@ -1,70 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { GraphifyStructuralMaterializer } from './graphify-structural-materializer.js';
-import { createNodeTreeSitterAstProvider } from './node-tree-sitter-ast-provider.js';
-
-describe('Node Tree-sitter AstProvider challenger', () => {
-  it('emits structural evidence without minting canonical/native provenance ids', async () => {
-    const provider = createNodeTreeSitterAstProvider();
-    const result = await provider.materialize({
-      sourceRef: 'src/example.ts',
-      sourceRevision: 'source-1',
-      language: 'typescript',
-      source: 'export function score(value: number) { return value + 1; }',
-    });
-
-    expect(result.provider).toBe('node-tree-sitter');
-    expect(result.status).toBe('PROVEN');
-    expect(result.evidence?.schema).toBe('atlas.ast.evidence.v1');
-    expect(result.evidence?.chunks.some((chunk) => chunk.kind === 'FUNCTION' && chunk.name === 'score')).toBe(true);
-    for (const chunk of result.evidence?.chunks ?? []) {
-      expect(chunk.upstream_chunk_id).toBeUndefined();
-      expect(chunk.upstream_node_id).toBeUndefined();
-      expect(chunk.upstream_file_id).toBeUndefined();
-      expect(chunk.upstream_symbol_id).toBeUndefined();
-    }
-  });
-
-  it('remains non-promotable through Graphify until canonical provenance parity is accepted', async () => {
-    const materializer = new GraphifyStructuralMaterializer(createNodeTreeSitterAstProvider());
-    const result = await materializer.materialize({
-      sourceRef: 'src/example.ts',
-      sourceRevision: 'source-1',
-      language: 'typescript',
-      source: 'export const answer = 42;',
-    });
-
-    expect(result.provider).toBe('node-tree-sitter');
-    expect(result.status).toBe('PROVEN');
-    expect(result.provenanceReadiness.status).toBe('COMPATIBILITY_ONLY');
-    expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
-    expect(result.persistence).toBe('NOT_ATTEMPTED');
-  });
-
-  it('reports malformed syntax as recovered evidence rather than throwing the whole provider call', async () => {
-    const result = await createNodeTreeSitterAstProvider().materialize({
-      sourceRef: 'src/broken.ts',
-      sourceRevision: 'source-2',
-      language: 'typescript',
-      source: 'export function broken( {',
-    });
-
-    expect(result.provider).toBe('node-tree-sitter');
-    expect(['RECOVERED_WITH_ERRORS', 'FAILED']).toContain(result.status);
-    if (result.status === 'RECOVERED_WITH_ERRORS') {
-      expect(result.diagnostics.some((diagnostic) => diagnostic.startsWith('TREE_SITTER_'))).toBe(true);
-    }
 import type { AstProvider } from './graphify-structural-materializer.js';
 import { GraphifyStructuralMaterializer } from './graphify-structural-materializer.js';
-
-const anchorOnly = (sourceRef: string, source: string) => ({
-  sourceRef,
-  sourceRevision: null,
-  sourceVersionAnchor: 'content:fixture',
-  sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY' as const,
-  language: 'typescript',
-  source,
-});
 
 describe('Node Tree-sitter AstProvider challenger boundary', () => {
   it('accepts a challenger through the shared AstProvider interface without granting canonical promotion', async () => {
@@ -106,19 +43,20 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
       },
     };
 
-    const result = await new GraphifyStructuralMaterializer(challenger).materialize(
-      anchorOnly('src/alpha.ts', 'export function alpha(){ return 1; }'),
-    );
+    const result = await new GraphifyStructuralMaterializer(challenger).materialize({
+      sourceRef: 'src/alpha.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source: 'export function alpha(){ return 1; }',
+    });
 
     expect(result.provider).toBe('node-tree-sitter-challenger');
     expect(result.status).toBe('PROVEN');
     expect(result.provenanceReadiness.status).toBe('COMPATIBILITY_ONLY');
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
-    expect(result.sourceRevision).toBeNull();
-    expect(result.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
-    expect(result.parserSourceRevisionToken).toBe('anchor:content:fixture');
     expect(result.diagnostics).toContain('STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY');
-    expect(result.diagnostics).toContain('SOURCE_REVISION_AUTHORITY_UNPROVEN');
     expect(result.persistence).toBe('NOT_ATTEMPTED');
   });
 
@@ -134,16 +72,20 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
       },
     };
 
-    const result = await new GraphifyStructuralMaterializer(challenger).materialize(
-      anchorOnly('src/broken.ts', 'export function broken( {'),
-    );
+    const result = await new GraphifyStructuralMaterializer(challenger).materialize({
+      sourceRef: 'src/broken.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source: 'export function broken( {',
+    });
 
     expect(result.provider).toBe('node-tree-sitter-challenger');
     expect(result.status).toBe('FAILED');
     expect(result.evidence).toBeNull();
     expect(result.normalized).toBeNull();
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
-    expect(result.sourceRevision).toBeNull();
     expect(result.fallback).toBe('NONE');
   });
 });

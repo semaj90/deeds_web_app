@@ -24,10 +24,6 @@ export type CanonicalSourceRef = {
   source: string;
 };
 
-export type AstProviderKind = 'treesitter-chunker-8095' | 'node-tree-sitter';
-
-export type AstProviderResult = {
-  provider: AstProviderKind;
 export type AstProviderId = 'treesitter-chunker-8095' | 'node-tree-sitter-challenger';
 
 export type AstProviderResult = {
@@ -187,9 +183,6 @@ export type StructuralMaterializationResult = {
   parserSourceRevisionToken: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
-  /** Raw structural evidence retained for the downstream Parent Atlas fabric. */
-  evidence: AtlasStructuralEvidence | null;
-  /** Normalized structural view retained for current Graphify consumers. */
   evidence: AtlasStructuralEvidence | null;
   normalized: NormalizedAtlasStructuralEvidence | null;
   provenanceReadiness: StructuralProvenanceReadiness;
@@ -199,12 +192,6 @@ export type StructuralMaterializationResult = {
 };
 
 /**
- * Canonical Graphify orchestration boundary. Providers emit structural
- * observations only; identity persistence and projections remain downstream.
- *
- * The 8095 treesitter-chunker provider remains the default/current executor.
- * Alternate providers may be injected for parity experiments without becoming
- * canonical owners merely by satisfying this interface.
  * Canonical Graphify owner boundary. Parser providers receive only an opaque
  * string correlation token. Atlas separately records whether a canonical
  * source revision exists and who owns it.
