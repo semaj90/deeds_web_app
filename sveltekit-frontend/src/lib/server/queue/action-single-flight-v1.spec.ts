@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const execute = vi.fn();
+const { execute } = vi.hoisted(() => ({ execute: vi.fn() }));
 
 vi.mock('$lib/server/db/client.js', () => ({
   db: { execute },
