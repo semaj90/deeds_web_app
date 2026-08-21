@@ -3,6 +3,7 @@ import {
   codeEvidencePersistedEventSchema,
   type CodeEvidencePersistedEventV1,
 } from './integration-events.js';
+import { artifactAddressSchema } from './artifact-work-item-v1.js';
 
 export {
   codeEvidencePersistedEventSchema,
@@ -44,6 +45,8 @@ export const eventFabricTypeSchema = z.enum([
   'recommendation.signal',
   'policy.decision.receipt',
   'checkpoint.commit',
+  'artifact.materialized',
+  'artifact.failed',
 ]);
 
 export type EventFabricType = z.infer<typeof eventFabricTypeSchema>;
@@ -183,6 +186,45 @@ export const checkpointCommitEventSchema = eventFabricEnvelopeSchema.extend({
 
 export type CheckpointCommitEventV1 = z.infer<typeof checkpointCommitEventSchema>;
 
+export const artifactMaterializedPayloadSchema = z.object({
+  actionKey: z.string().min(16),
+  artifact: artifactAddressSchema,
+  fencingToken: z.string().regex(/^\d+$/),
+  producerRevision: z.string().min(1),
+  inputArtifactRefs: z.array(artifactAddressSchema).max(64).default([]),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type ArtifactMaterializedPayloadV1 = z.infer<typeof artifactMaterializedPayloadSchema>;
+
+export const artifactMaterializedEventSchema = eventFabricEnvelopeSchema.extend({
+  eventType: z.literal('artifact.materialized'),
+  payload: artifactMaterializedPayloadSchema,
+});
+
+export type ArtifactMaterializedEventV1 = z.infer<typeof artifactMaterializedEventSchema>;
+
+export const artifactFailedPayloadSchema = z.object({
+  actionKey: z.string().min(16),
+  expectedOutputSchema: z.string().min(1),
+  fencingToken: z.string().regex(/^\d+$/).optional(),
+  producerRevision: z.string().min(1),
+  failureClass: atlasFailureClassSchema,
+  retryable: z.boolean(),
+  errorHash: z.string().min(16),
+  inputArtifactRefs: z.array(artifactAddressSchema).max(64).default([]),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type ArtifactFailedPayloadV1 = z.infer<typeof artifactFailedPayloadSchema>;
+
+export const artifactFailedEventSchema = eventFabricEnvelopeSchema.extend({
+  eventType: z.literal('artifact.failed'),
+  payload: artifactFailedPayloadSchema,
+});
+
+export type ArtifactFailedEventV1 = z.infer<typeof artifactFailedEventSchema>;
+
 export const eventFabricEventSchema = z.discriminatedUnion('eventType', [
   codeEvidencePersistedEventSchema,
   failureObservationEventSchema,
@@ -190,6 +232,8 @@ export const eventFabricEventSchema = z.discriminatedUnion('eventType', [
   recommendationSignalEventSchema,
   policyDecisionReceiptEventSchema,
   checkpointCommitEventSchema,
+  artifactMaterializedEventSchema,
+  artifactFailedEventSchema,
 ]);
 
 export type EventFabricEventV1 = z.infer<typeof eventFabricEventSchema>;
@@ -210,6 +254,8 @@ export function createDefaultEventFabricHandlers(): EventFabricHandlerRegistry {
     'recommendation.signal': async () => {},
     'policy.decision.receipt': async () => {},
     'checkpoint.commit': async () => {},
+    'artifact.materialized': async () => {},
+    'artifact.failed': async () => {},
   };
 }
 
