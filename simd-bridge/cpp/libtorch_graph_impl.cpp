@@ -3,36 +3,43 @@
 
 #include <cstdint>
 #include <cstring>
+#include <cmath>
 #include <torch/torch.h>
+
+#if SIMD_HAVE_CUDA
+#include <cuda_runtime_api.h>
+#endif
 
 extern "C" int checkCudaAvailable() {
   return torch::cuda::is_available() ? 1 : 0;
 }
 
 extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
-  if (!torch::cuda::is_available()) {
-    if (free_bytes) *free_bytes = 0;
-    if (total_bytes) *total_bytes = 0;
-    return -1;
-  }
-  // Best-effort: try CUDA runtime query
-  size_t free_mem = 0, total_mem = 0;
-#ifdef __CUDACC__
-  // If CUDA runtime available in this build, use cudaMemGetInfo
-  cudaError_t err = cudaMemGetInfo(&free_mem, &total_mem);
-  if (err != cudaSuccess) {
-    if (free_bytes) *free_bytes = 0;
-    if (total_bytes) *total_bytes = 0;
-    return -2;
-  }
-  if (free_bytes) *free_bytes = (int64_t)free_mem;
-  if (total_bytes) *total_bytes = (int64_t)total_mem;
-  return 0;
-#else
-  // CUDA runtime not visible; return unknown but indicate CUDA available
   if (free_bytes) *free_bytes = 0;
   if (total_bytes) *total_bytes = 0;
+
+  if (!torch::cuda::is_available()) {
+    return -1;
+  }
+
+#if SIMD_HAVE_CUDA
+  // This translation unit is compiled as C++, not NVCC, so __CUDACC__ is not
+  // a valid capability test here. CMake defines SIMD_HAVE_CUDA and links
+  // CUDA::cudart for the addon; use that build contract to call the runtime.
+  size_t free_mem = 0;
+  size_t total_mem = 0;
+  const cudaError_t err = cudaMemGetInfo(&free_mem, &total_mem);
+  if (err != cudaSuccess) {
+    return -2;
+  }
+  if (free_bytes) *free_bytes = static_cast<int64_t>(free_mem);
+  if (total_bytes) *total_bytes = static_cast<int64_t>(total_mem);
   return 0;
+#else
+  // CUDA tensors may still be visible through LibTorch, but this build did not
+  // expose the CUDA runtime target to the addon. Report telemetry as unavailable
+  // instead of returning a successful 0/0 measurement.
+  return -3;
 #endif
 }
 
