@@ -27,23 +27,6 @@ CREATE TABLE IF NOT EXISTS atlas_agent_action_events (
   persisted_at         timestamptz NOT NULL DEFAULT now()
 );
 
--- Storage-owned append-log sequence allocation. This sequence orders immutable
--- temporal events only; it is never workflow/action/execution/revision identity.
--- Gaps are legal when a reservation is made and the process exits before append.
-CREATE SEQUENCE IF NOT EXISTS atlas_agent_action_ledger_sequence_seq;
-
--- Always advance strictly beyond both persisted history and any value already
--- reserved by nextval(). Using is_called=true avoids reissuing last_value after
--- a crashed worker reserved a sequence number but never appended its event.
-SELECT setval(
-  'atlas_agent_action_ledger_sequence_seq',
-  GREATEST(
-    COALESCE((SELECT MAX(ledger_sequence) FROM atlas_agent_action_events), 0),
-    (SELECT last_value FROM atlas_agent_action_ledger_sequence_seq)
-  ),
-  true
-);
-
 CREATE INDEX IF NOT EXISTS idx_atlas_agent_action_events_execution
   ON atlas_agent_action_events (execution_key, ledger_sequence DESC);
 
