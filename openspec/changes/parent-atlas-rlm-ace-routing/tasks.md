@@ -7,10 +7,7 @@ RLM = epistemic/navigation policy
 ACE = residency/cache policy
 ```
 
-RLM decides which evidence branch deserves inspection or another model/tool call.
-ACE may predict which already-canonical objects should be warm, at what fidelity,
-but it does not choose semantic truth, canonical identity, graph truth, fusion votes,
-or the final answer.
+RLM decides which evidence branch deserves inspection or another model/tool call. ACE may predict which already-canonical objects should be warm, at what fidelity, but it does not choose semantic truth, canonical identity, graph truth, fusion votes, or the final answer.
 
 ## RLM-ACE-01 — Pure contracts and planner
 
@@ -19,79 +16,102 @@ or the final answer.
 - [x] Add a pure navigation planner for AST/callers/tests/runtime/docs/graph/source branches.
 - [x] Add a pure ACE prefetch planner for `semantic_768`, AST subtree, caller neighborhood, test packet, source span, and graph neighborhood.
 - [x] Ensure the planner emits no Postgres/Qdrant/Neo4j/Valkey/GPU/Kanban writes.
-- [x] Add focused fixture tests using `treeNodeId=T8421`, `symbolVersionId=S331`, and `packetKey=packet:1`.
+- [x] Add focused fixture tests.
 
 ## RLM-ACE-02 — Routing prefill
 
 - [x] Add bounded head activation and fetch-policy derivation.
-- [x] Keep the 20x20 SOM as routing metadata only; neighborhood expansion is bounded to the existing 0..19 coordinate space.
+- [x] Keep the 20x20 SOM as routing metadata only; neighborhood expansion is bounded to 0..19.
 - [x] Accept KMeans centroid IDs as routing hints without treating them as ANN results or fusion votes.
-- [ ] Bind real SOM BMU + revision from the existing SOM owner. Do not fabricate `(x,y)` from task labels or priority.
+- [ ] Bind real SOM BMU + revision from the existing SOM owner.
 - [ ] Bind revision-qualified KMeans centroid IDs from the existing clustering owner.
-- [ ] Measure the small routing-prefill token budget separately from synthesis prefill.
+- [ ] Measure routing-prefill token budget separately from synthesis prefill.
 
 ## RLM-ACE-03 — QAS integration
 
-- [x] Add `scripts/atlas/report-rlm-ace-routing.mts` that consumes the existing `atlas-qas-candidate-features.jsonl` artifact.
-- [x] Reject malformed/mixed request or workspace rows rather than padding missing identity/revisions.
+- [x] Add `scripts/atlas/report-rlm-ace-routing.mts` consuming existing QAS feature JSONL.
+- [x] Reject malformed/mixed request or workspace rows rather than padding identity/revisions.
 - [x] Keep exact promotion upstream; this report does not fetch or invent evidence.
-- [ ] Bind `tree_node_id` into `QueryAdaptiveFeatureRowV1` through the existing structural identity owner after the identity split is proven.
-- [ ] Add explicit same-request exact-top-k/evidence-promotion receipt linkage.
+- [ ] Bind structural locator into `QueryAdaptiveFeatureRowV1` after canonical identity acceptance.
+- [ ] Add same-request exact-top-k/evidence-promotion receipt linkage.
 - [ ] Add recursion-decision evaluation: direct retrieval vs bounded RLM vs parallel sub-RLM.
 
 ## RLM-ACE-04 — Daily Graphify
 
-- [x] Wire the read-only RLM/ACE receipt after the existing daily QAS proof/evaluation step.
-- [x] Failure/deferred RLM/ACE reporting must never block canonical `graphify:daily` completion.
-- [ ] Keep AST owner selection first: `graphify:daily -> GraphifyStructuralMaterializer -> AstProvider -> 8095 -> canonical owner` must be production-reachable before RLM claims AST-grounded recursion.
-- [ ] Feed the resulting routing receipt into recommendation/Kanban evidence only through the existing recommendation receipt owner.
-- [ ] Add durable execution-outcome linkage before ACE learns reuse/promotion utility from task success.
+- [x] Wire read-only RLM/ACE receipt after daily QAS proof/evaluation.
+- [x] Failure/deferred RLM/ACE reporting never blocks canonical Graphify completion.
+- [ ] Production owner reachability remains `graphify:daily -> GraphifyStructuralMaterializer -> AstProvider -> 8095 -> canonical persistence`.
+- [ ] Feed routing receipt into recommendation/Kanban only through existing receipt owner.
+- [ ] Add durable execution-outcome linkage before ACE learns reuse utility.
 
 ## RLM-ACE-05 — OpenSpec/git-diff recommendation audit
 
-- [x] Add `scripts/atlas/audit-openspec-diff-recommendations.mjs`.
-- [x] Read open checkboxes from current `openspec/changes/**/tasks.md` plus working-tree/index diffs.
-- [x] Emit deterministic, read-only Kanban recommendation drafts with source and changed-file evidence.
-- [x] Do not create or update Kanban cards from the audit script.
-- [ ] Join these drafts to `OkfRecommendationV1` / recommendation evidence receipts before promotion.
-- [ ] Compare accepted recommendations with later git/test/ExecutionReceipt outcomes for offline policy evaluation.
+- [x] Add deterministic read-only OpenSpec/git-diff recommendation drafts.
+- [ ] Join drafts to `OkfRecommendationV1` / recommendation evidence receipts before promotion.
+- [ ] Compare accepted recommendations with later git/test/ExecutionReceipt outcomes.
 
 ## RLM-ACE-06 — BitFrost / Valkey residency
 
-- [ ] Bind ACE hints to the existing `LodPromotionDecisionV1`; do not create a second residency contract.
-- [ ] Prove `WARM/TURBO_4BIT -> HOT/FP16` only after `SemanticSnapshotV1`, ordinal-map, and TurboVec execution-owner gates are proven.
-- [ ] Store only revision-qualified hot references/routing metadata in Valkey; Postgres remains durable receipt/canonical owner.
+- [ ] Bind ACE hints to existing `LodPromotionDecisionV1`; no second residency contract.
+- [ ] Prove `WARM/TURBO_4BIT -> HOT/FP16` only after snapshot/ordinal/TurboVec gates.
+- [ ] Store revision-qualified hot references/routing metadata in Valkey; Postgres remains durable owner.
 - [ ] Add stale workspace/source/representation/ordinal-map invalidation tests.
-- [ ] Add actual hit/miss, reuse probability, byte cost, RSS and VRAM evidence before enabling learned prefetch.
+- [ ] Add hit/miss, reuse probability, byte cost, RSS and VRAM evidence before learned prefetch.
 
 ## RLM-ACE-07 — Retrieval and graph expansion
 
-- [ ] Preserve one logical semantic lane regardless of Qdrant/cuVS/CAGRA/TurboVec executor.
-- [ ] Keep SOM/KMeans as coarse routing; KNN remains nearest-neighbor retrieval.
-- [ ] Run bounded Neo4j/cuGraph fanout only after canonical candidate narrowing.
-- [ ] Feed global PageRank/PPR/community/path signals into derived ranking features, never as an independent fusion vote.
-- [ ] Keep ontology-linked tuples and domain classifications canonical/revisioned in their existing OKF/Postgres ownership boundary; projection indexes may accelerate lookup but may not become truth.
+- [x] Add pure `RetrievalFanoutPlanV1` preserving one logical `semantic_768` lane across Qdrant/cuVS/CAGRA/TurboVec executors.
+- [x] Model SOM/KMeans as routing only; KNN remains candidate retrieval.
+- [x] Encode graph fanout as a bounded post-narrowing plan with seed count, depth and relation allowlist.
+- [x] Default cuGraph execution off until runtime/parity is proven; Neo4j is a bounded projection executor, not truth.
+- [ ] Bind live Qdrant payload filters for workspace/source/representation/domain/SOM/AST metadata.
+- [ ] Bind live KMeans centroid membership and measure candidate reduction/recall against exact baseline.
+- [ ] Bind Neo4j seed resolution through canonical symbolVersionId/treeNodeId, not filename/string guessing.
+- [ ] Feed global PageRank/PPR/community/path signals into derived ranking features, never an independent fusion vote.
 
-## RLM-ACE-08 — Storage/index experiments after correctness gates
+## RLM-ACE-08 — Structural identity promotion
 
-- [ ] PostgreSQL AIO, pgvector, and bitmap-index work remains proof/benchmark work until runtime ownership/parity is measured.
-- [ ] Qdrant tags/payload filters remain a projection for revision/domain/SOM/AST metadata; do not create a collection per SOM cell/domain/agent.
-- [ ] TurboVec uses the canonical ordinal map; compressed local IDs may not replace packet/symbol identity.
-- [ ] Any bitmap/BitFrost bucket warming must be derived from canonical identity + revisions and be rebuildable.
-- [ ] GPU top-K/KMeans/SOM bindings must consume existing bridge contracts and emit parity/ordinal receipts before production promotion.
+- [x] Add `AstNodeLocatorV1` and separate revision-local `astNodeId`, structural node ID, stable `symbolId`, and revisioned `symbolVersionId` derivations.
+- [x] Extend 8095 TypeScript client contract to preserve optional native IDs, node type, signature, named flag, raw/named AST paths, parent paths/type, child ordinals, depth, and grammar revision.
+- [x] Upgrade normalization to prefer exact grammar+AST-path coordinates and explicitly mark `UPSTREAM_NATIVE` or `SPAN_FALLBACK` when the sidecar has not supplied exact paths.
+- [x] Never use fallback structural coordinates as canonical acceptance proof.
+- [ ] Upgrade the live 8095 Python facade to actually emit grammar revision, signature, named flag, AST child-index paths and parent paths. Current latest-main facade preserves native Consiliency IDs/parent route, but these exact fields still require producer work.
+- [ ] Add canonical persistence resolver: exact existing version -> stable symbol -> approved alias -> structural fingerprint -> AMBIGUOUS/fail closed.
+- [ ] Persist/read back `symbolId <-> symbolVersionId <-> astNodeId <-> packetKey(s)` using existing canonical Postgres/Drizzle owner.
+- [ ] Resolve normalized CALLS/REFERENCES/TYPE/TEST edges to canonical IDs before Neo4j/cuGraph projection.
+
+## RLM-ACE-09 — N-ary hypergraph
+
+- [x] Add `StructuralHyperedgeV1` for genuinely n-ary facts such as call binding, type constraints, diagnostic context, test coverage, ontology assertions and retrieval promotion.
+- [x] Preserve participant role + ordinal; do not destroy n-ary meaning by making pairwise edges the canonical representation.
+- [x] Add focused fixture proof for a five-participant type-constraint hyperedge.
+- [ ] Project hyperedges to Neo4j using event/hyperedge nodes plus participant-role edges for traversal; keep Postgres/OKF event contract canonical.
+- [ ] Add Qdrant payload references to relevant hyperedge/event IDs for filtered semantic retrieval, not full hypergraph truth duplication.
+- [ ] Add hyperedge-derived ranking features: diagnostic overlap, type-constraint proximity, test coverage proximity, event breadth.
+
+## RLM-ACE-10 — Storage/index experiments after correctness gates
+
+- [ ] PostgreSQL AIO, pgvector, and bitmap-index work remains benchmark/proof until ownership/parity is measured.
+- [ ] Qdrant tags/payload filters remain projection metadata; no collection per SOM cell/domain/agent.
+- [ ] TurboVec uses canonical ordinal map; compressed local IDs never replace packet/symbol identity.
+- [ ] Bitmap/BitFrost bucket warming derives from canonical identity + revisions and remains rebuildable.
+- [ ] GPU top-K/KMeans/SOM bindings consume existing bridge contracts and emit parity/ordinal receipts before production promotion.
 
 ## Current safe order
 
 ```text
-AST production owner reachability
-  -> tree_node_id/canonical identity binding
-  -> live revision-qualified QAS feature export
-  -> exact baseline + promotion
-  -> RLM routing receipt
-  -> bounded AST/graph recursion
+8095 exact AST coordinates
+  -> structural identity promotion
+  -> Postgres identity readback
+  -> QAS structural locator
+  -> broad Qdrant/KNN candidate recall
+  -> KMeans/SOM routing hints
+  -> exact sampling/top-k promotion
+  -> bounded Neo4j/hypergraph fanout
+  -> RLM navigation
   -> ContextManifest synthesis prefill
   -> DAG candidates
   -> execution/validation receipt
   -> Kanban recommendation outcome
-  -> ACE/BitFrost measured prefetch and LOD policy
+  -> ACE/BitFrost measured prefetch + LOD policy
 ```
