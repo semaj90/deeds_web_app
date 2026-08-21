@@ -27,6 +27,8 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 - DiskANN/Vamana and HNSW/CAGRA are ANN/index executors, not embedding models.
 - Cross encoders remain a separate joint query-document task; dense MRL does not
   replace them without measured reranker parity.
+- Query-router model comparisons use one immutable dataset and one stable
+  `SHA256(query_id)` 80/10/10 split so model choice cannot change test membership.
 
 ## NLP-0 — inventory existing classifier owners
 
@@ -46,7 +48,7 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
   graph, exact symbol and mutation freshness.
 - [x] Predict bounded candidate / graph-hop / rerank budgets.
 - [x] Classification output has `evidenceAuthority=false`.
-- [ ] Execute schema tests.
+- [ ] Execute schema tests on the workstation.
 
 ## NLP-2 — deterministic query/POS-like feature projection
 
@@ -65,17 +67,30 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 - [x] Freeze source representation `classification_768`.
 - [x] Freeze router representation `classification_mrl_128`.
 - [x] Freeze projection `MRL_PREFIX_TRUNCATE_L2`.
+- [x] Dataset exporter can bind to the proven Ollama executor or an
+  OpenAI-compatible embedding endpoint without changing representation identity.
 - [ ] Produce fixture embeddings with the proven EmbeddingGemma executor.
-- [ ] Verify 128-d norm/digest determinism.
+- [ ] Verify 128-d norm/digest determinism on the exported corpus.
 
-## NLP-4 — router tensor
+## NLP-4 — router tensor / dataset
 
 - [x] Tensor width frozen to 154:
   - 128 EmbeddingGemma classification MRL values
   - 26 deterministic query features
 - [x] Feature contract revision `atlas.query-router-tensor.v1`.
-- [ ] Add dataset exporter from revisioned query/evaluation records.
-- [ ] Reject mixed prompt/model/feature revisions in one training dataset.
+- [x] Add `atlas.query-router-seed.v1` reviewed-label input contract.
+- [x] Add `atlas.query-router-dataset-row.v1` revision-qualified training row.
+- [x] Add `build-query-router-dataset.mts` exporter.
+- [x] Exporter requires query + label revisions and rejects duplicate IDs/text.
+- [x] Exporter verifies native finite 768-d EmbeddingGemma output before deriving
+  `classification_mrl_128` by prefix truncation + L2 normalization.
+- [x] Exporter emits only JSONL + receipt; no Qdrant/Postgres/Valkey writes.
+- [x] Freeze deterministic budget normalization and retrieval-need ordering.
+- [x] Add dataset contract tests.
+- [ ] Execute dataset contract tests.
+- [ ] Produce a reviewed non-toy seed corpus (minimum 30 rows; larger preferred).
+- [ ] Export the frozen corpus and verify one model/prompt/feature revision across
+  all rows.
 
 ## NLP-5 — PyTorch multi-head baseline
 
@@ -84,11 +99,25 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 - [x] Heads: domain, operation, retrieval-needs, budget.
 - [x] Cross entropy for categorical heads; BCE for multi-label needs; bounded
   regression for budgets.
-- [x] AdamW + gradient clipping + deterministic split seed.
+- [x] AdamW + gradient clipping.
+- [x] Replace framework-specific random split with stable
+  `SHA256(query_id)` 80/10/10 train/validation/test membership.
+- [x] Emit test-set probabilities for same-corpus evaluation.
 - [x] Optional ONNX export through `torch.onnx.export(..., dynamo=True)`.
 - [ ] Execute training on a revisioned non-toy dataset.
-- [ ] Add calibration/ECE report.
-- [ ] Compare against the existing XGBoost baseline on the exact same tensor.
+- [ ] Run calibration/ECE evaluation from emitted probabilities.
+
+## NLP-5B — XGBoost same-task baseline
+
+- [x] Add `train-query-router-xgboost.py`.
+- [x] Do **not** reuse the legacy `best_retrieval_lane` labels as the comparison
+  target.
+- [x] Train domain and operation with `multi:softprob`.
+- [x] Train eight retrieval-need probability heads with `binary:logistic`.
+- [x] Train three normalized budget regressors with `reg:squarederror`.
+- [x] Use the identical `SHA256(query_id)` 80/10/10 split as PyTorch.
+- [x] Emit test-set probabilities keyed by query ID.
+- [ ] Execute on the frozen non-toy dataset.
 
 ## NLP-6 — deterministic executor capability policy
 
@@ -165,10 +194,15 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 
 ## NLP-7 — same-corpus router evaluation
 
-- [ ] Freeze query corpus and relevance judgments.
-- [ ] Compare static rules vs legacy XGBoost vs PyTorch MLP.
-- [ ] Metrics:
-  domain macro-F1, operation macro-F1, retrieval-need AUROC/F1, ECE/Brier,
+- [x] Add `evaluate-query-router-models.py`.
+- [x] Evaluator requires exact query-ID parity against the frozen stable test set.
+- [x] Metrics implemented for classifier-only comparison:
+  domain macro-F1, operation macro-F1, retrieval-need F1/AUROC/Brier/ECE,
+  domain/operation ECE and budget MSE.
+- [ ] Freeze reviewed query corpus and relevance judgments.
+- [ ] Execute PyTorch and XGBoost on the exact same frozen dataset.
+- [ ] Add static-rule prediction export using the same test IDs.
+- [ ] Retrieval-level follow-on metrics after shadow execution:
   Recall@10/50/100, MRR, NDCG, exact-promotion rate, execution success,
   stale-evidence rate, p50/p95 latency, CPU/GPU time, tool calls and tokens.
 - [ ] Learned router must beat or materially simplify the static policy before
@@ -192,10 +226,21 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 
 ```bash
 cd sveltekit-frontend
-npx vitest run src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts
+
+npx vitest run \
+  src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts \
+  src/lib/server/atlas/neural-routing/query-router-dataset-v1.spec.ts
+
 python scripts/atlas/train-query-router-pytorch.py --help
+python scripts/atlas/train-query-router-xgboost.py --help
+python scripts/atlas/evaluate-query-router-models.py --help
+
+# Seed contract only — no embedding calls or artifact writes
+npx tsx scripts/atlas/build-query-router-dataset.mts \
+  --input <reviewed-seeds.jsonl> \
+  --dry-run
 ```
 
-Training remains blocked until a revision-qualified JSONL dataset exists.
-No Qdrant, Postgres, Valkey, Graphify, ANN index, model-residency or canonical
-writes are authorized by this change.
+Actual corpus export/training remains blocked until a reviewed revision-qualified
+seed JSONL exists. No Qdrant, Postgres, Valkey, Graphify, ANN index,
+model-residency or canonical writes are authorized by this change.
