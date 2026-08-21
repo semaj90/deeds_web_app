@@ -54,9 +54,11 @@ export function compileRetrievalFeatureRowV1(input: {
     if (!evidenceRefs.length) {
       throw new Error(`RETRIEVAL_FEATURE_PROVENANCE_MISSING:${input.candidate.packet_key}:${featureName}`);
     }
-    const disallowed = evidenceRefs.filter((ref) => !definition.allowedEvidenceKinds.includes(ref.evidenceKind));
-    if (disallowed.length) {
-      throw new Error(`RETRIEVAL_FEATURE_EVIDENCE_KIND_NOT_ALLOWED:${input.candidate.packet_key}:${featureName}:${disallowed[0].evidenceKind}`);
+    if (present) {
+      const disallowed = evidenceRefs.filter((ref) => !definition.allowedEvidenceKinds.includes(ref.evidenceKind));
+      if (disallowed.length) {
+        throw new Error(`RETRIEVAL_FEATURE_EVIDENCE_KIND_NOT_ALLOWED:${input.candidate.packet_key}:${featureName}:${disallowed[0].evidenceKind}`);
+      }
     }
     return {
       featureName,
