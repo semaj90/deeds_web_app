@@ -9,9 +9,11 @@ This addendum extends the package-owned temporal action ledger. It does not crea
 ```text
 packages/parent-atlas/src/core/temporal-action-recommendation-runtime.ts
 packages/parent-atlas/src/core/temporal-action-recommendation-runtime.spec.ts
+sveltekit-frontend/src/lib/server/atlas/temporal/temporal-tool-execution-boundary.ts
+sveltekit-frontend/src/lib/server/atlas/temporal/temporal-tool-execution-boundary.spec.ts
 ```
 
-The package export surface now exposes this runtime through `packages/parent-atlas/src/index.ts`.
+The package export surface exposes the recommendation runtime through `packages/parent-atlas/src/index.ts`.
 
 ## ACT-08 — OpenSpec task/action linkage
 
@@ -100,21 +102,86 @@ expensive early SYNTHESIZE
 
 ACT-09 cannot be marked PROVEN until the runtime consumes a frozen durable action-history fixture and its recommendation receipt is compared against observed downstream execution outcomes.
 
+## ACT-EXEC-01 — pre-tool temporal DRY boundary
+
+Implementation state: **IMPLEMENTED_UNPROVEN**
+
+The live LangGraph tool path is:
+
+```text
+langgraph-dag.ts
+  -> executeTool(call, ctx)
+  -> temporal-tool-execution-boundary.ts   when ctx.temporalAction is present
+  -> build existing ActionExecutionKey
+  -> Postgres currentByExecutionKey
+  -> existing decideExecutionReuse
+  -> disposition
+       REUSE_RESULT
+       SELECT_ALTERNATIVE
+       DISPATCH_RETRY
+       DISPATCH_RECOMPUTE
+       DISPATCH_EXECUTE
+  -> original tool implementation only for DISPATCH_* dispositions
+```
+
+This is intentionally an executor seam, not another action contract. It consumes the package-owned `ActionExecutionDescriptorV1`, `ActionCurrentProjectionV1`, `ExecutionReuseDecisionV1`, retry policy and Postgres repository.
+
+`buildTemporalToolInputHash()` binds reuse to the exact tool name + exact tool arguments. `buildTemporalToolExecutionContext()` computes that hash from the concrete call while requiring the producer to supply all revision coordinates and authority explicitly from their real owners.
+
+Temporal mode is opt-in through `ctx.temporalAction` until revision-owner/runtime proof is complete. Legacy tool callers remain unchanged when no temporal context is supplied.
+
+Once temporal mode is supplied, the boundary is fail-closed:
+
+```text
+history lookup failure
+schema mismatch
+expected tool mismatch
+input hash mismatch
+missing reusable result_ref
+
+=> do not silently fall through to tool execution
+```
+
+An exact finalized success becomes `REUSE_RESULT` and the underlying tool is not called. An exact finalized non-retryable failure becomes `SELECT_ALTERNATIVE` and the underlying tool is not called. A bounded retry, invalidated world state, or new execution remains dispatchable under the existing DRY policy.
+
+The generic agent chat route is not automatically enrolled because it does not currently carry canonical workspace/source revision authority. Query hashes, user IDs, session IDs and timestamps are not accepted as revision owners.
+
+The distributed agent worker already forwards its `ctx` payload into `runAgentDAG()`, so an authoritative workflow producer can carry the temporal context through the existing transport without the worker minting revision authority.
+
+ACT-EXEC-01 cannot be marked PROVEN until a real revision-qualified workflow action demonstrates:
+
+```text
+first delivery
+  no history -> DISPATCH_EXECUTE -> tool runs -> durable FINALIZED event
+
+second identical delivery
+  exact PROVEN revisions -> REUSE_RESULT or SELECT_ALTERNATIVE -> tool does not run
+
+changed relevant revision
+  changed execution key / invalidation -> tool may run
+
+UNPROVEN relevant revision
+  never REUSE_RESULT
+```
+
 ## Safety / authority boundary
 
 This tranche does not change the revision fail-closed rule.
 
 Cross-session result reuse still requires all relevant revision coordinates to be `PROVEN` and non-null. Historical recommendation features may summarize past outcomes, but they cannot convert `UNPROVEN` revision lineage into reusable truth.
 
-No production Postgres migration, queue mutation, Qdrant mutation, Valkey mutation, Graphify canonical write, task-file mutation, Arrow index promotion, ACE learning update, automatic tool dispatch or recommendation-following behavior is authorized by this addendum.
+No production Postgres migration, queue mutation, Qdrant mutation, Valkey mutation, Graphify canonical write, task-file mutation, Arrow index promotion, ACE learning update, or automatic enrollment of unqualified tool calls is authorized by this addendum.
 
 ## Next proof order
 
 1. Run package build and focused temporal ledger/recommendation Vitest suites.
-2. Run filesystem JSONL checksum/replay proof.
-3. Apply the manual action-ledger migration only in the intended non-production database.
-4. Prove Postgres append/readback/idempotency and JSONL ↔ Postgres `ActionCurrentProjectionV1` parity.
-5. Prove the hypergraph adapter on a real finalized action with PROVEN workspace/source and explicit representation revision.
-6. Link one real OpenSpec task revision through `OpenSpecActionLinkV1` and read it back.
-7. Build historical aggregates from that frozen action corpus and generate `NextActionRecommendationV1`.
-8. Record `RecommendationOutcomeReceiptV1` after execution; only then begin policy-quality evaluation or a Tang-inspired shortlist experiment.
+2. Run the focused `temporal-tool-execution-boundary.spec.ts` plus existing `tool-shim.spec.ts` legacy-compatibility proof.
+3. Run filesystem JSONL checksum/replay proof.
+4. Apply the manual action-ledger migration only in the intended non-production database.
+5. Prove Postgres append/readback/idempotency and JSONL ↔ Postgres `ActionCurrentProjectionV1` parity.
+6. Prove the hypergraph adapter on a real finalized action with PROVEN workspace/source and explicit representation revision.
+7. Link one real OpenSpec task revision through `OpenSpecActionLinkV1` and read it back.
+8. Build historical aggregates from that frozen action corpus and generate `NextActionRecommendationV1`.
+9. Record `RecommendationOutcomeReceiptV1` after execution.
+10. Run one real revision-qualified tool action through ACT-EXEC-01 twice and prove the second identical delivery does not call the tool.
+11. Only after those receipts pass should automatic temporal enrollment, policy-quality evaluation, Arrow action indexes, ACE procedural lessons, or a Tang-inspired shortlist experiment begin.
