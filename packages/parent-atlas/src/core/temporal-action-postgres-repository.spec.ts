@@ -5,12 +5,13 @@ import { createTemporalActionPostgresRepository } from './temporal-action-postgr
 
 const HASH = 'a'.repeat(64);
 
-function makeEvent(sequence = 1) {
+function makeEvent(sequence = 1, overrides: { state?: 'FINALIZED' | 'STARTED'; workflowId?: string } = {}) {
+  const finalized = overrides.state !== 'STARTED';
   return buildAgentActionEvent({
-    event_id: `workflow:w1:1:${sequence}`,
+    event_id: `workflow:${overrides.workflowId ?? 'w1'}:1:${sequence}`,
     ledger_sequence: sequence,
     workflow_action: {
-      workflow_id: 'w1',
+      workflow_id: overrides.workflowId ?? 'w1',
       workflow_revision: 1,
       action_id: 'a1',
       sequence,
@@ -28,7 +29,7 @@ function makeEvent(sequence = 1) {
       parameter_revision: 'params-v1',
       context_manifest_hash: null,
       applicability: {
-        observed_at: `2026-08-21T18:00:0${sequence}.000Z`,
+        observed_at: `2026-08-21T18:00:${String(sequence).padStart(2, '0')}.000Z`,
         valid_time: { from: null, to: null },
         workspace_revision: { value: 'workspace:123', authority: 'PROVEN', evidence_refs: [] },
         source_revision: { value: 'source:456', authority: 'PROVEN', evidence_refs: [] },
@@ -37,14 +38,14 @@ function makeEvent(sequence = 1) {
         evidence_frontier_hash: null,
       },
     },
-    state: 'FINALIZED',
-    outcome: 'SUCCESS_EXACT',
-    result_ref: 'artifact:result-1',
+    state: finalized ? 'FINALIZED' : 'STARTED',
+    outcome: finalized ? 'SUCCESS_EXACT' : null,
+    result_ref: finalized ? `artifact:result-${sequence}` : null,
     error_code: null,
-    evidence_refs: ['evidence:1'],
-    artifact_refs: ['artifact:result-1'],
+    evidence_refs: [`evidence:${sequence}`],
+    artifact_refs: finalized ? [`artifact:result-${sequence}`] : [],
     cost: { latency_ms: 12, gpu_bytes: null, tokens: 0, tool_calls: 1 },
-    observed_at: `2026-08-21T18:00:0${sequence}.000Z`,
+    observed_at: `2026-08-21T18:00:${String(sequence).padStart(2, '0')}.000Z`,
     producer_revision: 'temporal-test-v1',
   });
 }
@@ -141,5 +142,82 @@ describe('temporal action postgres repository', () => {
     expect(current?.latest_outcome).toBe('SUCCESS_EXACT');
     expect(receipt.event_count).toBe(1);
     expect(receipt.projection_checksum).toBe(current?.projection_checksum);
+  });
+
+  it('reads bounded finalized history and normalizes newest-first SQL rows into deterministic ledger order', async () => {
+    const e1 = makeEvent(1);
+    const e2 = makeEvent(2);
+    const e3 = makeEvent(3);
+    const calls: Array<{ text: string; values?: any[] }> = [];
+    const db = {
+      async query(text: string, values?: any[]) {
+        calls.push({ text, values });
+        return {
+          rowCount: 3,
+          rows: [e3, e2, e1].map((event) => ({
+            event_id: event.event_id,
+            event_checksum: event.event_checksum,
+            event_json: event,
+          })),
+        };
+      },
+    } as any;
+
+    const { events, receipt } = await createTemporalActionPostgresRepository(db).listRecentFinalized({
+      limit: 3,
+      producer_revision: 'history-test-v1',
+    });
+
+    expect(calls[0]?.text).toContain("WHERE state = 'FINALIZED'");
+    expect(calls[0]?.text).toContain('LIMIT $1');
+    expect(calls[0]?.values).toEqual([3]);
+    expect(events.map((event) => event.ledger_sequence)).toEqual([1, 2, 3]);
+    expect(receipt).toMatchObject({
+      event_count: 3,
+      limit: 3,
+      workflow_id: null,
+      oldest_ledger_sequence: 1,
+      newest_ledger_sequence: 3,
+    });
+  });
+
+  it('uses the indexed workflow filter when recommendation history is workflow-scoped', async () => {
+    const event = makeEvent(4, { workflowId: 'wf:scoped' });
+    const calls: Array<{ text: string; values?: any[] }> = [];
+    const db = {
+      async query(text: string, values?: any[]) {
+        calls.push({ text, values });
+        return {
+          rowCount: 1,
+          rows: [{ event_id: event.event_id, event_checksum: event.event_checksum, event_json: event }],
+        };
+      },
+    } as any;
+
+    const { receipt } = await createTemporalActionPostgresRepository(db).listRecentFinalized({
+      workflow_id: 'wf:scoped',
+      limit: 64,
+      producer_revision: 'history-test-v1',
+    });
+
+    expect(calls[0]?.text).toContain('AND workflow_id = $1');
+    expect(calls[0]?.values).toEqual(['wf:scoped', 64]);
+    expect(receipt.workflow_id).toBe('wf:scoped');
+  });
+
+  it('rejects non-finalized rows from the history read even if the storage query returned them', async () => {
+    const started = makeEvent(5, { state: 'STARTED' });
+    const db = {
+      async query() {
+        return {
+          rowCount: 1,
+          rows: [{ event_id: started.event_id, event_checksum: started.event_checksum, event_json: started }],
+        };
+      },
+    } as any;
+
+    await expect(createTemporalActionPostgresRepository(db).listRecentFinalized({
+      producer_revision: 'history-test-v1',
+    })).rejects.toThrow('TEMPORAL_HISTORY_NON_FINALIZED_READBACK');
   });
 });
