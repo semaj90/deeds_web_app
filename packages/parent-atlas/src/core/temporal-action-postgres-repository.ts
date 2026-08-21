@@ -66,6 +66,19 @@ function parseEventRow(row: EventRow): AgentActionEventV1 {
  */
 export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Queryable) {
   const queryable = db as Queryable;
+
+  async function listByExecutionKey(executionKey: string): Promise<AgentActionEventV1[]> {
+    checksum.parse(executionKey);
+    const result = await queryable.query<EventRow>(
+      `SELECT event_id, event_checksum, event_json
+         FROM atlas_agent_action_events
+        WHERE execution_key = $1
+        ORDER BY ledger_sequence ASC, event_id ASC`,
+      [executionKey],
+    );
+    return result.rows.map(parseEventRow);
+  }
+
   return {
     async append(eventInput: AgentActionEventV1, producerRevision: string): Promise<TemporalActionAppendReceiptV1> {
       const event = agentActionEventSchema.parse(eventInput);
@@ -125,23 +138,13 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
       });
     },
 
-    async listByExecutionKey(executionKey: string): Promise<AgentActionEventV1[]> {
-      checksum.parse(executionKey);
-      const result = await queryable.query<EventRow>(
-        `SELECT event_id, event_checksum, event_json
-           FROM atlas_agent_action_events
-          WHERE execution_key = $1
-          ORDER BY ledger_sequence ASC, event_id ASC`,
-        [executionKey],
-      );
-      return result.rows.map(parseEventRow);
-    },
+    listByExecutionKey,
 
     async currentByExecutionKey(executionKey: string, producerRevision: string): Promise<{
       current: ActionCurrentProjectionV1 | null;
       receipt: TemporalActionLookupReceiptV1;
     }> {
-      const events = await this.listByExecutionKey(executionKey);
+      const events = await listByExecutionKey(executionKey);
       const current = events.length ? actionCurrentProjectionSchema.parse(projectActionCurrent(events)) : null;
       return {
         current,
