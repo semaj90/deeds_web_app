@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Run Parent Atlas aligned-snapshot experiment v2 and emit proof envelope.
 
-When Qdrant is enabled, a preflight exact-store alignment gate compares Qdrant
-`exact=true` Top-K against the frozen PyTorch FP32 exact oracle. HNSW evaluation
-is not allowed to proceed when that gate fails, because excellent ANN-vs-local-
-exact recall on a stale collection is not evidence that the service matches the
-frozen experiment snapshot.
+Qdrant is evaluated through an explicit same-corpus scope before the base
+experiment. `snapshot_subset` (the default) filters BOTH Qdrant exact and HNSW
+to frozen canonical IDs. `full_collection` is allowed only when the exact gate
+proves the frozen snapshot represents the full service corpus.
 """
 
 from __future__ import annotations
@@ -15,6 +14,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_ROOT = ROOT / "python"
@@ -23,7 +23,7 @@ if str(PYTHON_ROOT) not in sys.path:
 
 from atlas_compute.aligned_snapshot_experiment_v2 import run_aligned_snapshot_experiment_v2
 from atlas_compute.gpu_memory import GpuMemorySampler
-from atlas_compute.qdrant_exact_alignment import compare_pytorch_and_qdrant_exact
+from atlas_compute.qdrant_scoped_ann import evaluate_qdrant_scoped_ann
 from atlas_compute.semantic_snapshot_freeze import load_and_verify_frozen_snapshot
 
 
@@ -42,7 +42,7 @@ def main() -> int:
     parser.add_argument("--spec", required=True)
     parser.add_argument("--output", default="reports/aligned-snapshot-experiment-v2.json")
     parser.add_argument("--envelope", default="reports/aligned-snapshot-proof-envelope-v2.json")
-    parser.add_argument("--qdrant-alignment", default="reports/qdrant-exact-alignment.json")
+    parser.add_argument("--qdrant-scoped-ann", default="reports/qdrant-scoped-ann.json")
     parser.add_argument("--gpu-device", type=int, default=0)
     args = parser.parse_args()
 
@@ -50,7 +50,7 @@ def main() -> int:
     spec_path = Path(args.spec).resolve()
     output = Path(args.output).resolve()
     envelope_path = Path(args.envelope).resolve()
-    qdrant_alignment_path = Path(args.qdrant_alignment).resolve()
+    qdrant_receipt_path = Path(args.qdrant_scoped_ann).resolve()
 
     semantic, manifest = load_and_verify_frozen_snapshot(semantic_manifest)
     spec = json.loads(spec_path.read_text(encoding="utf-8"))
@@ -64,10 +64,11 @@ def main() -> int:
     k = int(spec.get("k") or 10)
     torch_device = str(spec.get("torch_device") or "cpu")
 
-    qdrant_alignment = None
+    qdrant_scoped_ann = None
     qdrant_cfg = spec.get("qdrant")
     if isinstance(qdrant_cfg, dict) and qdrant_cfg.get("enabled", False):
-        qdrant_alignment = compare_pytorch_and_qdrant_exact(
+        qdrant_cfg = {**qdrant_cfg, "comparison_scope": str(qdrant_cfg.get("comparison_scope") or "snapshot_subset")}
+        qdrant_scoped_ann = evaluate_qdrant_scoped_ann(
             semantic,
             canonical_ids,
             query_ordinals,
@@ -76,28 +77,48 @@ def main() -> int:
             qdrant=qdrant_cfg,
             torch_device=torch_device,
         )
-        qdrant_alignment_path.parent.mkdir(parents=True, exist_ok=True)
-        qdrant_alignment_path.write_text(
-            json.dumps(qdrant_alignment.to_dict(), indent=2, sort_keys=True) + "\n",
+        qdrant_receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        qdrant_receipt_path.write_text(
+            json.dumps(qdrant_scoped_ann.to_dict(), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        if qdrant_alignment.status != "ALIGNED":
+        if qdrant_scoped_ann.exact_alignment_status != "ALIGNED":
             print(json.dumps({
                 "status": "BLOCKED_QDRANT_EXACT_STORE_MISMATCH",
-                "qdrant_exact_alignment": qdrant_alignment.to_dict(),
-                "reason": "HNSW evaluation is blocked until Qdrant exact Top-K aligns with the frozen PyTorch exact oracle.",
+                "qdrant_scoped_ann": qdrant_scoped_ann.to_dict(),
+                "reason": "HNSW evaluation is blocked until Qdrant exact Top-K aligns with the same frozen corpus as PyTorch exact.",
             }, indent=2, sort_keys=True))
             return 3
+
+    # The v2 runner still contains an older unscoped Qdrant stage. When the
+    # proof CLI owns Qdrant, disable that duplicate stage and carry the scoped
+    # exact+HNSW result in the proof envelope instead.
+    effective_spec = dict(spec)
+    if qdrant_scoped_ann is not None:
+        effective_spec["qdrant"] = {**dict(qdrant_cfg), "enabled": False}
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", encoding="utf-8", delete=False) as handle:
+        json.dump(effective_spec, handle, sort_keys=True)
+        effective_spec_path = Path(handle.name)
 
     sampler = GpuMemorySampler(device_index=args.gpu_device).start()
     try:
         receipt = run_aligned_snapshot_experiment_v2(
             semantic_manifest_path=semantic_manifest,
-            experiment_spec_path=spec_path,
+            experiment_spec_path=effective_spec_path,
             output_path=output,
         )
     finally:
         memory_receipt = sampler.stop()
+        effective_spec_path.unlink(missing_ok=True)
+
+    expected_order_checksum = str(manifest.get("canonical_order_checksum") or "")
+    if not expected_order_checksum:
+        raise RuntimeError("semantic manifest has no canonical_order_checksum")
+    if receipt.semantic_canonical_order_checksum != expected_order_checksum:
+        raise RuntimeError("SEMANTIC_CANONICAL_ORDER_RECEIPT_MISMATCH")
+    if receipt.aligned_feature_row_identity_checksum != expected_order_checksum:
+        raise RuntimeError("FEATURE_ALIGNMENT_CANONICAL_ORDER_MISMATCH")
 
     envelope_without_checksum = {
         "schema": "atlas.aligned-snapshot-proof-envelope.v2",
@@ -108,9 +129,9 @@ def main() -> int:
         "experiment_output_path": str(output),
         "experiment_output_file_checksum": sha256_file(output),
         "experiment_output_checksum": receipt.output_checksum,
-        "qdrant_exact_alignment": qdrant_alignment.to_dict() if qdrant_alignment else None,
-        "qdrant_exact_alignment_file": str(qdrant_alignment_path) if qdrant_alignment else None,
-        "qdrant_exact_alignment_file_checksum": sha256_file(qdrant_alignment_path) if qdrant_alignment else None,
+        "qdrant_scoped_ann": qdrant_scoped_ann.to_dict() if qdrant_scoped_ann else None,
+        "qdrant_scoped_ann_file": str(qdrant_receipt_path) if qdrant_scoped_ann else None,
+        "qdrant_scoped_ann_file_checksum": sha256_file(qdrant_receipt_path) if qdrant_scoped_ann else None,
         "gpu_memory": memory_receipt.to_dict(),
         "canonical_authority": False,
     }
@@ -131,11 +152,19 @@ def main() -> int:
             "row_count": receipt.row_count,
             "aligned_feature_columns": receipt.aligned_feature_columns,
             "pytorch_cuvs_exact_topk_overlap": receipt.pytorch_cuvs_exact_topk_overlap,
-            "pytorch_qdrant_exact_topk_overlap": qdrant_alignment.mean_overlap_at_k if qdrant_alignment else None,
             "cagra_recall_at_k": receipt.cagra_recall_at_k,
-            "qdrant_hnsw_best_recall_at_k": receipt.qdrant_hnsw_best_recall_at_k,
-            "cuvs_cagra": receipt.stages.get("cuvs_exact_cagra", {}).get("status"),
-            "qdrant_hnsw": receipt.stages.get("qdrant_hnsw", {}).get("status"),
+            "qdrant_exact_overlap_at_k": (
+                qdrant_scoped_ann.pytorch_qdrant_exact_mean_overlap_at_k if qdrant_scoped_ann else None
+            ),
+            "qdrant_hnsw_best_recall_at_k": (
+                qdrant_scoped_ann.best_hnsw_recall_at_k if qdrant_scoped_ann else None
+            ),
+            "qdrant_recommended_hnsw_ef": (
+                qdrant_scoped_ann.recommended_hnsw_ef if qdrant_scoped_ann else None
+            ),
+            "qdrant_comparison_scope": (
+                qdrant_scoped_ann.comparison_scope if qdrant_scoped_ann else None
+            ),
             "soft_kmeans": receipt.stages.get("soft_kmeans", {}).get("status"),
             "som": receipt.stages.get("som", {}).get("status"),
             "nary_sparse": receipt.stages.get("nary_sparse", {}).get("status"),
@@ -143,7 +172,7 @@ def main() -> int:
             "context_retrieval": receipt.context_retrieval.get("status"),
             "nary_retrieval": receipt.nary_retrieval.get("status"),
         },
-        "qdrant_exact_alignment": qdrant_alignment.to_dict() if qdrant_alignment else None,
+        "qdrant_scoped_ann": qdrant_scoped_ann.to_dict() if qdrant_scoped_ann else None,
         "gpu_memory": memory_receipt.to_dict(),
         "proof_envelope": str(envelope_path),
     }
