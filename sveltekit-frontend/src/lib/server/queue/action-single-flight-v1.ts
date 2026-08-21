@@ -43,6 +43,10 @@ type LeaseRow = {
   lease_expires_at: Date | string;
 };
 
+type LockedLeaseRow = LeaseRow & {
+  lease_is_live: boolean;
+};
+
 type ReceiptRow = {
   action_key: string;
   fencing_token: string | number | bigint;
@@ -166,7 +170,8 @@ export async function claimActionWork(opts: {
  * Persist the immutable successful output only if this worker still owns the
  * exact current fencing token. The lease row is locked through receipt insert,
  * so a replacement worker cannot increment the token concurrently with a stale
- * completion.
+ * completion. Lease liveness is evaluated by the same PostgreSQL clock that
+ * owns the lease timestamps, avoiding app/DB clock-skew decisions.
  *
  * If an earlier delivery already completed the same ActionKey, return that
  * existing immutable receipt instead of recomputing or overwriting it.
@@ -184,8 +189,9 @@ export async function completeActionWork(opts: {
     const existingBeforeLock = await getReceiptWith(tx, opts.actionKey);
     if (existingBeforeLock) return existingBeforeLock;
 
-    const leaseResult = await tx.execute<LeaseRow>(sql`
-      SELECT action_key, lease_owner, fencing_token, lease_expires_at
+    const leaseResult = await tx.execute<LockedLeaseRow>(sql`
+      SELECT action_key, lease_owner, fencing_token, lease_expires_at,
+             (lease_expires_at > NOW()) AS lease_is_live
       FROM workflow_action_leases
       WHERE action_key = ${opts.actionKey}
       FOR UPDATE
@@ -196,7 +202,7 @@ export async function completeActionWork(opts: {
       lease &&
       lease.lease_owner === opts.leaseOwner &&
       String(lease.fencing_token) === opts.fencingToken &&
-      new Date(lease.lease_expires_at).getTime() > Date.now();
+      lease.lease_is_live === true;
 
     if (!ownsCurrentFence) {
       const existingAfterLock = await getReceiptWith(tx, opts.actionKey);
