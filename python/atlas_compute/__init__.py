@@ -38,6 +38,12 @@ from .qdrant_exact_alignment import (
     compare_pytorch_and_qdrant_exact,
     compare_sidecar_and_qdrant_exact,
 )
+from .qdrant_scoped_ann import (
+    QdrantScopedAnnReceipt,
+    QdrantScopedSweepPoint,
+    build_same_corpus_filter,
+    evaluate_qdrant_scoped_ann,
+)
 from .rapids_matrix import (
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
