@@ -233,10 +233,19 @@ export function assertTorchExecutionReceiptsComparableV1(
 }
 
 export function buildTorchModelExecutionReceiptV1(input: Omit<TorchModelExecutionReceiptV1, 'schema' | 'executionRevision' | 'receiptSha256' | 'evidenceAuthority' | 'canonicalOwnerChanged' | 'logicalLaneVoteAdded'>): TorchModelExecutionReceiptV1 {
+  const {
+    schema: _schema,
+    executionRevision: _executionRevision,
+    receiptSha256: _receiptSha256,
+    evidenceAuthority: _evidenceAuthority,
+    canonicalOwnerChanged: _canonicalOwnerChanged,
+    logicalLaneVoteAdded: _logicalLaneVoteAdded,
+    ...payload
+  } = input as TorchModelExecutionReceiptV1;
   const preimage = {
     schema: 'atlas.torch-model-execution-receipt.v1' as const,
     executionRevision: TORCH_MODEL_EXECUTION_REVISION,
-    ...input,
+    ...payload,
     evidenceAuthority: false as const,
     canonicalOwnerChanged: false as const,
     logicalLaneVoteAdded: false as const,
