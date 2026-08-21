@@ -1,13 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { alignedSnapshotExperimentV2Schema } from '../dist/core/aligned-snapshot-experiment.js';
+import {
+  alignedSnapshotExperimentV2Schema,
+  alignedSnapshotProofEnvelopeV2Schema,
+  qdrantScopedAnnSchema,
+} from '../dist/core/aligned-snapshot-experiment.js';
 
 const hash = 'a'.repeat(64);
 const lineageHash = 'b'.repeat(64);
 
-test('aligned snapshot v2 separates lineage identity from canonical row-order identity', () => {
-  const value = alignedSnapshotExperimentV2Schema.parse({
+function baseExperiment(overrides = {}) {
+  return {
     schema: 'atlas.aligned-snapshot-experiment.v2',
     experiment_revision: 'exp:1',
     semantic_snapshot_revision: 'workspace:742',
@@ -25,7 +29,7 @@ test('aligned snapshot v2 separates lineage identity from canonical row-order id
     exact_self_exclusion: true,
     pytorch_cuvs_exact_topk_overlap: 1,
     cagra_recall_at_k: 0.98,
-    qdrant_hnsw_best_recall_at_k: 0.97,
+    qdrant_hnsw_best_recall_at_k: null,
     cluster_entropy: 1.2,
     cluster_replay_stability: 1,
     som_quantization_error: 0.2,
@@ -42,80 +46,116 @@ test('aligned snapshot v2 separates lineage identity from canonical row-order id
     aligned_feature_columns: 790,
     output_checksum: hash,
     canonical_authority: false,
-  });
+    ...overrides,
+  };
+}
+
+test('aligned snapshot v2 separates lineage identity from canonical row-order identity', () => {
+  const value = alignedSnapshotExperimentV2Schema.parse(baseExperiment());
   assert.equal(value.semantic_dimensions, 768);
   assert.equal(value.semantic_versioned_row_identity_checksum, lineageHash);
   assert.equal(value.semantic_canonical_order_checksum, value.aligned_feature_row_identity_checksum);
 });
 
 test('aligned snapshot v2 rejects row-order mismatch', () => {
-  assert.throws(() => alignedSnapshotExperimentV2Schema.parse({
-    schema: 'atlas.aligned-snapshot-experiment.v2',
-    experiment_revision: 'exp:1',
-    semantic_snapshot_revision: 'workspace:1',
-    representation_revision: 'semantic_768:r1',
-    semantic_versioned_row_identity_checksum: lineageHash,
-    semantic_canonical_order_checksum: hash,
-    semantic_tensor_checksum: hash,
-    row_count: 3,
-    semantic_dimensions: 768,
-    metric: 'cosine',
-    k: 1,
-    query_ordinals: [0],
-    query_canonical_ids: ['a'],
-    exact_semantic_result_checksum: hash,
-    exact_self_exclusion: true,
-    pytorch_cuvs_exact_topk_overlap: null,
-    cagra_recall_at_k: null,
-    qdrant_hnsw_best_recall_at_k: null,
-    cluster_entropy: null,
-    cluster_replay_stability: null,
-    som_quantization_error: null,
-    som_neighborhood_overlap_at_k: null,
-    sparse_dense: null,
-    context_retrieval: {},
-    nary_retrieval: {},
-    stages: {},
-    aligned_feature_matrix_checksum: hash,
+  assert.throws(() => alignedSnapshotExperimentV2Schema.parse(baseExperiment({
     aligned_feature_row_identity_checksum: 'c'.repeat(64),
-    aligned_feature_columns: 768,
-    output_checksum: hash,
-    canonical_authority: false,
-  }), /preserve the frozen canonical row order/);
+  })), /preserve the frozen canonical row order/);
 });
 
 test('aligned snapshot v2 rejects K that can include self-only overflow', () => {
-  assert.throws(() => alignedSnapshotExperimentV2Schema.parse({
-    schema: 'atlas.aligned-snapshot-experiment.v2',
-    experiment_revision: 'exp:1',
-    semantic_snapshot_revision: 'workspace:1',
-    representation_revision: 'semantic_768:r1',
-    semantic_versioned_row_identity_checksum: lineageHash,
-    semantic_canonical_order_checksum: hash,
-    semantic_tensor_checksum: hash,
+  assert.throws(() => alignedSnapshotExperimentV2Schema.parse(baseExperiment({
     row_count: 2,
-    semantic_dimensions: 768,
-    metric: 'cosine',
     k: 2,
     query_ordinals: [0],
     query_canonical_ids: ['a'],
-    exact_semantic_result_checksum: hash,
-    exact_self_exclusion: true,
-    pytorch_cuvs_exact_topk_overlap: null,
-    cagra_recall_at_k: null,
-    qdrant_hnsw_best_recall_at_k: null,
-    cluster_entropy: null,
-    cluster_replay_stability: null,
-    som_quantization_error: null,
-    som_neighborhood_overlap_at_k: null,
-    sparse_dense: null,
-    context_retrieval: {},
-    nary_retrieval: {},
-    stages: {},
-    aligned_feature_matrix_checksum: hash,
-    aligned_feature_row_identity_checksum: hash,
-    aligned_feature_columns: 768,
-    output_checksum: hash,
+  })), /smaller than row_count/);
+});
+
+test('same-corpus Qdrant receipt can recommend only an eligible ef', () => {
+  const value = qdrantScopedAnnSchema.parse({
+    schema: 'atlas.qdrant-scoped-ann-receipt.v1',
+    comparison_scope: 'snapshot_subset',
+    scoped_corpus_count: 100,
+    scoped_corpus_checksum: hash,
+    collection: 'codebase_chunks_768',
+    vector_name: 'semantic_768',
+    canonical_payload_key: 'canonical_id',
+    metric: 'cosine',
+    k: 10,
+    query_count: 20,
+    minimum_exact_overlap_at_k: 0.99,
+    pytorch_qdrant_exact_mean_overlap_at_k: 1,
+    pytorch_qdrant_exact_minimum_query_overlap_at_k: 1,
+    exact_alignment_status: 'ALIGNED',
+    exact_mean_latency_ms: 5,
+    exact_p95_latency_ms: 7,
+    exact_result_checksum: hash,
+    sweep: [
+      { hnsw_ef: 64, recall_at_k: 0.94, mean_latency_ms: 1.0, p95_latency_ms: 1.3, result_checksum: hash },
+      { hnsw_ef: 128, recall_at_k: 0.98, mean_latency_ms: 1.5, p95_latency_ms: 1.8, result_checksum: hash },
+    ],
+    minimum_hnsw_recall_at_k: 0.95,
+    recommended_hnsw_ef: 128,
+    recommendation_status: 'ELIGIBLE',
+    best_hnsw_recall_at_k: 0.98,
     canonical_authority: false,
-  }), /smaller than row_count/);
+  });
+  assert.equal(value.comparison_scope, 'snapshot_subset');
+  assert.equal(value.recommended_hnsw_ef, 128);
+});
+
+test('proof envelope refuses HNSW certification after exact-store mismatch', () => {
+  const mismatch = {
+    schema: 'atlas.qdrant-scoped-ann-receipt.v1',
+    comparison_scope: 'snapshot_subset',
+    scoped_corpus_count: 100,
+    scoped_corpus_checksum: hash,
+    collection: 'codebase_chunks_768',
+    vector_name: 'semantic_768',
+    canonical_payload_key: 'canonical_id',
+    metric: 'cosine',
+    k: 10,
+    query_count: 20,
+    minimum_exact_overlap_at_k: 0.99,
+    pytorch_qdrant_exact_mean_overlap_at_k: 0.7,
+    pytorch_qdrant_exact_minimum_query_overlap_at_k: 0.5,
+    exact_alignment_status: 'EXACT_STORE_MISMATCH',
+    exact_mean_latency_ms: 5,
+    exact_p95_latency_ms: 7,
+    exact_result_checksum: hash,
+    sweep: [],
+    minimum_hnsw_recall_at_k: 0.95,
+    recommended_hnsw_ef: null,
+    recommendation_status: 'BLOCKED_EXACT_STORE_MISMATCH',
+    best_hnsw_recall_at_k: 0,
+    canonical_authority: false,
+  };
+
+  assert.throws(() => alignedSnapshotProofEnvelopeV2Schema.parse({
+    schema: 'atlas.aligned-snapshot-proof-envelope.v2',
+    semantic_manifest_path: 'snapshot.json',
+    semantic_manifest_file_checksum: hash,
+    experiment_spec_path: 'spec.json',
+    experiment_spec_file_checksum: hash,
+    experiment_output_path: 'result.json',
+    experiment_output_file_checksum: hash,
+    experiment_output_checksum: hash,
+    qdrant_scoped_ann: mismatch,
+    qdrant_scoped_ann_file: 'qdrant.json',
+    qdrant_scoped_ann_file_checksum: hash,
+    gpu_memory: {
+      schema: 'atlas.gpu-memory-receipt.v1',
+      available: false,
+      measurement_source: 'unavailable',
+      measurement_scope: 'none',
+      baseline_bytes: null,
+      peak_bytes: null,
+      peak_delta_bytes: null,
+      sample_count: 0,
+      note: 'fixture',
+    },
+    canonical_authority: false,
+    envelope_checksum: hash,
+  }), /cannot certify HNSW/);
 });
