@@ -1,0 +1,156 @@
+syntax = "proto3";
+package parent_atlas.fabric.v1;
+
+// Transport projection only. Canonical identity/checksums are owned by Atlas
+// TypeScript contracts and must not be derived from serialized protobuf bytes.
+
+message RevisionFence {
+  string workspace_revision = 1;
+  optional string source_revision = 2;
+  optional string graph_revision = 3;
+  optional string representation_revision = 4;
+  optional string feature_revision = 5;
+}
+
+message ArrowLocation {
+  string snapshot_id = 1;
+  uint32 ordinal = 2;
+}
+
+message CudaLocation {
+  string tile_id = 1;
+  optional uint64 byte_offset = 2;
+}
+
+message StoreLocation {
+  string store = 1;
+  string key = 2;
+  optional string collection = 3;
+}
+
+message ArtifactRef {
+  string schema = 1;
+  string artifact_id = 2;
+  optional string canonical_id = 3;
+  string kind = 4;
+  RevisionFence revisions = 5;
+  string checksum = 6;
+  oneof location {
+    ArrowLocation arrow = 10;
+    CudaLocation cuda = 11;
+    StoreLocation store = 12;
+  }
+}
+
+message StructuralCoordinate {
+  optional string symbol_version_id = 1;
+  optional string tree_node_id = 2;
+  optional string node_type = 3;
+  repeated uint32 ast_path = 4;
+  repeated uint32 parent_ast_path = 5;
+  string source_ref = 6;
+  optional uint64 start_byte = 7;
+  optional uint64 end_byte = 8;
+}
+
+message OrdinalCoordinates {
+  optional uint32 semantic_ordinal = 1;
+  optional uint32 graph_ordinal = 2;
+  optional uint32 feature_ordinal = 3;
+  optional uint32 tensor_row_ordinal = 4;
+}
+
+message SmartPacketRef {
+  string packet_id = 1;
+  string packet_key = 2;
+  string canonical_id = 3;
+  RevisionFence revisions = 4;
+  StructuralCoordinate structural = 5;
+  OrdinalCoordinates ordinals = 6;
+  repeated string evidence_refs = 7;
+  optional string instruction_ref = 8;
+  string producer_revision = 9;
+  string content_checksum = 10;
+}
+
+message ResolvePacketRequest {
+  string canonical_id = 1;
+  RevisionFence revisions = 2;
+}
+
+message ResolveBatchRequest {
+  repeated string canonical_ids = 1;
+  RevisionFence revisions = 2;
+}
+
+message TensorBatchRequest {
+  string action_id = 1;
+  string semantic_snapshot_id = 2;
+  string feature_snapshot_id = 3;
+  optional string graph_snapshot_id = 4;
+  repeated uint32 candidate_ordinals = 5;
+  ArtifactRef query_tensor = 6;
+  uint32 top_k = 7;
+  RevisionFence revisions = 8;
+}
+
+message TensorBatchResult {
+  string action_id = 1;
+  ArtifactRef output = 2;
+  repeated uint32 ranked_ordinals = 3;
+  string receipt_id = 4;
+}
+
+message MaterializeTensorRequest {
+  string action_id = 1;
+  ArtifactRef source = 2;
+  string dtype = 3;
+  repeated uint64 shape = 4;
+  RevisionFence revisions = 5;
+}
+
+message ActionRequest {
+  string workflow_id = 1;
+  uint32 workflow_revision = 2;
+  string run_id = 3;
+  string action_id = 4;
+  string dag_node_id = 5;
+  uint32 sequence = 6;
+  repeated ArtifactRef inputs = 7;
+  RevisionFence revisions = 8;
+  string idempotency_key = 9;
+}
+
+message ActionEvent {
+  string workflow_id = 1;
+  string run_id = 2;
+  string action_id = 3;
+  string attempt_id = 4;
+  uint64 sequence = 5;
+  string kind = 6;
+  repeated ArtifactRef outputs = 7;
+  optional string error_code = 8;
+  string emitted_at = 9;
+}
+
+message InsertArtifactRequest {
+  string action_id = 1;
+  ArtifactRef proposal = 2;
+  string idempotency_key = 3;
+}
+
+message InsertionReceipt {
+  string action_id = 1;
+  string artifact_id = 2;
+  string status = 3;
+  string checksum = 4;
+}
+
+service AtlasFabricService {
+  rpc ResolvePacket(ResolvePacketRequest) returns (SmartPacketRef);
+  rpc ResolveBatch(ResolveBatchRequest) returns (stream SmartPacketRef);
+  rpc MaterializeTensor(MaterializeTensorRequest) returns (ArtifactRef);
+  rpc ExecuteTensorBatch(TensorBatchRequest) returns (TensorBatchResult);
+  rpc ExecuteWorkflowActions(stream ActionRequest) returns (stream ActionEvent);
+  rpc InsertArtifact(InsertArtifactRequest) returns (InsertionReceipt);
+}
