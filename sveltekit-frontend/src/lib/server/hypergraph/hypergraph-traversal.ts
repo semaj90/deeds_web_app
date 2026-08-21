@@ -85,9 +85,15 @@ export async function traverseMultihop(
 }
 
 /**
- * Resource-aware multihop traversal. Bounds are checked during expansion, before
- * the next frontier is queried, so maxEdges/maxMembers/maxTokens/maxMillis limit
- * actual store/query work rather than merely truncating the returned result.
+ * Resource-aware multihop traversal.
+ *
+ * Two invariants matter here:
+ *  1. Bounds are checked during expansion, before the next frontier is queried.
+ *  2. Only members of hyperedges that were actually ADMITTED under the budget
+ *     may seed the next frontier. Returned-but-rejected edges are not evidence.
+ *
+ * Frontier order is deterministic marginal-utility order (activation desc,
+ * member key asc), not alphabetical discovery order.
  */
 export async function traverseMultihopBounded(
   anchorKey: string,
@@ -126,7 +132,6 @@ export async function traverseMultihopBounded(
         break outer;
       }
 
-      // Never ask the backing store for more edges than the remaining edge budget.
       const remainingEdges = Math.max(0, budget.maxEdges - allEdges.size);
       const requestLimit = Math.min(limitPerHop, remainingEdges);
       if (requestLimit <= 0) {
@@ -135,26 +140,46 @@ export async function traverseMultihopBounded(
       }
 
       const { step, edges } = await hop(anchor, h, requestLimit);
+      const admittedMemberKeys = new Set<string>();
+
       for (const edge of edges) {
-        if (allEdges.has(edge.id)) continue;
+        if (allEdges.has(edge.id)) {
+          for (const member of edge.members) admittedMemberKeys.add(member.member_key);
+          continue;
+        }
+
         const nextMembers = memberCount + edge.members.length;
         const nextTokens = estimatedTokens + edgeTokenEstimate(edge);
-        if (allEdges.size + 1 > budget.maxEdges) { exhaustedBy.push('edges'); break outer; }
-        if (nextMembers > budget.maxMembers) { exhaustedBy.push('members'); break outer; }
-        if (nextTokens > budget.maxTokens) { exhaustedBy.push('tokens'); break outer; }
+        if (allEdges.size + 1 > budget.maxEdges) {
+          exhaustedBy.push('edges');
+          break outer;
+        }
+        if (nextMembers > budget.maxMembers) {
+          exhaustedBy.push('members');
+          break outer;
+        }
+        if (nextTokens > budget.maxTokens) {
+          exhaustedBy.push('tokens');
+          break outer;
+        }
+
         allEdges.set(edge.id, edge);
         memberCount = nextMembers;
         estimatedTokens = nextTokens;
+        for (const member of edge.members) admittedMemberKeys.add(member.member_key);
       }
 
+      // Critical: score propagation is filtered by admitted relation evidence.
       for (const [key, score] of Object.entries(step.scores)) {
-        if (visited.has(key)) continue;
+        if (!admittedMemberKeys.has(key) || visited.has(key)) continue;
         mergedScores[key] = Math.max(mergedScores[key] ?? 0, score);
         newCandidates.add(key);
       }
     }
 
-    const newKeys = [...newCandidates].sort();
+    const newKeys = [...newCandidates].sort(
+      (a, b) => (mergedScores[b] ?? 0) - (mergedScores[a] ?? 0) || a.localeCompare(b),
+    );
     steps.push({ hop: h, anchor_key: anchorKey, candidates: newKeys, scores: mergedScores });
     newKeys.forEach((key) => visited.add(key));
     frontier = newKeys;
