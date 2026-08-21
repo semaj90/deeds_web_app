@@ -64,6 +64,7 @@ RLM decides which evidence branch deserves inspection or another model/tool call
 - [x] Model SOM/KMeans as routing only; KNN remains candidate retrieval.
 - [x] Encode graph fanout as a bounded post-narrowing plan with seed count, depth and relation allowlist.
 - [x] Default cuGraph execution off until runtime/parity is proven; Neo4j is a bounded projection executor, not truth.
+- [x] Add `StructuralRoutingDecisionV1` that ranks canonical seeds, selects relevant n-ary hyperedges, and compiles the existing fanout contract without performing live retrieval.
 - [ ] Bind live Qdrant payload filters for workspace/source/representation/domain/SOM/AST metadata.
 - [ ] Bind live KMeans centroid membership and measure candidate reduction/recall against exact baseline.
 - [ ] Bind Neo4j seed resolution through canonical symbolVersionId/treeNodeId, not filename/string guessing.
@@ -85,11 +86,20 @@ RLM decides which evidence branch deserves inspection or another model/tool call
 - [x] Add `StructuralHyperedgeV1` for genuinely n-ary facts such as call binding, type constraints, diagnostic context, test coverage, ontology assertions and retrieval promotion.
 - [x] Preserve participant role + ordinal; do not destroy n-ary meaning by making pairwise edges the canonical representation.
 - [x] Add focused fixture proof for a five-participant type-constraint hyperedge.
+- [x] Add hyperedge-aware structural seed selection; hyperedges participate after candidate narrowing and never replace ordinary AST/CALLS binary edges.
 - [ ] Project hyperedges to Neo4j using event/hyperedge nodes plus participant-role edges for traversal; keep Postgres/OKF event contract canonical.
 - [ ] Add Qdrant payload references to relevant hyperedge/event IDs for filtered semantic retrieval, not full hypergraph truth duplication.
 - [ ] Add hyperedge-derived ranking features: diagnostic overlap, type-constraint proximity, test coverage proximity, event breadth.
 
-## RLM-ACE-10 — Storage/index experiments after correctness gates
+## RLM-ACE-10 — AST relational selection
+
+- [x] Add bounded `AstNodeSelectorV1` / `AstTraversalPlanV1` with parent, child, ancestor, descendant, sibling, calls, called-by, reference, type, test and diagnostic relations.
+- [x] Use named-node-first traversal and explicit max-depth/top-k/visited-node limits; selector relations are query policy, not structural identity.
+- [x] Allow a bounded `has` clause analogous to relational selection without exposing arbitrary recursive Cypher to the RLM.
+- [ ] Compile selector plans against the canonical AST adjacency owner after `astNodeId` persistence/readback is proven.
+- [ ] Measure relation-selection utility from execution receipts before learned edge-picking is promoted.
+
+## RLM-ACE-11 — Storage/index experiments after correctness gates
 
 - [ ] PostgreSQL AIO, pgvector, and bitmap-index work remains benchmark/proof until ownership/parity is measured.
 - [ ] Qdrant tags/payload filters remain projection metadata; no collection per SOM cell/domain/agent.
@@ -108,6 +118,7 @@ RLM decides which evidence branch deserves inspection or another model/tool call
   -> KMeans/SOM routing hints
   -> exact sampling/top-k promotion
   -> bounded Neo4j/hypergraph fanout
+  -> bounded AST relational selection
   -> RLM navigation
   -> ContextManifest synthesis prefill
   -> DAG candidates
