@@ -24,19 +24,26 @@ function eventTypeForAction(event: AgentActionEventV1): AtlasEventType {
   return 'tool_call';
 }
 
-function requireProvenSourceRevision(event: AgentActionEventV1): string {
+function requireProvenRevision(
+  event: AgentActionEventV1,
+  dimension: 'workspace' | 'source',
+): string {
   const applicability = event.descriptor.applicability;
-  const sourceRelevant = applicability.relevant_dimensions.includes('source');
-  if (!sourceRelevant) {
-    throw new Error(`TEMPORAL_HYPERGRAPH_SOURCE_REVISION_NOT_RELEVANT:${event.event_id}`);
+  if (!applicability.relevant_dimensions.includes(dimension)) {
+    throw new Error(
+      `TEMPORAL_HYPERGRAPH_${dimension.toUpperCase()}_REVISION_NOT_RELEVANT:${event.event_id}`,
+    );
   }
-  if (
-    applicability.source_revision.authority !== 'PROVEN' ||
-    applicability.source_revision.value === null
-  ) {
-    throw new Error(`TEMPORAL_HYPERGRAPH_SOURCE_REVISION_UNPROVEN:${event.event_id}`);
+  const coordinate =
+    dimension === 'workspace'
+      ? applicability.workspace_revision
+      : applicability.source_revision;
+  if (coordinate.authority !== 'PROVEN' || coordinate.value === null) {
+    throw new Error(
+      `TEMPORAL_HYPERGRAPH_${dimension.toUpperCase()}_REVISION_UNPROVEN:${event.event_id}`,
+    );
   }
-  return applicability.source_revision.value;
+  return coordinate.value;
 }
 
 function sourceRefForAction(event: AgentActionEventV1): string {
@@ -52,11 +59,14 @@ function sourceRefForAction(event: AgentActionEventV1): string {
  * `atlas.event.hypergraph.v1` remains the event/hypergraph schema owner and
  * `WorkflowActionEventV1` remains workflow/action identity owner. This adapter
  * does not mint either identity family. It projects only FINALIZED temporal
- * observations with a PROVEN source revision because the hypergraph contract
- * requires sourceRevision and must never receive invented lineage.
+ * observations with PROVEN workspace/source revisions because the hypergraph
+ * contract requires both coordinates and must never receive invented lineage.
+ * Representation revision is supplied by the caller from its canonical owner;
+ * parameter_revision is intentionally not reused as a representation revision.
  */
 export function adaptFinalizedTemporalActionToAtlasEvent(input: {
   event: AgentActionEventV1;
+  representationRevision: string;
   canonicalizerRevision: string;
   compilerRevision: string;
 }): AtlasEvent {
@@ -67,8 +77,12 @@ export function adaptFinalizedTemporalActionToAtlasEvent(input: {
   if (event.outcome === null) {
     throw new Error(`TEMPORAL_HYPERGRAPH_OUTCOME_MISSING:${event.event_id}`);
   }
+  if (!input.representationRevision.trim()) {
+    throw new Error(`TEMPORAL_HYPERGRAPH_REPRESENTATION_REVISION_MISSING:${event.event_id}`);
+  }
 
-  const sourceRevision = requireProvenSourceRevision(event);
+  const workspaceRevision = requireProvenRevision(event, 'workspace');
+  const sourceRevision = requireProvenRevision(event, 'source');
   const sourceRef = sourceRefForAction(event);
   const targetId = event.descriptor.target.canonical_id ?? event.descriptor.target.resource!;
 
@@ -78,10 +92,9 @@ export function adaptFinalizedTemporalActionToAtlasEvent(input: {
     sourceRef,
     packetKey: null,
     treeNodeId: null,
-    workspaceRevision:
-      event.descriptor.applicability.workspace_revision.value ?? 'UNPROVEN',
+    workspaceRevision,
     sourceRevision,
-    representationRevision: event.descriptor.parameter_revision,
+    representationRevision: input.representationRevision,
     producerId: 'parent-atlas-temporal-action-ledger',
     producerRevision: event.producer_revision,
     canonicalizerRevision: input.canonicalizerRevision,
