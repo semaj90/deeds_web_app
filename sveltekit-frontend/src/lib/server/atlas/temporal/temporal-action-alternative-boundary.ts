@@ -39,6 +39,7 @@ export const temporalAlternativePlanSchema = z.object({
   history_limit: z.number().int().positive().max(5000).default(512),
   history_scope: z.enum(['WORKFLOW', 'GLOBAL']).default('WORKFLOW'),
   excluded_execution_keys: z.array(checksum).default([]),
+  persist_outcome_receipt: z.boolean().default(false),
   created_at: z.string().datetime(),
   producer_revision: id,
 }).strict();
