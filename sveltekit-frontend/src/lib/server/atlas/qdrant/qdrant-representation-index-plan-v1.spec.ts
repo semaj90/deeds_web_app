@@ -6,20 +6,38 @@ import {
 } from './qdrant-representation-index-plan-v1.js';
 
 describe('QdrantRepresentationIndexPlanV1', () => {
-  it('keeps sparse lexical representations independent from EmbeddingGemma dense vectors', () => {
-    const bm25 = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'bm25');
-    const minicoil = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'minicoil');
-    const semantic = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'semantic_768');
+  it('preserves proven physical dense slots without inventing historical model provenance', () => {
+    const content = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'content');
+    const error = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'error');
+    const signature = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === 'signature');
 
-    expect(semantic?.storage).toBe('DENSE_VECTOR');
-    expect(semantic?.modelFamily).toContain('embeddinggemma');
-    expect(bm25?.storage).toBe('SPARSE_VECTOR');
-    expect(bm25?.derivedFrom).toBeNull();
-    expect(minicoil?.storage).toBe('SPARSE_VECTOR');
-    expect(minicoil?.derivedFrom).toBeNull();
+    expect(content?.logicalRepresentation).toBe('semantic_768');
+    expect(content?.dimensions).toBe(768);
+    expect(content?.modelFamily).toBe('UNPROVEN_HISTORICAL_MODEL');
+    expect(error?.dimensions).toBe(768);
+    expect(signature?.dimensions).toBe(768);
   });
 
-  it('indexes revision/identity routing fields but not score/cluster feature fields by default', () => {
+  it('keeps BM25, miniCOIL, and SPLADE as independent sparse text representations', () => {
+    for (const name of ['bm25', 'minicoil', 'splade']) {
+      const representation = QDRANT_CODEBASE_768_INDEX_PLAN.representations.find((entry) => entry.name === name);
+      expect(representation?.storage).toBe('SPARSE_VECTOR');
+      expect(representation?.derivedFrom).toBeNull();
+    }
+  });
+
+  it('requires BM25 for target readiness but keeps MRL/miniCOIL/SPLADE optional challengers', () => {
+    const required = new Set(QDRANT_CODEBASE_768_INDEX_PLAN.representations.filter((entry) => entry.requiredForReady).map((entry) => entry.name));
+    expect(required).toContain('content');
+    expect(required).toContain('error');
+    expect(required).toContain('signature');
+    expect(required).toContain('bm25');
+    expect(required).not.toContain('semantic_mrl_512');
+    expect(required).not.toContain('minicoil');
+    expect(required).not.toContain('splade');
+  });
+
+  it('indexes identity/routing fields while refusing score and cluster feature indexes by default', () => {
     const indexed = new Set(QDRANT_CODEBASE_768_INDEX_PLAN.payloadIndexes.filter((field) => field.indexByDefault).map((field) => field.fieldName));
     expect(indexed).toContain('canonical_id');
     expect(indexed).toContain('packet_key');
@@ -30,61 +48,50 @@ describe('QdrantRepresentationIndexPlanV1', () => {
     expect(indexed).not.toContain('kmeans_cluster');
   });
 
-  it('reports READY for an exact schema match', () => {
+  it('reports READY when required schema exists even if optional challengers are absent', () => {
     const drift = compareQdrantSchemaToPlan({
       denseVectors: {
-        semantic_768: { size: 768, distance: 'Cosine' },
-        semantic_mrl_512: { size: 512, distance: 'Cosine' },
+        content: { size: 768, distance: 'Cosine' },
+        error: { size: 768, distance: 'Cosine' },
+        signature: { size: 768, distance: 'Cosine' },
       },
-      sparseVectors: {
-        bm25: { modifier: 'idf' },
-        minicoil: { modifier: 'idf' },
-        splade: { modifier: null },
+      sparseVectors: { bm25: { modifier: 'idf' } },
+      payloadSchema: {
+        canonical_id: 'keyword',
+        packet_key: 'keyword',
       },
-      payloadSchema: Object.fromEntries(
-        QDRANT_CODEBASE_768_INDEX_PLAN.payloadIndexes
-          .filter((field) => field.indexByDefault)
-          .map((field) => [field.fieldName, field.fieldSchema]),
-      ),
     });
     expect(drift.status).toBe('READY');
+    expect(drift.missingOptionalRepresentations).toEqual(['minicoil', 'semantic_mrl_512', 'splade']);
     expect(drift.applyAllowed).toBe(false);
   });
 
-  it('reports CONFIG_DRIFT for a wrong dense dimension before missing fields', () => {
+  it('reports CONFIG_DRIFT for a wrong required dense dimension', () => {
     const drift = compareQdrantSchemaToPlan({
       denseVectors: {
-        semantic_768: { size: 512, distance: 'Cosine' },
+        content: { size: 512, distance: 'Cosine' },
+        error: { size: 768, distance: 'Cosine' },
+        signature: { size: 768, distance: 'Cosine' },
       },
-      sparseVectors: {},
-      payloadSchema: {},
+      sparseVectors: { bm25: { modifier: 'idf' } },
+      payloadSchema: { canonical_id: 'keyword', packet_key: 'keyword' },
     });
     expect(drift.status).toBe('CONFIG_DRIFT');
-    expect(drift.representationConfigDrift).toContain('semantic_768');
-    expect(drift.missingRepresentations).toContain('bm25');
+    expect(drift.representationConfigDrift).toEqual(['content']);
   });
 
-  it('reports TYPE_DRIFT for an indexed payload field with the wrong type', () => {
-    const payloadSchema = Object.fromEntries(
-      QDRANT_CODEBASE_768_INDEX_PLAN.payloadIndexes
-        .filter((field) => field.indexByDefault)
-        .map((field) => [field.fieldName, field.fieldSchema]),
-    );
-    payloadSchema.workspace_revision = 'integer';
+  it('reports MISSING when required BM25 is absent', () => {
     const drift = compareQdrantSchemaToPlan({
       denseVectors: {
-        semantic_768: { size: 768, distance: 'Cosine' },
-        semantic_mrl_512: { size: 512, distance: 'Cosine' },
+        content: { size: 768, distance: 'Cosine' },
+        error: { size: 768, distance: 'Cosine' },
+        signature: { size: 768, distance: 'Cosine' },
       },
-      sparseVectors: {
-        bm25: { modifier: 'idf' },
-        minicoil: { modifier: 'idf' },
-        splade: { modifier: null },
-      },
-      payloadSchema,
+      sparseVectors: {},
+      payloadSchema: { canonical_id: 'keyword', packet_key: 'keyword' },
     });
-    expect(drift.status).toBe('TYPE_DRIFT');
-    expect(drift.payloadTypeDrift).toEqual(['workspace_revision']);
+    expect(drift.status).toBe('MISSING');
+    expect(drift.missingRequiredRepresentations).toEqual(['bm25']);
   });
 
   it('has a stable SHA256 plan digest', () => {
