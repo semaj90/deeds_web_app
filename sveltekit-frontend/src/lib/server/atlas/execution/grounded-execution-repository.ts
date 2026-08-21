@@ -126,7 +126,9 @@ export function createGroundedExecutionRepository(pool: Pool) {
           task_id, run_id, worker, started_at, finished_at,
           success, failure_kind, execution_receipt_id
         ) VALUES ($1,$2,$3,$4::timestamptz,$5::timestamptz,$6,$7,$8)
-        ON CONFLICT (task_id, run_id, execution_receipt_id) DO NOTHING
+        ON CONFLICT (task_id, run_id, execution_receipt_id)
+        WHERE execution_receipt_id IS NOT NULL
+        DO NOTHING
       `, [
         receipt.taskId,
         receipt.runId,
