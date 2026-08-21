@@ -77,6 +77,38 @@ export {
   getPacketFeatureRow,
   normalizeDemandUtility,
 } from './ranking/packet-feature-matrix';
+
+export {
+  ActionLifecycleStateSchema,
+  ActionOutcomeSchema,
+  ActionOpcodeSchema,
+  TemporalApplicabilityV1Schema,
+  AgentActionEventV1Schema,
+  buildActionExecutionKey,
+  buildAgentActionEvent,
+} from './temporal/agent-action-event-v1';
+export type { AgentActionEventV1 } from './temporal/agent-action-event-v1';
+export {
+  ActionCurrentProjectionV1Schema,
+  ExecutionReuseDecisionV1Schema,
+  buildActionCurrentProjection,
+  decideExecutionReuse,
+} from './temporal/temporal-action-index-v1';
+export type {
+  ActionCurrentProjectionV1,
+  ExecutionReuseDecisionV1,
+} from './temporal/temporal-action-index-v1';
+export {
+  ActionFeatureRowV1Schema,
+  NextActionRecommendationV1Schema,
+  RecommendationOutcomeReceiptV1Schema,
+  rankNextActions,
+} from './temporal/next-action-recommendation-v1';
+export type {
+  ActionFeatureRowV1,
+  NextActionRecommendationV1,
+} from './temporal/next-action-recommendation-v1';
+
 export {
   KanbanTaskLaneSchema,
   KanbanTaskStatusSchema,
