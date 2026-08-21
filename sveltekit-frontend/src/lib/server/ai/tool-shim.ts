@@ -105,7 +105,75 @@ export function parseToolCalls(text: string) {
   return [];
 }
 
-export async function executeTool(call: { tool: string; args: any }, context?: any) {
+type ToolExecutionContext = {
+  temporalAction?: unknown;
+  temporalActionBoundary?: unknown;
+  [key: string]: unknown;
+};
+
+/**
+ * Optional temporal execution policy. Existing callers remain unchanged unless
+ * they explicitly supply `context.temporalAction`.
+ *
+ * Once supplied, the temporal gate is mandatory and fail-closed. A lookup or
+ * validation error is allowed to surface rather than silently re-running work.
+ */
+async function applyTemporalBoundary(
+  call: { tool: string; args: any },
+  context?: ToolExecutionContext,
+): Promise<null | { shortCircuit: true; result: unknown }> {
+  if (!context?.temporalAction) return null;
+
+  const {
+    decideTemporalToolExecutionFromPostgres,
+    temporalBoundaryAllowsDispatch,
+  } = await import('../atlas/temporal/temporal-tool-execution-boundary.js');
+
+  const decision = await decideTemporalToolExecutionFromPostgres({
+    call,
+    temporal: context.temporalAction as never,
+  });
+  context.temporalActionBoundary = decision;
+
+  if (temporalBoundaryAllowsDispatch(decision)) return null;
+
+  if (decision.disposition === 'REUSE_RESULT') {
+    return {
+      shortCircuit: true,
+      result: {
+        ok: true,
+        tool: call.tool,
+        temporalDisposition: 'REUSE_RESULT',
+        reused: true,
+        resultRef: decision.reused_result_ref,
+        executionKey: decision.execution_key,
+        priorEventId: decision.prior_event_id,
+        reason: decision.reason,
+        boundaryChecksum: decision.boundary_checksum,
+      },
+    };
+  }
+
+  return {
+    shortCircuit: true,
+    result: {
+      ok: false,
+      tool: call.tool,
+      temporalDisposition: 'SELECT_ALTERNATIVE',
+      reused: false,
+      resultRef: null,
+      executionKey: decision.execution_key,
+      priorEventId: decision.prior_event_id,
+      reason: decision.reason,
+      boundaryChecksum: decision.boundary_checksum,
+    },
+  };
+}
+
+export async function executeTool(call: { tool: string; args: any }, context?: ToolExecutionContext) {
+  const temporal = await applyTemporalBoundary(call, context);
+  if (temporal?.shortCircuit) return temporal.result;
+
   switch (call.tool) {
     case "rg_search":
       {
