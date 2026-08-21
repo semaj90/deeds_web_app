@@ -1,4 +1,6 @@
 export * from './contracts.js';
+export * from './canonical-packet-hash.js';
+export * from './smart-packet-fabric.js';
 export * from './query-classifier.js';
 export * from './retrieval-plan.js';
 export * from './exact-promotion.js';
