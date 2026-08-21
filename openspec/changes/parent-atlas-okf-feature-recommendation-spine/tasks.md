@@ -4,7 +4,7 @@ Status date: 2026-08-21
 
 This change freezes the semantic-evidence -> feature -> recommendation/training
 contract before adding or promoting another reranker. It is additive and
-non-authoritative. It does not change SearchRuntime, canonical identity,
+non-authoritative. It does not change SearchRuntime ranking, canonical identity,
 PostgreSQL/Qdrant/Valkey contents, GPU scheduling, reranker selection, or model
 weights. `WRITTEN != WIRED != PROVEN`.
 
@@ -51,7 +51,13 @@ weights. `WRITTEN != WIRED != PROVEN`.
 - [x] Missing feature = value `0`, `present=false`, explicit absence evidence.
 - [x] Present `NaN/+Inf/-Inf` = hard failure.
 - [x] Present values must use an evidence kind allowed by the feature registry.
-- [ ] Wire current SearchRuntime feature materializers through this compiler in shadow mode.
+- [x] Add `SearchRuntimeShadowCaptureV1` + replay compiler that maps only
+  evidence-backed SearchRuntime lane/revision signals and explicitly rejects
+  degraded identity or representation-revision drift.
+- [x] Do not reinterpret PageRank as `authority_norm`; leave unproven signals
+  absent rather than double-count graph authority.
+- [ ] Wire a live SearchRuntime observer only after replay fixtures pass; live
+  ranking/order must remain unchanged.
 
 ## OKF-FE-03 — derived feature matrix
 
@@ -60,6 +66,8 @@ weights. `WRITTEN != WIRED != PROVEN`.
 - [x] Preserve row canonical IDs, packet keys and deterministic ordinals.
 - [x] Record per-cell evidence refs and matrix checksum.
 - [x] Reject duplicate canonical IDs/packet keys and mixed feature/representation/mapping revisions.
+- [x] Add offline/replayable SearchRuntime shadow corpus builder that emits
+  Float32-LE matrix bytes, masks, row identities, evidence refs and checksums.
 - [ ] Prove byte parity against the existing TORCH feature tensor artifact.
 - [ ] Prove NumPy/PyTorch/LibTorch CPU/CUDA numerical parity over the same bytes.
 
@@ -72,8 +80,17 @@ weights. `WRITTEN != WIRED != PROVEN`.
 - [x] Capture exact-promotion receipt and downstream execution/test/repair outcomes.
 - [x] Allow reviewed human relevance grade and independent label revision.
 - [x] Keep `trainingEligible` explicit and fail on contradictory block reasons.
-- [ ] Build a revision-qualified pair-judgment exporter from existing retrieval/execution receipts.
-- [ ] Produce a non-toy corpus before training AtlasCrossEncoderV1.
+- [x] Add SearchRuntime shadow pair-judgment seed generation; all replay seeds are
+  forcibly `trainingEligible=false` until outcome enrichment.
+- [x] Add `finalizeAtlasPairJudgmentV1`; teacher + exact-promotion + execution
+  evidence must all be durable/receipt-backed before training eligibility.
+- [x] Receipt-backed failed exact promotion/execution remains valid negative
+  training evidence; success is not required for a labeled example.
+- [x] Add `build-search-runtime-shadow-corpus.mts` to emit seed JSONL and matrix
+  manifests without touching runtime ranking or canonical stores.
+- [ ] Add enrichment loader joining actual Mixedbread teacher receipts, exact
+  promotion receipts and execution/test/repair receipts to the seed corpus.
+- [ ] Produce a non-toy revision-qualified corpus before training AtlasCrossEncoderV1.
 
 ## REC-01 — evidence-backed recommendation chain
 
@@ -108,6 +125,7 @@ weights. `WRITTEN != WIRED != PROVEN`.
 
 ## Explicitly deferred
 
+- [ ] Live SearchRuntime shadow observer side effects; replay compiler comes first.
 - [ ] Training/promoting an Atlas-owned cross encoder.
 - [ ] Changing Mixedbread/MiniLM runtime ownership.
 - [ ] Valkey bitmap writes or Stream events.
@@ -125,8 +143,14 @@ npx vitest run \
   src/lib/server/atlas/okf/candidate-feature-registry-v1.spec.ts \
   src/lib/server/atlas/okf/retrieval-feature-row-compiler-v1.spec.ts \
   src/lib/server/atlas/okf/atlas-learning-recommendation-v1.spec.ts \
-  src/lib/server/atlas/okf/recommendation-evidence-adapter-v1.spec.ts
+  src/lib/server/atlas/okf/recommendation-evidence-adapter-v1.spec.ts \
+  src/lib/server/atlas/okf/search-runtime-shadow-v1.spec.ts \
+  src/lib/server/atlas/okf/pair-judgment-finalizer-v1.spec.ts
+
+npx tsx scripts/atlas/build-search-runtime-shadow-corpus.mts \
+  --input=docs/reports/search-runtime-shadow-captures.jsonl \
+  --output-dir=docs/reports/search-runtime-shadow-corpus
 ```
 
-No canonical, PostgreSQL, Qdrant, Valkey, Graphify, model-weight, vector-index or
-GPU scheduler mutation is authorized by this change.
+No canonical, PostgreSQL, Qdrant, Valkey, Graphify, model-weight, vector-index,
+SearchRuntime ranking or GPU scheduler mutation is authorized by this change.
