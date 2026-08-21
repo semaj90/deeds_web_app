@@ -55,6 +55,8 @@ export const EVENT_ROUTING_KEYS = {
   recommendationSignal: 'atlas.event.recommendation.signal',
   policyDecisionReceipt: 'atlas.event.policy.decision.receipt',
   checkpointCommit: 'atlas.event.checkpoint.commit',
+  artifactMaterialized: 'atlas.event.artifact.materialized',
+  artifactFailed: 'atlas.event.artifact.failed',
 } as const;
 
 export type EventRoutingKey = (typeof EVENT_ROUTING_KEYS)[keyof typeof EVENT_ROUTING_KEYS];
