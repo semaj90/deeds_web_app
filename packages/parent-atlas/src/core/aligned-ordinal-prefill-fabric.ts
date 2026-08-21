@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { canonicalJsonChecksum } from './artifact-transport.js';
 import { buildPrefillCacheEntry, type PrefillSynthesisCacheEntryV1 } from './contextual-prefill-fabric.js';
+import {
+  structuralProductionReceiptSchema,
+  structuralReceiptCanPromoteOwnership,
+  type StructuralProductionReceiptV1,
+} from './structural-production-receipt.js';
 import { tensorSnapshotSchema, type TensorSnapshotV1 } from './tensor-snapshot.js';
 
 const id = z.string().min(1);
@@ -46,6 +51,9 @@ export const alignedOrdinalRegistrySchema = z.object({
   if (new Set(value.rows.map((row) => row.canonical_id)).size !== value.rows.length) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rows'], message: 'canonical_id must be unique' });
   }
+  if (new Set(value.projections.map((projection) => projection.kind)).size !== value.projections.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projections'], message: 'projection kind must be unique within one aligned registry' });
+  }
   for (const projection of value.projections) {
     if (projection.row_identity_checksum !== value.row_identity_checksum) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projections'], message: `projection ${projection.projection_id} row identity does not align` });
@@ -63,6 +71,7 @@ export const canonicalStructuralCoordinateSchema = z.object({
   packet_key: id,
   source_ref: z.string().min(1),
   source_revision: revision,
+  source_snapshot_revision: revision,
   tree_node_id: id,
   symbol_version_id: id.nullable().default(null),
   node_type: z.string().min(1),
@@ -71,6 +80,9 @@ export const canonicalStructuralCoordinateSchema = z.object({
   start_byte: z.number().int().nonnegative(),
   end_byte: z.number().int().positive(),
   grammar_revision: revision.nullable().default(null),
+  identity_owner: z.literal('symbol-registry'),
+  symbol_registry_revision: revision,
+  structural_receipt_output_checksum: z.string().min(1),
   canonical_owner_attested: z.literal(true),
   producer_revision: revision,
   canonical_authority: z.literal(false).default(false),
@@ -191,6 +203,26 @@ export function buildAlignedOrdinalRegistry(input: {
   return alignedOrdinalRegistrySchema.parse({ ...body, registry_checksum: canonicalJsonChecksum(body) });
 }
 
+export function buildCanonicalStructuralCoordinate(
+  input: Omit<CanonicalStructuralCoordinateV1, 'schema' | 'source_snapshot_revision' | 'identity_owner' | 'symbol_registry_revision' | 'structural_receipt_output_checksum' | 'canonical_owner_attested' | 'canonical_authority'>,
+  receiptInput: StructuralProductionReceiptV1,
+): CanonicalStructuralCoordinateV1 {
+  const receipt = structuralProductionReceiptSchema.parse(receiptInput);
+  if (!structuralReceiptCanPromoteOwnership(receipt)) {
+    throw new Error('STRUCTURAL_RECEIPT_NOT_ELIGIBLE_FOR_CANONICAL_COORDINATE');
+  }
+  return canonicalStructuralCoordinateSchema.parse({
+    schema: 'atlas.canonical-structural-coordinate.v1',
+    ...input,
+    source_snapshot_revision: receipt.source_snapshot_revision,
+    identity_owner: 'symbol-registry',
+    symbol_registry_revision: receipt.symbol_registry_revision,
+    structural_receipt_output_checksum: receipt.output_checksum,
+    canonical_owner_attested: true,
+    canonical_authority: false,
+  });
+}
+
 export function buildSmartPacketCoordinateRef(input: {
   packet_key: string;
   canonical_id: string;
@@ -201,6 +233,10 @@ export function buildSmartPacketCoordinateRef(input: {
   const registry = alignedOrdinalRegistrySchema.parse(input.registry);
   const row = registry.rows.find((candidate) => candidate.canonical_id === input.canonical_id);
   if (!row) throw new Error(`ORDINAL_CANONICAL_ID_NOT_FOUND:${input.canonical_id}`);
+  const structural = input.structural ? canonicalStructuralCoordinateSchema.parse(input.structural) : null;
+  if (structural && structural.source_snapshot_revision !== registry.source_snapshot_revision) {
+    throw new Error('STRUCTURAL_SOURCE_SNAPSHOT_REVISION_MISMATCH');
+  }
   const byKind = new Map(registry.projections.map((projection) => [projection.kind, projection.artifact_id]));
   const body = {
     schema: 'atlas.smart-packet-coordinate-ref.v1' as const,
@@ -209,7 +245,7 @@ export function buildSmartPacketCoordinateRef(input: {
     registry_revision: registry.registry_revision,
     row_identity_checksum: registry.row_identity_checksum,
     ordinal: row.ordinal,
-    structural: input.structural ? canonicalStructuralCoordinateSchema.parse(input.structural) : null,
+    structural,
     semantic_artifact_id: byKind.get('SEMANTIC') ?? null,
     feature_artifact_id: byKind.get('FEATURE') ?? null,
     graph_artifact_id: byKind.get('GRAPH') ?? null,
