@@ -92,10 +92,12 @@ def main() -> int:
     if len(mask_bytes) != expected_values:
         raise RuntimeError("MASK_BYTE_LENGTH_MISMATCH")
 
-    np_features = np.frombuffer(feature_bytes, dtype="<f4").reshape(
+    # Verify the immutable fixture bytes first, then copy into writable NumPy storage.
+    # torch.from_numpy shares that writable storage; scoring clones it afterward.
+    np_features = np.frombuffer(feature_bytes, dtype="<f4").copy().reshape(
         fixture["rowCount"], fixture["columnCount"]
     )
-    np_mask = np.frombuffer(mask_bytes, dtype=np.uint8).reshape(
+    np_mask = np.frombuffer(mask_bytes, dtype=np.uint8).copy().reshape(
         fixture["rowCount"], fixture["columnCount"]
     )
     if not np.isfinite(np_features).all():
@@ -105,7 +107,6 @@ def main() -> int:
     if np.any((np_mask == 0) & (np_features != 0)):
         raise RuntimeError("NUMPY_MISSING_VALUE_NOT_ZERO")
 
-    # from_numpy preserves the NumPy storage; clone isolates the actual scoring tensor.
     torch_view = torch.from_numpy(np_features)
     cpu = torch_view.clone()
     cpu_scores_1 = cosine_scores(cpu)
