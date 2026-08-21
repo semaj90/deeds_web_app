@@ -26,13 +26,27 @@ describe('RetrievalCandidateFeatureMatrixV1 In-Memory Projection', () => {
     expect(matrix.feature_count).toBe(25);
     expect(matrix.candidate_packet_keys).toEqual(['packet:03e3bacd7a74', 'packet:41ae4f183768']);
 
-    // Row 0, col 18 (execution_utility) -> missing -> presence_mask = 0
     expect(matrix.presence_mask[0 * 25 + 18]).toBe(0);
     expect(matrix.candidate_features[0 * 25 + 18]).toBe(0.0);
-
-    // Row 1, col 18 (execution_utility) -> present -> presence_mask = 1
     expect(matrix.presence_mask[1 * 25 + 18]).toBe(1);
     expect(matrix.candidate_features[1 * 25 + 18]).toBeCloseTo(0.95, 4);
   });
-});
 
+  it('treats absent evidence as missing but rejects explicit non-finite evidence', () => {
+    const missing = buildCandidateFeatureMatrix([{ packet_key: 'packet:missing' }]);
+    expect(missing.presence_mask[0]).toBe(0);
+    expect(missing.candidate_features[0]).toBe(0);
+
+    expect(() => buildCandidateFeatureMatrix([
+      { packet_key: 'packet:bad', semantic_similarity_768: Number.POSITIVE_INFINITY },
+    ])).toThrow('CANDIDATE_FEATURE_NON_FINITE:packet:bad:semantic_similarity_768');
+
+    expect(() => buildCandidateFeatureMatrix([
+      { packet_key: 'packet:nan', lexical_score: Number.NaN },
+    ])).toThrow('CANDIDATE_FEATURE_NON_FINITE:packet:nan:lexical_score');
+  });
+
+  it('requires a stable packet identity for every tensor row', () => {
+    expect(() => buildCandidateFeatureMatrix([{ packet_key: '' }])).toThrow('CANDIDATE_PACKET_KEY_REQUIRED:0');
+  });
+});
