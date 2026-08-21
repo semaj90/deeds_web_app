@@ -50,6 +50,42 @@ function baseExperiment(overrides = {}) {
   };
 }
 
+function alignedQdrant(overrides = {}) {
+  return {
+    schema: 'atlas.qdrant-scoped-ann-receipt.v1',
+    comparison_scope: 'snapshot_subset',
+    scoped_corpus_count: 100,
+    scoped_corpus_checksum: hash,
+    collection: 'codebase_chunks_768',
+    vector_name: 'semantic_768',
+    canonical_payload_key: 'canonical_id',
+    metric: 'cosine',
+    qdrant_distance: 'Cosine',
+    qdrant_vector_size: 768,
+    metric_alignment_status: 'ALIGNED',
+    distance_interpretation: 'native_cosine',
+    k: 10,
+    query_count: 20,
+    minimum_exact_overlap_at_k: 0.99,
+    pytorch_qdrant_exact_mean_overlap_at_k: 1,
+    pytorch_qdrant_exact_minimum_query_overlap_at_k: 1,
+    exact_alignment_status: 'ALIGNED',
+    exact_mean_latency_ms: 5,
+    exact_p95_latency_ms: 7,
+    exact_result_checksum: hash,
+    sweep: [
+      { hnsw_ef: 64, recall_at_k: 0.94, mean_latency_ms: 1.0, p95_latency_ms: 1.3, result_checksum: hash },
+      { hnsw_ef: 128, recall_at_k: 0.98, mean_latency_ms: 1.5, p95_latency_ms: 1.8, result_checksum: hash },
+    ],
+    minimum_hnsw_recall_at_k: 0.95,
+    recommended_hnsw_ef: 128,
+    recommendation_status: 'ELIGIBLE',
+    best_hnsw_recall_at_k: 0.98,
+    canonical_authority: false,
+    ...overrides,
+  };
+}
+
 test('aligned snapshot v2 separates lineage identity from canonical row-order identity', () => {
   const value = alignedSnapshotExperimentV2Schema.parse(baseExperiment());
   assert.equal(value.semantic_dimensions, 768);
@@ -73,64 +109,40 @@ test('aligned snapshot v2 rejects K that can include self-only overflow', () => 
 });
 
 test('same-corpus Qdrant receipt can recommend only an eligible ef', () => {
-  const value = qdrantScopedAnnSchema.parse({
-    schema: 'atlas.qdrant-scoped-ann-receipt.v1',
-    comparison_scope: 'snapshot_subset',
-    scoped_corpus_count: 100,
-    scoped_corpus_checksum: hash,
-    collection: 'codebase_chunks_768',
-    vector_name: 'semantic_768',
-    canonical_payload_key: 'canonical_id',
-    metric: 'cosine',
-    k: 10,
-    query_count: 20,
-    minimum_exact_overlap_at_k: 0.99,
-    pytorch_qdrant_exact_mean_overlap_at_k: 1,
-    pytorch_qdrant_exact_minimum_query_overlap_at_k: 1,
-    exact_alignment_status: 'ALIGNED',
-    exact_mean_latency_ms: 5,
-    exact_p95_latency_ms: 7,
-    exact_result_checksum: hash,
-    sweep: [
-      { hnsw_ef: 64, recall_at_k: 0.94, mean_latency_ms: 1.0, p95_latency_ms: 1.3, result_checksum: hash },
-      { hnsw_ef: 128, recall_at_k: 0.98, mean_latency_ms: 1.5, p95_latency_ms: 1.8, result_checksum: hash },
-    ],
-    minimum_hnsw_recall_at_k: 0.95,
-    recommended_hnsw_ef: 128,
-    recommendation_status: 'ELIGIBLE',
-    best_hnsw_recall_at_k: 0.98,
-    canonical_authority: false,
-  });
+  const value = qdrantScopedAnnSchema.parse(alignedQdrant());
   assert.equal(value.comparison_scope, 'snapshot_subset');
+  assert.equal(value.qdrant_vector_size, 768);
   assert.equal(value.recommended_hnsw_ef, 128);
 });
 
+test('Qdrant metric mismatch blocks exact and HNSW stages', () => {
+  const value = qdrantScopedAnnSchema.parse(alignedQdrant({
+    qdrant_distance: 'Dot',
+    metric_alignment_status: 'MISMATCH',
+    exact_alignment_status: 'METRIC_MISMATCH',
+    pytorch_qdrant_exact_mean_overlap_at_k: 0,
+    pytorch_qdrant_exact_minimum_query_overlap_at_k: 0,
+    exact_mean_latency_ms: 0,
+    exact_p95_latency_ms: 0,
+    sweep: [],
+    recommended_hnsw_ef: null,
+    recommendation_status: 'BLOCKED_METRIC_MISMATCH',
+    best_hnsw_recall_at_k: 0,
+  }));
+  assert.equal(value.exact_alignment_status, 'METRIC_MISMATCH');
+  assert.equal(value.sweep.length, 0);
+});
+
 test('proof envelope refuses HNSW certification after exact-store mismatch', () => {
-  const mismatch = {
-    schema: 'atlas.qdrant-scoped-ann-receipt.v1',
-    comparison_scope: 'snapshot_subset',
-    scoped_corpus_count: 100,
-    scoped_corpus_checksum: hash,
-    collection: 'codebase_chunks_768',
-    vector_name: 'semantic_768',
-    canonical_payload_key: 'canonical_id',
-    metric: 'cosine',
-    k: 10,
-    query_count: 20,
-    minimum_exact_overlap_at_k: 0.99,
+  const mismatch = alignedQdrant({
     pytorch_qdrant_exact_mean_overlap_at_k: 0.7,
     pytorch_qdrant_exact_minimum_query_overlap_at_k: 0.5,
     exact_alignment_status: 'EXACT_STORE_MISMATCH',
-    exact_mean_latency_ms: 5,
-    exact_p95_latency_ms: 7,
-    exact_result_checksum: hash,
     sweep: [],
-    minimum_hnsw_recall_at_k: 0.95,
     recommended_hnsw_ef: null,
     recommendation_status: 'BLOCKED_EXACT_STORE_MISMATCH',
     best_hnsw_recall_at_k: 0,
-    canonical_authority: false,
-  };
+  });
 
   assert.throws(() => alignedSnapshotProofEnvelopeV2Schema.parse({
     schema: 'atlas.aligned-snapshot-proof-envelope.v2',
