@@ -6,14 +6,16 @@ import {
   adaptWorkflowActionEventToTemporalHistory,
   createTemporalActionPostgresRepository,
   isSuccessfulOutcome,
-  workflowActionEventSchema,
   type ActionExecutionDescriptorV1,
   type ActionOutcomeV1,
   type AgentActionEventV1,
   type TemporalActionAppendReceiptV1,
   type TemporalActionSequenceReservationReceiptV1,
-  type WorkflowActionEventV1,
 } from '@deeds/parent-atlas';
+import {
+  workflowActionEventSchema,
+  type WorkflowActionEventV1,
+} from '@deeds/parent-atlas/core/workflow-action-event';
 import { pool } from '$lib/server/db/client.js';
 import {
   artifactAddressSchema,
