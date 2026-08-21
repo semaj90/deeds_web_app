@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   actionWorkItemSchema,
   artifactAddressSchema,
+  artifactWorkResultSchema,
 } from './artifact-work-item-v1.js';
 
 const artifact = {
@@ -86,6 +87,34 @@ describe('ActionWorkItemV1', () => {
       parametersHash: 'cccccccccccccccccccccccccccccccc',
       expectedOutputSchema: 'x',
       producerRevision: 'v1',
+    })).toThrow();
+  });
+});
+
+describe('ArtifactWorkResultV1', () => {
+  it('binds a reusable immutable output to ActionKey, revision set and fencing token', () => {
+    const parsed = artifactWorkResultSchema.parse({
+      schema: 'atlas.action-work-result.v1',
+      actionKey: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      revisionSetHash: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      artifact,
+      producerRevision: 'candidate-fabric-v1',
+      fencingToken: '7',
+      receiptRef: 'receipt:artifact-work:1',
+    });
+
+    expect(parsed.artifact.artifactId).toBe('feature-snapshot-1');
+    expect(parsed.fencingToken).toBe('7');
+  });
+
+  it('rejects a non-numeric fencing token', () => {
+    expect(() => artifactWorkResultSchema.parse({
+      schema: 'atlas.action-work-result.v1',
+      actionKey: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      revisionSetHash: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      artifact,
+      producerRevision: 'candidate-fabric-v1',
+      fencingToken: 'old-worker',
     })).toThrow();
   });
 });
