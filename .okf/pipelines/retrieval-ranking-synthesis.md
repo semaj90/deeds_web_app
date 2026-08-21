@@ -14,8 +14,8 @@ related:
   - system/deep-research
   - tools/gemma4-synthesis
   - tools/ml-ranking-sidecar
-generated: manual_curation
-verified: unverified  # no formal verification pass has run against source_refs yet
+generated:
+  by: human:james
 ---
 
 # Retrieval → Ranking → Synthesis Pipeline

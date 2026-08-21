@@ -19,8 +19,8 @@ related:
   - tools/ml-ranking-sidecar
   - tools/gemma4-synthesis
   - runbook/admin-dashboard-setup
-generated: manual_curation
-verified: unverified  # no formal verification pass has run against source_refs yet
+generated:
+  by: human:james
 ---
 
 # Web Sources Ingestion & Ranking
