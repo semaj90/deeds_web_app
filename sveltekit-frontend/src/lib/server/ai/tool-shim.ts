@@ -24,10 +24,6 @@ function parseArgsString(tool: string, rawArgs: string): Record<string, any> {
     // fall through to loose parsing
   }
 
-  // Hermes / Gemma tool-call fallbacks:
-  // 1. terminal(shell="pwd")
-  // 2. terminal(command="pwd")
-  // 3. bare terminal text inside <execute_bash> blocks
   const keyValueMatch = normalized.match(/^(?:shell|command)\s*=\s*["']([\s\S]*)["']$/i);
   if (keyValueMatch) {
     return { command: keyValueMatch[1] };
@@ -106,12 +102,24 @@ export function parseToolCalls(text: string) {
   return [];
 }
 
+export type TemporalPostDispatchHookInput = {
+  call: { tool: string; args: any };
+  result: unknown;
+  temporalAction: unknown;
+  temporalBoundary: unknown;
+};
+
+export type TemporalPostDispatchHook = (
+  input: TemporalPostDispatchHookInput,
+) => Promise<void> | void;
+
 type ToolExecutionContext = {
   temporalAction?: unknown;
   temporalActionBoundary?: unknown;
   temporalAlternativePlan?: unknown;
   temporalAlternativeSelection?: unknown;
   temporalAlternativeDepth?: number;
+  temporalPostDispatch?: TemporalPostDispatchHook;
   [key: string]: unknown;
 };
 
@@ -120,13 +128,6 @@ type TemporalBoundaryOutcome =
   | { kind: 'REPLACE'; call: { tool: string; args: any }; temporalAction: unknown; failedExecutionKey: string }
   | null;
 
-/**
- * Optional temporal execution policy. Existing callers remain unchanged unless
- * they explicitly supply `context.temporalAction`.
- *
- * Once supplied, the temporal gate is mandatory and fail-closed. A lookup or
- * validation error is allowed to surface rather than silently re-running work.
- */
 async function applyTemporalBoundary(
   call: { tool: string; args: any },
   context?: ToolExecutionContext,
@@ -212,45 +213,25 @@ async function applyTemporalBoundary(
   };
 }
 
-async function executeToolAtDepth(
-  call: { tool: string; args: any },
-  context: ToolExecutionContext | undefined,
-  depth: number,
-): Promise<unknown> {
-  if (depth > MAX_TEMPORAL_ALTERNATIVE_HOPS) {
-    throw new Error(`TEMPORAL_ALTERNATIVE_HOP_LIMIT_EXCEEDED:${MAX_TEMPORAL_ALTERNATIVE_HOPS}`);
-  }
-
-  const temporal = await applyTemporalBoundary(call, context);
-  if (temporal?.kind === 'SHORT_CIRCUIT') return temporal.result;
-  if (temporal?.kind === 'REPLACE') {
-    if (!context) throw new Error('TEMPORAL_ALTERNATIVE_CONTEXT_MISSING');
-    context.temporalAction = temporal.temporalAction;
-    context.temporalAlternativeDepth = depth + 1;
-    return executeToolAtDepth(temporal.call, context, depth + 1);
-  }
-
+async function dispatchTool(call: { tool: string; args: any }): Promise<unknown> {
   switch (call.tool) {
-    case "rg_search":
-      {
-        const { tool_codebase_rg_search } = await import('./mcp-tool-dispatch.js');
-        return tool_codebase_rg_search(call.args);
-      }
+    case 'rg_search': {
+      const { tool_codebase_rg_search } = await import('./mcp-tool-dispatch.js');
+      return tool_codebase_rg_search(call.args);
+    }
 
-    case "graph_expand":
-      {
-        const { tool_graph_expand_neighborhood } = await import('./mcp-tool-dispatch.js');
-        return tool_graph_expand_neighborhood(call.args);
-      }
+    case 'graph_expand': {
+      const { tool_graph_expand_neighborhood } = await import('./mcp-tool-dispatch.js');
+      return tool_graph_expand_neighborhood(call.args);
+    }
 
-    case "atlas_lookup":
-    case "search.hybrid":
-      {
-        const { tool_search_hybrid } = await import('./mcp-tool-dispatch.js');
-        return tool_search_hybrid ? tool_search_hybrid(call.args) : null;
-      }
+    case 'atlas_lookup':
+    case 'search.hybrid': {
+      const { tool_search_hybrid } = await import('./mcp-tool-dispatch.js');
+      return tool_search_hybrid ? tool_search_hybrid(call.args) : null;
+    }
 
-    case "terminal": {
+    case 'terminal': {
       const command = String(call.args?.command ?? '').trim();
       if (!command) return { ok: false, tool: 'terminal', error: 'Missing terminal command' };
       const isWindows = process.platform === 'win32';
@@ -285,6 +266,43 @@ async function executeToolAtDepth(
     default:
       return null;
   }
+}
+
+async function runTemporalPostDispatchHook(
+  call: { tool: string; args: any },
+  result: unknown,
+  context?: ToolExecutionContext,
+): Promise<void> {
+  if (!context?.temporalAction || !context.temporalPostDispatch) return;
+  await context.temporalPostDispatch({
+    call,
+    result,
+    temporalAction: context.temporalAction,
+    temporalBoundary: context.temporalActionBoundary ?? null,
+  });
+}
+
+async function executeToolAtDepth(
+  call: { tool: string; args: any },
+  context: ToolExecutionContext | undefined,
+  depth: number,
+): Promise<unknown> {
+  if (depth > MAX_TEMPORAL_ALTERNATIVE_HOPS) {
+    throw new Error(`TEMPORAL_ALTERNATIVE_HOP_LIMIT_EXCEEDED:${MAX_TEMPORAL_ALTERNATIVE_HOPS}`);
+  }
+
+  const temporal = await applyTemporalBoundary(call, context);
+  if (temporal?.kind === 'SHORT_CIRCUIT') return temporal.result;
+  if (temporal?.kind === 'REPLACE') {
+    if (!context) throw new Error('TEMPORAL_ALTERNATIVE_CONTEXT_MISSING');
+    context.temporalAction = temporal.temporalAction;
+    context.temporalAlternativeDepth = depth + 1;
+    return executeToolAtDepth(temporal.call, context, depth + 1);
+  }
+
+  const result = await dispatchTool(call);
+  await runTemporalPostDispatchHook(call, result, context);
+  return result;
 }
 
 export async function executeTool(call: { tool: string; args: any }, context?: ToolExecutionContext) {
