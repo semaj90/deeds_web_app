@@ -124,3 +124,79 @@ QUEUE_ARTIFACT_LIFECYCLE_PROVEN
 ```
 
 Only after those proofs should QUEUE-06 through QUEUE-10 be checked off. QUEUE-05 remains a separate payload-census/remediation task; do not claim it from schema work alone.
+
+## Handoff (2026-08-21, context-limited session end)
+
+**Pushed to `origin/main` at `8e56c821b7`.** Everything below is real and verified unless
+marked otherwise; nothing here is speculative.
+
+### Done and merged this session
+- CAND-01/02/03, REV-01, CACHE-01 (identity/revision/cache contracts) — built, tested, unique
+  (checked against all 45+ `agent/*` branches, no duplicate).
+- QUEUE-06/07/08/09/10 — merged from `agent/parent-atlas-queue-artifact-transport-20260821`
+  (their implementation kept over an earlier local draft; theirs was more complete). Found and
+  fixed a real production-breaking TDZ bug in their `outbox.ts` (`enqueueTask` self-shadowed its
+  own `idempotencyKey` helper). Also fixed a missing `loadAtlasEnv()` call in two of their new
+  proof scripts (`prove-artifact-transport-readiness.mts`,
+  `prove-queue-artifact-lifecycle.mts`) that crashed with a SASL auth error before ever querying.
+- **QUEUE-05 steps 1–3 proven live** against production Postgres: applied
+  `parent_atlas_artifact_transport_v1.sql` (4 new tables, additive-only), confirmed
+  `ARTIFACT_TRANSPORT_STORE_READY`, then ran `prove-queue-artifact-lifecycle.mts` →
+  `QUEUE_ARTIFACT_LIFECYCLE_PROVEN` (idempotent replay, checksum-mismatch rejection, failure
+  persistence all verified for real). **Steps 4–8 remain open** — nothing yet redirects the real
+  `document.embed`/`vector.index` producers onto this store.
+- PR #15 (`parent-atlas-semantic-prefill-spine`) and PR #16 (`atlas-aligned-snapshot-proof-v2`) —
+  both already merged on GitHub, pulled into local main cleanly, zero conflicts, zero new
+  typecheck errors (20 pre-existing repo-wide errors remain, none in the new files).
+- Fixed a **real, pre-existing file corruption** unrelated to this session's own work: commit
+  `401f319770`'s merge byte-interleaved two independent implementations inside
+  `graphify-structural-materializer.ts` and `node-tree-sitter-ast-provider.ts` (+ its spec) —
+  confirmed via `git show HEAD` before any edits. Restored both from the last clean commit
+  (`e2376a0021`) and reapplied the FUNCTION-vs-VARIABLE taxonomy fix on top (a `const`/`let`
+  bound to an arrow/function-expression now classifies `FUNCTION`, not the old blanket
+  `VARIABLE`) — this closes the sidecar-vs-node-challenger parity mismatch found earlier in the
+  session. 2/2 tests pass, typecheck clean.
+- OKF frontmatter correction: verified the real GoogleCloudPlatform OKF v0.2 spec live (fetched
+  it), found the earlier session's `generated: manual_curation` / `verified: unverified` additions
+  didn't match (real spec: `generated` is a structured `{by, at}` object; `verified` should be
+  *omitted*, never a scalar "unverified" string). Fixed all 8 `.okf/*.md` files.
+- `llama-server` on `:8090` was down (no process at all) — restarted via
+  `npm run turbo:start:text:detached`. Running **text-only**: `mmproj-F16.gguf` doesn't match the
+  loaded `hforf.gguf` model's `n_embd` (2560 vs 4096) — vision/multimodal is disabled until a
+  matching mmproj file is found/built. Chat/synthesis works normally.
+
+### Explicitly NOT done — real open items for next session
+1. **FANOUT-01** — still blocked. `synthesize/+server.ts` assigns `candidateOrdinal` by plain
+   array position (twice, inconsistently across sort/slice). Root blocker: `GraphViewNodeV1` /
+   the live `atlas_graph_nodes_v2` table has **no revision columns at all** (checked directly
+   against production Postgres). Fixing this needs a real schema migration + identifying/fixing
+   whichever writer populates that table — and ties directly into the still-unproven
+   `REVISION_OWNER_NOT_PROVEN` status from the separate `agent/revision-owner-proof` work
+   (already merged, still says NOT_PROVEN). Do not attempt FANOUT-01 until revision ownership is
+   proven elsewhere first.
+2. **A real 3-way `CandidateFeatureRowV1` naming collision** — `graph-runtime-contracts.ts`,
+   `features/candidate-feature-row-v1.ts` (this change's canonical one), and
+   `neural-routing/contracts.ts` (different domain, tool-routing) all independently declare a
+   type with this exact name. Not renamed — cross-codebase rename is out of scope for a quick fix.
+3. **QUEUE-05 steps 4–8** — redirect the real `document.embed`/`vector.index` producers
+   (`rabbitmq-manager-fixed.ts`, `queue-worker.ts`) onto `ArtifactAddressV1` references, Qdrant
+   readback verification, large-payload audit, before/after latency benchmark.
+4. **FEAT-01→04** (Arrow IPC snapshot, CPU/GPU materializer, parity receipt) — deliberately never
+   started; needs a real design decision on Arrow IPC layout and a working CUDA path to verify
+   against, not something to stub out unverified.
+5. The corruption-fix pattern found in indexing/ (§ above) suggests other files touched by the
+   same `401f319770` merge may have the same interleaving bug — **not swept for this pass**, only
+   the two files actually needed for the taxonomy fix were checked and repaired. Worth a
+   dedicated audit (`git show 401f319770 --stat` to find every file that merge touched, then spot
+   check a few for the interleaving signature: duplicate `export function`/`export type` names in
+   one file).
+6. mmproj/vision file mismatch (see above) — not investigated further; text-only is fine for now.
+
+### Verification commands for next session to re-confirm state
+```bash
+cd sveltekit-frontend
+npx vitest run src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.spec.ts
+npx vitest run src/lib/server/queue/outbox-authority.spec.ts src/lib/server/queue/event-fabric.spec.ts
+npx tsx scripts/atlas/prove-artifact-transport-readiness.mts   # expect ARTIFACT_TRANSPORT_STORE_READY
+npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"    # expect ~20, none new
+```
