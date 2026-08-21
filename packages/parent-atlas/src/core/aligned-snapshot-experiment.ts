@@ -34,12 +34,20 @@ export const qdrantScopedAnnSchema = z.object({
   vector_name: z.string().min(1).nullable(),
   canonical_payload_key: z.string().min(1),
   metric: z.enum(['cosine', 'inner_product', 'sqeuclidean']),
+  qdrant_distance: z.string().min(1).nullable(),
+  qdrant_vector_size: z.number().int().positive().nullable(),
+  metric_alignment_status: z.enum(['ALIGNED', 'MISMATCH']),
+  distance_interpretation: z.enum([
+    'native_cosine',
+    'native_dot_product',
+    'euclidean_rank_equivalent_to_sqeuclidean',
+  ]),
   k: z.number().int().positive(),
   query_count: z.number().int().positive(),
   minimum_exact_overlap_at_k: z.number().finite().min(0).max(1),
   pytorch_qdrant_exact_mean_overlap_at_k: z.number().finite().min(0).max(1),
   pytorch_qdrant_exact_minimum_query_overlap_at_k: z.number().finite().min(0).max(1),
-  exact_alignment_status: z.enum(['ALIGNED', 'EXACT_STORE_MISMATCH']),
+  exact_alignment_status: z.enum(['ALIGNED', 'EXACT_STORE_MISMATCH', 'METRIC_MISMATCH']),
   exact_mean_latency_ms: z.number().finite().nonnegative(),
   exact_p95_latency_ms: z.number().finite().nonnegative(),
   exact_result_checksum: checksum,
@@ -49,13 +57,20 @@ export const qdrantScopedAnnSchema = z.object({
   recommendation_status: z.enum([
     'ELIGIBLE',
     'BLOCKED_EXACT_STORE_MISMATCH',
+    'BLOCKED_METRIC_MISMATCH',
     'NO_SWEEP_POINT_MEETS_RECALL_FLOOR',
   ]),
   best_hnsw_recall_at_k: z.number().finite().min(0).max(1),
   canonical_authority: z.literal(false),
 }).strict().superRefine((value, ctx) => {
   if (value.exact_alignment_status !== 'ALIGNED' && value.sweep.length !== 0) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sweep'], message: 'HNSW sweep must be empty when the exact same-corpus gate fails' });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sweep'], message: 'HNSW sweep must be empty when metric or exact same-corpus gates fail' });
+  }
+  if (value.metric_alignment_status === 'MISMATCH' && value.exact_alignment_status !== 'METRIC_MISMATCH') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['exact_alignment_status'], message: 'metric mismatch must block exact-store comparison' });
+  }
+  if (value.metric_alignment_status === 'ALIGNED' && value.exact_alignment_status === 'METRIC_MISMATCH') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['metric_alignment_status'], message: 'METRIC_MISMATCH requires a mismatched metric/dimension preflight' });
   }
   if (value.recommendation_status === 'ELIGIBLE' && value.recommended_hnsw_ef === null) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['recommended_hnsw_ef'], message: 'eligible HNSW recommendation requires an ef value' });
@@ -145,8 +160,8 @@ export const alignedSnapshotProofEnvelopeV2Schema = z.object({
   if (present !== (value.qdrant_scoped_ann_file !== null) || present !== (value.qdrant_scoped_ann_file_checksum !== null)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_scoped_ann'], message: 'Qdrant scoped receipt/file/checksum must be present or absent together' });
   }
-  if (value.qdrant_scoped_ann?.exact_alignment_status === 'EXACT_STORE_MISMATCH') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_scoped_ann'], message: 'proof envelope cannot certify HNSW when the same-corpus exact store mismatches PyTorch exact' });
+  if (value.qdrant_scoped_ann && value.qdrant_scoped_ann.exact_alignment_status !== 'ALIGNED') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['qdrant_scoped_ann'], message: 'proof envelope cannot certify HNSW when metric/dimension or same-corpus exact alignment fails' });
   }
 });
 
@@ -159,6 +174,7 @@ export function describeAlignedSnapshotExperiment(): string {
     'One frozen semantic_768 snapshot owns canonical row ordinals for the experiment.',
     'Snapshot lineage identity and cross-block canonical row-order identity use separate checksums and must not be conflated.',
     'PyTorch FP32 exact and cuVS brute-force compare exact Top-K.',
+    'Qdrant must match the requested vector dimension and distance before exact/HNSW comparison.',
     'Qdrant exact and HNSW must use one explicit corpus scope: the frozen snapshot subset or a proven full collection.',
     'CAGRA and Qdrant HNSW compare Recall@K only after their corresponding exact-oracle boundaries are valid.',
     'N-ary incidence remains canonical support while sparse softmax/SpMM are derived propagation.',
