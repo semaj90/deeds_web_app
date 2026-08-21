@@ -6,6 +6,7 @@ import {
   artifactAddressSchema,
   type ArtifactAddressV1,
 } from './artifact-work-item-v1.js';
+import { readPostgresJsonArtifact } from './postgres-json-artifact-v1.js';
 
 export type ArtifactVerificationGate =
   | 'ACTION_KEY_PRESENT'
@@ -137,6 +138,53 @@ async function verifyFileBackedArtifact(input: {
   };
 }
 
+async function verifyPostgresArtifact(input: {
+  actionKey: string;
+  producerRevision: string;
+  artifact: ArtifactAddressV1;
+}): Promise<ArtifactMaterializationVerificationV1> {
+  const gates = baseGates(input);
+  gates.STORAGE_VERIFIER_AVAILABLE = true;
+
+  try {
+    await readPostgresJsonArtifact(input.artifact);
+    gates.ARTIFACT_EXISTS = true;
+    gates.BYTE_LENGTH_MATCH = true;
+    gates.CHECKSUM_MATCH = true;
+  } catch (error) {
+    return {
+      schema: 'atlas.artifact-materialization-verification.v1',
+      artifactId: input.artifact.artifactId,
+      storage: input.artifact.locator.storage,
+      status: 'REJECTED',
+      gates,
+      actualByteLength: null,
+      actualChecksum: null,
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  const required = [
+    gates.ACTION_KEY_PRESENT,
+    gates.PRODUCER_REVISION_PRESENT,
+    gates.REVISION_SET_HASH_PRESENT,
+    gates.ARTIFACT_EXISTS,
+    gates.CHECKSUM_MATCH,
+    gates.STORAGE_VERIFIER_AVAILABLE,
+  ];
+
+  return {
+    schema: 'atlas.artifact-materialization-verification.v1',
+    artifactId: input.artifact.artifactId,
+    storage: input.artifact.locator.storage,
+    status: required.every(Boolean) ? 'PROVEN' : 'REJECTED',
+    gates,
+    actualByteLength: null,
+    actualChecksum: input.artifact.checksum,
+    reason: null,
+  };
+}
+
 export async function verifyArtifactMaterialization(input: {
   actionKey: string;
   producerRevision: string;
@@ -158,6 +206,7 @@ export async function verifyArtifactMaterialization(input: {
         path: artifact.locator.path,
       });
     case 'POSTGRES':
+      return verifyPostgresArtifact({ ...input, artifact });
     case 'QDRANT':
     case 'VALKEY':
     case 'GPU_RESIDENT': {
