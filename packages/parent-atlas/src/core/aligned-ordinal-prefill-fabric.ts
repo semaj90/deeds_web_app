@@ -53,7 +53,7 @@ export const alignedOrdinalRegistrySchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projections'], message: `projection ${projection.projection_id} row_count does not align` });
     }
   }
-}).strict();
+});
 export type AlignedOrdinalRegistryV1 = z.infer<typeof alignedOrdinalRegistrySchema>;
 
 export const canonicalStructuralCoordinateSchema = z.object({
@@ -131,7 +131,7 @@ export const gpuResidencyLeaseSchema = z.object({
   if (value.expires_at !== null && Date.parse(value.expires_at) <= Date.parse(value.issued_at)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expires_at'], message: 'expires_at must be later than issued_at' });
   }
-}).strict();
+});
 export type GpuResidencyLeaseV1 = z.infer<typeof gpuResidencyLeaseSchema>;
 
 export const compiledPrefillReceiptSchema = z.object({
