@@ -16,12 +16,10 @@ import {
   workflowActionEventSchema,
   type WorkflowActionEventV1,
 } from '@deeds/parent-atlas/core/workflow-action-event';
-import { pool } from '$lib/server/db/client.js';
 import {
   artifactAddressSchema,
   type ArtifactAddressV1,
 } from '$lib/server/queue/artifact-work-item-v1.js';
-import { materializePostgresJsonArtifact } from '$lib/server/queue/postgres-json-artifact-v1.js';
 
 const id = z.string().min(1);
 
@@ -208,6 +206,10 @@ export async function recordTemporalPostDispatchFromPostgres(input: {
   record: z.input<typeof temporalPostDispatchRecordInputSchema>;
   emit_workflow_terminal_event: WorkflowTerminalEventEmitter;
 }): Promise<TemporalPostDispatchRecordResultV1> {
+  const [{ pool }, { materializePostgresJsonArtifact }] = await Promise.all([
+    import('$lib/server/db/client.js'),
+    import('$lib/server/queue/postgres-json-artifact-v1.js'),
+  ]);
   const repository = createTemporalActionPostgresRepository(pool);
   return recordTemporalPostDispatch(input.record, {
     materialize_result: materializePostgresJsonArtifact,
