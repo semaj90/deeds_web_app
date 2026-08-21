@@ -14,6 +14,8 @@ related:
   - pipeline/retrieval-ranking-synthesis
   - datasets/legal-corpus
   - tools/trace-mcp
+generated: manual_curation
+verified: unverified  # no formal verification pass has run against source_refs yet
 ---
 
 # HyperRAG — Unified Retrieval & Knowledge System

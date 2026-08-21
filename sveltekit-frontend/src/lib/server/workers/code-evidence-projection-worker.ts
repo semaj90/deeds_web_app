@@ -19,6 +19,8 @@ import {
 	createDefaultEventFabricHandlers,
 	parseEventFabricMessage,
 	type AnalyticsObservationEventV1,
+	type ArtifactFailedEventV1,
+	type ArtifactMaterializedEventV1,
 	type CheckpointCommitEventV1,
 	type EventFabricHandlerRegistry,
 	type FailureObservationEventV1,
@@ -26,6 +28,10 @@ import {
 	type RecommendationSignalEventV1,
 } from '$lib/server/queue/event-fabric.js';
 import { emitEventFabricAnalyticsProjection } from '$lib/server/queue/event-fabric-analytics-projection.js';
+import {
+	recordArtifactFailure,
+	verifyArtifactMaterialization,
+} from '$lib/server/queue/artifact-materialization-event-processing.js';
 
 export type EventFabricProjectionHandlers = EventFabricHandlerRegistry;
 
@@ -42,6 +48,12 @@ function buildDefaultHandlers(): EventFabricProjectionHandlers {
 		...handlers,
 		'code.evidence.persisted': async (event: CodeEvidencePersistedEventV1) => {
 			await verifyCodeEvidenceReadback(event);
+		},
+		'artifact.materialized': async (event: ArtifactMaterializedEventV1) => {
+			await verifyArtifactMaterialization(event);
+		},
+		'artifact.failed': async (event: ArtifactFailedEventV1) => {
+			recordArtifactFailure(event);
 		},
 	};
 }
@@ -68,6 +80,12 @@ export async function dispatchEventFabricEvent(
 			return;
 		case 'checkpoint.commit':
 			await handlers['checkpoint.commit'](event as CheckpointCommitEventV1);
+			return;
+		case 'artifact.materialized':
+			await handlers['artifact.materialized'](event as ArtifactMaterializedEventV1);
+			return;
+		case 'artifact.failed':
+			await handlers['artifact.failed'](event as ArtifactFailedEventV1);
 			return;
 	}
 }

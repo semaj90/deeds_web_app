@@ -12,7 +12,7 @@ const atlasAstEvidenceChunkSchema = z.object({
   upstream_chunk_id: id.optional(),
   upstream_node_id: id.optional(),
   upstream_file_id: id.optional(),
-  upstream_symbol_id: id.optional(),
+  upstream_symbol_id: id.nullable().optional(),
   node_type: z.string().min(1),
   kind: z.string().min(1),
   name: z.string().nullable().optional(),

@@ -2,8 +2,11 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import type { GraphTraverseRequestV1 } from '$lib/server/atlas/graph/graph-runtime-contracts.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { request } = event;
   try {
     const body = (await request.json()) as GraphTraverseRequestV1;
     const result = await traverseGraphV1(body);

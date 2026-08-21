@@ -16,6 +16,7 @@ import {
   type ContextManifestV1,
   type SourceMutationStatusV1,
 } from '$lib/server/atlas/graph/graph-runtime-contracts.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 const DEFAULT_CANDIDATE_LIMIT = 128;
 const MAX_CANDIDATES = 512;
@@ -49,7 +50,9 @@ function isExecutableMutationStatus(status: SourceMutationStatusV1): boolean {
   return status !== 'STALE' && status !== 'MISSING';
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { request } = event;
   try {
     const body = (await request.json()) as AtlasSynthesisRequestV1;
     if (!body.snapshotId?.trim()) {

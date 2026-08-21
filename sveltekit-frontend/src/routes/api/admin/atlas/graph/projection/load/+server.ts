@@ -1,8 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { request } = event;
   try {
     const body = await request.json() as {
       artifactDir?: string;

@@ -656,6 +656,113 @@ identity. Focused challenger validation passed 1/1 and SvelteKit TypeScript
 validation passed. The 8095 sidecar remains the current migration executor;
 no provider switch or apply path was made.
 
+## Session 2026-08-21: native-structural-materializer Zod schema bug (fixed)
+
+Ran `scripts/atlas/native-structural-materializer.mts` (read-only dry-run, no
+canonical writes) against a 5-file sample and hit **100% failure** at the
+`compileStructuralExtractionFabric` step, downstream of a fully successful
+native structural parse (`proven_native_files: 5/5`). Root cause: two Zod
+schema bugs in `packages/parent-atlas/src/core/structural-symbol.ts` /
+`treesitter-chunker-evidence-adapter.ts`, both matching the same class of
+mistake — the schema was stricter than the real, legitimate data shape the
+upstream extractor produces:
+
+1. `upstream_symbol_id: id.optional()` (3 occurrences in
+   `structural-symbol.ts`, 1 in `treesitter-chunker-evidence-adapter.ts`)
+   rejected `null`, but a file/module-level chunk with no enclosing symbol
+   legitimately has `upstream_symbol_id: null` — and downstream code already
+   null-coalesces this field (`chunk.upstream_symbol_id ?? null` in
+   `atlas-ast-evidence-normalizer.ts:169`), confirming `null` was always the
+   intended value. Sibling fields in the same file
+   (`container_qualified_name`, `signature_normalized`, `export_name`,
+   `stable_symbol_id`) already correctly used `.nullable().optional()` for
+   the identical semantic — this was an isolated oversight, not a design
+   choice. Fixed all 4 occurrences to `.nullable().optional()`.
+2. `parent_context: z.string().min(1).optional()` rejected `""` (empty
+   string), but the real extractor represents "no parent context" as an
+   empty string rather than omitting the field or using `null`. Fixed with
+   `z.preprocess((v) => (v === '' ? undefined : v), z.string().min(1).optional())`
+   — preserves "if present, must be non-empty" for genuine values while
+   treating the extractor's empty-string convention as absent.
+
+One follow-on type error surfaced by the schema widening:
+`deriveUpstreamSymbolNominationKey()`'s parameter type was `string |
+undefined`, now needed `string | null | undefined` to match (its logic
+already null-safe via truthy check, `if (input.upstream_symbol_id) ...`).
+
+**Verification**: `packages/parent-atlas` typechecks clean
+(`tsc --noEmit`, 0 errors). Existing focused tests pass 7/7
+(`test:structural-extraction` 4/4, `test:structural-vertical` +
+`test:sidecar-provenance-compat` 3/3 combined). Live re-run on the same
+5-file sample: `0 failed_files`, `status: DRY_RUN_COMPLETE` (was 5/5
+failed before the fix). Scaled to a 300-file whole-repo sample:
+`284/299 proven_native_files`, `5,643 symbol_nominations`, **zero** Zod
+validation failures of this class. 15 files still report `failed_files`
+with an empty `failures` array (a different, pre-existing provenance-status
+path unrelated to this fix — not investigated this session). No canonical
+writes occurred (dry-run throughout; `APPLY` was never set).
+
+This directly unblocks the "GPH-17 owner-selection" gap this doc records
+above (`graphify:daily` does not yet invoke the materializer) — the
+downstream compile step that previously failed 100% of the time on real
+repository files now succeeds, which was a prerequisite before any owner-
+wiring decision could be usefully tested end-to-end. Owner selection itself
+(wiring `graphify:daily` to call this path) remains a separate, not-yet-made
+decision.
+
+**Follow-up (same session): the remaining 15 `failed_files` were investigated
+and were never real failures.** Traced `evaluateProvenanceReadiness()` in
+`graphify-structural-materializer.ts`: a file with zero extractable symbols
+(a pure re-export barrel, type-only file, constants file, etc.) returns
+`status: NO_EVIDENCE`, but the underlying 8095 sidecar call still succeeded
+(`structural.evidence` stays truthy) — there is nothing wrong with the file.
+The run script's status tally had no bucket for this case and fell through
+to `report.failed_files += 1`, mislabeling a benign, expected outcome as a
+failure. Fixed `native-structural-materializer.mts`: added a distinct
+`no_symbols_files` counter (with `no_symbols_refs` source-ref list for
+inspectability) so `failed_files` is reserved for genuine exceptions only.
+Separately, 5 of the original 15 turned out to be vendored CPython stdlib
+files under `.python311/` (a bundled interpreter directory — `bin/`,
+`include/`, `lib/`, `share/`, 1,453 `.py` files) — not real repository code.
+Added `.python311` to `EXCLUDED_DIRS` alongside the existing `.venv`/`venv`
+entries. **Live re-run on the same 300-file sample after both fixes:
+`status: DRY_RUN_COMPLETE`, `failed_files: 0`, `proven_native_files: 289`,
+`symbol_nominations: 2837`, `no_symbols_files: 10`** (the remaining 10 are
+genuinely symbol-free files — `.eslintrc.cjs` and several vendored
+`.tmp/atomicbot-src/` gguf/llama.cpp Python scripts with no top-level
+functions/classes — correctly categorized, not chased further as they are
+not repository-native code). No canonical writes occurred.
+
+**Second follow-up (same session): scaled the dry-run to 2,000 files and
+found two more real issues, both fixed.** First, `EXCLUDED_DIRS` used exact
+string matching and missed vendored virtualenv variants
+(`.venv-cu130`, `.venv-gemma4` — CUDA/model-specific Python environments
+alongside the already-excluded `.venv`), which flooded the sample with
+`numpy`/`PIL`/`pip`/`pika` site-packages. Hardened to a prefix-matching
+`isExcludedDir()` (`.venv*`, `.python3*`) so any current or future vendored
+interpreter tree is skipped. Also excluded `claude-mem/` (its own
+`package.json` describes it as "Runtime dependencies for claude-mem bundled
+hooks" — 44,250 files of vendored bundled dependencies, not first-party
+code). Second, found the sidecar client
+(`miniforge-nlp-sidecar.ts::astChunk`) was discarding the real FastAPI error
+body on non-2xx responses, reporting only `422 Unprocessable Content` with
+no detail — had to manually probe the 8095 endpoint directly to learn the
+real cause was `source` exceeding the sidecar's `max_length=200000`
+Pydantic constraint on genuinely huge minified/bundled files. Fixed to
+surface the already-parsed response body (truncated to 500 chars) in the
+thrown error, since debugging this class of issue should not require a
+manual out-of-band probe next time. Existing `miniforge-nlp-sidecar.spec.ts`
+still passes 3/3.
+
+**Final state after all fixes, 2,000-file live sample**:
+`status: DRY_RUN_COMPLETE`, `failed_files: 0`, `proven_native_files: 1840`,
+`recovered_files: 97`, `symbol_nominations: 16777`, `no_symbols_files: 57`,
+`diagnostics: 4` (all four are honest, correctly-categorized size-limit
+skips on genuinely huge vendored/generated files — a Drizzle introspection
+dump, a vendored llama.cpp fork's converter script and bundled JS, and an
+Obsidian plugin bundle — not failures, and not chased further). No
+canonical writes occurred at any point in this investigation.
+
 ## Session 2026-08-20: branch merge consolidation, duplicate-owner cleanup, G11 localhost hardening
 
 **Branch merge audit.** 17 new `agent/*`/`atlas/*`/`feature/*`/`codex/*`/`parent-atlas-*`

@@ -52,7 +52,8 @@
         "default_request_timeout_in_seconds": 180,
         "max_retries": 1,
         "retry_backoff_initial": 5000,
-        "retry_backoff_max": 10000
+        "retry_backoff_max": 10000,
+        "allow_private_network": true
       }
     },
     "openai": {
@@ -62,18 +63,17 @@
           "value": "local",
           "weight": 1,
           "models": [
-            "gemma4-rotorquant:latest",
-            "gemma4-legal-vlm:latest",
-            "gemma3-legal:latest"
+            "hforf.gguf"
           ]
         }
       ],
       "network_config": {
-        "base_url": "http://host.docker.internal:8090/v1",
+        "base_url": "http://host.docker.internal:8090",
         "default_request_timeout_in_seconds": 180,
         "max_retries": 1,
         "retry_backoff_initial": 5000,
-        "retry_backoff_max": 10000
+        "retry_backoff_max": 10000,
+        "allow_private_network": true
       }
     }
   }

@@ -1,5 +1,6 @@
 import { actionWorkItemSchema, type ActionWorkItemV1 } from './artifact-work-item-v1.js';
 import { enqueueTask } from './outbox.js';
+import { assertArtifactWorkItemEnvelopeSize } from './artifact-envelope-size-policy-v1.js';
 
 /**
  * Authoritative dispatch path for Parent Atlas artifact computations.
@@ -18,6 +19,7 @@ export async function enqueueArtifactWorkItem(opts: {
   item: ActionWorkItemV1;
 }): Promise<{ taskId: string; commandId: string; idempotencyKey: string }> {
   const item = actionWorkItemSchema.parse(opts.item);
+  assertArtifactWorkItemEnvelopeSize(item, { actionKey: item.actionKey, operation: item.operation });
 
   return enqueueTask({
     runId: opts.runId,

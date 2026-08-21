@@ -32,6 +32,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import struct
 import urllib.request
 from collections import Counter, defaultdict
@@ -52,6 +53,36 @@ ALGORITHM_REVISION = "atlas.semantic512-reconciliation.v1"
 DEFAULT_DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
 DEFAULT_QDRANT_URL = "http://127.0.0.1:6333"
 SCROLL_BATCH = 256
+UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
+)
+
+
+def is_uuid(value: Any) -> bool:
+    return isinstance(value, str) and bool(UUID_RE.match(value))
+
+
+def resolve_chunk_lookup_id(point: dict[str, Any]) -> str | None:
+    """Return the codebase_chunk_index.id (uuid) this point's chunk row lives under.
+
+    Two producer generations coexist in codebase_chunks_512: the majority
+    (`phase-embedding-lanes-qdrant-sync.mts` original sync) writes
+    `point.id = codebase_chunk_index.id` directly (a uuid). A later
+    `fallback-512d` backfill (same file, `phase4SyncFallback512d`) instead
+    reused whatever integer point id the *source* `codebase_chunks_768`
+    collection happened to have and stamped the true `codebase_chunk_index.id`
+    into `payload.representation_id` instead. Point id is therefore NOT a
+    reliable lookup key by itself -- it must be UUID-shaped to be trusted, and
+    non-UUID point ids fall back to payload.representation_id.
+    """
+    point_id = point.get("id")
+    if is_uuid(point_id):
+        return str(point_id)
+    payload = point.get("payload") or {}
+    representation_id = payload.get("representation_id")
+    if is_uuid(representation_id):
+        return str(representation_id)
+    return None
 
 
 @dataclass(frozen=True)
@@ -183,16 +214,16 @@ def db_snapshot(cursor: RealDictCursor) -> dict[str, Any]:
     }
 
 
-def chunk_rows(cursor: RealDictCursor, point_ids: list[int]) -> dict[str, dict[str, Any]]:
-    if not point_ids:
+def chunk_rows(cursor: RealDictCursor, lookup_ids: list[str]) -> dict[str, dict[str, Any]]:
+    if not lookup_ids:
         return {}
     cursor.execute(
         """
         SELECT id::text AS id, source_ref, content_hash
           FROM codebase_chunk_index
-         WHERE id = ANY(%s)
+         WHERE id = ANY(%s::uuid[])
         """,
-        (point_ids,),
+        (lookup_ids,),
     )
     return {str(row["id"]): dict(row) for row in cursor.fetchall()}
 
@@ -484,8 +515,12 @@ def main() -> int:
             snapshot = db_snapshot(cursor)
 
             for page in scroll_qdrant(args.qdrant_url, args.limit):
-                numeric_ids = [int(point["id"]) for point in page if isinstance(point.get("id"), int) or str(point.get("id", "")).isdigit()]
-                chunks = chunk_rows(cursor, numeric_ids)
+                lookup_ids = [
+                    lookup_id
+                    for lookup_id in (resolve_chunk_lookup_id(point) for point in page)
+                    if lookup_id is not None
+                ]
+                chunks = chunk_rows(cursor, lookup_ids)
 
                 expected_keys: list[str] = []
                 packet_ids: list[str] = []
@@ -494,7 +529,8 @@ def main() -> int:
                 legacy_keys: list[str] = []
                 for point in page:
                     point_id = str(point.get("id"))
-                    chunk = chunks.get(point_id)
+                    lookup_id = resolve_chunk_lookup_id(point)
+                    chunk = chunks.get(lookup_id) if lookup_id else None
                     if chunk:
                         source_ref = normalize_source_ref(chunk.get("source_ref"))
                         content_hash = None if chunk.get("content_hash") is None else str(chunk.get("content_hash"))
@@ -521,8 +557,8 @@ def main() -> int:
                 )
 
                 for point in page:
-                    point_id = str(point.get("id"))
-                    chunk = chunks.get(point_id)
+                    lookup_id = resolve_chunk_lookup_id(point)
+                    chunk = chunks.get(lookup_id) if lookup_id else None
                     status, classification, packet, details = classify_candidate(point, chunk, packets)
                     row = build_row(point, chunk, packet, status, classification, details, observed_at, snapshot)
                     rows.append(row)

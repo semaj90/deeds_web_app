@@ -36,7 +36,15 @@ const SUPPORTED: Record<string, string> = {
   '.js': 'javascript', '.jsx': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript',
   '.py': 'python', '.rs': 'rust', '.go': 'go', '.java': 'java',
 };
-const EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.svelte-kit', '.next', 'dist', 'build', 'coverage', '.venv', 'venv']);
+const EXCLUDED_DIRS = new Set(['.git', 'node_modules', '.svelte-kit', '.next', 'dist', 'build', 'coverage', '.venv', 'venv', '.python311', 'claude-mem']);
+// Exact-name exclusion misses vendored variants like `.venv-cu130` /
+// `.venv-gemma4` (CUDA/model-specific Python environments) -- match by
+// prefix too so any current or future vendored interpreter/site-packages
+// tree is skipped, not just the literal names above.
+const EXCLUDED_DIR_PREFIXES = ['.venv', '.python3'];
+function isExcludedDir(name: string): boolean {
+  return EXCLUDED_DIRS.has(name) || EXCLUDED_DIR_PREFIXES.some((prefix) => name.startsWith(prefix));
+}
 
 function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
@@ -73,7 +81,7 @@ async function discoverSources(): Promise<string[]> {
     const entries = await readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (files.length >= LIMIT) break;
-      if (entry.isDirectory() && EXCLUDED_DIRS.has(entry.name)) continue;
+      if (entry.isDirectory() && isExcludedDir(entry.name)) continue;
       const absolute = path.join(dir, entry.name);
       if (entry.isDirectory()) await walk(absolute);
       else if (entry.isFile() && SUPPORTED[path.extname(entry.name).toLowerCase()]) {
@@ -107,6 +115,7 @@ const report = {
   proven_native_files: 0,
   recovered_files: 0,
   compatibility_files: 0,
+  no_symbols_files: 0,
   failed_files: 0,
   evidence_rows_written: 0,
   symbol_nominations: 0,
@@ -114,6 +123,7 @@ const report = {
   symbols_created_or_versioned: 0,
   evidence_entity_facts_written: 0,
   diagnostics: [] as Array<{ source_ref: string; messages: string[] }>,
+  no_symbols_refs: [] as string[],
   failures: [] as Array<{ source_ref: string; error: string }>,
 };
 
@@ -134,10 +144,19 @@ for (const absolutePath of files) {
     });
     report.processed_files += 1;
 
+    // NOTE: NO_EVIDENCE means "zero extractable symbols" (e.g. a pure
+    // re-export barrel, type-only file, or constants file), not a pipeline
+    // failure -- the 8095 sidecar call succeeded (`structural.evidence` is
+    // still truthy) and there is nothing wrong with the file. Route it to
+    // its own counter rather than `failed_files`, which is reserved for
+    // genuine exceptions (see the catch block below).
     if (structural.provenanceReadiness.status === 'NATIVE_READY') report.proven_native_files += 1;
     else if (structural.provenanceReadiness.status === 'NATIVE_RECOVERED') report.recovered_files += 1;
     else if (structural.provenanceReadiness.status === 'COMPATIBILITY_ONLY') report.compatibility_files += 1;
-    else report.failed_files += 1;
+    else {
+      report.no_symbols_files += 1;
+      report.no_symbols_refs.push(ref);
+    }
 
     if (!structural.evidence) {
       report.diagnostics.push({ source_ref: ref, messages: structural.diagnostics });

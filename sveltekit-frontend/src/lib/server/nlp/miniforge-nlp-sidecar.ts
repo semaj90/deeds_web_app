@@ -353,7 +353,11 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
       });
       const raw = (await readJson(response)) as Partial<AtlasStructuralEvidence>;
       if (!response.ok) {
-        throw new Error(`[miniforge-nlp] ast/chunk failed: ${response.status} ${response.statusText}`);
+        // Surface the actual FastAPI error body (e.g. Pydantic validation
+        // detail like `source` exceeding max_length) rather than just the
+        // status line -- the body was already parsed above, don't discard it.
+        const detail = JSON.stringify(raw).slice(0, 500);
+        throw new Error(`[miniforge-nlp] ast/chunk failed: ${response.status} ${response.statusText} ${detail}`);
       }
       if (raw.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(raw.chunks)) {
         throw new Error('[miniforge-nlp] ast/chunk returned an invalid atlas.ast.evidence.v1 payload');

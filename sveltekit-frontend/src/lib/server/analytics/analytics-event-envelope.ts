@@ -43,6 +43,11 @@ export const AnalyticsEventTypeSchema = z.enum([
   'cache.miss',
   // Errors (non-fatal, for analytics — not exceptions)
   'error.occurred',
+  // Artifact lifecycle (QUEUE-06)
+  'artifact.materialized',
+  'artifact.failed',
+  // Artifact-reference envelope-size policy telemetry (QUEUE-10)
+  'artifact.envelope.telemetry',
 ]);
 
 export type AnalyticsEventType = z.infer<typeof AnalyticsEventTypeSchema>;

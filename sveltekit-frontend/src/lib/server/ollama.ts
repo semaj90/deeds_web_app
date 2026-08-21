@@ -970,7 +970,16 @@ export async function bifrostChat(
   );
   const effectiveModel = hasImages ? VLM_MODELS.vision : model;
 
-  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `ollama/${effectiveModel}`;
+  // Ollama is embeddings-only in this deployment (embeddinggemma/nomic-embed-text) — it
+  // has no chat models loaded. Every bifrostChat() caller's model name is therefore a
+  // gateway-routing tag, not a real Ollama model id; forwarding it under the `ollama/`
+  // provider prefix (the old default below) always 404s at Bifrost before it can reach
+  // any inference backend. Chat/synthesis routes through Bifrost's `openai` provider
+  // to llama-server (:8090), which only ever serves whatever ROTORQUANT_MODEL_PATH has
+  // loaded — so, same as the direct llama-server fallback path below, announce
+  // LLM_MODEL_ID rather than the caller's tag. An already-qualified `provider/model`
+  // string (containing '/') is passed through unchanged.
+  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `openai/${LLM_MODEL_ID}`;
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions

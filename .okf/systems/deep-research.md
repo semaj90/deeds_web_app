@@ -18,6 +18,8 @@ related:
   - tools/ml-ranking-sidecar
   - runbooks/admin-dashboard-setup
   - runbooks/ml-ranking-validation
+generated: manual_curation
+verified: unverified  # no formal verification pass has run against source_refs yet
 ---
 
 # Deep Research Task Infrastructure

@@ -130,4 +130,43 @@ describe('event fabric contracts', () => {
 
 		expect(event.eventType).toBe('checkpoint.commit');
 	});
+
+	it('parses artifact materialized events', () => {
+		const event = eventFabricEventSchema.parse({
+			...baseEvent,
+			eventType: 'artifact.materialized',
+			payload: {
+				actionKey: 'action-key-0123456789abcdef',
+				artifactId: 'artifact-1',
+				artifactHash: 'artifact-hash-0123456789abcdef',
+				checksum: 'checksum-0123456789abcdef',
+				revisionSetHash: 'revision-set-0123456789abcdef',
+				storage: 'MMAP',
+				locatorPath: '/tmp/artifact-1.bin',
+				byteLength: 1024,
+				producer: 'candidate-materializer',
+				producerRevision: 'materializer-v1',
+			},
+		});
+
+		expect(event.eventType).toBe('artifact.materialized');
+	});
+
+	it('parses artifact failed events', () => {
+		const event = eventFabricEventSchema.parse({
+			...baseEvent,
+			eventType: 'artifact.failed',
+			payload: {
+				actionKey: 'action-key-0123456789abcdef',
+				operation: 'candidate_feature_snapshot',
+				failureClass: 'GPU_OOM',
+				retryable: true,
+				retryCount: 2,
+				errorHash: 'error-hash-1',
+				inputArtifactRefs: ['artifact-0'],
+			},
+		});
+
+		expect(event.eventType).toBe('artifact.failed');
+	});
 });

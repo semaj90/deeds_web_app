@@ -6,6 +6,8 @@ status: active
 owners:
   - legal-ai-team
 updated: 2026-07-20
+generated: manual_curation
+verified: unverified  # no formal verification pass has run against source_refs yet
 ---
 
 # OKF Knowledge Graph — Deep Research & Canonical Packet Architecture

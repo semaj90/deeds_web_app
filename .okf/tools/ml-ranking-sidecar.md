@@ -11,6 +11,8 @@ source_refs:
 related:
   - pipeline/retrieval-ranking-synthesis
   - system/deep-research
+generated: manual_curation
+verified: unverified  # no formal verification pass has run against source_refs yet
 ---
 
 # Miniforge ML Ranking Sidecar

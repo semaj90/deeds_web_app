@@ -54,7 +54,7 @@ export const langExtractAlignmentStatusSchema = z.enum(LANGEXTRACT_ALIGNMENT_STA
 export const treesitterChunkerChunkSchema = z.object({
   upstream_node_id: id,
   upstream_file_id: id,
-  upstream_symbol_id: id.optional(),
+  upstream_symbol_id: id.nullable().optional(),
   upstream_chunk_id: id,
   source_ref: z.string().min(1),
   language: z.string().min(1),
@@ -62,7 +62,10 @@ export const treesitterChunkerChunkSchema = z.object({
   kind: z.string().min(1),
   symbol_name: z.string().min(1).optional(),
   parent_route: z.array(z.string()).default([]),
-  parent_context: z.string().min(1).optional(),
+  parent_context: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().min(1).optional(),
+  ),
   byte_start: z.number().int().nonnegative(),
   byte_end: z.number().int().nonnegative(),
   start_line: z.number().int().nonnegative(),
@@ -154,7 +157,7 @@ export const structuralSymbolNominationSchema = z.object({
   source_revision: revision,
   workspace_revision: revision,
   upstream_node_id: id,
-  upstream_symbol_id: id.optional(),
+  upstream_symbol_id: id.nullable().optional(),
   upstream_chunk_id: id,
   byte_start: z.number().int().nonnegative(),
   byte_end: z.number().int().nonnegative(),
@@ -207,7 +210,7 @@ export const symbolVersionSchema = z.object({
   source_revision: revision,
   workspace_revision: revision,
   upstream_node_id: id,
-  upstream_symbol_id: id.optional(),
+  upstream_symbol_id: id.nullable().optional(),
   upstream_chunk_id: id,
   qualified_name: z.string().min(1),
   declaration_hash: sha256,
@@ -290,7 +293,7 @@ export function deriveUpstreamSymbolNominationKey(input: {
   source_ref: string;
   kind: z.infer<typeof structuralSymbolKindSchema>;
   qualified_name: string;
-  upstream_symbol_id?: string;
+  upstream_symbol_id?: string | null;
 }): string {
   if (input.upstream_symbol_id) return `upstream-symbol:${input.upstream_symbol_id}`;
   return `symbol-key:${hash([

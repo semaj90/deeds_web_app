@@ -2,6 +2,8 @@ import { makeEvent, emit } from '$lib/server/analytics/analytics-sink.js';
 import type { AnalyticsEventEnvelope } from '$lib/server/analytics/analytics-event-envelope.js';
 import type {
 	AnalyticsObservationEventV1,
+	ArtifactFailedEventV1,
+	ArtifactMaterializedEventV1,
 	CheckpointCommitEventV1,
 	CodeEvidencePersistedEventV1,
 	FailureObservationEventV1,
@@ -142,6 +144,42 @@ function projectCheckpointCommit(event: CheckpointCommitEventV1): AnalyticsEvent
 	});
 }
 
+function projectArtifactMaterialized(event: ArtifactMaterializedEventV1): AnalyticsEventEnvelope {
+	return makeEvent({
+		eventType: 'artifact.materialized',
+		traceId: event.traceId ?? `artifact:${event.payload.artifactId}`,
+		sourceRef: event.sourceRef,
+		metadata: {
+			actionKey: event.payload.actionKey,
+			artifactId: event.payload.artifactId,
+			artifactHash: event.payload.artifactHash,
+			checksum: event.payload.checksum,
+			revisionSetHash: event.payload.revisionSetHash,
+			storage: event.payload.storage,
+			byteLength: event.payload.byteLength ?? null,
+			producer: event.payload.producer,
+			producerRevision: event.payload.producerRevision,
+		},
+	});
+}
+
+function projectArtifactFailed(event: ArtifactFailedEventV1): AnalyticsEventEnvelope {
+	return makeEvent({
+		eventType: 'artifact.failed',
+		traceId: event.traceId ?? `artifact-failed:${event.eventId}`,
+		sourceRef: event.sourceRef,
+		metadata: {
+			actionKey: event.payload.actionKey,
+			operation: event.payload.operation,
+			failureClass: event.payload.failureClass,
+			retryable: event.payload.retryable,
+			retryCount: event.payload.retryCount,
+			errorHash: event.payload.errorHash,
+			inputArtifactRefs: event.payload.inputArtifactRefs,
+		},
+	});
+}
+
 export function projectEventFabricToAnalytics(event: EventFabricEventV1): AnalyticsEventEnvelope | null {
 	switch (event.eventType) {
 		case 'code.evidence.persisted':
@@ -156,6 +194,10 @@ export function projectEventFabricToAnalytics(event: EventFabricEventV1): Analyt
 			return projectPolicyDecisionReceipt(event);
 		case 'checkpoint.commit':
 			return projectCheckpointCommit(event);
+		case 'artifact.materialized':
+			return projectArtifactMaterialized(event);
+		case 'artifact.failed':
+			return projectArtifactFailed(event);
 	}
 }
 

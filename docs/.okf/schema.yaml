@@ -1,6 +1,14 @@
-# OpenWiki Knowledge Format (OKF) v1.0.0 Schema
-# Google's machine-readable format for structured knowledge bases
-# Reference: https://github.com/google-ai-sb/okf-spec
+# Repo-local code-intelligence schema. This is NOT the real Google Cloud
+# "Open Knowledge Format" (OKF) spec -- that lives at
+# https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md
+# (currently v0.2, Markdown+YAML-frontmatter, only `type` required). The
+# previous header cited a nonexistent repo (github.com/google-ai-sb/okf-spec,
+# confirmed 404) and claimed "v1.0.0" -- both were fabricated. This repo's
+# actual OKF-aligned knowledge concepts live under root `.okf/` (systems/,
+# pipelines/, tools/, runbooks/, index.md) and already use real spec fields
+# (type/source_refs/generated/verified). The schema below is a separate,
+# code-intelligence-specific convention -- do not present it as the external
+# OKF spec.
 
 version: "1.0.0"
 spec_name: "OpenWiki Knowledge Format"

@@ -11,6 +11,8 @@ source_refs:
 related:
   - system/deep-research
   - runbook/ml-ranking-validation
+generated: manual_curation
+verified: unverified  # no formal verification pass has run against source_refs yet
 ---
 
 # Deep Research Admin Dashboard Setup & Operations
