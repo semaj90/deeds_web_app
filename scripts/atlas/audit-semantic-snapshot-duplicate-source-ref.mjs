@@ -12,6 +12,7 @@ const report = {
   timestamp: new Date().toISOString(),
   databasePath: path.relative(process.cwd(), dbPath),
   table: 'vector_snapshot_packets_5k_768',
+  mode: 'SELECT_ONLY',
   duplicateGroups: [],
   duplicateRowCount: 0,
   status: 'NOT_RUN',
@@ -27,7 +28,9 @@ function queryAll(connection, sql) {
 let db;
 try {
   if (!existsSync(dbPath)) throw new Error('SNAPSHOT_DUCKDB_NOT_FOUND');
-  db = new duckdb.Database(dbPath, { readonly: true });
+  // Use the same constructor contract as the repository's existing DuckDB
+  // scripts. This audit executes SELECT only and contains no DDL/DML paths.
+  db = new duckdb.Database(dbPath);
   const connection = db.connect();
   const rows = await queryAll(connection, `
     SELECT
