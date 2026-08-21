@@ -4,15 +4,18 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { sql } from 'drizzle-orm';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
 
-import { db } from '../../src/lib/server/db/client.js';
-import {
+loadAtlasEnv();
+
+const { db } = await import('../../src/lib/server/db/client.js');
+const {
   artifactFailedEventSchema,
   artifactMaterializedEventSchema,
-} from '../../src/lib/server/queue/event-fabric.js';
-import {
+} = await import('../../src/lib/server/queue/event-fabric.js');
+const {
   persistArtifactLifecycleEvent,
-} from '../../src/lib/server/queue/artifact-event-processing.js';
+} = await import('../../src/lib/server/queue/artifact-event-processing.js');
 
 function sha256(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
