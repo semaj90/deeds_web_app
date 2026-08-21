@@ -5,6 +5,7 @@ import type { RetrievalCandidateFeatureMatrixV1 } from '../../retrieval/retrieva
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
 const id = z.string().min(1);
+const CandidateFeatureNameSchema = z.enum(CANDIDATE_FEATURE_NAMES);
 
 export const TORCH_FEATURE_TENSOR_SCHEMA = 'atlas.torch-feature-tensor.v1' as const;
 export const TORCH_FEATURE_TENSOR_REVISION = 'atlas.torch-feature-tensor.row-major-f32-mask-v1' as const;
@@ -18,7 +19,7 @@ export const TorchFeatureTensorV1Schema = z.object({
   queryId: id,
   rowCount: z.number().int().nonnegative(),
   columnCount: z.literal(25),
-  columnNames: z.tuple(CANDIDATE_FEATURE_NAMES.map((name) => z.literal(name)) as [z.ZodLiteral<string>, ...z.ZodLiteral<string>[]]),
+  columnNames: z.array(CandidateFeatureNameSchema).length(25),
   rowKeys: z.array(id),
   layout: z.literal('ROW_MAJOR_CONTIGUOUS'),
   dtype: z.literal('float32'),
@@ -42,6 +43,20 @@ function digestStrings(values: readonly string[]): string {
   const hash = createHash('sha256');
   for (const value of values) hash.update(`${Buffer.byteLength(value, 'utf8')}:`, 'utf8').update(value, 'utf8');
   return hash.digest('hex');
+}
+
+function assertCanonicalColumnOrder(columnNames: readonly string[]): void {
+  if (columnNames.length !== CANDIDATE_FEATURE_NAMES.length) throw new Error('TORCH_FEATURE_COLUMN_ORDER_MISMATCH');
+  for (let i = 0; i < CANDIDATE_FEATURE_NAMES.length; i += 1) {
+    if (columnNames[i] !== CANDIDATE_FEATURE_NAMES[i]) throw new Error(`TORCH_FEATURE_COLUMN_ORDER_MISMATCH:${i}`);
+  }
+}
+
+export function validateTorchFeatureTensorArtifactV1(artifact: TorchFeatureTensorV1): TorchFeatureTensorV1 {
+  const parsed = TorchFeatureTensorV1Schema.parse(artifact);
+  assertCanonicalColumnOrder(parsed.columnNames);
+  if (parsed.rowKeys.length !== parsed.rowCount) throw new Error('TORCH_FEATURE_ROW_KEY_COUNT_MISMATCH');
+  return parsed;
 }
 
 export function buildTorchFeatureTensorV1(input: {
@@ -73,7 +88,7 @@ export function buildTorchFeatureTensorV1(input: {
 
   const features = matrix.candidate_features.slice();
   const presenceMask = matrix.presence_mask.slice();
-  const artifact = TorchFeatureTensorV1Schema.parse({
+  const artifact = validateTorchFeatureTensorArtifactV1({
     schema: TORCH_FEATURE_TENSOR_SCHEMA,
     tensorRevision: TORCH_FEATURE_TENSOR_REVISION,
     featureRevision: input.featureRevision,
