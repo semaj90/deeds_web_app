@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
+const MAX_TEMPORAL_ALTERNATIVE_HOPS = 8;
 
 function stripToolMarkup(text: string): string {
   return text
@@ -108,8 +109,16 @@ export function parseToolCalls(text: string) {
 type ToolExecutionContext = {
   temporalAction?: unknown;
   temporalActionBoundary?: unknown;
+  temporalAlternativePlan?: unknown;
+  temporalAlternativeSelection?: unknown;
+  temporalAlternativeDepth?: number;
   [key: string]: unknown;
 };
+
+type TemporalBoundaryOutcome =
+  | { kind: 'SHORT_CIRCUIT'; result: unknown }
+  | { kind: 'REPLACE'; call: { tool: string; args: any }; temporalAction: unknown; failedExecutionKey: string }
+  | null;
 
 /**
  * Optional temporal execution policy. Existing callers remain unchanged unless
@@ -121,7 +130,7 @@ type ToolExecutionContext = {
 async function applyTemporalBoundary(
   call: { tool: string; args: any },
   context?: ToolExecutionContext,
-): Promise<null | { shortCircuit: true; result: unknown }> {
+): Promise<TemporalBoundaryOutcome> {
   if (!context?.temporalAction) return null;
 
   const {
@@ -139,7 +148,7 @@ async function applyTemporalBoundary(
 
   if (decision.disposition === 'REUSE_RESULT') {
     return {
-      shortCircuit: true,
+      kind: 'SHORT_CIRCUIT',
       result: {
         ok: true,
         tool: call.tool,
@@ -154,8 +163,41 @@ async function applyTemporalBoundary(
     };
   }
 
+  if (decision.disposition !== 'SELECT_ALTERNATIVE') {
+    throw new Error(`TEMPORAL_NONDISPATCH_DISPOSITION_UNHANDLED:${decision.disposition}`);
+  }
+
+  if (context.temporalAlternativePlan) {
+    const { selectTemporalAlternativeToolFromPostgres } = await import(
+      '../atlas/temporal/temporal-action-alternative-boundary.js'
+    );
+    const plan = context.temporalAlternativePlan as Record<string, any>;
+    const exclusions = new Set<string>([
+      ...(Array.isArray(plan.excluded_execution_keys) ? plan.excluded_execution_keys : []),
+      decision.execution_key,
+    ]);
+    const selection = await selectTemporalAlternativeToolFromPostgres({
+      failed_boundary: decision,
+      plan: {
+        ...plan,
+        excluded_execution_keys: [...exclusions],
+      } as never,
+    });
+    context.temporalAlternativeSelection = selection;
+    context.temporalAlternativePlan = {
+      ...plan,
+      excluded_execution_keys: [...exclusions],
+    };
+    return {
+      kind: 'REPLACE',
+      call: selection.selected_call,
+      temporalAction: selection.selected_temporal,
+      failedExecutionKey: decision.execution_key,
+    };
+  }
+
   return {
-    shortCircuit: true,
+    kind: 'SHORT_CIRCUIT',
     result: {
       ok: false,
       tool: call.tool,
@@ -170,9 +212,23 @@ async function applyTemporalBoundary(
   };
 }
 
-export async function executeTool(call: { tool: string; args: any }, context?: ToolExecutionContext) {
+async function executeToolAtDepth(
+  call: { tool: string; args: any },
+  context: ToolExecutionContext | undefined,
+  depth: number,
+): Promise<unknown> {
+  if (depth > MAX_TEMPORAL_ALTERNATIVE_HOPS) {
+    throw new Error(`TEMPORAL_ALTERNATIVE_HOP_LIMIT_EXCEEDED:${MAX_TEMPORAL_ALTERNATIVE_HOPS}`);
+  }
+
   const temporal = await applyTemporalBoundary(call, context);
-  if (temporal?.shortCircuit) return temporal.result;
+  if (temporal?.kind === 'SHORT_CIRCUIT') return temporal.result;
+  if (temporal?.kind === 'REPLACE') {
+    if (!context) throw new Error('TEMPORAL_ALTERNATIVE_CONTEXT_MISSING');
+    context.temporalAction = temporal.temporalAction;
+    context.temporalAlternativeDepth = depth + 1;
+    return executeToolAtDepth(temporal.call, context, depth + 1);
+  }
 
   switch (call.tool) {
     case "rg_search":
@@ -229,4 +285,11 @@ export async function executeTool(call: { tool: string; args: any }, context?: T
     default:
       return null;
   }
+}
+
+export async function executeTool(call: { tool: string; args: any }, context?: ToolExecutionContext) {
+  const initialDepth = Number.isInteger(context?.temporalAlternativeDepth)
+    ? Number(context?.temporalAlternativeDepth)
+    : 0;
+  return executeToolAtDepth(call, context, initialDepth);
 }
