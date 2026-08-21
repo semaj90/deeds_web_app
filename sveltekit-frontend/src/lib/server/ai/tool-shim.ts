@@ -142,6 +142,176 @@ async function applyTemporalBoundary(
     throw new Error(`TEMPORAL_NONDISPATCH_DISPOSITION_UNHANDLED:${decision.disposition}`);
   }
 
+export type TemporalPostDispatchHook = (
+  input: TemporalPostDispatchHookInput,
+) => Promise<void> | void;
+
+type ToolExecutionContext = {
+  temporalAction?: unknown;
+  temporalActionBoundary?: unknown;
+  temporalAlternativePlan?: unknown;
+  temporalAlternativeSelection?: unknown;
+  temporalAlternativeDepth?: number;
+  temporalPostDispatch?: TemporalPostDispatchHook;
+  [key: string]: unknown;
+};
+
+type TemporalBoundaryOutcome =
+  | { kind: 'SHORT_CIRCUIT'; result: unknown }
+  | { kind: 'REPLACE'; call: { tool: string; args: any }; temporalAction: unknown; failedExecutionKey: string }
+  | null;
+
+async function runTemporalPostDispatchHook(
+  call: { tool: string; args: any },
+  result: unknown,
+  context?: ToolExecutionContext,
+): Promise<void> {
+  if (!context?.temporalAction || !context.temporalPostDispatch) return;
+  await context.temporalPostDispatch({
+    call,
+    result,
+    temporalAction: context.temporalAction,
+    temporalBoundary: context.temporalActionBoundary ?? null,
+  });
+}
+
+/**
+ * Optional temporal execution policy. Existing callers remain unchanged unless
+ * they explicitly supply `context.temporalAction`.
+ *
+ * Once supplied, the temporal gate is mandatory and fail-closed. A lookup or
+ * validation error is allowed to surface rather than silently re-running work.
+ */
+async function applyTemporalBoundary(
+  call: { tool: string; args: any },
+  context?: ToolExecutionContext,
+): Promise<TemporalBoundaryOutcome> {
+  if (!context?.temporalAction) return null;
+
+  const {
+    decideTemporalToolExecutionFromPostgres,
+    temporalBoundaryAllowsDispatch,
+  } = await import('../atlas/temporal/temporal-tool-execution-boundary.js');
+
+  const decision = await decideTemporalToolExecutionFromPostgres({
+    call,
+    temporal: context.temporalAction as never,
+  });
+  context.temporalActionBoundary = decision;
+
+  if (temporalBoundaryAllowsDispatch(decision)) return null;
+
+  if (decision.disposition === 'REUSE_RESULT') {
+    return {
+      kind: 'SHORT_CIRCUIT',
+      result: {
+        ok: true,
+        tool: call.tool,
+        temporalDisposition: 'REUSE_RESULT',
+        reused: true,
+        resultRef: decision.reused_result_ref,
+        executionKey: decision.execution_key,
+        priorEventId: decision.prior_event_id,
+        reason: decision.reason,
+        boundaryChecksum: decision.boundary_checksum,
+      },
+    };
+  }
+
+  if (decision.disposition !== 'SELECT_ALTERNATIVE') {
+    throw new Error(`TEMPORAL_NONDISPATCH_DISPOSITION_UNHANDLED:${decision.disposition}`);
+  }
+
+  if (context.temporalAlternativePlan) {
+    const { selectTemporalAlternativeToolFromPostgres } = await import(
+      '../atlas/temporal/temporal-action-alternative-boundary.js'
+    );
+    const plan = context.temporalAlternativePlan as Record<string, any>;
+    const exclusions = new Set<string>([
+      ...(Array.isArray(plan.excluded_execution_keys) ? plan.excluded_execution_keys : []),
+      decision.execution_key,
+    ]);
+    const selection = await selectTemporalAlternativeToolFromPostgres({
+      failed_boundary: decision,
+      plan: {
+        ...plan,
+        excluded_execution_keys: [...exclusions],
+      } as never,
+    });
+    context.temporalAlternativeSelection = selection;
+    context.temporalAlternativePlan = {
+      ...plan,
+      excluded_execution_keys: [...exclusions],
+    };
+    return {
+      kind: 'REPLACE',
+      call: selection.selected_call,
+      temporalAction: selection.selected_temporal,
+      failedExecutionKey: decision.execution_key,
+    };
+  }
+
+  return {
+    kind: 'SHORT_CIRCUIT',
+    result: {
+      ok: false,
+      tool: call.tool,
+      temporalDisposition: 'SELECT_ALTERNATIVE',
+      reused: false,
+      resultRef: null,
+      executionKey: decision.execution_key,
+      priorEventId: decision.prior_event_id,
+      reason: decision.reason,
+      boundaryChecksum: decision.boundary_checksum,
+    },
+  };
+}
+
+async function executeToolAtDepth(
+  call: { tool: string; args: any },
+  context: ToolExecutionContext | undefined,
+  depth: number,
+): Promise<unknown> {
+  if (depth > MAX_TEMPORAL_ALTERNATIVE_HOPS) {
+    throw new Error(`TEMPORAL_ALTERNATIVE_HOP_LIMIT_EXCEEDED:${MAX_TEMPORAL_ALTERNATIVE_HOPS}`);
+  }
+
+  const temporal = await applyTemporalBoundary(call, context);
+  if (temporal?.kind === 'SHORT_CIRCUIT') return temporal.result;
+  if (temporal?.kind === 'REPLACE') {
+    if (!context) throw new Error('TEMPORAL_ALTERNATIVE_CONTEXT_MISSING');
+    context.temporalAction = temporal.temporalAction;
+    context.temporalAlternativeDepth = depth + 1;
+    return executeToolAtDepth(temporal.call, context, depth + 1);
+  }
+
+  switch (call.tool) {
+    case "rg_search":
+      {
+        const { tool_codebase_rg_search } = await import('./mcp-tool-dispatch.js');
+        const result = await tool_codebase_rg_search(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
+      }
+
+    case "graph_expand":
+      {
+        const { tool_graph_expand_neighborhood } = await import('./mcp-tool-dispatch.js');
+        const result = await tool_graph_expand_neighborhood(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
+      }
+
+    case "atlas_lookup":
+    case "search.hybrid":
+      {
+        const { tool_search_hybrid } = await import('./mcp-tool-dispatch.js');
+        if (!tool_search_hybrid) return null;
+        const result = await tool_search_hybrid(call.args);
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
+      }
+
   if (context.temporalAlternativePlan) {
     const { selectTemporalAlternativeToolFromPostgres } = await import(
       '../atlas/temporal/temporal-action-alternative-boundary.js'
@@ -221,12 +391,27 @@ async function dispatchTool(call: { tool: string; args: any }): Promise<ToolDisp
             stdout: String(stdout ?? '').trim(),
             stderr: String(stderr ?? '').trim(),
           },
+        const result = {
+          ok: true,
+          tool: 'terminal',
+          command,
+          stdout: String(stdout ?? '').trim(),
+          stderr: String(stderr ?? '').trim(),
         };
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       } catch (error: any) {
         return {
           dispatched: true,
           result: { ok: false, tool: 'terminal', command, error: String(error?.message ?? error) },
+        const result = {
+          ok: false,
+          tool: 'terminal',
+          command,
+          error: String(error?.message ?? error),
         };
+        await runTemporalPostDispatchHook(call, result, context);
+        return result;
       }
     }
     default:
