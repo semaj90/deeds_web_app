@@ -90,7 +90,7 @@ export async function enqueueTask(opts: {
 
   const taskId = crypto.randomUUID();
   const commandId = crypto.randomUUID();
-  const idempotencyKey = await idempotencyKey(taskId, 0, opts.commandType);
+  const idempotencyKey = await computeIdempotencyKey(taskId, 0, opts.commandType);
 
   const command: WorkCommandBase = {
     commandId,
@@ -230,7 +230,7 @@ async function writeStructuredOutboxRow(
   return { eventId };
 }
 
-async function idempotencyKey(taskId: string, attempt: number, commandType: string): Promise<string> {
+async function computeIdempotencyKey(taskId: string, attempt: number, commandType: string): Promise<string> {
   const raw = `${taskId}:${attempt}:${commandType}`;
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
   return Array.from(new Uint8Array(buf))

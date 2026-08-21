@@ -137,14 +137,16 @@ describe('event fabric contracts', () => {
 			eventType: 'artifact.materialized',
 			payload: {
 				actionKey: 'action-key-0123456789abcdef',
-				artifactId: 'artifact-1',
-				artifactHash: 'artifact-hash-0123456789abcdef',
-				checksum: 'checksum-0123456789abcdef',
-				revisionSetHash: 'revision-set-0123456789abcdef',
-				storage: 'MMAP',
-				locatorPath: '/tmp/artifact-1.bin',
-				byteLength: 1024,
-				producer: 'candidate-materializer',
+				artifact: {
+					schema: 'atlas.artifact-address.v1',
+					artifactId: 'artifact-1',
+					artifactHash: 'artifact-hash-0123456789abcdef',
+					schemaId: 'atlas.candidate-feature-snapshot.v1',
+					checksum: 'checksum-0123456789abcdef',
+					revisionSetHash: 'revision-set-0123456789abcdef',
+					locator: { storage: 'MMAP', path: '/tmp/artifact-1.bin' },
+				},
+				fencingToken: '1',
 				producerRevision: 'materializer-v1',
 			},
 		});
@@ -158,12 +160,12 @@ describe('event fabric contracts', () => {
 			eventType: 'artifact.failed',
 			payload: {
 				actionKey: 'action-key-0123456789abcdef',
-				operation: 'candidate_feature_snapshot',
+				expectedOutputSchema: 'atlas.candidate-feature-snapshot.v1',
+				producerRevision: 'materializer-v1',
 				failureClass: 'GPU_OOM',
 				retryable: true,
-				retryCount: 2,
-				errorHash: 'error-hash-1',
-				inputArtifactRefs: ['artifact-0'],
+				errorHash: 'error-hash-0123456789abcdef',
+				inputArtifactRefs: [],
 			},
 		});
 
