@@ -5,6 +5,16 @@
 -- ActionCurrentProjectionV1 is derived/rebuildable and is intentionally not
 -- stored as canonical truth in this first durable tranche.
 
+-- Ledger ordering is storage-owned, not minted from wall-clock timestamps or
+-- workflow-local sequence numbers. Gaps are allowed; reuse depends on immutable
+-- event identity/checksum and explicit revision applicability, not contiguity.
+CREATE SEQUENCE IF NOT EXISTS atlas_agent_action_ledger_sequence_seq
+  AS bigint
+  START WITH 1
+  INCREMENT BY 1
+  MINVALUE 1
+  NO CYCLE;
+
 CREATE TABLE IF NOT EXISTS atlas_agent_action_events (
   event_id             text        PRIMARY KEY,
   ledger_sequence      bigint      NOT NULL UNIQUE CHECK (ledger_sequence > 0),
@@ -25,6 +35,15 @@ CREATE TABLE IF NOT EXISTS atlas_agent_action_events (
   event_json           jsonb       NOT NULL,
   producer_revision    text        NOT NULL,
   persisted_at         timestamptz NOT NULL DEFAULT now()
+);
+
+-- Safe for first application and for an existing test table: the next allocated
+-- sequence is always above the currently persisted maximum. This statement is
+-- deployment-time migration logic, not runtime action identity logic.
+SELECT setval(
+  'atlas_agent_action_ledger_sequence_seq',
+  GREATEST(COALESCE((SELECT MAX(ledger_sequence) + 1 FROM atlas_agent_action_events), 1), 1),
+  false
 );
 
 CREATE INDEX IF NOT EXISTS idx_atlas_agent_action_events_execution

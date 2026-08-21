@@ -21,6 +21,16 @@ vi.mock('../atlas/temporal/temporal-tool-execution-boundary.js', () => ({
         boundary_checksum: 'b'.repeat(64),
       };
     }
+    if (input.call.tool === 'atlas_lookup') {
+      return {
+        execution_key: 'e'.repeat(64),
+        disposition: 'REUSE_RESULT',
+        reused_result_ref: 'sha256:prior-result',
+        prior_event_id: 'evt:success',
+        reason: 'EXACT_SUCCESS_REUSE',
+        boundary_checksum: 'f'.repeat(64),
+      };
+    }
     return {
       execution_key: 'c'.repeat(64),
       disposition: 'DISPATCH_EXECUTE',
@@ -61,8 +71,9 @@ beforeEach(() => {
 });
 
 describe('tool shim temporal alternative orchestration', () => {
-  it('selects and dispatches the deterministic alternative without returning to the caller for replanning', async () => {
+  it('selects, dispatches, then hands the exact selected result to the post-dispatch owner', async () => {
     const { executeTool } = await import('./tool-shim.js');
+    const postDispatch: any[] = [];
     const context: Record<string, unknown> = {
       temporalAction: { schema: 'failed-temporal-context' },
       temporalAlternativePlan: {
@@ -70,6 +81,9 @@ describe('tool shim temporal alternative orchestration', () => {
         workflow_revision: 1,
         excluded_execution_keys: [],
         candidates: [{ candidate_action_id: 'placeholder' }],
+      },
+      temporalPostDispatch: (input: unknown) => {
+        postDispatch.push(input);
       },
     };
 
@@ -85,17 +99,47 @@ describe('tool shim temporal alternative orchestration', () => {
     expect(mockState.dispatched).toEqual([{ pattern: 'resolveCanonicalCandidateId' }]);
     expect(context.temporalAction).toEqual({ schema: 'selected-temporal-context' });
     expect(context.temporalAlternativeDepth).toBe(1);
+    expect(postDispatch).toHaveLength(1);
+    expect(postDispatch[0]).toMatchObject({
+      call: { tool: 'rg_search', args: { pattern: 'resolveCanonicalCandidateId' } },
+      result: { ok: true, tool: 'rg_search', matches: ['hit:1'] },
+      temporalAction: { schema: 'selected-temporal-context' },
+      temporalBoundary: { disposition: 'DISPATCH_EXECUTE', execution_key: 'c'.repeat(64) },
+    });
   });
 
-  it('preserves the typed SELECT_ALTERNATIVE short circuit when no alternative plan is supplied', async () => {
+  it('preserves SELECT_ALTERNATIVE short circuit and never invokes post-dispatch when no tool ran', async () => {
     const { executeTool } = await import('./tool-shim.js');
+    const postDispatch: any[] = [];
     const result = await executeTool(
       { tool: 'search.hybrid', args: { query: 'x' } },
-      { temporalAction: { schema: 'failed-temporal-context' } },
+      {
+        temporalAction: { schema: 'failed-temporal-context' },
+        temporalPostDispatch: (input: unknown) => postDispatch.push(input),
+      },
     ) as any;
 
     expect(result.temporalDisposition).toBe('SELECT_ALTERNATIVE');
     expect(result.executionKey).toBe('a'.repeat(64));
     expect(mockState.dispatched).toHaveLength(0);
+    expect(postDispatch).toHaveLength(0);
+  });
+
+  it('never records a REUSE_RESULT short circuit as a fresh dispatch', async () => {
+    const { executeTool } = await import('./tool-shim.js');
+    const postDispatch: any[] = [];
+    const result = await executeTool(
+      { tool: 'atlas_lookup', args: { query: 'already-proven' } },
+      {
+        temporalAction: { schema: 'success-temporal-context' },
+        temporalPostDispatch: (input: unknown) => postDispatch.push(input),
+      },
+    ) as any;
+
+    expect(result.temporalDisposition).toBe('REUSE_RESULT');
+    expect(result.reused).toBe(true);
+    expect(result.resultRef).toBe('sha256:prior-result');
+    expect(mockState.dispatched).toHaveLength(0);
+    expect(postDispatch).toHaveLength(0);
   });
 });
