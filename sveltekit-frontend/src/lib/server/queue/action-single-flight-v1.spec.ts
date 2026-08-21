@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { execute } = vi.hoisted(() => ({ execute: vi.fn() }));
+const mocks = vi.hoisted(() => {
+  const execute = vi.fn();
+  const transaction = vi.fn(async (callback: (tx: { execute: typeof execute }) => unknown) =>
+    callback({ execute }),
+  );
+  return { execute, transaction };
+});
 
 vi.mock('$lib/server/db/client.js', () => ({
-  db: { execute },
+  db: { execute: mocks.execute, transaction: mocks.transaction },
 }));
 
 import {
@@ -35,10 +41,13 @@ const receiptRow = {
 };
 
 describe('ActionKey single-flight', () => {
-  beforeEach(() => execute.mockReset());
+  beforeEach(() => {
+    mocks.execute.mockReset();
+    mocks.transaction.mockClear();
+  });
 
   it('returns an existing immutable receipt without trying to acquire a lease', async () => {
-    execute.mockResolvedValueOnce({ rows: [receiptRow] });
+    mocks.execute.mockResolvedValueOnce({ rows: [receiptRow] });
 
     const claim = await claimActionWork({
       actionKey: 'action-key-00000001',
@@ -47,18 +56,18 @@ describe('ActionKey single-flight', () => {
     });
 
     expect(claim.kind).toBe('receipt');
-    expect(execute).toHaveBeenCalledTimes(1);
+    expect(mocks.execute).toHaveBeenCalledTimes(1);
   });
 
   it('acquires a lease with the database-issued fencing token when no receipt exists', async () => {
-    execute
+    mocks.execute
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [{
           action_key: 'action-key-00000001',
           lease_owner: 'worker-a',
           fencing_token: '7',
-          lease_expires_at: new Date('2026-08-21T00:01:00.000Z'),
+          lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
         }],
       });
 
@@ -74,10 +83,8 @@ describe('ActionKey single-flight', () => {
     });
   });
 
-  it('returns the already-persisted receipt when duplicate completion loses the insert race', async () => {
-    execute
-      .mockResolvedValueOnce({ rows: [] })
-      .mockResolvedValueOnce({ rows: [receiptRow] });
+  it('returns an already-persisted receipt before locking or inserting again', async () => {
+    mocks.execute.mockResolvedValueOnce({ rows: [receiptRow] });
 
     const receipt = await completeActionWork({
       actionKey: 'action-key-00000001',
@@ -89,11 +96,48 @@ describe('ActionKey single-flight', () => {
 
     expect(receipt.fencingToken).toBe('4');
     expect(receipt.outputArtifact.artifactId).toBe('artifact-output-1');
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('persists a receipt only while the current fenced lease is locked', async () => {
+    mocks.execute
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({
+        rows: [{
+          action_key: 'action-key-00000001',
+          lease_owner: 'worker-a',
+          fencing_token: '3',
+          lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
+        }],
+      })
+      .mockResolvedValueOnce({
+        rows: [{ ...receiptRow, fencing_token: '3' }],
+      });
+
+    const receipt = await completeActionWork({
+      actionKey: 'action-key-00000001',
+      leaseOwner: 'worker-a',
+      fencingToken: '3',
+      outputArtifact: artifact,
+      producerRevision: 'producer-v1',
+    });
+
+    expect(receipt.fencingToken).toBe('3');
+    expect(mocks.execute).toHaveBeenCalledTimes(3);
   });
 
   it('rejects a stale fencing token when no receipt exists', async () => {
-    execute
+    mocks.execute
       .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({
+        rows: [{
+          action_key: 'action-key-00000001',
+          lease_owner: 'worker-new',
+          fencing_token: '4',
+          lease_expires_at: new Date('2099-08-21T00:01:00.000Z'),
+        }],
+      })
       .mockResolvedValueOnce({ rows: [] });
 
     await expect(completeActionWork({
