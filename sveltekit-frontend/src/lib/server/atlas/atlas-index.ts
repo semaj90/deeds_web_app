@@ -44,6 +44,32 @@ export {
 export type { StructuralHyperedgeV1, RetrievalFanoutPlanV1 } from './structural/structural-hypergraph-fanout';
 
 export {
+  AstRelationSchema,
+  AstNodeSelectorV1Schema,
+  AstTraversalSeedV1Schema,
+  AstTraversalPlanV1Schema,
+  buildAstTraversalPlan,
+} from './structural/ast-relational-selector';
+export type {
+  AstRelation,
+  AstNodeSelectorV1,
+  AstTraversalSeedV1,
+  AstTraversalPlanV1,
+} from './structural/ast-relational-selector';
+
+export {
+  StructuralRoutingCandidateV1Schema,
+  StructuralRoutingDecisionV1Schema,
+  chooseGraphSeeds,
+  chooseRelevantHyperedges,
+  buildStructuralRoutingDecision,
+} from './structural/structural-routing-policy';
+export type {
+  StructuralRoutingCandidateV1,
+  StructuralRoutingDecisionV1,
+} from './structural/structural-routing-policy';
+
+export {
   RlmRoutingPrefillV1Schema,
   RlmNavigationDecisionV1Schema,
   AcePrefetchHintV1Schema,
