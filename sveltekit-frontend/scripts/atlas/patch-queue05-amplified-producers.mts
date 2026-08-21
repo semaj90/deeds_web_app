@@ -6,6 +6,56 @@ const ROOT = process.cwd();
 const target = path.join(ROOT, 'src/lib/server/queue/queue-worker.ts');
 let source = await readFile(target, 'utf8');
 
+const beforeDocumentWorkerHeader = `export class DocumentEmbedWorker extends QueueWorker<{
+	documentId: string;
+	text: string;
+	collection?: string;
+}> {
+	readonly queue = 'document.embed' as const;
+
+	async process(data: {
+		documentId: string;
+		text: string;
+		collection?: string;
+	}): Promise<void> {
+		const { generateSingleEmbedding } = await import(`;
+
+const afterDocumentWorkerHeader = `export class DocumentEmbedWorker extends QueueWorker<unknown> {
+	readonly queue = 'document.embed' as const;
+
+	async process(raw: unknown): Promise<void> {
+		const { hydrateLegacyDocumentEmbedMessage } = await import(
+			'./legacy-amplified-payload-artifact-v1.js'
+		);
+		const data = await hydrateLegacyDocumentEmbedMessage(raw);
+		const { generateSingleEmbedding } = await import(`;
+
+const beforeVectorWorkerHeader = `export class VectorIndexWorker extends QueueWorker<{
+	documentId: string;
+	embedding: number[];
+	collection?: string;
+	metadata?: Record<string, unknown>;
+}> {
+	readonly queue = 'vector.index' as const;
+
+	async process(data: {
+		documentId: string;
+		embedding: number[];
+		collection?: string;
+		metadata?: Record<string, unknown>;
+	}): Promise<void> {
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');`;
+
+const afterVectorWorkerHeader = `export class VectorIndexWorker extends QueueWorker<unknown> {
+	readonly queue = 'vector.index' as const;
+
+	async process(raw: unknown): Promise<void> {
+		const { hydrateLegacyVectorIndexMessage } = await import(
+			'./legacy-amplified-payload-artifact-v1.js'
+		);
+		const data = await hydrateLegacyVectorIndexMessage(raw);
+		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');`;
+
 const beforeVector = `		// Chain to vector.index — uses dispatch utility so inline fallback works
 		const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
 		await dispatchOrExecuteInline('vector.index', {
@@ -67,6 +117,8 @@ const afterDocument = `    // QUEUE-05: materialize full processed text before c
     await dispatchOrExecuteInline('document.embed', documentMessage);`;
 
 const replacements: Array<[string, string, string]> = [
+  ['DocumentEmbedWorker artifact hydration', beforeDocumentWorkerHeader, afterDocumentWorkerHeader],
+  ['VectorIndexWorker artifact hydration', beforeVectorWorkerHeader, afterVectorWorkerHeader],
   ['DocumentEmbedWorker → vector.index', beforeVector, afterVector],
   ['EvidenceProcessWorker → document.embed', beforeDocument, afterDocument],
 ];
