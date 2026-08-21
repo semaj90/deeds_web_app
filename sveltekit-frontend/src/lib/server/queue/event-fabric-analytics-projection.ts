@@ -146,18 +146,17 @@ function projectCheckpointCommit(event: CheckpointCommitEventV1): AnalyticsEvent
 
 function projectArtifactMaterialized(event: ArtifactMaterializedEventV1): AnalyticsEventEnvelope {
 	return makeEvent({
-		eventType: 'artifact.materialized',
-		traceId: event.traceId ?? `artifact:${event.payload.artifactId}`,
+		eventType: 'lane.result',
+		traceId: event.traceId ?? `artifact:${event.eventId}`,
 		sourceRef: event.sourceRef,
+		laneId: 'artifact.materialized',
 		metadata: {
 			actionKey: event.payload.actionKey,
-			artifactId: event.payload.artifactId,
-			artifactHash: event.payload.artifactHash,
-			checksum: event.payload.checksum,
-			revisionSetHash: event.payload.revisionSetHash,
-			storage: event.payload.storage,
-			byteLength: event.payload.byteLength ?? null,
-			producer: event.payload.producer,
+			artifactId: event.payload.artifact.artifactId,
+			artifactHash: event.payload.artifact.artifactHash,
+			schemaId: event.payload.artifact.schemaId,
+			revisionSetHash: event.payload.artifact.revisionSetHash,
+			fencingToken: event.payload.fencingToken,
 			producerRevision: event.payload.producerRevision,
 		},
 	});
@@ -165,17 +164,17 @@ function projectArtifactMaterialized(event: ArtifactMaterializedEventV1): Analyt
 
 function projectArtifactFailed(event: ArtifactFailedEventV1): AnalyticsEventEnvelope {
 	return makeEvent({
-		eventType: 'artifact.failed',
+		eventType: 'error.occurred',
 		traceId: event.traceId ?? `artifact-failed:${event.eventId}`,
 		sourceRef: event.sourceRef,
 		metadata: {
 			actionKey: event.payload.actionKey,
-			operation: event.payload.operation,
+			expectedOutputSchema: event.payload.expectedOutputSchema,
+			fencingToken: event.payload.fencingToken ?? null,
+			producerRevision: event.payload.producerRevision,
 			failureClass: event.payload.failureClass,
 			retryable: event.payload.retryable,
-			retryCount: event.payload.retryCount,
 			errorHash: event.payload.errorHash,
-			inputArtifactRefs: event.payload.inputArtifactRefs,
 		},
 	});
 }

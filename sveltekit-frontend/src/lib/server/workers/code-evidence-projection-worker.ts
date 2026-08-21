@@ -2,8 +2,8 @@
  * Event Fabric Projection Worker
  *
  * Consumes the event-fabric queue and dispatches by eventType. The code
- * evidence path is the first real handler; the remaining event classes
- * are registered now so the control-loop seam is explicit and typed.
+ * evidence and artifact lifecycle paths have real durable handlers; the
+ * remaining event classes keep explicit typed seams for the control loop.
  */
 
 import amqp from 'amqplib';
@@ -12,6 +12,7 @@ import { declareTopology, QUEUES } from '$lib/server/queue/topology.js';
 import {
 	verifyCodeEvidenceReadback,
 } from '$lib/server/queue/code-evidence-event-processing.js';
+import { persistArtifactLifecycleEvent } from '$lib/server/queue/artifact-event-processing.js';
 import type {
 	CodeEvidencePersistedEventV1,
 } from '$lib/server/queue/integration-events.js';
@@ -28,10 +29,6 @@ import {
 	type RecommendationSignalEventV1,
 } from '$lib/server/queue/event-fabric.js';
 import { emitEventFabricAnalyticsProjection } from '$lib/server/queue/event-fabric-analytics-projection.js';
-import {
-	recordArtifactFailure,
-	verifyArtifactMaterialization,
-} from '$lib/server/queue/artifact-materialization-event-processing.js';
 
 export type EventFabricProjectionHandlers = EventFabricHandlerRegistry;
 
@@ -50,10 +47,10 @@ function buildDefaultHandlers(): EventFabricProjectionHandlers {
 			await verifyCodeEvidenceReadback(event);
 		},
 		'artifact.materialized': async (event: ArtifactMaterializedEventV1) => {
-			await verifyArtifactMaterialization(event);
+			await persistArtifactLifecycleEvent(event);
 		},
 		'artifact.failed': async (event: ArtifactFailedEventV1) => {
-			recordArtifactFailure(event);
+			await persistArtifactLifecycleEvent(event);
 		},
 	};
 }

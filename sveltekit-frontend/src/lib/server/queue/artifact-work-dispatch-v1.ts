@@ -1,14 +1,14 @@
 import { actionWorkItemSchema, type ActionWorkItemV1 } from './artifact-work-item-v1.js';
+import { assertArtifactReferenceEnvelopeSize } from './message-size-policy-v1.js';
 import { enqueueTask } from './outbox.js';
-import { assertArtifactWorkItemEnvelopeSize } from './artifact-envelope-size-policy-v1.js';
 
 /**
  * Authoritative dispatch path for Parent Atlas artifact computations.
  *
  * The large inputs live behind ArtifactAddressV1 references. This function
- * validates the work item then persists workflow_task + workflow_outbox before
- * RabbitMQ sees the command. Never route artifact work through the generic
- * fire-and-forget rabbitmq-client helper.
+ * validates and size-checks the work item, then persists workflow_task +
+ * workflow_outbox before RabbitMQ sees the command. Never route artifact work
+ * through the generic fire-and-forget rabbitmq-client helper.
  */
 export async function enqueueArtifactWorkItem(opts: {
   runId: string;
@@ -19,7 +19,7 @@ export async function enqueueArtifactWorkItem(opts: {
   item: ActionWorkItemV1;
 }): Promise<{ taskId: string; commandId: string; idempotencyKey: string }> {
   const item = actionWorkItemSchema.parse(opts.item);
-  assertArtifactWorkItemEnvelopeSize(item, { actionKey: item.actionKey, operation: item.operation });
+  assertArtifactReferenceEnvelopeSize(item);
 
   return enqueueTask({
     runId: opts.runId,

@@ -1,50 +1,28 @@
 /**
- * Transactional outbox pattern — guarantees Postgres-first ordering.
+ * Transactional outbox — Postgres is authoritative and RabbitMQ is delivery.
  *
- * Rule: a Postgres workflow_task row MUST exist before any WorkCommand is
- * published to RabbitMQ. The outbox achieves this by writing both the task
- * row and an outbox row in the SAME database transaction. A background
- * publisher reads undelivered outbox rows and sends them to RabbitMQ, then
- * marks them delivered.
- *
- * This prevents the race where the process crashes after publishing to
- * RabbitMQ but before recording the task in Postgres, which would produce
- * a worker that sees a task ID that doesn't exist.
- *
- * Worker policy (enforced by the consumer, not this module):
- *   receive → validate envelope → claim task in Postgres
- *   → check idempotency → emit worker.started → execute
- *   → persist outcome → emit worker.completed → commit → ACK
- *
- * On retryable failure:  persist attempt → emit retry_scheduled → NACK/retry
- * On permanent failure:  persist failure → emit worker.failed → dead-letter
+ * Durable task rule:
+ *   workflow_task + workflow_outbox are committed in one DB transaction.
+ *   Only the outbox publisher sends atlas.tasks.v1 work to RabbitMQ.
+ *   The publisher marks delivered_at only after its publishFn resolves; the
+ *   production boot path supplies a RabbitMQ confirm-channel publishFn.
  */
 
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import {
-	taskTypeSchema,
-	type TaskType,
-	type WorkCommandBase,
+  taskTypeSchema,
+  type TaskType,
+  type WorkCommandBase,
 } from './commands.js';
 import type { AnalyticsEventType } from '$lib/server/analytics/analytics-event-envelope.js';
-import {
-	type IntegrationEvent,
-} from './integration-events.js';
 import type { EventFabricType } from './event-fabric.js';
 import { EXCHANGES, ROUTING_KEYS, type EventRoutingKey } from './topology.js';
 
-/** Minimal shape both `db` and a `db.transaction()` callback's `tx` satisfy. */
 type SqlExecutor = { execute: typeof db.execute };
 
-// ---------------------------------------------------------------------------
-// Error details extractor — exposes PostgreSQL cause chain
-// ---------------------------------------------------------------------------
-
 function errorDetails(error: unknown): Record<string, unknown> {
-  if (!(error instanceof Error)) {
-    return { value: String(error) };
-  }
+  if (!(error instanceof Error)) return { value: String(error) };
   const cause = error.cause as Error | undefined;
   return {
     name: error.name,
@@ -59,14 +37,10 @@ function errorDetails(error: unknown): Record<string, unknown> {
       table: (cause as any).table,
       column: (cause as any).column,
       constraint: (cause as any).constraint,
-      stack: cause.stack
-    } : undefined
+      stack: cause.stack,
+    } : undefined,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Outbox row shape
-// ---------------------------------------------------------------------------
 
 export interface OutboxRow {
   id: string;
@@ -83,10 +57,6 @@ export interface OutboxRow {
   errorMessage: string | null;
 }
 
-// ---------------------------------------------------------------------------
-// Task type → RabbitMQ routing key
-// ---------------------------------------------------------------------------
-
 const TASK_TYPE_TO_ROUTING_KEY: Record<TaskType, string> = {
   'code.inspect': ROUTING_KEYS.codeInspect,
   'code.patch': ROUTING_KEYS.codePatch,
@@ -100,21 +70,11 @@ const TASK_TYPE_TO_ROUTING_KEY: Record<TaskType, string> = {
   'agent.execute.opencode': ROUTING_KEYS.agentExecuteOpencode,
 };
 
-// ---------------------------------------------------------------------------
-// Core outbox write — call inside your existing Postgres transaction
-// ---------------------------------------------------------------------------
-
 /**
- * Write a task row + outbox row atomically.
+ * Authoritative durable task enqueue.
  *
- * Usage — inside a transaction or at the end of a mutation handler:
- *
- *   const { taskId } = await enqueueTask(db, {
- *     runId, commandType: 'code.inspect',
- *     capability: 'retrieval', targetWorkerClass: 'atlas.worker.opencode.v1',
- *     payload: { ... },
- *     timeoutMs: 120_000,
- *   });
+ * The task and its RabbitMQ outbox row are inserted in the same transaction;
+ * there is no crash window where one can commit without the other.
  */
 export async function enqueueTask(opts: {
   runId: string;
@@ -126,14 +86,11 @@ export async function enqueueTask(opts: {
   payload: unknown;
   timeoutMs: number;
 }): Promise<{ taskId: string; commandId: string; idempotencyKey: string }> {
-  taskTypeSchema.parse(opts.commandType); // hard fail on unknown type
+  taskTypeSchema.parse(opts.commandType);
 
   const taskId = crypto.randomUUID();
   const commandId = crypto.randomUUID();
-
-  // Stable idempotency key: hash of (taskId + attempt=0 + commandType).
-  // Workers increment attempt on retry; subsequent attempts use the retry lane.
-  const idempotencyKey = await _idempotencyKey(taskId, 0, opts.commandType);
+  const idempotencyKey = await idempotencyKey(taskId, 0, opts.commandType);
 
   const command: WorkCommandBase = {
     commandId,
@@ -152,79 +109,64 @@ export async function enqueueTask(opts: {
 
   const routingKey = TASK_TYPE_TO_ROUTING_KEY[opts.commandType];
 
-  // Both rows in a single statement block — callers should wrap in a
-  // transaction if they need this atomic with other writes.
-  await db.execute(sql`
-    INSERT INTO workflow_tasks (
-      id, run_id, request_id, trace_id, command_type, capability,
-      target_worker_class, status, attempt, idempotency_key,
-      payload, timeout_ms, created_at, updated_at
-    ) VALUES (
-      ${taskId}::uuid,
-      ${opts.runId}::uuid,
-      ${opts.requestId}::uuid,
-      ${opts.traceId ?? null},
-      ${opts.commandType},
-      ${opts.capability},
-      ${opts.targetWorkerClass},
-      'queued',
-      0,
-      ${idempotencyKey},
-      ${JSON.stringify(opts.payload)}::jsonb,
-      ${opts.timeoutMs},
-      NOW(),
-      NOW()
-    )
-  `);
+  await db.transaction(async (tx: SqlExecutor) => {
+    await tx.execute(sql`
+      INSERT INTO workflow_tasks (
+        id, run_id, request_id, trace_id, command_type, capability,
+        target_worker_class, status, attempt, idempotency_key,
+        payload, timeout_ms, created_at, updated_at
+      ) VALUES (
+        ${taskId}::uuid,
+        ${opts.runId}::uuid,
+        ${opts.requestId}::uuid,
+        ${opts.traceId ?? null},
+        ${opts.commandType},
+        ${opts.capability},
+        ${opts.targetWorkerClass},
+        'queued',
+        0,
+        ${idempotencyKey},
+        ${JSON.stringify(opts.payload)}::jsonb,
+        ${opts.timeoutMs},
+        NOW(),
+        NOW()
+      )
+    `);
 
-  await db.execute(sql`
-    INSERT INTO workflow_outbox (
-      id, run_id, task_id, event_type, payload, routing_key, exchange,
-      attempt, created_at
-    ) VALUES (
-      gen_random_uuid(),
-      ${opts.runId}::uuid,
-      ${taskId}::uuid,
-      'worker.task.queued',
-      ${JSON.stringify({ command, payload: opts.payload })}::jsonb,
-      ${routingKey},
-      ${EXCHANGES.tasks},
-      0,
-      NOW()
-    )
-  `);
+    await tx.execute(sql`
+      INSERT INTO workflow_outbox (
+        id, run_id, task_id, event_type, payload, routing_key, exchange,
+        attempt, created_at
+      ) VALUES (
+        gen_random_uuid(),
+        ${opts.runId}::uuid,
+        ${taskId}::uuid,
+        'worker.task.queued',
+        ${JSON.stringify({ command, payload: opts.payload })}::jsonb,
+        ${routingKey},
+        ${EXCHANGES.tasks},
+        0,
+        NOW()
+      )
+    `);
+  });
 
   return { taskId, commandId, idempotencyKey };
 }
 
-// ---------------------------------------------------------------------------
-// AnalyticsEvent outbox write — pure notification, no workflow_tasks row.
-//
-// Call this with an open `tx` (from db.transaction()) alongside your own
-// insert, so the event row commits atomically with whatever it's reporting
-// on. Publishes on EXCHANGES.events, never EXCHANGES.tasks — this is
-// notification traffic, not claimable work.
-// ---------------------------------------------------------------------------
-
 export async function writeAnalyticsEventOutboxRow(
   tx: SqlExecutor,
   opts: {
-    /** Ties the event to the run/job that produced it. workflow_outbox.run_id is NOT NULL. */
     runId: string;
     eventType: AnalyticsEventType;
     routingKey: EventRoutingKey;
     payload: unknown;
     traceId?: string;
     sourceRef?: string;
-  }
+  },
 ): Promise<{ eventId: string }> {
-  return await writeStructuredOutboxRow(tx, {
-    runId: opts.runId,
-    eventType: opts.eventType,
-    routingKey: opts.routingKey,
-    payload: opts.payload,
-    traceId: opts.traceId,
-    sourceRef: opts.sourceRef,
+  return writeStructuredOutboxRow(tx, {
+    ...opts,
     exchange: EXCHANGES.events,
   });
 }
@@ -238,15 +180,10 @@ export async function writeIntegrationEventOutboxRow(
     payload: unknown;
     traceId?: string;
     sourceRef?: string;
-  }
+  },
 ): Promise<{ eventId: string }> {
-  return await writeStructuredOutboxRow(tx, {
-    runId: opts.runId,
-    eventType: opts.eventType,
-    routingKey: opts.routingKey,
-    payload: opts.payload,
-    traceId: opts.traceId,
-    sourceRef: opts.sourceRef,
+  return writeStructuredOutboxRow(tx, {
+    ...opts,
     exchange: EXCHANGES.events,
   });
 }
@@ -261,7 +198,7 @@ async function writeStructuredOutboxRow(
     traceId?: string;
     sourceRef?: string;
     exchange: string;
-  }
+  },
 ): Promise<{ eventId: string }> {
   const eventId = crypto.randomUUID();
   const event = {
@@ -293,32 +230,14 @@ async function writeStructuredOutboxRow(
   return { eventId };
 }
 
-// ---------------------------------------------------------------------------
-// Idempotency key derivation (SHA-256 via Web Crypto)
-// ---------------------------------------------------------------------------
-
-async function _idempotencyKey(taskId: string, attempt: number, commandType: string): Promise<string> {
+async function idempotencyKey(taskId: string, attempt: number, commandType: string): Promise<string> {
   const raw = `${taskId}:${attempt}:${commandType}`;
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
   return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, '0'))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
 }
 
-// ---------------------------------------------------------------------------
-// Outbox publisher — run from a singleton background loop
-// ---------------------------------------------------------------------------
-
-/**
- * Poll for undelivered outbox rows and publish to RabbitMQ.
- * This is the "at-least-once" delivery guarantee.
- *
- * Call once at server startup (hooks.server.ts worker #1, same pattern as
- * the existing RabbitMQ pipeline boot):
- *
- *   import { startOutboxPublisher } from '$lib/server/queue/outbox.js';
- *   startOutboxPublisher({ publishFn: rabbitPublish });
- */
 export function startOutboxPublisher(opts: {
   publishFn: (exchange: string, routingKey: string, payload: Buffer) => Promise<void>;
   intervalMs?: number;
@@ -334,60 +253,62 @@ export function startOutboxPublisher(opts: {
       } catch (err) {
         console.error('[outbox] publish batch error:', JSON.stringify(errorDetails(err), null, 2));
       }
-      await new Promise((r) => setTimeout(r, intervalMs));
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
     }
   };
 
-  loop().catch((err) => console.error('[outbox] publisher crashed:', err));
-
-  return () => {
-    running = false;
-  };
+  void loop().catch((err) => console.error('[outbox] publisher crashed:', err));
+  return () => { running = false; };
 }
 
 /**
- * Publish one batch of undelivered outbox rows. Exported (not just called
- * from the interval loop above) so tests can trigger exactly one
- * deterministic publish pass instead of racing startOutboxPublisher's timer.
+ * Publish one locked batch. The transaction keeps FOR UPDATE SKIP LOCKED row
+ * locks until broker confirms are received and delivered_at is persisted.
+ * A crash after broker confirm but before DB commit can cause redelivery, so
+ * consumers must remain idempotent; this is the intended at-least-once model.
  */
 export async function publishOutboxBatch(
   publishFn: (exchange: string, routingKey: string, payload: Buffer) => Promise<void>,
-  batchSize: number
+  batchSize: number,
 ): Promise<{ attempted: number; delivered: number }> {
-  const rows = await db.execute(sql`
-    SELECT id, routing_key, exchange, payload
-    FROM workflow_outbox
-    WHERE delivered_at IS NULL AND failed_at IS NULL
-    ORDER BY created_at ASC
-    LIMIT ${batchSize}
-    FOR UPDATE SKIP LOCKED
-  `);
+  return db.transaction(async (tx: SqlExecutor) => {
+    const rows = await tx.execute(sql`
+      SELECT id, routing_key, exchange, payload
+      FROM workflow_outbox
+      WHERE delivered_at IS NULL AND failed_at IS NULL
+      ORDER BY created_at ASC
+      LIMIT ${batchSize}
+      FOR UPDATE SKIP LOCKED
+    `);
 
-  const attempted = rows.rows?.length ?? 0;
-  let delivered = 0;
+    const attempted = rows.rows?.length ?? 0;
+    let delivered = 0;
 
-  for (const row of rows.rows ?? []) {
-    const r = row as Record<string, unknown>;
-    try {
-      await publishFn(
-        String(r.exchange),
-        String(r.routing_key),
-        Buffer.from(JSON.stringify(r.payload))
-      );
-      await db.execute(sql`
-        UPDATE workflow_outbox SET delivered_at = NOW() WHERE id = ${r.id}::uuid
-      `);
-      delivered += 1;
-    } catch (err) {
-      await db.execute(sql`
-        UPDATE workflow_outbox
-        SET attempt = attempt + 1,
-            failed_at = CASE WHEN attempt >= 5 THEN NOW() ELSE NULL END,
-            error_message = ${(err as Error).message}
-        WHERE id = ${r.id}::uuid
-      `);
+    for (const row of rows.rows ?? []) {
+      const record = row as Record<string, unknown>;
+      try {
+        await publishFn(
+          String(record.exchange),
+          String(record.routing_key),
+          Buffer.from(JSON.stringify(record.payload)),
+        );
+        await tx.execute(sql`
+          UPDATE workflow_outbox
+          SET delivered_at = NOW(), error_message = NULL
+          WHERE id = ${record.id}::uuid
+        `);
+        delivered += 1;
+      } catch (err) {
+        await tx.execute(sql`
+          UPDATE workflow_outbox
+          SET attempt = attempt + 1,
+              failed_at = CASE WHEN attempt >= 5 THEN NOW() ELSE NULL END,
+              error_message = ${(err as Error).message}
+          WHERE id = ${record.id}::uuid
+        `);
+      }
     }
-  }
 
-  return { attempted, delivered };
+    return { attempted, delivered };
+  });
 }

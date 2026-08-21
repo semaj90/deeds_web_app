@@ -117,10 +117,20 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 
 ## ANN-1 — cuVS exact / CAGRA
 
-- [ ] Reuse the existing RAPIDS sidecar proof path.
-- [ ] `cuvs_bruteforce_768` is the GPU exact semantic oracle, not an extra lane.
-- [ ] `cuvs_cagra_768` is an approximate executor challenger.
-- [ ] Measure Recall@K, p50/p95, VRAM, build/load cost and fallback behavior.
+- [x] Reuse the existing RAPIDS sidecar proof path.
+- [x] `cuvs_bruteforce_768` is the GPU exact semantic oracle, not an extra lane.
+- [x] Workstation same-corpus exact-store alignment is proven between the real
+  `:8098 /v1/knn/exact` sidecar and Qdrant exact search over the same restricted
+  subset: 20 real queries, 200 rows from `codebase_chunks_768_v2`, `k=10`,
+  mean/min overlap@10 = `1.0`, reproduced across two independent runs. Local
+  evidence is `docs/reports/sidecar-qdrant-exact-alignment.{json,md}`. The proof
+  artifacts and new sidecar-comparison function must still be committed before
+  this result is considered repository-contained evidence.
+- [ ] `cuvs_cagra_768` remains an approximate executor challenger. It was not
+  touched by the exact-store alignment proof and remains quarantined pending its
+  own same-corpus recall/latency/VRAM evidence.
+- [ ] Measure CAGRA Recall@K, p50/p95, VRAM, build/load cost and fallback
+  behavior against the now-aligned exact-store oracle.
 
 ## ANN-2 — Vamana / DiskANN
 

@@ -3,7 +3,7 @@ import {
   codeEvidencePersistedEventSchema,
   type CodeEvidencePersistedEventV1,
 } from './integration-events.js';
-import { artifactStorageSchema } from './artifact-work-item-v1.js';
+import { artifactAddressSchema } from './artifact-work-item-v1.js';
 
 export {
   codeEvidencePersistedEventSchema,
@@ -188,15 +188,10 @@ export type CheckpointCommitEventV1 = z.infer<typeof checkpointCommitEventSchema
 
 export const artifactMaterializedPayloadSchema = z.object({
   actionKey: z.string().min(16),
-  artifactId: z.string().min(1),
-  artifactHash: z.string().min(16),
-  checksum: z.string().min(16),
-  revisionSetHash: z.string().min(16),
-  storage: artifactStorageSchema,
-  locatorPath: z.string().min(1).optional(),
-  byteLength: z.number().int().nonnegative().optional(),
-  producer: z.string().min(1),
+  artifact: artifactAddressSchema,
+  fencingToken: z.string().regex(/^\d+$/),
   producerRevision: z.string().min(1),
+  inputArtifactRefs: z.array(artifactAddressSchema).max(64).default([]),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -211,12 +206,13 @@ export type ArtifactMaterializedEventV1 = z.infer<typeof artifactMaterializedEve
 
 export const artifactFailedPayloadSchema = z.object({
   actionKey: z.string().min(16),
-  operation: z.string().min(1),
+  expectedOutputSchema: z.string().min(1),
+  fencingToken: z.string().regex(/^\d+$/).optional(),
+  producerRevision: z.string().min(1),
   failureClass: atlasFailureClassSchema,
   retryable: z.boolean(),
-  retryCount: z.number().int().min(0),
-  errorHash: z.string().min(1),
-  inputArtifactRefs: z.array(z.string().min(1)).default([]),
+  errorHash: z.string().min(16),
+  inputArtifactRefs: z.array(artifactAddressSchema).max(64).default([]),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
