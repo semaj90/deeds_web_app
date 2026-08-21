@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from atlas_compute.qdrant_scoped_ann import build_same_corpus_filter
+from atlas_compute.qdrant_scoped_ann import build_same_corpus_filter, expected_qdrant_distance
 
 
 class QdrantScopedAnnTests(unittest.TestCase):
@@ -38,6 +38,16 @@ class QdrantScopedAnnTests(unittest.TestCase):
                 comparison_scope="snapshot_subset",
                 scoped_canonical_ids=[],
             )
+
+    def test_metric_mapping_is_explicit(self) -> None:
+        self.assertEqual(expected_qdrant_distance("cosine"), ("Cosine", "native_cosine"))
+        self.assertEqual(expected_qdrant_distance("inner_product"), ("Dot", "native_dot_product"))
+        self.assertEqual(
+            expected_qdrant_distance("sqeuclidean"),
+            ("Euclid", "euclidean_rank_equivalent_to_sqeuclidean"),
+        )
+        with self.assertRaises(ValueError):
+            expected_qdrant_distance("manhattan")
 
 
 if __name__ == "__main__":
