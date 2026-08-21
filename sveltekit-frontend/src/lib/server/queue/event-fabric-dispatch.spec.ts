@@ -11,8 +11,25 @@ function makeHandlers(): EventFabricProjectionHandlers {
 		'recommendation.signal': vi.fn(async () => {}),
 		'policy.decision.receipt': vi.fn(async () => {}),
 		'checkpoint.commit': vi.fn(async () => {}),
+		'artifact.materialized': vi.fn(async () => {}),
+		'artifact.failed': vi.fn(async () => {}),
 	};
 }
+
+const artifactAddress = {
+	schema: 'atlas.artifact-address.v1' as const,
+	artifactId: 'artifact-semantic-768-1',
+	artifactHash: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+	schemaId: 'atlas.semantic-vector.v1',
+	checksum: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+	revisionSetHash: 'cccccccccccccccccccccccccccccccc',
+	revisions: { semantic: 'semantic-v1' },
+	locator: {
+		storage: 'POSTGRES' as const,
+		table: 'workflow_artifacts',
+		primaryKey: 'artifact-semantic-768-1',
+	},
+};
 
 describe('event fabric dispatch', () => {
 	it('routes code evidence events to the code evidence handler', async () => {
@@ -64,5 +81,50 @@ describe('event fabric dispatch', () => {
 
 		expect(handlers['recommendation.signal']).toHaveBeenCalledTimes(1);
 		expect(handlers['code.evidence.persisted']).not.toHaveBeenCalled();
+	});
+
+	it('routes materialized artifacts to the durable artifact handler', async () => {
+		const handlers = makeHandlers();
+		const event = parseEventFabricMessage({
+			eventId: '33333333-3333-4333-8333-333333333333',
+			eventType: 'artifact.materialized',
+			occurredAt: '2026-08-21T00:00:00.000Z',
+			payload: {
+				actionKey: 'action-key-00000001',
+				artifact: artifactAddress,
+				fencingToken: '7',
+				producerRevision: 'producer-v1',
+				inputArtifactRefs: [],
+			},
+		});
+
+		await dispatchEventFabricEvent(event, handlers);
+
+		expect(handlers['artifact.materialized']).toHaveBeenCalledTimes(1);
+		expect(handlers['artifact.failed']).not.toHaveBeenCalled();
+	});
+
+	it('routes artifact failures without treating them as materializations', async () => {
+		const handlers = makeHandlers();
+		const event = parseEventFabricMessage({
+			eventId: '44444444-4444-4444-8444-444444444444',
+			eventType: 'artifact.failed',
+			occurredAt: '2026-08-21T00:00:00.000Z',
+			payload: {
+				actionKey: 'action-key-00000001',
+				expectedOutputSchema: 'atlas.semantic-vector.v1',
+				fencingToken: '8',
+				producerRevision: 'producer-v1',
+				failureClass: 'GPU_OOM',
+				retryable: true,
+				errorHash: 'dddddddddddddddddddddddddddddddd',
+				inputArtifactRefs: [],
+			},
+		});
+
+		await dispatchEventFabricEvent(event, handlers);
+
+		expect(handlers['artifact.failed']).toHaveBeenCalledTimes(1);
+		expect(handlers['artifact.materialized']).not.toHaveBeenCalled();
 	});
 });
