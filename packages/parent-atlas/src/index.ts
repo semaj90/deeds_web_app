@@ -59,6 +59,7 @@ export * from './core/temporal-action-ledger.js';
 export * from './core/temporal-action-ledger-runtime.js';
 export * from './core/temporal-action-workflow-adapter.js';
 export * from './core/temporal-action-postgres-repository.js';
+export * from './core/temporal-action-recommendation-runtime.js';
 export * from './core/observation-feature-compiler.js';
 export * from './core/observation-feature-repository.js';
 export * from './core/retrieval-executor-policy.js';
