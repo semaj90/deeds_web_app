@@ -27,6 +27,20 @@ CREATE TABLE IF NOT EXISTS atlas_agent_action_events (
   persisted_at         timestamptz NOT NULL DEFAULT now()
 );
 
+-- Storage-owned append-log sequence allocation. This sequence orders immutable
+-- temporal events only; it is never workflow/action/execution/revision identity.
+-- Gaps are legal when a reservation is made and the process exits before append.
+CREATE SEQUENCE IF NOT EXISTS atlas_agent_action_ledger_sequence_seq;
+
+SELECT setval(
+  'atlas_agent_action_ledger_sequence_seq',
+  GREATEST(
+    COALESCE((SELECT MAX(ledger_sequence) + 1 FROM atlas_agent_action_events), 1),
+    (SELECT last_value FROM atlas_agent_action_ledger_sequence_seq)
+  ),
+  false
+);
+
 CREATE INDEX IF NOT EXISTS idx_atlas_agent_action_events_execution
   ON atlas_agent_action_events (execution_key, ledger_sequence DESC);
 
