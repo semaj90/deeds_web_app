@@ -9,6 +9,7 @@ import { getValkeyClient } from '../cache/valkey-client.js';
 import crypto from 'crypto';
 
 const redis = getValkeyClient();
+const TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER = 'langgraph-dag:temporal-recommendation-outcome:v1';
 
 function canonicalJson(obj: any): string {
   if (typeof obj !== 'object' || obj === null) return JSON.stringify(obj);
@@ -34,6 +35,7 @@ export type AgentState = {
   attempts: number;
   maxAttempts: number;
   lastResult: string;
+  lastToolSuccess: boolean | null;
   success: boolean;
   suggestedFix?: string;
   hasLookedUpFailure?: boolean;
@@ -61,6 +63,39 @@ function shouldUseTool(query: string, ctx: any) {
   return false;
 }
 
+function explicitTemporalAlternativeToolSuccess(result: unknown, ctx: any): boolean | null {
+  if (!ctx?.temporalAlternativeSelection) return null;
+  if (!result || typeof result !== 'object') return null;
+  const value = result as Record<string, unknown>;
+  if (typeof value.success === 'boolean') return value.success;
+  if (value.temporalDisposition === 'REUSE_RESULT' && value.reused === true) return true;
+  return null;
+}
+
+async function persistTemporalRecommendationOutcomeIfEnabled(
+  state: AgentState,
+  downstreamSuccess: boolean,
+): Promise<void> {
+  const plan = state.ctx?.temporalAlternativePlan;
+  const selection = state.ctx?.temporalAlternativeSelection;
+  if (!plan || !selection || plan.persist_outcome_receipt !== true) return;
+  if (state.ctx.temporalRecommendationOutcomePersisted === true) return;
+
+  const authoritativeOutcome = state.ctx.temporalAuthoritativeActionOutcome ?? null;
+  const { persistTemporalRecommendationOutcomeFromPostgres } = await import(
+    '../atlas/temporal/temporal-recommendation-outcome-boundary.js'
+  );
+  const persisted = await persistTemporalRecommendationOutcomeFromPostgres({
+    selection,
+    downstream_success: downstreamSuccess,
+    outcome: authoritativeOutcome,
+    evidence_refs: [downstreamSuccess ? 'dag:final-success' : 'dag:final-failure'],
+    producer_revision: TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER,
+  });
+  state.ctx.temporalRecommendationOutcome = persisted;
+  state.ctx.temporalRecommendationOutcomePersisted = true;
+}
+
 const seenToolCalls = new Set<string>();
 
 function preventLoop(toolCall: any) {
@@ -83,6 +118,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
     state.ctx.cacheLayerUsed = 'llm_output';
     return {
       lastResult: cachedLlmOutput,
+      lastToolSuccess: null,
       history: [...state.history, cachedLlmOutput],
       attempts: state.attempts + 1,
       ctx: adjustStrategy(state.ctx, cachedLlmOutput)
@@ -110,6 +146,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
     state.ctx.cacheLayerUsed = 'bifrost_semantic';
     return {
       lastResult: cachedBifrost,
+      lastToolSuccess: null,
       history: [...state.history, cachedBifrost],
       attempts: state.attempts + 1,
       ctx: adjustStrategy(state.ctx, cachedBifrost)
@@ -127,6 +164,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
 
   // 1. Synthesize reasoning vs tool
   let result = "";
+  let lastToolSuccess: boolean | null = null;
   if (!shouldUseTool(state.query, state.ctx)) {
      result = "Successful reasoning synthesis for: " + state.query;
   } else {
@@ -137,6 +175,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
         result = "⚠️ Tool loop detected: duplicate_tool_call. Switching to reasoning.";
       } else {
         const res = await executeTool(toolCall, state.ctx);
+        lastToolSuccess = explicitTemporalAlternativeToolSuccess(res, state.ctx);
         result = JSON.stringify(res);
       }
     } else {
@@ -150,6 +189,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
 
   return {
     lastResult: result,
+    lastToolSuccess,
     history: [...state.history, result],
     attempts: state.attempts + 1,
     ctx: adjustStrategy(state.ctx, result) // Adjust strategy based on this run
@@ -174,6 +214,8 @@ async function failureLookupNode(state: AgentState): Promise<Partial<AgentState>
 }
 
 async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentState>> {
+  await persistTemporalRecommendationOutcomeIfEnabled(state, true);
+
   const normalizedUserQuery = state.query.trim().toLowerCase();
   const queryHash = hashContent(normalizedUserQuery);
   const clusterId = state.ctx.clusterId || `cluster_${queryHash.substring(0, 8)}`;
@@ -201,9 +243,23 @@ async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentStat
   return { success: true };
 }
 
+async function finalizeFailureNode(state: AgentState): Promise<Partial<AgentState>> {
+  await persistTemporalRecommendationOutcomeIfEnabled(state, false);
+  return { success: false };
+}
+
 // --- Conditional Edges ---
 function evaluateExecution(state: AgentState) {
   const res = state.lastResult;
+
+  // Explicit temporal alternative tool outcomes are admitted only from the
+  // typed MCP success boolean (or an authoritative temporal REUSE_RESULT).
+  if (state.lastToolSuccess === true) {
+    return "finalizeSuccess";
+  }
+  if (state.lastToolSuccess === false) {
+    return state.hasLookedUpFailure ? "finalizeFailure" : "failureLookup";
+  }
 
   // Explicit success checking instead of naive regex
   if (res.startsWith("Successful")) {
@@ -230,6 +286,7 @@ const workflow = new StateGraph<AgentState>({
     attempts: { value: (a, b) => b ?? a },
     maxAttempts: { value: (a, b) => b ?? a },
     lastResult: { value: (a, b) => b ?? a },
+    lastToolSuccess: { value: (_a, b) => b },
     success: { value: (a, b) => b ?? a },
     suggestedFix: { value: (a, b) => b ?? a },
     hasLookedUpFailure: { value: (a, b) => b ?? a }
@@ -239,6 +296,7 @@ const workflow = new StateGraph<AgentState>({
 workflow.addNode("synthesize", synthesizeNode);
 workflow.addNode("failureLookup", failureLookupNode);
 workflow.addNode("finalizeSuccess", finalizeSuccessNode);
+workflow.addNode("finalizeFailure", finalizeFailureNode);
 
 // @ts-expect-error TODO(TS-104): setEntryPoint type signature mismatch in @langchain/langgraph
 workflow.setEntryPoint("synthesize");
@@ -248,13 +306,15 @@ workflow.addConditionalEdges("synthesize", evaluateExecution, {
   synthesize: "synthesize",
   failureLookup: "failureLookup",
   finalizeSuccess: "finalizeSuccess",
-  finalizeFailure: END
+  finalizeFailure: "finalizeFailure"
 });
 
 // @ts-expect-error TODO(TS-105): addEdge requires START/END node identifiers which changed in current version
 workflow.addEdge("failureLookup", "synthesize");
 // @ts-expect-error TODO(TS-105): addEdge requires START/END node identifiers which changed in current version
 workflow.addEdge("finalizeSuccess", END);
+// @ts-expect-error TODO(TS-105): addEdge requires START/END node identifiers which changed in current version
+workflow.addEdge("finalizeFailure", END);
 
 const app = workflow.compile();
 
@@ -266,6 +326,7 @@ export async function runAgentDAG(query: string, ctx: any = {}) {
     attempts: 0,
     maxAttempts: 3,
     lastResult: "",
+    lastToolSuccess: null,
     success: false
   };
 
