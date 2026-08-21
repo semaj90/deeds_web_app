@@ -34,6 +34,8 @@ export type ActionClaimV1 =
   | { kind: 'lease'; lease: ActionLeaseV1 }
   | { kind: 'busy'; actionKey: string; leaseExpiresAt: string };
 
+type SqlExecutor = { execute: typeof db.execute };
+
 type LeaseRow = {
   action_key: string;
   lease_owner: string;
@@ -73,10 +75,11 @@ function rowToReceipt(row: ReceiptRow): ActionExecutionReceiptV1 {
   });
 }
 
-export async function getActionExecutionReceipt(
+async function getReceiptWith(
+  executor: SqlExecutor,
   actionKey: string,
 ): Promise<ActionExecutionReceiptV1 | null> {
-  const result = await db.execute<ReceiptRow>(sql`
+  const result = await executor.execute<ReceiptRow>(sql`
     SELECT action_key, fencing_token, output_artifact_address,
            producer_revision, completed_at
     FROM workflow_action_receipts
@@ -85,6 +88,12 @@ export async function getActionExecutionReceipt(
   `);
   const row = result.rows?.[0];
   return row ? rowToReceipt(row) : null;
+}
+
+export async function getActionExecutionReceipt(
+  actionKey: string,
+): Promise<ActionExecutionReceiptV1 | null> {
+  return getReceiptWith(db, actionKey);
 }
 
 /**
@@ -155,8 +164,9 @@ export async function claimActionWork(opts: {
 
 /**
  * Persist the immutable successful output only if this worker still owns the
- * exact current fencing token. A stale worker whose lease expired cannot win
- * a late race against a replacement worker.
+ * exact current fencing token. The lease row is locked through receipt insert,
+ * so a replacement worker cannot increment the token concurrently with a stale
+ * completion.
  *
  * If an earlier delivery already completed the same ActionKey, return that
  * existing immutable receipt instead of recomputing or overwriting it.
@@ -170,39 +180,59 @@ export async function completeActionWork(opts: {
 }): Promise<ActionExecutionReceiptV1> {
   const outputArtifact = artifactAddressSchema.parse(opts.outputArtifact);
 
-  const inserted = await db.execute<ReceiptRow>(sql`
-    INSERT INTO workflow_action_receipts (
-      action_key,
-      fencing_token,
-      output_artifact_address,
-      producer_revision,
-      completed_at
-    )
-    SELECT
-      ${opts.actionKey},
-      l.fencing_token,
-      ${JSON.stringify(outputArtifact)}::jsonb,
-      ${opts.producerRevision},
-      NOW()
-    FROM workflow_action_leases l
-    WHERE l.action_key = ${opts.actionKey}
-      AND l.lease_owner = ${opts.leaseOwner}
-      AND l.fencing_token = ${opts.fencingToken}::bigint
-      AND l.lease_expires_at > NOW()
-    ON CONFLICT (action_key) DO NOTHING
-    RETURNING action_key, fencing_token, output_artifact_address,
-              producer_revision, completed_at
-  `);
+  return db.transaction(async (tx: SqlExecutor) => {
+    const existingBeforeLock = await getReceiptWith(tx, opts.actionKey);
+    if (existingBeforeLock) return existingBeforeLock;
 
-  if (inserted.rows?.[0]) return rowToReceipt(inserted.rows[0]);
+    const leaseResult = await tx.execute<LeaseRow>(sql`
+      SELECT action_key, lease_owner, fencing_token, lease_expires_at
+      FROM workflow_action_leases
+      WHERE action_key = ${opts.actionKey}
+      FOR UPDATE
+    `);
+    const lease = leaseResult.rows?.[0];
 
-  const existing = await getActionExecutionReceipt(opts.actionKey);
-  if (existing) return existing;
+    const ownsCurrentFence =
+      lease &&
+      lease.lease_owner === opts.leaseOwner &&
+      String(lease.fencing_token) === opts.fencingToken &&
+      new Date(lease.lease_expires_at).getTime() > Date.now();
 
-  throw new Error(
-    `STALE_ACTION_FENCE: ActionKey ${opts.actionKey} is no longer owned by ` +
-      `${opts.leaseOwner} at fencing token ${opts.fencingToken}`,
-  );
+    if (!ownsCurrentFence) {
+      const existingAfterLock = await getReceiptWith(tx, opts.actionKey);
+      if (existingAfterLock) return existingAfterLock;
+      throw new Error(
+        `STALE_ACTION_FENCE: ActionKey ${opts.actionKey} is no longer owned by ` +
+          `${opts.leaseOwner} at fencing token ${opts.fencingToken}`,
+      );
+    }
+
+    const inserted = await tx.execute<ReceiptRow>(sql`
+      INSERT INTO workflow_action_receipts (
+        action_key,
+        fencing_token,
+        output_artifact_address,
+        producer_revision,
+        completed_at
+      ) VALUES (
+        ${opts.actionKey},
+        ${opts.fencingToken}::bigint,
+        ${JSON.stringify(outputArtifact)}::jsonb,
+        ${opts.producerRevision},
+        NOW()
+      )
+      ON CONFLICT (action_key) DO NOTHING
+      RETURNING action_key, fencing_token, output_artifact_address,
+                producer_revision, completed_at
+    `);
+
+    if (inserted.rows?.[0]) return rowToReceipt(inserted.rows[0]);
+
+    const existing = await getReceiptWith(tx, opts.actionKey);
+    if (existing) return existing;
+
+    throw new Error(`Action receipt insert lost without a durable winner: ${opts.actionKey}`);
+  });
 }
 
 export async function expireActionLease(opts: {
