@@ -11,10 +11,8 @@ import {
   type WorkflowActionEventV1,
 } from '@deeds/parent-atlas';
 
-import {
-  materializePostgresJsonArtifact,
-  type ArtifactAddressV1,
-} from '$lib/server/queue/postgres-json-artifact-v1.js';
+import { materializePostgresJsonArtifact } from '$lib/server/queue/postgres-json-artifact-v1.js';
+import type { ArtifactAddressV1 } from '$lib/server/queue/artifact-work-item-v1.js';
 
 export type TemporalPostDispatchRecordV1 = {
   event: AgentActionEventV1;
