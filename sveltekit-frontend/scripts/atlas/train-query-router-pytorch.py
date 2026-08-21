@@ -14,6 +14,9 @@ This trainer is intentionally small. It does not encode text and never owns the
 EmbeddingGemma model. It consumes frozen numeric features, trains a multi-head
 MLP, writes metrics/manifest/checkpoint, and can optionally export ONNX via the
 current torch.onnx.export(..., dynamo=True) path.
+
+Train/validation/test membership is derived from SHA-256(query_id) so PyTorch,
+XGBoost and static baselines evaluate the exact same rows.
 """
 
 from __future__ import annotations
@@ -30,7 +33,7 @@ from typing import Any
 import numpy as np
 import torch
 from torch import nn
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 
 DOMAINS = [
     "code", "database", "retrieval", "graph", "api", "security",
@@ -44,6 +47,7 @@ BUDGET_DIM = 3
 INPUT_DIM = EMBED_DIM + QUERY_FEATURE_DIM
 FEATURE_CONTRACT_REVISION = "atlas.query-router-tensor.v1"
 MODEL_ARCH_REVISION = "atlas.query-router-mlp.v1"
+STABLE_SPLIT_REVISION = "sha256-query-id-80-10-10-v1"
 
 
 @dataclass
@@ -115,6 +119,15 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def stable_split(query_id: str) -> str:
+    bucket = int(hashlib.sha256(query_id.encode("utf-8")).hexdigest()[:8], 16) % 100
+    if bucket < 80:
+        return "train"
+    if bucket < 90:
+        return "validation"
+    return "test"
+
+
 def load_rows(path: Path) -> tuple[list[Row], str]:
     raw = path.read_bytes()
     rows: list[Row] = []
@@ -151,8 +164,8 @@ def load_rows(path: Path) -> tuple[list[Row], str]:
             needs=needs,
             budget=budget,
         ))
-    if len(rows) < 20:
-        raise ValueError("at least 20 training rows are required")
+    if len(rows) < 30:
+        raise ValueError("at least 30 training rows are required for stable train/validation/test splits")
     return rows, sha256_bytes(raw)
 
 
@@ -164,8 +177,11 @@ def set_seed(seed: int):
         torch.cuda.manual_seed_all(seed)
 
 
-def accuracy(logits: torch.Tensor, labels: torch.Tensor) -> float:
-    return float((logits.argmax(dim=-1) == labels).float().mean().item())
+def rows_for_split(rows: list[Row], split: str) -> list[Row]:
+    selected = [row for row in rows if stable_split(row.query_id) == split]
+    if not selected:
+        raise ValueError(f"stable split {split!r} is empty")
+    return selected
 
 
 def evaluate(model: QueryRouterMLPV1, loader: DataLoader, device: torch.device) -> dict[str, float]:
@@ -191,6 +207,23 @@ def evaluate(model: QueryRouterMLPV1, loader: DataLoader, device: torch.device) 
     }
 
 
+def write_predictions(model: QueryRouterMLPV1, rows: list[Row], path: Path) -> None:
+    model.eval()
+    lines: list[str] = []
+    with torch.no_grad():
+        for row in rows:
+            x = torch.from_numpy(row.features).unsqueeze(0)
+            dlog, olog, nlog, blog = model(x)
+            lines.append(json.dumps({
+                "query_id": row.query_id,
+                "domain_probabilities": torch.softmax(dlog, dim=-1)[0].tolist(),
+                "operation_probabilities": torch.softmax(olog, dim=-1)[0].tolist(),
+                "retrieval_need_probabilities": torch.sigmoid(nlog)[0].tolist(),
+                "budget_predictions": torch.sigmoid(blog)[0].tolist(),
+            }, sort_keys=True))
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=Path, required=True)
@@ -206,13 +239,16 @@ def main() -> int:
 
     set_seed(args.seed)
     rows, dataset_checksum = load_rows(args.dataset)
-    dataset = RouterDataset(rows)
-    val_count = max(4, int(round(len(dataset) * 0.2)))
-    train_count = len(dataset) - val_count
+    train_rows = rows_for_split(rows, "train")
+    validation_rows = rows_for_split(rows, "validation")
+    test_rows = rows_for_split(rows, "test")
+    train_ds = RouterDataset(train_rows)
+    validation_ds = RouterDataset(validation_rows)
+    test_ds = RouterDataset(test_rows)
     generator = torch.Generator().manual_seed(args.seed)
-    train_ds, val_ds = random_split(dataset, [train_count, val_count], generator=generator)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, generator=generator)
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False)
+    validation_loader = DataLoader(validation_ds, batch_size=args.batch_size, shuffle=False)
+    test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False)
 
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA requested but torch.cuda.is_available() is false")
@@ -249,7 +285,7 @@ def main() -> int:
             loss_sum += float(loss.item()) * x.shape[0]
             rows_seen += int(x.shape[0])
 
-        metrics = evaluate(model, val_loader, device)
+        metrics = evaluate(model, validation_loader, device)
         score = metrics["domain_accuracy"] + metrics["operation_accuracy"] - 0.1 * metrics["retrieval_needs_bce_per_row"]
         history.append({"epoch": epoch, "train_loss": loss_sum / max(1, rows_seen), **metrics})
         if score > best_score:
@@ -260,12 +296,15 @@ def main() -> int:
         raise RuntimeError("training produced no checkpoint")
     model.load_state_dict(best_state)
     model.to("cpu").eval()
-    final_metrics = evaluate(model, val_loader, torch.device("cpu"))
+    validation_metrics = evaluate(model, validation_loader, torch.device("cpu"))
+    test_metrics = evaluate(model, test_loader, torch.device("cpu"))
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = args.output_dir / "query-router-v1.pt"
     torch.save({"state_dict": model.state_dict(), "domains": DOMAINS, "operations": OPERATIONS}, checkpoint_path)
     checkpoint_digest = sha256_bytes(checkpoint_path.read_bytes())
+    prediction_path = args.output_dir / "test-predictions.jsonl"
+    write_predictions(model, test_rows, prediction_path)
 
     manifest = {
         "schema": "atlas.query-router-training-receipt.v1",
@@ -280,8 +319,10 @@ def main() -> int:
         "datasetPath": str(args.dataset),
         "datasetChecksum": dataset_checksum,
         "rowCount": len(rows),
-        "trainCount": train_count,
-        "validationCount": val_count,
+        "splitRevision": STABLE_SPLIT_REVISION,
+        "trainCount": len(train_rows),
+        "validationCount": len(validation_rows),
+        "testCount": len(test_rows),
         "seed": args.seed,
         "optimizer": "AdamW",
         "epochs": args.epochs,
@@ -291,9 +332,11 @@ def main() -> int:
         "trainingDevice": str(device),
         "domains": DOMAINS,
         "operations": OPERATIONS,
-        "metrics": final_metrics,
+        "validationMetrics": validation_metrics,
+        "testMetrics": test_metrics,
         "checkpoint": str(checkpoint_path),
         "checkpointSha256": checkpoint_digest,
+        "testPredictions": str(prediction_path),
         "evidenceAuthority": False,
         "canonicalOwnerChanged": False,
     }
