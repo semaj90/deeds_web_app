@@ -15,12 +15,27 @@
 - [x] QUEUE-02 Add `ActionWorkItemV1` so queue payloads carry artifact refs, revision-set hash, ordinal selection, budget and executor class instead of dense tensors.
 - [x] QUEUE-03 Route artifact work through `enqueueTask()` transactional outbox via `enqueueArtifactWorkItem()`.
 - [x] QUEUE-04 Fix event-fabric projection worker type ownership imports (`integration-events.ts` owns code-evidence; `event-fabric.ts` owns the control-loop event types).
-- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example `document.embed → vector.index`) with artifact references where profiling shows payload amplification.
-- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers.
-- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently.
-- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt.
-- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative.
-- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit.
+- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example legacy `document.embed` / `vector.index`) with artifact references where profiling shows payload amplification. **OPEN** — compatibility publishers still exist; do a call-site + payload-size census before removing or redirecting them.
+- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers. **IMPLEMENTED_UNPROVEN** — schemas, outbox writers, durable lifecycle projection, and storage-aware materialization verification are present; run focused tests + lifecycle proof before checking off.
+- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently. **IMPLEMENTED_UNPROVEN** — `action-single-flight-v1.ts` owns leases, fencing and immutable receipts; focused tests exist.
+- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt. **IMPLEMENTED_UNPROVEN** — unit proof covers existing receipt reuse, duplicate completion race and stale fencing; lifecycle proof additionally checks duplicate event projection is one row.
+- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative. **IMPLEMENTED_UNPROVEN** — `rabbitmq-client.ts` explicitly rejects direct publish to `atlas.tasks.v1`; outbox remains the documented authoritative durable publisher. Run the boundary spec and startup confirm-channel proof before checking off.
+- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit. **IMPLEMENTED_UNPROVEN** — 64 KiB artifact-reference policy, in-process telemetry counters and oversize rejection are wired through `enqueueArtifactWorkItem()` with focused tests.
+
+### QUEUE-07 materialization verification gates
+
+File-backed `MMAP` / `ARROW_IPC` materialization must prove:
+
+- `ACTION_KEY_PRESENT`
+- `PRODUCER_REVISION_PRESENT`
+- `REVISION_SET_HASH_PRESENT`
+- `ARTIFACT_EXISTS`
+- `ARTIFACT_IS_FILE`
+- `BYTE_LENGTH_MATCH` when a byte length is declared
+- `CHECKSUM_MATCH` using streamed SHA-256 over materialized bytes
+- `STORAGE_VERIFIER_AVAILABLE`
+
+`POSTGRES`, `QDRANT`, `VALKEY`, and `GPU_RESIDENT` addresses fail closed as `NOT_PROVEN` until a storage-specific verifier is implemented. Queue events remain observations about materialization; they never become artifact ownership or canonical artifact storage.
 
 ## P1 — candidate feature fabric
 
@@ -86,9 +101,26 @@
 ```bash
 cd sveltekit-frontend
 npx vitest run \
-  src/lib/server/atlas/features/manifold4-orientation-v1.spec.ts \
   src/lib/server/queue/artifact-work-item-v1.spec.ts \
+  src/lib/server/queue/action-single-flight-v1.spec.ts \
+  src/lib/server/queue/message-size-policy-v1.spec.ts \
+  src/lib/server/queue/rabbitmq-client.spec.ts \
+  src/lib/server/queue/artifact-materialization-verification.spec.ts \
+  src/lib/server/queue/artifact-event-processing.spec.ts \
   src/lib/server/queue/event-fabric-dispatch.spec.ts
+
+npx tsx scripts/atlas/prove-queue-artifact-lifecycle.mts
 ```
 
-Then run the targeted TypeScript check for queue + candidate-fabric contracts before wiring artifact materializers.
+Acceptance target:
+
+```text
+focused queue tests: PASS
+materialized file checksum/size gates: PROVEN
+duplicate event projection: 1 row
+corrupt equal-length artifact: REJECTED / CHECKSUM_MISMATCH
+artifact.failed durable readback: 1 row
+QUEUE_ARTIFACT_LIFECYCLE_PROVEN
+```
+
+Only after those proofs should QUEUE-06 through QUEUE-10 be checked off. QUEUE-05 remains a separate payload-census/remediation task; do not claim it from schema work alone.
