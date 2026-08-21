@@ -32,13 +32,16 @@ CREATE TABLE IF NOT EXISTS atlas_agent_action_events (
 -- Gaps are legal when a reservation is made and the process exits before append.
 CREATE SEQUENCE IF NOT EXISTS atlas_agent_action_ledger_sequence_seq;
 
+-- Always advance strictly beyond both persisted history and any value already
+-- reserved by nextval(). Using is_called=true avoids reissuing last_value after
+-- a crashed worker reserved a sequence number but never appended its event.
 SELECT setval(
   'atlas_agent_action_ledger_sequence_seq',
   GREATEST(
-    COALESCE((SELECT MAX(ledger_sequence) + 1 FROM atlas_agent_action_events), 1),
+    COALESCE((SELECT MAX(ledger_sequence) FROM atlas_agent_action_events), 0),
     (SELECT last_value FROM atlas_agent_action_ledger_sequence_seq)
   ),
-  false
+  true
 );
 
 CREATE INDEX IF NOT EXISTS idx_atlas_agent_action_events_execution
