@@ -99,3 +99,41 @@ Required completion sequence:
 8. Benchmark message bytes and end-to-end latency before/after; only then check QUEUE-05 complete.
 
 No production migration or Qdrant data mutation is performed by this branch.
+
+## Step 1 executed live (2026-08-21, follow-on session)
+
+Applied `parent_atlas_artifact_transport_v1.sql` directly against the live Postgres instance
+(`docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < ...`): `CREATE TABLE`
+×4, `CREATE INDEX` ×3, all `IF NOT EXISTS` — no existing table altered or dropped.
+
+Also fixed a real bug found while running the readiness probe for the first time: the freshly
+merged `prove-artifact-transport-readiness.mts` was missing the standard `loadAtlasEnv()` call
+every other script in `scripts/atlas/` uses — it crashed with `SASL: SCRAM-SERVER-FIRST-MESSAGE:
+client password must be a string` before it could even query, because `DATABASE_URL` wasn't
+loaded yet when the `db` client module was first imported (top-level import gets hoisted ahead
+of any same-file env-loading call). Fixed by loading env first, then dynamic-`import()`-ing
+`inspectArtifactTransportReadiness` after `loadAtlasEnv()` runs.
+
+Live proof output, before and after:
+
+```text
+# before migration
+status: ARTIFACT_TRANSPORT_STORE_BLOCKED
+readiness.status: TABLE_MISSING
+readiness.missingColumns: [9 columns]
+
+# after migration
+status: ARTIFACT_TRANSPORT_STORE_READY
+readiness.status: READY
+readiness.missingColumns: []
+readiness.incompatibleColumns: []
+readiness.primaryKeyProven: true
+readiness.artifactHashUniqueProven: true
+```
+
+**`ARTIFACT_TRANSPORT_STORE_READY` is now real, not aspirational.** This satisfies step 1 of the
+8-step completion sequence above. Steps 2–8 (write/readback proof against a non-production
+database, compatibility reader/writer at both raw-vector paths, checksum/revision-set readback
+before Qdrant mutation, large-payload audit, before/after benchmark) remain open — this session
+only proved the store exists and is schema-correct, not that anything writes to or reads from it
+yet. Do not treat `ARTIFACT_TRANSPORT_STORE_READY` as `QUEUE-05 COMPLETE`.

@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
-import { inspectArtifactTransportReadiness } from '../../src/lib/server/queue/artifact-transport-readiness-v1.js';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
+
+loadAtlasEnv();
+
+const { inspectArtifactTransportReadiness } = await import(
+  '../../src/lib/server/queue/artifact-transport-readiness-v1.js'
+);
 
 const readiness = await inspectArtifactTransportReadiness();
 const proof = {
