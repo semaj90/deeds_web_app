@@ -52,6 +52,7 @@ const reportPath = path.resolve(value('report', 'docs/reports/embeddinggemma-q8-
 const ctx = EMBEDDINGGEMMA_MAX_CONTEXT_TOKENS;
 const batch = intValue('batch', ctx);
 const ubatch = intValue('ubatch', ctx);
+const parallelSlots = 1;
 
 function sha256Text(text: string): string { return createHash('sha256').update(text, 'utf8').digest('hex'); }
 function sha256File(file: string): Promise<string> {
@@ -196,6 +197,7 @@ try {
         '-m', modelPath,
         '--host', '127.0.0.1',
         '--port', String(port),
+        '--parallel', String(parallelSlots),
         '-ngl', '99',
         '--embedding',
         '--pooling', 'mean',
@@ -212,6 +214,12 @@ try {
     } else {
       await jsonRequest('/health', undefined, 5000);
     }
+
+    // For a launched proof server, capture the first user embedding request
+    // immediately after health as the cold-side probe. We compare the same
+    // prompt again after all other proof traffic to detect cache/state drift.
+    const coldWarmProbe = encodeCodeRetrievalQuery('Find GraphifyStructuralMaterializer source revision logic');
+    const coldProbeVector = launch ? (await embed(coldWarmProbe.formattedText))[0] : null;
 
     const prompts = [
       encodeRetrievalQuery('How does Parent Atlas resolve canonical packet identity?'),
@@ -258,6 +266,18 @@ try {
     if (nearContext.tokenCount == null) blockers.push('NEAR_CONTEXT_TOKEN_COUNT_UNPROVEN');
     else if (nearContext.tokenCount < Math.floor(ctx * 0.70) || nearContext.tokenCount >= ctx) blockers.push(`NEAR_CONTEXT_TOKEN_COUNT_OUT_OF_RANGE:${nearContext.tokenCount}`);
 
+    const warmProbeVector = launch ? (await embed(coldWarmProbe.formattedText))[0] : null;
+    const coldWarmCosine = launch && coldProbeVector && warmProbeVector
+      ? cosine(coldProbeVector, warmProbeVector)
+      : null;
+    const coldWarmStable = launch
+      ? Boolean(Number.isFinite(coldWarmCosine) && (coldWarmCosine as number) >= 0.999999)
+      : null;
+    const coldWarmExactDigestStable = launch && coldProbeVector && warmProbeVector
+      ? float32Digest(coldProbeVector) === float32Digest(warmProbeVector)
+      : null;
+    if (launch && !coldWarmStable) blockers.push(`COLD_WARM_COSINE_INSTABILITY:${coldWarmCosine}`);
+
     const nativeForProjection = promptObservations.length ? (await embed(prompts[0].formattedText))[0] : baseline;
     const projected = ([512, 256, 128] as const).map((dimension) => {
       const vector = mrlProject(nativeForProjection, dimension);
@@ -268,12 +288,22 @@ try {
       serverUrl,
       launchedByProof: launch,
       artifactBindingProven: launch,
-      launchPolicy: launch ? { ctx, batch, ubatch, pooling: 'MEAN', normalization: launchedWithNormalizeFlag ? 'L2_SERVER' : 'NOT_ASSERTED_BY_SERVER_FLAG' } : null,
+      launchPolicy: launch ? {
+        ctx,
+        batch,
+        ubatch,
+        parallelSlots,
+        pooling: 'MEAN',
+        normalization: launchedWithNormalizeFlag ? 'L2_SERVER' : 'NOT_ASSERTED_BY_SERVER_FLAG',
+      } : null,
       promptObservations,
       repeatedRequestStable,
       repeatedRequestExactDigestStable: exactDigestStable,
       repeatedCosineMin: repeatedCosines.length ? Math.min(...repeatedCosines) : 1,
-      coldWarmStable: launch ? repeatedRequestStable : null,
+      coldWarmStable,
+      coldWarmExactDigestStable,
+      coldWarmCosine,
+      coldWarmProbeFormattedTextSha256: coldWarmProbe.formattedTextSha256,
       multiInputPass,
       nearContext: {
         tokenCount: nearContext.tokenCount,
@@ -318,6 +348,7 @@ const report = {
   contextTokens: ctx,
   batch,
   ubatch,
+  parallelSlots: launch ? parallelSlots : null,
   promptRevision: EMBEDDINGGEMMA_PROMPT_REVISION,
   retrievalQueryPromptRevision: EMBEDDINGGEMMA_PROMPT_REVISION,
   codeQueryPromptRevision: EMBEDDINGGEMMA_PROMPT_REVISION,
@@ -347,7 +378,7 @@ const report = {
         ? 'PROVEN_NATIVE_EXECUTOR_READ_ONLY'
         : 'PROVEN_NATIVE_HTTP_CONTRACT_ARTIFACT_UNBOUND',
   blockers,
-  producerRevision: 'prove-embeddinggemma-q8-executor.v2',
+  producerRevision: 'prove-embeddinggemma-q8-executor.v3',
 };
 
 await mkdir(path.dirname(reportPath), { recursive: true });
