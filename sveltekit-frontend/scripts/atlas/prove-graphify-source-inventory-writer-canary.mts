@@ -30,19 +30,28 @@ const SOURCE = path.resolve(
   process.env.ATLAS_GRAPHIFY_REVISION_CANARY_SOURCE
     ?? 'sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts',
 );
+const MIGRATION = 'sveltekit-frontend/drizzle/manual/20260822_graphify_revision_authority_v2.sql';
 if (!DATABASE_URL) throw new Error('DATABASE_URL_REQUIRED');
+
+async function tableExists(client: pg.PoolClient, tableName: string): Promise<boolean> {
+  const result = await client.query<{ present: boolean }>(
+    'SELECT to_regclass($1) IS NOT NULL AS present',
+    [`public.${tableName}`],
+  );
+  return Boolean(result.rows[0]?.present);
+}
 
 async function resolveWorkspaceId(client: pg.PoolClient, repositoryRevision: string): Promise<string> {
   const explicit = process.env.ATLAS_GRAPHIFY_REVISION_CANARY_WORKSPACE_ID?.trim();
   if (explicit) return explicit;
   const exact = await client.query(
-    `SELECT workspace_id FROM graphify_runs
+    `SELECT workspace_id FROM public.graphify_runs
       WHERE lower(repository_revision) = lower($1)
       ORDER BY started_at DESC LIMIT 1`,
     [repositoryRevision],
   );
   if (exact.rowCount === 1) return String(exact.rows[0].workspace_id);
-  const latest = await client.query(`SELECT workspace_id FROM graphify_runs ORDER BY started_at DESC LIMIT 1`);
+  const latest = await client.query(`SELECT workspace_id FROM public.graphify_runs ORDER BY started_at DESC LIMIT 1`);
   if (latest.rowCount === 1) return String(latest.rows[0].workspace_id);
   throw new Error('GRAPHIFY_CANARY_WORKSPACE_ID_REQUIRED');
 }
@@ -65,7 +74,21 @@ async function main() {
   });
   const client = await pool.connect();
   try {
-    const workspaceId = await resolveWorkspaceId(client, origin.record.baseCommitOid);
+    const graphifyRunsPresent = await tableExists(client, 'graphify_runs');
+    const graphifyFilesPresent = await tableExists(client, 'graphify_files');
+    if (!graphifyRunsPresent || !graphifyFilesPresent) {
+      console.log(JSON.stringify({
+        schema: 'atlas.graphify-source-inventory-writer-canary.v2',
+        status: 'GRAPHIFY_REVISION_AUTHORITY_V2_MIGRATION_REQUIRED',
+        graphifyRunsPresent,
+        graphifyFilesPresent,
+        missingColumns: [],
+        canonicalWriteAttempted: false,
+        migration: MIGRATION,
+      }, null, 2));
+      process.exitCode = 1;
+      return;
+    }
 
     const columns = await client.query<{ table_name: string; column_name: string }>(`
       SELECT table_name, column_name FROM information_schema.columns
@@ -85,12 +108,36 @@ async function main() {
       console.log(JSON.stringify({
         schema: 'atlas.graphify-source-inventory-writer-canary.v2',
         status: 'GRAPHIFY_REVISION_AUTHORITY_V2_MIGRATION_REQUIRED',
+        graphifyRunsPresent,
+        graphifyFilesPresent,
         missingColumns: missing,
         canonicalWriteAttempted: false,
-        migration: 'sveltekit-frontend/drizzle/manual/20260822_graphify_revision_authority_v2.sql',
+        migration: MIGRATION,
       }, null, 2));
       process.exitCode = 1;
       return;
+    }
+
+    let workspaceId: string;
+    try {
+      workspaceId = await resolveWorkspaceId(client, origin.record.baseCommitOid);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'GRAPHIFY_CANARY_WORKSPACE_ID_REQUIRED') {
+        console.log(JSON.stringify({
+          schema: 'atlas.graphify-source-inventory-writer-canary.v2',
+          status: 'GRAPHIFY_CANARY_WORKSPACE_ID_REQUIRED',
+          workspaceRevision: origin.record.workspaceRevision,
+          sourceManifestDigest: origin.record.sourceManifestDigest,
+          baseGitCommitOid: origin.record.baseCommitOid,
+          source: sourceRef,
+          codeSourceRevision: binding.sourceRevision,
+          canonicalWriteAttempted: false,
+          hint: 'Set ATLAS_GRAPHIFY_REVISION_CANARY_WORKSPACE_ID to the intended non-production workspace UUID.',
+        }, null, 2));
+        process.exitCode = 1;
+        return;
+      }
+      throw error;
     }
 
     if (!APPLY) {
@@ -128,8 +175,8 @@ async function main() {
       `SELECT gf.file_id, gf.source_ref, gf.source_revision, gf.code_source_revision,
               gf.content_hash, gf.byte_length,
               gr.repository_revision, gr.workspace_revision, gr.source_manifest_digest
-         FROM graphify_files gf
-         JOIN graphify_runs gr ON gr.run_id = gf.last_seen_run_id
+         FROM public.graphify_files gf
+         JOIN public.graphify_runs gr ON gr.run_id = gf.last_seen_run_id
         WHERE gf.file_id = $1 FOR UPDATE`,
       [receipt.fileId],
     );
