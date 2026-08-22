@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { RetrievalCandidate } from '../contracts/retrieval-candidate';
-import { attachDomainEvidence } from './search-runtime';
+import { attachDomainEvidence, createSearchRuntime } from './search-runtime';
 
 function candidate(overrides: Partial<RetrievalCandidate> = {}): RetrievalCandidate {
   return {
@@ -82,5 +82,53 @@ describe('SearchRuntime domain evidence', () => {
     expect(output.lane).toBe('exact');
     expect(output.rank).toBe(1);
     expect(output.score).toBeNull();
+  });
+
+  it('classifies after cross-encoder reranking without changing the selected order', async () => {
+    const first = candidate({
+      packet_key: 'packet-first',
+      source_ref: 'src/auth/session.ts',
+      lane: 'exact',
+      rank: 1,
+      score: 0.95,
+      metadata: { summary: 'authenticate session token credential' },
+    });
+    const second = candidate({
+      packet_key: 'packet-second',
+      source_ref: 'src/graph/pagerank.ts',
+      lane: 'exact',
+      rank: 2,
+      score: 0.80,
+      metadata: { summary: 'neo4j pagerank community topology edge node' },
+    });
+
+    const crossEncoder = {
+      rerank: async (_query: string, candidates: RetrievalCandidate[]) => [
+        candidates.find((row) => row.packet_key === 'packet-second')!,
+        candidates.find((row) => row.packet_key === 'packet-first')!,
+      ],
+    };
+
+    const runtime = createSearchRuntime({
+      exactRetriever: { retrieve: async () => [first, second] },
+      crossEncoder,
+    });
+
+    const result = await runtime.search('find retrieval ranking candidates', 2);
+
+    expect(result.domain_analysis.domain).toBe('retrieval');
+    expect(result.candidates.map((row) => row.packet_key)).toEqual([
+      'packet-second',
+      'packet-first',
+    ]);
+    expect(result.ace.candidates.map((row) => row.packet_key)).toEqual([
+      'packet-second',
+      'packet-first',
+    ]);
+    expect(result.candidates[0]?.metadata.domain_class).toBe('graph');
+    expect(result.candidates[1]?.metadata.domain_class).toBe('auth');
+    expect(result.candidates[0]?.lane).toBe('exact');
+    expect(result.candidates[0]?.rank).toBe(2);
+    expect(result.candidates[0]?.score).toBe(0.80);
   });
 });
