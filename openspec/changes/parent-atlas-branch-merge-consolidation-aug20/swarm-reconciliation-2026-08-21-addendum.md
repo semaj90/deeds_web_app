@@ -302,6 +302,71 @@ for files the branch didn't touch but does depend on — this is the
 second time this session that step alone (not the merge diff itself)
 is what surfaced a real, shipped-would-be-broken regression.
 
+## Update: two more merges (2026-08-21/22) — one duplicate-ownership finding, one more fixture bug
+
+Merged `agent/aligned-snapshot-real-corpus-proof-20260821` → commit
+`f2d9ce5a36` (pure-additive CLI export script +
+Python gate/test helpers for the aligned-snapshot proof pipeline;
+depends on the already-merged `workspace-revision-origin-runtime-v1.js`,
+verified present). This script requires a live `DATABASE_URL` and reads
+real `graphify_runs`/`graphify_files`/`atlas_packets` rows — per
+DB-ROLE-01 (still unbuilt) and the "no destructive/unverified DB ops"
+non-goal above, **not executed**, only read and reasoned about
+statically. It fails closed (`FROZEN_SEMANTIC_SCHEMA_PREREQUISITE_MISSING`)
+if the expected columns aren't present, which is the right shape for an
+unexecuted, schema-gated script.
+
+Merged `agent/gpu-batch-request-current-main-20260821` → commit
+`90752c8e87` (`CandidateFeatureGpuBatchRequestV1`: GATHER/RANK batch
+envelope over an existing GPU-resident lease, 5-buffer-role binding,
+ordinal-dedup + topK + deadline invariants).
+
+**Real duplicate-ownership finding** (flagged, not resolved — this is
+exactly the "one canonical owner per capability" violation pattern this
+repo's root CLAUDE.md warns about): `origin/main` now carries **two
+independently-built, non-cross-referencing GPU-residency-lease
+implementations**:
+
+| | `candidate-feature-gpu-residency-v1.ts` | `candidate-feature-gpu-resident-lease-v1.ts` |
+|---|---|---|
+| Commits | `de1bb9b34d`, `7d37e7079c` (pre-dates this session) | `6d60ef29a6` (merged this session, see above) |
+| Schema literal | `atlas.candidate-feature-gpu-residency-lease.v1` | `atlas.candidate-feature-gpu-resident-lease.v1` |
+| Main export | `candidateFeatureGpuResidencyLeaseV1Schema` | `candidateFeatureGpuResidentLeaseV1Schema` |
+| Build fn | `buildCandidateFeatureGpuResidencyLease` | `buildCandidateFeatureGpuResidentLease` |
+| Now has a consumer | `candidate-feature-gpu-batch-request-v1.ts` (just merged) | none yet |
+
+Both implement essentially the same concept (a checksum-bound lease
+over GPU-resident candidate-feature buffers, build/verify/release
+lifecycle) with near-identical naming that differs only by
+"residency" vs "resident(-lease)". Neither file references the other;
+each was built by a different swarm branch with no apparent awareness
+of the other's existence. Per this repo's governance rules (root
+CLAUDE.md, "🚫 Duplication Prevention" + "One Canonical Runtime Owner
+Per Capability"), this needs an **operator canonicalization decision**
+(pick one as `CANONICAL_OWNER`, classify the other as `DEAD` or
+`COMPATIBILITY` or merge their capabilities) — not something to resolve
+silently mid-merge. Not fixed in this session; recorded here per rule
+6 of that governance section ("record what you found, even when you
+don't fix it").
+
+Also found and fixed (same category as the earlier two regressions,
+same discipline of "run the actual test, don't trust the clean merge"):
+`candidate-feature-gpu-batch-request-v1.spec.ts`'s `lease()` fixture
+hardcoded `observationChecksum: H('observation')` instead of hashing
+the real observation body, so all 4 of its own tests failed
+`GPU_RESIDENCY_OBSERVATION_CHECKSUM_MISMATCH` against the (otherwise
+passing) already-merged residency schema. Fixed by computing the
+checksum the same way the residency lib's own spec does (canonicalJson
++ sha256 over the pre-checksum body). Commit `9e7f0ca9d7`. This one was
+local to the branch's own new test file, not a pre-existing shared-file
+regression like the `.omit()`/lease-checksum pair earlier.
+
+**Running total this session**: 3 real bugs found and fixed across 3
+merged branches, purely by insisting on running actual `vitest`
+against every merge instead of trusting `git merge-tree`'s "no conflict
+markers" signal. Zero of these three would have been caught by the
+merge-cleanliness check alone.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
