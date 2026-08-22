@@ -7,16 +7,17 @@ import { verifyGraphSnapshotRevisionV1 } from './graph-snapshot-revision-v1.js';
 
 export const FANOUT_ADMISSION_SCHEMA = 'atlas.fanout-admission.v1' as const;
 const id = z.string().min(1);
+const nullableId = id.nullable();
 
 export const fanoutGraphNodeEvidenceV1Schema = z.object({
   snapshotId: z.string().uuid(),
   graphNodeKey: id,
-  canonicalId: id.nullable(),
+  canonicalId: nullableId,
   packetKey: id,
-  symbolVersionId: id.nullable(),
-  sourceRef: id.nullable(),
-  treeNodeId: id.nullable(),
-  sourceRevision: id,
+  symbolVersionId: nullableId,
+  sourceRef: nullableId,
+  treeNodeId: nullableId,
+  sourceRevision: nullableId,
   evidenceRefs: z.array(id).default([]),
 }).strict();
 export type FanoutGraphNodeEvidenceV1 = z.infer<typeof fanoutGraphNodeEvidenceV1Schema>;
@@ -37,9 +38,9 @@ export const fanoutAdmissionV1Schema = z.object({
   snapshotId: z.string().uuid(),
   workspaceRevision: id,
   graphRevision: id,
-  sourceRevision: id.nullable(),
+  sourceRevision: nullableId,
   representationId: z.literal('semantic_768').nullable(),
-  representationRevision: id.nullable(),
+  representationRevision: nullableId,
   blockers: z.array(id),
   canonicalWritesAttempted: z.literal(false),
   qdrantWritesAttempted: z.literal(false),
@@ -111,7 +112,7 @@ export function evaluateFanoutAdmissionV1(input: {
   if (node.snapshotId !== snapshot.snapshotId) {
     status = 'SNAPSHOT_BINDING_MISMATCH';
     blockers.push('GRAPH_NODE_SNAPSHOT_ID_MISMATCH');
-  } else if (!node.sourceRevision.trim()) {
+  } else if (!node.sourceRevision) {
     status = 'SOURCE_REVISION_MISSING';
     blockers.push('AUTHORITATIVE_SOURCE_REVISION_REQUIRED');
   } else if (!input.qdrantPayload) {
@@ -181,7 +182,7 @@ export function evaluateFanoutAdmissionV1(input: {
     snapshotId: snapshot.snapshotId,
     workspaceRevision: snapshot.workspaceRevision,
     graphRevision: snapshot.graphRevision,
-    sourceRevision: node.sourceRevision || null,
+    sourceRevision: node.sourceRevision,
     representationId: input.qdrantPayload && text(input.qdrantPayload.representation_id) === 'semantic_768'
       ? 'semantic_768' as const
       : null,
