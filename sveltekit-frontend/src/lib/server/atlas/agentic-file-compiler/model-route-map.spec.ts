@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { selectModelRoute, type ModelRouteMapV1 } from './model-route-map.js';
+describe('model route map',()=>{it('can choose BitNet for a cheap classifier without touching retrieval',()=>{const map:ModelRouteMapV1={schema:'atlas.model-route-map.v1',routeMapRevision:'1',producerRevision:'1',routes:[{taskClass:'query-classification',runtime:'bitnet',modelId:'tiny',minConfidence:.8,maxTokens:512,resourceClass:'cpu-cheap',priority:0},{taskClass:'query-classification',runtime:'llama-server',modelId:'large',minConfidence:.95,maxTokens:4096,resourceClass:'gpu',priority:1}]};expect(selectModelRoute(map,{taskClass:'query-classification',requiredConfidence:.7,estimatedTokens:100})?.runtime).toBe('bitnet');});});

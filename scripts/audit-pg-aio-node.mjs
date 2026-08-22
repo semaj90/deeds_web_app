@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 // Quick script to audit PG AIO settings via Node.js pg client
 import pg from 'pg';
+import { loadAtlasEnv } from './atlas/load-atlas-env.mjs';
 const { Pool } = pg;
 
+loadAtlasEnv();
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL_REQUIRED');
+}
+
 const pool = new Pool({
-  host: '127.0.0.1',
-  port: 5432,
-  user: 'legal_admin',
-  password: 'legal_admin_password',
-  database: 'legal_ai_db',
+  connectionString: databaseUrl,
   connectionTimeoutMillis: 5000,
 });
 

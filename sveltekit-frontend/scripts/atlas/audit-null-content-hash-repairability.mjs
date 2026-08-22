@@ -37,15 +37,21 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const FRONTEND_ROOT = path.resolve(HERE, '../..');
+const REPO_ROOT = path.resolve(FRONTEND_ROOT, '..');
 
 const COLLECTION = process.env.QDRANT_COLLECTION_V2 ?? 'codebase_chunks_768_v2';
 const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw new Error('DATABASE_URL is required');
 const SAMPLE = Math.max(1, Number(process.env.NULL_HASH_AUDIT_SAMPLE ?? 250));
 const OFFSET = Math.max(0, Number(process.env.NULL_HASH_AUDIT_OFFSET ?? 0));
 const VECTOR_TOLERANCE = Number(process.env.NULL_HASH_VECTOR_TOLERANCE ?? 1e-5);
-const REPORT_DIR = process.env.NULL_HASH_AUDIT_REPORT_DIR ?? 'docs/reports';
+const REPORT_DIR = path.resolve(REPO_ROOT, process.env.NULL_HASH_AUDIT_REPORT_DIR ?? 'docs/reports');
 const REPORT_JSON = path.join(REPORT_DIR, 'null-content-hash-repairability.json');
 const REPORT_MD = path.join(REPORT_DIR, 'null-content-hash-repairability.md');
 const MANIFEST = path.join(REPORT_DIR, 'null-content-hash-repairability.ndjson');

@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
 
 ALTER TABLE public.graphify_runs
   ADD COLUMN IF NOT EXISTS workspace_revision text,
-  ADD COLUMN IF NOT EXISTS source_manifest_digest text;
+  ADD COLUMN IF NOT EXISTS source_manifest_digest text,
+  ADD COLUMN IF NOT EXISTS source_manifest_source_count integer;
 
 ALTER TABLE public.graphify_files
   ADD COLUMN IF NOT EXISTS code_source_revision text;
@@ -98,6 +99,16 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.graphify_runs'::regclass
+      AND conname = 'graphify_runs_source_manifest_source_count_v2'
+  ) THEN
+    ALTER TABLE public.graphify_runs
+      ADD CONSTRAINT graphify_runs_source_manifest_source_count_v2
+      CHECK (source_manifest_source_count IS NULL OR source_manifest_source_count > 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
     WHERE conrelid = 'public.graphify_files'::regclass
       AND conname = 'graphify_files_content_hash_sha256_v2'
   ) THEN
@@ -121,6 +132,8 @@ CREATE INDEX IF NOT EXISTS graphify_runs_workspace_revision_idx_v2
 CREATE INDEX IF NOT EXISTS graphify_runs_source_manifest_digest_idx_v2
   ON public.graphify_runs (source_manifest_digest)
   WHERE source_manifest_digest IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_runs_status_started_at_idx_v2
+  ON public.graphify_runs (status, started_at DESC);
 CREATE INDEX IF NOT EXISTS graphify_files_source_ref_idx_v2
   ON public.graphify_files (workspace_id, source_ref);
 CREATE INDEX IF NOT EXISTS graphify_files_legacy_source_revision_provenance_idx_v2
@@ -139,6 +152,8 @@ COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
   'WorkspaceRevisionRecordV1 identity: sha256 of sorted exact-byte source manifest.';
 COMMENT ON COLUMN public.graphify_runs.source_manifest_digest IS
   'Unprefixed SHA-256 digest underlying workspace_revision.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_source_count IS
+  'Exact sourceCount from WorkspaceRevisionRecordV1. A graph consumer must prove this many exact source bindings before consuming the run as complete.';
 COMMENT ON COLUMN public.graphify_files.source_revision IS
   'Historical Git/file provenance retained for compatibility.';
 COMMENT ON COLUMN public.graphify_files.content_hash IS
@@ -147,3 +162,14 @@ COMMENT ON COLUMN public.graphify_files.code_source_revision IS
   'WorkspaceSourceBindingV1/CodeSourceRevisionV1 identity: sha256:<exact source bytes>.';
 
 COMMIT;
+
+-- Post-apply gate order (non-production proof DB only):
+--   1. npx tsx scripts/atlas/prove-graphify-revision-owner-v2.mts
+--      Expected before writer remediation: migration/schema state visible,
+--      revisionOwnerProven=false, fanoutMayConsumeAsCanonical=false.
+--   2. Reconcile the existing source-inventory materializer to the v2 two-table
+--      contract. Do not create a second revision writer.
+--   3. Run one rolled-back write/readback proof in the intended non-production DB.
+--   4. Only after review, commit one controlled row.
+--   5. Rerun prove-graphify-revision-owner-v2.mts and require
+--      REVISION_OWNER_PROVEN before FANOUT may consume lineage as canonical.

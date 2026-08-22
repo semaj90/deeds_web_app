@@ -1,0 +1,916 @@
+{
+  "schema": "atlas.emb3a-qdrant-lineage-audit.v1",
+  "generatedAt": "2026-08-22T04:57:13.404Z",
+  "mode": "READ_ONLY",
+  "collection": "codebase_chunks_768_v2",
+  "expectedRepresentation": {
+    "name": "semantic_768",
+    "dimension": 768,
+    "source": "collection-qualified writer/projection contract"
+  },
+  "observedCollection": {
+    "status": "green",
+    "pointsCount": 52380,
+    "sampleSize": 250,
+    "vectorSchema": [
+      {
+        "name": "content",
+        "size": 768
+      },
+      {
+        "name": "error",
+        "size": 768
+      },
+      {
+        "name": "signature",
+        "size": 768
+      }
+    ],
+    "dimensionMatches": true,
+    "representationNameCoveragePct": 100,
+    "payloadSchemaKeys": [
+      "chunk_id",
+      "content_hash",
+      "embedding_model",
+      "indexed_at",
+      "model_revision_state",
+      "postgres_id",
+      "projection_revision",
+      "qdrant_point_id",
+      "representation_name",
+      "source_ref"
+    ]
+  },
+  "writers": [
+    {
+      "id": "768_v2_direct_backfill",
+      "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+      "collection": "codebase_chunks_768_v2",
+      "transport": "DIRECT_POSTGRES_TO_QDRANT",
+      "present": true,
+      "sha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+    },
+    {
+      "id": "qdrant_sync_payload",
+      "path": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
+      "collection": "codebase_chunks_768",
+      "transport": "PACKET_TO_QDRANT_SYNC",
+      "present": true,
+      "sha256": "0eb4ed41669eeccef35d7162a649f471a2df72ddba47a8f8a32f99b5093ffae7"
+    },
+    {
+      "id": "legacy_projection_worker",
+      "path": "sveltekit-frontend/scripts/atlas/atlas-qdrant-projection-worker.mjs",
+      "collection": "codebase_chunks_384_hybrid",
+      "transport": "RABBITMQ_PROJECTION_JOB",
+      "present": true,
+      "sha256": "cec8acc7e0dc3361084df7399e264bb76db7ddbd303fad8c4bcb3c5c1f1d063d"
+    }
+  ],
+  "outboxTablesObserved": [],
+  "fields": [
+    {
+      "field": "canonical_id",
+      "payloadKey": "postgres_id",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "codebase_chunk_index",
+          "column": "id",
+          "semantic": "NON_NULL",
+          "exists": true,
+          "total": 52417,
+          "populated": 52417,
+          "coveragePct": 100
+        },
+        {
+          "table": "atlas_packets",
+          "column": "packet_id",
+          "semantic": "NON_NULL",
+          "exists": true,
+          "total": 61660,
+          "populated": 61660,
+          "coveragePct": 100
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "codebase_chunk_index.id",
+        "coveragePct": 100,
+        "populated": 52417,
+        "total": 52417
+      },
+      "snapshotSources": [
+        {
+          "table": "codebase_chunk_index",
+          "column": "id",
+          "semantic": "NON_NULL",
+          "exists": true,
+          "total": 52417,
+          "populated": 52417,
+          "coveragePct": 100
+        }
+      ],
+      "snapshot": {
+        "state": "POPULATED",
+        "owner": "codebase_chunk_index.id",
+        "coveragePct": 100,
+        "populated": 52417,
+        "total": 52417
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": true,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 250,
+        "coveragePct": 100,
+        "observedKeys": [
+          "postgres_id"
+        ],
+        "payloadIndexPresent": true,
+        "indexedKeys": [
+          "postgres_id"
+        ]
+      },
+      "indexed": true,
+      "classification": "EMB3A_LINEAGE_PROVEN"
+    },
+    {
+      "field": "packet_key",
+      "payloadKey": "packet_key",
+      "conditional": true,
+      "canonicalSources": [
+        {
+          "table": "atlas_packets",
+          "column": "packet_key",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 61660,
+          "populated": 61660,
+          "coveragePct": 100
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.packet_key",
+        "coveragePct": 100,
+        "populated": 61660,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER"
+    },
+    {
+      "field": "source_ref",
+      "payloadKey": "source_ref",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "codebase_chunk_index",
+          "column": "source_ref",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 52417,
+          "populated": 52380,
+          "coveragePct": 99.93
+        },
+        {
+          "table": "codebase_chunk_index",
+          "column": "relative_path",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 52417,
+          "populated": 52380,
+          "coveragePct": 99.93
+        },
+        {
+          "table": "atlas_packets",
+          "column": "source_ref",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 61660,
+          "populated": 61659,
+          "coveragePct": 100
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.source_ref",
+        "coveragePct": 100,
+        "populated": 61659,
+        "total": 61660
+      },
+      "snapshotSources": [
+        {
+          "table": "codebase_chunk_index",
+          "column": "source_ref",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 52417,
+          "populated": 52380,
+          "coveragePct": 99.93
+        },
+        {
+          "table": "codebase_chunk_index",
+          "column": "relative_path",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 52417,
+          "populated": 52380,
+          "coveragePct": 99.93
+        }
+      ],
+      "snapshot": {
+        "state": "POPULATED",
+        "owner": "codebase_chunk_index.source_ref",
+        "coveragePct": 99.93,
+        "populated": 52380,
+        "total": 52417
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": true,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 250,
+        "coveragePct": 100,
+        "observedKeys": [
+          "source_ref"
+        ],
+        "payloadIndexPresent": true,
+        "indexedKeys": [
+          "source_ref"
+        ]
+      },
+      "indexed": true,
+      "classification": "EMB3A_LINEAGE_PROVEN"
+    },
+    {
+      "field": "tree_node_id",
+      "payloadKey": "tree_node_id",
+      "conditional": true,
+      "canonicalSources": [
+        {
+          "table": "atlas_packets",
+          "column": "tree_node_id",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 61660,
+          "populated": 61659,
+          "coveragePct": 100
+        },
+        {
+          "table": "atlas_ast_nodes",
+          "column": "tree_node_id",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 11067,
+          "populated": 11067,
+          "coveragePct": 100
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.tree_node_id",
+        "coveragePct": 100,
+        "populated": 61659,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER"
+    },
+    {
+      "field": "symbol_version_id",
+      "payloadKey": "symbol_version_id",
+      "conditional": true,
+      "canonicalSources": [
+        {
+          "table": "atlas_symbol_versions",
+          "column": "symbol_version_id",
+          "semantic": "NON_EMPTY",
+          "exists": false,
+          "total": null,
+          "populated": null,
+          "coveragePct": null
+        }
+      ],
+      "canonical": {
+        "state": "NOT_OWNED_UPSTREAM",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE"
+    },
+    {
+      "field": "workspace_revision",
+      "payloadKey": "workspace_revision",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "atlas_symbol_versions",
+          "column": "workspace_revision",
+          "semantic": "NON_EMPTY",
+          "exists": false,
+          "total": null,
+          "populated": null,
+          "coveragePct": null
+        },
+        {
+          "table": "atlas_packets",
+          "column": "workspace_revision",
+          "semantic": "NON_ZERO",
+          "exists": true,
+          "total": 61660,
+          "populated": 0,
+          "coveragePct": 0
+        }
+      ],
+      "canonical": {
+        "state": "OWNER_PRESENT_UNPOPULATED",
+        "owner": "atlas_packets.workspace_revision",
+        "coveragePct": 0,
+        "populated": 0,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE"
+    },
+    {
+      "field": "source_revision",
+      "payloadKey": "source_revision",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "atlas_symbol_versions",
+          "column": "source_revision",
+          "semantic": "NON_EMPTY",
+          "exists": false,
+          "total": null,
+          "populated": null,
+          "coveragePct": null
+        },
+        {
+          "table": "atlas_ast_nodes",
+          "column": "source_revision",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 11067,
+          "populated": 0,
+          "coveragePct": 0
+        }
+      ],
+      "canonical": {
+        "state": "OWNER_PRESENT_UNPOPULATED",
+        "owner": "atlas_ast_nodes.source_revision",
+        "coveragePct": 0,
+        "populated": 0,
+        "total": 11067
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE"
+    },
+    {
+      "field": "representation_id",
+      "payloadKey": "representation_id",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "atlas_packets",
+          "column": "source_representation_id",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 61660,
+          "populated": 1,
+          "coveragePct": 0
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.source_representation_id",
+        "coveragePct": 0,
+        "populated": 1,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": true,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_PAYLOAD_POPULATION"
+    },
+    {
+      "field": "representation_revision",
+      "payloadKey": "representation_revision",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "atlas_packets",
+          "column": "representation_revision",
+          "semantic": "NON_ZERO",
+          "exists": true,
+          "total": 61660,
+          "populated": 1,
+          "coveragePct": 0
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.representation_revision",
+        "coveragePct": 0,
+        "populated": 1,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_NOT_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": false,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER"
+    },
+    {
+      "field": "embedding_model_revision",
+      "payloadKey": "model_revision",
+      "conditional": false,
+      "canonicalSources": [
+        {
+          "table": "atlas_packets",
+          "column": "encoder_revision",
+          "semantic": "NON_EMPTY",
+          "exists": true,
+          "total": 61660,
+          "populated": 1,
+          "coveragePct": 0
+        }
+      ],
+      "canonical": {
+        "state": "POPULATED",
+        "owner": "atlas_packets.encoder_revision",
+        "coveragePct": 0,
+        "populated": 1,
+        "total": 61660
+      },
+      "snapshotSources": [],
+      "snapshot": {
+        "state": "NOT_APPLICABLE_OR_NOT_PROJECTED",
+        "owner": null,
+        "coveragePct": null,
+        "populated": 0,
+        "total": 0
+      },
+      "outbox": {
+        "state": "NOT_APPLICABLE_DIRECT_BACKFILL",
+        "tablesObserved": []
+      },
+      "builder": {
+        "state": "FIELD_REFERENCED",
+        "builders": [
+          {
+            "id": "768_v2_direct_backfill",
+            "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+            "transport": "DIRECT_POSTGRES_TO_QDRANT",
+            "present": true,
+            "mentionsField": true,
+            "sourceSha256": "60a4e92d6a35b471a5ba149fcf56f8cc81348e8a80a31a3b2656879668fde6c9"
+          }
+        ]
+      },
+      "livePayload": {
+        "sampleTotal": 250,
+        "populated": 0,
+        "coveragePct": 0,
+        "observedKeys": [],
+        "payloadIndexPresent": false,
+        "indexedKeys": []
+      },
+      "indexed": false,
+      "classification": "EMB3A_BLOCKED_BY_PAYLOAD_POPULATION"
+    }
+  ],
+  "representationSamples": [
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    },
+    {
+      "representation_name": "semantic_768",
+      "representation_id": null,
+      "representation_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "embedding_model": "embeddinggemma",
+      "model_revision": null
+    }
+  ],
+  "firstBlockingClass": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE",
+  "status": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE",
+  "invariants": [
+    "payloadIndexPresent != qdrantPayloadPresent",
+    "vectorDimension does not synthesize representation_id",
+    "workspace_revision/source_revision are never inferred from timestamps, hashes, or representation metadata",
+    "collection qualification is required before representation assertions",
+    "audit performs no canonical or projection writes"
+  ],
+  "outputChecksum": "becda039044f7ccb8939cf1eb5e54fdd275e092f7622e2c66ecbc09be5f981df"
+}

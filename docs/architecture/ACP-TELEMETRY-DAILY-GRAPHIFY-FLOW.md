@@ -309,7 +309,7 @@ async function main() {
 
 | Service | Port | Purpose | Status |
 |---------|------|---------|--------|
-| Postgres | 5432 | Telemetry tables | ✅ Ready |
+| Postgres | 5434 | Telemetry tables | ✅ Ready (host mapping; container listens on 5432) |
 | Redis | 6379 | Cache + locks | ⚠️ Down, needs restart |
 | Qdrant | 6333 | ANN search | ✅ Ready |
 | Ollama | 11434 | Embeddings | ✅ Ready |

@@ -7,6 +7,33 @@ records verified state for this checkout; reports from other worktrees are not
 treated as proof here.
 
 - Canonical Parent Atlas source: `packages/parent-atlas`.
+- Parent Atlas package build passes with the package-local command
+  `npm --workspaces=false run build`; the plain `npm run build` wrapper is
+  incompatible with the repository’s root `.npmrc` setting
+  `workspaces=false`.
+- Parent Atlas temporal package specifications pass `51/51` across ledger,
+  sequence reservation, Postgres repository fixtures, alternative selection,
+  recommendation history, workflow adaptation, and outcome receipt contracts.
+  These remain fixture/package proofs, not live Postgres durability proof.
+- SvelteKit temporal adapter and LangGraph control-plane fixtures now pass
+  `29/29`: boundary/recorder tests `19/19`, tool-shim and closed-loop tests
+  `6/6`, and DAG success/persistence-disabled tests `4/4`. A transient
+  `.svelte-kit` missing-file warning appeared during the DAG run, but the
+  targeted suites completed successfully.
+- Ran `npx svelte-kit sync` successfully. The subsequent full
+  `svelte-check --tsconfig ./tsconfig.json` still produced no diagnostics after
+  90 seconds and was stopped as a bounded environment check; it is not marked
+  passed or failed. Targeted temporal tests remain the current SvelteKit proof.
+- The separate SvelteKit script check (`check:scripts:stable`) fails on a broad
+  pre-existing workspace baseline with more than 1,000 diagnostics, including
+  missing database exports, Redis typing mismatches, legacy TurboVec scripts,
+  Qdrant nullable-payload types, and old 512-dimension code. This does not
+  invalidate the focused Graphify/temporal suites, but it blocks a clean
+  workspace-wide typecheck.
+- Restored the missing `GraphifyWorkspaceManifestReceiptV1` source/spec that
+  the materializer imports. Its focused tests pass `2/2`, and a one-file
+  read-only materializer run now completes with `DRY_RUN_PROVEN` and
+  `sourceCount=1`; no row persistence was attempted.
 - `GraphSnapshotRevisionV1` now owns workspace/source/graph lineage at snapshot
   level; node and edge projections remain bound through `snapshot_id`.
 - Graph snapshot revision fixture tests pass 3/3.
@@ -37,6 +64,74 @@ treated as proof here.
   `drizzle/manual/20260821_graphify_source_inventory.sql` with explicit
   workspace/source indexes and constraints. Applying it remains a separate
   non-production operation; it does not authorize row population or FANOUT.
+- Rollback-only migration proof passed: the temporary `graphify_files` table,
+  columns, constraints, and indexes were validated in one transaction and
+  rolled back. Durable `graphify_files` state remains absent.
+- Migration safety audit found an older repository-only `drizzle/001_graphify_lineage.sql`
+  definition with incompatible columns and constraints. The manual migration
+  now fails closed if `graphify_files` already exists; it never drops, deletes,
+  truncates, or rewrites existing rows.
+- The owner canary now requires the complete source-inventory schema and
+  reports an incompatible legacy table separately instead of treating three
+  legacy columns as a canonical-owner signal.
+- The actual read-only fanout admission proof now loads the shared Atlas
+  environment and reaches its database/Qdrant gates. Current result is
+  `GRAPH_SNAPSHOT_REVISION_MIGRATION_REQUIRED`: all six required snapshot
+  revision columns are absent and the node source-revision column is absent.
+  The proof attempted zero Postgres, Qdrant, or Neo4j writes.
+- The two existing 2026-08-22 revision-owner migrations now have documented
+  rollback-only proofs. Snapshot migration proof observed the existing graph
+  snapshot/node tables; Graphify authority proof observed temporary
+  `graphify_runs`/`graphify_files` tables. Both rolled back with durable state
+  unchanged. Neither migration has been applied.
+- Added `GraphifyWorkspaceManifestReceiptV1` to distinguish one-row writer
+  evidence from full workspace completeness. It requires expected/persisted
+  source counts plus exact source-revision and content-digest counts before a
+  manifest can be marked complete; it remains observational and non-authoritative.
+- Updated the source-inventory dry-run materializer to derive logical
+  `workspaceRevision` from the exact source manifest and per-file
+  `sourceRevision` from exact content SHA-256. A bounded `--source` run now
+  explicitly reports `workspaceManifestComplete=false` rather than using Git
+  HEAD as canonical lineage.
+- Full read-only inventory pass completed for `4996` source files with zero
+  read failures. The pass is correctly classified as `BOUNDED_LIMIT` and
+  `workspaceManifestComplete=false` because the configured 5000-source cap was
+  reached; Git blob provenance is now loaded once from `git ls-tree` instead of
+  spawning one subprocess per file.
+- Uncapped read-only candidate pass completed for `24612` source files with
+  zero read failures. It produced `WORKSPACE_CANDIDATE`,
+  `workspaceManifestComplete=true`, and a complete manifest receipt. This is
+  still an observation/dry run only; no Graphify rows were persisted. The
+  materializer now excludes its own generated plan from the candidate set;
+  two consecutive uncapped runs reproduced the same `24612` count and
+  workspace-manifest checksum.
+- Read-only EMB3A Qdrant lineage audit sampled 250 points from
+  `codebase_chunks_768_v2` and remains `EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE`;
+  no projection or vector mutation was attempted.
+- Drizzle/sidecar audit recognizes the repository’s manual-sidecar inventory;
+  the live database still has no `graphify_files` owner. The broader audit
+  reports 75 live undeclared active tables and 998 column-drift findings, so
+  those findings remain a separate schema-reconciliation lane and do not
+  authorize applying this migration or promoting FANOUT.
+- PostgreSQL 18.4 runtime proof is now confirmed against the shared
+  `DATABASE_URL`: `io_method=worker`, `io_workers=3`, and the read-only Atlas
+  workload census reports `61660` packets and `52417` codebase chunks, of
+  which `52380` have embeddings. AIO/bitmap workload benchmarking and
+  `pg_stat_io` evidence remain open; this is capability evidence only.
+- Host-side PostgreSQL references in the active architecture/audit paths now
+  use `127.0.0.1:5434`; container-internal `5432` references remain explicitly
+  labeled as the Docker target. This sweep did not change unrelated archived
+  or isolated-database references.
+- Application-facing readiness check passes against PostgreSQL `127.0.0.1:5434`,
+  Redis `6379`, RabbitMQ `5672`, Qdrant `6333`, and optional Bifrost `3040`.
+  Service reachability does not promote any schema, graph, vector, or receipt
+  lane.
+- Read-only target identity is `legal_ai_db` / `legal_admin`, server address
+  `172.18.0.21`, internal port `5432`, data directory
+  `/var/lib/postgresql/18/docker`, and `pg_is_in_recovery=false`. The runtime is
+  Docker-backed through a host-side proxy on `5434`; it is explicitly not a
+  disposable migration target. `deploymentRole=PROXY`,
+  `migrationAllowed=false`, and all Graphify migrations remain unapplied.
 - No production Postgres, Qdrant, Neo4j, or Valkey writes were performed.
 
 ### Next gates
@@ -48,7 +143,7 @@ treated as proof here.
 - [x] Run the one-file source-inventory dry run and verify exact-byte hashing.
 - [ ] Apply the source-inventory migration only in a named non-production
   database; do not apply it to production.
-- [ ] Prove the migration in a rollback-only transaction with
+- [x] Prove the migration in a rollback-only transaction with
   `prove-graphify-source-inventory-migration.mts` before any durable apply.
 - [ ] Rerun the owner canary and require the table/schema gates to pass.
 - [ ] Run one explicit non-production `--apply --source <one-file>` operation

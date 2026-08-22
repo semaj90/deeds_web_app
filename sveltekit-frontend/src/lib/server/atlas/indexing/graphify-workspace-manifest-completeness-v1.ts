@@ -72,6 +72,13 @@ function checksum(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
+/**
+ * Proves that a persisted Graphify run is a complete physical projection of the
+ * exact WorkspaceRevisionRecordV1 source manifest. Git coordinates are not used
+ * by this proof. A bounded/single-row canary may prove writer mechanics, but it
+ * cannot make graphMayConsumeWorkspaceRevision true unless every manifest source
+ * binding is present and exact under the same run.
+ */
 export function evaluateGraphifyWorkspaceManifestCompletenessV1(input: {
   workspaceRecord: WorkspaceRevisionRecordV1;
   sourceBindings: readonly WorkspaceSourceBindingV1[];
@@ -92,6 +99,7 @@ export function evaluateGraphifyWorkspaceManifestCompletenessV1(input: {
     status = 'RUN_LINEAGE_MISMATCH';
     blockers.push('PERSISTED_RUN_WORKSPACE_MANIFEST_LINEAGE_MISMATCH');
   }
+
   if (run.sourceManifestSourceCount !== record.sourceCount
     || bindings.length !== record.sourceCount
     || persisted.length !== record.sourceCount) {

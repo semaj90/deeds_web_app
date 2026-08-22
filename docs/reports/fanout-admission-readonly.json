@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.fanout-admission-readonly-proof.v1",
+  "status": "GRAPH_SNAPSHOT_REVISION_MIGRATION_REQUIRED",
+  "readOnly": true,
+  "postgresWritesAttempted": false,
+  "qdrantWritesAttempted": false,
+  "neo4jWritesAttempted": false,
+  "missingSnapshotColumns": [
+    "workspace_revision",
+    "source_inventory_revision",
+    "graph_revision",
+    "identity_contract_version",
+    "parser_contract_version",
+    "revision_checksum"
+  ],
+  "nodeSourceRevisionColumn": false,
+  "collection": "codebase_chunks_768_v2"
+}

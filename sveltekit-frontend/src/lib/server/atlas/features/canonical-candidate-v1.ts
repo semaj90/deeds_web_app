@@ -7,7 +7,7 @@ export const CANDIDATE_ORDINAL_MAP_SCHEMA = 'atlas.candidate-ordinal-map.v1' as 
 const revision = z.string().min(1);
 const nullableId = z.string().min(1).nullable();
 
-export const canonicalCandidateV1Schema = z.object({
+const canonicalCandidateV1BaseSchema = z.object({
   schema: z.literal(CANONICAL_CANDIDATE_SCHEMA),
   candidateOrdinal: z.number().int().nonnegative(),
   canonicalId: z.string().min(1),
@@ -21,7 +21,9 @@ export const canonicalCandidateV1Schema = z.object({
   candidateSnapshotRevision: revision,
   degradedIdentity: z.boolean().default(false),
   evidenceRefs: z.array(z.string().min(1)).default([]),
-}).strict().superRefine((candidate, ctx) => {
+}).strict();
+
+export const canonicalCandidateV1Schema = canonicalCandidateV1BaseSchema.superRefine((candidate, ctx) => {
   if (!candidate.degradedIdentity && candidate.packetKey === null && candidate.treeNodeId === null && candidate.symbolVersionId === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -74,7 +76,7 @@ export function materializeCandidateOrdinalMap(input: {
   producerRevision: string;
 }): CandidateOrdinalMapV1 {
   const seenCanonical = new Set<string>();
-  const parsed = input.candidates.map((candidate) => canonicalCandidateV1Schema.omit({
+  const parsed = input.candidates.map((candidate) => canonicalCandidateV1BaseSchema.omit({
     schema: true,
     candidateOrdinal: true,
     candidateSnapshotRevision: true,
