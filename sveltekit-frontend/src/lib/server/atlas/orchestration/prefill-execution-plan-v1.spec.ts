@@ -18,6 +18,7 @@ function baseInput(): PrefillExecutionPlanInputV1 {
     userQuery: 'Find the packet owner and explain the source path',
     queryIntent: 'SEARCH',
     allowedOperationKinds: ['READ', 'AUDIT'],
+    allowedTargetScopes: ['NONE'],
     mutationAuthorized: false,
     humanApprovalPresent: false,
     selectedToolIds: ['atlas.packet_search', 'trace.validate_ace_hit'],
@@ -71,6 +72,7 @@ describe('PrefillExecutionPlanV1', () => {
     expect(first.queryHash).toBe(second.queryHash);
     expect(first.advisoryDecoder.authorizesExecution).toBe(false);
     expect(first.allowedOperationKinds).toEqual(['READ', 'AUDIT']);
+    expect(first.allowedTargetScopes).toEqual(['NONE']);
     expect(first.canonicalWritesAllowed).toBe(false);
   });
 
@@ -91,35 +93,61 @@ describe('PrefillExecutionPlanV1', () => {
     })).toThrow('APPLY requires mutationAuthorized=true');
   });
 
+  it('rejects canonical store scope unless canonical writes are authorized', () => {
+    const input = baseInput();
+    expect(() => createPrefillExecutionPlanV1({
+      ...input,
+      allowedTargetScopes: ['NONE', 'CANONICAL_STORE'],
+    })).toThrow('CANONICAL_STORE scope requires canonicalWritesAllowed=true');
+  });
+
   it('rejects canonical writes without human approval', () => {
     const input = baseInput();
     expect(() => createPrefillExecutionPlanV1({
       ...input,
       allowedOperationKinds: ['READ', 'PROPOSE', 'APPLY'],
+      allowedTargetScopes: ['NONE', 'CANONICAL_STORE'],
       mutationAuthorized: true,
       canonicalWritesAllowed: true,
       humanApprovalPresent: false,
     })).toThrow('canonical writes require APPLY + mutation authorization + human approval');
   });
 
-  it('allows PROPOSE without granting APPLY', () => {
+  it('allows PROPOSE to materialize a disposable .tmp artifact without granting APPLY', () => {
     const input = baseInput();
     const plan = createPrefillExecutionPlanV1({
       ...input,
       allowedOperationKinds: ['READ', 'AUDIT', 'PROPOSE'],
+      allowedTargetScopes: ['NONE', 'EPHEMERAL_WORKSPACE'],
     });
 
     expect(() => assertToolNominationAllowed({
       plan,
       toolId: 'atlas.packet_search',
       operationKind: 'PROPOSE',
+      targetScope: 'EPHEMERAL_WORKSPACE',
     })).not.toThrow();
 
     expect(() => assertToolNominationAllowed({
       plan,
       toolId: 'atlas.packet_search',
       operationKind: 'APPLY',
+      targetScope: 'WORKTREE_SOURCE',
     })).toThrow('OPERATION_KIND_NOT_AUTHORIZED:APPLY');
+  });
+
+  it('forbids READ from mutating even an ephemeral target', () => {
+    const input = baseInput();
+    const plan = createPrefillExecutionPlanV1({
+      ...input,
+      allowedTargetScopes: ['NONE', 'EPHEMERAL_WORKSPACE'],
+    });
+    expect(() => assertToolNominationAllowed({
+      plan,
+      toolId: 'atlas.packet_search',
+      operationKind: 'READ',
+      targetScope: 'EPHEMERAL_WORKSPACE',
+    })).toThrow('READ_OPERATION_CANNOT_MUTATE:EPHEMERAL_WORKSPACE');
   });
 
   it('rejects a tool nomination that was not selected during prefill', () => {
@@ -149,6 +177,7 @@ describe('PrefillExecutionPlanV1', () => {
       selectedToolIds: ['atlas.patch.apply'],
       prefill: { ...input.prefill, selectedToolIds: ['atlas.patch.apply'], cacheable: false },
       allowedOperationKinds: ['APPLY'],
+      allowedTargetScopes: ['NONE', 'WORKTREE_SOURCE', 'CANONICAL_STORE'],
       mutationAuthorized: true,
       humanApprovalPresent: true,
       canonicalWritesAllowed: true,
@@ -159,6 +188,7 @@ describe('PrefillExecutionPlanV1', () => {
       plan,
       toolId: 'atlas.patch.apply',
       operationKind: 'APPLY',
+      targetScope: 'CANONICAL_STORE',
     })).not.toThrow();
   });
 });
