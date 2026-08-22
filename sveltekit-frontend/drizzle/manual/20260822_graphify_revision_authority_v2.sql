@@ -21,6 +21,21 @@
 -- Historical uniqueness constraints are intentionally preserved. If an older
 -- deployment has a constraint whose semantics conflict with the v2 writer, that
 -- deployment must fail closed and be reconciled in a separate reviewed migration.
+-- Historical Graphify columns retain their original meanings:
+--   graphify_runs.repository_revision = Git commit provenance
+--   graphify_files.source_revision    = historical Git/file provenance
+--   graphify_files.content_hash       = exact-byte SHA-256 digest
+--
+-- Current Parent Atlas logical revisions are additive and first-class:
+--   graphify_runs.workspace_revision    = sha256:<sorted exact-byte source manifest>
+--   graphify_files.code_source_revision = sha256:<content_hash>
+--
+-- Safety:
+--   * Creates only graphify_runs / graphify_files when the historical base migration was never applied.
+--   * No backfill and no UPDATE / DELETE.
+--   * Existing repository_revision/source_revision values are preserved.
+--   * Existing rows are never promoted merely because the v2 columns exist.
+--   * FANOUT remains blocked until one controlled writer row and independent read-only proof agree.
 
 BEGIN;
 
@@ -52,6 +67,8 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
   parse_error jsonb,
   first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT,
   last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT
+  first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE,
+  last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE
 );
 
 ALTER TABLE public.graphify_runs
@@ -126,6 +143,26 @@ CREATE INDEX IF NOT EXISTS graphify_files_source_ref_idx_v2
   ON public.graphify_files (workspace_id, source_ref);
 CREATE INDEX IF NOT EXISTS graphify_files_legacy_source_revision_provenance_idx_v2
   ON public.graphify_files (workspace_id, source_ref, source_revision);
+END $$;
+
+ALTER TABLE public.graphify_runs
+  DROP CONSTRAINT IF EXISTS graphify_runs_workspace_id_repository_revision_parser_contract_version_key;
+ALTER TABLE public.graphify_files
+  DROP CONSTRAINT IF EXISTS graphify_files_workspace_id_source_ref_source_revision_key;
+
+CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
+  ON public.graphify_runs (workspace_id, workspace_revision, parser_contract_version)
+  WHERE workspace_revision IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_code_source_revision_uq_v2
+  ON public.graphify_files (workspace_id, source_ref, code_source_revision)
+  WHERE code_source_revision IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_runs_repository_revision_provenance_idx_v2
+  ON public.graphify_runs (workspace_id, repository_revision, started_at DESC);
+CREATE INDEX IF NOT EXISTS graphify_runs_workspace_revision_idx_v2
+  ON public.graphify_runs (workspace_id, workspace_revision)
+  WHERE workspace_revision IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_files_source_ref_idx_v2
+  ON public.graphify_files (workspace_id, source_ref);
 CREATE INDEX IF NOT EXISTS graphify_files_code_source_revision_idx_v2
   ON public.graphify_files (code_source_revision)
   WHERE code_source_revision IS NOT NULL;
