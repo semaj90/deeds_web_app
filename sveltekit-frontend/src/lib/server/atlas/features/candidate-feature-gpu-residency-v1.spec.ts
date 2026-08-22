@@ -11,6 +11,20 @@ const H = (value: string) => createHash('sha256').update(value).digest('hex');
 const FEATURE_COUNT = 12;
 const PHYSICAL_ROWS = 32;
 
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  return `{${Object.entries(value as Record<string, unknown>)
+    .filter(([, item]) => item !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`)
+    .join(',')}}`;
+}
+
+function observationChecksum(value: object): string {
+  return createHash('sha256').update(canonicalJson(value)).digest('hex');
+}
+
 function pack() {
   return {
     schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
@@ -24,13 +38,13 @@ function pack() {
     physicalRows: PHYSICAL_ROWS,
     paddingRows: PHYSICAL_ROWS - 2,
     rowAlignment: 32,
-    featureCount: FEATURE_COUNT as 12,
+    featureCount: FEATURE_COUNT,
     featureNames: [
       'semanticRelevance', 'lexicalRelevance', 'astAffinity', 'graphAuthority',
       'personalizedPageRank', 'communityAffinity', 'manifold4OrientationSimilarity',
       'crossEncoderRawScore', 'crossEncoderCalibratedScore', 'domainAffinity',
       'executionUtility', 'memoryUtility',
-    ] as const,
+    ],
     featureValues: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),
     featurePresence: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),
     validMask: [1, 1, ...Array(PHYSICAL_ROWS - 2).fill(0)],
@@ -59,7 +73,7 @@ function pack() {
 
 function observation() {
   const source = pack();
-  return {
+  const body = {
     schema: 'atlas.candidate-feature-gpu-residency-observation.v1' as const,
     leaseId: 'lease:test:1',
     deviceId: 0,
@@ -85,8 +99,8 @@ function observation() {
     issuedAt: '2026-08-22T03:00:00.000Z',
     expiresAt: '2026-08-22T03:05:00.000Z',
     producerRevision: 'gpu-residency:test:v1',
-    observationChecksum: H('observation'),
   };
+  return { ...body, observationChecksum: observationChecksum(body) };
 }
 
 describe('CandidateFeature GPU residency lifecycle', () => {
@@ -104,11 +118,22 @@ describe('CandidateFeature GPU residency lifecycle', () => {
     expect(lease.identityAuthority).toBe(false);
   });
 
-  it('rejects a GPU observation whose source buffer checksum does not match FEAT-03D', () => {
+  it('rejects tampered GPU observations before they become resident artifacts', () => {
     const observed = observation();
-    observed.buffers[0] = { ...observed.buffers[0], sourceChecksum: H('wrong-source') };
     expect(() => buildCandidateFeatureGpuResidencyLease({
-      pack: pack(), observation: observed, producerRevision: 'bridge:test:v1',
+      pack: pack(), observation: { ...observed, deviceName: 'tampered' }, producerRevision: 'bridge:test:v1',
+    })).toThrow(/GPU_RESIDENCY_OBSERVATION_CHECKSUM_MISMATCH/);
+  });
+
+  it('rejects a checksum-valid observation whose source buffer does not match FEAT-03D', () => {
+    const observed = observation();
+    const { observationChecksum: _old, ...body } = observed;
+    const buffers = body.buffers.map((buffer, index) => index === 0
+      ? { ...buffer, sourceChecksum: H('wrong-source') }
+      : buffer);
+    const changed = { ...body, buffers };
+    expect(() => buildCandidateFeatureGpuResidencyLease({
+      pack: pack(), observation: { ...changed, observationChecksum: observationChecksum(changed) }, producerRevision: 'bridge:test:v1',
     })).toThrow(/GPU_RESIDENCY_SOURCE_CHECKSUM_MISMATCH:feature_values/);
   });
 
