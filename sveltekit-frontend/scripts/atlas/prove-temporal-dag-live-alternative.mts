@@ -5,9 +5,7 @@ import { resolve } from 'node:path';
 
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
-// DB-adjacent application modules must be imported only after env loading. The
-// temporal dry-loop proof already found that static ESM evaluation can create
-// the pg Pool before loadAtlasEnv() runs.
+// DB-adjacent modules stay dynamic: db/client constructs its Pool at import time.
 loadAtlasEnv();
 
 const APPLY = process.env.ATLAS_TEMPORAL_DAG_LIVE_PROOF === '1';
@@ -29,7 +27,10 @@ const { runAgentDAG } = await import('../../src/lib/server/ai/langgraph-dag.js')
 const { closeConnections, pool } = await import('../../src/lib/server/db/client.js');
 
 async function relationExists(name: string): Promise<boolean> {
-  const result = await pool.query<{ regclass: string | null }>('SELECT to_regclass($1) AS regclass', [name]);
+  const result = await pool.query<{ regclass: string | null }>(
+    'SELECT to_regclass($1) AS regclass',
+    [name],
+  );
   return result.rows[0]?.regclass != null;
 }
 
@@ -47,7 +48,7 @@ function failingCounterCommand(path: string): string {
     `const p=${JSON.stringify(path)}`,
     "let n=0;try{n=Number(fs.readFileSync(p,'utf8'))||0}catch{}",
     "fs.writeFileSync(p,String(n+1))",
-    "process.exit(7)",
+    'process.exit(7)',
   ].join(';');
   const encoded = Buffer.from(script, 'utf8').toString('base64');
   return `node -e \"eval(Buffer.from(process.argv[1],'base64').toString('utf8'))\" ${encoded}`;
@@ -55,17 +56,15 @@ function failingCounterCommand(path: string): string {
 
 function descriptorBase(input: {
   opcode: string;
-  queryClass: string;
-  target: string;
-  implementationRevision: string;
   runId: string;
+  implementationRevision: string;
 }) {
   return {
     schema: 'atlas.action-execution-descriptor.v1' as const,
     opcode: input.opcode,
-    query_class: input.queryClass,
+    query_class: 'temporal_dag_live_proof',
     target: {
-      canonical_id: input.target,
+      canonical_id: `target:dag-live:${input.runId}`,
       resource: null,
       target_class: 'proof-target',
     },
@@ -104,7 +103,6 @@ function workflowEvent(input: {
   kind: 'completed' | 'failed';
   toolId: string;
   errorCode?: string | null;
-  artifactRefs?: string[];
 }) {
   const now = new Date().toISOString();
   return {
@@ -122,7 +120,7 @@ function workflowEvent(input: {
     receiptId: input.kind === 'completed' ? `receipt:${input.actionId}` : undefined,
     resourceRefs: [],
     evidenceRefs: ['proof:temporal-dag-live'],
-    artifactRefs: input.artifactRefs ?? [],
+    artifactRefs: [],
     startedAt: now,
     completedAt: now,
     errorCode: input.kind === 'failed' ? input.errorCode ?? 'PROOF_TOOL_ERROR' : undefined,
@@ -149,7 +147,6 @@ async function main(): Promise<void> {
     process.exitCode = 2;
     return;
   }
-
   if (!APPLY) {
     console.log(JSON.stringify({
       schema: 'atlas.temporal-dag-live-proof.v1',
@@ -160,7 +157,6 @@ async function main(): Promise<void> {
     }, null, 2));
     return;
   }
-
   if (process.env.NODE_ENV === 'production') {
     throw new Error('TEMPORAL_DAG_LIVE_PROOF_REFUSES_PRODUCTION');
   }
@@ -169,7 +165,6 @@ async function main(): Promise<void> {
   const workflowId = `proof:temporal-dag-live:${runId}`;
   const k1CounterPath = resolve(process.cwd(), 'tmp', `temporal-dag-k1-${runId}.txt`);
   let workflowSequence = 1;
-
   const retryPolicy = {
     policy_revision: 'proof-no-retry-v1',
     allow_transient_retry: false,
@@ -182,25 +177,31 @@ async function main(): Promise<void> {
     call: k1Call,
     descriptor: descriptorBase({
       opcode: 'TERMINAL_PROOF_FAILURE',
-      queryClass: 'temporal_dag_live_proof',
-      target: `target:dag-live:${runId}`,
-      implementationRevision: 'terminal-proof-failure:v1',
       runId,
+      implementationRevision: 'terminal-proof-failure:v1',
     }),
     retry_policy: retryPolicy,
     producer_revision: PRODUCER_REVISION,
   });
   const k1Key = buildActionExecutionKey(k1Temporal.descriptor);
 
-  const k2Call = { tool: 'rg_search', args: { pattern: `temporal-dag-live-proof-${runId}` } };
+  // codebase.rg_search is explicitly read-only. A unique query may return zero
+  // hits and still proves successful execution; we care about the K2 edge, not
+  // retrieval quality in this temporal-control fixture.
+  const k2Call = {
+    tool: 'rg_search',
+    args: {
+      query: `temporal-dag-live-proof-${runId}`,
+      paths: ['src/lib/server/atlas/temporal'],
+      limit: 5,
+    },
+  };
   const k2Temporal = buildTemporalToolExecutionContext({
     call: k2Call,
     descriptor: descriptorBase({
       opcode: 'RG_SEARCH',
-      queryClass: 'temporal_dag_live_proof',
-      target: `target:dag-live:${runId}`,
-      implementationRevision: 'rg-search:dag-live-proof:v1',
       runId,
+      implementationRevision: 'rg-search:dag-live-proof:v1',
     }),
     retry_policy: retryPolicy,
     producer_revision: PRODUCER_REVISION,
@@ -245,15 +246,14 @@ async function main(): Promise<void> {
   };
 
   try {
-    // K1 is a genuine failed subprocess execution, recorded once before the DAG
-    // replay. The DAG must consult this durable failure and never execute K1.
+    // Genuine K1 failure: execute a subprocess once, then persist the explicit
+    // TOOL_ERROR. The DAG replay must suppress this exact call from history.
     const firstK1Result = await executeTool(k1Call);
     const k1AfterSeed = await counter(k1CounterPath);
     if (k1AfterSeed !== 1) throw new Error(`DAG_K1_SEED_DISPATCH_COUNT:${k1AfterSeed}`);
     if ((firstK1Result as any)?.ok !== false) {
       throw new Error(`DAG_K1_EXPECTED_REAL_FAILURE:${JSON.stringify(firstK1Result)}`);
     }
-
     await recordTemporalToolDispatchOutcomeFromPostgres({
       workflow_event: workflowEvent({
         workflowId,
@@ -275,6 +275,9 @@ async function main(): Promise<void> {
       runId,
       temporalAction: k1Temporal,
       temporalAlternativePlan: plan,
+      // Explicit proof-owned canonical outcome for K2. The post-dispatch hook
+      // first requires the MCP contract's success=true; it does not silently
+      // promote arbitrary transport success to ActionOutcomeV1.
       temporalAuthoritativeActionOutcome: 'SUCCESS_EXACT',
       temporalPostDispatch: async ({ call, result, temporalAction }: any) => {
         if (call.tool !== 'rg_search') {
@@ -302,10 +305,12 @@ async function main(): Promise<void> {
       },
     };
 
-    // `graph` forces the production DAG's tool path. The original parsed call is
-    // still K1. The temporal boundary must replace it with K2 before dispatch.
-    const query = `graph <execute_bash>${k1Call.args.command}</execute_bash>`;
-    const dagResult = await runAgentDAG(query, ctx);
+    // `graph` forces the production DAG tool path. parseToolCall still identifies
+    // K1 from execute_bash; applyTemporalBoundary must replace it before dispatch.
+    const dagResult = await runAgentDAG(
+      `graph <execute_bash>${k1Call.args.command}</execute_bash>`,
+      ctx,
+    );
     if (dagResult.success !== true) {
       throw new Error(`DAG_K2_DID_NOT_FINALIZE_SUCCESS:${JSON.stringify(dagResult)}`);
     }
@@ -316,12 +321,8 @@ async function main(): Promise<void> {
     const temporalRepository = createTemporalActionPostgresRepository(pool);
     const k1History = await temporalRepository.currentByExecutionKey(k1Key, PRODUCER_REVISION);
     const k2History = await temporalRepository.currentByExecutionKey(k2Key, PRODUCER_REVISION);
-    if (k1History.receipt.event_count !== 1) {
-      throw new Error(`DAG_K1_HISTORY_COUNT:${k1History.receipt.event_count}`);
-    }
-    if (k2History.receipt.event_count !== 1) {
-      throw new Error(`DAG_K2_HISTORY_COUNT:${k2History.receipt.event_count}`);
-    }
+    if (k1History.receipt.event_count !== 1) throw new Error(`DAG_K1_HISTORY_COUNT:${k1History.receipt.event_count}`);
+    if (k2History.receipt.event_count !== 1) throw new Error(`DAG_K2_HISTORY_COUNT:${k2History.receipt.event_count}`);
     if (k1History.current?.latest_outcome !== 'TOOL_ERROR') {
       throw new Error(`DAG_K1_HISTORY_OUTCOME:${String(k1History.current?.latest_outcome)}`);
     }
@@ -331,12 +332,8 @@ async function main(): Promise<void> {
 
     const selection = ctx.temporalAlternativeSelection;
     if (!selection) throw new Error('DAG_ALTERNATIVE_SELECTION_MISSING');
-    if (selection.failed_execution_key !== k1Key) {
-      throw new Error('DAG_FAILED_EXECUTION_KEY_MISMATCH');
-    }
-    if (selection.selected_execution_key !== k2Key) {
-      throw new Error('DAG_SELECTED_EXECUTION_KEY_MISMATCH');
-    }
+    if (selection.failed_execution_key !== k1Key) throw new Error('DAG_FAILED_EXECUTION_KEY_MISMATCH');
+    if (selection.selected_execution_key !== k2Key) throw new Error('DAG_SELECTED_EXECUTION_KEY_MISMATCH');
 
     const outcomeBoundary = ctx.temporalRecommendationOutcome;
     if (!outcomeBoundary?.receipt) throw new Error('DAG_RECOMMENDATION_OUTCOME_MISSING');
@@ -344,19 +341,13 @@ async function main(): Promise<void> {
     const outcomeRows = await outcomeRepository.listByRecommendationId(
       selection.package_selection.recommendation.recommendation_id,
     );
-    if (outcomeRows.length !== 1) {
-      throw new Error(`DAG_RECOMMENDATION_OUTCOME_COUNT:${outcomeRows.length}`);
-    }
+    if (outcomeRows.length !== 1) throw new Error(`DAG_RECOMMENDATION_OUTCOME_COUNT:${outcomeRows.length}`);
     const outcome = outcomeRows[0]!;
     if (outcome.selected_action_id !== plan.candidates[0]!.candidate.candidate_action_id) {
       throw new Error('DAG_OUTCOME_SELECTED_ACTION_MISMATCH');
     }
-    if (outcome.resulting_execution_key !== k2Key) {
-      throw new Error('DAG_OUTCOME_EXECUTION_KEY_MISMATCH');
-    }
-    if (outcome.downstream_success !== true) {
-      throw new Error('DAG_OUTCOME_DOWNSTREAM_SUCCESS_MISMATCH');
-    }
+    if (outcome.resulting_execution_key !== k2Key) throw new Error('DAG_OUTCOME_EXECUTION_KEY_MISMATCH');
+    if (outcome.downstream_success !== true) throw new Error('DAG_OUTCOME_DOWNSTREAM_SUCCESS_MISMATCH');
 
     console.log(JSON.stringify({
       schema: 'atlas.temporal-dag-live-proof.v1',
