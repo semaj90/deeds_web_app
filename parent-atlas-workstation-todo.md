@@ -1,10 +1,85 @@
 # Parent Atlas Workstation TODO
 
-## Current execution-proof reconciliation — 2026-08-21
+## HMM → MCP → bounded DAG phase alignment — 2026-08-22
+
+The phase-alignment contracts are now present in the main checkout. Parent
+Atlas owns the revision/checksum-qualified phase receipt and the SvelteKit
+caller/LangGraph node only adapts it; no graph node owns durable truth.
+
+- Phase, Valkey metadata/readback, and encoder-training receipt fixtures pass
+  `9/9`.
+- LangGraph/tool boundary fixtures pass `6/6`.
+- Live `hforf.gguf` `:8090` tool-call smoke passes `5/5`; bounded replay emits
+  `rg_search` and executes only an injected dry-run tool.
+- The direct LangGraph Valkey access was moved behind
+  `sveltekit-frontend/src/lib/server/cache/langgraph-cache-adapter.ts`.
+- Training admission and canonical writes remain explicitly false.
+- Durable temporal Postgres proof remains blocked: the preflight requires an
+  isolated `ATLAS_INTEGRATION_DATABASE_URL` and reports the shared workstation
+  database as unsafe. No temporal migrations were applied.
+
+Status: `WIRED / BOUNDED_PROVEN / DURABLE_PROOF_BLOCKED`.
+See `docs/reports/phase-alignment-hmm-prefill-dag-20260822.md` and
+`openspec/changes/phase-alignment-hmm-prefill-dag-20260822/tasks.md`.
+
+## Candidate feature GEMM bridge — 2026-08-22
+
+The main checkout now contains the read-only `CandidateFeatureGemmReceiptV1`
+CPU reference in `sveltekit-frontend/src/lib/server/atlas/features/`.
+It consumes the existing revision-bound columnar feature fabric, preserves
+CandidateOrdinal order, computes deterministic float32 feature-head scores, and
+emits a checksum receipt that cannot authorize identity, promotion, or writes.
+
+Focused validation in the main checkout passed `14/14` across the GEMM oracle,
+GPU physical packing, and dense-executor ordinal normalization tests. This is
+`CPU_GEMM_REFERENCE_TEST_PROVEN`; it is not CUDA/LibTorch parity proof. The
+remaining gate is a real native execution receipt with matching input checksum,
+ordinal order, scores within the declared tolerance, and zero canonical writes.
+FANOUT-01 and graph revision ownership remain blocked independently.
+
+## SM86 hardware specialization — merged to this checkout
+
+The hardware-specialization implementation is now present in this checkout
+through commits `36f87f5a3c` through `e1f119dc61`. The contract and profile
+materializer focused tests pass. The current state is
+`SM86_ESTIMATOR_CONTRACT_PROVEN`; real RTX kernel timing, cuTile/CUTLASS
+profiler receipts, `KernelPerfReceiptV1`, and `TARGET_VALIDATED` promotion remain
+open. The implementation does not change embedding identity or select a GPU
+kernel in production.
+
+The bounded CUDA parity proof then passed in the main checkout:
+`CANDIDATE_FEATURE_GPU_PARITY_BOUNDED_PROVEN`, PyTorch `2.8.0+cu128`, CUDA
+`12.8`, RTX 3060 Ti, `maxAbsFeatureDelta=0`, exact ordinal/feature/presence/
+lane/degraded/padding parity, and no Postgres/Qdrant/Valkey/Neo4j writes.
+This closes the bounded FEAT-03D/FEAT-04 proof only; it does not prove a
+resident production GPU lease, kernel performance, graph fanout, or canonical
+promotion.
+
+## Current execution-proof reconciliation — 2026-08-22
 
 The active worktree is `C:\Users\james\Videos\deeds-web-app`. This section
 records verified state for this checkout; reports from other worktrees are not
 treated as proof here.
+
+### Scope-correction follow-up — trace bridge and candidate fabric
+
+The root shadow tree has already been archived under the 2026-08-22 archive
+manifest; it is not a second implementation to copy into the live app.
+`CandidateFeatureSnapshotV1`, columnar materialization, Arrow helpers, and GPU
+parity contracts are present under the SvelteKit consumer path. The focused
+snapshot/columnar/readback suites now pass `13/13`; the producer determinism
+proof still fails with `CANDIDATE_FEATURE_ARROW_BYTES_NONDETERMINISTIC`, so
+logical readback is proven but byte-level artifact determinism and mmap remain
+open. See
+`docs/reports/trace-xgboost-candidate-fabric-audit-20260822.md`.
+
+The XGBoost exporter now fails closed unless a non-empty, checksum-verified
+trace-label bridge is supplied in both dry-run and apply modes. It no longer
+expands synthetic trace labels through `atlas_packets.feature_id`; explicit
+`packet_key` identity is required. This closes the known unsafe fallback but
+does not create a bridge, a lineage-valid dataset, a model receipt, or GPU
+training proof. XGBoost remains `DATA_JOIN_BLOCKED`; FANOUT remains blocked by
+revision and semantic-768 identity gates.
 
 - Canonical Parent Atlas source: `packages/parent-atlas`.
 - Parent Atlas package build passes with the package-local command
@@ -133,6 +208,227 @@ treated as proof here.
   disposable migration target. `deploymentRole=PROXY`,
   `migrationAllowed=false`, and all Graphify migrations remain unapplied.
 - No production Postgres, Qdrant, Neo4j, or Valkey writes were performed.
+- Read-only XGBoost feature export was executed against the current environment:
+  `1100` traces loaded, but `0` packets/features indexed, `0` total rows, and
+  `0` positive rows. The `positive_rows_500`, `distinct_features_8`, and
+  `completeness_80pct` gates all failed. This is a dataset/index join blocker,
+  not evidence that XGBoost or GPU training is ready. The script wrote only its
+  local metadata report during dry-run; no CSV, model, or database mutation was
+  performed.
+- The join diagnostic now records `10` requested trace labels, `0` matched, and
+  `10` unmatched: `agent_intelligence`, `api_endpoints`, `database_orm`,
+  `emergent_topology`, `general_abstractions`, `infrastructure_config`,
+  `native_accelerators`, `observability_telemetry`, `test_harness`, and
+  `ui_components`. Current packet feature IDs are workspace-qualified values,
+  so these legacy labels must be reconciled through an evidence-backed bridge;
+  they must not be mapped by string guessing.
+- Read-only inspection confirms current packet identities are workspace-qualified
+  values such as `sveltekit-frontend.ui-components.d`, while the trace vocabulary
+  uses broad labels such as `ui_components` and `emergent_topology`. Near-matches
+  in `feature_label` or `source_ref` are not sufficient to establish packet
+  identity. The next artifact is a revisioned trace-label-to-packet bridge with
+  source evidence and cardinality checks; until then the XGBoost export remains
+  `DATA_JOIN_BLOCKED`.
+- The bridge contract is now implemented in `packages/parent-atlas` and the
+  exporter accepts it only through an explicit `--trace-label-bridge=...` input.
+  The exporter verifies schema, checksum, unique labels, unique packet keys,
+  evidence references, and `promotion_allowed=false` before using it. No bridge
+  entries have been approved, so this is wiring only and does not change the
+  current zero-row result or authorize training.
+- The exporter was rerun after this wiring in dry-run mode against the proxy
+  database: `1100` traces, `0` indexed packets, `0` rows, and all three training
+  gates failed. This confirms the new input path did not silently broaden the
+  join or mutate the output surface.
+- A separate read-only candidate audit now scans `61,660` packet rows and emits
+  `10` label suggestions in
+  `docs/reports/xgboost-trace-label-candidates.json`. They are all
+  `PROPOSED_NOT_GROUND_TRUTH`; several have ambiguous top ties, and even exact
+  token matches still require source evidence and revision/cardinality review.
+  The report explicitly keeps `promotion_allowed=false`.
+- The live `agent_traces` schema confirms the identity gap: all `1,100` packet
+  references in this sample are synthetic `packet:<label>:<ordinal>` values;
+  zero are canonical packet-key references, and traces carry no source or
+  revision identity fields. This is why lexical matching cannot close the
+  training join.
+- Added a package-level future-record contract requiring canonical `packet_key`,
+  `source_ref`, workspace/source revisions, `semantic_768`, representation
+  revision, and retrieval rank. It validates duplicate packet identities but
+  does not alter the historical `agent_traces` table or backfill old rows.
+- GAN validation classification for this lane:
+  `CREATED` bridge contract and future packet-reference contract;
+  `WIRED` exporter bridge input and fail-closed apply gates;
+  `PROVEN` package typecheck, 5 focused tests, candidate audit, and read-only
+  exporter execution;
+  `DONE` is not allowed because the future runtime trace producer is not wired,
+  the current trace corpus has no canonical identity fields, and the export has
+  zero rows.
+- Application-writer sweep found no active `agent_traces` retrieval emitter in
+  `src` or the Parent Atlas packages; only synthetic seed/backfill scripts write
+  that table. The future packet-reference contract therefore remains a seam,
+  not a runtime integration claim.
+- A separate `WorkflowTrace` logger exists in `packages/atlas-core` and already
+  carries packet keys and source refs in memory, but the live proxy database has
+  no `workflow_traces` table. It therefore cannot currently supply a durable
+  XGBoost dataset either; no migration is authorized on the shared proxy.
+- The exporter now rejects `--apply` unless a checksum-valid, non-empty trace
+  label bridge is supplied. This prevents an accidental legacy-label export
+  from producing a training artifact while the join remains unresolved.
+- Broader Parent Atlas package validation passed: `13` focused files and `54`
+  tests, including the new bridge, temporal ledger, sequence reservation,
+  recommendation history, and outcome repository contracts. These remain
+  fixture/package proofs; they do not prove live Postgres durability or model
+  training readiness.
+- Apply mode now also requires every bridge packet key and trace label to resolve
+  against the same current read-only snapshot; stale or partially resolved
+  bridges are rejected rather than generating partial training data.
+
+### Domain classifier / XGBoost reconciliation — 2026-08-22
+
+#### Scope correction: root shadow tree
+
+The repository root contains a large `src` shadow tree, but the root
+`svelte.config.js` explicitly delegates to `sveltekit-frontend/svelte.config.js`;
+the real application source is `sveltekit-frontend/src`. The root tree must not
+be bulk-merged into the application. Current counts are approximately `197`
+root `src` files versus `5,568` files under `sveltekit-frontend/src`.
+
+The only safe rule is selective porting of independently verified contracts.
+The domain-classification schema was already ported into the real application
+and tested. The shadow-tree SearchRuntime scoring change is not being copied
+without a separate production-path review.
+
+The claimed structural runtime-readiness hardening branch is not present in
+this checkout: the readiness contract/spec files were not found, and no
+generated Node Tree-sitter corpus-v2 receipt exists. Its status remains
+`IMPLEMENTED_UNPROVEN` only where the existing corpus runner/OpenSpec contract
+actually exists; it is not merged or promoted here.
+
+The narrow readiness hardening has now been selectively ported into the real
+`sveltekit-frontend` checkout. It classifies transport failure, unavailable
+parser engine, missing parser package, and provider failure separately, and
+blocks parity when a schema-valid response reports `engine=unavailable`.
+Focused validation passed `4/4`; Svelte check returned no diagnostics. The
+The bounded 66-file corpus proof has now run against the recorded provider
+revisions. Runtime availability and source-byte freezing passed `66/66`, but
+Node span self-validity was `46/66`, 8095 span self-validity was `17/66`, named
+symbol coverage was `22/66`, semantic-kind parity was `22/66`, exact-span
+parity was `5/66`, and full parity was `5/66`. The dominant mismatch classes
+were `RIGHT_SPAN_INVALID` (785), `LEFT_SPAN_INVALID` (606),
+`EXACT_SPAN_MISMATCH` (1445), and `NAMED_SYMBOL_MISSING_LEFT` (449).
+Result: `CORPUS_PARITY_MISMATCH`. The byte-contract tests passed `2/2` and the
+TypeScript structural observation/comparator tests passed `7/7`; therefore the
+remaining blocker is provider corpus behavior and coordinate normalization,
+not runtime availability. Node Tree-sitter remains a structural challenger;
+8095 remains the canonical chunk projection. Do not refresh Graphify or admit
+fan-out from this challenger until span validity and symbol coverage are
+repaired or the promotion contract is explicitly split into structural
+semantic parity versus chunk-boundary parity. Receipt:
+`docs/reports/node-tree-sitter-provider-parity-corpus-v2.{json,md}`.
+The local `miniforge-nlp-sidecar` provenance-v2 container was rebuilt from the
+corrected facade and passed its health contract. The LF-to-CRLF raw-coordinate
+adapter produced a measurable improvement: 8095 span self-validity rose from
+`17/66` to `24/66`, `RIGHT_SPAN_INVALID` fell from `785` to zero, and exact-span
+mismatches fell from `1445` to `1243`. Full parity remains `5/66`, with Node
+span self-validity `46/66`, named-symbol coverage `22/66`, and semantic-kind
+parity `22/66`. This is `CORPUS_PARITY_MISMATCH` with a proven partial repair;
+the remaining work is Node span validation and extraction coverage. No parity
+threshold or promotion gate was relaxed.
+
+#### GPU context compiler alignment — 2026-08-22
+
+The existing candidate fabric already owns revisioned ordinals, columnar
+features, GPU-resident leases, physical-row padding, and valid masks. The new
+missing contract is `TraversalInstructionV1`: compact control flags and head
+mask plus bounded ordinal/evidence parameters. It does not transfer raw 768-d
+vectors, expose device pointers, create padded candidates, or add an ANN owner.
+The pure compiler now deterministically derives the instruction ID and action
+flags from an already-admitted ordinal set; a read-only ContextManifest adapter
+also checks candidate-count and graph-revision agreement. Focused validation
+passed `7/7`. The tensor sweep also found and corrected stale `semantic_512`
+inheritance in GPU snapshot/telemetry contracts; those focused tests pass `7/7`.
+The periodic quaternion fixture also now canonicalizes near-zero residues and
+passes `7/7`.
+The central Qdrant projection contract is now aligned in code to native
+`semantic_768`, `codebase_chunks_768_v2`, and named vector `content`; the scorer
+uses the existing dense-768 embedding owner. This is code/test alignment only:
+collection existence, payload population, lineage readback, and migration remain
+unproven. The canonical representation registry now marks `semantic_768` active
+and retains `semantic_512` as superseded MRL history. Runtime SearchRuntime wiring,
+LibTorch/N-API binding, GEMM parity, and
+same-corpus cuVS/CAGRA parity remain open.
+
+The SvelteKit TypeScript compiler now passes after repairing the DuckDB package
+boundary, API contract merge corruption, routing feature import, and PageRank
+receipt map typing. This is a compile proof only; live Qdrant and graph-owner
+proofs remain separate.
+Combined semantic/Qdrant/tensor smoke validation now passes `10` files and
+`43/43` tests. This remains fixture/contract proof, not live collection proof.
+
+The read-only EMB3A inspection then reached the live `codebase_chunks_768_v2`
+collection and confirmed the named 768-dimensional cosine schema plus clean
+system-record exclusion. Its bounded 100-point sample had no `packet_key` /
+`source_ref` identity coverage, no workspace/source/representation revision
+payload coverage, no readable revision filter sample, and none of the seven
+EMB2 fixture cards indexed. Result: `DEGRADED_FIXTURE_OR_PAYLOAD_GAP`; Qdrant
+and canonical writes were both false. This is the current live projection
+blocker, not a reason to backfill or re-embed. The report is
+`docs/reports/emb3a-qdrant-semantic-projection-proof.{json,md}`.
+
+The companion gap document `END-TO-END-GAPS-DOMAIN-CLASSIFIER-XGBOOST.md` is
+useful as a historical inventory, but it is not the current promotion authority.
+The following corrections apply to this TODO:
+
+- PageRank is not missing infrastructure. Neo4j GDS stream execution,
+  NetworkX/Neo4j fixture parity, authority contracts, and promotion gates exist.
+  Same-corpus multi-backend identity/configuration parity, canonical persistence,
+  and Qdrant fan-out remain unproven.
+- `latent_128` and `latent_64` implementations/contracts exist in Python and
+  package lanes, but production population, lineage, and projection readback are
+  not proven. `latent_128` remains derived/internal; `latent_64` remains routing
+  compatibility or feature input.
+- `latent_64` must not be added as an independent fifth RRF vote. Current
+  semantic-768 policy places latent/topology signals in derived feature rows or
+  bounded routing, preventing duplicate vote multiplication.
+- The domain classifier exists and is now an optional, schema-validated input to
+  the canonical `SearchRuntime.search()` path. It emits query/candidate domain
+  evidence and affinity metadata without changing ranking or persisting data;
+  domain-aware reranking remains unproven.
+- Cross-encoder code and caching exist, but “production ready” is not a proof
+  status. Canonical SearchRuntime wiring, live executor health, identity
+  preservation, and promotion receipts remain open.
+- XGBoost training/verification scripts exist, but a lineage-valid dataset,
+  reproducible evaluation receipt, and runtime promotion are not proven.
+- Neo4j/SOM fan-out, graph-derived Qdrant updates, title generation, and the
+  complete SearchRuntime-to-XGBoost loop remain unproven. No new fan-out or
+  collection write is authorized by these scaffolds.
+
+#### Updated progress
+
+| Area | State | Evidence boundary |
+|---|---|---|
+| PageRank | `PROVEN_FIXTURE`, `LIVE_PARITY_OPEN` | Six-node NetworkX/Neo4j fixture passes; GPU parity and canonical enrollment remain open |
+| Domain classifier | `WIRED_FIXTURE`, `RERANK_UNPROVEN` | Optional Zod-validated SearchRuntime seam emits query/candidate evidence; ranking and persistence remain unchanged |
+| Latent128 | `IMPLEMENTED_UNPROVEN` | Autoencoder/training helpers exist; no authorized production population/readback |
+| Latent64 | `DERIVED_ROUTING_ONLY` | Semantic-768 policy forbids treating it as an independent RRF lane |
+| Cross-encoder | `IMPLEMENTED_UNPROVEN` | Client/orchestrator/cache exist; end-to-end canonical promotion proof open |
+| XGBoost | `BRIDGE_CONTRACT_CREATED`, `DATA_JOIN_BLOCKED` | Trace-label bridge is deterministic, checksum-validated, non-promoting, and unit-tested; no approved entries or lineage-valid rows exist |
+| Neo4j/Qdrant fan-out | `BLOCKED` | Snapshot/source revision owner and semantic-768 identity gates remain open |
+| End-to-end classifier → topology → XGBoost | `NOT_PROVEN` | No complete runtime fixture with durable, revision-qualified receipt |
+
+#### Next implementation sequence
+
+1. Review and approve trace-label-to-packet bridge entries from source evidence;
+   keep promotion disabled until cardinality, revision, and identity checks pass.
+2. Freeze one graph parity fixture identity/config/ordinal receipt across
+   NetworkX, Neo4j GDS, and cuGraph before any graph score enrollment.
+3. Complete source-inventory and graph-snapshot revision-owner proofs in a
+   genuinely disposable non-production database. The current `5434` endpoint
+   is a proxy to the shared database and remains migration-blocked.
+4. Build a read-only XGBoost export from revision-qualified candidate features;
+   verify dataset checksum, row split, model revision, and evaluation metrics.
+5. Only after those receipts pass, consider bounded Neo4j/Qdrant derived fan-out.
+   Keep latent representations out of canonical identity and independent RRF
+   voting unless a separately approved evaluation changes that policy.
 
 ### Next gates
 
@@ -2125,3 +2421,128 @@ deleted capabilities or AST correctness gates.
 GPU-02 ownership receipt: `docs/reports/gpu-runtime-ownership-proof.json`.
 Current control-plane result is `PROVEN`; the dedicated RAPIDS `:8098` runtime is
 recorded separately as unreachable/deferred.
+#### UTF-8 / glyph / WebGPU alignment audit — 2026-08-22
+
+The active retrieval package had a real byte-accounting gap in
+`packages/parent-atlas-retrieval/src/gpu/simdjson-bridge.ts`: JavaScript
+UTF-16 string length was used for the input limit, native threshold, telemetry,
+cache sizing, and sampled cache identity. Those decisions now use exact UTF-8
+transport bytes, with a focused regression test. This is a transport fix, not a
+change to semantic identity or embedding dimensions.
+
+NES/CHR97 glyphs, sprite/LOD data, bit-packed bytes, Canvas pixels, and WebGPU
+textures remain derived visualization/materialization lanes. They must carry
+canonical identity, revision, shape, pixel format, row stride, and checksum;
+they must not become Qdrant/Postgres identity or semantic-vector owners. The
+historical CHR97 design has been marked accordingly, while its remaining `384`
+examples are documentation debt rather than active writer proof.
+
+Current gates: UTF-8 bridge accounting `WIRED / FIXTURE-PROVEN`; AST source-byte
+fixtures `PROVEN` but 66-file provider parity remains blocked; WebGPU RGBA/
+`bytesPerRow`/LOD pixel round-trip `NOT PROVEN`; NES memory-swap residency
+`NOT PROVEN`. No canonical or projection writes occurred.
+
+The focused retrieval validation now passes `9/9` tests, including UTF-8 byte
+accounting and crossencoder fallback contracts. The retrieval package-wide
+TypeScript check remains blocked by pre-existing SvelteKit alias resolution,
+missing adapter modules, and stale package exports; the two syntax errors in
+the crossencoder integration fixture were repaired. See
+`docs/reports/utf8-glyph-webgpu-pipeline-audit-20260822.md`.
+
+The WebGPU texture path now uses `texture-layout-v1`: UTF-8 glyph labels remain
+metadata, RGBA8 pixels remain byte data, rows are staged to a 256-byte stride,
+and compressed bytes are rejected before an `rgba8unorm` upload. The bounded
+CPU fixture passes `3/3` and the SvelteKit TypeScript check passes with no
+diagnostics. GPU readback, Canvas parity, and real NES LOD swap residency remain
+unproven.
+`N64TextureLODSystem` remains a scaffold because its request queue does not yet
+materialize and read back the selected replacement texture; it is not a runtime
+memory-swap proof.
+Its request boundary now uses the revisioned LOD residency guard, stages
+uncompressed RGBA8 rows, and updates resident state only after the WebGPU upload
+call. Invalid, duplicate, over-budget, and compressed assets remain blocked.
+The combined texture layout/LOD/pixel-coordinate fixture passes `6/6`; actual
+GPU readback remains unproven.
+Eviction accounting now subtracts actual resident payload bytes rather than the
+display `sizeKB` estimate.
+The packet LOD token estimator now counts Unicode code points instead of UTF-16
+code units, preventing astral glyphs from being double-counted in budget gates.
+The combined UTF-8/texture/LOD/packet-LOD focused validation passes `7/7`.
+
+The browser `webgpu-gemma-client.js` audit found a separate stale demo defect:
+the file was syntactically invalid and exposed a simulated 2048-dimensional
+vector as if it were a Gemma embedding. It is now valid JavaScript, retains
+text/demo behavior, reports no embedding representation, and fails closed on
+embedding requests. It has no active import into the server retrieval or
+indexing paths. Browser/demo WebGPU inference remains non-canonical; the only
+accepted embedding lane remains the revisioned server `semantic_768` owner.
+
+The follow-up UTF-8 sweep found two additional derived-path issues and repaired
+them without changing the canonical embedding lane: browser client embedding
+and reply/cache keys now hash UTF-8 bytes, and the SOM error-analysis CPU
+fallback now encodes the same UTF-8 bytes already consumed by its WebGPU
+shader. This is cache/CPU-GPU parity evidence only; the SOM 128-vector output
+remains a derived error-analysis feature and is not `semantic_768`.
+
+The same sweep found `dimensional-tensor-store.ts` declaring an aligned
+`bytesPerRow` while submitting tightly packed source bytes. Its RGBA32F upload
+now stages rows into the declared aligned stride and zero-fills incomplete
+final texels. This is a local WebGPU upload correctness repair; GPU readback and
+resident tensor proof remain open.
+
+The MCP GPU orchestrator had a stale implicit `nomic-embed-text` default for
+`vector_embedding`. It now selects `embeddinggemma:latest` with explicit
+`semantic_768` and dimension `768` metadata; Nomic remains registered only as
+an explicit compatibility fallback. The local `/api/v1/embeddings` service
+reachability and response-dimension readback are still unproven.
+
+The shared `embedding-client.ts` fallback chain now rejects cached or returned
+vectors unless every vector is finite and exactly `768` dimensions; malformed
+transport responses fall through or fail closed before cache write. The ONNX
+integration suite was attempted but could not collect because the workstation
+environment requires `ROTORQUANT_MODEL_PATH`; no test assertion ran.
+
+#### Embedding / UTF-8 / WebGPU alignment audit follow-up — 2026-08-22
+
+The active live embedding owner is confirmed as Ollama
+`embeddinggemma:latest` on `127.0.0.1:11434`, returning finite native
+`semantic_768` vectors in a read-only probe. Port `8090` is chat/generation
+only; `8091` has no listener and is reserved for optional LangGraph synthesis.
+The browser ONNX path is `onnxruntime-web` with `WebGPU -> WASM -> CPU`; the
+server ONNX fallback is `onnxruntime-node` with `CUDA -> CPU`. DirectML is not
+configured or proven.
+
+The semantic-768 finite-vector gate, UTF-8 derived-path fixes, texture layout,
+and LOD residency contracts remain wired and focused-test proven. The fresh
+66-file AST provider parity receipt now has runtime/source-byte gates at
+`66/66`, named-symbol coverage `60/66`, semantic-kind parity `56/66`, exact
+span parity `23/66`, and full parity `10/66`. Full parity still blocks
+Graphify refresh/fanout because chunk-boundary spans remain different. The
+provider adapter now converts Node binding offsets to UTF-8 bytes, and the
+comparator excludes anonymous functions and quoted module labels from symbol
+coverage while retaining them as raw evidence. Remaining mismatch classes are
+`EXACT_SPAN_MISMATCH` (433), `NAMED_SYMBOL_MISSING_LEFT` (14),
+`NAMED_SYMBOL_MISSING_RIGHT` (2), and `SEMANTIC_KIND_MISMATCH` (6); this is
+still an AST parity defect, not an embedding or GPU defect.
+The ONNX integration suite remains blocked before assertions by the raw-shell
+`ROTORQUANT_MODEL_PATH` requirement. See
+`docs/reports/embedding-utf8-webgpu-alignment-audit-20260822.md`.
+
+## Parent Atlas GPU/candidate-materializer/trace-identity architecture research — DEDUPED (2026-08-22)
+
+**Do not re-paste this content here.** A verbatim copy of this same research was already
+captured, reviewed, and cross-referenced against this session's own root-`src/` archival in:
+
+- `openspec/changes/parent-atlas-agentic-repair-bundle-integration/trace-ownership-and-shadow-tree-followup-2026-08-22.md`
+  (TRACE OWN tranche, `WorkflowTrace`/`retrieval_telemetry` reconciliation, shadow-tree census,
+  XGBoost CUDA proof steps, KNN/KMeans/HMM-Viterbi/XGBoost orthogonality — confirms the shadow-tree
+  finding is already satisfied by commit `7cc9be2215`'s archival)
+- `openspec/changes/parent-atlas-gpu-graph-vector-substrate/candidate-materializer-design-note-2026-08-22.md`
+  (sibling file — `SemanticSnapshotV1`/`CandidateMaterializerV1`/`GpuCandidateBatchV1`/`DecisionFlagsV1`/
+  `TraversalInstructionV1`/`CandidateStateMatrixV1` content)
+
+Both are marked **RAW DESIGN NOTE — not yet reviewed, not yet decided, not yet implemented.**
+Read those two files directly rather than this section; do not draft a third copy. Their own
+"Recommended next step" guidance still applies: verify claims (`workflow_traces` migration absence,
+`agent_traces` label-expansion bug in the XGBoost exporter, etc.) against live code before any
+implementation, per this repo's "Agent Execution Integrity" rule.

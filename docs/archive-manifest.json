@@ -299,5 +299,34 @@
     "archived": "2026-08-21T00:00:00Z",
     "reason": "Duplicate-name package, same discovery as the atlas-duckdb entry above: this copy declared itself @atlas/semantic-contracts v1.0.0 (\"Canonical semantic contracts (JSON Schema + Zod) for Phase 109 infrastructure\"), the exact same name the canonical monorepo-root packages/semantic-contracts now uses. This copy was in fact the MORE complete and genuinely canonical implementation (real Zod schemas + hashing/validation functions for domain-prediction, ontology-proposal, semantic-packet, domain-feature-packet, vector-manifest, canonical-hashing — vs. a placeholder src/index.ts hand-written earlier in this same session before this duplicate was found). Its full source was merged into the canonical packages/semantic-contracts (superseding the placeholder) before this archival; 5 zod v4 z.record(valueSchema) calls needed updating to the v3->v4 two-argument z.record(keySchema, valueSchema) signature to actually build. vector-manifest.ts retains 5 pre-existing real type errors (a 'latent_64' vectorName not in the enum, a contentSha256 field not in the manifest type) left unfixed as a documented gap, not silently patched. The sole real consumer (sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts) was written against snake_case field names from an old ambient .d.ts shim, not this package's camelCase contract; fixed its one direct (non-cast) property access (prediction.prediction_id -> prediction.predictionId ?? prediction.classificationRunId) to compile against the real canonical type.",
     "recovery": "Full original sveltekit-frontend/packages/semantic-contracts tree preserved at the archive_path above for reference/diffing."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/llm/ollama-client.ts",
+    "archive_path": "deeds_labs/archive/2026-08-22/dead-ollama-clients/llm-ollama-client.ts.bak",
+    "sha256": "7da8f4e9fac4c15f39da3f3cfc3b5cd352ef9789eb4d6473f1683617304c0f45",
+    "archived": "2026-08-22T00:00:00Z",
+    "reason": "Dead duplicate found during a deep audit of the llama-server/Bifrost/ACE/TRACE-MCP wiring. Bifrost-aware llama-server client (307 lines, streaming + non-streaming) with zero production callers anywhere in src/ — only reachable via its own now-archived test suite. The repo's own auto-generated LLMS.md index already flagged this file with a 0.000 authority score. The live canonical owner of this call pattern is sveltekit-frontend/src/lib/server/ai/ollama-client.ts (2 real callers: legal-reasoning-chain.ts, routes/api/case-theory/+server.ts) plus sveltekit-frontend/src/lib/server/ollama.js's bifrostChat/turboQuantChat for the ACE-wired path."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/utils/ollama-client.ts",
+    "archive_path": "deeds_labs/archive/2026-08-22/dead-ollama-clients/utils-ollama-client.ts.bak",
+    "sha256": "cdede6c4a0415f358e6d734d4931e91d82a16202c121191b9f3424915f8cd74f",
+    "archived": "2026-08-22T00:00:00Z",
+    "reason": "Dead 6-line re-export shim (getOllamaEndpoint/getOllamaEmbeddingEndpoint/getOllamaGenerationEndpoint/getOllamaChatEndpoint, all re-exported unchanged from $lib/server/ollama.js) with zero static importers found repo-wide. Also flagged 0.000 authority score in the repo's own generated utils/LLMS.md. Found during the same llama-server/Bifrost wiring audit as the llm/ollama-client.ts entry above. Callers needing these getters should import directly from $lib/server/ollama.js."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/llm/ollamaClient.ts",
+    "archive_path": "deeds_labs/archive/2026-08-22/dead-ollama-clients/llm-ollamaClient.ts.bak",
+    "sha256": "6e63edd137026e5be6c60d7b1993c21faeff0c619df427fc6c341f7518c7b804",
+    "archived": "2026-08-22T00:00:00Z",
+    "reason": "Dead duplicate (generateLegalMemo/generatePDFSummaryFromNotes helpers) with zero production callers — the only importer was its own co-located test file (ollamaClient.test.ts, archived alongside this file since it would otherwise fail on a missing module). Near-identical filename to the live, unrelated sveltekit-frontend/src/lib/server/ai/ollama-client.ts caused confusion during the audit that found it. Found during the llama-server/Bifrost/ACE wiring deep audit, 2026-08-22."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/llm/ollamaClient.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-22/dead-ollama-clients/llm-ollamaClient.test.ts.bak",
+    "sha256": "1fbaea92638f93406e19b7fd8094162760c88ca31d412bab656a5f1e1a5ab1b4",
+    "archived": "2026-08-22T00:00:00Z",
+    "reason": "Test suite for the now-archived llm/ollamaClient.ts (see entry above) — archived together since a standalone test importing an archived module would fail in CI.",
+    "recovery": "Restore both this file and llm/ollamaClient.ts together from deeds_labs/archive/2026-08-22/dead-ollama-clients/ if the ollamaClient.ts API is ever needed again."
   }
 ]

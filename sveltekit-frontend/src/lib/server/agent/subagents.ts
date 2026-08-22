@@ -12,10 +12,10 @@
  *   - validation
  */
 
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import {
   SPECIALIST_AGENT_NAMES,
   SPECIALIST_AGENT_PROFILES,
@@ -149,19 +149,26 @@ export interface SubagentInstance {
 
 /**
  * Create a subagent with a scoped tool subset and domain-specific system prompt.
+ *
+ * Model id is resolved live via getLlamaSessionDescriptor() (GET /v1/models,
+ * cached) — whatever llama-server :8090 actually has loaded (e.g. hforf.gguf)
+ * — not a hardcoded name. llama-server is OpenAI-compatible, never Ollama,
+ * for chat/synthesis per this repo's hard rule.
  */
-export function createSubagent(
+export async function createSubagent(
 	name: SubagentName,
 	allTools: DynamicStructuredTool[],
 	options: { temperature?: number; maxIterations?: number } = {}
-): SubagentInstance {
+): Promise<SubagentInstance> {
 	const toolNames = SUBAGENT_TOOL_MAP[name];
 	const scopedTools = allTools.filter((t) => toolNames.includes(t.name));
 	const prompt = SUBAGENT_PROMPTS[name];
 
-	const llm = new ChatOllama({
-		baseUrl: ENV.OLLAMA_BASE_URL,
-		model: 'gemma4-rotorquant:latest',
+	const llamaSession = await getLlamaSessionDescriptor();
+	const llm = new ChatOpenAI({
+		configuration: { baseURL: LLAMA_SERVER_BASE_URL },
+		apiKey: process.env.LLAMA_SERVER_API_KEY ?? 'local-no-key',
+		model: llamaSession.modelId,
 		temperature: options.temperature ?? 0.3,
 	});
 

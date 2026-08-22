@@ -32,13 +32,14 @@ import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const TURBOQUANT_URL   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
 const CHAT_MODEL       = LLM_MODEL_ID;
 const NEO4J_URL        = ENV.NEO4J_URI;
@@ -116,62 +117,33 @@ export async function getEncodingLog(limit = 50): Promise<EncodingLogEntry[]> {
 
 // ── LLM inference (TurboQuant-first) ─────────────────────────────────────────
 
-let turboAvail: boolean | null = null;
-
-async function inferCommunity(system: string, user: string, communityId: number): Promise<string> {
-  if (turboAvail === null) {
-    try {
-      const h = await fetch(`${TURBOQUANT_URL}/health`, { signal: AbortSignal.timeout(2_000) });
-      turboAvail = h.ok;
-    } catch { turboAvail = false; }
-  }
-
+async function inferCommunity(
+  system: string,
+  user: string,
+  communityId: number
+): Promise<{ text: string; wasTurbo: boolean }> {
   const t0 = Date.now();
-
-  if (turboAvail) {
-    try {
-      const res = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: CHAT_MODEL,
-          messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-          temperature: 0.15,
-          max_tokens: 400,
-          stream: false,
-          cache_prompt: true,  // KV cache system prompt once, reuse across communities
-        }),
-        signal: AbortSignal.timeout(90_000),
-      });
-      if (res.ok) {
-        const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-        const text = data.choices?.[0]?.message?.content?.trim();
-        if (text) {
-          void logEncoding({ ts: Date.now(), eventType: 'turbo_hit', communityId, latencyMs: Date.now() - t0, model: CHAT_MODEL });
-          return text;
-        }
-      }
-    } catch { turboAvail = false; }
-  }
-
-  // Fallback: live llama-server lane
-  const res2 = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: CHAT_MODEL,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-      stream: false,
-      temperature: 0.15,
-      max_tokens: 400,
-    }),
-    signal: AbortSignal.timeout(120_000),
+  const llamaSession = await getLlamaSessionDescriptor();
+  const result = await bifrostChat(
+    [{ role: 'system', content: system }, { role: 'user', content: user }],
+    llamaSession.modelId,
+    { temperature: 0.15, maxTokens: 400, timeoutMs: 120_000, includeMetadata: true }
+  );
+  // bifrostChat() already does the TurboQuant-first / llama-server-fallback cascade
+  // this function used to hand-roll; `result.backend` reports which tier actually
+  // served the call (never fabricated — 'cache-l1'/'cache-l2' on a cache hit, the
+  // real inference tier otherwise), so the turbo_hit/turbo_miss dashboard metric
+  // (and the caller's stats.turboHits/turboMisses counters) stay accurate instead
+  // of being silently dropped.
+  const wasTurbo = result.backend === 'turboquant';
+  void logEncoding({
+    ts: Date.now(),
+    eventType: wasTurbo ? 'turbo_hit' : 'turbo_miss',
+    communityId,
+    latencyMs: Date.now() - t0,
+    model: CHAT_MODEL,
   });
-  if (!res2.ok) throw new Error(`llama-server ${res2.status}`);
-  const data2 = await res2.json() as { choices?: Array<{ message?: { content?: string } }> };
-  const text2 = (data2.choices?.[0]?.message?.content ?? '').trim();
-  void logEncoding({ ts: Date.now(), eventType: 'turbo_miss', communityId, latencyMs: Date.now() - t0, model: CHAT_MODEL });
-  return text2;
+  return { text: result.content.trim(), wasTurbo };
 }
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
@@ -395,12 +367,16 @@ export async function buildCommunityGraph(opts: {
     log(`  Summarizing community ${group.id} (${group.clusterIds.length} clusters)...`);
     const llmT = Date.now();
     let summaryText = '{}';
-    try { summaryText = await inferCommunity(SYSTEM_PROMPT, userPrompt, group.id); }
+    let wasTurbo = false;
+    try {
+      const inferred = await inferCommunity(SYSTEM_PROMPT, userPrompt, group.id);
+      summaryText = inferred.text;
+      wasTurbo = inferred.wasTurbo;
+    }
     catch (e) { log(`  ⚠ LLM failed for community ${group.id}: ${(e as Error).message}`); }
 
     const llmMs = Date.now() - llmT;
     stats.llmMs.push(llmMs);
-    const wasTurbo = turboAvail === true;
     if (wasTurbo) stats.turboHits++; else stats.turboMisses++;
 
     let parsed: { summary?: string; purpose?: string; tags?: string[] } = {};

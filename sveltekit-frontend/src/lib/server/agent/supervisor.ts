@@ -17,10 +17,10 @@ import {
 	END,
 	START,
 } from '@langchain/langgraph';
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { buildLangGraphConfig, getLangGraphCheckpointer } from '$lib/server/langgraph/checkpointer.js';
 import { recordOutcome } from '$lib/server/telemetry/tool-call-recorder.js';
 import {
@@ -87,7 +87,7 @@ export class SupervisorAgent {
 	private graphPromise: Promise<ReturnType<typeof StateGraph.prototype.compile> | null> | null = null;
 	private subagents: Map<SubagentName, SubagentInstance> = new Map();
 	private allTools: DynamicStructuredTool[];
-	private routerLlm: ChatOllama;
+	private routerLlm!: ChatOpenAI;
 	private config: SupervisorConfig;
 
 	constructor(
@@ -97,21 +97,39 @@ export class SupervisorAgent {
 		this.allTools = allTools;
 		this.config = config;
 
-		this.routerLlm = new ChatOllama({
-			baseUrl: ENV.OLLAMA_BASE_URL,
-			model: 'gemma4-rotorquant:latest',
-			temperature: 0, // deterministic routing
-		});
-
-		this.initializeSubagents();
-		this.graphPromise = this.buildGraph();
+		// Constructors can't await the live GET /v1/models resolver, so
+		// routerLlm construction + subagent init are deferred into this async
+		// chain, which buildGraph() awaits before compiling — every graph node
+		// (routeIntentNode, makeSubagentNode) only ever runs after both are ready.
+		this.graphPromise = this.initializeRouterLlm()
+			.then(() => this.initializeSubagents())
+			.then(() => this.buildGraph());
 	}
 
-	private initializeSubagents(): void {
+	/**
+	 * llama-server :8090 (OpenAI-compatible), not Ollama — chat/synthesis never
+	 * goes through Ollama per this repo's hard rule. Model id is resolved live
+	 * via getLlamaSessionDescriptor() (GET /v1/models, cached) — whatever GGUF
+	 * is actually loaded (e.g. hforf.gguf), not a hardcoded name.
+	 */
+	private async initializeRouterLlm(): Promise<void> {
+		const llamaSession = await getLlamaSessionDescriptor();
+		this.routerLlm = new ChatOpenAI({
+			configuration: { baseURL: LLAMA_SERVER_BASE_URL },
+			// llama-server has no auth — this is a placeholder so the OpenAI SDK
+			// client doesn't reject an empty apiKey string client-side. Matches
+			// the same fallback local-llama-provider.ts already uses.
+			apiKey: process.env.LLAMA_SERVER_API_KEY ?? 'local-no-key',
+			model: llamaSession.modelId,
+			temperature: 0, // deterministic routing
+		});
+	}
+
+	private async initializeSubagents(): Promise<void> {
 		const names = [...SUBAGENT_NAMES] as SubagentName[];
 		for (const name of names) {
 			try {
-				const subagent = createSubagent(name, this.allTools, {
+				const subagent = await createSubagent(name, this.allTools, {
 					temperature: this.config.temperature ?? 0.3,
 					maxIterations: this.config.maxIterations ?? 10,
 				});

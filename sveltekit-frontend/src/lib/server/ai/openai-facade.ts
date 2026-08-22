@@ -848,11 +848,11 @@ export async function runChatCompletion(
       );
     }
 
+    // Try TurboQuant first (KV-cache-compressed llama-server :8090), fall back
+    // to the standard Bifrost gateway — never LDR's research/poll pipeline,
+    // which defeats the point of an isolated model-layer benchmark.
     let text: string;
-    const selectedLane = 'bifrost';
-    if (selectedLane === 'bifrost') {
-      text = await runLdrChat(mappedMsgs, requestedMaxTokens, req.temperature);
-    } else if (canUseTurboQuantNow) {
+    if (canUseTurboQuantNow) {
       try {
         const result = await turboQuantChat(mappedMsgs, internalModel, {
           temperature: req.temperature,
@@ -879,7 +879,7 @@ export async function runChatCompletion(
       query,
       answer: text,
       model: rawModel,
-      selectedLane: selectedLane,
+      selectedLane: rawInferenceLane,
       cacheHit: 'raw',
     });
     return wrapResponse({

@@ -7,14 +7,13 @@
  *   - state  → route_state_snapshots row
  *
  * Uses stream:true per hard rule (Gemma4 thinking block can exhaust max_tokens
- * on non-streaming calls before any content tokens arrive).
+ * on non-streaming calls before any content tokens arrive), via bifrostChat()'s
+ * shared streaming assembler with the live-resolved model id.
  */
 
-const LLAMA_URL = (process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090').replace(
-  /^0\.0\.0\.0/,
-  '127.0.0.1'
-);
-const MODEL = process.env.HERMES_MODEL ?? 'gemma4-hermes-64k:latest';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
+
 const TIMEOUT_MS = 90_000;
 const MAX_PACKET_CHARS = 24_000;
 
@@ -62,55 +61,17 @@ Return strict JSON with no markdown fences:
 Packet:
 ${packetStr}`;
 
-  let res: Response;
+  let assembled: string;
   try {
-    res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: 0,
-        max_tokens: 2048,
-        stream: true,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+    const llamaSession = await getLlamaSessionDescriptor();
+    assembled = await bifrostChat(
+      [{ role: 'user', content: prompt }],
+      llamaSession.modelId,
+      { temperature: 0, maxTokens: 2048, timeoutMs: TIMEOUT_MS }
+    );
   } catch (e) {
     console.error('[gemma4-packet-compiler] fetch error:', e);
     return EMPTY;
-  }
-
-  if (!res.ok) {
-    console.error('[gemma4-packet-compiler] Gemma4 error:', res.status);
-    return EMPTY;
-  }
-
-  // Assemble SSE content deltas
-  let assembled = '';
-  const decoder = new TextDecoder();
-  let buf = '';
-  try {
-    for await (const chunk of res.body as unknown as AsyncIterable<Uint8Array>) {
-      buf += decoder.decode(chunk, { stream: true });
-      const lines = buf.split('\n');
-      buf = lines.pop() ?? '';
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed.startsWith('data:')) continue;
-        const payload = trimmed.slice(5).trim();
-        if (payload === '[DONE]') break;
-        try {
-          const parsed = JSON.parse(payload);
-          assembled += parsed.choices?.[0]?.delta?.content ?? '';
-        } catch {
-          // skip malformed SSE line
-        }
-      }
-    }
-  } catch (e) {
-    console.error('[gemma4-packet-compiler] stream error:', e);
-    if (!assembled) return EMPTY;
   }
 
   const text = assembled.trim();

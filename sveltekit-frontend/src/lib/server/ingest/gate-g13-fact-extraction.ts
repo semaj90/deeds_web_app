@@ -10,6 +10,8 @@ import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 export interface GateG13Result {
   fact_id: string;
   packet_key: string;
@@ -129,8 +131,7 @@ function extractJsonArray(text: string): unknown[] | null {
 export async function extractFactsFromPacket(
   packet_key: string,
   source_ref: string,
-  content: string,
-  gemma4_url: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'
+  content: string
 ): Promise<ExtractedFact[]> {
   const prompt = `TASK: Extract 3-5 key facts from the provided text.
 
@@ -165,24 +166,17 @@ EXAMPLE (do NOT copy this literally, GENERATE NEW FACTS):
 
 RESPOND WITH ONLY A VALID JSON ARRAY. NO PREAMBLE. NO THINKING. NO MARKDOWN.`;
 
-  const response = await fetch(`${gemma4_url}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemma4-legal-iq4xs-direct.gguf',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
-      stream: false,
-      max_tokens: 2048
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Gemma4 fact extraction failed: ${response.statusText}`);
+  const llamaSession = await getLlamaSessionDescriptor();
+  let extracted_text: string;
+  try {
+    extracted_text = await bifrostChat(
+      [{ role: 'user', content: prompt }],
+      llamaSession.modelId,
+      { temperature: 0.3, maxTokens: 2048 }
+    ) || '[]';
+  } catch (e) {
+    throw new Error(`Gemma4 fact extraction failed: ${e instanceof Error ? e.message : String(e)}`);
   }
-
-  const data = await response.json() as { choices: Array<{ message: { content: string } }> };
-  let extracted_text = data.choices[0]?.message.content || '[]';
 
   // Strip thinking tags
   extracted_text = stripThinkingTags(extracted_text);
