@@ -206,9 +206,16 @@ describeIf('ACT-REC-OUT-DAG-02 real selected-edge failure proof', () => {
     const k1Call = { tool: 'atlas_lookup', args: { query: `${RUN_ID}:k1`, limit: 1 } };
     const seeded = await seedFailedK1(pool, k1Call);
     const k2 = buildFailingK2Plan(seeded.workflowId);
-    const ctx: Record<string, unknown> = {
+    let k2DispatchCount = 0;
+    const ctx: Record<string, any> = {
       temporalAction: seeded.temporal,
       temporalAlternativePlan: k2.plan,
+      temporalPostDispatch: ({ call, result }: { call: { tool: string; args: unknown }; result: unknown }) => {
+        if (call.tool !== 'terminal') return;
+        k2DispatchCount += 1;
+        expect(call.args).toEqual({ command: 'exit 37' });
+        expect((result as Record<string, unknown>).ok).toBe(false);
+      },
     };
 
     const result = await executeTool(k1Call, ctx) as Record<string, unknown>;
@@ -217,6 +224,7 @@ describeIf('ACT-REC-OUT-DAG-02 real selected-edge failure proof', () => {
     expect(selection).toBeTruthy();
     expect(selection.failed_execution_key).toBe(seeded.executionKey);
     expect(selection.selected_execution_key).toBe(k2.executionKey);
+    expect(k2DispatchCount).toBe(1);
     expect(result.tool).toBe('terminal');
     expect(result.command).toBe('exit 37');
     expect(result.ok).toBe(false);
