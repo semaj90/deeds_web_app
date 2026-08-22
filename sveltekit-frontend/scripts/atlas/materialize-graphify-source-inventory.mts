@@ -1,4 +1,6 @@
 #!/usr/bin/env tsx
+/** Compatibility entrypoint for the manifest-authoritative v3 source writer. */
+import './materialize-graphify-source-inventory-v3.mts';
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
