@@ -97,6 +97,27 @@ receipt.outcome == null
 
 The retry/failure-lookup pass must not execute K1 again.
 
+## No-persistence negative control
+
+The third fixture uses the same known-failed K1 and successful deterministic K2 path, but explicitly sets:
+
+```text
+persist_outcome_receipt = false
+```
+
+This must change only the persistence side effect, not alternative execution.
+
+Assertions require:
+
+```text
+K1 dispatch count == 0
+K2 dispatch count == 1
+terminal DAG success == true
+receipt persistence attempts == 0
+```
+
+The mocked `persistTemporalRecommendationOutcomeFromPostgres()` is the only path that appends to the fixture receipt capture. Therefore `proof.receipts.length == 0` is the negative-control assertion that persistence was never attempted.
+
 ## Gate interpretation
 
 Until the Vitest file is executed successfully, all of this remains **WRITTEN_UNPROVEN**.
@@ -105,11 +126,10 @@ After a successful local run, this fixture can provide integration-contract evid
 
 - `ACT-REC-OUT-DAG-01` known failure -> different edge -> downstream success receipt;
 - `ACT-REC-OUT-DAG-02` selected edge -> terminal downstream failure receipt;
+- `ACT-REC-OUT-DAG-03` `persist_outcome_receipt=false` -> selected edge still executes but receipt persistence is not attempted;
 - `ACT-REC-OUT-DAG-04` selected execution key continuity from recommendation through selection, DRY gate, dispatch, and receipt.
 
-It does **not yet close `ACT-REC-OUT-DAG-03`**, which requires a dedicated negative-control fixture proving `persist_outcome_receipt=false` attempts no receipt persistence.
-
-It also does not by itself prove the stronger live-infrastructure gate:
+It does not by itself prove the stronger live-infrastructure gate:
 
 ```text
 real Qdrant-backed K1 history
