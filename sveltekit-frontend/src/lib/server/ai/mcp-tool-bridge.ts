@@ -12,14 +12,27 @@
  *     ↓
  *   TRACE MCP server :8788
  *
- * All dispatch goes through JSON-RPC 2.0 (/mcp, method: tools/call).
+ * Transport mode is explicit. Legacy behavior remains the default until the
+ * TRACE server opts into MCP 2026-07-28. Set TRACE_MCP_PROTOCOL_VERSION to
+ * 2026-07-28 only after the server-side protocol proof passes.
  */
 
 import { tool } from 'ai';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import {
+	buildMcpHttpHeaders,
+	buildMcpRequestParams,
+	isMcpCacheFresh,
+	parseMcpCacheHint,
+	resolveMcpHttpProtocolMode,
+	type McpHttpProtocolMode,
+} from '$lib/server/mcp/mcp-http-envelope-v1.js';
 
 const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
+export const TRACE_MCP_PROTOCOL_MODE: McpHttpProtocolMode = resolveMcpHttpProtocolMode(
+	process.env.TRACE_MCP_PROTOCOL_VERSION,
+);
 let requestSequence = 0;
 
 function nextRequestId(): number {
@@ -74,23 +87,31 @@ async function readMcpJsonRpcResponse(res: Response): Promise<Record<string, unk
 /**
  * Call a TRACE MCP tool via JSON-RPC 2.0.
  *
- * Note: StreamableHTTPServerTransport returns Server-Sent Events (SSE),
- * not plain JSON. Response format: event: message\ndata: {json}\n\n
+ * Modern MCP routing headers are emitted only when
+ * TRACE_MCP_PROTOCOL_VERSION=2026-07-28. This avoids claiming a protocol
+ * revision the checked-in TRACE server has not yet proven.
  */
 export async function callTraceMcpTool(name: string, args: Record<string, unknown>) {
 	const requestId = nextRequestId();
+	const params = buildMcpRequestParams({
+		mode: TRACE_MCP_PROTOCOL_MODE,
+		params: { name, arguments: args },
+		clientName: 'deeds-web-app',
+		clientVersion: '1.0.0',
+	});
 
 	const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Accept: 'application/json, text/event-stream',
-		},
+		headers: buildMcpHttpHeaders({
+			mode: TRACE_MCP_PROTOCOL_MODE,
+			method: 'tools/call',
+			name,
+		}),
 		body: JSON.stringify({
 			jsonrpc: '2.0',
 			id: requestId,
 			method: 'tools/call',
-			params: { name, arguments: args },
+			params,
 		}),
 		signal: AbortSignal.timeout(15_000),
 	});
@@ -100,73 +121,94 @@ export async function callTraceMcpTool(name: string, args: Record<string, unknow
 		throw new Error(`MCP HTTP ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ''}`);
 	}
 
-	try {
-		const body = await readMcpJsonRpcResponse(res);
+	const body = await readMcpJsonRpcResponse(res);
 
-		// Check for MCP errors
-		if ('error' in body && body.error) {
-			return { error: `MCP error: ${JSON.stringify(body.error)}`, isError: true };
-		}
-		if (body.id !== undefined && body.id !== requestId) {
-			return { error: `MCP response id mismatch: expected ${requestId}, got ${String(body.id)}`, isError: true };
-		}
-
-		// Extract the result content. Prefer structured JSON if present.
-		const result = body.result as Record<string, unknown> | undefined;
-		const structuredContent = result?.structuredContent;
-		if (structuredContent && typeof structuredContent === 'object') {
-			return structuredContent as Record<string, unknown>;
-		}
-
-		const contentItems = Array.isArray(result?.content) ? result.content : [];
-		const textContent = contentItems
-			.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
-			.filter((item) => typeof item.type === 'string' && item.type === 'text')
-			.map((item) => String(item.text ?? '').trim())
-			.filter(Boolean)
-			.join('\n\n');
-		if (textContent) {
-			const structured = tryParseJson(textContent);
-			if (structured && typeof structured === 'object') {
-				return structured as Record<string, unknown>;
-			}
-			return { text: textContent, isError: Boolean(result?.isError) };
-		}
-
-		if (result && typeof result === 'object') {
-			const structured = tryParseJson(JSON.stringify(result));
-			if (structured && typeof structured === 'object') {
-				return { ...(structured as Record<string, unknown>), isError: Boolean(result?.isError) };
-			}
-		}
-
-		return { error: 'Empty MCP response content' };
-	} catch (e) {
-		throw e;
+	if ('error' in body && body.error) {
+		return { error: `MCP error: ${JSON.stringify(body.error)}`, isError: true };
 	}
+	if (body.id !== undefined && body.id !== requestId) {
+		return { error: `MCP response id mismatch: expected ${requestId}, got ${String(body.id)}`, isError: true };
+	}
+
+	const result = body.result as Record<string, unknown> | undefined;
+	const structuredContent = result?.structuredContent;
+	if (structuredContent && typeof structuredContent === 'object') {
+		return structuredContent as Record<string, unknown>;
+	}
+
+	const contentItems = Array.isArray(result?.content) ? result.content : [];
+	const textContent = contentItems
+		.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+		.filter((item) => typeof item.type === 'string' && item.type === 'text')
+		.map((item) => String(item.text ?? '').trim())
+		.filter(Boolean)
+		.join('\n\n');
+	if (textContent) {
+		const structured = tryParseJson(textContent);
+		if (structured && typeof structured === 'object') {
+			return structured as Record<string, unknown>;
+		}
+		return { text: textContent, isError: Boolean(result?.isError) };
+	}
+
+	if (result && typeof result === 'object') {
+		const structured = tryParseJson(JSON.stringify(result));
+		if (structured && typeof structured === 'object') {
+			return { ...(structured as Record<string, unknown>), isError: Boolean(result?.isError) };
+		}
+	}
+
+	return { error: 'Empty MCP response content' };
 }
 
-/**
- * Fetch TRACE tool list once at startup, cache in memory
- */
-let _toolListCache: {
+interface ToolListEntry {
 	name: string;
 	description: string;
 	inputSchema: Record<string, unknown>;
-}[] | null = null;
+}
 
-async function fetchMcpToolList() {
-	if (_toolListCache) return _toolListCache;
+interface ToolListCacheEntry {
+	tools: ToolListEntry[];
+	receivedAtMs: number;
+	ttlMs: number;
+	cacheScope: 'public' | 'private' | null;
+}
+
+let _toolListCache: ToolListCacheEntry | null = null;
+
+/**
+ * Fetch the TRACE tool list.
+ *
+ * Legacy mode preserves the existing process-lifetime cache behavior.
+ * MCP 2026-07-28 mode obeys the server-provided ttlMs/cacheScope hint; an
+ * absent TTL is treated as zero/stale, matching the current specification.
+ */
+async function fetchMcpToolList(): Promise<ToolListEntry[]> {
+	if (_toolListCache) {
+		if (TRACE_MCP_PROTOCOL_MODE === 'LEGACY') return _toolListCache.tools;
+		if (isMcpCacheFresh({ receivedAtMs: _toolListCache.receivedAtMs, ttlMs: _toolListCache.ttlMs })) {
+			return _toolListCache.tools;
+		}
+	}
 
 	try {
+		const params = buildMcpRequestParams({
+			mode: TRACE_MCP_PROTOCOL_MODE,
+			params: {},
+			clientName: 'deeds-web-app',
+			clientVersion: '1.0.0',
+		});
 		const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: buildMcpHttpHeaders({
+				mode: TRACE_MCP_PROTOCOL_MODE,
+				method: 'tools/list',
+			}),
 			body: JSON.stringify({
 				jsonrpc: '2.0',
 				id: nextRequestId(),
 				method: 'tools/list',
-				params: {},
+				params,
 			}),
 			signal: AbortSignal.timeout(5_000),
 		});
@@ -176,14 +218,28 @@ async function fetchMcpToolList() {
 			return [];
 		}
 
-		const body = await readMcpJsonRpcResponse(res) as { result?: { tools?: Array<{ name: string; description: string; inputSchema: Record<string, unknown> }> } } | null;
-		_toolListCache = body?.result?.tools ?? [];
+		const body = await readMcpJsonRpcResponse(res) as {
+			result?: { tools?: ToolListEntry[]; ttlMs?: number; cacheScope?: 'public' | 'private' };
+		} | null;
+		const result = body?.result ?? {};
+		const tools = result.tools ?? [];
+		const hint = TRACE_MCP_PROTOCOL_MODE === 'STATELESS_2026_07_28'
+			? parseMcpCacheHint(result)
+			: { ttlMs: Number.MAX_SAFE_INTEGER, cacheScope: null };
+		_toolListCache = {
+			tools,
+			receivedAtMs: Date.now(),
+			ttlMs: hint.ttlMs,
+			cacheScope: hint.cacheScope,
+		};
 	} catch (e) {
 		console.warn(`[mcp-tool-bridge] tools/list failed: ${e}, using fallback`);
-		_toolListCache = [];
+		if (!_toolListCache) {
+			_toolListCache = { tools: [], receivedAtMs: Date.now(), ttlMs: 0, cacheScope: null };
+		}
 	}
 
-	return _toolListCache!;
+	return _toolListCache.tools;
 }
 
 /**
@@ -235,7 +291,6 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
 			}
 		}
 
-		// Make optional if not in required list
 		shape[key] = required.includes(key) ? field : field.optional();
 	}
 
@@ -258,15 +313,11 @@ export async function buildMcpToolMap(allowlist?: string[]) {
 	const result: Record<string, ReturnType<typeof tool>> = {};
 
 	for (const t of toolList) {
-		// If allowlist is provided, skip tools not in it
 		if (allowlist && !allowlist.includes(t.name)) {
 			continue;
 		}
 
-		// Convert JSON Schema to Zod
 		const schema = jsonSchemaToZod(t.inputSchema as Record<string, unknown>);
-
-		// Escape tool name for use as a JS identifier: dots/colons/dashes → underscores
 		const escapedName = t.name.replace(/[.:\-]/g, '__');
 
 		// @ts-ignore — Zod v4 / ai v6 mismatch
@@ -286,27 +337,16 @@ export async function buildMcpToolMap(allowlist?: string[]) {
  * These are the tools safe to expose to llama-server for automatic tool calling.
  */
 export const TRACE_TOOL_ALLOWLIST = [
-	// Core retrieval + KAG
 	'trace.kag_search',
 	'kag.search',
 	'kag.panel_context',
-
-	// Graph traversal
 	'graph.expand_neighborhood',
 	'graph.shortest_path',
-
-	// Topology + clustering
 	'topology.search_near',
 	'clusters.get_summary_lenses',
-
-	// Knowledge base
 	'knowledge.search_summary_tree',
-
-	// Dev context + search
 	'search.dev_context',
 	'trace.explain_retrieval',
 	'ops.search_tools',
-
-	// Context assembly (gating required)
 	'context.build_kv_packet',
 ];
