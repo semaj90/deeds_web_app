@@ -787,6 +787,63 @@ opt-in env var if it does real I/O. This repo already has the
 `RUN_DB_INTEGRATION` convention established — reuse it, don't invent a
 new one.
 
+## Update: 3 more branches confirmed superseded, 2 more merged (verified, not just clean-merged)
+
+**Confirmed superseded, skipped, no action needed**:
+- `agent/temporal-action-ledger-convergence-20260821` — reintroduces
+  the exact duplicate-ownership bug fixed earlier this session in
+  `temporal-action-postgres-repository.ts` (`reserveLedgerSequence`
+  reimplemented inline instead of delegating to the canonical
+  `reserveTemporalActionLedgerSequence`). Its spec file tests the
+  reintroduced duplicate directly rather than the canonical function.
+  Its SQL migration already exists on `main`. Branch forked before the
+  fix; all three of its changed files are stale relative to `main`.
+- `agent/aligned-snapshot-proof-hardening-20260821` — its
+  `cluster_softmax.py` diff vs `main` is pure formatting (one-line vs
+  multi-line argument lists, functionally identical logic already on
+  `main` via the earlier `aligned-snapshot-qdrant-proof-v3` merge). Its
+  test file (`test_cluster_softmax_config.py`) is byte-identical to
+  what's already on `main`.
+- `agent/candidate-feature-gpu-residency-runtime-20260821` — its
+  `.ts` file is byte-identical to what's already on `main` (merged via
+  `gpu-batch-request-current-main` earlier this session). Its `.spec.ts`
+  is the same file reformatted, but **still carries the exact
+  `observationChecksum: H('observation')` placeholder bug already found
+  and fixed this session** — confirms the branch forked before that fix
+  and never caught up.
+
+Pattern holding across the whole session: when two swarm branches
+solve the same problem independently, diff their core files directly
+against what's already merged before assuming a name-collision needs
+reconciliation — a large fraction turn out to be pure reformatting or
+already-fixed-elsewhere duplicates, not real conflicts.
+
+**Merged `agent/parent-atlas-agentic-file-compiler`** → commit
+`03896f74b8`. A large (55 files, 1662 lines), fully self-contained, new
+feature module: query classification, retrieval planning,
+exact-promotion gating, prompt/prefill-artifact planning, workflow-spec
+building, a Mastra workflow compiler + snapshot bridge, search-runtime
+policy, file-mutation-guard + validation-barrier +
+cache-invalidation-plan, and a model-route-map, plus 26 new `.okf`
+schema files. Zero existing files touched, zero external repo
+dependencies beyond `zod`/`node:crypto`. Verified 18/18 tests pass
+across all 13 spec files in the new directory.
+
+**Merged `agent/git-revision-semantics-proof-20260821`** → commit
+`654328944a`. Adds `GitRevisionSemanticsProofV1`: a deliberately
+conservative, read-only proof contract (`canonicalWritesAllowed:
+false`, `readOnly: true`, explicit `*_NOT_IMPLEMENTED` blockers) that
+formally encodes the git-commit-provenance-vs-workspace-revision
+distinction this addendum has tracked all session — a path-scoped
+git-blob-oid-derived `sourceRevisionId` kept explicitly separate from
+workspace commit binding, with `normalizeGitSourceRefV1` guarding
+against path traversal and absolute paths. 7/7 tests pass. Two sibling
+branches, `agent/git-revision-semantics-proof-20260820` and
+`agent/git-revision-semantics-proof-current-20260820` (byte-identical
+to each other), independently built a simpler, less-rigorous version of
+the same concept — read in full and compared before choosing; not a
+coin-flip. Both are now superseded, no action needed.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
