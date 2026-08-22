@@ -30,6 +30,7 @@ function storage(overrides: Partial<CodeRevisionStorageObservationV1> = {}): Cod
     productionWriterCreatesSourceRevision: false,
     persistedMatchingRows: 0,
     sourceRevisionStorageSemantics: 'CODE_SOURCE_REVISION_V1',
+    sourceRevisionAuthorityField: 'SOURCE_REVISION',
     notes: [],
     ...overrides,
   };
@@ -60,8 +61,11 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
     expect(result.fanoutMayConsumeAsCanonical).toBe(false);
   });
 
-  it('requires a versioned storage decision instead of reinterpreting legacy Git-SHA source revisions', () => {
-    const result = plan({ sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA' });
+  it('requires a versioned storage decision when legacy Git revisions have no byte authority', () => {
+    const result = plan({
+      sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA',
+      sourceRevisionAuthorityField: 'NONE',
+    });
     expect(result.status).toBe('BLOCKED_STORAGE_SEMANTICS_DECISION_REQUIRED');
     expect(result.storageStrategy).toBe('VERSIONED_LINEAGE_SCHEMA_REQUIRED');
     expect(result.target).toBeNull();
@@ -70,7 +74,7 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
     expect(result.blockers).toContain('NO_LEGACY_SOURCE_REVISION_REINTERPRETATION');
   });
 
-  it('permits implementation planning against compatible existing lineage only when no writer is bound', () => {
+  it('targets source_revision when the canonical revision is stored there directly', () => {
     const result = plan();
     expect(result.status).toBe('READY_FOR_CANONICAL_WRITER_IMPLEMENTATION');
     expect(result.storageStrategy).toBe('EXISTING_GRAPHIFY_LINEAGE');
@@ -78,7 +82,8 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
       runTable: 'graphify_runs',
       fileTable: 'graphify_files',
       workspaceRevisionColumn: 'repository_revision',
-      sourceRevisionColumn: 'source_revision',
+      sourceRevisionAuthorityColumn: 'source_revision',
+      legacySourceRevisionColumn: 'source_revision',
       sourceRefColumn: 'source_ref',
       contentDigestColumn: 'content_hash',
       byteLengthColumn: 'byte_length',
@@ -86,8 +91,22 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
     expect(result.createNewWriterAllowed).toBe(true);
     expect(result.migrationRequired).toBe(false);
     expect(result.applyAllowed).toBe(false);
+    expect(result.requiredWriterBehavior.preservesLegacySourceRevisionSemantics).toBe(true);
     expect(result.requiredWriterBehavior.acceptsCallerSourceRevisionAsAuthority).toBe(false);
     expect(result.requiredWriterBehavior.acceptsCallerWorkspaceRevisionAsAuthority).toBe(false);
+  });
+
+  it('targets content_hash without reinterpreting legacy source_revision', () => {
+    const result = plan({
+      sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
+      sourceRevisionAuthorityField: 'CONTENT_HASH',
+    });
+    expect(result.status).toBe('READY_FOR_CANONICAL_WRITER_IMPLEMENTATION');
+    expect(result.storageStrategy).toBe('EXISTING_GRAPHIFY_LINEAGE');
+    expect(result.target?.sourceRevisionAuthorityColumn).toBe('content_hash');
+    expect(result.target?.legacySourceRevisionColumn).toBe('source_revision');
+    expect(result.migrationRequired).toBe(false);
+    expect(result.createNewWriterAllowed).toBe(true);
   });
 
   it('forbids a second writer when an owner is already bound and asks only for the controlled canary', () => {
@@ -105,6 +124,8 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
 
   it('forbids a second writer after revision ownership is proven', () => {
     const result = plan({
+      sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
+      sourceRevisionAuthorityField: 'CONTENT_HASH',
       productionWriterPath: 'sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-writer-v1.ts',
       productionWriterPresent: true,
       productionWriterCreatesWorkspaceRevision: true,
@@ -112,6 +133,7 @@ describe('GraphifySourceInventoryWritePlanV1', () => {
       persistedMatchingRows: 1,
     });
     expect(result.status).toBe('OWNER_ALREADY_PROVEN_NO_NEW_WRITER');
+    expect(result.target?.sourceRevisionAuthorityColumn).toBe('content_hash');
     expect(result.createNewWriterAllowed).toBe(false);
     expect(result.applyAllowed).toBe(false);
     expect(result.fanoutMayConsumeAsCanonical).toBe(false);
