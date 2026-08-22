@@ -21,10 +21,15 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { materializeGraphSnapshot } from '../../src/lib/server/atlas/graph/graph-snapshot-materializer.js';
+import {
+  buildGraphSnapshotRevisionWriteV1,
+  verifyGraphSnapshotRevisionV1,
+} from '../../src/lib/server/atlas/graph/graph-snapshot-revision-v1.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');
 const REPORT_DIR = resolve(REPO_ROOT, '.tmp', 'graph-snapshot');
+const REVISION_PRODUCER = 'materialize-full-corpus-graph-snapshot-v2';
 
 const args = process.argv.slice(2);
 const mode = args.includes('--apply') ? 'apply' : args.includes('--verify') ? 'verify' : 'dry-run';
@@ -87,6 +92,15 @@ const PACKET_OPTIONAL_COLUMNS = [
   'qdrant_vector_dim'
 ];
 
+const REVISION_SNAPSHOT_COLUMNS = [
+  'workspace_revision',
+  'source_inventory_revision',
+  'graph_revision',
+  'identity_contract_version',
+  'parser_contract_version',
+  'revision_checksum',
+];
+
 function ensureReportDir() {
   mkdirSync(REPORT_DIR, { recursive: true });
 }
@@ -143,6 +157,21 @@ async function getExistingColumns(tableName) {
     [tableName]
   );
   return new Set(rows.map((row) => row.column_name));
+}
+
+async function assertRevisionSchemaReady() {
+  const snapshotColumns = await getExistingColumns('atlas_graph_snapshots_v2');
+  const nodeColumns = await getExistingColumns('atlas_graph_nodes_v2');
+  const missingSnapshot = REVISION_SNAPSHOT_COLUMNS.filter((column) => !snapshotColumns.has(column));
+  if (missingSnapshot.length || !nodeColumns.has('source_revision')) {
+    const error = new Error('GRAPH_SNAPSHOT_REVISION_MIGRATION_REQUIRED');
+    error.cause = {
+      missingSnapshotColumns: missingSnapshot,
+      missingNodeSourceRevision: !nodeColumns.has('source_revision'),
+      migration: 'drizzle/manual/20260822_graph_snapshot_revision_owner_v1.sql',
+    };
+    throw error;
+  }
 }
 
 function getWorkspaceRevision() {
@@ -236,13 +265,29 @@ async function loadPackets() {
   }));
 }
 
+function buildRevisionWrite({ workspaceRevision, input, result }) {
+  return buildGraphSnapshotRevisionWriteV1({
+    snapshotId: result.graphSnapshot.snapshotId,
+    workspaceRevision,
+    sourceInventorySnapshotId: input.sourceInventorySnapshotId,
+    identityContractVersion: input.identityContractVersion,
+    parserContractVersion: input.parserContractVersion,
+    sourceInventoryHash: result.graphSnapshotProof.sourceInventoryHash,
+    topologyHash: result.graphSnapshotProof.topologyHash,
+    policyHash: result.graphSnapshotProof.policyHash,
+    producerRevision: REVISION_PRODUCER,
+  });
+}
+
 function buildReport({
   modeName,
   workspaceRevision,
   sourceQueryHash,
   input,
   result,
+  revisionWrite,
   verifyResult,
+  verifyRevisionWrite,
   persistedCounts,
 }) {
   return {
@@ -258,12 +303,16 @@ function buildReport({
     topologyHash: result.graphSnapshotManifest.topologyHash,
     sourceInventoryHash: result.graphSnapshotProof.sourceInventoryHash,
     policyHash: result.graphSnapshotProof.policyHash,
+    graphRevision: revisionWrite.revision.graphRevision,
+    revisionChecksum: revisionWrite.revision.revisionChecksum,
     materializedAt: input.generatedAt,
     verifyTopologyHash: verifyResult?.graphSnapshotManifest?.topologyHash ?? null,
+    verifyGraphRevision: verifyRevisionWrite?.revision?.graphRevision ?? null,
     verifyReplayMatches: verifyResult?.graphSnapshotProof?.replayMatches ?? null,
     persistedCounts: persistedCounts ?? null,
     manifest: result.graphSnapshotManifest,
     proof: result.graphSnapshotProof,
+    revision: revisionWrite.revision,
   };
 }
 
@@ -298,23 +347,32 @@ async function main() {
 
   const input1 = buildInput();
   const run1 = materializeGraphSnapshot(input1);
+  const revisionWrite1 = buildRevisionWrite({ workspaceRevision, input: input1, result: run1 });
   console.log('--- Run 1 manifest ---');
   console.log(JSON.stringify(run1.graphSnapshotManifest, null, 2));
   console.log('--- Run 1 proof ---');
   console.log(JSON.stringify(run1.graphSnapshotProof, null, 2));
+  console.log('--- Run 1 revision ---');
+  console.log(JSON.stringify(revisionWrite1.revision, null, 2));
 
   let run2 = null;
+  let revisionWrite2 = null;
   if (mode === 'verify' || mode === 'apply') {
     const input2 = buildInput();
     run2 = materializeGraphSnapshot(input2);
-    const stable = run1.graphSnapshotManifest.topologyHash === run2.graphSnapshotManifest.topologyHash;
-    console.log(`\nHash stability across two independent materializations: ${stable ? 'PASS' : 'FAIL'}`);
+    revisionWrite2 = buildRevisionWrite({ workspaceRevision, input: input2, result: run2 });
+    const topologyStable = run1.graphSnapshotManifest.topologyHash === run2.graphSnapshotManifest.topologyHash;
+    const graphRevisionStable = revisionWrite1.revision.graphRevision === revisionWrite2.revision.graphRevision;
+    const stable = topologyStable && graphRevisionStable;
+    console.log(`\nTopology + logical graph revision stability: ${stable ? 'PASS' : 'FAIL'}`);
     console.log(`  run1 snapshotId: ${run1.graphSnapshotManifest.snapshotId}`);
     console.log(`  run2 snapshotId: ${run2.graphSnapshotManifest.snapshotId}`);
     console.log(`  run1 topologyHash: ${run1.graphSnapshotManifest.topologyHash}`);
     console.log(`  run2 topologyHash: ${run2.graphSnapshotManifest.topologyHash}`);
+    console.log(`  run1 graphRevision: ${revisionWrite1.revision.graphRevision}`);
+    console.log(`  run2 graphRevision: ${revisionWrite2.revision.graphRevision}`);
     if (!stable) {
-      console.error('ABORT: hash instability detected, not persisting.');
+      console.error('ABORT: topology/revision instability detected, not persisting.');
       process.exitCode = 1;
       await pool.end();
       return;
@@ -323,20 +381,32 @@ async function main() {
 
   let persistedCounts = null;
   if (mode === 'apply') {
+    await assertRevisionSchemaReady();
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      const revision = revisionWrite1.revision;
+      const sourceManifest = {
+        ...run1.graphSnapshot.sourceManifest,
+        workspaceRevision: revision.workspaceRevision,
+        sourceInventoryRevision: revision.sourceInventoryRevision,
+        graphRevision: revision.graphRevision,
+        revisionChecksum: revision.revisionChecksum,
+        revisionProducer: revision.producerRevision,
+      };
       await client.query(
         `INSERT INTO atlas_graph_snapshots_v2
            (snapshot_id, schema_version, status, source_manifest, projection_policy,
             node_count, edge_count, relation_event_count, excluded_count, unresolved_count,
-            source_hash, topology_hash, policy_hash, eligibility_predicate)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+            source_hash, topology_hash, policy_hash, eligibility_predicate,
+            workspace_revision, source_inventory_revision, graph_revision,
+            identity_contract_version, parser_contract_version, revision_checksum)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`,
         [
           run1.graphSnapshot.snapshotId,
           run1.graphSnapshot.schemaVersion,
           'VALIDATED',
-          JSON.stringify(run1.graphSnapshot.sourceManifest),
+          JSON.stringify(sourceManifest),
           JSON.stringify(run1.graphSnapshot.projectionPolicy),
           run1.graphSnapshot.nodeCount,
           run1.graphSnapshot.edgeCount,
@@ -347,13 +417,19 @@ async function main() {
           run1.graphSnapshot.topologyHash,
           run1.graphSnapshot.policyHash,
           run1.graphSnapshot.eligibilityPredicate,
+          revision.workspaceRevision,
+          revision.sourceInventoryRevision,
+          revision.graphRevision,
+          revision.identityContractVersion,
+          revision.parserContractVersion,
+          revision.revisionChecksum,
         ],
       );
 
       const BATCH = 1000;
       for (let i = 0; i < run1.graphSnapshotNodes.length; i += BATCH) {
         const batch = run1.graphSnapshotNodes.slice(i, i + BATCH);
-        const values: unknown[] = [];
+        const values = [];
         const placeholders = batch
           .map((n, idx) => {
             const o = idx * 8;
@@ -370,7 +446,7 @@ async function main() {
 
       for (let i = 0; i < run1.graphSnapshotEdges.length; i += BATCH) {
         const batch = run1.graphSnapshotEdges.slice(i, i + BATCH);
-        const values: unknown[] = [];
+        const values = [];
         const placeholders = batch
           .map((e, idx) => {
             const o = idx * 9;
@@ -386,7 +462,7 @@ async function main() {
 
       for (let i = 0; i < run1.graphSnapshotExclusions.length; i += BATCH) {
         const batch = run1.graphSnapshotExclusions.slice(i, i + BATCH);
-        const values: unknown[] = [];
+        const values = [];
         const placeholders = batch
           .map((x, idx) => {
             const o = idx * 7;
@@ -400,6 +476,31 @@ async function main() {
         );
       }
 
+      const revisionReadback = await client.query(
+        `SELECT snapshot_id, source_manifest, source_hash, topology_hash, policy_hash,
+                workspace_revision, source_inventory_revision, graph_revision,
+                identity_contract_version, parser_contract_version, revision_checksum
+           FROM atlas_graph_snapshots_v2
+          WHERE snapshot_id = $1`,
+        [run1.graphSnapshot.snapshotId],
+      );
+      if (revisionReadback.rowCount !== 1) throw new Error('GRAPH_SNAPSHOT_REVISION_READBACK_MISSING');
+      const persistedRevision = revisionReadback.rows[0];
+      verifyGraphSnapshotRevisionV1({
+        schema: 'atlas.graph-snapshot-revision.v1',
+        snapshotId: persistedRevision.snapshot_id,
+        workspaceRevision: persistedRevision.workspace_revision,
+        sourceInventoryRevision: persistedRevision.source_inventory_revision,
+        graphRevision: persistedRevision.graph_revision,
+        identityContractVersion: persistedRevision.identity_contract_version,
+        parserContractVersion: persistedRevision.parser_contract_version,
+        sourceInventoryHash: persistedRevision.source_hash,
+        topologyHash: persistedRevision.topology_hash,
+        policyHash: persistedRevision.policy_hash,
+        producerRevision: persistedRevision.source_manifest.revisionProducer,
+        revisionChecksum: persistedRevision.revision_checksum,
+      });
+
       await client.query('COMMIT');
       const counts = await client.query(
         `
@@ -411,8 +512,8 @@ async function main() {
         `,
         [run1.graphSnapshot.snapshotId],
       );
-      persistedCounts = counts.rows[0];
-      console.log(`\nPersisted snapshot ${run1.graphSnapshot.snapshotId}: ${persistedCounts.node_rows} nodes, ${persistedCounts.edge_rows} edges, ${persistedCounts.exclusion_rows} exclusions.`);
+      persistedCounts = { ...counts.rows[0], revision_readback_verified: true };
+      console.log(`\nPersisted snapshot ${run1.graphSnapshot.snapshotId}: ${persistedCounts.node_rows} nodes, ${persistedCounts.edge_rows} edges, ${persistedCounts.exclusion_rows} exclusions; revision readback verified.`);
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;
@@ -429,7 +530,9 @@ async function main() {
     sourceQueryHash,
     input: input1,
     result: run1,
+    revisionWrite: revisionWrite1,
     verifyResult: run2,
+    verifyRevisionWrite: revisionWrite2,
     persistedCounts,
   });
   const reportPath = await writeReport(mode, report);
