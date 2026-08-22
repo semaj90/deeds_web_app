@@ -121,3 +121,22 @@ export function buildActiveMcpToolRegistryV1(input: {
 export function routableActiveMcpToolsV1(registry: ActiveMcpToolRegistryV1): ActiveMcpToolEntryV1[] {
   return registry.entries.filter((entry) => decideActiveMcpToolRoutingV1(entry).routable);
 }
+
+/**
+ * Apply the ownership registry only to an MCP descriptor catalog. Built-in
+ * OpenCode/Node tools such as read/grep/glob/lsp/bash are intentionally outside
+ * this registry and must not be passed to this helper.
+ *
+ * Missing registry entries fail closed: an MCP tool is not eligible simply
+ * because it appeared in tools/list or in a generated manifest.
+ */
+export function filterRoutableMcpToolDescriptorsV1<T extends { name: string }>(
+  descriptors: T[],
+  registry: ActiveMcpToolRegistryV1,
+): T[] {
+  const byName = new Map(registry.entries.map((entry) => [entry.toolName, entry] as const));
+  return descriptors.filter((descriptor) => {
+    const entry = byName.get(descriptor.name);
+    return entry ? decideActiveMcpToolRoutingV1(entry).routable : false;
+  });
+}
