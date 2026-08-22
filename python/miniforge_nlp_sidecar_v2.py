@@ -122,12 +122,10 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
             continue
         extracted.append(
             {
-                # Compatibility aliases retained while current callers migrate.
                 "class": normalized["extraction_class"],
                 "text": normalized["extraction_text"],
                 "start_char": start_pos,
                 "end_char": end_pos,
-                # Native LangExtract grounding contract.
                 "extraction_class": normalized["extraction_class"],
                 "extraction_text": normalized["extraction_text"],
                 "char_interval": interval,
@@ -139,24 +137,11 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
     return extracted
 
 
-# The existing _analyze() resolves this global at call time, so the facade can
-# upgrade grounding without duplicating the rest of the NLP feature compiler.
 legacy._grounded_extractions = _native_grounded_extractions
 
 
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
-    """Return raw chunks plus whether logical identity_path was honored.
-
-    The temporary parser input is written as exact UTF-8 bytes. This is
-    intentional: Consiliency/Tree-sitter spans are byte coordinates, so text
-    mode newline translation (notably CRLF -> LF on Windows) would make the
-    returned offsets refer to bytes different from the request source.
-
-    If an older treesitter-chunker API rejects ``identity_path`` we may still
-    return structural evidence for search/diagnostics, but the response is
-    explicitly degraded so Graphify cannot allow GIS promotion from potentially
-    tempfile-affine upstream IDs.
-    """
+    """Return raw chunks plus whether logical identity_path was honored."""
 
     module = legacy.TREESITTER_CHUNKER_MODULE
     chunk_file = getattr(module, "chunk_file", None) if module is not None else None
@@ -188,8 +173,6 @@ def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[An
                         language,
                         extract_metadata=True,
                         include_retrieval_metadata=True,
-                        # Logical repository path is required for stable upstream
-                        # identities; tempfile path must never be treated as proof.
                         identity_path=file_path,
                     )
                     or []
@@ -232,11 +215,16 @@ def _span_matches_original(
     content_bytes: bytes | None,
     reported_start_line: int | None,
     reported_end_line: int | None,
+    allow_lf_normalized_content: bool = False,
 ) -> bool:
     if start < 0 or end < start or end > len(source_bytes):
         return False
-    if content_bytes is not None and source_bytes[start:end] != content_bytes:
-        return False
+    if content_bytes is not None:
+        source_slice = source_bytes[start:end]
+        if allow_lf_normalized_content:
+            source_slice = source_slice.replace(b"\r\n", b"\n")
+        if source_slice != content_bytes:
+            return False
     if reported_start_line is not None or reported_end_line is not None:
         actual_start_line, actual_end_line = _span_line_range(source_bytes, start, end)
         if reported_start_line is not None and actual_start_line != reported_start_line:
@@ -247,13 +235,7 @@ def _span_matches_original(
 
 
 def _lf_boundary_to_original_map(source_bytes: bytes) -> list[int]:
-    """Map LF-normalized byte boundaries back to exact original byte boundaries.
-
-    This is intentionally narrow: only CRLF pairs collapse to one LF byte.
-    Every other byte, including each byte of a multibyte UTF-8 codepoint, keeps
-    a one-to-one boundary mapping. The result has ``normalized_length + 1``
-    entries so both start and exclusive-end offsets can be translated exactly.
-    """
+    """Map LF-normalized byte boundaries back to exact original boundaries."""
 
     mapping = [0]
     original_index = 0
@@ -275,16 +257,7 @@ def _resolve_original_chunk_span(
     reported_start_line: int | None,
     reported_end_line: int | None,
 ) -> tuple[int, int, str | None] | None:
-    """Validate a chunk span against request bytes, with one CRLF compatibility repair.
-
-    treesitter-chunker documents byte_start/byte_end as UTF-8 offsets whose
-    original-file byte slice reproduces chunk content. Therefore valid spans
-    are retained byte-for-byte. We attempt a compatibility remap only when the
-    direct span violates that contract, the request actually contains CRLF,
-    and the reported offsets are valid in the LF-normalized byte world. The
-    remapped span must then agree with both available content and 1-indexed line
-    coordinates. Otherwise the chunk is rejected instead of guessed.
-    """
+    """Validate a native span, or conditionally repair LF offsets onto CRLF bytes."""
 
     source_bytes = source.encode("utf-8")
     if _span_matches_original(
@@ -318,6 +291,7 @@ def _resolve_original_chunk_span(
         content_bytes=content_bytes,
         reported_start_line=reported_start_line,
         reported_end_line=reported_end_line,
+        allow_lf_normalized_content=True,
     ):
         return None
     return remapped_start, remapped_end, "CONSILIENCY_LF_OFFSET_REMAP"
@@ -402,12 +376,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 reported_end_line=int(end_line) if end_line is not None else None,
             )
             if resolved_span is None:
-                identity = (
-                    normalized.get("upstream_chunk_id")
-                    or normalized.get("upstream_node_id")
-                    or normalized.get("name")
-                    or "unknown"
-                )
+                identity = normalized.get("upstream_chunk_id") or normalized.get("upstream_node_id") or normalized.get("name") or "unknown"
                 diagnostics.append(
                     f"ChunkingError: CONSILIENCY_BYTE_SPAN_INVALID:{identity}: explicit byte span does not reproduce original request bytes"
                 )
