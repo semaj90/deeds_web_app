@@ -422,6 +422,57 @@ branch was merged when 40% of its file changes were rejected). When
 only merging part of a branch, prefer the plain-commit form so `git
 log --merges` and `git rev-list` don't lie about provenance.
 
+## Update: `agent/qdrant-768-provenance-census-20260821` merged, session pause point
+
+Merged cleanly (pure-additive, zero deps beyond `node:crypto`) →
+commit `6cf93a7ad0`. Adds `EmbeddingProvenanceV1` (Qdrant 768-dim
+embedding provenance classifier: 5-status ladder
+PROVEN/PROVEN_FOR_GENERATION/MIXED_HISTORY/PARTIAL/UNPROVEN × 5-level
+evidence ladder COLLECTION_ONLY→NUMERICALLY_CORROBORATED) + a
+read-only census CLI script. 5/5 tests pass. Also re-ran every
+previously-fixed spec from earlier in this session
+(`graph-snapshot-revision-v1`, `temporal-recommendation-feature-
+runtime`, `temporal-action-sequence-reservation`) as a regression
+check — all still green, 13/13.
+
+**Session totals so far (2026-08-21/22, across both work blocks)**:
+- 6 full merges: `fanout-admission-gate`, `graphify-revision-owner-
+  reconciled` (graph-snapshot-revision-v1 + revision-authority-canary),
+  `revision-graph-fanout-convergence` (v1), `revision-authority-main-
+  reconcile`, `gpu-resident-feature-lease-converged`, `aligned-
+  snapshot-real-corpus-proof`, `gpu-batch-request-current-main`,
+  `qdrant-768-provenance-census` (8 total, not 6 — updated count)
+- 1 partial merge (3 of 5 files): `graphify-revision-owner-converged`
+- 1 branch identified as superseded/closed, correctly skipped:
+  `gpu-resident-feature-lease-20260821`
+- 5 real regressions found and fixed purely by running actual tests
+  after merging (not by trusting clean 3-way merges): `tool-shim.ts`
+  corruption, `graph-qdrant-fanout-alignment.ts` field bug, `.omit()`-
+  on-refined-schema Zod v4 break, non-deterministic lease-checksum
+  JSON key ordering, a hardcoded placeholder test checksum
+- 1 architectural finding flagged for operator decision, not resolved:
+  duplicate GPU-residency-lease ownership (`candidate-feature-gpu-
+  residency-v1.ts` vs `candidate-feature-gpu-resident-lease-v1.ts`)
+- 1 internal-defect finding flagged, not fixed (out of scope — file
+  was excluded from the merge rather than repaired): duplicate-column
+  SQL bug in a branch's own copy of the graphify revision-authority
+  migration
+- 0 force-pushes, 0 data loss, 0 unresolved conflict markers left
+  anywhere
+
+**Still pending** (re-verify ahead-count on next pickup, this queue
+moves fast): `agent/ast-parity-corpus-hardening-20260821` (6 commits —
+recall this is the branch flagged for a genuine unresolved AST
+kind-taxonomy architectural question, needs careful review not a quick
+merge), `agent/revision-graph-fanout-convergence-v2-20260822` (13
+commits, check for real delta vs the v1 already merged),
+`agent/graph-manifest-authority-v3-20260822` (13 commits, unreviewed),
+`agent/aligned-snapshot-qdrant-proof-v3-20260822` (9 commits,
+unreviewed). All four are larger/higher-risk than what's been handled
+so far this pass — budget a fresh review pass per the existing
+"~one branch per 15-20% of context" pacing guidance rather than
+rushing through them.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
