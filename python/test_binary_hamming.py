@@ -7,6 +7,7 @@ import numpy as np
 from atlas_compute.binary_hamming import (
     evaluate_binary_hamming_retrieval,
     rank_binary_hamming_exact,
+    spread_query_ordinals,
 )
 
 
@@ -22,17 +23,24 @@ class BinaryHammingTests(unittest.TestCase):
         self.assertEqual(ranking, [1, 2, 3])
         self.assertEqual(distances, [1, 1, 2])
 
-    def test_receipt_measures_mean_and_worst_query_overlap(self) -> None:
+    def test_spread_query_ordinals_cover_full_corpus_deterministically(self) -> None:
+        self.assertEqual(spread_query_ordinals(10, 4), [0, 3, 6, 9])
+        self.assertEqual(spread_query_ordinals(5000, 32)[0], 0)
+        self.assertEqual(spread_query_ordinals(5000, 32)[-1], 4999)
+        self.assertEqual(len(set(spread_query_ordinals(5000, 32))), 32)
+
+    def test_receipt_measures_mean_worst_overlap_and_boundary_ties(self) -> None:
         encoded = np.asarray([
             [0b00000000],
             [0b00000001],
+            [0b00000010],
             [0b00000011],
             [0b11111111],
         ], dtype=np.uint8)
         receipt = evaluate_binary_hamming_retrieval(
             encoded,
-            query_ordinals=[0, 3],
-            exact_reference_ordinals=[[1, 2], [2, 0]],
+            query_ordinals=[0, 4],
+            exact_reference_ordinals=[[1, 2], [3, 1]],
             top_k=2,
             benchmark_repeats=2,
         )
@@ -42,6 +50,8 @@ class BinaryHammingTests(unittest.TestCase):
         self.assertTrue(receipt.self_exclusion)
         self.assertEqual(receipt.mean_overlap_at_k, 1.0)
         self.assertEqual(receipt.minimum_query_overlap_at_k, 1.0)
+        self.assertGreaterEqual(receipt.mean_boundary_tie_count, 1.0)
+        self.assertGreaterEqual(receipt.maximum_boundary_tie_count, 1)
         self.assertEqual(len(receipt.rankings_checksum), 64)
         self.assertEqual(len(receipt.distances_checksum), 64)
         self.assertFalse(receipt.canonical_authority)
@@ -63,6 +73,10 @@ class BinaryHammingTests(unittest.TestCase):
                 query_ordinal=0,
                 top_k=1,
             )
+
+    def test_invalid_spread_query_count_is_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            spread_query_ordinals(3, 4)
 
 
 if __name__ == "__main__":
