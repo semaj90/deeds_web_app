@@ -18,6 +18,9 @@ from .determinism import configure_torch_determinism
 from .rapids_matrix import deterministic_farthest_first_ordinals
 
 
+DEFAULT_PREDICTION_BATCH_SIZE = 65536
+
+
 @dataclass(frozen=True)
 class CuvsSoftKMeansReceipt:
     schema: str
@@ -51,6 +54,14 @@ def _checksum(value: np.ndarray) -> str:
     return hashlib.sha256(np.ascontiguousarray(value).tobytes()).hexdigest()
 
 
+def resolve_prediction_batch_size(value: int) -> int:
+    """Resolve the experiment-level ``0 = auto`` convention to a cuVS batch size."""
+
+    if value < 0:
+        raise ValueError("prediction_batch_size must be >=0")
+    return DEFAULT_PREDICTION_BATCH_SIZE if value == 0 else value
+
+
 def run_cuvs_soft_kmeans(
     matrix: Sequence[Sequence[float]] | np.ndarray,
     *,
@@ -60,7 +71,7 @@ def run_cuvs_soft_kmeans(
     max_iter: int = 300,
     tol: float = 1e-4,
     streaming_batch_size: int = 0,
-    prediction_batch_size: int = 65536,
+    prediction_batch_size: int = DEFAULT_PREDICTION_BATCH_SIZE,
     device: str | None = None,
     seed: int = 0xA71A5,
 ):
@@ -69,7 +80,8 @@ def run_cuvs_soft_kmeans(
     When ``streaming_batch_size > 0``, the normalized NumPy source remains on
     host for cuVS fit and is streamed to the GPU. Prediction and pairwise
     centroid distances are processed in device batches because cuVS predict is a
-    CUDA-array API. ``l2_row`` is a cosine-like proxy, not exact spherical KMeans.
+    CUDA-array API. ``prediction_batch_size=0`` selects the bounded automatic
+    default. ``l2_row`` is a cosine-like proxy, not exact spherical KMeans.
     """
 
     import cupy as cp
@@ -87,8 +99,9 @@ def run_cuvs_soft_kmeans(
         raise ValueError("n_clusters out of range")
     if temperature <= 0 or not np.isfinite(temperature):
         raise ValueError("temperature must be finite and positive")
-    if streaming_batch_size < 0 or prediction_batch_size <= 0:
-        raise ValueError("streaming_batch_size must be >=0 and prediction_batch_size positive")
+    if streaming_batch_size < 0:
+        raise ValueError("streaming_batch_size must be >=0")
+    prediction_batch_size = resolve_prediction_batch_size(int(prediction_batch_size))
 
     if input_normalization == "l2_row":
         norms = np.linalg.norm(source.astype(np.float64), axis=1, keepdims=True)
