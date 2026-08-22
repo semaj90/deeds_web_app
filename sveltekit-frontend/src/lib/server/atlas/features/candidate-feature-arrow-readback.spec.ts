@@ -7,8 +7,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
 import { materializeCandidateFeatureSnapshot } from './candidate-feature-snapshot-v1.js';
 import { materializeCandidateFeatureColumnar } from './candidate-feature-columnar-v1.js';
-import { serializeCandidateFeatureArrowFile } from '../../../../../scripts/atlas/write-candidate-feature-arrow.mjs';
-import { readCandidateFeatureArrowFile } from '../../../../../scripts/atlas/read-candidate-feature-arrow.mjs';
+import { serializeCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/write-candidate-feature-arrow.mjs';
+import { readCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/read-candidate-feature-arrow.mjs';
 
 const tmpDirs: string[] = [];
 
