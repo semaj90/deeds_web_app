@@ -1,5 +1,19 @@
 # Parent Atlas Workstation TODO
 
+## Hardware specialization reconciliation — 2026-08-22
+
+The stale hardware branch was not merged wholesale. Its eight relevant commits
+were selectively carried onto a clean local `main` proof worktree. The SM86
+contract, profile materializer, estimator identity, and promotion tests are
+present. Focused validation passed `5/5`, and TypeScript emitted no diagnostics.
+
+Status is `SM86_ESTIMATOR_CONTRACT_PROVEN` but
+`HARDWARE_SPECIALIZATION_WRITTEN_UNPROVEN`: no real RTX 3060 Ti benchmark,
+KernelPerfReceiptV1, cuTile autotuning receipt, CUTLASS profiler receipt, or
+TARGET_VALIDATED promotion exists. CUTLASS analytical heuristics remain
+unsupported for `sm_86`; learned SM86 models remain estimates only. See
+`docs/reports/hardware-specialization-sm86-proof-20260822.md`.
+
 ## Current execution-proof reconciliation — 2026-08-21
 
 The active worktree is `C:\Users\james\Videos\deeds-web-app`. This section
