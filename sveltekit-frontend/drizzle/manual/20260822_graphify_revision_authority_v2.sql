@@ -6,10 +6,12 @@
 --   graphify_files.content_hash       = exact-byte SHA-256 digest
 --
 -- Current Parent Atlas logical revisions are additive and first-class:
---   graphify_runs.workspace_revision   = sha256:<sorted exact-byte source manifest>
+--   graphify_runs.workspace_revision    = sha256:<sorted exact-byte source manifest>
 --   graphify_files.code_source_revision = sha256:<content_hash>
 --
--- No historical row is backfilled or reinterpreted by this migration.
+-- Historical rows are not backfilled or reinterpreted. The two legacy UNIQUE
+-- constraints are replaced because they collapse distinct dirty/untracked byte
+-- states that share one Git HEAD. The legacy columns themselves are preserved.
 
 ALTER TABLE graphify_runs
   ADD COLUMN IF NOT EXISTS workspace_revision text,
@@ -57,6 +59,15 @@ BEGIN
   END IF;
 END $$;
 
+-- PostgreSQL default names for the historical inline UNIQUE constraints from
+-- drizzle/001_graphify_lineage.sql. Removing uniqueness does not remove the
+-- provenance columns or historical values.
+ALTER TABLE graphify_runs
+  DROP CONSTRAINT IF EXISTS graphify_runs_workspace_id_repository_revision_parser_contract_version_key;
+
+ALTER TABLE graphify_files
+  DROP CONSTRAINT IF EXISTS graphify_files_workspace_id_source_ref_source_revision_key;
+
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
   ON graphify_runs (workspace_id, workspace_revision, parser_contract_version)
   WHERE workspace_revision IS NOT NULL;
@@ -64,6 +75,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_code_source_revision_uq_v2
   ON graphify_files (workspace_id, source_ref, code_source_revision)
   WHERE code_source_revision IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS graphify_runs_repository_revision_provenance_idx_v2
+  ON graphify_runs (workspace_id, repository_revision, started_at DESC);
+
+CREATE INDEX IF NOT EXISTS graphify_files_legacy_source_revision_provenance_idx_v2
+  ON graphify_files (workspace_id, source_ref, source_revision);
 
 CREATE INDEX IF NOT EXISTS graphify_files_code_source_revision_idx_v2
   ON graphify_files (code_source_revision)
