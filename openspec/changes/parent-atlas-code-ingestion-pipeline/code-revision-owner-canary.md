@@ -21,7 +21,7 @@ git rev-parse HEAD
 
 Both values must be created inside the revision writer boundary. Callers are not allowed to inject either coordinate and then have the writer treat that value as authority.
 
-The new origin contract is:
+The origin contract is:
 
 ```text
 CodeRevisionAuthorityV1
@@ -35,32 +35,49 @@ CodeRevisionAuthorityV1
 
 The contract defaults to `canonicalWritesAllowed=false`.
 
-## Important historical schema conflict
+## Historical Graphify storage compatibility
 
-`drizzle/001_graphify_lineage.sql` describes:
+`drizzle/001_graphify_lineage.sql` already separates two revision concepts:
 
 ```text
 graphify_runs.repository_revision = Git commit SHA
-graphify_files.source_revision    = specific Git SHA when file was seen
+graphify_files.source_revision    = Git provenance coordinate for the file
+graphify_files.content_hash       = SHA-256 of the file content
 ```
 
-The latter is not the same semantic contract as current `CodeSourceRevisionV1`.
+Current `CodeSourceRevisionV1` is the exact-byte SHA-256, encoded as:
 
-Therefore this tranche **must not** silently start writing `sha256:<digest>` into an existing `graphify_files.source_revision` column whose populated rows use Git-SHA semantics. The live read-only canary classifies existing values as one of:
+```text
+sha256:<content digest>
+```
+
+Therefore the historical `source_revision` column does **not** need to be reinterpreted or overwritten merely to support the current source-revision contract. The existing `content_hash` field can be the durable byte-authority field while `source_revision` preserves its historical Git-provenance meaning.
+
+The read-only canary now recognizes these layouts:
 
 ```text
 CODE_SOURCE_REVISION_V1
+  sourceRevisionAuthorityField = SOURCE_REVISION
+
+LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1
+  sourceRevisionAuthorityField = CONTENT_HASH
+
 LEGACY_GIT_SHA
+  sourceRevisionAuthorityField = NONE
+
 UNKNOWN
+  sourceRevisionAuthorityField = NONE
 ```
 
-`LEGACY_GIT_SHA` and `UNKNOWN` block owner promotion. A later migration/writer decision must reconcile the storage semantic explicitly.
+`LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1` is storage-compatible: `CodeSourceRevisionV1` can be reconstructed exactly as `sha256:<content_hash>` without changing historical column semantics.
+
+`LEGACY_GIT_SHA` without a valid SHA-256 `content_hash`, `UNKNOWN`, or an authority-field mismatch still blocks owner promotion.
+
+This compatibility decision does **not** prove durable ownership. A legacy row having a content hash is only stored evidence; the canonical production writer must still prove that it creates the workspace Git revision and source byte digest itself.
 
 ## Production writer census
 
-Repository search found no trustworthy currently enrolled production `graphify_files` revision-origin writer. The only direct `graphifyFiles` implementation surface found is the legacy `scripts/atlas/index-engine.ts`, which is already known to be corrupted/interleaved and accepts `FileCandidate.sourceRevision` from its caller.
-
-That file is therefore not a revision authority owner and is not used by this tranche.
+Repository search found no trustworthy currently enrolled production Graphify revision-origin writer. The known legacy `scripts/atlas/index-engine.ts` accepts revision data from its caller and therefore cannot establish writer-origin authority.
 
 The canary intentionally reports:
 
@@ -69,7 +86,7 @@ productionWriterPath = null
 productionWriterPresent = false
 ```
 
-until a new writer is explicitly integrated into the canonical Graphify job.
+until a canonical Graphify source-inventory writer is explicitly integrated.
 
 ## Canary status model
 
@@ -88,11 +105,13 @@ BLOCKED_STORAGE_SEMANTICS_MISMATCH
 That final state requires all of:
 
 1. Graphify lineage schema exists with required columns.
-2. persisted source-revision storage semantics are `CODE_SOURCE_REVISION_V1`.
-3. an enrolled production writer creates both workspace/source revisions itself.
-4. at least one controlled persisted row read-backs with the exact computed workspace revision, source revision, source ref and content digest.
+2. source byte authority is available through either:
+   - canonical `source_revision = sha256:<digest>`, or
+   - legacy Git `source_revision` plus SHA-256 `content_hash` authority.
+3. an enrolled production writer creates both workspace and source revision coordinates itself.
+4. at least one controlled persisted row reads back with the exact computed workspace revision, source ref, and exact-byte digest under the selected authority field.
 
-A deterministic Git/SHA calculation without durable binding is not enough.
+A deterministic Git/SHA calculation, historical content hash, or populated column without writer-origin proof is not enough.
 
 ## Read-only proof
 
@@ -113,25 +132,19 @@ The proof:
 3. derives `CodeSourceRevisionV1` from exact bytes;
 4. opens Postgres with `BEGIN READ ONLY`;
 5. inspects `graphify_runs` / `graphify_files` existence and columns;
-6. classifies sampled `graphify_files.source_revision` semantics;
-7. checks whether an exactly matching persisted lineage row already exists;
-8. emits the canary receipt;
-9. rolls back and performs no canonical write.
+6. samples `source_revision` and `content_hash` together;
+7. selects `SOURCE_REVISION`, `CONTENT_HASH`, or `NONE` as the byte-authority field without redefining historical data;
+8. checks whether an exactly matching persisted lineage row already exists under that layout;
+9. emits the canary receipt;
+10. rolls back and performs no canonical write.
 
-Until a writer is enrolled, the healthy expected outcome is a blocked/nonzero receipt such as:
+Until a writer is enrolled, a healthy compatibility result is expected to remain blocked at:
 
 ```text
 REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND
 ```
 
-or, depending on the live schema:
-
-```text
-BLOCKED_SCHEMA_MISSING
-BLOCKED_STORAGE_SEMANTICS_MISMATCH
-```
-
-Those are useful proof outcomes, not failures to be bypassed.
+A `BLOCKED_STORAGE_SEMANTICS_MISMATCH` result should now mean the live rows truly lack a usable exact-byte authority or have mixed/unknown semantics, rather than merely using the documented legacy Git `source_revision` field.
 
 ## Validation
 
@@ -155,14 +168,17 @@ Use the live receipt to choose exactly one path:
 schema missing
   -> additive lineage migration review
 
-legacy Git-SHA source_revision
-  -> explicit storage-semantic migration/compatibility decision
+legacy Git source_revision + valid SHA-256 content_hash
+  -> storage is compatible; integrate canonical revision-origin writer
 
-schema compatible but writer absent
-  -> integrate CodeRevisionAuthorityV1 into the canonical Graphify source inventory writer
+legacy Git source_revision without valid content hash / mixed semantics
+  -> explicit storage repair or additive migration review
 
-writer + schema compatible
+compatible storage but writer absent
+  -> integrate CodeRevisionAuthorityV1 into canonical Graphify source inventory writer
+
+writer + compatible storage
   -> controlled single-file persistence/readback canary
 ```
 
-Only after `REVISION_OWNER_PROVEN` may `GraphViewNodeV1` and `atlas_graph_nodes_v2` be revision-qualified and `FANOUT-01` normalize Qdrant/cuVS/CAGRA/TurboVec results to the canonical `CandidateOrdinal` fabric.
+Only after `REVISION_OWNER_PROVEN` may `GraphViewNodeV1` / graph snapshots be revision-qualified for canonical consumption and `FANOUT-01` normalize Qdrant/cuVS/CAGRA/TurboVec results to the canonical `CandidateOrdinal` fabric.
