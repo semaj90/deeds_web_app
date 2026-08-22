@@ -87,10 +87,13 @@ export function evaluateGraphQdrantFanoutAlignment(input: GraphQdrantFanoutAlign
   const canonicalIdentityMatch = Boolean(strongIdentityEvidence) && !identityContradiction;
   const sourceRefCorroborated = Boolean(input.sourceRef && payloadSourceRef === input.sourceRef);
   const treeNodeIdCorroborated = Boolean(input.treeNodeId && payloadTreeNodeId === input.treeNodeId);
-  const workspaceRevisionAligned = text(payload.workspace_revision) === input.workspaceRevision;
+  // payload.repository_revision is the legacy Qdrant field name that now carries the
+  // canonical WorkspaceRevisionRecordV1 proof; payload.workspace_revision/workspace_cache_revision
+  // are legacy numeric cache epochs and never satisfy workspace revision authority.
+  const workspaceRevisionAligned = text(payload.repository_revision) === input.workspaceRevision;
   const repositoryRevisionAligned = input.repositoryRevision
     ? text(payload.repository_revision) === input.repositoryRevision
-    : true;
+    : text(payload.repository_revision) === input.workspaceRevision;
   const legacyWorkspaceCacheRevisionObserved = comparableRevision(payload.workspace_cache_revision);
   const graphRevisionAligned = text(payload.graph_revision) === input.graphRevision;
   const sourceRevisionAligned = input.sourceRevision ? text(payload.source_revision) === input.sourceRevision : false;

@@ -21,7 +21,7 @@ const fixture = {
   topologyHash: digest('topology'),
   policyHash: digest('policy'),
   producerRevision: 'graphify:producer-r2',
-} as const;
+};
 
 function revision(overrides: Partial<typeof fixture> = {}) {
   return buildGraphSnapshotRevisionV1({ ...fixture, ...overrides });
