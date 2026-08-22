@@ -36,7 +36,7 @@ export const fanoutAdmissionV1Schema = z.object({
   candidateOrdinalMap: z.custom<CandidateOrdinalMapV1>().nullable(),
   strongIdentityEvidence: z.enum(['CANONICAL_ID', 'SYMBOL_VERSION_ID', 'PACKET_KEY']).nullable(),
   snapshotId: z.string().uuid(),
-  workspaceRevision: id,
+  repositoryRevision: id,
   graphRevision: id,
   sourceRevision: nullableId,
   representationId: z.literal('semantic_768').nullable(),
@@ -89,8 +89,8 @@ function canonicalIdForAdmission(input: {
  *
  * This contract does not query or mutate stores. It consumes already-read
  * snapshot/node/Qdrant evidence and only materializes CandidateOrdinal after
- * snapshot binding, strong identity, source/workspace/graph revisions, and the
- * semantic_768 representation revision all agree.
+ * snapshot binding, strong identity, repository/source/graph revisions, and
+ * the semantic_768 representation revision all agree.
  */
 export function evaluateFanoutAdmissionV1(input: {
   graphSnapshotRevision: unknown;
@@ -139,7 +139,7 @@ export function evaluateFanoutAdmissionV1(input: {
       blockers.push('STRONG_CANONICAL_IDENTITY_AGREEMENT_REQUIRED');
     } else if (alignment.status !== 'ALIGNED') {
       status = 'REVISION_LINEAGE_REJECTED';
-      if (!alignment.workspaceRevisionAligned) blockers.push('WORKSPACE_REVISION_MISMATCH');
+      if (!alignment.repositoryRevisionAligned) blockers.push('REPOSITORY_REVISION_MISMATCH');
       if (!alignment.graphRevisionAligned) blockers.push('GRAPH_REVISION_MISMATCH');
       if (!alignment.sourceRevisionAligned) blockers.push('SOURCE_REVISION_MISMATCH');
       if (!alignment.semanticRepresentationAligned) blockers.push('SEMANTIC_768_REPRESENTATION_REQUIRED');
@@ -180,7 +180,7 @@ export function evaluateFanoutAdmissionV1(input: {
     candidateOrdinalMap,
     strongIdentityEvidence,
     snapshotId: snapshot.snapshotId,
-    workspaceRevision: snapshot.workspaceRevision,
+    repositoryRevision: snapshot.workspaceRevision,
     graphRevision: snapshot.graphRevision,
     sourceRevision: node.sourceRevision,
     representationId: input.qdrantPayload && text(input.qdrantPayload.representation_id) === 'semantic_768'
