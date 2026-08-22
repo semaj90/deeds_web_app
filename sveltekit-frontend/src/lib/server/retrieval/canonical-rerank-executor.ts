@@ -313,7 +313,11 @@ export function canonicalEnvelopeToRerankCandidate(
     astScore: envelope.ast?.score,
     graphScore: envelope.metadata?.score ?? envelope.authority?.score,
     pagerankScore: envelope.authority?.page_rank ?? envelope.authority?.score,
-    domainScore: envelope.metadata?.score,
+    domainClass: envelope.domain_class ?? envelope.domain ?? undefined,
+    // Deliberately do not derive domainScore/rewardPrior/domainClassMatch from
+    // metadata.score. MetadataSignal.score is a composite tags/domain/path
+    // relevance signal, while the XGBoost training schema treats reward_prior
+    // and domain_class_match as distinct features with distinct producers.
   };
 }
 
@@ -457,8 +461,8 @@ async function scoreWithXgboostSidecar(
         concept_overlap: candidate.astScore ?? 0.5,
         same_feature: candidate.packetKey ? 1 : 0,
         community_conf: candidate.graphScore ?? 0.5,
-        reward_prior: candidate.domainScore ?? 0.5,
-        domain_class_match: candidate.domainScore ?? 0.5,
+        reward_prior: candidate.rewardPrior ?? 0.5,
+        domain_class_match: candidate.domainClassMatch ?? 0.5,
         freshness_score: 0.5,
         pagerank_score: candidate.pagerankScore ?? candidate.graphScore ?? 0.5,
         som_cache_hit: 0,
