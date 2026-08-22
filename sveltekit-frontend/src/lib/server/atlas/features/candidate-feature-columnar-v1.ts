@@ -39,6 +39,7 @@ export type CandidateScalarFeatureName = typeof CANDIDATE_SCALAR_FEATURES[number
 
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 const revision = z.string().min(1);
+const scalarFeatureNameSchema = z.enum(CANDIDATE_SCALAR_FEATURES);
 
 export const candidateFeatureColumnarV1Schema = z.object({
   schema: z.literal(CANDIDATE_FEATURE_COLUMNAR_SCHEMA),
@@ -59,10 +60,7 @@ export const candidateFeatureColumnarV1Schema = z.object({
   semanticRevisions: z.array(z.string().min(1).nullable()),
   degradedIdentity: z.array(z.union([z.literal(0), z.literal(1)])),
   laneMaskU16: z.array(z.number().int().min(0).max(0xffff)),
-  featureNames: z.tuple(CANDIDATE_SCALAR_FEATURES.map((name) => z.literal(name)) as [
-    z.ZodLiteral<CandidateScalarFeatureName>,
-    ...z.ZodLiteral<CandidateScalarFeatureName>[],
-  ]),
+  featureNames: z.array(scalarFeatureNameSchema).length(CANDIDATE_SCALAR_FEATURES.length),
   featureValues: z.array(z.number().finite()),
   featurePresence: z.array(z.union([z.literal(0), z.literal(1)])),
   candidateOrdinalsChecksum: checksum,
@@ -79,7 +77,42 @@ export const candidateFeatureColumnarV1Schema = z.object({
   identityAuthority: z.literal(false),
   canonicalOwnerChanged: z.literal(false),
   producerRevision: revision,
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (JSON.stringify(value.featureNames) !== JSON.stringify(CANDIDATE_SCALAR_FEATURES)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['featureNames'],
+      message: 'CANDIDATE_FEATURE_COLUMN_ORDER_MISMATCH',
+    });
+  }
+  const rowColumns = [
+    value.candidateOrdinals,
+    value.canonicalIds,
+    value.packetKeys,
+    value.treeNodeIds,
+    value.symbolVersionIds,
+    value.sourceRevisions,
+    value.graphRevisions,
+    value.semanticRevisions,
+    value.degradedIdentity,
+    value.laneMaskU16,
+  ];
+  if (rowColumns.some((column) => column.length !== value.rowCount)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['rowCount'],
+      message: 'CANDIDATE_FEATURE_COLUMNAR_ROW_COLUMN_LENGTH_MISMATCH',
+    });
+  }
+  const cells = value.rowCount * value.featureCount;
+  if (value.featureValues.length !== cells || value.featurePresence.length !== cells) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['featureValues'],
+      message: 'CANDIDATE_FEATURE_COLUMNAR_CELL_COUNT_MISMATCH',
+    });
+  }
+});
 
 export type CandidateFeatureColumnarV1 = z.infer<typeof candidateFeatureColumnarV1Schema>;
 
@@ -220,7 +253,7 @@ export function materializeCandidateFeatureColumnar(input: {
     semanticRevisions: snapshot.rows.map((row) => row.semanticRevision),
     degradedIdentity: snapshot.rows.map((row) => row.degradedIdentity ? 1 : 0),
     laneMaskU16: snapshot.rows.map(laneMask),
-    featureNames: CANDIDATE_SCALAR_FEATURES,
+    featureNames: [...CANDIDATE_SCALAR_FEATURES],
     featureValues,
     featurePresence,
     candidateOrdinalsChecksum,
