@@ -101,6 +101,7 @@ function refinePrefillExecutionPlan(
 
 export const PrefillExecutionPlanV1Schema = PrefillExecutionPlanBaseV1Schema.superRefine(refinePrefillExecutionPlan);
 export type PrefillExecutionPlanV1 = z.infer<typeof PrefillExecutionPlanV1Schema>;
+export type PrefillExecutionPlanInputV1 = Omit<PrefillExecutionPlanV1, 'schema' | 'queryHash' | 'checksum'>;
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -118,9 +119,7 @@ export function orchestrationChecksum(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex');
 }
 
-export function createPrefillExecutionPlanV1(
-  input: Omit<PrefillExecutionPlanV1, 'schema' | 'queryHash' | 'checksum'>,
-): PrefillExecutionPlanV1 {
+export function createPrefillExecutionPlanV1(input: PrefillExecutionPlanInputV1): PrefillExecutionPlanV1 {
   const withoutChecksum = {
     ...input,
     schema: 'atlas.prefill-execution-plan.v1' as const,
