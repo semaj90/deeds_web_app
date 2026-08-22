@@ -7,6 +7,7 @@ import { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
 import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 import { CODEBASE_COLLECTION_PRIORITY } from '$lib/server/retrieval/collection-aliases.js';
+import { resolveQdrantSyncLineageV1 } from '$lib/server/retrieval/qdrant-sync-lineage-resolver.js';
 import { buildQdrantSyncPayload } from '$lib/server/retrieval/qdrant-sync-payload.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
@@ -89,13 +90,9 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
   }
 
   const qdrant = getQdrantClient();
-  const payload: Record<string, unknown> = buildQdrantSyncPayload(p);
 
-  // This worker owns payload synchronization only. It must never create or
-  // replace the semantic vector while repairing identity/revision lineage.
-  // Require the canonical-v2 point to exist, then use Qdrant's payload-only
-  // mutation API. Historical points absent from v2 remain a reconciliation
-  // problem rather than being silently recreated without a vector.
+  // First prove the canonical-v2 point exists. Historical points missing from
+  // v2 remain a reconciliation task; never manufacture a vectorless point.
   const existing = await (qdrant as any).retrieve(QDRANT_SYNC_COLLECTION, {
     ids: [p.qdrantPointId],
     with_payload: false,
@@ -111,6 +108,40 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
     return;
   }
 
+  // atlas_packets.workspace_revision is a legacy cache epoch, not canonical
+  // code-world identity. Resolve exact workspace/source authority from the v2
+  // Graphify ledger using source_ref + exact content digest. Missing/ambiguous
+  // authority is a semantic blocker, not a transient queue failure.
+  const lineage = await resolveQdrantSyncLineageV1({
+    client: db,
+    sourceRef: p.sourceRef,
+    sourceContentDigest: p.sha256,
+  });
+
+  if (!lineage.mutationAllowed || lineage.status !== 'LINEAGE_RESOLVED') {
+    console.log('Qdrant payload sync blocked by unresolved canonical lineage:', {
+      packet_key: event.packet_key,
+      qdrant_point_id: p.qdrantPointId,
+      collection: QDRANT_SYNC_COLLECTION,
+      lineage_status: lineage.status,
+      lineage_blocker: lineage.blocker,
+      source_ref: lineage.sourceRef,
+      source_content_digest: lineage.sourceContentDigest,
+    });
+    return;
+  }
+
+  const payload: Record<string, unknown> = buildQdrantSyncPayload({
+    ...p,
+    workspaceWorldRevision: lineage.workspaceWorldRevision,
+    repositoryRevision: lineage.repositoryRevision,
+    sourceRevision: lineage.sourceRevision,
+  });
+
+  // This worker owns payload synchronization only. setPayload cannot create or
+  // replace the semantic vector. graph_revision is intentionally not fabricated
+  // here; a later graph projection event/readback must supply it before FANOUT
+  // admission can become green.
   await (qdrant as any).setPayload(QDRANT_SYNC_COLLECTION, {
     payload,
     points: [p.qdrantPointId],
@@ -123,6 +154,10 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
     collection: QDRANT_SYNC_COLLECTION,
     mutation: 'setPayload',
     vector_write: false,
+    workspace_world_revision: lineage.workspaceWorldRevision,
+    repository_revision: lineage.repositoryRevision,
+    source_revision: lineage.sourceRevision,
+    graph_revision: payload.graph_revision ?? null,
   });
 }
 
