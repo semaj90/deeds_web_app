@@ -461,17 +461,76 @@ check — all still green, 13/13.
   anywhere
 
 **Still pending** (re-verify ahead-count on next pickup, this queue
-moves fast): `agent/ast-parity-corpus-hardening-20260821` (6 commits —
-recall this is the branch flagged for a genuine unresolved AST
-kind-taxonomy architectural question, needs careful review not a quick
-merge), `agent/revision-graph-fanout-convergence-v2-20260822` (13
+moves fast): `agent/revision-graph-fanout-convergence-v2-20260822` (13
 commits, check for real delta vs the v1 already merged),
-`agent/graph-manifest-authority-v3-20260822` (13 commits, unreviewed),
-`agent/aligned-snapshot-qdrant-proof-v3-20260822` (9 commits,
-unreviewed). All four are larger/higher-risk than what's been handled
-so far this pass — budget a fresh review pass per the existing
-"~one branch per 15-20% of context" pacing guidance rather than
-rushing through them.
+`agent/graph-manifest-authority-v3-20260822` (13 commits, unreviewed).
+Both larger/higher-risk than what's been handled so far — budget a
+fresh review pass per the existing "~one branch per 15-20% of context"
+pacing guidance rather than rushing through them.
+
+## Update: ast-parity-corpus-hardening + aligned-snapshot-qdrant-proof-v3 merged
+
+Merged `agent/ast-parity-corpus-hardening-20260821` → commit
+`e77205b430`. Adds `StructuralObservationV1` (provider-neutral AST
+symbol observation: rawNodeType/rawKind→canonical symbolKind, byte-span
+validity, parent-route context) + `StructuralParityComparatorV2`
+(compares the Node tree-sitter challenger provider against the 8095
+sidecar corpus) + a corpus-parity prove script. Also carried a real,
+independently-verified Windows bug fix in `miniforge_nlp_sidecar_v2.py`:
+the temp file for tree-sitter parsing was written in text mode with
+utf-8 encoding, which lets Python's newline translation turn CRLF into
+LF — since Tree-sitter spans are byte offsets, this silently shifted
+every span after the first CRLF on Windows checkouts. Fixed by writing
+exact utf-8 bytes in binary mode. 3/3 tests pass. This branch's own
+findings reconfirm (does not resolve) the AST kind-taxonomy mismatch
+this repo's CLAUDE.md already flags as an open operator question.
+Minor process note: the commit message used a backtick around the word
+"kind" inside a double-quoted `-m` string, which bash expanded as
+command substitution (`kind: command not found`) — the pushed commit's
+message silently lost that one word. Content unaffected; recorded here
+so a future session doesn't mistake it for something worse. **Lesson:
+never use backticks in git commit messages passed via bash double
+quotes — escape them (`` \` ``) or avoid the character entirely.**
+
+Merged `agent/aligned-snapshot-qdrant-proof-v3-20260822` → commit
+`282610320e`. Adds `real_semantic_snapshot.py`
+(`derive_real_semantic_snapshot_revision` lineage helper),
+`export-frozen-semantic-v2-source.mts`/`.spec.ts` (a read-only
+Postgres NDJSON source exporter that explicitly asserts
+`graphify_files.code_source_revision`/`graphify_runs.workspace_revision`
+as authority and `atlasPacketWorkspaceCacheEpochUsedAsAuthority: false`
+— i.e. it does NOT use the legacy `atlas_packets` cache epoch as
+revision authority, consistent with this repo's canonical-revision
+rules), and substantial rewrites to `qdrant_scoped_ann.py`/
+`cluster_softmax.py` with their test updates.
+
+**Add/add conflict resolved**: this branch independently authored its
+own `python/freeze_real_semantic_snapshot_v2.py`, colliding by name
+with the one already merged from `agent/aligned-snapshot-real-corpus-
+proof-20260821` this session (`f2d9ce5a36`). The two are genuinely
+different, incompatible CLI tools (`--export-receipt` +
+manifest/row-identity/canonical-order checksum verification, vs
+`--source`/`--source-receipt` delegating to the new
+`derive_real_semantic_snapshot_revision` helper). Kept main's
+already-merged version, discarded this branch's competing one, after
+confirming (via grep across every file this branch touches) that
+nothing else in the branch's diff references the excluded file. This
+is the same surgical-tree-override technique used for the SQL/canary
+partial merge above (`git merge-tree` for the auto-mergeable files,
+then `read-tree` + `update-index --cacheinfo` to force one specific
+path back to main's blob before `write-tree`/`commit-tree`).
+
+The new spec (`export-frozen-semantic-v2-source.spec.ts`) is a
+string-assertion test against its own source file's contents, but
+lives under `scripts/atlas/` — vitest's `include` glob only covers
+`src/**/*.spec.ts` plus an explicit allowlist, so `scripts/**/*.spec.ts`
+files (this one and 3 pre-existing `scripts/tests/probes/*.spec.ts`
+files) silently never run under the normal `vitest run` invocation.
+This is a **pre-existing test-harness gap**, not introduced by this
+merge — flagged, not fixed (out of scope for a branch-merge pass; fixing
+the vitest `include` glob is a separate, deliberate config change).
+Verified all 11 of its string assertions manually via `grep -F` against
+the merged `.mts` file instead — all pass.
 
 ## Explicit non-goals for whoever picks this up
 
