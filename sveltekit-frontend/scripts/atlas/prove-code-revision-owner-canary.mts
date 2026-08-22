@@ -1,141 +1,208 @@
 #!/usr/bin/env tsx
 
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { readFile, stat, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFile } from 'node:child_process';
-import { promisify } from 'node:util';
 import pg from 'pg';
+
 import { loadAtlasEnv } from './load-atlas-env.mjs';
+import {
+  workspaceRevisionRecordV1Schema,
+  workspaceSourceBindingV1Schema,
+} from '$lib/server/atlas/identity/workspace-source-binding-v1.js';
 
 await loadAtlasEnv();
 
-const execFileAsync = promisify(execFile);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND = path.resolve(HERE, '../..');
 const REPO_ROOT = path.resolve(FRONTEND, '..');
+const DATABASE_URL = process.env.DATABASE_URL;
 const OUT = path.resolve(
   REPO_ROOT,
-  process.env.ATLAS_CODE_REVISION_OWNER_CANARY_OUT ?? 'docs/reports/code-revision-owner-canary.json',
+  process.env.ATLAS_CODE_REVISION_OWNER_CANARY_OUT
+    ?? 'docs/reports/code-revision-owner-canary.json',
 );
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
+const OBSERVATION_PATH = path.resolve(
+  REPO_ROOT,
+  process.env.ATLAS_WORKSPACE_SOURCE_BINDING_OUT
+    ?? 'docs/reports/workspace-source-binding-observation.json',
+);
+const WRITER_PATH = path.resolve(
+  REPO_ROOT,
+  'sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts',
+);
+const SELECTED_SOURCE = process.env.ATLAS_GRAPHIFY_CANARY_SOURCE?.replaceAll('\\', '/') || null;
 
-const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
-const limit = Math.max(1, Math.min(100, Number(process.env.ATLAS_CODE_REVISION_OWNER_CANARY_SAMPLE ?? 10)));
+if (!DATABASE_URL) throw new Error('DATABASE_URL_REQUIRED');
 
-function normalizeHash(value: unknown): string | null {
-  const text = typeof value === 'string' ? value.trim().toLowerCase() : '';
-  const digest = text.startsWith('sha256:') ? text.slice('sha256:'.length) : text;
-  return /^[a-f0-9]{64}$/.test(digest) ? digest : null;
+async function exists(file: string): Promise<boolean> {
+  try { return (await stat(file)).isFile(); } catch { return false; }
 }
 
-function validLegacyGitRevision(value: unknown): boolean {
-  return typeof value === 'string' && /^(?:[a-f0-9]{7,64}|(?:refs\/)?(?:heads|tags)\/[A-Za-z0-9._/-]+)$/i.test(value.trim());
+async function writeReport(report: Record<string, unknown>) {
+  await mkdir(path.dirname(OUT), { recursive: true });
+  await writeFile(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify({ ...report, output: path.relative(REPO_ROOT, OUT) }, null, 2));
 }
 
-async function gitHead(): Promise<string | null> {
-  try {
-    const result = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' });
-    return result.stdout.trim() || null;
-  } catch {
-    return null;
-  }
+let record = null as ReturnType<typeof workspaceRevisionRecordV1Schema.parse> | null;
+let bindings: Array<ReturnType<typeof workspaceSourceBindingV1Schema.parse>> = [];
+let observationPresent = false;
+try {
+  const observation = JSON.parse(await readFile(OBSERVATION_PATH, 'utf8')) as Record<string, unknown>;
+  record = workspaceRevisionRecordV1Schema.parse(observation.record);
+  bindings = (Array.isArray(observation.bindings) ? observation.bindings : [])
+    .map((item) => workspaceSourceBindingV1Schema.parse(item));
+  observationPresent = bindings.length > 0;
+} catch {
+  observationPresent = false;
 }
 
-async function inspectRow(row: { source_ref: string; source_revision: string | null; content_hash: string | null }, head: string | null) {
-  const sourceRef = row.source_ref.replace(/\\/g, '/').trim();
-  const absolute = path.resolve(REPO_ROOT, sourceRef);
-  const insideRepo = absolute === REPO_ROOT || absolute.startsWith(`${REPO_ROOT}${path.sep}`);
-  let actualHash: string | null = null;
-  let regularFile = false;
-  if (insideRepo) {
-    try {
-      regularFile = (await stat(absolute)).isFile();
-      if (regularFile) actualHash = createHash('sha256').update(await readFile(absolute)).digest('hex');
-    } catch { /* classified below */ }
-  }
-  const storedHash = normalizeHash(row.content_hash);
-  const exactByteDigestMatches = Boolean(actualHash && storedHash && actualHash === storedHash);
-  return {
-    sourceRef,
-    sourceRevision: row.source_revision,
-    storedContentHash: storedHash,
-    actualContentHash: actualHash,
-    sourceInsideRepository: insideRepo,
-    regularFile,
-    exactByteDigestMatches,
-    legacyGitProvenanceValid: validLegacyGitRevision(row.source_revision),
-    currentGitHead: head,
-    currentGitHeadMatchesSourceRevision: Boolean(head && row.source_revision === head),
-  };
-}
+const writerPresent = await exists(WRITER_PATH);
+const pool = new pg.Pool({
+  connectionString: DATABASE_URL,
+  max: 1,
+  connectionTimeoutMillis: 5_000,
+  statement_timeout: 15_000,
+});
 
 await pool.query('BEGIN READ ONLY');
 try {
-  const tableResult = await pool.query<{ exists: boolean }>(`
-    SELECT EXISTS (
-      SELECT 1 FROM information_schema.tables
-      WHERE table_schema = current_schema() AND table_name = 'graphify_files'
-    ) AS exists
+  const schema = await pool.query(`
+    SELECT
+      to_regclass('public.graphify_runs') IS NOT NULL AS runs_present,
+      to_regclass('public.graphify_files') IS NOT NULL AS files_present,
+      EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema='public' AND table_name='graphify_runs' AND column_name='workspace_revision'
+      ) AS workspace_revision_present,
+      EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema='public' AND table_name='graphify_runs' AND column_name='source_manifest_digest'
+      ) AS source_manifest_digest_present,
+      EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema='public' AND table_name='graphify_files' AND column_name='code_source_revision'
+      ) AS code_source_revision_present
   `);
-  const tableExists = Boolean(tableResult.rows[0]?.exists);
-  const columnResult = tableExists
-    ? await pool.query<{ column_name: string }>(`
-        SELECT column_name FROM information_schema.columns
-        WHERE table_schema = current_schema() AND table_name = 'graphify_files'
-      `)
-    : { rows: [] as { column_name: string }[] };
-  const columns = new Set(columnResult.rows.map((row) => row.column_name));
-  const requiredColumns = ['source_ref', 'source_revision', 'content_hash'];
-  const requiredColumnsPresent = requiredColumns.every((column) => columns.has(column));
-  const head = await gitHead();
-  const rows = tableExists && requiredColumnsPresent
-    ? (await pool.query<{ source_ref: string; source_revision: string | null; content_hash: string | null }>(`
-        SELECT source_ref, source_revision, content_hash
-        FROM graphify_files
-        WHERE source_ref IS NOT NULL
-        ORDER BY source_ref
-        LIMIT $1
-      `, [limit])).rows
-    : [];
-  const samples = await Promise.all(rows.map((row) => inspectRow(row, head)));
-  const compatibilityPass = samples.length > 0 && samples.every((sample) =>
-    sample.sourceInsideRepository &&
-    sample.regularFile &&
-    sample.exactByteDigestMatches &&
-    sample.legacyGitProvenanceValid,
+  const schemaRow = schema.rows[0] ?? {};
+  const schemaReady = Boolean(
+    schemaRow.runs_present
+    && schemaRow.files_present
+    && schemaRow.workspace_revision_present
+    && schemaRow.source_manifest_digest_present
+    && schemaRow.code_source_revision_present
   );
-  const status = !tableExists || !requiredColumnsPresent
-    ? 'REVISION_OWNER_NOT_READY'
-    : samples.length === 0
-      ? 'REVISION_OWNER_TABLE_READY_NO_SAMPLE_ROWS'
-      : compatibilityPass
-        ? 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND'
-        : 'REVISION_ORIGIN_NOT_PROVEN';
+
+  let selectedBinding = null as (typeof bindings)[number] | null;
+  if (observationPresent && record) {
+    selectedBinding = SELECTED_SOURCE
+      ? bindings.find((item) => item.sourceRef === SELECTED_SOURCE) ?? null
+      : bindings[0] ?? null;
+  }
+
+  let persistedMatchingRows = 0;
+  let matchingRows: Array<Record<string, unknown>> = [];
+  if (schemaReady && record && selectedBinding) {
+    const matched = await pool.query(`
+      SELECT
+        gr.workspace_id::text AS workspace_id,
+        gr.run_id::text AS run_id,
+        gr.repository_revision,
+        gr.workspace_revision,
+        gr.source_manifest_digest,
+        gf.file_id::text AS file_id,
+        replace(gf.source_ref, '\\', '/') AS source_ref,
+        gf.source_revision AS legacy_source_revision,
+        gf.content_hash,
+        gf.code_source_revision,
+        gf.byte_length
+      FROM public.graphify_files gf
+      JOIN public.graphify_runs gr ON gr.run_id = gf.last_seen_run_id
+      WHERE gr.workspace_revision = $1
+        AND lower(gr.source_manifest_digest) = lower($2)
+        AND gr.repository_revision = $3
+        AND replace(gf.source_ref, '\\', '/') = $4
+        AND gf.code_source_revision = $5
+        AND lower(gf.content_hash) IN (lower($6), lower('sha256:' || $6))
+        AND gf.byte_length = $7
+    `, [
+      record.workspaceRevision,
+      record.sourceManifestDigest,
+      record.baseCommitOid,
+      selectedBinding.sourceRef,
+      selectedBinding.sourceRevision,
+      selectedBinding.contentDigest,
+      selectedBinding.byteLength,
+    ]);
+    persistedMatchingRows = matched.rowCount ?? matched.rows.length;
+    matchingRows = matched.rows;
+  }
+
+  let status:
+    | 'REVISION_OWNER_NOT_READY'
+    | 'REVISION_ORIGIN_OBSERVATION_REQUIRED'
+    | 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND'
+    | 'REVISION_OWNER_READY_FOR_CONTROLLED_CANARY'
+    | 'REVISION_OWNER_PROVEN';
+
+  if (!schemaReady) status = 'REVISION_OWNER_NOT_READY';
+  else if (!observationPresent || !record || !selectedBinding) status = 'REVISION_ORIGIN_OBSERVATION_REQUIRED';
+  else if (!writerPresent) status = 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND';
+  else if (persistedMatchingRows < 1) status = 'REVISION_OWNER_READY_FOR_CONTROLLED_CANARY';
+  else status = 'REVISION_OWNER_PROVEN';
+
+  const revisionOwnerProven = status === 'REVISION_OWNER_PROVEN';
   const report = {
-    schemaVersion: 'atlas.code-revision-owner-canary.v1',
+    schemaVersion: 'atlas.code-revision-owner-canary.v2',
     status,
-    sourceRevisionStorageSemantics: compatibilityPass ? 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1' : 'UNKNOWN',
-    sourceRevisionAuthorityField: compatibilityPass ? 'CONTENT_HASH' : 'NONE',
     readOnly: true,
     canonicalWriteAttempted: false,
-    durableOwnerBound: false,
-    fanoutMayConsumeAsCanonical: false,
-    tableExists,
-    requiredColumns,
-    requiredColumnsPresent,
-    sampleLimit: limit,
-    sampleCount: samples.length,
-    currentGitHead: head,
-    samples,
-    nextGate: 'CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK',
+    storageSemantics: 'GRAPHIFY_REVISION_AUTHORITY_V2',
+    sourceRevisionAuthorityField: 'code_source_revision',
+    legacySourceRevisionField: 'source_revision',
+    legacySourceRevisionSemantics: 'GIT_PROVENANCE_ONLY',
+    workspaceRevisionAuthorityField: 'workspace_revision',
+    workspaceRevisionAlgorithm: 'sha256:<sorted exact-byte source manifest>',
+    observationPresent,
+    observationPath: path.relative(REPO_ROOT, OBSERVATION_PATH),
+    writerPresent,
+    productionWriterPath: writerPresent ? path.relative(REPO_ROOT, WRITER_PATH) : null,
+    schemaReady,
+    tables: {
+      graphify_runs: Boolean(schemaRow.runs_present),
+      graphify_files: Boolean(schemaRow.files_present),
+    },
+    columns: {
+      workspace_revision: Boolean(schemaRow.workspace_revision_present),
+      source_manifest_digest: Boolean(schemaRow.source_manifest_digest_present),
+      code_source_revision: Boolean(schemaRow.code_source_revision_present),
+    },
+    selectedSourceRef: selectedBinding?.sourceRef ?? null,
+    expectedWorkspaceRevision: record?.workspaceRevision ?? null,
+    expectedSourceManifestDigest: record?.sourceManifestDigest ?? null,
+    expectedRepositoryRevision: record?.baseCommitOid ?? null,
+    expectedCodeSourceRevision: selectedBinding?.sourceRevision ?? null,
+    expectedContentDigest: selectedBinding?.contentDigest ?? null,
+    expectedByteLength: selectedBinding?.byteLength ?? null,
+    persistedMatchingRows,
+    matchingRows,
+    durableOwnerBound: schemaReady && writerPresent,
+    revisionOwnerProven,
+    fanoutMayConsumeAsCanonical: revisionOwnerProven,
+    nextGate: revisionOwnerProven
+      ? 'GRAPH_SNAPSHOT_LINEAGE_AND_QDRANT_IDENTITY_ALIGNMENT'
+      : status === 'REVISION_OWNER_READY_FOR_CONTROLLED_CANARY'
+        ? 'ONE_CONTROLLED_NON_PRODUCTION_PERSISTENCE_READBACK'
+        : status === 'REVISION_ORIGIN_OBSERVATION_REQUIRED'
+          ? 'RUN_WORKSPACE_SOURCE_BINDING_OBSERVER'
+          : status === 'REVISION_OWNER_NOT_READY'
+            ? 'APPLY_GRAPHIFY_REVISION_AUTHORITY_V2_TO_NON_PRODUCTION_PROOF_DB'
+            : 'BIND_CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER',
   };
-  await mkdir(path.dirname(OUT), { recursive: true });
-  await writeFile(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-  console.log(JSON.stringify({ ...report, output: OUT }, null, 2));
-  if (status !== 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND') process.exitCode = 3;
+
+  await writeReport(report);
+  if (!revisionOwnerProven) process.exitCode = 3;
 } finally {
   await pool.query('ROLLBACK');
   await pool.end();
