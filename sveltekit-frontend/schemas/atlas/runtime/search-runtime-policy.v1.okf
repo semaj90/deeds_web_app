@@ -1,0 +1,29 @@
+schema_id: atlas.search-runtime-policy
+schema_version: 1
+schema_kind: search_runtime_policy
+status: ACTIVE
+
+description: >
+  Chooses one executor behind a logical search lane. Executor selection affects
+  cost/latency but never creates extra fusion votes.
+
+fields:
+  schema: { type: literal, value: atlas.search-runtime-policy.v1 }
+  policyRevision: { type: string, required: true }
+  semanticRepresentation: { type: literal, value: semantic_768 }
+  executorPriority:
+    type: array
+    items:
+      type: enum
+      values: [QDRANT, CUVS_EXACT, CAGRA, DISKANN, TURBOVEC]
+  exactOracle: { type: literal, value: CUVS_EXACT }
+  hotGpuExecutor: { type: literal, value: CAGRA }
+  coldNvmeExecutor: { type: literal, value: DISKANN }
+  allowTurboVecChallenger: { type: boolean }
+  maxGpuResidentVectors: { type: integer, minimum: 0 }
+  minFreeVramBytes: { type: integer, minimum: 0 }
+
+invariants:
+  - semantic lane emits at most one logical vote per canonical candidate
+  - exactness=required selects CUVS_EXACT or fails closed
+  - cache state cannot alter semantic relevance

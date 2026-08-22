@@ -134,7 +134,7 @@ async function main() {
   // Connect to live DB
   const pool = new pg.Pool(env.DATABASE_URL || env.PG_URL
     ? { connectionString: env.DATABASE_URL || env.PG_URL }
-    : { host: 'localhost', port: 5432, user: 'legal_admin', database: 'legal_ai_db' });
+    : { host: '127.0.0.1', port: 5434, user: 'legal_admin', database: 'legal_ai_db' });
 
   let live;
   try {

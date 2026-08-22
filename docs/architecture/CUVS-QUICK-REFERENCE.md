@@ -47,7 +47,7 @@
                         └──────────────────────────────────────┘
                                ↓
                         ┌──────────────────────────────────────┐
-                        │ Postgres (Port 5432)                  │
+                        │ Postgres (Host Port 5434)             │
                         │ codebase_chunk_index table            │
                         │ (Join + metadata)                     │
                         └──────────────────────────────────────┘
@@ -100,7 +100,7 @@
 | Port | Service | Protocol | Status | Notes |
 |------|---------|----------|--------|-------|
 | 5173 | SvelteKit dev | HTTP | Active | Frontend |
-| 5432 | Postgres | TCP | Active | Main DB |
+| 5434 | Postgres | TCP | Active | Main DB host mapping (`5432` in container) |
 | 5434 | Postgres (test) | TCP | Active | Test replica |
 | 5672 | RabbitMQ | AMQP | Active | Message queue |
 | 6379 | Redis/Valkey | TCP | Active | Cache + pub/sub |

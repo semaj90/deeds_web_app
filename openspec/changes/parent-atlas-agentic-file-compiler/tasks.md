@@ -1,0 +1,23 @@
+# Tasks
+
+- [x] AFC-00 Audit current owners; preserve existing context/action/hypergraph contracts.
+- [x] AFC-01 Add QueryClassificationV1 and FileMutationIntentV1 contracts.
+- [x] AFC-02 Add CandidateFeatureRowV1 and ExactPromotionV1 contracts.
+- [x] AFC-03 Add ContextManifestV1 contract view without a new table.
+- [x] AFC-04 Add PromptPlanV1 and PrefillArtifactV1 contracts.
+- [x] AFC-05 Add DagNodePlanV1 and AtlasWorkflowSpecV1 contracts.
+- [x] AFC-06 Add WorkflowActionEventV1 persistence envelope.
+- [x] AFC-07 Add MastraWorkflowGraphV1 runtime-dialect contract.
+- [x] AFC-08 Add FileMutationPlan/ValidationObservation/Receipt/Failure contracts.
+- [x] AFC-09 Add GraphProjectionRequestV1 and SearchRuntimePolicyV1 contracts.
+- [ ] AFC-10 Wire query classifier to the live request front door.
+- [ ] AFC-11 Wire exact promotion to the live retrieval owner.
+- [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.
+- [ ] AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer.
+- [ ] AFC-14 Install/verify a real Mastra runtime before replacing the current passthrough shim.
+- [ ] AFC-15 Prove suspend/resume restart parity using Mastra snapshots.
+- [ ] AFC-16 Wire bounded filesystem mutation behind authorization and human-approval policy.
+- [ ] AFC-17 Prove Tree-sitter/typecheck/test validation barrier.
+- [ ] AFC-18 Wire incremental AST/semantic_768/graph refresh and cache invalidation.
+- [ ] AFC-19 Run CPU/GPU semantic executor parity and confirm one-vote-per-lane behavior.
+- [ ] AFC-20 Retire the fake Mastra `defineWorkflow` shim only after AFC-14/AFC-15 pass.

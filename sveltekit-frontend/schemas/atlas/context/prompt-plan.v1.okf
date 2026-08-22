@@ -1,0 +1,28 @@
+schema_id: atlas.prompt-plan
+schema_version: 1
+schema_kind: prompt_plan
+status: ACTIVE
+
+description: >
+  Deterministic prompt assembly plan. Stores references and ordering rather than
+  a giant mutable prompt string.
+
+fields:
+  schema: { type: literal, value: atlas.prompt-plan.v1 }
+  promptPlanId: { type: string, required: true }
+  contextManifestId: { type: string, required: true }
+  systemInstructionRevision: { type: string, required: true }
+  toolSchemaRevision: { type: string, required: true }
+  blocks:
+    type: array
+    items:
+      kind:
+        type: enum
+        values: [SYSTEM, TASK, SCHEMA, EVIDENCE, EXAMPLE, CONSTRAINT]
+      ref: { type: string, required: true }
+  estimatedTokens: { type: integer, minimum: 0 }
+  checksum: { type: string, required: true }
+
+validation_rules:
+  - block ordering participates in checksum identity
+  - evidence content stays behind revision-qualified refs

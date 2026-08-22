@@ -1,0 +1,28 @@
+schema_id: atlas.file-mutation-receipt
+schema_version: 1
+schema_kind: file_mutation_receipt
+status: ACTIVE
+
+description: >
+  Canonical proof of the repository side effect and deterministic validations.
+
+fields:
+  schema: { type: literal, value: atlas.file-mutation-receipt.v1 }
+  mutationId: { type: string, required: true }
+  workflowId: { type: string, required: true }
+  actionId: { type: string, required: true }
+  targetPath: { type: string, required: true }
+  beforeChecksum: { type: string, nullable: true }
+  afterChecksum: { type: string, nullable: true }
+  sourceRevisionBefore: { type: string, nullable: true }
+  sourceRevisionAfter: { type: string, nullable: true }
+  validations: { type: validation_observation_array, default: [] }
+  status:
+    type: enum
+    values: [PROVEN, FAILED, ROLLED_BACK]
+  evidenceRefs: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+validation_rules:
+  - PROVEN requires every required validator to be PASS or explicitly policy-accepted WARN

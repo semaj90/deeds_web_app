@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "atlas.graphify-source-inventory-plan.v1",
+  "status": "DRY_RUN_PROVEN",
+  "mode": "DRY_RUN",
+  "readOnly": true,
+  "canonicalWriteAttempted": false,
+  "durableOwnerBound": false,
+  "workspaceRevision": "sha256:bb7f99818453bd748d59727aa11ebd19fa778b051a699f77ca866173f70b9222",
+  "workspaceManifestDigest": "bb7f99818453bd748d59727aa11ebd19fa778b051a699f77ca866173f70b9222",
+  "workspaceManifestSourceCount": 1,
+  "workspaceManifestComplete": false,
+  "manifestScope": "BOUNDED_SOURCE",
+  "manifestReceipt": {
+    "schema": "atlas.graphify-workspace-manifest-receipt.v1",
+    "workspaceManifestRevision": "sha256:bb7f99818453bd748d59727aa11ebd19fa778b051a699f77ca866173f70b9222",
+    "workspaceManifestDigest": "bb7f99818453bd748d59727aa11ebd19fa778b051a699f77ca866173f70b9222",
+    "workspaceManifestSourceCount": 1,
+    "persistedSourceCount": 1,
+    "persistedExactRevisionCount": 1,
+    "persistedExactDigestCount": 1,
+    "parserContractVersion": "graphify-source-inventory-v1",
+    "writerRevision": "atlas.graphify-source-inventory-writer.v1",
+    "complete": true,
+    "readOnlyObservation": true,
+    "canonicalAuthority": false,
+    "checksum": "7517393ce42dabd4a0e1502f0af32b7523ceba5dfb1359a5aa7bc58bbab906d4"
+  },
+  "sourceCount": 1,
+  "records": [
+    {
+      "sourceRef": "parent-atlas-workstation-todo.md",
+      "sourceRevision": "sha256:4d36fa38e16429b1fb4afb28a16788e91d314788acb4fd052531821941e6535c",
+      "contentHash": "4d36fa38e16429b1fb4afb28a16788e91d314788acb4fd052531821941e6535c",
+      "byteLength": 136715,
+      "gitBlobOid": "3cb9e0df21a64be57b1136104c0972975b97e028",
+      "sourceRevisionAuthority": "content_hash",
+      "producerRevision": "atlas.graphify-source-inventory-writer.v1",
+      "workspaceRevision": "sha256:bb7f99818453bd748d59727aa11ebd19fa778b051a699f77ca866173f70b9222"
+    }
+  ],
+  "authority": {
+    "sourceRevisionAuthorityColumn": "content_hash",
+    "legacySourceRevisionColumn": "source_revision",
+    "preservesLegacySourceRevisionSemantics": true
+  },
+  "nextGate": "SINGLE_ROW_PERSISTENCE_READBACK_CANARY"
+}

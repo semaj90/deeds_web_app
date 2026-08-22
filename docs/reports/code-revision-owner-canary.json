@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "atlas.code-revision-owner-canary.v1",
+  "status": "REVISION_OWNER_NOT_READY",
+  "sourceRevisionStorageSemantics": "UNKNOWN",
+  "sourceRevisionAuthorityField": "NONE",
+  "readOnly": true,
+  "canonicalWriteAttempted": false,
+  "durableOwnerBound": false,
+  "fanoutMayConsumeAsCanonical": false,
+  "tableExists": false,
+  "requiredColumns": [
+    "workspace_revision",
+    "source_ref",
+    "source_revision",
+    "content_hash",
+    "byte_length",
+    "source_revision_authority",
+    "producer_revision"
+  ],
+  "requiredColumnsPresent": false,
+  "schemaReconciliationRequired": false,
+  "sampleLimit": 10,
+  "sampleCount": 0,
+  "currentGitHead": "ab55a250ef1028db2a3bdece7c6b04d2dd9fa29d",
+  "samples": [],
+  "nextGate": "CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK"
+}

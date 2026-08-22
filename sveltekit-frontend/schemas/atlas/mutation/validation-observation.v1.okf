@@ -1,0 +1,18 @@
+schema_id: atlas.validation-observation
+schema_version: 1
+schema_kind: validation_observation
+status: ACTIVE
+
+fields:
+  schema: { type: literal, value: atlas.validation-observation.v1 }
+  validator: { type: string, required: true }
+  status:
+    type: enum
+    values: [PASS, FAIL, WARN]
+  command: { type: string, nullable: true }
+  exitCode: { type: integer, nullable: true }
+  stdoutDigest: { type: string, nullable: true }
+  stderrDigest: { type: string, nullable: true }
+  evidenceRefs: { type: string_array, default: [] }
+  durationMs: { type: number, minimum: 0 }
+  producerRevision: { type: string, required: true }

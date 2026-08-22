@@ -1,0 +1,28 @@
+schema_id: atlas.graph-projection-request
+schema_version: 1
+schema_kind: graph_projection_request
+status: ACTIVE
+
+description: >
+  Bounded projection request from canonical n-ary/hyperedge truth into an
+  ordinary graph suitable for Neo4j navigation or cuGraph algorithms.
+
+fields:
+  schema: { type: literal, value: atlas.graph-projection-request.v1 }
+  requestId: { type: string, required: true }
+  graphRevision: { type: string, required: true }
+  seedCanonicalIds: { type: string_array, required: true }
+  relationTypes: { type: string_array, default: [] }
+  roleFilters: { type: string_array, default: [] }
+  maxHops: { type: integer, minimum: 0 }
+  maxNodes: { type: integer, minimum: 1 }
+  maxEdges: { type: integer, minimum: 0 }
+  maxHyperedges: { type: integer, minimum: 0 }
+  algorithm:
+    type: enum
+    values: [PAGERANK, PPR, BFS, SSSP, LEIDEN, HITS]
+  evidenceRefs: { type: string_array, default: [] }
+
+invariants:
+  - n-ary truth is never replaced by the projected graph
+  - algorithm executor choice is runtime policy, not canonical graph meaning

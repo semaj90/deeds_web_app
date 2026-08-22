@@ -17,6 +17,8 @@ import numpy as np
 from .determinism import configure_torch_determinism
 from .rapids_matrix import deterministic_farthest_first_ordinals
 
+DEFAULT_PREDICTION_BATCH_SIZE = 65536
+
 
 DEFAULT_PREDICTION_BATCH_SIZE = 65536
 
@@ -57,6 +59,7 @@ def _checksum(value: np.ndarray) -> str:
 def resolve_prediction_batch_size(value: int) -> int:
     """Resolve the experiment-level ``0 = auto`` convention to a cuVS batch size."""
 
+    """Resolve the experiment-level ``0 = auto`` convention to a bounded batch."""
     if value < 0:
         raise ValueError("prediction_batch_size must be >=0")
     return DEFAULT_PREDICTION_BATCH_SIZE if value == 0 else value
@@ -114,13 +117,8 @@ def run_cuvs_soft_kmeans(
     init_ordinals = deterministic_farthest_first_ordinals(source, n_clusters)
     initial = cp.asarray(source[np.asarray(init_ordinals, dtype=np.int64)], dtype=cp.float32)
     params = kmeans.KMeansParams(
-        metric="sqeuclidean",
-        n_clusters=n_clusters,
-        init_method="Array",
-        max_iter=max_iter,
-        tol=tol,
-        n_init=1,
-        streaming_batch_size=streaming_batch_size,
+        metric="sqeuclidean", n_clusters=n_clusters, init_method="Array",
+        max_iter=max_iter, tol=tol, n_init=1, streaming_batch_size=streaming_batch_size,
     )
 
     if streaming_batch_size > 0:
@@ -163,26 +161,14 @@ def run_cuvs_soft_kmeans(
 
     receipt = CuvsSoftKMeansReceipt(
         schema="atlas.cuvs-soft-kmeans-receipt.v2",
-        rows=int(source.shape[0]),
-        dimensions=int(source.shape[1]),
-        n_clusters=n_clusters,
-        metric="sqeuclidean",
-        input_normalization=input_normalization,
-        semantic_mode=semantic_mode,
-        pairwise_metric="euclidean",
-        pairwise_postprocess="square_distance",
-        temperature=float(temperature),
-        initialization_ordinals=init_ordinals,
-        fit_input_residency=fit_input_residency,
-        streaming_batch_size=int(streaming_batch_size),
-        prediction_batch_size=int(prediction_batch_size),
-        fit_iterations=int(n_iter),
-        inertia=float(inertia),
-        labels_checksum=_checksum(labels_host),
-        centroids_checksum=_checksum(centroids_host),
-        probabilities_checksum=_checksum(probabilities_host),
+        rows=int(source.shape[0]), dimensions=int(source.shape[1]), n_clusters=n_clusters,
+        metric="sqeuclidean", input_normalization=input_normalization, semantic_mode=semantic_mode,
+        pairwise_metric="euclidean", pairwise_postprocess="square_distance", temperature=float(temperature),
+        initialization_ordinals=init_ordinals, fit_input_residency=fit_input_residency,
+        streaming_batch_size=int(streaming_batch_size), prediction_batch_size=int(prediction_batch_size),
+        fit_iterations=int(n_iter), inertia=float(inertia), labels_checksum=_checksum(labels_host),
+        centroids_checksum=_checksum(centroids_host), probabilities_checksum=_checksum(probabilities_host),
         max_probability_sum_error=float(np.max(np.abs(sums - 1.0))),
-        mean_assignment_entropy=float(np.mean(entropy_host, dtype=np.float64)),
-        canonical_authority=False,
+        mean_assignment_entropy=float(np.mean(entropy_host, dtype=np.float64)), canonical_authority=False,
     )
     return labels_host, centroids_host, probabilities_host, receipt
