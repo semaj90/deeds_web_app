@@ -123,6 +123,13 @@ function expectedDtype(kind: z.infer<typeof candidateFeatureGpuResidentBufferKin
   }
 }
 
+function withLeaseChecksum<T extends Omit<CandidateFeatureGpuResidentLeaseV1, 'leaseChecksum'>>(value: T): CandidateFeatureGpuResidentLeaseV1 {
+  return candidateFeatureGpuResidentLeaseV1Schema.parse({
+    ...value,
+    leaseChecksum: sha256(JSON.stringify(value)),
+  });
+}
+
 export function verifyCandidateFeatureGpuResidentLease(input: {
   pack: z.input<typeof candidateFeatureGpuPackV1Schema>;
   lease: unknown;
@@ -216,11 +223,11 @@ export function buildCandidateFeatureGpuResidentLease(input: {
     };
   });
 
-  const withoutChecksum = {
+  return withLeaseChecksum({
     schema: CANDIDATE_FEATURE_GPU_RESIDENT_LEASE_SCHEMA,
     leaseId: input.leaseId,
     leaseEpoch: input.leaseEpoch,
-    state: 'ACTIVE' as const,
+    state: 'ACTIVE',
     deviceId: input.deviceId,
     candidateSnapshotRevision: pack.candidateSnapshotRevision,
     ordinalMapChecksum: pack.ordinalMapChecksum,
@@ -234,14 +241,30 @@ export function buildCandidateFeatureGpuResidentLease(input: {
     expiresAt: input.expiresAt,
     releasedAt: null,
     buffers,
-    identityAuthority: false as const,
-    canonicalOwnerChanged: false as const,
-    rawPointerExposed: false as const,
-    cudaIpcExported: false as const,
+    identityAuthority: false,
+    canonicalOwnerChanged: false,
+    rawPointerExposed: false,
+    cudaIpcExported: false,
     producerRevision: CANDIDATE_FEATURE_GPU_RESIDENT_LEASE_PRODUCER,
-  };
-  return candidateFeatureGpuResidentLeaseV1Schema.parse({
-    ...withoutChecksum,
-    leaseChecksum: sha256(JSON.stringify(withoutChecksum)),
+  });
+}
+
+export function releaseCandidateFeatureGpuResidentLease(input: {
+  lease: unknown;
+  releasedAt: string;
+}): CandidateFeatureGpuResidentLeaseV1 {
+  const lease = candidateFeatureGpuResidentLeaseV1Schema.parse(input.lease);
+  if (lease.state !== 'ACTIVE') {
+    throw new Error(`FEATURE_GPU_LEASE_RELEASE_REQUIRES_ACTIVE:${lease.state}`);
+  }
+  const releasedAt = instant.parse(input.releasedAt);
+  if (Date.parse(releasedAt) < Date.parse(lease.createdAt)) {
+    throw new Error('FEATURE_GPU_LEASE_RELEASE_BEFORE_CREATE');
+  }
+  const { leaseChecksum: _oldChecksum, ...payload } = lease;
+  return withLeaseChecksum({
+    ...payload,
+    state: 'RELEASED',
+    releasedAt,
   });
 }
