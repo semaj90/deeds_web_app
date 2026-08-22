@@ -1,16 +1,26 @@
 -- Parent Atlas Graphify revision-authority v2 extension.
 -- Manual / intentionally unapplied migration.
 --
+-- SAFETY CONTRACT:
+--   * additive CREATE TABLE / ADD COLUMN / ADD CONSTRAINT / CREATE INDEX only;
+--   * no DROP TABLE / DROP COLUMN / DROP CONSTRAINT / DROP INDEX;
+--   * no DELETE / TRUNCATE / UPDATE / historical backfill;
+--   * foreign keys use RESTRICT so deleting a Graphify run cannot cascade-delete
+--     source inventory rows created by this migration.
+--
 -- Historical provenance remains intact:
 --   graphify_runs.repository_revision = Git/base commit provenance
 --   graphify_files.source_revision    = legacy Git provenance
 --   graphify_files.content_hash       = exact-byte SHA-256 digest
 --
 -- Canonical Parent Atlas logical revisions are additive:
---   graphify_runs.workspace_revision    = sha256:<sorted exact-byte source manifest>
---   graphify_files.code_source_revision = sha256:<content_hash>
+--   graphify_runs.workspace_revision     = sha256:<sorted exact-byte source manifest>
+--   graphify_runs.source_manifest_digest = exact manifest digest
+--   graphify_files.code_source_revision  = sha256:<exact source bytes>
 --
--- No historical backfill, UPDATE, or DELETE is performed.
+-- Historical uniqueness constraints are intentionally preserved. If an older
+-- deployment has a constraint whose semantics conflict with the v2 writer, that
+-- deployment must fail closed and be reconciled in a separate reviewed migration.
 
 BEGIN;
 
@@ -40,8 +50,8 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
   parser_version text,
   parse_status text NOT NULL DEFAULT 'UNPROCESSED',
   parse_error jsonb,
-  first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE,
-  last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE
+  first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT,
+  last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT
 );
 
 ALTER TABLE public.graphify_runs
@@ -94,14 +104,8 @@ BEGIN
   END IF;
 END $$;
 
--- Historical uniqueness on Git provenance cannot represent dirty/untracked
--- byte states. Keep the columns but move canonical v2 uniqueness to logical
--- Parent Atlas revisions.
-ALTER TABLE public.graphify_runs
-  DROP CONSTRAINT IF EXISTS graphify_runs_workspace_id_repository_revision_parser_contract_version_key;
-ALTER TABLE public.graphify_files
-  DROP CONSTRAINT IF EXISTS graphify_files_workspace_id_source_ref_source_revision_key;
-
+-- Canonical v2 uniqueness is additive. Legacy constraints, when present, are
+-- retained rather than weakened or dropped by this migration.
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
   ON public.graphify_runs (workspace_id, workspace_revision, parser_contract_version)
   WHERE workspace_revision IS NOT NULL;
