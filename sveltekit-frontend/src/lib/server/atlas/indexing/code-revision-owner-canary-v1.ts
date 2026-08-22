@@ -23,8 +23,14 @@ export const codeRevisionStorageObservationV1Schema = z.object({
   persistedMatchingRows: z.number().int().nonnegative(),
   sourceRevisionStorageSemantics: z.enum([
     'CODE_SOURCE_REVISION_V1',
+    'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
     'LEGACY_GIT_SHA',
     'UNKNOWN',
+  ]),
+  sourceRevisionAuthorityField: z.enum([
+    'SOURCE_REVISION',
+    'CONTENT_HASH',
+    'NONE',
   ]),
   notes: z.array(z.string()),
 }).strict();
@@ -69,9 +75,24 @@ function sha256(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
+function sourceRevisionStorageReady(storage: CodeRevisionStorageObservationV1): boolean {
+  if (storage.sourceRevisionStorageSemantics === 'CODE_SOURCE_REVISION_V1') {
+    return storage.sourceRevisionAuthorityField === 'SOURCE_REVISION';
+  }
+  if (storage.sourceRevisionStorageSemantics === 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1') {
+    return storage.sourceRevisionAuthorityField === 'CONTENT_HASH';
+  }
+  return false;
+}
+
 /**
  * Classifies whether the new origin semantics may be promoted to durable
  * revision authority. This classifier never writes or backfills a store.
+ *
+ * Historical Graphify storage is allowed to preserve source_revision as a Git
+ * coordinate when content_hash already carries the exact-byte SHA-256 digest.
+ * In that compatibility layout, CodeSourceRevisionV1 is derived from
+ * content_hash; the historical source_revision column is never reinterpreted.
  */
 export function classifyCodeRevisionOwnerCanaryV1(input: {
   authority: CodeRevisionAuthorityV1;
@@ -86,11 +107,15 @@ export function classifyCodeRevisionOwnerCanaryV1(input: {
       || !storage.requiredRunColumnsPresent || !storage.requiredFileColumnsPresent) {
     blockers.push('GRAPHIFY_LINEAGE_SCHEMA_NOT_READY');
   }
+
   if (storage.sourceRevisionStorageSemantics === 'LEGACY_GIT_SHA') {
-    blockers.push('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA');
+    blockers.push('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA_WITHOUT_CONTENT_HASH_AUTHORITY');
   } else if (storage.sourceRevisionStorageSemantics === 'UNKNOWN') {
     blockers.push('GRAPHIFY_SOURCE_REVISION_STORAGE_SEMANTICS_UNPROVEN');
+  } else if (!sourceRevisionStorageReady(storage)) {
+    blockers.push('GRAPHIFY_SOURCE_REVISION_AUTHORITY_FIELD_MISMATCH');
   }
+
   if (!storage.productionWriterPresent || !storage.productionWriterPath) {
     blockers.push('GRAPHIFY_REVISION_PRODUCTION_WRITER_NOT_BOUND');
   } else {
@@ -102,7 +127,7 @@ export function classifyCodeRevisionOwnerCanaryV1(input: {
     && storage.graphifyFilesPresent
     && storage.requiredRunColumnsPresent
     && storage.requiredFileColumnsPresent;
-  const semanticsReady = storage.sourceRevisionStorageSemantics === 'CODE_SOURCE_REVISION_V1';
+  const semanticsReady = sourceRevisionStorageReady(storage);
   const writerReady = storage.productionWriterPresent
     && Boolean(storage.productionWriterPath)
     && storage.productionWriterCreatesWorkspaceRevision
