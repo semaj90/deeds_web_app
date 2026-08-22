@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
 
 ALTER TABLE public.graphify_runs
   ADD COLUMN IF NOT EXISTS workspace_revision text,
-  ADD COLUMN IF NOT EXISTS source_manifest_digest text;
+  ADD COLUMN IF NOT EXISTS source_manifest_digest text,
+  ADD COLUMN IF NOT EXISTS source_manifest_source_count integer;
 
 ALTER TABLE public.graphify_files
   ADD COLUMN IF NOT EXISTS code_source_revision text;
@@ -94,6 +95,16 @@ BEGIN
     ALTER TABLE public.graphify_files
       ADD CONSTRAINT graphify_files_code_source_revision_sha256_v2
       CHECK (code_source_revision IS NULL OR code_source_revision ~ '^sha256:[a-f0-9]{64}$') NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.graphify_runs'::regclass
+      AND conname = 'graphify_runs_source_manifest_source_count_v2'
+  ) THEN
+    ALTER TABLE public.graphify_runs
+      ADD CONSTRAINT graphify_runs_source_manifest_source_count_v2
+      CHECK (source_manifest_source_count IS NULL OR source_manifest_source_count > 0) NOT VALID;
   END IF;
 
   IF NOT EXISTS (
@@ -139,6 +150,8 @@ COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
   'WorkspaceRevisionRecordV1 identity: sha256 of sorted exact-byte source manifest.';
 COMMENT ON COLUMN public.graphify_runs.source_manifest_digest IS
   'Unprefixed SHA-256 digest underlying workspace_revision.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_source_count IS
+  'Exact sourceCount from WorkspaceRevisionRecordV1. A graph consumer must prove this many exact source bindings before consuming the run as complete.';
 COMMENT ON COLUMN public.graphify_files.source_revision IS
   'Historical Git/file provenance retained for compatibility.';
 COMMENT ON COLUMN public.graphify_files.content_hash IS
