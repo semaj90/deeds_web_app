@@ -7,7 +7,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
 import { materializeCandidateFeatureSnapshot } from './candidate-feature-snapshot-v1.js';
 import { materializeCandidateFeatureColumnar } from './candidate-feature-columnar-v1.js';
-import { serializeCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/write-candidate-feature-arrow.mjs';
+import {
+  assertCandidateFeatureArrowPhysicalSchema,
+  buildCandidateFeatureArrowTable,
+  serializeCandidateFeatureArrowFile,
+} from '../../../../../../scripts/atlas/write-candidate-feature-arrow.mjs';
 import { readCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/read-candidate-feature-arrow.mjs';
 
 const tmpDirs: string[] = [];
@@ -132,6 +136,33 @@ async function writeFixture() {
 }
 
 describe('candidate feature Arrow file readback', () => {
+  it('uses explicit plain Utf8 identity columns and byte-identical repeated IPC serialization', () => {
+    const columnar = fixture();
+    const table = buildCandidateFeatureArrowTable(columnar);
+    const physicalSchema = assertCandidateFeatureArrowPhysicalSchema(table);
+    const first = serializeCandidateFeatureArrowFile(columnar, 'features.arrow');
+    const second = serializeCandidateFeatureArrowFile(columnar, 'features.arrow');
+
+    expect(physicalSchema.dictionaryEncodingUsed).toBe(false);
+    expect(physicalSchema.stringEncoding).toBe('UTF8_PLAIN');
+    for (const columnName of [
+      'canonical_id',
+      'packet_key',
+      'tree_node_id',
+      'symbol_version_id',
+      'source_revision',
+      'graph_revision',
+      'semantic_revision',
+    ]) {
+      expect(physicalSchema.fields[columnName]).toBe('Utf8');
+      expect(physicalSchema.fields[columnName]).not.toMatch(/Dictionary/i);
+    }
+
+    expect(Buffer.from(first.bytes).equals(Buffer.from(second.bytes))).toBe(true);
+    expect(first.receipt.checksum).toBe(second.receipt.checksum);
+    expect(first.artifact.artifactId).toBe(second.artifact.artifactId);
+  });
+
   it('verifies ArtifactAddress lineage, dense ordinals, identity columns, and selected feature cells from disk', async () => {
     const { columnar, serialized } = await writeFixture();
     const readback = await readCandidateFeatureArrowFile({
