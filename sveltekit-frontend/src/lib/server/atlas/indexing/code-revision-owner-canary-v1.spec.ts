@@ -29,6 +29,7 @@ function storage(overrides: Partial<CodeRevisionStorageObservationV1> = {}): Cod
     productionWriterCreatesSourceRevision: false,
     persistedMatchingRows: 0,
     sourceRevisionStorageSemantics: 'CODE_SOURCE_REVISION_V1',
+    sourceRevisionAuthorityField: 'SOURCE_REVISION',
     notes: [],
     ...overrides,
   };
@@ -60,15 +61,46 @@ describe('CodeRevisionOwnerCanaryV1', () => {
     expect(receipt.fanoutMayConsumeAsCanonical).toBe(false);
   });
 
-  it('blocks legacy Git-SHA source_revision semantics rather than silently redefining them', () => {
+  it('accepts legacy Git source_revision only when content_hash is the exact-byte authority field', () => {
     const receipt = classifyCodeRevisionOwnerCanaryV1({
       authority: authority(),
-      storage: storage({ sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA' }),
+      storage: storage({
+        sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
+        sourceRevisionAuthorityField: 'CONTENT_HASH',
+      }),
+      producerRevision: 'test:revision-owner-canary:v1',
+    });
+    expect(receipt.status).toBe('REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND');
+    expect(receipt.blockers).not.toContain('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA_WITHOUT_CONTENT_HASH_AUTHORITY');
+    expect(receipt.blockers).toContain('GRAPHIFY_REVISION_PRODUCTION_WRITER_NOT_BOUND');
+    expect(receipt.fanoutMayConsumeAsCanonical).toBe(false);
+  });
+
+  it('blocks legacy Git-SHA source_revision when no exact-byte content authority is proven', () => {
+    const receipt = classifyCodeRevisionOwnerCanaryV1({
+      authority: authority(),
+      storage: storage({
+        sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA',
+        sourceRevisionAuthorityField: 'NONE',
+      }),
       producerRevision: 'test:revision-owner-canary:v1',
     });
     expect(receipt.status).toBe('BLOCKED_STORAGE_SEMANTICS_MISMATCH');
-    expect(receipt.blockers).toContain('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA');
+    expect(receipt.blockers).toContain('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA_WITHOUT_CONTENT_HASH_AUTHORITY');
     expect(receipt.fanoutMayConsumeAsCanonical).toBe(false);
+  });
+
+  it('blocks a mismatched authority-field declaration', () => {
+    const receipt = classifyCodeRevisionOwnerCanaryV1({
+      authority: authority(),
+      storage: storage({
+        sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
+        sourceRevisionAuthorityField: 'SOURCE_REVISION',
+      }),
+      producerRevision: 'test:revision-owner-canary:v1',
+    });
+    expect(receipt.status).toBe('BLOCKED_STORAGE_SEMANTICS_MISMATCH');
+    expect(receipt.blockers).toContain('GRAPHIFY_SOURCE_REVISION_AUTHORITY_FIELD_MISMATCH');
   });
 
   it('becomes ready for a controlled canary only after an origin writer is bound', () => {
@@ -93,6 +125,8 @@ describe('CodeRevisionOwnerCanaryV1', () => {
     const receipt = classifyCodeRevisionOwnerCanaryV1({
       authority: authority(),
       storage: storage({
+        sourceRevisionStorageSemantics: 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
+        sourceRevisionAuthorityField: 'CONTENT_HASH',
         productionWriterPath: 'sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-writer-v1.ts',
         productionWriterPresent: true,
         productionWriterCreatesWorkspaceRevision: true,
