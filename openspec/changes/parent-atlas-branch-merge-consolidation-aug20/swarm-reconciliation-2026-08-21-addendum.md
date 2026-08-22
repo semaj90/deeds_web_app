@@ -532,6 +532,87 @@ the vitest `include` glob is a separate, deliberate config change).
 Verified all 11 of its string assertions manually via `grep -F` against
 the merged `.mts` file instead — all pass.
 
+## Update: `agent/revision-graph-fanout-convergence-v2-20260822` merged — largest/riskiest merge this session
+
+Merged → commit `d7e2b63fbe`, with a manual SQL reconciliation (not a
+side-pick) and a flagged architecture-level field-convention mismatch.
+Adds `GraphifyWorkspaceManifestCompletenessV1` (proves a persisted
+`graphify_runs`/`graphify_files` pair covers every
+`WorkspaceRevisionRecordV1` source binding before a graph consumer may
+treat a run as complete) and `GraphSnapshotSourceRevisionBindingV1`
+(per-node source-ref/revision coverage receipt). Converts
+`materialize-full-corpus-graph-snapshot.mts` into a documented thin
+compatibility entrypoint delegating to a new revision-qualified
+`materialize-full-corpus-graph-snapshot-v3.mts` (keeps the operator CLI
+command stable; verified 19/19 assertions from its own spec manually,
+since it hits the same `scripts/**/*.spec.ts` vitest-include gap noted
+above). Substantially reworks `buildQdrantSyncPayload` in
+`qdrant-sync-payload.ts`.
+
+**SQL reconciliation (not a side-pick, an actual merge)**: this
+branch's own copy of `20260822_graphify_revision_authority_v2.sql`
+forked from the *same* stale pre-hardening state as the earlier
+`graphify-revision-owner-converged` branch (`ON DELETE CASCADE`
+instead of `RESTRICT`, missing safety-contract header, stale `DROP
+CONSTRAINT` lines) — but this time the branch also added a genuinely
+new, needed column: `graphify_runs.source_manifest_source_count`
+(consumed by the new completeness checker). Instead of picking one
+side wholesale, manually reconciled: kept main's hardened base intact
+and hand-added only the new column + its `CHECK` constraint + comment
+on top. This is the third time this exact migration file has
+independently regressed to the CASCADE/no-safety-contract state across
+different swarm branches — **worth an operator note**: whatever caused
+the swarm to keep forking from that stale commit should be investigated
+so a fourth branch doesn't repeat it.
+
+**Real architecture-level finding, flagged not resolved**: the new
+`buildQdrantSyncPayload` puts the canonical workspace-revision proof
+directly in `payload.workspace_revision` (content-addressed sha256)
+and treats `payload.repository_revision` as separate, optional
+Git-only provenance — confirmed via its own spec fixtures. This
+*disagrees* with the already-merged `graph-qdrant-fanout-alignment.ts`
+(this session, commit `20d0e4efe7`), which checks
+`payload.repository_revision === input.workspaceRevision` — i.e. it
+expects the canonical proof to live in `repository_revision`, not
+`workspace_revision`. The two files don't import each other and share
+no test, so nothing currently red — but a real Qdrant payload built by
+the new `buildQdrantSyncPayload` would fail
+`evaluateGraphQdrantFanoutAlignment`'s alignment check today. Needs an
+operator decision on which field convention is canonical before anyone
+wires these two together.
+
+**Real bug found and fixed**: the branch's own
+`qdrant-sync-payload.spec.ts` asserted `'semantic_768'` as the expected
+canonical representation ID, but this repo's frozen canonical
+representation is `'semantic_512'`
+(`ATLAS_CANONICAL_SEMANTIC_REPRESENTATION` in
+`qdrant-semantic-projection.ts` — also independently recorded in this
+session's own memory notes as a frozen decision). The real
+implementation already imports and enforces the correct constant; only
+the branch's own test fixtures were stale. Fixed by replacing all 3
+`semantic_768` occurrences with `semantic_512`. Commit `0340688923`.
+8/8 tests pass after the fix.
+
+**Live-edit conflict, resolved by taking the reviewed merge**: the
+local-sync stash/pop hit a real conflict on
+`materialize-graphify-source-inventory.mts` — the concurrent session's
+uncommitted WIP was rewriting this exact file with a substantially
+different, incomplete (still-in-progress) implementation (its own
+git-ls-files-based source enumeration, its own plan schema shape).
+Rather than hand-merging two divergent, partially-finished
+implementations of the same script, kept the just-merged, fully
+reviewed and tested branch version and left the concurrent session's
+WIP untouched in its stash entry (`stash@{0}`,
+"concurrent-wip-before-fanout-v2-sync" — **not dropped, fully
+recoverable** via `git stash show -p stash@{0}` if that session wants
+to reconcile their approach against the new base).
+
+**Total real bugs found and fixed this session: now 5** (Zod
+`.omit()`-on-refined-schema, non-deterministic lease checksum,
+hardcoded placeholder test checksum, stale `semantic_768` test
+fixture — plus the ongoing SQL-migration-hardening pattern, which isn't
+a "bug" per se but the same root cause recurring three times).
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
