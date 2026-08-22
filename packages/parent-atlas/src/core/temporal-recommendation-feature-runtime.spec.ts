@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   temporalActionChecksum,
   type NextActionRecommendationV1,
-  type RecommendationOutcomeReceiptV1,
 } from './temporal-action-ledger.js';
+import type { RecommendationOutcomeReceiptV1 } from './temporal-recommendation-outcome-runtime.js';
 import { compileActionFeatureRowWithRecommendationHistory } from './temporal-recommendation-feature-runtime.js';
 
 const K = temporalActionChecksum('rg-key');
@@ -79,7 +79,6 @@ describe('recommendation-conditioned action features', () => {
       policy_revision: 'recommend-policy:v1',
     });
 
-    // One prior observation at 0.8 plus one failure -> 0.4.
     expect(row.downstream_utility).toBeCloseTo(0.4);
     expect(row.semantic_affinity).toBe(0.8);
     expect(row.structural_affinity).toBe(0.9);
@@ -116,7 +115,6 @@ describe('recommendation-conditioned action features', () => {
       policy_revision: 'recommend-policy:v1',
     });
 
-    // Prior 0.8 + one success across two observations -> 1.8 / 3.
     expect(row.downstream_utility).toBeCloseTo(0.6);
   });
 });
