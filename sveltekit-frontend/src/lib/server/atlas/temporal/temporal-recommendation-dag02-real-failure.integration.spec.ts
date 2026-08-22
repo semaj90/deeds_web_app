@@ -4,7 +4,7 @@
 //
 // This file is intentionally NOT enabled by RUN_DB_INTEGRATION alone. It
 // appends and deletes throwaway temporal rows, so it requires an explicitly
-// disposable PostgreSQL target and rejects the workstation's known
+// named disposable PostgreSQL target and rejects the workstation's known
 // 127.0.0.1:5434 / localhost:5434 proxy before importing the DB client.
 
 import { existsSync } from 'node:fs';
@@ -37,9 +37,11 @@ for (const file of ['.env', '.env.local']) {
 
 const proofRequested = process.env.RUN_DB_INTEGRATION === '1'
   && process.env.ATLAS_TEMPORAL_DISPOSABLE_DB_PROOF === '1';
+const expectedDisposableDatabaseName = process.env.ATLAS_TEMPORAL_DISPOSABLE_DB_NAME;
 const dbSafety = classifyTemporalProofDatabaseSafetyV1({
   databaseUrl: process.env.DATABASE_URL,
   explicitDisposableConfirmation: process.env.ATLAS_TEMPORAL_DISPOSABLE_DB_PROOF === '1',
+  expectedDatabaseName: expectedDisposableDatabaseName,
 });
 
 if (proofRequested && !dbSafety.allowed) {
@@ -56,6 +58,16 @@ let pool: Awaited<ReturnType<typeof loadPool>> | null = null;
 async function loadPool() {
   const module = await import('$lib/server/db/client.js');
   return module.pool;
+}
+
+async function verifyLiveDatabaseIdentity(db: Awaited<ReturnType<typeof loadPool>>) {
+  const expected = String(expectedDisposableDatabaseName ?? '').trim().toLowerCase();
+  if (!expected || !dbSafety.allowed) throw new Error('TEMPORAL_PROOF_DB_IDENTITY_NOT_AUTHORIZED');
+  const result = await db.query<{ database_name: string }>('SELECT current_database() AS database_name');
+  const observed = String(result.rows[0]?.database_name ?? '').trim().toLowerCase();
+  if (observed !== expected || observed !== dbSafety.databaseName) {
+    throw new Error(`TEMPORAL_PROOF_DB_RUNTIME_IDENTITY_MISMATCH:expected=${expected}:observed=${observed || 'unknown'}`);
+  }
 }
 
 function noopApplicability() {
@@ -202,6 +214,7 @@ afterAll(async () => {
 describeIf('ACT-REC-OUT-DAG-02 real selected-edge failure proof', () => {
   it('selects K2, dispatches K2 exactly once to a real non-zero terminal exit, and persists observed downstream failure without fabricating ActionOutcomeV1', async () => {
     pool = await loadPool();
+    await verifyLiveDatabaseIdentity(pool);
 
     const k1Call = { tool: 'atlas_lookup', args: { query: `${RUN_ID}:k1`, limit: 1 } };
     const seeded = await seedFailedK1(pool, k1Call);
