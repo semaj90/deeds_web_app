@@ -12,7 +12,7 @@ const validPacket = {
   workspaceCacheRevision: 41,
   repositoryRevision: 'c'.repeat(40),
   sourceRevision,
-  representationId: 'semantic_768',
+  representationId: 'semantic_512',
   representationRevision: 3,
 };
 
@@ -26,7 +26,7 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
       workspace_cache_revision: 41,
       repository_revision: 'c'.repeat(40),
       source_revision: sourceRevision,
-      representation_id: 'semantic_768',
+      representation_id: 'semantic_512',
       representation_revision: 3,
       schema_version: 'atlas.qdrant.payload.v2',
     });
@@ -64,7 +64,7 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
       ...validPacket,
       sourceRepresentationId: 'embeddinggemma_768_native_v1',
       representationId: undefined,
-    })).toThrow(/canonical semantic_768 representation/);
+    })).toThrow(/canonical semantic_512 representation/);
   });
 
   it.each([
