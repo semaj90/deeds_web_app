@@ -1,0 +1,33 @@
+{
+  "name": "@atlas/semantic-contracts",
+  "version": "1.0.0",
+  "description": "Canonical semantic contracts (JSON Schema + Zod) for Phase 109 infrastructure",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./vector-manifest": "./dist/vector-manifest.js",
+    "./semantic-packet": "./dist/semantic-packet.js",
+    "./domain-feature-packet": "./dist/domain-feature-packet.js",
+    "./domain-prediction": "./dist/domain-prediction.js",
+    "./ontology-proposal": "./dist/ontology-proposal.js",
+    "./canonical-hashing": "./dist/canonical-hashing.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": ["atlas", "semantic-contracts", "zod", "json-schema", "domain-classification"],
+  "author": "Semantic Contracts Team",
+  "license": "MIT"
+}

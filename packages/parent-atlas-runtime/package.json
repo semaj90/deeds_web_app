@@ -1,0 +1,28 @@
+{
+  "name": "@deeds/parent-atlas-runtime",
+  "version": "0.1.0",
+  "description": "Parent Atlas retrieval runtime: BM25/Qdrant adapters, identity resolution, RRF fusion, pipeline orchestration",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deeds/parent-atlas-core": "file:../parent-atlas-core"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

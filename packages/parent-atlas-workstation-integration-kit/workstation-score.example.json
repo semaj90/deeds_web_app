@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "parent-atlas-workstation-score.v1",
+  "assessment": "Evidence-based estimate from the supplied state; replace with measured reports.",
+  "stages": [
+    {"id":"inventory","label":"Repository inventory and revision tracking","weight":8,"achieved":78,"state":"PARTIAL","evidence":["Repository workflow produced inventory and structural artifacts"],"blockers":["Full checkpoint/resume proof incomplete"]},
+    {"id":"structure","label":"File/symbol/AST structural mapping","weight":10,"achieved":68,"state":"PARTIAL","evidence":["76,227 structural facts reported"],"blockers":["Per-file denominator and stable symbol identity parity required"]},
+    {"id":"summaries","label":"Hierarchical summaries and contextual trees","weight":8,"achieved":62,"state":"PARTIAL","evidence":["Summary layers and packet summaries exist"],"blockers":["Contextual-tree parent/child completeness not proven"]},
+    {"id":"postgres","label":"Postgres canonical identity and indexed tables","weight":10,"achieved":70,"state":"PARTIAL","evidence":["atlas_packets, graph fields, vector fields, indexed tables"],"blockers":["Nullable packet_key and missing typed revision lineage"]},
+    {"id":"embedding","label":"Production embedding and representation lineage","weight":12,"achieved":35,"state":"PARTIAL","evidence":["Embedding lanes and sampled semantic workflow exist"],"blockers":["Full production EmbeddingGemma run and representation records not proven"]},
+    {"id":"qdrant","label":"Qdrant dense/sparse projection and readback","weight":9,"achieved":52,"state":"PARTIAL","evidence":["Qdrant collections and point references exist"],"blockers":["Current run upsert/readback/hash parity incomplete"]},
+    {"id":"graph","label":"Neo4j graph projection and PageRank lineage","weight":8,"achieved":65,"state":"PARTIAL","evidence":["PageRank and graph fields present"],"blockers":["Graph run/revision lineage and parity incomplete"]},
+    {"id":"cache","label":"Valkey cache contracts and invalidation","weight":6,"achieved":45,"state":"PARTIAL","evidence":["Redis/Valkey cache scripts and dry-run imports exist"],"blockers":["Canonical endpoint/key registry and readback proof incomplete"]},
+    {"id":"retrieval","label":"Hybrid retrieval and bounded graph expansion","weight":8,"achieved":58,"state":"PARTIAL","evidence":["Dense, sparse, RRF and graph scoring experiments exist"],"blockers":["Single runtime orchestrator and bounded traversal proof incomplete"]},
+    {"id":"reranker","label":"Reranker evaluation and production adapter","weight":7,"achieved":48,"state":"PARTIAL","evidence":["XGBoost NDCG evaluations exist"],"blockers":["Production adapter, leakage controls and latency gate incomplete"]},
+    {"id":"recommendations","label":"Evidence-backed file/symbol recommendations","weight":7,"achieved":32,"state":"PARTIAL","evidence":["Recommendation contracts discussed"],"blockers":["Closed recommendation trace with validation outcome not proven"]},
+    {"id":"agent-loop","label":"Edit, validate, re-index, and supersede loop","weight":7,"achieved":28,"state":"PARTIAL","evidence":["Agentic components and validation scripts exist"],"blockers":["End-to-end changed-symbol re-index and supersession trace not proven"]}
+  ]
+}

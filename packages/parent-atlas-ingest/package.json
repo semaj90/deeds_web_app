@@ -1,0 +1,40 @@
+{
+  "name": "@deeds/parent-atlas-ingest",
+  "version": "1.0.0",
+  "description": "Ingestion pipeline for Parent Atlas: repository scanning, AST parsing, packet generation",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@deeds/parent-atlas-core": "file:../parent-atlas-core"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "keywords": [
+    "parent-atlas",
+    "ingestion",
+    "ast",
+    "parsing",
+    "scanning"
+  ],
+  "author": "Deeds Team",
+  "license": "MIT"
+}
