@@ -37,7 +37,7 @@ function registry(entries = [registryEntry()]) {
   });
 }
 
-function routingSnapshot() {
+function routingSnapshot(overrides: Record<string, unknown> = {}) {
   return {
     requestId: 'request:1',
     toolRegistryRevision: 'tool-registry:v1',
@@ -77,6 +77,7 @@ function routingSnapshot() {
       evidenceRefs: ['registry:atlas.packet_search', 'profile:packet-search:v1'],
     }],
     checksum: HASH_A,
+    ...overrides,
   };
 }
 
@@ -153,6 +154,25 @@ describe('buildPrefillExecutionPlanFromRoutingV1', () => {
     expect(() => build({ toolRegistry: mismatchedRegistry })).toThrow('PREFILL_TOOL_REGISTRY_REVISION_MISMATCH');
   });
 
+  it('fails closed when neural routing selects a candidate marked ineligible', () => {
+    const snapshot = routingSnapshot({
+      candidateTools: [{
+        ...routingSnapshot().candidateTools[0],
+        eligible: false,
+        exclusionReasonCodes: ['TOOL_IMPLEMENTATION_STUB'],
+      }],
+    });
+    expect(() => build({ routingSnapshot: snapshot })).toThrow(
+      'PREFILL_SELECTED_TOOL_NOT_CANDIDATE_ELIGIBLE:atlas.packet_search:TOOL_IMPLEMENTATION_STUB',
+    );
+  });
+
+  it('fails closed when a routing receipt names a tool absent from the candidate world', () => {
+    expect(() => build({ routingReceipt: routingReceipt(['trace.unknown_tool']) })).toThrow(
+      'PREFILL_SELECTED_TOOL_NOT_CANDIDATE_ELIGIBLE:trace.unknown_tool:MISSING_CANDIDATE',
+    );
+  });
+
   it('fails closed when neural routing selects a registry-blocked tool', () => {
     const blocked = registryEntry({
       proofStatus: 'QUARANTINED',
@@ -168,6 +188,7 @@ describe('buildPrefillExecutionPlanFromRoutingV1', () => {
       operationKind: 'APPLY',
       targetScopes: ['WORKTREE_SOURCE'],
       permissions: ['code:write'],
+      cachePolicy: { mode: 'NONE', scope: null },
     });
     expect(() => build({ toolRegistry: registry([apply]) })).toThrow(
       'PREFILL_SELECTED_TOOL_OPERATION_NOT_AUTHORIZED:atlas.packet_search:APPLY',
@@ -178,6 +199,7 @@ describe('buildPrefillExecutionPlanFromRoutingV1', () => {
     const proposed = registryEntry({
       operationKind: 'PROPOSE',
       targetScopes: ['EPHEMERAL_WORKSPACE'],
+      permissions: ['code:read', 'workspace:write'],
       lane: 'synthesis',
       cachePolicy: { mode: 'NONE', scope: null },
     });
