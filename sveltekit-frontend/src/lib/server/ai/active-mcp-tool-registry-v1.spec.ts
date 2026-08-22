@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildActiveMcpToolRegistryV1,
   decideActiveMcpToolRoutingV1,
+  filterRoutableMcpToolDescriptorsV1,
   routableActiveMcpToolsV1,
   type ActiveMcpToolEntryV1,
 } from './active-mcp-tool-registry-v1';
@@ -105,5 +106,26 @@ describe('ActiveMcpToolRegistryV1', () => {
     expect(routableActiveMcpToolsV1(registry).map((entry) => entry.toolName)).toEqual([
       'atlas.packet_search',
     ]);
+  });
+
+  it('filters an MCP descriptor catalog and fails closed for missing registry entries', () => {
+    const registry = buildActiveMcpToolRegistryV1({
+      protocolRevision: 'legacy-sdk-v1-streamable-http',
+      entries: [
+        baseEntry({ toolName: 'atlas.packet_search' }),
+        baseEntry({ toolName: 'phase18_reranker', proofStatus: 'QUARANTINED' }),
+      ],
+    });
+
+    const eligible = filterRoutableMcpToolDescriptorsV1(
+      [
+        { name: 'atlas.packet_search', description: 'search' },
+        { name: 'phase18_reranker', description: 'placeholder' },
+        { name: 'unregistered.live.tool', description: 'appeared in tools/list only' },
+      ],
+      registry,
+    );
+
+    expect(eligible.map((tool) => tool.name)).toEqual(['atlas.packet_search']);
   });
 });
