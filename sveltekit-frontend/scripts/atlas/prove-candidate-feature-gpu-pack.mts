@@ -44,7 +44,7 @@ const ordinalMap = materializeCandidateOrdinalMap({
   ],
 });
 
-const ordinalById = new Map(ordinalMap.rows.map((row) => [row.canonicalId, row.candidateOrdinal]));
+const ordinalById = new Map(ordinalMap.candidates.map((row) => [row.canonicalId, row.candidateOrdinal]));
 function candidateRow(
   canonicalId: 'candidate:alpha' | 'candidate:beta' | 'candidate:gamma',
   values: {
