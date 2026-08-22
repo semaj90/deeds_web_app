@@ -1013,3 +1013,57 @@ specifically remains undone; a 5-way domain-classifier duplication was
 found and classified per the root CLAUDE.md governance vocabulary (3
 legitimate distinct-layer owners, 1 dead file, 1 out-of-scope). See that
 file directly for the full table and evidence.
+
+### Further continuation - same 2026-08-22 session, second batch
+
+- agent/qdrant-null-hash-metadata-repair-20260820 merged (commit
+  ed7cd7243a): adds qdrant-projection-metadata-v1.mjs (pure contract -
+  validateQdrantProjectionMetadataV1 hard-fails on missing
+  source_ref/content_hash/chunk_id; buildQdrantPointMetadataV1 centralizes
+  the card:<path>:<hash> point-metadata format) plus its test, confirmed
+  passing live (node scripts/atlas/qdrant-projection-metadata-v1.test.mjs
+  -> PASS). Wires this contract into backfill-qdrant-768-v2-uuid.mjs, which
+  also gets a real bug fix: a batch with zero valid points after validation
+  used to break out of the ENTIRE keyset-pagination loop, silently
+  abandoning all subsequent rows past that one bad batch - changed to
+  continue so only the bad batch is skipped.
+  **Flag, not yet resolved**: this branch also adds
+  apply-null-content-hash-metadata-repair.mjs, a second repair path for the
+  same content_hash IS NULL population already served by the existing
+  repair-null-content-hash-from-manifest.mjs. The two scripts have
+  different safety invariants - the existing one synthesizes chunk_id and
+  applies via a plain Postgres UPDATE; the new one explicitly never
+  synthesizes chunk_id and revalidates against live Qdrant vector identity
+  (cosine >= 0.99999) before applying. Neither has been run with --apply
+  against the shared DB. An operator should decide which is canonical
+  before either is ever applied - do not assume they are redundant or that
+  running both is safe.
+- agent/revision-authority-main-reconcile-20260821 NOT merged. It proposes
+  a genuinely different architecture for the graphify revision-owner
+  lineage: append-only ledger tables (graphify_workspace_revisions_v2,
+  graphify_source_revisions_v2) instead of the additive-columns-on-existing-
+  tables approach main has been iterating on all session. Disqualifying
+  problems for a blind merge: (1) it deletes
+  graphify-source-inventory-writer-v2.spec.ts with no replacement, which
+  would leave its rewritten writer module (single-source-per-call, integrates
+  materializeWorkspaceRevisionOriginV1 + deriveCodeRevisionAuthorityV2)
+  completely untested and silently drop main's existing 3 passing tests;
+  (2) its SQL migration variant reintroduces the same CASCADE-FK-instead-of-
+  RESTRICT regression rejected on 3 separate earlier forks this session;
+  (3) its own new audit-graphify-revision-authority-migration.mts hardcodes
+  a requirement for the two new ledger tables, so it fails by construction
+  against main's current migration - it isn't a reusable generic gate, it's
+  coupled to this branch's unmerged schema. The append-only-ledger idea
+  itself may be worth pursuing deliberately (it would avoid the historical-
+  UNIQUE-constraint collision problem the branch's own migration comment
+  describes for dirty/untracked byte states sharing a Git revision), but
+  that decision should be made explicitly, not inherited by force-merging
+  this branch.
+
+**Context budget note (second continuation)**: pausing the branch queue
+here again for the same reason as before - long session, diminishing
+value per additional cycle spent re-deriving context. Remaining queue
+(as of this point) is dominated by larger, older, more speculative
+branches (temporal-*, gpu-resident-*, parent-atlas-* fabric/compiler
+branches with 100+ ahead counts) that need a fresh triage pass rather
+than being squeezed into an already-long session.
