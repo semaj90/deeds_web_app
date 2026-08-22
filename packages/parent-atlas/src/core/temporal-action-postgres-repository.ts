@@ -29,6 +29,15 @@ export const temporalActionAppendReceiptSchema = z.object({
 }).strict();
 export type TemporalActionAppendReceiptV1 = z.infer<typeof temporalActionAppendReceiptSchema>;
 
+export const temporalActionSequenceReservationReceiptSchema = z.object({
+  schema: z.literal('atlas.temporal-action-sequence-reservation-receipt.v1').default('atlas.temporal-action-sequence-reservation-receipt.v1'),
+  ledger_sequence: z.number().int().positive(),
+  allocator: z.literal('atlas_agent_action_ledger_sequence_seq'),
+  identity_authority: z.literal(false).default(false),
+  producer_revision: z.string().min(1),
+}).strict();
+export type TemporalActionSequenceReservationReceiptV1 = z.infer<typeof temporalActionSequenceReservationReceiptSchema>;
+
 export const temporalActionLookupReceiptSchema = z.object({
   schema: z.literal('atlas.temporal-action-lookup-receipt.v1').default('atlas.temporal-action-lookup-receipt.v1'),
   execution_key: checksum,
@@ -135,6 +144,32 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
   }
 
   return {
+    /**
+     * Reserves only append-log ordering. This sequence is NOT workflow/action
+     * identity and MUST NOT participate in ActionExecutionKey derivation.
+     * Gaps are expected when a process reserves a number and later fails before
+     * append; append-only ordering does not require dense numbering.
+     */
+    async reserveLedgerSequence(producerRevision: string): Promise<TemporalActionSequenceReservationReceiptV1> {
+      const producer = id.parse(producerRevision);
+      const result = await queryable.query<{ ledger_sequence: string | number }>(
+        `SELECT nextval('atlas_agent_action_ledger_sequence_seq') AS ledger_sequence`,
+      );
+      if (result.rowCount !== 1 || result.rows.length !== 1) {
+        throw new Error('TEMPORAL_LEDGER_SEQUENCE_RESERVATION_FAILED');
+      }
+      const sequence = Number(result.rows[0]!.ledger_sequence);
+      if (!Number.isSafeInteger(sequence) || sequence <= 0) {
+        throw new Error(`TEMPORAL_LEDGER_SEQUENCE_INVALID:${String(result.rows[0]!.ledger_sequence)}`);
+      }
+      return temporalActionSequenceReservationReceiptSchema.parse({
+        ledger_sequence: sequence,
+        allocator: 'atlas_agent_action_ledger_sequence_seq',
+        identity_authority: false,
+        producer_revision: producer,
+      });
+    },
+
     async append(eventInput: AgentActionEventV1, producerRevision: string): Promise<TemporalActionAppendReceiptV1> {
       const event = agentActionEventSchema.parse(eventInput);
       const insert = await queryable.query<{ event_id: string }>(
@@ -219,6 +254,7 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
 export function describeTemporalActionPostgresRepository(): string {
   return [
     'atlas_agent_action_events is append-only persistence for AgentActionEventV1, not the workflow/action identity owner.',
+    'atlas_agent_action_ledger_sequence_seq owns append-log ordering only; it does not mint workflow/action identity and never participates in ActionExecutionKey.',
     'WorkflowActionEventV1 remains canonical for workflow/action identity; temporal events add deterministic execution identity and observed outcome history.',
     'ActionCurrentProjectionV1 is rebuilt from immutable events and is not canonical history.',
     'Duplicate event_id inserts are accepted only when checksum-verified readback matches the immutable event.',

@@ -1,5 +1,6 @@
 # Temporal Recommendation Outcome Receipt Addendum
 
+Status: **IMPLEMENTED_UNPROVEN**
 Status: **PARTIAL_PROVEN** (ACT-REC-OUT-01..04 and ACT-REC-OUT-PG-01..04 verified live 2026-08-21; ACT-REC-OUT-DAG-01..04 remain NOT_PROVEN — see "Evidence log" and "What remains genuinely open" below)
 
 This tranche closes the observation loop after deterministic temporal alternative selection. It does not change SearchRuntime ranking, candidate ranking ownership, workflow/action identity, action outcome ownership, or canonical storage authority.
@@ -164,6 +165,22 @@ Non-temporal tool execution behavior is otherwise unchanged.
 
 ## Proof gates
 
+- [ ] **ACT-REC-OUT-01** Parent Atlas package build succeeds with outcome runtime/repository exports.
+- [ ] **ACT-REC-OUT-02** Receipt builder proves selected action/execution-key binding and rejects drift.
+- [ ] **ACT-REC-OUT-03** Successful downstream evaluation can persist with `outcome=null`; no fabricated `SUCCESS_EXACT`.
+- [ ] **ACT-REC-OUT-04** Receipt-backed negative example with authoritative failure outcome is admitted.
+- [ ] **ACT-REC-OUT-PG-01** Apply `20260821_atlas_recommendation_outcome_receipts.sql` only in intended non-production DB.
+- [ ] **ACT-REC-OUT-PG-02** Append/readback/checksum proof succeeds.
+- [ ] **ACT-REC-OUT-PG-03** Duplicate identical receipt checksum is idempotent.
+- [ ] **ACT-REC-OUT-PG-04** Tampered receipt JSON is rejected on readback.
+- [ ] **ACT-REC-OUT-DAG-01** Exact known failure selects a different edge, selected edge succeeds, and one downstream-success receipt is persisted.
+- [ ] **ACT-REC-OUT-DAG-02** Selected edge reaches terminal failure and one downstream-failure receipt is persisted.
+- [ ] **ACT-REC-OUT-DAG-03** With `persist_outcome_receipt=false`, no recommendation-outcome DB write is attempted.
+- [ ] **ACT-REC-OUT-DAG-04** The same selected execution key is preserved from recommendation through selection, DRY gate, execution and outcome receipt.
+
+## No promotion in this tranche
+
+No migration was applied by this implementation session. No production Postgres/Qdrant/Valkey/Neo4j mutation, SearchRuntime ranking change, canonical write, generic agent enrollment, ACE policy update, model training, GPU scheduling change, or PR merge is claimed.
 - [x] **ACT-REC-OUT-01** Parent Atlas package build succeeds with outcome runtime/repository exports. Verified 2026-08-21 (next session): `tsc -p tsconfig.json` on `packages/parent-atlas` emits `dist/core/temporal-recommendation-outcome-runtime.js` and `dist/core/temporal-recommendation-outcome-postgres-repository.js` with both exports present. (Pre-existing, unrelated `.spec.ts` type errors in `temporal-action-alternative-runtime.spec.ts`/`temporal-action-workflow-adapter.spec.ts` — readonly-tuple-vs-mutable-array fixture typing — do not block emit; `noEmitOnError` is not set.)
 - [x] **ACT-REC-OUT-02** Receipt builder proves selected action/execution-key binding and rejects drift. Verified: `src/core/temporal-recommendation-outcome-runtime.spec.ts` — 4/4 pass.
 - [x] **ACT-REC-OUT-03** Successful downstream evaluation can persist with `outcome=null`; no fabricated `SUCCESS_EXACT`. Verified: same spec file, covered by its "binds downstream success without inventing outcome" case.
