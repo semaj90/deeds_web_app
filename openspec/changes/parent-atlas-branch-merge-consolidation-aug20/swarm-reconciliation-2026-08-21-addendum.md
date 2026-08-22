@@ -713,6 +713,80 @@ now-merged, fully-reviewed branch version rather than hand-merged with
 an incomplete WIP draft — that WIP remains fully recoverable from
 `stash@{0}` if needed.
 
+## Update: session resumed — full branch inventory (46 unmerged found), 3 more items processed
+
+Re-fetched: `git branch -r` now lists **~80 `agent/*` branches total**,
+of which **46 are not yet ancestors of `origin/main`** (checked via
+`git merge-base --is-ancestor` per branch, not assumed from names).
+Given the scale, this pass picked a few of the smallest/lowest-risk
+ones rather than attempting the full set — the queue is genuinely
+larger than tracked in earlier updates above, which only listed a
+subset the swarm had surfaced by name at the time.
+
+**Repo-wide finding, flagged, NOT fixed (out of scope for this pass) —
+recorded here per the "record what you found" rule**: while fixing one
+hardcoded-credential instance (next item), a repo-wide grep for the
+same literal (`legal_admin:123456@127.0.0.1`) found it in **130+
+files** across `scripts/`, `scripts/atlas/`, and a handful of `src/`
+files. This is a large, genuine credential-hygiene violation of this
+repo's own stated policy ("store all passwords in .env.local, never in
+code"), but far too large to fix as a side-effect of branch merging —
+it needs its own dedicated cleanup pass (likely a scripted
+find-replace + per-file verification). Recommend a future session run
+`grep -rl "legal_admin:123456@127.0.0.1"` and work through it
+deliberately.
+
+**Fixed on `main` directly (not a branch merge)**:
+`scripts/atlas/audit-null-content-hash-repairability.mjs` — this file
+already existed on `main` (committed directly at `ff88376b00`,
+predating this session's branch-merge work entirely) with the
+hardcoded password fallback above. While evaluating two small unmerged
+branches that happened to touch the same filename
+(`agent/qdrant-null-hash-readonly-audit-20260820` and `-20260821`, each
+independently reimplementing this exact audit), found that **both are
+now fully superseded** by main's own already-committed version — no
+merge needed for either. Instead patched main's live file directly:
+removed the hardcoded fallback (now throws if `DATABASE_URL` is unset)
+and fixed `REPORT_DIR`/output-path resolution to use
+`fileURLToPath(import.meta.url)`-relative repo-root resolution instead
+of bare `process.cwd()`-relative paths (the exact cross-directory-
+safety bug class this repo's CLAUDE.md warns about). Commit
+`4f14d3dc83`.
+
+**Merged `agent/temporal-action-ledger`** → commit `174be891e0`. Adds
+`temporal-recommendation-outcome-dag.integration.spec.ts`: a genuine
+live (non-mocked) proof of the previously-`NOT_PROVEN`
+ACT-REC-OUT-DAG-01/02/03/04 gates — seeds a real
+`FINALIZED`/`TOOL_ERROR` ledger failure via the real production
+append path, then drives the actual DRY-gate decision, real
+`rg_search` tool dispatch, real outcome-receipt persistence, and (for
+DAG-03) a full real LangGraph `runAgentDAG()` StateGraph run — all
+against a real Postgres round trip, with `afterAll` cleanup verified
+(0 residual rows) in the branch's own evidence log, honestly
+documenting the one real remaining gap (DAG-02's failure-injection
+case can't be forced deterministically without flakiness).
+
+**Safety fix applied before merging (not present in the original
+branch)**: this spec lives under `src/lib/server/atlas/temporal/`,
+which — unlike the `scripts/**/*.spec.ts` gap noted earlier — **does**
+match this repo's default vitest `include` glob and would run by
+default. Unguarded, it would attempt a real Postgres connection for
+any developer or CI run without `DATABASE_URL` configured. Fixed by
+adding the exact `RUN_DB_INTEGRATION=1`-gated `describeIf` pattern this
+repo already establishes as precedent in
+`tests/engram-registry-db.integration.spec.ts`. Verified locally: with
+no `RUN_DB_INTEGRATION` set, all 3 tests report "skipped" and no DB
+connection is attempted.
+
+**Lesson for whoever continues this**: when a merged branch adds a
+`.spec.ts` file that imports a real DB client at module or describe
+scope, always check (a) whether the file's directory is actually
+covered by the vitest include glob (some aren't — see the
+`scripts/**/*.spec.ts` gap above), and (b) whether it's guarded by an
+opt-in env var if it does real I/O. This repo already has the
+`RUN_DB_INTEGRATION` convention established — reuse it, don't invent a
+new one.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
