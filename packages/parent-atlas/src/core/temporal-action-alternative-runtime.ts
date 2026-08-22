@@ -10,6 +10,12 @@ import {
   compileActionFeatureRowFromHistory,
   recommendNextActionsDeterministic,
 } from './temporal-action-recommendation-runtime.js';
+import {
+  compileActionFeatureRowWithRecommendationHistory,
+} from './temporal-recommendation-feature-runtime.js';
+import {
+  recommendationHistoryObservationSchema,
+} from './temporal-recommendation-history-runtime.js';
 
 const id = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
@@ -38,6 +44,11 @@ export type AlternativeActionSelectionV1 = z.infer<typeof alternativeActionSelec
  * The exact failed execution key is a hard exclusion. Historical failure
  * similarity remains a ranking feature for related actions, but it can never
  * cause the exact failed execution to be selected again.
+ *
+ * Optional recommendation outcome observations are policy evidence only. When
+ * supplied they may update downstream_utility, but never semantic/structural
+ * relevance, action success history, failure similarity, cost, latency, risk,
+ * or canonical identity.
  */
 export function recommendAlternativeActionFromHistory(input: {
   workflow_id: string;
@@ -46,6 +57,8 @@ export function recommendAlternativeActionFromHistory(input: {
   excluded_execution_keys?: readonly string[];
   candidates: readonly z.input<typeof alternativeActionCandidateSchema>[];
   events: readonly unknown[];
+  recommendation_observations?: readonly z.input<typeof recommendationHistoryObservationSchema>[];
+  recommendation_policy_revision?: string;
   created_at: string;
   producer_revision: string;
 }): AlternativeActionSelectionV1 {
@@ -65,10 +78,18 @@ export function recommendAlternativeActionFromHistory(input: {
   const eligible = parsedCandidates.filter((candidate) => !excluded.has(candidate.execution_key));
   if (eligible.length === 0) throw new Error('ACTION_ALTERNATIVE_CANDIDATES_EXHAUSTED');
 
-  const rows = eligible.map(({ candidate }) => compileActionFeatureRowFromHistory({
-    candidate,
-    events: input.events,
-  }));
+  const recommendationObservations = (input.recommendation_observations ?? [])
+    .map((observation) => recommendationHistoryObservationSchema.parse(observation));
+  const recommendationPolicyRevision = input.recommendation_policy_revision ?? input.producer_revision;
+
+  const rows = eligible.map(({ candidate }) => recommendationObservations.length === 0
+    ? compileActionFeatureRowFromHistory({ candidate, events: input.events })
+    : compileActionFeatureRowWithRecommendationHistory({
+        candidate,
+        action_events: input.events,
+        recommendation_observations: recommendationObservations,
+        policy_revision: recommendationPolicyRevision,
+      }));
   const executionKeys = Object.fromEntries(
     eligible.map(({ candidate, execution_key }) => [candidate.candidate_action_id, execution_key]),
   );
@@ -104,6 +125,7 @@ export function describeTemporalAlternativeSelection(): string {
   return [
     'SELECT_ALTERNATIVE is resolved by the package-owned deterministic recommendation policy, not by prompting the LLM to rediscover the workflow.',
     'The exact failed execution key is a hard exclusion. Related historical failures remain recommendation features only.',
+    'Recommendation outcome history may affect downstream_utility only and remains observational, not causal evidence.',
     'AlternativeActionSelectionV1 is a derived execution-policy result; it does not become workflow identity, temporal history, or graph truth.',
   ].join(' ');
 }
