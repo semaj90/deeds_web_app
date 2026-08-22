@@ -4,6 +4,15 @@ import { z } from 'zod';
 export const OperationKindV1Schema = z.enum(['READ', 'AUDIT', 'PROPOSE', 'APPLY']);
 export type OperationKindV1 = z.infer<typeof OperationKindV1Schema>;
 
+export const OperationTargetScopeV1Schema = z.enum([
+  'NONE',
+  'EPHEMERAL_WORKSPACE',
+  'WORKTREE_SOURCE',
+  'CANONICAL_STORE',
+  'EXTERNAL_SIDE_EFFECT',
+]);
+export type OperationTargetScopeV1 = z.infer<typeof OperationTargetScopeV1Schema>;
+
 export const OrchestrationStageV1Schema = z.enum([
   'QUERY_CLASSIFICATION',
   'PREFILL',
@@ -65,6 +74,7 @@ const PrefillExecutionPlanBaseV1Schema = z.object({
   queryHash: z.string().length(64),
   queryIntent: z.enum(['SEARCH', 'READ', 'ANALYZE', 'PLAN', 'EDIT', 'VERIFY', 'SYNTHESIZE', 'UNKNOWN']),
   allowedOperationKinds: z.array(OperationKindV1Schema).min(1).max(4),
+  allowedTargetScopes: z.array(OperationTargetScopeV1Schema).min(1).max(5),
   mutationAuthorized: z.boolean(),
   humanApprovalPresent: z.boolean(),
   selectedToolIds: z.array(z.string().min(1)).max(64),
@@ -86,6 +96,9 @@ function refinePrefillExecutionPlan(
   const applyAllowed = value.allowedOperationKinds.includes('APPLY');
   if (applyAllowed && !value.mutationAuthorized) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['mutationAuthorized'], message: 'APPLY requires mutationAuthorized=true' });
+  }
+  if (value.allowedTargetScopes.includes('CANONICAL_STORE') && !value.canonicalWritesAllowed) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['allowedTargetScopes'], message: 'CANONICAL_STORE scope requires canonicalWritesAllowed=true' });
   }
   if (value.canonicalWritesAllowed && (!applyAllowed || !value.mutationAuthorized || !value.humanApprovalPresent)) {
     ctx.addIssue({
@@ -137,15 +150,26 @@ export function assertToolNominationAllowed(input: {
   plan: PrefillExecutionPlanV1;
   toolId: string;
   operationKind: OperationKindV1;
+  targetScope?: OperationTargetScopeV1;
 }): void {
   const plan = PrefillExecutionPlanV1Schema.parse(input.plan);
+  const targetScope = input.targetScope ?? 'NONE';
   if (!plan.selectedToolIds.includes(input.toolId)) {
     throw new Error(`TOOL_NOT_PREFILL_AUTHORIZED:${input.toolId}`);
   }
   if (!plan.allowedOperationKinds.includes(input.operationKind)) {
     throw new Error(`OPERATION_KIND_NOT_AUTHORIZED:${input.operationKind}`);
   }
-  if (input.operationKind === 'APPLY' && !plan.canonicalWritesAllowed) {
+  if (!plan.allowedTargetScopes.includes(targetScope)) {
+    throw new Error(`TARGET_SCOPE_NOT_AUTHORIZED:${targetScope}`);
+  }
+  if (input.operationKind === 'READ' && targetScope !== 'NONE') {
+    throw new Error(`READ_OPERATION_CANNOT_MUTATE:${targetScope}`);
+  }
+  if (input.operationKind === 'APPLY' && !plan.mutationAuthorized) {
     throw new Error('APPLY_BLOCKED_BY_PREFILL_PLAN');
+  }
+  if (targetScope === 'CANONICAL_STORE' && !plan.canonicalWritesAllowed) {
+    throw new Error('CANONICAL_STORE_WRITE_BLOCKED_BY_PREFILL_PLAN');
   }
 }
