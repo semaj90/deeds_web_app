@@ -89,7 +89,63 @@ const OPENCODE_MAX_OUTPUT_TOKENS = Number(
 );
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '../../../retrieval/cross-encoder-reranker.js';
+import { rerankCanonicalFeatureEnvelopes, type CanonicalRerankEnvelope } from '../../../retrieval/canonical-rerank-executor.js';
 import { applyTopologicalBoostAsync } from '../../../retrieval/topological-search.js';
+
+/**
+ * Second-pass canonical rerank over ACE's final blended top-K (Open Question 2,
+ * openspec/changes/inference-wiring-deep-audit-aug22/design.md). OFF by default —
+ * flip ACE_CANONICAL_RERANK_ENABLED=true only after evaluating quality impact,
+ * since `assembleACEContext()` already calls rerankWithCrossEncoder() directly
+ * inside fetchCodebaseContext() for part of the candidate set, and this second
+ * pass risks re-scoring content that already went through cross-encoder ranking
+ * once. Bounded by its own independent timeout (Promise.race), separate from the
+ * canonical reranker's internal fallback chain (which has per-backend timeouts up
+ * to 20s) — a slow/unavailable reranker must never add unbounded latency to the
+ * hot path every ACE-assembled chat/RAG response goes through. Any failure or
+ * timeout falls back to the existing `_aceRouting.score` order, non-fatally.
+ */
+const ACE_CANONICAL_RERANK_ENABLED = process.env.ACE_CANONICAL_RERANK_ENABLED === 'true';
+const ACE_CANONICAL_RERANK_TOP_K = Number(process.env.ACE_CANONICAL_RERANK_TOP_K ?? '12');
+const ACE_CANONICAL_RERANK_TIMEOUT_MS = Number(process.env.ACE_CANONICAL_RERANK_TIMEOUT_MS ?? '3000');
+
+async function applyCanonicalRerankSecondPass(
+  query: string,
+  acePayloads: any[]
+): Promise<any[]> {
+  if (!ACE_CANONICAL_RERANK_ENABLED || acePayloads.length < 2) return acePayloads;
+
+  const topSlice = acePayloads.slice(0, ACE_CANONICAL_RERANK_TOP_K);
+  const remainder = acePayloads.slice(ACE_CANONICAL_RERANK_TOP_K);
+
+  try {
+    const envelopes = topSlice.map((p, idx) => ({
+      ...p,
+      packet_key: p.packet_key ?? p.packetKey ?? p.feature_id ?? undefined,
+      source_ref: p.sourceRef ?? p.source_ref ?? p.filePath ?? (Array.isArray(p.sourceRefs) ? p.sourceRefs[0] : undefined),
+      content: p.content ?? p.snippet ?? p.summary ?? undefined,
+      retrieved_rank: idx + 1,
+    })) as CanonicalRerankEnvelope[];
+
+    const timeout = new Promise<null>((resolve) =>
+      setTimeout(() => resolve(null), ACE_CANONICAL_RERANK_TIMEOUT_MS)
+    );
+    const rerankResult = await Promise.race([
+      rerankCanonicalFeatureEnvelopes(query, envelopes, { topK: ACE_CANONICAL_RERANK_TOP_K, rerankTier: 'fast' }),
+      timeout,
+    ]);
+
+    if (!rerankResult) {
+      console.warn('[ACE canonical-rerank] second pass timed out, keeping existing order');
+      return acePayloads;
+    }
+
+    return [...rerankResult.results, ...remainder];
+  } catch (err) {
+    console.warn('[ACE canonical-rerank] second pass failed, keeping existing order:', (err as Error)?.message ?? err);
+    return acePayloads;
+  }
+}
 import {
   queryBmuCached,
   attentionScoreChunks,
@@ -3384,6 +3440,13 @@ export async function assembleACEContext(opts: {
         // Sort by computed routing score but do not change semantics beyond annotation
         (finalContext.acePayloads as any[]).sort(
           (a: any, b: any) => (b._aceRouting?.score ?? 0) - (a._aceRouting?.score ?? 0)
+        );
+
+        // Optional second-pass canonical rerank over the blend's top-K — OFF by
+        // default (ACE_CANONICAL_RERANK_ENABLED), see applyCanonicalRerankSecondPass.
+        finalContext.acePayloads = await applyCanonicalRerankSecondPass(
+          String(query ?? ''),
+          finalContext.acePayloads as any[]
         );
 
         // Write final rank summary line
