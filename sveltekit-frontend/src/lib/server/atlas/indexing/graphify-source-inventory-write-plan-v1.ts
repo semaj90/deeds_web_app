@@ -7,7 +7,7 @@ import {
 } from './code-revision-owner-canary-v1.js';
 
 export const GRAPHIFY_SOURCE_INVENTORY_WRITE_PLAN_SCHEMA = 'atlas.graphify-source-inventory-write-plan.v1' as const;
-export const GRAPHIFY_SOURCE_INVENTORY_WRITE_PLAN_REVISION = 'atlas.graphify-source-inventory-write-plan.2026-08-21.v1' as const;
+export const GRAPHIFY_SOURCE_INVENTORY_WRITE_PLAN_REVISION = 'atlas.graphify-source-inventory-write-plan.2026-08-21.v2' as const;
 
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 const id = z.string().min(1);
@@ -16,7 +16,8 @@ export const graphifySourceInventoryTargetV1Schema = z.object({
   runTable: z.literal('graphify_runs'),
   fileTable: z.literal('graphify_files'),
   workspaceRevisionColumn: z.literal('repository_revision'),
-  sourceRevisionColumn: z.literal('source_revision'),
+  sourceRevisionAuthorityColumn: z.enum(['source_revision', 'content_hash']),
+  legacySourceRevisionColumn: z.literal('source_revision'),
   sourceRefColumn: z.literal('source_ref'),
   contentDigestColumn: z.literal('content_hash'),
   byteLengthColumn: z.literal('byte_length'),
@@ -56,6 +57,7 @@ export const graphifySourceInventoryWritePlanV1Schema = z.object({
   requiredWriterBehavior: z.object({
     createsWorkspaceRevisionInsideBoundary: z.literal(true),
     createsSourceRevisionInsideBoundary: z.literal(true),
+    preservesLegacySourceRevisionSemantics: z.literal(true),
     acceptsCallerWorkspaceRevisionAsAuthority: z.literal(false),
     acceptsCallerSourceRevisionAsAuthority: z.literal(false),
     writesRunAndFileLineageTransactionally: z.literal(true),
@@ -87,22 +89,30 @@ function sha256(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
-const EXISTING_TARGET: GraphifySourceInventoryTargetV1 = {
-  runTable: 'graphify_runs',
-  fileTable: 'graphify_files',
-  workspaceRevisionColumn: 'repository_revision',
-  sourceRevisionColumn: 'source_revision',
-  sourceRefColumn: 'source_ref',
-  contentDigestColumn: 'content_hash',
-  byteLengthColumn: 'byte_length',
-};
+function existingTarget(canary: CodeRevisionOwnerCanaryV1): GraphifySourceInventoryTargetV1 | null {
+  const authorityColumn = canary.storage.sourceRevisionAuthorityField === 'SOURCE_REVISION'
+    ? 'source_revision'
+    : canary.storage.sourceRevisionAuthorityField === 'CONTENT_HASH'
+      ? 'content_hash'
+      : null;
+  if (!authorityColumn) return null;
+  return {
+    runTable: 'graphify_runs',
+    fileTable: 'graphify_files',
+    workspaceRevisionColumn: 'repository_revision',
+    sourceRevisionAuthorityColumn: authorityColumn,
+    legacySourceRevisionColumn: 'source_revision',
+    sourceRefColumn: 'source_ref',
+    contentDigestColumn: 'content_hash',
+    byteLengthColumn: 'byte_length',
+  };
+}
 
 /**
  * Produces the next writer-integration decision from a live/read-only canary.
- *
- * This function never authorizes writes. It exists so the eventual canary
- * result selects exactly one implementation path without silently reusing a
- * legacy source_revision column or creating a second revision owner.
+ * This planner never authorizes writes and never reinterprets the historical
+ * graphify_files.source_revision column when content_hash is the selected
+ * exact-byte authority field.
  */
 export function planGraphifySourceInventoryWriterV1(input: {
   canary: CodeRevisionOwnerCanaryV1;
@@ -133,7 +143,8 @@ export function planGraphifySourceInventoryWriterV1(input: {
     case 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND':
       status = 'READY_FOR_CANONICAL_WRITER_IMPLEMENTATION';
       storageStrategy = 'EXISTING_GRAPHIFY_LINEAGE';
-      target = EXISTING_TARGET;
+      target = existingTarget(canary);
+      if (!target) throw new Error('COMPATIBLE_CANARY_MISSING_SOURCE_REVISION_AUTHORITY_FIELD');
       createNewWriterAllowed = true;
       blockers.push('CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_NOT_IMPLEMENTED');
       blockers.push('CONTROLLED_PERSISTENCE_CANARY_REQUIRED_AFTER_WRITER_BINDING');
@@ -141,14 +152,16 @@ export function planGraphifySourceInventoryWriterV1(input: {
     case 'REVISION_OWNER_READY_FOR_CONTROLLED_CANARY':
       status = 'OWNER_ALREADY_BOUND_CONTROLLED_CANARY_REQUIRED';
       storageStrategy = 'EXISTING_GRAPHIFY_LINEAGE';
-      target = EXISTING_TARGET;
+      target = existingTarget(canary);
+      if (!target) throw new Error('BOUND_CANARY_MISSING_SOURCE_REVISION_AUTHORITY_FIELD');
       blockers.push('SECOND_REVISION_WRITER_FORBIDDEN');
       blockers.push('CONTROLLED_PERSISTENCE_CANARY_REQUIRED');
       break;
     case 'REVISION_OWNER_PROVEN':
       status = 'OWNER_ALREADY_PROVEN_NO_NEW_WRITER';
       storageStrategy = 'EXISTING_GRAPHIFY_LINEAGE';
-      target = EXISTING_TARGET;
+      target = existingTarget(canary);
+      if (!target) throw new Error('PROVEN_CANARY_MISSING_SOURCE_REVISION_AUTHORITY_FIELD');
       blockers.push('SECOND_REVISION_WRITER_FORBIDDEN');
       blockers.push('WRITER_PLAN_COMPLETE_USE_PROVEN_OWNER');
       break;
@@ -177,6 +190,7 @@ export function planGraphifySourceInventoryWriterV1(input: {
     requiredWriterBehavior: {
       createsWorkspaceRevisionInsideBoundary: true as const,
       createsSourceRevisionInsideBoundary: true as const,
+      preservesLegacySourceRevisionSemantics: true as const,
       acceptsCallerWorkspaceRevisionAsAuthority: false as const,
       acceptsCallerSourceRevisionAsAuthority: false as const,
       writesRunAndFileLineageTransactionally: true as const,
