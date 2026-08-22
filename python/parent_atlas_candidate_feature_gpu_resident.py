@@ -60,6 +60,11 @@ def _u16_le(values: list[int]) -> bytes:
     return b"".join(struct.pack("<H", int(value)) for value in values)
 
 
+def _i32_le(values: list[int]) -> bytes:
+    import struct
+    return b"".join(struct.pack("<i", int(value)) for value in values)
+
+
 def verify_pack_source_checksums(pack: dict[str, Any]) -> None:
     values = [float(v) for v in pack["featureValues"]]
     presence = bytes(int(v) for v in pack["featurePresence"])
@@ -78,6 +83,17 @@ def verify_pack_source_checksums(pack: dict[str, Any]) -> None:
         expected = _require_sha256(pack.get(field), field.upper())
         if actual != expected:
             raise GpuResidentLeaseError(f"FEATURE_GPU_RESIDENT_{field.upper()}_MISMATCH")
+
+
+def resident_physical_checksums(pack: dict[str, Any]) -> dict[BufferKind, str]:
+    return {
+        "FEATURE_VALUES": _sha256_bytes(_f32_le([float(v) for v in pack["featureValues"]])),
+        "FEATURE_PRESENCE": _sha256_bytes(bytes(int(v) for v in pack["featurePresence"])),
+        "VALID_MASK": _sha256_bytes(bytes(int(v) for v in pack["validMask"])),
+        # Current PyTorch worker stages the logical u16 mask losslessly as int32.
+        "LANE_MASK_U16": _sha256_bytes(_i32_le([int(v) for v in pack["laneMaskU16"]])),
+        "DEGRADED_IDENTITY": _sha256_bytes(bytes(int(v) for v in pack["degradedIdentity"])),
+    }
 
 
 @dataclass
@@ -99,6 +115,7 @@ class ResidentLease:
     created_at: str
     expires_at: str
     buffer_ids: dict[BufferKind, str]
+    resident_checksums: dict[BufferKind, str]
     buffers: ResidentBuffers
     released: bool = False
 
@@ -143,6 +160,7 @@ class CandidateFeatureGpuResidentStore:
             raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_EXPIRY_INVALID")
 
         verify_pack_source_checksums(pack)
+        resident_checksums = resident_physical_checksums(pack)
         torch = self._torch()
         device = torch.device(f"cuda:{self.device_id}")
         physical_rows = int(pack["physicalRows"])
@@ -151,8 +169,9 @@ class CandidateFeatureGpuResidentStore:
         cpu_values = torch.tensor(pack["featureValues"], dtype=torch.float32).reshape(physical_rows, feature_count)
         cpu_presence = torch.tensor(pack["featurePresence"], dtype=torch.uint8).reshape(physical_rows, feature_count)
         cpu_valid = torch.tensor(pack["validMask"], dtype=torch.uint8)
-        # PyTorch has no uint16 tensor dtype. Keep the exact u16 source checksum,
-        # then represent values losslessly as int32 on device for gather kernels.
+        # PyTorch has no generally portable uint16 tensor execution support across
+        # the target environments. Preserve the source u16 checksum and stage the
+        # values losslessly as int32 for device-side gather kernels.
         cpu_lane = torch.tensor(pack["laneMaskU16"], dtype=torch.int32)
         cpu_degraded = torch.tensor(pack["degradedIdentity"], dtype=torch.uint8)
 
@@ -183,6 +202,7 @@ class CandidateFeatureGpuResidentStore:
             created_at=created_at,
             expires_at=expires_at,
             buffer_ids=buffer_ids,
+            resident_checksums=resident_checksums,
             buffers=ResidentBuffers(*gpu),
         )
         self._next_epoch += 1
@@ -239,6 +259,5 @@ class CandidateFeatureGpuResidentStore:
         if lease.released:
             raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_LEASE_ALREADY_RELEASED")
         lease.released = True
-        # Drop the only strong references to the CUDA tensors held by this store.
         lease.buffers = ResidentBuffers(None, None, None, None, None)
         return lease
