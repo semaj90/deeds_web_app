@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.query-router-v2-plumbing-proof.v1",
+  "generatedAt": "2026-08-22T08:40:26.123Z",
+  "status": "SYNTHETIC_PLUMBING_PROVEN",
+  "evidenceClass": "SYNTHETIC_PLUMBING_ONLY",
+  "syntheticRows": 120,
+  "splitCounts": {
+    "train": 99,
+    "validation": 11,
+    "test": 10
+  },
+  "featureWidths": [
+    234
+  ],
+  "datasetDigest": "67af984875092d3e1d7d090e4d737ac77b30f798830bc80366cc27add1d89055",
+  "gates": {
+    "splitPass": true,
+    "widthPass": true,
+    "rowDigestsUnique": true,
+    "tensorRevisionPass": true
+  },
+  "trainingQualityProven": false,
+  "retrievalQualityProven": false,
+  "embeddingModelExecuted": false,
+  "canonicalOwnerChanged": false,
+  "retrievalOwnerChanged": false,
+  "canonicalWritesAllowed": false,
+  "nextRequirement": "REVISION_QUALIFIED_LABELED_QUERY_CORPUS_WITH_REAL_CLASSIFICATION_768"
+}

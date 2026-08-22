@@ -1,0 +1,90 @@
+{
+  "supersedes-ranker": {
+    "status": "canonical",
+    "canonical_path": "packages/atlas-core/src/ranking/supersedes-ranker.ts",
+    "phase": "85-P1",
+    "exported_from_index": true,
+    "supersedes": [
+      "scripts/atlas/rank-supersedes-candidates.mjs"
+    ],
+    "description": "Artifact ranking decisions: SKIP, METADATA_ONLY, REGENERATE, GAN_REVIEW, FULL_REGENERATION",
+    "ready_for_use": true
+  },
+  "gan-deep-audit": {
+    "status": "canonical",
+    "canonical_path": "packages/atlas-core/src/validation/gan-deep-audit.ts",
+    "phase": "85-P6",
+    "exported_from_index": true,
+    "supersedes": [
+      "scripts/atlas/validate-gan-tool-calls.mjs"
+    ],
+    "description": "GAN validation: 8 hard-fail conditions, 2 soft-warning conditions",
+    "ready_for_use": true
+  },
+  "semantic-diff-gate": {
+    "status": "incubation",
+    "canonical_path": "src/lib/server/generation/semantic-diff-gate.ts",
+    "phase": "85-P2",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "Semantic diff: EmbeddingGemma cosine similarity with 5-tier thresholds",
+    "ready_for_promotion": true,
+    "promotion_target": "packages/atlas-core/src/validation/semantic-diff.ts",
+    "note": "Pure logic, no infrastructure deps. Move after P2 backfill complete"
+  },
+  "artifact-registry-logger": {
+    "status": "incubation",
+    "canonical_path": "src/lib/server/generation/artifact-logger.ts",
+    "phase": "85-P3",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "Artifact registry: content hash dedup, supersedes tracking, lifecycle management",
+    "ready_for_promotion": true,
+    "promotion_target": "packages/atlas-core/src/artifacts/registry.ts",
+    "note": "Has DB dependencies. Need adapter pattern for Postgres ops"
+  },
+  "summary-qa-validation": {
+    "status": "incubation",
+    "canonical_path": "src/lib/server/generation/summary-qa.ts",
+    "phase": "85-P5",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "Summary QA: length, confidence, grounding, hallucination thresholds",
+    "ready_for_promotion": true,
+    "promotion_target": "packages/atlas-core/src/validation/summary-qa.ts",
+    "note": "Pure validation logic. Move after integration testing passes"
+  },
+  "reward-scoring": {
+    "status": "planned",
+    "canonical_path": "src/lib/server/cache/atlas-reward-cache.ts",
+    "phase": "85-P7",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "Reward scoring: weighted formula (compile, test, lint, user_acceptance, perf, security, gan)",
+    "ready_for_promotion": false,
+    "promotion_target": "packages/atlas-core/src/scoring/reward-score.ts",
+    "note": "Not yet implemented. Create pure scoring function before moving"
+  },
+  "git-diff-probes": {
+    "status": "planned",
+    "canonical_path": "scripts/atlas/git-diff-supersedes-reconcile-production.mjs",
+    "phase": "85-P8",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "7 production probes: Qdrant, Redis, Postgres, semantic diff, artifact, Neo4j, reward",
+    "ready_for_promotion": false,
+    "promotion_target": "packages/parent-atlas/src/adapters/git-diff-validator.ts",
+    "note": "Infrastructure-heavy. Belongs in parent-atlas adapters, not atlas-core"
+  },
+  "dataset-export": {
+    "status": "planned",
+    "canonical_path": "scripts/atlas/generate-production-readiness-report.mjs",
+    "phase": "85-P9",
+    "exported_from_index": false,
+    "supersedes": [],
+    "description": "Dataset export: good_traces, bad_traces, dpo_pairs, tool_call_sft",
+    "ready_for_promotion": false,
+    "promotion_target": "packages/parent-atlas/src/export/dataset-exporter.ts",
+    "note": "CLI wrapper. Keep as script, but delegate logic to atlas-core or parent-atlas"
+  }
+}

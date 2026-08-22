@@ -1,0 +1,46 @@
+{
+  "name": "@deeds/parent-atlas-opencode",
+  "version": "1.0.0",
+  "description": "OpenCode CLI plugin for Parent Atlas GPU acceleration pipeline",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./skills": {
+      "default": "./skills"
+    },
+    "./commands": {
+      "default": "./commands"
+    }
+  },
+  "files": [
+    "dist",
+    "skills",
+    "commands"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deeds/parent-atlas-core": "file:../parent-atlas-core",
+    "@deeds/parent-atlas-retrieval": "file:../parent-atlas-retrieval"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "opencode",
+    "claude-code",
+    "parent-atlas",
+    "gpu",
+    "skills"
+  ],
+  "author": "Deeds Team",
+  "license": "MIT"
+}

@@ -9,6 +9,10 @@ import {
   type AgentActionEventV1,
   type ActionCurrentProjectionV1,
 } from './temporal-action-ledger.js';
+import {
+  reserveTemporalActionLedgerSequence,
+  type TemporalActionSequenceReservationReceiptV1,
+} from './temporal-action-sequence-reservation.js';
 
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 const id = z.string().min(1);
@@ -28,15 +32,6 @@ export const temporalActionAppendReceiptSchema = z.object({
   producer_revision: z.string().min(1),
 }).strict();
 export type TemporalActionAppendReceiptV1 = z.infer<typeof temporalActionAppendReceiptSchema>;
-
-export const temporalActionSequenceReservationReceiptSchema = z.object({
-  schema: z.literal('atlas.temporal-action-sequence-reservation-receipt.v1').default('atlas.temporal-action-sequence-reservation-receipt.v1'),
-  ledger_sequence: z.number().int().positive(),
-  allocator: z.literal('atlas_agent_action_ledger_sequence_seq'),
-  identity_authority: z.literal(false).default(false),
-  producer_revision: z.string().min(1),
-}).strict();
-export type TemporalActionSequenceReservationReceiptV1 = z.infer<typeof temporalActionSequenceReservationReceiptSchema>;
 
 export const temporalActionLookupReceiptSchema = z.object({
   schema: z.literal('atlas.temporal-action-lookup-receipt.v1').default('atlas.temporal-action-lookup-receipt.v1'),
@@ -151,23 +146,7 @@ export function createTemporalActionPostgresRepository(db: Pool | PoolClient | Q
      * append; append-only ordering does not require dense numbering.
      */
     async reserveLedgerSequence(producerRevision: string): Promise<TemporalActionSequenceReservationReceiptV1> {
-      const producer = id.parse(producerRevision);
-      const result = await queryable.query<{ ledger_sequence: string | number }>(
-        `SELECT nextval('atlas_agent_action_ledger_sequence_seq') AS ledger_sequence`,
-      );
-      if (result.rowCount !== 1 || result.rows.length !== 1) {
-        throw new Error('TEMPORAL_LEDGER_SEQUENCE_RESERVATION_FAILED');
-      }
-      const sequence = Number(result.rows[0]!.ledger_sequence);
-      if (!Number.isSafeInteger(sequence) || sequence <= 0) {
-        throw new Error(`TEMPORAL_LEDGER_SEQUENCE_INVALID:${String(result.rows[0]!.ledger_sequence)}`);
-      }
-      return temporalActionSequenceReservationReceiptSchema.parse({
-        ledger_sequence: sequence,
-        allocator: 'atlas_agent_action_ledger_sequence_seq',
-        identity_authority: false,
-        producer_revision: producer,
-      });
+      return reserveTemporalActionLedgerSequence(queryable as Pool, producerRevision);
     },
 
     async append(eventInput: AgentActionEventV1, producerRevision: string): Promise<TemporalActionAppendReceiptV1> {

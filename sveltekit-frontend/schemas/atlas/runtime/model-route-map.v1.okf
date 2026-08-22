@@ -1,0 +1,25 @@
+schema_id: atlas.model-route-map
+schema_version: 1
+schema_kind: model_route_map
+status: ACTIVE
+
+description: >
+  Bounded model-executor routing independent of retrieval. BitNet is one optional
+  model runtime for cheap classification/validation tasks, not a search backend.
+
+fields:
+  schema: { type: literal, value: atlas.model-route-map.v1 }
+  routeMapRevision: { type: string, required: true }
+  routes:
+    type: array
+    items:
+      taskClass: { type: string, required: true }
+      runtime:
+        type: enum
+        values: [llama-server, trt-llm, bitnet, hosted]
+      modelId: { type: string, required: true }
+      minConfidence: { type: number, minimum: 0, maximum: 1 }
+      maxTokens: { type: integer, minimum: 1 }
+      resourceClass: { type: string, required: true }
+      priority: { type: integer, minimum: 0 }
+  producerRevision: { type: string, required: true }

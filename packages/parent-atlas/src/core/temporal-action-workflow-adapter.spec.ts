@@ -43,7 +43,7 @@ function base() {
         workspace_revision: { value: 'W1', authority: 'PROVEN' as const, evidence_refs: ['e:w'] },
         source_revision: { value: 'S1', authority: 'PROVEN' as const, evidence_refs: ['e:s'] },
         graph_revision: { value: null, authority: 'NOT_APPLICABLE' as const, evidence_refs: [] },
-        relevant_dimensions: ['workspace', 'source'] as const,
+        relevant_dimensions: ['workspace', 'source'] as ('workspace' | 'source' | 'graph')[],
         evidence_frontier_hash: H('frontier'),
       },
     },

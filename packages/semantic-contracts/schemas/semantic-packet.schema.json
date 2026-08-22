@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/semantic-packet/2.0.0",
+  "title": "Semantic Packet v2.0.0",
+  "description": "Canonical packet identity and lifecycle. Single source of truth across Postgres, Qdrant, Redis, Neo4j.",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "packetKey",
+    "sourceRef",
+    "featureId",
+    "featureLabel",
+    "workspaceRevision",
+    "contentSha256",
+    "evidenceState"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "atlas:semantic:packet",
+      "description": "Immutable schema identifier"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "2.0.0",
+      "description": "Schema version. Breaking changes increment major."
+    },
+    "packetKey": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Immutable cross-store identity. Primary join key across all systems."
+    },
+    "sourceRef": {
+      "type": "string",
+      "description": "Source reference (file path, function, etc). One-to-many with packets."
+    },
+    "featureId": {
+      "type": "string",
+      "description": "Feature identifier. Canonical within workspace."
+    },
+    "featureLabel": {
+      "type": "string",
+      "description": "Human-readable feature label"
+    },
+    "workspaceRevision": {
+      "type": "string",
+      "description": "Workspace/corpus revision at packet creation time"
+    },
+    "contentSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA256 of source content"
+    },
+    "domainClass": {
+      "type": ["string", "null"],
+      "description": "Canonical domain classification (NULL = unresolved). Updated ONLY via mutation authorization gate."
+    },
+    "predictedDomain": {
+      "type": ["string", "null"],
+      "description": "Non-canonical prediction from classifier ledger (informational only)"
+    },
+    "ontologyIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "IDs of accepted ontology relations involving this packet"
+    },
+    "evidenceState": {
+      "type": "string",
+      "enum": [
+        "ACTIVE_VERIFIED",
+        "ACTIVE_GATED",
+        "SUPERSEDED",
+        "ARCHIVED",
+        "UNRESOLVED"
+      ],
+      "description": "Lifecycle state of this packet"
+    },
+    "semanticTags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Searchable semantic tags"
+    },
+    "vectorVersions": {
+      "type": "object",
+      "description": "Manifest versions for all available vectors"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensible metadata. NOT part of canonical identity."
+    }
+  },
+  "additionalProperties": false
+}

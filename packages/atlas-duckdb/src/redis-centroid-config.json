@@ -1,0 +1,252 @@
+{
+  "redis_centroid_layer": "bifrost_l2_semantic_cache",
+  "description": "Redis/Valkey storage contract for SOM centroids, cluster membership, and reranking scores",
+  "connection": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": "redis",
+    "db": 0,
+    "pool_size": 4,
+    "timeout_ms": 5000,
+    "client": "ioredis v5+"
+  },
+  "key_patterns": {
+    "centroid_vector": {
+      "pattern": "centroid:som:{cluster_id}",
+      "type": "string (base64-encoded float32 array)",
+      "ttl_seconds": 86400,
+      "size_bytes": 3140,
+      "example": "centroid:som:0x0f42",
+      "contents": "SOM BMU centroid at grid (15, 66), 768-dim embedding"
+    },
+    "cluster_members": {
+      "pattern": "cluster:members:{cluster_id}",
+      "type": "set (packet_keys)",
+      "ttl_seconds": 86400,
+      "size_estimate_bytes": 65536,
+      "example": "cluster:members:0x0f42",
+      "max_members": 2000,
+      "contents": "all packet_keys assigned to this SOM cell"
+    },
+    "feature_centroid": {
+      "pattern": "centroid:feature:{feature_id}",
+      "type": "string (base64-encoded float32 array)",
+      "ttl_seconds": 604800,
+      "size_bytes": 3140,
+      "example": "centroid:feature:auth.sessions",
+      "contents": "mean embedding of all packets with this feature_id"
+    },
+    "directory_centroid": {
+      "pattern": "centroid:directory:{directory_hash}",
+      "type": "string (base64-encoded float32 array)",
+      "ttl_seconds": 604800,
+      "size_bytes": 3140,
+      "example": "centroid:directory:src/lib/server",
+      "contents": "mean embedding of all packets in directory"
+    },
+    "rerank_scores": {
+      "pattern": "rerank:scores:{query_hash}:{cluster_id}",
+      "type": "hash (packet_key → float32 score)",
+      "ttl_seconds": 300,
+      "size_estimate_bytes": 40960,
+      "example": "rerank:scores:abc123def:0x0f42",
+      "max_entries": 2000,
+      "contents": "similarity scores for packets in cluster vs query",
+      "lifecycle": "temporary, populated during query reranking"
+    },
+    "som_grid_metadata": {
+      "pattern": "som:metadata:grid",
+      "type": "hash",
+      "ttl_seconds": 86400,
+      "example_fields": {
+        "width": "20",
+        "height": "20",
+        "total_cells": "400",
+        "populated_cells": "387",
+        "centroid_dim": "768",
+        "last_updated": "2026-07-21T12:34:56Z"
+      }
+    },
+    "query_cache_metadata": {
+      "pattern": "cache:metadata:{query_hash}",
+      "type": "hash",
+      "ttl_seconds": 300,
+      "example_fields": {
+        "query_text": "semantic legal analysis",
+        "embedding_hash": "xyz789",
+        "clusters_searched": "5",
+        "candidates_returned": "50",
+        "rerank_applied": "true",
+        "total_time_ms": "245"
+      }
+    }
+  },
+  "storage_tiers": {
+    "hot_som_grid": {
+      "size_mb": 125,
+      "contents": [
+        "All SOM centroid vectors (400 cells × 3.1KB each)",
+        "All cluster membership sets (active cells)"
+      ],
+      "eviction_policy": "no_evict",
+      "refresh_interval_hours": 24,
+      "use_case": "K-hop SOM neighborhood expansion during retrieval"
+    },
+    "warm_feature_centroids": {
+      "size_mb": 98,
+      "contents": [
+        "Feature centroids for top-100 features (by packet count)",
+        "Directory centroids for top-50 directories"
+      ],
+      "eviction_policy": "lru",
+      "ttl_seconds": 604800,
+      "use_case": "authority scoring, query-feature similarity"
+    },
+    "ephemeral_rerank_cache": {
+      "size_mb": 32,
+      "contents": [
+        "Current query reranking scores (top-5 clusters)",
+        "Query metadata and timing"
+      ],
+      "eviction_policy": "ttl (300s)",
+      "use_case": "cache query context during multi-round retrieval"
+    }
+  },
+  "write_patterns": {
+    "som_materialization": {
+      "trigger": "daily_schedule OR manual_npm_run",
+      "source": "DuckDB cluster analysis + GPU k-means/SOM",
+      "workflow": [
+        "1. GPU: Run SOM training on all 61K packet embeddings",
+        "2. DuckDB: Aggregate packets by BMU (SOM grid cell)",
+        "3. Redis: MSET all 400 centroid:som:{id} keys (atomic)",
+        "4. Redis: SADD all cluster:members:{id} sets (atomic per cell)",
+        "5. Redis: HSET som:metadata:grid with dimensions + timestamp",
+        "6. Emit: event on rabbitmq topic 'centroid.updated' for subscribers"
+      ],
+      "atomicity": "per_key (not multi-key transaction)",
+      "retry_on_failure": "exponential backoff (3 attempts)",
+      "estimated_time_seconds": 8
+    },
+    "feature_centroid_batch": {
+      "trigger": "weekly_schedule OR on_new_feature_lane",
+      "source": "DuckDB feature aggregation",
+      "workflow": [
+        "1. DuckDB: GROUP BY feature_id, compute mean embedding",
+        "2. Redis: MSET top-100 centroid:feature:{id} keys",
+        "3. Redis: EXPIRE all with ttl 604800 (7 days)",
+        "4. Emit: 'feature_centroid.updated' event"
+      ],
+      "batch_size": 100,
+      "estimated_time_seconds": 3
+    },
+    "query_rerank_ephemeral": {
+      "trigger": "on_every_query_with_rerank",
+      "source": "GPU cosine similarity results",
+      "workflow": [
+        "1. GPU: Compute similarity(query, candidates)",
+        "2. Filter: Keep top-K per cluster",
+        "3. Redis: HSET rerank:scores:{query_hash}:{cluster_id}",
+        "4. Redis: EXPIRE after 5 minutes (ephemeral)",
+        "5. Return: scores to ACE context packer"
+      ],
+      "lifetime_seconds": 300,
+      "atomic_per_cluster": true
+    }
+  },
+  "read_patterns": {
+    "som_neighborhood_expansion": {
+      "operation": "K-hop neighbor lookup from query hit cluster",
+      "redis_calls": [
+        "GET centroid:som:{cluster_id} → load BMU centroid",
+        "SMEMBERS cluster:members:{cluster_id} → load candidates",
+        "GET centroid:som:{neighbor_1..K} → load neighbor centroids"
+      ],
+      "total_keys_accessed": 1 + 1 + 2 + 5 + 5,
+      "cache_hit_rate": 0.95,
+      "latency_ms": 8
+    },
+    "feature_authority_scoring": {
+      "operation": "Query-feature similarity for authority blend",
+      "redis_calls": [
+        "MGET centroid:feature:{top_10_features} → load centroids",
+        "GPU: compute similarity(query_emb, feature_centroids)",
+        "Use scores for authority boosting"
+      ],
+      "total_keys_accessed": 10,
+      "cache_hit_rate": 0.98,
+      "latency_ms": 12
+    },
+    "rerank_cache_check": {
+      "operation": "Check if query already reranked recently",
+      "redis_calls": [
+        "GET cache:metadata:{query_hash} → check if cached",
+        "HGETALL rerank:scores:{query_hash}:* → fetch cached scores"
+      ],
+      "total_keys_accessed": 1 + 5,
+      "cache_hit_rate": 0.15,
+      "latency_ms": 3
+    }
+  },
+  "memory_footprint": {
+    "som_grid_400_cells": {
+      "centroid_vectors": {
+        "count": 400,
+        "size_bytes_each": 3140,
+        "total_mb": 1.2
+      },
+      "cluster_membership": {
+        "count": 400,
+        "avg_members": 150,
+        "bytes_per_key": 16,
+        "total_mb": 0.9
+      },
+      "metadata": {
+        "size_mb": 0.01
+      },
+      "total_mb": 2.11
+    },
+    "feature_centroids_top_100": {
+      "total_mb": 0.3
+    },
+    "directory_centroids_top_50": {
+      "total_mb": 0.15
+    },
+    "rerank_cache_ephemeral": {
+      "max_concurrent_queries": 10,
+      "size_per_query_mb": 0.32,
+      "total_mb": 3.2
+    },
+    "grand_total_mb": 5.76,
+    "headroom_percent": 95
+  },
+  "invalidation_triggers": {
+    "full_invalidate": [
+      "packet_count_mismatch (atlas_packets row count changed)",
+      "embedding_dimension_change (pgvector column type changed)",
+      "schema_migration (new feature table added)"
+    ],
+    "partial_invalidate": [
+      "new_packets_indexed (increment cluster members, recompute centroids)",
+      "feature_lane_change (recompute feature centroids only)"
+    ],
+    "ephemeral_invalidate": [
+      "query_cache_ttl_expired (automatic, 300s)",
+      "rerank_cache_stale (manual, on retrieval retry)"
+    ]
+  },
+  "monitoring": {
+    "metrics": {
+      "centroid_cache_hit_rate": "percentage of SOM/feature lookups found in Redis",
+      "rerank_cache_hit_rate": "percentage of queries reusing cached scores",
+      "som_grid_utilization": "populated_cells / 400",
+      "average_cluster_size": "mean members per cell",
+      "memory_peak_mb": "peak Redis memory during query batch"
+    },
+    "alerts": {
+      "hit_rate_below_90_percent": "investigate Redis eviction or TTL issues",
+      "grid_utilization_below_80_percent": "SOM may be imbalanced; consider retraining",
+      "cluster_size_outliers": "cells with >1000 members; consider re-clustering"
+    }
+  }
+}

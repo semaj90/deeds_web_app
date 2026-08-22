@@ -1,15 +1,11 @@
 """Same-corpus Qdrant exact/HNSW evaluation for frozen Atlas snapshots.
 
-A frozen snapshot may represent an entire Qdrant collection or only a bounded
-subset. ANN recall is only meaningful when Qdrant exact and HNSW search the same
-corpus, vector dimension, and metric as the frozen PyTorch/cuVS oracle.
-
-`snapshot_subset` adds a payload `match.any` filter over the frozen canonical IDs
-to BOTH exact and HNSW queries. `full_collection` performs no inclusion filter
-and is valid only when the exact-alignment gate proves the frozen snapshot is the
-service corpus.
+Qdrant exact is a service-side brute-force oracle, but it is only comparable to
+Parent Atlas when both search the same frozen corpus, vector dimension, metric,
+and canonical identity scope. HNSW evaluation is fail-closed until BOTH the mean
+exact Top-K overlap and the worst individual query overlap meet the configured
+floor.
 """
-
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -76,6 +72,27 @@ def _stable_checksum(value: Any) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def classify_exact_alignment(
+    *,
+    mean_overlap: float,
+    minimum_query_overlap: float,
+    minimum_required_overlap: float,
+) -> str:
+    """Classify PyTorch↔Qdrant exact alignment without averaging away a bad query."""
+    values = (mean_overlap, minimum_query_overlap, minimum_required_overlap)
+    if any(not np.isfinite(value) for value in values):
+        raise ValueError("exact overlap values must be finite")
+    if any(value < 0.0 or value > 1.0 for value in values):
+        raise ValueError("exact overlap values must be in [0,1]")
+    if mean_overlap < minimum_query_overlap:
+        raise ValueError("mean exact overlap cannot be lower than minimum query overlap")
+    return (
+        "ALIGNED"
+        if mean_overlap >= minimum_required_overlap and minimum_query_overlap >= minimum_required_overlap
+        else "EXACT_STORE_MISMATCH"
+    )
+
+
 def _post_json(url: str, payload: dict[str, Any], timeout: float) -> dict[str, Any]:
     body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
     req = urllib_request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
@@ -95,38 +112,24 @@ def expected_qdrant_distance(metric: str) -> tuple[str, str]:
     if metric == "inner_product":
         return "Dot", "native_dot_product"
     if metric == "sqeuclidean":
-        # Qdrant stores Euclidean distance; x -> x^2 is monotonic for x>=0,
-        # therefore exact/ANN Top-K order is equivalent to squared Euclidean.
         return "Euclid", "euclidean_rank_equivalent_to_sqeuclidean"
     raise ValueError(f"unsupported Atlas metric: {metric}")
 
 
-def _collection_vector_config(
-    *,
-    base_url: str,
-    collection: str,
-    vector_name: str | None,
-    timeout: float,
-) -> tuple[int, str]:
+def _collection_vector_config(*, base_url: str, collection: str, vector_name: str | None, timeout: float) -> tuple[int, str]:
     response = _get_json(f"{base_url.rstrip('/')}/collections/{collection}", timeout)
     result = response.get("result") or {}
     vectors = (((result.get("config") or {}).get("params") or {}).get("vectors"))
     if not isinstance(vectors, dict):
         raise ValueError("Qdrant collection info has no config.params.vectors")
-
-    params: Any
     if vector_name:
         params = vectors.get(vector_name)
         if not isinstance(params, dict):
             raise ValueError(f"Qdrant named vector not found: {vector_name}")
+    elif "size" in vectors and "distance" in vectors:
+        params = vectors
     else:
-        # Single-vector mode is the object itself; named-vector mode requires an
-        # explicit vector_name because each vector can have its own metric/size.
-        if "size" in vectors and "distance" in vectors:
-            params = vectors
-        else:
-            raise ValueError("Qdrant collection has named vectors; vector_name is required")
-
+        raise ValueError("Qdrant collection has named vectors; vector_name is required")
     size = params.get("size")
     distance = params.get("distance")
     if not isinstance(size, int) or size <= 0:
@@ -137,11 +140,8 @@ def _collection_vector_config(
 
 
 def build_same_corpus_filter(
-    *,
-    self_canonical_id: str,
-    canonical_payload_key: str,
-    comparison_scope: ComparisonScope,
-    scoped_canonical_ids: Sequence[str],
+    *, self_canonical_id: str, canonical_payload_key: str,
+    comparison_scope: ComparisonScope, scoped_canonical_ids: Sequence[str],
 ) -> dict[str, Any]:
     if comparison_scope not in {"snapshot_subset", "full_collection"}:
         raise ValueError("comparison_scope must be snapshot_subset or full_collection")
@@ -159,19 +159,9 @@ def build_same_corpus_filter(
 
 
 def _query(
-    *,
-    base_url: str,
-    collection: str,
-    vector_name: str | None,
-    vector: np.ndarray,
-    self_canonical_id: str,
-    canonical_payload_key: str,
-    comparison_scope: ComparisonScope,
-    scoped_canonical_ids: Sequence[str],
-    k: int,
-    exact: bool,
-    hnsw_ef: int | None,
-    timeout: float,
+    *, base_url: str, collection: str, vector_name: str | None, vector: np.ndarray,
+    self_canonical_id: str, canonical_payload_key: str, comparison_scope: ComparisonScope,
+    scoped_canonical_ids: Sequence[str], k: int, exact: bool, hnsw_ef: int | None, timeout: float,
 ) -> tuple[list[str], float]:
     params: dict[str, Any] = {"exact": exact}
     if hnsw_ef is not None:
@@ -190,13 +180,8 @@ def _query(
     }
     if vector_name:
         payload["using"] = vector_name
-
     started = time.perf_counter()
-    response = _post_json(
-        f"{base_url.rstrip('/')}/collections/{collection}/points/query",
-        payload,
-        timeout,
-    )
+    response = _post_json(f"{base_url.rstrip('/')}/collections/{collection}/points/query", payload, timeout)
     elapsed = (time.perf_counter() - started) * 1000.0
     result = response.get("result") or {}
     points = result.get("points") if isinstance(result, dict) else result
@@ -214,15 +199,32 @@ def _query(
     return identities, elapsed
 
 
+def _blocked_metric_receipt(
+    *, comparison_scope: ComparisonScope, ids: list[str], collection: str, vector_name: str | None,
+    payload_key: str, metric: str, qdrant_distance: str, qdrant_size: int,
+    distance_interpretation: str, k: int, query_count: int,
+    minimum_exact_overlap: float, minimum_hnsw_recall: float,
+) -> QdrantScopedAnnReceipt:
+    return QdrantScopedAnnReceipt(
+        schema="atlas.qdrant-scoped-ann-receipt.v1", comparison_scope=comparison_scope,
+        scoped_corpus_count=len(ids), scoped_corpus_checksum=_stable_checksum(ids),
+        collection=collection, vector_name=vector_name, canonical_payload_key=payload_key,
+        metric=metric, qdrant_distance=qdrant_distance, qdrant_vector_size=qdrant_size,
+        metric_alignment_status="MISMATCH", distance_interpretation=distance_interpretation,
+        k=k, query_count=query_count, minimum_exact_overlap_at_k=minimum_exact_overlap,
+        pytorch_qdrant_exact_mean_overlap_at_k=0.0,
+        pytorch_qdrant_exact_minimum_query_overlap_at_k=0.0,
+        exact_alignment_status="METRIC_MISMATCH", exact_mean_latency_ms=0.0,
+        exact_p95_latency_ms=0.0, exact_result_checksum=_stable_checksum([]), sweep=[],
+        minimum_hnsw_recall_at_k=minimum_hnsw_recall, recommended_hnsw_ef=None,
+        recommendation_status="BLOCKED_METRIC_MISMATCH", best_hnsw_recall_at_k=0.0,
+        canonical_authority=False,
+    )
+
+
 def evaluate_qdrant_scoped_ann(
-    semantic: np.ndarray,
-    canonical_ids: Sequence[str],
-    query_ordinals: Sequence[int],
-    *,
-    metric: str,
-    k: int,
-    qdrant: dict[str, Any],
-    torch_device: str = "cpu",
+    semantic: np.ndarray, canonical_ids: Sequence[str], query_ordinals: Sequence[int],
+    *, metric: str, k: int, qdrant: dict[str, Any], torch_device: str = "cpu",
 ) -> QdrantScopedAnnReceipt:
     source = np.asarray(semantic, dtype=np.float32)
     ids = [str(value) for value in canonical_ids]
@@ -238,7 +240,6 @@ def evaluate_qdrant_scoped_ann(
     comparison_scope: ComparisonScope = str(qdrant.get("comparison_scope") or "snapshot_subset")  # type: ignore[assignment]
     if comparison_scope not in {"snapshot_subset", "full_collection"}:
         raise ValueError("unsupported qdrant comparison_scope")
-
     base_url = str(qdrant.get("url") or "http://127.0.0.1:6333")
     collection = str(qdrant.get("collection") or "")
     if not collection:
@@ -257,51 +258,20 @@ def evaluate_qdrant_scoped_ann(
 
     expected_distance, distance_interpretation = expected_qdrant_distance(metric)
     qdrant_size, qdrant_distance = _collection_vector_config(
-        base_url=base_url,
-        collection=collection,
-        vector_name=vector_name,
-        timeout=timeout,
+        base_url=base_url, collection=collection, vector_name=vector_name, timeout=timeout,
     )
-    metric_aligned = qdrant_size == int(source.shape[1]) and qdrant_distance.lower() == expected_distance.lower()
-    if not metric_aligned:
-        return QdrantScopedAnnReceipt(
-            schema="atlas.qdrant-scoped-ann-receipt.v1",
-            comparison_scope=comparison_scope,
-            scoped_corpus_count=len(ids),
-            scoped_corpus_checksum=_stable_checksum(ids),
-            collection=collection,
-            vector_name=vector_name,
-            canonical_payload_key=payload_key,
-            metric=metric,
-            qdrant_distance=qdrant_distance,
-            qdrant_vector_size=qdrant_size,
-            metric_alignment_status="MISMATCH",
-            distance_interpretation=distance_interpretation,
-            k=k,
-            query_count=len(query_ordinals),
-            minimum_exact_overlap_at_k=minimum_exact_overlap,
-            pytorch_qdrant_exact_mean_overlap_at_k=0.0,
-            pytorch_qdrant_exact_minimum_query_overlap_at_k=0.0,
-            exact_alignment_status="METRIC_MISMATCH",
-            exact_mean_latency_ms=0.0,
-            exact_p95_latency_ms=0.0,
-            exact_result_checksum=_stable_checksum([]),
-            sweep=[],
-            minimum_hnsw_recall_at_k=minimum_hnsw_recall,
-            recommended_hnsw_ef=None,
-            recommendation_status="BLOCKED_METRIC_MISMATCH",
-            best_hnsw_recall_at_k=0.0,
-            canonical_authority=False,
+    if qdrant_size != int(source.shape[1]) or qdrant_distance.lower() != expected_distance.lower():
+        return _blocked_metric_receipt(
+            comparison_scope=comparison_scope, ids=ids, collection=collection, vector_name=vector_name,
+            payload_key=payload_key, metric=metric, qdrant_distance=qdrant_distance,
+            qdrant_size=qdrant_size, distance_interpretation=distance_interpretation, k=k,
+            query_count=len(query_ordinals), minimum_exact_overlap=minimum_exact_overlap,
+            minimum_hnsw_recall=minimum_hnsw_recall,
         )
 
     queries = source[np.asarray(query_ordinals, dtype=np.int64)]
     exact_reference = exact_semantic_search(
-        source,
-        queries,
-        ids,
-        metric=metric,
-        top_k=min(k + 1, source.shape[0]),
-        device=torch_device,
+        source, queries, ids, metric=metric, top_k=min(k + 1, source.shape[0]), device=torch_device,
     )
     reference_rankings: list[list[str]] = []
     for query_index, hits in enumerate(exact_reference.hits):
@@ -316,18 +286,10 @@ def evaluate_qdrant_scoped_ann(
     exact_overlaps: list[float] = []
     for query_index, ordinal in enumerate(query_ordinals):
         ranking, latency = _query(
-            base_url=base_url,
-            collection=collection,
-            vector_name=vector_name,
-            vector=source[int(ordinal)],
-            self_canonical_id=ids[int(ordinal)],
-            canonical_payload_key=payload_key,
-            comparison_scope=comparison_scope,
-            scoped_canonical_ids=ids,
-            k=k,
-            exact=True,
-            hnsw_ef=None,
-            timeout=timeout,
+            base_url=base_url, collection=collection, vector_name=vector_name,
+            vector=source[int(ordinal)], self_canonical_id=ids[int(ordinal)],
+            canonical_payload_key=payload_key, comparison_scope=comparison_scope,
+            scoped_canonical_ids=ids, k=k, exact=True, hnsw_ef=None, timeout=timeout,
         )
         exact_rankings.append(ranking)
         exact_latencies.append(latency)
@@ -335,7 +297,11 @@ def evaluate_qdrant_scoped_ann(
 
     mean_exact_overlap = float(np.mean(exact_overlaps))
     min_exact_overlap = float(np.min(exact_overlaps))
-    exact_status = "ALIGNED" if mean_exact_overlap >= minimum_exact_overlap else "EXACT_STORE_MISMATCH"
+    exact_status = classify_exact_alignment(
+        mean_overlap=mean_exact_overlap,
+        minimum_query_overlap=min_exact_overlap,
+        minimum_required_overlap=minimum_exact_overlap,
+    )
 
     sweep: list[QdrantScopedSweepPoint] = []
     if exact_status == "ALIGNED":
@@ -345,59 +311,34 @@ def evaluate_qdrant_scoped_ann(
             result_rows: list[list[str]] = []
             for query_index, ordinal in enumerate(query_ordinals):
                 ranking, latency = _query(
-                    base_url=base_url,
-                    collection=collection,
-                    vector_name=vector_name,
-                    vector=source[int(ordinal)],
-                    self_canonical_id=ids[int(ordinal)],
-                    canonical_payload_key=payload_key,
-                    comparison_scope=comparison_scope,
-                    scoped_canonical_ids=ids,
-                    k=k,
-                    exact=False,
-                    hnsw_ef=ef,
-                    timeout=timeout,
+                    base_url=base_url, collection=collection, vector_name=vector_name,
+                    vector=source[int(ordinal)], self_canonical_id=ids[int(ordinal)],
+                    canonical_payload_key=payload_key, comparison_scope=comparison_scope,
+                    scoped_canonical_ids=ids, k=k, exact=False, hnsw_ef=ef, timeout=timeout,
                 )
                 recalls.append(len(set(ranking) & set(exact_rankings[query_index])) / float(k))
                 latencies.append(latency)
                 result_rows.append(ranking)
             sweep.append(QdrantScopedSweepPoint(
-                hnsw_ef=ef,
-                recall_at_k=float(np.mean(recalls)),
-                mean_latency_ms=float(np.mean(latencies)),
-                p95_latency_ms=float(np.percentile(latencies, 95)),
+                hnsw_ef=ef, recall_at_k=float(np.mean(recalls)),
+                mean_latency_ms=float(np.mean(latencies)), p95_latency_ms=float(np.percentile(latencies, 95)),
                 result_checksum=_stable_checksum(result_rows),
             ))
 
     eligible = [row for row in sweep if row.recall_at_k >= minimum_hnsw_recall]
-    recommended = min(
-        eligible,
-        key=lambda row: (row.mean_latency_ms, row.p95_latency_ms, row.hnsw_ef),
-    ) if eligible else None
-
+    recommended = min(eligible, key=lambda row: (row.mean_latency_ms, row.p95_latency_ms, row.hnsw_ef)) if eligible else None
     return QdrantScopedAnnReceipt(
-        schema="atlas.qdrant-scoped-ann-receipt.v1",
-        comparison_scope=comparison_scope,
-        scoped_corpus_count=len(ids),
-        scoped_corpus_checksum=_stable_checksum(ids),
-        collection=collection,
-        vector_name=vector_name,
-        canonical_payload_key=payload_key,
-        metric=metric,
-        qdrant_distance=qdrant_distance,
-        qdrant_vector_size=qdrant_size,
-        metric_alignment_status="ALIGNED",
-        distance_interpretation=distance_interpretation,
-        k=k,
-        query_count=len(query_ordinals),
-        minimum_exact_overlap_at_k=minimum_exact_overlap,
+        schema="atlas.qdrant-scoped-ann-receipt.v1", comparison_scope=comparison_scope,
+        scoped_corpus_count=len(ids), scoped_corpus_checksum=_stable_checksum(ids), collection=collection,
+        vector_name=vector_name, canonical_payload_key=payload_key, metric=metric,
+        qdrant_distance=qdrant_distance, qdrant_vector_size=qdrant_size,
+        metric_alignment_status="ALIGNED", distance_interpretation=distance_interpretation, k=k,
+        query_count=len(query_ordinals), minimum_exact_overlap_at_k=minimum_exact_overlap,
         pytorch_qdrant_exact_mean_overlap_at_k=mean_exact_overlap,
         pytorch_qdrant_exact_minimum_query_overlap_at_k=min_exact_overlap,
-        exact_alignment_status=exact_status,
-        exact_mean_latency_ms=float(np.mean(exact_latencies)),
+        exact_alignment_status=exact_status, exact_mean_latency_ms=float(np.mean(exact_latencies)),
         exact_p95_latency_ms=float(np.percentile(exact_latencies, 95)),
-        exact_result_checksum=_stable_checksum(exact_rankings),
-        sweep=sweep,
+        exact_result_checksum=_stable_checksum(exact_rankings), sweep=sweep,
         minimum_hnsw_recall_at_k=minimum_hnsw_recall,
         recommended_hnsw_ef=recommended.hnsw_ef if recommended else None,
         recommendation_status=(

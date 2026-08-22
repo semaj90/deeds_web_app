@@ -1,0 +1,44 @@
+schema_id: atlas.workflow-spec
+schema_version: 1
+schema_kind: workflow_spec
+status: ACTIVE
+
+description: >
+  Canonical Parent Atlas workflow meaning. Mastra JSON, local execution, and
+  future durable backends are compiled runtime dialects and do not own this spec.
+
+fields:
+  schema: { type: literal, value: atlas.workflow-spec.v1 }
+  workflowId: { type: string, required: true }
+  workflowRevision: { type: integer, minimum: 1 }
+  requestId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, nullable: true }
+  representationRevision: { type: string, required: true }
+  intentId: { type: string, required: true }
+  contextManifestId: { type: string, required: true }
+  promptPlanId: { type: string, nullable: true }
+  nodes: { type: dag_node_plan_array, required: true }
+  edges: { type: dag_edge_array, required: true }
+  entryNodeIds: { type: string_array, required: true }
+  terminalNodeIds: { type: string_array, required: true }
+  resourceEnvelope:
+    type: object
+    fields:
+      tokenBudget: { type: integer, minimum: 1 }
+      candidateBudget: { type: integer, minimum: 1 }
+      graphHopBudget: { type: integer, minimum: 0 }
+      hyperedgeExpansionBudget: { type: integer, minimum: 0 }
+      toolCallBudget: { type: integer, minimum: 0 }
+      gpuVramBudgetBytes: { type: integer, nullable: true }
+      hostMemoryBudgetBytes: { type: integer, nullable: true }
+      wallClockBudgetMs: { type: integer, nullable: true }
+  retryPolicyRevision: { type: string, required: true }
+  authorizationPolicyRevision: { type: string, required: true }
+  validationPolicyRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - workflow meaning is independent of Mastra/Temporal/local executor choice
+  - all mutation nodes require validation descendants before terminal success

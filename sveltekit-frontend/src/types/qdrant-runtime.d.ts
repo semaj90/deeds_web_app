@@ -2,15 +2,7 @@ declare module '@qdrant/js-client' {
   export type Qdrant = any;
 }
 
-declare module '@atlas/semantic-contracts' {
-  export interface DomainPrediction {
-    classificationRunId: string;
-    prediction_id: string;
-    packet_key: string;
-    predicted_domain: string;
-  }
-
-  export interface OntologyProposal {
-    proposalId: string;
-  }
-}
+// The @atlas/semantic-contracts ambient shim that used to live here has been
+// replaced by the real package at packages/semantic-contracts (added to the
+// root workspaces array). Its types are a superset of this placeholder's
+// fields — see packages/semantic-contracts/src/index.ts.

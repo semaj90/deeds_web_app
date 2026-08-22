@@ -208,12 +208,18 @@ PublishScripts/
 **/[Pp]ackages/*
 !**/[Pp]ackages/build/
 
-# Parent Atlas source packages are repository-owned code, not NuGet artifacts.
+# The monorepo-root packages/ directory is repository-owned npm workspace
+# source, not NuGet artifacts. Previously only packages/atlas/ and
+# packages/parent-atlas/ were re-included here, which silently left every
+# other packages/* workspace member (atlas-core, atlas-duckdb, atlas-orchestrator,
+# parent-atlas-client, parent-atlas-core, parent-atlas-ingest,
+# parent-atlas-opencode, parent-atlas-retrieval, parent-atlas-runtime,
+# parent-atlas-workstation-integration-kit, semantic-contracts) untracked by
+# git despite being listed in the root package.json workspaces array and
+# containing real, substantial code. Found 2026-08-21 while auditing why
+# branches seemed to be "merging into packages that aren't in the main repo."
 !packages/
-!packages/atlas/
-!packages/atlas/**
-!packages/parent-atlas/
-!packages/parent-atlas/**
+!packages/**
 *.nuget.props
 *.nuget.targets
 

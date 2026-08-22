@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.query-router-v2-readiness-audit.v1",
+  "generatedAt": "2026-08-22T08:40:16.836Z",
+  "mode": "READ_ONLY_NO_TRAINING_NO_RETRIEVAL_WRITES",
+  "status": "READY_FOR_FROZEN_CORPUS_EVAL",
+  "contractsPresent": true,
+  "pythonReady": true,
+  "entrypointsReady": true,
+  "files": [
+    {
+      "relativePath": "src/lib/server/atlas/classification/query-router-dataset-v2.ts",
+      "exists": true,
+      "sha256": "8f41a16e5f1ea53593cc1fa0b598ee9c373f758d1127610e204735e13ee6a284"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/retrieval-router-tensor-manifest-v2.ts",
+      "exists": true,
+      "sha256": "49fd7b39d2230eaab024f65d5cbe622b0093210d15532a919b821b7af5fb017c"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "exists": true,
+      "sha256": "342d59d6dba62807adeea0028799f397080a538ecae434561ce5b41ab39e4c23"
+    },
+    {
+      "relativePath": "src/lib/server/atlas/classification/query-router-v2-integration.spec.ts",
+      "exists": true,
+      "sha256": "2984e0e1f4d09e7e946a422d891feb5774c654751b20cd8b8bd52dd266af68c9"
+    },
+    {
+      "relativePath": "scripts/atlas/build-query-router-dataset-v2.mts",
+      "exists": true,
+      "sha256": "90ed61e76db8ab5adf3be47bd9f1ea41ede8a1eb3112836026a71de4876c375b"
+    },
+    {
+      "relativePath": "scripts/atlas/train-query-router-pytorch-v2.py",
+      "exists": true,
+      "sha256": "68998eeab887bcc8b564014b596cb09c5adaaab740166b6947ba0d6685bcfd49"
+    },
+    {
+      "relativePath": "scripts/atlas/train-query-router-xgboost-v2.py",
+      "exists": true,
+      "sha256": "ba446d12fc8fd208913ccc02d2ed71cbf41a6f6da109b18e86b03e1c9b9b9f8d"
+    },
+    {
+      "relativePath": "scripts/atlas/compare-query-router-v2.py",
+      "exists": true,
+      "sha256": "83ac67ef33edff746526407b30bc391be13679f5b24698594fa7aff3b319e146"
+    }
+  ],
+  "python": {
+    "numpy": {
+      "available": true,
+      "version": "2.2.6",
+      "error": null
+    },
+    "torch": {
+      "available": true,
+      "version": "2.8.0+cu128",
+      "error": null
+    },
+    "xgboost": {
+      "available": true,
+      "version": "3.2.0",
+      "error": null
+    }
+  },
+  "entrypoints": {
+    "pytorchHelp": {
+      "pass": true,
+      "output": "usage: train-query-router-pytorch-v2.py [-h] --dataset DATASET\r\n                                        [--output-dir OUTPUT_DIR]\r\n                                        [--epochs EPOCHS]\r\n                                        [--batch-size BATCH_SIZE] [--lr LR]\r\n                                        [--seed SEED]\r\n                                        [--device {auto,cpu,cuda}]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --dataset DATASET\r\n  --output-dir OUTPUT_DIR\r\n  --epochs EPOCHS\r\n  --batch-size BATCH_SIZE\r\n  --lr LR\r\n  --seed SEED\r\n  --device {auto,cpu,cuda}",
+      "error": null
+    },
+    "xgboostHelp": {
+      "pass": true,
+      "output": "usage: train-query-router-xgboost-v2.py [-h] --dataset DATASET\r\n                                        [--output-dir OUTPUT_DIR]\r\n                                        [--seed SEED]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --dataset DATASET\r\n  --output-dir OUTPUT_DIR\r\n  --seed SEED",
+      "error": null
+    },
+    "compareHelp": {
+      "pass": true,
+      "output": "usage: compare-query-router-v2.py [-h] --pytorch-receipt PYTORCH_RECEIPT\r\n                                  --xgboost-receipt XGBOOST_RECEIPT\r\n                                  [--output OUTPUT]\r\n                                  [--min-domain-accuracy MIN_DOMAIN_ACCURACY]\r\n                                  [--min-operation-accuracy MIN_OPERATION_ACCURACY]\r\n\r\noptions:\r\n  -h, --help            show this help message and exit\r\n  --pytorch-receipt PYTORCH_RECEIPT\r\n  --xgboost-receipt XGBOOST_RECEIPT\r\n  --output OUTPUT\r\n  --min-domain-accuracy MIN_DOMAIN_ACCURACY\r\n  --min-operation-accuracy MIN_OPERATION_ACCURACY",
+      "error": null
+    }
+  },
+  "trainingExecuted": false,
+  "retrievalOwnerChanged": false,
+  "canonicalWritesAllowed": false,
+  "nextRequirement": "REVISION_QUALIFIED_LABELED_QUERY_CORPUS"
+}

@@ -1,0 +1,21 @@
+schema_id: atlas.file-mutation-intent
+schema_version: 1
+schema_kind: file_mutation_intent
+status: ACTIVE
+
+description: >
+  Normalized user intent for a bounded repository file mutation before evidence
+  retrieval and planning.
+
+fields:
+  schema: { type: literal, value: atlas.file-mutation-intent.v1 }
+  intentId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  operation:
+    type: enum
+    values: [CREATE, PATCH, RENAME, DELETE]
+  targetPathHint: { type: string, required: true }
+  targetArtifactKind: { type: string, nullable: true }
+  requiredSymbols: { type: string_array, default: [] }
+  constraints: { type: object, default: {} }
+  producerRevision: { type: string, required: true }

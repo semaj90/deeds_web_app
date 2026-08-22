@@ -1,0 +1,61 @@
+{
+  "name": "@deeds/parent-atlas-retrieval",
+  "version": "0.1.0",
+  "description": "Parent Atlas retrieval pipeline: Bifrost, TurboVec, LibTorch GPU bridge",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./bifrost": {
+      "types": "./dist/bifrost/index.d.ts",
+      "default": "./dist/bifrost/index.js"
+    },
+    "./turbovec": {
+      "types": "./dist/turbovec/index.d.ts",
+      "default": "./dist/turbovec/index.js"
+    },
+    "./gpu": {
+      "types": "./dist/gpu/index.d.ts",
+      "default": "./dist/gpu/index.js"
+    },
+    "./qdrant": {
+      "types": "./dist/qdrant/index.d.ts",
+      "default": "./dist/qdrant/index.js"
+    },
+    "./pipeline": {
+      "types": "./dist/pipeline/index.d.ts",
+      "default": "./dist/pipeline/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "native"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:native": "node-gyp rebuild",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deeds/parent-atlas-core": "file:../parent-atlas-core",
+    "zod": "^3.23.8",
+    "ioredis": "^5.4.0",
+    "@qdrant/js-client-rest": "^1.15.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.0.0",
+    "node-gyp": "^10.2.0"
+  },
+  "binary": {
+    "module_name": "tensorrt_bridge",
+    "module_path": "./native/",
+    "host": "https://github.com/semaj90/deeds-web-app/releases/download/"
+  }
+}

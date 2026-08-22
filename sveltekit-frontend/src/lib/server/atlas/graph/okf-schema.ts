@@ -8,14 +8,22 @@ const RelationshipNameSchema = z.enum([
 	'references',
 	'depends_on',
 	'implements',
+	'specifies',
 	'uses_concept',
+	'uses_table',
+	'uses_column',
+	'auth_guards',
+	'validates',
+	'blocks',
+	'observed_at_runtime',
 	'participates_in',
+	'authorized_resource_mutation',
 	'semantic_similar'
 ]);
 
 export const GraphProjectionPolicySchema = z
 	.object({
-		node_types: z.array(z.enum(['file', 'symbol', 'packet'])).min(1),
+		node_types: z.array(z.enum(['file', 'symbol', 'packet', 'feature', 'evidence', 'relationship'])).min(1),
 		pagerank_edges: z.array(RelationshipNameSchema).min(1),
 		traversal_edges: z.array(RelationshipNameSchema).min(1),
 		excluded_edges: z.array(RelationshipNameSchema).min(1),

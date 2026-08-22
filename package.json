@@ -190,11 +190,16 @@
   "workspaces": [
     "packages/atlas",
     "packages/atlas-core",
+    "packages/atlas-duckdb",
     "packages/atlas-orchestrator",
     "packages/parent-atlas",
+    "packages/parent-atlas-client",
     "packages/parent-atlas-core",
     "packages/parent-atlas-retrieval",
+    "packages/parent-atlas-runtime",
     "packages/parent-atlas-ingest",
-    "packages/parent-atlas-opencode"
+    "packages/parent-atlas-opencode",
+    "packages/parent-atlas-workstation-integration-kit",
+    "packages/semantic-contracts"
   ]
 }

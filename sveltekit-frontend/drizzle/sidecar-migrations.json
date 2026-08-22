@@ -244,6 +244,33 @@
       "appliedAt": "2026-06-12",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_packet_payload_path', 'idx_packet_payload_feature');\""
+    },
+    {
+      "file": "manual/20260821_graphify_source_inventory.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied Graphify source-inventory owner schema. It preserves legacy source_revision, records exact content_hash authority, and requires a non-production readback canary before row population or FANOUT admission.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-source-inventory-migration.mts"
+    },
+    {
+      "file": "manual/20260822_graph_snapshot_revision_owner_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive snapshot-level Graphify revision columns and nullable node source_revision. Unapplied; requires rollback proof and non-production readback before FANOUT admission.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-revision-migration.mts --migration=snapshot"
+    },
+    {
+      "file": "manual/20260822_graphify_revision_authority_v2.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive Graphify workspace and code-source revision columns. Unapplied; preserves legacy repository/source revisions and does not backfill or promote rows.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-revision-migration.mts --migration=graphify"
     }
   ]
 }

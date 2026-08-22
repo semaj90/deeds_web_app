@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import unittest
 
-from atlas_compute.qdrant_scoped_ann import build_same_corpus_filter, expected_qdrant_distance
+from atlas_compute.qdrant_scoped_ann import (
+    build_same_corpus_filter,
+    classify_exact_alignment,
+    expected_qdrant_distance,
+)
 
 
 class QdrantScopedAnnTests(unittest.TestCase):
@@ -48,6 +52,48 @@ class QdrantScopedAnnTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             expected_qdrant_distance("manhattan")
+
+    def test_exact_alignment_requires_mean_and_every_query_to_meet_floor(self) -> None:
+        self.assertEqual(
+            classify_exact_alignment(
+                mean_overlap=0.98,
+                minimum_query_overlap=0.96,
+                minimum_required_overlap=0.95,
+            ),
+            "ALIGNED",
+        )
+        self.assertEqual(
+            classify_exact_alignment(
+                mean_overlap=0.98,
+                minimum_query_overlap=0.90,
+                minimum_required_overlap=0.95,
+            ),
+            "EXACT_STORE_MISMATCH",
+        )
+
+    def test_exact_alignment_accepts_threshold_boundary(self) -> None:
+        self.assertEqual(
+            classify_exact_alignment(
+                mean_overlap=0.95,
+                minimum_query_overlap=0.95,
+                minimum_required_overlap=0.95,
+            ),
+            "ALIGNED",
+        )
+
+    def test_exact_alignment_rejects_invalid_overlap_evidence(self) -> None:
+        with self.assertRaises(ValueError):
+            classify_exact_alignment(
+                mean_overlap=0.90,
+                minimum_query_overlap=0.95,
+                minimum_required_overlap=0.95,
+            )
+        with self.assertRaises(ValueError):
+            classify_exact_alignment(
+                mean_overlap=1.01,
+                minimum_query_overlap=0.95,
+                minimum_required_overlap=0.95,
+            )
 
 
 if __name__ == "__main__":

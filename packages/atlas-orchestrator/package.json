@@ -1,0 +1,39 @@
+{
+  "name": "@deeds/atlas-orchestrator",
+  "version": "1.0.0",
+  "description": "Mastra workflows for Atlas durable operations: PageRank computation, clustering, registry alignment, and labeling",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./workflows": "./dist/workflows/index.js",
+    "./steps": "./dist/steps/index.js",
+    "./executors": "./dist/executors/index.js",
+    "./models": "./dist/models/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "mastra dev",
+    "test": "vitest",
+    "lint": "eslint src",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mastra/core": "^0.1.0",
+    "@deeds/atlas-core": "1.0.0",
+    "zod": "^3.22.0",
+    "pg": "^8.11.0",
+    "redis": "^4.7.0",
+    "apache-arrow": "^21.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "tsx": "^4.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^9.0.0"
+  }
+}

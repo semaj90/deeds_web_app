@@ -1,0 +1,292 @@
+{
+  "acp_agentic_workflow": "agent_control_plane",
+  "description": "Atlas Control Plane orchestration workflow for DuckDB snapshots, GPU operations, and ACE packet assembly",
+  "version": "2.0",
+  "architecture": {
+    "layers": [
+      {
+        "name": "Request Entry",
+        "component": "SvelteKit API route (/api/retrieval/unified)",
+        "input": "user_query: string, case_id?: uuid, raw?: boolean",
+        "output": "execution_context (planner input)"
+      },
+      {
+        "name": "ACP Planner",
+        "component": "AcpRoutingDecision",
+        "decisions": [
+          "cache_strategy (L1 Redis exact → L2 Bifrost semantic → L3 retrieve)",
+          "retrieval_lanes (Qdrant vector vs Neo4j graph vs Sparse lexical)",
+          "gpu_operations (rerank threshold, cluster expansion depth)",
+          "context_packing (ACE envelope size, token budget)"
+        ],
+        "output": "execution_plan"
+      },
+      {
+        "name": "Cache Layer",
+        "component": "BitFrost L1/L2",
+        "checks": [
+          "L1: Redis exact-match cache (SHA256 of normalized query + params)",
+          "L2: Bifrost semantic cache (0.8 similarity threshold to prior query)",
+          "Fallthrough: proceed to retrieval if no hit"
+        ]
+      },
+      {
+        "name": "Retrieval Orchestrator",
+        "component": "RetrievalOrchestrator (3 parallel lanes)",
+        "lanes": [
+          {
+            "lane": "Vector RAG",
+            "service": "Qdrant :6333",
+            "query": "HNSW ANN search (codebase_chunks_768, named vector 'content')",
+            "k": 20,
+            "payload_fields": ["source_ref", "file_path", "feature_id", "content_hash"]
+          },
+          {
+            "lane": "Hyper-graph KAG",
+            "service": "Neo4j :7687",
+            "query": "Cypher MATCH neighbors (k-hop bounded, depth=2)",
+            "relations": ["IMPORTS", "BELONGS_TO_CLUSTER", "SIMILAR_TOPOLOGY", "SHARES_TAGS"],
+            "max_hops": 2
+          },
+          {
+            "lane": "Sparse Lexical",
+            "service": "rg CLI + BM25 (planned)",
+            "query": "exact filename / export / redis key lookup",
+            "tool": "Fuse.js (client-side) or rg (server)"
+          }
+        ],
+        "parallelism": "all_lanes_concurrent"
+      },
+      {
+        "name": "Postgres Join",
+        "component": "Canonical truth layer",
+        "operation": "SELECT * FROM atlas_packets WHERE packet_key IN (vector_hits + graph_hits + lexical_hits)",
+        "deduplication": "by packet_key",
+        "coverage": "ensures all hits have canonical identity"
+      },
+      {
+        "name": "RRF Fusion",
+        "component": "Reciprocal Rank Fusion (100 / (60 + rank))",
+        "formula": "0.30·qdrant_rank + 0.20·turbovec_rank + 0.20·rg_rank + 0.15·ast_rank + 0.10·postgres_rank + 0.05·freshness_rank",
+        "output": "unified_candidates (sorted by fused score)"
+      },
+      {
+        "name": "GPU Reranking",
+        "component": "LibTorch N-API cosine similarity",
+        "operation": "computeGpuSimilarity(query_embedding, candidate_embeddings)",
+        "threshold": "rerank_only_if candidates > 10",
+        "output_type": "similarity_scores (float32)"
+      },
+      {
+        "name": "ACE Packet Assembly",
+        "component": "ContextAssembler",
+        "inputs": [
+          "unified_candidates (top-K after rerank)",
+          "query_context (raw text + metadata)",
+          "acp_telemetry (latency per stage, cache hits)"
+        ],
+        "operations": [
+          "1. Dedup by source_ref (don't include same file twice)",
+          "2. Enrich: fetch full summary + metadata from Postgres",
+          "3. Pack: truncate to 4,800 tokens (ACE budget)",
+          "4. Embed metadata: emit evidence trail (Qdrant hit + rank + confidence)"
+        ],
+        "output": "ace_context_packet"
+      },
+      {
+        "name": "Synthesis",
+        "component": "Gemma4 :8090 or Claude API",
+        "input": "ace_context_packet + user_query",
+        "prompt_template": "You are a legal AI assistant. Context: {chunks}. Question: {query}. Answer:",
+        "output": "final_answer (structured or free-form)"
+      },
+      {
+        "name": "Cache Warming",
+        "component": "Async fire-and-forget",
+        "operations": [
+          "1. Redis L1: SETEX query_hash answer 3600",
+          "2. Bifrost L2: POST to :3040/cache (semantic embedding + answer)",
+          "3. RabbitMQ: emit 'retrieval.completed' event (for analytics)"
+        ]
+      }
+    ]
+  },
+  "workflow_states": {
+    "planning": {
+      "actions": [
+        "Parse user query",
+        "Detect cache strategy (exact vs semantic)",
+        "Decide retrieval lanes (vector, graph, sparse)",
+        "Set GPU rerank threshold"
+      ],
+      "timeout_ms": 50,
+      "next_state": "cache_check"
+    },
+    "cache_check": {
+      "actions": [
+        "L1 Redis exact-match lookup",
+        "L2 Bifrost semantic lookup (if no L1 hit)",
+        "Return cached answer if hit"
+      ],
+      "timeout_ms": 100,
+      "hit_rate_target": "0.70",
+      "next_state": "retrieval OR cache_hit"
+    },
+    "retrieval": {
+      "actions": [
+        "Parallel: Qdrant ANN, Neo4j neighbors, Fuse.js lexical",
+        "Deduplicate by packet_key",
+        "Postgres join for canonical metadata"
+      ],
+      "timeout_ms": 2000,
+      "parallelism": "all_lanes_concurrent",
+      "next_state": "fusion"
+    },
+    "fusion": {
+      "actions": [
+        "RRF blend rankings",
+        "GPU rerank (if candidates > 10)",
+        "Deduplicate by source_ref"
+      ],
+      "timeout_ms": 500,
+      "next_state": "assembly"
+    },
+    "assembly": {
+      "actions": [
+        "Fetch full summaries from Postgres",
+        "Truncate to 4,800 tokens",
+        "Embed evidence trace (hit source, rank, confidence)"
+      ],
+      "timeout_ms": 300,
+      "next_state": "synthesis"
+    },
+    "synthesis": {
+      "actions": [
+        "Send ACE packet to Gemma4",
+        "Generate structured or free-form answer",
+        "Cap tokens: 512 (for UX latency)"
+      ],
+      "timeout_ms": 25000,
+      "next_state": "cache_warming"
+    },
+    "cache_warming": {
+      "actions": [
+        "Async: Redis L1 SETEX",
+        "Async: Bifrost L2 cache POST",
+        "Async: RabbitMQ emit analytics event"
+      ],
+      "timeout_ms": 0,
+      "blocking": false,
+      "next_state": "complete"
+    },
+    "cache_hit": {
+      "actions": [
+        "Return cached answer immediately",
+        "Emit 'cache.hit' analytics event",
+        "Skip all retrieval + synthesis"
+      ],
+      "timeout_ms": 10,
+      "next_state": "complete"
+    },
+    "complete": {
+      "output": "final_answer with metadata (cache_hit, total_time_ms, evidence_count)"
+    }
+  },
+  "decision_tree": {
+    "entry": "if raw == true THEN skip_cache ELSE check_cache",
+    "check_cache": "if L1_hit THEN return_cached ELSE check_L2",
+    "check_L2": "if L2_hit AND similarity > 0.8 THEN return_cached ELSE retrieve",
+    "retrieve": "if gpu_rerank_enabled AND candidates > 10 THEN rerank ELSE fuse_only",
+    "fuse_only": "RRF blend without GPU acceleration",
+    "rerank": "GPU cosine similarity then RRF blend",
+    "assembly": "pack_ace_context (4800 tokens max)",
+    "synthesis": "call Gemma4, max_tokens=512",
+    "cache_warm": "async fire-and-forget"
+  },
+  "telemetry_collection": {
+    "per_stage_latency": {
+      "planning_ms": "ACP decision time",
+      "cache_check_ms": "Redis + Bifrost lookup time",
+      "qdrant_ms": "Vector ANN latency",
+      "neo4j_ms": "Graph traversal latency",
+      "fusion_ms": "RRF blend time",
+      "gpu_rerank_ms": "LibTorch cosine similarity time",
+      "assembly_ms": "ACE packet construction time",
+      "synthesis_ms": "Gemma4 inference time",
+      "cache_warm_ms": "Async write time (not blocking)"
+    },
+    "decision_signals": {
+      "cache_strategy_chosen": "exact | semantic | none",
+      "retrieval_lanes_active": "[vector, graph, lexical]",
+      "gpu_rerank_applied": "boolean",
+      "fusion_score_top": "float (best RRF score)"
+    },
+    "outcome_metrics": {
+      "cache_hit": "boolean",
+      "candidate_count": "number",
+      "total_time_ms": "sum of all stages",
+      "evidence_count": "packets in final ACE context",
+      "token_count": "ACE packet token budget used"
+    },
+    "export_destination": "Langfuse OR Redis telemetry hash"
+  },
+  "error_handling": {
+    "retrieval_timeout": {
+      "fallback": "use cached answer OR return degraded response",
+      "action": "emit 'retrieval.timeout' event"
+    },
+    "gpu_oom": {
+      "fallback": "skip GPU rerank, use CPU RRF only",
+      "action": "log 'gpu.oom' and proceed with lower ranking quality"
+    },
+    "postgres_unavailable": {
+      "fallback": "return Qdrant/Neo4j results without canonical join",
+      "action": "warn: incomplete identity verification"
+    },
+    "all_services_down": {
+      "fallback": "return L1 Redis cache if available",
+      "action": "return 503 Service Unavailable if no cache"
+    }
+  },
+  "performance_targets": {
+    "cache_hit_path": "< 50ms (L1 exact match)",
+    "l2_semantic_hit": "< 5s (Bifrost + synthesis)",
+    "cold_retrieval_path": "< 25s (full pipeline)",
+    "p95_latency": "< 30s",
+    "p99_latency": "< 60s"
+  },
+  "integration_points": {
+    "duckdb_snapshot": {
+      "use": "optional (for Postgres join only)",
+      "operation": "SELECT * FROM snapshot_packets WHERE packet_key IN (...)",
+      "fallback": "direct Postgres query if snapshot stale"
+    },
+    "gpu_rerank": {
+      "use": "conditional (if candidates > 10 AND GPU available)",
+      "operation": "computeGpuSimilarity(query_emb, candidate_embs)",
+      "fallback": "CPU RRF only if GPU unavailable"
+    },
+    "redis_centroid": {
+      "use": "for SOM neighborhood expansion (optional K-hop)",
+      "operation": "GET centroid:som:{cluster_id}",
+      "fallback": "skip SOM expansion if Redis unavailable"
+    },
+    "bifrost_semantic": {
+      "use": "L2 cache strategy decision",
+      "operation": "POST :3040/cache with query embedding + context",
+      "fallback": "skip L2, proceed to retrieval"
+    }
+  },
+  "configuration_knobs": {
+    "cache_exact_ttl_seconds": 3600,
+    "cache_semantic_ttl_seconds": 86400,
+    "cache_semantic_threshold": 0.80,
+    "gpu_rerank_min_candidates": 10,
+    "ace_token_budget": 4800,
+    "synthesis_max_tokens": 512,
+    "neo4j_max_hops": 2,
+    "parallel_timeout_ms": 2000,
+    "enable_telemetry": true,
+    "enable_cache_warming": true
+  }
+}

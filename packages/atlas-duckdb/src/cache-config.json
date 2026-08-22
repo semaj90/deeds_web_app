@@ -1,0 +1,125 @@
+{
+  "cacheStrategy": "hybrid",
+  "description": "DuckDB snapshot caching strategy with shared L1/L2 tiers and GPU acceleration boundaries",
+  "tiers": {
+    "L0_memory": {
+      "type": "in-process",
+      "backend": "Map<string, unknown>",
+      "ttl_seconds": 300,
+      "max_size_bytes": 104857600,
+      "use_case": "hot query results within single process",
+      "eviction_policy": "LRU",
+      "bypass_on": ["full_scan", "large_export"]
+    },
+    "L1_duckdb_snapshot": {
+      "type": "local_file",
+      "backend": "DuckDB",
+      "file": "data/atlas-ml/atlas-analytics.duckdb",
+      "ttl_seconds": 86400,
+      "max_size_bytes": 2147483648,
+      "use_case": "materialized snapshots (corpus, training rows, derived tables)",
+      "materialization": {
+        "build_once": true,
+        "query_many": true,
+        "replacement_policy": "full_rebuild_on_schema_change"
+      },
+      "tables": {
+        "snapshot_packets": {
+          "rows": 61659,
+          "size_mb": 1024,
+          "refresh_interval_hours": 24,
+          "source": "postgres:atlas_packets + 4 feature tables"
+        },
+        "domain_training_rows": {
+          "rows": 35219,
+          "size_mb": 256,
+          "refresh_interval_hours": 24,
+          "source": "snapshot_packets (deduplicated + split)"
+        }
+      }
+    },
+    "L2_postgres_pgvector": {
+      "type": "remote_db",
+      "backend": "PostgreSQL 18 + pgvector",
+      "connection": "read_only",
+      "pool_size": 8,
+      "ttl_seconds": 0,
+      "use_case": "canonical truth for all packet identity and embeddings",
+      "tables": [
+        "atlas_packets",
+        "codebase_chunk_index",
+        "feature_domain_facts",
+        "feature_lexical_facts",
+        "feature_structural_facts"
+      ]
+    },
+    "L3_gpu_acceleration": {
+      "type": "cuda_memory",
+      "backend": "LibTorch N-API",
+      "device": "RTX 3060 Ti (8GB)",
+      "ttl_seconds": 60,
+      "max_vectors": 100000,
+      "use_case": "cosine similarity reranking, batch operations on hot embeddings",
+      "operations": [
+        "computeGpuSimilarity(queryVec, candidates[])",
+        "batchCosineSimilarity(matrix, vector)",
+        "clusterEmbeddings(vectors[], k)"
+      ],
+      "precision": "float32",
+      "fallback": "CPU via TypeScript"
+    }
+  },
+  "shared_cache_contract": {
+    "key_patterns": {
+      "duckdb_snapshot": "duckdb:snapshot:{table}:{hash}",
+      "query_result": "duckdb:query:{query_hash}:{timestamp}",
+      "parquet_export": "duckdb:export:{dataset}:{version}:{timestamp}"
+    },
+    "coordination": {
+      "write_owner": "one_per_duckdb_file",
+      "concurrent_readers": "unlimited",
+      "lock_strategy": "file_system_flock",
+      "timeout_seconds": 300
+    }
+  },
+  "thread_configuration": {
+    "auto_detect": {
+      "enabled": true,
+      "formula": "Math.max(2, Math.floor(os.availableParallelism() / 2))",
+      "environment_override": "ATLAS_DUCKDB_THREADS"
+    },
+    "benchmarked_settings": {
+      "RTX_3060_Ti_8GB": {
+        "optimal_threads": 4,
+        "corpus_snapshot_seconds": 2.5,
+        "training_rows_seconds": 1.8,
+        "memory_peak_mb": 2048,
+        "reason": "balances DuckDB parallelism with GPU work + embedding service + retrieval"
+      },
+      "CPU_only_16_cores": {
+        "optimal_threads": 8,
+        "corpus_snapshot_seconds": 3.2,
+        "training_rows_seconds": 2.1,
+        "memory_peak_mb": 1536,
+        "reason": "higher thread count, lower GPU pressure"
+      }
+    }
+  },
+  "invalidation_rules": {
+    "invalidate_on": [
+      "postgres_schema_change",
+      "packet_count_mismatch",
+      "embedding_dimension_change",
+      "new_feature_lane_discovered"
+    ],
+    "preserve_on": [
+      "query_parameter_change",
+      "threshold_adjustment",
+      "rerank_weight_tuning"
+    ],
+    "cascade_invalidation": {
+      "snapshot_packets_changed": ["domain_training_rows", "query_cache_*"],
+      "postgres_attachment_lost": ["all_local_tables"]
+    }
+  }
+}

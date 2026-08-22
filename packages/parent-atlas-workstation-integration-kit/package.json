@@ -1,0 +1,12 @@
+{
+  "name": "parent-atlas-workstation-integration-kit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --import tsx tests/integration-kit.test.mts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

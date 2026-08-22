@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/domain-prediction/1.0.0",
+  "title": "Domain Prediction v1.0.0",
+  "description": "Non-canonical domain classification prediction. Staged to prediction ledger. Promotion to canonical requires authorization gate. Models produce predictions; operators authorize mutations.",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "classificationRunId",
+    "packetKey",
+    "predictedDomain",
+    "rawScore",
+    "classifierKind",
+    "classifierVersion",
+    "modelSha256",
+    "featureSchemaVersion",
+    "sourceSnapshotSha256",
+    "ontologyVersion",
+    "status",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "atlas:domain:prediction",
+      "description": "Immutable schema identifier"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version. Breaking changes increment major."
+    },
+    "predictionId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "nullable": true,
+      "description": "UUIDv7 unique identifier for this prediction row. Set by database on insertion."
+    },
+    "classificationRunId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "UUIDv7 batch identifier. Groups predictions from one classifier run. Links to atlas_domain_classification_runs."
+    },
+    "packetKey": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Reference to semantic packet. MUST match exactly one row in atlas_packets via packet_key. Immutable."
+    },
+    "predictedDomain": {
+      "type": "string",
+      "description": "Predicted domain label (e.g., 'backend_database', 'frontend_ui', 'infrastructure', 'unknown'). Proposed, not canonical."
+    },
+    "rawScore": {
+      "type": "number",
+      "description": "Raw model output score. Interpretation depends on classifier (log probability for Naive Bayes, sigmoid for logistic regression, etc)."
+    },
+    "scoreMargin": {
+      "type": "number",
+      "nullable": true,
+      "description": "Difference between top-2 class scores. Indicates prediction confidence. NULL if only one class possible."
+    },
+    "calibratedConfidence": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence after calibration (isotonic regression on validation split). NULL if not calibrated."
+    },
+    "classifierKind": {
+      "type": "string",
+      "enum": [
+        "rule_baseline",
+        "word_frequency_prototype",
+        "naive_bayes",
+        "logistic_regression",
+        "xgboost",
+        "pytorch_mlp",
+        "unknown"
+      ],
+      "description": "Classifier algorithm (not model instance). Enables comparison across model versions."
+    },
+    "classifierVersion": {
+      "type": "string",
+      "description": "Semantic version of classifier (e.g., '0.1' for prototype, '1.0' for first stable release)"
+    },
+    "modelSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hash of model artifact (weights, coefficients, tree structure). Enables reproducibility and audit."
+    },
+    "featureSchemaVersion": {
+      "type": "string",
+      "description": "Domain feature schema version used for prediction (e.g., 'atlas:domain:features:v2'). Enables feature versioning."
+    },
+    "sourceSnapshotSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 of training/validation snapshot. Enables tracking which data trained the model."
+    },
+    "ontologyVersion": {
+      "type": "string",
+      "description": "Ontology schema version at prediction time (e.g., 'atlas:ontology:v4'). Prediction may become invalid if ontology changes."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PREDICTED",
+        "GATED_LOW_CONFIDENCE",
+        "GATED_VERSION_MISMATCH",
+        "GATED_UNKNOWN",
+        "ACCEPTED",
+        "REJECTED",
+        "SUPERSEDED"
+      ],
+      "description": "Lifecycle state. PREDICTED = raw output. GATED_* = awaiting review/authorization. ACCEPTED = eligible for promotion. REJECTED = dismissed. SUPERSEDED = replaced by newer prediction."
+    },
+    "gateReason": {
+      "type": "string",
+      "nullable": true,
+      "description": "If status starts with GATED_, reason why (e.g., 'scoreMargin < 0.1', 'modelVersionMismatch', 'predictedDomain=unknown')"
+    },
+    "authorizedBy": {
+      "type": "string",
+      "nullable": true,
+      "description": "User or service that authorized promotion from ACCEPTED to canonical. NULL if not yet authorized."
+    },
+    "authorizedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "Timestamp of authorization. NULL if not yet authorized."
+    },
+    "promotedToCanonicalAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "Timestamp when prediction was promoted to atlas_packets.domain_class. NULL if not yet promoted."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when prediction was created."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensible metadata. Classifier-specific fields, confidence breakdown, feature contribution, etc. NOT part of canonical identity."
+    }
+  },
+  "additionalProperties": false
+}

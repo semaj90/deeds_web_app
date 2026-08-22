@@ -1,0 +1,41 @@
+schema_id: atlas.candidate-feature-row
+schema_version: 1
+schema_kind: candidate_feature_row
+status: ACTIVE
+
+description: >
+  Immutable interpretable feature row keyed by CandidateOrdinal. One logical
+  candidate has one row regardless of how many executors surfaced it.
+
+fields:
+  schema: { type: literal, value: atlas.candidate-feature-row.v1 }
+  requestId: { type: string, required: true }
+  candidateOrdinal: { type: integer, minimum: 0 }
+  canonicalId: { type: string, required: true }
+  packetKey: { type: string, nullable: true }
+  sourceRef: { type: string, required: true }
+  semanticSimilarity: { type: number, minimum: 0, maximum: 1 }
+  lexicalScore: { type: number, minimum: 0, maximum: 1 }
+  astMatch: { type: number, minimum: 0, maximum: 1 }
+  pagerank: { type: number, minimum: 0 }
+  ppr: { type: number, minimum: 0 }
+  graphProximity: { type: number, minimum: 0, maximum: 1 }
+  sameDirectory: { type: number, minimum: 0, maximum: 1 }
+  sameDomain: { type: number, minimum: 0, maximum: 1 }
+  symbolMatch: { type: number, minimum: 0, maximum: 1 }
+  testNeighbor: { type: number, minimum: 0, maximum: 1 }
+  schemaMatch: { type: number, minimum: 0, maximum: 1 }
+  freshness: { type: number, minimum: 0, maximum: 1 }
+  revisionMatch: { type: number, minimum: 0, maximum: 1 }
+  evidenceCoverage: { type: number, minimum: 0, maximum: 1 }
+  tokenCost: { type: number, minimum: 0 }
+  latencyCost: { type: number, minimum: 0 }
+  workspaceRevision: { type: string, required: true }
+  featureRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  representationRevision: { type: string, required: true }
+
+invariants:
+  - executor identity is not a feature vote
+  - cache residence is not a relevance feature
+  - semanticSimilarity compares only vectors in the same representation space

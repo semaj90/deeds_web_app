@@ -9,7 +9,7 @@
 import net from 'net';
 
 const SERVICES = [
-  { name: 'PostgreSQL (Prod DB)', host: '127.0.0.1', port: 5432 },
+  { name: 'PostgreSQL (Prod DB)', host: '127.0.0.1', port: Number(process.env.DB_PORT ?? process.env.POSTGRES_PORT ?? 5434) },
   { name: 'Redis', host: '127.0.0.1', port: 6379 },
   { name: 'RabbitMQ', host: '127.0.0.1', port: 5672 },
   { name: 'Qdrant', host: '127.0.0.1', port: 6333 },

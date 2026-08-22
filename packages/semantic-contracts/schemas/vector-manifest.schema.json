@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/vector-manifest/1.0.0",
+  "title": "Vector Manifest v1.0.0",
+  "description": "Declares a vector's identity: name, dimensions, model, normalization, hashing. Every vector must declare its manifest.",
+  "type": "object",
+  "required": [
+    "vectorName",
+    "model",
+    "dimensions",
+    "representation",
+    "distance",
+    "normalized",
+    "contentSha256",
+    "workspaceRevision"
+  ],
+  "properties": {
+    "vectorName": {
+      "type": "string",
+      "enum": [
+        "dense_384",
+        "dense_768_legacy",
+        "title_384",
+        "summary_384",
+        "symbol_384",
+        "ontology_384",
+        "late_interaction",
+        "bm42_sparse"
+      ],
+      "description": "Canonical vector identity across all stores"
+    },
+    "model": {
+      "type": "string",
+      "description": "Model used to produce this vector (e.g., 'embeddinggemma:latest')"
+    },
+    "modelRevision": {
+      "type": "string",
+      "description": "Model version/revision for reproducibility"
+    },
+    "dimensions": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "description": "Vector dimensionality (384 canonical, 768 legacy)"
+    },
+    "representation": {
+      "type": "string",
+      "enum": ["dense", "sparse", "multivector"],
+      "description": "Storage representation type"
+    },
+    "distance": {
+      "type": "string",
+      "enum": ["Cosine", "Dot", "Euclid", "Manhattan"],
+      "description": "Distance metric for similarity search"
+    },
+    "normalized": {
+      "type": "boolean",
+      "description": "Whether vector is L2-normalized (required for Cosine distance)"
+    },
+    "contentSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA256 of source content at embedding time"
+    },
+    "workspaceRevision": {
+      "type": "string",
+      "description": "Workspace/corpus revision at embedding time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when vector was created"
+    }
+  },
+  "additionalProperties": false
+}

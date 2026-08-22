@@ -1,0 +1,29 @@
+schema_id: atlas.prefill-artifact
+schema_version: 1
+schema_kind: prefill_artifact
+status: ACTIVE
+
+description: >
+  Backend-neutral identity for compiled model prefill. Runtime KV blocks remain
+  backend-local and are referenced, never treated as portable canonical state.
+
+fields:
+  schema: { type: literal, value: atlas.prefill-artifact.v1 }
+  artifactId: { type: string, required: true }
+  promptPlanChecksum: { type: string, required: true }
+  modelRevision: { type: string, required: true }
+  tokenizerRevision: { type: string, required: true }
+  adapterRevision: { type: string, nullable: true }
+  toolSchemaRevision: { type: string, required: true }
+  evidenceRevisions: { type: string_array, default: [] }
+  tokenCount: { type: integer, minimum: 0 }
+  cacheKey: { type: string, required: true }
+  storage:
+    type: enum
+    values: [NONE, RAM, NVME, GPU]
+  runtimeArtifactRef: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - cacheKey is computed from canonical ordered inputs, not serialized protobuf bytes
+  - runtimeArtifactRef never becomes portable source truth
