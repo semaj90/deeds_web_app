@@ -1,7 +1,11 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
-import { materializeCandidateOrdinalMap, type CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
+import {
+  candidateOrdinalMapV1Schema,
+  materializeCandidateOrdinalMap,
+  type CandidateOrdinalMapV1,
+} from '../features/canonical-candidate-v1.js';
 import { evaluateGraphQdrantFanoutAlignment } from './graph-qdrant-fanout-alignment.js';
 import { verifyGraphSnapshotRevisionV1 } from './graph-snapshot-revision-v1.js';
 
@@ -33,7 +37,7 @@ export const fanoutAdmissionV1Schema = z.object({
     'REVISION_LINEAGE_REJECTED',
   ]),
   admitted: z.boolean(),
-  candidateOrdinalMap: z.custom<CandidateOrdinalMapV1>().nullable(),
+  candidateOrdinalMap: candidateOrdinalMapV1Schema.nullable(),
   strongIdentityEvidence: z.enum(['CANONICAL_ID', 'SYMBOL_VERSION_ID', 'PACKET_KEY']).nullable(),
   snapshotId: z.string().uuid(),
   repositoryRevision: id,
