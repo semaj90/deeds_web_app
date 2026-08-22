@@ -119,7 +119,28 @@ async function main() {
       revisionError = error instanceof Error ? error.message : String(error);
     }
 
-    const nodeResult = await client.query<{
+    const coverageResult = await client.query<{
+      source_node_count: number;
+      source_revision_proven_rows: number;
+      source_revision_missing_rows: number;
+    }>(
+      `SELECT
+         COUNT(*)::int AS source_node_count,
+         COUNT(*) FILTER (
+           WHERE source_revision IS NOT NULL AND length(btrim(source_revision)) > 0
+         )::int AS source_revision_proven_rows,
+         COUNT(*) FILTER (
+           WHERE source_revision IS NULL OR length(btrim(source_revision)) = 0
+         )::int AS source_revision_missing_rows
+       FROM atlas_graph_nodes_v2
+       WHERE snapshot_id = $1
+         AND source_ref IS NOT NULL`,
+      [row.snapshot_id],
+    );
+    if (coverageResult.rowCount !== 1) throw new Error('GRAPH_SOURCE_REVISION_COVERAGE_READBACK_FAILED');
+    const coverage = coverageResult.rows[0]!;
+
+    const sampleResult = await client.query<{
       node_key: string;
       packet_key: string | null;
       tree_node_id: string | null;
@@ -135,10 +156,6 @@ async function main() {
       [row.snapshot_id, sampleLimit],
     );
 
-    const sourceRevisionProvenRows = nodeResult.rows.filter(
-      (node) => typeof node.source_revision === 'string' && node.source_revision.trim().length > 0,
-    ).length;
-    const sourceRevisionMissingRows = nodeResult.rows.length - sourceRevisionProvenRows;
     const snapshotRevisionFieldsPresent = [
       row.workspace_revision,
       row.source_inventory_revision,
@@ -149,7 +166,8 @@ async function main() {
     ].every((value) => typeof value === 'string' && value.trim().length > 0);
 
     const snapshotRevisionProven = snapshotRevisionFieldsPresent && revisionVerified;
-    const nodeSourceRevisionProven = nodeResult.rows.length > 0 && sourceRevisionMissingRows === 0;
+    const nodeSourceRevisionProven =
+      coverage.source_node_count > 0 && coverage.source_revision_missing_rows === 0;
     const status = !snapshotRevisionProven
       ? 'GRAPH_SNAPSHOT_REVISION_OWNER_NOT_PROVEN'
       : nodeSourceRevisionProven
@@ -171,9 +189,15 @@ async function main() {
       topologyHash: row.topology_hash,
       policyHash: row.policy_hash,
       revisionChecksum: row.revision_checksum,
-      sampledNodeCount: nodeResult.rows.length,
-      sourceRevisionProvenRows,
-      sourceRevisionMissingRows,
+      sourceNodeCount: coverage.source_node_count,
+      sourceRevisionProvenRows: coverage.source_revision_proven_rows,
+      sourceRevisionMissingRows: coverage.source_revision_missing_rows,
+      sourceRevisionCoverage:
+        coverage.source_node_count === 0
+          ? 0
+          : coverage.source_revision_proven_rows / coverage.source_node_count,
+      sampledNodeCount: sampleResult.rows.length,
+      sample: sampleResult.rows,
       nodeSourceRevisionProven,
       fanoutAllowed: snapshotRevisionProven && nodeSourceRevisionProven,
       status,
