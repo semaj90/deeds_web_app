@@ -47,6 +47,7 @@ export const ToolProofStatusV1Schema = z.enum([
 export const ToolPermissionV1Schema = z.enum([
   'code:read',
   'code:write',
+  'workspace:write',
   'db:read',
   'db:write',
   'graph:read',
@@ -102,9 +103,19 @@ export const ActiveToolRegistryEntryV1Schema = z.object({
   if (entry.operationKind === 'APPLY' && entry.targetScopes.every((scope) => scope === 'NONE')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['targetScopes'], message: 'APPLY tools require a mutation target scope' });
   }
-  if ((entry.operationKind === 'APPLY' || entry.targetScopes.includes('CANONICAL_STORE'))
-      && !entry.permissions.some((permission) => permission.endsWith(':write'))) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['permissions'], message: 'mutating tools require an explicit write permission' });
+  if (entry.targetScopes.includes('EPHEMERAL_WORKSPACE') && !entry.permissions.includes('workspace:write')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['permissions'], message: 'EPHEMERAL_WORKSPACE requires workspace:write permission' });
+  }
+  if (entry.targetScopes.includes('WORKTREE_SOURCE') && !entry.permissions.includes('code:write')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['permissions'], message: 'WORKTREE_SOURCE requires code:write permission' });
+  }
+  if (entry.targetScopes.includes('CANONICAL_STORE')
+      && !entry.permissions.some((permission) => ['db:write', 'graph:write', 'cache:write'].includes(permission))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['permissions'], message: 'CANONICAL_STORE requires an explicit store write permission' });
+  }
+  if (entry.targetScopes.includes('EXTERNAL_SIDE_EFFECT')
+      && !entry.permissions.some((permission) => permission === 'external:write' || permission === 'workflow:control')) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['permissions'], message: 'EXTERNAL_SIDE_EFFECT requires external:write or workflow:control permission' });
   }
   if (entry.cachePolicy.mode !== 'NONE' && !['READ', 'AUDIT'].includes(entry.operationKind)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['cachePolicy'], message: 'only READ/AUDIT tools may advertise reusable result caching' });
