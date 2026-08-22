@@ -95,10 +95,10 @@ function candidate(input: {
       downstream_utility: 0.8,
       latency_budget_ms: 1000,
       prior_failure_error_code: input.priorFailure ?? null,
-      evidence_refs: [`candidate:${input.id}`],
+      evidence_refs: [`candidate:${input.id}`] as string[],
       feature_revision: 'action-features:v1',
     },
-  } as const;
+  };
 }
 
 describe('temporal alternative action runtime', () => {
