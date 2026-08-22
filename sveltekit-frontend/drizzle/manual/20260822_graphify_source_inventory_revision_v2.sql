@@ -11,7 +11,9 @@
 --   repository_revision          = explicit Git provenance for new rows
 --
 -- Manual migration only. It performs no backfill and authorizes no Qdrant or
--- graph promotion.
+-- graph promotion. The old Git-keyed UNIQUE constraint is removed because it
+-- collapses multiple dirty/untracked world states that share the same Git HEAD;
+-- legacy columns and values themselves are preserved.
 
 ALTER TABLE graphify_files
   ADD COLUMN IF NOT EXISTS workspace_manifest_revision text,
@@ -30,6 +32,9 @@ BEGIN
   END IF;
 END $$;
 
+ALTER TABLE graphify_files
+  DROP CONSTRAINT IF EXISTS graphify_files_workspace_source_unique;
+
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_manifest_source_revision_uq_v2
   ON graphify_files (workspace_manifest_revision, source_ref, code_source_revision)
   WHERE workspace_manifest_revision IS NOT NULL AND code_source_revision IS NOT NULL;
@@ -37,6 +42,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_manifest_source_revision_uq_v2
 CREATE INDEX IF NOT EXISTS graphify_files_manifest_source_idx_v2
   ON graphify_files (workspace_manifest_revision, source_ref)
   WHERE workspace_manifest_revision IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS graphify_files_legacy_git_source_idx_v2
+  ON graphify_files (workspace_revision, source_ref)
+  WHERE workspace_revision IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS graphify_files_code_source_revision_idx_v2
   ON graphify_files (code_source_revision)
