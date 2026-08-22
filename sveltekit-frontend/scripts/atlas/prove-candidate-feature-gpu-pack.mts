@@ -10,9 +10,14 @@ import {
 } from '../../src/lib/server/atlas/features/candidate-feature-gpu-pack-v1.js';
 import { verifyCandidateFeatureGpuParity } from '../../src/lib/server/atlas/features/candidate-feature-gpu-parity-v1.js';
 
-const outputArg = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length)
-  ?? process.argv[process.argv.indexOf('--output') + 1]
-  ?? 'tmp/candidate-feature-gpu-parity-input.json';
+function parseArg(name: string, fallback: string): string {
+  const inline = process.argv.find((value) => value.startsWith(`--${name}=`));
+  if (inline) return inline.slice(name.length + 3);
+  const index = process.argv.indexOf(`--${name}`);
+  return index >= 0 && process.argv[index + 1] ? process.argv[index + 1]! : fallback;
+}
+
+const outputArg = parseArg('output', 'tmp/candidate-feature-gpu-parity-input.json');
 
 const candidateSnapshotRevision = 'candidate-snapshot:gpu-proof:v1';
 const workspaceRevision = 'workspace:gpu-proof:v1';
