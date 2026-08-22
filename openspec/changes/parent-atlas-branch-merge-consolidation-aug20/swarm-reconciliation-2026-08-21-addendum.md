@@ -184,6 +184,52 @@ and work directly against `origin/main` refs (fetch + `git show
 origin/main:<path>`) the way this session did for all the actual branch
 merges, which never required a clean local working tree to begin with.
 
+## Update: local checkout sync completed (still 2026-08-21, later same day)
+
+The race settled. Verified via `git hash-object` on the same migration file
+across a 20s window (stable both checks) before retrying. This time the
+sync succeeded, with one genuinely necessary conflict:
+
+- `git stash push -u` initially left the tracked-file modifications in
+  place (stash object was created correctly, but the untracked-file
+  cleanup step failed with `permission denied` on an empty leftover
+  directory, `parent-atlas-kimi-containment/`, which appears to have
+  aborted the working-tree reset for tracked files too). Fix: re-stash
+  with plain `git stash push` (no `-u`), which stashed tracked changes
+  only and left the problem directory alone — that succeeded cleanly.
+- `git merge --ff-only origin/main` then fast-forwarded local `main`
+  from `ddd1739d99` to `0316a1425f` with zero issues.
+- `git stash pop` produced exactly one real conflict:
+  `sveltekit-frontend/drizzle/manual/20260822_graphify_revision_authority_v2.sql`.
+  The "Updated upstream" side (already merged into `origin/main` by
+  another swarm branch in the interim) turned out to be the complete,
+  syntactically-valid version — it both removed the two stray
+  `ALTER TABLE ... DROP CONSTRAINT IF EXISTS` lines (the same fix the
+  local WIP was independently making) **and** added a third constraint
+  block (`graphify_files_content_hash_sha256_v2`) with a correctly
+  closed `END $$;`. The local WIP's stashed side, by contrast, had
+  neither the third constraint nor the closing `END $$;` — taking it
+  as-is would have left the `DO $$ BEGIN ... END $$;` block unterminated,
+  a real SQL syntax break. Resolved by keeping the upstream side in
+  full and discarding the stashed side. No data was lost: the WIP's
+  intended fix was already present upstream by other means.
+- All other stash-pop file conflicts were none — every other touched
+  file (todo notes, audit scripts, proof scripts, reports) merged
+  cleanly with ordinary `M`/staged states, verified individually for
+  leftover `<<<<<<<`/`=======`/`>>>>>>>` markers (found zero).
+- Left all prior backup stashes (`stash@{1}` onward — several near-
+  duplicate "concurrent-wip-before-sync*"/"final-sync-attempt*" entries
+  from earlier failed attempts) untouched rather than dropping them;
+  they're redundant now but harmless, and stash history costs nothing
+  to keep around as a safety net.
+
+**Lesson generalized**: if `git stash push -u` reports success but
+`git status` afterward still shows the same tracked-file modifications,
+suspect a failed untracked-file cleanup (permission-denied on some
+directory) silently aborting the tracked-file reset too. Retry with
+plain `git stash push` (no `-u`) to isolate tracked changes from the
+untracked cleanup step.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
