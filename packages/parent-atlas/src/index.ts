@@ -27,6 +27,7 @@ export * from './core/ace-synthesis-graph.js';
 export * from './core/agentic-file-mutation.js';
 export * from './core/exact-promotion.js';
 export * from './core/exact-promotion-postgres-executor.js';
+export * from './core/exact-promotion-workspace-source-reader.js';
 export * from './core/agentic-workflow-control-plane.js';
 export * from './core/a2a-wire-v1.js';
 export * from './core/atlas-kernel-session.js';
