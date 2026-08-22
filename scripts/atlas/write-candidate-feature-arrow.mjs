@@ -6,12 +6,25 @@
  * Input JSON is the output of materializeCandidateFeatureColumnar(). This root-workspace
  * writer intentionally reuses the repository's existing apache-arrow dependency and
  * ArtifactAddressV1 vocabulary rather than introducing a second Arrow/artifact owner.
+ *
+ * IMPORTANT: Arrow JS infers bare JavaScript string arrays as Dictionary<Utf8, Int32>.
+ * Dictionary IDs are process-global when not supplied explicitly, so rebuilding the same
+ * logical table can produce different IPC schema bytes. This writer therefore constructs
+ * every column as an explicit Arrow Vector. Identity/revision strings are plain Utf8, while
+ * numeric columns use their exact typed-array physical types.
  */
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { tableFromArrays, tableFromIPC, tableToIPC } from 'apache-arrow';
+import {
+  Table,
+  Utf8,
+  makeVector,
+  tableFromIPC,
+  tableToIPC,
+  vectorFromArray,
+} from 'apache-arrow';
 
 export const CANDIDATE_FEATURE_ARROW_SCHEMA = 'atlas.candidate-feature-arrow-ipc.v1';
 
@@ -28,6 +41,16 @@ const FEATURE_NAMES = [
   'domainAffinity',
   'executionUtility',
   'memoryUtility',
+];
+
+const IDENTITY_UTF8_COLUMNS = [
+  'canonical_id',
+  'packet_key',
+  'tree_node_id',
+  'symbol_version_id',
+  'source_revision',
+  'graph_revision',
+  'semantic_revision',
 ];
 
 function parseArg(name, fallback = null) {
@@ -61,6 +84,16 @@ function assertChecksum(value, name) {
   if (typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value)) {
     throw new Error(`CANDIDATE_FEATURE_ARROW_INVALID_CHECKSUM:${name}`);
   }
+}
+
+function utf8Vector(values, columnName) {
+  if (!Array.isArray(values)) throw new Error(`CANDIDATE_FEATURE_ARROW_UTF8_COLUMN_REQUIRED:${columnName}`);
+  for (const value of values) {
+    if (value !== null && value !== undefined && typeof value !== 'string') {
+      throw new Error(`CANDIDATE_FEATURE_ARROW_UTF8_COLUMN_VALUE_INVALID:${columnName}`);
+    }
+  }
+  return vectorFromArray(values, new Utf8());
 }
 
 export function validateCandidateFeatureColumnar(input) {
@@ -130,45 +163,90 @@ export function validateCandidateFeatureColumnar(input) {
   return input;
 }
 
+export function assertCandidateFeatureArrowPhysicalSchema(table) {
+  const fields = Object.fromEntries(table.schema.fields.map((field) => [field.name, String(field.type)]));
+
+  if (fields.candidate_ordinal !== 'Uint32') {
+    throw new Error(`CANDIDATE_FEATURE_ARROW_ORDINAL_TYPE_MISMATCH:${fields.candidate_ordinal}`);
+  }
+  if (fields.degraded_identity !== 'Uint8') {
+    throw new Error(`CANDIDATE_FEATURE_ARROW_DEGRADED_IDENTITY_TYPE_MISMATCH:${fields.degraded_identity}`);
+  }
+  if (fields.lane_mask_u16 !== 'Uint16') {
+    throw new Error(`CANDIDATE_FEATURE_ARROW_LANE_MASK_TYPE_MISMATCH:${fields.lane_mask_u16}`);
+  }
+
+  for (const columnName of IDENTITY_UTF8_COLUMNS) {
+    if (fields[columnName] !== 'Utf8') {
+      throw new Error(`CANDIDATE_FEATURE_ARROW_UTF8_TYPE_MISMATCH:${columnName}:${fields[columnName]}`);
+    }
+    if (/Dictionary/i.test(fields[columnName])) {
+      throw new Error(`CANDIDATE_FEATURE_ARROW_DICTIONARY_ENCODING_FORBIDDEN:${columnName}`);
+    }
+  }
+
+  for (const featureName of FEATURE_NAMES) {
+    if (fields[featureName] !== 'Float32') {
+      throw new Error(`CANDIDATE_FEATURE_ARROW_FEATURE_TYPE_MISMATCH:${featureName}:${fields[featureName]}`);
+    }
+    const presenceName = `${featureName}_present`;
+    if (fields[presenceName] !== 'Uint8') {
+      throw new Error(`CANDIDATE_FEATURE_ARROW_PRESENCE_TYPE_MISMATCH:${presenceName}:${fields[presenceName]}`);
+    }
+  }
+
+  return {
+    schema: 'atlas.candidate-feature-arrow-physical-schema-receipt.v1',
+    fields,
+    stringEncoding: 'UTF8_PLAIN',
+    dictionaryEncodingUsed: false,
+    explicitPhysicalTypes: true,
+  };
+}
+
 export function buildCandidateFeatureArrowTable(columnarInput) {
   const input = validateCandidateFeatureColumnar(columnarInput);
   const columns = {
-    candidate_ordinal: Uint32Array.from(input.candidateOrdinals),
-    canonical_id: input.canonicalIds,
-    packet_key: input.packetKeys,
-    tree_node_id: input.treeNodeIds,
-    symbol_version_id: input.symbolVersionIds,
-    source_revision: input.sourceRevisions,
-    graph_revision: input.graphRevisions,
-    semantic_revision: input.semanticRevisions,
-    degraded_identity: Uint8Array.from(input.degradedIdentity),
-    lane_mask_u16: Uint16Array.from(input.laneMaskU16),
+    candidate_ordinal: makeVector(Uint32Array.from(input.candidateOrdinals)),
+    canonical_id: utf8Vector(input.canonicalIds, 'canonical_id'),
+    packet_key: utf8Vector(input.packetKeys, 'packet_key'),
+    tree_node_id: utf8Vector(input.treeNodeIds, 'tree_node_id'),
+    symbol_version_id: utf8Vector(input.symbolVersionIds, 'symbol_version_id'),
+    source_revision: utf8Vector(input.sourceRevisions, 'source_revision'),
+    graph_revision: utf8Vector(input.graphRevisions, 'graph_revision'),
+    semantic_revision: utf8Vector(input.semanticRevisions, 'semantic_revision'),
+    degraded_identity: makeVector(Uint8Array.from(input.degradedIdentity)),
+    lane_mask_u16: makeVector(Uint16Array.from(input.laneMaskU16)),
   };
 
   for (let featureIndex = 0; featureIndex < FEATURE_NAMES.length; featureIndex += 1) {
-    const name = FEATURE_NAMES[featureIndex];
-    const values = new Float32Array(input.rowCount);
-    const presence = new Uint8Array(input.rowCount);
-    for (let row = 0; row < input.rowCount; row += 1) {
-      const cell = row * input.featureCount + featureIndex;
-      values[row] = input.featureValues[cell];
-      presence[row] = input.featurePresence[cell];
+    const featureName = FEATURE_NAMES[featureIndex];
+    const featureValues = new Float32Array(input.rowCount);
+    const featurePresence = new Uint8Array(input.rowCount);
+    for (let rowIndex = 0; rowIndex < input.rowCount; rowIndex += 1) {
+      const cellIndex = rowIndex * input.featureCount + featureIndex;
+      featureValues[rowIndex] = input.featureValues[cellIndex];
+      featurePresence[rowIndex] = input.featurePresence[cellIndex];
     }
-    columns[name] = values;
-    columns[`${name}_present`] = presence;
+    columns[featureName] = makeVector(featureValues);
+    columns[`${featureName}_present`] = makeVector(featurePresence);
   }
 
-  return tableFromArrays(columns);
+  const table = new Table(columns);
+  assertCandidateFeatureArrowPhysicalSchema(table);
+  return table;
 }
 
 export function serializeCandidateFeatureArrowFile(columnarInput, outputPath = 'candidate-features.arrow') {
   const input = validateCandidateFeatureColumnar(columnarInput);
   const table = buildCandidateFeatureArrowTable(input);
   if (table.numRows !== input.rowCount) throw new Error('CANDIDATE_FEATURE_ARROW_TABLE_ROW_COUNT_MISMATCH');
+  const physicalSchema = assertCandidateFeatureArrowPhysicalSchema(table);
 
   const bytes = tableToIPC(table, 'file');
   const roundtrip = tableFromIPC(bytes);
   if (roundtrip.numRows !== input.rowCount) throw new Error('CANDIDATE_FEATURE_ARROW_ROUNDTRIP_ROW_COUNT_MISMATCH');
+  assertCandidateFeatureArrowPhysicalSchema(roundtrip);
   const roundtripOrdinals = roundtrip.getChild('candidate_ordinal');
   for (let ordinal = 0; ordinal < input.rowCount; ordinal += 1) {
     if (Number(roundtripOrdinals?.get(ordinal)) !== ordinal) {
@@ -222,6 +300,7 @@ export function serializeCandidateFeatureArrowFile(columnarInput, outputPath = '
       featureSnapshotChecksum: input.featureSnapshotChecksum,
       columnarChecksum: input.columnarChecksum,
       roundtripRowCount: roundtrip.numRows,
+      physicalSchema,
       logicalRowsOnly: true,
       identityAuthority: false,
       canonicalOwnerChanged: false,
