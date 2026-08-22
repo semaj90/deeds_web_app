@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildExactPromotionReceipt,
   exactPromotionCandidateSchema,
+  type ExactPromotionCandidateV1,
   type ExactPromotionEvidenceFactsV1,
   type ExactPromotionRevisionAuthorityV1,
 } from './exact-promotion.js';
@@ -19,7 +20,7 @@ const authority: ExactPromotionRevisionAuthorityV1 = {
   source_revision_proven: true,
 };
 
-const candidate = {
+const candidate: ExactPromotionCandidateV1 = {
   candidate_id: 'candidate:1',
   candidate_ordinal: 7,
   canonical_id: 'symbol:stable-1',
@@ -35,7 +36,7 @@ const candidate = {
   expected_span_content_hash: SPAN_HASH,
   evidence_refs: ['retrieval:1'],
   qdrant_point_id: 'qdrant:diagnostic-only',
-} as const;
+};
 
 function matchingFacts(): ExactPromotionEvidenceFactsV1 {
   return {
