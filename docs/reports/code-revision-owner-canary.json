@@ -9,14 +9,19 @@
   "fanoutMayConsumeAsCanonical": false,
   "tableExists": false,
   "requiredColumns": [
+    "workspace_revision",
     "source_ref",
     "source_revision",
-    "content_hash"
+    "content_hash",
+    "byte_length",
+    "source_revision_authority",
+    "producer_revision"
   ],
   "requiredColumnsPresent": false,
+  "schemaReconciliationRequired": false,
   "sampleLimit": 10,
   "sampleCount": 0,
-  "currentGitHead": "31762389c69c733b8362e2b1ca784a8bd63f6536",
+  "currentGitHead": "ab55a250ef1028db2a3bdece7c6b04d2dd9fa29d",
   "samples": [],
   "nextGate": "CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK"
 }

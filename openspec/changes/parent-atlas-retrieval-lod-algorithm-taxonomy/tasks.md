@@ -454,6 +454,96 @@ remain deferred until the CPU exact baseline is proven.
   `NOT_WIRED` and expects a separate `atlas/qas` owner path. It is not copied
   into the application as a second sampler or receipt owner.
 
+## Reconciliation vs stale "End-to-End Gaps" doc (2026-08-22)
+
+A July 13, 2026 status doc (`End-to-End Gaps: Domain Classifier + Cross-Reranker
+→ XGBoost/RL`, not part of this OpenSpec change — a standalone note the
+operator was re-reading) claimed 9 gaps in the `SearchRuntime` → promotion →
+XGBoost pipeline, several flagged `❌ NOT WIRED`. Read `search-runtime.ts`
+(the real `SearchRuntime.search()` method, 1359 lines) plus its downstream
+promotion path in full and checked real callers (not just file existence,
+per the Duplication Prevention rule in root CLAUDE.md) before trusting the
+doc. Verdict: **the doc is 5+ weeks stale and wrong in both directions** —
+some gaps it called trivial are still open, some it called missing are done,
+just under different names/architecture than it assumed.
+
+- [x] **Confirmed PageRank is live**, contrary to the doc's "not wired" claim.
+  `neo4j-gds-client.ts::runPageRankClient()` runs a real
+  `CALL gds.pageRank.mutate(...)`, with real callers
+  (`graph-analysis-runner.ts`, `graph-analytics-service.ts`,
+  `pagerank-analysis-adapter.ts`, `cheirank-analysis-adapter.ts`,
+  `kcore-analysis-adapter.ts`). `pagerankScore` is consumed in
+  `search-runtime.ts`'s Stage 3b blended score. This matches the Aug 9
+  governance audit's finding that this is the one PageRank implementation
+  (of 5 total) with a live runtime proof; the other 4 remain dead/fixture-only
+  per `docs/architecture/runtime-ownership-baseline.json`.
+- [x] **Confirmed SOM→Neo4j cluster fan-out is live** (doc's gap #8),
+  predating even the July doc — `BELONGS_TO_CLUSTER` edges are written by
+  `scripts/graphify-som-cluster-summaries.mjs` and consumed across
+  `neo4j-gds-client.ts`, `graph-projection-manifest.ts`,
+  `node-sync-neo4j-mirror.ts`, and others. No action needed.
+- [x] **Confirmed Neo4j fan-out after Postgres write exists** (doc's gap #4)
+  but as a narrower mechanism than the doc's proposed `promote-results-neo4j.ts`:
+  `promote-results-outbox.ts` implements a transactional-outbox pattern with a
+  `PROMOTE_NEO4J` operation; its `promoteNeo4j()` substage matches the
+  `Packet` node by `packet_key` and creates a `RETRIEVED_BY → RetrievalEvent`
+  edge (retrieval-history telemetry), updating only `summary`/`retrieved_at`/
+  `updated_at` on the node. It does **not** currently propagate `latent_64`,
+  `latent_128`, `domain_class`, or `title_id` onto the Neo4j `Packet` node —
+  those land in Postgres only (see next item). If Neo4j-side topology
+  properties for those fields are wanted, that is still a real, scoped gap —
+  distinct from "no fan-out exists," which is false.
+- [x] **Confirmed domain classification AND title generation are both wired**
+  (doc's gaps #5 and #7, both called trivial/schema-only in the doc) — via
+  `promote-results-outbox.ts::recordPromotionIntent()` → `enrichPacketSemantics()`
+  in `src/lib/server/ace/promotion-enrichment-service.ts`, which calls
+  `classifyDomainTaxonomy()` (from `src/lib/server/atlas/domain-taxonomy.ts`)
+  and `generateTitleIdentity()` (from `src/lib/server/ace/title-id-generator.ts`).
+  Both write `domain_class` / `title_id` / `title_generator_version` /
+  `domain_classification` / `domain_class_source` to Postgres in the
+  `PROMOTE_SUMMARY` stage. **Important nuance the doc missed**: this runs in
+  Stage 6 (promotion), strictly *after* Stage 4 rerank and Stage 4b
+  postProcess have already fixed `finalPackets`' order. So while domain
+  classification is wired end-to-end for storage/labeling, the doc's
+  specific ask — "domain-aware reranking boost" — genuinely is not done;
+  classification never feeds back into ranking. Don't close that half of
+  the gap by pointing at the promotion-stage wiring.
+- [ ] **Domain-classifier duplication (new finding, governance-relevant per
+  root CLAUDE.md "Duplication Prevention" / one-canonical-owner rules)** — at
+  least 5 modules implement domain/taxonomy classification, only 3 have any
+  real caller:
+  | File | Export | Real callers | Role |
+  |---|---|---|---|
+  | `src/lib/server/atlas/domain-taxonomy.ts` | `classifyDomainTaxonomy` | `ace/promotion-enrichment-service.ts` | **CANONICAL_OWNER** for the live SearchRuntime promotion path |
+  | `src/lib/server/ace/features/domain-classifier.ts` | `DomainClassifier` class, 13-class | `ace/features/feature-extraction-orchestrator.ts` | live, but a *different* pipeline (ACE feature extraction, not SearchRuntime promotion) |
+  | `src/lib/server/enrichment/domain-classifier.ts` | `classifyDomain`, `DOMAIN_TAXONOMY` | `atlas/feature-doc-enrichment.ts` | live, but a third distinct pipeline (feature-doc enrichment) |
+  | `src/lib/server/classifier/domain-classifier.ts` | `classifyDomainFromText` | **none found** | dead — this is the exact function name the July doc wanted wired; it was written but never called anywhere |
+  | `src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts` | `classifyWorkstationDomain` | not checked for callers here | out of scope — belongs to the workstation chunking/summarization tool (tree-sitter + NLP sidecar + llama-server), unrelated taxonomy |
+  Per the CLAUDE.md classification vocabulary, `domain-taxonomy.ts` should be
+  recorded as `CANONICAL_OWNER` for the SearchRuntime/promotion capability;
+  the ACE and feature-doc-enrichment classifiers are legitimate distinct-layer
+  `CANONICAL_OWNER`s for their own pipelines (not peers to reconcile away);
+  `classifier/domain-classifier.ts` is `DEAD` and should be flagged for
+  archival (not deleted, per root CLAUDE.md archival rules) rather than
+  reused — do not wire the July doc's exact suggested call
+  (`classifyDomainFromText`) since that would resurrect a dead, unreviewed,
+  differently-shaped classifier alongside the one already live in production.
+- [ ] **Latent128/Latent64 status needs a dedicated read, not grep** (doc's
+  gaps #2/#3) — both have substantially more real infrastructure than the
+  doc's "schema only" claim (a `src/lib/server/atlas/contracts/*` subsystem:
+  `canonical-chunk-contract.ts`, `dense-lane-policy.ts`,
+  `cluster-feature-projection-v1.ts`, `classification-ledger-writer.ts`,
+  `retrieval-router-feature-row-v1.ts`), but this session did not verify
+  whether that infrastructure actually trains/encodes/persists a real
+  768→128→64 latent end-to-end or is still contract/schema scaffolding
+  without a live producer. Do not claim either DONE or MISSING for these two
+  without reading that contracts subsystem directly.
+- [ ] **E2E search→XGBoost test still does not exist** (doc's gap #9,
+  confirmed) — no `search-to-xgboost` test anywhere. `train-baseline-xgboost.mts`
+  and `train-xgboost-v2-with-domain.mts` exist as separate training scripts
+  under `scripts/atlas/`; not verified here whether they actually consume
+  `SearchRuntime` promotion output or a different, disconnected dataset path.
+
 ## Non-goals (repeat from proposal.md — do not action these under this change)
 
 - No re-run of the RF2 13-implementation census.

@@ -1,0 +1,47 @@
+schema_id: atlas.workflow-action-event
+schema_version: 1
+schema_kind: workflow_action_event
+status: ACTIVE
+
+description: >
+  Canonical execution event envelope that normalizes existing agent_run_actions,
+  workflow_events, and outbox_events without creating a second event database.
+
+persistence_adapter:
+  existing_writer: sveltekit-frontend/src/lib/server/agent/action-writer.ts
+
+fields:
+  schema: { type: literal, value: atlas.workflow-action.v1 }
+  workflowId: { type: string, required: true }
+  workflowRevision: { type: integer, minimum: 1 }
+  runId: { type: string, required: true }
+  sequence: { type: integer, minimum: 0 }
+  actionId: { type: string, required: true }
+  parentActionId: { type: string, nullable: true }
+  dagNodeId: { type: string, required: true }
+  attempt: { type: integer, minimum: 1 }
+  lane:
+    type: enum
+    values: [planner, lexical, ast, semantic, graph, gpu, tool, validator, materializer, acp, a2a]
+  transport:
+    type: enum
+    values: [local, grpc, rabbitmq, acp, a2a]
+    nullable: true
+  executorFamily:
+    type: enum
+    values: [local, mastra, temporal, grpc-worker, gpu-worker]
+    nullable: true
+  kind:
+    type: enum
+    values: [scheduled, started, progress, artifact, blocked, suspended, resumed, retrying, validated, materialized, completed, failed, cancelled]
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, nullable: true }
+  representationRevision: { type: string, nullable: true }
+  inputRefs: { type: string_array, default: [] }
+  outputRefs: { type: string_array, default: [] }
+  evidenceRefs: { type: string_array, default: [] }
+  errorRef: { type: string, nullable: true }
+  emittedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }

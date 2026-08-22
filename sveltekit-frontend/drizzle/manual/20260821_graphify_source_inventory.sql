@@ -5,6 +5,21 @@
 -- preserve legacy Git source_revision and store exact bytes in content_hash;
 -- the read-only canary must pass before any row is populated.
 
+-- Additive-only safety gate. A historical graphify_files definition exists in
+-- the repository with different columns and constraints. CREATE TABLE IF NOT
+-- EXISTS would silently accept that incompatible table and make the writer's
+-- lineage contract ambiguous. Stop instead; an operator must reconcile the
+-- existing schema in a separately reviewed migration. This migration never
+-- drops, deletes, truncates, or rewrites existing rows.
+DO $$
+BEGIN
+  IF to_regclass('public.graphify_files') IS NOT NULL THEN
+    RAISE EXCEPTION
+      'GRAPHIFY_FILES_ALREADY_EXISTS_REQUIRES_SCHEMA_RECONCILIATION';
+  END IF;
+END
+$$;
+
 CREATE TABLE IF NOT EXISTS graphify_files (
   file_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_revision text NOT NULL,

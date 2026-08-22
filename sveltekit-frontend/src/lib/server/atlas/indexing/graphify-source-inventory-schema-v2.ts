@@ -4,7 +4,8 @@ export const GRAPHIFY_SOURCE_INVENTORY_SCHEMA_V2 = 'atlas.graphify-source-invent
 
 export const GRAPHIFY_RUN_REQUIRED_COLUMNS_V2 = [
   'run_id', 'workspace_id', 'repository_revision', 'workspace_revision',
-  'source_manifest_digest', 'parser_contract_version', 'extraction_contract_version',
+  'source_manifest_digest', 'source_manifest_source_count',
+  'parser_contract_version', 'extraction_contract_version',
 ] as const;
 
 export const GRAPHIFY_FILE_REQUIRED_COLUMNS_V2 = [

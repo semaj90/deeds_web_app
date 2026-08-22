@@ -8,10 +8,12 @@ import pg from 'pg';
 import { CODEBASE_COLLECTION_PRIORITY } from '../../src/lib/server/retrieval/collection-aliases.js';
 import { evaluateFanoutAdmissionV1 } from '../../src/lib/server/atlas/graph/fanout-admission-v1.js';
 import { verifyGraphSnapshotRevisionV1 } from '../../src/lib/server/atlas/graph/graph-snapshot-revision-v1.js';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND = path.resolve(HERE, '../..');
 const REPO_ROOT = path.resolve(FRONTEND, '..');
+loadAtlasEnv();
 const DATABASE_URL = process.env.DATABASE_URL;
 const QDRANT_URL = String(process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
 const QDRANT_API_KEY = String(process.env.QDRANT_API_KEY ?? '').trim();

@@ -1,14 +1,21 @@
 -- Parent Atlas Graphify revision-authority v2 extension.
 -- Manual / intentionally unapplied migration.
 --
+-- SAFETY CONTRACT:
+--   * additive CREATE TABLE / ADD COLUMN / ADD CONSTRAINT / CREATE INDEX only;
+--   * no DROP TABLE / DROP COLUMN / DROP CONSTRAINT / DROP INDEX;
+--   * no DELETE / TRUNCATE / UPDATE / historical backfill;
+--   * new foreign keys use RESTRICT; no new cascading-delete path is introduced.
+--
 -- Historical Graphify columns retain their original meanings:
 --   graphify_runs.repository_revision = Git commit provenance
 --   graphify_files.source_revision    = historical Git/file provenance
 --   graphify_files.content_hash       = exact-byte SHA-256 digest
 --
 -- Current Parent Atlas logical revisions are additive and first-class:
---   graphify_runs.workspace_revision    = sha256:<sorted exact-byte source manifest>
---   graphify_files.code_source_revision = sha256:<content_hash>
+--   graphify_runs.workspace_revision     = sha256:<sorted exact-byte source manifest>
+--   graphify_runs.source_manifest_digest = exact manifest digest
+--   graphify_files.code_source_revision  = sha256:<exact source bytes>
 --
 -- Safety:
 --   * Creates only the two source-inventory tables when the historical base
@@ -20,6 +27,13 @@
 --   * Existing rows are never promoted merely because the v2 columns exist.
 --   * FANOUT remains blocked until the canonical writer commits one controlled
 --     row and the independent read-only owner canary proves exact readback.
+-- Existing repository_revision/source_revision values and legacy uniqueness
+-- constraints are preserved. If an existing constraint conflicts with the v2
+-- writer, the writer/canary must fail closed and that conflict must be resolved
+-- in a separate reviewed migration rather than weakening historical protection.
+-- Existing rows are never promoted merely because the v2 columns exist.
+-- FANOUT remains blocked until one controlled writer row and independent
+-- read-only proof agree.
 
 BEGIN;
 
@@ -49,13 +63,14 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
   parser_version text,
   parse_status text NOT NULL DEFAULT 'UNPROCESSED',
   parse_error jsonb,
-  first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE,
-  last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE CASCADE
+  first_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT,
+  last_seen_run_id uuid NOT NULL REFERENCES public.graphify_runs(run_id) ON DELETE RESTRICT
 );
 
 ALTER TABLE public.graphify_runs
   ADD COLUMN IF NOT EXISTS workspace_revision text,
-  ADD COLUMN IF NOT EXISTS source_manifest_digest text;
+  ADD COLUMN IF NOT EXISTS source_manifest_digest text,
+  ADD COLUMN IF NOT EXISTS source_manifest_source_count integer;
 
 ALTER TABLE public.graphify_files
   ADD COLUMN IF NOT EXISTS code_source_revision text;
@@ -103,10 +118,26 @@ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE public.graphify_runs
-  DROP CONSTRAINT IF EXISTS graphify_runs_workspace_id_repository_revision_parser_contract_version_key;
-ALTER TABLE public.graphify_files
-  DROP CONSTRAINT IF EXISTS graphify_files_workspace_id_source_ref_source_revision_key;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.graphify_runs'::regclass
+      AND conname = 'graphify_runs_source_manifest_source_count_v2'
+  ) THEN
+    ALTER TABLE public.graphify_runs
+      ADD CONSTRAINT graphify_runs_source_manifest_source_count_v2
+      CHECK (source_manifest_source_count IS NULL OR source_manifest_source_count > 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.graphify_files'::regclass
+      AND conname = 'graphify_files_content_hash_sha256_v2'
+  ) THEN
+    ALTER TABLE public.graphify_files
+      ADD CONSTRAINT graphify_files_content_hash_sha256_v2
+      CHECK (content_hash ~ '^(sha256:)?[a-f0-9]{64}$') NOT VALID;
+  END IF;
+END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
   ON public.graphify_runs (workspace_id, workspace_revision, parser_contract_version)
@@ -148,6 +179,19 @@ COMMENT ON COLUMN public.graphify_files.content_hash IS
   'Exact serialized source byte SHA-256 digest.';
 COMMENT ON COLUMN public.graphify_files.code_source_revision IS
   'Parent Atlas CodeSourceRevisionV1 identity: sha256:<content_hash>.';
+  'Git/base commit provenance only; not canonical workspace revision authority.';
+COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
+  'WorkspaceRevisionRecordV1 identity: sha256 of sorted exact-byte source manifest.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_digest IS
+  'Unprefixed SHA-256 digest underlying workspace_revision.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_source_count IS
+  'Exact sourceCount from WorkspaceRevisionRecordV1. A graph consumer must prove this many exact source bindings before consuming the run as complete.';
+COMMENT ON COLUMN public.graphify_files.source_revision IS
+  'Historical Git/file provenance retained for compatibility.';
+COMMENT ON COLUMN public.graphify_files.content_hash IS
+  'Exact source-byte SHA-256 digest.';
+COMMENT ON COLUMN public.graphify_files.code_source_revision IS
+  'WorkspaceSourceBindingV1/CodeSourceRevisionV1 identity: sha256:<exact source bytes>.';
 
 COMMIT;
 

@@ -10,7 +10,7 @@
 **What exists in the repo and is live:**
 
 ```
-Postgres 18.4 (127.0.0.1:5432)
+Postgres 18.4 (host `127.0.0.1:5434` → container `5432`)
   │
   ├─ nes_chrom_packets (17,931 rows)
   │  ├─ id (bigserial PK)

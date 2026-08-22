@@ -1,0 +1,19 @@
+schema_id: atlas.failure-observation
+schema_version: 1
+schema_kind: failure_observation
+status: ACTIVE
+
+fields:
+  schema: { type: literal, value: atlas.failure-observation.v1 }
+  failureId: { type: string, required: true }
+  workflowId: { type: string, required: true }
+  actionId: { type: string, required: true }
+  dagNodeId: { type: string, required: true }
+  category:
+    type: enum
+    values: [RETRIEVAL, IDENTITY, STALE_REVISION, SYNTHESIS, PATCH, PARSE, TYPECHECK, TEST, AUTHORIZATION, RESOURCE, TRANSPORT]
+  errorFingerprint: { type: string, required: true }
+  evidenceRefs: { type: string_array, default: [] }
+  retryable: { type: boolean }
+  suggestedRepairCapabilities: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }

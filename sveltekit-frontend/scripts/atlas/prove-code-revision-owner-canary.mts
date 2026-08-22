@@ -88,7 +88,15 @@ try {
       `)
     : { rows: [] as { column_name: string }[] };
   const columns = new Set(columnResult.rows.map((row) => row.column_name));
-  const requiredColumns = ['source_ref', 'source_revision', 'content_hash'];
+  const requiredColumns = [
+    'workspace_revision',
+    'source_ref',
+    'source_revision',
+    'content_hash',
+    'byte_length',
+    'source_revision_authority',
+    'producer_revision',
+  ];
   const requiredColumnsPresent = requiredColumns.every((column) => columns.has(column));
   const head = await gitHead();
   const rows = tableExists && requiredColumnsPresent
@@ -107,8 +115,10 @@ try {
     sample.exactByteDigestMatches &&
     sample.legacyGitProvenanceValid,
   );
-  const status = !tableExists || !requiredColumnsPresent
+  const status = !tableExists
     ? 'REVISION_OWNER_NOT_READY'
+    : !requiredColumnsPresent
+      ? 'REVISION_OWNER_SCHEMA_INCOMPATIBLE'
     : samples.length === 0
       ? 'REVISION_OWNER_TABLE_READY_NO_SAMPLE_ROWS'
       : compatibilityPass
@@ -126,11 +136,14 @@ try {
     tableExists,
     requiredColumns,
     requiredColumnsPresent,
+    schemaReconciliationRequired: tableExists && !requiredColumnsPresent,
     sampleLimit: limit,
     sampleCount: samples.length,
     currentGitHead: head,
     samples,
-    nextGate: 'CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK',
+    nextGate: tableExists && !requiredColumnsPresent
+      ? 'LEGACY_GRAPHIFY_FILES_SCHEMA_RECONCILIATION'
+      : 'CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK',
   };
   await mkdir(path.dirname(OUT), { recursive: true });
   await writeFile(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
