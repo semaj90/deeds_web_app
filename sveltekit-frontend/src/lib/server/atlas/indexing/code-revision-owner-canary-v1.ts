@@ -16,18 +16,22 @@ export const codeRevisionStorageObservationV1Schema = z.object({
   graphifyFilesPresent: z.boolean(),
   requiredRunColumnsPresent: z.boolean(),
   requiredFileColumnsPresent: z.boolean(),
+  logicalWorkspaceRevisionColumnsPresent: z.boolean(),
+  logicalCodeSourceRevisionColumnPresent: z.boolean(),
   productionWriterPath: id.nullable(),
   productionWriterPresent: z.boolean(),
   productionWriterCreatesWorkspaceRevision: z.boolean(),
   productionWriterCreatesSourceRevision: z.boolean(),
   persistedMatchingRows: z.number().int().nonnegative(),
   sourceRevisionStorageSemantics: z.enum([
+    'GRAPHIFY_REVISION_AUTHORITY_V2',
     'CODE_SOURCE_REVISION_V1',
     'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1',
     'LEGACY_GIT_SHA',
     'UNKNOWN',
   ]),
   sourceRevisionAuthorityField: z.enum([
+    'CODE_SOURCE_REVISION',
     'SOURCE_REVISION',
     'CONTENT_HASH',
     'NONE',
@@ -75,7 +79,7 @@ function sha256(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
-function sourceRevisionStorageReady(storage: CodeRevisionStorageObservationV1): boolean {
+function compatibilitySemanticsReady(storage: CodeRevisionStorageObservationV1): boolean {
   if (storage.sourceRevisionStorageSemantics === 'CODE_SOURCE_REVISION_V1') {
     return storage.sourceRevisionAuthorityField === 'SOURCE_REVISION';
   }
@@ -85,14 +89,18 @@ function sourceRevisionStorageReady(storage: CodeRevisionStorageObservationV1): 
   return false;
 }
 
+function v2StorageReady(storage: CodeRevisionStorageObservationV1): boolean {
+  return storage.logicalWorkspaceRevisionColumnsPresent
+    && storage.logicalCodeSourceRevisionColumnPresent
+    && storage.sourceRevisionStorageSemantics === 'GRAPHIFY_REVISION_AUTHORITY_V2'
+    && storage.sourceRevisionAuthorityField === 'CODE_SOURCE_REVISION';
+}
+
 /**
- * Classifies whether the new origin semantics may be promoted to durable
- * revision authority. This classifier never writes or backfills a store.
- *
- * Historical Graphify storage is allowed to preserve source_revision as a Git
- * coordinate when content_hash already carries the exact-byte SHA-256 digest.
- * In that compatibility layout, CodeSourceRevisionV1 is derived from
- * content_hash; the historical source_revision column is never reinterpreted.
+ * Classifies whether the merged workspace/source revision semantics are bound
+ * to a durable Graphify owner. Pre-v2 layouts may be compatible evidence, but
+ * they cannot become durable authority because their historical uniqueness
+ * keys collapse dirty/untracked states under one Git provenance coordinate.
  */
 export function classifyCodeRevisionOwnerCanaryV1(input: {
   authority: CodeRevisionAuthorityV1;
@@ -103,17 +111,26 @@ export function classifyCodeRevisionOwnerCanaryV1(input: {
   const storage = codeRevisionStorageObservationV1Schema.parse(input.storage);
   const blockers: string[] = [];
 
-  if (!storage.graphifyRunsPresent || !storage.graphifyFilesPresent
-      || !storage.requiredRunColumnsPresent || !storage.requiredFileColumnsPresent) {
-    blockers.push('GRAPHIFY_LINEAGE_SCHEMA_NOT_READY');
-  }
+  const baseSchemaReady = storage.graphifyRunsPresent
+    && storage.graphifyFilesPresent
+    && storage.requiredRunColumnsPresent
+    && storage.requiredFileColumnsPresent;
+
+  if (!baseSchemaReady) blockers.push('GRAPHIFY_LINEAGE_SCHEMA_NOT_READY');
+
+  const compatibilityReady = compatibilitySemanticsReady(storage);
+  const v2Ready = v2StorageReady(storage);
 
   if (storage.sourceRevisionStorageSemantics === 'LEGACY_GIT_SHA') {
     blockers.push('GRAPHIFY_SOURCE_REVISION_SEMANTICS_LEGACY_GIT_SHA_WITHOUT_CONTENT_HASH_AUTHORITY');
   } else if (storage.sourceRevisionStorageSemantics === 'UNKNOWN') {
     blockers.push('GRAPHIFY_SOURCE_REVISION_STORAGE_SEMANTICS_UNPROVEN');
-  } else if (!sourceRevisionStorageReady(storage)) {
+  } else if (!compatibilityReady && !v2Ready) {
     blockers.push('GRAPHIFY_SOURCE_REVISION_AUTHORITY_FIELD_MISMATCH');
+  }
+
+  if (baseSchemaReady && !v2Ready) {
+    blockers.push('GRAPHIFY_REVISION_AUTHORITY_V2_MIGRATION_REQUIRED');
   }
 
   if (!storage.productionWriterPresent || !storage.productionWriterPath) {
@@ -123,22 +140,17 @@ export function classifyCodeRevisionOwnerCanaryV1(input: {
     if (!storage.productionWriterCreatesSourceRevision) blockers.push('SOURCE_REVISION_WRITER_NOT_ORIGIN');
   }
 
-  const schemaReady = storage.graphifyRunsPresent
-    && storage.graphifyFilesPresent
-    && storage.requiredRunColumnsPresent
-    && storage.requiredFileColumnsPresent;
-  const semanticsReady = sourceRevisionStorageReady(storage);
   const writerReady = storage.productionWriterPresent
     && Boolean(storage.productionWriterPath)
     && storage.productionWriterCreatesWorkspaceRevision
     && storage.productionWriterCreatesSourceRevision;
-  const durableOwnerBound = schemaReady && semanticsReady && writerReady;
+  const durableOwnerBound = baseSchemaReady && v2Ready && writerReady;
   const revisionOwnerProven = durableOwnerBound && storage.persistedMatchingRows > 0;
 
   let status: CodeRevisionOwnerCanaryV1['status'];
-  if (!schemaReady) status = 'BLOCKED_SCHEMA_MISSING';
-  else if (!semanticsReady) status = 'BLOCKED_STORAGE_SEMANTICS_MISMATCH';
-  else if (!writerReady) status = 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND';
+  if (!baseSchemaReady) status = 'BLOCKED_SCHEMA_MISSING';
+  else if (!compatibilityReady && !v2Ready) status = 'BLOCKED_STORAGE_SEMANTICS_MISMATCH';
+  else if (!durableOwnerBound) status = 'REVISION_ORIGIN_SEMANTICS_PROVEN_DURABLE_OWNER_NOT_BOUND';
   else if (!revisionOwnerProven) status = 'REVISION_OWNER_READY_FOR_CONTROLLED_CANARY';
   else status = 'REVISION_OWNER_PROVEN';
 
