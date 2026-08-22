@@ -5,18 +5,19 @@ import {
   createPrefillExecutionPlanV1,
   LlmPrefillEnvelopeV1Schema,
   PrefillExecutionPlanV1Schema,
+  type PrefillExecutionPlanInputV1,
 } from './prefill-execution-plan-v1.js';
 
 const HASH = 'a'.repeat(64);
 
-function baseInput() {
+function baseInput(): PrefillExecutionPlanInputV1 {
   return {
     requestId: 'req:prefill:1',
     workflowId: 'workflow:prefill:1',
     workflowRevision: 1,
     userQuery: 'Find the packet owner and explain the source path',
-    queryIntent: 'SEARCH' as const,
-    allowedOperationKinds: ['READ', 'AUDIT'] as const,
+    queryIntent: 'SEARCH',
+    allowedOperationKinds: ['READ', 'AUDIT'],
     mutationAuthorized: false,
     humanApprovalPresent: false,
     selectedToolIds: ['atlas.packet_search', 'trace.validate_ace_hit'],
@@ -29,16 +30,16 @@ function baseInput() {
       'TOOL_EXECUTION',
       'VALIDATION',
       'SYNTHESIS',
-    ] as const,
+    ],
     advisoryDecoder: {
-      source: 'HMM_VITERBI' as const,
+      source: 'HMM_VITERBI',
       state: 'RETRIEVE',
       confidence: 0.82,
       evidenceRefs: ['hmm:transition:v1', 'viterbi:path:v1'],
-      authorizesExecution: false as const,
+      authorizesExecution: false,
     },
     prefill: {
-      schema: 'atlas.llm-prefill-envelope.v1' as const,
+      schema: 'atlas.llm-prefill-envelope.v1',
       modelProvider: 'llama-server',
       modelId: 'hforf.gguf',
       endpoint: 'http://127.0.0.1:8090/v1',
