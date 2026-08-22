@@ -40,21 +40,34 @@ append + readback
 
 ## Database safety gate
 
-This proof writes throwaway ledger/receipt rows and is therefore disabled unless both are true:
+This proof writes throwaway ledger/receipt rows and is therefore disabled unless all three are supplied:
 
 ```text
 RUN_DB_INTEGRATION=1
 ATLAS_TEMPORAL_DISPOSABLE_DB_PROOF=1
+ATLAS_TEMPORAL_DISPOSABLE_DB_NAME=<explicit disposable database name>
 ```
 
-The proof calls `TemporalProofDatabaseSafetyV1` before importing the DB client. The known workstation proxy targets are hard rejected even when both flags are set:
+The proof calls `TemporalProofDatabaseSafetyV1` before importing the DB client. It requires the database name in `DATABASE_URL` to match `ATLAS_TEMPORAL_DISPOSABLE_DB_NAME`. The known workstation proxy and canonical database identity are hard rejected even when all proof flags are set:
 
 ```text
 postgresql://...@127.0.0.1:5434/...
 postgresql://...@localhost:5434/...
         ↓
 KNOWN_PROXY_TARGET_REJECTED
+
+postgresql://...@<any-route>/legal_ai_db
+        ↓
+KNOWN_CANONICAL_DATABASE_REJECTED
 ```
+
+After the DB client is loaded, but before the first append, the integration also executes:
+
+```sql
+SELECT current_database()
+```
+
+and requires the server-reported identity to equal both the expected disposable database name and the database name authorized by the URL guard. A mismatch fails before K1 is seeded.
 
 This is a proof harness safety boundary, not a general deployment-role classifier.
 
@@ -68,11 +81,12 @@ node_modules\.bin\vitest run `
   src/lib/server/atlas/temporal/temporal-proof-database-safety.spec.ts
 ```
 
-On the known proxy, even explicit proof flags must fail before DB import:
+On the known proxy, explicit proof flags must still fail before DB import:
 
 ```powershell
 $env:RUN_DB_INTEGRATION='1'
 $env:ATLAS_TEMPORAL_DISPOSABLE_DB_PROOF='1'
+$env:ATLAS_TEMPORAL_DISPOSABLE_DB_NAME='atlas_temporal_proof'
 node_modules\.bin\vitest run `
   src/lib/server/atlas/temporal/temporal-recommendation-dag02-real-failure.integration.spec.ts
 ```
@@ -83,12 +97,22 @@ Expected against `127.0.0.1:5434`:
 TEMPORAL_PROOF_DB_REJECTED:KNOWN_PROXY_TARGET_REJECTED
 ```
 
-Only after `DATABASE_URL` points at an independently identified disposable Postgres containing the required temporal proof schema may the same command be used as the live DAG-02R proof.
+Only after `DATABASE_URL` points at an independently identified disposable Postgres containing the required temporal proof schema may the live proof run. The expected name must match that target explicitly:
+
+```powershell
+$env:DATABASE_URL='postgresql://...@127.0.0.1:55432/atlas_temporal_proof'
+$env:RUN_DB_INTEGRATION='1'
+$env:ATLAS_TEMPORAL_DISPOSABLE_DB_PROOF='1'
+$env:ATLAS_TEMPORAL_DISPOSABLE_DB_NAME='atlas_temporal_proof'
+node_modules\.bin\vitest run `
+  src/lib/server/atlas/temporal/temporal-recommendation-dag02-real-failure.integration.spec.ts
+```
 
 ## Non-goals
 
 - no migration application
 - no write to the 5434 proxy
+- no write to `legal_ai_db` through any route
 - no Qdrant/Neo4j/Valkey mutation
 - no new recommendation policy
 - no new retrieval/ranking subsystem
