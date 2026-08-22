@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/domain-feature-packet/1.0.0",
+  "title": "Domain Feature Packet v1.0.0",
+  "description": "Versioned feature vector for domain classification. Produced deterministically from semantic packet. Consumed by all classifier stages.",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "packetKey",
+    "featureSchemaVersion",
+    "lexical",
+    "provenance"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "atlas:domain:features",
+      "description": "Immutable schema identifier"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version. Increment minor for new optional features, major for breaking changes."
+    },
+    "packetKey": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Reference to semantic packet. Join key for feature lookup."
+    },
+    "featureSchemaVersion": {
+      "type": "string",
+      "description": "Feature engineering schema version (e.g., atlas:domain:features:v2). Enables feature versioning independent of schema."
+    },
+    "lexical": {
+      "type": "object",
+      "description": "Lexical (text-based) features",
+      "required": ["tokens"],
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Normalized word tokens (lowercased, stopwords optionally removed)"
+        },
+        "tokenCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total token count (including duplicates)"
+        },
+        "uniqueTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of unique tokens"
+        },
+        "tf_idf": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "TF-IDF scores for selected tokens (optional)"
+        }
+      }
+    },
+    "path": {
+      "type": "object",
+      "description": "File path and structure features",
+      "properties": {
+        "segments": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Path segments (e.g., ['src', 'lib', 'server', 'db', 'client.ts'])"
+        },
+        "fileExtension": {
+          "type": ["string", "null"],
+          "description": "File extension (e.g., 'ts', 'tsx', 'json', 'sql'). NULL if none."
+        },
+        "depth": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Path depth (number of segments)"
+        }
+      }
+    },
+    "identifiers": {
+      "type": "object",
+      "description": "Code identifiers and symbols",
+      "properties": {
+        "exported": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Exported function/class names"
+        },
+        "imported": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Imported identifiers"
+        },
+        "local": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Local variable/function names"
+        }
+      }
+    },
+    "imports": {
+      "type": "object",
+      "description": "Import and dependency features",
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Imported module names (e.g., ['pg', 'drizzle-orm', 'zod'])"
+        },
+        "frameworks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Detected frameworks (e.g., ['sveltekit', 'drizzle', 'ioredis'])"
+        },
+        "relativeImports": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of relative imports (../, ./)"
+        }
+      }
+    },
+    "syntax": {
+      "type": "object",
+      "description": "Syntactic and AST features",
+      "properties": {
+        "language": {
+          "type": ["string", "null"],
+          "description": "Language detected by parser (typescript, python, sql, etc)"
+        },
+        "symbolKinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "AST node kinds (e.g., ['FunctionDeclaration', 'ClassDeclaration', 'InterfaceDeclaration'])"
+        },
+        "decorators": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Decorator/annotation names (e.g., ['@Component', '@Injectable'])"
+        },
+        "callTargets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Function calls made (e.g., ['db.query', 'console.log', 'fetch'])"
+        },
+        "astNodeCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total AST nodes"
+        }
+      }
+    },
+    "semantic": {
+      "type": "object",
+      "description": "Semantic features from embeddings and topology",
+      "properties": {
+        "embeddingModel": {
+          "type": "string",
+          "description": "Embedding model used (e.g., 'embeddinggemma:latest')"
+        },
+        "embeddingDimensions": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Embedding vector dimensionality (384 canonical)"
+        },
+        "embeddingRef": {
+          "type": ["string", "null"],
+          "description": "Reference to embedding row in Qdrant or Postgres. NULL if no embedding."
+        },
+        "nearestDomainLabels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Domain labels of K-NN neighbors"
+        },
+        "nearestDomainDistances": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Distances to K-NN neighbors"
+        }
+      }
+    },
+    "topology": {
+      "type": "object",
+      "description": "Topological features from K-means, SOM, graph analysis",
+      "properties": {
+        "kmeansClusterId": {
+          "type": ["integer", "null"],
+          "description": "K-means cluster ID (0-399 for 20x20 SOM). NULL if not assigned."
+        },
+        "somX": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 19,
+          "description": "SOM grid X coordinate (0-19). NULL if not assigned."
+        },
+        "somY": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 19,
+          "description": "SOM grid Y coordinate (0-19). NULL if not assigned."
+        },
+        "communityId": {
+          "type": ["string", "null"],
+          "description": "Graph community ID from Neo4j. NULL if isolated."
+        },
+        "pageRank": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "PageRank authority score. NULL if not computed."
+        },
+        "degree": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Graph node degree (in/out edges). NULL if isolated."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Feature materialization provenance",
+      "required": ["sourceContentSha256", "parserVersion", "featureMaterializationTime"],
+      "properties": {
+        "sourceContentSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 of source content at feature materialization time"
+        },
+        "parserVersion": {
+          "type": "string",
+          "description": "Parser version that produced features"
+        },
+        "featureSchemaVersion": {
+          "type": "string",
+          "description": "Feature engineering schema version"
+        },
+        "featureMaterializationTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When features were computed"
+        },
+        "reproducible": {
+          "type": "boolean",
+          "description": "Whether same source + parser + schema produces identical features"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

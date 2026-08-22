@@ -53,7 +53,7 @@ export async function mirrorPredictionToQdrant(
   await qdrant.upsert(collectionName, {
     points: [
       {
-        id: hashStringToNumber(prediction.prediction_id),
+        id: hashStringToNumber(prediction.predictionId ?? prediction.classificationRunId),
         vector: embeddingVector,
         payload: {
           prediction_id: p.prediction_id,

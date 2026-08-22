@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/ontology-proposal/1.0.0",
+  "title": "Ontology Proposal v1.0.0",
+  "description": "Proposed ontology relation. Evidence-backed but non-canonical. Subject and object are packet_keys. Promotion to canonical requires authorization gate.",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "proposalId",
+    "subjectPacketKey",
+    "predicate",
+    "objectPacketKey",
+    "ontologyVersion",
+    "status",
+    "proposedBy",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "type": "string",
+      "const": "atlas:ontology:proposal",
+      "description": "Immutable schema identifier"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version. Breaking changes increment major."
+    },
+    "proposalId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "UUIDv7 unique identifier for this proposal."
+    },
+    "subjectPacketKey": {
+      "type": "string",
+      "minLength": 8,
+      "description": "packet_key of subject (source) packet. Must exist in atlas_packets."
+    },
+    "predicate": {
+      "type": "string",
+      "enum": [
+        "BELONGS_TO_DOMAIN",
+        "IMPORTS_FROM",
+        "DEPENDS_ON",
+        "USES",
+        "DEFINES",
+        "EXTENDS",
+        "IMPLEMENTS",
+        "REFERENCES",
+        "TESTS",
+        "DOCUMENTS",
+        "SIMILAR_DOMAIN",
+        "PRECEDES",
+        "SUPERSEDES",
+        "RELATED_TO"
+      ],
+      "description": "Relation type. Controlled vocabulary for ontology consistency."
+    },
+    "objectPacketKey": {
+      "type": "string",
+      "minLength": 8,
+      "description": "packet_key of object (target) packet. Must exist in atlas_packets."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Proposer confidence in this relation (0-1). Evidence of how certain the proposer is."
+    },
+    "evidenceIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to supporting evidence (packet_keys of evidence packets, or UUIDs of extraction results). Explains why this relation was proposed."
+    },
+    "proposalSource": {
+      "type": "string",
+      "enum": [
+        "domain_classifier_prediction",
+        "ast_analysis",
+        "langextract_relation",
+        "graph_neighbor_inference",
+        "documentation_analysis",
+        "human_annotation",
+        "other"
+      ],
+      "description": "How this relation was proposed (automated or manual)."
+    },
+    "proposedBy": {
+      "type": "string",
+      "description": "Who/what proposed this relation (e.g., 'atlas:domain:classifier:xgboost:v3', 'user:alice@example.com', 'langextract:v2')"
+    },
+    "ontologyVersion": {
+      "type": "string",
+      "description": "Ontology schema version at proposal time (e.g., 'atlas:ontology:v4'). Proposal may become invalid if ontology changes."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PROPOSED",
+        "GATED_LOW_CONFIDENCE",
+        "GATED_VERSION_MISMATCH",
+        "GATED_SUBJECT_UNRESOLVED",
+        "GATED_OBJECT_UNRESOLVED",
+        "ACCEPTED",
+        "REJECTED",
+        "APPROVED",
+        "DEPRECATED"
+      ],
+      "description": "Lifecycle. PROPOSED = awaiting review. GATED_* = awaiting gates. ACCEPTED = approved for canonical. APPROVED = promoted to atlas_ontology. DEPRECATED = replaced."
+    },
+    "gateReason": {
+      "type": "string",
+      "nullable": true,
+      "description": "If status starts with GATED_, reason why (e.g., 'confidence < 0.7', 'subject packet unresolved')"
+    },
+    "approvedBy": {
+      "type": "string",
+      "nullable": true,
+      "description": "User or service that approved promotion from ACCEPTED to canonical. NULL if not yet approved."
+    },
+    "approvedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "Timestamp of approval. NULL if not yet approved."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when proposal was created."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensible metadata. Proposer-specific reasoning, confidence breakdown, etc. NOT part of canonical ontology."
+    }
+  },
+  "additionalProperties": false
+}

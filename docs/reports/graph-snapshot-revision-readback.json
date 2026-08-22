@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "atlas.graph-snapshot-revision-readback.v1",
+  "status": "SNAPSHOT_OWNER_READBACK_PROVEN_REVISION_BLOCKED",
+  "readOnly": true,
+  "canonicalWriteAttempted": false,
+  "canonicalPersistenceAuthorized": false,
+  "tables": {
+    "atlas_graph_snapshots_v2": true,
+    "atlas_graph_nodes_v2": true,
+    "atlas_graph_edges_v2": true
+  },
+  "requiredSnapshotColumns": [
+    "snapshot_id",
+    "source_manifest",
+    "source_hash",
+    "topology_hash",
+    "policy_hash"
+  ],
+  "requiredColumnsPresent": true,
+  "selectedSnapshotId": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+  "snapshotReadbackProven": true,
+  "manifestRevisionComplete": false,
+  "revisions": {
+    "workspaceRevision": null,
+    "sourceInventoryRevision": null,
+    "graphRevision": null,
+    "identityContractVersion": "identity-contract-v1",
+    "parserContractVersion": "tree-sitter-typescript-v1",
+    "producerRevision": null
+  },
+  "nodeCount": 162234,
+  "edgeCount": 108156,
+  "selectedNodeReadback": {
+    "snapshot_id": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+    "node_key": "packet:packet:0025cf347c12"
+  },
+  "selectedEdgeReadback": {
+    "snapshot_id": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+    "edge_key": "contains:0000d010-2455-4211-ada9-b396cf4af177:b401debc-6fdd-4d73-8536-6a08942ee382"
+  },
+  "revisionOwnerProven": false,
+  "canonicalWrites": false
+}
