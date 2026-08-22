@@ -23,7 +23,8 @@ const authority: ExactPromotionRevisionAuthorityV1 = {
 const candidate: ExactPromotionCandidateV1 = {
   candidate_id: 'candidate:1',
   candidate_ordinal: 7,
-  canonical_id: 'symbol:stable-1',
+  // symbol_version_id outranks packet_key in the existing retrieval identity fabric.
+  canonical_id: 'symbol-version:1',
   packet_key: 'packet:1',
   stable_symbol_id: 'symbol:stable-1',
   symbol_version_id: 'symbol-version:1',
@@ -96,6 +97,7 @@ describe('ExactPromotionReceiptV1', () => {
       facts: matchingFacts(), producer_revision: 'exact-promotion:test:v1',
     });
     expect(receipt.status).toBe('PROVEN');
+    expect(receipt.checks.canonical_identity_match).toBe(true);
     expect(receipt.checks.source_file_hash_match).toBe(true);
     expect(receipt.checks.source_span_hash_match).toBe(true);
     expect(receipt.mutation_authorized).toBe(false);
@@ -152,13 +154,25 @@ describe('ExactPromotionReceiptV1', () => {
     expect(receipt.reason_codes).toContain('SOURCE_REVISION_MISMATCH');
   });
 
-  it('does not allow a Qdrant point id to be the only identity', () => {
+  it('rejects a canonical id that does not match symbol-version -> packet precedence', () => {
+    const receipt = buildExactPromotionReceipt({
+      request_id: 'request:6',
+      candidate: { ...candidate, canonical_id: 'packet:1' },
+      revision_authority: authority,
+      facts: matchingFacts(),
+      producer_revision: 'exact-promotion:test:v1',
+    });
+    expect(receipt.status).toBe('IDENTITY_MISMATCH');
+    expect(receipt.reason_codes).toContain('CANONICAL_IDENTITY_MISMATCH');
+  });
+
+  it('does not allow Qdrant or tree-node identity to replace packet/symbol canonical identity', () => {
     expect(() => exactPromotionCandidateSchema.parse({
       ...candidate,
       packet_key: null,
       symbol_version_id: null,
-      tree_node_id: null,
+      tree_node_id: 'tree:1',
       qdrant_point_id: 'qdrant:42',
-    })).toThrow(/requires packet_key, symbol_version_id, or tree_node_id/);
+    })).toThrow(/requires canonical packet_key or symbol_version_id identity/);
   });
 });
