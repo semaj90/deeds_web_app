@@ -288,4 +288,26 @@ describe('LangGraph temporal known-failure -> alternative -> outcome proof', () 
       outcome: null,
     });
   });
+
+  it('executes K2 but attempts no recommendation persistence when persist_outcome_receipt=false', async () => {
+    const fixture = buildFixture('no-persist');
+    proof.history.push(fixture.failed);
+    const ctx: any = {
+      strategy: 'default',
+      temporalAction: fixture.k1,
+      temporalAlternativePlan: {
+        ...fixture.plan,
+        persist_outcome_receipt: false,
+      },
+      temporalAuthoritativeActionOutcome: null,
+    };
+    const { runAgentDAG } = await import('./langgraph-dag.js');
+    const result = await runAgentDAG(`graph call:atlas_lookup(${JSON.stringify(fixture.k1Call.args)})`, ctx);
+
+    expect(result.success).toBe(true);
+    expect(proof.boundaryCalls).toEqual(['atlas_lookup', 'rg_search']);
+    expect(proof.dispatched.filter((entry) => entry.tool === 'atlas_lookup')).toHaveLength(0);
+    expect(proof.dispatched.filter((entry) => entry.tool === 'rg_search')).toHaveLength(1);
+    expect(proof.receipts).toHaveLength(0);
+  });
 });
