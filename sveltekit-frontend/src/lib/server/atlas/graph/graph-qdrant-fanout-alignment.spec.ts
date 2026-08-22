@@ -8,7 +8,7 @@ const base = {
   sourceRef: 'src/lib/graphify.ts',
   treeNodeId: 'tree:graphify',
   sourceRevision: 'sha256:source-revision',
-  workspaceRevision: 'workspace:42',
+  workspaceRevision: 'a'.repeat(40),
   graphRevision: 'graph:42',
   representationRevision: 7,
 };
@@ -21,7 +21,9 @@ function alignedPayload() {
     source_ref: base.sourceRef,
     tree_node_id: base.treeNodeId,
     source_revision: base.sourceRevision,
-    workspace_revision: base.workspaceRevision,
+    repository_revision: base.workspaceRevision,
+    workspace_revision: 41,
+    workspace_cache_revision: 41,
     graph_revision: base.graphRevision,
     representation_id: 'semantic_768',
     representation_revision: base.representationRevision,
@@ -30,12 +32,26 @@ function alignedPayload() {
 }
 
 describe('Graphify to Qdrant fanout alignment', () => {
-  it('accepts matching strong identity, revisions, and semantic representation', () => {
+  it('accepts matching strong identity and repository/source/graph/representation revisions', () => {
     const result = evaluateGraphQdrantFanoutAlignment({ ...base, qdrantPayload: alignedPayload() });
     expect(result.status).toBe('ALIGNED');
     expect(result.strongIdentityEvidence).toBe('CANONICAL_ID');
+    expect(result.repositoryRevisionAligned).toBe(true);
+    expect(result.workspaceRevisionAligned).toBe(true);
+    expect(result.legacyWorkspaceCacheRevisionObserved).toBe('41');
     expect(result.sourceRevisionAligned).toBe(true);
     expect(result.representationRevisionAligned).toBe(true);
+  });
+
+  it('does not allow the legacy integer workspace/cache revision to satisfy repository lineage', () => {
+    const { repository_revision: _repositoryRevision, ...projectionWithoutRepositoryRevision } = alignedPayload();
+    const result = evaluateGraphQdrantFanoutAlignment({
+      ...base,
+      qdrantPayload: projectionWithoutRepositoryRevision,
+    });
+    expect(result.status).toBe('LINEAGE_GAP');
+    expect(result.repositoryRevisionAligned).toBe(false);
+    expect(result.legacyWorkspaceCacheRevisionObserved).toBe('41');
   });
 
   it('does not allow source_ref or tree_node_id alone to mint canonical identity', () => {
@@ -45,7 +61,7 @@ describe('Graphify to Qdrant fanout alignment', () => {
         source_ref: base.sourceRef,
         tree_node_id: base.treeNodeId,
         source_revision: base.sourceRevision,
-        workspace_revision: base.workspaceRevision,
+        repository_revision: base.workspaceRevision,
         graph_revision: base.graphRevision,
         representation_id: 'semantic_768',
         representation_revision: base.representationRevision,
@@ -67,7 +83,7 @@ describe('Graphify to Qdrant fanout alignment', () => {
         source_ref: base.sourceRef,
         tree_node_id: base.treeNodeId,
         source_revision: base.sourceRevision,
-        workspace_revision: base.workspaceRevision,
+        repository_revision: base.workspaceRevision,
         graph_revision: base.graphRevision,
         representation_id: 'semantic_768',
         representation_revision: base.representationRevision,
