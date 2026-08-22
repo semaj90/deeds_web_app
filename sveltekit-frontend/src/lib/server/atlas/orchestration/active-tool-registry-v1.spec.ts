@@ -52,6 +52,20 @@ describe('ActiveToolRegistryV1', () => {
     );
   });
 
+  it('requires workspace:write even for disposable .tmp proposal artifacts', () => {
+    expect(() => ActiveToolRegistryEntryV1Schema.parse(entry({
+      entryId: 'local:patch.propose:no-write',
+      toolId: 'atlas.patch.propose',
+      handlerId: 'local:patch.propose:no-write',
+      dispatchSurface: 'LOCAL_FUNCTION',
+      lane: 'ops',
+      operationKind: 'PROPOSE',
+      targetScopes: ['EPHEMERAL_WORKSPACE'],
+      permissions: ['code:read'],
+      proofStatus: 'IMPLEMENTED_UNPROVEN',
+    }))).toThrow('EPHEMERAL_WORKSPACE requires workspace:write permission');
+  });
+
   it('permits a proposal tool to write only an ephemeral work artifact', () => {
     const proposed = entry({
       entryId: 'local:patch.propose',
@@ -61,14 +75,14 @@ describe('ActiveToolRegistryV1', () => {
       lane: 'ops',
       operationKind: 'PROPOSE',
       targetScopes: ['EPHEMERAL_WORKSPACE'],
-      permissions: ['code:read'],
+      permissions: ['code:read', 'workspace:write'],
       proofStatus: 'IMPLEMENTED_UNPROVEN',
       cachePolicy: { mode: 'NONE', scope: null },
     });
     expect(ActiveToolRegistryEntryV1Schema.parse(proposed).targetScopes).toEqual(['EPHEMERAL_WORKSPACE']);
   });
 
-  it('requires explicit write permission for APPLY tools', () => {
+  it('requires code:write for worktree APPLY tools', () => {
     expect(() => ActiveToolRegistryEntryV1Schema.parse(entry({
       entryId: 'local:patch.apply',
       toolId: 'atlas.patch.apply',
@@ -76,7 +90,7 @@ describe('ActiveToolRegistryV1', () => {
       operationKind: 'APPLY',
       targetScopes: ['WORKTREE_SOURCE'],
       permissions: ['code:read'],
-    }))).toThrow('mutating tools require an explicit write permission');
+    }))).toThrow('WORKTREE_SOURCE requires code:write permission');
   });
 
   it('requires exactly one canonical owner for duplicated tool names', () => {
@@ -126,6 +140,7 @@ describe('ActiveToolRegistryV1', () => {
       lane: 'synthesis',
       operationKind: 'PROPOSE',
       targetScopes: ['EPHEMERAL_WORKSPACE'],
+      permissions: ['workspace:write'],
       proofStatus: 'IMPLEMENTED_UNPROVEN',
     });
     const apply = entry({
