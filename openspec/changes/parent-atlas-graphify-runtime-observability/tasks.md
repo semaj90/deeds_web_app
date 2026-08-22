@@ -18,10 +18,11 @@ PostgreSQL and Valkey counters are server/cluster cumulative. A before/after del
 - [x] Add `scripts/atlas/probe-graphify-runtime-observability.mjs`.
 - [x] Probe PostgreSQL version and AIO-related settings without changing configuration.
 - [x] Probe `pg_stat_io` when available; fail open with an explicit unavailable/error field on older/incompatible servers.
+- [x] Probe `pg_aios` occupancy by state when available; fail open explicitly when unavailable.
 - [x] Probe Valkey server/memory/stats/keyspace INFO without writing cache values.
 - [x] Count bounded BitFrost key prefixes using SCAN, never KEYS.
 - [x] Redact connection URLs from errors.
-- [ ] Add `pg_aios` occupancy sampling for PostgreSQL 18 when live runtime proves the view is available and useful on this workstation.
+- [ ] Prove `pg_aios` occupancy sampling against the workstation PostgreSQL 18 runtime and decide whether point-in-time handle occupancy adds useful signal beyond `pg_stat_io` deltas.
 
 ## OBS-02 — Delta receipt
 
@@ -85,6 +86,7 @@ POSTGRES_REACHABLE
 SERVER_VERSION_CAPTURED
 AIO_METHOD_OBSERVED_OR_EXPLICITLY_UNAVAILABLE
 PG_STAT_IO_CAPTURED_OR_EXPLICITLY_UNAVAILABLE
+PG_AIOS_CAPTURED_OR_EXPLICITLY_UNAVAILABLE
 VALKEY_REACHABLE
 BITFROST_PREFIX_COUNTS_CAPTURED
 GRAPHIFY_EXIT_CODE_PRESERVED
