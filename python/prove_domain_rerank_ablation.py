@@ -12,7 +12,8 @@ import argparse
 import json
 from pathlib import Path
 
-from atlas_compute.domain_rerank_ablation import load_frozen_rows, run_domain_rerank_ablation
+from atlas_compute.domain_rerank_ablation import load_frozen_rows
+from atlas_compute.domain_rerank_ablation_gate import run_gated_domain_rerank_ablation
 
 
 def main() -> int:
@@ -26,7 +27,7 @@ def main() -> int:
     args = parser.parse_args()
 
     rows = load_frozen_rows(args.input)
-    receipt = run_domain_rerank_ablation(
+    receipt = run_gated_domain_rerank_ablation(
         rows,
         eval_k=args.k,
         seed=args.seed,
