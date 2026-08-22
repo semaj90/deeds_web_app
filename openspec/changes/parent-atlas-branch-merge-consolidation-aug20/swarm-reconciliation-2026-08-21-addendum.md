@@ -152,6 +152,38 @@ in the swarm's own proposal (`current_database()`, `current_user`,
 `20260822_graphify_source_inventory_revision_v2.sql` or the graph-snapshot
 migrations already sitting on `main` unapplied.
 
+## Update: local checkout sync deliberately deferred (still 2026-08-21)
+
+After this addendum was first written and pushed (`e6ab34bfb1`), `origin/main`
+advanced a further 36 commits from continued concurrent swarm activity.
+Attempting the usual `git stash push -u` → `git merge --ff-only origin/main`
+→ `git stash pop` sync twice in a row both failed at the same file:
+`sveltekit-frontend/drizzle/manual/20260822_graphify_revision_authority_v2.sql`.
+
+Confirmed via `git diff` that this is a **real, substantive in-progress
+edit** (the concurrent session removing two `ALTER TABLE ... DROP
+CONSTRAINT IF EXISTS` statements, 5 lines), not a line-ending or stash
+artifact — it reappeared as freshly modified within seconds of being
+stashed, twice. This is a genuine live race against another session
+actively iterating on that exact migration file.
+
+**Decision**: stopped retrying rather than forcing through it. The
+merge/stash sequence correctly protected the data both times (aborted
+cleanly, nothing lost, all WIP restored) — the failure mode here is
+"can't safely fast-forward while someone else is mid-edit on a file the
+fast-forward touches," not a bug in the sync method itself. Local `main`
+was left intentionally behind `origin/main`; the durable/shared state
+(this addendum, and everything the swarm has pushed since) is unaffected
+since it all lives on `origin/main` already.
+
+**For whoever picks this up next**: before attempting a local-checkout
+sync, check `git status --short` for exactly this file (or others) being
+actively re-modified within seconds of a stash — that's the race signal.
+If present, either wait for a quiet window, or skip local sync entirely
+and work directly against `origin/main` refs (fetch + `git show
+origin/main:<path>`) the way this session did for all the actual branch
+merges, which never required a clean local working tree to begin with.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
