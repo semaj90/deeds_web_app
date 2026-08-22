@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
-import { artifactAddressSchema } from '../../../queue/artifact-work-item-v1.js';
+import { artifactAddressSchema } from '../../queue/artifact-work-item-v1.js';
 import { candidateFeatureGpuPackV1Schema } from './candidate-feature-gpu-pack-v1.js';
 
 export const CANDIDATE_FEATURE_GPU_RESIDENT_LEASE_SCHEMA =
