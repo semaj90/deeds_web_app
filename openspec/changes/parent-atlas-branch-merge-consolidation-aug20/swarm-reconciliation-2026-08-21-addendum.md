@@ -613,6 +613,106 @@ hardcoded placeholder test checksum, stale `semantic_768` test
 fixture — plus the ongoing SQL-migration-hardening pattern, which isn't
 a "bug" per se but the same root cause recurring three times).
 
+## Update: `agent/graph-manifest-authority-v3-20260822` — fully superseded, confirmed and skipped, tracked queue now clear
+
+Checked merge-base with `agent/revision-graph-fanout-convergence-v2-20260822`
+(the branch just merged above): both fork from the *identical* parent
+commit (`02c9752018`), and their commit timestamps are 6 minutes apart
+(`21:04:38` vs `21:10:59` on 2026-08-21) — textbook two-parallel-swarm-
+agents-solving-the-same-problem-simultaneously. `git merge-tree`
+reported **9 conflicts** against current `main` (nearly every file this
+branch touches), so each core file was diffed directly against what's
+already merged:
+
+- `graphify-workspace-manifest-completeness-v1.ts` — differs from
+  main's (already-merged) version by exactly one JSDoc comment block
+  and one blank line. Otherwise byte-identical.
+- `graph-snapshot-source-revision-binding-v1.ts` — differs only in
+  code-formatting style (compact single-line `if`/arrow-chain style vs
+  main's multi-line style) and cosmetic variable renames (`map` vs
+  `bindingMap`, `normalize` vs `normalizeSourceRef`, `seen` vs
+  `seenRefs`). Logic is identical.
+- `materialize-graphify-source-inventory-v3.mts` (new filename in this
+  branch, vs. an in-place edit in the branch already merged) — same
+  algorithm, same imports, same error codes, just denser formatting
+  and a different producer-revision string suffix (`.v3` vs `.v2`).
+- The one non-duplicate artifact: `20260822_graphify_manifest_
+  completeness_v3.sql`, a small additive migration re-adding
+  `graphify_runs.source_manifest_source_count` (already added via the
+  hand-reconciliation above, in the `_v2` migration) under a `_v3`-
+  suffixed constraint name, plus one new composite index
+  (`workspace_revision, source_manifest_digest,
+  source_manifest_source_count`) that main's migration doesn't have.
+
+**Decision: skip the whole branch, merge nothing.** The composite index
+is the only genuinely non-duplicate content, and it isn't valuable
+enough on its own to justify a *third* manual migration file in this
+area (there are already two: `20260821_graphify_source_inventory.sql`
+and the reconciled `20260822_graphify_revision_authority_v2.sql`) —
+adding a `_v3.sql` for one already-covered column would itself be the
+kind of migration-file sprawl this repo's duplication-prevention
+governance rule warns against. If that composite index turns out to be
+needed later, it's a one-line addition to the existing `_v2` migration,
+not a new file.
+
+**This closes the tracked branch queue** from the original addendum
+list (all six branches named there are now: merged, partially merged,
+or confirmed-superseded-and-skipped — see the running total in the
+next section).
+
+## Session totals, final (2026-08-21/22, all work blocks this session)
+
+- **10 branches fully or partially merged**: `fanout-admission-gate`,
+  `graphify-revision-owner-reconciled`, `revision-graph-fanout-
+  convergence` (v1), `revision-authority-main-reconcile`, `gpu-
+  resident-feature-lease-converged`, `aligned-snapshot-real-corpus-
+  proof`, `gpu-batch-request-current-main`, `qdrant-768-provenance-
+  census`, `ast-parity-corpus-hardening`, `aligned-snapshot-qdrant-
+  proof-v3` (full merges); `graphify-revision-owner-converged`,
+  `revision-graph-fanout-convergence-v2` (partial merges with manual
+  reconciliation)
+- **2 branches confirmed fully superseded and correctly skipped**:
+  `gpu-resident-feature-lease-20260821`, `graph-manifest-authority-v3`
+- **5 real bugs found and fixed** purely by running actual tests after
+  every merge (never trusted a clean `git merge-tree` alone):
+  `tool-shim.ts` corruption, `graph-qdrant-fanout-alignment.ts` field
+  bug, Zod `.omit()`-on-refined-schema break, non-deterministic lease
+  checksum (JSON key reordering), hardcoded placeholder test checksum,
+  stale `semantic_768` test fixture (6, not 5 — running count corrected)
+- **2 architecture-level findings flagged for an operator decision,
+  neither silently resolved**: duplicate GPU-residency-lease ownership
+  (`candidate-feature-gpu-residency-v1.ts` vs `candidate-feature-gpu-
+  resident-lease-v1.ts`); Qdrant payload field-convention mismatch
+  (`workspace_revision` vs `repository_revision` as the canonical-proof
+  carrier) between `qdrant-sync-payload.ts` and `graph-qdrant-fanout-
+  alignment.ts`
+- **1 internal-defect finding flagged, file excluded from merge rather
+  than repaired**: duplicate-column SQL bug (`RESTRICT`+`CASCADE` on
+  the same column) in a stale branch fork of the revision-authority
+  migration
+- **1 recurring-root-cause pattern flagged**: the same migration file
+  (`20260822_graphify_revision_authority_v2.sql`) independently
+  regressed to a stale pre-hardening state (missing safety contract,
+  `CASCADE` instead of `RESTRICT`) across at least 3 different swarm
+  branches forked from the same parent commit — worth an operator look
+  at why that commit keeps getting used as a fork point
+- **1 pre-existing test-harness gap flagged, not fixed**: vitest's
+  `include` glob doesn't cover `scripts/**/*.spec.ts`, so several
+  merged spec files never run under normal `vitest run` — verified
+  their assertions manually via grep/node instead each time
+  encountered
+- **0 force-pushes, 0 data loss, 0 unresolved conflict markers left
+  anywhere, 0 destructive operations against any database**
+
+Local `main` and `origin/main` are fully synced as of this update.
+The concurrent live session's uncommitted WIP was preserved throughout
+(never destroyed) via the stash/ff-only/pop discipline established
+earlier in this addendum; one of its in-progress files
+(`materialize-graphify-source-inventory.mts`) was superseded by a
+now-merged, fully-reviewed branch version rather than hand-merged with
+an incomplete WIP draft — that WIP remains fully recoverable from
+`stash@{0}` if needed.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
