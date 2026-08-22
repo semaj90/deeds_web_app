@@ -122,23 +122,15 @@ describe('opencode MCP wiring', () => {
     }
   });
 
-  it('keeps root opencode jsonc aligned with bifrost provider and MCP endpoints', () => {
+  it('keeps root opencode jsonc aligned with the llama-server hforf provider and TRACE endpoint', () => {
     const cfg = readJson(rootConfigPath);
-    expect(cfg.model).toBe('ollama/gemma4-rotorquant:latest');
-    expect(cfg.provider?.['ollama']).toBeTruthy();
-    expect(cfg.permission).toMatchObject({
-      skill: 'allow',
-      'trace_*': 'allow',
-      'turbovec_*': 'allow',
-      'engram_*': 'allow',
-      'langextract_*': 'allow',
-    });
-    if (cfg.skills?.paths) {
-      expect(cfg.skills.paths).toContain('./.opencode/skills');
-    }
+    expect(cfg.model).toBe('llama-server/hforf.gguf');
+    expect(cfg.small_model).toBe('llama-server/hforf.gguf');
+    expect(cfg.provider?.['llama-server']).toBeTruthy();
+    expect(cfg.provider['llama-server'].npm).toBe('@ai-sdk/openai-compatible');
+    expect(cfg.provider['llama-server'].options?.baseURL).toBe('http://127.0.0.1:8090/v1');
+    expect(cfg.provider['llama-server'].models?.['hforf.gguf']).toBeTruthy();
     expect(cfg.mcp?.trace?.url).toBe('http://127.0.0.1:8788/mcp');
-    expect(cfg.mcp?.turbovec?.url).toBe('http://127.0.0.1:8791/mcp');
-    expect(cfg.mcp?.['engram-embed']).toBeTruthy();
   });
 
   it('ships the required OpenCode docs and command prompt', () => {
