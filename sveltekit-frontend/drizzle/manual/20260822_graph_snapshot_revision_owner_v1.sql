@@ -22,21 +22,21 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1
       FROM pg_constraint
-     WHERE conname = 'atlas_graph_snapshots_v2_workspace_revision_nonempty'
+     WHERE conname = 'atlas_graph_snapshots_v2_workspace_revision_sha256_v2'
   ) THEN
     ALTER TABLE atlas_graph_snapshots_v2
-      ADD CONSTRAINT atlas_graph_snapshots_v2_workspace_revision_nonempty
-      CHECK (workspace_revision IS NULL OR length(btrim(workspace_revision)) > 0);
+      ADD CONSTRAINT atlas_graph_snapshots_v2_workspace_revision_sha256_v2
+      CHECK (workspace_revision IS NULL OR workspace_revision ~ '^sha256:[a-f0-9]{64}$');
   END IF;
 
   IF NOT EXISTS (
     SELECT 1
       FROM pg_constraint
-     WHERE conname = 'atlas_graph_snapshots_v2_source_inventory_revision_nonempty'
+     WHERE conname = 'atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2'
   ) THEN
     ALTER TABLE atlas_graph_snapshots_v2
-      ADD CONSTRAINT atlas_graph_snapshots_v2_source_inventory_revision_nonempty
-      CHECK (source_inventory_revision IS NULL OR length(btrim(source_inventory_revision)) > 0);
+      ADD CONSTRAINT atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2
+      CHECK (source_inventory_revision IS NULL OR source_inventory_revision ~ '^sha256:[a-f0-9]{64}$');
   END IF;
 
   IF NOT EXISTS (
