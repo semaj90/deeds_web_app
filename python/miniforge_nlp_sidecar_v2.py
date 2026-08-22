@@ -147,6 +147,11 @@ legacy._grounded_extractions = _native_grounded_extractions
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
     """Return raw chunks plus whether logical identity_path was honored.
 
+    The temporary parser input is written as exact UTF-8 bytes. This is
+    intentional: Consiliency/Tree-sitter spans are byte coordinates, so text
+    mode newline translation (notably CRLF -> LF on Windows) would make the
+    returned offsets refer to bytes different from the request source.
+
     If an older treesitter-chunker API rejects ``identity_path`` we may still
     return structural evidence for search/diagnostics, but the response is
     explicitly degraded so Graphify cannot allow GIS promotion from potentially
@@ -172,8 +177,8 @@ def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[An
     suffix = suffix_map.get(language.lower(), Path(file_path).suffix or ".txt")
     temp_path: Optional[str] = None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
-            handle.write(source)
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=suffix, delete=False) as handle:
+            handle.write(source.encode("utf-8"))
             temp_path = handle.name
         try:
             return (
