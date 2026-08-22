@@ -18,6 +18,21 @@ function findRepoRoot(start: string): string {
 const repoRoot = findRepoRoot(process.cwd());
 const pythonOracle = resolve(repoRoot, 'python', 'parent_atlas_networkx_pagerank.py');
 const gdsRunner = resolve(repoRoot, 'scripts', 'atlas', 'compute-pagerank-neo4j-v2.mjs');
+// This is a bounded parity test. Both PageRank runners deliberately support a larger
+// frozen snapshot for explicit CLI runs, but their default selects that snapshot when
+// it exists locally. Pinning the six-node fixture here prevents a workstation artifact
+// from silently turning this test into a 162k-node / 108k-edge production-scale run.
+const pagerankFixture = resolve(
+	repoRoot,
+	'sveltekit-frontend',
+	'src',
+	'lib',
+	'server',
+	'atlas',
+	'graph',
+	'fixtures',
+	'pagerank-parity-graph.json',
+);
 
 type Score = { nodeKey: string; pagerankRaw: number };
 type Witness = Record<string, number | string>;
@@ -75,10 +90,10 @@ function spearman(left: readonly Score[], right: readonly Score[]): number {
 describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 	it('proves parity without modifying production score surfaces', async () => {
 		const before = readWitness();
-		const networkx = JSON.parse(run('python', [pythonOracle]));
+		const networkx = JSON.parse(run('python', [pythonOracle, '--fixture', pagerankFixture]));
 		expect(networkx.status).toBe('NETWORKX_REFERENCE_PROVEN');
 
-		const gds = JSON.parse(run('node', [gdsRunner, '--json']));
+		const gds = JSON.parse(run('node', [gdsRunner, '--fixture', pagerankFixture, '--json']));
 		const after = readWitness();
 		expect(after).toEqual(before);
 
