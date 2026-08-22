@@ -32,10 +32,10 @@ function candidate(input: { id: string; executionKey: string; structural: number
       downstream_utility: input.downstream,
       latency_budget_ms: 1000,
       prior_failure_error_code: null,
-      evidence_refs: [`candidate:${input.id}`],
+      evidence_refs: [`candidate:${input.id}`] as string[],
       feature_revision: 'action-features:v1',
     },
-  } as const;
+  };
 }
 
 function oldRecommendation(id: string): NextActionRecommendationV1 {
