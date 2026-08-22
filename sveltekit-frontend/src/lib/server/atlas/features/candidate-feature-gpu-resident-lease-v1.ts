@@ -21,6 +21,8 @@ export const candidateFeatureGpuResidentBufferKindSchema = z.enum([
   'DEGRADED_IDENTITY',
 ]);
 
+type BufferKind = z.infer<typeof candidateFeatureGpuResidentBufferKindSchema>;
+
 export const candidateFeatureGpuResidentBufferV1Schema = z.object({
   kind: candidateFeatureGpuResidentBufferKindSchema,
   address: artifactAddressSchema.superRefine((value, ctx) => {
@@ -28,7 +30,10 @@ export const candidateFeatureGpuResidentBufferV1Schema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'FEATURE_GPU_LEASE_BUFFER_NOT_GPU_RESIDENT' });
     }
   }),
+  /** FEAT-03D source bytes before any physical staging transform. */
   sourceChecksum: checksum,
+  /** Exact resident physical representation copied to the device. */
+  residentChecksum: checksum,
 }).strict();
 
 export const candidateFeatureGpuResidentLeaseV1Schema = z.object({
@@ -91,10 +96,7 @@ function sha256(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
-function expectedSourceChecksum(
-  pack: z.infer<typeof candidateFeatureGpuPackV1Schema>,
-  kind: z.infer<typeof candidateFeatureGpuResidentBufferKindSchema>,
-): string {
+function expectedSourceChecksum(pack: z.infer<typeof candidateFeatureGpuPackV1Schema>, kind: BufferKind): string {
   switch (kind) {
     case 'FEATURE_VALUES': return pack.featureValuesChecksum;
     case 'FEATURE_PRESENCE': return pack.featurePresenceChecksum;
@@ -104,21 +106,19 @@ function expectedSourceChecksum(
   }
 }
 
-function expectedShape(
-  pack: z.infer<typeof candidateFeatureGpuPackV1Schema>,
-  kind: z.infer<typeof candidateFeatureGpuResidentBufferKindSchema>,
-): number[] {
+function expectedShape(pack: z.infer<typeof candidateFeatureGpuPackV1Schema>, kind: BufferKind): number[] {
   return kind === 'FEATURE_VALUES' || kind === 'FEATURE_PRESENCE'
     ? [pack.physicalRows, pack.featureCount]
     : [pack.physicalRows];
 }
 
-function expectedDtype(kind: z.infer<typeof candidateFeatureGpuResidentBufferKindSchema>) {
+function expectedResidentDtype(kind: BufferKind) {
   switch (kind) {
     case 'FEATURE_VALUES': return 'f32' as const;
     case 'FEATURE_PRESENCE': return 'u8' as const;
     case 'VALID_MASK': return 'u8' as const;
-    case 'LANE_MASK_U16': return 'u16' as const;
+    // The current PyTorch worker stages the logical uint16 mask losslessly as int32.
+    case 'LANE_MASK_U16': return 'i32' as const;
     case 'DEGRADED_IDENTITY': return 'u8' as const;
   }
 }
@@ -158,27 +158,25 @@ export function verifyCandidateFeatureGpuResidentLease(input: {
     if (buffer.address.locator.storage !== 'GPU_RESIDENT') {
       throw new Error(`FEATURE_GPU_LEASE_BUFFER_NOT_GPU_RESIDENT:${kind}`);
     }
-    if (buffer.address.locator.dtype !== expectedDtype(kind)) {
+    if (buffer.address.locator.dtype !== expectedResidentDtype(kind)) {
       throw new Error(`FEATURE_GPU_LEASE_DTYPE_MISMATCH:${kind}`);
     }
     if (JSON.stringify(buffer.address.locator.shape) !== JSON.stringify(expectedShape(pack, kind))) {
       throw new Error(`FEATURE_GPU_LEASE_BUFFER_SHAPE_MISMATCH:${kind}`);
     }
-    if (buffer.address.checksum !== buffer.sourceChecksum) {
+    if (buffer.address.checksum !== buffer.residentChecksum) {
       throw new Error(`FEATURE_GPU_LEASE_ARTIFACT_CHECKSUM_MISMATCH:${kind}`);
     }
   }
 
   const { leaseChecksum, ...payload } = lease;
-  const expectedLeaseChecksum = sha256(JSON.stringify(payload));
-  if (leaseChecksum !== expectedLeaseChecksum) {
+  if (leaseChecksum !== sha256(JSON.stringify(payload))) {
     throw new Error('FEATURE_GPU_LEASE_CHECKSUM_MISMATCH');
   }
 
   const now = Date.parse(input.now ?? new Date().toISOString());
   if (lease.state !== 'ACTIVE') throw new Error(`FEATURE_GPU_LEASE_NOT_ACTIVE:${lease.state}`);
   if (now >= Date.parse(lease.expiresAt)) throw new Error('FEATURE_GPU_LEASE_EXPIRED');
-
   return lease;
 }
 
@@ -190,33 +188,37 @@ export function buildCandidateFeatureGpuResidentLease(input: {
   stagingMode: 'PAGEABLE_SYNC' | 'PINNED_ASYNC';
   createdAt: string;
   expiresAt: string;
-  bufferIds: Record<z.infer<typeof candidateFeatureGpuResidentBufferKindSchema>, string>;
+  bufferIds: Record<BufferKind, string>;
+  residentChecksums: Record<BufferKind, string>;
 }): CandidateFeatureGpuResidentLeaseV1 {
   const pack = candidateFeatureGpuPackV1Schema.parse(input.pack);
   const buffers = candidateFeatureGpuResidentBufferKindSchema.options.map((kind) => {
     const sourceChecksum = expectedSourceChecksum(pack, kind);
+    const residentChecksum = checksum.parse(input.residentChecksums[kind]);
     return {
       kind,
       sourceChecksum,
+      residentChecksum,
       address: {
         schema: 'atlas.artifact-address.v1' as const,
         artifactId: `${input.leaseId}:${kind}`,
-        artifactHash: sourceChecksum,
+        artifactHash: residentChecksum,
         schemaId: `atlas.candidate-feature-gpu-buffer.${kind.toLowerCase()}.v1`,
-        checksum: sourceChecksum,
+        checksum: residentChecksum,
         revisionSetHash: pack.gpuPackChecksum,
         revisions: {
           candidateSnapshotRevision: pack.candidateSnapshotRevision,
           featureSnapshotChecksum: pack.featureSnapshotChecksum,
           ordinalMapChecksum: pack.ordinalMapChecksum,
           gpuPackChecksum: pack.gpuPackChecksum,
+          sourceChecksum,
           leaseEpoch: String(input.leaseEpoch),
         },
         locator: {
           storage: 'GPU_RESIDENT' as const,
           deviceId: input.deviceId,
           bufferId: input.bufferIds[kind],
-          dtype: expectedDtype(kind),
+          dtype: expectedResidentDtype(kind),
           shape: expectedShape(pack, kind),
         },
       },
@@ -262,9 +264,5 @@ export function releaseCandidateFeatureGpuResidentLease(input: {
     throw new Error('FEATURE_GPU_LEASE_RELEASE_BEFORE_CREATE');
   }
   const { leaseChecksum: _oldChecksum, ...payload } = lease;
-  return withLeaseChecksum({
-    ...payload,
-    state: 'RELEASED',
-    releasedAt,
-  });
+  return withLeaseChecksum({ ...payload, state: 'RELEASED', releasedAt });
 }
