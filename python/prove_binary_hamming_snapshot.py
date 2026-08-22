@@ -19,7 +19,7 @@ PYTHON_ROOT = ROOT / "python"
 if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
-from atlas_compute.binary_hamming import evaluate_binary_hamming_retrieval
+from atlas_compute.binary_hamming import evaluate_binary_hamming_retrieval, spread_query_ordinals
 from atlas_compute.cuvs_analytics import run_cuvs_binary_quantization
 from atlas_compute.exact_semantic import exact_semantic_search
 from atlas_compute.semantic_snapshot_freeze import load_and_verify_frozen_snapshot
@@ -48,7 +48,8 @@ def main() -> int:
     if not 1 <= args.k < len(canonical_ids):
         raise ValueError("k must be >=1 and smaller than frozen row count")
     query_count = min(max(1, args.query_count), len(canonical_ids))
-    query_ordinals = list(range(query_count))
+    query_ordinals = spread_query_ordinals(len(canonical_ids), query_count)
+    query_selection_checksum = stable_checksum(query_ordinals)
     queries = semantic[query_ordinals]
 
     exact = exact_semantic_search(
@@ -85,6 +86,8 @@ def main() -> int:
         "semantic_canonical_order_checksum": str(manifest.get("canonical_order_checksum") or ""),
         "metric": args.metric,
         "k": args.k,
+        "query_selection": "DETERMINISTIC_CORPUS_SPREAD_V1",
+        "query_selection_checksum": query_selection_checksum,
         "query_ordinals": query_ordinals,
         "query_canonical_ids": [canonical_ids[value] for value in query_ordinals],
         "semantic_exact_result_checksum": exact.result_checksum,
