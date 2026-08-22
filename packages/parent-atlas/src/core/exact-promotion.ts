@@ -31,8 +31,12 @@ export const exactPromotionCandidateSchema = z.object({
   workspace_revision: revision,
   source_revision: revision,
   representation_revision: revision,
-  expected_source_content_hash: checksum.nullable().default(null),
+  /** Optional expected full-file digest. Never substitute a span digest here. */
+  expected_file_content_hash: checksum.nullable().default(null),
+  /** Optional expected exact selected-span digest. */
+  expected_span_content_hash: checksum.nullable().default(null),
   evidence_refs: z.array(id).default([]),
+  /** Projection diagnostic only; never accepted as canonical identity. */
   qdrant_point_id: id.nullable().default(null),
 }).strict().superRefine((value, ctx) => {
   if (!value.packet_key && !value.symbol_version_id && !value.tree_node_id) {
@@ -40,13 +44,6 @@ export const exactPromotionCandidateSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['candidate_id'],
       message: 'exact promotion requires packet_key, symbol_version_id, or tree_node_id',
-    });
-  }
-  if (value.qdrant_point_id && !value.packet_key && !value.symbol_version_id && !value.tree_node_id) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['qdrant_point_id'],
-      message: 'qdrant_point_id is diagnostic projection identity and cannot satisfy exact promotion identity',
     });
   }
 });
@@ -59,6 +56,8 @@ export const exactPromotionEvidenceFactsSchema = z.object({
   packet_representation_revision: revision.nullable(),
   packet_sha256: checksum.nullable(),
   packet_tree_node_id: id.nullable(),
+  packet_byte_start: z.number().int().nonnegative().nullable(),
+  packet_byte_end: z.number().int().nonnegative().nullable(),
 
   symbol_version_found: z.boolean(),
   symbol_version_source_ref: id.nullable(),
@@ -66,11 +65,15 @@ export const exactPromotionEvidenceFactsSchema = z.object({
   symbol_version_workspace_revision: revision.nullable(),
   symbol_version_stable_symbol_id: id.nullable(),
   symbol_version_upstream_node_id: id.nullable(),
+  symbol_version_byte_start: z.number().int().nonnegative().nullable(),
+  symbol_version_byte_end: z.number().int().nonnegative().nullable(),
 
   ast_node_found: z.boolean(),
   ast_node_source_ref: id.nullable(),
   ast_node_source_revision: revision.nullable(),
   ast_node_content_hash: checksum.nullable(),
+  ast_node_byte_start: z.number().int().nonnegative().nullable(),
+  ast_node_byte_end: z.number().int().nonnegative().nullable(),
 
   source_ref_found: z.boolean(),
   source_ref_content_hash: checksum.nullable(),
@@ -80,11 +83,23 @@ export const exactPromotionEvidenceFactsSchema = z.object({
   graphify_source_found: z.boolean(),
   graphify_source_revision: revision.nullable(),
   graphify_workspace_revision: revision.nullable(),
+  /** Graphify file-level content digest. */
   graphify_content_hash: checksum.nullable(),
 
-  source_bytes_found: z.boolean(),
-  source_bytes_sha256: checksum.nullable(),
-}).strict();
+  selected_span_basis: z.enum(['AST_NODE', 'SYMBOL_VERSION', 'PACKET']).nullable(),
+  selected_span_start: z.number().int().nonnegative().nullable(),
+  selected_span_end: z.number().int().nonnegative().nullable(),
+  selected_span_expected_hash: checksum.nullable(),
+
+  source_file_bytes_found: z.boolean(),
+  source_file_bytes_sha256: checksum.nullable(),
+  source_span_bytes_found: z.boolean(),
+  source_span_bytes_sha256: checksum.nullable(),
+}).strict().superRefine((value, ctx) => {
+  if (value.selected_span_start !== null && value.selected_span_end !== null && value.selected_span_end < value.selected_span_start) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['selected_span_end'], message: 'selected span end must be >= start' });
+  }
+});
 export type ExactPromotionEvidenceFactsV1 = z.infer<typeof exactPromotionEvidenceFactsSchema>;
 
 export const EXACT_PROMOTION_STATUSES = [
@@ -95,17 +110,23 @@ export const EXACT_PROMOTION_STATUSES = [
   'REVISION_MISMATCH',
   'SOURCE_BYTES_UNAVAILABLE',
   'SOURCE_HASH_MISMATCH',
+  'SOURCE_SPAN_UNAVAILABLE',
+  'SOURCE_SPAN_HASH_MISMATCH',
 ] as const;
 
 export const exactPromotionChecksSchema = z.object({
   revision_authority_proven: z.boolean(),
   identity_found: z.boolean(),
   source_ref_match: z.boolean(),
+  stable_symbol_match: z.boolean(),
   workspace_revision_match: z.boolean(),
   source_revision_match: z.boolean(),
   representation_revision_match: z.boolean(),
-  source_bytes_present: z.boolean(),
-  source_hash_match: z.boolean(),
+  source_file_bytes_present: z.boolean(),
+  source_file_hash_match: z.boolean(),
+  source_span_selected: z.boolean(),
+  source_span_bytes_present: z.boolean(),
+  source_span_hash_match: z.boolean(),
 }).strict();
 
 export const exactPromotionReceiptSchema = z.object({
@@ -143,22 +164,23 @@ function sha256(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
-function normalizeDigest(value: string | null): string | null {
-  return value?.replace(/^sha256:/, '').toLowerCase() ?? null;
-}
-
-function sameRevision(expected: string, observed: string | null): boolean {
-  return observed !== null && expected === observed;
-}
-
 function allObservedMatch(expected: string, observed: Array<string | null>): boolean {
   const values = observed.filter((value): value is string => value !== null);
   return values.length > 0 && values.every((value) => value === expected);
 }
 
+function allHashesMatch(actual: string | null, expected: Array<string | null>): boolean {
+  const values = expected.filter((value): value is string => value !== null);
+  return actual !== null && values.length > 0 && values.every((value) => value === actual);
+}
+
 /**
- * Pure promotion decision over already-read facts. This is the canonical policy
- * owner; Postgres/filesystem adapters only collect facts and cannot relax it.
+ * Pure promotion decision over already-read facts. Database/filesystem adapters
+ * only collect evidence and cannot relax these gates.
+ *
+ * Full-file freshness and exact-span evidence are deliberately separate. AST and
+ * source-ref hashes may describe a symbol/span; Graphify's content hash describes
+ * the file. They are never compared as though they were the same byte range.
  */
 export function buildExactPromotionReceipt(input: {
   request_id: string;
@@ -185,6 +207,9 @@ export function buildExactPromotionReceipt(input: {
   const sourceRefMatch = sourceRefObservations.length > 0
     && sourceRefObservations.every((value) => value === candidate.source_ref);
 
+  const stableSymbolMatch = !candidate.stable_symbol_id
+    || (facts.symbol_version_found && facts.symbol_version_stable_symbol_id === candidate.stable_symbol_id);
+
   const workspaceRevisionMatch = allObservedMatch(candidate.workspace_revision, [
     candidate.packet_key ? facts.packet_workspace_revision : null,
     candidate.symbol_version_id ? facts.symbol_version_workspace_revision : null,
@@ -197,22 +222,21 @@ export function buildExactPromotionReceipt(input: {
     facts.graphify_source_found ? facts.graphify_source_revision : null,
   ]);
 
-  const representationRevisionMatch = candidate.packet_key
-    ? sameRevision(candidate.representation_revision, facts.packet_representation_revision)
-    : true;
+  const representationRevisionMatch = !candidate.packet_key
+    || facts.packet_representation_revision === candidate.representation_revision;
 
-  const expectedHashes = [
-    candidate.expected_source_content_hash,
-    facts.source_ref_content_hash,
+  const fileHashMatch = allHashesMatch(facts.source_file_bytes_sha256, [
+    candidate.expected_file_content_hash,
     facts.graphify_content_hash,
-  ].map(normalizeDigest).filter((value): value is string => value !== null);
-  const actualSourceHash = normalizeDigest(facts.source_bytes_sha256);
-  const sourceHashMatch = Boolean(
-    facts.source_bytes_found
-    && actualSourceHash
-    && expectedHashes.length > 0
-    && expectedHashes.every((value) => value === actualSourceHash)
-  );
+  ]);
+
+  const spanSelected = facts.selected_span_basis !== null
+    && facts.selected_span_start !== null
+    && facts.selected_span_end !== null;
+  const spanHashMatch = allHashesMatch(facts.source_span_bytes_sha256, [
+    candidate.expected_span_content_hash,
+    facts.selected_span_expected_hash,
+  ]);
 
   const revisionAuthorityProven = authority.status === 'REVISION_OWNER_PROVEN'
     && authority.workspace_revision_proven
@@ -222,30 +246,38 @@ export function buildExactPromotionReceipt(input: {
     revision_authority_proven: revisionAuthorityProven,
     identity_found: identityFound,
     source_ref_match: sourceRefMatch,
+    stable_symbol_match: stableSymbolMatch,
     workspace_revision_match: workspaceRevisionMatch,
     source_revision_match: sourceRevisionMatch,
     representation_revision_match: representationRevisionMatch,
-    source_bytes_present: facts.source_bytes_found,
-    source_hash_match: sourceHashMatch,
+    source_file_bytes_present: facts.source_file_bytes_found,
+    source_file_hash_match: fileHashMatch,
+    source_span_selected: spanSelected,
+    source_span_bytes_present: facts.source_span_bytes_found,
+    source_span_hash_match: spanHashMatch,
   });
 
   const reasonCodes: string[] = [];
   if (!revisionAuthorityProven) reasonCodes.push('REVISION_AUTHORITY_NOT_PROVEN');
   if (!identityFound) reasonCodes.push('IDENTITY_NOT_FOUND');
-  if (identityFound && !sourceRefMatch) reasonCodes.push('SOURCE_REF_MISMATCH');
+  if (identityFound && (!sourceRefMatch || !stableSymbolMatch)) reasonCodes.push('IDENTITY_EVIDENCE_MISMATCH');
   if (identityFound && !workspaceRevisionMatch) reasonCodes.push('WORKSPACE_REVISION_MISMATCH');
   if (identityFound && !sourceRevisionMatch) reasonCodes.push('SOURCE_REVISION_MISMATCH');
   if (identityFound && !representationRevisionMatch) reasonCodes.push('REPRESENTATION_REVISION_MISMATCH');
-  if (!facts.source_bytes_found) reasonCodes.push('SOURCE_BYTES_UNAVAILABLE');
-  else if (!sourceHashMatch) reasonCodes.push('SOURCE_HASH_MISMATCH');
+  if (!facts.source_file_bytes_found) reasonCodes.push('SOURCE_FILE_BYTES_UNAVAILABLE');
+  else if (!fileHashMatch) reasonCodes.push('SOURCE_FILE_HASH_MISMATCH');
+  if (!spanSelected || !facts.source_span_bytes_found) reasonCodes.push('SOURCE_SPAN_UNAVAILABLE');
+  else if (!spanHashMatch) reasonCodes.push('SOURCE_SPAN_HASH_MISMATCH');
 
   let status: ExactPromotionReceiptV1['status'];
   if (!revisionAuthorityProven) status = 'BLOCKED_REVISION_AUTHORITY';
   else if (!identityFound) status = 'IDENTITY_NOT_FOUND';
-  else if (!sourceRefMatch) status = 'IDENTITY_MISMATCH';
+  else if (!sourceRefMatch || !stableSymbolMatch) status = 'IDENTITY_MISMATCH';
   else if (!workspaceRevisionMatch || !sourceRevisionMatch || !representationRevisionMatch) status = 'REVISION_MISMATCH';
-  else if (!facts.source_bytes_found) status = 'SOURCE_BYTES_UNAVAILABLE';
-  else if (!sourceHashMatch) status = 'SOURCE_HASH_MISMATCH';
+  else if (!facts.source_file_bytes_found) status = 'SOURCE_BYTES_UNAVAILABLE';
+  else if (!fileHashMatch) status = 'SOURCE_HASH_MISMATCH';
+  else if (!spanSelected || !facts.source_span_bytes_found) status = 'SOURCE_SPAN_UNAVAILABLE';
+  else if (!spanHashMatch) status = 'SOURCE_SPAN_HASH_MISMATCH';
   else status = 'PROVEN';
 
   const evidenceRefs = [...new Set([
@@ -264,7 +296,8 @@ export function buildExactPromotionReceipt(input: {
     source_revision: candidate.source_revision,
     representation_revision: candidate.representation_revision,
     proof_checksum: authority.proof_checksum,
-    source_bytes_sha256: facts.source_bytes_sha256,
+    source_file_bytes_sha256: facts.source_file_bytes_sha256,
+    source_span_bytes_sha256: facts.source_span_bytes_sha256,
   }).slice(0, 40)}`;
 
   const payload = {
