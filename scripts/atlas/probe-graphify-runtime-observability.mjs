@@ -9,7 +9,6 @@ import { createAtlasRedisClient } from './lib/redis-client-factory.mjs';
 Object.assign(process.env, loadRepoEnv(process.env));
 
 const root = resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const reportDir = resolve(root, 'docs/reports');
 const PG_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const phase = process.argv.find((arg) => arg.startsWith('--phase='))?.split('=')[1] || 'snapshot';
 const out = process.argv.find((arg) => arg.startsWith('--out='))?.slice('--out='.length) || `docs/reports/graphify-runtime-${phase}.json`;
@@ -28,6 +27,8 @@ async function probePostgres() {
     ioMethod: null,
     pgStatIoAvailable: false,
     pgStatIo: [],
+    pgAiosAvailable: false,
+    pgAios: { activeHandles: null, states: [] },
     settings: {},
     error: null,
   };
@@ -38,7 +39,17 @@ async function probePostgres() {
     result.serverVersion = version.rows[0]?.version ?? null;
     result.serverVersionNum = version.rows[0]?.server_version_num ?? null;
 
-    for (const name of ['io_method', 'effective_io_concurrency', 'maintenance_io_concurrency', 'shared_buffers']) {
+    const settingNames = [
+      'io_method',
+      'io_workers',
+      'io_max_concurrency',
+      'io_combine_limit',
+      'io_max_combine_limit',
+      'effective_io_concurrency',
+      'maintenance_io_concurrency',
+      'shared_buffers',
+    ];
+    for (const name of settingNames) {
       try {
         const setting = await pool.query('SELECT current_setting($1, true) AS value', [name]);
         result.settings[name] = setting.rows[0]?.value ?? null;
@@ -65,6 +76,22 @@ async function probePostgres() {
       result.pgStatIoAvailable = false;
       result.pgStatIoError = String(error instanceof Error ? error.message : error);
     }
+
+    try {
+      const aios = await pool.query(`
+        SELECT state, count(*)::bigint AS count
+        FROM pg_aios
+        GROUP BY state
+        ORDER BY state
+      `);
+      result.pgAiosAvailable = true;
+      result.pgAios.states = aios.rows.map((row) => ({ state: row.state, count: safeNumber(row.count) }));
+      result.pgAios.activeHandles = result.pgAios.states.reduce((sum, row) => sum + (row.count ?? 0), 0);
+    } catch (error) {
+      result.pgAiosAvailable = false;
+      result.pgAiosError = String(error instanceof Error ? error.message : error);
+    }
+
     await pool.query('ROLLBACK');
   } catch (error) {
     result.error = String(error instanceof Error ? error.message : error).replace(/postgres(?:ql)?:\/\/[^\s]+/gi, '<redacted-url>');
@@ -135,4 +162,13 @@ const report = {
 const outputPath = resolve(root, out);
 mkdirSync(resolve(outputPath, '..'), { recursive: true });
 writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ status: 'GRAPHIFY_RUNTIME_OBSERVABILITY_CAPTURED', phase, output: out, postgres: report.postgres.reachable, valkey: report.valkey.reachable }, null, 2));
+console.log(JSON.stringify({
+  status: 'GRAPHIFY_RUNTIME_OBSERVABILITY_CAPTURED',
+  phase,
+  output: out,
+  postgres: report.postgres.reachable,
+  postgresAioMethod: report.postgres.ioMethod,
+  pgStatIo: report.postgres.pgStatIoAvailable,
+  pgAios: report.postgres.pgAiosAvailable,
+  valkey: report.valkey.reachable,
+}, null, 2));
