@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   temporalActionChecksum,
   type NextActionRecommendationV1,
-  type RecommendationOutcomeReceiptV1,
 } from './temporal-action-ledger.js';
+import type { RecommendationOutcomeReceiptV1 } from './temporal-recommendation-outcome-runtime.js';
 import { aggregateHistoricalRecommendations } from './temporal-recommendation-history-runtime.js';
 
 const K1 = temporalActionChecksum('k1');
