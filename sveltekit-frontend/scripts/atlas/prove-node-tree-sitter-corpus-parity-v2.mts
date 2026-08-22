@@ -14,6 +14,7 @@ import {
   compareStructuralObservationsV2,
   type StructuralParityMismatchClassV2,
 } from '$lib/server/atlas/indexing/structural-parity-comparator-v2.js';
+import { classifyStructuralProviderRuntimeReadiness } from '$lib/server/atlas/indexing/structural-provider-runtime-readiness-v1.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND = path.resolve(HERE, '../..');
@@ -72,13 +73,6 @@ function addCounts(
   }
 }
 
-function runtimeUnavailable(result: { status: string; diagnostics: string[]; errorTag?: string }): boolean {
-  if (result.status !== 'FAILED') return false;
-  return /SIDECAR_UNAVAILABLE|ECONNREFUSED|fetch failed|NODE_TREE_SITTER_RUNTIME|PACKAGE_VERSION_MISSING|Cannot find module/i.test(
-    [...result.diagnostics, result.errorTag ?? ''].join('\n'),
-  );
-}
-
 const head = git('rev-parse', 'HEAD');
 const providerPath = 'sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts';
 const providerBlobSha = git('hash-object', providerPath);
@@ -86,6 +80,8 @@ const sidecarPath = 'python/miniforge_nlp_sidecar_v2.py';
 const sidecarBlobSha = git('hash-object', sidecarPath);
 const comparatorPath = 'sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.ts';
 const comparatorBlobSha = git('hash-object', comparatorPath);
+const runtimeReadinessPath = 'sveltekit-frontend/src/lib/server/atlas/indexing/structural-provider-runtime-readiness-v1.ts';
+const runtimeReadinessBlobSha = git('hash-object', runtimeReadinessPath);
 const corpusFiles = await collectFiles(path.resolve(FRONTEND, 'src'));
 const sidecar = create8095AstProvider(process.env.MINIFORGE_SIDECAR_URL);
 const node = createNodeTreeSitterAstProvider();
@@ -105,7 +101,9 @@ for (const absolute of corpusFiles) {
     sidecar.materialize(input),
     node.materialize(input),
   ]);
-  const runtimeBlocked = runtimeUnavailable(sidecarResult) || runtimeUnavailable(nodeResult);
+  const sidecarRuntime = classifyStructuralProviderRuntimeReadiness(sidecarResult);
+  const nodeRuntime = classifyStructuralProviderRuntimeReadiness(nodeResult);
+  const runtimeBlocked = !sidecarRuntime.available || !nodeRuntime.available;
   if (runtimeBlocked) blockedRuntimeFiles += 1;
 
   const sidecarRows = (sidecarResult.evidence?.chunks ?? [])
@@ -133,6 +131,7 @@ for (const absolute of corpusFiles) {
       status: sidecarResult.status,
       engine: sidecarResult.evidence?.engine ?? null,
       engineVersion: sidecarResult.evidence?.engine_version ?? null,
+      runtimeReadiness: sidecarRuntime,
       diagnostics: sidecarResult.diagnostics,
       observationCount: sidecarRows.length,
     },
@@ -140,6 +139,7 @@ for (const absolute of corpusFiles) {
       status: nodeResult.status,
       engine: nodeResult.evidence?.engine ?? null,
       engineVersion: nodeResult.evidence?.engine_version ?? null,
+      runtimeReadiness: nodeRuntime,
       diagnostics: nodeResult.diagnostics,
       observationCount: nodeRows.length,
     },
@@ -179,6 +179,8 @@ const report = {
     sidecarBlobSha,
     comparatorPath,
     comparatorBlobSha,
+    runtimeReadinessPath,
+    runtimeReadinessBlobSha,
   },
   corpus: {
     root: 'sveltekit-frontend/src',
@@ -201,6 +203,7 @@ const report = {
     fragmentIsNotVariable: true,
     unknownSymbolKindIsNotParity: true,
     duplicateNamesUseOneToOneMatching: true,
+    explicitUnavailableEngineBlocksProof: true,
     exactSpanParityRequiresOriginalRequestByteCoordinates: true,
     canonicalOwnerChanged: false,
     promotionAllowed: false,
@@ -220,6 +223,7 @@ await writeFile(mdPath, [
   `- Node provider blob: \`${providerBlobSha}\``,
   `- 8095 facade blob: \`${sidecarBlobSha}\``,
   `- comparator blob: \`${comparatorBlobSha}\``,
+  `- runtime-readiness blob: \`${runtimeReadinessBlobSha}\``,
   `- corpus files: ${count}`,
   `- runtime available: ${report.gates.runtimeAvailable}`,
   `- source bytes frozen: ${report.gates.sourceBytesFrozen}`,
@@ -237,6 +241,7 @@ await writeFile(mdPath, [
     .map(([key, value]) => `- ${key}: ${value}`),
   '',
   'Duplicate names are paired one-to-one. A `fragment` chunk remains semantic kind `UNKNOWN`; UNKNOWN never counts as semantic parity.',
+  'A provider with `engine: unavailable` blocks the proof even when the HTTP response itself is schema-valid.',
   'Canonical ownership and persistence remain unchanged.',
   '',
 ].join('\n'), 'utf8');
