@@ -367,6 +367,61 @@ against every merge instead of trusting `git merge-tree`'s "no conflict
 markers" signal. Zero of these three would have been caught by the
 merge-cleanliness check alone.
 
+## Update: superseded branch identified, one branch partially (not fully) merged
+
+**`agent/gpu-resident-feature-lease-20260821` (12 commits, was listed as
+"pending") is fully superseded — no action needed, don't merge it.**
+Traced its true merge-base with the already-merged `-converged` sibling
+and confirmed its entire unique contribution (the 6 `candidate-feature-
+gpu-resident-lease-v1.*` + Python files) is byte-identical to what
+`-converged` already brought into `main` this session (commit
+`6d60ef29a6`), *including* the exact `sha256(JSON.stringify(...))`
+checksum bug already found and fixed here. Merging it now would add
+nothing and reintroduce a bug already fixed. Treat as closed.
+
+**`agent/graphify-revision-owner-converged-20260821` (3 commits) —
+merged only 3 of its 5 changed files**, as a plain (non-merge) commit
+`c3f9ea745d`, not a 2-parent merge commit — because 2 of its 5 files
+failed verification and were deliberately excluded:
+
+1. Its own copy of `sveltekit-frontend/drizzle/manual/20260822_
+   graphify_revision_authority_v2.sql` has a **real internal defect,
+   independent of any merge conflict**: `first_seen_run_id` and
+   `last_seen_run_id` are declared *twice* inside the same `CREATE
+   TABLE public.graphify_files (...)` statement — once as `ON DELETE
+   RESTRICT`, once immediately after as `ON DELETE CASCADE`. This is
+   invalid SQL (duplicate column) that would fail outright if ever
+   applied, and the `CASCADE` half directly contradicts this file's own
+   safety-contract header ("no new cascading-delete path is
+   introduced"). Root cause looks like a botched internal rebase/paste
+   within the branch's own history, predating the safety-contract
+   rewrite and the `.omit()`/checksum fixes already on `main`. `main`'s
+   current version of this file (already verified working earlier this
+   session — see the very first addendum update above) was kept as-is;
+   the branch's version was discarded entirely, not force-reconciled.
+2. Its copy of `sveltekit-frontend/scripts/atlas/prove-code-revision-
+   owner-canary.mts` is a near-total independent rewrite (different
+   imports, different output shape, reads a new `workspace-source-
+   binding-observation.json` side-file) with an unclear relationship to
+   `main`'s current version of the same script. Too large a behavioral
+   delta to fold in without dedicated review of which version is
+   actually current/correct — flagged, not resolved.
+
+What *was* merged: `graphify-source-inventory-writer-v2.ts` (the
+transactional Postgres writer for `WorkspaceRevisionRecordV1` +
+per-file `WorkspaceSourceBindingV1` bindings into
+`graphify_runs`/`graphify_files`), its spec (3/3 passing, verified),
+and its CLI prove script — all pure-additive, zero dependency on the
+two excluded files.
+
+**Process note**: this is the first time this session a "branch merge"
+deliberately used a single-parent commit instead of a 2-parent
+`commit-tree -p main -p branch` merge commit — specifically because a
+2-parent merge commit would misrepresent history (claiming the whole
+branch was merged when 40% of its file changes were rejected). When
+only merging part of a branch, prefer the plain-commit form so `git
+log --merges` and `git rev-list` don't lie about provenance.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
