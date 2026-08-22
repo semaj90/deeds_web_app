@@ -143,10 +143,11 @@ export const traceOutcomeReceiptV1Schema = z.object({
 });
 export type TraceOutcomeReceiptV1 = z.infer<typeof traceOutcomeReceiptV1Schema>;
 
-function withChecksum<T extends Record<string, unknown>>(value: T, checksumField: keyof T): T {
-  const payload = { ...value };
-  delete payload[checksumField];
-  return { ...value, [checksumField]: traceAuthorityChecksum(payload) };
+function withChecksum<T extends Record<string, unknown>>(value: T, checksumField: string): T {
+  const payload = Object.fromEntries(
+    Object.entries(value).filter(([key]) => key !== checksumField),
+  );
+  return { ...value, [checksumField]: traceAuthorityChecksum(payload) } as T;
 }
 
 export function materializeTraceExecutionV1(
