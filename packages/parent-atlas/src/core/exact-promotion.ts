@@ -39,11 +39,11 @@ export const exactPromotionCandidateSchema = z.object({
   /** Projection diagnostic only; never accepted as canonical identity. */
   qdrant_point_id: id.nullable().default(null),
 }).strict().superRefine((value, ctx) => {
-  if (!value.packet_key && !value.symbol_version_id && !value.tree_node_id) {
+  if (!value.packet_key && !value.symbol_version_id) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['candidate_id'],
-      message: 'exact promotion requires packet_key, symbol_version_id, or tree_node_id',
+      message: 'exact promotion requires canonical packet_key or symbol_version_id identity; tree_node_id is structural evidence only',
     });
   }
 });
@@ -117,6 +117,7 @@ export const EXACT_PROMOTION_STATUSES = [
 export const exactPromotionChecksSchema = z.object({
   revision_authority_proven: z.boolean(),
   identity_found: z.boolean(),
+  canonical_identity_match: z.boolean(),
   source_ref_match: z.boolean(),
   stable_symbol_match: z.boolean(),
   workspace_revision_match: z.boolean(),
@@ -174,6 +175,11 @@ function allHashesMatch(actual: string | null, expected: Array<string | null>): 
   return actual !== null && values.length > 0 && values.every((value) => value === actual);
 }
 
+/** Canonical identity precedence shared with the retrieval fabric. */
+function expectedCanonicalId(candidate: ExactPromotionCandidateV1): string {
+  return candidate.symbol_version_id ?? candidate.packet_key!;
+}
+
 /**
  * Pure promotion decision over already-read facts. Database/filesystem adapters
  * only collect evidence and cannot relax these gates.
@@ -196,8 +202,8 @@ export function buildExactPromotionReceipt(input: {
   const identityFound = Boolean(
     (candidate.packet_key && facts.packet_found)
     || (candidate.symbol_version_id && facts.symbol_version_found)
-    || (candidate.tree_node_id && facts.ast_node_found)
   );
+  const canonicalIdentityMatch = candidate.canonical_id === expectedCanonicalId(candidate);
 
   const sourceRefObservations = [
     candidate.packet_key ? facts.packet_source_ref : null,
@@ -245,6 +251,7 @@ export function buildExactPromotionReceipt(input: {
   const checks = exactPromotionChecksSchema.parse({
     revision_authority_proven: revisionAuthorityProven,
     identity_found: identityFound,
+    canonical_identity_match: canonicalIdentityMatch,
     source_ref_match: sourceRefMatch,
     stable_symbol_match: stableSymbolMatch,
     workspace_revision_match: workspaceRevisionMatch,
@@ -260,6 +267,7 @@ export function buildExactPromotionReceipt(input: {
   const reasonCodes: string[] = [];
   if (!revisionAuthorityProven) reasonCodes.push('REVISION_AUTHORITY_NOT_PROVEN');
   if (!identityFound) reasonCodes.push('IDENTITY_NOT_FOUND');
+  if (!canonicalIdentityMatch) reasonCodes.push('CANONICAL_IDENTITY_MISMATCH');
   if (identityFound && (!sourceRefMatch || !stableSymbolMatch)) reasonCodes.push('IDENTITY_EVIDENCE_MISMATCH');
   if (identityFound && !workspaceRevisionMatch) reasonCodes.push('WORKSPACE_REVISION_MISMATCH');
   if (identityFound && !sourceRevisionMatch) reasonCodes.push('SOURCE_REVISION_MISMATCH');
@@ -272,7 +280,7 @@ export function buildExactPromotionReceipt(input: {
   let status: ExactPromotionReceiptV1['status'];
   if (!revisionAuthorityProven) status = 'BLOCKED_REVISION_AUTHORITY';
   else if (!identityFound) status = 'IDENTITY_NOT_FOUND';
-  else if (!sourceRefMatch || !stableSymbolMatch) status = 'IDENTITY_MISMATCH';
+  else if (!canonicalIdentityMatch || !sourceRefMatch || !stableSymbolMatch) status = 'IDENTITY_MISMATCH';
   else if (!workspaceRevisionMatch || !sourceRevisionMatch || !representationRevisionMatch) status = 'REVISION_MISMATCH';
   else if (!facts.source_file_bytes_found) status = 'SOURCE_BYTES_UNAVAILABLE';
   else if (!fileHashMatch) status = 'SOURCE_HASH_MISMATCH';
@@ -292,6 +300,7 @@ export function buildExactPromotionReceipt(input: {
   const receiptId = `exact-promotion:${sha256({
     request_id: input.request_id,
     candidate_id: candidate.candidate_id,
+    canonical_id: candidate.canonical_id,
     workspace_revision: candidate.workspace_revision,
     source_revision: candidate.source_revision,
     representation_revision: candidate.representation_revision,
