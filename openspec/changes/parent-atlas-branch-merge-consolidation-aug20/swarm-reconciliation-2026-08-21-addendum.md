@@ -861,3 +861,27 @@ coin-flip. Both are now superseded, no action needed.
   roughly one branch per ~15-20% of a context window given the
   read-diff-verify-build-test cycle above; the queue is provably still
   growing faster than one session can absorb it.
+
+## Update: cross-reference doc + one more small merge (2026-08-22, session resumed)
+
+Wrote `workstation-todo-cross-reference-2026-08-22.md` (same directory)
+connecting `parent-atlas-workstation-todo.md`'s PF-G0 (packet-key
+duplication) and GS1_12 (source-revision index safety audit) open
+items to this session's swarm merges — confirmed PF-G0 was resolved via
+`packet-identity-resolver.ts` + `atlas_packet_identity_aliases` (a
+bridge, not a forced winner between the two competing schemes), and
+flagged that several of this session's merges (GraphifyWorkspaceManifest
+CompletenessV1, GraphSnapshotSourceRevisionBindingV1,
+StructuralObservationV1, GitRevisionSemanticsProofV1) are scattered
+building blocks toward GS1_12's still-unassembled consolidated receipt.
+
+Merged `agent/openspec-domain-uuid-derivation-20260821` -> commit
+`8391b5c508`. Small, pure-additive: a deterministic UUIDv8 derivation
+utility (sha256-canonical-JSON of domainClass + sorted/trimmed
+attributes), verify script, spec. 7/7 tests pass.
+
+**Context budget note**: this session has been running long; pacing
+back to smaller, well-verified merges rather than continuing to open
+new large branches. Most of the smallest/safest branches in the queue
+have now been triaged; remaining ones are larger and need a fresh
+review pass in a future session.
