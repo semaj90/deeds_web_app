@@ -5,7 +5,7 @@ import { evaluateFanoutAdmissionV1 } from './fanout-admission-v1.js';
 
 const snapshot = buildGraphSnapshotRevisionV1({
   snapshotId: '11111111-1111-4111-8111-111111111111',
-  workspaceRevision: 'workspace:42',
+  workspaceRevision: 'a'.repeat(40),
   sourceInventoryRevision: 'inventory:42',
   identityContractVersion: 'identity:v1',
   parserContractVersion: 'parser:v1',
@@ -35,7 +35,9 @@ function payload(overrides: Record<string, unknown> = {}) {
     source_ref: node.sourceRef,
     tree_node_id: node.treeNodeId,
     source_revision: node.sourceRevision,
-    workspace_revision: snapshot.workspaceRevision,
+    repository_revision: snapshot.workspaceRevision,
+    workspace_revision: 41,
+    workspace_cache_revision: 41,
     graph_revision: snapshot.graphRevision,
     representation_id: 'semantic_768',
     representation_revision: 7,
@@ -61,6 +63,7 @@ describe('FanoutAdmissionV1', () => {
     const result = evaluate();
     expect(result.status).toBe('ADMITTED_TO_CANDIDATE_ORDINAL');
     expect(result.admitted).toBe(true);
+    expect(result.repositoryRevision).toBe(snapshot.workspaceRevision);
     expect(result.candidateOrdinalMap?.rowCount).toBe(1);
     expect(result.candidateOrdinalMap?.candidates[0]?.candidateOrdinal).toBe(0);
     expect(result.candidateOrdinalMap?.candidates[0]?.canonicalId).toBe(node.canonicalId);
@@ -98,9 +101,18 @@ describe('FanoutAdmissionV1', () => {
     expect(result.candidateOrdinalMap).toBeNull();
   });
 
-  it('rejects graph/workspace/source/representation drift', () => {
+  it('does not let legacy workspace/cache epoch satisfy repository revision', () => {
+    const projection = payload();
+    delete projection.repository_revision;
+    const result = evaluate({ qdrantPayload: projection });
+    expect(result.status).toBe('REVISION_LINEAGE_REJECTED');
+    expect(result.blockers).toContain('REPOSITORY_REVISION_MISMATCH');
+    expect(result.candidateOrdinalMap).toBeNull();
+  });
+
+  it('rejects repository/graph/source/representation drift', () => {
     for (const [field, value] of [
-      ['workspace_revision', 'workspace:other'],
+      ['repository_revision', 'b'.repeat(40)],
       ['graph_revision', 'graph:other'],
       ['source_revision', 'sha256:other'],
       ['representation_revision', 8],
