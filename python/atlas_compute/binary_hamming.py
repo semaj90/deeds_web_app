@@ -35,6 +35,8 @@ class BinaryHammingRetrievalReceipt:
     minimum_query_overlap_at_k: float
     mean_latency_ms: float
     p95_latency_ms: float
+    mean_boundary_tie_count: float
+    maximum_boundary_tie_count: int
     rankings_checksum: str
     distances_checksum: str
     canonical_authority: bool
@@ -48,6 +50,25 @@ def _stable_checksum(value: Any) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def spread_query_ordinals(row_count: int, query_count: int) -> list[int]:
+    """Select deterministic ordinals spread across the full frozen corpus.
+
+    The result always includes both endpoints when query_count > 1 and avoids
+    letting a canonical/source-sorted prefix stand in for the whole snapshot.
+    """
+
+    if row_count <= 0:
+        raise ValueError("row_count must be positive")
+    if not 1 <= query_count <= row_count:
+        raise ValueError("query_count must be between 1 and row_count")
+    if query_count == 1:
+        return [0]
+    ordinals = [index * (row_count - 1) // (query_count - 1) for index in range(query_count)]
+    if len(set(ordinals)) != query_count:
+        raise RuntimeError("spread query selection produced duplicate ordinals")
+    return ordinals
+
+
 def _encoded_matrix(value: Sequence[Sequence[int]] | np.ndarray) -> np.ndarray:
     encoded = np.asarray(value)
     if encoded.ndim != 2 or encoded.shape[0] == 0 or encoded.shape[1] == 0:
@@ -59,6 +80,11 @@ def _encoded_matrix(value: Sequence[Sequence[int]] | np.ndarray) -> np.ndarray:
             raise ValueError("encoded binary matrix contains values outside uint8 range")
         encoded = encoded.astype(np.uint8)
     return np.ascontiguousarray(encoded, dtype=np.uint8)
+
+
+def _hamming_distances(source: np.ndarray, query_ordinal: int) -> np.ndarray:
+    xor = np.bitwise_xor(source, source[query_ordinal])
+    return _POPCOUNT_U8[xor].sum(axis=1, dtype=np.int32)
 
 
 def rank_binary_hamming_exact(
@@ -75,8 +101,7 @@ def rank_binary_hamming_exact(
     if not 1 <= top_k < source.shape[0]:
         raise ValueError("top_k must be >=1 and smaller than row count")
 
-    xor = np.bitwise_xor(source, source[query_ordinal])
-    distances = _POPCOUNT_U8[xor].sum(axis=1, dtype=np.int32)
+    distances = _hamming_distances(source, query_ordinal)
     ordinals = np.arange(source.shape[0], dtype=np.int64)
     ordering = np.lexsort((ordinals, distances))
     selected = [int(value) for value in ordering if int(value) != query_ordinal][:top_k]
@@ -92,7 +117,7 @@ def evaluate_binary_hamming_retrieval(
     top_k: int,
     benchmark_repeats: int = 3,
 ) -> BinaryHammingRetrievalReceipt:
-    """Measure exact Hamming Top-K overlap and query latency.
+    """Measure exact Hamming Top-K overlap, tie pressure, and query latency.
 
     `exact_reference_ordinals` must be the same self-excluding semantic exact
     rankings used elsewhere in the aligned-snapshot experiment. The Hamming
@@ -124,6 +149,7 @@ def evaluate_binary_hamming_retrieval(
     selected_distances: list[list[int]] = []
     latencies: list[float] = []
     overlaps: list[float] = []
+    boundary_tie_counts: list[int] = []
 
     for query, reference in zip(queries, references, strict=True):
         observed_ranking: list[int] | None = None
@@ -142,6 +168,12 @@ def evaluate_binary_hamming_retrieval(
         selected_distances.append(observed_distances)
         overlaps.append(len(set(observed_ranking) & set(reference[:top_k])) / float(top_k))
 
+        all_distances = _hamming_distances(source, query)
+        kth_distance = observed_distances[-1]
+        boundary_tie_counts.append(
+            int(np.count_nonzero(all_distances == kth_distance) - (1 if int(all_distances[query]) == kth_distance else 0))
+        )
+
     return BinaryHammingRetrievalReceipt(
         schema="atlas.binary-hamming-retrieval-receipt.v1",
         rows=int(source.shape[0]),
@@ -156,6 +188,8 @@ def evaluate_binary_hamming_retrieval(
         minimum_query_overlap_at_k=float(np.min(overlaps)),
         mean_latency_ms=float(np.mean(latencies)),
         p95_latency_ms=float(np.percentile(latencies, 95)),
+        mean_boundary_tie_count=float(np.mean(boundary_tie_counts)),
+        maximum_boundary_tie_count=int(np.max(boundary_tie_counts)),
         rankings_checksum=_stable_checksum(rankings),
         distances_checksum=_stable_checksum(selected_distances),
         canonical_authority=False,
