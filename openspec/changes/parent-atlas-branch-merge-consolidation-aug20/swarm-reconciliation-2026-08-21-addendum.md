@@ -230,6 +230,78 @@ directory) silently aborting the tracked-file reset too. Retry with
 plain `git stash push` (no `-u`) to isolate tracked changes from the
 untracked cleanup step.
 
+## Update: branch queue resumed (2026-08-21/22) — one merge, one real regression found and fixed
+
+Fetched again; swarm continues growing (14 more branches appeared/moved
+in one `fetch --prune`). Cross-checked the full queue with
+`git merge-base --is-ancestor` and found three previously-listed
+branches had already been folded into `origin/main` by other sessions:
+`agent/fanout-executor-ordinal-normalization-20260821`,
+`agent/pagerank-bounded-fixture-pin-20260821`,
+`agent/graphify-revision-owner-safe-migration-20260822`. No action
+needed on those three.
+
+Merged `agent/gpu-resident-feature-lease-converged-20260821` → commit
+`6d60ef29a6` (pure-additive: `CandidateFeatureGpuResidentLeaseV1`
+build/verify/release lifecycle for GPU-resident candidate feature
+buffers, plus Python-side prove/test counterparts). Zero collisions,
+clean 3-way merge, all imported dependencies (`artifact-work-item-v1`,
+`candidate-feature-gpu-pack-v1`, `canonical-candidate-v1`,
+`candidate-feature-snapshot-v1`, `candidate-feature-columnar-v1`)
+verified present on `main` beforehand.
+
+**Running the actual spec files after merging (not just trusting the
+clean 3-way merge) surfaced a real, pre-existing, repo-wide regression
+that predates this branch**: every consumer of
+`materializeCandidateOrdinalMap` (in `canonical-candidate-v1.ts`) threw
+`.omit() cannot be used on object schemas containing refinements` at
+runtime, 100% reproducible, because that function called `.omit()`
+directly on a schema that carries `.superRefine()` — forbidden in the
+installed Zod v4. This had apparently never been exercised by a real
+test run before (or ran against an older Zod). Confirmed pre-existing
+(not introduced by the branch just merged) by running an unrelated,
+already-merged spec (`dense-executor-candidate-ordinal-v1.spec.ts`)
+and seeing the identical failure.
+
+Fixed in the same pass (commit `207ac335e3`, pushed directly after,
+same plumbing method):
+1. Split `canonicalCandidateV1BaseSchema` (no refinement) out of
+   `canonicalCandidateV1Schema` so `.omit()` has something legal to
+   operate on at intake-parse time; the full refined schema still
+   re-validates every candidate before the ordinal map is returned, so
+   the strong-identity invariant is still enforced, just slightly later
+   in the same function — not weakened.
+2. A second, unrelated real bug in the branch's own new file: lease
+   checksums were computed via `sha256(JSON.stringify(...))` over a
+   pre-Zod-parse object at build time, then reverified over a
+   post-Zod-parse object at verify time — Zod re-emits object keys in
+   schema declaration order, so the two JSON strings differed and
+   **every** lease (including untampered, freshly-built ones) failed
+   `FEATURE_GPU_LEASE_CHECKSUM_MISMATCH`. Fixed by hashing a canonical
+   sorted-key JSON serialization instead (mirrors the existing
+   `canonicalJson()` pattern in `canonical-candidate-v1.ts`).
+
+Verified 10/10 tests pass in both directly-affected spec files, plus
+26/26 across every other spec depending on `canonical-candidate-v1.ts`.
+One unrelated, pre-existing, already-on-`main`-before-today failure
+noted but explicitly NOT chased (out of scope for this merge):
+`candidate-feature-arrow-readback.spec.ts` fails with a Vitest
+`SyntaxError` on an import of a `.mjs` script that has a CRLF line
+ending immediately after its `#!/usr/bin/env node` shebang — the file
+parses fine standalone via `node --check`, so this looks like an
+esbuild/Vite shebang-stripping-vs-CRLF interaction, not a logic bug.
+Whoever picks this up: reproduce with
+`npx vitest run src/lib/server/atlas/features/candidate-feature-arrow-readback.spec.ts`
+from `sveltekit-frontend/`.
+
+**Lesson reinforced yet again**: "clean 3-way merge" only proves the
+merge is syntactically conflict-free. It says nothing about whether
+the *pre-existing* code the branch depends on actually works at
+runtime. Always run the real spec files after merging, including specs
+for files the branch didn't touch but does depend on — this is the
+second time this session that step alone (not the merge diff itself)
+is what surfaced a real, shipped-would-be-broken regression.
+
 ## Explicit non-goals for whoever picks this up
 
 - Do not treat the swarm's own status narration (pasted into chat) as
