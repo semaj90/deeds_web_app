@@ -96,6 +96,16 @@ function sha256(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
+/** Key-order-independent JSON serialization so the checksum survives Zod's parse-time key reordering. */
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, v]) => v !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b));
+  return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${canonicalJson(v)}`).join(',')}}`;
+}
+
 function expectedSourceChecksum(pack: z.infer<typeof candidateFeatureGpuPackV1Schema>, kind: BufferKind): string {
   switch (kind) {
     case 'FEATURE_VALUES': return pack.featureValuesChecksum;
@@ -126,7 +136,7 @@ function expectedResidentDtype(kind: BufferKind) {
 function withLeaseChecksum<T extends Omit<CandidateFeatureGpuResidentLeaseV1, 'leaseChecksum'>>(value: T): CandidateFeatureGpuResidentLeaseV1 {
   return candidateFeatureGpuResidentLeaseV1Schema.parse({
     ...value,
-    leaseChecksum: sha256(JSON.stringify(value)),
+    leaseChecksum: sha256(canonicalJson(value)),
   });
 }
 
@@ -170,7 +180,7 @@ export function verifyCandidateFeatureGpuResidentLease(input: {
   }
 
   const { leaseChecksum, ...payload } = lease;
-  if (leaseChecksum !== sha256(JSON.stringify(payload))) {
+  if (leaseChecksum !== sha256(canonicalJson(payload))) {
     throw new Error('FEATURE_GPU_LEASE_CHECKSUM_MISMATCH');
   }
 
