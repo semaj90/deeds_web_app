@@ -1,14 +1,24 @@
-import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import {
+  buildGraphSnapshotRevisionV1 as buildCanonicalGraphSnapshotRevisionV1,
+  deriveGraphRevisionV1 as deriveCanonicalGraphRevisionV1,
+  verifyGraphSnapshotRevisionV1 as verifyCanonicalGraphSnapshotRevisionV1,
+  type GraphSnapshotRevisionInputV1 as CanonicalGraphSnapshotRevisionInputV1,
+} from '@deeds/parent-atlas';
 
 const id = z.string().min(1);
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
+const contentRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 
+/**
+ * Persistence/wire compatibility shape for existing Svelte Graphify callers.
+ * The graph-revision algorithm owner is packages/parent-atlas.
+ */
 export const graphSnapshotRevisionV1Schema = z.object({
   schema: z.literal('atlas.graph-snapshot-revision.v1'),
   snapshotId: z.string().uuid(),
-  workspaceRevision: id,
-  sourceInventoryRevision: id,
+  workspaceRevision: contentRevision,
+  sourceInventoryRevision: contentRevision,
   graphRevision: sha256,
   identityContractVersion: id,
   parserContractVersion: id,
@@ -17,43 +27,22 @@ export const graphSnapshotRevisionV1Schema = z.object({
   policyHash: sha256,
   producerRevision: id,
   revisionChecksum: sha256,
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.sourceInventoryRevision !== `sha256:${value.sourceInventoryHash}`) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['sourceInventoryRevision'],
+      message: 'sourceInventoryRevision must bind sourceInventoryHash',
+    });
+  }
+});
 
 export type GraphSnapshotRevisionV1 = z.infer<typeof graphSnapshotRevisionV1Schema>;
+export type GraphSnapshotRevisionInputV1 = Omit<GraphSnapshotRevisionV1, 'schema' | 'graphRevision' | 'revisionChecksum'>;
 
-export type GraphSnapshotRevisionInputV1 = Omit<
-  GraphSnapshotRevisionV1,
-  'schema' | 'graphRevision' | 'revisionChecksum'
->;
-
-function canonicalJson(value: Record<string, unknown>): string {
-  return JSON.stringify(
-    Object.fromEntries(
-      Object.entries(value)
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([key, item]) => [key, item]),
-    ),
-  );
-}
-
-function digest(namespace: string, payload: Record<string, unknown>): string {
-  return createHash('sha256')
-    .update(namespace)
-    .update('\0')
-    .update(canonicalJson(payload))
-    .digest('hex');
-}
-
-/**
- * Content/revision identity for one logical graph snapshot.
- *
- * snapshotId is the immutable persistence occurrence ID. graphRevision is the
- * deterministic logical revision identity and therefore deliberately excludes
- * snapshotId and wall-clock timestamps so an identical rematerialization can
- * prove it represents the same graph world state.
- */
-export function deriveGraphRevisionV1(input: GraphSnapshotRevisionInputV1): string {
-  return digest('atlas.graph-revision.v1', {
+function toCanonicalInput(input: GraphSnapshotRevisionInputV1): CanonicalGraphSnapshotRevisionInputV1 {
+  return {
+    snapshotId: input.snapshotId,
     workspaceRevision: input.workspaceRevision,
     sourceInventoryRevision: input.sourceInventoryRevision,
     identityContractVersion: input.identityContractVersion,
@@ -61,57 +50,60 @@ export function deriveGraphRevisionV1(input: GraphSnapshotRevisionInputV1): stri
     sourceInventoryHash: input.sourceInventoryHash,
     topologyHash: input.topologyHash,
     policyHash: input.policyHash,
+    producerRevision: input.producerRevision,
+  };
+}
+
+function fromCanonical(input: ReturnType<typeof buildCanonicalGraphSnapshotRevisionV1>): GraphSnapshotRevisionV1 {
+  return graphSnapshotRevisionV1Schema.parse({
+    schema: 'atlas.graph-snapshot-revision.v1',
+    snapshotId: input.snapshotId,
+    workspaceRevision: input.workspaceRevision,
+    sourceInventoryRevision: input.sourceInventoryRevision,
+    graphRevision: input.graphRevision,
+    identityContractVersion: input.identityContractVersion,
+    parserContractVersion: input.parserContractVersion,
+    sourceInventoryHash: input.sourceInventoryHash,
+    topologyHash: input.topologyHash,
+    policyHash: input.policyHash,
+    producerRevision: input.producerRevision,
+    revisionChecksum: input.revisionChecksum,
   });
 }
 
-export function buildGraphSnapshotRevisionV1(
-  input: GraphSnapshotRevisionInputV1,
-): GraphSnapshotRevisionV1 {
-  const parsedInput = z.object({
-    snapshotId: z.string().uuid(),
-    workspaceRevision: id,
-    sourceInventoryRevision: id,
-    identityContractVersion: id,
-    parserContractVersion: id,
-    sourceInventoryHash: sha256,
-    topologyHash: sha256,
-    policyHash: sha256,
-    producerRevision: id,
-  }).strict().parse(input);
+export function deriveGraphRevisionV1(input: GraphSnapshotRevisionInputV1): string {
+  return deriveCanonicalGraphRevisionV1(toCanonicalInput(input));
+}
 
-  const graphRevision = deriveGraphRevisionV1(parsedInput);
-  const withoutChecksum = {
-    schema: 'atlas.graph-snapshot-revision.v1' as const,
-    ...parsedInput,
-    graphRevision,
-  };
-  const revisionChecksum = digest('atlas.graph-snapshot-revision.v1', withoutChecksum);
-  return graphSnapshotRevisionV1Schema.parse({ ...withoutChecksum, revisionChecksum });
+export function buildGraphSnapshotRevisionV1(input: GraphSnapshotRevisionInputV1): GraphSnapshotRevisionV1 {
+  return fromCanonical(buildCanonicalGraphSnapshotRevisionV1(toCanonicalInput(input)));
 }
 
 export function verifyGraphSnapshotRevisionV1(input: unknown): GraphSnapshotRevisionV1 {
   const parsed = graphSnapshotRevisionV1Schema.parse(input);
-  const expectedGraphRevision = deriveGraphRevisionV1(parsed);
-  if (parsed.graphRevision !== expectedGraphRevision) {
-    throw new Error(`GRAPH_REVISION_MISMATCH:${parsed.snapshotId}`);
-  }
-  const { revisionChecksum, ...withoutChecksum } = parsed;
-  const expectedChecksum = digest('atlas.graph-snapshot-revision.v1', withoutChecksum);
-  if (revisionChecksum !== expectedChecksum) {
-    throw new Error(`GRAPH_SNAPSHOT_REVISION_CHECKSUM_MISMATCH:${parsed.snapshotId}`);
-  }
+  verifyCanonicalGraphSnapshotRevisionV1({
+    schemaVersion: 'graph-snapshot-revision-v1',
+    snapshotId: parsed.snapshotId,
+    workspaceRevision: parsed.workspaceRevision,
+    sourceInventoryRevision: parsed.sourceInventoryRevision,
+    graphRevision: parsed.graphRevision,
+    identityContractVersion: parsed.identityContractVersion,
+    parserContractVersion: parsed.parserContractVersion,
+    sourceInventoryHash: parsed.sourceInventoryHash,
+    topologyHash: parsed.topologyHash,
+    policyHash: parsed.policyHash,
+    producerRevision: parsed.producerRevision,
+    revisionChecksum: parsed.revisionChecksum,
+  });
   return parsed;
 }
 
-/**
- * Maps the existing materializer/writer evidence into first-class snapshot
- * revision columns. This helper does not write anything itself and does not
- * infer per-node sourceRevision.
- */
+/** Maps existing materializer evidence into persisted columns using the package owner. */
 export function buildGraphSnapshotRevisionWriteV1(input: {
   snapshotId: string;
   workspaceRevision: string;
-  sourceInventorySnapshotId: string;
+  sourceInventorySnapshotId?: string;
+  sourceInventoryRevision?: string;
   identityContractVersion: string;
   parserContractVersion: string;
   sourceInventoryHash: string;
@@ -119,10 +111,12 @@ export function buildGraphSnapshotRevisionWriteV1(input: {
   policyHash: string;
   producerRevision: string;
 }) {
+  const sourceInventoryRevision = input.sourceInventoryRevision
+    ?? (input.sourceInventorySnapshotId?.startsWith('sha256:') ? input.sourceInventorySnapshotId : `sha256:${input.sourceInventoryHash}`);
   const revision = buildGraphSnapshotRevisionV1({
     snapshotId: input.snapshotId,
     workspaceRevision: input.workspaceRevision,
-    sourceInventoryRevision: input.sourceInventorySnapshotId,
+    sourceInventoryRevision,
     identityContractVersion: input.identityContractVersion,
     parserContractVersion: input.parserContractVersion,
     sourceInventoryHash: input.sourceInventoryHash,
@@ -145,9 +139,10 @@ export function buildGraphSnapshotRevisionWriteV1(input: {
 
 export function describeGraphSnapshotRevisionOwnership(): string {
   return [
-    'atlas_graph_snapshots_v2 owns snapshot-scoped workspaceRevision, sourceInventoryRevision, graphRevision, topologyHash, and policyHash.',
-    'atlas_graph_nodes_v2 and atlas_graph_edges_v2 inherit those revisions through snapshot_id rather than duplicating them on every row.',
-    'atlas_graph_nodes_v2.source_revision is nullable and may be populated only by an authoritative source revision owner.',
-    'source_ref, content_hash, packet_key, tree_node_id, Neo4j IDs, Qdrant IDs, and GPU ordinals are not source-revision authority.',
+    'packages/parent-atlas owns GraphSnapshotRevisionV1 derivation and verification.',
+    'the Svelte graph-snapshot-revision-v1 module is a persistence/wire compatibility adapter only.',
+    'WorkspaceRevisionRecordV1 owns workspaceRevision; Git commit/tree IDs are provenance only.',
+    'graph nodes and edges inherit graph revisions through snapshot_id.',
+    'per-node source_revision may be populated only from authoritative CodeSourceRevisionV1 evidence.',
   ].join(' ');
 }
