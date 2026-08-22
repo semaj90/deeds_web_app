@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
@@ -9,6 +10,17 @@ import {
   releaseCandidateFeatureGpuResidentLease,
   verifyCandidateFeatureGpuResidentLease,
 } from './candidate-feature-gpu-resident-lease-v1.js';
+
+function sha256(bytes: Uint8Array): string {
+  return createHash('sha256').update(bytes).digest('hex');
+}
+
+function encodeI32LE(values: readonly number[]): Uint8Array {
+  const bytes = new Uint8Array(values.length * 4);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  values.forEach((value, index) => view.setInt32(index * 4, value, true));
+  return bytes;
+}
 
 function packFixture() {
   const ordinalMap = materializeCandidateOrdinalMap({
@@ -77,9 +89,20 @@ const bufferIds = {
   DEGRADED_IDENTITY: 'buf:degraded:1',
 };
 
+function residentChecksums(pack: ReturnType<typeof packFixture>) {
+  return {
+    FEATURE_VALUES: pack.featureValuesChecksum,
+    FEATURE_PRESENCE: pack.featurePresenceChecksum,
+    VALID_MASK: pack.validMaskChecksum,
+    LANE_MASK_U16: sha256(encodeI32LE(pack.laneMaskU16)),
+    DEGRADED_IDENTITY: pack.degradedIdentityChecksum,
+  };
+}
+
 function activeLease() {
+  const pack = packFixture();
   return buildCandidateFeatureGpuResidentLease({
-    pack: packFixture(),
+    pack,
     leaseId: 'lease:gpu-features:1',
     leaseEpoch: 7,
     deviceId: 0,
@@ -87,11 +110,12 @@ function activeLease() {
     createdAt: '2026-08-22T03:00:00.000Z',
     expiresAt: '2026-08-22T03:05:00.000Z',
     bufferIds,
+    residentChecksums: residentChecksums(pack),
   });
 }
 
 describe('CandidateFeatureGpuResidentLeaseV1', () => {
-  it('binds five opaque GPU-resident buffers to the exact FEAT-03D source checksums', () => {
+  it('binds five opaque GPU-resident buffers to FEAT-03D source and resident checksums', () => {
     const pack = packFixture();
     const lease = activeLease();
     const verified = verifyCandidateFeatureGpuResidentLease({
@@ -109,16 +133,33 @@ describe('CandidateFeatureGpuResidentLeaseV1', () => {
     expect(verified.buffers.every((buffer) => buffer.address.locator.storage === 'GPU_RESIDENT')).toBe(true);
     expect(verified.buffers.find((buffer) => buffer.kind === 'FEATURE_VALUES')?.sourceChecksum).toBe(pack.featureValuesChecksum);
     expect(verified.buffers.find((buffer) => buffer.kind === 'VALID_MASK')?.sourceChecksum).toBe(pack.validMaskChecksum);
+
+    const lane = verified.buffers.find((buffer) => buffer.kind === 'LANE_MASK_U16')!;
+    expect(lane.sourceChecksum).toBe(pack.laneMaskChecksum);
+    expect(lane.residentChecksum).toBe(residentChecksums(pack).LANE_MASK_U16);
+    expect(lane.address.locator.storage === 'GPU_RESIDENT' && lane.address.locator.dtype).toBe('i32');
+    expect(lane.address.checksum).toBe(lane.residentChecksum);
   });
 
-  it('rejects a source-checksum substitution even when the resident buffer ID is unchanged', () => {
+  it('rejects a source-checksum substitution even when resident bytes and buffer ID are unchanged', () => {
     const pack = packFixture();
     const lease = activeLease();
     const tampered = structuredClone(lease);
     const values = tampered.buffers.find((buffer) => buffer.kind === 'FEATURE_VALUES')!;
     values.sourceChecksum = 'f'.repeat(64);
-    values.address.checksum = 'f'.repeat(64);
 
+    expect(() => verifyCandidateFeatureGpuResidentLease({
+      pack,
+      lease: tampered,
+      now: '2026-08-22T03:01:00.000Z',
+    })).toThrow();
+  });
+
+  it('rejects resident-artifact checksum drift independently of FEAT-03D lineage', () => {
+    const pack = packFixture();
+    const tampered = structuredClone(activeLease());
+    const lane = tampered.buffers.find((buffer) => buffer.kind === 'LANE_MASK_U16')!;
+    lane.address.checksum = 'e'.repeat(64);
     expect(() => verifyCandidateFeatureGpuResidentLease({
       pack,
       lease: tampered,
@@ -134,7 +175,7 @@ describe('CandidateFeatureGpuResidentLeaseV1', () => {
     })).toThrow('FEATURE_GPU_LEASE_EXPIRED');
   });
 
-  it('release preserves source lineage but prevents subsequent ACTIVE use', () => {
+  it('release preserves lineage but prevents subsequent ACTIVE use', () => {
     const pack = packFixture();
     const active = activeLease();
     const released = releaseCandidateFeatureGpuResidentLease({
