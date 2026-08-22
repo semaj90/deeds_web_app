@@ -7,6 +7,20 @@ const H = (value: string) => createHash('sha256').update(value).digest('hex');
 const R = 32;
 const F = 12;
 
+function canonicalJson(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  return `{${Object.entries(value as Record<string, unknown>)
+    .filter(([, item]) => item !== undefined)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`)
+    .join(',')}}`;
+}
+
+function observationChecksum(value: object): string {
+  return createHash('sha256').update(canonicalJson(value)).digest('hex');
+}
+
 function pack() {
   return {
     schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
@@ -25,22 +39,23 @@ function pack() {
 
 function lease() {
   const p = pack();
+  const observationBody = {
+    schema: 'atlas.candidate-feature-gpu-residency-observation.v1', leaseId: 'lease:batch:test:1', deviceId: 0, deviceName: 'test-cuda-device',
+    sourceGpuPackChecksum: p.gpuPackChecksum, candidateSnapshotRevision: p.candidateSnapshotRevision, ordinalMapChecksum: p.ordinalMapChecksum,
+    featureSnapshotChecksum: p.featureSnapshotChecksum, columnarChecksum: p.columnarChecksum, logicalRows: p.logicalRows, physicalRows: p.physicalRows,
+    featureCount: 12, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
+    buffers: [
+      { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,12], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,12], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'valid_mask', bufferId: 'gpu:valid', dtype: 'u8', shape: [R], sourceChecksum: p.validMaskChecksum, materializedChecksum: H('gpu-valid'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'lane_mask', bufferId: 'gpu:lane', dtype: 'i32', shape: [R], sourceChecksum: p.laneMaskChecksum, materializedChecksum: H('gpu-lane'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'degraded_identity', bufferId: 'gpu:degraded', dtype: 'u8', shape: [R], sourceChecksum: p.degradedIdentityChecksum, materializedChecksum: H('gpu-degraded'), deviceAllocationObserved: true, readbackVerified: true },
+    ],
+    issuedAt: '2026-08-22T03:00:00.000Z', expiresAt: '2026-08-22T03:10:00.000Z', producerRevision: 'gpu-residency:test:v1',
+  };
   return buildCandidateFeatureGpuResidencyLease({
     pack: p,
-    observation: {
-      schema: 'atlas.candidate-feature-gpu-residency-observation.v1', leaseId: 'lease:batch:test:1', deviceId: 0, deviceName: 'test-cuda-device',
-      sourceGpuPackChecksum: p.gpuPackChecksum, candidateSnapshotRevision: p.candidateSnapshotRevision, ordinalMapChecksum: p.ordinalMapChecksum,
-      featureSnapshotChecksum: p.featureSnapshotChecksum, columnarChecksum: p.columnarChecksum, logicalRows: p.logicalRows, physicalRows: p.physicalRows,
-      featureCount: 12, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
-      buffers: [
-        { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,12], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
-        { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,12], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
-        { role: 'valid_mask', bufferId: 'gpu:valid', dtype: 'u8', shape: [R], sourceChecksum: p.validMaskChecksum, materializedChecksum: H('gpu-valid'), deviceAllocationObserved: true, readbackVerified: true },
-        { role: 'lane_mask', bufferId: 'gpu:lane', dtype: 'i32', shape: [R], sourceChecksum: p.laneMaskChecksum, materializedChecksum: H('gpu-lane'), deviceAllocationObserved: true, readbackVerified: true },
-        { role: 'degraded_identity', bufferId: 'gpu:degraded', dtype: 'u8', shape: [R], sourceChecksum: p.degradedIdentityChecksum, materializedChecksum: H('gpu-degraded'), deviceAllocationObserved: true, readbackVerified: true },
-      ],
-      issuedAt: '2026-08-22T03:00:00.000Z', expiresAt: '2026-08-22T03:10:00.000Z', producerRevision: 'gpu-residency:test:v1', observationChecksum: H('observation'),
-    },
+    observation: { ...observationBody, observationChecksum: observationChecksum(observationBody) },
     producerRevision: 'gpu-residency-bridge:test:v1',
   });
 }
