@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadAtlasEnv } from '../../sveltekit-frontend/scripts/atlas/load-atlas-env.mjs';
 import {
@@ -11,7 +12,8 @@ import {
 
 await loadAtlasEnv();
 
-const REPO_ROOT = path.resolve(process.cwd());
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(HERE, '../..');
 const REVISION_PROOF_PATH = process.env.ATLAS_REVISION_OWNER_PROOF
   ? path.resolve(REPO_ROOT, process.env.ATLAS_REVISION_OWNER_PROOF)
   : path.resolve(REPO_ROOT, 'docs/reports/revision-owner-proof.json');
