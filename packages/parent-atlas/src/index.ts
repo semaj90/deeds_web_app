@@ -63,6 +63,8 @@ export * from './core/temporal-action-recommendation-runtime.js';
 export * from './core/temporal-action-alternative-runtime.js';
 export * from './core/temporal-recommendation-outcome-runtime.js';
 export * from './core/temporal-recommendation-outcome-postgres-repository.js';
+export * from './core/temporal-recommendation-history-runtime.js';
+export * from './core/temporal-recommendation-feature-runtime.js';
 export * from './core/observation-feature-compiler.js';
 export * from './core/observation-feature-repository.js';
 export * from './core/retrieval-executor-policy.js';
