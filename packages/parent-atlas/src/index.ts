@@ -17,6 +17,7 @@ export * from './core/adaptive-hypergraph-chain.js';
 export * from './core/retrieval-action-receipt.js';
 export * from './core/relationship-vector-projection.js';
 export * from './core/graph-projection-parity.js';
+export * from './core/graph-snapshot-revision-v1.js';
 export * from './core/semantic-executor-manifest.js';
 export * from './core/algorithm-execution-manifest.js';
 export * from './core/compute-comparison.js';

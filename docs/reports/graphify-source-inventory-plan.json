@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "atlas.graphify-source-inventory-plan.v1",
+  "mode": "DRY_RUN",
+  "readOnly": true,
+  "canonicalWriteAttempted": false,
+  "durableOwnerBound": false,
+  "workspaceRevision": "31762389c69c733b8362e2b1ca784a8bd63f6536",
+  "sourceCount": 1,
+  "records": [
+    {
+      "workspaceRevision": "31762389c69c733b8362e2b1ca784a8bd63f6536",
+      "sourceRef": "parent-atlas-workstation-todo.md",
+      "sourceRevision": "31762389c69c733b8362e2b1ca784a8bd63f6536",
+      "contentHash": "5c7d126a4f6dd209d337ec3a549ab02622183d31778a14f3befbb44262467951",
+      "byteLength": 126856,
+      "gitBlobOid": "88bfa798bb322a1d3e378002b84845d632f9cbe1",
+      "sourceRevisionAuthority": "content_hash",
+      "producerRevision": "atlas.graphify-source-inventory-writer.v1"
+    }
+  ],
+  "authority": {
+    "sourceRevisionAuthorityColumn": "content_hash",
+    "legacySourceRevisionColumn": "source_revision",
+    "preservesLegacySourceRevisionSemantics": true
+  },
+  "nextGate": "SINGLE_ROW_PERSISTENCE_READBACK_CANARY"
+}

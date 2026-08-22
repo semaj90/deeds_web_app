@@ -1,5 +1,81 @@
 # Parent Atlas Workstation TODO
 
+## Current execution-proof reconciliation — 2026-08-21
+
+The active worktree is `C:\Users\james\Videos\deeds-web-app`. This section
+records verified state for this checkout; reports from other worktrees are not
+treated as proof here.
+
+- Canonical Parent Atlas source: `packages/parent-atlas`.
+- `GraphSnapshotRevisionV1` now owns workspace/source/graph lineage at snapshot
+  level; node and edge projections remain bound through `snapshot_id`.
+- Graph snapshot revision fixture tests pass 3/3.
+- The explicit six-node NetworkX/Neo4j PageRank fixture passes with top-k
+  overlap `1`, Spearman `1`, and max score delta `2.7548415493239276e-9`.
+- FANOUT-01 remains blocked pending persisted snapshot readback, selected
+  node/edge binding, canonical identity agreement, and Qdrant `semantic_768`
+  lineage.
+- Code revision compatibility semantics are now fixture-proven: exact source
+  bytes may be selected as `content_hash` authority while preserving legacy
+  Git `source_revision`; this does not bind a durable writer or unlock FANOUT.
+- The Graphify source-inventory write plan now freezes the authority column,
+  preserves legacy `source_revision`, and remains explicitly non-authorizing
+  until a readback canary succeeds.
+- Added the read-only code revision owner canary. It compares historical
+  `graphify_files` rows to current repository bytes and Git provenance when
+  that table exists; absence or mismatch remains a hard block.
+- Main-checkout canary result: `REVISION_OWNER_NOT_READY`; `graphify_files` is
+  absent, so no historical source-inventory owner is available. Git HEAD was
+  observed, but no canonical writer or persistence target was inferred.
+- Main-checkout graph snapshot readback result:
+  `SNAPSHOT_OWNER_READBACK_PROVEN_REVISION_BLOCKED`. The snapshot, node, and
+  edge tables read back successfully for snapshot
+  `382c8dc6-a115-40d9-a3a5-034fa44d2e71` with `162234` nodes and `108156`
+  edges, but workspace/source/graph/producer revisions are missing from the
+  manifest. `revisionOwnerProven=false` and canonical writes remain false.
+- Added unapplied manual migration
+  `drizzle/manual/20260821_graphify_source_inventory.sql` with explicit
+  workspace/source indexes and constraints. Applying it remains a separate
+  non-production operation; it does not authorize row population or FANOUT.
+- No production Postgres, Qdrant, Neo4j, or Valkey writes were performed.
+
+### Next gates
+
+- [x] Run the snapshot revision/readback proof: tables and selected node/edge
+  bindings read back, but manifest revisions remain incomplete.
+- [x] Run the code revision owner canary: correctly blocked because
+  `graphify_files` is absent.
+- [x] Run the one-file source-inventory dry run and verify exact-byte hashing.
+- [ ] Apply the source-inventory migration only in a named non-production
+  database; do not apply it to production.
+- [ ] Prove the migration in a rollback-only transaction with
+  `prove-graphify-source-inventory-migration.mts` before any durable apply.
+- [ ] Rerun the owner canary and require the table/schema gates to pass.
+- [ ] Run one explicit non-production `--apply --source <one-file>` operation
+  with both confirmation gates enabled, then verify persisted row readback.
+- [ ] Bind graph snapshot manifest revisions to the verified source-inventory
+  record and rebuild only in the non-production proof database.
+- [ ] Prove Qdrant `semantic_768` candidate identity and graph revision agree.
+- [ ] Only then enable FANOUT-01 CandidateOrdinal normalization.
+
+### Remaining lane gaps
+
+| Lane | Current gap | Promotion condition |
+|---|---|---|
+| Source/revision owner | `graphify_files` absent; no durable writer bound | Migration, one-row readback, then bounded writer proof |
+| Graph snapshot | Snapshot/node/edge readback works; manifest lacks workspace/source/graph/producer revisions | Revision-qualified manifest readback |
+| FANOUT | CandidateOrdinal normalization still blocked | Snapshot identity + Qdrant `semantic_768` lineage agreement |
+| PageRank | Six-node NetworkX/Neo4j fixture proven | Same frozen identity/config receipt for all backends; no writes |
+| Temporal DRY | Fixture contracts pass; durable PostgreSQL round trip open | Manual migrations plus first-dispatch/reuse readback |
+| Qdrant dense | Historical v2 identity/revision population incomplete | Active writer census and bounded identity readback |
+| Sparse | Runtime owner and relevance labels absent | Ground-truth evaluation and explicit sparse owner |
+| cuVS/CAGRA/TurboVec | Executor capability exists; production parity not closed | Same-corpus exact oracle, identity, recall, and memory receipts |
+| BitFrost compression | Hot bitmap path must remain raw/zero-copy | Benchmark-only compression lane; no hot-path Huffman promotion |
+- [ ] Only after migration + canary approval, run the explicitly confirmed
+  non-production `--apply` path and verify one-row readback.
+
+---
+
 **Status**: LAYER 1 🟡 FIELDS POPULATED, IDENTITY MODEL NOT YET PROVEN (see corrected section below, 2026-08-02) | EXPORT STACK ✅ READY | LANE ALIGNMENT ⏳ IN PROGRESS
 
 ---
