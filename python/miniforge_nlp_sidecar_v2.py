@@ -32,6 +32,7 @@ from atlas_structural_provenance import (
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
 )
+from atlas_treesitter_span_compat import resolve_chunk_byte_span
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -268,6 +269,18 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 diagnostics.append("ChunkingError: chunk missing both byte and line spans")
                 continue
             start, end = legacy._line_span_to_offsets(req.source, int(start_line), int(end_line))
+        else:
+            span = resolve_chunk_byte_span(req.source, raw, int(start), int(end))
+            if span.mode == "INVALID":
+                diagnostics.append(
+                    "ChunkingError: explicit treesitter-chunker byte span does not match original UTF-8 bytes or LF-compatibility mapping"
+                )
+                continue
+            if span.mode == "LF_COMPAT_REMAPPED":
+                diagnostics.append(
+                    "CONSILIENCY_LF_BYTE_SPAN_REMAPPED: explicit chunk span was LF-relative and was mapped back to original UTF-8 bytes"
+                )
+            start, end = span.start_byte, span.end_byte
         start = max(0, int(start))
         end = max(start, int(end))
         start_row, start_column = legacy._offset_line_column(req.source, start)
