@@ -1,0 +1,24 @@
+schema_id: atlas.compiled-artifact-cache-key
+schema_version: 1
+schema_kind: compiled_artifact_cache_key
+status: ACTIVE
+
+description: >
+  Canonical cache identity for compiled context/prompt/prefill metadata. Cache
+  residence is an execution optimization and never a ranking signal.
+
+fields:
+  schema: { type: literal, value: atlas.compiled-artifact-cache-key.v1 }
+  contextManifestChecksum: { type: string, required: true }
+  promptPlanChecksum: { type: string, required: true }
+  modelRevision: { type: string, required: true }
+  adapterRevision: { type: string, nullable: true }
+  tokenizerRevision: { type: string, required: true }
+  promptTemplateRevision: { type: string, required: true }
+  toolSchemaRevision: { type: string, required: true }
+  evidenceRevisions: { type: string_array, required: true }
+  cacheKey: { type: string, required: true }
+
+invariants:
+  - evidenceRevisions are sorted before hashing
+  - serialized protobuf bytes are not used as long-term canonical checksum input

@@ -1,0 +1,41 @@
+schema_id: atlas.dag-node-plan
+schema_version: 1
+schema_kind: dag_node_plan
+status: ACTIVE
+
+description: >
+  Executor-neutral workflow node. Declares capability and resource requirements;
+  it normally does not pin a concrete semantic or graph executor.
+
+fields:
+  schema: { type: literal, value: atlas.dag-node-plan.v1 }
+  nodeId: { type: string, required: true }
+  kind:
+    type: enum
+    values: [CLASSIFY, RETRIEVE, RANK, EXACT_PROMOTE, COMPILE_CONTEXT, PREFILL, MODEL, TOOL, MUTATE, VALIDATE, MATERIALIZE, APPROVAL, CACHE_INVALIDATE, PROJECT, STOP]
+  lane:
+    type: enum
+    values: [planner, lexical, ast, semantic, graph, gpu, tool, validator, materializer, acp, a2a]
+    nullable: true
+  capability: { type: string, nullable: true }
+  inputRefs: { type: string_array, default: [] }
+  outputRefs: { type: string_array, default: [] }
+  dependsOn: { type: string_array, default: [] }
+  condition: { type: object, nullable: true }
+  resources:
+    type: object
+    fields:
+      tokens: { type: integer, nullable: true }
+      gpuBytes: { type: integer, nullable: true }
+      hostBytes: { type: integer, nullable: true }
+      timeoutMs: { type: integer, nullable: true }
+  retry:
+    type: object
+    fields:
+      maxAttempts: { type: integer, minimum: 1 }
+      strategy:
+        type: enum
+        values: [NONE, FIXED, EXPONENTIAL]
+  idempotencyKey: { type: string, required: true }
+  requiredEvidenceRefs: { type: string_array, default: [] }
+  checksum: { type: string, required: true }

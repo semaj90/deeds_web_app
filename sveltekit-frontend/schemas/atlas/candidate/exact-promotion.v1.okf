@@ -1,0 +1,35 @@
+schema_id: atlas.exact-promotion
+schema_version: 1
+schema_kind: exact_promotion
+status: ACTIVE
+
+description: >
+  Promotion boundary from approximate candidate evidence to revision-qualified
+  exact source evidence before mutation-critical synthesis.
+
+fields:
+  schema: { type: literal, value: atlas.exact-promotion.v1 }
+  requestId: { type: string, required: true }
+  candidateOrdinal: { type: integer, minimum: 0 }
+  canonicalId: { type: string, required: true }
+  approximateEvidenceRefs: { type: string_array, default: [] }
+  exactEvidence:
+    type: array
+    items:
+      sourceRef: { type: string, required: true }
+      checksum: { type: string, required: true }
+      startByte: { type: integer, nullable: true }
+      endByte: { type: integer, nullable: true }
+      symbolVersionId: { type: string, nullable: true }
+      treeNodeId: { type: string, nullable: true }
+  workspaceRevision: { type: string, required: true }
+  sourceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  status:
+    type: enum
+    values: [PROMOTED, REJECTED_STALE, REJECTED_IDENTITY, REJECTED_NO_EXACT_EVIDENCE]
+  checksum: { type: string, required: true }
+
+validation_rules:
+  - PROMOTED requires at least one exactEvidence item
+  - treeNodeId and symbolVersionId may be absent; they must never be fabricated

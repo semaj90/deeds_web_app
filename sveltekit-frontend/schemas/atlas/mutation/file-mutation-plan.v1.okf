@@ -1,0 +1,39 @@
+schema_id: atlas.file-mutation-plan
+schema_version: 1
+schema_kind: file_mutation_plan
+status: ACTIVE
+
+description: >
+  Exact bounded side-effect plan. The LLM may synthesize a patch artifact but
+  cannot enlarge allowed roots, bypass expected checksums, or remove validators.
+
+fields:
+  schema: { type: literal, value: atlas.file-mutation-plan.v1 }
+  mutationId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  workflowId: { type: string, required: true }
+  dagNodeId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  operation:
+    type: enum
+    values: [CREATE, PATCH, RENAME, DELETE]
+  targetPath: { type: string, required: true }
+  destinationPath: { type: string, nullable: true }
+  targetArtifactKind: { type: string, required: true }
+  requiredSymbols: { type: string_array, default: [] }
+  contextManifestId: { type: string, required: true }
+  packetKeys: { type: string_array, default: [] }
+  sourceRefs: { type: string_array, default: [] }
+  promotedEvidenceIds: { type: string_array, default: [] }
+  expectedAbsent: { type: boolean, nullable: true }
+  expectedExistingChecksum: { type: string, nullable: true }
+  allowedRoots: { type: string_array, required: true }
+  forbiddenRoots: { type: string_array, default: [] }
+  contentRef: { type: string, nullable: true }
+  validationNodeIds: { type: string_array, required: true }
+  planChecksum: { type: string, required: true }
+
+validation_rules:
+  - CREATE with expectedAbsent=true fails closed if target exists
+  - PATCH/RENAME/DELETE may require expectedExistingChecksum for optimistic concurrency
+  - target and destination must remain inside allowedRoots and outside forbiddenRoots

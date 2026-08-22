@@ -1,0 +1,32 @@
+schema_id: atlas.invalidation-plan
+schema_version: 1
+schema_kind: invalidation_plan
+status: ACTIVE
+
+description: >
+  Incremental post-mutation invalidation/materialization plan. Marks dependent
+  projections dirty without requiring synchronous full GPU/index rebuilds.
+
+fields:
+  schema: { type: literal, value: atlas.invalidation-plan.v1 }
+  invalidationId: { type: string, required: true }
+  mutationId: { type: string, required: true }
+  sourceRefs: { type: string_array, required: true }
+  invalidate:
+    type: array
+    items:
+      type: enum
+      values: [bitfrost, context-manifest, prompt-plan, prefill, lexical, ast, semantic_768, qdrant, graph, neo4j, cagra, diskann]
+  eagerRefresh:
+    type: array
+    items:
+      type: enum
+      values: [lexical, ast, semantic_768, qdrant, graph, neo4j]
+  lazyRefresh:
+    type: array
+    items:
+      type: enum
+      values: [cagra, diskann, prefill]
+  workspaceRevision: { type: string, required: true }
+  sourceRevisionAfter: { type: string, required: true }
+  checksum: { type: string, required: true }
