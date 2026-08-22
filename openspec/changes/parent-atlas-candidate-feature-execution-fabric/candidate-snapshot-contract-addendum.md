@@ -2,7 +2,7 @@
 
 Status: **IMPLEMENTED_UNPROVEN**
 
-This tranche implements the pure CAND-01/02/03, FEAT-01/02, and FEAT-03A/03B boundary on top of the existing `CandidateFeatureRowV1`, `ArtifactAddressV1`, and repository `apache-arrow` owners. It does not wire SearchRuntime, mmap reads, GPU buffers, Qdrant/TurboVec/cuVS/CAGRA, or canonical persistence.
+This tranche implements CAND-01/02/03, FEAT-01/02, FEAT-03A/03B, and the FEAT-03C readback/mmap proof surfaces on top of the existing `CandidateFeatureRowV1`, `ArtifactAddressV1`, and repository `apache-arrow` owners. It does not wire SearchRuntime, GPU buffers, Qdrant/TurboVec/cuVS/CAGRA, or canonical persistence.
 
 ## Ownership
 
@@ -33,7 +33,12 @@ CandidateFeatureColumnarV1
         v
 Arrow IPC FILE
   ArtifactAddressV1 / ARROW_IPC locator
-  canonicalOwnerChanged = false
+        |
+        +--> JS disk readback verifier
+        |
+        `--> Python read-only OS mmap + PyArrow proof
+
+canonicalOwnerChanged = false throughout
 ```
 
 `CandidateOrdinal` is valid only under `candidateSnapshotRevision`. It is not a packet key, symbol identity, tree identity, Qdrant point ID, or GPU node ID.
@@ -46,7 +51,10 @@ sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.t
 sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts
 sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-columnar-v1.ts
 sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-columnar-v1.spec.ts
+sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-arrow-readback.spec.ts
 scripts/atlas/write-candidate-feature-arrow.mjs
+scripts/atlas/read-candidate-feature-arrow.mjs
+scripts/atlas/prove-candidate-feature-arrow-mmap.py
 sveltekit-frontend/scripts/atlas/prove-candidate-feature-arrow.mts
 ```
 
@@ -123,6 +131,61 @@ ArtifactAddressV1
 
 No Postgres/Qdrant/Valkey write is performed by the bounded proof.
 
+## FEAT-03C file readback + mmap boundary
+
+FEAT-03C is split intentionally so the implementation does not call an ordinary Node `readFile()` operation an OS mmap.
+
+### FEAT-03C-JS — immutable disk readback
+
+`scripts/atlas/read-candidate-feature-arrow.mjs`:
+
+1. accepts the existing `ArtifactAddressV1` or writer receipt envelope;
+2. recomputes and verifies `revisionSetHash`, `artifactHash`, and `artifactId`;
+3. opens the `ARROW_IPC` locator read-only;
+4. verifies SHA-256 of the actual file bytes;
+5. verifies `ARROW1` file magic at prefix and suffix;
+6. parses the Arrow IPC file;
+7. proves dense CandidateOrdinal order;
+8. optionally compares all identity/revision columns to `CandidateFeatureColumnarV1`;
+9. reads an explicit ordinal/feature subset and verifies value + presence parity.
+
+Its receipt is explicit:
+
+```text
+readMode = NODE_FILE_BYTES_ARROW_IPC
+osMmap = false
+randomAccessCapableFormat = true
+```
+
+The focused Vitest writes a real temporary Arrow file and includes corrupted-file and revision-set tamper negative cases.
+
+### FEAT-03C-MMAP — true read-only OS mapping
+
+`scripts/atlas/prove-candidate-feature-arrow-mmap.py` uses Python `mmap.mmap(..., access=mmap.ACCESS_READ)` over the same immutable Arrow file.
+
+Before parsing it verifies:
+
+```text
+ArtifactAddressV1 identity
+revisionSetHash
+artifactHash / artifactId
+ARROW1 file magic
+SHA256(mapped file bytes)
+```
+
+If PyArrow is installed, it opens the IPC file from the mapped buffer, verifies dense ordinals, and optionally proves identity + selected feature value/presence parity against the columnar reference.
+
+If PyArrow is absent it emits:
+
+```text
+status = MMAP_FILE_PROVEN_PYARROW_BLOCKED
+blocker = PYARROW_NOT_INSTALLED
+```
+
+and exits nonzero. That may prove the OS mapping primitive but **does not** promote FEAT-03C Arrow mmap readback.
+
+This boundary does not claim Arrow IPC is GPU zero-copy. Host mmap -> pinned/pageable transfer -> GPU is a later FEAT-03D benchmark/implementation concern.
+
 ## Proof gates written
 
 - [ ] **CAND-01** canonical candidate identity round-trip through ordinal map.
@@ -139,6 +202,12 @@ No Postgres/Qdrant/Valkey write is performed by the bounded proof.
 - [ ] **FEAT-03B-02** Arrow round-trip preserves row count and CandidateOrdinal.
 - [ ] **FEAT-03B-03** ArtifactAddress revision set binds ordinal/logical/columnar revisions.
 - [ ] **FEAT-03B-04** identical input yields identical Arrow bytes and artifact ID.
+- [ ] **FEAT-03C-JS-01** disk readback verifies artifact/revision/file checksums.
+- [ ] **FEAT-03C-JS-02** disk readback preserves dense ordinals and identity columns.
+- [ ] **FEAT-03C-JS-03** selected feature values + presence bits match CPU columnar reference.
+- [ ] **FEAT-03C-JS-04** corrupted bytes and revision tampering fail closed.
+- [ ] **FEAT-03C-MMAP-01** actual read-only OS mmap opens the exact artifact bytes.
+- [ ] **FEAT-03C-MMAP-02** PyArrow IPC readback from mapped bytes preserves ordinals/selected columns.
 
 These remain unchecked until executed on the workstation.
 
@@ -149,22 +218,40 @@ cd C:\Users\james\Videos\deeds_web_app\sveltekit-frontend
 
 node_modules\.bin\vitest run `
   src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts `
-  src/lib/server/atlas/features/candidate-feature-columnar-v1.spec.ts
+  src/lib/server/atlas/features/candidate-feature-columnar-v1.spec.ts `
+  src/lib/server/atlas/features/candidate-feature-arrow-readback.spec.ts
 
 npx tsx scripts/atlas/prove-candidate-feature-arrow.mts
 ```
 
-Expected bounded proof terminal status:
+Expected FEAT-03A/03B bounded proof terminal status:
 
 ```text
 CANDIDATE_FEATURE_ARROW_BOUNDED_PROVEN
 ```
 
-That proof performs no store writes.
+For true mmap readback, first materialize an Arrow file + writer receipt + matching columnar JSON, then run from repository root:
+
+```powershell
+python scripts/atlas/prove-candidate-feature-arrow-mmap.py `
+  --artifact=<writer-receipt.json> `
+  --expected=<columnar.json> `
+  --features=semanticRelevance,astAffinity,graphAuthority `
+  --ordinals=0,1
+```
+
+Full FEAT-03C acceptance requires:
+
+```text
+CANDIDATE_FEATURE_ARROW_MMAP_PROVEN
+```
+
+A `PYARROW_NOT_INSTALLED` blocker is diagnostic only, not proof completion.
+
+All focused proofs are read-only with respect to Postgres/Qdrant/Valkey/Neo4j and do not allocate GPU state.
 
 ## Explicitly deferred
 
-- FEAT-03C mmap reader/readback verifier
 - FEAT-03D GPU gather/pack challenger and physical row padding
 - FEAT-04 CPU/GPU parity receipt
 - FANOUT-01 executor result normalization to CandidateOrdinal
@@ -173,4 +260,4 @@ That proof performs no store writes.
 - `KnnNeighborhoodSnapshotV1`
 - GPU-resident leases
 
-After FEAT-03A/03B pass locally, the next safe tranche is **FEAT-03C**: memory-map/read back the Arrow file, validate ArtifactAddress checksum/revision lineage, and prove selected columns can be read without changing logical ordinals. Only after that should GPU gather/pack begin.
+After FEAT-03C passes locally, the next safe tranche is **FEAT-03D + FEAT-04**: compile the proven logical rows into an explicitly padded physical GPU batch with a valid mask, then compare CandidateOrdinal and feature values against the CPU reference. Executor fanout remains behind that parity boundary.
