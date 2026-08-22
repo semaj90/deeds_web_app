@@ -20,8 +20,7 @@ function ordinalMap() {
         semanticRevision: 'sem-1',
         degradedIdentity: false,
         evidenceRefs: [],
-        producerRevision: 'test',
-      } as never,
+      },
       {
         canonicalId: 'c2',
         packetKey: 'p2',
@@ -33,8 +32,7 @@ function ordinalMap() {
         semanticRevision: 'sem-1',
         degradedIdentity: false,
         evidenceRefs: [],
-        producerRevision: 'test',
-      } as never,
+      },
     ],
   });
 }
