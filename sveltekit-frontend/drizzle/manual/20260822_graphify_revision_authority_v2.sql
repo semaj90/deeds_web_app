@@ -132,6 +132,8 @@ CREATE INDEX IF NOT EXISTS graphify_runs_workspace_revision_idx_v2
 CREATE INDEX IF NOT EXISTS graphify_runs_source_manifest_digest_idx_v2
   ON public.graphify_runs (source_manifest_digest)
   WHERE source_manifest_digest IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_runs_status_started_at_idx_v2
+  ON public.graphify_runs (status, started_at DESC);
 CREATE INDEX IF NOT EXISTS graphify_files_source_ref_idx_v2
   ON public.graphify_files (workspace_id, source_ref);
 CREATE INDEX IF NOT EXISTS graphify_files_legacy_source_revision_provenance_idx_v2
@@ -160,3 +162,14 @@ COMMENT ON COLUMN public.graphify_files.code_source_revision IS
   'WorkspaceSourceBindingV1/CodeSourceRevisionV1 identity: sha256:<exact source bytes>.';
 
 COMMIT;
+
+-- Post-apply gate order (non-production proof DB only):
+--   1. npx tsx scripts/atlas/prove-graphify-revision-owner-v2.mts
+--      Expected before writer remediation: migration/schema state visible,
+--      revisionOwnerProven=false, fanoutMayConsumeAsCanonical=false.
+--   2. Reconcile the existing source-inventory materializer to the v2 two-table
+--      contract. Do not create a second revision writer.
+--   3. Run one rolled-back write/readback proof in the intended non-production DB.
+--   4. Only after review, commit one controlled row.
+--   5. Rerun prove-graphify-revision-owner-v2.mts and require
+--      REVISION_OWNER_PROVEN before FANOUT may consume lineage as canonical.
