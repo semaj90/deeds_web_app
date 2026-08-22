@@ -32,7 +32,7 @@ function fixture() {
     ],
   });
 
-  const byId = new Map(ordinalMap.rows.map((row) => [row.canonicalId, row.candidateOrdinal]));
+  const byId = new Map(ordinalMap.candidates.map((row) => [row.canonicalId, row.candidateOrdinal]));
   const row = (canonicalId: 'candidate:a' | 'candidate:b' | 'candidate:c', values: Record<string, number | null>, lanes: Array<'semantic' | 'lexical' | 'ast' | 'graph' | 'domain' | 'memory'>, degradedIdentity = false) => {
     const ordinal = byId.get(canonicalId)!;
     const suffix = canonicalId.at(-1)!;
