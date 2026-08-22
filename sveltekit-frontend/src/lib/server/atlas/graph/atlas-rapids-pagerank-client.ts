@@ -119,7 +119,7 @@ export function createAtlasRapidsPageRankClient(
   return {
     loadProjection: (input: AtlasGraphProjectionLoadRequestV1) =>
       requestJson<AtlasGraphProjectionLoadReceiptV1>('/v1/graph/load', input, 60_000),
-    pagerank: (input: AtlasPageRankRequestV1) => {
+    pagerank: async (input: AtlasPageRankRequestV1) => {
       assertPageRankRequest(input);
       return requestJson<AtlasPageRankReceiptV1>(
         '/v1/graph/pagerank',

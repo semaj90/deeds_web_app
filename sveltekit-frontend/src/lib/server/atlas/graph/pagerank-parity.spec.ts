@@ -18,12 +18,25 @@ function findRepoRoot(start: string): string {
 const repoRoot = findRepoRoot(process.cwd());
 const pythonOracle = resolve(repoRoot, 'python', 'parent_atlas_networkx_pagerank.py');
 const gdsRunner = resolve(repoRoot, 'scripts', 'atlas', 'compute-pagerank-neo4j-v2.mjs');
+// Pin the bounded 6-node/5-edge test fixture explicitly for BOTH the Python oracle and the
+// Neo4j GDS runner. Without --fixture, both scripts' own CLI defaults silently prefer
+// graphify/frozen-graph-snapshot-v2.json (a real ~487MB production snapshot: 162,234 nodes /
+// 108,156 edges) whenever that file happens to exist on disk. For the Neo4j runner this is
+// especially severe — it writes one sequential awaited Cypher CREATE per node/edge (270K+
+// round-trips), which is what actually caused the multi-minute/hung test runs, not merely slow
+// JSON parsing. See openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening/tasks.md.
+const pythonFixture = resolve(repoRoot, 'sveltekit-frontend', 'src', 'lib', 'server', 'atlas', 'graph', 'fixtures', 'pagerank-parity-graph.json');
 
 type Score = { nodeKey: string; pagerankRaw: number };
 type Witness = Record<string, number | string>;
 
 function run(command: string, args: string[]): string {
-	return execFileSync(command, args, { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+	return execFileSync(command, args, {
+		cwd: repoRoot,
+		encoding: 'utf8',
+		stdio: ['ignore', 'pipe', 'pipe'],
+		maxBuffer: 1024 * 1024 * 50,
+	}).trim();
 }
 
 function readWitness(): Witness {
@@ -75,10 +88,10 @@ function spearman(left: readonly Score[], right: readonly Score[]): number {
 describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 	it('proves parity without modifying production score surfaces', async () => {
 		const before = readWitness();
-		const networkx = JSON.parse(run('python', [pythonOracle]));
+		const networkx = JSON.parse(run('python', [pythonOracle, '--fixture', pythonFixture]));
 		expect(networkx.status).toBe('NETWORKX_REFERENCE_PROVEN');
 
-		const gds = JSON.parse(run('node', [gdsRunner, '--json']));
+		const gds = JSON.parse(run('node', [gdsRunner, '--fixture', pythonFixture, '--json']));
 		const after = readWitness();
 		expect(after).toEqual(before);
 
