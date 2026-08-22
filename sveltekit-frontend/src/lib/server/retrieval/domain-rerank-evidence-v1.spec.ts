@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import type { FeatureEnvelope } from './feature-envelope.js';
+import type { DomainClassMatchV1 } from './domain-class-match-v1.js';
 import {
+  composeDomainRerankEvidenceV1,
   extractDomainRerankEvidenceV1,
   projectRerankPolicyFeaturesV1,
 } from './domain-rerank-evidence-v1.js';
@@ -23,6 +25,26 @@ function envelope(overrides: Partial<FeatureEnvelope> = {}): FeatureEnvelope {
   };
 }
 
+function comparison(overrides: Partial<DomainClassMatchV1> = {}): DomainClassMatchV1 {
+  return {
+    schema: 'atlas.domain-class-match.v1',
+    queryHash: 'a'.repeat(64),
+    queryClassifierVersion: 'parent-atlas-domain-taxonomy-v1',
+    queryDomainClass: 'retrieval',
+    querySecondaryDomains: [],
+    queryConfidence: 0.9,
+    candidatePacketKey: 'packet-1',
+    candidateDomainClass: 'retrieval',
+    candidateClassifierVersion: 'domain-classifier-v1',
+    candidateLineageStatus: 'PROVEN',
+    domainClassMatch: 1,
+    matchKind: 'EXACT_PRIMARY',
+    featureEligible: true,
+    comparisonChecksum: 'b'.repeat(64),
+    ...overrides,
+  };
+}
+
 describe('DomainRerankEvidenceV1', () => {
   it('preserves the categorical domain label but refuses to invent a numeric domain score', () => {
     const result = extractDomainRerankEvidenceV1(envelope());
@@ -31,6 +53,7 @@ describe('DomainRerankEvidenceV1', () => {
     expect(result.labelSource).toBe('feature_envelope_domain_class');
     expect(result.domainScore).toBeNull();
     expect(result.domainClassMatch).toBeNull();
+    expect(result.domainClassMatchEligible).toBe(false);
     expect(result.rankingEligible).toBe(false);
     expect(result.trainingEligible).toBe(false);
     expect(result.blockers).toContain('DOMAIN_CLASSIFIER_LINEAGE_MISSING');
@@ -75,6 +98,37 @@ describe('DomainRerankEvidenceV1', () => {
 
     expect(result.domainClass).toBe('graph');
     expect(result.labelSource).toBe('feature_envelope_domain');
+  });
+
+  it('composes proven query-domain evidence for training while keeping live ranking blocked', () => {
+    const result = composeDomainRerankEvidenceV1({
+      ...envelope(),
+      domain_classifier_version: 'domain-classifier-v1',
+      domain_class_source: 'feature_domain_facts:heuristic_path_classifier',
+    }, comparison());
+
+    expect(result.domainClassMatch).toBe(1);
+    expect(result.domainClassMatchEligible).toBe(true);
+    expect(result.trainingEligible).toBe(true);
+    expect(result.rankingEligible).toBe(false);
+    expect(result.blockers).not.toContain('QUERY_DOMAIN_MISSING');
+    expect(result.blockers).toContain('DOMAIN_SCORE_PRODUCER_MISSING');
+  });
+
+  it('rejects a comparison receipt for a different packet or domain', () => {
+    const input = {
+      ...envelope(),
+      domain_classifier_version: 'domain-classifier-v1',
+      domain_class_source: 'feature_domain_facts:heuristic_path_classifier',
+    };
+
+    const wrongPacket = composeDomainRerankEvidenceV1(input, comparison({ candidatePacketKey: 'packet-other' }));
+    expect(wrongPacket.domainClassMatch).toBeNull();
+    expect(wrongPacket.trainingEligible).toBe(false);
+
+    const wrongDomain = composeDomainRerankEvidenceV1(input, comparison({ candidateDomainClass: 'graph' }));
+    expect(wrongDomain.domainClassMatch).toBeNull();
+    expect(wrongDomain.trainingEligible).toBe(false);
   });
 
   it('keeps reward prior and domain-class match independent', () => {
