@@ -1,24 +1,32 @@
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { z } from 'zod';
 
-import { deriveCodeSourceRevisionV1 } from '../identity/code-source-revision-v1.js';
+import {
+  workspaceRevisionRecordV1Schema,
+  workspaceSourceBindingV1Schema,
+  type WorkspaceRevisionRecordV1,
+  type WorkspaceSourceBindingV1,
+} from '../identity/workspace-source-binding-v1.js';
 
 export const CODE_REVISION_AUTHORITY_SCHEMA = 'atlas.code-revision-authority.v1' as const;
-export const CODE_REVISION_AUTHORITY_REVISION = 'atlas.code-revision-authority.git-head-plus-source-sha256.v1' as const;
+export const CODE_REVISION_AUTHORITY_REVISION = 'atlas.code-revision-authority.workspace-manifest-plus-source-sha256.v2' as const;
 
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
+const sourceRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 const revision = z.string().min(1);
 
 export const codeRevisionAuthorityV1Schema = z.object({
   schema: z.literal(CODE_REVISION_AUTHORITY_SCHEMA),
   authorityRevision: z.literal(CODE_REVISION_AUTHORITY_REVISION),
   workspaceRoot: z.string().min(1),
-  workspaceRevision: revision,
-  workspaceRevisionKind: z.literal('GIT_COMMIT_SHA'),
+  workspaceRevision: sourceRevision,
+  workspaceRevisionKind: z.literal('SHA256_SOURCE_MANIFEST'),
+  workspaceSourceManifestDigest: sha256,
+  baseGitCommitOid: revision,
+  baseGitTreeOid: revision,
   sourceRef: z.string().min(1),
-  sourceRevision: revision,
+  sourceRevision,
   sourceRevisionKind: z.literal('SHA256_EXACT_UTF8_SOURCE_BYTES'),
   sourceContentDigest: sha256,
   sourceByteLength: z.number().int().nonnegative(),
@@ -26,6 +34,7 @@ export const codeRevisionAuthorityV1Schema = z.object({
   sourceRevisionCreatedByWriter: z.literal(true),
   callerSuppliedWorkspaceRevisionAccepted: z.literal(false),
   callerSuppliedSourceRevisionAccepted: z.literal(false),
+  gitCommitIsProvenanceOnly: z.literal(true),
   canonicalWritesAllowed: z.boolean(),
   producerRevision: revision,
   authorityChecksum: sha256,
@@ -55,69 +64,60 @@ function normalizeSourceRef(workspaceRoot: string, absolutePath: string): string
   return relative;
 }
 
-export function resolveGitWorkspaceRevision(input: {
-  workspaceRoot: string;
-  gitBinary?: string;
-}): string {
-  const gitBinary = input.gitBinary ?? 'git';
-  let value: string;
-  try {
-    value = execFileSync(gitBinary, ['rev-parse', 'HEAD'], {
-      cwd: input.workspaceRoot,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-  } catch (error) {
-    throw new Error(`CODE_REVISION_WORKSPACE_GIT_HEAD_UNAVAILABLE:${error instanceof Error ? error.message : String(error)}`);
-  }
-  if (!/^[a-f0-9]{40,64}$/i.test(value)) {
-    throw new Error(`CODE_REVISION_WORKSPACE_GIT_HEAD_INVALID:${value}`);
-  }
-  return value.toLowerCase();
-}
-
 /**
- * Canonical code revision origin candidate.
+ * Adapts the already-owned WorkspaceRevisionRecordV1 + WorkspaceSourceBindingV1
+ * into the revision authority candidate consumed by Graphify/FANOUT gates.
  *
- * Neither revision coordinate is accepted from the caller. Workspace revision
- * is resolved from Git HEAD inside the writer boundary; source revision is
- * derived from the exact UTF-8 source bytes using CodeSourceRevisionV1.
+ * This module does NOT define another workspace revision algorithm. The
+ * canonical candidate is the sorted exact-byte source manifest digest from
+ * WorkspaceRevisionRecordV1. Git commit/tree identifiers remain provenance.
  */
 export function deriveCodeRevisionAuthorityV1(input: {
   workspaceRoot: string;
   absoluteSourcePath: string;
-  sourceText: string;
+  workspaceRecord: WorkspaceRevisionRecordV1;
+  sourceBinding: WorkspaceSourceBindingV1;
   producerRevision: string;
   canonicalWritesAllowed?: boolean;
-  workspaceRevisionResolver?: (workspaceRoot: string) => string;
 }): CodeRevisionAuthorityV1 {
-  if (!input.sourceText) throw new Error('CODE_REVISION_SOURCE_TEXT_REQUIRED');
   const workspaceRoot = path.resolve(input.workspaceRoot);
   const absoluteSourcePath = path.resolve(input.absoluteSourcePath);
   const sourceRef = normalizeSourceRef(workspaceRoot, absoluteSourcePath);
-  const workspaceRevision = (input.workspaceRevisionResolver
-    ? input.workspaceRevisionResolver(workspaceRoot)
-    : resolveGitWorkspaceRevision({ workspaceRoot })).trim().toLowerCase();
-  if (!/^[a-f0-9]{40,64}$/i.test(workspaceRevision)) {
-    throw new Error(`CODE_REVISION_WORKSPACE_REVISION_INVALID:${workspaceRevision}`);
+  const workspaceRecord = workspaceRevisionRecordV1Schema.parse(input.workspaceRecord);
+  const sourceBinding = workspaceSourceBindingV1Schema.parse(input.sourceBinding);
+
+  if (sourceBinding.sourceRef !== sourceRef) {
+    throw new Error(`CODE_REVISION_SOURCE_BINDING_REF_MISMATCH:${sourceRef}:${sourceBinding.sourceRef}`);
   }
-  const source = deriveCodeSourceRevisionV1(input.sourceText);
+  if (sourceBinding.workspaceRevision !== workspaceRecord.workspaceRevision) {
+    throw new Error('CODE_REVISION_WORKSPACE_BINDING_REVISION_MISMATCH');
+  }
+  if (sourceBinding.baseCommitOid !== workspaceRecord.baseCommitOid) {
+    throw new Error('CODE_REVISION_WORKSPACE_BINDING_GIT_COMMIT_MISMATCH');
+  }
+  if (sourceBinding.sourceRevision !== `sha256:${sourceBinding.contentDigest}`) {
+    throw new Error('CODE_REVISION_SOURCE_BINDING_DIGEST_MISMATCH');
+  }
 
   const payload = {
     schema: CODE_REVISION_AUTHORITY_SCHEMA,
     authorityRevision: CODE_REVISION_AUTHORITY_REVISION,
     workspaceRoot,
-    workspaceRevision,
-    workspaceRevisionKind: 'GIT_COMMIT_SHA' as const,
+    workspaceRevision: workspaceRecord.workspaceRevision,
+    workspaceRevisionKind: 'SHA256_SOURCE_MANIFEST' as const,
+    workspaceSourceManifestDigest: workspaceRecord.sourceManifestDigest,
+    baseGitCommitOid: workspaceRecord.baseCommitOid,
+    baseGitTreeOid: workspaceRecord.baseTreeOid,
     sourceRef,
-    sourceRevision: source.sourceRevision,
+    sourceRevision: sourceBinding.sourceRevision,
     sourceRevisionKind: 'SHA256_EXACT_UTF8_SOURCE_BYTES' as const,
-    sourceContentDigest: source.contentDigest,
-    sourceByteLength: source.byteLength,
+    sourceContentDigest: sourceBinding.contentDigest,
+    sourceByteLength: sourceBinding.byteLength,
     workspaceRevisionCreatedByWriter: true as const,
     sourceRevisionCreatedByWriter: true as const,
     callerSuppliedWorkspaceRevisionAccepted: false as const,
     callerSuppliedSourceRevisionAccepted: false as const,
+    gitCommitIsProvenanceOnly: true as const,
     canonicalWritesAllowed: input.canonicalWritesAllowed ?? false,
     producerRevision: input.producerRevision,
   };
