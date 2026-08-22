@@ -1,0 +1,124 @@
+syntax = "proto3";
+package parent_atlas.fabric.v1;
+
+// Control/reference projection only. Atlas logical identity and checksums are
+// computed independently of protobuf serialization.
+message RevisionFence {
+  string workspace_revision = 1;
+  string source_snapshot_revision = 2;
+  optional string graph_revision = 3;
+  optional string feature_revision = 4;
+  optional string representation_revision = 5;
+}
+
+message ArtifactRef {
+  string artifact_id = 1;
+  string artifact_revision = 2;
+  string role = 3;
+  string content_checksum_sha256 = 4;
+  optional string row_identity_checksum = 5;
+  string storage_ref = 6;
+  string access_mode = 7;
+  string content_format = 8;
+}
+
+message PacketCoordinateRef {
+  string packet_key = 1;
+  string canonical_id = 2;
+  string registry_revision = 3;
+  string row_identity_checksum = 4;
+  uint32 ordinal = 5;
+  optional string tree_node_id = 6;
+  optional string symbol_version_id = 7;
+  optional string semantic_artifact_id = 8;
+  optional string feature_artifact_id = 9;
+  optional string graph_artifact_id = 10;
+  optional string hypergraph_artifact_id = 11;
+  string coordinate_checksum = 12;
+}
+
+message ResolvePacketRequest {
+  string canonical_id = 1;
+  string registry_revision = 2;
+  string row_identity_checksum = 3;
+}
+
+message ResolveBatchRequest {
+  repeated string canonical_ids = 1;
+  string registry_revision = 2;
+  string row_identity_checksum = 3;
+}
+
+message GpuResidencyRef {
+  string lease_id = 1;
+  string tile_id = 2;
+  string source_artifact_id = 3;
+  string source_artifact_checksum = 4;
+  string row_identity_checksum = 5;
+  string device_id = 6;
+  string dtype = 7;
+  repeated uint64 shape = 8;
+  uint64 byte_offset = 9;
+  uint64 byte_length = 10;
+  string residency = 11;
+  optional string cuda_ipc_handle_ref = 12;
+  string lease_checksum = 13;
+}
+
+message MaterializeTensorRequest {
+  string action_id = 1;
+  ArtifactRef source = 2;
+  RevisionFence revisions = 3;
+  string target_dtype = 4;
+  repeated uint64 target_shape = 5;
+}
+
+message TensorBatchRequest {
+  string action_id = 1;
+  string registry_revision = 2;
+  string row_identity_checksum = 3;
+  repeated uint32 candidate_ordinals = 4;
+  string query_tensor_lease_id = 5;
+  repeated string feature_artifact_ids = 6;
+  uint32 top_k = 7;
+  RevisionFence revisions = 8;
+}
+
+message TensorBatchResult {
+  string action_id = 1;
+  repeated uint32 ranked_ordinals = 2;
+  ArtifactRef score_artifact = 3;
+  string action_receipt_id = 4;
+}
+
+message WorkflowActionRequest {
+  string workflow_id = 1;
+  uint64 workflow_revision = 2;
+  string action_id = 3;
+  string run_id = 4;
+  string dag_node_id = 5;
+  uint64 sequence = 6;
+  repeated ArtifactRef input_artifacts = 7;
+  string idempotency_key = 8;
+  RevisionFence revisions = 9;
+}
+
+message WorkflowActionEvent {
+  string workflow_id = 1;
+  string run_id = 2;
+  string action_id = 3;
+  string attempt_id = 4;
+  uint64 sequence = 5;
+  string kind = 6;
+  repeated ArtifactRef output_artifacts = 7;
+  optional string error_code = 8;
+  string emitted_at = 9;
+}
+
+service AtlasFabricService {
+  rpc ResolvePacket(ResolvePacketRequest) returns (PacketCoordinateRef);
+  rpc ResolveBatch(ResolveBatchRequest) returns (stream PacketCoordinateRef);
+  rpc MaterializeTensor(MaterializeTensorRequest) returns (GpuResidencyRef);
+  rpc ExecuteTensorBatch(TensorBatchRequest) returns (TensorBatchResult);
+  rpc ExecuteWorkflowActions(stream WorkflowActionRequest) returns (stream WorkflowActionEvent);
+}
