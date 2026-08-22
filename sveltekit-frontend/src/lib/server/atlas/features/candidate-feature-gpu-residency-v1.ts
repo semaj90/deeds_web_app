@@ -2,9 +2,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 import { artifactAddressSchema, type ArtifactAddressV1 } from '../../queue/artifact-work-item-v1.js';
-import {
-  CANDIDATE_SCALAR_FEATURES,
-} from './candidate-feature-columnar-v1.js';
+import { CANDIDATE_SCALAR_FEATURES } from './candidate-feature-columnar-v1.js';
 import {
   candidateFeatureGpuPackV1Schema,
   type CandidateFeatureGpuPackV1,
@@ -83,17 +81,17 @@ export const candidateFeatureGpuResidencyObservationSchema = z.object({
   if (Date.parse(value.expiresAt) <= Date.parse(value.issuedAt)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expiresAt'], message: 'GPU_RESIDENCY_EXPIRY_NOT_AFTER_ISSUE' });
   }
+  const { observationChecksum, ...body } = value;
+  if (sha256(canonicalJson(body)) !== observationChecksum) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['observationChecksum'], message: 'GPU_RESIDENCY_OBSERVATION_CHECKSUM_MISMATCH' });
+  }
 });
 export type CandidateFeatureGpuResidencyObservationV1 = z.infer<typeof candidateFeatureGpuResidencyObservationSchema>;
 
 export const candidateFeatureGpuResidentArtifactSchema = z.object({
   role: bufferRoleSchema,
   sourceChecksum: checksum,
-  address: artifactAddressSchema.superRefine((value, ctx) => {
-    if (value.locator.storage !== 'GPU_RESIDENT') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['locator', 'storage'], message: 'GPU_RESIDENCY_REQUIRES_GPU_RESIDENT_ADDRESS' });
-    }
-  }),
+  address: artifactAddressSchema,
 }).strict();
 export type CandidateFeatureGpuResidentArtifactV1 = z.infer<typeof candidateFeatureGpuResidentArtifactSchema>;
 
@@ -130,9 +128,15 @@ export const candidateFeatureGpuResidencyLeaseV1Schema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['artifacts'], message: 'GPU_RESIDENCY_ARTIFACT_ROLE_DUPLICATE_OR_MISSING' });
   }
   for (const artifact of value.artifacts) {
-    if (artifact.address.locator.storage === 'GPU_RESIDENT' && artifact.address.locator.deviceId !== value.deviceId) {
+    if (artifact.address.locator.storage !== 'GPU_RESIDENT') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['artifacts'], message: `GPU_RESIDENCY_NON_GPU_ADDRESS:${artifact.role}` });
+    } else if (artifact.address.locator.deviceId !== value.deviceId) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['artifacts'], message: `GPU_RESIDENCY_DEVICE_MISMATCH:${artifact.role}` });
     }
+  }
+  const { leaseChecksum, ...body } = value;
+  if (sha256(canonicalJson(body)) !== leaseChecksum) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['leaseChecksum'], message: 'GPU_RESIDENCY_LEASE_CHECKSUM_MISMATCH' });
   }
 });
 export type CandidateFeatureGpuResidencyLeaseV1 = z.infer<typeof candidateFeatureGpuResidencyLeaseV1Schema>;
@@ -147,7 +151,12 @@ export const candidateFeatureGpuReleaseReceiptV1Schema = z.object({
   bufferIds: z.array(z.string().min(1)).length(GPU_CANDIDATE_BUFFER_ROLES.length),
   releaseChecksum: checksum,
   identityAuthority: z.literal(false),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  const { releaseChecksum, schema: _schema, identityAuthority: _authority, ...body } = value;
+  if (sha256(canonicalJson(body)) !== releaseChecksum) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['releaseChecksum'], message: 'GPU_RESIDENCY_RELEASE_CHECKSUM_MISMATCH' });
+  }
+});
 export type CandidateFeatureGpuReleaseReceiptV1 = z.infer<typeof candidateFeatureGpuReleaseReceiptV1Schema>;
 
 function expectedSourceChecksum(pack: CandidateFeatureGpuPackV1, role: GpuCandidateBufferRole): string {
@@ -173,8 +182,8 @@ function expectedDtype(role: GpuCandidateBufferRole): 'f32' | 'u8' | 'i32' {
 }
 
 export function buildCandidateFeatureGpuResidencyLease(input: {
-  pack: z.input<typeof candidateFeatureGpuPackV1Schema>;
-  observation: z.input<typeof candidateFeatureGpuResidencyObservationSchema>;
+  pack: unknown;
+  observation: unknown;
   leaseEpoch?: number;
   producerRevision: string;
 }): CandidateFeatureGpuResidencyLeaseV1 {
@@ -268,8 +277,8 @@ export function buildCandidateFeatureGpuResidencyLease(input: {
 }
 
 export function verifyGpuResidentArtifactLease(input: {
-  lease: z.input<typeof candidateFeatureGpuResidencyLeaseV1Schema>;
-  address: z.input<typeof artifactAddressSchema>;
+  lease: unknown;
+  address: unknown;
   role: GpuCandidateBufferRole;
   now?: Date;
 }): { status: 'PROVEN' | 'REJECTED'; reason: string | null } {
@@ -282,12 +291,13 @@ export function verifyGpuResidentArtifactLease(input: {
     return { status: 'REJECTED', reason: 'GPU_RESIDENCY_ADDRESS_MISMATCH' };
   }
   if (address.locator.storage !== 'GPU_RESIDENT') return { status: 'REJECTED', reason: 'GPU_RESIDENCY_STORAGE_MISMATCH' };
+  if (expected.address.locator.storage !== 'GPU_RESIDENT') return { status: 'REJECTED', reason: 'GPU_RESIDENCY_LEASE_ADDRESS_INVALID' };
   if (address.locator.bufferId !== expected.address.locator.bufferId) return { status: 'REJECTED', reason: 'GPU_RESIDENCY_BUFFER_ID_MISMATCH' };
   return { status: 'PROVEN', reason: null };
 }
 
 export function buildCandidateFeatureGpuReleaseReceipt(input: {
-  lease: z.input<typeof candidateFeatureGpuResidencyLeaseV1Schema>;
+  lease: unknown;
   releasedAt: string;
 }): CandidateFeatureGpuReleaseReceiptV1 {
   const lease = candidateFeatureGpuResidencyLeaseV1Schema.parse(input.lease);
