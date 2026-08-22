@@ -20,8 +20,7 @@ function ordinalMap() {
         semanticRevision: 'sem-1',
         degradedIdentity: false,
         evidenceRefs: [],
-        producerRevision: 'test',
-      } as never,
+      },
       {
         canonicalId: 'c2',
         packetKey: 'p2',
@@ -33,14 +32,12 @@ function ordinalMap() {
         semanticRevision: 'sem-1',
         degradedIdentity: false,
         evidenceRefs: [],
-        producerRevision: 'test',
-      } as never,
+      },
     ],
   });
 }
 
-function hit(candidateOrdinal: number, hop: number): GraphNeighborhoodHitV1 {
-  const map = ordinalMap();
+function hit(map: ReturnType<typeof ordinalMap>, candidateOrdinal: number, hop: number): GraphNeighborhoodHitV1 {
   return {
     schema: 'atlas.graph-neighborhood-hit.v1',
     candidateOrdinal,
@@ -63,7 +60,7 @@ describe('BFS -> StructuralFeatureSnapshotV1', () => {
     const map = ordinalMap();
     const snapshot = materializeBfsStructuralFeatureSnapshotV1({
       ordinalMap: map,
-      hits: [hit(1, 2), hit(0, 0)],
+      hits: [hit(map, 1, 2), hit(map, 0, 0)],
       producerRevision: 'bfs-snapshot-test-v1',
       generatedAt: '2026-08-22T18:00:00.000Z',
     });
@@ -85,17 +82,17 @@ describe('BFS -> StructuralFeatureSnapshotV1', () => {
 
   it('rejects mixed projection revisions', () => {
     const map = ordinalMap();
-    const second = { ...hit(1, 1), projectionRevision: 'proj-other' };
+    const second = { ...hit(map, 1, 1), projectionRevision: 'proj-other' };
     expect(() => materializeBfsStructuralFeatureSnapshotV1({
       ordinalMap: map,
-      hits: [hit(0, 0), second],
+      hits: [hit(map, 0, 0), second],
       producerRevision: 'test',
     })).toThrow('BFS_STRUCTURAL_REVISION_SET_MISMATCH');
   });
 
   it('does not accept a graph revision that differs from the canonical candidate map', () => {
     const map = ordinalMap();
-    const wrong = { ...hit(0, 1), graphRevision: 'g-other' };
+    const wrong = { ...hit(map, 0, 1), graphRevision: 'g-other' };
     expect(() => materializeBfsStructuralFeatureSnapshotV1({
       ordinalMap: map,
       hits: [wrong],
