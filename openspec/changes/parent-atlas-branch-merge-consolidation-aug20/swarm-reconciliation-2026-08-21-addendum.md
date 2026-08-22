@@ -1067,3 +1067,61 @@ value per additional cycle spent re-deriving context. Remaining queue
 branches (temporal-*, gpu-resident-*, parent-atlas-* fabric/compiler
 branches with 100+ ahead counts) that need a fresh triage pass rather
 than being squeezed into an already-long session.
+
+### Next steps for a future session (recorded 2026-08-22, operator-requested)
+
+Three open threads, presented to the operator at the end of this session;
+none started yet. Pick up whichever the operator names first - they are
+independent of each other.
+
+1. **Continue the branch queue.** Re-fetch (`git fetch origin --prune`),
+   re-list `refs/remotes/origin/agent/*` sorted by `ahead` count against
+   `main`, and resume triage from the smallest untriaged branch using the
+   same methodology used throughout this file: merge-tree dry run, diff
+   against the branch's own merge-base (not blindly against `main`) to
+   isolate real unique content, verify duplicate-ownership before assuming
+   reconciliation is needed, merge via git plumbing (never touch the
+   working tree mid-merge), sync local `main` separately via
+   stash/ff-only/pop, then run real tests/scripts before trusting a clean
+   `merge-tree` result. As of this session's last full listing, the
+   remaining queue is dominated by larger/older branches: `temporal-*`
+   (dozen-plus variants, mostly already flagged superseded or net-zero, a
+   few genuinely unreviewed), `gpu-resident-*`, and several
+   `parent-atlas-*` fabric/compiler branches with 100+ commits ahead of
+   `main` that will need a fresh, focused review pass rather than the
+   same drive-by triage used on the smaller branches.
+2. **Resolve the XGBoost trace-label blocker.** A parallel workstream
+   (separate from the branch-merge queue, running concurrently with this
+   session under `packages/parent-atlas/src/core/` and possibly the
+   orphaned root `src/` tree - see item 3) reported: Parent Atlas focused
+   suite green (13 files, 54/54 tests, covering the XGBoost bridge,
+   temporal ledger, sequence reservation, recommendation history, and
+   outcome repositories), but the read-only exporter still produces zero
+   rows because no trace-label mappings are approved yet - i.e. package
+   contracts are healthy but live training is blocked by unresolved
+   trace-to-packet lineage. Next action: review
+   `docs/reports/xgboost-trace-label-candidates.json` and decide/approve
+   the trace-to-packet lineage mapping before attempting a live export or
+   training run. No live Postgres migration or model training has been
+   performed by this workstream so far.
+3. **Resolve the orphaned root-level `src/` tree question**, deferred
+   earlier this session (see "New finding this continuation" above) -
+   still unresolved and now higher-priority than when first flagged,
+   because a second, unrelated workstream
+   (`packages/parent-atlas/src/core/xgboost-trace-label-bridge.ts`,
+   `src/lib/server/atlas/runtime/search-runtime-domain-classifier.spec.ts`)
+   is now also writing into paths that live outside
+   `sveltekit-frontend/`, and it isn't yet established whether that work
+   is landing in the real, buildable location or the same orphaned
+   duplicate tree as `agent/search-runtime-domain-feature-20260822`
+   (confirmed a 108-line toy `search-runtime.ts` unrelated to the real
+   1359-line production one, not declared in root `package.json`
+   `workspaces`, not excluded in root `tsconfig.json`, not referenced by
+   any build/vitest config). Recommended first step: confirm exactly
+   which `src/` tree(s) the concurrent `packages/parent-atlas` /
+   `xgboost-trace-label` workstream is actually writing to and whether
+   `packages/parent-atlas` (a real declared workspace member) is affected
+   or only the separate orphaned root `src/`, before deciding whether to
+   archive the orphaned tree (per the project's archive-not-delete
+   convention: move to `deeds_labs/archive/` with a manifest entry) or
+   leave it in place pending further investigation.
