@@ -116,10 +116,16 @@ export function buildPrefillExecutionPlanFromRoutingV1(input: BuildPrefillFromRo
       .filter((entry) => entry.canonicalOwner && entry.routingEligible)
       .map((entry) => [entry.toolId, entry] as const),
   );
+  const candidateByTool = new Map(snapshot.candidateTools.map((candidate) => [candidate.toolId, candidate] as const));
   const operations = new Set(allowedOperationKinds);
   const scopes = new Set(allowedTargetScopes);
 
   for (const toolId of receipt.selectedToolIds) {
+    const candidate = candidateByTool.get(toolId);
+    if (!candidate || !candidate.eligible) {
+      const reason = candidate?.exclusionReasonCodes.join(',') || 'MISSING_CANDIDATE';
+      throw new Error(`PREFILL_SELECTED_TOOL_NOT_CANDIDATE_ELIGIBLE:${toolId}:${reason}`);
+    }
     const entry = canonicalRoutableByTool.get(toolId);
     if (!entry) throw new Error(`PREFILL_SELECTED_TOOL_NOT_REGISTRY_ROUTABLE:${toolId}`);
     if (!operations.has(entry.operationKind)) {
