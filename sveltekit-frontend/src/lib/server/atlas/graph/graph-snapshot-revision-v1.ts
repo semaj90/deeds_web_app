@@ -3,12 +3,15 @@ import { z } from 'zod';
 
 const id = z.string().min(1);
 const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
+const contentRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 
 export const graphSnapshotRevisionV1Schema = z.object({
   schema: z.literal('atlas.graph-snapshot-revision.v1'),
   snapshotId: z.string().uuid(),
-  workspaceRevision: id,
-  sourceInventoryRevision: id,
+  /** Upstream owner: WorkspaceRevisionRecordV1, never Git HEAD directly. */
+  workspaceRevision: contentRevision,
+  /** Deterministic revision of the exact graph source-inventory input. */
+  sourceInventoryRevision: contentRevision,
   graphRevision: sha256,
   identityContractVersion: id,
   parserContractVersion: id,
@@ -17,43 +20,29 @@ export const graphSnapshotRevisionV1Schema = z.object({
   policyHash: sha256,
   producerRevision: id,
   revisionChecksum: sha256,
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  if (value.sourceInventoryRevision !== `sha256:${value.sourceInventoryHash}`) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['sourceInventoryRevision'],
+      message: 'sourceInventoryRevision must bind sourceInventoryHash',
+    });
+  }
+});
 
 export type GraphSnapshotRevisionV1 = z.infer<typeof graphSnapshotRevisionV1Schema>;
-
-export type GraphSnapshotRevisionInputV1 = Omit<
-  GraphSnapshotRevisionV1,
-  'schema' | 'graphRevision' | 'revisionChecksum'
->;
+export type GraphSnapshotRevisionInputV1 = Omit<GraphSnapshotRevisionV1, 'schema' | 'graphRevision' | 'revisionChecksum'>;
 
 function canonicalJson(value: Record<string, unknown>): string {
-  return JSON.stringify(
-    Object.fromEntries(
-      Object.entries(value)
-        .sort(([left], [right]) => left.localeCompare(right))
-        .map(([key, item]) => [key, item]),
-    ),
-  );
+  return JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b))));
 }
-
 function digest(namespace: string, payload: Record<string, unknown>): string {
-  return createHash('sha256')
-    .update(namespace)
-    .update('\0')
-    .update(canonicalJson(payload))
-    .digest('hex');
+  return createHash('sha256').update(namespace).update('\0').update(canonicalJson(payload)).digest('hex');
 }
 
-/**
- * Content/revision identity for one logical graph snapshot.
- *
- * snapshotId is the immutable persistence occurrence ID. graphRevision is the
- * deterministic logical revision identity and therefore deliberately excludes
- * snapshotId and wall-clock timestamps so an identical rematerialization can
- * prove it represents the same graph world state.
- */
+/** Logical graph revision. snapshotId is occurrence identity and excluded. */
 export function deriveGraphRevisionV1(input: GraphSnapshotRevisionInputV1): string {
-  return digest('atlas.graph-revision.v1', {
+  return digest('atlas.graph-revision.v2', {
     workspaceRevision: input.workspaceRevision,
     sourceInventoryRevision: input.sourceInventoryRevision,
     identityContractVersion: input.identityContractVersion,
@@ -64,13 +53,11 @@ export function deriveGraphRevisionV1(input: GraphSnapshotRevisionInputV1): stri
   });
 }
 
-export function buildGraphSnapshotRevisionV1(
-  input: GraphSnapshotRevisionInputV1,
-): GraphSnapshotRevisionV1 {
+export function buildGraphSnapshotRevisionV1(input: GraphSnapshotRevisionInputV1): GraphSnapshotRevisionV1 {
   const parsedInput = z.object({
     snapshotId: z.string().uuid(),
-    workspaceRevision: id,
-    sourceInventoryRevision: id,
+    workspaceRevision: contentRevision,
+    sourceInventoryRevision: contentRevision,
     identityContractVersion: id,
     parserContractVersion: id,
     sourceInventoryHash: sha256,
@@ -78,40 +65,31 @@ export function buildGraphSnapshotRevisionV1(
     policyHash: sha256,
     producerRevision: id,
   }).strict().parse(input);
-
+  if (parsedInput.sourceInventoryRevision !== `sha256:${parsedInput.sourceInventoryHash}`) {
+    throw new Error('GRAPH_SOURCE_INVENTORY_REVISION_MISMATCH');
+  }
   const graphRevision = deriveGraphRevisionV1(parsedInput);
-  const withoutChecksum = {
-    schema: 'atlas.graph-snapshot-revision.v1' as const,
-    ...parsedInput,
-    graphRevision,
-  };
-  const revisionChecksum = digest('atlas.graph-snapshot-revision.v1', withoutChecksum);
-  return graphSnapshotRevisionV1Schema.parse({ ...withoutChecksum, revisionChecksum });
+  const withoutChecksum = { schema: 'atlas.graph-snapshot-revision.v1' as const, ...parsedInput, graphRevision };
+  return graphSnapshotRevisionV1Schema.parse({
+    ...withoutChecksum,
+    revisionChecksum: digest('atlas.graph-snapshot-revision.v2', withoutChecksum),
+  });
 }
 
 export function verifyGraphSnapshotRevisionV1(input: unknown): GraphSnapshotRevisionV1 {
   const parsed = graphSnapshotRevisionV1Schema.parse(input);
   const expectedGraphRevision = deriveGraphRevisionV1(parsed);
-  if (parsed.graphRevision !== expectedGraphRevision) {
-    throw new Error(`GRAPH_REVISION_MISMATCH:${parsed.snapshotId}`);
-  }
+  if (parsed.graphRevision !== expectedGraphRevision) throw new Error(`GRAPH_REVISION_MISMATCH:${parsed.snapshotId}`);
   const { revisionChecksum, ...withoutChecksum } = parsed;
-  const expectedChecksum = digest('atlas.graph-snapshot-revision.v1', withoutChecksum);
-  if (revisionChecksum !== expectedChecksum) {
-    throw new Error(`GRAPH_SNAPSHOT_REVISION_CHECKSUM_MISMATCH:${parsed.snapshotId}`);
-  }
+  const expectedChecksum = digest('atlas.graph-snapshot-revision.v2', withoutChecksum);
+  if (revisionChecksum !== expectedChecksum) throw new Error(`GRAPH_SNAPSHOT_REVISION_CHECKSUM_MISMATCH:${parsed.snapshotId}`);
   return parsed;
 }
 
-/**
- * Maps the existing materializer/writer evidence into first-class snapshot
- * revision columns. This helper does not write anything itself and does not
- * infer per-node sourceRevision.
- */
+/** Maps upstream workspace authority and the materializer's exact source inventory hash into persisted columns. */
 export function buildGraphSnapshotRevisionWriteV1(input: {
   snapshotId: string;
   workspaceRevision: string;
-  sourceInventorySnapshotId: string;
   identityContractVersion: string;
   parserContractVersion: string;
   sourceInventoryHash: string;
@@ -122,7 +100,7 @@ export function buildGraphSnapshotRevisionWriteV1(input: {
   const revision = buildGraphSnapshotRevisionV1({
     snapshotId: input.snapshotId,
     workspaceRevision: input.workspaceRevision,
-    sourceInventoryRevision: input.sourceInventorySnapshotId,
+    sourceInventoryRevision: `sha256:${input.sourceInventoryHash}`,
     identityContractVersion: input.identityContractVersion,
     parserContractVersion: input.parserContractVersion,
     sourceInventoryHash: input.sourceInventoryHash,
@@ -145,9 +123,10 @@ export function buildGraphSnapshotRevisionWriteV1(input: {
 
 export function describeGraphSnapshotRevisionOwnership(): string {
   return [
-    'atlas_graph_snapshots_v2 owns snapshot-scoped workspaceRevision, sourceInventoryRevision, graphRevision, topologyHash, and policyHash.',
-    'atlas_graph_nodes_v2 and atlas_graph_edges_v2 inherit those revisions through snapshot_id rather than duplicating them on every row.',
-    'atlas_graph_nodes_v2.source_revision is nullable and may be populated only by an authoritative source revision owner.',
-    'source_ref, content_hash, packet_key, tree_node_id, Neo4j IDs, Qdrant IDs, and GPU ordinals are not source-revision authority.',
+    'WorkspaceRevisionRecordV1 owns workspaceRevision; Git commit/tree IDs are provenance only.',
+    'atlas_graph_snapshots_v2 binds that upstream workspaceRevision to deterministic sourceInventoryRevision and graphRevision.',
+    'nodes and edges inherit snapshot revisions through snapshot_id rather than duplicating workspace/graph identity.',
+    'per-node source_revision may be populated only from authoritative CodeSourceRevisionV1 evidence.',
+    'source_ref, content_hash, packet/tree IDs, Qdrant/Neo4j IDs, and GPU ordinals never mint revision identity.',
   ].join(' ');
 }
