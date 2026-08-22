@@ -26,7 +26,7 @@ export const AdvisoryDecoderStateV1Schema = z.object({
 }).strict();
 export type AdvisoryDecoderStateV1 = z.infer<typeof AdvisoryDecoderStateV1Schema>;
 
-export const LlmPrefillEnvelopeV1Schema = z.object({
+const LlmPrefillEnvelopeBaseV1Schema = z.object({
   schema: z.literal('atlas.llm-prefill-envelope.v1'),
   modelProvider: z.string().min(1),
   modelId: z.string().min(1),
@@ -42,7 +42,9 @@ export const LlmPrefillEnvelopeV1Schema = z.object({
   routingReceiptChecksum: z.string().length(64),
   cacheKey: z.string().min(1),
   cacheable: z.boolean(),
-}).strict().superRefine((value, ctx) => {
+}).strict();
+
+export const LlmPrefillEnvelopeV1Schema = LlmPrefillEnvelopeBaseV1Schema.superRefine((value, ctx) => {
   const used = value.reservedOutputTokens + value.toolSchemaBudgetTokens + value.evidenceBudgetTokens + value.instructionBudgetTokens;
   if (used > value.contextWindowTokens) {
     ctx.addIssue({
@@ -54,7 +56,7 @@ export const LlmPrefillEnvelopeV1Schema = z.object({
 });
 export type LlmPrefillEnvelopeV1 = z.infer<typeof LlmPrefillEnvelopeV1Schema>;
 
-export const PrefillExecutionPlanV1Schema = z.object({
+const PrefillExecutionPlanBaseV1Schema = z.object({
   schema: z.literal('atlas.prefill-execution-plan.v1'),
   requestId: z.string().min(1),
   workflowId: z.string().min(1),
@@ -75,7 +77,12 @@ export const PrefillExecutionPlanV1Schema = z.object({
   canonicalWritesAllowed: z.boolean(),
   producerRevision: z.string().min(1),
   checksum: z.string().length(64),
-}).strict().superRefine((value, ctx) => {
+}).strict();
+
+function refinePrefillExecutionPlan(
+  value: z.infer<typeof PrefillExecutionPlanBaseV1Schema>,
+  ctx: z.RefinementCtx,
+): void {
   const applyAllowed = value.allowedOperationKinds.includes('APPLY');
   if (applyAllowed && !value.mutationAuthorized) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['mutationAuthorized'], message: 'APPLY requires mutationAuthorized=true' });
@@ -90,7 +97,9 @@ export const PrefillExecutionPlanV1Schema = z.object({
   if (value.prefill.selectedToolIds.join('\0') !== value.selectedToolIds.join('\0')) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['prefill', 'selectedToolIds'], message: 'prefill selected tools must exactly match plan selected tools' });
   }
-});
+}
+
+export const PrefillExecutionPlanV1Schema = PrefillExecutionPlanBaseV1Schema.superRefine(refinePrefillExecutionPlan);
 export type PrefillExecutionPlanV1 = z.infer<typeof PrefillExecutionPlanV1Schema>;
 
 function canonicalize(value: unknown): unknown {
@@ -117,11 +126,12 @@ export function createPrefillExecutionPlanV1(
     schema: 'atlas.prefill-execution-plan.v1' as const,
     queryHash: orchestrationChecksum(input.userQuery),
   };
-  const parsed = PrefillExecutionPlanV1Schema.omit({ checksum: true }).parse(withoutChecksum);
-  return PrefillExecutionPlanV1Schema.parse({
+  const parsed = PrefillExecutionPlanBaseV1Schema.omit({ checksum: true }).parse(withoutChecksum);
+  const candidate = PrefillExecutionPlanBaseV1Schema.parse({
     ...parsed,
     checksum: orchestrationChecksum(parsed),
   });
+  return PrefillExecutionPlanV1Schema.parse(candidate);
 }
 
 export function assertToolNominationAllowed(input: {
