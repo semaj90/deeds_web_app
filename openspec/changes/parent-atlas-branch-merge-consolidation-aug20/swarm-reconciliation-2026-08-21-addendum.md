@@ -885,3 +885,131 @@ back to smaller, well-verified merges rather than continuing to open
 new large branches. Most of the smallest/safest branches in the queue
 have now been triaged; remaining ones are larger and need a fresh
 review pass in a future session.
+
+## Session continuation - 2026-08-22
+
+Resumed the branch queue after a compaction boundary. Full methodology
+unchanged (merge-tree dry run, diff against real merge-base for duplicate-
+ownership check, verify content directly, merge via plumbing or direct
+commit, sync local main, run real tests/scripts, push).
+
+### Merged / folded this continuation
+
+- agent/ast-parity-corpus-hardening-v2-20260821 (commit 159845b637): hardens
+  the node-tree-sitter-vs-8095-sidecar corpus parity proof - direct unit
+  coverage for compareStructuralObservationsV2's one-to-one duplicate-name
+  matching, a runtimeAvailable gate distinguishing sidecar/Node
+  unavailability from a genuine mismatch, aggregate mismatch-class counts,
+  and a UTF-8/CRLF byte-preservation test for _raw_chunk_file.
+  agent/ast-parity-corpus-hardening-20260821 (the non-v2 sibling) confirmed
+  superseded - byte-identical 4-commit sequence, forked from an earlier
+  main; not merged separately.
+- Graphify revision-owner branch cluster (commit b04b10ef77): reconciled 4
+  branches all touching the same v2 migration/canary lineage.
+  - agent/graphify-revision-owner-reconciled-20260821: folded in a
+    genuinely missing graphify_runs_status_started_at_idx_v2 index and a
+    post-apply gate-order comment onto main's already-hardened SQL (this
+    branch predates the SAFETY CONTRACT hardening and lacked RESTRICT FKs /
+    source_manifest_source_count). Cherry-picked its new
+    graphify-revision-owner-v2.spec.ts (5 tests, previously uncovered on
+    main); fixed one stale fixture missing source_manifest_source_count.
+    5/5 passing.
+  - agent/graphify-revision-owner-converged-20260821: its
+    graphify-source-inventory-writer-v2.ts/.spec.ts and
+    prove-graphify-source-inventory-writer-v2.mts turned out byte-identical
+    to what's already on main (merged via an earlier branch this session) -
+    confirmed via direct diff, no action. Its SQL variant and rewritten
+    prove-code-revision-owner-canary.mts both predate main's hardening and
+    reintroduce the CASCADE-FK / DROP-CONSTRAINT pattern the hardening pass
+    deliberately removed - not merged. The canary rewrite itself
+    (workspace-source-binding-observation-backed readback proof,
+    REVISION_OWNER_PROVEN state machine) is a real architectural
+    advancement over main's current single-table canary but depends on a
+    companion observe-workspace-source-binding.mts that exists in neither
+    main nor this branch - flagged for a dedicated follow-up rather than
+    force-merged blind.
+  - agent/temporal-post-dispatch-proof-20260821: net-zero relative to its
+    own merge-base (self-canceling add-then-remove commits) - no unique
+    content, not merged.
+- agent/graph-snapshot-revision-owner-20260821 (commit 0dade05c65): its core
+  contract changes (graph-snapshot-revision-v1.ts/.spec.ts: sha256:-prefixed
+  content-addressed revisions, superRefine binding) are already superseded
+  on main, which moved the algorithm itself into the packages/parent-atlas
+  canonical owner and kept this file as a thin wire-compatibility adapter
+  with equivalent test coverage already in place. Two genuinely real, still-
+  open pieces were pulled in: (1) tightened the unapplied
+  20260822_graph_snapshot_revision_owner_v1.sql's two non-empty-string CHECK
+  constraints to real sha256:<64-hex> regex checks (confirmed unapplied via
+  sidecar-migrations.json, safe to edit in place); (2) fixed a real bug in
+  prove-graph-snapshot-revision-writer.mts - it called
+  buildGraphSnapshotRevisionV1() with hardcoded prose literals
+  ('canary:workspace:revision') that the now-stricter sha256: contract
+  would reject, meaning the canary would throw the moment
+  ATLAS_GRAPH_REVISION_CANARY=1 was ever set, never reaching its
+  rollback-only write/readback proof. Replaced with the branch's fix (reads
+  a real upstream WorkspaceRevisionRecordV1-shaped row from graphify_runs).
+  Verified live against the real DATABASE_URL: runs clean, correctly
+  reports GRAPH_SNAPSHOT_REVISION_MIGRATION_REQUIRED (accurate - this
+  migration is unapplied), no crash. Also swapped its hardcoded
+  legal_admin/123456 credential fallback for loadAtlasEnv().
+- agent/git-revision-semantics-proof-current-20260820 and
+  agent/git-revision-semantics-proof-20260820 confirmed superseded - both
+  predate the already-merged -20260821 sibling, which replaced the entire
+  buildGitRevisionSemanticsProofV1/buildGitSourceTreeEntryV1 design with
+  classifyGitSourceRevisionV1/classifyGitWorkspaceRevisionV1. Not a
+  duplicate-content match this time (main's version is a rewrite, not
+  identical), but the whole approach was intentionally replaced - nothing
+  to salvage.
+- agent/query-router-v2-proof-integration (commit 6f63f2e580, plus
+  verification commit 2e75c16e84): 3 new read-only/local-write-only proof
+  scripts for the existing query-router-v2 ecosystem
+  (query-router-dataset-v2.ts, retrieval-router-tensor-manifest-v2.ts,
+  retrieval-executor-policy-v2.ts, the PyTorch/XGBoost training scripts): a
+  readiness audit (file/hash + python module probes), a real EmbeddingGemma
+  source materializer (writes only local JSONL, no DB), and a synthetic
+  end-to-end plumbing proof (no external dependency at all). No filename
+  collision with the existing query-router-v2 files confirmed before
+  merging. Ran both the readiness audit and the plumbing proof live after
+  merging: READY_FOR_FROZEN_CORPUS_EVAL and SYNTHETIC_PLUMBING_PROVEN
+  respectively - committed the report output as evidence.
+
+### New finding this continuation - orphaned root-level src/ tree
+
+Discovered while investigating agent/search-runtime-domain-feature-20260822
+(a fresh branch, ahead=4/behind=1, whose 4 commits are titled exactly like a
+fix for the domain-reranking gap flagged in the
+parent-atlas-retrieval-lod-algorithm-taxonomy OpenSpec update - see below):
+its diff touches src/lib/server/atlas/runtime/search-runtime.ts at the repo
+root, not sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts (the
+real, 1359-line production SearchRuntime). The repo root has a completely
+separate, tracked src/ tree - 202 files, 113+ historical commits dating back
+to old-style commit messages ("9_11_nextsteps", "errorclean") that look
+like a pre-restructure snapshot from before the app moved into
+sveltekit-frontend/. It is not declared in the root package.json workspaces
+array (only lists packages/*), not excluded in root tsconfig.json, not
+referenced by any build/vitest config. Its search-runtime.ts is a 108-line
+toy reimplementation with a different shape than the real one, and imports
+classifyDomainFromText from classifier/domain-classifier.ts - the exact
+dead-code function (zero real callers in the real sveltekit-frontend/src
+tree) flagged in the parent-atlas-retrieval-lod-algorithm-taxonomy OpenSpec
+reconciliation. Presented this to the operator with 4 options (archive,
+leave-alone-skip-branch, investigate further, defer); operator chose to
+defer - continue the branch queue for now, revisit the root src/ question
+in a dedicated follow-up. agent/search-runtime-domain-feature-20260822 is
+therefore intentionally skipped, not merged, pending that follow-up - it
+would add real-looking work to a file nothing imports or runs.
+
+### Separate OpenSpec update this session (different change directory)
+
+Reconciled a stale July 13, 2026 "End-to-End Gaps" status doc against the
+real sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts pipeline
+in openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md
+(commit f0a2a85396). Key findings: PageRank, SOM to Neo4j fan-out, Postgres
+to Neo4j fan-out, domain classification, and title generation are all
+actually live (the doc called 4 of these missing) via a transactional-
+outbox promotion pattern the doc didn't anticipate; domain classification
+runs strictly after rerank/postProcess, so "domain-aware reranking boost"
+specifically remains undone; a 5-way domain-classifier duplication was
+found and classified per the root CLAUDE.md governance vocabulary (3
+legitimate distinct-layer owners, 1 dead file, 1 out-of-scope). See that
+file directly for the full table and evidence.
