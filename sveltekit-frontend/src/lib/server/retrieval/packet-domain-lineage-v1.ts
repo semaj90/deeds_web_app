@@ -62,6 +62,21 @@ export interface PacketDomainLineageHydrationProofV1 {
   statusCounts: Record<PacketDomainLineageStatusV1, number>;
 }
 
+/**
+ * Additive runtime evidence carried only after the exact packet/domain readback.
+ * The legacy FeatureEnvelope contract stays stable; callers that need domain
+ * provenance opt into this stronger type instead of making every envelope
+ * pretend that classifier lineage exists.
+ */
+export type PacketDomainFeatureEnvelopeV1 = FeatureEnvelope & {
+  domain_class_source: string | null;
+  domain_classifier_version: string | null;
+  domain_class_confidence: number | null;
+  domain_fact_content_hash: string | null;
+  domain_lineage_status: PacketDomainLineageStatusV1;
+  reward_prior: number | null;
+};
+
 function cleanSourceRef(value: string | null | undefined): string {
   return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
 }
@@ -225,7 +240,10 @@ function emptyStatusCounts(): Record<PacketDomainLineageStatusV1, number> {
   ) as Record<PacketDomainLineageStatusV1, number>;
 }
 
-function applyLineage(envelope: FeatureEnvelope, lineage: PacketDomainLineageV1): FeatureEnvelope {
+function applyLineage(
+  envelope: FeatureEnvelope,
+  lineage: PacketDomainLineageV1,
+): PacketDomainFeatureEnvelopeV1 {
   return {
     ...envelope,
     domain_class: lineage.domainClass ?? envelope.domain_class,
@@ -247,7 +265,7 @@ function applyLineage(envelope: FeatureEnvelope, lineage: PacketDomainLineageV1)
  */
 export async function hydratePacketDomainLineageV1(
   envelopes: FeatureEnvelope[],
-): Promise<{ envelopes: FeatureEnvelope[]; proof: PacketDomainLineageHydrationProofV1 }> {
+): Promise<{ envelopes: PacketDomainFeatureEnvelopeV1[]; proof: PacketDomainLineageHydrationProofV1 }> {
   const packetKeys = [...new Set(
     envelopes.map((envelope) => envelope.packet_key?.trim()).filter((value): value is string => Boolean(value)),
   )];
