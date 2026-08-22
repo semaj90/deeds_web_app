@@ -15,6 +15,22 @@
         "apiKey": "local"
       },
       "models": {
+        "hforf.gguf": {
+          "name": "Ornith 1.0 9B",
+          "tools": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          },
+          "options": {
+            "temperature": 0.6,
+            "topP": 0.95,
+            "topK": 20,
+            "stream": true,
+            "maxTokens": 4096
+          }
+        },
         "gemma4-legal-iq4xs-direct.gguf": {
           "name": "Gemma4 Legal Direct 65K",
           "tools": true,
