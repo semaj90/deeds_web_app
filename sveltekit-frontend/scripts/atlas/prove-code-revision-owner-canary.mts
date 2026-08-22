@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -18,7 +18,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND = path.resolve(HERE, '../..');
 const REPO_ROOT = path.resolve(FRONTEND, '..');
 const DATABASE_URL = process.env.DATABASE_URL;
-const PRODUCER_REVISION = 'atlas.code-revision-owner-canary.proof.v2';
+const PRODUCER_REVISION = 'atlas.code-revision-owner-canary.proof.v3';
+const CANONICAL_WRITER_RELATIVE = 'sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v1.ts';
+const CANONICAL_WRITER = path.resolve(REPO_ROOT, CANONICAL_WRITER_RELATIVE);
 const SAMPLE_SOURCE = path.resolve(
   REPO_ROOT,
   process.env.ATLAS_CODE_REVISION_CANARY_SOURCE
@@ -140,7 +142,7 @@ try {
     'CodeSourceRevisionV1 is sha256 of exact UTF-8 source bytes, encoded as sha256:<digest>.',
     'Historical graphify_files.source_revision may remain a Git provenance coordinate; it is never reinterpreted by this proof.',
     'Historical graphify_files.content_hash may serve as the exact-byte source-revision authority when it is a SHA-256 digest.',
-    'A deterministic formula is not durable revision authority until a production writer and matching persisted canary are proven.',
+    'Durable revision authority additionally requires the canonical writer to be present and at least one exact persisted readback match.',
   ];
 
   if (graphifyFilesPresent && fileColumns.has('source_revision') && fileColumns.has('content_hash')) {
@@ -190,11 +192,17 @@ try {
     }
   }
 
-  // Repository census still has no trustworthy enrolled origin writer. Keep
-  // this false until a canonical Graphify source-inventory writer computes
-  // Git HEAD and exact-byte source digest inside its own write boundary.
-  const productionWriterPath: string | null = null;
-  const productionWriterPresent = false;
+  let productionWriterPresent = false;
+  try {
+    await access(CANONICAL_WRITER);
+    productionWriterPresent = true;
+  } catch {
+    productionWriterPresent = false;
+  }
+  const productionWriterPath = productionWriterPresent ? CANONICAL_WRITER_RELATIVE : null;
+  if (productionWriterPresent) {
+    notes.push(`Canonical Graphify source-inventory writer present: ${CANONICAL_WRITER_RELATIVE}.`);
+  }
 
   const storage: CodeRevisionStorageObservationV1 = {
     graphifyRunsPresent,
@@ -203,8 +211,8 @@ try {
     requiredFileColumnsPresent,
     productionWriterPath,
     productionWriterPresent,
-    productionWriterCreatesWorkspaceRevision: false,
-    productionWriterCreatesSourceRevision: false,
+    productionWriterCreatesWorkspaceRevision: productionWriterPresent,
+    productionWriterCreatesSourceRevision: productionWriterPresent,
     persistedMatchingRows,
     sourceRevisionStorageSemantics,
     sourceRevisionAuthorityField,
@@ -226,6 +234,8 @@ try {
     sourceRef: receipt.authority.sourceRef,
     sourceRevisionStorageSemantics: receipt.storage.sourceRevisionStorageSemantics,
     sourceRevisionAuthorityField: receipt.storage.sourceRevisionAuthorityField,
+    productionWriterPath: receipt.storage.productionWriterPath,
+    productionWriterPresent: receipt.storage.productionWriterPresent,
     persistedMatchingRows: receipt.storage.persistedMatchingRows,
     durableOwnerBound: receipt.durableOwnerBound,
     revisionOwnerProven: receipt.revisionOwnerProven,
