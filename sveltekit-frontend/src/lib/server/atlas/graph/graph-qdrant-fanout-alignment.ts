@@ -17,11 +17,14 @@ export interface GraphQdrantFanoutAlignmentResult {
   sourceRefCorroborated: boolean;
   treeNodeIdCorroborated: boolean;
   sourceRevisionAligned: boolean;
+  repositoryRevisionAligned: boolean;
+  /** @deprecated Alias for repositoryRevisionAligned; retained for existing report consumers. */
   workspaceRevisionAligned: boolean;
   graphRevisionAligned: boolean;
   semanticRepresentationAligned: boolean;
   representationRevisionAligned: boolean;
   qdrantPayloadPresent: boolean;
+  legacyWorkspaceCacheRevisionObserved: string | null;
   status: 'ALIGNED' | 'LINEAGE_GAP' | 'IDENTITY_MISMATCH' | 'MISSING_PROJECTION';
 }
 
@@ -45,6 +48,12 @@ function contradicts(expected: string | null | undefined, observed: string | nul
  * with the canonical graph/Postgres evidence. source_ref and tree_node_id may
  * corroborate or contradict the match but can never prove canonical identity by
  * themselves. Qdrant point IDs are intentionally absent from this contract.
+ *
+ * Revision semantics are intentionally split:
+ * - GraphSnapshotRevisionV1.workspaceRevision is a repository/Git code-world
+ *   coordinate and MUST match payload.repository_revision.
+ * - payload.workspace_revision / workspace_cache_revision are historical
+ *   integer packet/cache epochs and MUST NOT satisfy this gate.
  */
 export function evaluateGraphQdrantFanoutAlignment(
   input: GraphQdrantFanoutAlignmentInput,
@@ -57,11 +66,13 @@ export function evaluateGraphQdrantFanoutAlignment(
       sourceRefCorroborated: false,
       treeNodeIdCorroborated: false,
       sourceRevisionAligned: false,
+      repositoryRevisionAligned: false,
       workspaceRevisionAligned: false,
       graphRevisionAligned: false,
       semanticRepresentationAligned: false,
       representationRevisionAligned: false,
       qdrantPayloadPresent: false,
+      legacyWorkspaceCacheRevisionObserved: null,
       status: 'MISSING_PROJECTION',
     };
   }
@@ -94,7 +105,11 @@ export function evaluateGraphQdrantFanoutAlignment(
   const canonicalIdentityMatch = Boolean(strongIdentityEvidence) && !identityContradiction;
   const sourceRefCorroborated = Boolean(input.sourceRef && payloadSourceRef === input.sourceRef);
   const treeNodeIdCorroborated = Boolean(input.treeNodeId && payloadTreeNodeId === input.treeNodeId);
-  const workspaceRevisionAligned = text(payload.workspace_revision) === input.workspaceRevision;
+  const repositoryRevisionAligned = text(payload.repository_revision) === input.workspaceRevision;
+  const workspaceRevisionAligned = repositoryRevisionAligned;
+  const legacyWorkspaceCacheRevisionObserved = comparableRevision(
+    payload.workspace_cache_revision ?? payload.workspace_revision,
+  );
   const graphRevisionAligned = text(payload.graph_revision) === input.graphRevision;
   const sourceRevisionAligned = input.sourceRevision
     ? text(payload.source_revision) === input.sourceRevision
@@ -108,7 +123,7 @@ export function evaluateGraphQdrantFanoutAlignment(
 
   const status = !canonicalIdentityMatch
     ? 'IDENTITY_MISMATCH'
-    : !workspaceRevisionAligned
+    : !repositoryRevisionAligned
       || !graphRevisionAligned
       || !sourceRevisionAligned
       || !semanticRepresentationAligned
@@ -122,11 +137,13 @@ export function evaluateGraphQdrantFanoutAlignment(
     sourceRefCorroborated,
     treeNodeIdCorroborated,
     sourceRevisionAligned,
+    repositoryRevisionAligned,
     workspaceRevisionAligned,
     graphRevisionAligned,
     semanticRepresentationAligned,
     representationRevisionAligned,
     qdrantPayloadPresent: true,
+    legacyWorkspaceCacheRevisionObserved,
     status,
   };
 }
