@@ -133,8 +133,7 @@ def parse_ordinals(value: str | None, row_count: int) -> list[int]:
 
 
 def pyarrow_value(column: Any, index: int) -> Any:
-    value = column[index].as_py()
-    return value
+    return column[index].as_py()
 
 
 def verify_expected(table: Any, expected: dict[str, Any], selected_features: list[str]) -> None:
@@ -163,7 +162,6 @@ def verify_expected(table: Any, expected: dict[str, Any], selected_features: lis
             actual_present = int(pyarrow_value(presence, row))
             expected_value = float(expected["featureValues"][cell])
             expected_present = int(expected["featurePresence"][cell])
-            # Arrow stores the already-rounded float32 physical value.
             if abs(actual_value - expected_value) > 1e-6:
                 raise ValueError(f"CANDIDATE_FEATURE_MMAP_FEATURE_VALUE_MISMATCH:{row}:{feature_name}")
             if actual_present != expected_present:
@@ -219,23 +217,19 @@ def main() -> int:
                 import pyarrow as pa  # type: ignore
                 import pyarrow.ipc as ipc  # type: ignore
             except ImportError:
-                print(
-                    json.dumps(
-                        {
-                            **base_receipt,
-                            "status": "MMAP_FILE_PROVEN_PYARROW_BLOCKED",
-                            "pyarrowAvailable": False,
-                            "arrowReadbackProven": False,
-                            "blocker": "PYARROW_NOT_INSTALLED",
-                        },
-                        indent=2,
-                    )
-                )
+                print(json.dumps({
+                    **base_receipt,
+                    "status": "MMAP_FILE_PROVEN_PYARROW_BLOCKED",
+                    "pyarrowAvailable": False,
+                    "arrowReadbackProven": False,
+                    "blocker": "PYARROW_NOT_INSTALLED",
+                }, indent=2))
                 return 3
 
-            # BufferReader over a memoryview of the actual OS mapping keeps the Arrow
-            # parser on the mapped bytes for this proof; no mutable store is involved.
             mapped_view = memoryview(mapped)
+            reader = None
+            ipc_file = None
+            table = None
             try:
                 reader = pa.BufferReader(mapped_view)
                 ipc_file = ipc.open_file(reader)
@@ -262,31 +256,36 @@ def main() -> int:
                     }
                     for ordinal in selected_ordinals
                 ]
-                print(
-                    json.dumps(
-                        {
-                            **base_receipt,
-                            "status": "CANDIDATE_FEATURE_ARROW_MMAP_PROVEN",
-                            "pyarrowAvailable": True,
-                            "arrowReadbackProven": True,
-                            "denseOrdinalVerified": True,
-                            "expectedColumnarVerified": expected is not None,
-                            "rowCount": row_count,
-                            "selectedRowCount": len(selected_rows),
-                            "selectedFeatures": selected_features,
-                            "selectedRows": selected_rows,
-                        },
-                        indent=2,
-                    )
-                )
-                return 0
+                output = {
+                    **base_receipt,
+                    "status": "CANDIDATE_FEATURE_ARROW_MMAP_PROVEN",
+                    "pyarrowAvailable": True,
+                    "arrowReadbackProven": True,
+                    "denseOrdinalVerified": True,
+                    "expectedColumnarVerified": expected is not None,
+                    "rowCount": row_count,
+                    "selectedRowCount": len(selected_rows),
+                    "selectedFeatures": selected_features,
+                    "selectedRows": selected_rows,
+                }
             finally:
+                # PyArrow may retain references to the exported mmap memoryview.
+                # Drop the table and reader before releasing the view so the
+                # surrounding mmap context can close deterministically.
+                table = None
+                ipc_file = None
+                if reader is not None:
+                    reader.close()
+                reader = None
                 mapped_view.release()
+
+            print(json.dumps(output, indent=2))
+            return 0
 
 
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except Exception as exc:  # deliberate compact proof failure surface
+    except Exception as exc:
         print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
         raise SystemExit(1)
