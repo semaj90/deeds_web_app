@@ -7,15 +7,17 @@
 --   graphify_files.content_hash       = exact-byte SHA-256 digest
 --
 -- Current Parent Atlas logical revisions are additive and first-class:
---   graphify_runs.workspace_revision    = sha256:<sorted exact-byte source manifest>
---   graphify_files.code_source_revision = sha256:<content_hash>
+--   graphify_runs.workspace_revision          = sha256:<sorted exact-byte source manifest>
+--   graphify_runs.source_manifest_digest      = exact WorkspaceRevisionRecordV1 manifest digest
+--   graphify_runs.source_manifest_source_count = exact number of indexed sources in that manifest
+--   graphify_files.code_source_revision       = sha256:<content_hash>
 --
 -- Safety:
 --   * Creates only graphify_runs / graphify_files when the historical base migration was never applied.
---   * No backfill and no UPDATE / DELETE.
+--   * No backfill and no UPDATE / DELETE of historical rows.
 --   * Existing repository_revision/source_revision values are preserved.
 --   * Existing rows are never promoted merely because the v2 columns exist.
---   * FANOUT remains blocked until one controlled writer row and independent read-only proof agree.
+--   * FANOUT remains blocked until a complete persisted manifest and independent read-only proof agree.
 
 BEGIN;
 
@@ -51,7 +53,8 @@ CREATE TABLE IF NOT EXISTS public.graphify_files (
 
 ALTER TABLE public.graphify_runs
   ADD COLUMN IF NOT EXISTS workspace_revision text,
-  ADD COLUMN IF NOT EXISTS source_manifest_digest text;
+  ADD COLUMN IF NOT EXISTS source_manifest_digest text,
+  ADD COLUMN IF NOT EXISTS source_manifest_source_count integer;
 
 ALTER TABLE public.graphify_files
   ADD COLUMN IF NOT EXISTS code_source_revision text;
@@ -76,6 +79,16 @@ BEGIN
     ALTER TABLE public.graphify_runs
       ADD CONSTRAINT graphify_runs_source_manifest_digest_sha256_v2
       CHECK (source_manifest_digest IS NULL OR source_manifest_digest ~ '^[a-f0-9]{64}$') NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.graphify_runs'::regclass
+      AND conname = 'graphify_runs_source_manifest_source_count_v2'
+  ) THEN
+    ALTER TABLE public.graphify_runs
+      ADD CONSTRAINT graphify_runs_source_manifest_source_count_v2
+      CHECK (source_manifest_source_count IS NULL OR source_manifest_source_count > 0) NOT VALID;
   END IF;
 
   IF NOT EXISTS (
@@ -114,5 +127,14 @@ CREATE INDEX IF NOT EXISTS graphify_files_content_hash_idx_v2
   ON public.graphify_files (content_hash);
 CREATE INDEX IF NOT EXISTS graphify_files_last_seen_run_id_idx_v2
   ON public.graphify_files (last_seen_run_id);
+
+COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
+  'Canonical WorkspaceRevisionRecordV1 world-state identity; Git revision is provenance only.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_digest IS
+  'WorkspaceRevisionRecordV1 sourceManifestDigest bound by workspace_revision = sha256:<digest>.';
+COMMENT ON COLUMN public.graphify_runs.source_manifest_source_count IS
+  'Exact sourceCount from WorkspaceRevisionRecordV1. A graph consumer must prove this many exact source bindings before consuming the run as complete.';
+COMMENT ON COLUMN public.graphify_files.code_source_revision IS
+  'Canonical CodeSourceRevisionV1 identity for exact UTF-8 source bytes.';
 
 COMMIT;
