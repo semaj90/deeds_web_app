@@ -1,12 +1,12 @@
 {
   "schema": "atlas.node-tree-sitter-corpus-parity.v2",
-  "generatedAt": "2026-08-23T23:35:32.896Z",
+  "generatedAt": "2026-08-23T23:56:50.592Z",
   "mode": "READ_ONLY_NO_PERSISTENCE",
   "status": "CORPUS_PARITY_MISMATCH",
   "git": {
-    "head": "0952b72dfce405b8ae15e827fd1336f802339fee",
+    "head": "f45052109c7460dd6721ddb74b139bde0ab67377",
     "providerPath": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
-    "providerBlobSha": "29f1081eda063f45044690ea8ce05caac3356e73",
+    "providerBlobSha": "56a08ce1038505f37330077f3d1f0eb324a41a9d",
     "sidecarPath": "python/miniforge_nlp_sidecar_v2.py",
     "sidecarBlobSha": "666b15c63aa2cdafe942928a71de01a46c9fdbdc",
     "comparatorPath": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.ts",
@@ -23,14 +23,13 @@
     "sourceBytesFrozen": "66/66",
     "nodeSpanSelfValid": "66/66",
     "sidecarSpanSelfValid": "66/66",
-    "namedSymbolCoverage": "45/66",
-    "semanticKindParity": "45/66",
-    "exactSpanParity": "45/66",
-    "fullParity": "45/66"
+    "namedSymbolCoverage": "66/66",
+    "semanticKindParity": "63/66",
+    "exactSpanParity": "66/66",
+    "fullParity": "63/66"
   },
   "mismatchCounts": {
-    "NAMED_SYMBOL_MISSING_LEFT": 12,
-    "NAMED_SYMBOL_MISSING_RIGHT": 60
+    "SEMANTIC_KIND_UNKNOWN_BOTH": 4
   },
   "interpretation": {
     "fragmentIsNotVariable": true,
@@ -71,33 +70,62 @@
         "engine": "node-tree-sitter",
         "engineVersion": "0.25.1",
         "diagnostics": [],
-        "observationCount": 3
+        "observationCount": 4
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 2,
+        "leftNamedCount": 3,
         "rightNamedCount": 3,
-        "pairedCount": 2,
+        "pairedCount": 3,
         "unmatchedLeft": [],
-        "unmatchedRight": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "internal_module",
-            "rawKind": "fragment",
-            "symbolKind": "UNKNOWN",
-            "name": "NodeJS",
-            "startByte": 144,
-            "endByte": 244,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "internal_module"
-            ],
-            "parentContext": ""
-          }
-        ],
+        "unmatchedRight": [],
         "pairs": [
+          {
+            "name": "NodeJS",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "internal_module",
+              "rawKind": "NAMESPACE",
+              "symbolKind": "UNKNOWN",
+              "name": "NodeJS",
+              "startByte": 144,
+              "endByte": 244,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "statement_block",
+                "expression_statement"
+              ],
+              "parentContext": "expression_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "internal_module",
+              "rawKind": "fragment",
+              "symbolKind": "UNKNOWN",
+              "name": "NodeJS",
+              "startByte": 144,
+              "endByte": 244,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "internal_module"
+              ],
+              "parentContext": ""
+            },
+            "semanticKindComparable": false,
+            "semanticKindMatch": false,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": [
+              "SEMANTIC_KIND_UNKNOWN_BOTH"
+            ]
+          },
           {
             "name": "ProcessEnv",
             "left": {
@@ -190,14 +218,14 @@
           }
         ],
         "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_LEFT": 1
+          "SEMANTIC_KIND_UNKNOWN_BOTH": 1
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
+          "namedSymbolCoverage": true,
           "semanticKindParity": false,
-          "exactSpanParity": false
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -205,9 +233,9 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
+        "namedSymbolCoverage": true,
         "semanticKindParity": false,
-        "exactSpanParity": false
+        "exactSpanParity": true
       },
       "fullParity": false
     },
@@ -269,139 +297,106 @@
         "diagnostics": [
           "TREE_SITTER_MISSING:identifier:2220"
         ],
-        "observationCount": 9
+        "observationCount": 16
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 8,
+        "leftNamedCount": 15,
         "rightNamedCount": 15,
-        "pairedCount": 8,
+        "pairedCount": 15,
         "unmatchedLeft": [],
-        "unmatchedRight": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "internal_module",
-            "rawKind": "fragment",
-            "symbolKind": "UNKNOWN",
-            "name": "App",
-            "startByte": 179,
-            "endByte": 370,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "internal_module"
-            ],
-            "parentContext": ""
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "internal_module",
-            "rawKind": "fragment",
-            "symbolKind": "UNKNOWN",
-            "name": "App",
-            "startByte": 433,
-            "endByte": 1085,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "internal_module"
-            ],
-            "parentContext": ""
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "function_signature",
-            "rawKind": "function",
-            "symbolKind": "FUNCTION",
-            "name": "lexer",
-            "startByte": 2389,
-            "endByte": 2439,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "module",
-              "export_statement",
-              "function_signature"
-            ],
-            "parentContext": "export_statement"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "function_signature",
-            "rawKind": "function",
-            "symbolKind": "FUNCTION",
-            "name": "marked",
-            "startByte": 2264,
-            "endByte": 2316,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "module",
-              "export_statement",
-              "function_signature"
-            ],
-            "parentContext": "export_statement"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "function_signature",
-            "rawKind": "function",
-            "symbolKind": "FUNCTION",
-            "name": "parse",
-            "startByte": 2327,
-            "endByte": 2378,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "module",
-              "export_statement",
-              "function_signature"
-            ],
-            "parentContext": "export_statement"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "function_signature",
-            "rawKind": "function",
-            "symbolKind": "FUNCTION",
-            "name": "parser",
-            "startByte": 2450,
-            "endByte": 2504,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "module",
-              "export_statement",
-              "function_signature"
-            ],
-            "parentContext": "export_statement"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "function_signature",
-            "rawKind": "function",
-            "symbolKind": "FUNCTION",
-            "name": "useSonner",
-            "startByte": 1886,
-            "endByte": 1912,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "module",
-              "export_statement",
-              "function_signature"
-            ],
-            "parentContext": "export_statement"
-          }
-        ],
+        "unmatchedRight": [],
         "pairs": [
+          {
+            "name": "App",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "internal_module",
+              "rawKind": "NAMESPACE",
+              "symbolKind": "UNKNOWN",
+              "name": "App",
+              "startByte": 179,
+              "endByte": 370,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration"
+              ],
+              "parentContext": "ambient_declaration"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "internal_module",
+              "rawKind": "fragment",
+              "symbolKind": "UNKNOWN",
+              "name": "App",
+              "startByte": 179,
+              "endByte": 370,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "internal_module"
+              ],
+              "parentContext": ""
+            },
+            "semanticKindComparable": false,
+            "semanticKindMatch": false,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": [
+              "SEMANTIC_KIND_UNKNOWN_BOTH"
+            ]
+          },
+          {
+            "name": "App",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "internal_module",
+              "rawKind": "NAMESPACE",
+              "symbolKind": "UNKNOWN",
+              "name": "App",
+              "startByte": 433,
+              "endByte": 1085,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "statement_block",
+                "expression_statement"
+              ],
+              "parentContext": "expression_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "internal_module",
+              "rawKind": "fragment",
+              "symbolKind": "UNKNOWN",
+              "name": "App",
+              "startByte": 433,
+              "endByte": 1085,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "internal_module"
+              ],
+              "parentContext": ""
+            },
+            "semanticKindComparable": false,
+            "semanticKindMatch": false,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": [
+              "SEMANTIC_KIND_UNKNOWN_BOTH"
+            ]
+          },
           {
             "name": "Error",
             "left": {
@@ -534,6 +529,53 @@
             "mismatchClasses": []
           },
           {
+            "name": "lexer",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "function_signature",
+              "rawKind": "FUNCTION",
+              "symbolKind": "FUNCTION",
+              "name": "lexer",
+              "startByte": 2389,
+              "endByte": 2439,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "module",
+                "statement_block",
+                "export_statement"
+              ],
+              "parentContext": "export_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "function_signature",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
+              "name": "lexer",
+              "startByte": 2389,
+              "endByte": 2439,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "module",
+                "export_statement",
+                "function_signature"
+              ],
+              "parentContext": "export_statement"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
             "name": "Locals",
             "left": {
               "schema": "atlas.structural-observation.v1",
@@ -581,6 +623,53 @@
             "mismatchClasses": []
           },
           {
+            "name": "marked",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "function_signature",
+              "rawKind": "FUNCTION",
+              "symbolKind": "FUNCTION",
+              "name": "marked",
+              "startByte": 2264,
+              "endByte": 2316,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "module",
+                "statement_block",
+                "export_statement"
+              ],
+              "parentContext": "export_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "function_signature",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
+              "name": "marked",
+              "startByte": 2264,
+              "endByte": 2316,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "module",
+                "export_statement",
+                "function_signature"
+              ],
+              "parentContext": "export_statement"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
             "name": "PageState",
             "left": {
               "schema": "atlas.structural-observation.v1",
@@ -619,6 +708,100 @@
                 "interface_declaration"
               ],
               "parentContext": "internal_module"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
+            "name": "parse",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "function_signature",
+              "rawKind": "FUNCTION",
+              "symbolKind": "FUNCTION",
+              "name": "parse",
+              "startByte": 2327,
+              "endByte": 2378,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "module",
+                "statement_block",
+                "export_statement"
+              ],
+              "parentContext": "export_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "function_signature",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
+              "name": "parse",
+              "startByte": 2327,
+              "endByte": 2378,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "module",
+                "export_statement",
+                "function_signature"
+              ],
+              "parentContext": "export_statement"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
+            "name": "parser",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "function_signature",
+              "rawKind": "FUNCTION",
+              "symbolKind": "FUNCTION",
+              "name": "parser",
+              "startByte": 2450,
+              "endByte": 2504,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "module",
+                "statement_block",
+                "export_statement"
+              ],
+              "parentContext": "export_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "function_signature",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
+              "name": "parser",
+              "startByte": 2450,
+              "endByte": 2504,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "module",
+                "export_statement",
+                "function_signature"
+              ],
+              "parentContext": "export_statement"
             },
             "semanticKindComparable": true,
             "semanticKindMatch": true,
@@ -769,17 +952,64 @@
             "startByteDelta": 0,
             "endByteDelta": 0,
             "mismatchClasses": []
+          },
+          {
+            "name": "useSonner",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "function_signature",
+              "rawKind": "FUNCTION",
+              "symbolKind": "FUNCTION",
+              "name": "useSonner",
+              "startByte": 1886,
+              "endByte": 1912,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "module",
+                "statement_block",
+                "export_statement"
+              ],
+              "parentContext": "export_statement"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "function_signature",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
+              "name": "useSonner",
+              "startByte": 1886,
+              "endByte": 1912,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "module",
+                "export_statement",
+                "function_signature"
+              ],
+              "parentContext": "export_statement"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
           }
         ],
         "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_LEFT": 7
+          "SEMANTIC_KIND_UNKNOWN_BOTH": 2
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
+          "namedSymbolCoverage": true,
           "semanticKindParity": false,
-          "exactSpanParity": false
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -787,9 +1017,9 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
+        "namedSymbolCoverage": true,
         "semanticKindParity": false,
-        "exactSpanParity": false
+        "exactSpanParity": true
       },
       "fullParity": false
     },
@@ -858,35 +1088,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 27,
+        "leftNamedCount": 26,
         "rightNamedCount": 26,
         "pairedCount": 26,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ firstName, lastName, email }",
-            "startByte": 828,
-            "endByte": 878,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "class_declaration",
-              "class_body",
-              "public_field_definition",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -2123,15 +2328,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -2139,11 +2342,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/custom-modules.d.ts",
@@ -2692,50 +2895,15 @@
         "engine": "node-tree-sitter",
         "engineVersion": "0.25.1",
         "diagnostics": [],
-        "observationCount": 16
+        "observationCount": 18
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 15,
+        "leftNamedCount": 17,
         "rightNamedCount": 17,
-        "pairedCount": 15,
+        "pairedCount": 17,
         "unmatchedLeft": [],
-        "unmatchedRight": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "method_signature",
-            "rawKind": "method",
-            "symbolKind": "METHOD",
-            "name": "getAcceleration",
-            "startByte": 3038,
-            "endByte": 3064,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "interface_declaration",
-              "method_signature"
-            ],
-            "parentContext": "interface_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "method_signature",
-            "rawKind": "method",
-            "symbolKind": "METHOD",
-            "name": "requestAdapter",
-            "startByte": 2865,
-            "endByte": 2895,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "interface_declaration",
-              "method_signature"
-            ],
-            "parentContext": "interface_declaration"
-          }
-        ],
+        "unmatchedRight": [],
         "pairs": [
           {
             "name": "component",
@@ -3065,6 +3233,55 @@
             "mismatchClasses": []
           },
           {
+            "name": "getAcceleration",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "method_signature",
+              "rawKind": "METHOD",
+              "symbolKind": "METHOD",
+              "name": "getAcceleration",
+              "startByte": 3038,
+              "endByte": 3064,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "statement_block",
+                "interface_declaration",
+                "interface_body",
+                "property_signature",
+                "type_annotation",
+                "object_type"
+              ],
+              "parentContext": "object_type"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "method_signature",
+              "rawKind": "method",
+              "symbolKind": "METHOD",
+              "name": "getAcceleration",
+              "startByte": 3038,
+              "endByte": 3064,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "interface_declaration",
+                "method_signature"
+              ],
+              "parentContext": "interface_declaration"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
             "name": "GPU",
             "left": {
               "schema": "atlas.structural-observation.v1",
@@ -3292,6 +3509,52 @@
             "mismatchClasses": []
           },
           {
+            "name": "requestAdapter",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "method_signature",
+              "rawKind": "METHOD",
+              "symbolKind": "METHOD",
+              "name": "requestAdapter",
+              "startByte": 2865,
+              "endByte": 2895,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration",
+                "statement_block",
+                "interface_declaration",
+                "interface_body"
+              ],
+              "parentContext": "interface_body"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "method_signature",
+              "rawKind": "method",
+              "symbolKind": "METHOD",
+              "name": "requestAdapter",
+              "startByte": 2865,
+              "endByte": 2895,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "interface_declaration",
+                "method_signature"
+              ],
+              "parentContext": "interface_declaration"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
             "name": "Timestamp",
             "left": {
               "schema": "atlas.structural-observation.v1",
@@ -3429,15 +3692,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_LEFT": 2
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -3445,11 +3706,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/hooks.client.ts",
@@ -3508,53 +3769,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 16,
+        "leftNamedCount": 14,
         "rightNamedCount": 14,
         "pairedCount": 14,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ initE2B }",
-            "startByte": 4497,
-            "endByte": 4555,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ warmSynthesisCache }",
-            "startByte": 4793,
-            "endByte": 4865,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -4161,15 +4379,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 2
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -4177,11 +4393,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/hooks.server.ts",
@@ -4212,208 +4428,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 105,
+        "leftNamedCount": 97,
         "rightNamedCount": 97,
         "pairedCount": 97,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "[\n        { createDefaultRegistry },\n        { startDocumentEmbedConsumer },\n        { startAudioQueueConsumer },\n        { startDummyPdfOcrWorker },\n        { startEventFabricWorker },\n      ]",
-            "startByte": 11317,
-            "endByte": 11860,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "member_expression",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "[redis, db]",
-            "startByte": 6762,
-            "endByte": 6820,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ closeAllConnections }",
-            "startByte": 41395,
-            "endByte": 41479,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration",
-              "variable_declarator",
-              "arrow_function",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ closeConnections }",
-            "startByte": 41689,
-            "endByte": 41749,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration",
-              "variable_declarator",
-              "arrow_function",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ flushInferenceLog }",
-            "startByte": 42127,
-            "endByte": 42209,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration",
-              "variable_declarator",
-              "arrow_function",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ session, user }",
-            "startByte": 29953,
-            "endByte": 30005,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "arrow_function",
-              "statement_block",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ shutdownLangfuse }",
-            "startByte": 41927,
-            "endByte": 42003,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration",
-              "variable_declarator",
-              "arrow_function",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ startWorker }",
-            "startByte": 7462,
-            "endByte": 7526,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "member_expression",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "if_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -8971,15 +8989,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 8
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -8987,11 +9003,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/agent/bounded-tool-caller.spec.ts",
@@ -9290,31 +9306,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 13,
+        "leftNamedCount": 12,
         "rightNamedCount": 12,
         "pairedCount": 12,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ name, arguments: args }",
-            "startByte": 983,
-            "endByte": 1015,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -9866,15 +9861,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -9882,11 +9875,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/agent/register-tools.ts",
@@ -16104,32 +16097,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 10,
+        "leftNamedCount": 9,
         "rightNamedCount": 9,
         "pairedCount": 9,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ stdout }",
-            "startByte": 489,
-            "endByte": 542,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -16562,15 +16533,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -16578,11 +16547,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
@@ -20857,34 +20826,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 71,
+        "leftNamedCount": 70,
         "rightNamedCount": 70,
         "pairedCount": 70,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "[fuseSettled, ragSettled]",
-            "startByte": 6879,
-            "endByte": 8335,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -24424,15 +24369,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -24440,11 +24383,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/client-cache.ts",
@@ -24565,138 +24508,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 83,
+        "leftNamedCount": 78,
         "rightNamedCount": 78,
         "pairedCount": 78,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ replies }",
-            "startByte": 5603,
-            "endByte": 5629,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ replies }",
-            "startByte": 6258,
-            "endByte": 6284,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ replies }",
-            "startByte": 6935,
-            "endByte": 6961,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ router }",
-            "startByte": 11445,
-            "endByte": 11470,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ router }",
-            "startByte": 12214,
-            "endByte": 12239,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "lexical_declaration",
-              "variable_declarator",
-              "object",
-              "method_definition",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -28535,15 +28350,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 5
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -28551,11 +28364,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/client-embed.ts",
@@ -28669,53 +28482,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 64,
+        "leftNamedCount": 62,
         "rightNamedCount": 62,
         "pairedCount": 62,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ Tensor }",
-            "startByte": 3977,
-            "endByte": 4021,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ getGPUCompute }",
-            "startByte": 9003,
-            "endByte": 9071,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -31631,15 +31401,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 2
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -31647,11 +31415,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/client-llm-synthesis.ts",
@@ -34789,31 +34557,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 66,
+        "leftNamedCount": 65,
         "rightNamedCount": 65,
         "pairedCount": 65,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ intent }",
-            "startByte": 13654,
-            "endByte": 13690,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -37719,15 +37466,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -37735,11 +37480,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/e2b/inference.ts",
@@ -40497,31 +40242,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 37,
+        "leftNamedCount": 36,
         "rightNamedCount": 36,
         "pairedCount": 36,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ composite, face, text, behavioral }",
-            "startByte": 10934,
-            "endByte": 10986,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -42131,15 +41855,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -42147,11 +41869,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/gemma4-e2b-client.ts",
@@ -42239,55 +41961,15 @@
         "engine": "node-tree-sitter",
         "engineVersion": "0.25.1",
         "diagnostics": [],
-        "observationCount": 48
+        "observationCount": 49
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
         "leftNamedCount": 47,
         "rightNamedCount": 47,
-        "pairedCount": 46,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{\r\n\t\tmaxNewTokens = 256,\r\n\t\ttemperature = 0.7,\r\n\t\ttopK = 40,\r\n\t\ttopP = 0.9,\r\n\t\tonToken,\r\n\t\tsystemPrompt = 'You are a helpful legal AI assistant running locally in the browser. Provide concise, accurate responses.'\r\n\t}",
-            "startByte": 6896,
-            "endByte": 7123,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
-        "unmatchedRight": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "method_signature",
-            "rawKind": "method",
-            "symbolKind": "METHOD",
-            "name": "requestAdapter",
-            "startByte": 2523,
-            "endByte": 2591,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "function_declaration",
-              "variable_declarator",
-              "method_signature"
-            ],
-            "parentContext": "variable_declarator"
-          }
-        ],
+        "pairedCount": 47,
+        "unmatchedLeft": [],
+        "unmatchedRight": [],
         "pairs": [
           {
             "name": "_gpuMemoryMB",
@@ -43809,6 +43491,57 @@
             "mismatchClasses": []
           },
           {
+            "name": "requestAdapter",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "method_signature",
+              "rawKind": "METHOD",
+              "symbolKind": "METHOD",
+              "name": "requestAdapter",
+              "startByte": 2523,
+              "endByte": 2591,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "function_declaration",
+                "statement_block",
+                "try_statement",
+                "statement_block",
+                "lexical_declaration",
+                "variable_declarator",
+                "as_expression",
+                "object_type"
+              ],
+              "parentContext": "object_type"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "method_signature",
+              "rawKind": "method",
+              "symbolKind": "METHOD",
+              "name": "requestAdapter",
+              "startByte": 2523,
+              "endByte": 2591,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "function_declaration",
+                "variable_declarator",
+                "method_signature"
+              ],
+              "parentContext": "variable_declarator"
+            },
+            "semanticKindComparable": true,
+            "semanticKindMatch": true,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": []
+          },
+          {
             "name": "result",
             "left": {
               "schema": "atlas.structural-observation.v1",
@@ -44371,16 +44104,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1,
-          "NAMED_SYMBOL_MISSING_LEFT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -44388,11 +44118,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/hypergraph.ts",
@@ -48557,52 +48287,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 64,
+        "leftNamedCount": 62,
         "rightNamedCount": 62,
         "pairedCount": 62,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ AutoTokenizer }",
-            "startByte": 4120,
-            "endByte": 4181,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ maxTokens = 200, temperature = 0.7, topP = 0.9, topK = 40 }",
-            "startByte": 5998,
-            "endByte": 6069,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -51424,15 +51112,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 2
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -51440,11 +51126,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ai/onnx/session.ts",
@@ -54284,75 +53970,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 52,
+        "leftNamedCount": 49,
         "rightNamedCount": 49,
         "pairedCount": 49,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ getE2bSession }",
-            "startByte": 5578,
-            "endByte": 5630,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ runE2bInference }",
-            "startByte": 6050,
-            "endByte": 6106,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ runOnnxInference }",
-            "startByte": 7964,
-            "endByte": 8022,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -56601,15 +56222,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 3
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -56617,11 +56236,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/ambient-events.d.ts",
@@ -56651,32 +56270,15 @@
         "engine": "node-tree-sitter",
         "engineVersion": "0.25.1",
         "diagnostics": [],
-        "observationCount": 2
+        "observationCount": 3
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 1,
+        "leftNamedCount": 2,
         "rightNamedCount": 2,
-        "pairedCount": 1,
+        "pairedCount": 2,
         "unmatchedLeft": [],
-        "unmatchedRight": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "treesitter-chunker-8095",
-            "rawNodeType": "internal_module",
-            "rawKind": "fragment",
-            "symbolKind": "UNKNOWN",
-            "name": "svelteHTML",
-            "startByte": 324,
-            "endByte": 801,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "internal_module"
-            ],
-            "parentContext": ""
-          }
-        ],
+        "unmatchedRight": [],
         "pairs": [
           {
             "name": "HTMLAttributes",
@@ -56722,17 +56324,61 @@
             "startByteDelta": 0,
             "endByteDelta": 0,
             "mismatchClasses": []
+          },
+          {
+            "name": "svelteHTML",
+            "left": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "node-tree-sitter-challenger",
+              "rawNodeType": "internal_module",
+              "rawKind": "NAMESPACE",
+              "symbolKind": "UNKNOWN",
+              "name": "svelteHTML",
+              "startByte": 324,
+              "endByte": 801,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "program",
+                "ambient_declaration"
+              ],
+              "parentContext": "ambient_declaration"
+            },
+            "right": {
+              "schema": "atlas.structural-observation.v1",
+              "provider": "treesitter-chunker-8095",
+              "rawNodeType": "internal_module",
+              "rawKind": "fragment",
+              "symbolKind": "UNKNOWN",
+              "name": "svelteHTML",
+              "startByte": 324,
+              "endByte": 801,
+              "spanValid": true,
+              "spanContainsName": true,
+              "parentRoute": [
+                "internal_module"
+              ],
+              "parentContext": ""
+            },
+            "semanticKindComparable": false,
+            "semanticKindMatch": false,
+            "exactSpanMatch": true,
+            "startByteDelta": 0,
+            "endByteDelta": 0,
+            "mismatchClasses": [
+              "SEMANTIC_KIND_UNKNOWN_BOTH"
+            ]
           }
         ],
         "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_LEFT": 1
+          "SEMANTIC_KIND_UNKNOWN_BOTH": 1
         },
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
+          "namedSymbolCoverage": true,
           "semanticKindParity": false,
-          "exactSpanParity": false
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -56740,9 +56386,9 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
+        "namedSymbolCoverage": true,
         "semanticKindParity": false,
-        "exactSpanParity": false
+        "exactSpanParity": true
       },
       "fullParity": false
     },
@@ -56868,659 +56514,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 55,
+        "leftNamedCount": 31,
         "rightNamedCount": 31,
         "pairedCount": 31,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cache }",
-            "startByte": 7196,
-            "endByte": 7255,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cache }",
-            "startByte": 7526,
-            "endByte": 7585,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cache }",
-            "startByte": 7840,
-            "endByte": 7899,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cache }",
-            "startByte": 8094,
-            "endByte": 8153,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cache }",
-            "startByte": 8666,
-            "endByte": 8725,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 655,
-            "endByte": 723,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 1042,
-            "endByte": 1110,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 1536,
-            "endByte": 1604,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 1867,
-            "endByte": 1935,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 2184,
-            "endByte": 2252,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 2415,
-            "endByte": 2483,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ indexedDBCache }",
-            "startByte": 2778,
-            "endByte": 2846,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 3190,
-            "endByte": 3250,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 3435,
-            "endByte": 3495,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 3744,
-            "endByte": 3804,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 4066,
-            "endByte": 4126,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 4452,
-            "endByte": 4512,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 5018,
-            "endByte": 5078,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 5441,
-            "endByte": 5501,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 5826,
-            "endByte": 5886,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ lokiCache }",
-            "startByte": 6362,
-            "endByte": 6422,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ offlineFetch }",
-            "startByte": 9266,
-            "endByte": 9325,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ offlineFetch }",
-            "startByte": 9934,
-            "endByte": 9993,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ offlineMutate }",
-            "startByte": 10548,
-            "endByte": 10608,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "expression_statement",
-              "call_expression",
-              "arguments",
-              "arrow_function",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -59198,15 +58195,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 24
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -59214,11 +58209,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/cache/cache-invalidation.ts",
@@ -59651,74 +58646,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 34,
+        "leftNamedCount": 31,
         "rightNamedCount": 31,
         "pairedCount": 31,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{\r\n\t\t\tmemory = true,\r\n\t\t\tpersistent = true,\r\n\t\t\tttl = 3600000, // 1 hour default\r\n\t\t\tcollection = 'default'\r\n\t\t}",
-            "startByte": 2958,
-            "endByte": 3081,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "class_declaration",
-              "class_body",
-              "method_definition",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ memory = true, persistent = true, collection = 'default' }",
-            "startByte": 2036,
-            "endByte": 2107,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "class_declaration",
-              "class_body",
-              "method_definition",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ memory = true, persistent = true, collection = 'default' }",
-            "startByte": 3544,
-            "endByte": 3615,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "class_declaration",
-              "class_body",
-              "method_definition",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -61141,15 +60072,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 3
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -61157,11 +60086,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
@@ -64460,31 +63389,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 14,
+        "leftNamedCount": 13,
         "rightNamedCount": 13,
         "pairedCount": 13,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ cacheKey, forceFresh = false, ttl = DEFAULT_TTL }",
-            "startByte": 517,
-            "endByte": 578,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -65069,15 +63977,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -65085,11 +63991,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts",
@@ -72719,75 +71625,10 @@
       },
       "comparison": {
         "schema": "atlas.structural-parity-comparison.v2",
-        "leftNamedCount": 19,
+        "leftNamedCount": 16,
         "rightNamedCount": 16,
         "pairedCount": 16,
-        "unmatchedLeft": [
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ done, value }",
-            "startByte": 786,
-            "endByte": 823,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "try_statement",
-              "statement_block",
-              "while_statement",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ onChunk, onComplete, onError, signal }",
-            "startByte": 418,
-            "endByte": 468,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          },
-          {
-            "schema": "atlas.structural-observation.v1",
-            "provider": "node-tree-sitter-challenger",
-            "rawNodeType": "variable_declarator",
-            "rawKind": "VARIABLE",
-            "symbolKind": "VARIABLE",
-            "name": "{ onChunk, onComplete, onError, signal, ...fetchOptions }",
-            "startByte": 1821,
-            "endByte": 1888,
-            "spanValid": true,
-            "spanContainsName": true,
-            "parentRoute": [
-              "program",
-              "export_statement",
-              "function_declaration",
-              "statement_block",
-              "lexical_declaration"
-            ],
-            "parentContext": "lexical_declaration"
-          }
-        ],
+        "unmatchedLeft": [],
         "unmatchedRight": [],
         "pairs": [
           {
@@ -73552,15 +72393,13 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "NAMED_SYMBOL_MISSING_RIGHT": 3
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
-          "namedSymbolCoverage": false,
-          "semanticKindParity": false,
-          "exactSpanParity": false
+          "namedSymbolCoverage": true,
+          "semanticKindParity": true,
+          "exactSpanParity": true
         }
       },
       "gates": {
@@ -73568,11 +72407,11 @@
         "sourceBytesFrozen": true,
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
-        "namedSymbolCoverage": false,
-        "semanticKindParity": false,
-        "exactSpanParity": false
+        "namedSymbolCoverage": true,
+        "semanticKindParity": true,
+        "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/client/subscribeEmbedding.svelte.ts",

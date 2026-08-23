@@ -49,6 +49,25 @@ const DECLARATION_KINDS = new Map<string, string>([
   ['type_alias_declaration', 'TYPE'],
   ['enum_declaration', 'ENUM'],
   ['variable_declarator', 'VARIABLE'],
+  // Ambient/ .d.ts declarations: an interface-body or namespace-body
+  // function signature with no implementation body (`declare function
+  // foo(): void`, an overload signature). treesitter-chunker's sidecar
+  // classifies these as FUNCTION (node_type contains "function"); this
+  // provider previously emitted nothing at all for them.
+  ['function_signature', 'FUNCTION'],
+  // Ambient/interface-body method signature with no implementation body
+  // (`interface Foo { bar(): void; }`). Same rationale as function_signature
+  // above -- the sidecar already classifies these as METHOD.
+  ['method_signature', 'METHOD'],
+  // TypeScript `namespace X {}` / `module X {}` declarations. 'NAMESPACE'
+  // is intentionally not one of normalizeStructuralSymbolKind's known
+  // keywords -- it falls through to UNKNOWN, matching the sidecar's own
+  // UNKNOWN classification for internal_module (semanticKindComparable is
+  // false for UNKNOWN-UNKNOWN pairs, so this can't introduce a new
+  // SEMANTIC_KIND_MISMATCH). The point of adding this is only to close
+  // the NAMED_SYMBOL_MISSING_LEFT gap -- both sides should agree such a
+  // symbol exists, even without a specific shared kind vocabulary for it.
+  ['internal_module', 'NAMESPACE'],
 ]);
 
 function packageVersion(packageName: string): string {
@@ -93,8 +112,21 @@ function field(node: SyntaxNodeLike, name: string): SyntaxNodeLike | null {
   return node.childForFieldName?.(name) ?? null;
 }
 
+// Tree-sitter's TypeScript grammar names the left-hand side of a
+// variable_declarator "name" even when it's a destructuring pattern, not a
+// plain identifier -- e.g. `const { firstName, lastName } = user;` has a
+// `name` field whose node type is object_pattern, not identifier, and whose
+// .text is the entire pattern source ("{ firstName, lastName }"). That text
+// is not a valid symbol name; emitting it as one was the root cause of the
+// NAMED_SYMBOL_MISSING_RIGHT class in
+// docs/reports/node-tree-sitter-provider-parity-corpus-v2.json (60/66
+// files) -- the sidecar correctly does not emit a named symbol for these.
+const DESTRUCTURING_PATTERN_TYPES = new Set(['object_pattern', 'array_pattern']);
+
 function nodeName(node: SyntaxNodeLike): string | null {
-  const explicit = field(node, 'name')?.text?.trim();
+  const nameField = field(node, 'name');
+  if (nameField && DESTRUCTURING_PATTERN_TYPES.has(nameField.type)) return null;
+  const explicit = nameField?.text?.trim();
   if (explicit) return explicit;
   for (const child of node.namedChildren ?? []) {
     if (child.type === 'identifier' || child.type === 'type_identifier' || child.type === 'property_identifier') {

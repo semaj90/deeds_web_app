@@ -108,4 +108,89 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
     const sourceBytes = Buffer.from(source, 'utf8');
     expect(sourceBytes.subarray(functionChunk!.start_byte, functionChunk!.end_byte).toString('utf8')).toContain('function flushErrors');
   });
+
+  it('emits named symbols for ambient function signatures and TS namespace declarations', async () => {
+    // Regression test for the NAMED_SYMBOL_MISSING_LEFT class found in
+    // docs/reports/node-tree-sitter-provider-parity-corpus-v2.json --
+    // function_signature and internal_module node types were previously
+    // absent from DECLARATION_KINDS entirely, so this provider emitted no
+    // chunk at all for `declare function foo(): void` or `namespace X {}`.
+    const source = [
+      'declare function lexer(input: string): unknown;',
+      'namespace App {',
+      '  interface Locals { userId: string; }',
+      '}',
+      '',
+    ].join('\n');
+    const provider = createNodeTreeSitterAstProvider();
+    const result = await provider.materialize({
+      sourceRef: 'src/ambient.d.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:ambient-fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source,
+    });
+
+    const chunks = result.evidence?.chunks ?? [];
+    const lexerChunk = chunks.find((chunk) => chunk.name === 'lexer');
+    expect(lexerChunk).toBeDefined();
+    expect(lexerChunk?.node_type).toBe('function_signature');
+    expect(lexerChunk?.kind).toBe('FUNCTION');
+
+    const namespaceChunk = chunks.find((chunk) => chunk.name === 'App');
+    expect(namespaceChunk).toBeDefined();
+    expect(namespaceChunk?.node_type).toBe('internal_module');
+    expect(namespaceChunk?.kind).toBe('NAMESPACE');
+  });
+
+  it('emits named symbols for ambient interface method signatures', async () => {
+    // Regression test: same NAMED_SYMBOL_MISSING_LEFT class as the ambient
+    // function signature test above, for method_signature nodes
+    // (`interface Foo { bar(): void; }`).
+    const source = [
+      'interface Accelerometer {',
+      '  requestAdapter(): Promise<void>;',
+      '}',
+      '',
+    ].join('\n');
+    const provider = createNodeTreeSitterAstProvider();
+    const result = await provider.materialize({
+      sourceRef: 'src/ambient-method.d.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:ambient-method-fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source,
+    });
+
+    const chunks = result.evidence?.chunks ?? [];
+    const methodChunk = chunks.find((chunk) => chunk.name === 'requestAdapter');
+    expect(methodChunk).toBeDefined();
+    expect(methodChunk?.node_type).toBe('method_signature');
+    expect(methodChunk?.kind).toBe('METHOD');
+  });
+
+  it('does not emit a destructuring pattern as a symbol name', async () => {
+    // Regression test for the NAMED_SYMBOL_MISSING_RIGHT class found in
+    // docs/reports/node-tree-sitter-provider-parity-corpus-v2.json (60/66
+    // files) -- `const { firstName, lastName } = user;` previously emitted
+    // a chunk whose `name` was the literal pattern text
+    // "{ firstName, lastName }", which is not a valid symbol name; the
+    // sidecar correctly emits no named symbol for these.
+    const source = 'const { firstName, lastName } = user;\n';
+    const provider = createNodeTreeSitterAstProvider();
+    const result = await provider.materialize({
+      sourceRef: 'src/destructure.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:destructure-fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source,
+    });
+
+    const chunks = result.evidence?.chunks ?? [];
+    const namedChunks = chunks.filter((chunk) => chunk.name);
+    expect(namedChunks.some((chunk) => chunk.name?.startsWith('{'))).toBe(false);
+  });
 });
