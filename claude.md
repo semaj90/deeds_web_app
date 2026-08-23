@@ -2269,6 +2269,17 @@ See `memory/corruption-patterns.md` for detection patterns and fix strategies.
 **Automated:** `bash sveltekit-frontend/scripts/audit/orphan-detector.sh [dir]` covers Tier A (~10s).
 **MSYS/Git Bash:** Use bash arrays for globs: `RG_GLOB=(--glob '*.ts')` then `"${RG_GLOB[@]}"`.
 
+**⚠️ Gate-number collision with the `/deep-audit` skill (found 2026-08-22)** — the `/deep-audit`
+skill's own G1-G26 dispatch table (which reads `graph.files[]` flags from
+`codebase-graph.json`) uses gate numbers that do NOT match this canonical list below. Its "G4"
+reads `f.hasAuth` (auth-guard check) and its "G5" reads `f.hasZod`/`f.parsesBody` (Zod-validation
+check) — but in THIS canonical numbering, **G4 is `@vite-ignore` variable imports** and **G5 is
+barrel re-exports**; the real auth/Zod gates here are **G18/G19**. The skill's dispatch table
+also references `f.parsesBody`, a field that does not exist in the live indexer schema (confirmed
+2026-08-22 — see `openspec/changes/deep-audit-code-gates-aug22/`). Two separate numbering schemes
+share this repo; do not assume a "G4"/"G5" reported by `/deep-audit` refers to the definitions
+below. Not yet reconciled — tracked in the OpenSpec change above, not fixed here.
+
 ```bash
 MODULE="ComponentName"   # or filename stem, API path, table name
 
