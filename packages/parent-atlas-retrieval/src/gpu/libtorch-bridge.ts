@@ -357,6 +357,10 @@ export function gpuHasRoom(requiredMB: number): boolean {
 		const rc = native.getCudaMemory(_cudaMemFreeBuf, _cudaMemTotalBuf);
 		if (rc !== 0) return false;
 		const freeMB = Number(_cudaMemFreeBuf[0]) / (1024 * 1024);
+		// Some native builds can report a successful CUDA probe without
+		// exposing NVML/cudaMemGetInfo values. Zero means unmeasured, not
+		// zero available VRAM; let the native operation apply its own guard.
+		if (freeMB === 0 && Number(_cudaMemTotalBuf[0]) === 0) return true;
 		return freeMB >= requiredMB;
 	} catch {
 		return false;
@@ -1195,7 +1199,7 @@ export function getCudaMemoryInfo(): CudaMemoryInfo {
           freeMB: Math.round(freeBytes / (1024 * 1024)),
           totalMB: Math.round(totalBytes / (1024 * 1024)),
           usedMB: Math.round((totalBytes - freeBytes) / (1024 * 1024)),
-          available: true,
+          available: totalBytes > 0,
         };
       }
     } catch {

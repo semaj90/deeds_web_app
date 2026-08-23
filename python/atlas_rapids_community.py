@@ -29,6 +29,7 @@ from pydantic import BaseModel, Field, model_validator
 
 CUGRAPH_LOUVAIN_26_06 = "cugraph.louvain.26.06"
 CUGRAPH_LEIDEN_26_06 = "cugraph.leiden.26.06"
+CUGRAPH_SPECTRAL_MODULARITY_26_06 = "cugraph.spectralModularityMaximizationClustering.26.06"
 UNDIRECTED_WEIGHTED_PROJECTION_V1 = "atlas.undirected-weighted-projection.v1"
 
 
@@ -44,7 +45,7 @@ class CommunityEdgeV1(BaseModel):
 
 class CommunityPartitionRequestV1(BaseModel):
     schema: Literal["atlas.community-partition-request.v1"] = "atlas.community-partition-request.v1"
-    algorithm: Literal["louvain", "leiden"]
+    algorithm: Literal["louvain", "leiden", "spectral"]
     graphRevision: str = Field(min_length=1)
     topologyHash: str = Field(min_length=1)
     projectionRevision: str = Field(min_length=1)
@@ -56,12 +57,23 @@ class CommunityPartitionRequestV1(BaseModel):
     threshold: float = Field(default=1e-7, gt=0.0)
     randomState: int = 0
     theta: float = Field(default=1.0, gt=0.0)
+    numClusters: int = Field(default=2, ge=1, le=32)
+    numEigenvectors: int = Field(default=2, ge=1, le=32)
+    eigenTolerance: float = Field(default=1e-5, gt=0.0)
+    eigenMaxIterations: int = Field(default=100, ge=1, le=1000)
+    kmeansTolerance: float = Field(default=1e-5, gt=0.0)
+    kmeansMaxIterations: int = Field(default=100, ge=1, le=1000)
 
     @model_validator(mode="after")
     def validate_identity_and_edges(self) -> "CommunityPartitionRequestV1":
         node_ids = [node.nodeId for node in self.nodes]
         if len(set(node_ids)) != len(node_ids):
             raise ValueError("nodes must have unique nodeId values")
+        if self.algorithm == "spectral":
+            if self.numEigenvectors > self.numClusters:
+                raise ValueError("spectral numEigenvectors must be <= numClusters")
+            if self.numClusters > len(node_ids):
+                raise ValueError("spectral numClusters must be <= node count")
         known = set(node_ids)
         for edge in self.edges:
             if edge.source not in known or edge.target not in known:
@@ -85,7 +97,7 @@ class CommunityPartitionV1(BaseModel):
 
 class CommunityPartitionResponseV1(BaseModel):
     schema: Literal["atlas.community-partition-response.v1"] = "atlas.community-partition-response.v1"
-    algorithm: Literal["louvain", "leiden"]
+    algorithm: Literal["louvain", "leiden", "spectral"]
     algorithmId: str
     backend: Literal["cugraph"] = "cugraph"
     backendVersion: str
@@ -94,7 +106,8 @@ class CommunityPartitionResponseV1(BaseModel):
     projectionRevision: str
     projectionSemantics: Literal["atlas.undirected-weighted-projection.v1"]
     parameters: dict[str, Any]
-    modularity: float
+    modularity: float | None
+    qualityMetric: str
     assignments: list[CommunityAssignmentV1]
     communities: list[CommunityPartitionV1]
     inputHash: str
@@ -208,7 +221,34 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
         vertices=vertices,
     )
 
-    if req.algorithm == "leiden":
+    if req.algorithm == "spectral":
+        spectral = getattr(cugraph, "spectralModularityMaximizationClustering", None)
+        if spectral is None:
+            raise RuntimeError("cuGraph spectral modularity clustering is unavailable")
+        parts = spectral(
+            graph,
+            num_clusters=req.numClusters,
+            num_eigen_vects=req.numEigenvectors,
+            evs_tolerance=req.eigenTolerance,
+            evs_max_iter=req.eigenMaxIterations,
+            kmean_tolerance=req.kmeansTolerance,
+            kmean_max_iter=req.kmeansMaxIterations,
+            random_state=req.randomState,
+        )
+        modularity = None
+        algorithm_id = CUGRAPH_SPECTRAL_MODULARITY_26_06
+        quality_metric = "MODULARITY_MAXIMIZATION"
+        parameters: dict[str, Any] = {
+            "num_clusters": req.numClusters,
+            "num_eigen_vects": req.numEigenvectors,
+            "evs_tolerance": req.eigenTolerance,
+            "evs_max_iter": req.eigenMaxIterations,
+            "kmean_tolerance": req.kmeansTolerance,
+            "kmean_max_iter": req.kmeansMaxIterations,
+            "random_state": req.randomState,
+        }
+        host_parts = parts[["vertex", "cluster"]].to_pandas().rename(columns={"cluster": "partition"})
+    elif req.algorithm == "leiden":
         parts, modularity = cugraph.leiden(
             graph,
             max_iter=req.maxIterations,
@@ -223,6 +263,8 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
             "random_state": req.randomState,
             "theta": req.theta,
         }
+        quality_metric = "MODULARITY"
+        host_parts = parts[["vertex", "partition"]].to_pandas()
     else:
         parts, modularity = cugraph.louvain(
             graph,
@@ -236,8 +278,9 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
             "resolution": req.resolution,
             "threshold": req.threshold,
         }
+        quality_metric = "MODULARITY"
+        host_parts = parts[["vertex", "partition"]].to_pandas()
 
-    host_parts = parts[["vertex", "partition"]].to_pandas()
     partition_by_ordinal = {
         int(row.vertex): int(row.partition)
         for row in host_parts.itertuples(index=False)
@@ -257,7 +300,8 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
     canonical_output = {
         "assignments": [assignment.model_dump() for assignment in assignments],
         "communities": [community.model_dump() for community in communities],
-        "modularity": float(modularity),
+        "modularity": float(modularity) if modularity is not None else None,
+        "qualityMetric": quality_metric,
     }
 
     return CommunityPartitionResponseV1(
@@ -269,7 +313,8 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
         projectionRevision=req.projectionRevision,
         projectionSemantics=req.projectionSemantics,
         parameters=parameters,
-        modularity=float(modularity),
+        modularity=float(modularity) if modularity is not None else None,
+        qualityMetric=quality_metric,
         assignments=assignments,
         communities=communities,
         inputHash=_sha256_json(canonical_input),

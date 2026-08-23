@@ -267,8 +267,9 @@ export function buildAceSynthesisGraph(input: Omit<z.input<typeof aceSynthesisGr
     schema: 'atlas.ace-synthesis-graph.v1' as const,
     ...input,
   };
-  const graph_checksum = sha256({ ...raw, graph_checksum: undefined });
-  return validateAceSynthesisGraph({ ...raw, graph_checksum });
+  const normalized = aceSynthesisGraphSchema.omit({ graph_checksum: true }).parse(raw);
+  const graph_checksum = sha256({ ...normalized, graph_checksum: undefined });
+  return validateAceSynthesisGraph({ ...normalized, graph_checksum });
 }
 
 export function prefillIdentityChecksum(input: {

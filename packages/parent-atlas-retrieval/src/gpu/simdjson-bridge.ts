@@ -87,29 +87,31 @@ const lruCache   = new Map<string, CacheEntry>();
 let   cacheBytes = 0;
 
 /**
- * FNV-1a 32-bit hash — L1-cache-friendly: reads first 64 bytes + stride-sampled tail.
- * Keeps hot path (< 64 chars) entirely within a single L1 cache line.
+ * FNV-1a 32-bit hash — L1-cache-friendly: reads first 64 UTF-8 bytes +
+ * stride-sampled tail. Cache identity is based on transport bytes, not
+ * JavaScript UTF-16 code units.
  */
 function fnv1aKey(input: string): string {
-	const len = input.length;
+	const bytes = Buffer.from(input, 'utf8');
+	const len = bytes.byteLength;
 	let hash = 0x811c9dc5 >>> 0;
 
-	// First 64 chars (≤ 256 bytes in UTF-16, fits in L1 D-cache)
+	// First 64 UTF-8 bytes. This is intentionally a byte-level cache key.
 	const head = Math.min(len, 64);
 	for (let i = 0; i < head; i++) {
-		hash ^= input.charCodeAt(i);
+		hash ^= bytes[i];
 		hash = Math.imul(hash, 0x01000193) >>> 0;
 	}
 
-	// Stride-sample the tail (every 32 chars) to catch length + content variation
+	// Stride-sample the tail (every 32 bytes) to catch length + content variation.
 	if (len > 64) {
 		const stride = Math.max(32, Math.floor((len - 64) / 8));
 		for (let i = 64; i < len; i += stride) {
-			hash ^= input.charCodeAt(i);
+			hash ^= bytes[i];
 			hash = Math.imul(hash, 0x01000193) >>> 0;
 		}
 		// Always include the last char (catches trailing-diff strings)
-		hash ^= input.charCodeAt(len - 1);
+		hash ^= bytes[len - 1];
 		hash = Math.imul(hash, 0x01000193) >>> 0;
 	}
 
@@ -122,10 +124,16 @@ function fnv1aKey(input: string): string {
 
 function approximateSize(value: unknown): number {
 	try {
-		return JSON.stringify(value).length * 2; // rough UTF-16 estimate
+		const serialized = JSON.stringify(value);
+		return Buffer.byteLength(serialized, 'utf8');
 	} catch {
 		return 1024; // unknown — assume 1 KB
 	}
+}
+
+/** Return the exact UTF-8 transport size used by the bridge byte budgets. */
+export function utf8ByteLength(input: string): number {
+	return Buffer.byteLength(input, 'utf8');
 }
 
 function lruEvictExpired(): void {
@@ -206,10 +214,11 @@ const MIN_NATIVE_BYTES = 1024;
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
 export function fastJsonParse<T = unknown>(input: string): T {
+	const inputBytes = utf8ByteLength(input);
 	// OOM guard — bail before any allocation
-	if (input.length > MAX_INPUT_BYTES) {
+	if (inputBytes > MAX_INPUT_BYTES) {
 		throw new RangeError(
-			`[simdjson-bridge] Input too large (${(input.length / 1e6).toFixed(1)} MB). ` +
+			`[simdjson-bridge] Input too large (${(inputBytes / 1e6).toFixed(1)} MB). ` +
 			`Max is ${MAX_INPUT_BYTES / 1e6} MB.`
 		);
 	}
@@ -220,10 +229,10 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	if (cached !== undefined) return cached as T;
 
 	stats.misses++;
-	stats.totalBytesParsed += input.length;
+	stats.totalBytesParsed += inputBytes;
 
 	let result: T;
-	const native = input.length >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+	const native = inputBytes >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
 
 	if (native) {
 		const start = performance.now();
@@ -251,7 +260,7 @@ export function fastJsonParse<T = unknown>(input: string): T {
  * Falls back to try/catch JSON.parse if addon unavailable.
  */
 export function fastJsonValidate(input: string): boolean {
-	if (input.length > MAX_INPUT_BYTES) return false;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return false;
 
 	const native = getSimdJsonAddon();
 	if (native) {
@@ -275,7 +284,7 @@ export function fastJsonValidate(input: string): boolean {
  * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
 	const native = getSimdJsonAddon();
 	if (!native) return null;
 	try {
@@ -291,7 +300,7 @@ export function fastJsonExtractNumbers(input: string, pointer: string): Float64A
  * Example: fastJsonExtractField('{"model":"gemma4","status":"ok"}', "status") → "ok"
  */
 export function fastJsonExtractField(input: string, key: string): string | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
 
 	// Fast regex — captures first occurrence of `"key": <value>`
 	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

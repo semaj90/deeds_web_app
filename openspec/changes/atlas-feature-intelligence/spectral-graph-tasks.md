@@ -7,6 +7,21 @@ Status vocabulary:
 - `PENDING`: implementation or runtime proof remains.
 - `BLOCKED`: an explicit prerequisite prevents promotion.
 
+## Alignment sweep — 2026-08-23
+
+The spectral challenger now has a bounded request contract and a non-mutating
+RAPIDS sidecar route. TypeScript and Python fixtures share CandidateOrdinal and
+checksum rules. These are fixture gates only; they do not prove activated WSL2
+cuGraph execution or authorize Qdrant, Valkey, or Neo4j writes.
+
+- [x] Validate `numEigenvectors <= numClusters <= node_count`.
+- [x] Expose spectral capability dynamically without false availability claims.
+- [x] Preserve graph/projection revisions and non-authority flags.
+- [ ] Run the sidecar in activated `atlas-rapids-cu13` and capture a real SM86 receipt.
+- [ ] Compare live cuGraph assignments with the CPU/reference ordinal checksum.
+- [ ] Add projection readback only after parity passes.
+- [ ] Wire workflow/A2A receipts and grounded repair outcomes.
+
 ## Placement
 
 Spectral clustering is a derived graph stage. It does not replace semantic retrieval, KMeans/SOM routing, PageRank/PPR, or canonical graph facts.

@@ -36,8 +36,16 @@ async function writerObservation() {
   }
 }
 
-const origin = materializeWorkspaceRevisionOriginV1({ workspaceRoot: REPO_ROOT, repositoryId: 'semaj90/deeds_web_app', producerRevision: PRODUCER_REVISION });
 const sourceRef = path.relative(REPO_ROOT, SAMPLE_SOURCE).replaceAll('\\', '/');
+const boundedSourceScope = process.env.ATLAS_REVISION_OWNER_FULL_SCAN === 'true'
+  ? undefined
+  : [sourceRef];
+const origin = materializeWorkspaceRevisionOriginV1({
+  workspaceRoot: REPO_ROOT,
+  repositoryId: 'semaj90/deeds_web_app',
+  producerRevision: PRODUCER_REVISION,
+  sourceRefs: boundedSourceScope,
+});
 const binding = origin.bindings.find((item) => item.sourceRef === sourceRef);
 if (!binding) throw new Error(`GRAPHIFY_REVISION_OWNER_SAMPLE_NOT_IN_MANIFEST:${sourceRef}`);
 const authority = deriveGraphifyRevisionAuthorityV2({ workspaceRoot: REPO_ROOT, absoluteSourcePath: SAMPLE_SOURCE, workspaceRecord: origin.record, sourceBinding: binding, producerRevision: PRODUCER_REVISION, canonicalWritesAllowed: false });
@@ -96,8 +104,8 @@ try {
   });
 
   await mkdir(path.dirname(OUTPUT), { recursive: true });
-  await writeFile(OUTPUT, `${JSON.stringify({ ...receipt, schemaObservation: schema, workspaceOrigin: { record: origin.record, skipped: origin.skipped } }, null, 2)}\n`, 'utf8');
-  console.log(JSON.stringify({ status: receipt.status, workspaceRevision: authority.workspaceRevision, sourceRevision: authority.sourceRevision, sourceRef: authority.sourceRef, schemaV2Ready: schema.v2Ready, productionWriterPresent: writer.present, productionWriterV2Compatible: writer.v2Compatible, persistedMatchingRows, revisionOwnerProven: receipt.revisionOwnerProven, fanoutMayConsumeAsCanonical: receipt.fanoutMayConsumeAsCanonical, blockers: receipt.blockers, canonicalWriteAttempted: false, output: OUTPUT }, null, 2));
+  await writeFile(OUTPUT, `${JSON.stringify({ ...receipt, schemaObservation: schema, workspaceOrigin: { record: origin.record, skipped: origin.skipped }, boundedSourceScope: boundedSourceScope ?? null }, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify({ status: receipt.status, workspaceRevision: authority.workspaceRevision, sourceRevision: authority.sourceRevision, sourceRef: authority.sourceRef, boundedSourceScope: boundedSourceScope ?? null, schemaV2Ready: schema.v2Ready, productionWriterPresent: writer.present, productionWriterV2Compatible: writer.v2Compatible, persistedMatchingRows, revisionOwnerProven: receipt.revisionOwnerProven, fanoutMayConsumeAsCanonical: receipt.fanoutMayConsumeAsCanonical, blockers: receipt.blockers, canonicalWriteAttempted: false, output: OUTPUT }, null, 2));
   if (!receipt.revisionOwnerProven) process.exitCode = 3;
 } finally {
   await pool.query('ROLLBACK');
