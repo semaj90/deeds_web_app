@@ -29,6 +29,7 @@ import { z } from 'zod';
 import { generateDeepResearch, invalidateDeepResearchCache } from '$lib/server/analytics/deep-research.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { startLdrResearch, searchLdrHistory } from '$lib/server/analytics/ldr-client.js';
 import { db } from '$lib/server/db/client.js';
 import { deepResearchReports } from '$lib/server/db/schema-postgres.js';
@@ -132,13 +133,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			? `\n\nContext: This analysis pertains to case ID ${caseId}. Consider case-specific evidence and relationships.`
 			: '';
 
-		// Call llama-server /v1/chat/completions directly (gemma4-legal-iq4xs-direct.gguf with TurboQuant)
+		// Call llama-server /v1/chat/completions directly (whatever GGUF :8090 actually has
+		// loaded, resolved live via getLlamaSessionDescriptor() rather than hardcoded)
+		const llamaSession = await getLlamaSessionDescriptor();
 		const llmUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 		const llmResponse = await fetch(`${llmUrl}/v1/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: llamaSession.modelId,
 				messages: [
 					{ role: 'system', content: system + caseContext },
 					{ role: 'user', content: selfPrompt },
@@ -171,14 +174,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					userId: Number(locals.user.id),
 					query: selfPrompt,
 					reportType: 'summary',
-					modelUsed: 'gemma4-legal-iq4xs-direct.gguf',
+					modelUsed: llamaSession.modelId,
 					markdownContent: answer,
 					metadata: {
 						pipelineHint: pipelineHint ?? 'ace',
 						caseId,
 						durationMs,
 						provider: 'llama-server',
-						model: 'gemma4-legal-iq4xs-direct.gguf',
+						model: llamaSession.modelId,
 					},
 				})
 				.returning();
@@ -189,7 +192,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				durationMs,
 				cached: false,
 				provider: 'llama-server',
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: llamaSession.modelId,
 				reportId: savedReport?.id,
 			});
 		} catch (dbErr) {
@@ -201,7 +204,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				durationMs,
 				cached: false,
 				provider: 'llama-server',
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: llamaSession.modelId,
 				warning: 'Report not persisted to database',
 			});
 		}

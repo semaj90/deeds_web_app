@@ -1,11 +1,10 @@
 import { db } from '$lib/server/db/client';
 import { adminAiSkills, adminAiSubagentRuns } from '$lib/server/db/schema.js';
 import { traceMcpClient } from '$lib/server/mcp-client.js';
-import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { eq } from 'drizzle-orm';
 import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
-
-const MODEL_URL = ENV.TURBOQUANT_BASE_URL;
 
 export interface SubagentMission {
   skillName: string;
@@ -65,19 +64,15 @@ export class SubagentOrchestrator {
         }
       `;
 
-      const res = await fetch(`${MODEL_URL}/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: ENV.GEMMA4_MODEL ?? 'gemma4',
-          messages: [{ role: 'system', content: prompt }],
-          response_format: { type: 'json_object' }
-        })
-      });
+      const llamaSession = await getLlamaSessionDescriptor();
+      const chatResult = await bifrostChat(
+        [{ role: 'system', content: prompt }],
+        llamaSession.modelId,
+        { responseFormat: { type: 'json_object' }, includeMetadata: true }
+      );
 
-      const data = await res.json();
-      const output = JSON.parse(data.choices[0].message.content);
-      tokensUsed += data.usage?.total_tokens || 0;
+      const output = JSON.parse(chatResult.content);
+      tokensUsed += chatResult.usage?.totalTokens ?? 0;
 
       if (output.final_answer) {
         result = output.final_answer;

@@ -10,6 +10,7 @@ import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbi
 import { streamLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 
 const trtStreamSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(50000),
@@ -33,11 +34,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Fallback to llama-server (:8090) SSE streaming — never Ollama for chat/synthesis
 		const llamaServerUrl = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 		try {
+			const llamaSession = await getLlamaSessionDescriptor();
 			const llamaRes = await fetch(`${llamaServerUrl}/v1/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-legal-iq4xs-direct.gguf',
+					model: llamaSession.modelId,
 					messages: [{ role: 'user', content: prompt }],
 					stream: true,
 					temperature: temperature ?? 0.7,

@@ -26,6 +26,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { computeDispatchDecision, type DispatcherState } from '$lib/server/dispatch/dynamic-dispatcher.js';
 import { createValidationMiddleware } from '$lib/server/opencode/validation-schema.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import {
   classifyOpenCodeIntent,
   chooseOpenCodeAction,
@@ -84,11 +85,12 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "...", "r
   ];
 
   try {
+    const llamaSession = await getLlamaSessionDescriptor();
     const res = await fetch(`${LLAMA_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: llamaSession.modelId,
         messages,
         temperature: 0.3,
         max_tokens: 256,

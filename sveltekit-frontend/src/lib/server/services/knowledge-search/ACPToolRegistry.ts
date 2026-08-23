@@ -36,6 +36,7 @@ import {
   showKanbanTask,
 } from '$lib/server/atlas/kanban-task-board.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 import {
 	buildPhase89WorkflowPlan,
 	buildPhase89FabricLaneManifest,
@@ -401,6 +402,118 @@ const handlers: Record<string, HandlerFn> = {
       };
     } catch (error: any) {
       return fail(error.message, startTime);
+    }
+  },
+
+  // -------------------------------------------------------------------------
+  // Miniforge NLP sidecar tools (registered on TRACE MCP as miniforge.health/
+  // analyze/extract; this exposes the same client via ACP tool discovery
+  // per the Duplication Prevention hard rule — a live sidecar with real
+  // capabilities must be discoverable through GET /api/acp/tools, not only
+  // through TRACE MCP's separate tool surface)
+  // -------------------------------------------------------------------------
+
+  async miniforgeHealth(_args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'probe', target: 'miniforge-sidecar', detail: 'GET sidecar health + capabilities' },
+      ], startTime);
+    }
+
+    try {
+      const client = createMiniforgeNlpSidecarClient();
+      const health = await client.health();
+      return {
+        success: true,
+        kind: 'result',
+        data: {
+          ready: health.ready,
+          status: health.status ?? null,
+          model: health.model ?? null,
+          capabilities: health.capabilities ?? null,
+        },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  async miniforgeAnalyze(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { text, sourceType, extractionMode, documentId, sourceRef, packetKey, language, modelId, maxChars } = args ?? {};
+
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return fail('text must be a non-empty string', startTime);
+    }
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'analyze', target: 'miniforge-sidecar', detail: `NLP analysis of ${text.length}-char text (mode=${extractionMode ?? 'full'})` },
+      ], startTime);
+    }
+
+    try {
+      const client = createMiniforgeNlpSidecarClient();
+      const result = await client.analyze({
+        text,
+        sourceType: typeof sourceType === 'string' ? (sourceType as any) : undefined,
+        extractionMode: typeof extractionMode === 'string' ? (extractionMode as any) : undefined,
+        documentId: typeof documentId === 'string' ? documentId : undefined,
+        sourceRef: typeof sourceRef === 'string' ? sourceRef : undefined,
+        packetKey: typeof packetKey === 'string' ? packetKey : undefined,
+        language: typeof language === 'string' ? language : undefined,
+        modelId: typeof modelId === 'string' ? modelId : undefined,
+        maxChars: typeof maxChars === 'number' ? maxChars : undefined,
+      });
+      return {
+        success: true,
+        kind: 'result',
+        data: result,
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  async miniforgeExtract(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { text, sourceType, extractionMode, documentId, sourceRef, packetKey, language, modelId, maxChars } = args ?? {};
+
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return fail('text must be a non-empty string', startTime);
+    }
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'extract', target: 'miniforge-sidecar', detail: `NLP extraction of ${text.length}-char text (mode=${extractionMode ?? 'full'})` },
+      ], startTime);
+    }
+
+    try {
+      const client = createMiniforgeNlpSidecarClient();
+      const result = await client.extract({
+        text,
+        sourceType: typeof sourceType === 'string' ? (sourceType as any) : undefined,
+        extractionMode: typeof extractionMode === 'string' ? (extractionMode as any) : undefined,
+        documentId: typeof documentId === 'string' ? documentId : undefined,
+        sourceRef: typeof sourceRef === 'string' ? sourceRef : undefined,
+        packetKey: typeof packetKey === 'string' ? packetKey : undefined,
+        language: typeof language === 'string' ? language : undefined,
+        modelId: typeof modelId === 'string' ? modelId : undefined,
+        maxChars: typeof maxChars === 'number' ? maxChars : undefined,
+      });
+      return {
+        success: true,
+        kind: 'result',
+        data: result,
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
     }
   },
 
@@ -870,7 +983,8 @@ const DRY_RUN_TOOLS = new Set([
   'phase89:board-workflow', 'graph:snapshot-parity:validate',
   'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry',
   'atlas.kanban.list', 'atlas.kanban.show',
-  'atlas:bash-worker'
+  'atlas:bash-worker',
+  'miniforge:health', 'miniforge:analyze', 'miniforge:extract'
 ]);
 
 export const TOOLS: Record<string, ACPTool> = {
@@ -958,6 +1072,72 @@ export const TOOLS: Record<string, ACPTool> = {
       { input: { prompt: 'Summarize: ...' }, output: { text: '...' }, description: 'Generate a legal summary' }
     ],
     handler: handlers.llmGenerate
+  },
+
+  // -------------------------------------------------------------------------
+  // Miniforge NLP sidecar tools
+  // -------------------------------------------------------------------------
+
+  'miniforge:health': {
+    name: 'miniforge:health',
+    description: 'Check the local Miniforge CUDA sidecar used for structural/linguistic NLP analysis.',
+    category: 'code',
+    inputSchema: { type: 'object', properties: {} },
+    outputSchema: { type: 'object' },
+    examples: [
+      { input: {}, output: { ready: true, model: null, capabilities: null }, description: 'Probe sidecar health' }
+    ],
+    handler: handlers.miniforgeHealth
+  },
+  'miniforge:analyze': {
+    name: 'miniforge:analyze',
+    description: 'Run Miniforge CUDA-backed NLP analysis over text for entities, relationships, chunks, and features.',
+    category: 'code',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Text to analyze' },
+        sourceType: { type: 'string', description: 'plain_text | docling_markdown | docling_json | ocr_text | transcript | codebase | general (default: plain_text)' },
+        extractionMode: { type: 'string', description: 'entities | relationships | concepts | full (default: full)' },
+        documentId: { type: 'string' },
+        sourceRef: { type: 'string' },
+        packetKey: { type: 'string' },
+        language: { type: 'string' },
+        modelId: { type: 'string' },
+        maxChars: { type: 'number', description: 'Max 200000, default 50000' }
+      },
+      required: ['text']
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      { input: { text: 'The defendant filed a motion...' }, output: { entities: [], relationships: [], concepts: [], chunks: [], features: [] }, description: 'Full NLP analysis of a text snippet' }
+    ],
+    handler: handlers.miniforgeAnalyze
+  },
+  'miniforge:extract': {
+    name: 'miniforge:extract',
+    description: 'Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities.',
+    category: 'code',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Text to extract from' },
+        sourceType: { type: 'string', description: 'plain_text | docling_markdown | docling_json | ocr_text | transcript | codebase | general (default: plain_text)' },
+        extractionMode: { type: 'string', description: 'entities | relationships | concepts | full (default: full)' },
+        documentId: { type: 'string' },
+        sourceRef: { type: 'string' },
+        packetKey: { type: 'string' },
+        language: { type: 'string' },
+        modelId: { type: 'string' },
+        maxChars: { type: 'number', description: 'Max 200000, default 50000' }
+      },
+      required: ['text']
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      { input: { text: 'function validateSession(token) { ... }' }, output: {}, description: 'Structural extraction of a code snippet' }
+    ],
+    handler: handlers.miniforgeExtract
   },
 
   // -------------------------------------------------------------------------
