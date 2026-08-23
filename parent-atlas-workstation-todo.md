@@ -2909,25 +2909,28 @@ Remaining end-to-end gates, in order:
   split; (4) resume the Graphify revision-owner proof sequence → snapshot/Qdrant lineage → FANOUT,
   which was blocked all session on the semantic-dimension question that's now resolved.
 
-**Addendum, same session — 129 uncommitted working-tree files found, NOT yet reviewed or
-committed.** After the two commits above landed on `origin/main` (`d7d396b369`, `7d3eb0f61f`),
-`git status` on the working tree still shows 129 entries not touched by either commit: 114
-modified, 10 untracked, 1 deleted, 3 submodule pointer changes (`claude-mem`, `turbovec`,
-`embeddinggemma_300m` — pre-existing per this session's own start-of-session `gitStatus`, not new).
-Spot-checked the largest one to rule out data loss: `docs/reports/graphify-source-inventory-plan.json`
-shows as `246,055` deletions in `git diff --stat`, but this is a **legitimate schema regeneration**,
-not corruption — confirmed via direct diff: `HEAD` has `schemaVersion: v1` (246,157 lines, a full
-raw dump), the working tree has `schemaVersion: v2` (728 lines, a compact summary). Not chased
-further given context budget, but **NOT reviewed line-by-line and NOT committed** — this is
-deliberate, not an oversight: per this session's own git-safety discipline, 129 unreviewed files
-of unknown provenance should never go into one blanket `git add -A`. Notable un-reviewed files
-worth a look first: several `docker-compose*.yml/.yaml` (`docker-compose.yaml` alone shows 313
-lines removed — this is the bare-name, highest-collision-risk file flagged in
-`docker-compose-duplication-remediation/tasks.md`'s own audit, so a real edit here may be directly
-relevant to that change's still-open canonical-file decision) and modified scripts
-(`start_services.sh`, `scripts/mcp/atlas-tools-mcp.mjs`, `scripts/atlas/prove-code-revision-owner-canary.mts`,
-`scripts/atlas/observe-workspace-source-binding.mts`, `workspace-revision-origin-runtime-v1.ts`,
-`scripts/tests/smoke-outcome-ledger.mjs`). **Next-session action**: run `git diff` (or `git diff -w`
-to skip whitespace/CRLF noise) on each of those specific files before deciding whether to commit,
-discard, or hand back to whoever's concurrent work this might be — do not run a blanket `git add`
-on the full 129-file working tree.
+**Addendum, same session — 129-file pile RESOLVED, was concurrent user commit, not abandoned
+work.** The 129 uncommitted files flagged above were never mine to review — while this session's
+handoff commit was in flight, the user landed their own commit **`806c0ed2fe` ("docker_audit_823")**
+directly on `origin/main` in the same working directory, in between this session's `git fetch` and
+`git push`. `git push origin main` succeeded but reported `806c0ed2fe..b8c9c9c2e9` instead of the
+expected `7d3eb0f61f..b8c9c9c2e9` — a fast-forward, not a conflict, so nothing was lost. Verified
+directly: `git show 806c0ed2fe --stat` is 125 files changed, 420,710 insertions / 247,677 deletions,
+and includes every file this addendum had named as unreviewed — `docker-compose.yaml` (the exact
+-313 lines flagged), `docker-compose.dev.yml`, `docker-compose.production.yml`, `docker-compose.test.yml`,
+`docker-compose.yml`, `docker/docker-compose.gpu.yml`, `docker/omni-worker/docker-compose.omni.yml`,
+`scripts/start_services.sh`, `sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs`,
+`sveltekit-frontend/scripts/atlas/prove-code-revision-owner-canary.mts`,
+`sveltekit-frontend/scripts/atlas/observe-workspace-source-binding.mts`,
+`sveltekit-frontend/scripts/atlas/workspace-revision-origin-runtime-v1.ts`,
+`scripts/tests/smoke-outcome-ledger.mjs`. `docs/reports/graphify-source-inventory-plan.json`'s v1→v2
+schema regen (the "246K deletions" false alarm) is also in this commit. **No review/commit action
+needed from this addendum's original "next-session action" — it's done, by the user, not this
+session.** Post-resolution `git status --short` is down to 11 entries, all unrelated new activity
+(3 pre-existing submodule pointers, a couple of new graphify receipt files, `REVIEW_AND_NEXT_STEPS.md`,
+`run-graphify-daily-startup.mjs` in two locations, `sveltekit-frontend/package.json`,
+`sveltekit-frontend/docs/reports/graphify-bm25-index-plan.json`) — not reviewed this session, low
+concern, small enough to review quickly whenever picked up next. The **docker-compose canonical-file
+decision itself is still open** — `806c0ed2fe` edited multiple compose files but per its own audit
+history did not declare a winner; `docker-compose-duplication-remediation/tasks.md`'s operator
+decision is still pending regardless of this file-pile resolution.
