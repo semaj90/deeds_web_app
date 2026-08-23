@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import hashlib
+import json
 from typing import Any, Sequence
 
 import numpy as np
@@ -48,6 +49,29 @@ class LowRankComparisonReceipt:
     input_checksum: str
     output_checksum: str
     canonical_authority: bool
+    numerical_owner: str = "python_pytorch"
+    execution_device: str = "cpu"
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class LowRankCpuCudaParityReceipt:
+    schema: str
+    status: str
+    cuda_available: bool
+    input_checksum: str
+    representation_id: str | None
+    representation_revision: str | None
+    candidate_ordinal_map_checksum: str | None
+    singular_value_max_abs_delta: float | None
+    singular_value_max_relative_delta: float | None
+    relative_error_abs_delta: float | None
+    top_k_overlap_abs_delta: float | None
+    sample_bounds_valid: bool | None
+    canonical_authority: bool = False
+    numerical_owner: str = "python_pytorch"
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -55,6 +79,18 @@ class LowRankComparisonReceipt:
 
 def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def candidate_ordinal_map_checksum(canonical_ids: Sequence[str]) -> str:
+    """Checksum the dense ordinal map using the frozen snapshot convention."""
+    normalized = [str(value) for value in canonical_ids]
+    if not normalized or any(not value for value in normalized):
+        raise ValueError("canonical_ids must be non-empty strings")
+    if len(set(normalized)) != len(normalized):
+        raise ValueError("canonical_ids must be unique")
+    if normalized != sorted(normalized):
+        raise ValueError("canonical_ids must be in canonical ordinal order")
+    return _sha256_bytes(json.dumps(normalized, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
 
 
 def _stable_top_k(values: np.ndarray, k: int) -> list[LowRankRecommendation]:
@@ -66,15 +102,30 @@ def _stable_top_k(values: np.ndarray, k: int) -> list[LowRankRecommendation]:
     ]
 
 
-def _length_square_sample(matrix: np.ndarray, sample_count: int, seed: int) -> list[int]:
-    row_norm_sq = np.sum(matrix.astype(np.float64) ** 2, axis=1)
-    total = float(row_norm_sq.sum())
-    if total <= 0:
+def _length_square_sample_torch(tensor: Any, sample_count: int, seed: int) -> list[int]:
+    """Sample row ordinals from tensor-native length-squared probabilities.
+
+    This is a nomination lane only. It never creates a retrieval vote or
+    canonical identity. Keeping the reduction and multinomial call in PyTorch
+    allows the same implementation to run on CPU or CUDA without copying the
+    large matrix through JavaScript/NumPy loops.
+    """
+    import torch
+
+    row_norm_sq = tensor.square().sum(dim=1)
+    total = row_norm_sq.sum()
+    if not bool(torch.isfinite(total).item()) or float(total.detach().cpu()) <= 0.0:
         return []
     probabilities = row_norm_sq / total
-    rng = np.random.default_rng(seed)
-    samples = rng.choice(matrix.shape[0], size=sample_count, replace=True, p=probabilities)
-    return [int(value) for value in samples.tolist()]
+    generator = torch.Generator(device=tensor.device)
+    generator.manual_seed(seed)
+    samples = torch.multinomial(
+        probabilities,
+        num_samples=sample_count,
+        replacement=True,
+        generator=generator,
+    )
+    return [int(value) for value in samples.detach().cpu().tolist()]
 
 
 def compare_low_rank_recommendations(
@@ -145,7 +196,7 @@ def compare_low_rank_recommendations(
     approx_set = {item.column_ordinal for item in approx_top}
     overlap = len(exact_set & approx_set) / float(top_k)
 
-    samples = _length_square_sample(source, sample_count, seed)
+    samples = _length_square_sample_torch(tensor, sample_count, seed)
     input_checksum = _sha256_bytes(np.ascontiguousarray(source).tobytes())
     output_payload = (
         f"{relative_error:.17g}|{overlap:.17g}|"
@@ -172,4 +223,100 @@ def compare_low_rank_recommendations(
         input_checksum=input_checksum,
         output_checksum=_sha256_bytes(output_payload.encode("utf-8")),
         canonical_authority=False,
+        numerical_owner="python_pytorch",
+        execution_device=str(tensor.device),
+    )
+
+
+def prove_low_rank_cpu_cuda_parity(
+    matrix: Sequence[Sequence[float]] | np.ndarray,
+    *,
+    target_rank: int = 4,
+    oversampling: int = 8,
+    power_iterations: int = 2,
+    top_k: int = 10,
+    sample_count: int = 64,
+    seed: int = 0xA71A5,
+    canonical_ids: Sequence[str] | None = None,
+    representation_id: str | None = None,
+    representation_revision: str | None = None,
+) -> LowRankCpuCudaParityReceipt:
+    """Compare the Python/PyTorch CPU and CUDA owners on one bounded matrix.
+
+    CPU and CUDA multinomial implementations are allowed to choose different
+    ordinals for the same seed. Parity therefore compares numerical outputs,
+    probability-derived bounds, and policy flags rather than requiring byte-
+    identical random samples across devices.
+    """
+    import torch
+
+    source = np.asarray(matrix, dtype=np.float32)
+    if canonical_ids is not None and len(canonical_ids) != source.shape[0]:
+        raise ValueError("canonical_ids length must match matrix rows")
+    ordinal_checksum = candidate_ordinal_map_checksum(canonical_ids) if canonical_ids is not None else None
+    cpu = compare_low_rank_recommendations(
+        source,
+        target_rank=target_rank,
+        oversampling=oversampling,
+        power_iterations=power_iterations,
+        top_k=top_k,
+        sample_count=sample_count,
+        seed=seed,
+        device="cpu",
+    )
+    if not torch.cuda.is_available():
+        return LowRankCpuCudaParityReceipt(
+            schema="atlas.low-rank-cpu-cuda-parity-receipt.v1",
+            status="CUDA_UNAVAILABLE",
+            cuda_available=False,
+            input_checksum=cpu.input_checksum,
+            representation_id=representation_id,
+            representation_revision=representation_revision,
+            candidate_ordinal_map_checksum=ordinal_checksum,
+            singular_value_max_abs_delta=None,
+            singular_value_max_relative_delta=None,
+            relative_error_abs_delta=None,
+            top_k_overlap_abs_delta=None,
+            sample_bounds_valid=None,
+        )
+
+    cuda = compare_low_rank_recommendations(
+        source,
+        target_rank=target_rank,
+        oversampling=oversampling,
+        power_iterations=power_iterations,
+        top_k=top_k,
+        sample_count=sample_count,
+        seed=seed,
+        device="cuda",
+    )
+    singular_delta = max(
+        abs(left - right)
+        for left, right in zip(cpu.exact_singular_values, cuda.exact_singular_values)
+    )
+    singular_relative_delta = max(
+        abs(left - right) / max(abs(left), 1e-12)
+        for left, right in zip(cpu.exact_singular_values, cuda.exact_singular_values)
+    )
+    relative_delta = abs(cpu.relative_frobenius_error - cuda.relative_frobenius_error)
+    overlap_delta = abs(cpu.top_k_overlap - cuda.top_k_overlap)
+    sample_bounds_valid = all(0 <= ordinal < source.shape[0] for ordinal in cuda.length_square_sample_ordinals)
+    status = (
+        "PARITY_PROVEN"
+        if singular_relative_delta <= 1e-3 and relative_delta <= 1e-3 and sample_bounds_valid
+        else "NUMERICAL_MISMATCH"
+    )
+    return LowRankCpuCudaParityReceipt(
+        schema="atlas.low-rank-cpu-cuda-parity-receipt.v1",
+        status=status,
+        cuda_available=True,
+        input_checksum=cpu.input_checksum,
+        representation_id=representation_id,
+        representation_revision=representation_revision,
+        candidate_ordinal_map_checksum=ordinal_checksum,
+        singular_value_max_abs_delta=singular_delta,
+        singular_value_max_relative_delta=singular_relative_delta,
+        relative_error_abs_delta=relative_delta,
+        top_k_overlap_abs_delta=overlap_delta,
+        sample_bounds_valid=sample_bounds_valid,
     )
