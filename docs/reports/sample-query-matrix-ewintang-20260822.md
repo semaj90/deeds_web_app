@@ -4,93 +4,155 @@ Date: 2026-08-22
 
 ## Scope
 
-This tranche introduces a measurement-only sample/query matrix aligned by `CandidateOrdinal`.
-It does **not** create a new retrieval lane, identity authority, production sampler, or promotion path.
+This is a measurement-only sampling lane aligned by `CandidateOrdinal`. It does not create a retrieval vote, identity authority, canonical writer, or promotion path.
 
 ## Contracts
+
+Existing:
 
 - `SampleQueryMatrixV1`
 - `SamplingDecisionV1`
 - `SamplingEvaluationV1`
 
-Matrix roles:
+Added for real-corpus measurement:
 
-- `CANDIDATE_FEATURE`
-- `SEMANTIC_RESIDUAL`
-- `LATENT_ROUTING`
+- `SamplingTargetSetV1`
+- `SamplingPolicyAggregateV1`
+- `SamplingCorpusEvaluationV1`
+- `SamplingMatrixComparisonV1`
 
-Normalization is explicit and checksum-bearing:
+All receipts keep:
 
-- `NONE`
-- `COLUMN_STANDARDIZED`
-- `ROW_L2`
+```text
+identityAuthority=false
+retrievalVoteProduced=false
+canonicalWritesAttempted=false
+promotionAuthorized=false
+```
 
-Sampling policies:
+## Mathematical gate
+
+If every semantic row is row-L2 normalized, row norms are equal and row-level length-squared sampling degenerates toward uniform sampling. The semantic control therefore exists to measure this effect, not to introduce another semantic representation.
+
+The feature experiment uses `CandidateFeatureColumnarV1`. Present feature values are optionally column-standardized and the presence matrix is appended explicitly, so missing evidence is not silently conflated with a real numeric zero when row norms are measured.
+
+## CandidateOrdinal admission
+
+Real-corpus measurement requires one frozen candidate world. Four explicit artifacts are required:
+
+1. `CandidateOrdinalMapV1` JSON;
+2. frozen `semantic_768` parquet;
+3. `CandidateFeatureColumnarV1` JSON;
+4. exact `CandidateOrdinalSetV1` JSON defining the target top-k.
+
+The known semantic producer is:
+
+```text
+scripts/atlas/duckdb/freeze-vector-snapshot-5k-768.mts
+  -> .tmp/atlas-vector-snapshots/vector-snapshot-5k-768.parquet
+```
+
+That parquet is ordered by `packet_key`, not CandidateOrdinal. The semantic adapter therefore joins by exact `packetKey` and rejects missing, duplicate, or null/degraded packet-key bindings.
+
+Only a verified `CandidateOrdinalSetV1` with `approximate=false` may become `EXACT_TOP_K` target truth. ANN-local ordinals that do not carry the same `candidateSnapshotRevision` and `ordinalMapChecksum` are rejected.
+
+## Metrics
+
+Across one fixed seed suite, each policy records:
+
+- target recall mean/std/min/max;
+- pairwise selection Jaccard across seeds;
+- sampling latency p50/p95/max;
+- estimated FP32 matrix bytes;
+- deterministic decision-set checksum.
+
+Policies:
 
 - `LENGTH_SQUARED`
 - `UNIFORM`
 - `TOP_K_ROW_NORM`
 
-## Critical proof question
+The same sample size, seeds, target set, and CandidateOrdinal world are used for both semantic and feature matrices.
 
-If all rows are L2-normalized, row norms are equal and row-level length-squared sampling degenerates toward uniform sampling. The contract records row squared norms and their coefficient of variation and exposes `lengthSquaredDegeneratesTowardUniform` rather than assuming the sampling policy remains informative.
+## Readiness audit
 
-## Safety invariants
+```powershell
+cd C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
 
-Every receipt records:
-
-- `identityAuthority=false`
-- `retrievalVoteProduced=false`
-- `canonicalWritesAttempted=false`
-- `promotionAuthorized=false`
-
-The bounded proof runner uses fixture-only data and performs no Postgres, Qdrant, Neo4j, or Valkey reads or writes.
-
-## Proof sequence
-
-```text
-EWINTANG-00 MATRIX ASSUMPTIONS RECORDED          IMPLEMENTED_UNPROVEN
-EWINTANG-01 SAMPLE/QUERY ACCESS DEFINED          IMPLEMENTED_UNPROVEN
-EWINTANG-02 NORMALIZATION EFFECT PROVEN          WRITTEN_UNRUN
-EWINTANG-03 DETERMINISTIC PRNG RECEIPT           IMPLEMENTED_UNPROVEN
-EWINTANG-04 LOW-RANK FIXTURE PARITY              NOT IMPLEMENTED
-EWINTANG-05 CANDIDATE RECALL MEASURED            FIXTURE SURFACE WRITTEN_UNRUN
-EWINTANG-06 NO NEW RETRIEVAL VOTE                CONTRACTUALLY GUARDED
-EWINTANG-07 NO CANONICAL IDENTITY                CONTRACTUALLY GUARDED
-EWINTANG-08 RTX GEMM ACCELERATION                NOT IMPLEMENTED
+npx tsx scripts/atlas/audit-sample-query-corpus-readiness.mts `
+  --ordinal-map=<candidate-ordinal-map.json> `
+  --feature-columnar=<candidate-feature-columnar.json> `
+  --exact-candidate-set=<exact-candidate-ordinal-set.json>
 ```
 
-## Workstation commands
+The semantic parquet defaults to:
 
-From `sveltekit-frontend`:
+```text
+../.tmp/atlas-vector-snapshots/vector-snapshot-5k-768.parquet
+```
+
+Repository discovery found the semantic parquet producer, but no canonical persisted corpus producer yet for:
+
+```text
+CandidateOrdinalMapV1 JSON
+CandidateFeatureColumnarV1 corpus JSON
+exact CandidateOrdinalSetV1 JSON
+```
+
+Contract builders and fixtures exist; fixture generation is not real-corpus evidence.
+
+## Real-corpus run
+
+```powershell
+npx tsx scripts/atlas/evaluate-sample-query-corpus-v1.mts `
+  --ordinal-map=<candidate-ordinal-map.json> `
+  --semantic-parquet=../.tmp/atlas-vector-snapshots/vector-snapshot-5k-768.parquet `
+  --feature-columnar=<candidate-feature-columnar.json> `
+  --exact-candidate-set=<exact-candidate-ordinal-set.json> `
+  --sample-size=64 `
+  --target-k=10 `
+  --seeds=1,7,42,99,2026,65537,104729 `
+  --output=../docs/reports/sample-query-real-corpus-v1.json
+```
+
+Successful execution is still classified:
+
+```text
+SAMPLE_QUERY_REAL_CORPUS_MEASURED_NOT_PROMOTED
+```
+
+## Existing low-rank owner
+
+Do not create a duplicate low-rank implementation. The repository already has:
+
+```text
+python/atlas_compute/low_rank.py
+```
+
+It contains a bounded full-SVD reference, seeded `torch.svd_lowrank` challenger, and Tang-inspired length-square nomination helper, while explicitly disclaiming Tang's full sublinear recommendation algorithm. Its existing tests live in `python/test_atlas_compute.py`.
+
+If real feature-matrix length-squared sampling produces repeatable recall lift over uniform, EWINTANG-04 should reuse that module. RTX GEMM acceleration is a later executor optimization.
+
+## Proof state
+
+```text
+EWINTANG-00 MATRIX ASSUMPTIONS                 IMPLEMENTED_UNPROVEN
+EWINTANG-01 SAMPLE/QUERY ACCESS                IMPLEMENTED_UNPROVEN
+EWINTANG-02 NORMALIZATION EFFECT               WRITTEN_UNRUN
+EWINTANG-03 DETERMINISTIC PRNG                 IMPLEMENTED_UNPROVEN
+EWINTANG-04 LOW-RANK                           EXISTING PYTHON SURFACE / CORPUS BINDING OPEN
+EWINTANG-05 MULTI-SEED CANDIDATE RECALL        IMPLEMENTED_UNPROVEN
+EWINTANG-06 NO NEW RETRIEVAL VOTE              CONTRACTUALLY GUARDED
+EWINTANG-07 NO CANONICAL IDENTITY              CONTRACTUALLY GUARDED
+EWINTANG-08 RTX GEMM ACCELERATION              NOT IMPLEMENTED
+```
+
+## Fixture tests
 
 ```powershell
 npx vitest run `
-  src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts
+  src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts `
+  src/lib/server/atlas/sampling/sample-query-corpus-evaluation-v1.spec.ts
 ```
 
-Then:
-
-```powershell
-npx tsx scripts/atlas/prove-sample-query-matrix-v1.mts `
-  --output=../docs/reports/sample-query-matrix-proof-v1.json
-```
-
-A passing fixture receipt proves only deterministic CandidateOrdinal-aligned sampling behavior and the L2-normalization degeneracy check. It does not prove low-rank utility on the real corpus.
-
-## Next real experiment
-
-Materialize the same `CandidateOrdinal` candidate world into two derived matrices:
-
-1. row-L2-normalized semantic rows;
-2. an explicitly defined unnormalized or column-standardized candidate-feature / residual matrix.
-
-Run fixed seeds over the same target ordinals and compare:
-
-- Recall@sample-size
-- overlap with exact/top-k target candidates
-- variance across seeds
-- sampling time
-- matrix bytes
-
-Only if the length-squared policy improves bounded coverage over uniform should a low-rank approximation or RTX acceleration tranche be opened.
+Promotion rule: only open the low-rank corpus tranche if the feature matrix shows repeatable positive `lengthSquared.recallMean - uniform.recallMean` on the same exact target set, sample size, CandidateOrdinal map, and seed suite.
