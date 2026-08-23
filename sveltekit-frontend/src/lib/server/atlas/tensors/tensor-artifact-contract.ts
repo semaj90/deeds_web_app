@@ -1,10 +1,11 @@
-import {
-  ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID,
-  ATLAS_CANONICAL_SEMANTIC_DIMENSION as SEMANTIC_DIMENSION,
-} from '../retrieval/qdrant-semantic-projection.js';
+// GPU snapshot artifacts are native EmbeddingGemma output. They must not
+// inherit the stale legacy Qdrant projection constant while that migration is
+// still being reconciled.
+export const SEMANTIC_SNAPSHOT_REPRESENTATION_ID = 'semantic_768' as const;
+export const SEMANTIC_SNAPSHOT_DIMENSION = 768 as const;
 
 export type TensorArtifactType =
-  | typeof SEMANTIC_REPRESENTATION_ID
+  | typeof SEMANTIC_SNAPSHOT_REPRESENTATION_ID
   | 'feature_matrix_5'
   | 'centroids_768'
   | 'topology_coordinate4'
@@ -44,10 +45,10 @@ export interface SemanticSnapshotManifest {
   snapshotId: string;
   workspaceRevision: string;
   sourceRevision: string;
-  representationId: typeof SEMANTIC_REPRESENTATION_ID;
+  representationId: typeof SEMANTIC_SNAPSHOT_REPRESENTATION_ID;
   representationRevision: string;
   ordinalMapRevision: string;
-  dimension: typeof SEMANTIC_DIMENSION;
+  dimension: typeof SEMANTIC_SNAPSHOT_DIMENSION;
   dtype: 'float32';
   vectorCount: number;
   identityDigest: string;
@@ -74,7 +75,7 @@ export interface SemanticCentroidRoutingManifest {
   routingRevision: string;
   algorithm: 'kmeans';
   k: 64 | 128 | 256;
-  dimension: typeof SEMANTIC_DIMENSION;
+  dimension: typeof SEMANTIC_SNAPSHOT_DIMENSION;
   vectorCount: number;
   centroidCount: number;
   seed: string;
@@ -90,13 +91,13 @@ export function assertTensorArtifactManifest(m: TensorArtifactManifest): void {
   if (!Array.isArray(m.shape) || m.shape.some((n) => !Number.isInteger(n) || n < 0)) throw new Error('invalid shape');
   if (!Number.isInteger(m.batchCount) || m.batchCount < 0) throw new Error('invalid batchCount');
   if (!Number.isFinite(m.byteLength) || m.byteLength < 0) throw new Error('invalid byteLength');
-  if (m.artifactType === SEMANTIC_REPRESENTATION_ID && m.shape.at(-1) !== SEMANTIC_DIMENSION) throw new Error('semantic_768 must end in 768');
+  if (m.artifactType === SEMANTIC_SNAPSHOT_REPRESENTATION_ID && m.shape.at(-1) !== SEMANTIC_SNAPSHOT_DIMENSION) throw new Error('semantic_768 must end in 768');
 }
 
 export function assertSemanticSnapshotManifest(m: SemanticSnapshotManifest): void {
   if (m.schemaVersion !== 'atlas.semantic-snapshot.v1') throw new Error('invalid semantic snapshot schema');
   if (!m.snapshotId || !m.workspaceRevision || !m.sourceRevision) throw new Error('semantic snapshot lineage required');
-  if (m.representationId !== SEMANTIC_REPRESENTATION_ID || m.dimension !== SEMANTIC_DIMENSION) {
+  if (m.representationId !== SEMANTIC_SNAPSHOT_REPRESENTATION_ID || m.dimension !== SEMANTIC_SNAPSHOT_DIMENSION) {
     throw new Error('semantic snapshot representation mismatch');
   }
   if (!m.representationRevision || !m.ordinalMapRevision) throw new Error('semantic snapshot revision required');
@@ -114,7 +115,7 @@ export function assertSemanticCentroidRoutingManifest(m: SemanticCentroidRouting
     throw new Error('centroid routing lineage required');
   }
   if (m.algorithm !== 'kmeans' || ![64, 128, 256].includes(m.k)) throw new Error('unsupported centroid routing configuration');
-  if (m.dimension !== SEMANTIC_DIMENSION || !Number.isInteger(m.vectorCount) || m.vectorCount < 0) {
+  if (m.dimension !== SEMANTIC_SNAPSHOT_DIMENSION || !Number.isInteger(m.vectorCount) || m.vectorCount < 0) {
     throw new Error('centroid routing representation mismatch');
   }
   if (!Number.isInteger(m.centroidCount) || m.centroidCount !== m.k) throw new Error('centroid count must equal k');

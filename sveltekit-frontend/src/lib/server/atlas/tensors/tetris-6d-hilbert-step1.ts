@@ -188,6 +188,9 @@ export function eulerZYXToCanonicalQuaternion(roll: number, pitch: number, yaw: 
     : Math.abs(q[1]) > 1e-12 ? q[1]
       : Math.abs(q[2]) > 1e-12 ? q[2] : q[3];
   if (signProbe < 0) q = [-q[0], -q[1], -q[2], -q[3]];
+  // Eliminate platform-dependent signed/near-zero residue at periodic angles
+  // so equivalent Euler representations have identical physical coordinates.
+  q = (q as readonly number[]).map((component) => Math.abs(component) <= 1e-12 ? 0 : component) as PhysicalQuaternion;
   return PhysicalQuaternionSchema.parse(q);
 }
 
