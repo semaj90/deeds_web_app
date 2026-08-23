@@ -41,13 +41,37 @@ const LAYER_RULES = [
 const IDENTITY_FIELDS = ['feature_id', 'feature_label', 'source_ref', 'packet_key', 'identity_lane'];
 
 const WRITE_STORES = {
-  postgres: ['db.', 'atlas.coverage', 'ops.record', 'ops.propose', 'ops.run'],
+  postgres: ['ops.record_fix_attempt'],
   redis:    ['engram.redis', 'redis_health', 'bifrost'],
-  qdrant:   ['evidence.link', 'evidence.enrich'],
-  neo4j:    ['graph.community', 'graph.shortest', 'graph.expand'],
-  kanban:   ['ops.propose_patch', 'ops.record_fix_attempt', 'kanban'],
+  qdrant:   ['evidence.enrich'],
+  neo4j:    ['evidence.link_image_graph'],
+  kanban:   ['ops.record_fix_attempt', 'kanban'],
   engram:   ['engram.ace_packet_inject', 'engram.chat_memory_store'],
 };
+
+const READ_ONLY_NAMES = new Set([
+  'db.schema_overview',
+  'db.table_inspect',
+  'graph.expand_neighborhood',
+  'graph.shortest_path',
+  'graph.community_for_node',
+  'hypergraph.expand_members',
+  'atlas.coverage',
+  'ops.propose_patch',
+  'ops.run_targeted_test',
+  'ops.run_quality_gate',
+  'engram.redis_health',
+]);
+
+function classifyOperation(name, description, writesTo) {
+  if (/^ops\.propose_patch$/.test(name)) return 'PROPOSE';
+  if (READ_ONLY_NAMES.has(name) || /read[- ]only|does not modify|no row data/i.test(description)) {
+    return 'READ';
+  }
+  if (writesTo.length > 0) return 'APPLY';
+  if (/^ops\.|audit|health|coverage|inspect|validate|quality_gate|targeted_test/i.test(name)) return 'AUDIT';
+  return 'READ';
+}
 
 function classifyTool(tool) {
   const name = tool.name ?? '';
@@ -68,7 +92,9 @@ function classifyTool(tool) {
   const namespace = name.includes('.') ? name.split('.')[0] :
                     name.includes(':') ? name.split(':')[0] : 'misc';
 
-  const requiredPermissions = writesTo.length > 0 ? 'read_write' : 'read_only';
+  const operationKind = classifyOperation(name, tool.description ?? '', writesTo);
+  const effectiveWritesTo = operationKind === 'READ' || operationKind === 'AUDIT' ? [] : writesTo;
+  const requiredPermissions = effectiveWritesTo.length > 0 ? 'read_write' : 'read_only';
 
   return {
     tool_name: name,
@@ -76,7 +102,8 @@ function classifyTool(tool) {
     description: tool.description ?? '',
     retrieval_layer: layers.length > 0 ? layers : ['unknown'],
     identity_fields: identityFields,
-    writes_to: writesTo,
+    operation_kind: operationKind,
+    writes_to: effectiveWritesTo,
     required_permissions: requiredPermissions,
     input_schema_keys: tool.inputSchema?.properties ? Object.keys(tool.inputSchema.properties) : [],
   };

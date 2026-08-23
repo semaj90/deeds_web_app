@@ -27,6 +27,10 @@
  */
 
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import {
+  buildPhaseAlignmentReceipt,
+  type PhaseAlignmentInputV1,
+} from '@deeds/parent-atlas';
 
 /**
  * Generate a session ID from MCP request context
@@ -52,7 +56,59 @@ export function createToolWithDispatcher(
   sessionId: string,
   handler: (input: unknown) => Promise<unknown>
 ): (input: unknown) => Promise<unknown> {
-  return middleware.wrap(handler, toolName, sessionId);
+  return middleware ? middleware.wrap(handler, toolName, sessionId) : handler;
+}
+
+/**
+ * Opt-in phase-aware MCP adapter. The phase envelope is transport metadata;
+ * it is removed before the existing tool handler receives its domain input.
+ * No new executor or persistence owner is introduced here.
+ */
+export function createPhaseAlignedToolWithDispatcher(
+  middleware: DispatcherMiddleware | undefined,
+  toolName: string,
+  sessionId: string,
+  handler: (input: unknown) => Promise<any>
+): (input: unknown) => Promise<any> {
+  const dispatch = createToolWithDispatcher(
+    middleware,
+    toolName,
+    sessionId,
+    handler,
+  );
+
+  return async (input: unknown) => {
+    if (!input || typeof input !== 'object' || !('phase_alignment' in input)) {
+      return dispatch(input);
+    }
+
+    const envelope = input as Record<string, unknown>;
+    const receipt = buildPhaseAlignmentReceipt({
+      ...(envelope.phase_alignment as PhaseAlignmentInputV1),
+      selected_tool: toolName,
+    });
+    const action = receipt.decision.action;
+    const dispatchAllowed =
+      receipt.decision.decode_admitted ||
+      action === 'RETRIEVE' ||
+      action === 'EXPAND_GRAPH' ||
+      action === 'VALIDATE';
+
+    if (!dispatchAllowed) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify(receipt) }],
+        isError: true,
+        phase_alignment_receipt: receipt,
+      };
+    }
+
+    const { phase_alignment: _phaseAlignment, ...domainInput } = envelope;
+    const result = await dispatch(domainInput);
+    if (result && typeof result === 'object' && !Array.isArray(result)) {
+      return { ...result, phase_alignment_receipt: receipt };
+    }
+    return { content: [{ type: 'text', text: String(result) }], phase_alignment_receipt: receipt };
+  };
 }
 
 /**

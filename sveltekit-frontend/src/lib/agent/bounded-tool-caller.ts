@@ -9,10 +9,13 @@
  */
 
 import { runTool, type ToolCall, type ToolResult } from './tool-registry';
+import { buildPhaseAlignmentReceipt, type PhaseAlignmentInputV1 } from '@deeds/parent-atlas';
 
 export type InProcessToolCall = {
   name: string;
   arguments: Record<string, unknown>;
+  /** Optional fail-closed HMM → DAG → prefill/decode gate. */
+  phase_alignment?: PhaseAlignmentInputV1;
 };
 
 export type ToolCallResult = {
@@ -21,6 +24,7 @@ export type ToolCallResult = {
   error?: string;
   execution_time_ms?: number;
   tool_type: 'bounded' | 'in-process';
+  phase_alignment_receipt?: ReturnType<typeof buildPhaseAlignmentReceipt>;
 };
 
 /**
@@ -29,7 +33,19 @@ export type ToolCallResult = {
  * - In-process handler (for rag_search, case_search, etc)
  */
 export async function callToolSafely(call: InProcessToolCall): Promise<ToolCallResult> {
-  const { name, arguments: args } = call;
+  const { name, arguments: args, phase_alignment } = call;
+
+  const phaseAlignmentReceipt = phase_alignment
+    ? buildPhaseAlignmentReceipt({ ...phase_alignment, selected_tool: name })
+    : undefined;
+  if (phaseAlignmentReceipt && !phaseAlignmentReceipt.decision.decode_admitted && phaseAlignmentReceipt.decision.action !== 'RETRIEVE' && phaseAlignmentReceipt.decision.action !== 'EXPAND_GRAPH' && phaseAlignmentReceipt.decision.action !== 'VALIDATE') {
+    return {
+      ok: false,
+      error: `Phase alignment blocked tool dispatch: ${phaseAlignmentReceipt.decision.block_reasons.join(',') || phaseAlignmentReceipt.decision.action}`,
+      tool_type: isBoundedTool(name) ? 'bounded' : 'in-process',
+      phase_alignment_receipt: phaseAlignmentReceipt,
+    };
+  }
 
   // Bounded tools — route via registry
   if (isBoundedTool(name)) {
@@ -37,6 +53,7 @@ export async function callToolSafely(call: InProcessToolCall): Promise<ToolCallR
     return {
       ...result,
       tool_type: 'bounded',
+      ...(phaseAlignmentReceipt ? { phase_alignment_receipt: phaseAlignmentReceipt } : {}),
     };
   }
 
@@ -45,6 +62,7 @@ export async function callToolSafely(call: InProcessToolCall): Promise<ToolCallR
     ok: false,
     error: `Unknown tool: ${name}. Use in-process tool handler instead.`,
     tool_type: 'in-process',
+    ...(phaseAlignmentReceipt ? { phase_alignment_receipt: phaseAlignmentReceipt } : {}),
   };
 }
 

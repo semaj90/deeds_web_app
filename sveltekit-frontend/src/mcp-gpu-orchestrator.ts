@@ -150,12 +150,24 @@ class MCPGPUOrchestrator {
 			top_p: 0.9
 		});
 
-		// Nomic Embeddings Configuration
+		// Canonical EmbeddingGemma semantic lane. Nomic remains an explicit
+		// compatibility fallback and is never selected implicitly.
+		this.modelConfigs.set('embeddinggemma:latest', {
+			name: 'embeddinggemma:latest',
+			port: 11434,
+			capabilities: ['vector_embedding', 'similarity_search'],
+			dimensions: 768,
+			representationId: 'semantic_768',
+			memory_requirement: '274MB',
+			batch_size: 32
+		});
 		this.modelConfigs.set('nomic-embed-text', {
-			name: 'nomic-embed-text, latest',
+			name: 'nomic-embed-text, latest (compatibility fallback)',
 			port: 11436,
 			capabilities: ['vector_embedding', 'similarity_search'],
 			dimensions: 768,
+			representationId: 'legacy_embedding_fallback',
+			fallbackOnly: true,
 			memory_requirement: '274MB',
 			batch_size: 32
 		});
@@ -365,8 +377,10 @@ class MCPGPUOrchestrator {
 			'/api/v1/embeddings',
 			{
 				texts: Array.isArray(task.data.text) ? task.data.text : [task.data.text],
-				model: task.config?.model ?? 'nomic-embed-text',
-				batch_size: task.config?.model === 'nomic-embed-text' ? 32 : 16
+				model: task.config?.model ?? 'embeddinggemma:latest',
+				representation_id: 'semantic_768',
+				dimension: 768,
+				batch_size: task.config?.model === 'embeddinggemma:latest' ? 32 : 16
 			},
 			{
 				preferredProtocol: 'http',

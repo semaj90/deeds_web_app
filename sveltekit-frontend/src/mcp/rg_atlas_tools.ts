@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { runRgSearchAtlas } from '../lib/server/rg-atlas/run.js';
 import { rgSearchAtlasOptionsSchema } from '../lib/server/rg-atlas/types.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
-import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
+import { generateSessionId, createPhaseAlignedToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 /**
  * Register RG-Atlas search tools.
@@ -16,7 +16,7 @@ export function registerRgAtlasTools(server: McpServer, dispatcherMiddleware?: D
       description: 'Execute high-authority deep search using the RG-Atlas pipeline (rg + GPU Karpathy + Qdrant union + MARCO rerank). Better for deep research than standard trace_search.',
       inputSchema: rgSearchAtlasOptionsSchema
     },
-    createToolWithDispatcher(
+    createPhaseAlignedToolWithDispatcher(
       dispatcherMiddleware,
       'kb.rg_atlas_search',
       sessionId_rg_atlas_search,
