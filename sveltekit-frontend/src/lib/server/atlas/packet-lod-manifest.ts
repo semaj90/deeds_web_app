@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import type { PacketLodManifest } from '$lib/runtime-cache/contracts';
-import { PacketLodManifestSchema, LOD_LEVELS } from '$lib/runtime-cache/contracts';
+import type { PacketLodManifest } from '../../runtime-cache/contracts.js';
+import { PacketLodManifestSchema, LOD_LEVELS } from '../../runtime-cache/contracts.js';
 
 /**
  * LOD Manifest Emission — Retrieve Chain Integration
@@ -27,8 +27,9 @@ export function determineLod(destination: string): '0' | '1' | '2' | '3' {
 }
 
 export function estimateTokenCount(text: string): number {
-  // Rough estimate: ~4 chars per token (GPT tokenizer average)
-  return Math.ceil(text.length / 4);
+  // Rough estimate: ~4 Unicode code points per token. `String.length` counts
+  // UTF-16 code units and double-counts astral glyphs such as emoji.
+  return Math.ceil(Array.from(text).length / 4);
 }
 
 export async function buildPacketLodManifest(
