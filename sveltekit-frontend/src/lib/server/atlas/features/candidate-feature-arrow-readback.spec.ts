@@ -1,14 +1,30 @@
 import fs from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
 import { materializeCandidateFeatureSnapshot } from './candidate-feature-snapshot-v1.js';
 import { materializeCandidateFeatureColumnar } from './candidate-feature-columnar-v1.js';
-import { serializeCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/write-candidate-feature-arrow.mjs';
-import { readCandidateFeatureArrowFile } from '../../../../../../scripts/atlas/read-candidate-feature-arrow.mjs';
+type ArrowWriter = (input: unknown, outputPath?: string) => {
+  bytes: Uint8Array;
+  artifact: Record<string, unknown>;
+  receipt: Record<string, unknown>;
+};
+type ArrowReader = (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+
+let serializeCandidateFeatureArrowFile: ArrowWriter;
+let readCandidateFeatureArrowFile: ArrowReader;
+
+beforeAll(async () => {
+  const require = createRequire(import.meta.url);
+  const writer = require('../../../../../../scripts/atlas/write-candidate-feature-arrow.mjs') as Record<string, unknown>;
+  const reader = require('../../../../../../scripts/atlas/read-candidate-feature-arrow.mjs') as Record<string, unknown>;
+  serializeCandidateFeatureArrowFile = writer.serializeCandidateFeatureArrowFile as ArrowWriter;
+  readCandidateFeatureArrowFile = reader.readCandidateFeatureArrowFile as ArrowReader;
+});
 
 const tmpDirs: string[] = [];
 
