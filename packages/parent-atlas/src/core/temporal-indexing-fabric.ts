@@ -193,8 +193,15 @@ export function temporalIndexChecksum(value: unknown): string {
   return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
-export function buildTemporalIndexPlan(input: Omit<z.input<typeof temporalIndexPlanSchema>, 'schema' | 'actions' | 'plan_checksum' | 'canonical_authority'>): TemporalIndexPlanV1 {
+export function buildTemporalIndexPlan(input: Omit<z.input<typeof temporalIndexPlanSchema>, 'schema' | 'plan_id' | 'actions' | 'plan_checksum' | 'canonical_authority'> & { plan_id?: string }): TemporalIndexPlanV1 {
   const deltas = input.deltas.map((item) => sourceRevisionDeltaSchema.parse(item));
+  const plan_id = input.plan_id ?? `temporal-plan:${temporalIndexChecksum({
+    workspace_revision: input.workspace_revision,
+    previous_source_snapshot_revision: input.previous_source_snapshot_revision,
+    source_snapshot_revision: input.source_snapshot_revision,
+    producer_revision: input.producer_revision,
+    deltas,
+  })}`;
   const actions = deltas.map((delta) => ({
     source_ref: delta.source_ref,
     structural: delta.change_kind === 'UNCHANGED' ? 'REUSE' as const
@@ -221,6 +228,7 @@ export function buildTemporalIndexPlan(input: Omit<z.input<typeof temporalIndexP
   const raw = {
     schema: 'atlas.temporal-index-plan.v1' as const,
     ...input,
+    plan_id,
     deltas,
     actions,
     pagerank_policy: graphChanged ? 'FULL_RECOMPUTE_WARM_START' as const : 'REUSE_IF_GRAPH_UNCHANGED' as const,
