@@ -1,9 +1,16 @@
+import importlib.util
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
 
-from python.atlas_xgboost_grouped_ranking_v1 import prepare_grouped_ranking_dataset_v1
+MODULE_PATH = Path(__file__).resolve().parents[1] / 'atlas_xgboost_grouped_ranking_v1.py'
+spec = importlib.util.spec_from_file_location('atlas_xgboost_grouped_ranking_v1', MODULE_PATH)
+module = importlib.util.module_from_spec(spec)
+assert spec and spec.loader
+spec.loader.exec_module(module)
+prepare_grouped_ranking_dataset_v1 = module.prepare_grouped_ranking_dataset_v1
 
 
 def test_grouped_dataset_sorts_by_qid_and_candidate_and_is_deterministic():
