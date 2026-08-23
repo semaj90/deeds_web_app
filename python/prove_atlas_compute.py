@@ -4,6 +4,10 @@ NPZ input contract:
   corpus: float32 [N,D]              semantic/feature tensor
   queries: float32 [Q,D]
   canonical_ids: unicode/bytes [N]
+  query_corpus_ordinals: optional int64 [Q]
+      For queries sampled from the corpus, provides each query's canonical corpus
+      ordinal so ANN Recall@K can exclude the trivial self-neighbor. Do not infer
+      this mapping from floating-point equality.
   association_matrix: optional float32 [A,B]
       Required only for --low-rank. This must be a real association matrix such
       as query-profile×candidate, feature×evidence, or task×candidate. A
@@ -61,10 +65,18 @@ def main() -> None:
     args = parser.parse_args()
 
     association_matrix: np.ndarray | None = None
+    query_corpus_ordinals: list[int] | None = None
     with np.load(args.snapshot, allow_pickle=False) as data:
         corpus = np.asarray(data["corpus"], dtype=np.float32)
         queries = np.asarray(data["queries"], dtype=np.float32)
         raw_ids = np.asarray(data["canonical_ids"])
+        if "query_corpus_ordinals" in data.files:
+            raw_query_ordinals = np.asarray(data["query_corpus_ordinals"], dtype=np.int64)
+            if raw_query_ordinals.ndim != 1 or raw_query_ordinals.shape[0] != queries.shape[0]:
+                raise ValueError("query_corpus_ordinals must be rank-1 with one ordinal per query")
+            query_corpus_ordinals = [int(value) for value in raw_query_ordinals.tolist()]
+            if any(value < 0 or value >= corpus.shape[0] for value in query_corpus_ordinals):
+                raise ValueError("query_corpus_ordinals contains an out-of-range corpus ordinal")
         if "association_matrix" in data.files:
             association_matrix = np.asarray(data["association_matrix"], dtype=np.float32)
     canonical_ids = [
@@ -81,6 +93,7 @@ def main() -> None:
         "query_checksum": query_checksum,
         "metric": args.metric,
         "canonical_authority": False,
+        "query_corpus_ordinals_present": query_corpus_ordinals is not None,
         "receipts": {},
     }
 
@@ -112,6 +125,7 @@ def main() -> None:
             queries,
             metric=args.metric,
             k=args.top_k,
+            query_corpus_ordinals=query_corpus_ordinals,
         ))
 
     if args.pca_components > 0:
