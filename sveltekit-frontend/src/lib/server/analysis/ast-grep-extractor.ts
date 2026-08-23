@@ -10,7 +10,16 @@
  * Consiliency chunk/node provenance without reconstructing offsets from lines.
  */
 
+import { createHash } from 'node:crypto';
 import type { SgNode } from '@ast-grep/napi';
+
+export interface AstGrepObservationContextV1 {
+	sourceRef: string;
+	workspaceRevision: string;
+	sourceRevision: string;
+	providerRevision: string;
+	producerRevision: string;
+}
 
 export interface ExtractedFeature {
 	type:
@@ -34,9 +43,28 @@ export interface ExtractedFeature {
 	ruleId?: string;
 	captures?: Record<string, string>;
 	confidence?: number;
+	/** Revision-qualified provenance. Present when the caller supplies context. */
+	sourceRef?: string;
+	workspaceRevision?: string;
+	sourceRevision?: string;
+	providerRevision?: string;
+	producerRevision?: string;
+	evidenceKey?: string;
+	lineageQualified?: boolean;
 }
 
 type SgLang = 'TypeScript' | 'Tsx' | 'JavaScript' | 'Jsx';
+
+type FeatureCore = Omit<
+	ExtractedFeature,
+	| 'sourceRef'
+	| 'workspaceRevision'
+	| 'sourceRevision'
+	| 'providerRevision'
+	| 'producerRevision'
+	| 'evidenceKey'
+	| 'lineageQualified'
+>;
 
 function detectLang(hint?: string): SgLang {
 	const h = (hint ?? '').toLowerCase();
@@ -59,8 +87,45 @@ function firstLine(text: string, maxChars = 120): string {
 	return text.split('\n')[0].slice(0, maxChars);
 }
 
+function stableEvidenceKey(feature: FeatureCore, context: AstGrepObservationContextV1): string {
+	const payload = [
+		'ast-grep',
+		context.sourceRef,
+		context.workspaceRevision,
+		context.sourceRevision,
+		context.providerRevision,
+		context.producerRevision,
+		feature.ruleId ?? feature.type,
+		feature.name,
+		feature.byteStart ?? -1,
+		feature.byteEnd ?? -1,
+	].join('\u001f');
+	return `astgrep:${createHash('sha256').update(payload, 'utf8').digest('hex')}`;
+}
+
+function qualifyFeature(
+	feature: FeatureCore,
+	context?: AstGrepObservationContextV1,
+): ExtractedFeature {
+	if (!context) return { ...feature, lineageQualified: false };
+	return {
+		...feature,
+		sourceRef: context.sourceRef,
+		workspaceRevision: context.workspaceRevision,
+		sourceRevision: context.sourceRevision,
+		providerRevision: context.providerRevision,
+		producerRevision: context.producerRevision,
+		evidenceKey: stableEvidenceKey(feature, context),
+		lineageQualified: true,
+	};
+}
+
 /** Extract code structure using @ast-grep/napi real AST parsing. */
-export async function extractAstFeatures(code: string, langHint?: string): Promise<ExtractedFeature[]> {
+export async function extractAstFeatures(
+	code: string,
+	langHint?: string,
+	context?: AstGrepObservationContextV1,
+): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	const lang = detectLang(langHint);
 	let root: ReturnType<typeof parse>;
@@ -86,7 +151,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		seen.add(key);
 		const sig = firstLine(node.text());
 		const isExported = node.text().startsWith('export');
-		features.push({
+		features.push(qualifyFeature({
 			type: 'ast_function',
 			name,
 			description: `${isExported ? 'Exported f' : 'F'}unction ${name}()`,
@@ -96,7 +161,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:function-declaration',
 			captures: { name },
 			confidence: 0.95,
-		});
+		}, context));
 	}
 
 	for (const node of root.root().findAll({ rule: { kind: 'lexical_declaration' } })) {
@@ -109,7 +174,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		const key = `arrow:${name}:${range.byteStart}:${range.byteEnd}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
-		features.push({
+		features.push(qualifyFeature({
 			type: 'ast_arrow',
 			name,
 			description: `Arrow function ${name}`,
@@ -119,7 +184,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:arrow-function-variable',
 			captures: { name },
 			confidence: 0.92,
-		});
+		}, context));
 	}
 
 	for (const node of root.root().findAll({ rule: { kind: 'class_declaration' } })) {
@@ -130,7 +195,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		if (seen.has(key)) continue;
 		seen.add(key);
 		const isExported = node.text().startsWith('export');
-		features.push({
+		features.push(qualifyFeature({
 			type: 'ast_class',
 			name,
 			description: `${isExported ? 'Exported c' : 'C'}lass ${name}`,
@@ -140,7 +205,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:class-declaration',
 			captures: { name },
 			confidence: 0.95,
-		});
+		}, context));
 
 		for (const method of node.findAll({ rule: { kind: 'method_definition' } })) {
 			const mName = method.child(0)?.text() ?? '<anon>';
@@ -149,7 +214,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			const mKey = `method:${name}.${mName}:${methodRange.byteStart}:${methodRange.byteEnd}`;
 			if (seen.has(mKey)) continue;
 			seen.add(mKey);
-			features.push({
+			features.push(qualifyFeature({
 				type: 'ast_method',
 				name: `${name}.${mName}`,
 				description: `Method ${mName}() on class ${name}`,
@@ -159,7 +224,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 				ruleId: 'ast-grep:method-definition',
 				captures: { class: name, method: mName },
 				confidence: 0.93,
-			});
+			}, context));
 		}
 	}
 
@@ -167,7 +232,10 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 }
 
 /** Parse code for external dependencies (import/require statements). */
-export async function extractDependencyFeatures(code: string): Promise<ExtractedFeature[]> {
+export async function extractDependencyFeatures(
+	code: string,
+	context?: AstGrepObservationContextV1,
+): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	let root: ReturnType<typeof parse>;
 	try {
@@ -184,7 +252,7 @@ export async function extractDependencyFeatures(code: string): Promise<Extracted
 		if (!moduleName || seen.has(moduleName)) continue;
 		seen.add(moduleName);
 		const range = nodeRange(node);
-		features.push({
+		features.push(qualifyFeature({
 			type: 'ast_import',
 			name: moduleName,
 			description: `Import: ${moduleName}`,
@@ -193,13 +261,16 @@ export async function extractDependencyFeatures(code: string): Promise<Extracted
 			ruleId: 'ast-grep:import-statement',
 			captures: { module: moduleName },
 			confidence: 0.98,
-		});
+		}, context));
 	}
 	return features;
 }
 
 /** Detect large functions as complexity/risk indicators. */
-export async function extractComplexityFeatures(code: string): Promise<ExtractedFeature[]> {
+export async function extractComplexityFeatures(
+	code: string,
+	context?: AstGrepObservationContextV1,
+): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	let root: ReturnType<typeof parse>;
 	try {
@@ -215,7 +286,7 @@ export async function extractComplexityFeatures(code: string): Promise<Extracted
 		if (lineCount <= 50) continue;
 		const name = node.child(1)?.text() ?? '<anon>';
 		const range = nodeRange(node);
-		features.push({
+		features.push(qualifyFeature({
 			type: 'ast_function',
 			name,
 			description: `Large function ${name}() (~${lineCount} lines) — potential complexity concern`,
@@ -224,7 +295,7 @@ export async function extractComplexityFeatures(code: string): Promise<Extracted
 			ruleId: 'ast-grep:large-function',
 			captures: { name, line_count: String(lineCount) },
 			confidence: 0.85,
-		});
+		}, context));
 	}
 	return features;
 }
