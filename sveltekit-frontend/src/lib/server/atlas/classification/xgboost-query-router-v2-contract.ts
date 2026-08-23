@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { RETRIEVAL_ROUTER_TENSOR_REVISION_V1, RETRIEVAL_ROUTER_TENSOR_WIDTH_V1 } from './retrieval-router-tensor-manifest-v1.js';
+import { RETRIEVAL_ROUTER_TENSOR_REVISION_V2, RETRIEVAL_ROUTER_TENSOR_WIDTH_V2 } from './retrieval-router-tensor-manifest-v2.js';
 
 export const XgboostQueryRouterV2ContractSchema = z.object({
   schema: z.literal('atlas.xgboost-query-router.v2'),
   role: z.literal('CONTROL_PLANE_ROUTER'),
   objective: z.literal('multi:softprob'),
-  tensorRevision: z.literal(RETRIEVAL_ROUTER_TENSOR_REVISION_V1),
-  tensorWidth: z.literal(RETRIEVAL_ROUTER_TENSOR_WIDTH_V1),
+  tensorRevision: z.literal(RETRIEVAL_ROUTER_TENSOR_REVISION_V2),
+  tensorWidth: z.literal(RETRIEVAL_ROUTER_TENSOR_WIDTH_V2),
   modelRevision: z.string().min(1),
   trainingSnapshotRevision: z.string().min(1),
   classVocabularyRevision: z.string().min(1),
@@ -23,8 +23,8 @@ export const XGBOOST_QUERY_ROUTER_V2_CHALLENGER: XgboostQueryRouterV2Contract = 
   schema: 'atlas.xgboost-query-router.v2',
   role: 'CONTROL_PLANE_ROUTER',
   objective: 'multi:softprob',
-  tensorRevision: RETRIEVAL_ROUTER_TENSOR_REVISION_V1,
-  tensorWidth: RETRIEVAL_ROUTER_TENSOR_WIDTH_V1,
+  tensorRevision: RETRIEVAL_ROUTER_TENSOR_REVISION_V2,
+  tensorWidth: RETRIEVAL_ROUTER_TENSOR_WIDTH_V2,
   modelRevision: 'UNBOUND',
   trainingSnapshotRevision: 'UNBOUND',
   classVocabularyRevision: 'UNBOUND',
