@@ -20,9 +20,7 @@ function fixtureMap() {
       semanticRevision: 'semantic-r1',
       degradedIdentity: false,
       evidenceRefs: ['source-evidence-A'],
-      identityAuthority: undefined as never,
-      producerRevision: undefined as never,
-    } as never],
+    }],
   });
 }
 
