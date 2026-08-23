@@ -12,13 +12,13 @@ describe('Atlas semantic_512 exact client v2', () => {
       expect(body.corpus[0].packetKey).toBe('packet-1');
       expect(body.corpus[0].sourceRevision).toBeUndefined();
       return new Response(JSON.stringify({
-        schema: 'atlas.semantic512-exact-knn-receipt.v1',
+        schema: 'atlas.semantic512-exact-knn-receipt.v2',
         operation: 'knn.exact',
         backend: 'cuvs.neighbors.brute_force',
         metric: 'cosine',
         algorithmRevision: 'atlas.cuvs-exact-cosine.semantic512.v2-mutation-aware',
         identityRequirement: 'packet_key',
-        sourceFreshnessAuthority: 'external-mutation-awareness-receipt',
+        sourceFreshnessAuthority: 'external-mutation/source-version-receipt',
         representationId: 'semantic_512',
         representationRevision: '109',
         dimension: 512,
@@ -62,7 +62,7 @@ describe('Atlas semantic_512 exact client v2', () => {
       expect.any(Object),
     );
     expect(receipt.identityRequirement).toBe('packet_key');
-    expect(receipt.sourceFreshnessAuthority).toBe('external-mutation-awareness-receipt');
+    expect(receipt.sourceFreshnessAuthority).toBe('external-mutation/source-version-receipt');
   });
 
   it('still rejects duplicate packet identity', async () => {
