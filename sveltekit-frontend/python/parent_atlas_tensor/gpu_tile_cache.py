@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -61,6 +61,26 @@ class GpuTileCache:
         self.tiles[key] = tile
         self.bytes += needed
         return tile
+
+    def promote_ranked(self, tiles_descending_utility: Sequence[Tuple[str, np.ndarray]]) -> list[GpuTile]:
+        """Promote tiles given in ACE's natural utility-descending order (highest utility first).
+
+        `promote()` is a plain LRU primitive: the *last* call wins eviction priority, so callers
+        that want ACE's utility ranking to determine what survives eviction must call `promote()`
+        in ascending-utility order (lowest first) so the highest-utility tile is inserted last and
+        is therefore most-recently-used. Getting that reversal wrong is a silent, zero-error
+        footgun -- promoting in the natural descending order keeps exactly the WRONG tiles
+        resident (see docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json for a live
+        reproduction of the failure mode). This method takes ACE's natural ordering and performs
+        the reversal internally so callers cannot get it backwards.
+        """
+        promoted = [
+            self.promote(key, host_matrix)
+            for key, host_matrix in reversed(list(tiles_descending_utility))
+        ]
+        # `reversed()` promotes lowest-utility first; return results in the
+        # caller's original (descending-utility) order for readability.
+        return list(reversed(promoted))
 
     def exact_cosine(self, key: str, query: np.ndarray, k: int) -> tuple[np.ndarray, np.ndarray]:
         tile = self.tiles[key]

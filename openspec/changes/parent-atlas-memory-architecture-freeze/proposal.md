@@ -231,9 +231,32 @@ IPC artifact) and called `GpuTileCache.promote()`/`.exact_cosine()` directly for
 staged a 200×768 matrix through the actual pinned-memory→async-H2D path onto the live RTX 3060 Ti,
 computed exact GPU cosine top-10, and confirmed an exact index match against an independent CPU
 oracle, float diff 7.45e-9). Full receipt at
-`docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json`; details in tasks.md 2.7. Gates
-T4 (ACE residency wiring) and T6 (CAGRA parity) remain genuinely unexercised — the next concrete
-step for this slice.
+`docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json`; details in tasks.md 2.7.
+
+**Gate T4 also run, same-day follow-up — PASS, with a real gap found.** Wired
+`ace-residency-policy.ts`'s actual `tileUtility()`/`rankEvictionCandidates()` (confirmed zero
+other production callers before writing this proof, matching the same "designed but unwired"
+pattern found earlier for `ContextManifest`) to compute a real residency decision over 5 synthetic
+tiles under a memory budget that fits only ~2, wrote the decision as JSON, then drove the real
+`GpuTileCache` on the live RTX 3060 Ti with it. **The first attempt got the wrong answer**:
+promoting tiles in ACE's utility-*descending* order (the natural reading of "promote ACE's ranked
+tiles") silently kept the *lowest*-utility tiles resident and evicted the highest-utility ones —
+because `GpuTileCache` is a plain LRU cache and its docstring specifies the caller must promote in
+*ascending*-utility order for LRU recency to align with ACE's ranking. No exception, no warning —
+just the exactly-backwards outcome. The second attempt (ascending order, per the documented
+convention) matched ACE's prediction exactly on the real GPU. Full evidence for both runs:
+`docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json`; details in tasks.md 2.9.
+
+**Fixed same-day (tasks.md 2.10)**: added `GpuTileCache.promote_ranked()` — takes ACE's natural
+descending-utility order and performs the ascending-order LRU reversal internally, closing the
+footgun rather than leaving it as a documentation-only convention. Confirmed zero other callers of
+`promote()` existed, so this was a safe API addition. Added
+`python/parent_atlas_tensor/test_gpu_tile_cache.py` — this module had **zero** test coverage
+before; now has 3 tests, including a permanent regression guard for the exact failure mode this
+proof found and a permanent version of the Gate T3 exact-cosine-vs-CPU-oracle check. 12/12 tests
+pass across this Python package (up from the 9 that existed before this proof pass touched it).
+
+Gate T6 (CAGRA parity) remains genuinely unexercised — the next concrete step for this slice.
 
 ## What's actually new and worth scoping (the real delta)
 

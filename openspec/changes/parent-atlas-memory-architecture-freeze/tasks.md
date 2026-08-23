@@ -117,13 +117,39 @@ already completed plus the follow-up scoping work, not feature implementation �
   v1 doesn't have) before working from v2 as canonical, and decide whether v1 should be archived
   per this repo's archive-not-delete convention once confirmed superseded.
 
+- [x] 2.9 **Done, 2026-08-23 same-day follow-up — Gate T4 proof, PASS with a real gap found.**
+  Wired `ace-residency-policy.ts`'s actual `tileUtility()`/`rankEvictionCandidates()` (still zero
+  other production callers, confirmed via grep before writing this proof) to compute a real
+  residency decision over 5 synthetic tiles under a memory budget that fits only ~2, wrote it as
+  JSON (`scripts/atlas/prove-tensor-residency-gate-t4.mts`), then drove the real
+  `GpuTileCache` on the live RTX 3060 Ti with that decision
+  (`python/parent_atlas_tensor/prove_gate_t4.py`). **First attempt (promote in ACE's
+  utility-descending order) produced the WRONG residency outcome** — `GpuTileCache` is a plain LRU
+  cache (oldest-inserted = first evicted), and its docstring says the caller must promote in
+  ascending-utility order for LRU recency to align with ACE's utility ranking; promoting in the
+  naive descending order silently kept the *lowest*-utility tiles resident and evicted the
+  highest-utility ones, with no error or warning. Second attempt (ascending order, per the
+  documented convention) matched ACE's prediction exactly. Full evidence, both runs:
+  `docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json`.
+- [x] 2.10 **Fixed same-day, 2026-08-23.** Added `GpuTileCache.promote_ranked()` (Python) — takes
+  tiles in ACE's natural utility-descending order and performs the ascending-order LRU reversal
+  internally, so a caller passing ACE's ranking straight through can no longer get backwards
+  residency. Confirmed zero other callers of `GpuTileCache.promote()` existed before this change
+  (safe to add an API surface, nothing else depends on the old contract). Updated
+  `prove_gate_t4.py` to use the new helper (still passes). Added
+  `python/parent_atlas_tensor/test_gpu_tile_cache.py` (3 tests, previously this module had **zero**
+  test coverage): one pins down the old plain-`promote()` footgun as a documented regression
+  guard (so a future refactor can't silently reintroduce or silently fix it without a test
+  noticing either way), one proves `exact_cosine()` against a CPU oracle (mirrors the Gate T3
+  proof as a permanent regression test, not just an ad hoc script run), one proves
+  `promote_ranked()` produces the correct residency outcome. All 3 new tests pass, plus the 2
+  pre-existing tests in this Python package (`test_gpu_resident_executor.py`,
+  `test_exact_space_partition.py`) still pass — 12/12 total.
+
 ## 3. Governance-only, zero implementation cost
 
-- [ ] 3.1 Consider adding the wire-format layering rule ("JSON/MessagePack describe things,
-  bitmaps select things, ordinals address things, mmap/Arrow/tensors store and compute large
-  numeric things — never MessagePack for bulk numeric arrays") to `CLAUDE.md` or a referenced
-  memory doc, since it's a durable rule with no build cost and would prevent a plausible future
-  mistake (reaching for MessagePack to encode a `semantic_768` vector array).
+- [x] 3.1 **Done.** Added the wire-format layering rule to `claude.md` as a new canonical section
+  ("🧮 Wire Format Layering Rule") — see the commit that recorded this proposal.
 
 ## 4. Explicitly out of scope for this change
 

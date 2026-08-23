@@ -3221,3 +3221,50 @@ fixture, once T4 wiring exists; (3) `NAMED_SYMBOL_MISSING_LEFT/RIGHT` + `SEMANTI
 AST gap; (4) bounded XGBoost GPU proof; (5) `codebase_chunks_768` vs `_768_v2` split; (6) ACE crash
 instrumentation; (7) Graphify FANOUT sequencing; (8) docker-compose canonical-file decision; (9)
 the two remaining CANONICAL_OWNER decisions in the memory-architecture proposal.
+
+### Session handoff — 2026-08-23 (Gate T4 run — real bug found and fixed same-day)
+
+Continued directly to Gate T4 per the prior entry's stated next step. Wrote
+`scripts/atlas/prove-tensor-residency-gate-t4.mts` (TS side — computes a real residency decision
+via `ace-residency-policy.ts`'s actual `tileUtility()`/`rankEvictionCandidates()`, still zero other
+production callers confirmed) and `python/parent_atlas_tensor/prove_gate_t4.py` (Python side —
+drives the real `GpuTileCache` on the live RTX 3060 Ti with that decision).
+
+**First run got the wrong answer.** Promoting tiles in ACE's natural utility-descending order
+silently kept the *lowest*-utility tiles resident and evicted the highest-utility ones —
+`GpuTileCache` is a plain LRU cache and its docstring says the caller must promote in
+*ascending*-utility order for LRU recency to align with ACE's ranking; nothing enforced this except
+the comment, and this module had **zero test coverage** before this pass. No exception, no
+warning — just backwards residency.
+
+Fixed it same-day rather than leaving it as a TODO: added `GpuTileCache.promote_ranked()` (does the
+reversal internally, so a caller passing ACE's natural ranking can't get it backwards), and added
+`python/parent_atlas_tensor/test_gpu_tile_cache.py` (3 tests — a regression guard pinning the old
+footgun down, a permanent version of the Gate T3 exact-cosine-vs-CPU-oracle check, and a
+`promote_ranked()` correctness test). All 12 tests in this Python package pass after the fix
+(up from 9 before). Full receipt: `docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json`
+(both the failing and passing runs recorded, not just the final passing one).
+
+Updated `parent-atlas-memory-architecture-freeze/proposal.md` and `tasks.md` (2.9, 2.10) with the
+full writeup.
+
+**Noted but not touched**: a pile of unrelated concurrent files appeared in `git status`
+(`query-adaptive-sampling-proof.json`, `backfill-ast-symbols.mjs`, `go-retrieval-service/main.go`,
+`go-retrieval-facade.ts`/`go-retrieval-orchestrator.ts`, new `audit-atlas-indexing-surfaces.mjs`,
+`audit-graph-structural-quality.mjs`, `indexed-rpc-capability-v1.ts`,
+`graph-structural-quality-v1.ts`, a new BM25/AST-symbol migration SQL file,
+`graphify-daily-workflow-receipt.json`) — matches the pattern from the earlier `806c0ed2fe`
+incident (concurrent user/background-hook activity in the same working directory, likely the
+`graphify:daily` / GPU-Karpathy background hooks referenced in this session's own SessionStart
+context). Left entirely alone per this session's git-safety discipline — only staged/committed the
+files this pass actually authored.
+
+**Next-session priority, updated**: (1) Gate T6 (CAGRA parity) — now the next concrete step for
+the tensor-residency slice, T4 is solid; (2) re-run Gates T2-T4 against real production packet
+data instead of synthetic fixtures; (3) `NAMED_SYMBOL_MISSING_LEFT/RIGHT` +
+`SEMANTIC_KIND_MISMATCH` AST gap; (4) bounded XGBoost GPU proof; (5) `codebase_chunks_768` vs
+`_768_v2` split; (6) ACE crash instrumentation; (7) Graphify FANOUT sequencing; (8) docker-compose
+canonical-file decision; (9) the two remaining CANONICAL_OWNER decisions in the memory-architecture
+proposal; (10) whatever the concurrent `audit-atlas-indexing-surfaces.mjs`/`audit-graph-structural-
+quality.mjs`/BM25-AST-symbol activity turns out to be, once it's committed by whoever's running it
+and shows up cleanly in `git log` instead of as loose working-tree files.

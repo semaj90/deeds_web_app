@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.tensor-residency-gate-t4-proof-receipt.v1",
+  "summary": "Gate T4 proof: ACE (TypeScript, ace-residency-policy.ts) decides tile residency by utility score; GpuTileCache (Python) physically promotes/evicts on the real RTX 3060 Ti. Decision crosses the process boundary as plain JSON, matching the wire-format layering rule (JSON describes the decision; tensors are never serialized through it).",
+  "acesideDecision": {
+    "tool": "sveltekit-frontend/scripts/atlas/prove-tensor-residency-gate-t4.mts",
+    "realFunctionsUsed": ["tileUtility", "rankEvictionCandidates", "DEFAULT_ACE_WEIGHTS"],
+    "sourceFile": "sveltekit-frontend/src/lib/server/atlas/tensors/ace-residency-policy.ts",
+    "candidateTiles": 5,
+    "gpuBudgetBytes": 1351680,
+    "bytesPerTile": 614400,
+    "utilityRankingDescending": [
+      "semantic_768:tile-hot-auth",
+      "semantic_768:tile-hot-graph",
+      "semantic_768:tile-warm-retrieval",
+      "semantic_768:tile-cold-legacy",
+      "semantic_768:tile-cold-archive"
+    ],
+    "acePredictedResidentAfterBudget": [
+      "semantic_768:tile-hot-auth",
+      "semantic_768:tile-hot-graph"
+    ]
+  },
+  "gpuSideExecution": {
+    "tool": "sveltekit-frontend/python/parent_atlas_tensor/prove_gate_t4.py",
+    "backend": "GpuTileCache (real pinned-memory -> async-H2D staging onto cuda:0, RTX 3060 Ti)",
+    "attempt1_naive_descending_promotion_order": {
+      "description": "Promoted tiles in ACE's utility-descending order (highest utility promoted first) -- the naive/natural reading of 'promote ACE's ranked tiles'.",
+      "actualGpuResidentAfterPromotion": ["semantic_768:tile-cold-archive", "semantic_768:tile-cold-legacy"],
+      "residencyMatchesAcePrediction": false,
+      "rootCause": "GpuTileCache is a plain LRU cache (OrderedDict, victim = oldest non-pinned insertion). Its docstring says 'ACE should rank/promote tiles before calling this backend,' meaning the caller must promote in ASCENDING utility order so the highest-utility tile is inserted LAST and is therefore most-recently-used under LRU. Promoting in descending order (the naive reading) inserts the highest-utility tile FIRST, making it the oldest and thus the first eviction victim -- the exact opposite of the intended outcome.",
+      "findingType": "REAL_GAP_NOT_TEST_METHODOLOGY_ERROR",
+      "severity": "The promotion-order requirement exists only as a docstring comment -- nothing in the type system or a runtime check enforces or verifies it. A first-time caller (this proof included) can silently get exactly backwards residency behavior with no error, no exception, no warning -- the cache just runs cleanly and keeps the wrong tiles resident."
+    },
+    "attempt2_fixed_ascending_promotion_order": {
+      "description": "Reversed to promote tiles in ACE's utility-ascending order per the documented convention.",
+      "actualGpuResidentAfterPromotion": ["semantic_768:tile-hot-auth", "semantic_768:tile-hot-graph"],
+      "residencyMatchesAcePrediction": true,
+      "actualTotalGpuBytes": 1228800,
+      "budgetRespected": true,
+      "residentTileDevices": {
+        "semantic_768:tile-hot-graph": "cuda:0",
+        "semantic_768:tile-hot-auth": "cuda:0"
+      }
+    }
+  },
+  "conclusion": {
+    "gateT4Status": "PASS",
+    "whatWasProven": "ACE's utility-based residency decision (computed in TypeScript, crossing the process boundary as JSON) correctly and reproducibly determines which tiles physically survive GPU LRU eviction under a real memory budget on real CUDA hardware.",
+    "gapFoundAndFixedSameDay": "The ACE-utility-to-LRU-order translation was a caller responsibility enforced only by a code comment, with zero test coverage on GpuTileCache. Fixed: added GpuTileCache.promote_ranked() (accepts ACE's natural descending-utility order and performs the reversal internally) and python/parent_atlas_tensor/test_gpu_tile_cache.py (3 tests: a regression guard pinning down the old plain-promote() footgun, an exact_cosine()-vs-CPU-oracle test making the Gate T3 proof permanent, and a promote_ranked() correctness test). 12/12 tests pass in this Python package after the fix (up from 0 tests on this module before)."
+  },
+  "notProven": [
+    "Real production packet data (synthetic per-tile matrices, seeded deterministically by tile key)",
+    "TileDirectory persistence (TensorTileManifest objects were constructed in-memory for this proof, not read from/written to a real TileDirectory implementation)",
+    "Concurrent/multi-request residency pressure (this proof is single-threaded, single decision, single promotion pass)",
+    "Gate T5 (Valkey/BitFrost metadata mirroring of residency state) and Gate T6 (CAGRA parity)"
+  ]
+}
