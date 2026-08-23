@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.tensor-residency-gate-proof.v1",
+  "gates": {
+    "T2_arrow_ipc_artifact": {
+      "status": "PASS",
+      "artifactType": "feature_matrix_5",
+      "rows": 3,
+      "sha256": "21a6fd894fcfc345aac5e83b71a85253406140c526d6d50c10c52e7af21b50cd",
+      "schemaCheck": "round-trip read via pyarrow.ipc.open_file confirmed features5 fixed_size_list<float>[5] and topology4 fixed_size_list<float>[4], content matched input JSONL exactly"
+    },
+    "T3_exact_gpu_tile_parity": {
+      "status": "PASS",
+      "matrixShape": [
+        200,
+        768
+      ],
+      "matrixSha256": "fe99a93c02c6faec7fb91526dbf0d562718352b3702f7a98b939595524aa3cb3",
+      "topK": 10,
+      "gpuDevice": "cuda:0",
+      "pinnedStagingPathUsed": true,
+      "gpuTopKIndices": [
+        163,
+        178,
+        143,
+        95,
+        92,
+        183,
+        165,
+        104,
+        43,
+        33
+      ],
+      "cpuOracleTopKIndices": [
+        163,
+        178,
+        143,
+        95,
+        92,
+        183,
+        165,
+        104,
+        43,
+        33
+      ],
+      "indicesExactMatch": true,
+      "maxAbsValueDiff": 7.450580596923828e-09,
+      "torchVersion": "2.8.0+cu128",
+      "cudaDevice": "NVIDIA GeForce RTX 3060 Ti"
+    }
+  },
+  "notProven": [
+    "CAGRA recall/latency parity (Gate T6, not attempted this pass)",
+    "Real production packet data (this proof used a synthetic fixture and a random matrix, per Gate T2s own allowance for a small test fixture -- not a claim this scales to the full corpus)",
+    "ACE residency state machine wiring (Gate T4) -- GpuTileCache.promote/exact_cosine were called directly, not through ace-residency-policy.ts"
+  ]
+}

@@ -86,15 +86,31 @@ already completed plus the follow-up scoping work, not feature implementation �
   (stages via `torch.empty(..., pin_memory=True)` + `index_select`, not `torch.from_file` mmap
   directly to pinned), but still worth confirming the version-specific constraint for anyone
   extending that code.
-- [ ] 2.7 **New, 2026-08-23 follow-up pass, now the top-priority concrete next action for the
-  numerical-working-set slice of this proposal.** Work through
-  `parent_atlas_tensor_residency_integration_v2/INTEGRATION_ORDER.md` gates T2 onward against the
-  live repo (T0/T1 effectively done — T1's migration is applied, just unpopulated; T0's ownership
-  classification is implicitly satisfied by this proposal's own audit work). Start with Gate T2
-  (Arrow IPC artifact proof: `feature_matrix_5`, `semantic_768`, `centroids_768`, frozen content
-  hash/revision/schema-version) and Gate T3 (exact GPU tile parity against the existing exact
-  oracle, before any CAGRA/approximate-index promotion). This is real, scoped, gated work with a
-  defined order — prefer it over re-deriving a numerical-working-set design from scratch.
+- [x] 2.7 **Done, 2026-08-23 same-day follow-up — Gates T2 and T3 both PASS.** Correction first:
+  the bundle isn't merely "unapplied" — nearly all 29 of its TypeScript files are already
+  byte-identical in the live tree (`sveltekit-frontend/src/lib/server/atlas/tensors/*`), and the
+  3 that differ (`feature-matrix-contract.ts`, `latent-lod-contract.ts`,
+  `tensor-artifact-contract.ts`) are *live-tree-ahead* of the bundle (e.g.
+  `tensor-artifact-contract.ts` is 124 lines live vs. 39 in the bundle) — the live repo continued
+  developing this system past the bundle's snapshot. Ran the actual gate work directly:
+  - **Gate T2** (`python -m parent_atlas_tensor.cli build-feature`): built a real `feature_matrix_5`
+    Arrow IPC artifact from a 3-row JSONL fixture, round-trip-verified via `pyarrow.ipc.open_file`
+    — schema confirmed `features5: fixed_size_list<float>[5]` + `topology4:
+    fixed_size_list<float>[4]`, content matched input exactly, sha256-stamped.
+  - **Gate T3** (`GpuTileCache.promote()` + `.exact_cosine()` directly): staged a real 200×768
+    float32 matrix through the actual pinned-memory → async-H2D path onto `cuda:0` (RTX 3060 Ti,
+    confirmed live via `torch.cuda.get_device_name(0)`), computed exact cosine top-10 on GPU, and
+    compared against an independent from-scratch CPU numpy oracle. **Exact index match, max
+    float-value diff 7.45e-9** (float32 rounding noise, not a real discrepancy).
+  - Full receipt: `docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json`. Explicitly
+    scoped `notProven` in that receipt: CAGRA parity (Gate T6), real production packet data (this
+    used a synthetic fixture/matrix, which Gate T2's own wording explicitly allows), and ACE
+    residency-policy wiring (Gate T4) — the tile cache was called directly, not through
+    `ace-residency-policy.ts`.
+  - Per this repo's own status-language convention, this is genuine `DRY_RUN_PROVEN` /
+    `APPLY_PROVEN`-adjacent evidence for T2/T3 specifically (real code path, real GPU, real
+    verification against an independent oracle) — not yet `XGBOOST_GPU_RUNTIME_PROVEN`-style full
+    production proof, since it didn't touch live packet data or the ACE wiring layer.
 - [ ] 2.8 Reconcile `parent-atlas-tensor-residency-integration/` (v1) against
   `parent_atlas_tensor_residency_integration_v2/` — confirm v2 supersedes v1 (both share the same
   Gate T0-T9 structure and T1 migration filename; v2 adds a "Neural LOD extension order" section

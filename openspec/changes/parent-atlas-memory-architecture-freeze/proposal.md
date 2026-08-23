@@ -214,13 +214,26 @@ is unverified.
 bitmap admission masking" and "pinned-staging chain" as two separate small tasks to scope fresh
 (as the original 2026-08-23 audit pass assumed), the more accurate framing is that **a mature,
 already-gated integration plan for most of this proposal's numerical-working-set layer already
-exists and is partially applied (schema only)**. The actual next action for that whole slice of
-the proposal is not "design it" but **"work through `parent_atlas_tensor_residency_integration_v2/
-INTEGRATION_ORDER.md`'s gates T2 onward against the live repo"** — starting with the Arrow tile
-artifact proof (T2) and exact-parity proof (T3), since T1 is already done. This bundle was not
-found by the original audit pass because it lives at repo root under a name
-(`parent_atlas_tensor_residency_integration_v2/`) that doesn't contain "LOD", "bitmap", "pinned",
-or "ordinal" — only found via `find` for the specific Python filenames while completing task 2.1.
+exists**. This bundle was not found by the original audit pass because it lives at repo root under
+a name (`parent_atlas_tensor_residency_integration_v2/`) that doesn't contain "LOD", "bitmap",
+"pinned", or "ordinal" — only found via `find` for the specific Python filenames while completing
+task 2.1.
+
+**Correction, same-day follow-up**: the file-application state is further along than first
+assessed. A full pass diffing every non-spec TypeScript file in the bundle against the live tree
+found **26 of 29 byte-identical**, and the 3 that differ are **live-ahead of the bundle**, not
+behind it (e.g. `tensor-artifact-contract.ts` is 124 lines live vs. 39 in the bundle — the live
+repo kept developing this system past the bundle's snapshot). So this isn't "an unapplied bundle
+to work through" — it's a substantially-already-merged system whose Gates T2/T3 just hadn't been
+*exercised and verified* yet. Fixed that directly: ran `python -m parent_atlas_tensor.cli
+build-feature` for real (Gate T2 — built and round-trip-verified a real `feature_matrix_5` Arrow
+IPC artifact) and called `GpuTileCache.promote()`/`.exact_cosine()` directly for real (Gate T3 —
+staged a 200×768 matrix through the actual pinned-memory→async-H2D path onto the live RTX 3060 Ti,
+computed exact GPU cosine top-10, and confirmed an exact index match against an independent CPU
+oracle, float diff 7.45e-9). Full receipt at
+`docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json`; details in tasks.md 2.7. Gates
+T4 (ACE residency wiring) and T6 (CAGRA parity) remain genuinely unexercised — the next concrete
+step for this slice.
 
 ## What's actually new and worth scoping (the real delta)
 

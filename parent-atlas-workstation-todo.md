@@ -3184,3 +3184,40 @@ next step across all open threads this session has surfaced; (2) `NAMED_SYMBOL_M
 canonical-file decision; (8) the two remaining CANONICAL_OWNER decisions in the memory-architecture
 proposal (typed-packet model vs. existing lane-axis ContextManifest; which of the now-four LOD
 meanings survives).
+
+### Session handoff — 2026-08-23 (Gates T2 and T3 actually run and PASS, real GPU proof)
+
+Continued directly on the tensor-residency bundle finding. Correction first: a full diff of all 29
+non-spec TypeScript files in `parent_atlas_tensor_residency_integration_v2/` against the live tree
+found 26 byte-identical and the other 3 **live-ahead** of the bundle (e.g. `tensor-artifact-
+contract.ts` is 124 lines live vs. 39 in the bundle) — this bundle isn't "unapplied," it's already
+substantially merged and the live repo kept developing past its snapshot. So the real gap was
+narrower than first framed: Gates T2/T3 existed as code but hadn't actually been *run and verified*.
+
+Ran them for real:
+- **Gate T2**: `python -m parent_atlas_tensor.cli build-feature` against a real 3-row JSONL fixture
+  → produced a real `feature_matrix_5` Arrow IPC file, round-trip-read back via `pyarrow.ipc.open_file`
+  and confirmed schema (`features5: fixed_size_list<float>[5]`, `topology4:
+  fixed_size_list<float>[4]`) and content match exactly.
+- **Gate T3**: called `GpuTileCache.promote()`/`.exact_cosine()` directly with a real 200×768
+  float32 matrix — staged through the actual pinned-memory → async-H2D path, landed on `cuda:0`
+  (confirmed live as the RTX 3060 Ti via `torch.cuda.get_device_name(0)`), computed exact cosine
+  top-10 on GPU, compared against an independent from-scratch CPU numpy oracle. **Exact index
+  match, max float-value diff 7.45e-9** (float32 rounding noise).
+
+Receipt written to `docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json` with explicit
+`notProven` scope (CAGRA/Gate T6 not attempted; used a synthetic fixture/matrix, not live packet
+data — Gate T2's own wording allows a small test fixture; ACE residency-policy wiring/Gate T4 not
+touched — the tile cache was called directly, not through `ace-residency-policy.ts`).
+
+Updated `parent-atlas-memory-architecture-freeze/proposal.md` and `tasks.md` (2.7) with the
+correction and the real results.
+
+**Next-session priority, updated**: (1) Gate T4 — wire the actual `ace-residency-policy.ts` state
+machine (`COLD → MMAPPED → PINNED → GPU_RESIDENT → IN_USE → DEMOTED`) and re-run an equivalent
+proof through that layer instead of calling `GpuTileCache` directly; (2) re-run Gates T2/T3 against
+real production packet data (real `semantic_768` rows from Postgres/Qdrant) instead of a synthetic
+fixture, once T4 wiring exists; (3) `NAMED_SYMBOL_MISSING_LEFT/RIGHT` + `SEMANTIC_KIND_MISMATCH`
+AST gap; (4) bounded XGBoost GPU proof; (5) `codebase_chunks_768` vs `_768_v2` split; (6) ACE crash
+instrumentation; (7) Graphify FANOUT sequencing; (8) docker-compose canonical-file decision; (9)
+the two remaining CANONICAL_OWNER decisions in the memory-architecture proposal.
