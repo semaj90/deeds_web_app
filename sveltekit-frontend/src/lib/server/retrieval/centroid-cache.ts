@@ -1,9 +1,11 @@
 /**
- * Centroid cache — precomputed cluster centroid vectors in Redis.
+ * Centroid cache — precomputed cluster centroid vectors in Valkey.
+ *
+ * The service is Valkey; ioredis/Redis naming reflects wire/API compatibility.
  *
  * Key layout (matches cache-keys.ts centroidKey):
- *   taxonomy:clusters:gpu:<clusterId>     Float32Array packed as JSON
- *   taxonomy:clusters:som:<x>:<y>         SOM cell centroid
+ *   taxonomy:clusters:gpu:<clusterId>     Versioned semantic_768 centroid envelope
+ *   taxonomy:clusters:som:<x>:<y>         SOM cell centroid (separate legacy array contract)
  *
  * Centroids are computed by averaging all chunk embeddings in a cluster
  * (done by graphify:semantic / som-topology pipeline) and stored here for
@@ -20,20 +22,46 @@ import { centroidKey, TTL } from '$lib/server/cache-keys.js';
 import { db } from '$lib/server/db/client';
 import { gpuClusterCentroids } from '$lib/server/db/schema/codebase-intelligence.js';
 import { eq, sql } from 'drizzle-orm';
+import {
+  normalizeCentroidCacheRecordV1,
+  serializeCentroidCacheEnvelopeV1,
+} from './centroid-cache-contract-v1.js';
+
+export interface CentroidCacheWriteMetadataV1 {
+  representationRevision?: string | null;
+  producerRevision?: string | null;
+  topoClass?: string | null;
+  topoByte?: number | null;
+}
 
 // ── get / set ─────────────────────────────────────────────────────────────────
 
 export async function getClusterCentroid(clusterId: number): Promise<Float32Array | null> {
-  const arr = await getJson<number[]>(centroidKey.cluster(clusterId));
-  return arr ? new Float32Array(arr) : null;
+  try {
+    const raw = await getJson<unknown>(centroidKey.cluster(clusterId));
+    if (raw == null) return null;
+    const envelope = normalizeCentroidCacheRecordV1(clusterId, raw);
+    return new Float32Array(envelope.vector);
+  } catch {
+    return null;
+  }
 }
 
 export async function setClusterCentroid(
   clusterId: number,
   vec: Float32Array,
-  ttlSeconds = TTL.CENTROID
+  ttlSeconds = TTL.CENTROID,
+  metadata: CentroidCacheWriteMetadataV1 = {},
 ): Promise<void> {
-  await setJsonWithTtl(centroidKey.cluster(clusterId), Array.from(vec), ttlSeconds);
+  const envelope = serializeCentroidCacheEnvelopeV1({
+    clusterId,
+    vector: vec,
+    representationRevision: metadata.representationRevision,
+    producerRevision: metadata.producerRevision,
+    topoClass: metadata.topoClass,
+    topoByte: metadata.topoByte,
+  });
+  await setJsonWithTtl(centroidKey.cluster(clusterId), envelope, ttlSeconds);
 }
 
 export async function getSomCentroid(x: number, y: number): Promise<Float32Array | null> {
@@ -94,15 +122,16 @@ export async function nearestCluster(
 
     // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate.
     const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
-    let parseFn: (s: string) => number[] = (s) => JSON.parse(s) as number[];
+    let parseFn: (s: string) => unknown = (s) => JSON.parse(s) as unknown;
     if (values.length >= 10 && totalChars >= 5_000) {
       try {
         const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-        if (isSimdJsonAvailable()) parseFn = fastJsonParse<number[]>;
+        if (isSimdJsonAvailable()) parseFn = fastJsonParse<unknown>;
       } catch { /* addon unavailable — keep V8 */ }
     }
 
-    // Build parallel arrays of (id, vec) for valid entries
+    // Build parallel arrays of (id, vec) for valid entries. Each entry is
+    // normalized independently so one corrupt cache record degrades locally.
     const ids:  number[]   = [];
     const vecs: number[][] = [];
     const meta: Array<{ topoClass?: string; topoByte?: number }> = [];
@@ -112,17 +141,17 @@ export async function nearestCluster(
       if (!raw) continue;
       const id = parseInt(keys[i].split(':').at(-1)!, 10);
       if (isNaN(id)) continue;
-      
-      const parsed = parseFn(raw);
-      ids.push(id);
-      
-      if (Array.isArray(parsed)) {
-        vecs.push(parsed);
-        meta.push({});
-      } else {
-        const data = parsed as any;
-        vecs.push(data.vector || []);
-        meta.push({ topoClass: data.topoClass, topoByte: data.topoByte });
+
+      try {
+        const envelope = normalizeCentroidCacheRecordV1(id, parseFn(raw));
+        ids.push(id);
+        vecs.push(envelope.vector);
+        meta.push({
+          topoClass: envelope.topoClass ?? undefined,
+          topoByte: envelope.topoByte ?? undefined,
+        });
+      } catch {
+        continue;
       }
     }
     if (!ids.length) return null;
@@ -176,7 +205,7 @@ export async function nearestCluster(
 
 /**
  * Build and cache centroids from Qdrant codebase_chunks_768.
- * Called by graphify:semantic after GPU k-means to seed Redis.
+ * Called by graphify:semantic after GPU k-means to seed Valkey.
  * Returns number of centroids written.
  */
 export async function buildAndCacheCentroids(
@@ -243,11 +272,12 @@ data = JSON.parse(raw);
       `);
       const topoInfo = (topoRows[0] as any) || { topo_class: 'unclassified', topo_byte: 0 };
 
-      const centroidData = {
-        vector: Array.from(sum),
+      const centroidData = serializeCentroidCacheEnvelopeV1({
+        clusterId,
+        vector: sum,
         topoClass: String(topoInfo.topo_class),
-        topoByte: Number(topoInfo.topo_byte)
-      };
+        topoByte: Number(topoInfo.topo_byte),
+      });
 
       pipe.setex(centroidKey.cluster(clusterId), ttlSeconds, JSON.stringify(centroidData));
       written++;
@@ -261,7 +291,7 @@ data = JSON.parse(raw);
 // ── Postgres persistence ──────────────────────────────────────────────────────
 
 /**
- * Persist all currently cached centroids from Redis → Postgres.
+ * Persist all currently cached centroids from Valkey → Postgres.
  * Called after buildAndCacheCentroids() to make them durable across restarts.
  * Returns number of rows upserted.
  */
@@ -278,11 +308,11 @@ export async function persistCentroidsToDB(
   // 768-dim Float32Array serialized as JSON (~6KB), so 10+ centroids
   // (a typical batch) is ~60KB — well above the threshold.
   const totalChars = values.reduce((sum, v) => sum + (v?.length ?? 0), 0);
-  let parseFn: (s: string) => number[] = (s) => JSON.parse(s) as number[];
+  let parseFn: (s: string) => unknown = (s) => JSON.parse(s) as unknown;
   if (values.length >= 10 && totalChars >= 5_000) {
     try {
       const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-      if (isSimdJsonAvailable()) parseFn = fastJsonParse<number[]>;
+      if (isSimdJsonAvailable()) parseFn = fastJsonParse<unknown>;
     } catch { /* addon unavailable — keep V8 */ }
   }
 
@@ -291,14 +321,13 @@ export async function persistCentroidsToDB(
     const raw = values[i];
     if (!raw) continue;
     try {
-      const data = parseFn(raw) as any;
-      if (!data) continue;
+      const data = normalizeCentroidCacheRecordV1(clusterIds[i], parseFn(raw));
       await db
         .insert(gpuClusterCentroids)
         .values({
           clusterId:   clusterIds[i],
           clusterType,
-          centroidVec: data.vector || [],
+          centroidVec: data.vector,
           topoClass:   data.topoClass || 'unclassified',
           topoByte:    data.topoByte || 0,
           chunkCount:  0,
@@ -332,7 +361,7 @@ export interface SomNeighbor {
 /**
  * Return up to `maxNeighbors` SOM cells adjacent to `(row, col)` ranked by
  * centroid similarity to the primary cell.  Uses the Moore neighbourhood
- * (8 surrounding cells).  Missing cells (no centroid in Redis) are skipped.
+ * (8 surrounding cells).  Missing cells (no centroid in Valkey) are skipped.
  *
  * Used by the "did you mean" path: when a query lands far from any centroid
  * (high reconstruction error), the adjacent cells surface related clusters
@@ -394,7 +423,7 @@ export interface DidYouMeanResult {
 
 // ── Autoencoder weight loader ─────────────────────────────────────────────────
 
-/** Redis key written by the topology projection pipeline after autoencoder training. */
+/** Valkey key written by the topology projection pipeline after autoencoder training. */
 const DECODER_WEIGHTS_KEY = 'ace:autoencoder:decoder:weights';
 
 interface StoredWeights {
@@ -405,7 +434,7 @@ interface StoredWeights {
 }
 
 /**
- * Load decoder weights from Redis.
+ * Load decoder weights from Valkey.
  * Returns null when the autoencoder hasn't been trained / weights not yet cached.
  * Results are NOT cached in-process — weights may be refreshed between SOM rebuilds.
  */
@@ -538,8 +567,8 @@ export async function getTokenBudget(
 }
 
 /**
- * Warm Redis centroid cache from Postgres on startup / after Redis restart.
- * Returns number of centroids loaded into Redis.
+ * Warm Valkey centroid cache from Postgres on startup / after Valkey restart.
+ * Returns number of centroids loaded into Valkey.
  */
 export async function loadCentroidsFromDB(
   clusterType: 'gpu' | 'som' = 'gpu',
@@ -560,23 +589,30 @@ export async function loadCentroidsFromDB(
 
     const redis = getRedis();
     const pipe  = redis.pipeline();
+    let written = 0;
 
     for (const row of rows) {
       if (!row.centroidVec?.length) continue;
-      const centroidData = {
-        vector: row.centroidVec,
-        topoClass: row.topoClass,
-        topoByte: row.topoByte
-      };
-      pipe.setex(
-        centroidKey.cluster(row.clusterId),
-        ttlSeconds,
-        JSON.stringify(centroidData),
-      );
+      try {
+        const centroidData = serializeCentroidCacheEnvelopeV1({
+          clusterId: row.clusterId,
+          vector: row.centroidVec,
+          topoClass: row.topoClass,
+          topoByte: row.topoByte,
+        });
+        pipe.setex(
+          centroidKey.cluster(row.clusterId),
+          ttlSeconds,
+          JSON.stringify(centroidData),
+        );
+        written++;
+      } catch {
+        continue;
+      }
     }
 
     await pipe.exec();
-    return rows.length;
+    return written;
   } catch {
     return 0;
   }
