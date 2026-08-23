@@ -1,5 +1,7 @@
 # ACE Qdrant Materialization Fix (Blocker #1 FIXED)
 
+> Historical status note (2026-08-23): The MCP dispatcher TODO below is retained as historical provenance from the June 26, 2026 snapshot. Current MCP/Atlas wiring evidence is tracked in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md; this document original results are preserved.
+
 **Date**: June 26, 2026  
 **Status**: ✅ **FIXED**  
 **Blocker**: Layer 4 (Qdrant) returning empty searches due to zero-vector embeddings  
@@ -186,8 +188,15 @@ await materializePacket({
 
 ### 4. Redis Cache Hit Verification
 ```bash
-docker exec legal-ai-redis redis-cli HGETALL "embedding:cache"
-# Should show entries with real vectors (not all zeros)
+docker exec legal-ai-valkey redis-cli -a redis --no-auth-warning --scan --pattern "embed:*"
+# Pick a key from the results, then:
+docker exec legal-ai-valkey redis-cli -a redis --no-auth-warning GET "embed:embeddinggemma:latest:<hash>"
+# Should show a real 768-float JSON array (not all zeros). Corrected 2026-08-23: the key
+# is a per-text string (embed:embeddinggemma:latest:<hash> or embed:v2:...), not a single
+# "embedding:cache" hash — the original command here never matched any real key and would
+# always report empty/false-negative even when caching is working correctly. Verified live
+# 2026-08-23: real non-zero 768-dim vectors present under this pattern, and the same is true
+# for codebase_chunks_768 points in Qdrant directly.
 ```
 
 ---

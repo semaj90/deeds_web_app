@@ -1,5 +1,7 @@
 # Legal AI Platform — Claude Project Instructions
 
+> MCP/Atlas status note (2026-08-23): The MCP and Atlas connection/tool-count statements in this document are historical snapshots. Current bounded evidence is in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md. Live TRACE currently exposes 175 tools; active project config wires trace plus local atlas-tools.
+
 ## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
 
 **Status**: ✅ VALIDATED | **Validation**: 3-point contract PASS | **Commit**: TBD
@@ -70,35 +72,59 @@ cp deeds_labs/archive/2026-07-23/old-module.ts.bak src/old-module.ts
 
 ---
 
-## 🧠 Embedding Dimensions Policy (CANONICAL — July 27, 2026)
+## 🧠 Embedding Dimensions Policy (CANONICAL — resolved 2026-08-23, supersedes all earlier framings)
 
-**STALE relative to a later, dated operator decision — see
-`openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md`.** Operator correction
-(2026-08-19): the persisted EmbeddingGemma corpus that actually exists is 512-dimensional; a
-production/canonical 768-dimensional Qdrant corpus was not created. Do not promote an assumed
-768 store merely because EmbeddingGemma's native output is 768. That doc's frozen contract makes
-`semantic_512` (native 768 → MRL prefix [0:512] → L2 renorm) the canonical persisted semantic
-representation. Section below has NOT yet been updated to match — it documents the pre-migration
-768-canonical state that the code (`embedding-contract-768.ts`) still implements as of this
-writing. Do not treat this section as current policy without checking that OpenSpec change first.
+**FINAL DECISION, operator-confirmed 2026-08-23: `semantic_768` (native EmbeddingGemma output) is
+the canonical, primary persisted semantic representation.** This resolves a chain of five
+undocumented, uncoordinated policy re-decisions made across less than a month without checking
+prior state — Jul 27 (768) → Aug 3 proposal (768) → Aug 11 inventory (768, unexecuted) → **Aug 19
+operator correction (512)** → Aug 22 undocumented code revert (back to 768). Full forensic trace
+of that chain, and the live ground-truth evidence that resolved it, is preserved in
+`openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md` section 1 — read it
+before touching any of the three still-open historical docs (`parent-atlas-semantic-512-canonicalization/`,
+`parent-atlas-semantic-768-canonical-contract/`, `parent-atlas-768-dim-migration/SPEC.md`), all of
+which now point back to this section as the authoritative resolution.
+
+**Why 768, not 512**: Postgres's own truth-of-record column (`codebase_chunk_index.content_embedding`)
+is natively 768-dim and was already populated (52,380 rows) a full month before the Aug 19 freeze;
+a Qdrant 768-dim mirror (`codebase_chunks_768_v2`) also already existed three weeks before that
+freeze. The freeze's own stated premise — "a production/canonical 768-dimensional Qdrant corpus
+was not created" — did not match what was actually populated, even at the time it was written.
+
+**Truncation rule (the part that makes this safe, not just a reversal)**: lower-dimensional
+projections (512 via MRL-prefix + L2-renorm, 384 for the Warden/Nomic routing lane, etc.) remain
+legitimate **derived, secondary** lanes — but a truncation may only be produced **from a 768-dim
+source that has already been indexed and validated**, never computed speculatively ahead of or
+in parallel with 768 indexing, and never treated as if it could stand in for 768 if the 768 index
+is incomplete or unvalidated. This is the same MRL-prefix mechanism the Aug 19 freeze doc
+describes for `semantic_512` — the only change is which lane is primary-and-required versus
+derived-and-optional.
 
 **PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
-- **Canonical storage**: Qdrant `codebase_chunks_768` collection (40,568 points)
-- **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 40,568 rows populated)
+- **Canonical storage**: Qdrant — **two 768-dim collections currently coexist**,
+  `codebase_chunks_768` (105,762 points, older generation, richer payload incl. `graphAuthorityScore`/
+  `pagerank`/`community_id`/`tags`) and `codebase_chunks_768_v2` (52,380 points, `embedding-contract-768.ts`'s
+  declared canonical target, leaner identity-only payload). **This split is a separate open finding**,
+  not resolved by this policy update — see `codereview-semantic-dimension-regression-aug22/tasks.md`
+  section 5 before picking one as "the" collection to query or write to.
+- **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 52,380 rows populated as of 2026-08-23)
 - **Retrieval path**: Qdrant ANN → Postgres join by source_ref → optional Neo4j topology expansion
 
-**SECONDARY ROUTING LANE**: 384d Warden/Nomic (optional, cost-optimized re-ranking)
-- **Purpose**: Fast re-ranking when VRAM pressure is high (skip GPU cost)
-- **Storage**: Redis cache (`gpu:warden:cache:384d:*` keys, generated on demand)
-- **Use case**: Final ranking of top-K after primary 768d ANN retrieval
-- **NOT authoritative**: This lane never produces final recall results; it guides ranking only
+**SECONDARY ROUTING LANE(S)**: 512d (MRL-truncated) and 384d Warden/Nomic (optional, cost-optimized re-ranking)
+- **Purpose**: Fast re-ranking when VRAM pressure is high (skip GPU cost), or a smaller ANN index
+  where full 768d recall isn't required
+- **Storage**: 512d → Qdrant `codebase_chunks_512` (derived, `projected_from_768d` payload field
+  confirms derivation); 384d → Redis cache (`gpu:warden:cache:384d:*` keys, generated on demand)
+- **Use case**: Final ranking of top-K after primary 768d ANN retrieval, or a bounded secondary index
+- **NOT authoritative**: Neither lane produces final recall results on its own; both guide/derive from 768d
 
 **HARD RULES** (non-negotiable):
-- ✅ Always use 768-dim embeddings from embeddinggemma for Qdrant and Postgres
-- ✅ Never store 384d vectors in Qdrant (no dimension mismatch)
-- ✅ 384d routing is OPTIONAL; don't block retrieval if Redis 384d cache miss
-- ❌ Never make 384d the primary retrieval lane (it's a secondary optimization)
+- ✅ Always use 768-dim embeddings from embeddinggemma as the primary source for Qdrant and Postgres
+- ✅ Any 512d/384d truncation must be produced from an already-indexed, already-validated 768d source — never speculatively ahead of it
+- ✅ 384d/512d routing lanes are OPTIONAL; don't block retrieval if their cache/collection misses
+- ❌ Never make a truncated (512d/384d) lane the primary retrieval authority
 - ❌ Never use different embedding models for the same dimension (embeddinggemma only for 768d)
+- ❌ Never silently re-decide this policy in a future session without first reading the reconciliation trace above — that exact failure mode is what produced 5 rounds of churn in under a month
 
 **Retrieval Decision Tree**:
 ```
@@ -617,7 +643,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
 # Expected: 58304 or close to it
 
 # 7. Valkey/Redis (cache at :6379, password: redis)
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 # Expected: PONG
 ```
 
@@ -827,7 +853,7 @@ Docker containers are disposable. **Volumes are the only durable layer.** Before
 docker inspect legal-ai-postgres | jq '.[0].Mounts'
 docker inspect legal-ai-qdrant   | jq '.[0].Mounts'
 docker inspect legal-ai-neo4j    | jq '.[0].Mounts'
-docker inspect legal-ai-redis    | jq '.[0].Mounts'
+docker inspect legal-ai-valkey    | jq '.[0].Mounts'
 ```
 
 **Never run** (without explicit operator approval + backups):
@@ -946,7 +972,7 @@ curl http://127.0.0.1:6333/collections/codebase_chunks_768/snapshots
 
 **Redis:**
 ```bash
-docker exec legal-ai-redis redis-cli SAVE
+docker exec legal-ai-valkey valkey-cli SAVE
 ```
 
 **Neo4j:**
@@ -2696,7 +2722,7 @@ Use `docker exec` directly via Bash/PowerShell tool — never wrap in Node.js sc
 ```bash
 # ✅ CORRECT — direct docker exec
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM users"
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 docker exec legal-ai-qdrant curl -s http://localhost:6333/collections
 
 # ❌ WRONG — Node.js Docker SDK (causes OOM)
@@ -3402,14 +3428,14 @@ Wired into the heavy lane of `scripts/startup/ace-incremental-startup.mjs` via `
 
 ```bash
 # Sample scores
-docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores 'src/lib/server/db/client.ts'
+docker exec legal-ai-valkey valkey-cli HGET gpu:karpathy:scores 'src/lib/server/db/client.ts'
 # → {"pr":7.06,"attn":0.999,"authority":0.555,"blend":3.291}
 
 # 64-dim memory path for a file
-docker exec legal-ai-redis redis-cli HGET gpu:karpathy:encoded 'src/lib/server/db/client.ts'
+docker exec legal-ai-valkey valkey-cli HGET gpu:karpathy:encoded 'src/lib/server/db/client.ts'
 
 # Run metadata
-docker exec legal-ai-redis redis-cli HGETALL gpu:karpathy:summary
+docker exec legal-ai-valkey valkey-cli HGETALL gpu:karpathy:summary
 ```
 
 ---
@@ -3479,7 +3505,7 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 - **Git-diff cold archive (no-delete workaround)**: To retire archive-eligible files without destroying content — `git add` → structured commit → `git tag archive/YYYY-MM-DD/<slug>` → `git rm` + prune commit. Content lives in git DAG forever; recoverable via `git show <tag>:<path>`. Score gate: only files with `superseded-score >= threshold` qualify. Canonical scorer: `scripts/atlas/score-superseded-originals.mjs`. Archive pipeline (not yet built): `scripts/atlas/archive-cold-originals.mjs`. See `docs/architecture/phase-101-completion-plan.md` Block 1.
 - **Valkey bundle replaces Redis Stack**: `valkey/valkey-bundle:8` is the AGPL-free drop-in. Includes `valkey-json` (RapidJSON C++) and `valkey-search`. Swap image in docker-compose, bind `127.0.0.1:6379`. Zero ioredis code changes. `ROTORQUANT_KV_ENABLED=true` in `.env` is a dead variable — `launch-turboquant.ps1` never reads it; use `TURBO_PROFILE` instead.
 - **Hybrid Omni-Worker**: Anaconda container unifies Node.js + PyTorch + TRT-LLM in one process sharing a CUDA context. Bridge is `n-api.rs` using `tch-rs` (Rust LibTorch bindings) or `cudarc` — zero-copy tensor hand-off between SvelteKit and GPU inference. LangGraph = orchestration-only planner, never writes to DB. Not yet implemented; scaffold in `docker/omni-worker/`. See `docs/architecture/phase-101-completion-plan.md` Block 6.
-- **ioredis cold-start and lifecycle checks**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise). **Rule**: Never reuse a closed or disconnected client across distinct script segments or different query runs. Always create a fresh client instance or use block/scope isolation (e.g., with a clean `try...finally` with `redis.quit()`) to prevent `Connection is closed` errors. Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
+- **ioredis cold-start and lifecycle checks**: `legal-ai-valkey` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise). **Rule**: Never reuse a closed or disconnected client across distinct script segments or different query runs. Always create a fresh client instance or use block/scope isolation (e.g., with a clean `try...finally` with `redis.quit()`) to prevent `Connection is closed` errors. Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
 - **Valkey/Redis Config Object Pattern (The "Redis Trick")**: In standalone Node/smoke scripts, do not parse/interpolate `REDIS_URL` strings with passwords (fails on special characters like `:` or `@`). Always configure the `ioredis` constructor with an options object: `{ host: env.REDIS_HOST, port: env.REDIS_PORT, password: env.REDIS_PASSWORD }`.
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
 - **TS imports in SvelteKit**: Use `.js` extensions not `.ts` (bundler resolves `.js` → `.ts`)

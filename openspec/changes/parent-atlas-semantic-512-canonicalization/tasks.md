@@ -1,5 +1,18 @@
 # Parent Atlas semantic_512 canonicalization — proof sequence
 
+**⛔ SUPERSEDED, 2026-08-23 — operator decision.** This freeze is no longer canonical policy.
+Presented with live ground-truth evidence that this doc's own stated premise ("no production
+768-dimensional Qdrant corpus was created") did not hold even at the time this freeze was written
+(Postgres's truth column and a Qdrant mirror were both already natively 768-dim, populated weeks
+earlier), the operator reversed this decision and confirmed `semantic_768` as canonical instead.
+See `openspec/changes/parent-atlas-semantic-768-canonical-contract/proposal.md` (now `ACCEPTED`)
+and root `CLAUDE.md`'s embedding-dimensions policy for the current, authoritative rule. Full
+forensic trace of the whole conflict (5 rounds of undocumented re-decision across less than a
+month) is in `openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md` section 1.
+**Everything below this point is historical record, not current policy** — kept for its real
+audit/proof-sequence value (the S180-6B live-storage corrections, the writer-lineage findings)
+but the frozen `semantic_512`-as-canonical conclusion itself no longer applies.
+
 Operator correction (2026-08-19): the persisted EmbeddingGemma test corpus that actually exists is 512-dimensional; a production/canonical 768-dimensional Qdrant corpus was not created. Do not promote an assumed 768 store merely because EmbeddingGemma's native output is 768.
 
 Live-storage correction (2026-08-19): the read-only S180-6B audit proved that live `atlas_packets` has complete `source_ref` but **no literal `source_revision` column**. Do not synthesize source revision from `workspace_revision`, `representation_revision`, vector dimension, timestamps, or Qdrant point IDs. Source freshness is a separate mutation-awareness proof.

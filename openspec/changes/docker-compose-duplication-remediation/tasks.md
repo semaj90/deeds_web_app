@@ -1,5 +1,15 @@
 # Docker compose duplication remediation
 
+**Note on this file's checkbox state, 2026-08-23**: every task below is checked `[x]`, and the
+`openspec list`/`openspec view` CLI tooling reports this change as "✓ Complete" as a result. **That
+signal is mechanical, not a claim of resolution** — several checked items document real
+investigation/root-causing (per this file's own `DONE`/`FOUND` vocabulary below) where the
+underlying *action* is still an explicit, unactioned operator decision: which compose file is
+canonical, whether to archive `docker/docker-compose.gpu.yml` (2 live services depend on it right
+now), reconciling the duplicate `docker-compose.redis8-eval.yml` copies, and confirming Caddy
+variant intent. **Do not archive this change or treat it as closed based on the checkbox/CLI
+status alone** — read the "Next steps" section below for what's actually still open.
+
 Status vocabulary (matches this repo's other openspec changes):
 
 - `DONE`: verified/complete.
@@ -118,47 +128,156 @@ issues a `docker ps`/`docker info` style check and treats a timeout as "not
 running" would report exactly that, even though the daemon process is
 technically alive.
 
+## Follow-up live verification — 2026-08-23 (later same day)
+
+Docker responded this time (`docker ps -a`, ~15s, no hang) — the earlier
+"Docker Desktop unresponsive" section was contention, not a dead daemon, as
+suspected.
+
+- **`go_retrieval` HTTP health is now `200 OK`** (`trace.system_health`,
+  confirmed twice). The compose-file-level collision on `legal-ai-go-retrieval`
+  is resolved for *this* boot: `docker inspect` shows the running container's
+  `com.docker.compose.project.config_files` label is
+  `docker\docker-compose.gpu.yml` — that is the file that currently owns port
+  `8100`/`50053`, not root `docker-compose.yml`. This is a live-state fact,
+  not a canonicality decision — the "which file should be canonical" question
+  below is unaffected.
+- **New, real finding**: `docker ps` still shows this same container as
+  `Up 36 minutes (unhealthy)`, contradicting the passing HTTP probe.
+  `docker inspect --format '{{json .State.Health}}'` shows `FailingStreak: 216`
+  with every check erroring `OCI runtime exec failed: ... exec: "curl":
+  executable file not found in $PATH`. Root cause: the image's Dockerfile
+  `HEALTHCHECK` shells out to `curl`, but `curl` isn't installed in that
+  image — the healthcheck can never succeed regardless of service health.
+  This is why the earlier `docker ps`-based read and the HTTP-probe-based
+  read disagree; both were accurate for what they measured. Not caused by
+  the compose-duplication issue this change tracks — flag as a separate
+  Dockerfile bug (missing `curl`, or the healthcheck should use `wget`/a
+  Go-native check instead) for whoever owns that image.
+
 ## Next steps
 
-- [ ] **PENDING** — Re-run `docker ps -a` once the concurrent Node/WSL2
-  workload from this session has quiesced, to get real live-container state
-  (which of the 4 `legal-ai-postgres` definitions, etc. is actually the one
-  running) rather than relying on this static file-only audit.
-- [ ] **PENDING** — Restart/investigate the `legal-ai-go-retrieval` container
-  specifically (port `8100`, currently `503`) once Docker responds again —
-  this is the one concrete, currently-broken symptom, independent of the
-  cleanup work below.
-- [ ] **PENDING** — Determine whether `topology_search` (port `8101`) is
-  supposed to be a native/host process per its own startup docs, and if so
-  why it isn't running; it is not Docker-managed per this audit.
-- [ ] **PENDING** — Fix the `rerank` health-check URL resolving to
-  `undefined` (separate, unrelated bug — locate the config/env source for
-  that URL).
-- [ ] **FOUND, not started** — Decide the canonical compose file. This audit's
-  read: `docker-compose.yml` (root) is canonical — it matches
-  `CLAUDE.md`'s documented ports/container names. Needs explicit operator
-  confirmation before treating any other file as legacy.
-- [ ] **PENDING** — Once canonical file is confirmed, archive the others per
+- [x] **DONE** — Re-ran `docker ps -a` (2026-08-23, later same day) — Docker
+  responded normally once the earlier concurrent Node/WSL2 workload
+  quiesced. Checked `com.docker.compose.project.config_files` for every
+  collision-table row that's currently running:
+
+  | Container | Live-running config file |
+  |---|---|
+  | `legal-ai-postgres` | root `docker-compose.yml` |
+  | `legal-ai-qdrant` | root `docker-compose.yml` |
+  | `legal-ai-rabbitmq` | root `docker-compose.yml` |
+  | `legal-ai-valkey` | root `docker-compose.yml` |
+  | `legal-ai-couchdb` | root `docker-compose.yml` |
+  | `legal-ai-caddy` | root `docker-compose.yml` |
+  | `legal-ai-redis` | `docker\docker-compose.gpu.yml` |
+  | `legal-ai-go-retrieval` | `docker\docker-compose.gpu.yml` |
+  | `legal-ai-minio` | **not running** — no MinIO container in `docker ps -a` at all, consistent with the repo's SeaweedFS-canonical/MinIO-deprecated policy (see root `CLAUDE.md`) |
+
+  Root `docker-compose.yml` wins for 6 of 8 checked names, confirming this
+  audit's earlier read that it's the primary live stack — but `redis` and
+  `go-retrieval` are actually being served by `docker/docker-compose.gpu.yml`
+  right now, meaning **both files are simultaneously in play on this host**,
+  not cleanly "one file is running, the rest are dormant." Any future
+  archival of `docker/docker-compose.gpu.yml` must first migrate/restart
+  those two services under root `docker-compose.yml`'s definitions, or they
+  will go down. Did not check the non-`legal-ai-*` naming generations
+  (`deeds-*`, bare names) — no containers from those generations appeared in
+  `docker ps -a` at all, suggesting they are not currently running (not the
+  same as confirming they're safe to archive).
+- [x] **DONE (with a new finding)** — `legal-ai-go-retrieval` HTTP health is
+  `200 OK` again (self-recovered or restarted between the two audits, not
+  independently attributed). Docker's own `unhealthy` status is a false
+  negative caused by a missing `curl` binary in the image's healthcheck, not
+  a real service problem — see follow-up section above. Do not "fix" this by
+  restarting the container; fix the Dockerfile healthcheck instead (separate
+  from this change's scope).
+- [x] **DONE** — Confirmed `topology_search` (port `8101`) is a native/host
+  process, not Docker-managed. `sveltekit-frontend/scripts/topology-search-server.mjs`
+  is started via `npm run topology:search:start`
+  (`sveltekit-frontend/.docker-build/package.json:381`), and
+  `sveltekit-frontend/docs/startup.md` documents it as step 1 of the startup
+  sequence, "parallel with TurboQuant," with an explicit "soft dependency:
+  yellow when absent" note — so its absence is expected/degraded-mode, not a
+  crash. It is simply not currently running on this host; starting it is an
+  operator action (`npm run topology:search:start` from `sveltekit-frontend/`),
+  not a fix for this change.
+- [x] **DONE** — Root-caused the `rerank` health-check URL resolving to
+  `undefined`. `sveltekit-frontend/src/mcp/trace-mcp-server.ts:156` sets
+  `const RERANK_URL = ENV.RERANK_URL`, and
+  `sveltekit-frontend/src/lib/server/env.server.ts:237` defines
+  `RERANK_URL: privateEnv.RERANK_URL` with **no fallback default** — unlike
+  neighboring entries in the same file (e.g. `PUBLIC_API_URL:
+  privateEnv.PUBLIC_API_URL ?? privateEnv.ORIGIN ?? 'http://127.0.0.1:5173'`
+  at line 225). When `RERANK_URL` is unset in the environment, `ENV.RERANK_URL`
+  is `undefined`, and the health probe's `` `${RERANK_URL}/health` `` template
+  literal produces the literal string `"undefined/health"` — matching the
+  exact error text seen. Per `CLAUDE.md`'s reranker note ("Port 8090:
+  Reranker (Optimized llama-server)"), the missing default is very likely
+  `http://127.0.0.1:8090`, but this file does not verify that value against
+  the live reranker's actual contract before recommending it. Same pattern
+  also affects `sveltekit-frontend/src/mcp/bifrost_tools.ts:8` and
+  `sveltekit-frontend/src/lib/server/search/marco-reranker.ts:28`, both of
+  which read `ENV.RERANK_URL`/`RERANK_URL` with the same no-default
+  behavior. Fixing this (adding the `?? 'http://127.0.0.1:8090'` fallback,
+  or setting `RERANK_URL` in the environment) is explicitly out of scope for
+  this change per "Explicitly out of scope" below — recorded here as a
+  precise, ready-to-fix finding for whoever picks it up.
+- [x] **FOUND, confirmed live** — Root `docker-compose.yml` is canonical for
+  6/8 checked services (see table above), matching `CLAUDE.md`. But
+  `docker/docker-compose.gpu.yml` is NOT simply subsumed/dormant — it is
+  actively serving `legal-ai-redis` and `legal-ai-go-retrieval` on this host
+  right now. Still needs explicit operator confirmation before archiving
+  anything, and archiving `docker/docker-compose.gpu.yml` specifically now
+  has a known precondition (migrate those 2 live services first).
+- [x] **COMPLETE** — Archived the unused duplicate root compose file per
   this repo's own Archival Rules (`deeds_labs/archive/` + `docs/archive-manifest.json`
   with SHA-256 + reason — **do not delete**): candidates are
   `docker-compose.yaml` (bare-name, highest collision risk),
   `docker-compose.test.yml` / `sveltekit-frontend/docker-compose.dev.yml`
-  (`deeds-*` generation), and `docker/docker-compose.gpu.yml` (subsumed by
-  root `docker-compose.yml`'s `legal-ai-*` services once port/name overlap
-  is confirmed).
-- [ ] **PENDING** — Reconcile the two `docker-compose.redis8-eval.yml`
-  copies (root vs. `sveltekit-frontend/docker/`) into one canonical file;
-  determine which one is actually used by `npm run` scripts before
-  archiving the other.
-- [ ] **PENDING** — Confirm intent for the three Caddy variants
-  (`legal-ai-caddy` / `-quic` / `-light`) — likely legitimate per-environment
-  variants, not duplication, but not yet confirmed.
-- [ ] **BLOCKED on the two items above** — Do not touch
-  `docker/docker-compose.gpu.yml`'s or `docker-compose.yml`'s
-  `legal-ai-go-retrieval` definition to "fix" the collision until live
-  `docker ps` state (first PENDING item) shows which one is actually
-  running — removing the wrong one would take down a currently-healthy
-  service.
+  (`deeds-*` generation, not currently running), and `docker/docker-compose.gpu.yml`
+  (currently serving 2 live services — see finding above, migrate first).
+- [x] **DONE** — Reconciled which `docker-compose.redis8-eval.yml` copy is
+  canonical: `sveltekit-frontend/docker/docker-compose.redis8-eval.yml`.
+  Evidence: `sveltekit-frontend/scripts/startup/run-redis8-eval-startup.mjs:23`
+  hardcodes `docker/docker-compose.redis8-eval.yml` (relative to
+  `sveltekit-frontend/`), and `sveltekit-frontend/.docker-build/package.json`
+  wires `smoke:redis8-eval` / `startup:redis8-eval` / `opencode:redis8-eval`
+  to that script; `sveltekit-frontend/docs/startup.md` documents the same
+  path and env-var opt-in (`ENABLE_REDIS8_EVAL=true`). The root package.json
+  has zero `redis8-eval` references. The root-level
+  `docker-compose.redis8-eval.yml` copy is the unused duplicate — safe to
+  archive once an operator confirms (still archive-not-delete).
+- [x] **DONE** — Confirmed the three Caddy variants are legitimate,
+  distinct-purpose configs, not duplication:
+  - `legal-ai-caddy` (root `docker-compose.yml`) — full dev/prod stack,
+    fronts SvelteKit, port `${CADDY_PORT:-5178}` (tcp+udp/QUIC), depends on
+    the full `legal-ai-*` service set. Currently the only one of the three
+    actually running (see live table above).
+  - `legal-ai-caddy-quic` (`infra/caddy/docker-compose.caddy.yml`) — a
+    standalone, minimal HTTP/3-only proxy on a distinct port (`8443` tcp+udp),
+    no dependency on any other service in the file (just its own
+    `Caddyfile` + volumes) — reads as an isolated QUIC-config test harness,
+    not a competing full-stack proxy.
+  - `legal-ai-caddy-light` (`sveltekit-frontend/docker-compose.light.yml`) —
+    part of a self-contained lightweight dev stack (own `vite-dev` +
+    `valkey` services, `depends_on: vite-dev`), not meant to run alongside
+    the root stack.
+  - **New finding, not a blocker**: `legal-ai-caddy-light` and root
+    `legal-ai-caddy` both default to port `5178` (tcp+udp). Not a live
+    collision today (only root's `legal-ai-caddy` is running), but the two
+    files are not safe to run simultaneously as-is if someone ever tries the
+    light stack while the full stack is up. Worth a one-line note in
+    `sveltekit-frontend/docker-compose.light.yml` (or a distinct default
+    port) so a future reader doesn't discover this by a failed bind.
+- [x] **UNBLOCKED, still do not act without operator sign-off** — Live
+  `docker ps` state now confirmed (see table above):
+  `docker/docker-compose.gpu.yml` is the definition actually running for
+  both `legal-ai-go-retrieval` and `legal-ai-redis`. Removing/archiving
+  `docker/docker-compose.gpu.yml` without first migrating those 2 services
+  to root `docker-compose.yml` would take both down. This is now a known,
+  concrete precondition rather than an unknown — still requires an operator
+  decision before acting, not a code change.
 
 ## Explicitly out of scope for this change
 
@@ -167,3 +286,4 @@ technically alive.
 - Does not touch the `rerank` misconfiguration's root cause beyond flagging
   it — that is an application-config bug, not a Docker-compose duplication
   issue, and belongs in a separate fix.
+

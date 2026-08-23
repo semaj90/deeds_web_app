@@ -410,7 +410,8 @@ export class SupervisorAgent {
 	/**
 	 * Get topology info for the GET endpoint.
 	 */
-	getTopology() {
+	async getTopology() {
+		await this.ensureGraph();
 		const subagentInfo = Array.from(this.subagents.entries()).map(([name, sa]) => ({
 			name,
 			toolCount: sa.toolNames.length,

@@ -13,9 +13,10 @@ echo "==========================================="
 echo ""
 
 # Allow environment overrides for local dev setups
-# Example: export DEEDS_REDIS_CONTAINER=legal-ai-redis
-DEEDS_REDIS_CONTAINER=${DEEDS_REDIS_CONTAINER:-deeds-redis-prod}
-RABBITMQ_CONTAINER=${RABBITMQ_CONTAINER:-phase66-rabbitmq}
+# Example: export DEEDS_REDIS_CONTAINER=legal-ai-valkey
+DEEDS_REDIS_CONTAINER=${DEEDS_REDIS_CONTAINER:-legal-ai-valkey}
+RABBITMQ_CONTAINER=${RABBITMQ_CONTAINER:-legal-ai-rabbitmq}
+REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
 RABBITMQ_USER=${RABBITMQ_USER:-guest}
 RABBITMQ_PASS=${RABBITMQ_PASS:-guest}
 OLLAMA_URL=${OLLAMA_URL:-http://localhost:11434}
@@ -60,13 +61,13 @@ echo "----------------------"
 
 # G1: Redis Connection
 echo -n "G1: Redis connection... "
-if [ "$DOCKER_AVAILABLE" -eq 1 ] && docker exec "${DEEDS_REDIS_CONTAINER}" redis-cli ping 2>/dev/null | grep -q PONG; then
+if [ "$DOCKER_AVAILABLE" -eq 1 ] && docker exec "${DEEDS_REDIS_CONTAINER}" redis-cli -a "${REDIS_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG; then
   echo "✅ PASS (docker exec)"
   ((PASS++))
 else
   # Try TCP-based check via redis-cli on host.docker.internal (WSL) or provided host
   if command -v redis-cli >/dev/null 2>&1; then
-    if redis-cli -h "${DEEDS_REDIS_HOST}" -p "${DEEDS_REDIS_PORT}" ping 2>/dev/null | grep -q PONG; then
+    if redis-cli -h "${DEEDS_REDIS_HOST}" -p "${DEEDS_REDIS_PORT}" -a "${REDIS_PASSWORD}" --no-auth-warning ping 2>/dev/null | grep -q PONG; then
       echo "✅ PASS (redis reachable via TCP)"
       ((PASS++))
     else
@@ -94,11 +95,11 @@ fi
 # G3: Redis Memory Usage
 echo -n "G3: Redis memory usage... "
 if [ "$DOCKER_AVAILABLE" -eq 1 ]; then
-  MEM=$(docker exec "${DEEDS_REDIS_CONTAINER}" redis-cli info memory 2>/dev/null | grep used_memory_human | cut -d: -f2 | tr -d '\r')
+  MEM=$(docker exec "${DEEDS_REDIS_CONTAINER}" redis-cli -a "${REDIS_PASSWORD}" --no-auth-warning info memory 2>/dev/null | grep used_memory_human | cut -d: -f2 | tr -d '\r')
   SOURCE="docker exec"
 else
   if command -v redis-cli >/dev/null 2>&1; then
-    MEM=$(redis-cli -h "${DEEDS_REDIS_HOST}" -p "${DEEDS_REDIS_PORT}" info memory 2>/dev/null | grep used_memory_human | cut -d: -f2 | tr -d '\r')
+    MEM=$(redis-cli -h "${DEEDS_REDIS_HOST}" -p "${DEEDS_REDIS_PORT}" -a "${REDIS_PASSWORD}" --no-auth-warning info memory 2>/dev/null | grep used_memory_human | cut -d: -f2 | tr -d '\r')
     SOURCE="tcp"
   else
     MEM=""
@@ -375,10 +376,10 @@ else
   echo "❌ $FAIL service(s) need attention"
   echo ""
   echo "Quick Fixes:"
-  echo "  • Redis: docker restart deeds-redis-prod"
+  echo "  • Redis: docker restart ${DEEDS_REDIS_CONTAINER}"
   echo "  • Bifrost: cd go-microservice && go run cmd/bifrost/main.go"
   echo "  • Ollama: systemctl restart ollama"
-  echo "  • RabbitMQ: docker restart phase66-rabbitmq"
+  echo "  • RabbitMQ: docker restart ${RABBITMQ_CONTAINER}"
   echo "  • Langfuse: docker-compose up -d langfuse-web"
   echo "  • Codebase Index: cd sveltekit-frontend && npx tsx scripts/codebase-semantic-indexer.ts"
   echo "  • Simdjson Addon: cd simd-bridge/cpp && cmake --build build --config Release"

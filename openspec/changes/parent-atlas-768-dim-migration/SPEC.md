@@ -1,7 +1,17 @@
 # 768-dim Canonical Migration — Script Inventory
 
 **Date**: 2026-08-11
-**Status**: INVENTORY ONLY — not yet triaged, not yet executed
+**Status**: UNBLOCKED, 2026-08-23 — the target this inventory needs is now settled. This doc's
+premise ("768-dim is canonical") went through a later reversal-and-reversal (see
+`openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md` section 1 for the full
+5-round history) but the operator's final 2026-08-23 decision confirms `semantic_768` as canonical
+— the same target this inventory already assumed. **The A/B/C/D classification work below can now
+proceed** against its original premise. Two things changed since this doc was written that should
+be folded in before executing: (1) the truncation rule is now explicit — a 512d/384d derived lane
+is fine, but only if produced from an already-indexed, already-validated 768d source, never
+speculatively; (2) this inventory's original 50-file grep cap was hit and never re-run at a higher
+limit — do that before treating the sample below as complete. Still genuinely not yet triaged or
+executed past the sampling stage — this note removes the blocker, it doesn't do the work.
 **Owner**: james
 **Trigger**: root CLAUDE.md "Embedding Dimensions Policy" (2026-07-27) declares
 768-dim (`embeddinggemma:latest`) canonical; 384-dim is a legacy/optional

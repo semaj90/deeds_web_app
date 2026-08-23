@@ -1,5 +1,13 @@
 [
   {
+    "path": "openspec/changes/{agent-branch-review-fanout-ace-centroid-aug22, agent-branch-review-prefanout-samplequery-aug22, codereview-inference-wiring-followup-aug22, codereview-semantic-dimension-regression-aug22, deep-audit-code-gates-aug22, inference-wiring-deep-audit-aug22, parent-atlas-xgboost-cuda-runtime-proof}/** (9 full change proposals) + 4 standalone addendum docs under still-live changes (parent-atlas-agentic-repair-bundle-integration/trace-ownership-and-shadow-tree-followup-2026-08-22.md, parent-atlas-candidate-feature-execution-fabric/{representation-matrix-index-alignment-addendum,trace-authority-addendum}.md, parent-atlas-gpu-graph-vector-substrate/candidate-materializer-design-note-2026-08-22.md, parent-atlas-transport-memory-boundaries/temporal-recommendation-dag02-real-failure-proof.md), plus a pre-recreation snapshot of parent-atlas-gpu-runtime-abi-alignment/tasks.md (35 files total)",
+    "archive_path": "deeds_labs/archive/2026-08-23/retired-openspec-changes-aug22/",
+    "sha256": "see deeds_labs/archive/2026-08-23/retired-openspec-changes-aug22/_manifest.json (per-file sha256, 35 entries)",
+    "archived": "2026-08-23T00:00:00Z",
+    "reason": "Restored from git history (git show a2e4dab329~1:<path>) after discovering commit a2e4dab329 ('wip(atlas): restore orphaned root src tree, retire Atlas v1...') deleted these 9 openspec change directories plus 4 addendum docs directly via git rm, with commit message framing it as 'closes out several completed openspec/changes/* proposals' — but without following this repo's own Archival Rules (no manifest entry, no SHA-256, no recovery path) or the standard OpenSpec archive workflow (no move to an archive/ subdirectory, no proposal marked deployed). Found during a TRACE-MCP-assisted review session (2026-08-23) tracing the sample-query-corpus join-blocker forward from openspec/changes/atlas-feature-intelligence — the owning change (agent-branch-review-prefanout-samplequery-aug22) had vanished from disk. Nothing was unrecoverable (full content was retrievable from git history), but the deletion bypassed the tracked-archive convention this file itself exists to enforce. Restored here as a proper archive entry; completion status of each retired change against its own tasks.md still needs independent verification before treating the commit author's 'completed' framing as proven (see openspec/changes/atlas-feature-intelligence for the ongoing review thread).",
+    "recovery": "Full original openspec/changes/<name>/ trees preserved at the archive_path above, one subdirectory per retired change, plus the loose addendum docs at their original relative paths under their still-live owning changes."
+  },
+  {
     "path": "sveltekit-frontend/src/mcp/server_mcp_todo.ts.20260731-154126.disabled",
     "archive_path": "deeds_labs/archive/2026-08-11/server_mcp_todo.ts.20260731-154126.disabled.bak",
     "sha256": "6ff869d7d619d3d11ab24fb672727d8e94da7ec953bcbb402d8d9462ed4f6332",
@@ -292,5 +300,13 @@
     "archived": "2026-08-21T00:00:00Z",
     "reason": "Duplicate-name package, same discovery as the atlas-duckdb entry above: this copy declared itself @atlas/semantic-contracts v1.0.0 (\"Canonical semantic contracts (JSON Schema + Zod) for Phase 109 infrastructure\"), the exact same name the canonical monorepo-root packages/semantic-contracts now uses. This copy was in fact the MORE complete and genuinely canonical implementation (real Zod schemas + hashing/validation functions for domain-prediction, ontology-proposal, semantic-packet, domain-feature-packet, vector-manifest, canonical-hashing — vs. a placeholder src/index.ts hand-written earlier in this same session before this duplicate was found). Its full source was merged into the canonical packages/semantic-contracts (superseding the placeholder) before this archival; 5 zod v4 z.record(valueSchema) calls needed updating to the v3->v4 two-argument z.record(keySchema, valueSchema) signature to actually build. vector-manifest.ts retains 5 pre-existing real type errors (a 'latent_64' vectorName not in the enum, a contentSha256 field not in the manifest type) left unfixed as a documented gap, not silently patched. The sole real consumer (sveltekit-frontend/src/lib/server/semantic-contracts/qdrant-staging-mirror.ts) was written against snake_case field names from an old ambient .d.ts shim, not this package's camelCase contract; fixed its one direct (non-cast) property access (prediction.prediction_id -> prediction.predictionId ?? prediction.classificationRunId) to compile against the real canonical type.",
     "recovery": "Full original sveltekit-frontend/packages/semantic-contracts tree preserved at the archive_path above for reference/diffing."
+  },
+  {
+    "source_path": "docker-compose.yaml",
+    "archive_path": "deeds_labs/archive/2026-08-23/docker-compose.yaml",
+    "sha256": "fa3270ee3db0c79ff0b52cfd8a7677dacb10743215ba7bdabc95cee44d194922",
+    "archived": "2026-08-23T19:50:27Z",
+    "reason": "Unused duplicate legacy compose stack; docker-compose.yml is the canonical active stack after Valkey and native Windows Ollama alignment.",
+    "recovery": "Move the archive file back to the repository root as docker-compose.yaml after verifying compose ownership and references."
   }
 ]

@@ -1,6 +1,26 @@
 # Parent Atlas Canonical 768 Retrieval, Knowledge & Feature Contract
 
-**Status**: PROPOSED — documentation-only, no code changes yet.
+**Status**: ✅ ACCEPTED, 2026-08-23 (operator decision) — supersedes the `semantic_512` freeze
+below and resolves the conflict this document previously flagged.
+
+**Resolution record.** This proposal (dated 2026-08-03) was in undocumented conflict with a later
+freeze to `semantic_512` (`openspec/changes/parent-atlas-semantic-512-canonicalization/`, Aug 19)
+for a month, until an undocumented Aug 22 commit (`cdae3e454b`) silently implemented this
+document's position in live code anyway. On 2026-08-23, presented with the full forensic trace
+and live ground-truth evidence (Postgres's own truth column and a Qdrant mirror are both natively
+768-dim and predate the Aug 19 freeze by weeks — the freeze's own stated premise, "no production
+768 corpus exists," did not hold at the time it was written), **the operator confirmed `semantic_768`
+as canonical.** Full trace: `openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md`
+section 1. Root `CLAUDE.md`'s embedding-dimensions policy has been updated to match.
+
+**Amendment to this document's original position, per the same operator decision**: lower-dimensional
+truncations (512 via MRL-prefix, 384 for Warden/Nomic routing) remain legitimate **derived,
+secondary** lanes — this document's original framing of them as "legacy migration artifacts,
+never a fallback" is too strong. The actual rule: a truncation may only be produced from a 768-dim
+source that has **already been indexed and validated** — never computed speculatively ahead of or
+in parallel with 768 indexing. This reconciles with, rather than fully discards, the mechanism the
+512-freeze doc itself used (native 768 → MRL prefix → L2 renorm) — it changes which lane is
+primary/required versus derived/optional, not the truncation technique itself.
 **Corrects/supersedes**: an earlier "384 vs 768" framing found in prior planning docs. Note: the
 operator's dictation said "remove 368" — the actual conflicting representation throughout the
 supplied material is **384**, not 368. This document uses 384 throughout as the intended target.
