@@ -83,17 +83,26 @@ async function inspectCollection(collectionName) {
 function classifyCollection(collectionName, collectionInfo) {
   const name = collectionName.toLowerCase();
   const config = collectionInfo?.result?.config;
+  const vectors = config?.params?.vectors ?? config?.vectors;
 
   // Extract vector dimensions from config
   let vectorDimensions = null;
-  if (config?.vectors?.size) {
-    vectorDimensions = config.vectors.size;
+  if (vectors?.size) {
+    vectorDimensions = vectors.size;
   }
 
   // Named vectors?
   let namedVectors = null;
-  if (config?.vectors && typeof config.vectors === 'object' && !config.vectors.size) {
-    namedVectors = Object.keys(config.vectors);
+  let vectorDimensionsByName = null;
+  if (vectors && typeof vectors === 'object' && !vectors.size) {
+    namedVectors = Object.keys(vectors);
+    vectorDimensionsByName = Object.fromEntries(
+      Object.entries(vectors).map(([name, value]) => [name, value?.size ?? null]),
+    );
+    const dimensions = Object.values(vectorDimensionsByName).filter((size) => Number.isInteger(size));
+    if (dimensions.length > 0 && dimensions.every((size) => size === dimensions[0])) {
+      vectorDimensions = dimensions[0];
+    }
   }
 
   // Classify based on name and dimensions
@@ -138,6 +147,7 @@ function classifyCollection(collectionName, collectionInfo) {
     collectionName,
     vectorDimensions,
     namedVectors,
+    vectorDimensionsByName,
     classification,
     representationId,
     confidence,

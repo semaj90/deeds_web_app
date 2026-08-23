@@ -1,0 +1,1295 @@
+{
+  "timestamp": "2026-08-23T08:12:14.898Z",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "totalCollections": 43,
+  "byClassification": {
+    "UNCLASSIFIED": [
+      {
+        "collectionName": "BifrostSemanticCachePlugin",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 3
+      },
+      {
+        "collectionName": "agent_memory_observations",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "audio_segments",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "case_chunks",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "chat_messages",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "message"
+        ],
+        "vectorDimensionsByName": {
+          "message": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "chunks_web_search",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "cluster_narratives",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "narrative"
+        ],
+        "vectorDimensionsByName": {
+          "narrative": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 18
+      },
+      {
+        "collectionName": "code_llm_outputs",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "codebase_chunks_512",
+        "vectorDimensions": 512,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 53379
+      },
+      {
+        "collectionName": "codebase_chunks_sparse_test_v1",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 500
+      },
+      {
+        "collectionName": "codebase_topology_128",
+        "vectorDimensions": 128,
+        "namedVectors": [
+          "latent_128"
+        ],
+        "vectorDimensionsByName": {
+          "latent_128": 128
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "codebase_topology_64",
+        "vectorDimensions": 64,
+        "namedVectors": [
+          "latent_64"
+        ],
+        "vectorDimensionsByName": {
+          "latent_64": 64
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 105761
+      },
+      {
+        "collectionName": "court_opinions",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "diagnosis_embeddings",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "diagnosis"
+        ],
+        "vectorDimensionsByName": {
+          "diagnosis": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "document_tags",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "embedding_cache",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "embedding"
+        ],
+        "vectorDimensionsByName": {
+          "embedding": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "error_embeddings",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "error"
+        ],
+        "vectorDimensionsByName": {
+          "error": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 6
+      },
+      {
+        "collectionName": "evidence_items",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "evidence_items_clip_512",
+        "vectorDimensions": 512,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "evidence_vectors",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "feature_maps",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "summary"
+        ],
+        "vectorDimensionsByName": {
+          "summary": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "fictional_case_chunks",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "knowledge_base",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "legal_canon_chunks",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "legal_cases",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "description"
+        ],
+        "vectorDimensionsByName": {
+          "description": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "legal_documents",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "legal_glossary",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "llm_response_cache",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "query"
+        ],
+        "vectorDimensionsByName": {
+          "query": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 7
+      },
+      {
+        "collectionName": "poi_profiles",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "embedding"
+        ],
+        "vectorDimensionsByName": {
+          "embedding": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "sc_deedscodebase_deeds-web-app",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "dense"
+        ],
+        "vectorDimensionsByName": {
+          "dense": 768
+        },
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "sc_deedssocraticode_metadata",
+        "vectorDimensions": 1,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "topic_clusters",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 0
+      }
+    ],
+    "CUSTOM_384_DEPRECATED": [
+      {
+        "collectionName": "codebase_chunks_384",
+        "vectorDimensions": 384,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 384
+        },
+        "classification": "CUSTOM_384_DEPRECATED",
+        "representationId": "embeddinggemma_300m_384_custom_onnx_v1",
+        "confidence": 0.8,
+        "notes": [
+          "Name explicitly claims 384-dim (custom projection)",
+          "Status: DEPRECATED - do not use for new collections"
+        ],
+        "pointCount": 1
+      },
+      {
+        "collectionName": "codebase_chunks_384_hybrid",
+        "vectorDimensions": 384,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 384
+        },
+        "classification": "CUSTOM_384_DEPRECATED",
+        "representationId": "embeddinggemma_300m_384_custom_onnx_v1",
+        "confidence": 0.8,
+        "notes": [
+          "Name explicitly claims 384-dim (custom projection)",
+          "Status: DEPRECATED - do not use for new collections"
+        ],
+        "pointCount": 0
+      }
+    ],
+    "CANDIDATE_768": [
+      {
+        "collectionName": "codebase_chunks_768",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content",
+          "error",
+          "signature"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768,
+          "error": 768,
+          "signature": 768
+        },
+        "classification": "CANDIDATE_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.7,
+        "notes": [
+          "Name suggests 768-dim, consistent with native EmbeddingGemma"
+        ],
+        "pointCount": 105762
+      },
+      {
+        "collectionName": "codebase_chunks_768_v2",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content",
+          "error",
+          "signature"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768,
+          "error": 768,
+          "signature": 768
+        },
+        "classification": "CANDIDATE_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.7,
+        "notes": [
+          "Name suggests 768-dim, consistent with native EmbeddingGemma"
+        ],
+        "pointCount": 52380
+      }
+    ],
+    "LIKELY_768": [
+      {
+        "collectionName": "document_knowledge_768",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "external_programming_docs_768",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "fixer_memory_768",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "phase110_baseline_768",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "vectorDimensionsByName": null,
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 2467
+      },
+      {
+        "collectionName": "research_memory_768",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "content"
+        ],
+        "vectorDimensionsByName": {
+          "content": 768
+        },
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "summary_lenses_768",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "summary"
+        ],
+        "vectorDimensionsByName": {
+          "summary": 768
+        },
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 0
+      },
+      {
+        "collectionName": "synthesis_memory_768",
+        "vectorDimensions": 768,
+        "namedVectors": [
+          "synthesis"
+        ],
+        "vectorDimensionsByName": {
+          "synthesis": 768
+        },
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 8
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "severity": "HIGH",
+      "issue": "Deprecated 384-dim custom projection in use",
+      "affected": [
+        "codebase_chunks_384",
+        "codebase_chunks_384_hybrid"
+      ],
+      "action": "Migrate to canonical 768-dim (native EmbeddingGemma) or explicitly register 384 projection in atlas_representations",
+      "timeline": "Before Phase 110 production deployment"
+    },
+    {
+      "severity": "MEDIUM",
+      "issue": "Unclassified collections",
+      "affected": [
+        "BifrostSemanticCachePlugin",
+        "agent_memory_observations",
+        "audio_segments",
+        "case_chunks",
+        "chat_messages",
+        "chunks_web_search",
+        "cluster_narratives",
+        "code_llm_outputs",
+        "codebase_chunks_512",
+        "codebase_chunks_sparse_test_v1",
+        "codebase_topology_128",
+        "codebase_topology_64",
+        "court_opinions",
+        "diagnosis_embeddings",
+        "document_tags",
+        "embedding_cache",
+        "error_embeddings",
+        "evidence_items",
+        "evidence_items_clip_512",
+        "evidence_vectors",
+        "feature_maps",
+        "fictional_case_chunks",
+        "knowledge_base",
+        "legal_canon_chunks",
+        "legal_cases",
+        "legal_documents",
+        "legal_glossary",
+        "llm_response_cache",
+        "poi_profiles",
+        "sc_deedscodebase_deeds-web-app",
+        "sc_deedssocraticode_metadata",
+        "topic_clusters"
+      ],
+      "action": "Inspect these collections manually and update atlas_representations registry with provenance",
+      "timeline": "Within 1 week"
+    }
+  ],
+  "results": [
+    {
+      "collectionName": "BifrostSemanticCachePlugin",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 3
+    },
+    {
+      "collectionName": "agent_memory_observations",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "audio_segments",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "case_chunks",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "chat_messages",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "message"
+      ],
+      "vectorDimensionsByName": {
+        "message": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "chunks_web_search",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "cluster_narratives",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "narrative"
+      ],
+      "vectorDimensionsByName": {
+        "narrative": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 18
+    },
+    {
+      "collectionName": "code_llm_outputs",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "codebase_chunks_384",
+      "vectorDimensions": 384,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 384
+      },
+      "classification": "CUSTOM_384_DEPRECATED",
+      "representationId": "embeddinggemma_300m_384_custom_onnx_v1",
+      "confidence": 0.8,
+      "notes": [
+        "Name explicitly claims 384-dim (custom projection)",
+        "Status: DEPRECATED - do not use for new collections"
+      ],
+      "pointCount": 1
+    },
+    {
+      "collectionName": "codebase_chunks_384_hybrid",
+      "vectorDimensions": 384,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 384
+      },
+      "classification": "CUSTOM_384_DEPRECATED",
+      "representationId": "embeddinggemma_300m_384_custom_onnx_v1",
+      "confidence": 0.8,
+      "notes": [
+        "Name explicitly claims 384-dim (custom projection)",
+        "Status: DEPRECATED - do not use for new collections"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "codebase_chunks_512",
+      "vectorDimensions": 512,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 53379
+    },
+    {
+      "collectionName": "codebase_chunks_768",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768,
+        "error": 768,
+        "signature": 768
+      },
+      "classification": "CANDIDATE_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.7,
+      "notes": [
+        "Name suggests 768-dim, consistent with native EmbeddingGemma"
+      ],
+      "pointCount": 105762
+    },
+    {
+      "collectionName": "codebase_chunks_768_v2",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768,
+        "error": 768,
+        "signature": 768
+      },
+      "classification": "CANDIDATE_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.7,
+      "notes": [
+        "Name suggests 768-dim, consistent with native EmbeddingGemma"
+      ],
+      "pointCount": 52380
+    },
+    {
+      "collectionName": "codebase_chunks_sparse_test_v1",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 500
+    },
+    {
+      "collectionName": "codebase_topology_128",
+      "vectorDimensions": 128,
+      "namedVectors": [
+        "latent_128"
+      ],
+      "vectorDimensionsByName": {
+        "latent_128": 128
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "codebase_topology_64",
+      "vectorDimensions": 64,
+      "namedVectors": [
+        "latent_64"
+      ],
+      "vectorDimensionsByName": {
+        "latent_64": 64
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 105761
+    },
+    {
+      "collectionName": "court_opinions",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "diagnosis_embeddings",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "diagnosis"
+      ],
+      "vectorDimensionsByName": {
+        "diagnosis": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "document_knowledge_768",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "document_tags",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "embedding_cache",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "embedding"
+      ],
+      "vectorDimensionsByName": {
+        "embedding": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "error_embeddings",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "error"
+      ],
+      "vectorDimensionsByName": {
+        "error": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 6
+    },
+    {
+      "collectionName": "evidence_items",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "evidence_items_clip_512",
+      "vectorDimensions": 512,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "evidence_vectors",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "external_programming_docs_768",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "feature_maps",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "summary"
+      ],
+      "vectorDimensionsByName": {
+        "summary": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "fictional_case_chunks",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "fixer_memory_768",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "knowledge_base",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "legal_canon_chunks",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "legal_cases",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "description"
+      ],
+      "vectorDimensionsByName": {
+        "description": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "legal_documents",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "legal_glossary",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "llm_response_cache",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "query"
+      ],
+      "vectorDimensionsByName": {
+        "query": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 7
+    },
+    {
+      "collectionName": "phase110_baseline_768",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 2467
+    },
+    {
+      "collectionName": "poi_profiles",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "embedding"
+      ],
+      "vectorDimensionsByName": {
+        "embedding": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "research_memory_768",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "content"
+      ],
+      "vectorDimensionsByName": {
+        "content": 768
+      },
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "sc_deedscodebase_deeds-web-app",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "dense"
+      ],
+      "vectorDimensionsByName": {
+        "dense": 768
+      },
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "sc_deedssocraticode_metadata",
+      "vectorDimensions": 1,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "summary_lenses_768",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "summary"
+      ],
+      "vectorDimensionsByName": {
+        "summary": 768
+      },
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 0
+    },
+    {
+      "collectionName": "synthesis_memory_768",
+      "vectorDimensions": 768,
+      "namedVectors": [
+        "synthesis"
+      ],
+      "vectorDimensionsByName": {
+        "synthesis": 768
+      },
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 8
+    },
+    {
+      "collectionName": "topic_clusters",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "vectorDimensionsByName": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 0
+    }
+  ]
+}

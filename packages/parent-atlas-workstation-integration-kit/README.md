@@ -14,6 +14,11 @@ This kit converts the current PageRank + summaries + indexed-table state into ex
 - `001_parent_atlas_integration_contract.sql`: adds typed lineage fields and separate representation/projection/graph-run ledgers.
 - `002_parent_atlas_completeness_queries.sql`: identity, projection-coverage, row-size, and keyset-plan checks.
 
+`001_parent_atlas_integration_contract.sql` must be executed outside an
+explicit transaction: its additive indexes use `CREATE INDEX CONCURRENTLY`.
+Apply it only to an isolated non-production database after the read-only
+schema and duplicate audits pass.
+
 ## Suggested integration order
 
 1. Run the identity/duplicate audit before enforcing packet-key uniqueness.
