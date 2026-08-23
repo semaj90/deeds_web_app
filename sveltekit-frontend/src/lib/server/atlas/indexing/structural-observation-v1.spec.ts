@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   fingerprintStructuralSource,
   normalizeStructuralSymbolKind,
+  normalizeStructuralSymbolName,
   projectStructuralObservation,
 } from './structural-observation-v1.js';
 
@@ -20,6 +21,13 @@ describe('StructuralObservationV1', () => {
     expect(fingerprint.crlfCount).toBe(2);
     expect(fingerprint.lfCount).toBe(2);
     expect(fingerprint.loneLfCount).toBe(0);
+  });
+
+  it('does not treat parser placeholders or module literals as symbols', () => {
+    expect(normalizeStructuralSymbolName('<anonymous>')).toBeNull();
+    expect(normalizeStructuralSymbolName("'svelte-sonner'")).toBeNull();
+    expect(normalizeStructuralSymbolName('{ maxTokens = 256 }')).toBeNull();
+    expect(normalizeStructuralSymbolName('AuthStore')).toBe('AuthStore');
   });
 
   it('checks provider spans against the original request bytes', () => {
