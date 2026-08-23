@@ -261,6 +261,17 @@ async function auditProductionHardening(
 ): Promise<ProductionHardeningIssue[]> {
   const issues: ProductionHardeningIssue[] = [];
 
+  // Drizzle returns { rows } through the postgres client, while bounded
+  // fixtures commonly return the row array directly. Keep the proof adapter
+  // shape-tolerant without changing the canonical query or write boundary.
+  const rowsOf = (result: unknown): any[] => {
+    if (Array.isArray(result)) return result;
+    if (result && typeof result === 'object' && Array.isArray((result as any).rows)) {
+      return (result as any).rows;
+    }
+    return [];
+  };
+
   try {
     const { sql } = await import('drizzle-orm');
 
@@ -272,7 +283,7 @@ async function auditProductionHardening(
         AND tablename = 'atlas_packets'
     `);
 
-    if ((indexCheck as any).rows?.length > 0) {
+    if (rowsOf(indexCheck).length > 0) {
       // Check if critical indexes exist
       const indexList = await db.execute(sql`
         SELECT indexname
@@ -280,7 +291,9 @@ async function auditProductionHardening(
         WHERE tablename = 'atlas_packets'
       `);
 
-      const indexes = (indexList as any).rows?.map((r: any) => r.indexname) || [];
+      const indexes = rowsOf(indexList)
+        .map((r: any) => r.indexname)
+        .filter((indexName: unknown): indexName is string => typeof indexName === 'string');
       const requiredIndexes = ['packet_key_idx', 'source_ref_idx', 'feature_id_idx'];
 
       for (const requiredIdx of requiredIndexes) {
@@ -306,7 +319,7 @@ async function auditProductionHardening(
         AND created_at > NOW() - INTERVAL '7 days'
     `);
 
-    const orphanCount = (orphanCheck as any).rows?.[0]?.orphan_count || 0;
+    const orphanCount = rowsOf(orphanCheck)[0]?.orphan_count || 0;
     if (orphanCount > 10) {
       issues.push({
         type: 'orphaned_ref',
@@ -324,7 +337,7 @@ async function auditProductionHardening(
       WHERE ganValidated = false AND ganWarnings IS NOT NULL
     `);
 
-    const violationCount = (constraintCheck as any).rows?.[0]?.violation_count || 0;
+    const violationCount = rowsOf(constraintCheck)[0]?.violation_count || 0;
     if (violationCount > 0) {
       issues.push({
         type: 'invalid_constraint',
@@ -342,7 +355,7 @@ async function auditProductionHardening(
       GROUP BY schema_version
     `);
 
-    const versions = (schemaVersions as any).rows || [];
+    const versions = rowsOf(schemaVersions);
     if (versions.length > 1) {
       issues.push({
         type: 'invalid_constraint',
