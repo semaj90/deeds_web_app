@@ -16,7 +16,7 @@ const FRONTEND = path.resolve(HERE, '../..');
 const REPO_ROOT = path.resolve(FRONTEND, '..');
 const DATABASE_URL = process.env.DATABASE_URL;
 const PRODUCER_REVISION = 'atlas.graphify-revision-owner-v2.proof.v1';
-const WRITER_RELATIVE = 'sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts';
+const WRITER_RELATIVE = 'sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory-v3.mts';
 const WRITER = path.resolve(REPO_ROOT, WRITER_RELATIVE);
 const SAMPLE_SOURCE = path.resolve(REPO_ROOT, process.env.ATLAS_CODE_REVISION_CANARY_SOURCE ?? 'sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts');
 const OUTPUT = path.resolve(REPO_ROOT, process.env.ATLAS_GRAPHIFY_REVISION_OWNER_V2_OUT ?? 'docs/reports/graphify-revision-owner-v2.json');
@@ -89,7 +89,7 @@ try {
       persistedMatchingRows,
       notes: [
         'Read-only independent v2 proof; no canonical write attempted.',
-        writer.v2Compatible ? 'Current materializer statically references the v2 two-table authority coordinates.' : 'Current materializer is not statically compatible with the v2 two-table authority contract.',
+        writer.v2Compatible ? 'Current V3 materializer statically references the v2 two-table authority coordinates.' : 'Current V3 materializer is not statically compatible with the v2 two-table authority contract.',
       ],
     },
     producerRevision: PRODUCER_REVISION,
