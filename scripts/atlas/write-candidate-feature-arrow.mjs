@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * FEAT-03B — serialize CandidateFeatureColumnarV1 into Arrow IPC FILE format.
  *
@@ -11,7 +9,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { tableFromArrays, tableFromIPC, tableToIPC } from 'apache-arrow';
+import {
+  makeBuilder,
+  tableFromArrays,
+  tableFromIPC,
+  tableToIPC,
+  Utf8,
+  vectorFromArray,
+} from 'apache-arrow';
 
 export const CANDIDATE_FEATURE_ARROW_SCHEMA = 'atlas.candidate-feature-arrow-ipc.v1';
 
@@ -132,17 +137,25 @@ export function validateCandidateFeatureColumnar(input) {
 
 export function buildCandidateFeatureArrowTable(columnarInput) {
   const input = validateCandidateFeatureColumnar(columnarInput);
+  const utf8Vector = (values) => {
+    const builder = makeBuilder({ type: new Utf8() });
+    for (const value of values) builder.append(value);
+    return builder.finish().toVector();
+  };
   const columns = {
-    candidate_ordinal: Uint32Array.from(input.candidateOrdinals),
-    canonical_id: input.canonicalIds,
-    packet_key: input.packetKeys,
-    tree_node_id: input.treeNodeIds,
-    symbol_version_id: input.symbolVersionIds,
-    source_revision: input.sourceRevisions,
-    graph_revision: input.graphRevisions,
-    semantic_revision: input.semanticRevisions,
-    degraded_identity: Uint8Array.from(input.degradedIdentity),
-    lane_mask_u16: Uint16Array.from(input.laneMaskU16),
+    candidate_ordinal: vectorFromArray(Uint32Array.from(input.candidateOrdinals)),
+    // Force plain Utf8 vectors. vectorFromArray(string[]) infers dictionary
+    // encoding, whose dictionary/buffer layout can vary between equivalent
+    // serializations and breaks the artifact byte-determinism gate.
+    canonical_id: utf8Vector(input.canonicalIds),
+    packet_key: utf8Vector(input.packetKeys),
+    tree_node_id: utf8Vector(input.treeNodeIds),
+    symbol_version_id: utf8Vector(input.symbolVersionIds),
+    source_revision: utf8Vector(input.sourceRevisions),
+    graph_revision: utf8Vector(input.graphRevisions),
+    semantic_revision: utf8Vector(input.semanticRevisions),
+    degraded_identity: vectorFromArray(Uint8Array.from(input.degradedIdentity)),
+    lane_mask_u16: vectorFromArray(Uint16Array.from(input.laneMaskU16)),
   };
 
   for (let featureIndex = 0; featureIndex < FEATURE_NAMES.length; featureIndex += 1) {
@@ -154,8 +167,8 @@ export function buildCandidateFeatureArrowTable(columnarInput) {
       values[row] = input.featureValues[cell];
       presence[row] = input.featurePresence[cell];
     }
-    columns[name] = values;
-    columns[`${name}_present`] = presence;
+    columns[name] = vectorFromArray(values);
+    columns[`${name}_present`] = vectorFromArray(presence);
   }
 
   return tableFromArrays(columns);
