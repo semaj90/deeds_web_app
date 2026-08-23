@@ -13,8 +13,6 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
@@ -39,22 +37,39 @@ export interface SummaryPipelineResult {
 
 async function generateSummaryViaLlamaServer(sourceRef: string, context: string): Promise<string | null> {
   try {
-    const llamaSession = await getLlamaSessionDescriptor();
-    const summary = await bifrostChat(
-      [
-        {
-          role: 'system',
-          content: 'You are a code summarization expert. Summarize the following code/text in 1-3 sentences, capturing the core functionality or purpose.',
-        },
-        {
-          role: 'user',
-          content: `${context}\n\nProvide a concise summary.`,
-        },
-      ],
-      llamaSession.modelId,
-      { temperature: 0.3, maxTokens: 150, timeoutMs: 15_000 }
-    );
-    return summary.trim() || null;
+    const baseUrl = String(ENV.LLAMA_SERVER_URL ?? process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+    const model = ENV.GEMMA4_MODEL ?? process.env.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a code summarization expert. Summarize the following code/text in 1-3 sentences, capturing the core functionality or purpose.',
+          },
+          {
+            role: 'user',
+            content: `${context}\n\nProvide a concise summary.`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 150,
+        stream: false,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+      console.error(`Summary generation failed for ${sourceRef}: HTTP ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const summary = data.choices?.[0]?.message?.content?.trim();
+    return summary || null;
   } catch (err) {
     console.error(`Failed to generate summary for ${sourceRef}:`, err);
     return null;

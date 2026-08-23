@@ -462,8 +462,7 @@ const TOOLS = [
         text: { type: 'string', description: 'Repo evidence to classify.' },
         labels: {
           type: 'array',
-          description: 'Two to fifty allowed classification labels; the model must return exactly one.',
-          items: { type: 'string', description: 'One allowed classification label.' },
+          items: { type: 'string' },
           minItems: 2,
           maxItems: 50,
         },

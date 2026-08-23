@@ -28,7 +28,7 @@ type RankRequest = {
   query: string;
   /** Each candidate has an `id` (caller-controlled) + `text` to embed. */
   candidates: Array<{ id: string; text: string }>;
-  /** Optional model override; default stays small for first-paint latency. */
+  /** Optional model override; the default is the canonical local 768-dim model. */
   model?: string;
 };
 
@@ -47,7 +47,8 @@ type ProbeResponse = {
   transformersAvailable: boolean;
 };
 
-const DEFAULT_MODEL = 'Xenova/all-MiniLM-L6-v2';
+const DEFAULT_MODEL = '/embeddinggemma_300m_onnx';
+const CANONICAL_EMBEDDING_DIMENSION = 768;
 let extractor: unknown = null;
 let extractorModel: string | null = null;
 let extractorDevice: RankResponse['device'] = 'unavailable';
@@ -123,7 +124,7 @@ async function embed(extractor: unknown, text: string): Promise<Float32Array | n
     const out = await extractor(text, { pooling: 'mean', normalize: true });
     // out.data is a Float32Array; out can be a Tensor wrapper.
     const data = (out as { data?: Float32Array }).data;
-    if (data instanceof Float32Array) return data;
+    if (data instanceof Float32Array && data.length === CANONICAL_EMBEDDING_DIMENSION) return data;
     return null;
   } catch {
     return null;

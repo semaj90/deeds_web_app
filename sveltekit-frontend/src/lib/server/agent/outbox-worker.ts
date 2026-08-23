@@ -86,14 +86,14 @@ async function handleAceCache(row: OutboxRow): Promise<void> {
 /**
  * Qdrant: upsert action packet as a point in the agent_memory_observations collection.
  * Only fires when the action has a pre-computed embedding in the payload.
- * Embedding must be 384-dim (project canonical).
+ * Embedding must be canonical EmbeddingGemma semantic_768.
  */
 async function handleQdrantUpsert(row: OutboxRow): Promise<void> {
     const p         = row.payload;
     const embedding = p.embedding as number[] | undefined;
     const sourceRef = p.sourceRef as string | undefined;
 
-    if (!embedding || embedding.length !== 384 || !sourceRef) return;
+    if (!embedding || embedding.length !== 768 || !sourceRef) return;
 
     const client = getQdrantClient();
     await client.upsert('agent_memory_observations', {
@@ -107,6 +107,10 @@ async function handleQdrantUpsert(row: OutboxRow): Promise<void> {
                     event_type:     row.eventType,
                     source_ref:     sourceRef,
                     content_hash:   p.contentHash,
+                    embedding_model: 'google/embeddinggemma-300m',
+                    embedding_dimension: 768,
+                    representation_id: 'semantic_768',
+                    normalization: 'L2',
                     run_id:         p.runId,
                     action_id:      p.actionId,
                     recorded_at:    row.createdAt.toISOString(),

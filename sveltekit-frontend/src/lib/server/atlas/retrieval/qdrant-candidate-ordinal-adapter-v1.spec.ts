@@ -44,17 +44,17 @@ function ordinalMapFixture() {
 function receiptFixture(): QdrantSemanticScoreReceiptV1 {
   return {
     schema: 'atlas.qdrant-semantic-score-receipt.v2',
-    collection: 'codebase_chunks_512',
+    collection: 'codebase_chunks_768_v2',
     vectorName: null,
-    representationId: 'semantic_512',
+    representationId: 'semantic_768',
     representationRevision: 'projection:test:r12',
-    dimension: 512,
+    dimension: 768,
     requestedPacketKeys: 2,
     returnedPacketKeys: 2,
     embeddingModel: 'embeddinggemma:test',
     embeddingCached: true,
     embeddingExecMs: 1,
-    queryVector: Array.from({ length: 512 }, () => 0),
+    queryVector: Array.from({ length: 768 }, () => 0),
     scores: [
       {
         packetKey: 'packet:b',
@@ -72,7 +72,7 @@ function receiptFixture(): QdrantSemanticScoreReceiptV1 {
         treeNodeId: 'tree:b',
         featureLabel: null,
         projectionRevision: 'projection:test:r12',
-        vector: Array.from({ length: 512 }, () => 0.25),
+        vector: Array.from({ length: 768 }, () => 0.25),
       },
       {
         packetKey: 'packet:a',
@@ -90,7 +90,7 @@ function receiptFixture(): QdrantSemanticScoreReceiptV1 {
         treeNodeId: 'tree:a',
         featureLabel: null,
         projectionRevision: 'projection:test:r12',
-        vector: Array.from({ length: 512 }, () => 0.5),
+        vector: Array.from({ length: 768 }, () => 0.5),
       },
     ],
   };

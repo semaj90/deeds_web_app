@@ -1,102 +1,85 @@
 import { createHash } from 'node:crypto';
+import { z } from 'zod';
 
-export type StructuralEvidenceProviderV2 =
-  | 'NODE_TREE_SITTER'
-  | 'TREESITTER_CHUNKER'
-  | 'AST_GREP';
+export const StructuralEvidenceProviderV1Schema = z.enum([
+  'NODE_TREE_SITTER',
+  'TREESITTER_CHUNKER',
+  'AST_GREP',
+]);
+export type StructuralEvidenceProviderV1 = z.infer<typeof StructuralEvidenceProviderV1Schema>;
 
-export type StructuralObservationUnitV2 = 'SYMBOL' | 'CHUNK' | 'PATTERN_MATCH';
+export const StructuralSpanRelationV1Schema = z.enum([
+  'EXACT',
+  'CHUNK_CONTAINS_SYMBOL',
+  'SYMBOL_CONTAINS_CHUNK',
+  'OVERLAPS',
+  'DISJOINT',
+]);
+export type StructuralSpanRelationV1 = z.infer<typeof StructuralSpanRelationV1Schema>;
 
-export type StructuralSpanAuthorityV2 = 'ORIGINAL_UTF8' | 'LF_COMPAT_REMAPPED';
-
-export type StructuralSpanRelationV1 =
-  | 'EXACT'
-  | 'CHUNK_CONTAINS_SYMBOL'
-  | 'SYMBOL_CONTAINS_CHUNK'
-  | 'OVERLAPS'
-  | 'DISJOINT';
-
-export interface StructuralObservationV2 {
-  schema: 'atlas.structural-observation.v2';
-  evidenceKey: string;
-  provider: StructuralEvidenceProviderV2;
-  observationUnit: StructuralObservationUnitV2;
-  sourceRef: string;
-  workspaceRevision: string;
-  sourceRevision: string;
-  providerRevision: string;
-  producerRevision: string;
-  byteStart: number;
-  byteEnd: number;
-  semanticKind?: string;
-  symbolName?: string;
-  parentEvidenceKey?: string;
-  containingChunkKeys?: string[];
-  spanAuthority: StructuralSpanAuthorityV2;
-  lineageQualified: boolean;
-}
-
-export interface StructuralEvidenceRelationV1 {
-  schema: 'atlas.structural-evidence-relation.v1';
-  leftEvidenceKey: string;
-  rightEvidenceKey: string;
-  relation: StructuralSpanRelationV1;
-  sourceRevision: string;
-}
-
-function assertSpan(start: number, end: number): void {
-  if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < start) {
-    throw new Error(`STRUCTURAL_SPAN_INVALID start=${start} end=${end}`);
+export const StructuralObservationV2Schema = z.object({
+  schema: z.literal('atlas.structural-observation.v2'),
+  provider: StructuralEvidenceProviderV1Schema,
+  sourceRef: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  providerRevision: z.string().min(1),
+  startByte: z.number().int().nonnegative(),
+  endByte: z.number().int().nonnegative(),
+  rawKind: z.string().min(1),
+  symbolKind: z.string().min(1),
+  name: z.string().nullable(),
+  parentPath: z.string().nullable(),
+  evidenceKey: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+}).strict().superRefine((value, ctx) => {
+  if (value.endByte < value.startByte) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endByte'], message: 'endByte must be >= startByte' });
   }
+});
+export type StructuralObservationV2 = z.infer<typeof StructuralObservationV2Schema>;
+
+export const StructuralSpanRelationV1SchemaObject = z.object({
+  schema: z.literal('atlas.structural-span-relation.v1'),
+  leftEvidenceKey: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+  rightEvidenceKey: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+  relation: StructuralSpanRelationV1Schema,
+  intersectionBytes: z.number().int().nonnegative(),
+  unionBytes: z.number().int().nonnegative(),
+  iou: z.number().min(0).max(1),
+  leftContainsRight: z.boolean(),
+  rightContainsLeft: z.boolean(),
+}).strict();
+export type StructuralSpanRelationV1Object = z.infer<typeof StructuralSpanRelationV1SchemaObject>;
+
+function evidenceDigest(input: Omit<StructuralObservationV2, 'schema' | 'evidenceKey'>): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(input)).digest('hex')}`;
 }
 
-export function classifySpanRelationV1(input: {
-  symbolStart: number;
-  symbolEnd: number;
-  chunkStart: number;
-  chunkEnd: number;
-}): StructuralSpanRelationV1 {
-  assertSpan(input.symbolStart, input.symbolEnd);
-  assertSpan(input.chunkStart, input.chunkEnd);
-
-  if (input.symbolStart === input.chunkStart && input.symbolEnd === input.chunkEnd) return 'EXACT';
-  if (input.chunkStart <= input.symbolStart && input.chunkEnd >= input.symbolEnd) return 'CHUNK_CONTAINS_SYMBOL';
-  if (input.symbolStart <= input.chunkStart && input.symbolEnd >= input.chunkEnd) return 'SYMBOL_CONTAINS_CHUNK';
-  if (Math.max(input.symbolStart, input.chunkStart) < Math.min(input.symbolEnd, input.chunkEnd)) return 'OVERLAPS';
-  return 'DISJOINT';
+export function buildStructuralObservationV2(
+  input: Omit<StructuralObservationV2, 'schema' | 'evidenceKey'>,
+): StructuralObservationV2 {
+  const normalized = { schema: 'atlas.structural-observation.v2' as const, ...input };
+  return StructuralObservationV2Schema.parse({ ...normalized, evidenceKey: evidenceDigest(input) });
 }
 
-export function makeStructuralEvidenceKeyV2(input: {
-  provider: StructuralEvidenceProviderV2;
-  observationUnit: StructuralObservationUnitV2;
-  sourceRef: string;
-  sourceRevision: string;
-  providerRevision: string;
-  byteStart: number;
-  byteEnd: number;
-  semanticKind?: string;
-  symbolName?: string;
-}): string {
-  assertSpan(input.byteStart, input.byteEnd);
-  const body = [
-    input.provider,
-    input.observationUnit,
-    input.sourceRef,
-    input.sourceRevision,
-    input.providerRevision,
-    String(input.byteStart),
-    String(input.byteEnd),
-    input.semanticKind ?? '',
-    input.symbolName ?? '',
-  ].join('\0');
-  return `sev2:${createHash('sha256').update(body).digest('hex')}`;
-}
-
-export function assertStructuralObservationV2(row: StructuralObservationV2): void {
-  assertSpan(row.byteStart, row.byteEnd);
-  if (!row.evidenceKey || !row.sourceRef || !row.workspaceRevision || !row.sourceRevision) {
-    throw new Error('STRUCTURAL_OBSERVATION_V2_LINEAGE_REQUIRED');
-  }
-  if (!row.providerRevision || !row.producerRevision) throw new Error('STRUCTURAL_OBSERVATION_V2_PRODUCER_REVISION_REQUIRED');
-  if (!row.lineageQualified) throw new Error('STRUCTURAL_OBSERVATION_V2_LINEAGE_UNQUALIFIED');
+export function relateStructuralSpansV1(
+  left: Pick<StructuralObservationV2, 'startByte' | 'endByte' | 'evidenceKey'>,
+  right: Pick<StructuralObservationV2, 'startByte' | 'endByte' | 'evidenceKey'>,
+): StructuralSpanRelationV1Object {
+  const intersectionBytes = Math.max(0, Math.min(left.endByte, right.endByte) - Math.max(left.startByte, right.startByte));
+  const leftBytes = Math.max(0, left.endByte - left.startByte);
+  const rightBytes = Math.max(0, right.endByte - right.startByte);
+  const unionBytes = leftBytes + rightBytes - intersectionBytes;
+  const leftContainsRight = left.startByte <= right.startByte && left.endByte >= right.endByte;
+  const rightContainsLeft = right.startByte <= left.startByte && right.endByte >= left.endByte;
+  const relation: StructuralSpanRelationV1 = left.startByte === right.startByte && left.endByte === right.endByte
+    ? 'EXACT'
+    : leftContainsRight ? 'CHUNK_CONTAINS_SYMBOL'
+      : rightContainsLeft ? 'SYMBOL_CONTAINS_CHUNK'
+        : intersectionBytes > 0 ? 'OVERLAPS' : 'DISJOINT';
+  return StructuralSpanRelationV1SchemaObject.parse({
+    schema: 'atlas.structural-span-relation.v1', leftEvidenceKey: left.evidenceKey,
+    rightEvidenceKey: right.evidenceKey, relation, intersectionBytes, unionBytes,
+    iou: unionBytes === 0 ? 1 : intersectionBytes / unionBytes,
+    leftContainsRight, rightContainsLeft,
+  });
 }

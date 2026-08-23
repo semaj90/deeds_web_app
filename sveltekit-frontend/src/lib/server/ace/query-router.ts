@@ -88,7 +88,7 @@ interface QdrantHit {
   payload: Record<string, unknown>;
 }
 
-async function qdrantSearch(embedding: number[], limit = 10, collection = 'codebase_chunks_768'): Promise<QdrantHit[]> {
+async function qdrantSearch(embedding: number[], limit = 10, collection = 'codebase_chunks_768_v2'): Promise<QdrantHit[]> {
   const qdrantUrl = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333';
   try {
     const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
@@ -174,7 +174,7 @@ export interface QueryRouterResult {
 }
 
 export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResult> {
-  const { query, clusterHint, featureHint, limit = 10, collection = 'codebase_chunks_768' } = opts;
+  const { query, clusterHint, featureHint, limit = 10, collection = 'codebase_chunks_768_v2' } = opts;
   const redis = getValkeyClient();
   const queryHash = makeQueryHash(query);
   const trace: RouteTrace[] = [];

@@ -10,7 +10,6 @@
 import type { DecomposedQuery, Subgoal } from './gemma4-policy-orchestrator';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 
 const DECOMPOSITION_PROMPT = `You are an expert research assistant breaking down complex questions into focused search tasks.
 
@@ -85,12 +84,11 @@ Respond with ONLY valid JSON, no other text.`;
 
   try {
     // Try TurboQuant at :8090
-    const llamaSession = await getLlamaSessionDescriptor();
     const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: llamaSession.modelId,
+        model: 'gemma4-legal-iq4xs-direct.gguf',
         messages: [
           {
             role: 'system',

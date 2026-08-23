@@ -39,6 +39,15 @@
         "apiKey": "local"
       },
       "models": {
+        "hforf.gguf": {
+          "name": "HForF GGUF (tool-calling)",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
         "gemma4-legal-iq4xs-direct.gguf": {
           "name": "Gemma4 Legal Direct 65K",
           "tools": true,
@@ -315,27 +324,21 @@
   "plugin": [],
   "command": {
     "rg-atlas": {
-      "description": "Run exact ripgrep-first repository retrieval with compact source references.",
       "template": "Run the tool-first retrieval lane.\n\n1. Use `rg` for exact repo search.\n2. Use Atlas or LangExtract-style compact extraction for sourceRefs.\n3. Return only verified paths, symbols, and a short answer.\n4. If evidence is weak, stop and say so."
     },
     "mcp-turbovec": {
-      "description": "Run the bounded TurboVec reranking lane over retrieved candidates.",
       "template": "Use TurboVec MCP tools.\n\n1. Rerank retrieved chunks by semantic fit.\n2. Keep answers compact and grounded.\n3. Stop early when evidence is weak."
     },
     "mcp-trace": {
-      "description": "Run read-only TRACE MCP retrieval and graph-context checks.",
       "template": "Use TRACE MCP tools first.\n\n1. Query TRACE for exact repo context.\n2. Keep output compact and sourceRef-backed.\n3. Do not read raw infra directly."
     },
     "mcp-langextract": {
-      "description": "Run bounded LangExtract-style entity and source-reference extraction.",
       "template": "Use LangExtract MCP tools.\n\n1. Compact entities, citations, symbols, and source refs.\n2. Return only structured evidence-backed output.\n3. Stop when the result set is weak."
     },
     "mcp-health": {
-      "description": "Run non-destructive MCP, contract, and cache-trace health checks.",
       "template": "Run MCP health checks.\n\n1. Run `npm run check`.\n2. Run `npm run audit:contracts`.\n3. Verify:\n   - http://127.0.0.1:8791/mcp\n   - http://127.0.0.1:8792/mcp\n   - http://127.0.0.1:8793/mcp\n4. Verify cache trace writes.\n5. Report broken MCP tools only. Do not delete tools."
     },
     "mcp-engram": {
-      "description": "Read compact Engram memory and prior packet traces without inventing results.",
       "template": "Use Engram MCP tools.\n\n1. Pull short-term memory and prior packet traces.\n2. Keep output compact.\n3. Do not invent results not returned by tools."
     }
   },

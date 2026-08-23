@@ -11,8 +11,6 @@ import crypto from 'node:crypto';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { inArray } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import type { HyperRAGPacketState, HyperRAGPacketPipeline } from './hyperrag-rpc-client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { makePacketUlid } from '$lib/server/identity/ulid.js';
@@ -297,15 +295,44 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
    */
   private async summarizeChunk(chunk: string): Promise<string> {
     try {
-      const llamaSession = await getLlamaSessionDescriptor();
-      const assembled = await bifrostChat(
-        [
-          { role: 'system', content: 'Summarize this code chunk in 1-2 sentences. Focus on what it does.' },
-          { role: 'user', content: chunk.slice(0, 2000) },
-        ],
-        llamaSession.modelId,
-        { temperature: 0.3, maxTokens: 100, timeoutMs: 90_000 }
-      );
+      const model = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+      const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'Summarize this code chunk in 1-2 sentences. Focus on what it does.' },
+            { role: 'user', content: chunk.slice(0, 2000) },
+          ],
+          max_tokens: 100,
+          temperature: 0.3,
+          stream: true,
+        }),
+        signal: AbortSignal.timeout(90_000),
+      });
+
+      if (!response.ok || !response.body) throw new Error(`Gemma4 failed: ${response.status}`);
+
+      // Assemble content deltas from SSE stream
+      let assembled = '';
+      const decoder = new TextDecoder();
+      let buf = '';
+      for await (const rawChunk of response.body as unknown as AsyncIterable<Uint8Array>) {
+        buf += decoder.decode(rawChunk, { stream: true });
+        const lines = buf.split('\n');
+        buf = lines.pop() ?? '';
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+          const payload = trimmed.slice(5).trim();
+          if (payload === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(payload) as any;
+            assembled += parsed.choices?.[0]?.delta?.content ?? '';
+          } catch { /* skip malformed SSE line */ }
+        }
+      }
 
       return assembled.trim() || '(summarization empty)';
     } catch {

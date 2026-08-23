@@ -11,6 +11,14 @@
  */
 
 import type { SgNode } from '@ast-grep/napi';
+import { createHash } from 'node:crypto';
+
+export interface AstEvidenceProvenanceV1 {
+	sourceRef: string;
+	sourceRevision: string;
+	providerRevision: string;
+	graphRevision?: string;
+}
 
 export interface ExtractedFeature {
 	type:
@@ -34,6 +42,8 @@ export interface ExtractedFeature {
 	ruleId?: string;
 	captures?: Record<string, string>;
 	confidence?: number;
+	provenance?: AstEvidenceProvenanceV1;
+	evidenceKey?: string;
 }
 
 type SgLang = 'TypeScript' | 'Tsx' | 'JavaScript' | 'Jsx';
@@ -55,12 +65,23 @@ function nodeRange(node: SgNode): { lineNumber: number; byteStart: number; byteE
 	};
 }
 
+function evidenceKey(provenance: AstEvidenceProvenanceV1 | undefined, feature: Pick<ExtractedFeature, 'type' | 'name' | 'byteStart' | 'byteEnd'>): string | undefined {
+	if (!provenance || feature.byteStart === undefined || feature.byteEnd === undefined) return undefined;
+	const value = [provenance.sourceRef, provenance.sourceRevision, provenance.providerRevision, feature.type, feature.name, feature.byteStart, feature.byteEnd].join('\u001f');
+	return `ast:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function withProvenance(feature: ExtractedFeature, provenance?: AstEvidenceProvenanceV1): ExtractedFeature {
+	if (!provenance) return feature;
+	return { ...feature, provenance, evidenceKey: evidenceKey(provenance, feature) };
+}
+
 function firstLine(text: string, maxChars = 120): string {
 	return text.split('\n')[0].slice(0, maxChars);
 }
 
 /** Extract code structure using @ast-grep/napi real AST parsing. */
-export async function extractAstFeatures(code: string, langHint?: string): Promise<ExtractedFeature[]> {
+export async function extractAstFeatures(code: string, langHint?: string, provenance?: AstEvidenceProvenanceV1): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	const lang = detectLang(langHint);
 	let root: ReturnType<typeof parse>;
@@ -86,7 +107,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		seen.add(key);
 		const sig = firstLine(node.text());
 		const isExported = node.text().startsWith('export');
-		features.push({
+		features.push(withProvenance({
 			type: 'ast_function',
 			name,
 			description: `${isExported ? 'Exported f' : 'F'}unction ${name}()`,
@@ -96,7 +117,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:function-declaration',
 			captures: { name },
 			confidence: 0.95,
-		});
+		}, provenance));
 	}
 
 	for (const node of root.root().findAll({ rule: { kind: 'lexical_declaration' } })) {
@@ -109,7 +130,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		const key = `arrow:${name}:${range.byteStart}:${range.byteEnd}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
-		features.push({
+		features.push(withProvenance({
 			type: 'ast_arrow',
 			name,
 			description: `Arrow function ${name}`,
@@ -119,7 +140,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:arrow-function-variable',
 			captures: { name },
 			confidence: 0.92,
-		});
+		}, provenance));
 	}
 
 	for (const node of root.root().findAll({ rule: { kind: 'class_declaration' } })) {
@@ -130,7 +151,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 		if (seen.has(key)) continue;
 		seen.add(key);
 		const isExported = node.text().startsWith('export');
-		features.push({
+		features.push(withProvenance({
 			type: 'ast_class',
 			name,
 			description: `${isExported ? 'Exported c' : 'C'}lass ${name}`,
@@ -140,7 +161,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			ruleId: 'ast-grep:class-declaration',
 			captures: { name },
 			confidence: 0.95,
-		});
+		}, provenance));
 
 		for (const method of node.findAll({ rule: { kind: 'method_definition' } })) {
 			const mName = method.child(0)?.text() ?? '<anon>';
@@ -149,7 +170,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 			const mKey = `method:${name}.${mName}:${methodRange.byteStart}:${methodRange.byteEnd}`;
 			if (seen.has(mKey)) continue;
 			seen.add(mKey);
-			features.push({
+			features.push(withProvenance({
 				type: 'ast_method',
 				name: `${name}.${mName}`,
 				description: `Method ${mName}() on class ${name}`,
@@ -159,7 +180,7 @@ export async function extractAstFeatures(code: string, langHint?: string): Promi
 				ruleId: 'ast-grep:method-definition',
 				captures: { class: name, method: mName },
 				confidence: 0.93,
-			});
+			}, provenance));
 		}
 	}
 

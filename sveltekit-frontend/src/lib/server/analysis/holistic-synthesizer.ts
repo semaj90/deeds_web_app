@@ -5,10 +5,24 @@
  * and extract structural relationships (triples) for the knowledge graph.
  */
 
+import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
+
+const RUNTIME_CONTEXT_SIZE = Number(
+  process.env.LLM_CONTEXT_SIZE ??
+    process.env.TURBO_CTX_SIZE ??
+    process.env.LLAMA_CTX_SIZE ??
+    process.env.LLAMA_SERVER_CTX ??
+    process.env.OLLAMA_CONTEXT_LENGTH ??
+    '65536'
+);
+
+
+const MODEL = LLM_MODEL_ID;
+const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
 
 const synthesisSchema = z.object({
   globalSummary: z.string(),
@@ -58,21 +72,54 @@ Text:
 ${input}`;
 
   try {
-    const llamaSession = await getLlamaSessionDescriptor();
-    return await traceLLM('holistic-synthesis', { model: llamaSession.modelId, prompt: input.slice(0, 500) }, async (gen) => {
-      // bifrostChat() already implements the TurboQuant-first / llama-server-fallback
-      // cascade this function used to hand-roll here; json_schema response_format
-      // enforces the shape instead of relying on prompt instructions alone.
-      const rawContent = await bifrostChat(
-        [{ role: 'user', content: prompt }],
-        llamaSession.modelId,
-        {
+    return await traceLLM('holistic-synthesis', { model: MODEL, prompt: input.slice(0, 500) }, async (gen) => {
+      // Prefer TurboQuant if available for faster long-context inference
+      const baseUrl = TURBOQUANT_BASE_URL;
+      const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gemma4-rotorquant:latest',
+          messages: [{ role: 'user', content: prompt }],
           temperature: 0.1,
-          maxTokens: 4096,
-          timeoutMs: 180_000, // long-context synthesis
-          responseFormat: { type: 'json_schema', json_schema: synthesisJsonSchema as Record<string, unknown> },
-        }
-      );
+          max_tokens: 4096,
+          // TurboQuant specific options for KV compression
+          options: {
+            num_ctx: RUNTIME_CONTEXT_SIZE,
+            kv_cache_type: 'turbo3'
+          }
+        }),
+        signal: AbortSignal.timeout(180_000), // 3 min timeout for long-context synthesis
+      });
+
+      if (!res.ok) {
+        console.warn('[HolisticSynthesizer] TurboQuant failed, falling back to local llama-server');
+        const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [{ role: 'user', content: prompt }],
+            stream: false,
+            response_format: {
+              type: 'json_schema',
+              json_schema: synthesisJsonSchema,
+            },
+            temperature: 0.1,
+            max_tokens: 4096
+          }),
+          signal: AbortSignal.timeout(180_000),
+        });
+
+        if (!ollamaRes.ok) throw new Error('Both synthesis backends failed');
+        const data = await ollamaRes.json();
+        const result = JSON.parse(String(data.choices?.[0]?.message?.content ?? '').replace(/^```json?\n?|\n?```$/g, '').trim());
+        gen.end({ output: 'local llama-server fallback success' });
+        return result as HolisticSynthesisResult;
+      }
+
+      const data = await res.json();
+      const rawContent = data.choices?.[0]?.message?.content ?? '';
       const result = JSON.parse(rawContent.replace(/^```json?\n?|\n?```$/g, '').trim());
       gen.end({ output: `Extracted ${result.triples?.length ?? 0} triples` });
       return result as HolisticSynthesisResult;

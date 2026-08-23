@@ -46,7 +46,7 @@ export const EMBEDDING_LANES: Record<EmbeddingLane, EmbeddingLaneConfig> = {
     model: 'embeddinggemma:latest',
     dimension: SEMANTIC_DIMENSION,
     collections: {
-      primary: 'codebase_chunks_768',
+      primary: 'codebase_chunks_768_v2',
       fallback: 'evidence_items_768'
     },
     estimatedVramMb: 2048,

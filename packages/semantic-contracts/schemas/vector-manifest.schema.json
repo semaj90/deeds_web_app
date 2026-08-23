@@ -40,7 +40,7 @@
     "dimensions": {
       "type": "integer",
       "exclusiveMinimum": 0,
-      "description": "Vector dimensionality (384 canonical, 768 legacy)"
+      "description": "Vector dimensionality (768 canonical; 384 reference-only legacy)"
     },
     "representation": {
       "type": "string",

@@ -1,5 +1,5 @@
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
-import { embedSemantic768 } from './semantic-768.js';
+import { embedSemantic512 } from './semantic-512.js';
 import {
   ATLAS_CANONICAL_SEMANTIC_DIMENSION,
   ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
@@ -31,7 +31,7 @@ export interface QdrantSemanticScoreV1 {
 export interface QdrantSemanticScoreReceiptV1 {
   schema: 'atlas.qdrant-semantic-score-receipt.v2';
   collection: typeof QDRANT_SEMANTIC_COLLECTION;
-  vectorName: typeof QDRANT_SEMANTIC_VECTOR_NAME;
+  vectorName: null;
   representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
   representationRevision: string;
   dimension: typeof ATLAS_CANONICAL_SEMANTIC_DIMENSION;
@@ -84,11 +84,10 @@ export async function scoreQdrantSemanticCandidatesV1(
     };
   }
 
-  const embedding = await embedSemantic768(query);
+  const embedding = await embedSemantic512(query);
   const client = getQdrantClient();
   const response = (await client.query(QDRANT_SEMANTIC_COLLECTION, {
     query: Array.from(embedding.vector),
-    using: QDRANT_SEMANTIC_VECTOR_NAME,
     filter: {
       must: [{ key: 'packet_key', match: { any: uniquePacketKeys } }],
     },
@@ -107,7 +106,7 @@ export async function scoreQdrantSemanticCandidatesV1(
     const rawVector = Array.isArray(point?.vector)
       ? point.vector
       : point?.vector && typeof point.vector === 'object'
-        ? point.vector[QDRANT_SEMANTIC_VECTOR_NAME]
+        ? Object.values(point.vector)[0]
         : null;
     if (!Array.isArray(rawVector) || rawVector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) continue;
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 // See atlas-rapids-knn-client.ts note: this client operates on the native
-// 768-dim representation, not the persisted canonical semantic_512 lane.
+// 768-dim native semantic representation, matching the active canonical lane.
 import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
 import { createAtlasRapidsKnnClient, type AtlasKnnRequest } from './atlas-rapids-knn-client.js';
 

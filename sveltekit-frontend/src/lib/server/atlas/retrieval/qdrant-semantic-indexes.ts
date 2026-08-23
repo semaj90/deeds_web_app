@@ -47,7 +47,9 @@ export async function ensureQdrantSemanticPayloadIndexesV1(): Promise<QdrantSema
 
   const params = info?.config?.params ?? info?.result?.config?.params ?? {};
   const hnsw = info?.config?.hnsw_config ?? info?.result?.config?.hnsw_config ?? {};
-  const vectorConfig = params?.vectors?.content ?? params?.vectors ?? {};
+  // codebase_chunks_768_v2 is an unnamed single-vector collection, so params.vectors
+  // itself is the vector config rather than params.vectors.content.
+  const vectorConfig = params?.vectors ?? {};
 
   return {
     schema: 'atlas.qdrant-semantic-index-ensure-receipt.v1',

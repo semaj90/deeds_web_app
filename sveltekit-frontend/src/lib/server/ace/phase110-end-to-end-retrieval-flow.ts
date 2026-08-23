@@ -5,8 +5,6 @@
  */
 
 import { db } from '$lib/server/db/client.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { gateG13FactExtraction } from '$lib/server/ingest/gate-g13-fact-extraction.js';
 import { ACEContextAssembler } from './context-assembler.js';
 import type { ACEPacket } from './context-assembler.js';
@@ -115,7 +113,8 @@ async function gateG15GraphExpansion(
 async function gateG16Gemma4Synthesis(
   facts: string[],
   context: string,
-  query: string
+  query: string,
+  gemma4_url: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'
 ): Promise<Phase110ProofGate & { answer: string | null }> {
   const start_time = Date.now();
 
@@ -133,12 +132,24 @@ Question: ${query}
 
 Provide a clear, evidence-based answer:`;
 
-    const llamaSession = await getLlamaSessionDescriptor();
-    const answer = (await bifrostChat(
-      [{ role: 'user', content: prompt }],
-      llamaSession.modelId,
-      { temperature: 0.3, maxTokens: 1024 }
-    )) || null;
+    const response = await fetch(`${gemma4_url}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma4-legal-iq4xs-direct.gguf',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        stream: false,
+        max_tokens: 1024
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemma4 synthesis failed: ${response.statusText}`);
+    }
+
+    const data = await response.json() as { choices: Array<{ message: { content: string } }> };
+    const answer = data.choices[0]?.message.content || null;
 
     return {
       gate_number: 'G16',
@@ -300,3 +311,5 @@ export async function executePhase110EndToEnd(
 
 // Import at module level to avoid circular deps
 import crypto from 'crypto';
+
+import { ENV } from '$lib/server/env.server.js';

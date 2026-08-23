@@ -5,8 +5,8 @@ import { evaluateFanoutAdmissionV1 } from './fanout-admission-v1.js';
 
 const snapshot = buildGraphSnapshotRevisionV1({
   snapshotId: '11111111-1111-4111-8111-111111111111',
-  workspaceRevision: 'a'.repeat(40),
-  sourceInventoryRevision: 'inventory:42',
+  workspaceRevision: `sha256:${'a'.repeat(64)}`,
+  sourceInventoryRevision: `sha256:${'a'.repeat(64)}`,
   identityContractVersion: 'identity:v1',
   parserContractVersion: 'parser:v1',
   sourceInventoryHash: 'a'.repeat(64),
@@ -23,7 +23,7 @@ const node = {
   symbolVersionId: 'symbol-version:1',
   sourceRef: 'src/a.ts',
   treeNodeId: 'tree:1',
-  sourceRevision: 'sha256:source-1',
+  sourceRevision: `sha256:${'c'.repeat(64)}`,
   evidenceRefs: ['evidence:node:1'],
 };
 
@@ -114,7 +114,7 @@ describe('FanoutAdmissionV1', () => {
     for (const [field, value] of [
       ['repository_revision', 'b'.repeat(40)],
       ['graph_revision', 'graph:other'],
-      ['source_revision', 'sha256:other'],
+      ['source_revision', `sha256:${'d'.repeat(64)}`],
       ['representation_revision', 8],
       ['representation_id', 'legacy_384'],
     ] as const) {

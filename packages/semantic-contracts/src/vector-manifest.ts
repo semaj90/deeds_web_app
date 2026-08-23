@@ -2,12 +2,15 @@ import { z } from 'zod';
 import crypto from 'crypto';
 
 export const VectorNameEnum = z.enum([
+  'semantic_768',
   'dense_384',
   'dense_768_legacy',
   'title_384',
   'summary_384',
   'symbol_384',
   'ontology_384',
+  'latent_128',
+  'latent_64',
   'late_interaction',
   'bm42_sparse',
 ]);
@@ -84,10 +87,11 @@ export const VECTOR_MANIFESTS = {
     normalized: true,
     contentSha256: '',
     workspaceRevision: '',
-    status: 'ACTIVE' as const,
+    status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-07-15T00:00:00Z',
     postgresColumn: 'content_embedding_384',
     qdrantVectorSlot: 'dense_384',
+    supersededBy: 'semantic_768' as const,
   },
   dense768Legacy: {
     vectorName: 'dense_768_legacy' as const,
@@ -103,9 +107,23 @@ export const VECTOR_MANIFESTS = {
     activatedAt: '2026-06-01T00:00:00Z',
     deprecatedAt: '2026-07-15T00:00:00Z',
     supersededAt: '2026-08-01T00:00:00Z',
-    supersededBy: 'dense_384' as const,
+    supersededBy: 'semantic_768' as const,
     postgresColumn: 'content_embedding_768',
     qdrantVectorSlot: 'dense_768_legacy',
+  },
+  semantic768: {
+    vectorName: 'semantic_768' as const,
+    model: 'google/embeddinggemma-300m',
+    modelRevision: 'UNBOUND',
+    dimensions: 768,
+    representation: 'dense' as const,
+    distance: 'Cosine' as const,
+    normalized: true,
+    contentSha256: '',
+    workspaceRevision: '',
+    status: 'ACTIVE' as const,
+    qdrantVectorSlot: 'semantic_768',
+    postgresColumn: 'content_embedding_768',
   },
   title384: {
     vectorName: 'title_384' as const,
@@ -152,7 +170,7 @@ export const VECTOR_MANIFESTS = {
     postgresColumn: 'embedding_sparse',
     qdrantVectorSlot: 'bm42_sparse',
   },
-} as const satisfies Record<string, Omit<VectorManifest, 'contentSha256' | 'workspaceRevision' | 'createdAt'>>;
+} as const satisfies Record<string, Omit<VectorManifest, 'createdAt'>>;
 
 /**
  * Lookup vector manifest by name.

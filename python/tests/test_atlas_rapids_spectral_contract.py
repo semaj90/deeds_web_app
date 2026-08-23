@@ -41,5 +41,3 @@ def test_spectral_request_rejects_invalid_eigenvector_and_cluster_bounds():
         CommunityPartitionRequestV1(**base, numClusters=2, numEigenvectors=3)
     with pytest.raises(ValueError, match="numClusters"):
         CommunityPartitionRequestV1(**base, numClusters=3, numEigenvectors=2)
-
-

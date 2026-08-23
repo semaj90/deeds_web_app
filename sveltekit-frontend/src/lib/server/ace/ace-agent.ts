@@ -21,7 +21,7 @@ import { parseQdrantResponse } from '$lib/server/qdrant/parse-qdrant-json.js';
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * search_codebase — semantic search against the Qdrant codebase_chunks_768 collection.
+ * search_codebase — semantic search against the Qdrant codebase_chunks_768_v2 collection.
  * Returns top-K chunk summaries + file paths for Gemma 4 to reason over.
  */
 const searchCodebase: Gemma4Tool = {
@@ -59,7 +59,7 @@ const searchCodebase: Gemma4Tool = {
         : undefined;
 
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/search`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -101,7 +101,7 @@ const getClusterSummary: Gemma4Tool = {
 
     try {
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`,
+        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/scroll`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

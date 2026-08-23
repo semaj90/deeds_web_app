@@ -121,6 +121,10 @@ export interface NlpFeature {
   captures?: Record<string, string>;
   confidence?: number;
   rawText?: string;
+  sourceRef?: string;
+  sourceRevision?: string;
+  providerRevision?: string;
+  evidenceKey?: string;
 }
 
 export interface NlpAnalyzeRequest {

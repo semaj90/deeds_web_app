@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request }) => {
       traceId: filters.traceId ?? `routing:${analysis.query.length}:${Date.now()}`,
       evidenceIds: [],
       processingPassId: `ace-route:${Date.now()}`,
-      embeddingContractVersion: 'embeddinggemma-384',
+      embeddingContractVersion: 'embeddinggemma-semantic-768',
       retrievalContractVersion: 'hybrid-rrf-v1',
     });
 

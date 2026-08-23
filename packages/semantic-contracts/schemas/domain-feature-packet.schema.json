@@ -162,7 +162,7 @@
         "embeddingDimensions": {
           "type": "integer",
           "minimum": 1,
-          "description": "Embedding vector dimensionality (384 canonical)"
+          "description": "Embedding vector dimensionality (768 canonical; 384 reference-only legacy)"
         },
         "embeddingRef": {
           "type": ["string", "null"],

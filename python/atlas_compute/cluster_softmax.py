@@ -20,9 +20,6 @@ from .rapids_matrix import deterministic_farthest_first_ordinals
 DEFAULT_PREDICTION_BATCH_SIZE = 65536
 
 
-DEFAULT_PREDICTION_BATCH_SIZE = 65536
-
-
 @dataclass(frozen=True)
 class CuvsSoftKMeansReceipt:
     schema: str
@@ -57,8 +54,6 @@ def _checksum(value: np.ndarray) -> str:
 
 
 def resolve_prediction_batch_size(value: int) -> int:
-    """Resolve the experiment-level ``0 = auto`` convention to a cuVS batch size."""
-
     """Resolve the experiment-level ``0 = auto`` convention to a bounded batch."""
     if value < 0:
         raise ValueError("prediction_batch_size must be >=0")

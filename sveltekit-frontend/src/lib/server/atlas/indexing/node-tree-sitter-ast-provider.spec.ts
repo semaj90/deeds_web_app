@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { AstProvider } from './graphify-structural-materializer.js';
 import { GraphifyStructuralMaterializer } from './graphify-structural-materializer.js';
+import { createNodeTreeSitterAstProvider } from './node-tree-sitter-ast-provider.js';
 
 describe('Node Tree-sitter AstProvider challenger boundary', () => {
   it('accepts a challenger through the shared AstProvider interface without granting canonical promotion', async () => {
@@ -87,5 +88,24 @@ describe('Node Tree-sitter AstProvider challenger boundary', () => {
     expect(result.normalized).toBeNull();
     expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
     expect(result.fallback).toBe('NONE');
+  });
+
+  it('emits UTF-8 byte spans when CRLF and non-ASCII text precede a declaration', async () => {
+    const source = 'const café = "é";\r\nfunction flushErrors() { return café; }\r\n';
+    const provider = createNodeTreeSitterAstProvider();
+    const result = await provider.materialize({
+      sourceRef: 'src/utf8.ts',
+      sourceRevision: null,
+      sourceVersionAnchor: 'content:utf8-fixture',
+      sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
+      language: 'typescript',
+      source,
+    });
+
+    const functionChunk = result.evidence?.chunks.find((chunk) => chunk.name === 'flushErrors');
+    expect(functionChunk).toBeDefined();
+    expect(functionChunk?.start_byte).toBe(Buffer.byteLength(source.slice(0, source.indexOf('function flushErrors')), 'utf8'));
+    const sourceBytes = Buffer.from(source, 'utf8');
+    expect(sourceBytes.subarray(functionChunk!.start_byte, functionChunk!.end_byte).toString('utf8')).toContain('function flushErrors');
   });
 });

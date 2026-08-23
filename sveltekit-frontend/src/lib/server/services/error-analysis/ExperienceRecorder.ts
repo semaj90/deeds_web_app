@@ -58,7 +58,7 @@ export class ExperienceRecorder {
 			jsonlDir: config?.jsonlDir ?? './data/experiences',
 			similarityThreshold: config?.similarityThreshold ?? 0.85,
 			maxGroupSize: config?.maxGroupSize ?? 100,
-			embeddingDimension: config?.embeddingDimension ?? 384,
+			embeddingDimension: config?.embeddingDimension ?? 768,
 			maxExperiences: config?.maxExperiences ?? 10000,
 			maxGroups: config?.maxGroups ?? 1000,
 			maxStrategyStats: config?.maxStrategyStats ?? 500

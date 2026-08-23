@@ -9,9 +9,9 @@ const bit = z.union([z.literal(0), z.literal(1)]);
 const mask32 = z.array(bit).length(32);
 
 export const SemanticFeatureV1Schema = z.object({
-  representationId: z.literal('semantic_512'),
+  representationId: z.literal('semantic_768'),
   representationRevision: z.string().min(1),
-  dimension: z.literal(512),
+  dimension: z.literal(768),
   cosine: z.number().min(-1).max(1).nullable(),
 }).strict();
 

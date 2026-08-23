@@ -115,8 +115,8 @@ export const claimVerificationReceiptSchema = z.object({
   claim_id: id,
   claim_revision: revision,
   policy_revision: revision,
-  evidence_refs: z.array(id).max(4096),
-  evidence_checksums: z.array(checksum).max(4096),
+  evidence_refs: z.array(id).min(1).max(4096),
+  evidence_checksums: z.array(checksum).min(1).max(4096),
   verdict: z.enum(['VERIFIED', 'REJECTED', 'INSUFFICIENT_EVIDENCE']),
   satisfied_required_kinds: z.array(z.enum(EVIDENCE_KINDS)).default([]),
   missing_required_kinds: z.array(z.enum(EVIDENCE_KINDS)).default([]),
@@ -130,9 +130,6 @@ export const claimVerificationReceiptSchema = z.object({
   }
   if (value.verdict === 'VERIFIED' && value.missing_required_kinds.length > 0) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['missing_required_kinds'], message: 'VERIFIED receipt cannot have missing required evidence kinds' });
-  }
-  if (value.verdict === 'VERIFIED' && value.evidence_refs.length === 0) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence_refs'], message: 'VERIFIED receipt requires admitted evidence' });
   }
 });
 export type ClaimVerificationReceiptV1 = z.infer<typeof claimVerificationReceiptSchema>;
@@ -211,8 +208,11 @@ export function verifyClaimAgainstPolicy(input: {
     claim_id: claim.claim_id,
     claim_revision: claim.claim_revision,
     policy_revision: policy.policy_revision,
-    evidence_refs: considered.map((item) => item.evidence_id),
-    evidence_checksums: considered.map((item) => item.output_checksum),
+    // Preserve the selected observations on an insufficient receipt. The
+    // evidence may be disallowed for this claim, but dropping it would make
+    // the diagnostic receipt unverifiable and violate the receipt pair rule.
+    evidence_refs: selected.map((item) => item.evidence_id),
+    evidence_checksums: selected.map((item) => item.output_checksum),
     verdict: enough ? 'VERIFIED' : 'INSUFFICIENT_EVIDENCE',
     satisfied_required_kinds: policy.required_evidence_kinds.filter((kind) => kinds.has(kind)),
     missing_required_kinds: missing,

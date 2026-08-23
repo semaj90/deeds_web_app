@@ -153,18 +153,11 @@ function firstDeclaredName(node: SyntaxNodeLike): string | null {
   return null;
 }
 
-/**
- * The installed Node binding exposes startIndex/endIndex in JavaScript string
- * offsets for this runtime. Atlas structural coordinates are always UTF-8
- * bytes, so convert at the provider boundary instead of making consumers
- * guess which coordinate system a backend used.
- */
-function utf8ByteOffset(source: string, codeUnitOffset: number): number {
-  const bounded = Math.max(0, Math.min(source.length, Math.trunc(codeUnitOffset)));
-  return Buffer.byteLength(source.slice(0, bounded), 'utf8');
-}
-
-function chunkForNode(node: SyntaxNodeLike, kind: string, source: string): AtlasStructuralEvidenceChunk {
+function chunkForNode(
+  node: SyntaxNodeLike,
+  kind: string,
+  source: string,
+): AtlasStructuralEvidenceChunk {
   const name = kind === 'FILE' ? null : nodeName(node);
   const imports: string[] = [];
   const exports: string[] = [];
@@ -199,8 +192,11 @@ function chunkForNode(node: SyntaxNodeLike, kind: string, source: string): Atlas
     name,
     parent_route: routeFor(node),
     parent_context: node.parent?.type ?? null,
-    start_byte: utf8ByteOffset(source, node.startIndex),
-    end_byte: utf8ByteOffset(source, node.endIndex),
+    // The Node binding exposes startIndex/endIndex in JavaScript string
+    // coordinates. Atlas structural observations are UTF-8 byte coordinates,
+    // so convert at the provider boundary before emitting evidence.
+    start_byte: Buffer.byteLength(source.slice(0, node.startIndex), 'utf8'),
+    end_byte: Buffer.byteLength(source.slice(0, node.endIndex), 'utf8'),
     start_line: node.startPosition.row,
     start_column: node.startPosition.column,
     end_line: node.endPosition.row,

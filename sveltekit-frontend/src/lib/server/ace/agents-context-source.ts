@@ -43,7 +43,7 @@ const REDIS_CARDS_SCAN_LIMIT = 60; // bounded scan; ACE caller is hot-path
  * through in this order, stopping when `limit` is reached:
  *   1. Redis exact: derive cardId from `filePath` walk-up
  *   2. Redis broad: scan `agents:dir:*`, filter by query keyword in tags
- *   3. Qdrant: search `codebase_chunks_768` and pull out unique `agents_card_id` payload values
+ *   3. Qdrant: search `codebase_chunks_768_v2` and pull out unique `agents_card_id` payload values
  *   4. CouchDB: not yet wired (returns empty); leaves a hook
  */
 export async function getAgentsContextForQuery(
@@ -209,7 +209,7 @@ async function qdrantPayloadCardIds(query: string, limit: number): Promise<strin
 		const res = await qdrant.hybridSearch({
 			query,
 			queryEmbedding: vec,
-			collection:     'codebase_chunks_768',
+			collection:     'codebase_chunks_768_v2',
 			limit:          Math.min(limit * 3, 30),
 		});
 		const seen = new Set<string>();

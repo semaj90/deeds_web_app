@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { candidateOrdinalMapV1Schema, type CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
+import { fanoutAdmissionV1Schema, type FanoutAdmissionV1 } from '../graph/fanout-admission-v1.js';
 import { ontologyObservationTupleV1Schema } from './ontology-observation-tuple-v1.js';
 
 export const PRE_FANOUT_EVIDENCE_BUNDLE_SCHEMA_V1 = 'atlas.pre-fanout-evidence-bundle.v1' as const;
@@ -172,4 +173,32 @@ export function materializePreFanoutEvidenceBundleV1(input: {
     ...payload,
     bundleChecksum: sha256(payload),
   });
+}
+
+/**
+ * Joins the evidence bundle to the existing admission receipt without
+ * creating a second admission authority. This is intentionally read-only:
+ * the admission receipt remains the only source of CandidateOrdinal
+ * eligibility, while the bundle proves the evidence families agree with it.
+ */
+export function verifyPreFanoutBundleAgainstAdmissionV1(input: {
+  admission: unknown;
+  bundle: unknown;
+}): { aligned: boolean; blockers: string[] } {
+  const admission = fanoutAdmissionV1Schema.parse(input.admission);
+  const bundle = preFanoutEvidenceBundleV1Schema.parse(input.bundle);
+  const blockers: string[] = [];
+  const candidate = admission.candidateOrdinalMap?.candidates[bundle.candidateOrdinal];
+
+  if (!admission.admitted || admission.status !== 'ADMITTED_TO_CANDIDATE_ORDINAL') blockers.push('FANOUT_ADMISSION_REQUIRED');
+  if (!bundle.fanoutEligible) blockers.push('PRE_FANOUT_BUNDLE_NOT_ELIGIBLE');
+  if (!candidate || candidate.candidateOrdinal !== bundle.candidateOrdinal) blockers.push('CANDIDATE_ORDINAL_MISMATCH');
+  if (admission.snapshotId !== bundle.candidateSnapshotRevision && admission.candidateOrdinalMap?.candidateSnapshotRevision !== bundle.candidateSnapshotRevision) blockers.push('CANDIDATE_SNAPSHOT_REVISION_MISMATCH');
+  if (admission.sourceRevision !== bundle.sourceRevision) blockers.push('SOURCE_REVISION_MISMATCH');
+  if (admission.representationId !== bundle.semantic.representationId) blockers.push('REPRESENTATION_ID_MISMATCH');
+  if (admission.representationRevision !== bundle.semantic.representationRevision) blockers.push('REPRESENTATION_REVISION_MISMATCH');
+  if (admission.candidateOrdinalMap?.ordinalMapChecksum !== bundle.ordinalMapChecksum) blockers.push('ORDINAL_MAP_CHECKSUM_MISMATCH');
+  if (bundle.identityAuthority || bundle.retrievalVoteProduced || bundle.canonicalWritesAllowed) blockers.push('PRE_FANOUT_AUTHORITY_FLAGS_INVALID');
+
+  return { aligned: blockers.length === 0, blockers };
 }

@@ -11,13 +11,13 @@
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const COUCHDB_URL      = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
 const COUCHDB_USER     = process.env.COUCHDB_USER  ?? 'admin';
 const COUCHDB_PASS     = process.env.COUCHDB_PASS  ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
 const DB_NAME          = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
+const ROTORQUANT_URL   = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
 
 const schema = z.object({
 	maxClusters: z.number().int().min(1).max(50).default(10),
@@ -85,12 +85,18 @@ async function synthesize(clusterId: string, docs: Array<{ title: string; body: 
 	const prompt = `Synthesize a concise 2-3 sentence technical summary for GPU cluster ${clusterId}. Focus on: what code lives here, its role, key dependencies.\n\n${context}\n\nSummary:`;
 
 	try {
-		const llamaSession = await getLlamaSessionDescriptor();
-		const text = (await bifrostChat(
-			[{ role: 'user', content: prompt }],
-			llamaSession.modelId,
-			{ maxTokens: 800, timeoutMs: 30_000 }
-		)).trim();
+		const res = await fetch(`${ROTORQUANT_URL}/v1/chat/completions`, {
+			method: 'POST', headers: { 'Content-Type': 'application/json' },
+			body:   JSON.stringify({
+				model:      LLM_MODEL_ID,
+				max_tokens: 800,
+				messages: [{ role: 'user', content: prompt }],
+			}),
+			signal: AbortSignal.timeout(30_000),
+		});
+		if (!res.ok) return `Cluster ${clusterId}: ${docs.length} wiki notes (LLM unavailable)`;
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const text = (data.choices?.[0]?.message?.content ?? '').trim();
 		return text.slice(0, 500) || `Cluster ${clusterId}: ${docs.length} wiki notes`;
 	} catch {
 		return `Cluster ${clusterId}: ${docs.length} wiki notes`;

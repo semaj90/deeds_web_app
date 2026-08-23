@@ -627,28 +627,10 @@ async function getEmbedRedis() {
 /**
  * Construct a short-lived ioredis client for one tool-call's worth of work.
  * Attaches a no-op error listener before the connection attempt so that
- * Redis being offline does not flood stderr with "Unhandled error event"
- * (or, worse, crash the process — Node's default behavior for an unhandled
- * EventEmitter 'error' event is to throw). Caller is responsible for
- * calling `.connect()` (this returns a lazyConnect client, not yet
- * connected) and for `redis.quit()` when done.
- *
- * Canonical factory for every short-lived Redis client in this file —
- * consolidated 2026-08-22 from ~15 near-identical inline `new Redis(...)`
- * call sites (see openspec/changes/inference-wiring-deep-audit-aug22/).
- * Two of those sites (REDIS_KEY inspector, batch-summarize pending queue)
- * were missing the error listener entirely — a real crash-risk gap this
- * consolidation fixes uniformly, not just a style cleanup.
- *
- * @param opts.connectTimeoutMs Override the default 2s connect timeout.
- *   A few call sites used 3-4s for slower operations (contextForFile,
- *   batch file I/O); pass that explicitly rather than silently changing
- *   their timeout behavior.
- * @param opts.commandTimeoutMs Per-command timeout (ioredis `commandTimeout`
- *   option). Only one call site needed this (batch pending-queue ops); left
- *   undefined everywhere else, matching prior behavior.
+ * Redis being offline does not flood stderr with "Unhandled error event".
+ * Caller is responsible for `redis.quit()` when done.
  */
-function makeRedis(opts?: { connectTimeoutMs?: number; commandTimeoutMs?: number }) {
+function makeRedis() {
   // Sync Redis() works fine without a dynamic import here — `Redis` is
   // already imported at the top of this file via the static import chain.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -658,9 +640,7 @@ function makeRedis(opts?: { connectTimeoutMs?: number; commandTimeoutMs?: number
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
-    enableReadyCheck: false,
-    connectTimeout: opts?.connectTimeoutMs ?? 2_000,
-    ...(opts?.commandTimeoutMs !== undefined ? { commandTimeout: opts.commandTimeoutMs } : {}),
+    connectTimeout: 2_000,
     retryStrategy: () => null,
   });
   r.on('error', () => {
@@ -1981,6 +1961,7 @@ server.registerTool(
     // a label filter is supplied since Neo4j is the only source that carries labels.
     if (!nodeType) {
       try {
+        const { default: Redis } = await import('ioredis');
         const redis = makeRedis();
         await redis.connect().catch(() => {});
         const raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
@@ -3120,6 +3101,7 @@ server.registerTool(
   },
   async ({ query }) => {
     try {
+      const { default: Redis } = await import('ioredis');
       const redis = makeRedis();
       await redis.connect().catch(() => {});
       // Look for the most recent ACE trace for this query prefix
@@ -4233,9 +4215,15 @@ server.registerTool(
         mkdirSync(failDir, { recursive: true });
       }
 
+      const REDIS_URL_ENV = REDIS_URL;
       let redis: InstanceType<typeof Redis> | null = null;
       try {
-        redis = makeRedis({ connectTimeoutMs: 4_000, commandTimeoutMs: 4_000 });
+        redis = new Redis(REDIS_URL_ENV, {
+          password: REDIS_PASSWORD,
+          lazyConnect: true,
+          connectTimeout: 4_000,
+          commandTimeout: 4_000,
+        });
         await redis.connect();
       } catch {
         redis = null;
@@ -4572,7 +4560,15 @@ server.registerTool(
   async ({ errorText, priorFix }) => {
     try {
       const { storeErrorFingerprint } = await import('../lib/server/ace/error-fingerprint.js');
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
       const fp = await storeErrorFingerprint(r, pool, errorText, priorFix);
       await r.quit().catch(() => {});
@@ -4618,7 +4614,15 @@ server.registerTool(
       const { lookupErrorFingerprint, findSimilarErrors } = await import(
         '../lib/server/ace/error-fingerprint.js'
       );
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
 
       const exact = await lookupErrorFingerprint(r, pool, errorText);
@@ -4675,7 +4679,15 @@ server.registerTool(
   async ({ query, isError, topK, lanes }) => {
     try {
       const { multiLaneSearch } = await import('../lib/server/ace/multi-lane-retrieval.js');
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
       const result = await multiLaneSearch(r, pool, { text: query, isError, topK });
       await r.quit().catch(() => {});
@@ -4977,7 +4989,15 @@ server.registerTool(
   },
   async ({ limit = 10 }) => {
     try {
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
 
       // Count ace:injection:blocked:* keys
@@ -5348,7 +5368,15 @@ server.registerTool(
   },
   async ({ clusterId, maxNotes }) => {
     try {
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
 
       // Qdrant cluster members (top 5 files by pageRank)
@@ -5544,7 +5572,15 @@ server.registerTool(
   },
   async ({ filePath, chunkId, queryHash }) => {
     try {
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
 
       const checks: Record<string, unknown> = {};
@@ -6433,7 +6469,13 @@ server.registerTool(
   },
   async ({ filePath, maxCards, forceReload }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
-    const redis = makeRedis({ connectTimeoutMs: 3000 });
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     try {
       await redis.connect();
       const packet = await contextForFile(filePath, {
@@ -6463,7 +6505,13 @@ server.registerTool(
   },
   async ({ filePath }) => {
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
-    const redis = makeRedis({ connectTimeoutMs: 3000 });
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     try {
       await redis.connect();
       const full = await contextForFile(filePath, { peerLimit: 0, redis });
@@ -6506,7 +6554,13 @@ server.registerTool(
       .replace(/^\.?\//, '')
       .replace(/^sveltekit-frontend\//, '')
       .replace(/^src\//, '');
-    const redis = makeRedis({ connectTimeoutMs: 3000 });
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     try {
       await redis.connect();
       // Try original then normalized form
@@ -6796,7 +6850,13 @@ server.registerTool(
     const safeDir = dir_path.replace(/\.\./g, '').replace(/\\/g, '/').replace(/^\//, '');
     const safeFact = String(fact).slice(0, 2000).replace(/\r\n/g, '\n');
 
-    const redisClient = makeRedis({ connectTimeoutMs: 3000 });
+    const { default: Redis } = await import('ioredis');
+    const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      password: process.env.REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     try {
       await redisClient.connect();
       const { join, resolve } = await import('node:path');
@@ -7398,7 +7458,16 @@ server.registerTool(
     }
 
     if (target_kind === 'REDIS_KEY') {
-      const redis = makeRedis({ connectTimeoutMs: 3000 });
+      const { default: Redis } = await import('ioredis');
+      const redis = new Redis({
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+        lazyConnect: true,
+        connectTimeout: 3000,
+        enableReadyCheck: false,
+        retryStrategy: () => null,
+      });
       try {
         await redis.connect();
         const val = await redis.get(target);
@@ -7592,7 +7661,15 @@ server.registerTool(
   async ({ errorHash, queryEmbedding, limit }) => {
     try {
       const { recallFixerPattern } = await import('../lib/server/fixer/fixer-memory.js');
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
       const { exact, similar } = await recallFixerPattern(
         r,
@@ -7659,7 +7736,15 @@ server.registerTool(
       const { storeFixerPattern, ensureFixerMemoryCollection } = await import(
         '../lib/server/fixer/fixer-memory.js'
       );
-      const r = makeRedis();
+      const Redis = (await import('ioredis')).default;
+      const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        retryStrategy: () => null,
+      });
+      r.on('error', () => {});
       await r.connect().catch(() => {});
       await ensureFixerMemoryCollection().catch(() => {});
       const patternId = await storeFixerPattern(r, pool, {
@@ -7830,7 +7915,15 @@ server.registerTool(
     // ── Lane 4: Karpathy Redis blend scores for the file ─────────────────────
     if (includeKarp && opts.file_path) {
       try {
-        const r = makeRedis();
+        const { default: Redis } = await import('ioredis');
+        const r = new Redis(REDIS_URL, {
+          password: REDIS_PASSWORD,
+          lazyConnect: true,
+          maxRetriesPerRequest: 1,
+          enableOfflineQueue: false,
+          retryStrategy: () => null,
+        });
+        r.on('error', () => {});
         await r.connect().catch(() => {});
 
         // Top Karpathy files near this one
@@ -8023,10 +8116,16 @@ server.registerTool(
     }),
   },
   async ({ point_id, collection, approved, query }) => {
+    const { default: Redis } = await import('ioredis');
     const { createHash } = await import('node:crypto');
 
     const PROMOTE_THRESHOLD = 3;
-    const redis = makeRedis({ connectTimeoutMs: 3000 });
+    const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     try {
       await redis.connect();
       const pid = String(point_id);

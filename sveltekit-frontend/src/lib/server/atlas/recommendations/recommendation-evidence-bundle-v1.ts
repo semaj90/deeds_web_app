@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
-import { sampleQueryMatrixV1Schema } from '../sampling/sample-query-matrix-v1.js';
+import { SampleQueryMatrixV1Schema } from '../sampling/sample-query-matrix-v1.js';
 
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
 const revision = z.string().min(1);
@@ -65,7 +65,7 @@ export const RecommendationEvidenceBundleV1Schema = z.object({
   semanticChecksum: checksum,
   ordinalMapChecksum: checksum,
   candidateOrdinals: z.array(z.number().int().nonnegative()).min(1).max(512),
-  sample: sampleQueryMatrixV1Schema.nullable(),
+  sample: SampleQueryMatrixV1Schema.nullable(),
   graph: z.array(RecommendationGraphReceiptV1Schema).max(8),
   knn: RecommendationKnnReceiptV1Schema.nullable(),
   domain: z.array(RecommendationDomainReceiptV1Schema).max(8),
@@ -120,6 +120,6 @@ export function recommendationEvidenceFeatureWeightV1(input: RecommendationEvide
   const provenDomainWeight = input.domain.reduce((sum, item) => sum + item.featureWeight, 0);
   const graphSignal = input.graph.length > 0 ? 1 : 0;
   const knnSignal = input.knn && input.knn.hits.length > 0 ? 1 : 0;
-  const sampleSignal = input.sample?.retrievalVoteProduced === false ? 1 : 0;
+  const sampleSignal = input.sample?.retrievalVoteAdded === false ? 1 : 0;
   return Math.min(1, (provenDomainWeight * 0.35) + (graphSignal * 0.25) + (knnSignal * 0.3) + (sampleSignal * 0.1));
 }

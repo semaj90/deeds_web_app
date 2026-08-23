@@ -5,7 +5,7 @@ import {
   type AstGrepStructuralCandidateV1,
 } from './ast-grep-structural-topk.js';
 import {
-  compileApiContractObservationV1,
+  buildApiContractObservationV1,
   type ApiContractObservationV1,
 } from './api-contract-observation-v1.js';
 
@@ -54,25 +54,12 @@ export function observeSvelteKitHttpContractV1(
   const options = SvelteKitApiObservationOptionsV1Schema.parse(optionsValue);
   const route = routeFromServerFile(candidate.filePath);
   const method = candidateMethod(candidate);
-  if (!route || !method || !candidate.treeNodeId) return null;
+  if (!route || !method) return null;
 
-  return compileApiContractObservationV1({
-    schema: 'atlas.api-contract-nomination.v1',
+  return buildApiContractObservationV1({
     sourceRef: candidate.sourceRef,
-    workspaceRevision: candidate.workspaceRevision,
-    sourceRevision: candidate.sourceRevision,
-    coordinate: {
-      sourceRef: candidate.sourceRef,
-      filePath: candidate.filePath,
-      startByte: candidate.startByte,
-      endByte: candidate.endByte,
-      startChar: candidate.startColumn,
-      endChar: candidate.endColumn,
-      startLine: candidate.startLine,
-      endLine: candidate.endLine,
-      treeNodeId: candidate.treeNodeId,
-      symbolVersionId: candidate.symbolVersionId,
-    },
+    treeNodeId: candidate.treeNodeId,
+    symbolVersionId: candidate.symbolVersionId,
     transport: 'HTTP',
     method,
     route,
@@ -81,13 +68,14 @@ export function observeSvelteKitHttpContractV1(
     outputSchemaRefs: options.outputSchemaRefs,
     authRequirements: options.authRequirements,
     sideEffects: options.sideEffects,
-    evidenceSources: ['AST_GREP'],
-    grammarRevision: candidate.producerRevision,
-    semanticEngineRevision: options.semanticEngine ? `semantic-engine:${options.semanticEngine}` : null,
-    producerRevision: options.producerRevision,
+    workspaceRevision: candidate.workspaceRevision,
+    sourceRevision: candidate.sourceRevision,
+    structuralEngine: 'TREE_SITTER_PLUS_AST_GREP',
+    semanticEngine: options.semanticEngine,
     evidenceRefs: [
       `${candidate.sourceRef}#bytes=${candidate.startByte}-${candidate.endByte}`,
       `${candidate.sourceRef}#handler=${candidate.name}`,
     ],
+    producerRevision: options.producerRevision,
   });
 }

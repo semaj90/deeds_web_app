@@ -42,7 +42,7 @@ export const ValidateTruthToolParams = z.object({
   packet_key: z.string().describe('Packet identifier to validate'),
   source_ref: z.string().describe('Source file reference'),
   feature_id: z.string().describe('Feature ID'),
-  packet_metadata: z.record(z.unknown()).optional().describe('Optional cached metadata for comparison'),
+  packet_metadata: z.record(z.string(), z.unknown()).optional().describe('Optional cached metadata for comparison'),
 });
 
 export type ValidateTruthParams = z.infer<typeof ValidateTruthToolParams>;
@@ -151,7 +151,7 @@ export const WriteTraceEventToolParams = z.object({
   source_ref: z.string().describe('Source file reference'),
   feature_id: z.string().describe('Feature ID'),
   event_type: z.enum(['trace_checkpoint', 'packet_updated', 'retrieval_complete']).describe('Event classification'),
-  event_data: z.record(z.unknown()).describe('Event payload (schema varies by event_type)'),
+  event_data: z.record(z.string(), z.unknown()).describe('Event payload (schema varies by event_type)'),
   ttl_seconds: z.number().int().default(3600).describe('Cache invalidation TTL'),
 });
 

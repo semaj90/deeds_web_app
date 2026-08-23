@@ -31,17 +31,9 @@ describe('recommendation evidence bundle v1', () => {
   it('accepts low-rank sampling only as non-voting evidence', () => {
     const bundle = compileRecommendationEvidenceBundleV1({
       ...base,
-      sample: {
-        schema: 'atlas.sample-query-matrix.v1', matrixRole: 'LATENT_ROUTING', normalization: 'ROW_L2',
-        candidateSnapshotRevision: 'candidate-r1', workspaceRevision: 'w1', sourceMatrixRevision: 'matrix-r1',
-        sourceMatrixChecksum: H, ordinalMapChecksum: H, rowCount: 2, columnCount: 128,
-        rows: [{ candidateOrdinal: 0, values: [1], rowNormSquared: 1 }], totalRowNormSquared: 1,
-        rowNormCoefficientOfVariation: 0, lengthSquaredDegeneratesTowardUniform: true,
-        matrixChecksum: H, identityAuthority: false, retrievalVoteProduced: false,
-        canonicalWritesAttempted: false, producerRevision: 'sample-r1',
-      },
+      sample: { schema: 'atlas.sample-query-matrix.v1', matrixRole: 'LATENT_ROUTING', rows: 2, columns: 128, samplingAxis: 'ROW', samplingPolicy: 'LENGTH_SQUARED', normalization: 'ROW_L2', candidateSnapshotRevision: 'candidate-r1', ordinalMapChecksum: H, canonicalIdentityAuthority: false, retrievalVoteAdded: false, matrixChecksum: H },
     });
-    expect(bundle.sample?.retrievalVoteProduced).toBe(false);
+    expect(bundle.sample?.retrievalVoteAdded).toBe(false);
     expect(recommendationEvidenceFeatureWeightV1(bundle)).toBeGreaterThan(0);
   });
 

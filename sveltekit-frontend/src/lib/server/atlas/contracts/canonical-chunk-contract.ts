@@ -11,7 +11,7 @@ export const CANONICAL_EMBEDDING_DIMENSION = ATLAS_CANONICAL_SEMANTIC_DIMENSION;
 
 export const CanonicalRepresentationNameSchema = z.enum([
   ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
-  'semantic_512',
+  'semantic_768',
   'semantic_128',
   'latent_64',
   'lexical_v1',

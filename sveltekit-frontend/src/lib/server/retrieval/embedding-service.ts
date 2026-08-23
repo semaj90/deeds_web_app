@@ -15,7 +15,6 @@
  */
 
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
-import { tryEmbed } from '$lib/server/embedding/ollama-embed.js';
 
 import { ENV } from '$lib/server/env.server.js';
 /**
@@ -216,28 +215,7 @@ export async function embedQueryForLane(
     // producing a dimensionally-valid but semantically-corrupted embedding that
     // passes every downstream check (Qdrant's own vector-size validation included)
     // while being cosine-scored against real 768-dim embeddings as if legitimate.
-    // Keep test/legacy environments deterministic when no provider env is
-    // injected, while explicit production configuration always wins.
-    const provider = ENV.EMBEDDING_PROVIDER ?? 'ollama';
-    const baseUrl =
-      ENV.EMBEDDING_BASE_URL ??
-      ENV.LLAMA_SERVER_URL ??
-      (provider === 'ollama' ? config.ollama_url : undefined);
-    const result = await tryEmbed(query, {
-      model,
-      provider,
-      baseUrl,
-      expectedDimensions: 768,
-      timeoutMs: config.timeout_ms,
-    });
-    if (!result) throw new Error('Canonical semantic_768 embedding backend returned no vector');
-    return {
-      vector: new Float32Array(result.embedding),
-      model: result.model,
-      dimension: result.embedding.length,
-      cached: false,
-      exec_ms: performance.now() - start,
-    };
+    return embedViaOllama(query, 768, model, start, true);
   }
 
   if (lane === 'dense_384') {

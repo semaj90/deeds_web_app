@@ -9,18 +9,25 @@ Status vocabulary:
 
 ## Alignment sweep — 2026-08-23
 
-The spectral challenger now has a bounded request contract and a non-mutating
-RAPIDS sidecar route. TypeScript and Python fixtures share CandidateOrdinal and
-checksum rules. These are fixture gates only; they do not prove activated WSL2
-cuGraph execution or authorize Qdrant, Valkey, or Neo4j writes.
+The repository now has a narrow, non-mutating spectral request path in
+`python/atlas_rapids_community.py` and `/v1/community/spectral` in the RAPIDS
+sidecar. The TypeScript and Python fixture adapters share CandidateOrdinal and
+checksum rules. These are implementation and fixture gates only; they do not
+prove an activated WSL2 cuGraph run or authorize Qdrant/Valkey/Neo4j writes.
 
-- [x] Validate `numEigenvectors <= numClusters <= node_count`.
-- [x] Expose spectral capability dynamically without false availability claims.
-- [x] Preserve graph/projection revisions and non-authority flags.
-- [ ] Run the sidecar in activated `atlas-rapids-cu13` and capture a real SM86 receipt.
-- [ ] Compare live cuGraph assignments with the CPU/reference ordinal checksum.
-- [ ] Add projection readback only after parity passes.
-- [ ] Wire workflow/A2A receipts and grounded repair outcomes.
+- [x] Validate bounded spectral parameters, including
+  `numEigenvectors <= numClusters <= node_count`.
+- [x] Expose capability discovery without claiming availability when cuGraph
+  is not importable.
+- [x] Preserve graph/projection revisions and non-authority flags in the
+  fixture receipt.
+- [ ] Run the sidecar in the activated `atlas-rapids-cu13` environment and
+  capture a real SM86 execution receipt.
+- [ ] Compare the same ordinal assignment against the CPU/reference path and
+  record checksum, score/partition metrics, runtime versions, and GPU memory.
+- [ ] Add Qdrant/Valkey projection readback only after the parity receipt passes.
+- [ ] Wire workflow/A2A artifact receipts and grounded repair outcomes; cluster
+  membership alone must not authorize mutation.
 
 ## Placement
 

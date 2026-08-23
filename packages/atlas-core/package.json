@@ -24,10 +24,12 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "drizzle-orm": "0.45.2",
     "zod": "^3.22.0",
     "pg": "^8.11.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.6",
     "@types/node": "^22.0.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"

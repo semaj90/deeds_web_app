@@ -112,5 +112,3 @@ export function assertSpectralRtxFixtureAligned(input: {
   }
   if (fixture.promotionEligible || fixture.canonicalWritesAllowed || fixture.identityAuthority) throw new Error('SPECTRAL_RTX_FIXTURE_AUTHORITY_VIOLATION');
 }
-
-

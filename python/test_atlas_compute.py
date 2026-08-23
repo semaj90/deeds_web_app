@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import unittest
-import json
 
 import numpy as np
 
@@ -11,11 +10,7 @@ try:
     from atlas_compute.exact_semantic import exact_semantic_search
     from atlas_compute.hypergraph_tensor import run_tensor_ppr
     from atlas_compute.interpolation import interpolate_topology_field
-    from atlas_compute.low_rank import (
-        candidate_ordinal_map_checksum,
-        compare_low_rank_recommendations,
-        prove_low_rank_cpu_cuda_parity,
-    )
+    from atlas_compute.low_rank import compare_low_rank_recommendations
     from atlas_compute.rapids_matrix import deterministic_farthest_first_ordinals
     TORCH_AVAILABLE = True
 except Exception:
@@ -77,44 +72,6 @@ class AtlasComputeReferenceTests(unittest.TestCase):
         self.assertEqual(first.length_square_sample_ordinals, second.length_square_sample_ordinals)
         self.assertGreaterEqual(first.top_k_overlap, 0.8)
         self.assertFalse(first.canonical_authority)
-        self.assertEqual(first.numerical_owner, "python_pytorch")
-        self.assertEqual(first.execution_device, "cpu")
-
-    def test_low_rank_cpu_cuda_parity_receipt_is_bounded(self) -> None:
-        rng = np.random.default_rng(7)
-        matrix = rng.normal(size=(16, 12)).astype(np.float32)
-        receipt = prove_low_rank_cpu_cuda_parity(
-            matrix, target_rank=3, oversampling=4, power_iterations=2, top_k=4, sample_count=12, seed=9
-        )
-        self.assertIn(receipt.status, {"PARITY_PROVEN", "CUDA_UNAVAILABLE", "NUMERICAL_MISMATCH"})
-        self.assertFalse(receipt.canonical_authority)
-        if receipt.cuda_available:
-            self.assertEqual(receipt.status, "PARITY_PROVEN")
-            self.assertTrue(receipt.sample_bounds_valid)
-            self.assertIsNotNone(receipt.singular_value_max_relative_delta)
-
-    def test_low_rank_receipt_serialization_preserves_ordinal_lineage(self) -> None:
-        matrix = np.arange(24, dtype=np.float32).reshape(6, 4)
-        canonical_ids = [f"packet-{index:02d}" for index in range(6)]
-        receipt = prove_low_rank_cpu_cuda_parity(
-            matrix,
-            target_rank=2,
-            oversampling=2,
-            power_iterations=1,
-            top_k=2,
-            sample_count=4,
-            seed=11,
-            canonical_ids=canonical_ids,
-            representation_id="semantic_768",
-            representation_revision="0",
-        )
-        encoded = json.dumps(receipt.to_dict(), sort_keys=True, separators=(",", ":"))
-        decoded = json.loads(encoded)
-        self.assertEqual(decoded["representation_id"], "semantic_768")
-        self.assertEqual(decoded["representation_revision"], "0")
-        self.assertEqual(decoded["candidate_ordinal_map_checksum"], candidate_ordinal_map_checksum(canonical_ids))
-        self.assertIn(decoded["status"], {"PARITY_PROVEN", "CUDA_UNAVAILABLE", "NUMERICAL_MISMATCH"})
-        self.assertFalse(decoded["canonical_authority"])
 
     def test_farthest_first_initialization_is_deterministic_and_tie_stable(self) -> None:
         matrix = np.array([

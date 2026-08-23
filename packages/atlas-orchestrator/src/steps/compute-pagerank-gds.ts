@@ -13,22 +13,20 @@
 import { z } from 'zod';
 import { Pool } from 'pg';
 
-export const computePageRankGdsInput = z.object({
-  neo4jUri: z.string().default('bolt://localhost:7687'),
-  neo4jUser: z.string().default('neo4j'),
-  neo4jPassword: z.string(),
-  pgConnectionString: z.string(),
-  dryRun: z.boolean().default(true),
-  graphVersion: z.string().default('1.0'),
-});
-
 export const computePageRankGdsStep = {
   name: 'compute-pagerank-gds',
   description: 'Compute PageRank via Neo4j GDS and write to PostgreSQL',
 
-  input: computePageRankGdsInput,
+  input: z.object({
+    neo4jUri: z.string().default('bolt://localhost:7687'),
+    neo4jUser: z.string().default('neo4j'),
+    neo4jPassword: z.string(),
+    pgConnectionString: z.string(),
+    dryRun: z.boolean().default(true),
+    graphVersion: z.string().default('1.0'),
+  }),
 
-  async execute(input: z.infer<typeof computePageRankGdsInput>) {
+  async execute(input: z.infer<typeof computePageRankGdsStep.input>) {
     console.log('╔════════════════════════════════════════════════╗');
     console.log('║   Step: Compute PageRank (Neo4j GDS + NetworkX) ║');
     console.log('╚════════════════════════════════════════════════╝\n');

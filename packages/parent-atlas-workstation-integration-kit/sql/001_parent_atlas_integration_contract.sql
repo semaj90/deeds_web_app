@@ -1,5 +1,4 @@
--- This migration must be run outside an explicit transaction because the
--- additive indexes below use CREATE INDEX CONCURRENTLY.
+BEGIN;
 
 -- Identity and revision fields required for cross-store parity.
 ALTER TABLE public.atlas_packets
@@ -81,3 +80,5 @@ CREATE TABLE IF NOT EXISTS public.atlas_graph_feature_runs (
   computed_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (packet_id, graph_run_id)
 );
+
+COMMIT;

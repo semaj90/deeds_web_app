@@ -5,10 +5,7 @@ export const QDRANT_COLLECTION_REGISTRY = {
 } as const;
 
 export const QDRANT_VECTOR_NAMES = {
-  // Physical named vector on codebase_chunks_768_v2. Keep the logical API name
-  // denseRetrieval so callers do not confuse the serving vector name with a
-  // second semantic representation or fusion lane.
-  denseRetrieval: 'content',
+  denseRetrieval: 'dense_retrieval',
   summaryRoute: 'summary_route',
   latentRoute: 'latent_route',
   lateInteraction: 'late_interaction',

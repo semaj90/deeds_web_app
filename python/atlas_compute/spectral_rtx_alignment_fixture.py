@@ -71,5 +71,3 @@ def build_spectral_rtx_alignment_fixture(payload: dict[str, Any]) -> dict[str, A
         "identityAuthority": False,
         "promotionEligible": False,
     }
-
-

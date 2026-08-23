@@ -1,37 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import { buildStructuralObservationV2, relateStructuralSpansV1 } from './structural-evidence-unit-v2.js';
 
-import {
-  classifySpanRelationV1,
-  makeStructuralEvidenceKeyV2,
-} from './structural-evidence-unit-v2.js';
+const row = (startByte: number, endByte: number, provider: 'NODE_TREE_SITTER' | 'TREESITTER_CHUNKER' = 'NODE_TREE_SITTER') =>
+  buildStructuralObservationV2({ provider, sourceRef: 'src/a.ts', sourceRevision: 'sha256:source', providerRevision: 'provider:v1', startByte, endByte, rawKind: 'function_declaration', symbolKind: 'FUNCTION', name: 'run', parentPath: null });
 
-describe('structural evidence unit v2', () => {
-  it.each([
-    [{ symbolStart: 10, symbolEnd: 20, chunkStart: 10, chunkEnd: 20 }, 'EXACT'],
-    [{ symbolStart: 12, symbolEnd: 18, chunkStart: 10, chunkEnd: 20 }, 'CHUNK_CONTAINS_SYMBOL'],
-    [{ symbolStart: 10, symbolEnd: 20, chunkStart: 12, chunkEnd: 18 }, 'SYMBOL_CONTAINS_CHUNK'],
-    [{ symbolStart: 10, symbolEnd: 20, chunkStart: 18, chunkEnd: 30 }, 'OVERLAPS'],
-    [{ symbolStart: 10, symbolEnd: 20, chunkStart: 20, chunkEnd: 30 }, 'DISJOINT'],
-  ] as const)('classifies %o as %s', (input, expected) => {
-    expect(classifySpanRelationV1(input)).toBe(expected);
+describe('StructuralEvidenceUnitV2', () => {
+  it('creates revision-qualified deterministic evidence identity', () => {
+    const a = row(10, 20);
+    const b = row(10, 20);
+    expect(a.evidenceKey).toBe(b.evidenceKey);
+    expect(a.evidenceKey).toMatch(/^sha256:/);
   });
 
-  it('makes revision-qualified deterministic evidence keys', () => {
-    const input = {
-      provider: 'AST_GREP' as const,
-      observationUnit: 'SYMBOL' as const,
-      sourceRef: 'src/example.ts',
-      sourceRevision: 'sha256:source',
-      providerRevision: 'ast-grep@0.40.0',
-      byteStart: 10,
-      byteEnd: 20,
-      semanticKind: 'FUNCTION',
-      symbolName: 'load',
-    };
-    const a = makeStructuralEvidenceKeyV2(input);
-    const b = makeStructuralEvidenceKeyV2(input);
-    expect(a).toBe(b);
-    expect(a).toMatch(/^sev2:[0-9a-f]{64}$/);
-    expect(makeStructuralEvidenceKeyV2({ ...input, sourceRevision: 'sha256:changed' })).not.toBe(a);
+  it.each([
+    [[10, 20], [10, 20], 'EXACT'], [[0, 30], [10, 20], 'CHUNK_CONTAINS_SYMBOL'],
+    [[10, 20], [0, 30], 'SYMBOL_CONTAINS_CHUNK'], [[10, 20], [15, 25], 'OVERLAPS'],
+    [[0, 5], [10, 20], 'DISJOINT'],
+  ] as const)('classifies %s and %s as %s', (left, right, expected) => {
+    expect(relateStructuralSpansV1(row(left[0], left[1]), row(right[0], right[1])).relation).toBe(expected);
   });
 });

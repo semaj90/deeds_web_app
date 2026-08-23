@@ -62,7 +62,7 @@ export const ExtractionPayloadSchema = z.object({
 // ── Embedding & Topology (layer 2) ───────────────────────────────────────
 
 export const EmbeddingSchema = z.object({
-  dimension: z.literal(384).describe('embeddinggemma standard: 384-dim'),
+  dimension: z.literal(768).describe('EmbeddingGemma canonical native representation: 768-dim'),
   model: z.string().default('embeddinggemma:latest'),
   normalized: z.boolean().default(true).describe('L2 normalization applied'),
   vector: z.instanceof(Float32Array).optional().describe('Raw vector (not stored in JSON)'),
@@ -132,7 +132,7 @@ export const ValidationSchema = z.object({
 
 export const SummarySchema = z.object({
   summary_text: z.string().optional().describe('Human-readable summary (Gemma4 output)'),
-  summary_embedding: z.instanceof(Float32Array).optional().describe('Embedding of summary (384-dim)'),
+  summary_embedding: z.instanceof(Float32Array).optional().describe('Embedding of summary (768-dim)'),
   summary_model: z.string().optional(),
   summary_generated_at: z.string().datetime().optional(),
 }).strict();
@@ -259,7 +259,7 @@ export const PACKET_EXAMPLE_LAYER_1: PacketAfterLayer1 = {
 
 export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
   ...PACKET_EXAMPLE_LAYER_1,
-  dimension: 384,
+  dimension: 768,
   model: 'embeddinggemma:latest',
   normalized: true,
   som_cluster: 42,

@@ -267,7 +267,9 @@ export function buildAceSynthesisGraph(input: Omit<z.input<typeof aceSynthesisGr
     schema: 'atlas.ace-synthesis-graph.v1' as const,
     ...input,
   };
-  const normalized = aceSynthesisGraphSchema.omit({ graph_checksum: true }).parse(raw);
+  // Hash the normalized graph so Zod defaults cannot make a freshly built graph
+  // fail its own read-back checksum validation.
+  const normalized = aceSynthesisGraphSchema.parse({ ...raw, graph_checksum: sha256({ ...raw, graph_checksum: undefined }) });
   const graph_checksum = sha256({ ...normalized, graph_checksum: undefined });
   return validateAceSynthesisGraph({ ...normalized, graph_checksum });
 }

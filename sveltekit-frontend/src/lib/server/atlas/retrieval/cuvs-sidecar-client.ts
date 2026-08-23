@@ -20,8 +20,8 @@ import { ENV } from '$lib/server/env.server.js';
 // This file's index names ('content768'/'summary768') and dimension hardcode
 // the native 768-dim EmbeddingGemma output — matching the real sidecar's
 // `_EXPECTED_DIMENSION = 768` (python/atlas_rapids_sidecar.py) — not the
-// persisted canonical semantic_512 lane. Aliased to the native-dimension
-// constant, not the canonical-persisted one.
+// persisted native semantic_768 lane. The sidecar consumes the native
+// EmbeddingGemma matrix; MRL prefixes are separate derived artifacts.
 import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
 
 export type CuvsKnnAlgorithm = 'exact' | 'cagra';

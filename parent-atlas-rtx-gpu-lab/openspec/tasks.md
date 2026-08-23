@@ -31,35 +31,15 @@
 
 ## GPU3a spectral challenger
 - [x] Add bounded spectral request/response contract and non-mutating sidecar route.
-- [x] Preserve graph/projection revisions, topology hash, ordinal identity, and
-      explicit non-authority status.
-- [ ] Activate WSL2 RAPIDS and prove cuGraph spectral execution on the frozen SM86 fixture.
-- [ ] Compare CPU/reference and cuGraph assignments with the same ordinal checksum.
+- [x] Preserve graph revision, projection revision, topology hash, ordinal identity,
+      and explicit non-authority status.
+- [ ] Activate the WSL2 RAPIDS environment and prove cuGraph spectral execution on
+      the frozen fixture at SM86.
+- [ ] Compare CPU/reference and cuGraph assignments using the same ordinal map and
+      canonical checksum; record seed and spectral tolerances.
 - [ ] Record RAPIDS/cuGraph/cuVS/CUDA/driver versions and GPU memory observations.
-- [ ] Keep Qdrant/Valkey/Neo4j projections read-only until parity passes.
-
-## GPU0a numerical ownership
-- [x] Keep TypeScript limited to descriptors, revisions, ordinals, Zod gates,
-      admission, and receipt verification.
-- [x] Move low-rank length-squared reduction and sampling to the Python/PyTorch
-      owner in `python/atlas_compute/low_rank.py`.
-- [ ] Prove CPU/PyTorch-CUDA parity on the same frozen CandidateOrdinal artifact.
-- [x] Bounded PyTorch CPU↔CUDA low-rank parity fixture; full-corpus artifact
-      parity remains open.
-- [x] Read-only `256 × 768` prefix of `vector-snapshot-5k-768` returned
-      `PARITY_PROVEN` with `semantic_768` lineage.
-- [ ] Run the complete frozen artifact with CandidateOrdinal-map checksum and
-      persist a revision-qualified, non-authority receipt.
-- [x] Execute the complete read-only `5,000 × 768` `semantic_768` artifact.
-- [x] Full frozen `5,000 × 768` artifact passes the scale-aware CPU/CUDA
-      parity gate: max relative singular-value delta `1.97203e-4`, relative
-      reconstruction-error delta `4.44651e-5`, and valid sample bounds.
-- [x] Join the full receipt to the complete CandidateOrdinal map using the
-      frozen ordered-`packet_key` checksum
-      `b77644ae7a9f87ebb08a8a26e990f76acc003df06a145ace36db59885c84bfd2`;
-      retain `canonical_authority=false`. Absolute singular-value delta
-      `1.17798e-2` remains diagnostic backend variance.
-- [ ] Add cuBLASLt/custom CUDA only after a measured profiler bottleneck exists.
+- [ ] Keep Qdrant/Valkey/Neo4j projections read-only until the comparison receipt
+      passes and a separate promotion gate is reviewed.
 
 ## GPU4 Arrow data plane
 - [ ] CSV/DB export -> Arrow IPC.

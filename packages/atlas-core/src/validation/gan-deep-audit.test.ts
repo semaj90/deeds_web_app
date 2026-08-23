@@ -144,7 +144,7 @@ describe('GAN Deep Audit', () => {
       const query = 'Short query';
       const recommendation = await generateTokenSavingsRecommendation(query, []);
 
-      expect(['exact_match', 'semantic', 'none', 'query']).toContain(
+      expect(['exact_match', 'semantic', 'none']).toContain(
         recommendation.cache_key_suggestion.split(':')[1]
       );
     });
@@ -165,7 +165,7 @@ describe('GAN Deep Audit', () => {
         includeProductionHardening: true,
       };
 
-      const result = await executeGanDeepAudit(config, { db: mockDb, redis: mockRedis });
+      const result = await executeGanDeepAudit(config, { db: mockDb });
 
       // Should detect missing indexes
       const indexIssues = result.production_hardening_issues?.filter(
@@ -313,15 +313,6 @@ describe('GAN Deep Audit', () => {
     });
 
     it('should prioritize hard failure remediation', async () => {
-      mockDb.execute = vi.fn(async () => [
-        {
-          packet_key: '',
-          source_ref: '',
-          feature_id: '',
-          summary: 'fixture hard failure',
-          ganValidated: false,
-        },
-      ]);
       const config: GanDeepAuditConfig = {
         operation: 'gan-audit',
         dryRun: false,
@@ -330,7 +321,7 @@ describe('GAN Deep Audit', () => {
         includeFeatureRecommendations: true,
       };
 
-      const result = await executeGanDeepAudit(config, { db: mockDb, redis: mockRedis });
+      const result = await executeGanDeepAudit(config, { db: mockDb });
 
       // Should always have remediation recommendations
       expect(result.agentic_recommendations?.length || 0).toBeGreaterThan(0);

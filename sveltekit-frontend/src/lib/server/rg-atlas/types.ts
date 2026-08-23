@@ -3,7 +3,6 @@
  * Based on Section 3 of docs/design/2026-05-11_rg-atlas-search-pipeline.md
  */
 import { z } from 'zod';
-import { phaseAlignmentInputSchema } from '@deeds/parent-atlas';
 
 export const rgSearchAtlasOptionsSchema = z.object({
   query: z.string().min(1).describe('Search query (regex for Stage 1, NL for stages 4-8)'),
@@ -19,8 +18,7 @@ export const rgSearchAtlasOptionsSchema = z.object({
     karpathy: z.number(),
     cos: z.number(),
     lang: z.number()
-  }).optional().describe('Weights for final blend score'),
-  phase_alignment: phaseAlignmentInputSchema.optional().describe('Optional HMM → DAG phase gate metadata; never passed to the search executor')
+  }).optional().describe('Weights for final blend score')
 });
 
 export interface RgSearchAtlasOptions {

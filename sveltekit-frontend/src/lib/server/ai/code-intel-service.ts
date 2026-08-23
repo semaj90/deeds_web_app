@@ -297,8 +297,8 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 	const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
 	const queryEmbedding = await generateSingleEmbedding(params.goal);
 	const qdrant = getQdrantClient();
-	// 512-dim MRL evaluation candidate lane (primary: 768-dim, reference: 384-dim)
-	const hits = await qdrant.search('codebase_chunks_512', {
+	// Canonical EmbeddingGemma semantic_768 retrieval lane.
+	const hits = await qdrant.search('codebase_chunks_768_v2', {
 		vector: queryEmbedding,
 		limit: 3,
 		with_payload: true

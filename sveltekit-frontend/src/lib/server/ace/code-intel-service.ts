@@ -662,12 +662,12 @@ export async function rebuildCodeIntelCorpus(): Promise<{
 async function ingestNodesToQdrant(nodes: CodeIntelNode[]): Promise<void> {
   try {
     // Ensure collection exists
-    await ensureQdrantCollection('codebase_chunks_512', 512);
+    await ensureQdrantCollection('codebase_chunks_768_v2', 768);
 
     // Convert nodes to Qdrant points
     const points = nodes.map((node, idx) => ({
       id: `${node.id}:${idx}`,
-      vector: node.embedding || new Array(512).fill(0), // 512-dim MRL lane; zero-vector fallback
+      vector: node.embedding || new Array(768).fill(0), // canonical semantic_768 lane; zero-vector fallback
       payload: {
         filePath: node.filePath,
         symbol: node.symbol,
@@ -688,7 +688,7 @@ async function ingestNodesToQdrant(nodes: CodeIntelNode[]): Promise<void> {
       }
     }));
 
-    await batchUpsertPoints('codebase_chunks_512', points, true);
+    await batchUpsertPoints('codebase_chunks_768_v2', points, true);
   } catch (err) {
     console.error('[CodeIntel] Qdrant ingestion failed:', (err as Error).message);
   }
@@ -699,11 +699,11 @@ async function ingestNodesToQdrant(nodes: CodeIntelNode[]): Promise<void> {
 async function materializeDomainCentroids(redis: Redis): Promise<void> {
   try {
     const centroids: Record<DomainClass, number[]> = {
-      AUTH: new Array(512).fill(0),
-      DATA: new Array(512).fill(0),
-      API: new Array(512).fill(0),
-      UI: new Array(512).fill(0),
-      UNKNOWN: new Array(512).fill(0)
+      AUTH: new Array(768).fill(0),
+      DATA: new Array(768).fill(0),
+      API: new Array(768).fill(0),
+      UI: new Array(768).fill(0),
+      UNKNOWN: new Array(768).fill(0)
     };
 
     // Note: In production, aggregate embeddings from all nodes

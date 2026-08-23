@@ -103,23 +103,12 @@ vi.mock('@langchain/langgraph', () => {
   };
 });
 
-vi.mock('@langchain/openai', () => ({
-  ChatOpenAI: class {
+vi.mock('@langchain/ollama', () => ({
+  ChatOllama: class {
     async invoke() {
       return { content: 'retrieval_contract' };
     }
   },
-}));
-
-vi.mock('$lib/server/ai/local-llama-provider.js', () => ({
-  LLAMA_SERVER_BASE_URL: 'http://127.0.0.1:8090/v1',
-  getLlamaSessionDescriptor: async () => ({
-    baseUrl: 'http://127.0.0.1:8090',
-    modelId: 'test-model.gguf',
-    healthy: true,
-    discoveredAt: new Date().toISOString(),
-    source: 'fallback' as const,
-  }),
 }));
 
 vi.mock('$lib/server/telemetry/tool-call-recorder.js', () => ({

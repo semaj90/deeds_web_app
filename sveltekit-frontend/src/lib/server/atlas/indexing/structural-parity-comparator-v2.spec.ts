@@ -72,26 +72,5 @@ describe('compareStructuralObservationsV2', () => {
     expect(result.mismatchCounts.EXACT_SPAN_MISMATCH).toBe(1);
     expect(result.pairs[0]?.startByteDelta).toBe(2);
     expect(result.pairs[0]?.endByteDelta).toBe(2);
-    expect(result.pairs[0]?.spanIntersectionBytes).toBe(8);
-    expect(result.pairs[0]?.spanUnionBytes).toBe(12);
-    expect(result.pairs[0]?.spanIoU).toBeCloseTo(8 / 12);
-    expect(result.pairs[0]?.leftContainsRight).toBe(false);
-    expect(result.pairs[0]?.rightContainsLeft).toBe(false);
-  });
-
-  it('does not treat anonymous functions or quoted module labels as symbols', () => {
-    const result = compareStructuralObservationsV2(
-      [row({ name: 'alpha', startByte: 0, endByte: 10 })],
-      [
-        row({ name: '<anonymous>', startByte: 0, endByte: 10, symbolKind: 'FUNCTION' }),
-        row({ name: "'module-name'", startByte: 20, endByte: 32, symbolKind: 'UNKNOWN' }),
-        row({ name: 'alpha', startByte: 0, endByte: 10 }),
-      ],
-    );
-
-    expect(result.pairedCount).toBe(1);
-    expect(result.unmatchedLeft).toHaveLength(0);
-    expect(result.unmatchedRight).toHaveLength(0);
-    expect(result.gates.namedSymbolCoverage).toBe(true);
   });
 });

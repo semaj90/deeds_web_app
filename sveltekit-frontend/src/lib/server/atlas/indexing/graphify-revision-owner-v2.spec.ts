@@ -51,7 +51,6 @@ describe('Graphify source inventory schema v2', () => {
     const result = classifyGraphifySourceInventorySchemaV2({
       graphifyRunsPresent: true,
       graphifyFilesPresent: true,
-      runColumns: ['run_id','workspace_id','repository_revision','workspace_revision','source_manifest_digest','parser_contract_version','extraction_contract_version'],
       runColumns: ['run_id','workspace_id','repository_revision','workspace_revision','source_manifest_digest','source_manifest_source_count','parser_contract_version','extraction_contract_version'],
       fileColumns: ['file_id','workspace_id','source_ref','source_revision','code_source_revision','content_hash','byte_length','first_seen_run_id','last_seen_run_id'],
     });

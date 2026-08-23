@@ -21,6 +21,7 @@ import { registerDispatcherToolsAsACP, executeACPTool } from '$lib/server/acp/ac
 import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
 import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js';
 import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LDRToolInput } from './tools/ldr-research.js';
+import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './tools/phase18-reranker-tool.js';
 import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
 import { ATLAS_SEMANTIC_TOOL_DEFINITIONS, handleAtlasSemanticToolCall } from '$lib/server/atlas/atlas-semantic-tools.js';
 import { phase109aTools, getPhase109aToolDefinitions } from '$lib/server/mcp/phase109a-mcp-tools.js';
@@ -689,9 +690,15 @@ export function setupToolHandlers() {
           required: ['query'],
         },
       },
-      // phase18_reranker is intentionally not exposed here. Its current
-      // implementation is a randomized placeholder and cannot be an agentic
-      // ranking authority until a real XGBoost model + receipt gate exists.
+      // ─────────────────────────────────────────────────────────────────────
+      // Codebase Cluster Explain — VLM narrative for a GPU k-means cluster
+      // Step 8: Claude / Copilot MCP bridge
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'phase18_reranker',
+        description: PHASE18_RERANKER_TOOL_SCHEMA.description,
+        inputSchema: PHASE18_RERANKER_TOOL_SCHEMA.inputSchema as any,
+      },
       // ─────────────────────────────────────────────────────────────────────
       // Atlas Identity Audit Tools — Cross-Store Identity Parity Gate
       // ─────────────────────────────────────────────────────────────────────
@@ -5332,6 +5339,9 @@ export function setupToolHandlers() {
           content: [{ type: 'text', text: formatted }],
           isError: !ldrOutput.success,
         };
+      }
+      if (name === 'phase18_reranker') {
+        return await handlePhase18RerankerToolCall(request as any);
       }
       if (name === 'atlas.identity_audit') {
         const input = ATLAS_IDENTITY_AUDIT_SCHEMA.parse(args);
