@@ -2934,3 +2934,81 @@ concern, small enough to review quickly whenever picked up next. The **docker-co
 decision itself is still open** — `806c0ed2fe` edited multiple compose files but per its own audit
 history did not declare a winner; `docker-compose-duplication-remediation/tasks.md`'s operator
 decision is still pending regardless of this file-pile resolution.
+
+### Session handoff — 2026-08-23 (second review package: `CURRENT_STATE_REVIEW.md`/`SAFE_NEXT_COMMANDS.ps1`)
+
+A second external review package landed at repo root (`CURRENT_STATE_REVIEW.md`,
+`SAFE_NEXT_COMMANDS.ps1` — the other 3 files it references, `EVIDENCE_MANIFEST.json`,
+`WEB_VERIFICATION.md`, `workstation_handoff_20260822_192206.txt`, do not actually exist on disk;
+their content was pasted inline in chat instead). Ran every read-only/proof command from
+`SAFE_NEXT_COMMANDS.ps1` and verified each of the review's 7 numbered claims against live state:
+
+1. **768 canonical / Valkey naming** — no contradicting evidence found; consistent with this
+   session's earlier resolution (see the embedding-dimension entries above).
+2. **AST corpus parity still structurally blocked — CONFIRMED, still live.** Ran
+   `ATLAS_AST_PARITY_CORPUS_LIMIT=66 npx tsx scripts/atlas/prove-node-tree-sitter-corpus-parity-v2.mts`:
+   `status: "CORPUS_PARITY_MISMATCH"`, `fullParity: "16/66"` (up from the 5/66 the external handoff
+   cited — some improvement since, but still failing), `exactSpanParity: "17/66"`,
+   `EXACT_SPAN_MISMATCH: 463`. Root cause matches the review's claim: current
+   `python/miniforge_nlp_sidecar_v2.py` (line ~262) takes `byte_start`/`byte_end` from the chunker
+   completely unvalidated — no CRLF/LF remap, no repair layer at all.
+3. **CRLF/LF span-compat module deletion — CONFIRMED and PARTIALLY RESTORED.**
+   `git show --diff-filter=D --name-only a2e4dab329...` confirms `python/atlas_treesitter_span_compat.py`
+   and `python/test_atlas_treesitter_span_compat.py` were deleted by that commit. Inspected the
+   restored-candidate content first (pure, self-contained, fail-closed, zero external deps beyond
+   stdlib) before acting. Restored both files via `git restore --source=a2e4dab329^ --`, ran
+   `python -m pytest python/test_atlas_treesitter_span_compat.py python/test_miniforge_nlp_sidecar_v2_bytes.py`
+   → 7/7 pass. **NOT wired into the live sidecar** — found the old sidecar actually had *two*
+   overlapping CRLF-repair layers (`atlas_treesitter_span_compat.py`'s `resolve_chunk_byte_span`,
+   plus sidecar-local `_resolve_original_chunk_span`/`_span_matches_original`/
+   `_lf_boundary_to_original_map`, both deleted, both doing similar-but-not-identical remapping).
+   Wiring requires reconciling why two mechanisms existed and rewriting the live chunk-processing
+   loop (`miniforge_nlp_sidecar_v2.py` lines ~260-330 in the old version) — a real architectural
+   decision on a hot path of a running service, not a mechanical restore. **Deliberately stopped
+   here** rather than rewrite a live service loop blind. Module + tests are staged
+   (`python/atlas_treesitter_span_compat.py`, `python/test_atlas_treesitter_span_compat.py`), inert
+   until wired (nothing imports them yet, so zero behavior change from this restore alone).
+4. **XGBoost qid/QuantileDMatrix/device hardening — CONFIRMED ALREADY RESOLVED, review claim is
+   stale.** The review's claim #4 describes the pre-restore state; this session had already fixed it
+   earlier (commit `d7d396b369`). Re-verified live: `QuantileDMatrix` with `ref=dtrain`, `--device`
+   CLI arg with fail-closed `_find_any_value_containing(resolved_config, 'cuda')` check, `qid`
+   sorting/attachment via `prepare_grouped_ranking_dataset_v1()`. Updated
+   `openspec/changes/parent-atlas-xgboost-cuda-runtime-proof/tasks.md` sections 2-4 to `[x]` with
+   evidence. **Also found and restored a missed file**: the earlier XGBoost restore pass got the two
+   production modules but missed `python/tests/test_atlas_xgboost_grouped_ranking_v1.py` (also
+   deleted by `a2e4dab329`) — restored it, and **found+fixed a real, restore-independent bug**: its
+   `importlib.util.spec_from_file_location(...) → exec_module()` pattern didn't register the module
+   in `sys.modules` before exec, which fails under this machine's Python 3.13
+   (`dataclasses` needs `sys.modules[cls.__module__]` for `ClassVar`/`KW_ONLY` resolution). Fixed
+   with the standard `sys.modules[spec.name] = module` idiom; 4/4 pass after the fix. **Still open**:
+   the bounded synthetic GPU proof run itself (task section 1, `XGBOOST_GPU_RUNTIME_PROVEN`) — not
+   executed this pass either, same as noted in the earlier XGBoost restore entry above.
+5. **`a2e4dab329` deserves targeted, not wholesale, audit** — agreed, consistent with this session's
+   approach throughout (spot-checked, restored only what inspection confirmed safe).
+6. **Graphify migration additive-only / DB-connected proofs both re-run, both still pass.**
+   `audit-graphify-revision-migration-safety.mts` → `GRAPHIFY_REVISION_MIGRATION_ADDITIVE_ONLY_PROVEN`,
+   zero destructive findings. `prove-graphify-revision-migration-preflight.mts` → connected to the
+   real DB (read-only), `GRAPHIFY_REVISION_MIGRATION_PREFLIGHT_COMPATIBLE`, `v2Columns` already
+   present live (`workspaceRevision`, `sourceManifestDigest`, `codeSourceRevision` all `true`),
+   `baseSchemaConflicts: []`. No migration was applied; none needed applying — the v2 schema is
+   already live. `fanoutMayConsumeAsCanonical: false` in both — FANOUT still not authorized by this
+   proof pair alone.
+7. **D9 tooling gap** — already found and fixed by this session earlier (glob v7→v10 shim, npm
+   script wiring); not re-litigated this pass.
+8. **384-dim stale-canonical grep** — `rg "codebase_chunks_384|384-dim|legal-ai-redis|legal_ai_redis"`
+   across `AGENTS.md`/`CLAUDE.md`/`.cline*`/`.claude` → only hits frame 384 as legacy/compatibility,
+   none claim it canonical. No stale-policy drift found.
+
+**Committed this pass**: `python/atlas_treesitter_span_compat.py` (new),
+`python/test_atlas_treesitter_span_compat.py` (new), `python/tests/test_atlas_xgboost_grouped_ranking_v1.py`
+(restored + bugfixed), `openspec/changes/parent-atlas-xgboost-cuda-runtime-proof/tasks.md` (sections
+2-4 marked done with evidence).
+
+**Next-session priority, updated**: (1) decide + implement the CRLF span-compat wiring into
+`miniforge_nlp_sidecar_v2.py` (requires reconciling the two historical repair layers — read both
+old implementations first, in this doc's referenced scratch paths or via
+`git show a2e4dab329^:python/miniforge_nlp_sidecar_v2.py`); (2) re-run the 66-file corpus parity
+proof after wiring to see whether `fullParity` improves — that's the actual acceptance signal;
+(3) run the bounded XGBoost GPU proof; (4) everything else already queued above (ACE crash
+instrumentation, `codebase_chunks_768`/`_768_v2` split, Graphify FANOUT sequencing, docker-compose
+canonical-file decision).
