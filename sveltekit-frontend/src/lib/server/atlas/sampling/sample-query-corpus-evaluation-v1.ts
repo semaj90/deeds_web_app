@@ -360,8 +360,20 @@ export function compareSamplingMatricesV1(input: {
   }
   if (left.rowCount !== right.rowCount) throw new Error('SAMPLING_MATRIX_ROW_COUNT_MISMATCH');
 
-  const leftEvaluation = evaluateSamplingCorpusV1({ left: undefined as never, matrix: left, targetSet, sampleSize: input.sampleSize, seeds, producerRevision: input.producerRevision } as never);
-  const rightEvaluation = evaluateSamplingCorpusV1({ matrix: right, targetSet, sampleSize: input.sampleSize, seeds, producerRevision: input.producerRevision });
+  const leftEvaluation = evaluateSamplingCorpusV1({
+    matrix: left,
+    targetSet,
+    sampleSize: input.sampleSize,
+    seeds,
+    producerRevision: input.producerRevision,
+  });
+  const rightEvaluation = evaluateSamplingCorpusV1({
+    matrix: right,
+    targetSet,
+    sampleSize: input.sampleSize,
+    seeds,
+    producerRevision: input.producerRevision,
+  });
 
   const payload = {
     candidateSnapshotRevision: left.candidateSnapshotRevision,
