@@ -21,8 +21,8 @@ function candidate(overrides: Record<string, unknown> = {}) {
     startColumn: 0,
     endLine: 4,
     endColumn: 1,
-    treeNodeId: null,
-    symbolVersionId: null,
+    treeNodeId: 'tree:search-post',
+    symbolVersionId: 'symbol:search-post',
     workspaceRevision: 'ws-42',
     sourceRevision: 'src-7',
     engine: 'AST_GREP_NAPI',
@@ -51,7 +51,7 @@ describe('SvelteKitApiContractObserverV1', () => {
     expect(observation?.route).toBe('/api/search');
     expect(observation?.method).toBe('POST');
     expect(observation?.transport).toBe('HTTP');
-    expect(observation?.treeNodeId).toBeNull();
+    expect(observation?.treeNodeId).toBe('tree:search-post');
     expect(observation?.requiresCanonicalPromotion).toBe(true);
     expect(observation?.canonicalWritesAllowed).toBe(false);
   });
