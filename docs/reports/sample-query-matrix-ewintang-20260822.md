@@ -4,69 +4,130 @@ Date: 2026-08-22
 
 ## Scope
 
-This tranche introduces a measurement-only sample/query matrix aligned by `CandidateOrdinal`.
-It does **not** create a new retrieval lane, identity authority, production sampler, or promotion path.
+This lane is measurement-only and aligned by `CandidateOrdinal`. It does **not** create a new retrieval vote, identity authority, production sampler, or promotion path.
 
-## Contracts
+Current upstream behavior still supports the original experiment design:
 
-- `SampleQueryMatrixV1`
-- `SamplingDecisionV1`
-- `SamplingEvaluationV1`
+- PyTorch row-L2 normalization divides each vector by its p-norm with an epsilon floor.
+- Row-level length-squared sampling is therefore expected to become uninformative when all row norms are equal.
+- pgvector supports exact search, subvector indexing with full-vector reranking, half-precision indexing, and binary quantization; these remain executor/index experiments rather than semantic identity changes.
 
-Matrix roles:
+## Current-main repair
 
-- `CANDIDATE_FEATURE`
-- `SEMANTIC_RESIDUAL`
-- `LATENT_ROUTING`
+A merge on `main` had interleaved the original probability-only `SampleQueryMatrixV1` implementation with the newer CandidateOrdinal-bound implementation. The same corruption existed in `sample-query-matrix-v1.spec.ts`.
 
-Normalization is explicit and checksum-bearing:
+On `agent/sample-query-corpus-current-main-20260822` both files are replaced with the clean CandidateOrdinal-bound contract/spec before any corpus evaluation is layered on top.
 
-- `NONE`
-- `COLUMN_STANDARDIZED`
-- `ROW_L2`
+The retained contract requires:
 
-Sampling policies:
+- a complete `CandidateOrdinalMapV1` row world;
+- dense ordinals `0..N-1`;
+- explicit source-matrix revision/checksum;
+- explicit normalization;
+- deterministic fixture PRNG seed;
+- no identity authority;
+- no retrieval vote;
+- no canonical writes;
+- no promotion authorization.
 
-- `LENGTH_SQUARED`
-- `UNIFORM`
-- `TOP_K_ROW_NORM`
+## Corpus evaluation additions
 
-## Critical proof question
+Added:
 
-If all rows are L2-normalized, row norms are equal and row-level length-squared sampling degenerates toward uniform sampling. The contract records row squared norms and their coefficient of variation and exposes `lengthSquaredDegeneratesTowardUniform` rather than assuming the sampling policy remains informative.
+- `sample-query-corpus-evaluation-v1.ts`
+- `sample-query-corpus-evaluation-v1.spec.ts`
+- `sample-query-artifact-adapters-v1.ts`
+- `scripts/atlas/evaluate-sample-query-corpus-v1.mts`
+- `scripts/atlas/audit-sample-query-corpus-readiness.mts`
 
-## Safety invariants
+### SamplingTargetSetV1
 
-Every receipt records:
+Target truth is revision/checksum bound to the same candidate world. `EXACT_TOP_K` is accepted only from `CandidateOrdinalSetV1` with `approximate=false` and a verified result checksum.
 
-- `identityAuthority=false`
-- `retrievalVoteProduced=false`
-- `canonicalWritesAttempted=false`
-- `promotionAuthorized=false`
+### Candidate feature matrix
 
-The bounded proof runner uses fixture-only data and performs no Postgres, Qdrant, Neo4j, or Valkey reads or writes.
-
-## Proof sequence
+`CandidateFeatureColumnarV1` is projected as:
 
 ```text
-EWINTANG-00 MATRIX ASSUMPTIONS RECORDED          IMPLEMENTED_UNPROVEN
-EWINTANG-01 SAMPLE/QUERY ACCESS DEFINED          IMPLEMENTED_UNPROVEN
-EWINTANG-02 NORMALIZATION EFFECT PROVEN          WRITTEN_UNRUN
-EWINTANG-03 DETERMINISTIC PRNG RECEIPT           IMPLEMENTED_UNPROVEN
-EWINTANG-04 LOW-RANK FIXTURE PARITY              NOT IMPLEMENTED
-EWINTANG-05 CANDIDATE RECALL MEASURED            FIXTURE SURFACE WRITTEN_UNRUN
-EWINTANG-06 NO NEW RETRIEVAL VOTE                CONTRACTUALLY GUARDED
-EWINTANG-07 NO CANONICAL IDENTITY                CONTRACTUALLY GUARDED
-EWINTANG-08 RTX GEMM ACCELERATION                NOT IMPLEMENTED
+[12 feature values | 12 presence bits]
 ```
 
+so:
+
+```text
+missing evidence = value 0, presence 0
+measured zero    = value 0, presence 1
+```
+
+The default corpus experiment column-standardizes only present feature values and leaves presence bits unchanged.
+
+### Semantic matrix
+
+The semantic sampling view is joined to CandidateOrdinal by `packetKey`, never by Parquet/NDJSON row number. It explicitly row-L2 normalizes the 768-dimensional values before measuring row-norm sampling.
+
+The preferred source on current main is now:
+
+```text
+sveltekit-frontend/scripts/atlas/export-frozen-semantic-v2-source.mts
+```
+
+rather than the older packet-key-only 5K Parquet freeze. That exporter already requires revision-qualified Graphify source/workspace lineage and emits:
+
+- canonical/packet key;
+- canonical source revision;
+- source ref;
+- `semantic_768` representation ID;
+- representation revision;
+- workspace revision;
+- 768-dimensional embedding;
+- NDJSON checksum receipt;
+- read-only database transaction / no writes.
+
+The real corpus evaluator verifies those fields against the supplied `CandidateOrdinalMapV1` before sampling.
+
+## Multi-seed measurement
+
+For each matrix and each fixed seed, the evaluator records:
+
+- length-squared recall;
+- uniform recall;
+- top-k-row-norm recall;
+- recall mean/std/min/max;
+- pairwise selection Jaccard across seeds;
+- p50/p95/max sampling latency;
+- deterministic decision-set checksum;
+- approximate dense value bytes.
+
+The comparison receipt remains:
+
+```text
+measurementOnly = true
+identityAuthority = false
+retrievalVoteProduced = false
+canonicalWritesAttempted = false
+promotionAuthorized = false
+```
+
+## Current real-corpus blockers
+
+The repository can now name the missing artifacts precisely instead of guessing:
+
+1. **CandidateOrdinalMapV1 file** — the contract/materializer exists, but a durable real-corpus JSON export owner has not yet been identified.
+2. **CandidateFeatureColumnarV1 real corpus** — materializer and deterministic Arrow writer/readback exist, but current repo usage is proof/spec scoped; a corpus-wide producer in the same candidate world is not yet proven.
+3. **Exact CandidateOrdinalSetV1** — the contract exists, but the sampling target must come from an exact executor result already bound to the same candidate snapshot and `ordinalMapChecksum`; ANN-local ordinals are not accepted.
+
+The evaluator does not reconstruct any of these from row position, executor-local IDs, or partial identity fields.
+
 ## Workstation commands
+
+### 1. Focused fixture proofs
 
 From `sveltekit-frontend`:
 
 ```powershell
 npx vitest run `
-  src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts
+  src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts `
+  src/lib/server/atlas/sampling/sample-query-corpus-evaluation-v1.spec.ts
 ```
 
 Then:
@@ -76,21 +137,52 @@ npx tsx scripts/atlas/prove-sample-query-matrix-v1.mts `
   --output=../docs/reports/sample-query-matrix-proof-v1.json
 ```
 
-A passing fixture receipt proves only deterministic CandidateOrdinal-aligned sampling behavior and the L2-normalization degeneracy check. It does not prove low-rank utility on the real corpus.
+### 2. Check real corpus artifact readiness
 
-## Next real experiment
+```powershell
+npx tsx scripts/atlas/audit-sample-query-corpus-readiness.mts `
+  --ordinal-map=<candidate-ordinal-map.json> `
+  --semantic-source=<semantic-768-v2-source.ndjson> `
+  --semantic-receipt=<semantic-768-v2-source-receipt.json> `
+  --feature-columnar=<candidate-feature-columnar.json> `
+  --exact-candidate-set=<exact-candidate-ordinal-set.json>
+```
 
-Materialize the same `CandidateOrdinal` candidate world into two derived matrices:
+### 3. Real measurement after all inputs are present
 
-1. row-L2-normalized semantic rows;
-2. an explicitly defined unnormalized or column-standardized candidate-feature / residual matrix.
+```powershell
+npx tsx scripts/atlas/evaluate-sample-query-corpus-v1.mts `
+  --ordinal-map=<candidate-ordinal-map.json> `
+  --semantic-source=<semantic-768-v2-source.ndjson> `
+  --semantic-receipt=<semantic-768-v2-source-receipt.json> `
+  --feature-columnar=<candidate-feature-columnar.json> `
+  --exact-candidate-set=<exact-candidate-ordinal-set.json> `
+  --sample-size=64 `
+  --target-k=10 `
+  --seeds=1,7,42,99,2026,65537,104729 `
+  --output=../docs/reports/sample-query-real-corpus-v1.json
+```
 
-Run fixed seeds over the same target ordinals and compare:
+## Proof state
 
-- Recall@sample-size
-- overlap with exact/top-k target candidates
-- variance across seeds
-- sampling time
-- matrix bytes
+```text
+EWINTANG-00 MATRIX ASSUMPTIONS RECORDED          IMPLEMENTED_UNPROVEN
+EWINTANG-01 SAMPLE/QUERY ACCESS DEFINED          IMPLEMENTED_UNPROVEN
+EWINTANG-02 NORMALIZATION EFFECT                 FIXTURE WRITTEN_UNRUN
+EWINTANG-03 DETERMINISTIC PRNG RECEIPT           IMPLEMENTED_UNPROVEN
+EWINTANG-04 LOW-RANK FIXTURE PARITY              EXISTING PYTHON CHALLENGER / NOT CANDIDATE-WORLD PROMOTED
+EWINTANG-05 MULTI-SEED CANDIDATE RECALL          IMPLEMENTED_UNPROVEN
+EWINTANG-06 NO NEW RETRIEVAL VOTE                CONTRACTUALLY GUARDED
+EWINTANG-07 NO CANONICAL IDENTITY                CONTRACTUALLY GUARDED
+EWINTANG-08 RTX GEMM ACCELERATION                NOT IMPLEMENTED
 
-Only if the length-squared policy improves bounded coverage over uniform should a low-rank approximation or RTX acceleration tranche be opened.
+SAMPLE QUERY MAIN MERGE CORRUPTION               REPAIRED_ON_BRANCH
+REAL SEMANTIC V2 INPUT ADAPTER                   IMPLEMENTED_UNPROVEN
+REAL FEATURE COLUMNAR ADAPTER                    IMPLEMENTED_UNPROVEN
+EXACT TARGET ADMISSION                           IMPLEMENTED_UNPROVEN
+REAL CORPUS EVALUATOR                            IMPLEMENTED_UNPROVEN
+REAL CORPUS RECEIPT                              NOT YET PRODUCED
+LOW-RANK PROMOTION                               NOT AUTHORIZED
+```
+
+Only if the real feature/residual matrix's length-squared policy improves bounded target coverage over uniform should a low-rank approximation promotion experiment be opened. RTX acceleration is a later performance gate, not a prerequisite for establishing sampling utility.
