@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createHash } from 'node:crypto';
-import { ROUTING_FEATURE_NAMES, stableRoutingChecksum, type QueryRoutingFeatureVectorV1, type ToolTrainingExampleV1 } from './contracts.js';
+import { ROUTING_FEATURE_NAMES, stableRoutingChecksum, type ToolTrainingExampleV1 } from './contracts.js';
+import type { QueryRoutingFeatureVectorV1 } from './query-routing-features-v1.js';
 
 export interface EncoderJsonlRowV1 {
   schemaVersion: 'atlas.encoder-jsonl-row.v1';

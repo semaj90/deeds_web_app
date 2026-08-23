@@ -90,7 +90,7 @@ export function projectQueryFeaturesV1(query: string): QueryFeatureProjectionV1 
     queryDigest: createHash('sha256').update(normalized, 'utf8').digest('hex'),
     tokenCount: tokens.length,
     charCount: normalized.length,
-    identifierCount: tokens.filter((token) => IDENTIFIER.test(token) && (token.includes('.') || /[A-Z_$]/.test(token) || token.includes('_'))).length,
+    identifierCount: tokens.filter((token) => IDENTIFIER.test(String(token)) && (String(token).includes('.') || /[A-Z_$]/.test(String(token)) || String(token).includes('_'))).length,
     quotedSpanCount: (normalized.match(/(['"`])(?:(?!\1).)*\1/g) ?? []).length,
     pathLikeCount: (normalized.match(PATH_LIKE) ?? []).length,
     extensionCount: (normalized.match(EXTENSION) ?? []).length,
