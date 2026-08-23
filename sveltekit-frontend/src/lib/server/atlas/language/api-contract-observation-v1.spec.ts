@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildApiContractObservationV1 } from './api-contract-observation-v1.js';
+import {
+  compileApiContractObservationV1,
+  type ApiContractEvidenceSourceV1,
+  type ApiContractNominationV1,
+} from './api-contract-observation-v1.js';
 
 describe('ApiContractObservationV1', () => {
   it('preserves revision-qualified schema links without inventing canonical coordinates', () => {
@@ -68,11 +73,8 @@ describe('ApiContractObservationV1', () => {
     expect(a.observationId).toBe(b.observationId);
     expect(a.inputSchemaRefs).toEqual(b.inputSchemaRefs);
     expect(a.evidenceRefs).toEqual(b.evidenceRefs);
-import {
-  compileApiContractObservationV1,
-  type ApiContractEvidenceSourceV1,
-  type ApiContractNominationV1,
-} from './api-contract-observation-v1.js';
+  });
+});
 
 function nomination(treeNodeId: string | null): ApiContractNominationV1 {
   const evidenceSources: ApiContractEvidenceSourceV1[] = ['TREE_SITTER', 'AST_GREP', 'TS_MORPH', 'ZOD'];
@@ -109,7 +111,7 @@ function nomination(treeNodeId: string | null): ApiContractNominationV1 {
   };
 }
 
-describe('ApiContractObservationV1', () => {
+describe('compileApiContractObservationV1', () => {
   it('requires a joined canonical tree node before producing an observation', () => {
     expect(() => compileApiContractObservationV1(nomination(null))).toThrow(
       'API_CONTRACT_CANONICAL_TREE_NODE_REQUIRED',

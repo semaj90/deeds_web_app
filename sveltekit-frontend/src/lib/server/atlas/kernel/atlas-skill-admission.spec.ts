@@ -64,7 +64,7 @@ describe('Atlas skill admission', () => {
       pyprojectSha256: sha256Bytes(pyproject),
       sourceTreeSha256: hashSkillSourceTree(sourceFiles),
       dependencyLockSha256: null,
-      declaredHostRequests: ['RUN_ANALYZER'],
+      declaredHostRequests: ['RETRIEVE'],
       permissions,
       lintPassed: true,
       metadataPassed: true,
@@ -128,7 +128,7 @@ describe('Atlas skill admission', () => {
       pyprojectSha256: 'b'.repeat(64),
       sourceTreeSha256: 'c'.repeat(64),
       dependencyLockSha256: null,
-      declaredHostRequests: ['RUN_ANALYZER'],
+      declaredHostRequests: ['RETRIEVE'],
       permissions: {
         ...permissions,
         networkAccess: 'APPROVED_EXTERNAL',

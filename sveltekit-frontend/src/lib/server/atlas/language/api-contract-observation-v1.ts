@@ -25,59 +25,49 @@ export const ApiContractEvidenceSourceV1Schema = z.enum([
 ]);
 export type ApiContractEvidenceSourceV1 = z.infer<typeof ApiContractEvidenceSourceV1Schema>;
 
-export const ApiContractObservationV1Schema = z.object({
+/**
+ * Base object for both observation paths:
+ *  - buildApiContractObservationV1(): a lighter, coordinate-free path used
+ *    before a canonical structural join exists (treeNodeId/symbolVersionId
+ *    may be null; coordinate/evidenceSources/grammarRevision/
+ *    semanticEngineRevision/retrievalVoteAdded are absent).
+ *  - compileApiContractObservationV1(): the canonical-coordinate-joined path
+ *    (coordinate required, treeNodeId non-null; structuralEngine/
+ *    semanticEngine are absent in favor of evidenceSources).
+ * Kept as an un-exported pre-refine base so ApiContractObservationInputV1Schema
+ * can still use .omit() (unavailable once .superRefine() is chained on).
+ */
+const ApiContractObservationV1BaseSchema = z.object({
   schema: z.literal('atlas.api-contract-observation.v1'),
   observationId: z.string().min(1),
   sourceRef: z.string().min(1),
   treeNodeId: z.string().min(1).nullable(),
+  symbolVersionId: z.string().min(1).nullable(),
   workspaceRevision: z.string().min(1),
   sourceRevision: z.string().min(1),
-  coordinate: LanguageSourceCoordinateV1Schema,
-  treeNodeId: z.string().min(1),
-  symbolVersionId: z.string().min(1).nullable(),
+  coordinate: LanguageSourceCoordinateV1Schema.optional(),
   transport: ApiContractTransportV1Schema,
   method: z.string().min(1).nullable(),
   route: z.string().min(1).nullable(),
-  handlerSymbol: z.string().min(1).nullable(),
   handlerSymbol: z.string().min(1),
   inputSchemaRefs: z.array(z.string().min(1)),
   outputSchemaRefs: z.array(z.string().min(1)),
   authRequirements: z.array(z.string().min(1)),
   sideEffects: z.array(z.string().min(1)),
-  workspaceRevision: z.string().min(1),
-  sourceRevision: z.string().min(1),
-  structuralEngine: z.enum(['TREE_SITTER', 'AST_GREP', 'TREE_SITTER_PLUS_AST_GREP']),
-  semanticEngine: z.enum(['TS_MORPH', 'LSP']).nullable(),
+  structuralEngine: z.enum(['TREE_SITTER', 'AST_GREP', 'TREE_SITTER_PLUS_AST_GREP']).optional(),
+  semanticEngine: z.enum(['TS_MORPH', 'LSP']).nullable().optional(),
+  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1).optional(),
   evidenceRefs: z.array(z.string().min(1)).min(1),
+  grammarRevision: z.string().min(1).nullable().optional(),
+  semanticEngineRevision: z.string().min(1).nullable().optional(),
+  producerRevision: z.string().min(1),
   requiresCanonicalPromotion: z.literal(true),
   canonicalWritesAllowed: z.literal(false),
-  producerRevision: z.string().min(1),
+  retrievalVoteAdded: z.literal(false).optional(),
 }).strict();
-export type ApiContractObservationV1 = z.infer<typeof ApiContractObservationV1Schema>;
 
-export const ApiContractObservationInputV1Schema = ApiContractObservationV1Schema.omit({
-  schema: true,
-  observationId: true,
-  requiresCanonicalPromotion: true,
-  canonicalWritesAllowed: true,
-});
-export type ApiContractObservationInputV1 = z.infer<typeof ApiContractObservationInputV1Schema>;
-
-function stable(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.entries(value as Record<string, unknown>)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
-  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1),
-  evidenceRefs: z.array(z.string().min(1)).min(1),
-  grammarRevision: z.string().min(1).nullable(),
-  semanticEngineRevision: z.string().min(1).nullable(),
-  producerRevision: z.string().min(1),
-  requiresCanonicalPromotion: z.literal(true),
-  canonicalWritesAllowed: z.literal(false),
-  retrievalVoteAdded: z.literal(false),
-}).strict().superRefine((value, ctx) => {
+export const ApiContractObservationV1Schema = ApiContractObservationV1BaseSchema.superRefine((value, ctx) => {
+  if (!value.coordinate) return;
   if (value.coordinate.treeNodeId !== value.treeNodeId) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -102,34 +92,20 @@ function stable(value: unknown): string {
 });
 export type ApiContractObservationV1 = z.infer<typeof ApiContractObservationV1Schema>;
 
-export const ApiContractNominationV1Schema = z.object({
-  schema: z.literal('atlas.api-contract-nomination.v1'),
-  sourceRef: z.string().min(1),
-  workspaceRevision: z.string().min(1),
-  sourceRevision: z.string().min(1),
-  coordinate: LanguageSourceCoordinateV1Schema,
-  transport: ApiContractTransportV1Schema,
-  method: z.string().min(1).nullable(),
-  route: z.string().min(1).nullable(),
-  handlerSymbol: z.string().min(1),
-  inputSchemaRefs: z.array(z.string().min(1)).default([]),
-  outputSchemaRefs: z.array(z.string().min(1)).default([]),
-  authRequirements: z.array(z.string().min(1)).default([]),
-  sideEffects: z.array(z.string().min(1)).default([]),
-  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1),
-  evidenceRefs: z.array(z.string().min(1)).min(1),
-  grammarRevision: z.string().min(1).nullable(),
-  semanticEngineRevision: z.string().min(1).nullable(),
-  producerRevision: z.string().min(1),
-}).strict();
-export type ApiContractNominationV1 = z.infer<typeof ApiContractNominationV1Schema>;
+export const ApiContractObservationInputV1Schema = ApiContractObservationV1BaseSchema.omit({
+  schema: true,
+  observationId: true,
+  requiresCanonicalPromotion: true,
+  canonicalWritesAllowed: true,
+});
+export type ApiContractObservationInputV1 = z.infer<typeof ApiContractObservationInputV1Schema>;
 
-function stableStringify(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   if (value && typeof value === 'object') {
     return `{${Object.entries(value as Record<string, unknown>)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
+      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
       .join(',')}}`;
   }
   return JSON.stringify(value) ?? 'null';
@@ -172,6 +148,42 @@ export function buildApiContractObservationV1(
     ...input,
     requiresCanonicalPromotion: true,
     canonicalWritesAllowed: false,
+  });
+}
+
+export const ApiContractNominationV1Schema = z.object({
+  schema: z.literal('atlas.api-contract-nomination.v1'),
+  sourceRef: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  coordinate: LanguageSourceCoordinateV1Schema,
+  transport: ApiContractTransportV1Schema,
+  method: z.string().min(1).nullable(),
+  route: z.string().min(1).nullable(),
+  handlerSymbol: z.string().min(1),
+  inputSchemaRefs: z.array(z.string().min(1)).default([]),
+  outputSchemaRefs: z.array(z.string().min(1)).default([]),
+  authRequirements: z.array(z.string().min(1)).default([]),
+  sideEffects: z.array(z.string().min(1)).default([]),
+  evidenceSources: z.array(ApiContractEvidenceSourceV1Schema).min(1),
+  evidenceRefs: z.array(z.string().min(1)).min(1),
+  grammarRevision: z.string().min(1).nullable(),
+  semanticEngineRevision: z.string().min(1).nullable(),
+  producerRevision: z.string().min(1),
+}).strict();
+export type ApiContractNominationV1 = z.infer<typeof ApiContractNominationV1Schema>;
+
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stableStringify(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
 function observationId(value: ApiContractNominationV1, treeNodeId: string): string {
   return `api-contract:${createHash('sha256').update(stableStringify({
     sourceRef: value.sourceRef,
@@ -181,8 +193,8 @@ function observationId(value: ApiContractNominationV1, treeNodeId: string): stri
     method: value.method,
     route: value.route,
     handlerSymbol: value.handlerSymbol,
-    inputSchemaRefs: [...value.inputSchemaRefs].sort(),
-    outputSchemaRefs: [...value.outputSchemaRefs].sort(),
+    inputSchemaRefs: [...new Set(value.inputSchemaRefs)].sort(),
+    outputSchemaRefs: [...new Set(value.outputSchemaRefs)].sort(),
     producerRevision: value.producerRevision,
   })).digest('hex')}`;
 }
