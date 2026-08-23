@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * FEAT-03C-JS — immutable file-backed readback verification for
  * CandidateFeatureColumnarV1 Arrow IPC FILE artifacts.

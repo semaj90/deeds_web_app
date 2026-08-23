@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
 import { loadMutationAwarenessV1 } from '$lib/server/atlas/graph/mutation-awareness.js';
-import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
+import { createAtlasRapidsPageRankClient, type AtlasPageRankReceiptV1, type AtlasPageRankResultV1 } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 import { createAtlasRapidsSemantic512Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic512-client.js';
@@ -159,7 +159,9 @@ export const POST: RequestHandler = async (event) => {
     const lexicalErrors = lexicalResult.status === 'rejected'
       ? [lexicalResult.reason instanceof Error ? lexicalResult.reason.message : String(lexicalResult.reason)]
       : [];
-    const pprReceipt = pprResult.status === 'fulfilled' ? pprResult.value : null;
+    const pprReceipt: AtlasPageRankReceiptV1 | null = pprResult.status === 'fulfilled'
+      ? pprResult.value as AtlasPageRankReceiptV1 | null
+      : null;
     const pprErrors = pprResult.status === 'rejected'
       ? [pprResult.reason instanceof Error ? pprResult.reason.message : String(pprResult.reason)]
       : [];
@@ -219,7 +221,7 @@ export const POST: RequestHandler = async (event) => {
     const lexicalByPacket = new Map(
       (lexicalReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
     );
-    const pprByNode = new Map(
+    const pprByNode = new Map<string, AtlasPageRankResultV1>(
       (pprReceipt?.results ?? []).map((score) => [score.nodeKey, score]),
     );
 
@@ -240,8 +242,8 @@ export const POST: RequestHandler = async (event) => {
         sourceRef: node.sourceRef,
         sourceMutationStatus,
         sourceFreshnessProven: sourceMutationStatus === 'FRESH',
-        semanticCosine: exactSemantic?.cosineSimilarity ?? qdrantSemantic?.score ?? null,
-        lexicalScore: lexical?.score ?? null,
+        semanticCosine: exactSemantic?.cosineSimilarity ?? (qdrantSemantic as { score?: number } | undefined)?.score ?? null,
+        lexicalScore: (lexical as { score?: number } | undefined)?.score ?? null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
         astMatch: null,
         personalizedPageRank: queryPpr?.score ?? staticGraph?.personalizedPageRank ?? null,

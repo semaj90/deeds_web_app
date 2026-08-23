@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.graphify-revision-owner.v2",
+  "status": "BLOCKED_SCHEMA_MISSING",
+  "authority": {
+    "schema": "atlas.graphify-revision-authority.v2",
+    "authorityRevision": "atlas.graphify-revision-authority.workspace-manifest-plus-source-sha256.v2",
+    "workspaceRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "workspaceRevision": "sha256:643bd33335d78ed3e0bcd158b6b46afe815be6b2dbc78d0e6ba057c2e3b42956",
+    "workspaceRevisionKind": "SHA256_SOURCE_MANIFEST",
+    "workspaceSourceManifestDigest": "643bd33335d78ed3e0bcd158b6b46afe815be6b2dbc78d0e6ba057c2e3b42956",
+    "baseGitCommitOid": "875dc7f683c2f1f5871a2e37be08e1195723ec62",
+    "baseGitTreeOid": "61a7fc3c7f0cb07826cb63c74a432125229a9f3e",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts",
+    "sourceRevision": "sha256:fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
+    "sourceRevisionKind": "SHA256_EXACT_UTF8_SOURCE_BYTES",
+    "sourceContentDigest": "fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
+    "sourceByteLength": 3254,
+    "workspaceRevisionCreatedByWriter": true,
+    "sourceRevisionCreatedByWriter": true,
+    "callerSuppliedWorkspaceRevisionAccepted": false,
+    "callerSuppliedSourceRevisionAccepted": false,
+    "gitCommitIsProvenanceOnly": true,
+    "canonicalWritesAllowed": false,
+    "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+    "authorityChecksum": "eee0e5411c6b983123eb8eb88ce0a37783d9322d1d657b4989847db3b29601b7"
+  },
+  "storage": {
+    "graphifyRunsPresent": false,
+    "graphifyFilesPresent": false,
+    "requiredRunColumnsPresent": false,
+    "requiredFileColumnsPresent": false,
+    "logicalWorkspaceRevisionColumnsPresent": false,
+    "logicalCodeSourceRevisionColumnPresent": false,
+    "productionWriterPath": "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts",
+    "productionWriterPresent": true,
+    "productionWriterCreatesWorkspaceRevision": true,
+    "productionWriterCreatesSourceRevision": true,
+    "persistedMatchingRows": 0,
+    "notes": [
+      "Read-only independent v2 proof; no canonical write attempted.",
+      "Current materializer statically references the v2 two-table authority coordinates."
+    ]
+  },
+  "durableOwnerBound": false,
+  "revisionOwnerProven": false,
+  "fanoutMayConsumeAsCanonical": false,
+  "blockers": [
+    "GRAPHIFY_LINEAGE_SCHEMA_NOT_READY"
+  ],
+  "canonicalWriteAttempted": false,
+  "readOnly": true,
+  "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+  "ownerChecksum": "bb1fc96de3f7c23bca70a67243264b4ac0a330b6551fc0639e0778e58fd3c237",
+  "schemaObservation": {
+    "schema": "atlas.graphify-source-inventory-schema.v2",
+    "graphifyRunsPresent": false,
+    "graphifyFilesPresent": false,
+    "runColumns": [],
+    "fileColumns": [],
+    "requiredRunColumnsPresent": false,
+    "requiredFileColumnsPresent": false,
+    "v2Ready": false,
+    "missingRunColumns": [
+      "run_id",
+      "workspace_id",
+      "repository_revision",
+      "workspace_revision",
+      "source_manifest_digest",
+      "source_manifest_source_count",
+      "parser_contract_version",
+      "extraction_contract_version"
+    ],
+    "missingFileColumns": [
+      "file_id",
+      "workspace_id",
+      "source_ref",
+      "source_revision",
+      "code_source_revision",
+      "content_hash",
+      "byte_length",
+      "first_seen_run_id",
+      "last_seen_run_id"
+    ]
+  },
+  "workspaceOrigin": {
+    "record": {
+      "schema": "atlas.workspace-revision.v1",
+      "workspaceRevision": "sha256:643bd33335d78ed3e0bcd158b6b46afe815be6b2dbc78d0e6ba057c2e3b42956",
+      "repositoryId": "semaj90/deeds_web_app",
+      "gitObjectFormat": "sha1",
+      "baseCommitOid": "875dc7f683c2f1f5871a2e37be08e1195723ec62",
+      "baseTreeOid": "61a7fc3c7f0cb07826cb63c74a432125229a9f3e",
+      "gitHeadRef": "refs/heads/archive/orphaned-root-src-tree-20260822",
+      "dirty": true,
+      "sourceCount": 1,
+      "sourceManifestDigest": "643bd33335d78ed3e0bcd158b6b46afe815be6b2dbc78d0e6ba057c2e3b42956",
+      "sourceRevisionAlgorithm": "atlas.code.source-revision.v1",
+      "generatedAt": "2026-08-23T01:04:10.722Z",
+      "readOnlyObservation": true,
+      "canonicalAuthority": false,
+      "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+      "checksum": "ff6b3bdf20af5ca0fff329b16e4fb262845fa3dc28a04a115d953f729b83065a"
+    },
+    "skipped": []
+  },
+  "boundedSourceScope": [
+    "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts"
+  ]
+}

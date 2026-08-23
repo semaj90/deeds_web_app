@@ -9,6 +9,7 @@
  */
 
 import type { QdrantHit } from '../turbovec/turbovec-rerank.js';
+export type { QdrantHit } from '../turbovec/turbovec-rerank.js';
 
 export interface CrossEncoderCandidate {
   packet_key: string;
@@ -62,7 +63,16 @@ export async function checkCrossEncoderHealth(): Promise<CrossEncoderHealthStatu
     });
 
     if (!res.ok) return null;
-    return (await res.json()) as CrossEncoderHealthStatus;
+    const payload = (await res.json()) as Partial<CrossEncoderHealthStatus>;
+    if (
+      (payload.status !== 'healthy' && payload.status !== 'unhealthy') ||
+      typeof payload.model_loaded !== 'boolean' ||
+      typeof payload.device !== 'string' ||
+      typeof payload.model_id !== 'string'
+    ) {
+      return null;
+    }
+    return payload as CrossEncoderHealthStatus;
   } catch (err) {
     console.warn('[crossencoder-client] health check failed:', err);
     return null;
@@ -165,6 +175,7 @@ export function blendCrossEncoderScore(
   ceWeight: number = 0.30
 ): number {
   const semantic = hit.score || 0;
-  const crossencoder = hit.crossencoder_score || 0;
+  if (hit.crossencoder_score == null) return semantic;
+  const crossencoder = hit.crossencoder_score;
   return semantic * (1 - ceWeight) + crossencoder * ceWeight;
 }

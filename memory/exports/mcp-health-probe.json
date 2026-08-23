@@ -1,17 +1,17 @@
 {
-  "timestamp": "2026-07-08T16:52:11.602Z",
+  "timestamp": "2026-08-22T20:58:20.438Z",
   "configPath": "C:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
-  "totalMcpEntries": 6,
+  "totalMcpEntries": 1,
   "liveMcp": 1,
   "mcpUpButDisabled": 0,
-  "customHttpOnly": 1,
+  "customHttpOnly": 0,
   "broken": 0,
   "notListening": 0,
-  "localStdio": 4,
+  "localStdio": 0,
   "wsl2DockerNotes": {
     "rule": "Loopback 127.0.0.1 works when MCPs run on Windows host. Docker containers calling host services need host.docker.internal.",
     "detected": {
-      "windows_host_loopback_count": 2,
+      "windows_host_loopback_count": 1,
       "docker_internal_count": 0
     }
   },
@@ -22,60 +22,19 @@
       "url": "http://127.0.0.1:8788/mcp",
       "enabledInConfig": true,
       "toolsListStatus": 200,
-      "toolsListMs": 262,
-      "toolCount": 129,
+      "toolsListMs": 81,
+      "toolCount": 175,
       "sampleTools": [
         "kb.organize_messy_text",
         "kb.extract_citations",
         "kb.trace_search",
         "atlas.query",
-        "kb.wiki_note_lookup"
+        "trace_search"
       ],
       "mcpHealthy": true,
       "healthEndpointStatus": 200,
-      "healthBody": "{\"ok\":true,\"version\":\"1.0.0\",\"uptime\":6144.9699954}",
+      "healthBody": "{\"ok\":true,\"degraded\":false,\"version\":\"1.0.0\",\"uptime\":8459.5367682,\"dependencies\":{\"mcp\":true,\"post",
       "classification": "live_mcp"
-    },
-    {
-      "name": "turbovec",
-      "type": "remote",
-      "url": "http://127.0.0.1:8791/mcp",
-      "enabledInConfig": false,
-      "toolsListStatus": 404,
-      "toolsListMs": 6,
-      "mcpHealthy": false,
-      "errorBody": "{\"error\": \"not found\"}",
-      "healthEndpointStatus": 200,
-      "healthBody": "{\"ok\": true, \"indexed\": 0, \"dim\": 64, \"bits\": 4, \"turbovec\": true, \"collection\": \"codebase_chunks_76",
-      "classification": "custom_http_only"
-    },
-    {
-      "name": "engram-embed",
-      "type": "local",
-      "command": "node ./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs --stdio",
-      "enabledInConfig": true,
-      "classification": "local_stdio_not_probed"
-    },
-    {
-      "name": "ldr-research",
-      "type": "local",
-      "command": "node ./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs",
-      "enabledInConfig": true,
-      "classification": "local_stdio_not_probed"
-    },
-    {
-      "name": "gemma4-offload",
-      "type": "local",
-      "command": "node ./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs",
-      "enabledInConfig": true,
-      "classification": "local_stdio_not_probed"
-    },
-    {
-      "name": "atlas-tools",
-      "type": "local",
-      "command": "node ./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
-      "enabledInConfig": true,
-      "classification": "local_stdio_not_probed"
     }
   ]
 }

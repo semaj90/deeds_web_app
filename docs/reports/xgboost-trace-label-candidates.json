@@ -1,0 +1,788 @@
+{
+  "schema": "atlas.xgboost-trace-label-candidate-audit.v1",
+  "generated_at": "2026-08-22T17:09:48.322Z",
+  "read_only": true,
+  "database_url_role": "proxy_or_shared_database_no_migrations",
+  "traces_loaded": 1100,
+  "trace_labels": 10,
+  "packets_scanned": 61660,
+  "trace_ref_shape": {
+    "total_refs": 2200,
+    "synthetic_packet_refs": 1100,
+    "canonical_packet_key_refs": 0,
+    "canonical_identity_fields_present": false
+  },
+  "identity_gap": "TRACE_REFS_HAVE_LABEL_AND_ORDINAL_ONLY",
+  "suggestions": [
+    {
+      "trace_label": "agent_intelligence",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 3,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:2ca3ca81af71",
+          "feature_id": "agent",
+          "feature_label": "agent",
+          "source_ref": "src/routes/api/ai/agent/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:8f8a518ae164",
+          "feature_id": "agent",
+          "feature_label": "agent",
+          "source_ref": "src/lib/types/agent.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:fbdd5ccb53b3",
+          "feature_id": "agent",
+          "feature_label": "agent",
+          "source_ref": "src/routes/api/ace/agent/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:09e623f7226b",
+          "feature_id": "search-intelligence",
+          "feature_label": "search-intelligence",
+          "source_ref": "src/routes/(app)/admin/search-intelligence/+page.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:28278b7fe0be",
+          "feature_id": "autonomous-agent",
+          "feature_label": "autonomous-agent",
+          "source_ref": "src/lib/server/agent/autonomous-agent.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:40731123a24d",
+          "feature_id": "gemma4-agent",
+          "feature_label": "gemma4-agent",
+          "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:41ae4f183768",
+          "feature_id": "agent-orchestrator",
+          "feature_label": "agent-orchestrator",
+          "source_ref": "scripts/agent/agent-orchestrator.mjs",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:59f297c10ba9",
+          "feature_id": "agent-chat",
+          "feature_label": "agent-chat",
+          "source_ref": "src/routes/(app)/demos/agent-chat/+page.svelte",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:60a18f3e435e",
+          "feature_id": "codebase-intelligence",
+          "feature_label": "codebase-intelligence",
+          "source_ref": "src/lib/server/db/schema/codebase-intelligence.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:7e68a46d35a5",
+          "feature_id": "search-intelligence",
+          "feature_label": "search-intelligence",
+          "source_ref": "src/routes/(app)/admin/search-intelligence/+page.svelte",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "api_endpoints",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 1,
+      "ambiguous_top_ties": 1,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:683b49e6fa48",
+          "feature_id": "api-endpoints",
+          "feature_label": "api-endpoints",
+          "source_ref": "src/lib/utils/api-endpoints.ts",
+          "score": 1
+        },
+        {
+          "packet_key": "packet:7c5e5eb00945",
+          "feature_id": "llama-cpp-turboquant-gemma4.api-endpoints",
+          "feature_label": "api-endpoints.ts",
+          "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/api-endpoints.ts",
+          "score": 0.666667
+        },
+        {
+          "packet_key": "packet:f34f636bfb4e",
+          "feature_id": "sveltekit-frontend.api-endpoints",
+          "feature_label": "api-endpoints.ts",
+          "source_ref": "sveltekit-frontend/src/lib/utils/api-endpoints.ts",
+          "score": 0.666667
+        },
+        {
+          "packet_key": "ace:packet:30842d20eba3",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/server/endpoints.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:9292cdc634eb",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/server/ai/endpoints.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:a5be1c0aa60d",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/utils/endpoints.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:be9e6f2254e0",
+          "feature_id": "api",
+          "feature_label": "api",
+          "source_ref": "src/lib/types/api.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:bf6f9e5b9a15",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/server/utils/endpoints.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:c69ebec9a427",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/server/config/endpoints.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:ffdd6f1e531a",
+          "feature_id": "endpoints",
+          "feature_label": "endpoints",
+          "source_ref": "src/lib/server/env/endpoints.ts",
+          "score": 0.5
+        }
+      ],
+      "review_required": true,
+      "review_reason": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "trace_label": "database_orm",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 3,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:0098519ac98d",
+          "feature_id": "database",
+          "feature_label": "database",
+          "source_ref": "src/routes/api/health/database/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:e8b7d40df96f",
+          "feature_id": "database",
+          "feature_label": "database",
+          "source_ref": "src/lib/types/database.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:e979a5609e1e",
+          "feature_id": "database",
+          "feature_label": "database",
+          "source_ref": "src/lib/config/database.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:e479b4245302",
+          "feature_id": "database-simple",
+          "feature_label": "database-simple",
+          "source_ref": "src/lib/server/database-simple.js",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:e5c979485049",
+          "feature_id": "setup-database",
+          "feature_label": "setup-database",
+          "source_ref": "src/lib/server/db/setup-database.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:113d029176d0",
+          "feature_id": "claude-mem.database",
+          "feature_label": "database.mdx",
+          "source_ref": "claude-mem/docs/public/architecture/database.mdx",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:2900d6a28aa5",
+          "feature_id": "sveltekit-frontend.database",
+          "feature_label": "database.ts",
+          "source_ref": "sveltekit-frontend/src/lib/types/database.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:3858a77f9358",
+          "feature_id": "sveltekit-frontend.database",
+          "feature_label": "database.ts",
+          "source_ref": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/database.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:626118c2ef32",
+          "feature_id": "llama-cpp-turboquant-gemma4.database.d",
+          "feature_label": "database.d.ts",
+          "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/database.d.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:70130d574fd3",
+          "feature_id": "claude-mem.Database",
+          "feature_label": "Database.ts",
+          "source_ref": "claude-mem/src/services/sqlite/Database.ts",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "emergent_topology",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 8,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:09c6f474e462",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/(app)/admin/topology/+page.svelte",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:34fffd67db6c",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/api/code-intel/topology/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:3d6397d2303c",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/lib/server/db/schema/topology.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:5985fa94d5af",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/api/phase89/topology/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:a9eea489256a",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/api/topology/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:d5e34127bb23",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/(app)/code-intel/topology/+page.server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:ead70469a1e8",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/code-intel/topology/+page.svelte",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:fa1b1705f4e2",
+          "feature_id": "topology",
+          "feature_label": "topology",
+          "source_ref": "src/routes/(app)/code-intel/topology/+page.svelte",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:276af9de2f73",
+          "feature_id": "topology-hits",
+          "feature_label": "topology-hits",
+          "source_ref": "src/routes/api/codebase-index/topology-hits/+server.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:29855dd3a3e7",
+          "feature_id": "ast-topology",
+          "feature_label": "ast-topology",
+          "source_ref": "src/routes/(app)/admin/ast-topology/+page.svelte",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "general_abstractions",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.2,
+      "ambiguous_top_ties": 1,
+      "candidates": [
+        {
+          "packet_key": "packet:c1d89d0fd143",
+          "feature_id": "llama-cpp-turboquant-gemma4.gemv_noshuffle_general",
+          "feature_label": "gemv_noshuffle_general.cl",
+          "source_ref": "llama-cpp-turboquant-gemma4/ggml/src/ggml-opencl/kernels/gemv_noshuffle_general.cl",
+          "score": 0.2
+        },
+        {
+          "packet_key": "packet:125e3b5bff75",
+          "feature_id": "llama-cpp-turboquant-gemma4.gemv_noshuffle_general_q8_0_f32",
+          "feature_label": "gemv_noshuffle_general_q8_0_f32.cl",
+          "source_ref": "llama-cpp-turboquant-gemma4/ggml/src/ggml-opencl/kernels/gemv_noshuffle_general_q8_0_f32.cl",
+          "score": 0.142857
+        },
+        {
+          "packet_key": "packet:7867de489b6c",
+          "feature_id": "lawpdfs.Federal Habeas Corpus _ State of California - Department of Justice - Office of the Attorney General",
+          "feature_label": "Federal Habeas Corpus _ State of California - Department of Justice - Office of the Attorney General.pdf",
+          "source_ref": "lawpdfs/Federal Habeas Corpus _ State of California - Department of Justice - Office of the Attorney General.pdf",
+          "score": 0.071429
+        },
+        {
+          "packet_key": "packet:a4b9e6c8582d",
+          "feature_id": "lawpdfs.Victims' Rights Under Marsy's Law _ State of California - Department of Justice - Office of the Attorney General",
+          "feature_label": "Victims' Rights Under Marsy's Law _ State of California - Department of Justice - Office of the Attorney General.pdf",
+          "source_ref": "lawpdfs/Victims' Rights Under Marsy's Law _ State of California - Department of Justice - Office of the Attorney General.pdf",
+          "score": 0.0625
+        }
+      ],
+      "review_required": true,
+      "review_reason": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "trace_label": "infrastructure_config",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 3,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:327c39e94e9d",
+          "feature_id": "config",
+          "feature_label": "config",
+          "source_ref": "src/routes/api/phase89/config/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:ce0117f0eee8",
+          "feature_id": "config",
+          "feature_label": "config",
+          "source_ref": "src/lib/server/config.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "packet:ea6e6554337a",
+          "feature_id": ".python311.config",
+          "feature_label": "config.c",
+          "source_ref": ".python311/lib/python3.11/config-3.11-x86_64-linux-gnu/config.c",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:4ba013420680",
+          "feature_id": "cache-config",
+          "feature_label": "cache-config",
+          "source_ref": "src/lib/server/cache-config.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:5dcfd3d7e171",
+          "feature_id": "redis-config",
+          "feature_label": "redis-config",
+          "source_ref": "src/lib/config/redis-config.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:a71e792759ee",
+          "feature_id": "vector-config",
+          "feature_label": "vector-config",
+          "source_ref": "src/lib/server/config/vector-config.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:ab4e067feea4",
+          "feature_id": "ollama-config",
+          "feature_label": "ollama-config",
+          "source_ref": "src/lib/ai/ollama-config.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:b29ca848e3a4",
+          "feature_id": "ollama-config",
+          "feature_label": "ollama-config",
+          "source_ref": "src/lib/server/ai/ollama-config.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:03d1dadab7ff",
+          "feature_id": "sveltekit-frontend.config",
+          "feature_label": "config.json",
+          "source_ref": "sveltekit-frontend/static/embeddinggemma_300m_onnx/config.json",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:053ce460f589",
+          "feature_id": "storage.config",
+          "feature_label": "config.json",
+          "source_ref": "storage/collections/phase72_evidence_embeddings/0/segments/a2bf68c0-57b5-4c95-b39a-c7ba4702b039/payload_index/config.json",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "native_accelerators",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 1,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:a239b74faa88",
+          "feature_id": "native",
+          "feature_label": "native",
+          "source_ref": "src/lib/server/langextract/native.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "packet:0c7b03bb60d1",
+          "feature_id": "sveltekit-frontend.native",
+          "feature_label": "native.ts",
+          "source_ref": "sveltekit-frontend/src/lib/server/langextract/native.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:bd23f38d29d6",
+          "feature_id": ".python311.rxvt-cygwin-native",
+          "feature_label": "rxvt-cygwin-native",
+          "source_ref": ".python311/share/terminfo/r/rxvt-cygwin-native",
+          "score": 0.25
+        },
+        {
+          "packet_key": "packet:4a845e012a0d",
+          "feature_id": "sveltekit-frontend.langextract-native.spec",
+          "feature_label": "langextract-native.spec.ts",
+          "source_ref": "sveltekit-frontend/tests/langextract-native.spec.ts",
+          "score": 0.2
+        },
+        {
+          "packet_key": "packet:d2c2643163a8",
+          "feature_id": "docs.native-gemm-deferral",
+          "feature_label": "native-gemm-deferral.md",
+          "source_ref": "docs/atlas/native-gemm-deferral.md",
+          "score": 0.2
+        },
+        {
+          "packet_key": "packet:ed69c3f6dc96",
+          "feature_id": "sveltekit-frontend.smoke-rust-native",
+          "feature_label": "smoke-rust-native.mjs",
+          "source_ref": "sveltekit-frontend/scripts/tests/smoke-rust-native.mjs",
+          "score": 0.2
+        },
+        {
+          "packet_key": "packet:fa7ad4977ced",
+          "feature_id": "packages.native-gemm-deferral",
+          "feature_label": "native-gemm-deferral.md",
+          "source_ref": "packages/parent-atlas/docs/atlas/native-gemm-deferral.md",
+          "score": 0.2
+        },
+        {
+          "packet_key": "packet:25d76d2ff867",
+          "feature_id": ".tmp.cmake-native-symbol-audit",
+          "feature_label": "cmake-native-symbol-audit.json",
+          "source_ref": ".tmp/cmake-native-symbol-audit.json",
+          "score": 0.166667
+        },
+        {
+          "packet_key": "packet:35e09deed968",
+          "feature_id": ".tmp.simd-native-bridge-validation",
+          "feature_label": "simd-native-bridge-validation.md",
+          "source_ref": ".tmp/simd-native-bridge-validation.md",
+          "score": 0.166667
+        },
+        {
+          "packet_key": "packet:529eeb9ac12f",
+          "feature_id": "docs.GPU-NATIVE-STACK-INVENTORY",
+          "feature_label": "GPU-NATIVE-STACK-INVENTORY.md",
+          "source_ref": "docs/GPU-NATIVE-STACK-INVENTORY.md",
+          "score": 0.166667
+        }
+      ],
+      "review_required": true,
+      "review_reason": "SOURCE_EVIDENCE_REQUIRED"
+    },
+    {
+      "trace_label": "observability_telemetry",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 3,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:3e271f88828c",
+          "feature_id": "observability",
+          "feature_label": "observability",
+          "source_ref": "src/routes/(app)/admin/observability/+page.svelte",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:ad706534db95",
+          "feature_id": "telemetry",
+          "feature_label": "telemetry",
+          "source_ref": "src/lib/utils/telemetry.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:c716f5a7c3f3",
+          "feature_id": "observability",
+          "feature_label": "observability",
+          "source_ref": "src/routes/api/admin/observability/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:146dfeb8da89",
+          "feature_id": "wire-telemetry",
+          "feature_label": "wire-telemetry",
+          "source_ref": "src/lib/webgpu/wire-telemetry.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:326fa06a0c66",
+          "feature_id": "sveltekit-frontend.telemetry",
+          "feature_label": "telemetry.ts",
+          "source_ref": "sveltekit-frontend/src/lib/server/agents/regen/telemetry.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:37c1fa19a811",
+          "feature_id": "sveltekit-frontend.telemetry",
+          "feature_label": "telemetry.ts",
+          "source_ref": "sveltekit-frontend/src/lib/utils/telemetry.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:3f2bc716fb7e",
+          "feature_id": "sveltekit-frontend.telemetry",
+          "feature_label": "telemetry.ts",
+          "source_ref": "sveltekit-frontend/src/lib/server/features/cases/telemetry.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "packet:1153a1e86da8",
+          "feature_id": "sveltekit-frontend.retrieval-telemetry",
+          "feature_label": "retrieval-telemetry.ts",
+          "source_ref": "sveltekit-frontend/src/lib/server/db/schema/retrieval-telemetry.ts",
+          "score": 0.25
+        },
+        {
+          "packet_key": "packet:1a3fe8d73a7f",
+          "feature_id": "sveltekit-frontend.wire-telemetry",
+          "feature_label": "wire-telemetry.ts",
+          "source_ref": "sveltekit-frontend/src/lib/webgpu/wire-telemetry.ts",
+          "score": 0.25
+        },
+        {
+          "packet_key": "packet:20eecbadd33e",
+          "feature_id": "sveltekit-frontend.clear_telemetry",
+          "feature_label": "clear_telemetry.mjs",
+          "source_ref": "sveltekit-frontend/scratch/clear_telemetry.mjs",
+          "score": 0.25
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "test_harness",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 0.5,
+      "ambiguous_top_ties": 3,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:5f1d12bab3c9",
+          "feature_id": "test",
+          "feature_label": "test",
+          "source_ref": "src/routes/api/evidence/upload-test/test.html",
+          "score": 0.5
+        },
+        {
+          "packet_key": "packet:814f0798bb91",
+          "feature_id": "llama-cpp-turboquant-gemma4.test-c",
+          "feature_label": "test-c.c",
+          "source_ref": "llama-cpp-turboquant-gemma4/tests/test-c.c",
+          "score": 0.5
+        },
+        {
+          "packet_key": "packet:8e7714648002",
+          "feature_id": "sveltekit-frontend.stream.test-harness",
+          "feature_label": "stream.test-harness.ts",
+          "source_ref": "sveltekit-frontend/tests/routes/auto/api/chat/stream.test-harness.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:047c77e6863e",
+          "feature_id": "smoke-test",
+          "feature_label": "smoke-test",
+          "source_ref": "packages/atlas-core/src/smoke-test.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:579bea5b436e",
+          "feature_id": "page.test",
+          "feature_label": "page.test",
+          "source_ref": "src/routes/(app)/admin/all-routes/__tests__/page.test.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:66320ee2189f",
+          "feature_id": "upload-test",
+          "feature_label": "upload-test",
+          "source_ref": "src/routes/api/evidence/upload-test/+server.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:8189957c12b4",
+          "feature_id": "ab-test",
+          "feature_label": "ab-test",
+          "source_ref": "src/lib/server/ai/ab-test.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:9158665a1997",
+          "feature_id": "AgentChat.test",
+          "feature_label": "AgentChat.test",
+          "source_ref": "src/lib/components/agentic/__tests__/AgentChat.test.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:a7d83374f971",
+          "feature_id": "cache.test",
+          "feature_label": "cache.test",
+          "source_ref": "src/lib/cache/__tests__/cache.test.ts",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:b224e16895d0",
+          "feature_id": "test-setup",
+          "feature_label": "test-setup",
+          "source_ref": "src/test-setup.ts",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    },
+    {
+      "trace_label": "ui_components",
+      "status": "PROPOSED_NOT_GROUND_TRUTH",
+      "promotion_allowed": false,
+      "top_score": 1,
+      "ambiguous_top_ties": 2,
+      "candidates": [
+        {
+          "packet_key": "ace:packet:556dfc0581c6",
+          "feature_id": "ui-components.d",
+          "feature_label": "ui-components.d",
+          "source_ref": "src/types/ui-components.d.ts",
+          "score": 1
+        },
+        {
+          "packet_key": "ace:packet:c1a2fd3e1702",
+          "feature_id": "ui-components",
+          "feature_label": "ui-components",
+          "source_ref": "src/routes/(app)/demos/ui-components/+page.svelte",
+          "score": 1
+        },
+        {
+          "packet_key": "packet:b538d5885e72",
+          "feature_id": "sveltekit-frontend.ui-components.d",
+          "feature_label": "ui-components.d.ts",
+          "source_ref": "sveltekit-frontend/src/types/ui-components.d.ts",
+          "score": 0.666667
+        },
+        {
+          "packet_key": "ace:packet:5169c392e5a6",
+          "feature_id": "components.d",
+          "feature_label": "components.d",
+          "source_ref": "src/types/components.d.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "ace:packet:8157928d7dea",
+          "feature_id": "components",
+          "feature_label": "components",
+          "source_ref": "src/routes/api/phase89/components/+server.ts",
+          "score": 0.5
+        },
+        {
+          "packet_key": "packet:fda87e4136d9",
+          "feature_id": "sveltekit-frontend.src__types__ui-components.d",
+          "feature_label": "src__types__ui-components.d.md",
+          "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__types__ui-components.d.md",
+          "score": 0.4
+        },
+        {
+          "packet_key": "ace:packet:0050126ac87d",
+          "feature_id": "MicroInteraction",
+          "feature_label": "MicroInteraction",
+          "source_ref": "src/lib/components/ui/MicroInteraction.svelte",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:00d5d4f35ec0",
+          "feature_id": "AIDialog",
+          "feature_label": "AIDialog",
+          "source_ref": "src/lib/components/ui/AIDialog.svelte",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:088bfd4dc4c8",
+          "feature_id": "Badge",
+          "feature_label": "Badge",
+          "source_ref": "src/lib/components/ui/badge/Badge.svelte",
+          "score": 0.333333
+        },
+        {
+          "packet_key": "ace:packet:09fc19b5967e",
+          "feature_id": "SearchBox",
+          "feature_label": "SearchBox",
+          "source_ref": "src/lib/components/ui/SearchBox.svelte",
+          "score": 0.333333
+        }
+      ],
+      "review_required": true,
+      "review_reason": "AMBIGUOUS_CARDINALITY"
+    }
+  ],
+  "promotion_allowed": false,
+  "next_gate": "HUMAN_REVIEW_WITH_SOURCE_EVIDENCE"
+}

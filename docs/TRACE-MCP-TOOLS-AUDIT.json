@@ -1,7 +1,7 @@
 {
-  "totalTools": 117,
+  "totalTools": 119,
   "gemma4MaxTools": 3,
-  "toolSetCount": 39,
+  "toolSetCount": 40,
   "namespaces": [
     "file",
     "wiki",
@@ -14,6 +14,7 @@
     "search",
     "hypergraph",
     "clusters",
+    "trace_dynamic_context",
     "context",
     "kag",
     "ops",
@@ -68,6 +69,7 @@
     ],
     "Context & Schema": [
       "kb.explain_context_pack",
+      "trace_dynamic_context",
       "context.build_kv_packet",
       "context.get_compressed_card",
       "context.explain_compression",
@@ -174,6 +176,7 @@
       "atlas.feature_document_ingestion_plan",
       "atlas.feature_document_enrichment_plan",
       "atlas.materialize_feature_evidence_tuples",
+      "atlas.pos_concept_tagging",
       "service_workers.status",
       "service_workers.result",
       "miniforge.health",
@@ -207,6 +210,7 @@
     "atlas.packet_search",
     "research.playbook_lookup_by_language",
     "kb.explain_context_pack",
+    "trace_dynamic_context",
     "context.build_kv_packet",
     "context.get_compressed_card",
     "context.explain_compression",
@@ -292,6 +296,7 @@
     "atlas.feature_document_ingestion_plan",
     "atlas.feature_document_enrichment_plan",
     "atlas.materialize_feature_evidence_tuples",
+    "atlas.pos_concept_tagging",
     "karpathy.attention_rank_files",
     "service_workers.status",
     "service_workers.result",
@@ -300,6 +305,128 @@
     "miniforge.extract",
     "shell.run"
   ],
+  "registeredTools": [
+    "file.read_window",
+    "wiki.status",
+    "wiki.search",
+    "wiki.refresh_directory",
+    "wiki.explain_page",
+    "graph.expand_neighborhood",
+    "turbovec.rank_chunks",
+    "engram.chat_memory_recent",
+    "graph.shortest_path",
+    "graph.semantic_path_synthesis",
+    "graph.community_for_node",
+    "graph.pagerank_top",
+    "topology.search_near",
+    "topology.same_som_cluster",
+    "topology.search_som_neighborhood",
+    "kb.hybrid_search",
+    "graph.materialize_pathway",
+    "kb.search_pathways",
+    "kb.search_summary_tree",
+    "kb.search_notecards",
+    "kb.explain_context_pack",
+    "trace.system_health",
+    "search.rerank",
+    "hypergraph.semantic_path_synthesis",
+    "topology.search_4d",
+    "clusters.get_members",
+    "trace.explain_retrieval",
+    "trace_dynamic_context",
+    "search.postgres_fts",
+    "search.hybrid",
+    "trace.kag_search",
+    "trace.graphrag_search",
+    "search.go_hybrid",
+    "context.build_kv_packet",
+    "context.get_compressed_card",
+    "context.explain_compression",
+    "context.refresh_task_toc",
+    "search.dev_context",
+    "kag.record_agent_run",
+    "kag.ingest_memory_directory",
+    "kag.ingest_error",
+    "kag.recall_similar_fix",
+    "kag.multi_lane_search",
+    "kag.web_search",
+    "kag.feature_lookup",
+    "kag.panel_context",
+    "ops.trust_audit",
+    "taxonomy.children",
+    "taxonomy.path",
+    "LLMS.md.peers_via_relations",
+    "LLMS.md.coverage_chain",
+    "clusters.get_summary_lenses",
+    "clusters.som_cell_lookup",
+    "clusters.kmeans_members",
+    "trace.validate_ace_hit",
+    "ops.propose_patch",
+    "ops.run_targeted_test",
+    "ops.record_fix_attempt",
+    "ops.run_quality_gate",
+    "hypergraph.search",
+    "hypergraph.get_edge",
+    "hypergraph.explain_activation",
+    "hypergraph.expand_members",
+    "knowledge.get_minified_map",
+    "tools.batch_call",
+    "codebase.context_for_file",
+    "LLMS.md.context_for_file",
+    "LLMS.md.peers_for_dir",
+    "LLMS.md.coverage",
+    "LLMS.md.shares_tags",
+    "LLMS.md.binding_chain",
+    "ops.update_LLMS.md",
+    "ops.search_tools",
+    "ops.inspect_tool_contract",
+    "ops.validate_tool_call",
+    "ops.audit_tool_result",
+    "ops.verify_write",
+    "ops.validate_claims",
+    "ops.fixer_semantic_recall",
+    "ops.fixer_pattern_store",
+    "context.prefetch_feature_context",
+    "evidence.search_by_image",
+    "evidence.image_feedback",
+    "evidence.link_image_graph",
+    "image.search_by_text",
+    "image.caption",
+    "image.enrich_tags",
+    "ops.gpu_attention",
+    "ops.gpu_pagerank",
+    "ops.gpu_topk",
+    "ops.gpu_pipeline_stats",
+    "runtime.simdjson_status",
+    "runtime.sse_probe",
+    "runtime.quic_status",
+    "atlas.prefilter",
+    "ace.compact_search",
+    "atlas.packet_search",
+    "atlas.coverage",
+    "atlas.graph.pagerank",
+    "atlas.workstation_status",
+    "atlas.feature_document_status",
+    "atlas.populate_feature_documents",
+    "atlas.feature_document_ingestion_plan",
+    "atlas.feature_document_enrichment_plan",
+    "atlas.materialize_feature_evidence_tuples",
+    "atlas.pos_concept_tagging",
+    "atlas.build_taxonomy_topology_packet",
+    "karpathy.attention_rank_files",
+    "karpathy.som_topology_stats",
+    "topology.language_distribution",
+    "research.playbook_lookup_by_language",
+    "context.build_ace_packet",
+    "context.build_indexed_source_packet",
+    "service_workers.status",
+    "service_workers.result",
+    "miniforge.health",
+    "miniforge.analyze",
+    "miniforge.extract",
+    "shell.run"
+  ],
+  "excludedStubTools": [],
   "toolSets": [
     {
       "set": "Set 1",
@@ -377,280 +504,288 @@
       "set": "Set 9",
       "tools": [
         "kb.explain_context_pack",
-        "context.build_kv_packet",
-        "context.get_compressed_card"
+        "trace_dynamic_context",
+        "context.build_kv_packet"
       ],
       "count": 3
     },
     {
       "set": "Set 10",
       "tools": [
+        "context.get_compressed_card",
         "context.explain_compression",
-        "context.refresh_task_toc",
-        "kag.panel_context"
+        "context.refresh_task_toc"
       ],
       "count": 3
     },
     {
       "set": "Set 11",
       "tools": [
+        "kag.panel_context",
         "codebase.context_for_file",
-        "LLMS.md.context_for_file",
-        "ops.inspect_tool_contract"
+        "LLMS.md.context_for_file"
       ],
       "count": 3
     },
     {
       "set": "Set 12",
       "tools": [
+        "ops.inspect_tool_contract",
         "context.prefetch_feature_context",
-        "context.build_ace_packet",
-        "context.build_indexed_source_packet"
+        "context.build_ace_packet"
       ],
       "count": 3
     },
     {
       "set": "Set 13",
       "tools": [
+        "context.build_indexed_source_packet",
         "graph.expand_neighborhood",
-        "graph.shortest_path",
-        "graph.semantic_path_synthesis"
+        "graph.shortest_path"
       ],
       "count": 3
     },
     {
       "set": "Set 14",
       "tools": [
+        "graph.semantic_path_synthesis",
         "graph.community_for_node",
-        "graph.pagerank_top",
-        "topology.same_som_cluster"
+        "graph.pagerank_top"
       ],
       "count": 3
     },
     {
       "set": "Set 15",
       "tools": [
+        "topology.same_som_cluster",
         "graph.materialize_pathway",
-        "hypergraph.semantic_path_synthesis",
-        "hypergraph.get_edge"
+        "hypergraph.semantic_path_synthesis"
       ],
       "count": 3
     },
     {
       "set": "Set 16",
       "tools": [
+        "hypergraph.get_edge",
         "hypergraph.explain_activation",
-        "hypergraph.expand_members",
-        "evidence.link_image_graph"
+        "hypergraph.expand_members"
       ],
       "count": 3
     },
     {
       "set": "Set 17",
       "tools": [
+        "evidence.link_image_graph",
         "atlas.graph.pagerank",
-        "atlas.build_taxonomy_topology_packet",
-        "karpathy.som_topology_stats"
+        "atlas.build_taxonomy_topology_packet"
       ],
       "count": 3
     },
     {
       "set": "Set 18",
       "tools": [
+        "karpathy.som_topology_stats",
         "topology.language_distribution",
-        "file.read_window",
-        "wiki.status"
+        "file.read_window"
       ],
       "count": 3
     },
     {
       "set": "Set 19",
       "tools": [
+        "wiki.status",
         "wiki.refresh_directory",
-        "wiki.explain_page",
-        "turbovec.rank_chunks"
+        "wiki.explain_page"
       ],
       "count": 3
     },
     {
       "set": "Set 20",
       "tools": [
+        "turbovec.rank_chunks",
         "engram.chat_memory_recent",
-        "trace.system_health",
-        "clusters.get_members"
+        "trace.system_health"
       ],
       "count": 3
     },
     {
       "set": "Set 21",
       "tools": [
+        "clusters.get_members",
         "trace.explain_retrieval",
-        "kag.record_agent_run",
-        "kag.ingest_memory_directory"
+        "kag.record_agent_run"
       ],
       "count": 3
     },
     {
       "set": "Set 22",
       "tools": [
+        "kag.ingest_memory_directory",
         "kag.ingest_error",
-        "kag.recall_similar_fix",
-        "kag.feature_lookup"
+        "kag.recall_similar_fix"
       ],
       "count": 3
     },
     {
       "set": "Set 23",
       "tools": [
+        "kag.feature_lookup",
         "ops.trust_audit",
-        "taxonomy.children",
-        "taxonomy.path"
+        "taxonomy.children"
       ],
       "count": 3
     },
     {
       "set": "Set 24",
       "tools": [
+        "taxonomy.path",
         "LLMS.md.peers_via_relations",
-        "LLMS.md.coverage_chain",
-        "clusters.get_summary_lenses"
+        "LLMS.md.coverage_chain"
       ],
       "count": 3
     },
     {
       "set": "Set 25",
       "tools": [
+        "clusters.get_summary_lenses",
         "clusters.som_cell_lookup",
-        "clusters.kmeans_members",
-        "trace.validate_ace_hit"
+        "clusters.kmeans_members"
       ],
       "count": 3
     },
     {
       "set": "Set 26",
       "tools": [
+        "trace.validate_ace_hit",
         "ops.propose_patch",
-        "ops.run_targeted_test",
-        "ops.record_fix_attempt"
+        "ops.run_targeted_test"
       ],
       "count": 3
     },
     {
       "set": "Set 27",
       "tools": [
+        "ops.record_fix_attempt",
         "ops.run_quality_gate",
-        "knowledge.get_minified_map",
-        "tools.batch_call"
+        "knowledge.get_minified_map"
       ],
       "count": 3
     },
     {
       "set": "Set 28",
       "tools": [
+        "tools.batch_call",
         "LLMS.md.peers_for_dir",
-        "LLMS.md.coverage",
-        "LLMS.md.shares_tags"
+        "LLMS.md.coverage"
       ],
       "count": 3
     },
     {
       "set": "Set 29",
       "tools": [
+        "LLMS.md.shares_tags",
         "LLMS.md.binding_chain",
-        "ops.update_LLMS.md",
-        "ops.validate_tool_call"
+        "ops.update_LLMS.md"
       ],
       "count": 3
     },
     {
       "set": "Set 30",
       "tools": [
+        "ops.validate_tool_call",
         "ops.audit_tool_result",
-        "ops.verify_write",
-        "ops.validate_claims"
+        "ops.verify_write"
       ],
       "count": 3
     },
     {
       "set": "Set 31",
       "tools": [
+        "ops.validate_claims",
         "ops.fixer_semantic_recall",
-        "ops.fixer_pattern_store",
-        "evidence.image_feedback"
+        "ops.fixer_pattern_store"
       ],
       "count": 3
     },
     {
       "set": "Set 32",
       "tools": [
+        "evidence.image_feedback",
         "image.caption",
-        "image.enrich_tags",
-        "ops.gpu_attention"
+        "image.enrich_tags"
       ],
       "count": 3
     },
     {
       "set": "Set 33",
       "tools": [
+        "ops.gpu_attention",
         "ops.gpu_pagerank",
-        "ops.gpu_topk",
-        "ops.gpu_pipeline_stats"
+        "ops.gpu_topk"
       ],
       "count": 3
     },
     {
       "set": "Set 34",
       "tools": [
+        "ops.gpu_pipeline_stats",
         "runtime.simdjson_status",
-        "runtime.sse_probe",
-        "runtime.quic_status"
+        "runtime.sse_probe"
       ],
       "count": 3
     },
     {
       "set": "Set 35",
       "tools": [
+        "runtime.quic_status",
         "atlas.prefilter",
-        "atlas.coverage",
-        "atlas.workstation_status"
+        "atlas.coverage"
       ],
       "count": 3
     },
     {
       "set": "Set 36",
       "tools": [
+        "atlas.workstation_status",
         "atlas.feature_document_status",
-        "atlas.populate_feature_documents",
-        "atlas.feature_document_ingestion_plan"
+        "atlas.populate_feature_documents"
       ],
       "count": 3
     },
     {
       "set": "Set 37",
       "tools": [
+        "atlas.feature_document_ingestion_plan",
         "atlas.feature_document_enrichment_plan",
-        "atlas.materialize_feature_evidence_tuples",
-        "karpathy.attention_rank_files"
+        "atlas.materialize_feature_evidence_tuples"
       ],
       "count": 3
     },
     {
       "set": "Set 38",
       "tools": [
-        "service_workers.status",
-        "service_workers.result",
-        "miniforge.health"
+        "atlas.pos_concept_tagging",
+        "karpathy.attention_rank_files",
+        "service_workers.status"
       ],
       "count": 3
     },
     {
       "set": "Set 39",
       "tools": [
-        "miniforge.analyze",
+        "service_workers.result",
+        "miniforge.health",
+        "miniforge.analyze"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 40",
+      "tools": [
         "miniforge.extract",
         "shell.run"
       ],
-      "count": 3
+      "count": 2
     }
   ]
 }
