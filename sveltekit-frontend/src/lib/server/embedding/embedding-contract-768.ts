@@ -1,22 +1,9 @@
 /**
  * SEMANTIC_768_RUNTIME_CUTOVER — canonical runtime contract.
  *
- * !! STALE relative to a later, dated operator decision — read before trusting !!
- * Operator correction (2026-08-19, see
- * openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md): "the
- * persisted EmbeddingGemma test corpus that actually exists is 512-dimensional;
- * a production/canonical 768-dimensional Qdrant corpus was not created. Do not
- * promote an assumed 768 store merely because EmbeddingGemma's native output is
- * 768." That doc's frozen representation contract makes semantic_512 (native
- * 768 -> MRL prefix [0:512] -> L2 renorm) the CANONICAL PERSISTED SEMANTIC
- * REPRESENTATION — this file's exported constants below (SEMANTIC_REPRESENTATION_ID
- * = 'semantic_768', SEMANTIC_DIMENSION = 768, CANONICAL_QDRANT_COLLECTION =
- * 'codebase_chunks_768') have NOT yet been migrated to match that correction.
- * truncateEmbeddingGemmaMrl(vector, 512) already implements the correct
- * derivation step. Do not silently "fix" this file's constants without doing
- * the full migration the OpenSpec change describes (new assertSemantic512,
- * updated CANONICAL_QDRANT_COLLECTION, semantic-lineage.ts re-exports, etc.) —
- * this comment exists so the gap is visible, not to be quietly patched over.
+ * Native EmbeddingGemma semantic_768 is the persisted/search authority.
+ * truncateEmbeddingGemmaMrl() produces separately named reference lanes such
+ * as semantic_512; derived prefixes never replace the native authority.
  *
  * Active semantic embedding lane (as currently implemented in code, pre-migration):
  * semantic_768 (768-dim, EmbeddingGemma native).
@@ -24,9 +11,7 @@
  * and never substitutable for semantic_768 at retrieval time.
  *
  * 384-dim is retired: no runtime code may read or write it. 512/256/128 are
- * supported EmbeddingGemma MRL-derived representations; per the 2026-08-19
- * correction above, 512 is meant to become the canonical persisted lane, but
- * the code below still treats 768 as canonical pending that migration.
+ * supported EmbeddingGemma MRL-derived reference representations.
  * Migration-only tooling that still needs 384-dim access belongs in
  * `embedding/legacy-384-migration.ts` and must never be imported from
  * retrieval, ACE, cache, or reranking paths.
@@ -36,7 +21,7 @@ import { createHash } from 'node:crypto';
 
 export const SEMANTIC_REPRESENTATION_ID = 'semantic_768' as const;
 export const SEMANTIC_DIMENSION = 768 as const;
-export const CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768' as const;
+export const CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768_v2' as const;
 export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [768, 512, 256, 128] as const;
 
 /**

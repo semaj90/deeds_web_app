@@ -75,8 +75,8 @@ export const EMBEDDING_CONTRACT = {
    * source: 768-dim lane
    * retrieval: 768-dim canonical lane
    */
-  qdrant_source_collection: 'codebase_chunks_768',
-  qdrant_collection: 'codebase_chunks_768',
+  qdrant_source_collection: 'codebase_chunks_768_v2',
+  qdrant_collection: 'codebase_chunks_768_v2',
   qdrant_legacy_collection: 'codebase_chunks_384_hybrid',
 
   /**
@@ -101,7 +101,9 @@ export const EMBEDDING_CONTRACT = {
    * Vector validation rules
    */
   validation: {
-    min_dimension: 384,
+    // Canonical callers must use native semantic_768. Legacy 384 inputs are
+    // accepted only by explicitly named reference-lane contracts.
+    min_dimension: 768,
     max_dimension: 768,
     min_norm_squared: 0.98, // 1.0 ± 0.02
     max_norm_squared: 1.02,
@@ -149,7 +151,18 @@ export const EMBEDDING_CONTRACT = {
       projection_method: 'none',
       projection_version: 'embeddinggemma-native-768-v1',
       normalization: 'L2',
-      collection: 'codebase_chunks_768',
+      collection: 'codebase_chunks_768_v2',
+    },
+    semantic_512: {
+      lane_id: 'mrl_512',
+      role: 'derived_reference_projection',
+      status: 'REFERENCE_ONLY',
+      source_dimension: 768,
+      output_dimension: 512,
+      projection_method: 'mrl_prefix_truncate_renormalize',
+      projection_version: 'embeddinggemma-mrl-512-v1',
+      normalization: 'L2',
+      collection: null,
     },
     semantic_384: {
       lane_id: 'dense_384',

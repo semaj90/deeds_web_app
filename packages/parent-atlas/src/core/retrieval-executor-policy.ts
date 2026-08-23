@@ -149,7 +149,7 @@ export function defaultRetrievalExecutorPolicy(policyRevision: string): Retrieva
       { executor_id: 'semantic:qdrant-hnsw', executor: 'QDRANT_HNSW', evidence_family: 'SEMANTIC', exact: false, approximate: true, mutable_index: true, build_location: 'DATABASE', search_location: 'NVME_MMAP', persistence: 'DATABASE', semantic_lane_vote: 0, format_owner: 'QDRANT', format_revision: null },
     ],
     hnsw_interop: {},
-    valkey_cache: {},
+    valkey_cache: { role: 'HOT_RETRIEVAL_CACHE' },
     canonical_authority: false,
   });
 }

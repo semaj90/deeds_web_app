@@ -1,16 +1,16 @@
 import { createHash } from 'crypto';
 
 /**
- * Persisted Parent Atlas semantic evidence is the real 512-d EmbeddingGemma MRL
- * projection. The model-native 768 dimension is lineage metadata, not a claim
- * that a persisted 768 corpus or source revision exists.
+ * Persisted Parent Atlas semantic evidence is the native 768-d EmbeddingGemma
+ * representation. Lower-dimensional MRL prefixes remain derived/reference
+ * lanes and must carry their own representation identity.
  */
-export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = 'semantic_512' as const;
-export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = 512 as const;
+export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = 'semantic_768' as const;
+export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = 768 as const;
 export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION = 768 as const;
-export const ATLAS_SEMANTIC_PROJECTION_METHOD = 'embeddinggemma-mrl-prefix-renorm' as const;
-export const QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_512' as const;
-export const QDRANT_SEMANTIC_VECTOR_NAME = null as null;
+export const ATLAS_SEMANTIC_PROJECTION_METHOD = 'embeddinggemma-native-768' as const;
+export const QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_768_v2' as const;
+export const QDRANT_SEMANTIC_VECTOR_NAME = 'content' as const;
 
 export const QDRANT_BM42_CHALLENGER_COLLECTION = 'codebase_chunks_384_hybrid' as const;
 export const QDRANT_BM42_VECTOR_NAME = 'bm42' as const;
@@ -53,7 +53,7 @@ export interface AtlasQdrantSemanticPayloadV1 {
 export interface AtlasQdrantSemanticProjectionV1 {
   schema: 'atlas.qdrant-semantic-projection.v2';
   collection: typeof QDRANT_SEMANTIC_COLLECTION;
-  vectorName: null;
+  vectorName: typeof QDRANT_SEMANTIC_VECTOR_NAME;
   representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
   nativeModelDimension: typeof ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION;
   dimension: typeof ATLAS_CANONICAL_SEMANTIC_DIMENSION;
