@@ -287,11 +287,8 @@ export async function buildMcpToolMap(allowlist?: string[]) {
  */
 export const TRACE_TOOL_ALLOWLIST = [
 	// Core retrieval + KAG
-	// NOTE: 'kag.search' is not a registered tool name on trace-mcp-server.ts —
-	// the real KAG search surface is 'kag.multi_lane_search'. Fixed 2026-08-22
-	// after an audit found the stale name would silently no-op if ever called.
 	'trace.kag_search',
-	'kag.multi_lane_search',
+	'kag.search',
 	'kag.panel_context',
 
 	// Graph traversal
@@ -303,9 +300,7 @@ export const TRACE_TOOL_ALLOWLIST = [
 	'clusters.get_summary_lenses',
 
 	// Knowledge base
-	// NOTE: was 'knowledge.search_summary_tree' — trace-mcp-server.ts registers
-	// this under the 'kb.*' namespace, not 'knowledge.*'. Fixed 2026-08-22.
-	'kb.search_summary_tree',
+	'knowledge.search_summary_tree',
 
 	// Dev context + search
 	'search.dev_context',

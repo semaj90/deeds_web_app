@@ -1,8 +1,8 @@
 // NOTE: this file operates on the native 768-dim EmbeddingGemma representation
 // (representationId is hardcoded to the literal 'semantic_768' throughout,
-// and callers pass 768-wide vectors), not the persisted canonical semantic_512
-// lane. Aliased to the native-dimension constant (768) rather than the
-// canonical-persisted constant (512) to preserve this file's actual meaning.
+// and callers pass 768-wide vectors), matching the active semantic_768
+// lane. It intentionally uses the native-dimension constant (768), while
+// derived MRL prefixes use their own explicit dimensions.
 import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
 
 export type AtlasKnnCorpusRow = {

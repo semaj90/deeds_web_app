@@ -133,34 +133,6 @@ rather than assembled into the one audit the todo file asked for.
    "Next gates" / "Remaining lane gaps" tables against current `main` state
    rather than trusting the 2026-08-13 snapshot as current.
 
-## Update: orphaned root `src/` tree archived (2026-08-22, later same day)
-
-Item 3 above is resolved. Before archiving, root `src/` was compared file-by-file
-(SHA-256 + basename) against `sveltekit-frontend/src/`: of 224 files (`src/**` +
-`tests/{atlas,classifier,hmm,integration,opencode,retrieval,fixtures}/**`), 3 were
-exact duplicates, 54 existed at the same relative path but were stale/superseded by a
-materially larger live version, and 137 had no counterpart anywhere by basename. The
-`openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md` T0a audit
-(2026-08-08) had already salvaged the only two valuable pieces
-(`pagerank-authority-contract.ts`/`pagerank-promotion-gate.ts` →
-`sveltekit-frontend/src/lib/server/graph/`, `candidate-fusion.ts` →
-`sveltekit-frontend/src/lib/server/retrieval/rrf-oracle.ts`) and explicitly recommended
-archiving the rest once those two were copied out — confirmed both are live in
-`sveltekit-frontend/` before proceeding. One further piece of in-flight uncommitted work
-was found in the orphan tree: a Zod validator added to the orphan's own
-`classifier/domain-classifier.ts`, which was ported onto the real
-`sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts` in the same commit
-(zero existing importers of that function, confirmed no breakage risk). A second
-uncommitted diff — per-candidate domain-affinity scoring added to the orphan's
-`atlas/runtime/search-runtime.ts` — was deliberately left un-ported, since it has no
-equivalent in the real 1359-line production `search-runtime.ts` and needs its own design
-review before landing in a live retrieval path; it's preserved as-is in the archive copy.
-
-All 224 files were copied to `deeds_labs/archive/2026-08-22/orphaned-root-src-tree/`
-(per-file SHA-256 manifest at `_manifest.json` inside that directory) before removal from
-their live location, per the repo's archive-not-delete convention. Manifest entry:
-`docs/archive-manifest.json` (directory-level entry, dated 2026-08-22).
-
 ## Explicit non-claim
 
 This cross-reference does **not** claim GS1_12 is closed, does **not** claim the

@@ -83,13 +83,6 @@
             "context": 65536,
             "output": 4096
           }
-        },
-        "ornith-9b": {
-          "name": "Ornith 9B / hforf.gguf (OpenAI-compatible tool-calling challenger)",
-          "limit": {
-            "context": 32768,
-            "output": 4096
-          }
         }
       }
     },
@@ -246,21 +239,6 @@
     }
   },
   "agent": {
-    "ornith-tournament": {
-      "description": "Opt-in Ornith 1.5 9B tool-calling challenger for bounded tournament validation.",
-      "model": "ornith-9b",
-      "temperature": 0,
-      "steps": 8,
-      "prompt": "Use the repository evidence-first workflow. The orchestration layer supplies at most three tools and the model must emit at most one tool call per assistant turn. Never claim a tool succeeded before its result. Prefer retrieval, context assembly, validation, and bounded execution receipts. This agent is a challenger lane: do not promote model quality, durable receipts, or τ-bench performance without a recorded replay receipt.",
-      "permission": {
-        "*": "deny",
-        "read": "ask",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow"
-      }
-    },
     "atlas-context": {
       "description": "Atlas-first retrieval agent using ACE packets and strict context-budget rules.",
       "model": "gemma4-legal-iq4xs-direct.gguf",

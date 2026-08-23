@@ -252,7 +252,7 @@ export function extractACEFeatures(context: {
  * Represents packet position in learned SOM topology.
  */
 export async function fetchSOMEmbedding(packetKey: string): Promise<SOMEmbedding> {
-  // Production: query Qdrant codebase_chunks_768 payload for som_embedding
+  // Production: query Qdrant codebase_chunks_768_v2 payload for som_embedding
   // or fetch from Redis cache ace:som:{packetKey}
   // For now, return mock embedding with correct structure.
 

@@ -33,9 +33,6 @@ from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
-sys.path.insert(0, str(ROOT / 'python'))
-from atlas_xgboost_grouped_ranking_v1 import prepare_grouped_ranking_dataset_v1  # noqa: E402
-
 CSV_PATH    = ROOT / 'docs' / 'reports' / 'xgboost-features.csv'
 MODEL_DIR   = ROOT / 'models'
 REPORT_DIR  = ROOT / 'docs' / 'reports'
@@ -140,43 +137,6 @@ def train_val_split(X, y, groups: list[str], val_ratio: float = 0.2, seed: int =
             X[val_idx],   y[val_idx],   [groups[i] for i in val_idx])
 
 
-def split_rows_by_trace(rows: list[dict], val_ratio: float = 0.2, seed: int = 42):
-    """Split RAW rows (not yet feature-extracted) by trace_id, before any
-    grouping/sorting happens. Used by the ranking-objective path so that
-    qid group boundaries (derived downstream from trace_id) are never split
-    across train/val, and so a group's rows never get separated by an
-    unrelated shuffle of extracted arrays."""
-    import numpy as np
-
-    unique_traces = list({row.get(ID_COL, '') for row in rows})
-    rng = np.random.default_rng(seed)
-    rng.shuffle(unique_traces)
-    n_val = max(1, int(len(unique_traces) * val_ratio))
-    val_traces = set(unique_traces[:n_val])
-
-    train_rows = [row for row in rows if row.get(ID_COL, '') not in val_traces]
-    val_rows   = [row for row in rows if row.get(ID_COL, '') in val_traces]
-    return train_rows, val_rows
-
-
-def build_ranking_dataset(rows: list[dict]):
-    """Build a qid-grouped dataset for rank:pairwise/rank:ndcg via the
-    canonical grouped-ranking preparation module (python/atlas_xgboost_grouped_ranking_v1.py).
-    Rows are explicitly sorted by (trace_id, packet_key) before qid assignment —
-    group boundaries are exact, never inferred from arbitrary CSV row order.
-    Returns (X, y, qid, val_group_labels) where val_group_labels[i] is the
-    trace_id string for row i, aligned to the (sorted) row order of X/y/qid."""
-    dataset = prepare_grouped_ranking_dataset_v1(
-        rows,
-        FEATURE_COLS,
-        qid_field=ID_COL,
-        candidate_key_field='packet_key',
-        label_field=LABEL_COL,
-    )
-    group_labels = [dataset.qid_labels[i] for i in dataset.qid]
-    return dataset.X, dataset.y, dataset.qid, group_labels
-
-
 def evaluate_ndcg(model, X_val, y_val, val_groups: list[str], k: int = 10, use_lgbm: bool = False):
     """Group val rows by trace_id, rank by predicted score, compute NDCG@k and MRR@k."""
     preds = model.predict(X_val)
@@ -198,26 +158,14 @@ def evaluate_ndcg(model, X_val, y_val, val_groups: list[str], k: int = 10, use_l
     return avg_ndcg, avg_mrr, len(ndcgs)
 
 
-def _find_any_value_containing(value, needle: str) -> bool:
-    """Recursively search a parsed JSON structure for any string value
-    containing `needle` (case-insensitive). Used to verify the device that
-    actually trained the model, not merely the device that was requested."""
-    if isinstance(value, dict):
-        return any(_find_any_value_containing(v, needle) for v in value.values())
-    if isinstance(value, list):
-        return any(_find_any_value_containing(v, needle) for v in value)
-    return isinstance(value, str) and needle.lower() in value.lower()
-
-
-def train_xgboost(X_train, y_train, X_val, y_val, objective: str, device: str,
-                   qid_train=None, qid_val=None):
+def train_xgboost(X_train, y_train, X_val, y_val, objective: str):
     try:
         import xgboost as xgb
     except ImportError:
         print('ERROR: xgboost not installed. Run: pip install xgboost')
         sys.exit(1)
 
-    print(f'\nTraining XGBoost ({objective}) — {X_train.shape[0]:,} train rows, {X_val.shape[0]:,} val rows, device={device}')
+    print(f'\nTraining XGBoost ({objective}) — {X_train.shape[0]:,} train rows, {X_val.shape[0]:,} val rows')
 
     params = {
         'objective':        objective,
@@ -230,20 +178,13 @@ def train_xgboost(X_train, y_train, X_val, y_val, objective: str, device: str,
         'reg_alpha':        0.1,
         'reg_lambda':       1.0,
         'tree_method':      'hist',
-        'device':           device,
+        'device':           'cuda',  # falls back to cpu if no CUDA
         'eval_metric':      'rmse',
         'verbosity':        0,
     }
 
-    # QuantileDMatrix is the current stable recommendation for GPU training
-    # (lower memory footprint than a plain DMatrix's intermediate CSR build).
-    # dval must share dtrain's quantile bins via ref=dtrain.
-    dtrain = xgb.QuantileDMatrix(X_train, label=y_train, feature_names=FEATURE_COLS)
-    dval   = xgb.QuantileDMatrix(X_val,   label=y_val,   feature_names=FEATURE_COLS, ref=dtrain)
-
-    if qid_train is not None:
-        dtrain.set_info(qid=qid_train)
-        dval.set_info(qid=qid_val)
+    dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=FEATURE_COLS)
+    dval   = xgb.DMatrix(X_val,   label=y_val,   feature_names=FEATURE_COLS)
 
     evals_result: dict = {}
     booster = xgb.train(
@@ -255,22 +196,6 @@ def train_xgboost(X_train, y_train, X_val, y_val, objective: str, device: str,
         evals_result=evals_result,
         verbose_eval=50,
     )
-
-    # Fail closed: a caller that explicitly requested a CUDA device gets a
-    # hard error if the resolved training config doesn't actually show CUDA
-    # engaged — never silently accept a CPU run as equivalent to the
-    # requested GPU run. `device='cpu'` requests are exempt (nothing to
-    # verify). This inspects the booster's OWN resolved config, not just
-    # whether the request was accepted without raising.
-    if device != 'cpu':
-        resolved_config = json.loads(booster.save_config())
-        if not _find_any_value_containing(resolved_config, 'cuda'):
-            raise RuntimeError(
-                f'XGBOOST_GPU_DEVICE_FAIL_CLOSED: requested device={device!r} but the '
-                f'resolved booster config shows no cuda device engaged. Refusing to '
-                f'report this run as a GPU run. Pass --device cpu explicitly if a CPU '
-                f'run is actually intended.'
-            )
 
     # Wrap in sklearn API for evaluate_ndcg compatibility
     class BoosterWrapper:
@@ -327,13 +252,7 @@ def main():
     parser.add_argument('--lightgbm',   action='store_true', help='Use LightGBM instead of XGBoost')
     parser.add_argument('--dry-run',    action='store_true', help='Validate CSV only, no training')
     parser.add_argument('--ndcg-gate',  type=float, default=0.70, help='Min NDCG@10 to pass gate')
-    parser.add_argument('--device',     default='cuda:0', choices=['cpu', 'cuda:0', 'cuda'],
-                        help='XGBoost training device. A GPU request fails closed (nonzero exit, '
-                             'no report written) if CUDA does not actually engage — never silently '
-                             'downgrades to CPU and reports success. Pass --device cpu for an '
-                             'intentional CPU run.')
     args = parser.parse_args()
-    is_ranking = args.objective in ('rank:pairwise', 'rank:ndcg')
 
     print(f'\n═══ XGBoost/LightGBM Reranker Training ═══\n')
     print(f'CSV:       {CSV_PATH}')
@@ -345,12 +264,13 @@ def main():
         sys.exit(1)
 
     rows = load_csv(CSV_PATH)
+    X, y, groups = build_arrays(rows)
+
+    print(f'Feature matrix: {X.shape[0]:,} × {X.shape[1]} | label range [{y.min():.3f}, {y.max():.3f}]')
+    print(f'Positive labels (>0): {(y > 0).sum():,} ({100*(y>0).mean():.1f}%)')
+    print(f'Unique trace IDs:     {len(set(groups)):,}')
 
     if args.dry_run:
-        X, y, groups = build_arrays(rows)
-        print(f'Feature matrix: {X.shape[0]:,} × {X.shape[1]} | label range [{y.min():.3f}, {y.max():.3f}]')
-        print(f'Positive labels (>0): {(y > 0).sum():,} ({100*(y>0).mean():.1f}%)')
-        print(f'Unique trace IDs:     {len(set(groups)):,}')
         print('\n(dry-run — validation only, no training)')
         print('✅ CSV is valid and loadable')
         return
@@ -362,28 +282,12 @@ def main():
         print('ERROR: numpy not installed. Run: pip install numpy xgboost lightgbm')
         sys.exit(1)
 
-    MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
-
-    qid_train = qid_val = None
-    if is_ranking and not args.lightgbm:
-        # Split RAW rows by trace_id first (group-locality preserved before any
-        # feature extraction/sorting), then run each split through the
-        # canonical grouped-ranking builder to get an explicit, sorted qid.
-        train_rows, val_rows = split_rows_by_trace(rows)
-        X_train, y_train, qid_train, groups_train = build_ranking_dataset(train_rows)
-        X_val,   y_val,   qid_val,   groups_val   = build_ranking_dataset(val_rows)
-        print(f'Feature matrix (grouped): {X_train.shape[0] + X_val.shape[0]:,} × {X_train.shape[1]}')
-        print(f'Unique trace IDs:     {len(set(groups_train) | set(groups_val)):,}')
-    else:
-        X, y, groups = build_arrays(rows)
-        print(f'Feature matrix: {X.shape[0]:,} × {X.shape[1]} | label range [{y.min():.3f}, {y.max():.3f}]')
-        print(f'Positive labels (>0): {(y > 0).sum():,} ({100*(y>0).mean():.1f}%)')
-        print(f'Unique trace IDs:     {len(set(groups)):,}')
-        X_train, y_train, groups_train, X_val, y_val, groups_val = train_val_split(X, y, groups)
-
+    X_train, y_train, groups_train, X_val, y_val, groups_val = train_val_split(X, y, groups)
     print(f'\nTrain: {X_train.shape[0]:,} rows ({len(set(groups_train))} traces)')
     print(f'Val:   {X_val.shape[0]:,} rows ({len(set(groups_val))} traces)')
+
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
     if args.lightgbm:
         model, importance = train_lightgbm(X_train, y_train, X_val, y_val)
@@ -392,8 +296,7 @@ def main():
         model_path_str = str(LGB_PATH)
     else:
         wrapper, booster, importance, evals = train_xgboost(
-            X_train, y_train, X_val, y_val, args.objective, args.device,
-            qid_train=qid_train, qid_val=qid_val,
+            X_train, y_train, X_val, y_val, args.objective
         )
         booster.save_model(str(MODEL_PATH))
         print(f'\nModel saved: {MODEL_PATH}')
@@ -422,7 +325,6 @@ def main():
         'generated':    __import__('datetime').datetime.utcnow().isoformat() + 'Z',
         'model_type':   'lightgbm' if args.lightgbm else 'xgboost',
         'objective':    'regression' if args.lightgbm else args.objective,
-        'device':       'gpu-requested (see lightgbm device_type)' if args.lightgbm else args.device,
         'model_path':   model_path_str,
         'train_rows':   int(X_train.shape[0]),
         'val_rows':     int(X_val.shape[0]),

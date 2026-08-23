@@ -21,6 +21,16 @@ export interface AstGrepObservationContextV1 {
 	producerRevision: string;
 }
 
+/** Legacy provenance accepted for compatibility with existing callers. */
+export interface AstEvidenceProvenanceV1 {
+	sourceRef: string;
+	sourceRevision: string;
+	providerRevision: string;
+	graphRevision?: string;
+}
+
+type AstObservationInputV1 = AstGrepObservationContextV1 | AstEvidenceProvenanceV1;
+
 export interface ExtractedFeature {
 	type:
 		| 'ast_function'
@@ -49,6 +59,7 @@ export interface ExtractedFeature {
 	sourceRevision?: string;
 	providerRevision?: string;
 	producerRevision?: string;
+	provenance?: AstEvidenceProvenanceV1;
 	evidenceKey?: string;
 	lineageQualified?: boolean;
 }
@@ -62,6 +73,7 @@ type FeatureCore = Omit<
 	| 'sourceRevision'
 	| 'providerRevision'
 	| 'producerRevision'
+	| 'provenance'
 	| 'evidenceKey'
 	| 'lineageQualified'
 >;
@@ -103,11 +115,40 @@ function stableEvidenceKey(feature: FeatureCore, context: AstGrepObservationCont
 	return `astgrep:${createHash('sha256').update(payload, 'utf8').digest('hex')}`;
 }
 
+function legacyEvidenceKey(
+	provenance: AstEvidenceProvenanceV1,
+	feature: Pick<ExtractedFeature, 'type' | 'name' | 'byteStart' | 'byteEnd'>,
+): string | undefined {
+	if (feature.byteStart === undefined || feature.byteEnd === undefined) return undefined;
+	const value = [
+		provenance.sourceRef,
+		provenance.sourceRevision,
+		provenance.providerRevision,
+		feature.type,
+		feature.name,
+		feature.byteStart,
+		feature.byteEnd,
+	].join('\u001f');
+	return `ast:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
+}
+
+function isQualifiedContext(value: AstObservationInputV1): value is AstGrepObservationContextV1 {
+	return 'workspaceRevision' in value && 'producerRevision' in value;
+}
+
 function qualifyFeature(
 	feature: FeatureCore,
-	context?: AstGrepObservationContextV1,
+	context?: AstObservationInputV1,
 ): ExtractedFeature {
 	if (!context) return { ...feature, lineageQualified: false };
+	if (!isQualifiedContext(context)) {
+		return {
+			...feature,
+			provenance: context,
+			evidenceKey: legacyEvidenceKey(context, feature),
+			lineageQualified: false,
+		};
+	}
 	return {
 		...feature,
 		sourceRef: context.sourceRef,
@@ -124,7 +165,7 @@ function qualifyFeature(
 export async function extractAstFeatures(
 	code: string,
 	langHint?: string,
-	context?: AstGrepObservationContextV1,
+	context?: AstObservationInputV1,
 ): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	const lang = detectLang(langHint);
@@ -234,7 +275,7 @@ export async function extractAstFeatures(
 /** Parse code for external dependencies (import/require statements). */
 export async function extractDependencyFeatures(
 	code: string,
-	context?: AstGrepObservationContextV1,
+	context?: AstObservationInputV1,
 ): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	let root: ReturnType<typeof parse>;
@@ -269,7 +310,7 @@ export async function extractDependencyFeatures(
 /** Detect large functions as complexity/risk indicators. */
 export async function extractComplexityFeatures(
 	code: string,
-	context?: AstGrepObservationContextV1,
+	context?: AstObservationInputV1,
 ): Promise<ExtractedFeature[]> {
 	const { parse } = await import('@ast-grep/napi');
 	let root: ReturnType<typeof parse>;

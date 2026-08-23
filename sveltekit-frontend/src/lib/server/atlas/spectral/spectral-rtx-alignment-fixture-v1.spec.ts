@@ -21,5 +21,3 @@ describe('spectral RTX alignment fixture v1', () => {
     expect(() => assertSpectralRtxFixtureAligned({ fixture, workspaceRevision: 'w1', sourceRevision: 's1', representationRevision: 'r1', graphRevision: 'g1', ordinalMapChecksum: 'b'.repeat(64) })).toThrow('SPECTRAL_RTX_ORDINALMAPCHECKSUM_MISMATCH');
   });
 });
-
-

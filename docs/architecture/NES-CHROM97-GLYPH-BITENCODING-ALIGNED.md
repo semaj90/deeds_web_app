@@ -1,8 +1,15 @@
 # NES/CHROM97/Glyph BitEncoding Architecture — Phase 110+
 
-**Status**: Design-ready for Phase 110+  
+**Status**: Derived visualization design only; not an active retrieval or embedding owner.
 **Goal**: Unified memory hierarchy for feature extraction → latent encoding → glyph bitpacking → CHROM97 visualization  
 **Layers**: 5 (Canonical → Features → Latents → Glyphs → CHROM97)
+
+> **2026-08-22 alignment note:** The active Parent Atlas semantic representation is
+> `semantic_768`. Any `384` dimensions in this historical design are legacy or
+> explicitly derived projection examples and must not be used as a Qdrant,
+> Postgres, or embedding-writer default. Glyph/CHR97 bytes are visualization
+> artifacts keyed by canonical identity and revision; they do not become a
+> semantic vector, source-text encoding, or GPU identity coordinate.
 
 ---
 
@@ -558,6 +565,5 @@ npm run glyph:browser:smoke
 
 ---
 
-**Status**: 🟢 ARCHITECTURE READY  
-**Next**: Implement Layer 2 feature extraction (Phase 2B/2C/2D) in Session 111
-
+**Status**: Historical derived-visualization design; not a production promotion gate.
+**Next**: Define and prove the bounded pixel/row-stride/LOD artifact contract before any runtime promotion.

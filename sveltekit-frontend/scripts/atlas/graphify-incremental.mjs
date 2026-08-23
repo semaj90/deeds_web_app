@@ -51,7 +51,7 @@ function stableProjectionFingerprint(row) {
     kmeans_vector_contract: row.kmeans_vector_contract ?? null,
     cluster_margin: row.cluster_margin ?? null,
     embedding_model: 'embeddinggemma-300m',
-    embedding_dimension: 384,
+    embedding_dimension: 768,
   })).digest('hex');
 }
 

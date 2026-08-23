@@ -32,7 +32,6 @@ from atlas_structural_provenance import (
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
 )
-from atlas_treesitter_span_compat import resolve_chunk_byte_span
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -123,10 +122,12 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
             continue
         extracted.append(
             {
+                # Compatibility aliases retained while current callers migrate.
                 "class": normalized["extraction_class"],
                 "text": normalized["extraction_text"],
                 "start_char": start_pos,
                 "end_char": end_pos,
+                # Native LangExtract grounding contract.
                 "extraction_class": normalized["extraction_class"],
                 "extraction_text": normalized["extraction_text"],
                 "char_interval": interval,
@@ -138,81 +139,24 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
     return extracted
 
 
+# The existing _analyze() resolves this global at call time, so the facade can
+# upgrade grounding without duplicating the rest of the NLP feature compiler.
 legacy._grounded_extractions = _native_grounded_extractions
 
 
-def _line_span_to_utf8_byte_offsets(source: str, start_line: int, end_line: int) -> tuple[int, int]:
-    """Convert the legacy character-based line fallback into UTF-8 offsets."""
-
-    char_start, char_end = legacy._line_span_to_offsets(source, start_line, end_line)
-    return (
-        len(source[:char_start].encode("utf-8")),
-        len(source[:char_end].encode("utf-8")),
-    )
-
-
-def _structural_symbol_name(value: Any) -> str | None:
-    """Keep declaration identifiers while excluding module/string labels."""
-
-    if value is None:
-        return None
-    name = str(value).strip()
-    if not name or name == "<anonymous>":
-        return None
-    if len(name) >= 2 and name[0] in {"'", '"', "`"} and name[-1] == name[0]:
-        return None
-    if name[0] in {"{", "["}:
-        return None
-    return name
-
-
-def _normalized_lf_to_source_byte_offsets(source: str) -> list[int]:
-    """Map every LF-normalized UTF-8 boundary to the original source boundary."""
-
-    source_bytes = source.encode("utf-8")
-    normalized_bytes = source.replace("\r\n", "\n").encode("utf-8")
-    mapping = [0]
-    source_offset = 0
-    normalized_offset = 0
-    while normalized_offset < len(normalized_bytes):
-        if (
-            source_bytes[source_offset:source_offset + 2] == b"\r\n"
-            and normalized_bytes[normalized_offset:normalized_offset + 1] == b"\n"
-        ):
-            source_offset += 2
-        else:
-            source_offset += 1
-        normalized_offset += 1
-        mapping.append(source_offset)
-    return mapping
-
-
-def _repair_raw_chunk_byte_span(
-    source: str,
-    start: int,
-    end: int,
-    name: str | None,
-    normalized_offset_map: list[int],
-) -> tuple[int, int]:
-    """Prefer native byte spans and repair only valid LF-relative spans."""
-
-    source_bytes = source.encode("utf-8")
-    native_valid = 0 <= start <= end <= len(source_bytes)
-    native_text = source_bytes[start:end].decode("utf-8", errors="ignore") if native_valid else ""
-    if native_valid and (not name or name in native_text):
-        return start, end
-
-    if 0 <= start <= end < len(normalized_offset_map):
-        mapped_start = normalized_offset_map[start]
-        mapped_end = normalized_offset_map[end]
-        mapped_text = source_bytes[mapped_start:mapped_end].decode("utf-8", errors="ignore")
-        if mapped_start <= mapped_end <= len(source_bytes) and (not name or name in mapped_text):
-            return mapped_start, mapped_end
-    return start, end
-
-
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
-    """Return raw chunks plus whether logical identity_path was honored."""
+    """Return raw chunks plus whether logical identity_path was honored.
+
+    The temporary parser input is written as exact UTF-8 bytes. This is
+    intentional: Consiliency/Tree-sitter spans are byte coordinates, so text
+    mode newline translation (notably CRLF -> LF on Windows) would make the
+    returned offsets refer to bytes different from the request source.
+
+    If an older treesitter-chunker API rejects ``identity_path`` we may still
+    return structural evidence for search/diagnostics, but the response is
+    explicitly degraded so Graphify cannot allow GIS promotion from potentially
+    tempfile-affine upstream IDs.
+    """
 
     module = legacy.TREESITTER_CHUNKER_MODULE
     chunk_file = getattr(module, "chunk_file", None) if module is not None else None
@@ -244,6 +188,8 @@ def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[An
                         language,
                         extract_metadata=True,
                         include_retrieval_metadata=True,
+                        # Logical repository path is required for stable upstream
+                        # identities; tempfile path must never be treated as proof.
                         identity_path=file_path,
                     )
                     or []
@@ -255,121 +201,6 @@ def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[An
     finally:
         if temp_path:
             Path(temp_path).unlink(missing_ok=True)
-
-
-def _raw_chunk_content_bytes(raw: Any) -> bytes | None:
-    value = raw.get("content") if isinstance(raw, dict) else getattr(raw, "content", None)
-    if value is None:
-        value = raw.get("text") if isinstance(raw, dict) else getattr(raw, "text", None)
-    if value is None:
-        metadata = raw.get("metadata") if isinstance(raw, dict) else getattr(raw, "metadata", None)
-        if isinstance(metadata, dict):
-            value = metadata.get("content", metadata.get("text"))
-    if isinstance(value, bytes):
-        return value
-    if isinstance(value, str):
-        return value.encode("utf-8")
-    return None
-
-
-def _span_line_range(source_bytes: bytes, start: int, end: int) -> tuple[int, int]:
-    start_line = source_bytes[:start].count(b"\n") + 1
-    body = source_bytes[start:end].rstrip(b"\r\n")
-    return start_line, start_line + body.count(b"\n")
-
-
-def _span_matches_original(
-    source_bytes: bytes,
-    start: int,
-    end: int,
-    *,
-    content_bytes: bytes | None,
-    reported_start_line: int | None,
-    reported_end_line: int | None,
-    allow_lf_normalized_content: bool = False,
-) -> bool:
-    if start < 0 or end < start or end > len(source_bytes):
-        return False
-    if content_bytes is not None:
-        source_slice = source_bytes[start:end]
-        if allow_lf_normalized_content:
-            source_slice = source_slice.replace(b"\r\n", b"\n")
-        if source_slice != content_bytes:
-            return False
-    if reported_start_line is not None or reported_end_line is not None:
-        actual_start_line, actual_end_line = _span_line_range(source_bytes, start, end)
-        if reported_start_line is not None and actual_start_line != reported_start_line:
-            return False
-        if reported_end_line is not None and actual_end_line != reported_end_line:
-            return False
-    return True
-
-
-def _lf_boundary_to_original_map(source_bytes: bytes) -> list[int]:
-    """Map LF-normalized byte boundaries back to exact original boundaries."""
-
-    mapping = [0]
-    original_index = 0
-    while original_index < len(source_bytes):
-        if source_bytes[original_index:original_index + 2] == b"\r\n":
-            original_index += 2
-        else:
-            original_index += 1
-        mapping.append(original_index)
-    return mapping
-
-
-def _resolve_original_chunk_span(
-    source: str,
-    start: int,
-    end: int,
-    *,
-    content_bytes: bytes | None,
-    reported_start_line: int | None,
-    reported_end_line: int | None,
-) -> tuple[int, int, str | None] | None:
-    """Validate a native span, or conditionally repair LF offsets onto CRLF bytes."""
-
-    source_bytes = source.encode("utf-8")
-    if _span_matches_original(
-        source_bytes,
-        start,
-        end,
-        content_bytes=content_bytes,
-        reported_start_line=reported_start_line,
-        reported_end_line=reported_end_line,
-    ):
-        return start, end, None
-
-    if b"\r\n" not in source_bytes:
-        return None
-
-    normalized_bytes = source_bytes.replace(b"\r\n", b"\n")
-    if start < 0 or end < start or end > len(normalized_bytes):
-        return None
-
-    boundary_map = _lf_boundary_to_original_map(source_bytes)
-    if end >= len(boundary_map):
-        return None
-    remapped_start = boundary_map[start]
-    remapped_end = boundary_map[end]
-    if (remapped_start, remapped_end) == (start, end):
-        return None
-    if not _span_matches_original(
-        source_bytes,
-        remapped_start,
-        remapped_end,
-        content_bytes=content_bytes,
-        reported_start_line=reported_start_line,
-        reported_end_line=reported_end_line,
-        allow_lf_normalized_content=True,
-    ):
-        return None
-    return remapped_start, remapped_end, "CONSILIENCY_LF_OFFSET_REMAP"
-
-
-def _diagnostics_have_errors(diagnostics: list[str]) -> bool:
-    return any(not item.startswith("CONSILIENCY_LF_OFFSET_REMAP:") for item in diagnostics)
 
 
 def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
@@ -436,38 +267,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             if start_line is None or end_line is None:
                 diagnostics.append("ChunkingError: chunk missing both byte and line spans")
                 continue
-            start, end = _line_span_to_utf8_byte_offsets(req.source, int(start_line), int(end_line))
-        else:
-            span = resolve_chunk_byte_span(req.source, raw, int(start), int(end))
-            if span.mode == "INVALID":
-                diagnostics.append(
-                    "ChunkingError: explicit treesitter-chunker byte span does not match original UTF-8 bytes or LF-compatibility mapping"
-                )
-                continue
-            if span.mode == "LF_COMPAT_REMAPPED":
-                diagnostics.append(
-                    "CONSILIENCY_LF_BYTE_SPAN_REMAPPED: explicit chunk span was LF-relative and was mapped back to original UTF-8 bytes"
-                )
-            start, end = span.start_byte, span.end_byte
-            resolved_span = _resolve_original_chunk_span(
-                req.source,
-                int(start),
-                int(end),
-                content_bytes=_raw_chunk_content_bytes(raw),
-                reported_start_line=int(start_line) if start_line is not None else None,
-                reported_end_line=int(end_line) if end_line is not None else None,
-            )
-            if resolved_span is None:
-                identity = normalized.get("upstream_chunk_id") or normalized.get("upstream_node_id") or normalized.get("name") or "unknown"
-                diagnostics.append(
-                    f"ChunkingError: CONSILIENCY_BYTE_SPAN_INVALID:{identity}: explicit byte span does not reproduce original request bytes"
-                )
-                continue
-            start, end, repair = resolved_span
-            if repair is not None:
-                identity = normalized.get("upstream_chunk_id") or normalized.get("upstream_node_id") or normalized.get("name") or "unknown"
-                diagnostics.append(f"{repair}:{identity}:{int(normalized.get('byte_start'))}-{int(normalized.get('byte_end'))}->{start}-{end}")
-
+            start, end = legacy._line_span_to_offsets(req.source, int(start_line), int(end_line))
         start = max(0, int(start))
         end = max(start, int(end))
         start_row, start_column = legacy._offset_line_column(req.source, start)
@@ -482,7 +282,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 upstream_symbol_id=normalized.get("upstream_symbol_id"),
                 node_type=node_type,
                 kind=legacy._structural_kind(node_type),
-                name=_structural_symbol_name(normalized.get("name")),
+                name=normalized.get("name"),
                 parent_route=list(normalized.get("parent_route") or []),
                 parent_context=normalized.get("parent_context"),
                 start_byte=start,
@@ -564,7 +364,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         edges=edges,
         diagnostics=diagnostics,
         error_tag="ChunkingError" if any(item.startswith("ChunkingError:") for item in diagnostics) else None,
-        syntax_status="RECOVERED_WITH_ERRORS" if _diagnostics_have_errors(diagnostics) else "CLEAN",
+        syntax_status="RECOVERED_WITH_ERRORS" if diagnostics else "CLEAN",
     )
 
 

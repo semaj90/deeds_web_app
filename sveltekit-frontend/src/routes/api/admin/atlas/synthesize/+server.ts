@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
 import { loadMutationAwarenessV1 } from '$lib/server/atlas/graph/mutation-awareness.js';
-import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
+import { createAtlasRapidsPageRankClient, type AtlasPageRankReceiptV1, type AtlasPageRankResultV1 } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 import { createAtlasRapidsSemantic512Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic512-client.js';
@@ -159,7 +159,9 @@ export const POST: RequestHandler = async (event) => {
     const lexicalErrors = lexicalResult.status === 'rejected'
       ? [lexicalResult.reason instanceof Error ? lexicalResult.reason.message : String(lexicalResult.reason)]
       : [];
-    const pprReceipt = pprResult.status === 'fulfilled' ? pprResult.value : null;
+    const pprReceipt: AtlasPageRankReceiptV1 | null = pprResult.status === 'fulfilled'
+      ? pprResult.value as AtlasPageRankReceiptV1 | null
+      : null;
     const pprErrors = pprResult.status === 'rejected'
       ? [pprResult.reason instanceof Error ? pprResult.reason.message : String(pprResult.reason)]
       : [];
@@ -190,7 +192,7 @@ export const POST: RequestHandler = async (event) => {
         exactSemanticReceipt = await exactClient.exactKnn({
           query: {
             vector: semanticReceipt.queryVector,
-            representationId: 'semantic_512',
+            representationId: 'semantic_768',
             representationRevision: semanticReceipt.representationRevision,
           },
           corpus: exactEligibleRows.map((score) => ({
@@ -219,7 +221,7 @@ export const POST: RequestHandler = async (event) => {
     const lexicalByPacket = new Map(
       (lexicalReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
     );
-    const pprByNode = new Map(
+    const pprByNode = new Map<string, AtlasPageRankResultV1>(
       (pprReceipt?.results ?? []).map((score) => [score.nodeKey, score]),
     );
 
@@ -240,8 +242,8 @@ export const POST: RequestHandler = async (event) => {
         sourceRef: node.sourceRef,
         sourceMutationStatus,
         sourceFreshnessProven: sourceMutationStatus === 'FRESH',
-        semanticCosine: exactSemantic?.cosineSimilarity ?? qdrantSemantic?.score ?? null,
-        lexicalScore: lexical?.score ?? null,
+        semanticCosine: exactSemantic?.cosineSimilarity ?? (qdrantSemantic as { score?: number } | undefined)?.score ?? null,
+        lexicalScore: (lexical as { score?: number } | undefined)?.score ?? null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
         astMatch: null,
         personalizedPageRank: queryPpr?.score ?? staticGraph?.personalizedPageRank ?? null,
@@ -366,7 +368,7 @@ export const POST: RequestHandler = async (event) => {
             ? `source freshness remains unknown for at least one candidate; ${gpuBudget.reason}`
             : gpuBudget.reason,
         residency: gpuBudget,
-        stages: ['source_ref_mutation_gate', 'semantic_512', 'cuvs_exact_cosine_v2', 'lexical', 'personalized_pagerank', 'graph_features', 'exact_promotion', 'context_manifest'],
+        stages: ['source_ref_mutation_gate', 'semantic_768', 'cuvs_exact_cosine_v2', 'lexical', 'personalized_pagerank', 'graph_features', 'exact_promotion', 'context_manifest'],
       },
       semantic: {
         qdrant: { receipt: semanticPublicReceipt, errors: semanticErrors },
@@ -390,8 +392,8 @@ export const POST: RequestHandler = async (event) => {
       },
       retrievalPlan: {
         sourceFreshness: 'source_ref + trusted snapshot sha256 + git_mutation_provenance; no fabricated source_revision',
-        dense: 'codebase_chunks_512 (persisted EmbeddingGemma MRL semantic_512, cosine)',
-        exactDense: shouldRunExactSemantic ? 'cuVS brute_force cosine v2 over bounded non-stale semantic_512 rows' : null,
+        dense: 'codebase_chunks_768_v2 (persisted EmbeddingGemma native semantic_768, cosine)',
+        exactDense: shouldRunExactSemantic ? 'cuVS brute_force cosine v2 over bounded non-stale semantic_768 rows' : null,
         routing: 'latent_64 autoencoder + KMeans is routing-only and requires its own revision receipt before use',
         lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',
         queryGraph: shouldRunQueryPpr ? 'resident cuGraph personalized PageRank over the requested graphRevision' : null,
@@ -405,10 +407,10 @@ export const POST: RequestHandler = async (event) => {
             ? 'Promote UNKNOWN source occurrences against current source content/AST before invoking the model.'
             : 'Selected source occurrences are freshness-proven against available mutation evidence.',
         semantic: exactSemanticReceipt
-          ? 'semanticCosine is exact cuVS cosine over the bounded semantic_512 candidate fabric; source freshness remains a separate receipt.'
+          ? 'semanticCosine is exact cuVS cosine over the bounded semantic_768 candidate fabric; source freshness remains a separate receipt.'
           : semanticReceipt
             ? 'semanticCosine currently uses Qdrant cosine because exact cuVS was skipped/failed; do not conflate this with source freshness.'
-            : 'Qdrant semantic_512 enrichment failed open; do not fabricate semanticCosine.',
+            : 'Qdrant semantic_768 enrichment failed open; do not fabricate semanticCosine.',
         lexical: lexicalReceipt
           ? 'lexicalScore is hydrated by PostgreSQL FTS; BM42 remains challenger-only.'
           : 'PostgreSQL lexical enrichment failed open; BM42 must not silently become the canonical lexical score.',
@@ -417,7 +419,7 @@ export const POST: RequestHandler = async (event) => {
           : body.graphRevision
             ? 'Query-time PPR failed open or GPU policy skipped it; only revision-qualified persisted graph features may remain.'
             : 'Provide graphRevision to hydrate persisted graph features and enable query-time PPR; never infer it from snapshotId.',
-        routing: 'Train semantic_512→latent_64, run deterministic KMeans, then prove routed Recall@K against full semantic_512 cuVS exact before enabling cluster prefiltering.',
+        routing: 'Train semantic_768→latent_64, run deterministic KMeans, then prove routed Recall@K against full semantic_768 cuVS exact before enabling cluster prefiltering.',
         cache: 'BitFrost/Valkey entries must be keyed by snapshot/representation/mutation evidence before they can be trusted after a source change.',
         promotion: 'Hydrate exact current source/AST/type evidence; UNKNOWN freshness must not reach the synthesis model.',
       },

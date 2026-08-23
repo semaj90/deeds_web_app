@@ -44,18 +44,6 @@ export const BlendWeightsSchema = z
 
 export type BlendWeights = z.infer<typeof BlendWeightsSchema>;
 
-/**
- * Domain/policy fields are deliberately independent.
- *
- * - domainClass is a categorical label/evidence value.
- * - domainScore is a query-conditioned, lineage-qualified numeric affinity.
- * - rewardPrior is historical/policy evidence and is NOT a domain score.
- * - domainClassMatch is a query↔candidate comparison and is NOT the label itself.
- *
- * Callers must leave numeric fields undefined when they do not have an explicit
- * producer. In particular, a generic metadata composite must never be copied
- * into these fields as a neutral-looking substitute.
- */
 export const RerankCandidateSchema = z.object({
   packetKey: z.string().min(1),
   sourceRef: z.string().min(1),
@@ -69,10 +57,7 @@ export const RerankCandidateSchema = z.object({
   astScore: z.number().min(0).max(1).optional(),
   graphScore: z.number().min(0).max(1).optional(),
   pagerankScore: z.number().min(0).max(1).optional(),
-  domainClass: z.string().min(1).optional(),
   domainScore: z.number().min(0).max(1).optional(),
-  rewardPrior: z.number().min(0).max(1).optional(),
-  domainClassMatch: z.number().min(0).max(1).optional(),
   crossEncoderScore: z.number().finite().optional(),
   crossEncoderScoreNormalized: z.number().min(0).max(1).optional(),
 });

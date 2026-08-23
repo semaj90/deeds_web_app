@@ -104,7 +104,7 @@ export const BrowserContextSnapshotSchema = z.object({
   /** id of the DOM element under the operator's cursor when they invoked Copilot.
    *  No values, no innerText — id only. Helps the assistant ground "what's selected". */
   highlighted_element_id: z.string().max(BROWSER_CONTEXT_CAPS.MAX_HIGHLIGHTED_ID).optional(),
-  /** Local embedding model used by the worker, if any. e.g. 'Xenova/all-MiniLM-L6-v2'. */
+  /** Local canonical embedding model used by the worker, if any. Expected output is 768-dim. */
   embed_model:  z.string().max(200).optional(),
   /** WebGPU / WASM / unavailable. */
   embed_device: z.enum(['webgpu', 'wasm', 'cpu', 'unavailable']).default('unavailable'),

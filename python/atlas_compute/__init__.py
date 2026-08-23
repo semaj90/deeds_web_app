@@ -26,13 +26,7 @@ from .gpu_memory import GpuMemoryReceipt, GpuMemorySampler
 from .graph_programs import BfsReceipt, CondensationDagReceipt, deterministic_bfs, condense_and_lexicographically_sort
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
 from .interpolation import TensorInterpolationReceipt, interpolate_topology_field
-from .low_rank import (
-    LowRankComparisonReceipt,
-    LowRankCpuCudaParityReceipt,
-    candidate_ordinal_map_checksum,
-    compare_low_rank_recommendations,
-    prove_low_rank_cpu_cuda_parity,
-)
+from .low_rank import LowRankComparisonReceipt, compare_low_rank_recommendations
 from .model_topology import ModelTopologyDetection, audit_model_manifest, detect_model_topology
 from .moe_grouped_mm import MoeGroupedMmReceipt, run_grouped_mm_experiment
 from .nary_feature_propagation import NaryFeaturePropagationReceipt, propagate_nary_features

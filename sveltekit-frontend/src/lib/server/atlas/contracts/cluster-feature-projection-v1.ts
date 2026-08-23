@@ -8,7 +8,7 @@ export const ClusterFeatureProjectionV1Schema = z.object({
   sourceRef: z.string().min(1),
   sourceVersionReceiptId: z.string().min(1).nullable(),
 
-  sourceRepresentationId: z.literal('semantic_512'),
+  sourceRepresentationId: z.literal('semantic_768'),
   sourceRepresentationRevision: z.string().min(1),
   routingRepresentationId: z.literal('latent_64').nullable(),
   autoencoderRevision: z.string().min(1).nullable(),

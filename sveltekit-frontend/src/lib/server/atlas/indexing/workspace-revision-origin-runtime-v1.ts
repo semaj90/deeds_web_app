@@ -63,9 +63,8 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   producerRevision: string;
   generatedAt?: string;
   maxSourceBytes?: number;
-  /** Optional bounded source scope for read-only proofs; never implies completeness. */
-  sourceRefs?: readonly string[];
   sourceExtensions?: ReadonlySet<string>;
+  onProgress?: (progress: { completed: number; total: number; sourceRef: string }) => void;
 }): WorkspaceRevisionOriginRuntimeV1 {
   const workspaceRoot = path.resolve(input.workspaceRoot);
   const maxSourceBytes = input.maxSourceBytes ?? 5 * 1024 * 1024;
@@ -84,23 +83,19 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   const trackedOutput = git(workspaceRoot, ['ls-tree', '-r', '--name-only', '-z', 'HEAD']);
   const trackedAtHead = new Set(trackedOutput.split('\0').filter(Boolean).map(normalizeSourceRef));
   const currentOutput = git(workspaceRoot, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']);
-  const discoveredFiles = [...new Set(currentOutput
+  const files = [...new Set(currentOutput
     .split('\0')
     .filter(Boolean)
     .map(normalizeSourceRef)
     .filter((sourceRef) => isSourceFile(sourceRef, extensions)))]
     .sort();
-  const requestedSourceRefs = input.sourceRefs?.map(normalizeSourceRef).filter(Boolean);
-  const files = requestedSourceRefs && requestedSourceRefs.length > 0
-    ? [...new Set(requestedSourceRefs)].filter((sourceRef) => discoveredFiles.includes(sourceRef)).sort()
-    : discoveredFiles;
 
   const entries: WorkspaceSourceManifestEntryV1[] = [];
   const tracked = new Map<string, boolean>();
   const dirtyByPath = new Map<string, boolean>();
   const skipped: Array<{ sourceRef: string; reason: string }> = [];
 
-  for (const sourceRef of files) {
+  for (const [index, sourceRef] of files.entries()) {
     const absolute = path.resolve(workspaceRoot, sourceRef);
     if (absolute !== workspaceRoot && !absolute.startsWith(`${workspaceRoot}${path.sep}`)) {
       skipped.push({ sourceRef, reason: 'PATH_OUTSIDE_REPOSITORY' });
@@ -142,6 +137,7 @@ export function materializeWorkspaceRevisionOriginV1(input: {
     } catch (error) {
       skipped.push({ sourceRef, reason: error instanceof Error ? error.message : String(error) });
     }
+    input.onProgress?.({ completed: index + 1, total: files.length, sourceRef });
   }
 
   if (entries.length === 0) throw new Error('WORKSPACE_REVISION_NO_INDEXABLE_SOURCE_FILES');

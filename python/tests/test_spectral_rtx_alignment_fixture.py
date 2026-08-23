@@ -34,5 +34,3 @@ def test_fixture_is_deterministic_and_non_promotable():
     assert first["canonicalWritesAllowed"] is False
     assert first["identityAuthority"] is False
     assert first["promotionEligible"] is False
-
-

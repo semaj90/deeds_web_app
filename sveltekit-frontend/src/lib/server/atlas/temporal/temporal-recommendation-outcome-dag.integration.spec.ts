@@ -30,6 +30,13 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 
+// Requires a real reachable Postgres + real tool dispatch (rg_search over src/).
+// Opt-in only, matching the established repo convention in
+// tests/engram-registry-db.integration.spec.ts, so a normal `vitest run`
+// without RUN_DB_INTEGRATION=1 set never attempts a live DB connection.
+const RUN_DB_INTEGRATION = process.env.RUN_DB_INTEGRATION === '1';
+const describeIf = RUN_DB_INTEGRATION ? describe : describe.skip;
+
 // First call to executeTool() triggers a cold dynamic import of
 // mcp-tool-dispatch.js, whose module graph touches several other
 // service clients (Redis, Qdrant, Neo4j) at import time even though this
@@ -63,17 +70,7 @@ for (const file of ['.env', '.env.local']) {
     config({ path, override: false });
   }
 }
-
-// Never let this proof inherit the shared workstation DATABASE_URL. A live
-// run requires an explicit disposable target supplied by the operator.
-const integrationDatabaseUrl = process.env.ATLAS_INTEGRATION_DATABASE_URL;
-const RUN_DB_INTEGRATION = process.env.RUN_DB_INTEGRATION === '1' && Boolean(integrationDatabaseUrl);
-const describeIf = RUN_DB_INTEGRATION ? describe : describe.skip;
-let pool: { query: (sql: string, params?: unknown[]) => Promise<any> } | null = null;
-if (RUN_DB_INTEGRATION) {
-  process.env.DATABASE_URL = integrationDatabaseUrl;
-  ({ pool } = await import('$lib/server/db/client.js'));
-}
+const { pool } = await import('$lib/server/db/client.js');
 
 const RUN_ID = `dag-live-proof-${Date.now()}`;
 const PRODUCER_REVISION = `${RUN_ID}:v1`;
@@ -100,7 +97,7 @@ const RETRY_POLICY_NO_RETRY = {
   )[],
 };
 
-const actionRepo = pool ? createTemporalActionPostgresRepository(pool) : null;
+const actionRepo = createTemporalActionPostgresRepository(pool);
 // atlas_agent_action_events.ledger_sequence is UNIQUE across the whole table
 // (not scoped per workflow_id), and all three scenarios below run in the same
 // process before the shared afterAll fires — so each seeded event needs a
@@ -223,7 +220,6 @@ function buildK2Plan(scenario: string, workflowId: string, call: { tool: string;
 }
 
 afterAll(async () => {
-  if (!pool) return;
   for (const workflowId of seededWorkflowIds) {
     await pool.query(`DELETE FROM atlas_agent_action_events WHERE workflow_id = $1`, [workflowId]);
   }

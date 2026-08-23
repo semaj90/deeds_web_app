@@ -201,7 +201,7 @@ export function buildAceQueryPacket(input: AceQueryPacketBuildInput): AceQueryPa
     },
     provenance: {
       processingPassId: input.processingPassId ?? `ace-routing:${hash}`,
-      embeddingContractVersion: input.embeddingContractVersion ?? 'embeddinggemma-384',
+      embeddingContractVersion: input.embeddingContractVersion ?? 'embeddinggemma-semantic-768',
       retrievalContractVersion: input.retrievalContractVersion ?? 'hybrid-rrf-v1',
       evidenceIds: input.evidenceIds ?? [],
       traceId: input.traceId ?? queryId,

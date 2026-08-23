@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 import time
 from collections import defaultdict
 from typing import Any, Literal
@@ -114,61 +113,11 @@ class CommunityPartitionResponseV1(BaseModel):
     inputHash: str
     outputHash: str
     durationMs: float
-    executionReceipt: dict[str, Any] | None = None
 
 
 def _sha256_json(value: Any) -> str:
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return "sha256:" + hashlib.sha256(encoded).hexdigest()
-
-
-def _execution_receipt(
-    *,
-    graph_input_hash: str,
-    assignment_checksum: str,
-    duration_ms: float,
-    torch: Any,
-    cugraph: Any,
-) -> dict[str, Any]:
-    """Collect observational runtime evidence; never authorize a promotion."""
-    driver_version: str | None = None
-    try:
-        completed = subprocess.run(
-            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=2,
-        )
-        if completed.returncode == 0 and completed.stdout.strip():
-            driver_version = completed.stdout.strip().splitlines()[0]
-    except (FileNotFoundError, OSError, subprocess.TimeoutExpired):
-        pass
-
-    gpu_memory: dict[str, Any] | None = None
-    try:
-        free_bytes, total_bytes = torch.cuda.mem_get_info()
-        gpu_memory = {"freeBytes": int(free_bytes), "totalBytes": int(total_bytes)}
-    except Exception:
-        gpu_memory = None
-
-    return {
-        "schema": "atlas.community-execution-receipt.v1",
-        "graphInputHash": graph_input_hash,
-        "assignmentChecksum": assignment_checksum,
-        "durationMs": duration_ms,
-        "gpu": {
-            "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-            "cudaAvailable": bool(torch.cuda.is_available()),
-            "torchVersion": str(getattr(torch, "__version__", "unknown")),
-            "torchCudaRuntime": str(getattr(torch.version, "cuda", None)),
-            "driverVersion": driver_version,
-            "memory": gpu_memory,
-        },
-        "rapids": {"cugraphVersion": str(getattr(cugraph, "__version__", "unknown"))},
-        "canonicalWritesAllowed": False,
-        "promotionEligible": False,
-    }
 
 
 def canonicalize_undirected_edges(
@@ -237,34 +186,27 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
     """Execute Louvain or Leiden against the request's explicit undirected projection."""
     started = time.perf_counter()
     try:
-        # Load PyTorch first so its CUDA runtime symbols are resolved before
-        # RAPIDS loads its cuBLAS/cuGraph extensions in shared processes.
-        import torch  # noqa: F401
         import cudf
         import cugraph
     except Exception as exc:  # pragma: no cover - runtime capability boundary
         raise RuntimeError(f"cuGraph unavailable: {type(exc).__name__}: {exc}") from exc
 
     node_ids, canonical_edges = canonicalize_undirected_edges(req.nodes, req.edges)
-    # Keep every ordinal column at one width.  cuGraph's spectral modularity
-    # implementation requires int32 vertices; allowing DataFrame inference to
-    # widen only the edge columns causes invalid device-side graph copies.
-    ordinal_dtype = "int32"
-    vertices = cudf.Series(list(range(len(node_ids))), dtype=ordinal_dtype)
+    vertices = cudf.Series(list(range(len(node_ids))), dtype="int32")
 
     if canonical_edges:
         edge_df = cudf.DataFrame(
             {
-                "src": cudf.Series([edge[0] for edge in canonical_edges], dtype=ordinal_dtype),
-                "dst": cudf.Series([edge[1] for edge in canonical_edges], dtype=ordinal_dtype),
+                "src": [edge[0] for edge in canonical_edges],
+                "dst": [edge[1] for edge in canonical_edges],
                 "weight": [edge[2] for edge in canonical_edges],
             }
         )
     else:
         edge_df = cudf.DataFrame(
             {
-                "src": cudf.Series([], dtype=ordinal_dtype),
-                "dst": cudf.Series([], dtype=ordinal_dtype),
+                "src": cudf.Series([], dtype="int32"),
+                "dst": cudf.Series([], dtype="int32"),
                 "weight": cudf.Series([], dtype="float32"),
             }
         )
@@ -361,8 +303,6 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
         "modularity": float(modularity) if modularity is not None else None,
         "qualityMetric": quality_metric,
     }
-    duration_ms = round((time.perf_counter() - started) * 1000.0, 3)
-    assignment_checksum = _sha256_json(canonical_output["assignments"])
 
     return CommunityPartitionResponseV1(
         algorithm=req.algorithm,
@@ -379,12 +319,5 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
         communities=communities,
         inputHash=_sha256_json(canonical_input),
         outputHash=_sha256_json(canonical_output),
-        durationMs=duration_ms,
-        executionReceipt=_execution_receipt(
-            graph_input_hash=_sha256_json(canonical_input),
-            assignment_checksum=assignment_checksum,
-            duration_ms=duration_ms,
-            torch=torch,
-            cugraph=cugraph,
-        ),
+        durationMs=round((time.perf_counter() - started) * 1000.0, 3),
     )

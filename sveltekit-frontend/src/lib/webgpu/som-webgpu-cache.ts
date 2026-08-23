@@ -534,9 +534,9 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
   private computeErrorEmbeddingsCPU(errors: NPMError[]): Float32Array[] {
     return errors.map((error) => {
       const embedding = new Float32Array(128);
-      const textBytes = new TextEncoder().encode(error.message.toLowerCase());
-      for (let i = 0; i < textBytes.length && i < 128; i++) {
-        embedding[i] = textBytes[i] / 255.0;
+      const text = error.message.toLowerCase();
+      for (let i = 0; i < text.length && i < 128; i++) {
+        embedding[i] = text.charCodeAt(i) / 255.0;
       }
       return embedding;
     });
@@ -752,7 +752,8 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
 
   private generateCacheKey(input: string): string {
     let hash = 0;
-    for (const char of new TextEncoder().encode(input)) {
+    for (let i = 0; i < input.length; i++) {
+      const char = input.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }

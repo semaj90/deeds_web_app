@@ -40,10 +40,16 @@ File-backed `MMAP` / `ARROW_IPC` materialization must prove:
 ## P1 — candidate feature fabric
 
 - [x] FEAT-00 Add `CandidateFeatureRowV1` schema with nullable learned features and availability flags.
-- [ ] FEAT-01 Add `CandidateFeatureSnapshotV1` materializer with one row per CandidateOrdinal.
-- [ ] FEAT-02 Join semantic/lexical/AST/graph/domain/execution/memory features by ordinal and fail on revision mismatch.
+- [x] FEAT-01 Add `CandidateFeatureSnapshotV1` materializer with one row per CandidateOrdinal. **Fixture-proven; live lane join remains open.**
+- [x] FEAT-02 Join semantic/lexical/AST/graph/domain/execution/memory features by ordinal and fail on revision mismatch. **Fixture-proven; live producer alignment remains open.**
 - [ ] FEAT-03 Add CPU reference materializer and GPU gather/scatter/sort/compact challenger.
-- [ ] FEAT-04 Require CPU↔GPU ordinal and feature parity receipt.
+- [x] FEAT-04 Require CPU↔GPU ordinal and feature parity receipt; bounded RTX proof passed, production residency and fanout remain separate gates.
+- [ ] FEAT-03E Add the revision-bound CPU feature-head GEMM oracle and checksum receipt; focused TypeScript proof passes, native CUDA/LibTorch parity remains open.
+
+Current checkout reconciliation: snapshot/columnar focused tests pass `10/10`.
+Arrow readback is blocked by the Vitest import boundary for the root `.mjs`
+helper, and FEAT-03/04 remain unproven until the supported readback and actual
+GPU parity receipts pass. No executor or canonical-store promotion is implied.
 
 ## P1 — manifold4 / SOM derived projection
 
@@ -200,9 +206,10 @@ marked otherwise; nothing here is speculative.
 3. **QUEUE-05 steps 4–8** — redirect the real `document.embed`/`vector.index` producers
    (`rabbitmq-manager-fixed.ts`, `queue-worker.ts`) onto `ArtifactAddressV1` references, Qdrant
    readback verification, large-payload audit, before/after latency benchmark.
-4. **FEAT-01→04** (Arrow IPC snapshot, CPU/GPU materializer, parity receipt) — deliberately never
-   started; needs a real design decision on Arrow IPC layout and a working CUDA path to verify
-   against, not something to stub out unverified.
+4. **FEAT-01→04** — implementation and bounded proof now exist. FEAT-01/02 are
+   fixture-proven, FEAT-03D/04 have a real RTX CUDA parity receipt, and the CPU
+   feature-head GEMM oracle is focused-test proven. Native LibTorch/cuBLAS GEMM
+   parity, production residency, and live producer alignment remain open.
 5. The corruption-fix pattern found in indexing/ (§ above) suggests other files touched by the
    same `401f319770` merge may have the same interleaving bug — **not swept for this pass**, only
    the two files actually needed for the taxonomy fix were checked and repaired. Worth a

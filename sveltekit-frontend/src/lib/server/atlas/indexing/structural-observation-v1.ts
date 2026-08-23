@@ -77,14 +77,6 @@ export function normalizeStructuralSymbolKind(
   return 'UNKNOWN';
 }
 
-export function normalizeStructuralSymbolName(value: string | null | undefined): string | null {
-  const name = value?.trim() || null;
-  if (!name) return null;
-  if (name === '<anonymous>' || name.startsWith('{') || name.startsWith('[')) return null;
-  if (name.length >= 2 && [`'`, '"', '`'].includes(name[0]!) && name.at(-1) === name[0]) return null;
-  return name;
-}
-
 export function projectStructuralObservation(
   provider: string,
   source: string,
@@ -98,7 +90,7 @@ export function projectStructuralObservation(
     && startByte >= 0
     && endByte >= startByte
     && endByte <= bytes.byteLength;
-  const name = normalizeStructuralSymbolName(chunk.name);
+  const name = chunk.name?.trim() || null;
   const spanText = spanValid ? bytes.subarray(startByte, endByte).toString('utf8') : '';
 
   return {

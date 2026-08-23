@@ -23,8 +23,9 @@ export interface PacketIdentity {
 export interface Packet extends PacketIdentity {
   id: string; // duplicate of packet_key for compatibility
   summary: string; // one-liner description
-  embedding?: Float32Array; // 768-dim (deprecated in atlas_packets)
-  embedding_384?: Float32Array; // canonical 384-dim from codebase_chunk_index
+  embedding?: Float32Array; // canonical EmbeddingGemma semantic_768 representation
+  embedding_768?: Float32Array; // explicit semantic_768 alias for typed consumers
+  embedding_384?: Float32Array; // legacy/reference-only projection; never canonical
   qdrant_point_id?: string; // reference to Qdrant point
   som_cluster?: number; // SOM cluster assignment
   pagerank_score?: number; // Neo4j PageRank

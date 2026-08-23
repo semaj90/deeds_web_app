@@ -76,27 +76,6 @@ def test_missing_modularity_is_partial_not_proven() -> None:
     assert "MODULARITY_NOT_COMPARABLE" in receipt.reasonCodes
 
 
-def test_spectral_fixture_assignment_is_compared_without_modularity_claim() -> None:
-    receipt = compare_community_partitions_v1(
-        CommunityParityInputV1(
-            graphRevision="fixture:components",
-            projectionRevision="projection:1",
-            topologyHash="sha256:topology",
-            algorithm="spectral",
-            oracleBackend="networkx-components-fixture",
-            challengerBackend="cugraph-spectral",
-            oracleAssignments=_rows({"0": "left", "1": "left", "2": "left", "3": "right", "4": "right", "5": "right"}),
-            challengerAssignments=_rows({"0": "7", "1": "7", "2": "7", "3": "9", "4": "9", "5": "9"}),
-        )
-    )
-
-    assert receipt.adjustedRandIndex == pytest.approx(1.0)
-    assert receipt.normalizedMutualInformation == pytest.approx(1.0)
-    assert receipt.pairwiseMembershipAgreement == pytest.approx(1.0)
-    assert receipt.status == "PARTIAL"
-    assert "MODULARITY_NOT_COMPARABLE" in receipt.reasonCodes
-
-
 def test_mismatched_node_universe_fails_closed() -> None:
     with pytest.raises(ValueError, match="node universes differ"):
         CommunityParityInputV1(

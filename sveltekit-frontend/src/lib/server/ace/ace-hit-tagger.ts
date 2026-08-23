@@ -14,7 +14,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { qdrant } from '$lib/server/db/unified-client.js';
 import type { ACEContext } from './types.js';
 
-const COLLECTION = 'codebase_chunks_768';
+const COLLECTION = 'codebase_chunks_768_v2';
 const REDIS_PREFIX = 'ace:chunk:hits:';
 
 export interface AceHitSummary {

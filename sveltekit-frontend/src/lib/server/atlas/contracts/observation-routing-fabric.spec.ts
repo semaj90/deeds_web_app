@@ -9,7 +9,7 @@ describe('Observation Routing Fabric contracts', () => {
       sourceRef: 'src/lib/db/upsert.ts',
       treeNodeId: 'tree:42',
       sourceVersionReceiptId: 'svr:abc',
-      representationId: 'semantic_512',
+      representationId: 'semantic_768',
       representationRevision: 'sem512:r1',
       ontologyClasses: ['RETRIEVAL', 'DATABASE', 'API'],
       astObservationKinds: ['DATABASE_WRITE', 'FUNCTION_CALL', 'OBJECT_LITERAL'],
@@ -34,14 +34,14 @@ describe('Observation Routing Fabric contracts', () => {
     expect(first.evidenceRefs).toEqual(['evidence:1', 'evidence:2']);
   });
 
-  it('builds semantic_512 + latent_64 router rows without conflating representations', () => {
+  it('builds semantic_768 + latent_64 router rows without conflating representations', () => {
     const observation = buildObservationFeatureProjectionV1({
       packetKey: 'packet:qdrant-upsert',
       sourceRef: 'src/lib/qdrant/upsert.ts',
       treeNodeId: 'tree:99',
       sourceVersionReceiptId: 'svr:99',
-      representationId: 'semantic_512',
-      representationRevision: 'sem512:r7',
+      representationId: 'semantic_768',
+      representationRevision: 'sem768:r7',
       ontologyClasses: ['RETRIEVAL', 'VECTOR', 'DATABASE'],
       astObservationKinds: ['FUNCTION_CALL', 'DATABASE_WRITE'],
       langextractClasses: ['api'],
@@ -63,9 +63,9 @@ describe('Observation Routing Fabric contracts', () => {
       graphRevision: 'graph:338',
       observation,
       semantic: {
-        representationId: 'semantic_512',
-        representationRevision: 'sem512:r7',
-        dimension: 512,
+        representationId: 'semantic_768',
+        representationRevision: 'sem768:r7',
+        dimension: 768,
         cosine: 0.91,
       },
       latent: {
@@ -81,8 +81,8 @@ describe('Observation Routing Fabric contracts', () => {
       evidence: { groundingExact: true, validatorPassed: true, authorityWeight: 0.9 },
     });
 
-    expect(row.semantic.dimension).toBe(512);
-    expect(row.semantic.representationId).toBe('semantic_512');
+    expect(row.semantic.dimension).toBe(768);
+    expect(row.semantic.representationId).toBe('semantic_768');
     expect(row.latent?.dimension).toBe(64);
     expect(row.latent?.representationId).toBe('latent_64');
     expect(row.structure.hasDatabaseAccess).toBe(true);
@@ -106,7 +106,7 @@ describe('Observation Routing Fabric contracts', () => {
       featureRevision: 'orf:1',
       observation,
       semantic: {
-        representationId: 'semantic_512',
+        representationId: 'semantic_768',
         representationRevision: 'sem512:r1',
         dimension: 512,
         cosine: null,

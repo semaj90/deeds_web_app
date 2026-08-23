@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-v1.js';
 import { materializeObservationCoordinateV2 } from './observation-coordinate-v2.js';
 import { materializeOntologyObservationTupleV1 } from './ontology-observation-tuple-v1.js';
-import { materializePreFanoutEvidenceBundleV1 } from './pre-fanout-evidence-bundle-v1.js';
+import { materializePreFanoutEvidenceBundleV1, verifyPreFanoutBundleAgainstAdmissionV1 } from './pre-fanout-evidence-bundle-v1.js';
 
 function fixtureMap() {
   return materializeCandidateOrdinalMap({
@@ -147,5 +147,27 @@ describe('pre-fanout evidence alignment', () => {
       },
     });
     expect(receipt.fanoutEligible).toBe(false);
+  });
+
+  it('joins only when admission and evidence checksums agree', () => {
+    const map = fixtureMap();
+    const bundle = materializePreFanoutEvidenceBundleV1({
+      ordinalMap: map,
+      candidateOrdinal: 0,
+      structuralEvidenceRefs: ['sev2:node-A'],
+      ontologyRevision: 'ontology-r1',
+      semantic: { representationId: 'semantic_768', representationRevision: 'semantic-r1', representationChecksum: 'd'.repeat(64) },
+      gates: { sourceBytesProven: true, structuralIdentityProven: true, ontologyLineageProven: true, semanticRevisionBound: true },
+    });
+    const admission = {
+      schema: 'atlas.fanout-admission.v1',
+      status: 'ADMITTED_TO_CANDIDATE_ORDINAL', admitted: true,
+      candidateOrdinalMap: map, strongIdentityEvidence: 'CANONICAL_ID', snapshotId: '00000000-0000-4000-8000-000000000001',
+      repositoryRevision: 'workspace-r1', graphRevision: 'graph-r1', sourceRevision: 'source-r1', representationId: 'semantic_768',
+      representationRevision: 'semantic-r1', blockers: [], canonicalWritesAttempted: false, qdrantWritesAttempted: false,
+      neo4jWritesAttempted: false, producerRevision: 'producer-r1', receiptChecksum: 'e'.repeat(64),
+    };
+    expect(verifyPreFanoutBundleAgainstAdmissionV1({ admission, bundle })).toEqual({ aligned: true, blockers: [] });
+    expect(verifyPreFanoutBundleAgainstAdmissionV1({ admission, bundle: { ...bundle, ordinalMapChecksum: 'f'.repeat(64) } }).aligned).toBe(false);
   });
 });

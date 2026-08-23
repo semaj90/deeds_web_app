@@ -41,13 +41,11 @@
  *   node scripts/atlas/export-xgboost-features.mjs --apply      # write CSV
  *   node scripts/atlas/export-xgboost-features.mjs --apply --verbose
  *   node scripts/atlas/export-xgboost-features.mjs --apply --limit=2000
- *   node scripts/atlas/export-xgboost-features.mjs --trace-label-bridge=docs/reports/bridge.json
  */
 
 import pg        from 'pg';
 import Redis     from 'ioredis';
-import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -59,7 +57,6 @@ const APPLY     = process.argv.includes('--apply');
 const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
-const BRIDGE_ARG = process.argv.find(a => a.startsWith('--trace-label-bridge='));
 const MAX_TRACES = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : 10_000;
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -123,56 +120,6 @@ function labelFromRef(ref) {
   return parts[1] ?? null;
 }
 
-function loadTraceLabelBridge() {
-  if (!BRIDGE_ARG) return null;
-  const bridgePath = path.resolve(ROOT, BRIDGE_ARG.slice('--trace-label-bridge='.length));
-  const bridge = JSON.parse(readFileSync(bridgePath, 'utf8'));
-  if (bridge.schema !== 'atlas.xgboost-trace-label-bridge.v1') {
-    throw new Error(`Unsupported trace-label bridge schema: ${bridge.schema ?? '(missing)'}`);
-  }
-  if (bridge.promotion_allowed !== false) {
-    throw new Error('Trace-label bridge must remain promotion_allowed=false for this exporter');
-  }
-  if (!Array.isArray(bridge.entries) || !bridge.bridge_checksum) {
-    throw new Error('Trace-label bridge requires entries and bridge_checksum');
-  }
-  const entries = bridge.entries
-    .map((entry) => ({
-      trace_label: String(entry.trace_label),
-      packet_keys: [...new Set((entry.packet_keys ?? []).map(String))].sort(),
-      mapping_method: String(entry.mapping_method),
-      evidence_refs: [...new Set((entry.evidence_refs ?? []).map(String))].sort(),
-    }))
-    .sort((a, b) => a.trace_label.localeCompare(b.trace_label));
-  const labels = new Set();
-  const packetKeys = new Set();
-  for (const entry of entries) {
-    if (labels.has(entry.trace_label)) throw new Error(`Duplicate trace label: ${entry.trace_label}`);
-    labels.add(entry.trace_label);
-    if (entry.packet_keys.length === 0 || entry.evidence_refs.length === 0) {
-      throw new Error(`Bridge entry requires packet_keys and evidence_refs: ${entry.trace_label}`);
-    }
-    if (!['EXPLICIT_ALIAS', 'SOURCE_REF_EXACT', 'REVIEWED_MAPPING'].includes(entry.mapping_method)) {
-      throw new Error(`Unsupported bridge mapping method: ${entry.mapping_method}`);
-    }
-    for (const packetKey of entry.packet_keys) {
-      if (packetKeys.has(packetKey)) throw new Error(`Duplicate packet key: ${packetKey}`);
-      packetKeys.add(packetKey);
-    }
-  }
-  const base = {
-    schema: bridge.schema,
-    workspace_revision: String(bridge.workspace_revision),
-    source_revision: String(bridge.source_revision),
-    bridge_revision: String(bridge.bridge_revision),
-    entries,
-    promotion_allowed: false,
-  };
-  const expected = createHash('sha256').update(JSON.stringify(base), 'utf8').digest('hex');
-  if (expected !== bridge.bridge_checksum) throw new Error('Trace-label bridge checksum mismatch');
-  return { path: bridgePath, ...bridge, entries };
-}
-
 // CSV escape
 function csv(v) {
   if (v === null || v === undefined) return '0';
@@ -196,17 +143,6 @@ const CSV_HEADER = [
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const traceLabelBridge = loadTraceLabelBridge();
-  // A legacy trace ref such as packet:<label>:<ordinal> is not a packet
-  // identity.  Never let a dry-run silently expand that label into every
-  // atlas_packets row sharing feature_id; training and its audit report must
-  // be based on an explicit, checksum-verified bridge in every mode.
-  if (!traceLabelBridge) {
-    throw new Error('XGBOOST_EXPORT_REQUIRES_TRACE_LABEL_BRIDGE');
-  }
-  if (APPLY && traceLabelBridge.entries.length === 0) {
-    throw new Error('XGBOOST_EXPORT_APPLY_REQUIRES_NONEMPTY_TRACE_LABEL_BRIDGE');
-  }
   console.log(`\n═══ XGBoost Feature Export ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══\n`);
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
@@ -255,7 +191,6 @@ async function main() {
       }
     }
 
-    const bridgePacketKeys = [...new Set(traceLabelBridge.entries.flatMap((entry) => entry.packet_keys))];
     const { rows: packets } = await pool.query(`
       SELECT
         packet_key, source_ref, feature_id, concept_ids,
@@ -266,44 +201,19 @@ async function main() {
         payload->>'som_cache_hit'      AS som_cache_hit,
         payload->>'ann_turbovec_score' AS ann_turbovec_score
       FROM atlas_packets
-      WHERE packet_key = ANY($1::text[])
+      WHERE feature_id = ANY($1::text[])
         AND packet_key IS NOT NULL
-    `, [bridgePacketKeys]);
+    `, [[...allLabels]]);
 
     // Index by feature_id (multiple packets per feature_id)
     const packetsByFeature = new Map();
+    const packetByKey = new Map();
     for (const p of packets) {
+      packetByKey.set(p.packet_key, p);
       if (!packetsByFeature.has(p.feature_id)) packetsByFeature.set(p.feature_id, []);
       packetsByFeature.get(p.feature_id).push(p);
     }
-    const packetsByTraceLabel = new Map();
-    const indexedPacketKeys = new Set(packets.map((packet) => packet.packet_key));
-    const missingBridgePacketKeys = bridgePacketKeys
-      .filter((packetKey) => !indexedPacketKeys.has(packetKey))
-      .sort();
-    if (traceLabelBridge) {
-      const packetsByKey = new Map(packets.map((packet) => [packet.packet_key, packet]));
-      for (const entry of traceLabelBridge.entries) {
-        packetsByTraceLabel.set(
-          entry.trace_label,
-          entry.packet_keys.map((packetKey) => packetsByKey.get(packetKey)).filter(Boolean),
-        );
-      }
-    }
-    const packetsForTraceLabel = (label) => packetsByTraceLabel.get(label) ?? [];
-    const unmatchedLabels = [...allLabels]
-      .filter((label) => packetsForTraceLabel(label).length === 0)
-      .sort();
-    if (APPLY && (unmatchedLabels.length > 0 || missingBridgePacketKeys.length > 0)) {
-      throw new Error(
-        `XGBOOST_EXPORT_APPLY_REQUIRES_CURRENT_IDENTITY_MATCH labels=${unmatchedLabels.length} packet_keys=${missingBridgePacketKeys.length}`,
-      );
-    }
     console.log(`Packets indexed: ${packets.length} across ${packetsByFeature.size} feature labels`);
-    console.log(`Unmatched trace labels: ${unmatchedLabels.length}`);
-    if (VERBOSE && unmatchedLabels.length > 0) {
-      console.log(`  Examples: ${unmatchedLabels.slice(0, 10).join(', ')}`);
-    }
 
     // ── 3. Load Karpathy blend scores from Redis ───────────────────────────────
     const karpathyScores = new Map(); // source_ref → blend score
@@ -330,7 +240,7 @@ async function main() {
       for (const ref of (t.retrieved_packets ?? [])) {
         const label = labelFromRef(ref);
         if (!label) continue;
-        const pkts = packetsForTraceLabel(label);
+        const pkts = packetsByFeature.get(label) ?? [];
         for (const p of pkts) {
           packetHitCount.set(p.packet_key, (packetHitCount.get(p.packet_key) ?? 0) + 1);
         }
@@ -365,7 +275,7 @@ async function main() {
       for (const ref of refs) {
         const label = labelFromRef(ref);
         if (!label) continue;
-        const pkts = packetsForTraceLabel(label);
+        const pkts = packetsByFeature.get(label) ?? [];
         for (const p of pkts) {
           if (seenInTrace.has(p.packet_key)) continue;
           seenInTrace.add(p.packet_key);
@@ -485,22 +395,6 @@ async function main() {
       distinct_features: distinctFeatures,
       completeness_pct: parseFloat((completenessPct * 100).toFixed(1)),
       karpathy_scores_loaded: karpathyScores.size,
-      trace_labels_requested: allLabels.size,
-      trace_labels_matched: [...allLabels].filter((label) => packetsForTraceLabel(label).length > 0).length,
-      trace_labels_unmatched: unmatchedLabels.length,
-      unmatched_trace_label_examples: unmatchedLabels.slice(0, 20),
-      bridge_packet_keys_missing: missingBridgePacketKeys.length,
-      missing_bridge_packet_key_examples: missingBridgePacketKeys.slice(0, 20),
-      trace_label_bridge: traceLabelBridge ? {
-        path: traceLabelBridge.path,
-        schema: traceLabelBridge.schema,
-        workspace_revision: traceLabelBridge.workspace_revision,
-        source_revision: traceLabelBridge.source_revision,
-        bridge_revision: traceLabelBridge.bridge_revision,
-        entries: traceLabelBridge.entries.length,
-        promotion_allowed: traceLabelBridge.promotion_allowed,
-        checksum_verified: true,
-      } : null,
       gates,
       feature_schema: CSV_HEADER.split(','),
       training_command_policy:  `python scripts/atlas/train-policy-reranker.py`,

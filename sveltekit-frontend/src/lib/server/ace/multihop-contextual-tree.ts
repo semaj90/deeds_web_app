@@ -87,7 +87,7 @@ export async function retrieveMultihopContext(opts: MultihopOpts): Promise<Multi
   if (embedding) {
     const qdrantUrl = ENV.QDRANT_URL || 'http://127.0.0.1:6333';
     try {
-      const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+      const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768_v2/points/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

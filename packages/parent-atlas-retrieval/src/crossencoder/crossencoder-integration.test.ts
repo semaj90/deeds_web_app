@@ -89,7 +89,7 @@ describe('CrossEncoder Reranker Integration', () => {
     it.skipIf(!sidecarAvailable)('should handle batch size parameter', async () => {
       const query = 'Evidence handling and upload';
       const candidates: CrossEncoderCandidate[] = Array.from({ length: 20 }, (_, i) => ({
-        packet_key: `candidate:${i:03d}`,
+        packet_key: `candidate:${String(i).padStart(3, '0')}`,
         text: `Evidence chunk ${i}: handling, upload, storage patterns ${i % 3 === 0 ? 'RELEVANT' : 'other'}`
       }));
 
@@ -236,7 +236,7 @@ describe('CrossEncoder Reranker Integration', () => {
     it.skipIf(!sidecarAvailable)('should complete reranking in reasonable time', async () => {
       const query = 'performance test query';
       const candidates: CrossEncoderCandidate[] = Array.from({ length: 50 }, (_, i) => ({
-        packet_key: `perf:${i:03d}`,
+        packet_key: `perf:${String(i).padStart(3, '0')}`,
         text: `Performance test candidate ${i} with some content to rank`
       }));
 

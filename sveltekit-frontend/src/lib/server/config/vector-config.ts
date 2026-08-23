@@ -62,7 +62,7 @@ export const VECTOR_CONFIG = {
     poi_profiles: 'poi_profiles',
     legal_canon_chunks: 'legal_canon_chunks',
     fictional_case_chunks: 'fictional_case_chunks',
-    codebase_chunks: 'codebase_chunks_768',
+    codebase_chunks: 'codebase_chunks_768_v2',
     codebase_chunks_768_v2: 'codebase_chunks_768_v2',
     codebase_chunks_768: 'codebase_chunks_768',
     codebase_chunks_384_hybrid: 'codebase_chunks_384_hybrid',

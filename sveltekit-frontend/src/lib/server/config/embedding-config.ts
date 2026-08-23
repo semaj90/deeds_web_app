@@ -21,7 +21,7 @@ export const EMBEDDING_CONFIG = {
   qdrantVectorSize: SEMANTIC_DIMENSION,
 
   /** Qdrant collection name for code embeddings */
-  qdrantCollection: 'codebase_chunks_768',
+  qdrantCollection: 'codebase_chunks_768_v2',
 
   /** Autoencoder output dimension (768 → 64 latent compression) */
   autoencoderOutputDim: 64,

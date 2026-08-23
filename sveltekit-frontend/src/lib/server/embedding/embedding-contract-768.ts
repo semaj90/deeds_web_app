@@ -5,8 +5,7 @@
  * truncateEmbeddingGemmaMrl() produces separately named reference lanes such
  * as semantic_512; derived prefixes never replace the native authority.
  *
- * Active semantic embedding lane (as currently implemented in code, pre-migration):
- * semantic_768 (768-dim, EmbeddingGemma native).
+ * Active semantic embedding lane: semantic_768 (768-dim, EmbeddingGemma native).
  * latent_128 / latent_64 are topology/routing projections — NOT embedding APIs
  * and never substitutable for semantic_768 at retrieval time.
  *

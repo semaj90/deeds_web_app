@@ -64,7 +64,7 @@ export const DEFAULT_GPU_RESIDENCY_POLICY_V1: GpuResidencyPolicyV1 = {
   semanticReservedBytes: 0,
   workspaceReservedBytes: 0,
   semanticCacheFraction: 0.5,
-  semanticVectorBytes: ATLAS_CANONICAL_SEMANTIC_DIMENSION * 2, // semantic_512 FP16 resident cache
+  semanticVectorBytes: ATLAS_CANONICAL_SEMANTIC_DIMENSION * 2, // semantic_768 FP16 resident cache
   minimumLeaseBytesByBucket: {
     32: 384 * MIB,
     64: 512 * MIB,

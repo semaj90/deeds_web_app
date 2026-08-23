@@ -100,7 +100,7 @@ export function assemblePacketFromGrpcResponse(
 
     // Mirror references (optional)
     qdrant_point_id: mirrors?.qdrant_point_id ?? null,
-    qdrant_collection: mirrors?.qdrant_collection ?? 'codebase_chunks_768',
+    qdrant_collection: mirrors?.qdrant_collection ?? 'codebase_chunks_768_v2',
     redis_key: mirrors?.redis_key ?? null,
     neo4j_node_id: mirrors?.neo4j_node_id ?? null,
     neo4j_edges: mirrors?.neo4j_edges ?? [],
@@ -259,7 +259,7 @@ function extractMirrors(
 ): Partial<PacketTopologyEnvelope> | null {
   const qdrant_point_id = response.qdrant_point_id ?? response.qdrantPointId ?? null;
   const qdrant_collection =
-    response.qdrant_collection ?? response.qdrantCollection ?? 'codebase_chunks_768';
+    response.qdrant_collection ?? response.qdrantCollection ?? 'codebase_chunks_768_v2';
   const redis_key = response.redis_key ?? response.redisKey ?? null;
   const neo4j_node_id = response.neo4j_node_id ?? response.neo4jNodeId ?? null;
   const neo4j_edges = response.neo4j_edges ?? response.neo4jEdges ?? [];

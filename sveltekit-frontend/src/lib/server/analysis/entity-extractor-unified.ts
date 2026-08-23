@@ -6,9 +6,8 @@
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch, bifrostChat } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 import { CACHE_KEYS, CACHE_TTL } from '../cache/cache-config.js';
@@ -147,38 +146,97 @@ Only extract entities clearly present. Do not fabricate.
 Text (first 8000 chars):
 ${text.slice(0, 8000)}`;
 
+    const gemma4Url = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+
     try {
-      const llamaSession = await getLlamaSessionDescriptor();
-      return await traceLLM('entity-extraction-unified', { model: llamaSession.modelId, prompt: text.slice(0, 500) }, async (gen) => {
-        const accumulated = await bifrostChat(
-          [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          llamaSession.modelId,
-          { temperature: 0.1, maxTokens: 2048, timeoutMs: 90_000 }
-        );
+      return await traceLLM('entity-extraction-unified', { model: 'gemma4-legal-iq4xs-direct.gguf', prompt: text.slice(0, 500) }, async (gen) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
-        // Parse JSON response
-        const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-          gen.end({ output: 'no-json', level: 'WARNING' });
-          return [];
+        try {
+          const res = await fetch(`${gemma4Url}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gemma4-legal-iq4xs-direct.gguf',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+              ],
+              max_tokens: 2048,
+              temperature: 0.1,
+              stream: true,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            gen.end({ output: 'gemma4-error', level: 'WARNING' });
+            return [];
+          }
+
+          // Parse streaming SSE response
+          let accumulated = '';
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          if (!res.body) {
+            gen.end({ output: 'no-body', level: 'WARNING' });
+            return [];
+          }
+
+          const reader = res.body.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() ?? '';
+
+              for (const line of lines) {
+                if (!line.trim().startsWith('data:')) continue;
+                const payload = line.slice(5).trim();
+                if (payload === '[DONE]') break;
+
+                try {
+                  const parsed = JSON.parse(payload);
+                  const content = parsed.choices?.[0]?.delta?.content ?? '';
+                  accumulated += content;
+                } catch {
+                  // Skip malformed lines
+                }
+              }
+            }
+          } finally {
+            reader.releaseLock();
+          }
+
+          // Parse JSON response
+          const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            gen.end({ output: 'no-json', level: 'WARNING' });
+            return [];
+          }
+
+          const parsed = JSON.parse(jsonMatch[0]);
+          const arr = Array.isArray(parsed.entities) ? parsed.entities : [];
+          const entities = arr
+            .filter((e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0)
+            .map((e: any) => ({
+              type: e.label as EntityType,
+              value: e.text,
+              confidence: 0.9,
+              source: 'llm' as const,
+            }));
+
+          gen.end({ output: `${entities.length} entities`, level: 'DEFAULT' });
+          return entities;
+        } finally {
+          clearTimeout(timeoutId);
         }
-
-        const parsed = JSON.parse(jsonMatch[0]);
-        const arr = Array.isArray(parsed.entities) ? parsed.entities : [];
-        const entities = arr
-          .filter((e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0)
-          .map((e: any) => ({
-            type: e.label as EntityType,
-            value: e.text,
-            confidence: 0.9,
-            source: 'llm' as const,
-          }));
-
-        gen.end({ output: `${entities.length} entities`, level: 'DEFAULT' });
-        return entities;
       });
     } catch (err) {
       console.warn('[EntityExtractorUnified] Gemma4 extraction failed:', err);

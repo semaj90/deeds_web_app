@@ -20,11 +20,6 @@ export interface StructuralParityPairV2 {
   exactSpanMatch: boolean;
   startByteDelta: number;
   endByteDelta: number;
-  spanIntersectionBytes: number;
-  spanUnionBytes: number;
-  spanIoU: number;
-  leftContainsRight: boolean;
-  rightContainsLeft: boolean;
   mismatchClasses: StructuralParityMismatchClassV2[];
 }
 
@@ -54,19 +49,9 @@ type Candidate = {
   spanDelta: number;
 };
 
-function isComparableSymbolName(value: string | null): value is string {
-  const name = value?.trim() ?? '';
-  if (!name || name === '<anonymous>') return false;
-  // Module specifiers and import/export string literals are evidence labels,
-  // not symbols. Keep them in the raw provider receipt but out of symbol
-  // parity and identity coverage gates.
-  if (/^(?:['\"`]).*(?:['\"`])$/s.test(name)) return false;
-  return /[$A-Z_a-z][$\w]*/.test(name);
-}
-
 function named(rows: StructuralObservationV1[]): StructuralObservationV1[] {
   return rows
-    .filter((row) => isComparableSymbolName(row.name))
+    .filter((row) => Boolean(row.name?.trim()))
     .sort((a, b) =>
       (a.name ?? '').localeCompare(b.name ?? '')
       || a.startByte - b.startByte
@@ -149,14 +134,6 @@ function classifyPair(left: StructuralObservationV1, right: StructuralObservatio
   const exactSpanMatch = left.startByte === right.startByte && left.endByte === right.endByte;
   if (!exactSpanMatch) mismatchClasses.push('EXACT_SPAN_MISMATCH');
 
-  const intersectionStart = Math.max(left.startByte, right.startByte);
-  const intersectionEnd = Math.min(left.endByte, right.endByte);
-  const spanIntersectionBytes = Math.max(0, intersectionEnd - intersectionStart);
-  const leftLength = Math.max(0, left.endByte - left.startByte);
-  const rightLength = Math.max(0, right.endByte - right.startByte);
-  const spanUnionBytes = leftLength + rightLength - spanIntersectionBytes;
-  const spanIoU = spanUnionBytes === 0 ? 1 : spanIntersectionBytes / spanUnionBytes;
-
   return {
     name: left.name!,
     left,
@@ -166,11 +143,6 @@ function classifyPair(left: StructuralObservationV1, right: StructuralObservatio
     exactSpanMatch,
     startByteDelta: right.startByte - left.startByte,
     endByteDelta: right.endByte - left.endByte,
-    spanIntersectionBytes,
-    spanUnionBytes,
-    spanIoU,
-    leftContainsRight: left.startByte <= right.startByte && left.endByte >= right.endByte,
-    rightContainsLeft: right.startByte <= left.startByte && right.endByte >= left.endByte,
     mismatchClasses,
   };
 }

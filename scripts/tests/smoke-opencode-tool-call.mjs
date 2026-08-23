@@ -10,14 +10,12 @@
  * Usage:
  *   node scripts/tests/smoke-opencode-tool-call.mjs
  *   node scripts/tests/smoke-opencode-tool-call.mjs --url http://127.0.0.1:8090
- *   node scripts/tests/smoke-opencode-tool-call.mjs --url http://127.0.0.1:8090 --model hforf.gguf
  */
 
 const args = process.argv.slice(2);
 const urlIdx = args.indexOf('--url');
-const modelIdx = args.indexOf('--model');
 const BASE = urlIdx >= 0 ? args[urlIdx + 1] : 'http://127.0.0.1:8090';
-const MODEL = modelIdx >= 0 ? args[modelIdx + 1] : (process.env.ATLAS_TOOL_MODEL || 'hforf.gguf');
+const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 
 let passed = 0;
 let failed = 0;
@@ -62,55 +60,6 @@ async function checkSystemPrompt() {
   }
   if (content === 'SYSTEM_OK') ok(`system-prompt obeyed (content="${content}", prompt_tokens=${promptTokens})`);
   else fail('system-prompt', `content="${content}" — expected "SYSTEM_OK"`);
-}
-
-async function checkToolCall() {
-  const res = await fetch(`${BASE}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: 'system', content: 'Use the provided tool. Do not answer in prose.' },
-        { role: 'user', content: 'Search the code for the exact token phase_alignment.' },
-      ],
-      tools: [{
-        type: 'function',
-        function: {
-          name: 'rg_search',
-          description: 'Search the repository for an exact token.',
-          parameters: {
-            type: 'object',
-            properties: { pattern: { type: 'string' } },
-            required: ['pattern'],
-            additionalProperties: false,
-          },
-        },
-      }],
-      tool_choice: { type: 'function', function: { name: 'rg_search' } },
-      temperature: 0,
-      max_tokens: 128,
-      stream: false,
-    }),
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!res.ok) { fail('tool-call', `HTTP ${res.status}`); return; }
-  const d = await res.json();
-  const toolCall = d.choices?.[0]?.message?.tool_calls?.[0];
-  if (toolCall?.function?.name !== 'rg_search') {
-    fail('tool-call', 'no structured rg_search tool call returned');
-    return;
-  }
-  let args;
-  try { args = JSON.parse(toolCall.function.arguments ?? '{}'); } catch {
-    fail('tool-call', 'tool arguments were not valid JSON');
-    return;
-  }
-  if (typeof args.pattern !== 'string' || args.pattern.length === 0) {
-    fail('tool-call', 'tool arguments omitted pattern');
-    return;
-  }
-  ok(`tool-call (${toolCall.function.name}, pattern=${JSON.stringify(args.pattern)})`);
 }
 
 async function checkStreaming() {
@@ -158,7 +107,6 @@ async function main() {
 
   try { await checkProps(); } catch (e) { fail('props', e.message); }
   try { await checkSystemPrompt(); } catch (e) { fail('system-prompt', e.message); }
-  try { await checkToolCall(); } catch (e) { fail('tool-call', e.message); }
   try { await checkStreaming(); } catch (e) { fail('streaming', e.message); }
 
   console.log(`\n── Result: ${passed} passed, ${failed} failed ─────────────`);

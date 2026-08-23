@@ -162,7 +162,7 @@ INSERT INTO evaluation_corpora (
   '${gitCommit}',
   58365, 40754,
   'codebase_chunks_768', 40568,
-  'embeddinggemma:latest', 384, 'v1.0',
+  'embeddinggemma:latest', 768, 'v1.0',
   'sha256:query-set-hash',
   'pending'
 ) ON CONFLICT DO NOTHING;`;

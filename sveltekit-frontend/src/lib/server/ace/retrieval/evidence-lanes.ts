@@ -128,7 +128,7 @@ export class QdrantDenseLane {
     embedding: number[],
     limit: number = 20
   ): Promise<AceEvidence[]> {
-    const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+      const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

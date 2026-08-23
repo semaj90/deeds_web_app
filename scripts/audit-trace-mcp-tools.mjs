@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Audit TRACE MCP Tools for bounded tool-calling compatibility
+ * Audit TRACE MCP Tools for Gemma4 Compatibility
  *
- * Context: the local orchestration policy exposes at most 3 tools per request.
+ * Context: Gemma4 can handle max 3 tools per request (like Ornithopter).
  * This script extracts all registered tools and groups them by functionality
  * to create optimal tool subsets for LLM consumption.
  */
@@ -29,23 +29,8 @@ while ((match = toolRegex.exec(content)) !== null) {
 
 console.log(`\n📊 TRACE MCP Tools Audit\n`);
 console.log(`Total Tools Registered: ${tools.length}`);
-const modelLabel = process.env.ATLAS_TOOL_MODEL ?? 'shared-tool-policy';
-console.log(`${modelLabel} Max Tools Per Request: 3`);
-
-// These names are explicitly marked STUB/routingEligible=false by the
-// canonical implementation-profile contract. Keep them visible in the audit
-// as exclusions, but never offer them to a model as executable tools.
-const nonRoutableTools = new Set([
-  'atlas.search',
-  'atlas.patch.propose',
-  'atlas.patch.apply',
-]);
-const routableTools = tools.filter((tool) => !nonRoutableTools.has(tool));
-const excludedTools = tools.filter((tool) => nonRoutableTools.has(tool));
-console.log(`Routable Tools: ${routableTools.length}`);
-console.log(`Excluded STUB Tools: ${excludedTools.length}`);
-if (excludedTools.length > 0) console.log(`Excluded: ${excludedTools.join(', ')}`);
-console.log(`Required Tool Sets for Routable Coverage: ${Math.ceil(routableTools.length / 3)}\n`);
+console.log(`Gemma4 Max Tools Per Request: 3`);
+console.log(`Required Tool Sets for Full Coverage: ${Math.ceil(tools.length / 3)}\n`);
 
 // Group tools by namespace
 const groups = {};
@@ -66,16 +51,16 @@ Object.entries(groups).forEach(([namespace, ns_tools]) => {
 const toolSets = [];
 const toolsByPriority = [
   // Priority 1: Core retrieval (highest value for Gemma4)
-  ...routableTools.filter(t => t.match(/search|retrieve|query|find/i)),
+  ...tools.filter(t => t.match(/search|retrieve|query|find/i)),
 
   // Priority 2: Context building
-  ...routableTools.filter(t => t.match(/context|schema|inspect|overview/i)),
+  ...tools.filter(t => t.match(/context|schema|inspect|overview/i)),
 
   // Priority 3: Graph/topology
-  ...routableTools.filter(t => t.match(/graph|topology|neighbor|expand/i)),
+  ...tools.filter(t => t.match(/graph|topology|neighbor|expand/i)),
 
   // Priority 4: Everything else
-  ...routableTools.filter(t =>
+  ...tools.filter(t =>
     !t.match(/search|retrieve|query|find|context|schema|inspect|overview|graph|topology|neighbor|expand/i)
   ),
 ];
@@ -93,7 +78,7 @@ for (let i = 0; i < uniqueTools.length; i += 3) {
   toolSets.push(uniqueTools.slice(i, i + 3));
 }
 
-console.log(`\n🎯 ${modelLabel}-bounded Tool Sets (max 3 tools per set):\n`);
+console.log(`\n🎯 Gemma4-Optimized Tool Sets (max 3 tools per set):\n`);
 toolSets.forEach((set, idx) => {
   console.log(`Set ${idx + 1} (${set.length} tools):`);
   set.forEach(t => console.log(`  - ${t}`));
@@ -102,19 +87,19 @@ toolSets.forEach((set, idx) => {
 
 // Categorize tools functionally
 const categories = {
-  'Retrieval & Search': routableTools.filter(t => t.match(/search|retrieve|query|find|kb\.trace|kag\./i)),
-  'Context & Schema': routableTools.filter(t => t.match(/context|schema|inspect|overview|table|db\./i)),
-  'Graph & Topology': routableTools.filter(t => t.match(/graph|topology|neighbor|expand|shortest|path/i)),
-  'Clustering & Analysis': routableTools.filter(t => t.match(/cluster|summary|aggregat|analyze|score/i)),
-  'File & Code': routableTools.filter(t => t.match(/file|code|read|write|lint|format/i)),
-  'Validation & Verification': routableTools.filter(t => t.match(/validat|verify|check|test|audit/i)),
+  'Retrieval & Search': tools.filter(t => t.match(/search|retrieve|query|find|kb\.trace|kag\./i)),
+  'Context & Schema': tools.filter(t => t.match(/context|schema|inspect|overview|table|db\./i)),
+  'Graph & Topology': tools.filter(t => t.match(/graph|topology|neighbor|expand|shortest|path/i)),
+  'Clustering & Analysis': tools.filter(t => t.match(/cluster|summary|aggregat|analyze|score/i)),
+  'File & Code': tools.filter(t => t.match(/file|code|read|write|lint|format/i)),
+  'Validation & Verification': tools.filter(t => t.match(/validat|verify|check|test|audit/i)),
   'Other': [],
 };
 
 // Assign remaining tools to Other
 const assigned = new Set();
 Object.values(categories).forEach(cat => cat.forEach(t => assigned.add(t)));
-	routableTools.forEach(t => {
+tools.forEach(t => {
   if (!assigned.has(t)) {
     categories['Other'].push(t);
   }
@@ -173,8 +158,6 @@ const summary = {
     Object.entries(categories).map(([cat, tools]) => [cat, tools.map(t => t)])
   ),
   allTools: uniqueTools,
-  registeredTools: tools,
-  excludedStubTools: excludedTools,
   toolSets: toolSets.map((set, idx) => ({
     set: `Set ${idx + 1}`,
     tools: set,

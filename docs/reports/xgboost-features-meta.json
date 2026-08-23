@@ -1,28 +1,46 @@
 {
-  "generated": "2026-08-09T00:00:00.000Z",
+  "generated": "2026-08-22T17:09:41.562Z",
   "mode": "dry-run",
-  "traces_loaded": 1134,
-  "total_rows": 101708,
-  "positive_rows": 98355,
-  "zero_label_rows": 3353,
-  "distinct_features": 8,
-  "completeness_pct": 100,
-  "karpathy_scores_loaded": 179,
+  "traces_loaded": 1100,
+  "total_rows": 0,
+  "positive_rows": 0,
+  "zero_label_rows": 0,
+  "distinct_features": 0,
+  "completeness_pct": 0,
+  "karpathy_scores_loaded": 0,
+  "trace_labels_requested": 10,
+  "trace_labels_matched": 0,
+  "trace_labels_unmatched": 10,
+  "unmatched_trace_label_examples": [
+    "agent_intelligence",
+    "api_endpoints",
+    "database_orm",
+    "emergent_topology",
+    "general_abstractions",
+    "infrastructure_config",
+    "native_accelerators",
+    "observability_telemetry",
+    "test_harness",
+    "ui_components"
+  ],
+  "bridge_packet_keys_missing": 0,
+  "missing_bridge_packet_key_examples": [],
+  "trace_label_bridge": null,
   "gates": [
     {
       "name": "positive_rows_500",
-      "pass": true,
-      "detail": "98355 positive rows (gate ≥500)"
+      "pass": false,
+      "detail": "0 positive rows (gate ≥500)"
     },
     {
       "name": "distinct_features_8",
-      "pass": true,
-      "detail": "8 distinct features (gate ≥8; ≥20 for production training)"
+      "pass": false,
+      "detail": "0 distinct features (gate ≥8; ≥20 for production training)"
     },
     {
       "name": "completeness_80pct",
-      "pass": true,
-      "detail": "100.0% complete rows (gate ≥80%)"
+      "pass": false,
+      "detail": "0.0% complete rows (gate ≥80%)"
     }
   ],
   "feature_schema": [
