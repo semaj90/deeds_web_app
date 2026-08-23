@@ -1,0 +1,51 @@
+{
+  "actualCudaConfigured": true,
+  "buildInfo": {
+    "BUILTIN_PREFETCH_PRESENT": false,
+    "CUDA_VERSION": [
+      12,
+      9
+    ],
+    "DEBUG": false,
+    "MM_PREFETCH_PRESENT": true,
+    "THRUST_VERSION": [
+      2,
+      8,
+      2
+    ],
+    "USE_CUDA": true,
+    "USE_DLOPEN_NCCL": false,
+    "USE_FEDERATED": false,
+    "USE_NCCL": false,
+    "USE_NVCOMP": false,
+    "USE_OPENMP": true,
+    "USE_RMM": false,
+    "libxgboost": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\xgboost\\lib\\xgboost.dll"
+  },
+  "canonicalWriteAttempted": false,
+  "cols": 32,
+  "configuredDevices": [
+    "cuda:0"
+  ],
+  "finitePredictions": true,
+  "generatedAt": "2026-08-23T04:28:33.648039+00:00",
+  "matrix": "QuantileDMatrix",
+  "matrixBuildMs": 355.0629000237677,
+  "modelPromotionAuthorized": false,
+  "neo4jWrites": false,
+  "postgresWrites": false,
+  "predictionCount": 200000,
+  "predictionMax": 3.3683292865753174,
+  "predictionMin": -6.060235500335693,
+  "qdrantWrites": false,
+  "requestedDevice": "cuda:0",
+  "rounds": 128,
+  "rows": 200000,
+  "schema": "atlas.xgboost-gpu-runtime-receipt.v1",
+  "status": "XGBOOST_GPU_RUNTIME_PROVEN",
+  "trainMs": 1551.306300010765,
+  "trainingData": "SYNTHETIC_FIXTURE",
+  "treeMethod": "hist",
+  "valkeyWrites": false,
+  "xgboostVersion": "3.2.0"
+}
