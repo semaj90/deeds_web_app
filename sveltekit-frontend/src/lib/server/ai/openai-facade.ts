@@ -342,7 +342,30 @@ async function persistEngramChatMemory(input: {
 
 type InferenceLane = 'ldr' | 'turboquant' | 'bifrost';
 
+/**
+ * runLdrChat() is called as the last-resort fallback when both Bifrost and
+ * TurboQuant have already failed — there is no further backend to cascade to.
+ * If LDR itself fails (confirmed live 2026-08-22: /api/start_research doesn't
+ * exist in this codebase, so this path can currently never succeed), the
+ * caller must still get a valid response shape rather than an uncaught throw
+ * turning into a raw 500 "Internal error" with no useful content — same
+ * Degraded Response Contract root CLAUDE.md documents for GET routes, applied
+ * here to the last link in this POST route's inference cascade.
+ */
 async function runLdrChat(
+  messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
+  maxTokens: number,
+  temperature?: number
+): Promise<string> {
+  try {
+    return await runLdrChatUnsafe(messages, maxTokens, temperature);
+  } catch (err) {
+    console.warn('[openai-facade] LDR fallback failed (last-resort backend, no further cascade):', (err as Error)?.message ?? err);
+    return 'I was unable to generate a response — all inference backends (Bifrost, TurboQuant, and the LDR fallback) are currently unavailable. Please try again shortly.';
+  }
+}
+
+async function runLdrChatUnsafe(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
   _maxTokens: number,
   _temperature?: number

@@ -7107,7 +7107,12 @@ export async function fetchCodebaseContext(
     return fallbackChunks;
   } catch (err) {
     console.warn('[ACE context] codebase context fetch failed:', (err as Error)?.message ?? err);
-    return null;
+    // Must match this function's own Promise<ACEContext['codebaseContext']> (array)
+    // contract — returning null here was the root cause of a live 500: downstream
+    // consumers (e.g. buildACEPrompt's wikiRows/codebaseContext .length reads)
+    // assumed an array, never guarded against null, and crashed on any upstream
+    // failure (a DB schema-drift error, in the case that surfaced this).
+    return [];
   }
 }
 
