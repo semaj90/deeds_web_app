@@ -5,20 +5,13 @@ import {
   ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION,
 } from '../retrieval/qdrant-semantic-projection.js';
 
-// The canonical PERSISTED/searched representation (per the 2026-08-19 operator
-// correction) is semantic_512. semantic_768 is kept as a SEPARATE, coexisting
-// registry entry — it is the native EmbeddingGemma output that semantic_512 is
-// derived from, and it is still a real, live dimension elsewhere: the cuVS
-// exact-KNN sidecar hardcodes 768 (python/atlas_rapids_sidecar.py
-// _EXPECTED_DIMENSION), and som-routing.ts's trainedFrom carries a
-// 'SEMANTIC_768_EXPERIMENT' lineage value. Renaming/collapsing the 768 entry
-// away would break both. Same vector dimension never implies the same
-// representation identity — see CLAUDE.md's duplication-prevention rule.
+// The canonical persisted/searched representation is native semantic_768.
+// MRL prefixes remain separately named derived/reference lanes.
 export const CANONICAL_EMBEDDING_DIMENSION = ATLAS_CANONICAL_SEMANTIC_DIMENSION;
 
 export const CanonicalRepresentationNameSchema = z.enum([
   ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
-  'semantic_768',
+  'semantic_512',
   'semantic_128',
   'latent_64',
   'lexical_v1',
@@ -45,20 +38,17 @@ export type CanonicalRepresentationRegistryEntry = {
 };
 
 export const CANONICAL_REPRESENTATIONS = {
-  semantic_512: {
-    persistedName: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
-    dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
-    status: 'ACTIVE',
-    aliases: ['semantic512', 'dense_512', 'dense512'],
-  },
   semantic_768: {
-    persistedName: 'semantic_768',
+    persistedName: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
     dimension: ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION,
-    // Not the canonical persisted lane, but a real, live native-source
-    // representation — the cuVS exact-KNN sidecar and som-routing.ts's
-    // SEMANTIC_768_EXPERIMENT lineage both operate on it directly.
-    status: 'EXPERIMENTAL',
+    status: 'ACTIVE',
     aliases: ['semantic768', 'dense_768', 'dense768'],
+  },
+  semantic_512: {
+    persistedName: 'semantic_512',
+    dimension: 512,
+    status: 'REFERENCE_ONLY',
+    aliases: ['semantic512', 'dense_512', 'dense512'],
   },
   semantic_128: {
     persistedName: 'semantic_128',

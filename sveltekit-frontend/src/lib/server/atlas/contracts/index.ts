@@ -1,4 +1,5 @@
 export * from './canonical-chunk-contract.js';
+export * from './canonical-semantic-768-source-ref-v1.js';
 export * from './feature-extraction-v1.js';
 export * from './gpu-quantization-v1.js';
 export * from './graphify-task-candidate.js';
