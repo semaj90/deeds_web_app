@@ -1625,6 +1625,7 @@
     "bits-ui": "^2.0.0",
     "duckdb": "1.4.4",
     "express": "5.1.0",
+    "gpt-tokenizer": "4.0.0",
     "idb": "8.0.3",
     "ioredis": "^5.0.0",
     "jsdom": "27.2.0",
