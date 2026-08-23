@@ -17,16 +17,6 @@
 --   graphify_runs.source_manifest_digest = exact manifest digest
 --   graphify_files.code_source_revision  = sha256:<exact source bytes>
 --
--- Safety:
---   * Creates only the two source-inventory tables when the historical base
---     migration was never applied.
---   * Does not create graphify_symbols / graphify_edges; this tranche owns
---     source inventory + revision authority only.
---   * No data backfill and no UPDATE / DELETE.
---   * Existing repository_revision/source_revision values are preserved.
---   * Existing rows are never promoted merely because the v2 columns exist.
---   * FANOUT remains blocked until the canonical writer commits one controlled
---     row and the independent read-only owner canary proves exact readback.
 -- Existing repository_revision/source_revision values and legacy uniqueness
 -- constraints are preserved. If an existing constraint conflicts with the v2
 -- writer, the writer/canary must fail closed and that conflict must be resolved
@@ -109,17 +99,6 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint
-    WHERE conrelid = 'public.graphify_files'::regclass
-      AND conname = 'graphify_files_content_hash_sha256_v2'
-  ) THEN
-    ALTER TABLE public.graphify_files
-      ADD CONSTRAINT graphify_files_content_hash_sha256_v2
-      CHECK (content_hash ~ '^(sha256:)?[a-f0-9]{64}$') NOT VALID;
-  END IF;
-END $$;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
     WHERE conrelid = 'public.graphify_runs'::regclass
       AND conname = 'graphify_runs_source_manifest_source_count_v2'
   ) THEN
@@ -145,14 +124,14 @@ CREATE UNIQUE INDEX IF NOT EXISTS graphify_runs_workspace_revision_parser_uq_v2
 CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_code_source_revision_uq_v2
   ON public.graphify_files (workspace_id, source_ref, code_source_revision)
   WHERE code_source_revision IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_runs_repository_revision_provenance_idx_v2
+  ON public.graphify_runs (workspace_id, repository_revision, started_at DESC);
 CREATE INDEX IF NOT EXISTS graphify_runs_workspace_revision_idx_v2
   ON public.graphify_runs (workspace_id, workspace_revision)
   WHERE workspace_revision IS NOT NULL;
 CREATE INDEX IF NOT EXISTS graphify_runs_source_manifest_digest_idx_v2
   ON public.graphify_runs (source_manifest_digest)
   WHERE source_manifest_digest IS NOT NULL;
-CREATE INDEX IF NOT EXISTS graphify_runs_repository_revision_provenance_idx_v2
-  ON public.graphify_runs (workspace_id, repository_revision, started_at DESC);
 CREATE INDEX IF NOT EXISTS graphify_runs_status_started_at_idx_v2
   ON public.graphify_runs (status, started_at DESC);
 CREATE INDEX IF NOT EXISTS graphify_files_source_ref_idx_v2
@@ -168,17 +147,6 @@ CREATE INDEX IF NOT EXISTS graphify_files_last_seen_run_id_idx_v2
   ON public.graphify_files (last_seen_run_id);
 
 COMMENT ON COLUMN public.graphify_runs.repository_revision IS
-  'Historical Git commit provenance. Never substitute this for logical Parent Atlas workspaceRevision.';
-COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
-  'Parent Atlas WorkspaceRevisionRecordV1 identity: sha256 of the sorted exact-byte indexed source manifest.';
-COMMENT ON COLUMN public.graphify_runs.source_manifest_digest IS
-  'Unprefixed SHA-256 digest underlying workspace_revision.';
-COMMENT ON COLUMN public.graphify_files.source_revision IS
-  'Historical Git/file provenance coordinate retained for compatibility; not the Parent Atlas CodeSourceRevisionV1 owner.';
-COMMENT ON COLUMN public.graphify_files.content_hash IS
-  'Exact serialized source byte SHA-256 digest.';
-COMMENT ON COLUMN public.graphify_files.code_source_revision IS
-  'Parent Atlas CodeSourceRevisionV1 identity: sha256:<content_hash>.';
   'Git/base commit provenance only; not canonical workspace revision authority.';
 COMMENT ON COLUMN public.graphify_runs.workspace_revision IS
   'WorkspaceRevisionRecordV1 identity: sha256 of sorted exact-byte source manifest.';

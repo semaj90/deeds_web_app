@@ -12,7 +12,7 @@
  *   const result = await agent.investigate("Find all Svelte 4 patterns");
  */
 
-import { ChatOpenAI } from '@langchain/openai';
+import { ChatOllama } from '@langchain/ollama';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { HumanMessage } from '@langchain/core/messages';
 import { DynamicStructuredTool } from '@langchain/core/tools';
@@ -25,7 +25,6 @@ import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
 import { ENV } from '$lib/server/env.server.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
-import { LLAMA_SERVER_BASE_URL, getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { resolve } from 'path';
 
 const AGENT_API_BASE = () => `${ENV.PUBLIC_API_URL}/api`;
@@ -97,17 +96,10 @@ interface InvestigationResult {
 }
 
 export class AutonomousAgent {
-  private llm!: ChatOpenAI;
+  private llm: ChatOllama;
   private tools: DynamicStructuredTool[];
   private reactAgent: ReturnType<typeof createReactAgent> | null = null;
   private config: AgentConfig;
-  /**
-   * Constructors can't await the live GET /v1/models resolver, so LLM +
-   * ReAct-agent construction are deferred here. investigate() awaits this
-   * before touching this.reactAgent/this.llm.
-   */
-  private initPromise: Promise<void>;
-  private resolvedModelId: string | null = null;
 
   constructor(config: AgentConfig = {}) {
     this.config = {
@@ -117,27 +109,15 @@ export class AutonomousAgent {
       ...config,
     };
 
-    // Initialize FastMCP tools
-    this.tools = this.initializeTools();
-
-    this.initPromise = this.initializeLlm();
-  }
-
-  /**
-   * llama-server :8090 (OpenAI-compatible), not Ollama — chat/synthesis never
-   * goes through Ollama per this repo's hard rule. Model id is resolved live
-   * via getLlamaSessionDescriptor() (GET /v1/models, cached) — whatever GGUF
-   * is actually loaded (e.g. hforf.gguf), not a hardcoded name.
-   */
-  private async initializeLlm(): Promise<void> {
-    const llamaSession = await getLlamaSessionDescriptor();
-    this.resolvedModelId = llamaSession.modelId;
-    this.llm = new ChatOpenAI({
-      configuration: { baseURL: LLAMA_SERVER_BASE_URL },
-      apiKey: process.env.LLAMA_SERVER_API_KEY ?? 'local-no-key',
-      model: llamaSession.modelId,
+    // Initialize Ollama LLM
+    this.llm = new ChatOllama({
+      baseUrl: ENV.OLLAMA_BASE_URL,
+      model: 'gemma4-rotorquant:latest',
       temperature: this.config.temperature,
     });
+
+    // Initialize FastMCP tools
+    this.tools = this.initializeTools();
 
     // Initialize LangGraph ReAct agent
     try {
@@ -1377,7 +1357,6 @@ export class AutonomousAgent {
     options: { useACE?: boolean; maxIterations?: number } = {}
   ): Promise<InvestigationResult> {
     const startTime = Date.now();
-    await this.initPromise;
 
     // Assemble ACE context if requested
     let aceContext;
@@ -1610,7 +1589,7 @@ export class AutonomousAgent {
       toolCount: this.tools.length,
       maxIterations: this.config.maxIterations,
       temperature: this.config.temperature,
-      model: this.resolvedModelId ?? 'unresolved (llama-server session not yet initialized)',
+      model: 'gemma4-rotorquant:latest',
       hasACEContext: !!(this.config.userId || this.config.caseId),
     };
   }

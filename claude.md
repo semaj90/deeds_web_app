@@ -1,54 +1,5 @@
 # Legal AI Platform — Claude Project Instructions
 
-## 🔌 LangChain agents: ChatOpenAI → llama-server :8090, never ChatOllama (Aug 22 2026)
-
-**Hard rule**: LangChain-based agents (`createReactAgent`, `StateGraph` router LLMs, any direct
-LangChain chat-model instantiation) MUST use `ChatOpenAI` from `@langchain/openai` pointed at
-llama-server's OpenAI-compatible endpoint — never `ChatOllama` from `@langchain/ollama`. This is
-the LangChain-specific instance of the repo-wide "Ollama vs llama-server Boundary" rule
-(`sveltekit-frontend/CLAUDE.md`): Ollama (`:11434`) is embeddings-only, all chat/synthesis goes
-through llama-server.
-
-**Found and fixed 2026-08-22**: `src/lib/server/agent/supervisor.ts`, `agent/subagents.ts`,
-`agent/autonomous-agent.ts` all instantiated `new ChatOllama({ baseUrl: ENV.OLLAMA_BASE_URL,
-model: 'gemma4-rotorquant:latest', ... })` — a live boundary-rule violation the deep-audit sweep
-in `openspec/changes/inference-wiring-deep-audit-aug22/` originally only flagged, then converted.
-
-**Canonical pattern**:
-```typescript
-import { ChatOpenAI } from '@langchain/openai';
-import { LLAMA_SERVER_BASE_URL, getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
-
-// Model id resolved LIVE via GET /v1/models (cached internally) — never a
-// hardcoded literal. llama-server ignores the model field at inference time
-// anyway (serves whatever GGUF it was launched with), but the field still
-// matters for logging/metadata accuracy and for callers that branch on it.
-const llamaSession = await getLlamaSessionDescriptor();
-const llm = new ChatOpenAI({
-  configuration: { baseURL: LLAMA_SERVER_BASE_URL },      // already includes /v1
-  apiKey: process.env.LLAMA_SERVER_API_KEY ?? 'local-no-key', // llama-server has no auth;
-                                                                 // placeholder so the OpenAI SDK
-                                                                 // client doesn't reject an empty string
-  model: llamaSession.modelId,   // e.g. "hforf.gguf" — whatever's actually loaded
-  temperature: 0,
-});
-```
-
-**Constructors can't `await`** — if the LLM is built inside a class constructor (as in all three
-files above), defer construction into an async init method and have every public method that
-touches the LLM/agent `await` that promise first (see `SupervisorAgent`'s `graphPromise` chain
-and `AutonomousAgent`'s `initPromise` for the pattern). Do not fall back to a synchronous
-env-derived constant (`LOCAL_VLM_MODEL`) just to avoid this restructuring — the whole point is
-tracking what's *actually* loaded, not what was last configured.
-
-**Test mocking**: if a test mocks the LLM (`vi.mock('@langchain/ollama', ...)`), update it to
-mock `@langchain/openai`'s `ChatOpenAI` instead, AND mock
-`$lib/server/ai/local-llama-provider.js`'s `getLlamaSessionDescriptor` — otherwise the test makes
-a real network call to `GET /v1/models` and hangs/fails when llama-server isn't running in the
-test environment. See `src/lib/server/agent/supervisor.integration.test.ts` for the fixed pattern.
-
----
-
 ## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
 
 **Status**: ✅ VALIDATED | **Validation**: 3-point contract PASS | **Commit**: TBD
@@ -3226,7 +3177,7 @@ Ollama :11434 (final fallback)
 `TURBO_KV_K` / `TURBO_KV_V` env vars override the profile. The launcher's failure semantics (added 2026-05-08):
 - Invalid `TURBO_PROFILE` → throw before launch.
 - Explicit `TURBO_KV_K` / `TURBO_KV_V` outside the allowlist (`f32, f16, bf16, q8_0, q4_0, q4_1, iq4_nl, q5_0, q5_1, turbo2, turbo3, turbo4, tbq3_0, tbq4_0`) → throw.
-- Profile resolves to `turbo*` but binary's `-h` doesn't advertise turbo support → **correction (confirmed by a live-code audit, 2026-08-22): this is a `Write-Warning` + fallback to q8_0/q8_0, not a throw**, even when `$turboExplicit` is true (`scripts/launch-turboquant.ps1` lines ~610-629). The warning text does include the test1111 fork build URL (for Gemma 4 / D=256/512) and TheTom releases URL (for D=128 models), so the remediation guidance below is still accurate — only "throw" was wrong; the launcher degrades gracefully and silently continues on q8_0/q8_0 rather than stopping. This IS exactly the failure mode that hid `-ctk turbo3 -ctv turbo4` for months, precisely because it silently downgrades instead of throwing — if hard-fail-on-mismatch is actually wanted here, that's a real launcher change, not yet made.
+- Profile resolves to `turbo*` but binary's `-h` doesn't advertise turbo support → throw with the test1111 fork build URL (for Gemma 4 / D=256/512) and TheTom releases URL (for D=128 models). Silent downgrade is exactly the failure mode that hid `-ctk turbo3 -ctv turbo4` for months.
 - Profile defaults that resolve to a stock-only name and the binary doesn't accept it → soft-fallback (the user did not assert intent).
 
 Recommended sequence on RTX 3060 Ti / 8GB:
@@ -3718,32 +3669,16 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 ## OpenCode + llama-server Config — Validated Shape (June 2026)
 
-**STALE on the flag values below (confirmed by a live-code audit, 2026-08-22).**
-This section predates and is superseded by the "❄️ CANONICAL LLAMA-SERVER
-STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)" section at the top of
-this file. `scripts/launch-turboquant.ps1` was directly inspected and does
-NOT use `gemma4-opencode.jinja` or `--reasoning-format none` — the launcher's
-`gemma4-direct`/`gemma4-thinking` profiles use
-`--chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja`
-(matching the frozen Aug 4 contract), and reasoning format is
-`--reasoning-format deepseek` (env-overridable via `TURBO_REASONING_FORMAT`),
-never `none`. The `supports_system_role`/`supports_tool_calls` validation
-approach and the `opencode.jsonc` model-block guidance further below in this
-section remain accurate and unaffected by this correction — only the
-chat-template-file path and `--reasoning-format` value in the flag block
-immediately below are stale. See
-`openspec/changes/inference-wiring-deep-audit-aug22/` for the full audit.
-
 ### Root cause: historical template mismatch, now fixed in the live launch config
 
 The older embedded `gemma` chat template path was the source of the earlier system-role drop. The live server on `:8090` now reports `supports_system_role: true` and `supports_tool_calls: true`, which means the current launch path is using the corrected chat-template wiring.
 
-**Current rule**: keep the `--chat-template-file custom_pub_chat_template_gemma4.jinja` override in the launcher so the runtime stays on the validated template path (see the frozen Aug 4 contract at the top of this file — this is the file the launcher actually passes).
+**Current rule**: keep the `--chat-template-file configs/templates/gemma4-opencode.jinja` override in the launcher so the runtime stays on the validated template path.
 
 ```
 llama-server.exe -m model.gguf
-  --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja
-  --jinja --reasoning-format deepseek
+  --chat-template-file configs/templates/gemma4-opencode.jinja
+  --jinja --reasoning-format none
   -c 65536 -ngl 99 -fa on -ctk q8_0 -ctv q8_0
   --cache-prompt --cache-reuse 256
 ```

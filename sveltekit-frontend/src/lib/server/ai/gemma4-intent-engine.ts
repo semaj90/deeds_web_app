@@ -1,6 +1,5 @@
 import { writeIntentSynthesisRecord, buildIntentSynthesisQueryHash } from '$lib/server/ace/intent-synthesis.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
+import { ENV } from '../env.server.js';
 
 export interface Gemma4IntentLaneResult {
   synthesis: string;
@@ -24,15 +23,30 @@ export async function processGemma4IntentionLane(
   targetClusterId: number
 ): Promise<Gemma4IntentLaneResult> {
   const basePrompt = `<|think|>\nResolve explicit action items for this operational constraint: "${userQuery}"`;
-  const llamaSession = await getLlamaSessionDescriptor();
-  const rawContent = await bifrostChat(
-    [
-      { role: 'system', content: 'You are a legal-ai engineering director parsing code paths.' },
-      { role: 'user', content: basePrompt },
-    ],
-    llamaSession.modelId,
-    { temperature: 1.0, topP: 0.95, topK: 64, maxTokens: 2048 }
-  );
+  const response = await fetch(`${ENV.TURBOQUANT_BASE_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gemma4-rotorquant:latest',
+      messages: [
+        { role: 'system', content: 'You are a legal-ai engineering director parsing code paths.' },
+        { role: 'user', content: basePrompt },
+      ],
+      temperature: 1.0,
+      top_p: 0.95,
+      top_k: 64,
+      max_tokens: 2048,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Gemma4 intent lane failed: HTTP ${response.status}`);
+  }
+
+  const data = (await response.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const rawContent = String(data.choices?.[0]?.message?.content ?? '');
   const { visible, hadThoughtBlock } = stripGemmaThoughtBlock(rawContent);
   const queryHash = buildIntentSynthesisQueryHash(userQuery);
 

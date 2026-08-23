@@ -24,7 +24,6 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { runAcpRpcLoop } from '$lib/server/ai/acp-rpc-loop.js';
-import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
 
@@ -70,12 +69,11 @@ export const POST: RequestHandler = async (event) => {
         try {
           let contentBuffer = '';
           let chunkIndex = 0;
-          const llamaSession = await getLlamaSessionDescriptor();
 
           for await (const chunk of runAcpRpcLoop(
             {
               llamaBaseUrl: LLAMA_BASE_URL,
-              model: llamaSession.modelId,
+              model: 'gemma4-legal-iq4xs-direct.gguf',
               temperature: 0.3,
               maxTokens: 2048,
               maxToolRounds: max_tool_rounds,

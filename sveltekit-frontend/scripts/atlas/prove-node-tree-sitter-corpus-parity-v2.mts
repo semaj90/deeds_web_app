@@ -21,7 +21,6 @@ const REPO_ROOT = path.resolve(FRONTEND, '..');
 const REPORT_DIR = path.resolve(REPO_ROOT, 'docs/reports');
 const LIMIT = Math.max(1, Number(process.env.ATLAS_AST_PARITY_CORPUS_LIMIT ?? '100'));
 const MAX_BYTES = Math.max(1024, Number(process.env.ATLAS_AST_PARITY_MAX_BYTES ?? String(512 * 1024)));
-const LF_COMPAT_DIAGNOSTIC = 'CONSILIENCY_LF_BYTE_SPAN_REMAPPED';
 
 const EXTENSION_LANGUAGE = new Map([
   ['.ts', 'typescript'],
@@ -80,10 +79,6 @@ function runtimeUnavailable(result: { status: string; diagnostics: string[]; err
   );
 }
 
-function countLfCompatRemaps(diagnostics: string[]): number {
-  return diagnostics.filter((diagnostic) => diagnostic.includes(LF_COMPAT_DIAGNOSTIC)).length;
-}
-
 const head = git('rev-parse', 'HEAD');
 const providerPath = 'sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts';
 const providerBlobSha = git('hash-object', providerPath);
@@ -96,7 +91,6 @@ const sidecar = create8095AstProvider(process.env.MINIFORGE_SIDECAR_URL);
 const node = createNodeTreeSitterAstProvider();
 const files: Array<Record<string, unknown>> = [];
 let blockedRuntimeFiles = 0;
-let sidecarLfCompatRemapCount = 0;
 
 for (const absolute of corpusFiles) {
   const sourceBytes = await readFile(absolute);
@@ -113,9 +107,6 @@ for (const absolute of corpusFiles) {
   ]);
   const runtimeBlocked = runtimeUnavailable(sidecarResult) || runtimeUnavailable(nodeResult);
   if (runtimeBlocked) blockedRuntimeFiles += 1;
-
-  const lfCompatRemapCount = countLfCompatRemaps(sidecarResult.diagnostics);
-  sidecarLfCompatRemapCount += lfCompatRemapCount;
 
   const sidecarRows = (sidecarResult.evidence?.chunks ?? [])
     .map((chunk) => projectStructuralObservation(sidecarResult.provider, source, chunk));
@@ -144,7 +135,6 @@ for (const absolute of corpusFiles) {
       engineVersion: sidecarResult.evidence?.engine_version ?? null,
       diagnostics: sidecarResult.diagnostics,
       observationCount: sidecarRows.length,
-      lfCompatRemapCount,
     },
     node: {
       status: nodeResult.status,
@@ -206,18 +196,12 @@ const report = {
     exactSpanParity: `${countGate('exactSpanParity')}/${count}`,
     fullParity: `${fullParityCount}/${count}`,
   },
-  compatibility: {
-    sidecarLfCompatRemapCount,
-    diagnostic: LF_COMPAT_DIAGNOSTIC,
-    canonicalSpanContract: 'ORIGINAL_UTF8_BYTES',
-  },
   mismatchCounts: aggregateMismatchCounts,
   interpretation: {
     fragmentIsNotVariable: true,
     unknownSymbolKindIsNotParity: true,
     duplicateNamesUseOneToOneMatching: true,
     exactSpanParityRequiresOriginalRequestByteCoordinates: true,
-    lfCompatRemapIsCompatibilityOnly: true,
     canonicalOwnerChanged: false,
     promotionAllowed: false,
   },
@@ -245,7 +229,6 @@ await writeFile(mdPath, [
   `- semantic-kind parity: ${report.gates.semanticKindParity}`,
   `- exact-span parity: ${report.gates.exactSpanParity}`,
   `- full parity: ${report.gates.fullParity}`,
-  `- 8095 LF-compat byte-span remaps: ${sidecarLfCompatRemapCount}`,
   '',
   '## Aggregate mismatch classes',
   '',
@@ -254,18 +237,10 @@ await writeFile(mdPath, [
     .map(([key, value]) => `- ${key}: ${value}`),
   '',
   'Duplicate names are paired one-to-one. A `fragment` chunk remains semantic kind `UNKNOWN`; UNKNOWN never counts as semantic parity.',
-  'LF-compat remapping is diagnostic compatibility behavior only; canonical byte spans remain original UTF-8 request coordinates.',
   'Canonical ownership and persistence remain unchanged.',
   '',
 ].join('\n'), 'utf8');
 
-console.log(JSON.stringify({
-  status,
-  jsonPath,
-  mdPath,
-  gates: report.gates,
-  compatibility: report.compatibility,
-  mismatchCounts: aggregateMismatchCounts,
-}, null, 2));
+console.log(JSON.stringify({ status, jsonPath, mdPath, gates: report.gates, mismatchCounts: aggregateMismatchCounts }, null, 2));
 if (status === 'BLOCKED_RUNTIME_UNAVAILABLE') process.exitCode = 4;
 else if (status !== 'CORPUS_PARITY_PROVEN') process.exitCode = 2;
