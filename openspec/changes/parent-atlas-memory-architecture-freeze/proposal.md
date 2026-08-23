@@ -114,11 +114,113 @@ into this document, per this repo's own "audit before you build" rule:
 | `ContextManifest` / typed packet DAG | `sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.ts` — real, working `ContextManifest`/`CompiledContext`/`ContextCandidate` types, `compileContext()`, `scoreContextCandidate()`, `mergeDuplicateCandidates()`. Its own bridge file's header comment (`ace-context-manifest.ts`) literally says "already-designed `ContextManifest` contract... previously unwired — zero production callers" | **Adjacent, not identical.** Organizes by `ContextLane = 'exact' \| 'lexical' \| 'dense' \| 'graph' \| 'bitfrost'` (retrieval-lane axis), not by the proposal's evidence-type axis (`SourceEvidencePacket`/`AstEvidencePacket`/`GraphEvidencePacket`/etc.). Adopting the proposal's packet-class model would be a rearchitecture of an existing, working-but-underused system, not a greenfield build. |
 | `CandidateOrdinalMap` / ordinal addressing | `sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-*` (columnar-v1, gemm-v1, gpu-pack-v1, gpu-resident-lease-v1, row-v1, snapshot-v1, arrow-readback), `sveltekit-frontend/src/lib/server/atlas/evidence/pre-fanout-evidence-bundle-v1.ts` | **Already substantially built.** Ordinal-addressed candidate feature matrices, GPU-resident leasing, and Arrow readback already exist as a real subsystem — this is much further along than the proposal's framing suggests. |
 | LOD residency contract | `sveltekit-frontend/src/lib/runtime-cache/packet-lod-manifest.ts` + `contracts.ts` (`PacketLodManifest`, `LOD_LEVELS`), `determineLod()` | **Exists, different granularity.** Current LOD is 4 levels (0-3), keyed by *cache destination* (`browser-l1`/`valkey-hot`/`valkey-warm`/`analytics-only`/`cold-archive`), not by *evidence kind* (identity/routing/latent/semantic/structural/evidence/generation). The proposal's 7-level LOD0-6 scheme is a genuinely different axis — could layer on top of or replace the existing 0-3 scheme, needs an explicit decision, not a silent parallel system. |
+| **LOD naming, third and fourth instances** (found during the 2026-08-23 follow-up pass, below) | `parent_atlas_documents.summary_lod0/summary_lod1/summary_lod2` (Drizzle schema at `src/lib/server/db/schema/parent-atlas-documents.ts:39-41`, real Postgres columns with a `idx_pad_lod1` index); `hyperrag-packet-rpc.ts`'s `summary_lod0`/`summary_lod1` read/select (reads the same columns); `ace:telemetry:{packetId}:lod0` Redis key in `telemetry-compressor.ts` (single-tier "most compact" NES-style integer-coded packet, not part of a real 0-3 ladder in that file); `prompt-packet.ts`'s `opencode:file:v1:{sourceRef}` comment mentioning `lod1Summary`. | **A third, unrelated axis**, missed by the original 2026-08-23 audit pass because the grep pattern (`\bLOD\b`) doesn't match `lod0`/`lod1` as a suffix on another word. This one is a **summary-verbosity axis** (0=shortest, 2=longest/full document summary) scoped to a single `parent_atlas_documents` row — not a cache-destination axis (`packet-lod-manifest.ts`) and not an evidence-kind axis (this proposal). Three genuinely different "LOD" meanings now confirmed live in the codebase under the same short name. This raises the stakes on tasks.md 2.4 — reconciling needs to cover three existing systems, not two, before any fourth (this proposal's) is added. |
 | Bitmap-based candidate filtering | `sveltekit-frontend/src/lib/server/cache/packet-bitmap.ts` (`PacketBitmapCache`) — `SETBIT`/`GETBIT`/`BITOP`/`BITCOUNT` already wired via ioredis | **Different purpose, not a duplicate.** Existing bitmaps are **per-packet gate flags** (one bitmap key per packet, 8 bits = 8 readiness gates like `featureIdPresent`/`aceCacheHit`/`embeddingExists`). The proposal wants **per-category candidate-membership bitmaps** (one bitmap key per domain/concept/SOM-cell/etc., where bit position = candidate ordinal), intersected via `BITOP AND` to generate an admission mask across a candidate set. These are orthogonal indexing axes — implementing the proposal's version is a genuinely new capability, not a rename of the existing one. Both can coexist under different key prefixes. |
-| Pinned-memory / CUDA staging pipeline | `python/parent_atlas_tensor/gpu_resident_executor.py`, `gpu_tile_cache.py`, `pytorch_gpu_helpers.py`, `python/parent_atlas_candidate_feature_gpu_resident.py` | Exists in some form; **not read in detail as part of this recording pass** — whether it already implements the `mmap → index_select → pin → async H2D` chain the proposal specifies, or something else, is unverified. Flagged for whoever picks up the pinned-staging piece to check before writing new code. |
+| Pinned-memory / CUDA staging pipeline | `sveltekit-frontend/python/parent_atlas_tensor/gpu_resident_executor.py` (288 lines), `gpu_tile_cache.py`, `pytorch_gpu_helpers.py` | **Already substantially implements the proposal's exact chain**, read in full during the 2026-08-23 follow-up pass — see dedicated section below. |
 | ast-grep as structural authority (vs. regex/NLP as classifier) | Consistent with this repo's existing `CLAUDE.md` rule ("AST corpus parity", Tree-sitter/ast-grep sections) and the whole CRLF-span-compat fix earlier this session | **Already the repo's stated direction**, not a new decision — this proposal's ownership hierarchy formalizes what the codebase's own conventions already assume. No conflict. |
 | Tang-inspired low-rank sampling | No existing implementation found (grep for "tang"/"low-rank sampling"/"l2-norm sampling" turned up unrelated matches — component names containing similar substrings, not a real hit) | **Genuinely new.** Nothing to reconcile against; this is a fresh capability if built. |
-| `AcePacketV2` JSON shape (ordinal/revision/routing/lod/policy/artifact) | `ace-packet-writer.ts`/`ace-packet-reader.ts`/`ace-packet-store.ts`/`canonical-packet-envelope.ts` exist under `sveltekit-frontend/src/lib/server/ace/` | **Not compared field-by-field as part of this pass** — a real packet envelope system already exists under this name space; whether its shape already matches or should be extended to match the proposal's specific `AcePacketV2` shape needs a dedicated read, not assumed either way. |
+| `AcePacketV2` JSON shape (ordinal/revision/routing/lod/policy/artifact) | `canonical-packet-envelope.ts`'s `CanonicalAcePacketEnvelope` (read in full during the 2026-08-23 follow-up pass) — see field-by-field comparison below | **Compared field-by-field, follow-up pass.** Substantial real overlap, some genuine gaps. |
+
+### `AcePacketV2` vs. `CanonicalAcePacketEnvelope` — field-by-field (2026-08-23 follow-up pass)
+
+Read `sveltekit-frontend/src/lib/server/ace/canonical-packet-envelope.ts` in full. It already
+exports a real, Zod-validated `CanonicalAcePacketEnvelope` type with a snake_case/camelCase dual-key
+row parser (`CanonicalAcePacketEnvelopeRow`). Comparison against the proposal's `AcePacketV2` shape
+(`ordinal`, `revision.{workspace,graph,representation}`, `routing.{som,leiden,domain}`,
+`lod.{resident,recommended}`, `policy.{hot,nextTopicProbability,historicalUtility}`,
+`artifact.{semanticOrdinal,featureOrdinal}`):
+
+| Proposal field | Existing equivalent | Verdict |
+|---|---|---|
+| `ordinal` (numeric candidate ordinal) | none — identity is `packet_key`/`packet_id`/`packet_ulid` (string-keyed) | **Gap.** No numeric ordinal field on the envelope itself; ordinals live in the separate `candidate-feature-*` subsystem (see table above), not on this packet type. |
+| `revision.workspace` (sha256) | none directly, but `source_revision` (string) + `representation_revision` (int) exist | **Partial.** Two revision fields exist but neither is a workspace-level hash; a `workspace` scope isn't represented at all on this envelope. |
+| `revision.graph` (sha256) | none | **Gap.** |
+| `revision.representation` (sha256) | `representation_id` (string) + `representation_revision` (int) — close, but an id+int-revision pair, not a sha256 | **Partial, different encoding.** |
+| `routing.som` | `som_cell`, `som_row`, `som_col` | **Exists, more granular** (cell/row/col vs. a single value). |
+| `routing.leiden` | `community_id` (string \| number) | **Likely the same concept under a different name** — Leiden community detection typically produces exactly this kind of community id; not confirmed the writer actually runs Leiden vs. some other community algorithm, but the field slot exists. |
+| `routing.domain` | `domain`, `domain_class` | **Exists**, arguably more expressive (two fields vs. one). |
+| `lod.resident` / `lod.recommended` | none on this envelope — `lane_status`/`evidence_state`/`knowledge_resolution` exist but are a different state machine (promotion/trust status, not residency tier) | **Gap**, and also the LOD-naming-collision problem from above — adding `lod` fields here would be a *fourth* "LOD" meaning on top of the three already found. |
+| `policy.hot` | none directly — closest is `lane_status === 'ACTIVE'` | **Gap**, arguably already partially expressible via `lane_status`. |
+| `policy.nextTopicProbability` | none | **Gap**, genuinely new. |
+| `policy.historicalUtility` | `page_rank_score` (number) — a different metric, not utility/reward history | **Gap**, `page_rank_score` is graph authority, not usage-based utility. |
+| `artifact.semanticOrdinal` / `featureOrdinal` (ordinal references, not inline vectors) | `mmap_vector_refs`, `columnar_tables`, `packed_arrays` — **the existing envelope already follows the proposal's own "reference, don't inline" rule** for bulk vector data | **Already aligned in spirit**, though not ordinal-typed specifically — these are string ref arrays, not typed ordinal fields. |
+
+**Net assessment**: the existing envelope is not a rough sketch — it already has real SOM/domain/
+community routing, real revision tracking (differently shaped), and already keeps vector data
+out-of-band via `mmap_vector_refs` (independently arriving at the proposal's own "don't inline
+bulk numeric data" rule). The genuine gaps are: no numeric ordinal identity, no residency/LOD
+field, and no explicit policy-scoring fields (`hot`/`nextTopicProbability`/`historicalUtility`).
+Extending this existing type with those fields looks more appropriate than introducing a parallel
+`AcePacketV2` type — but per tasks.md 2.3, this is exactly the kind of call that needs an explicit
+decision, not an assumption.
+
+### Pinned-staging / GPU-residency: a whole staged integration bundle already exists (major finding)
+
+`sveltekit-frontend/python/parent_atlas_tensor/gpu_resident_executor.py` (a real,
+checksum-verified, schema-versioned `CandidateFeatureGpuExecutor` — leases GPU buffers by opaque
+ID, never returns raw CUDA pointers, deliberately no CUDA IPC export yet) already implements
+**almost exactly** the proposal's specified chain:
+
+```
+torch.empty(tensor.shape, dtype=tensor.dtype, pin_memory=True)        # pinned staging tensor
+tensor.to(self.device, non_blocking=True)                             # async H2D on a CUDA stream
+torch.index_select(tensor, 0, indices)                                # ordinal gather
+```
+
+(same pattern repeated in `gpu_tile_cache.py` and `pytorch_gpu_helpers.py`). This is the proposal's
+`mmap → index_select(ordinals) → bounded CPU staging → pin → async H2D` chain, already live code,
+not aspirational.
+
+**Bigger finding**: these three files are part of a much larger **staged, gated, unapplied
+integration bundle checked into the repo root** —
+`parent_atlas_tensor_residency_integration_v2/` (and an earlier `parent-atlas-tensor-residency-
+integration/` v1) — delivered from an external working container (per its own
+`IMPORT_STATUS.md`: "generated in the ChatGPT working container... not verified as copied into
+[this repo]"). Its `INTEGRATION_ORDER.md` defines gates T0-T9 plus a "Neural LOD extension order"
+that **already covers most of this proposal's scope end to end**:
+- Gate T0 explicitly requires the same `CANONICAL_OWNER`/`BACKEND`/`ADAPTER`/`EXPERIMENT`/
+  `COMPATIBILITY`/`DEAD` classification vocabulary as this repo's own `CLAUDE.md` Duplication
+  Prevention section — this bundle was written with awareness of that governance rule.
+- Gate T2/T3: Arrow IPC artifacts (`feature_matrix_5`, `semantic_768`, `centroids_768`) with frozen
+  content hash/revision/schema-version, staged → GPU → exact cosine/top-k parity proof before any
+  approximate-index (CAGRA) promotion — directly matches this proposal's "PyTorch is reference,
+  cuTile/CAGRA is challenger" ordering.
+- Gate T4: `COLD → MMAPPED → PINNED → GPU_RESIDENT → IN_USE → DEMOTED` — a **residency state
+  machine that is effectively the proposal's LOD/residency contract already named and staged**,
+  independently arriving at the same shape (ACE picks the logical tile, CUDA allocators pick
+  physical addresses — same "ACE decides which things stay warm" principle from the proposal's own
+  closing line).
+- Gate T5: Valkey/BitFrost mirrors small metadata only (tile manifests, hot candidate IDs,
+  centroid IDs, residency state, invalidation versions) — same "descriptors in JSON/cache, bulk
+  data elsewhere" rule this proposal states as its core wire-format principle.
+- Gate T9: explicitly warns NES/PS2-style glyph/LOD visualization must stay a derived debug view,
+  never written back as semantic identity — directly relevant given this proposal's own NES-CHR/OAM
+  analogy; this bundle's authors evidently hit the same analogy independently and already flagged
+  the risk of taking it too literally.
+
+**Live status, checked 2026-08-23**: `docker exec legal-ai-postgres psql ... \dt atlas_tensor_*`
+confirms Gate T1's migration (`atlas_tensor_artifacts`, `atlas_tensor_tiles`,
+`atlas_tensor_tile_members`, `atlas_tensor_residency_events`) **is applied** — all 4 tables exist —
+but **all 4 have zero rows**. Per this repo's own status-language convention: **CREATED**, not
+**WIRED** or further. This directly contradicts the bundle's own `CHECKS.json`, which claims
+`"migration": "confirmed unapplied, as intended at that checkpoint"` — another instance of a
+delivered package's self-reported status not matching live reality, consistent with this session's
+recurring finding pattern from the two earlier external review packages. `gpu_tile_cache.py` and
+`pytorch_gpu_helpers.py` are byte-identical between the bundle and the live tree (`diff -q`
+confirmed, zero output) — i.e. **already copied in**, despite `IMPORT_STATUS.md` saying copy status
+is unverified.
+
+**This changes the recommended next step substantially**: rather than treating "candidate-ordinal
+bitmap admission masking" and "pinned-staging chain" as two separate small tasks to scope fresh
+(as the original 2026-08-23 audit pass assumed), the more accurate framing is that **a mature,
+already-gated integration plan for most of this proposal's numerical-working-set layer already
+exists and is partially applied (schema only)**. The actual next action for that whole slice of
+the proposal is not "design it" but **"work through `parent_atlas_tensor_residency_integration_v2/
+INTEGRATION_ORDER.md`'s gates T2 onward against the live repo"** — starting with the Arrow tile
+artifact proof (T2) and exact-parity proof (T3), since T1 is already done. This bundle was not
+found by the original audit pass because it lives at repo root under a name
+(`parent_atlas_tensor_residency_integration_v2/`) that doesn't contain "LOD", "bitmap", "pinned",
+or "ordinal" — only found via `find` for the specific Python filenames while completing task 2.1.
 
 ## What's actually new and worth scoping (the real delta)
 

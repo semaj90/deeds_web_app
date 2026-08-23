@@ -3123,3 +3123,64 @@ instrumentation; (5) Graphify FANOUT sequencing; (6) docker-compose canonical-fi
 operator wants to prioritize the memory-architecture proposal instead, the two decisions in
 `parent-atlas-memory-architecture-freeze/tasks.md` 2.3/2.4 need answering first — everything else
 in that change (2.1, 2.2, 2.5, 2.6, 3.1) can proceed independently without those answers.
+
+### Session handoff — 2026-08-23 (memory-architecture proposal fleshed out — major finding: staged tensor-residency bundle)
+
+Followed up on the "flesh it out" request. Read `docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20.md`
+(confirmed genuinely authoritative per `sveltekit-frontend/CLAUDE.md`'s "OpenCode / Memory
+Authority" section) looking for alignment — found the doc's own Phase 101B section referencing
+`ace:telemetry:{id}:lod0` Redis replay, which led to discovering a **third, unrelated "LOD" naming
+collision**: `parent_atlas_documents.summary_lod0/1/2` (real Postgres columns, Drizzle schema,
+summary-verbosity axis) plus a single-tier `ace:telemetry:*:lod0` Redis key — neither matched by
+the original audit's `\bLOD\b` grep pattern. Added to the proposal's comparison table; the LOD
+reconciliation question in tasks.md 2.4 now needs to cover three existing systems, not two.
+
+Completed task 2.2 (field-by-field `AcePacketV2` vs. live `CanonicalAcePacketEnvelope` diff) — the
+existing envelope already has real SOM/domain/community routing and already keeps bulk vector data
+out-of-band via `mmap_vector_refs` (independently matches the proposal's own "reference, don't
+inline" rule). Real gaps: no numeric ordinal identity field, no residency/LOD field, no explicit
+`hot`/`nextTopicProbability`/`historicalUtility` policy fields.
+
+**Completed task 2.1 and found something much bigger than expected.** Read the pinned-memory/CUDA
+staging code (`gpu_resident_executor.py`, `gpu_tile_cache.py`, `pytorch_gpu_helpers.py`) — the
+proposal's exact `mmap → index_select → pin → async H2D` chain is already live code (`torch.empty(
+..., pin_memory=True)` → `.to(device, non_blocking=True)` → `torch.index_select`). More
+importantly, these files are part of a **much larger staged integration bundle checked into the
+repo root**: `parent_atlas_tensor_residency_integration_v2/` (plus an earlier v1) — delivered from
+an external working container, with its own `INTEGRATION_ORDER.md` defining gates T0-T9 that
+**already cover most of this proposal's numerical-working-set and residency-state-machine scope**,
+including a `COLD → MMAPPED → PINNED → GPU_RESIDENT → IN_USE → DEMOTED` state machine that's
+effectively the proposal's LOD/residency contract, already named and staged. Gate T0 explicitly
+uses this repo's own `CANONICAL_OWNER`/`BACKEND`/`ADAPTER`/etc. governance vocabulary.
+
+**Verified live status directly** (not trusting the bundle's own claims, per this session's
+established discipline): `docker exec legal-ai-postgres psql ... \dt atlas_tensor_*` confirms
+Gate T1's migration (4 tables: `atlas_tensor_artifacts`, `atlas_tensor_tiles`,
+`atlas_tensor_tile_members`, `atlas_tensor_residency_events`) **is applied but all 4 tables have
+zero rows** — CREATED, not WIRED. This directly contradicts the bundle's own `CHECKS.json`, which
+claims the migration is "unapplied" — another instance of a delivered package's self-reported
+status not matching reality, same pattern as the two earlier external review packages this
+session. `gpu_tile_cache.py`/`pytorch_gpu_helpers.py` are byte-identical between the bundle and the
+live tree (already copied in), despite the bundle's `IMPORT_STATUS.md` saying copy status is
+unverified.
+
+**This substantially changes the recommended next step for the memory-architecture proposal's
+numerical-working-set slice**: rather than designing pinned-staging/bitmap-admission from scratch,
+the concrete next action is working through `parent_atlas_tensor_residency_integration_v2/
+INTEGRATION_ORDER.md`'s gates T2 onward (Arrow tile artifact proof, then exact GPU parity proof)
+against the live repo — T0/T1 are effectively done. Full writeup, including the exact governance
+alignment (Gate T9's NES/LOD-as-debug-view-only warning independently echoes this proposal's own
+NES-CHR/OAM analogy caveat) in `openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md`.
+
+**New follow-up task added**: reconcile `parent-atlas-tensor-residency-integration/` (v1) against
+the v2 bundle before treating v2 as canonical, and decide whether v1 should be archived once
+confirmed superseded (both are git-tracked, not gitignored noise).
+
+**Next-session priority, updated**: (1) work through the tensor-residency bundle's Gate T2/T3
+(Arrow artifact proof, exact GPU parity) — this is now the most concretely scoped, highest-signal
+next step across all open threads this session has surfaced; (2) `NAMED_SYMBOL_MISSING_LEFT/RIGHT`
++ `SEMANTIC_KIND_MISMATCH` AST gap; (3) bounded XGBoost GPU proof; (4) `codebase_chunks_768` vs
+`_768_v2` split; (5) ACE crash instrumentation; (6) Graphify FANOUT sequencing; (7) docker-compose
+canonical-file decision; (8) the two remaining CANONICAL_OWNER decisions in the memory-architecture
+proposal (typed-packet model vs. existing lane-axis ContextManifest; which of the now-four LOD
+meanings survives).
