@@ -50,3 +50,19 @@ revision-qualified receipt now have a deterministic join checksum:
 `b77644ae7a9f87ebb08a8a26e990f76acc003df06a145ace36db59885c84bfd2`.
 The receipt remains non-authoritative until it is persisted through the
 approved artifact/receipt path.
+
+## 2026-08-23 runtime attempt
+
+Focused contract validation passed:
+
+- Python spectral/community tests: `7 passed`
+- TypeScript spectral/community tests: `8 passed`
+
+The activated WSL2 `atlas-rapids-cu13` execution attempt used a six-node,
+two-component fixture and entered `run_cugraph_partition` but did not return
+within the bounded 90-second observation window. The process was stopped by
+the operator. The follow-up import/version probe also did not return, so no
+CUDA/driver/RAPIDS execution receipt was produced.
+
+Status remains `RUNTIME_BLOCKED / NO_PROMOTION`. No projection, Qdrant tag,
+Valkey residency, Neo4j feature, or synthesis routing write was attempted.
