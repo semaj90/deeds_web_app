@@ -16,6 +16,8 @@ import type { CanonicalIDHierarchy } from '../topology/canonical-id-hierarchy.js
 import type { PermissionManager } from '../topology/permission-manager.js';
 
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 interface RetrievalRequest {
   query: string;
   query_embedding: number[]; // 768-dim canonical dense lane from EmbeddingGemma
@@ -185,8 +187,7 @@ export async function gpuReranker(
  */
 export async function gemma4AnswerSynthesis(
   candidates: RetrievalCandidate[],
-  query: string,
-  llmUrl: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
+  query: string
 ): Promise<GemmaAnswer> {
   if (candidates.length === 0) {
     return {
@@ -209,34 +210,22 @@ export async function gemma4AnswerSynthesis(
   const startTime = Date.now();
 
   try {
-    const response = await fetch(`${llmUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are a legal AI assistant. Synthesize answers from provided context. Be concise and cite sources.'
-          },
-          {
-            role: 'user',
-            content: `Query: ${query}\n\nContext:\n${context}\n\nAnswer:`
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 500,
-        stream: false
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemma4 ${response.status}: ${await response.text()}`);
-    }
-
-    const { choices } = await response.json();
-    const answer = choices[0]?.message?.content || '';
+    const llamaSession = await getLlamaSessionDescriptor();
+    const answer = await bifrostChat(
+      [
+        {
+          role: 'system',
+          content:
+            'You are a legal AI assistant. Synthesize answers from provided context. Be concise and cite sources.'
+        },
+        {
+          role: 'user',
+          content: `Query: ${query}\n\nContext:\n${context}\n\nAnswer:`
+        }
+      ],
+      llamaSession.modelId,
+      { temperature: 0.3, maxTokens: 500 }
+    );
 
     return {
       answer,
@@ -300,7 +289,7 @@ export async function endToEndRetrieval(
 
   // 3. Gemma4 synthesis
   const startGemma = Date.now();
-  const answer = await gemma4AnswerSynthesis(reranked, query, gemma4Url);
+  const answer = await gemma4AnswerSynthesis(reranked, query);
   const gemmaTime = Date.now() - startGemma;
 
   return {

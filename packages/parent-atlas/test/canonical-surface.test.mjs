@@ -32,7 +32,7 @@ test('parent-atlas mirrors the shared Atlas contracts used for sharing logic', (
   assert.equal(typeof pkg.buildAtlasEventFlow, 'function');
   assert.equal(typeof pkg.buildMultiHopRetrievalResult, 'function');
   assert.equal(typeof pkg.resolveAtlasQdrantDenseVectorName, 'function');
-  assert.equal(pkg.resolveAtlasQdrantDenseVectorName(), 'dense_retrieval');
+  assert.equal(pkg.resolveAtlasQdrantDenseVectorName(), 'content');
 
   const flow = pkg.buildAtlasEventFlow({
     flow_id: 'flow-1',

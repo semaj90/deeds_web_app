@@ -1,85 +1,40 @@
 /**
- * Legal document summarization via Gemma4 RotorQuant at :8090.
+ * Legal document summarization via the ACE-aware bifrostChat() cascade
+ * (Bifrost L1/L2 cache → TurboQuant → llama-server :8090).
  * Generates a concise summary for each uploaded evidence document.
- * Wired to use Gemma4 synthesis server with streaming support.
+ *
+ * Converted 2026-08-22 from a hand-rolled direct-:8090 SSE client (see
+ * openspec/changes/inference-wiring-deep-audit-aug22/) — this was one of
+ * several independent reimplementations of the same streaming/delta-assembly
+ * logic bifrostChat() already provides, and bypassed its L1/L2 cache.
+ *
+ * Model id is resolved live via getLlamaSessionDescriptor() (GET /v1/models,
+ * cached) rather than trusted from the static ROTORQUANT_MODEL_PATH-derived
+ * constant — this confirms what llama-server :8090 actually has loaded
+ * (e.g. "hforf.gguf") at call time instead of assuming the env config still
+ * matches the running process.
  */
 
-import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 
 /**
- * Assemble summary by reading streaming response from Gemma4.
- * Returns accumulated content or truncation fallback on error.
+ * Fetch a summary via bifrostChat(). Returns accumulated content, or ''
+ * on failure (caller falls back to truncation).
  */
 async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, timeoutMs: number = 90_000): Promise<string> {
 	try {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-		const res = await fetch(`${GEMMA4_URL}/v1/chat/completions`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: MODEL,
-				messages: [
-					{ role: 'system', content: systemPrompt },
-					{ role: 'user', content: userPrompt },
-				],
-				max_tokens: 1024,
-				temperature: 0.3,
-				stream: true, // REQUIRED for Gemma4 to avoid thinking block exhausting max_tokens
-			}),
-			signal: controller.signal,
-		});
-
-		clearTimeout(timeoutId);
-
-		if (!res.ok) {
-			console.warn(`[Summarizer] Gemma4 returned ${res.status}: ${res.statusText}`);
-			return '';
-		}
-
-		// Parse streaming response (SSE format)
-		let accumulated = '';
-		const decoder = new TextDecoder();
-		let buffer = '';
-
-		if (!res.body) {
-			console.warn('[Summarizer] No response body from Gemma4');
-			return '';
-		}
-
-		const reader = res.body.getReader();
-		try {
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-				buffer += decoder.decode(value, { stream: true });
-				const lines = buffer.split('\n');
-				buffer = lines.pop() ?? '';
-
-				for (const line of lines) {
-					if (!line.trim().startsWith('data:')) continue;
-					const payload = line.slice(5).trim();
-					if (payload === '[DONE]') break;
-
-					try {
-						const parsed = JSON.parse(payload);
-						const content = parsed.choices?.[0]?.delta?.content ?? '';
-						accumulated += content;
-					} catch {
-						// Skip malformed JSON lines
-					}
-				}
-			}
-		} finally {
-			reader.releaseLock();
-		}
-
-		return accumulated.trim();
+		const session = await getLlamaSessionDescriptor();
+		const summary = await bifrostChat(
+			[
+				{ role: 'system', content: systemPrompt },
+				{ role: 'user', content: userPrompt },
+			],
+			session.modelId,
+			{ temperature: 0.3, maxTokens: 1024, timeoutMs }
+		);
+		return summary.trim();
 	} catch (err: any) {
 		if (err?.name === 'AbortError') {
 			console.warn(`[Summarizer] Gemma4 timeout after ${timeoutMs}ms`);
@@ -97,7 +52,8 @@ export async function summarizeDocument(text: string, maxWords: number = 150): P
 	const input = text.slice(0, 16_000);
 
 	try {
-		return await traceLLM('summarize-document', { model: MODEL, prompt: input.slice(0, 500) }, async (gen) => {
+		const session = await getLlamaSessionDescriptor();
+		return await traceLLM('summarize-document', { model: session.modelId, prompt: input.slice(0, 500) }, async (gen) => {
 			const systemPrompt = `You are a legal document summarizer. Provide concise, factual summaries focusing on key parties, dates, legal issues, and outcomes.`;
 
 			const userPrompt = `Summarize the following legal document in ${maxWords} words or less. Focus on key facts, dates, parties involved, and legal issues:\n\n${input}`;

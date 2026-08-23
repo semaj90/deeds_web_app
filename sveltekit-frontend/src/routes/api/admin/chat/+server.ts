@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { z } from 'zod';
@@ -53,11 +54,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // 3. Call Model (TurboQuant / llama-server /v1/chat/completions)
   try {
+    const llamaSession = await getLlamaSessionDescriptor();
     const response = await fetch(`${MODEL_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4',
+        model: llamaSession.modelId,
         messages: [
           { role: 'system', content: systemPrompt },
           ...history,

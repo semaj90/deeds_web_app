@@ -785,11 +785,49 @@ type BifrostChatOptions = {
   entityTags?: string[];
   tools?: ReadonlyArray<unknown>;
   toolChoice?: string | object;
+  /** Nucleus sampling (llama-server /v1/chat/completions top_p field). */
+  topP?: number;
+  /** Top-K sampling (llama-server-specific extension, not standard OpenAI). */
+  topK?: number;
+  /**
+   * OpenAI-compatible response_format passthrough. `json_schema` shape matches what
+   * `holistic-synthesizer.ts` sent pre-conversion (a raw JSON Schema object under
+   * `json_schema`, not the OpenAI-wrapped `{name, schema, strict}` form) — carried
+   * forward unchanged, not independently re-verified against llama-server here.
+   */
+  responseFormat?: { type: 'json_object' } | { type: 'text' } | { type: 'json_schema'; json_schema: Record<string, unknown> };
+  /**
+   * When true, resolves to a `BifrostChatResult` object (content + usage + backend +
+   * sessionId) instead of a bare string, even when no `tools` are passed. `usage` is
+   * `undefined` on an L1/L2 cache hit — cache hits never re-run inference, so there is
+   * no real per-call token count to report, and fabricating zero would misrepresent an
+   * unknown value as a known one. `backend` is always a real, literal identifier of
+   * what actually served the call (`'cache-l1' | 'cache-l2' | 'turboquant' |
+   * 'llama-server' | 'bifrost-gateway'`), never attributed to an inference backend on
+   * a cache hit.
+   */
+  includeMetadata?: boolean;
   lane?: Hypergraph.AgentLane;
   /** Valkey/Redis client for centroid compression (optional, graceful fallback if null) */
   valkey?: any;
   taskType?: Hypergraph.TaskType;
   sessionId?: string;
+};
+
+/** Which layer actually served a bifrostChat() call — never fabricated on a cache hit. */
+export type BifrostChatBackend = 'cache-l1' | 'cache-l2' | 'turboquant' | 'llama-server' | 'bifrost-gateway';
+
+/** Real token counts from the inference backend's own response. Never estimated. */
+export type BifrostChatUsage = { promptTokens: number; completionTokens: number; totalTokens: number };
+
+/** Rich result shape returned when `options.includeMetadata` is set, or `tools` are used. */
+export type BifrostChatResult = {
+  content: string;
+  tool_calls?: any[];
+  sessionId: string;
+  /** undefined on any cache hit (L1/L2) — cache hits don't re-run inference. */
+  usage?: BifrostChatUsage;
+  backend: BifrostChatBackend;
 };
 
 function normalizeToolCalls(toolCalls: unknown): any[] | undefined {
@@ -873,40 +911,21 @@ export async function turboQuantChat(
     })),
     max_tokens: options?.maxTokens ?? 2048,
     temperature: options?.temperature ?? 0.2,
-    stream: false,
+    stream: true,
     cache_prompt: true,
     ...(options?.tools ? { tools: options.tools } : {}),
     ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
   };
 
   const startedAt = Date.now();
-  const dataRaw = await safeJsonPost(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, requestBody, {
-    timeoutMs: timeoutMs,
-    maxResponseBytes: 2_000_000,
-  });
+  const streamed = await fetchStreamedChatCompletion(
+    `${TURBOQUANT_BASE_URL}/v1/chat/completions`,
+    requestBody,
+    AbortSignal.timeout(timeoutMs)
+  );
 
-  if (!dataRaw) {
-    throw new Error(`TurboQuant chat failed (no response)`);
-  }
-
-  const data = dataRaw as {
-    usage?: {
-      prompt_tokens?: number;
-      completion_tokens?: number;
-      total_tokens?: number;
-    };
-    choices?: Array<{
-      message?: {
-        content?: string;
-        reasoning_content?: string;
-        tool_calls?: unknown;
-      };
-    }>;
-  };
-
-  const choice = data.choices?.[0]?.message;
-  const content = choice?.content ?? choice?.reasoning_content ?? '';
-  const toolCalls = normalizeToolCalls(choice?.tool_calls);
+  const content = streamed.content;
+  const toolCalls = normalizeToolCalls(streamed.tool_calls);
 
   logInference({
     type: 'llm',
@@ -930,24 +949,117 @@ export async function turboQuantChat(
   return content;
 }
 
-/** Overload: no tools → guaranteed string */
+/**
+ * POST an OpenAI-shaped chat/completions request with `stream: true` and
+ * assemble the SSE content + tool_call deltas into a single result.
+ *
+ * Gemma4 is a thinking model: with `stream: false`, the reasoning block
+ * fills `reasoning_content` first (~350-400 tokens of chain-of-thought)
+ * before any `content` token appears. A fixed `max_tokens` budget can be
+ * exhausted by thinking alone, leaving `content` empty with
+ * `finish_reason: "length"`. Streaming accumulates content/tool_call
+ * deltas as they arrive and stops correctly on `[DONE]` regardless of how
+ * long the thinking phase runs. See root CLAUDE.md "Gemma4 LLM Call
+ * Rules — llama-server :8090 — always stream: true".
+ */
+async function fetchStreamedChatCompletion(
+  url: string,
+  body: Record<string, unknown>,
+  signal: AbortSignal
+): Promise<{ content: string; tool_calls?: any[]; usage?: BifrostChatUsage }> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    // stream_options.include_usage: llama-server sends a final chunk with an empty
+    // `choices` array and a real `usage` object (prompt/completion/total tokens) when
+    // this is set — verified live against :8090 2026-08-22. Without it, no tier of
+    // bifrostChat() ever sees real token counts, only the fallback string estimate.
+    body: JSON.stringify({ ...body, stream: true, stream_options: { include_usage: true } }),
+    signal,
+  });
+
+  if (!res.ok || !res.body) {
+    const text = res.body ? await res.text().catch(() => '') : '';
+    throw new Error(`streamed chat completion HTTP ${res.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+  }
+
+  let content = '';
+  let usage: BifrostChatUsage | undefined;
+  const toolCallsByIndex = new Map<number, { id?: string; type?: string; function: { name?: string; arguments: string } }>();
+  const decoder = new TextDecoder();
+  const reader = res.body.getReader();
+  let buf = '';
+
+  const consumeLine = (line: string) => {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('data:')) return;
+    const payload = trimmed.slice(5).trim();
+    if (!payload || payload === '[DONE]') return;
+    let parsed: any;
+    try {
+      parsed = JSON.parse(payload);
+    } catch {
+      return; // skip malformed SSE line
+    }
+    if (parsed.usage) {
+      usage = {
+        promptTokens: parsed.usage.prompt_tokens ?? 0,
+        completionTokens: parsed.usage.completion_tokens ?? 0,
+        totalTokens: parsed.usage.total_tokens ?? 0,
+      };
+    }
+    const delta = parsed.choices?.[0]?.delta;
+    if (!delta) return;
+    if (typeof delta.content === 'string') content += delta.content;
+    for (const tc of delta.tool_calls ?? []) {
+      const idx = tc.index ?? 0;
+      const existing = toolCallsByIndex.get(idx) ?? { function: { arguments: '' } };
+      if (tc.id) existing.id = tc.id;
+      if (tc.type) existing.type = tc.type;
+      if (tc.function?.name) existing.function.name = tc.function.name;
+      if (tc.function?.arguments) existing.function.arguments += tc.function.arguments;
+      toolCallsByIndex.set(idx, existing);
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() ?? '';
+    for (const line of lines) consumeLine(line);
+  }
+  if (buf.trim()) consumeLine(buf);
+
+  const tool_calls = toolCallsByIndex.size > 0 ? Array.from(toolCallsByIndex.values()) : undefined;
+  return { content, tool_calls, usage };
+}
+
+/** Overload: no tools, no metadata → guaranteed string (default, unchanged behavior) */
 export function bifrostChat(
   messages: Array<OllamaMessage>,
   model: string,
-  options?: Omit<BifrostChatOptions, 'tools' | 'toolChoice'> & { tools?: never }
+  options?: Omit<BifrostChatOptions, 'tools' | 'toolChoice' | 'includeMetadata'> & { tools?: never; includeMetadata?: false }
 ): Promise<string>;
+/** Overload: includeMetadata: true (no tools) → BifrostChatResult with usage/backend */
+export function bifrostChat(
+  messages: Array<OllamaMessage>,
+  model: string,
+  options: Omit<BifrostChatOptions, 'tools' | 'toolChoice'> & { tools?: never; includeMetadata: true }
+): Promise<BifrostChatResult>;
 /** Overload: with tools → may return tool_calls object */
 export function bifrostChat(
   messages: Array<OllamaMessage>,
   model: string,
   options: BifrostChatOptions & { tools: ReadonlyArray<unknown> }
-): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }>;
+): Promise<string | BifrostChatResult>;
 /** Implementation */
 export async function bifrostChat(
   messages: Array<OllamaMessage>,
   model: string,
   options?: BifrostChatOptions
-): Promise<string | { content: string; tool_calls?: any[]; sessionId: string }> {
+): Promise<string | BifrostChatResult> {
   // ── Hypergraph Recording Start ──
   const sessionId = options?.sessionId ?? crypto.randomUUID();
   const lane = options?.lane ?? Hypergraph.AgentLane.Interactive;
@@ -1024,7 +1136,11 @@ export async function bifrostChat(
       source: 'bifrostChat',
       cache_backend: 'redis-exact-match',
     });
-    return sanitizeModelOutput(exactMatch.content);
+    const l1Content = sanitizeModelOutput(exactMatch.content);
+    if (options?.includeMetadata) {
+      return { content: l1Content, sessionId, backend: 'cache-l1', usage: undefined };
+    }
+    return l1Content;
   }
 
   // ── L2 Cache: Qdrant HTTP Semantic Search (bypasses Bifrost gRPC bug) ──
@@ -1117,6 +1233,9 @@ export async function bifrostChat(
                       cache_backend: 'qdrant-semantic',
                     }
                   );
+                  if (options?.includeMetadata) {
+                    return { content: cachedContent, sessionId, backend: 'cache-l2', usage: undefined };
+                  }
                   return cachedContent;
                 }
               } catch {
@@ -1138,6 +1257,8 @@ export async function bifrostChat(
   let cacheHit = false;
   let hitType: string | undefined;
   let tool_calls: any[] | undefined;
+  let resolvedBackend: BifrostChatBackend = 'bifrost-gateway';
+  let resolvedUsage: BifrostChatUsage | undefined;
 
   // ── Centroid Compression (30-40% token reduction) ────────────────────────
   let messagesForInference = normalizedMessages;
@@ -1162,7 +1283,7 @@ export async function bifrostChat(
     // Prefer TurboQuant for Gemma4 models if available (KV cache compression benefit)
     const isTurboQuantModel = model?.includes('gemma4') || model?.includes('gemma3');
     const turboQuantUrl = ENV.TURBOQUANT_BASE_URL?.replace(/\/$/, '') ?? 'http://127.0.0.1:8090';
-    let usedBackend = 'llama-server';
+    resolvedBackend = 'llama-server';
 
     if (isTurboQuantModel) {
       try {
@@ -1172,10 +1293,9 @@ export async function bifrostChat(
         });
         if (modelsProbe.ok) {
           // TurboQuant available — try it first
-          const turboquantRes = await fetch(`${turboQuantUrl}/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          const turboquantResult = await fetchStreamedChatCompletion(
+            `${turboQuantUrl}/v1/chat/completions`,
+            {
               // Direct-to-llama-server path: announce what this server actually has
               // loaded (LLM_MODEL_ID), not the caller's gateway-routing tag (which may
               // name a different backend, e.g. a Docker Ollama model like
@@ -1184,21 +1304,21 @@ export async function bifrostChat(
               messages: messagesForInference,
               temperature: options?.temperature ?? 0.7,
               max_tokens: options?.maxTokens ?? 2048,
-              stream: false,
+              ...(options?.topP !== undefined ? { top_p: options.topP } : {}),
+              ...(options?.topK !== undefined ? { top_k: options.topK } : {}),
+              ...(options?.responseFormat ? { response_format: options.responseFormat } : {}),
               ...(options?.tools ? { tools: options.tools } : {}),
-            }),
-            signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
-          });
+            },
+            AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS)
+          );
 
-          if (turboquantRes.ok) {
-            const turboquantData = (await turboquantRes.json()) as any;
-            content = sanitizeModelOutput(turboquantData.choices?.[0]?.message?.content ?? '');
-            tool_calls = turboquantData.choices?.[0]?.message?.tool_calls;
-            t_l3 = performance.now() - bifrostStart;
-            usedBackend = 'turboquant';
-            console.log(`[bifrost] L3 TURBOQUANT OK (l3_ms=${Math.round(t_l3)})`);
-            return; // Success — don't fallback further
-          }
+          content = sanitizeModelOutput(turboquantResult.content);
+          tool_calls = turboquantResult.tool_calls;
+          resolvedUsage = turboquantResult.usage;
+          t_l3 = performance.now() - bifrostStart;
+          resolvedBackend = 'turboquant';
+          console.log(`[bifrost] L3 TURBOQUANT OK (l3_ms=${Math.round(t_l3)})`);
+          return; // Success — don't fallback further
         }
       } catch (err) {
         // TurboQuant probe/call failed — fall through to llama-server direct
@@ -1208,32 +1328,31 @@ export async function bifrostChat(
 
     // ── llama-server Fallback ───────────────────────────────────────────────
     // Default fallback if TurboQuant unavailable, not gated, or fails.
-    const llamaRes = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: LLM_MODEL_ID, // this server only ever has ROTORQUANT_MODEL_PATH loaded
-        messages: messagesForInference,
-        stream: false,
-        ...(options?.tools ? { tools: options.tools } : {}),
-        temperature: options?.temperature ?? 0.7,
-        max_tokens: options?.maxTokens ?? 2048,
-      }),
-      signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
-    });
-
-    if (!llamaRes.ok) {
-      throw new Error(`llama-server L3 error: ${llamaRes.status}`);
+    let llamaResult: { content: string; tool_calls?: any[]; usage?: BifrostChatUsage };
+    try {
+      llamaResult = await fetchStreamedChatCompletion(
+        `${CHAT_BASE_URL}/v1/chat/completions`,
+        {
+          model: LLM_MODEL_ID, // this server only ever has ROTORQUANT_MODEL_PATH loaded
+          messages: messagesForInference,
+          ...(options?.tools ? { tools: options.tools } : {}),
+          temperature: options?.temperature ?? 0.7,
+          max_tokens: options?.maxTokens ?? 2048,
+          ...(options?.topP !== undefined ? { top_p: options.topP } : {}),
+          ...(options?.topK !== undefined ? { top_k: options.topK } : {}),
+          ...(options?.responseFormat ? { response_format: options.responseFormat } : {}),
+        },
+        AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS)
+      );
+    } catch (err) {
+      throw new Error(`llama-server L3 error: ${(err as Error).message}`);
     }
 
-    const llamaData = fastJsonParse<{
-      choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
-    }>(await llamaRes.text());
-    const choice = llamaData.choices?.[0]?.message;
-    content = sanitizeModelOutput(choice?.content ?? '');
-    tool_calls = choice?.tool_calls;
+    content = sanitizeModelOutput(llamaResult.content);
+    tool_calls = llamaResult.tool_calls;
+    resolvedUsage = llamaResult.usage;
     t_l3 = performance.now() - bifrostStart;
-    usedBackend = 'llama-server';
+    resolvedBackend = 'llama-server';
     console.log(`[bifrost] L3 LLAMA-SERVER FALLBACK OK (l3_ms=${Math.round(t_l3)})`);
   };
 
@@ -1264,6 +1383,10 @@ export async function bifrostChat(
           });
           await callDirectLlamaFallback();
         } else {
+          // Bifrost forwards `stream`/cache-debug headers through to the OpenAI-shaped
+          // SSE response; cache_debug still arrives as a non-delta field on the final
+          // chunk, so we recover it from the raw stream below rather than a JSON body.
+          let bifrostCacheDebug: { cache_hit?: boolean; hit_type?: string; similarity?: number } | undefined;
           const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
             method: 'POST',
             headers: {
@@ -1275,32 +1398,73 @@ export async function bifrostChat(
               messages: normalizedMessages,
               temperature: options?.temperature ?? 0.7,
               max_tokens: options?.maxTokens ?? 2048,
-              stream: false,
+              stream: true,
+              stream_options: { include_usage: true },
+              ...(options?.topP !== undefined ? { top_p: options.topP } : {}),
+              ...(options?.topK !== undefined ? { top_k: options.topK } : {}),
+              ...(options?.responseFormat ? { response_format: options.responseFormat } : {}),
               ...(options?.tools ? { tools: options.tools } : {}),
               ...(options?.toolChoice ? { tool_choice: options.toolChoice } : {}),
             }),
             signal: AbortSignal.timeout(bifrostGatewayTimeoutMs),
           });
 
-          if (!res.ok) {
-            const text = await res.text().catch(() => '');
+          if (!res.ok || !res.body) {
+            const text = res.body ? await res.text().catch(() => '') : '';
             throw new Error(`Bifrost error: ${res.status} ${text.slice(0, 200)}`);
           }
 
-          // GPU-accelerated JSON parsing via simdjson (5× faster for large Bifrost responses)
-          const rawText = await res.text();
-          const data = fastJsonParse<{
-            choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
-            extra_fields?: {
-              cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number };
-            };
-          }>(rawText);
-          const debug = data.extra_fields?.cache_debug;
-          const choice = data.choices?.[0]?.message;
-          content = sanitizeModelOutput(choice?.content ?? '');
-          tool_calls = choice?.tool_calls;
-          cacheHit = !!debug?.cache_hit;
-          hitType = debug?.hit_type;
+          content = '';
+          const toolCallsByIndex = new Map<number, { id?: string; type?: string; function: { name?: string; arguments: string } }>();
+          const decoder = new TextDecoder();
+          const reader = res.body.getReader();
+          let buf = '';
+          const consumeLine = (line: string) => {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) return;
+            const payload = trimmed.slice(5).trim();
+            if (!payload || payload === '[DONE]') return;
+            let parsed: any;
+            try {
+              parsed = JSON.parse(payload);
+            } catch {
+              return;
+            }
+            if (parsed.extra_fields?.cache_debug) bifrostCacheDebug = parsed.extra_fields.cache_debug;
+            if (parsed.usage) {
+              resolvedUsage = {
+                promptTokens: parsed.usage.prompt_tokens ?? 0,
+                completionTokens: parsed.usage.completion_tokens ?? 0,
+                totalTokens: parsed.usage.total_tokens ?? 0,
+              };
+            }
+            const delta = parsed.choices?.[0]?.delta;
+            if (!delta) return;
+            if (typeof delta.content === 'string') content += delta.content;
+            for (const tc of delta.tool_calls ?? []) {
+              const idx = tc.index ?? 0;
+              const existing = toolCallsByIndex.get(idx) ?? { function: { arguments: '' } };
+              if (tc.id) existing.id = tc.id;
+              if (tc.type) existing.type = tc.type;
+              if (tc.function?.name) existing.function.name = tc.function.name;
+              if (tc.function?.arguments) existing.function.arguments += tc.function.arguments;
+              toolCallsByIndex.set(idx, existing);
+            }
+          };
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            const lines = buf.split('\n');
+            buf = lines.pop() ?? '';
+            for (const line of lines) consumeLine(line);
+          }
+          if (buf.trim()) consumeLine(buf);
+
+          content = sanitizeModelOutput(content);
+          tool_calls = toolCallsByIndex.size > 0 ? Array.from(toolCallsByIndex.values()) : undefined;
+          cacheHit = !!bifrostCacheDebug?.cache_hit;
+          hitType = bifrostCacheDebug?.hit_type;
           bifrostGatewayUnavailableUntil = 0;
 
           if (!content.trim() && !tool_calls?.length) {
@@ -1308,9 +1472,9 @@ export async function bifrostChat(
           }
 
           t_l3 = performance.now() - bifrostStart;
-          if (debug?.cache_hit) {
+          if (bifrostCacheDebug?.cache_hit) {
             console.debug(
-              `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
+              `[bifrost] L2 SEMANTIC HIT type=${bifrostCacheDebug.hit_type} similarity=${bifrostCacheDebug.similarity?.toFixed(3)}`
             );
           }
         }
@@ -1335,7 +1499,7 @@ export async function bifrostChat(
           toolCalls: tool_calls.length,
         }
       );
-      return { content, tool_calls, sessionId };
+      return { content, tool_calls, sessionId, usage: resolvedUsage, backend: resolvedBackend };
     }
   } catch (bifrostErr) {
     // ── L3 Fallback: Direct llama-server (bypasses broken Bifrost) ──
@@ -1379,7 +1543,7 @@ export async function bifrostChat(
           toolCalls: tool_calls.length,
         }
       );
-      return { content, tool_calls, sessionId };
+      return { content, tool_calls, sessionId, usage: resolvedUsage, backend: resolvedBackend };
     }
   }
 
@@ -1479,8 +1643,8 @@ export async function bifrostChat(
     });
   }
 
-  if (tool_calls?.length) {
-    return { content, tool_calls, sessionId };
+  if (tool_calls?.length || options?.includeMetadata) {
+    return { content, tool_calls, sessionId, usage: resolvedUsage, backend: resolvedBackend };
   }
 
   return content;

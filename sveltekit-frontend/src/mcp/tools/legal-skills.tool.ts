@@ -2,43 +2,31 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 
-const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
-
+/**
+ * Converted 2026-08-22 to bifrostChat() — gains streaming (avoids Gemma4
+ * thinking-block truncation), the L1/L2 cache cascade, and live model
+ * resolution via getLlamaSessionDescriptor(). The old MODEL_PREFERENCE retry
+ * loop tried two model-name strings, but llama-server ignores the model
+ * field and serves whatever GGUF it was launched with — both attempts hit
+ * the identical endpoint, so the "fallback" only ever helped by retrying a
+ * transient failure, which bifrostChat's own TurboQuant→llama-server→Bifrost
+ * cascade already does more robustly.
+ */
 async function callLlamaServer(prompt: string, format?: 'json' | 'text', timeoutMs = 90_000): Promise<string> {
-  for (const model of MODEL_PREFERENCE) {
-    try {
-      const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.3,
-          max_tokens: 2048,
-          stream: false,
-          ...(format === 'json' && { response_format: { type: 'json_object' } }),
-        }),
-        signal: AbortSignal.timeout(timeoutMs),
-      });
-
-      if (!res.ok) {
-        if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-          throw new Error(`llama-server ${res.status}`);
-        }
-        continue;
-      }
-
-      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-      return data.choices?.[0]?.message?.content ?? '{}';
-    } catch (err) {
-      if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-        throw err;
-      }
+  const llamaSession = await getLlamaSessionDescriptor();
+  return bifrostChat(
+    [{ role: 'user', content: prompt }],
+    llamaSession.modelId,
+    {
+      temperature: 0.3,
+      maxTokens: 2048,
+      timeoutMs,
+      ...(format === 'json' ? { responseFormat: { type: 'json_object' as const } } : {}),
     }
-  }
-  throw new Error('No LLM models available');
+  );
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
