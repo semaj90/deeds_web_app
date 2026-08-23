@@ -115,8 +115,8 @@ export const claimVerificationReceiptSchema = z.object({
   claim_id: id,
   claim_revision: revision,
   policy_revision: revision,
-  evidence_refs: z.array(id).min(1).max(4096),
-  evidence_checksums: z.array(checksum).min(1).max(4096),
+  evidence_refs: z.array(id).max(4096),
+  evidence_checksums: z.array(checksum).max(4096),
   verdict: z.enum(['VERIFIED', 'REJECTED', 'INSUFFICIENT_EVIDENCE']),
   satisfied_required_kinds: z.array(z.enum(EVIDENCE_KINDS)).default([]),
   missing_required_kinds: z.array(z.enum(EVIDENCE_KINDS)).default([]),
@@ -130,6 +130,9 @@ export const claimVerificationReceiptSchema = z.object({
   }
   if (value.verdict === 'VERIFIED' && value.missing_required_kinds.length > 0) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['missing_required_kinds'], message: 'VERIFIED receipt cannot have missing required evidence kinds' });
+  }
+  if (value.verdict === 'VERIFIED' && value.evidence_refs.length === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence_refs'], message: 'VERIFIED receipt requires admitted evidence' });
   }
 });
 export type ClaimVerificationReceiptV1 = z.infer<typeof claimVerificationReceiptSchema>;

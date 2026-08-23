@@ -47,7 +47,7 @@ class ModelTopologyTests(unittest.TestCase):
 class TorchKernelExperimentTests(unittest.TestCase):
     def test_cpu_eager_reference_and_compile_receipt(self) -> None:
         try:
-            receipt = run_torch_kernel_experiment(rows=8, cols=16, device="cpu", dynamic_shapes=True)
+            receipt = run_torch_kernel_experiment(rows=8, cols=16, device="cpu", compile_dynamic=True)
         except ImportError:
             self.skipTest("PyTorch unavailable")
         self.assertEqual(receipt.operation, "add_scale")
