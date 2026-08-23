@@ -46,6 +46,26 @@ exactly what this change proposed:
     8-item checklist in spirit (build-info CUDA-capable ✓, device accepted ✓, QuantileDMatrix
     training ✓, resolved-config shows cuda ✓, finite predictions ✓, `nvidia-smi` confirms real GPU
     hardware present ✓ — though live VRAM-during-training correlation via `nvidia-smi dmon` was not
+  - **Correction, 2026-08-22 (operator pushback: "do we even have cuda 12.9 where is this file?")** —
+    verified precisely rather than trusting `build_info()` at face value. **We do NOT have CUDA 12.9
+    installed** — this machine has CUDA 12.8 and CUDA 13.0 toolkits (`nvcc --version` → 13.0; both
+    `v12.8/` and `v13.0/` exist under `NVIDIA GPU Computing Toolkit/CUDA/`). `xgb.build_info()`'s
+    `CUDA_VERSION: [12, 9]` is a **compile-time constant** baked in by whoever built the PyPI wheel —
+    it records what CUDA version *they* compiled `xgboost.dll` against, not a runtime requirement for
+    an exact installed version. At runtime, `xgboost.dll` dynamically loads `cudart64_12.dll` — a
+    **major-version-generic filename** (CUDA's runtime API is ABI-compatible across all 12.x minors)
+    — satisfied by the installed **CUDA 12.8** toolkit's copy, confirmed present and on `PATH` at
+    `NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin/cudart64_12.dll`. CUDA 13.0 is also installed but
+    unused by this xgboost wheel (it's built against the 12.x runtime family, not `cudart64_13.dll`);
+    driver 580.88 (13.0-capable) runs the 12.x-built binary fine via standard backward compatibility.
+    **`nvidia-smi`'s "CUDA Version: 13.0" field is the driver's max-supported version, not what any
+    given app actually links against** — don't conflate the two again. Also clarified: "cuTile needs
+    13.1" (raised by the operator) is unrelated — cuTile is a separate NVIDIA tile-based programming
+    API that XGBoost's tree-training kernels don't use at all; nothing in this proof depends on it.
+    **Re-verified with the exact config keys the original proof protocol asked for** (not a generic
+    string match): a fresh 300,000-row run showed `learner.generic_param.device == "cuda:0"` and
+    `learner.gradient_booster.gbtree_train_param.updater == "grow_gpu_hist"` in the resolved
+    `save_config()` — precise, unambiguous GPU-engine confirmation.
     separately captured for this specific 1.5-second run, a minor gap given everything else lines up).
   - **`XGBOOST_GPU_RUNTIME_PROVEN` is hereby declared** for this workstation's native Windows Python
     environment. **`XGBOOST_RERANKER_PRODUCTION_PROVEN` remains explicitly NOT declared** — the
