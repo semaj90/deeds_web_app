@@ -15,7 +15,7 @@ const paths = {
   searchSchema: 'sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts',
   routeSchema: 'sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts',
   redisCompat: 'sveltekit-frontend/src/lib/server/redis.ts',
-  valkeyOwner: 'sveltekit-frontend/src/lib/server/valkey-client.ts',
+  valkeyOwner: 'sveltekit-frontend/src/lib/server/cache/valkey-client.ts',
   centroidContract: 'sveltekit-frontend/src/lib/server/retrieval/centroid-cache-contract-v1.ts',
   centroidCache: 'sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts',
 };
