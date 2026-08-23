@@ -2810,3 +2810,101 @@ Remaining end-to-end gates, in order:
 - Alignment sweep report: `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 - The request validator now rejects spectral configurations where
   `numEigenvectors > numClusters` or `numClusters > node_count`.
+
+### Session handoff — 2026-08-23 (openspec review + semantic-dimension resolution + XGBoost restore)
+
+**Pushed to origin/main**: `d7d396b369` (parent `7fe3c52136`). All work below is live on `main`.
+
+- **Restored 9 openspec change directories** that commit `a2e4dab329` deleted via raw `git rm`
+  (bypassing this repo's archive-not-delete convention) into `deeds_labs/archive/2026-08-23/
+  retired-openspec-changes-aug22/` with a proper `docs/archive-manifest.json` entry. 6 of the 9
+  brought back to active `openspec/changes/` and substantively worked: `agent-branch-review-
+  fanout-ace-centroid-aug22`, `codereview-inference-wiring-followup-aug22`, `codereview-semantic-
+  dimension-regression-aug22`, `deep-audit-code-gates-aug22`, `inference-wiring-deep-audit-aug22`,
+  `parent-atlas-xgboost-cuda-runtime-proof`. Archived 2 genuinely-complete unrelated changes via
+  `openspec archive` (`parent-atlas-llama-server-chat-consolidation`, `phase-alignment-hmm-prefill-
+  dag-20260822`).
+- **RESOLVED — embedding dimension policy, operator-confirmed**: found a 5-round undocumented
+  policy flip-flop across less than a month (Jul 27 → Aug 3 → Aug 11 → Aug 19 freeze to 512 →
+  Aug 22 silent revert to 768 via commit `cdae3e454b`, zero commit-message justification). Live
+  ground truth broke the tie: Postgres's own truth column (`codebase_chunk_index.content_embedding`)
+  and a Qdrant mirror (`codebase_chunks_768_v2`) are both natively 768-dim and predate the Aug 19
+  freeze by weeks — the freeze's own stated premise ("no production 768 corpus exists") didn't
+  hold even when written. **`semantic_768` is now canonical**, with 512/384 remaining legitimate
+  derived lanes only when produced from an already-indexed, already-validated 768d source, never
+  speculatively. Propagated through root `claude.md` and all 3 stale docs (`parent-atlas-semantic-
+  512-canonicalization` marked SUPERSEDED, `parent-atlas-semantic-768-canonical-contract` marked
+  ACCEPTED, `parent-atlas-768-dim-migration` unblocked). Live code already matched the decision —
+  no code revert needed there.
+- **KNOWN OPEN — the `codebase_chunks_768` vs `codebase_chunks_768_v2` Qdrant split** (not resolved
+  by the above): `_768` has 105,762 points with richer payload (`graphAuthorityScore`/`pagerank`/
+  `community_id`/`tags`), `_768_v2` has 52,380 points (1:1 mirror of Postgres) with a leaner
+  identity-only payload but is the one `embedding-contract-768.ts` declares canonical.
+  `turbovec-search.ts` (8 sites) + `trace-mcp-server.ts` still hardcode `_768`; the ACP/
+  `packet-assembler.ts` lane already defaults to `_768_v2`. Picking `_768_v2` everywhere today
+  would silently drop PageRank/authority/tag ranking signals — needs a payload backfill or a
+  reversed canonical pick, not a blind constant-propagation. See `codereview-semantic-dimension-
+  regression-aug22/tasks.md` section 5.
+- **RESTORED — XGBoost reranker collateral regression**: `a2e4dab329` reverted `scripts/atlas/
+  train-xgboost-reranker.py` back to its pre-fix hardcoded `'device': 'cuda'  # falls back to cpu`
+  state and deleted its 2 supporting Python modules (`prove_atlas_xgboost_gpu_runtime_v1.py`,
+  `atlas_xgboost_grouped_ranking_v1.py`), while retiring unrelated Atlas v1 modules in the same
+  commit. Independently corroborated by a separate external audit reaching the identical
+  `COLLATERAL_REGRESSION` conclusion before restoring. Restored via `git restore --source=<exact
+  historical commit>` for all 3 files (working-tree + committed this session, not squashed into
+  the historical commits). **Not yet run**: the bounded synthetic GPU proof
+  (`python python/prove_atlas_xgboost_gpu_runtime_v1.py --rows 100000 --cols 32 --rounds 64
+  --device cuda:0`) — next session should run this before trusting the restore compiles-and-works,
+  not just compiles.
+- **Fixed `scripts/audit/backend-infrastructure-audit.sh`**: wrong container-name defaults
+  (`deeds-redis-prod`/`phase66-rabbitmq` → `legal-ai-valkey`/`legal-ai-rabbitmq`) and missing
+  Redis `-a` auth flag on all `redis-cli` calls (silent `NOAUTH` failures were masquerading as
+  G1 SKIP / G3 FAIL). Now 11/4/3 pass/fail/skip out of the box, no env overrides needed.
+- **Fixed `sveltekit-frontend/src/lib/server/agent/supervisor.ts`**: `getTopology()` read
+  `this.graph` without awaiting the init chain `investigate()`/`stream()` already await — made it
+  `async` + added `await this.ensureGraph()`. Zero live callers currently, safe change.
+- **D9 orphan-verification chain run end to end** after unblocking a broken `glob` import in
+  `deep-audit-ast.mjs` (assumed glob v9+ named-export API against an undeclared, incidentally-
+  installed v7.2.3 transitive dependency — fixed via scoped `npm install --no-save glob@10`, not
+  persisted to package.json; `D9_GLOB_COMPATIBILITY_PATCH.md` in the external recovery package at
+  `Downloads/parent_atlas_recovery_review_2026-08-23/` has a more durable source-level shim if
+  wanted). Result: 7,416 raw fanIn=0 candidates → 613 true-orphan after triage (91.7% resolved as
+  dynamic-import-target/sibling-replaced/fanOut-without-fanIn — matches this repo's own documented
+  ~95% false-positive-rate warning almost exactly). Cross-referenced against `next_steps/`: 37
+  PLANNED (should wire, not archive), 3,964 DRIFT (archive candidates), 136 INVERTED (stale plans
+  referencing nonexistent files). Reports are gitignored (`sveltekit-frontend/reports/`), not
+  committed — regenerate via `node scripts/deep-audit-ast.mjs --gate=D9 && node scripts/triage-d9-
+  shallow-dynamic.mjs && node scripts/triage-orphans-vs-next-steps.mjs` from `sveltekit-frontend/`.
+- **Live-reproduced the ACE `.length` crash** (previously flagged in `inference-wiring-deep-audit-
+  aug22` as unresolved with unreliable stack-trace line numbers). Repaired a completely broken dev
+  environment first (12 missing/undeclared dependencies: `@babel/code-frame`, `@babel/parser`,
+  `postcss-preset-env`, `@internationalized/date`, `class-variance-authority`, `marked`,
+  `@tiptap/*` ×4, `bcryptjs`, `dexie`, plus a missing native `sharp` binary — all fixed via scoped
+  `npm install --no-save`, not persisted). Confirmed the crash is real and path-dependent (2/4
+  requests through `/api/v1/chat/completions` succeeded, 2/4 crashed with the same error), and
+  confirmed the reported stack-trace file/line/function are unreliable under Vite's dev-mode SSR
+  transform (checked both reported lines directly — one is a comment, one is an unrelated `await`
+  call, neither has a `.length` read nearby). Root throw site still not located — needs breadcrumb
+  instrumentation, not more static reading. Also found a real, separate, unrelated bug along the
+  way: `telemetry-compressor.ts:29` fails with `column "source_ref_id" does not exist` (same
+  schema-drift class as 2 previously-fixed bugs in that file).
+- **Not investigated this session, flagged only**: root `main` currently shows an enormous number
+  of modified files unrelated to any of the above work (likely CRLF/LF normalization noise, or
+  concurrent-session activity) — worth a `git diff --stat` sanity pass before the next commit on
+  this branch, to make sure nothing unexpected gets swept into a future broad `git add`.
+- **External recovery package referenced this session**: `Downloads/parent_atlas_recovery_review_
+  2026-08-23/` (README_REVIEW.md, RESTORE_XGBOOST_REGRESSION.ps1, D9_GLOB_COMPATIBILITY_PATCH.md,
+  AUDIT_A2E4DAB329.md, NEXT_COMMANDS.ps1, MANIFEST.json) — independently reached the same XGBoost
+  regression conclusion via a separate audit pass; its `AUDIT_A2E4DAB329.md` has a disciplined
+  phase-by-phase classification framework (`INTENTIONAL_V1_RETIREMENT` / `REPLACED_BY_V2` /
+  `COLLATERAL_REGRESSION` / `HISTORICAL_DOC_ONLY` / `UNKNOWN_NEEDS_OWNER_REVIEW`) worth reusing if
+  auditing the rest of `a2e4dab329`'s 582 files beyond what this session already checked
+  (`materialize-graphify-source-inventory-v3.mts`, `audit-agent-runtime-alignment.mjs`,
+  `canonical-semantic-768-source-ref-v1.ts`, `texture-layout-v1.ts`/`texture-lod-residency-v1.ts`,
+  `packet-domain-lineage-v1.ts` — all confirmed clean removals with zero dangling references).
+- **Next session priority order** (per the external package's own recommendation, which this
+  session's own findings independently agree with): (1) run the XGBoost bounded GPU proof to
+  confirm the restore actually works, not just compiles; (2) instrument and re-trigger the ACE
+  `.length` crash to find the real throw site; (3) resolve the `codebase_chunks_768` vs `_768_v2`
+  split; (4) resume the Graphify revision-owner proof sequence → snapshot/Qdrant lineage → FANOUT,
+  which was blocked all session on the semantic-dimension question that's now resolved.
