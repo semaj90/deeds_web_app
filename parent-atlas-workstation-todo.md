@@ -2811,3 +2811,25 @@ implementation, per this repo's "Agent Execution Integrity" rule.
   CandidateOrdinal-map checksum and full receipt join are produced. The
   read-only join now yields ordinal-map checksum
   `b77644ae7a9f87ebb08a8a26e990f76acc003df06a145ace36db59885c84bfd2`.
+
+### Spectral RAPIDS correction — 2026-08-23
+
+- [x] WSL2 `atlas-rapids-cu13` direct environment startup, RTX 3060 Ti
+  visibility, and `cugraph 26.06.00` import verified with Torch loaded first.
+- [x] Fixed the community sidecar's cuGraph ordinal buffer alignment: vertex,
+  source, and destination columns are explicitly `int32`, which is required by
+  the spectral API and prevents mixed-width device copies.
+- [x] Six-node/two-component spectral fixture executed in the activated WSL2
+  environment and returned deterministic canonical assignments.
+- [ ] Add the full GPU/driver/RAPIDS/VRAM/latency receipt to the spectral
+  response and compare against the CPU assignment under the same ordinal map.
+- [x] Bounded fixture assignment matches the CPU NetworkX reference for the
+  two disconnected components; this is fixture evidence only, not general
+  spectral parity.
+- [x] Sidecar emits an observational runtime receipt with CUDA/driver/Torch/
+  cuGraph versions, graph and assignment checksums, latency, and VRAM.
+- [x] Backend-neutral parity accepts `spectral` and reports assignment metrics
+  separately from modularity; missing modularity remains `PARTIAL`.
+- [ ] Keep spectral projection admission, Qdrant tags, Valkey residency,
+  Neo4j-derived features, and synthesis routing read-only until that receipt
+  passes. Native C ABI/N-API and workflow/A2A receipt seams remain later gates.

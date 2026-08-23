@@ -33,7 +33,7 @@ class CommunityParityInputV1(BaseModel):
     graphRevision: str = Field(min_length=1)
     projectionRevision: str = Field(min_length=1)
     topologyHash: str = Field(min_length=1)
-    algorithm: Literal["louvain", "leiden"]
+    algorithm: Literal["louvain", "leiden", "spectral"]
     oracleBackend: str = Field(min_length=1)
     challengerBackend: str = Field(min_length=1)
     oracleAssignments: list[PartitionAssignmentV1] = Field(min_length=1)
@@ -61,7 +61,7 @@ class CommunityBackendParityReceiptV1(BaseModel):
     graphRevision: str
     projectionRevision: str
     topologyHash: str
-    algorithm: Literal["louvain", "leiden"]
+    algorithm: Literal["louvain", "leiden", "spectral"]
     oracleBackend: str
     challengerBackend: str
     nodeCount: int = Field(ge=1)

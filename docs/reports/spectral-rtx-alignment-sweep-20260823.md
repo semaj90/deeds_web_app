@@ -82,3 +82,55 @@ The failure isolates to `cugraph` import/execution: importing `cugraph`
 does not return within the bounded observation window, including with
 `CUDA_VISIBLE_DEVICES=-1`. Therefore no spectral assignment, checksum,
 latency, or GPU-memory receipt exists yet.
+
+## 2026-08-23 bounded execution correction
+
+The prior runtime diagnosis was refined with a direct activated-environment
+probe. `cugraph` imports successfully after the documented Torch-before-RAPIDS
+ordering. The six-node spectral call then exposed a concrete graph-construction
+bug: Python/cuDF inference widened edge ordinal columns while the explicit
+vertex column remained `int32`, producing either `cudaErrorInvalidValue` during
+graph construction or a spectral API rejection for non-`int32` vertices.
+
+The sidecar now explicitly uses `int32` for vertices, source, and destination
+ordinal columns and imports Torch before cuDF/cuGraph. The bounded fixture then
+executed successfully in WSL2:
+
+- `cugraph`: `26.06.00`
+- algorithm: `spectralModularityMaximizationClustering`
+- fixture: 6 nodes, 4 weighted edges, 2 components, 2 clusters
+- result: 2 deterministic canonical community assignments
+- execution duration: `10015.635 ms` in the returned sidecar response
+- no database, Qdrant, Neo4j, Valkey, or projection writes
+
+Focused Python validation remains `7 passed`. The remaining gate is not
+installation: the sidecar response still needs the full GPU/driver/memory
+execution receipt and an independently computed CPU assignment comparison
+before spectral output can be admitted to any derived projection.
+
+The same frozen six-node topology was checked against a CPU NetworkX
+connected-component reference under the identical sorted ordinal map. Both
+produce memberships `[0,1,2]` and `[3,4,5]`; this is recorded only as
+`FIXTURE_ASSIGNMENT_MATCH`, not as general spectral parity. A CPU spectral
+implementation and a revision-qualified comparison receipt are still required
+for promotion.
+
+The sidecar now emits an observational execution receipt. The activated WSL2
+run returned:
+
+- CUDA available: `true`; device: RTX 3060 Ti; driver: `580.88`
+- Torch: `2.13.0+cu130`; runtime CUDA: `13.0`
+- cuGraph: `26.06.00`
+- graph input checksum: `sha256:bdc226f176cb8cdd6ddf811851872071a3532d4a0bf5f853f23d0589095d1062`
+- assignment checksum: `sha256:1c94fd67cd595a0ae15e21548465d49a01ffccda36cde895d497f2afef9c60fd`
+- duration: `5752.744 ms`; memory: `3,350,591,488 / 8,589,410,304` bytes free/total
+
+The receipt explicitly sets `canonicalWritesAllowed=false` and
+`promotionEligible=false`. It is runtime evidence, not a promotion proof.
+
+The backend-neutral parity evaluator now accepts `spectral` as an explicit
+algorithm and compares label-invariant ARI/NMI/pairwise membership while
+reporting missing modularity as `PARTIAL`, not `PROVEN`. The new spectral
+fixture contract test passes; this closes the comparison seam without
+pretending that the disconnected-component fixture proves general spectral
+equivalence.
