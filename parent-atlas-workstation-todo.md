@@ -3012,3 +3012,62 @@ proof after wiring to see whether `fullParity` improves — that's the actual ac
 (3) run the bounded XGBoost GPU proof; (4) everything else already queued above (ACE crash
 instrumentation, `codebase_chunks_768`/`_768_v2` split, Graphify FANOUT sequencing, docker-compose
 canonical-file decision).
+
+### Session handoff — 2026-08-23 (CRLF span-compat wiring completed, real measured fix)
+
+Followed up on the deferred wiring decision from the previous entry. Reconstructed the exact
+pre-deletion pipeline by diffing (with `--strip-trailing-cr` — CRLF line endings were making `diff`
+report the whole 625-line file as one giant hunk) the historical `miniforge_nlp_sidecar_v2.py`
+against current, and confirmed via grep that `_normalized_lf_to_source_byte_offsets`/
+`_repair_raw_chunk_byte_span` had **zero callers even before the deletion commit** — genuinely dead
+code, correctly left out. Restored and wired the two real, used layers:
+`resolve_chunk_byte_span()` (from the module restored in the prior entry) + sidecar-local
+`_resolve_original_chunk_span()`/`_span_matches_original()`/`_lf_boundary_to_original_map()`/
+`_raw_chunk_content_bytes()`, plus `_structural_symbol_name()` and `_diagnostics_have_errors()`.
+
+**Found and fixed a real, pre-existing bug independent of the restore.** Restored
+`python/test_miniforge_nlp_sidecar_v2_multiline_crlf.py` (also deleted, the end-to-end regression
+test for exactly this pipeline) and it failed. Verified — importantly — that this was **not**
+something introduced by my restore: checked out the sidecar file completely unmodified at
+`a2e4dab329^` (the actual pre-deletion state) via a throwaway `PYTHONPATH` sandbox and confirmed the
+test already failed there too. Root cause: `_resolve_original_chunk_span()`'s first validation pass
+required an exact byte match, but by the time it runs the span may already have been LF-remapped by
+`resolve_chunk_byte_span()` — so it would re-interpret already-corrected original-byte coordinates
+as still-LF-relative and attempt a second, incorrect remap (exactly what the test's docstring warns
+against: "must not be interpreted as LF-relative twice"). Fixed with one line:
+`allow_lf_normalized_content=True` on that first check — a strict superset of the exact-match case
+(a no-op when no CRLF is present), so it only additionally accepts spans the old code wrongly
+rejected. 8/8 relevant tests pass after the fix.
+
+**Real infra gotcha hit along the way**: the corpus parity proof talks to the sidecar over HTTP
+(`create8095AstProvider`), and the running `miniforge-nlp-sidecar` Docker container bakes
+`python/` into the image at build time (`docker/miniforge-nlp-sidecar/docker-compose.yml`'s volume
+mount is `../..:/workspace:ro` — NOT `/app`, where the code actually runs from) — a source edit
+alone does nothing until the image is rebuilt. Ran `docker compose build` (~80s) then
+`docker compose up -d` (recreated the container) before the fix showed up in the proof output.
+**If touching this file again, remember: rebuild + recreate the container, don't just edit and
+re-run the proof** — the first parity re-run after the initial restore-but-not-yet-rebuilt state
+showed *zero change* and was momentarily confusing before this was root-caused.
+
+**Measured, real result** (`ATLAS_AST_PARITY_CORPUS_LIMIT=66 npx tsx
+scripts/atlas/prove-node-tree-sitter-corpus-parity-v2.mts`, same 66-file corpus, before rebuild vs.
+after):
+
+| Gate | Before | After |
+|---|---|---|
+| `EXACT_SPAN_MISMATCH` count | 463 | **0** |
+| `exactSpanParity` | 17/66 | **45/66** |
+| `fullParity` | 16/66 | **42/66** |
+
+Still `CORPUS_PARITY_MISMATCH` overall — the CRLF/byte-coordinate class of mismatch is now fully
+eliminated, but `namedSymbolCoverage` (45/66), `semanticKindParity` (42/66),
+`NAMED_SYMBOL_MISSING_LEFT/RIGHT` (12/60), and `SEMANTIC_KIND_MISMATCH` (7) are untouched — a
+separate, unrelated issue class (name/kind classification, not byte spans) that would need its own
+investigation. Committed as `dd23db570b`.
+
+**Next-session priority, updated**: (1) investigate the `NAMED_SYMBOL_MISSING_LEFT/RIGHT` and
+`SEMANTIC_KIND_MISMATCH` gap now that byte-span noise is gone (this should be much easier to isolate
+now that 463 spurious span mismatches aren't drowning out the signal); (2) run the bounded XGBoost
+GPU proof; (3) resolve `codebase_chunks_768` vs `_768_v2` (94 vs 40 file references — confirmed
+substantial, correctly scoped as its own investigation, not tackled this pass); (4) ACE crash
+instrumentation; (5) Graphify FANOUT sequencing; (6) docker-compose canonical-file decision.
