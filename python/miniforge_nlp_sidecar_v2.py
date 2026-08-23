@@ -141,6 +141,76 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
 legacy._grounded_extractions = _native_grounded_extractions
 
 
+def _line_span_to_utf8_byte_offsets(source: str, start_line: int, end_line: int) -> tuple[int, int]:
+    """Convert the legacy character-based line fallback into UTF-8 offsets."""
+
+    char_start, char_end = legacy._line_span_to_offsets(source, start_line, end_line)
+    return (
+        len(source[:char_start].encode("utf-8")),
+        len(source[:char_end].encode("utf-8")),
+    )
+
+
+def _structural_symbol_name(value: Any) -> str | None:
+    """Keep declaration identifiers while excluding module/string labels."""
+
+    if value is None:
+        return None
+    name = str(value).strip()
+    if not name or name == "<anonymous>":
+        return None
+    if len(name) >= 2 and name[0] in {"'", '"', "`"} and name[-1] == name[0]:
+        return None
+    if name[0] in {"{", "["}:
+        return None
+    return name
+
+
+def _normalized_lf_to_source_byte_offsets(source: str) -> list[int]:
+    """Map every LF-normalized UTF-8 boundary to the original source boundary."""
+
+    source_bytes = source.encode("utf-8")
+    normalized_bytes = source.replace("\r\n", "\n").encode("utf-8")
+    mapping = [0]
+    source_offset = 0
+    normalized_offset = 0
+    while normalized_offset < len(normalized_bytes):
+        if (
+            source_bytes[source_offset:source_offset + 2] == b"\r\n"
+            and normalized_bytes[normalized_offset:normalized_offset + 1] == b"\n"
+        ):
+            source_offset += 2
+        else:
+            source_offset += 1
+        normalized_offset += 1
+        mapping.append(source_offset)
+    return mapping
+
+
+def _repair_raw_chunk_byte_span(
+    source: str,
+    start: int,
+    end: int,
+    name: str | None,
+    normalized_offset_map: list[int],
+) -> tuple[int, int]:
+    """Prefer native byte spans and repair only valid LF-relative spans."""
+
+    source_bytes = source.encode("utf-8")
+    native_valid = 0 <= start <= end <= len(source_bytes)
+    native_text = source_bytes[start:end].decode("utf-8", errors="ignore") if native_valid else ""
+    if native_valid and (not name or name in native_text):
+        return start, end
+
+    if 0 <= start <= end < len(normalized_offset_map):
+        mapped_start = normalized_offset_map[start]
+        mapped_end = normalized_offset_map[end]
+        mapped_text = source_bytes[mapped_start:mapped_end].decode("utf-8", errors="ignore")
+        if mapped_start <= mapped_end <= len(source_bytes) and (not name or name in mapped_text):
+            return mapped_start, mapped_end
+    return start, end
+
+
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
     """Return raw chunks plus whether logical identity_path was honored."""
 
@@ -366,7 +436,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             if start_line is None or end_line is None:
                 diagnostics.append("ChunkingError: chunk missing both byte and line spans")
                 continue
-            start, end = legacy._line_span_to_offsets(req.source, int(start_line), int(end_line))
+            start, end = _line_span_to_utf8_byte_offsets(req.source, int(start_line), int(end_line))
         else:
             span = resolve_chunk_byte_span(req.source, raw, int(start), int(end))
             if span.mode == "INVALID":
@@ -412,7 +482,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 upstream_symbol_id=normalized.get("upstream_symbol_id"),
                 node_type=node_type,
                 kind=legacy._structural_kind(node_type),
-                name=normalized.get("name"),
+                name=_structural_symbol_name(normalized.get("name")),
                 parent_route=list(normalized.get("parent_route") or []),
                 parent_context=normalized.get("parent_context"),
                 start_byte=start,
