@@ -3268,3 +3268,46 @@ canonical-file decision; (9) the two remaining CANONICAL_OWNER decisions in the 
 proposal; (10) whatever the concurrent `audit-atlas-indexing-surfaces.mjs`/`audit-graph-structural-
 quality.mjs`/BM25-AST-symbol activity turns out to be, once it's committed by whoever's running it
 and shows up cleanly in `git log` instead of as loose working-tree files.
+
+### Session handoff — 2026-08-23 (Gate T6 run — real negative result, CAGRA not ready)
+
+Continued to Gate T6 per the prior entry's priority list. RAPIDS/cuVS is Linux-only on this
+workstation, so ran under WSL2 (`atlas-rapids-cu13` conda env, cuVS 26.06.00 confirmed available).
+
+Wrote `python/parent_atlas_tensor/prove_gate_t6.py`: Step 1 proves cuVS `brute_force` exact search
+against an independent CPU numpy oracle (100% recall at both 5,000 and 15,000 rows — trustworthy).
+Step 2 measures CAGRA's recall against that same brute-force result (never against itself, per
+Gate T3/T6's "exact before approximate" rule). **Real result: CAGRA recall dropped from 77% at
+5,000 rows to 45% at 15,000 rows — worse with more data, not better — and was slower than
+brute-force at both scales.** VRAM was constrained during the run (~1.2GB free out of 8GB;
+`llama-server.exe` held ~5.8GB), capping the test at 15,000 rows rather than real corpus scale
+(40K-105K rows).
+
+**This is a genuine, correctly-negative gate result**, not a failed proof attempt: per Gate T3/T6's
+own stated precondition ("No CAGRA promotion before this passes"), CAGRA is correctly NOT cleared
+for promotion with default parameters at the scales tested. Brute-force `exact_cosine`/
+`exact_search` (both already proven in Gates T3 and T6-step-1) remain the trustworthy path.
+Recorded a scoped follow-up (tasks.md 2.12) for whoever revisits CAGRA later: tune
+`graph_degree`/`intermediate_graph_degree`/`itopk_size` instead of defaults, and re-test at real
+corpus scale with the full GPU budget free — explicitly noted this finding should not be read as
+"CAGRA doesn't work," only "not proven ready at the scales/params tested here."
+
+Receipt: `docs/reports/tensor-residency-gate-t6-proof-2026-08-23.json` (first write attempt got
+corrupted by stray WSL/cuVS log lines mixing into the stdout redirect — caught and fixed by
+validating with `python -c "import json; json.load(...)"` before trusting the file, same discipline
+as every other receipt this session).
+
+**Tensor-residency bundle status after this pass**: T0 (implicit via this proposal's own audit),
+T1 (migration applied, schema only), T2 (Arrow artifact — PASS), T3 (exact GPU parity — PASS), T4
+(ACE residency wiring — PASS, plus a real bug found and fixed), T6 (CAGRA parity — correctly FAILS
+at tested scale/params, real negative result recorded). T5 (Valkey/BitFrost metadata mirroring)
+and T7-T9 remain unexercised.
+
+**Next-session priority, updated**: (1) Gate T5 (Valkey/BitFrost residency-state metadata
+mirroring) — the next unexercised gate in sequence; (2) re-run Gates T2-T4 against real production
+packet data instead of synthetic fixtures now that the pipeline is proven end-to-end; (3)
+`NAMED_SYMBOL_MISSING_LEFT/RIGHT` + `SEMANTIC_KIND_MISMATCH` AST gap; (4) bounded XGBoost GPU
+proof; (5) `codebase_chunks_768` vs `_768_v2` split; (6) ACE crash instrumentation; (7) Graphify
+FANOUT sequencing; (8) docker-compose canonical-file decision; (9) the two remaining
+CANONICAL_OWNER decisions in the memory-architecture proposal; (10) CAGRA re-test per 2.12, once
+GPU budget/tuning time is available.

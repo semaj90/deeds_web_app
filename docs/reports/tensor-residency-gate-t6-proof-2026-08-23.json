@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.tensor-residency-gate-t6-proof.v1",
+  "runs": {
+    "n5000": {
+      "dataset": {
+        "rows": 5000,
+        "dims": 768,
+        "queries": 25,
+        "k": 20
+      },
+      "step1_cuvs_bruteforce_vs_cpu_oracle": {
+        "recallAtK": 1.0,
+        "elapsedSeconds": 1.3810342870019667,
+        "status": "PASS"
+      },
+      "step2_cagra_vs_bruteforce_oracle": {
+        "recallAtK": 0.7560000000000001,
+        "elapsedSeconds": 2.1750262800014752,
+        "speedupVsBruteForce": 0.6349506209189482
+      }
+    },
+    "n15000": {
+      "dataset": {
+        "rows": 15000,
+        "dims": 768,
+        "queries": 25,
+        "k": 20
+      },
+      "step1_cuvs_bruteforce_vs_cpu_oracle": {
+        "recallAtK": 1.0,
+        "elapsedSeconds": 0.04288233300030697,
+        "status": "PASS"
+      },
+      "step2_cagra_vs_bruteforce_oracle": {
+        "recallAtK": 0.41200000000000003,
+        "elapsedSeconds": 1.4782604499996523,
+        "speedupVsBruteForce": 0.029008645262962325
+      }
+    }
+  },
+  "verdict": {
+    "cuvsBruteForceExactParity": "PASS",
+    "cagraDefaultParamsReadyForPromotion": false,
+    "reasoning": "cuVS brute_force reproduces the CPU exact oracle at 100% recall in both runs -- the exact-search GPU path is trustworthy. CAGRA with default IndexParams/SearchParams does NOT clear a reasonable recall bar at either scale tested (recall dropped from 76% at 5,000 rows to 41% at 15,000 rows, worse not better with more data) and was slower than brute_force at both scales on this 8GB workstation GPU. Per Gate T3/T6's own precondition ('No CAGRA promotion before this passes'), CAGRA is NOT cleared for promotion with default parameters at these scales. This is the gate correctly blocking a premature promotion, not a failed proof attempt -- the negative result is the useful outcome here."
+  },
+  "notProven": [
+    "cuML KMeans artifact lineage (Gate T6 sub-item 3, not attempted this pass)",
+    "cuGraph operations through existing graph-analysis ownership (Gate T6 sub-item 4, not attempted this pass)",
+    "Real production semantic_768 data (synthetic normalized random vectors)",
+    "CAGRA behavior at full corpus scale (40K-105K rows) or with tuned IndexParams/SearchParams (graph_degree, intermediate_graph_degree, itopk_size, etc.) -- this run used library defaults only and was VRAM-constrained (~1.2GB free) to at most 15,000 rows on this workstation"
+  ]
+}

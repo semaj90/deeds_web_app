@@ -256,7 +256,26 @@ before; now has 3 tests, including a permanent regression guard for the exact fa
 proof found and a permanent version of the Gate T3 exact-cosine-vs-CPU-oracle check. 12/12 tests
 pass across this Python package (up from the 9 that existed before this proof pass touched it).
 
-Gate T6 (CAGRA parity) remains genuinely unexercised — the next concrete step for this slice.
+**Gate T6 also run, same-day follow-up — real negative result, gate correctly blocks promotion.**
+RAPIDS/cuVS is Linux-only on this workstation (per this repo's own WSL2/`atlas-rapids-cu13`
+guidance); ran `python -m parent_atlas_tensor.prove_gate_t6` under WSL2 with cuVS 26.06.00.
+**Step 1 (cuVS `brute_force` exact search)**: 100% recall against an independent CPU numpy oracle
+at both 5,000 and 15,000 rows — the GPU exact-search path is trustworthy, matching Gate T3's own
+finding. **Step 2 (CAGRA approximate, measured against that same brute-force result, never against
+itself)**: recall dropped from 77% at 5,000 rows to 45% at 15,000 rows with default
+`IndexParams`/`SearchParams` — *worse*, not better, with more data — and CAGRA was slower than
+brute-force at both scales on this 8GB GPU (VRAM was constrained during this run, ~1.2GB free,
+`llama-server.exe` holding ~5.8GB, capping the test at 15,000 rows rather than the real corpus's
+40K-105K scale). Per Gate T3/T6's own stated precondition ("No CAGRA promotion before this
+passes"), **CAGRA is correctly NOT cleared for promotion** with default parameters at the scales
+tested — this is the gate doing its job, not a failed proof attempt. Full receipt:
+`docs/reports/tensor-residency-gate-t6-proof-2026-08-23.json`.
+
+This is a genuinely useful negative result for the roadmap: if/when CAGRA is revisited, it needs
+either (a) tuned `graph_degree`/`intermediate_graph_degree`/`itopk_size` parameters (library
+defaults were used here, untuned), or (b) testing at real corpus scale with a full 8GB budget
+free, before it can be considered a viable `codebase_chunks_768`/`_768_v2` ANN backend — brute-force
+`exact_cosine` (already proven in Gate T3) remains the trustworthy path in the meantime.
 
 ## What's actually new and worth scoping (the real delta)
 

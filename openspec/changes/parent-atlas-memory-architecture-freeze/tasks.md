@@ -146,6 +146,27 @@ already completed plus the follow-up scoping work, not feature implementation �
   pre-existing tests in this Python package (`test_gpu_resident_executor.py`,
   `test_exact_space_partition.py`) still pass — 12/12 total.
 
+- [x] 2.11 **Done, 2026-08-23 same-day follow-up — Gate T6, real negative result.** Ran
+  `python -m parent_atlas_tensor.prove_gate_t6` under WSL2 (`atlas-rapids-cu13` conda env, cuVS
+  26.06.00 — RAPIDS is Linux-only on this workstation). Step 1 (cuVS `brute_force` exact vs. an
+  independent CPU numpy oracle): 100% recall at both 5,000 and 15,000 rows, confirmed trustworthy.
+  Step 2 (CAGRA vs. that same brute-force result): recall 77% → 45% going from 5K → 15K rows
+  (worse with more data, not better) and slower than brute-force at both scales on this 8GB GPU
+  (VRAM-constrained during the run, ~1.2GB free — `llama-server.exe` held ~5.8GB — capping the
+  test below real corpus scale). **Verdict: CAGRA NOT cleared for promotion with default params at
+  these scales** — correctly matches Gate T3/T6's own "no CAGRA promotion before this passes"
+  precondition. Full receipt: `docs/reports/tensor-residency-gate-t6-proof-2026-08-23.json`. New
+  script kept per this repo's "never delete working scripts" convention:
+  `python/parent_atlas_tensor/prove_gate_t6.py`.
+- [ ] 2.12 **New follow-up, found by 2.11.** If CAGRA is revisited later: (a) tune
+  `graph_degree`/`intermediate_graph_degree`/`itopk_size` instead of library defaults, and
+  (b) re-run at real corpus scale (40K-105K rows) with the full 8GB GPU budget free (stop
+  `llama-server.exe` first, or run on a machine without that contention) before drawing any
+  conclusion about production viability. Brute-force `exact_cosine`/`exact_search` (both already
+  proven in Gates T3/T6) remain the trustworthy ANN path until then — do not let this finding be
+  read as "CAGRA doesn't work," only as "CAGRA isn't proven ready at the scales/params tested
+  here."
+
 ## 3. Governance-only, zero implementation cost
 
 - [x] 3.1 **Done.** Added the wire-format layering rule to `claude.md` as a new canonical section
