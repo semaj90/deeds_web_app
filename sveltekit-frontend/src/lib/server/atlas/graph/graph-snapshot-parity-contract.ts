@@ -156,8 +156,9 @@ export function buildGraphSnapshotParityReceipt(input: {
 			louvainCommunityAgreement: input.louvainCommunityAgreement
 		});
 
+	const { edgeProjectionDiagnostics: _edgeProjectionDiagnostics, ...receiptInput } = input;
 	return GraphSnapshotParityReceiptSchema.parse({
-		...input,
+		...receiptInput,
 		status,
 		generatedAt: input.generatedAt ?? new Date().toISOString()
 	});
