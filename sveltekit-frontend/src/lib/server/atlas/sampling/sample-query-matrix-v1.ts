@@ -6,6 +6,14 @@ import {
   type CandidateOrdinalMapV1,
 } from '../features/canonical-candidate-v1.js';
 
+function sumSquares(values: readonly number[]): number {
+  let sum = 0;
+  for (const value of values) sum += value * value;
+  return sum;
+}
+
+const rowNormSquared = sumSquares;
+
 export const SAMPLE_QUERY_MATRIX_SCHEMA = 'atlas.sample-query-matrix.v1' as const;
 export const SAMPLING_DECISION_SCHEMA = 'atlas.sampling-decision.v1' as const;
 export const SAMPLING_EVALUATION_SCHEMA = 'atlas.sampling-evaluation.v1' as const;
@@ -114,12 +122,15 @@ export function sampleQueryChecksum(value: unknown): string {
   return createHash('sha256').update(canonicalJson(value)).digest('hex');
 }
 
+<<<<<<< origin/main
 function rowNormSquared(values: readonly number[]): number {
   let sum = 0;
   for (const value of values) sum += value * value;
   return sum;
 }
 
+=======
+>>>>>>> 659f5619337b1dc3c1851a5f232f30bdb05dadbc
 function coefficientOfVariation(values: readonly number[]): number {
   if (values.length === 0) return 0;
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
