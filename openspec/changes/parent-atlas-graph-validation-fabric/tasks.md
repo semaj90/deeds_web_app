@@ -26,6 +26,26 @@
 policy, RMM pooling, or ablation studies — those remain open per this proposal's own build order,
 items 12+.
 
+### Regression found + fixed, gate reproduced — 2026-08-23
+
+Attempted to reproduce this closed gate against the live-confirmed WSL2
+`atlas-rapids-cu13` environment. Found a real regression introduced after
+2026-08-12 (the committed `receipt.json` predates the `edgeProjectionDiagnostics`
+field): `buildGraphSnapshotParityReceipt()` in
+`sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-parity-contract.ts`
+spread its full `input` — including `edgeProjectionDiagnostics`, used only
+for status derivation — into a `.strict()` Zod parse whose top-level receipt
+schema doesn't declare that field (only nested under `networkx`/`cugraph`).
+Both oracles had already completed real PageRank+Louvain compute over all
+162,234 nodes before the crash; the bug only discarded the receipt object.
+Fixed by destructuring the field out before the spread (commit `8fa9443a89`).
+Re-run reproduced the closed gate's numbers exactly: `status: PASS`,
+`pagerankTopKOverlap/Correlation: 1`, `pagerankMaxDelta≈4.89e-9`,
+Louvain `ARI/NMI: 1.0`, componentCount/community-count exact match `54078`.
+Did not overwrite the committed `receipt.json` with the new run — that
+decision (promote as canonical vs. treat as a regression-test artifact) is
+still open. See `parent-atlas-workstation-todo.md` for the full account.
+
 ## Still open (not started this session)
 
 - [ ] `graph_pagerank_nx_cugraph` mode (NetworkX-API dispatch to cuGraph backend) — proposal

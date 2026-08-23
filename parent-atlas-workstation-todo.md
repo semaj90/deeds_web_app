@@ -1,5 +1,62 @@
 # Parent Atlas Workstation TODO
 
+## GRAPH_SNAPSHOT_PARITY regression found + fixed; reproduction confirms determinism — 2026-08-23
+
+**Correction to an earlier draft of this entry**: this is NOT a first-time
+proof. `GRAPH_SNAPSHOT_PARITY` was already closed on 2026-08-12 (see
+`openspec/changes/parent-atlas-graph-validation-fabric/tasks.md`, commit
+`647627d7a8`) with a committed `receipt.json` at
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json` showing
+the identical `status: "PASS"`, `pagerankTopKOverlap: 1`,
+`pagerankCorrelation: 1`, `pagerankMaxDelta≈4.89e-9`, and
+`louvainCommunityAgreement: 1` on this same frozen snapshot
+(`382c8dc6-a115-40d9-a3a5-034fa44d2e71`, `nodeCount=162234`,
+`edgeCount=108156`). The 2026-08-11 receipt predates `edgeProjectionDiagnostics`
+being added to the schema/oracles.
+
+Attempted to re-run `sveltekit-frontend/scripts/atlas/validate-graph-snapshot-parity.mts
+--manifest docs/reports/graph-snapshot-parity/manifest.json --run-networkx
+--run-cugraph` against the live-confirmed WSL2 `atlas-rapids-cu13` environment
+(booted WSL2 Ubuntu, confirmed `torch.cuda.is_available()=True`, RTX 3060 Ti
+visible, `cugraph 26.06.00`, `cuvs` importable) to see whether the closed
+gate still reproduces. **It did not run cleanly — found a real regression**:
+`buildGraphSnapshotParityReceipt()` in
+`sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-parity-contract.ts`
+spread its full `input` object — including `edgeProjectionDiagnostics`, a
+field used only for status derivation — into a `.strict()`
+`GraphSnapshotParityReceiptSchema.parse()` call whose top-level schema only
+declares that field nested under `networkx`/`cugraph`, not at the top level.
+Confirmed live: both oracles had already completed real PageRank + Louvain
+compute over all 162,234 nodes before the crash (four NDJSON output files,
+162,234 lines each, written and gitignored under
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/`) — the bug only
+discarded the receipt object, not the compute. Fixed by destructuring
+`edgeProjectionDiagnostics` out of `input` before the spread (commit
+`8fa9443a89`).
+
+Re-run after the fix reproduced the closed gate's numbers exactly (new
+`generatedAt: "2026-08-23T10:52:38.342Z"`, not yet written back over the
+committed Aug-11 `receipt.json`):
+
+- `status: "PASS"`; componentCount exact match `54078` (both backends)
+- `pagerankTopKOverlap: 1`, `pagerankCorrelation: 1`,
+  `pagerankMaxDelta: 4.888482368395049e-9` — identical to the 2026-08-12 receipt
+- Louvain: `ARI=1.000000`, `NMI=1.000000`, community counts exact match
+  (`54078` both sides), modularity agrees to ~14 significant digits
+- `edgeProjectionDiagnostics` (new field, not present in the Aug-11 receipt):
+  zero duplicate/reciprocal/unordered-pair issues on both backends
+
+Net effect: confirms the 2026-08-12 closure is reproducible/deterministic,
+and catches+fixes a schema regression that would have silently broken any
+future re-run of this validator (e.g. CI or a scheduled re-proof) without
+anyone noticing the underlying compute was still fine. Did not overwrite the
+committed `receipt.json` — that is a separate decision (whether to promote
+this reproduction as the new canonical receipt, or leave the Aug-11 one as
+the record-of-first-proof and treat this as a regression-test artifact).
+Governance note preserved from the script's own docstring: no canonical
+PageRank/Louvain values were written back to Postgres/Qdrant/Neo4j by this
+run, and this does not unblock FANOUT-01 or any canonical write on its own.
+
 ## TRACE / ACE / PageRank alignment recheck — 2026-08-23
 
 The local atlas-tools MCP smoke passed `10/10`: initialization, tool listing,
@@ -423,7 +480,7 @@ treated as proof here.
 | Source/revision owner | `graphify_files` absent; no durable writer bound | Migration, one-row readback, then bounded writer proof |
 | Graph snapshot | Snapshot/node/edge readback works; manifest lacks workspace/source/graph/producer revisions | Revision-qualified manifest readback |
 | FANOUT | CandidateOrdinal normalization still blocked | Snapshot identity + Qdrant `semantic_768` lineage agreement |
-| PageRank | Six-node NetworkX/Neo4j fixture proven | Same frozen identity/config receipt for all backends; no writes |
+| PageRank | Six-node NetworkX/Neo4j fixture proven; full-scale NetworkX/cuGraph PageRank+Louvain parity (`GRAPH_SNAPSHOT_PARITY`, 162,234-node frozen snapshot) closed 2026-08-12, reproduced 2026-08-23 after fixing a schema regression (see above) | Neo4j GDS stream-mode leg of the six-node fixture still open; no canonical writes |
 | Temporal DRY | Fixture contracts pass; durable PostgreSQL round trip open | Manual migrations plus first-dispatch/reuse readback |
 | Qdrant dense | Historical v2 identity/revision population incomplete | Active writer census and bounded identity readback |
 | Sparse | Runtime owner and relevance labels absent | Ground-truth evaluation and explicit sparse owner |
