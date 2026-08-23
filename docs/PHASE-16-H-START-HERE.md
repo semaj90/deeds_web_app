@@ -31,7 +31,7 @@ docker ps | grep -E "postgres|qdrant|redis|neo4j"
 # Expected output: 4 containers running
 # - legal-ai-postgres (port 5434)
 # - legal-ai-qdrant (port 6333)
-# - legal-ai-redis-* (port 6379)
+# - legal-ai-valkey-* (port 6379)
 # - legal-ai-neo4j* (port 7687/7474)
 ```
 

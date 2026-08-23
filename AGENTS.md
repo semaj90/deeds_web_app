@@ -28,7 +28,7 @@ Only `Read` a file if `rg` confirms it contains what you need. Never load an ent
 
 **Key Rules**:
 - **Archival, Not Deletion**: Files are moved to `deeds_labs/archive/YYYY-MM-DD/` with SHA-256 + reason + recovery instructions
-- **Embedding Contracts**: 768-dim CANONICAL_NATIVE, 384-dim CANONICAL_RETRIEVAL_CONTRACT, 64-dim ROUTING_FEATURE
+- **Embedding Contracts**: 768-dim CANONICAL_NATIVE and CANONICAL_RETRIEVAL_CONTRACT, 384-dim LEGACY_COMPATIBILITY only, 64-dim ROUTING_FEATURE
 - **Retrieval Lanes**: 7 independent lanes (lexical, dense, sparse, topology, documentation, centroid, temporal) with RRF fusion
 - **Pipeline Stages**: 0-14 sequential, no skipping, deterministic outputs (sorted NDJSON)
 

@@ -79,7 +79,7 @@ GPU reranking active: 100% of scenarios
 
 ## Pre-Execution Checklist: COMPLETED ✅
 
-- [x] **Valkey running** (`docker exec legal-ai-valkey redis-cli -p 6379 --pass redis ping` → PONG) ✅
+- [x] **Valkey running** (`docker exec legal-ai-valkey valkey-cli -p 6379 --pass redis ping` → PONG) ✅
 - [x] **Postgres telemetry tables created** (acp_decisions, retrieval_traces, gpu_rerank_telemetry, synthesis_traces) ✅
 - [x] **CUDA integration test passes** (6/6) ✅
 - [x] **E2E latency test passes** (5/5) ✅
@@ -159,7 +159,7 @@ All 4 tables created and ready for Phase C execution:
 ### Immediate (Next 15 min)
 ```bash
 # 1. Verify all services still running
-docker exec legal-ai-valkey redis-cli -p 6379 --pass redis ping
+docker exec legal-ai-valkey valkey-cli -p 6379 --pass redis ping
 curl -s http://127.0.0.1:6333/health | jq .
 psql -h 127.0.0.1 -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM acp_decisions"
 

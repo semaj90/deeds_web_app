@@ -163,7 +163,7 @@ docker exec legal-ai-neo4j cypher-shell -u neo4j -p password \
   "MATCH (n:Packet) WHERE n.pagerank IS NOT NULL RETURN COUNT(n);"
 
 # Verify SOM grid coverage
-docker exec legal-ai-redis redis-cli KEYS 'som:cell:*' | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS 'som:cell:*' | wc -l
 # Expected: 400 keys (20×20 grid)
 
 # Verify Autoencoder latents

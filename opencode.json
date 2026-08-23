@@ -97,6 +97,12 @@
       "headers": {
         "Accept": "application/json, text/event-stream"
       }
+    },
+    "atlas-tools": {
+      "type": "local",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
+      "enabled": true,
+      "timeout": 30000
     }
   },
   "agent": {

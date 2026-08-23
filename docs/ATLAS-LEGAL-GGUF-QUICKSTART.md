@@ -38,7 +38,7 @@ npm run atlas:warm
 
 ### 4. Watch cache hit rate
 ```bash
-docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*" | wc -l
 # Should grow as summarization completes
 ```
 
@@ -183,10 +183,10 @@ curl http://127.0.0.1:8090/v1/models | jq '.data[0].metadata'
 curl http://127.0.0.1:3040/health
 
 # Check Redis is accessible
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 
 # Check cache keys exist
-docker exec legal-ai-redis redis-cli KEYS "bifrost:kv:prefix:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:kv:prefix:*" | wc -l
 
 # Check TurboQuant intercept is enabled
 # Should be true by default, check: TURBOQUANT_INTERCEPT env var
@@ -198,7 +198,7 @@ docker exec legal-ai-redis redis-cli KEYS "bifrost:kv:prefix:*" | wc -l
 # Second startup should be 60-80% hits
 
 # Check semantic cache is being populated
-docker exec legal-ai-redis redis-cli KEYS "bifrost:kag:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:kag:*" | wc -l
 
 # Verify Qdrant is available
 curl http://127.0.0.1:6333/collections
@@ -233,7 +233,7 @@ tail -f logs/turboquant/launch-*.err
 docker logs legal-ai-bifrost --tail 50 --follow
 
 # Check cache keys
-docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*" | wc -l
 
 # Check cache stats
 curl http://127.0.0.1:3040/health
@@ -280,7 +280,7 @@ Atlas Engram Cache
 - [ ] `npm run turbo:start:detached` completes without error
 - [ ] `.\scripts\atlas\test-legal-gguf.ps1` shows all green checks
 - [ ] Legal prompt returns within 5 seconds
-- [ ] Bifrost cache keys exist: `docker exec legal-ai-redis redis-cli KEYS "bifrost:*"`
+- [ ] Bifrost cache keys exist: `docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*"`
 - [ ] `npm run atlas:warm` completes and summarizes files
 - [ ] Second `npm run atlas:warm` completes in < 5 seconds (cache hits)
 

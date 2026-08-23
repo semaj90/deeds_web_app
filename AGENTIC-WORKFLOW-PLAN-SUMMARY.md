@@ -1,5 +1,7 @@
 # Agentic Workflow Testing Plan — OpenSpec Change Complete ✅
 
+> Status note (2026-08-23): This plan records its original implementation snapshot. The :8788 and 42-tool claims are not current global counts; see docs/reports/mcp-atlas-markdown-audit-2026-08-23.md for current runtime evidence.
+
 **Change Name:** `wire-agentic-workflows-e2e-test`  
 **Status:** ✅ **ALL ARTIFACTS CREATED** (proposal, design, specs, tasks)  
 **Location:** `sveltekit-frontend/openspec/changes/wire-agentic-workflows-e2e-test/`  

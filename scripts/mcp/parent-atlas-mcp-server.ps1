@@ -338,7 +338,7 @@ LIMIT $limit;
             # Check Redis
             if ($stores -contains 'redis') {
                 $redisKey = "bifrost:packet:$key"
-                $exists = docker exec legal-ai-redis redis-cli EXISTS $redisKey 2>$null
+                $exists = docker exec legal-ai-valkey valkey-cli EXISTS $redisKey 2>$null
                 if ($exists -eq 0) { $missing += 'redis' }
             }
 

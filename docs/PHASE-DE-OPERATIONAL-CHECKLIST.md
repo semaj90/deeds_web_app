@@ -34,7 +34,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
   "SELECT COUNT(*) as packets, COUNT(DISTINCT feature_id) as features FROM atlas_packets"
 
 # Redis Karpathy cache
-docker exec legal-ai-redis redis-cli HLEN gpu:karpathy:scores
+docker exec legal-ai-valkey valkey-cli HLEN gpu:karpathy:scores
 
 # Neo4j USED_CONCEPT edges  
 docker exec legal-ai-neo4j cypher-shell "MATCH ()-[r:USED_CONCEPT]->() RETURN COUNT(r)"
@@ -61,7 +61,7 @@ grep -n "enrichRetrievalChunksPhase5" \
 
 1. **Start services** (if not already running):
    ```bash
-   docker-compose up -d legal-ai-postgres legal-ai-redis legal-ai-neo4j
+   docker-compose up -d legal-ai-postgres legal-ai-valkey legal-ai-neo4j
    ```
 
 2. **Run Phase D validation**:
@@ -98,7 +98,7 @@ npm run atlas:validate:unified
 curl -s http://localhost:5173/api/atlas/phase-e/health | jq .phase_e.status
 
 # View Karpathy scores sample
-docker exec legal-ai-redis redis-cli HGETALL gpu:karpathy:scores | head -20
+docker exec legal-ai-valkey valkey-cli HGETALL gpu:karpathy:scores | head -20
 ```
 
 ### Troubleshooting
@@ -120,7 +120,7 @@ grep "enrichRetrievalChunksPhase5" \
 npm run atlas:phase-e:karpathy
 
 # Check Redis connection
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 ```
 
 **Symptom**: Community confidence boost not working

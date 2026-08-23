@@ -93,7 +93,7 @@ async function attemptRecovery(failures) {
   if (failures.redis && AUTO_RESTART) {
     log('Attempting to restart Redis/Valkey...');
     try {
-      execSync('docker restart legal-ai-redis', { stdio: 'ignore', timeout: 15_000 });
+      execSync('docker restart legal-ai-valkey', { stdio: 'ignore', timeout: 15_000 });
       log('✓ Redis/Valkey restarted');
       recovery.redis = true;
     } catch (err) {
@@ -160,7 +160,7 @@ function recordDegradedState(failures, recovery) {
       },
     },
     recommendations: [
-      !recovery.redis && 'Restart Docker: docker restart legal-ai-redis',
+      !recovery.redis && 'Restart Docker: docker restart legal-ai-valkey',
       !recovery.qdrant && 'Restart Docker: docker restart legal-ai-qdrant',
       !recovery.postgres && 'Restart Docker: docker restart legal-ai-postgres',
       'Or run: docker compose -f docker-compose.yml up -d',

@@ -44,7 +44,12 @@ async function gitHead(): Promise<string | null> {
   }
 }
 
-async function inspectRow(row: { source_ref: string; source_revision: string | null; content_hash: string | null }, head: string | null) {
+async function inspectRow(row: {
+  source_ref: string;
+  source_revision: string | null;
+  code_source_revision: string | null;
+  content_hash: string | null;
+}, head: string | null) {
   const sourceRef = row.source_ref.replace(/\\/g, '/').trim();
   const absolute = path.resolve(REPO_ROOT, sourceRef);
   const insideRepo = absolute === REPO_ROOT || absolute.startsWith(`${REPO_ROOT}${path.sep}`);
@@ -57,15 +62,20 @@ async function inspectRow(row: { source_ref: string; source_revision: string | n
     } catch { /* classified below */ }
   }
   const storedHash = normalizeHash(row.content_hash);
+  const codeSourceHash = normalizeHash(row.code_source_revision);
   const exactByteDigestMatches = Boolean(actualHash && storedHash && actualHash === storedHash);
+  const canonicalSourceRevisionMatches = Boolean(actualHash && codeSourceHash && actualHash === codeSourceHash);
   return {
     sourceRef,
     sourceRevision: row.source_revision,
     storedContentHash: storedHash,
+    codeSourceRevision: row.code_source_revision,
+    canonicalSourceRevisionDigest: codeSourceHash,
     actualContentHash: actualHash,
     sourceInsideRepository: insideRepo,
     regularFile,
     exactByteDigestMatches,
+    canonicalSourceRevisionMatches,
     legacyGitProvenanceValid: validLegacyGitRevision(row.source_revision),
     currentGitHead: head,
     currentGitHeadMatchesSourceRevision: Boolean(head && row.source_revision === head),
@@ -89,13 +99,14 @@ try {
     : { rows: [] as { column_name: string }[] };
   const columns = new Set(columnResult.rows.map((row) => row.column_name));
   const requiredColumns = [
-    'workspace_revision',
+    'workspace_id',
     'source_ref',
     'source_revision',
+    'code_source_revision',
     'content_hash',
     'byte_length',
-    'source_revision_authority',
-    'producer_revision',
+    'first_seen_run_id',
+    'last_seen_run_id',
   ];
   const requiredColumnsPresent = requiredColumns.every((column) => columns.has(column));
   const head = await gitHead();
@@ -113,6 +124,7 @@ try {
     sample.sourceInsideRepository &&
     sample.regularFile &&
     sample.exactByteDigestMatches &&
+    sample.canonicalSourceRevisionMatches &&
     sample.legacyGitProvenanceValid,
   );
   const status = !tableExists
@@ -127,8 +139,8 @@ try {
   const report = {
     schemaVersion: 'atlas.code-revision-owner-canary.v1',
     status,
-    sourceRevisionStorageSemantics: compatibilityPass ? 'LEGACY_GIT_SHA_WITH_CONTENT_HASH_V1' : 'UNKNOWN',
-    sourceRevisionAuthorityField: compatibilityPass ? 'CONTENT_HASH' : 'NONE',
+    sourceRevisionStorageSemantics: compatibilityPass ? 'LEGACY_GIT_SHA_WITH_CODE_SOURCE_REVISION_V2' : 'UNKNOWN',
+    sourceRevisionAuthorityField: compatibilityPass ? 'CODE_SOURCE_REVISION' : 'NONE',
     readOnly: true,
     canonicalWriteAttempted: false,
     durableOwnerBound: false,

@@ -241,7 +241,7 @@ Watch:
      -c "SELECT COUNT(*) as summaries_written FROM codebase_chunk_index WHERE summary IS NOT NULL"
    
    # Redis: cache warmed
-   docker exec legal-ai-redis redis-cli KEYS 'bitfrost:packet:*' | wc -l
+   docker exec legal-ai-valkey valkey-cli KEYS 'bitfrost:packet:*' | wc -l
    
    # Qdrant: payloads updated
    curl http://127.0.0.1:6333/collections/codebase_chunks_768/points | jq '.result.points | length'

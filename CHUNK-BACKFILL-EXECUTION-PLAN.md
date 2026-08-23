@@ -271,7 +271,7 @@ Error: Qdrant: 404 Not Found
 **Solution**:
 1. Test Redis: `redis-cli -h 127.0.0.1 -p 6379 -a redis PING`
 2. Check password in `.env`: `REDIS_PASSWORD=redis`
-3. If Valkey down: `docker-compose up -d legal-ai-redis` (or valkey container name)
+3. If Valkey down: `docker compose up -d valkey` (container: `legal-ai-valkey`)
 4. Scripts continue safely without Redis (just no cache)
 
 ---

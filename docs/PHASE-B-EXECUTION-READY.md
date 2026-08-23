@@ -68,7 +68,7 @@ Postgres atlas_packets (identity)
 
 ```bash
 # 1. Redis
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 # Expected: PONG
 
 # 2. Postgres
@@ -125,8 +125,8 @@ node scripts/phase-b/multi-pass-enrichment.mjs --pass=1 --limit=57000
 
 ### Clear cache if needed:
 ```bash
-docker exec legal-ai-redis redis-cli DEL "emb:q:v1:*"
-docker exec legal-ai-redis redis-cli DEL "qdrant:topk:v1:*"
+docker exec legal-ai-valkey valkey-cli DEL "emb:q:v1:*"
+docker exec legal-ai-valkey valkey-cli DEL "qdrant:topk:v1:*"
 ```
 
 ---

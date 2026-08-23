@@ -93,7 +93,7 @@ fi
 # Gate 6: Redis BitFrost cache
 echo ""
 echo "📍 Gate 6: Redis BitFrost Cache..."
-result=$(docker exec legal-ai-redis redis-cli --raw DBSIZE)
+result=$(docker exec legal-ai-valkey valkey-cli --raw DBSIZE)
 
 if [ "$result" -gt 0 ]; then
   gate_pass "Redis BitFrost cache ($result keys)"

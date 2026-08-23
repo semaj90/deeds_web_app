@@ -48,7 +48,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       qdrant:
         condition: service_healthy
@@ -139,7 +139,7 @@ services:
       - "8100:8100"
       - "50053:50053"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8100/ready"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8100/health"]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -147,7 +147,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       qdrant:
         condition: service_healthy
@@ -156,17 +156,17 @@ services:
     restart: unless-stopped
 
   # ========================================================================
-  # Redis Cache
+  # Valkey Cache (Redis protocol compatible)
   # ========================================================================
-  redis:
-    image: redis:7-alpine
-    container_name: legal-ai-redis
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: legal-ai-valkey
     volumes:
       - redis_data:/data
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -289,4 +289,5 @@ volumes:
 # ============================================================================
 networks:
   legal-ai-network:
-    driver: bridge
+    external: true
+    name: deeds-web-app_legal-ai-network

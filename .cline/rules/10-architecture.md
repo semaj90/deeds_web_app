@@ -4,8 +4,8 @@
 | Service | Port | Role |
 |---------|------|------|
 | llama-server (Gemma4) | :8090 | Generation only — `stream: true` required |
-| Ollama (embeddinggemma) | :11434 | Embeddings only (384-dim) |
-| Qdrant | :6333 | ANN mirror — collection `codebase_chunks_384_hybrid` |
+| Ollama (embeddinggemma) | :11434 | Embeddings only (768-dim) |
+| Qdrant | :6333 | ANN mirror — collection `codebase_chunks_768` |
 | TurboVec | :8791 | CUDA prefilter (64-dim routing) |
 | Postgres | :5432 (Docker) / :5434 (host) | Canonical truth |
 | Valkey/Redis | :6379 | BitFrost cache — password from REDIS_PASSWORD env |
@@ -17,13 +17,13 @@
 ```
 Redis BitFrost exact (L1, <5ms)
 → Postgres packet_key/source_ref (canonical)
-→ Qdrant ANN 384-dim (mirror)
+→ Qdrant ANN 768-dim (mirror)
 → Neo4j k-hop bounded (topology only)
 → Gemma4 synthesis (last)
 ```
 
 ## Dimension policy
-- Embeddings: 384-dim (`embeddinggemma:latest` via Ollama)
+- Embeddings: 768-dim (`embeddinggemma:latest` via Ollama)
 - AE latent: 64-dim (routing cache only, NOT for ANN search)
 - Never mix dimensions in the same Qdrant collection
 

@@ -158,7 +158,7 @@ After Phase C, daily `graphify:daily:from-telemetry` reads telemetry and adjusts
 
 | Service | Port | Status | Action |
 |---------|------|--------|--------|
-| Redis/Valkey | 6379 | ❌ DOWN | `docker-compose up legal-ai-redis` |
+| Redis/Valkey | 6379 | ❌ DOWN | `docker-compose up legal-ai-valkey` |
 | Telemetry tables | 5432 | ⏳ PENDING | `npm run db:migrate` |
 
 ### Optional (Can Skip)
@@ -225,7 +225,7 @@ After Phase C, daily `graphify:daily:from-telemetry` reads telemetry and adjusts
 ### Step 2: Start Redis (10 min)
 
 ```bash
-docker-compose up legal-ai-redis
+docker-compose up legal-ai-valkey
 ```
 
 - [ ] Redis `:6379` running
@@ -331,7 +331,7 @@ npm run bench:cuda-graph-cache:quick
 
 ```bash
 cd sveltekit-frontend
-docker-compose up legal-ai-redis
+docker-compose up legal-ai-valkey
 npm run db:migrate
 ```
 

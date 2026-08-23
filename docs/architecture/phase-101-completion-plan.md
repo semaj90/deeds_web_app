@@ -110,9 +110,9 @@ Command: `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < 
 
 3. Smoke test:
    ```bash
-   docker compose up -d legal-ai-redis
-   docker exec legal-ai-redis valkey-cli ping   # → PONG
-   docker exec legal-ai-redis valkey-cli module list  # → valkey-json + valkey-search
+   docker compose up -d legal-ai-valkey
+   docker exec legal-ai-valkey valkey-cli ping   # → PONG
+   docker exec legal-ai-valkey valkey-cli module list  # → valkey-json + valkey-search
    ```
 
 4. No Node.js code changes — ioredis sees it as Redis
@@ -179,6 +179,6 @@ Estimated total: **8-10h** at focused pace. Valkey (Block 5) is the fastest win 
 
 - `node --check` + `node scripts/packets/score-superseded-originals.mjs` — stays green throughout
 - `node scripts/promotion/report-promotion-status.mjs` — promotion status stays green
-- `docker exec legal-ai-redis valkey-cli ping` — after Block 5
+- `docker exec legal-ai-valkey valkey-cli ping` — after Block 5
 - `(Invoke-RestMethod http://127.0.0.1:8090/slots)[0].n_ctx` — stays 65536 throughout
 - `svelte-check` — 0 errors, 0 warnings throughout (no frontend changes in this plan)

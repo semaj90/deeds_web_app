@@ -248,7 +248,7 @@ curl http://127.0.0.1:6333/collections/codebase_chunks_768/points/...
 curl http://127.0.0.1:7474/db/neo4j/exec -X POST "MATCH (p:Packet {id: ...}) RETURN p"
 
 # Check Valkey
-docker exec legal-ai-valkey redis-cli GET "bifrost:packet:auth:001"
+docker exec legal-ai-valkey valkey-cli GET "bifrost:packet:auth:001"
 
 # Check Postgres
 curl http://localhost:5173/api/packets/auth:001

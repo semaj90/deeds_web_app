@@ -299,10 +299,10 @@ docker logs neo4j-container | tail -20
 **Debug**:
 ```bash
 # Check Valkey connection
-docker exec legal-ai-valkey redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 
 # Check cache key
-docker exec legal-ai-valkey redis-cli GET "bifrost:packet:auth:001"
+docker exec legal-ai-valkey valkey-cli GET "bifrost:packet:auth:001"
 
 # Run smoke test with verbose
 npm run audit:smoke --verbose

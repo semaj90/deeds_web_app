@@ -228,8 +228,8 @@ npm run verify:p4:end-to-end
 
 ```bash
 # Verify traces in Redis
-docker exec legal-ai-redis redis-cli KEYS 'retrieval:trace:*'
-docker exec legal-ai-redis redis-cli GET 'retrieval:trace:trace-XXXXXXXXX' | jq
+docker exec legal-ai-valkey valkey-cli KEYS 'retrieval:trace:*'
+docker exec legal-ai-valkey valkey-cli GET 'retrieval:trace:trace-XXXXXXXXX' | jq
 ```
 
 ---

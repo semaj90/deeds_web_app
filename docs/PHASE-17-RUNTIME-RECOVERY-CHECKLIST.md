@@ -76,13 +76,13 @@ Redis is only accessible via Docker since redis-cli is not in PATH. This is norm
 
 ```bash
 # Check Redis health
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 
 # Check Redis memory
-docker exec legal-ai-redis redis-cli INFO memory | grep used_memory_human
+docker exec legal-ai-valkey valkey-cli INFO memory | grep used_memory_human
 
 # Flush test data (if needed)
-docker exec legal-ai-redis redis-cli FLUSHDB
+docker exec legal-ai-valkey valkey-cli FLUSHDB
 ```
 
 **Expected**: PONG response and memory usage < 2 GB

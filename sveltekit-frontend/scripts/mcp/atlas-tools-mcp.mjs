@@ -43,6 +43,20 @@ process.on('exit', () => {
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'atlas-tools', version: '0.2.0' };
+const MOCK_MODE = /^(1|true|yes)$/i.test(process.env.ATLAS_TOOLS_MOCK ?? '');
+
+function mockGraphResult(tool, args) {
+  if (tool === 'find_dependencies') {
+    const target = String(args.target ?? '').replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
+    return { target, dependencies: [{ dep: 'mock/fixture-dependency.ts', type: 'IMPORTS' }], mock: true };
+  }
+  if (tool === 'trace_database') return { query: String(args.query ?? ''), traces: [{ file: 'mock/fixture.ts', table: String(args.query ?? 'fixture_table'), operation: 'SELECT' }], mock: true };
+  if (tool === 'trace_tool_chain') return { tool: String(args.tool ?? ''), traces: [{ file: 'mock/fixture.ts', tool: String(args.tool ?? 'fixture_tool'), type: 'CALLS' }], mock: true };
+  if (tool === 'find_source_refs') return { query: String(args.query ?? ''), sourceRefs: ['mock/fixture.ts'], mock: true };
+  if (tool === 'find_feature') return { feature: String(args.feature ?? ''), features: [{ name: String(args.feature ?? 'fixture-feature'), description: 'deterministic mock feature' }], mock: true };
+  if (tool === 'find_route') return { route: String(args.route ?? ''), routes: [{ path: String(args.route ?? '/mock'), type: 'mock' }], mock: true };
+  return null;
+}
 
 // ── Tool definitions ───────────────────────────────────────────────────────────
 
@@ -453,6 +467,9 @@ function buildRecommendation({ intent, domain, errorSummary, evidenceLines, patc
 
 async function recordOutcome(args) {
   const { intent, tool, sourceRefs, recommendationAccepted, reward, graphVersion = '2026-05-29', errorMsg = null } = args;
+  if (MOCK_MODE) {
+    return { ok: true, id: 'mock-outcome', syncedToNeo4j: false, mock: true, sourceRefs: sourceRefs ?? [] };
+  }
 
   const outcomeRecord = {
     id: crypto.randomUUID(),
@@ -568,6 +585,7 @@ async function recordOutcome(args) {
 }
 
 async function findDependencies({ target }) {
+  if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
   const normalizedTarget = target.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
   const driver = getNeo4jDriver();
   const session = driver.session();
@@ -585,6 +603,7 @@ async function findDependencies({ target }) {
 }
 
 async function traceDatabase({ query }) {
+  if (MOCK_MODE) return mockGraphResult('trace_database', { query });
   const driver = getNeo4jDriver();
   const session = driver.session();
   try {
@@ -602,6 +621,7 @@ async function traceDatabase({ query }) {
 }
 
 async function traceToolChain({ tool }) {
+  if (MOCK_MODE) return mockGraphResult('trace_tool_chain', { tool });
   const driver = getNeo4jDriver();
   const session = driver.session();
   try {
@@ -619,6 +639,7 @@ async function traceToolChain({ tool }) {
 }
 
 async function findSourceRefs({ query }) {
+  if (MOCK_MODE) return mockGraphResult('find_source_refs', { query });
   const driver = getNeo4jDriver();
   const session = driver.session();
   try {
@@ -635,6 +656,7 @@ async function findSourceRefs({ query }) {
 }
 
 async function findFeature({ feature }) {
+  if (MOCK_MODE) return mockGraphResult('find_feature', { feature });
   const driver = getNeo4jDriver();
   const session = driver.session();
   try {
@@ -651,6 +673,7 @@ async function findFeature({ feature }) {
 }
 
 async function findRoute({ route }) {
+  if (MOCK_MODE) return mockGraphResult('find_route', { route });
   const driver = getNeo4jDriver();
   const session = driver.session();
   try {

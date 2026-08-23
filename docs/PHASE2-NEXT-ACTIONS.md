@@ -108,7 +108,7 @@ if (keys.length > 0) {
 
 **Verification**:
 ```bash
-docker exec legal-ai-redis redis-cli KEYS "bitfrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bitfrost:*" | wc -l
 # Expect: count decreases after invalidation
 ```
 

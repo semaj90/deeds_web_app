@@ -255,7 +255,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db \
   -c "SELECT COUNT(*) FROM codebase_chunk_index WHERE summary IS NOT NULL AND summary_quality_score > 0;"
 
 # Check Redis (Karpathy scores)
-docker exec legal-ai-redis redis-cli HGETALL gpu:karpathy:summary | head -20
+docker exec legal-ai-valkey valkey-cli HGETALL gpu:karpathy:summary | head -20
 
 # Monitor workers (while running)
 watch 'docker exec legal-ai-rabbitmq rabbitmqctl list_queues name messages consumers'

@@ -105,7 +105,7 @@ If you want to publish a bifrost/Redis invalidation message without performing Q
 node scripts/atlas/publish-bifrost-invalidation.mjs --collection codebase_chunks_768 --dry-run
 
 # publish to Redis (requires REDIS_URL env var, or defaults to redis://localhost:6379)
-REDIS_URL=redis://redis:6379 node scripts/atlas/publish-bifrost-invalidation.mjs --collection codebase_chunks_768 --publish
+REDIS_URL=redis://valkey:6379 node scripts/atlas/publish-bifrost-invalidation.mjs --collection codebase_chunks_768 --publish
 ```
 
 The publisher prefers `ioredis` (already in repo deps) and falls back to the node `redis` client if available.

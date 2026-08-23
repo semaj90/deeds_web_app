@@ -285,8 +285,8 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 
 ```bash
 # Redis
-docker exec legal-ai-redis redis-cli DBSIZE
-docker exec legal-ai-redis redis-cli KEYS "bifrost:packet:*" | wc -l
+docker exec legal-ai-valkey valkey-cli DBSIZE
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:packet:*" | wc -l
 
 # Qdrant
 curl -s http://127.0.0.1:6333/collections/chrom97_context | jq '.result.points_count'
@@ -321,7 +321,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 "
 
 # Clear Redis
-docker exec legal-ai-redis redis-cli FLUSHDB
+docker exec legal-ai-valkey valkey-cli FLUSHDB
 
 # Re-run worker
 npm run worker:embedding:batch:apply

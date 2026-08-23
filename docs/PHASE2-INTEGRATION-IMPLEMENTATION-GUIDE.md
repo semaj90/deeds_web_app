@@ -15,7 +15,7 @@
 - Connection: Via `$lib/server/db/client.ts` (Drizzle ORM + node-postgres)
 
 ### 2. Redis/Valkey Cache
-- Endpoint: `127.0.0.1:6379` (docker compose: `legal-ai-redis`)
+- Endpoint: `127.0.0.1:6379` (docker compose: `legal-ai-valkey`)
 - Pattern: `bitfrost:packet:{packet_key}`, `bitfrost:trace:*`, `bitfrost:source:*`, `bitfrost:feature:*`
 - Package: `ioredis` (already installed)
 
@@ -434,7 +434,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
   "SELECT packet_key, ganValidated, ganValidationError FROM atlas_packets LIMIT 5"
 
 # Check Redis cache keys were deleted
-docker exec legal-ai-redis redis-cli KEYS "bitfrost:*" | head -10
+docker exec legal-ai-valkey valkey-cli KEYS "bitfrost:*" | head -10
 ```
 
 ---

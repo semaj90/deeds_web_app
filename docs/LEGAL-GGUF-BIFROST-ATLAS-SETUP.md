@@ -449,10 +449,10 @@ curl http://127.0.0.1:8090/v1/models | jq '.data[0] | {id, context_length: .meta
 ### Monitor Cache Hit Rate
 ```bash
 # Check Redis cache keys
-docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*" | wc -l
 
 # Sample L1 hit
-docker exec legal-ai-redis redis-cli GET "bifrost:kv:prefix:<hash>"
+docker exec legal-ai-valkey valkey-cli GET "bifrost:kv:prefix:<hash>"
 
 # Check cache stats
 curl http://127.0.0.1:3040/health  # Bifrost health

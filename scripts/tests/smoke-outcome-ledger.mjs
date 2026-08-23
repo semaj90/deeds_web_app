@@ -27,7 +27,7 @@ function ko(label, detail) { console.log('  ❌', label, detail ? `— ${detail}
 
 async function runMcp(messages) {
   return new Promise((resolve, reject) => {
-    const child = spawn('node', [SERVER], { stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn('node', [SERVER], { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, ATLAS_TOOLS_MOCK: '1' } });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', d => stdout += d.toString());
@@ -101,10 +101,26 @@ async function main() {
       method: 'tools/call',
       params: {
         name: 'trace_tool_chain',
-        arguments: {
-          tool: 'smoke_test_tool'
-        }
+        arguments: { tool: 'smoke_test_tool' }
       }
+    },
+    {
+      jsonrpc: '2.0',
+      id: 7,
+      method: 'tools/call',
+      params: { name: 'find_source_refs', arguments: { query: 'cache' } }
+    },
+    {
+      jsonrpc: '2.0',
+      id: 8,
+      method: 'tools/call',
+      params: { name: 'find_feature', arguments: { feature: 'retrieval' } }
+    },
+    {
+      jsonrpc: '2.0',
+      id: 9,
+      method: 'tools/call',
+      params: { name: 'find_route', arguments: { route: '/api/atlas' } }
     }
   ]);
 
@@ -119,35 +135,24 @@ async function main() {
   if (names.includes('find_dependencies')) ok('tools/list includes find_dependencies');
   else ko('tools/list missing find_dependencies', names.join(', '));
 
-  // 2. record_outcome output
+  // 2. record_outcome output (mock mode must not touch ledger or Neo4j)
   const ro = byId[3];
   if (ro?.result && !ro.result.isError) {
     const r = JSON.parse(ro.result.content?.[0]?.text ?? '{}');
     if (r.ok && r.id) {
       ok(`record_outcome completed successfully, id: ${r.id}`);
-      if (r.syncedToNeo4j) {
-        ok('Outcome synced to Neo4j database successfully.');
-      } else {
-        ko('Outcome failed to sync to Neo4j (warning or offline db).');
-      }
+      if (r.mock === true && r.syncedToNeo4j === false) ok('record_outcome mock mode avoided Neo4j');
+      else ko('record_outcome did not report deterministic mock mode', JSON.stringify(r));
     } else {
       ko('record_outcome returned missing properties', JSON.stringify(r));
     }
   } else {
     ko('record_outcome tool execution failed', JSON.stringify(ro));
   }
-
-  // 3. Verify local NDJSON ledger writes
-  if (fs.existsSync(LEDGER)) {
-    const finalSize = fs.statSync(LEDGER).size;
-    if (finalSize > initialSize) {
-      ok(`outcome-ledger.ndjson updated successfully (new size: ${finalSize} bytes)`);
-    } else {
-      ko(`outcome-ledger.ndjson size did not increase (old: ${initialSize}, new: ${finalSize})`);
-    }
-  } else {
-    ko('outcome-ledger.ndjson file does not exist');
-  }
+  // 3. Verify mock mode did not write the local ledger
+  const finalSize = fs.existsSync(LEDGER) ? fs.statSync(LEDGER).size : 0;
+  if (finalSize === initialSize) ok('record_outcome mock mode did not write outcome-ledger.ndjson');
+  else ko(`record_outcome mock mode changed ledger size (old: ${initialSize}, new: ${finalSize})`);
 
   // 4. trace dependencies result
   const fd = byId[4];
@@ -175,6 +180,17 @@ async function main() {
     ko('trace_database tool call failed', JSON.stringify(td));
   }
 
+  // 6. remaining graph lookup tools
+  for (const [id, tool, field] of [[7, 'find_source_refs', 'sourceRefs'], [8, 'find_feature', 'features'], [9, 'find_route', 'routes']]) {
+    const response = byId[id];
+    if (response?.result && !response.result.isError) {
+      const result = JSON.parse(response.result.content?.[0]?.text ?? '{}');
+      if (Array.isArray(result[field]) && result.mock === true) ok(`${tool} returned deterministic mock result`);
+      else ko(`${tool} returned invalid mock result`, JSON.stringify(result));
+    } else {
+      ko(`${tool} tool call failed`, JSON.stringify(response));
+    }
+  }
   if (fail > 0) {
     console.log('\n--- Child Process STDERR ---');
     console.log(stderr);

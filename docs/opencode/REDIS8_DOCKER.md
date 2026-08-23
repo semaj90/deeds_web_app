@@ -4,9 +4,9 @@ This guide shows how to run the isolated Redis 8 eval lane, verify connectivity,
 
 Keep the split:
 
-- Redis 7 `legal-ai-redis` = current production hot cache
+- Valkey 8 `legal-ai-valkey` = current production hot cache
 - Redis 8 eval = experimental agent-memory / vector-set lane
-- do not replace the current Redis 7 stack yet
+- do not replace the current Valkey stack with this evaluation lane
 
 1) Run Redis 8 with Docker (quick)
 

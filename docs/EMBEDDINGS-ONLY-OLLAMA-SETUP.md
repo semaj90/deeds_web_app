@@ -311,7 +311,7 @@ echo "3️⃣ Bifrost Cache..."
 curl -s http://127.0.0.1:3040/health | jq .
 
 echo "4️⃣ Redis/Valkey..."
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 
 echo "5️⃣ Postgres..."
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT 1" 2>&1

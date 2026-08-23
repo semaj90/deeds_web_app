@@ -276,15 +276,15 @@ The OKF spec enforces a strict embedding dimension hierarchy:
 
 ```bash
 # Domain centroids warmed?
-docker exec legal-ai-redis redis-cli HGETALL corpus:centroids | wc -l
+docker exec legal-ai-valkey valkey-cli HGETALL corpus:centroids | wc -l
 # Expected: 4 (AUTH, DATA, API, UI)
 
 # Ontology entries indexed?
-docker exec legal-ai-redis redis-cli HLEN corpus:concepts
+docker exec legal-ai-valkey valkey-cli HLEN corpus:concepts
 # Expected: ~800-1000 (depends on corpus size)
 
 # Directory cache warm?
-docker exec legal-ai-redis redis-cli HLEN okf:directory:index
+docker exec legal-ai-valkey valkey-cli HLEN okf:directory:index
 # Expected: increasing over time as directories are accessed
 ```
 
@@ -310,7 +310,7 @@ GROUP BY spec->'audit'->>'status';
 
 **Check:** `corpus:centroids` hash is populated
 ```bash
-docker exec legal-ai-redis redis-cli HGETALL corpus:centroids
+docker exec legal-ai-valkey valkey-cli HGETALL corpus:centroids
 ```
 
 **Solution:** Run corpus rebuild

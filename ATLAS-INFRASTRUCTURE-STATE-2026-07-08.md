@@ -62,7 +62,7 @@
 |---------|------|--------|--------------|
 | SvelteKit | 5173 | ✅ | `curl localhost:5173` |
 | Postgres | 5434 (WSL native) | ✅ | `docker exec legal-ai-postgres psql -c "SELECT 1"` |
-| Valkey | 6379 | ✅ | `docker exec legal-ai-redis redis-cli PING` |
+| Valkey | 6379 | ✅ | `docker exec legal-ai-valkey valkey-cli PING` |
 | Qdrant | 6333 | ✅ | `curl http://127.0.0.1:6333/` |
 | Ollama | 11434 | ✅ | `curl http://127.0.0.1:11434/api/tags` |
 | Gemma4 TurboQuant | 8090 | ✅ | `curl http://127.0.0.1:8090/v1/models` |
@@ -106,7 +106,7 @@ npm run atlas:dispatcher:test:dry         # 10s, validates logic
 
 # Baseline metrics (before Phase 6)
 npm run atlas:phase6:baseline-latency:capture    # 5 min, captures histogram
-docker exec legal-ai-redis redis-cli DBSIZE     # Baseline key count
+docker exec legal-ai-valkey valkey-cli DBSIZE     # Baseline key count
 
 # Phase 6 canary startup
 npm run atlas:phase6:start --traffic=5          # Enable 5% traffic

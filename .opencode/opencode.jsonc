@@ -83,6 +83,12 @@
       "enabled": true,
       "timeout": 60000,
     },
+    "atlas-tools": {
+      "type": "local",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
+      "enabled": true,
+      "timeout": 30000,
+    },
   },
   "agent": {
     "hforf-trace-audit": {

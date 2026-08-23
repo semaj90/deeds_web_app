@@ -838,8 +838,8 @@ rg -n "MATCH.*-\[\*0\.\." sveltekit-frontend/src  # should have bounds
 ### Lane D: Cache + BitFrost
 ```bash
 # Check Valkey cache
-docker exec legal-ai-valkey redis-cli -a redis DBSIZE
-docker exec legal-ai-valkey redis-cli -a redis KEYS "bifrost:packet:*" | wc -l
+docker exec legal-ai-valkey valkey-cli -a redis DBSIZE
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "bifrost:packet:*" | wc -l
 
 # Verify cache written AFTER Postgres
 rg -n "redis\|redis-cli" scripts/atlas/phase8*.mjs | grep -A5 "postgres\|db\.update"

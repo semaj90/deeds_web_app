@@ -62,7 +62,7 @@ npm run startup:recover:verbose
 docker compose -f docker-compose.yml up -d
 
 # Or restart individual services
-docker restart legal-ai-redis
+docker restart legal-ai-valkey
 docker restart legal-ai-qdrant
 docker restart legal-ai-postgres
 docker restart legal-ai-neo4j
@@ -93,7 +93,7 @@ cat .tmp/ace-degraded-state.json | jq '.canProceed'
 ```
 Symptom: "Connection is closed" for Redis
 Impact: Cache operations slow (memory-only fallback)
-Fix: docker restart legal-ai-redis
+Fix: docker restart legal-ai-valkey
 Time: ~5-10 seconds
 ```
 
@@ -289,10 +289,10 @@ If Postgres is down:
 ### Cache Misses (Slow Queries)
 ```
 Check: Is Redis running?
-  docker ps | grep legal-ai-redis
+  docker ps | grep legal-ai-valkey
   
 If Redis is down:
-  docker restart legal-ai-redis
+  docker restart legal-ai-valkey
   
 Expected: Query speed improves 2-3×
 ```

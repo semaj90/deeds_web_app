@@ -1,5 +1,7 @@
 # ACE → Search → Chat → Go Retrieval Pipeline: Completion Audit (0-100%)
 
+> Historical status note (2026-08-23): The Layer 1 :8788 registration findings below describe the June 26, 2026 snapshot. Current TRACE registration and runtime gates are documented in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md; the original findings are preserved unchanged.
+
 **Date**: June 26, 2026  
 **Scope**: End-to-end packet lookup (IDE) → synthesis (answer)  
 **Overall Completion**: **57%** (5 layers: 35% + 60% + 85% + 75% + 40% + 45% = 57% avg)

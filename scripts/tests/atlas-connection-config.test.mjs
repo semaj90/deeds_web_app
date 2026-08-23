@@ -11,7 +11,7 @@ import {
 test('normalizeConnectionHost keeps real hosts and rewrites 0.0.0.0', () => {
   assert.equal(normalizeConnectionHost('127.0.0.1'), '127.0.0.1');
   assert.equal(normalizeConnectionHost('0.0.0.0'), '127.0.0.1');
-  assert.equal(normalizeConnectionHost('', 'legal-ai-redis'), 'legal-ai-redis');
+  assert.equal(normalizeConnectionHost('', 'legal-ai-valkey'), 'legal-ai-valkey');
 });
 
 test('normalizeRedisUrl preserves host:port inputs but normalizes bare hosts', () => {

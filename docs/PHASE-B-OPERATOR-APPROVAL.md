@@ -157,7 +157,7 @@ sleep 600 && node scripts/phase-b/multi-pass-enrichment.mjs --pass=3 --limit=570
 
 - **Script Issues**: Review `scripts/phase-b/multi-pass-enrichment.mjs` for debugging
 - **Service Down**: Use rollback procedures in `PHASE-B-FINAL-SUMMARY.md`
-- **Cache Issues**: Clear via `docker exec legal-ai-valkey redis-cli -a redis FLUSHDB`
+- **Cache Issues**: Clear via `docker exec legal-ai-valkey valkey-cli -a redis FLUSHDB`
 - **Database Issues**: Check `analysis_pass_results` schema in Postgres
 
 ---

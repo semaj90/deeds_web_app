@@ -75,7 +75,7 @@ production_monitoring:
     - main_application: 'https://yourdomain.com'
     - api_endpoints: 'https://yourdomain.com/api/health'
     - database_health: 'postgres://db:5432'
-    - redis_health: 'redis://redis:6379'
+    - valkey_health: 'redis://legal-ai-valkey:6379'
     - check_interval: '30s'
     - alert_threshold: '3 failures'
 

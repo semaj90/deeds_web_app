@@ -94,7 +94,7 @@
 watch -n 5 'psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_summary_layers"'
 
 # Check cache stats
-docker exec legal-ai-valkey redis-cli KEYS "summary:embedding:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "summary:embedding:*" | wc -l
 ```
 
 ### Phase 5: Validate Clustering Proof (AFTER coverage > 5,000)

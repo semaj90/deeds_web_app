@@ -145,8 +145,8 @@ async function backfillIdentity() {
         // Use docker exec to invalidate cache
         const child = spawn('docker', [
           'exec',
-          'legal-ai-redis',
-          'redis-cli',
+          'legal-ai-valkey',
+          'valkey-cli',
           'DEL',
           'bitfrost:packet:*'
         ]);

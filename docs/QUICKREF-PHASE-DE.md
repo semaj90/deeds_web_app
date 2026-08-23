@@ -91,7 +91,7 @@ const enrichedChunks = await enrichRetrievalChunksPhase5(
 # TODO: create benchmark suite (see NEXT-PRIORITIES-POST-PHASE-DE.md)
 
 # Cache stats:
-docker exec legal-ai-redis redis-cli HLEN gpu:karpathy:scores
+docker exec legal-ai-valkey valkey-cli HLEN gpu:karpathy:scores
 # Expected: 100+ (target: 17,485 full coverage)
 
 # Neo4j topology:

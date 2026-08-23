@@ -102,7 +102,7 @@ if (-not $SkipDocker) {
 
 # Gate 1.3: Valkey container running
 if (-not $SkipDocker) {
-    if (Test-Gate "G1.3" { docker exec legal-ai-redis redis-cli PING | Select-String "PONG" } "Valkey/Redis reachable") {
+    if (Test-Gate "G1.3" { docker exec legal-ai-valkey valkey-cli PING | Select-String "PONG" } "Valkey/Redis reachable") {
         $passCount++
     } else {
         $failCount++
@@ -349,7 +349,7 @@ if (Test-Gate "G6.1" { docker exec legal-ai-postgres psql --version | Select-Str
 }
 
 # Gate 6.2: Valkey memory
-if (Test-Gate "G6.2" { docker exec legal-ai-redis redis-cli INFO memory | Select-String "used_memory_human" } "Valkey memory stats") {
+if (Test-Gate "G6.2" { docker exec legal-ai-valkey valkey-cli INFO memory | Select-String "used_memory_human" } "Valkey memory stats") {
     $passCount++
 } else {
     $failCount++

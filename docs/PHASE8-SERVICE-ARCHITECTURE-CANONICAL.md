@@ -62,7 +62,7 @@ Progress Reporting (3 levels):
 #### Docker Containers
 - **PostgreSQL 18** (legal-ai-postgres)
 - **Qdrant** (legal-ai-qdrant)
-- **Redis/Valkey** (legal-ai-redis)
+- **Redis/Valkey** (legal-ai-valkey)
 - **Neo4j** (legal-ai-neo4j)
 - **Ollama** (legal-ai-ollama) — for embeddings only
 

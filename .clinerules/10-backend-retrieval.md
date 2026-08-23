@@ -16,7 +16,7 @@ paths:
 |---------|------|------|
 | llama-server (Gemma4) | :8090 | Generation only — `stream: true` in request body |
 | Ollama (embeddinggemma) | :11434 | Embeddings only — 768-dim output |
-| Qdrant | :6333 | ANN mirror — `codebase_chunks_768_hybrid` |
+| Qdrant | :6333 | ANN mirror — `codebase_chunks_768` |
 | TurboVec | :8791 | CUDA prefilter (64-dim routing, not ANN search) |
 | Postgres | :5432 Docker / :5434 host | Canonical truth |
 | Valkey/Redis | :6379 | Cache — password from `REDIS_PASSWORD` env var |

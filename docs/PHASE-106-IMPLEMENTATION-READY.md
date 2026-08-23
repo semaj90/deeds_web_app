@@ -193,7 +193,7 @@ The retrieval arbitration layer sits **between decision-making (HMM) and executi
 | "Connection refused" | Postgres not running | Start: `docker start legal-ai-postgres` |
 | "FATAL: remaining connection slot reserved" | Max connections exceeded | Restart: `docker restart legal-ai-postgres` |
 | "Missing module 'pg'" | Dependencies not installed | `cd sveltekit-frontend && npm install` |
-| "Redis connection failed" | Redis not running | Start: `docker start legal-ai-redis` |
+| "Redis connection failed" | Redis not running | Start: `docker start legal-ai-valkey` |
 | "Dry-run shows 0 queries" | No data in atlas_packets | Seed data first (separate task) |
 
 ---
@@ -246,7 +246,7 @@ Before starting, clarify with user:
 
 1. **Data availability:** Are there >100 rows in `atlas_packets`? (needed for test)
 2. **Postgres health:** Is `legal-ai-postgres` running and healthy?
-3. **Redis availability:** Is `legal-ai-redis` running for cache promotion?
+3. **Redis availability:** Is `legal-ai-valkey` running for cache promotion?
 4. **Scope:** Apply to all data or limit to first 100–1000 rows?
 5. **Audit threshold:** Keep default 0.70 confidence threshold or adjust?
 

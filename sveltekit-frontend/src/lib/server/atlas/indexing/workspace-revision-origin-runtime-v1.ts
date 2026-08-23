@@ -80,8 +80,19 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   const statusPorcelain = git(workspaceRoot, ['status', '--porcelain=v1', '--untracked-files=all']);
   const dirty = statusPorcelain.length > 0;
 
-  const trackedOutput = git(workspaceRoot, ['ls-tree', '-r', '--name-only', '-z', 'HEAD']);
-  const trackedAtHead = new Set(trackedOutput.split('\0').filter(Boolean).map(normalizeSourceRef));
+  const trackedOutput = git(workspaceRoot, ['ls-tree', '-r', '-z', 'HEAD']);
+  const trackedBlobByPath = new Map<string, string>();
+  for (const record of trackedOutput.split('\0').filter(Boolean)) {
+    const separator = record.indexOf('\t');
+    if (separator < 0) continue;
+    const metadata = record.slice(0, separator).split(/\s+/);
+    const sourceRef = normalizeSourceRef(record.slice(separator + 1));
+    const blobOid = metadata[2];
+    if (sourceRef && blobOid) trackedBlobByPath.set(sourceRef, blobOid);
+  }
+  const trackedAtHead = new Set(trackedBlobByPath.keys());
+  const dirtyOutput = git(workspaceRoot, ['diff', '--name-only', '-z', 'HEAD']);
+  const dirtyPaths = new Set(dirtyOutput.split('\0').filter(Boolean).map(normalizeSourceRef));
   const currentOutput = git(workspaceRoot, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']);
   const files = [...new Set(currentOutput
     .split('\0')
@@ -119,7 +130,7 @@ export function materializeWorkspaceRevisionOriginV1(input: {
       }
       const revision = deriveCodeSourceRevisionV1(sourceText);
       const isTracked = trackedAtHead.has(sourceRef);
-      const gitBlobOid = isTracked ? gitMaybe(workspaceRoot, ['rev-parse', `HEAD:${sourceRef}`]) : null;
+      const gitBlobOid = trackedBlobByPath.get(sourceRef) ?? null;
       entries.push({
         sourceRef,
         sourceRevision: revision.sourceRevision,
@@ -128,12 +139,7 @@ export function materializeWorkspaceRevisionOriginV1(input: {
         gitBlobOid,
       });
       tracked.set(sourceRef, isTracked);
-      if (!isTracked || !gitBlobOid) {
-        dirtyByPath.set(sourceRef, true);
-      } else {
-        const workingBlob = gitMaybe(workspaceRoot, ['hash-object', '--path', sourceRef, sourceRef]);
-        dirtyByPath.set(sourceRef, workingBlob !== gitBlobOid);
-      }
+      dirtyByPath.set(sourceRef, !isTracked || dirtyPaths.has(sourceRef));
     } catch (error) {
       skipped.push({ sourceRef, reason: error instanceof Error ? error.message : String(error) });
     }

@@ -43,10 +43,10 @@ async function searchBitfrostCache(query: string, redis: any): Promise<FeatureSe
 **Test manually**:
 ```bash
 # Check Redis cache key
-docker exec legal-ai-redis redis-cli KEYS "workflow:query_hash:*" | head -5
+docker exec legal-ai-valkey valkey-cli KEYS "workflow:query_hash:*" | head -5
 
 # Check cached trace
-docker exec legal-ai-redis redis-cli GET "workflow:trace:xyz" | jq .
+docker exec legal-ai-valkey valkey-cli GET "workflow:trace:xyz" | jq .
 ```
 
 ---

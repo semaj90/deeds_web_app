@@ -25,7 +25,7 @@ function ko(label, detail) { console.log('  ❌', label, detail ? `— ${detail}
 
 async function runMcp(messages) {
   return new Promise((resolve, reject) => {
-    const child = spawn('node', [SERVER], { stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn('node', [SERVER], { stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, ATLAS_TOOLS_MOCK: '1' } });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', d => stdout += d.toString());

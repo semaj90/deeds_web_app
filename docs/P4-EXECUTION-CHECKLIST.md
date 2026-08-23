@@ -21,7 +21,7 @@ docker ps | grep postgres
 
 # Redis: Check connectivity
 docker ps | grep redis
-# Should show: legal-ai-redis (Up)
+# Should show: legal-ai-valkey (Up)
 
 # Ollama: Check inference services
 curl http://127.0.0.1:11434/api/tags
@@ -319,7 +319,7 @@ SQL
 ```bash
 # Check all P4 scores are cached in Redis
 
-docker exec legal-ai-redis redis-cli <<'REDIS'
+docker exec legal-ai-valkey valkey-cli <<'REDIS'
 HLEN atlas:pagerank:som:scores
 HLEN atlas:attention:som:scores
 HLEN atlas:karpathy:som:scores

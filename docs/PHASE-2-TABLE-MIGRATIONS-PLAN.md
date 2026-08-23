@@ -511,7 +511,7 @@ async function backfill() {
 1. **Verify Phase 1d cache is populated**:
    ```bash
    node scripts/atlas/phase-1d-redis-som-cell-cache.mjs --apply
-   docker exec legal-ai-redis redis-cli DBSIZE
+   docker exec legal-ai-valkey valkey-cli DBSIZE
    ```
 
 2. **Run health baseline (BEFORE Phase 2.1)**:

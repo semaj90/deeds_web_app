@@ -173,7 +173,7 @@ Before running Phase 17, verify:
 - [ ] **Postgres**: `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_packets"`
 - [ ] **Qdrant**: `curl -s http://127.0.0.1:6333/collections | jq .result`
 - [ ] **Embedding Service**: `curl -s http://127.0.0.1:8081/v1/models | jq .`
-- [ ] **Redis**: `docker exec legal-ai-redis redis-cli ping` → PONG
+- [ ] **Redis**: `docker exec legal-ai-valkey valkey-cli ping` → PONG
 - [ ] **HyperRAG RPC** (optional): `curl http://127.0.0.1:8094/health`
 
 ---

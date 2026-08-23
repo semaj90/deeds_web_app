@@ -340,8 +340,8 @@ curl http://127.0.0.1:3040/health
 docker logs legal-ai-bifrost --tail 50 --follow
 
 # Check Redis cache keys
-docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
-docker exec legal-ai-redis redis-cli DBSIZE
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli DBSIZE
 
 # Check Bifrost memory usage
 docker stats legal-ai-bifrost

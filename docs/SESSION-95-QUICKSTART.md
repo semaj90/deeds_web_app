@@ -277,7 +277,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT 1;"
 ```bash
 # Redis might be down, Executive Planner will degrade gracefully
 # Check if needed:
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 # Expected: PONG (if running)
 # Not PONG: Redis is down, that's OK for now
 ```

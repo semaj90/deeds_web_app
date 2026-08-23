@@ -177,7 +177,7 @@ curl -sS http://127.0.0.1:8788/health
 node scripts/smoke-trace-mcp-tools.mjs            # 34 tools sweep
 
 # Debug
-docker exec legal-ai-redis redis-cli HGETALL gpu:karpathy:summary
+docker exec legal-ai-valkey valkey-cli HGETALL gpu:karpathy:summary
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db \
   -c "SELECT count(*) FROM agent_context_files;"
 ```

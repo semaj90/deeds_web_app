@@ -7,7 +7,7 @@
 #   - Node.js      → port 5173 (npm run dev)
 #
 # DOCKER (all data services):
-#   Default:       postgres, redis, qdrant, rabbitmq    (~6GB)
+#   Default:       postgres, valkey, qdrant, rabbitmq    (~6GB)
 #   SeaweedFS:     add the seaweedfs profile for canonical object storage
 #   --profile full: + couchdb, neo4j, nats, go-search, go-embed (~8GB)
 #   --profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)
@@ -302,7 +302,12 @@ services:
       - seaweed_volume_data:/data
     networks:
       - legal-ai-network
-
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://seaweedfs-volume:8080/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
   # SeaweedFS Filer — metadata index (required by S3 gateway)
   seaweedfs-filer:
     image: chrislusf/seaweedfs:latest
@@ -330,7 +335,12 @@ services:
       - "8888:8888"
     networks:
       - legal-ai-network
-
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://seaweedfs-filer:8888/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
   # SeaweedFS S3 — canonical S3-compatible API gateway (port 8333)
   # Existing S3-compatible client code connects here when SEAWEED_* env vars are set.
   seaweedfs-s3:

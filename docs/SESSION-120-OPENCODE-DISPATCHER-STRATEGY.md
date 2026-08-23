@@ -183,7 +183,7 @@ Expected: success_rate >= 0.95, confidence >= 0.8
 | Milestone | Proof |
 |-----------|-------|
 | OpenCode → Dispatcher wired | `POST /api/opencode-dispatch` returns `{ results, telemetry, proof }` |
-| Real telemetry captured | `docker exec legal-ai-valkey redis-cli KEYS "telemetry:*"` returns > 10 keys |
+| Real telemetry captured | `docker exec legal-ai-valkey valkey-cli KEYS "telemetry:*"` returns > 10 keys |
 | Implementation cluster populated | `GET /api/telemetry/implementation-clusters?tool_name=identity:recover` returns non-empty clusters |
 | Kanban workflow proven | 3 completed Kanban cards with telemetry signal proof in git commits |
 | Sessions 115-118 ready | Mirror worker can invoke `identity:recover` MCP tool → telemetry captured |

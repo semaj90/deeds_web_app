@@ -53,7 +53,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 OLLAMA_URL         = os.environ.get("OLLAMA_URL",       "http://host.docker.internal:11434")
 QDRANT_URL         = os.environ.get("QDRANT_URL",       "http://qdrant:6333")
 BIFROST_URL        = os.environ.get("BIFROST_URL",      "http://host.docker.internal:3040")
-REDIS_URL          = os.environ.get("REDIS_URL",        "redis://redis:6379/0")
+REDIS_URL          = os.environ.get("REDIS_URL",        "redis://valkey:6379/0")
 NEO4J_URI          = os.environ.get("NEO4J_URI",        "bolt://neo4j:7687")
 NEO4J_USER         = os.environ.get("NEO4J_USER",       "neo4j")
 NEO4J_PASSWORD     = os.environ.get("NEO4J_PASSWORD",   "password")

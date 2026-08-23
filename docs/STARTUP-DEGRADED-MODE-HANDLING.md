@@ -96,7 +96,7 @@ OK TurboQuant                              ← Operational
   },
   "canProceed": true,
   "recommendations": [
-    "Restart Docker: docker restart legal-ai-redis",
+    "Restart Docker: docker restart legal-ai-valkey",
     "Restart Docker: docker restart legal-ai-qdrant"
   ]
 }
@@ -201,7 +201,7 @@ Result:
   - Can proceed: YES
   - Degraded mode: Memory-only cache
   - Impact: Cache misses, slower repeating queries
-  - Fix: docker restart legal-ai-redis
+  - Fix: docker restart legal-ai-valkey
 ```
 
 ### Scenario 2: Qdrant Offline, Redis OK

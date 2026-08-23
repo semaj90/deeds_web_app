@@ -55,19 +55,23 @@ function isSourceFile(relativePath: string): boolean {
   return SOURCE_EXTENSIONS.has(path.extname(normalized).toLowerCase());
 }
 
-async function trackedFilesAtHead(): Promise<Set<string>> {
-  const output = await git(['ls-tree', '-r', '--name-only', '-z', 'HEAD']);
-  return new Set(output.split('\0').filter(Boolean).map((item) => item.replace(/\\/g, '/')));
+async function trackedBlobOidsAtHead(): Promise<Map<string, string>> {
+  const output = await git(['ls-tree', '-r', '-z', 'HEAD']);
+  const tracked = new Map<string, string>();
+  for (const record of output.split('\0').filter(Boolean)) {
+    const separator = record.indexOf('\t');
+    if (separator < 0) continue;
+    const metadata = record.slice(0, separator).split(/\s+/);
+    const sourceRef = record.slice(separator + 1).replace(/\\/g, '/');
+    const blobOid = metadata[2];
+    if (sourceRef && blobOid) tracked.set(sourceRef, blobOid);
+  }
+  return tracked;
 }
 
 async function currentSourceFiles(): Promise<string[]> {
   const output = await git(['ls-files', '--cached', '--others', '--exclude-standard', '-z']);
   return [...new Set(output.split('\0').filter(Boolean).map((item) => item.replace(/\\/g, '/')).filter(isSourceFile))].sort();
-}
-
-async function baseBlobOid(relativePath: string): Promise<string | null> {
-  // `HEAD:path` resolves to the blob object for that path in the base snapshot.
-  return gitMaybe(['rev-parse', `HEAD:${relativePath}`]);
 }
 
 async function main() {
@@ -81,7 +85,10 @@ async function main() {
   const gitHeadRef = await gitMaybe(['symbolic-ref', '-q', 'HEAD']);
   const statusPorcelain = await git(['status', '--porcelain=v1', '--untracked-files=all']);
   const dirty = statusPorcelain.length > 0;
-  const trackedAtHead = await trackedFilesAtHead();
+  const trackedBlobByPath = await trackedBlobOidsAtHead();
+  const trackedAtHead = new Set(trackedBlobByPath.keys());
+  const dirtyOutput = await git(['diff', '--name-only', '-z', 'HEAD']);
+  const dirtyPaths = new Set(dirtyOutput.split('\0').filter(Boolean).map((item) => item.replace(/\\/g, '/')));
   const files = await currentSourceFiles();
 
   const entries: WorkspaceSourceManifestEntryV1[] = [];
@@ -114,7 +121,7 @@ async function main() {
       }
       const revision = deriveCodeSourceRevisionV1(source);
       const isTracked = trackedAtHead.has(sourceRef);
-      const blobOid = isTracked ? await baseBlobOid(sourceRef) : null;
+      const blobOid = trackedBlobByPath.get(sourceRef) ?? null;
       entries.push({
         sourceRef,
         sourceRevision: revision.sourceRevision,
@@ -123,15 +130,7 @@ async function main() {
         gitBlobOid: blobOid,
       });
       tracked.set(sourceRef, isTracked);
-      if (!isTracked || !blobOid) {
-        dirtyByPath.set(sourceRef, true);
-      } else {
-        // Compare actual working-tree bytes to the base blob by asking Git to
-        // hash the current file as it would be stored for this path. This keeps
-        // Git attributes/clean filters on the provenance side only.
-        const workingBlob = await gitMaybe(['hash-object', '--path', sourceRef, sourceRef]);
-        dirtyByPath.set(sourceRef, workingBlob !== blobOid);
-      }
+      dirtyByPath.set(sourceRef, !isTracked || dirtyPaths.has(sourceRef));
     } catch (error) {
       skipped.push({ sourceRef, reason: error instanceof Error ? error.message : String(error) });
     }

@@ -12,18 +12,10 @@
       "url": "http://127.0.0.1:8788/mcp"
     },
     "atlas-tools": {
-      "command": "cmd",
-      "args": ["/c", "npx", "tsx", "./sveltekit-frontend/src/mcp/server.ts"],
+      "command": "node",
+      "args": ["./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "env": {
-        "NODE_ENV": "production",
-        "DATABASE_URL": "postgresql://legal_admin:legal@127.0.0.1:5434/legal_ai_db",
-        "REDIS_HOST": "127.0.0.1",
-        "REDIS_PORT": "6379",
-        "REDIS_PASSWORD": "redis",
-        "QDRANT_URL": "http://127.0.0.1:6333",
-        "NEO4J_URI": "bolt://127.0.0.1:7687",
-        "NEO4J_USERNAME": "neo4j",
-        "NEO4J_PASSWORD": "legal"
+        "ATLAS_TOOLS_MOCK": "0"
       }
     },
     "socraticode": {

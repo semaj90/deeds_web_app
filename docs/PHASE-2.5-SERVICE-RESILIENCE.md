@@ -55,8 +55,8 @@ try {
 
 **Recovery**:
 ```bash
-docker restart legal-ai-redis-prod
-docker exec legal-ai-redis-prod redis-cli PING
+docker restart legal-ai-valkey-prod
+docker exec legal-ai-valkey-prod valkey-cli PING
 ```
 
 ---
@@ -160,10 +160,10 @@ curl http://127.0.0.1:8100/health
 
 **Test command**:
 ```bash
-docker stop legal-ai-redis-prod
+docker stop legal-ai-valkey-prod
 npm run atlas:gan-audit:deep:full --verbose
 # Expected: completes with degraded token-analysis (no BitFrost hits)
-docker start legal-ai-redis-prod
+docker start legal-ai-valkey-prod
 ```
 
 ---
@@ -231,10 +231,10 @@ docker start go-retrieval-service
 
 **Test command**:
 ```bash
-docker stop legal-ai-redis-prod legal-ai-qdrant go-retrieval-service
+docker stop legal-ai-valkey-prod legal-ai-qdrant go-retrieval-service
 npm run atlas:gan-audit:deep:full --verbose
 # Expected: completes with empty token + retrieval arrays, but full hardening audit
-docker start legal-ai-redis-prod legal-ai-qdrant go-retrieval-service
+docker start legal-ai-valkey-prod legal-ai-qdrant go-retrieval-service
 ```
 
 ---
@@ -353,7 +353,7 @@ context.retrieval_metrics = {
 ### Health Check All Services
 ```bash
 echo "=== Redis ===" && \
-docker exec legal-ai-redis-prod redis-cli PING && \
+docker exec legal-ai-valkey-prod valkey-cli PING && \
 echo "=== Qdrant ===" && \
 curl -s http://127.0.0.1:6333/collections | jq '.result | length' && \
 echo "=== Go Retrieval ===" && \
@@ -368,13 +368,13 @@ cat .env.local | grep -E "REDIS_URL|QDRANT_URL|GO_RETRIEVAL" | sed 's/=.*/=***/'
 ### Simulate Service Down (Testing)
 ```bash
 # Down
-docker stop legal-ai-redis-prod
+docker stop legal-ai-valkey-prod
 
 # Run test
 npm run atlas:gan-audit:deep:dry --verbose
 
 # Back up
-docker start legal-ai-redis-prod
+docker start legal-ai-valkey-prod
 ```
 
 ---

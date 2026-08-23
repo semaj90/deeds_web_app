@@ -101,7 +101,7 @@ node scripts/phase-b/multi-pass-enrichment.mjs --pass=3 --limit=100 --dry-run
 ```bash
 # Quick health check
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_packets;" | grep 58304
-docker exec legal-ai-valkey redis-cli -a redis PING | grep PONG
+docker exec legal-ai-valkey valkey-cli -a redis PING | grep PONG
 curl -s http://127.0.0.1:6333/collections/codebase_chunks_768 | grep '"points_count":40568'
 curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | select(.name | contains("embeddinggemma"))' | grep embeddinggemma
 ```
@@ -112,7 +112,7 @@ curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | select(.name | contain
 watch -n 5 "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT pass_key, COUNT(*) FROM analysis_pass_results WHERE pass_status='complete' GROUP BY pass_key;\""
 
 # Monitor cache population
-watch -n 5 "docker exec legal-ai-valkey redis-cli -a redis DBSIZE | tail -1"
+watch -n 5 "docker exec legal-ai-valkey valkey-cli -a redis DBSIZE | tail -1"
 ```
 
 ### After Completion
@@ -128,8 +128,8 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT pass
 #  pass_3_semantic         |     57000
 
 # Check cache warmth
-docker exec legal-ai-valkey redis-cli -a redis KEYS "emb:q:v1:*" | wc -l  # Should be > 1000
-docker exec legal-ai-valkey redis-cli -a redis KEYS "qdrant:topk:v1:*" | wc -l  # Should be > 1000
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "emb:q:v1:*" | wc -l  # Should be > 1000
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "qdrant:topk:v1:*" | wc -l  # Should be > 1000
 ```
 
 ---
@@ -171,8 +171,8 @@ node scripts/phase-b/multi-pass-enrichment.mjs --pass=1 --limit=57000
 ### If cache needs rebuild:
 ```bash
 # Clear specific cache keys
-docker exec legal-ai-valkey redis-cli -a redis DEL "emb:q:v1:*"
-docker exec legal-ai-valkey redis-cli -a redis DEL "qdrant:topk:v1:*"
+docker exec legal-ai-valkey valkey-cli -a redis DEL "emb:q:v1:*"
+docker exec legal-ai-valkey valkey-cli -a redis DEL "qdrant:topk:v1:*"
 
 # Re-run Pass 3 (cache rebuilds on first run, speeds up on subsequent runs)
 node scripts/phase-b/multi-pass-enrichment.mjs --pass=3 --limit=57000

@@ -249,7 +249,7 @@ curl http://127.0.0.1:6333/collections/codebase_chunks_768/points/1 | jq '.resul
 docker ps --all | grep -E "postgres|qdrant|redis|gemma4|go-retrieval"
 
 # Start missing containers
-docker-compose up -d legal-ai-postgres legal-ai-redis legal-ai-qdrant
+docker-compose up -d legal-ai-postgres legal-ai-valkey legal-ai-qdrant
 
 # Wait 10s, then re-test health
 curl "http://localhost:5173/api/phase102/retrieval-pipeline?q=test" | jq '.infrastructure_health'

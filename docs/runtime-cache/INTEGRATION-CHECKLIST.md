@@ -45,7 +45,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT 1" &
 echo "✅ Postgres OK" || echo "❌ Postgres FAIL"
 
 echo -e "\n=== Valkey/Redis ===" && \
-docker exec legal-ai-redis redis-cli PING && \
+docker exec legal-ai-valkey valkey-cli PING && \
 echo "✅ Valkey OK" || echo "❌ Valkey FAIL"
 
 echo -e "\n=== Qdrant ===" && \
@@ -133,7 +133,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUN
 
 # 2. Redis
 echo -n "✓ Valkey: "
-docker exec legal-ai-redis redis-cli DBSIZE 2>/dev/null | grep keys || echo "FAIL"
+docker exec legal-ai-valkey valkey-cli DBSIZE 2>/dev/null | grep keys || echo "FAIL"
 
 # 3. Health endpoint
 echo -n "✓ Health: "

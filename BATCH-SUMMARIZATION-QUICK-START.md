@@ -67,7 +67,7 @@ curl http://127.0.0.1:11434/api/tags | jq '.models[].name'
 
 # 2. Docker services
 docker ps --filter "status=running" --format "{{.Names}}" | Select-String "legal-ai"
-# Expected: legal-ai-postgres, legal-ai-redis, legal-ai-rabbitmq, legal-ai-qdrant, legal-ai-go-embedding
+# Expected: legal-ai-postgres, legal-ai-valkey, legal-ai-rabbitmq, legal-ai-qdrant, legal-ai-go-embedding
 
 # 3. go-embedding-service responding (768-dim)
 curl -X POST http://localhost:8097/embed `

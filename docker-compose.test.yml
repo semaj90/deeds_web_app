@@ -2,7 +2,6 @@
 # Usage: docker-compose -f docker-compose.sveltekit-prod.yml up -d
 # Memory savings: ~50% reduction via node-caged pointer compression
 
-version: '3.8'
 
 services:
   # SvelteKit Frontend (Pointer Compression Enabled)
@@ -20,7 +19,7 @@ services:
       PORT: 3000
       # Database connections
       DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://valkey:6379
       QDRANT_URL: http://qdrant:6333
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       OLLAMA_URL: http://host.docker.internal:11434
@@ -41,7 +40,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       qdrant:
         condition: service_healthy
@@ -92,13 +91,13 @@ services:
         limits:
           memory: 1G
 
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: deeds-redis-prod
+  # Valkey Cache
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: deeds-valkey-prod
     restart: unless-stopped
     command: >
-      redis-server
+      valkey-server
       --maxmemory 2gb
       --maxmemory-policy allkeys-lru
       --appendonly yes
@@ -110,11 +109,11 @@ services:
       --slowlog-log-slower-than 10000
       --slowlog-max-len 128
     volumes:
-      - redis-data:/data
+      - valkey-data:/data
     networks:
       - deeds-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis}", "--no-auth-warning", "ping"]
+      test: ["CMD", "valkey-cli", "-a", "${REDIS_PASSWORD:-redis}", "--no-auth-warning", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -251,7 +250,7 @@ networks:
 volumes:
   postgres-data:
     driver: local
-  redis-data:
+  valkey-data:
     driver: local
   qdrant-data:
     driver: local

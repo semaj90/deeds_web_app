@@ -14,7 +14,7 @@
 - [ ] **Embedding Model Available** — `curl http://127.0.0.1:11434/api/embeddings -d '{"model":"embeddinggemma:latest","prompt":"test"}' | jq '.embedding | length'` → 768
 - [ ] **Postgres Connected** — `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_packets;"` → ≥40000
 - [ ] **Qdrant Running** — `curl http://127.0.0.1:6333/collections | jq '.result | length'` → ≥58
-- [ ] **Redis/Valkey Running** — `docker exec legal-ai-redis redis-cli PING` → PONG
+- [ ] **Redis/Valkey Running** — `docker exec legal-ai-valkey valkey-cli PING` → PONG
 - [ ] **Docker Volumes Mounted** — `docker inspect legal-ai-postgres | jq '.[0].Mounts' | grep -c volumes` → ≥1
 
 ### Embedding Service Validation (P0 + P1)

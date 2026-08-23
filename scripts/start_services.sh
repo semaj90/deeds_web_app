@@ -27,15 +27,15 @@ docker run -d \
 echo -e "${GREEN}✅ Postgres running on localhost:5432${NC}"
 sleep 2
 
-# 2. Redis
-echo -e "${BLUE}2. Starting Redis...${NC}"
+# 2. Valkey (Redis-compatible cache)
+echo -e "${BLUE}2. Starting Valkey...${NC}"
 docker run -d \
-  --name redis-legal-ai \
+  --name legal-ai-valkey \
   -p 6379:6379 \
-  -v redis_data:/data \
-  redis:7-alpine
+  -v valkey_data:/data \
+  valkey/valkey:8-alpine
 
-echo -e "${GREEN}✅ Redis running on localhost:6379${NC}"
+echo -e "${GREEN}✅ Valkey running on localhost:6379${NC}"
 sleep 2
 
 # 3. RabbitMQ
@@ -65,17 +65,10 @@ docker run -d \
 echo -e "${GREEN}✅ Qdrant GPU running on localhost:6333${NC}"
 sleep 2
 
-# 5. Ollama Gemma-Legal
-echo -e "${BLUE}5. Starting Ollama Gemma-Legal...${NC}"
-docker run -d \
-  --name ollama-gemma \
-  --gpus all \
-  -p 11434:11434 \
-  -v ollama_data:/root/.ollama \
-  ollama/ollama:latest
-
-echo -e "${GREEN}✅ Ollama running on localhost:11434${NC}"
-sleep 2
+# 5. Native Windows Ollama (managed outside Docker)
+echo -e "${BLUE}5. Using native Windows Ollama at http://127.0.0.1:11434...${NC}"
+echo -e "${GREEN}✅ Ollama is not started as a container${NC}"
+sleep 1
 
 # 6. Bootstrap RabbitMQ
 echo -e "${BLUE}6. Bootstrapping RabbitMQ...${NC}"

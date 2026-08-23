@@ -212,10 +212,10 @@ nvidia-smi -L
 ### Bifrost caching not working
 ```powershell
 # Check Redis is working
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 
 # Check cache keys exist
-docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*" | wc -l
 
 # Should increase as you query
 ```
@@ -233,7 +233,7 @@ docker exec legal-ai-redis redis-cli KEYS "bifrost:*" | wc -l
 ### This Week
 - [ ] Implement bifrost-summary-worker.ts (from SETUP doc)
 - [ ] Add `npm run atlas:warm` to dev startup pipeline
-- [ ] Monitor cache hit rate (`docker exec legal-ai-redis redis-cli KEYS "bifrost:*"`)
+- [ ] Monitor cache hit rate (`docker exec legal-ai-valkey valkey-cli KEYS "bifrost:*"`)
 
 ### This Sprint (P1 Agentic Error Fixing)
 - [ ] Extract PageIndex (page-level summaries)

@@ -331,7 +331,7 @@ async function main() {
 ### Step 1: Start required services
 
 ```bash
-docker-compose up legal-ai-redis
+docker-compose up legal-ai-valkey
 docker-compose up legal-ai-qdrant
 docker-compose up legal-ai-postgres
 # Ollama + TurboQuant should already be running

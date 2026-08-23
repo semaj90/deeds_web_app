@@ -60,9 +60,9 @@ services:
       start_period: 30s
 
   # ── Valkey Bundle Server ────────────────────────────────────────────────────
-  redis:
+  valkey:
     image: valkey/valkey-bundle:8.1.1
-    container_name: legal-ai-redis-prod
+    container_name: legal-ai-valkey-prod
     restart: unless-stopped
     deploy:
       resources:

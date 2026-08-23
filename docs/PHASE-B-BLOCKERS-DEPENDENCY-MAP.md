@@ -13,7 +13,7 @@ All required services must be running and healthy:
 
 ```bash
 # Redis/Valkey (password: redis)
-docker exec legal-ai-valkey redis-cli -a redis PING
+docker exec legal-ai-valkey valkey-cli -a redis PING
 # Expected: PONG
 
 # Postgres (verify packet count)
@@ -123,7 +123,7 @@ Phase B Execution
 
 | Item | Status | Command |
 |------|--------|---------|
-| Redis/Valkey password | ✅ `redis` | `docker exec legal-ai-valkey redis-cli -a redis PING` |
+| Redis/Valkey password | ✅ `redis` | `docker exec legal-ai-valkey valkey-cli -a redis PING` |
 | Postgres connection | ✅ Legal_admin user | `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT 1"` |
 | Qdrant collection | ✅ codebase_chunks_768 | `curl http://127.0.0.1:6333/collections/codebase_chunks_768` |
 | Ollama models | ✅ embeddinggemma + gemma4 | `curl http://127.0.0.1:11434/api/tags | jq '.models[].name'` |
@@ -164,13 +164,13 @@ SELECT pass_key, COUNT(*) FROM analysis_pass_results WHERE pass_status='complete
 
 ### Redis/Valkey
 ```bash
-docker exec legal-ai-valkey redis-cli -a redis INFO stats | grep total_commands_processed
+docker exec legal-ai-valkey valkey-cli -a redis INFO stats | grep total_commands_processed
 # Expected: High number (millions of cache hits + writes during Phase B)
 
-docker exec legal-ai-valkey redis-cli -a redis KEYS "emb:q:v1:*" | wc -l
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "emb:q:v1:*" | wc -l
 # Expected: > 5000 (embedding cache entries)
 
-docker exec legal-ai-valkey redis-cli -a redis KEYS "qdrant:topk:v1:*" | wc -l
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "qdrant:topk:v1:*" | wc -l
 # Expected: > 5000 (topK cache entries)
 ```
 
@@ -197,10 +197,10 @@ docker exec legal-ai-valkey redis-cli -a redis KEYS "qdrant:topk:v1:*" | wc -l
 
 ```bash
 # Clear embedding cache
-docker exec legal-ai-valkey redis-cli -a redis DEL "emb:q:v1:*"
+docker exec legal-ai-valkey valkey-cli -a redis DEL "emb:q:v1:*"
 
 # Clear topK cache
-docker exec legal-ai-valkey redis-cli -a redis DEL "qdrant:topk:v1:*"
+docker exec legal-ai-valkey valkey-cli -a redis DEL "qdrant:topk:v1:*"
 
 # Re-run (will be slower first run, cache rebuilds on next invocation)
 node scripts/phase-b/multi-pass-enrichment.mjs --pass=3 --limit=57000

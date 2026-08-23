@@ -115,9 +115,9 @@ atlas_som_cell_karpathy_scores  | 400 | 400
 
 ### Redis Cache
 ```bash
-docker exec legal-ai-redis redis-cli HLEN atlas:pagerank:som:scores
-docker exec legal-ai-redis redis-cli HLEN atlas:attention:som:scores
-docker exec legal-ai-redis redis-cli HLEN atlas:karpathy:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:pagerank:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:attention:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:karpathy:som:scores
 # Expected: 400, 400, 400
 ```
 

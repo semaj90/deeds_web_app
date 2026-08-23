@@ -104,11 +104,11 @@ node scripts/atlas/karpathy-gpu-enrich.mjs --limit 200
 **Verification** (after completion):
 ```bash
 # Check score count
-docker exec legal-ai-redis redis-cli HLEN gpu:karpathy:scores
+docker exec legal-ai-valkey valkey-cli HLEN gpu:karpathy:scores
 # Expected: 17485 (or close, depending on which packets were scoreable)
 
 # Sample a score
-docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores '$lib/server/db/client:...' \
+docker exec legal-ai-valkey valkey-cli HGET gpu:karpathy:scores '$lib/server/db/client:...' \
   | jq '.'
 # Expected: { "pr": 7.06, "attn": 0.999, "authority": 0.555, "blend": 3.291 }
 ```
@@ -224,7 +224,7 @@ curl -s http://localhost:11434/api/tags | jq '.models | length'
 nvidia-smi  # or: docker exec legal-ai-postgres nvidia-smi
 
 # Check Redis is accepting writes
-docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 ```
 
 **Fix**:

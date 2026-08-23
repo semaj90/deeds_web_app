@@ -47,7 +47,7 @@ REDIS_URL: `redis://127.0.0.1:6379`
 
 **Docker command to test**:
 ```bash
-docker exec legal-ai-valkey redis-cli -a redis PING
+docker exec legal-ai-valkey valkey-cli -a redis PING
 # Expected: PONG
 ```
 
@@ -445,7 +445,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db \
   -c "SELECT COUNT(*) FROM atlas_packets;" | grep -E '[0-9]+'
 
 # 2. Redis cache
-docker exec legal-ai-valkey redis-cli -a redis KEYS "telemetry:*" | wc -l
+docker exec legal-ai-valkey valkey-cli -a redis KEYS "telemetry:*" | wc -l
 
 # 3. Qdrant vector store
 curl -s http://127.0.0.1:6333/collections | jq '.result | length'

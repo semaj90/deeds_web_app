@@ -70,7 +70,7 @@ curl http://127.0.0.1:8090/health
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_packets"
 
 # Verify Redis connection
-docker exec legal-ai-valkey redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 ```
 
 ### 2. Run 50-Packet Pilot (Dry-Run)
@@ -101,8 +101,8 @@ python scripts/gemma4/offline_summary_worker.py \
 watch -n 5 'psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM atlas_summary_layers WHERE layer_type=\"gemma4_offline\""'
 
 # Watch Redis cache
-docker exec legal-ai-valkey redis-cli DBSIZE
-docker exec legal-ai-valkey redis-cli KEYS 'summary:*' | wc -l
+docker exec legal-ai-valkey valkey-cli DBSIZE
+docker exec legal-ai-valkey valkey-cli KEYS 'summary:*' | wc -l
 ```
 
 ---
@@ -118,10 +118,10 @@ docker exec legal-ai-valkey redis-cli KEYS 'summary:*' | wc -l
 
 ```bash
 # Query
-docker exec legal-ai-valkey redis-cli GET "summary:embedding:ace:packet:auth:001"
+docker exec legal-ai-valkey valkey-cli GET "summary:embedding:ace:packet:auth:001"
 
 # Cleanup (if needed)
-docker exec legal-ai-valkey redis-cli DEL "summary:embedding:*"
+docker exec legal-ai-valkey valkey-cli DEL "summary:embedding:*"
 ```
 
 ### L2: Qdrant (Semantic Search)
@@ -266,10 +266,10 @@ LEFT JOIN atlas_summary_layers asl ON ap.packet_key = asl.packet_key;
 ### Check Cache Hit Rate
 ```bash
 # Monitor Redis keyspace
-docker exec legal-ai-valkey redis-cli INFO keyspace
+docker exec legal-ai-valkey valkey-cli INFO keyspace
 
 # Count summary embeddings cached
-docker exec legal-ai-valkey redis-cli KEYS 'summary:embedding:*' | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS 'summary:embedding:*' | wc -l
 
 # Check Qdrant payload tags
 curl http://127.0.0.1:6333/collections/codebase_chunks_768/points/count

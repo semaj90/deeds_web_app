@@ -58,7 +58,7 @@ Before destructive commands, verify volumes:
 docker inspect legal-ai-postgres | jq '.[0].Mounts'
 docker inspect legal-ai-qdrant   | jq '.[0].Mounts'
 docker inspect legal-ai-neo4j    | jq '.[0].Mounts'
-docker inspect legal-ai-redis    | jq '.[0].Mounts'
+docker inspect legal-ai-valkey    | jq '.[0].Mounts'
 ```
 Never run: `docker compose down -v`, `docker volume prune`, `docker system prune --volumes`
 

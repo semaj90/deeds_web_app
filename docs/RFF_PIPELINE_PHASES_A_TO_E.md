@@ -269,7 +269,7 @@ curl "http://127.0.0.1:6333/collections/codebase_chunks_768/points?ids=1&with_pa
 -- Look for: summary_embedding_id, summary_bm25_score, summary_confidence
 
 -- Phase E: Check RRF cache
-docker exec legal-ai-redis redis-cli KEYS "rff:query:*" | wc -l
+docker exec legal-ai-valkey valkey-cli KEYS "rff:query:*" | wc -l
 -- Expect: 100+ keys if warmup successful
 ```
 

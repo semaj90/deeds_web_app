@@ -108,8 +108,8 @@ node scripts/atlas/phase-1d-redis-som-cell-cache.mjs --dry-run
 node scripts/atlas/phase-1d-redis-som-cell-cache.mjs --apply
 
 # Verify
-docker exec legal-ai-redis redis-cli SMEMBERS som:cell:42
-docker exec legal-ai-redis redis-cli DBSIZE  # Total Redis keys
+docker exec legal-ai-valkey valkey-cli SMEMBERS som:cell:42
+docker exec legal-ai-valkey valkey-cli DBSIZE  # Total Redis keys
 ```
 
 ### Cell Distribution
@@ -226,8 +226,8 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUN
 node scripts/atlas/phase-1d-redis-som-cell-cache.mjs --apply
 
 # 4. Verify Redis cell cache
-docker exec legal-ai-redis redis-cli DBSIZE
-docker exec legal-ai-redis redis-cli SMEMBERS som:cell:42 | head -10
+docker exec legal-ai-valkey valkey-cli DBSIZE
+docker exec legal-ai-valkey valkey-cli SMEMBERS som:cell:42 | head -10
 
 # 5. Run health baseline (measures improvement)
 npm run atlas:clustering:health
@@ -339,8 +339,8 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUN
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT som_cluster, COUNT(*) as packet_count FROM atlas_codebase_packets WHERE som_cluster IS NOT NULL GROUP BY som_cluster ORDER BY packet_count DESC LIMIT 10;"
 
 # Check Redis cache
-docker exec legal-ai-redis redis-cli DBSIZE
-docker exec legal-ai-redis redis-cli SMEMBERS som:cell:42
+docker exec legal-ai-valkey valkey-cli DBSIZE
+docker exec legal-ai-valkey valkey-cli SMEMBERS som:cell:42
 
 # Run health check
 npm run atlas:clustering:health

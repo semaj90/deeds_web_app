@@ -25,9 +25,9 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  valkey:
     image: valkey/valkey-bundle:8.1.1
-    container_name: legal-ai-redis
+    container_name: legal-ai-valkey
     ports:
       - "127.0.0.1:6379:6379"   # Redis-compatible port (loopback only)
     command: >
@@ -46,7 +46,7 @@ services:
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis}", "--no-auth-warning", "ping"]
+      test: ["CMD", "valkey-cli", "-a", "${REDIS_PASSWORD:-redis}", "--no-auth-warning", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -66,14 +66,14 @@ services:
       - go_mod_cache:/go/pkg/mod
     environment:
       - DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://valkey:6379/0
       - ENVIRONMENT=development
       - DEBUG=true
       - PORT=8080
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
     networks:
       - legal-ai-network
@@ -98,13 +98,13 @@ services:
       - go_mod_cache:/go/pkg/mod
     environment:
       - DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://valkey:6379/0
       - OLLAMA_URL=http://host.docker.internal:11434
       - PORT=8094
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
     networks:
       - legal-ai-network
@@ -126,14 +126,14 @@ services:
       - go_mod_cache:/go/pkg/mod
     environment:
       - DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://valkey:6379/0
       - OLLAMA_URL=http://host.docker.internal:11434
       - CUDA_VISIBLE_DEVICES=0
       - PORT=8095
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
     networks:
       - legal-ai-network

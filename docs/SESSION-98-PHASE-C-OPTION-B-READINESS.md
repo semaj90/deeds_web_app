@@ -308,7 +308,7 @@ npm run graphify:daily:from-telemetry
 
 ```bash
 # 1. Start Redis
-docker-compose up legal-ai-redis
+docker-compose up legal-ai-valkey
 
 # 2. Create telemetry tables
 npm run db:migrate

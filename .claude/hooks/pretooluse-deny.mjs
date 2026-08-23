@@ -60,7 +60,7 @@ const RULES = [
   { tool: 'Bash', re: /\bgit\s+commit\b.*--no-verify\b/,
     reason: 'Skipping pre-commit hooks (--no-verify) is forbidden unless the operator explicitly asked. Investigate hook failures instead.' },
   { tool: 'Bash', re: /\bdocker\s+(rm|rmi|volume\s+rm|system\s+prune)\b.*-(f|-force|-volumes)/,
-    reason: 'Forced docker removal can destroy named volumes (legal-ai-redis data, postgres data). Confirm volumes are stopped + backed up first.' },
+    reason: 'Forced docker removal can destroy named volumes (legal-ai-valkey data, postgres data). Confirm volumes are stopped + backed up first.' },
   { tool: 'Bash', re: /\bredis-cli[^|]*\b(FLUSHDB|FLUSHALL|CONFIG\s+SET\s+save)\b/i,
     reason: 'Redis FLUSHDB/FLUSHALL wipes the cache including gpu:karpathy:* and ace:* keys. Run a targeted DEL pattern instead.' },
 

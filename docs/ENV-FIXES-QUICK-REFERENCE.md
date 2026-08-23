@@ -50,8 +50,8 @@ Is Phase 2.5 not working?
 ├─→ BitFrost cache not working?
 │   │
 │   └─→ REDIS ISSUE
-│       ├─→ docker logs legal-ai-redis-prod
-│       ├─→ docker restart legal-ai-redis-prod
+│       ├─→ docker logs legal-ai-valkey-prod
+│       ├─→ docker restart legal-ai-valkey-prod
 │       └─→ Check .env.local: REDIS_URL + REDIS_PASSWORD
 │
 ├─→ Tier 3 semantic search failing?
@@ -76,7 +76,7 @@ Is Phase 2.5 not working?
 
 ```bash
 # Redis
-docker exec legal-ai-redis-prod redis-cli PING
+docker exec legal-ai-valkey-prod valkey-cli PING
 
 # Qdrant
 curl -s http://127.0.0.1:6333/collections | jq .
@@ -85,7 +85,7 @@ curl -s http://127.0.0.1:6333/collections | jq .
 curl -s http://127.0.0.1:8100/health || curl -s http://127.0.0.1:8096/health
 
 # All three at once
-echo "=== Redis ===" && docker exec legal-ai-redis-prod redis-cli PING && \
+echo "=== Redis ===" && docker exec legal-ai-valkey-prod valkey-cli PING && \
 echo "=== Qdrant ===" && curl -s http://127.0.0.1:6333/health && \
 echo "=== Go Retrieval ===" && curl -s http://127.0.0.1:8100/health
 ```
@@ -95,7 +95,7 @@ echo "=== Go Retrieval ===" && curl -s http://127.0.0.1:8100/health
 ## Restart All Services (if needed)
 
 ```bash
-docker restart legal-ai-redis-prod legal-ai-qdrant go-retrieval-service
+docker restart legal-ai-valkey-prod legal-ai-qdrant go-retrieval-service
 
 # Wait for startup
 sleep 5
@@ -113,9 +113,9 @@ docker ps | grep -E "redis|qdrant|go-retrieval" | grep -c "Up"
 ```
 ❌ Problem: Redis is down or misconfigured
 ✅ Fix:
-   1. docker restart legal-ai-redis-prod
+   1. docker restart legal-ai-valkey-prod
    2. Verify .env.local: REDIS_URL + REDIS_PASSWORD
-   3. Test: docker exec legal-ai-redis-prod redis-cli PING
+   3. Test: docker exec legal-ai-valkey-prod valkey-cli PING
 ```
 
 ### "Go Retrieval service unreachable"
@@ -220,7 +220,7 @@ curl -X POST http://localhost:5173/api/atlas/gan-audit/deep \
 
 2. **Check Logs**:
    ```bash
-   docker logs legal-ai-redis-prod --tail=50
+   docker logs legal-ai-valkey-prod --tail=50
    docker logs legal-ai-qdrant --tail=50
    docker logs go-retrieval-service --tail=50
    ```

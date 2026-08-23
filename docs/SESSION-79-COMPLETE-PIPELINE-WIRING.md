@@ -482,7 +482,7 @@ curl -s http://127.0.0.1:8090/slots | jq '.[] | {model, n_ctx}'
 # Check Valkey is running (it's the Redis drop-in replacement)
 docker ps | grep valkey
 
-# Should show: legal-ai-valkey (or legal-ai-redis-prod)
+# Should show: legal-ai-valkey (or legal-ai-valkey-prod)
 ```
 
 ### Alignment Points
@@ -514,11 +514,11 @@ docker ps | grep valkey
 # No code changes needed — ioredis works unchanged
 
 # Test connection
-docker exec legal-ai-valkey redis-cli PING
+docker exec legal-ai-valkey valkey-cli PING
 # Expected: PONG
 
 # Check memory usage
-docker exec legal-ai-valkey redis-cli INFO memory
+docker exec legal-ai-valkey valkey-cli INFO memory
 # Expected: used_memory_human (should be <500MB for caches)
 ```
 

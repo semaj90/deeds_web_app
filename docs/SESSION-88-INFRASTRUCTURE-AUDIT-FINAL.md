@@ -47,7 +47,7 @@ The deeds-web-app repository is **operationally sound** across 5 critical infras
 
 **Fixes Applied:**
 - Fixed PowerShell hashtable syntax errors (3 instances)
-- Updated container names (legal-ai-redis → legal-ai-valkey)
+- Updated container names (legal-ai-valkey → legal-ai-valkey)
 - Added password auth for Valkey (-a redis flag)
 
 ### 2. Phase 85 Unified Reindex Audit ✅ READY

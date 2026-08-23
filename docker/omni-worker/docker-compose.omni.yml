@@ -18,7 +18,7 @@ services:
       CUDA_VISIBLE_DEVICES: "0"
       # Inherit DB + Redis + RabbitMQ from .env
       DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL:-redis://legal-ai-redis:6379}
+      REDIS_URL: ${REDIS_URL:-redis://legal-ai-valkey:6379}
       RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@legal-ai-rabbitmq:5672}
       OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
       LLAMA_URL: ${LLAMA_URL:-http://host.docker.internal:8090}

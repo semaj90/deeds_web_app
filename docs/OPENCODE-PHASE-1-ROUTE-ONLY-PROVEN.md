@@ -67,7 +67,7 @@ curl -X POST http://localhost:5173/api/opencode-dispatch \
 
 **Valkey verification**:
 ```bash
-docker exec legal-ai-valkey redis-cli -a redis GET telemetry:opencode:dispatch:anon-1783392272656:1783392274101
+docker exec legal-ai-valkey valkey-cli -a redis GET telemetry:opencode:dispatch:anon-1783392272656:1783392274101
 
 {
   "timestamp": "2026-07-07T02:22:05.444Z",

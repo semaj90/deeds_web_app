@@ -146,10 +146,10 @@ cat .tmp/ace-mcp-telemetry-join-test.json
 
 ```bash
 # List all retrieval traces
-docker exec legal-ai-redis redis-cli KEYS 'retrieval:trace:*'
+docker exec legal-ai-valkey valkey-cli KEYS 'retrieval:trace:*'
 
 # Inspect a trace
-docker exec legal-ai-redis redis-cli GET 'retrieval:trace:trace-XXXXXXXXX' | jq
+docker exec legal-ai-valkey valkey-cli GET 'retrieval:trace:trace-XXXXXXXXX' | jq
 
 # Expected fields:
 #   trace_id, event_count, total_results, cache_hit_rate, avg_rerank_score, token_estimate, latency_ms
@@ -300,9 +300,9 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
 
 **Check Redis**:
 ```bash
-docker exec legal-ai-redis redis-cli PING  # Should return PONG
+docker exec legal-ai-valkey valkey-cli PING  # Should return PONG
 
-docker exec legal-ai-redis redis-cli KEYS 'retrieval:*' | head -10
+docker exec legal-ai-valkey valkey-cli KEYS 'retrieval:*' | head -10
 # If empty: telemetry wasn't written
 ```
 
@@ -383,7 +383,7 @@ npm run gemma4:batch:summarize-packets:apply
 npm run test:ace-mcp-telemetry-join
 
 # 6. Check telemetry in Redis
-docker exec legal-ai-redis redis-cli KEYS 'retrieval:trace:*'
+docker exec legal-ai-valkey valkey-cli KEYS 'retrieval:trace:*'
 
 # 7. View test report
 cat .tmp/ace-mcp-telemetry-join-test.json | jq

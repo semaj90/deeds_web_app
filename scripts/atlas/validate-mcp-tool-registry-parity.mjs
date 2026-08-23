@@ -32,12 +32,7 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const JSON_ONLY = process.argv.includes('--json');
 
 const TARGET_FILES = [
-  {
-    id: 'lib-server-mcp',
-    relPath: 'sveltekit-frontend/src/lib/server/mcp/server.ts',
-    shape: 'array-literal + if-chain',
-  },
-  {
+{
     id: 'mcp-server',
     relPath: 'sveltekit-frontend/src/mcp/server.ts',
     shape: 'array-literal + switch',

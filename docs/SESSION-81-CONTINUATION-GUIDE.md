@@ -101,7 +101,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db \
 ```bash
 npm run atlas:p4:karpathy:apply
 # Verify blend computation completed
-docker exec legal-ai-redis redis-cli HLEN atlas:karpathy:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:karpathy:som:scores
 # Expected: 400 entries
 ```
 
@@ -159,9 +159,9 @@ atlas_som_cell_karpathy_scores  | 400 | 400
 
 ### Redis Cache
 ```bash
-docker exec legal-ai-redis redis-cli HLEN atlas:pagerank:som:scores
-docker exec legal-ai-redis redis-cli HLEN atlas:attention:som:scores
-docker exec legal-ai-redis redis-cli HLEN atlas:karpathy:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:pagerank:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:attention:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:karpathy:som:scores
 # Expected: 400, 400, 400 (all present and cached)
 ```
 
@@ -296,7 +296,7 @@ pwsh ./scripts/atlas/Index-DatabaseWithSummaries.ps1 -BatchSize 20 -MaxWorkers 4
 # Verify data state
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db \
   "SELECT COUNT(DISTINCT pagerank_score) FROM atlas_som_cell_scores;"
-docker exec legal-ai-redis redis-cli HLEN atlas:karpathy:som:scores
+docker exec legal-ai-valkey valkey-cli HLEN atlas:karpathy:som:scores
 ```
 
 ---

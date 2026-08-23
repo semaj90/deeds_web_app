@@ -170,7 +170,7 @@ EXPECTED TESTS:
 
 ROLLBACK:
 - git reset --hard origin/main
-- docker exec legal-ai-valkey redis-cli FLUSHDB (only if cache corrupted)
+- docker exec legal-ai-valkey valkey-cli FLUSHDB (only if cache corrupted)
 
 TELEMETRY SIGNAL:
 - Query: GET /api/telemetry/implementation-clusters?tool_name=identity:recover

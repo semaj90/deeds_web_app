@@ -12,7 +12,7 @@
 - [ ] Dev server running: `npm run dev` (check logs for "Boot" complete)
 - [ ] llama-server @ :8090 running: `curl http://127.0.0.1:8090/slots | jq '.[] | .n_ctx'` → should be `65536`
 - [ ] MCP @ :8788 up: `curl http://127.0.0.1:8788/tools/list | jq '.tools | length'` → should be `42+`
-- [ ] Redis available: `docker exec legal-ai-valkey redis-cli -a redis PING` → `PONG`
+- [ ] Redis available: `docker exec legal-ai-valkey valkey-cli -a redis PING` → `PONG`
 - [ ] Qdrant available: `curl http://127.0.0.1:6333/collections | jq '.result | length'` → `40+`
 
 ---
@@ -167,7 +167,7 @@ npm run test -- opencode-dispatch
      -d '{"intent":"search for auth implementation"}' | jq .
 
    # Check Redis keys were written
-   docker exec legal-ai-valkey redis-cli -a redis KEYS "telemetry:*"
+   docker exec legal-ai-valkey valkey-cli -a redis KEYS "telemetry:*"
    # Expected: at least 2 keys (stats + events)
 
    # Check telemetry endpoint sees data
@@ -203,7 +203,7 @@ npm run test -- opencode-dispatch
 |---------|-----------|-----|
 | `POST /api/opencode-dispatch` returns 404 | Route not created or misspelled | Check file path: `src/routes/api/opencode-dispatch/+server.ts` |
 | Cannot import dispatch-router | Module path wrong | Import as: `import { routeIntentToTool } from '$lib/server/opencode/dispatch-router'` |
-| Redis connection fails | Valkey not running or password wrong | `docker exec legal-ai-valkey redis-cli -a redis PING` |
+| Redis connection fails | Valkey not running or password wrong | `docker exec legal-ai-valkey valkey-cli -a redis PING` |
 | Tool execution times out | AbortSignal timeout too short | Increase from 10s to 15s in dispatch-router |
 | Telemetry keys not written | Redis call failed silently | Check getRedis() initialization, add error logging |
 | Tests fail | Type mismatch or mocked Redis not working | Use redis-mock in test, verify DispatchResponse shape |
@@ -282,7 +282,7 @@ Run this to confirm all services are up:
 for service in postgres redis qdrant ollama llama-server mcp; do
   case $service in
     postgres) docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT 1" > /dev/null && echo "✅ $service" || echo "❌ $service" ;;
-    redis) docker exec legal-ai-valkey redis-cli -a redis PING > /dev/null && echo "✅ $service" || echo "❌ $service" ;;
+    redis) docker exec legal-ai-valkey valkey-cli -a redis PING > /dev/null && echo "✅ $service" || echo "❌ $service" ;;
     qdrant) curl -s http://127.0.0.1:6333/ > /dev/null && echo "✅ $service" || echo "❌ $service" ;;
     ollama) curl -s http://127.0.0.1:11434/ > /dev/null && echo "✅ $service" || echo "❌ $service" ;;
     llama-server) curl -s http://127.0.0.1:8090/slots > /dev/null && echo "✅ $service" || echo "❌ $service" ;;

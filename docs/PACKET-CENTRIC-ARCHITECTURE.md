@@ -125,7 +125,7 @@ await db.update(atlas_packet_registry)
 ```bash
 curl http://127.0.0.1:6333/...
 curl http://127.0.0.1:7474/...
-docker exec legal-ai-valkey redis-cli keys "bifrost:*"
+docker exec legal-ai-valkey valkey-cli keys "bifrost:*"
 ```
 
 **After** (single query):

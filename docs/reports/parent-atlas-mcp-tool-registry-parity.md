@@ -2,17 +2,14 @@
 
 Method: TypeScript compiler API AST parse of each target file. Not regex-based. Identifier-based dispatch conditions (e.g. name === SOME_CONST.name) resolved one import-hop where possible; unresolved ones are reported explicitly, not guessed.
 
-## sveltekit-frontend/src/lib/server/mcp/server.ts (array-literal + if-chain)
-- **FILE_NOT_FOUND**
-
 ## sveltekit-frontend/src/mcp/server.ts (array-literal + switch)
 
 | Metric | Count |
 |---|---|
-| arrayLiteralToolsListed | 84 |
-| uniqueListedNames | 84 |
+| arrayLiteralToolsListed | 85 |
+| uniqueListedNames | 85 |
 | switchCaseDispatch | 89 |
-| ifChainDispatch | 17 |
+| ifChainDispatch | 18 |
 | registerToolCalls | 0 |
 | uniqueRegisterToolNames | 0 |
 

@@ -17,7 +17,7 @@ Before running Phase 12 scripts, verify:
 
 ```bash
 # 1. Backend services running
-docker ps | grep -E "legal-ai-postgres|legal-ai-qdrant|legal-ai-redis"
+docker ps | grep -E "legal-ai-postgres|legal-ai-qdrant|legal-ai-valkey"
 # Expected: 3 containers UP
 
 # 2. Postgres has packet data

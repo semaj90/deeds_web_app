@@ -221,10 +221,10 @@ async function analyzeRetrievalCoverage(auditResult, goSearchBridge, db) {
 ```bash
 # From Windows PowerShell
 docker ps | grep redis
-# Expected: legal-ai-redis-prod running on 127.0.0.1:6379
+# Expected: legal-ai-valkey-prod running on 127.0.0.1:6379
 
 # Test connection
-docker exec legal-ai-redis-prod redis-cli PING
+docker exec legal-ai-valkey-prod valkey-cli PING
 # Expected: PONG
 
 # Verify password in .env.local
@@ -277,16 +277,16 @@ cat .env.local | grep -i retrieval
 **Recovery**:
 ```bash
 # Check Redis status
-docker logs legal-ai-redis-prod | tail -20
+docker logs legal-ai-valkey-prod | tail -20
 
 # Restart Redis
-docker restart legal-ai-redis-prod
+docker restart legal-ai-valkey-prod
 
 # Clear stale connections
-docker exec legal-ai-redis-prod redis-cli FLUSHDB
+docker exec legal-ai-valkey-prod valkey-cli FLUSHDB
 
 # Verify
-docker exec legal-ai-redis-prod redis-cli PING
+docker exec legal-ai-valkey-prod valkey-cli PING
 ```
 
 **Code path**:

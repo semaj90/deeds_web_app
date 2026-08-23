@@ -215,7 +215,7 @@ Full reference: `docs/SESSION-120-ENV-AND-INFRASTRUCTURE-REFERENCE.md`
 - [ ] Dev server running: `npm run dev` (logs show "Boot" complete)
 - [ ] llama-server @ :8090: `curl http://127.0.0.1:8090/slots | jq '.[] | .n_ctx'` → 65536
 - [ ] MCP @ :8788: `curl http://127.0.0.1:8788/tools/list | jq '.tools | length'` → 42+
-- [ ] Redis: `docker exec legal-ai-valkey redis-cli -a redis PING` → PONG
+- [ ] Redis: `docker exec legal-ai-valkey valkey-cli -a redis PING` → PONG
 - [ ] Qdrant: `curl http://127.0.0.1:6333/collections | jq '.result | length'` → 40+
 - [ ] All green? **Start Phase 1 task checklist**: `docs/SESSION-120-PHASE-1-CHECKLIST.md`
 
