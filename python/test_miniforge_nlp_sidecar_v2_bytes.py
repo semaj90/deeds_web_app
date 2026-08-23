@@ -7,6 +7,35 @@ from types import SimpleNamespace
 import miniforge_nlp_sidecar_v2 as sidecar_v2
 
 
+def test_line_span_fallback_returns_utf8_byte_offsets():
+    source = 'const alpha = "λ";\r\nconst beta = "漢字";\r\n'
+
+    start, end = sidecar_v2._line_span_to_utf8_byte_offsets(source, 2, 2)
+
+    assert source.encode('utf-8')[start:end] == 'const beta = "漢字";\r\n'.encode('utf-8')
+
+
+def test_structural_symbol_name_excludes_quoted_module_literals():
+    assert sidecar_v2._structural_symbol_name("'svelte-sonner'") is None
+    assert sidecar_v2._structural_symbol_name('<anonymous>') is None
+    assert sidecar_v2._structural_symbol_name('{ maxTokens = 256 }') is None
+    assert sidecar_v2._structural_symbol_name('ImportMeta') == 'ImportMeta'
+
+
+def test_lf_normalized_chunk_span_maps_back_to_crlf_source():
+    source = 'a\r\nb\r\nc\r\ninterface ImportMeta {}\r\n'
+    normalized_map = sidecar_v2._normalized_lf_to_source_byte_offsets(source)
+    start, end = sidecar_v2._repair_raw_chunk_byte_span(
+        source,
+        6,
+        26,
+        'ImportMeta',
+        normalized_map,
+    )
+
+    assert source.encode('utf-8')[start:end].startswith(b'interface ImportMeta')
+
+
 def test_raw_chunk_file_preserves_exact_utf8_bytes(monkeypatch):
     source = 'const alpha = "λ";\r\nconst beta = "漢字";\r\n'
     expected = source.encode('utf-8')
