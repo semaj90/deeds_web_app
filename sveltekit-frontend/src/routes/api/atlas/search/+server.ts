@@ -46,6 +46,8 @@ import { z }       from 'zod';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
@@ -700,9 +702,8 @@ async function crossEncoderRerank(
   candidates: AtlasPacket[],
   topK: number,
 ): Promise<AtlasPacket[]> {
-  const llamaBase = process.env.LLAMA_BASE_URL ?? process.env.LLAMA_URL ?? 'http://127.0.0.1:8090';
-
   try {
+    const llamaSession = await getLlamaSessionDescriptor();
     // Score each candidate as a query-document pair via Gemma4 chat completion
     // We use a lightweight scoring prompt; stream: true required for Gemma4
     const scored: Array<{ packet: AtlasPacket; ce_score: number }> = [];
@@ -719,24 +720,14 @@ async function crossEncoderRerank(
       ].filter(Boolean).join(' | ');
 
       try {
-        const res = await fetch(`${llamaBase}/v1/chat/completions`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
-            model:       'gemma4-legal-iq4xs-direct.gguf',
-            messages: [
-              { role: 'system', content: 'Rate relevance 0-10. Reply with only a number.' },
-              { role: 'user',   content: `Query: ${query.slice(0, 300)}\nDocument: ${doc}` },
-            ],
-            max_tokens:  4,
-            temperature: 0,
-            stream:      false,
-          }),
-          signal: AbortSignal.timeout(8_000),
-        });
-        if (!res.ok) { scored.push({ packet, ce_score: 0.5 }); return; }
-        const d = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-        const raw = d.choices?.[0]?.message?.content?.trim() ?? '';
+        const raw = (await bifrostChat(
+          [
+            { role: 'system', content: 'Rate relevance 0-10. Reply with only a number.' },
+            { role: 'user',   content: `Query: ${query.slice(0, 300)}\nDocument: ${doc}` },
+          ],
+          llamaSession.modelId,
+          { maxTokens: 4, temperature: 0, timeoutMs: 8_000 }
+        )).trim();
         const num = parseFloat(raw);
         scored.push({ packet, ce_score: isFinite(num) ? num / 10 : 0.5 });
       } catch {

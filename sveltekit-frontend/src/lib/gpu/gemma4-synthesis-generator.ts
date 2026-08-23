@@ -252,7 +252,7 @@ async function callOllamaSynthesis(
           ],
           max_tokens: maxTokens,
           temperature,
-          stream: false,
+          stream: true,
           cache_prompt: true
         }),
         signal: AbortSignal.timeout(60_000)
@@ -262,8 +262,7 @@ async function callOllamaSynthesis(
         throw new Error(`llama-server HTTP ${response.status}`);
       }
 
-      const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      const answerText = data.choices?.[0]?.message?.content?.trim() || '';
+      const answerText = (await parseStreamingResponse(response)).trim();
 
       return parseAndCiteSynthesis(answerText);
     } catch (err) {

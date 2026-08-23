@@ -17,6 +17,8 @@ import { readFileSync, existsSync } from 'fs';
 import { createHash }               from 'crypto';
 import path                         from 'path';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 import type { DiagnosticEntry, RepairPlan } from '../graph/graph-schema.js';
 
 const ROOT         = path.resolve(process.cwd());
@@ -131,27 +133,16 @@ Respond ONLY with a JSON code block matching this schema:
 \`\`\``;
 
 async function callGemma4(userPrompt: string): Promise<{ text: string; pt: number; ct: number }> {
-  const res = await fetch(`${TURBO_BASE}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model:       'gemma4-rotorquant:latest',
-      messages:    [{ role: 'system', content: SYSTEM }, { role: 'user', content: userPrompt }],
-      max_tokens:  1024,
-      temperature: 0.2,
-      stream:      false,
-    }),
-    signal: AbortSignal.timeout(90_000),
-  });
-  if (!res.ok) throw new Error(`Gemma4 HTTP ${res.status}`);
-  const d = await res.json() as {
-    choices: Array<{ message: { content: string } }>;
-    usage?: { prompt_tokens: number; completion_tokens: number };
-  };
+  const llamaSession = await getLlamaSessionDescriptor();
+  const result = await bifrostChat(
+    [{ role: 'system', content: SYSTEM }, { role: 'user', content: userPrompt }],
+    llamaSession.modelId,
+    { maxTokens: 1024, temperature: 0.2, timeoutMs: 90_000, includeMetadata: true }
+  );
   return {
-    text: d.choices?.[0]?.message?.content ?? '',
-    pt:   d.usage?.prompt_tokens    ?? 0,
-    ct:   d.usage?.completion_tokens ?? 0,
+    text: result.content,
+    pt:   result.usage?.promptTokens    ?? 0,
+    ct:   result.usage?.completionTokens ?? 0,
   };
 }
 

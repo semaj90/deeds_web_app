@@ -2,7 +2,8 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
 
 const schema = z.object({
 	query:      z.string().min(1).max(2000),
@@ -16,7 +17,6 @@ const QDRANT_URL      = ENV.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION      = 'codebase_chunks_768';
 const EMBED_URL       = `${ENV.OLLAMA_BASE_URL}/api/embed`;
 const EMBED_MODEL     = 'embeddinggemma:latest';
-const ROTORQUANT_URL  = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
 
 async function embed(text: string): Promise<number[]> {
 	const res = await fetch(EMBED_URL, {
@@ -69,22 +69,15 @@ function buildFilter(tags: string[], clusters: number[]): Record<string, unknown
 
 async function rewriteQueries(query: string): Promise<string[]> {
 	try {
-		const res = await fetch(`${ROTORQUANT_URL}/v1/chat/completions`, {
-			method:  'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body:    JSON.stringify({
-				model:      LLM_MODEL_ID,
-				max_tokens: 800,
-				messages: [{
-					role:    'user',
-					content: `Rewrite this code search query into 3 distinct variants for better retrieval. Return ONLY a JSON array of strings, no explanation.\n\nQuery: "${query}"`,
-				}],
-			}),
-			signal: AbortSignal.timeout(15_000),
-		});
-		if (!res.ok) return [query];
-		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-		const content = data.choices?.[0]?.message?.content ?? '';
+		const llamaSession = await getLlamaSessionDescriptor();
+		const content = await bifrostChat(
+			[{
+				role:    'user',
+				content: `Rewrite this code search query into 3 distinct variants for better retrieval. Return ONLY a JSON array of strings, no explanation.\n\nQuery: "${query}"`,
+			}],
+			llamaSession.modelId,
+			{ maxTokens: 800, timeoutMs: 15_000 }
+		);
 		const match = content.match(/\[[\s\S]*?\]/);
 		if (match) {
 			const variants = JSON.parse(match[0]) as string[];
