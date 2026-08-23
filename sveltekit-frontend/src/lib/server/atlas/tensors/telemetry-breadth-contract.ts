@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
-import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
+const SEMANTIC_REPRESENTATION_ID = 'semantic_768' as const;
 
 export const TELEMETRY_BREADTH_SCHEMA_VERSION = 'atlas.telemetry-breadth.v1' as const;
 
