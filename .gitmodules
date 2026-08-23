@@ -1,0 +1,23 @@
+[submodule "claude-mem"]
+	path = claude-mem
+	url = https://github.com/thedotmack/claude-mem.git
+
+[submodule "granite-docling-258M"]
+	path = granite-docling-258M
+	url = https://huggingface.co/ibm-granite/granite-docling-258M
+
+[submodule "mcp-server-mcp"]
+	path = mcp-server-mcp
+	url = https://github.com/sveltejs/mcp.git
+
+[submodule "models/embeddinggemma_300m"]
+	path = models/embeddinggemma_300m
+	url = https://huggingface.co/google/embeddinggemma-300m
+
+[submodule "sites/parent-atlas-gateboard"]
+	path = sites/parent-atlas-gateboard
+	url = https://git.chatgpt-team.site/9f9711ec-1dba-409f-a183-cc43488a0711/appgprj_6a78f2fe1db881918bf69e0c197b6909.git
+
+[submodule "turbovec"]
+	path = turbovec
+	url = https://github.com/RyanCodrai/turbovec.git
