@@ -18,6 +18,7 @@ entrypoint a one-line container change while the contracts are being proven.
 from __future__ import annotations
 
 import os
+import re
 import tempfile
 import time
 from pathlib import Path
@@ -168,6 +169,34 @@ def _structural_symbol_name(value: Any) -> str | None:
     if name[0] in {"{", "["}:
         return None
     return name
+
+
+# treesitter-chunker's own `kind` field for a `variable_declarator`/similar
+# declarator node is a generic "fragment" label -- it does not inspect the
+# initializer, so `const handleError = (...) => {...}` and
+# `const handleError = 5` both report the same raw kind. This mirrors the
+# semantic check the challenger AST provider (node-tree-sitter-challenger)
+# already performs by inspecting the declarator's value node, without
+# requiring a second full tree-sitter parse: it inspects the declarator's own
+# already-known byte span text for a function-valued initializer.
+_FUNCTION_INITIALIZER_RE = re.compile(
+    r"=\s*(?:export\s+)?(?:async\s+)?(?:function\b|\([^()]*\)\s*(?::[^={]+)?\s*=>|[A-Za-z_$][\w$]*\s*=>)"
+)
+_DECLARATOR_NODE_TYPES = frozenset({"variable_declarator", "lexical_declaration", "variable_declaration"})
+
+
+def _declarator_kind_override(node_type: str, span_text: str) -> str | None:
+    """Return 'function_declarator' when a declarator's initializer is a
+    function/arrow-function, so `_structural_kind()`'s substring match on
+    'function' classifies it correctly. Returns None (no override) for
+    anything that isn't a declarator node or doesn't match the pattern --
+    never downgrades an already-specific node_type."""
+
+    if node_type not in _DECLARATOR_NODE_TYPES:
+        return None
+    if _FUNCTION_INITIALIZER_RE.search(span_text):
+        return "function_declarator"
+    return None
 
 
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
@@ -456,6 +485,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         start_row, start_column = legacy._offset_line_column(req.source, start)
         end_row, end_column = legacy._offset_line_column(req.source, end)
         node_type = str(normalized.get("node_type") or "fragment")
+        span_text = req.source.encode("utf-8")[start:end].decode("utf-8", errors="ignore")
+        kind_node_type = _declarator_kind_override(node_type, span_text) or node_type
 
         evidence_chunks.append(
             AstEvidenceChunkV2(
@@ -464,7 +495,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 upstream_file_id=normalized.get("upstream_file_id"),
                 upstream_symbol_id=normalized.get("upstream_symbol_id"),
                 node_type=node_type,
-                kind=legacy._structural_kind(node_type),
+                kind=legacy._structural_kind(kind_node_type),
                 name=_structural_symbol_name(normalized.get("name")),
                 parent_route=list(normalized.get("parent_route") or []),
                 parent_context=normalized.get("parent_context"),

@@ -1,14 +1,14 @@
 {
   "schema": "atlas.node-tree-sitter-corpus-parity.v2",
-  "generatedAt": "2026-08-23T22:07:20.851Z",
+  "generatedAt": "2026-08-23T23:35:32.896Z",
   "mode": "READ_ONLY_NO_PERSISTENCE",
   "status": "CORPUS_PARITY_MISMATCH",
   "git": {
-    "head": "350f302a999361414227557aac63ae1deaf7a4d1",
+    "head": "0952b72dfce405b8ae15e827fd1336f802339fee",
     "providerPath": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
     "providerBlobSha": "29f1081eda063f45044690ea8ce05caac3356e73",
     "sidecarPath": "python/miniforge_nlp_sidecar_v2.py",
-    "sidecarBlobSha": "b2a596fed2603690f44cd4e2515b61a60fa94a00",
+    "sidecarBlobSha": "666b15c63aa2cdafe942928a71de01a46c9fdbdc",
     "comparatorPath": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-parity-comparator-v2.ts",
     "comparatorBlobSha": "3e63746e2aedff7f8837cf3a72b8231827a19039"
   },
@@ -24,14 +24,13 @@
     "nodeSpanSelfValid": "66/66",
     "sidecarSpanSelfValid": "66/66",
     "namedSymbolCoverage": "45/66",
-    "semanticKindParity": "42/66",
+    "semanticKindParity": "45/66",
     "exactSpanParity": "45/66",
-    "fullParity": "42/66"
+    "fullParity": "45/66"
   },
   "mismatchCounts": {
     "NAMED_SYMBOL_MISSING_LEFT": 12,
-    "NAMED_SYMBOL_MISSING_RIGHT": 60,
-    "SEMANTIC_KIND_MISMATCH": 7
+    "NAMED_SYMBOL_MISSING_RIGHT": 60
   },
   "interpretation": {
     "fragmentIsNotVariable": true,
@@ -3877,8 +3876,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "handleError",
               "startByte": 1663,
               "endByte": 2162,
@@ -3891,13 +3890,11 @@
               "parentContext": "export_statement"
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "observer",
@@ -4165,7 +4162,6 @@
           }
         ],
         "mismatchCounts": {
-          "SEMANTIC_KIND_MISMATCH": 1,
           "NAMED_SYMBOL_MISSING_RIGHT": 2
         },
         "gates": {
@@ -6335,8 +6331,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "handle",
               "startByte": 26860,
               "endByte": 39680,
@@ -6349,13 +6345,11 @@
               "parentContext": "export_statement"
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "handleError",
@@ -6381,8 +6375,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "handleError",
               "startByte": 39721,
               "endByte": 40554,
@@ -6395,13 +6389,11 @@
               "parentContext": "export_statement"
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "hardTimer",
@@ -8199,8 +8191,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "shutdown",
               "startByte": 40770,
               "endByte": 42457,
@@ -8212,13 +8204,11 @@
               "parentContext": ""
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "SHUTDOWN_TIMEOUT",
@@ -8982,7 +8972,6 @@
           }
         ],
         "mismatchCounts": {
-          "SEMANTIC_KIND_MISMATCH": 3,
           "NAMED_SYMBOL_MISSING_RIGHT": 8
         },
         "gates": {
@@ -9062,8 +9051,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "checksum",
               "startByte": 113,
               "endByte": 158,
@@ -9075,13 +9064,11 @@
               "parentContext": ""
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "phase",
@@ -9234,14 +9221,12 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "SEMANTIC_KIND_MISMATCH": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
           "namedSymbolCoverage": true,
-          "semanticKindParity": false,
+          "semanticKindParity": true,
           "exactSpanParity": true
         }
       },
@@ -9251,10 +9236,10 @@
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
         "namedSymbolCoverage": true,
-        "semanticKindParity": false,
+        "semanticKindParity": true,
         "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/agent/bounded-tool-caller.ts",
@@ -69872,8 +69857,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "randomUUID",
               "startByte": 264,
               "endByte": 302,
@@ -69885,13 +69870,11 @@
               "parentContext": ""
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "request",
@@ -71502,14 +71485,12 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "SEMANTIC_KIND_MISMATCH": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
           "namedSymbolCoverage": true,
-          "semanticKindParity": false,
+          "semanticKindParity": true,
           "exactSpanParity": true
         }
       },
@@ -71519,10 +71500,10 @@
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
         "namedSymbolCoverage": true,
-        "semanticKindParity": false,
+        "semanticKindParity": true,
         "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/client/search/ace-client.ts",
@@ -74442,8 +74423,8 @@
               "schema": "atlas.structural-observation.v1",
               "provider": "treesitter-chunker-8095",
               "rawNodeType": "variable_declarator",
-              "rawKind": "fragment",
-              "symbolKind": "VARIABLE",
+              "rawKind": "function",
+              "symbolKind": "FUNCTION",
               "name": "handler",
               "startByte": 3230,
               "endByte": 3250,
@@ -74457,13 +74438,11 @@
               "parentContext": "function_declaration"
             },
             "semanticKindComparable": true,
-            "semanticKindMatch": false,
+            "semanticKindMatch": true,
             "exactSpanMatch": true,
             "startByteDelta": 0,
             "endByteDelta": 0,
-            "mismatchClasses": [
-              "SEMANTIC_KIND_MISMATCH"
-            ]
+            "mismatchClasses": []
           },
           {
             "name": "installingWorker",
@@ -74784,14 +74763,12 @@
             "mismatchClasses": []
           }
         ],
-        "mismatchCounts": {
-          "SEMANTIC_KIND_MISMATCH": 1
-        },
+        "mismatchCounts": {},
         "gates": {
           "leftSpanSelfValid": true,
           "rightSpanSelfValid": true,
           "namedSymbolCoverage": true,
-          "semanticKindParity": false,
+          "semanticKindParity": true,
           "exactSpanParity": true
         }
       },
@@ -74801,10 +74778,10 @@
         "nodeSpanSelfValid": true,
         "sidecarSpanSelfValid": true,
         "namedSymbolCoverage": true,
-        "semanticKindParity": false,
+        "semanticKindParity": true,
         "exactSpanParity": true
       },
-      "fullParity": false
+      "fullParity": true
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/client/timeline-client.ts",
