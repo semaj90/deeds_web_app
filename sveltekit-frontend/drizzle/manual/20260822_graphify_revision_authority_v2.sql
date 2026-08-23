@@ -1,6 +1,11 @@
 -- Parent Atlas Graphify revision-authority v2 extension.
--- Manual / intentionally unapplied migration.
--- Additive only: no destructive DDL and no historical data mutation.
+-- Manual migration. Additive only: no destructive DDL and no historical data mutation.
+-- APPLIED 2026-08-23 against the live legal-ai-postgres container (docker exec psql -f).
+-- graphify_runs/graphify_files now exist with this schema; both tables have 0 rows —
+-- schema presence alone does not mean the producer scripts that read from them (e.g.
+-- sveltekit-frontend/scripts/atlas/export-frozen-semantic-v2-source.mts) have real data
+-- to work with. Populating these tables requires a real Graphify ingestion run, not
+-- part of this migration.
 
 BEGIN;
 

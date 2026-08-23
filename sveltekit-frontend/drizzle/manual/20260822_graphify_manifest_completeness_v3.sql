@@ -1,6 +1,7 @@
 -- Parent Atlas Graphify full-manifest completeness extension.
--- Manual / intentionally unapplied.
--- Additive only: no DROP / UPDATE / DELETE / TRUNCATE / backfill.
+-- Manual migration. Additive only: no DROP / UPDATE / DELETE / TRUNCATE / backfill.
+-- APPLIED 2026-08-23 against the live legal-ai-postgres container, immediately after
+-- 20260822_graphify_revision_authority_v2.sql (see that file's header for status).
 
 BEGIN;
 
