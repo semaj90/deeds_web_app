@@ -1,10 +1,11 @@
 {
   "schema": "atlas.embeddinggemma.mrl.runtime.proof.v1",
-  "generatedAt": "2026-08-21T02:31:16.720Z",
-  "executor": "llama.cpp",
-  "endpoint": "http://127.0.0.1:8081/v1/embeddings",
+  "generatedAt": "2026-08-23T08:10:10.554Z",
+  "provider": "ollama",
+  "executor": "ollama",
+  "endpoint": "http://127.0.0.1:11434/api/embed",
   "sourceRepresentationId": "semantic_768",
-  "modelId": "google/embeddinggemma-300m",
+  "modelId": "embeddinggemma:latest",
   "projectionMethod": "MRL_PREFIX_TRUNCATE_L2",
   "dimensions": [
     768,
@@ -20,9 +21,9 @@
       "dimension": 768,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000009,
+      "l2Norm": 0.9999999999999999,
       "normalized": true,
-      "vectorDigest": "8b59206f715d344696bdd40dce465926d5d148a6727a2365a762fe1f138ad4b7"
+      "vectorDigest": "4cc34f3057c8fb3893b268cadafe3514b1d86738869792f429e5a83ce73464fa"
     },
     {
       "representationId": "semantic_mrl_512",
@@ -30,9 +31,9 @@
       "dimension": 512,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000002,
+      "l2Norm": 1.0000000000000004,
       "normalized": true,
-      "vectorDigest": "d5122cc334cc30e44d606813ffc89af81e266c5346a3ed9597a74a5c7afbab6d"
+      "vectorDigest": "a399217fcccae69a9a70cacc4ae6501765f46b968db075d9015e361944c59e88"
     },
     {
       "representationId": "semantic_mrl_256",
@@ -42,7 +43,7 @@
       "finite": true,
       "l2Norm": 1.0000000000000002,
       "normalized": true,
-      "vectorDigest": "8ee5a1e02e177337ed91475c3d2cc978d0212afcabc6d532fbde2bf62b9c6241"
+      "vectorDigest": "9622ad2481c742f60b1a5a4cc830600d7115cd81d6c9ae47894ab00bc2d73aef"
     },
     {
       "representationId": "semantic_mrl_128",
@@ -50,9 +51,9 @@
       "dimension": 128,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000002,
+      "l2Norm": 1,
       "normalized": true,
-      "vectorDigest": "15eb782cc3cfda8cb784ccf7265f0f4895f0450157c6669e22d0197a4dac8cb0"
+      "vectorDigest": "5295b12db2afbf624e9d2de138cc53ab9ac599f666460ef4b678f1fd3a3a7633"
     }
   ],
   "writes": {
@@ -61,7 +62,7 @@
     "valkey": false,
     "embeddingArtifacts": false
   },
-  "nativeNorm": 1.0000000295687823,
-  "nativeDigest": "8d44b7b06594912da50d8d07f5f2ce365eac769fef226777d46aa9a09854ff4b",
+  "nativeNorm": 0.9999997852223809,
+  "nativeDigest": "26c03d742b0acebb16433ee96315868658603d846cd3ba22724e348180582a99",
   "status": "PROVEN"
 }
