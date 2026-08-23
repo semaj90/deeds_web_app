@@ -153,7 +153,18 @@ function firstDeclaredName(node: SyntaxNodeLike): string | null {
   return null;
 }
 
-function chunkForNode(node: SyntaxNodeLike, kind: string): AtlasStructuralEvidenceChunk {
+/**
+ * The installed Node binding exposes startIndex/endIndex in JavaScript string
+ * offsets for this runtime. Atlas structural coordinates are always UTF-8
+ * bytes, so convert at the provider boundary instead of making consumers
+ * guess which coordinate system a backend used.
+ */
+function utf8ByteOffset(source: string, codeUnitOffset: number): number {
+  const bounded = Math.max(0, Math.min(source.length, Math.trunc(codeUnitOffset)));
+  return Buffer.byteLength(source.slice(0, bounded), 'utf8');
+}
+
+function chunkForNode(node: SyntaxNodeLike, kind: string, source: string): AtlasStructuralEvidenceChunk {
   const name = kind === 'FILE' ? null : nodeName(node);
   const imports: string[] = [];
   const exports: string[] = [];
@@ -188,8 +199,8 @@ function chunkForNode(node: SyntaxNodeLike, kind: string): AtlasStructuralEviden
     name,
     parent_route: routeFor(node),
     parent_context: node.parent?.type ?? null,
-    start_byte: node.startIndex,
-    end_byte: node.endIndex,
+    start_byte: utf8ByteOffset(source, node.startIndex),
+    end_byte: utf8ByteOffset(source, node.endIndex),
     start_line: node.startPosition.row,
     start_column: node.startPosition.column,
     end_line: node.endPosition.row,
@@ -200,7 +211,7 @@ function chunkForNode(node: SyntaxNodeLike, kind: string): AtlasStructuralEviden
   };
 }
 
-function collectEvidence(tree: TreeLike): { chunks: AtlasStructuralEvidenceChunk[]; diagnostics: string[] } {
+function collectEvidence(tree: TreeLike, source: string): { chunks: AtlasStructuralEvidenceChunk[]; diagnostics: string[] } {
   const chunks: AtlasStructuralEvidenceChunk[] = [];
   const diagnostics: string[] = [];
 
@@ -209,7 +220,7 @@ function collectEvidence(tree: TreeLike): { chunks: AtlasStructuralEvidenceChunk
     if (isMissing(node)) diagnostics.push(`TREE_SITTER_MISSING:${node.type}:${node.startIndex}`);
 
     const declarationKind = resolveDeclarationKind(node);
-    if (declarationKind) chunks.push(chunkForNode(node, declarationKind));
+    if (declarationKind) chunks.push(chunkForNode(node, declarationKind, source));
 
     for (const child of node.namedChildren ?? []) visit(child);
   };
@@ -217,7 +228,7 @@ function collectEvidence(tree: TreeLike): { chunks: AtlasStructuralEvidenceChunk
 
   // Always expose one FILE unit so empty modules remain observable while also
   // preserving whole-file imports/exports/call evidence for parity analysis.
-  chunks.unshift(chunkForNode(tree.rootNode, 'FILE'));
+  chunks.unshift(chunkForNode(tree.rootNode, 'FILE', source));
 
   return {
     chunks: chunks.sort((a, b) => a.start_byte - b.start_byte || a.end_byte - b.end_byte || a.kind.localeCompare(b.kind)),
@@ -242,7 +253,7 @@ export function createNodeTreeSitterAstProvider(): AstProvider {
         const parser = new runtime.Parser();
         parser.setLanguage(runtime.grammar);
         const tree = parser.parse(input.source);
-        const { chunks, diagnostics } = collectEvidence(tree);
+        const { chunks, diagnostics } = collectEvidence(tree, input.source);
         const evidence: AtlasStructuralEvidence = {
           schema: 'atlas.ast.evidence.v1',
           engine: 'node-tree-sitter',

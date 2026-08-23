@@ -63,6 +63,8 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   producerRevision: string;
   generatedAt?: string;
   maxSourceBytes?: number;
+  /** Optional bounded source scope for read-only proofs; never implies completeness. */
+  sourceRefs?: readonly string[];
   sourceExtensions?: ReadonlySet<string>;
 }): WorkspaceRevisionOriginRuntimeV1 {
   const workspaceRoot = path.resolve(input.workspaceRoot);
@@ -82,12 +84,16 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   const trackedOutput = git(workspaceRoot, ['ls-tree', '-r', '--name-only', '-z', 'HEAD']);
   const trackedAtHead = new Set(trackedOutput.split('\0').filter(Boolean).map(normalizeSourceRef));
   const currentOutput = git(workspaceRoot, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']);
-  const files = [...new Set(currentOutput
+  const discoveredFiles = [...new Set(currentOutput
     .split('\0')
     .filter(Boolean)
     .map(normalizeSourceRef)
     .filter((sourceRef) => isSourceFile(sourceRef, extensions)))]
     .sort();
+  const requestedSourceRefs = input.sourceRefs?.map(normalizeSourceRef).filter(Boolean);
+  const files = requestedSourceRefs && requestedSourceRefs.length > 0
+    ? [...new Set(requestedSourceRefs)].filter((sourceRef) => discoveredFiles.includes(sourceRef)).sort()
+    : discoveredFiles;
 
   const entries: WorkspaceSourceManifestEntryV1[] = [];
   const tracked = new Map<string, boolean>();
