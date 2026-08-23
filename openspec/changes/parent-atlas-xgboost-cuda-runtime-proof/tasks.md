@@ -1,4 +1,40 @@
+## 0. UPDATE 2026-08-22 21:xx — a concurrent agent picked this proposal up directly
+
+Merge PR #64 (`agent/ast-lineage-xgboost-runtime-hardening-20260822`) landed on `main` shortly
+after this change's original commit (`31bff54117`) and, per its commit sequence, implements
+exactly what this change proposed:
+
+- [x] **`python/prove_atlas_xgboost_gpu_runtime_v1.py`** (commit `9bcd78536c`) — a bounded, synthetic
+  XGBoost CUDA runtime proof: `xgb.QuantileDMatrix`, explicit `--device` arg (default `cuda:0`),
+  synthetic matrix only, no trace-lineage read, argument-bounds validation (`rows<1024` etc. rejected).
+  This is a cleaner, simpler realization of the same idea section 1 below proposed as a manual WSL
+  protocol — **use this script directly instead of hand-running the WSL steps below.**
+- [x] **`python/atlas_xgboost_grouped_ranking_v1.py`** (commit `340dc98b34`) — implements the exact
+  qid/group design section 4 below proposed: sorts rows by `(qid, candidate_key)`, derives a stable
+  `qid` array from sorted unique labels, rejects duplicate `(qid, candidate_key)` pairs, requires
+  every qid group to have ≥2 rows. Docstring explicitly states "without inventing candidate identity."
+- [ ] **NOT done**: neither new file is wired into `scripts/atlas/train-xgboost-reranker.py`. Verified
+  by direct grep of the current `train-xgboost-reranker.py` content on `main` (`9dcb4d71c6`) — it is
+  byte-identical to what this change's proposal.md originally quoted: still plain `xgb.DMatrix` (not
+  `QuantileDMatrix`), still `'device': 'cuda',  # falls back to cpu if no CUDA` (silent fallback,
+  unchanged), still zero occurrences of `qid`/`set_info`/`group`. **The two new Python modules exist
+  as standalone utilities; the actual reranker training script that had the 3 verified bugs is
+  unmodified.** This is either (a) intentional — a new Python-native training path is meant to
+  eventually replace `train-xgboost-reranker.py`, or (b) an integration gap — the new pieces need to
+  be wired into the existing trainer. **Not yet resolved; needs its own investigation before writing
+  more code** — per root CLAUDE.md's Duplication Prevention rule, two implementations of the same
+  logical capability (grouped-ranking dataset prep) now exist and must be classified
+  (CANONICAL_OWNER / BACKEND / EXPERIMENT / DEAD) rather than left as an unexplained duplicate.
+  Also unresolved: `prove_atlas_xgboost_gpu_runtime_v1.py` has been added but not yet actually run —
+  no `docs/reports/*xgboost*gpu*` receipt exists anywhere in history as of this check. Section 1's
+  checklist (8 items) still applies to whatever run eventually happens.
+
 ## 1. XGBOOST_GPU_RUNTIME_PROVEN — synthetic-matrix proof (no trace-lineage dependency)
+
+**Superseded in practice by `python/prove_atlas_xgboost_gpu_runtime_v1.py` (see section 0) — prefer
+running that script over hand-executing this WSL protocol.** Kept below as the detailed manual
+fallback and as the source of the 8-item proof checklist (1.6), which still applies regardless of
+which script produces the run.
 
 Run entirely in WSL's existing `atlas-rapids-cu13` conda env (CUDA 13, already provisioned per `parent-atlas-compute-rank-cache-eval-dspy-gepa` GS1.31's correction — do not re-provision).
 
