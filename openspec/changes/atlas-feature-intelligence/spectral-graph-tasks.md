@@ -464,6 +464,13 @@ what was previously assumed, not looser.
    `openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md` for the
    full field list this implies for `SpectralGpuExecutionReceiptV1`.
 
+5. **Record the COO reduction audit before promotion.** The receipt must
+   include raw edge rows, unique undirected pairs, duplicate pairs,
+   self-loop count, and the deterministic duplicate reduction policy. A
+   summed duplicate input is valid for a diagnostic run, but it is not the
+   same proof as a zero-duplicate frozen fixture. Repeated identical GPU runs
+   must also report a stability metric before projection admission.
+
 ### Corrected honest status (2026-08-23)
 
 `SPECTRAL RTX ALIGNMENT`: contracts `PROVEN`, fixture contracts `PROVEN`,

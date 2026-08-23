@@ -1,0 +1,292 @@
+{
+  "schema": "atlas.spectral-live-fixture-receipt.v1",
+  "status": "EXECUTED_UNPROVEN",
+  "producer": "run_fabric_benchmark.py::spectral_live_fixture",
+  "producer_revision": "2026-08-20.spectral-live-fixture-v2",
+  "started_at": "2026-08-23T11:43:24Z",
+  "completed_at": "2026-08-23T11:43:26Z",
+  "input": {
+    "nodes": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/nodes.parquet",
+    "edges": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/edges.parquet",
+    "labels": null,
+    "candidate_sizes": [
+      500
+    ],
+    "recall_k": [
+      10,
+      50
+    ],
+    "edge_types": []
+  },
+  "runtime": {
+    "cugraph": "26.06.00",
+    "cudf": "26.06.01",
+    "cupy": "14.1.1",
+    "cuda_runtime": "13.2",
+    "nvidia_driver": "580.88",
+    "cuda_driver_api": "13.0",
+    "gpu_name": "NVIDIA GeForce RTX 3060 Ti"
+  },
+  "edge_authority": {
+    "SEMANTIC_KNN": "DERIVED_SIMILARITY",
+    "factual_oracle_excludes_derived_similarity": true
+  },
+  "results": [
+    {
+      "candidate_count": 500,
+      "edge_count_typed": 4683,
+      "edge_count_simple_undirected": 4683,
+      "edge_family_counts": {
+        "COALESCED_UNDIRECTED": 4683
+      },
+      "factual_edge_count": 4683,
+      "semantic_knn_edge_count": 0,
+      "distinct_source_refs": 500,
+      "sparse_representation": {
+        "fixture_input": "COO_TYPED_EDGE_LIST",
+        "cugraph_executor": "WEIGHTED_UNDIRECTED_COMPRESSED_GRAPH",
+        "store_transposed": true
+      },
+      "spectral_backend": {
+        "api_owner": "CUGRAPH_PYTHON_COMPATIBILITY_API",
+        "implementation_dependency": "CUVS_SPECTRAL",
+        "observability": "PACKAGE_AND_RELEASE_PROVENANCE_NOT_KERNEL_SYMBOL_PROOF",
+        "cugraph_version": "26.06.00",
+        "cuvs_version": "26.6.0"
+      },
+      "coo_duplicate_audit": {
+        "raw_undirected_edge_count": 4683,
+        "unique_undirected_edge_count": 4683,
+        "duplicate_undirected_edge_count": 0,
+        "self_loop_count": 0,
+        "duplicate_reduction_policy": "SUM_BY_UNDIRECTED_PAIR"
+      },
+      "cluster_count_owner": "EXPLICIT_FROZEN_FIXTURE_CONFIG",
+      "cluster_count_explicit": true,
+      "cluster_count": 8,
+      "num_eigenvectors": 2,
+      "num_eigenvectors_owner": "EXPLICIT_DIAGNOSTIC_CONFIG",
+      "random_seed": 684453,
+      "spectral_solver": {
+        "balanced_cut": {
+          "num_clusters": 8,
+          "num_eigen_vects": 2,
+          "evs_tolerance": 1e-05,
+          "evs_max_iter": 100,
+          "kmean_tolerance": 1e-05,
+          "kmean_max_iter": 100,
+          "random_state": 684453
+        },
+        "modularity_maximization": {
+          "num_clusters": 8,
+          "num_eigen_vects": 2,
+          "evs_tolerance": 1e-05,
+          "evs_max_iter": 100,
+          "kmean_tolerance": 1e-05,
+          "kmean_max_iter": 100,
+          "random_state": 684453
+        },
+        "parameter_source": "EXPLICIT_REQUEST_NOT_LIBRARY_DEFAULTS"
+      },
+      "repeats": 3,
+      "pagerank": {
+        "latency_ms": 81.37013998930342,
+        "converged": true
+      },
+      "leiden": {
+        "latency_ms": 175.7072399923345,
+        "reported_modularity": -0.21979308161852879,
+        "analyzers": {
+          "cluster_count": 500,
+          "modularity": -0.024923143208881025,
+          "edge_cut": 4738.0905566215515,
+          "ratio_cut": 9476.181113243103
+        },
+        "stability_ari": 1.0
+      },
+      "spectral_balanced_cut": {
+        "latency_ms": 503.26390098780394,
+        "analyzers": {
+          "cluster_count": 8,
+          "modularity": 0.03653635698821247,
+          "edge_cut": 97.6936075091362,
+          "ratio_cut": 33.86649106406804
+        },
+        "stability_ari": 0.9558165881130404,
+        "cpu_gpu_parity": {
+          "schema": "atlas.spectral-gpu-parity-receipt.v1",
+          "graph_checksum": "7e1eef4f924dee88ea9925d9cc5aeec2d1607b576949018f49d4ae767c6c94dc",
+          "ordinal_map_checksum": "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "cluster_count": 8,
+          "num_eigenvectors": 2,
+          "seed": 684453,
+          "cpu_assignment_checksum": "81602b9d502912272f7bde72ab3cf927d1691fa57a6a2eb8b1e6d060c175f3f9",
+          "gpu_assignment_checksum": "f4bedbb72830e1c04b855b1b78eef842adeb875b4e73a749f57f1c95d223dd81",
+          "adjusted_rand_index": 0.9332499188757115,
+          "ari_threshold": 0.99,
+          "partition_parity_passed": false,
+          "canonical_authority": false,
+          "projection_write_allowed": false,
+          "runtime_receipt_required": true,
+          "cpu_quality": {
+            "modularity": 0.311196065065642,
+            "edge_cut": 0.0,
+            "ratio_cut": 0.0
+          },
+          "cpu_reference_config": {
+            "operator": "normalized_laplacian",
+            "matrix_dtype": "float64",
+            "eigensolver": "numpy.linalg.eigh",
+            "eigenvector_selection": "smallest",
+            "kmeans_initialization": "DETERMINISTIC_FARTHEST_POINT",
+            "kmeans_iterations": 100,
+            "random_state_used": false
+          },
+          "comparison_scope": "ORDINAL_AND_ASSIGNMENT_COMPARISON_WITH_EXPLICIT_REFERENCE_CONFIG"
+        }
+      },
+      "spectral_modularity": {
+        "latency_ms": 46.527540995157324,
+        "analyzers": {
+          "cluster_count": 8,
+          "modularity": 0.03653635698821247,
+          "edge_cut": 97.6936075091362,
+          "ratio_cut": 33.86649106406804
+        },
+        "stability_ari": 0.9559881923760233,
+        "cpu_gpu_parity": {
+          "schema": "atlas.spectral-gpu-parity-receipt.v1",
+          "graph_checksum": "7e1eef4f924dee88ea9925d9cc5aeec2d1607b576949018f49d4ae767c6c94dc",
+          "ordinal_map_checksum": "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "cluster_count": 8,
+          "num_eigenvectors": 2,
+          "seed": 684453,
+          "cpu_assignment_checksum": "07bf4c8c329dd743e6f771187e14b5db876d161635fe4201a2b6b0d28b4d6b11",
+          "gpu_assignment_checksum": "020965540c65b8594356fe06a7cc4ca05a2a72f19863cc65117eafb72ae53c4c",
+          "adjusted_rand_index": 0.9519887125848147,
+          "ari_threshold": 0.99,
+          "partition_parity_passed": false,
+          "canonical_authority": false,
+          "projection_write_allowed": false,
+          "runtime_receipt_required": true,
+          "cpu_quality": {
+            "modularity": 0.2914900006966242,
+            "edge_cut": 94.09216672182083,
+            "ratio_cut": 37.474695598773465
+          },
+          "cpu_reference_config": {
+            "operator": "modularity",
+            "matrix_dtype": "float64",
+            "eigensolver": "numpy.linalg.eigh",
+            "eigenvector_selection": "largest",
+            "kmeans_initialization": "DETERMINISTIC_FARTHEST_POINT",
+            "kmeans_iterations": 100,
+            "random_state_used": false
+          },
+          "comparison_scope": "ORDINAL_AND_ASSIGNMENT_COMPARISON_WITH_EXPLICIT_REFERENCE_CONFIG"
+        }
+      },
+      "partition_agreement": {
+        "balanced_cut_vs_leiden_ari": 0.0,
+        "spectral_modularity_vs_leiden_ari": 0.0
+      },
+      "retrieval": [
+        {
+          "view": "pagerank_only",
+          "seed_queries": 64,
+          "recall": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "source_coverage": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "mrr_first_factual_neighbor": 0.8858082022144522,
+          "validator_success": null,
+          "repair_success": null
+        },
+        {
+          "view": "semantic_knn_plus_pagerank",
+          "seed_queries": 64,
+          "recall": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "source_coverage": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "mrr_first_factual_neighbor": 0.8858082022144522,
+          "validator_success": null,
+          "repair_success": null
+        },
+        {
+          "view": "leiden_plus_pagerank",
+          "seed_queries": 64,
+          "recall": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "source_coverage": {
+            "@10": 0.7218204148471616,
+            "@50": 0.8386206497287283
+          },
+          "mrr_first_factual_neighbor": 0.8858082022144522,
+          "validator_success": null,
+          "repair_success": null
+        },
+        {
+          "view": "spectral_balanced_cut_plus_pagerank",
+          "seed_queries": 64,
+          "recall": {
+            "@10": 0.7566215512107979,
+            "@50": 0.8431177219796215
+          },
+          "source_coverage": {
+            "@10": 0.7566215512107979,
+            "@50": 0.8431177219796215
+          },
+          "mrr_first_factual_neighbor": 0.9673477564102564,
+          "validator_success": null,
+          "repair_success": null
+        },
+        {
+          "view": "spectral_modularity_plus_pagerank",
+          "seed_queries": 64,
+          "recall": {
+            "@10": 0.7566215512107979,
+            "@50": 0.8431177219796215
+          },
+          "source_coverage": {
+            "@10": 0.7566215512107979,
+            "@50": 0.8431177219796215
+          },
+          "mrr_first_factual_neighbor": 0.9673477564102564,
+          "validator_success": null,
+          "repair_success": null
+        }
+      ],
+      "validator_success_available": false,
+      "repair_success_available": false,
+      "latency": {
+        "host_gpu_fixture_prep_ms": 494.19358499289956,
+        "total_fixture_ms": 2535.1492469926598
+      },
+      "gpu_memory": {
+        "used_bytes_before": 5325727744,
+        "used_bytes_after_graph": 5335164928,
+        "observed_high_watermark_bytes": 5385017344,
+        "observed_delta_bytes": 59289600,
+        "measurement": "CUDA_MEM_GET_INFO_CHECKPOINT_HIGH_WATERMARK_NOT_KERNEL_PEAK"
+      }
+    }
+  ],
+  "promotion_rule": {
+    "spectral_is_routing_hint_only": true,
+    "daily_graphify_requires_measurable_delta_over_semantic_leiden_kmeans_som": true,
+    "validator_repair_metrics_must_come_from_external_joined_evidence": true
+  },
+  "input_hash": "979d4d8306b3c9cc04064bbd7fe5497a7f1e58df48d331c02e44a5899617d37d",
+  "output_hash": "9a97c0b4c4360efa758049a829d7745f109e52fecbed40a2973f18a059697134"
+}

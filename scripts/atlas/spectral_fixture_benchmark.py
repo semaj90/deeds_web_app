@@ -15,12 +15,21 @@ import hashlib
 import json
 import math
 import os
+from pathlib import Path
+import subprocess
+import sys
 import time
 from importlib.metadata import PackageNotFoundError, version as package_version
 from typing import Dict, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT / "python") not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT / "python"))
+from atlas_compute.spectral_parity import compare_spectral_assignments
+from atlas_compute.spectral_reference import spectral_partition
 
 DERIVED_EDGE_MARKERS = ("SIMILAR", "SEMANTIC", "KNN", "COOCCUR", "CO_OCCUR", "LEXICAL")
 DEFAULT_RECALL_K = (10, 50, 100)
@@ -41,6 +50,31 @@ def _hash(value) -> str:
 def _used_gpu_bytes(cp) -> int:
     free_bytes, total_bytes = cp.cuda.runtime.memGetInfo()
     return int(total_bytes - free_bytes)
+
+
+def _runtime_version(module, distribution: str) -> str:
+    return str(getattr(module, "__version__", _version(distribution)))
+
+
+def _cuda_runtime_version(cp) -> str:
+    value = int(cp.cuda.runtime.runtimeGetVersion())
+    return f"{value // 1000}.{(value % 1000) // 10}"
+
+
+def _cuda_driver_api_version(cp) -> str:
+    value = int(cp.cuda.runtime.driverGetVersion())
+    return f"{value // 1000}.{(value % 1000) // 10}"
+
+
+def _nvidia_driver_version() -> str:
+    try:
+        result = subprocess.run(
+            ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+            capture_output=True, text=True, timeout=5, check=False,
+        )
+        return (result.stdout.strip().splitlines() or ["UNKNOWN"])[0]
+    except Exception:
+        return "UNKNOWN"
 
 
 def _ari(a: Sequence[int], b: Sequence[int]) -> float:
@@ -82,6 +116,40 @@ def _normalize_partition(frame, cluster_column: str):
 
 def _partition_map(frame: pd.DataFrame) -> Dict[int, object]:
     return {int(row.vertex): row.cluster for row in frame.itertuples(index=False)}
+
+
+def _cpu_partition_quality(simple: pd.DataFrame, labels: Sequence[int], cluster_count: int) -> Mapping[str, float]:
+    degrees = np.zeros(len(labels), dtype=np.float64)
+    total_weight = 0.0
+    cut = 0.0
+    for row in simple.itertuples(index=False):
+        source, target, weight = int(row.src), int(row.dst), float(row.weight)
+        degrees[source] += weight
+        degrees[target] += weight
+        total_weight += weight
+        if int(labels[source]) != int(labels[target]):
+            cut += weight
+    if total_weight <= 0:
+        raise ValueError("CPU spectral quality requires positive edge weight")
+    modularity = 0.0
+    for row in simple.itertuples(index=False):
+        source, target, weight = int(row.src), int(row.dst), float(row.weight)
+        if int(labels[source]) == int(labels[target]):
+            modularity += weight - (degrees[source] * degrees[target]) / (2.0 * total_weight)
+            modularity += weight - (degrees[target] * degrees[source]) / (2.0 * total_weight)
+    modularity /= 2.0 * total_weight
+    ratio_cut = 0.0
+    for cluster in range(cluster_count):
+        members = {index for index, label in enumerate(labels) if int(label) == cluster}
+        if not members:
+            continue
+        boundary = sum(
+            float(row.weight)
+            for row in simple.itertuples(index=False)
+            if (int(row.src) in members) != (int(row.dst) in members)
+        )
+        ratio_cut += boundary / len(members)
+    return {"modularity": float(modularity), "edge_cut": float(cut), "ratio_cut": float(ratio_cut)}
 
 
 def _analyzers(cugraph, graph, partition_gpu) -> Mapping[str, Optional[float]]:
@@ -241,9 +309,14 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
         simple["src"] = np.minimum(simple["src_gpu_node_id"].to_numpy(), simple["dst_gpu_node_id"].to_numpy())
         simple["dst"] = np.maximum(simple["src_gpu_node_id"].to_numpy(), simple["dst_gpu_node_id"].to_numpy())
         simple = simple[simple["src"] != simple["dst"]]
+        raw_undirected_pairs = simple[["src", "dst"]].value_counts()
+        duplicate_undirected_edge_count = int((raw_undirected_pairs - 1).clip(lower=0).sum())
+        raw_edge_count = int(len(simple))
         simple = simple.groupby(["src", "dst"], as_index=False)["weight"].sum()
         if simple.empty:
             raise ValueError(f"fixture {size} has no non-self graph edges")
+        simple["src"] = simple["src"].astype(np.int32)
+        simple["dst"] = simple["dst"].astype(np.int32)
         simple_gpu = cudf.from_pandas(simple)
         graph = cugraph.Graph(directed=False)
         graph.from_cudf_edgelist(
@@ -251,7 +324,7 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
             source="src",
             destination="dst",
             edge_attr="weight",
-            vertices=cudf.Series(np.arange(size, dtype=np.int64)),
+            vertices=cudf.Series(np.arange(size, dtype=np.int32)),
             renumber=False,
             store_transposed=True,
         )
@@ -300,8 +373,35 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
                 leiden_latency = elapsed
                 leiden_reported_modularity = float(modularity)
         assert leiden_first_gpu is not None and leiden_first_cpu is not None
-        cluster_count = max(2, min(int(leiden_first_cpu["cluster"].nunique()), size - 1))
-        eigenvectors = min(cluster_count, max(2, int(math.ceil(math.log2(cluster_count)))))
+        requested_cluster_count = getattr(args, "cluster_count", None)
+        if requested_cluster_count is not None:
+            if not 2 <= int(requested_cluster_count) <= size:
+                raise ValueError(f"cluster_count must be between 2 and {size}")
+            cluster_count = int(requested_cluster_count)
+            cluster_count_owner = "EXPLICIT_FROZEN_FIXTURE_CONFIG"
+        else:
+            cluster_count = max(2, min(int(leiden_first_cpu["cluster"].nunique()), size - 1))
+            cluster_count_owner = "LEIDEN_CHALLENGER_UNFROZEN"
+        requested_eigenvectors = getattr(args, "num_eigen_vects", None)
+        eigenvectors = (
+            int(requested_eigenvectors)
+            if requested_eigenvectors is not None
+            else min(cluster_count, max(2, int(math.ceil(math.log2(cluster_count)))))
+        )
+        if not 1 <= eigenvectors <= cluster_count:
+            raise ValueError(f"num-eigen-vects must be between 1 and {cluster_count}")
+        solver_parameters = {
+            "num_clusters": cluster_count,
+            "num_eigen_vects": eigenvectors,
+            "evs_tolerance": float(getattr(args, "evs_tolerance", 1e-5)),
+            "evs_max_iter": int(getattr(args, "evs_max_iter", 100)),
+            "kmean_tolerance": float(getattr(args, "kmean_tolerance", 1e-5)),
+            "kmean_max_iter": int(getattr(args, "kmean_max_iter", 100)),
+        }
+        if solver_parameters["evs_tolerance"] <= 0 or solver_parameters["kmean_tolerance"] <= 0:
+            raise ValueError("spectral tolerances must be positive")
+        if solver_parameters["evs_max_iter"] <= 0 or solver_parameters["kmean_max_iter"] <= 0:
+            raise ValueError("spectral iteration limits must be positive")
 
         def run_spectral(method: str):
             runs: list[np.ndarray] = []
@@ -310,15 +410,7 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
             first_latency = None
             local_high = _used_gpu_bytes(cp)
             for repeat in range(repeats):
-                kwargs = dict(
-                    num_clusters=cluster_count,
-                    num_eigen_vects=eigenvectors,
-                    evs_tolerance=1e-5,
-                    evs_max_iter=100,
-                    kmean_tolerance=1e-5,
-                    kmean_max_iter=100,
-                    random_state=seed + repeat,
-                )
+                kwargs = dict(solver_parameters, random_state=seed + repeat)
                 t0 = time.perf_counter()
                 raw = (
                     cugraph.spectralBalancedCutClustering(graph, **kwargs)
@@ -333,6 +425,49 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
                 runs.append(cpu["cluster"].to_numpy(np.int64))
                 if repeat == 0:
                     first_gpu, first_cpu, first_latency = normalized, cpu, elapsed
+            cpu_reference = spectral_partition(
+                size,
+                [
+                    (int(row.src), int(row.dst), float(row.weight))
+                    for row in simple.itertuples(index=False)
+                ],
+                cluster_count=cluster_count,
+                num_eigenvectors=eigenvectors,
+                operator=("modularity" if method == "MODULARITY_MAXIMIZATION" else "normalized_laplacian"),
+            )
+            gpu_assignments = [
+                {"ordinal": int(row.vertex), "cluster": int(row.cluster)}
+                for row in first_cpu.itertuples(index=False)
+            ]
+            parity = compare_spectral_assignments(
+                [
+                    {"ordinal": int(row["vertex"]), "cluster": int(row["cluster"])}
+                    for row in cpu_reference["assignments"]
+                ],
+                gpu_assignments,
+                graph_checksum=_hash(simple.to_dict("records")),
+                ordinal_map_checksum=_hash(list(range(size))),
+                cluster_count=cluster_count,
+                num_eigenvectors=eigenvectors,
+                seed=seed,
+            )
+            parity["cpu_quality"] = _cpu_partition_quality(
+                simple,
+                [int(row["cluster"]) for row in cpu_reference["assignments"]],
+                cluster_count,
+            )
+            parity["cpu_reference_config"] = {
+                "operator": "modularity" if method == "MODULARITY_MAXIMIZATION" else "normalized_laplacian",
+                "matrix_dtype": "float64",
+                "eigensolver": "numpy.linalg.eigh",
+                "eigenvector_selection": "largest" if method == "MODULARITY_MAXIMIZATION" else "smallest",
+                "kmeans_initialization": "DETERMINISTIC_FARTHEST_POINT",
+                "kmeans_iterations": 100,
+                "random_state_used": False,
+            }
+            parity["comparison_scope"] = (
+                "ORDINAL_AND_ASSIGNMENT_COMPARISON_WITH_EXPLICIT_REFERENCE_CONFIG"
+            )
             return {
                 "gpu": first_gpu,
                 "cpu": first_cpu,
@@ -340,6 +475,10 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
                 "stability_ari": _mean_pairwise_ari(runs),
                 "analyzers": _analyzers(cugraph, graph, first_gpu),
                 "gpu_high": int(local_high),
+                "cpu_reference": cpu_reference,
+                "cpu_gpu_parity": parity,
+                "algorithm": method,
+                "solver_parameters": dict(solver_parameters, random_state=seed),
             }
 
         balanced = run_spectral("BALANCED_CUT")
@@ -424,10 +563,31 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
                 "cugraph_executor": "WEIGHTED_UNDIRECTED_COMPRESSED_GRAPH",
                 "store_transposed": True,
             },
-            "cluster_count_owner": "LEIDEN_CHALLENGER",
+            "spectral_backend": {
+                "api_owner": "CUGRAPH_PYTHON_COMPATIBILITY_API",
+                "implementation_dependency": "CUVS_SPECTRAL",
+                "observability": "PACKAGE_AND_RELEASE_PROVENANCE_NOT_KERNEL_SYMBOL_PROOF",
+                "cugraph_version": _runtime_version(cugraph, "cugraph"),
+                "cuvs_version": _version("cuvs"),
+            },
+            "coo_duplicate_audit": {
+                "raw_undirected_edge_count": raw_edge_count,
+                "unique_undirected_edge_count": int(len(simple)),
+                "duplicate_undirected_edge_count": duplicate_undirected_edge_count,
+                "self_loop_count": int((edges["src_gpu_node_id"] == edges["dst_gpu_node_id"]).sum()),
+                "duplicate_reduction_policy": "SUM_BY_UNDIRECTED_PAIR",
+            },
+            "cluster_count_owner": cluster_count_owner,
+            "cluster_count_explicit": requested_cluster_count is not None,
             "cluster_count": cluster_count,
             "num_eigenvectors": eigenvectors,
+            "num_eigenvectors_owner": "EXPLICIT_DIAGNOSTIC_CONFIG" if requested_eigenvectors is not None else "DERIVED_FIXTURE_DEFAULT",
             "random_seed": seed,
+            "spectral_solver": {
+                "balanced_cut": balanced["solver_parameters"],
+                "modularity_maximization": spectral_mod["solver_parameters"],
+                "parameter_source": "EXPLICIT_REQUEST_NOT_LIBRARY_DEFAULTS",
+            },
             "repeats": repeats,
             "pagerank": {"latency_ms": pagerank_ms, "converged": None if pr_converged is None else bool(pr_converged)},
             "leiden": {
@@ -438,9 +598,11 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
             },
             "spectral_balanced_cut": {
                 "latency_ms": balanced["latency_ms"], "analyzers": balanced["analyzers"], "stability_ari": balanced["stability_ari"],
+                "cpu_gpu_parity": balanced["cpu_gpu_parity"],
             },
             "spectral_modularity": {
                 "latency_ms": spectral_mod["latency_ms"], "analyzers": spectral_mod["analyzers"], "stability_ari": spectral_mod["stability_ari"],
+                "cpu_gpu_parity": spectral_mod["cpu_gpu_parity"],
             },
             "partition_agreement": agreement,
             "retrieval": retrieval,
@@ -471,7 +633,15 @@ def run_spectral_live_fixture(args, reports_dir: str) -> Mapping[str, object]:
             "recall_k": recall_k,
             "edge_types": sorted(args.edge_type or []),
         },
-        "runtime": {"cugraph": _version("cugraph-cu13"), "cudf": _version("cudf-cu13"), "cupy": _version("cupy-cuda13x")},
+        "runtime": {
+            "cugraph": _runtime_version(cugraph, "cugraph-cu13"),
+            "cudf": _runtime_version(cudf, "cudf-cu13"),
+            "cupy": _runtime_version(cp, "cupy-cuda13x"),
+            "cuda_runtime": _cuda_runtime_version(cp),
+            "nvidia_driver": _nvidia_driver_version(),
+            "cuda_driver_api": _cuda_driver_api_version(cp),
+            "gpu_name": cp.cuda.runtime.getDeviceProperties(0)["name"].decode("utf-8"),
+        },
         "edge_authority": {"SEMANTIC_KNN": "DERIVED_SIMILARITY", "factual_oracle_excludes_derived_similarity": True},
         "results": results,
         "promotion_rule": {

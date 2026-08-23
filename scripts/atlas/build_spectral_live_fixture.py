@@ -53,6 +53,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--semantic-top-k", type=int, default=10)
     parser.add_argument("--semantic-weight", type=float, default=1.0)
     parser.add_argument("--edge-type", action="append", default=[], help="Optional structural edge allowlist")
+    parser.add_argument(
+        "--collapse-undirected-pairs",
+        action="store_true",
+        help="Derived diagnostic mode: sum all edge families into one undirected pair",
+    )
     args = parser.parse_args()
     if args.limit < 500:
         raise ValueError("fixture limit must be >= 500")
@@ -187,6 +192,18 @@ def main() -> None:
         .sort_values(["src_gpu_node_id", "dst_gpu_node_id", "edge_type"])
         .reset_index(drop=True)
     )
+    if args.collapse_undirected_pairs:
+        all_edges["src_gpu_node_id"], all_edges["dst_gpu_node_id"] = (
+            np.minimum(all_edges["src_gpu_node_id"], all_edges["dst_gpu_node_id"]),
+            np.maximum(all_edges["src_gpu_node_id"], all_edges["dst_gpu_node_id"]),
+        )
+        all_edges = (
+            all_edges.groupby(["src_gpu_node_id", "dst_gpu_node_id"], as_index=False)["weight"]
+            .sum()
+            .assign(edge_type="COALESCED_UNDIRECTED")
+            .sort_values(["src_gpu_node_id", "dst_gpu_node_id"])
+            .reset_index(drop=True)
+        )
 
     nodes_out = pd.DataFrame({
         "gpu_node_id": semantic["gpu_node_id"].astype(np.int64),
@@ -239,6 +256,10 @@ def main() -> None:
             "canonical_authority": False,
             "preserves_source_edge_type": True,
             "edge_type_allowlist": sorted(args.edge_type),
+        },
+        "duplicate_policy": {
+            "collapse_undirected_pairs": bool(args.collapse_undirected_pairs),
+            "reduction": "SUM_BY_UNDIRECTED_PAIR" if args.collapse_undirected_pairs else "BY_EDGE_FAMILY",
         },
         "input_hashes": input_hashes,
         "runtime": {

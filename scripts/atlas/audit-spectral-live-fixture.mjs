@@ -10,7 +10,7 @@ const markdownPath = path.join(reportDir, 'spectral-live-fixture-implementation-
 
 const expected = [
   'scripts/atlas/build_spectral_live_fixture.py',
-  'scripts/atlas/export_spectral_fixture_routing_labels.mjs',
+  'scripts/atlas/export-spectral-fixture-routing-labels.mjs',
   'scripts/atlas/run_fabric_benchmark.py',
   'docs/reports/spectral-live-fixture-receipt.json',
   'docs/reports/spectral-live-fixture-receipt.md',
@@ -57,4 +57,3 @@ await fs.writeFile(markdownPath, [
 ].join('\n') + '\n', 'utf8');
 
 console.log(JSON.stringify({ status: report.status, missing: report.missing, reportPath: path.relative(root, reportPath), canonicalWrites: false }, null, 2));
-

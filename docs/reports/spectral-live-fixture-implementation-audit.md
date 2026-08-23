@@ -6,8 +6,6 @@
 - Runtime receipt present: **false**
 
 Missing claimed tranche files:
-- `scripts/atlas/build_spectral_live_fixture.py`
-- `scripts/atlas/export_spectral_fixture_routing_labels.mjs`
 - `docs/reports/spectral-live-fixture-receipt.json`
 - `docs/reports/spectral-live-fixture-receipt.md`
 
