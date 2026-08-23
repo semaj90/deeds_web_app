@@ -7,50 +7,7 @@
       "id": "lib-server-mcp",
       "relPath": "sveltekit-frontend/src/lib/server/mcp/server.ts",
       "shape": "array-literal + if-chain",
-      "absPath": "sveltekit-frontend\\src\\lib\\server\\mcp\\server.ts",
-      "counts": {
-        "arrayLiteralToolsListed": 85,
-        "uniqueListedNames": 85,
-        "switchCaseDispatch": 89,
-        "ifChainDispatch": 18,
-        "registerToolCalls": 0,
-        "uniqueRegisterToolNames": 0
-      },
-      "listedWithoutHandler": [],
-      "handlerWithoutListing": [
-        "identity:quarantine",
-        "identity:recover",
-        "envelope:validate",
-        "mirror:sync_qdrant",
-        "mirror:sync_neo4j",
-        "graph:expand",
-        "retrieval:rerank",
-        "answer:synthesize",
-        "escalation:route",
-        "atlas.discover",
-        "atlas.retrieve",
-        "atlas.build_context",
-        "atlas.inspect_runtime",
-        "atlas.apply_change",
-        "atlas.validate_change",
-        "atlas.delegate",
-        "phase109a_archive_signal",
-        "phase109a_supersede_signal",
-        "phase109a_promote_recommendation",
-        "phase109a_query_signal_history",
-        "phase109a_validate_state_transition"
-      ],
-      "duplicateListedNames": [],
-      "duplicateRegisterToolNames": [],
-      "registerToolMissingHandler": [],
-      "registerToolUnresolvedNames": [],
-      "unresolvedDispatchTerms": [
-        {
-          "rawExpr": "LDR_RESEARCH_TOOL.name",
-          "line": 5735,
-          "kind": "if-chain"
-        }
-      ]
+      "error": "FILE_NOT_FOUND"
     },
     {
       "id": "mcp-server",
@@ -58,10 +15,10 @@
       "shape": "array-literal + switch",
       "absPath": "sveltekit-frontend\\src\\mcp\\server.ts",
       "counts": {
-        "arrayLiteralToolsListed": 85,
-        "uniqueListedNames": 85,
+        "arrayLiteralToolsListed": 84,
+        "uniqueListedNames": 84,
         "switchCaseDispatch": 89,
-        "ifChainDispatch": 18,
+        "ifChainDispatch": 17,
         "registerToolCalls": 0,
         "uniqueRegisterToolNames": 0
       },
@@ -106,8 +63,8 @@
         "uniqueListedNames": 0,
         "switchCaseDispatch": 0,
         "ifChainDispatch": 0,
-        "registerToolCalls": 117,
-        "uniqueRegisterToolNames": 117
+        "registerToolCalls": 119,
+        "uniqueRegisterToolNames": 119
       },
       "listedWithoutHandler": [],
       "handlerWithoutListing": [],
@@ -120,198 +77,8 @@
   ],
   "crossFileDuplicateNames": [
     {
-      "name": "cases:load",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "rag:search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "rag:index_page",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "memory:prior_answer_lookup",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "playwright:browser_action",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "transcribe_audio",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "evidence:analyze",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "evidence:analyze_multimodal",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "evidence:detect_objects",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "evidence:transcribe_gpu",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "evidence:search_similar",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "cases:create",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "cases:update",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "cases:delete",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "citations:search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "citations:list_by_case",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "citations:add_to_case",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:list",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:create",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:generate_from_template",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:update",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:delete",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "reports:export",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "embedding:generate",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "gpu:similarity",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "inference:route",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "startup:briefing",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
       "name": "atlas.packet_search",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
       ]
@@ -319,359 +86,20 @@
     {
       "name": "atlas.coverage",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
-      ]
-    },
-    {
-      "name": "schema-dependents:find",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "LLMS.md",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:ace_context",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "phase18_reranker",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "atlas.identity_audit",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "atlas.cross_store_proof",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:explain_cluster",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:get_buffer",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "langextract:legal",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "langextract:evidence",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "langextract:file",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "langextract:custom",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "compose:pipeline",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:file_intel",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:graph_neighbors",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:graph_traverse",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "topology_search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:deep_research",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:research_topics",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:rg_search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:mapreduce_matrix",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:unified_research",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:codebase_research",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:concurrent_research",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "analytics:web_research",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "face:identify",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "poi:face_synth",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codeintel.health",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "cluster.summary.get",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "cluster.summary.refresh",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
       ]
     },
     {
       "name": "clusters.get_summary_lenses",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
       ]
     },
     {
-      "name": "chunk.lookup",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codebase:export_bundle",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codeintel.fix_recommend",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "codeintel.ace.context",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "graph.index",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "graph.status",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "ace.wiki",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "research:github_search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "research:reddit_search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "research:search_chunks",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.search_cards",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.search_schema_contract",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.get_card",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.expand_neighbors",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.explain_retrieval",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "kb.rg_atlas_search",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "ast:cross_language",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
       "name": "wiki.status",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
       ]
@@ -679,7 +107,6 @@
     {
       "name": "wiki.search",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
       ]
@@ -687,7 +114,6 @@
     {
       "name": "wiki.explain_page",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
       ]
@@ -695,30 +121,8 @@
     {
       "name": "wiki.refresh_directory",
       "files": [
-        "lib-server-mcp",
         "mcp-server",
         "trace-mcp-server"
-      ]
-    },
-    {
-      "name": "vlm:switch_mode",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "llm_synthesis.log_event",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
-      ]
-    },
-    {
-      "name": "agents_md",
-      "files": [
-        "lib-server-mcp",
-        "mcp-server"
       ]
     }
   ]

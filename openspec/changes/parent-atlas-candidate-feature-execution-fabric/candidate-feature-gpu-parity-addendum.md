@@ -95,19 +95,19 @@ A CUDA-labelled challenger with `gpuExecutionObserved != true` fails closed. CPU
 
 ## Proof gates
 
-- [ ] **FEAT-03D-01** deterministic logical→physical row alignment.
-- [ ] **FEAT-03D-02** valid mask is exactly the logical prefix.
-- [ ] **FEAT-03D-03** all padded values/presence/lane/degraded fields are zero.
-- [ ] **FEAT-03D-04** padded rows cannot be gathered as CandidateOrdinal.
-- [ ] **FEAT-03D-05** missing zero and real zero remain distinguishable.
-- [ ] **FEAT-03D-06** pack/gather checksums are deterministic.
-- [ ] **FEAT-04-01** actual PyTorch CUDA execution is observed.
-- [ ] **FEAT-04-02** CUDA selected CandidateOrdinals exactly match CPU gather order.
-- [ ] **FEAT-04-03** CUDA float32 values exactly match the CPU reference.
-- [ ] **FEAT-04-04** CUDA presence bits exactly match the CPU reference.
-- [ ] **FEAT-04-05** CUDA lane/degraded metadata matches the CPU reference.
-- [ ] **FEAT-04-06** CUDA padded rows remain zero and invalid.
-- [ ] **FEAT-04-07** final acceptance is emitted by the TypeScript parity receipt, not the Python observer alone.
+- [x] **FEAT-03D-01** deterministic logical→physical row alignment.
+- [x] **FEAT-03D-02** valid mask is exactly the logical prefix.
+- [x] **FEAT-03D-03** all padded values/presence/lane/degraded fields are zero.
+- [x] **FEAT-03D-04** padded rows cannot be gathered as CandidateOrdinal.
+- [x] **FEAT-03D-05** missing zero and real zero remain distinguishable.
+- [x] **FEAT-03D-06** pack/gather checksums are deterministic.
+- [x] **FEAT-04-01** actual PyTorch CUDA execution is observed.
+- [x] **FEAT-04-02** CUDA selected CandidateOrdinals exactly match CPU gather order.
+- [x] **FEAT-04-03** CUDA float32 values exactly match the CPU reference.
+- [x] **FEAT-04-04** CUDA presence bits exactly match the CPU reference.
+- [x] **FEAT-04-05** CUDA lane/degraded metadata matches the CPU reference.
+- [x] **FEAT-04-06** CUDA padded rows remain zero and invalid.
+- [x] **FEAT-04-07** final acceptance is emitted by the TypeScript parity receipt, not the Python observer alone.
 
 All remain unchecked until workstation execution.
 

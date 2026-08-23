@@ -13,6 +13,14 @@ export default defineConfig({
 	},
   test: {
     environment: 'node',
+    // These Arrow helpers are repository-owned ESM scripts imported by the
+    // SvelteKit readback spec. Inline them so Vitest does not hand the
+    // workspace .mjs files to its external CJS loader.
+    server: {
+      deps: {
+        inline: [/write-candidate-feature-arrow\.mjs$/, /read-candidate-feature-arrow\.mjs$/],
+      },
+    },
     include: [
       'tests/lane-contracts/**/*.spec.ts',
       'tests/hyperrag/**/*.spec.ts',

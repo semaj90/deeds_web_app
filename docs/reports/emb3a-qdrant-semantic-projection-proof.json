@@ -58,15 +58,27 @@
       "quantization_config": null
     },
     "payload_schema": {
-      "qdrant_point_id": {
+      "representation_name": {
         "data_type": "keyword",
         "points": 52380
+      },
+      "projection_revision": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "content_hash": {
+        "data_type": "keyword",
+        "points": 45472
       },
       "source_ref": {
         "data_type": "keyword",
         "points": 52380
       },
-      "indexed_at": {
+      "embedding_model": {
+        "data_type": "keyword",
+        "points": 52380
+      },
+      "qdrant_point_id": {
         "data_type": "keyword",
         "points": 52380
       },
@@ -74,7 +86,7 @@
         "data_type": "keyword",
         "points": 52380
       },
-      "embedding_model": {
+      "indexed_at": {
         "data_type": "keyword",
         "points": 52380
       },
@@ -85,18 +97,6 @@
       "chunk_id": {
         "data_type": "keyword",
         "points": 16805
-      },
-      "representation_name": {
-        "data_type": "keyword",
-        "points": 52380
-      },
-      "content_hash": {
-        "data_type": "keyword",
-        "points": 45472
-      },
-      "projection_revision": {
-        "data_type": "keyword",
-        "points": 52380
       }
     },
     "update_queue": {

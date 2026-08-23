@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-06-15T21:30:56.633Z",
+  "generated_at": "2026-08-23T06:37:13.703Z",
   "source_url": "http://127.0.0.1:8788/mcp",
-  "total_tools": 128,
+  "total_tools": 175,
   "namespaces": [
     "LLMS",
     "ace",
+    "admin",
     "atlas",
     "clusters",
     "codebase",
@@ -17,12 +18,19 @@
     "hypergraph",
     "image",
     "kag",
+    "karpathy",
     "kb",
     "knowledge",
     "legal",
+    "library",
+    "miniforge",
+    "misc",
     "ops",
+    "research",
     "runtime",
     "search",
+    "service_workers",
+    "shell",
     "skills",
     "taxonomy",
     "tools",
@@ -33,25 +41,28 @@
     "wiki"
   ],
   "layer_counts": {
-    "unknown": 41,
-    "identity": 5,
+    "unknown": 65,
+    "identity": 4,
     "read": 10,
-    "synthesis": 25,
-    "graph": 31,
-    "ops": 13,
-    "dense": 23,
+    "synthesis": 30,
+    "graph": 39,
+    "ops": 19,
+    "dense": 28,
     "lexical": 7,
-    "cache": 12,
+    "cache": 19,
     "memory": 3,
-    "rerank": 8
+    "rerank": 7
   },
   "routing_table": {
     "unknown": [
       "kb.organize_messy_text",
       "kb.extract_citations",
       "kb.trace_search",
+      "trace_search",
+      "wiki_note_lookup",
       "atlas.suggest_files",
       "ui.analyze_view",
+      "admin.log_event",
       "skills.list",
       "skills.run_mission",
       "legal.get_transcript",
@@ -62,6 +73,14 @@
       "legal.write_obsidian_note",
       "topology.hydration_status",
       "topology.recompute_manifold_plan",
+      "library.registry_search",
+      "library.registry_rescan",
+      "phase109a_archive_signal",
+      "phase109a_supersede_signal",
+      "phase109a_supersede_recommendation",
+      "phase109a_promote_recommendation",
+      "phase109a_query_signal_history",
+      "phase109a_validate_state_transition",
       "topology.search_near",
       "topology.same_som_cluster",
       "kb.hybrid_search",
@@ -71,6 +90,7 @@
       "topology.search_4d",
       "clusters.get_members",
       "trace.explain_retrieval",
+      "trace_dynamic_context",
       "trace.kag_search",
       "context.build_kv_packet",
       "context.get_compressed_card",
@@ -82,19 +102,30 @@
       "kag.ingest_error",
       "kag.panel_context",
       "taxonomy.children",
+      "clusters.kmeans_members",
       "trace.validate_ace_hit",
       "knowledge.get_minified_map",
       "tools.batch_call",
       "codebase.context_for_file",
       "runtime.simdjson_status",
-      "runtime.quic_status"
+      "runtime.quic_status",
+      "atlas.workstation_status",
+      "atlas.feature_document_status",
+      "atlas.feature_document_ingestion_plan",
+      "atlas.feature_document_enrichment_plan",
+      "atlas.materialize_feature_evidence_tuples",
+      "atlas.pos_concept_tagging",
+      "service_workers.status",
+      "service_workers.result",
+      "miniforge.health",
+      "miniforge.analyze",
+      "miniforge.extract"
     ],
     "identity": [
       "atlas.query",
       "atlas.source_refs",
       "kag.feature_lookup",
-      "atlas.packet_search",
-      "atlas:packet_search"
+      "atlas.packet_search"
     ],
     "read": [
       "kb.wiki_note_lookup",
@@ -115,6 +146,8 @@
       "legal.issue_spotter",
       "legal.mock_trial",
       "engram.ace_packet_inject",
+      "library.registry_fetch_tier",
+      "ldr_research",
       "graph.semantic_path_synthesis",
       "kb.explain_context_pack",
       "hypergraph.semantic_path_synthesis",
@@ -133,13 +166,18 @@
       "ops.fixer_semantic_recall",
       "image.search_by_text",
       "image.caption",
-      "image.enrich_tags"
+      "image.enrich_tags",
+      "atlas.populate_feature_documents",
+      "karpathy.attention_rank_files",
+      "shell.run"
     ],
     "graph": [
       "context.prefetch_feature_context",
       "atlas.compact_context",
       "atlas.explain_trace",
       "legal.check_services",
+      "library.registry_lookup",
+      "library.registry_fetch_tier",
       "wiki.status",
       "wiki.search",
       "wiki.refresh_directory",
@@ -156,6 +194,7 @@
       "trace.graphrag_search",
       "kag.feature_lookup",
       "taxonomy.path",
+      "clusters.som_cell_lookup",
       "hypergraph.search",
       "hypergraph.get_edge",
       "hypergraph.explain_activation",
@@ -166,7 +205,12 @@
       "runtime.sse_probe",
       "ace.compact_search",
       "atlas.packet_search",
-      "atlas:packet_search"
+      "atlas.graph.pagerank",
+      "atlas.build_taxonomy_topology_packet",
+      "karpathy.attention_rank_files",
+      "karpathy.som_topology_stats",
+      "research.playbook_lookup_by_language",
+      "context.build_indexed_source_packet"
     ],
     "ops": [
       "ops.execute_graphify",
@@ -176,6 +220,12 @@
       "ops.record_fix_attempt",
       "ops.run_quality_gate",
       "ops.update_LLMS.md",
+      "ops.search_tools",
+      "ops.inspect_tool_contract",
+      "ops.validate_tool_call",
+      "ops.audit_tool_result",
+      "ops.verify_write",
+      "ops.validate_claims",
       "ops.fixer_semantic_recall",
       "ops.fixer_pattern_store",
       "ops.gpu_attention",
@@ -189,6 +239,11 @@
       "legal.find_similar_opinions",
       "legal.transcribe_video",
       "legal.check_services",
+      "atlas.embedding_keywords",
+      "atlas.embedding_cluster_tags",
+      "atlas.embedding_neighbors",
+      "atlas.embedding_all_tags",
+      "ldr_research",
       "wiki.status",
       "wiki.search",
       "wiki.explain_page",
@@ -204,9 +259,9 @@
       "atlas.prefilter",
       "ace.compact_search",
       "atlas.packet_search",
-      "atlas:packet_search",
       "atlas.coverage",
-      "atlas:verify_coverage"
+      "karpathy.attention_rank_files",
+      "topology.language_distribution"
     ],
     "lexical": [
       "legal.find_similar_opinions",
@@ -221,15 +276,22 @@
       "legal.transcribe_video",
       "legal.check_services",
       "engram.ace_packet_inject",
+      "atlas_get_active_context",
       "engram.chat_memory_store",
       "engram.redis_health",
+      "atlas.embedding_keywords",
+      "atlas.embedding_cluster_tags",
       "wiki.status",
       "wiki.search",
       "ops.update_LLMS.md",
+      "ops.verify_write",
       "ops.fixer_semantic_recall",
       "evidence.image_feedback",
       "ops.gpu_attention",
-      "ace.compact_search"
+      "ace.compact_search",
+      "karpathy.attention_rank_files",
+      "karpathy.som_topology_stats",
+      "context.build_ace_packet"
     ],
     "memory": [
       "engram.chat_memory_store",
@@ -243,8 +305,7 @@
       "search.go_hybrid",
       "ops.gpu_attention",
       "atlas.prefilter",
-      "atlas.coverage",
-      "atlas:verify_coverage"
+      "atlas.coverage"
     ]
   },
   "tools": [
@@ -256,6 +317,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -271,6 +333,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -285,6 +348,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -301,6 +365,24 @@
         "identity"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "intent"
+      ]
+    },
+    {
+      "tool_name": "trace_search",
+      "namespace": "misc",
+      "description": "DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -317,6 +399,23 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "wiki_note_lookup",
+      "namespace": "misc",
+      "description": "DEPRECATED bare-name alias for kb.wiki_note_lookup. Gated by MCP_LEGACY_ALIASES.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -332,6 +431,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -349,6 +449,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -369,6 +470,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -391,6 +493,7 @@
       "identity_fields": [
         "source_ref"
       ],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -411,6 +514,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -432,6 +536,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -452,6 +557,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -475,11 +581,29 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
         "snapshot",
         "focus"
+      ]
+    },
+    {
+      "tool_name": "admin.log_event",
+      "namespace": "admin",
+      "description": "Logs a manual administrative event with context.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "event",
+        "severity",
+        "context"
       ]
     },
     {
@@ -490,6 +614,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -505,6 +630,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -519,6 +645,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -535,12 +662,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "evidenceId",
-        "includeSegments"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.find_precedents",
@@ -550,14 +675,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "query",
-        "court",
-        "caseId",
-        "limit"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.search_recordings",
@@ -567,14 +688,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "query",
-        "caseId",
-        "evidenceId",
-        "limit"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.cross_examine",
@@ -584,13 +701,10 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "witnessName",
-        "witnessStatement",
-        "caseContext"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.score_case",
@@ -600,11 +714,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "caseId"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.similar_cases",
@@ -614,12 +727,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "caseId",
-        "limit"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.batch_ingest",
@@ -629,13 +740,10 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "documentUrls",
-        "caseId",
-        "priority"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.build_timeline",
@@ -645,12 +753,10 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "caseId",
-        "maxEvents"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.cross_reference_evidence",
@@ -660,13 +766,10 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "evidenceId",
-        "caseIds",
-        "topK"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.issue_spotter",
@@ -676,12 +779,10 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "caseId",
-        "additionalContext"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.find_similar_opinions",
@@ -692,13 +793,10 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "factsSummary",
-        "chargeCode",
-        "limit"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.transcribe_video",
@@ -709,14 +807,10 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "url",
-        "caseId",
-        "priority",
-        "timestampChunking"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.write_obsidian_note",
@@ -726,14 +820,10 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "path",
-        "content",
-        "tags",
-        "append"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.mock_trial",
@@ -743,13 +833,10 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
-      "input_schema_keys": [
-        "caseId",
-        "chargeDescription",
-        "defenseTheory"
-      ]
+      "input_schema_keys": []
     },
     {
       "tool_name": "legal.check_services",
@@ -761,6 +848,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -774,6 +862,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "APPLY",
       "writes_to": [
         "engram"
       ],
@@ -785,6 +874,19 @@
       ]
     },
     {
+      "tool_name": "atlas_get_active_context",
+      "namespace": "misc",
+      "description": "Read the newest bounded ACE reconciliation packet from Redis Valkey, validate it, and return compact resume context.",
+      "retrieval_layer": [
+        "cache"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
       "tool_name": "engram.chat_memory_store",
       "namespace": "engram",
       "description": "Append a chat turn to user memory store (Redis sorted set + bounded trim).",
@@ -793,6 +895,7 @@
         "memory"
       ],
       "identity_fields": [],
+      "operation_kind": "APPLY",
       "writes_to": [
         "engram"
       ],
@@ -812,11 +915,86 @@
         "cache"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "redis"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": []
+    },
+    {
+      "tool_name": "atlas.embedding_keywords",
+      "namespace": "atlas",
+      "description": "Extract top-K keywords from a 768-dimensional source embedding using cosine similarity to cached keyword centroids in Redis.",
+      "retrieval_layer": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "packetKey",
+        "sourceRef",
+        "embedding",
+        "topK"
+      ]
+    },
+    {
+      "tool_name": "atlas.embedding_cluster_tags",
+      "namespace": "atlas",
+      "description": "Assign SOM cluster tags to a 768-dimensional embedding by matching against cached SOM centroids in Redis.",
+      "retrieval_layer": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "packetKey",
+        "sourceRef",
+        "embedding",
+        "topClusters"
+      ]
+    },
+    {
+      "tool_name": "atlas.embedding_neighbors",
+      "namespace": "atlas",
+      "description": "Find semantically adjacent packets via Qdrant ANN search on a 768-dimensional embedding. Returns a query structure for agentic dense search in the source lane collection.",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "packetKey",
+        "sourceRef",
+        "embedding",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "atlas.embedding_all_tags",
+      "namespace": "atlas",
+      "description": "Comprehensive tag derivation for a packet embedding. Combines keywords, cluster tags, and neighbor query in parallel. Returns combined metadata for packet enrichment.",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "packetKey",
+        "sourceRef",
+        "embedding",
+        "keywordTopK",
+        "clusterTopK",
+        "neighborLimit"
+      ]
     },
     {
       "tool_name": "topology.hydration_status",
@@ -826,6 +1004,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -838,6 +1017,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -850,10 +1030,9 @@
         "read"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "postgres"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "include_row_estimates",
         "schema"
@@ -867,16 +1046,203 @@
         "read"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "postgres"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "table",
         "schema",
         "include_columns",
         "include_indexes",
         "include_foreign_keys"
+      ]
+    },
+    {
+      "tool_name": "library.registry_lookup",
+      "namespace": "library",
+      "description": "Resolve a library/package identity by its canonical address (e.g. \"npm:ts-morph@27.0.2\", \"pip:torch@2.8.0+cu128\"). Returns Tier 1 (name/version/exports/types) and Tier 2 (declaration file paths, if populated) — never Tier 3/4 content.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "address"
+      ]
+    },
+    {
+      "tool_name": "library.registry_search",
+      "namespace": "library",
+      "description": "Search the library registry by name substring, source type, package manager, or workspace root. Returns bounded metadata only (name/version/address) — no tier content.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "sourceType",
+        "packageManager",
+        "workspaceRoot",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "library.registry_fetch_tier",
+      "namespace": "library",
+      "description": "Fetch Tier 3 (bounded, depth-limited implementation subset, with content) or Tier 4 (full walk, paths-only) file content for a package, applying the exclude-by-default list (dist bundles, source maps, minified code, binary assets, nested duplicate dependencies, generated caches). Explicit-request-only — this is intentionally NOT part of the bulk scan.",
+      "retrieval_layer": [
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "address",
+        "tier"
+      ]
+    },
+    {
+      "tool_name": "library.registry_rescan",
+      "namespace": "library",
+      "description": "Trigger a rescan of the library registry (npm root + sveltekit-frontend + miniforge pip sidecar). Runs scripts/atlas/library-registry-scan.mjs as a child process and returns a summary. This is a write-adjacent operation (repopulates library_identities).",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "ldr_research",
+      "namespace": "misc",
+      "description": "Execute Local Deep Research - autonomous web search, document extraction, and synthesis for questions Parent Atlas cannot answer from local repo evidence. Returns a synthesized answer with web sources as CANDIDATE evidence only; it does not persist canonical records. Use trace_dynamic_context first for repo-internal questions.",
+      "retrieval_layer": [
+        "dense",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "maxResults",
+        "maxDocs",
+        "temperature"
+      ]
+    },
+    {
+      "tool_name": "phase109a_archive_signal",
+      "namespace": "misc",
+      "description": "Archive a semantic signal: transitions ACTIVE or SUPERSEDED to ARCHIVED state. Creates immutable audit event in semantic_lifecycle_events table.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "signal_id",
+        "actor_id",
+        "reason"
+      ]
+    },
+    {
+      "tool_name": "phase109a_supersede_signal",
+      "namespace": "misc",
+      "description": "Supersede a semantic signal with a replacement: transitions ACTIVE to SUPERSEDED. Sets superseded_by link and creates audit event.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "signal_id",
+        "replacement_signal_id",
+        "actor_id",
+        "reason"
+      ]
+    },
+    {
+      "tool_name": "phase109a_supersede_recommendation",
+      "namespace": "misc",
+      "description": "Supersede a recommendation with a replacement: transitions ACTIVE lifecycle_state to SUPERSEDED. Revision-aware — rejects self-supersession, cross-subject/cross-workspace replacements, and same-revision replacements. Sets superseded_by link and creates audit event.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "recommendation_id",
+        "replacement_recommendation_id",
+        "actor_id",
+        "reason"
+      ]
+    },
+    {
+      "tool_name": "phase109a_promote_recommendation",
+      "namespace": "misc",
+      "description": "Promote a recommendation to APPROVED status. Enforces mutual approval safeguard (approver ≠ creator). Supports dry-run mode.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "recommendation_id",
+        "approver_id",
+        "proof_manifest_id",
+        "actor_id",
+        "dry_run"
+      ]
+    },
+    {
+      "tool_name": "phase109a_query_signal_history",
+      "namespace": "misc",
+      "description": "Query the state transition history for a semantic signal. Returns all audit events in reverse chronological order.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "signal_id",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "phase109a_validate_state_transition",
+      "namespace": "misc",
+      "description": "Validate whether a state transition is allowed without making changes. Useful for dry-run validation.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "signal_id",
+        "current_state",
+        "target_state"
       ]
     },
     {
@@ -887,6 +1253,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -907,6 +1274,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -922,6 +1290,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -938,6 +1307,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -955,6 +1325,7 @@
         "read"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -969,10 +1340,9 @@
         "graph"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "neo4j"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "sourceRefs",
         "stableKey",
@@ -993,6 +1363,7 @@
         "rerank"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1014,6 +1385,7 @@
         "memory"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1030,10 +1402,9 @@
         "graph"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "neo4j"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "fromKey",
         "toKey",
@@ -1049,6 +1420,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1065,10 +1437,9 @@
         "graph"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "neo4j"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "stableKey"
       ]
@@ -1081,6 +1452,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1096,6 +1468,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1113,6 +1486,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1128,6 +1502,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1145,6 +1520,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1161,6 +1537,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1180,6 +1557,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1195,6 +1573,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1213,6 +1592,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1228,6 +1608,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1247,6 +1628,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -1259,6 +1641,7 @@
         "rerank"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1276,6 +1659,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1291,6 +1675,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1311,6 +1696,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1326,10 +1712,32 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
         "query"
+      ]
+    },
+    {
+      "tool_name": "trace_dynamic_context",
+      "namespace": "misc",
+      "description": "Build a bounded evidence bundle with the first trace_dynamic_context slice: static discovery plus canonical Postgres join-back.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "workspaceId",
+        "question",
+        "target",
+        "workspaceRevision",
+        "sourceRevision",
+        "lanes",
+        "limits"
       ]
     },
     {
@@ -1340,6 +1748,7 @@
         "lexical"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1356,6 +1765,7 @@
         "lexical"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1373,6 +1783,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1390,6 +1801,7 @@
         "rerank"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1411,6 +1823,7 @@
         "rerank"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1428,6 +1841,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1447,6 +1861,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1461,6 +1876,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1475,6 +1891,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1492,6 +1909,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1509,6 +1927,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1530,6 +1949,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1547,6 +1967,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1564,6 +1985,7 @@
         "memory"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1580,6 +2002,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1597,6 +2020,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1613,6 +2037,7 @@
         "identity"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1629,6 +2054,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1646,6 +2072,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1660,6 +2087,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1675,6 +2103,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1689,6 +2118,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1704,6 +2134,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1718,11 +2149,50 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
         "clusterId",
         "maxNotes"
+      ]
+    },
+    {
+      "tool_name": "clusters.som_cell_lookup",
+      "namespace": "clusters",
+      "description": "Look up packets in a 20×20 SOM grid cell and its Moore neighborhood (8 adjacent cells). Returns packet_key, source_ref, authority scores, and provenance. NOTE: som_assignment_health is \"unverified\" until SOM distribution audit completes.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "som_row",
+        "som_col",
+        "include_neighbors",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "clusters.kmeans_members",
+      "namespace": "clusters",
+      "description": "List packets belonging to K-means clusters (0–19, from atlas_packets.som_cluster). Returns source refs, authority scores, and SOM grid positions.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "cluster_ids",
+        "limit",
+        "min_authority"
       ]
     },
     {
@@ -1733,6 +2203,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1749,11 +2220,9 @@
         "ops"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "postgres",
-        "kanban"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "PROPOSE",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "operator_token",
         "file_path",
@@ -1769,10 +2238,9 @@
         "ops"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "postgres"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "operator_token",
         "test_file",
@@ -1787,6 +2255,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "APPLY",
       "writes_to": [
         "postgres",
         "kanban"
@@ -1811,10 +2280,9 @@
         "ops"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "postgres"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "operator_token",
         "gate",
@@ -1829,6 +2297,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1846,6 +2315,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1861,6 +2331,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1876,10 +2347,9 @@
         "graph"
       ],
       "identity_fields": [],
-      "writes_to": [
-        "neo4j"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "edge_hash"
       ]
@@ -1892,6 +2362,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1908,6 +2379,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1923,6 +2395,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1939,6 +2412,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1953,6 +2427,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1967,6 +2442,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1981,6 +2457,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -1996,6 +2473,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2012,6 +2490,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2020,6 +2499,114 @@
         "section",
         "fact",
         "redis_only"
+      ]
+    },
+    {
+      "tool_name": "ops.search_tools",
+      "namespace": "ops",
+      "description": "Search the bounded tool catalog and return a compact always-include + recent + ranked subset. Use this to avoid flooding the context window with every available tool.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "top_k",
+        "domain",
+        "bootstrap"
+      ]
+    },
+    {
+      "tool_name": "ops.inspect_tool_contract",
+      "namespace": "ops",
+      "description": "Returns the formal input contract for a named ops.* tool: required fields, types, nullability, side-effect class, and authorization requirements. MUST be called before any write tool invocation to prove the model read the contract.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "tool_name"
+      ]
+    },
+    {
+      "tool_name": "ops.validate_tool_call",
+      "namespace": "ops",
+      "description": "Pre-flight validation for any ops.* write tool call. Checks all required arguments are non-null non-empty strings, validates authorization evidence is present for WRITE tools, and verifies the current workflow state permits a write attempt. If this tool returns ok=false, the actual write tool MUST NOT be invoked.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "tool_name",
+        "arguments",
+        "authorization_evidence_id",
+        "current_workflow_state"
+      ]
+    },
+    {
+      "tool_name": "ops.audit_tool_result",
+      "namespace": "ops",
+      "description": "Verifies that a tool result is consistent with what was attempted. Classifies the result and determines whether a side effect actually occurred. MUST be called after every ops.* invocation before the model responds to the user.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "tool_name",
+        "tool_call_id",
+        "expected_effect",
+        "result_ok",
+        "result_error",
+        "result_data"
+      ]
+    },
+    {
+      "tool_name": "ops.verify_write",
+      "namespace": "ops",
+      "description": "Proves that a write actually occurred by reading the target back and computing its hash. A write is NOT proven merely because a tool returned ok=true. For file writes: reads the file, computes SHA-256, compares to expected_before_hash. For Redis writes: reads the key back and confirms content matches. For Postgres writes: counts affected rows and reads stored content hash.",
+      "retrieval_layer": [
+        "cache",
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "target_kind",
+        "target",
+        "expected_contains",
+        "expected_before_hash"
+      ]
+    },
+    {
+      "tool_name": "ops.validate_claims",
+      "namespace": "ops",
+      "description": "Parses proposed agent response claims and verifies each one against evidence. Detects false completion claims (claiming success without proof). MUST be called before the agent sends any response that asserts a write occurred. Returns supported=true only for claims backed by ops.verify_write or ops.audit_tool_result evidence.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "draft_claims",
+        "evidence_ids",
+        "write_verified",
+        "side_effect_confirmed"
       ]
     },
     {
@@ -2033,6 +2620,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2050,6 +2638,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2076,6 +2665,7 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2095,6 +2685,7 @@
         "dense"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2112,8 +2703,9 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "APPLY",
       "writes_to": [
-        "qdrant"
+        "neo4j"
       ],
       "required_permissions": "read_write",
       "input_schema_keys": [
@@ -2131,6 +2723,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2151,6 +2744,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2168,6 +2762,7 @@
         "synthesis"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2188,6 +2783,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2206,6 +2802,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2223,6 +2820,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2238,6 +2836,7 @@
         "ops"
       ],
       "identity_fields": [],
+      "operation_kind": "AUDIT",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2250,6 +2849,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2262,6 +2862,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": []
@@ -2274,6 +2875,7 @@
         "unknown"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2289,6 +2891,7 @@
         "rerank"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2307,6 +2910,7 @@
         "graph"
       ],
       "identity_fields": [],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2330,29 +2934,7 @@
         "feature_id",
         "source_ref"
       ],
-      "writes_to": [],
-      "required_permissions": "read_only",
-      "input_schema_keys": [
-        "source_ref",
-        "feature_id",
-        "concept_id",
-        "summary_query",
-        "limit"
-      ]
-    },
-    {
-      "tool_name": "atlas:packet_search",
-      "namespace": "atlas",
-      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
-      "retrieval_layer": [
-        "dense",
-        "graph",
-        "identity"
-      ],
-      "identity_fields": [
-        "feature_id",
-        "source_ref"
-      ],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
@@ -2375,30 +2957,417 @@
         "feature_id",
         "source_ref"
       ],
-      "writes_to": [
-        "postgres"
-      ],
-      "required_permissions": "read_write",
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
       "input_schema_keys": [
         "verbose"
       ]
     },
     {
-      "tool_name": "atlas:verify_coverage",
+      "tool_name": "atlas.graph.pagerank",
       "namespace": "atlas",
-      "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+      "description": "List the top authoritative nodes in the codebase by PageRank score (computed by Neo4j GDS). Returns paginated results with packet_key, pageRank score, and rank. Used by agents to identify high-authority code areas for focus.",
       "retrieval_layer": [
-        "dense",
-        "rerank"
+        "graph"
       ],
       "identity_fields": [
-        "feature_id",
-        "source_ref"
+        "packet_key"
       ],
+      "operation_kind": "READ",
       "writes_to": [],
       "required_permissions": "read_only",
       "input_schema_keys": [
-        "verbose"
+        "limit",
+        "offset"
+      ]
+    },
+    {
+      "tool_name": "atlas.workstation_status",
+      "namespace": "atlas",
+      "description": "Return Parent Atlas workstation readiness from the canonical Postgres spine plus lane-health artifacts. Use this before trusting mirror-backed MCP retrieval tools.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "atlas.feature_document_status",
+      "namespace": "atlas",
+      "description": "Return feature-scoped document evidence readiness for Parent Atlas. Checks docs/features notes, docs/<feature_id> bundles, manifest validity, official docs coverage, and Atlas canonical spine counts before ingestion/ranking promotion.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [
+        "feature_id"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId"
+      ]
+    },
+    {
+      "tool_name": "atlas.populate_feature_documents",
+      "namespace": "atlas",
+      "description": "Generate or refresh the feature-scoped docs bundle for Parent Atlas. Builds docs/features note content, writes docs/<feature_id>/manifest.json from LDR evidence, and seeds a compact indexed source packet for the generated feature note.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [
+        "feature_id"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId",
+        "query",
+        "forceRefresh",
+        "dryRun",
+        "maxSources",
+        "startResearchIfMissing"
+      ]
+    },
+    {
+      "tool_name": "atlas.feature_document_ingestion_plan",
+      "namespace": "atlas",
+      "description": "Return the validated ingestion plan for a feature docs bundle. Reads docs/<feature>/manifest.json, filters officialDocs through SSRF-safe URL validation, and reports the exact URLs that can be sent through the existing library crawl pipeline.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId"
+      ]
+    },
+    {
+      "tool_name": "atlas.feature_document_enrichment_plan",
+      "namespace": "atlas",
+      "description": "Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. Validates feature-doc sources, folds in linked Atlas source_refs, and returns bounded extraction, retrieval, storage, and model intents.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [
+        "source_ref"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId"
+      ]
+    },
+    {
+      "tool_name": "atlas.materialize_feature_evidence_tuples",
+      "namespace": "atlas",
+      "description": "Read-only tuple materializer for Parent Atlas feature-document evidence. Links feature docs to canonical packet_key, source_ref, tree_node_id, and fact-table provenance without writing any new rows.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId",
+        "maxTuples"
+      ]
+    },
+    {
+      "tool_name": "atlas.pos_concept_tagging",
+      "namespace": "atlas",
+      "description": "Build a deterministic POS/concept tagging packet from AST, semantic, topology, ranking, citation, screenshot, and MCP tool-call evidence. Returns versioned ontology-linked tuples and the packet envelope without writing canonical truth.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "schemaVersion",
+        "packetKey",
+        "sourceRef",
+        "sourceRevision",
+        "workspaceRevision",
+        "featureId",
+        "featureLabel",
+        "treeNodeId",
+        "titleId",
+        "jsonlSourceDigest",
+        "jsonlRecordIndex",
+        "jsonlLineNumber",
+        "jsonlParserRevision",
+        "representationId",
+        "representationRevision",
+        "producerId",
+        "producerRevision",
+        "featureRevision",
+        "graphRevision",
+        "ontologyRevision",
+        "modelRevision",
+        "partOfSpeech",
+        "astSymbols",
+        "semanticConceptIds",
+        "ontologyIds",
+        "posCandidateLabels",
+        "citations",
+        "screenshots",
+        "policySummary",
+        "mcpToolCalls",
+        "rankingSignals",
+        "participants",
+        "concepts",
+        "sourceTables",
+        "inputDigest",
+        "lastVerifiedAt"
+      ]
+    },
+    {
+      "tool_name": "atlas.build_taxonomy_topology_packet",
+      "namespace": "atlas",
+      "description": "Build a compact ACE packet for taxonomy/topology routing. Combines ontology path, top children, SOM 20x20 neighborhood, K-means labels, linked tuples, and fanout hints into a small Valkey-backed packet suitable for KAG/DAG and classifier lanes.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureId",
+        "nodeKey",
+        "query",
+        "limit",
+        "asLatest"
+      ]
+    },
+    {
+      "tool_name": "karpathy.attention_rank_files",
+      "namespace": "karpathy",
+      "description": "Rank files by attention score (Karpathy blend). Embeds query via embeddinggemma, fetches Karpathy scores from Redis, returns top-N files by attention × authority. Blending: 0.4·PageRank + 0.3·attention + 0.3·authority. Uses gpu:karpathy:scores Redis cache (24h TTL).",
+      "retrieval_layer": [
+        "cache",
+        "dense",
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "include_scores"
+      ]
+    },
+    {
+      "tool_name": "karpathy.som_topology_stats",
+      "namespace": "karpathy",
+      "description": "Get SOM topology statistics: grid dimensions, cluster occupancy, centroid stats. Reads from Redis cached SOM state (gpu:karpathy:som:* keys). Returns grid heatmap and occupancy metrics.",
+      "retrieval_layer": [
+        "cache",
+        "graph"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "metric"
+      ]
+    },
+    {
+      "tool_name": "topology.language_distribution",
+      "namespace": "topology",
+      "description": "Get language distribution across Qdrant clusters. Queries codebase_chunks_768 payload tags (language field) and returns counts by language, top files per language.",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "language",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "research.playbook_lookup_by_language",
+      "namespace": "research",
+      "description": "Lookup code playbooks and examples by programming language. Searches CouchDB karpathy_wiki (stored playbooks indexed by language), returns usage patterns and Karpathy authority scores.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "language",
+        "topic",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "context.build_ace_packet",
+      "namespace": "context",
+      "description": "Build and persist a bounded ACE packet from a sourceRef or markdown content. Reads a local file when sourceRef resolves, enriches with variance recovery, writes to Redis ACE packet store, and returns only compact packet metadata for injection-safe reuse.",
+      "retrieval_layer": [
+        "cache"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "sourceRef",
+        "markdown",
+        "query",
+        "featureId",
+        "forceRefresh",
+        "defer"
+      ]
+    },
+    {
+      "tool_name": "context.build_indexed_source_packet",
+      "namespace": "context",
+      "description": "Build a compact Valkey-backed packet for an already indexed source_ref. Prefers Parent Atlas identity lookup (NES card + SOM cluster) to avoid broad retrieval, and falls back to bounded source packetization only if the indexed identity path misses.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [
+        "source_ref"
+      ],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "sourceRef",
+        "query",
+        "featureId",
+        "forceRefresh",
+        "defer"
+      ]
+    },
+    {
+      "tool_name": "service_workers.status",
+      "namespace": "service_workers",
+      "description": "Return the current local trace service worker queue status and recent job summaries.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "service_workers.result",
+      "namespace": "service_workers",
+      "description": "Fetch the result of a queued local trace service worker job by job id.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "job_id"
+      ]
+    },
+    {
+      "tool_name": "miniforge.health",
+      "namespace": "miniforge",
+      "description": "Check the local Miniforge CUDA sidecar used for NLP and analysis.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "AUDIT",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "miniforge.analyze",
+      "namespace": "miniforge",
+      "description": "Run Miniforge CUDA-backed NLP analysis over text for entities, relationships, chunks, and features.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "text",
+        "sourceType",
+        "extractionMode",
+        "documentId",
+        "sourceRef",
+        "packetKey",
+        "language",
+        "modelId",
+        "maxChars",
+        "defer"
+      ]
+    },
+    {
+      "tool_name": "miniforge.extract",
+      "namespace": "miniforge",
+      "description": "Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "text",
+        "sourceType",
+        "extractionMode",
+        "documentId",
+        "sourceRef",
+        "packetKey",
+        "language",
+        "modelId",
+        "maxChars",
+        "defer"
+      ]
+    },
+    {
+      "tool_name": "shell.run",
+      "namespace": "shell",
+      "description": "Run a bash command and return output. Used by Gemma4 to safely invoke shell operations. Output is truncated to 10KB to stay within context limits.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "operation_kind": "READ",
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "command",
+        "timeout_ms",
+        "cwd"
       ]
     }
   ]

@@ -209,3 +209,29 @@ python scripts/atlas/train-query-router-pytorch.py --help
 Training remains blocked until a revision-qualified JSONL dataset exists.
 No Qdrant, Postgres, Valkey, Graphify, ANN index, model-residency or canonical
 writes are authorized by this change.
+
+## NLP-10 — XGBoost trace-label identity bridge
+
+- [x] Keep `packages/parent-atlas` as the sole bridge contract owner.
+- [x] Validate bridge checksum, revisions, evidence references, unique labels,
+  and unique packet keys.
+- [x] Add read-only candidate audit with explicit
+  `PROPOSED_NOT_GROUND_TRUTH` status.
+- [x] Require an explicit bridge for exporter apply mode.
+- [x] Reject stale, partial, empty, or unresolved bridge mappings before apply.
+- [ ] Review candidate mappings against source evidence and current revisions.
+- [ ] Add an upstream trace-record identity producer carrying canonical
+  `packet_key`/`source_ref` plus workspace/source/representation revisions;
+  synthetic `packet:<label>:<ordinal>` refs are insufficient.
+- [ ] Confirm and wire the real runtime retrieval trace emitter; current
+  repository search finds only synthetic seed/backfill writers for
+  `agent_traces`, not an active application writer.
+- [ ] Reconcile the existing `packages/atlas-core` `WorkflowTrace` logger with
+  a live durable table before using it as a training source; the shared proxy
+  currently has no `workflow_traces` table, and migrations remain blocked.
+- [x] Define and test the future trace packet reference contract in
+  `packages/parent-atlas`, fixed to `semantic_768` and revision-qualified
+  identity. Historical rows remain unchanged.
+- [ ] Produce a non-empty approved bridge manifest.
+- [ ] Rerun the exporter and obtain a lineage-valid, revision-qualified dataset.
+- [ ] Compare XGBoost and PyTorch on the exact same frozen split and tensor.

@@ -578,6 +578,28 @@ This workstream is design-only until explicitly opened as its own task.
 ### Optional downstream phases
 
 1. Phase 10B TurboVec + Qdrant optimization.
+
+## GPU context compiler alignment — 2026-08-22
+
+- [x] Reuse existing revisioned ordinal registry, candidate feature columnar
+  pack, valid-mask padding, and GPU residency lease contracts.
+- [x] Add `TraversalInstructionV1` with compact `uint8` decision flags,
+  revisioned ordinal-map identity, bounded head mask, graph depth, and evidence
+  offsets. It carries no device pointer or raw embedding tensor.
+- [x] Add the pure deterministic instruction compiler; reject duplicate
+  ordinals and primary ordinals outside the admitted candidate set.
+- [x] Add a read-only ContextManifest adapter that checks candidate membership
+  count and graph-revision agreement before compiling the instruction.
+- [x] Keep GPU snapshot and telemetry contracts explicitly on native
+  `semantic_768`; do not inherit the legacy Qdrant projection constant.
+- [x] Align the Qdrant projection contract/scorer to native `semantic_768`,
+  `codebase_chunks_768_v2`, and named vector `content` without applying a
+  collection migration.
+- [ ] Wire the adapter to the existing SearchRuntime/ContextManifest seam.
+- [ ] Prove native LibTorch/N-API GEMM parity against the CPU feature-head
+  oracle.
+- [ ] Prove same-corpus cuVS/CAGRA ordinal parity and keep TurboVec/DiskANN as
+  challengers.
 2. Phase 11 cuVS / CUDA sidecar benchmark.
 3. Phase 12 CUDA streams / tensor bridge / RNN experiments.
 4. Phase 13 graph synthesis + feature MapReduce.

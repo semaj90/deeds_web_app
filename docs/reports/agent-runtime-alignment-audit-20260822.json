@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.agent-runtime-alignment-audit.v1",
+  "generatedAt": "2026-08-23T00:37:58.050Z",
+  "readOnly": true,
+  "canonicalWritesAttempted": false,
+  "status": "PARTIAL_PROVEN_ALIGNMENT_OPEN",
+  "checks": [
+    {
+      "id": "DRIZZLE_NODE_POSTGRES_OWNER",
+      "passed": true,
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/db/client.ts"
+      ]
+    },
+    {
+      "id": "NO_PRISMA_RUNTIME_OWNER",
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "id": "NO_KYSELY_RUNTIME_OWNER",
+      "passed": true,
+      "evidence": []
+    },
+    {
+      "id": "SEMANTIC_768_NATIVE_CONTRACT_PRESENT",
+      "passed": true,
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.ts"
+      ]
+    },
+    {
+      "id": "SEMANTIC_512_ROUTING_CONTRACT_PRESENT",
+      "passed": true,
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/semantic-512.ts",
+        "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts"
+      ]
+    },
+    {
+      "id": "QDRANT_NON_IDENTITY_AUTHORITY_DECLARED",
+      "passed": true,
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/fanout-admission-v1.ts"
+      ]
+    },
+    {
+      "id": "CODEBASE_QDRANT_SEMANTIC_768_SOURCE_REF_HARD_RULE",
+      "passed": true,
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-semantic-768-source-ref-v1.ts"
+      ]
+    },
+    {
+      "id": "REPRESENTATION_REGISTRY_AND_QUERY_OWNER_AGREE",
+      "passed": true,
+      "status": "ALIGNED",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/semantic-512.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.ts"
+      ]
+    },
+    {
+      "id": "SEMANTIC_MATRIX_REPRESENTATION_RECONCILIATION",
+      "passed": false,
+      "status": "OPEN",
+      "evidence": [
+        "semantic_768 native matrix and semantic_512 derived projection have separate owners; index/readback proof remains open"
+      ]
+    }
+  ],
+  "missingExpectedArtifacts": [
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/semantic-storage-boundary-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/active-mcp-tool-registry-v1.spec.ts"
+  ]
+}
