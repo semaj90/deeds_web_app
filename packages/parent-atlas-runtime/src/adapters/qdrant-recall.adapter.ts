@@ -1,7 +1,8 @@
 /**
  * Qdrant ANN Recall Adapter — Semantic vector search stage
  *
- * Executes HNSW approximate nearest neighbor search against Qdrant codebase_chunks_768
+ * Executes HNSW approximate nearest neighbor search against the active Qdrant
+ * codebase_chunks_768_v2 projection.
  * collection as the second recall stage in the Parent Atlas retrieval pipeline.
  *
  * Returns up to qdrantLimit candidates sorted by cosine similarity.
@@ -25,7 +26,8 @@ export interface QdrantRecallResult extends CandidateForIdentityResolution {
 /**
  * Search Qdrant for nearest neighbors by semantic similarity
  *
- * Uses HNSW index on codebase_chunks_768 collection.
+ * Uses HNSW index on codebase_chunks_768_v2 collection. The adapter accepts
+ * only native 768-dimensional semantic queries; Postgres remains identity owner.
  * Returns up to `limit` candidates sorted by cosine similarity (descending).
  */
 export async function searchQdrantANN(
@@ -39,7 +41,7 @@ export async function searchQdrantANN(
   }
 
   try {
-    const response = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+    const response = await fetch(`${qdrantUrl}/collections/codebase_chunks_768_v2/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

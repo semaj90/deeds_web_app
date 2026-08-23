@@ -24,7 +24,6 @@ import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { countTokens } from '$lib/server/llm/token-budget.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/vector/embedding-dimension-guard.js';
 import {
   type EmbeddingProvider,
@@ -232,10 +231,20 @@ export async function tryEmbed(
             signal,
           };
 
-          const response =
-            provider === 'ollama' ? await ollamaFetch(candidate.url, request) : await fetch(candidate.url, request);
+          // Embedding transport must remain independent from the chat runtime.
+          // Do not import ollama.ts here: it initializes the mandatory chat GGUF
+          // contract (ROTORQUANT_MODEL_PATH) even when only embeddings are used.
+          const response = await fetch(candidate.url, request);
 
-          const raw = await response.text();
+          // Keep the adapter compatible with real Fetch responses and the
+          // minimal JSON-only responses used by deterministic unit fixtures.
+          const responseWithJson = response as Response & { json?: () => Promise<unknown> };
+          const raw =
+            typeof responseWithJson.text === 'function'
+              ? await responseWithJson.text()
+              : typeof responseWithJson.json === 'function'
+                ? JSON.stringify(await responseWithJson.json())
+                : '';
 
           let data: EmbeddingResponse = {};
 
@@ -304,6 +313,13 @@ export async function tryEmbed(
         expectedDimensions,
         attempts,
       });
+
+      const dimensionMismatch = attempts.find((attempt) =>
+        attempt.error?.startsWith('Embedding dimension mismatch:'),
+      );
+      if (dimensionMismatch) {
+        throw new Error(`SEMANTIC_768_DIMENSION_MISMATCH: ${dimensionMismatch.error}`);
+      }
 
       return null;
     }, traceMetadata);

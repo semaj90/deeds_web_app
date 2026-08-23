@@ -44,6 +44,19 @@ export interface EmbeddingOptions {
 }
 
 type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local' | 'cache';
+const SEMANTIC_DIMENSION = 768;
+
+function isSemantic768Vector(value: unknown): value is number[] {
+  return Array.isArray(value)
+    && value.length === SEMANTIC_DIMENSION
+    && value.every((component) => typeof component === 'number' && Number.isFinite(component));
+}
+
+function isSemantic768Batch(value: unknown, expectedCount: number): value is number[][] {
+  return Array.isArray(value)
+    && value.length === expectedCount
+    && value.every(isSemantic768Vector);
+}
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -778,7 +791,9 @@ export async function generateEmbeddings(
     : await Promise.all(texts.map(getCachedEmbeddingEntry));
 
   // Check cache for each text
-  const cachedResults = cachedEntries.map((entry) => entry?.vector ?? null);
+  const cachedResults = cachedEntries.map((entry) =>
+    entry && isSemantic768Vector(entry.vector) ? entry.vector : null
+  );
   const uncachedIndices = cachedResults.map((v, i) => (v === null ? i : -1)).filter((i) => i >= 0);
 
   // All cached — return immediately
@@ -813,7 +828,7 @@ export async function generateEmbeddings(
   if (LLAMA_EMBED_URL) {
     const llamaStart = performance.now();
     const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
-    if (llamaVecs) {
+    if (llamaVecs && isSemantic768Batch(llamaVecs, uncachedTexts.length)) {
       newVectors = llamaVecs;
       source = 'http-ollama';
       model = 'embeddinggemma-openai-compatible';
@@ -838,7 +853,7 @@ export async function generateEmbeddings(
     const grpcStart = performance.now();
     const grpcResult = await generateViaGrpc(uncachedTexts);
     const grpcVectors = grpcResult.vectors;
-    if (grpcVectors && grpcVectors.length === uncachedTexts.length && grpcVectors[0]?.length > 0) {
+    if (isSemantic768Batch(grpcVectors, uncachedTexts.length)) {
       newVectors = grpcVectors;
       source = 'grpc';
       model = 'embeddinggemma-grpc';
@@ -865,7 +880,7 @@ export async function generateEmbeddings(
     const quicStart = performance.now();
     const quicResult = await generateViaQuic(uncachedTexts);
     const quicVectors = quicResult.vectors;
-    if (quicVectors && quicVectors.length === uncachedTexts.length && quicVectors[0]?.length > 0) {
+    if (isSemantic768Batch(quicVectors, uncachedTexts.length)) {
       newVectors = quicVectors;
       source = 'quic';
       model = 'embeddinggemma-quic';
@@ -891,9 +906,17 @@ export async function generateEmbeddings(
   if (!newVectors) {
     try {
       const httpResult = await generateViaHttp(uncachedTexts, options);
-      newVectors = httpResult.vectors;
-      source = httpResult.source;
-      attempts.push(...httpResult.attempts);
+      if (isSemantic768Batch(httpResult.vectors, uncachedTexts.length)) {
+        newVectors = httpResult.vectors;
+        source = httpResult.source;
+        attempts.push(...httpResult.attempts);
+      } else {
+        attempts.push(...httpResult.attempts, {
+          transport: httpResult.source,
+          status: 'failed',
+          detail: 'embedding response did not satisfy semantic_768 finite-vector contract',
+        });
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const httpAttempts =
@@ -916,7 +939,7 @@ export async function generateEmbeddings(
     const onnxStart = performance.now();
     try {
       const onnxVectors = await batchEmbedOnnx(uncachedTexts);
-      const validVectors = onnxVectors.filter((v) => v !== null) as number[][];
+      const validVectors = onnxVectors.filter(isSemantic768Vector);
 
       if (validVectors.length === uncachedTexts.length) {
         // All ONNX embeddings succeeded
@@ -976,14 +999,14 @@ export async function generateEmbeddings(
     vectors[idx] = newVectors[j];
   }
 
-  // Validate dimension contract (768-dim canonical for embeddinggemma)
-  const dimension = vectors[0]?.length ?? 768;
-  if (dimension !== 768) {
-    console.warn(
-      `[embedding-client] WARNING: Received ${dimension}-dim embedding from ${source}, expected 768-dim. ` +
-      `This may indicate a model mismatch or misconfiguration (source: ${model}).`
+  // Validate the complete merged batch before caching or returning it.
+  if (!isSemantic768Batch(vectors, texts.length)) {
+    throw new EmbeddingGenerationError(
+      `Embedding response violated semantic_768 finite-vector contract from ${source} (${model})`,
+      attempts,
     );
   }
+  const dimension = SEMANTIC_DIMENSION;
 
   // Fire-and-forget cache writes for new embeddings
   for (let j = 0; !options.skipCacheWrite && j < uncachedIndices.length; j++) {
