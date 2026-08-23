@@ -152,6 +152,9 @@
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
     "@babel/types": "7.29.7",
+    "@rollup/plugin-commonjs": "29.0.3",
+    "@rollup/plugin-json": "6.1.0",
+    "@rollup/plugin-node-resolve": "16.0.3",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@types/chokidar": "1.7.5",
