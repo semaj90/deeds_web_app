@@ -446,12 +446,15 @@ what was previously assumed, not looser.
 3. **Version the cuGraph algorithm explicitly — do not let `/v1/community/spectral`
    implicitly mean balanced-cut.** cuGraph exposes both `BALANCED_CUT` and
    `MODULARITY_MAXIMIZATION` spectral clustering; cuGraph 26.08 marks the
-   legacy balanced-cut entry point deprecated in favor of modularity
-   maximization. Freeze `algorithm: 'BALANCED_CUT' | 'MODULARITY_MAXIMIZATION'`
-   in both the request and the receipt. For the 26.06 proof, keep whichever
-   implementation the existing fixture contracts already target — do not
-   silently migrate algorithms mid-proof; treat any later migration as a
-   separate parity tranche.
+   current runtime may emit a deprecation warning for the balanced-cut call,
+   while NVIDIA's current documentation still lists both Balanced Cut and
+   Modularity Maximization. Freeze `algorithm: 'BALANCED_CUT' |
+   'MODULARITY_MAXIMIZATION'` in both the request and the receipt. For the
+   26.06 proof, keep whichever implementation the existing fixture contracts
+   already target — do not silently migrate algorithms mid-proof; treat any
+   later migration as a separate parity tranche. Prefer the documented
+   `spectralModularityMaximizationClustering` signature when modularity is the
+   selected algorithm and record all effective solver parameters.
 4. **Don't collapse RAPIDS/CUDA versions into one ambiguous `cudaVersion`
    field.** RAPIDS 26.06 officially supports CUDA Toolkit 13.0–13.2 (580
    driver family); RAPIDS 26.08 expanded that to 13.0–13.3. The system
@@ -522,3 +525,145 @@ Only after Blocker D (RT-05's `PARITY` section) passes should any GPU
 ABI/cuTile/CUTLASS/LibTorch benchmarking work resume — see the priority
 freeze recorded in
 `openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md`.
+
+## First live RT-04/RT-05 result: ARI 0.9535, below promotion threshold — diagnostic extension (SPECTRAL_DIAG-01..05)
+
+A live run against the same frozen graph/ordinal map (`K=8`, same spectral
+parameters, same frozen seed) produced **CPU-vs-cuGraph ARI = 0.953547** —
+below the `>= 0.99` promotion threshold from the corrections above, but not
+necessarily evidence of a defective GPU result. The measured value is
+consistent with two numerically different but nearly-equivalent spectral
+partitions of the same graph, which is a distinct failure mode from "the GPU
+result is wrong" and needs to be distinguished before touching the
+threshold.
+
+**Do not lower the 0.99 threshold, and do not tune the CPU (NumPy) reference's
+tolerances until its ARI crosses 0.99 to match cuGraph's labels.** cuGraph
+26.06's spectral clustering is a legacy single-GPU path with independent
+eigensolver/k-means controls, already being steered away from in newer APIs
+— the actual proof question is *"do both implementations produce a
+sufficiently equivalent, stable, quality-preserving partition of the same
+frozen graph?"*, not *"can the CPU reference be parameter-tuned until it
+emits cuGraph's exact labels?"*.
+
+### Receipt extension (objective-quality diagnostics)
+
+cuGraph separates the clustering operation itself from its analyzers
+(`analyzeClustering_modularity`, `analyzeClustering_edge_cut`,
+`analyzeClustering_ratio_cut`) — note balanced-cut specifically targets
+RatioCut. Extend the parity receipt with independently-computed objective
+metrics for both partitions, from both the cuGraph analyzer AND an
+independent CPU reference analyzer (kept as `REFERENCE_DIAGNOSTIC`, not a
+promotion authority, until its weighted-edge symmetrization semantics are
+verified against cuGraph's):
+
+```text
+cpu_partition:  { assignment_checksum, canonical_partition_checksum, cluster_sizes,
+                   cugraph_analyzer: { modularity, edge_cut, ratio_cut },
+                   cpu_reference_analyzer: { modularity, edge_cut, ratio_cut } }
+gpu_partition:  { assignment_checksum, canonical_partition_checksum, cluster_sizes,
+                   cugraph_analyzer: { modularity, edge_cut, ratio_cut },
+                   cpu_reference_analyzer: { modularity, edge_cut, ratio_cut } }
+parity:         { adjusted_rand_index, modularity_abs_delta, edge_cut_abs_delta,
+                   ratio_cut_abs_delta, disagreement_vertex_count,
+                   disagreement_vertex_fraction, disagreement_ordinal_checksum }
+```
+
+### SPECTRAL_DIAG-02 — label-aligned disagreement receipt
+
+ARI reports *how much* structural disagreement exists but not *where*.
+Canonicalize cluster labels (same rule as the earlier corrections section)
+and record `SpectralPartitionDeltaV1`: `vertexCount`, `clusterCount`, `ari`,
+`matchedClusterPairs` (`CPU_i -> GPU_j`), `disagreementCount`,
+`disagreementFraction`, `disagreementOrdinalChecksum` (bind a checksum from
+the receipt rather than retaining the full ordinal list forever — write it
+to a separate diagnostic artifact if needed), and `perCluster: { cpuSize,
+gpuSize, retainedCount, movedIn, movedOut }`. This answers a materially
+different question than the raw ARI number: "12 boundary vertices moved"
+and "one entire sub-community got reassigned" are both consistent with
+ARI≈0.9535 but imply very different next steps.
+
+### SPECTRAL_DIAG-03 — GPU repeat-determinism proof (run before touching tolerances)
+
+cuGraph exposes explicit `num_eigen_vects`, `evs_tolerance`, `evs_max_iter`,
+`kmean_tolerance`, `kmean_max_iter`, `random_state` — and its lower-level
+docs note an *omitted* random state defaults to a value derived from
+process ID/time/hostname, which is why the explicit frozen seed here is
+essential. Run the identical GPU calculation three times with every input
+frozen (`graphChecksum`, `ordinalMapChecksum`, `K=8`, `numEigenvectors`,
+`evsTolerance`, `evsMaxIterations`, `kmeansTolerance`, `kmeansMaxIterations`,
+`randomSeed`) and require `gpuAssignmentChecksum` (post-canonicalization)
+identical across all three runs.
+- **If checksums match** across runs but CPU-vs-GPU ARI stays ~0.9535 with
+  near-identical objective values: deterministic implementation divergence
+  — an alternative, near-equivalent partition, not a bug.
+- **If checksums differ** despite the frozen seed: a real GPU spectral
+  determinism problem — investigate this before pursuing CPU parity
+  further.
+
+### SPECTRAL_DIAG-04 — CPU eigengap diagnostic
+
+Have the CPU reference retain a few extra eigenvalues around the selected
+embedding boundary (`eigenvalues[m-1], [m], [m+1], [m+2]` where `m` is the
+eigenvector cutoff) and record `spectralGapAbs`/`spectralGapRelative`. This
+is the highest-value numerical diagnostic here: standard spectral-clustering
+literature links a small eigengap around the chosen invariant subspace to
+weak eigenspace stability — small numerical perturbations can substantially
+rotate that subspace and change the resulting clustering even when cut
+quality is almost unchanged. That pattern (CPU embedding at slightly
+different coordinates, GPU embedding landing on a non-convex/near-degenerate
+k-means boundary, ~5% partition disagreement with near-identical graph
+objective) would make k-means label-assignment sensitivity to
+initialization — a documented scikit-learn caveat, and something cuGraph
+exposes separate `kmean_tolerance`/`kmean_max_iter` controls for — a
+credible root cause. Record `clusterCount`, `numEigenvectors`,
+`eigensolverTolerance`, `eigensolverMaxIterations`, `kmeansTolerance`,
+`kmeansMaxIterations`, `randomSeed` on every receipt going forward, not just
+the seed.
+
+### SPECTRAL_DIAG-05 — multi-seed stability matrix (diagnostic only, NOT promotion evidence)
+
+After the frozen single-seed run is preserved, sweep a small seed matrix
+(`S0..S3`) across both CPU and cuGraph, recording pairwise CPU-CPU ARI,
+GPU-GPU ARI, CPU-GPU ARI, and modularity/edge-cut/ratio-cut for each. Mark
+the whole artifact `SPECTRAL_STABILITY_DIAGNOSTIC / NON_PROMOTION` — do not
+let it feed a promotion decision directly. Interpretation:
+- CPU-CPU ARI wanders 0.95–1.0 → the CPU oracle is not itself a unique-
+  partition oracle.
+- GPU-GPU ARI wanders → investigate cuGraph determinism (see DIAG-03).
+- Each implementation is internally stable but CPU-GPU is consistently
+  ~0.9535 → a stable, implementation-specific solution (not noise).
+- All solutions have near-indistinguishable objective values → raw ARI
+  probably should not remain the *sole* eventual equivalence criterion —
+  but this does not license lowering the threshold now, only informs a
+  later, deliberate decision about what the promotion contract should be.
+
+### Corrected proof-state receipt (richer than binary EXECUTED_UNPROVEN)
+
+```text
+RTX_SPECTRAL_RUNTIME:      PROVEN
+FROZEN_INPUT_BINDING:      PROVEN
+FROZEN_K:                  PROVEN
+FROZEN_SEED:               PROVEN
+CPU_REFERENCE_EXECUTION:   PROVEN
+CUGRAPH_EXECUTION:         PROVEN
+CPU_CUGRAPH_ARI:           0.953547  (BELOW_PROMOTION_THRESHOLD)
+OBJECTIVE_PARITY:          DIAGNOSTIC_PRESENT
+CROSS_IMPLEMENTATION_REFERENCE: PENDING
+GPU_REPEAT_DETERMINISM:    NOT_YET_PROVEN
+EIGENSPACE_STABILITY:      NOT_YET_CHARACTERIZED
+PROMOTION:                 BLOCKED
+```
+
+This is meaningfully stronger evidence than a flat `EXECUTED_UNPROVEN`: real
+RTX runtime execution is proven; what remains unproven is specifically
+*spectral equivalence suitable for promotion*, not the runtime path itself.
+
+**Next tranche, in order — no FANOUT/Qdrant/Neo4j writes or cuTile/CUTLASS/ABI
+work should move ahead of this diagnosis**: `SPECTRAL_DIAG-01` (CPU-native
+quality metrics: modularity/edge-cut/ratio-cut) → `SPECTRAL_DIAG-02`
+(canonical cluster alignment + disagreement receipt) → `SPECTRAL_DIAG-03`
+(3× identical-frozen-seed GPU determinism) → `SPECTRAL_DIAG-04` (CPU
+eigenvalue-cutoff/eigengap receipt) → `SPECTRAL_DIAG-05` (non-promotion
+multi-seed stability matrix) → **then** decide, with actual evidence in
+hand, whether `ARI >= 0.99` remains the correct promotion contract.
