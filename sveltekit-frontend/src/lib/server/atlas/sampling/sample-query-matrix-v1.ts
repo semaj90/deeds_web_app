@@ -122,15 +122,6 @@ export function sampleQueryChecksum(value: unknown): string {
   return createHash('sha256').update(canonicalJson(value)).digest('hex');
 }
 
-<<<<<<< origin/main
-function rowNormSquared(values: readonly number[]): number {
-  let sum = 0;
-  for (const value of values) sum += value * value;
-  return sum;
-}
-
-=======
->>>>>>> 659f5619337b1dc3c1851a5f232f30bdb05dadbc
 function coefficientOfVariation(values: readonly number[]): number {
   if (values.length === 0) return 0;
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
