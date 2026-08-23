@@ -1,5 +1,53 @@
 # Parent Atlas Workstation TODO
 
+## Gap sweep: 3 real regressions found + fixed in atlas contract tests — 2026-08-23
+
+Prompted by the GRAPH_SNAPSHOT_PARITY regression below, ran a targeted vitest
+pass over the ~21 `src/lib/server/atlas/**` files that share the same
+`...input` spread-into-`.strict().parse()` pattern as the parity bug, to see
+if the same class of bug exists elsewhere. Found and fixed three unrelated,
+real gaps (commits `8fa9443a89`, `057cf8d5b5`, `439e412abc`):
+
+1. **`api-contract-observation-v1.ts` was completely unparseable** (esbuild
+   transform failure) since commit `a2e4dab329`
+   ("wip(atlas): restore orphaned root src tree...") — a bad merge produced
+   duplicate schema keys (`treeNodeId`, `handlerSymbol`, `workspaceRevision`,
+   `sourceRevision`), a helper function body spliced mid-statement with a
+   second schema's tail fields, and a duplicate `export type
+   ApiContractObservationV1`. Both `buildApiContractObservationV1()` and
+   `compileApiContractObservationV1()`, plus their sole downstream consumer
+   (`sveltekit-api-contract-observer-v1.ts`), were silently broken —
+   TypeScript's own diagnostics correctly reported missing exports (initially
+   mistook this for a stale/false diagnostic; it was not). Reconstructed as
+   one unified base object schema shared by both observation paths
+   (build-path fields optional, compile-path fields optional, joined by a
+   `.superRefine()` coordinate-consistency check that's skipped when
+   `coordinate` is absent). All three affected suites now pass: 5/5, 3/3, 6/6.
+2. **Same commit also broke `api-contract-observation-v1.spec.ts`**: a second
+   test suite's leading `import` statement had been spliced mid-body of the
+   first suite's last test instead of hoisted to the top of the file,
+   breaking the whole spec file's parse (0 tests could even load).
+3. **A real determinism bug this corruption had been hiding**:
+   `observationId()`'s hash included `inputSchemaRefs`/`outputSchemaRefs`
+   sorted but not deduped, so two nominations with the same logical evidence
+   set (one with duplicate refs, one pre-deduped) hashed differently —
+   contradicting the function's own determinism contract. The actual
+   returned object already deduped via `[...new Set(...)]`; the hash input
+   didn't match.
+4. **`atlas-skill-admission.spec.ts`** used `'RUN_ANALYZER'` as a
+   `declaredHostRequests` value in two tests — never a valid member of
+   `AtlasKernelHostRequestKindSchema`'s enum. Both tests' actual intent
+   (skill-review gating, external-service allowlisting) is orthogonal to
+   which host-request kind is declared; swapped to `'RETRIEVE'`.
+
+Not pursued further this pass: `api-contract-observation-v1.spec.ts` sat
+undetected for the same reason the parity bug did — nobody had re-run its
+suite since the corrupting commit landed (same day, `2026-08-23`). Did not
+exhaustively check all ~21 candidate files' logic beyond running their
+existing test suites; only failures surfaced by the existing tests were
+investigated. A fuller audit of that file list (or a repo-wide `vitest run`)
+would be a separate, larger task.
+
 ## GRAPH_SNAPSHOT_PARITY regression found + fixed; reproduction confirms determinism — 2026-08-23
 
 **Correction to an earlier draft of this entry**: this is NOT a first-time
