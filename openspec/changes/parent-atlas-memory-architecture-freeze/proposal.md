@@ -277,6 +277,47 @@ defaults were used here, untuned), or (b) testing at real corpus scale with a fu
 free, before it can be considered a viable `codebase_chunks_768`/`_768_v2` ANN backend — brute-force
 `exact_cosine` (already proven in Gate T3) remains the trustworthy path in the meantime.
 
+### The headline finding: this entire subsystem has zero entry point into production
+
+Before running any more gates, audited whether the tensor-residency system this session has been
+proving gate-by-gate is actually reachable from anything real. It is not, and this is the single
+most important finding in this whole exploration.
+
+**Every one of the 34 non-spec TypeScript files under `src/lib/server/atlas/tensors/`** (plus
+`lod-glyph-contract.ts`) **was checked for imports from anywhere outside that directory** —
+`src/routes/`, `src/lib/server/ace/`, `src/lib/server/retrieval/`, and the rest of
+`src/lib/server/atlas/` — **and found zero**. `npx vitest run tests/atlas/tensor-residency/` passes
+(8 files, 11 tests), but these are shallow structural tests exercising the modules in isolation,
+not proof that anything in the live app calls them. Every T2/T3/T4 PASS and the T6 correctly-FAIL
+result this session produced were obtained by writing bespoke proof scripts that invoke the
+Python/TypeScript modules directly — **none of that machinery is wired into a real request path**.
+3 files (`cache-tier-contract.ts`, `gpu-backend-contract.ts`, `metrics-registry.ts`) are pure
+type/constant declarations with no runtime logic whatsoever — `CREATED` status only, per this
+repo's own convention, not even minimally implemented.
+
+**Separately confirmed there IS a real, live, production-reachable GPU path, unrelated to this
+subsystem**: `src/routes/api/v1/chat/completions` (via `openai-facade.ts`) →
+`attention-head-ranker.ts` → `LibTorchReranker` (`src/lib/server/ai/libtorch-reranker.ts`) → the
+native LibTorch N-API bridge (`tensorrt_bridge.node`, C++, in-process, zero-copy Float32Array
+handoff). This does stateless per-call candidate scoring — no persistent GPU-resident tile cache,
+no residency/LOD/eviction concept at all. Architecturally different from `parent_atlas_tensor`
+(which is specifically about keeping large matrices GPU-resident *across* requests to amortize
+transfer cost) — plausibly complementary rather than duplicate in purpose, but **there is zero
+evidence anyone has decided how, or whether, the two should connect**. Today the simpler, already-
+wired path does 100% of the real production GPU reranking work, and the far more elaborate,
+individually-gate-proven residency system contributes exactly nothing to any live request.
+
+**What this means for "finishing the pipeline"**: the T2/T3/T4/T6 proofs this session ran are real
+and valuable — they establish the *mechanisms* are correct (Arrow artifacts round-trip exactly,
+GPU tile staging and eviction work correctly when driven correctly, CAGRA isn't ready at tested
+scale). But a mechanism with no caller delivers zero user-facing value no matter how many more
+gates pass. Continuing to grind through T5/T7/T8/T9 without first deciding the integration
+question would be proving more mechanisms in isolation, not finishing anything. See tasks.md 2.14
+for the three candidate framings of what `parent_atlas_tensor`'s relationship to the live
+`LibTorchReranker` path should be — this is explicitly an operator decision, not something decided
+in this document, per `CLAUDE.md`'s Duplication Prevention section (don't silently pick a
+`CANONICAL_OWNER` between two systems that might both have a legitimate role).
+
 ## What's actually new and worth scoping (the real delta)
 
 Ranked by how clearly novel vs. how much rearchitecture of working systems it implies:

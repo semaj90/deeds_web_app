@@ -167,6 +167,52 @@ already completed plus the follow-up scoping work, not feature implementation �
   read as "CAGRA doesn't work," only as "CAGRA isn't proven ready at the scales/params tested
   here."
 
+- [x] 2.13 **Done, 2026-08-23 same-day follow-up — the headline finding of this whole
+  tensor-residency exploration.** Ran `npx vitest run tests/atlas/tensor-residency/` (8 files,
+  11 tests, all PASS — shallow structural tests, not behavioral proofs like the T2-T4/T6 receipts)
+  then audited all 34 non-spec files under `src/lib/server/atlas/tensors/` +
+  `src/lib/client/atlas/visualization/lod-glyph-contract.ts` for real logic vs. pure type/interface
+  stubs, and for callers anywhere in the app outside that directory. **Result: zero files in this
+  entire subsystem are imported by anything outside `src/lib/server/atlas/tensors/` itself** —
+  `grep`ed `src/routes/`, `src/lib/server/ace/`, `src/lib/server/retrieval/`, and
+  `src/lib/server/atlas/` (excluding `tensors/`) for imports of any tensor-residency module or
+  `tensor-runtime`/`tile-directory`/`ace-residency-policy`/`gpu-backend-contract`, zero hits. Every
+  gate this session proved (T2/T3/T4 PASS, T6 correctly FAIL) was proven by directly invoking the
+  Python/TS modules from bespoke proof scripts — **none of it is reachable from a real request**.
+  3 files (`cache-tier-contract.ts`, `gpu-backend-contract.ts`, `metrics-registry.ts`) are pure
+  type/constant declarations with zero runtime logic at all — `CREATED` only, not even minimally
+  wired, per this repo's own status-language convention.
+  - **Separately confirmed**: there IS a real, live, production-reachable GPU path that has
+    nothing to do with this subsystem — `src/routes/api/v1/chat/completions` (via
+    `openai-facade.ts`) → `attention-head-ranker.ts` → `LibTorchReranker`
+    (`src/lib/server/ai/libtorch-reranker.ts`) → the native LibTorch N-API bridge
+    (`tensorrt_bridge.node`, C++, in-process, zero-copy). This is architecturally different from
+    `parent_atlas_tensor` (stateless per-call candidate scoring vs. persistent GPU-resident tile
+    caching across requests) — not necessarily a duplicate in *purpose*, but there is **zero
+    evidence anyone has decided how or whether the two should connect**, and today the elaborate,
+    individually-gate-proven residency system contributes nothing to any live request while this
+    separate, simpler path does the actual production GPU reranking work.
+  - **This reframes every T2/T3/T4/T6 result recorded above**: they prove the *mechanisms* work
+    (Arrow artifacts round-trip, GPU tile staging is correct, ACE utility ranking can drive real
+    residency decisions, CAGRA isn't ready) — they do NOT prove the *pipeline* is finished, because
+    a pipeline with no entry point delivers zero user-facing value regardless of how many
+    internal gates pass. "Finishing the pipeline" requires an explicit wiring decision before
+    further gate-proving is worth the effort.
+- [ ] 2.14 **New, highest-priority follow-up from 2.13 — an operator decision, not an agent
+  decision, per `CLAUDE.md`'s Duplication Prevention section.** Before any further work on Gates
+  T5/T7/T8/T9 or on wiring `parent_atlas_tensor` into a real caller: decide what
+  `parent_atlas_tensor`'s relationship to the live `LibTorchReranker`/`attention-head-ranker.ts`
+  path actually is. Candidate framings (not decided here): (a) **complementary layers** — residency
+  system manages which large `semantic_768`/candidate matrices stay GPU-resident, `LibTorchReranker`
+  scores whatever's already resident; wiring means having the residency system feed materialized
+  matrices to the reranker instead of the reranker's callers building fresh Float32Arrays each
+  call; (b) **the residency system is a research/experiment track** (`EXPERIMENT` per this repo's
+  classification vocabulary) not intended for near-term production wiring, in which case further
+  gate-proving should stop until that changes; (c) **the residency system should replace** the
+  current stateless-scoring approach for high-QPS paths where repeated re-transfer of the same
+  candidate data is wasteful. Whichever framing is chosen determines whether Gates T5/T7/T8/T9 are
+  worth running next, or whether this whole change should pause pending a real integration plan.
+
 ## 3. Governance-only, zero implementation cost
 
 - [x] 3.1 **Done.** Added the wire-format layering rule to `claude.md` as a new canonical section

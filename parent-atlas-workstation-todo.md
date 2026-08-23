@@ -3311,3 +3311,53 @@ proof; (5) `codebase_chunks_768` vs `_768_v2` split; (6) ACE crash instrumentati
 FANOUT sequencing; (8) docker-compose canonical-file decision; (9) the two remaining
 CANONICAL_OWNER decisions in the memory-architecture proposal; (10) CAGRA re-test per 2.12, once
 GPU budget/tuning time is available.
+
+### Session handoff — 2026-08-23 (headline finding: entire tensor-residency subsystem has zero production entry point)
+
+User asked to finish out the pipeline and find gaps. Did a systematic audit rather than continuing
+mechanically to Gate T5: checked every one of the 34 non-spec files under
+`sveltekit-frontend/src/lib/server/atlas/tensors/` (plus `lod-glyph-contract.ts`) for real logic
+vs. pure type stubs, and for callers anywhere outside that directory.
+
+**Result: zero.** Nothing in `src/routes/`, `src/lib/server/ace/`, `src/lib/server/retrieval/`, or
+the rest of `src/lib/server/atlas/` imports anything from this subsystem. `npx vitest run
+tests/atlas/tensor-residency/` passes (8 files, 11 tests) but these are shallow structural tests
+in isolation, not evidence of live wiring. Every T2/T3/T4 PASS and T6 correctly-FAIL result this
+session produced was obtained via bespoke proof scripts calling the modules directly — **none of
+it is reachable from a real request**. 3 files (`cache-tier-contract.ts`, `gpu-backend-contract.ts`,
+`metrics-registry.ts`) are pure type/constant declarations with zero runtime logic — CREATED only.
+
+**Separately confirmed there IS a real, live, production-reachable GPU path that has nothing to do
+with any of this**: `/api/v1/chat/completions` → `openai-facade.ts` → `attention-head-ranker.ts` →
+`LibTorchReranker` → the native LibTorch N-API bridge (`tensorrt_bridge.node`). Stateless per-call
+scoring, no residency concept — architecturally different from `parent_atlas_tensor`'s
+persistent-GPU-residency design (plausibly complementary, not necessarily duplicate), but **zero
+evidence anyone decided how or whether the two connect**. Today the simpler already-wired path
+does all the real production GPU reranking; the elaborate, individually-gate-proven residency
+system contributes nothing to any live request.
+
+**This reframes the whole session's T2/T3/T4/T6 work**: real, valuable proof that the mechanisms
+are correct — but a mechanism with no caller delivers zero user value regardless of how many more
+gates pass. Recorded as tasks.md 2.13 (the audit) and 2.14 (the resulting operator decision needed
+before continuing — three candidate framings for what `parent_atlas_tensor` should be relative to
+`LibTorchReranker`: complementary layers, a research/experiment track, or a replacement for the
+stateless-scoring approach on high-QPS paths). Deliberately did not decide this myself — matches
+this repo's own Duplication Prevention governance rule about not silently picking a
+`CANONICAL_OWNER` between two systems that might both have a legitimate role.
+
+**Next-session priority, updated — this decision now blocks the rest of the tensor-residency
+thread**: (1) get an operator answer on tasks.md 2.14 before running Gates T5/T7/T8/T9 — further
+gate-proving without this answer would be proving more isolated mechanisms, not finishing
+anything; (2) once answered, either wire a real caller (if complementary/replacement framing) or
+explicitly park the change as `EXPERIMENT` (if research-track framing); (3) unrelated to this
+thread — `NAMED_SYMBOL_MISSING_LEFT/RIGHT` + `SEMANTIC_KIND_MISMATCH` AST gap; (4) bounded
+XGBoost GPU proof; (5) `codebase_chunks_768` vs `_768_v2` split; (6) ACE crash instrumentation;
+(7) Graphify FANOUT sequencing; (8) docker-compose canonical-file decision; (9) the two remaining
+CANONICAL_OWNER decisions from the earlier memory-architecture audit pass (typed-packet model vs.
+existing `ContextManifest`; which of the three found LOD naming meanings survives). Minor
+additional note from this pass, not a new LOD collision but worth a look if 2.14 lands on
+wiring this system: `cache-tier-contract.ts`'s `DataResidency` (6-value merged COLD/MMAPPED/WARM/
+PINNED/GPU_RESIDENT/IN_USE enum) and `tile-directory.ts`'s split `HostResidency`/`GpuResidency`
+(3+4 values) describe the same conceptual state machine two different ways within this one
+subsystem — an internal inconsistency to reconcile alongside the entry-point decision, not before
+it.
