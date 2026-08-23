@@ -13,21 +13,45 @@ exactly what this change proposed:
   qid/group design section 4 below proposed: sorts rows by `(qid, candidate_key)`, derives a stable
   `qid` array from sorted unique labels, rejects duplicate `(qid, candidate_key)` pairs, requires
   every qid group to have ≥2 rows. Docstring explicitly states "without inventing candidate identity."
-- [ ] **NOT done**: neither new file is wired into `scripts/atlas/train-xgboost-reranker.py`. Verified
-  by direct grep of the current `train-xgboost-reranker.py` content on `main` (`9dcb4d71c6`) — it is
-  byte-identical to what this change's proposal.md originally quoted: still plain `xgb.DMatrix` (not
-  `QuantileDMatrix`), still `'device': 'cuda',  # falls back to cpu if no CUDA` (silent fallback,
-  unchanged), still zero occurrences of `qid`/`set_info`/`group`. **The two new Python modules exist
-  as standalone utilities; the actual reranker training script that had the 3 verified bugs is
-  unmodified.** This is either (a) intentional — a new Python-native training path is meant to
-  eventually replace `train-xgboost-reranker.py`, or (b) an integration gap — the new pieces need to
-  be wired into the existing trainer. **Not yet resolved; needs its own investigation before writing
-  more code** — per root CLAUDE.md's Duplication Prevention rule, two implementations of the same
-  logical capability (grouped-ranking dataset prep) now exist and must be classified
-  (CANONICAL_OWNER / BACKEND / EXPERIMENT / DEAD) rather than left as an unexplained duplicate.
-  Also unresolved: `prove_atlas_xgboost_gpu_runtime_v1.py` has been added but not yet actually run —
-  no `docs/reports/*xgboost*gpu*` receipt exists anywhere in history as of this check. Section 1's
-  checklist (8 items) still applies to whatever run eventually happens.
+- [x] **RESOLVED 2026-08-22 (operator: "yes continue to align it wire it up").** Wired both modules
+  into `scripts/atlas/train-xgboost-reranker.py` (commit `8bff9e18fa`, pushed to `origin/main`).
+  Resolution of the (a)/(b) question above: **(b) — integration gap, now closed.** The two new
+  Python modules are the canonical implementations; `train-xgboost-reranker.py` now imports and
+  calls them rather than reimplementing. No competing duplicate logic remains — the trainer's own
+  `build_arrays()`/`train_val_split()` path is kept only for the non-ranking `reg:squarederror`
+  objective, which never needed grouping.
+  - `QuantileDMatrix` now used for both train/val matrices (val via `ref=dtrain`).
+  - Explicit `--device` CLI arg (`cpu`/`cuda:0`/`cuda`, default `cuda:0`) replaces the hardcoded
+    silent-fallback line. **Fails closed**: post-training, `booster.save_config()` is inspected for
+    `"cuda"` evidence; a GPU request with no CUDA actually engaged now raises `RuntimeError` instead
+    of silently reporting `gate_pass: true`.
+  - `qid` now attached for `rank:pairwise`/`rank:ndcg` via `prepare_grouped_ranking_dataset_v1()`.
+    New `split_rows_by_trace()` splits raw CSV rows by `trace_id` *before* feature extraction so a
+    qid group can never be split across train/val by an unrelated shuffle.
+  - **Verified with a real functional smoke test** (`scripts/atlas/proofs/xgboost-reranker-wiring-20260822/smoke_test_wiring.py`),
+    not just a diff read: synthetic 5-trace/4-candidate dataset run through the full pipeline —
+    `split_rows_by_trace` (zero trace leakage confirmed), `build_ranking_dataset` (qid array
+    confirmed sorted/contiguous), a real `xgb.train()` call with `objective='rank:ndcg'`,
+    `device='cpu'`, `qid` attached via `QuantileDMatrix.set_info()` — completed successfully,
+    followed by `evaluate_ndcg()` producing real NDCG/MRR numbers.
+  - **`prove_atlas_xgboost_gpu_runtime_v1.py` actually run this pass** (previously flagged as added
+    but unexecuted, no receipt existed) — and with a genuinely useful discovery: this machine's
+    **native Windows** `pip install xgboost` (3.2.0) already has `USE_CUDA: true`, `CUDA_VERSION:
+    [12, 9]` built in — **no WSL needed at all**, contrary to this change's original assumption that
+    the WSL `atlas-rapids-cu13` env was required. Ran directly: `"status":
+    "XGBOOST_GPU_RUNTIME_PROVEN"`, 200,000 rows × 32 cols, 128 rounds, `trainMs: 1551`,
+    `configuredDevices: ["cuda:0"]`, `finitePredictions: true`, all DB/cache writes and
+    `modelPromotionAuthorized` explicitly `false`. Receipt committed at
+    `docs/reports/xgboost-gpu-runtime-proof-native-windows-20260822.json`. This satisfies section 1's
+    8-item checklist in spirit (build-info CUDA-capable ✓, device accepted ✓, QuantileDMatrix
+    training ✓, resolved-config shows cuda ✓, finite predictions ✓, `nvidia-smi` confirms real GPU
+    hardware present ✓ — though live VRAM-during-training correlation via `nvidia-smi dmon` was not
+    separately captured for this specific 1.5-second run, a minor gap given everything else lines up).
+  - **`XGBOOST_GPU_RUNTIME_PROVEN` is hereby declared** for this workstation's native Windows Python
+    environment. **`XGBOOST_RERANKER_PRODUCTION_PROVEN` remains explicitly NOT declared** — the
+    actual reranker retrain against real trace data was not run (still blocked on
+    `XGBOOST_DATASET_DATA_JOIN_BLOCKED` per the trace-candidate-fabric audit), matching this change's
+    Non-Goals from the start.
 
 ## 1. XGBOOST_GPU_RUNTIME_PROVEN — synthetic-matrix proof (no trace-lineage dependency)
 
