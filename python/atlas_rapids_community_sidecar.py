@@ -71,6 +71,12 @@ def capabilities() -> dict[str, Any]:
         "operations": [
             {"op": "community.louvain", "backend": "cugraph.louvain", **common},
             {"op": "community.leiden", "backend": "cugraph.leiden", **common},
+            {
+                "op": "community.spectral",
+                "backend": "cugraph.spectralModularityMaximizationClustering",
+                "available": available and hasattr(cugraph, "spectralModularityMaximizationClustering"),
+                **{key: value for key, value in common.items() if key != "available"},
+            },
         ],
         "note": "Neo4j GDS remains the durable promoted owner until parity/eval promotion is proven.",
     }
@@ -106,6 +112,11 @@ def community_louvain(req: CommunityPartitionRequestV1) -> CommunityPartitionRes
 @app.post("/v1/community/leiden", response_model=CommunityPartitionResponseV1)
 def community_leiden(req: CommunityPartitionRequestV1) -> CommunityPartitionResponseV1:
     return _execute(req, "leiden")
+
+
+@app.post("/v1/community/spectral", response_model=CommunityPartitionResponseV1)
+def community_spectral(req: CommunityPartitionRequestV1) -> CommunityPartitionResponseV1:
+    return _execute(req, "spectral")
 
 
 def main() -> None:

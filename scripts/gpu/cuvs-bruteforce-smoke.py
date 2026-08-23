@@ -55,7 +55,8 @@ def main() -> int:
     build_ms = (time.perf_counter() - build_start) * 1000.0
 
     search_start = time.perf_counter()
-    neighbors, distances = brute_force.search(index, queries, args.top_k)
+    # cuVS returns `(distances, neighbors)` for brute-force search.
+    distances, neighbors = brute_force.search(index, queries, args.top_k)
     cp.cuda.Device().synchronize()
     search_ms = (time.perf_counter() - search_start) * 1000.0
 
@@ -63,7 +64,10 @@ def main() -> int:
     distances_np = cp.asnumpy(distances)
     top1 = neighbors_np[:, 0]
     expected = list(range(args.query_count))
-    self_match_rate = float((top1 == cp.arange(args.query_count)).mean().item())
+    # `top1` is already a NumPy array after the explicit device-to-host
+    # readback; keep the correctness comparison on the host rather than
+    # mixing NumPy and CuPy operands.
+    self_match_rate = float((top1 == expected).mean())
 
     payload = {
         'status': 'CUVS_BRUTE_FORCE_PASS' if self_match_rate == 1.0 else 'CUVS_RESULT_MISMATCH',
