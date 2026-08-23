@@ -1,4 +1,4 @@
-import { ATLAS_CANONICAL_SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
+import { SEMANTIC_512_DIMENSION } from './semantic-512.js';
 
 export interface AtlasSemantic512CorpusRowV1 {
   packetKey: string;
@@ -66,7 +66,7 @@ export interface AtlasSemantic512ExactReceiptV1 {
 function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
   if (input.query.representationId !== 'semantic_512') throw new Error('ATLAS_SEMANTIC512_REPRESENTATION_REQUIRED');
   if (!input.query.representationRevision?.trim()) throw new Error('ATLAS_SEMANTIC512_REVISION_REQUIRED');
-  if (input.query.vector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) throw new Error('ATLAS_SEMANTIC512_QUERY_DIMENSION');
+  if (input.query.vector.length !== SEMANTIC_512_DIMENSION) throw new Error('ATLAS_SEMANTIC512_QUERY_DIMENSION');
   if (input.corpus.length === 0 || input.corpus.length > 512) throw new Error(`ATLAS_SEMANTIC512_CORPUS_COUNT:${input.corpus.length}`);
   if (!Number.isInteger(input.topK) || input.topK < 1 || input.topK > input.corpus.length) {
     throw new Error(`ATLAS_SEMANTIC512_TOPK:${input.topK}`);
@@ -77,7 +77,7 @@ function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
     if (row.sourceRepresentationId != null && row.sourceRepresentationId !== 'semantic_512') {
       throw new Error(`ATLAS_SEMANTIC512_SOURCE_REPRESENTATION:${index}`);
     }
-    if (row.vector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) throw new Error(`ATLAS_SEMANTIC512_CORPUS_DIMENSION:${index}`);
+    if (row.vector.length !== SEMANTIC_512_DIMENSION) throw new Error(`ATLAS_SEMANTIC512_CORPUS_DIMENSION:${index}`);
     if (seen.has(row.packetKey)) throw new Error(`ATLAS_SEMANTIC512_DUPLICATE_IDENTITY:${row.packetKey}`);
     seen.add(row.packetKey);
   }
