@@ -286,7 +286,10 @@ BALANCED_CUT
 MODULARITY_MAXIMIZATION
 ```
 
-For the live fixture, Leiden's observed community count is only a `LEIDEN_CHALLENGER` value for spectral `k`; it is not canonical cluster-count truth.
+For the live fixture, promotion-grade parity requires an explicit frozen
+`--cluster-count K`. Leiden's observed community count is only a
+`LEIDEN_CHALLENGER_UNFROZEN` exploratory fallback and is not canonical
+cluster-count truth.
 
 ## Evaluation / promotion rule
 
@@ -407,3 +410,115 @@ node --test packages/parent-atlas/test/spectral-graph-clustering.test.mjs
 ```
 
 Live cuGraph proof must additionally record the RAPIDS/cuGraph/cuVS/CUDA versions, graph/vector input checksums, random seed, GPU-resource observations, output/fixture checksums and analyzer scores before `SGC-5/6/7/8` can be promoted from `IMPLEMENTED_UNPROVEN` to proven.
+
+## Web-verification corrections — 2026-08-23
+
+External-docs verification of the spectral RTX alignment sweep (see
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md` and
+`docs/reports/spectral-live-fixture-implementation-audit.md`) surfaced four
+corrections that change how the live cuGraph proof must be structured. Apply
+these before promoting any spectral parity claim — they are stricter than
+what was previously assumed, not looser.
+
+1. **CPU/GPU partition parity must NOT require raw cluster-label equality.**
+   Cluster labels are arbitrary — `CPU=[0,0,1,1]` and `GPU=[7,7,4,4]` are the
+   *same* partition under label permutation. Use Adjusted Rand Index (ARI),
+   which is exactly 1.0 for identical partitions regardless of labeling, and
+   additionally canonicalize before checksumming: group CandidateOrdinals by
+   cluster → sort members within each cluster → sort clusters by their
+   minimum CandidateOrdinal → renumber `0..K-1` → `CanonicalSpectralPartitionV1`
+   with a `partitionChecksum`. For the small frozen fixture, require an
+   *exact* match after canonicalization (`ordinalMapChecksum`, `vertexSet`,
+   `clusterCount`, canonical partition, `partitionChecksum` all exact) plus
+   `adjustedRandIndex: 1.0`. For larger real-corpus runs, relax to measured
+   ARI/NMI plus an objective-score (ratioCut/edgeCut/modularity) tolerance —
+   do not require bitwise-exact partitions at scale.
+2. **Do not assume the CPU reference's normalized-Laplacian formulation
+   matches cuGraph's actual spectral implementation** — this is unconfirmed
+   from cuGraph's own docs (cuML has a separate normalized-Laplacian spectral
+   path; that is not evidence about cuGraph's). Make the CPU reference
+   config explicit and versioned:
+   `SpectralReferenceConfigV1 { algorithm, laplacianKind, numClusters,
+   numEigenvectors, eigensolverTolerance, eigensolverMaxIterations,
+   kmeansTolerance, kmeansMaxIterations, randomSeed }`. Do not promote parity
+   until the reference formulation is confirmed to match the invoked cuGraph
+   lane.
+3. **Version the cuGraph algorithm explicitly — do not let `/v1/community/spectral`
+   implicitly mean balanced-cut.** cuGraph exposes both `BALANCED_CUT` and
+   `MODULARITY_MAXIMIZATION` spectral clustering; cuGraph 26.08 marks the
+   legacy balanced-cut entry point deprecated in favor of modularity
+   maximization. Freeze `algorithm: 'BALANCED_CUT' | 'MODULARITY_MAXIMIZATION'`
+   in both the request and the receipt. For the 26.06 proof, keep whichever
+   implementation the existing fixture contracts already target — do not
+   silently migrate algorithms mid-proof; treat any later migration as a
+   separate parity tranche.
+4. **Don't collapse RAPIDS/CUDA versions into one ambiguous `cudaVersion`
+   field.** RAPIDS 26.06 officially supports CUDA Toolkit 13.0–13.2 (580
+   driver family); RAPIDS 26.08 expanded that to 13.0–13.3. The system
+   `nvcc` version installed does not necessarily equal the CUDA runtime
+   each RAPIDS library actually loads — this must be measured per-library,
+   not inferred from `nvcc --version`. See the corresponding correction in
+   `openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md` for the
+   full field list this implies for `SpectralGpuExecutionReceiptV1`.
+
+### Corrected honest status (2026-08-23)
+
+`SPECTRAL RTX ALIGNMENT`: contracts `PROVEN`, fixture contracts `PROVEN`,
+RAPIDS import runtime `PROVEN`, GPU hardware visibility `PROVEN`,
+`semantic_768` frozen corpus `MISSING`, live `/v1/community/spectral`
+request `UNPROVEN`, CPU/GPU partition parity `UNPROVEN`,
+`SpectralGpuExecutionReceiptV1` `MISSING`. Overall:
+**`WIRED / FIXTURE_PROVEN / RUNTIME_UNPROVEN`** (unchanged conclusion from
+the 2026-08-23 sweep report, now with corrected reasoning above). Successful
+`cuGraph`/`cuVS`/`cuDF` imports and a visible RTX 3060 Ti are **environment
+proof, not algorithm execution proof** — do not conflate the two.
+
+Four named blockers, in dependency order:
+- **Blocker A**: `semantic_768` frozen corpus absent.
+- **Blocker B**: same-ordinal-map CPU spectral execution absent.
+- **Blocker C**: real `/v1/community/spectral` RTX execution absent.
+- **Blocker D**: canonical partition parity (CPU vs GPU, per corrections
+  above) absent.
+
+### Proposed build order (not yet started — SPECTRAL_RT-01..05)
+
+1. **RT-01** — Produce the frozen semantic corpus: `CandidateOrdinalMapV1` +
+   `SemanticMatrixV2` (`N×768` FP32) + a manifest carrying
+   `workspaceRevision`, `candidateSnapshotRevision`, `ordinalMapChecksum`,
+   `rowIdentityChecksum`, `representationId`, `representationRevision`,
+   `producerRevision`, `rowCount`, `dimension=768`, `dtype=FP32`,
+   `normalization`, `matrixChecksum`. No Postgres/Qdrant/Neo4j/Valkey
+   mutation required for this step.
+2. **RT-02** — Freeze the graph input GPU and CPU must consume identically:
+   edge set, edge weights, symmetrization rule, self-loop policy, duplicate-
+   edge policy, isolated-node policy, algorithm parameters, random seed —
+   as `SpectralGraphSnapshotV1 { graphChecksum, ordinalMapChecksum }`. Do
+   not let cuGraph's internal renumbering become the external identity
+   coordinate.
+3. **RT-03** — Run the CPU oracle, emitting `SpectralCpuExecutionReceiptV1`
+   (`algorithm`, `referenceImplementationRevision`, `laplacianKind`,
+   `candidateSnapshotRevision`, `ordinalMapChecksum`, `graphChecksum`,
+   `numClusters`, `parameters`, `rawAssignmentChecksum`,
+   `canonicalPartitionChecksum`, `ratioCut`, `edgeCut`, `modularity`,
+   `elapsedMs`).
+4. **RT-04** — Actually invoke `POST /v1/community/spectral` against the
+   live WSL2 RAPIDS sidecar, requiring `executionDevice: 'CUDA'`,
+   `realTargetExecution: true`, `gpuName: 'RTX 3060 Ti'`,
+   `computeCapability: '8.6'` in the response.
+5. **RT-05** — Emit `SpectralGpuExecutionReceiptV1` with sections `IDENTITY`
+   (`requestId`, `candidateSnapshotRevision`, `ordinalMapChecksum`,
+   `graphChecksum`), `ALGORITHM` (`algorithm`, `numClusters`,
+   `numEigenvectors`, solver tolerances/iterations, `randomSeed`),
+   `RUNTIME` (per-library versions — see the ABI-alignment doc),
+   `EXECUTION` (`realTargetExecution`, `executionDevice`, `rowCount`,
+   `edgeCount`, `elapsedMs`, `peakDeviceBytes`), `RESULT`
+   (`rawAssignmentChecksum`, `canonicalPartitionChecksum`, `clusterCount`,
+   `ratioCut`, `edgeCut`, `modularity`), `PARITY` (`cpuReceiptRef`,
+   `cpuCanonicalPartitionChecksum`, `adjustedRandIndex`,
+   `canonicalPartitionExact`, `objectiveTolerancePass`), `STATUS`
+   (`RUNTIME_PROVEN | PARITY_FAILED | ENVIRONMENT_UNSUPPORTED`).
+
+Only after Blocker D (RT-05's `PARITY` section) passes should any GPU
+ABI/cuTile/CUTLASS/LibTorch benchmarking work resume — see the priority
+freeze recorded in
+`openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md`.
