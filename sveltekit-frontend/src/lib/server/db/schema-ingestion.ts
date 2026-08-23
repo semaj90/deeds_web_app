@@ -1,7 +1,15 @@
 /**
  * Enhanced Schema Migration for Document Ingestion Pipeline
- * Adds: pgvector, support: MinIO integration: OCR tracking, embedding storage
- * Compatible with: Drizzle ORM 0.44: PostgreSQL 17, pgvector extension
+ * Adds: pgvector, MinIO integration, OCR tracking, embedding storage
+ * Compatible with: Drizzle ORM 0.44, PostgreSQL + pgvector extension
+ *
+ * IMPORTANT STORAGE BOUNDARY
+ * --------------------------
+ * This module describes the legacy legal-document ingestion tables created by
+ * drizzle/migrations/001_enable_pgvector_ingestion.sql. Those physical columns
+ * are vector(384). They are NOT the Parent Atlas canonical semantic_512
+ * representation and must not be used to infer Parent Atlas representation
+ * identity from dimensionality alone.
  */
 
 import { sql } from 'drizzle-orm';
@@ -18,9 +26,13 @@ import {
     index,
     foreignKey,
     real,
-    pgEnum
+    pgEnum,
+    vector
 } from 'drizzle-orm/pg-core';
 import { cases, users } from './schema-postgres.js';
+
+// Historical ingestion representation. Keep separate from Parent Atlas semantic_512.
+export const LEGACY_INGESTION_VECTOR_DIMENSION = 384 as const;
 
 // === ENUMS ===
 export const processingStatusEnum = pgEnum('processing_status', [
@@ -74,7 +86,7 @@ export const ingestedDocuments = pgTable('ingested_documents', {
     embeddingModel: varchar('embedding_model', { length: 100 }),
     embeddingCompletedAt: timestamp('embedding_completed_at', { withTimezone: true }),
 
-    // Qdrant mirror
+    // Qdrant mirror. This is a rebuildable projection pointer, not identity authority.
     qdrantId: uuid('qdrant_id'),
     qdrantCollection: varchar('qdrant_collection', { length: 100 }).default('legal_documents'),
     lastSyncedToQdrant: timestamp('last_synced_to_qdrant', { withTimezone: true }),
@@ -121,14 +133,17 @@ export const ingestedDocuments = pgTable('ingested_documents', {
 }));
 
 /**
- * Document chunks - semantic chunks with embeddings for RAG
- * Using pgvector for efficient similarity search
+ * Document chunks - semantic chunks with embeddings for legacy legal RAG.
+ *
+ * The physical migration creates vector(384). Use Drizzle's native pgvector
+ * type so schema metadata matches PostgreSQL. Parent Atlas semantic_512 is a
+ * separate representation family and must not be collapsed into this table.
  */
 export const ingestedDocumentChunks = pgTable('document_chunks', {
     id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 
-    // Document reference
-    documentId: text('document_id').notNull(),
+    // Document reference. Physical migration uses UUID.
+    documentId: uuid('document_id').notNull(),
 
     // Chunk metadata
     chunkIndex: integer('chunk_index').notNull(),
@@ -137,10 +152,8 @@ export const ingestedDocumentChunks = pgTable('document_chunks', {
     textHash: varchar('text_hash', { length: 64 }).notNull(), // For deduplication
     tokens: integer('tokens').notNull(),
 
-    // Vector embedding - THIS IS THE KEY FIELD FOR pgvector
-    // Using sql template for vector type (768 dimensions for embeddinggemma:latest)
-    // Note: Legacy schemas used 384; 768 is the canonical native dimension.
-    embedding: text('embedding').notNull().$type<number[]>(), // Will be cast to vector(768) in migration
+    // Legacy ingestion vector. This is not Parent Atlas semantic_512.
+    embedding: vector('embedding', { dimensions: LEGACY_INGESTION_VECTOR_DIMENSION }).notNull(),
     embeddingModel: varchar('embedding_model', { length: 100 }).notNull().default('embeddinggemma:latest'),
 
     // Position in document
@@ -159,7 +172,7 @@ export const ingestedDocumentChunks = pgTable('document_chunks', {
         index('idx_document_chunks_document_id').on(table.documentId),
         index('idx_document_chunks_chunk_index').on(table.chunkIndex),
         index('idx_document_chunks_text_hash').on(table.textHash),
-        // HNSW index for vector similarity search - must be created in SQL migration
+        // HNSW is created by SQL migration because extension/index lifecycle is operator-owned.
         // CREATE INDEX idx_document_chunks_embedding_hnsw ON document_chunks USING hnsw (embedding vector_cosine_ops);
     ],
     foreignKeys: [
@@ -172,15 +185,15 @@ export const ingestedDocumentChunks = pgTable('document_chunks', {
 }));
 
 /**
- * Embedding cache - avoid re-computing embeddings for identical text
+ * Embedding cache - avoid re-computing embeddings for identical legacy-ingestion text.
  */
 export const embeddingCacheTable = pgTable('embedding_cache_enhanced', {
     id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
     textHash: varchar('text_hash', { length: 64 }).notNull().unique(),
     text: text('text').notNull(),
-    embedding: text('embedding').notNull().$type<number[]>(),
+    embedding: vector('embedding', { dimensions: LEGACY_INGESTION_VECTOR_DIMENSION }).notNull(),
     model: varchar('model', { length: 100 }).notNull(),
-    dimensions: integer('dimensions').notNull().default(384),
+    dimensions: integer('dimensions').notNull().default(LEGACY_INGESTION_VECTOR_DIMENSION),
     hitCount: integer('hit_count').default(0).notNull(),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true }).defaultNow().notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -232,7 +245,7 @@ export const vectorSearchLogs = pgTable('vector_search_logs', {
     id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
     userId: integer('user_id'),
     query: text('query').notNull(),
-    queryEmbedding: text('query_embedding').$type<number[]>(),
+    queryEmbedding: vector('query_embedding', { dimensions: LEGACY_INGESTION_VECTOR_DIMENSION }),
     resultsCount: integer('results_count').notNull(),
     topResultId: uuid('top_result_id'),
     topSimilarity: real('top_similarity'),
@@ -290,4 +303,3 @@ export const ingestionSchema = {
     vectorSearchLogs,
     documentSummaries,
 };
-
