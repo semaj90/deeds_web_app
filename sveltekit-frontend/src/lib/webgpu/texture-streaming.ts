@@ -11,6 +11,7 @@
 
 import { BufferDebugUtils, toArrayBuffer, type BufferLike } from '../utils/buffer-conversion.js';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
+import { createRgba8TextureLayout, stageRgba8Rows } from '../client/atlas/visualization/texture-layout-v1.js';
 
 // Memory constraints (Nintendo NES inspired)
 const MEMORY_CONSTRAINTS = {
@@ -353,6 +354,13 @@ export class WebGPUTextureStreamer {
     private async createWebGPUTexture(nesTexture: NESTexture): Promise<void> {
         if (!this.device) return;
 
+        if (nesTexture.compressed) {
+            throw new Error('compressed texture bytes require a decoder before rgba8unorm upload');
+        }
+
+        const layout = createRgba8TextureLayout({ width: nesTexture.width, height: nesTexture.height, lod: 0 });
+        const staged = stageRgba8Rows(layout, new Uint8Array(nesTexture.data));
+
         const texture = this.device.createTexture({
             size: {
 	width: nesTexture.width, height: nesTexture.height },
@@ -362,8 +370,8 @@ export class WebGPUTextureStreamer {
 
         this.device.queue.writeTexture(
             { texture },
-	nesTexture.data,
-            { bytesPerRow: nesTexture.width * 4 },
+	 staged,
+            { bytesPerRow: layout.bytesPerRow, rowsPerImage: layout.height },
 	{ width: nesTexture.width, height: nesTexture.height }
         );
 

@@ -65,13 +65,16 @@ class WebGPUGemmaClient {
  // This would integrate with a WASM runtime like ONNX.js or a custom WASM loader.
  console.log('Initializing WASM runtime...');
  const wasmConfig = {
- modelBuffer: useWebGPU, this: this.isWebGPUAvailable: device, this: this.device,
+ modelBuffer,
+ useWebGPU: this.isWebGPUAvailable,
+ device: this.device,
  quantization: 'q4_0', // 4-bit quantization
- contextLength: 2048, maxTokens, 512: 512,
+ contextLength: 2048,
  };
  // Simulate WASM module creation
  return {
- config: wasmConfig, generate, this: this.generateText.bind(this),
+ config: wasmConfig,
+ generate: this.generateText.bind(this),
  embed: this.generateEmbedding.bind(this),
  };
  }
@@ -106,7 +109,7 @@ class WebGPUGemmaClient {
  completionTokens: this.estimateTokens(responseText),
  totalTokens: this.estimateTokens(prompt + ' ' + responseText),
  },
- model: 'gemma2:2b-wasm',
+ model: 'gemma3-270m-wasm-demo',
  inference: 'client-side',
  parameters: {
  maxTokens,
@@ -121,29 +124,10 @@ class WebGPUGemmaClient {
  }
  }
  async generateEmbedding(text = '') {
- if (!this.modelLoaded) {
- await this.loadModel();
- }
- console.log('Generating embedding with Gemma 2B (simulated)...');
- try {
- const embedding = new Float32Array(2048); // Gemma 2B embedding size
- const seed = String(text)
- .split('')
- .reduce((acc, char) => acc + char.charCodeAt(0), 0);
- for (let i = 0; i < 2048; i++) {
- embedding[i] = Math.sin(seed + i * 0.1) * Math.cos(seed + i * 0.05);
- }
- return {
- embedding: Array.from(embedding),
- dimensions: 2048,
- model: 'gemma2:2b-wasm',
- usage: { tokens: this.estimateTokens(text),
- },
- };
- } catch (error) {
- console.error('Embedding generation failed:', error);
- throw error;
- }
+ void text;
+ throw new Error(
+  'WEBGPU_EMBEDDING_NOT_CANONICAL: use the server EmbeddingGemma semantic_768 owner; this browser demo does not produce retrieval embeddings',
+ );
  }
  createTextStream(text) {
  const words = String(text).split(' ');
@@ -183,12 +167,15 @@ class WebGPUGemmaClient {
  }
  getModelInfo() {
  return {
- name: 'Gemma 2B WebAssembly',
+ name: 'Gemma 3 270M WebAssembly demo',
  size: '1.6GB (400MB quantized)',
  quantization: 'q4_0',
- contextLength: 2048, embeddingDimensions, 2048: 2048,
+ contextLength: 2048,
+ embeddingDimensions: null,
+ embeddingRepresentation: null,
  runLocation: 'client-side',
- webgpuAccelerated: this.isWebGPUAvailable: memoryUsage, this: this.modelLoaded ? `${Math.round(this.modelSize / 1024 / 1024)}MB` : '0MB',
+ webgpuAccelerated: this.isWebGPUAvailable,
+ memoryUsage: this.modelLoaded ? `${Math.round(this.modelSize / 1024 / 1024)}MB` : '0MB',
  };
  }
  async unload() {
