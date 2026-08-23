@@ -5,10 +5,11 @@ import { buildACEPacket, injectACETableCache } from './ace-builder.js';
 import { recordExecutionOutcome, mutatePromptWithLearnings } from './learning-loop.js';
 import { logSynthesisRun } from '../observability/synthesis-logger.js';
 import { ENV } from '../env.server.js';
-import { getValkeyClient } from '../cache/valkey-client.js';
+import { getLangGraphCacheAdapter } from '../cache/langgraph-cache-adapter.js';
 import crypto from 'crypto';
+import { buildPhaseAlignmentReceipt, type PhaseAlignmentInputV1 } from '@deeds/parent-atlas';
 
-const redis = getValkeyClient();
+const cache = getLangGraphCacheAdapter();
 const TEMPORAL_RECOMMENDATION_OUTCOME_PRODUCER = 'langgraph-dag:temporal-recommendation-outcome:v1';
 
 function canonicalJson(obj: any): string {
@@ -113,7 +114,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
   const queryHash = hashContent(normalizedUserQuery);
 
   // Phase 8B: check llm_output
-  const cachedLlmOutput = await redis.get(`llm_output:${queryHash}`);
+  const cachedLlmOutput = await cache.get(`llm_output:${queryHash}`);
   if (cachedLlmOutput) {
     state.ctx.cacheLayerUsed = 'llm_output';
     return {
@@ -140,7 +141,7 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
   const prefixHash = hashContent(stablePrefix);
   const suffixHash = hashContent(dynamicSuffix);
   const modelId = stablePrefix.modelId;
-  const cachedBifrost = await redis.get(`semantic:bifrost:${modelId}:${prefixHash}:${suffixHash}`);
+  const cachedBifrost = await cache.get(`semantic:bifrost:${modelId}:${prefixHash}:${suffixHash}`);
 
   if (cachedBifrost) {
     state.ctx.cacheLayerUsed = 'bifrost_semantic';
@@ -174,7 +175,19 @@ async function synthesizeNode(state: AgentState): Promise<Partial<AgentState>> {
       if (check.stop) {
         result = "⚠️ Tool loop detected: duplicate_tool_call. Switching to reasoning.";
       } else {
-        const res = await executeTool(toolCall, state.ctx);
+        const phaseInput = state.ctx.phaseAlignmentInput as PhaseAlignmentInputV1 | undefined;
+        const phaseReceipt = phaseInput
+          ? buildPhaseAlignmentReceipt({ ...phaseInput, selected_tool: toolCall.tool })
+          : undefined;
+        if (phaseReceipt) state.ctx.phaseAlignmentReceipt = phaseReceipt;
+        const phaseMayDispatch = !phaseReceipt || phaseReceipt.decision.decode_admitted || ['RETRIEVE', 'EXPAND_GRAPH', 'VALIDATE'].includes(phaseReceipt.decision.action);
+        const res = phaseMayDispatch
+          ? await executeTool(toolCall, state.ctx)
+          : {
+              ok: false,
+              error: `Phase alignment blocked tool dispatch: ${phaseReceipt.decision.block_reasons.join(',') || phaseReceipt.decision.action}`,
+              phaseAlignmentReceipt: phaseReceipt,
+            };
         lastToolSuccess = explicitTemporalAlternativeToolSuccess(res, state.ctx);
         result = JSON.stringify(res);
       }
@@ -222,7 +235,7 @@ async function finalizeSuccessNode(state: AgentState): Promise<Partial<AgentStat
   const stableKey = state.ctx.stableKey || `path_${queryHash.substring(0, 8)}`;
 
   // Phase 8B: Save successful execution cache to llm_output (7 days TTL)
-  await redis.set(`llm_output:${queryHash}`, JSON.stringify(state.lastResult), "EX", 3600 * 24 * 7);
+  await cache.setJson(`llm_output:${queryHash}`, state.lastResult, 3600 * 24 * 7);
 
   // Phase 10: Reward strategy success in reinforcement loop
   await recordExecutionOutcome(state.query, true, state.ctx);

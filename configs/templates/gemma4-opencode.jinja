@@ -1,5 +1,8 @@
 {# Gemma4/OpenCode tool-aware chat template.
-This file must contain Jinja only. Do not append PowerShell launcher code. #}
+This file must contain Jinja only. Do not append PowerShell launcher code.
+Gemma-native only: Ornith uses its model/server-native OpenAI-compatible
+template. Keep shared tool policy (max three supplied tools; one call per
+assistant turn) aligned, but do not pass this Gemma token format to Ornith. #}
 
 {%- macro json_value(value) -%}
 {%- if value is string -%}
@@ -49,6 +52,8 @@ When a tool is required, respond with exactly one tool call using this format:
 
 Rules:
 
+* The orchestration layer supplies at most three tools in one request.
+* Emit at most one tool call in one assistant turn; continue after its result.
 * Use only a tool name present in the supplied tools.
 * Arguments must be one valid JSON object.
 * Follow the tool's JSON schema exactly.
