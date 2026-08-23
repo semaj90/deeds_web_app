@@ -66,3 +66,19 @@ CUDA/driver/RAPIDS execution receipt was produced.
 
 Status remains `RUNTIME_BLOCKED / NO_PROMOTION`. No projection, Qdrant tag,
 Valkey residency, Neo4j feature, or synthesis routing write was attempted.
+
+## Runtime isolation
+
+The WSL2 environment itself starts successfully:
+
+- GPU: `NVIDIA GeForce RTX 3060 Ti`
+- Driver: `580.88`
+- VRAM: `8192 MiB`
+- `cupy`: `14.1.1` import passed
+- `cudf`: `26.06.01` import passed
+- Conda metadata: `cugraph 26.06.00`, `cuvs 26.06.00`, CUDA `13.3`
+
+The failure isolates to `cugraph` import/execution: importing `cugraph`
+does not return within the bounded observation window, including with
+`CUDA_VISIBLE_DEVICES=-1`. Therefore no spectral assignment, checksum,
+latency, or GPU-memory receipt exists yet.
