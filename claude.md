@@ -172,6 +172,39 @@ Query arrives
 
 ---
 
+## 🧮 Wire Format Layering Rule (CANONICAL — recorded 2026-08-23)
+
+**JSON/MessagePack describe things. Bitmaps select things. Ordinals address things. mmap/Arrow
+stores large things. Pinned memory stages things. CUDA tensors compute things.** Don't let
+serialization, caching, retrieval, and canonical identity collapse into one coupled system.
+
+**Hard rule**: Bulk numeric arrays (`semantic_768` rows, feature matrices, any vector/matrix
+payload) SHALL NOT be serialized through JSON or MessagePack. Use Arrow IPC, raw FP32 `mmap`, or
+PyTorch/CUDA tensors instead — unpacking thousands of scalar JSON/MessagePack values back into a
+numeric array defeats the point of a compact binary array format, and this repo already hit
+exactly this failure mode once for Qdrant vectors (see the Qdrant API Strategy section directly
+below — `ENOBUFS` from JSON-serializing 768-dim float arrays through a shell).
+
+**JSON stays the default for logical/descriptor packets** (ordinals, revisions, routing flags,
+policy hints — e.g. an `AcePacket`-shaped envelope) while the schema is still evolving. MessagePack
+is a valid *later* codec swap for the same logical schema once it stabilizes — introducing it
+should never mean inventing a second schema, only an alternate encoding of the existing one, and
+it still must not carry numeric matrix data.
+
+**A packet descriptor referencing a large vector/matrix carries a reference** (mmap offset, Qdrant
+point id, ordinal into a `CandidateFeatureMatrix`), never the raw float values inline.
+
+Full design context, live-codebase audit of what of this already exists (`ContextManifest`,
+`CandidateOrdinal*`, packet bitmaps, LOD manifest — several are already substantially built under
+different axes than a later proposal assumed), and the undecided architectural questions this
+raised are recorded in
+`openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md`. That document also records
+a companion rule already consistent with this file's existing AST/ast-grep guidance: a
+model/regex/NLP classifier proposes structural facts (is this a function, is this the caller) but
+never decides them — ast-grep/Tree-sitter/Graphify evidence is the decision-maker.
+
+---
+
 ## 🔌 Qdrant API Strategy: Native Binary or REST with Streaming (CRITICAL — July 28, 2026)
 
 **INCIDENT**: Attempted Qdrant backfill via shell/docker exec + curl failed with ENOBUFS on 768-dim vectors.

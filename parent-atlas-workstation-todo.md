@@ -3071,3 +3071,55 @@ now that 463 spurious span mismatches aren't drowning out the signal); (2) run t
 GPU proof; (3) resolve `codebase_chunks_768` vs `_768_v2` (94 vs 40 file references — confirmed
 substantial, correctly scoped as its own investigation, not tackled this pass); (4) ACE crash
 instrumentation; (5) Graphify FANOUT sequencing; (6) docker-compose canonical-file decision.
+
+### Session handoff — 2026-08-23 (memory-architecture design proposal recorded, not implemented)
+
+Received a large (14-part) inline architectural design proposal covering evidence/retrieval/
+numerical-working-set/policy layering, an ast-grep-primary structural-authority hierarchy, a
+7-level LOD residency contract, candidate-ordinal-indexed Valkey bitmap admission masking, a
+wire-format layering rule (JSON/MessagePack for descriptors, Arrow/mmap/tensors for numeric bulk
+data, never the reverse), `TANG_INSPIRED_LOW_RANK_SHORTLIST` naming, and a typed-packet-class DAG
+synthesis model. **Did not implement any of it blind** — audited what already exists first, per
+this repo's own Duplication Prevention rule, and found the overlap is much larger than the
+proposal's framing suggested:
+
+- `ContextManifest`/`ContextCandidate`/`ContextLane`/`compileContext()` already exist and work
+  (`context-compiler.parent-atlas.ts`) — its own bridge file says "previously unwired, zero
+  production callers", organized by retrieval-lane axis, not the proposal's evidence-type axis.
+- `CandidateOrdinalMap`-equivalent (ordinal-addressed candidate feature matrices, GPU-resident
+  leasing, Arrow readback) is already a real, fairly mature subsystem under
+  `src/lib/server/atlas/features/candidate-feature-*` — further along than the proposal implied.
+- A 4-level LOD scheme already exists (`packet-lod-manifest.ts`), keyed by cache destination, not
+  the proposal's 7-level evidence-type axis — different axis, needs reconciliation, not silent
+  duplication.
+- A per-packet gate-flag bitmap already exists (`packet-bitmap.ts`) — different purpose from the
+  proposal's per-category candidate-membership bitmaps (orthogonal indexing axes, genuinely safe
+  to add the new one alongside without conflict).
+- Tang-inspired low-rank sampling has no existing owner — genuinely new if built.
+- Pinned-memory/CUDA-staging code exists in `python/parent_atlas_tensor/*` but wasn't read in
+  detail this pass — unverified whether it already matches the proposed chain.
+
+**Recorded as `openspec/changes/parent-atlas-memory-architecture-freeze/`** (proposal.md + tasks.md
++ specs/atlas-memory-architecture/spec.md) — the audit table above lives there in full, plus a
+ranked list of what's actually novel and worth scoping vs. what needs an explicit operator
+`CANONICAL_OWNER` decision before any code changes (the two highest-risk items: does the proposed
+typed-packet-class model replace or layer onto the existing lane-axis `ContextManifest`, and does
+the 7-level LOD scheme replace or layer onto the existing 4-level one — both are exactly the kind
+of "two competing owners" mistake this repo's CLAUDE.md warns about, so deliberately left
+undecided pending explicit sign-off rather than picked unilaterally).
+
+**Also applied immediately**: the wire-format layering rule itself (JSON/MessagePack for
+descriptors, Arrow/mmap/tensors for numeric arrays, never MessagePack for bulk numeric data) is
+zero-cost governance with real value — added to `claude.md` as a new canonical section
+("🧮 Wire Format Layering Rule") right before the existing Qdrant API Strategy section, since this
+repo already hit exactly the failure mode this rule prevents once (the `ENOBUFS` JSON-serializing-
+768-dim-vectors incident documented right below it).
+
+**Next-session priority, unchanged from before** (this was a recording pass, not implementation —
+none of the priority queue below was touched by it): (1) `NAMED_SYMBOL_MISSING_LEFT/RIGHT` +
+`SEMANTIC_KIND_MISMATCH` gap investigation now that CRLF span noise is gone; (2) bounded XGBoost
+GPU proof; (3) `codebase_chunks_768` vs `_768_v2` split (94 vs 40 file references); (4) ACE crash
+instrumentation; (5) Graphify FANOUT sequencing; (6) docker-compose canonical-file decision. If the
+operator wants to prioritize the memory-architecture proposal instead, the two decisions in
+`parent-atlas-memory-architecture-freeze/tasks.md` 2.3/2.4 need answering first — everything else
+in that change (2.1, 2.2, 2.5, 2.6, 3.1) can proceed independently without those answers.
