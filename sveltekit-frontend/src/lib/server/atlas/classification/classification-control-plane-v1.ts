@@ -5,6 +5,7 @@ import { compileClassificationCandidateFeaturesV1 } from './classification-candi
 import { classificationObservationsToHmmV1 } from './classification-hmm-bridge-v1.js';
 import { escalateAmbiguousCandidatesV1, type CrossEncoderEscalationCandidateV1 } from './cross-encoder-escalation-v1.js';
 import type { ClassificationObservationV1, ClassificationTaskV1 } from './classification-observation-v1.js';
+import type { RecommendationEvidenceBundleV1 } from '../recommendations/recommendation-evidence-bundle-v1.js';
 
 export interface ClassificationControlPlaneCandidateV1 {
   candidate: CandidateProjectionInput;
@@ -26,6 +27,7 @@ export interface ClassificationControlPlaneResultV1 {
   rerank: Awaited<ReturnType<typeof escalateAmbiguousCandidatesV1>>;
   canonicalWritesAllowed: false;
   retrievalVoteAdded: false;
+  recommendationEvidence: RecommendationEvidenceBundleV1 | null;
 }
 
 export async function runClassificationControlPlaneV1(input: {
@@ -38,6 +40,7 @@ export async function runClassificationControlPlaneV1(input: {
   queryPolicy?: MrlClassifierPolicyV1;
   candidates: readonly ClassificationControlPlaneCandidateV1[];
   maxCrossEncoderCandidates?: number;
+  recommendationEvidence?: RecommendationEvidenceBundleV1;
 }): Promise<ClassificationControlPlaneResultV1> {
   const queryClassification = input.queryVector768 && input.queryPrototypes?.length
     ? classifyEmbeddingGemmaMrlV1({
@@ -98,5 +101,6 @@ export async function runClassificationControlPlaneV1(input: {
     rerank,
     canonicalWritesAllowed: false,
     retrievalVoteAdded: false,
+    recommendationEvidence: input.recommendationEvidence ?? null,
   };
 }
