@@ -306,6 +306,13 @@ valid empty extraction, not evidence that the AST lane is complete.
   **NE-07's `used_concepts` write is explicitly NOT this task** — it is a
   lexical heuristic (tokenized, stopword-filtered `ast_symbols`), not a
   domain-classifier- or `ontology-proposal.ts`-validated concept. NE-08 still
+  has a read-only candidate stage at
+  `scripts/atlas/classify-ast-entities-okf-dry-run.mts`: it reuses the
+  versioned `parent-atlas-domain-taxonomy-v1` owner and classified
+  `34,041/42,398` AST candidates. These remain `CANDIDATE_ONLY`; no domain
+  ledger or ontology tuple writes are authorized. The remaining gate is
+  evidence-backed validation against declared OKF domains and ontology
+  references.
   requires wiring the real owners
   (`ai/parent-atlas-workstation-domain-classifier.ts`,
   `packages/semantic-contracts/src/ontology-proposal.ts`) into this same

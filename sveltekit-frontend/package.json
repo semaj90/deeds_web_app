@@ -1673,4 +1673,8 @@
     "packages/atlas-duckdb",
     "packages/parent-atlas",
     "packages/parent-atlas-core",
-    "packages/par
+    "packages/parent-atlas-retrieval",
+    "packages/parent-atlas-ingest",
+    "packages/parent-atlas-opencode"
+  ]
+}

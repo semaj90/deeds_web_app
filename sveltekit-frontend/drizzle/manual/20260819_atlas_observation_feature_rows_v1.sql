@@ -1,5 +1,38 @@
 -- Parent Atlas staged observation feature materialization.
 -- PostgreSQL is the exact identity/observation owner; Qdrant/Valkey/HNSW are rebuildable retrieval projections.
+--
+-- ============================================================================
+-- SUPERSEDED — DO NOT APPLY the `atlas_observation_feature_rows` table below.
+-- ============================================================================
+-- Confirmed via docs/reports/atlas-observation-feature-row-contract-v1.json
+-- (BLOCKED_DUPLICATE_INCOMPATIBLE_MIGRATIONS audit) and live schema
+-- inspection (2026-08-24): this file's `atlas_observation_feature_rows`
+-- (PK candidate_id+workspace_revision, carries semantic_768) collides on
+-- table name with `20260819_atlas_observation_feature_rows.sql`'s
+-- `atlas_observation_feature_rows` (PK packet_key+feature_revision, no
+-- vector — semantic ANN intentionally owned elsewhere). ONLY the sibling
+-- file's version matches the live Drizzle schema
+-- (src/lib/server/db/schema/atlas-observation-feature-rows.ts),
+-- observation-feature-materializer.ts, and export-spectral-fixture-routing-labels.mjs
+-- and was applied live 2026-08-24 (table confirmed empty/new at apply time,
+-- zero pre-existing data affected).
+--
+-- This file's `atlas_observation_feature_rows` block was NEVER applied
+-- against live Postgres. Because it uses `CREATE TABLE IF NOT EXISTS`, running
+-- this file now would silently no-op that block (the table already exists in
+-- the OTHER shape) rather than error — do not run this file expecting it to
+-- create this shape.
+--
+-- The `atlas_observation_records` table above this banner is a SEPARATE,
+-- non-conflicting table and is not affected by this notice — it was left
+-- untouched and unapplied, pending its own review.
+--
+-- If this candidate_id/semantic_768 shape is still wanted, it needs a new,
+-- non-colliding table name and an explicit decision on whether it becomes a
+-- second semantic_768 owner (a hard "no" per this repo's runtime-ownership
+-- rules unless a documented supersession/migration is written first) — an
+-- operator decision, not made by this edit.
+-- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS vector;
 

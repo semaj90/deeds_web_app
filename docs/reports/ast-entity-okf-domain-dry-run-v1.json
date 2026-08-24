@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.ast-entity-okf-domain-dry-run-receipt.v1",
+  "status": "READ_ONLY_COMPLETE",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-identity.jsonl",
+  "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-okf-domain.jsonl",
+  "taxonomy_revision": "parent-atlas-domain-taxonomy-v1",
+  "counts": {
+    "total": 42398,
+    "classified": 34041,
+    "fallback": 8357,
+    "noEvidence": 0,
+    "identityResolved": 42398
+  },
+  "coverage": {
+    "identity": 1,
+    "classified": 0.8028916458323506,
+    "evidence": 1
+  },
+  "canonical_writes": false,
+  "database_writes": false,
+  "ontology_tuple_writes": false
+}

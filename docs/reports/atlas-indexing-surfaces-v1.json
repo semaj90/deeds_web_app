@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-24T16:30:37.260Z",
+  "generatedAt": "2026-08-24T17:00:23.867Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -14,7 +14,7 @@
     "activeBackfill": "scripts/atlas/backfill-ast-symbols.mjs",
     "activeBackfillUsesAstGrep": true,
     "activeBackfillRegexMatchers": 0,
-    "extractionRegexFallbackReferences": 3,
+    "extractionRegexFallbackReferences": 2,
     "supportedSymbolKinds": [
       "function",
       "class",
@@ -37,7 +37,7 @@
       },
       "atlas_packet_features": {
         "exists": true,
-        "count": 61657
+        "count": 61660
       },
       "atlas_ast_nodes": {
         "exists": true,
@@ -157,7 +157,12 @@
         "entities",
         "tree_node_ids",
         "imports",
-        "exports"
+        "exports",
+        "source_ref",
+        "ast_coverage",
+        "ast_language",
+        "ast_extraction_method",
+        "ast_hash"
       ],
       "atlas_ast_nodes": [
         "tree_node_id",
@@ -1106,7 +1111,7 @@
   "qdrant": {
     "reachable": false,
     "url": "http://127.0.0.1:6333",
-    "error": "fetch failed"
+    "error": "The operation was aborted due to timeout"
   },
   "drizzle": {
     "journalEntries": 41,
@@ -1199,7 +1204,7 @@
       "severity": "medium",
       "message": "Fewer than half of atlas_packet_features rows have AST symbols.",
       "evidence": [
-        "12497/61657"
+        "12497/61660"
       ]
     },
     {
