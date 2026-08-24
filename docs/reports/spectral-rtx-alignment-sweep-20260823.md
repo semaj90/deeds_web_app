@@ -151,6 +151,22 @@ operators both converge to ARI ~0.953–0.955 against the GPU baseline in the
 v2 receipt, i.e. the same ceiling regardless of operator). No run in the
 census reaches the 0.99 promotion gate; the gate remains `BLOCKED`.
 
-Not yet done: Leiden/Louvain comparison against this same fixture (LVG-7),
+Correction: Leiden comparison against this fixture (LVG-7) was already run, not
+"not yet done" as an earlier draft of this addendum stated. It produced a
+degenerate result — `cugraph.leiden(graph, max_iter=100, resolution=1.0,
+random_state=seed+repeat, theta=1.0)` returns 500 singleton clusters for 500
+nodes, `reported_modularity: -0.2198`, identically in both
+`spectral-live-fixture-receipt-500.json` and
+`spectral-live-fixture-zero-duplicates-receipt-500.json`
+(`leiden.stability_ari: 1.0`, so reproducible, not noise). `partition_agreement`
+against both spectral methods is `0.0` and not meaningful as a comparison. The
+same `cugraph.leiden` call (same signature, same `theta=1.0`) correctly finds
+structure on `networkx.karate_club_graph()` in the live `atlas-rapids-cu13`
+env (`modularity: 0.4188`), so this is not a wrapper/API-misuse bug — the
+candidate cause is `resolution=1.0` interacting badly with this fixture's
+edge-weight scale, untested. Louvain was not run on this fixture at all.
+
+Not yet done: root-causing the Leiden fragmentation, Louvain comparison,
 Nsight Systems/Compute evidence (LVG-10/11), and committing
-`spectral_diagnostic_receipt_v2.py` + its receipt.
+`spectral_diagnostic_receipt_v2.py` + its receipt (now committed as of this
+addendum's follow-up).

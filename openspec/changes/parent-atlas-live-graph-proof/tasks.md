@@ -82,7 +82,7 @@ LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533)
 LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535)
-LVG-7 Leiden comparison                                     IMPLEMENTED_UNPROVEN (not yet run on this fixture)
+LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (500/500 singleton clusters, modularity -0.2198)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
@@ -95,6 +95,25 @@ LVG-14 agentic repair validator fixture                     PENDING
 `IMPLEMENTED_UNPROVEN` means runnable code exists; no live workstation PASS is implied.
 `EXECUTED_UNPROVEN` means a live workstation receipt exists but at least one proof-criteria
 item below still fails (here: item 4/5, promotion gate criterion 6's `cpuGpuARI >= 0.99`).
+`EXECUTED_DEGENERATE` means a live workstation receipt exists and the algorithm ran without
+error, but produced a partition that is not a candidate for the comparison it was meant for
+(here: every node its own cluster). This is a separate, more severe failure than
+`EXECUTED_UNPROVEN` and must not be reported as "not yet run."
+
+LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
+theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
+nodes with `reported_modularity: -0.2198` and `analyzers.modularity: -0.0249`, identically
+across both `spectral-live-fixture-receipt-500.json` and
+`spectral-live-fixture-zero-duplicates-receipt-500.json` (`leiden.stability_ari: 1.0`, so this
+is a deterministic, reproducible result, not run-to-run noise). `partition_agreement` against
+both spectral methods is therefore `0.0` — meaningless as a comparison, since one side is fully
+fragmented. Spot-checked the same `cugraph.leiden` call signature and column contract
+(`vertex`/`partition`, `theta=1.0`) against `networkx.karate_club_graph()` in the live
+`atlas-rapids-cu13` WSL2 env and it correctly finds a 2-4 community structure
+(`modularity: 0.4188`) — so this is not an API-misuse or column-naming bug in the wrapper.
+The candidate cause is untested: Leiden's `resolution=1.0` interacting with this fixture's
+edge-weight scale/distribution (semantic_512 cosine-derived weights) rather than a code defect.
+Not diagnosed further; record as an open anomaly, not a conclusion.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
