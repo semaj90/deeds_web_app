@@ -3361,3 +3361,66 @@ PINNED/GPU_RESIDENT/IN_USE enum) and `tile-directory.ts`'s split `HostResidency`
 (3+4 values) describe the same conceptual state machine two different ways within this one
 subsystem — an internal inconsistency to reconcile alongside the entry-point decision, not before
 it.
+
+### Session handoff — 2026-08-23 (AST corpus parity gap closed — 16/66 to 63/66 fullParity)
+
+Continued the "find gaps" request into the AST corpus parity thread (queued since the CRLF fix
+earlier this session left `NAMED_SYMBOL_MISSING_LEFT/RIGHT` + `SEMANTIC_KIND_MISMATCH` open).
+Root-caused and fixed three more real, distinct bug classes this pass, each verified with a
+before/after measurement via the 66-file corpus parity proof:
+
+1. **SEMANTIC_KIND_MISMATCH (7 files)**: `treesitter-chunker`'s own `kind` for a
+   `variable_declarator` is a generic "fragment" label that doesn't inspect the initializer, so
+   `const handleError = (event) => {...}` was classified as VARIABLE instead of FUNCTION on the
+   sidecar side. Fixed in `python/miniforge_nlp_sidecar_v2.py` — added
+   `_declarator_kind_override()`, which checks the declarator's own already-known byte span text
+   for a function/arrow-function initializer pattern. Rebuilt+restarted the
+   `miniforge-nlp-sidecar` Docker container (same gotcha as the CRLF fix — code changes need a
+   rebuild, not just a restart). Result: `SEMANTIC_KIND_MISMATCH` 7→0.
+2. **NAMED_SYMBOL_MISSING_LEFT (12 files)**: the canonical `node-tree-sitter-ast-provider.ts`'s
+   `DECLARATION_KINDS` map had no entries for `function_signature` (ambient function
+   declarations), `method_signature` (ambient interface methods), or `internal_module` (TS
+   `namespace X {}`) — it emitted no chunk at all for these node types, while the sidecar already
+   classified the first two correctly. Added all three; `internal_module` maps to a new
+   `'NAMESPACE'` kind deliberately outside `normalizeStructuralSymbolKind`'s known keywords, so it
+   falls through to UNKNOWN on both sides (matching, not a new mismatch, since UNKNOWN-UNKNOWN
+   pairs aren't `semanticKindComparable`). Result: `NAMED_SYMBOL_MISSING_LEFT` 12→0.
+3. **NAMED_SYMBOL_MISSING_RIGHT (60 files, the largest single class)**: `nodeName()` returned the
+   literal destructuring-pattern text (`"{ firstName, lastName }"`) as a variable's "name" —
+   tree-sitter's TS grammar names a `variable_declarator`'s LHS field "name" even when it's an
+   `object_pattern`/`array_pattern`, not an identifier. Fixed `nodeName()` to return `null` for
+   destructuring-pattern declarators, matching the sidecar's already-correct behavior of not
+   emitting a named symbol for these. Result: `NAMED_SYMBOL_MISSING_RIGHT` 60→0.
+
+Added regression tests for all three fixes (1 Python test file with 3 tests, 3 new TS tests in
+`node-tree-sitter-ast-provider.spec.ts`) — all pass, no regressions in the existing suites.
+
+**Cumulative measured result this session** (66-file corpus, `ATLAS_AST_PARITY_CORPUS_LIMIT=66 npx
+tsx scripts/atlas/prove-node-tree-sitter-corpus-parity-v2.mts`):
+
+| Gate | Session start | Now |
+|---|---|---|
+| `fullParity` | 16/66 | **63/66** |
+| `namedSymbolCoverage` | — | **66/66 (perfect)** |
+| `exactSpanParity` | 17/66 | **66/66 (perfect)** |
+| `semanticKindParity` | — | **63/66** |
+
+Remaining gap: `SEMANTIC_KIND_UNKNOWN_BOTH` (4 instances, 3 files) — both sides now agree a
+`namespace X {}` symbol exists (the named-symbol gap is closed), but neither side has a shared
+NAMESPACE kind vocabulary, so it can't achieve semantic-kind parity either. Per the comparator's
+own design (`unknownSymbolKindIsNotParity: true`), this is explicitly NOT counted as a mismatch —
+closing it would mean adding a real `NAMESPACE` variant to `StructuralSymbolKindV1` on both
+providers, a shared-vocabulary design decision rather than a bug fix, left open rather than
+decided unilaterally. Status is still `CORPUS_PARITY_MISMATCH` overall (not yet promotable) but
+the remaining gap is narrow, understood, and load-bearing on an explicit design choice rather than
+an unexamined defect.
+
+Committed as `6df99c8dfd`.
+
+**Next-session priority, updated**: (1) bounded XGBoost GPU proof; (2) `codebase_chunks_768` vs
+`_768_v2` split; (3) ACE crash instrumentation; (4) Graphify FANOUT sequencing; (5) docker-compose
+canonical-file decision; (6) the operator decision on tensor-residency's production entry point
+(tasks.md 2.14 in the memory-architecture-freeze change); (7) if AST parity is revisited: decide
+whether to add a real `NAMESPACE` symbol kind shared by both providers to close the last 3 files,
+or accept `SEMANTIC_KIND_UNKNOWN_BOTH` as permanently outside the parity contract's scope; (8) the
+two remaining CANONICAL_OWNER decisions from the memory-architecture audit pass.
