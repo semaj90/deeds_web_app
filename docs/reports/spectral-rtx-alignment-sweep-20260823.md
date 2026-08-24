@@ -629,7 +629,72 @@ partitions of real structure — a genuine CPU/GPU implementation
 divergence, not noise on a degenerate/near-empty signal. This is a new,
 untested hypothesis, not a conclusion.
 
-Not yet done: investigating why parity is worse on the connected graph
-(compare CPU vs GPU eigenvalue spectra directly on this fixture, the way
-the earlier eigengap probe did for the disconnected one), Louvain
-comparison, Nsight Systems/Compute evidence (LVG-10/11).
+### Eigengap re-check on the connected graph: K=8 is not structurally supported either
+
+A direct CPU-vs-GPU eigenspectrum comparison isn't possible — confirmed
+again here, same constraint recorded in `spectral-diagnostic-receipt-v2.json`:
+cuGraph's spectral wrapper only returns cluster assignments, never raw
+eigenvalues/eigenvectors (`eigenvectorObservability:
+ASSIGNMENTS_ONLY_FROM_CUGRAPH_PYTHON_WRAPPER`). Ran the CPU-side eigengap
+probe (`spectral_eigengap_probe_v1.py`, same tool used earlier for the
+disconnected fixture) against this connected graph instead
+(`docs/reports/spectral-eigengap-probe-v2-connected.json`).
+
+Confirms single-connectivity independently, via a second method: exactly
+one Laplacian eigenvalue at machine-zero (`-0.00000`) before the next
+(`0.048`) — no second near-zero value, corroborating the `scipy` check with
+a different technique.
+
+More importantly: **the strongest eigengap is at K=3** (gap `0.1149`,
+between eigenvalue[2]=`0.0909` and eigenvalue[3]=`0.2058`) — more than
+double any other gap in the top-20 spectrum. From index 5 onward the gaps
+flatten into an undifferentiated tail (`0.007`-`0.057`, no bump anywhere
+near index 8; the gap exactly at K=8, `0.0274`, is unremarkable and similar
+in size to its neighbors). This graph's own spectrum most strongly supports
+roughly 3 coarse communities, not 8 — `K=8` is not something the data singles
+out on this fixture either, connected or not.
+
+This is consistent with, though doesn't fully prove, the hypothesis from
+the ARI re-test above: forcing `K=8` past what the spectrum actually
+differentiates pushes both the CPU and GPU k-means step into a region of
+the eigenspace where successive eigengaps are small and similar in
+magnitude — exactly the condition under which small CPU/numpy vs.
+GPU/cuGraph implementation differences would produce genuinely different,
+comparably "valid" sub-partitions of that weak signal, rather than
+disagreeing about real structure. Not fully proven: this still can't
+directly compare CPU and GPU eigenvector subspaces (the wrapper constraint
+above), only infer from the CPU-side spectrum shape and the observed ARI
+behavior together.
+
+### K=3 parity test: partial support, not confirmation
+
+Ran the same diagnostic at `cluster_count=3` (the eigengap-supported value)
+instead of the frozen `K=8`, same fixture, same seed. Receipt:
+`docs/reports/spectral-diagnostic-receipt-v4-k3-connected.json`.
+
+| | K=8 (connected fixture) | K=3 (connected fixture) |
+|---|---|---|
+| normalized_laplacian ARI | 0.6615 | **0.8740** |
+| modularity ARI | 0.3082 | 0.3719 |
+| k-means census ARI range | 0.29 - 0.35 | 0.40 - 0.42 |
+| Promotion gate | `BLOCKED` | `BLOCKED` |
+
+**Mixed, not clean.** Matching K to the eigengap-supported value gives a
+real, substantial improvement on the `normalized_laplacian` operator
+(0.66 -> 0.87, `movedNodeCount` 20 vs. 500 nodes) — meaningful support for
+the hypothesis. But the `modularity`-operator comparison barely moves
+(0.31 -> 0.37) and the k-means census stays flat/init-independent in the
+low 0.40s. Neither comes remotely close to the `0.99` gate. The hypothesis
+("matching K to real structure closes the gap") is therefore partially
+supported for one CPU reference operator and not for the other — record
+this as a nuanced, incomplete result, not a resolution. The modularity
+operator's persistent, K-independent divergence from cuGraph's actual
+output is now the more interesting open question than the original
+disconnection or cardinality issues, and is unexplained.
+
+Not yet done: understanding why the modularity operator stays poor
+regardless of K (possibly a genuine algorithmic difference between the CPU
+reference's modularity-matrix eigendecomposition and cuGraph's internal
+`spectralModularityMaximizationClustering` implementation, not yet
+investigated), Louvain comparison, Nsight Systems/Compute evidence
+(LVG-10/11).

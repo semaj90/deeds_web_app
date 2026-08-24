@@ -188,9 +188,26 @@ both-locally-valid partitions — a real implementation divergence, not
 k-means noise on a near-degenerate signal. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-Not yet done: investigating why parity is worse on the connected graph
-(compare CPU vs GPU eigenvalue spectra directly, mirroring the earlier
-eigengap probe), Louvain comparison, Nsight Systems/Compute evidence
+**Eigengap re-check on the connected graph** (`spectral-eigengap-probe-v2-connected.json`):
+GPU eigenvectors still aren't observable (cuGraph wrapper constraint,
+unchanged), but the CPU-side spectrum independently confirms single
+connectivity (one machine-zero eigenvalue, not two) and shows the
+strongest gap at **K=3** (`0.1149`, more than double any other gap in the
+top-20), not K=8 — the tail from index 5 on is flat and undifferentiated,
+no bump near K=8.
+
+**K=3 parity test, mixed result — partial support, not confirmation**
+(`spectral-diagnostic-receipt-v4-k3-connected.json`): normalized_laplacian
+ARI improved substantially (0.6615 -> **0.8740**, `movedNodeCount` 20/500),
+real support for "matching K to real structure helps." But modularity ARI
+barely moved (0.3082 -> 0.3719) and the k-means census stayed flat/init-independent
+(0.40-0.42). Gate remains `BLOCKED` at both K values. The modularity
+operator's persistent, K-independent divergence from cuGraph is now the
+most interesting unresolved question in this file — more interesting than
+the original disconnection/cardinality issues, which are both now fixed.
+
+Not yet done: understanding why the modularity operator stays poor
+regardless of K, Louvain comparison, Nsight Systems/Compute evidence
 (LVG-10/11).
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,

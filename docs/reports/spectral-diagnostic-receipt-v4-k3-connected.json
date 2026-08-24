@@ -1,0 +1,516 @@
+{
+  "schema": "atlas.spectral-diagnostic-receipt.v2",
+  "producer": "scripts/atlas/spectral_diagnostic_receipt_v2.py",
+  "readOnly": true,
+  "runtime": {
+    "python": "3.14.6",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "cugraphVersion": "26.06.00",
+    "cudfVersion": "26.06.01",
+    "spectralApiOwner": "CUGRAPH",
+    "spectralImplementation": "CUVS_LEGACY_CUGRAPH_WRAPPER"
+  },
+  "frozenConfiguration": {
+    "clusterCount": 3,
+    "numEigenvectors": 3,
+    "evsMaxIterations": 100,
+    "kmeanTolerance": 1e-05,
+    "kmeanMaxIterations": 100,
+    "randomSeed": 684453,
+    "nInit": null,
+    "kmeansInitMethod": null,
+    "kmeansOversamplingFactor": null,
+    "observability": "NOT_EXPOSED_BY_CUGRAPH_WRAPPER",
+    "gpuEigenvectorsExposed": false,
+    "eigenvectorObservability": "ASSIGNMENTS_ONLY_FROM_CUGRAPH_PYTHON_WRAPPER",
+    "nextParityPath": "CUVS_SPECTRAL_EMBEDDING_PRECOMPUTED_COO_OR_CUML_CPP"
+  },
+  "fixture": {
+    "nodes": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-descoped/nodes.parquet",
+    "edges": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-descoped/edges.parquet",
+    "nodeCount": 500,
+    "graphChecksum": "9649f4f59218a88d010daab4876f1da25b9373c5eeba6dd6de9c75e4e637094b",
+    "ordinalMapChecksum": "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+    "cooAudit": {
+      "rawEdgeCount": 5987,
+      "uniqueDirectedEdgeCount": 5987,
+      "uniqueUndirectedEdgeCount": 5987,
+      "selfLoopCount": 0,
+      "cooEntryCount": 11974,
+      "uniqueCooEntryCount": 11974,
+      "duplicateCooEntryCount": 0,
+      "symmetricExpansionCount": 5987,
+      "duplicateReductionPolicy": "none_required",
+      "weightAggregationPolicy": "fixture_preaggregated_by_undirected_pair",
+      "cooChecksum": "ef6972f3dcf726da32da7936af00a6353034ef9648cc7a85c38f35dad125261e"
+    }
+  },
+  "diagnostics": {
+    "gpuRepeatDeterminism": true,
+    "toleranceSweep": [
+      {
+        "evsTolerance": 0.0001,
+        "runs": 3,
+        "assignmentChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "canonicalPartitionChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "objective": {
+          "modularity": 0.47025156534469215,
+          "edgeCut": 80.84339033961287,
+          "ratioCut": 1.05683109796188
+        },
+        "gpuObjective": {
+          "modularity": 0.4702515653446921,
+          "edgeCut": 80.84339033961297,
+          "ratioCut": 1.05683109796188
+        },
+        "networkxModularity": 0.47025156534469215,
+        "cpuGpuObjectiveDelta": {
+          "modularity": 5.551115123125783e-17,
+          "edgeCut": -9.947598300641403e-14,
+          "ratioCut": 0.0
+        },
+        "objectiveSpread": {
+          "modularity": 0.0,
+          "edgeCut": 0.0,
+          "ratioCut": 0.0
+        },
+        "elapsedMs": [
+          330.13907100394135,
+          27.79327199823456,
+          30.42259599897079
+        ]
+      },
+      {
+        "evsTolerance": 1e-05,
+        "runs": 3,
+        "assignmentChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "canonicalPartitionChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "objective": {
+          "modularity": 0.47025156534469215,
+          "edgeCut": 80.84339033961287,
+          "ratioCut": 1.05683109796188
+        },
+        "gpuObjective": {
+          "modularity": 0.4702515653446921,
+          "edgeCut": 80.84339033961297,
+          "ratioCut": 1.05683109796188
+        },
+        "networkxModularity": 0.47025156534469215,
+        "cpuGpuObjectiveDelta": {
+          "modularity": 5.551115123125783e-17,
+          "edgeCut": -9.947598300641403e-14,
+          "ratioCut": 0.0
+        },
+        "objectiveSpread": {
+          "modularity": 0.0,
+          "edgeCut": 0.0,
+          "ratioCut": 0.0
+        },
+        "elapsedMs": [
+          32.48954499576939,
+          29.6077780003543,
+          29.278884998348076
+        ]
+      },
+      {
+        "evsTolerance": 1e-06,
+        "runs": 3,
+        "assignmentChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "canonicalPartitionChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "objective": {
+          "modularity": 0.47025156534469215,
+          "edgeCut": 80.84339033961287,
+          "ratioCut": 1.05683109796188
+        },
+        "gpuObjective": {
+          "modularity": 0.4702515653446921,
+          "edgeCut": 80.84339033961297,
+          "ratioCut": 1.05683109796188
+        },
+        "networkxModularity": 0.47025156534469215,
+        "cpuGpuObjectiveDelta": {
+          "modularity": 5.551115123125783e-17,
+          "edgeCut": -9.947598300641403e-14,
+          "ratioCut": 0.0
+        },
+        "objectiveSpread": {
+          "modularity": 0.0,
+          "edgeCut": 0.0,
+          "ratioCut": 0.0
+        },
+        "elapsedMs": [
+          49.43985700083431,
+          59.76901500253007,
+          46.08499399910215
+        ]
+      },
+      {
+        "evsTolerance": 1e-07,
+        "runs": 3,
+        "assignmentChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "canonicalPartitionChecksums": [
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0",
+          "8c3fa091bb1483523a114d2eb6cea61b2e4254bc1a34aff3248978133b6d80e0"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "objective": {
+          "modularity": 0.47025156534469215,
+          "edgeCut": 80.84339033961287,
+          "ratioCut": 1.05683109796188
+        },
+        "gpuObjective": {
+          "modularity": 0.4702515653446921,
+          "edgeCut": 80.84339033961297,
+          "ratioCut": 1.05683109796188
+        },
+        "networkxModularity": 0.47025156534469215,
+        "cpuGpuObjectiveDelta": {
+          "modularity": 5.551115123125783e-17,
+          "edgeCut": -9.947598300641403e-14,
+          "ratioCut": 0.0
+        },
+        "objectiveSpread": {
+          "modularity": 0.0,
+          "edgeCut": 0.0,
+          "ratioCut": 0.0
+        },
+        "elapsedMs": [
+          30.216763996577356,
+          29.407852998701856,
+          27.27762100403197
+        ]
+      }
+    ],
+    "cpuReferenceComparisons": [
+      {
+        "operator": "normalized_laplacian",
+        "cpuAssignmentChecksum": "c925d5b2089cd4f68afbc42b1aa0c81264a67bd5371493afa0e433d0726154f9",
+        "cpuGpuARI": 0.8740350505725938,
+        "coMembershipAgreement": 0.9377074148296594,
+        "movedNodeCount": 20,
+        "movedNodeOrdinals": [
+          4,
+          15,
+          23,
+          35,
+          46,
+          50,
+          69,
+          85,
+          92,
+          95,
+          102,
+          127,
+          131,
+          257,
+          264,
+          267,
+          271,
+          410,
+          454,
+          472
+        ],
+        "cpuClusterSizes": {
+          "0": 280,
+          "1": 164,
+          "2": 56
+        },
+        "gpuClusterSizes": {
+          "0": 299,
+          "1": 153,
+          "2": 48
+        },
+        "clusterContingency": {
+          "0:0": 280,
+          "1:1": 152,
+          "1:0": 12,
+          "2:2": 48,
+          "2:0": 7,
+          "2:1": 1
+        },
+        "cpuObjectives": {
+          "modularity": 0.48336548453054257,
+          "edgeCut": 87.37011230587947,
+          "ratioCut": 1.123013726244924
+        },
+        "eigenspace": {
+          "schema": "atlas.spectral-receipt.v1",
+          "matrix_size": 500,
+          "component_count": 3,
+          "eigenvalues": [
+            -5.009315920117845e-16,
+            0.048186752296080514,
+            0.09092671700157612
+          ],
+          "projector_checksum": "1c72db8cf2ec2afd8998df1eed080b52dbcfe60a417df27673980e3f0487266e",
+          "spectral_gap": 0.11488768139799224,
+          "canonical_authority": false
+        }
+      },
+      {
+        "operator": "modularity",
+        "cpuAssignmentChecksum": "08502f1d9e2e511b1ab8aa783b00faa11488967ec7f0acf6926f9ba9fce7ae22",
+        "cpuGpuARI": 0.37192836679286667,
+        "coMembershipAgreement": 0.6901963927855711,
+        "movedNodeCount": 115,
+        "movedNodeOrdinals": [
+          2,
+          9,
+          15,
+          23,
+          26,
+          27,
+          28,
+          31,
+          34,
+          35,
+          38,
+          45,
+          50,
+          52,
+          56,
+          59,
+          60,
+          69,
+          73,
+          85,
+          90,
+          92,
+          95,
+          97,
+          102,
+          107,
+          109,
+          110,
+          117,
+          123,
+          127,
+          131,
+          133,
+          136,
+          146,
+          149,
+          153,
+          158,
+          160,
+          163,
+          169,
+          171,
+          175,
+          177,
+          185,
+          188,
+          190,
+          197,
+          204,
+          208,
+          209,
+          212,
+          221,
+          223,
+          234,
+          244,
+          245,
+          248,
+          250,
+          252,
+          253,
+          257,
+          259,
+          260,
+          262,
+          264,
+          267,
+          276,
+          289,
+          293,
+          297,
+          308,
+          311,
+          315,
+          337,
+          338,
+          339,
+          340,
+          351,
+          357,
+          358,
+          361,
+          366,
+          380,
+          386,
+          389,
+          392,
+          396,
+          397,
+          399,
+          404,
+          405,
+          409,
+          410,
+          411,
+          420,
+          432,
+          433,
+          439,
+          441,
+          449,
+          454,
+          455,
+          456,
+          471,
+          473,
+          474,
+          477,
+          478,
+          482,
+          486,
+          487,
+          488,
+          491,
+          494
+        ],
+        "cpuClusterSizes": {
+          "0": 187,
+          "1": 258,
+          "2": 55
+        },
+        "gpuClusterSizes": {
+          "0": 299,
+          "1": 153,
+          "2": 48
+        },
+        "clusterContingency": {
+          "0:0": 186,
+          "1:1": 151,
+          "1:0": 107,
+          "2:2": 48,
+          "2:0": 6,
+          "2:1": 1,
+          "0:1": 1
+        },
+        "cpuObjectives": {
+          "modularity": 0.4300490846636814,
+          "edgeCut": 163.03681401312363,
+          "ratioCut": 1.7987930163983754
+        },
+        "eigenspace": {
+          "schema": "atlas.spectral-receipt.v1",
+          "matrix_size": 500,
+          "component_count": 3,
+          "eigenvalues": [
+            4.8725985388148505,
+            4.766513319119467,
+            3.407246577094642
+          ],
+          "projector_checksum": "7b19f829428eb6126c6ba9d8463d6fd9a503fe6d0b38a51c313be4d988bd6091",
+          "spectral_gap": 0.17704624031436733,
+          "canonical_authority": false
+        }
+      }
+    ],
+    "kmeansCensus": {
+      "available": true,
+      "cumlVersion": "26.06.00",
+      "embedding": "cpu_modularity_eigenvectors_row_l2_normalized",
+      "embeddingChecksum": "400fc12ceb1f1346e6ee4c7ce090e0a00a0f8436609a8640eef8b6097710c893",
+      "runs": [
+        {
+          "init": "scalable-k-means++",
+          "nInit": 1,
+          "ariToCuGraph": 0.4099822170865054,
+          "coMembershipAgreement": 0.7127374749498998,
+          "inertia": 168.9705063983629
+        },
+        {
+          "init": "scalable-k-means++",
+          "nInit": 10,
+          "ariToCuGraph": 0.4208688902765183,
+          "coMembershipAgreement": 0.7182204408817635,
+          "inertia": 160.31806430536835
+        },
+        {
+          "init": "k-means++",
+          "nInit": 1,
+          "ariToCuGraph": 0.4208688902765183,
+          "coMembershipAgreement": 0.7182204408817635,
+          "inertia": 160.31806430536835
+        },
+        {
+          "init": "k-means++",
+          "nInit": 10,
+          "ariToCuGraph": 0.4208688902765183,
+          "coMembershipAgreement": 0.7182204408817635,
+          "inertia": 160.31806430536835
+        },
+        {
+          "init": "random",
+          "nInit": 1,
+          "ariToCuGraph": 0.40443214091236074,
+          "coMembershipAgreement": 0.7099158316633266,
+          "inertia": 169.27795630234024
+        },
+        {
+          "init": "random",
+          "nInit": 10,
+          "ariToCuGraph": 0.4208688902765183,
+          "coMembershipAgreement": 0.7182204408817635,
+          "inertia": 160.31806430536835
+        }
+      ]
+    },
+    "promotionGate": {
+      "cpuGpuARI": 0.99,
+      "state": "BLOCKED",
+      "reason": "cpu_gpu_ari_below_threshold"
+    }
+  }
+}
