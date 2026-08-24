@@ -177,6 +177,17 @@ any library, database feature, model, or accelerator into a canonical owner.
   connect through evidence references. Derived relationships must be
   replayable from canonical Postgres/Graphify records and must not be inferred
   solely from a cluster label or embedding similarity.
+
+  **Spot-check (2026-08-24, read-only)**: verified OKF-06.1/06.2/06.3's `[x]`
+  marks are backed by real code, not just checked off in this file —
+  `DomainClassificationV1Schema`
+  (`sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts:22`)
+  has exactly the fields OKF-06.1 specifies (`subjectRef`, `domainId`,
+  `taxonomyRevision`, `producerId`, confirmed by grep against the live file).
+  Confirmed OKF-06.4 by contrast has **no** corresponding envelope anywhere:
+  searched `sveltekit-frontend/src/lib/server/atlas/contracts/` for
+  `DocumentDerivationGraph`/`DerivationGraphV1`/similar — zero matches. The
+  `[ ]` here is accurate, not stale.
 - [x] **OKF-06.5 Runtime ownership matrix** Classify LangChain, Deep Agents,
   LangGraph, OpenWiki, PyTorch, PostgreSQL AIO, bitmap/table indexes, pgvector,
   Qdrant, Neo4j, Valkey, and the agentic Kanban board as
