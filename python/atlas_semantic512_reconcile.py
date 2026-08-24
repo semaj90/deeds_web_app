@@ -146,9 +146,18 @@ def extract_vector(point: dict[str, Any]) -> list[float]:
 
 
 def expected_packet_key(source_ref: str, content_hash: str | None) -> str | None:
-    if not source_ref or not content_hash:
+    """Live ace:packet: derivation, verified against 5 sampled atlas_packets
+    rows on 2026-08-24 (see docs/reports/spectral-rtx-alignment-sweep-20260823.md):
+    packet_key = "ace:packet:" + sha256(source_ref)[:12]. content_hash is not
+    part of the live derivation; kept as a parameter for call-site
+    compatibility (unused). The prior formula
+    f"{source_ref}:{content_hash[:16]}" never matched any live packet_key --
+    it made this match path structurally unreachable, which was the actual
+    cause of LVG-0 admitting 0/53379 rows.
+    """
+    if not source_ref:
         return None
-    return f"{normalize_source_ref(source_ref)}:{str(content_hash)[:16]}"
+    return f"ace:packet:{sha256_text(normalize_source_ref(source_ref))[:12]}"
 
 
 def post_json(url: str, body: dict[str, Any], timeout: int = 120) -> dict[str, Any]:

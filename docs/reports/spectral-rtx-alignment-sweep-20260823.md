@@ -415,7 +415,61 @@ for whatever gets admitted once LVG-0 is fixed, but LVG-0 itself is the
 actual blocker on re-verifying anything end to end right now — not the
 missing-manifest framing from the previous note in this addendum.
 
-Not yet done: deciding and implementing the correct LVG-0 match formula
-(explicit review needed, not a mechanical guess), then re-running
-reconciliation, the fixture builder, connectivity/parity re-checks, Louvain
+### LVG-0 formula fix, empirically verified (not a guess)
+
+`expected_packet_key()`'s formula was checked against 5 real
+`(source_ref, atlas_packets.packet_key)` pairs and matched exactly 5/5:
+`packet_key = "ace:packet:" + sha256(normalize_source_ref(source_ref))[:12]`,
+with **no `content_hash` involvement at all** in the live scheme. This is not
+a policy choice — it reproduces what the live system already deterministically
+computes, verified by direct computation against real rows, not inferred.
+Applied as the fix (`python/atlas_semantic512_reconcile.py`'s
+`expected_packet_key()`; `content_hash` param kept for call-site
+compatibility, unused).
+
+Re-ran reconciliation read-only with the fix: **41,344/53,379 admitted
+(77.5%)**, up from 0; 12,035 remain `SOURCE_REF_ONLY_MATCH` (genuine review
+cases now, not everything); 0 rejected. Confirms the formula fix is real and
+effective, not another false lead.
+
+### New blocker surfaced by the fix: packet-level identity vs. chunk-level candidates
+
+Rebuilding the live-graph fixture against the fixed manifest
+(`build_live_graph_fixture_semantic512.py`, same command as the earlier LVG-1
+verification attempt) hard-failed in `load_reconciliation()`:
+`duplicate admitted packet_key ace:packet:ea6f0e3e6e3f`. Checked the scale:
+the 41,344 admitted rows collapse to only **3,293 distinct `packet_key`
+values** — `atlas_packets` identity is file/source_ref-level (by construction
+of the now-fixed formula: derived from `source_ref` alone), while
+`codebase_chunk_index`/Qdrant `codebase_chunks_512` is chunk-level. 3,131 of
+the 3,293 packet_keys (95%) have more than one admitted chunk, averaging
+~12.5 chunks per packet, one with 412. This is a near-universal many-to-one
+cardinality mismatch, not an edge case a small dedup tiebreak can quietly
+paper over — naively picking "first chunk wins" would silently discard
+~92% (38,051/41,344) of admitted rows, and which chunk gets kept is not an
+obvious or evidence-derivable choice (unlike the formula fix above, there is
+no single real answer to verify this against).
+
+**Genuinely blocked on a decision, not more diagnosis.** Candidates, not
+picked:
+1. Aggregate: build one graph vertex per `packet_key`, combining its chunks'
+   vectors somehow (mean? first-by-some-ordering? weighted by chunk size?)
+   before this reaches candidate selection.
+2. Re-scope candidate identity to chunk-level (`codebase_chunk_index.id`)
+   instead of `packet_key`, and treat `packet_key` as a many-valued grouping
+   attribute on top rather than the graph's node identity.
+3. Restrict `ADMITTED` to one canonical chunk per packet (e.g. a designated
+   "primary"/summary chunk if one exists) and route the rest to a different,
+   non-`ADMITTED` status — mirrors the existing `AMBIGUOUS_TOP_MATCH` REVIEW
+   pattern in `classify_candidate()`, but for the reverse (many-points→one-packet)
+   direction.
+
+This also confirms the earlier note's inference was right: the 500-node
+fixture analyzed throughout this file's LVG-1/5/6/7 findings could not have
+come from a current, correctly-admitting run of this reconciliation script
+at all — it must predate both this bug's introduction and (now clearer) this
+unresolved cardinality question.
+
+Not yet done: deciding the candidate-identity cardinality question above,
+then re-running the fixture builder, connectivity/parity re-checks, Louvain
 comparison, Nsight Systems/Compute evidence (LVG-10/11).

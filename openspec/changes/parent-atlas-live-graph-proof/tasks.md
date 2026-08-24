@@ -75,7 +75,7 @@ NVTX parent-atlas@atlas.graph_fixture
 ## Implementation status
 
 ```text
-LVG-0 semantic_512 reconciliation prerequisite              BLOCKED (matching-logic bug: all 3 strong-match paths structurally unreachable, 0/53379 admitted)
+LVG-0 semantic_512 reconciliation prerequisite              BLOCKED (formula bug fixed+verified, 0->41344/53379 admitted; now blocked on packet-vs-chunk cardinality decision)
 LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (proto-exclusion fix applied, unverified -- LVG-0 blocks re-run)
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
@@ -123,7 +123,25 @@ an identity-authority decision (what should back each match path given the
 live `ace:packet:` scheme?) needing explicit review, not a unilateral guess.
 This also means the 500-node fixture analyzed throughout this file's LVG-1/5/6/7
 findings could not have come from a *current* run of this script — it predates
-this bug or the schema drift that caused it. Full detail in
+this bug or the schema drift that caused it.
+
+**Formula fix applied and empirically verified** (not a guess): `expected_packet_key()`
+now computes `"ace:packet:" + sha256(normalize_source_ref(source_ref))[:12]`,
+matched exactly against 5 real `atlas_packets` rows before applying. Fresh
+read-only re-run: **0 -> 41,344/53,379 admitted (77.5%)**, 0 rejected. Confirms
+the fix is real.
+
+**New blocker surfaced by the fix, genuinely undecided**: the 41,344 admitted
+rows collapse to only 3,293 distinct `packet_key` values (`atlas_packets`
+identity is file/source_ref-level) against chunk-level
+`codebase_chunk_index`/Qdrant candidates — 3,131/3,293 packet_keys (95%) have
+more than one admitted chunk, avg ~12.5, max 412. `build_live_graph_fixture_semantic512.py`'s
+`load_reconciliation()` correctly hard-fails on this (`duplicate admitted
+packet_key`). No single-chunk-per-packet tiebreak is evidence-derivable the
+way the formula fix was — this needs a real decision: aggregate chunks per
+packet before candidate selection, re-scope candidate identity to chunk-level
+instead of packet-level, or restrict admission to one canonical chunk per
+packet via a new non-`ADMITTED` review status. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
