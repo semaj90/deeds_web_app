@@ -1,0 +1,324 @@
+{
+  "schema": "atlas.leiden-diagnostic-receipt.v1",
+  "producer": "scripts/atlas/leiden_diagnostic_receipt_v1.py",
+  "readOnly": true,
+  "runtime": {
+    "python": "3.14.6",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "cugraphVersion": "26.06.00",
+    "cudfVersion": "26.06.01"
+  },
+  "frozenConfiguration": {
+    "maxIter": 100,
+    "theta": 1.0,
+    "randomSeed": 684453,
+    "resolutionsSwept": [
+      0.001,
+      0.01,
+      0.05,
+      0.1,
+      0.5,
+      1.0
+    ]
+  },
+  "fixture": {
+    "nodes": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/nodes.parquet",
+    "edges": "/mnt/c/Users/james/Videos/deeds-web-app/.tmp/atlas-spectral-live-fixture-zero-duplicates/edges.parquet",
+    "nodeCount": 500,
+    "graphChecksum": "96ca0d7538b98cded7ee29bb816dbe814bb275ffabb569ea285612b15ecc68e3",
+    "ordinalMapChecksum": "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+    "edgeWeightStats": {
+      "count": 4683,
+      "min": 0.45181119441986084,
+      "max": 1.9999996423721313,
+      "mean": 1.0117639454669125,
+      "median": 0.9999998211860657
+    }
+  },
+  "diagnostics": {
+    "resolutionSweep": [
+      {
+        "resolution": 0.001,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9990605571826848,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          195.52001199917868,
+          54.83707600069465,
+          50.449886002752464
+        ]
+      },
+      {
+        "resolution": 0.001,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9990612097614422,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          61.31080599880079,
+          73.87078999454388,
+          87.97774399863556
+        ]
+      },
+      {
+        "resolution": 0.01,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9906055718268488,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          61.244132004503626,
+          84.25627899850952,
+          62.33543300186284
+        ]
+      },
+      {
+        "resolution": 0.01,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9906120976144216,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          69.39564800268272,
+          80.52245200087782,
+          94.72009500314016
+        ]
+      },
+      {
+        "resolution": 0.05,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.953027859134244,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          83.87559000402689,
+          83.03769100166392,
+          57.14277399965795
+        ]
+      },
+      {
+        "resolution": 0.05,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9530604880721082,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          70.85989199549658,
+          87.18531599879498,
+          66.45280199882109
+        ]
+      },
+      {
+        "resolution": 0.1,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9",
+          "b27eb258d05c7b7521336784fc017b31b399177a1c602a66be9b7e93eaec3ad9"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 2,
+        "reportedModularity": 0.9060557182684881,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          60.98715699772583,
+          59.53987400425831,
+          51.65831500198692
+        ]
+      },
+      {
+        "resolution": 0.1,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 500,
+        "reportedModularity": -0.005711377434401942,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          2.7781389944721013,
+          2.8761560024577193,
+          3.1535140005871654
+        ]
+      },
+      {
+        "resolution": 0.5,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 500,
+        "reportedModularity": -0.09652129667528057,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          4.234423999150749,
+          3.0133179971016943,
+          2.954447001684457
+        ]
+      },
+      {
+        "resolution": 0.5,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 500,
+        "reportedModularity": -0.10201407273681859,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          3.3827239967649803,
+          3.915592998964712,
+          3.11841400252888
+        ]
+      },
+      {
+        "resolution": 1.0,
+        "graphWeighting": "fixture_weighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 500,
+        "reportedModularity": -0.21979308161852879,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          4.392524002469145,
+          3.657756999018602,
+          3.437143997871317
+        ]
+      },
+      {
+        "resolution": 1.0,
+        "graphWeighting": "unweighted",
+        "runs": 3,
+        "assignmentChecksums": [
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea",
+          "5a97a9b5d813c39d121c81830f566f3ef04776fa9ac13eb78a19dc18977041ea"
+        ],
+        "gpuGpuARI": [
+          1.0,
+          1.0
+        ],
+        "gpuRepeatDeterministic": true,
+        "clusterCount": 500,
+        "reportedModularity": -0.22239244186483942,
+        "reportedModularitySpread": 0.0,
+        "elapsedMs": [
+          3.2056069976533763,
+          2.9776110022794455,
+          3.030817002581898
+        ]
+      }
+    ],
+    "priorAnomaly": {
+      "source": "docs/reports/spectral-live-fixture-receipt-500.json",
+      "resolution": 1.0,
+      "clusterCount": 500,
+      "reportedModularity": -0.21979308161852879
+    }
+  }
+}

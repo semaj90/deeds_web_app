@@ -162,11 +162,43 @@ nodes, `reported_modularity: -0.2198`, identically in both
 against both spectral methods is `0.0` and not meaningful as a comparison. The
 same `cugraph.leiden` call (same signature, same `theta=1.0`) correctly finds
 structure on `networkx.karate_club_graph()` in the live `atlas-rapids-cu13`
-env (`modularity: 0.4188`), so this is not a wrapper/API-misuse bug — the
-candidate cause is `resolution=1.0` interacting badly with this fixture's
-edge-weight scale, untested. Louvain was not run on this fixture at all.
+env (`modularity: 0.4188`), so this is not a wrapper/API-misuse bug.
 
-Not yet done: root-causing the Leiden fragmentation, Louvain comparison,
-Nsight Systems/Compute evidence (LVG-10/11), and committing
-`spectral_diagnostic_receipt_v2.py` + its receipt (now committed as of this
-addendum's follow-up).
+### Leiden resolution sweep (follow-up)
+
+`scripts/atlas/leiden_diagnostic_receipt_v1.py` (receipt
+`docs/reports/leiden-diagnostic-receipt-v1.json`) swept `resolution` in
+`{0.001, 0.01, 0.05, 0.1, 0.5, 1.0}` at the same fixed seed, against both the
+fixture's real edge weights and an all-weight-1.0 unweighted control graph
+(edge weights: min 0.452, max 2.000, mean 1.012, median 1.000 — cosine-derived,
+occasionally >1 from summed edge families per the zero-duplicate reduction
+policy):
+
+| resolution | weighted clusters/modularity | unweighted clusters/modularity |
+|---|---|---|
+| 0.001 | 2 / 0.9991 | 2 / 0.9991 |
+| 0.01  | 2 / 0.9906 | 2 / 0.9906 |
+| 0.05  | 2 / 0.9530 | 2 / 0.9531 |
+| 0.1   | 2 / 0.9061 | 500 / -0.0057 |
+| 0.5   | 500 / -0.0965 | 500 / -0.1020 |
+| 1.0   | 500 / -0.2198 | 500 / -0.2224 |
+
+This rules out the edge-weight-scale hypothesis floated above: the unweighted
+control collapses to the same singleton degeneracy at essentially the same
+point as the weighted graph (unweighted at `0.1`, weighted at `0.5`; both fully
+degenerate by `1.0`, the value the original benchmark uses by default). This is
+a sharp resolution-driven collapse specific to this graph's structure, not an
+edge-weight artifact. All runs are deterministic (`gpuGpuARI: 1.0` at every
+resolution). Root numerical/implementation cause of the sharp (not gradual)
+transition is still undiagnosed.
+
+Separately worth noting: even the healthy low-resolution regime only finds 2
+communities, not the frozen `K=8` this tranche assumes for the spectral
+methods — so "pick a resolution where Leiden doesn't degenerate" does not by
+itself give a Leiden result comparable to the K=8 spectral partitions; that
+would need its own reconciliation.
+
+Louvain was not run on this fixture at all.
+
+Not yet done: root-causing the sharp collapse itself, Louvain comparison,
+Nsight Systems/Compute evidence (LVG-10/11).

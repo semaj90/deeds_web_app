@@ -82,7 +82,7 @@ LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533)
 LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535)
-LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (500/500 singleton clusters, modularity -0.2198)
+LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (resolution-driven collapse, healthy at res<=0.05)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
@@ -111,9 +111,21 @@ fragmented. Spot-checked the same `cugraph.leiden` call signature and column con
 (`vertex`/`partition`, `theta=1.0`) against `networkx.karate_club_graph()` in the live
 `atlas-rapids-cu13` WSL2 env and it correctly finds a 2-4 community structure
 (`modularity: 0.4188`) — so this is not an API-misuse or column-naming bug in the wrapper.
-The candidate cause is untested: Leiden's `resolution=1.0` interacting with this fixture's
-edge-weight scale/distribution (semantic_512 cosine-derived weights) rather than a code defect.
-Not diagnosed further; record as an open anomaly, not a conclusion.
+A resolution sweep (`scripts/atlas/leiden_diagnostic_receipt_v1.py`, receipt
+`docs/reports/leiden-diagnostic-receipt-v1.json`, same seed/fixture, run against
+both the fixture's actual edge weights and an all-weight-1.0 control graph) rules
+out the edge-weight-scale hypothesis: the unweighted control graph collapses to
+the same 500-singleton degeneracy at essentially the same resolution as the
+weighted graph (unweighted collapses at `resolution=0.1`, weighted at
+`resolution=0.5`; both are fully degenerate by `1.0`, the value the benchmark
+uses). At `resolution <= 0.05` both graphs are healthy and near-identical
+(2 clusters, modularity 0.90-0.999, deterministic, `gpuGpuARI: 1.0`). So this is
+a sharp resolution-driven collapse specific to this graph's structure, not an
+edge-weight artifact — root numerical/implementation cause still undiagnosed.
+Separately: even the healthy low-resolution regime finds only 2 communities, not
+the frozen `K=8` this tranche assumes elsewhere — Leiden's natural community
+count on this fixture doesn't match the spectral `cluster_count` assumption
+regardless of the degeneracy question.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
