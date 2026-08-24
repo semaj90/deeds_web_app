@@ -30,6 +30,8 @@
 
 import { existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { createRequire } from 'module';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -55,9 +57,27 @@ function log(...args) { if (!JSON_OUT) console.log(...args); }
 function vlog(...args) { if (VERBOSE && !JSON_OUT) console.log(...args); }
 
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
+const execFileAsync = promisify(execFile);
+
+const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function retryHealth(operation, attempts = 3) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const result = await operation();
+      if (result !== null && result !== false) return result;
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < attempts) await sleep(500 * attempt);
+  }
+  return lastError ? null : false;
+}
 
 async function tryPg(fn) {
-  try {
+  return retryHealth(async () => {
     const { default: pg } = await import('pg');
     const pool = new pg.Pool({
       connectionString: DATABASE_URL,
@@ -65,11 +85,11 @@ async function tryPg(fn) {
     });
     try   { return await fn(pool); }
     finally { await pool.end().catch(() => {}); }
-  } catch { return null; }
+  });
 }
 
 async function tryRedis(fn) {
-  try {
+  return retryHealth(async () => {
     const { default: Redis } = await import('ioredis');
     const redis = new Redis({
       host:              process.env.REDIS_HOST ?? '127.0.0.1',
@@ -88,15 +108,26 @@ async function tryRedis(fn) {
     } finally {
       await redis.quit().catch(() => {});
     }
-  } catch { return null; }
+  });
 }
 
 async function tryQdrant(path_) {
-  try {
-    const res = await fetch(`http://127.0.0.1:6333${path_}`, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
+  return retryHealth(async () => {
+    try {
+      const res = await fetch(`${QDRANT_URL}${path_}`, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) return await res.json();
+    } catch {}
+
+    if (process.env.ATLAS_STARTUP_DOCKER_FALLBACK === '0') return null;
+    try {
+      const { stdout } = await execFileAsync('docker', [
+        'exec', 'legal-ai-go-retrieval', 'wget', '-q', '-O', '-', `http://qdrant:6333${path_}`,
+      ], { timeout: 7000, windowsHide: true, maxBuffer: 10 * 1024 * 1024 });
+      return JSON.parse(stdout);
+    } catch {
+      return null;
+    }
+  });
 }
 
 async function tryNeo4j(query, params = {}) {

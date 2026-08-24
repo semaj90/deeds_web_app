@@ -6,7 +6,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const url = (process.env.LLAMA_EMBED_URL ?? 'http://127.0.0.1:8081').replace(/\/$/, '');
+const backend = (process.env.EMBEDDING_BACKEND ?? 'ollama').toLowerCase();
+const url = (process.env.EMBEDDING_URL ?? (backend === 'ollama'
+  ? (process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434')
+  : (process.env.LLAMA_EMBED_URL ?? 'http://127.0.0.1:8081'))).replace(/\/$/, '');
+const model = process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
+const endpoint = backend === 'ollama' ? `${url}/api/embeddings` : `${url}/v1/embeddings`;
 const reportPath = path.join(ROOT, 'docs/reports/embeddinggemma-mrl-runtime-proof.json');
 const dimensions = [768, 512, 256, 128];
 
@@ -25,10 +30,15 @@ function project(vector, dimension) {
 const receipt = {
   schema: 'atlas.embeddinggemma.mrl.runtime.proof.v1',
   generatedAt: new Date().toISOString(),
-  executor: 'llama.cpp',
-  endpoint: `${url}/v1/embeddings`,
+  executor: backend,
+  endpoint,
+  model,
   sourceRepresentationId: 'semantic_768',
   modelId: 'google/embeddinggemma-300m',
+  modelRevision: 'embeddinggemma-full768-v1',
+  queryEncoderRole: 'QUERY',
+  candidateEncoderRole: 'DOCUMENT',
+  metric: 'cosine',
   projectionMethod: 'MRL_PREFIX_TRUNCATE_L2',
   dimensions,
   input: 'task: code retrieval query | query: locate the canonical Graphify materializer',
@@ -37,15 +47,19 @@ const receipt = {
 };
 
 try {
-  const response = await fetch(`${url}/v1/embeddings`, {
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ model: 'embeddinggemma', input: receipt.input }),
+    body: JSON.stringify(backend === 'ollama'
+      ? { model, prompt: receipt.input }
+      : { model, input: receipt.input }),
     signal: AbortSignal.timeout(Number(process.env.EMBED_PROOF_TIMEOUT_MS ?? 10_000)),
   });
   if (!response.ok) throw new Error(`HTTP_${response.status}`);
   const payload = await response.json();
-  const native = payload?.data?.[0]?.embedding;
+  const native = backend === 'ollama'
+    ? payload?.embedding
+    : payload?.data?.[0]?.embedding;
   if (!Array.isArray(native) || native.length !== 768) throw new Error('NATIVE_VECTOR_INVALID');
   const nativeNorm = Math.sqrt(native.reduce((sum, value) => sum + value * value, 0));
   for (const dimension of dimensions) {

@@ -98,7 +98,9 @@ Tags are metadata/filter hints, not independent retrieval votes.
 - [x] ORF-0 — Existing owners audited: OKF registry, ontology-linked tuples, legacy FeatureMatrix, multicore MCP boundary, external-doc Qdrant scripts.
 - [x] ORF-1 — `ObservationFeatureProjectionV1` implemented: fixed ontology/AST masks, grounded structural booleans, LangExtract classes, flattened tags, evidence refs, source/representation lineage.
 - [ ] ORF-1P — Run deterministic unit tests for ORF-1 and prove input/output digest stability. Tests are written, not yet executed in this GitHub-only session.
-- [x] ORF-2 — Postgres exact-filter plane implemented: isolated manual migration, Drizzle schema, `(packet_key, feature_revision)` materializer, selective B-tree/GIN indexes, and no pgvector ANN duplication.
+- [ ] ORF-2 — Postgres exact-filter plane specified, but not yet applied: the active packet-key migration, Drizzle schema, materializer, and spectral exporter agree on `(packet_key, feature_revision)`. A conflicting `20260819_atlas_observation_feature_rows_v1.sql` defines the same table with `(candidate_id, workspace_revision)` plus `semantic_768`; it must be retired or reconciled before apply.
+- [ ] ORF-2R — Reconcile the exported `packages/parent-atlas` observation repository: it is currently an unused legacy writer targeting `candidate_id + workspace_revision` and a second `semantic_768` owner. Either adapt it to the packet-key exact-filter projection or explicitly split it into a separately named staging repository before enabling any caller.
+- [x] ORF-2R.1 — Legacy repository now fails closed unless callers explicitly opt into `LEGACY_CANDIDATE_VECTOR_V1`; no caller was enabled.
 - [ ] ORF-2P — PostgreSQL 18 proof script implemented; live EXPLAIN/ANALYZE must capture bitmap/index/heap plan and AIO settings before promotion.
 - [x] ORF-3C — `ExternalDocProjectionV1` target contract implemented for one programming-doc evidence family: semantic_512 lineage, selective indexed fields, flattened tags, cluster/community/PageRank payload hints.
 - [ ] ORF-3 — Qdrant collection/materializer implementation after migration dry-run proves the target is safe.
@@ -165,7 +167,7 @@ GIN   (langextract_classes)
 GIN   (flattened_tags)
 ```
 
-The table is intentionally managed by `drizzle/manual/20260819_atlas_observation_feature_rows.sql` and excluded from ordinary Drizzle generation so this additive plane can be proven independently of unrelated schema drift.
+The table is intended to be managed by `drizzle/manual/20260819_atlas_observation_feature_rows.sql` and excluded from ordinary Drizzle generation so this additive plane can be proven independently of unrelated schema drift. Do not apply either same-named migration until the duplicate contract is reconciled; see `docs/reports/atlas-observation-feature-row-contract-v1.json`.
 
 Do not add pgvector HNSW here by default. Existing Qdrant/cached GPU semantic executors already own the main ANN workload; Postgres vector use is a bounded exact/join mirror only if a later proof needs it.
 

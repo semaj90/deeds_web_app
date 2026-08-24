@@ -33,13 +33,30 @@ function categoricalValue(row: ObservationFeatureRowV1, featureId: string): stri
 
 export type ObservationFeatureRepository = ReturnType<typeof createObservationFeatureRepository>;
 
-export function createObservationFeatureRepository(pool: Pool) {
+export type ObservationFeatureRepositoryOptions = {
+  /**
+   * This repository targets the pre-ORF candidate/vector schema. It must be
+   * explicitly enabled until the repository is migrated to the packet-key
+   * exact-filter contract used by SvelteKit.
+   */
+  schema?: 'LEGACY_CANDIDATE_VECTOR_V1';
+};
+
+export function createObservationFeatureRepository(pool: Pool, options: ObservationFeatureRepositoryOptions = {}) {
+  const legacySchemaEnabled = options.schema === 'LEGACY_CANDIDATE_VECTOR_V1';
+  const assertSchemaOptIn = () => {
+    if (!legacySchemaEnabled) {
+      throw new Error('OBSERVATION_FEATURE_REPOSITORY_SCHEMA_UNRESOLVED');
+    }
+  };
+
   return {
     async upsertFeatureRow(input: {
       row: ObservationFeatureRowV1;
       semantic768?: readonly number[] | null;
       embeddingRevision?: string | null;
     }): Promise<ObservationFeatureRowV1> {
+      assertSchemaOptIn();
       const row = observationFeatureRowSchema.parse(input.row);
       const semantic = input.semantic768 ?? null;
       const embeddingRevision = input.embeddingRevision ?? null;
@@ -133,6 +150,7 @@ export function createObservationFeatureRepository(pool: Pool) {
       somCells?: string[];
       limit?: number;
     }): Promise<Array<{ candidate_id: string; row_ordinal: number; row_identity_checksum: string }>> {
+      assertSchemaOptIn();
       const limit = Math.max(1, Math.min(input.limit ?? 200, 5000));
       const result = await pool.query<{ candidate_id: string; row_ordinal: string | number; row_identity_checksum: string }>(`
         SELECT candidate_id, row_ordinal, row_identity_checksum
@@ -171,6 +189,7 @@ export function createObservationFeatureRepository(pool: Pool) {
       candidateIds?: string[];
       limit?: number;
     }): Promise<Array<{ candidate_id: string; distance: number }>> {
+      assertSchemaOptIn();
       const limit = Math.max(1, Math.min(input.limit ?? 20, 500));
       const ids = [...new Set(input.candidateIds ?? [])];
       const result = await pool.query<{ candidate_id: string; distance: string | number }>(`

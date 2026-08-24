@@ -27,6 +27,7 @@ import { pingValkey } from '$lib/server/cache/valkey-client.js';
 
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
+import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 import type { RequestHandler } from './$types';
 
 const querySchema = z.object({
@@ -531,6 +532,6 @@ async function persistServiceHealth(checks: Record<string, CheckResult>): Promis
     );
   } catch (err) {
     // Best-effort persistence only; health endpoint should still respond.
-    console.warn('[health] Service health persistence failed:', (err as Error).message);
+    console.warn('[health] Service health persistence failed:', postgresErrorDetails(err));
   }
 }

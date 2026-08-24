@@ -405,6 +405,7 @@
     "atlas:lane-classifier:extract-keywords:apply": "node ../scripts/atlas/extract-ast-keywords.mjs --apply --verbose",
     "atlas:lane-classifier:test": "vitest run tests/classifier/",
     "atlas:domain-classification:readiness": "node ../scripts/atlas/domain-classification-readiness-audit.mjs",
+    "atlas:ast-entities:okf-domain:dry": "npx tsx ../scripts/atlas/classify-ast-entities-okf-dry-run.mts",
     "atlas:p0:validate-bridges": "node ../scripts/atlas/p0-validate-qdrant-bridges.mjs",
     "atlas:p0:validate-bridges:verbose": "node ../scripts/atlas/p0-validate-qdrant-bridges.mjs --verbose",
     "atlas:p0:identify-recoverable": "node ../scripts/atlas/p0-identify-recoverable-packets.mjs",
@@ -416,6 +417,15 @@
     "atlas:features:ast-symbols:backfill:dry": "node ../scripts/atlas/backfill-ast-symbols.mjs --limit=200",
     "atlas:features:ast-symbols:backfill:apply": "node ../scripts/atlas/backfill-ast-symbols.mjs --apply --limit=200 --batch-size=50",
     "atlas:features:ast-symbols:probe": "node ../scripts/atlas/backfill-ast-symbols.mjs --probe=scripts/atlas/backfill-ast-symbols.mjs",
+    "atlas:features:ast-entities:prefill": "node ../scripts/atlas/prefill-ast-entities.mjs",
+    "atlas:features:ast-entities:identity:read": "node ../scripts/atlas/enrich-ast-entity-prefill-identity.mjs",
+    "atlas:features:ast-entities:graphify:read": "node ../scripts/atlas/run-ast-entity-prefill-yaml.mjs",
+    "atlas:export:graphify-file-index:sample": "node ../scripts/atlas/export-graphify-file-index-v1.mjs --limit=100",
+    "atlas:export:graphify-file-index:all": "node ../scripts/atlas/export-graphify-file-index-v1.mjs --all",
+    "atlas:export:graphify-file-index:all:vectors": "node ../scripts/atlas/export-graphify-file-index-v1.mjs --all --include-vectors",
+    "atlas:features:ast-symbols:nominate:dry": "node ../scripts/atlas/nominate-ast-symbols-dry-run.mjs",
+    "atlas:features:ast-symbols:resolve:dry": "node ../scripts/atlas/resolve-ast-symbol-nominations-dry-run.mjs",
+    "atlas:features:ast-symbols:review:dry": "node ../scripts/atlas/review-ast-symbol-promotion-plan.mjs",
     "atlas:retrieval:attempts:dry": "node ../scripts/atlas/materialize-retrieval-attempts.mjs --dry-run --limit=100",
     "atlas:retrieval:attempts:apply": "node ../scripts/atlas/materialize-retrieval-attempts.mjs --apply",
     "atlas:retrieval:promote:dry": "node ../scripts/atlas/promote-retrieval-winner.mjs --dry-run --limit=100",
@@ -1663,8 +1673,4 @@
     "packages/atlas-duckdb",
     "packages/parent-atlas",
     "packages/parent-atlas-core",
-    "packages/parent-atlas-retrieval",
-    "packages/parent-atlas-ingest",
-    "packages/parent-atlas-opencode"
-  ]
-}
+    "packages/par

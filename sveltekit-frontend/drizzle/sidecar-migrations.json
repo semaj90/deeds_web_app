@@ -271,6 +271,24 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-revision-migration.mts --migration=graphify"
+    },
+    {
+      "file": "manual/20260818_atlas_symbol_registry_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Creates the additive canonical symbol registry, aliases, revisioned symbol versions, and structural-reference resolution indexes. Applied and read back on PostgreSQL 18.4; no symbol rows were inserted.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name IN ('atlas_symbol_registry','atlas_symbol_aliases','atlas_symbol_versions','atlas_structural_reference_resolutions');\""
+    },
+    {
+      "file": "manual/20260824_graphify_file_search_bitmap_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive Graphify file search projection with PostgreSQL 18 tsvector/GIN, pgvector 768, JSONB metadata, concept arrays, and explicit candidate bitmap. Unapplied until export, schema, and rollback proofs pass.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/export-graphify-file-index-v1.mjs --limit=100 && node scripts/atlas/audit-atlas-indexing-surfaces.mjs"
     }
   ]
 }

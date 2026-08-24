@@ -12,6 +12,7 @@ import {
   type PersistedEnvelope,
 } from '$lib/shared/schemas/protocol.js';
 import { eq, sql } from 'drizzle-orm';
+import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 
 export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
@@ -234,7 +235,7 @@ export async function claimBatch(
     }
 
     // Other errors: log once and return empty
-    console.error('[AnalysisJobs] Unexpected DB error:', err.message);
+    console.error('[AnalysisJobs] Unexpected DB error:', postgresErrorDetails(err));
     return [];
   }
 }

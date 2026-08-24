@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.observation-feature-row-contract-audit.v1",
+  "generatedAt": "2026-08-24T16:51:17.183Z",
+  "writes": false,
+  "liveDatabaseChecked": false,
+  "status": "BLOCKED_DUPLICATE_INCOMPATIBLE_MIGRATIONS",
+  "canonicalOwnerCandidate": "sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql",
+  "migrationCandidates": {
+    "orfPacketKey": {
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260819_atlas_observation_feature_rows.sql",
+      "primaryKey": "packet_key + feature_revision",
+      "includes": [
+        "packet_key",
+        "feature_revision",
+        "tree_node_id",
+        "ontology_mask",
+        "ast_pattern_mask",
+        "input_digest"
+      ],
+      "semanticVector": false,
+      "matchesDrizzleSchema": true,
+      "matchesMaterializer": true,
+      "matchesSpectralExporter": true
+    },
+    "candidateIdVector": {
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260819_atlas_observation_feature_rows_v1.sql",
+      "primaryKey": "candidate_id + workspace_revision",
+      "includes": [
+        "candidate_id",
+        "row_ordinal",
+        "row_identity_checksum",
+        "registry_revision",
+        "feature_row_checksum",
+        "semantic_768"
+      ],
+      "semanticVector": true,
+      "matchesDrizzleSchema": false,
+      "matchesRepository": true,
+      "conflict": "same table name, incompatible primary key and column contract"
+    }
+  },
+  "consumers": {
+    "drizzleSchema": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-observation-feature-rows.ts",
+    "sveltekitMaterializer": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\atlas\\materializers\\observation-feature-materializer.ts",
+    "parentAtlasRepository": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas\\src\\core\\observation-feature-repository.ts",
+    "spectralExporter": "scripts/atlas/export-spectral-fixture-routing-labels.mjs"
+  },
+  "decisionRequired": [
+    "Keep ORF packet_key schema as the active exact-filter table because current Drizzle/materializer/exporter consumers target it.",
+    "Retire or rename the candidate_id/vector migration before any feature-row migration is applied.",
+    "Keep semantic_768 owned by the canonical packet/vector lane; do not add a second ANN owner by applying the candidate migration unchanged.",
+    "Reconcile parent-atlas repository code separately before wiring its candidate_id/semantic_768 writer to the packet_key table."
+  ]
+}

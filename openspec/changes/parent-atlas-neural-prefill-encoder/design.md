@@ -19,14 +19,15 @@ Go retrieval / EmbeddingGemma semantic_768 query
         v
 CandidateFeatureMatrixV2
         |
-        +-- neural encoder: 768 -> 256 -> 128
-        +-- optional hot encoder head: 128 -> 64
-        +-- CPU reference and LibTorch RTX inference
+        +-- EmbeddingGemma native MRL: 768 -> 512/256/128
+        +-- learned Atlas autoencoder challenger: 768 -> 256 -> 128 -> 64
+        +-- CPU reference and optional LibTorch RTX inference
         v
-latent_128 warm cache + latent_64 hot routing
+semantic_mrl_* admission/shortlist lanes
         |
-        +-- cuVS/Qdrant candidate rerank/index projection
-        +-- Valkey centroid/SOM warm and hot working sets
+        +-- PCA/SVD/Tang-inspired/SOM/AE challenger lanes
+        +-- cuVS/Qdrant candidate admission/index projection
+        +-- Valkey centroid/SOM working sets
         +-- XGBoost ranker/domain head
         +-- logistic and Naive Bayes baselines
         v
@@ -99,9 +100,11 @@ EmbeddingGemma semantic_768 query
   -> Valkey/SOM/cuVS cache or exact rerank
 ```
 
-`latent_128` is a candidate working-set representation. It is not an
-alternative to the initial `semantic_768` query and must not be produced by
-scrolling arbitrary Qdrant points without a fan-out receipt.
+`semantic_mrl_512`, `semantic_mrl_256`, and `semantic_mrl_128` are the first
+derived admission/shortlist representations because they use EmbeddingGemma's
+trained MRL prefixes. `latent_128` and `latent_64` remain learned Atlas
+challengers and are not prerequisites for the MRL proof. Neither path may be
+produced by scrolling arbitrary Qdrant points without a fan-out receipt.
 
 ## Representation and Bi-Encoder Awareness
 
@@ -164,8 +167,9 @@ the query into a bounded SVD basis, returns original `CandidateOrdinal`
 values, and emits `atlas.candidate-shortlist-receipt.v1` with checksums and
 device metadata. This is a deterministic, Tang-inspired nomination policy;
 it is not Tang's sublinear recommendation algorithm and is not yet a live
-retrieval stage. Promotion still requires a frozen RRF snapshot, 512 input
-rows, approximately 96 nominated ordinals, exact-rerank comparison, and
+retrieval stage. Promotion still requires a frozen RRF snapshot,
+`candidate_count: 512`, approximately `shortlist_count: 96` nominated
+ordinals, full `semantic_768` exact rerank to `final_count: 24`, and
 quality/memory receipts.
 
 ## Training and Inference Boundaries
@@ -201,6 +205,97 @@ XGBoost is the primary nonlinear ranking/domain head. Logistic regression is a
 calibration and linear baseline. Naive Bayes is a lexical/count baseline.
 Their model IDs, labels, metrics, and feature revisions are separate from the
 autoencoder manifest.
+
+## Training lane ownership
+
+The semantic and ranking models have different responsibilities and must not
+share an artifact identity:
+
+```text
+semantic lane:
+  EmbeddingGemma semantic_768              canonical oracle
+  Quaterion similarity-learning encoder   challenger only
+
+feature/ranking lane:
+  lexical, AST, semantic, graph, domain,
+  ontology, SOM, provenance features
+       -> CandidateFeatureMatrix
+       -> XGBoost LambdaMART / rank:ndcg
+```
+
+The existing `learning-trainer.tool.ts` may describe a `quaterion` trainer,
+but that is configuration evidence, not proof that the Quaterion package,
+weights, corpus, or serving path is installed. A Quaterion experiment must
+produce a separate encoder revision, query/document role metadata, training
+pair or group checksum, and held-out Recall/NDCG receipt. It must never
+overwrite `semantic_768` or write Qdrant projections before promotion.
+
+### Quaterion adapter boundary
+
+The integration is a Python training and serving sidecar, not a TypeScript
+dependency and not a replacement for `legal-ai-go-embedding`:
+
+```text
+Postgres replay evidence
+  -> SimilarityPairSample / SimilarityGroupSample NDJSON
+  -> Quaterion TrainableModel + held-out replay
+  -> model.save_servable() artifact bundle
+  -> quaterion-models inference sidecar
+  -> typed embedding receipt
+  -> challenger Qdrant collection only after promotion
+```
+
+The export contains canonical references and grounded labels only:
+`query_id`, `source_ref`, `packet_key`, `candidate_ordinal`, `query_role`,
+`document_role`, `label`, `workflow_id`, and revision checksums. Source-revision
+grouping prevents a file or generated projection from appearing in both train
+and held-out splits.
+
+The inference receipt identifies the challenger separately from the base model:
+
+```yaml
+encoder_id: atlas-quaterion-challenger-v1
+framework: quaterion-models
+base_model_revision: embeddinggemma-full768-v1
+query_encoder_role: QUERY
+document_encoder_role: DOCUMENT
+output_dimensions: 768
+normalization: L2
+metric: COSINE
+artifact_checksum: sha256:...
+dataset_checksum: sha256:...
+canonical_authority: false
+```
+
+Serving may use ONNX or a bounded Python/gRPC adapter, but the wire contract
+returns vectors and typed metadata only. It must not expose Python objects,
+tensors, or Qdrant client details to TypeScript. The first integration test is
+offline encoding and compatibility; Qdrant dual-write and promotion are later
+gates.
+
+LambdaMART belongs after candidate generation. Its rows are grouped by a
+stable query ID (`qid`) and retain `CandidateOrdinal`; labels are grounded in
+replayed evidence, not generated text. The first ranker proof should compare
+the existing hand-weighted or exact baseline against XGBoost `rank:ndcg` at
+NDCG@10 and NDCG@24, with Recall@K, MRR, top-K overlap, latency, CPU RAM, VRAM,
+and fallback state. Logistic regression and Naive Bayes remain separately
+reported baselines rather than inputs to a hidden ensemble.
+
+Embedding geometry and training regularization are distinct contracts:
+
+```text
+L2_NORMALIZE_VECTOR       embedding/search geometry; recorded per representation
+L2_REGULARIZE_WEIGHTS     training policy; implemented here as AdamW weight_decay
+```
+
+The existing autoencoder's AdamW `weight_decay` is the training owner. Do not
+add a manual embedding L2 penalty or call both concerns simply `l2` in a
+receipt. Vector normalization remains part of the query/document
+representation compatibility gate.
+
+Quaternion or `manifold4` values may be derived topology/ontology features,
+but they are not Quaterion outputs, canonical embeddings, or canonical
+identity. They require their own feature revision and evidence contract.
 
 ## Tournament and training ladder
 

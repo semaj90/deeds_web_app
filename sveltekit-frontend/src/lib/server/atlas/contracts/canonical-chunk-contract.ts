@@ -12,6 +12,9 @@ export const CANONICAL_EMBEDDING_DIMENSION = ATLAS_CANONICAL_SEMANTIC_DIMENSION;
 export const CanonicalRepresentationNameSchema = z.enum([
   ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
   'semantic_768',
+  'semantic_mrl_512',
+  'semantic_mrl_256',
+  'semantic_mrl_128',
   'semantic_128',
   'latent_64',
   'lexical_v1',
@@ -49,6 +52,24 @@ export const CANONICAL_REPRESENTATIONS = {
     dimension: 512,
     status: 'REFERENCE_ONLY',
     aliases: ['semantic512', 'dense_512', 'dense512'],
+  },
+  semantic_mrl_512: {
+    persistedName: 'semantic_mrl_512',
+    dimension: 512,
+    status: 'REFERENCE_ONLY',
+    aliases: ['mrl_512'],
+  },
+  semantic_mrl_256: {
+    persistedName: 'semantic_mrl_256',
+    dimension: 256,
+    status: 'REFERENCE_ONLY',
+    aliases: ['mrl_256'],
+  },
+  semantic_mrl_128: {
+    persistedName: 'semantic_mrl_128',
+    dimension: 128,
+    status: 'REFERENCE_ONLY',
+    aliases: ['mrl_128'],
   },
   semantic_128: {
     persistedName: 'semantic_128',

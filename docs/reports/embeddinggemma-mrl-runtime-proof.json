@@ -1,10 +1,15 @@
 {
   "schema": "atlas.embeddinggemma.mrl.runtime.proof.v1",
-  "generatedAt": "2026-08-21T02:31:16.720Z",
-  "executor": "llama.cpp",
-  "endpoint": "http://127.0.0.1:8081/v1/embeddings",
+  "generatedAt": "2026-08-24T15:10:35.519Z",
+  "executor": "ollama",
+  "endpoint": "http://127.0.0.1:11434/api/embeddings",
+  "model": "embeddinggemma:latest",
   "sourceRepresentationId": "semantic_768",
   "modelId": "google/embeddinggemma-300m",
+  "modelRevision": "embeddinggemma-full768-v1",
+  "queryEncoderRole": "QUERY",
+  "candidateEncoderRole": "DOCUMENT",
+  "metric": "cosine",
   "projectionMethod": "MRL_PREFIX_TRUNCATE_L2",
   "dimensions": [
     768,
@@ -22,7 +27,7 @@
       "finite": true,
       "l2Norm": 1.0000000000000009,
       "normalized": true,
-      "vectorDigest": "8b59206f715d344696bdd40dce465926d5d148a6727a2365a762fe1f138ad4b7"
+      "vectorDigest": "af27745dd4c500c25db5c346aa8d9bab8ce60831f944f0e3f175d2633315a944"
     },
     {
       "representationId": "semantic_mrl_512",
@@ -30,9 +35,9 @@
       "dimension": 512,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000002,
+      "l2Norm": 1.0000000000000007,
       "normalized": true,
-      "vectorDigest": "d5122cc334cc30e44d606813ffc89af81e266c5346a3ed9597a74a5c7afbab6d"
+      "vectorDigest": "e681d262cc33325bf5f302e9a68dc8fedaec01e7645f04a76c38058c810a4e6a"
     },
     {
       "representationId": "semantic_mrl_256",
@@ -40,9 +45,9 @@
       "dimension": 256,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000002,
+      "l2Norm": 1,
       "normalized": true,
-      "vectorDigest": "8ee5a1e02e177337ed91475c3d2cc978d0212afcabc6d532fbde2bf62b9c6241"
+      "vectorDigest": "245be0c6e2263770ce47ad6d75765de75202f432b70fbb58fa65d12099820055"
     },
     {
       "representationId": "semantic_mrl_128",
@@ -50,9 +55,9 @@
       "dimension": 128,
       "nativeDimension": 768,
       "finite": true,
-      "l2Norm": 1.0000000000000002,
+      "l2Norm": 1.0000000000000007,
       "normalized": true,
-      "vectorDigest": "15eb782cc3cfda8cb784ccf7265f0f4895f0450157c6669e22d0197a4dac8cb0"
+      "vectorDigest": "ecb6ffff900849e11be2466ffeb58dfe3d344bb90785b638bef14847ab717af8"
     }
   ],
   "writes": {
@@ -61,7 +66,7 @@
     "valkey": false,
     "embeddingArtifacts": false
   },
-  "nativeNorm": 1.0000000295687823,
-  "nativeDigest": "8d44b7b06594912da50d8d07f5f2ce365eac769fef226777d46aa9a09854ff4b",
+  "nativeNorm": 1.0000000210674456,
+  "nativeDigest": "0c3f711fd8d73209466baf9ac835c068a466c17e0d388739ae93b6d1692497f7",
   "status": "PROVEN"
 }

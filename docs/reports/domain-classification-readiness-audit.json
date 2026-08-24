@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T07:15:52.005Z",
+  "generated_at": "2026-08-24T16:56:48.093Z",
   "overall_status": "READY_WITH_GAPS",
   "tables": {
     "atlas_packets": true,
@@ -13,19 +13,19 @@
     "title_id": 100,
     "tree_node_id": 100,
     "domain_class": 100,
-    "qdrant_point_id": 8.1,
-    "summary": 7.16,
-    "pagerank": 21.62,
-    "som": 7.17,
-    "latent_64": 2.14,
-    "used_concepts": 99.99,
+    "qdrant_point_id": 10.46,
+    "summary": 11.17,
+    "pagerank": 100,
+    "som": 100,
+    "latent_64": 12.2,
+    "used_concepts": 96.55,
     "lexical_features": 99.98,
-    "ast_symbols": 3.74,
-    "entities": 0,
-    "content_embedding": 99.65,
+    "ast_symbols": 20.27,
+    "entities": 19.45,
+    "content_embedding": 99.93,
     "naive_bayes_predictions": 100,
-    "jepa_similarity": 100,
-    "kmeans_cluster": 0
+    "jepa_similarity": 1.48,
+    "kmeans_cluster": 100
   },
   "artifacts": {
     "naive_bayes_model": true,
@@ -51,31 +51,31 @@
     {
       "name": "feature envelope",
       "status": "FAIL",
-      "evidence": "used_concepts=99.99%, lexical=99.98%, ast=3.74%",
+      "evidence": "used_concepts=96.55%, lexical=99.98%, ast=20.27%",
       "target": ">=95%"
     },
     {
       "name": "metric lane",
-      "status": "PARTIAL",
-      "evidence": "nb=100%, jepa=100%, kmeans=0%, som=0%",
+      "status": "PASS",
+      "evidence": "nb=100%, jepa=1.48%, kmeans=100%, som=100%",
       "target": ">=95%"
     },
     {
       "name": "embedding corpus",
       "status": "PASS",
-      "evidence": "99.65% content_embedding",
+      "evidence": "99.93% content_embedding",
       "target": ">=95%"
     },
     {
       "name": "retrieval mirror",
       "status": "FAIL",
-      "evidence": "8.1% qdrant_point_id",
+      "evidence": "10.46% qdrant_point_id",
       "target": ">=95%"
     },
     {
       "name": "topology readiness",
       "status": "FAIL",
-      "evidence": "som=7.17%, latent_64=2.14%, pagerank=21.62%",
+      "evidence": "som=100%, latent_64=12.2%, pagerank=100%",
       "target": ">=95%"
     },
     {
@@ -99,84 +99,84 @@
   ],
   "topk_samples": [
     {
-      "packet_key": "packet:055b9cde2d66",
-      "source_ref": "sveltekit-frontend/src/routes/api/codebase-index/karpathy-tag/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:49d48e41",
+      "domain_class": "mcp_agents",
       "evidence_score": 10
     },
     {
-      "packet_key": "packet:07d5bb528993",
-      "source_ref": "sveltekit-frontend/src/routes/api/codebase/apply-patch/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:84786dd5",
+      "domain_class": "mcp_agents",
       "evidence_score": 10
     },
     {
-      "packet_key": "packet:156fa8119692",
-      "source_ref": "sveltekit-frontend/src/routes/(app)/citations/law/[citation]/+page.server.ts",
-      "feature_id": "sveltekit-frontend.+page.server",
-      "title_id": "page.server.ts",
-      "domain_class": "frontend",
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:3df64b80",
+      "domain_class": "mcp_agents",
       "evidence_score": 10
     },
     {
-      "packet_key": "packet:18742adf0d17",
-      "source_ref": "sveltekit-frontend/src/routes/api/search/filters/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:bef00376",
+      "domain_class": "mcp_agents",
       "evidence_score": 10
     },
     {
-      "packet_key": "packet:1ec59f25ab9e",
-      "source_ref": "sveltekit-frontend/src/routes/api/tools/batch/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
-      "evidence_score": 9
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:9aa6c88e",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     },
     {
-      "packet_key": "packet:2c90dd0b0846",
-      "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
-      "evidence_score": 9
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:22e93e07",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     },
     {
-      "packet_key": "packet:2dd3a5e049f5",
-      "source_ref": "sveltekit-frontend/src/lib/server/analytics/unified-research-query.ts",
-      "feature_id": "sveltekit-frontend.unified-research-query",
-      "title_id": "unified.research.query.ts",
-      "domain_class": "backend",
-      "evidence_score": 9
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:55ae22ab",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     },
     {
-      "packet_key": "packet:2ee20d8a0277",
-      "source_ref": "sveltekit-frontend/src/routes/(dev)/odin/+page.server.ts",
-      "feature_id": "sveltekit-frontend.+page.server",
-      "title_id": "page.server.ts",
-      "domain_class": "frontend",
-      "evidence_score": 9
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:8cfd5203",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     },
     {
-      "packet_key": "packet:3779986ad404",
-      "source_ref": "sveltekit-frontend/src/routes/api/cache/metrics/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
-      "evidence_score": 9
+      "packet_key": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:579d4f74",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     },
     {
-      "packet_key": "packet:3e92ce301de6",
-      "source_ref": "sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/similar/+server.ts",
-      "feature_id": "sveltekit-frontend.+server",
-      "title_id": "server.ts",
-      "domain_class": "frontend",
-      "evidence_score": 9
+      "packet_key": "271b5446f6a86a48",
+      "source_ref": "proto:CyberElephantService.GetClusters",
+      "feature_id": "grpc_service",
+      "title_id": "title:grpc-service:55ab2018",
+      "domain_class": "mcp_agents",
+      "evidence_score": 10
     }
   ],
   "next_actions": [

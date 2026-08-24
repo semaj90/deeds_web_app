@@ -1,38 +1,88 @@
 {
-  "generatedAt": "2026-08-11T16:46:53.000Z",
-  "receiptKind": "POS_CONCEPT_TAGGING_LANE_PROOF",
-  "status": "PROVEN",
-  "command": "npx vitest run src/lib/server/atlas/pos-concept-tagging-lane.spec.ts",
-  "summary": {
-    "testFilesPassed": 1,
-    "testsPassed": 3,
-    "testsFailed": 0
+  "schemaVersion": "pos-concept-tagging-proof.v1",
+  "status": "PASS",
+  "generatedAt": "2026-08-24T16:57:01.697Z",
+  "sourceRef": "src/routes/+layout.ts",
+  "sourceRevision": "4f1de56c2326aa40df073e65a701f36ca8d9376e",
+  "sourcePath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\+layout.ts",
+  "sourceDigest": "3a59fd0909812a0835815fcd6aebbb7ff271b23b6435a1a8dfdaf1e653b6e815",
+  "packetKey": "ace:packet:c115e487d04d",
+  "tupleCount": 1,
+  "tupleIds": [
+    "7315bfb93bb20b5998c48b35fb6218f42210496273b743fc86794e7569970d01"
+  ],
+  "evidenceState": "ACTIVE_VERIFIED",
+  "rankingSignals": {
+    "bm25": 0,
+    "bm42": 0.3,
+    "pageRank": 0.5,
+    "manifold": {
+      "x": 0,
+      "y": 0.6,
+      "z": 0.3,
+      "w": 0.015
+    },
+    "somCell": "proof:4:8",
+    "kmeansCluster": 13,
+    "communityId": "community:proof"
   },
-  "featureMatrixSetup": {
-    "schemaVersion": "atlas.feature-extraction.v1",
-    "kind": "feature_matrix_setup",
+  "provenance": {
+    "sourceRevision": "4f1de56c2326aa40df073e65a701f36ca8d9376e",
     "representationId": "semantic_768",
-    "semanticDimension": 768,
-    "staticPacket": {
-      "width": 5,
-      "columnNames": [
-        "authority_norm",
-        "domain_fit_base",
-        "ast_signal",
-        "entropy_norm",
-        "execution_utility"
-      ]
-    },
-    "candidateQuery": {
-      "kmeansCandidates": [64, 128, 256],
-      "somGrid": [20, 20],
-      "topClusterSoftCap": 8
-    },
-    "mcpToolCallsMaxIndependentReads": 3
+    "representationRevision": "0",
+    "producerId": "pos-concept-tagging-lane",
+    "producerRevision": "lane:v1",
+    "featureRevision": "feature:v1",
+    "graphRevision": "graph:proof:v1",
+    "ontologyRevision": "ontology:proof:v1",
+    "modelRevision": "model:proof:v1"
   },
-  "proofNotes": [
-    "Participant order did not change tuple identity.",
-    "Ranking signals stayed out of canonical tuple identity.",
-    "Explicit revision lineage and MCP fanout cap were enforced."
+  "evidenceRefs": [
+    "bm25:0.0000",
+    "bm42:0.3000",
+    "community:community:proof",
+    "concept:evidence",
+    "concept:mcp",
+    "concept:packet",
+    "concept:provenance",
+    "concept:revision",
+    "concept:tuple",
+    "kmeans:13",
+    "manifold:0.0000,0.6000,0.3000,0.0150",
+    "ontology:parent-atlas.evidence.lineage",
+    "ontology:parent-atlas.pos-concept-tagging",
+    "ontology:parent-atlas.semantic.representation",
+    "pagerank:0.5000",
+    "som:proof:4:8",
+    "src/routes/+layout.ts"
+  ],
+  "astSymbols": [],
+  "semanticConceptIds": [
+    "concept:evidence",
+    "concept:mcp",
+    "concept:packet",
+    "concept:provenance",
+    "concept:revision",
+    "concept:tuple"
+  ],
+  "ontologyIds": [
+    "ontology:parent-atlas.evidence.lineage",
+    "ontology:parent-atlas.pos-concept-tagging",
+    "ontology:parent-atlas.semantic.representation"
+  ],
+  "persistence": {
+    "analysisJobId": "414e4080-d8f5-cae0-3e4b-4aa9386059c6",
+    "evidenceId": "9905fca6-f82d-9a8c-6cfc-67ffd58d1beb",
+    "idempotencyKey": "pos-concept-tagging:5c6b78d228c31c2e9b77406367287ca49214ea3b269c4a89509f08eff7cc0a6d",
+    "inserted": true,
+    "rowId": 11134,
+    "table": "analysis_pass_results"
+  },
+  "notes": [
+    "Real atlas_packets row used as source evidence.",
+    "Tuple identity remained stable under deterministic construction.",
+    "Ranking signals were retained as evidence, not identity.",
+    "No canonical store was mutated.",
+    "A durable analysis_pass_results receipt was written."
   ]
 }

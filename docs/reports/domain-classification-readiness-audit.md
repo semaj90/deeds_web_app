@@ -1,6 +1,6 @@
 # Domain Classification Readiness Audit
 
-Generated: 2026-07-11T07:15:52.005Z
+Generated: 2026-08-24T16:56:48.093Z
 Status: READY_WITH_GAPS
 
 ## Coverage
@@ -8,11 +8,11 @@ Status: READY_WITH_GAPS
 | Lane | Coverage | Threshold | Status |
 |---|---:|---:|---|
 | identity spine | 100% source_ref, 100% tree_node_id | >=95% | PASS |
-| feature envelope | used_concepts=99.99%, lexical=99.98%, ast=3.74% | >=95% | FAIL |
-| metric lane | nb=100%, jepa=100%, kmeans=0%, som=0% | >=95% | PARTIAL |
-| embedding corpus | 99.65% content_embedding | >=95% | PASS |
-| retrieval mirror | 8.1% qdrant_point_id | >=95% | FAIL |
-| topology readiness | som=7.17%, latent_64=2.14%, pagerank=21.62% | >=95% | FAIL |
+| feature envelope | used_concepts=96.55%, lexical=99.98%, ast=20.27% | >=95% | FAIL |
+| metric lane | nb=100%, jepa=1.48%, kmeans=100%, som=100% | >=95% | PASS |
+| embedding corpus | 99.93% content_embedding | >=95% | PASS |
+| retrieval mirror | 10.46% qdrant_point_id | >=95% | FAIL |
+| topology readiness | som=100%, latent_64=12.2%, pagerank=100% | >=95% | FAIL |
 | Naive Bayes lane | model present; report=present | train + apply | PASS |
 | XGBoost lane | csv=present, meta=present, report=present, model=present | export + train + serve | PASS |
 | RRF activation | helpers present; unified-orchestrator TODO=no | wire canonical lane | FAIL |
@@ -33,16 +33,16 @@ Status: READY_WITH_GAPS
 
 ## Top-K Domain Mapping Samples
 
-1. packet:055b9cde2d66 | frontend | sveltekit-frontend.+server | server.ts | evidence=10
-2. packet:07d5bb528993 | frontend | sveltekit-frontend.+server | server.ts | evidence=10
-3. packet:156fa8119692 | frontend | sveltekit-frontend.+page.server | page.server.ts | evidence=10
-4. packet:18742adf0d17 | frontend | sveltekit-frontend.+server | server.ts | evidence=10
-5. packet:1ec59f25ab9e | frontend | sveltekit-frontend.+server | server.ts | evidence=9
-6. packet:2c90dd0b0846 | frontend | sveltekit-frontend.+server | server.ts | evidence=9
-7. packet:2dd3a5e049f5 | backend | sveltekit-frontend.unified-research-query | unified.research.query.ts | evidence=9
-8. packet:2ee20d8a0277 | frontend | sveltekit-frontend.+page.server | page.server.ts | evidence=9
-9. packet:3779986ad404 | frontend | sveltekit-frontend.+server | server.ts | evidence=9
-10. packet:3e92ce301de6 | frontend | sveltekit-frontend.+server | server.ts | evidence=9
+1. 0ba2345cd9c542fa | mcp_agents | grpc_service | title:grpc-service:49d48e41 | evidence=10
+2. 0bffe0382a0d44bb | mcp_agents | grpc_service | title:grpc-service:84786dd5 | evidence=10
+3. 0ee918abc8c53e8d | mcp_agents | grpc_service | title:grpc-service:3df64b80 | evidence=10
+4. 1703d9c005252a62 | mcp_agents | grpc_service | title:grpc-service:bef00376 | evidence=10
+5. 175066b8a4ceee3c | mcp_agents | grpc_service | title:grpc-service:9aa6c88e | evidence=10
+6. 17dc1fe9f5f8a021 | mcp_agents | grpc_service | title:grpc-service:22e93e07 | evidence=10
+7. 1d5eba7211dea6f9 | mcp_agents | grpc_service | title:grpc-service:55ae22ab | evidence=10
+8. 1dc5ac2b3cd9bfe8 | mcp_agents | grpc_service | title:grpc-service:8cfd5203 | evidence=10
+9. 25c824811a2efd81 | mcp_agents | grpc_service | title:grpc-service:579d4f74 | evidence=10
+10. 271b5446f6a86a48 | mcp_agents | grpc_service | title:grpc-service:55ab2018 | evidence=10
 
 ## Next Steps
 

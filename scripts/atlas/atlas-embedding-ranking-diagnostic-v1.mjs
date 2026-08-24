@@ -14,7 +14,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFile } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { promisify } from 'node:util';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const args = new Map();
@@ -39,6 +41,7 @@ const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/atla
 
 const VECTOR_COLUMNS = ['content_embedding_768', 'content_embedding', 'embedding_768', 'embedding'];
 const AST_COLUMNS = ['ast_symbols', 'ast_nodes', 'symbols'];
+const execFileAsync = promisify(execFile);
 
 function loadPg() {
   const roots = [path.join(REPO_ROOT, 'sveltekit-frontend', 'node_modules'), path.join(REPO_ROOT, 'node_modules')];
@@ -104,6 +107,49 @@ function cosine(a, b) {
   return an && bn ? dot / Math.sqrt(an * bn) : null;
 }
 
+function rankByCosine(query, rows, dimension) {
+  const queryPrefix = query.slice(0, dimension);
+  return rows
+    .map((row, ordinal) => ({ ordinal, score: cosine(queryPrefix, row.vector.slice(0, dimension)) ?? -Infinity }))
+    .sort((a, b) => b.score - a.score || a.ordinal - b.ordinal);
+}
+
+function ndcgAgainstOracle(oracle, candidate, k) {
+  const oracleRanks = new Map(oracle.slice(0, k).map((item, index) => [item.ordinal, index + 1]));
+  const dcg = candidate.slice(0, k).reduce((sum, item, index) => {
+    const oracleRank = oracleRanks.get(item.ordinal);
+    return sum + (oracleRank ? (1 / Math.log2(oracleRank + 1)) / Math.log2(index + 2) : 0);
+  }, 0);
+  const ideal = oracle.slice(0, k).reduce((sum, _item, index) => sum + (1 / Math.log2(index + 2)) ** 2, 0);
+  return ideal > 0 ? dcg / ideal : 0;
+}
+
+function benchmarkMrl(query, rows) {
+  const dimensions = [512, 256, 128];
+  const topK = Math.min(10, rows.length);
+  const oracle = rankByCosine(query, rows, 768);
+  return dimensions.map((dimension) => {
+    const candidate = rankByCosine(query, rows, dimension);
+    const oracleTop = new Set(oracle.slice(0, topK).map((item) => item.ordinal));
+    const overlap = candidate.slice(0, topK).filter((item) => oracleTop.has(item.ordinal)).length / topK;
+    return {
+      representationId: `semantic_mrl_${dimension}`,
+      dimension,
+      oracleRepresentationId: 'semantic_768',
+      queryEncoderRole: 'QUERY',
+      candidateEncoderRole: 'DOCUMENT',
+      metric: 'cosine',
+      renormalizedAfterPrefix: true,
+      corpusRows: rows.length,
+      topK,
+      recallAtKAgainst768: overlap,
+      ndcgAtKAgainst768: ndcgAgainstOracle(oracle, candidate, topK),
+      exactOracleTopK: oracle.slice(0, topK).map((item) => rows[item.ordinal]?.pointId ?? null),
+      candidateTopK: candidate.slice(0, topK).map((item) => rows[item.ordinal]?.pointId ?? null),
+    };
+  });
+}
+
 async function embedQuery() {
   const attempts = [
     { url: EMBED_URL.includes('/v1/') ? EMBED_URL : `${EMBED_URL}/v1/embeddings`, body: { model: EMBED_MODEL, input: QUERY } },
@@ -123,10 +169,23 @@ async function embedQuery() {
 }
 
 async function fetchQdrant() {
-  const body = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-    method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ limit: LIMIT, with_payload: true, with_vector: true }),
-  });
+  const qdrantPath = `/collections/${COLLECTION}/points/scroll`;
+  const requestBody = JSON.stringify({ limit: LIMIT, with_payload: true, with_vector: true });
+  let body;
+  try {
+    body = await jsonFetch(`${QDRANT_URL}${qdrantPath}`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: requestBody,
+    });
+  } catch (hostError) {
+    if (process.env.ATLAS_DOCKER_FALLBACK === '0') throw hostError;
+    const { stdout } = await execFileAsync('docker', [
+      'exec', 'legal-ai-go-retrieval', 'wget', '-q', '-O', '-',
+      `http://qdrant:6333${qdrantPath}`,
+      '--header=content-type: application/json',
+      `--post-data=${requestBody}`,
+    ], { timeout: 120_000, windowsHide: true, maxBuffer: 64 * 1024 * 1024 });
+    body = JSON.parse(stdout);
+  }
   return (body?.result?.points ?? []).map((point) => {
     const payload = point.payload ?? {};
     return {
@@ -207,7 +266,12 @@ async function main() {
   const report = { schema: 'atlas.embedding-ranking-diagnostic.v1', generatedAt: new Date().toISOString(), readOnly: true, query: QUERY, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME }, postgres: {}, embeddinggemma: {}, ranking: {}, turbovec: {} };
   try {
     const qdrantRows = await fetchQdrant();
-    const [postgres, embedding] = await Promise.all([fetchPostgres(qdrantRows.map((row) => row.sourceRef), qdrantRows.map((row) => row.pointId)), embedQuery()]);
+    const [postgresResult, embedding] = await Promise.all([
+      fetchPostgres(qdrantRows.map((row) => row.sourceRef), qdrantRows.map((row) => row.pointId))
+        .catch((error) => ({ table: 'codebase_chunk_index', vectorColumn: null, vectorCounts: {}, rows: [], columns: [], error: error.message })),
+      embedQuery(),
+    ]);
+    const postgres = postgresResult;
     report.postgres = {
       table: postgres.table,
       vectorColumn: postgres.vectorColumn,
@@ -216,6 +280,7 @@ async function main() {
       canonicalVectorPopulated: Number(postgres.vectorCounts?.content_embedding_768 ?? 0) > 0,
       astColumn: postgres.astColumn,
       rowsFetched: postgres.rows.length,
+      error: postgres.error ?? null,
       vectorDimension: postgres.rows[0]?.vector?.length ?? null,
       columns: postgres.columns,
     };
@@ -236,7 +301,7 @@ async function main() {
       const blended = (semantic ?? 0) * 0.60 + (pgSemantic ?? semantic ?? 0) * 0.10 + lexical * 0.15 + ast * 0.15;
       return { pointId: row.pointId, packetKey: row.packetKey, sourceRef: row.sourceRef, postgresMatch: Boolean(pg), semanticScore: semantic, postgresSemanticScore: pgSemantic, lexicalScore: lexical, astScore: ast, astSymbols: astValues.slice(0, 32), blendedScore: blended };
     }).sort((a, b) => b.blendedScore - a.blendedScore || String(a.packetKey).localeCompare(String(b.packetKey)));
-    report.ranking = { formula: '0.60*qdrantSemantic + 0.10*postgresSemantic + 0.15*lexical + 0.15*ast', candidates: scored.slice(0, LIMIT), joinedPostgres: scored.filter((row) => row.postgresMatch).length, astAwareCandidates: scored.filter((row) => row.astScore > 0).length };
+    report.ranking = { formula: '0.60*qdrantSemantic + 0.10*postgresSemantic + 0.15*lexical + 0.15*ast', candidates: scored.slice(0, LIMIT), joinedPostgres: scored.filter((row) => row.postgresMatch).length, astAwareCandidates: scored.filter((row) => row.astScore > 0).length, mrlAgainst768: embedding.vector?.length === 768 ? benchmarkMrl(embedding.vector, qdrantRows) : [] };
     report.turbovec = await turbovecProbe(qdrantRows);
     report.gates = {
       qdrantVectors: qdrantRows.length > 0,

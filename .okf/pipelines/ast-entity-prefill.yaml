@@ -1,0 +1,40 @@
+schema: atlas.ast-entity-prefill-pipeline.v1
+source:
+  table: atlas_packets
+  identity:
+    - packet_key
+    - source_ref
+    - feature_id
+    - title_id
+    - tree_node_id
+  source_revision: graphify_packet_revision_pending
+extraction:
+  engine: ast-grep-napi
+  languages: [typescript, tsx, javascript]
+  entities: [function, class, method, variable, interface, type, enum]
+  identity_status: candidate_only
+lexical:
+  engine: postgres_fts
+  compatibility_alias: ps_fts
+  fields: [search_vector, summary, feature_label, feature_id]
+  authority: lexical_signal_only
+json:
+  parser: simdjson_optional
+  authority: payload_acceleration_only
+nlp:
+  engine: langextract
+  status: later_grounded_pass
+  authority: semantic_entities_only
+embedding:
+  model: embeddinggemma-full768-v1
+  representation: semantic_768
+  query_role: QUERY
+  document_role: DOCUMENT
+  normalization: L2_VECTOR
+  status: later_prefill_pass
+domain:
+  classifier: pending_neural_encoder
+  okf_manifest: .okf/manifest.yaml
+output:
+  format: ndjson
+  canonical_writes: false

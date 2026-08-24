@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.ne28-centroid-prefill-projection-report.v1",
+  "mode": "APPLY_WITH_READBACK",
+  "clusterType": "kmeans_js",
+  "limit": null,
+  "startedAt": "2026-08-24T16:24:37.878Z",
+  "rowsRead": 64,
+  "keysWritten": 64,
+  "keysVerified": 64,
+  "mismatches": [],
+  "errors": [],
+  "finishedAt": "2026-08-24T16:24:38.013Z"
+}

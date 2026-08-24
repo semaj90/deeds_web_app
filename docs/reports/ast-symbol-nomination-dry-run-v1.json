@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.ast-symbol-nomination-dry-run-receipt.v1",
+  "status": "DRY_RUN_COMPLETE",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entities.jsonl",
+  "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-nominations.jsonl",
+  "input_candidates": 42398,
+  "nominations": 42398,
+  "duplicates_removed": 0,
+  "invalid_candidates": 0,
+  "canonical_symbols_created": 0,
+  "symbol_versions_created": 0,
+  "database_writes": false,
+  "canonical_writes": false
+}

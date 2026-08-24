@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.graphify-file-index-manifest.v1",
+  "read_only": true,
+  "canonical_authority": "postgres",
+  "source_table": "atlas_packets",
+  "packet_jsonl": ".tmp/atlas/graphify-file-index-v1/packets.jsonl",
+  "ast_jsonl": ".tmp/atlas/graphify-file-index-v1/ast-entities.jsonl",
+  "packet_count": 61659,
+  "invalid_rows": 0,
+  "packet_checksum": "e5ab9a307ff8054c58331503c16787693bbbca2ead2c992a5c7ad2e7f8df0bef",
+  "ast_exit_code": 0,
+  "ast_receipt": {
+    "schema": "atlas.ast-entity-prefill-graphify-receipt.v2",
+    "config": ".okf\\pipelines\\ast-entity-prefill.yaml",
+    "packets_selected": 3293,
+    "files_resolved": 2951,
+    "files_unresolved": 342,
+    "unresolved_samples": [
+      "src/AGENTS.md",
+      "src/lib/adapters/legal-corpus.ts",
+      "src/lib/AGENTS.md",
+      "src/lib/ai/AGENTS.md",
+      "src/lib/ai/e2b/AGENTS.md",
+      "src/lib/ai/onnx/AGENTS.md",
+      "src/lib/cache/AGENTS.md",
+      "src/lib/client/AGENTS.md",
+      "src/lib/client/ui/AGENTS.md",
+      "src/lib/components/admin/AGENTS.md"
+    ],
+    "entity_candidates": 42398,
+    "ast_grep": true,
+    "canonical_writes": false,
+    "symbol_registry_resolved": 0,
+    "canonical_entity_resolved": 0,
+    "coverage": {
+      "structural_entity": 0.8961433343455816,
+      "packet_identity": 1,
+      "feature_identity": 1,
+      "source_revision": 1,
+      "symbol_registry": 0,
+      "domain": 1,
+      "ontology": 1,
+      "semantic_768": 0
+    },
+    "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entities.jsonl"
+  },
+  "ast_extractor": "ast-grep-napi",
+  "lexical_owner": "postgres_tsvector_gin_ts_rank_cd",
+  "lexical_compatibility_alias": "ps_fts",
+  "json_parser": "simdjson_optional_consumer_v8_export_validation",
+  "vector_transport": "embedding_metadata_only",
+  "graph_exports": [
+    "tree_node_id",
+    "routing",
+    "provenance"
+  ],
+  "hypergraph_input": [
+    "concept_ids",
+    "ontology",
+    "packet_ontology",
+    "payload"
+  ],
+  "canonical_writes": false,
+  "generated_at": "2026-08-24T16:37:09.248Z",
+  "report": "docs/reports/graphify-file-index-v1.json"
+}

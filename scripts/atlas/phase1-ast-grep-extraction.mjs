@@ -13,6 +13,7 @@ import pg from 'pg';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
+import { extractSymbolsViaAstGrep } from './lib/ast-grep-symbol-extraction.mjs';
 
 const { Pool } = pg;
 
@@ -105,21 +106,32 @@ async function initDatabase() {
     database: process.env.POSTGRES_DB || 'legal_ai_db',
   });
 
-  // Ensure atlas_packet_features table exists
+  // Ensure atlas_packet_features exists. This previously declared a
+  // `packet_id INTEGER NOT NULL REFERENCES atlas_packets(id)` FK that could
+  // never be satisfied — atlas_packets has no `id` column at all, and its
+  // own identity column (`packet_id`) is `text`, not an integer. Because the
+  // real table already existed (drizzle/0043 + drizzle/0020), this
+  // CREATE TABLE IF NOT EXISTS was always a silent no-op, so the mismatch
+  // never surfaced until this table's actual writer (this file's own
+  // INSERT, below) was finally exercised. The 5 real columns this script
+  // needs (source_ref/ast_coverage/ast_language/ast_extraction_method/
+  // ast_hash) were added additively via
+  // drizzle/0154_atlas_packet_features_ast_provenance_columns.sql — no data
+  // was touched. `packet_key` (already the table's real unique constraint)
+  // is the canonical identity join key; there is no packet_id column here.
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS atlas_packet_features (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        packet_id INTEGER NOT NULL REFERENCES atlas_packets(id) ON DELETE CASCADE,
-        packet_key VARCHAR(255) NOT NULL UNIQUE,
-        source_ref VARCHAR(512),
+        packet_key TEXT NOT NULL UNIQUE,
+        source_ref TEXT,
         ast_symbols TEXT[],
         ast_coverage REAL DEFAULT 0,
         ast_language VARCHAR(50),
         ast_extraction_method VARCHAR(50),
         ast_hash VARCHAR(64),
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
     `);
   } catch (err) {
@@ -153,8 +165,17 @@ async function extractASTSymbols(content, language, file_path) {
   }
 
   try {
-    // Use ast-grep to extract symbols
-    // For now, use a simple regex fallback if ast-grep is not available
+    // NE-06: real ast-grep structural extraction for TypeScript/JavaScript.
+    // extractSymbolsViaAstGrep returns null (not an empty array) when the
+    // language isn't TS/JS or the ast-grep binary isn't on PATH, so we can
+    // fall back to the regex extractor honestly rather than silently.
+    const astGrepResult = extractSymbolsViaAstGrep(content, language);
+    if (astGrepResult) {
+      return astGrepResult;
+    }
+
+    // Fallback: regex extraction (still the only path for python/go, or if
+    // the ast-grep binary is unavailable in this environment).
     const symbols = await extractSymbolsViaRegex(content, language);
 
     return {
@@ -242,11 +263,21 @@ async function generateASTHash(symbols) {
 }
 
 async function extractPackets(pool, limit) {
+  // `payload->>'kind' = 'code'` is dead: confirmed live via
+  // `SELECT payload->>'kind', count(*) FROM atlas_packets GROUP BY 1` that
+  // `payload` has no `kind` key at all on any of the 61,660 rows in this
+  // table — this half of the OR has never matched anything. The real
+  // code-identifying value, confirmed the same way, is
+  // `source_kind = 'codebase_chunk'` (3,294 rows; `rpc_method` and
+  // `cluster-summary` are the only other non-empty source_kind values).
+  // Kept the original `payload->>'kind'` clause as a forward-compatible
+  // no-op rather than deleting it outright, in case a future producer
+  // starts setting it.
   const query = `
-    SELECT p.packet_id, p.packet_key, p.source_ref, p.file_path,
+    SELECT p.packet_key, p.source_ref, p.file_path,
            COALESCE(p.payload->>'text', '') as content
     FROM atlas_packets p
-    WHERE (p.payload->>'kind' = 'code' OR p.source_kind = 'code')
+    WHERE (p.payload->>'kind' = 'code' OR p.source_kind = 'codebase_chunk')
       AND p.packet_key IS NOT NULL
       AND p.source_ref IS NOT NULL
       AND NOT EXISTS (
@@ -271,7 +302,10 @@ async function processPackets(pool, packets) {
 
   for (let i = 0; i < packets.length; i++) {
     const packet = packets[i];
-    const language = detectLanguage(packet.file_path);
+    // Some codebase_chunk packets carry the real path only in source_ref,
+    // not file_path (confirmed live: 3 of the 4 currently-eligible rows
+    // have an empty file_path but a populated source_ref).
+    const language = detectLanguage(packet.file_path || packet.source_ref || '');
 
     try {
       const extraction = await extractASTSymbols(packet.content, language, packet.file_path);
@@ -287,10 +321,11 @@ async function processPackets(pool, packets) {
         // INSERT or UPDATE
         await pool.query(`
           INSERT INTO atlas_packet_features (
-            packet_id, packet_key, source_ref, ast_symbols, ast_coverage,
+            packet_key, source_ref, ast_symbols, ast_coverage,
             ast_language, ast_extraction_method, ast_hash
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7)
           ON CONFLICT (packet_key) DO UPDATE SET
+            source_ref = EXCLUDED.source_ref,
             ast_symbols = EXCLUDED.ast_symbols,
             ast_coverage = EXCLUDED.ast_coverage,
             ast_language = EXCLUDED.ast_language,
@@ -298,7 +333,6 @@ async function processPackets(pool, packets) {
             ast_hash = EXCLUDED.ast_hash,
             updated_at = NOW()
         `, [
-          packet.packet_id,
           packet.packet_key,
           packet.source_ref,
           extraction.symbols,

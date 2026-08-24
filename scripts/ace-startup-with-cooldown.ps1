@@ -9,11 +9,15 @@ if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).Total
     exit 0
 }
 
-npm run atlas:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log
-if ($LASTEXITCODE -eq 0) {
+$output = npm --prefix sveltekit-frontend run atlas:startup 2>&1 |
+    Tee-Object logs/task-output/ace-startup-latest.log |
+    Out-String
+$npmExitCode = $LASTEXITCODE
+$gatesPassed = [regex]::Match($output, 'Gates:\s+(\d+)\/7').Groups[1].Value
+if ($npmExitCode -eq 0 -and $gatesPassed -eq '7') {
     Set-Content -Path $stamp -Value (Get-Date -Format o)
     Write-Host 'ACE startup pipeline green'
 } else {
-    Write-Host 'ACE startup pipeline FAILED — check logs/task-output/ace-startup-latest.log'
+    Write-Host "ACE startup pipeline FAILED — npm=$npmExitCode gates=$gatesPassed/7; check logs/task-output/ace-startup-latest.log"
     exit 1
 }
