@@ -290,11 +290,86 @@ tree-lineage work is closed.
 
 ## 12. Docs correction
 
-- [ ] 12.1 Fix `docs/architecture/PACKET-COMPILER-STAGES.md`'s Stage 1
-      heading ("AST-Grep (Structural Extraction)") to reflect the layered
-      ownership: TreeSitter Chunker (chunking application) as the structural
-      extraction owner, ast-grep as a separate structural query/rewrite
-      stage — not one conflated stage name.
+- [x] 12.1 **Done, 2026-08-23.** Fixed `docs/architecture/PACKET-COMPILER-STAGES.md`'s Stage 1
+      heading ("AST-Grep (Structural Extraction)" → "TreeSitter Chunker (Structural Extraction)")
+      and the matching `-- Stage 1: AST-Grep` SQL comment above `ast_symbols text[]`, to reflect
+      the layered ownership already established in the file's own Dependency Chain summary
+      (line 13 onward): TreeSitter Chunker is the structural-extraction owner (boundary IR →
+      `atlas_ast_nodes`); ast-grep is a separate structural query/rewrite stage
+      (`scripts/atlas/phase1.5-ast-grep-extraction.mjs`, confirmed live via `grep` to genuinely
+      call ast-grep, not TreeSitter Chunker) that consumes those facts to produce this column's
+      `ast_symbols[]`. Added an explicit "Layered ownership" note in the Stage 1 section body so
+      the two names on the page read as two layers of one stage, not two rival Stage-1 owners.
+
+## 14. External API surface reference (2026-08-23 — plain-URL extracted contracts)
+
+Non-code, reference-only appendix. Captures a URL-extracted API-surface audit the user did
+against live upstream docs for every tool this change (and its siblings — see 3-13 above) touches,
+so future sessions don't have to re-derive method signatures from memory. Nothing here implies any
+of these APIs is wired yet — cross-reference against this file's own STATIC_OWNER/live-verify
+sections above before trusting an integration claim.
+
+- [x] 14.1 Recorded. PostgreSQL 18 native FTS (`tsvector`/`tsquery`/`to_tsvector`/`ts_rank_cd`) is
+      confirmed the live lexical owner for AST evidence
+      (`POSTGRES_FTS_AST` — matches this repo's own live-verified naming, see
+      `parent-atlas-transport-memory-boundaries`/`parent-atlas-retrieval-fusion-reachability`).
+      ParadeDB's `pg_search` extension is a **separate, not-installed** product that adds a real
+      BM25 index access method (`USING bm25(...)`, `paradedb.score(id)`) on top of Postgres —
+      PostgreSQL's own docs do not claim BM25 scoring for native FTS, and ParadeDB's docs say so
+      explicitly. Do not rename `POSTGRES_FTS_AST` artifacts to anything with "BM25" in the name
+      until `pg_search` (or an equivalent real BM25 scorer) is actually installed and proven live.
+      GIN is confirmed a retrieval (posting-list/candidate-lookup) structure, not a ranker —
+      `ts_rank_cd` is the separate ranking step. `pg_trgm` stays scoped to fuzzy/spelling fallback,
+      not primary lexical ownership.
+  - Sources: `postgresql.org/docs/18/textsearch.html`, `postgresql.org/docs/18/gin.html`,
+    `postgresql.org/docs/18/pgtrgm.html`, `paradedb.com/learn/search-in-postgresql/bm25`,
+    `github.com/paradedb/paradedb/blob/main/pg_search/README.md`
+- [x] 14.2 Recorded. ast-grep's own docs mark the Node.js/NAPI programmatic API "experimental" —
+      confirms this change's existing preference for the CLI+YAML rule surface
+      (`pattern`/`kind`/`regex`/relational `inside`/`has`/`precedes`/`follows`/composite
+      `all`/`any`/`not`/`matches`, `ast-grep run --json` for structured output) as the primary
+      integration surface, NAPI/Python bindings reserved for bounded programmatic extraction only.
+  - Sources: `ast-grep.github.io/guide/pattern-syntax`, `ast-grep.github.io/reference/rule`,
+    `ast-grep.github.io/reference/api`, `ast-grep.github.io/reference/cli`
+- [x] 14.3 Recorded. Tree-sitter's `SyntaxNode` field-aware traversal (`childForFieldName`,
+      `descendantsOfType`, byte/position offsets) is the same coordinate surface this change's AST
+      corpus-parity work (`node-tree-sitter-ast-provider.ts`) already depends on — confirms
+      `childForFieldName('value')` is the correct, docs-sanctioned way to resolve a
+      `variable_declarator`'s RHS kind (the exact fix already landed this session for the
+      declarator-kind misclassification bug).
+  - Source: `tree-sitter.github.io/node-tree-sitter/interfaces/SyntaxNode.html`
+- [x] 14.4 Recorded. simdjson's On-Demand API is forward-only, iterator-style, values consumed
+      once, source buffer must stay alive — confirms the existing repo rule (Wire Format Layering
+      Rule, `claude.md`) that simdjson is for NDJSON/manifest/descriptor JSON (Graphify NDJSON, ACE
+      packet descriptors, Qdrant payload exports), never for numeric matrices like `semantic_768`
+      rows, which must stay in Arrow IPC / raw mmap / CUDA tensors.
+  - Sources: `github.com/simdjson/simdjson/blob/master/doc/basics.md`,
+    `github.com/simdjson/simdjson/blob/master/doc/ondemand_design.md`
+- [x] 14.5 Recorded (adjacent subsystem, not this change's scope, but same audit pass). NetworkX's
+      backend-dispatch model (`backend='cugraph'`, `NETWORKX_BACKEND_PRIORITY`,
+      `nx_cugraph.from_networkx`) frames the correct ownership split for any future graph-algorithm
+      GPU work: NetworkX stays the algorithm-semantics reference implementation, `nx-cugraph`/
+      `cugraph` is an accelerated executor selected by config, never a second algorithm surface.
+      `cugraph.pagerank`/`cugraph.leiden` and cuVS CAGRA's `search(..., filter=bitset)` param are
+      concrete future integration points — the CAGRA filter bitset maps directly onto a future
+      Valkey-backed `CandidateOrdinal` membership bitmap. XGBoost's `QuantileDMatrix(..., qid=...,
+      group=...)` + `objective='rank:ndcg'` is the confirmed ranking-metadata shape for any future
+      GPU learning-to-rank gate (`device='cuda', tree_method='hist'`).
+  - Sources: `networkx.org/documentation/stable/backends.html`,
+    `docs.rapids.ai/api/cugraph/stable/nx_cugraph`,
+    `docs.rapids.ai/api/cugraph/stable/api_docs/api/cugraph.cugraph.pagerank`,
+    `docs.pytorch.org/tutorials/intermediate/pinmem_nonblock.html`,
+    `docs.pytorch.org/docs/stable/generated/torch.sparse.mm`,
+    `docs.rapids.ai/api/cuvs/stable/python_api/neighbors_cagra`,
+    `docs.rapids.ai/api/cuvs/stable/python_api/distance`,
+    `xgboost.readthedocs.io/en/stable/python/python_api.html`,
+    `xgboost.readthedocs.io/en/stable/gpu`,
+    `xgboost.readthedocs.io/en/latest/python/examples/learning_to_rank.html`
+- [x] 14.6 Recorded. `yq` stays scoped to YAML inspection/merge/transform for `.okf.yaml` config
+      (`docs/deep-research-task-schema.okf.yaml`,
+      `sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml` — both confirmed to exist
+      live via `find`), never the authoritative schema validator — that role stays with Zod
+      (TypeScript boundary) / typed Python models (sidecar boundary).
 
 ## 13. Acceptance fixture
 

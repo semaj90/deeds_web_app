@@ -112,7 +112,7 @@ CREATE TABLE atlas_packet_features (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   packet_key text NOT NULL UNIQUE,
   
-  -- Stage 1: AST-Grep
+  -- Stage 1: TreeSitter Chunker boundary IR → ast-grep query (ast_symbols)
   ast_symbols text[] DEFAULT '{}',
   
   -- Stage 2: Lexical
@@ -197,11 +197,19 @@ CREATE INDEX idx_atlas_packet_metrics_som_cluster ON atlas_packet_metrics(som_cl
 
 ---
 
-## Stage 1: AST-Grep (Structural Extraction)
+## Stage 1: TreeSitter Chunker (Structural Extraction)
+
+**Layered ownership** (see the Dependency Chain above): TreeSitter Chunker is the canonical
+structural-extraction owner — it produces the boundary-IR structural facts (`AstUnit` →
+`atlas_ast_nodes`, packet_key null, `structural_revision`-scoped). ast-grep is a **separate**
+structural query/rewrite stage that consumes those facts (or the source directly) to produce this
+column's `ast_symbols[]` output. ast-grep is not a competing chunk owner and does not replace
+TreeSitter Chunker's boundary IR — the two names on this page describe two layers of Stage 1, not
+two rival implementations of the same layer.
 
 **Input**: Code files  
 **Output**: `ast_symbols[]` in `atlas_packet_features`  
-**Script**: `scripts/atlas/phase1.5-ast-grep-extraction.mjs`  
+**Script**: `scripts/atlas/phase1.5-ast-grep-extraction.mjs` (ast-grep query layer)  
 **Example**:
 
 ```
