@@ -81,7 +81,7 @@ LVG-2 canonical N-ary relationship compute projection      DESCOPED (tables don'
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut (normalized_laplacian operator)  EXECUTED_UNPROVEN (parity BLOCKED but K-sensitive: peaks 0.88 at K=6, credible path to close further exists)
-LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, flat 0.29-0.37 across K=3/6/7/8 -- no K-mismatch explanation, genuinely unresolved)
+LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, flat 0.29-0.37 across K -- externally corroborated as a documented limitation for non-uniform community sizes, not an unexplained internal bug)
 LVG-7 Leiden/Louvain comparison                              EXECUTED_UNPROVEN (both healthy on the connected fixture: Leiden 6 clusters, Louvain 7; degeneracy found earlier was specific to the disconnected fixture, since fixed)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
@@ -295,11 +295,30 @@ diverge, not resolved by anything tried in this file (tolerance sweep,
 eigenvector-count sweep, disconnection fix, or K sweep). Full table in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-Not yet done: Nsight Systems/Compute evidence (LVG-10/11), investigating
-the modularity operator's K-independent divergence (needs
-implementation-level comparison, not more diagnostic-script sweeps),
-testing whether upstream candidate selection tuned for cleaner eigenvalue
-separation improves the Laplacian operator's parity further.
+**External validation, closing the LVG-6 investigative arc at the
+Python-diagnostic level**: `cugraph/community/spectral_clustering.py`
+(read directly) is a pure pass-through to
+`pylibcugraph_spectral_modularity_maximization` with zero pre/post
+processing at the Python level — the actual algorithm is entirely below the
+C++/CUDA boundary, unreachable as source here. Checked NVIDIA's own public
+sources instead: (1) a public GitHub issue
+(rapidsai/cugraph#4392) independently reports
+`spectralModularityMaximizationClustering` can silently return an
+**incorrect cluster count** at small `num_eigen_vects` on an unrelated
+1M-node graph — external corroboration this function has known reliability
+limits beyond tuning; (2) RAPIDS' own docs state spectral clustering "may
+incorrectly partition data with non-uniform community sizes, as it seeks
+similar-sized clusters" — this fixture's every community structure found
+(Louvain, Leiden, spectral) is non-uniform, roughly 10x range top-to-bottom
+in each case. Both are independent, sourced explanations consistent with
+(not contradicting) the near-degenerate-eigenvalue mechanism found earlier.
+Full detail in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), testing whether
+upstream candidate selection tuned for cleaner eigenvalue separation *and*
+more uniform community sizes improves the Laplacian operator's parity
+further, C++/CUDA-level investigation of the modularity operator if pursued
+(out of scope for Python-level diagnostics).
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500

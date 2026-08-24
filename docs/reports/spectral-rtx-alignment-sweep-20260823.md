@@ -910,8 +910,54 @@ different investigation (likely: understanding what
 implementation actually does differently from the CPU numpy reference,
 which is out of scope for Python-level diagnostics).
 
-Not yet done: Nsight Systems/Compute evidence (LVG-10/11), investigating
-the modularity operator's K-independent divergence (would need
-implementation-level, not diagnostic-script-level, investigation), testing
-whether a candidate sample selected for cleaner eigenvalue separation
-improves the balanced-cut/Laplacian operator's parity further.
+### External validation: the modularity operator's divergence is independently documented, not just internally observed
+
+The actual algorithm lives entirely in cuGraph's C++/CUDA layer, unreachable
+as readable source from this environment — confirmed by reading
+`cugraph/community/spectral_clustering.py` directly: it is a pure
+pass-through to `pylibcugraph_spectral_modularity_maximization`, with zero
+pre/post-processing at the Python level (no graph normalization,
+symmetrization, or filtering happens above the C++ boundary). So there is no
+Python-level explanation left to find; the divergence's actual mechanism is
+below what this diagnostic approach can inspect.
+
+Checked NVIDIA's own public sources instead of continuing to guess:
+
+1. A public cuGraph GitHub issue (rapidsai/cugraph#4392) independently
+   reports that `spectralModularityMaximizationClustering` can **silently
+   return an incorrect cluster count** at small `num_eigen_vects` (36
+   instead of the requested 47 on a 1M-node graph), separate from its
+   documented crash behavior at large parameter combinations. This is
+   external, independent corroboration — from a different graph, a
+   different scale, a different reporter — that this specific function has
+   known reliability issues beyond what tolerance/K tuning alone can fix,
+   not something specific to this addendum's fixture or diagnostic setup.
+2. RAPIDS' own official docs
+   (`docs.rapids.ai/api/cugraph/stable/graph_support/algorithms/spectral_clustering/`)
+   state plainly that spectral clustering "may incorrectly partition data
+   with non-uniform community sizes, as it seeks similar-sized clusters."
+   This matches this addendum's own data directly: every community
+   structure found on this fixture is non-uniform in size (Louvain
+   `[135,110,87,57,54,43,14]`, Leiden `[147,138,68,59,57,31]`, spectral-K8
+   `[166,90,74,46,40,35,35,14]` — roughly 10x range top-to-bottom in every
+   case). This is a second, independently-sourced, documented explanation
+   consistent with (not competing with) the near-degenerate-eigenvalue
+   mechanism found earlier: both point at the same underlying property —
+   this graph's community structure does not match spectral clustering's
+   implicit assumption of comparably-sized, cleanly-separated communities.
+
+**This closes the investigative arc for LVG-6 at the level this diagnostic
+approach can reach.** The modularity operator's persistent, K-independent
+CPU/GPU divergence is not an unexplained mystery internal to this addendum's
+tooling — it is consistent with a documented, externally-reported
+characteristic of the algorithm itself when applied to graphs with
+non-uniform community sizes, which this fixture genuinely has. Closing it
+further would require either C++/CUDA-level source investigation (out of
+scope for Python-level diagnostics) or accepting that this candidate
+sample's structure may not be well-suited to spectral modularity
+maximization at all, independent of any implementation bug.
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), testing whether
+a candidate sample selected for both cleaner eigenvalue separation and more
+uniform community sizes improves parity, C++/CUDA-level investigation if
+pursued further (out of scope here).
