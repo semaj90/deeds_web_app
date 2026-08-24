@@ -88,7 +88,7 @@ LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       BLOCKED (nsys not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
 LVG-11 Nsight Compute Tensor Core/precision evidence        BLOCKED (ncu not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
 LVG-12 Graphify daily adoption                              PENDING
-LVG-13 workflow/A2A artifact streaming                      SPECCED (existing WorkflowActionEventV1 infra found, wiring not yet built)
+LVG-13 workflow/A2A artifact streaming                      SPECCED (corrected once: 3 competing WorkflowActionEventV1 defs found repo-wide; spec now points at the real one, 15 consumers, not the 1-consumer one first named)
 LVG-14 agentic repair validator fixture                     SPECCED_BLOCKED (consumption code exists; ground-truth repair data essentially absent -- 1 usable row found repo-wide)
 ```
 
@@ -511,51 +511,73 @@ below. Spec only; neither is implemented as of this commit.
 
 ### LVG-13: workflow/A2A artifact streaming
 
+**Correction to this section's first draft**: it pointed at
+`context-tool-dag-contracts.ts`'s `WorkflowActionEventV1Schema` as "the
+existing infrastructure to reuse." Audited actual consumers before treating
+that as settled and found it's wrong — there are **three independent
+definitions** of a type claiming the identical
+`schema: 'atlas.workflow-action.v1'` literal, and the one this section
+pointed at is not the dominant one:
+
+| Definition | File | Real external consumers (excl. self/spec) |
+|---|---|---|
+| plain interface (`state`/`operation`/`visual` fields) | `workflow/workflow-action-event-v1.ts` | **0** — dead code by this repo's own classification vocabulary |
+| zod schema A (`canonicalIds`/`toolName`/`mutationRequested` fields) | `workflow/context-tool-dag-contracts.ts` | **1** (`kernel/atlas-kernel-session.ts`) |
+| zod schema B (`runId`/`executor`/`revisions`/`checksum` fields) | `agentic-file-compiler/contracts.ts` | **15** (`mastra-workflow-compiler.ts`, `temporal/*` adapters, `exact-promotion.ts`, `file-mutation-guard.ts`, `invalidation-plan.ts`, `workflow-action-event-adapter.ts`, and 9 more across the whole `agentic-file-compiler` subsystem) |
+
+`agentic-file-compiler/contracts.ts`'s `WorkflowActionEventSchema` is the
+real, actively-developed, heavily-consumed contract — not the one this
+section originally named. This is a live instance of exactly the
+three-competing-owners failure mode this repo's own "Duplication
+Prevention" governance section (root `CLAUDE.md`) describes at length; not
+resolving that duplication is out of scope for this proof tranche, but
+LVG-13 must build against the dominant, real one, not the lightly-used one
+this draft named first.
+
 **What it actually is**: this proof tranche's own progress and receipts
 (fixture build, spectral/Leiden/Louvain runs, eigengap probes) currently
 only reach a human by someone reading `docs/reports/*.json` files after the
-fact. LVG-13 is wiring this tranche's producer scripts to emit into the
-already-built `WorkflowActionEventV1` stream
-(`sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts`)
-so other agents/consumers watching that stream see this work as it happens,
-not a new artifact-streaming system.
+fact. LVG-13 is wiring this tranche's producer scripts to emit into
+`agentic-file-compiler/contracts.ts`'s `WorkflowActionEventSchema` stream
+— the one with 15 real consumers, not a new artifact-streaming system, and
+not the schema this section named before checking.
 
 Grounding, already present in the codebase, not proposed here:
-- `WorkflowActionEventV1Schema` (`context-tool-dag-contracts.ts:46-71`)
-  already has `kind: 'artifact'` in its event-kind enum and `lane: 'a2a'` /
-  `transport: 'a2a'` in their respective enums — the exact shape LVG-13
-  needs already exists, unused by this proof tranche so far.
-- `workflowActionFromDagNode()` (same file, line 138) is the existing
-  factory for producing a valid `WorkflowActionEventV1` from a DAG node —
-  this tranche doesn't need to hand-construct events.
+- `WorkflowActionEventSchema` (`agentic-file-compiler/contracts.ts:99-133`)
+  already has `kind: 'artifact'` and `transport: 'a2a'` in its enums — the
+  exact shape LVG-13 needs, unused by this proof tranche so far.
+- `workflow-action-event-adapter.ts` (same directory) is an existing
+  adapter that converts a `WorkflowActionEventV1` into
+  `workflowEventToActionWriterRequest(...)` — the existing write path this
+  tranche should call into, not something to reimplement.
 - `openspec/changes/parent-atlas-governed-compute-fabric/tasks.md` section
-  6 already establishes the rule this must follow: "Route external side
-  effects through existing MCP/ACP/A2A adapters instead of exposing every
-  ...cuGraph/analyzer primitive as a model-facing tool" and "Add
-  kernel-request DAG node/action metadata without creating a second
-  workflow engine."
+  6 still applies: "Route external side effects through existing
+  MCP/ACP/A2A adapters instead of exposing every ...cuGraph/analyzer
+  primitive as a model-facing tool" and "Add kernel-request DAG node/action
+  metadata without creating a second workflow engine."
 
 **Concrete scope, not yet built**:
-1. Define a `ContextToolDagV1` for this proof tranche: nodes for
-   `RETRIEVAL` (semantic_512 reconciliation, LVG-0), `MCP_TOOL_CALL` or a
-   new equivalent kind for each GPU algorithm run (LVG-4 through LVG-9),
-   `VALIDATE` for the promotion-gate check, `MATERIALIZE` for writing the
-   final receipt. `validateContextToolDag()` already enforces the DAG
-   shape and mutation/validation rules — reuse it, don't reimplement.
+1. Define this proof tranche's DAG shape against
+   `agentic-file-compiler/contracts.ts`'s `AtlasWorkflowSpecSchema` (the
+   companion spec type in the same file, line ~60-97, not yet read in
+   detail here — read it before implementing, don't assume its shape from
+   `WorkflowActionEventSchema` alone).
 2. Each Python script in this tranche (`spectral_diagnostic_receipt_v2.py`,
    `run_louvain_challenger_v1.py`, `prove_live_graph_fixture.py`, etc.)
    emits one `WorkflowActionEventV1` per meaningful step
    (`scheduled`/`started`/`artifact`/`completed`), with `evidenceRefs`
    pointing at the receipt file path(s) it produced. Since these are
-   Python scripts and the schema/factory are TypeScript, this needs either
+   Python scripts and the schema/adapter are TypeScript, this needs either
    (a) a thin JSON-emission convention the TS side ingests, or (b) calling
    into the TS layer via whatever RPC/HTTP boundary this repo already uses
-   for Python->TS event submission — **not decided here**, needs a design
+   for Python->TS event submission — **still not decided**, needs a design
    choice consistent with how other Python producers in this repo already
-   talk to the TS event layer (audit that pattern before choosing).
-3. `canonicalWritesAllowed` should be `false` for this entire DAG — every
-   node in this proof tranche is read-only per its own "Authority rules"
-   section above; no node should ever set `readOnly: false`.
+   talk to the TS event layer (audit that pattern before choosing; not yet
+   done even after this correction).
+3. `canonicalWritesAllowed`/equivalent gate should stay `false` for this
+   entire DAG — every node in this proof tranche is read-only per its own
+   "Authority rules" section above; no node should ever set a mutating
+   flag.
 
 Not yet done: step 2's Python->TS event submission mechanism needs to be
 identified (audit existing Python producers first, per this file's own
