@@ -174,6 +174,24 @@ type TelemetryBreadth = {
 ## Slice 3 — Mock/stub candidate detection
 
 - [ ] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\.random.*(mock|stub|simulate|placeholder|demo)`.
+
+  **Partial, 2026-08-24**: ran the first three terms (not yet the
+  `Math.random.*(mock|stub|...)` clause) against
+  `sveltekit-frontend/src`. Raw: 703 hits across 404 files, but the large
+  majority are auto-generated `LLMS.md` directory-index files, not source
+  code. Real code-only count (`.ts` files): **156 hits across 79 files**
+  (sample includes `mcp/server.ts`, `lib/server/ai/agent-worker.ts` (8),
+  `lib/server/router/authority-ranking-bridge.ts` (9),
+  `lib/server/atlas/atlas-mastra-adapter.ts` (6)). Not yet run: the
+  `Math.random` clause, or against `.svelte` files.
+
+  **AST-context classification (task 2 below) not attempted this pass**:
+  156 hits require per-hit judgment (test fixture vs. demo-flag-gated vs.
+  unlabeled synthetic vs. throwing/unreferenced stub) — a genuinely large
+  classification job, not something to rush through under a tight context
+  budget. Left honestly incomplete rather than producing a shallow or
+  guessed classification. The raw hit list above is real, reusable input
+  for whoever runs this to completion next.
 - [ ] AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).
 - [ ] LLM used only to summarize post-static+runtime findings — never as sole verdict source.
 - [ ] Output: one JSON + Markdown report.
