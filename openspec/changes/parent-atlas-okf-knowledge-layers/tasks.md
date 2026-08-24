@@ -79,9 +79,27 @@ recommendation engine, or Deep Agents integration under this task list.
   than inventing from nothing) — needs an explicit decision before a real
   validator can be built; reconciling the manifest/filesystem drift found
   above (5 declared vs. 3 present domain schemas).
-- [ ] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
+- [x] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
 
-  **Attempted 2026-08-24, blocked before writing anything**: checked
+  **Unblocked and done, 2026-08-24**: added a minimal `concepts` registry
+  to `.okf/manifest.yaml` (`path: concepts/`, 6 declared schemas) rather
+  than inventing a full validator spec — kept the new schema
+  (`atlas.okf-concept-gap.v1`) small and modeled on the already-proven
+  `DomainClassificationV1` field pattern
+  (`gap_id`/`title`/`status`/`owner`/`summary`/`evidence`/`discovered_at`).
+  Wrote all 6 files under `.okf/concepts/`, each `status: NOT_PROVEN`, each
+  citing the specific table/doc the gap traces to (`atlas_packets.domain_class`,
+  `concept_records`, root `CLAUDE.md`'s documented 768/768_v2 split,
+  `atlas_topology_index` and its missing `cluster_run_id`/`som_run_id`
+  columns). Content traces directly to `proposal.md`'s own "Known
+  repository gaps" list (lines 35-39) — not independently re-verified
+  against live Postgres in this pass (prior session turns already
+  confirmed several of these directly; the rest are carried from that
+  proposal doc's existing claims, not fabricated here). Task-3 below
+  ("OKF validator run against the 6 new files reports 0 schema errors")
+  remains open — no validator exists yet to run.
+
+  **Previously attempted 2026-08-24, blocked before writing anything**: checked
   `.okf/manifest.yaml`'s registries before creating files, since every
   existing `.okf/` file type (`languages`, `domains`, `corpora`, `symbols`,
   `tools`, `predicates`, `indexes`) is declared there first. There is no

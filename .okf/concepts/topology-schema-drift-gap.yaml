@@ -1,0 +1,14 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: topology-schema-drift-gap
+title: atlas_topology_index is live only outside Drizzle
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  atlas_topology_index exists and is populated in live PostgreSQL but is
+  not declared in the Drizzle schema (schema-postgres.ts), so Drizzle
+  migrations cannot see or protect it without an explicit tablesFilter
+  entry. Schema-as-code and live schema have drifted for this table.
+evidence:
+  - ref: postgres:atlas_topology_index
+    note: live table, not present in sveltekit-frontend Drizzle schema
+discovered_at: 2026-08-24

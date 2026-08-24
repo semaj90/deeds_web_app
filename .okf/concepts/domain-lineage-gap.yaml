@@ -1,0 +1,13 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: domain-lineage-gap
+title: No domain-prediction lineage table
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  atlas_packets.domain_class exists and is populated, but there is no table
+  recording which classifier (id/revision), what confidence, or what
+  evidence produced that value. The label exists; its provenance does not.
+evidence:
+  - ref: postgres:atlas_packets.domain_class
+    note: live column, populated, no lineage sibling table
+discovered_at: 2026-08-24

@@ -1,0 +1,14 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: som-run-lineage-gap
+title: som_run_id missing from atlas_topology_index
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  atlas_topology_index has no som_run_id column, the same gap as
+  cluster-run-lineage-gap but for SOM (self-organizing map) grid
+  assignments. A row's SOM coordinate cannot be traced to the training
+  run (seed, grid size, epochs) that produced it.
+evidence:
+  - ref: postgres:atlas_topology_index
+    note: no som_run_id column found
+discovered_at: 2026-08-24

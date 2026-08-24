@@ -1,0 +1,14 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: concept-edge-ledger-gap
+title: No canonical concept edge ledger
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  concept_records exists as a table of concept nodes, but there is no
+  canonical ledger of edges between concepts (relation type, revision,
+  evidence). Relationships between concepts are not currently queryable
+  as durable, revisioned facts.
+evidence:
+  - ref: postgres:concept_records
+    note: nodes exist; no concept_relations/concept_edges table found
+discovered_at: 2026-08-24

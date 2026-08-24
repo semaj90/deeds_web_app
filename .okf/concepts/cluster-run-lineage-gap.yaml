@@ -1,0 +1,14 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: cluster-run-lineage-gap
+title: cluster_run_id missing from atlas_topology_index
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  atlas_topology_index has no cluster_run_id column, so a given row's
+  cluster assignment cannot be traced back to which clustering run (seed,
+  algorithm, parameters, timestamp) produced it. Re-running clustering
+  cannot be distinguished from a stale prior run in this table alone.
+evidence:
+  - ref: postgres:atlas_topology_index
+    note: no cluster_run_id column found
+discovered_at: 2026-08-24

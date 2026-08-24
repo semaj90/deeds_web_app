@@ -1,0 +1,16 @@
+schema: atlas.okf-concept-gap.v1
+gap_id: representation-fragmentation-gap
+title: Representation records fragmented across tables/storage types
+status: NOT_PROVEN
+owner: parent-atlas-okf-knowledge-layers
+summary: >-
+  Semantic/vector representation state is split across multiple owners
+  (Postgres columns, Qdrant collections, Redis caches) without one
+  canonical representation-identity table tying a representation_id to
+  its dimension, model, storage location, and validation state. This is
+  the same class of gap documented in root CLAUDE.md's "codebase_chunks_768
+  vs codebase_chunks_768_v2 split" finding, generalized.
+evidence:
+  - ref: docs:root-CLAUDE.md#embedding-dimensions-policy
+    note: documents a live, unresolved 768/768_v2 collection split
+discovered_at: 2026-08-24

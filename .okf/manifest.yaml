@@ -42,6 +42,20 @@ registries:
       - functions.yaml
       - routes.yaml
 
+  concepts:
+    path: concepts/
+    description: >-
+      Evidence-linked gap records (missing lineage, fragmented ownership,
+      undecided schema). status is always NOT_PROVEN until closed by a
+      real fix with a receipt; never PROVEN by a concept file alone.
+    schemas:
+      - domain-lineage-gap.yaml
+      - concept-edge-ledger-gap.yaml
+      - representation-fragmentation-gap.yaml
+      - topology-schema-drift-gap.yaml
+      - cluster-run-lineage-gap.yaml
+      - som-run-lineage-gap.yaml
+
   tools:
     path: tools/
     description: External tool integrations (ast-grep, qdrant, etc.)
