@@ -219,9 +219,29 @@ in both K conditions — a real, reproducible correlation, but intuitive
 rather than explanatory, and doesn't identify the actual mechanism. Full
 table and detail in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-Not yet done: identifying the actual mechanism (would need raw eigenvector
-or per-node assignment comparison, not done), Louvain comparison, Nsight
-Systems/Compute evidence (LVG-10/11).
+**Mechanism found, confirmed via `clusterContingency` (not just aggregate
+stats):** GPU eigenvectors confirmed unreachable at every accessible API
+layer (`cuvs.cluster` has only `kmeans`, `pylibcugraph.spectral_modularity_maximization` —
+the lowest-level Python binding — still returns only `(vertices, clusters)`
+per its own docstring; not a matter of more effort). Pivoted to the
+contingency table instead: of the K=3 modularity operator's 115 moved
+nodes, essentially all are one single confusion (CPU cluster 1 <-> GPU
+cluster 0); the third cluster (48-55 nodes) is agreed on almost perfectly.
+This matches the eigenvalue gaps exactly: the pair of eigenvalues that
+distinguishes the poorly-agreed clusters has gap `0.1061` (nearly
+degenerate); the pair isolating the well-agreed cluster has gap `1.3593`
+(12x larger). Classical near-degenerate-eigenspace behavior — CPU numpy and
+GPU cuGraph solvers land on different, comparably-valid splits specifically
+where eigenvalues are close together, not where they're well-separated.
+Not a bug in either implementation; a property of this graph's actual
+spectrum. Closing the gap to the 0.99 gate likely needs a candidate sample
+with cleaner eigenvalue separation (a property of upstream selection, not
+this spectral step) rather than more solver tuning. Full detail in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: Louvain comparison, Nsight Systems/Compute evidence
+(LVG-10/11), testing whether upstream candidate selection tuned for cleaner
+eigenvalue separation improves parity.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500

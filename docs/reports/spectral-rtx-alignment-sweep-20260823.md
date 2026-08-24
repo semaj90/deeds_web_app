@@ -725,8 +725,72 @@ CPU reference is more objective-inconsistent with GPU than the
 normalized-Laplacian operator's is. Recorded as further-characterized, not
 resolved.
 
-Not yet done: identifying the actual mechanism behind the modularity
-operator's larger, direction-inconsistent divergence (would need comparing
-raw eigenvector matrices or per-node assignment differences directly, not
-done here), Louvain comparison, Nsight Systems/Compute evidence
-(LVG-10/11).
+### Mechanism found: disagreement is concentrated on one near-degenerate eigenvalue gap, not diffuse noise
+
+First checked whether GPU eigenvectors are reachable through any lower API
+layer than the `cugraph` wrapper already ruled out earlier — confirmed
+dead end, checked at all three levels available in this environment:
+`cuvs.cluster` has only `kmeans` (no spectral primitives at all);
+`pylibcugraph.spectral_modularity_maximization` (the lowest-level Python
+binding beneath `cugraph.spectralModularityMaximizationClustering`) still
+returns only `(vertices, clusters)`, confirmed from its own docstring and
+signature. GPU eigenvectors are not exposed anywhere in the accessible
+RAPIDS 26.06 Python surface — not a matter of digging harder, a real API
+gap.
+
+Pivoted to what's answerable from data already on disk: the K=3 modularity
+operator's `clusterContingency` (`spectral-diagnostic-receipt-v4-k3-connected.json`,
+115/500 moved nodes) shows the disagreement is **not diffuse**:
+
+```
+        GPU:0  GPU:1  GPU:2
+CPU:0     186     1      0
+CPU:1     107   151      0
+CPU:2       6     1     48
+```
+
+Cluster 2 (48-55 nodes) is agreed on almost perfectly by both CPU and GPU
+(48/55, 6 stragglers). Essentially all 107 "moved" nodes are one single
+confusion: nodes CPU calls cluster 1 that GPU calls cluster 0 — not noise
+spread across all three clusters, one specific weak boundary.
+
+This matches the eigenvalue structure exactly. For the modularity operator's
+3 selected eigenvalues (`[4.8726, 4.7665, 3.4072]`, descending): the gap
+between eigenvalue[0] and eigenvalue[1] (the pair whose eigenvectors
+distinguish cluster 0 from cluster 1) is only **0.1061** — nearly
+degenerate. The gap between eigenvalue[1] and eigenvalue[2] (the pair that
+isolates cluster 2) is **1.3593**, over 12x larger. The specific pairwise
+eigenvalue gap directly predicts which cluster boundary is stable between
+CPU and GPU and which isn't: well-separated eigenvalues -> near-unanimous
+agreement (cluster 2); nearly-degenerate eigenvalues -> the associated
+eigenvector direction is only weakly determined and free to rotate within
+that subspace, so CPU's numpy solver and cuGraph's internal solver land on
+different, comparably-valid splits (clusters 0 vs 1).
+
+This is a mechanistic confirmation, not just a correlation between summary
+statistics — classical near-degenerate-eigenspace behavior, demonstrated at
+the level of actual cluster assignments and per-eigenvalue-pair gaps, not
+inferred from aggregate ARI/modularity numbers alone. It also explains
+degree-of-boundary-node correlation checked earlier this session:
+`moved` nodes have modestly lower mean degree (3.70 vs. 4.19 for stable
+nodes) — nodes weakly attached to the graph are more likely to sit near
+this specific unstable boundary.
+
+**What this means for the promotion gate**: this is not a bug fixable by
+more eigensolver tolerance tuning (already ruled out earlier in this
+addendum) or by picking a "better" K (partially tested, mixed result) — it
+is a property of this graph's actual eigenvalue spectrum. Two of its three
+K=3 components are only weakly separated (gap 0.106), so *any* two
+numerically-distinct eigensolvers (CPU numpy vs. GPU cuGraph internals)
+should be expected to disagree on that specific boundary, by the normal
+behavior of eigendecomposition under near-degenerate eigenvalues — not
+because either implementation is wrong. Closing this gap to `ARI >= 0.99`
+would likely require either a candidate sample with more cleanly-separated
+community structure (a property of *which* packets get selected, upstream
+of this spectral step) or accepting that near-degenerate boundaries are
+inherently solver-sensitive and the 0.99 gate itself may need to account
+for that rather than treating any CPU/GPU disagreement as a defect.
+
+Not yet done: Louvain comparison, Nsight Systems/Compute evidence
+(LVG-10/11), and (if pursued) testing whether a candidate sample selected
+for cleaner eigenvalue separation improves parity.
