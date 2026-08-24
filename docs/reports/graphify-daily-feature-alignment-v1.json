@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-daily-feature-alignment.v1",
-  "generatedAt": "2026-08-24T03:11:24.016Z",
+  "generatedAt": "2026-08-24T17:30:53.834Z",
   "readOnly": true,
   "scope": {
     "table": "codebase_chunk_index",
@@ -9,7 +9,8 @@
   },
   "qdrant": {
     "url": "http://127.0.0.1:6333",
-    "collection": "codebase_chunks_768"
+    "collection": "codebase_chunks_768",
+    "transport": "DOCKER_INTERNAL_HTTP"
   },
   "status": "PASS",
   "rows": [
@@ -349,7 +350,7 @@
     "counts": {
       "centroid:*": 66,
       "som:*": 0,
-      "ace:*": 123,
+      "ace:*": 52,
       "gpu:karpathy:*": 1
     }
   }

@@ -274,7 +274,7 @@
     },
     {
       "file": "manual/20260818_atlas_symbol_registry_v1.sql",
-      "status": "manual_sidecar",
+      "status": "applied",
       "reason": "Creates the additive canonical symbol registry, aliases, revisioned symbol versions, and structural-reference resolution indexes. Applied and read back on PostgreSQL 18.4; no symbol rows were inserted.",
       "appliedBy": "operator",
       "appliedAt": "2026-08-24",
@@ -289,6 +289,42 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/export-graphify-file-index-v1.mjs --limit=100 && node scripts/atlas/audit-atlas-indexing-surfaces.mjs"
+    },
+    {
+      "file": "manual/20260824_atlas_callable_search_v1.sql",
+      "status": "applied",
+      "reason": "Additive callable-search projection and nullable callable metadata columns. Preserves atlas_symbol_versions and creates an idempotent projection backfill with simple-token FTS, B-tree, array GIN, and JSONB path indexes.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_callable_search'), count(*) FROM atlas_callable_search;\""
+    },
+    {
+      "file": "manual/20260824_atlas_callable_enrichment_v1.sql",
+      "status": "applied",
+      "reason": "Additive domain, parent-container, inferred-use, taxonomy, and JSONB evidence fields on the rebuildable callable-search projection. No canonical identity writes or destructive operations.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/enrich-ast-callable-search.mjs"
+    },
+    {
+      "file": "manual/20260819_atlas_observation_feature_rows_v1.sql",
+      "status": "superseded_unapplied",
+      "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-observation-feature-row-contract.mjs"
+    },
+    {
+      "file": "manual/20260824_kag_contract_alignment_v1.sql",
+      "status": "applied",
+      "reason": "Additive alignment for existing atlas_hyperedges, atlas_hyperedge_members, and atlas_ontology_tuples. Adds contract IDs, packet/revision lineage, evidence arrays, lifecycle, provenance, and schema registry keys. No backfill or destructive operation.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-24",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-kag-persistence-v1.mjs"
     }
   ]
 }

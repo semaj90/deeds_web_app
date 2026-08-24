@@ -11,6 +11,27 @@ export interface RlmBudget {
 	maxPacketsHydrated: number;
 	maxTokens: number;
 	deadlineMs: number;
+	maxFetchedBytes?: number;
+	maxCandidateExpansion?: number;
+}
+
+export type RlmPermittedOperation =
+	| 'FILTER' | 'SORT' | 'GROUP' | 'SLICE' | 'FETCH_PACKET'
+	| 'FETCH_AST' | 'FETCH_RELATION' | 'SUBCALL';
+
+export interface RlmEnvironmentV1 {
+	schema: 'atlas.rlm-environment.v1';
+	contextArtifactId: string;
+	candidateSnapshotRevision: string;
+	ordinalMapChecksum: string;
+	candidateOrdinals: number[];
+	permittedOperations: RlmPermittedOperation[];
+	maxDepth: number;
+	maxSubcalls: number;
+	maxTokens: number;
+	maxWallClockMs: number;
+	maxFetchedBytes: number;
+	maxCandidateExpansion: number;
 }
 
 export interface RlmSearchRequest {
@@ -21,6 +42,7 @@ export interface RlmSearchRequest {
 	filters?: Record<string, unknown>;
 	topK?: number;
 	budget: RlmBudget;
+	environment?: RlmEnvironmentV1;
 }
 
 export interface RlmTraceStep {
@@ -41,6 +63,7 @@ export interface RlmTrace {
 	subcalls: number;
 	steps: RlmTraceStep[];
 	status: 'COMPLETED' | 'BUDGET_EXHAUSTED' | 'DEGRADED' | 'FAILED';
+	failureCode?: 'RLM_PROGRAM_FAILED' | 'RLM_ENVIRONMENT_INVALID';
 }
 
 export interface RlmSearchResult {

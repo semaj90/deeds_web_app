@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T11:08:08.487Z",
+  "generatedAt": "2026-08-24T21:50:57.986Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -8,8 +8,8 @@
   "summary": {
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 0,
-    "centroidKeys": 0,
+    "bifrostKeys": 46,
+    "centroidKeys": 66,
     "somKeys": 0
   },
   "patterns": [
@@ -34,18 +34,82 @@
     {
       "key": "bifrost:*",
       "pattern": "bifrost:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 46,
+      "sample": [
+        "bifrost:sem:packet:175066b8a4ceee3c",
+        "bifrost:sem:packet:packet:0011712c94d1",
+        "bifrost:sem:feature:.tmp.0056213574662f41",
+        "bifrost:sem:feature:sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+        "bifrost:sem:packet:packet:0004b466d863"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:packet:175066b8a4ceee3c",
+          "ttl": 19064,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:0011712c94d1",
+          "ttl": 19109,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:.tmp.0056213574662f41",
+          "ttl": 19085,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+          "ttl": 19089,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:0004b466d863",
+          "ttl": 19075,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "centroid:*",
       "pattern": "centroid:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 66,
+      "sample": [
+        "centroid:kmeans:17",
+        "centroid:kmeans:20",
+        "centroid:kmeans:23",
+        "centroid:kmeans:meta",
+        "centroid:kmeans:34"
+      ],
+      "ttlSamples": [
+        {
+          "key": "centroid:kmeans:17",
+          "ttl": 19113,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:20",
+          "ttl": 19114,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:23",
+          "ttl": 19114,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:meta",
+          "ttl": 19119,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:34",
+          "ttl": 19115,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -61,18 +125,82 @@
     {
       "key": "bifrost:sem:packet:*",
       "pattern": "bifrost:sem:packet:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 25,
+      "sample": [
+        "bifrost:sem:packet:175066b8a4ceee3c",
+        "bifrost:sem:packet:packet:0011712c94d1",
+        "bifrost:sem:packet:packet:0004b466d863",
+        "bifrost:sem:packet:packet:000f704e5207",
+        "bifrost:sem:packet:0ee918abc8c53e8d"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:packet:175066b8a4ceee3c",
+          "ttl": 19061,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:0011712c94d1",
+          "ttl": 19106,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:0004b466d863",
+          "ttl": 19073,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:000f704e5207",
+          "ttl": 19100,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:0ee918abc8c53e8d",
+          "ttl": 19055,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:feature:*",
       "pattern": "bifrost:sem:feature:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 21,
+      "sample": [
+        "bifrost:sem:feature:.tmp.0056213574662f41",
+        "bifrost:sem:feature:sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+        "bifrost:sem:feature:simd-bridge.LLMS",
+        "bifrost:sem:feature:neschrom97.93f973562fff24ed",
+        "bifrost:sem:feature:sveltekit-frontend.keyboard-shortcuts.svelte"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:feature:.tmp.0056213574662f41",
+          "ttl": 19081,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+          "ttl": 19086,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:simd-bridge.LLMS",
+          "ttl": 19097,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:neschrom97.93f973562fff24ed",
+          "ttl": 19069,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:sveltekit-frontend.keyboard-shortcuts.svelte",
+          "ttl": 19090,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -115,20 +243,38 @@
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
-      "count": 2,
+      "count": 6,
       "sample": [
-        "ace:feature:trace-mcp",
-        "ace:feature:sveltekit-frontend.+page"
+        "ace:feature:ACE-MATERIALIZATION-BLOCKER-1-FIXED",
+        "ace:feature:claude",
+        "ace:feature:AGENTIC-WORKFLOW-PLAN-SUMMARY",
+        "ace:feature:ACE-TO-RETRIEVAL-COMPLETION-AUDIT",
+        "ace:feature:ATLAS-STATUS-RECONCILIATION"
       ],
       "ttlSamples": [
         {
-          "key": "ace:feature:trace-mcp",
-          "ttl": 40400,
+          "key": "ace:feature:ACE-MATERIALIZATION-BLOCKER-1-FIXED",
+          "ttl": 507151,
           "ok": true
         },
         {
-          "key": "ace:feature:sveltekit-frontend.+page",
-          "ttl": 65393,
+          "key": "ace:feature:claude",
+          "ttl": 507144,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:AGENTIC-WORKFLOW-PLAN-SUMMARY",
+          "ttl": 507146,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:ACE-TO-RETRIEVAL-COMPLETION-AUDIT",
+          "ttl": 507106,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:ATLAS-STATUS-RECONCILIATION",
+          "ttl": 507148,
           "ok": true
         }
       ],

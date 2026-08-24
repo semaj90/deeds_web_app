@@ -38,6 +38,7 @@ vi.mock('./promote-results-outbox.js', () => ({
 }));
 
 import { createSearchRuntime } from './search-runtime.js';
+import type { SearchResult } from './search-runtime.js';
 
 describe('search runtime bridge', () => {
   beforeEach(() => {
@@ -462,5 +463,28 @@ describe('SearchMetadataFilterSchema — allow-list enforcement', () => {
       unknownExecutionField: 'dense',
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('SearchResult.provenance.hypergraphNeighbors — KAG-01/02 additive integration point', () => {
+  it('is a valid SearchResult provenance without the field present (current real state — no persisted source yet)', () => {
+    const provenance: SearchResult['provenance'] = {
+      retrievalSources: ['qdrant_768'],
+      fusionMethod: 'rrf',
+      rerankModel: 'none',
+      rerankerUsed: false,
+    };
+    expect(provenance.hypergraphNeighbors).toBeUndefined();
+  });
+
+  it('accepts a well-typed hypergraphNeighbors payload when a future caller does populate it', () => {
+    const provenance: SearchResult['provenance'] = {
+      retrievalSources: ['qdrant_768'],
+      fusionMethod: 'rrf',
+      rerankModel: 'none',
+      rerankerUsed: false,
+      hypergraphNeighbors: [{ canonicalId: 'packet:a', hyperedgeIds: ['hyperedge:1', 'hyperedge:2'] }],
+    };
+    expect(provenance.hypergraphNeighbors?.[0].canonicalId).toBe('packet:a');
   });
 });

@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.ast-symbol-registry-promotion-report.v1",
+  "mode": "DRY_RUN",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-nominations.jsonl",
+  "registryRevision": "promotion:ast-nominations:v1",
+  "limit": null,
+  "inputNominations": 42398,
+  "excludedVariables": 32228,
+  "eligibleDeclarationLike": 10170,
+  "uniqueCandidatesAfterDedup": 10170,
+  "rowsAttempted": 0,
+  "rowsInserted": 0,
+  "rowsAlreadyRegistered": 0,
+  "sample": [
+    {
+      "canonicalKey": "symbol-key:05692e88296afd1acbf3688a815114d37d916906",
+      "stableSymbolId": "stable-symbol:724245877356ccc9f1de0f2afc29e13f5fa2f99af54f2c8d08db6a453d05f6ab",
+      "kind": "function",
+      "qualifiedName": "main",
+      "sourceRef": "packages/atlas-core/src/cli.ts"
+    },
+    {
+      "canonicalKey": "symbol-key:66650d5e5cbb1defcb00b02e5f6f751b657d1c88",
+      "stableSymbolId": "stable-symbol:b1dad2db636411a5a16fb8641af767e81e815311a09b9dcc215f3f09ad3f2f52",
+      "kind": "type",
+      "qualifiedName": "ErrorFixingStateType",
+      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+    },
+    {
+      "canonicalKey": "symbol-key:fb507112af415c145c5995fb4fed2006232b7ba3",
+      "stableSymbolId": "stable-symbol:0099a4262a53f5cec33f6fe2692808ae27f54b4e838e69487b2317372dc4a6ce",
+      "kind": "interface",
+      "qualifiedName": "KanbanErrorFixingTask",
+      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+    },
+    {
+      "canonicalKey": "symbol-key:1f0cffb7592b00798934f4f51f73bfd1c2eecfb9",
+      "stableSymbolId": "stable-symbol:6bb4cee33cb7321b03ac01625d85d5327e25583b4e1a5806af5554da9bf178f4",
+      "kind": "interface",
+      "qualifiedName": "ErrorFixSuggestion",
+      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+    },
+    {
+      "canonicalKey": "symbol-key:63d943bb2aa81d5f88adb09f0589aa38e8ddef12",
+      "stableSymbolId": "stable-symbol:eb9460fb949a07f2fb3954d25bbbfb3072cb6557ce61880b05daa6f30da87cbd",
+      "kind": "function",
+      "qualifiedName": "loadErrorFixingPackets",
+      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+    }
+  ],
+  "errors": []
+}

@@ -1,25 +1,48 @@
 {
   "schema": "atlas.graphify-rff-embedding-backfill.v1",
-  "generatedAt": "2026-08-24T05:38:19.432Z",
+  "generatedAt": "2026-08-24T17:30:53.064Z",
   "apply": false,
-  "signatureOnly": false,
+  "signatureOnly": true,
   "model": "embeddinggemma:latest",
   "scope": {
     "sinceHours": 24,
-    "limit": 64,
+    "limit": 4,
     "batchSize": 8
   },
-  "status": "BLOCKED_DIMENSION_CONTRACT",
-  "selected": 0,
+  "status": "DRY_RUN",
+  "selected": 4,
   "errorEmbedded": 0,
   "signatureEmbedded": 0,
   "written": 0,
-  "errors": [
-    "RFF columns are not 768d; no writes attempted. Existing RFF columns are legacy compatibility lanes.",
-    "RFF columns are not 768d; no writes attempted. Existing RFF columns are legacy compatibility lanes."
-  ],
+  "errors": [],
   "schemaColumns": {
     "error_embedding": "vector(384)",
     "signature_embedding": "halfvec(768)"
-  }
+  },
+  "sample": [
+    {
+      "id": "93590876-8f40-45ad-9bba-b0dd5dcdfe6b",
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "942b8fad-d5ea-4040-a6bc-b1c44ad9aa0f",
+      "sourceRef": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "94b3bfcd-2beb-4855-9f05-e9f8c0e05a01",
+      "sourceRef": "src/lib/utils/security.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "9630adda-8721-42fc-aeb0-7064b9713a12",
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "missingError": true,
+      "missingSignature": true
+    }
+  ]
 }

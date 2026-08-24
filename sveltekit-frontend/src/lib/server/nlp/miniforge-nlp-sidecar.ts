@@ -143,6 +143,7 @@ export interface NlpAnalyzeRequest {
 
 export interface NlpAnalyzeResponse {
   document_id: string;
+  provider_revision?: string;
   source_type: NlpSourceType;
   extraction_mode: NlpExtractionMode;
   entities: NlpEntity[];
@@ -288,6 +289,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
 
       return {
         document_id: raw.document_id ?? req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
+        provider_revision: typeof raw.provider_revision === 'string' ? raw.provider_revision : undefined,
         source_type: (raw.source_type ?? req.sourceType ?? 'plain_text') as NlpSourceType,
         extraction_mode: (raw.extraction_mode ?? req.extractionMode ?? 'full') as NlpExtractionMode,
         entities: Array.isArray(raw.entities) ? raw.entities : [],

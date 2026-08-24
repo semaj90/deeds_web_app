@@ -1,7 +1,7 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-21T01:53:53.046Z",
-  "status": "SOURCE_LINEAGE_OWNER_NOT_FOUND",
+  "generatedAt": "2026-08-24T17:48:59.104Z",
+  "status": "SOURCE_LINEAGE_OWNER_CANDIDATE_PRESENT",
   "canonicalWrites": false,
   "tables": [
     {
@@ -126,6 +126,22 @@
     },
     {
       "table_schema": "public",
+      "table_name": "graphify_bm25_index_candidates"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_bm25_index_runs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_runs"
+    },
+    {
+      "table_schema": "public",
       "table_name": "hypergraph_edge_members"
     },
     {
@@ -234,6 +250,18 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_agent_action_events",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_agent_action_events",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
       "table_name": "atlas_artifacts",
       "column_name": "source_ref",
       "data_type": "character varying"
@@ -247,6 +275,18 @@
     {
       "table_schema": "public",
       "table_name": "atlas_ast_nodes",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_chunk_packet_identity_links",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_chunk_packet_identity_links",
       "column_name": "source_revision",
       "data_type": "text"
     },
@@ -408,7 +448,25 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_observation_feature_rows",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_observation_feature_rows",
+      "column_name": "workspace_revision",
+      "data_type": "integer"
+    },
+    {
+      "table_schema": "public",
       "table_name": "atlas_ontology_tuples",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_packet_features",
       "column_name": "source_ref",
       "data_type": "text"
     },
@@ -486,6 +544,12 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_structural_reference_resolutions",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
       "table_name": "atlas_summary_layers",
       "column_name": "source_ref",
       "data_type": "text"
@@ -495,6 +559,36 @@
       "table_name": "atlas_svg_glyphs",
       "column_name": "source_ref",
       "data_type": "character varying"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_symbol_aliases",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_symbol_aliases",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_symbol_versions",
+      "column_name": "workspace_revision",
+      "data_type": "text"
     },
     {
       "table_schema": "public",
@@ -776,6 +870,48 @@
       "table_schema": "public",
       "table_name": "graph_analysis_runs",
       "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_bm25_index_candidates",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_bm25_index_candidates",
+      "column_name": "repository_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_files",
+      "column_name": "source_ref",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_files",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_files",
+      "column_name": "content_hash",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_runs",
+      "column_name": "repository_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_runs",
+      "column_name": "workspace_revision",
       "data_type": "text"
     },
     {
@@ -1077,7 +1213,20 @@
     },
     {
       "tableName": "graphify_files",
-      "present": false
+      "present": true,
+      "columns": [
+        "content_hash",
+        "source_ref",
+        "source_revision"
+      ],
+      "row_count": 0,
+      "source_ref_count": 0,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "content_hash_count": 0,
+      "content_digest_count": 0,
+      "source_content_count": 0,
+      "content_count": 0
     }
   ],
   "diagnostics": []

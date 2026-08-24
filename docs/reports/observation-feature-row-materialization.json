@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.observation-feature-row-materialization-report.v1",
+  "mode": "APPLY",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\observation-feature-projection-plan.jsonl",
+  "limit": 174,
+  "planRows": 174,
+  "rowsAttempted": 174,
+  "rowsMaterialized": 174,
+  "validationErrors": [],
+  "sample": [
+    {
+      "packetKey": "ace:packet:047c77e6863e",
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "hasFunction": false,
+      "hasDatabaseAccess": false,
+      "inputDigest": "06f0089a05bf58bd040b42257d0b82e9400df5dd84339fdf240fd510ee1b7d93"
+    },
+    {
+      "packetKey": "ace:packet:04abe0bfe254",
+      "astObservationKinds": [
+        "CLASS_DECL",
+        "FUNCTION_DECL",
+        "VARIABLE_DECL"
+      ],
+      "hasFunction": true,
+      "hasDatabaseAccess": false,
+      "inputDigest": "605f850d44cd433730d5f1e742c6058c002f2660bb873f98d760294313a22286"
+    },
+    {
+      "packetKey": "ace:packet:05c077ba0f26",
+      "astObservationKinds": [
+        "FUNCTION_DECL",
+        "INTERFACE_DECL",
+        "VARIABLE_DECL"
+      ],
+      "hasFunction": true,
+      "hasDatabaseAccess": false,
+      "inputDigest": "f2438e0bb13ab6731b44a4adfeb9250dd2e346b7d080b199a9ee8cf0d961c8a8"
+    }
+  ]
+}

@@ -102,11 +102,12 @@ async function auditAst() {
 async function auditPostgres() {
   try {
     const version = await query('SELECT current_setting(\'server_version\') AS version');
-    const extension = await query("SELECT extversion FROM pg_extension WHERE extname = 'vector'");
+    const extensions = await query("SELECT extname, extversion FROM pg_extension WHERE extname IN ('vector', 'pg_search', 'pg_trgm') ORDER BY extname");
+    const extension = extensions.find((row) => row.extname === 'vector');
     const tables = {};
     const columns = {};
     for (const table of [
-      'codebase_chunk_index', 'atlas_packet_features', 'atlas_ast_nodes',
+      'atlas_packets', 'codebase_chunk_index', 'atlas_packet_features', 'atlas_ast_nodes',
       'atlas_symbol_registry', 'atlas_symbol_versions',
       'atlas_structural_reference_resolutions', 'atlas_observation_feature_rows',
     ]) {
@@ -134,9 +135,17 @@ async function auditPostgres() {
       if (vectorColumn) populated.codebaseChunkEmbeddings = await tableCount('codebase_chunk_index', `WHERE "${vectorColumn}" IS NOT NULL`);
       if (searchColumn) populated.codebaseChunkSearchVectors = await tableCount('codebase_chunk_index', `WHERE "${searchColumn}" IS NOT NULL`);
       if (qdrantColumn) populated.codebaseChunkQdrantIds = await tableCount('codebase_chunk_index', `WHERE "${qdrantColumn}" IS NOT NULL`);
+      for (const column of ['content_embedding', 'content_embedding_768', 'content_embedding_384', 'summary_embedding', 'signature_embedding', 'search_vector']) {
+        if (codeColumns.has(column)) {
+          populated[`codebaseChunk_${column}`] = await tableCount('codebase_chunk_index', `WHERE "${column}" IS NOT NULL`);
+        }
+      }
     }
     if (tables.atlas_packet_features.exists) {
       populated.packetAstSymbols = await tableCount('atlas_packet_features', 'WHERE COALESCE(cardinality(ast_symbols), 0) > 0');
+    }
+    if (tables.atlas_packets?.exists) {
+      populated.atlasPacketsSemantic768 = await tableCount('atlas_packets', 'WHERE embedding IS NOT NULL');
     }
     if (tables.atlas_ast_nodes.exists) populated.astNodesWithSymbols = await tableCount('atlas_ast_nodes', "WHERE COALESCE(qualified_symbol, '') <> ''");
     if (tables.atlas_symbol_registry.exists) populated.symbolRegistryActive = await tableCount('atlas_symbol_registry', "WHERE status = 'active'");
@@ -154,23 +163,42 @@ async function auditPostgres() {
       WHERE table_schema = 'public' AND table_name ILIKE '%bitmap%'
       ORDER BY table_name
     `);
+    const proposedBitmapProjection = await tableExists('atlas_file_search_index_v1');
+    const proposedConceptLinks = await tableExists('atlas_file_search_concept_links_v1');
+    const pgSearch = extensions.find((row) => row.extname === 'pg_search');
     report.postgres = {
       reachable: true,
       serverVersion: version[0]?.version ?? null,
-      vectorExtension: extension[0]?.extversion ?? null,
+      extensions: Object.fromEntries(extensions.map((row) => [row.extname, row.extversion])),
+      vectorExtension: extension?.extversion ?? null,
+      lexicalOwner: pgSearch ? 'UNVERIFIED_PG_SEARCH_AVAILABLE' : 'POSTGRES_FTS_TSVECTOR_GIN_TS_RANK_CD',
+      denseOwner: 'POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE',
+      canonicalDenseRepresentation: 'semantic_768',
+      canonicalDenseColumn: tables.codebase_chunk_index.exists && columns.codebase_chunk_index.includes('content_embedding_768')
+        ? 'codebase_chunk_index.content_embedding_768'
+        : 'UNAVAILABLE',
+      proposedSearchProjection: {
+        table: 'atlas_file_search_index_v1',
+        applied: proposedBitmapProjection,
+        conceptLinksApplied: proposedConceptLinks,
+        writesPerformedByAudit: false,
+      },
       tables,
       columns,
       populated,
       bitmapTables: bitmapTables.map((row) => row.table_name),
       relevantIndexes: indexes.map((row) => ({ table: row.tablename, name: row.indexname, definition: row.indexdef })),
     };
-    if (!extension.length) finding('PGVECTOR_EXTENSION_MISSING', 'high', 'The live PostgreSQL database does not report the vector extension.');
+    if (!extension) finding('PGVECTOR_EXTENSION_MISSING', 'high', 'The live PostgreSQL database does not report the vector extension.');
     if (!tables.atlas_symbol_registry.exists) finding('SYMBOL_REGISTRY_TABLE_MISSING', 'high', 'The stable cross-revision symbol registry migration has not been applied to the live database.');
     if (!tables.atlas_observation_feature_rows.exists) finding('FEATURE_ROW_TABLE_MISSING', 'high', 'The revisioned observation feature-row table has not been applied to the live database.');
     if (tables.atlas_ast_nodes.exists && !populated.astNodesWithSymbols?.count) finding('AST_NODE_SYMBOL_COVERAGE_EMPTY', 'high', 'atlas_ast_nodes exists but has no populated qualified symbols.');
     if (tables.atlas_symbol_registry.exists && !populated.symbolRegistryActive?.count) finding('SYMBOL_REGISTRY_EMPTY', 'high', 'The stable symbol registry exists but has no active symbols.');
     if (tables.codebase_chunk_index.exists && !populated.codebaseChunkSearchVectors?.count) finding('BM25_VECTOR_EMPTY', 'high', 'codebase_chunk_index exists but has no populated search_vector rows.');
-    if (tables.codebase_chunk_index.exists && populated.codebaseChunkEmbeddings?.count === 0) finding('POSTGRES_CANONICAL_EMBEDDING_EMPTY', 'high', 'The canonical 768-dimensional Postgres embedding column is present but empty; Qdrant is populated independently.', ['codebase_chunk_index.content_embedding_768', 'codebase_chunks_768_v2']);
+    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count === 0) finding('POSTGRES_CANONICAL_EMBEDDING_EMPTY', 'high', 'The canonical 768-dimensional Postgres embedding column is present but empty; Qdrant is populated independently.', ['codebase_chunk_index.content_embedding_768', 'codebase_chunks_768_v2']);
+    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count > 0 && populated.codebaseChunk_content_embedding_768.count < tables.codebase_chunk_index.count) {
+      finding('POSTGRES_CANONICAL_EMBEDDING_PARTIAL', 'high', 'The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.', [`${populated.codebaseChunk_content_embedding_768.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding_768', 'codebase_chunk_index.content_embedding']);
+    }
     if (bitmapTables.length === 0) finding('POSTGRES_BITMAP_TABLE_MISSING', 'medium', 'No PostgreSQL table explicitly models bitmap-combinable routing state; current filtering relies on GIN/Valkey projections.');
     if (tables.atlas_packet_features.exists && populated.packetAstSymbols?.count < tables.atlas_packet_features.count * 0.5) {
       finding('PACKET_AST_SYMBOL_COVERAGE_LOW', 'medium', 'Fewer than half of atlas_packet_features rows have AST symbols.', [`${populated.packetAstSymbols.count}/${tables.atlas_packet_features.count}`]);

@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.neural-prefill-validation-receipt.v1",
+  "generatedAt": "2026-08-24T21:45:48.330Z",
+  "status": "PASS",
+  "readinessPercent": 70,
+  "readOnly": true,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false,
+  "trainingStarted": false,
+  "gracefulFallback": {
+    "enabledByPolicy": true,
+    "behavior": "CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT",
+    "canonicalMutation": false
+  },
+  "checks": [
+    {
+      "id": "EMBEDDING_GEOMETRY",
+      "status": "PASS",
+      "evidence": "EmbeddingGemma representation contract is present with revision and L2 geometry fields.",
+      "next": "Run the MRL corpus benchmark before promotion."
+    },
+    {
+      "id": "PARAMETER_LOOKUP",
+      "status": "PASS",
+      "evidence": "Revision-aware model/artifact lookup and compatibility gate are present.",
+      "next": "Add a durable registry only after contract adoption is approved."
+    },
+    {
+      "id": "QLORA_BOUNDARY",
+      "status": "PASS",
+      "evidence": "QLoRA gate forbids online training and canonical writes.",
+      "next": "Require verified tournament tuples and held-out shadow metrics."
+    },
+    {
+      "id": "LOW_RANK_POLICY",
+      "status": "DEGRADED",
+      "evidence": "Read-only 512-to-96 receipt and exact semantic_768 rerank executed; oracle Recall@24=0.333. No labeled relevance proof yet.",
+      "next": "Add labeled relevance/RRF evaluation and repeat on held-out query groups."
+    },
+    {
+      "id": "PACKET_AGGREGATION",
+      "status": "PASS",
+      "evidence": "174 packet-level ORF rows materialized from 174 plans with zero validation errors.",
+      "next": "Expand beyond the reviewed snapshot during full daily adoption."
+    },
+    {
+      "id": "DAILY_NLP_PREFILL",
+      "status": "PASS",
+      "evidence": "Bounded daily dry receipt status: PASS.",
+      "next": "A failure must leave the existing Graphify receipt intact and continue in degraded mode."
+    },
+    {
+      "id": "INDEX_METADATA",
+      "status": "DEGRADED",
+      "evidence": "Indexing ownership audit exists; live metadata/extension state remains environment-dependent.",
+      "next": "Keep Postgres typed columns and JSONB GIN as separate ownership layers."
+    }
+  ]
+}

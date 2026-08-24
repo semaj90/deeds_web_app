@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-30T04:33:04.449Z",
+  "generatedAt": "2026-08-24T18:48:48.695Z",
   "queueContracts": [
     {
       "queue": "phase7.summarization",
@@ -31,9 +31,9 @@
     {
       "proto": "Packet",
       "table": "atlas_packets",
-      "columns": 131,
+      "columns": 140,
       "columnsMissing": [],
-      "indexesTotal": 85,
+      "indexesTotal": 88,
       "indexesMissing": [],
       "indexesCoverage": "PASS",
       "fieldsCoverage": "PASS",
@@ -45,18 +45,15 @@
     {
       "proto": "RouteRuntimePacket",
       "table": "route_runtime_packets",
-      "columns": 0,
+      "columns": 39,
       "columnsMissing": [
         "feature_id",
-        "raw",
         "route_state"
       ],
-      "indexesTotal": 0,
+      "indexesTotal": 25,
       "indexesMissing": [
         "idx_route_runtime_packets_feature_id",
-        "idx_rrp_raw_gin",
-        "idx_rrp_feature_cluster",
-        "idx_rrp_feature_ids_gin"
+        "idx_rrp_feature_cluster"
       ],
       "indexesCoverage": "FAIL",
       "fieldsCoverage": "FAIL",

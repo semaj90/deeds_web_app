@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.kag.persistence.audit.v1",
+  "status": "READY_FOR_MATERIALIZATION",
+  "readOnly": true,
+  "tablesPresent": [
+    "atlas_hyperedge_members",
+    "atlas_hyperedges",
+    "atlas_ontology_tuples"
+  ],
+  "missingColumns": {
+    "atlas_hyperedges": [],
+    "atlas_hyperedge_members": [],
+    "atlas_ontology_tuples": []
+  },
+  "counts": [
+    {
+      "table": "atlas_hyperedges",
+      "rows": 0
+    },
+    {
+      "table": "atlas_hyperedge_members",
+      "rows": 0
+    },
+    {
+      "table": "atlas_ontology_tuples",
+      "rows": 0
+    }
+  ],
+  "contractRegistry": [
+    {
+      "schema_id": "atlas.hyperedge",
+      "schema_version": 1,
+      "schema_kind": "hyperedge_contract",
+      "status": "ACTIVE"
+    },
+    {
+      "schema_id": "atlas.ontology-linked-tuple",
+      "schema_version": 1,
+      "schema_kind": "ontology_tuple_contract",
+      "status": "ACTIVE"
+    }
+  ],
+  "canonicalWrites": false
+}

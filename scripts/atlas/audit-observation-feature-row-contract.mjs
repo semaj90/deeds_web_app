@@ -7,7 +7,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const root = process.cwd();
+const cwd = process.cwd();
+const root = path.basename(cwd).toLowerCase() === 'sveltekit-frontend'
+  ? path.dirname(cwd)
+  : cwd;
 const files = {
   orf: path.join(root, 'sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql'),
   candidate: path.join(root, 'sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows_v1.sql'),
@@ -22,13 +25,20 @@ const hasAll = (text, values) => values.every((value) => text.includes(value));
 const [orf, candidate, drizzle, materializer, repository] = await Promise.all(
   Object.values(files).map(read),
 );
+const candidateSuperseded = candidate.includes('SUPERSEDED — DO NOT APPLY');
+const repositoryAligned = repository.includes('packet_key, feature_revision')
+  && !repository.includes('candidate_id, workspace_revision');
 
 const report = {
   schema: 'atlas.observation-feature-row-contract-audit.v1',
   generatedAt: new Date().toISOString(),
   writes: false,
   liveDatabaseChecked: false,
-  status: 'BLOCKED_DUPLICATE_INCOMPATIBLE_MIGRATIONS',
+  status: candidateSuperseded && repositoryAligned
+    ? 'PASS_ACTIVE_ORF_REPOSITORY_ALIGNED'
+    : candidateSuperseded
+      ? 'PASS_ACTIVE_ORF_CANDIDATE_SUPERSEDED'
+      : 'BLOCKED_DUPLICATE_INCOMPATIBLE_MIGRATIONS',
   canonicalOwnerCandidate: 'sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql',
   migrationCandidates: {
     orfPacketKey: {
@@ -56,7 +66,13 @@ const report = {
     parentAtlasRepository: files.repository,
     spectralExporter: 'scripts/atlas/export-spectral-fixture-routing-labels.mjs',
   },
-  decisionRequired: [
+  decisionRequired: candidateSuperseded && repositoryAligned ? [
+    'Keep ORF packet_key schema as the active exact-filter table because current Drizzle/materializer/exporter consumers target it.',
+    'Keep semantic_768 search in the canonical vector lane; the ORF repository remains exact/filter-only.',
+  ] : candidateSuperseded ? [
+    'Keep ORF packet_key schema as the active exact-filter table because current Drizzle/materializer/exporter consumers target it.',
+    'Reconcile parent-atlas repository code separately before wiring its candidate_id/semantic_768 writer to the packet_key table.',
+  ] : [
     'Keep ORF packet_key schema as the active exact-filter table because current Drizzle/materializer/exporter consumers target it.',
     'Retire or rename the candidate_id/vector migration before any feature-row migration is applied.',
     'Keep semantic_768 owned by the canonical packet/vector lane; do not add a second ANN owner by applying the candidate migration unchanged.',

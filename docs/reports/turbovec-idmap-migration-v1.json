@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.turbovec-idmap-migration-receipt.v1",
+  "generatedAt": "2026-08-24T20:12:42.747Z",
+  "readOnly": true,
+  "writes": false,
+  "persistedIndexFiles": [
+    "sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim"
+  ],
+  "persistedFormatStatus": "LEGACY_ARTIFACT_REQUIRES_REBUILD",
+  "probe": {
+    "version": "1.0.0",
+    "idMapIndex": true,
+    "nativeAllowlist": true,
+    "allowlistResultIds": [
+      101
+    ],
+    "allowlistResultCount": 1,
+    "artifactLoads": [
+      {
+        "path": "sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim",
+        "loader": "IdMapIndex",
+        "status": "LOAD_FAIL",
+        "error": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim is a version 1 turbovec index, which predates the v5 rotation change and cannot be decoded by any current build; rebuild it from the source vectors.: C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cach"
+      },
+      {
+        "path": "sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim",
+        "loader": "TurboQuantIndex",
+        "status": "LOAD_FAIL",
+        "error": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim is a version 1 turbovec index, which predates the v5 rotation change and cannot be decoded by any current build; rebuild it from the source vectors.: C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.cach"
+      }
+    ]
+  },
+  "promotion": "BLOCKED_PENDING_FULL_CORPUS_ALLOWLIST_RECALL"
+}

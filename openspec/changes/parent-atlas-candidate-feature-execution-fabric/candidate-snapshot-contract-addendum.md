@@ -43,6 +43,13 @@ canonicalOwnerChanged = false throughout
 
 `CandidateOrdinal` is valid only under `candidateSnapshotRevision`. It is not a packet key, symbol identity, tree identity, Qdrant point ID, or GPU node ID.
 
+Each candidate may now carry additive `representationBindings`. These bindings
+describe derived vector lineage only: `semantic_mrl_512`, `semantic_mrl_256`,
+and `semantic_mrl_128` use EmbeddingGemma prefix truncation with post-projection
+normalization; `latent_128` and `latent_64` require a learned autoencoder
+projection revision. Neither representation ID nor vector slot changes the
+CandidateOrdinal identity or canonical authority.
+
 ## Implemented files
 
 ```text

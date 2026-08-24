@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.turbovec-ordinal-bridge-audit.v1",
+  "readOnly": true,
+  "collection": "codebase_chunks_768",
+  "ordinalMapPath": ".tmp/atlas/ordinal-bridge-source/candidate-ordinal-map.json",
+  "candidateSnapshotRevision": "sample-query:0:0:v1",
+  "ordinalMapChecksum": "6a19baafe36a160bbafd18e3465e64de28b2d2d43f739179171774f005b10e2f",
+  "sampledQdrantRows": 1000,
+  "sourceRefPresent": 1000,
+  "packetKeyPresent": 134,
+  "sourceRefMatches": 1,
+  "packetKeyMatches": 1,
+  "uniqueMatchedOrdinals": 1,
+  "identityConflicts": 0,
+  "unresolvedSample": [
+    {
+      "pointId": 2,
+      "sourceRef": "sveltekit-frontend/src/AGENTS.md",
+      "packetKey": "ace:packet:3362030dfe23"
+    },
+    {
+      "pointId": 3,
+      "sourceRef": "src/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 4,
+      "sourceRef": "src/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 5,
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts",
+      "packetKey": "ace:packet:b5aa13ce0a61"
+    },
+    {
+      "pointId": 6,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 7,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 8,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 9,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 10,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 11,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 12,
+      "sourceRef": "src/hooks.server.ts",
+      "packetKey": null
+    },
+    {
+      "pointId": 13,
+      "sourceRef": "sveltekit-frontend/src/lib/AGENTS.md",
+      "packetKey": "ace:packet:83dc9fe1e87d"
+    },
+    {
+      "pointId": 14,
+      "sourceRef": "src/lib/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 15,
+      "sourceRef": "src/lib/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 16,
+      "sourceRef": "src/lib/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 17,
+      "sourceRef": "sveltekit-frontend/src/lib/ai/AGENTS.md",
+      "packetKey": "ace:packet:c113744e3e98"
+    },
+    {
+      "pointId": 18,
+      "sourceRef": "src/lib/ai/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 19,
+      "sourceRef": "src/lib/ai/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 20,
+      "sourceRef": "src/lib/ai/AGENTS.md",
+      "packetKey": null
+    },
+    {
+      "pointId": 21,
+      "sourceRef": "src/lib/ai/AGENTS.md",
+      "packetKey": null
+    }
+  ],
+  "status": "PARTIAL_CORPUS_OVERLAP",
+  "writes": false
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.ast-callable-enrichment-v1",
+  "mode": "APPLY",
+  "domainCandidates": 4365,
+  "nominationCandidates": 42398,
+  "rowsSeen": 100,
+  "rowsMatched": 100,
+  "rowsEnriched": 100,
+  "variablesSkipped": 0,
+  "databaseWrites": true,
+  "canonicalWrites": false,
+  "sample": [
+    {
+      "symbolVersionId": "symbol-version:0167e230af226c584148c1b3ce52e3c342180ea119167a3a34bebed6880a7d07",
+      "qualifiedName": "constructor",
+      "domain": "retrieval",
+      "inferredUses": []
+    },
+    {
+      "symbolVersionId": "symbol-version:01c5ae1be5086a4236a2cde657fb3163ee97d8d82071d721f0861bc5ea62489b",
+      "qualifiedName": "toNdjsonLine",
+      "domain": "retrieval",
+      "inferredUses": []
+    },
+    {
+      "symbolVersionId": "symbol-version:02ffe66ca545ac4ebda7fff388329e343177cb29dd0c8a746e9fde73f740a5a0",
+      "qualifiedName": "loadPackets",
+      "domain": "agent",
+      "inferredUses": []
+    },
+    {
+      "symbolVersionId": "symbol-version:07d4c32baafef6f9b8b7cfecf6370945e97045247a93eb2518c0dcd128dda0f6",
+      "qualifiedName": "stableStringify",
+      "domain": "database",
+      "inferredUses": []
+    },
+    {
+      "symbolVersionId": "symbol-version:080c0381e1a116314bd80aa3a79ffcd1adc27246a2abd980d0768b61efd93670",
+      "qualifiedName": "classifyDomain",
+      "domain": "retrieval",
+      "inferredUses": []
+    }
+  ],
+  "limit": 100
+}

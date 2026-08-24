@@ -13,6 +13,7 @@ fields:
   candidateOrdinal: { type: integer, minimum: 0 }
   canonicalId: { type: string, required: true }
   packetKey: { type: string, nullable: true }
+  sourceRef: { type: string, nullable: true }
   sourceRef: { type: string, required: true }
   semanticSimilarity: { type: number, minimum: 0, maximum: 1 }
   lexicalScore: { type: number, minimum: 0, maximum: 1 }
@@ -34,8 +35,12 @@ fields:
   featureRevision: { type: string, required: true }
   graphRevision: { type: string, nullable: true }
   representationRevision: { type: string, required: true }
+  representationBindings: { type: representation_binding_array, default: [] }
 
 invariants:
   - executor identity is not a feature vote
   - cache residence is not a relevance feature
   - semanticSimilarity compares only vectors in the same representation space
+  - CandidateOrdinal remains the join key; representationBindings are derived lineage, never identity
+  - semantic_mrl_512, semantic_mrl_256, and semantic_mrl_128 are EmbeddingGemma prefix projections
+  - latent_128 and latent_64 require a learned projection revision and remain challenger representations

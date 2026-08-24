@@ -13,7 +13,7 @@ claims, based on the current repository inventory:
 | Lane | Progress | Evidence | Remaining proof |
 |---|---:|---|---|
 | EmbeddingGemma `semantic_768` authority | 85% | Go embedding/retrieval services, Qdrant `semantic_768`, cache and contracts | current end-to-end receipt and stale-revision proof |
-| Qdrant semantic/RFF fan-out | 48% | semantic/signature prefetch and RRF path; bounded RFF writer exists; 384 lane now explicitly marked direct-slice compatibility | live dry-run is `BLOCKED_DIMENSION_CONTRACT`; error lane is `vector(384)`, signature lane is `halfvec(768)` |
+| Qdrant semantic/RFF fan-out | 55% | semantic/signature prefetch and RRF path; bounded RFF writer exists; 384 lane now explicitly marked direct-slice compatibility; Docker-network read-only Qdrant fallback is wired and the bounded 768 alignment gate passes | canonical projection/apply, full-corpus MRL parity, and error-lane dimension reconciliation remain open |
 | `latent_128` warm representation | 25% | manifest, adaptive-memory contracts, provisional backfill script | learned post-fan-out encoder and promotion gate |
 | `latent_64` hot representation | 30% | vector manifest, simulated Phase 5 bridge, residency tests | trained nested encoder and LibTorch parity |
 | LibTorch/RTX inference | 45% | native addon and GPU wrappers exist | model loading, CPU/RTX parity, no-fallback receipt |
@@ -21,7 +21,10 @@ claims, based on the current repository inventory:
 | Logistic/NB baselines | 15% | available contracts/capability surfaces | reproducible baseline artifacts and comparison |
 | ACE/Valkey/SOM pre-fill | 40% | cache/SOM contracts and packet paths | projection wiring after latent promotion |
 | MiniCoil/uniCOIL/SPLADE bi-encoder sparse lane | 10% | discovery terms and sparse adapter surfaces only | model/runtime owner, vocabulary, sparse index, and recall proof |
-| Candidate matrix to low-rank shortlist | 25% | 25-column TypeScript matrix; deterministic PyTorch low-rank nomination primitive | live 512-to-96 receipt joined to RRF candidates and exact-rerank quality proof |
+| Candidate matrix to low-rank shortlist | 50% | deterministic PyTorch nomination plus read-only PostgreSQL ORF receipt for 768? 512 inputs -> 96 CandidateOrdinals | exact semantic_768 rerank, RRF join, and Recall/NDCG quality proof |
+| Daily Graphify NLP/AST prefill | 80% | bounded export -> AST identity -> OKF classification -> packet aggregation -> 174-row ORF materialization passes; optional startup preflight fails open with a degraded receipt | full daily adoption and canonical symbol promotion |
+| Parameter/artifact lookup | 65% | revision-aware lookup contract and compatibility tests | durable registry adoption and live artifact resolution |
+| QLoRA boundary | 55% | read-only gate forbids online training/canonical writes; artifact metadata contract added | verified tournament tuples, checkpoint, and held-out shadow evaluation |
 
 The current trainer inventory distinguishes configuration from executable
 ownership: Quaterion is selectable in the agent trainer schema and test
@@ -30,18 +33,39 @@ receipt has been found. AdamW/`weight_decay` is already owned by the Python
 autoencoder. XGBoost ranking is an existing contract/trainer direction, but a
 live qid-grouped LambdaMART receipt is not yet proven.
 
-**Overall weighted readiness: approximately 39%.** This is not a claim that
+**Overall weighted readiness: approximately 43%.** This is not a claim that
 39% of production traffic is covered. Native EmbeddingGemma MRL is now the
 first compact-representation proof path; the learned, revisioned encoder and
 post-fan-out projection remain challenger work.
 
-Latest live gate: `docs/reports/graphify-rff-embedding-backfill-v1.json`
-reported `BLOCKED_DIMENSION_CONTRACT` for a read-only limit-64 run on
-2026-08-24. No rows or projections were written. The RFF contract must be
-reconciled before `latent_128` can be promoted after fan-out. A separate legacy
-Phase 1 dry-run reached Ollama and generated a 256-row sample, but its source
-still targets the legacy 384-dimensional schema; this is execution evidence,
-not a successful write or 768 migration.
+Latest receipt: `docs/reports/graphify-rff-embedding-backfill-v1.json` is a
+read-only `DRY_RUN` (`apply: false`, `signatureOnly: true`, `selected: 4`,
+`written: 0`) generated on 2026-08-24. It exposes the unresolved dimension
+contract: `error_embedding` is `vector(384)` while `signature_embedding` is
+`halfvec(768)`. The current receipt does not itself report
+`BLOCKED_DIMENSION_CONTRACT`; therefore classify this lane as
+`DRY_RUN / DIMENSION_CONTRACT_UNPROVEN`, not as an executed blocked apply.
+No rows or projections were written. The RFF contract must still be reconciled
+before `latent_128` can be promoted after fan-out. A separate legacy Phase 1
+dry-run reached Ollama and generated a 256-row sample, but its source still
+targets the legacy 384-dimensional schema; this is execution evidence, not a
+successful write or 768 migration.
+
+### Evidence review correction (2026-08-24)
+
+The readiness percentages above remain planning estimates, not measured
+production coverage. Current receipts tighten their interpretation:
+
+- Canonical `semantic_768` coverage is `576/52,417`, so the 85% authority
+  estimate describes contract/infrastructure readiness, not populated rows.
+- The prefill chain is read-only `PASS` at `readinessPercent: 70`; symbol
+  promotion remains zero-write and the cache namespace proof is `FAIL` with
+  only 3/5 required namespaces ready.
+- Valkey currently carries 66 optional centroid keys and 51 ACE keys, but the
+  SOM namespace is empty; this is projection presence, not end-to-end routing
+  proof.
+- The 512-to-96 shortlist remains a nomination receipt until exact
+  `semantic_768` rerank plus labeled Recall/NDCG evidence is attached.
 
 Latest read-only readiness proof: `node scripts/atlas/autoencoder-dataset-readiness.mjs --dry-run --analyze`
 completed successfully. It found identity coverage at 100%, topology coverage
@@ -66,7 +90,7 @@ parallel implementations. Status uses the GAN validation vocabulary:
 | Surface | Existing owner | State | Next proof |
 |---|---|---|---|
 | Candidate feature matrix | `sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts` | CREATED | join to a frozen RRF candidate snapshot |
-| Low-rank nomination | `python/atlas_compute/low_rank.py` | CREATED + unit-proven | live `SAMPLE_CANDIDATES` receipt with 512 -> 96 ordinals |
+| Low-rank nomination | `python/atlas_compute/low_rank.py`, `scripts/atlas/candidate-shortlist-receipt-v1.mjs` | WIRED + read-only receipt | labeled relevance/RRF evaluation and exact quality promotion |
 | Nested encoder | `python/atlas_compute/latent_autoencoder.py` | CREATED + unit-proven | dataset training receipt and retrieval-preservation evaluation |
 | Encoder dataset readiness | `scripts/atlas/autoencoder-dataset-readiness.mjs` | WIRED as CLI | dry-run/export receipt with revision and memory bounds |
 | Exact GPU oracle | `python/atlas_rapids_sidecar.py`, `scripts/gpu/cuvs-bruteforce-smoke.py` | RUNTIME-PROVEN on bounded fixtures | 20K semantic_768 recall and memory benchmark |
@@ -130,6 +154,53 @@ valid empty extraction, not evidence that the AST lane is complete.
   or cuGraph algorithm failure.
 
 ## P0 — NLP pre-fill
+
+### Structural index integration review (2026-08-24)
+
+The live ownership audit found `atlas_ast_nodes` populated with 11,067 structural rows,
+`atlas_symbol_registry` populated with 10,220 rows (10,170 active), and
+`atlas_observation_feature_rows` populated with 1,808 revisioned feature rows. The missing
+link is revision-specific symbol materialization: `atlas_symbol_versions` exists but has zero
+rows, and no `atlas_callable_search` projection exists. Do not create another structural
+registry. Keep `atlas_ast_nodes` as structural identity, `atlas_symbol_registry` as the
+cross-revision stable registry, `atlas_symbol_versions` as the source-revision callable
+record, and `atlas_packet_features.ast_symbols` / observation rows as denormalized retrieval
+features.
+
+The additive schema tranche is now applied through
+`sveltekit-frontend/drizzle/manual/20260824_atlas_callable_search_v1.sql`: callable metadata
+columns exist on `atlas_symbol_versions`, `atlas_callable_search` exists with its indexed FTS
+projection, and the idempotent backfill inserted zero rows because the source version table is
+empty. The materialization and retrieval proof tasks remain open.
+
+The first bounded apply populated 100 `atlas_symbol_versions` rows and 100 callable-search
+rows; the immediate idempotent rerun inserted 0 additional rows. All 100 rows are active-
+registry joined and FTS-populated, while `tree_node_id` remains unresolved for all 100 because
+the current Graphify `source_ref`/upstream-node keys do not match `atlas_ast_nodes` keys.
+
+- [ ] AST-INDEX-01 Materialize declaration-like AST nominations into
+  `atlas_symbol_versions` only when an active `atlas_symbol_registry` match exists; preserve
+  `tree_node_id`, `symbol_version_id`, `source_revision`, byte span, declaration hash,
+  normalized signature, and producer revision. Dry-run and idempotency receipt required.
+- [ ] AST-INDEX-02 Add a rebuildable `atlas_callable_search` projection from
+  `atlas_symbol_versions` + `atlas_ast_nodes` + packet identity. Include qualified name,
+  node kind, path, signature, parameter names/types, returns, imports/calls, revisions, and
+  `search_vector`. This is a retrieval projection, not a new identity owner.
+- [ ] AST-INDEX-03 Add read-only indexed lookup parity: PostgreSQL exact/B-tree, GIN FTS,
+  and optional `pg_trgm` identifier lookup versus `rg` scan and AST reparse. Record p50/p95,
+  candidate identity overlap, and source-span hydration correctness.
+- [ ] AST-INDEX-04 Add a Go retrieval adapter receipt that returns
+  `symbol_version_id -> tree_node_id -> packet_key -> candidate_ordinal`; fail closed when
+  any join revision or ordinal-map checksum is missing.
+- [x] AST-INDEX-05 Keep domain, taxonomy, ontology tuples, PageRank/PPR, SOM, and semantic vectors as separate derived feature/projection lanes.
+- [x] AST-ENRICH-01 Add additive symbol-level domain/use enrichment to the rebuildable callable projection.
+- [x] AST-ENRICH-02 Add JSONB evidence metadata, taxonomy fields, parent container, and inferred-use indexes without destructive migration.
+- [x] AST-ENRICH-03 Run the read-only enrichment dry run against the AST-grep domain artifact.
+- [x] AST-ENRICH-04 Apply a bounded enrichment batch and verify idempotent projection updates.
+- [ ] AST-ENRICH-05 Aggregate enriched callable facts into packet-level observation feature rows.
+- [x] AST-ENRICH-06 Prove `upstream_chunk_id` to packet-key provenance before ORF aggregation; 100/100 bounded rows matched `atlas_packets.packet_key` read-only.
+- [x] AST-ENRICH-07 Reconcile the main `@deeds/parent-atlas` observation repository to the active packet-key ORF contract; remove candidate/vector writes and keep semantic search owned by the canonical vector lane.
+- [x] AST-ORF-01 Materialize the reviewed 174-row packet-level ORF plan with bounded additive upserts; verify zero validation errors, stable row count, and complete input digests.
 
 - [x] NE-05 Read daily Graphify indexed files using canonical identity joins.
   Implemented as the read-only Graphify file export and AST entity prefill
@@ -263,6 +334,11 @@ valid empty extraction, not evidence that the AST lane is complete.
 - [x] NE-06D Add read-only registry resolution at
   `scripts/atlas/resolve-ast-symbol-nominations-dry-run.mjs`; it checks active
   canonical keys and aliases and emits resolution evidence without promotion.
+  The refreshed live dry run resolved `10,170/42,398` nominations against
+  `10,170` active registry keys, with `0` ambiguous results and `32,228`
+  unresolved variable nominations; the resolver now uses a bounded Docker
+  output buffer so large registry exports fail neither by truncation nor by
+  promoting data.
 - [x] NE-06E Add a bounded promotion-review report at
   `scripts/atlas/review-ast-symbol-promotion-plan.mjs`; duplicate declarations
   remain review-required and no canonical identity is inferred from names.
@@ -371,18 +447,22 @@ valid empty extraction, not evidence that the AST lane is complete.
   recall gate passes.
 - [ ] NE-23A Enforce `semantic_768 query -> RFF/Qdrant fan-out -> latent_128`
   candidate encoding; reject pre-fan-out latent writes.
-- [ ] NE-23B Add a query/candidate representation compatibility gate covering
+- [x] NE-23B Add a query/candidate representation compatibility gate covering
   model revision, `QUERY`/`DOCUMENT` encoder roles, representation family,
-  output dimension, normalization, and metric.
-- [ ] NE-23C Require MRL query/candidate pairs to use the same EmbeddingGemma
+  output dimension, normalization, and metric. CandidateOrdinal maps now carry
+  additive per-candidate representation bindings without changing identity.
+- [x] NE-23C Require MRL query/candidate pairs to use the same EmbeddingGemma
   revision, task roles, MRL prefix dimension, renormalization, and metric;
   require learned latent pairs to use the same learned projection revision and
-  normalization.
-- [ ] NE-23D Add a bounded `SAMPLE_CANDIDATES` proof using the existing
+  normalization. The binding contract covers native MRL 512/256/128 and
+  challenger latent 128/64; live parity and promotion remain open.
+- [x] NE-23D Add a bounded `SAMPLE_CANDIDATES` proof using the existing
   CandidateFeatureMatrix and a deterministic low-rank row projection. The
   receipt must preserve CandidateOrdinals, record rank/target count/device,
-  and explicitly identify the policy as Tang-inspired rather than Tang's
-  algorithm.
+  explicitly identify the policy as Tang-inspired rather than Tang's
+  algorithm, and retain the sorted packet-key ordinal-map checksum. Receipt:
+  `docs/reports/atlas-candidate-shortlist-receipt-v1.json`. This is executed
+  and read-only; it does not prove exact-rerank quality.
 - [ ] NE-23E Compare the low-rank nomination against exact ranking on the same
   frozen candidate snapshot; record Recall@K, NDCG/MRR, top-K overlap, latency,
   and CPU/RTX memory telemetry before any live executor adoption.
@@ -446,6 +526,10 @@ valid empty extraction, not evidence that the AST lane is complete.
   MRL512, 0.60/0.7452 for MRL256, and 0.30/0.3793 for MRL128. These results
   are query/snapshot diagnostics, not a promotion receipt; PostgreSQL joins
   were unavailable, so AST/lexical/graph fusion was not included.
+  The bounded daily alignment gate now passes through the Docker-network
+  Qdrant fallback and records `DOCKER_INTERNAL_HTTP`; the host mapping remains
+  an unreliable diagnostic transport. This proves read-only transport and
+  point-ID alignment only, not projection writes or MRL promotion.
 
 ## P1 — ACE and cache projection
 
@@ -515,6 +599,280 @@ valid empty extraction, not evidence that the AST lane is complete.
 - [ ] NE-34 Produce a promotion receipt or an explicit blocked receipt.
 - [ ] NE-35 Adopt the pipeline in the live agentic workflow only after all P0/P1
   gates pass.
+- [x] NE-35A Add the read-only main validation gate at
+  `scripts/atlas/validate-neural-prefill-pipeline.mjs`. It checks embedding
+  geometry, low-rank policy, metadata/index ownership, QLoRA write boundaries,
+  packet aggregation, and the daily NLP prefill receipt. A failing or missing
+  daily receipt is explicitly degraded/fallback state and does not authorize a
+  canonical mutation. `run-graphify-daily-startup.mjs` now invokes this lane
+  only when `GRAPHIFY_NEURAL_PREFILL=1`; any failure logs degraded state and
+  continues the existing Graphify chain. Daily adoption is still opt-in.
+- [x] NE-35B Add a read-only preflight command that runs the NLP/AST dry chain
+  and validator without invoking the mutating daily Graphify chain:
+  `npm run atlas:graphify:neural-prefill:preflight`.
+- [x] NE-35C Add the shortlist as a separate opt-in read-only daily lane via
+  `GRAPHIFY_NEURAL_PREFILL_SHORTLIST=1`. It emits child receipt checksums and
+  fail-opens to the unchanged Graphify chain; it does not authorize writes or
+  make the shortlist an authority.
+- [x] NE-35D (2026-08-24) Re-verified NE-35A/B/C are real and correctly
+  isolated, then fixed one adjacent Windows launcher bug found while
+  checking: `scripts/atlas/graphify-trigger-downstream-pipeline.mjs`'s
+  TurboVec consolidation stage spawned `npx.cmd tsx <script>` with
+  `shell: true` — Node documents that a `.cmd` file cannot be launched
+  directly via `spawn`/`execFile`/`execFileSync` without a shell on
+  Windows, which was the wrong executable boundary for a JS CLI. Replaced
+  with `spawn(process.execPath, [tsxCliPath, script, ...], {shell: false})`
+  — `tsx` ships a real ESM entry (`node_modules/tsx/dist/cli.mjs`) that
+  `node` runs directly, cross-platform, no shell involved (frontend-local
+  install preferred, repo-root install as fallback). `node --check` passes;
+  smoke-verified `node node_modules/tsx/dist/cli.mjs --version` resolves
+  and runs without a shell. This is a different file from the one NE-35A/B/C
+  describe (`run-graphify-daily-startup.mjs`, which already used
+  `process.execPath`-based invocation correctly) — no duplication, this was
+  a genuinely separate latent bug in a sibling orchestrator script.
+  **Correction to avoid future duplicate work**: NE-35A/B/C's daily wiring
+  already fully implements what a later request (2026-08-24, phrased as
+  "wire it in... DAILY-01 through DAILY-08") re-described from scratch —
+  opt-in via `GRAPHIFY_NEURAL_PREFILL[_SHORTLIST][_ONLY]`, read-only NLP/AST
+  dry chain + validator, fail-open with `DEGRADED` (not `FAIL`) status,
+  `fallbackPolicy: 'CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT'`, and a daily
+  receipt (`docs/reports/atlas-graphify-neural-prefill-daily-v1.json`)
+  embedding child receipt checksums
+  (`writeNeuralPrefillDailyReceipt` in `run-graphify-daily-startup.mjs`).
+  Confirmed by direct code read the identity/provenance step
+  (`atlas:phase109b:workflow:dry`, line ~124) runs BEFORE the neural-prefill
+  block and is NOT wrapped in try/catch — so an identity/provenance failure
+  there aborts the whole daily run through the outer catch block, and can
+  never be misreported as neural `DEGRADED`, matching the requested
+  "identity failure ≠ neural degradation" rule exactly, without any change
+  needed. What genuinely remains open (operational, not code): running
+  several live daily cycles with `GRAPHIFY_NEURAL_PREFILL=1` and canonical
+  writes still `false`, then a deliberate default-on decision — neither is
+  something a single session can produce; both require real elapsed days of
+ cron/startup runs.
+
+### Daily ledger correction: DAILY-01 through DAILY-08
+
+`DAILY-01` through `DAILY-08` are implementation-complete and must not be
+recreated as new implementation tasks. Their remaining state is operational:
+multi-day replay with canonical writes disabled, receipt review, and an
+explicit default-on/adoption decision. The preserved runtime boundary is:
+
+```text
+identity/provenance failure -> abort daily run
+neural enrichment failure   -> DEGRADED
+                               CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT
+```
+
+Current classification: `LOCAL_CODE_VERIFIED / OPERATIONAL_ADOPTION_NOT_PROVEN`.
+
+## Operator Lookup Checklist
+
+These are the remaining facts needed to move from contract readiness to live
+proof. Run only the commands marked read-only and paste the resulting summary
+or report path back for the next pass.
+
+- [ ] G-01 Dependency health: confirm Postgres, Qdrant REST/gRPC, Valkey, and
+  EmbeddingGemma are reachable. Required result: endpoint, version, and
+  degraded reason if unavailable; no writes.
+- [ ] G-02 Canonical symbol promotion: run
+  `npm run atlas:features:ast-symbols:review:dry` and report declaration-like
+  nomination counts, registry matches, ambiguous keys, and unresolved keys.
+  Do not run a promotion/apply command.
+- [ ] G-03 Feature-row ownership: run the observation feature migration audit
+  and report the single active table/schema, primary key, vector dimensions,
+  and conflicting migrations. Do not apply a migration in this step.
+- [ ] G-04 Canonical embedding coverage: report populated
+  `content_embedding_768`, Qdrant `codebase_chunks_768`, and source-revision
+  overlap from the existing read-only ranking diagnostic.
+- [ ] G-05 Retrieval benchmark inputs: identify one frozen query set,
+  CandidateOrdinal map revision, ordinal-map checksum, and compatible
+  query/candidate representation descriptors for `semantic_768`,
+  `semantic_mrl_512`, `semantic_mrl_256`, and `semantic_mrl_128`. Each
+  descriptor MUST bind model/encoder revision, role, dimension, normalization,
+  and metric. `latent_128`/`latent_64` remain separate representation families.
+  No new vector-store writes.
+- [ ] G-06 Graph feature readiness: report graph snapshot revision and
+  ordinal-map checksum separately from PageRank/PPR rank revisions, Leiden
+  community revision, `topology_4d` basis revision, and SOM prototype and
+  assignment revisions. Missing PageRank, topology, or SOM values are
+  independently blocked and must not invalidate canonical graph identity.
+- [ ] G-07 Memory/runtime budget: report WSL2 GPU free VRAM, host RAM, CPU
+  worker limit, and whether the runtime silently falls back from CUDA.
+- [ ] G-08 Acceptance receipt: after G-01 through G-07, run the bounded
+  preflight and attach `docs/reports/atlas-neural-prefill-validation-v1.json`.
+
+### Read-only preflight evidence (2026-08-24)
+
+The bounded preflight has now been executed successfully, but this does not
+close G-01 through G-07 or authorize canonical promotion:
+
+- `atlas.graphify-nlp-prefill-dry-receipt.v1`: `PASS`, `readOnly: true`,
+  `databaseWrites: false`, `qdrantWrites: false`, `valkeyWrites: false`, and
+  `canonicalPromotion: false`.
+- The 1,000-packet Graphify sample produced 4,365 AST-grep candidates;
+  4,365/4,365 received read-only identity enrichment.
+- Domain classification covered 3,535 candidates; 830 used the declared
+  fallback classifier path.
+- Observation aggregation produced 174 packet-level projection plans.
+- `atlas.neural-prefill-validation-receipt.v1` reports `readinessPercent: 70`.
+  Its low-rank check remains degraded because no labeled relevance proof is
+  present; the semantic_768 corpus benchmark and live service health gates
+  remain open.
+- The source-index receipt still reports 85 unresolved file paths, zero symbol
+  registry resolutions, and zero semantic_768 coverage in this bounded sample.
+
+Status: `READ_ONLY_PREFILL_PROVEN / PROMOTION_AND_ADOPTION_OPEN`. Do not mark
+G-08 complete until the prerequisite health, registry, feature-row, embedding,
+graph, and runtime-budget receipts are attached and reviewed.
+
+The subsequent symbol-promotion review is also read-only:
+
+- `42,398` nominations were inspected across TypeScript, JavaScript, and MJS.
+- `10,170` declaration-like nominations are `PROMOTION_CANDIDATE` scope;
+  `32,228` variables remain `REVIEW_REQUIRED_SCOPE_EVIDENCE`.
+- There are `3,080` duplicate source/kind/name groups requiring review.
+- `canonical_symbols_created: 0`, `canonical_writes: false`, and
+  `database_writes: false`.
+
+This satisfies the evidence portion of G-02, but not canonical promotion:
+registry-backed review and an explicit bounded apply decision remain required.
+
+The feature-row ownership audit is now also complete and read-only:
+
+- Active repository owner: `20260819_atlas_observation_feature_rows.sql`,
+  keyed by `packet_key + feature_revision` and aligned with Drizzle, the
+  materializer, and the spectral exporter.
+- The competing `candidate_id + workspace_revision` migration remains an
+  incompatible candidate and is not the active owner.
+- `semantic_768` is intentionally outside the ORF exact/filter table; it stays
+  in the canonical vector lane.
+- Audit status: `PASS_ACTIVE_ORF_REPOSITORY_ALIGNED`; `writes: false`.
+
+This closes the ownership decision for G-03, but does not apply or reconcile
+the competing migration.
+
+## Alignment Addendum: Domain to GPU Fabric
+
+- [ ] G-09 Validate `.okf` documents at two levels: `OKF_V0_2_CONFORMANCE`
+  against the upstream OKF specification, and
+  `ATLAS_OKF_DOMAIN_PROFILE_V1` for Atlas-specific domain ID, taxonomy
+  revision, declared parent/child links, provenance/evidence references,
+  lifecycle, and trust metadata where required by Atlas policy. Do not report
+  an Atlas-profile violation as an OKF-v0.2 violation.
+- [ ] G-10 Emit a read-only ontology tuple receipt distinguishing grounded,
+  unresolved, ambiguous, and rejected tuples. Ontology IDs remain references,
+  never numeric topology coordinates.
+- [ ] G-11 Define the Engram/Valkey boundary: document the actual Valkey
+  namespace, TTL, revision envelope, one-to-many metadata shape, and no-write
+  fallback. Engram provides deterministic memory coordinates; Valkey is a hot
+  cache projection only; Postgres remains canonical truth. Valkey must not be
+  described as Engram authority.
+- [ ] G-12 Prove transport ownership: simdjson for JSON/NDJSON only, protobuf/
+  gRPC for typed tensors and receipts, and Arrow/typed arrays for bounded
+  numeric matrices. Record native/fallback parser counts.
+- [ ] G-13 Freeze the feature-map contract around CandidateOrdinal,
+  featureRevision, sourceRevision, matrix shape, dtype, and ordinal checksum.
+- [ ] G-14 Produce the live low-rank receipt: CandidateFeatureMatrix input,
+  512 candidates to 96 ordinals, exact semantic_768 rerank, and Recall/NDCG.
+- [ ] G-15 Produce a revisioned TopologyFeature4/SOM receipt with prototype
+  checksum, assignment checksum, and graph/ontology feature revisions.
+- [ ] G-16 Produce a CPU/RTX alignment receipt with dtype/shape conventions,
+  free VRAM, host RAM, worker cap, CUDA fallback state, and output checksum.
+- [ ] G-17 Resolve the meaning and ownership of “tricubic 7x3”, “12/24”,
+  cuTile, and SIMT cache-tile parameters from a source or benchmark before
+  adding them to `.okf` or runtime schemas.
+- [ ] G-18 Correctly model protobuf transport: varint is 7 payload bits plus a
+  continuation bit; protobuf tags use a separate three-bit wire type. Keep
+  allow/stop as an explicit bool or named packed mask, not an overloaded bit.
+- [ ] G-19 Separate control serialization from numeric transport: JSON/
+  MessagePack for descriptors and receipts, simdjson for JSON/NDJSON parsing,
+  protobuf/gRPC for typed envelopes, and Arrow/typed arrays or protobuf bytes
+  for bounded feature matrices.
+- [ ] G-20 Keep embedding L2 normalization separate from Tang-inspired
+  `l2`-sampling. The latter requires row-norm/entry-query sampling structures
+  and remains `INSPIRED_ONLY` until a CandidateOrdinal shortlist receipt is
+  proven.
+- [ ] G-21 Emit one boundary receipt across Postgres -> AST/NLP -> feature map
+  -> gRPC -> NetworkX/cuGraph -> PyTorch/SOM/low-rank -> ACE/Engram, preserving
+  packet identity, revisions, checksums, and fallback state at every hop.
+- [x] G-22 Run the read-only gRPC-to-Postgres coverage audit. Core `Packet`,
+  `TaskSemanticPacket`, `ConceptRecord`, and ACP queue contracts pass. Optional
+  `RouteRuntimePacket` coverage remains incomplete because its expected columns
+  and named indexes are absent; do not apply that optional migration implicitly.
+- [ ] G-23 Freeze storage representations: `semantic_768` canonical
+  `vector(768)`, optional `halfvec(768)` projection, binary `bit(768)` filter
+  projection, and 4-bit/nibble TurboVec codes only with codebook/scale metadata.
+- [ ] G-24 Verify PostgreSQL 18 AIO and bitmap behavior with `EXPLAIN (ANALYZE,
+  BUFFERS)` on read-only queries. AIO is a scan optimization; it is not an
+  8KB vector or bitmap schema limit.
+- [ ] G-25 Audit Drizzle declarations against explicit pgvector expression
+  indexes and GIN/bitmap filters. Do not assume a Drizzle model proves a live
+  PostgreSQL index.
+- [ ] G-26 Prove Node N-API/LibTorch row-major dtype/shape parity for FP32,
+  halfvec-derived inputs, and any interpolation challenger. Interpolation is
+  not allowed to change canonical semantic_768 without a Recall/NDCG receipt.
+- [ ] G-27 Freeze one-to-many feature materialization as a revisioned CSR-like
+  contract: `CandidateOrdinal`, `row_offsets`, `feature_ids`, typed values,
+  evidence refs, and source/feature/ontology revisions. Do not use duplicate
+  JSON/protobuf map keys for repeated feature values.
+- [ ] G-28 Emit a read-only cross-layer descriptor receipt proving the join of
+  source, AST/NLP evidence, domain distribution, taxonomy path, ontology
+  tuples, feature map, `TopologyFeature4`, ordinal map, and fallback state.
+- [ ] G-29 Keep tricubic/interpolation parameters out of topology identity;
+  document `4x4x4=64` coefficient semantics and quarantine unresolved `7x3`
+  and `12/24` labels until an operator benchmark exists.
+- [ ] G-30 Audit Engram lookup/residency against Valkey and Postgres ownership;
+  record deterministic key derivation, TTL/epoch, revision envelope, and
+  read-only fallback without treating Engram as ontology authority.
+- [ ] G-31 Add a bounded tensor materialization receipt for PyTorch CPU/RTX,
+  cuTile/SIMT implementation choice, row-major strides, dtype, padding,
+  worker cap, VRAM/RAM headroom, and gRPC descriptor checksum.
+- [ ] G-32 Test the dimension mapping explicitly: logical `TopologyFeature4`
+  remains four features and the baseline block test is `4x4`; a proposed
+  `4x6` RTX/cuTile/SIMT layout is physical tiling only. Record logical shape,
+  physical tile shape, padding, strides, and CPU/GPU output checksum together.
+- [ ] G-33 Keep `7x3` and `12/24` as unresolved feature-group/interpolation
+  labels until an operator benchmark defines them. They must not alter
+  cuGraph, cuVS, CAGRA, or canonical feature-matrix dimensions.
+- [x] G-34 Upgrade the Python TurboVec sidecar contract to pinned
+  `turbovec==1.0.0`, prefer `IdMapIndex`, and bind its external IDs to
+  `CandidateOrdinal` when supplied. Report whether native allowlist support is
+  available; retain positional compatibility fallback for legacy string IDs.
+- [ ] G-35 Prove TurboVec 1.0 persisted `.tv/.tvim` compatibility and compare
+  native allowlist recall against the full `semantic_768` oracle before any
+  shared index promotion. The read-only audit found
+  `sveltekit-frontend/.cache/turbovec/evidence_text.tvim` is version 1 and
+  cannot be loaded by TurboVec 1.0; rebuild from source vectors is required,
+  but no cache deletion or rebuild was performed.
+- [x] G-35A Add a read-only TurboVec v1 rebuild plan that identifies the
+  maintained Qdrant `codebase_chunks_768`/`content`/768-dim source builder,
+  records source-service health, preserves the legacy cache, and emits the
+  bounded dry-run/apply commands. The plan does not rebuild or overwrite the
+  version-1 `.tvim` artifact.
+- [x] G-35B Run the bounded source dry run: Qdrant was reachable, 1,000
+  `codebase_chunks_768` vectors were read, all were 768-dimensional, and zero
+  vectors were rejected. This proves source readiness only; it does not prove
+  CandidateOrdinal mapping, persisted v1 compatibility, full-corpus recall, or
+  promotion.
+- [ ] G-35C Join Qdrant points to the canonical CandidateOrdinal snapshot before
+  any TurboVec rebuild. The read-only payload census found `source_ref` on
+  1,000/1,000 sampled points but no `candidateOrdinal` field, so Qdrant point
+  IDs must remain projection IDs and cannot be promoted as ordinals. The
+  additive bridge is now wired: ordinal maps carry `sourceRef`, and the
+  TurboVec builder accepts `--ordinal-map=...` and resolves by `source_ref` or
+  `packet_key`. A bounded read-only run joined `1/1000` Qdrant rows, proving
+  the lookup path but leaving corpus-slice/revision alignment blocked; live
+  coverage and full-corpus recall remain unproven. The dedicated audit now
+  records `source_ref` on `1000/1000` Qdrant rows, `packet_key` on `134/1000`,
+  `source_ref` matches on `1/1000`, `packet_key` matches on `1/1000`, and zero
+  identity conflicts. This indicates sample population/revision mismatch,
+  not an ambiguous join.
+
+The safe first command is `npm run atlas:graphify:neural-prefill:preflight`.
+The similarly named `npm run atlas:graphify:neural-prefill:daily` remains a
+full startup command and may run mutating Graphify stages; it is not a smoke
+test.
 
 ## P3 — Tournament training and quantized deployment
 
@@ -559,6 +917,57 @@ automatic model replacement.
   `npm run docs:okf:dev:index`; retain raw markdown as evidence and keep
   symbol JSONL/Arrow/IPC outputs rebuildable.
 
+## P4 — ACE/RLM/KAG/DAG/HyperGraphRAG Live Alignment
+
+These tasks close the boundary between the proven bounded contracts and the
+live Graphify retrieval workflow. They do not authorize autonomous writes,
+online self-training, or projection while identity/revision gates are open.
+
+- [ ] NE-46 Bind `runHypergraphFusionFacade` to the canonical
+  `FeatureIntelligenceRepository` and a frozen Graphify source snapshot;
+  emit repository, source, and CandidateOrdinal checksums.
+- [ ] NE-47 Populate ACE lineage with relationship, graph, semantic-model,
+  semantic-projection, and feature-matrix revisions; fail closed when a
+  required revision is absent or incompatible.
+- [ ] NE-48 Wire `buildHyperRagAceMetadataPatch` into the existing canonical
+  packet transaction after `AcePacketV2` validation; preserve the canonical
+  envelope and record the versioned metadata namespace.
+- [ ] NE-49 Add a bounded HyperGraphRAG/KAG/DAG replay receipt containing
+  input candidates, canonical accepts/rejects, hop/fanout limits, expanded and
+  pruned counts, relationship/evidence counts, and retrieve-more/synthesize
+  decision.
+- [ ] NE-50 Record the ACE top-K/payload cap as policy data rather than an
+  implicit `slice(0, 20)` and prove deterministic reruns on the same snapshot.
+- [ ] NE-51 Choose one durable RLM trace owner and wire observable request,
+  revision, selected-packet, outcome, and provenance fields; console logging
+  alone is not a proof. Keep traces out of canonical evidence authority.
+- [ ] NE-52 Connect the bounded SvelteKit RLM recursive engine to the selected
+  orchestrator seam, or explicitly mark the parent-atlas-core orchestrator as
+  a separate deprecated scaffold with a supersedes decision.
+- [ ] NE-53 Replay live Graphify candidates through canonical entity,
+  relationship, evidence, ACE, and RLM adapters; keep Neo4j/Qdrant/Valkey
+  projections read-only until the receipt passes.
+- [ ] NE-54 Add contradiction/stale evidence fixtures and prove that the
+  sufficient-context gate blocks synthesis until the evidence state is
+  resolved or refreshed.
+- [ ] NE-55 Add adaptive entity-to-hyperedge confidence propagation and an
+  ablation against greedy traversal, or retain the current deterministic beam
+  search explicitly as a challenger.
+- [ ] NE-56 Require ACE callers to populate `ContextEvidenceIdentityV2` and
+  reject incomplete identity before exact evidence promotion; legacy discovery
+  candidates may remain `complete: false` but cannot become canonical context.
+- [x] NE-57 Define `RlmEnvironmentV1` around a revisioned context artifact,
+  CandidateOrdinal set, permitted operations, max depth/subcalls/tokens/bytes,
+  and explicit `RLM_PROGRAM_FAILED` failure receipt. True recursive model
+  execution and sandbox enforcement remain separate gates.
+- [ ] NE-58 Prove `ContextManifestV2` determinism using candidate-ordinal,
+  evidence-revision, ordinal-map, retrieval-policy, ACE playbook, model, and
+  prompt-template checksums on the same frozen snapshot.
+- [ ] NE-59 Verify current external contract versions before implementation:
+  OKF v0.2 reader/writer compatibility, MCP 2026-07-28 capability/config
+  behavior, cuTile compute capability/tile constraints, and protobuf map versus
+  repeated-entry semantics. Record the source ledger and migration policy.
+
 ## Acceptance Gates
 
 - [ ] No canonical identity or source data changes during dry-run/training.
@@ -570,3 +979,147 @@ automatic model replacement.
   until NE-31 through NE-38 produce replayable quality evidence.
 - [ ] Quantized GGUF or adapter deployment remains blocked until the exact
   FP32 reference and the quantized challenger pass the same held-out suite.
+
+## P0 — Structural identity bridge (2026-08-24, promoted ahead of latent training)
+
+**Critical-path reordering.** Training a compact encoder now would learn over
+a structurally incomplete/ambiguously-grounded candidate corpus. The new
+priority is `AstObservationV1 → tree_node_id → symbol_version_id →
+stable_symbol_id → packet_key → CandidateOrdinal` (P0), then indexed
+structural retrieval (`atlas_callable_search`, P1), before any derived
+representation (`semantic_768`/bitset-Jaccard/latent_128/latent_64`, P2).
+`latent_128` is explicitly no longer the immediate blocker.
+
+- [x] NE-ID-01/02 (verified, not built this pass) `atlas_symbol_registry`
+  (10,170 active rows, `promote-ast-symbols-to-registry.mjs`, Session 200)
+  already freezes `stable_symbol_id` as an observation-derived identity, and
+  `atlas_symbol_versions` (schema already has `symbol_version_id`,
+  `stable_symbol_id`, `source_ref`, `source_revision`, `byte_start`/`byte_end`,
+  `packet_key`, `candidate_ordinal`, `parameter_names`/`types`/`return_types`/
+  `imports`/`calls` — i.e. the callable-search shape NE-CALL wants already
+  exists as columns) has an FK to it. Both existed before this session.
+- [x] NE-ID-03/04 typed failure classification added + real root cause found.
+  `materialize-ast-symbol-versions.mjs`'s `atlas_ast_nodes` join previously
+  used `n.source_ref_key = v.source_ref` — but `source_ref_key` is a
+  **composite key** for declaration-level nodes
+  (`"<path>#<kind>:<qualifiedName>"`, e.g.
+  `"src/lib/ai/base64-fp32-quantizer.ts#function:quantizeGemmaLegalOutput"`),
+  not a bare path, confirmed via live sample rows. The old join silently
+  matched **0 of 100** existing `atlas_callable_search` rows
+  (`tree_node_id` NULL on all 100, no error — a LEFT JOIN miss is silent by
+  design) — this was previously undocumented. Fixed the join to reconstruct
+  the real composite key from `source_ref + callable_metadata->>'kind' +
+  qualified_name`, and replaced the silent LEFT JOIN with an explicit
+  candidate-count classification: 0 matches → `UNRESOLVED`, 1 → `RESOLVED`
+  (sets `tree_node_id`), >1 → `AMBIGUOUS` (does not guess; `tree_node_id`
+  stays NULL). Outcome is written into
+  `atlas_callable_search.callable_metadata.identity_bridge_outcome` so it's
+  queryable, not just logged. **Fix logic validated correct**: manually
+  confirmed `quantizeGemmaLegalOutput` resolves to exactly 1
+  `atlas_ast_nodes` row via the reconstructed key.
+- [x] NE-ID-05 (real number obtained; result is BLOCKED, not zero-ambiguous)
+  Re-ran `materialize-ast-symbol-versions.mjs --apply --limit=100` (the same
+  100-row fixture already in the table) with the fix: **result is still
+  100 UNRESOLVED, 0 RESOLVED, 0 AMBIGUOUS** — not because the join logic is
+  wrong (see NE-ID-03/04's validation above), but because of a deeper,
+  previously-unrecorded finding: **the two tables draw from disjoint
+  source-ref namespaces.** `atlas_symbol_versions`/`atlas_symbol_registry`
+  are populated overwhelmingly from `packages/` and `scripts/`-rooted
+  source refs (only 50 of 10,170 active registry rows even contain `src/`
+  in their `canonical_key`), while `atlas_ast_nodes` (11,067 rows) is
+  populated exclusively from `src/`-rooted refs (0 rows outside `src/`,
+  confirmed via `split_part(source_ref_key,'/',1)` distinct check). This
+  bounded 100-row fixture happened to sample entirely from the
+  non-overlapping side. Zero ambiguous joins is trivially true here (0
+  candidates ≠ 0 ambiguity) but the real gate — resolvable — is far from
+  proven at scale.
+- [x] NE-ID-06 (option (b) attempted; real number obtained; deeper gap found)
+  Correcting the previous "only 50 of 10,170 registry rows contain `src/`"
+  reading — that was a `LIKE '%src/%'` check against `canonical_key`, which
+  is the wrong field to check. Re-derived from the actual nominations/
+  resolution source directly: **10,047 of 10,170** canonical declaration
+  candidates (99%) are genuinely `src/`-rooted; the first 100 in file order
+  happened to be 100% `packages/`/`scripts/` because the underlying export
+  is alphabetically ordered by directory (`packages` < `scripts` < `src`) —
+  the first `src/`-rooted candidate is at index 123. Re-ran
+  `materialize-ast-symbol-versions.mjs --apply --limit=200` (the next 100
+  rows past the already-materialized 100, landing well past index 123):
+  **3 RESOLVED, 197 UNRESOLVED, 0 AMBIGUOUS.** All 3 resolved rows are real
+  `src/lib/ai/base64-fp32-quantizer.ts` symbols (matches the earlier manual
+  validation). Investigated the UNRESOLVED `src/`-rooted rows directly:
+  `src/app.d.ts`, `src/ambient-legacy.d.ts` (ambient declaration files —
+  `atlas_ast_nodes` has zero rows for either), and `src/auth-store.svelte.ts`
+  (zero rows for this top-level file too) — none of these files exist in
+  `atlas_ast_nodes` at all. `atlas_ast_nodes` covers only **2,196 distinct
+  files total**, and every `source_ref_key` found there falls under
+  `src/routes/` or `src/lib/` specifically — top-level `src/*.ts`/`*.d.ts`
+  files (outside both subtrees) are entirely unindexed. **Real conclusion**:
+  this is not a join-format bug (already fixed, already validated correct)
+  and not a `packages/`-vs-`src/` split (that assumption was wrong) — it is
+  an `atlas_ast_nodes` **coverage gap** even within `src/`: its own AST
+  extraction pass never ran over `src/routes`/`src/lib`'s siblings or
+  top-level files. Fixing this requires re-running whatever produced
+  `atlas_ast_nodes`.
+- [ ] NE-ID-07 (correction — the forward path proposed in NE-ID-06's note
+  was wrong, checked before acting on it) Went looking for that populator.
+  `run-graphify-daily-startup.mjs`'s `GRAPHIFY_NATIVE_STRUCTURAL` lane
+  (`sveltekit-frontend/scripts/atlas/native-structural-materializer.mts`) is
+  live-healthy (`docker ps`: `miniforge-nlp-sidecar` up 5h; `curl
+  127.0.0.1:8095/health`: `treesitterChunker.available=true,
+  version=4.0.0, importVerified=true`) and does call the 8095 sidecar
+  internally — but confirmed by reading the script and its two direct
+  imports (`GraphifyStructuralMaterializer`,
+  `graphify-structural-intelligence-adapter.ts`) that **neither writes to
+  `atlas_ast_nodes` at all** — zero occurrences of the table name in either
+  file. That lane writes to `atlas_symbol_registry` / the evidence ledger /
+  evidence entities, a related but distinct pipeline, and is separately
+  hardcoded `canonical_write_gate: 'BLOCKED_SOURCE_REVISION_AUTHORITY_UNPROVEN'`
+  regardless of `--apply`. **Correcting my own prior turn**: this is not
+  the fix path for NE-ID-06 after all. Extended the search for the actual
+  `atlas_ast_nodes` writer to Rust (`*.rs`, no `crates/` dir found in this
+  repo) and manual SQL (`drizzle/manual/*.sql`, DDL only, no `INSERT`) —
+  still zero hits anywhere in the current working tree. The original
+  11,067-row population source is genuinely not findable via static
+  search from this repo state; most likely a script that was later deleted/
+  archived, or a manual one-off `docker exec psql` seed (both are
+  established patterns elsewhere in this repo's own history per
+  project CLAUDE.md). **Stopping here rather than guessing further** — do
+  not scale bounded symbol-version materialization, and do not attempt to
+  build a new `atlas_ast_nodes` writer speculatively, until an operator
+  either locates the original producer or makes an explicit decision to
+  build a new one.
+- [ ] `atlas_packet_features.ast_symbols` remains explicitly
+  `DENORMALIZED_RETRIEVAL_FEATURE`, never structural authority — unchanged,
+  no action needed this pass.
+
+### Recorded but not attempted this pass (recommendations only)
+
+The rest of a larger reprioritization proposal — P1 indexed structural
+retrieval (NE-CALL-01..06: populate `atlas_callable_search` only from
+bridge-proven rows, B-tree/GIN/FTS/pg_trgm index proof, Recall@K/MRR
+benchmarking against `rg` and query-time reparsing); a structural
+binary-Jaccard lane (NE-JAC-01..08: `FeatureBitOrdinalMapV1` +
+`StructuralBitsetV1` over set-valued facts only — AST kinds/concepts/
+domains/calls/imports, explicitly never `semantic_768`/PageRank/topology/
+latent values — exact Postgres Jaccard oracle before an HNSW
+`bit_jaccard_ops` challenger); a graph projection contract (NE-GRAPH-01..08:
+freeze `GraphSnapshotV2` bound to `CandidateOrdinalMapV1`, split
+`StructuralDiGraphV1` vs `AffinityGraphV1`, NetworkX as CPU parity oracle,
+direct cuGraph as the RTX executor, `nx-cugraph` compatibility-only —
+never as the CPU half of a parity check); connected-component gating before
+spectral clustering (NE-SPEC-01..07: never report a frozen benchmark K as a
+discovered natural K); an explicit `AffinityFusionPolicyV1` (NE-AFF-01..05:
+version and coefficient every affinity family — semantic cosine, ontology
+Jaccard, AST Jaccard, call affinity, hyperrelation affinity — bind its
+checksum into the graph projection checksum, never sum heterogeneous scores
+implicitly); tighter XGBoost/LibTorch/RAPIDS-challenger gates (qid-grouped
+CUDA device receipts with real NDCG@K; `libtorchAbiMode: VERSION_PINNED |
+LIMITED_STABLE_ABI` plus `stableApiMinimumVersion` distinguishing PyTorch
+2.8's *limited* stable ABI from full ABI stability; a separate
+`atlas-rapids-cu13-26.08` challenger environment replaying the same frozen
+fixtures against the proven `26.06` reference, never upgrading it in place)
+— was reviewed against the live repo and judged directionally correct, but
+none of it was implemented this pass. It is a multi-session effort, not a
+documentation gap that can be closed in one addendum; treat this paragraph
+as the pointer back to the original proposal, not as a substitute for
+writing the actual typed contracts when that work is picked up.

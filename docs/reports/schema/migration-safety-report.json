@@ -6,24 +6,24 @@
   "noteCount": 1,
   "findings": [
     {
-      "file": "drizzle\\0115_phase109a_workspace_revision_and_purge_audit.sql",
+      "file": "drizzle\\manual\\20260824_atlas_callable_search_v1.sql",
       "findings": [
         {
           "ruleId": "IF_NOT_EXISTS",
           "level": "NOTE",
           "message": "Idempotent guard (good practice)",
-          "line": 7,
-          "snippet": "ADD COLUMN IF NOT EXISTS workspace_revision TEXT;"
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS packet_key TEXT,"
         },
         {
-          "ruleId": "VALIDATE_CONSTRAINT",
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
           "level": "WARN",
-          "message": "VALIDATE CONSTRAINT scans the full table; do during low-traffic window",
-          "line": 39,
-          "snippet": "VALIDATE CONSTRAINT semantic_signals_workspace_revision_nn;"
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 15,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_symbol_versions_packet_ordinal"
         }
       ]
     }
   ],
-  "generatedAt": "2026-07-29T20:55:29.141Z"
+  "generatedAt": "2026-08-24T19:24:37.928Z"
 }

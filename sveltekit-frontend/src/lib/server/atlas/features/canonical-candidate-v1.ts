@@ -4,6 +4,60 @@ import { z } from 'zod';
 export const CANONICAL_CANDIDATE_SCHEMA = 'atlas.canonical-candidate.v1' as const;
 export const CANDIDATE_ORDINAL_MAP_SCHEMA = 'atlas.candidate-ordinal-map.v1' as const;
 
+const candidateRepresentationId = z.enum([
+  'semantic_768',
+  'semantic_mrl_512',
+  'semantic_mrl_256',
+  'semantic_mrl_128',
+  'latent_128',
+  'latent_64',
+]);
+
+export const candidateRepresentationBindingV1Schema = z.object({
+  representationId: candidateRepresentationId,
+  family: z.enum(['EMBEDDINGGEMMA_MRL', 'LEARNED_LATENT']),
+  dimensions: z.number().int().positive(),
+  modelRevision: z.string().min(1),
+  projectionKind: z.enum(['NONE', 'MRL_PREFIX_TRUNCATION', 'LEARNED_AUTOENCODER']),
+  sourceRepresentationId: candidateRepresentationId.nullable(),
+  projectionRevision: z.string().min(1).nullable(),
+  normalized: z.literal(true),
+  available: z.boolean(),
+  availabilityReason: z.string().min(1).nullable(),
+}).strict().superRefine((binding, ctx) => {
+  const mrlDimensions: Record<string, number> = {
+    semantic_768: 768,
+    semantic_mrl_512: 512,
+    semantic_mrl_256: 256,
+    semantic_mrl_128: 128,
+  };
+  const latentDimensions: Record<string, number> = { latent_128: 128, latent_64: 64 };
+  const expected = mrlDimensions[binding.representationId] ?? latentDimensions[binding.representationId];
+  if (binding.dimensions !== expected) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dimensions'], message: 'REPRESENTATION_DIMENSION_MISMATCH' });
+  }
+  if (binding.family === 'EMBEDDINGGEMMA_MRL') {
+    if (binding.projectionKind !== (binding.representationId === 'semantic_768' ? 'NONE' : 'MRL_PREFIX_TRUNCATION')) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionKind'], message: 'MRL_PROJECTION_KIND_MISMATCH' });
+    }
+    if (binding.sourceRepresentationId !== (binding.representationId === 'semantic_768' ? null : 'semantic_768')) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'MRL_SOURCE_MISMATCH' });
+    }
+  }
+  if (binding.family === 'LEARNED_LATENT') {
+    if (binding.projectionKind !== 'LEARNED_AUTOENCODER' || binding.projectionRevision === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionRevision'], message: 'LEARNED_LATENT_PROJECTION_REVISION_REQUIRED' });
+    }
+    if (binding.sourceRepresentationId !== 'semantic_768') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'LEARNED_LATENT_SOURCE_MUST_BE_SEMANTIC_768' });
+    }
+  }
+  if (!binding.available && binding.availabilityReason === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['availabilityReason'], message: 'UNAVAILABLE_REPRESENTATION_REASON_REQUIRED' });
+  }
+});
+export type CandidateRepresentationBindingV1 = z.infer<typeof candidateRepresentationBindingV1Schema>;
+
 const revision = z.string().min(1);
 const nullableId = z.string().min(1).nullable();
 
@@ -12,6 +66,7 @@ const canonicalCandidateV1BaseSchema = z.object({
   candidateOrdinal: z.number().int().nonnegative(),
   canonicalId: z.string().min(1),
   packetKey: nullableId,
+  sourceRef: nullableId.default(null),
   treeNodeId: nullableId,
   symbolVersionId: nullableId,
   workspaceRevision: revision,
@@ -21,6 +76,7 @@ const canonicalCandidateV1BaseSchema = z.object({
   candidateSnapshotRevision: revision,
   degradedIdentity: z.boolean().default(false),
   evidenceRefs: z.array(z.string().min(1)).default([]),
+  representationBindings: z.array(candidateRepresentationBindingV1Schema).default([]),
 }).strict();
 
 export const canonicalCandidateV1Schema = canonicalCandidateV1BaseSchema.superRefine((candidate, ctx) => {

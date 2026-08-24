@@ -26,6 +26,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import crypto from 'node:crypto';
+import { buildDefaultAtlasMcpSurface } from '@deeds/parent-atlas/core/okf-mcp-surface';
 
 const SERVER_NAME = 'parent-atlas-multicore';
 const SERVER_VERSION = '2.0.0';
@@ -382,6 +383,71 @@ const server = new McpServer({
   name: SERVER_NAME,
   version: SERVER_VERSION,
 });
+
+// ORF-6C: register the .okf resource catalog (packages/parent-atlas's
+// buildDefaultAtlasMcpSurface) as real MCP Resources. The manifest's
+// resource descriptors are metadata only (uri/name/mime_type/source_ref) —
+// this is what actually serves resources/list + resources/read against
+// them, reusing this file's own path-bound + output-truncation helpers so
+// resource reads get the same enforcement as the search_codebase tool.
+const OKF_SURFACE_MANIFEST = buildDefaultAtlasMcpSurface('mcp-multicore-server:orf-6c:v1');
+
+for (const resource of OKF_SURFACE_MANIFEST.resources) {
+  server.registerResource(
+    resource.resource_id,
+    resource.uri,
+    {
+      title: resource.name,
+      description: resource.description,
+      mimeType: resource.mime_type,
+    },
+    async (uri) => {
+      let absolutePath;
+      try {
+        absolutePath = resolveWithinRepository(resource.source_ref);
+      } catch (err) {
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: 'application/json',
+            text: JSON.stringify({ error: 'PATH_OUTSIDE_REPOSITORY', resource_id: resource.resource_id, message: err.message }),
+          }],
+        };
+      }
+
+      try {
+        const raw = await readFile(absolutePath, 'utf8');
+        const { text, truncated } = truncateText(raw);
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: resource.mime_type,
+            text,
+            _meta: truncated ? { truncated: true, maxBytes: MAX_OUTPUT_BYTES } : undefined,
+          }],
+        };
+      } catch (err) {
+        // Honest failure, not a fabricated/placeholder body: several of
+        // these manifest entries (docs/.okf/domains/*) do not have their
+        // source files created yet (confirmed live 2026-08-24 — the
+        // docs/.okf/domains/ directory does not exist at all). Report
+        // that plainly rather than inventing ontology content.
+        return {
+          contents: [{
+            uri: uri.href,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              error: 'RESOURCE_SOURCE_UNAVAILABLE',
+              resource_id: resource.resource_id,
+              source_ref: resource.source_ref,
+              message: err.code === 'ENOENT' ? 'source file does not exist yet' : err.message,
+            }),
+          }],
+        };
+      }
+    },
+  );
+}
 
 /**
  * Search the repository using ripgrep.

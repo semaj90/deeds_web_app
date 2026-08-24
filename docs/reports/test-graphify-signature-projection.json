@@ -1,13 +1,14 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-08-24T03:11:23.596Z",
+  "generatedAt": "2026-08-24T17:30:53.418Z",
   "apply": false,
   "sourceColumn": "signature_embedding",
   "qdrant": {
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "vectorName": "signature",
-    "projectionRevision": "graphify-signature-768-v1"
+    "projectionRevision": "graphify-signature-768-v1",
+    "transport": "DOCKER_INTERNAL_HTTP"
   },
   "payloadFields": [
     "canonical_id",
@@ -58,5 +59,5 @@
       "sourceRef": "src/lib/services/voice-commands.ts"
     }
   ],
-  "elapsedMs": 198
+  "elapsedMs": 232
 }

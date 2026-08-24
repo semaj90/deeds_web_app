@@ -22,8 +22,34 @@ export const CONTEXT_COMPILER_SPEC_REFS = [
   'openspec:parent-atlas-agentic-completion#requirement:offline-learning',
 ] as const;
 
+export interface ContextEvidenceIdentityV2 {
+  canonical_id: string;
+  packet_key: string;
+  symbol_version_id?: string;
+  tree_node_id?: string;
+  workspace_revision: string;
+  source_revision: string;
+  graph_revision?: string;
+  representation_revision: string;
+  feature_revision: string;
+  ontology_revision?: string;
+  evidence_refs: string[];
+}
+
 export interface ContextCandidate {
   packet_key: string;
+  /** Canonical identity is optional for legacy discovery, but required before promotion. */
+  canonical_id?: string;
+  candidate_ordinal?: number;
+  symbol_version_id?: string;
+  tree_node_id?: string;
+  workspace_revision?: string;
+  source_revision?: string;
+  graph_revision?: string;
+  representation_revision?: string;
+  feature_revision?: string;
+  ontology_revision?: string;
+  evidence_refs?: string[];
   feature_id?: string;
   process_id?: string;
   source_ref?: string;
@@ -121,6 +147,17 @@ export interface ContextManifest {
   rlm_cache_hits?: number;
   rlm_cache_misses?: number;
   ace_playbook_revision?: string;
+  /** Additive V2 identity envelope; absent for legacy candidates without revisions. */
+  identity?: {
+    candidate_ordinal_set_checksum: string;
+    evidence_revision_checksum: string;
+    ordinal_map_checksum: string | null;
+    retrieval_policy_revision: string;
+    ace_playbook_revision: string | null;
+    model_revision: string | null;
+    prompt_template_revision: string | null;
+    complete: boolean;
+  };
 }
 
 export interface CompiledContext {
@@ -163,6 +200,9 @@ export interface ContextCompileInput {
   rlm_cache_hits?: number;
   rlm_cache_misses?: number;
   ace_playbook_revision?: string;
+  ordinal_map_checksum?: string;
+  model_revision?: string;
+  prompt_template_revision?: string;
 }
 
 export interface ContextManifestPersistence {
@@ -336,6 +376,7 @@ function createManifestId(input: {
   source_refs: string[];
   rlm_trace_id?: string;
   ace_playbook_revision?: string;
+  identity?: ContextManifest['identity'];
 }): string {
   const canonical = JSON.stringify({
     request_id: input.request_id,
@@ -346,8 +387,64 @@ function createManifestId(input: {
     source_refs: [...input.source_refs].sort(),
     rlm_trace_id: input.rlm_trace_id ?? null,
     ace_playbook_revision: input.ace_playbook_revision ?? null,
+    identity: input.identity ?? null,
   });
   return `context:${createHash('sha256').update(canonical).digest('hex').slice(0, 24)}`;
+}
+
+function buildContextIdentity(input: {
+  selected: readonly ContextCandidate[];
+  policyVersion: string;
+  ordinalMapChecksum?: string;
+  acePlaybookRevision?: string;
+  modelRevision?: string;
+  promptTemplateRevision?: string;
+}): ContextManifest['identity'] {
+  const identities = input.selected.map((candidate) => ({
+    canonical_id: candidate.canonical_id ?? null,
+    packet_key: candidate.packet_key,
+    candidate_ordinal: candidate.candidate_ordinal ?? null,
+    symbol_version_id: candidate.symbol_version_id ?? null,
+    tree_node_id: candidate.tree_node_id ?? null,
+    workspace_revision: candidate.workspace_revision ?? null,
+    source_revision: candidate.source_revision ?? null,
+    graph_revision: candidate.graph_revision ?? null,
+    representation_revision: candidate.representation_revision ?? null,
+    feature_revision: candidate.feature_revision ?? null,
+    ontology_revision: candidate.ontology_revision ?? null,
+    evidence_refs: [...new Set(candidate.evidence_refs ?? [])].sort(),
+  })).sort((a, b) => a.packet_key.localeCompare(b.packet_key));
+  const complete = identities.every((identity) => Boolean(
+    identity.canonical_id &&
+    identity.workspace_revision &&
+    identity.source_revision &&
+    identity.representation_revision &&
+    identity.feature_revision,
+  ));
+  const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+  const evidenceRevisionChecksum = digest(identities.map((identity) => ({
+    packet_key: identity.packet_key,
+    source_revision: identity.source_revision,
+    graph_revision: identity.graph_revision,
+    representation_revision: identity.representation_revision,
+    feature_revision: identity.feature_revision,
+    ontology_revision: identity.ontology_revision,
+    evidence_refs: identity.evidence_refs,
+  })));
+  return {
+    candidate_ordinal_set_checksum: digest(identities.map((identity) => ({
+      packet_key: identity.packet_key,
+      candidate_ordinal: identity.candidate_ordinal,
+      canonical_id: identity.canonical_id,
+    }))),
+    evidence_revision_checksum: evidenceRevisionChecksum,
+    ordinal_map_checksum: input.ordinalMapChecksum ?? null,
+    retrieval_policy_revision: input.policyVersion,
+    ace_playbook_revision: input.acePlaybookRevision ?? null,
+    model_revision: input.modelRevision ?? null,
+    prompt_template_revision: input.promptTemplateRevision ?? null,
+    complete,
+  };
 }
 
 /**
@@ -435,6 +532,14 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
       .map((c) => c.process_id)
       .filter((v): v is string => Boolean(v))
   )].sort();
+  const identity = buildContextIdentity({
+    selected,
+    policyVersion: policy.version,
+    ordinalMapChecksum: input.ordinal_map_checksum,
+    acePlaybookRevision: input.ace_playbook_revision,
+    modelRevision: input.model_revision,
+    promptTemplateRevision: input.prompt_template_revision,
+  });
 
   const manifest: ContextManifest = {
     manifest_id: createManifestId({
@@ -446,6 +551,7 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
       source_refs: sourceRefs,
       rlm_trace_id: input.rlm_trace_id,
       ace_playbook_revision: input.ace_playbook_revision,
+      identity,
     }),
     request_id: input.request_id,
     feature_id: input.feature_id,
@@ -482,6 +588,7 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
     ...(input.rlm_cache_hits !== undefined ? { rlm_cache_hits: input.rlm_cache_hits } : {}),
     ...(input.rlm_cache_misses !== undefined ? { rlm_cache_misses: input.rlm_cache_misses } : {}),
     ...(input.ace_playbook_revision ? { ace_playbook_revision: input.ace_playbook_revision } : {}),
+    identity,
   };
 
   return {

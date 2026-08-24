@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { createRlmSearchAdapter, type RlmSearchCache } from './rlm-search-adapter.js';
-import type { RlmBudget, RlmInspectionTools, RlmSearchRequest, RlmSearchResult, RlmTrace, RlmTraceStep } from './rlm-contract.js';
+import type { RlmBudget, RlmEnvironmentV1, RlmInspectionTools, RlmSearchRequest, RlmSearchResult, RlmTrace, RlmTraceStep } from './rlm-contract.js';
 
 interface Counters {
 	depthReached: number; subcalls: number; searchCalls: number; graphCalls: number;
@@ -10,6 +10,7 @@ interface Counters {
 
 export interface RlmRuntimeOptions {
 	budget: RlmBudget; workspaceRevision: string; policyRevision: string; requestId: string;
+	environment?: RlmEnvironmentV1;
 	cache?: RlmSearchCache; tools: RlmInspectionTools;
 	search?: (request: RlmSearchRequest) => Promise<RlmSearchResult>;
 }
@@ -17,6 +18,7 @@ export interface RlmRuntimeOptions {
 export interface RlmRuntimeReceipt extends RlmTrace {
 	limits: RlmBudget; observed: Counters; selectedCanonicalIds: string[];
 	termination: RlmTrace['status']; durationMs: number;
+	environment?: RlmEnvironmentV1;
 }
 
 function hash(value: unknown): string { return createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 24); }
@@ -73,8 +75,15 @@ export function createRlmRuntime(options: RlmRuntimeOptions) {
 			if (!allow('SEARCH')) return null;
 			counters.searchCalls += 1; counters.subcalls += 1;
 			const search = options.search ?? (async (input: RlmSearchRequest) => createRlmSearchAdapter({ cache: options.cache }).search(input));
-			const result = await search({ ...request, requestId: options.requestId, workspaceRevision: options.workspaceRevision,
-				policyRevision: options.policyRevision, budget: options.budget });
+			let result: RlmSearchResult;
+			try {
+				result = await search({ ...request, requestId: options.requestId, workspaceRevision: options.workspaceRevision,
+					policyRevision: options.policyRevision, budget: options.budget, environment: options.environment });
+			} catch {
+				status = 'FAILED';
+				addStep({ kind: 'SEARCH', reason: 'RLM_PROGRAM_FAILED', durationMs: 0 });
+				return null;
+			}
 			counters.cacheHits += result.trace.steps.filter((step) => step.cacheStatus === 'HIT').length;
 			counters.cacheMisses += result.trace.steps.filter((step) => step.cacheStatus === 'MISS').length;
 			selectedCanonicalIds.push(...result.response.topPacketKeys);
@@ -104,8 +113,9 @@ export function createRlmRuntime(options: RlmRuntimeOptions) {
 		receipt(): RlmRuntimeReceipt {
 			const trace: RlmTrace = { requestId: options.requestId, workspaceRevision: options.workspaceRevision,
 				policyRevision: options.policyRevision, depthReached: counters.depthReached, subcalls: counters.subcalls,
-				steps: steps.map((step, index) => ({ ...step, sequence: index })), status };
-			return { ...trace, limits: options.budget, observed: { ...counters }, selectedCanonicalIds: [...new Set(selectedCanonicalIds)], termination: status, durationMs: Date.now() - startedAt };
+				steps: steps.map((step, index) => ({ ...step, sequence: index })), status,
+				...(status === 'FAILED' ? { failureCode: 'RLM_PROGRAM_FAILED' as const } : {}) };
+			return { ...trace, limits: options.budget, observed: { ...counters }, selectedCanonicalIds: [...new Set(selectedCanonicalIds)], termination: status, durationMs: Date.now() - startedAt, environment: options.environment };
 		},
 	};
 }

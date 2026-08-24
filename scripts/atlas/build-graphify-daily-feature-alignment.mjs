@@ -2,6 +2,7 @@
 /** Read-only alignment receipt for files emitted by daily Graphify. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import pg from 'pg';
 import Redis from 'ioredis';
 import { loadRepoEnv, resolveDatabaseUrl, resolveRedisUrl, REPO_ROOT } from './connection-config.mjs';
@@ -14,6 +15,7 @@ const SINCE_HOURS = Math.max(1, Math.min(720, Number(arg('since-hours', 24))));
 const QDRANT_URL = String(arg('qdrant-url', env.QDRANT_URL ?? 'http://127.0.0.1:6333')).replace(/\/+$/, '');
 const COLLECTION = String(arg('collection', env.QDRANT_CODE_COLLECTION ?? 'codebase_chunks_768'));
 const OUT = path.resolve(REPO_ROOT, String(arg('out', 'docs/reports/graphify-daily-feature-alignment-v1.json')));
+let qdrantTransport = 'HOST_HTTP';
 
 function pointId(value) {
   const text = String(value ?? '').trim();
@@ -22,10 +24,27 @@ function pointId(value) {
 }
 async function qdrantIds(ids) {
   if (!ids.length) return new Set();
-  const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids, with_payload: false, with_vector: false }), signal: AbortSignal.timeout(30_000) });
-  if (!response.ok) throw new Error(`Qdrant point lookup HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
-  const body = await response.json();
-  return new Set((body?.result ?? []).map((point) => String(point.id)));
+  const requestBody = JSON.stringify({ ids, with_payload: false, with_vector: false });
+  try {
+    const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: requestBody, signal: AbortSignal.timeout(30_000) });
+    if (!response.ok) throw new Error(`Qdrant point lookup HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
+    const body = await response.json();
+    qdrantTransport = 'HOST_HTTP';
+    return new Set((body?.result ?? []).map((point) => String(point.id)));
+  } catch (hostError) {
+    try {
+      const raw = execFileSync('docker', [
+        'exec', 'legal-ai-go-retrieval', 'wget', '-qO-', '--timeout=30',
+        '--header=Content-Type: application/json', `--post-data=${requestBody}`,
+        `http://qdrant:6333/collections/${COLLECTION}/points`,
+      ], { cwd: REPO_ROOT, encoding: 'utf8', timeout: 35_000, stdio: ['ignore', 'pipe', 'pipe'] });
+      const body = JSON.parse(raw);
+      qdrantTransport = 'DOCKER_INTERNAL_HTTP';
+      return new Set((body?.result ?? []).map((point) => String(point.id)));
+    } catch (dockerError) {
+      throw new Error(`Qdrant host and Docker transports failed: host=${hostError.message}; docker=${dockerError.message}`);
+    }
+  }
 }
 async function valkeyProbe() {
   const redis = new Redis(resolveRedisUrl(env), { lazyConnect: true, maxRetriesPerRequest: 1, connectTimeout: 3000 });
@@ -44,7 +63,7 @@ async function valkeyProbe() {
 }
 async function main() {
   const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-daily-feature-alignment' });
-  const report = { schema: 'atlas.graphify-daily-feature-alignment.v1', generatedAt: new Date().toISOString(), readOnly: true, scope: { table: 'codebase_chunk_index', sinceHours: SINCE_HOURS, limit: LIMIT }, qdrant: { url: QDRANT_URL, collection: COLLECTION }, status: 'FAIL', rows: [], coverage: {}, featureAuthority: {}, valkey: {} };
+  const report = { schema: 'atlas.graphify-daily-feature-alignment.v1', generatedAt: new Date().toISOString(), readOnly: true, scope: { table: 'codebase_chunk_index', sinceHours: SINCE_HOURS, limit: LIMIT }, qdrant: { url: QDRANT_URL, collection: COLLECTION, transport: qdrantTransport }, status: 'FAIL', rows: [], coverage: {}, featureAuthority: {}, valkey: {} };
   try {
     const authorityResult = await pool.query(`
       SELECT count(*)::int AS total,
@@ -69,6 +88,7 @@ async function main() {
       LIMIT $2
     `, [SINCE_HOURS, LIMIT]);
     const qdrantPresent = await qdrantIds(result.rows.map((row) => row.qdrant_id).filter(Boolean).map(pointId));
+    report.qdrant.transport = qdrantTransport;
     report.rows = result.rows.map((row) => ({ ...row, qdrant: row.qdrant_id ? qdrantPresent.has(String(row.qdrant_id)) : false }));
     const fields = ['semantic_768', 'bm25', 'ast', 'error_embedding', 'signature_embedding', 'pagerank', 'centroid', 'latent_64', 'som', 'kmeans', 'qdrant'];
     report.coverage = Object.fromEntries(fields.map((field) => [field, { count: report.rows.filter((row) => row[field]).length, total: report.rows.length }]));

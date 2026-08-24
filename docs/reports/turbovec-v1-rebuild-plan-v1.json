@@ -1,0 +1,68 @@
+{
+  "schema": "atlas.turbovec-v1-rebuild-plan.v1",
+  "generatedAt": "2026-08-24T21:11:47.994Z",
+  "readOnly": true,
+  "writes": false,
+  "sourceContract": {
+    "owner": "sveltekit-frontend/scripts/atlas/build-turbovec-768-4bit.mts",
+    "collection": "codebase_chunks_768",
+    "vectorName": "content",
+    "dimension": 768,
+    "bits": 4,
+    "identity": "CandidateOrdinal when present; otherwise source payload identity remains projection metadata",
+    "canonicalStore": "Qdrant semantic_768 projection; Postgres remains canonical provenance authority"
+  },
+  "legacyArtifact": {
+    "path": "sveltekit-frontend\\.cache\\turbovec\\evidence_text.tvim",
+    "exists": true,
+    "bytes": 396014,
+    "modifiedAt": "2026-05-13T23:27:20.348Z",
+    "auditStatus": "LEGACY_ARTIFACT_REQUIRES_REBUILD"
+  },
+  "sourceBuilder": {
+    "path": "sveltekit-frontend\\scripts\\atlas\\build-turbovec-768-4bit.mts",
+    "exists": true,
+    "bytes": 5781,
+    "modifiedAt": "2026-08-02T07:41:38.088Z"
+  },
+  "qdrant": {
+    "status": "REACHABLE",
+    "httpStatus": 200,
+    "points": 106338,
+    "vectors": {
+      "content": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "error": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "signature": {
+        "size": 768,
+        "distance": "Cosine"
+      }
+    }
+  },
+  "qdrantPayload": {
+    "status": "READ_OK",
+    "sampled": 1000,
+    "candidateOrdinalField": "ABSENT",
+    "candidateOrdinalRows": 0,
+    "sourceRefRows": 1000,
+    "nextPage": 1002
+  },
+  "decision": "BLOCKED_CANDIDATE_ORDINAL_BRIDGE_MISSING",
+  "nextApply": {
+    "dryRun": "npm --prefix sveltekit-frontend run atlas:turbovec:768:4bit:build:dry -- --limit=1000",
+    "applyAfterReview": "npm --prefix sveltekit-frontend run atlas:turbovec:768:4bit:build -- --limit=1000",
+    "requiredChecks": [
+      "Do not delete or overwrite evidence_text.tvim in place",
+      "Write a versioned output artifact or rebuild from canonical Qdrant vectors",
+      "Bind external IDs to CandidateOrdinal and record the ordinal checksum",
+      "Compare native allowlist recall against the semantic_768 oracle",
+      "Promote only after full-corpus load and recall evidence"
+    ]
+  },
+  "promotion": "BLOCKED_PENDING_CANDIDATE_ORDINAL_BRIDGE_AND_FULL_CORPUS_ALLOWLIST_RECALL"
+}

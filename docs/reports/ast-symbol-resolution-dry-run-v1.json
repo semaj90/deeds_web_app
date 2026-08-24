@@ -4,10 +4,10 @@
   "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-nominations.jsonl",
   "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-resolution.jsonl",
   "input_nominations": 42398,
-  "registry_keys": 0,
-  "canonical": 0,
+  "registry_keys": 10170,
+  "canonical": 10170,
   "ambiguous": 0,
-  "unresolved": 42398,
+  "unresolved": 32228,
   "invalid": 0,
   "canonical_writes": false,
   "database_writes": false

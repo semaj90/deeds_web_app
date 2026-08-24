@@ -23,7 +23,12 @@ ORDER BY canonical_key, stable_symbol_id, source;
 const raw = execFileSync('docker', [
   'exec', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db',
   '-At', '-F', '|', '-c', sql,
-], { cwd: root, encoding: 'utf8', timeout: 30000 });
+], {
+  cwd: root,
+  encoding: 'utf8',
+  timeout: 30000,
+  maxBuffer: 64 * 1024 * 1024,
+});
 
 const registry = new Map();
 for (const line of raw.split(/\r?\n/).filter(Boolean)) {

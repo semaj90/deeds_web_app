@@ -69,6 +69,83 @@ function row(candidate: ReturnType<typeof materializeCandidateOrdinalMap>['candi
 }
 
 describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
+  it('carries MRL truncation and learned latent lineage without changing CandidateOrdinal identity', () => {
+    const map = materializeCandidateOrdinalMap({
+      candidates: [{
+        ...identities()[0],
+        representationBindings: [
+          {
+            representationId: 'semantic_768',
+            family: 'EMBEDDINGGEMMA_MRL',
+            dimensions: 768,
+            modelRevision: 'embeddinggemma-full768-v1',
+            projectionKind: 'NONE',
+            sourceRepresentationId: null,
+            projectionRevision: null,
+            normalized: true,
+            available: true,
+            availabilityReason: null,
+          },
+          {
+            representationId: 'semantic_mrl_128',
+            family: 'EMBEDDINGGEMMA_MRL',
+            dimensions: 128,
+            modelRevision: 'embeddinggemma-full768-v1',
+            projectionKind: 'MRL_PREFIX_TRUNCATION',
+            sourceRepresentationId: 'semantic_768',
+            projectionRevision: 'mrl-prefix-v1',
+            normalized: true,
+            available: true,
+            availabilityReason: null,
+          },
+          {
+            representationId: 'latent_64',
+            family: 'LEARNED_LATENT',
+            dimensions: 64,
+            modelRevision: 'atlas-autoencoder-768x64-v1',
+            projectionKind: 'LEARNED_AUTOENCODER',
+            sourceRepresentationId: 'semantic_768',
+            projectionRevision: 'ae:pending',
+            normalized: true,
+            available: false,
+            availabilityReason: 'TRAINING_NOT_PROMOTED',
+          },
+        ],
+      }],
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    });
+
+    expect(map.candidates[0].candidateOrdinal).toBe(0);
+    expect(map.candidates[0].representationBindings.map((binding) => binding.representationId))
+      .toEqual(['semantic_768', 'semantic_mrl_128', 'latent_64']);
+    expect(map.identityAuthority).toBe(false);
+  });
+
+  it('rejects a latent binding without a learned projection revision', () => {
+    expect(() => materializeCandidateOrdinalMap({
+      candidates: [{
+        ...identities()[0],
+        representationBindings: [{
+          representationId: 'latent_128',
+          family: 'LEARNED_LATENT',
+          dimensions: 128,
+          modelRevision: 'atlas-autoencoder-768x128-v1',
+          projectionKind: 'LEARNED_AUTOENCODER',
+          sourceRepresentationId: 'semantic_768',
+          projectionRevision: null,
+          normalized: true,
+          available: false,
+          availabilityReason: 'TRAINING_NOT_PROMOTED',
+        }],
+      }],
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    })).toThrow('LEARNED_LATENT_PROJECTION_REVISION_REQUIRED');
+  });
+
   it('assigns deterministic ordinals independent of input order', () => {
     const a = materializeCandidateOrdinalMap({
       candidates: identities(),

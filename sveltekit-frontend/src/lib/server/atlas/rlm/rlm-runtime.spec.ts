@@ -28,4 +28,15 @@ describe('bounded RLM runtime', () => {
 	it('uses bounded owner inspection tools', async () => {
 		const rlm = runtime(); await expect(rlm.inspectGraph('symbol-1', 1)).resolves.toEqual({ canonicalId: 'symbol-1' }); await expect(rlm.inspectProcess('process-1')).resolves.toEqual({ processId: 'process-1' }); expect(rlm.receipt().observed.graphCalls).toBe(1); expect(rlm.receipt().observed.processCalls).toBe(1);
 	});
+	it('fails closed when the recursive/search program throws', async () => {
+		const rlm = createRlmRuntime({ ...runtimeOptions(), search: async () => { throw new Error('program failure'); } });
+		await expect(rlm.search({ query: 'failure' })).resolves.toBeNull();
+		expect(rlm.receipt().termination).toBe('FAILED');
+		expect(rlm.receipt().failureCode).toBe('RLM_PROGRAM_FAILED');
+	});
 });
+
+function runtimeOptions() {
+	return { requestId: 'req-1', workspaceRevision: 'workspace-r1', policyRevision: 'policy-r1', budget: budget(),
+		tools: { packet: async (key: string) => ({ packetKey: key }), source: async (ref: string) => ({ sourceRef: ref }), graph: async (id: string) => ({ canonicalId: id }), process: async (id: string) => ({ processId: id }) } };
+}

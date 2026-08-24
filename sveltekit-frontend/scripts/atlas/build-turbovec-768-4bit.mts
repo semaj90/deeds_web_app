@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
@@ -31,8 +31,17 @@ const config = resolveTurboVec4BitConfig({
 const LOG_PREFIX = '[turbovec-768-4bit]';
 const SEMANTIC_PROFILE = 'ast-aware lexical langextract';
 const SOURCE_MODEL_PATH = path.resolve(APP_ROOT, '..', 'models', 'hfor', 'hforf.gguf');
+const REPRESENTATION_BINDINGS = [
+  { representationId: 'semantic_768', family: 'EMBEDDINGGEMMA_MRL', dimensions: 768, projectionKind: 'NONE', sourceRepresentationId: null, promotionRole: 'CANONICAL_ORACLE' },
+  { representationId: 'semantic_mrl_512', family: 'EMBEDDINGGEMMA_MRL', dimensions: 512, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
+  { representationId: 'semantic_mrl_256', family: 'EMBEDDINGGEMMA_MRL', dimensions: 256, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
+  { representationId: 'semantic_mrl_128', family: 'EMBEDDINGGEMMA_MRL', dimensions: 128, projectionKind: 'MRL_PREFIX_TRUNCATION', sourceRepresentationId: 'semantic_768', promotionRole: 'SHORTLIST_CHALLENGER' },
+  { representationId: 'latent_128', family: 'LEARNED_LATENT', dimensions: 128, projectionKind: 'LEARNED_AUTOENCODER', sourceRepresentationId: 'semantic_768', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
+  { representationId: 'latent_64', family: 'LEARNED_LATENT', dimensions: 64, projectionKind: 'LEARNED_AUTOENCODER', sourceRepresentationId: 'semantic_768', promotionRole: 'CHALLENGER_PENDING_TRAINING' },
+];
 const DRY_RUN = process.argv.includes('--dry-run');
 const LIMIT = Math.max(1, Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? config.limit));
+const ORDINAL_MAP_PATH = process.argv.find((arg) => arg.startsWith('--ordinal-map='))?.split('=').slice(1).join('=') ?? null;
 const REPORT_JSON = path.join(REPORTS_DIR, 'turbovec-768-4bit-build-report.json');
 const REPORT_MD = path.join(REPORTS_DIR, 'turbovec-768-4bit-build-report.md');
 const MANIFEST_JSON = path.join(TMP_DIR, 'turbovec-768-4bit-index-manifest.json');
@@ -53,12 +62,34 @@ function renderMarkdown(report) {
     `- Duration ms: ${report.durationMs}`,
     `- Build URL: ${report.buildUrl}`,
     `- Mode: ${report.status}`,
+    `- CandidateOrdinal coverage: ${report.candidateOrdinalCoverage}`,
     `- Manifest: ${report.manifestFile}`,
   ].join('\n');
 }
 
+function loadOrdinalMap() {
+  if (!ORDINAL_MAP_PATH) return null;
+  const parsed = JSON.parse(readFileSync(path.resolve(ORDINAL_MAP_PATH), 'utf8'));
+  if (parsed?.identityAuthority !== false || !Array.isArray(parsed?.candidates)) {
+    throw new Error('ORDINAL_MAP_SCHEMA_OR_AUTHORITY_REJECTED');
+  }
+  const bySourceRef = new Map();
+  const byPacketKey = new Map();
+  for (const candidate of parsed.candidates) {
+    if (!Number.isInteger(candidate.candidateOrdinal)) throw new Error('ORDINAL_MAP_ORDINAL_INVALID');
+    for (const [index, key] of [['sourceRef', candidate.sourceRef], ['packetKey', candidate.packetKey]]) {
+      if (typeof key !== 'string' || !key) continue;
+      const target = index === 'sourceRef' ? bySourceRef : byPacketKey;
+      if (target.has(key)) throw new Error(`ORDINAL_MAP_DUPLICATE:${index}:${key}`);
+      target.set(key, candidate.candidateOrdinal);
+    }
+  }
+  return { candidateSnapshotRevision: parsed.candidateSnapshotRevision, ordinalMapChecksum: parsed.ordinalMapChecksum, bySourceRef, byPacketKey };
+}
+
 async function main() {
   const startedAt = Date.now();
+  const ordinalMap = loadOrdinalMap();
   console.log(`${LOG_PREFIX} building index from ${config.collection}`);
   console.log(`${LOG_PREFIX} limit=${LIMIT} dim=${config.dimension} bits=${config.bits} dryRun=${DRY_RUN}`);
 
@@ -82,10 +113,18 @@ async function main() {
     }
 
     const preview = quantizeInt4(point.vector);
+    const sourceRef = typeof point.payload?.source_ref === 'string' ? point.payload.source_ref : null;
+    const packetKey = typeof point.payload?.packet_key === 'string' ? point.payload.packet_key : null;
+    const candidateOrdinal = Number.isInteger(point.payload?.candidateOrdinal)
+      ? point.payload.candidateOrdinal
+      : Number.isInteger(point.payload?.candidate_ordinal)
+        ? point.payload.candidate_ordinal
+        : ordinalMap?.bySourceRef.get(sourceRef) ?? ordinalMap?.byPacketKey.get(packetKey) ?? null;
     accepted.push({
       id: point.id,
       vector: point.vector,
       payload: point.payload,
+      candidateOrdinal,
       quantization: {
         scale: round(preview.scale),
         maxAbs: round(preview.maxAbs),
@@ -108,12 +147,24 @@ async function main() {
     bits: config.bits,
     semanticProfile: SEMANTIC_PROFILE,
     sourceModelPath: SOURCE_MODEL_PATH,
+    representationId: 'semantic_768',
+    representationRevision: 'embeddinggemma-full768-v1',
+    representationBindings: REPRESENTATION_BINDINGS,
+    ordinalMap: ordinalMap ? {
+      candidateSnapshotRevision: ordinalMap.candidateSnapshotRevision,
+      ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
+      supplied: true,
+    } : { supplied: false },
     buildUrl: config.buildUrl,
     buildPort: config.buildPort,
     pointsRequested: LIMIT,
     pointsScrolled: points.length,
     pointsAccepted: accepted.length,
     pointsRejected: rejected.length,
+    candidateOrdinalCoverage: `${accepted.filter((entry) => entry.candidateOrdinal !== null).length}/${accepted.length}`,
+    candidateOrdinalBridgeStatus: accepted.every((entry) => entry.candidateOrdinal !== null)
+      ? 'PRESENT'
+      : 'MISSING',
     rejectedSample: rejected.slice(0, 20),
     accepted: accepted.map((entry) => ({
       id: entry.id,
@@ -125,15 +176,22 @@ async function main() {
         source_ref: entry.payload?.source_ref ?? null,
         title_id: entry.payload?.title_id ?? null,
         feature_id: entry.payload?.feature_id ?? null,
+        candidateOrdinal: entry.candidateOrdinal,
       },
     })),
-    status: DRY_RUN ? 'DRY_RUN' : 'READY',
+    status: DRY_RUN
+      ? (accepted.every((entry) => entry.candidateOrdinal !== null) ? 'DRY_RUN' : 'DRY_RUN_BLOCKED_CANDIDATE_ORDINAL_BRIDGE')
+      : 'READY',
   };
 
   writeFileSync(MANIFEST_JSON, JSON.stringify(manifest, null, 2));
 
   let upload = null;
   if (!DRY_RUN) {
+    if (!accepted.every((entry) => entry.candidateOrdinal !== null)) {
+      throw new Error('CANDIDATE_ORDINAL_BRIDGE_REQUIRED_BEFORE_TURBOVEC_UPLOAD');
+    }
+    const ordinalBoundVectors = accepted.map((entry) => ({ ...entry, id: entry.candidateOrdinal }));
     const sidecar = await ensureTurboVecSidecar({
       buildUrl: config.buildUrl,
       buildPort: config.buildPort,
@@ -144,7 +202,7 @@ async function main() {
       bits: config.bits,
       logPrefix: LOG_PREFIX,
     });
-    upload = await uploadTurboVecIndex({ buildUrl: sidecar.url, vectors: accepted });
+    upload = await uploadTurboVecIndex({ buildUrl: sidecar.url, vectors: ordinalBoundVectors });
     manifest.upload = {
       url: sidecar.url,
       started: sidecar.started,

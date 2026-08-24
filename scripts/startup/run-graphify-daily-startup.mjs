@@ -10,7 +10,7 @@
 
 import { createHash } from 'crypto';
 import { execSync } from 'child_process';
-import { mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-lock.mjs';
@@ -32,6 +32,10 @@ const nativeStructuralAllowCreateSymbols = process.env.GRAPHIFY_NATIVE_STRUCTURA
 const nativeStructuralLimit = process.env.GRAPHIFY_NATIVE_STRUCTURAL_LIMIT || '50';
 const nativeStructuralInclude = process.env.GRAPHIFY_NATIVE_STRUCTURAL_INCLUDE || '';
 const nativeStructuralReachabilityOut = process.env.GRAPHIFY_NATIVE_STRUCTURAL_REACHABILITY_OUT?.trim() || '';
+const neuralPrefill = process.env.GRAPHIFY_NEURAL_PREFILL === '1';
+const neuralPrefillShortlist = process.env.GRAPHIFY_NEURAL_PREFILL_SHORTLIST === '1';
+const neuralPrefillOnly = process.env.GRAPHIFY_NEURAL_PREFILL_ONLY === '1';
+let neuralPrefillStatus = 'NOT_RUN';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 function stable(value) {
@@ -70,6 +74,34 @@ function writeNativeStructuralReachability(state) {
   writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 }
 
+function writeNeuralPrefillDailyReceipt(state) {
+  const reportPaths = [
+    'docs/reports/atlas-graphify-nlp-prefill-dry-v1.json',
+    'docs/reports/atlas-neural-prefill-validation-v1.json',
+    'docs/reports/atlas-candidate-shortlist-receipt-v1.json',
+  ];
+  const children = reportPaths.filter((relativePath) => existsSync(path.resolve(ROOT, relativePath))).map((relativePath) => {
+    const content = readFileSync(path.resolve(ROOT, relativePath), 'utf8');
+    return { path: relativePath, checksum: sha256(content) };
+  });
+  const payload = {
+    schema: 'atlas.graphify-neural-prefill-daily-receipt.v1',
+    generatedAt: new Date().toISOString(),
+    wrapper: 'scripts/startup/run-graphify-daily-startup.mjs',
+    optIn: neuralPrefill || neuralPrefillShortlist,
+    shortlistOptIn: neuralPrefillShortlist,
+    readOnly: true,
+    canonicalWrites: false,
+    qdrantWrites: false,
+    valkeyWrites: false,
+    ...state,
+    children,
+  };
+  const outputPath = path.resolve(ROOT, 'docs/reports/atlas-graphify-neural-prefill-daily-v1.json');
+  mkdirSync(path.dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify({ ...payload, outputChecksum: sha256(payload) }, null, 2)}\n`, 'utf8');
+}
+
 if (!acquireStartupLock(STARTUP_LOCK_FILE, { script: 'run-graphify-daily-startup.mjs' })) {
   if (!quiet) console.log('[graphify:daily] Another startup lock is active; backing off.');
   console.log('graphify:daily complete');
@@ -104,6 +136,67 @@ try {
     stdio: quiet ? 'ignore' : 'inherit',
     timeout: 60 * 1000
   });
+
+  // Optional read-only neural/AST/NLP prefill. This is deliberately before
+  // the mutating daily chain and fail-open while the lane is in progress.
+  if (neuralPrefill) {
+    if (!quiet) console.log('[graphify:daily] Running optional neural prefill dry pass...');
+    try {
+      execSync('npm run atlas:graphify:nlp:passes:dry', {
+        cwd: FRONTEND,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 20 * 60 * 1000,
+      });
+      execSync('npm run atlas:neural:prefill:validate', {
+        cwd: FRONTEND,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 60 * 1000,
+      });
+      if (neuralPrefillShortlist) {
+        execSync('npm run atlas:neural:prefill:shortlist:dry', {
+          cwd: FRONTEND,
+          stdio: quiet ? 'ignore' : 'inherit',
+          timeout: 5 * 60 * 1000,
+        });
+      }
+      neuralPrefillStatus = 'PASS';
+      if (!quiet) console.log('[graphify:daily] Neural prefill dry pass validated.');
+    } catch (prefillError) {
+      neuralPrefillStatus = 'DEGRADED';
+      console.warn(`[graphify:daily] Neural prefill degraded; continuing existing Graphify chain: ${prefillError.message}`);
+    }
+  }
+
+  if (neuralPrefillShortlist && !neuralPrefill) {
+    try {
+      execSync('npm run atlas:neural:prefill:shortlist:dry', {
+        cwd: FRONTEND,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 5 * 60 * 1000,
+      });
+      neuralPrefillStatus = 'PASS';
+    } catch (shortlistError) {
+      neuralPrefillStatus = 'DEGRADED';
+      console.warn(`[graphify:daily] Neural shortlist degraded; continuing existing Graphify chain: ${shortlistError.message}`);
+    }
+  }
+
+  if (neuralPrefill || neuralPrefillShortlist) {
+    writeNeuralPrefillDailyReceipt({
+      status: neuralPrefillStatus,
+      neuralPrefill,
+      neuralPrefillShortlist,
+      fallbackPolicy: 'CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT',
+    });
+  }
+
+  if (neuralPrefillOnly) {
+    if (!neuralPrefill && !neuralPrefillShortlist) {
+      throw new Error('GRAPHIFY_NEURAL_PREFILL_ONLY requires an opt-in neural lane');
+    }
+    console.log('graphify:daily neural-prefill-only complete');
+    process.exit(0);
+  }
 
   // Run from sveltekit-frontend directory to resolve npm scripts
   //

@@ -1,0 +1,227 @@
+{
+  "schema": "atlas.ast-callable-enrichment-orf-plan-receipt.v1",
+  "readOnly": true,
+  "databaseWrites": false,
+  "callableRows": 100,
+  "packetPlans": 12,
+  "packetProvenanceCandidates": 100,
+  "canonicalPacketMatches": 100,
+  "unresolvedPacketProvenance": 0,
+  "domainRows": 90,
+  "inferredUseRows": 16,
+  "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\callable-enrichment-orf-plan.jsonl",
+  "planChecksum": "b136662e0c0eae685b452cec55e15724f9bc4df949005d2b8699c5d5d29f5de6",
+  "sample": [
+    {
+      "schema": "atlas.callable-enrichment-orf-plan-row.v1",
+      "packetKey": "ace:packet:068730e767d2",
+      "featureRevision": "atlas-callable-enrichment-v1",
+      "sourceRef": "packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
+      "sourceRevision": "workspace:0",
+      "symbolCount": 1,
+      "symbolNames": [
+        "main"
+      ],
+      "symbolKinds": [
+        "function"
+      ],
+      "domainIds": [
+        "agent"
+      ],
+      "inferredUses": [],
+      "evidenceRefs": [
+        "classification:996b2fbbd165908c0afba29c7266d0f4"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "0ebfd2e8d4d7ca105bdf70c75c24be1f9518403a847da2d8d09ab13b3ea2611f"
+    },
+    {
+      "schema": "atlas.callable-enrichment-orf-plan-row.v1",
+      "packetKey": "ace:packet:0a1b776d85f5",
+      "featureRevision": "atlas-callable-enrichment-v1",
+      "sourceRef": "packages/parent-atlas/src/core/summary-context.ts",
+      "sourceRevision": "workspace:0",
+      "symbolCount": 10,
+      "symbolNames": [
+        "buildSummaryContext",
+        "classifyDomain",
+        "classifyOntology",
+        "classifyTopology",
+        "firstNumber",
+        "firstText",
+        "formatSummaryContext",
+        "missingFields",
+        "normalizedPathDir",
+        "objectValue"
+      ],
+      "symbolKinds": [
+        "function"
+      ],
+      "domainIds": [
+        "graph",
+        "retrieval",
+        "ui"
+      ],
+      "inferredUses": [],
+      "evidenceRefs": [
+        "classification:094fb8d8544c678df3e61a6359c21dc8",
+        "classification:1f0d5ef3ff24c6f4a3b28be9f2160ee4",
+        "classification:2dd7635e15214c589f6c07d6a1045a9e",
+        "classification:7df4b596b515dabf0e7bdff1fccebbd1",
+        "classification:9ed3cc91b99f4fb59146ff8675e0fd2b",
+        "classification:d09ea5e97e0a1e08ec2c40a63afd523a",
+        "classification:d833780996d3c1c2061a7535f15c5875",
+        "classification:f0d71cb6d5d2b6a326fd6c776db5b4fd",
+        "classification:fdec4f3731a9de9d68b7cf771375adec",
+        "classification:fe5395a185a5c4b745e167bbd3ebac8b"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "ace14cba3ff1101e1ac1500ade82a360f75b6d302a66b7b173fcae253e2f6917"
+    },
+    {
+      "schema": "atlas.callable-enrichment-orf-plan-row.v1",
+      "packetKey": "ace:packet:3d01c1df26b3",
+      "featureRevision": "atlas-callable-enrichment-v1",
+      "sourceRef": "scripts/agent/ace-assembler-recommendations.mjs",
+      "sourceRevision": "workspace:0",
+      "symbolCount": 4,
+      "symbolNames": [
+        "ACEAssemblerRecommendations",
+        "addCandidate",
+        "constructor",
+        "rankCandidates"
+      ],
+      "symbolKinds": [
+        "class",
+        "method"
+      ],
+      "domainIds": [
+        "agent"
+      ],
+      "inferredUses": [
+        "retrieval"
+      ],
+      "evidenceRefs": [
+        "classification:53963e594487a8b9da5b21955b99ff12",
+        "classification:60f51859497fb733b900a7c344abaa87",
+        "classification:c53057031dd3d747b0778a7e86c2a252",
+        "classification:c9f3785422da9ab907a4ff0b9ca6bc1e"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "eaff60706d21db11850eeacc50a9c1152b7df5b4c6707fbdd632fcab91d6e2c9"
+    },
+    {
+      "schema": "atlas.callable-enrichment-orf-plan-row.v1",
+      "packetKey": "ace:packet:41936db449c2",
+      "featureRevision": "atlas-callable-enrichment-v1",
+      "sourceRef": "packages/parent-atlas/src/pipelines/summary-packets.ts",
+      "sourceRevision": "workspace:0",
+      "symbolCount": 11,
+      "symbolNames": [
+        "Chrom97SummaryPacket",
+        "Gemma4SummaryPacket",
+        "dedupe",
+        "firstText",
+        "makeChrom97Packet",
+        "makeGemma4SummaryPacket",
+        "normalizeText",
+        "sha256",
+        "stableJson",
+        "stableStringify",
+        "toNdjsonLine"
+      ],
+      "symbolKinds": [
+        "function",
+        "interface"
+      ],
+      "domainIds": [
+        "database",
+        "retrieval"
+      ],
+      "inferredUses": [],
+      "evidenceRefs": [
+        "classification:017bb3c83e83f25f93d33875cdc98725",
+        "classification:0bac70c951c3181955aad374107b06b6",
+        "classification:5156a999674f9da8f264103ed0238e48",
+        "classification:5f1bc1e2f716df8bdc1fce55c0627ee7",
+        "classification:850bbd33e59771d89c447db043af3ed2",
+        "classification:90bdbcfbb1497c2d03ae538dfcf6962c",
+        "classification:952bfc52a3f0e4019500fd4d3f08d8f4",
+        "classification:b263f88433ebc5ff60a28bd6fa595829",
+        "classification:dc486d554e65a14a8c1e001bb3d23de6",
+        "classification:dda4000fae4e9fec0332bb84d1b09903",
+        "classification:fea7b269ee5f8727aa1e61b90456914e"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "48e6629021820e2a21c2ffa5593c21d2179140e264f818b4baf63a60187f3a51"
+    },
+    {
+      "schema": "atlas.callable-enrichment-orf-plan-row.v1",
+      "packetKey": "ace:packet:8aa196c6fcb5",
+      "featureRevision": "atlas-callable-enrichment-v1",
+      "sourceRef": "packages/parent-atlas-core/src/policy-orchestrator.ts",
+      "sourceRevision": "workspace:0",
+      "symbolCount": 19,
+      "symbolNames": [
+        "ACEContext",
+        "DecomposedQuery",
+        "ParentAtlasPolicyOrchestrator",
+        "PolicyOrchestrationResult",
+        "PolicyOrchestratorConfig",
+        "PolicyScore",
+        "ScoredCandidate",
+        "Subgoal",
+        "SynthesisResult",
+        "assembleACE",
+        "constructor",
+        "createPolicyOrchestrator",
+        "decomposeQuery",
+        "extractFeatures",
+        "healthCheck",
+        "logRLMTrace",
+        "orchestrateQuery",
+        "rerank",
+        "synthesizeAnswer"
+      ],
+      "symbolKinds": [
+        "class",
+        "function",
+        "interface",
+        "method"
+      ],
+      "domainIds": [
+        "agent",
+        "retrieval"
+      ],
+      "inferredUses": [
+        "agent",
+        "database",
+        "retrieval"
+      ],
+      "evidenceRefs": [
+        "classification:024c02b23e4b56bd6363242d5e698756",
+        "classification:130dd74cb6fdeb21b30aa95119baeefd",
+        "classification:1bfd20c4f80ba1512d90e47a2d97d94b",
+        "classification:1fafd0a3bc28f1a3ba7913a58411a001",
+        "classification:2822a8cf228796d95e5b9a033924bd29",
+        "classification:6cd8948fd18d6b675574ce1d4cfd42e1",
+        "classification:70e281213019a7d680de9621bfd3cd66",
+        "classification:71800cf715f6440eab32f8df3ab07ebe",
+        "classification:72e980152af7316f3749e7d07818f3fe",
+        "classification:7f988e8e90044337566f23ccbfa85282",
+        "classification:887c400ea1cafca0606e3659ff75ff4d",
+        "classification:911114bc6cda021f44bdfe4fb1e17a20",
+        "classification:a09be8065877c132327a31eddb5896ee",
+        "classification:a1603d10cf8d1794a5af6b603937f129",
+        "classification:af25f16ad159730f475adf746a59327d",
+        "classification:b80679219d87b22807cc1c1a6a5bb1f4",
+        "classification:c0954c0481f0f3e7c4f97607aeb44cab",
+        "classification:e8b759ded3da5b811ce9943717cd27ed",
+        "classification:fef48c99bad46ce56cd2789da33f97f6"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "8910c4c977c537ebb1bdc6ed534376cd88f22b94db66df7f83a042afc62e0da3"
+    }
+  ],
+  "nextGate": "REVIEW_PACKET_PROVENANCE_BEFORE_ORF_MATERIALIZATION"
+}

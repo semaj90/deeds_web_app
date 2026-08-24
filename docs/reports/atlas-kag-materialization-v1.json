@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.kag.materialization.v1",
+  "status": "APPLIED",
+  "inputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\kag04-live-proof-fixture.jsonl",
+  "limit": 1000,
+  "inputLines": 2,
+  "accepted": 2,
+  "rejected": [],
+  "hyperedges": 1,
+  "hyperedgeMembers": 2,
+  "ontologyTuples": 1,
+  "canonicalWrites": true,
+  "identityMinting": false,
+  "materialized": {
+    "hyperedges": 1,
+    "members": 2,
+    "ontologyTuples": 1
+  }
+}

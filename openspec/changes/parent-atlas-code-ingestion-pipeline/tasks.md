@@ -136,13 +136,153 @@ safe to delete based on naming or lack of obvious callers alone.
 
 | Task | State | What it answers |
 |---|---|---|
-| **CHUNK0** `/audit-duplication chunking` | PARTIAL_PROVEN | Which structural extraction path is `CANONICAL_OWNER`: in-process TS bridge (`ast-langextract-bridge.ts`, confirmed live — `code_feature_registry` worker routes through it), Python `treesitter-chunker` sidecar (:8095, also real — installs `tree-sitter`, `tree-sitter-language-pack`, `ast-grep-py`, `langextract`), or legacy `ast-chunker.ts` (ts-morph-based)? Live worker wiring now uses the bridge; the Python NLP sidecar now prefers `treesitter-chunker` for structural spans when installed and keeps local tree-sitter only as compatibility fallback. Canonical ownership still needs the duplication audit. |
+| **CHUNK0** `/audit-duplication chunking` | PARTIAL_PROVEN | Which structural extraction path is `CANONICAL_OWNER`: in-process TS bridge (`ast-langextract-bridge.ts`, confirmed live — `code_feature_registry` worker routes through it), Python `treesitter-chunker` sidecar (:8095, also real — installs `tree-sitter`, `tree-sitter-language-pack`, `ast-grep-py`, `langextract`), or legacy `ast-chunker.ts` (ts-morph-based)? Live worker wiring now uses the bridge; the Python NLP sidecar now prefers `treesitter-chunker` for structural spans when installed and keeps local tree-sitter only as compatibility fallback. Canonical ownership still needs the duplication audit. **Re-verified live 2026-08-24 against the running `miniforge-nlp-sidecar` container** (was down; fixed via `docker restart`, same stuck-WSL2-port-forward class as Postgres/Valkey/Qdrant this session): `GET /health` confirms `treesitterChunker: {available:true, version:"4.0.0", importVerified:true}` — a real install, not a stub. Direct `POST /ast/chunk` against 3 real repo TS files returned genuine `function`/`class`/`method`/`import`/`type`/`interface`/`fragment` (gap-fill) chunks with correct byte spans (verified `EntityExtractorUnified` class body `[1663,10582]` containing `registerPattern` method `[2724,2828]`), `engine_version` and `source_revision` both echoed back correctly, `syntax_status: RECOVERED_WITH_ERRORS` with only benign `CONSILIENCY_LF_BYTE_SPAN_REMAPPED` diagnostics (correct LF→UTF-8 byte remapping, not real errors), `error_tag: null`. Confirmed live wiring: `chunkViaNlpSidecar()` (`parent-atlas-workstation-domain-classifier.ts:321`) calls the sidecar's `/analyze` (not `/ast/chunk` directly) via `createLangExtractClient()`, and the in-process `chunkViaTreeSitter()` is an explicit, distinctly-labeled (`chunkSource: 'sidecar'` vs `'tree-sitter'`) fallback only on sidecar failure — not silently masquerading as canonical. **One genuine, confirmed gap** (not closed by this verification): no Zod schema validates the sidecar's JSON response at the TS boundary anywhere in this call path (`chunkViaNlpSidecar` / `langextract-client.ts::analyze()`) — response fields are read with optional chaining and defaults, not parsed/validated. This was one of CHUNK0's own original acceptance criteria and **is now
+closed (2026-08-25)**: added `z.looseObject`-based Zod schemas for both
+`/health` and `/analyze` responses directly in
+`langextract-transport.ts::readJson()` — the one real fetch/JSON boundary
+both `langextract-client.ts` and every caller (including
+`chunkViaNlpSidecar()`) go through. Deliberately permissive
+(`.passthrough()`, most fields optional) rather than a tight mirror of the
+TS interfaces, since a live `/analyze` call carries real fields the TS
+interface never declared (`pass_results`, `control5`,
+`experiment_feature_matrix`, `event_hypergraph`) — the goal is catching a
+genuinely wrong-shaped response, not rejecting legitimate sidecar
+evolution. A schema failure throws
+`[langextract-transport] <context> response failed schema validation: ...`,
+which existing callers already catch (`chunkViaNlpSidecar`'s try/catch
+falls back to local tree-sitter on any thrown error) — so this closes the
+validation gap without changing fail-open behavior. 6/6 new vitest pass
+(`langextract-transport.spec.ts`, mocked `fetch`): valid `/analyze` and
+`/health` responses pass through typed; wrong-shaped and
+missing-required-field responses are rejected instead of silently trusted;
+a non-ok HTTP status still throws the original error before schema
+validation runs. **Also validated against the real live sidecar** (not
+just mocks) — a real `POST /analyze` call through the now-validated
+`requestLangExtractAnalyze()` against the running `miniforge-nlp-sidecar`
+container returned `LIVE_VALIDATION_PASSED` with 2 real chunks parsed
+successfully through the new schema.
+**Supplementary live proof (2026-08-25), closes the specific residual doubt
+noted in prior session notes** ("Live container/runtime proof that the
+sidecar is actually using the installed treesitter-chunker module in its
+`/analyze` path" was flagged unproven, distinct from the `/ast/chunk` proof
+above): called `POST /analyze` directly (`source_type: 'codebase'`,
+matching `chunkViaNlpSidecar()`'s exact real request shape) on a small
+synthetic TS fixture. Response chunks carried rich, correctly-typed
+metadata — `signature: {name, parameters, return_type}`,
+`complexity: {cyclomatic, cognitive, nesting_depth, logical_lines}`,
+`qualified_name`, `semantic_path` (e.g. `atlas-input.ts::Bar.baz`) — that
+only the real `treesitter-chunker` package's
+`chunk_file(extract_metadata=True, include_retrieval_metadata=True)` call
+produces; read `python/miniforge_nlp_sidecar.py:792-850`
+(`_code_chunks_tree_sitter`) directly to confirm this exact metadata shape
+is only reachable through that call, and that its `except Exception:
+raw_chunks = []` fallback (which would have produced zero or bare chunks)
+did not fire. `capabilities`/`pass_results` in the `/analyze` response do
+not carry a per-call chunker-source marker, so this is inference from
+response shape, not a direct flag — reasonably strong given the exact
+metadata match, but not as conclusive as an explicit provenance field
+would be. Recommend adding one, given it's cheap and would make this
+proof direct instead of inferred next time it's checked.
+**CANONICAL_OWNER question answered by live caller graph (2026-08-25)**,
+closing CHUNK0's remaining top-level open question. Traced real callers of
+all three candidates directly (`grep -rl`, not file existence):
+- Legacy ts-morph `ast-chunker.ts` (`chunkFiles`) has **3 live SvelteKit API
+  route callers** — `routes/api/codebase/index/+server.ts`,
+  `routes/api/codebase-index/gpu-pipeline/+server.ts` (dynamic import),
+  `routes/api/codebase-index/orchestrate/+server.ts` — real registered
+  routes, not dead code. (`dual-embedder.ts`'s reference is a `CodeChunk`
+  type-only import, not a functional caller.)
+- In-process TS bridge (`ast-langextract-bridge.ts`, tree-sitter +
+  LangExtract) has **2 live callers** — `source-pos-concept-packet.ts`,
+  `worker.ts` — powering the `code_feature_registry` background job path
+  specifically, not the interactive API routes above.
+- Python `treesitter-chunker` sidecar path (`chunkViaNlpSidecar()` in
+  `parent-atlas-workstation-domain-classifier.ts`, the file this session's
+  live proofs above were run against) has **zero live callers anywhere in
+  `src/`** — confirmed by the file's own header comment: "standalone and
+  NOT wired into any live route or startup hook yet... callable via CLI."
+  This session's treesitter-chunker `/analyze` proof and the new Zod
+  validation are both real and correct, but they currently validate a path
+  the live application never actually calls.
+
+**Corrected classification**: the "legacy" `ast-chunker.ts` is the
+functioning `CANONICAL_OWNER` in practice (most live callers, includes
+interactive request-serving routes); `ast-langextract-bridge.ts` is a
+`BACKEND` serving one specific background job lane; the Python sidecar path
+is `EXPERIMENT` — technically proven correct and now schema-validated, but
+not promoted to any live caller. Do not treat this session's sidecar
+proof work as evidence the sidecar is canonical — it closes a
+code-correctness gap, not an adoption gap. Promoting the sidecar path (or
+deprecating one of the other two) is an explicit, separate decision this
+session did not make and should not make unilaterally. |
 | **CHUNK1** compare output contracts | PARTIAL_PROVEN | The Node Tree-sitter challenger now emits `atlas.ast.evidence.v1` and passes its seam test; six-fixture comparison against the 8095 owner is still required for names, spans, typed edges, diagnostics, and identity parity. |
 | **CHUNK2** demote redundant path | NOT STARTED | Classify the loser `COMPATIBILITY`/`LEGACY`, not delete (Archival Rules) |
 | **TURBOVEC** `/audit-duplication turbovec` | **DONE 2026-08-12** | See `openspec/changes/parent-atlas-error-research-lane/tasks.md` — 4 live uncoordinated transports found (HTTP :8791, gRPC, Rust N-API, `child_process.spawn` CLI), NEW_CONFLICT, not yet resolved |
 | **LX0** LangExtract runtime grounding proof | PARTIAL_PROVEN | import is real `langextract` (not a stub), call reaches the 8095 sidecar, model provider explicit, extraction schema/examples explicit, grounded source spans returned, ungrounded extractions rejected/marked (not silently promoted), extraction provider revision persisted, failures explicit (not silently empty-success), `SourcePosConceptPacket` actually receives LangExtract-derived fields, live `code_feature_registry` worker exercises this path end-to-end |
 
 Live implementation note (2026-08-12): `sveltekit-frontend/src/lib/server/analysis/worker.ts` now routes `code_feature_registry` through `ast-langextract-bridge.ts` before packet synthesis. That means the live worker path is no longer AST-grep-only; it merges AST-grep, LangExtract, and tree-sitter fallback evidence before `SourcePosConceptPacket` / `CodeEvidenceSynthesizer` / `analysis_pass_results`. `ast-chunker.ts` remains the legacy compatibility path until CHUNK1/CHUNK2 close.
+
+**LX0 "ungrounded extractions rejected/marked" criterion closed (2026-08-25).**
+Found the gap directly: both LangExtract-entity paths in
+`ast-langextract-bridge.ts` (the sidecar path via `miniforge-nlp-sidecar.ts`
+and the standalone `entity-extraction.ts` path for non-code text) receive
+entities whose wire type already carries optional `start`/`end` character
+offsets (`NlpEntity`/`Entity`, the `char_interval`-equivalent), but neither
+path checked them before pushing the entity into `features[]` — every
+entity was silently promoted regardless of whether it had a real grounded
+span. Added `isGroundedEntity()` (exported, pure: requires both `start`
+and `end` to be finite numbers with `end > start`) and gated both push
+sites on it; `ExtractedFeature` now carries `start?`/`end?` through for
+whichever entities pass. Ungrounded entities are silently **dropped**, not
+marked-with-lower-confidence — matches the literal ask ("do not promote
+into ontology tuple") rather than inventing a new low-confidence tier.
+6/6 vitest pass (`ast-langextract-bridge.spec.ts`): the pure grounding
+predicate (valid span, missing start/end, one-sided, zero-width/inverted,
+non-finite); and one true end-to-end test with `entity-extraction.js`
+mocked, proving `extractAstAndEntities()` itself drops an ungrounded
+entity while keeping a grounded one in the same call. Both live callers
+(`source-pos-concept-packet.ts`, `worker.ts`) checked — they only consume
+the `ExtractedFeature[]` array shape, unaffected by the additive optional
+fields.
+
+**LX0 "failures explicit (not silently empty-success)" criterion closed
+(2026-08-25).** All three extraction paths (sidecar, standalone
+entity-extraction, ast-grep) previously only `console.warn`'d on failure
+and fell through to an empty contribution — a caller had no way to tell
+"this document genuinely has zero entities" apart from "the sidecar was
+down and we silently got nothing." Added
+`extractAstAndEntitiesWithDiagnostics(text, isCode)` returning
+`{features, diagnostics}` where `diagnostics` carries a
+`'ok'|'skipped'|'unavailable'|'error'` status per path plus a typed
+`errors[]` array (`{path, message}`). `extractAstAndEntities()` (the
+original export both live callers use) is now a thin wrapper that just
+returns `.features` — **contract unchanged for
+`source-pos-concept-packet.ts`/`worker.ts`**, confirmed by re-reading both
+call sites after the refactor. 4 new vitest cases on top of the existing
+6 (10/10 total pass): genuinely-empty extraction reports `status: 'ok'`
+with zero errors; a thrown error reports `status: 'error'` with the
+captured message, distinguishable from the empty-success case; sidecar
+absence reports `'unavailable'` (a real, expected state) rather than
+`'error'` (a genuine failure) — the two are no longer conflated;
+non-applicable paths (e.g. ast-grep on non-code text) report `'skipped'`.
+
+**LX0 "extraction provider revision persisted" criterion closed
+(2026-08-24).** The Python `/analyze` response now emits a per-call
+`provider_revision` composed from the explicit sidecar analysis revision and
+the installed ast-grep, tree-sitter, and treesitter-chunker package
+revisions. The TypeScript client preserves that field, and
+`extractAstAndEntitiesWithDiagnostics()` reports
+`providerRevisionStatus: 'present'|'missing'|'unavailable'` plus the captured
+revision. Missing revisions are explicit diagnostics rather than silently
+accepted provenance. The focused NLP/client and LX0 suites pass (13/13), and
+the Python sidecar compiles successfully.
+
+**Live deployment follow-up:** the currently running `:8095` process was
+probed after the change and still returns `provider_revision: null`; it has
+not been restarted onto this source revision. Treat local implementation and
+tests as proven, but keep live LX0 deployment verification pending until the
+normal NLP sidecar rebuild/restart is performed and the same `/analyze` probe
+returns a non-empty revision.
 
 ### Priority update from the latest review
 

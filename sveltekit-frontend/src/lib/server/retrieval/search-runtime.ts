@@ -326,6 +326,22 @@ export interface SearchResult {
     rerankModel: string;
     rerankerUsed: boolean;
     promotionAttempted?: boolean;
+    /**
+     * KAG hypergraph neighbor evidence (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration,
+     * KAG-01/KAG-02), purely additive/informational — NEVER used for
+     * scoring, fusion, or reranking above. Populated from
+     * `kag-mutual-index-v1.ts::buildKagMutualIndexV1()` against real
+     * `OntologyLinkedTupleV1`/`HyperedgeV1` rows.
+     *
+     * Deliberately always `undefined` right now: no live Postgres table
+     * persists either contract yet (checked directly — zero `INSERT INTO`
+     * across `ontology-linked-tuple-cache.ts`/`feature-doc-enrichment.ts`,
+     * the two real callers of `OntologyLinkedTupleV1`). This field exists
+     * so a caller can type-check against its eventual shape now, without
+     * this file fabricating placeholder data pretending a real evidence
+     * source exists. Populate it only after that persistence work lands.
+     */
+    hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
   };
   promotion?: {
     status: 'success' | 'partial' | 'skipped' | 'failed';

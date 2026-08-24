@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-24T17:00:23.867Z",
+  "generatedAt": "2026-08-24T21:50:57.966Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -29,8 +29,26 @@
   "postgres": {
     "reachable": true,
     "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "extensions": {
+      "pg_trgm": "1.6",
+      "vector": "0.8.3"
+    },
     "vectorExtension": "0.8.3",
+    "lexicalOwner": "POSTGRES_FTS_TSVECTOR_GIN_TS_RANK_CD",
+    "denseOwner": "POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE",
+    "canonicalDenseRepresentation": "semantic_768",
+    "canonicalDenseColumn": "codebase_chunk_index.content_embedding_768",
+    "proposedSearchProjection": {
+      "table": "atlas_file_search_index_v1",
+      "applied": false,
+      "conceptLinksApplied": false,
+      "writesPerformedByAudit": false
+    },
     "tables": {
+      "atlas_packets": {
+        "exists": true,
+        "count": 61660
+      },
       "codebase_chunk_index": {
         "exists": true,
         "count": 52417
@@ -45,22 +63,164 @@
       },
       "atlas_symbol_registry": {
         "exists": true,
-        "count": 0
+        "count": 10220
       },
       "atlas_symbol_versions": {
         "exists": true,
-        "count": 0
+        "count": 200
       },
       "atlas_structural_reference_resolutions": {
         "exists": true,
         "count": 0
       },
       "atlas_observation_feature_rows": {
-        "exists": false,
-        "count": null
+        "exists": true,
+        "count": 1808
       }
     },
     "columns": {
+      "atlas_packets": [
+        "packet_id",
+        "artifact_id",
+        "packet_key",
+        "source_ref",
+        "source_ref_key",
+        "file_path",
+        "directory_path",
+        "feature_id",
+        "feature_label",
+        "community_id",
+        "concept_ids",
+        "cluster_id",
+        "embedding",
+        "payload",
+        "metadata",
+        "permissions",
+        "topology",
+        "vectors",
+        "summary",
+        "tags",
+        "byte_start",
+        "byte_end",
+        "sha256",
+        "source_kind",
+        "source_path",
+        "group_id",
+        "packet_universe",
+        "qdrant_point_id",
+        "qdrant_collection",
+        "qdrant_vector_dim",
+        "identity_lane",
+        "identity_confidence",
+        "som_cluster",
+        "som_row",
+        "som_col",
+        "som_index",
+        "kmeans_cluster",
+        "pagerank",
+        "betweenness",
+        "eigenvector",
+        "neo4j_node_id",
+        "redis_centroid_key",
+        "latent_64",
+        "reward_prior",
+        "created_at",
+        "updated_at",
+        "function_symbol",
+        "content_embedding_384",
+        "embedding_status",
+        "embedding_timestamp",
+        "extracted_entities",
+        "keywords",
+        "error_pattern",
+        "feature_group_id",
+        "domain_class",
+        "taxonomy_level",
+        "bm25_indexed_at",
+        "bm25_score",
+        "bm25_terms",
+        "packet_ulid",
+        "title_id",
+        "canonical_source_ref",
+        "page_rank_score",
+        "kmeans_cluster_id",
+        "tree_node_id",
+        "routing_hints",
+        "community_source",
+        "community_confidence",
+        "lineage_version",
+        "ledger_type",
+        "canonical",
+        "payload_backfilled_at",
+        "k_core",
+        "ngrams",
+        "trigrams",
+        "engrams",
+        "used_concepts",
+        "topolog_cluster",
+        "topolog_confidence",
+        "topolog_method",
+        "topolog_applied_at",
+        "repository_id",
+        "directory_id",
+        "file_id",
+        "module_id",
+        "symbol_id",
+        "chunk_id",
+        "recovery_lane",
+        "som_cluster_id",
+        "ontology",
+        "packet_type_test",
+        "packet_type",
+        "packet_ontology",
+        "parent_packet_key",
+        "related_packets",
+        "telemetry",
+        "embedding_eligible",
+        "summary_hash",
+        "embedding_version",
+        "embedding_claimed_at",
+        "embedding_claimed_by",
+        "feature_envelope",
+        "domain_confidence",
+        "title_generator_version",
+        "file_purpose",
+        "thoroughness",
+        "app_criticality",
+        "test_coverage_pct",
+        "file_understanding_computed_at",
+        "file_understanding_method",
+        "openspec_id",
+        "gsd_id",
+        "enrichment_updated_at",
+        "som_cell_x",
+        "som_cell_y",
+        "ast_score",
+        "community_boost",
+        "rerank_features",
+        "pagerank_score",
+        "som_distance",
+        "predicted_domain",
+        "classifier_kind",
+        "classifier_version",
+        "pagerank_raw",
+        "authority_score",
+        "workspace_id",
+        "semantic_anchor",
+        "ontology_version",
+        "content_hash",
+        "domain_memberships",
+        "primary_domain",
+        "workspace_revision",
+        "representation_revision",
+        "embedding_digest",
+        "source_representation_id",
+        "source_dimension",
+        "projection_representation_id",
+        "projection_dimension",
+        "encoder_revision",
+        "som_revision"
+      ],
       "codebase_chunk_index": [
         "id",
         "qdrant_id",
@@ -222,7 +382,15 @@
         "byte_end",
         "parent_route",
         "producer_revision",
-        "created_at"
+        "created_at",
+        "packet_key",
+        "candidate_ordinal",
+        "parameter_names",
+        "parameter_types",
+        "return_types",
+        "imports",
+        "calls",
+        "callable_metadata"
       ],
       "atlas_structural_reference_resolutions": [
         "reference_id",
@@ -238,7 +406,34 @@
         "created_at",
         "updated_at"
       ],
-      "atlas_observation_feature_rows": []
+      "atlas_observation_feature_rows": [
+        "packet_key",
+        "feature_revision",
+        "source_ref",
+        "source_version_receipt_id",
+        "workspace_revision",
+        "representation_id",
+        "representation_revision",
+        "tree_node_id",
+        "ontology_classes",
+        "ast_observation_kinds",
+        "langextract_classes",
+        "flattened_tags",
+        "ontology_mask",
+        "ast_pattern_mask",
+        "structural_flags",
+        "evidence_refs",
+        "kmeans_cluster_id",
+        "som_row",
+        "som_col",
+        "community_id",
+        "pagerank",
+        "personalized_pagerank",
+        "producer_revision",
+        "input_digest",
+        "created_at",
+        "updated_at"
+      ]
     },
     "populated": {
       "codebaseChunkEmbeddingColumn": "content_embedding_768",
@@ -256,9 +451,37 @@
         "exists": true,
         "count": 52417
       },
+      "codebaseChunk_content_embedding": {
+        "exists": true,
+        "count": 52380
+      },
+      "codebaseChunk_content_embedding_768": {
+        "exists": true,
+        "count": 576
+      },
+      "codebaseChunk_content_embedding_384": {
+        "exists": true,
+        "count": 52380
+      },
+      "codebaseChunk_summary_embedding": {
+        "exists": true,
+        "count": 1160
+      },
+      "codebaseChunk_signature_embedding": {
+        "exists": true,
+        "count": 533
+      },
+      "codebaseChunk_search_vector": {
+        "exists": true,
+        "count": 52417
+      },
       "packetAstSymbols": {
         "exists": true,
         "count": 12497
+      },
+      "atlasPacketsSemantic768": {
+        "exists": true,
+        "count": 61659
       },
       "astNodesWithSymbols": {
         "exists": true,
@@ -266,7 +489,7 @@
       },
       "symbolRegistryActive": {
         "exists": true,
-        "count": 0
+        "count": 10170
       }
     },
     "bitmapTables": [],
@@ -320,6 +543,46 @@
         "table": "atlas_artifacts",
         "name": "idx_atlas_artifacts_metadata",
         "definition": "CREATE INDEX idx_atlas_artifacts_metadata ON public.atlas_artifacts USING gin (metadata)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_calls_gin",
+        "definition": "CREATE INDEX atlas_callable_search_calls_gin ON public.atlas_callable_search USING gin (calls)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_enrichment_metadata_gin",
+        "definition": "CREATE INDEX atlas_callable_search_enrichment_metadata_gin ON public.atlas_callable_search USING gin (enrichment_metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_imports_gin",
+        "definition": "CREATE INDEX atlas_callable_search_imports_gin ON public.atlas_callable_search USING gin (imports)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_inferred_uses_gin",
+        "definition": "CREATE INDEX atlas_callable_search_inferred_uses_gin ON public.atlas_callable_search USING gin (inferred_uses)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_metadata_gin",
+        "definition": "CREATE INDEX atlas_callable_search_metadata_gin ON public.atlas_callable_search USING gin (callable_metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_parameter_names_gin",
+        "definition": "CREATE INDEX atlas_callable_search_parameter_names_gin ON public.atlas_callable_search USING gin (parameter_names)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_parameter_types_gin",
+        "definition": "CREATE INDEX atlas_callable_search_parameter_types_gin ON public.atlas_callable_search USING gin (parameter_types)"
+      },
+      {
+        "table": "atlas_callable_search",
+        "name": "atlas_callable_search_search_vector_gin",
+        "definition": "CREATE INDEX atlas_callable_search_search_vector_gin ON public.atlas_callable_search USING gin (search_vector)"
       },
       {
         "table": "atlas_embeddings_384",
@@ -382,9 +645,34 @@
         "definition": "CREATE INDEX idx_higher_hop_metadata_gin ON public.atlas_higher_hop_index USING gin (metadata jsonb_path_ops)"
       },
       {
+        "table": "atlas_hyperedges",
+        "name": "atlas_hyperedges_provenance_gin_idx",
+        "definition": "CREATE INDEX atlas_hyperedges_provenance_gin_idx ON public.atlas_hyperedges USING gin (provenance jsonb_path_ops)"
+      },
+      {
         "table": "atlas_knowledge_objects",
         "name": "idx_ako_canonical_data_gin",
         "definition": "CREATE INDEX idx_ako_canonical_data_gin ON public.atlas_knowledge_objects USING gin (canonical_data)"
+      },
+      {
+        "table": "atlas_observation_feature_rows",
+        "name": "atlas_observation_feature_rows_ast_gin",
+        "definition": "CREATE INDEX atlas_observation_feature_rows_ast_gin ON public.atlas_observation_feature_rows USING gin (ast_observation_kinds)"
+      },
+      {
+        "table": "atlas_observation_feature_rows",
+        "name": "atlas_observation_feature_rows_extract_gin",
+        "definition": "CREATE INDEX atlas_observation_feature_rows_extract_gin ON public.atlas_observation_feature_rows USING gin (langextract_classes)"
+      },
+      {
+        "table": "atlas_observation_feature_rows",
+        "name": "atlas_observation_feature_rows_ontology_gin",
+        "definition": "CREATE INDEX atlas_observation_feature_rows_ontology_gin ON public.atlas_observation_feature_rows USING gin (ontology_classes)"
+      },
+      {
+        "table": "atlas_observation_feature_rows",
+        "name": "atlas_observation_feature_rows_tags_gin",
+        "definition": "CREATE INDEX atlas_observation_feature_rows_tags_gin ON public.atlas_observation_feature_rows USING gin (flattened_tags)"
       },
       {
         "table": "atlas_ontology_concepts",
@@ -392,9 +680,34 @@
         "definition": "CREATE INDEX idx_atlas_ontology_concepts_aliases ON public.atlas_ontology_concepts USING gin (aliases)"
       },
       {
+        "table": "atlas_ontology_linked_tuples",
+        "name": "idx_atlas_ontology_linked_tuples_concept_ids_gin",
+        "definition": "CREATE INDEX idx_atlas_ontology_linked_tuples_concept_ids_gin ON public.atlas_ontology_linked_tuples USING gin (concept_ids)"
+      },
+      {
+        "table": "atlas_ontology_linked_tuples",
+        "name": "idx_atlas_ontology_linked_tuples_ontology_ids_gin",
+        "definition": "CREATE INDEX idx_atlas_ontology_linked_tuples_ontology_ids_gin ON public.atlas_ontology_linked_tuples USING gin (ontology_ids)"
+      },
+      {
+        "table": "atlas_ontology_tuples",
+        "name": "atlas_ontology_tuples_concepts_gin_idx",
+        "definition": "CREATE INDEX atlas_ontology_tuples_concepts_gin_idx ON public.atlas_ontology_tuples USING gin (concept_ids)"
+      },
+      {
+        "table": "atlas_ontology_tuples",
+        "name": "atlas_ontology_tuples_ontology_ids_gin_idx",
+        "definition": "CREATE INDEX atlas_ontology_tuples_ontology_ids_gin_idx ON public.atlas_ontology_tuples USING gin (ontology_ids)"
+      },
+      {
         "table": "atlas_ontology_tuples",
         "name": "atlas_ontology_tuples_pkey",
         "definition": "CREATE UNIQUE INDEX atlas_ontology_tuples_pkey ON public.atlas_ontology_tuples USING btree (subject_id, predicate, object_id, origin, version)"
+      },
+      {
+        "table": "atlas_ontology_tuples",
+        "name": "atlas_ontology_tuples_provenance_gin_idx",
+        "definition": "CREATE INDEX atlas_ontology_tuples_provenance_gin_idx ON public.atlas_ontology_tuples USING gin (provenance jsonb_path_ops)"
       },
       {
         "table": "atlas_packet_features",
@@ -1109,14 +1422,515 @@
     ]
   },
   "qdrant": {
-    "reachable": false,
+    "reachable": true,
     "url": "http://127.0.0.1:6333",
-    "error": "The operation was aborted due to timeout"
+    "collections": [
+      {
+        "name": "BifrostSemanticCachePlugin",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 5,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "agent_memory_observations",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "audio_segments",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "case_chunks",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "chat_messages",
+        "vectors": {
+          "message": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "chunks_web_search",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "cluster_narratives",
+        "vectors": {
+          "narrative": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 18,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "code_llm_outputs",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_384",
+        "vectors": {
+          "content": {
+            "size": 384,
+            "distance": "Cosine"
+          }
+        },
+        "points": 1,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_384_hybrid",
+        "vectors": {
+          "content": {
+            "size": 384,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_512",
+        "vectors": {
+          "size": 512,
+          "distance": "Cosine"
+        },
+        "points": 53379,
+        "indexedVectors": 50149,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_768",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 106338,
+        "indexedVectors": 106696,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_768_v2",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 52380,
+        "indexedVectors": 52380,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_sparse_test_v1",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 500,
+        "indexedVectors": 500,
+        "status": "green"
+      },
+      {
+        "name": "codebase_topology_128",
+        "vectors": {
+          "latent_128": {
+            "size": 128,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_topology_64",
+        "vectors": {
+          "latent_64": {
+            "size": 64,
+            "distance": "Cosine"
+          }
+        },
+        "points": 105761,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "court_opinions",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "diagnosis_embeddings",
+        "vectors": {
+          "diagnosis": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "document_knowledge_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "document_tags",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "embedding_cache",
+        "vectors": {
+          "embedding": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "error_embeddings",
+        "vectors": {
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 6,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_items",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_items_clip_512",
+        "vectors": {
+          "size": 512,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_vectors",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "external_programming_docs_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "feature_maps",
+        "vectors": {
+          "summary": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "fictional_case_chunks",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "fixer_memory_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "knowledge_base",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_canon_chunks",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_cases",
+        "vectors": {
+          "description": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_documents",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_glossary",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "llm_response_cache",
+        "vectors": {
+          "query": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 9,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "phase110_baseline_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 2467,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "poi_profiles",
+        "vectors": {
+          "embedding": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "research_memory_768",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "sc_deedscodebase_deeds-web-app",
+        "vectors": {
+          "dense": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "sc_deedssocraticode_metadata",
+        "vectors": {
+          "size": 1,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "summary_lenses_768",
+        "vectors": {
+          "summary": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "synthesis_memory_768",
+        "vectors": {
+          "synthesis": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 8,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "topic_clusters",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      }
+    ]
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 247,
-    "declaredSidecars": 32,
+    "manualSqlFiles": 251,
+    "declaredSidecars": 36,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",
@@ -1182,16 +1996,14 @@
       ]
     },
     {
-      "id": "FEATURE_ROW_TABLE_MISSING",
+      "id": "POSTGRES_CANONICAL_EMBEDDING_PARTIAL",
       "severity": "high",
-      "message": "The revisioned observation feature-row table has not been applied to the live database.",
-      "evidence": []
-    },
-    {
-      "id": "SYMBOL_REGISTRY_EMPTY",
-      "severity": "high",
-      "message": "The stable symbol registry exists but has no active symbols.",
-      "evidence": []
+      "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
+      "evidence": [
+        "576/52417",
+        "codebase_chunk_index.content_embedding_768",
+        "codebase_chunk_index.content_embedding"
+      ]
     },
     {
       "id": "POSTGRES_BITMAP_TABLE_MISSING",
@@ -1206,12 +2018,6 @@
       "evidence": [
         "12497/61660"
       ]
-    },
-    {
-      "id": "QDRANT_UNAVAILABLE",
-      "severity": "high",
-      "message": "The read-only indexing audit could not reach Qdrant.",
-      "evidence": []
     },
     {
       "id": "DRIZZLE_SIDECAR_DECLARATION_GAP",

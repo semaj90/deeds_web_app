@@ -1,0 +1,193 @@
+{
+  "schema": "atlas.observation-feature-materialization-plan.v1",
+  "generatedAt": "2026-08-24T19:48:26.439Z",
+  "readOnly": true,
+  "writes": false,
+  "sourceArtifacts": {
+    "identity": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-identity.jsonl",
+    "domain": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-okf-domain.jsonl"
+  },
+  "inputIdentityRows": 4365,
+  "inputDomainRows": 4365,
+  "examinedRows": 4365,
+  "eligibleRows": 4365,
+  "featureRevision": "atlas-ast-entity-prefill-v2",
+  "projectedUniqueRows": 174,
+  "primaryKeyCollisionGroups": 167,
+  "primaryKeyCollisionRows": 4191,
+  "collisionSamples": [
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "symbolCount": 12,
+      "symbols": [
+        "function:main",
+        "variable:args",
+        "variable:isDryRun",
+        "variable:isVerbose",
+        "variable:enableGPU",
+        "variable:enableBitFrost",
+        "variable:enableKAG",
+        "variable:limit"
+      ]
+    },
+    {
+      "packetKey": "ace:packet:fc287b3526b5",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "symbolCount": 37,
+      "symbols": [
+        "variable:ErrorFixingState",
+        "type:ErrorFixingStateType",
+        "interface:KanbanErrorFixingTask",
+        "interface:ErrorFixSuggestion",
+        "function:loadErrorFixingPackets",
+        "variable:orchestrator",
+        "variable:packets",
+        "variable:errorFixingPackets"
+      ]
+    },
+    {
+      "packetKey": "ace:packet:068730e767d2",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "symbolCount": 7,
+      "symbols": [
+        "function:main",
+        "variable:args",
+        "variable:isDryRun",
+        "variable:isVerbose",
+        "variable:graph",
+        "variable:initialState",
+        "variable:result"
+      ]
+    },
+    {
+      "packetKey": "ace:packet:bf0f0228d6c8",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "symbolCount": 23,
+      "symbols": [
+        "variable:pkg",
+        "interface:Packet",
+        "interface:PacketReaderOptions",
+        "class:PacketReader",
+        "method:constructor",
+        "method:readPackets",
+        "variable:options",
+        "variable:whereConditions"
+      ]
+    },
+    {
+      "packetKey": "ace:packet:badf6fd441dd",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "symbolCount": 15,
+      "symbols": [
+        "type:PolicyTaskType",
+        "interface:PolicyTask",
+        "interface:TaskRoute",
+        "function:classifyPacketTask",
+        "variable:packet",
+        "variable:TASK_ROUTES",
+        "function:getTaskRoute",
+        "function:groupPacketsByTask"
+      ]
+    }
+  ],
+  "blockedRows": 0,
+  "coverage": {
+    "packetKey": 4365,
+    "sourceRef": 4365,
+    "sourceRevision": 4365,
+    "astObservationKind": 4365,
+    "domainCandidate": 3535,
+    "domainFallback": 830
+  },
+  "blockers": {},
+  "sampleEligible": [
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "treeNodeId": "9c534377-2efa-42fb-a445-15dd6df4dcd1",
+      "sourceRevision": "workspace:0",
+      "symbolName": "main",
+      "symbolKind": "function",
+      "astObservationKinds": [
+        "FUNCTION_DECL"
+      ],
+      "domainId": "retrieval",
+      "fallbackDomainId": null,
+      "classificationStatus": "PRIMARY_CANDIDATE",
+      "identityStatus": "RESOLVED_CANDIDATE",
+      "eligible": true,
+      "blockers": []
+    },
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "treeNodeId": "9c534377-2efa-42fb-a445-15dd6df4dcd1",
+      "sourceRevision": "workspace:0",
+      "symbolName": "args",
+      "symbolKind": "variable",
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "domainId": "retrieval",
+      "fallbackDomainId": null,
+      "classificationStatus": "PRIMARY_CANDIDATE",
+      "identityStatus": "RESOLVED_CANDIDATE",
+      "eligible": true,
+      "blockers": []
+    },
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "treeNodeId": "9c534377-2efa-42fb-a445-15dd6df4dcd1",
+      "sourceRevision": "workspace:0",
+      "symbolName": "isDryRun",
+      "symbolKind": "variable",
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "domainId": "retrieval",
+      "fallbackDomainId": null,
+      "classificationStatus": "PRIMARY_CANDIDATE",
+      "identityStatus": "RESOLVED_CANDIDATE",
+      "eligible": true,
+      "blockers": []
+    },
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "treeNodeId": "9c534377-2efa-42fb-a445-15dd6df4dcd1",
+      "sourceRevision": "workspace:0",
+      "symbolName": "isVerbose",
+      "symbolKind": "variable",
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "domainId": "retrieval",
+      "fallbackDomainId": null,
+      "classificationStatus": "PRIMARY_CANDIDATE",
+      "identityStatus": "RESOLVED_CANDIDATE",
+      "eligible": true,
+      "blockers": []
+    },
+    {
+      "packetKey": "ace:packet:ade07a30f5b6",
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "treeNodeId": "9c534377-2efa-42fb-a445-15dd6df4dcd1",
+      "sourceRevision": "workspace:0",
+      "symbolName": "enableGPU",
+      "symbolKind": "variable",
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "domainId": "retrieval",
+      "fallbackDomainId": null,
+      "classificationStatus": "PRIMARY_CANDIDATE",
+      "identityStatus": "RESOLVED_CANDIDATE",
+      "eligible": true,
+      "blockers": []
+    }
+  ],
+  "planChecksum": "903c260d658141cd3d8e0041ca04c01653b5546735a21fba57174d1fb9ce2b60",
+  "nextGate": "REVIEW_ORF_PLAN_BEFORE_APPLY"
+}

@@ -428,6 +428,7 @@ class EventHypergraphPayload(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     document_id: str
+    provider_revision: str
     source_type: SOURCE_TYPES
     extraction_mode: EXTRACTION_MODES
     entities: list[Entity]
@@ -765,6 +766,15 @@ def _chunk_field(item: Any, *names: str) -> Any:
         if value is not None:
             return value
     return None
+
+
+def _provider_revision() -> str:
+    """Stable per-call provenance for the analysis provider and parser stack."""
+    explicit = os.getenv("NLP_SIDECAR_PROVIDER_REVISION", "parent-atlas-nlp-sidecar:analysis-v1").strip()
+    parser = _package_version("ast-grep-py", "ast-grep") or "unavailable"
+    tree_sitter = _package_version("tree-sitter-language-pack", "tree-sitter") or "unavailable"
+    chunker = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unavailable"
+    return f"{explicit}|ast-grep={parser}|tree-sitter={tree_sitter}|chunker={chunker}"
 
 
 def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[int, int]:
@@ -1898,6 +1908,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         experiment_feature_matrix,
     )
     metadata: dict[str, Any] = {
+        "provider_revision": _provider_revision(),
         "source_ref": req.source_ref,
         "packet_key": req.packet_key,
         "model_id": req.model_id,
@@ -1919,6 +1930,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 
     return AnalyzeResponse(
         document_id=document_id,
+        provider_revision=_provider_revision(),
         source_type=req.source_type,
         extraction_mode=req.extraction_mode,
         entities=entities[:200],

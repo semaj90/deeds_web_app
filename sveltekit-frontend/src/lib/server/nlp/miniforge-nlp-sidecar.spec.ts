@@ -30,6 +30,7 @@ describe('miniforge-nlp-sidecar', () => {
         expect(body.grounded_extraction_required).toBe(true);
         return new Response(JSON.stringify({
           document_id: 'doc-1',
+          provider_revision: 'parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.44.0',
           source_type: 'codebase',
           extraction_mode: 'full',
           entities: [],
@@ -71,6 +72,7 @@ describe('miniforge-nlp-sidecar', () => {
     });
 
     expect(analysis.document_id).toBe('doc-1');
+    expect(analysis.provider_revision).toContain('parent-atlas-nlp-sidecar:analysis-v1');
     expect(Array.isArray(analysis.entities)).toBe(true);
     expect(analysis.event_hypergraph?.events).toEqual([]);
     expect(analysis.event_hypergraph?.recommendation_feature_rows).toEqual([]);

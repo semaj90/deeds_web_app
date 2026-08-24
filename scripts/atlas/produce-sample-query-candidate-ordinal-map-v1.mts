@@ -16,6 +16,7 @@ function arg(name: string, fallback: string | null = null): string | null {
 
 interface SemanticSourceRow {
   canonical_id: string;
+  packet_key: string;
   canonical_revision: string;
   source_ref: string;
   representation_id: 'semantic_768';
@@ -26,7 +27,24 @@ interface SemanticSourceRow {
 
 async function readNdjson(filePath: string): Promise<SemanticSourceRow[]> {
   const text = await fs.readFile(filePath, 'utf8');
-  return text.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line) as SemanticSourceRow);
+  return text.split(/\r?\n/).filter(Boolean).map((line) => {
+    const raw = JSON.parse(line) as Record<string, unknown>;
+    const embedding = typeof raw.embedding === 'string' ? JSON.parse(raw.embedding) : raw.embedding;
+    const sourceRef = typeof raw.source_ref === 'string' ? raw.source_ref : '';
+    const packetKey = typeof raw.packet_key === 'string' ? raw.packet_key : sourceRef;
+    const workspaceRevision = String(raw.workspace_revision ?? 'unknown');
+    const representationRevision = String(raw.representation_revision ?? `embedding:${raw.embedding_digest ?? 'unknown'}`);
+    return {
+      canonical_id: packetKey,
+      packet_key: packetKey,
+      canonical_revision: String(raw.source_revision ?? raw.content_hash ?? 'unknown'),
+      source_ref: sourceRef,
+      representation_id: 'semantic_768',
+      representation_revision: representationRevision,
+      workspace_revision: workspaceRevision,
+      embedding: Array.isArray(embedding) ? embedding as number[] : [],
+    };
+  });
 }
 
 async function main() {
@@ -59,7 +77,8 @@ async function main() {
     producerRevision: 'sample-query-candidate-ordinal-map-producer-v1',
     candidates: rows.map((row) => ({
       canonicalId: row.canonical_id,
-      packetKey: row.canonical_id,
+      packetKey: row.packet_key,
+      sourceRef: row.source_ref,
       treeNodeId: null,
       symbolVersionId: null,
       workspaceRevision: row.workspace_revision,

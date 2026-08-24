@@ -106,6 +106,22 @@ already own the query-time layer per the existing 3-layer split above).
 
 ### D2 — cuVS for exact/CAGRA ANN, KMeans, PCA (extends the live sidecar, doesn't replace it)
 
+### D2a — Logical feature blocks versus physical GPU tiles
+
+The feature matrix contract and the GPU launch layout are different layers.
+`TopologyFeature4` and any four-channel topology block are logically `4x4`
+when represented as four features over four selected rows/lanes. A `4x6`
+layout is only a candidate physical tile shape for an RTX/cuTile/SIMT kernel;
+it is not a new feature dimension, topology coordinate system, or cuGraph/cuVS
+schema. Padding, stride, shared-memory staging, and warp grouping must be
+recorded in a kernel receipt and must preserve the logical shape/checksum.
+
+Likewise, `7x3` and `12/24` are feature-group or interpolation labels until a
+specific operator benchmark gives them a formal meaning. They must not be
+used as semantic dimensions or silently folded into CAGRA, cuVS, or cuGraph
+identities. The promotion order is: logical matrix contract, CPU reference,
+GPU physical layout, output parity, then performance receipt.
+
 **API surface** (fetched live from `docs.rapids.ai/api/cuvs/stable/python_api/`,
 2026-08-09):
 - Exact KNN: `brute_force.build()` / `brute_force.search()` / `brute_force.Index`

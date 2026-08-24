@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { candidateRepresentationBindingV1Schema } from './canonical-candidate-v1.js';
 
 export const CANDIDATE_FEATURE_ROW_SCHEMA = 'atlas.candidate-feature-row.v1' as const;
 
@@ -17,6 +18,7 @@ export const CandidateFeatureRowV1Schema = z.object({
   graphRevision: z.string().min(1).nullable().default(null),
   semanticRevision: z.string().min(1).nullable().default(null),
   featureRevision: z.string().min(1),
+  representationBindings: z.array(candidateRepresentationBindingV1Schema).default([]),
 
   semanticRelevance: nullableScore,
   lexicalRelevance: nullableScore,

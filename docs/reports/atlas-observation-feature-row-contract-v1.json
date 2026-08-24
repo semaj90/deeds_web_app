@@ -1,9 +1,9 @@
 {
   "schema": "atlas.observation-feature-row-contract-audit.v1",
-  "generatedAt": "2026-08-24T16:51:17.183Z",
+  "generatedAt": "2026-08-24T21:49:42.877Z",
   "writes": false,
   "liveDatabaseChecked": false,
-  "status": "BLOCKED_DUPLICATE_INCOMPATIBLE_MIGRATIONS",
+  "status": "PASS_ACTIVE_ORF_REPOSITORY_ALIGNED",
   "canonicalOwnerCandidate": "sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql",
   "migrationCandidates": {
     "orfPacketKey": {
@@ -35,7 +35,7 @@
       ],
       "semanticVector": true,
       "matchesDrizzleSchema": false,
-      "matchesRepository": true,
+      "matchesRepository": false,
       "conflict": "same table name, incompatible primary key and column contract"
     }
   },
@@ -47,8 +47,6 @@
   },
   "decisionRequired": [
     "Keep ORF packet_key schema as the active exact-filter table because current Drizzle/materializer/exporter consumers target it.",
-    "Retire or rename the candidate_id/vector migration before any feature-row migration is applied.",
-    "Keep semantic_768 owned by the canonical packet/vector lane; do not add a second ANN owner by applying the candidate migration unchanged.",
-    "Reconcile parent-atlas repository code separately before wiring its candidate_id/semantic_768 writer to the packet_key table."
+    "Keep semantic_768 search in the canonical vector lane; the ORF repository remains exact/filter-only."
   ]
 }

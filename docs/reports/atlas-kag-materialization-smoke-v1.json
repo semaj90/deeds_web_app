@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.kag.materialization.v1",
+  "status": "DRY_RUN_READY",
+  "inputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\fixtures\\kag-contract-smoke.jsonl",
+  "limit": 10,
+  "inputLines": 2,
+  "accepted": 2,
+  "rejected": [],
+  "hyperedges": 1,
+  "hyperedgeMembers": 2,
+  "ontologyTuples": 1,
+  "canonicalWrites": false,
+  "identityMinting": false
+}

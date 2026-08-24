@@ -185,13 +185,14 @@ two OpenSpec changes (this one vs. `parent-atlas-graph-retrieval-proof`) should 
 GS1.3x+/Gate 4-6 owner going forward — that's an explicit operator decision, not something to
 guess at by unilaterally merging or deprecating either file.
 
-## GPU algorithm availability inventory (2026-08-10) — import-level check only, not runtime-proven
+## GPU algorithm availability inventory (2026-08-24) — bounded fixture proof
 
 Requested to confirm which GPU graph/vector algorithms are actually importable in
 `atlas-rapids-cu13` before planning further enhancements (PageRank, n-ary hypergraph, RAG).
-This is an **import/`hasattr` check only** — confirms the function exists and is callable,
-**not** that it has been run against real data or produces correct results on this repo's
-graph. Do not treat any row below as "proven," only as "available to build against."
+The original inventory below remains an availability record. The 2026-08-24 bounded
+fixture check additionally executed Jaccard, PageRank, Louvain, and Leiden on a four-node
+weighted-graph-compatible fixture. This is still not a proof against the canonical Graphify
+snapshot or a promotion/parity result.
 
 | Library | Function | Available? | Notes |
 |---|---|---|---|
@@ -199,6 +200,9 @@ graph. Do not treat any row below as "proven," only as "available to build again
 | `cugraph` 26.06.00 | `betweenness_centrality` | ✅ | Top-level namespace — this repo's live TS `betweenness-analysis-adapter.ts` uses Neo4j GDS, not this; a GPU-native cuGraph path is a separate, unbuilt alternative backend (see `parent-atlas-graph-analysis-contract` Gate 5, "cuGraph parity for kcore/betweenness", not started) |
 | `cugraph` 26.06.00 | `louvain` | ✅ | Top-level namespace |
 | `cugraph` 26.06.00 | `leiden` | ✅ | Top-level namespace |
+| `cugraph` 26.06.00 | `jaccard` / `all_pairs_jaccard` | ✅ | Top-level namespace; bounded fixture execution returned a DataFrame |
+| `cugraph` 26.06.00 | `spectralModularityMaximizationClustering` | ✅ | Top-level namespace; callable and separately covered by the spectral fixture path; parity remains unpromoted |
+| `cugraph` 26.06.00 | `spectralBalancedCutClustering` | ✅ | Top-level namespace; retained as legacy challenger, not deprecated by this task |
 | `cugraph` 26.06.00 | `k_core` | ✅ | Top-level namespace |
 | `cugraph` 26.06.00 | `hypergraph` | ✅ | Top-level namespace — **exists as an importable symbol; not inspected further this pass** (signature, whether it's a construction helper vs. a full n-ary hypergraph algorithm suite, and whether it maps onto this repo's own 4-lane hypergraph model in `memory/hypergraph-4-lanes-vault.md` are all unchecked). Flagged as the concrete next research step for the "n-ary hypergraph RAG" enhancement named in this request — do not assume it's a drop-in fit without reading its actual API first. |
 | `cuvs` 26.06.00 | `cuvs.neighbors.cagra` (`.build()`, `.search()`) | ✅ | **Not** at `cuvs.cagra` top-level — submodule import required. Already used correctly by `python/atlas_rapids_sidecar.py`'s `/v1/knn/cagra` endpoint. |
@@ -223,6 +227,10 @@ did not wire any new sidecar endpoint, did not run any of these algorithms again
 data from WSL2 (only import-level presence confirmed), did not cross-reference this table
 against this repo's existing hypergraph model (`memory/hypergraph-4-lanes-vault.md`,
 `hypergraph-4d.ts`) to check for a canonical-owner conflict before any future wiring.
+
+The bounded fixture execution does not change that conclusion: it proves callable behavior
+on a toy graph only. It does not prove Graphify identity alignment, canonical graph ownership,
+spectral CPU/GPU parity, or a retrieval-quality benefit.
 
 ### Recommendations (2026-08-10) — bounded next steps, not a mandate to build all of this
 

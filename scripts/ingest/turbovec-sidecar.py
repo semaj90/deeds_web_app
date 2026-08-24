@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """
 turbovec-sidecar.py — Phase 10B
-Minimal HTTP sidecar wrapping turbovec TurboQuantIndex.
+Minimal HTTP sidecar wrapping turbovec IdMapIndex when stable numeric IDs are
+available, with TurboQuantIndex positional compatibility for legacy callers.
 Listens on :8791, provides /health + /rerank + /build + /prefilter + /search endpoints.
 
 POST /rerank
@@ -18,18 +19,22 @@ POST /prefilter
 
 POST /search
   body: { "vector": [768 floats], "topK": int }
-  returns: { "candidates": [{"id": str, "score": float, "cluster": int}, ...], "backend": "python" }
+  body may include allowlist: [CandidateOrdinal, ...]; TurboVec 1.0 applies it
+  inside the IdMapIndex search kernel.
 
 GET /health
-  returns: { "ok": true, "indexed": int, "dim": 768, "bits": 2, "backend": "python" }
+  returns: { "ok": true, "indexed": int, "dim": 768, "bits": 2,
+             "index_mode": "id_map", "native_allowlist": true }
 """
 
 import json
+import inspect
 import sys
 import time
 import numpy as np
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from turbovec import TurboQuantIndex
+import turbovec
+from turbovec import TurboQuantIndex, IdMapIndex
 
 PORT     = 8791
 DIM      = 768
@@ -42,31 +47,58 @@ class TurboVecSidecar:
         self.bit_width  = bit_width
         self._index     = None
         self._ids       = []
+        self._external_ids = {}
         self._clusters  = []   # parallel cluster label per indexed vector
+        self._index_mode = "uninitialized"
+        self._allowlist_native = "allowlist" in inspect.signature(IdMapIndex.search).parameters
 
-    def build(self, ids, vectors, clusters=None):
-        """Build index from id list + float32 matrix (N, dim)."""
+    def build(self, ids, vectors, clusters=None, index_ids=None):
+        """Build from display IDs and optional stable CandidateOrdinal IDs."""
         vecs = np.array(vectors, dtype=np.float32)
         if vecs.ndim == 1:
             vecs = vecs.reshape(1, -1)
-        self._index = TurboQuantIndex(self.dim, self.bit_width)
-        self._index.add(vecs)
+        numeric_ids = []
+        index_ids = list(index_ids) if index_ids is not None else list(ids)
+        try:
+            numeric_ids = [int(value) for value in index_ids]
+            if len(set(numeric_ids)) != len(numeric_ids) or min(numeric_ids, default=0) < 0:
+                raise ValueError("ids must be unique non-negative ordinals")
+            self._index = IdMapIndex(self.dim, self.bit_width)
+            self._index.add_with_ids(vecs, np.asarray(numeric_ids, dtype=np.uint64))
+            self._index_mode = "id_map"
+            self._external_ids = dict(zip(numeric_ids, ids))
+        except (TypeError, ValueError, OverflowError):
+            self._index = TurboQuantIndex(self.dim, self.bit_width)
+            self._index.add(vecs)
+            self._index_mode = "positional_compatibility"
+            self._external_ids = {}
         self._index.prepare()
         self._ids     = list(ids)
         self._clusters = list(clusters) if clusters else [0] * len(ids)
 
-    def search(self, query_vec, top_k=10):
+    def search(self, query_vec, top_k=10, allowlist=None):
         """Search index. Returns list of {id, turbovec_score, rank, cluster}."""
         if self._index is None or not self._ids:
             return []
         q  = np.array(query_vec, dtype=np.float32).reshape(1, -1)
         k  = min(top_k, len(self._ids))
-        scores, indices = self._index.search(q, k)
+        native_allowlist = None
+        if allowlist and self._index_mode == "id_map" and self._allowlist_native:
+            native_allowlist = np.asarray([int(value) for value in allowlist], dtype=np.uint64)
+        if native_allowlist is not None:
+            scores, indices = self._index.search(q, k, allowlist=native_allowlist)
+        else:
+            scores, indices = self._index.search(q, k)
         results = []
         for rank, (score, idx) in enumerate(zip(scores[0], indices[0])):
-            if idx < len(self._ids):
+            value = int(idx)
+            if self._index_mode == "id_map":
+                external_id = self._external_ids.get(value)
+            else:
+                external_id = self._ids[value] if 0 <= value < len(self._ids) else None
+            if external_id is not None and (not allowlist or native_allowlist is not None or external_id in allowlist):
                 results.append({
-                    "id":             self._ids[idx],
+                    "id":             external_id,
                     "score":          round(float(score), 6),
                     "turbovec_score": round(float(score), 6),
                     "cluster":        self._clusters[idx] if idx < len(self._clusters) else 0,
@@ -143,6 +175,9 @@ class Handler(BaseHTTPRequestHandler):
                 "bits":    sidecar.bit_width,
                 "bit_width": sidecar.bit_width,
                 "backend": "python",
+                "turbovec_version": getattr(turbovec, "__version__", "unknown"),
+                "index_mode": sidecar._index_mode,
+                "native_allowlist": sidecar._allowlist_native,
             })
         else:
             self.send_json(404, {"error": "not found"})
@@ -174,10 +209,11 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "candidates required"})
             return
         ids      = [c["id"] for c in candidates]
+        index_ids = [c.get("candidateOrdinal", c["id"]) for c in candidates]
         vectors  = [c["vector"] for c in candidates]
         clusters = [c.get("cluster", 0) for c in candidates]
         t0 = time.perf_counter()
-        sidecar.build(ids, vectors, clusters)
+        sidecar.build(ids, vectors, clusters, index_ids=index_ids)
         elapsed = round((time.perf_counter() - t0) * 1000, 1)
         self.send_json(200, {"indexed": sidecar.indexed, "build_ms": elapsed})
 
@@ -194,15 +230,16 @@ class Handler(BaseHTTPRequestHandler):
         # If candidates provided, build a fresh ephemeral index
         if candidates:
             ids      = [c["id"] for c in candidates]
+            index_ids = [c.get("candidateOrdinal", c["id"]) for c in candidates]
             vectors  = [c.get("vector") for c in candidates]
             clusters = [c.get("cluster", 0) for c in candidates]
             # Filter out candidates without vectors
-            valid = [(i, v, cl) for i, v, cl in zip(ids, vectors, clusters) if v is not None]
+            valid = [(i, ordinal, v, cl) for i, ordinal, v, cl in zip(ids, index_ids, vectors, clusters) if v is not None]
             if not valid:
                 self.send_json(400, {"error": "no candidates with vectors"})
                 return
-            valid_ids, valid_vecs, valid_cls = zip(*valid)
-            sidecar.build(valid_ids, valid_vecs, valid_cls)
+            valid_ids, valid_index_ids, valid_vecs, valid_cls = zip(*valid)
+            sidecar.build(valid_ids, valid_vecs, valid_cls, index_ids=valid_index_ids)
 
         if sidecar.indexed == 0:
             self.send_json(400, {"error": "no index built — POST /build first or include candidates"})
@@ -254,6 +291,7 @@ class Handler(BaseHTTPRequestHandler):
         """ANN search — returns top-K candidate point IDs with scores."""
         vector = req.get("vector")
         top_k  = int(req.get("topK", 200))
+        allowlist = req.get("allowlist")
 
         if not vector:
             self.send_json(400, {"error": "vector required"})
@@ -268,7 +306,7 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         t0      = time.perf_counter()
-        results = sidecar.search(vector, top_k)
+        results = sidecar.search(vector, top_k, allowlist=allowlist)
         elapsed = round((time.perf_counter() - t0) * 1000, 1)
 
         # Reshape to the interface turbovec-prefilter.ts expects
@@ -278,6 +316,9 @@ class Handler(BaseHTTPRequestHandler):
             "candidates": candidates,
             "backend":    "python",
             "indexed":    sidecar.indexed,
+            "index_mode": sidecar._index_mode,
+            "native_allowlist": sidecar._allowlist_native,
+            "allowlist_mode": "native" if allowlist and sidecar._allowlist_native else "post_filter" if allowlist else "none",
             "durationMs": elapsed,
         })
 

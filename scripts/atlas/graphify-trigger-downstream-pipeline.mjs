@@ -294,16 +294,25 @@ async function runTurboVecConsolidation() {
   report.stages[stage] = { status: 'running' };
 
   return new Promise((resolve) => {
-    const cmd = resolveSpawnCommand('npx');
+    // DAILY-01: `npx`/`npx.cmd` requires a shell on Windows (Node cannot
+    // exec a .cmd file directly via spawn/execFile without shell:true —
+    // that's the wrong executable boundary for a JS CLI). tsx ships a real
+    // ESM entry (dist/cli.mjs) that `node` runs directly, cross-platform,
+    // no shell involved. Prefer the frontend-local install (cwd is
+    // FRONTEND_ROOT); fall back to the repo-root install if hoisted there.
+    const frontendTsxCli = path.join(FRONTEND_ROOT, 'node_modules/tsx/dist/cli.mjs');
+    const rootTsxCli = path.join(REPO_ROOT, 'node_modules/tsx/dist/cli.mjs');
+    const tsxCli = existsSync(frontendTsxCli) ? frontendTsxCli : rootTsxCli;
+    const cmd = process.execPath;
     const script = path.join(FRONTEND_ROOT, 'scripts/atlas/kanban-turbovec-consolidation.mts');
-    const cmdArgs = ['tsx', script, ...(APPLY ? ['--apply'] : [])];
+    const cmdArgs = [tsxCli, script, ...(APPLY ? ['--apply'] : [])];
 
     if (VERBOSE) log(`Running: ${cmd} ${cmdArgs.join(' ')}`);
 
     const child = spawn(cmd, cmdArgs, {
       cwd: FRONTEND_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: resolveSpawnShell('npx'),
+      shell: false,
       windowsHide: true,
     });
 

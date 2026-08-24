@@ -34,6 +34,31 @@ export interface ExtractedFeature {
 	rawText?: string;
 	lineNumber?: number;
 	confidence?: number;
+	/** Character offsets into the source text this feature was grounded from.
+	 * Absent for AST/pattern features (grounded by construction); present
+	 * only for `source: 'langextract'` entities that passed the grounding
+	 * check in extractAstAndEntities(). */
+	start?: number;
+	end?: number;
+}
+
+/**
+ * LX0 (openspec/changes/parent-atlas-code-ingestion-pipeline): LangExtract's
+ * own documentation states ungrounded extractions carry `char_interval: None`
+ * and recommends filtering them out before treating them as grounded
+ * results — do not silently accept an entity with no character span, and do
+ * not promote it into downstream ontology tuples. `start`/`end` are optional
+ * on the wire (`NlpEntity`), so this is a real runtime check, not a type
+ * formality.
+ */
+export function isGroundedEntity(entity: { start?: number; end?: number }): boolean {
+	return (
+		typeof entity.start === 'number' &&
+		typeof entity.end === 'number' &&
+		Number.isFinite(entity.start) &&
+		Number.isFinite(entity.end) &&
+		entity.end > entity.start
+	);
 }
 
 async function getMiniforgeNlpClient() {
@@ -51,12 +76,44 @@ export interface RankedFeature extends ExtractedFeature {
 	contextSummary: string;
 }
 
+type PathStatus = 'ok' | 'skipped' | 'unavailable' | 'error';
+
+/**
+ * LX0 "failures explicit (not silently empty-success)". Each extraction
+ * path previously only `console.warn`'d on failure and fell through to an
+ * empty contribution — a caller could not tell "this document genuinely has
+ * zero entities" apart from "the sidecar was down and we silently got
+ * nothing". `extractAstAndEntities()` keeps its original `ExtractedFeature[]`
+ * return shape for the two existing live callers; new callers that need to
+ * distinguish real-empty from failed-empty should use
+ * `extractAstAndEntitiesWithDiagnostics()` instead.
+ */
+export interface ExtractionDiagnostics {
+	sidecarStatus: PathStatus;
+	providerRevisionStatus: 'present' | 'missing' | 'unavailable';
+	providerRevision?: string;
+	entityExtractionStatus: PathStatus;
+	astExtractionStatus: PathStatus;
+	errors: Array<{ path: 'sidecar' | 'entity-extraction' | 'ast-grep'; message: string }>;
+}
+
 /**
  * Unified extraction: AST features + LangExtract entities.
- * Returns features ready for Gemma4 reranking.
+ * Returns features ready for Gemma4 reranking, plus per-path status so a
+ * caller can tell "genuinely no entities" apart from "a path failed".
  */
-export async function extractAstAndEntities(text: string, isCode: boolean = false): Promise<ExtractedFeature[]> {
+export async function extractAstAndEntitiesWithDiagnostics(
+	text: string,
+	isCode: boolean = false
+): Promise<{ features: ExtractedFeature[]; diagnostics: ExtractionDiagnostics }> {
 	const features: ExtractedFeature[] = [];
+	const diagnostics: ExtractionDiagnostics = {
+		sidecarStatus: 'skipped',
+		providerRevisionStatus: 'unavailable',
+		entityExtractionStatus: 'skipped',
+		astExtractionStatus: 'skipped',
+		errors: [],
+	};
 	const sidecar = await getMiniforgeNlpClient();
 
 	if (sidecar) {
@@ -66,6 +123,13 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 				sourceType: isCode ? 'codebase' : 'plain_text',
 				extractionMode: isCode ? 'full' : 'entities',
 			});
+			if (analysis.provider_revision) {
+				diagnostics.providerRevision = analysis.provider_revision;
+				diagnostics.providerRevisionStatus = 'present';
+			} else {
+				diagnostics.providerRevisionStatus = 'missing';
+				diagnostics.errors.push({ path: 'sidecar', message: 'analysis response omitted provider_revision' });
+			}
 
 			for (const entity of analysis.entities) {
 				const typeMapping: Record<string, ExtractedFeature['type']> = {
@@ -77,7 +141,7 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 					CODE_SYMBOL: 'ast_function',
 				};
 				const mappedType = typeMapping[entity.label];
-				if (mappedType) {
+				if (mappedType && isGroundedEntity(entity)) {
 					features.push({
 						type: mappedType,
 						name: entity.text,
@@ -85,6 +149,8 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 						source: 'langextract',
 						rawText: entity.text,
 						confidence: entity.confidence,
+						start: entity.start,
+						end: entity.end,
 					});
 				}
 			}
@@ -109,9 +175,14 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 					});
 				}
 			}
+			diagnostics.sidecarStatus = 'ok';
 		} catch (err) {
+			diagnostics.sidecarStatus = 'error';
+			diagnostics.errors.push({ path: 'sidecar', message: (err as Error)?.message ?? String(err) });
 			console.warn('[AstLangextractBridge] Miniforge NLP sidecar unavailable:', err);
 		}
+	} else {
+		diagnostics.sidecarStatus = 'unavailable';
 	}
 
 	// Path 1: LangExtract entities (preferred for non-code text).
@@ -132,7 +203,7 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 				};
 
 				const mappedType = typeMapping[entity.label];
-				if (mappedType) {
+				if (mappedType && isGroundedEntity(entity)) {
 					features.push({
 						type: mappedType,
 						name: entity.text,
@@ -140,10 +211,15 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 						source: 'langextract',
 						rawText: entity.text,
 						confidence: entity.score,
+						start: entity.start,
+						end: entity.end,
 					});
 				}
 			}
+			diagnostics.entityExtractionStatus = 'ok';
 		} catch (err) {
+			diagnostics.entityExtractionStatus = 'error';
+			diagnostics.errors.push({ path: 'entity-extraction', message: (err as Error)?.message ?? String(err) });
 			console.warn('[AstLangextractBridge] Entity extraction failed:', err);
 		}
 	}
@@ -155,6 +231,8 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 		try {
 			astExtractor = await import('./ast-grep-extractor.js');
 		} catch (importErr) {
+			diagnostics.astExtractionStatus = 'unavailable';
+			diagnostics.errors.push({ path: 'ast-grep', message: (importErr as Error)?.message ?? String(importErr) });
 			console.warn('[AstLangextractBridge] AST extractor unavailable (regex fallback skipped):', importErr);
 		}
 
@@ -162,7 +240,10 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 			try {
 				const astFeatures = await astExtractor.extractAstFeatures(text);
 				features.push(...astFeatures);
+				diagnostics.astExtractionStatus = 'ok';
 			} catch (err) {
+				diagnostics.astExtractionStatus = 'error';
+				diagnostics.errors.push({ path: 'ast-grep', message: (err as Error)?.message ?? String(err) });
 				console.warn('[AstLangextractBridge] AST extraction failed:', err);
 			}
 		}
@@ -174,7 +255,19 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 		if (!deduped.has(key)) deduped.set(key, feature);
 	}
 
-	return [...deduped.values()];
+	return { features: [...deduped.values()], diagnostics };
+}
+
+/**
+ * Backward-compatible wrapper preserving the original `ExtractedFeature[]`
+ * return shape for the two existing live callers
+ * (`source-pos-concept-packet.ts`, `worker.ts`). Prefer
+ * `extractAstAndEntitiesWithDiagnostics()` for any new caller that needs to
+ * distinguish "genuinely no entities" from "a path failed silently".
+ */
+export async function extractAstAndEntities(text: string, isCode: boolean = false): Promise<ExtractedFeature[]> {
+	const { features } = await extractAstAndEntitiesWithDiagnostics(text, isCode);
+	return features;
 }
 
 /**

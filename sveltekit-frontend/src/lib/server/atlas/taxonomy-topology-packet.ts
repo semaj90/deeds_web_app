@@ -7,6 +7,7 @@ import {
   buildOntologyLinkedTupleCachePlan,
   writeOntologyLinkedTupleCachePlan,
 } from './ontology-linked-tuple-cache.js';
+import { persistOntologyLinkedTuples } from './ontology-linked-tuple-postgres.js';
 
 export const TaxonomyTupleSchema = z.object({
   source: z.string().min(1),
@@ -423,37 +424,39 @@ export async function buildTaxonomyTopologyPacket(
     { asLatest: input.asLatest ?? false, ttl: 3600 }
   );
 
+  const rawOntologyLinkedTuples = summary.linkedTuples.map((tuple, index) => ({
+    tupleId: `${packet.packet_id}:${index}`,
+    schemaVersion: 'ontology-linked-tuple.v1' as const,
+    packetKey: packet.packet_id,
+    sourceRef: `taxonomy:${summary.nodeKey}`,
+    surfaceText: tuple.target,
+    tokenIndex: index,
+    partOfSpeech: null,
+    label: tuple.target,
+    labelKind: (tuple.relation === 'HAS_ONTOLOGY_TAG' ? 'ontology' : 'tag') as 'ontology' | 'tag',
+    labelSource: 'semantic_tagger' as const,
+    ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+    conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+    participants: [],
+    evidenceRefs: [],
+    confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
+    evidenceState: 'ACTIVE_VERIFIED' as const,
+    lifecycle: 'OBSERVED' as const,
+    provenance: {
+      sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
+      labelerVersion: classifier.domainClassifierTier ?? null,
+      taggerVersion: classifier.evidenceSource ?? null,
+      ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
+      nlpVersion: null,
+    },
+  }));
+
   const ontologyCachePlan = buildOntologyLinkedTupleCachePlan({
     packetId: packet.packet_id,
     packetRevision: packet.packet_ulid ?? packet.packet_id,
     featureId,
     sourceRef: `taxonomy:${summary.nodeKey}`,
-    tuples: summary.linkedTuples.map((tuple, index) => ({
-      tupleId: `${packet.packet_id}:${index}`,
-      schemaVersion: 'ontology-linked-tuple.v1',
-      packetKey: packet.packet_id,
-      sourceRef: `taxonomy:${summary.nodeKey}`,
-      surfaceText: tuple.target,
-      tokenIndex: index,
-      partOfSpeech: null,
-      label: tuple.target,
-      labelKind: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 'ontology' : 'tag',
-      labelSource: 'semantic_tagger',
-      ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
-      conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
-      participants: [],
-      evidenceRefs: [],
-      confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
-      evidenceState: 'ACTIVE_VERIFIED',
-      lifecycle: 'OBSERVED',
-      provenance: {
-        sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
-        labelerVersion: classifier.domainClassifierTier ?? null,
-        taggerVersion: classifier.evidenceSource ?? null,
-        ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
-        nlpVersion: null,
-      },
-    })),
+    tuples: rawOntologyLinkedTuples,
     centroid: {
       domainClass: summary.classifier.domainClass ?? 'unknown',
       domainCentroidKey: `atlas:centroid:domain:${summary.classifier.domainClass ?? 'unknown'}`,
@@ -477,6 +480,16 @@ export async function buildTaxonomyTopologyPacket(
     blockedContentHashes: [],
   });
 
+  // Postgres is truth; Redis is cache — write there FIRST (project CLAUDE.md
+  // "Atlas Data Persistence + Retrieval Contract"). This was previously
+  // Redis-only; KAG-01/02 persistence
+  // (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) adds the
+  // missing truth layer. Fail-open to match the existing Redis write's own
+  // `.catch(() => {})` — a persistence failure must not break this MCP
+  // tool's response, but is worth a warning since it's the truth write now.
+  await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
+    console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed:', err);
+  });
   await writeOntologyLinkedTupleCachePlan(ontologyCachePlan, 6 * 60 * 60).catch(() => {});
 
   return { summary, packet };
