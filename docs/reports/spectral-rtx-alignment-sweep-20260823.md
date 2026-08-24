@@ -198,7 +198,40 @@ methods — so "pick a resolution where Leiden doesn't degenerate" does not by
 itself give a Leiden result comparable to the K=8 spectral partitions; that
 would need its own reconciliation.
 
+### Is the collapse gradual or a hard jump? (follow-up)
+
+A finer sweep (`docs/reports/leiden-diagnostic-receipt-v1-fine.json`,
+resolution `{0.05, 0.06, ..., 0.5}` in 13 steps) shows the transition is a
+**hard jump, not a gradual refinement**: cluster count goes directly from 2 to
+500 with no step in between ever showing an intermediate community count (5,
+20, 100, etc.) — weighted graph: 2 clusters through `resolution=0.12`, then 500
+at `0.15`; unweighted: 2 clusters through `0.08`, then 500 at `0.09`. Modularity
+also crosses from strongly positive (0.89-0.95) to weakly negative in that same
+single step, not a smooth decline.
+
+This is consistent with a real, non-buggy property of resolution-scaled
+modularity optimization on a graph dominated by one dense giant community with
+a sparse periphery (matches what the spectral methods independently found: one
+~459-462-node cluster plus several 2-12-node clusters, not eight comparably-sized
+communities): once the resolution-scaled null-model term exceeds the actual
+edge density for essentially every node pair simultaneously, no single local
+move improves modularity anywhere in the graph at once, and the entire giant
+community shatters to singletons in the same step rather than splitting
+hierarchically. This is not confirmed as "expected cuGraph behavior" via
+external documentation — it is inferred from the sweep's shape — but nothing in
+these two sweeps points at a wrapper or numerical-precision defect anymore.
+
+This raises a structural question independent of the collapse: at every
+resolution where Leiden is healthy, it only ever finds 2 communities (never
+3-8) on this exact 500-node sample. Combined with the spectral methods' own
+"one dominant 459-462-node cluster + several single-digit clusters" shape, this
+suggests the candidate graph may not actually have K=8-scale multi-community
+structure at all — spectral's K=8 forces a split the graph's natural structure
+doesn't otherwise support, rather than K=8 being a real property of this data.
+Worth checking before spending more effort on CPU/GPU parity at a K that may
+not be the right target.
+
 Louvain was not run on this fixture at all.
 
-Not yet done: root-causing the sharp collapse itself, Louvain comparison,
-Nsight Systems/Compute evidence (LVG-10/11).
+Not yet done: confirming/refuting the "K=8 isn't natural to this sample"
+hypothesis, Louvain comparison, Nsight Systems/Compute evidence (LVG-10/11).

@@ -82,7 +82,7 @@ LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533)
 LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535)
-LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (resolution-driven collapse, healthy at res<=0.05)
+LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (hard 2->500 cluster jump; only ever finds K=2, not K=8)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
@@ -126,6 +126,19 @@ Separately: even the healthy low-resolution regime finds only 2 communities, not
 the frozen `K=8` this tranche assumes elsewhere — Leiden's natural community
 count on this fixture doesn't match the spectral `cluster_count` assumption
 regardless of the degeneracy question.
+
+A finer 13-point sweep (`docs/reports/leiden-diagnostic-receipt-v1-fine.json`)
+confirms this is a hard jump (2 clusters -> 500 clusters in one resolution
+step, no intermediate community count ever observed), not a gradual
+refinement. Consistent with — but not confirmed via external documentation
+as — the known behavior of resolution-scaled modularity on a graph with one
+dense giant community and a sparse periphery (which is what the spectral
+methods also independently found: one ~459-462-node cluster plus several
+single-digit clusters, not eight comparably-sized ones). This raises a
+structural question broader than Leiden alone: this 500-node candidate sample
+may not have K=8-scale multi-community structure at all, in which case the
+CPU/GPU parity work above is being measured at a K the data may not actually
+support. Not yet confirmed or refuted.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
