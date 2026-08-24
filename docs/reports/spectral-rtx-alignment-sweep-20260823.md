@@ -284,7 +284,47 @@ of one global `K=8` across a disconnected graph; (c) only after either of
 those, re-run the parity gate to see if it was ever really about eigensolver
 precision at all.
 
+### Why it's disconnected: candidate selection is a naive lexicographic sort over un-canonicalized packet_key strings
+
+Cross-referenced the two connected components against `nodes.parquet`'s
+`packet_key` column directly:
+
+- Component 0 (41 nodes): bare hex keys, e.g. `0ba2345cd9c542fa`,
+  `1703d9c005252a62` — no prefix.
+- Component 1 (459 nodes): `ace:packet:`-prefixed keys, e.g.
+  `ace:packet:001be68ca4b0`, `ace:packet:0050126ac87d`.
+
+These are the two packet-key naming schemes described in prior session
+memory (`SESSION-200-PACKET-IDENTITY-ALIAS-CONVERGENCE`: a bare-hex scheme
+and an `ace:packet:`-prefixed scheme, reconciled there via a new
+`atlas_packet_identity_aliases` table and `resolveCanonicalPacketKey()`
+resolver). `python/build_live_graph_fixture_semantic512.py:215` selects
+this fixture's 500 candidates with
+`identities = sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]`
+— a plain lexicographic string sort over `row.packet_key`, taken directly
+from the reconciliation manifest (`load_reconciliation()` at line 210-214)
+with **no call anywhere in this file to `resolveCanonicalPacketKey` or any
+reference to `atlas_packet_identity_aliases`**. ASCII sorts digit characters
+before `a`, so every bare-hex-scheme row sorts before every
+`ace:packet:`-scheme row with the same leading character, and the first 500
+rows by this sort order end up being "all currently-admitted bare-hex rows,
+padded out with the alphabetically-earliest `ace:packet:` rows" — not a
+representative or connected sample of the corpus, an artifact of mixing two
+un-reconciled identity schemes and then sorting on the raw string.
+
+This is a more direct and more actionable explanation than "K=8 may not suit
+a 500-node sample in general": the fixture builder should either (a) resolve
+every `packet_key` through the canonical alias resolver before selecting
+candidates, so both schemes collapse to one, or (b) not use raw
+lexicographic packet_key order as the candidate-selection method at all
+(e.g. sample by `source_ref`/`directory_path`, or take a connectivity-aware
+sample). Until one of those changes, disconnection at this candidate size
+should be expected to recur on every re-run of this fixture builder, not
+just this one execution.
+
 Louvain was not run on this fixture at all.
 
-Not yet done: (a)/(b)/(c) above, Louvain comparison (would also trivially
-find K=2 for the same reason), Nsight Systems/Compute evidence (LVG-10/11).
+Not yet done: fixing `build_live_graph_fixture_semantic512.py`'s candidate
+selection (LVG-1) per the above, re-running the fixture and re-testing
+parity after the fix, Louvain comparison, Nsight Systems/Compute evidence
+(LVG-10/11).

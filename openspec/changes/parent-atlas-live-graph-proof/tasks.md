@@ -76,7 +76,7 @@ NVTX parent-atlas@atlas.graph_fixture
 
 ```text
 LVG-0 semantic_512 reconciliation prerequisite              EXISTING_UNEXECUTED
-LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN
+LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (candidate-selection defect found, see below)
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
@@ -146,11 +146,25 @@ single near-homogeneous 459-node component (92% of the sample) using an
 eigenspace with little real signal past the first two components — consistent
 with the already-recorded `eigenspace.canonical_authority: false` flag and
 the k-means census's ARI range of 0.20-0.9553 driven purely by
-`init`/`n_init` choice. See the full writeup and recommended next step
-(check whether the candidate-selection step at this sample size produces
-disconnected graphs generally, before spending more effort tuning eigensolver
-tolerance at a K=8 that may not be a real property of this sample) in
-`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+`init`/`n_init` choice. See the full writeup in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+**LVG-1 defect, root-caused (not just hypothesized):** cross-referencing the
+two components against `packet_key` shows component 0 (41 nodes) is entirely
+bare-hex packet keys (e.g. `0ba2345cd9c542fa`) and component 1 (459 nodes) is
+entirely `ace:packet:`-prefixed keys — the two identity naming schemes
+described in `SESSION-200-PACKET-IDENTITY-ALIAS-CONVERGENCE` memory (resolved
+there via `atlas_packet_identity_aliases` + `resolveCanonicalPacketKey()`).
+`python/build_live_graph_fixture_semantic512.py:215` selects candidates via
+`sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]`
+— a raw lexicographic string sort, with no call to `resolveCanonicalPacketKey`
+or reference to `atlas_packet_identity_aliases` anywhere in the file. ASCII
+sorts digits before `a`, so the first 500 rows by this order are "every
+currently-admitted bare-hex row, padded out with the alphabetically-earliest
+`ace:packet:` rows" — an artifact of un-reconciled identity schemes plus a raw
+string sort, not a representative sample. This will recur on every re-run
+until the fixture builder either canonicalizes `packet_key` before selecting
+candidates or stops using raw lexicographic packet_key order as the
+selection method.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
