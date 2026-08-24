@@ -76,7 +76,7 @@ NVTX parent-atlas@atlas.graph_fixture
 
 ```text
 LVG-0 semantic_512 reconciliation prerequisite              EXISTING_UNEXECUTED
-LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (mixes proto-service + codebase corpora, see below)
+LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (proto-exclusion fix applied, unverified -- LVG-0 blocks re-run)
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
@@ -168,10 +168,16 @@ candidate sort at line 215
 then determines exactly *which* 41-vs-459 split gets admitted (pure-hex proto
 keys sort before `ace:packet:...` alphabetically), but the underlying
 "these two corpora don't bridge under KNN" is a real structural property,
-not a sort-order artifact by itself. Full corrected writeup, including two
-un-implemented fix candidates that need an explicit scope decision first
-(exclude proto-service packets from this proof entirely, vs. raise
-semantic-top-k / use a connectivity-aware sample), is in
+not a sort-order artifact by itself. **Fix applied**: `python/build_live_graph_fixture_semantic512.py` now excludes
+`proto:*`-sourced packets from candidate selection by default (new
+`--include-proto-service-packets` opt-out flag; fixture output records
+`proto_service_packets_included` / `proto_service_packets_excluded_count`
+for auditability). **Not yet re-verified**: re-running the fixture builder
+to confirm this produces a connected graph failed on an unrelated,
+pre-existing gap — the on-disk reconciliation manifest currently has zero
+`ADMITTED` rows (LVG-0, already `EXISTING_UNEXECUTED` before this session).
+The patch itself compiles cleanly and reached the reconciliation-loading
+step before hitting that unrelated failure. Full writeup in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):

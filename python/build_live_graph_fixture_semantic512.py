@@ -204,6 +204,19 @@ def main() -> int:
     parser.add_argument("--semantic-edge-weight", type=float, default=0.20)
     parser.add_argument("--seed", type=int, default=0xA71A5)
     parser.add_argument("--output", default=".tmp/atlas/live-graph/live-graph.json")
+    parser.add_argument(
+        "--include-proto-service-packets",
+        action="store_true",
+        default=False,
+        help=(
+            "Include proto:<Service>.<Method> gRPC/Protobuf service-definition packets in "
+            "candidate selection. Default is to exclude them: a live 500-candidate run found "
+            "they form a structurally distinct corpus (2 disconnected graph components, "
+            "verified via scipy connected_components) from regular codebase packets, "
+            "unrelated to codebase-semantic-cluster structure. See "
+            "docs/reports/spectral-rtx-alignment-sweep-20260823.md."
+        ),
+    )
     args = parser.parse_args()
 
     limit = max(500, min(5000, int(args.limit)))
@@ -212,6 +225,11 @@ def main() -> int:
         Path(args.reconciliation_receipt).resolve(),
         None,
     )
+    excluded_proto_service_packet_count = 0
+    if not args.include_proto_service_packets:
+        before = len(identities)
+        identities = [row for row in identities if not row.source_ref.startswith("proto:")]
+        excluded_proto_service_packet_count = before - len(identities)
     identities = sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]
     if len(identities) < 500:
         raise ValueError(f"LIVE_GRAPH_REQUIRES_500_ADMITTED_SEMANTIC512_ROWS:{len(identities)}")
@@ -282,6 +300,8 @@ def main() -> int:
         "semantic_knn_executor": "CUVS_ALL_NEIGHBORS_BRUTE_FORCE",
         "reconciliation_receipt_id": reconciliation_receipt["receiptId"],
         "reconciliation_manifest_checksum": reconciliation_receipt["manifestChecksum"],
+        "proto_service_packets_included": bool(args.include_proto_service_packets),
+        "proto_service_packets_excluded_count": excluded_proto_service_packet_count,
         "postgres_snapshots": postgres_snapshots,
         "vertices": vertices,
         "edges": canonical_edges + semantic_edges,

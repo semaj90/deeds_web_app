@@ -337,9 +337,35 @@ purely as a side effect of sort order.
 
 Louvain was not run on this fixture at all.
 
-Not yet done: deciding between fix candidates (a)/(b) above for
-`build_live_graph_fixture_semantic512.py`'s candidate selection (LVG-1) —
-this needs an explicit decision (should proto-service packets be in scope
-for a codebase-semantic-cluster proof at all?) before implementing, not just
-a mechanical fix — then re-running the fixture and re-testing parity,
-Louvain comparison, Nsight Systems/Compute evidence (LVG-10/11).
+### LVG-1 fix applied: exclude proto-service packets by default
+
+Decision made (fix candidate (a) above): `proto:*`-sourced packets are
+excluded from candidate selection by default in
+`python/build_live_graph_fixture_semantic512.py`, since this proof tranche's
+own purpose statement is about codebase-semantic-cluster structure, and
+proto/gRPC service-definition packets are a structurally distinct corpus
+unrelated to that. A new `--include-proto-service-packets` flag restores the
+old (mixed) behavior for anyone who wants it. The fixture output now records
+`proto_service_packets_included` and `proto_service_packets_excluded_count`
+so this choice is always auditable from the receipt itself, not just from
+this doc.
+
+**Not yet re-verified end-to-end.** Attempting to re-run the fixture builder
+to confirm the fix actually produces a connected graph failed for an
+unrelated, pre-existing reason: the on-disk reconciliation manifest
+(`data/atlas-ml/semantic512-reconciliation.ndjson`) currently has **zero**
+`ADMITTED` rows (53,379 rows, all `SOURCE_REF_ONLY_MATCH`) — stale relative
+to whenever the original 500-node fixture analyzed throughout this addendum
+was built. Regenerating admitted rows requires re-running the full
+`atlas_semantic512_reconcile.py` pipeline (LVG-0, already flagged
+`EXISTING_UNEXECUTED` in `tasks.md` before this session), which is a
+materially larger and longer action than the read-only diagnostics in this
+addendum — not triggered here. The code change itself compiles cleanly
+(`python -m py_compile`) and reached the reconciliation-loading step before
+failing on the unrelated empty-manifest condition, so the patch itself is not
+what's blocking verification.
+
+Not yet done: running LVG-0 reconciliation to get fresh `ADMITTED` rows,
+re-running the fixture builder with the fix applied, re-checking connectivity
+and re-testing spectral parity against the result, Louvain comparison,
+Nsight Systems/Compute evidence (LVG-10/11).
