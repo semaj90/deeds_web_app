@@ -55,10 +55,15 @@ const DECLARATION_KINDS = new Map<string, string>([
   // classifies these as FUNCTION (node_type contains "function"); this
   // provider previously emitted nothing at all for them.
   ['function_signature', 'FUNCTION'],
+  ['arrow_function', 'FUNCTION'],
+  ['function_expression', 'FUNCTION'],
+  ['generator_function', 'FUNCTION'],
   // Ambient/interface-body method signature with no implementation body
   // (`interface Foo { bar(): void; }`). Same rationale as function_signature
   // above -- the sidecar already classifies these as METHOD.
   ['method_signature', 'METHOD'],
+  ['import_statement', 'IMPORT'],
+  ['export_statement', 'EXPORT'],
   // TypeScript `namespace X {}` / `module X {}` declarations. 'NAMESPACE'
   // is intentionally not one of normalizeStructuralSymbolKind's known
   // keywords -- it falls through to UNKNOWN, matching the sidecar's own

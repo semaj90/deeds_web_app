@@ -1,0 +1,1685 @@
+{
+  "schema": "atlas.indexing-surfaces.v1",
+  "generatedAt": "2026-08-24T00:30:46.702Z",
+  "readOnly": true,
+  "canonicalAuthority": "postgres",
+  "ast": {
+    "dependencyDeclared": true,
+    "napiAvailable": true,
+    "extractionScripts": [
+      "scripts\\atlas\\phase1-ast-grep-extraction.mjs",
+      "sveltekit-frontend\\scripts\\atlas\\phase1-ast-grep-extraction.mjs",
+      "sveltekit-frontend\\scripts\\atlas\\phase1.5-ast-grep-extraction.mjs"
+    ],
+    "activeBackfill": "scripts/atlas/backfill-ast-symbols.mjs",
+    "activeBackfillUsesAstGrep": true,
+    "activeBackfillRegexMatchers": 0,
+    "extractionRegexFallbackReferences": 3,
+    "supportedSymbolKinds": [
+      "function",
+      "class",
+      "method",
+      "variable",
+      "interface",
+      "enum",
+      "import",
+      "export"
+    ]
+  },
+  "postgres": {
+    "reachable": true,
+    "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "vectorExtension": "0.8.3",
+    "tables": {
+      "codebase_chunk_index": {
+        "exists": true,
+        "count": 52417
+      },
+      "atlas_packet_features": {
+        "exists": true,
+        "count": 61657
+      },
+      "atlas_ast_nodes": {
+        "exists": true,
+        "count": 11067
+      },
+      "atlas_symbol_registry": {
+        "exists": false,
+        "count": null
+      },
+      "atlas_symbol_versions": {
+        "exists": false,
+        "count": null
+      },
+      "atlas_structural_reference_resolutions": {
+        "exists": false,
+        "count": null
+      },
+      "atlas_observation_feature_rows": {
+        "exists": false,
+        "count": null
+      }
+    },
+    "columns": {
+      "codebase_chunk_index": [
+        "id",
+        "qdrant_id",
+        "relative_path",
+        "symbol",
+        "kind",
+        "line_start",
+        "line_end",
+        "content_embedding",
+        "gpu_cluster",
+        "som_cluster",
+        "page_rank_score",
+        "community_id",
+        "tags",
+        "neo4j_meta",
+        "indexed_at",
+        "enriched_at",
+        "updated_at",
+        "content",
+        "cluster_summary",
+        "summary_embedding",
+        "signature_embedding",
+        "domain",
+        "language",
+        "extension",
+        "embedding_model",
+        "summary_model",
+        "summary",
+        "metadata",
+        "semantic_tags",
+        "som_bmu_row",
+        "som_bmu_col",
+        "manifold4",
+        "chunk_id",
+        "repo_id",
+        "content_hash",
+        "token_count",
+        "neo4j_gpu_cluster",
+        "output_meta",
+        "content_embedding_384",
+        "summary_embedding_384",
+        "embedding_dimension",
+        "embedding_normalized",
+        "error_embedding",
+        "source_ref",
+        "latent_64",
+        "latent64_model",
+        "latent64_meta",
+        "latent64_validated_at",
+        "latent64_msgpack",
+        "embedding_eligible",
+        "summary_hash",
+        "embedding_version",
+        "embedding_dtype",
+        "embedding_created_at",
+        "encoder_id",
+        "latent_embedding_valid",
+        "latent_embedding_validated_at",
+        "search_vector",
+        "ast_symbols",
+        "ast_imports",
+        "ast_exports",
+        "ast_facts_at",
+        "kmeans_cluster",
+        "centroid_distance",
+        "second_cluster_id",
+        "second_distance",
+        "cluster_margin",
+        "kmeans_model_version",
+        "kmeans_assigned_at",
+        "kmeans_vector_contract",
+        "kmeans384_cluster",
+        "kmeans384_distance",
+        "kmeans384_second_id",
+        "kmeans384_second_dist",
+        "kmeans384_margin",
+        "kmeans384_model_version",
+        "kmeans384_assigned_at",
+        "kmeans_distance",
+        "content_embedding_768",
+        "centroid_id",
+        "reconstruction_error",
+        "routing_tier"
+      ],
+      "atlas_packet_features": [
+        "id",
+        "packet_key",
+        "used_concepts",
+        "concept_coverage",
+        "lexical_features",
+        "ast_symbols",
+        "created_at",
+        "updated_at",
+        "entities",
+        "tree_node_ids",
+        "imports",
+        "exports"
+      ],
+      "atlas_ast_nodes": [
+        "tree_node_id",
+        "structural_key",
+        "repo_id",
+        "relative_path",
+        "node_kind",
+        "qualified_symbol",
+        "start_byte",
+        "end_byte",
+        "line_start",
+        "line_end",
+        "normalized_node_hash",
+        "source_content_hash",
+        "parser_name",
+        "parser_version",
+        "created_at",
+        "superseded_by",
+        "parser_language",
+        "normalized_signature",
+        "parent_tree_node_id",
+        "source_ref_key",
+        "updated_at",
+        "workspace_id",
+        "source_revision",
+        "grammar_version"
+      ],
+      "atlas_symbol_registry": [],
+      "atlas_symbol_versions": [],
+      "atlas_structural_reference_resolutions": [],
+      "atlas_observation_feature_rows": []
+    },
+    "populated": {
+      "codebaseChunkEmbeddingColumn": "content_embedding_768",
+      "codebaseChunkSearchColumn": "search_vector",
+      "codebaseChunkQdrantColumn": "qdrant_id",
+      "codebaseChunkEmbeddings": {
+        "exists": true,
+        "count": 192
+      },
+      "codebaseChunkSearchVectors": {
+        "exists": true,
+        "count": 52417
+      },
+      "codebaseChunkQdrantIds": {
+        "exists": true,
+        "count": 52417
+      },
+      "packetAstSymbols": {
+        "exists": true,
+        "count": 12297
+      },
+      "astNodesWithSymbols": {
+        "exists": true,
+        "count": 11067
+      }
+    },
+    "bitmapTables": [],
+    "relevantIndexes": [
+      {
+        "table": "agent_context_files",
+        "name": "agent_context_files_qdrant_tags_gin",
+        "definition": "CREATE INDEX agent_context_files_qdrant_tags_gin ON public.agent_context_files USING gin (qdrant_tags)"
+      },
+      {
+        "table": "agent_context_files",
+        "name": "agent_context_files_rules_gin",
+        "definition": "CREATE INDEX agent_context_files_rules_gin ON public.agent_context_files USING gin (rules jsonb_path_ops)"
+      },
+      {
+        "table": "agent_context_files",
+        "name": "agent_context_files_tags_gin",
+        "definition": "CREATE INDEX agent_context_files_tags_gin ON public.agent_context_files USING gin (semantic_tags)"
+      },
+      {
+        "table": "agent_context_relations",
+        "name": "agent_context_relations_evidence_gin_idx",
+        "definition": "CREATE INDEX agent_context_relations_evidence_gin_idx ON public.agent_context_relations USING gin (evidence)"
+      },
+      {
+        "table": "agent_observations",
+        "name": "idx_agent_observations_bm25_tags_gin",
+        "definition": "CREATE INDEX idx_agent_observations_bm25_tags_gin ON public.agent_observations USING gin (bm25_tags)"
+      },
+      {
+        "table": "agent_observations",
+        "name": "idx_agent_observations_hnsw",
+        "definition": "CREATE INDEX idx_agent_observations_hnsw ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "agent_observations",
+        "name": "idx_agent_observations_hnsw_768",
+        "definition": "CREATE INDEX idx_agent_observations_hnsw_768 ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "analysis_pass_results",
+        "name": "idx_analysis_pass_output_gin",
+        "definition": "CREATE INDEX idx_analysis_pass_output_gin ON public.analysis_pass_results USING gin (output)"
+      },
+      {
+        "table": "analysis_pass_results",
+        "name": "idx_analysis_pass_provenance_gin",
+        "definition": "CREATE INDEX idx_analysis_pass_provenance_gin ON public.analysis_pass_results USING gin (provenance)"
+      },
+      {
+        "table": "atlas_artifacts",
+        "name": "idx_atlas_artifacts_metadata",
+        "definition": "CREATE INDEX idx_atlas_artifacts_metadata ON public.atlas_artifacts USING gin (metadata)"
+      },
+      {
+        "table": "atlas_embeddings_384",
+        "name": "idx_ae384_content_hnsw",
+        "definition": "CREATE INDEX idx_ae384_content_hnsw ON public.atlas_embeddings_384 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='128') WHERE ((vector_role = 'content'::text) AND (normalized = true))"
+      },
+      {
+        "table": "atlas_feature_envelopes",
+        "name": "idx_feature_envelopes_lexical_terms",
+        "definition": "CREATE INDEX idx_feature_envelopes_lexical_terms ON public.atlas_feature_envelopes USING gin (lexical_terms)"
+      },
+      {
+        "table": "atlas_feature_packets",
+        "name": "idx_atlas_feature_metadata",
+        "definition": "CREATE INDEX idx_atlas_feature_metadata ON public.atlas_feature_packets USING gin (metadata)"
+      },
+      {
+        "table": "atlas_feature_packets",
+        "name": "idx_atlas_feature_permissions",
+        "definition": "CREATE INDEX idx_atlas_feature_permissions ON public.atlas_feature_packets USING gin (permissions)"
+      },
+      {
+        "table": "atlas_feature_packets",
+        "name": "idx_atlas_feature_topology",
+        "definition": "CREATE INDEX idx_atlas_feature_topology ON public.atlas_feature_packets USING gin (topology)"
+      },
+      {
+        "table": "atlas_feature_packets",
+        "name": "idx_atlas_feature_vectors",
+        "definition": "CREATE INDEX idx_atlas_feature_vectors ON public.atlas_feature_packets USING gin (vectors)"
+      },
+      {
+        "table": "atlas_feature_vectors",
+        "name": "idx_atlas_feature_vectors_keywords",
+        "definition": "CREATE INDEX idx_atlas_feature_vectors_keywords ON public.atlas_feature_vectors USING gin (keywords)"
+      },
+      {
+        "table": "atlas_feature_vectors",
+        "name": "idx_atlas_feature_vectors_ontology",
+        "definition": "CREATE INDEX idx_atlas_feature_vectors_ontology ON public.atlas_feature_vectors USING gin (ontology_classes)"
+      },
+      {
+        "table": "atlas_feature_vectors",
+        "name": "idx_atlas_feature_vectors_semantic_tags",
+        "definition": "CREATE INDEX idx_atlas_feature_vectors_semantic_tags ON public.atlas_feature_vectors USING gin (semantic_tags)"
+      },
+      {
+        "table": "atlas_features",
+        "name": "idx_af_labels_gin",
+        "definition": "CREATE INDEX idx_af_labels_gin ON public.atlas_features USING gin (labels)"
+      },
+      {
+        "table": "atlas_higher_hop_index",
+        "name": "idx_higher_hop_file_path_trgm",
+        "definition": "CREATE INDEX idx_higher_hop_file_path_trgm ON public.atlas_higher_hop_index USING gin (file_path gin_trgm_ops)"
+      },
+      {
+        "table": "atlas_higher_hop_index",
+        "name": "idx_higher_hop_metadata_gin",
+        "definition": "CREATE INDEX idx_higher_hop_metadata_gin ON public.atlas_higher_hop_index USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_knowledge_objects",
+        "name": "idx_ako_canonical_data_gin",
+        "definition": "CREATE INDEX idx_ako_canonical_data_gin ON public.atlas_knowledge_objects USING gin (canonical_data)"
+      },
+      {
+        "table": "atlas_ontology_concepts",
+        "name": "idx_atlas_ontology_concepts_aliases",
+        "definition": "CREATE INDEX idx_atlas_ontology_concepts_aliases ON public.atlas_ontology_concepts USING gin (aliases)"
+      },
+      {
+        "table": "atlas_ontology_tuples",
+        "name": "atlas_ontology_tuples_pkey",
+        "definition": "CREATE UNIQUE INDEX atlas_ontology_tuples_pkey ON public.atlas_ontology_tuples USING btree (subject_id, predicate, object_id, origin, version)"
+      },
+      {
+        "table": "atlas_packet_features",
+        "name": "idx_atlas_packet_features_concepts_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_features_concepts_gin ON public.atlas_packet_features USING gin (used_concepts)"
+      },
+      {
+        "table": "atlas_packet_metrics",
+        "name": "idx_atlas_packet_metrics_metadata",
+        "definition": "CREATE INDEX idx_atlas_packet_metrics_metadata ON public.atlas_packet_metrics USING gin (metadata)"
+      },
+      {
+        "table": "atlas_packet_metrics",
+        "name": "idx_atlas_packet_metrics_semantic_topk_analysis_gin",
+        "definition": "CREATE INDEX idx_atlas_packet_metrics_semantic_topk_analysis_gin ON public.atlas_packet_metrics USING gin (semantic_topk_analysis)"
+      },
+      {
+        "table": "atlas_packet_registry",
+        "name": "idx_packet_dag_edges",
+        "definition": "CREATE INDEX idx_packet_dag_edges ON public.atlas_packet_registry USING gin (dag_edges)"
+      },
+      {
+        "table": "atlas_packet_registry",
+        "name": "idx_packet_embedding_cosine",
+        "definition": "CREATE INDEX idx_packet_embedding_cosine ON public.atlas_packet_registry USING hnsw (embedding_768d vector_cosine_ops)"
+      },
+      {
+        "table": "atlas_packet_registry",
+        "name": "idx_packet_kag_edges",
+        "definition": "CREATE INDEX idx_packet_kag_edges ON public.atlas_packet_registry USING gin (kag_edges)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "atlas_packets_metadata_gin_idx",
+        "definition": "CREATE INDEX atlas_packets_metadata_gin_idx ON public.atlas_packets USING gin (metadata)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_bm25_terms",
+        "definition": "CREATE INDEX idx_atlas_packets_bm25_terms ON public.atlas_packets USING gin (bm25_terms)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_concept_ids",
+        "definition": "CREATE INDEX idx_atlas_packets_concept_ids ON public.atlas_packets USING gin (concept_ids)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_domain_memberships",
+        "definition": "CREATE INDEX idx_atlas_packets_domain_memberships ON public.atlas_packets USING gin (domain_memberships)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_envelope_fts",
+        "definition": "CREATE INDEX idx_atlas_packets_envelope_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, ((((((COALESCE((payload ->> 'title'::text), ''::text) || ' '::text) || COALESCE(summary, ''::text)) || ' '::text) || COALESCE(feature_label, ''::text)) || ' '::text) || COALESCE(feature_id, ''::text))))"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_extracted_entities",
+        "definition": "CREATE INDEX idx_atlas_packets_extracted_entities ON public.atlas_packets USING gin (extracted_entities)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_file_path_trgm",
+        "definition": "CREATE INDEX idx_atlas_packets_file_path_trgm ON public.atlas_packets USING gin (file_path gin_trgm_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_keywords",
+        "definition": "CREATE INDEX idx_atlas_packets_keywords ON public.atlas_packets USING gin (keywords)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_metadata_gin",
+        "definition": "CREATE INDEX idx_atlas_packets_metadata_gin ON public.atlas_packets USING gin (metadata)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_metadata_gin_pathops",
+        "definition": "CREATE INDEX idx_atlas_packets_metadata_gin_pathops ON public.atlas_packets USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_ontology_gin",
+        "definition": "CREATE INDEX idx_atlas_packets_ontology_gin ON public.atlas_packets USING gin (packet_ontology)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_payload_gin",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_gin ON public.atlas_packets USING gin (payload)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_payload_gin_pathops",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_gin_pathops ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_payload_path",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_path ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_permissions_gin_pathops",
+        "definition": "CREATE INDEX idx_atlas_packets_permissions_gin_pathops ON public.atlas_packets USING gin (permissions jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_rerank_features",
+        "definition": "CREATE INDEX idx_atlas_packets_rerank_features ON public.atlas_packets USING gin (rerank_features)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_routing_hints",
+        "definition": "CREATE INDEX idx_atlas_packets_routing_hints ON public.atlas_packets USING gin (routing_hints)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_summary_fts",
+        "definition": "CREATE INDEX idx_atlas_packets_summary_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, COALESCE(summary, ''::text)))"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_tags",
+        "definition": "CREATE INDEX idx_atlas_packets_tags ON public.atlas_packets USING gin (tags)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_tags_gin",
+        "definition": "CREATE INDEX idx_atlas_packets_tags_gin ON public.atlas_packets USING gin (tags)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_topology_gin_pathops",
+        "definition": "CREATE INDEX idx_atlas_packets_topology_gin_pathops ON public.atlas_packets USING gin (topology jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_atlas_packets_vectors_gin_pathops",
+        "definition": "CREATE INDEX idx_atlas_packets_vectors_gin_pathops ON public.atlas_packets USING gin (vectors jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_packets_feature_envelope",
+        "definition": "CREATE INDEX idx_packets_feature_envelope ON public.atlas_packets USING gin (feature_envelope)"
+      },
+      {
+        "table": "atlas_packets",
+        "name": "idx_packets_used_concepts_gin",
+        "definition": "CREATE INDEX idx_packets_used_concepts_gin ON public.atlas_packets USING gin (used_concepts)"
+      },
+      {
+        "table": "atlas_retrieval_eval_times",
+        "name": "idx_eval_times_payload_gin",
+        "definition": "CREATE INDEX idx_eval_times_payload_gin ON public.atlas_retrieval_eval_times USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_summary_layers",
+        "name": "idx_summary_layers_entities",
+        "definition": "CREATE INDEX idx_summary_layers_entities ON public.atlas_summary_layers USING gin (entities)"
+      },
+      {
+        "table": "atlas_summary_layers",
+        "name": "idx_summary_layers_keywords",
+        "definition": "CREATE INDEX idx_summary_layers_keywords ON public.atlas_summary_layers USING gin (keywords)"
+      },
+      {
+        "table": "atlas_summary_layers",
+        "name": "idx_summary_layers_metadata_gin",
+        "definition": "CREATE INDEX idx_summary_layers_metadata_gin ON public.atlas_summary_layers USING gin (metadata)"
+      },
+      {
+        "table": "atlas_summary_layers",
+        "name": "idx_summary_layers_summary_fts",
+        "definition": "CREATE INDEX idx_summary_layers_summary_fts ON public.atlas_summary_layers USING gin (to_tsvector('english'::regconfig, COALESCE(summary, summary_text, ''::text)))"
+      },
+      {
+        "table": "atlas_topology_eval_times",
+        "name": "idx_topo_eval_metadata_gin",
+        "definition": "CREATE INDEX idx_topo_eval_metadata_gin ON public.atlas_topology_eval_times USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_tree_nodes",
+        "name": "idx_tree_nodes_metadata_gin",
+        "definition": "CREATE INDEX idx_tree_nodes_metadata_gin ON public.atlas_tree_nodes USING gin (metadata)"
+      },
+      {
+        "table": "cluster_cards",
+        "name": "cluster_cards_card_gin",
+        "definition": "CREATE INDEX cluster_cards_card_gin ON public.cluster_cards USING gin (card)"
+      },
+      {
+        "table": "cluster_summaries",
+        "name": "cluster_summaries_embedding_hnsw",
+        "definition": "CREATE INDEX cluster_summaries_embedding_hnsw ON public.cluster_summaries USING hnsw (summary_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "cluster_summaries",
+        "name": "cluster_summaries_tags_gin",
+        "definition": "CREATE INDEX cluster_summaries_tags_gin ON public.cluster_summaries USING gin (tags)"
+      },
+      {
+        "table": "cluster_summaries",
+        "name": "idx_cluster_summaries_metadata_gin",
+        "definition": "CREATE INDEX idx_cluster_summaries_metadata_gin ON public.cluster_summaries USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "cluster_summaries",
+        "name": "idx_cluster_summaries_tags_gin",
+        "definition": "CREATE INDEX idx_cluster_summaries_tags_gin ON public.cluster_summaries USING gin (tags)"
+      },
+      {
+        "table": "code_features",
+        "name": "idx_code_features_tags",
+        "definition": "CREATE INDEX idx_code_features_tags ON public.code_features USING gin (static_tags)"
+      },
+      {
+        "table": "code_llm_index",
+        "name": "code_llm_index_output_meta_gin",
+        "definition": "CREATE INDEX code_llm_index_output_meta_gin ON public.code_llm_index USING gin (output_meta jsonb_path_ops)"
+      },
+      {
+        "table": "code_relations",
+        "name": "code_relations_evidence_gin_idx",
+        "definition": "CREATE INDEX code_relations_evidence_gin_idx ON public.code_relations USING gin (evidence)"
+      },
+      {
+        "table": "code_retrieval_chunks",
+        "name": "crc_embedding_hnsw",
+        "definition": "CREATE INDEX crc_embedding_hnsw ON public.code_retrieval_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "code_retrieval_chunks",
+        "name": "crc_fts_gin",
+        "definition": "CREATE INDEX crc_fts_gin ON public.code_retrieval_chunks USING gin (search_vector)"
+      },
+      {
+        "table": "code_retrieval_chunks",
+        "name": "crc_metadata_gin",
+        "definition": "CREATE INDEX crc_metadata_gin ON public.code_retrieval_chunks USING gin (metadata)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_cluster_summary_gin",
+        "definition": "CREATE INDEX codebase_chunk_index_cluster_summary_gin ON public.codebase_chunk_index USING gin (cluster_summary jsonb_path_ops)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_content_hnsw",
+        "definition": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_metadata_gin",
+        "definition": "CREATE INDEX codebase_chunk_index_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_semantic_tags_gin",
+        "definition": "CREATE INDEX codebase_chunk_index_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_summary_hnsw",
+        "definition": "CREATE INDEX codebase_chunk_index_summary_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "codebase_chunk_index_tags_idx",
+        "definition": "CREATE INDEX codebase_chunk_index_tags_idx ON public.codebase_chunk_index USING gin (tags)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_bm25_search",
+        "definition": "CREATE INDEX idx_codebase_chunk_bm25_search ON public.codebase_chunk_index USING gin (search_vector)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_content_embedding_384_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_content_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_384 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_content_embedding_768_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_index_error_embedding_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_latent64_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_metadata_gin",
+        "definition": "CREATE INDEX idx_codebase_chunk_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_semantic_tags_gin",
+        "definition": "CREATE INDEX idx_codebase_chunk_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_summary_embedding_384_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_summary_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding_384 vector_cosine_ops) WITH (m='12', ef_construction='48')"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_tags_gin",
+        "definition": "CREATE INDEX idx_codebase_chunk_tags_gin ON public.codebase_chunk_index USING gin (tags jsonb_path_ops)"
+      },
+      {
+        "table": "concept_records",
+        "name": "idx_concept_records_feature_ids_gin",
+        "definition": "CREATE INDEX idx_concept_records_feature_ids_gin ON public.concept_records USING gin (feature_ids)"
+      },
+      {
+        "table": "concept_records",
+        "name": "idx_concept_records_metadata_gin",
+        "definition": "CREATE INDEX idx_concept_records_metadata_gin ON public.concept_records USING gin (metadata)"
+      },
+      {
+        "table": "concept_records",
+        "name": "idx_concept_records_strategy_dist_gin",
+        "definition": "CREATE INDEX idx_concept_records_strategy_dist_gin ON public.concept_records USING gin (strategy_distribution)"
+      },
+      {
+        "table": "document_embeddings",
+        "name": "document_embeddings_hnsw_idx",
+        "definition": "CREATE INDEX document_embeddings_hnsw_idx ON public.document_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "embedded_summaries",
+        "name": "idx_embedded_summaries_vector_hnsw",
+        "definition": "CREATE INDEX idx_embedded_summaries_vector_hnsw ON public.embedded_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "embedding_cache",
+        "name": "embedding_cache_hnsw_idx",
+        "definition": "CREATE INDEX embedding_cache_hnsw_idx ON public.embedding_cache USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "error_fingerprints",
+        "name": "error_fingerprints_fts_idx",
+        "definition": "CREATE INDEX error_fingerprints_fts_idx ON public.error_fingerprints USING gin (to_tsvector('english'::regconfig, normalized_text))"
+      },
+      {
+        "table": "error_fingerprints",
+        "name": "error_fingerprints_normalized_trgm_idx",
+        "definition": "CREATE INDEX error_fingerprints_normalized_trgm_idx ON public.error_fingerprints USING gin (normalized_text gin_trgm_ops)"
+      },
+      {
+        "table": "error_fingerprints",
+        "name": "error_fingerprints_top_files_gin_idx",
+        "definition": "CREATE INDEX error_fingerprints_top_files_gin_idx ON public.error_fingerprints USING gin (top_files)"
+      },
+      {
+        "table": "error_fingerprints",
+        "name": "error_fingerprints_top_symbols_gin_idx",
+        "definition": "CREATE INDEX error_fingerprints_top_symbols_gin_idx ON public.error_fingerprints USING gin (top_symbols)"
+      },
+      {
+        "table": "evidence",
+        "name": "evidence_entities_gin_idx",
+        "definition": "CREATE INDEX evidence_entities_gin_idx ON public.evidence USING gin (entities)"
+      },
+      {
+        "table": "evidence",
+        "name": "evidence_search_vector_idx",
+        "definition": "CREATE INDEX evidence_search_vector_idx ON public.evidence USING gin (search_vector)"
+      },
+      {
+        "table": "evidence",
+        "name": "evidence_tags_gin_idx",
+        "definition": "CREATE INDEX evidence_tags_gin_idx ON public.evidence USING gin (tags)"
+      },
+      {
+        "table": "evidence_vectors",
+        "name": "evidence_vectors_hnsw_idx",
+        "definition": "CREATE INDEX evidence_vectors_hnsw_idx ON public.evidence_vectors USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "feature_implementations",
+        "name": "fi_fts_idx",
+        "definition": "CREATE INDEX fi_fts_idx ON public.feature_implementations USING gin (to_tsvector('english'::regconfig, ((feature_name || ' '::text) || COALESCE(description, ''::text))))"
+      },
+      {
+        "table": "feature_lexical",
+        "name": "idx_feature_lexical_bm25",
+        "definition": "CREATE INDEX idx_feature_lexical_bm25 ON public.feature_lexical USING gin (bm25_terms)"
+      },
+      {
+        "table": "feature_lexical",
+        "name": "idx_feature_lexical_keywords",
+        "definition": "CREATE INDEX idx_feature_lexical_keywords ON public.feature_lexical USING gin (keywords)"
+      },
+      {
+        "table": "feature_lexical_facts",
+        "name": "feature_lexical_facts_keywords_idx",
+        "definition": "CREATE INDEX feature_lexical_facts_keywords_idx ON public.feature_lexical_facts USING gin (keywords)"
+      },
+      {
+        "table": "feature_lexical_facts",
+        "name": "feature_lexical_facts_symbols_idx",
+        "definition": "CREATE INDEX feature_lexical_facts_symbols_idx ON public.feature_lexical_facts USING gin (symbols)"
+      },
+      {
+        "table": "feature_records",
+        "name": "idx_feature_records_payload",
+        "definition": "CREATE INDEX idx_feature_records_payload ON public.feature_records USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "feature_structural",
+        "name": "idx_feature_structural_symbol_name",
+        "definition": "CREATE INDEX idx_feature_structural_symbol_name ON public.feature_structural USING gin (symbol_name)"
+      },
+      {
+        "table": "feature_structural_facts",
+        "name": "feature_structural_facts_imports_idx",
+        "definition": "CREATE INDEX feature_structural_facts_imports_idx ON public.feature_structural_facts USING gin (imports)"
+      },
+      {
+        "table": "file_summaries",
+        "name": "idx_file_summaries_manifold4",
+        "definition": "CREATE INDEX idx_file_summaries_manifold4 ON public.file_summaries USING gin (manifold4)"
+      },
+      {
+        "table": "file_summaries",
+        "name": "idx_file_summaries_tags",
+        "definition": "CREATE INDEX idx_file_summaries_tags ON public.file_summaries USING gin (tags)"
+      },
+      {
+        "table": "fix_attempts",
+        "name": "fix_attempts_metadata_gin_idx",
+        "definition": "CREATE INDEX fix_attempts_metadata_gin_idx ON public.fix_attempts USING gin (metadata)"
+      },
+      {
+        "table": "fixer_patterns",
+        "name": "fp_embedding_hnsw_idx",
+        "definition": "CREATE INDEX fp_embedding_hnsw_idx ON public.fixer_patterns USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "fixer_patterns",
+        "name": "fp_tags_gin_idx",
+        "definition": "CREATE INDEX fp_tags_gin_idx ON public.fixer_patterns USING gin (tags)"
+      },
+      {
+        "table": "fixer_patterns",
+        "name": "fp_template_trgm_idx",
+        "definition": "CREATE INDEX fp_template_trgm_idx ON public.fixer_patterns USING gin (fix_template gin_trgm_ops)"
+      },
+      {
+        "table": "legal_documents",
+        "name": "idx_legal_documents_metadata",
+        "definition": "CREATE INDEX idx_legal_documents_metadata ON public.legal_documents USING gin (metadata)"
+      },
+      {
+        "table": "legal_documents",
+        "name": "legal_documents_content_tsv_gin",
+        "definition": "CREATE INDEX legal_documents_content_tsv_gin ON public.legal_documents USING gin (content_tsv)"
+      },
+      {
+        "table": "legal_documents",
+        "name": "legal_documents_hnsw_idx",
+        "definition": "CREATE INDEX legal_documents_hnsw_idx ON public.legal_documents USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "llm_summary_cache",
+        "name": "llm_summary_cache_json_gin",
+        "definition": "CREATE INDEX llm_summary_cache_json_gin ON public.llm_summary_cache USING gin (json_summary)"
+      },
+      {
+        "table": "llm_summary_cache",
+        "name": "llm_summary_cache_tags_gin",
+        "definition": "CREATE INDEX llm_summary_cache_tags_gin ON public.llm_summary_cache USING gin (tags)"
+      },
+      {
+        "table": "metadata_envelopes",
+        "name": "metadata_envelopes_features_gin",
+        "definition": "CREATE INDEX metadata_envelopes_features_gin ON public.metadata_envelopes USING gin (features)"
+      },
+      {
+        "table": "metadata_envelopes",
+        "name": "metadata_envelopes_metadata_gin",
+        "definition": "CREATE INDEX metadata_envelopes_metadata_gin ON public.metadata_envelopes USING gin (metadata)"
+      },
+      {
+        "table": "metadata_envelopes",
+        "name": "metadata_envelopes_relations_gin",
+        "definition": "CREATE INDEX metadata_envelopes_relations_gin ON public.metadata_envelopes USING gin (relations)"
+      },
+      {
+        "table": "packet_source_features",
+        "name": "packet_source_features_keywords_gin",
+        "definition": "CREATE INDEX packet_source_features_keywords_gin ON public.packet_source_features USING gin (keywords)"
+      },
+      {
+        "table": "packet_source_features",
+        "name": "packet_source_features_regex_gin",
+        "definition": "CREATE INDEX packet_source_features_regex_gin ON public.packet_source_features USING gin (regex_hits jsonb_path_ops)"
+      },
+      {
+        "table": "packet_source_features",
+        "name": "packet_source_features_symbols_gin",
+        "definition": "CREATE INDEX packet_source_features_symbols_gin ON public.packet_source_features USING gin (symbols)"
+      },
+      {
+        "table": "packet_source_features",
+        "name": "packet_source_features_tags_gin",
+        "definition": "CREATE INDEX packet_source_features_tags_gin ON public.packet_source_features USING gin (nlp_tags)"
+      },
+      {
+        "table": "qdrant_centroid_clusters",
+        "name": "qdrant_centroid_clusters_dirs_gin",
+        "definition": "CREATE INDEX qdrant_centroid_clusters_dirs_gin ON public.qdrant_centroid_clusters USING gin (directory_paths)"
+      },
+      {
+        "table": "qdrant_centroid_clusters",
+        "name": "qdrant_centroid_clusters_tags_gin",
+        "definition": "CREATE INDEX qdrant_centroid_clusters_tags_gin ON public.qdrant_centroid_clusters USING gin (tags)"
+      },
+      {
+        "table": "qlora_examples",
+        "name": "qlora_examples_clusters_idx",
+        "definition": "CREATE INDEX qlora_examples_clusters_idx ON public.qlora_examples USING gin (gpu_clusters)"
+      },
+      {
+        "table": "rag_query_log",
+        "name": "rag_query_log_embedding_hnsw",
+        "definition": "CREATE INDEX rag_query_log_embedding_hnsw ON public.rag_query_log USING hnsw (query_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "table": "recommendation_log",
+        "name": "idx_recommendation_log_evidence",
+        "definition": "CREATE INDEX idx_recommendation_log_evidence ON public.recommendation_log USING gin (evidence_ids)"
+      },
+      {
+        "table": "research_summaries",
+        "name": "rs_embedding_hnsw",
+        "definition": "CREATE INDEX rs_embedding_hnsw ON public.research_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "research_summaries",
+        "name": "rs_entity_tags_gin",
+        "definition": "CREATE INDEX rs_entity_tags_gin ON public.research_summaries USING gin (entity_tags)"
+      },
+      {
+        "table": "research_summaries",
+        "name": "rs_fts",
+        "definition": "CREATE INDEX rs_fts ON public.research_summaries USING gin (to_tsvector('english'::regconfig, ((COALESCE(query, ''::text) || ' '::text) || COALESCE(summary, ''::text))))"
+      },
+      {
+        "table": "research_summaries",
+        "name": "rs_query_trgm",
+        "definition": "CREATE INDEX rs_query_trgm ON public.research_summaries USING gin (query gin_trgm_ops)"
+      },
+      {
+        "table": "retrieval_telemetry",
+        "name": "idx_retrieval_telemetry_feature_ids_gin",
+        "definition": "CREATE INDEX idx_retrieval_telemetry_feature_ids_gin ON public.retrieval_telemetry USING gin (feature_ids)"
+      },
+      {
+        "table": "retrieval_telemetry",
+        "name": "idx_retrieval_telemetry_selected_packet_keys_gin",
+        "definition": "CREATE INDEX idx_retrieval_telemetry_selected_packet_keys_gin ON public.retrieval_telemetry USING gin (selected_packet_keys)"
+      },
+      {
+        "table": "rg_search_hits",
+        "name": "rg_hits_entities_gin",
+        "definition": "CREATE INDEX rg_hits_entities_gin ON public.rg_search_hits USING gin (entities)"
+      },
+      {
+        "table": "rg_search_hits",
+        "name": "rg_hits_scores_gin",
+        "definition": "CREATE INDEX rg_hits_scores_gin ON public.rg_search_hits USING gin (scores)"
+      },
+      {
+        "table": "route_runtime_packets",
+        "name": "idx_route_runtime_packets_metadata_gin",
+        "definition": "CREATE INDEX idx_route_runtime_packets_metadata_gin ON public.route_runtime_packets USING gin (metadata)"
+      },
+      {
+        "table": "route_runtime_packets",
+        "name": "idx_route_runtime_packets_tags_gin",
+        "definition": "CREATE INDEX idx_route_runtime_packets_tags_gin ON public.route_runtime_packets USING gin (tags)"
+      },
+      {
+        "table": "route_runtime_packets",
+        "name": "idx_rrp_feature_ids_gin",
+        "definition": "CREATE INDEX idx_rrp_feature_ids_gin ON public.route_runtime_packets USING gin (feature_ids)"
+      },
+      {
+        "table": "route_runtime_packets",
+        "name": "idx_rrp_raw_gin",
+        "definition": "CREATE INDEX idx_rrp_raw_gin ON public.route_runtime_packets USING gin (raw)"
+      },
+      {
+        "table": "route_runtime_packets",
+        "name": "idx_rrp_source_refs_gin",
+        "definition": "CREATE INDEX idx_rrp_source_refs_gin ON public.route_runtime_packets USING gin (source_refs)"
+      },
+      {
+        "table": "screenshot_artifacts",
+        "name": "screenshot_artifacts_caption_embedding_hnsw_idx",
+        "definition": "CREATE INDEX screenshot_artifacts_caption_embedding_hnsw_idx ON public.screenshot_artifacts USING hnsw (caption_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "screenshot_artifacts",
+        "name": "screenshot_artifacts_caption_trgm_idx",
+        "definition": "CREATE INDEX screenshot_artifacts_caption_trgm_idx ON public.screenshot_artifacts USING gin (caption gin_trgm_ops)"
+      },
+      {
+        "table": "screenshot_artifacts",
+        "name": "screenshot_artifacts_file_trgm_idx",
+        "definition": "CREATE INDEX screenshot_artifacts_file_trgm_idx ON public.screenshot_artifacts USING gin (file_path gin_trgm_ops)"
+      },
+      {
+        "table": "screenshot_artifacts",
+        "name": "screenshot_artifacts_metadata_gin_idx",
+        "definition": "CREATE INDEX screenshot_artifacts_metadata_gin_idx ON public.screenshot_artifacts USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "screenshot_artifacts",
+        "name": "screenshot_artifacts_ocr_trgm_idx",
+        "definition": "CREATE INDEX screenshot_artifacts_ocr_trgm_idx ON public.screenshot_artifacts USING gin (ocr_text gin_trgm_ops)"
+      },
+      {
+        "table": "semantic_memories",
+        "name": "idx_semantic_memories_concept_ids",
+        "definition": "CREATE INDEX idx_semantic_memories_concept_ids ON public.semantic_memories USING gin (concept_ids)"
+      },
+      {
+        "table": "semantic_memories",
+        "name": "idx_semantic_memories_keywords",
+        "definition": "CREATE INDEX idx_semantic_memories_keywords ON public.semantic_memories USING gin (keywords)"
+      },
+      {
+        "table": "semantic_signals",
+        "name": "idx_semantic_signals_evidence_ids",
+        "definition": "CREATE INDEX idx_semantic_signals_evidence_ids ON public.semantic_signals USING gin (evidence_ids)"
+      },
+      {
+        "table": "task_semantic_packets",
+        "name": "idx_task_semantic_packets_metadata",
+        "definition": "CREATE INDEX idx_task_semantic_packets_metadata ON public.task_semantic_packets USING gin (metadata)"
+      },
+      {
+        "table": "task_semantic_packets",
+        "name": "idx_task_semantic_packets_metadata_gin",
+        "definition": "CREATE INDEX idx_task_semantic_packets_metadata_gin ON public.task_semantic_packets USING gin (metadata)"
+      },
+      {
+        "table": "taxonomy_nodes",
+        "name": "taxonomy_nodes_metadata_gin_idx",
+        "definition": "CREATE INDEX taxonomy_nodes_metadata_gin_idx ON public.taxonomy_nodes USING gin (metadata)"
+      },
+      {
+        "table": "tensor_analysis_cache",
+        "name": "tensor_analysis_cache_json_gin",
+        "definition": "CREATE INDEX tensor_analysis_cache_json_gin ON public.tensor_analysis_cache USING gin (tensor_json)"
+      },
+      {
+        "table": "tool_execution_audit",
+        "name": "idx_tool_execution_keywords",
+        "definition": "CREATE INDEX idx_tool_execution_keywords ON public.tool_execution_audit USING gin (to_tsvector('english'::regconfig, keywords))"
+      },
+      {
+        "table": "tool_registry",
+        "name": "idx_tool_registry_capabilities_gin",
+        "definition": "CREATE INDEX idx_tool_registry_capabilities_gin ON public.tool_registry USING gin (tool_capabilities)"
+      },
+      {
+        "table": "tool_registry",
+        "name": "idx_tool_registry_tags",
+        "definition": "CREATE INDEX idx_tool_registry_tags ON public.tool_registry USING gin (tool_tags)"
+      },
+      {
+        "table": "tool_registry",
+        "name": "tool_registry_domain_idx",
+        "definition": "CREATE INDEX tool_registry_domain_idx ON public.tool_registry USING gin (domains)"
+      },
+      {
+        "table": "tool_registry",
+        "name": "tool_registry_embedding_hnsw",
+        "definition": "CREATE INDEX tool_registry_embedding_hnsw ON public.tool_registry USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "table": "tool_registry",
+        "name": "tool_registry_schema_gin",
+        "definition": "CREATE INDEX tool_registry_schema_gin ON public.tool_registry USING gin (input_schema jsonb_path_ops)"
+      },
+      {
+        "table": "vault_md_index",
+        "name": "vault_md_index_frontmatter_gin",
+        "definition": "CREATE INDEX vault_md_index_frontmatter_gin ON public.vault_md_index USING gin (frontmatter)"
+      },
+      {
+        "table": "vault_md_index",
+        "name": "vault_md_index_links_gin",
+        "definition": "CREATE INDEX vault_md_index_links_gin ON public.vault_md_index USING gin (links_out)"
+      },
+      {
+        "table": "warden_chunks",
+        "name": "warden_chunks_hnsw_idx",
+        "definition": "CREATE INDEX warden_chunks_hnsw_idx ON public.warden_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      }
+    ]
+  },
+  "qdrant": {
+    "reachable": true,
+    "url": "http://127.0.0.1:6333",
+    "collections": [
+      {
+        "name": "BifrostSemanticCachePlugin",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 5,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "agent_memory_observations",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "audio_segments",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "case_chunks",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "chat_messages",
+        "vectors": {
+          "message": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "chunks_web_search",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "cluster_narratives",
+        "vectors": {
+          "narrative": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 18,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "code_llm_outputs",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_384",
+        "vectors": {
+          "content": {
+            "size": 384,
+            "distance": "Cosine"
+          }
+        },
+        "points": 1,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_384_hybrid",
+        "vectors": {
+          "content": {
+            "size": 384,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_512",
+        "vectors": {
+          "size": 512,
+          "distance": "Cosine"
+        },
+        "points": 53379,
+        "indexedVectors": 50149,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_768",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 105954,
+        "indexedVectors": 117302,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_768_v2",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 52380,
+        "indexedVectors": 52380,
+        "status": "green"
+      },
+      {
+        "name": "codebase_chunks_sparse_test_v1",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 500,
+        "indexedVectors": 500,
+        "status": "green"
+      },
+      {
+        "name": "codebase_topology_128",
+        "vectors": {
+          "latent_128": {
+            "size": 128,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "codebase_topology_64",
+        "vectors": {
+          "latent_64": {
+            "size": 64,
+            "distance": "Cosine"
+          }
+        },
+        "points": 105761,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "court_opinions",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "diagnosis_embeddings",
+        "vectors": {
+          "diagnosis": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "document_knowledge_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "document_tags",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "embedding_cache",
+        "vectors": {
+          "embedding": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "error_embeddings",
+        "vectors": {
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 6,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_items",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_items_clip_512",
+        "vectors": {
+          "size": 512,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "evidence_vectors",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "external_programming_docs_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "feature_maps",
+        "vectors": {
+          "summary": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "fictional_case_chunks",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "fixer_memory_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "knowledge_base",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_canon_chunks",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_cases",
+        "vectors": {
+          "description": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_documents",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "legal_glossary",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "llm_response_cache",
+        "vectors": {
+          "query": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 9,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "phase110_baseline_768",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 2467,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "poi_profiles",
+        "vectors": {
+          "embedding": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "research_memory_768",
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "sc_deedscodebase_deeds-web-app",
+        "vectors": {
+          "dense": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "sc_deedssocraticode_metadata",
+        "vectors": {
+          "size": 1,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "summary_lenses_768",
+        "vectors": {
+          "summary": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "synthesis_memory_768",
+        "vectors": {
+          "synthesis": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "points": 8,
+        "indexedVectors": 0,
+        "status": "green"
+      },
+      {
+        "name": "topic_clusters",
+        "vectors": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "points": 0,
+        "indexedVectors": 0,
+        "status": "green"
+      }
+    ]
+  },
+  "drizzle": {
+    "journalEntries": 41,
+    "manualSqlFiles": 246,
+    "declaredSidecars": 30,
+    "untrackedManualFiles": [
+      "0009_hybrid_graph_indexes.sql",
+      "0010_distilled_table_store.sql",
+      "0016_cluster_centroids.sql",
+      "0018_ace_observability_canonicalize.sql",
+      "0020_p1_phase_2a_tree_nodes.sql",
+      "0021_p1_phase_2b_topology_index.sql",
+      "0022_p1_phase_2c_svg_glyphs.sql",
+      "0023_p1_phase_2d_summary_layers.sql",
+      "0024_feature_id_metadata_gin_indexes.sql",
+      "0024_p1_task_10_link_packets_to_tree.sql",
+      "0029_align_userid_sidecar.sql",
+      "0029_align_userid_validation.sql",
+      "0035_phase_20_packet_metadata_topology.sql",
+      "0040_durable_execution_journal.sql",
+      "0040_phase-1-add-tree-node-id-som-cluster.sql",
+      "0040_tree_nodes_pageindex.sql",
+      "0041_higher_hop_schema_repair.sql",
+      "0041_p1_error_logs_table.sql",
+      "0041_phase-1-enhanced-indexes.sql",
+      "0042_parent_atlas_plugin_extensions.sql",
+      "0042_phase-2a-svg-glyphs.sql",
+      "0043_parent_atlas_plugin_core_schema.sql",
+      "0043_phase-1c-enrichment-columns.sql",
+      "0044_agentic_error_fixing_schema.sql",
+      "0044_packet_topology_projection.sql",
+      "0045_adaptive_schema_repair.generated.sql",
+      "0046_atlas_packets_identity_lane.sql",
+      "0046_phase_16_identity_lanes.sql",
+      "0047_bm25_packet_summary_index.sql",
+      "0047_kag_knowledge_layer.sql",
+      "0047_packet_topology_projection.sql",
+      "0047_phase2_telemetry_schema.sql",
+      "0047_phase85a_semantic_diffs.sql",
+      "0047_repo_function_registry.sql",
+      "0048_feature_registry_queries.sql",
+      "0048_phase85a_artifact_registry.sql",
+      "0048_phase_20_4_retrieval_eval_times.sql",
+      "0049_retrieval_provenance_p2_fields.sql",
+      "0050_add_summary_quality_score.sql",
+      "0050_agent_claim_ledger.sql",
+      "0050_agent_memory_registry.sql",
+      "0050_atlas_artifacts.sql",
+      "0050_deep_research_reports.sql",
+      "0051_atlas_identity_ledger.sql",
+      "0051_atlas_semantic_diffs.sql",
+      "0051_chunk_hit_log.sql",
+      "0051_deep_research_reports_gin_indexes.sql",
+      "0051_evaluation_registry.sql",
+      "0053_agent_memory_refactor_many_to_many.sql",
+      "0053_atlas_directory_agents_signals.sql"
+    ]
+  },
+  "findings": [
+    {
+      "id": "AST_EXTRACTION_FALLBACK_PRESENT",
+      "severity": "medium",
+      "message": "An AST extraction path still advertises or uses regex fallback.",
+      "evidence": [
+        "scripts\\atlas\\phase1-ast-grep-extraction.mjs",
+        "sveltekit-frontend\\scripts\\atlas\\phase1-ast-grep-extraction.mjs",
+        "sveltekit-frontend\\scripts\\atlas\\phase1.5-ast-grep-extraction.mjs"
+      ]
+    },
+    {
+      "id": "SYMBOL_REGISTRY_TABLE_MISSING",
+      "severity": "high",
+      "message": "The stable cross-revision symbol registry migration has not been applied to the live database.",
+      "evidence": []
+    },
+    {
+      "id": "FEATURE_ROW_TABLE_MISSING",
+      "severity": "high",
+      "message": "The revisioned observation feature-row table has not been applied to the live database.",
+      "evidence": []
+    },
+    {
+      "id": "POSTGRES_BITMAP_TABLE_MISSING",
+      "severity": "medium",
+      "message": "No PostgreSQL table explicitly models bitmap-combinable routing state; current filtering relies on GIN/Valkey projections.",
+      "evidence": []
+    },
+    {
+      "id": "PACKET_AST_SYMBOL_COVERAGE_LOW",
+      "severity": "medium",
+      "message": "Fewer than half of atlas_packet_features rows have AST symbols.",
+      "evidence": [
+        "12297/61657"
+      ]
+    },
+    {
+      "id": "DRIZZLE_SIDECAR_DECLARATION_GAP",
+      "severity": "medium",
+      "message": "Manual SQL files are not visibly declared in the Drizzle sidecar manifest.",
+      "evidence": [
+        "0009_hybrid_graph_indexes.sql",
+        "0010_distilled_table_store.sql",
+        "0016_cluster_centroids.sql",
+        "0018_ace_observability_canonicalize.sql",
+        "0020_p1_phase_2a_tree_nodes.sql",
+        "0021_p1_phase_2b_topology_index.sql",
+        "0022_p1_phase_2c_svg_glyphs.sql",
+        "0023_p1_phase_2d_summary_layers.sql",
+        "0024_feature_id_metadata_gin_indexes.sql",
+        "0024_p1_task_10_link_packets_to_tree.sql",
+        "0029_align_userid_sidecar.sql",
+        "0029_align_userid_validation.sql",
+        "0035_phase_20_packet_metadata_topology.sql",
+        "0040_durable_execution_journal.sql",
+        "0040_phase-1-add-tree-node-id-som-cluster.sql",
+        "0040_tree_nodes_pageindex.sql",
+        "0041_higher_hop_schema_repair.sql",
+        "0041_p1_error_logs_table.sql",
+        "0041_phase-1-enhanced-indexes.sql",
+        "0042_parent_atlas_plugin_extensions.sql"
+      ]
+    }
+  ]
+}

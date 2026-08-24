@@ -67,7 +67,9 @@
     "./core/ace-runtime-adapter": "./dist/core/ace-runtime-adapter.js",
     "./core/hyperrag-live-integration": "./dist/core/hyperrag-live-integration.js",
     "./core/proof-gates": "./dist/core/proof-gates.js",
-    "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js"
+    "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js",
+    "./core/atlas-operation-v1": "./dist/core/atlas-operation-v1.js",
+    "./core/atlas-topology-v1": "./dist/core/atlas-topology-v1.js"
   },
   "bin": { "atlas": "./dist/cli.js" },
   "scripts": {

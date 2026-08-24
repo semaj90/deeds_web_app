@@ -15,8 +15,8 @@
 import pg from 'pg';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { writeFileSync } from 'fs';
+import { dirname, join, resolve } from 'path';
+import { existsSync, writeFileSync } from 'fs';
 
 dotenv.config({ path: join(dirname(fileURLToPath(import.meta.url)), '../../sveltekit-frontend/.env') });
 dotenv.config({ path: join(dirname(fileURLToPath(import.meta.url)), '../../sveltekit-frontend/.env.local') });
@@ -24,6 +24,7 @@ dotenv.config({ path: join(dirname(fileURLToPath(import.meta.url)), '../../svelt
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
 const JSON_OUT = process.argv.includes('--json');
+const ALLOW_DELETE_UNRESOLVED = process.argv.includes('--allow-delete-unresolved');
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit=') || a === '--limit');
 const LIMIT = LIMIT_ARG
   ? parseInt(LIMIT_ARG.includes('=') ? LIMIT_ARG.split('=')[1] : process.argv[process.argv.indexOf('--limit') + 1])
@@ -31,6 +32,7 @@ const LIMIT = LIMIT_ARG
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.ATLAS_QDRANT_COLLECTION || 'codebase_chunks_768';
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const BATCH_SIZE = 100;
 const PG_BATCH = 1000;
 
@@ -44,6 +46,15 @@ const PG_CONFIG = {
 };
 
 function log(...args) { if (VERBOSE) console.log(...args); }
+
+function sourceExistsOnDisk(sourceRef) {
+  const value = String(sourceRef ?? '').trim();
+  if (!value || value.includes(':') && !/^[A-Za-z]:[\\/]/.test(value)) return false;
+  return [
+    resolve(REPO_ROOT, value),
+    resolve(REPO_ROOT, 'sveltekit-frontend', value),
+  ].some((candidate) => existsSync(candidate));
+}
 
 async function deleteQdrantPoints(pointIds) {
   const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/delete`, {
@@ -108,7 +119,7 @@ async function scrollQdrantAllCodePoints(callback) {
   while (true) {
     const body = {
       limit: BATCH_SIZE,
-      with_payload: ['source_ref', 'packet_key'],
+      with_payload: ['source_ref', 'packet_key', 'content_hash', 'canonical_id', 'projection_revision'],
       with_vector: false,
       filter: {
         must_not: [{ key: 'kind', match: { value: 'directory-cluster' } }],
@@ -151,8 +162,12 @@ async function getPostgresSourceRefs(pool) {
   }
 
   try {
-    const r2 = await pool.query(`SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL`);
-    for (const row of r2.rows) refs.add(row.source_ref);
+    const r2 = await pool.query(`
+      SELECT source_ref AS ref FROM atlas_packets WHERE source_ref IS NOT NULL
+      UNION
+      SELECT canonical_source_ref AS ref FROM atlas_packets WHERE canonical_source_ref IS NOT NULL
+    `);
+    for (const row of r2.rows) refs.add(row.ref);
     log(`  Postgres combined source_refs: ${refs.size}`);
   } catch (e) {
     log(`  atlas_packets query failed: ${e.message}`);
@@ -163,17 +178,28 @@ async function getPostgresSourceRefs(pool) {
 
 async function main() {
   const stats = {
-    phase1_orphan_no_packet_key: { scanned: 0, deleted: 0, errors: 0, ids: [] },
-    phase2_stale_no_pg_match: { scanned: 0, deleted: 0, errors: 0, ids: [] },
+    phase1_orphan_no_packet_key: { scanned: 0, recoverable_by_source_ref: 0, deleted: 0, errors: 0, ids: [] },
+    phase2_stale_no_pg_match: { scanned: 0, recoverable_on_disk: 0, deleted: 0, errors: 0, source_refs_on_disk: 0, source_refs_missing_on_disk: 0, by_extension: {}, by_packet_prefix: {}, id_kinds: { numeric: 0, string: 0 }, samples: [], unresolved_candidates: [], ids: [] },
     total_deleted: 0,
   };
 
   console.log(`=== Qdrant orphan prune — ${DRY_RUN ? 'DRY RUN' : 'LIVE'} ===`);
   console.log(`Collection: ${QDRANT_COLLECTION}`);
+  if (!DRY_RUN && !ALLOW_DELETE_UNRESOLVED) {
+    console.error('Refusing live deletion without --allow-delete-unresolved; run --dry-run first.');
+    process.exit(2);
+  }
   if (LIMIT !== Infinity) console.log(`Limit: ${LIMIT} points`);
   console.log('');
 
   const pool = new pg.Pool(PG_CONFIG);
+
+  // A missing packet_key is recoverable when source_ref still resolves to
+  // canonical Postgres data. Do not classify those points as deletable.
+  console.log('[Identity] Loading Postgres source_refs before orphan classification...');
+  const pgSourceRefs = await getPostgresSourceRefs(pool);
+  console.log(`  Postgres has ${pgSourceRefs.size} distinct source_refs`);
+  console.log('');
 
   // ── Phase 1: Delete points with no packet_key (AGENTS.md, deleted files) ──
   console.log('[Phase 1] Pruning points with no packet_key (post-backfill orphans)...');
@@ -181,8 +207,13 @@ async function main() {
   const phase1Ids = [];
   await scrollQdrantMissingPacketKey(async (points) => {
     for (const p of points) {
+      const sourceRef = p.payload?.source_ref ?? p.payload?.relative_path;
+      if (sourceRef && pgSourceRefs.has(sourceRef)) {
+        stats.phase1_orphan_no_packet_key.recoverable_by_source_ref++;
+        continue;
+      }
       phase1Ids.push(p.id);
-      log(`  Orphan (no packet_key): id=${p.id} source_ref=${p.payload?.source_ref ?? p.payload?.relative_path ?? 'UNKNOWN'}`);
+      log(`  Unresolved (no packet_key/source_ref match): id=${p.id} source_ref=${sourceRef ?? 'UNKNOWN'}`);
     }
   });
   stats.phase1_orphan_no_packet_key.scanned = phase1Ids.length;
@@ -206,15 +237,10 @@ async function main() {
     }
   }
   stats.phase1_orphan_no_packet_key.ids = phase1Ids.slice(0, 20);
-  console.log(`  Phase 1: scanned=${stats.phase1_orphan_no_packet_key.scanned}, deleted=${stats.phase1_orphan_no_packet_key.deleted}, errors=${stats.phase1_orphan_no_packet_key.errors}`);
+  console.log(`  Phase 1: scanned=${stats.phase1_orphan_no_packet_key.scanned}, recoverable=${stats.phase1_orphan_no_packet_key.recoverable_by_source_ref}, deleted=${stats.phase1_orphan_no_packet_key.deleted}, errors=${stats.phase1_orphan_no_packet_key.errors}`);
   console.log('');
 
   // ── Phase 2: Find points with packet_key but no matching source_ref in Postgres ──
-  console.log('[Phase 2] Loading Postgres source_refs...');
-  const pgSourceRefs = await getPostgresSourceRefs(pool);
-  console.log(`  Postgres has ${pgSourceRefs.size} distinct source_refs`);
-  console.log('');
-
   console.log('[Phase 2] Scanning Qdrant for stale points (source_ref not in Postgres)...');
 
   const phase2Ids = [];
@@ -223,10 +249,44 @@ async function main() {
   await scrollQdrantAllCodePoints(async (points) => {
     for (const p of points) {
       phase2Scanned++;
+      if (!p.payload?.packet_key) continue; // phase 1 owns unresolved no-key points
       const sourceRef = p.payload?.source_ref;
       if (!sourceRef) continue; // no source_ref — already handled by phase 1 or has packet_key from other means
       if (!pgSourceRefs.has(sourceRef)) {
+        const onDisk = sourceExistsOnDisk(sourceRef);
+        if (onDisk) stats.phase2_stale_no_pg_match.source_refs_on_disk++;
+        else stats.phase2_stale_no_pg_match.source_refs_missing_on_disk++;
+        if (stats.phase2_stale_no_pg_match.samples.length < 25) {
+          stats.phase2_stale_no_pg_match.samples.push({
+            id: p.id,
+            source_ref: sourceRef,
+            packet_key: p.payload?.packet_key ?? null,
+            canonical_id: p.payload?.canonical_id ?? null,
+            content_hash: p.payload?.content_hash ?? null,
+            projection_revision: p.payload?.projection_revision ?? null,
+            source_exists_on_disk: onDisk,
+          });
+        }
+        if (onDisk) {
+          stats.phase2_stale_no_pg_match.recoverable_on_disk++;
+          continue;
+        }
         phase2Ids.push(p.id);
+        const extension = sourceRef.includes('.') ? sourceRef.split('.').pop().toLowerCase() : '(none)';
+        const packetPrefix = String(p.payload?.packet_key ?? '(none)').split(':')[0];
+        stats.phase2_stale_no_pg_match.by_extension[extension] = (stats.phase2_stale_no_pg_match.by_extension[extension] ?? 0) + 1;
+        stats.phase2_stale_no_pg_match.by_packet_prefix[packetPrefix] = (stats.phase2_stale_no_pg_match.by_packet_prefix[packetPrefix] ?? 0) + 1;
+        const idKind = typeof p.id === 'number' ? 'numeric' : 'string';
+        stats.phase2_stale_no_pg_match.id_kinds[idKind]++;
+        stats.phase2_stale_no_pg_match.unresolved_candidates.push({
+          id: p.id,
+          source_ref: sourceRef,
+          packet_key: p.payload?.packet_key ?? null,
+          canonical_id: p.payload?.canonical_id ?? null,
+          content_hash: p.payload?.content_hash ?? null,
+          projection_revision: p.payload?.projection_revision ?? null,
+          source_exists_on_disk: false,
+        });
         log(`  Stale (no PG match): id=${p.id} source_ref=${sourceRef}`);
       }
     }

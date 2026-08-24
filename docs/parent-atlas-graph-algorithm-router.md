@@ -19,6 +19,8 @@ Official references checked 2026-08-16:
 - cuGraph traversal API: https://docs.rapids.ai/api/cugraph/stable/api_docs/cugraph/traversal/
 - cuGraph homogeneous neighbor sampling: https://docs.rapids.ai/api/cugraph/stable/api_docs/api/cugraph/cugraph.homogeneous_neighbor_sample/
 - cuGraph Leiden: https://docs.rapids.ai/api/cugraph/stable/api_docs/api/cugraph/cugraph.leiden/
+- cuGraph spectral modularity: https://docs.rapids.ai/api/cugraph/nightly/api_docs/api/cugraph/cugraph.spectralmodularitymaximization/
+- cuGraph spectral clustering overview: https://docs.rapids.ai/api/cugraph/nightly/graph_support/algorithms/spectral_clustering/
 - Neo4j GDS BFS: https://neo4j.com/docs/graph-data-science/current/algorithms/bfs/
 - Neo4j GDS Dijkstra single-source: https://neo4j.com/docs/graph-data-science/current/algorithms/dijkstra-single-source/
 - Neo4j GDS Yen k-shortest paths: https://neo4j.com/docs/graph-data-science/current/algorithms/yens/
@@ -40,6 +42,13 @@ Official references checked 2026-08-16:
 | `similarity` | bounded Jaccard | cuGraph or NetworkX oracle |
 | `explore` | bounded neighbor sampling | cuGraph preferred |
 | `revision_lineage` | k-best Viterbi | Parent Atlas temporal DP module |
+
+## Spectral and community policy
+
+- **Spectral Modularity Maximization** is the primary bounded spectral GPU diagnostic. Its receipt must freeze graph identity, ordinal mapping, cluster count, eigenvector count, solver tolerances, iteration limits, and random seed.
+- **Balanced Cut** is a historical challenger and parity comparison only. Current cuGraph documentation lists Balanced Cut and Modularity as supported single-GPU spectral algorithms; this repository does not claim that Balanced Cut is deprecated.
+- **Leiden** is the preferred persistent community feature once a revision-qualified graph snapshot passes its quality gates. **Louvain** remains a parity/challenger signal.
+- Spectral partitions are diagnostic topology features, not query-time community ownership and not independent retrieval votes.
 
 ## Why Leiden/Louvain are not ordinary `expand` operations
 

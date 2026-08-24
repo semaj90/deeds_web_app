@@ -100,8 +100,13 @@ Do not call any of these complete yet:
 The immediate smallest safe engineering step is declaring/verifying the direct `glob` dependency plus D9 argument-parser hardening.
 ## BM25 Graphify index control
 
-- Existing codebase_chunk_index.search_vector and idx_codebase_chunk_bm25_search remain the lexical document lane; PostgreSQL 18 bitmap scans operate on that GIN index.
-- Added manual migration sveltekit-frontend/drizzle/manual/20260823_graphify_bm25_index_control_v1.sql for graphify_bm25_index_runs and graphify_bm25_index_candidates.
-- Added read-only planner sveltekit-frontend/scripts/atlas/plan-graphify-bm25-index.mjs; current result is BM25_CONTROL_PLANE_MIGRATION_REQUIRED because the manual migration is unapplied.
-- index_run_id is ULID; workflow_id remains stable logical identity; graphify_run_id remains the existing UUID execution identity.
+- Existing `codebase_chunk_index.search_vector` and `idx_codebase_chunk_bm25_search` remain the lexical document lane; PostgreSQL 18 bitmap scans operate on that GIN index.
+- Added manual migration `sveltekit-frontend/drizzle/manual/20260823_graphify_bm25_index_control_v1.sql` for `graphify_bm25_index_runs` and `graphify_bm25_index_candidates`.
+- Added read-only planner `sveltekit-frontend/scripts/atlas/plan-graphify-bm25-index.mjs`; current result is `BM25_CONTROL_PLANE_MIGRATION_REQUIRED` because the manual migration is unapplied.
+- `index_run_id` is ULID; `workflow_id` remains stable logical identity; `graphify_run_id` remains the existing UUID execution identity.
 - No hourly schedule is installed yet. Apply and prove the control-plane migration first, then add the external worker/pg_cron schedule.
+- The configured root daily Graphify wrapper now invokes the read-only `atlas:bm25:index:plan` step after `graphify:daily:chain`. It records a plan only; it does not index or mutate Postgres.
+- The daily launcher has local `stepResults`/log summaries, but no proven canonical `graphify_runs` writer carrying `workflow_id`, `source_manifest_digest`, and source-level bindings.
+- The phase109b agentic provenance report provides a per-run UUID and stage summaries, but that `runId` is not a stable workflow identity and does not currently carry the complete source-binding manifest required for BM25 idempotency.
+- Actual hourly BM25 execution remains blocked until the Graphify run writer and source-binding readback are proven.
+- Added scripts/atlas/prepare-graphify-daily-workflow-receipt.mjs and wired it after the provenance dry-run. It emits docs/reports/graphify-daily-workflow-receipt.json with stable workflowId=graphify:daily:v1, agentic runId, manifest digest, source counts, stage summaries, and canonicalWriteAttempted=false.

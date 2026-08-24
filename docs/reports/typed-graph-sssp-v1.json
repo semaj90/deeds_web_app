@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.graph-sssp-report.v1",
+  "operation": "GRAPH_SSSP",
+  "status": "PROVEN",
+  "semantics": {
+    "weightedOnly": true,
+    "unreachable": "distance=Infinity, predecessor=-1",
+    "sourcePredecessor": -1,
+    "negativeWeights": "rejected"
+  },
+  "networkxReference": "passed_5_tests",
+  "cugraphSmoke": {
+    "status": "passed",
+    "environment": "WSL2 atlas-rapids-cu13",
+    "vertices": [10, 11, 12],
+    "distances": {"10": 0.0, "11": 2.0, "12": 5.0},
+    "predecessors": {"10": -1, "11": 10, "12": 11}
+  },
+  "canonicalAuthority": false,
+  "likely_cause": "The typed ordinal graph runtime had PageRank and SOM routing but no weighted shortest-path executor.",
+  "evidence": [
+    "python/atlas_compute/typed_graph_runtime.py",
+    "python/tests/test_typed_graph_runtime.py",
+    "WSL2 cuGraph sssp three-node smoke"
+  ],
+  "patch_targets": [
+    "python/atlas_compute/typed_graph_runtime.py",
+    "python/tests/test_typed_graph_runtime.py"
+  ],
+  "safe_next_command": "python -m pytest -q python/tests/test_typed_graph_runtime.py",
+  "smoke_command": "wsl -d Ubuntu -- /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python -c \"import cugraph; print(cugraph.sssp)\"",
+  "report_path": "docs/reports/typed-graph-sssp-v1.json"
+}

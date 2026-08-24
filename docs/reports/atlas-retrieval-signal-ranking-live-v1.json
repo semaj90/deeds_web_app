@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.retrieval-signal-ranking-live.v1",
+  "status": "BLOCKED",
+  "readOnly": true,
+  "inputReport": "docs\\reports\\agentic-recommendation-workflow.json",
+  "workflowStatus": "COMPLETE",
+  "query": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
+  "identity": {
+    "pass": false,
+    "packetKey": null,
+    "sourceRef": null
+  },
+  "counts": {
+    "lexical": 0,
+    "dense": 0,
+    "graph": 0,
+    "reranked": 0,
+    "aceCards": 10
+  },
+  "lanes": [
+    {
+      "rank": 1,
+      "lane": "identity_provenance",
+      "role": "hard_admission_gate",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 2,
+      "lane": "lexical_ast",
+      "role": "exact_admission",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 3,
+      "lane": "dense_semantic",
+      "role": "semantic_candidate_generation",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 4,
+      "lane": "structural_graph",
+      "role": "bounded_expansion",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 5,
+      "lane": "domain_ontology",
+      "role": "categorical_alignment",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 6,
+      "lane": "som_centroid",
+      "role": "locality_admission",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 7,
+      "lane": "bounded_rerank",
+      "role": "final_candidate_ordering",
+      "available": false,
+      "count": 0
+    },
+    {
+      "rank": 8,
+      "lane": "ace_synthesis",
+      "role": "cited_context_assembly",
+      "available": true,
+      "count": 10
+    }
+  ],
+  "blockers": [
+    "IDENTITY_UNRESOLVED",
+    "LEXICAL_EMPTY",
+    "DENSE_EMPTY",
+    "GRAPH_EMPTY"
+  ],
+  "canonicalAuthority": "Postgres/source provenance; report is diagnostic only",
+  "likely_cause": "The workflow report contains the orchestration stages but one or more retrieval lanes lack live evidence or canonical identity.",
+  "evidence": [
+    "docs\\reports\\agentic-recommendation-workflow.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-retrieval-signal-ranking.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-retrieval-signal-ranking.mjs --input docs\\reports\\agentic-recommendation-workflow.json",
+  "smoke_command": "node --check scripts/atlas/audit-retrieval-signal-ranking.mjs",
+  "report_path": "docs\\reports\\atlas-retrieval-signal-ranking-live-v1.json"
+}

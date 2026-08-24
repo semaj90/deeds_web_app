@@ -1,63 +1,118 @@
 {
   "gate": "ATLAS_CROSS_STORE_IDENTITY_PROVEN",
-  "run_at": "2026-07-25T22:42:32.856Z",
+  "run_at": "2026-08-24T01:33:41.461Z",
   "counts": {
     "postgres": {
       "atlas_packets": 61659,
       "codebase_chunks": 52380,
       "total_eligible": 52380,
-      "total_atlas_packets": 61659,
-      "som_enriched": 61659
+      "total_atlas_packets": 61660,
+      "som_enriched": 61660
     },
     "qdrant": {
-      "total_points": 54224,
-      "directory_cluster_points": 728,
-      "code_points": 53496,
-      "with_packet_key": 53496,
-      "with_source_ref": 53842,
-      "content_hash_present": 0,
-      "sampled_hashes": [],
+      "total_points": 106338,
+      "directory_cluster_points": 0,
+      "code_points": 106338,
+      "with_packet_key": 54070,
+      "with_source_ref": 106338,
+      "with_canonical_id": 576,
+      "with_projection_revision": 576,
+      "with_content_projection_revision": 576,
+      "with_signature_projection_revision": 528,
+      "active_content_projection": 576,
+      "active_signature_projection": 528,
+      "content_hash_present": 100,
+      "sampled_hashes": [
+        {
+          "source_ref": "1",
+          "content_hash": "0852bd8c141bccf6"
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/AGENTS.md",
+          "content_hash": "19cf4dd92a0829d1"
+        },
+        {
+          "source_ref": "src/AGENTS.md",
+          "content_hash": "7765ecd953daf907"
+        },
+        {
+          "source_ref": "src/AGENTS.md",
+          "content_hash": "b33a95adc12f82d6"
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/hooks.server.ts",
+          "content_hash": "1ad8934d9cefa0be"
+        },
+        {
+          "source_ref": "src/hooks.server.ts",
+          "content_hash": "2a352e73a1aa39f6"
+        },
+        {
+          "source_ref": "src/hooks.server.ts",
+          "content_hash": "4f3dc89c12d99e11"
+        },
+        {
+          "source_ref": "src/hooks.server.ts",
+          "content_hash": "5438eb5d9a3024c6"
+        },
+        {
+          "source_ref": "src/hooks.server.ts",
+          "content_hash": "5e08c4ca6ae813a4"
+        },
+        {
+          "source_ref": "src/hooks.server.ts",
+          "content_hash": "776613949fb19716"
+        }
+      ],
       "error": null
     },
     "neo4j": {
-      "total_nodes": 349411,
-      "with_packet_key": 18951,
-      "with_source_ref": 144555,
+      "total_nodes": 621162,
+      "with_packet_key": 130058,
+      "with_source_ref": 309745,
       "error": null
     }
   },
   "checks": {
+    "content_hash_match": {
+      "checked": 10,
+      "matched": 2,
+      "rate": 0.2,
+      "pass": false
+    },
     "pg_qdrant_count_parity": {
       "pg": 52380,
-      "qdrant": 53496,
-      "qdrant_total": 54224,
-      "qdrant_dir_clusters": 728,
-      "diff_pct": "2.09",
-      "pass": true
+      "qdrant": 106338,
+      "qdrant_total": 106338,
+      "qdrant_dir_clusters": 0,
+      "diff_pct": "50.74",
+      "pass": false
     },
     "qdrant_packet_key_coverage": {
-      "total": 54224,
-      "with_key": 53496,
-      "rate": "98.66",
-      "pass": true
+      "total": 106338,
+      "with_key": 54070,
+      "rate": "50.85",
+      "pass": false
     },
     "qdrant_source_ref_coverage": {
-      "total": 54224,
-      "with_ref": 53842,
-      "rate": "99.30",
+      "total": 106338,
+      "with_ref": 106338,
+      "rate": "100.00",
       "pass": true
     },
     "neo4j_coverage": {
       "pg": 52380,
-      "neo4j": 18951,
-      "rate": "36.18",
-      "pass": false
+      "neo4j": 130058,
+      "rate": "248.30",
+      "pass": true
     }
   },
-  "gate_result": "PASS",
-  "failures": [],
+  "gate_result": "FAIL",
+  "failures": [
+    "PG (52380) vs Qdrant code points (106338) diverges by 50.74% — 53958 points in Qdrant without Postgres counterpart (packet_key backfill needed)",
+    "Qdrant packet_key missing on 52268 points"
+  ],
   "warnings": [
-    "Content-hash match not verified — Qdrant sample returned no hashes",
-    "Neo4j topology coverage 36.18% below 50% (topology mirror may need rebuild)"
+    "Content-hash match rate 20.0% below 99%"
   ]
 }

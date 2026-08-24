@@ -1,59 +1,2293 @@
 {
   "phase1_orphan_no_packet_key": {
-    "scanned": 757,
-    "deleted": 757,
+    "scanned": 0,
+    "recoverable_by_source_ref": 52268,
+    "deleted": 0,
     "errors": 0,
-    "ids": [
-      "02a1d423-face-43ba-b851-7c0fd94424a3",
-      "02a456f1-b2bb-4889-8568-0e04227d9a0b",
-      "02e919ae-9bdc-42d4-bc5f-dd6bc521c470",
-      "02e919e6-96ab-4660-9004-050b1f8d5c7c",
-      "02f10f38-4f90-4001-af58-041d7c89a4ec",
-      "031cf4bf-4e4a-4c51-8a5e-d67b8c0270a4",
-      "032d1a20-b1e9-4d70-8824-910726301b7c",
-      "032f0488-f502-451c-829e-9e48771a83f4",
-      "0489c739-45c7-4879-8854-a08f488a8a60",
-      "04948651-3380-4313-b843-60a3d4ad64ec",
-      "049ea5dc-e462-4572-af9a-b669fb32b4fb",
-      "04aa76c0-2804-4fb6-922f-a3806451bb0e",
-      "04ca3cbb-3e98-43ba-9a83-9ebaecc6b59d",
-      "04dca991-193e-4dbb-9add-385b3db376a3",
-      "04f13100-f681-48ea-a756-ec6e41f7e2de",
-      "05074737-9760-42f1-81b4-95200c16c04d",
-      "050a943e-ba09-4e14-b3c9-7a166d1d92fd",
-      "0511ecca-47fd-4bfe-b017-453b538b0a26",
-      "081c5d3b-58ca-402a-9f9f-7ae06f356be1",
-      "08270e95-7a76-4b9c-95fa-df0074669aa5"
-    ]
+    "ids": []
   },
   "phase2_stale_no_pg_match": {
-    "scanned": 53635,
-    "deleted": 139,
+    "scanned": 106338,
+    "recoverable_on_disk": 1,
+    "deleted": 223,
     "errors": 0,
+    "source_refs_on_disk": 1,
+    "source_refs_missing_on_disk": 223,
+    "by_extension": {
+      "md": 177,
+      "ts": 41,
+      "svelte": 4,
+      "rs": 1
+    },
+    "by_packet_prefix": {
+      "ace": 220,
+      "packet": 2,
+      "sha256": 1
+    },
+    "id_kinds": {
+      "numeric": 221,
+      "string": 2
+    },
+    "samples": [
+      {
+        "id": 2,
+        "source_ref": "sveltekit-frontend/src/AGENTS.md",
+        "packet_key": "ace:packet:3362030dfe23",
+        "canonical_id": null,
+        "content_hash": "19cf4dd92a0829d1",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 13,
+        "source_ref": "sveltekit-frontend/src/lib/AGENTS.md",
+        "packet_key": "ace:packet:83dc9fe1e87d",
+        "canonical_id": null,
+        "content_hash": "3a4cada5ef0bad03",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 17,
+        "source_ref": "sveltekit-frontend/src/lib/ai/AGENTS.md",
+        "packet_key": "ace:packet:c113744e3e98",
+        "canonical_id": null,
+        "content_hash": "0f397608dad9ed2d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 23,
+        "source_ref": "sveltekit-frontend/src/lib/ai/e2b/AGENTS.md",
+        "packet_key": "ace:packet:73c63464e142",
+        "canonical_id": null,
+        "content_hash": "170bac0a675bee8e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 28,
+        "source_ref": "sveltekit-frontend/src/lib/ai/onnx/AGENTS.md",
+        "packet_key": "ace:packet:b5295274e2b7",
+        "canonical_id": null,
+        "content_hash": "239328590f324cc2",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 32,
+        "source_ref": "sveltekit-frontend/src/lib/cache/AGENTS.md",
+        "packet_key": "ace:packet:756ddd25ac36",
+        "canonical_id": null,
+        "content_hash": "6c2a9b77e1a3ef0a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 38,
+        "source_ref": "sveltekit-frontend/src/lib/client/AGENTS.md",
+        "packet_key": "ace:packet:6061bede0c9f",
+        "canonical_id": null,
+        "content_hash": "390c20948fe05444",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 42,
+        "source_ref": "sveltekit-frontend/src/lib/client/ui/AGENTS.md",
+        "packet_key": "ace:packet:4758b464fae1",
+        "canonical_id": null,
+        "content_hash": "2fba48d6af7b963c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 57,
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/AGENTS.md",
+        "packet_key": "ace:packet:d330df2e0574",
+        "canonical_id": null,
+        "content_hash": "0350a0f3eb41d450",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 125,
+        "source_ref": "sveltekit-frontend/src/lib/components/agentic/AGENTS.md",
+        "packet_key": "ace:packet:b54a07a56c35",
+        "canonical_id": null,
+        "content_hash": "174eff872cef2589",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 131,
+        "source_ref": "sveltekit-frontend/src/lib/components/AGENTS.md",
+        "packet_key": "ace:packet:14711014c320",
+        "canonical_id": null,
+        "content_hash": "2d16fac0f2671850",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 138,
+        "source_ref": "sveltekit-frontend/src/lib/components/ai/AGENTS.md",
+        "packet_key": "ace:packet:87d1791c0efb",
+        "canonical_id": null,
+        "content_hash": "0a574466e3665e05",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 168,
+        "source_ref": "sveltekit-frontend/src/lib/components/analysis/AGENTS.md",
+        "packet_key": "ace:packet:0236cbc259b8",
+        "canonical_id": null,
+        "content_hash": "06159b4bf1e75a54",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 173,
+        "source_ref": "sveltekit-frontend/src/lib/components/analytics/AGENTS.md",
+        "packet_key": "ace:packet:b7dd5be81b07",
+        "canonical_id": null,
+        "content_hash": "4a8c706d7544f306",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 177,
+        "source_ref": "sveltekit-frontend/src/lib/components/cache/AGENTS.md",
+        "packet_key": "ace:packet:e61dc6df2c50",
+        "canonical_id": null,
+        "content_hash": "5156485988800749",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 182,
+        "source_ref": "sveltekit-frontend/src/lib/components/canvas/AGENTS.md",
+        "packet_key": "ace:packet:9d73425fe897",
+        "canonical_id": null,
+        "content_hash": "152adb0b58f58ad4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 188,
+        "source_ref": "sveltekit-frontend/src/lib/components/case/AGENTS.md",
+        "packet_key": "ace:packet:4114913939ea",
+        "canonical_id": null,
+        "content_hash": "1463ba821ae20d37",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 193,
+        "source_ref": "sveltekit-frontend/src/lib/components/cases/AGENTS.md",
+        "packet_key": "ace:packet:672a646a81e7",
+        "canonical_id": null,
+        "content_hash": "05e028896e76db9a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 199,
+        "source_ref": "sveltekit-frontend/src/lib/components/chat/AGENTS.md",
+        "packet_key": "ace:packet:44bfaeb6d87a",
+        "canonical_id": null,
+        "content_hash": "04c28ddc08eda0b6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 204,
+        "source_ref": "sveltekit-frontend/src/lib/components/citations/AGENTS.md",
+        "packet_key": "ace:packet:6783d2ba7b5f",
+        "canonical_id": null,
+        "content_hash": "0621fd67550169f8",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 209,
+        "source_ref": "sveltekit-frontend/src/lib/components/codebase/AGENTS.md",
+        "packet_key": "ace:packet:b51c65785363",
+        "canonical_id": null,
+        "content_hash": "2decd6e4ec13b2d5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 214,
+        "source_ref": "sveltekit-frontend/src/lib/components/courtroom/AGENTS.md",
+        "packet_key": "ace:packet:aa1c744546dd",
+        "canonical_id": null,
+        "content_hash": "18e4426dadd283bf",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 219,
+        "source_ref": "sveltekit-frontend/src/lib/components/dashboard/AGENTS.md",
+        "packet_key": "ace:packet:cd32c080b1b4",
+        "canonical_id": null,
+        "content_hash": "018ce01dec998d0b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 225,
+        "source_ref": "sveltekit-frontend/src/lib/components/detective/AGENTS.md",
+        "packet_key": "ace:packet:11a73bd8eefb",
+        "canonical_id": null,
+        "content_hash": "327e1d1bac5ce27f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 230,
+        "source_ref": "sveltekit-frontend/src/lib/components/editor/AGENTS.md",
+        "packet_key": "ace:packet:5f4b17f5dcc7",
+        "canonical_id": null,
+        "content_hash": "50a47c044fc901ef",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      }
+    ],
+    "unresolved_candidates": [
+      {
+        "id": 2,
+        "source_ref": "sveltekit-frontend/src/AGENTS.md",
+        "packet_key": "ace:packet:3362030dfe23",
+        "canonical_id": null,
+        "content_hash": "19cf4dd92a0829d1",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 13,
+        "source_ref": "sveltekit-frontend/src/lib/AGENTS.md",
+        "packet_key": "ace:packet:83dc9fe1e87d",
+        "canonical_id": null,
+        "content_hash": "3a4cada5ef0bad03",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 17,
+        "source_ref": "sveltekit-frontend/src/lib/ai/AGENTS.md",
+        "packet_key": "ace:packet:c113744e3e98",
+        "canonical_id": null,
+        "content_hash": "0f397608dad9ed2d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 23,
+        "source_ref": "sveltekit-frontend/src/lib/ai/e2b/AGENTS.md",
+        "packet_key": "ace:packet:73c63464e142",
+        "canonical_id": null,
+        "content_hash": "170bac0a675bee8e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 28,
+        "source_ref": "sveltekit-frontend/src/lib/ai/onnx/AGENTS.md",
+        "packet_key": "ace:packet:b5295274e2b7",
+        "canonical_id": null,
+        "content_hash": "239328590f324cc2",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 32,
+        "source_ref": "sveltekit-frontend/src/lib/cache/AGENTS.md",
+        "packet_key": "ace:packet:756ddd25ac36",
+        "canonical_id": null,
+        "content_hash": "6c2a9b77e1a3ef0a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 38,
+        "source_ref": "sveltekit-frontend/src/lib/client/AGENTS.md",
+        "packet_key": "ace:packet:6061bede0c9f",
+        "canonical_id": null,
+        "content_hash": "390c20948fe05444",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 42,
+        "source_ref": "sveltekit-frontend/src/lib/client/ui/AGENTS.md",
+        "packet_key": "ace:packet:4758b464fae1",
+        "canonical_id": null,
+        "content_hash": "2fba48d6af7b963c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 57,
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/AGENTS.md",
+        "packet_key": "ace:packet:d330df2e0574",
+        "canonical_id": null,
+        "content_hash": "0350a0f3eb41d450",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 125,
+        "source_ref": "sveltekit-frontend/src/lib/components/agentic/AGENTS.md",
+        "packet_key": "ace:packet:b54a07a56c35",
+        "canonical_id": null,
+        "content_hash": "174eff872cef2589",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 131,
+        "source_ref": "sveltekit-frontend/src/lib/components/AGENTS.md",
+        "packet_key": "ace:packet:14711014c320",
+        "canonical_id": null,
+        "content_hash": "2d16fac0f2671850",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 138,
+        "source_ref": "sveltekit-frontend/src/lib/components/ai/AGENTS.md",
+        "packet_key": "ace:packet:87d1791c0efb",
+        "canonical_id": null,
+        "content_hash": "0a574466e3665e05",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 168,
+        "source_ref": "sveltekit-frontend/src/lib/components/analysis/AGENTS.md",
+        "packet_key": "ace:packet:0236cbc259b8",
+        "canonical_id": null,
+        "content_hash": "06159b4bf1e75a54",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 173,
+        "source_ref": "sveltekit-frontend/src/lib/components/analytics/AGENTS.md",
+        "packet_key": "ace:packet:b7dd5be81b07",
+        "canonical_id": null,
+        "content_hash": "4a8c706d7544f306",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 177,
+        "source_ref": "sveltekit-frontend/src/lib/components/cache/AGENTS.md",
+        "packet_key": "ace:packet:e61dc6df2c50",
+        "canonical_id": null,
+        "content_hash": "5156485988800749",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 182,
+        "source_ref": "sveltekit-frontend/src/lib/components/canvas/AGENTS.md",
+        "packet_key": "ace:packet:9d73425fe897",
+        "canonical_id": null,
+        "content_hash": "152adb0b58f58ad4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 188,
+        "source_ref": "sveltekit-frontend/src/lib/components/case/AGENTS.md",
+        "packet_key": "ace:packet:4114913939ea",
+        "canonical_id": null,
+        "content_hash": "1463ba821ae20d37",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 193,
+        "source_ref": "sveltekit-frontend/src/lib/components/cases/AGENTS.md",
+        "packet_key": "ace:packet:672a646a81e7",
+        "canonical_id": null,
+        "content_hash": "05e028896e76db9a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 199,
+        "source_ref": "sveltekit-frontend/src/lib/components/chat/AGENTS.md",
+        "packet_key": "ace:packet:44bfaeb6d87a",
+        "canonical_id": null,
+        "content_hash": "04c28ddc08eda0b6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 204,
+        "source_ref": "sveltekit-frontend/src/lib/components/citations/AGENTS.md",
+        "packet_key": "ace:packet:6783d2ba7b5f",
+        "canonical_id": null,
+        "content_hash": "0621fd67550169f8",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 209,
+        "source_ref": "sveltekit-frontend/src/lib/components/codebase/AGENTS.md",
+        "packet_key": "ace:packet:b51c65785363",
+        "canonical_id": null,
+        "content_hash": "2decd6e4ec13b2d5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 214,
+        "source_ref": "sveltekit-frontend/src/lib/components/courtroom/AGENTS.md",
+        "packet_key": "ace:packet:aa1c744546dd",
+        "canonical_id": null,
+        "content_hash": "18e4426dadd283bf",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 219,
+        "source_ref": "sveltekit-frontend/src/lib/components/dashboard/AGENTS.md",
+        "packet_key": "ace:packet:cd32c080b1b4",
+        "canonical_id": null,
+        "content_hash": "018ce01dec998d0b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 225,
+        "source_ref": "sveltekit-frontend/src/lib/components/detective/AGENTS.md",
+        "packet_key": "ace:packet:11a73bd8eefb",
+        "canonical_id": null,
+        "content_hash": "327e1d1bac5ce27f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 230,
+        "source_ref": "sveltekit-frontend/src/lib/components/editor/AGENTS.md",
+        "packet_key": "ace:packet:5f4b17f5dcc7",
+        "canonical_id": null,
+        "content_hash": "50a47c044fc901ef",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 235,
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/AGENTS.md",
+        "packet_key": "ace:packet:543825d76077",
+        "canonical_id": null,
+        "content_hash": "6439f698fb4ee4fe",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 272,
+        "source_ref": "sveltekit-frontend/src/lib/components/forms/AGENTS.md",
+        "packet_key": "ace:packet:c51152dc0b27",
+        "canonical_id": null,
+        "content_hash": "1bb5a2f4e48850dd",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 278,
+        "source_ref": "sveltekit-frontend/src/lib/components/graph/AGENTS.md",
+        "packet_key": "ace:packet:cecf8e705e14",
+        "canonical_id": null,
+        "content_hash": "4399d8936208d1dd",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 281,
+        "source_ref": "sveltekit-frontend/src/lib/components/legal/AGENTS.md",
+        "packet_key": "ace:packet:626596208bea",
+        "canonical_id": null,
+        "content_hash": "04be253b1af75309",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 287,
+        "source_ref": "sveltekit-frontend/src/lib/components/legal-ai/AGENTS.md",
+        "packet_key": "ace:packet:9d4000521d12",
+        "canonical_id": null,
+        "content_hash": "3bb7cd5beb155dbe",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 293,
+        "source_ref": "sveltekit-frontend/src/lib/components/legal-corpus/AGENTS.md",
+        "packet_key": "ace:packet:9e103dd6f5d8",
+        "canonical_id": null,
+        "content_hash": "0a0d8b8e2bfc97b5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 300,
+        "source_ref": "sveltekit-frontend/src/lib/components/modals/AGENTS.md",
+        "packet_key": "ace:packet:90f6c8ec16f9",
+        "canonical_id": null,
+        "content_hash": "07dec9b30ce78f35",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 305,
+        "source_ref": "sveltekit-frontend/src/lib/components/monitoring/AGENTS.md",
+        "packet_key": "ace:packet:c27922a1734b",
+        "canonical_id": null,
+        "content_hash": "5d51375fc06e935e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 310,
+        "source_ref": "sveltekit-frontend/src/lib/components/phase78/AGENTS.md",
+        "packet_key": "ace:packet:e7fb27a488e1",
+        "canonical_id": null,
+        "content_hash": "22fff746b32046c3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 315,
+        "source_ref": "sveltekit-frontend/src/lib/components/poi/AGENTS.md",
+        "packet_key": "ace:packet:83f4794674a1",
+        "canonical_id": null,
+        "content_hash": "07c2962ed8c35d9d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 320,
+        "source_ref": "sveltekit-frontend/src/lib/components/rag/AGENTS.md",
+        "packet_key": "ace:packet:89be88e8ca78",
+        "canonical_id": null,
+        "content_hash": "56e30893f5983d8d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 325,
+        "source_ref": "sveltekit-frontend/src/lib/components/recommendations/AGENTS.md",
+        "packet_key": "ace:packet:74f61a0c3f49",
+        "canonical_id": null,
+        "content_hash": "018d049413f800c0",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 330,
+        "source_ref": "sveltekit-frontend/src/lib/components/shells/AGENTS.md",
+        "packet_key": "ace:packet:f6e9736b0fcd",
+        "canonical_id": null,
+        "content_hash": "15a2d0283068d81a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 335,
+        "source_ref": "sveltekit-frontend/src/lib/components/source-validation/AGENTS.md",
+        "packet_key": "ace:packet:37226bec09c8",
+        "canonical_id": null,
+        "content_hash": "2fe007e50f6fd6c7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 339,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/AGENTS.md",
+        "packet_key": "ace:packet:e85dc5fb4c0a",
+        "canonical_id": null,
+        "content_hash": "1512b1cce938c51d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 343,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/alert-dialog/AGENTS.md",
+        "packet_key": "ace:packet:d0a9567992b6",
+        "canonical_id": null,
+        "content_hash": "06563561bae3e223",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 349,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/avatar/AGENTS.md",
+        "packet_key": "ace:packet:618d2ee7eaf1",
+        "canonical_id": null,
+        "content_hash": "595384c245112ac3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 353,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/badge/AGENTS.md",
+        "packet_key": "ace:packet:2c0c5b81057e",
+        "canonical_id": null,
+        "content_hash": "a4843b84acbf7aba",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 357,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/bits/AGENTS.md",
+        "packet_key": "ace:packet:0a5e4c2c569e",
+        "canonical_id": null,
+        "content_hash": "006f6373403fed2a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 361,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/button/AGENTS.md",
+        "packet_key": "ace:packet:ff7458261e14",
+        "canonical_id": null,
+        "content_hash": "1981a24306ab630a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 365,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/card/AGENTS.md",
+        "packet_key": "ace:packet:e7f076e6f1fa",
+        "canonical_id": null,
+        "content_hash": "bca51e7d43dc7f66",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 368,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/core/AGENTS.md",
+        "packet_key": "ace:packet:3c626865d653",
+        "canonical_id": null,
+        "content_hash": "3052b02c297de476",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 371,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/dialog/AGENTS.md",
+        "packet_key": "ace:packet:42c6c2f69b17",
+        "canonical_id": null,
+        "content_hash": "4b9f75502724914c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 373,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/8bit/AGENTS.md",
+        "packet_key": "ace:packet:aa2e1fce8818",
+        "canonical_id": null,
+        "content_hash": "5b2b0e4dd23b3e4b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 377,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/constants/AGENTS.md",
+        "packet_key": "ace:packet:ec5722c4244c",
+        "canonical_id": null,
+        "content_hash": "0a5195c84c2ab634",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 380,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/core/AGENTS.md",
+        "packet_key": "ace:packet:15b43676db9b",
+        "canonical_id": null,
+        "content_hash": "51359366765ea83e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 383,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/effects/AGENTS.md",
+        "packet_key": "ace:packet:fe56b5180e9d",
+        "canonical_id": null,
+        "content_hash": "5eb8e9fae5190bc9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 387,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/n64/AGENTS.md",
+        "packet_key": "ace:packet:1c24ea9aeb94",
+        "canonical_id": null,
+        "content_hash": "629df2dd1d8fb9ff",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 392,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/types/AGENTS.md",
+        "packet_key": "ace:packet:194baa6959eb",
+        "canonical_id": null,
+        "content_hash": "36290b2cc1853575",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 395,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/input/AGENTS.md",
+        "packet_key": "ace:packet:5a7d7c392c75",
+        "canonical_id": null,
+        "content_hash": "9aa7fb04d2e40ec9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 400,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/label/AGENTS.md",
+        "packet_key": "ace:packet:b7785ed26ca5",
+        "canonical_id": null,
+        "content_hash": "27ea1acf52809142",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 404,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/modal/AGENTS.md",
+        "packet_key": "ace:packet:b14712d0ddbd",
+        "canonical_id": null,
+        "content_hash": "2966e479ef854898",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 408,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/modular/AGENTS.md",
+        "packet_key": "ace:packet:8969b9797d50",
+        "canonical_id": null,
+        "content_hash": "167cf88ebaf4fcca",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 413,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/progress/AGENTS.md",
+        "packet_key": "ace:packet:230448560b18",
+        "canonical_id": null,
+        "content_hash": "2eb8e78c67d523f4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 417,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/scrollarea/AGENTS.md",
+        "packet_key": "ace:packet:03fc7c0c3f15",
+        "canonical_id": null,
+        "content_hash": "4b33133c6eca5134",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 420,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/select/AGENTS.md",
+        "packet_key": "ace:packet:b9051452c4ea",
+        "canonical_id": null,
+        "content_hash": "2bb88c40ccc47bfa",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 425,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/table/AGENTS.md",
+        "packet_key": "ace:packet:471f36a617f7",
+        "canonical_id": null,
+        "content_hash": "1ee1a546604ad509",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 428,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/tabs/AGENTS.md",
+        "packet_key": "ace:packet:f12ff84dd426",
+        "canonical_id": null,
+        "content_hash": "00523432b9e6bfdf",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 433,
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/textarea/AGENTS.md",
+        "packet_key": "ace:packet:206d18803be7",
+        "canonical_id": null,
+        "content_hash": "1c19b76b3a00e03c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 446,
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/AGENTS.md",
+        "packet_key": "ace:packet:f5344e34d0a8",
+        "canonical_id": null,
+        "content_hash": "1ada0960b0d0190e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 452,
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/cases/AGENTS.md",
+        "packet_key": "ace:packet:a69f741ebe6b",
+        "canonical_id": null,
+        "content_hash": "1d4b37aa56f7f5eb",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 456,
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/dashboard/AGENTS.md",
+        "packet_key": "ace:packet:b70685ed3890",
+        "canonical_id": null,
+        "content_hash": "2e9913b2e42c8b30",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 461,
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/evidence/AGENTS.md",
+        "packet_key": "ace:packet:40134a164eb2",
+        "canonical_id": null,
+        "content_hash": "3005e4dc2c763e19",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 466,
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/_simulations/AGENTS.md",
+        "packet_key": "ace:packet:7c0e87666cbd",
+        "canonical_id": null,
+        "content_hash": "42817a080008c1a6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 470,
+        "source_ref": "sveltekit-frontend/src/lib/config/AGENTS.md",
+        "packet_key": "ace:packet:38e7a62f8340",
+        "canonical_id": null,
+        "content_hash": "14cc75434c68b8b4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 498,
+        "source_ref": "sveltekit-frontend/src/lib/courtroom/AGENTS.md",
+        "packet_key": "ace:packet:40e13b32cb62",
+        "canonical_id": null,
+        "content_hash": "2009bc247a5c7fc7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 502,
+        "source_ref": "sveltekit-frontend/src/lib/data/AGENTS.md",
+        "packet_key": "ace:packet:9f68a6c32e11",
+        "canonical_id": null,
+        "content_hash": "098783d15aa87823",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 507,
+        "source_ref": "sveltekit-frontend/src/lib/db/AGENTS.md",
+        "packet_key": "ace:packet:6cf1c0468dae",
+        "canonical_id": null,
+        "content_hash": "6689fcf50f25bd9d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 511,
+        "source_ref": "sveltekit-frontend/src/lib/db/queries/AGENTS.md",
+        "packet_key": "ace:packet:85b019cda3bc",
+        "canonical_id": null,
+        "content_hash": "5438e50f7a09af13",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 515,
+        "source_ref": "sveltekit-frontend/src/lib/db/schema/AGENTS.md",
+        "packet_key": "ace:packet:bc9738be66d3",
+        "canonical_id": null,
+        "content_hash": "5ae6ac63217eeaf3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 520,
+        "source_ref": "sveltekit-frontend/src/lib/env/AGENTS.md",
+        "packet_key": "ace:packet:4f1036ce17f4",
+        "canonical_id": null,
+        "content_hash": "1efc8efdd5b3b590",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 524,
+        "source_ref": "sveltekit-frontend/src/lib/features/evidence-command-center/AGENTS.md",
+        "packet_key": "ace:packet:8bdb26eb3e91",
+        "canonical_id": null,
+        "content_hash": "84ec3d9466fa9536",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 530,
+        "source_ref": "sveltekit-frontend/src/lib/gpu/AGENTS.md",
+        "packet_key": "ace:packet:ddf2657b0e63",
+        "canonical_id": null,
+        "content_hash": "1218b1c73d01e5b9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 536,
+        "source_ref": "sveltekit-frontend/src/lib/icons/yorha/AGENTS.md",
+        "packet_key": "ace:packet:bc7aea125d1e",
+        "canonical_id": null,
+        "content_hash": "77e03559ce4a76fd",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 541,
+        "source_ref": "sveltekit-frontend/src/lib/machines/AGENTS.md",
+        "packet_key": "ace:packet:16d554001628",
+        "canonical_id": null,
+        "content_hash": "02f29118fc0f60f6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 547,
+        "source_ref": "sveltekit-frontend/src/lib/schemas/AGENTS.md",
+        "packet_key": "ace:packet:1f42f5e454b9",
+        "canonical_id": null,
+        "content_hash": "1702cc475f0e66e8",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 552,
+        "source_ref": "sveltekit-frontend/src/lib/schemas/tools/AGENTS.md",
+        "packet_key": "ace:packet:a656179a235f",
+        "canonical_id": null,
+        "content_hash": "34c6846b83389b70",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 557,
+        "source_ref": "sveltekit-frontend/src/lib/server/ace/AGENTS.md",
+        "packet_key": "ace:packet:91377c23a23b",
+        "canonical_id": null,
+        "content_hash": "04043c718cdbc895",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 611,
+        "source_ref": "sveltekit-frontend/src/lib/server/admin/AGENTS.md",
+        "packet_key": "ace:packet:3bac6c2b830e",
+        "canonical_id": null,
+        "content_hash": "40f4d6f532778186",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 671,
+        "source_ref": "sveltekit-frontend/src/lib/server/agent/AGENTS.md",
+        "packet_key": "ace:packet:a3d72c4b9c09",
+        "canonical_id": null,
+        "content_hash": "624c334897fbae21",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 674,
+        "source_ref": "sveltekit-frontend/src/lib/server/agents/AGENTS.md",
+        "packet_key": "ace:packet:f7aadfca1f7b",
+        "canonical_id": null,
+        "content_hash": "0e596fb5b47071e9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 678,
+        "source_ref": "sveltekit-frontend/src/lib/server/AGENTS.md",
+        "packet_key": "ace:packet:9084cc3035b3",
+        "canonical_id": null,
+        "content_hash": "11d27a2aeba9b3c2",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 683,
+        "source_ref": "sveltekit-frontend/src/lib/server/agents-md/AGENTS.md",
+        "packet_key": "ace:packet:d0bc366a631c",
+        "canonical_id": null,
+        "content_hash": "73937a1ff843b1f3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 687,
+        "source_ref": "sveltekit-frontend/src/lib/server/agent/tools/AGENTS.md",
+        "packet_key": "ace:packet:4c090a0617b2",
+        "canonical_id": null,
+        "content_hash": "7371fe9eea3b807e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 688,
+        "source_ref": "sveltekit-frontend/src/lib/server/agent/tools/web-search-searxng.ts",
+        "packet_key": "ace:packet:43faa3eda1a8",
+        "canonical_id": null,
+        "content_hash": "25b4cf3cfa0c9c4f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 702,
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/AGENTS.md",
+        "packet_key": "ace:packet:ba4448f2a480",
+        "canonical_id": null,
+        "content_hash": "27ba472cda420cc4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1066,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/KAGTraverser.ts",
+        "packet_key": "ace:packet:27c68677a331",
+        "canonical_id": null,
+        "content_hash": "20b8dbbb9181466f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1081,
+        "source_ref": "sveltekit-frontend/src/routes/(analysis)/video-analysis/[evidenceId]/AGENTS.md",
+        "packet_key": "ace:packet:66e8b93a4c2d",
+        "canonical_id": null,
+        "content_hash": "636861cab722a9ff",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1089,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/TagExtractor.ts",
+        "packet_key": "ace:packet:a89e323e2353",
+        "canonical_id": null,
+        "content_hash": "52ec56445a763b66",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1136,
+        "source_ref": "sveltekit-frontend/src/lib/server/evidence/services/drizzle-stub.ts",
+        "packet_key": "ace:packet:421e165a64eb",
+        "canonical_id": null,
+        "content_hash": "c45732d514e31f0a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1157,
+        "source_ref": "sveltekit-frontend/src/lib/server/ff1/cli/AGENTS.md",
+        "packet_key": "ace:packet:29a9e4f83ca3",
+        "canonical_id": null,
+        "content_hash": "37a264e9e01f3122",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1170,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/fictional-cases/[id]/AGENTS.md",
+        "packet_key": "ace:packet:7753b3d20d51",
+        "canonical_id": null,
+        "content_hash": "2f8450342853ce9b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1220,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/OllamaService.ts",
+        "packet_key": "ace:packet:6c3aa0d2cba0",
+        "canonical_id": null,
+        "content_hash": "3e1ef12e7e5d1889",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1253,
+        "source_ref": "sveltekit-frontend/src/langgraph/index.ts",
+        "packet_key": "packet:dc3652982540",
+        "canonical_id": null,
+        "content_hash": "202e520526e2c05183b302c20413d716b172da0569fa8794744afabde5da7c64",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1267,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/FixSynthesizer.ts",
+        "packet_key": "ace:packet:63f7009f83a5",
+        "canonical_id": null,
+        "content_hash": "9feca655c7d07559",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1314,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/notes/AGENTS.md",
+        "packet_key": "ace:packet:d96eb053d5ee",
+        "canonical_id": null,
+        "content_hash": "e600729b85a868e6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1340,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/AGENTS.md",
+        "packet_key": "ace:packet:4860129952fa",
+        "canonical_id": null,
+        "content_hash": "ffe464187f2359c6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1345,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/KnowledgeSearcher.ts",
+        "packet_key": "ace:packet:9317bda68ad7",
+        "canonical_id": null,
+        "content_hash": "da8d0350102bfc0b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1376,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/KnowledgeIndexer.ts",
+        "packet_key": "ace:packet:f04385004d08",
+        "canonical_id": null,
+        "content_hash": "f96ba31e7a82c4d2",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1420,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/citations/AGENTS.md",
+        "packet_key": "ace:packet:a81076144ea2",
+        "canonical_id": null,
+        "content_hash": "52a9eb00bc43151c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1473,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/AGENTS.md",
+        "packet_key": "ace:packet:623988b66100",
+        "canonical_id": null,
+        "content_hash": "0e7ca390b58ce41a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1494,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/nes-routes/AGENTS.md",
+        "packet_key": "ace:packet:1e8208ec1b3c",
+        "canonical_id": null,
+        "content_hash": "e189859a0287ebe4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1512,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/RedisCacheService.ts",
+        "packet_key": "ace:packet:b1ce57706261",
+        "canonical_id": null,
+        "content_hash": "f07bf2ced89f066e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1556,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/AGENTS.md",
+        "packet_key": "ace:packet:b1cf77fc1ec7",
+        "canonical_id": null,
+        "content_hash": "8950a741e0f9518a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1557,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/PostgresKnowledgeStore.ts",
+        "packet_key": "ace:packet:5997e267917c",
+        "canonical_id": null,
+        "content_hash": "1919e5f34d684ae3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1576,
+        "source_ref": "sveltekit-frontend/src/routes/(dev)/odin/AGENTS.md",
+        "packet_key": "ace:packet:39f69ae694e7",
+        "canonical_id": null,
+        "content_hash": "c6e23a853e1a311c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1622,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/chat/[id]/AGENTS.md",
+        "packet_key": "ace:packet:4278486f520d",
+        "canonical_id": null,
+        "content_hash": "3e33bd49fdf43f8a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1630,
+        "source_ref": "sveltekit-frontend/src/lib/server/ocr/AGENTS.md",
+        "packet_key": "ace:packet:fa6df6a42f42",
+        "canonical_id": null,
+        "content_hash": "1e669f634d963724",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1686,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/fictional-cases/AGENTS.md",
+        "packet_key": "ace:packet:df93d72f160a",
+        "canonical_id": null,
+        "content_hash": "98c2116b5405b327",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1689,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts",
+        "packet_key": "ace:packet:b75885d29a93",
+        "canonical_id": null,
+        "content_hash": "0e5d4cb47e637d88",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1708,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/observability/+page.svelte",
+        "packet_key": "ace:packet:3e271f88828c",
+        "canonical_id": null,
+        "content_hash": "2892bab104fa6614",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1733,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/MinioKnowledgeStore.ts",
+        "packet_key": "ace:packet:a55e66b52915",
+        "canonical_id": null,
+        "content_hash": "a6a53190315fca5b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1737,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/svelte5-components/AGENTS.md",
+        "packet_key": "ace:packet:7402ff93eb61",
+        "canonical_id": null,
+        "content_hash": "3f31c429907e65bc",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1756,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/dev-tools/component-showcase/AGENTS.md",
+        "packet_key": "ace:packet:980976ffc22a",
+        "canonical_id": null,
+        "content_hash": "f99facd77eda463c",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1759,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/command-center/AGENTS.md",
+        "packet_key": "ace:packet:a82f89541ca6",
+        "canonical_id": null,
+        "content_hash": "e8a0e3146c36fca7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1772,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/dev-tools/AGENTS.md",
+        "packet_key": "ace:packet:56936b1df50b",
+        "canonical_id": null,
+        "content_hash": "ffe8e712102f21c7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1804,
+        "source_ref": "sveltekit-frontend/src/routes/AGENTS.md",
+        "packet_key": "ace:packet:e4fdbae9c11e",
+        "canonical_id": null,
+        "content_hash": "31a7c5d6ac8bbba8",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1881,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/persons-of-interest/create/AGENTS.md",
+        "packet_key": "ace:packet:b7416db88dc4",
+        "canonical_id": null,
+        "content_hash": "c03b826c56320f11",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1885,
+        "source_ref": "sveltekit-frontend/src/lib/server/streaming/AGENTS.md",
+        "packet_key": "ace:packet:d735364f759a",
+        "canonical_id": null,
+        "content_hash": "ebf0859ad9732378",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1887,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/seed.ts",
+        "packet_key": "ace:packet:e585a206383c",
+        "canonical_id": null,
+        "content_hash": "de70b3cbbdd4b122",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1888,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/PatternStorage.ts",
+        "packet_key": "ace:packet:52cd68dcc1c7",
+        "canonical_id": null,
+        "content_hash": "3745902fb261d0b2",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1939,
+        "source_ref": "sveltekit-frontend/src/lib/server/legal/AGENTS.md",
+        "packet_key": "ace:packet:53459d6dbc14",
+        "canonical_id": null,
+        "content_hash": "da97a696b0cdad19",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1949,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/vector-schema.ts",
+        "packet_key": "ace:packet:02c6c0bd37e6",
+        "canonical_id": null,
+        "content_hash": "b122389260d95a74",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1986,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/library/AGENTS.md",
+        "packet_key": "ace:packet:71a94372dbe5",
+        "canonical_id": null,
+        "content_hash": "c0fb6fdbd385011e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 1994,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/library/[documentId]/AGENTS.md",
+        "packet_key": "ace:packet:9d4410026e21",
+        "canonical_id": null,
+        "content_hash": "a57bae3919bd1784",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2006,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/rag-search/AGENTS.md",
+        "packet_key": "ace:packet:4fe9221a93d3",
+        "canonical_id": null,
+        "content_hash": "245a8108e98b19e4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2015,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/ExperienceRecorder.ts",
+        "packet_key": "ace:packet:46e5c960a95a",
+        "canonical_id": null,
+        "content_hash": "7ae1893c91090478",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2019,
+        "source_ref": "sveltekit-frontend/src/lib/server/evidence/AGENTS.md",
+        "packet_key": "ace:packet:6651dd6ab4c1",
+        "canonical_id": null,
+        "content_hash": "020326c9c8b5e45f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2029,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/EscalationService.ts",
+        "packet_key": "ace:packet:484f4f4761db",
+        "canonical_id": null,
+        "content_hash": "63f0e638e221cd33",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2049,
+        "source_ref": "sveltekit-frontend/src/lib/services/couchdb-client.ts",
+        "packet_key": "ace:packet:6f862a96d6b5",
+        "canonical_id": null,
+        "content_hash": "6cad85fbb45752c3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2053,
+        "source_ref": "sveltekit-frontend/src/lib/server/grpc/AGENTS.md",
+        "packet_key": "ace:packet:5e5126b20dc3",
+        "canonical_id": null,
+        "content_hash": "396110e94bcaab1b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2069,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/AGENTS.md",
+        "packet_key": "ace:packet:ceba4b9a4884",
+        "canonical_id": null,
+        "content_hash": "763a42fb4c10ecac",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2128,
+        "source_ref": "sveltekit-frontend/src/lib/server/minio/AGENTS.md",
+        "packet_key": "ace:packet:e69526ddf39e",
+        "canonical_id": null,
+        "content_hash": "10bf0bd95ecaee1f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2147,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/library/[documentId]/node/[nodeId]/AGENTS.md",
+        "packet_key": "ace:packet:cd872ccd88fa",
+        "canonical_id": null,
+        "content_hash": "fd9749b45c0f4c1a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2233,
+        "source_ref": "sveltekit-frontend/src/lib/services/AGENTS.md",
+        "packet_key": "ace:packet:cd6922aaf309",
+        "canonical_id": null,
+        "content_hash": "e609318ac2e14036",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2263,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/DecisionEngine.ts",
+        "packet_key": "ace:packet:1af9c1b474d4",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2284,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/LearningPipeline.ts",
+        "packet_key": "ace:packet:11bd8c8b9114",
+        "canonical_id": null,
+        "content_hash": "3cf693f8b121261a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2338,
+        "source_ref": "sveltekit-frontend/src/routes/code-intel/topology/+page.svelte",
+        "packet_key": "ace:packet:ead70469a1e8",
+        "canonical_id": null,
+        "content_hash": "5f6e43cff1cac008",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2364,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/citations/law/[citation]/AGENTS.md",
+        "packet_key": "ace:packet:3c12fd909b23",
+        "canonical_id": null,
+        "content_hash": "887fc08286a936a4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2375,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/ACPToolRegistry.ts",
+        "packet_key": "ace:packet:3c57f67d08ad",
+        "canonical_id": null,
+        "content_hash": "457c05d11f6af98f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2377,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/additional-tables.ts",
+        "packet_key": "ace:packet:1061048ef3c6",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2407,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence/upload/AGENTS.md",
+        "packet_key": "ace:packet:aa5438dc493a",
+        "canonical_id": null,
+        "content_hash": "1cc053da43578fe5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2415,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/canvas/AGENTS.md",
+        "packet_key": "ace:packet:2fba9ce45a5a",
+        "canonical_id": null,
+        "content_hash": "fa8588fb036897ea",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2438,
+        "source_ref": "sveltekit-frontend/src/lib/services/knowledge-search/types.ts",
+        "packet_key": "ace:packet:f6c6232a262a",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2443,
+        "source_ref": "sveltekit-frontend/src/lib.rs",
+        "packet_key": "packet:4667d26f62f6",
+        "canonical_id": null,
+        "content_hash": "6b76622db0e5bdff7990657ea4ce6d3482d2b3e9c2796cce70b178f0930605e6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2490,
+        "source_ref": "sveltekit-frontend/src/lib/server/error-brain/transport/AGENTS.md",
+        "packet_key": "ace:packet:b8630b9f2c92",
+        "canonical_id": null,
+        "content_hash": "74addf5220966ac3",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2494,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/phase89/AGENTS.md",
+        "packet_key": "ace:packet:2509e5411ad0",
+        "canonical_id": null,
+        "content_hash": "656da8cc54573aea",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2546,
+        "source_ref": "sveltekit-frontend/src/lib/server/gpu/AGENTS.md",
+        "packet_key": "ace:packet:0c295fd20238",
+        "canonical_id": null,
+        "content_hash": "65fc58d1f9364254",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2565,
+        "source_ref": "sveltekit-frontend/src/lib/server/utils/AGENTS.md",
+        "packet_key": "ace:packet:6d9fe7bf11db",
+        "canonical_id": null,
+        "content_hash": "f9d1716249281b09",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2613,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/citations/law/AGENTS.md",
+        "packet_key": "ace:packet:397a1954ad84",
+        "canonical_id": null,
+        "content_hash": "3f17eb7be112bbe5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2627,
+        "source_ref": "sveltekit-frontend/src/routes/code-intel/retrieval/+page.svelte",
+        "packet_key": "ace:packet:170e333a7192",
+        "canonical_id": null,
+        "content_hash": "84de5708fab9e186",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2643,
+        "source_ref": "sveltekit-frontend/src/lib/server/middleware/AGENTS.md",
+        "packet_key": "ace:packet:2e7571b5a1cd",
+        "canonical_id": null,
+        "content_hash": "794027fbb802613b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2651,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/active-cases/AGENTS.md",
+        "packet_key": "ace:packet:63ef05cf4db1",
+        "canonical_id": null,
+        "content_hash": "2b54ad7aae7c6b5d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2692,
+        "source_ref": "sveltekit-frontend/src/lib/server/pdf/AGENTS.md",
+        "packet_key": "ace:packet:427d097d4a31",
+        "canonical_id": null,
+        "content_hash": "3165de5d920848b0",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2693,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/evidence/AGENTS.md",
+        "packet_key": "ace:packet:5f99efd0f37a",
+        "canonical_id": null,
+        "content_hash": "2eb6cf654d0fc0be",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2787,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/types.ts",
+        "packet_key": "ace:packet:fb396d644b14",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2856,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/gpu-evidence-graph/AGENTS.md",
+        "packet_key": "ace:packet:5bb88e45bd04",
+        "canonical_id": null,
+        "content_hash": "26c726a5bfafb791",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2857,
+        "source_ref": "sveltekit-frontend/src/lib/server/ff1/AGENTS.md",
+        "packet_key": "ace:packet:285e9cda0a78",
+        "canonical_id": null,
+        "content_hash": "0cec46e47f01fce4",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2873,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence/AGENTS.md",
+        "packet_key": "ace:packet:d90a5cdb673c",
+        "canonical_id": null,
+        "content_hash": "1ca33f4fe5b0be5a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2954,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/reports/[id]/AGENTS.md",
+        "packet_key": "ace:packet:8be8e376cd7f",
+        "canonical_id": null,
+        "content_hash": "84aecedca7bdc969",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 2977,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/AGENTS.md",
+        "packet_key": "ace:packet:7c6ab2ea60d9",
+        "canonical_id": null,
+        "content_hash": "6bdc766cb947ab8d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3021,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/qlora-training/AGENTS.md",
+        "packet_key": "ace:packet:b5c704530c94",
+        "canonical_id": null,
+        "content_hash": "0fc5fe896aa94f43",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3037,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/lucia-schema.ts",
+        "packet_key": "ace:packet:fd5780238ba0",
+        "canonical_id": null,
+        "content_hash": "e8334a788f46e637",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3043,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/new/AGENTS.md",
+        "packet_key": "ace:packet:6ab58af86e29",
+        "canonical_id": null,
+        "content_hash": "16ba89ebcb732b0e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3055,
+        "source_ref": "sveltekit-frontend/src/lib/adapters/legal-corpus.ts",
+        "packet_key": "ace:packet:ef2068417de9",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3062,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/codebase-viewer/AGENTS.md",
+        "packet_key": "ace:packet:64097f27bbc8",
+        "canonical_id": null,
+        "content_hash": "8b9b440bce7473c7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3069,
+        "source_ref": "sveltekit-frontend/src/lib/shims/AGENTS.md",
+        "packet_key": "ace:packet:1b41a08a0d37",
+        "canonical_id": null,
+        "content_hash": "61f2795d10dfc31e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3084,
+        "source_ref": "sveltekit-frontend/src/routes/login/AGENTS.md",
+        "packet_key": "ace:packet:17c3dc5e1091",
+        "canonical_id": null,
+        "content_hash": "a9c517de88227f1e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3093,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/kag-notebook/AGENTS.md",
+        "packet_key": "ace:packet:9ace1d3407c7",
+        "canonical_id": null,
+        "content_hash": "48a1d55ad48079c5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3117,
+        "source_ref": "sveltekit-frontend/src/routes/code-intel/research/+page.svelte",
+        "packet_key": "ace:packet:d24c4617bf39",
+        "canonical_id": null,
+        "content_hash": "058a05761ef04e7b",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3198,
+        "source_ref": "sveltekit-frontend/src/lib/stores/AGENTS.md",
+        "packet_key": "ace:packet:ec35bd6e164a",
+        "canonical_id": null,
+        "content_hash": "d82c6f579cb320fc",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3271,
+        "source_ref": "sveltekit-frontend/src/lib/server/config/AGENTS.md",
+        "packet_key": "ace:packet:ea32be0bd19e",
+        "canonical_id": null,
+        "content_hash": "1980059caa9c2928",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3276,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/MetricsCollector.ts",
+        "packet_key": "ace:packet:0ae92959b0fa",
+        "canonical_id": null,
+        "content_hash": "4457457ba1e64f61",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3303,
+        "source_ref": "sveltekit-frontend/src/wasm/AGENTS.md",
+        "packet_key": "ace:packet:dd8078e48c79",
+        "canonical_id": null,
+        "content_hash": "9f2ff2db12476a94",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3341,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/AGENTS.md",
+        "packet_key": "ace:packet:b075c3e53c0f",
+        "canonical_id": null,
+        "content_hash": "807553848052364e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3347,
+        "source_ref": "sveltekit-frontend/src/lib/server/indexer/AGENTS.md",
+        "packet_key": "ace:packet:6a3a81ff124d",
+        "canonical_id": null,
+        "content_hash": "5a55b78ffae199d0",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3359,
+        "source_ref": "sveltekit-frontend/src/lib/server/data/AGENTS.md",
+        "packet_key": "ace:packet:258bcda8f064",
+        "canonical_id": null,
+        "content_hash": "01b83338b5ea9937",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3363,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/legal-corpus/[id]/AGENTS.md",
+        "packet_key": "ace:packet:84b1da548964",
+        "canonical_id": null,
+        "content_hash": "ae8878b5134c87fb",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3372,
+        "source_ref": "sveltekit-frontend/src/lib/stores/dashboard/AGENTS.md",
+        "packet_key": "ace:packet:684a5126ec1d",
+        "canonical_id": null,
+        "content_hash": "50ef7f4b1251cd46",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3396,
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/embeddings-simple.ts",
+        "packet_key": "ace:packet:5e9caff35630",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3433,
+        "source_ref": "sveltekit-frontend/src/lib/webgpu/AGENTS.md",
+        "packet_key": "ace:packet:08952b959deb",
+        "canonical_id": null,
+        "content_hash": "111befb9e01804f6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3441,
+        "source_ref": "sveltekit-frontend/src/lib/shared/AGENTS.md",
+        "packet_key": "ace:packet:6838b3a41b5c",
+        "canonical_id": null,
+        "content_hash": "fe65a6f059bd410a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3455,
+        "source_ref": "sveltekit-frontend/src/lib/server/audit/evidence-audit.ts",
+        "packet_key": "ace:packet:2683fec96069",
+        "canonical_id": null,
+        "content_hash": "7dc69619a23a008f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3495,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/codebase-graph/AGENTS.md",
+        "packet_key": "ace:packet:9c0e5acc0dc8",
+        "canonical_id": null,
+        "content_hash": "21bf9eb2631d4324",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3519,
+        "source_ref": "sveltekit-frontend/src/lib/machines/evidence-lifecycle-machine.ts",
+        "packet_key": "ace:packet:987f45dbd43b",
+        "canonical_id": null,
+        "content_hash": "4dc17e56db868bd9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3570,
+        "source_ref": "sveltekit-frontend/src/lib/server/search/AGENTS.md",
+        "packet_key": "ace:packet:46e17fb6f1a4",
+        "canonical_id": null,
+        "content_hash": "14d7c5b6c5eb957a",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3619,
+        "source_ref": "sveltekit-frontend/src/lib/server/actions/legal-actions.ts",
+        "packet_key": "ace:packet:aa9032669eb3",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3707,
+        "source_ref": "sveltekit-frontend/src/lib/server/indexer/pipeline/AGENTS.md",
+        "packet_key": "ace:packet:7baad0728140",
+        "canonical_id": null,
+        "content_hash": "bac9d5eb87f0d4b6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3757,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/command-center/codebase/clusters/[id]/AGENTS.md",
+        "packet_key": "ace:packet:5b86a9178a3e",
+        "canonical_id": null,
+        "content_hash": "d1aa0c56dbce790f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3791,
+        "source_ref": "sveltekit-frontend/src/lib/server/context/contextual.ts",
+        "packet_key": "ace:packet:c62ef974e4d8",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3882,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/schema-old.ts",
+        "packet_key": "ace:packet:73de565251c6",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3905,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/nes-graph/AGENTS.md",
+        "packet_key": "ace:packet:a1beb55e6be0",
+        "canonical_id": null,
+        "content_hash": "7632add1057df26d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 3927,
+        "source_ref": "sveltekit-frontend/src/lib/server/wiki/AGENTS.md",
+        "packet_key": "ace:packet:e4eb8c16c2fa",
+        "canonical_id": null,
+        "content_hash": "2cdf3286ce8c9103",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4076,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/analysis/AGENTS.md",
+        "packet_key": "ace:packet:5f3f6c2d4de2",
+        "canonical_id": null,
+        "content_hash": "1aaef12aa78b7845",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4092,
+        "source_ref": "sveltekit-frontend/src/routes/(dev)/voice-chat-demo/AGENTS.md",
+        "packet_key": "ace:packet:ded8635f84c6",
+        "canonical_id": null,
+        "content_hash": "3ecdad47f780c9a5",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4193,
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/AGENTS.md",
+        "packet_key": "ace:packet:3a5a639912d2",
+        "canonical_id": null,
+        "content_hash": "7ae040fc7dc580be",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4318,
+        "source_ref": "sveltekit-frontend/src/lib/server/log-adapters/sentry.ts",
+        "packet_key": "ace:packet:7c3e79d1ae9d",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4332,
+        "source_ref": "sveltekit-frontend/src/lib/server/pgai/AGENTS.md",
+        "packet_key": "ace:packet:2e7f058e7873",
+        "canonical_id": null,
+        "content_hash": "0de755603c6971d9",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4356,
+        "source_ref": "sveltekit-frontend/src/lib/server/rate-limit/AGENTS.md",
+        "packet_key": "ace:packet:ef2e7c1435f5",
+        "canonical_id": null,
+        "content_hash": "b730312824676659",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4378,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/legal-corpus/AGENTS.md",
+        "packet_key": "ace:packet:0eb793044093",
+        "canonical_id": null,
+        "content_hash": "ce531dcf45062269",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4397,
+        "source_ref": "sveltekit-frontend/src/lib/server/logging/production-logger.ts",
+        "packet_key": "ace:packet:ae7728036877",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4402,
+        "source_ref": "sveltekit-frontend/src/routes/api/rag/search/AGENTS.md",
+        "packet_key": "ace:packet:6c1d8367c09b",
+        "canonical_id": null,
+        "content_hash": "2d05e523dcfe34c0",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4428,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/demos/memory-palace/AGENTS.md",
+        "packet_key": "ace:packet:ed971452a7a4",
+        "canonical_id": null,
+        "content_hash": "8129a880d84fed1f",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4605,
+        "source_ref": "sveltekit-frontend/src/lib/server/db/schema/AGENTS.md",
+        "packet_key": "ace:packet:2d41be53301b",
+        "canonical_id": null,
+        "content_hash": "7ed78a647687b176",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4642,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/GRPOPolicy.ts",
+        "packet_key": "ace:packet:5d6ce824dcd4",
+        "canonical_id": null,
+        "content_hash": "ae4b83c1237bde15",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4669,
+        "source_ref": "sveltekit-frontend/src/lib/server/kb/AGENTS.md",
+        "packet_key": "ace:packet:0a241fff9296",
+        "canonical_id": null,
+        "content_hash": "b21fd0ad0886ae8d",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4750,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/RAGRetriever.ts",
+        "packet_key": "ace:packet:cd7816a4b278",
+        "canonical_id": null,
+        "content_hash": "9f8574d4500a97f1",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4779,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/couchdb-analytics/AGENTS.md",
+        "packet_key": "ace:packet:5cfd17eff95f",
+        "canonical_id": null,
+        "content_hash": "65a072fd515da6d6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4861,
+        "source_ref": "sveltekit-frontend/src/lib/server/llm/AGENTS.md",
+        "packet_key": "ace:packet:32e2a7c9b610",
+        "canonical_id": null,
+        "content_hash": "04a09a260f0433c6",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4881,
+        "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/JSONLStorage.ts",
+        "packet_key": "ace:packet:6376481ee656",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4897,
+        "source_ref": "sveltekit-frontend/src/lib/server/cache/AGENTS.md",
+        "packet_key": "ace:packet:e76fb59f1bfe",
+        "canonical_id": null,
+        "content_hash": "2ebb2f6b6d8c8b14",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4910,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/AGENTS.md",
+        "packet_key": "ace:packet:14b1e7ecda13",
+        "canonical_id": null,
+        "content_hash": "84b49bcce94d7f56",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4932,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence/realtime/AGENTS.md",
+        "packet_key": "ace:packet:8b63769291d4",
+        "canonical_id": null,
+        "content_hash": "4cea612d698ffd65",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4949,
+        "source_ref": "sveltekit-frontend/src/lib/utils/AGENTS.md",
+        "packet_key": "ace:packet:d5d145ea8fa4",
+        "canonical_id": null,
+        "content_hash": "c66f1d0ac65a4cb7",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4959,
+        "source_ref": "sveltekit-frontend/src/lib/stores/unified/AGENTS.md",
+        "packet_key": "ace:packet:efc21c801fd8",
+        "canonical_id": null,
+        "content_hash": "170c8aa77e2b9f6e",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": 4966,
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/AGENTS.md",
+        "packet_key": "ace:packet:cee71b098e4a",
+        "canonical_id": null,
+        "content_hash": "ac508cc2cd9304f8",
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      },
+      {
+        "id": "00d296b1-5abf-4b3e-adb2-7efd8e056468",
+        "source_ref": "sveltekit-frontend/src/cli.ts",
+        "packet_key": "ace:packet:ade07a30f5b6",
+        "canonical_id": "60c281fe-5b39-4db2-a198-1b1e204ec9ba",
+        "content_hash": "f9de6a8a3daa3a0ed449363751f4f8cd3a9f839d94e88fcc5b133c43c5dbce36",
+        "projection_revision": "graphify-signature-768-v1",
+        "source_exists_on_disk": false
+      },
+      {
+        "id": "d76ece77-32fc-eb27-3972-431e2b4e5b69",
+        "source_ref": "src/routes/search/+server.ts",
+        "packet_key": "sha256:45ac2b9aa25c47c1236c3dbc",
+        "canonical_id": null,
+        "content_hash": null,
+        "projection_revision": null,
+        "source_exists_on_disk": false
+      }
+    ],
     "ids": [
-      633420353322016100,
-      776962483503429900,
-      860801023964350600,
-      1054235802777289600,
-      2139286862380106200,
-      2586034699990434300,
-      2754577355372591600,
-      2906002275548116000,
-      3407709158810669600,
-      3936291099178413600,
-      4427808040329647000,
-      4931064400984644000,
-      5181272632859916000,
-      6001681343413880000,
-      7687627149880814000,
-      "015503bc-3eb5-4d3c-82d1-b3fb05835399",
-      "045c2ee2-fa20-4ef3-b045-fe9c359c3555",
-      "07d34f30-5ab5-4260-9307-9f813a216a65",
-      "103a9263-d2f0-4cd6-999e-f39e04837f1b",
-      "2368bc1b-13b9-46d8-a735-c149bc0a1ac1"
+      2,
+      13,
+      17,
+      23,
+      28,
+      32,
+      38,
+      42,
+      57,
+      125,
+      131,
+      138,
+      168,
+      173,
+      177,
+      182,
+      188,
+      193,
+      199,
+      204
     ]
   },
-  "total_deleted": 896,
-  "run_at": "2026-07-25T22:41:13.174Z",
-  "dry_run": false
+  "total_deleted": 223,
+  "run_at": "2026-08-24T02:04:38.545Z",
+  "dry_run": true
 }

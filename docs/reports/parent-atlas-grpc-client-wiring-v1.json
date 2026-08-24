@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.grpc-client-wiring-report.v1",
+  "status": "WIRED_VERIFIED",
+  "service": "yorha.retrieval.RetrievalService",
+  "canonicalProto": "proto/active/retrieval.proto",
+  "transport": "@grpc/grpc-js",
+  "loader": "@grpc/proto-loader",
+  "defaultEndpoint": "127.0.0.1:50053",
+  "implementedMethods": [
+    "SearchCodebase",
+    "SearchEvidence",
+    "StreamCodebase",
+    "StreamEvidence",
+    "Health"
+  ],
+  "publicAdapters": [
+    "GrpcRetrievalClient.searchCodebase",
+    "GrpcRetrievalClient.search",
+    "GrpcRetrievalClient.health"
+  ],
+  "channelDefaults": {
+    "maxReceiveMessageLength": 16777216,
+    "maxSendMessageLength": 4194304,
+    "keepaliveTimeMs": 120000,
+    "keepaliveTimeoutMs": 20000
+  },
+  "logicalMapping": {
+    "RetrievalFacade.search": "SearchCodebase",
+    "GrpcRetrievalClient.searchEvidence": "SearchEvidence",
+    "RetrievalFacade.health": "Health"
+  },
+  "safety": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "gpuStateChanged": false,
+    "contextAssemblyClaimed": false
+  },
+  "verification": {
+    "gitDiffCheck": "passed",
+    "packageBuild": "passed",
+    "mockTransportSmoke": "passed",
+    "typedSearchCodebaseSmoke": "passed",
+    "typedSearchEvidenceSmoke": "passed",
+    "streamingAdapterSmoke": "passed",
+    "healthDetailsSmoke": "passed_degraded_state_preserved",
+    "liveGrpcHealth": "passed_127.0.0.1:50053",
+    "liveHealthDetails": "passed_healthy_all_components",
+    "channelOptionsBuild": "passed",
+    "repositoryTest": "passed_4_tests",
+    "channelCloseSmoke": "passed",
+    "workspaceProtoFallback": "passed_from_sveltekit_frontend_cwd",
+    "liveSearchEvidence": "passed_result_count_0",
+    "liveStreamEvidence": "passed_events_observed_1",
+    "liveStreamCodebase": "passed_clean_termination_events_0",
+    "packageBarrelRuntimeSmoke": "blocked_preexisting_parent_atlas_core_dist_extensionless_import"
+  },
+  "likely_cause": "The TypeScript retrieval client was a placeholder while the canonical Go retrieval service and proto already existed.",
+  "patch_targets": [
+    "packages/parent-atlas-client/src/grpc/client.ts",
+    "packages/parent-atlas-client/package.json"
+  ],
+  "safe_next_command": "npm.cmd install --ignore-scripts",
+  "smoke_command": "npm --prefix packages/parent-atlas-client run build",
+  "report_path": "docs/reports/parent-atlas-grpc-client-wiring-v1.json"
+}

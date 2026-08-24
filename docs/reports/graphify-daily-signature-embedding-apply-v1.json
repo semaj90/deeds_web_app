@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.graphify-rff-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T00:20:20.433Z",
+  "apply": true,
+  "signatureOnly": true,
+  "model": "embeddinggemma:latest",
+  "scope": {
+    "sinceHours": 24,
+    "limit": 128,
+    "batchSize": 8
+  },
+  "status": "PASS",
+  "selected": 128,
+  "errorEmbedded": 0,
+  "signatureEmbedded": 128,
+  "written": 128,
+  "errors": [],
+  "schemaColumns": {
+    "error_embedding": "vector(384)",
+    "signature_embedding": "halfvec(768)"
+  },
+  "sample": [
+    {
+      "id": "057cba80-3883-4f03-829c-b539f1567966",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "05f52294-e528-4bff-8438-d227664251b0",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "0639be51-c62d-4e2d-a6dd-aefa56594b82",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "0679e2c6-de64-4a88-975d-ea9462a17557",
+      "sourceRef": "src/routes/api/chat/memory/search/+server.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "06f05d34-e4b6-431f-8711-df1487f0bdfb",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "missingError": true,
+      "missingSignature": true
+    }
+  ]
+}

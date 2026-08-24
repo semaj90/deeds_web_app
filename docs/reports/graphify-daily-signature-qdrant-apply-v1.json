@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.graphify-embedding-qdrant-projection.v1",
+  "generatedAt": "2026-08-24T00:20:41.425Z",
+  "apply": true,
+  "sourceColumn": "signature_embedding",
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "vectorName": "signature"
+  },
+  "scope": {
+    "sinceHours": 24,
+    "limit": 128
+  },
+  "status": "PASS",
+  "selected": 128,
+  "projected": 128,
+  "skipped": 0,
+  "errors": [],
+  "sample": [
+    {
+      "id": "057cba80-3883-4f03-829c-b539f1567966",
+      "qdrantId": "1767779151",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts"
+    },
+    {
+      "id": "05f52294-e528-4bff-8438-d227664251b0",
+      "qdrantId": "128882801",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts"
+    },
+    {
+      "id": "0639be51-c62d-4e2d-a6dd-aefa56594b82",
+      "qdrantId": "357047681",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts"
+    },
+    {
+      "id": "0679e2c6-de64-4a88-975d-ea9462a17557",
+      "qdrantId": "5a927f4d-5bc1-0124-2f52-434b6b51bb34",
+      "sourceRef": "src/routes/api/chat/memory/search/+server.ts"
+    },
+    {
+      "id": "06f05d34-e4b6-431f-8711-df1487f0bdfb",
+      "qdrantId": "598616250",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts"
+    }
+  ],
+  "elapsedMs": 558
+}

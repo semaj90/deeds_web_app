@@ -1,0 +1,208 @@
+{
+  "schema": "atlas.graphify-lexical-owner.v1",
+  "generatedAt": "2026-08-24T03:11:25.337Z",
+  "readOnly": true,
+  "table": "codebase_chunk_index",
+  "extensions": [
+    {
+      "extname": "pg_trgm",
+      "extversion": "1.6"
+    },
+    {
+      "extname": "vector",
+      "extversion": "0.8.3"
+    }
+  ],
+  "columns": [
+    {
+      "column_name": "ast_symbols",
+      "data_type": "jsonb",
+      "udt_name": "jsonb"
+    },
+    {
+      "column_name": "content_embedding",
+      "data_type": "USER-DEFINED",
+      "udt_name": "halfvec"
+    },
+    {
+      "column_name": "content_embedding_768",
+      "data_type": "USER-DEFINED",
+      "udt_name": "vector"
+    },
+    {
+      "column_name": "search_vector",
+      "data_type": "tsvector",
+      "udt_name": "tsvector"
+    }
+  ],
+  "indexes": [
+    {
+      "indexname": "codebase_chunk_index_centroid_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_centroid_idx ON public.codebase_chunk_index USING btree (centroid_id)"
+    },
+    {
+      "indexname": "codebase_chunk_index_chunk_id_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_chunk_id_idx ON public.codebase_chunk_index USING btree (chunk_id)"
+    },
+    {
+      "indexname": "codebase_chunk_index_cluster_summary_gin",
+      "indexdef": "CREATE INDEX codebase_chunk_index_cluster_summary_gin ON public.codebase_chunk_index USING gin (cluster_summary jsonb_path_ops)"
+    },
+    {
+      "indexname": "codebase_chunk_index_content_hnsw",
+      "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "indexname": "codebase_chunk_index_domain_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_domain_idx ON public.codebase_chunk_index USING btree (domain)"
+    },
+    {
+      "indexname": "codebase_chunk_index_extension_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_extension_idx ON public.codebase_chunk_index USING btree (extension)"
+    },
+    {
+      "indexname": "codebase_chunk_index_gpu_cluster_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_gpu_cluster_idx ON public.codebase_chunk_index USING btree (gpu_cluster)"
+    },
+    {
+      "indexname": "codebase_chunk_index_language_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_language_idx ON public.codebase_chunk_index USING btree (language)"
+    },
+    {
+      "indexname": "codebase_chunk_index_metadata_gin",
+      "indexdef": "CREATE INDEX codebase_chunk_index_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "indexname": "codebase_chunk_index_path_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_path_idx ON public.codebase_chunk_index USING btree (relative_path)"
+    },
+    {
+      "indexname": "codebase_chunk_index_pkey",
+      "indexdef": "CREATE UNIQUE INDEX codebase_chunk_index_pkey ON public.codebase_chunk_index USING btree (id)"
+    },
+    {
+      "indexname": "codebase_chunk_index_qdrant_id_unique",
+      "indexdef": "CREATE UNIQUE INDEX codebase_chunk_index_qdrant_id_unique ON public.codebase_chunk_index USING btree (qdrant_id)"
+    },
+    {
+      "indexname": "codebase_chunk_index_routing_tier_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_routing_tier_idx ON public.codebase_chunk_index USING btree (routing_tier)"
+    },
+    {
+      "indexname": "codebase_chunk_index_semantic_tags_gin",
+      "indexdef": "CREATE INDEX codebase_chunk_index_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+    },
+    {
+      "indexname": "codebase_chunk_index_som_bmu_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_som_bmu_idx ON public.codebase_chunk_index USING btree (som_bmu_row, som_bmu_col)"
+    },
+    {
+      "indexname": "codebase_chunk_index_som_cluster_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_som_cluster_idx ON public.codebase_chunk_index USING btree (som_cluster)"
+    },
+    {
+      "indexname": "codebase_chunk_index_summary_hnsw",
+      "indexdef": "CREATE INDEX codebase_chunk_index_summary_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "indexname": "codebase_chunk_index_tags_idx",
+      "indexdef": "CREATE INDEX codebase_chunk_index_tags_idx ON public.codebase_chunk_index USING gin (tags)"
+    },
+    {
+      "indexname": "idx_cci_kmeans384_cluster",
+      "indexdef": "CREATE INDEX idx_cci_kmeans384_cluster ON public.codebase_chunk_index USING btree (kmeans384_cluster) WHERE (kmeans384_cluster IS NOT NULL)"
+    },
+    {
+      "indexname": "idx_cci_kmeans_cluster",
+      "indexdef": "CREATE INDEX idx_cci_kmeans_cluster ON public.codebase_chunk_index USING btree (kmeans_cluster) WHERE (kmeans_cluster IS NOT NULL)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_bm25_search",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_bm25_search ON public.codebase_chunk_index USING gin (search_vector)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_content_embedding_384_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_384 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "indexname": "idx_codebase_chunk_embedding_model_normalized",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_embedding_model_normalized ON public.codebase_chunk_index USING btree (embedding_model, embedding_normalized) WHERE ((embedding_model IS NOT NULL) AND (embedding_normalized = true))"
+    },
+    {
+      "indexname": "idx_codebase_chunk_encoder_id",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_encoder_id ON public.codebase_chunk_index USING btree (encoder_id)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_index_error_embedding_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "indexname": "idx_codebase_chunk_index_metadata_packet_key",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_index_metadata_packet_key ON public.codebase_chunk_index USING btree (((metadata ->> 'packet_key'::text)))"
+    },
+    {
+      "indexname": "idx_codebase_chunk_index_metadata_tree_node_id",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_index_metadata_tree_node_id ON public.codebase_chunk_index USING btree (((metadata ->> 'tree_node_id'::text)))"
+    },
+    {
+      "indexname": "idx_codebase_chunk_index_output_meta_tree_node_id",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_index_output_meta_tree_node_id ON public.codebase_chunk_index USING btree (((output_meta ->> 'tree_node_id'::text)))"
+    },
+    {
+      "indexname": "idx_codebase_chunk_latent64_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_latent_valid",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent_valid ON public.codebase_chunk_index USING btree (latent_embedding_valid)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_metadata_gin",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_semantic_tags_gin",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_source_ref",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_source_ref ON public.codebase_chunk_index USING btree (source_ref)"
+    },
+    {
+      "indexname": "idx_codebase_chunk_summary_embedding_384_hnsw",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding_384 vector_cosine_ops) WITH (m='12', ef_construction='48')"
+    },
+    {
+      "indexname": "idx_codebase_chunk_summary_embedding_ivfflat",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_ivfflat ON public.codebase_chunk_index USING ivfflat (summary_embedding halfvec_cosine_ops) WITH (lists='100')"
+    },
+    {
+      "indexname": "idx_codebase_chunk_summary_null",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_summary_null ON public.codebase_chunk_index USING btree (summary) WHERE ((summary IS NOT NULL) AND (btrim(summary) <> ''::text))"
+    },
+    {
+      "indexname": "idx_codebase_chunk_tags_gin",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_tags_gin ON public.codebase_chunk_index USING gin (tags jsonb_path_ops)"
+    }
+  ],
+  "triggers": [
+    {
+      "tgname": "trig_update_codebase_chunk_search_vector",
+      "definition": "CREATE TRIGGER trig_update_codebase_chunk_search_vector BEFORE INSERT OR UPDATE ON public.codebase_chunk_index FOR EACH ROW EXECUTE FUNCTION compute_codebase_chunk_search_vector()"
+    }
+  ],
+  "counts": {
+    "total": 52417,
+    "search_vector": 52417,
+    "ast_symbols": 17800,
+    "content_embedding_768": 576,
+    "content_embedding": 52380
+  },
+  "owner": "POSTGRES_FTS_TSVECTOR_TS_RANK_CD",
+  "findings": [],
+  "status": "PASS"
+}

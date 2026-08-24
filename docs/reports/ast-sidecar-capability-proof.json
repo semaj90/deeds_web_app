@@ -1,22 +1,36 @@
 {
-  "schemaVersion": "atlas.ast.sidecar.proof.v1",
-  "generatedAt": "2026-08-14T05:11:47.583Z",
+  "schemaVersion": "atlas.ast.sidecar.proof.v3",
+  "generatedAt": "2026-08-24T02:15:45.160Z",
   "endpoint": "http://127.0.0.1:8095",
   "status": "PROVEN",
+  "structuralStatus": "PROVEN",
+  "groundingStatus": "DEGRADED",
   "gates": {
     "SIDECAR_HEALTH_PASS": true,
+    "PROVENANCE_V2_CONTRACT": true,
     "SIDECAR_CAPABILITY_DISCOVERY": true,
     "TREESITTER_CHUNKER_IMPORTABLE": true,
     "AST_EVIDENCE_ENDPOINT": true,
     "AST_EVIDENCE_DIAGNOSTICS_EMPTY": true,
-    "UPSTREAM_CHUNK_ID_ONLY": true,
-    "TYPED_EDGE_EVIDENCE": true,
-    "NO_FAKE_CALL_SYMBOLS": true
+    "STRUCTURAL_CHUNKS_NONEMPTY": true,
+    "NATIVE_CHUNK_IDS": true,
+    "NATIVE_NODE_IDS": true,
+    "NATIVE_FILE_IDS": true,
+    "NATIVE_SYMBOL_IDS_FOR_NAMED_CHUNKS": true,
+    "HIERARCHY_PRESERVED": true,
+    "DEFINES_EDGE_EVIDENCE": true,
+    "REFERENCE_EDGE_EVIDENCE": true,
+    "EDGE_TYPES_RECOGNIZED": true,
+    "NO_FAKE_CALL_SYMBOLS": true,
+    "GROUNDED_PROBE_COMPLETED": true,
+    "LANGEXTRACT_NATIVE_CHAR_INTERVAL": false,
+    "LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE": false
   },
   "runtime": {
     "health": {
       "status": "ok",
-      "model": "miniforge-nlp-sidecar"
+      "model": "miniforge-nlp-sidecar",
+      "contract": "provenance-v2"
     },
     "ast": {
       "engine": "treesitter-chunker",
@@ -24,9 +38,17 @@
       "xref": true,
       "repositoryProcessing": true
     },
+    "structuralProvenance": {
+      "nativeConsiliencyIds": true,
+      "identityPathRequiredForPromotion": true,
+      "langextractCharInterval": true,
+      "langextractAlignmentStatus": true,
+      "canonicalIdentityAuthority": false
+    },
     "engine": "treesitter-chunker",
     "engineVersion": "4.0.0",
     "chunks": 3,
+    "namedChunks": 1,
     "edges": 9,
     "edgeTypes": [
       "IMPORTS",
@@ -35,6 +57,19 @@
       "CALLS",
       "DEFINES"
     ],
-    "diagnostics": []
+    "diagnostics": [],
+    "nativeProvenance": {
+      "chunkIds": true,
+      "nodeIds": true,
+      "fileIds": true,
+      "symbolIdsForNamedChunks": true,
+      "hierarchy": true
+    },
+    "grounding": {
+      "extractionCount": 0,
+      "nativeCharInterval": false,
+      "alignmentStatusVisible": false,
+      "error": null
+    }
   }
 }

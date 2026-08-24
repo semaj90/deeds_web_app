@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.graphify-file-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T03:11:19.020Z",
+  "apply": false,
+  "scope": {
+    "table": "codebase_chunk_index",
+    "canonicalColumn": "content_embedding_768",
+    "sinceHours": 24,
+    "limit": 4,
+    "declaredType": "vector(768)"
+  },
+  "model": "embeddinggemma:latest",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "status": "DRY_RUN",
+  "selected": 4,
+  "embedded": 0,
+  "written": 0,
+  "skipped": 0,
+  "errors": [],
+  "sample": [
+    {
+      "id": "93590876-8f40-45ad-9bba-b0dd5dcdfe6b",
+      "relativePath": "src/routes/api/cases/[id]/similar/+server.ts",
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "textHash": "84ab2837792479d2ba1fc967ff185adcec1613034cecc12d3725f9f0063c621a"
+    },
+    {
+      "id": "942b8fad-d5ea-4040-a6bc-b1c44ad9aa0f",
+      "relativePath": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "sourceRef": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "textHash": "e80f7e62931d0943f2bc5c8d0b0a20e3e0ad019abc26b8ac758e7e1e31c83b9c"
+    },
+    {
+      "id": "94b3bfcd-2beb-4855-9f05-e9f8c0e05a01",
+      "relativePath": "src/lib/utils/security.ts",
+      "sourceRef": "src/lib/utils/security.ts",
+      "textHash": "da971e6c52cbe9872813036aa3c74e875747234e001648e2ac3f8db4df88ffaf"
+    },
+    {
+      "id": "9630adda-8721-42fc-aeb0-7064b9713a12",
+      "relativePath": "src/lib/services/voice-commands.ts",
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "textHash": "64996261185e943a2cb5dbf702a03917a732be9968925ba3c5c5e00a9093f696"
+    }
+  ],
+  "elapsedMs": 2901
+}

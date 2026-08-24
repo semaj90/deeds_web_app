@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.graphify-embedding-qdrant-projection.v1",
+  "generatedAt": "2026-08-24T03:11:22.556Z",
+  "apply": false,
+  "sourceColumn": "content_embedding_768",
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "vectorName": "content",
+    "projectionRevision": "graphify-content-768-v1"
+  },
+  "payloadFields": [
+    "canonical_id",
+    "packet_key",
+    "source_ref",
+    "repo_id",
+    "chunk_id",
+    "domain",
+    "language",
+    "tags",
+    "semantic_tags",
+    "content_hash",
+    "embedding_model",
+    "embedding_version",
+    "projection_revision",
+    "content_projection_revision",
+    "signature_projection_revision",
+    "projection_revisions"
+  ],
+  "scope": {
+    "sinceHours": 24,
+    "limit": 4
+  },
+  "status": "DRY_RUN",
+  "selected": 4,
+  "projected": 0,
+  "skipped": 0,
+  "errors": [],
+  "sample": [
+    {
+      "id": "87737546-81ea-4253-86c6-1594793859bf",
+      "qdrantId": "2f957591-4836-f0a7-9ecd-a73fff3aac5f",
+      "sourceRef": "src/lib/server/ace/codeintel-datastore.ts"
+    },
+    {
+      "id": "879ae2c4-70b7-4d02-88be-df14647d6014",
+      "qdrantId": "9020400d-1083-025c-92fc-251aa39ee865",
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts"
+    },
+    {
+      "id": "89267199-d704-4408-a0a7-12b9f376a0c8",
+      "qdrantId": "1703176200",
+      "sourceRef": "src/lib/services/voice-commands.ts"
+    },
+    {
+      "id": "8a83b91a-43b8-4512-a693-d8f28523342d",
+      "qdrantId": "7ffd9621-5c4b-eda1-bdee-48b593edc686",
+      "sourceRef": "src/lib/services/voice-commands.ts"
+    }
+  ],
+  "elapsedMs": 916
+}

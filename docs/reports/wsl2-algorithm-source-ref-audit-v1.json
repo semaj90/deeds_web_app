@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.wsl2-algorithm-source-ref-audit.v1",
+  "status": "WARN",
+  "scope": "Implementation, fixture, contract, stub/mock, HMM/Viterbi, and MCP reachability audit",
+  "sourceRefToc": "docs/okf/parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
+  "findings": [
+    {
+      "surface": "NetworkX PageRank",
+      "status": "LIVE_PROVEN",
+      "evidence": ["python/atlas_compute/typed_graph_runtime.py", "python/tests/test_typed_graph_runtime.py"]
+    },
+    {
+      "surface": "Weighted SSSP",
+      "status": "LIVE_PROVEN",
+      "evidence": ["python/atlas_compute/typed_graph_runtime.py", "python/tests/test_typed_graph_runtime.py", "cugraph.sssp live smoke"]
+    },
+    {
+      "surface": "cuGraph PPR",
+      "status": "LIVE_PROVEN",
+      "evidence": ["python/atlas_compute/cugraph_ppr.py"]
+    },
+    {
+      "surface": "Spectral modularity and Leiden",
+      "status": "EXECUTED_UNPROVEN",
+      "evidence": ["python/atlas_compute/live_graph_fixture.py", "GPU execution passed", "CPU/GPU promotion gate remains open"]
+    },
+    {
+      "surface": "HITS, Jaccard, triangles, ForceAtlas2",
+      "status": "CONTRACT_ONLY",
+      "evidence": ["packages/parent-atlas/src/core/algorithm-execution-manifest.ts", "No verified Atlas executor found in this audit"]
+    },
+    {
+      "surface": "TypeScript Viterbi",
+      "status": "IMPLEMENTED_TEST_FAILURE",
+      "evidence": ["sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts", "sveltekit-frontend/src/lib/server/analysis/hmm-error-classifier.ts", "hmm-policy-bridge.spec.ts passed", "k-best-viterbi.spec.ts failed global-lineage assertion"]
+    },
+    {
+      "surface": "HMM/Viterbi sidecar",
+      "status": "CONTRACT_ONLY",
+      "evidence": ["sveltekit-frontend/src/lib/server/analysis/model-analysis-sidecar.ts", "TODO: formalize sidecar contract"]
+    },
+    {
+      "surface": "OpenCode MCP dispatch",
+      "status": "STUB_OR_MOCK",
+      "evidence": ["sveltekit-frontend/src/routes/api/opencode-dispatch/+server.ts", "source explicitly states tool execution is stubbed"]
+    },
+    {
+      "surface": "trace-mcp and atlas-tools",
+      "status": "UNREACHABLE_IN_SESSION",
+      "evidence": ["No callable session tools matched trace or atlas-tools"]
+    }
+  ],
+  "viterbi": {
+    "properLocalApi": "sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts",
+    "classifierApi": "sveltekit-frontend/src/lib/server/analysis/hmm-error-classifier.ts",
+    "sidecarApi": "sveltekit-frontend/src/lib/server/analysis/model-analysis-sidecar.ts",
+    "pythonSidecarObservationStatus": "observation generation only; no Python Viterbi/Baum-Welch proof found",
+    "focusedTestStatus": "FAIL: k-best-viterbi.spec.ts global-lineage assertion"
+  },
+  "mcp": {
+    "traceMcpCallable": false,
+    "atlasToolsCallable": false,
+    "note": "Repository routes and MCP-shaped code are not equivalent to connected MCP server tools."
+  },
+  "likely_cause": "The source-reference TOC combined real executors, fixtures, contracts, and route-only dispatch surfaces without a uniform truth-status label.",
+  "evidence": ["docs/okf/parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md", "sveltekit-frontend/src/routes/api/opencode-dispatch/+server.ts", "sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts"],
+  "patch_targets": ["docs/okf/parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md", "docs/reports/wsl2-algorithm-source-ref-audit-v1.json"],
+  "safe_next_command": "cd sveltekit-frontend; npx vitest run src/lib/server/analysis/hmm-kanban-diagnoser.test.ts src/lib/server/analysis/hmm-error-classifier.test.ts",
+  "smoke_command": "python -m pytest -q python/tests/test_typed_graph_runtime.py",
+  "report_path": "docs/reports/wsl2-algorithm-source-ref-audit-v1.json"
+}

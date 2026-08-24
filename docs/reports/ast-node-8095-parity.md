@@ -10,6 +10,6 @@
 - imports-exports: **DEGRADED**
 - nested-callbacks: **DEGRADED**
 - test-file: **DEGRADED**
-- malformed: **DEGRADED**
+- malformed: **PASS**
 
 Node is a compatibility challenger only; this report does not authorize a provider switch.

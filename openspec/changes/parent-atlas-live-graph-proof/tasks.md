@@ -634,6 +634,60 @@ Not yet done: deciding between (a) and (b) above — this is a genuine
 product/process decision, not a diagnostic finding, and shouldn't be made
 unilaterally the same way the LVG-2/LVG-10/11 decisions weren't.
 
+### LVG-15: supersede and rank retrieval signals
+
+This is the bounded read-only pass for the retrieval fabric described by the
+LVG work. It does not delete duplicate contracts, rewrite embeddings, or make
+GPU claims from hardware specifications. It records which signal is allowed
+to admit, rank, or synthesize candidates and produces one replayable receipt.
+
+**Supersede decision:**
+
+- `sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/contracts.ts`
+  owns `WorkflowActionEventSchema` for LVG-13 because it has the dominant
+  consumer set and the existing adapter.
+- `workflow/workflow-action-event-v1.ts` is legacy/dead-code evidence.
+- `workflow/context-tool-dag-contracts.ts` is a challenger/compatibility
+  owner with a minor consumer set.
+- Neither competing definition is deleted in this tranche. Any migration
+  requires a separate compatibility and consumer-removal change.
+
+**Signal ranking policy, in order:**
+
+1. Identity/provenance gate: `canonical_id`, `packet_key`, `source_ref`, and
+   revision compatibility. A candidate failing this gate cannot be promoted.
+2. Lexical and AST admission: PostgreSQL `tsvector`/GIN plus AST-grep or the
+   validated AST sidecar. This preserves exact symbol and identifier matches.
+3. Dense semantic retrieval: canonical 768-dimensional EmbeddingGemma vectors
+   from PostgreSQL/Qdrant, with Qdrant treated as a rebuildable projection.
+4. Structural expansion: typed graph BFS/SSSP, PageRank/PPR, and bounded
+   hyperedge participation. These add evidence and locality, not identity.
+5. Domain and ontology features: normalized classifications and typed tuples;
+   labels are categorical and must not be treated as numeric distances.
+6. SOM/KMeans admission: 20x20 routing coordinates and centroid/Valkey cache
+   are cheap candidate filters, never final evidence authority.
+7. Reranking: TurboVec/cuVS or another proven executor over the bounded union;
+   record executor, revision, and candidate count.
+8. ACE assembly and synthesis: top-K cited packets only; Gemma4 recommends
+   from the canonicalized packet, never from raw search output.
+
+**Acceptance receipt:**
+
+- one frozen query and source revision;
+- candidate counts and top-K from lexical, dense, graph, SOM, and fused lanes;
+- identity/revision rejection counts;
+- per-lane contribution and overlap/recall diagnostics;
+- final ACE packet containing `source_ref`, concept/domain labels,
+  confidence, evidence refs, and a checksum;
+- replay produces the same ordering for the same revisions and seed;
+- no Postgres, Qdrant, Neo4j, or Valkey mutation in the proof run.
+
+The existing `scripts/atlas/agentic-recommendation-workflow.mjs` is the
+closest end-to-end executor: it already calls TRACE MCP, loads active context,
+builds ACE context, performs BM25+dense+graph retrieval, reranks, synthesizes,
+and builds a structured recommendation. LVG-15 should wrap that path with the
+receipt above rather than create another retrieval engine.
+
 ## Tests
 
 ```bash

@@ -97,6 +97,14 @@ try {
   });
   if (!quiet) console.log('[graphify:daily] Repository provenance dry-run complete');
 
+  // Normalize the agentic provenance output into a stable workflow receipt.
+  // This is a local read-only artifact; Postgres ownership remains gated separately.
+  execSync('node scripts/atlas/prepare-graphify-daily-workflow-receipt.mjs', {
+    cwd: ROOT,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 60 * 1000
+  });
+
   // Run from sveltekit-frontend directory to resolve npm scripts
   //
   // graphify:daily:chain runs 6 sequential steps (dedup-validation,
@@ -112,6 +120,48 @@ try {
     stdio: 'inherit',
     timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
   });
+
+  // Read-only BM25 plan consumes the completed Graphify run when the control plane is installed.
+  // It never creates an index receipt or mutates Postgres.
+  if (!quiet) console.log('[graphify:daily] Planning BM25 index from Graphify run...');
+  execSync('npm run atlas:bm25:index:plan', {
+    cwd: FRONTEND,
+    stdio: 'inherit',
+    timeout: 60 * 1000
+  });
+
+  // Record the bounded 768d feature/Qdrant alignment after the daily refresh.
+  // This is diagnostic only: it must not block Graphify completion or mutate a
+  // canonical store when an optional projection is unavailable.
+  if (!quiet) console.log('[graphify:daily] Checking 768d embedding alignment...');
+  try {
+    execSync('node scripts/atlas/test-graphify-embedding-alignment.mjs', {
+      cwd: ROOT,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 2 * 60 * 1000
+    });
+  } catch (alignmentError) {
+    console.warn(`[graphify:daily] 768d alignment receipt deferred: ${alignmentError.message}`);
+  }
+
+  // Keep backfill eligibility visible without embedding or writing projections.
+  // The error lane is intentionally omitted because its live column is legacy
+  // 384d and requires an explicit migration decision.
+  for (const [label, command] of [
+    ['canonical 768d embedding plan', 'node scripts/atlas/backfill-graphify-file-embeddings-768.mjs --limit=128 --since-hours=24 --out=docs/reports/graphify-daily-content-embedding-plan-v1.json'],
+    ['signature 768d embedding plan', 'node scripts/atlas/backfill-graphify-rff-embeddings-768.mjs --signature-only --limit=128 --since-hours=24 --out=docs/reports/graphify-daily-signature-embedding-plan-v1.json']
+  ]) {
+    if (!quiet) console.log(`[graphify:daily] Planning ${label}...`);
+    try {
+      execSync(command, {
+        cwd: ROOT,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 2 * 60 * 1000
+      });
+    } catch (planError) {
+      console.warn(`[graphify:daily] ${label} deferred: ${planError.message}`);
+    }
+  }
 
   console.log('graphify:daily partial');
 

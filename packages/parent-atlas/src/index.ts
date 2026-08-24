@@ -88,6 +88,8 @@ export * from './core/ace-runtime-adapter.js';
 export * from './core/hyperrag-live-integration.js';
 export * from './core/proof-gates.js';
 export * from './core/hypergraph-fusion-facade.js';
+export * from './core/atlas-operation-v1.js';
+export * from './core/atlas-topology-v1.js';
 export * from './core/temporal-packet.js';
 export * from './core/processing-pass.js';
 export * from './core/qdrant-semantic-payload-envelope.js';

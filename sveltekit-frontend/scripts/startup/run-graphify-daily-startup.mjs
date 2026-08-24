@@ -144,6 +144,7 @@ const steps = [
   ['graphify:cluster-cards:generate', { required: false, name: 'Generate cluster-cards.jsonl' }],
   ['graphify:cluster-cards:validate', { required: false, name: 'Validate schema' }],
   ['graphify:cluster-cards:load', { required: false, name: 'Load into Postgres' }],
+  ['atlas:bm25:index:plan', { required: false, name: 'Plan BM25 index from Graphify run' }],
 ];
 
 if (INCLUDE_QDRANT_LINK_REPAIR) {

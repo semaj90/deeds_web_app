@@ -19,6 +19,7 @@ import { searchRouter } from './routers/search.js';
 import { analyticsRouter } from './routers/analytics.js';
 import { atlasRouter } from './routers/atlas.js';
 import { astSidecarRouter } from './routers/ast-sidecar.js';
+import { atlasOperationsRouter } from './routers/atlas-operations.js';
 import { phase18RerankerProcedure, phase18RerankerMutationProcedure } from './procedures/phase18-reranker.js';
 
 export const appRouter = router({
@@ -28,6 +29,7 @@ export const appRouter = router({
   analytics: analyticsRouter,
   atlas: atlasRouter,
   astSidecar: astSidecarRouter,
+  atlasOperations: atlasOperationsRouter,
   phase18Reranker: phase18RerankerProcedure,
   phase18RerankerMutation: phase18RerankerMutationProcedure,
 });

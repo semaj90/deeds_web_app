@@ -17,10 +17,13 @@
   ],
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsc && node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@deeds/parent-atlas-core": "file:../parent-atlas-core"
+    "@deeds/parent-atlas-core": "file:../parent-atlas-core",
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.0"
   },
   "devDependencies": {
     "typescript": "^5.7.2"

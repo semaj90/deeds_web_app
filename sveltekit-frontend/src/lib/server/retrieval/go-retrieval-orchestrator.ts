@@ -131,23 +131,13 @@ export class GoRetrievalOrchestrator {
   }
 
   private async embedQuery(query: string): Promise<number[]> {
-    try {
-      const response = await fetch(`${this.goRetrievalUrl}/embed`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: query })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Embedding service returned ${response.status}`);
-      }
-
-      const data = (await response.json()) as { embedding: number[] };
-      return data.embedding;
-    } catch (err) {
-      console.error('Failed to embed query:', err);
-      throw err;
-    }
+    const { tryEmbed } = await import('../embedding/ollama-embed.js');
+    const result = await tryEmbed(query, {
+      model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
+      expectedDimensions: 768,
+    });
+    if (!result?.embedding?.length) throw new Error('EmbeddingGemma query embedding unavailable');
+    return result.embedding;
   }
 
   private async queryQdrantANN(embedding: number[], topK: number): Promise<any> {
@@ -187,17 +177,21 @@ export class GoRetrievalOrchestrator {
     const start = Date.now();
 
     try {
-      // Placeholder: actual BM25 implementation
-      const results = await db.query.codebase_chunk_index.findMany({
-        // WHERE tsv @@ to_tsquery(query) ORDER BY rank DESC LIMIT topK
-        limit: topK
+      const response = await fetch(`${this.goRetrievalUrl}/search/bm25`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit: topK }),
+        signal: AbortSignal.timeout(1200),
       });
+      const data = (await response.json()) as { results?: Array<Record<string, unknown>>; error?: string };
+      if (!response.ok || data.error) throw new Error(data.error ?? `BM25 service returned ${response.status}`);
+      const results = data.results ?? [];
 
       return {
-        ids: results.map((r: any) => r.id),
-        ranked: results.map((r: any, idx: number) => ({
-          feature_id: r.feature_id,
-          bm25_score: 1.0 / (1 + idx),
+        ids: results.map((r) => String(r.id ?? r.source_ref ?? '')),
+        ranked: results.map((r, idx) => ({
+          feature_id: String(r.id ?? r.source_ref ?? ''),
+          bm25_score: Number(r.score ?? 0),
           rank: idx
         })),
         duration_ms: Date.now() - start

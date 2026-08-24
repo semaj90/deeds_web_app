@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.retrieval-signal-ranking.v1",
+  "status": "SPECCED_READ_ONLY",
+  "supersede": {
+    "dominantWorkflowActionOwner": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/contracts.ts",
+    "adapter": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/workflow-action-event-adapter.ts",
+    "legacyOwner": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts",
+    "challengerOwner": "sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts",
+    "deletionAllowed": false,
+    "reason": "The dominant owner has the real consumer set and existing adapter; compatibility owners require a separate migration."
+  },
+  "ranking": [
+    { "rank": 1, "lane": "identity_provenance", "role": "hard admission gate", "authority": "Postgres/source revisions" },
+    { "rank": 2, "lane": "lexical_ast", "role": "exact admission", "executor": "Postgres tsvector GIN plus validated AST provider" },
+    { "rank": 3, "lane": "dense_semantic", "role": "semantic candidate generation", "executor": "EmbeddingGemma 768 / Qdrant projection / pgvector canonical" },
+    { "rank": 4, "lane": "structural_graph", "role": "bounded expansion and authority", "executor": "NetworkX/cuGraph PageRank, PPR, BFS, weighted SSSP" },
+    { "rank": 5, "lane": "domain_ontology", "role": "categorical feature alignment", "executor": "typed tuples and domain classifiers" },
+    { "rank": 6, "lane": "som_centroid", "role": "cheap locality admission", "executor": "20x20 SOM plus Valkey centroid cache" },
+    { "rank": 7, "lane": "bounded_rerank", "role": "final candidate ordering", "executor": "TurboVec/cuVS or proven reranker" },
+    { "rank": 8, "lane": "ace_synthesis", "role": "cited context assembly and recommendation", "executor": "ACE packet builder plus Gemma4" }
+  ],
+  "existingEndToEndPath": "scripts/atlas/agentic-recommendation-workflow.mjs",
+  "existingStages": ["TRACE/Atlas tool calls", "active context", "ACE context", "BM25+dense+graph retrieval", "rerank", "Gemma4 synthesis", "structured recommendation"],
+  "not_proven_by_this_receipt": ["empirical lane quality ranking", "Tensor Core utilization", "Nsight Systems trace", "Nsight Compute precision evidence", "Python to TypeScript LVG-13 event submission"],
+  "acceptance": ["frozen query and revisions", "per-lane counts and top-K", "identity/revision rejects", "overlap and recall", "ACE checksum", "deterministic replay", "zero durable mutation"],
+  "likely_cause": "The retrieval components exist as separate executors, but no single read-only receipt currently ranks their roles and binds them to the dominant workflow event contract.",
+  "evidence": ["scripts/atlas/agentic-recommendation-workflow.mjs", "openspec/changes/parent-atlas-live-graph-proof/tasks.md", "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/contracts.ts"],
+  "patch_targets": ["openspec/changes/parent-atlas-live-graph-proof/tasks.md", "docs/reports/atlas-retrieval-signal-ranking-v1.json"],
+  "safe_next_command": "node scripts/atlas/agentic-recommendation-workflow.mjs --dry-run --query \"rank graph retrieval signals\"",
+  "smoke_command": "git diff --check",
+  "report_path": "docs/reports/atlas-retrieval-signal-ranking-v1.json"
+}

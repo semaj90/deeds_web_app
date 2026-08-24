@@ -19,7 +19,7 @@ const VECTOR_NAME = String(arg('vector-name', 'content'));
 if (!['content', 'signature'].includes(VECTOR_NAME)) throw new Error(`Unsupported vector-name: ${VECTOR_NAME}`);
 const SOURCE_COLUMN = VECTOR_NAME === 'signature' ? 'signature_embedding' : 'content_embedding_768';
 const PROJECTION_REVISION = String(arg('projection-revision', `graphify-${VECTOR_NAME}-768-v1`));
-const OUT = path.resolve(REPO_ROOT, String(arg('out', 'docs/reports/graphify-embedding-qdrant-projection-v1.json')));
+const OUT = path.resolve(REPO_ROOT, String(arg('out', `docs/reports/graphify-embedding-qdrant-${VECTOR_NAME}-projection-v1.json`)));
 
 function parseVector(value) {
   const text = String(value ?? '').trim().replace(/^\[|\]$/g, '');
@@ -45,7 +45,7 @@ async function jsonFetch(url, options = {}) {
 async function main() {
   const started = Date.now();
   const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-embedding-qdrant-projection' });
-  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'embedding_model', 'embedding_version', 'projection_revision'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, errors: [] };
+  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'embedding_model', 'embedding_version', 'projection_revision', 'content_projection_revision', 'signature_projection_revision', 'projection_revisions'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, errors: [] };
   try {
     const collection = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}`);
     const vectors = collection?.result?.config?.params?.vectors;
@@ -65,7 +65,14 @@ async function main() {
     else {
       for (let offset = 0; offset < result.rows.length; offset += BATCH) {
         const rows = result.rows.slice(offset, offset + BATCH);
-        const points = rows.map((row) => ({ id: pointId(row.qdrant_id), vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { canonical_id: row.id, packet_key: row.packet_key ?? null, source_ref: row.source_ref, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, embedding_model: row.embedding_model, embedding_version: row.embedding_version, projection_revision: PROJECTION_REVISION, graphify_embedding_projected_at: new Date().toISOString() } }));
+        const existing = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids: rows.map((row) => pointId(row.qdrant_id)), with_payload: true, with_vector: false }) });
+        const existingPayloads = new Map((existing?.result ?? []).map((point) => [String(point.id), point.payload ?? {}]));
+        const points = rows.map((row) => {
+          const id = pointId(row.qdrant_id);
+          const prior = existingPayloads.get(String(id)) ?? {};
+          const projectionRevisions = { ...(prior.projection_revisions ?? {}), [VECTOR_NAME]: PROJECTION_REVISION };
+          return { id, vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { ...prior, canonical_id: row.id, packet_key: row.packet_key ?? prior.packet_key ?? null, source_ref: row.source_ref, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, embedding_model: row.embedding_model, embedding_version: row.embedding_version, projection_revision: PROJECTION_REVISION, [`${VECTOR_NAME}_projection_revision`]: PROJECTION_REVISION, projection_revisions: projectionRevisions, graphify_embedding_projected_at: new Date().toISOString() } };
+        });
         await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=true`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ points }) });
         report.projected += points.length;
       }

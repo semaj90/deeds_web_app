@@ -1,18 +1,18 @@
 {
   "schemaVersion": "atlas.ast.replacement.parity.v1",
-  "generatedAt": "2026-08-14T15:14:03.061Z",
+  "generatedAt": "2026-08-24T01:01:45.300Z",
   "repoRevision": "ast-replacement-parity-v1",
   "filesChecked": 6,
   "currentOwner": "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
   "replacementOwner": "miniforge-nlp-sidecar /ast/chunk",
   "endpoint": "http://127.0.0.1:8095",
   "symbolsCurrent": 8,
-  "symbolsReplacement": 21,
+  "symbolsReplacement": 20,
   "requiredEdgeCounts": {
     "EXPORTS": 6,
-    "CALLS": 9,
-    "REFERENCES": 29,
-    "DEFINES": 12,
+    "CALLS": 7,
+    "REFERENCES": 28,
+    "DEFINES": 8,
     "IMPORTS": 4
   },
   "spanMatches": 0,
@@ -108,18 +108,17 @@
       },
       "replacement": {
         "names": [
-          "run",
-          "<anonymous>"
+          "run"
         ],
         "kinds": [
           "import",
           "export",
           "export",
-          "fragment",
+          "function",
           "function"
         ],
         "chunkCount": 5,
-        "edgeCount": 10,
+        "edgeCount": 9,
         "diagnostics": []
       },
       "missingRequiredSymbols": [],
@@ -141,8 +140,7 @@
       },
       "replacement": {
         "names": [
-          "outer",
-          "<anonymous>"
+          "outer"
         ],
         "kinds": [
           "export",
@@ -150,7 +148,7 @@
           "function"
         ],
         "chunkCount": 3,
-        "edgeCount": 10,
+        "edgeCount": 9,
         "diagnostics": []
       },
       "missingRequiredSymbols": [],
@@ -171,17 +169,14 @@
         "featureCount": 1
       },
       "replacement": {
-        "names": [
-          "<anonymous>",
-          "<anonymous>"
-        ],
+        "names": [],
         "kinds": [
           "import",
           "function",
           "function"
         ],
         "chunkCount": 3,
-        "edgeCount": 15,
+        "edgeCount": 10,
         "diagnostics": []
       },
       "missingRequiredSymbols": [],
@@ -199,13 +194,12 @@
       },
       "replacement": {
         "names": [],
-        "kinds": [
-          "fragment"
-        ],
-        "chunkCount": 1,
+        "kinds": [],
+        "chunkCount": 0,
         "edgeCount": 0,
         "diagnostics": [
-          "Tree-sitter ERROR at line 1, column 8: ERROR"
+          "Tree-sitter ERROR at line 1, column 8: ERROR",
+          "treesitter-chunker returned no structural chunks"
         ]
       },
       "missingRequiredSymbols": [],

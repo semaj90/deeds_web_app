@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
 import platform
 import sys
 import sysconfig
@@ -49,6 +50,8 @@ class RuntimeProbe:
     neo4j: PackageCapability
     torch_cuda_available: bool | None
     torch_cuda_device_count: int | None
+    host_memory_total_mb: int | None
+    host_memory_available_mb: int | None
     executor_hints: dict[str, str]
 
 
@@ -69,6 +72,51 @@ def probe_package(name: str) -> tuple[PackageCapability, Any | None]:
         return PackageCapability(True, str(version) if version is not None else None, None), module
     except Exception as exc:  # capability probe: preserve failure as evidence
         return PackageCapability(False, None, f"{type(exc).__name__}: {exc}"), None
+
+
+def host_memory_mb() -> tuple[int | None, int | None]:
+    """Return total/available host memory without adding a probe dependency."""
+    try:
+        import psutil  # type: ignore
+        memory = psutil.virtual_memory()
+        return int(memory.total / (1024 * 1024)), int(memory.available / (1024 * 1024))
+    except Exception:
+        pass
+
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            class MemoryStatus(ctypes.Structure):
+                _fields_ = [
+                    ("length", ctypes.c_ulong),
+                    ("memory_load", ctypes.c_ulong),
+                    ("total_phys", ctypes.c_ulonglong),
+                    ("avail_phys", ctypes.c_ulonglong),
+                    ("total_page", ctypes.c_ulonglong),
+                    ("avail_page", ctypes.c_ulonglong),
+                    ("total_virtual", ctypes.c_ulonglong),
+                    ("avail_virtual", ctypes.c_ulonglong),
+                    ("avail_extended", ctypes.c_ulonglong),
+                ]
+
+            status = MemoryStatus()
+            status.length = ctypes.sizeof(MemoryStatus)
+            if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status)):
+                return int(status.total_phys / (1024 * 1024)), int(status.avail_phys / (1024 * 1024))
+        except Exception:
+            return None, None
+
+    try:
+        page_size = int(os.sysconf("SC_PAGE_SIZE"))
+        total_pages = int(os.sysconf("SC_PHYS_PAGES"))
+        available_pages = int(os.sysconf("SC_AVPHYS_PAGES"))
+        return (
+            int(page_size * total_pages / (1024 * 1024)),
+            int(page_size * available_pages / (1024 * 1024)),
+        )
+    except Exception:
+        return None, None
 
 
 def main() -> int:
@@ -101,10 +149,13 @@ def main() -> int:
             cuda_count = None
 
     true_cpu_threads = free_thread_build and after is False
+    total_memory_mb, available_memory_mb = host_memory_mb()
+    recommended_workers = 1 if available_memory_mb is None or available_memory_mb < 4096 else 2
     executor_hints = {
         "qdrant_io": "ASYNCIO_OR_THREAD_POOL",
         "neo4j_io": "ASYNCIO_OR_THREAD_POOL",
         "networkx_cpu": "THREAD_POOL" if true_cpu_threads else "PROCESS_POOL",
+        "recommended_cpu_workers": str(recommended_workers),
         "pytorch_cuda": "ISOLATED_GPU_WORKER" if torch_cap.available and cuda_available else "UNAVAILABLE",
         "shared_cuda_context_across_python_threads": "DO_NOT_ASSUME_SAFE_OR_BENEFICIAL",
     }
@@ -125,6 +176,8 @@ def main() -> int:
         neo4j=neo4j_cap,
         torch_cuda_available=cuda_available,
         torch_cuda_device_count=cuda_count,
+        host_memory_total_mb=total_memory_mb,
+        host_memory_available_mb=available_memory_mb,
         executor_hints=executor_hints,
     )
     print(json.dumps(asdict(result), sort_keys=True, separators=(",", ":")))

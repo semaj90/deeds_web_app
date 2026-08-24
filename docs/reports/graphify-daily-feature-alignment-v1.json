@@ -1,0 +1,356 @@
+{
+  "schema": "atlas.graphify-daily-feature-alignment.v1",
+  "generatedAt": "2026-08-24T03:11:24.016Z",
+  "readOnly": true,
+  "scope": {
+    "table": "codebase_chunk_index",
+    "sinceHours": 24,
+    "limit": 16
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768"
+  },
+  "status": "PASS",
+  "rows": [
+    {
+      "id": "8e1dd85c-db3c-4a4f-a802-c1989ca06be9",
+      "qdrant_id": "93333c0f-656a-b7dc-bfc0-f54a16bee325",
+      "source_ref": "src/lib/services/voice-commands.ts",
+      "relative_path": "src/lib/services/voice-commands.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8eabb01f-da60-432a-9ec3-31ae07a95045",
+      "qdrant_id": "69cf54e8-d7dd-20cc-55e4-9a3c7b341d17",
+      "source_ref": "src/routes/api/health/obsidian/+server.ts",
+      "relative_path": "src/routes/api/health/obsidian/+server.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8ff3ba45-79ff-4dfd-a2df-512b7786f9fa",
+      "qdrant_id": "fdbe5635-6c15-65af-ac38-7e125922e6c9",
+      "source_ref": "src/routes/api/search/laws/+server.ts",
+      "relative_path": "src/routes/api/search/laws/+server.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "90b0205a-f059-4274-9de9-e9fff671a264",
+      "qdrant_id": "479ae772-631e-6443-1423-14ca9080a172",
+      "source_ref": "src/lib/utils/security.ts",
+      "relative_path": "src/lib/utils/security.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "919494f6-1d33-4af5-b579-f43e4fc6f5d1",
+      "qdrant_id": "e31d491e-6107-c30d-3265-e4acf1e6c96f",
+      "source_ref": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "relative_path": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "92555615-eafc-46c0-a35d-9e771a383adc",
+      "qdrant_id": "cdbae032-e99a-9b00-140e-f08703bf6e51",
+      "source_ref": "src/routes/api/citations/+server.ts",
+      "relative_path": "src/routes/api/citations/+server.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "92ad4a64-fb4f-4768-ae71-c543e331b9bc",
+      "qdrant_id": "98b2057b-d437-85bc-6a89-84496b917534",
+      "source_ref": "src/lib/server/ace/codeintel-datastore.ts",
+      "relative_path": "src/lib/server/ace/codeintel-datastore.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "92dd672b-3aad-45fb-9be2-43bb3632617c",
+      "qdrant_id": "97830ff6-a8d6-690a-ae7f-7a37eabef437",
+      "source_ref": "src/lib/stores/index.ts",
+      "relative_path": "src/lib/stores/index.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "87737546-81ea-4253-86c6-1594793859bf",
+      "qdrant_id": "2f957591-4836-f0a7-9ecd-a73fff3aac5f",
+      "source_ref": "src/lib/server/ace/codeintel-datastore.ts",
+      "relative_path": "src/lib/server/ace/codeintel-datastore.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "879ae2c4-70b7-4d02-88be-df14647d6014",
+      "qdrant_id": "9020400d-1083-025c-92fc-251aa39ee865",
+      "source_ref": "src/routes/api/cases/[id]/similar/+server.ts",
+      "relative_path": "src/routes/api/cases/[id]/similar/+server.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "89267199-d704-4408-a0a7-12b9f376a0c8",
+      "qdrant_id": "1703176200",
+      "source_ref": "src/lib/services/voice-commands.ts",
+      "relative_path": "src/lib/services/voice-commands.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8a83b91a-43b8-4512-a693-d8f28523342d",
+      "qdrant_id": "7ffd9621-5c4b-eda1-bdee-48b593edc686",
+      "source_ref": "src/lib/services/voice-commands.ts",
+      "relative_path": "src/lib/services/voice-commands.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8aa04d29-34d4-4305-a56d-337e73ab85b1",
+      "qdrant_id": "492392135",
+      "source_ref": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "relative_path": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8bfbcaf9-3f18-4d5e-9819-d8f98d78ae3c",
+      "qdrant_id": "760462791",
+      "source_ref": "src/lib/services/voice-commands.ts",
+      "relative_path": "src/lib/services/voice-commands.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8c1f2df7-cbcc-4a95-a1ca-10ef15adc509",
+      "qdrant_id": "f7245518-03fd-dec4-6a8f-7e29bfcce4e6",
+      "source_ref": "src/routes/api/cases/[id]/similar/+server.ts",
+      "relative_path": "src/routes/api/cases/[id]/similar/+server.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    },
+    {
+      "id": "8da186de-74ec-4f1f-8884-70b2c07a8f42",
+      "qdrant_id": "1609887714",
+      "source_ref": "src/lib/utils/security.ts",
+      "relative_path": "src/lib/utils/security.ts",
+      "semantic_768": true,
+      "bm25": true,
+      "ast": true,
+      "error_embedding": false,
+      "signature_embedding": true,
+      "pagerank": false,
+      "centroid": false,
+      "latent_64": false,
+      "som": true,
+      "kmeans": true,
+      "qdrant": true
+    }
+  ],
+  "coverage": {
+    "semantic_768": {
+      "count": 16,
+      "total": 16
+    },
+    "bm25": {
+      "count": 16,
+      "total": 16
+    },
+    "ast": {
+      "count": 16,
+      "total": 16
+    },
+    "error_embedding": {
+      "count": 0,
+      "total": 16
+    },
+    "signature_embedding": {
+      "count": 16,
+      "total": 16
+    },
+    "pagerank": {
+      "count": 0,
+      "total": 16
+    },
+    "centroid": {
+      "count": 0,
+      "total": 16
+    },
+    "latent_64": {
+      "count": 0,
+      "total": 16
+    },
+    "som": {
+      "count": 16,
+      "total": 16
+    },
+    "kmeans": {
+      "count": 16,
+      "total": 16
+    },
+    "qdrant": {
+      "count": 16,
+      "total": 16
+    },
+    "feature_pagerank": {
+      "table": "code_features",
+      "scoreColumn": "page_rank_score",
+      "total": 1477,
+      "scored": 1477
+    }
+  },
+  "featureAuthority": {
+    "table": "code_features",
+    "scoreColumn": "page_rank_score",
+    "total": 1477,
+    "scored": 1477
+  },
+  "valkey": {
+    "reachable": true,
+    "counts": {
+      "centroid:*": 66,
+      "som:*": 0,
+      "ace:*": 123,
+      "gpu:karpathy:*": 1
+    }
+  }
+}

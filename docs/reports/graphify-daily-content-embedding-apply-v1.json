@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.graphify-file-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T00:19:40.770Z",
+  "apply": true,
+  "scope": {
+    "table": "codebase_chunk_index",
+    "canonicalColumn": "content_embedding_768",
+    "sinceHours": 24,
+    "limit": 128,
+    "declaredType": "vector(768)"
+  },
+  "model": "embeddinggemma:latest",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "status": "PASS",
+  "selected": 128,
+  "embedded": 128,
+  "written": 128,
+  "skipped": 0,
+  "errors": [],
+  "sample": [
+    {
+      "id": "6e0b6088-951e-4083-b448-533132f44d39",
+      "relativePath": "src/lib/stores/knowledge-search.svelte.ts",
+      "sourceRef": "src/lib/stores/knowledge-search.svelte.ts",
+      "textHash": "3b1afd9cbdccc1a84f7d612aa8f19e07d4ef7259fa52bf5243d578affa62f58e"
+    },
+    {
+      "id": "6f25c168-264b-486e-90a6-e9e365415ebf",
+      "relativePath": "src/lib/webgpu/shader-cache-manager.ts",
+      "sourceRef": "src/lib/webgpu/shader-cache-manager.ts",
+      "textHash": "e2730125cfdb9f0e65f681000b43e4f8eb3db76194f696e22e9f6acb277394c6"
+    },
+    {
+      "id": "71cebfb8-1096-4e02-a9e9-475ce85b61ac",
+      "relativePath": "src/lib/webgpu/shader-cache-manager.ts",
+      "sourceRef": "src/lib/webgpu/shader-cache-manager.ts",
+      "textHash": "1408e50c79e91e38d1c720ac612bfd14343dfa28ceaa9e2605829ed844533105"
+    },
+    {
+      "id": "7209a663-f993-4262-8174-60375ca5c725",
+      "relativePath": "src/routes/api/codeintel/semantic-health/+server.ts",
+      "sourceRef": "src/routes/api/codeintel/semantic-health/+server.ts",
+      "textHash": "d8753e9cd55759ec83967a9df60c189cd1eb98e20ec9fd2a349369237f1a231d"
+    },
+    {
+      "id": "743ed7a4-e725-4dcb-a81f-82039c82cec0",
+      "relativePath": "src/lib/server/atlas/context-for-file.ts",
+      "sourceRef": "src/lib/server/atlas/context-for-file.ts",
+      "textHash": "4eef4370eb911875396f143274359480dd6f3314bc97b5d27f2a560404e80255"
+    }
+  ],
+  "elapsedMs": 11163
+}

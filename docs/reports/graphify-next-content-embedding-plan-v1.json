@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.graphify-file-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T01:10:31.827Z",
+  "apply": false,
+  "scope": {
+    "table": "codebase_chunk_index",
+    "canonicalColumn": "content_embedding_768",
+    "sinceHours": 24,
+    "limit": 128,
+    "declaredType": "vector(768)"
+  },
+  "model": "embeddinggemma:latest",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "status": "DRY_RUN",
+  "selected": 128,
+  "embedded": 0,
+  "written": 0,
+  "skipped": 0,
+  "errors": [],
+  "sample": [
+    {
+      "id": "2291c4e3-2a34-4c92-b7a3-9ec8eade2ddb",
+      "relativePath": "src/lib/utils/telemetry.ts",
+      "sourceRef": "src/lib/utils/telemetry.ts",
+      "textHash": "77758be2baab3ecc3cbc9c506834a7a4711c2de4c6c638f3c798ec3cf957960b"
+    },
+    {
+      "id": "23288a17-c5f3-43f1-a1c6-3e5022f2be15",
+      "relativePath": "src/lib/services/voice-commands.ts",
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "textHash": "944eab163079dfb013bcd42dc6515f7286bbdbd2afd12ced80646238c4a97524"
+    },
+    {
+      "id": "23a1c224-a1ff-428a-939e-fa37ecd003d2",
+      "relativePath": "src/routes/api/cases/[id]/similar/+server.ts",
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "textHash": "8be253ecfc0e3ceb0fd81265619495bfdfdbfabe6fa946fd4583ba10edebe468"
+    },
+    {
+      "id": "26e6a5a2-f0a8-4e89-9480-e51bfa7a7921",
+      "relativePath": "src/lib/server/knowledge-cache.ts",
+      "sourceRef": "src/lib/server/knowledge-cache.ts",
+      "textHash": "8188ef1563a6b3c273b5fb6bcfb035a4accf5894e62a46eaacd040cf067f7d7a"
+    },
+    {
+      "id": "276b69b7-cf9c-4955-9830-f1db8f8e6c7a",
+      "relativePath": "src/lib/server/chrrom/patterns.ts",
+      "sourceRef": "src/lib/server/chrrom/patterns.ts",
+      "textHash": "4af0b9981a1d1a093ef0b78e93e732d2c5a6e24c6b8edf59bf0328d517cdd90f"
+    }
+  ],
+  "elapsedMs": 124
+}

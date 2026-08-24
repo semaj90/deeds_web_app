@@ -20,7 +20,7 @@
 
 import { z } from 'zod';
 import { publicProcedure, router } from '../init.js';
-import { create8095AstProvider } from '$lib/server/atlas/indexing/graphify-structural-materializer.js';
+import { createAstChunkOperationRequestV1, executeAtlasOperationV1 } from '$lib/server/atlas/operations/atlas-operation-runtime-v1.js';
 
 const AstChunkInputSchema = z.object({
   sourceRef: z.string().min(1),
@@ -63,19 +63,18 @@ export const astSidecarRouter = router({
     .input(AstChunkInputSchema)
     .output(AstChunkOutputSchema)
     .query(async ({ input }) => {
-      const provider = create8095AstProvider();
-      const result = await provider.materialize({
+      const operation = await executeAtlasOperationV1(createAstChunkOperationRequestV1({
         sourceRef: input.sourceRef,
         sourceRevision: input.sourceRevision,
         language: input.language,
         source: input.source,
-      });
+      }, crypto.randomUUID()));
       return AstChunkOutputSchema.parse({
         provider: 'treesitter-chunker-8095',
-        status: result.status,
-        chunks: result.evidence?.chunks ?? [],
-        diagnostics: result.diagnostics,
-        errorTag: result.errorTag ?? null,
+        status: operation.payload?.status ?? 'FAILED',
+        chunks: operation.payload?.chunks ?? [],
+        diagnostics: operation.payload?.diagnostics ?? [operation.errorMessage].filter(Boolean),
+        errorTag: operation.payload?.errorTag ?? operation.errorCode ?? null,
       });
     }),
 });

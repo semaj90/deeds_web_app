@@ -45,10 +45,18 @@ const AUTOENCODER_HISTORY_STREAM = 'ace:autoencoder:history';
 const args = process.argv.slice(2);
 function parseArg(flag, fallback) {
   const eq  = args.find(a => a.startsWith(`${flag}=`));
-  if (eq) return Number(eq.slice(flag.length + 1));
+  if (eq) return parseNumericArg(flag, eq.slice(flag.length + 1), fallback);
   const idx = args.indexOf(flag);
-  if (idx >= 0 && args[idx + 1]) return Number(args[idx + 1]);
+  if (idx >= 0 && args[idx + 1]) return parseNumericArg(flag, args[idx + 1], fallback);
   return fallback;
+}
+
+function parseNumericArg(flag, value, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`${flag} must be a positive number; received ${value}`);
+  }
+  return parsed;
 }
 
 const FLAGS = {
@@ -300,7 +308,7 @@ function cosineLr(baseLr, epoch, total) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   log('=== ae:train:js — 768→256→64 encoder (tied-weight reconstruction) ===');
-  log(`[cfg] epochs=${FLAGS.epochs} batch=${FLAGS.batch} lr=${FLAGS.lr} l2=${FLAGS.l2} dryRun=${FLAGS.dryRun}`);
+  log(`[cfg] epochs=${FLAGS.epochs} batch=${FLAGS.batch} limit=${FLAGS.limit === Infinity ? 'unbounded' : FLAGS.limit} lr=${FLAGS.lr} l2=${FLAGS.l2} dryRun=${FLAGS.dryRun}`);
 
   const redis = makeRedis();
   try {
@@ -310,7 +318,7 @@ async function main() {
     if (meta?.trainedAt && !FLAGS.force) {
       log(`[redis] Existing weights found — trainedAt=${meta.trainedAt} bestLoss=${meta.bestLoss}`);
       log('  Use --force to overwrite.');
-      await redis.disconnect().catch(() => {});
+      await Promise.resolve(redis.disconnect()).catch(() => {});
       process.exit(0);
     }
   } catch (err) {
@@ -325,7 +333,7 @@ async function main() {
 
   if (FLAGS.dryRun) {
     log(`[dry-run] ${vectors.length} vectors ready — skipping training.`);
-    await redis.disconnect().catch(() => {});
+    await Promise.resolve(redis.disconnect()).catch(() => {});
     process.exit(0);
   }
 

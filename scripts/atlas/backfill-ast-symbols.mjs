@@ -9,17 +9,26 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
+const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
+
+const { Lang, parse } = await import(pathToFileURL(
+  path.join(REPO_ROOT, 'sveltekit-frontend/node_modules/@ast-grep/napi/index.js'),
+).href);
 
 const APPLY = process.argv.includes('--apply');
 const LIMIT = Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? '500');
 const BATCH_SIZE = Number(process.argv.find((arg) => arg.startsWith('--batch-size='))?.split('=')[1] ?? '100');
+const PROBE_PATH = process.argv.find((arg) => arg.startsWith('--probe='))?.slice('--probe='.length);
+let changedFeatureRows = 0;
+let changedCodebaseRows = 0;
 
 const env = loadRepoEnv(process.env);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(env) });
@@ -32,27 +41,118 @@ function unique(values) {
   return [...new Set((values ?? []).map((v) => String(v).trim()).filter(Boolean))];
 }
 
-function extractAstSymbolsFromText(text) {
+function toCodebaseAstSymbols(symbols) {
+  return symbols.map((symbol) => {
+    const separator = symbol.indexOf(':');
+    const prefix = separator >= 0 ? symbol.slice(0, separator) : 'symbol';
+    const name = separator >= 0 ? symbol.slice(separator + 1) : symbol;
+    const kind = {
+      fn: 'function',
+      class: 'class',
+      method: 'method',
+      var: 'variable',
+      interface: 'interface',
+      type: 'type',
+      enum: 'enum',
+      import: 'import',
+      export: 'export',
+    }[prefix] ?? prefix;
+    return { kind, name };
+  });
+}
+
+function languageForPath(filePath) {
+  const extension = path.extname(filePath).toLowerCase();
+  if (extension === '.ts') return Lang.TypeScript;
+  if (extension === '.tsx') return Lang.Tsx;
+  if (extension === '.js' || extension === '.jsx' || extension === '.mjs' || extension === '.cjs') return Lang.JavaScript;
+  return null;
+}
+
+function firstNamedChild(node, kinds) {
+  return node.children().find((child) => kinds.has(child.kind()));
+}
+
+function extractAstSymbolsFromText(text, filePath) {
+  const language = languageForPath(filePath);
+  if (!language) return { symbols: [], method: 'ast-grep-unsupported-language', language: null };
+
   const symbols = [];
-  const lines = String(text ?? '').split(/\r?\n/);
+  const root = parse(language, String(text ?? '')).root();
+  const declarationKinds = new Map([
+    ['function_declaration', ['fn', new Set(['identifier'])]],
+    ['generator_function_declaration', ['fn', new Set(['identifier'])]],
+    ['class_declaration', ['class', new Set(['type_identifier', 'identifier'])]],
+    ['method_definition', ['method', new Set(['property_identifier', 'private_property_identifier', 'identifier'])]],
+    ['variable_declarator', ['var', new Set(['identifier', 'destructuring_pattern'])]],
+    ['interface_declaration', ['interface', new Set(['type_identifier', 'identifier'])]],
+    ['type_alias_declaration', ['type', new Set(['type_identifier', 'identifier'])]],
+    ['enum_declaration', ['enum', new Set(['identifier', 'type_identifier'])]],
+  ]);
 
-  for (const line of lines) {
-    const fn = line.match(/\b(?:export\s+)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)/);
-    if (fn) symbols.push(`fn:${fn[1]}`);
-
-    const cls = line.match(/\b(?:export\s+)?class\s+([A-Za-z0-9_$]+)/);
-    if (cls) symbols.push(`class:${cls[1]}`);
-
-    const method = line.match(/^\s*([A-Za-z0-9_$]+)\s*\(/);
-    if (method && !['if', 'for', 'while', 'switch', 'catch', 'return'].includes(method[1])) {
-      symbols.push(`method:${method[1]}`);
+  function visit(node) {
+    const kind = node.kind();
+    const declaration = declarationKinds.get(kind);
+    if (declaration) {
+      const [prefix, nameKinds] = declaration;
+      const nameNode = firstNamedChild(node, nameKinds);
+      if (nameNode) symbols.push(`${prefix}:${nameNode.text()}`);
+    } else if (kind === 'import_statement') {
+      const source = node.children().find((child) => child.kind() === 'string');
+      if (source) symbols.push(`import:${source.text().replace(/^['"]|['"]$/g, '')}`);
+    } else if (kind === 'export_statement') {
+      const declarationNode = node.children().find((child) => declarationKinds.has(child.kind()));
+      if (declarationNode) {
+        const declaration = declarationKinds.get(declarationNode.kind());
+        const nameNode = firstNamedChild(declarationNode, declaration[1]);
+        if (nameNode) symbols.push(`export:${nameNode.text()}`);
+      }
     }
-
-    const imp = line.match(/\bimport\s+.*?\bfrom\s+['"]([^'"]+)['"]/);
-    if (imp) symbols.push(`import:${imp[1]}`);
+    for (const child of node.children()) visit(child);
   }
 
-  return unique(symbols).slice(0, 64);
+  visit(root);
+  return { symbols: unique(symbols).slice(0, 128), method: 'ast-grep-napi', language };
+}
+
+let rgFileIndex;
+function getRgFileIndex() {
+  if (rgFileIndex) return rgFileIndex;
+  rgFileIndex = new Map();
+  try {
+    const output = execFileSync('rg', [
+      '--files', '--hidden', '--no-ignore',
+      '-g', '!node_modules/**',
+      '-g', '!.git/**',
+      '-g', '!.cache/**',
+      '-g', '!sveltekit-frontend/.svelte-kit/**',
+      '-g', '!sveltekit-frontend/.vite/**',
+      '-g', '!sveltekit-frontend/.docker-build/**',
+    ], { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    for (const line of output.split(/\r?\n/)) {
+      const relative = line.trim();
+      if (!relative) continue;
+      const normalized = relative.replace(/\\/g, '/').replace(/^\.\//, '');
+      rgFileIndex.set(normalized.toLowerCase(), path.join(REPO_ROOT, relative));
+    }
+  } catch (error) {
+    console.warn(`[ast-symbols] rg file inventory unavailable: ${error.message}`);
+  }
+  return rgFileIndex;
+}
+
+function resolveViaRg(candidate) {
+  const normalized = candidate.replace(/\\/g, '/').replace(/^\.\//, '').toLowerCase();
+  const variants = [normalized, normalized.replace(/^sveltekit-frontend\//, '')];
+  const index = getRgFileIndex();
+  for (const variant of variants) {
+    const direct = index.get(variant) ?? index.get(`sveltekit-frontend/${variant}`);
+    if (direct) return direct;
+  }
+  const suffixMatches = [...index.entries()]
+    .filter(([relative]) => variants.some((variant) => relative.endsWith(`/${variant}`)))
+    .map(([, absolute]) => absolute);
+  return suffixMatches.length === 1 ? suffixMatches[0] : null;
 }
 
 async function resolveSourceText(row) {
@@ -65,15 +165,17 @@ async function resolveSourceText(row) {
   ].filter(Boolean).map((v) => normalizeSourceRef(v));
 
   for (const candidate of candidates) {
-    const abs = path.resolve(REPO_ROOT, candidate);
-    try {
-      const stat = await fs.stat(abs);
-      if (stat.isFile()) {
-        return { path: abs, text: await fs.readFile(abs, 'utf8') };
+    for (const base of [REPO_ROOT, FRONTEND_ROOT]) {
+      const abs = path.resolve(base, candidate);
+      try {
+        const stat = await fs.stat(abs);
+        if (stat.isFile()) return { path: abs, text: await fs.readFile(abs, 'utf8'), resolution: 'direct' };
+      } catch {
+        // continue
       }
-    } catch {
-      // continue
     }
+    const indexed = resolveViaRg(candidate);
+    if (indexed) return { path: indexed, text: await fs.readFile(indexed, 'utf8'), resolution: 'rg-files' };
   }
 
   return null;
@@ -96,6 +198,7 @@ async function main() {
   try {
     const packetCols = await getColumns(client, 'atlas_packets');
     const featureCols = await getColumns(client, 'atlas_packet_features');
+    const codebaseCols = await getColumns(client, 'codebase_chunk_index');
     const pathCandidates = ['file_path', 'source_path', 'canonical_source_ref', 'source_ref']
       .filter((column) => packetCols.has(column));
 
@@ -129,7 +232,8 @@ async function main() {
     for (const row of rows) {
       const resolved = await resolveSourceText(row);
       const sourceText = resolved?.text || row.summary || '';
-      const astSymbols = extractAstSymbolsFromText(sourceText);
+      const extracted = extractAstSymbolsFromText(sourceText, resolved?.path ?? row.source_ref);
+      const astSymbols = extracted.symbols;
       if (astSymbols.length === 0) continue;
 
       planned.push({
@@ -137,6 +241,9 @@ async function main() {
         ast_symbols: astSymbols,
         source_ref: row.source_ref,
         resolved_path: resolved?.path ?? null,
+        resolution: resolved?.resolution ?? null,
+        extraction_method: extracted.method,
+        extraction_language: extracted.language,
       });
     }
 
@@ -157,7 +264,7 @@ async function main() {
       await client.query('BEGIN');
       try {
         for (const item of batch) {
-          await client.query(
+          const featureUpdate = await client.query(
             `
             INSERT INTO atlas_packet_features (packet_key, ast_symbols, updated_at)
             VALUES ($1, $2::text[], NOW())
@@ -165,9 +272,25 @@ async function main() {
             DO UPDATE SET
               ast_symbols = EXCLUDED.ast_symbols,
               updated_at = NOW()
+            WHERE atlas_packet_features.ast_symbols IS DISTINCT FROM EXCLUDED.ast_symbols
             `,
             [item.packet_key, item.ast_symbols],
           );
+          changedFeatureRows += featureUpdate.rowCount;
+
+          if (codebaseCols.has('ast_symbols') && codebaseCols.has('source_ref')) {
+            const codebaseSymbolJson = JSON.stringify(toCodebaseAstSymbols(item.ast_symbols));
+            const codebaseUpdate = await client.query(
+              `
+              UPDATE codebase_chunk_index
+              SET ast_symbols = $1::jsonb${codebaseCols.has('updated_at') ? ', updated_at = NOW()' : ''}
+              WHERE (source_ref = $2 OR relative_path = $2)
+                AND ast_symbols IS DISTINCT FROM $1::jsonb
+              `,
+              [codebaseSymbolJson, item.source_ref],
+            );
+            changedCodebaseRows += codebaseUpdate.rowCount;
+          }
         }
         await client.query('COMMIT');
       } catch (err) {
@@ -192,11 +315,22 @@ async function main() {
       coverage_percent: verify.rows[0].total > 0
         ? Number(((verify.rows[0].populated / verify.rows[0].total) * 100).toFixed(2))
         : 0,
+      changed_feature_rows: changedFeatureRows,
+      changed_codebase_rows: changedCodebaseRows,
     }, null, 2));
   } finally {
     client.release();
     await pool.end();
   }
+}
+
+if (PROBE_PATH) {
+  const absolutePath = path.resolve(REPO_ROOT, PROBE_PATH);
+  const probeText = await fs.readFile(absolutePath, 'utf8');
+  const probe = extractAstSymbolsFromText(probeText, absolutePath);
+  console.log(JSON.stringify({ path: absolutePath, ...probe }, null, 2));
+  await pool.end();
+  process.exit(0);
 }
 
 main().catch((err) => {

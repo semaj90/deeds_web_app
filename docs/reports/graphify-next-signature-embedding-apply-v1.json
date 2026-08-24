@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.graphify-rff-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T01:10:37.585Z",
+  "apply": true,
+  "signatureOnly": true,
+  "model": "embeddinggemma:latest",
+  "scope": {
+    "sinceHours": 24,
+    "limit": 128,
+    "batchSize": 8
+  },
+  "status": "PASS",
+  "selected": 128,
+  "errorEmbedded": 0,
+  "signatureEmbedded": 128,
+  "written": 128,
+  "errors": [],
+  "schemaColumns": {
+    "error_embedding": "vector(384)",
+    "signature_embedding": "halfvec(768)"
+  },
+  "sample": [
+    {
+      "id": "2291c4e3-2a34-4c92-b7a3-9ec8eade2ddb",
+      "sourceRef": "src/lib/utils/telemetry.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "23288a17-c5f3-43f1-a1c6-3e5022f2be15",
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "23a1c224-a1ff-428a-939e-fa37ecd003d2",
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "26e6a5a2-f0a8-4e89-9480-e51bfa7a7921",
+      "sourceRef": "src/lib/server/knowledge-cache.ts",
+      "missingError": true,
+      "missingSignature": true
+    },
+    {
+      "id": "276b69b7-cf9c-4955-9830-f1db8f8e6c7a",
+      "sourceRef": "src/lib/server/chrrom/patterns.ts",
+      "missingError": true,
+      "missingSignature": true
+    }
+  ]
+}

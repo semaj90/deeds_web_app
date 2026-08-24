@@ -21,10 +21,14 @@ const WSL_SCRIPT_PATH = `/mnt/c/Users/james/Videos/deeds-web-app/scripts/gpu/pha
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const PHASE4_CUVS_N_LISTS = process.env.PHASE4_CUVS_N_LISTS || '';
 
 function runWsl(command, inherit = false) {
   const exportedDbUrl = DATABASE_URL.replace(/'/g, `'\\''`);
-  return spawnSync('wsl', ['bash', '-lc', `${WSL_CONDA_INIT} && export DATABASE_URL='${exportedDbUrl}' && ${command}`], {
+  const exportedNLists = PHASE4_CUVS_N_LISTS
+    ? ` && export PHASE4_CUVS_N_LISTS='${PHASE4_CUVS_N_LISTS.replace(/'/g, `'\\''`)}'`
+    : '';
+  return spawnSync('wsl', ['bash', '-lc', `${WSL_CONDA_INIT} && export DATABASE_URL='${exportedDbUrl}'${exportedNLists} && ${command}`], {
     encoding: 'utf-8',
     stdio: inherit ? 'inherit' : 'pipe',
     env: {

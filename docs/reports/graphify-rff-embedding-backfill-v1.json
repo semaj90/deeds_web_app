@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.graphify-rff-embedding-backfill.v1",
+  "generatedAt": "2026-08-24T05:38:19.432Z",
+  "apply": false,
+  "signatureOnly": false,
+  "model": "embeddinggemma:latest",
+  "scope": {
+    "sinceHours": 24,
+    "limit": 64,
+    "batchSize": 8
+  },
+  "status": "BLOCKED_DIMENSION_CONTRACT",
+  "selected": 0,
+  "errorEmbedded": 0,
+  "signatureEmbedded": 0,
+  "written": 0,
+  "errors": [
+    "RFF columns are not 768d; no writes attempted. Existing RFF columns are legacy compatibility lanes.",
+    "RFF columns are not 768d; no writes attempted. Existing RFF columns are legacy compatibility lanes."
+  ],
+  "schemaColumns": {
+    "error_embedding": "vector(384)",
+    "signature_embedding": "halfvec(768)"
+  }
+}

@@ -21,7 +21,16 @@ export type { HttpClientConfig, HttpError } from './http/client.js';
 
 // gRPC client (internal)
 export { GrpcRetrievalClient, createGrpcClient } from './grpc/client.js';
-export type { GrpcClientConfig } from './grpc/client.js';
+export type {
+  GrpcClientConfig,
+  GrpcCodebaseChunk,
+  GrpcCodebaseSearchRequest,
+  GrpcCodebaseSearchResponse,
+  GrpcEvidenceSearchRequest,
+  GrpcEvidenceSearchResponse,
+  GrpcHealthDetails,
+  RetrievalGrpcTransport,
+} from './grpc/client.js';
 
 // MCP client (tool integration)
 export { McpClient, createMcpClient } from './mcp/client.js';

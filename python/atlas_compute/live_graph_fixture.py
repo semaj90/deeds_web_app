@@ -278,9 +278,11 @@ def run_live_graph_fixture(raw_fixture: dict[str, Any]) -> dict[str, Any]:
 
     edge_frame = cudf.DataFrame(
         {
-            "src": [int(edge["src"]) for edge in edges],
-            "dst": [int(edge["dst"]) for edge in edges],
-            "weight": [float(edge.get("weight", 1.0)) for edge in edges],
+            # cuGraph spectral clustering currently requires int32 vertex
+            # columns; keep the ordinal boundary explicit in the fixture.
+            "src": cudf.Series([int(edge["src"]) for edge in edges], dtype="int32"),
+            "dst": cudf.Series([int(edge["dst"]) for edge in edges], dtype="int32"),
+            "weight": cudf.Series([float(edge.get("weight", 1.0)) for edge in edges], dtype="float32"),
         }
     )
     graph = cugraph.Graph(directed=False)

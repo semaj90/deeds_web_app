@@ -512,16 +512,16 @@ export async function executeGoRetrievalSearch(
           queryEmbedding = embedData.embedding;
           console.log(`[go-retrieval-facade] embedded query: ${queryEmbedding?.length || 0}-dim vector`);
         } else {
-          console.warn(`[go-retrieval-facade] embed failed (status ${embedResponse.status}), using placeholder`);
-          queryEmbedding = new Array(768).fill(0.1); // Fallback placeholder
+          console.warn(`[go-retrieval-facade] embed failed (status ${embedResponse.status}), using lexical fallback`);
+
         }
       } catch (err) {
         console.warn('[go-retrieval-facade] embed error:', err);
-        queryEmbedding = new Array(768).fill(0.1); // Fallback placeholder
+
       }
 
       if (!queryEmbedding || queryEmbedding.length === 0) {
-        queryEmbedding = new Array(768).fill(0.1); // Final fallback
+        return executeGoRetrievalSearch({ ...request, useMultiVector: false, use_multi_vector: false });
       }
 
       console.log('[go-retrieval-facade] routing to multi-vector RRF');

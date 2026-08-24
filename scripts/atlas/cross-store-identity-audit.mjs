@@ -128,6 +128,12 @@ async function countQdrantPoints() {
     code_points: 0,
     with_packet_key: 0,
     with_source_ref: 0,
+    with_canonical_id: 0,
+    with_projection_revision: 0,
+    with_content_projection_revision: 0,
+    with_signature_projection_revision: 0,
+    active_content_projection: 0,
+    active_signature_projection: 0,
     content_hash_present: 0,
     sampled_hashes: [],
     error: null,
@@ -201,6 +207,33 @@ async function countQdrantPoints() {
       result.with_source_ref = result.total_points;
     }
     log(`  Qdrant points with source_ref: ${result.with_source_ref}`);
+
+    async function countPayload(key, filter) {
+      const response = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/count`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exact: true, filter: filter ?? { must: [{ is_empty: { key } }] } }),
+      });
+      if (!response.ok) return null;
+      const body = await response.json();
+      return body.result?.count ?? 0;
+    }
+
+    const missingCanonicalId = await countPayload('canonical_id');
+    const missingProjectionRevision = await countPayload('projection_revision');
+    if (missingCanonicalId !== null) result.with_canonical_id = result.total_points - missingCanonicalId;
+    if (missingProjectionRevision !== null) result.with_projection_revision = result.total_points - missingProjectionRevision;
+    result.active_content_projection = await countPayload('projection_revision', {
+      must: [{ key: 'content_projection_revision', match: { value: 'graphify-content-768-v1' } }],
+    }) ?? 0;
+    result.active_signature_projection = await countPayload('projection_revision', {
+      must: [{ key: 'signature_projection_revision', match: { value: 'graphify-signature-768-v1' } }],
+    }) ?? 0;
+    result.with_content_projection_revision = result.active_content_projection;
+    result.with_signature_projection_revision = result.active_signature_projection;
+    log(`  Qdrant canonical_id coverage: ${result.with_canonical_id}/${result.total_points}`);
+    log(`  Qdrant projection_revision coverage: ${result.with_projection_revision}/${result.total_points}`);
+    log(`  Active content/signature projections: ${result.active_content_projection}/${result.active_signature_projection}`);
 
     // Sample points to check content_hash
     const sampleRes = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {

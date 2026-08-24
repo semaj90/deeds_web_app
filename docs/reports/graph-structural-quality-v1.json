@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.graph-structural-quality.v1",
+  "generatedAt": "2026-08-23T22:13:00.606Z",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "graphRevision": null,
+  "projectionRevision": "codeGraph",
+  "nodeCount": 69009,
+  "relationshipCount": 3452,
+  "weaklyConnectedComponentCount": 66754,
+  "isolatedNodeCount": 66392,
+  "largestComponentNodeCount": 502,
+  "averageDegree": 0.1000449216768832,
+  "communityCount": 66461,
+  "singletonCommunityCount": 65774,
+  "modularity": null,
+  "allowedRelationshipTypes": [
+    "CALLS",
+    "REFERENCES",
+    "IMPORTS",
+    "EXPORTS",
+    "EXTENDS",
+    "IMPLEMENTS",
+    "TESTS",
+    "TYPE_OF",
+    "DEFINES",
+    "DEPENDS_ON"
+  ],
+  "communityPromotionEligible": false,
+  "reasonCodes": [
+    "AVERAGE_DEGREE_TOO_LOW",
+    "ISOLATED_NODE_RATIO_HIGH",
+    "MULTIPLE_WEAK_COMPONENTS",
+    "COMMUNITY_SINGLETON_RATIO_HIGH",
+    "COMMUNITY_COUNT_NEAR_NODE_COUNT"
+  ],
+  "metricErrors": []
+}

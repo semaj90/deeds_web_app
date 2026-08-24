@@ -13,6 +13,7 @@
  */
 
 import postgres from 'postgres';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const args = process.argv.slice(2);
 const limit = parseInt(args.find(arg => arg.startsWith('--limit'))?.split('=')[1] || '5000', 10);
@@ -20,13 +21,8 @@ const offset = parseInt(args.find(arg => arg.startsWith('--offset'))?.split('=')
 const dryRun = args.includes('--dry-run');
 const verbose = args.includes('--verbose');
 
-const sql = postgres({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-  database: process.env.POSTGRES_DB || 'legal_ai_db',
-  username: process.env.POSTGRES_USER || 'legal_admin',
-  password: process.env.POSTGRES_PASSWORD || '',
-});
+const env = loadRepoEnv(process.env);
+const sql = postgres(resolveDatabaseUrl(env));
 
 async function backfillTopologyAuthority() {
   console.log(`\n=== Atlas Topology Authority Backfill ===`);
@@ -47,7 +43,7 @@ async function backfillTopologyAuthority() {
       SELECT
         packet_key,
         source_ref,
-        COALESCE(community_id, 'unclassified') as community_id
+        community_id
       FROM atlas_packets
       WHERE packet_key IS NOT NULL
       ORDER BY created_at ASC
@@ -69,7 +65,7 @@ async function backfillTopologyAuthority() {
       packet_key: p.packet_key,
       source_ref: p.source_ref,
       // Heuristic authority: 0.9 if in a community, 0.5 if unclassified
-      authority_score: p.community_id === 'unclassified' ? 0.5 : 0.9,
+      authority_score: p.community_id == null ? 0.5 : 0.9,
       updated_at: new Date()
     }));
 

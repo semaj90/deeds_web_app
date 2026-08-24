@@ -2,11 +2,11 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-08-23T21:19:05.611Z",
+  "generatedAt": "2026-08-24T03:11:18.706Z",
   "limit": 10,
-  "status": "BM25_CONTROL_PLANE_MIGRATION_REQUIRED",
+  "status": "BM25_INDEX_PLAN_READY",
   "candidates": [],
   "blockers": [
-    "graphify_bm25_index_candidates_view_missing"
+    "no_completed_graphify_candidates"
   ]
 }

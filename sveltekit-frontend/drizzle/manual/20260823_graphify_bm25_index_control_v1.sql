@@ -1,4 +1,5 @@
--- Parent Atlas Graphify BM25 index control plane v1.
+-- Parent Atlas Graphify PostgreSQL FTS lexical index control plane v1.
+-- Historical filename and compatibility command retain the BM25 label.
 --
 -- Manual / intentionally unapplied migration.
 -- The document store remains codebase_chunk_index.search_vector with its GIN
@@ -66,7 +67,7 @@ CREATE INDEX IF NOT EXISTS graphify_bm25_index_runs_graphify_run_idx
   ON public.graphify_bm25_index_runs (graphify_run_id, requested_at DESC);
 
 COMMENT ON TABLE public.graphify_bm25_index_runs IS
-  'Operational BM25 indexing receipts. Canonical documents remain in codebase_chunk_index.';
+  'Operational PostgreSQL tsvector lexical indexing receipts. Canonical documents remain in codebase_chunk_index.';
 COMMENT ON COLUMN public.graphify_bm25_index_runs.index_run_id IS
   'Caller-generated ULID for sortable indexing-attempt correlation.';
 COMMENT ON COLUMN public.graphify_bm25_index_runs.workflow_id IS

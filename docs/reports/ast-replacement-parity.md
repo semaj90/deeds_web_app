@@ -5,7 +5,7 @@
 - replacement owner: miniforge-nlp-sidecar /ast/chunk
 - files checked: 6
 - current symbols/features: 8
-- replacement chunks: 21
+- replacement chunks: 20
 - missing required symbols: 0
 - parse failures isolated: 1
 

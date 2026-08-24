@@ -2281,6 +2281,55 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(resp)
 }
 
+// httpSearchBM25 exposes the canonical PostgreSQL sparse lane separately from
+// dense Qdrant retrieval. Fusion remains in the TypeScript retrieval runtime.
+func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "POST only"})
+		return
+	}
+	var body struct {
+		Query string `json:"query"`
+		Limit int    `json:"limit"`
+	}
+	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil || strings.TrimSpace(body.Query) == "" {
+		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "query is required"})
+		return
+	}
+	if body.Limit <= 0 || body.Limit > 100 {
+		body.Limit = 20
+	}
+	started := time.Now()
+	rows, err := s.pool.Query(r.Context(), `
+		SELECT id::text AS id,
+		       COALESCE(chunk_id, relative_path) AS source_ref,
+		       relative_path AS file_path,
+		       COALESCE(summary, '') AS summary,
+		       ts_rank_cd(search_vector, websearch_to_tsquery('english', $1), 32)::float4 AS score,
+		       ts_headline('english', COALESCE(content, ''), websearch_to_tsquery('english', $1),
+		         'MaxFragments=2,MaxWords=30,MinWords=10') AS snippet
+		FROM codebase_chunk_index
+		WHERE search_vector @@ websearch_to_tsquery('english', $1)
+		ORDER BY score DESC, indexed_at DESC NULLS LAST
+		LIMIT $2`, body.Query, body.Limit)
+	if err != nil {
+		json.NewEncoder(w).Encode(map[string]any{"results": []any{}, "error": "bm25 unavailable", "detail": err.Error()})
+		return
+	}
+	defer rows.Close()
+	results := make([]map[string]any, 0, body.Limit)
+	for rows.Next() {
+		var id, sourceRef, filePath, summary, snippet string
+		var score float32
+		if err := rows.Scan(&id, &sourceRef, &filePath, &summary, &score, &snippet); err != nil {
+			continue
+		}
+		results = append(results, map[string]any{"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet, "score": score})
+	}
+	json.NewEncoder(w).Encode(map[string]any{"results": results, "lane": "bm25", "read_only": true, "total_ms": time.Since(started).Milliseconds(), "capability": map[string]any{"schema": "atlas.indexed-rpc-capability.v1", "capabilityId": "go-retrieval:bm25:v1", "operation": "BM25_SEARCH", "executor": "GO_RETRIEVAL", "proofState": "PROVEN", "canonicalAuthority": false}})
+}
+
 func (s *retrievalServer) httpStats(w http.ResponseWriter, r *http.Request) {
 	total := atomic.LoadInt64(&s.totalRequests)
 	hits := atomic.LoadInt64(&s.cacheHits)
@@ -2393,6 +2442,7 @@ func main() {
 	mux.HandleFunc("/health", srv.httpHealth)
 	mux.HandleFunc("/search/evidence", srv.httpSearchEvidence)
 	mux.HandleFunc("/search/codebase", srv.httpSearchCodebase)
+	mux.HandleFunc("/search/bm25", srv.httpSearchBM25)
 	mux.HandleFunc("/stats", srv.httpStats)
 
 	httpSrv := &http.Server{
