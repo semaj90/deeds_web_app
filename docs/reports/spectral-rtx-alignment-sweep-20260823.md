@@ -863,7 +863,55 @@ closer to 6-7 is a real, independently-corroborated factor in why spectral
 clustering behaves unstably here, not solely a CPU/GPU numerical-solver
 artifact.
 
-Not yet done: Nsight Systems/Compute evidence (LVG-10/11), testing whether
-a candidate sample selected for cleaner eigenvalue separation improves
-parity, re-running Leiden/spectral at `K=6` or `K=7` (matching what Louvain
-and Leiden naturally find) for a fully apples-to-apples comparison.
+### Full K sweep (3, 6, 7, 8) — the two operators have genuinely different profiles
+
+Ran the same diagnostic at `K=6` and `K=7` (matching Louvain's/Leiden's
+natural counts) on the connected fixture, alongside the existing `K=3` and
+`K=8` results:
+
+| K | normalized_laplacian ARI (moved) | modularity ARI (moved) |
+|---|---|---|
+| 3 | 0.8740 (20) | 0.3719 (115) |
+| 6 | **0.8784** (54) | 0.2937 (259) |
+| 7 | 0.7854 (89) | 0.2931 (272) |
+| 8 | 0.6615 (132) | 0.3082 (237) |
+
+**These two operators behave completely differently under this sweep, and
+that difference is now well-evidenced, not speculative:**
+
+- `normalized_laplacian` (the operator underlying `LVG-5`, balanced-cut-family
+  clustering): parity is genuinely K-sensitive and peaks near the graph's
+  natural community structure — best at `K=6` (Leiden's own natural count),
+  nearly as good at `K=3` (the eigengap-supported coarse split), and
+  degrades steadily as `K` increases past that (`0.88 -> 0.79 -> 0.66` for
+  K=6/7/8). This is real, reproducible support for the K-mismatch
+  hypothesis, specific to this operator.
+- `modularity` (the operator underlying `LVG-6`, and the one
+  `cugraph.spectralModularityMaximizationClustering` actually implements):
+  parity stays stubbornly poor and **flat** across the entire sweep
+  (`0.37, 0.29, 0.29, 0.31` — no monotonic trend, not even a local optimum
+  near any tested K). The K-mismatch hypothesis does not explain this
+  operator's behavior at all. Its divergence from cuGraph is a separate,
+  still-unexplained property — not resolved by any of the interventions
+  tried in this addendum (tolerance sweep, eigenvector-count sweep,
+  duplicate-edge audit, disconnection fix, K sweep).
+
+**Practical implication for the promotion gate, now precise rather than
+general**: `LVG-5` (balanced-cut/Laplacian family) has a credible, evidenced
+path toward `0.99` — pick `K` from the graph's actual structure (e.g. via
+the eigengap probe or by cross-checking against Louvain/Leiden's natural
+count) rather than a frozen value, and the gap may close substantially,
+though even the best result here (`0.88` at K=6) is still short of `0.99`.
+`LVG-6` (modularity maximization) has no such path identified yet — its
+gap appears to be a genuine, K-independent property of how the CPU
+reference and cuGraph's internal implementation diverge, and needs
+different investigation (likely: understanding what
+`cugraph.spectralModularityMaximizationClustering`'s C++/CUDA
+implementation actually does differently from the CPU numpy reference,
+which is out of scope for Python-level diagnostics).
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), investigating
+the modularity operator's K-independent divergence (would need
+implementation-level, not diagnostic-script-level, investigation), testing
+whether a candidate sample selected for cleaner eigenvalue separation
+improves the balanced-cut/Laplacian operator's parity further.

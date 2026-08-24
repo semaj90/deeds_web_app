@@ -80,8 +80,8 @@ LVG-1 semantic_512 exact fixture builder                    EXECUTED_UNPROVEN (r
 LVG-2 canonical N-ary relationship compute projection      DESCOPED (tables don't exist; --include-canonical-relationships flag added, off by default, auditable via fixture fields)
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
-LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.66 -- disconnection hypothesis disproven)
-LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.31 -- disconnection hypothesis disproven)
+LVG-5 spectral balanced-cut (normalized_laplacian operator)  EXECUTED_UNPROVEN (parity BLOCKED but K-sensitive: peaks 0.88 at K=6, credible path to close further exists)
+LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, flat 0.29-0.37 across K=3/6/7/8 -- no K-mismatch explanation, genuinely unresolved)
 LVG-7 Leiden/Louvain comparison                              EXECUTED_UNPROVEN (both healthy on the connected fixture: Leiden 6 clusters, Louvain 7; degeneracy found earlier was specific to the disconnected fixture, since fixed)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
@@ -280,11 +280,26 @@ agree moderately with each other and both disagree substantially with the
 spectral instability. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-Not yet done: Nsight Systems/Compute evidence (LVG-10/11), re-running
-spectral/Leiden at `K=6` or `K=7` (matching Louvain/Leiden's natural
-counts) for an apples-to-apples comparison, testing whether upstream
-candidate selection tuned for cleaner eigenvalue separation improves
-parity.
+**Full K sweep run (K=3, 6, 7, 8): the two spectral operators have
+genuinely different, now well-evidenced profiles, not one shared problem.**
+`normalized_laplacian` (LVG-5): ARI is K-sensitive and peaks at `K=6`
+(`0.8784`, Leiden's own natural count), degrading steadily above that
+(`0.79` at K=7, `0.66` at K=8) — real support for closing this gap by
+picking K from actual structure rather than a frozen value, though even
+the best result here is still short of `0.99`. `modularity` (LVG-6): ARI
+stays flat and poor across the entire sweep (`0.37, 0.29, 0.29, 0.31`,
+K=3/6/7/8) — no K-mismatch explanation applies here at all; this operator's
+gap is a separate, still-unexplained property of how the CPU reference and
+`cugraph.spectralModularityMaximizationClustering`'s actual implementation
+diverge, not resolved by anything tried in this file (tolerance sweep,
+eigenvector-count sweep, disconnection fix, or K sweep). Full table in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), investigating
+the modularity operator's K-independent divergence (needs
+implementation-level comparison, not more diagnostic-script sweeps),
+testing whether upstream candidate selection tuned for cleaner eigenvalue
+separation improves the Laplacian operator's parity further.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
