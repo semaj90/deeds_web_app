@@ -3424,3 +3424,50 @@ canonical-file decision; (6) the operator decision on tensor-residency's product
 whether to add a real `NAMESPACE` symbol kind shared by both providers to close the last 3 files,
 or accept `SEMANTIC_KIND_UNKNOWN_BOTH` as permanently outside the parity contract's scope; (8) the
 two remaining CANONICAL_OWNER decisions from the memory-architecture audit pass.
+
+### Session handoff — 2026-08-23 (concurrent work reviewed and verified — aligned)
+
+User shared a transcript of extensive concurrent work (embedding-ranking diagnostic, TurboVec
+alignment fix, canonical `content_embedding_768` backfill + Qdrant projection, and a detailed
+BM25-vs-Postgres-FTS naming audit). Verified the load-bearing claims live rather than trusting the
+transcript at face value:
+
+- **Confirmed real**: `pg_search` extension is NOT installed (`SELECT extname FROM pg_extension`
+  → only `pg_trgm`, `vector`). This validates the transcript's core critique — the index
+  `idx_codebase_chunk_bm25_search` (GIN on `search_vector`, a `tsvector` column) is native
+  PostgreSQL full-text search, not true BM25, despite the naming throughout the codebase
+  (`0019_bm25_search_vector.sql`, `graphify_bm25_index_control_v1`). The transcript's proposed
+  `VERIFY_LIVE_OWNER` classification (`BM25_AST_WIRED` only if `pg_search` present AND actually
+  used vs. `POSTGRES_FTS_AST_WIRED` as current reality) is correct and worth adopting.
+- **Confirmed real**: TurboVec's live `/health` reports `"collection": "codebase_chunks_768"` —
+  this resolves the `codebase_chunks_768` vs `_768_v2` split flagged as open earlier this session
+  (see the memory-architecture-freeze proposal's comparison table). The concurrent work picked
+  `_768` (older generation, 105,762 pts, richer payload) as the operational TurboVec default. Not
+  a full resolution of the split (94 vs 40 file references still exist across the codebase) but a
+  real, live, working decision for at least the TurboVec lane.
+- **Row counts have moved since the transcript's own snapshot**: `content_embedding_768` is now
+  192 populated rows (transcript reported 64) — consistent with ongoing background Graphify daily
+  activity, not an error.
+- **AST symbol coverage figure needs a better query** — my own quick check against
+  `atlas_packet_features.ast_symbols IS NOT NULL` returned 61,475, which exceeds
+  `codebase_chunk_index`'s total row count (52,417), meaning that table isn't 1:1 with chunks and
+  isn't a fair comparison to the transcript's "10,062/52,417 ≈ 19%" figure. Not chased further
+  this pass — flagged so nobody assumes either number without re-deriving the right join.
+
+**Not acted on this pass** (the transcript's own proposed next steps, left for the operator/next
+session to actually execute, not implemented here): the 1,000-row AST backfill with the
+`AST_BF_01`-`AST_BF_10` idempotency-proof receipt schema the transcript proposes, the
+`ts_debug`/tokenization diagnostic probe, the `pg_stat_user_tables` dead-tuple telemetry check, and
+renaming `graphify_bm25_index_runs` → `graphify_lexical_index_runs` with an `index_kind` field
+distinguishing `postgres_tsvector_english`/`postgres_tsvector_simple`/`pg_search_bm25_v1`. All are
+well-reasoned and consistent with this repo's own governance conventions — genuinely good next
+steps, just not executed in this turn.
+
+**Next-session priority, updated**: (1) run the receipt-driven 1,000-row AST backfill per the
+transcript's `AST_BF_01`-`AST_BF_10` proof schema, if this is the direction to continue in; (2)
+rename the BM25-labeled artifacts to reflect the verified `POSTGRES_FTS_AST` reality (docs/schema
+comments, not a table rename); (3) bounded XGBoost GPU proof; (4) resolve the remaining
+`codebase_chunks_768`/`_768_v2` file-reference split beyond just TurboVec's default; (5) ACE crash
+instrumentation; (6) Graphify FANOUT sequencing; (7) docker-compose canonical-file decision; (8)
+the tensor-residency production-entry-point operator decision (memory-architecture-freeze tasks.md
+2.14); (9) the remaining CANONICAL_OWNER decisions from the memory-architecture audit pass.
