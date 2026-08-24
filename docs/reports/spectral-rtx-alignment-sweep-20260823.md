@@ -589,7 +589,47 @@ built against the parquet fixture schema, not this JSON schema) — re-testing
 the actual 0.99 promotion gate against this connected fixture is the last
 remaining step to fully close this addendum, not yet done.
 
-Not yet done: adapting the ARI parity check to this fixture's JSON schema (or
-converting to the parquet schema the existing diagnostic scripts expect) and
-re-running it against the 0.99 gate, Louvain comparison, Nsight
-Systems/Compute evidence (LVG-10/11).
+### ARI parity re-tested on the connected fixture — the disconnection hypothesis is disproven
+
+Converted the connected fixture to the parquet schema
+`spectral_diagnostic_receipt_v2.py` expects and re-ran it with the same
+frozen `K=8`, seed `684453`, and 4-tolerance sweep as every earlier run in
+this addendum. Receipt: `docs/reports/spectral-diagnostic-receipt-v3-connected.json`.
+
+**Result: parity got worse, not better.**
+
+| | Broken/disconnected fixture (this addendum, earlier) | Connected, correctly-built fixture |
+|---|---|---|
+| normalized_laplacian ARI | 0.9533 | **0.6615** |
+| modularity ARI | 0.9535 | **0.3082** |
+| k-means census ARI range | 0.20 - 0.9553 (init-dependent) | 0.29 - 0.35 (flat, init-independent) |
+| Promotion gate | `BLOCKED` | `BLOCKED` (further from 0.99 than before) |
+
+This directly falsifies the hypothesis recorded earlier in this addendum
+("very plausibly why the spectral CPU/GPU parity gate is BLOCKED... K=8
+forces 6 extra cluster boundaries to be carved out of a single
+near-homogeneous 459-node component"). That reasoning was coherent given
+the evidence at the time, but it was wrong: fixing the exact disconnection
+it was built on made CPU/GPU agreement substantially worse. The earlier
+framing should be read as a falsified hypothesis, not a resolved root
+cause — recorded here rather than quietly edited out, per this addendum's
+own practice of correcting rather than erasing wrong claims.
+
+**What the new evidence suggests instead** (not yet confirmed): the flat,
+init-independent 0.29-0.35 k-means census range on the connected graph
+(versus the earlier 0.20-0.9553 *init-dependent* spread) points away from
+"k-means initialization noise on a near-degenerate eigenspace" as the
+driver here — that theory predicted a good init could recover close
+agreement with cuGraph, which happened on the old disconnected graph but
+does not happen on this one. On a graph with genuine, comparably-sized
+multi-community structure (8 clusters, 14-166 nodes each, not one
+92%-dominant blob), the CPU numpy eigensolver and cuGraph's internal
+solver may simply be converging to different, both-locally-valid
+partitions of real structure — a genuine CPU/GPU implementation
+divergence, not noise on a degenerate/near-empty signal. This is a new,
+untested hypothesis, not a conclusion.
+
+Not yet done: investigating why parity is worse on the connected graph
+(compare CPU vs GPU eigenvalue spectra directly on this fixture, the way
+the earlier eigengap probe did for the disconnected one), Louvain
+comparison, Nsight Systems/Compute evidence (LVG-10/11).

@@ -80,8 +80,8 @@ LVG-1 semantic_512 exact fixture builder                    EXECUTED_UNPROVEN (r
 LVG-2 canonical N-ary relationship compute projection      DESCOPED (tables don't exist; --include-canonical-relationships flag added, off by default, auditable via fixture fields)
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
-LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533; candidate cause: K=8 on a 2-component graph)
-LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535; candidate cause: K=8 on a 2-component graph)
+LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.66 -- disconnection hypothesis disproven)
+LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.31 -- disconnection hypothesis disproven)
 LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (hard 2->500 cluster jump; only ever finds K=2, not K=8)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
@@ -171,12 +171,27 @@ naturally land on 8 clusters matching the frozen K, balanced 14-166 nodes,
 no 92%-dominant giant cluster. Every pathology found earlier in this file is
 absent here.
 
-**Not yet done**: `prove_live_graph_fixture.py` doesn't itself compute
-CPU/GPU ARI against the 0.99 promotion gate (that was
-`spectral_diagnostic_receipt_v2.py`, built against a different, parquet-based
-fixture schema) — re-testing the actual gate against this connected fixture
-is the one remaining step to fully close this file's open thread. Full
-detail in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+**ARI parity re-tested on the connected fixture (receipt
+`docs/reports/spectral-diagnostic-receipt-v3-connected.json`) — result:
+parity got WORSE, not better, and the earlier "K=8 on a 2-component graph"
+hypothesis is DISPROVEN.** normalized_laplacian ARI dropped 0.9533 -> 0.6615;
+modularity ARI dropped 0.9535 -> 0.3082; the k-means census range flattened
+from init-dependent 0.20-0.9553 to a flat, init-independent 0.29-0.35.
+Fixing the exact disconnection this file spent several commits root-causing
+made CPU/GPU agreement substantially worse, not better. This is recorded as
+a falsified hypothesis, not quietly corrected away — the earlier reasoning
+was coherent given the evidence at the time but turned out wrong once
+actually tested. New unconfirmed hypothesis: on a graph with genuine,
+comparably-sized multi-community structure (this one: 8 clusters, 14-166
+nodes each), CPU numpy and cuGraph's solver may be converging to different,
+both-locally-valid partitions — a real implementation divergence, not
+k-means noise on a near-degenerate signal. Full detail in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: investigating why parity is worse on the connected graph
+(compare CPU vs GPU eigenvalue spectra directly, mirroring the earlier
+eigengap probe), Louvain comparison, Nsight Systems/Compute evidence
+(LVG-10/11).
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
