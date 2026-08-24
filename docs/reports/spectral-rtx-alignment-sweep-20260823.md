@@ -692,9 +692,41 @@ operator's persistent, K-independent divergence from cuGraph's actual
 output is now the more interesting open question than the original
 disconnection or cardinality issues, and is unexplained.
 
-Not yet done: understanding why the modularity operator stays poor
-regardless of K (possibly a genuine algorithmic difference between the CPU
-reference's modularity-matrix eigendecomposition and cuGraph's internal
-`spectralModularityMaximizationClustering` implementation, not yet
-investigated), Louvain comparison, Nsight Systems/Compute evidence
+### Further characterizing the modularity-operator gap — a real correlation, not yet a cause
+
+Compared each CPU reference partition's *own* achieved modularity value
+against GPU's achieved modularity (from the tolerance sweep's
+`gpuObjective`, cuGraph's own analyzer on its own partition), across both
+K values tested:
+
+| | GPU modularity | CPU modularity | gap | ARI |
+|---|---|---|---|---|
+| K=8, normalized_laplacian | 0.4168 | 0.4365 | +0.0197 | 0.6615 |
+| K=8, modularity | 0.4168 | 0.4624 | +0.0456 | 0.3082 |
+| K=3, normalized_laplacian | 0.4703 | 0.4834 | +0.0131 | 0.8740 |
+| K=3, modularity | 0.4703 | 0.4300 | **-0.0403** | 0.3719 |
+
+An initial read of only the K=3 row ("CPU's modularity-operator partition is
+worse than GPU's, 0.43 vs 0.47 — CPU is a weaker optimizer for this
+operator") does **not** hold at K=8, where CPU's modularity-operator
+partition is *better* than GPU's (0.4624 vs 0.4168) — the direction flips
+between K values. That earlier framing is retracted before it was fully
+written up, not left as a plausible-sounding but unverified claim.
+
+What **is** consistent across all four rows: the operator with the larger
+`|gap|` between CPU's and GPU's achieved modularity also has the lower ARI
+in both K conditions (K=8: 0.0456 gap / 0.31 ARI vs. 0.0197 gap / 0.66 ARI;
+K=3: 0.0403 gap / 0.37 ARI vs. 0.0131 gap / 0.87 ARI). This is a real,
+reproducible correlation across 2 independent K values — but it's
+intuitive rather than explanatory (two partitions that score more
+differently by the same objective are unsurprisingly also more different
+in membership) and doesn't identify *why* the modularity-matrix operator's
+CPU reference is more objective-inconsistent with GPU than the
+normalized-Laplacian operator's is. Recorded as further-characterized, not
+resolved.
+
+Not yet done: identifying the actual mechanism behind the modularity
+operator's larger, direction-inconsistent divergence (would need comparing
+raw eigenvector matrices or per-node assignment differences directly, not
+done here), Louvain comparison, Nsight Systems/Compute evidence
 (LVG-10/11).

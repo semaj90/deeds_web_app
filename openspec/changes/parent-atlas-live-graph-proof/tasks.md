@@ -206,9 +206,22 @@ operator's persistent, K-independent divergence from cuGraph is now the
 most interesting unresolved question in this file — more interesting than
 the original disconnection/cardinality issues, which are both now fixed.
 
-Not yet done: understanding why the modularity operator stays poor
-regardless of K, Louvain comparison, Nsight Systems/Compute evidence
-(LVG-10/11).
+**Further characterized (not resolved)**: compared each CPU reference
+partition's own achieved modularity vs. GPU's, across both K values. An
+initial read of the K=3 case alone ("CPU modularity-operator partition is
+worse than GPU's, 0.43 vs 0.47") does not hold at K=8, where CPU's
+modularity-operator partition is *better* than GPU's (0.4624 vs 0.4168) —
+direction flips between K values, so "CPU is a weaker optimizer for this
+operator" is retracted before being asserted as a conclusion. What is
+consistent across all 4 rows (2 operators x 2 K values): the operator with
+the larger `|CPU modularity - GPU modularity|` gap also has the lower ARI
+in both K conditions — a real, reproducible correlation, but intuitive
+rather than explanatory, and doesn't identify the actual mechanism. Full
+table and detail in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: identifying the actual mechanism (would need raw eigenvector
+or per-node assignment comparison, not done), Louvain comparison, Nsight
+Systems/Compute evidence (LVG-10/11).
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
