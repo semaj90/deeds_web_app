@@ -1054,6 +1054,65 @@ conflict is fixed, but verify the actual Python script
 before running training — doc correctness and code correctness are two
 different claims.
 
+## Patch (2026-08-24) — double `packet:` prefix bug in graph-snapshot-materializer, + file-level PageRank backfill path
+
+Started as an investigation into "does `codebase_chunk_index.page_rank_score`
+being 0/52,417-populated (vs. `code_features.page_rank_score` at
+1,477/1,477) have a usable backfill path via the existing custom NetworkX
+PageRank oracle?" (see the "5 competing PageRank implementations" audit in
+`CLAUDE.md`'s Duplication Prevention section, which this patch is squarely
+inside of).
+
+**Bug found and fixed** (live-verified, not from a report): `graph-snapshot-
+materializer.ts` built packet-type node keys as `` `packet:${packet.packetKey}` ``
+unconditionally in two places (packet-node construction, and the
+`DERIVED_FROM` edge's `sourceNodeKey`), but `packet.packetKey` already
+carries the `packet:` prefix for 58,304/61,660 live `atlas_packets` rows.
+Result: every packet-type node in every materialized graph snapshot gets
+`nodeKey = packet:packet:<hash>` instead of `packet:<hash>`. Confirmed live:
+54,078 of 162,234 rows in `atlas_graph_authority_scores_v2.node_key` carry
+this exact bug today. Fixed both call sites (conditional on
+`startsWith('packet:')`, not an unconditional strip, because 61 legacy
+`atlas_packets` rows still store a bare unprefixed hex key). Two existing
+tests had baked the bug in as an expected value — corrected both. Commit
+`03820ae695`.
+
+A third occurrence of the identical pattern exists in
+`packet-lod-manifest.ts`'s `buildPacketLodCacheKey` (Service Worker LOD
+cache keys) — confirmed **zero live callers** outside its own test file, so
+left unfixed as flagged-but-dormant, consistent with this repo's "record
+what you found, even when you don't fix it" rule.
+
+**Backfill path found and verified (read-only), not yet applied**: the
+correct join for `codebase_chunk_index → atlas_graph_authority_scores_v2` is
+`source_ref`, NOT `packet_key`/`metadata->>'packet_key'`. Verified live:
+- `codebase_chunk_index.source_ref = atlas_packets.source_ref` resolves
+  100% (52,417/52,417).
+- `codebase_chunk_index.metadata->>'packet_key'` is a **decoy** for this
+  join — it's a different identity scheme entirely (1,392 `sha256:<hash>` +
+  13,251 bare UUIDs, 0 matching `atlas_packets.packet_key`'s `packet:<hash>`
+  format). This is the same field the `project-graphify-embeddings-qdrant.mjs`
+  packet_key projection fix (commit `7fda58e04f`) now writes into Qdrant —
+  worth noting its actual join value against `atlas_packets` is currently
+  zero, a separate open finding.
+- Full chain `codebase_chunk_index.source_ref → atlas_packets.source_ref/
+  packet_key → 'packet:' || packet_key = atlas_graph_authority_scores_v2.node_key`
+  resolves 5,182/52,417 rows (~10%) against the single existing `run_id`.
+  Coverage is partial because the authority-scores graph snapshot itself
+  only covers a subset of nodes, not an identity-resolution failure.
+  Coverage should increase after the double-prefix fix above is picked up
+  by the next `stage5-pagerank-authority-validated.mjs` run (new node keys
+  will no longer need the `'packet:' ||` prefix-add workaround at all, once
+  a fresh snapshot is exported).
+
+**Not yet done**: the actual `UPDATE codebase_chunk_index SET
+page_rank_score = ...` backfill for the resolvable rows. Left open pending
+an explicit decision on whether `atlas_graph_authority_scores_v2` is the
+`CANONICAL_OWNER` for this signal (per this file's own 5-implementation
+audit, that classification decision has not been made) — running a
+backfill from a not-yet-classified owner risks the same "pick a winner
+silently" failure mode this file's governance section exists to prevent.
+
 ## Cross-references
 
 - See README.md for the full architecture, gate table, and patch order.
