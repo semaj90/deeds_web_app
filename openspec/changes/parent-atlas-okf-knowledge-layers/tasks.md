@@ -42,6 +42,43 @@ recommendation engine, or Deep Agents integration under this task list.
 ## Slice 1 — OKF validation + gap export
 
 - [ ] Validate existing `.okf/` files against OKF v0.2 (provenance, trust, lifecycle fields present and well-formed).
+
+  **Partial finding (2026-08-24, read-only, no validator built yet)**: checked
+  what actually exists before writing a validator. `.okf/manifest.yaml`
+  declares itself `version: 2` and registers 5 domain schemas under
+  `registries.domains.schemas` (`retrieval.yaml`, `cache.yaml`,
+  `database.yaml`, `feature-intelligence.yaml`, `parent-atlas-execution.yaml`)
+  but `.okf/domains/` only actually contains 3 files
+  (`feature-intelligence.yaml`, `parent-atlas-execution.yaml`,
+  `structured-value.yaml`) — `retrieval.yaml`, `cache.yaml`, `database.yaml`
+  are declared but absent, and `structured-value.yaml` exists but isn't
+  declared in the manifest. Manifest/filesystem drift, both directions.
+
+  Of the 3 files that exist, all three declare `version: 1` (not `v0.2`,
+  and inconsistent with the manifest's own `version: 2`), all three have
+  `status:`, but only `structured-value.yaml` has any `provenance:` field
+  (line 55) — `feature-intelligence.yaml` and `parent-atlas-execution.yaml`
+  have none. **No file anywhere in `.okf/` has a `trust:` or `lifecycle:`
+  field** (checked all 3 domain files plus `manifest.yaml` and `index.md`).
+
+  **This blocks writing an actual validator, not just running one that
+  doesn't exist yet**: "OKF v0.2" (an internal framework name — "OpenSpec
+  Knowledge Framework" per `manifest.yaml`'s own header comment, not an
+  external standard) is referenced by this proposal/design/tasks file as
+  requiring "provenance, trust, lifecycle fields," but no file in this repo
+  enumerates what those fields must actually contain to pass validation —
+  there is no v0.2 spec document to validate against, only the phrase. A
+  validator built now would have to invent the required schema itself,
+  which is a spec decision (same class of decision this repo's own rules
+  say shouldn't be made unilaterally — e.g. the LVG-2/LVG-10/11 pattern in
+  `parent-atlas-live-graph-proof/tasks.md`), not a mechanical check.
+
+  Not yet done: writing the actual OKF v0.2 field spec (what must
+  `provenance`/`trust`/`lifecycle` contain, using `structured-value.yaml`'s
+  existing `provenance:` block, if suitable, as a starting template rather
+  than inventing from nothing) — needs an explicit decision before a real
+  validator can be built; reconciling the manifest/filesystem drift found
+  above (5 declared vs. 3 present domain schemas).
 - [ ] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
 - [ ] Validation: OKF validator run against the 6 new files reports 0 schema errors.
 
