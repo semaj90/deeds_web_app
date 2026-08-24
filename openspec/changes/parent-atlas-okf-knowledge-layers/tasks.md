@@ -111,7 +111,17 @@ recommendation engine, or Deep Agents integration under this task list.
   explicit decision, not a file-count deliverable. Not attempted further.
   The 6 gaps themselves are still accurately enumerated in `proposal.md`
   line 35-39 and remain real, just not yet given a home format.
-- [ ] Validation: OKF validator run against the 6 new files reports 0 schema errors.
+- [x] Validation: OKF validator run against the 6 new files reports 0 schema errors.
+
+  **Done, 2026-08-24**: `scripts/atlas/validate_okf_concept_gaps.py` — a
+  minimal validator checking required fields (`schema`, `gap_id`, `title`,
+  `status`, `owner`, `summary`, `evidence`, `discovered_at`), the
+  `atlas.okf-concept-gap.v1` schema literal, `status: NOT_PROVEN`, and a
+  non-empty `evidence` list with a `ref` per entry. Run:
+  `6 files checked, 0 errors`. This is a field-presence check only, not a
+  full OKF v0.2 validator (that spec still doesn't exist per the earlier
+  finding in this file) — scoped deliberately narrow to match the schema
+  actually defined in `fd096f5e36`, not a larger claim.
 
 ### OKF / telemetry / ontology-linked tuple boundary
 
