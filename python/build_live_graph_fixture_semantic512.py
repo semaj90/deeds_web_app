@@ -6,10 +6,22 @@ Inputs:
 - exact Qdrant point vectors, re-read and digest-verified through the existing trainer helpers;
 - canonical PostgreSQL relationship headers/members for admitted packet keys.
 
+Candidate identity is packet-level (`atlas_packets.packet_key`, derived from
+`source_ref` alone), not chunk-level. Since `codebase_chunk_index`/Qdrant
+`semantic_512` candidates are chunk-level and a file's chunks share one
+packet_key, a packet's semantic vector here is the L2-renormalized mean of
+its admitted chunks' exact, digest-verified vectors -- see
+`aggregate_by_packet_key()` and
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md` (2026-08-24 decision).
+A single-chunk packet's aggregate is numerically identical to its one exact
+chunk vector. Every vertex records `aggregated_chunk_count` and
+`aggregated_member_point_ids` so this is always auditable from the fixture
+itself.
+
 Output:
-- 500..5000 dense local ordinals;
+- 500..5000 dense local ordinals, one per distinct admitted packet_key;
 - canonical relationship edges represented only as a bounded pairwise compute view with relationship IDs retained;
-- exact cuVS brute-force semantic top-K edges marked derived_similarity=true;
+- cuVS brute-force semantic top-K edges over packet-level aggregate vectors, marked derived_similarity=true;
 - no invented source_revision and no canonical relationship promotion.
 """
 
@@ -32,8 +44,10 @@ from atlas_semantic512_autoencoder_train import (
     COLLECTION,
     REPRESENTATION_ID,
     SEMANTIC_DIM,
+    l2_normalize,
     load_reconciliation,
     retrieve_vectors,
+    vector_digest,
 )
 
 DEFAULT_DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
@@ -187,6 +201,52 @@ def exact_semantic_edges(matrix: np.ndarray, *, k: int, family_weight: float) ->
     return sorted(by_pair.values(), key=lambda edge: (edge["src"], edge["dst"]))
 
 
+def aggregate_by_packet_key(identities: list, matrix: np.ndarray) -> list[dict[str, Any]]:
+    """Collapse chunk-level admitted identities to one packet-level candidate
+    per packet_key. atlas_packets identity is file/source_ref-level
+    (packet_key = "ace:packet:" + sha256(source_ref)[:12]); codebase_chunk_index
+    / Qdrant semantic_512 candidates are chunk-level, so a file with multiple
+    chunks admits multiple identities sharing one packet_key. Decided
+    2026-08-24: aggregate rather than re-scope identity to chunk-level or
+    drop extra chunks (see docs/reports/spectral-rtx-alignment-sweep-20260823.md).
+    Aggregate vector is the L2-renormalized mean of member chunk vectors
+    (each already L2-normalized and digest-verified against live Qdrant by
+    retrieve_vectors before this runs); a single-chunk packet's "aggregate"
+    is numerically identical to its one exact chunk vector. The representative
+    identity per group (for source_ref/tree_node_id/feature_label/etc, which
+    may legitimately differ per chunk) is chosen deterministically as the
+    member with the lexicographically smallest str(point_id) -- an explicit,
+    documented tiebreak, not an implicit one.
+    """
+    groups: dict[str, list[int]] = defaultdict(list)
+    for index, identity in enumerate(identities):
+        groups[identity.packet_key].append(index)
+
+    aggregated: list[dict[str, Any]] = []
+    for packet_key, indices in groups.items():
+        indices.sort(key=lambda i: str(identities[i].point_id))
+        representative = identities[indices[0]]
+        member_vectors = matrix[indices]
+        mean_vector = l2_normalize(member_vectors.mean(axis=0).tolist())
+        aggregated.append(
+            {
+                "packet_key": packet_key,
+                "source_ref": representative.source_ref,
+                "source_version_receipt_id": representative.source_version_receipt_id,
+                "reconciliation_receipt_id": representative.reconciliation_receipt_id,
+                "tree_node_id": representative.tree_node_id,
+                "feature_label": representative.feature_label,
+                "workspace_revision": representative.workspace_revision,
+                "representation_revision": representative.representation_revision,
+                "vector": mean_vector,
+                "aggregated_chunk_count": len(indices),
+                "aggregated_member_point_ids": sorted(str(identities[i].point_id) for i in indices),
+                "representative_point_id": str(representative.point_id),
+            }
+        )
+    return aggregated
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--reconciliation-manifest", required=True)
@@ -224,39 +284,54 @@ def main() -> int:
         Path(args.reconciliation_manifest).resolve(),
         Path(args.reconciliation_receipt).resolve(),
         None,
+        allow_duplicate_packet_keys=True,
     )
     excluded_proto_service_packet_count = 0
     if not args.include_proto_service_packets:
         before = len(identities)
         identities = [row for row in identities if not row.source_ref.startswith("proto:")]
         excluded_proto_service_packet_count = before - len(identities)
-    identities = sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]
-    if len(identities) < 500:
-        raise ValueError(f"LIVE_GRAPH_REQUIRES_500_ADMITTED_SEMANTIC512_ROWS:{len(identities)}")
-    matrix = retrieve_vectors(args.qdrant_url, identities)
-    if matrix.shape != (len(identities), SEMANTIC_DIM):
+    if not identities:
+        raise ValueError("LIVE_GRAPH_NO_ADMITTED_ROWS_AFTER_PROTO_FILTER")
+
+    chunk_level_matrix = retrieve_vectors(args.qdrant_url, identities)
+    if chunk_level_matrix.shape != (len(identities), SEMANTIC_DIM):
+        raise ValueError("LIVE_GRAPH_SEMANTIC512_MATRIX_SHAPE_MISMATCH")
+
+    aggregated_candidates = aggregate_by_packet_key(identities, chunk_level_matrix)
+    aggregated_candidates = sorted(
+        aggregated_candidates,
+        key=lambda row: (row["packet_key"], row["representative_point_id"]),
+    )[:limit]
+    if len(aggregated_candidates) < 500:
+        raise ValueError(f"LIVE_GRAPH_REQUIRES_500_ADMITTED_SEMANTIC512_ROWS:{len(aggregated_candidates)}")
+    matrix = np.stack([candidate["vector"] for candidate in aggregated_candidates])
+    if matrix.shape != (len(aggregated_candidates), SEMANTIC_DIM):
         raise ValueError("LIVE_GRAPH_SEMANTIC512_MATRIX_SHAPE_MISMATCH")
 
     vertices = [
         {
             "ordinal": ordinal,
-            "candidate_id": identity.packet_key,
-            "packet_key": identity.packet_key,
-            "source_ref": identity.source_ref,
-            "source_version_receipt_id": identity.source_version_receipt_id,
-            "reconciliation_receipt_id": identity.reconciliation_receipt_id,
-            "tree_node_id": identity.tree_node_id,
-            "feature_label": identity.feature_label,
-            "workspace_revision": identity.workspace_revision,
-            "representation_revision": identity.representation_revision,
+            "candidate_id": candidate["packet_key"],
+            "packet_key": candidate["packet_key"],
+            "source_ref": candidate["source_ref"],
+            "source_version_receipt_id": candidate["source_version_receipt_id"],
+            "reconciliation_receipt_id": candidate["reconciliation_receipt_id"],
+            "tree_node_id": candidate["tree_node_id"],
+            "feature_label": candidate["feature_label"],
+            "workspace_revision": candidate["workspace_revision"],
+            "representation_revision": candidate["representation_revision"],
             "semantic_representation": REPRESENTATION_ID,
             "semantic_dimension": SEMANTIC_DIM,
-            "semantic_vector_digest": identity.vector_digest,
+            "semantic_vector_digest": vector_digest(matrix[ordinal].tolist()),
+            "semantic_vector_source": "packet_level_mean_aggregate",
+            "aggregated_chunk_count": candidate["aggregated_chunk_count"],
+            "aggregated_member_point_ids": candidate["aggregated_member_point_ids"],
             "semantic_512": matrix[ordinal].astype(np.float32).tolist(),
         }
-        for ordinal, identity in enumerate(identities)
+        for ordinal, candidate in enumerate(aggregated_candidates)
     ]
-    packet_keys = [identity.packet_key for identity in identities]
+    packet_keys = [candidate["packet_key"] for candidate in aggregated_candidates]
     ordinal_by_packet = {packet_key: ordinal for ordinal, packet_key in enumerate(packet_keys)}
     canonical_relationship_rows = fetch_relationship_rows(args.database_url, packet_keys)
     canonical_edges = relationship_edges(canonical_relationship_rows, ordinal_by_packet)
@@ -302,6 +377,10 @@ def main() -> int:
         "reconciliation_manifest_checksum": reconciliation_receipt["manifestChecksum"],
         "proto_service_packets_included": bool(args.include_proto_service_packets),
         "proto_service_packets_excluded_count": excluded_proto_service_packet_count,
+        "candidate_identity_scope": "PACKET_LEVEL",
+        "packet_level_aggregation": True,
+        "packet_aggregation_method": "MEAN_L2_RENORMALIZED_OVER_ADMITTED_CHUNKS",
+        "chunk_level_admitted_row_count": len(identities),
         "postgres_snapshots": postgres_snapshots,
         "vertices": vertices,
         "edges": canonical_edges + semantic_edges,

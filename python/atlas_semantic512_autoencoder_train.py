@@ -115,7 +115,13 @@ def vector_digest(vector: list[float]) -> str:
     return hashlib.sha256(values.tobytes(order="C")).hexdigest()
 
 
-def load_reconciliation(manifest_path: Path, receipt_path: Path, limit: int | None) -> tuple[list[Identity], dict[str, Any]]:
+def load_reconciliation(
+    manifest_path: Path,
+    receipt_path: Path,
+    limit: int | None,
+    *,
+    allow_duplicate_packet_keys: bool = False,
+) -> tuple[list[Identity], dict[str, Any]]:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     if receipt.get("schema") != "atlas.semantic512-reconciliation-receipt.v1":
         raise ValueError("unsupported reconciliation receipt schema")
@@ -151,7 +157,7 @@ def load_reconciliation(manifest_path: Path, receipt_path: Path, limit: int | No
         digest = str(representation.get("vectorDigest") or "").strip()
         if not packet_key or not source_ref or not source_version_receipt_id or not digest:
             raise ValueError(f"line {line_number}: admitted row lacks canonical lineage")
-        if packet_key in seen_packets:
+        if packet_key in seen_packets and not allow_duplicate_packet_keys:
             raise ValueError(f"line {line_number}: duplicate admitted packet_key {packet_key}")
         if representation.get("representationId") != REPRESENTATION_ID:
             raise ValueError(f"line {line_number}: wrong representation")

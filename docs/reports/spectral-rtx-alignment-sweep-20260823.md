@@ -470,6 +470,69 @@ come from a current, correctly-admitting run of this reconciliation script
 at all — it must predate both this bug's introduction and (now clearer) this
 unresolved cardinality question.
 
-Not yet done: deciding the candidate-identity cardinality question above,
-then re-running the fixture builder, connectivity/parity re-checks, Louvain
-comparison, Nsight Systems/Compute evidence (LVG-10/11).
+### Cardinality decision made: aggregate to packet-level
+
+Operator decision (2026-08-24): aggregate chunks to one packet-level
+candidate rather than re-scoping identity to chunk-level or dropping extra
+chunks. Implemented in `build_live_graph_fixture_semantic512.py`:
+
+- `atlas_semantic512_autoencoder_train.py`'s shared `load_reconciliation()`
+  gained a narrow, backward-compatible `allow_duplicate_packet_keys: bool = False`
+  keyword-only parameter (default preserves the existing strict
+  one-row-per-packet behavior for its other caller, the autoencoder trainer;
+  the fixture builder now passes `True` explicitly) — chosen over writing a
+  second parallel manifest loader, to avoid validation-logic drift between
+  two copies of the same checksum/schema checks.
+- New `aggregate_by_packet_key()`: groups admitted chunk-level identities by
+  `packet_key`, computes each packet's vector as the L2-renormalized mean of
+  its member chunks' exact, digest-verified vectors (a single-chunk packet's
+  aggregate is numerically identical to its one exact vector), and picks a
+  deterministic representative identity per group (smallest `str(point_id)`)
+  for source_ref/tree_node_id/feature_label metadata.
+- Every vertex now records `aggregated_chunk_count` and
+  `aggregated_member_point_ids`, and the fixture records
+  `packet_level_aggregation: true` / `packet_aggregation_method` /
+  `chunk_level_admitted_row_count` — the aggregation is always auditable
+  from the output file itself, not just from this doc.
+- `semantic_vector_digest` per vertex is now a digest of the aggregate
+  vector (computed fresh), not the original per-chunk Qdrant-verified
+  digest — relabeled via a new `semantic_vector_source: "packet_level_mean_aggregate"`
+  field so this provenance change is explicit, not silently reused under
+  the old meaning.
+
+**Verified as far as this gap allows**: ran the fixture builder against the
+fixed, fresh reconciliation manifest. The aggregation code itself ran
+end-to-end without error — loaded all admitted chunk-level identities
+(`allow_duplicate_packet_keys=True`), excluded proto-service packets,
+fetched and digest-verified every chunk vector via Qdrant, grouped and
+aggregated by packet_key, sorted/limited to 500 candidates. This is further
+than any previous run in this thread got.
+
+### New, separate, larger blocker: LVG-2's relationship tables don't exist
+
+The run then failed at the canonical-relationship-edge step:
+`psycopg2.errors.UndefinedTable: relation "atlas_relationship_members" does
+not exist`. Checked directly: neither `atlas_relationships` nor
+`atlas_relationship_members` (the tables
+`build_live_graph_fixture_semantic512.py`'s `fetch_relationship_rows()`
+queries) exist anywhere in the live schema. The four `*relationship*` tables
+that do exist (`atlas_feature_relationships`, `codebase_relationship_reports`,
+`evidence_relationships`, `poi_relationships`) are not obvious renames —
+`atlas_feature_relationships` is feature-level, not the packet-pairwise
+canonical relationship structure this proof's "PostgreSQL canonical
+relationships" lane (LVG-2) describes.
+
+This is a different kind of gap than everything fixed in this thread so
+far: those were logic bugs (wrong formula, wrong cardinality assumption)
+fixable in application code. This is missing schema — LVG-2 appears to
+never have been implemented at the table level. Per this repo's own Drizzle
+Safety Rule (`CLAUDE.md`: "Do NOT change schema/migrations" without
+explicit review), this is not something to create or redirect unilaterally.
+
+Not yet done: deciding what LVG-2's relationship storage should actually
+be (create the missing tables? redirect the query at
+`atlas_feature_relationships` or a different existing table if its shape
+fits? treat canonical relationship edges as out of scope for this proof and
+make the graph semantic-KNN-only?), then re-running the fixture builder,
+connectivity/parity re-checks, Louvain comparison, Nsight Systems/Compute
+evidence (LVG-10/11).

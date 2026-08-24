@@ -76,8 +76,8 @@ NVTX parent-atlas@atlas.graph_fixture
 
 ```text
 LVG-0 semantic_512 reconciliation prerequisite              BLOCKED (formula bug fixed+verified, 0->41344/53379 admitted; now blocked on packet-vs-chunk cardinality decision)
-LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (proto-exclusion fix applied, unverified -- LVG-0 blocks re-run)
-LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
+LVG-1 semantic_512 exact fixture builder                    EXECUTED_UNPROVEN (aggregation logic runs end-to-end clean; blocked downstream by LVG-2)
+LVG-2 canonical N-ary relationship compute projection      BLOCKED (atlas_relationships / atlas_relationship_members do not exist in live schema)
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533; candidate cause: K=8 on a 2-component graph)
@@ -131,17 +131,29 @@ matched exactly against 5 real `atlas_packets` rows before applying. Fresh
 read-only re-run: **0 -> 41,344/53,379 admitted (77.5%)**, 0 rejected. Confirms
 the fix is real.
 
-**New blocker surfaced by the fix, genuinely undecided**: the 41,344 admitted
-rows collapse to only 3,293 distinct `packet_key` values (`atlas_packets`
-identity is file/source_ref-level) against chunk-level
-`codebase_chunk_index`/Qdrant candidates — 3,131/3,293 packet_keys (95%) have
-more than one admitted chunk, avg ~12.5, max 412. `build_live_graph_fixture_semantic512.py`'s
-`load_reconciliation()` correctly hard-fails on this (`duplicate admitted
-packet_key`). No single-chunk-per-packet tiebreak is evidence-derivable the
-way the formula fix was — this needs a real decision: aggregate chunks per
-packet before candidate selection, re-scope candidate identity to chunk-level
-instead of packet-level, or restrict admission to one canonical chunk per
-packet via a new non-`ADMITTED` review status. Full detail in
+**Cardinality blocker surfaced by the fix, resolved by operator decision
+(2026-08-24): aggregate to packet-level.** The 41,344 admitted rows collapse
+to only 3,293 distinct `packet_key` values (`atlas_packets` identity is
+file/source_ref-level) against chunk-level `codebase_chunk_index`/Qdrant
+candidates — 3,131/3,293 packet_keys (95%) have more than one admitted
+chunk, avg ~12.5, max 412. Implemented: `load_reconciliation()` gained a
+backward-compatible `allow_duplicate_packet_keys` opt-in (default `False`,
+unchanged for its other caller); new `aggregate_by_packet_key()` collapses
+chunk-level identities to one packet-level candidate per `packet_key` via
+L2-renormalized mean of member chunk vectors, with a deterministic
+representative-identity tiebreak (smallest `str(point_id)`) and full
+audit fields (`aggregated_chunk_count`, `aggregated_member_point_ids`) on
+every vertex. **Ran end-to-end without error through candidate selection**
+— further than any previous attempt in this file.
+
+**New, separate, larger blocker found immediately after: LVG-2's relationship
+tables don't exist.** The run failed at the next step with
+`psycopg2.errors.UndefinedTable: relation "atlas_relationship_members" does
+not exist`. Checked directly: neither `atlas_relationships` nor
+`atlas_relationship_members` exist anywhere in the live schema — this is
+missing schema, not a logic bug, and not fixable the way LVG-0/LVG-1 were.
+Per this repo's Drizzle Safety Rule (no schema/migration changes without
+explicit review), not touched. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
