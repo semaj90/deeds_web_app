@@ -811,7 +811,59 @@ throughout this file.
 **Not yet run against this fixture, but this is a matter of invoking an
 existing, purpose-built module — do not write a second Louvain runner.**
 
-Not yet done: invoking `atlas_rapids_community.py`'s Louvain path against
-the connected fixture, Nsight Systems/Compute evidence (LVG-10/11), and (if
-pursued) testing whether a candidate sample selected for cleaner eigenvalue
-separation improves parity.
+### Louvain challenger: found and fixed a real crash, then ran it successfully
+
+Wrote `scripts/atlas/run_louvain_challenger_v1.py`, a thin driver that loads
+a `live-graph-fixture.v1` JSON and calls
+`atlas_rapids_community.py::run_cugraph_partition` directly (`algorithm="louvain"`)
+— reusing the existing module per the audit above, not reimplementing it.
+
+First attempt crashed, and not on this fixture specifically — isolated with
+a trivial 10-node line graph through the same module and it crashed
+identically: `RuntimeError: ... cugraph_graph_create_with_times_sg(): ...
+cudaMemcpyAsync ... cudaErrorInvalidValue: invalid argument`. Root-caused
+via direct dtype inspection: `run_cugraph_partition` builds `vertices` as an
+explicit `cudf.Series(..., dtype="int32")` but builds `edge_df`'s `src`/`dst`
+columns from plain Python int lists, which cudf infers as `int64` by
+default — confirmed the dtype mismatch directly
+(`vertices.dtype == 'int32'`, `edge_df['src'].dtype == 'int64'`) before
+attributing the crash to it. With `renumber=False` and an explicit vertex
+list, cuGraph's low-level `SGGraph` constructor can't reconcile the two
+integer widths and the underlying `cudaMemcpyAsync` fails. This is a
+pre-existing bug in the module itself, affecting all three algorithms it
+wraps (louvain/leiden/spectral), not something introduced by this session's
+driver — verified by reproducing it via the module's own code path on a
+graph unrelated to this proof tranche's fixtures.
+
+**Fixed**: cast `edge_df`'s `src`/`dst` to `int32` to match `vertices` before
+constructing the DataFrame. Re-ran the toy graph (now succeeds, 3
+communities, modularity 0.426) then the real fixture.
+
+**Louvain result on the connected 500-node fixture**
+(`docs/reports/louvain-challenger-receipt-v1.json`): **7 communities**,
+modularity **0.5495**, sizes `[135, 110, 87, 57, 54, 43, 14]` — balanced,
+non-degenerate, broadly consistent in shape with Leiden's own independent
+6-cluster result (`[147, 138, 68, 59, 57, 31]`).
+
+**Three-way ARI cross-check** on this same graph:
+
+| Comparison | ARI |
+|---|---|
+| Louvain vs. Leiden | 0.6863 |
+| Louvain vs. spectral modularity (K=8) | 0.3759 |
+| Leiden vs. spectral modularity (K=8) | 0.4297 |
+
+Independent confirmation of the eigengap/K-mismatch finding above: two
+unforced, natural-K community-detection methods (Louvain finds 7, Leiden
+finds 6) agree with each other moderately well (0.69) but both disagree
+substantially with the artificially `K=8`-forced spectral result (0.38,
+0.43) — by a margin comparable to the CPU/GPU spectral divergence itself.
+This supports that forcing `K=8` on a graph whose natural community count is
+closer to 6-7 is a real, independently-corroborated factor in why spectral
+clustering behaves unstably here, not solely a CPU/GPU numerical-solver
+artifact.
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), testing whether
+a candidate sample selected for cleaner eigenvalue separation improves
+parity, re-running Leiden/spectral at `K=6` or `K=7` (matching what Louvain
+and Leiden naturally find) for a fully apples-to-apples comparison.

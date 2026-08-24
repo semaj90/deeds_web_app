@@ -195,10 +195,17 @@ def run_cugraph_partition(req: CommunityPartitionRequestV1) -> CommunityPartitio
     vertices = cudf.Series(list(range(len(node_ids))), dtype="int32")
 
     if canonical_edges:
+        # src/dst must match `vertices`' explicit int32 dtype. Building this
+        # DataFrame from plain Python int lists makes cudf infer int64,
+        # which cugraph's from_cudf_edgelist(renumber=False, vertices=...)
+        # cannot reconcile -- verified 2026-08-24: even a trivial 10-node
+        # line graph crashes _make_plc_graph with
+        # "cudaMemcpyAsync ... cudaErrorInvalidValue: invalid argument"
+        # when src/dst are int64 against an int32 vertices Series.
         edge_df = cudf.DataFrame(
             {
-                "src": [edge[0] for edge in canonical_edges],
-                "dst": [edge[1] for edge in canonical_edges],
+                "src": cudf.Series([edge[0] for edge in canonical_edges], dtype="int32"),
+                "dst": cudf.Series([edge[1] for edge in canonical_edges], dtype="int32"),
                 "weight": [edge[2] for edge in canonical_edges],
             }
         )

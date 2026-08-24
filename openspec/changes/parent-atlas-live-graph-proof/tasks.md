@@ -82,7 +82,7 @@ LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.66 -- disconnection hypothesis disproven)
 LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED; re-tested on connected fixture, ARI WORSE at 0.31 -- disconnection hypothesis disproven)
-LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (hard 2->500 cluster jump; only ever finds K=2, not K=8)
+LVG-7 Leiden/Louvain comparison                              EXECUTED_UNPROVEN (both healthy on the connected fixture: Leiden 6 clusters, Louvain 7; degeneracy found earlier was specific to the disconnected fixture, since fixed)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
@@ -258,10 +258,33 @@ file. **Not yet run against this fixture** — this is a matter of invoking
 an existing, purpose-built module, not writing a new Louvain runner. Do not
 create a second one.
 
-Not yet done: invoking `atlas_rapids_community.py`'s Louvain path against
-the same connected fixture used in the mechanism-finding above, Nsight
-Systems/Compute evidence (LVG-10/11), testing whether upstream candidate
-selection tuned for cleaner eigenvalue separation improves parity.
+**Invoked, found and fixed a real crash, then got a clean result.**
+`scripts/atlas/run_louvain_challenger_v1.py` drives
+`atlas_rapids_community.py::run_cugraph_partition` against the connected
+fixture. First attempt crashed
+(`cudaMemcpyAsync ... cudaErrorInvalidValue`); isolated with a trivial
+10-node line graph through the same module (crashed identically, confirming
+this predates and is unrelated to this session's fixture) and root-caused
+via direct dtype inspection: `vertices` is explicit `int32`, `edge_df`'s
+`src`/`dst` default to `int64` when built from plain Python lists, and
+`renumber=False` can't reconcile the mismatch. Fixed by casting `src`/`dst`
+to `int32`. **Result**: 7 communities, modularity 0.5495, sizes
+`[135,110,87,57,54,43,14]` — balanced, consistent in shape with Leiden's own
+6-cluster result.
+
+Three-way ARI: Louvain vs. Leiden `0.6863`; Louvain vs. spectral-K8
+`0.3759`; Leiden vs. spectral-K8 `0.4297`. Two unforced natural-K methods
+agree moderately with each other and both disagree substantially with the
+`K=8`-forced spectral result — independent corroboration that forcing
+`K=8` (not just CPU/GPU solver noise) is a real factor in this fixture's
+spectral instability. Full detail in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11), re-running
+spectral/Leiden at `K=6` or `K=7` (matching Louvain/Leiden's natural
+counts) for an apples-to-apples comparison, testing whether upstream
+candidate selection tuned for cleaner eigenvalue separation improves
+parity.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
