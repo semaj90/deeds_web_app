@@ -231,7 +231,60 @@ doesn't otherwise support, rather than K=8 being a real property of this data.
 Worth checking before spending more effort on CPU/GPU parity at a K that may
 not be the right target.
 
+### Root cause confirmed: the fixture is a disconnected graph (2 components: 459 + 41 nodes)
+
+`scripts/atlas/spectral_eigengap_probe_v1.py` (receipt
+`docs/reports/spectral-eigengap-probe-v1.json`) computed the top-20 eigenvalues
+of both the normalized Laplacian and the modularity matrix for this same
+500-node fixture. The normalized Laplacian has **two** eigenvalues at
+essentially machine-zero (`4.8e-16`, `5.7e-16`) before the next eigenvalue
+(`0.2073`) — for a normalized Laplacian, the multiplicity of the exact-zero
+eigenvalue equals the number of connected components. Verified independently
+(not just via eigenvalue counting) with `scipy.sparse.csgraph.connected_components`
+on the same edge list: **2 components, sizes 459 and 41.**
+
+This is the actual root cause behind every open item in this addendum, not
+three separate mysteries:
+
+- **Leiden's natural K=2** (the earlier "K=8 isn't natural" hypothesis) is not
+  a resolution-parameter coincidence — disconnected components are trivially
+  their own communities under any modularity-family objective; K=2 is the
+  structural floor.
+- **The hard resolution collapse, unweighted-graph-first**: the 41-node
+  satellite component is far sparser relative to its size than the 459-node
+  component, so it crosses the resolution-scaled fragmentation threshold
+  first (matches the unweighted-graph-collapses-before-weighted-graph
+  ordering observed in the fine sweep).
+- **The CPU/GPU spectral ARI ceiling (~0.953-0.955, `BLOCKED` against the
+  0.99 gate)** is very plausibly the same phenomenon, not a numerical-solver
+  bug: with `K=8` requested against a graph that is structurally 2 pieces
+  (one of which is 459/500 = 92% of all nodes), the eigensolver has to carve
+  6 additional cluster boundaries out of a single near-homogeneous giant
+  component using an eigenspace with little real signal past the first two
+  components — exactly what `spectral-diagnostic-receipt-v2.json`'s
+  `eigenspace.canonical_authority: false` flag and its k-means census
+  (ARI to cuGraph ranging 0.20-0.9553 purely from `init`/`n_init` choice)
+  already independently suggested: k-means tie-breaking noise on an
+  approximately-degenerate eigenspace, not a real CPU/GPU disagreement about
+  graph structure. The `movedNodeOrdinals` in that receipt (14-19 nodes out
+  of 500) are consistent with boundary noise inside the giant component, not
+  a structural misread.
+
+This changes the recommended next step. More eigensolver-tolerance or
+eigenvector-count sweeping on `K=8` is unlikely to close the gap, because the
+gap is plausibly explained by `K=8` not being a real property of this
+500-node candidate sample rather than by solver precision. Before spending
+more effort on CPU/GPU parity at `K=8`: (a) check whether the semantic_512
+candidate *selection* step (LVG-1) is what's producing a disconnected
+sample — is 500 candidates too small / too disjoint a slice of the full
+corpus, and does a larger or differently-sampled candidate set stay
+connected; (b) if disconnection is expected/normal at this candidate size,
+freeze `K` per-component (e.g. `K` proportional to component size) instead
+of one global `K=8` across a disconnected graph; (c) only after either of
+those, re-run the parity gate to see if it was ever really about eigensolver
+precision at all.
+
 Louvain was not run on this fixture at all.
 
-Not yet done: confirming/refuting the "K=8 isn't natural to this sample"
-hypothesis, Louvain comparison, Nsight Systems/Compute evidence (LVG-10/11).
+Not yet done: (a)/(b)/(c) above, Louvain comparison (would also trivially
+find K=2 for the same reason), Nsight Systems/Compute evidence (LVG-10/11).

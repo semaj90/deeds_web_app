@@ -80,8 +80,8 @@ LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
-LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533)
-LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535)
+LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533; candidate cause: K=8 on a 2-component graph)
+LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535; candidate cause: K=8 on a 2-component graph)
 LVG-7 Leiden comparison                                     EXECUTED_DEGENERATE (hard 2->500 cluster jump; only ever finds K=2, not K=8)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
@@ -130,15 +130,27 @@ regardless of the degeneracy question.
 A finer 13-point sweep (`docs/reports/leiden-diagnostic-receipt-v1-fine.json`)
 confirms this is a hard jump (2 clusters -> 500 clusters in one resolution
 step, no intermediate community count ever observed), not a gradual
-refinement. Consistent with — but not confirmed via external documentation
-as — the known behavior of resolution-scaled modularity on a graph with one
-dense giant community and a sparse periphery (which is what the spectral
-methods also independently found: one ~459-462-node cluster plus several
-single-digit clusters, not eight comparably-sized ones). This raises a
-structural question broader than Leiden alone: this 500-node candidate sample
-may not have K=8-scale multi-community structure at all, in which case the
-CPU/GPU parity work above is being measured at a K the data may not actually
-support. Not yet confirmed or refuted.
+refinement.
+
+**Root cause confirmed** (`scripts/atlas/spectral_eigengap_probe_v1.py`,
+receipt `docs/reports/spectral-eigengap-probe-v1.json`, cross-checked with
+`scipy.sparse.csgraph.connected_components`): this 500-node fixture is a
+literally disconnected graph — exactly 2 connected components, sizes 459 and
+41. That is why Leiden only ever finds K=2 (disconnected components are
+trivially separate communities under any modularity objective — this is a
+structural floor, not a resolution-parameter coincidence), why the smaller
+41-node component fragments first under increasing resolution, and very
+plausibly why the spectral CPU/GPU parity gate is `BLOCKED` at ARI
+~0.953-0.955: `K=8` forces 6 extra cluster boundaries to be carved out of a
+single near-homogeneous 459-node component (92% of the sample) using an
+eigenspace with little real signal past the first two components — consistent
+with the already-recorded `eigenspace.canonical_authority: false` flag and
+the k-means census's ARI range of 0.20-0.9553 driven purely by
+`init`/`n_init` choice. See the full writeup and recommended next step
+(check whether the candidate-selection step at this sample size produces
+disconnected graphs generally, before spending more effort tuning eigensolver
+tolerance at a K=8 that may not be a real property of this sample) in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
