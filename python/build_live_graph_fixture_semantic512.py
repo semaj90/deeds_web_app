@@ -77,6 +77,16 @@ def edge_family(relationship_type: str) -> str:
     return "NARY_INCIDENCE"
 
 
+def fetch_postgres_snapshot_only(database_url: str) -> str:
+    """Cheap read-only provenance capture used when canonical relationship
+    edges are descoped (see fetch_relationship_rows docstring)."""
+    with psycopg2.connect(database_url) as conn:
+        conn.set_session(readonly=True, autocommit=False, isolation_level="REPEATABLE READ")
+        with conn.cursor() as cur:
+            cur.execute("SELECT pg_current_snapshot()::text AS snapshot")
+            return str(cur.fetchone()[0])
+
+
 def fetch_relationship_rows(database_url: str, packet_keys: list[str]) -> list[dict[str, Any]]:
     with psycopg2.connect(database_url) as conn:
         conn.set_session(readonly=True, autocommit=False, isolation_level="REPEATABLE READ")
@@ -167,7 +177,13 @@ def exact_semantic_edges(matrix: np.ndarray, *, k: int, family_weight: float) ->
 
     device = cp.asarray(matrix.astype(np.float32, copy=False))
     params = all_neighbors.AllNeighborsParams(algo="brute_force", n_clusters=1, metric="cosine")
-    indices, _distances, _core = all_neighbors.build(device, k + 1, params)
+    # cuvs.neighbors.all_neighbors.build() returns only the indices array
+    # (a bare pylibraft device_ndarray) when no distances/core_distances
+    # output buffers are supplied, not the 3-tuple its docstring's
+    # "Returns" section implies -- verified empirically against the live
+    # cuvs 26.06.00 install on 2026-08-24 (a 50x8 float32 random dataset
+    # returned a (50, 5) device_ndarray directly, not a tuple).
+    indices = all_neighbors.build(device, k + 1, params)
     neighbors = cp.asnumpy(indices)
 
     by_pair: dict[tuple[int, int], dict[str, Any]] = {}
@@ -265,6 +281,20 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=0xA71A5)
     parser.add_argument("--output", default=".tmp/atlas/live-graph/live-graph.json")
     parser.add_argument(
+        "--include-canonical-relationships",
+        action="store_true",
+        default=False,
+        help=(
+            "Fetch canonical relationship edges from atlas_relationships / "
+            "atlas_relationship_members. Default is to skip: as of 2026-08-24 "
+            "neither table exists in the live schema (confirmed via "
+            "information_schema.tables), so this lane is descoped rather than "
+            "hard-failing the whole fixture build. Graph edges are "
+            "semantic_knn_derived only unless this flag is passed once the "
+            "tables exist. See docs/reports/spectral-rtx-alignment-sweep-20260823.md."
+        ),
+    )
+    parser.add_argument(
         "--include-proto-service-packets",
         action="store_true",
         default=False,
@@ -333,10 +363,15 @@ def main() -> int:
     ]
     packet_keys = [candidate["packet_key"] for candidate in aggregated_candidates]
     ordinal_by_packet = {packet_key: ordinal for ordinal, packet_key in enumerate(packet_keys)}
-    canonical_relationship_rows = fetch_relationship_rows(args.database_url, packet_keys)
-    canonical_edges = relationship_edges(canonical_relationship_rows, ordinal_by_packet)
-    if not canonical_edges:
-        raise ValueError("LIVE_GRAPH_NO_CANONICAL_RELATIONSHIP_EDGES_FOR_ADMITTED_SEMANTIC512_ROWS")
+    if args.include_canonical_relationships:
+        canonical_relationship_rows = fetch_relationship_rows(args.database_url, packet_keys)
+        canonical_edges = relationship_edges(canonical_relationship_rows, ordinal_by_packet)
+        if not canonical_edges:
+            raise ValueError("LIVE_GRAPH_NO_CANONICAL_RELATIONSHIP_EDGES_FOR_ADMITTED_SEMANTIC512_ROWS")
+        postgres_snapshots = sorted({str(row["postgres_snapshot"]) for row in canonical_relationship_rows})
+    else:
+        canonical_edges = []
+        postgres_snapshots = [fetch_postgres_snapshot_only(args.database_url)]
     semantic_edges = exact_semantic_edges(
         matrix,
         k=int(args.semantic_top_k),
@@ -356,7 +391,6 @@ def main() -> int:
             for vertex in vertices
         ]
     )
-    postgres_snapshots = sorted({str(row["postgres_snapshot"]) for row in canonical_relationship_rows})
     fixture = {
         "schema": "atlas.live-graph-fixture.v1",
         "workflow_id": args.workflow_id,
@@ -382,6 +416,12 @@ def main() -> int:
         "packet_aggregation_method": "MEAN_L2_RENORMALIZED_OVER_ADMITTED_CHUNKS",
         "chunk_level_admitted_row_count": len(identities),
         "postgres_snapshots": postgres_snapshots,
+        "canonical_relationship_edges_included": bool(args.include_canonical_relationships),
+        "canonical_relationship_edges_skip_reason": (
+            None
+            if args.include_canonical_relationships
+            else "ATLAS_RELATIONSHIPS_TABLES_DO_NOT_EXIST_IN_LIVE_SCHEMA_AS_OF_2026_08_24"
+        ),
         "vertices": vertices,
         "edges": canonical_edges + semantic_edges,
         "edge_counts": {

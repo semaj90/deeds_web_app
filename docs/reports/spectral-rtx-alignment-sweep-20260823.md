@@ -529,10 +529,67 @@ never have been implemented at the table level. Per this repo's own Drizzle
 Safety Rule (`CLAUDE.md`: "Do NOT change schema/migrations" without
 explicit review), this is not something to create or redirect unilaterally.
 
-Not yet done: deciding what LVG-2's relationship storage should actually
-be (create the missing tables? redirect the query at
-`atlas_feature_relationships` or a different existing table if its shape
-fits? treat canonical relationship edges as out of scope for this proof and
-make the graph semantic-KNN-only?), then re-running the fixture builder,
-connectivity/parity re-checks, Louvain comparison, Nsight Systems/Compute
-evidence (LVG-10/11).
+### LVG-2 descoped, fixture finally builds end to end -- and it's connected
+
+Operator decision (2026-08-24): descope canonical relationship edges rather
+than create schema or guess at a redirect target. Implemented via a new
+`--include-canonical-relationships` flag (default `False`) in
+`build_live_graph_fixture_semantic512.py` — when off, `fetch_relationship_rows`
+is skipped entirely, `canonical_edges = []`, and a lightweight
+`fetch_postgres_snapshot_only()` still captures a `pg_current_snapshot()`
+provenance marker so `postgres_snapshots` isn't silently dropped. The fixture
+now records `canonical_relationship_edges_included` and
+`canonical_relationship_edges_skip_reason` so this is always auditable from
+the output file, not just this doc. The prior hard-fail on zero canonical
+edges (`LIVE_GRAPH_NO_CANONICAL_RELATIONSHIP_EDGES...`) now only fires when
+`--include-canonical-relationships` is explicitly passed and still comes back
+empty — descoping itself is expected, not an error.
+
+Re-ran the fixture builder. Got past the relationship step cleanly, then hit
+a *fourth*, entirely separate bug: `cugraph`'s neighbor call aside,
+`cuvs.neighbors.all_neighbors.build()` (line 180) unpacks its result as a
+3-tuple (`indices, _distances, _core`), but the live `cuvs` 26.06.00 install
+returns a bare `device_ndarray` when no `distances`/`core_distances` output
+buffers are supplied — verified empirically (not from the docstring, which
+claims a 3-tuple return unconditionally) against a 50x8 test dataset:
+`all_neighbors.build(...)` returned a `(50, 5)` array directly, not a tuple.
+Fixed by assigning the return value directly instead of unpacking.
+
+**With all four fixes together (formula, aggregation, relationship descope,
+cuVS unpacking), the fixture builder ran completely end to end for the first
+time in this entire thread**: 500 vertices, 0 canonical edges (correctly
+descoped), 5,987 semantic KNN edges.
+(`.tmp/atlas/live-graph/live-graph-descoped.json`, not committed —
+`.tmp/` output).
+
+**Connectivity check — the question this whole addendum chased**: run through
+`scipy.sparse.csgraph.connected_components` on this fresh graph:
+**1 connected component, all 500 nodes.** The disconnection that started this
+entire diagnostic thread (2 components, 459+41, traced to proto-service
+packets and confirmed independently three separate times) does not occur in
+a correctly-built fixture.
+
+Ran the tranche's own documented proof script,
+`prove_live_graph_fixture.py`, against this fixture: `status: EXECUTED`, all
+four algorithms (PageRank, spectral balanced-cut, spectral modularity,
+Leiden) completed. Cluster shape is now structurally healthy, a sharp
+contrast to every earlier receipt in this addendum:
+
+| Algorithm | Distinct clusters | Sizes |
+|---|---|---|
+| Leiden | 6 (natural, not forced) | 147, 138, 68, 59, 57, 31 |
+| Spectral balanced-cut | 8 (matches frozen K) | 166, 90, 74, 46, 40, 35, 35, 14 |
+| Spectral modularity | 8 (matches frozen K) | 166, 90, 74, 46, 40, 35, 35, 14 |
+
+No 92%-dominant giant cluster, no Leiden degeneracy, no forced K=8 split of a
+near-homogeneous blob — every pathology found earlier in this addendum is
+absent from this fixture. `prove_live_graph_fixture.py` does not itself
+compute CPU/GPU ARI parity (that was `spectral_diagnostic_receipt_v2.py`,
+built against the parquet fixture schema, not this JSON schema) — re-testing
+the actual 0.99 promotion gate against this connected fixture is the last
+remaining step to fully close this addendum, not yet done.
+
+Not yet done: adapting the ARI parity check to this fixture's JSON schema (or
+converting to the parquet schema the existing diagnostic scripts expect) and
+re-running it against the 0.99 gate, Louvain comparison, Nsight
+Systems/Compute evidence (LVG-10/11).

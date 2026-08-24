@@ -76,8 +76,8 @@ NVTX parent-atlas@atlas.graph_fixture
 
 ```text
 LVG-0 semantic_512 reconciliation prerequisite              BLOCKED (formula bug fixed+verified, 0->41344/53379 admitted; now blocked on packet-vs-chunk cardinality decision)
-LVG-1 semantic_512 exact fixture builder                    EXECUTED_UNPROVEN (aggregation logic runs end-to-end clean; blocked downstream by LVG-2)
-LVG-2 canonical N-ary relationship compute projection      BLOCKED (atlas_relationships / atlas_relationship_members do not exist in live schema)
+LVG-1 semantic_512 exact fixture builder                    EXECUTED_UNPROVEN (runs end-to-end clean, produces a CONNECTED 500-node graph -- ARI parity re-check not yet run)
+LVG-2 canonical N-ary relationship compute projection      DESCOPED (tables don't exist; --include-canonical-relationships flag added, off by default, auditable via fixture fields)
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
 LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533; candidate cause: K=8 on a 2-component graph)
@@ -146,15 +146,37 @@ audit fields (`aggregated_chunk_count`, `aggregated_member_point_ids`) on
 every vertex. **Ran end-to-end without error through candidate selection**
 — further than any previous attempt in this file.
 
-**New, separate, larger blocker found immediately after: LVG-2's relationship
-tables don't exist.** The run failed at the next step with
-`psycopg2.errors.UndefinedTable: relation "atlas_relationship_members" does
-not exist`. Checked directly: neither `atlas_relationships` nor
-`atlas_relationship_members` exist anywhere in the live schema — this is
-missing schema, not a logic bug, and not fixable the way LVG-0/LVG-1 were.
-Per this repo's Drizzle Safety Rule (no schema/migration changes without
-explicit review), not touched. Full detail in
-`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+**LVG-2 descoped by operator decision (2026-08-24)**: new
+`--include-canonical-relationships` flag (default `False`, tables confirmed
+absent from live schema) skips `fetch_relationship_rows` entirely rather than
+creating schema or guessing a redirect target; fixture records
+`canonical_relationship_edges_included` / `canonical_relationship_edges_skip_reason`
+so this is always auditable.
+
+**Then hit and fixed a fourth, unrelated bug**: `cuvs.neighbors.all_neighbors.build()`
+was unpacked as a 3-tuple, but the live `cuvs` 26.06.00 install returns a bare
+`device_ndarray` when no `distances`/`core_distances` buffers are supplied —
+verified empirically against a throwaway 50x8 test dataset (contradicts the
+function's own docstring). Fixed by not unpacking.
+
+**Result: the fixture builder ran completely end to end for the first time in
+this thread** — 500 vertices, 0 canonical edges (correctly descoped), 5,987
+semantic KNN edges — **and the resulting graph is fully connected**: 1
+component, all 500 nodes, verified via `scipy.sparse.csgraph.connected_components`.
+The disconnection this entire file started with does not reproduce in a
+correctly-built fixture. Ran `prove_live_graph_fixture.py` against it
+(`status: EXECUTED`): Leiden naturally finds 6 balanced clusters (31-147
+nodes, no forcing, no degeneracy); spectral balanced-cut and modularity both
+naturally land on 8 clusters matching the frozen K, balanced 14-166 nodes,
+no 92%-dominant giant cluster. Every pathology found earlier in this file is
+absent here.
+
+**Not yet done**: `prove_live_graph_fixture.py` doesn't itself compute
+CPU/GPU ARI against the 0.99 promotion gate (that was
+`spectral_diagnostic_receipt_v2.py`, built against a different, parquet-based
+fixture schema) — re-testing the actual gate against this connected fixture
+is the one remaining step to fully close this file's open thread. Full
+detail in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500
