@@ -1,0 +1,59 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "firecrawl",
+  "source_ref": "firecrawl:docs-firecrawl-dev-api-reference-introduction-introduction",
+  "url": "https://docs.firecrawl.dev/api-reference/introduction",
+  "title": "Introduction - Firecrawl Docs",
+  "domain_class": "database",
+  "focus_tags": [
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations",
+    "kanban"
+  ],
+  "llm_synthesis": "This page documents Introduction - Firecrawl Docs. Firecrawl Docs is classified as tool. Use /scrape for known official docs pages and /crawl only when you need site-wide discovery.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Introduction - Firecrawl Docs",
+    "markdown_excerpt": "Introduction - Firecrawl Docs Documentation Index Fetch the complete documentation index at: /llms.txt Use this file to discover all available pages before exploring further. Skip to main content Firecrawl Docs home page v2 English Search... ⌘ K Status Support Sign Up firecrawl/firecrawl firecrawl/firecrawl Search... Navigation Introduction Documentation SDKs API Reference Build with AI Using the API Introduction Errors Search Endpoints POST Search POST Search Feedback Scrape Endpoints POST Scrape POST Batch Scrape GET Get Batch Scrape Status DEL Cancel Batch Scrape GET Get Batch Scrape Errors Interact Endpoints POST Create Interact Session POST Execute Code in a Session GET List Interact Sessions DEL Delete Interact Session POST Interact with a Scraped Page DEL Stop Interacting Research Index Endpoints GET Search Papers GET Inspect or Read Paper GET Find Related Papers Developer Index Endpoints GET Search the Developer Index Map Endpoints POST Map Parse Endpoints POST Parse Crawl Endpoints POST Crawl GET Get Crawl Status POST Crawl Params Preview DEL Cancel Crawl GET Get Crawl Errors GET Get Active Crawls Monitor Endpoints POST Create Monitor GET List Monitors GET Get Monitor PATC",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:firecrawl:docs-firecrawl-dev-api-reference-introduction-introduction",
+    "title": "Introduction - Firecrawl Docs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Firecrawl Docs from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Firecrawl /scrape",
+      "recommendation": "Use /scrape for known official docs pages and /crawl only when you need site-wide discovery.",
+      "rationale": "Firecrawl documents scrape, crawl, search, extract, and parse as distinct surfaces."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "17b6c5e46e0634be1c09d6c00ec070dc582acdd8d960df68439ae670fa27b604",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\raw\\firecrawl\\docs-firecrawl-dev-api-reference-introduction-introduction.md",
+  "fetched_at": "2026-08-24T06:06:21.617Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "firecrawl",
+    "source_title": "Firecrawl Docs",
+    "fetched_via": "fallback"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\raw\\firecrawl\\docs-firecrawl-dev-api-reference-introduction-introduction.md"
+}

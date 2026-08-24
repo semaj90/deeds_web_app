@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.okf-dev-symbol-summary.v1",
+  "status": "WRITTEN",
+  "source_files": 1,
+  "code_blocks": 0,
+  "ast_grep_parsed_blocks": 0,
+  "symbols": 0,
+  "output": {
+    "symbol_index": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\symbol-index.jsonl",
+    "summary": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\symbol-summary.json"
+  },
+  "canonical_authority": false
+}

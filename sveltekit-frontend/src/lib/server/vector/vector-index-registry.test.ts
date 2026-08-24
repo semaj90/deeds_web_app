@@ -5,6 +5,10 @@ import {
   EMBEDDINGGEMMA_FULL768_V1,
   EMBEDDINGGEMMA_PREFIX384_CONTRACT,
   EMBEDDINGGEMMA_PREFIX384_V1,
+  EMBEDDINGGEMMA_MRL512_CONTRACT,
+  EMBEDDINGGEMMA_MRL256_CONTRACT,
+  EMBEDDINGGEMMA_MRL128_CONTRACT,
+  projectEmbeddingForContract,
 } from './embeddinggemma-prefix384.js';
 import {
   VECTOR_INDEX_REGISTRY,
@@ -30,7 +34,12 @@ describe('vector-index-registry', () => {
     expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.dimension).toBe(384);
     expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.sourceDimension).toBe(768);
     expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.outputDimension).toBe(384);
-    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.truncation).toBe('prefix');
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.truncation).toBe('legacy_direct_slice');
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.projectionKind).toBe('direct_slice');
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.encoderFamily).toBe('embeddinggemma');
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.queryCompatible).toBe(false);
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.queryEncoderRole).toBe('QUERY');
+    expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.candidateEncoderRole).toBe('DOCUMENT');
     expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.canonical).toBe(false);
     expect(EMBEDDINGGEMMA_PREFIX384_CONTRACT.vectorPurpose).toBe('content-semantic');
   });
@@ -43,6 +52,31 @@ describe('vector-index-registry', () => {
     expect(VECTOR_INDEX_REGISTRY.qdrantHybrid.collection).toBe('codebase_chunks_384_hybrid');
     expect(VECTOR_INDEX_REGISTRY.qdrantDense.collection).toBe('codebase_chunks_384');
     expect(VECTOR_INDEX_REGISTRY.turbovecShadow.backend).toBe('turbovec-shadow');
+  });
+
+  it('defines model-native MRL prefixes and renormalizes after projection', () => {
+    for (const [contract, dimension] of [
+      [EMBEDDINGGEMMA_MRL512_CONTRACT, 512],
+      [EMBEDDINGGEMMA_MRL256_CONTRACT, 256],
+      [EMBEDDINGGEMMA_MRL128_CONTRACT, 128],
+    ] as const) {
+      expect(contract.outputDimension).toBe(dimension);
+      expect(contract.truncation).toBe('mrl_prefix');
+      expect(contract.projectionKind).toBe('mrl_prefix');
+      expect(contract.representationFamily).toBe('semantic_mrl');
+      expect(contract.queryCompatible).toBe(true);
+      expect(contract.queryEncoderRole).toBe('QUERY');
+      expect(contract.candidateEncoderRole).toBe('DOCUMENT');
+      expect(contract.renormalizeAfterProjection).toBe(true);
+      expect(contract.modelRevision).toBe(EMBEDDINGGEMMA_FULL768_V1);
+    }
+
+    const projected = projectEmbeddingForContract([3, 4, ...new Array(763).fill(0)], EMBEDDINGGEMMA_MRL128_CONTRACT);
+    const norm = Math.sqrt(projected.reduce((sum, value) => sum + value * value, 0));
+    expect(projected).toHaveLength(128);
+    expect(norm).toBeCloseTo(1, 6);
+    expect(projected[0]).toBeCloseTo(0.6, 6);
+    expect(projected[1]).toBeCloseTo(0.8, 6);
   });
 
   it('returns registry entries by key', () => {

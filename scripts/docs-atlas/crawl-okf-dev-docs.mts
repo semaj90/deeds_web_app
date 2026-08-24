@@ -3,6 +3,8 @@ import 'dotenv/config';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import crypto from 'node:crypto';
 import { z } from 'zod';
 
@@ -77,6 +79,7 @@ const RAW_ROOT = join(OUTPUT_ROOT, 'raw');
 const RECORDS_PATH = join(OUTPUT_ROOT, 'corpus.jsonl');
 const INDEX_PATH = join(OUTPUT_ROOT, 'index.md');
 const SUMMARY_PATH = join(OUTPUT_ROOT, 'summary.json');
+const execFileAsync = promisify(execFile);
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -240,6 +243,23 @@ async function fetchWithFallback(url: string) {
   };
 }
 
+async function fetchWithBeautifulSoup(url: string) {
+  const python = process.env.PYTHON_BIN || 'python';
+  const script = join(REPO_ROOT, 'scripts/docs-atlas/fetch-beautifulsoup.py');
+  const { stdout } = await execFileAsync(python, [script, url], {
+    cwd: REPO_ROOT,
+    maxBuffer: 8 * 1024 * 1024,
+    windowsHide: true,
+  });
+  const payload = JSON.parse(stdout.trim()) as Record<string, unknown>;
+  if (payload.error) throw new Error(`beautifulsoup_${String(payload.error)}`);
+  return {
+    title: String(payload.title ?? new URL(url).hostname),
+    markdown: String(payload.markdown ?? ''),
+    raw: { source: 'beautifulsoup', ...payload },
+  };
+}
+
 async function main() {
   const manifest = JSON.parse(await readFile(MANIFEST_PATH, 'utf8')) as { sources: ManifestSource[] };
   const records: string[] = [];
@@ -272,7 +292,8 @@ async function main() {
       await mkdir(sourceDir, { recursive: true });
 
       const fetched =
-        (await fetchWithFirecrawl(url).catch(async () => await fetchWithFallback(url))) ??
+        (await fetchWithFirecrawl(url).catch(() => null)) ??
+        (await fetchWithBeautifulSoup(url).catch(() => null)) ??
         (await fetchWithFallback(url));
       const markdown = fetched.markdown || '';
       const contentHash = sha256(markdown);
@@ -319,7 +340,7 @@ async function main() {
           kind: source.kind,
           source_id: source.source_id,
           source_title: source.title,
-          fetched_via: process.env.FIRECRAWL_API_KEY ? 'firecrawl' : 'fallback',
+          fetched_via: fetched.raw?.source ?? (process.env.FIRECRAWL_API_KEY ? 'firecrawl' : 'fallback'),
         },
       });
 

@@ -20,9 +20,15 @@ export const QDRANT_COLLECTION_BY_TIER = {
 
 export const EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT = {
   embeddingContract: 'embeddinggemma-prefix768-v1',
+  modelRevision: 'embeddinggemma-full768-v1',
+  queryEncoderRole: 'QUERY',
+  candidateEncoderRole: 'DOCUMENT',
+  representation: 'semantic_768',
   sourceEmbeddingDimension: QDRANT_SOURCE_EMBEDDING_DIMENSION,
   retrievalEmbeddingDimension: QDRANT_RETRIEVAL_EMBEDDING_DIMENSION,
   truncation: 'none',
+  projectionKind: 'none',
+  renormalized: false,
   canonical: true,
   denseVectorName: QDRANT_DENSE_VECTOR_NAME,
   sparseVectorName: QDRANT_SPARSE_VECTOR_NAME,
@@ -33,7 +39,21 @@ export const EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT = {
 } as const;
 
 export const EMBEDDINGGEMMA_PREFIX384_RETRIEVAL_CONTRACT =
-  EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT;
+  {
+    ...EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT,
+    embeddingContract: 'atlas-embeddinggemma-direct-slice384-v1',
+    modelRevision: 'atlas-embeddinggemma-direct-slice384-v1',
+    queryEncoderRole: 'QUERY',
+    candidateEncoderRole: 'DOCUMENT',
+    representation: 'legacy_384',
+    sourceEmbeddingDimension: 768,
+    retrievalEmbeddingDimension: 384,
+    truncation: 'legacy_direct_slice',
+    canonical: false,
+    queryCompatible: false,
+    projectionKind: 'direct_slice',
+    renormalized: false,
+  } as const;
 
 /**
  * Compatibility alias for legacy callers.
@@ -43,4 +63,5 @@ export const EMBEDDINGGEMMA_PREFIX384_RETRIEVAL_CONTRACT =
  */
 
 export type QdrantRetrievalSemantics =
-  typeof EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT;
+  | typeof EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT
+  | typeof EMBEDDINGGEMMA_PREFIX384_RETRIEVAL_CONTRACT;

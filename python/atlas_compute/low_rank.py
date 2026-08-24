@@ -53,6 +53,24 @@ class LowRankComparisonReceipt:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class CandidateShortlistReceipt:
+    schema: str
+    policy: str
+    rows: int
+    columns: int
+    rank: int
+    target_count: int
+    seed: int
+    device: str
+    input_checksum: str
+    output_checksum: str
+    canonical_authority: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
@@ -173,3 +191,77 @@ def compare_low_rank_recommendations(
         output_checksum=_sha256_bytes(output_payload.encode("utf-8")),
         canonical_authority=False,
     )
+
+
+def shortlist_candidate_ordinals(
+    matrix: Sequence[Sequence[float]] | np.ndarray,
+    candidate_ordinals: Sequence[int],
+    query_features: Sequence[float],
+    *,
+    rank: int = 32,
+    target_count: int = 96,
+    seed: int = 0xA71A5,
+    device: str | None = None,
+) -> tuple[list[int], CandidateShortlistReceipt]:
+    """Nominate candidate rows with a bounded low-rank query projection.
+
+    This is an explicit ``TANG_INSPIRED`` nomination primitive, not Tang's
+    sublinear algorithm. Exact ranking and evidence promotion remain outside
+    this function. Candidate ordinals are preserved as the durable identity;
+    matrix row positions are only execution addresses.
+    """
+
+    import torch
+
+    source = np.asarray(matrix, dtype=np.float32)
+    ordinals = np.asarray(candidate_ordinals, dtype=np.int64)
+    query = np.asarray(query_features, dtype=np.float32)
+    if source.ndim != 2 or source.shape[0] == 0 or source.shape[1] == 0:
+        raise ValueError("matrix must be non-empty rank-2")
+    if ordinals.ndim != 1 or ordinals.shape[0] != source.shape[0]:
+        raise ValueError("candidate_ordinals must match matrix rows")
+    if query.ndim != 1 or query.shape[0] != source.shape[1]:
+        raise ValueError("query_features must match matrix columns")
+    if len(set(ordinals.tolist())) != len(ordinals):
+        raise ValueError("candidate_ordinals must be unique")
+    max_rank = min(source.shape)
+    if not (1 <= rank <= max_rank):
+        raise ValueError(f"rank must be in [1,{max_rank}]")
+    if not (1 <= target_count <= source.shape[0]):
+        raise ValueError("target_count must be within matrix rows")
+
+    configure_torch_determinism(seed=seed, matmul_mode="ieee")
+    resolved_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+    tensor = torch.as_tensor(source, dtype=torch.float32, device=resolved_device)
+    query_tensor = torch.as_tensor(query, dtype=torch.float32, device=resolved_device)
+    with torch.inference_mode():
+        mean = tensor.mean(dim=0, keepdim=True)
+        centered = tensor - mean
+        _, _, vh = torch.linalg.svd(centered, full_matrices=False)
+        basis = vh[:rank].transpose(0, 1)
+        candidate_latent = centered @ basis
+        query_latent = (query_tensor.unsqueeze(0) - mean) @ basis
+        candidate_norm = torch.linalg.vector_norm(candidate_latent, dim=1).clamp_min(1e-12)
+        query_norm = torch.linalg.vector_norm(query_latent, dim=1).clamp_min(1e-12)
+        scores = (candidate_latent @ query_latent.squeeze(0)) / (candidate_norm * query_norm)
+
+    score_values = scores.detach().cpu().numpy().astype(np.float64, copy=False)
+    row_indices = np.arange(source.shape[0], dtype=np.int64)
+    order = np.lexsort((ordinals, row_indices, -score_values))[:target_count]
+    selected = [int(ordinals[index]) for index in order.tolist()]
+    input_checksum = _sha256_bytes(np.ascontiguousarray(source).tobytes() + np.ascontiguousarray(query).tobytes())
+    output_checksum = _sha256_bytes(",".join(map(str, selected)).encode("utf-8"))
+    receipt = CandidateShortlistReceipt(
+        schema="atlas.candidate-shortlist-receipt.v1",
+        policy="TANG_INSPIRED_LOW_RANK_SHORTLIST",
+        rows=int(source.shape[0]),
+        columns=int(source.shape[1]),
+        rank=int(rank),
+        target_count=int(target_count),
+        seed=int(seed),
+        device=resolved_device,
+        input_checksum=input_checksum,
+        output_checksum=output_checksum,
+        canonical_authority=False,
+    )
+    return selected, receipt

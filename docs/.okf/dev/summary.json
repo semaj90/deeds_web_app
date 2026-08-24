@@ -1,38 +1,42 @@
 {
   "schema_version": "okf.dev.summary.v1",
-  "generated_at": "2026-07-30T21:13:34.334Z",
-  "source_count": 8,
-  "page_count": 29,
-  "source_ids": [
-    "firecrawl",
-    "qdrant",
-    "mastra",
-    "trpc",
-    "acp",
-    "a2a",
-    "opencode",
-    "rapids"
-  ],
-  "domain_classes": [
-    "tool",
-    "database",
-    "workflow",
-    "agent",
-    "gpu"
-  ],
-  "focus_tags": [
-    "llm_output",
-    "taskboard",
-    "agentic_error_fixing",
-    "canonical_api_recommendations",
-    "llm_synthesis",
-    "kanban"
-  ],
-  "firecrawl_key_present": false,
-  "searxng_url": "http://localhost:8889",
-  "output_files": [
-    "index.md",
-    "summary.json"
-  ],
-  "inventory_path": "local-source-inventory.md"
+  "generated_at": "2026-08-24T06:06:21.629Z",
+  "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\manifest.json",
+  "records": 1,
+  "summary": {
+    "firecrawl": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "qdrant": {
+      "pages": 0,
+      "domains": {}
+    },
+    "mastra": {
+      "pages": 0,
+      "domains": {}
+    },
+    "trpc": {
+      "pages": 0,
+      "domains": {}
+    },
+    "acp": {
+      "pages": 0,
+      "domains": {}
+    },
+    "a2a": {
+      "pages": 0,
+      "domains": {}
+    },
+    "opencode": {
+      "pages": 0,
+      "domains": {}
+    },
+    "rapids": {
+      "pages": 0,
+      "domains": {}
+    }
+  }
 }
