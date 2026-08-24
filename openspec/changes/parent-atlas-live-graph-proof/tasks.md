@@ -80,10 +80,10 @@ LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
-LVG-5 spectral balanced-cut                                 IMPLEMENTED_UNPROVEN
-LVG-6 spectral modularity                                   IMPLEMENTED_UNPROVEN
-LVG-7 Leiden comparison                                     IMPLEMENTED_UNPROVEN
-LVG-8 stability/analyzer/repair metrics                     IMPLEMENTED_UNPROVEN
+LVG-5 spectral balanced-cut                                 EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9533)
+LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (parity BLOCKED, ARI 0.9535)
+LVG-7 Leiden comparison                                     IMPLEMENTED_UNPROVEN (not yet run on this fixture)
+LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
 LVG-11 Nsight Compute Tensor Core/precision evidence        IMPLEMENTED_UNPROVEN
@@ -93,6 +93,25 @@ LVG-14 agentic repair validator fixture                     PENDING
 ```
 
 `IMPLEMENTED_UNPROVEN` means runnable code exists; no live workstation PASS is implied.
+`EXECUTED_UNPROVEN` means a live workstation receipt exists but at least one proof-criteria
+item below still fails (here: item 4/5, promotion gate criterion 6's `cpuGpuARI >= 0.99`).
+
+Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
+`docs/reports/spectral-live-fixture-receipt-500.json`,
+`docs/reports/spectral-live-fixture-zero-duplicates-receipt-500.json`,
+`docs/reports/spectral-live-fixture-zero-duplicates-evs-1e-4-receipt-500.json`,
+`docs/reports/spectral-live-fixture-zero-duplicates-evs-1e-6-receipt-500.json`,
+`docs/reports/spectral-live-fixture-zero-duplicates-eigen-2-receipt-500.json`,
+`docs/reports/spectral-live-fixture-zero-duplicates-eigen-4-receipt-500.json`,
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md` (narrative + reconciliation addendum), and
+`docs/reports/spectral-diagnostic-receipt-v2.json` (fixed-seed repeat determinism +
+k-means initialization census — **currently untracked**, along with its producer
+`scripts/atlas/spectral_diagnostic_receipt_v2.py`; commit both before treating this
+as durable evidence). Promotion gate (proof criterion 6, `cpuGpuARI >= 0.99`) remains
+`BLOCKED` at ARI ~0.953-0.955 regardless of eigensolver tolerance, eigenvector count,
+or CPU operator (normalized-Laplacian vs. modularity matrix); k-means initialization
+method is the strongest untested lead (`scripts/atlas/spectral_diagnostic_receipt_v2.py`
+`kmeansCensus`: ARI 0.20-0.9553 depending on `init`/`n_init`, none reaching 0.99).
 
 ## Operator sequence
 

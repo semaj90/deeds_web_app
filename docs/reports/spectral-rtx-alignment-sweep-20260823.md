@@ -105,3 +105,52 @@ Status: `WIRED / FIXTURE_PROVEN / RUNTIME_EXECUTED / PARITY_BLOCKED`
 3. Inspect the receipt and compare CPU/GPU checksums and metrics.
 4. Only after parity, design a separate projection readback proof; do not add
    a new canonical table or mutate existing stores in this tranche.
+
+## Addendum (2026-08-23, later same day): "stability ARI 0.968814" reconciled — not a determinism failure
+
+A second diagnostic (`scripts/atlas/spectral_diagnostic_receipt_v2.py`, receipt
+`docs/reports/spectral-diagnostic-receipt-v2.json`, both currently untracked)
+was run against the same frozen 500-node zero-duplicate fixture to close gap
+1 above (GPU determinism / k-means initialization semantics). It reports
+`gpuGpuARI: [1.0, 1.0]` and `gpuRepeatDeterministic: true` across all four
+`evs_tolerance` values (`1e-4`..`1e-7`), each with 3 repeats and identical
+assignment/canonical-partition checksums per tolerance.
+
+This looks like a contradiction of the `0.968814` stability figure reported
+above until the two scripts are compared directly:
+
+- `scripts/atlas/spectral_fixture_benchmark.py:413` — `kwargs = dict(solver_parameters, random_state=seed + repeat)`.
+  Each of the 3 repeats runs with a **different** `random_state`
+  (`seed`, `seed+1`, `seed+2`). `stability_ari` is therefore a
+  seed-sensitivity measurement, not a same-seed determinism check.
+- `scripts/atlas/spectral_diagnostic_receipt_v2.py:266` — `random_state=args.random_seed`
+  inside the repeat loop, unchanged across all 3 iterations. This is the
+  actual fixed-seed determinism check.
+
+Both figures are real and not in conflict once read this way:
+`cugraph.spectralModularityMaximizationClustering` on this fixture is
+**exactly deterministic for a fixed seed** (ARI 1.0, confirmed) **and**
+**sensitive to which seed is used** (ARI ~0.9688 across seed, seed+1, seed+2,
+confirmed separately) — consistent with the near-degenerate eigenspace
+hypothesis (`spectral_gap: 0.092` on the balanced-cut operator in the v2
+receipt) rather than GPU nondeterminism. Item 4 in "Remaining gaps" above
+(`Keep the live receipt as EXECUTED_UNPROVEN until parity and repeat
+determinism pass`) is updated accordingly: **fixed-seed repeat determinism
+now passes**; parity against the CPU oracle (item 2) does not.
+
+The v2 receipt also ran a k-means initialization census
+(`cuml.cluster.KMeans` over the CPU modularity-eigenvector embedding,
+`init` × `n_init` swept) that the earlier gap list flagged as unexplored.
+Results range from ARI 0.20 (`random` init, `n_init=1`) to ARI 0.9553
+(`k-means++`, `n_init=10`) against the cuGraph baseline partition, with
+`scalable-k-means++` (cuML's own default) at 0.9536–0.9540. This is now the
+strongest lead for the remaining CPU/GPU gap: k-means initialization
+sensitivity, not eigensolver tolerance (already ruled out in the sweep
+above) and not choice of CPU operator (normalized-Laplacian and modularity
+operators both converge to ARI ~0.953–0.955 against the GPU baseline in the
+v2 receipt, i.e. the same ceiling regardless of operator). No run in the
+census reaches the 0.99 promotion gate; the gate remains `BLOCKED`.
+
+Not yet done: Leiden/Louvain comparison against this same fixture (LVG-7),
+Nsight Systems/Compute evidence (LVG-10/11), and committing
+`spectral_diagnostic_receipt_v2.py` + its receipt.
