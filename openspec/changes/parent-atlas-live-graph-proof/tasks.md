@@ -239,9 +239,29 @@ with cleaner eigenvalue separation (a property of upstream selection, not
 this spectral step) rather than more solver tuning. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-Not yet done: Louvain comparison, Nsight Systems/Compute evidence
-(LVG-10/11), testing whether upstream candidate selection tuned for cleaner
-eigenvalue separation improves parity.
+**Louvain comparison: audited before assuming it needs new code
+(`rg -i louvain`).** `python/atlas_rapids_community.py` already implements a
+real, working `cugraph.louvain(...)` call (line 269) behind a Pydantic
+request/response schema (`CommunityPartitionRequestV1`,
+`algorithm: Literal["louvain", "leiden", "spectral"]`) explicitly framed as
+"a GPU challenger... so the same frozen undirected weighted projection can
+be compared backend-to-backend" — this is not the Neo4j GDS canonical
+Louvain/Leiden lane (`compute-louvain-neo4j.mjs`,
+`neo4j-gds-louvain.mjs`, etc. — 28 files match `louvain` under
+`scripts/atlas/`, but those are the separate, durable-ownership community
+lane the module's own docstring explicitly distinguishes itself from: "Neo4j
+GDS remains the durable owner for promoted Louvain/Leiden runs today"). The
+request schema uses external string node IDs (`nodeId`, `source`, `target`),
+matching this tranche's `packet_key` identity directly — no ordinal
+remapping needed to invoke it against the same fixture used throughout this
+file. **Not yet run against this fixture** — this is a matter of invoking
+an existing, purpose-built module, not writing a new Louvain runner. Do not
+create a second one.
+
+Not yet done: invoking `atlas_rapids_community.py`'s Louvain path against
+the same connected fixture used in the mechanism-finding above, Nsight
+Systems/Compute evidence (LVG-10/11), testing whether upstream candidate
+selection tuned for cleaner eigenvalue separation improves parity.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500

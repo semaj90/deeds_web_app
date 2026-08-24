@@ -791,6 +791,27 @@ of this spectral step) or accepting that near-degenerate boundaries are
 inherently solver-sensitive and the 0.99 gate itself may need to account
 for that rather than treating any CPU/GPU disagreement as a defect.
 
-Not yet done: Louvain comparison, Nsight Systems/Compute evidence
-(LVG-10/11), and (if pursued) testing whether a candidate sample selected
-for cleaner eigenvalue separation improves parity.
+### Louvain comparison: audited before assuming new code was needed
+
+Ran `rg -i louvain` across the repo before writing a Louvain runner for this
+fixture. `python/atlas_rapids_community.py:269` already has a real, working
+`cugraph.louvain(...)` call behind a Pydantic request/response schema
+(`CommunityPartitionRequestV1`, `algorithm: Literal["louvain", "leiden", "spectral"]`),
+explicitly framed by its own module docstring as "a GPU challenger... so the
+same frozen undirected weighted projection can be compared backend-to-backend" —
+distinct from the separate Neo4j GDS canonical Louvain/Leiden lane (28 files
+match `louvain` under `scripts/atlas/`, e.g. `compute-louvain-neo4j.mjs`,
+`neo4j-gds-louvain.mjs`; the module's own docstring calls that lane out
+explicitly: "Neo4j GDS remains the durable owner for promoted Louvain/Leiden
+runs today"). The request schema uses external string node IDs (`nodeId`,
+`source`, `target`), matching this addendum's `packet_key` identity
+directly — no ordinal remapping needed to point it at the same fixture used
+throughout this file.
+
+**Not yet run against this fixture, but this is a matter of invoking an
+existing, purpose-built module — do not write a second Louvain runner.**
+
+Not yet done: invoking `atlas_rapids_community.py`'s Louvain path against
+the connected fixture, Nsight Systems/Compute evidence (LVG-10/11), and (if
+pursued) testing whether a candidate sample selected for cleaner eigenvalue
+separation improves parity.
