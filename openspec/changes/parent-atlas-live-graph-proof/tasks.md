@@ -76,7 +76,7 @@ NVTX parent-atlas@atlas.graph_fixture
 
 ```text
 LVG-0 semantic_512 reconciliation prerequisite              EXISTING_UNEXECUTED
-LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (candidate-selection defect found, see below)
+LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (mixes proto-service + codebase corpora, see below)
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
 LVG-4 live cuGraph PageRank                                 IMPLEMENTED_UNPROVEN
@@ -148,23 +148,31 @@ with the already-recorded `eigenspace.canonical_authority: false` flag and
 the k-means census's ARI range of 0.20-0.9553 driven purely by
 `init`/`n_init` choice. See the full writeup in `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
-**LVG-1 defect, root-caused (not just hypothesized):** cross-referencing the
-two components against `packet_key` shows component 0 (41 nodes) is entirely
-bare-hex packet keys (e.g. `0ba2345cd9c542fa`) and component 1 (459 nodes) is
-entirely `ace:packet:`-prefixed keys — the two identity naming schemes
-described in `SESSION-200-PACKET-IDENTITY-ALIAS-CONVERGENCE` memory (resolved
-there via `atlas_packet_identity_aliases` + `resolveCanonicalPacketKey()`).
-`python/build_live_graph_fixture_semantic512.py:215` selects candidates via
-`sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]`
-— a raw lexicographic string sort, with no call to `resolveCanonicalPacketKey`
-or reference to `atlas_packet_identity_aliases` anywhere in the file. ASCII
-sorts digits before `a`, so the first 500 rows by this order are "every
-currently-admitted bare-hex row, padded out with the alphabetically-earliest
-`ace:packet:` rows" — an artifact of un-reconciled identity schemes plus a raw
-string sort, not a representative sample. This will recur on every re-run
-until the fixture builder either canonicalizes `packet_key` before selecting
-candidates or stops using raw lexicographic packet_key order as the
-selection method.
+**LVG-1 finding, corrected once already** — an earlier version of this note
+claimed the two components were the `SESSION-200-PACKET-IDENTITY-ALIAS-CONVERGENCE`
+`packet:`/`ace:packet:` collision. That was checked against the live database
+and is wrong: all 41 bare-hex keys already have live `atlas_packets` rows
+(exact-match, no alias needed) and none appear in `atlas_packet_identity_aliases`
+(3,294 rows checked, all a different key shape). `resolveCanonicalPacketKey()`
+would resolve these 41 keys unchanged — it would fix nothing here.
+
+The real finding: component 0's 41 nodes all have `source_ref` of the form
+`proto:<ServiceName>.<Method>` (gRPC/Protobuf service-definition packets) —
+a structurally different corpus from component 1's 459 `ace:packet:`
+codebase-chunk packets. These two corpora are far enough apart in
+`semantic_512` space that the top-16 cuVS KNN
+(`python/build_live_graph_fixture_semantic512.py`, `--semantic-top-k 16`)
+doesn't bridge them at this candidate-window size. The lexicographic
+candidate sort at line 215
+(`sorted(identities, key=lambda row: (row.packet_key, str(row.point_id)))[:limit]`)
+then determines exactly *which* 41-vs-459 split gets admitted (pure-hex proto
+keys sort before `ace:packet:...` alphabetically), but the underlying
+"these two corpora don't bridge under KNN" is a real structural property,
+not a sort-order artifact by itself. Full corrected writeup, including two
+un-implemented fix candidates that need an explicit scope decision first
+(exclude proto-service packets from this proof entirely, vs. raise
+semantic-top-k / use a connectivity-aware sample), is in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):
 `docs/reports/spectral-live-fixture-receipt-500.json`,
