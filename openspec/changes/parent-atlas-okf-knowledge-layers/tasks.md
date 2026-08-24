@@ -80,6 +80,19 @@ recommendation engine, or Deep Agents integration under this task list.
   validator can be built; reconciling the manifest/filesystem drift found
   above (5 declared vs. 3 present domain schemas).
 - [ ] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
+
+  **Attempted 2026-08-24, blocked before writing anything**: checked
+  `.okf/manifest.yaml`'s registries before creating files, since every
+  existing `.okf/` file type (`languages`, `domains`, `corpora`, `symbols`,
+  `tools`, `predicates`, `indexes`) is declared there first. There is no
+  `concepts` or `gaps` registry defined anywhere in the manifest. Writing 6
+  "gap concept files" now would mean inventing a new registry category and
+  file schema (what fields, what directory, what the OKF validator would
+  even check) from nothing — the same class of unilateral spec decision
+  this file's own OKF v0.2 finding above already flagged as needing an
+  explicit decision, not a file-count deliverable. Not attempted further.
+  The 6 gaps themselves are still accurately enumerated in `proposal.md`
+  line 35-39 and remain real, just not yet given a home format.
 - [ ] Validation: OKF validator run against the 6 new files reports 0 schema errors.
 
 ### OKF / telemetry / ontology-linked tuple boundary
