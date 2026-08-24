@@ -85,8 +85,8 @@ LVG-6 spectral modularity                                   EXECUTED_UNPROVEN (p
 LVG-7 Leiden/Louvain comparison                              EXECUTED_UNPROVEN (both healthy on the connected fixture: Leiden 6 clusters, Louvain 7; degeneracy found earlier was specific to the disconnected fixture, since fixed)
 LVG-8 stability/analyzer/repair metrics                     EXECUTED_UNPROVEN (fixed-seed repeat determinism PROVEN; repair metrics still absent)
 LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
-LVG-10 Nsight Systems immutable trace                       IMPLEMENTED_UNPROVEN
-LVG-11 Nsight Compute Tensor Core/precision evidence        IMPLEMENTED_UNPROVEN
+LVG-10 Nsight Systems immutable trace                       BLOCKED (nsys not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
+LVG-11 Nsight Compute Tensor Core/precision evidence        BLOCKED (ncu not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
 LVG-12 Graphify daily adoption                              PENDING
 LVG-13 workflow/A2A artifact streaming                      PENDING
 LVG-14 agentic repair validator fixture                     PENDING
@@ -398,6 +398,19 @@ pre-existing gap — the on-disk reconciliation manifest currently has zero
 `ADMITTED` rows (LVG-0, already `EXISTING_UNEXECUTED` before this session).
 The patch itself compiles cleanly and reached the reconciliation-loading
 step before hitting that unrelated failure. Full writeup in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
+
+LVG-10/LVG-11 detail: `scripts/atlas/profile-live-graph-fixture.sh` requires
+both `nsys` and `ncu` on `PATH`. Checked directly in the `atlas-rapids-cu13`
+WSL2 environment: neither is installed (`which nsys`/`which ncu` empty, no
+`/opt/nvidia`, no `/usr/local/cuda*/bin`, no Nsight package via
+`dpkg`/`apt`). This is a genuine tooling gap, not a script or fixture
+defect — the wrapper's own `NSYS_NOT_FOUND`/`NCU_NOT_FOUND` guards would
+fire cleanly rather than fail silently. Installing Nsight Systems/Compute
+is a real system-level change to the environment, not something to do
+unilaterally the way this session's other fixes were (dtype casts, formula
+corrections, driver scripts) — needs an explicit decision, same as the
+LVG-2 schema question earlier in this file. Full detail in
 `docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 Live receipts backing the `EXECUTED_UNPROVEN` rows (2026-08-23):

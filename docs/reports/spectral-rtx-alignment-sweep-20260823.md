@@ -957,7 +957,33 @@ scope for Python-level diagnostics) or accepting that this candidate
 sample's structure may not be well-suited to spectral modularity
 maximization at all, independent of any implementation bug.
 
-Not yet done: Nsight Systems/Compute evidence (LVG-10/11), testing whether
+Not yet done: Nsight Systems/Compute evidence (LVG-10/11) — see next
+section, blocked on missing tooling, not attempted further; testing whether
 a candidate sample selected for both cleaner eigenvalue separation and more
-uniform community sizes improves parity, C++/CUDA-level investigation if
+uniform community sizes improves parity; C++/CUDA-level investigation if
 pursued further (out of scope here).
+
+### LVG-10/11 Nsight evidence: blocked on missing tooling, not a bug
+
+`scripts/atlas/profile-live-graph-fixture.sh` (this tranche's documented
+Nsight wrapper) requires both `nsys` and `ncu` on `PATH`. Checked the
+`atlas-rapids-cu13` WSL2 environment directly: neither binary exists
+anywhere (`which nsys` / `which ncu` both empty; no `/opt/nvidia`, no
+`/usr/local/cuda*/bin`, no Nsight package registered via `dpkg`/`apt`).
+Nsight Systems and Nsight Compute are not installed in this environment at
+all — this is a genuine tooling gap, not a script defect or a fixture
+problem, and running the wrapper would simply hit its own documented
+`NSYS_NOT_FOUND`/`NCU_NOT_FOUND` guard (`exit 20`/`21`) rather than fail
+silently.
+
+**Not installed here.** Installing NVIDIA Nsight Systems/Compute into WSL2
+is a real system-level download and install, not something to do
+unilaterally the way the earlier in-session fixes (dtype casts, formula
+corrections, a Python driver script) were — it changes the environment
+itself, not just this repo's code. This needs an explicit decision, the
+same way the LVG-2 schema question did.
+
+Not yet done: deciding whether to install Nsight Systems/Compute in this
+environment (or run this proof step on a workstation that already has it),
+then executing `profile-live-graph-fixture.sh` against the connected
+fixture once available.
