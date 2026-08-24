@@ -75,7 +75,7 @@ NVTX parent-atlas@atlas.graph_fixture
 ## Implementation status
 
 ```text
-LVG-0 semantic_512 reconciliation prerequisite              EXISTING_UNEXECUTED
+LVG-0 semantic_512 reconciliation prerequisite              BLOCKED (matching-logic bug: all 3 strong-match paths structurally unreachable, 0/53379 admitted)
 LVG-1 semantic_512 exact fixture builder                    IMPLEMENTED_UNPROVEN (proto-exclusion fix applied, unverified -- LVG-0 blocks re-run)
 LVG-2 canonical N-ary relationship compute projection      IMPLEMENTED_UNPROVEN
 LVG-3 exact cuVS semantic top-K graph                       IMPLEMENTED_UNPROVEN
@@ -99,6 +99,32 @@ item below still fails (here: item 4/5, promotion gate criterion 6's `cpuGpuARI 
 error, but produced a partition that is not a candidate for the comparison it was meant for
 (here: every node its own cluster). This is a separate, more severe failure than
 `EXECUTED_UNPROVEN` and must not be reported as "not yet run."
+`BLOCKED` means a live, read-only run was executed and produced a deterministic,
+reproducible non-result (here: 0 admitted rows) traced to a specific bug, not
+absence of a run and not flaky/stale data.
+
+LVG-0 detail: a fresh, read-only run of `python/atlas_semantic512_reconcile.py`
+(no `--apply-payload`, no `--expected-manifest-checksum` — confirmed those are
+the only write-gating flags in the script) produced 0 `ADMITTED`, 0 `REJECTED`,
+53,379/53,379 rows `SOURCE_REF_ONLY_MATCH`. Traced to `classify_candidate()`'s
+three "strong match" paths all being structurally unreachable against the live
+schema: `EXPECTED_PACKET_KEY` assumes `packet_key = f"{source_ref}:{content_hash[:16]}"`
+but live `packet_key` is `ace:packet:sha256(source_ref)[:12]` (verified on 5
+sampled rows, no `content_hash` involvement at all); `CONTENT_HASH_PACKET_ID`
+assumes `atlas_packets.packet_id == content_hash` but live `packet_id` values
+are legacy sequential IDs like `packet_44_1784513267991` (61,660/61,660 rows
+checked); `POINT_ID_ARTIFACT_ID` assumes `atlas_packets.artifact_id` equals a
+bare Qdrant point UUID but live `artifact_id` values are `artifact:<16-hex>`
+(58,304/61,660 rows populated, never UUID-shaped). This is a bug in the
+reconciliation script's matching logic, not a corpus data-quality problem —
+verified deterministic and 100% reproducible across the whole 53,379-row
+corpus, not a sampling artifact. **Not fixed**: the correct match formula is
+an identity-authority decision (what should back each match path given the
+live `ace:packet:` scheme?) needing explicit review, not a unilateral guess.
+This also means the 500-node fixture analyzed throughout this file's LVG-1/5/6/7
+findings could not have come from a *current* run of this script — it predates
+this bug or the schema drift that caused it. Full detail in
+`docs/reports/spectral-rtx-alignment-sweep-20260823.md`.
 
 LVG-7 detail: `cugraph.leiden(graph, max_iter=100, resolution=1.0, random_state=seed+repeat,
 theta=1.0)` (`scripts/atlas/spectral_fixture_benchmark.py:361`) returns 500 clusters for 500

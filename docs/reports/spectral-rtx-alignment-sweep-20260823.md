@@ -365,7 +365,57 @@ addendum — not triggered here. The code change itself compiles cleanly
 failing on the unrelated empty-manifest condition, so the patch itself is not
 what's blocking verification.
 
-Not yet done: running LVG-0 reconciliation to get fresh `ADMITTED` rows,
-re-running the fixture builder with the fix applied, re-checking connectivity
-and re-testing spectral parity against the result, Louvain comparison,
-Nsight Systems/Compute evidence (LVG-10/11).
+### LVG-0 is currently blocked by a matching-logic bug, not stale data
+
+Ran `python/atlas_semantic512_reconcile.py` fresh (read-only: no `--apply-payload`,
+no `--expected-manifest-checksum`, confirmed those flags gate the only write
+path in the script). Result: **0 `ADMITTED`, 0 `REJECTED`, 53,379/53,379
+rows classified `SOURCE_REF_ONLY_MATCH`.** Every single row, uniformly.
+
+This is not stale corpus data — it's `classify_candidate()`'s three
+"strong match" scoring paths being structurally unreachable given the live
+schema, verified against real rows via direct Postgres queries:
+
+- `EXPECTED_PACKET_KEY` (line 148: `expected_packet_key()` computes
+  `f"{normalize_source_ref(source_ref)}:{content_hash[:16]}"`) — the live
+  `atlas_packets.packet_key` format is `ace:packet:<12-hex>` derived from
+  `sha256(source_ref)` alone (confirmed on 5 sampled rows); it never
+  contains `content_hash` or a `:` separator. This match can never fire.
+- `CONTENT_HASH_PACKET_ID` (`packet.packet_id == content_hash`) — live
+  `atlas_packets.packet_id` values look like `packet_44_1784513267991`
+  (a legacy sequential/timestamp ID, all 61,660 rows populated), not a
+  content hash. Never equals a `content_hash` value (`b8d0fdd8d88d5fe4`
+  shape). Can never fire.
+- `POINT_ID_ARTIFACT_ID` (`packet.artifact_id == qdrant_point_id`) — live
+  `atlas_packets.artifact_id` values look like `artifact:01131c7e6f000a4b`
+  (58,304/61,660 rows populated), never a bare Qdrant point UUID
+  (`0000d635-8df8-4a03-a1b0-e33d2699f6c0` shape). Can never fire.
+
+With all three strong paths dead, only the weak `SOURCE_REF` match (+10
+points) can ever contribute, which the function correctly refuses to
+`ADMIT` on its own (`strong` check at line 352) — hence 100% `SOURCE_REF_ONLY_MATCH`
+and 0% `ADMITTED`, deterministically, regardless of what's actually in the
+corpus. This is a bug in the reconciliation script's matching logic, not a
+data-quality finding about the codebase.
+
+**Not fixed here.** Deciding the correct match formula (what should
+`EXPECTED_PACKET_KEY` actually compute given the live `ace:packet:sha256(source_ref)[:12]`
+scheme? should `CONTENT_HASH_PACKET_ID`/`POINT_ID_ARTIFACT_ID` be dropped
+entirely, or is there a different live column that should back them?) is an
+identity-authority decision, not a mechanical fix — this repo's own rules
+(canonical identity chain, hard-fail-don't-guess) say this needs explicit
+review, not a unilateral guess at what the "right" match should have been.
+
+This also reframes everything upstream: the 500-node fixture analyzed
+throughout the rest of this addendum could not have come from a *current*
+run of this reconciliation script (which admits 0 rows). It must predate
+this bug, or predate the schema drift that caused it. The proto-service
+exclusion fix in `build_live_graph_fixture_semantic512.py` is still correct
+for whatever gets admitted once LVG-0 is fixed, but LVG-0 itself is the
+actual blocker on re-verifying anything end to end right now — not the
+missing-manifest framing from the previous note in this addendum.
+
+Not yet done: deciding and implementing the correct LVG-0 match formula
+(explicit review needed, not a mechanical guess), then re-running
+reconciliation, the fixture builder, connectivity/parity re-checks, Louvain
+comparison, Nsight Systems/Compute evidence (LVG-10/11).
