@@ -210,13 +210,20 @@ describe('graph snapshot materializer', () => {
     expect(
       left.graphSnapshotEdges.find((edge) => edge.edgeType === 'DERIVED_FROM')
     ).toMatchObject({
-      sourceNodeKey: 'packet:packet:alpha',
+      // NOT 'packet:packet:alpha' -- packet.packetKey ('packet:alpha') already
+      // carries the canonical prefix; this must match the packet node's own
+      // nodeKey (see the node-construction fix in graph-snapshot-materializer.ts)
+      // or the edge points at a sourceNodeKey no real node has.
+      sourceNodeKey: 'packet:alpha',
       targetNodeKey: 'tree:22222222-2222-4222-8222-222222222222',
       properties: {
         packetKey: 'packet:alpha',
         derivedFromTreeNodeId: '22222222-2222-4222-8222-222222222222'
       }
     });
+    expect(
+      left.graphSnapshotNodes.find((node) => node.nodeType === 'packet')?.nodeKey
+    ).toBe('packet:alpha');
 
     expect(left.graphSnapshotExclusions.map((item) => item.exclusionReason)).toEqual(
       expect.arrayContaining(['MISSING_PARENT_NODE', 'MISSING_TREE_NODE_ID', 'UNRESOLVED_TREE_NODE_ID'])

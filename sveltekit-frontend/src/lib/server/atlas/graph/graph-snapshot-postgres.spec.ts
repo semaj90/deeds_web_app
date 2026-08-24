@@ -147,7 +147,9 @@ describe('canonical graph snapshot postgres loader', () => {
     expect(materialized.graphSnapshot.snapshotId).toBe(snapshotId);
     expect(materialized.graphSnapshotManifest.status).toBe('MATERIALIZED');
     expect(materialized.graphSnapshotNodes.map((node) => node.nodeKey)).toEqual([
-      'packet:packet:alpha',
+      // NOT 'packet:packet:alpha' -- packets[0].packetKey ('packet:alpha',
+      // asserted at line 135 above) already carries the canonical prefix.
+      'packet:alpha',
       'tree:11111111-1111-4111-8111-111111111111',
       'tree:22222222-2222-4222-8222-222222222222'
     ]);

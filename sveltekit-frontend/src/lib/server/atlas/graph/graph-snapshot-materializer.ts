@@ -399,7 +399,14 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
       continue;
     }
 
-    const nodeKey = `packet:${packet.packetKey}`;
+    // packet.packetKey already carries the `packet:` prefix for the
+    // overwhelming majority of live atlas_packets rows (verified live
+    // 2026-08-24: 58,304/61,660). Blindly re-prefixing produced a
+    // `packet:packet:<hash>` nodeKey for every packet-type node -- 54,078
+    // rows in atlas_graph_authority_scores_v2 carry this bug today. A small
+    // legacy minority (61 rows) still store a bare hex key with no prefix,
+    // so this stays conditional rather than an unconditional strip.
+    const nodeKey = packet.packetKey.startsWith('packet:') ? packet.packetKey : `packet:${packet.packetKey}`;
     includedPacketKeys.add(nodeKey);
     graphSnapshotNodes.push(
       parseGraphNode({
@@ -518,7 +525,12 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     addEdge(graphSnapshotEdges, seenEdgeKeys, graphSnapshotExclusions, snapshotId, {
       snapshotId,
       edgeKey: `derived_from:${packet.packetKey}:${owner.nodeId}`,
-      sourceNodeKey: `packet:${packet.packetKey}`,
+      // Must match the packet node's own nodeKey construction above -- this
+      // was a second, independent instance of the same double-`packet:`-
+      // prefix bug (see the node-construction comment above), which had
+      // silently left DERIVED_FROM edges pointing at a sourceNodeKey that
+      // never matched any real node.nodeKey.
+      sourceNodeKey: packet.packetKey.startsWith('packet:') ? packet.packetKey : `packet:${packet.packetKey}`,
       targetNodeKey: `tree:${owner.nodeId}`,
       edgeType: 'DERIVED_FROM',
       weight: 1,
