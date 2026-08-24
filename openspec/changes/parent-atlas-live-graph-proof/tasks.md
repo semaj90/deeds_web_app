@@ -88,8 +88,8 @@ LVG-9 GPU memory telemetry                                  IMPLEMENTED_UNPROVEN
 LVG-10 Nsight Systems immutable trace                       BLOCKED (nsys not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
 LVG-11 Nsight Compute Tensor Core/precision evidence        BLOCKED (ncu not installed in atlas-rapids-cu13 WSL2 env -- tooling gap, not a bug)
 LVG-12 Graphify daily adoption                              PENDING
-LVG-13 workflow/A2A artifact streaming                      PENDING
-LVG-14 agentic repair validator fixture                     PENDING
+LVG-13 workflow/A2A artifact streaming                      SPECCED (existing WorkflowActionEventV1 infra found, wiring not yet built)
+LVG-14 agentic repair validator fixture                     SPECCED_BLOCKED (consumption code exists; ground-truth repair data essentially absent -- 1 usable row found repo-wide)
 ```
 
 `IMPLEMENTED_UNPROVEN` means runnable code exists; no live workstation PASS is implied.
@@ -501,6 +501,116 @@ Do not add this to `graphify:daily` until all of the following are observed on o
 9. any cuBLAS/cuBLASLt claims come from observed trace records;
 10. any Tensor Core claim is supported by non-zero Nsight Compute metrics, not names/heuristics;
 11. no code path fabricates `source_revision` or treats vector dimension as mutation freshness.
+
+## LVG-13 / LVG-14 spec (2026-08-24)
+
+Both were bare one-line labels with no detail anywhere in this file before
+this section. Drafted by finding the actual existing infrastructure these
+labels point at, not by inventing new design — see the grounding for each
+below. Spec only; neither is implemented as of this commit.
+
+### LVG-13: workflow/A2A artifact streaming
+
+**What it actually is**: this proof tranche's own progress and receipts
+(fixture build, spectral/Leiden/Louvain runs, eigengap probes) currently
+only reach a human by someone reading `docs/reports/*.json` files after the
+fact. LVG-13 is wiring this tranche's producer scripts to emit into the
+already-built `WorkflowActionEventV1` stream
+(`sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts`)
+so other agents/consumers watching that stream see this work as it happens,
+not a new artifact-streaming system.
+
+Grounding, already present in the codebase, not proposed here:
+- `WorkflowActionEventV1Schema` (`context-tool-dag-contracts.ts:46-71`)
+  already has `kind: 'artifact'` in its event-kind enum and `lane: 'a2a'` /
+  `transport: 'a2a'` in their respective enums — the exact shape LVG-13
+  needs already exists, unused by this proof tranche so far.
+- `workflowActionFromDagNode()` (same file, line 138) is the existing
+  factory for producing a valid `WorkflowActionEventV1` from a DAG node —
+  this tranche doesn't need to hand-construct events.
+- `openspec/changes/parent-atlas-governed-compute-fabric/tasks.md` section
+  6 already establishes the rule this must follow: "Route external side
+  effects through existing MCP/ACP/A2A adapters instead of exposing every
+  ...cuGraph/analyzer primitive as a model-facing tool" and "Add
+  kernel-request DAG node/action metadata without creating a second
+  workflow engine."
+
+**Concrete scope, not yet built**:
+1. Define a `ContextToolDagV1` for this proof tranche: nodes for
+   `RETRIEVAL` (semantic_512 reconciliation, LVG-0), `MCP_TOOL_CALL` or a
+   new equivalent kind for each GPU algorithm run (LVG-4 through LVG-9),
+   `VALIDATE` for the promotion-gate check, `MATERIALIZE` for writing the
+   final receipt. `validateContextToolDag()` already enforces the DAG
+   shape and mutation/validation rules — reuse it, don't reimplement.
+2. Each Python script in this tranche (`spectral_diagnostic_receipt_v2.py`,
+   `run_louvain_challenger_v1.py`, `prove_live_graph_fixture.py`, etc.)
+   emits one `WorkflowActionEventV1` per meaningful step
+   (`scheduled`/`started`/`artifact`/`completed`), with `evidenceRefs`
+   pointing at the receipt file path(s) it produced. Since these are
+   Python scripts and the schema/factory are TypeScript, this needs either
+   (a) a thin JSON-emission convention the TS side ingests, or (b) calling
+   into the TS layer via whatever RPC/HTTP boundary this repo already uses
+   for Python->TS event submission — **not decided here**, needs a design
+   choice consistent with how other Python producers in this repo already
+   talk to the TS event layer (audit that pattern before choosing).
+3. `canonicalWritesAllowed` should be `false` for this entire DAG — every
+   node in this proof tranche is read-only per its own "Authority rules"
+   section above; no node should ever set `readOnly: false`.
+
+Not yet done: step 2's Python->TS event submission mechanism needs to be
+identified (audit existing Python producers first, per this file's own
+repeated practice) before this can be implemented.
+
+### LVG-14: agentic repair validator fixture
+
+**What it actually is**: `scripts/atlas/spectral_fixture_benchmark.py`
+(lines 262-263, 498-503, 609-610) already has a complete, working
+consumption path for per-candidate `validator_success`/`repair_success`
+boolean labels — if a `labels` DataFrame with those columns is present, it
+joins them onto graph candidates by `gpu_node_id` and reports mean success
+rate plus `validator_success_available`/`repair_success_available` flags.
+Every receipt produced by that script so far reports both flags `false`
+because no labeled data has ever been supplied. LVG-14 is producing that
+labeled fixture — joining real historical repair outcomes onto real
+`packet_key`/`source_ref` candidates — not building new consumption
+machinery, which already exists.
+
+**The actual blocker, found by checking, not assumed**: queried the live
+schema for repair/fix/validation tables
+(`information_schema.tables ILIKE '%repair%|%fix%|%validat%'`) and found
+several real candidates — `fix_attempts`, `atlas_qdrant_repair_log`,
+`atlas_validation_results`, `fixer_run_log`, `fixer_patterns`. Checked each
+one's actual row count and content rather than assuming a table with the
+right name has the right data:
+
+- `atlas_qdrant_repair_log` has a direct `packet_key` join column (trivial
+  join onto this tranche's candidates) but **0 rows**.
+- `atlas_validation_results` joins via `knowledge_id` (uuid, not
+  `packet_key` — would need an extra join hop through whatever table maps
+  `knowledge_id` -> `packet_key`, not yet identified) and also has **0
+  rows**.
+- `fix_attempts` has 23 rows, but 22 are `fix_type='smoke'` placeholder
+  rows with `success: NULL` and empty `metadata`. **Exactly 1 row has real
+  content** (`fix_type='logic-bug'`, describes a real fix to
+  `data-backfill-hash.ts`, `success: false`) — and even that one row has no
+  `packet_key`/`source_ref` column to join against this tranche's
+  candidates directly; it would need to be resolved from free-text
+  `fix_description`, which is not a reliable automated join.
+
+**This means LVG-14 is not a wiring task the way LVG-13 is — the ground-truth
+data it needs essentially does not exist yet.** Fewer than 2 usable rows
+exist across the entire schema search. Building a "repair validator
+fixture" right now would mean either (a) waiting for real repair-history
+data to accumulate in one of these tables with a proper `packet_key`
+foreign key (a schema/process change to how repairs get logged, out of
+scope for this file), or (b) hand-labeling a small bootstrap set, which
+risks looking like real ground truth when it's actually a handful of
+manually-asserted examples — worth flagging explicitly if done, not
+presented as equivalent to real historical outcomes.
+
+Not yet done: deciding between (a) and (b) above — this is a genuine
+product/process decision, not a diagnostic finding, and shouldn't be made
+unilaterally the same way the LVG-2/LVG-10/11 decisions weren't.
 
 ## Tests
 
