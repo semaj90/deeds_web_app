@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.corpus-reembed-document-prefix.v1",
+  "generatedAt": "2026-08-25T18:45:20.015Z",
+  "dryRun": true,
+  "writesPerformed": false,
+  "newEmbeddingModelTag": "embeddinggemma:latest:eg-task-prefix-v1",
+  "limit": 5,
+  "processed": 5,
+  "updated": 5,
+  "skippedAlreadyDone": 0,
+  "errors": [],
+  "sampleDimensionCheck": {
+    "id": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+    "dimension": 768,
+    "first3": [
+      -0.11483407020568848,
+      0.011425882577896118,
+      0.00746946083381772
+    ]
+  },
+  "startedAt": "2026-08-25T18:45:20.015Z",
+  "finishedAt": "2026-08-25T18:45:20.345Z"
+}

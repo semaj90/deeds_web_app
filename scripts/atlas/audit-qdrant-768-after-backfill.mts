@@ -16,10 +16,13 @@
 import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { config as loadEnv } from 'dotenv';
 import pg from 'pg';
+
+loadEnv({ path: path.resolve(process.cwd(), '.env') });
 
 import {
   detectQdrantVectorTarget,
@@ -143,6 +146,7 @@ interface AuditReport {
     duplicateQdrantIdMappings: number;
     unmatchedPoints: number;
     ambiguousPoints: number;
+    ambiguityReasonDistribution: Record<string, number>;
     matchedExact: number;
     matchedChunk: number;
     matchedPathHash: number;
@@ -492,6 +496,7 @@ function resolvePointIdentity(
   byPostgresId: Map<string, PostgresIdentityRow>,
   byChunkId: Map<string, PostgresIdentityRow[]>,
   byPathHash: Map<string, PostgresIdentityRow[]>,
+  byPathHashChunk: Map<string, PostgresIdentityRow[]>,
   byQdrantId: Map<string, PostgresIdentityRow[]>,
 ): PointMatch {
   const payload = (point.payload ?? {}) as JsonRecord;
@@ -499,6 +504,7 @@ function resolvePointIdentity(
 
   const qdrantId = toStringOrNull(payload.qdrant_id) ?? pointId;
   const postgresId = toStringOrNull(payload.postgres_id);
+  const representationId = toStringOrNull(payload.representation_id);
   const chunkId = toStringOrNull(payload.chunk_id);
   const relativePath = toStringOrNull(payload.relative_path ?? payload.source_ref);
   const contentHash = toStringOrNull(payload.content_hash);
@@ -511,15 +517,20 @@ function resolvePointIdentity(
     return { state: 'MATCHED_POSTGRES_ID', postgresRows: [byPostgresId.get(pointId)!], pointGeneration: determinePointGeneration(point.id), reason: 'Qdrant point id matched a Postgres UUID' };
   }
 
-  if (chunkId && byChunkId.has(chunkId)) {
-    const rows = byChunkId.get(chunkId) ?? [];
-    if (rows.length === 1) {
-      return { state: 'MATCHED_CHUNK_ID', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'unique chunk_id mapped to one Postgres row' };
-    }
-    return { state: 'MATCHED_AMBIGUOUS', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'chunk_id matched multiple Postgres rows' };
+  if (representationId && byPostgresId.has(representationId)) {
+    return { state: 'MATCHED_POSTGRES_ID', postgresRows: [byPostgresId.get(representationId)!], pointGeneration: determinePointGeneration(point.id), reason: 'payload.representation_id matched a Postgres UUID' };
   }
 
   if (relativePath && contentHash) {
+    const qualifiedRows = chunkId
+      ? byPathHashChunk.get(`${relativePath}||${contentHash}||${chunkId}`) ?? []
+      : [];
+    if (qualifiedRows.length === 1) {
+      return { state: 'MATCHED_PATH_HASH', postgresRows: qualifiedRows, pointGeneration: determinePointGeneration(point.id), reason: 'relative_path + content_hash + chunk_id mapped uniquely' };
+    }
+    if (qualifiedRows.length > 1) {
+      return { state: 'MATCHED_AMBIGUOUS', postgresRows: qualifiedRows, pointGeneration: determinePointGeneration(point.id), reason: 'relative_path + content_hash + chunk_id matched multiple Postgres rows' };
+    }
     const rows = byPathHash.get(`${relativePath}||${contentHash}`) ?? [];
     if (rows.length === 1) {
       return { state: 'MATCHED_PATH_HASH', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'relative_path + content_hash mapped uniquely' };
@@ -527,6 +538,16 @@ function resolvePointIdentity(
     if (rows.length > 1) {
       return { state: 'MATCHED_AMBIGUOUS', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'relative_path + content_hash matched multiple Postgres rows' };
     }
+  }
+
+  // chunk_id is not globally unique across revisions. Use it only after the
+  // revision-qualified path/hash identity has been exhausted.
+  if (chunkId && byChunkId.has(chunkId)) {
+    const rows = byChunkId.get(chunkId) ?? [];
+    if (rows.length === 1) {
+      return { state: 'MATCHED_CHUNK_ID', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'unique chunk_id mapped to one Postgres row' };
+    }
+    return { state: 'MATCHED_AMBIGUOUS', postgresRows: rows, pointGeneration: determinePointGeneration(point.id), reason: 'chunk_id matched multiple Postgres rows without unique path/hash' };
   }
 
   if (qdrantId && byQdrantId.has(qdrantId)) {
@@ -572,6 +593,7 @@ function buildLookupMaps(rows: PostgresIdentityRow[]) {
   const byPostgresId = new Map<string, PostgresIdentityRow>();
   const byChunkId = new Map<string, PostgresIdentityRow[]>();
   const byPathHash = new Map<string, PostgresIdentityRow[]>();
+  const byPathHashChunk = new Map<string, PostgresIdentityRow[]>();
   const byQdrantId = new Map<string, PostgresIdentityRow[]>();
 
   for (const row of rows) {
@@ -579,11 +601,12 @@ function buildLookupMaps(rows: PostgresIdentityRow[]) {
     addMulti(byChunkId, row.chunkId, row);
     if (row.contentHash) {
       addMulti(byPathHash, `${row.relativePath}||${row.contentHash}`, row);
+      addMulti(byPathHashChunk, `${row.relativePath}||${row.contentHash}||${row.chunkId ?? ''}`, row);
     }
     addMulti(byQdrantId, row.qdrantId, row);
   }
 
-  return { byPostgresId, byChunkId, byPathHash, byQdrantId };
+  return { byPostgresId, byChunkId, byPathHash, byPathHashChunk, byQdrantId };
 }
 
 function countDuplicates(map: Map<string, PostgresIdentityRow[]>): number {
@@ -621,6 +644,7 @@ function formatReport(report: AuditReport): string {
     `- duplicate_qdrant_id_mappings: \`${report.qdrant.duplicateQdrantIdMappings}\``,
     `- unmatched_points: \`${report.qdrant.unmatchedPoints}\``,
     `- ambiguous_points: \`${report.qdrant.ambiguousPoints}\``,
+    `- ambiguity_reason_distribution: \`${JSON.stringify(report.qdrant.ambiguityReasonDistribution)}\``,
     `- matched_exact: \`${report.qdrant.matchedExact}\``,
     `- matched_chunk: \`${report.qdrant.matchedChunk}\``,
     `- matched_path_hash: \`${report.qdrant.matchedPathHash}\``,
@@ -720,6 +744,7 @@ async function main(): Promise<void> {
       duplicateQdrantIdMappings: 0,
       unmatchedPoints: 0,
       ambiguousPoints: 0,
+      ambiguityReasonDistribution: createDistribution(),
       matchedExact: 0,
       matchedChunk: 0,
       matchedPathHash: 0,
@@ -830,6 +855,7 @@ async function main(): Promise<void> {
         lookupMaps.byPostgresId,
         lookupMaps.byChunkId,
         lookupMaps.byPathHash,
+        lookupMaps.byPathHashChunk,
         lookupMaps.byQdrantId,
       );
 
@@ -854,6 +880,7 @@ async function main(): Promise<void> {
         }
       } else if (match.state === 'MATCHED_AMBIGUOUS') {
         report.qdrant.ambiguousPoints += 1;
+        incrementDistribution(report.qdrant.ambiguityReasonDistribution, match.reason);
       } else {
         report.qdrant.unmatchedPoints += 1;
       }
@@ -1017,6 +1044,7 @@ async function main(): Promise<void> {
             lookupMaps.byPostgresId,
             lookupMaps.byChunkId,
             lookupMaps.byPathHash,
+            lookupMaps.byPathHashChunk,
             lookupMaps.byQdrantId,
           );
           return resolved.postgresRows.some((row) => row.id === sampleRow.id);
@@ -1086,9 +1114,8 @@ async function main(): Promise<void> {
 }
 
 const executedDirectly = (() => {
-  const argv1 = process.argv[1];
-  if (!argv1) return false;
-  return import.meta.url === pathToFileURL(path.resolve(argv1)).href;
+  const currentFile = path.resolve(fileURLToPath(import.meta.url));
+  return process.argv.some((arg) => path.resolve(arg) === currentFile);
 })();
 
 if (executedDirectly) {

@@ -3,6 +3,10 @@
 
 #include <cstdint>
 #include <cstring>
+#include <algorithm>
+#include <cmath>
+#include <limits>
+#include <vector>
 #include <torch/torch.h>
 
 extern "C" int checkCudaAvailable() {
@@ -140,16 +144,62 @@ extern "C" int computeCaseEmbedding(const float* weights, int n, const float* em
     for (int d = 0; d < dim; ++d) output[d] += (float)(w * e[d]);
   }
   if (total_w == 0.0) total_w = 1.0;
-  for (int d = 0; d < dim; ++d) output[d] = (float)(output[d] / total_w);
+  double norm_sq = 0.0;
+  for (int d = 0; d < dim; ++d) {
+    output[d] = (float)(output[d] / total_w);
+    norm_sq += (double)output[d] * output[d];
+  }
+  const double norm = std::sqrt(norm_sq);
+  if (norm > 1e-12) {
+    for (int d = 0; d < dim; ++d) output[d] = (float)(output[d] / norm);
+  }
   return 0;
 }
 
 extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len, int* out_reseeded_count) {
-  // For now, call the simple CPU k-means from fallback; production should use optimized GPU impl.
   if (!embeddings || !assignments) return -1;
-  if (assignments_len < n) return -2;
-  // deterministic simple assignment: modulo
-  for (int i = 0; i < n; ++i) assignments[i] = i % k;
+  if (assignments_len < n || n <= 0 || dim <= 0 || k <= 0 || k > n) return -2;
+  std::vector<float> centroids((size_t)k * dim);
+  std::vector<int> next_assignments((size_t)n, -1);
+  for (int c = 0; c < k; ++c) {
+    std::copy(embeddings + (size_t)c * dim,
+              embeddings + (size_t)(c + 1) * dim,
+              centroids.begin() + (size_t)c * dim);
+  }
+  const int iterations = std::max(1, std::min(max_iters, 1000));
+  for (int iteration = 0; iteration < iterations; ++iteration) {
+    bool changed = false;
+    for (int i = 0; i < n; ++i) {
+      int best = 0;
+      float best_distance = std::numeric_limits<float>::max();
+      for (int c = 0; c < k; ++c) {
+        float distance = 0.0f;
+        for (int d = 0; d < dim; ++d) {
+          const float delta = embeddings[(size_t)i * dim + d] - centroids[(size_t)c * dim + d];
+          distance += delta * delta;
+        }
+        if (distance < best_distance) {
+          best_distance = distance;
+          best = c;
+        }
+      }
+      if (next_assignments[i] != best) changed = true;
+      next_assignments[i] = best;
+    }
+    std::vector<float> sums((size_t)k * dim, 0.0f);
+    std::vector<int> counts((size_t)k, 0);
+    for (int i = 0; i < n; ++i) {
+      const int c = next_assignments[i];
+      ++counts[c];
+      for (int d = 0; d < dim; ++d) sums[(size_t)c * dim + d] += embeddings[(size_t)i * dim + d];
+    }
+    for (int c = 0; c < k; ++c) {
+      if (counts[c] == 0) continue;
+      for (int d = 0; d < dim; ++d) centroids[(size_t)c * dim + d] = sums[(size_t)c * dim + d] / counts[c];
+    }
+    if (!changed) break;
+  }
+  std::copy(next_assignments.begin(), next_assignments.end(), assignments);
   if (out_reseeded_count) *out_reseeded_count = 0;
   return 0;
 }

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.qdrant-sparse-configuration-audit.v1",
-  "generated_at": "2026-08-25T05:34:36.206Z",
+  "generated_at": "2026-08-25T21:30:53.192Z",
   "mode": "READ_ONLY",
   "writes_performed": false,
   "qdrant_url": "http://127.0.0.1:6333",

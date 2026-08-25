@@ -77,6 +77,10 @@ export function quaternionAngularDistance(
   b: QuaternionWxyz,
 ): number {
   const similarity = quaternionOrientationSimilarity(a, b);
+  // Round the numerically indistinguishable identity case to zero. This keeps
+  // q and -q equivalent after normalization and avoids an artificial distance
+  // from floating-point error in the acos path.
+  if (similarity >= 1 - 1e-12) return 0;
   return 2 * Math.acos(Math.min(1, Math.max(-1, similarity)));
 }
 

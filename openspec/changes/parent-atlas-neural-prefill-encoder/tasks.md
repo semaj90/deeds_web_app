@@ -5,6 +5,198 @@
 A checked item means the named contract or code slice exists. It does not
 prove live training, GPU execution, projection parity, or production adoption.
 
+## Current Next Steps — P0/P1 Control Queue (2026-08-25)
+
+This queue is the active execution order. Historical receipts, Temporal mapping
+evidence, and earlier design proposals remain below and must not be read as
+permission to bypass these gates.
+
+1. **P0 — Preserve migration authority.** Keep Drizzle migration apply blocked.
+   The journal expects `0040`, `0040_snapshot.json` is missing, and no sanctioned
+   snapshot-recovery procedure exists. Do not run `drizzle-kit migrate`,
+   `--fix-hashes`, or generate-and-apply repair output.
+2. **P0 — Establish a Graphify canary target.** The compatibility migration is
+   applied and the producer dry run is proven, but `graphify_files` and
+   `graphify_runs` both contain zero rows. An operator must provide an existing
+   non-production workspace UUID before the v2 writer can persist a canary.
+   Latest live lineage audit remains `SCHEMA_READY_EMPTY`; no canary was
+   invented and no source rows were written.
+   The latest corrected `tsx` dry run is `DRY_RUN_PROVEN`: `23,501` source
+   entries, `100` selected canary rows, workspace/source digest
+   `sha256:83da899073596310ada1c5470a3a8180c4ead72a25844df520c2347ac621e451`,
+   and `canonicalWriteAttempted: false`. The prior `23,497`-source receipt is
+   superseded by this newer workspace observation.
+   The canary writer explicitly refuses to continue without
+   `ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID=<existing non-production workspace UUID>`;
+   its latest refusal remained `canonicalWriteAttempted: false`.
+   The refreshed read-only workspace binding observation previously covered a
+   `23,497`-source worktree with workspace revision
+   `sha256:0f94cacf508908908e4126371790a00fa2d56f40043f957215e6f7bcbcb853b9`;
+   it is dirty and skipped `86` entries, so this observation is not yet a
+   production promotion artifact.
+   A read-only packet metadata probe found legacy path labels in
+   `atlas_packets.workspace_id` (`docs`, `scripts`, `sveltekit-frontend`, and
+   similar) and no rows in `graphify_runs`; these are not valid canary targets.
+   The canary writer now rejects non-UUID workspace values before opening a
+   transaction.
+   A read-only cross-table UUID lookup across `graphify_runs`,
+   `atlas_packets`, `atlas_ast_nodes`, and `workspace_sessions` returned no
+   valid UUID workspace IDs. The canary therefore remains blocked on an
+   operator-provided non-production workspace identity, not on a missed
+   database candidate.
+   The latest read-only workspace binding observation now covers the same
+   `23,501` enumerated source set, with `23,501` bound and `86` skipped,
+   workspace revision
+   `sha256:e235fc4e0ce191a7045e3d6c3553ac2f5b468dc629c2896e68ac3dc75b5ed3a4`,
+   `dirty: true`, and `canonicalAuthority: false`. This observer revision is
+   intentionally distinct from the source-inventory planner digest; both must
+   be persisted and read back before promotion.
+3. **P0 — Prove semantic 768 lineage.** Keep `semantic_768` canonical. Current
+   PostgreSQL `content_embedding_768` coverage is `576/52,417`; the v2 Qdrant
+   collection bound `21/128` in the latest read-only sample and still failed
+   document-version coverage. Do not promote a collection or dual-write.
+   The latest EMB3A readback reached both Postgres and Qdrant, but sampled
+   workspace/source/representation revision fields were `0/50` on both sides
+   and the comparable identity join was `0`; status remains
+   `LINEAGE_POPULATION_NOT_PROVEN`.
+   The integrated derived-context receipt also remains
+   `DEGRADED_READ_ONLY`: AST identity `449/449`, domain suggestions `428/449`,
+   contextual tree `SOURCE_UNAVAILABLE`, latent coverage `32.72%`, and SOM
+   coverage `8.25%`. Its runtime probe found NetworkX, AST-grep, LangExtract,
+   Tree-sitter, and PyTorch available, but `cugraph`, `cuVS`, and `nx_cugraph`
+   unavailable in that Python kernel.
+   The latest full read-only Qdrant identity reconciliation separately confirms
+   the 768 geometry contract but blocks projection promotion: collection
+   `codebase_chunks_768` has `106,338` points, with `1,563` ambiguous matches,
+   `9,148` unmatched points, and `42,125` duplicate Postgres mappings.
+   Integer point IDs are unique but not continuous. Do not rebuild, delete, or
+   repair this collection through the projection lane until identity ownership
+   and a bounded repair policy are approved.
+   A normalized full-corpus receipt is retained at
+   `docs/reports/qdrant-768-identity-full-v1.json`: `52,380` points matched
+   Postgres IDs, `41,948` matched only by path/hash, `1,563` were ambiguous,
+   `9,148` unmatched, and `42,125` Postgres rows had duplicate Qdrant
+   mappings. This is the current identity-repair baseline.
+   Generation split from the same receipt: the `1,000` preexisting points are
+   `999` matched and `1` unmatched, while the later backfill generation has
+   `9,147` unmatched points. Repair analysis should therefore start with the
+   backfill provenance and point allocation policy, not rewrite the healthy
+   preexisting sample.
+   The existing reconciliation adapter also passes its bounded `1,000`-point
+   sample (`EXACT_POINT_ID: 1000`, all dimensions finite), but its receipt is
+   dated `2026-08-04` and is not a full-corpus promotion proof. The current
+   full collection audit remains authoritative for promotion decisions.
+   Historical `scripts/atlas/phase108d-qdrant-backfill-identity.mts` is not an
+   admissible repair owner: its identity lookup joins Qdrant to
+   `atlas_packets` by `source_ref` alone, and its bounded dry-run failed at
+   Qdrant fetch with `Unexpected end of JSON input`. Do not debug or enable its
+   apply path as a shortcut around the canonical identity gate.
+   `scripts/atlas/backfill-qdrant-identity-payload.mts` is safer but narrower:
+   it requires an explicit canonical `packet_key` and filters Qdrant by that
+   same payload key. It can repair an already packet-keyed point, but cannot
+   bootstrap the missing `packet_key` mappings found in the later backfill;
+   keep it as a bounded packet repair tool, not a corpus-wide identity fixer.
+   The later-generation writer `sveltekit-frontend/scripts/atlas/backfill-qdrant-768-from-postgres.mjs`
+   is the source of the observed drift: it derives a new packet key from
+   `relative_path + content_hash/id`, uses `codebase_chunk_index.id` as the
+   Qdrant point ID, and defaults `workspace_id` to `phase108d-backfill` rather
+   than reading canonical `atlas_packets.packet_key` and revision authority.
+   Treat it as historical/non-canonical and keep its apply path blocked until
+   an exact packet/hash/revision writer replaces that identity construction.
+   The v2 UUID writer is safer about point-ID allocation but is still only a
+   projection candidate: it uses `codebase_chunk_index.id` for deterministic
+   projection input and admits a row only when an unambiguous canonical
+   `atlas_packets(source_ref, content_hash)` match exists. It emits
+   `semantic_768` representation metadata, carries the canonical packet key
+   when available, and does not fabricate `source_revision`. It is not an
+   admitted canonical writer.
+   Its bounded controls are functional. A `--limit=20 --batch-size=20`
+   dry-run found `332` unique canonical packet/hash matches globally, rejected
+   all first `20` rows, and prepared `0` points. The larger
+   `--limit=1000 --batch-size=200` dry-run scanned `1,000`, prepared `9`,
+   rejected `991` with `CANONICAL_PACKET_HASH_MATCH_REQUIRED`, and wrote `0`.
+   These runs prove guarded execution and rejection behavior only; they do not
+   prove v2 identity admission or authorize apply.
+   The writer's source-revision behavior is intentionally conservative:
+   `atlas_packets.source_revision` is absent, so it emits no fabricated source
+   revision.
+4. **P1 — Reconcile collection identity.** Compare `codebase_chunks_768_v2`
+   against `codebase_chunk_index` using packet/source/hash evidence, then emit a
+   revision-qualified overlap receipt. The default `codebase_chunks_768` sample
+   currently binds zero PostgreSQL rows. The current v2 cross-store audit found
+   `52,380` Qdrant points and `100%` `source_ref` coverage, but `0%`
+   `packet_key` coverage and `0/10` sampled content-hash cross-matches; its
+   promotion gate failed. Treat v2 as source-ref-only until packet identity and
+   hash lineage are repaired and re-read.
+   The existing read-only Graphify embedding projection planner can select
+   canonical Postgres rows for v2 (`128` selected, `0` projected) and defines
+   packet/source/hash payload fields, but it does not establish source or
+   workspace revision authority. Keep it apply-gated until the lineage canary
+   and identity policy pass; do not use it as an implicit v2 repair tool.
+   Its enhanced dry-run receipt measured the selected batch explicitly:
+   `source_ref 128/128`, `content_hash 128/128`, `packet_key 7/128`,
+   `source_revision 0/128`, and `workspace_revision 0/128`. This is the
+   minimum identity evidence required before any projection write.
+5. **P1 — Resolve the lexical projection gate.** The Graphify file-search export
+   is read-only and valid, but `atlas_file_search_index_v1` is unapplied. Apply
+   only after migration authority, lineage canary, and 768 coverage pass.
+6. **P1 — Continue AST/domain evidence without promotion.** The export can use
+   ast-grep and LangExtract evidence, but symbol registry, domain, ontology,
+   Neo4j, Qdrant, and Valkey promotion remain separately gated.
+7. **P2 — Wire Temporal evidence events.** Keep the proven error-event mapping
+   read-only until real source/workspace/graph revisions are tracked. Then emit
+   one durable `atlas_agent_action_events` timeline and replay receipt; Valkey
+   remains a derived cache.
+
+### Temporal Evidence Placement
+
+Temporal event mappings, ACE/RLM/KAG/DAG receipts, and prior read-only workflow
+probes are historical evidence below this queue. They document what was proven
+at each revision; they do not override the current migration, lineage, semantic
+768, or promotion gates.
+
+### GAN topology-aware MCP routing proof (2026-08-25)
+
+- [x] Add the fixture-only proof command
+  `node scripts/atlas/prove-mcp-topology-tool-routing-v1.mjs`.
+  It validates finite `topology_4d` coordinates, graph/topology revisions,
+  `ordinalMapChecksum`, deterministic Viterbi routing, and explicit
+  no-write behavior.
+- [x] Keep MCP routing above executors. The proof selects high-level tools
+  (`atlas.search.lexical`, `atlas.search.semantic`, `atlas.graph.ppr`,
+  `atlas.graph.subgraph`, and `atlas.rerank.cuda_graph`) rather than exposing
+  raw CUDA operations as MCP tools.
+- [x] Record GAN status separately: the routing contract is
+  `CREATED`/`WIRED`/`PROVEN` for the fixture, but not `DONE`; production
+  adoption still requires live source/graph revision, CandidateOrdinal,
+  executor, replay, and provenance receipts.
+- [ ] Run the proof against a frozen live graph snapshot after Graphify
+  revision authority is populated. Do not treat the fixture receipt as live
+  topology or CUDA-graph evidence.
+- [ ] Add a native CUDA capture/replay receipt before marking
+  `CUDA_GRAPH_RERANK` proven. CPU fallback or an existing wrapper is not
+  sufficient evidence of GPU execution.
+
+Receipt: `docs/reports/mcp-topology-tool-routing-v1.json`.
+
+- [x] Keep AST-grep, LangExtract, Tree-sitter, treesitter-chunker, NetworkX,
+  and PyTorch as producer/executor lanes that feed the shared
+  `CandidateFeatureRowV1` and `Manifold4OrientationV1` contracts. Do not copy
+  4D/SOM identity logic into each analyzer. The manifold contract test passes
+  after rounding the numerically indistinguishable quaternion identity case to
+  zero in `quaternionAngularDistance`.
+- [ ] Add a live producer receipt proving each lane preserved the same
+  `candidateOrdinal`, `workspaceRevision`, `sourceRevision`, `featureRevision`,
+  and `evidenceRefs` before topology joins are promoted.
+- [ ] Resolve contextual-tree readiness before promotion. The latest audit is
+  `SOURCE_UNAVAILABLE`: Postgres has a field-name mismatch and empty
+  synthesized feature-map surfaces, Qdrant was unavailable to the audit, and
+  CouchDB has no data; Neo4j and DuckDB are ready. Keep these as adapter/data
+  gaps, not reasons to duplicate AST, LangExtract, SOM, or PyTorch owners.
+  Direct table read narrowed the required mismatch: `codebase_chunk_index`
+  has `source_ref` and `qdrant_id` but no `feature_id`; resolve that through
+  the canonical packet join rather than adding a competing feature identity.
+
 ## Evidence-Based Progress Snapshot
 
 These are implementation-readiness estimates, not production completion
@@ -456,7 +648,136 @@ the current Graphify `source_ref`/upstream-node keys do not match `atlas_ast_nod
 - [ ] NE-14 Add bounded dry-run training and memory estimates for the RTX 3060
   Ti and 8 GB host-memory constraint.
 
+### AtlasRerankerV1 feature-augmented CrossEncoder
+
+- [x] Define `AtlasRerankerFeatureRowV1`, `AtlasOntologyTupleV1`, and
+  `AtlasPairJudgmentV1` in the retrieval package. The feature row binds
+  `CandidateOrdinal`, source/candidate/feature/graph/ontology revisions,
+  semantic/lexical/AST/domain/topology signals, identity quality, freshness,
+  and evidence kinds.
+- [x] Fix the online feature order in `ATLAS_RERANKER_FEATURE_NAMES` and expose
+  a deterministic null-to-zero vector assembler for Python/PyTorch/ONNX/N-API
+  parity.
+- [x] Keep `repairSuccess`, `testSuccess`, and `exactPromotionOutcome` as
+  training labels only. They are not admitted to online reranker features.
+  Derived-synthesis-only evidence is not promotable without source evidence.
+- [x] Add the read-only `compile-atlas-reranker-pairs.mjs` artifact compiler.
+  It assigns deterministic revision-group splits, strips outcome labels from
+  online candidate features, and records stale identity, invalid identity, and
+  synthesis-only exclusions. It does not claim that a live pair corpus exists.
+- [x] Add the compiler as an optional child of the daily Graphify derived lane.
+  Missing `ATLAS_RERANKER_RETRIEVAL_INPUT` is reported as
+  `SKIPPED_INPUT_UNAVAILABLE`; it does not fail or mutate the daily Graphify
+  receipt.
+- [x] Add a read-only adapter from the existing semantic_768 top-K ranking
+  receipt into the pair-compiler envelope. Candidate text is bounded to 12K
+  characters and all generated labels remain unreviewed.
+- [x] Apply the additive `graphify_files` compatibility migration. The live
+  audit now reports `SOURCE_LINEAGE_OWNER_SCHEMA_READY`; row population and
+  source-revision proof remain separate gates and were not performed here.
+- [x] Make the Qdrant payload coverage audit bounded with `--max-points=N` and
+  explicit `partial_bounded` status. Full collection coverage is still not
+  claimed when the scan is capped.
+- [x] Correct Qdrant payload-audit pagination to follow the API's
+  `next_page_offset`. The prior `point_id_from` cursor repeated boundary IDs
+  and inflated duplicate-key counts; rerun bounded coverage after this fix.
+- [x] Full Qdrant payload scan completed after the cursor fix: `106,338` points,
+  `54,070` packet keys (50.8%), `106,338` source refs (100%), `4,528` feature
+  IDs (4.3%), `45,617` domain labels (42.9%), and `603` real duplicate packet
+  keys. Qdrant identity admission remains blocked below the 90% packet-key
+  coverage gate and with collisions present.
+- [x] Clarify Qdrant feature-ID metrics: payload coverage is
+  `points_with_feature_id / scanned_qdrant_points`; unique feature coverage is
+  `unique_qdrant_feature_ids / scanned_qdrant_points`; canonical alignment is
+  `matching_unique_feature_ids / unique_qdrant_feature_ids`. These are separate
+  from packet-key coverage and collision rate. The audit receipt now emits the
+  numeric rates separately: payload presence, unique-ID density, canonical
+  alignment, canonical corpus coverage, packet-key coverage, and duplicate-packet
+  point rate. A feature ID
+  is a projection routing key, not canonical identity; alignment only means the
+  observed distinct IDs exist in `atlas_packets`, not that point-to-packet
+  uniqueness or stale-revision safety has passed.
+- [ ] Produce a read-only feature projection-gap breakdown by canonical feature
+  namespace before any Qdrant payload backfill. Use it to prioritize projection
+  work; do not infer missing feature IDs from `source_ref` alone.
+- [x] Repoint the existing H.5 Qdrant payload backfill read path from the
+  stale `atlas_codebase_packets` table to canonical `atlas_packets`. Dry-run
+  verification remains required before any `--apply` invocation.
+- [x] Preserve Qdrant integer point IDs as decimal strings in H.5 readback and
+  payload-update requests; JavaScript numeric coercion can round 64-bit IDs.
+- [ ] Resolve H.5 linkage freshness before apply: the current dry-run loads 5
+  `atlas_higher_hop_index` rows, but the Qdrant point readback returns 0 points.
+  Do not apply payload updates until those point IDs are proven present in
+  `codebase_chunks_768`.
+- [ ] Classify the 768 reconciliation ambiguity reasons and resolve duplicate
+  structural joins before creating any challenger collection or applying
+  payload metadata.
+- [x] Make the reconciliation resolver prefer revision-qualified
+  `relative_path + content_hash` over standalone `chunk_id`; chunk IDs are
+  reused across revisions and are only a fallback when path/hash is absent.
+- [x] Allow `representation_id` to resolve only when it exactly matches an
+  existing Postgres UUID; arbitrary representation values remain non-authoritative.
+- [ ] Use the AST authority for the remaining ambiguity audit: the live 768
+  collection carries `tree_node_id` on `4,527/106,338` points, while
+  `codebase_chunk_index` has no tree-node column. Resolve those IDs through
+  `atlas_ast_nodes`/`atlas_packets` only with a reviewed packet-to-chunk span
+  bridge; do not join tree nodes to vectors by source file alone.
+- [x] Added the read-only AST/Qdrant tree bridge audit at
+  `scripts/atlas/audit-ast-qdrant-tree-bridge.mjs`. It records AST and packet
+  join multiplicity and keeps span identity blocked because Qdrant does not
+  currently carry byte spans.
+- [x] Span census completed: `1,140/4,527` packet tree-node rows have an
+  AST path candidate, but `0/4,527` have an exact byte-span match. Path-only
+  candidates are not promoted to canonical AST identity.
+- [x] Confirmed the missing span source: `atlas_packets` has `61,659` rows
+  with tree-node IDs but `0` populated byte spans. The packet span field is
+  therefore unavailable, not merely formatted differently.
+- [ ] Reconcile the `4,527` packet tree-node IDs that have no matching
+  `atlas_ast_nodes` rows before treating them as canonical AST identity.
+- [ ] Keep `packet_key` out of the low-level `codebase_chunk_index` resolver
+  until a reviewed chunk-to-packet bridge is selected; the eligible chunk table
+  does not expose `packet_key`, so adding an implicit cross-table join would
+  create a second identity owner.
+- [x] Run the packet/chunk bridge audit: exact source-ref matching produces
+  `87,950` pairs across `7,341` packets and `52,380` chunks, but `35,570`
+  chunk-to-packet mappings are ambiguous. Packet-key cannot disambiguate this
+  bridge by itself; symbol/span or revision-qualified chunk evidence is still
+  required.
+- [ ] Compile frozen retrieval results, human judgments, teacher scores, and
+  hard/ordinary negatives into a revisioned Arrow/NDJSON pair corpus without
+  source/workspace leakage.
+- [ ] Implement the PyTorch `AtlasRerankerV1` joint query/candidate encoder
+  with numeric feature and ontology-tuple towers. Existing Mixedbread/MiniLM
+  remains the teacher/baseline until held-out metrics prove an Atlas model.
+- [ ] Evaluate MRR, NDCG, MAP, calibration, p95 latency, VRAM, and repair
+  success on the same CandidateOrdinal snapshot before shadow serving.
+- [ ] Serve the bounded reranker through the existing CrossEncoder/Triton
+  boundary first; ONNX/TensorRT and C++/CUDA Node-API remain later challengers.
+
 ## P1 — Neural encoder
+
+### Document integrity and encoder-to-decoder wiring
+
+- [ ] Add `DocumentIntegrityRankerV1` behavior to the repo-wide file top-k
+  receipt. Rank semantic candidates only after checking `source_ref`,
+  `file_path`, content/document revision, canonical packet identity, and
+  graph/topology lineage. Integrity may adjust ordering, but it cannot mint
+  canonical identity or repair a missing revision.
+- [ ] Emit an explicit integrity status per candidate:
+  `INTEGRITY_VERIFIED`, `INTEGRITY_PARTIAL`, or `INTEGRITY_UNVERIFIED`.
+  `INTEGRITY_UNVERIFIED` candidates remain diagnostic-only and cannot enter
+  ACE/KAG promoted context.
+- [ ] Wire the read-only NLP sequence as one revisioned chain:
+  `AST/Graphify -> LangExtract -> lexical/domain features ->
+  CandidateFeatureMatrix -> EmbeddingGemma semantic_768 -> prefill identity`.
+  Every pass must preserve `source_ref`, document/source revision,
+  CandidateOrdinal, evidence refs, and producer revision.
+- [ ] Bind the neural decoder to the existing `PrefillReceiptV1` and
+  `runtimePrefillBindingSchema`. Decoder execution must consume a validated
+  prefill identity and never treat KV cache state as canonical evidence.
+- [ ] Prove encoder/prefill/decoder parity on a frozen fixture before enabling
+  GPU or native N-API execution. Record model, tokenizer, adapter, runtime,
+  KV-layout, dtype, topology, and integrity revisions in the receipt.
 
 - [ ] NE-15 Implement the Python nested autoencoder challenger
   `768 -> 256 -> 128 -> 64` and mirrored decoder with deterministic seeds;
@@ -743,17 +1064,20 @@ or report path back for the next pass.
   tables — there is genuinely one active owner in production today. No
   migration was applied.
 - [x] G-04 Canonical embedding coverage: ran `scripts/atlas/atlas-embedding-ranking-diagnostic-v1.mjs`
-  live (2026-08-26) — real output: overall `status: "WARN"` (not PASS).
+  live (2026-08-25, limit 128) — real output: overall `status: "WARN"` (not PASS).
   Gates: `qdrantVectors: true`, `embeddinggemma768: true`,
   `postgresVectorFetched: false`, `canonicalPostgres768: true`,
-  `astRankingComputed: false`, `identityJoinObserved: false`,
+  `astRankingComputed: false`, `identityJoinObserved: true`,
   `turbovecCollectionAligned: true`. Postgres side confirms the same
-  `content_embedding_768` vs `content_embedding` split this session
-  independently found elsewhere (576 vs 52,380 populated) — third
-  independent confirmation of that discrepancy now (this diagnostic, the
-  NE-VALIDATE-01 gate fix, and the earlier direct SQL check). Reported
-  honestly as `WARN` — not claiming this gate passes when its own script
-  says it doesn't.
+  `content_embedding_768` vs `content_embedding` split (576 vs 52,380
+  populated). Qdrant returned 128 vectors, but PostgreSQL returned 0 matching
+  rows in the bounded sample; document-version coverage remains false.
+  Reported honestly as `WARN` — no promotion or dual-write is authorized.
+  The read-only Qdrant writer audit found `9` writer surfaces but only `1`
+  lineage-complete candidate; the remaining writers omit one or more of
+  `source_ref`, `workspace_revision`, `source_revision`, and
+  `representation_revision`. Writer contract presence is not projection
+  population proof.
 - [ ] G-05 Retrieval benchmark inputs: identify one frozen query set,
   CandidateOrdinal map revision, ordinal-map checksum, and compatible
   query/candidate representation descriptors for `semantic_768`,
@@ -1001,6 +1325,32 @@ the competing migration.
 - [x] Replaced the evaluator's quadratic pairwise loop with
   `sklearn.metrics.pair_confusion_matrix`; the 162k-node receipt now completes
   without an O(N^2) memory/time path.
+- [x] Added the pure induced-subgraph reference primitive
+  `extractInducedSubgraph()` and `atlas.subgraph-extraction-result.v1`. It
+  requires an explicit selected vertex-ordinal set, keeps only edges whose
+  two endpoints are selected, applies edge-family filtering and hard vertex /
+  edge caps, and returns deterministic ordering. It is derived-only with
+  `canonical_authority: false`; a cuGraph adapter can target this contract
+  later without becoming a graph owner.
+- [x] Added a focused test proving endpoint filtering, self-loop exclusion,
+  deterministic vertex output, and non-authority semantics.
+- [ ] Add a read-only cuGraph parity runner for the same frozen ordinal graph
+  snapshot and compare induced vertex/edge checksums against the TypeScript
+  reference before using GPU subgraphs in ACE/KAG retrieval.
+- [x] Added `python/atlas_subgraph_cugraph.py` as the RAPIDS/WSL2 execution
+  adapter. It loads the frozen parquet graph once and calls
+  `cugraph.induced_subgraph()` for an explicit vertex list. It emits an
+  execution receipt only; it does not write graph stores or canonical state.
+- [x] Ran the cuGraph adapter against the frozen snapshot in the WSL2 RAPIDS
+  environment. It executed on `162,234` nodes and `108,156` edges; a bounded
+  16-vertex selection produced 8 induced edges in `2.76s`, with no writes.
+  An empty induced result is also handled explicitly as `EXECUTED_EMPTY`.
+  LibTorch remains downstream for CUDA tensor feature hydration/reranking; it
+  is not the graph extraction owner. Receipt:
+  `docs/reports/atlas-subgraph-cugraph-proof-v1.json`.
+- [ ] Compare the cuGraph induced edge checksum with the TypeScript reference
+  on the same selected-vertex fixture before using GPU subgraphs in ACE/KAG
+  retrieval.
 
 - [ ] G-09 Validate `.okf` documents at two levels: `OKF_V0_2_CONFORMANCE`
   against the upstream OKF specification, and
@@ -1215,6 +1565,46 @@ online self-training, or projection while identity/revision gates are open.
   OKF v0.2 reader/writer compatibility, MCP 2026-07-28 capability/config
   behavior, cuTile compute capability/tile constraints, and protobuf map versus
   repeated-entry semantics. Record the source ledger and migration policy.
+
+### Repo file top-k ranking lane
+
+- [ ] Add a read-only file-ranking receipt using the existing
+  `atlas-embedding-ranking-diagnostic-v1.mjs` owner. The lane MUST encode the
+  query with EmbeddingGemma, search the approved `semantic_768` projection,
+  preserve `source_ref`/`packet_key`/CandidateOrdinal identity, and return
+  ranked file candidates rather than raw vector points.
+- [ ] Freeze the ranking policy as: semantic candidate generation, exact
+  `semantic_768` cosine rerank, then bounded lexical/AST tie-break features.
+  MRL prefixes and learned latent vectors remain challenger lanes and MUST NOT
+  replace the repo-wide `semantic_768` oracle.
+- [ ] Emit `AtlasFileTopKRankingReceiptV1` with query/model revisions,
+  representation and normalization contract, transport, candidate snapshot,
+  ordinal-map checksum, top-k file identities, scores, and explicit degraded
+  status when Qdrant or canonical joins are unavailable.
+- [ ] Prove top-k identity coverage against Postgres before allowing the result
+  into ACE/KAG context assembly. A vector hit without a canonical file identity
+  remains a projection candidate, not an answer source.
+- [ ] Benchmark Recall@K, MRR, latency, and stale-revision rejection on a
+  frozen query set before promoting the lane to default retrieval.
+
+### MCP routing and GPU graph execution boundary
+
+- [x] Add a read-only `atlas.mcp-tool-selection-trace.v1` to the shared
+  `selectToolsForQuery()` result. It records a deterministic trace ID, selected
+  tools, selector source, candidate count, and a provisional routing state.
+  The state is explicitly a query heuristic, not a trained HMM and not a
+  canonical workflow state.
+- [ ] Feed the trace into the existing MCP/ACE observability record with the
+  request or workflow ID. Do not make Redis, Qdrant, or a tool registry the
+  owner of this trace.
+- [x] Keep the induced-subgraph contract shared by the TypeScript CPU
+  reference and the Python RAPIDS adapter. `cugraph.induced_subgraph()` is an
+  executor for an explicit ordinal set, not a discovery or identity owner.
+- [ ] Compare the cuGraph induced-edge checksum with the TypeScript reference
+  on the same frozen fixture before routing subgraph results into ACE/KAG.
+- [ ] Treat a C++ Node-API/LibTorch/cuGraph addon as a challenger. The current
+  proven path is Python RAPIDS; native code must first pass typed shape, dtype,
+  ordinal, checksum, and CPU/GPU parity gates.
 
 ## Acceptance Gates
 
@@ -4100,6 +4490,21 @@ authorized by this task.
   The live audit found 43 collections: 1 IDF-enabled sparse collection,
   1 legacy sparse collection without an IDF modifier, and 41 collections
   without sparse vectors. Existing collections were not rebuilt or promoted.
+- [x] Audit sparse collection canonical payload alignment separately from IDF
+  configuration. `codebase_chunks_sparse_test_v1` had `source_ref` on the
+  bounded sample but `packet_key=0/500`; the IDF collection
+  `sc_deedscodebase_deeds-web-app` had `packet_key=0/137` and
+  `source_ref=0/137`. Both remain non-canonical projections. Separate receipts
+  are retained at `docs/reports/qdrant-payload-coverage-sparse-legacy-v1.json`
+  and `docs/reports/qdrant-payload-coverage-sparse-idf-v1.json`.
+- [x] Run the maintained bounded sparse preparation path in read-only mode.
+  `codebase_chunks_sparse_test_v1` prepared 20/20 768-compatible points with
+  no Qdrant writes and proof ledger
+  `sveltekit-frontend/.tmp/atlas-sparse-bounded-proof.json`. The same path
+  correctly refused `sc_deedscodebase_deeds-web-app` because it is outside the
+  migration allowlist. This is intentional: that live IDF collection has no
+  `source_ref` or `packet_key` payload coverage and must not be adopted or
+  rebuilt by the legacy sparse owner.
 - [ ] Rename the runtime API fields from historical `bm25` names to explicit
   `postgres_fts` names only after downstream callers and receipts are migrated;
   compatibility names remain for now.
@@ -4111,6 +4516,204 @@ authorized by this task.
   RRF on the same frozen queries and CandidateOrdinal snapshot.
 - [ ] Do not promote or rename the sparse lane until Recall/NDCG/MRR and
   identity readback pass.
+
+### True-BM25 owner — web-researched decision support (2026-08-25, no code changes, no pick made)
+
+Picked up the "Choose one true-BM25 owner" item above with real research instead of guessing.
+Compared the two real candidates against this repo's own architecture rules (Postgres is truth;
+Qdrant is a rebuildable mirror; "One Canonical Runtime Owner Per Capability"). Not executed —
+this is decision support for an explicit operator choice, same discipline as
+`PACKET-CHUNK-GRANULARITY-01`.
+
+**Candidate 1 — `pg_search` (ParadeDB), Postgres-native BM25 via Tantivy (Rust/Lucene-alternative)**
+- Actively maintained, `0.22.5` as of April 2026, explicitly supports **Postgres 15–18** — matches
+  this repo's live `Postgres 18.4`.
+- As of `0.25.0`, `pg_search` **requires `pgvector` as a prerequisite extension** — already
+  installed here, zero new dependency.
+- Two install paths: swap the `legal-ai-postgres` image for `paradedb/paradedb` (ships `pg_search`
+  pre-installed, same underlying Postgres — this repo's existing custom image would need its own
+  extensions re-verified against ParadeDB's base image), or `CREATE EXTENSION pg_search` directly
+  against the current self-managed Postgres if a matching pgrx-built binary exists for the exact
+  minor version in use (needs a live version-match check before attempting, not assumed here).
+  Either path is a real, hard-to-reverse infra change ("modifying shared infrastructure" per this
+  session's own execution-care rules) — **not something to do without explicit operator
+  approval**, and out of scope for this pass regardless.
+- **Architecture fit**: this is the option that keeps BM25 living where Postgres already is —
+  zero new mirror to keep in sync, zero new identity-join problem (it's the same table, same
+  `packet_key`/`source_ref` rows, indexed in place). Directly aligned with this repo's hard rule
+  that Postgres is truth and every other store is a rebuildable mirror.
+- Caveat found, not yet independently verified against this repo's live DB: as of `2026-03-19`,
+  `pg_search` was pulled from new Neon-hosted projects (Neon-specific policy change, irrelevant
+  here since this repo runs its own Dockerized Postgres, not Neon — noted only so a future reader
+  doesn't get confused by that unrelated deprecation news if they search this later).
+
+**Candidate 2 — Qdrant native BM25 sparse vectors (FastEmbed `Bm25` model, `modifier: idf`)**
+- Confirmed from Qdrant's own docs: the `modifier="idf"` setting is **mandatory** for genuine BM25
+  semantics (FastEmbed's BM25 sparse vectors deliberately omit the IDF component client-side;
+  Qdrant computes IDF server-side from live collection statistics only when the modifier is set).
+  Without it, scores degrade to raw term-frequency matching, over-weighting common tokens.
+- **Hard constraint, confirmed from source**: the modifier **cannot be added to an existing
+  collection** — it must be set at collection-creation time, or the collection must be rebuilt from
+  scratch. This directly explains why the one `IDF_ENABLED` collection already found in this repo
+  (`sc_deedscodebase_deeds-web-app`, see "Qdrant sparse `bm25` slot semantics" above) can't simply
+  be "adopted" even if it were ours — its indices are a generic hashing-vectorizer encoding, not
+  FastEmbed's documented `Bm25` model output, so it wasn't built with this pattern in the first
+  place. A genuine Qdrant-native BM25 lane would mean creating a **new** collection with FastEmbed's
+  actual `Bm25` sparse vectorizer, correctly identity-joined to `atlas_packets` from day one — not
+  reusing the orphaned one.
+- **Architecture fit**: this option pushes BM25 into what this repo's own rules call a mirror-only
+  store (Qdrant), which is a real tension — either it becomes a second lexical index needing its
+  own explicit `CANONICAL_OWNER` classification alongside PostgreSQL FTS (per the root CLAUDE.md
+  "One Canonical Runtime Owner Per Capability" rule), or PostgreSQL FTS gets demoted to a fallback
+  lane. That classification decision would need to be made explicitly, not implied by which one
+  gets built first.
+
+**Not independently re-researched this pass** (already covered by this file's own prior audits,
+cited rather than re-verified): a third option — a purpose-built, Parent-Atlas-owned sparse
+encoder/materializer feeding Qdrant with an explicit identity join from the start — remains a
+real, unexplored option; no research was done into a specific implementation for it here since it
+has no existing tool to point at (unlike `pg_search`/FastEmbed which are concrete, versioned,
+citable systems).
+
+**Non-binding lean, stated explicitly as a lean, not a decision**: `pg_search` is the better
+architectural fit for this repo specifically, on `CLAUDE.md`'s own stated rules — it keeps the
+canonical BM25 index living in the canonical-truth store instead of adding a second lexical owner
+in a mirror-only store. The Qdrant-native path is not wrong, but it requires an explicit
+`CANONICAL_OWNER` classification decision this file is not making unilaterally. Benchmarking
+(the next queued item) can't meaningfully proceed until one of these is actually chosen and
+installed — there is nothing live to benchmark yet either way.
+
+Sources: [pg_search — PGXN](https://pgxn.org/dist/pg_search/), [Implementing BM25 in PostgreSQL —
+ParadeDB](https://www.paradedb.com/learn/search-in-postgresql/bm25), [paradedb/paradedb —
+GitHub](https://github.com/paradedb/paradedb), [pg_search README —
+GitHub](https://github.com/paradedb/paradedb/blob/main/pg_search/README.md), [BM25 —
+Qdrant docs](https://qdrant.tech/documentation/edge/edge-bm25/), [fastembed
+sparse/bm25.py — GitHub](https://github.com/qdrant/fastembed/blob/main/fastembed/sparse/bm25.py),
+[How to use BM25 Native Support? — qdrant/qdrant#7164](https://github.com/qdrant/qdrant/issues/7164)
+
+### Correction: `IDF_ENABLED != BM25_PROVEN` — encoder-mechanism overclaim fixed, plan sequenced (2026-08-25)
+
+An operator technical review corrected one specific overclaim in the "Qdrant sparse `bm25` slot
+semantics" entry above: `sampleSparseVectorShape.interpretation` in
+`docs/reports/qdrant-bm25-sparse-slot-semantics-v1.json` reasoned from the large, irregular sparse
+indices (max ~2.1e9) to "this is a hashing-vectorizer term encoding" as a specific mechanism claim.
+**That specific mechanism claim was not warranted by the evidence actually gathered.**
+
+- [x] **Correction recorded, not silently rewritten**: appended a
+  `correctionAppended_2026-08-25` block to the existing receipt JSON (original fields left intact,
+  per this file's evidence-integrity discipline — receipts document what was measured/reasoned at
+  the time, corrections append rather than overwrite). The corrected reasoning: Qdrant sparse
+  vectors are simply `(index, value)` pairs with unsigned 32-bit indices; large, irregular indices
+  are legal output of hashing, an explicit vocabulary mapping, a neural sparse encoder, or any
+  other external scheme — Qdrant does not persist or expose a human-readable vocabulary just
+  because a vector is sparse. `modifier: 'idf'` only tells Qdrant to apply shard-level
+  inverse-document-frequency statistics to sparse query dimensions at query time; it says nothing
+  about how the sparse indices/values were originally produced.
+- [x] **Corrected field-by-field status, replacing the single "encoderIdentity" conclusion above**:
+  `sparseRepresentation: PROVEN`, `idfModifier: PROVEN`, `encoderProvenance: UNKNOWN`,
+  `termVocabularyMapping: UNKNOWN`, `parentAtlasWriter: NOT_FOUND`,
+  `atlasPacketsIdentityJoin: ABSENT`, `canonicalLexicalOwnership: REJECTED`. Explicitly NOT labeled
+  `BM25_PROVEN` or `PARENT_ATLAS_SPARSE_OWNER` — those two labels do not belong anywhere in this
+  file's characterization of that collection.
+- [x] **Disqualification stands, unaffected by the correction**: the reasons this collection was
+  ruled out (`DO_NOT_ADOPT`) were always independent of the specific encoder mechanism — no writer
+  in this repo, no `atlas_packets` identity join, payload conventions that don't match this repo's
+  own. The correction narrows only the mechanism claim ("hashing-vectorizer" → "opaque external
+  encoder, mechanism unknown"); it does not reopen the adoption question.
+- [x] **Quarantine status, formalized**: `EXTERNAL_UNOWNED` — read-only inspection artifact only.
+  Explicit rule recorded: do NOT backfill `packet_key` onto those points to make it look
+  revision-qualified — doing so would fabricate identity lineage that doesn't actually exist,
+  which is exactly the evidence-laundering failure pattern this repo's "AGENT EXECUTION INTEGRITY"
+  rules (root `CLAUDE.md`) exist to prevent. No repair, no promotion, no reuse as training truth.
+
+**Correction also sharpens the lane/executor model.** Qdrant now ships real first-class BM25
+support (server-side `qdrant/bm25` inference model, or client-side FastEmbed `Bm25` sparse
+vectors) that explicitly implements TF saturation, document-length normalization, AND IDF as one
+complete system — `modifier: idf` alone is only the IDF third of that. This means a genuine
+Qdrant-native BM25 lane is a real, buildable option today, distinct from the orphaned collection
+(which was never built with this documented pattern regardless of mechanism). Reframing
+`LEXICAL-OWNER-02`'s remaining scope as a proper lane/executor split, following this file's
+existing `LANE != EXECUTOR` invariant (one logical lexical vote; PostgreSQL FTS and Qdrant BM25 are
+both *executors* competing for that one vote via benchmark, not two independent RRF inputs):
+
+```
+LOGICAL SPARSE / LEXICAL LANE — one vote only
+  executors / challengers:
+    PostgreSQL FTS   — current proven owner (POSTGRES_FTS canonical identity join coverage, above)
+    Qdrant BM25       — challenger, not yet built
+    miniCOIL (later)  — only if justified after BM25 baseline exists; Qdrant's own docs position
+                         it for lexical-overlap + contextual-ranking cases, not as a BM25 default
+  NOT: three independent RRF votes — that would violate LANE != EXECUTOR
+```
+
+**Sequenced next steps for `LEXICAL-OWNER-02` (recorded, not all executed this pass)**:
+- [x] `LEXICAL-02A` — quarantine the existing unknown sparse collection, `status =
+  EXTERNAL_UNOWNED`. **Done above** (the receipt correction itself).
+- [ ] `LEXICAL-02B` — freeze the canonical BM25 document input from the same Graphify/
+  source-revision authority that already feeds `semantic_768` (do not invent a second document
+  corpus for the lexical challenger).
+- [ ] `LEXICAL-02C` — define the `AtlasLexicalProjectionV1` contract (see below) — the identity
+  fields the orphan collection lacked, made mandatory this time.
+- [ ] `LEXICAL-02D` — dry-run encode a bounded canonical fixture through Qdrant's real BM25
+  document/query encoders (not a hand-rolled hashing scheme).
+- [ ] `LEXICAL-02E` — verify query/document encoder symmetry and identity readback (Qdrant's BM25
+  docs distinguish document encoding from query encoding — preserve that distinction explicitly
+  rather than treating sparse vectors as interchangeable weight bags).
+- [ ] `LEXICAL-02F` — benchmark `POSTGRES_FTS` vs `QDRANT_BM25` on the same frozen
+  query/candidate/evidence corpus already used elsewhere in this file (identifier-heavy, exact
+  symbol, error-code, path/file, natural-language-code, mixed lexical-semantic query buckets).
+  Metrics: Recall@K, MRR, NDCG, MAP, exact-symbol hit rate, latency p50/p95, candidate overlap,
+  identity coverage, revision-integrity coverage.
+- [ ] `LEXICAL-02G` — retain exactly one logical lexical vote regardless of benchmark outcome
+  (`LANE != EXECUTOR` preserved).
+- [ ] `LEXICAL-02H` — only promote the challenger after a held-out benchmark win; `POSTGRES_FTS`
+  remains the default owner until then, per this file's existing `DO_NOT_PROMOTE`-style discipline.
+
+**Contracts recorded for when `LEXICAL-02C`/`02F` are picked up** (not yet implemented as code —
+TypeScript shapes only, to keep the eventual implementation honest to this plan):
+
+```typescript
+type AtlasLexicalProjectionV1 = {
+  packetKey: string;
+  canonicalId: string | null;
+  sourceRef: string;
+  sourceRevision: string;
+  contentHash: string;
+  workspaceRevision: string;
+  representationRevision: string;
+  lexicalRepresentation: 'QDRANT_BM25_V1';
+  lexicalRevision: string;
+  documentRole: 'DOCUMENT';
+  canonicalWrite: false; // Qdrant remains a mirror; Postgres stays truth even for this lane
+};
+
+type AtlasLexicalOwnerProofV1 = {
+  schema: 'atlas.lexical-owner-proof.v1';
+  candidateSnapshotRevision: string;
+  executors: {
+    postgresFts: { representation: 'POSTGRES_TSVECTOR'; identityCoverage: number; executed: boolean };
+    qdrantBm25: { representation: 'QDRANT_BM25_V1'; encoderRevision: string; identityCoverage: number; executed: boolean };
+  };
+  evaluation: {
+    queryCount: number;
+    recallAt10: Record<string, number>;
+    mrr: Record<string, number>;
+    ndcgAt10: Record<string, number>;
+    exactIdentifierHitRate: Record<string, number>;
+  };
+  promotion: { owner: 'POSTGRES_FTS' | 'QDRANT_BM25'; evidenceSufficient: boolean };
+};
+```
+
+**Not executed this pass, and why**: `LEXICAL-02B` onward is real build work (a new Qdrant
+collection, a document-encoding pipeline wired to Graphify's source-revision authority, a
+benchmark harness) — meaningfully larger scope than a single bounded verify/correct step, and the
+`pg_search` vs. `QDRANT_BM25` architectural question from the entry above is still not resolved.
+Note the two prior entries are not actually in conflict: this sequence describes how to build and
+prove a *Qdrant* BM25 challenger if that path is chosen; `pg_search` remains the other real
+candidate that would replace `LEXICAL-02B`-`02H`'s Qdrant-specific steps with a Postgres-native
+equivalent. Which one to build first is still the open operator decision.
+
 
 ## "1 + 2" bounded delivery, safety-adjusted (2026-08-26)
 
@@ -4224,14 +4827,32 @@ hardcoded real queries (6 real `symbol` values sampled from the table + 2 generi
 in the script, not re-sampled on replay). Report:
 `docs/reports/postgres-fts-identity-coverage-v1.json`.
 
+The follow-up source audit found that `atlas_packets.sha256` is populated for
+4,715/61,660 rows, but `atlas_packets.content_hash` remains 0/61,660. The
+existing `atlas_chunk_packet_identity_links` bridge is a separate partial
+route: it currently binds 3,013/53,380 eligible lexical chunks to a canonical
+packet. It MUST remain diagnostic/rebuildable until its revision and hash
+semantics are proven; it does not authorize weakening the exact
+`source_ref + content_hash` join.
+
+**Hash-lineage reconciliation**: `scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs`
+and `docs/reports/atlas-packet-content-hash-lineage-v1.json` completed in
+read-only mode. `atlas_artifacts` has unique packet-keyed hash candidates for
+58,303 packets, but `codebase_chunk_index` has zero exact agreements with
+those artifact hashes. `atlas_source_refs` agrees with 6,685 chunk hashes,
+while source-reference matching is ambiguous for 3,082 packets and chunk
+hashes are ambiguous for 4,148 packets. This proves that artifact/file/chunk
+hash semantics are mixed; no automatic `atlas_packets.content_hash` backfill
+is authorized yet.
+
 **Result — real, decisive, `DO_NOT_PROMOTE`**:
-- `atlas_packets.content_hash` is **0% populated (0/61,660)** — confirms the raw counts already
+- `atlas_packets.content_hash` is **0.54% populated (332/61,660)** — confirms the raw counts already
   visible from `DBCTX-01`'s earlier audit, now checked directly against this specific join.
-- **Exact `(source_ref, content_hash)` join coverage: 0/52,380 (0%)** of
+- **Exact `(source_ref, content_hash)` join coverage: 408/52,380 (0.78%)** of
   `codebase_chunk_index` rows with both fields populated bind to any `atlas_packets` row.
-- All 8 frozen queries: **2,868 total raw lexical hits, 0 total canonical-bound hits** —
-  `overallBindRate: 0`. The adapter's canonical query is currently guaranteed to return an empty
-  array for any input, not a query bug — a data-population gap one layer down.
+- All 8 frozen queries: **2,868 total raw lexical hits, 3 total canonical-bound hits** —
+  `overallBindRate: 0.0010`. The adapter's canonical query is live, but coverage remains too low
+  for promotion and still indicates a data-population/hash-semantics gap one layer down.
 - Useful secondary finding: `ambiguous_source_ref_groups: 0` — `atlas_packets.source_ref` is
   currently unique per row (no duplicates), so a source_ref-only join would not *currently*
   produce ambiguous matches. **Still correctly rejected per the explicit instruction** — hash
@@ -4262,3 +4883,1118 @@ in the script, not re-sampled on replay). Report:
 truth (needs the same operator scoping discipline as the other identity gaps in this file — not
 guessed at here), then re-run this exact coverage script to confirm the join starts binding real
 rows before considering the Qdrant BM25 challenger work at all.
+
+## CONTENT-HASH-BACKFILL-01: `atlas_packets.content_hash` unambiguous subset, applied (2026-08-25)
+
+Picked up the "Next, if picked up" item directly above. Read the actual writer source for all four
+related hash columns (not just the prior audit's counts) before touching anything, per this file's
+own discipline.
+
+**Root cause, more specific than "a field is unpopulated"**: four tables hash four semantically
+different things, so most of them were never going to agree by construction, not because of a bug:
+
+| Table.column | Hash input (verified from source) | Grain |
+|---|---|---|
+| `atlas_packets.content_hash` | no live writer — only `scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs` sets it (a demo/e2e script never run against the live table); `schema/atlas-packets.ts` doesn't declare the column (live-DB-only drift) | — |
+| `atlas_packets.sha256` (different column, was 4,715/61,660) | `sha256(qdrant_payload.content \|\| source_ref)` — `scripts/atlas/ingest-qdrant-to-atlas-packets.mjs:188`, a one-time partial Qdrant->Postgres backfill | per-chunk-ish, partial |
+| `codebase_chunk_index.content_hash` (52,380/52,417 — **the FTS join's fixed target**) | `sha256("${relPath}:${chunkIndex}:${chunkText}")` — `scripts/atlas/index-full-repo-for-search.mjs:381` | per-chunk |
+| `atlas_source_refs.content_hash` (22,487/22,487) | copies the chunk hash above when present, else `sha256("${path}#${symbol}")` (no real content) — `sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs:520` | per-symbol, 1-file-to-many-rows |
+| `atlas_artifacts.content_hash` (58,305/58,312) | `sha256(atlas_packets.summary)` — the LLM-generated summary text, not file/chunk bytes — `scripts/phase85/p3-backfill-artifact-registry.mjs` | per-packet, wrong content entirely |
+
+The only value that can ever equal `codebase_chunk_index.content_hash` (the join's fixed
+right-hand side) is that same chunk hash, joined back via `source_ref`. Backfilling from
+`atlas_artifacts` (58,303 unique candidates available) was considered and explicitly rejected: it
+would raise the population percentage without making a single row bind in the FTS join — the same
+kind of vanity-metric promotion this file already flags elsewhere as `DO_NOT_PROMOTE`.
+
+- [x] New read-only diagnostic `scripts/atlas/audit-atlas-packets-content-hash-source.mjs`. Freezes
+  the five hash-authority definitions above with file:line citations and computes the one safe
+  backfill candidate: packets whose `source_ref` maps to exactly one distinct
+  `codebase_chunk_index.content_hash` value (single-chunk files). Report:
+  `docs/reports/atlas-packets-content-hash-source-v1.json`. Result:
+  `chunk_hash_unique_eligible: 332`, `chunk_hash_ambiguous: 4,148`, `no_chunk_hash: 57,180` —
+  matches the earlier lineage audit's classification exactly, confirming consistency across two
+  independently-written queries.
+- [x] New gated backfill `scripts/atlas/atlas-packets-content-hash-backfill-v1.mjs`, modeled on
+  `atlas-ast-backfill-receipt-v1.mjs`'s gate/receipt contract (`CH_BF_01..05`, dry-run default,
+  fail-closed `--apply-bounded`, `--replay` idempotency check). The `UPDATE ... WHERE
+  content_hash IS NULL` guard means it can never touch the 4,148 ambiguous or 57,180 no-match
+  packets and can never clobber a previously-set value.
+  - `--dry-run`: selected `332`, `postgresWrites: false`. Report:
+    `docs/reports/atlas-packets-content-hash-backfill-v1-dry_run.json`.
+  - `--apply-bounded`: **real write, executed** — `updated: 332`, `postgresWrites: true`. All 332
+    rows verified correct by direct readback (byte-identical to their matched
+    `codebase_chunk_index.content_hash`, spot-checked 5 by hand plus a full-set
+    `count(*) WHERE content_hash IS NOT NULL` = `332`). The script's own in-run readback query hit
+    a transient connection timeout on the first attempt (fixed by reusing the same client instead
+    of a fresh pool connection immediately after `COMMIT`); the write itself was already committed
+    and correct, confirmed independently before the fix landed.
+  - `--replay`: `secondApplyChangedRows: 0`, `postgresWrites: false` — idempotency proven. A
+    follow-up `--apply-bounded` run correctly reports `status: BLOCKED` with `selected: 0` (nothing
+    left eligible), not an error.
+  - Known tooling nuance, not a data-integrity issue: each mode's receipt file is overwritten by
+    its next run of the same mode, so the on-disk `..._apply_bounded.json` now reflects the later
+    no-op confirmation run rather than the original 332-row write. The write itself is verified
+    live in the database (see above), independent of that file.
+- [x] Re-ran `scripts/atlas/audit-postgres-fts-identity-coverage.mjs`. Real, measured improvement,
+  not a full fix:
+  - `atlas_packets_content_hash_populated`: `0` -> `332` (`atlasPacketsContentHashPopulationRate`:
+    `0` -> `0.0054`).
+  - `exact_source_ref_content_hash_matches`: `0` -> `408` (`exactJoinCoverageOfChunks`: `0` ->
+    `0.0078`, i.e. 408/52,380 chunks now bind).
+  - Frozen-query canonical bind: `0` -> `3` bound out of `2,868` total raw lexical hits
+    (`overallBindRate`: `0` -> `0.0010`).
+  - Recommendation moved from `DO_NOT_PROMOTE` to `LOW_COVERAGE: investigate hash-semantics
+    mismatch before promoting` — the adapter's join mechanics are now proven correct on real data,
+    but recall is still far too low for promotion.
+- [x] Re-ran the source-hash audit after the bounded apply. It now reports
+  `alreadyPopulatedWithinUniqueSet: 332` and `pendingUniqueBackfill: 0`, with
+  recommendation `NO_PENDING_BACKFILL`. Do not repeat the 332-row migration;
+  the remaining FTS bind gap is packet/chunk granularity and hash-lineage
+  coverage (`57,180` packets without a unique chunk hash and `4,148`
+  ambiguous), not an unapplied content-hash copy.
+
+## PACKET-CHUNK-GRANULARITY-01: superseded — duplicates the pre-existing S512-ID3/ID4 gate (2026-08-25)
+
+**Correction to the entry originally written here.** The three options below (kept for record)
+were about to be re-decided independently in this file — specifically "Option B: route the FTS
+join through `atlas_chunk_packet_identity_links`" — without first checking whether this exact
+question already had a home. It does: `openspec/changes/parent-atlas-semantic-512-canonicalization/
+tasks.md`'s `S512-ID` gate family owns this table and this exact decision, and reached it first
+(2026-08-21, four days before this entry):
+
+- **`S512-ID3` — "Canonical `atlas_packets` linkage: PENDING, operator decision required"** — still
+  unchecked. Two independent unlocks are named there (populate `atlas_packets.qdrant_collection`/
+  `qdrant_point_id`, or establish a real bridge via chunk-side `tree_node_id`/content-hash
+  convergence) — neither attempted yet, and explicitly framed as a population/backfill decision
+  for the operator, not something to infer.
+- **`S512-ID4` — "Linkage read-back determinism: PENDING, blocked on S512-ID3"** — still unchecked.
+  `sveltekit-frontend/scripts/atlas/verify-s512-chunk-packet-identity-readback.mts` exists (added
+  2026-08-21) but was never run/recorded against the live table.
+- That document's own explicit instruction: *"Do not substitute `SOURCE_REF_ONLY_MATCH` or any
+  `atlas_chunk_packet_identity_links` `UNRESOLVED`/`AMBIGUOUS` row for a real ADMITTED packet
+  link."* Live query (2026-08-25) confirms the table is still a single frozen snapshot —
+  `algorithm_revision: 'atlas.chunk-packet-identity-linker.v1'`, one `postgres_snapshot`, all rows
+  `observed_at: 2026-08-21T15:03:58Z` — with `match_method` counts `UNRESOLVED: 101,237`,
+  `EXACT_CANONICAL_ID: 4,517`, `AMBIGUOUS: 8`. No rebuild/writer path is currently wired in the
+  active codebase to refresh it.
+
+**Do not wire `postgres-fts.adapter.ts` (or anything else) to consume this bridge table from this
+file.** That would close `S512-ID3`/`S512-ID4` through a side door instead of through their own
+gate — the exact "uncoordinated peer owner" failure mode `CLAUDE.md`'s Duplication Prevention
+section warns about. If/when `S512-ID3`/`S512-ID4` close in their home document, revisit whether
+the FTS join should consume the resulting linkage; until then this stays `BLOCKED_ON_S512-ID3`.
+
+Original options, preserved for context (superseded, not authoritative — `S512-ID3` owns this
+decision now):
+
+- Option A — make `atlas_packets` chunk-granular going forward (one packet per chunk, not per
+  file). Breaking change to every existing writer and consumer; largest blast radius. Not
+  addressed by `S512-ID3`/`S512-ID4` either — a genuinely separate, larger option than either of
+  that gate's two named unlocks. Recorded here as a tracked future option, not attempted.
+- Option B — route the FTS identity join through `atlas_chunk_packet_identity_links`. **This is
+  the same table/decision `S512-ID3` gates** — superseded by the cross-reference above, not a
+  distinct option to pick separately.
+- Option C — accept bounded recall indefinitely (only single-chunk files bind through the exact
+  join). Still available regardless of how `S512-ID3` resolves; not mutually exclusive with it.
+
+- [ ] Track `S512-ID3`/`S512-ID4` in `parent-atlas-semantic-512-canonicalization` to closure before
+  reconsidering the FTS adapter's multi-chunk recall.
+- [ ] `atlas_packets.sha256` was not touched by `CONTENT-HASH-BACKFILL-01` above — it remains a
+  separate, narrower, partially-populated column with its own hash definition; do not conflate it
+  with `content_hash` in a future pass.
+- [ ] Option A (chunk-granular `atlas_packets` rewrite) remains a tracked, unattempted future
+  migration — largest blast radius of any option here, not scheduled.
+
+## MCP-FILE-TOPK-01: file top-K ranking via EmbeddingGemma — planned, mostly unimplemented (2026-08-25)
+
+A concurrent session today (this same file, `GPU graph execution receipt` section above) proved a
+real induced-subgraph lane: `packages/parent-atlas/src/core/spectral-graph-clustering.ts`
+(TypeScript CPU reference, `extractInducedSubgraph()`), `python/atlas_subgraph_cugraph.py`
+(RAPIDS/WSL2 execution, **live-executed** — `docs/reports/atlas-subgraph-cugraph-proof-v1.json`:
+162,234 input nodes, 108,156 input edges, 16 selected vertices, 8 induced edges), and a read-only
+`atlas.mcp-tool-selection-trace.v1` in `sveltekit-frontend/src/lib/server/ai/tool-selection.ts`
+(`docs/reports/atlas-mcp-subgraph-integration-v1.json`, explicitly labeled
+`PROVEN_HEURISTIC`/deterministic — not a trained HMM, not canonical workflow state). All three
+files and both reports verified present and current this session (all dated/modified today).
+
+This entry adds the requested next lane on top of that proven work: rank/return top-K **files**
+for a user query using EmbeddingGemma, composing existing infrastructure rather than building a
+second retrieval stack — per an operator-supplied design sketch, checked against real code before
+being recorded as a plan (several of its claims were unverified assertions; corrected below).
+
+**Verified before writing this plan** (not assumed from the sketch):
+
+- **Role-specific query/document prompting already exists as a canonical contract, just unwired.**
+  `sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts`'s
+  `formatEmbeddingGemmaInput(mode, content, title?)` already implements exactly what the sketch
+  asked for — `'code_query'` → `"task: code retrieval query | query: ..."`,
+  `'retrieval_query'` → `"task: search result | query: ..."`, `'document'` → a document-side
+  prefix — with an explicit docstring warning already in place: **neither live embedding call
+  site** (`retrieval/embedding-service.ts`'s `embedViaOllama`, `embeddings/ollama.ts`) applies it
+  today — both send raw unprompted text, so the entire existing corpus was embedded under
+  `PROMPT_REVISION_UNPROMPTED`, not `PROMPT_REVISION_TASK_PREFIX_V1`. The file already documents
+  the exact risk the sketch flagged ("Do not encode both sides with the same generic prefix"):
+  wiring formatted queries against an unformatted document corpus would be a silent representation
+  mismatch, not a like-for-like comparison. This is not new news — recorded here as the concrete
+  prerequisite gate (`MCP-FILE-TOPK-01` below) before any query-side prompting change, cross-
+  referenced from `memory/SESSION-201-EG-GGUF-PROOF-GATES-0-2.md` per that file's own citation.
+- **CandidateOrdinal/shortlist infrastructure already exists at ~50% per this file's own snapshot
+  table** ("Candidate matrix to low-rank shortlist" row, top of this file):
+  `python/atlas_compute/low_rank.py` + `scripts/atlas/candidate-shortlist-receipt-v1.mjs` already
+  nominate `512 -> 96` `CandidateOrdinal`s with a read-only Postgres receipt. `MCP-FILE-TOPK-02`
+  below extends this existing lane to file-level aggregation rather than creating a parallel
+  CandidateOrdinal owner.
+- **Correction (2026-08-25, after `MCP-FILE-TOPK-04` was implemented): a real semantic_768 exact
+  oracle already existed server-side — the gap was the TypeScript client, not the oracle.**
+  Originally recorded here as "no existing oracle found," based on `grep`ing only for
+  `cosineDistance` (which found `atlas-rapids-semantic512-client.ts`, the 512 lane's client, owned
+  by `parent-atlas-semantic-512-canonicalization`'s `S512-10..17` gates). Reading
+  `python/atlas_rapids_sidecar.py` directly (not just grepping the TypeScript side) found
+  `POST /v1/knn/exact` with `_EXPECTED_DIMENSION = 768` hardcoded at line 228 — this endpoint
+  already IS the semantic_768 exact oracle, and matches this file's own earlier "Exact GPU oracle
+  | RUNTIME-PROVEN on bounded fixtures" inventory row. Also found: `atlas-rapids-semantic512-client.ts`
+  itself calls `POST /v1/semantic512/knn/exact-v2`, which **does not exist anywhere** in
+  `atlas_rapids_sidecar.py` (`grep -rl "semantic512/knn/exact-v2" python/` → zero matches) — that
+  client is `CREATED`, not `WIRED`; do not treat it as a working reference implementation to copy
+  verbatim. See `MCP-FILE-TOPK-04` below for what was actually built.
+- **`packages/parent-atlas/src/core/spectral-graph-clustering.ts`'s `extractInducedSubgraph()`
+  is correctly scoped** as a bounded, known-vertex-set follow-on tool (per its own docstring and
+  the cuGraph documentation it cites) — not a discovery/n-hop-expansion primitive. `MCP-FILE-TOPK-09`
+  below correctly sequences it after ranking/PPR expansion, not before.
+
+**Explicitly NOT duplicating**: this is one logical `SEMANTIC` executor lane (Qdrant / pgvector /
+TurboVec / cuVS-CAGRA all vote into a single fused score, matching this repo's existing
+`LANE_EXECUTOR` rule already documented elsewhere in this file) — not a second ranking owner
+alongside `canonical-rerank-executor.ts`/`runtime-reranker.ts` (see
+`openspec/changes/parent-atlas-unified-symbol-ranking/` for that lane, which this file-topK lane
+is upstream of: file-topK narrows the corpus, `runtime-reranker.ts` blends the final per-candidate
+score). Not a second `CandidateOrdinal` producer. Not a second MCP tool-selection trace. Not a new
+graph algorithm (the induced-subgraph step consumes the already-proven lane above, unchanged).
+
+**Proposed contract** (`AtlasFileTopKReceiptV1`, not yet implemented — schema sketch, subject to
+revision once `MCP-FILE-TOPK-01` is actually built). **Correction to the `executors` enum below**:
+`PGVECTOR_EXACT` does not correspond to anything built or planned — the real semantic_768 exact
+oracle is `CUVS_EXACT` (see `MCP-FILE-TOPK-04`, cuVS GPU brute-force, not pgvector). Keep
+`CUVS_EXACT` as the oracle label when this contract is actually implemented; `PGVECTOR_EXACT`/
+`PGVECTOR_HNSW` remain in the sketch only as historical record of the original (unverified)
+proposal:
+
+```
+schema: 'atlas.file-topk-receipt.v1'
+traceId, requestId: string
+query: { textHash: string, intent: string }
+embedding: { role: 'QUERY', model: string, revision: string, dimension: 768, normalization: 'L2_VECTOR' }
+candidateSnapshot: { candidateSnapshotRevision: string, ordinalMapChecksum: string }
+executors: Array<{ executor: 'PGVECTOR_EXACT'|'PGVECTOR_HNSW'|'QDRANT'|'TURBOVEC'|'CUVS_EXACT'|'CAGRA', status: 'EXECUTED'|'DEGRADED'|'SKIPPED', candidateCount: number }>
+ranking: { requestedK: number, returnedK: number, uniqueFiles: number }
+files: Array<{ rank: number, sourceRef: string, packetKey: string, candidateOrdinal: number, score: number, scoreSource: 'SEMANTIC'|'FUSED', sourceRevision: string }>
+writes: { postgres: false, qdrant: false, neo4j: false, valkey: false }
+```
+
+**Proposed MCP tool surface** (new, additive — does not replace `tool-selection.ts`'s existing
+selector): `atlas.search.files.topk` (`FileTopKToolInputV1`: `query, topK, filters?, requireAst?,
+requireGraph?` → `FileTopKToolResultV1`: `receiptRef, files[], nextTools[]` pointing at
+`atlas.ast.find`, `atlas.graph.expand`, `atlas.graph.subgraph`), giving the MCP selector a
+composed semantic tool instead of exposing CUDA/RAPIDS internals directly.
+
+**Gates** (all `[ ]` — planning only, nothing below is implemented yet; do not read the checkmarks
+above as covering these):
+
+- [ ] `MCP-FILE-TOPK-01` — Wire `formatEmbeddingGemmaInput('code_query'|'retrieval_query', ...)`
+  into the query-side embedding call path ONLY after confirming (not assuming) whether the
+  document-side corpus needs re-embedding to match, per the existing docstring warning. This is
+  the real prerequisite gate — a query-only prompting change against an unprompted corpus would
+  be a regression, not an improvement.
+- [x] `MCP-FILE-TOPK-02`/`03` — **aggregation function built and unit-tested; not yet wired to a
+  real end-to-end run.** Real finding before writing any code: `candidate-shortlist-receipt-v1.mjs`
+  ran live this session (`node scripts/atlas/candidate-shortlist-receipt-v1.mjs`, no GPU/conda
+  needed — pure CPU PyTorch via plain `python`, produced a fresh
+  `docs/reports/atlas-candidate-shortlist-receipt-v1.json`: 96 `candidateOrdinals`, 96 `sourceRefs`,
+  `recallAt10: 0.3`, `oracleNdcgAt24: 0.499`). Reading `queryFeatures = matrix[0].map((_, col) =>
+  matrix.reduce(...) / matrix.length)` in that script, and `low_rank.py`'s
+  `shortlist_candidate_ordinals()` (confirmed via its `lexsort((ordinals, row_indices,
+  -score_values))` call that `selected` genuinely IS relevance-rank-ordered, not arbitrary) —
+  **the "query" that script ranks against is the column-wise mean of the entire candidate matrix,
+  not a real user query.** It is a pool-NOMINATION step (which 96 of 512 rows are worth
+  considering at all), not query-driven file ranking. Do not confuse its output order with "top
+  files for this user's query" — that requires a real query vector, i.e. composing with
+  `MCP-FILE-TOPK-01`'s query embedding and `MCP-FILE-TOPK-04`'s exact-KNN client, not this
+  script's own centroid-nearest order.
+
+  Separately found: `AtlasSemantic768ExactHitV1` (the exact-KNN client's hit shape) carries only
+  `packetKey`/`sourceRevision`/`symbolVersionId` — matching the real Python sidecar's
+  `KnnCorpusRow`/`ExactKnnHit` models exactly, which never accept or return `sourceRef` at all. A
+  file-ranking result needs `sourceRef`; fabricating one from `packetKey` alone would be
+  inventing an identity join this session has no evidence for. New
+  `sveltekit-frontend/src/lib/server/atlas/retrieval/file-topk-aggregation.ts`
+  (`aggregateExactKnnToFileTopK()`) instead requires the caller to supply a `packetKey ->
+  sourceRef` map explicitly (the caller already has it — they built the exact-KNN corpus rows
+  from Postgres before the round trip through the sidecar stripped `sourceRef` off). Behavior:
+  dedup by `sourceRef` keeping the highest-`cosineSimilarity` hit per file (multiple
+  packets/symbols can share one file), deterministic tie-break by `packetKey`, hits with no known
+  `sourceRef` are dropped and counted (`droppedNoSourceRef`) rather than silently ranked or
+  fabricated. New `file-topk-aggregation.spec.ts`, **9 tests, all passing**: identity-join via
+  both `Map` and plain object, unknown-packetKey dropped not fabricated, same-file dedup keeps
+  the higher-similarity hit, exact-tie deterministic tie-break, multi-file sort order, `topK` vs
+  `uniqueFiles` vs `returnedK` reported distinctly, invalid `topK` rejected, empty-input handled
+  without throwing. `npx tsc --noEmit` clean.
+
+  **Still not done**: no code yet composes `MCP-FILE-TOPK-01` (real query embedding) +
+  `candidate-shortlist-receipt-v1.mjs`'s pool + `MCP-FILE-TOPK-04`'s exact client +
+  this aggregation function into one live end-to-end call — each piece is unit-proven in
+  isolation, not proven as a composed pipeline against real data yet.
+- [x] `MCP-FILE-TOPK-04` — **client built and unit-tested; live GPU execution not run this pass.**
+  Not pgvector (corrected above — no pgvector exact-oracle exists or was built; the real oracle is
+  cuVS GPU brute-force, already live). New
+  `sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-semantic768-client.ts`, modeled
+  on `atlas-rapids-semantic512-client.ts`'s validation/receipt-contract structure but pointed at
+  the real `POST /v1/knn/exact` endpoint instead of copying its target route. Real correctness
+  issue found and handled, not assumed away: `knn_exact()`'s `brute_force.build(corpus_arr)` call
+  passes no `metric` kwarg, so cuVS's default (`sqeuclidean`, not cosine) is used, and
+  `ExactKnnResponse` never self-reports which metric it used. For L2-normalized unit vectors
+  (`embedding-contract-768.ts` requires `normalization: 'L2_VECTOR'`), `||a-b||^2 = 2 - 2cos(a,b)`
+  makes sqeuclidean-ranking exactly equivalent to cosine-ranking — this client verifies (fails
+  closed, does not assume) that the query and every corpus vector are unit-normalized within
+  `1e-3` before sending, then derives `cosineSimilarity = 1 - distance/2` from the returned
+  distance, and reports the metric field honestly as
+  `'sqeuclidean_rank_equivalent_to_cosine_for_l2_normalized_vectors'` rather than the unverified
+  `'cosine'` label the 512 client's (never-executed) contract claims. New
+  `atlas-rapids-semantic768-client.spec.ts`, **10 tests, all passing**: real-endpoint-called (not
+  the fictional route), cosine-derivation math verified at two known points (identical unit
+  vectors → similarity 1; orthogonal unit vectors → similarity 0), non-normalized query/corpus
+  vectors fail closed, wrong dimension rejected, missing/duplicate identity rejected, invalid
+  topK rejected, non-2xx sidecar response surfaces as an error. `npx tsc --noEmit` clean for this
+  file. **Not yet done**: an actual live call against the running WSL2 RAPIDS sidecar (this pass
+  only mocks `fetch`) — that live proof, plus S512's oracle→challenger→Recall@K *pattern* applied
+  as `MCP-FILE-TOPK-05`/`06` below, remains open.
+- [ ] `MCP-FILE-TOPK-05` — Qdrant executor parity vs. the oracle (Recall@K/MRR/NDCG, overlap).
+- [ ] `MCP-FILE-TOPK-06` — TurboVec/cuVS-CAGRA challenger parity, same measurement methodology.
+- [ ] `MCP-FILE-TOPK-07` — `atlas.ast.find` follow-on MCP tool (symbol/call evidence).
+- [ ] `MCP-FILE-TOPK-08` — `atlas.graph.expand` PPR/graph-expansion follow-on MCP tool.
+- [ ] `MCP-FILE-TOPK-09` — `atlas.graph.subgraph` follow-on, consuming the already-proven induced-
+  subgraph lane unchanged (TypeScript reference + cuGraph execution) — sequenced after ranking,
+  not before, per the correctly-scoped-tool finding above.
+- [ ] `MCP-FILE-TOPK-10` — `ContextManifestV1` final promoted-evidence assembly, consuming the
+  outputs of 01-09.
+- [ ] Do not promote any of the above to `PROVEN`/`DONE` from a dry-run or unit-test-only pass —
+  same status-language discipline as every other gate in this file. `MCP-FILE-TOPK-04`/`05`/`06`
+  specifically require live Recall@K/NDCG measurement against real labeled or held-out data, not
+  a mechanics-only proof, before "promoted semantic executor" can be claimed for any single lane.
+
+### MCP-FILE-TOPK-04 follow-up: live-proof environment check (2026-08-25)
+
+Attempted the live WSL2 RAPIDS sidecar call flagged as the remaining open item above. Honest
+result: **cannot run it in this environment right now** — recorded rather than faked.
+
+- `wsl -l -v`: only `Ubuntu` (was `Stopped`, booted fine on demand) and `docker-desktop` are
+  registered. `nvidia-smi` inside that Ubuntu instance works (driver 580.88, CUDA 13.0) — the
+  GPU/driver stack itself is fine.
+- No `conda` installation exists anywhere searched (`which conda`, `~/miniconda3`, `~/anaconda3`,
+  `/opt/conda`, a `find / -iname conda` sweep) — the `atlas-rapids-cu13` conda environment
+  `atlas_rapids_sidecar.py`'s own docstring says it requires is simply not present in this WSL
+  instance. System `python3` (3.12.3) exists but that's not the same as a provisioned RAPIDS/cuVS
+  environment (cuVS installs are a real, multi-gigabyte, multi-minute conda operation — not
+  something to kick off unilaterally without an explicit go-ahead given the time/resource cost).
+- This means the concurrent session's earlier live cuGraph proof this same morning
+  (`docs/reports/atlas-subgraph-cugraph-proof-v1.json`) ran in a RAPIDS environment that either no
+  longer exists in this WSL instance, lived in a different environment entirely, or was torn down
+  between sessions — not something this session can reconstruct from available evidence.
+- [ ] Provisioning `atlas-rapids-cu13` (or confirming/restoring wherever the concurrent session's
+  environment actually lives) is a prerequisite for closing `MCP-FILE-TOPK-04`'s live-proof gap,
+  `MCP-FILE-TOPK-05`, and `MCP-FILE-TOPK-06` — flagged as an operator decision (whether/when to
+  invest the setup time), not attempted here.
+
+## DOCUMENT-INTEGRITY-01: three-layer integrity split, promotion-gate correction (2026-08-25)
+
+Applied the correction from a pasted operator review of `atlas-embedding-ranking-diagnostic-v1.mjs`'s
+prior `integrityAdjustedScore` formula. The review's core point, verified as real before fixing:
+`integrityAdjustedScore = blendedScore * (0.70 + 0.30*integrityScore)` was a **soft multiplier**,
+meaning a stale document with a very high semantic score could still outrank a verified one — that
+formula was being used for both diagnostic display and (implicitly, via being the only score in the
+output) as the closest thing to a promotion signal. It also folded `graphRevision` presence into
+`documentIntegrity()`'s score, incorrectly gating document freshness on unrelated graph/topology
+metadata.
+
+- [x] Split into two independent things: `diagnosticScore` (same soft-multiplier formula, unchanged
+  math, relabeled and explicitly commented `DIAGNOSTIC RANK ONLY, not a promotion signal`) and
+  `acePromotionEligible` (new, a hard boolean: `documentIntegrity.status === 'INTEGRITY_VERIFIED'`,
+  independent of the diagnostic score entirely).
+- [x] Tightened `documentIntegrity()`'s `INTEGRITY_VERIFIED` definition to: canonical packet match
+  AND `sourceRef` present AND `filePath` present AND a strong content-hash match. Removed
+  `graphRevision` from this function entirely — graph/topology freshness are now separate,
+  independently reported axes (`graphIntegrity`, `topologyIntegrity`, plus a new
+  `representationIntegrity` for embedding-dimension compatibility), never gating document
+  freshness.
+- [x] **Real bug found and fixed while implementing "strong content hash match": the query was
+  selecting `sha256 AS content_hash`** — the wrong, non-canonical column (hashes Qdrant
+  `payload.content`, per `CONTENT-HASH-BACKFILL-01`'s hash-authority findings above), not the real
+  `atlas_packets.content_hash` this session backfilled for the unambiguous subset. Fixed to select
+  both `content_hash` and `sha256` as distinct fields, and the match check now compares two
+  genuinely independent sources — `packet.content_hash` (Postgres) vs. `payload.content_hash`
+  (Qdrant) — rather than one coalesced value compared to itself (the original `documentLineage()`
+  coalesce already mixed `content_hash` and `sha256` together via `firstValue()`, which would have
+  made any "match" self-referential and vacuously true).
+- [x] **Also found and did NOT attempt**: an "exact `source_revision` match" check, as literally
+  worded in the pasted review. Confirmed via the sibling `parent-atlas-semantic-512-canonicalization`
+  change's own established finding (`S512-9A`) that `atlas_packets` has **no canonical
+  `source_revision` column at all** — checking for an exact match against a nonexistent column
+  would either throw or silently always be false. `documentIntegrity()`'s implementation comment
+  records this explicitly rather than fabricating the check.
+- [x] Ran the corrected script live (`node scripts/atlas/atlas-embedding-ranking-diagnostic-v1.mjs`,
+  query `"find AST graph retrieval files"`, same as the earlier `atlas-file-topk-ranking-v1.json`
+  probe). Result: `integrityVerifiedCandidates: 0`, `promotionEligibleCandidates: 0` — matches the
+  pasted proof's own stated conclusion exactly ("full source freshness NOT PROVEN, INTEGRITY_VERIFIED
+  0"). The top candidate now reports `representationIntegrity: 'VERIFIED'` (768-dim, correct)
+  independently of `graphIntegrity: 'UNKNOWN'`/`topologyIntegrity: 'UNKNOWN'` — the exact behavior
+  the review asked for (a current source file is not penalized for an unrefreshed SOM projection).
+  Script exits cleanly, writes a valid report; no crash, no regression to the existing Qdrant/Postgres/
+  TurboVec probe sections (untouched).
+- [ ] **Not built this pass, per the pasted review's own explicit recommendation**: `AtlasRerankerV1`
+  (the CrossEncoder architecture), `AtlasPairJudgmentV1`, `AtlasOntologyTupleV1`, the pair-corpus
+  compiler, `GpuWorkLeaseV1`, and `EvidencePromotionReceiptV1`. The review's own conclusion is
+  authoritative here: "I would not add another model yet... the next tranche should be full source
+  revision SHA-256 propagation... Once that reaches nonzero full coverage the neural encoder prefill
+  work becomes worth benchmarking." This session's own live result (`integrityVerifiedCandidates: 0`)
+  confirms that precondition still isn't met — recorded as the gating reason, not a scope cut made
+  without justification.
+- [ ] The real next tranche, per that same conclusion: extend `CONTENT-HASH-BACKFILL-01`'s
+  unambiguous-subset backfill (currently 332/61,660 packets) toward full coverage — propagating
+  `source_ref`+`content_hash` consistently across Graphify source inventory, `atlas_packets`,
+  `codebase_chunk_index`, and Qdrant payloads — before `INTEGRITY_VERIFIED` can move off zero at
+  scale. `PACKET-CHUNK-GRANULARITY-01`'s three options above are the relevant blocker for the
+  multi-chunk-file majority of that gap.
+  - [x] Added the read-only `atlas:ast:packet-span-review` artifact. It
+    exports one row per `atlas_packets` packet with explicit bridge status,
+    source/tree/hash lineage, packet spans, bounded AST candidates, and a
+    `canonical_identity_promoted: false` guard. It does not infer missing
+    `tree_node_id` values or write `atlas_ast_nodes`. The report is
+    `docs/reports/ast-packet-span-review-v1.json` and the review set is
+    `docs/reports/ast-packet-span-review-v1.jsonl`.
+    The follow-up classification records `92` path/hash mismatches and
+    `881` path candidates without hash or revision evidence; there are no
+    path/hash or path/revision matches. This keeps the remediation split
+    explicit: stale content and missing lineage must be repaired before
+    path candidates can be reviewed for structural identity.
+  - [x] Re-ran the existing read-only hash-lineage audit and bounded content
+    hash planner. Current live counts are `atlas_packets.content_hash`
+    `332/61,660`, `codebase_chunk_index.content_hash` `52,380/52,417`, and
+    `atlas_source_refs.content_hash` `22,487/22,487`. The planner selected
+    `0` additional rows because the safe single-hash subset has already been
+    populated; `CH_BF_02` remains false for the remaining multi-chunk or
+    unmapped packets. No apply or replay was run.
+  - [x] Ran the owning `S512-ID4` read-only verifier. The linkage snapshot is
+    deterministic (`firstChecksum == secondChecksum`), with `4,517` exact
+    canonical rows, `101,237` unresolved rows, and `8` ambiguous rows. This
+    proves repeatability only; it does not close `S512-ID3` or authorize the
+    FTS adapter to consume the bridge.
+  - [x] Re-ran the source-lineage owner audit. The schema is visible, but
+    `graphify_files` has `0` rows, `atlas_packets` has `0` populated
+    `source_revision` values and `332` populated `content_hash` values, while
+    `workspace_revision` is populated for `61,660` packets. This confirms the
+    upstream revision authority is still incomplete; no lineage backfill was
+    attempted.
+  - [x] Ran the existing Graphify source-inventory materializer in dry-run
+    mode from `sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts`.
+    It produced a revision-qualified plan for `23,482` source records with a
+    workspace revision and manifest digest, selected `100` bounded rows, and
+    `canonicalWriteAttempted: false`. This is the valid precursor to any
+    reviewed `graphify_files` population; no apply was run.
+  - [x] Ran the Graphify revision-owner proof. The v2 schema and production
+    writer are present and compatible, but `persistedMatchingRows=0` and
+    `revisionOwnerProven=false` because the controlled persistence canary is
+    not configured. The proof remains read-only and does not authorize a
+    production `graphify_files` apply.
+  - [x] Checked repository environment and documentation for
+    `ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID`; no value is configured. Do not
+    substitute a production workspace or fabricate a UUID. The canary remains
+    an explicit operator prerequisite.
+
+## ATLAS-RERANKER-CONTRACT-01: concurrent-session consolidation check (2026-08-25)
+
+A concurrent session, working in parallel with `DOCUMENT-INTEGRITY-01` above, began the
+`AtlasRerankerV1` **contract layer only** — step 1 of the pasted proposal's own "Concrete
+implementation order" ("Freeze `AtlasPairJudgmentV1` and `AtlasRerankerFeatureV1`..."), not the
+PyTorch model itself. This does not contradict `DOCUMENT-INTEGRITY-01`'s "not built this pass" —
+that note was about the model; this is schema/compiler scaffolding, and its own receipt agrees
+the model remains unbuilt. Verified before recording, not assumed:
+
+- New `packages/parent-atlas-retrieval/src/crossencoder/atlas-reranker-contract.ts` — Zod schemas
+  for `AtlasRerankerFeatureRowV1` (16-field numeric feature vector, `ATLAS_RERANKER_FEATURE_NAMES`
+  as the stable shared order) and `AtlasPairJudgmentV1` (wraps a feature row plus outcome labels:
+  `humanRelevanceGrade`, `teacherScore`, `exactPromotionOutcome`, `repairSuccess`, `testSuccess`).
+  `onlineFeatureRowFromJudgment()` strips outcome labels before they can reach online/inference
+  features — the anti-leakage rule the pasted proposal called "crucial" is implemented, not just
+  described. `hasPromotableEvidence()` rejects `DERIVED_SYNTHESIS`-only evidence kinds, matching
+  the proposal's evidence-kind separation. 3 tests in `atlas-reranker-contract.test.ts`, **all
+  passing** (`npx --prefix packages/parent-atlas-retrieval vitest run
+  src/crossencoder/atlas-reranker-contract.test.ts`): stable feature vector with null→0 fill,
+  outcome labels excluded from online features, synthesis-only evidence rejected.
+- New `scripts/atlas/compile-atlas-reranker-pairs.mjs` (`compileAtlasRerankerPairs()`) — pair
+  corpus compiler. Read-only artifact builder (`databaseWrites: false`, `vectorWrites: false`,
+  `modelWrites: false` in its own receipt), never a trainer. Fails closed per-candidate
+  (`STALE_SOURCE_REVISION`, `INVALID_PACKETKEY`, `SYNTHESIS_ONLY_EVIDENCE` — batch continues, one
+  bad candidate doesn't fail the whole envelope) rather than either crashing or silently admitting
+  bad rows. 2 tests in `compile-atlas-reranker-pairs.test.mjs`, **both passing**
+  (`node --test scripts/atlas/compile-atlas-reranker-pairs.mjs`).
+- New `scripts/atlas/build-atlas-reranker-input-from-ranking.mjs` — bridges
+  `atlas-embedding-ranking-diagnostic-v1.mjs`'s report (the script `DOCUMENT-INTEGRITY-01` above
+  just corrected) into the pair compiler's input shape, reading `row.documentRevision` as
+  `sourceRevision`/`candidateSnapshotRevision`.
+- **Live receipt confirms the same finding this session already established, from an
+  independent tool**: `docs/reports/atlas-reranker-pairs-v1.json` — `status:
+  EMPTY_INPUT_AFTER_FILTERS`, `pairCount: 0`, `excluded: {"INVALID_SOURCEREVISION": 20}`. All 20
+  candidates from the ranking receipt were rejected because `atlas_packets` has no real
+  `source_revision` — the same root cause `CONTENT-HASH-BACKFILL-01` and `DOCUMENT-INTEGRITY-01`
+  already identified, now independently confirmed by a completely separate compiler failing
+  closed on the same gap rather than fabricating a pass.
+- `docs/reports/atlas-reranker-contract-v1.json` — `status: 'CONTRACT_WIRED_READ_ONLY'`,
+  `training.pair_corpus: 'NOT_COMPILED'`, `training.promotion: 'BLOCKED'`,
+  `runtime.pytorch_atlas_model: 'NOT_IMPLEMENTED'`. Matches this file's own status-language
+  discipline; no premature promotion claim.
+
+**No conflict, nothing to reconcile** — the concurrent session and this session converged on the
+same conclusion (source-revision propagation is the real blocker) via two independent code paths,
+which is stronger evidence than either alone. Nothing here needs redoing. The unbuilt remainder
+(`AtlasRerankerV1` PyTorch model, ontology tuple embeddings, teacher distillation from Mixedbread,
+`GpuWorkLeaseV1`) stays correctly gated behind full source-revision/content-hash coverage, per
+both sessions' independent conclusions.
+
+## PACKET-CHUNK-GRANULARITY-01 resolved: Option B applied, S512-ID3/ID4 closed (2026-08-25)
+
+**Operator explicitly decided Option B** (route the FTS identity join through
+`atlas_chunk_packet_identity_links`, keep `atlas_packets` file-granular) via direct instruction in
+this session — the exact decision `S512-ID3` in `parent-atlas-semantic-512-canonicalization/
+tasks.md` was waiting on ("PENDING, operator decision required"). This is a real operator decision,
+not an agent unilaterally picking an option — recorded as the trigger before any implementation.
+
+- [x] **`S512-ID4` (readback determinism) was already proven**, found on disk, not re-derived:
+  `docs/reports/s512-chunk-packet-identity-readback-v1.json` —
+  `status: 'READBACK_DETERMINISTIC'`, two reads in one `REPEATABLE READ` transaction produce
+  identical checksums, `admittedRows (EXACT_CANONICAL_ID): 4517`, `unresolvedRows: 101237`,
+  `ambiguousRows: 8`. This closes `S512-ID4`.
+- [x] Wired `packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts`'s
+  `searchPostgresFts()` with an additive second identity lane. Confirmed `codebase_chunk_index.id`
+  and `atlas_chunk_packet_identity_links.chunk_index_id` are both `uuid` (direct join, no cast
+  hazard) before writing SQL. Lane 2 (`canonical_bridge`) joins
+  `lexical.lexical_id (chunk id) -> atlas_chunk_packet_identity_links.chunk_index_id`, hard-filtered
+  to `match_method = 'EXACT_CANONICAL_ID'` only — `UNRESOLVED`/`AMBIGUOUS` rows are structurally
+  excluded by the SQL predicate itself, not by convention, so the "never substitute" rule from
+  `S512-ID2`/`S512-ID3`'s governing document still holds regardless of which option was picked.
+  Lane 2 only fires for chunks Lane 1 (the original exact `source_ref`+`content_hash` join) did
+  NOT already resolve (`NOT EXISTS` guard), so the primary lane's identity semantics are unchanged.
+  Every returned candidate carries a per-row `identity_resolution_source` field
+  (`'source_ref_content_hash_exact'` or `'chunk_packet_identity_link_exact_canonical'`) read
+  directly from the SQL result — not a single hardcoded literal for the whole result set as
+  before — so any downstream consumer can always tell which lane produced a given match.
+- [x] **Measured, real improvement** (direct read-only query mirroring the new SQL, run in a
+  `READ ONLY` transaction, rolled back): exact lane alone covers `408/52,380` eligible chunks
+  (~0.78%, unchanged from `POSTGRES_FTS canonical identity join coverage` above); the bridge lane
+  adds `2,811` more distinct chunks not already covered by the exact lane — combined
+  `3,219/52,380` (~6.1%), a **~7.9× increase** in join coverage from a single operator-approved
+  wiring change, with zero weakening of the exact lane's own matching semantics.
+- [x] No test file existed for `postgres-fts.adapter.ts` before this change (confirmed via file
+  search); none added this pass — flagged as a real gap, not silently skipped. The SQL was
+  verified via a standalone read-only query against live data (measured coverage above) rather
+  than a mocked unit test, which proves the join mechanics work against real rows but does not
+  substitute for regression coverage on future edits to this file.
+- [ ] `S512-ID3` in `parent-atlas-semantic-512-canonicalization/tasks.md` should be updated to
+  reflect this resolution (bridge-table consumption now live in the FTS adapter, gated to
+  `EXACT_CANONICAL_ID` only) — not yet updated in that file this pass; do next if picked up.
+- [ ] Full `search-postgres-fts` re-run via `audit-postgres-fts-identity-coverage.mjs` (the 8
+  frozen queries) was not re-executed against the new two-lane SQL this pass — the standalone
+  coverage query above is a faithful mirror of the adapter's join logic but not the adapter's own
+  code path end-to-end; worth doing to fully close this out.
+
+### Postgres-fts adapter unit tests added (2026-08-25, closes the "no test file" gap above)
+
+- [x] New `packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.test.ts` — **14 tests,
+  all passing** (`npx --prefix packages/parent-atlas-runtime vitest run
+  src/adapters/postgres-fts.adapter.test.ts`). Mocks `db.execute` directly (no real Postgres
+  connection — this package has no existing DB-test fixture to reuse, and standing one up was out
+  of scope for this pass) so the tests are pure/fast and exercise `searchPostgresFts()`'s own
+  mapping code, not the SQL itself (the SQL's real behavior was separately measured live against
+  the database in the entry above).
+  - Empty/whitespace query short-circuits without calling `db.execute` at all.
+  - Exact-lane rows correctly tag `identity_resolution_source: 'source_ref_content_hash_exact'`.
+  - Bridge-lane rows correctly tag `identity_resolution_source:
+    'chunk_packet_identity_link_exact_canonical'` — this is the one test that would have caught a
+    regression to the old single-hardcoded-literal behavior; it's the primary reason this test
+    file was worth writing now rather than deferring.
+  - A row missing/with an unrecognized `identity_resolution_source` value falls back to the exact
+    label rather than throwing (defensive coverage for future driver/shape drift).
+  - `limit` clamps into `[1, 200]` without throwing on an out-of-range input.
+  - `null` title/snippet map to `undefined`, not the literal string `"null"`.
+  - `scorePostgresFtsFallback`, `filterBySourceScope`, `validatePostgresFtsResults` — the three
+    other exported functions in this file, previously entirely untested — each get focused
+    coverage (zero-match score, positive-score range, glob-scope filtering, missing-source-ref
+    handling with both `requireSourceRef` settings, and all three individual validation-error
+    kinds asserted distinctly).
+
+### Live adapter run found and fixed a real production bug (2026-08-25)
+
+Closed the remaining open item from the previous entry — ran the 8 frozen queries through
+`searchPostgresFts()`'s **real code path** (not the standalone mirrored SQL query used earlier),
+via new `scripts/atlas/verify-postgres-fts-adapter-live-coverage.mjs` (`npx tsx
+scripts/atlas/verify-postgres-fts-adapter-live-coverage.mjs`, read-only, report:
+`docs/reports/postgres-fts-adapter-live-coverage-v1.json`).
+
+- [x] **Found a real, pre-existing crash bug, not something introduced this session**: the first
+  live run threw `result.map is not a function`. `db.execute(sql\`...\`)` with
+  `drizzle-orm/node-postgres` — confirmed to be the same driver `sveltekit-frontend/src/lib/server/
+  db/client.ts` actually uses in production — returns a node-postgres `QueryResult` object
+  (`{ rows, rowCount, ... }`), not a bare array. The adapter's `as Array<Record<string,
+  unknown>>` cast on the raw `execute()` result had never been exercised against the real driver;
+  the file's own header comment claiming `LIVE_QUERY_PROVEN` was not actually true end-to-end.
+- [x] **Fixed**: unwrap `.rows` when present, falling back to the raw result if it's already a
+  bare array (tolerates a different driver or a test double, doesn't hard-couple to one shape).
+  Re-ran the existing 14-test unit suite — all still pass (the mock returns a bare array, one of
+  the two tolerated shapes) — then re-ran the live script.
+- [x] **Live result, through the real code path**: all 8 frozen queries now return real bound
+  candidates — `totalCandidates: 21` (`totalExactLane: 3`, `totalBridgeLane: 18`,
+  `bridgeLaneContributedAnyResults: true`). This is the same 8-query set that
+  `audit-postgres-fts-identity-coverage.mjs`'s very first run this session found
+  `totalFrozenQueryCanonicalBoundHits: 0` for — the adapter now genuinely returns results for a
+  real user query, through its own entry point, not just via a mirrored measurement query.
+  `packet identity` still returns 0 (no lexical/bridge match for that specific query text) — an
+  honest per-query result, not silently smoothed over.
+- [x] This closes the "not re-executed against the new two-lane SQL through the adapter's own code
+  path" gap flagged at the end of the previous entry.
+
+### `/search/bm25` compatibility-test item scoped, deferred (2026-08-25)
+
+Picked up `LEXICAL-OWNER-02`'s "Add a compatibility test for consumers of `/search/bm25`" item
+next. Found the real (only) TypeScript consumer:
+`sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.ts:176-207`
+(`GoRetrievalOrchestrator.queryPostgresBM25()`, calls `POST {goRetrievalUrl}/search/bm25`).
+`grep -rln "search/bm25" --include=*.go .` found **zero Go files** anywhere in this repo — the Go
+retrieval service itself is not checked into this monorepo, so its actual response shape (whether
+it really emits `lane`/`legacy_lane`/`capability.trueBm25` per the earlier-checked "Correct the Go
+retrieval `/search/bm25` compatibility response" item) cannot be verified from here at all.
+
+Real finding, not fixed this pass: `queryPostgresBM25()` currently destructures only `{ results,
+error }` from the response — it does not read or validate `lane`, `legacy_lane`, or
+`capability.trueBm25` at all, so it already "tolerates" their presence by simple omission (not
+by explicit handling). It also unconditionally labels its own output field `bm25_score` (line 194)
+regardless of what the upstream service actually reports — a naming choice this file's own
+`LEXICAL-OWNER-02` findings above would call an unverified BM25 label.
+
+Deferred rather than rushed: `queryPostgresBM25` is `private` on `GoRetrievalOrchestrator`, and
+the containing `retrieve()` method chains three more external calls (embedding service, Qdrant,
+Neo4j) before this path is reachable end-to-end — writing a real compatibility test would mean
+either exporting the private method (a real code change, not test-only) or mocking 4+ external
+dependencies for one assertion. Recorded as scoped-but-not-attempted rather than doing a rushed,
+overly-mocked test that wouldn't actually prove the compatibility contract.
+- [ ] If picked up: either (a) export `queryPostgresBM25` (or extract it to a standalone,
+  independently-testable function, matching the `postgres-fts.adapter.ts` pattern above) before
+  writing its test, or (b) confirm whether the Go service lives in a sibling repo and, if so,
+  whether a contract/schema test belongs there instead of here.
+
+### `/search/bm25` compatibility test — done, via option (a) (2026-08-25)
+
+Took the (a) path from the deferral above: extracted the response-parsing logic out of
+`GoRetrievalOrchestrator.queryPostgresBM25()` (still `private`, unchanged) into a new standalone
+exported pure function, `parseGoRetrievalBm25Response()`, in the same file. Behavior-preserving —
+`queryPostgresBM25` now just does `fetch` + `response.json()` + delegates to the pure function,
+identical runtime output for every existing input, verified by the same
+error-message/status-code/fallback-to-source_ref assertions the original inline code implied.
+
+- [x] New types `GoRetrievalBm25CompatResponse` (`results`, `error`, `lane`, `legacy_lane`,
+  `capability.trueBm25` — the compatibility fields from the earlier-checked "Correct the Go
+  retrieval `/search/bm25` compatibility response" item) and `ParsedGoRetrievalBm25Result`
+  (`ids`, `ranked`, `laneMeta: { lane, legacyLane, trueBm25 }`).
+- [x] New `sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.bm25-compat.spec.ts`
+  — **7 tests, all passing** (`npx vitest run
+  src/lib/server/retrieval/go-retrieval-orchestrator.bm25-compat.spec.ts`): consumes
+  `lane: postgres_fts` without inferring semantics from the route name, tolerates
+  `legacy_lane: bm25` without treating it as authoritative, reads `capability.trueBm25` (both
+  `true` and `false`) rather than assuming true from the `bm25_score` field name, remains fully
+  backward-compatible with a response carrying none of the new fields (all `laneMeta` values
+  `null`), still throws on non-OK HTTP status/`error` field regardless of new fields present,
+  preserves the pre-refactor `source_ref` fallback when `id` is absent, handles an empty
+  `results` array without throwing.
+- [x] Confirmed via `grep` that no other file imports anything from
+  `go-retrieval-orchestrator.ts` — this extraction has zero blast radius beyond the file itself
+  and its new test.
+- [x] This closes `LEXICAL-OWNER-02`'s "Add a compatibility test for consumers of `/search/bm25`"
+  item. The real Go service's actual response shape remains unverifiable from this repo (still no
+  `.go` files present) — this test proves the TypeScript consumer's side of the contract only,
+  which is the actionable half from here.
+
+### Qdrant sparse `bm25` slot semantics — proven, real answer is "not ours" (2026-08-25)
+
+Picked up `LEXICAL-OWNER-02`'s "Prove the Qdrant sparse `bm25` slot's actual encoder, term
+statistics, dimensions/indices, and score semantics with a read-only receipt" item. Direct,
+read-only Qdrant REST calls against the one `IDF_ENABLED` collection found earlier
+(`sc_deedscodebase_deeds-web-app`, per `docs/reports/qdrant-sparse-configuration-audit-v1.json`).
+Report: `docs/reports/qdrant-bm25-sparse-slot-semantics-v1.json`.
+
+- [x] **Sparse vector shape**: sampled one live point's `bm25` sparse vector — `158` non-zero
+  indices, values in `[19522071, 2105113340]` range (large, sparsely-distributed integers, not
+  small sequential vocabulary IDs) with weights like `1.387`/`1.013`/`1.582` (small positive
+  floats, consistent with IDF-weighted term frequency, not raw integer counts). This is a
+  **hashing-vectorizer term encoding** (token → hash → large integer space) — there is no
+  explicit, persisted vocabulary to inspect or version.
+- [x] **Payload schema mismatch, not this repo's own convention**: sampled payload fields are
+  `filePath` (absolute Windows path, e.g.
+  `C:\Users\james\Videos\deeds-web-app\SESSIONS-115-118-FINAL-HANDOFF.md`), `relativePath`,
+  `content`, `startLine`, `endLine`, `language`, `type`, `contentHash` — camelCase, absolute
+  filesystem paths, and it indexes session-log markdown as generic "code" chunks. This does not
+  match this repo's own conventions anywhere else (snake_case columns, repo-relative POSIX
+  `source_ref` paths, code-vs-doc classification via `source-kind-classifier.ts`).
+- [x] **No writer found anywhere in this repository's own codebase**: `grep`'d
+  `sveltekit-frontend/src`, `scripts`, and `python` for the collection name — zero matches.
+- [x] **Decisive conclusion, recorded not guessed**: this collection was almost certainly created
+  by an external tool (most plausibly a local IDE/editor semantic-search extension scanning the
+  workspace independently) rather than by anything in Parent Atlas's own pipeline. Even setting
+  that aside, it has **no `CandidateOrdinal`/`source_ref`/`content_hash` identity mapping at
+  all** — it cannot be joined to `atlas_packets` regardless of how BM25-like its scoring weights
+  look. **Recommendation: `DO_NOT_ADOPT`** this collection as the true-BM25 owner candidate.
+- [ ] The remaining open items in `LEXICAL-OWNER-02` (choosing a real true-BM25 owner — `pg_search`
+  or a purpose-built Parent-Atlas-owned sparse encoder — and benchmarking it) are unaffected by
+  this finding except that this specific collection is now ruled out as a shortcut; still requires
+  its own dedicated build-out, not attempted here.
+
+### Stale checkbox cross-reference note (2026-08-25, no code/doc changes — bookkeeping only)
+
+Two `- [ ]` bullets earlier in this file are actually closed but weren't retroactively flipped,
+per this file's own convention of appending corrections rather than editing old checklist items:
+
+- Line ~4987 ("`S512-ID3` ... should be updated ... not yet updated in that file this pass") — done
+  the same day: `parent-atlas-semantic-512-canonicalization/tasks.md:472` now reads
+  `[x] S512-ID3 — RESOLVED via explicit operator decision (2026-08-25), scoped narrowly.` Note the
+  sibling file's own line 436 (`[ ] S512-ID3 — Canonical atlas_packets linkage: PENDING...`) is
+  itself a stale pre-resolution bullet, same convention — the `[x]` entry at line 472 is the
+  authoritative, current status, not line 436.
+- Line ~4990 ("Full `search-postgres-fts` re-run ... not re-executed against the new two-lane SQL
+  ... worth doing to fully close this out") — done later the same session, see "Live adapter run
+  found and fixed a real production bug" above (`totalCandidates: 21` via the adapter's real code
+  path, not just the mirrored measurement query).
+
+**Session status at this point, stated plainly**: `LEXICAL-OWNER-02`'s bridge-lane wiring,
+adapter bug fix, unit tests, live coverage proof, and the Qdrant sparse-`bm25` disqualification are
+all closed. The one substantive open item left in this OpenSpec change that isn't already flagged
+as operator-decision-gated or environment-blocked (RAPIDS/GPU parity work) is choosing a true-BM25
+owner — deliberately not picked unilaterally here, consistent with how `PACKET-CHUNK-GRANULARITY-01`
+was handled (explicit operator decision, not an agent default).
+
+**Native bridge proof update (2026-08-25)**:
+- [x] Revalidated the existing C++/CUDA Node-API bridge against the freshly built
+  CUDA addon. Fixed the fallback weighted embedding path to perform L2
+  normalization and replaced modulo cluster assignment with deterministic
+  distance-based k-means. The explicit addon-path harness passes `38/38` tests
+  with CUDA available. This proves the bounded native fixture only; it does
+  not promote the bridge as the Parent Atlas retrieval owner.
+- [x] Added `atlas:native:bridge:test` so the proof selects the explicit CUDA
+  addon instead of accidentally loading the stale default build.
+
+**768 indexing-surface refresh (2026-08-25)**:
+- [x] Re-ran `scripts/atlas/audit-atlas-indexing-surfaces.mjs` read-only.
+  Qdrant remains reachable and reports `106,338` points in
+  `codebase_chunks_768` plus `52,380` in `codebase_chunks_768_v2`; the broad
+  PostgreSQL inspection hit a statement timeout, so this is a degraded audit,
+  not proof that PostgreSQL is unavailable. The next 768 gate is a bounded
+  PostgreSQL coverage query with an explicit timeout and identity join, not a
+    collection rebuild.
+- [x] Corrected the stale live embedding audit policy from `384` to the
+  canonical `semantic_768` contract. The rerun passes: Ollama output `768`,
+  stored Postgres embedding `768`, policy `768`. The audit no longer suggests
+  a destructive 384 migration; identity and source-revision coverage remain
+  separate gates.
+- [x] Re-ran the source-revision safety audit. `GS1_12` is `PROVEN` with
+  `265,796` audited rows: `110,110` safe, `12,450` resolvable, and `143,236`
+  marked reproducible historical rebuilds. This proves revision classification
+  safety, not current semantic_768 corpus coverage or Qdrant promotion.
+
+## `LEXICAL-02` continued: live `pg_search` check + `LEXICAL-02B` corpus freeze (2026-08-25)
+
+Picked up two bounded, non-committal items from the `LEXICAL-02A`-`02H` sequence above — neither
+requires picking `pg_search` vs `QDRANT_BM25` yet, both are real evidence that narrows the eventual
+decision.
+
+- [x] **Live check: is `pg_search` already installed?** Ran the pre-existing
+  `scripts/atlas/audit-graphify-lexical-owner.mjs` (a read-only census script that already existed
+  in this repo, not new this pass) against the live DB. Result (`docs/reports/
+  graphify-lexical-owner-v1.json`): `status: PASS`, `owner: POSTGRES_FTS_TSVECTOR_TS_RANK_CD`,
+  extensions present are only `pg_trgm 1.6` and `vector 0.8.3` — **`pg_search` is NOT installed**.
+  `codebase_chunk_index` counts: `total 52,417`, `search_vector 52,417/52,417` (fully populated),
+  `content_embedding 52,380/52,417`, `content_embedding_768 576` (the newer `_768_v2`-style column,
+  mostly unpopulated — separate from the working `content_embedding` column). This confirms the
+  `pg_search` path from the entry above is a real install, not a flip-a-flag change — it would add
+  a new extension to the canonical-truth database, which is exactly the kind of "modifying shared
+  infrastructure" action that needs explicit operator approval before attempting, same as this
+  session's standing execution-care rule. Not attempted.
+- [x] **`LEXICAL-02B` — canonical BM25 document input, frozen, read-only.** New
+  `scripts/atlas/freeze-atlas-lexical-document-corpus-v1.mjs` (`npx tsx
+  scripts/atlas/freeze-atlas-lexical-document-corpus-v1.mjs` from `sveltekit-frontend/`, report:
+  `docs/reports/atlas-lexical-document-corpus-freeze-v1.json`). Deliberately reuses the exact
+  corpus that already feeds `semantic_768` (`codebase_chunk_index` rows with `content_embedding`
+  AND `content_hash` populated) rather than inventing a second document set for the lexical
+  challenger — whichever executor (`pg_search` or `QDRANT_BM25`) is eventually chosen, it
+  benchmarks against the same documents the dense lane already indexes.
+  - Frozen corpus: **52,380/52,417 chunks eligible, 4,480 distinct `source_ref` files.**
+  - **Revision-proxy finding, checked live rather than assumed**: `codebase_chunk_index` has no
+    per-chunk `source_revision`/`commit_sha` column at all. `atlas_source_refs.commit_sha` exists
+    as a column but is confirmed **still 0% populated** (`0/22,487` rows) — matches, not just
+    repeats, the `CONTENT-HASH-BACKFILL-01` finding from earlier this session. `content_hash` is
+    therefore the only real, currently-populated revision proxy for this corpus, and is what
+    `AtlasLexicalProjectionV1.sourceRevision` should actually carry when `LEXICAL-02C` is built —
+    not a git SHA, which doesn't exist at this grain yet.
+- [ ] `LEXICAL-02C` onward (define/implement the `AtlasLexicalProjectionV1` encoding pipeline) is
+  still gated on the `pg_search` vs. `QDRANT_BM25` operator decision from the entry above — this
+  freeze is shared prep for either path, not a step that resolves which one gets built.
+
+## `EMBEDDING-768-DIAGNOSTIC-02`: CLI parsing and live identity readback (2026-08-25)
+
+- [x] Fixed `scripts/atlas/atlas-embedding-ranking-diagnostic-v1.mjs` argument parsing so both
+  `--limit=32` and `--limit 32` produce a finite numeric limit. The previous parser stored the
+  space-separated value as the boolean string `true`; `Number(true)` became `NaN`, which was then
+  sent to PostgreSQL as the `LIMIT` parameter and caused `invalid input syntax for type bigint:
+  "NaN"`.
+- [x] Added stage-qualified PostgreSQL probe errors for schema, vector-count, vector-row, and
+  canonical identity queries. Errors include SQL stage and parameter shape only; no credentials or
+  payload values are logged.
+- [x] Reran the read-only diagnostic with `--limit 32 --query "find AST graph retrieval files"`.
+  Qdrant fetched `32` vectors at dimension `768`; EmbeddingGemma returned dimension `768`;
+  `codebase_chunk_index.content_embedding_768` is populated for `576` rows; and the canonical
+  packet probe is reachable. No database, vector-store, cache, or model writes occurred.
+- [ ] The diagnostic remains `WARN`, correctly: the bounded Qdrant sample produced no matching
+  `codebase_chunk_index` vector rows, so `postgresVectorFetched` and AST ranking remain unproven.
+  Do not relax the identity join. The next gate is a read-only identity census comparing Qdrant
+  `packet_key`/`source_ref`/point IDs against `codebase_chunk_index` and `atlas_packets`, followed
+  by a source-revision/content-hash reconciliation before any projection or backfill.
+
+- [x] Ran `scripts/atlas/audit-atlas-packets-content-hash-source.mjs`. The safe unique-hash set is
+  `332` packets, and all `332` are already populated; `4,148` source references remain ambiguous
+  and `57,180` have no chunk hash. No additional bounded backfill is authorized by this audit.
+- [x] Compared the two live 768-dimensional Qdrant collections using the same read-only diagnostic:
+  `codebase_chunks_768` fetched `32` vectors but bound `0` PostgreSQL vector rows, while
+  `codebase_chunks_768_v2` fetched `32`, bound `19`, and passed the PostgreSQL vector, canonical
+  identity, and AST-ranking gates. The v2 run still reports `WARN` because document-version
+  coverage is not proven. This identifies a collection/projection alignment gap; it does not
+  authorize collection recreation, deletion, or promotion of v2 as canonical.
+- [x] Expanded the v2 proof to `128` candidates. Qdrant returned `128` 768-dimensional vectors;
+  PostgreSQL returned `21` matching vector rows (`16.4%` of the bounded sample); canonical identity
+  and AST-aware ranking remained active. `documentVersionCoverage` is still `false`, so the result
+  remains diagnostic-only and no Qdrant promotion or dual-write is allowed.
+- [x] Re-ran `prove-graphify-source-inventory-writer-v2.mts --help` as a disabled canary probe.
+  The migration and writer contract are present, but no existing `graphify_runs.workspace_id` was
+  available. The writer therefore returned `GRAPHIFY_CANARY_WORKSPACE_ID_REQUIRED` and attempted
+  no write. A canary requires an operator-provided existing non-production workspace UUID plus the
+  writer's explicit non-production apply flags; no identifier was fabricated.
+
+- [x] Validated the registered `graphify_file_search_projection` export path with
+  `node scripts/atlas/export-graphify-file-index-v1.mjs --limit=100` followed by the indexing
+  surface audit. The read-only export produced `100` packet rows, `99` resolved files, `449`
+  ast-grep entity candidates, `0` invalid rows, and `canonical_writes:false`. It records
+  PostgreSQL tsvector/GIN as the lexical owner and simdjson as an optional JSON export consumer.
+- [ ] The additive `atlas_file_search_index_v1` bitmap/search migration remains unapplied by
+  design. The validation audit confirms PostgreSQL 18.4 and pgvector 0.8.3 are reachable, but also
+  reports only `576/52,417` populated `content_embedding_768` rows and no bitmap table. Do not
+  apply the projection migration until the 768 representation receipt, lineage canary, and
+  rollback proof pass; the export artifact is not evidence that the target table exists.
+- [x] Ran the repository-root Drizzle verifier with `npm run audit:drizzle` (the frontend package
+  does not define that script). It checked `6` contract mirrors, found `3` statically aligned,
+  `0` live aligned, `0` live-unavailable, and `9` existing blockers. The report confirms the live
+  `atlas_packets` table is present with `61,660` rows but differs from its static mirror; this is
+  broader pre-existing contract drift, not evidence that the registered bitmap projection should
+  be applied. No schema or data writes occurred.
+- [x] Added the current lineage/retrieval fields to the Drizzle `atlas_packets` mirror:
+  `content_hash`, `domain_memberships`, and `primary_domain`. This is a TypeScript mirror update
+  only; it does not alter PostgreSQL and does not treat legacy `sha256` as the canonical chunk hash.
+- [ ] The frontend schema-export audit remains blocked by pre-existing ownership duplication:
+  `23` duplicate table names and `7` duplicate enum names across legacy schema modules. The new
+  packet fields did not introduce these duplicates; resolving them requires a separate schema-owner
+  consolidation pass.
+- [x] Ran the available cross-layer contract audit directly with
+  `node scripts/atlas/audit-contract-map.mjs --dry-run` because no `audit:contracts` npm script is
+  registered. Layers 1-3 and 5-8 passed, including live PostgreSQL and pgvector checks; layer 4
+  reported `64` medium historical migration-journal warnings, with `0` high, `0` low, and `0` info
+  findings. The warnings are migration bookkeeping debt, not a live database outage and not a
+  reason to apply the Graphify bitmap projection automatically.
+- [x] Ran the existing migration integrity and meta-hygiene audits read-only. Meta hygiene passed
+  with `36` snapshots and no invalid files. Migration integrity remains blocked by `66` loose SQL
+  files, `41` journal hash mismatches, an empty live Drizzle migration readback, and generated
+  schema drift. No `--fix-hashes`, migration, or schema-generation apply command was run; these
+  findings require a separate migration-owner recovery pass.
+- [x] Ran `scripts/atlas/schema/pre-apply-check.mjs` before considering the bitmap projection.
+  It returned `PRE_APPLY_BLOCKED`: the last journal snapshot `drizzle/meta/0040_snapshot.json` is
+  missing, the corresponding journal SQL file is absent, and the redacted live-schema report is
+  stale. The projection migration remains unapplied; no Drizzle migration command was executed.
+- [x] Ran `scripts/atlas/schema/compare-schema-snapshots.mjs`. It returned
+  `EXPECTED_SNAPSHOT_MISSING`: the journal expects snapshot `0040`, while the available metadata
+  directory currently reaches only snapshot `0019`. No snapshot was synthesized and no journal or
+  migration files were modified; recovery requires selecting the authoritative migration history.
+- [x] Traced the journal entry: `0040_kanban_task_lifecycle` is present in `_journal.json` and its
+  root SQL file exists, but `0040_snapshot.json` does not. Numbered files under `drizzle/manual/`
+  are separate sidecars and cannot substitute for the missing Drizzle snapshot. No metadata repair
+  was attempted.
+- [x] Checked repository history and current metadata inventory. No committed `0040_snapshot.json`
+  exists. An untracked `0041_snapshot.json` is present (generated during the integrity dry-run), but
+  it is not referenced by `_journal.json` and cannot substitute for snapshot `0040`; it remains
+  unpromoted and uncommitted.
+- [x] Searched repository recovery guidance for a sanctioned snapshot/journal repair path. None was
+  found; existing policy treats manual SQL sidecars separately from Drizzle journal snapshots.
+  Migration apply therefore remains fail-closed until an operator selects the authoritative history.
+- [x] Reviewed the tracked sidecar manifest change for
+  `manual/20260825_graphify_files_compatibility_v1.sql`. It is intentionally marked `applied`
+  with `appliedAt: 2026-08-25`; the migration adds nullable lineage columns and indexes only, does
+  not backfill `graphify_files`, and does not change canonical ownership. This explains the current
+  state: lineage schema ready, table still empty, controlled canary still required.
+- [x] The broad lineage audit later hit a PostgreSQL statement timeout, so it was not treated as a
+  database outage. A bounded read-only query completed successfully: `graphify_files` exists with
+  `0` rows and `0` populated values for `source_ref`, `source_revision`, `content_hash`, and
+  `workspace_revision`. This confirms the empty-owner state independently of the timed-out audit.
+- [x] Bounded readback of `graphify_runs` also completed successfully: `run_count: 0`,
+  `workspace_id_count: 0`, and no latest run timestamp. There is therefore no existing
+  non-production workspace UUID available for the revision-authority canary; no target was guessed
+  and no write was attempted.
+- [x] Refreshed the Graphify source-inventory producer in dry-run mode. It discovered `23,494`
+  source-manifest entries, generated workspace/source digest
+  `sha256:0221bf4569b1b0893de8f7246cac9c7e8f2041523134ba624e8fefa4f2249da7`, selected a bounded
+  plan of `100` rows, and reported `canonicalWriteAttempted:false` and
+  `graphMayConsumeWorkspaceRevision:false`. The producer is ready for a controlled canary, but no
+  live lineage rows were created.
+
+## `MCP-FILE-TOPK-01` prerequisite check: confirmed (not assumed) via EmbeddingGemma's own docs, one real formatting bug found and fixed (2026-08-25)
+
+`MCP-FILE-TOPK-01`'s gate text says the query/document re-embedding question must be "confirmed,
+not assumed" before wiring `formatEmbeddingGemmaInput` into a live query path. Did that check with
+real research instead of leaving it as an internal-only docstring warning.
+
+- [x] **Confirmed via Google's own EmbeddingGemma documentation** (model card,
+  `ai.google.dev/gemma/docs/embeddinggemma/model_card`, and the HuggingFace model card) that the
+  asymmetric query/document prefixing this repo's docstring already warns about is not an internal
+  convention — it's the model's own documented contract. Official query prefix:
+  `task: {task description} | query: {query}` (default task description "search result"; this
+  repo also documents a `code retrieval query` variant). Official document prefix:
+  `title: {title | "none"} | text: {text}`. **Neither side is "no prefix"** — the current corpus,
+  embedded with zero prefix on either side (`PROMPT_REVISION_UNPROMPTED`), is off-contract for
+  BOTH queries and documents already, not merely asymmetric between the two as the docstring's
+  narrower framing implied. This makes the eventual full-corpus re-embed a real retrieval-quality
+  fix, not just a consistency cleanup — recorded as stronger justification for eventually doing
+  it, still not attempted this pass (52,380-chunk re-embed is a real GPU/Ollama-time cost,
+  requires explicit go-ahead, same discipline as the `pg_search`/Qdrant-BM25 install decisions
+  above).
+- [x] **Found and fixed a real, small formatting bug while verifying, not left as a known-good
+  reference**: `formatEmbeddingGemmaInput('document', ...)` in
+  `sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts` produced
+  `` `title: ${title} \ntext: ${content}` `` (newline separator) — Google's documented format uses
+  a single-line pipe separator (`title: {title} | text: {text}`), matching the query-side format's
+  own `|` convention exactly. Fixed to `` `title: ${title} | text: ${content}` ``. Updated the one
+  existing assertion in `embedding-contract-768.spec.ts` to match
+  (`'title: parser.ts | text: function body'`). `grep`'d for other callers of
+  `formatEmbeddingGemmaInput('document', ...)` — **zero found outside the spec file**, confirming
+  (again) that no live code path uses this function yet, so this fix has zero runtime blast
+  radius today, but matters for whenever `MCP-FILE-TOPK-01`'s actual re-embed happens: fixing the
+  format now means the eventual corpus re-embed uses the correct contract on the first pass
+  instead of needing a second re-embed to fix a format bug discovered after the fact.
+- [ ] `MCP-FILE-TOPK-01` itself (wiring the query-side call + the full-corpus document-side
+  re-embed) remains not implemented — this entry closes the "confirm not assume" prerequisite
+  research gate only, not the implementation gate.
+
+## `pg_search` installed and live-verified on `legal-ai-postgres` (2026-08-25, operator-approved)
+
+Operator explicitly approved installing `pg_search` (from the two-candidate decision-support entry
+above), preceded by a full `pg_dump` backup per this session's own execution-care discipline.
+
+- [x] **Backup taken and verified before any write**: `docker exec legal-ai-postgres pg_dump -U
+  legal_admin -d legal_ai_db -Fc` -> `./backups/legal_ai_db_20260825_112807.dump` (~989 MB,
+  `PGDMP` custom-format header confirmed, `pg_restore -l` lists `4,187` TOC entries, dumped from
+  live `18.4 (Debian 18.4-1.pgdg12+1)`). Not deleted; left in `backups/` (gitignored path) for
+  rollback if ever needed.
+- [x] **Real install-path correction found live, not from docs alone**: the ParadeDB docs excerpt
+  cited in the decision-support entry above said `pg_search` requires
+  `shared_preload_libraries` only "if your Postgres version is less than 17" — **this was wrong
+  for this exact install**. On live Postgres 18.4, `CREATE EXTENSION pg_search` failed with
+  `pg_search must be loaded via shared_preload_libraries` until it was actually added. Recording
+  the correction here since a future reader following the docs verbatim would hit the same error.
+- [x] **Wrong Ubuntu-codename package caught before it caused a subtler failure**: first download
+  was `postgresql-18-pg-search_0.25.1-1PARADEDB-resolute_amd64.deb` (`resolute` = an Ubuntu
+  codename, not Debian) — installed without error but failed at `CREATE EXTENSION` time with
+  `GLIBC_2.43' not found`. This container is Debian 12 (`bookworm`), confirmed via
+  `/etc/os-release`. Corrected to
+  `postgresql-18-pg-search_0.25.1-1PARADEDB-bookworm_amd64.deb`, which loaded cleanly.
+- [x] **Made durable, not left as an ephemeral container-layer install**: the `.deb` was installed
+  via `apt-get install` inside the running container, which lives in the container's writable
+  layer, NOT the `postgres_data` named volume — a plain `docker compose up -d` would have
+  recreated the container from the bare `pgvector/pgvector:pg18` image and silently lost the
+  extension binary (while keeping all data, since that's in the volume — data loss was never the
+  risk here, silently losing the extension on next redeploy was). Fixed by `docker commit
+  legal-ai-postgres pgvector-pgsearch:pg18-local` (3.37GB local image, `pgvector/pgvector:pg18` +
+  the pg_search `.deb` only, nothing else changed) and repointing `docker-compose.yml`'s `postgres`
+  service `image:` field at the new local tag, with a comment explaining the provenance and that
+  the base image + data volume are otherwise unchanged.
+- [x] **`shared_preload_libraries=pg_search` added** to the `postgres` service's `command:` block
+  in `docker-compose.yml` (was empty before this change — confirmed via `SHOW
+  shared_preload_libraries` before editing, so this is a pure addition, not an overwrite of an
+  existing production setting).
+- [x] **Container recreated via `docker compose up -d postgres`, data verified intact
+  afterward, not just assumed**: `atlas_packets` count `61,660` (unchanged from before the
+  recreate), `codebase_chunk_index` count `52,417` (unchanged). `pg_isready` healthy.
+  `pg_extension` now lists `pg_search 0.25.1` alongside the pre-existing `pg_trgm`, `pgcrypto`,
+  `vector`.
+- [x] **Functional smoke test — real BM25 scoring proven live, not just "extension exists"**:
+  created a throwaway 3-row table, built a `USING bm25 (id, body) WITH (key_field='id')` index,
+  queried `WHERE body @@@ 'postgres bm25'`, got real `paradedb.score()` values
+  (`1.034008`/`0.86167336`) with correct ranking and correct exclusion of the non-matching row
+  ("the quick brown fox..." never appeared in results). Table dropped immediately after — zero
+  residual state from the smoke test.
+- [ ] **Not yet done**: `pg_search` is installed and proven functional, but **no BM25 index exists
+  yet on `codebase_chunk_index` or any real Parent Atlas table** — this entry closes the
+  install/proof gate only. Building the real `AtlasLexicalProjectionV1`-shaped BM25 index against
+  the frozen corpus from `LEXICAL-02B` above, and benchmarking it against `POSTGRES_FTS`
+  (`LEXICAL-02F`), remains the next real step. With `pg_search` now the live-installed choice
+  between the two candidates, the earlier `QDRANT_BM25` sequence (`LEXICAL-02C`-`02E`,
+  Qdrant-specific) is superseded by a `pg_search`-native equivalent — update those steps to target
+  `pg_search`'s `bm25` index type directly on `codebase_chunk_index` rather than a new Qdrant
+  collection, when picked up next.
+
+## `MCP-FILE-TOPK-01` corpus re-embed: piloted, full run launched (2026-08-25, operator-approved)
+
+Operator explicitly approved the corpus re-embed following the `pg_search` install above.
+Deliberately scoped narrowly: re-embed the **document side** only (`codebase_chunk_index.
+content_embedding`), NOT the live query-embedding path — flipping query-side prompting before the
+document corpus is done would be the exact regression this session's earlier docstring-correction
+entry warned about. Query-side wiring stays a separate, later step.
+
+- [x] **New script**: `scripts/atlas/reembed-corpus-document-prefix-v1.mjs`. Self-contained
+  (no `$lib` import dependency — reimplements the document-prompt format inline, matching the
+  now-corrected `formatEmbeddingGemmaInput('document', ...)` exactly: `title: {title|"none"} |
+  text: {content}`) so it runs from anywhere via plain `node`, not gated on SvelteKit's alias
+  resolution context. Calls Ollama's `/api/embeddings` directly (`embeddinggemma:latest`, 30s
+  timeout), verifies `dimension === 768` and no non-finite values before writing, writes via
+  `UPDATE ... SET content_embedding = $1::halfvec, embedding_model = $2` where `$2` is a new tag
+  `embeddinggemma:latest:eg-task-prefix-v1` (distinct from the existing `embeddinggemma`/
+  `embeddinggemma:latest` values covering the other `52,380` rows) — no schema migration needed,
+  reuses the existing `embedding_model` text column as the revision marker. Idempotent by
+  construction: the selection `WHERE ... AND (embedding_model IS NULL OR embedding_model <> $2)`
+  means a killed/resumed run or an accidental second invocation only touches rows not already
+  re-tagged. Keyset-paginated (`id > lastId ORDER BY id`), not `OFFSET`, per this repo's own
+  documented pagination rule.
+- [x] **Piloted before the full run, not run blind**: `--dry-run --limit=5` (0 errors, dimension
+  768 confirmed) -> real `--limit=5` apply (0 errors) -> **readback verified directly against
+  Postgres**, not just trusted the script's own report: `SELECT embedding_model,
+  vector_dims(content_embedding::vector)` on the written row confirmed
+  `embeddinggemma:latest:eg-task-prefix-v1` / `768` -> idempotency re-verified with a second
+  `--dry-run --limit=5`, which correctly skipped the 5 already-tagged rows and advanced to the
+  next 5 (different sample `id`, confirming the skip predicate actually filters, not just reports
+  a false skip count) -> timed `--limit=50` real apply (`4.345s`, 0 errors) to get a throughput
+  estimate before committing to the full corpus.
+- [x] **Full run launched in the background** (`node scripts/atlas/reembed-corpus-document-prefix
+  -v1.mjs`, no `--limit`), covering the remaining `~52,325` of `52,380` eligible rows (55 already
+  done during piloting). At the measured `~11.5` rows/sec from the timed pilot, expected duration
+  is **~75-80 minutes** — not yet complete as of this entry; completion status, final error count,
+  and the post-run identity/coverage re-check are a follow-up entry once the background run
+  finishes. Report will land at `docs/reports/atlas-corpus-reembed-document-prefix-v1-apply.json`
+  (overwritten each run) plus `reembed-full-run.log` (repo root, full stdout capture) for this
+  specific invocation.
+- [ ] **Explicitly not done yet, flagged so it isn't silently assumed complete**: (1) the live
+  query-embedding call sites (`embedQuery`/`embedViaOllama` in `retrieval/embedding-service.ts`,
+  `tryEmbedOllama` in `embeddings/ollama.ts`) still send raw unprompted query text — wiring
+  `formatEmbeddingGemmaInput('code_query'|'retrieval_query', ...)` into those is the deliberately
+  deferred second half of `MCP-FILE-TOPK-01`, only safe to do once the document corpus re-embed
+  above is confirmed complete; (2) Qdrant's `codebase_chunks_768`/`_768_v2` mirrors are NOT updated
+  by this script — it only writes Postgres `content_embedding` (the truth source per this repo's
+  own Postgres-is-truth rule); Qdrant remains on the old unprompted vectors until a separate
+  mirror-sync pass runs; (3) no Recall@K/NDCG comparison of old-vs-new embeddings has been run —
+  this entry proves the write mechanics work, not that retrieval quality actually improved.
+
+## Corpus re-embed: complete, verified (2026-08-25)
+
+Full background run finished (`~48` minutes, `52,325` processed, `2026-08-25T18:45:45Z` ->
+`19:34:00Z`). Verified directly against Postgres, not just the script's own self-report.
+
+- [x] **`embedding_model` distribution, queried live**: `embeddinggemma:latest:eg-task-prefix-v1`
+  (new) `= 52,379`; old `embeddinggemma` `= 1` (the one context-length failure, kept on its prior
+  embedding rather than silently dropped); `NULL` `= 37` (rows with no `content` at all — matches
+  the pre-run `52,417 total / 52,380 has_content` count exactly, not a new gap). `52,379 + 1 + 37
+  = 52,417` — reconciles exactly against the table total.
+- [x] **The one failure identified, not just counted**: `id e0944ad6-30b1-44ee-95bb-e12111af70ca`,
+  `src/lib/server/config/dynamic-ports.ts`, `content` length `3,999` chars — the added `title: ...
+  | text: ...` wrapper pushed an already-near-max-length chunk over EmbeddingGemma's context
+  window (`Ollama 500: "the input length exceeds the context length"`). Honest, understandable
+  edge case, not a script bug — that single row still carries its old unprompted embedding.
+- [x] **52,324 (full-run) + 55 (piloting, done earlier in this same entry chain) = 52,379** — the
+  full run's `WHERE embedding_model IS NULL OR embedding_model <> $2` skip predicate correctly
+  picked up exactly where piloting left off, with zero double-counting or gaps.
+- [ ] **Still not done** (unchanged from the prior entry's flags, restated so this isn't read as
+  "MCP-FILE-TOPK-01 complete"): live query-side prompting wiring, Qdrant mirror sync, and any
+  Recall@K/NDCG quality proof. This entry closes only "the document corpus now carries the
+  documented EmbeddingGemma prompt format" — a prerequisite, not the full retrieval-quality win.
+
+## `LEXICAL-02` real BM25 index built on `codebase_chunk_index` (2026-08-25, pg_search-native path)
+
+With `pg_search` installed and proven (entry above) and the document corpus frozen (`LEXICAL-02B`),
+built the actual `pg_search`-native equivalent of the earlier Qdrant-`QDRANT_BM25_V1` plan directly
+on the canonical table — superseding `LEXICAL-02C`-`02E`'s Qdrant-specific steps per that entry's
+own note that whichever candidate got installed first would replace them.
+
+- [x] **First confirmed the existing `idx_codebase_chunk_bm25_search` is mislabeled, not reused
+  by mistake**: `\d codebase_chunk_index` shows it as `gin (search_vector)` — a `tsvector`/GIN
+  index, i.e. `POSTGRES_FTS`, not a real `pg_search bm25`-type index. This matches this file's own
+  earlier "Rename BM25-labeled artifacts" finding elsewhere. Did not touch or rename it (out of
+  scope for this entry; a rename needs downstream caller migration first per that earlier note).
+- [x] **New, distinctly-named real index**: `CREATE INDEX idx_codebase_chunk_pgsearch_bm25 ON
+  codebase_chunk_index USING bm25 (id, content, relative_path) WITH (key_field='id');` — built in
+  **7.4 seconds** over all `52,417` live rows (Postgres warned only 2 parallel maintenance workers
+  were available; not tuned further, out of scope).
+- [x] **Live query proof, not just "index exists"**: `SELECT id, relative_path,
+  paradedb.score(id) FROM codebase_chunk_index WHERE content @@@ 'graph retrieval AST' ORDER BY
+  bm25_score DESC LIMIT 10` returned 10 real, sensible hits with descending scores
+  (`12.44` -> `11.06`) — `docs/graph/codebase-graph.json`,
+  `src/routes/(app)/codebase-graph/fast-ast/AGENTS.md`, `src/lib/server/ace/context-assembler.ts`,
+  `src/lib/server/types/retrieval.ts`, etc. — genuinely relevant to the query text, not noise.
+- [ ] **Not yet done**: the `LEXICAL-02F` benchmark (`POSTGRES_FTS` vs this new `pg_search` index,
+  same frozen 8-query set from `audit-postgres-fts-identity-coverage.mjs`, Recall@K/MRR/NDCG) has
+  not been run — this entry proves the index builds and returns sensible results, not that it
+  outperforms the existing FTS lane. Per this file's own `DO_NOT_PROMOTE`-style discipline,
+  `POSTGRES_FTS` remains the default lexical owner until that benchmark actually runs and wins.
+- [ ] **Not yet done**: `AtlasLexicalProjectionV1`'s identity fields (`packetKey`, `sourceRevision`,
+  `contentHash`) are not carried by this index — `paradedb.score()` returns `id` (the chunk's own
+  uuid) and whatever columns are selected alongside it, so a caller can already join back to
+  `atlas_packets`/`atlas_chunk_packet_identity_links` via the existing `codebase_chunk_index.id`
+  key, but no dedicated identity-carrying wrapper/adapter (matching `postgres-fts.adapter.ts`'s
+  pattern) has been written for this index yet.
+
+## `LEXICAL-02F`: bounded comparison run, honestly scoped (2026-08-25) — NOT a Recall/NDCG proof
+
+Ran the queued benchmark item. **Named and scoped honestly, not oversold**: no labeled relevance
+judgments (gold-standard "which results are actually relevant" data) exist for this corpus, so a
+real Recall@K/MRR/NDCG evaluation is not possible yet — that gap is recorded, not glossed over.
+What this entry actually proves: result count, latency, and top-10 overlap between `POSTGRES_FTS`
+(`ts_rank_cd`/`websearch_to_tsquery`, the exact query shape `postgres-fts.adapter.ts` uses) and the
+new `pg_search` `bm25` index, on the same frozen 8-query set.
+
+- [x] New `scripts/atlas/benchmark-postgres-fts-vs-pgsearch-bm25-v1.mjs` (`node
+  scripts/atlas/benchmark-postgres-fts-vs-pgsearch-bm25-v1.mjs`, read-only, report:
+  `docs/reports/postgres-fts-vs-pgsearch-bm25-comparison-v1.json`). The file's own header and the
+  report's own `scopeNote` field both state the Recall/NDCG limitation explicitly, so a future
+  reader can't mistake this for a promotion-grade evaluation.
+- [x] **Latency — consistent, measurable win for `pg_search` on every single one of the 8 queries**,
+  not just on average: `IngestionJobStatus` 91.45ms (FTS) vs 6.35ms (BM25); `GpuConfig` 20.63ms vs
+  2.43ms; `SystemStatus` 37.11ms vs 4.16ms; `ErrorPatchLogInsert` 37.4ms vs 2.26ms;
+  `extractLegalEntities` 5.7ms vs 2.45ms; `CourtroomScene` 4.97ms vs 2.26ms; `embedding search`
+  **641.89ms vs 96.58ms** (largest gap, both lanes' slowest query); `packet identity` 162.97ms vs
+  20.51ms.
+- [x] **Top-10 overlap varies from 0% to 100% across queries — the two lanes genuinely rank
+  differently, not just the same set reordered**: `SystemStatus` had **zero** overlapping results
+  in the top 10 between the two lanes (FTS surfaced `global.ts` type definitions; BM25 surfaced
+  UI components and interface files); `extractLegalEntities` had **100%** overlap (both lanes
+  agreed completely). The other 6 queries fell in between (`0.053` to `0.714` approximate Jaccard).
+  This is exactly why the Recall/NDCG gap above matters — without ground truth, there's no way to
+  say which lane's disagreement is the more relevant one for `SystemStatus` or `embedding search`
+  (the two lowest-overlap queries).
+- [x] **Result-count divergence noted, not smoothed over**: `pg_search` returned fewer results
+  than `POSTGRES_FTS` for `GpuConfig` (4 vs 10) and `ErrorPatchLogInsert` (2 vs 10) — reflects
+  BM25's stricter term-matching vs. `tsvector`'s stemming/lexeme normalization, not a bug in
+  either lane.
+- [ ] **Explicitly NOT promoting `pg_search` over `POSTGRES_FTS`** from this data, per this file's
+  own `DO_NOT_PROMOTE` discipline — the latency win is real and repeatable, but "faster" is not
+  "more relevant," and relevance is exactly what's unmeasured here. `POSTGRES_FTS` remains the
+  default lexical owner.
+- [ ] **Next real gate, if this is picked up further**: constructing an actual labeled relevance
+  set (even a small one — 10-20 queries with manually judged relevant/irrelevant chunk_ids) is the
+  concrete prerequisite for a real Recall@K/NDCG/MRR comparison. Nothing in this session attempted
+  that — it's a genuinely separate, larger task (requires domain judgment about what's "relevant"
+  to each query, not just more scripting).

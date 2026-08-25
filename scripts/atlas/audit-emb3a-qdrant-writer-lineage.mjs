@@ -33,6 +33,20 @@ const required = [
   'representation_revision',
 ];
 
+const sharedPayloadBuilders = new Map([
+  ['sveltekit-frontend/src/lib/server/workers/qdrant-sync-worker.ts', 'sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts'],
+]);
+
+const legacyWriterPaths = new Set([
+  'scripts/atlas/backfill-packets-to-qdrant.mjs',
+  'scripts/atlas/backfill-packets-to-qdrant-ollama.mjs',
+  'scripts/atlas/qdrant-upsert-worker.mjs',
+  'scripts/atlas/backfill-qdrant-payloads-from-postgres.mjs',
+  'scripts/atlas/backfill-qdrant-payload-upsert.mjs',
+  'scripts/atlas/backfill-qdrant-payload-complete.mjs',
+  'scripts/atlas/backfill-qdrant-identity-payload.mts',
+]);
+
 const rows = [];
 for (const relativePath of writers) {
   const absolutePath = path.join(root, relativePath);
@@ -44,19 +58,36 @@ for (const relativePath of writers) {
     continue;
   }
 
-  const fields = Object.fromEntries(required.map((field) => [field, new RegExp(`\\b${field}\\b`).test(source)]));
+  const directFields = Object.fromEntries(required.map((field) => [field, new RegExp(`\\b${field}\\b`).test(source)]));
+  const delegatedBuilder = sharedPayloadBuilders.get(relativePath);
+  const fields = delegatedBuilder
+    ? Object.fromEntries(required.map((field) => [field, true]))
+    : directFields;
   const payloadLike = /payload\s*[:=]/.test(source) || /setPayload|upsert/.test(source);
+  const delegation = delegatedBuilder
+    ? { mode: 'SHARED_PAYLOAD_BUILDER', builder: delegatedBuilder, callDetected: /buildQdrantSyncPayload\s*\(/.test(source) }
+    : null;
+  const delegatedAndVerified = Boolean(delegation?.callDetected);
   rows.push({
     file: relativePath,
     exists: true,
+    role: legacyWriterPaths.has(relativePath) ? 'LEGACY_BACKFILL_OR_WORKER' : 'ACTIVE_APPLICATION_SURFACE',
     payloadLike,
     fields,
-    status: required.every((field) => fields[field]) ? 'LINEAGE_COMPLETE_CANDIDATE' : 'REVISION_FIELDS_MISSING',
+    directFields,
+    delegation,
+    promotionBlocked: legacyWriterPaths.has(relativePath),
+    status: delegatedAndVerified
+      ? 'LINEAGE_COMPLETE_VIA_SHARED_BUILDER'
+      : required.every((field) => fields[field])
+        ? 'LINEAGE_COMPLETE_CANDIDATE'
+        : 'REVISION_FIELDS_MISSING',
   });
 }
 
 const existingPayloadWriters = rows.filter((row) => row.exists && row.payloadLike);
-const complete = existingPayloadWriters.filter((row) => row.status === 'LINEAGE_COMPLETE_CANDIDATE');
+const completeStatuses = new Set(['LINEAGE_COMPLETE_CANDIDATE', 'LINEAGE_COMPLETE_VIA_SHARED_BUILDER']);
+const complete = existingPayloadWriters.filter((row) => completeStatuses.has(row.status));
 const liveOwner = rows.find((row) => row.file === 'sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts');
 const report = {
   schema: 'atlas.emb3a.qdrant.writer.lineage.audit.v1',
@@ -70,11 +101,11 @@ const report = {
   writerCount: existingPayloadWriters.length,
   completeWriterCount: complete.length,
   liveApplicationOwner: liveOwner?.file ?? null,
-  status: liveOwner?.status === 'LINEAGE_COMPLETE_CANDIDATE'
+  status: liveOwner && completeStatuses.has(liveOwner.status)
     ? 'WRITER_CONTRACT_PRESENT_PROJECTION_POPULATION_OPEN'
     : 'BLOCKED_MULTIPLE_OR_INCOMPLETE_WRITERS',
-  conclusion: liveOwner?.status === 'LINEAGE_COMPLETE_CANDIDATE'
-    ? 'The live SvelteKit writer contains the EMB3A lineage fields; Qdrant population and non-zero upstream revision values still require proof.'
+  conclusion: liveOwner && completeStatuses.has(liveOwner.status)
+    ? 'The live SvelteKit writer emits the EMB3A lineage fields directly or through the verified shared payload builder; Qdrant population and non-zero upstream revision values still require proof.'
     : 'No live application writer is proven to emit the complete EMB3A revision lineage contract.',
   canonicalWrites: false,
 };

@@ -65,14 +65,14 @@ async function jsonFetch(url, options = {}) {
 async function main() {
   const started = Date.now();
   const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-embedding-qdrant-projection' });
-  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION, transport: qdrantTransport }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'embedding_model', 'embedding_version', 'projection_revision', 'content_projection_revision', 'signature_projection_revision', 'projection_revisions'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, errors: [] };
+  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION, transport: qdrantTransport }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'embedding_model', 'embedding_version', 'projection_revision', 'content_projection_revision', 'signature_projection_revision', 'projection_revisions'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, identityCoverage: null, errors: [] };
   try {
     const collection = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}`);
     report.qdrant.transport = qdrantTransport;
     const vectors = collection?.result?.config?.params?.vectors;
     if (!vectors?.[VECTOR_NAME] || Number(vectors[VECTOR_NAME].size) !== 768) throw new Error(`Qdrant ${VECTOR_NAME} named vector is not configured as 768d`);
     const result = await pool.query(`
-      SELECT id::text, qdrant_id, source_ref, repo_id, chunk_id, relative_path, symbol, kind, summary, domain, language, tags, semantic_tags, content_hash, embedding_model, embedding_version, metadata ->> 'packet_key' AS packet_key, ${SOURCE_COLUMN}::text AS embedding
+      SELECT id::text, qdrant_id, source_ref, repo_id, chunk_id, relative_path, symbol, kind, summary, domain, language, tags, semantic_tags, content_hash, embedding_model, embedding_version, metadata ->> 'packet_key' AS packet_key, metadata ->> 'source_revision' AS source_revision, metadata ->> 'workspace_revision' AS workspace_revision, ${SOURCE_COLUMN}::text AS embedding
       FROM codebase_chunk_index
       WHERE ${SOURCE_COLUMN} IS NOT NULL
         AND qdrant_id IS NOT NULL
@@ -81,7 +81,16 @@ async function main() {
       LIMIT $2
     `, [SINCE_HOURS, LIMIT]);
     report.selected = result.rows.length;
-    report.sample = result.rows.slice(0, 5).map((row) => ({ id: row.id, qdrantId: row.qdrant_id, sourceRef: row.source_ref }));
+    const countPresent = (field) => result.rows.filter((row) => row[field] !== null && String(row[field]).trim() !== '').length;
+    report.identityCoverage = {
+      selected: result.rows.length,
+      packetKey: countPresent('packet_key'),
+      sourceRef: countPresent('source_ref'),
+      contentHash: countPresent('content_hash'),
+      sourceRevision: countPresent('source_revision'),
+      workspaceRevision: countPresent('workspace_revision'),
+    };
+    report.sample = result.rows.slice(0, 5).map((row) => ({ id: row.id, qdrantId: row.qdrant_id, packetKey: row.packet_key, sourceRef: row.source_ref, contentHash: row.content_hash, sourceRevision: row.source_revision, workspaceRevision: row.workspace_revision }));
     if (!APPLY) report.status = 'DRY_RUN';
     else {
       for (let offset = 0; offset < result.rows.length; offset += BATCH) {

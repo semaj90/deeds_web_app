@@ -1,6 +1,6 @@
 {
   "schema": "contextual_tree_readiness.v1",
-  "generatedAt": "2026-08-25T04:51:17.960Z",
+  "generatedAt": "2026-08-25T21:02:45.295Z",
   "readOnly": true,
   "checks": [],
   "lanes": {
@@ -190,7 +190,7 @@
         "primary_cluster_id"
       ],
       "sourceUnavailable": false,
-      "dataAbsent": true,
+      "dataAbsent": false,
       "materializationMissing": false,
       "fieldNameMismatch": true,
       "ready": false
@@ -286,52 +286,122 @@
       "purpose": "Offline analytical joins / rollups",
       "status": "READY",
       "evidence": [
-        "tables=vector_snapshot_packets_5k_768",
+        "tables=atlas_feature_map, mapreduce_consolidated_index, mapreduce_consolidated_index_meta",
         "views=none",
-        "tables=vector_snapshot_packets",
+        "tables=hidden_packet_pathmap, hidden_packet_pathmap_summary",
+        "views=none",
+        "tables=agg_facts, agg_rewards, agg_source_refs, agg_tokens, edges, facts, packets, raw_edges, raw_facts, raw_packets, raw_rewards, raw_token_map",
         "views=none",
         "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
         "views=none",
         "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
-        "views=none",
-        "tables=cards_raw, outcomes_raw, training_examples",
-        "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
+        "views=none"
       ],
       "actualFieldNames": [
-        "embedding_digest",
-        "feature_id",
-        "legacy_domain",
-        "normalized_domain",
-        "packet_key",
-        "qdrant_vector_dim",
-        "representation_id",
-        "representation_revision",
-        "semantic_embedding_768",
-        "source_ref",
-        "summary",
-        "title_id",
-        "afm_indexed_at",
-        "alias_id",
-        "atlas_file_count",
         "atlas_version",
-        "attention_score",
-        "avg_confidence",
-        "behavior_score",
+        "centroid_id",
+        "cluster_id",
+        "colocatedFiles",
+        "contentHash",
+        "directory",
+        "dynamicImports",
+        "dynamic_imports",
+        "extension",
+        "extensions",
+        "feature",
+        "feature_id",
+        "features",
+        "fileName",
+        "filePath",
+        "importErrorCount",
+        "indexed_at",
+        "keywords",
+        "lane_ids",
+        "lastScanned",
+        "lines",
+        "metadata",
+        "neo4j_node_id",
+        "nes_card_id",
+        "normalized_path",
+        "qdrant_point_id",
+        "related_feature_ids",
+        "resolvedDynamicImports",
+        "resolvedStaticImports",
+        "rows",
+        "semanticMarkers",
+        "size",
+        "som_cluster",
+        "source_id",
+        "source_ref",
+        "stableKey",
+        "staticImports",
+        "static_imports",
+        "bucket",
+        "bucket_rows",
+        "description",
+        "duckdb_rows",
+        "feature_ids",
+        "feature_key",
+        "file",
+        "joined_rows",
+        "line_number",
+        "packet_kind",
+        "path",
+        "pathmap_root",
+        "section",
+        "source",
+        "source_ref_joins",
+        "source_refs",
+        "stable_id",
+        "stable_id_joins",
+        "status",
+        "task_id",
+        "title",
+        "todo_source_ref_rows",
+        "answer_hint",
         "cache_hit",
         "cache_tier",
         "captured_at",
-        "centroid_id",
-        "cluster_id",
+        "confidence",
+        "created_at",
+        "dst",
+        "edge_type",
+        "fact_key",
+        "fact_type",
+        "fact_value",
+        "id",
+        "latency_ms",
+        "packet_id",
+        "packet_uuid",
+        "prompt_hash",
+        "qdrant_hits",
+        "query_hash",
+        "redis_hot_keys",
+        "reward",
+        "reward_samples",
+        "route",
+        "route_state",
+        "score",
+        "scored_at",
+        "source_ref_count",
+        "src",
+        "token_hint",
+        "token_hints",
+        "weight",
+        "afm_indexed_at",
+        "alias_id",
+        "atlas_file_count",
+        "attention_score",
+        "avg_confidence",
+        "behavior_score",
         "cluster_ids",
         "cold_storage_ready",
-        "created_at",
         "dominant_status",
         "drizzle_refs",
         "exports",
         "feature_avg_confidence",
         "feature_behavior_score",
         "feature_dominant_status",
-        "feature_ids",
         "feature_primary_cluster",
         "file_ext",
         "file_path",
@@ -340,18 +410,13 @@
         "has_centroid",
         "has_vector",
         "has_zod",
-        "id",
         "imports",
         "ingest_source",
         "is_route",
         "is_svelte_comp",
         "karpathy_blend",
-        "lane_ids",
-        "latency_ms",
         "line_count",
         "max_confidence",
-        "neo4j_node_id",
-        "nes_card_id",
         "next_actions",
         "packet_count",
         "pad_centroid_count",
@@ -360,19 +425,12 @@
         "pagerank_score",
         "primary_centroid_id",
         "primary_cluster_id",
-        "qdrant_hits",
         "qdrant_point_count",
-        "qdrant_point_id",
         "rel_path",
-        "related_feature_ids",
-        "route",
         "route_handlers",
         "runtime_hot_path_score",
         "semantic_confidence",
-        "som_cluster",
-        "source_id",
         "source_kind",
-        "source_refs",
         "synthesized_at",
         "synthesized_summary",
         "tags",
@@ -388,9 +446,6 @@
         "cluster_size",
         "column0",
         "degree",
-        "edge_type",
-        "feature",
-        "filePath",
         "from_node_id",
         "import_errors",
         "lane",
@@ -404,26 +459,20 @@
         "som_index",
         "som_row",
         "sourceRef",
-        "title",
         "to_node_id",
         "total_degree",
         "total_outcomes",
         "unique_sources",
-        "weight",
-        "cardId",
-        "enrichment_phase",
-        "input",
-        "instruction",
-        "kind",
-        "output",
-        "reward",
-        "reward_total",
-        "som_bmu_col",
-        "som_bmu_distance",
-        "som_bmu_row",
-        "som_cluster_col",
-        "som_cluster_row",
-        "vector64_compressed",
+        "embedding_digest",
+        "legacy_domain",
+        "normalized_domain",
+        "packet_key",
+        "qdrant_vector_dim",
+        "representation_id",
+        "representation_revision",
+        "semantic_embedding_768",
+        "summary",
+        "title_id",
         "content",
         "content_embedding_768",
         "content_hash",
@@ -449,68 +498,19 @@
         "summary_hash",
         "text",
         "used_concepts",
-        "colocatedFiles",
-        "contentHash",
-        "directory",
-        "dynamicImports",
-        "dynamic_imports",
-        "extension",
-        "extensions",
-        "features",
-        "fileName",
-        "importErrorCount",
-        "indexed_at",
-        "keywords",
-        "lastScanned",
-        "lines",
-        "metadata",
-        "normalized_path",
-        "resolvedDynamicImports",
-        "resolvedStaticImports",
-        "rows",
-        "semanticMarkers",
-        "size",
-        "stableKey",
-        "staticImports",
-        "static_imports",
-        "bucket",
-        "bucket_rows",
-        "description",
-        "duckdb_rows",
-        "feature_key",
-        "file",
-        "joined_rows",
-        "line_number",
-        "packet_kind",
-        "path",
-        "pathmap_root",
-        "section",
-        "source",
-        "source_ref_joins",
-        "stable_id",
-        "stable_id_joins",
-        "status",
-        "task_id",
-        "todo_source_ref_rows",
-        "answer_hint",
-        "confidence",
-        "dst",
-        "fact_key",
-        "fact_type",
-        "fact_value",
-        "packet_id",
-        "packet_uuid",
-        "prompt_hash",
-        "query_hash",
-        "redis_hot_keys",
-        "reward_samples",
-        "route_state",
-        "score",
-        "scored_at",
-        "source_ref_count",
-        "src",
-        "token_hint",
-        "token_hints",
+        "cardId",
+        "enrichment_phase",
+        "input",
+        "instruction",
+        "kind",
+        "output",
+        "reward_total",
+        "som_bmu_col",
+        "som_bmu_distance",
+        "som_bmu_row",
+        "som_cluster_col",
+        "som_cluster_row",
+        "vector64_compressed",
         "labels",
         "payload",
         "score_authority",
@@ -523,8 +523,8 @@
       "expectedAliasesMissing": [
         "featureId",
         "sourceRef",
-        "feature_id",
-        "source_ref"
+        "source_ref",
+        "feature_id"
       ],
       "expectedAliasesPresent": [
         "feature_id",
@@ -731,1425 +731,6 @@
     "featureIdHits": "0"
   },
   "duckdbInventory": [
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-snapshot-5k-768.duckdb",
-      "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-snapshot-5k-768.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=vector_snapshot_packets_5k_768",
-        "views=none"
-      ],
-      "tables": [
-        "vector_snapshot_packets_5k_768"
-      ],
-      "views": [],
-      "columns": [
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "packet_key"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "feature_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "title_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "summary"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "legacy_domain"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "normalized_domain"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "representation_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "representation_revision"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "embedding_digest"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "qdrant_vector_dim"
-        },
-        {
-          "table_name": "vector_snapshot_packets_5k_768",
-          "column_name": "semantic_embedding_768"
-        }
-      ],
-      "actualFieldNames": [
-        "embedding_digest",
-        "feature_id",
-        "legacy_domain",
-        "normalized_domain",
-        "packet_key",
-        "qdrant_vector_dim",
-        "representation_id",
-        "representation_revision",
-        "semantic_embedding_768",
-        "source_ref",
-        "summary",
-        "title_id"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "source_ref"
-        ],
-        "feature_id": [
-          "feature_id"
-        ],
-        "qdrant_point_id": [],
-        "neo4j_node": []
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "feature_id"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "sourceRef"
-      ],
-      "expectedAliasesPresent": [
-        "feature_id",
-        "source_ref"
-      ]
-    },
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-index-lanes.duckdb",
-      "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-index-lanes.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=vector_snapshot_packets",
-        "views=none"
-      ],
-      "tables": [
-        "vector_snapshot_packets"
-      ],
-      "views": [],
-      "columns": [
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "packet_key"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "feature_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "title_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "summary"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "legacy_domain"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "normalized_domain"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "representation_id"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "representation_revision"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "embedding_digest"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "qdrant_vector_dim"
-        },
-        {
-          "table_name": "vector_snapshot_packets",
-          "column_name": "semantic_embedding_768"
-        }
-      ],
-      "actualFieldNames": [
-        "embedding_digest",
-        "feature_id",
-        "legacy_domain",
-        "normalized_domain",
-        "packet_key",
-        "qdrant_vector_dim",
-        "representation_id",
-        "representation_revision",
-        "semantic_embedding_768",
-        "source_ref",
-        "summary",
-        "title_id"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "source_ref"
-        ],
-        "feature_id": [
-          "feature_id"
-        ],
-        "qdrant_point_id": [],
-        "neo4j_node": []
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "feature_id"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "sourceRef"
-      ],
-      "expectedAliasesPresent": [
-        "feature_id",
-        "source_ref"
-      ]
-    },
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\offline-synthesis-mapreduce.duckdb",
-      "relPath": ".tmp/offline-synthesis-mapreduce.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
-        "views=none"
-      ],
-      "tables": [
-        "cold_feature_rollups",
-        "cold_hot_path_rollups",
-        "cold_parent_atlas_cards",
-        "cold_profile_card_candidates",
-        "cold_source_ref_rollups"
-      ],
-      "views": [],
-      "columns": [
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "feature_id"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "packet_count"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "atlas_file_count"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "qdrant_point_count"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "avg_confidence"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "max_confidence"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "semantic_confidence"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "behavior_score"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "primary_cluster_id"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "primary_centroid_id"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "cluster_ids"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "top_file_paths"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "source_refs"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "synthesized_summary"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "next_actions"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "dominant_status"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "has_blocked"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "atlas_version"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "synthesized_at"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "updated_at"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "pad_file_count"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "pad_qdrant_count"
-        },
-        {
-          "table_name": "cold_feature_rollups",
-          "column_name": "pad_centroid_count"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "id"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "route"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "latency_ms"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "captured_at"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "source_refs"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "feature_ids"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "qdrant_hits"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "cache_hit"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "cache_tier"
-        },
-        {
-          "table_name": "cold_hot_path_rollups",
-          "column_name": "runtime_hot_path_score"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "source_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "rel_path"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "file_path"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "feature_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "related_feature_ids"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "workspace_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "file_ext"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "tags"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "line_count"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "is_route"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "is_svelte_comp"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "has_auth"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "has_zod"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "drizzle_refs"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "imports"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "exports"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "route_handlers"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "cluster_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "centroid_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "qdrant_point_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "alias_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "ingest_source"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "created_at"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "updated_at"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "som_cluster"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "neo4j_node_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "nes_card_id"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "lane_ids"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "atlas_version"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "afm_indexed_at"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "source_kind"
-        },
-        {
-          "table_name": "cold_parent_atlas_cards",
-          "column_name": "cold_storage_ready"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "source_id"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "rel_path"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "file_path"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "feature_id"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "related_feature_ids"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "source_kind"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "line_count"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "is_route"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "is_svelte_comp"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "has_auth"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "has_zod"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "drizzle_refs"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "imports"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "exports"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "route_handlers"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "tags"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "som_cluster"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "centroid_id"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "qdrant_point_id"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "cluster_id"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "atlas_version"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "cold_storage_ready"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "karpathy_blend"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "pagerank_score"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "attention_score"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "feature_dominant_status"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "feature_avg_confidence"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "feature_primary_cluster"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "feature_behavior_score"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "has_vector"
-        },
-        {
-          "table_name": "cold_profile_card_candidates",
-          "column_name": "has_centroid"
-        },
-        {
-          "table_name": "cold_source_ref_rollups",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "cold_source_ref_rollups",
-          "column_name": "pagerank_score"
-        },
-        {
-          "table_name": "cold_source_ref_rollups",
-          "column_name": "karpathy_blend"
-        },
-        {
-          "table_name": "cold_source_ref_rollups",
-          "column_name": "attention_score"
-        }
-      ],
-      "actualFieldNames": [
-        "afm_indexed_at",
-        "alias_id",
-        "atlas_file_count",
-        "atlas_version",
-        "attention_score",
-        "avg_confidence",
-        "behavior_score",
-        "cache_hit",
-        "cache_tier",
-        "captured_at",
-        "centroid_id",
-        "cluster_id",
-        "cluster_ids",
-        "cold_storage_ready",
-        "created_at",
-        "dominant_status",
-        "drizzle_refs",
-        "exports",
-        "feature_avg_confidence",
-        "feature_behavior_score",
-        "feature_dominant_status",
-        "feature_id",
-        "feature_ids",
-        "feature_primary_cluster",
-        "file_ext",
-        "file_path",
-        "has_auth",
-        "has_blocked",
-        "has_centroid",
-        "has_vector",
-        "has_zod",
-        "id",
-        "imports",
-        "ingest_source",
-        "is_route",
-        "is_svelte_comp",
-        "karpathy_blend",
-        "lane_ids",
-        "latency_ms",
-        "line_count",
-        "max_confidence",
-        "neo4j_node_id",
-        "nes_card_id",
-        "next_actions",
-        "packet_count",
-        "pad_centroid_count",
-        "pad_file_count",
-        "pad_qdrant_count",
-        "pagerank_score",
-        "primary_centroid_id",
-        "primary_cluster_id",
-        "qdrant_hits",
-        "qdrant_point_count",
-        "qdrant_point_id",
-        "rel_path",
-        "related_feature_ids",
-        "route",
-        "route_handlers",
-        "runtime_hot_path_score",
-        "semantic_confidence",
-        "som_cluster",
-        "source_id",
-        "source_kind",
-        "source_ref",
-        "source_refs",
-        "synthesized_at",
-        "synthesized_summary",
-        "tags",
-        "top_file_paths",
-        "updated_at",
-        "workspace_id"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "source_ref",
-          "file_path"
-        ],
-        "feature_id": [
-          "feature_id",
-          "feature_ids"
-        ],
-        "qdrant_point_id": [
-          "qdrant_point_id",
-          "id"
-        ],
-        "neo4j_node": []
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "feature_id",
-        "qdrant_point_id"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "sourceRef"
-      ],
-      "expectedAliasesPresent": [
-        "feature_id",
-        "source_ref"
-      ]
-    },
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\atlas.duckdb",
-      "relPath": ".tmp/ingest/atlas.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
-        "views=none"
-      ],
-      "tables": [
-        "card_enriched",
-        "cluster_summary",
-        "edges_all",
-        "lane_summary",
-        "node_degree",
-        "node_degree_agg",
-        "nodes_all",
-        "parent_atlas_full",
-        "sourceref_patch"
-      ],
-      "views": [],
-      "columns": [
-        {
-          "table_name": "card_enriched",
-          "column_name": "card_id"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "title"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "sourceRef"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "som_row"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "som_col"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "som_index"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "reward_avg"
-        },
-        {
-          "table_name": "card_enriched",
-          "column_name": "reward_count"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "som_row"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "som_col"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "card_count"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "avg_reward"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "total_outcomes"
-        },
-        {
-          "table_name": "cluster_summary",
-          "column_name": "cards_with_rewards"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "lane"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "from_node_id"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "to_node_id"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "edge_type"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "weight"
-        },
-        {
-          "table_name": "edges_all",
-          "column_name": "column0"
-        },
-        {
-          "table_name": "lane_summary",
-          "column_name": "lane"
-        },
-        {
-          "table_name": "lane_summary",
-          "column_name": "node_count"
-        },
-        {
-          "table_name": "lane_summary",
-          "column_name": "unique_sources"
-        },
-        {
-          "table_name": "node_degree",
-          "column_name": "node_id"
-        },
-        {
-          "table_name": "node_degree",
-          "column_name": "out_degree"
-        },
-        {
-          "table_name": "node_degree_agg",
-          "column_name": "node_id"
-        },
-        {
-          "table_name": "node_degree_agg",
-          "column_name": "total_degree"
-        },
-        {
-          "table_name": "nodes_all",
-          "column_name": "lane"
-        },
-        {
-          "table_name": "nodes_all",
-          "column_name": "node_id"
-        },
-        {
-          "table_name": "nodes_all",
-          "column_name": "title"
-        },
-        {
-          "table_name": "nodes_all",
-          "column_name": "sourceRef"
-        },
-        {
-          "table_name": "nodes_all",
-          "column_name": "payload_json"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "lane"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "node_id"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "title"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "sourceRef"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "degree"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "som_row"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "som_col"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "som_index"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "reward_avg"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "reward_count"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "cluster_size"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "cluster_avg_reward"
-        },
-        {
-          "table_name": "parent_atlas_full",
-          "column_name": "payload_json"
-        },
-        {
-          "table_name": "sourceref_patch",
-          "column_name": "atlas_id"
-        },
-        {
-          "table_name": "sourceref_patch",
-          "column_name": "filePath"
-        },
-        {
-          "table_name": "sourceref_patch",
-          "column_name": "feature"
-        },
-        {
-          "table_name": "sourceref_patch",
-          "column_name": "import_errors"
-        }
-      ],
-      "actualFieldNames": [
-        "atlas_id",
-        "avg_reward",
-        "card_count",
-        "card_id",
-        "cards_with_rewards",
-        "cluster_avg_reward",
-        "cluster_size",
-        "column0",
-        "degree",
-        "edge_type",
-        "feature",
-        "filePath",
-        "from_node_id",
-        "import_errors",
-        "lane",
-        "node_count",
-        "node_id",
-        "out_degree",
-        "payload_json",
-        "reward_avg",
-        "reward_count",
-        "som_col",
-        "som_index",
-        "som_row",
-        "sourceRef",
-        "title",
-        "to_node_id",
-        "total_degree",
-        "total_outcomes",
-        "unique_sources",
-        "weight"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "sourceRef",
-          "filePath"
-        ],
-        "feature_id": [
-          "feature"
-        ],
-        "qdrant_point_id": [],
-        "neo4j_node": [
-          "node_id",
-          "filePath",
-          "sourceRef"
-        ]
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "feature_id",
-        "graph_node"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "feature_id",
-        "source_ref"
-      ],
-      "expectedAliasesPresent": [
-        "sourceRef"
-      ]
-    },
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\duckdb\\atlas.duckdb",
-      "relPath": "duckdb/atlas.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=cards_raw, outcomes_raw, training_examples",
-        "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
-      ],
-      "tables": [
-        "cards_raw",
-        "outcomes_raw",
-        "training_examples"
-      ],
-      "views": [
-        "atlas_cards_enriched",
-        "cluster_summary",
-        "parent_atlas_index"
-      ],
-      "columns": [
-        {
-          "table_name": "cards_raw",
-          "column_name": "id"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "sourceRef"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "kind"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "reward_count"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "reward_total"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "reward_avg"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "som_bmu_row"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "som_bmu_col"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "som_bmu_distance"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "vector64_compressed"
-        },
-        {
-          "table_name": "cards_raw",
-          "column_name": "created_at"
-        },
-        {
-          "table_name": "outcomes_raw",
-          "column_name": "id"
-        },
-        {
-          "table_name": "outcomes_raw",
-          "column_name": "cardId"
-        },
-        {
-          "table_name": "outcomes_raw",
-          "column_name": "reward"
-        },
-        {
-          "table_name": "outcomes_raw",
-          "column_name": "sourceRef"
-        },
-        {
-          "table_name": "outcomes_raw",
-          "column_name": "created_at"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "id"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "instruction"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "input"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "output"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "reward"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "som_cluster_row"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "som_cluster_col"
-        },
-        {
-          "table_name": "training_examples",
-          "column_name": "enrichment_phase"
-        }
-      ],
-      "actualFieldNames": [
-        "cardId",
-        "created_at",
-        "enrichment_phase",
-        "id",
-        "input",
-        "instruction",
-        "kind",
-        "output",
-        "reward",
-        "reward_avg",
-        "reward_count",
-        "reward_total",
-        "som_bmu_col",
-        "som_bmu_distance",
-        "som_bmu_row",
-        "som_cluster_col",
-        "som_cluster_row",
-        "sourceRef",
-        "vector64_compressed"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "sourceRef"
-        ],
-        "feature_id": [],
-        "qdrant_point_id": [
-          "id"
-        ],
-        "neo4j_node": [
-          "sourceRef"
-        ]
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "qdrant_point_id",
-        "graph_node"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "feature_id",
-        "source_ref"
-      ],
-      "expectedAliasesPresent": [
-        "sourceRef"
-      ]
-    },
-    {
-      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\data\\atlas-ml\\atlas-analytics.duckdb",
-      "relPath": "data/atlas-ml/atlas-analytics.duckdb",
-      "exists": true,
-      "status": "READY",
-      "evidence": [
-        "tables=domain_training_rows, snapshot_packets, test_packets",
-        "views=none"
-      ],
-      "tables": [
-        "domain_training_rows",
-        "snapshot_packets",
-        "test_packets"
-      ],
-      "views": [],
-      "columns": [
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "packet_key"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "label"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "text"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "source_group"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "content_hash"
-        },
-        {
-          "table_name": "domain_training_rows",
-          "column_name": "split_name"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "id"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "relative_path"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "content"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "legacy_domain"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "normalized_domain"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "normalized_domain_confidence"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "lexical_keywords"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "lexical_identifiers"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "lexical_symbols"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "lexical_imported_modules"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_symbol_name"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_symbol_kind"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_path"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_imports"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_calls"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "structural_exports"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "representation_id"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "representation_revision"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "embedding_digest"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "qdrant_vector_dim"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "content_embedding_768"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "kmeans_cluster"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "som_cluster"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "qdrant_point_id"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "page_rank_score"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "used_concepts"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "content_hash"
-        },
-        {
-          "table_name": "snapshot_packets",
-          "column_name": "summary_hash"
-        },
-        {
-          "table_name": "test_packets",
-          "column_name": "packet_key"
-        },
-        {
-          "table_name": "test_packets",
-          "column_name": "source_ref"
-        },
-        {
-          "table_name": "test_packets",
-          "column_name": "summary"
-        },
-        {
-          "table_name": "test_packets",
-          "column_name": "domain"
-        },
-        {
-          "table_name": "test_packets",
-          "column_name": "embedding_dim"
-        }
-      ],
-      "actualFieldNames": [
-        "content",
-        "content_embedding_768",
-        "content_hash",
-        "domain",
-        "embedding_digest",
-        "embedding_dim",
-        "id",
-        "kmeans_cluster",
-        "label",
-        "legacy_domain",
-        "lexical_identifiers",
-        "lexical_imported_modules",
-        "lexical_keywords",
-        "lexical_symbols",
-        "normalized_domain",
-        "normalized_domain_confidence",
-        "packet_key",
-        "page_rank_score",
-        "qdrant_point_id",
-        "qdrant_vector_dim",
-        "relative_path",
-        "representation_id",
-        "representation_revision",
-        "som_cluster",
-        "source_group",
-        "source_ref",
-        "split_name",
-        "structural_calls",
-        "structural_exports",
-        "structural_imports",
-        "structural_path",
-        "structural_symbol_kind",
-        "structural_symbol_name",
-        "summary",
-        "summary_hash",
-        "text",
-        "used_concepts"
-      ],
-      "aliasFamilies": {
-        "source_ref": [
-          "source_ref",
-          "relative_path"
-        ],
-        "feature_id": [],
-        "qdrant_point_id": [
-          "qdrant_point_id",
-          "id"
-        ],
-        "neo4j_node": []
-      },
-      "canonicalJoins": [
-        "source_ref",
-        "qdrant_point_id"
-      ],
-      "expectedAliasesMissing": [
-        "featureId",
-        "feature_id",
-        "sourceRef"
-      ],
-      "expectedAliasesPresent": [
-        "source_ref"
-      ]
-    },
     {
       "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\offline-synthesis-mapreduce.duckdb",
       "relPath": "docs/reports/offline-synthesis-mapreduce.duckdb",
@@ -3014,6 +1595,1425 @@
       ]
     },
     {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\offline-synthesis-mapreduce.duckdb",
+      "relPath": ".tmp/offline-synthesis-mapreduce.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
+        "views=none"
+      ],
+      "tables": [
+        "cold_feature_rollups",
+        "cold_hot_path_rollups",
+        "cold_parent_atlas_cards",
+        "cold_profile_card_candidates",
+        "cold_source_ref_rollups"
+      ],
+      "views": [],
+      "columns": [
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "feature_id"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "packet_count"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "atlas_file_count"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "qdrant_point_count"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "avg_confidence"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "max_confidence"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "semantic_confidence"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "behavior_score"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "primary_cluster_id"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "primary_centroid_id"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "cluster_ids"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "top_file_paths"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "source_refs"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "synthesized_summary"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "next_actions"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "dominant_status"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "has_blocked"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "atlas_version"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "synthesized_at"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "updated_at"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "pad_file_count"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "pad_qdrant_count"
+        },
+        {
+          "table_name": "cold_feature_rollups",
+          "column_name": "pad_centroid_count"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "id"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "route"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "latency_ms"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "captured_at"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "source_refs"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "feature_ids"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "qdrant_hits"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "cache_hit"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "cache_tier"
+        },
+        {
+          "table_name": "cold_hot_path_rollups",
+          "column_name": "runtime_hot_path_score"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "source_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "rel_path"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "file_path"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "feature_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "related_feature_ids"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "workspace_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "file_ext"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "tags"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "line_count"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "is_route"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "is_svelte_comp"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "has_auth"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "has_zod"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "drizzle_refs"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "imports"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "exports"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "route_handlers"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "cluster_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "centroid_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "qdrant_point_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "alias_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "ingest_source"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "created_at"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "updated_at"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "som_cluster"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "neo4j_node_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "nes_card_id"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "lane_ids"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "atlas_version"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "afm_indexed_at"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "source_kind"
+        },
+        {
+          "table_name": "cold_parent_atlas_cards",
+          "column_name": "cold_storage_ready"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "source_id"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "rel_path"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "file_path"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "feature_id"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "related_feature_ids"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "source_kind"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "line_count"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "is_route"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "is_svelte_comp"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "has_auth"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "has_zod"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "drizzle_refs"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "imports"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "exports"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "route_handlers"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "tags"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "som_cluster"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "centroid_id"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "qdrant_point_id"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "cluster_id"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "atlas_version"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "cold_storage_ready"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "karpathy_blend"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "pagerank_score"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "attention_score"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "feature_dominant_status"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "feature_avg_confidence"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "feature_primary_cluster"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "feature_behavior_score"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "has_vector"
+        },
+        {
+          "table_name": "cold_profile_card_candidates",
+          "column_name": "has_centroid"
+        },
+        {
+          "table_name": "cold_source_ref_rollups",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "cold_source_ref_rollups",
+          "column_name": "pagerank_score"
+        },
+        {
+          "table_name": "cold_source_ref_rollups",
+          "column_name": "karpathy_blend"
+        },
+        {
+          "table_name": "cold_source_ref_rollups",
+          "column_name": "attention_score"
+        }
+      ],
+      "actualFieldNames": [
+        "afm_indexed_at",
+        "alias_id",
+        "atlas_file_count",
+        "atlas_version",
+        "attention_score",
+        "avg_confidence",
+        "behavior_score",
+        "cache_hit",
+        "cache_tier",
+        "captured_at",
+        "centroid_id",
+        "cluster_id",
+        "cluster_ids",
+        "cold_storage_ready",
+        "created_at",
+        "dominant_status",
+        "drizzle_refs",
+        "exports",
+        "feature_avg_confidence",
+        "feature_behavior_score",
+        "feature_dominant_status",
+        "feature_id",
+        "feature_ids",
+        "feature_primary_cluster",
+        "file_ext",
+        "file_path",
+        "has_auth",
+        "has_blocked",
+        "has_centroid",
+        "has_vector",
+        "has_zod",
+        "id",
+        "imports",
+        "ingest_source",
+        "is_route",
+        "is_svelte_comp",
+        "karpathy_blend",
+        "lane_ids",
+        "latency_ms",
+        "line_count",
+        "max_confidence",
+        "neo4j_node_id",
+        "nes_card_id",
+        "next_actions",
+        "packet_count",
+        "pad_centroid_count",
+        "pad_file_count",
+        "pad_qdrant_count",
+        "pagerank_score",
+        "primary_centroid_id",
+        "primary_cluster_id",
+        "qdrant_hits",
+        "qdrant_point_count",
+        "qdrant_point_id",
+        "rel_path",
+        "related_feature_ids",
+        "route",
+        "route_handlers",
+        "runtime_hot_path_score",
+        "semantic_confidence",
+        "som_cluster",
+        "source_id",
+        "source_kind",
+        "source_ref",
+        "source_refs",
+        "synthesized_at",
+        "synthesized_summary",
+        "tags",
+        "top_file_paths",
+        "updated_at",
+        "workspace_id"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "source_ref",
+          "file_path"
+        ],
+        "feature_id": [
+          "feature_id",
+          "feature_ids"
+        ],
+        "qdrant_point_id": [
+          "qdrant_point_id",
+          "id"
+        ],
+        "neo4j_node": []
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "feature_id",
+        "qdrant_point_id"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "sourceRef"
+      ],
+      "expectedAliasesPresent": [
+        "feature_id",
+        "source_ref"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\atlas.duckdb",
+      "relPath": ".tmp/ingest/atlas.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
+        "views=none"
+      ],
+      "tables": [
+        "card_enriched",
+        "cluster_summary",
+        "edges_all",
+        "lane_summary",
+        "node_degree",
+        "node_degree_agg",
+        "nodes_all",
+        "parent_atlas_full",
+        "sourceref_patch"
+      ],
+      "views": [],
+      "columns": [
+        {
+          "table_name": "card_enriched",
+          "column_name": "card_id"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "title"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "sourceRef"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "som_row"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "som_col"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "som_index"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "reward_avg"
+        },
+        {
+          "table_name": "card_enriched",
+          "column_name": "reward_count"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "som_row"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "som_col"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "card_count"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "avg_reward"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "total_outcomes"
+        },
+        {
+          "table_name": "cluster_summary",
+          "column_name": "cards_with_rewards"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "lane"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "from_node_id"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "to_node_id"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "edge_type"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "weight"
+        },
+        {
+          "table_name": "edges_all",
+          "column_name": "column0"
+        },
+        {
+          "table_name": "lane_summary",
+          "column_name": "lane"
+        },
+        {
+          "table_name": "lane_summary",
+          "column_name": "node_count"
+        },
+        {
+          "table_name": "lane_summary",
+          "column_name": "unique_sources"
+        },
+        {
+          "table_name": "node_degree",
+          "column_name": "node_id"
+        },
+        {
+          "table_name": "node_degree",
+          "column_name": "out_degree"
+        },
+        {
+          "table_name": "node_degree_agg",
+          "column_name": "node_id"
+        },
+        {
+          "table_name": "node_degree_agg",
+          "column_name": "total_degree"
+        },
+        {
+          "table_name": "nodes_all",
+          "column_name": "lane"
+        },
+        {
+          "table_name": "nodes_all",
+          "column_name": "node_id"
+        },
+        {
+          "table_name": "nodes_all",
+          "column_name": "title"
+        },
+        {
+          "table_name": "nodes_all",
+          "column_name": "sourceRef"
+        },
+        {
+          "table_name": "nodes_all",
+          "column_name": "payload_json"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "lane"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "node_id"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "title"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "sourceRef"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "degree"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "som_row"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "som_col"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "som_index"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "reward_avg"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "reward_count"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "cluster_size"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "cluster_avg_reward"
+        },
+        {
+          "table_name": "parent_atlas_full",
+          "column_name": "payload_json"
+        },
+        {
+          "table_name": "sourceref_patch",
+          "column_name": "atlas_id"
+        },
+        {
+          "table_name": "sourceref_patch",
+          "column_name": "filePath"
+        },
+        {
+          "table_name": "sourceref_patch",
+          "column_name": "feature"
+        },
+        {
+          "table_name": "sourceref_patch",
+          "column_name": "import_errors"
+        }
+      ],
+      "actualFieldNames": [
+        "atlas_id",
+        "avg_reward",
+        "card_count",
+        "card_id",
+        "cards_with_rewards",
+        "cluster_avg_reward",
+        "cluster_size",
+        "column0",
+        "degree",
+        "edge_type",
+        "feature",
+        "filePath",
+        "from_node_id",
+        "import_errors",
+        "lane",
+        "node_count",
+        "node_id",
+        "out_degree",
+        "payload_json",
+        "reward_avg",
+        "reward_count",
+        "som_col",
+        "som_index",
+        "som_row",
+        "sourceRef",
+        "title",
+        "to_node_id",
+        "total_degree",
+        "total_outcomes",
+        "unique_sources",
+        "weight"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "sourceRef",
+          "filePath"
+        ],
+        "feature_id": [
+          "feature"
+        ],
+        "qdrant_point_id": [],
+        "neo4j_node": [
+          "node_id",
+          "filePath",
+          "sourceRef"
+        ]
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "feature_id",
+        "graph_node"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "feature_id",
+        "source_ref"
+      ],
+      "expectedAliasesPresent": [
+        "sourceRef"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-snapshot-5k-768.duckdb",
+      "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-snapshot-5k-768.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=vector_snapshot_packets_5k_768",
+        "views=none"
+      ],
+      "tables": [
+        "vector_snapshot_packets_5k_768"
+      ],
+      "views": [],
+      "columns": [
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "packet_key"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "feature_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "title_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "summary"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "legacy_domain"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "normalized_domain"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "representation_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "representation_revision"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "embedding_digest"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "qdrant_vector_dim"
+        },
+        {
+          "table_name": "vector_snapshot_packets_5k_768",
+          "column_name": "semantic_embedding_768"
+        }
+      ],
+      "actualFieldNames": [
+        "embedding_digest",
+        "feature_id",
+        "legacy_domain",
+        "normalized_domain",
+        "packet_key",
+        "qdrant_vector_dim",
+        "representation_id",
+        "representation_revision",
+        "semantic_embedding_768",
+        "source_ref",
+        "summary",
+        "title_id"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "source_ref"
+        ],
+        "feature_id": [
+          "feature_id"
+        ],
+        "qdrant_point_id": [],
+        "neo4j_node": []
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "feature_id"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "sourceRef"
+      ],
+      "expectedAliasesPresent": [
+        "feature_id",
+        "source_ref"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-index-lanes.duckdb",
+      "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-index-lanes.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=vector_snapshot_packets",
+        "views=none"
+      ],
+      "tables": [
+        "vector_snapshot_packets"
+      ],
+      "views": [],
+      "columns": [
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "packet_key"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "feature_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "title_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "summary"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "legacy_domain"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "normalized_domain"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "representation_id"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "representation_revision"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "embedding_digest"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "qdrant_vector_dim"
+        },
+        {
+          "table_name": "vector_snapshot_packets",
+          "column_name": "semantic_embedding_768"
+        }
+      ],
+      "actualFieldNames": [
+        "embedding_digest",
+        "feature_id",
+        "legacy_domain",
+        "normalized_domain",
+        "packet_key",
+        "qdrant_vector_dim",
+        "representation_id",
+        "representation_revision",
+        "semantic_embedding_768",
+        "source_ref",
+        "summary",
+        "title_id"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "source_ref"
+        ],
+        "feature_id": [
+          "feature_id"
+        ],
+        "qdrant_point_id": [],
+        "neo4j_node": []
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "feature_id"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "sourceRef"
+      ],
+      "expectedAliasesPresent": [
+        "feature_id",
+        "source_ref"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\data\\atlas-ml\\atlas-analytics.duckdb",
+      "relPath": "data/atlas-ml/atlas-analytics.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=domain_training_rows, snapshot_packets, test_packets",
+        "views=none"
+      ],
+      "tables": [
+        "domain_training_rows",
+        "snapshot_packets",
+        "test_packets"
+      ],
+      "views": [],
+      "columns": [
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "packet_key"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "label"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "text"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "source_group"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "content_hash"
+        },
+        {
+          "table_name": "domain_training_rows",
+          "column_name": "split_name"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "id"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "relative_path"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "content"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "legacy_domain"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "normalized_domain"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "normalized_domain_confidence"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "lexical_keywords"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "lexical_identifiers"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "lexical_symbols"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "lexical_imported_modules"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_symbol_name"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_symbol_kind"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_path"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_imports"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_calls"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "structural_exports"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "representation_id"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "representation_revision"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "embedding_digest"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "qdrant_vector_dim"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "content_embedding_768"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "kmeans_cluster"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "som_cluster"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "qdrant_point_id"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "page_rank_score"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "used_concepts"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "content_hash"
+        },
+        {
+          "table_name": "snapshot_packets",
+          "column_name": "summary_hash"
+        },
+        {
+          "table_name": "test_packets",
+          "column_name": "packet_key"
+        },
+        {
+          "table_name": "test_packets",
+          "column_name": "source_ref"
+        },
+        {
+          "table_name": "test_packets",
+          "column_name": "summary"
+        },
+        {
+          "table_name": "test_packets",
+          "column_name": "domain"
+        },
+        {
+          "table_name": "test_packets",
+          "column_name": "embedding_dim"
+        }
+      ],
+      "actualFieldNames": [
+        "content",
+        "content_embedding_768",
+        "content_hash",
+        "domain",
+        "embedding_digest",
+        "embedding_dim",
+        "id",
+        "kmeans_cluster",
+        "label",
+        "legacy_domain",
+        "lexical_identifiers",
+        "lexical_imported_modules",
+        "lexical_keywords",
+        "lexical_symbols",
+        "normalized_domain",
+        "normalized_domain_confidence",
+        "packet_key",
+        "page_rank_score",
+        "qdrant_point_id",
+        "qdrant_vector_dim",
+        "relative_path",
+        "representation_id",
+        "representation_revision",
+        "som_cluster",
+        "source_group",
+        "source_ref",
+        "split_name",
+        "structural_calls",
+        "structural_exports",
+        "structural_imports",
+        "structural_path",
+        "structural_symbol_kind",
+        "structural_symbol_name",
+        "summary",
+        "summary_hash",
+        "text",
+        "used_concepts"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "source_ref",
+          "relative_path"
+        ],
+        "feature_id": [],
+        "qdrant_point_id": [
+          "qdrant_point_id",
+          "id"
+        ],
+        "neo4j_node": []
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "qdrant_point_id"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "feature_id",
+        "sourceRef"
+      ],
+      "expectedAliasesPresent": [
+        "source_ref"
+      ]
+    },
+    {
+      "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\duckdb\\atlas.duckdb",
+      "relPath": "duckdb/atlas.duckdb",
+      "exists": true,
+      "status": "READY",
+      "evidence": [
+        "tables=cards_raw, outcomes_raw, training_examples",
+        "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
+      ],
+      "tables": [
+        "cards_raw",
+        "outcomes_raw",
+        "training_examples"
+      ],
+      "views": [
+        "atlas_cards_enriched",
+        "cluster_summary",
+        "parent_atlas_index"
+      ],
+      "columns": [
+        {
+          "table_name": "cards_raw",
+          "column_name": "id"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "sourceRef"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "kind"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "reward_count"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "reward_total"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "reward_avg"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "som_bmu_row"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "som_bmu_col"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "som_bmu_distance"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "vector64_compressed"
+        },
+        {
+          "table_name": "cards_raw",
+          "column_name": "created_at"
+        },
+        {
+          "table_name": "outcomes_raw",
+          "column_name": "id"
+        },
+        {
+          "table_name": "outcomes_raw",
+          "column_name": "cardId"
+        },
+        {
+          "table_name": "outcomes_raw",
+          "column_name": "reward"
+        },
+        {
+          "table_name": "outcomes_raw",
+          "column_name": "sourceRef"
+        },
+        {
+          "table_name": "outcomes_raw",
+          "column_name": "created_at"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "id"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "instruction"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "input"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "output"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "reward"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "som_cluster_row"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "som_cluster_col"
+        },
+        {
+          "table_name": "training_examples",
+          "column_name": "enrichment_phase"
+        }
+      ],
+      "actualFieldNames": [
+        "cardId",
+        "created_at",
+        "enrichment_phase",
+        "id",
+        "input",
+        "instruction",
+        "kind",
+        "output",
+        "reward",
+        "reward_avg",
+        "reward_count",
+        "reward_total",
+        "som_bmu_col",
+        "som_bmu_distance",
+        "som_bmu_row",
+        "som_cluster_col",
+        "som_cluster_row",
+        "sourceRef",
+        "vector64_compressed"
+      ],
+      "aliasFamilies": {
+        "source_ref": [
+          "sourceRef"
+        ],
+        "feature_id": [],
+        "qdrant_point_id": [
+          "id"
+        ],
+        "neo4j_node": [
+          "sourceRef"
+        ]
+      },
+      "canonicalJoins": [
+        "source_ref",
+        "qdrant_point_id",
+        "graph_node"
+      ],
+      "expectedAliasesMissing": [
+        "featureId",
+        "feature_id",
+        "source_ref"
+      ],
+      "expectedAliasesPresent": [
+        "sourceRef"
+      ]
+    },
+    {
       "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\feature-card.duckdb",
       "relPath": "sveltekit-frontend/docs/reports/feature-card.duckdb",
       "exists": true,
@@ -3773,7 +3773,7 @@
           "primary_cluster_id"
         ],
         "sourceUnavailable": false,
-        "dataAbsent": true,
+        "dataAbsent": false,
         "materializationMissing": false,
         "fieldNameMismatch": true,
         "ready": false
@@ -3869,52 +3869,122 @@
         "purpose": "Offline analytical joins / rollups",
         "status": "READY",
         "evidence": [
-          "tables=vector_snapshot_packets_5k_768",
+          "tables=atlas_feature_map, mapreduce_consolidated_index, mapreduce_consolidated_index_meta",
           "views=none",
-          "tables=vector_snapshot_packets",
+          "tables=hidden_packet_pathmap, hidden_packet_pathmap_summary",
+          "views=none",
+          "tables=agg_facts, agg_rewards, agg_source_refs, agg_tokens, edges, facts, packets, raw_edges, raw_facts, raw_packets, raw_rewards, raw_token_map",
           "views=none",
           "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
           "views=none",
           "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
-          "views=none",
-          "tables=cards_raw, outcomes_raw, training_examples",
-          "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
+          "views=none"
         ],
         "actualFieldNames": [
-          "embedding_digest",
-          "feature_id",
-          "legacy_domain",
-          "normalized_domain",
-          "packet_key",
-          "qdrant_vector_dim",
-          "representation_id",
-          "representation_revision",
-          "semantic_embedding_768",
-          "source_ref",
-          "summary",
-          "title_id",
-          "afm_indexed_at",
-          "alias_id",
-          "atlas_file_count",
           "atlas_version",
-          "attention_score",
-          "avg_confidence",
-          "behavior_score",
+          "centroid_id",
+          "cluster_id",
+          "colocatedFiles",
+          "contentHash",
+          "directory",
+          "dynamicImports",
+          "dynamic_imports",
+          "extension",
+          "extensions",
+          "feature",
+          "feature_id",
+          "features",
+          "fileName",
+          "filePath",
+          "importErrorCount",
+          "indexed_at",
+          "keywords",
+          "lane_ids",
+          "lastScanned",
+          "lines",
+          "metadata",
+          "neo4j_node_id",
+          "nes_card_id",
+          "normalized_path",
+          "qdrant_point_id",
+          "related_feature_ids",
+          "resolvedDynamicImports",
+          "resolvedStaticImports",
+          "rows",
+          "semanticMarkers",
+          "size",
+          "som_cluster",
+          "source_id",
+          "source_ref",
+          "stableKey",
+          "staticImports",
+          "static_imports",
+          "bucket",
+          "bucket_rows",
+          "description",
+          "duckdb_rows",
+          "feature_ids",
+          "feature_key",
+          "file",
+          "joined_rows",
+          "line_number",
+          "packet_kind",
+          "path",
+          "pathmap_root",
+          "section",
+          "source",
+          "source_ref_joins",
+          "source_refs",
+          "stable_id",
+          "stable_id_joins",
+          "status",
+          "task_id",
+          "title",
+          "todo_source_ref_rows",
+          "answer_hint",
           "cache_hit",
           "cache_tier",
           "captured_at",
-          "centroid_id",
-          "cluster_id",
+          "confidence",
+          "created_at",
+          "dst",
+          "edge_type",
+          "fact_key",
+          "fact_type",
+          "fact_value",
+          "id",
+          "latency_ms",
+          "packet_id",
+          "packet_uuid",
+          "prompt_hash",
+          "qdrant_hits",
+          "query_hash",
+          "redis_hot_keys",
+          "reward",
+          "reward_samples",
+          "route",
+          "route_state",
+          "score",
+          "scored_at",
+          "source_ref_count",
+          "src",
+          "token_hint",
+          "token_hints",
+          "weight",
+          "afm_indexed_at",
+          "alias_id",
+          "atlas_file_count",
+          "attention_score",
+          "avg_confidence",
+          "behavior_score",
           "cluster_ids",
           "cold_storage_ready",
-          "created_at",
           "dominant_status",
           "drizzle_refs",
           "exports",
           "feature_avg_confidence",
           "feature_behavior_score",
           "feature_dominant_status",
-          "feature_ids",
           "feature_primary_cluster",
           "file_ext",
           "file_path",
@@ -3923,18 +3993,13 @@
           "has_centroid",
           "has_vector",
           "has_zod",
-          "id",
           "imports",
           "ingest_source",
           "is_route",
           "is_svelte_comp",
           "karpathy_blend",
-          "lane_ids",
-          "latency_ms",
           "line_count",
           "max_confidence",
-          "neo4j_node_id",
-          "nes_card_id",
           "next_actions",
           "packet_count",
           "pad_centroid_count",
@@ -3943,19 +4008,12 @@
           "pagerank_score",
           "primary_centroid_id",
           "primary_cluster_id",
-          "qdrant_hits",
           "qdrant_point_count",
-          "qdrant_point_id",
           "rel_path",
-          "related_feature_ids",
-          "route",
           "route_handlers",
           "runtime_hot_path_score",
           "semantic_confidence",
-          "som_cluster",
-          "source_id",
           "source_kind",
-          "source_refs",
           "synthesized_at",
           "synthesized_summary",
           "tags",
@@ -3971,9 +4029,6 @@
           "cluster_size",
           "column0",
           "degree",
-          "edge_type",
-          "feature",
-          "filePath",
           "from_node_id",
           "import_errors",
           "lane",
@@ -3987,26 +4042,20 @@
           "som_index",
           "som_row",
           "sourceRef",
-          "title",
           "to_node_id",
           "total_degree",
           "total_outcomes",
           "unique_sources",
-          "weight",
-          "cardId",
-          "enrichment_phase",
-          "input",
-          "instruction",
-          "kind",
-          "output",
-          "reward",
-          "reward_total",
-          "som_bmu_col",
-          "som_bmu_distance",
-          "som_bmu_row",
-          "som_cluster_col",
-          "som_cluster_row",
-          "vector64_compressed",
+          "embedding_digest",
+          "legacy_domain",
+          "normalized_domain",
+          "packet_key",
+          "qdrant_vector_dim",
+          "representation_id",
+          "representation_revision",
+          "semantic_embedding_768",
+          "summary",
+          "title_id",
           "content",
           "content_embedding_768",
           "content_hash",
@@ -4032,68 +4081,19 @@
           "summary_hash",
           "text",
           "used_concepts",
-          "colocatedFiles",
-          "contentHash",
-          "directory",
-          "dynamicImports",
-          "dynamic_imports",
-          "extension",
-          "extensions",
-          "features",
-          "fileName",
-          "importErrorCount",
-          "indexed_at",
-          "keywords",
-          "lastScanned",
-          "lines",
-          "metadata",
-          "normalized_path",
-          "resolvedDynamicImports",
-          "resolvedStaticImports",
-          "rows",
-          "semanticMarkers",
-          "size",
-          "stableKey",
-          "staticImports",
-          "static_imports",
-          "bucket",
-          "bucket_rows",
-          "description",
-          "duckdb_rows",
-          "feature_key",
-          "file",
-          "joined_rows",
-          "line_number",
-          "packet_kind",
-          "path",
-          "pathmap_root",
-          "section",
-          "source",
-          "source_ref_joins",
-          "stable_id",
-          "stable_id_joins",
-          "status",
-          "task_id",
-          "todo_source_ref_rows",
-          "answer_hint",
-          "confidence",
-          "dst",
-          "fact_key",
-          "fact_type",
-          "fact_value",
-          "packet_id",
-          "packet_uuid",
-          "prompt_hash",
-          "query_hash",
-          "redis_hot_keys",
-          "reward_samples",
-          "route_state",
-          "score",
-          "scored_at",
-          "source_ref_count",
-          "src",
-          "token_hint",
-          "token_hints",
+          "cardId",
+          "enrichment_phase",
+          "input",
+          "instruction",
+          "kind",
+          "output",
+          "reward_total",
+          "som_bmu_col",
+          "som_bmu_distance",
+          "som_bmu_row",
+          "som_cluster_col",
+          "som_cluster_row",
+          "vector64_compressed",
           "labels",
           "payload",
           "score_authority",
@@ -4106,8 +4106,8 @@
         "expectedAliasesMissing": [
           "featureId",
           "sourceRef",
-          "feature_id",
-          "source_ref"
+          "source_ref",
+          "feature_id"
         ],
         "expectedAliasesPresent": [
           "feature_id",
@@ -4314,1425 +4314,6 @@
       "featureIdHits": "0"
     },
     "duckdbInventory": [
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-snapshot-5k-768.duckdb",
-        "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-snapshot-5k-768.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=vector_snapshot_packets_5k_768",
-          "views=none"
-        ],
-        "tables": [
-          "vector_snapshot_packets_5k_768"
-        ],
-        "views": [],
-        "columns": [
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "packet_key"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "feature_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "title_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "summary"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "legacy_domain"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "normalized_domain"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "representation_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "representation_revision"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "embedding_digest"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "qdrant_vector_dim"
-          },
-          {
-            "table_name": "vector_snapshot_packets_5k_768",
-            "column_name": "semantic_embedding_768"
-          }
-        ],
-        "actualFieldNames": [
-          "embedding_digest",
-          "feature_id",
-          "legacy_domain",
-          "normalized_domain",
-          "packet_key",
-          "qdrant_vector_dim",
-          "representation_id",
-          "representation_revision",
-          "semantic_embedding_768",
-          "source_ref",
-          "summary",
-          "title_id"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "source_ref"
-          ],
-          "feature_id": [
-            "feature_id"
-          ],
-          "qdrant_point_id": [],
-          "neo4j_node": []
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "feature_id"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "sourceRef"
-        ],
-        "expectedAliasesPresent": [
-          "feature_id",
-          "source_ref"
-        ]
-      },
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-index-lanes.duckdb",
-        "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-index-lanes.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=vector_snapshot_packets",
-          "views=none"
-        ],
-        "tables": [
-          "vector_snapshot_packets"
-        ],
-        "views": [],
-        "columns": [
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "packet_key"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "feature_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "title_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "summary"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "legacy_domain"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "normalized_domain"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "representation_id"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "representation_revision"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "embedding_digest"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "qdrant_vector_dim"
-          },
-          {
-            "table_name": "vector_snapshot_packets",
-            "column_name": "semantic_embedding_768"
-          }
-        ],
-        "actualFieldNames": [
-          "embedding_digest",
-          "feature_id",
-          "legacy_domain",
-          "normalized_domain",
-          "packet_key",
-          "qdrant_vector_dim",
-          "representation_id",
-          "representation_revision",
-          "semantic_embedding_768",
-          "source_ref",
-          "summary",
-          "title_id"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "source_ref"
-          ],
-          "feature_id": [
-            "feature_id"
-          ],
-          "qdrant_point_id": [],
-          "neo4j_node": []
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "feature_id"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "sourceRef"
-        ],
-        "expectedAliasesPresent": [
-          "feature_id",
-          "source_ref"
-        ]
-      },
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\offline-synthesis-mapreduce.duckdb",
-        "relPath": ".tmp/offline-synthesis-mapreduce.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
-          "views=none"
-        ],
-        "tables": [
-          "cold_feature_rollups",
-          "cold_hot_path_rollups",
-          "cold_parent_atlas_cards",
-          "cold_profile_card_candidates",
-          "cold_source_ref_rollups"
-        ],
-        "views": [],
-        "columns": [
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "feature_id"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "packet_count"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "atlas_file_count"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "qdrant_point_count"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "avg_confidence"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "max_confidence"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "semantic_confidence"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "behavior_score"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "primary_cluster_id"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "primary_centroid_id"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "cluster_ids"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "top_file_paths"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "source_refs"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "synthesized_summary"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "next_actions"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "dominant_status"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "has_blocked"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "atlas_version"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "synthesized_at"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "updated_at"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "pad_file_count"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "pad_qdrant_count"
-          },
-          {
-            "table_name": "cold_feature_rollups",
-            "column_name": "pad_centroid_count"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "id"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "route"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "latency_ms"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "captured_at"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "source_refs"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "feature_ids"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "qdrant_hits"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "cache_hit"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "cache_tier"
-          },
-          {
-            "table_name": "cold_hot_path_rollups",
-            "column_name": "runtime_hot_path_score"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "source_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "rel_path"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "file_path"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "feature_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "related_feature_ids"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "workspace_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "file_ext"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "tags"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "line_count"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "is_route"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "is_svelte_comp"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "has_auth"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "has_zod"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "drizzle_refs"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "imports"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "exports"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "route_handlers"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "cluster_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "centroid_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "qdrant_point_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "alias_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "ingest_source"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "created_at"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "updated_at"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "som_cluster"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "neo4j_node_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "nes_card_id"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "lane_ids"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "atlas_version"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "afm_indexed_at"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "source_kind"
-          },
-          {
-            "table_name": "cold_parent_atlas_cards",
-            "column_name": "cold_storage_ready"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "source_id"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "rel_path"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "file_path"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "feature_id"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "related_feature_ids"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "source_kind"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "line_count"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "is_route"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "is_svelte_comp"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "has_auth"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "has_zod"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "drizzle_refs"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "imports"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "exports"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "route_handlers"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "tags"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "som_cluster"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "centroid_id"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "qdrant_point_id"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "cluster_id"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "atlas_version"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "cold_storage_ready"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "karpathy_blend"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "pagerank_score"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "attention_score"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "feature_dominant_status"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "feature_avg_confidence"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "feature_primary_cluster"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "feature_behavior_score"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "has_vector"
-          },
-          {
-            "table_name": "cold_profile_card_candidates",
-            "column_name": "has_centroid"
-          },
-          {
-            "table_name": "cold_source_ref_rollups",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "cold_source_ref_rollups",
-            "column_name": "pagerank_score"
-          },
-          {
-            "table_name": "cold_source_ref_rollups",
-            "column_name": "karpathy_blend"
-          },
-          {
-            "table_name": "cold_source_ref_rollups",
-            "column_name": "attention_score"
-          }
-        ],
-        "actualFieldNames": [
-          "afm_indexed_at",
-          "alias_id",
-          "atlas_file_count",
-          "atlas_version",
-          "attention_score",
-          "avg_confidence",
-          "behavior_score",
-          "cache_hit",
-          "cache_tier",
-          "captured_at",
-          "centroid_id",
-          "cluster_id",
-          "cluster_ids",
-          "cold_storage_ready",
-          "created_at",
-          "dominant_status",
-          "drizzle_refs",
-          "exports",
-          "feature_avg_confidence",
-          "feature_behavior_score",
-          "feature_dominant_status",
-          "feature_id",
-          "feature_ids",
-          "feature_primary_cluster",
-          "file_ext",
-          "file_path",
-          "has_auth",
-          "has_blocked",
-          "has_centroid",
-          "has_vector",
-          "has_zod",
-          "id",
-          "imports",
-          "ingest_source",
-          "is_route",
-          "is_svelte_comp",
-          "karpathy_blend",
-          "lane_ids",
-          "latency_ms",
-          "line_count",
-          "max_confidence",
-          "neo4j_node_id",
-          "nes_card_id",
-          "next_actions",
-          "packet_count",
-          "pad_centroid_count",
-          "pad_file_count",
-          "pad_qdrant_count",
-          "pagerank_score",
-          "primary_centroid_id",
-          "primary_cluster_id",
-          "qdrant_hits",
-          "qdrant_point_count",
-          "qdrant_point_id",
-          "rel_path",
-          "related_feature_ids",
-          "route",
-          "route_handlers",
-          "runtime_hot_path_score",
-          "semantic_confidence",
-          "som_cluster",
-          "source_id",
-          "source_kind",
-          "source_ref",
-          "source_refs",
-          "synthesized_at",
-          "synthesized_summary",
-          "tags",
-          "top_file_paths",
-          "updated_at",
-          "workspace_id"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "source_ref",
-            "file_path"
-          ],
-          "feature_id": [
-            "feature_id",
-            "feature_ids"
-          ],
-          "qdrant_point_id": [
-            "qdrant_point_id",
-            "id"
-          ],
-          "neo4j_node": []
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "feature_id",
-          "qdrant_point_id"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "sourceRef"
-        ],
-        "expectedAliasesPresent": [
-          "feature_id",
-          "source_ref"
-        ]
-      },
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\atlas.duckdb",
-        "relPath": ".tmp/ingest/atlas.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
-          "views=none"
-        ],
-        "tables": [
-          "card_enriched",
-          "cluster_summary",
-          "edges_all",
-          "lane_summary",
-          "node_degree",
-          "node_degree_agg",
-          "nodes_all",
-          "parent_atlas_full",
-          "sourceref_patch"
-        ],
-        "views": [],
-        "columns": [
-          {
-            "table_name": "card_enriched",
-            "column_name": "card_id"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "title"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "sourceRef"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "som_row"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "som_col"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "som_index"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "reward_avg"
-          },
-          {
-            "table_name": "card_enriched",
-            "column_name": "reward_count"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "som_row"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "som_col"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "card_count"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "avg_reward"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "total_outcomes"
-          },
-          {
-            "table_name": "cluster_summary",
-            "column_name": "cards_with_rewards"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "lane"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "from_node_id"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "to_node_id"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "edge_type"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "weight"
-          },
-          {
-            "table_name": "edges_all",
-            "column_name": "column0"
-          },
-          {
-            "table_name": "lane_summary",
-            "column_name": "lane"
-          },
-          {
-            "table_name": "lane_summary",
-            "column_name": "node_count"
-          },
-          {
-            "table_name": "lane_summary",
-            "column_name": "unique_sources"
-          },
-          {
-            "table_name": "node_degree",
-            "column_name": "node_id"
-          },
-          {
-            "table_name": "node_degree",
-            "column_name": "out_degree"
-          },
-          {
-            "table_name": "node_degree_agg",
-            "column_name": "node_id"
-          },
-          {
-            "table_name": "node_degree_agg",
-            "column_name": "total_degree"
-          },
-          {
-            "table_name": "nodes_all",
-            "column_name": "lane"
-          },
-          {
-            "table_name": "nodes_all",
-            "column_name": "node_id"
-          },
-          {
-            "table_name": "nodes_all",
-            "column_name": "title"
-          },
-          {
-            "table_name": "nodes_all",
-            "column_name": "sourceRef"
-          },
-          {
-            "table_name": "nodes_all",
-            "column_name": "payload_json"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "lane"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "node_id"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "title"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "sourceRef"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "degree"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "som_row"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "som_col"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "som_index"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "reward_avg"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "reward_count"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "cluster_size"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "cluster_avg_reward"
-          },
-          {
-            "table_name": "parent_atlas_full",
-            "column_name": "payload_json"
-          },
-          {
-            "table_name": "sourceref_patch",
-            "column_name": "atlas_id"
-          },
-          {
-            "table_name": "sourceref_patch",
-            "column_name": "filePath"
-          },
-          {
-            "table_name": "sourceref_patch",
-            "column_name": "feature"
-          },
-          {
-            "table_name": "sourceref_patch",
-            "column_name": "import_errors"
-          }
-        ],
-        "actualFieldNames": [
-          "atlas_id",
-          "avg_reward",
-          "card_count",
-          "card_id",
-          "cards_with_rewards",
-          "cluster_avg_reward",
-          "cluster_size",
-          "column0",
-          "degree",
-          "edge_type",
-          "feature",
-          "filePath",
-          "from_node_id",
-          "import_errors",
-          "lane",
-          "node_count",
-          "node_id",
-          "out_degree",
-          "payload_json",
-          "reward_avg",
-          "reward_count",
-          "som_col",
-          "som_index",
-          "som_row",
-          "sourceRef",
-          "title",
-          "to_node_id",
-          "total_degree",
-          "total_outcomes",
-          "unique_sources",
-          "weight"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "sourceRef",
-            "filePath"
-          ],
-          "feature_id": [
-            "feature"
-          ],
-          "qdrant_point_id": [],
-          "neo4j_node": [
-            "node_id",
-            "filePath",
-            "sourceRef"
-          ]
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "feature_id",
-          "graph_node"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "feature_id",
-          "source_ref"
-        ],
-        "expectedAliasesPresent": [
-          "sourceRef"
-        ]
-      },
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\duckdb\\atlas.duckdb",
-        "relPath": "duckdb/atlas.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=cards_raw, outcomes_raw, training_examples",
-          "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
-        ],
-        "tables": [
-          "cards_raw",
-          "outcomes_raw",
-          "training_examples"
-        ],
-        "views": [
-          "atlas_cards_enriched",
-          "cluster_summary",
-          "parent_atlas_index"
-        ],
-        "columns": [
-          {
-            "table_name": "cards_raw",
-            "column_name": "id"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "sourceRef"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "kind"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "reward_count"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "reward_total"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "reward_avg"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "som_bmu_row"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "som_bmu_col"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "som_bmu_distance"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "vector64_compressed"
-          },
-          {
-            "table_name": "cards_raw",
-            "column_name": "created_at"
-          },
-          {
-            "table_name": "outcomes_raw",
-            "column_name": "id"
-          },
-          {
-            "table_name": "outcomes_raw",
-            "column_name": "cardId"
-          },
-          {
-            "table_name": "outcomes_raw",
-            "column_name": "reward"
-          },
-          {
-            "table_name": "outcomes_raw",
-            "column_name": "sourceRef"
-          },
-          {
-            "table_name": "outcomes_raw",
-            "column_name": "created_at"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "id"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "instruction"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "input"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "output"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "reward"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "som_cluster_row"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "som_cluster_col"
-          },
-          {
-            "table_name": "training_examples",
-            "column_name": "enrichment_phase"
-          }
-        ],
-        "actualFieldNames": [
-          "cardId",
-          "created_at",
-          "enrichment_phase",
-          "id",
-          "input",
-          "instruction",
-          "kind",
-          "output",
-          "reward",
-          "reward_avg",
-          "reward_count",
-          "reward_total",
-          "som_bmu_col",
-          "som_bmu_distance",
-          "som_bmu_row",
-          "som_cluster_col",
-          "som_cluster_row",
-          "sourceRef",
-          "vector64_compressed"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "sourceRef"
-          ],
-          "feature_id": [],
-          "qdrant_point_id": [
-            "id"
-          ],
-          "neo4j_node": [
-            "sourceRef"
-          ]
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "qdrant_point_id",
-          "graph_node"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "feature_id",
-          "source_ref"
-        ],
-        "expectedAliasesPresent": [
-          "sourceRef"
-        ]
-      },
-      {
-        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\data\\atlas-ml\\atlas-analytics.duckdb",
-        "relPath": "data/atlas-ml/atlas-analytics.duckdb",
-        "exists": true,
-        "status": "READY",
-        "evidence": [
-          "tables=domain_training_rows, snapshot_packets, test_packets",
-          "views=none"
-        ],
-        "tables": [
-          "domain_training_rows",
-          "snapshot_packets",
-          "test_packets"
-        ],
-        "views": [],
-        "columns": [
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "packet_key"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "label"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "text"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "source_group"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "content_hash"
-          },
-          {
-            "table_name": "domain_training_rows",
-            "column_name": "split_name"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "id"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "relative_path"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "content"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "legacy_domain"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "normalized_domain"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "normalized_domain_confidence"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "lexical_keywords"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "lexical_identifiers"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "lexical_symbols"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "lexical_imported_modules"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_symbol_name"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_symbol_kind"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_path"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_imports"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_calls"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "structural_exports"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "representation_id"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "representation_revision"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "embedding_digest"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "qdrant_vector_dim"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "content_embedding_768"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "kmeans_cluster"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "som_cluster"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "qdrant_point_id"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "page_rank_score"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "used_concepts"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "content_hash"
-          },
-          {
-            "table_name": "snapshot_packets",
-            "column_name": "summary_hash"
-          },
-          {
-            "table_name": "test_packets",
-            "column_name": "packet_key"
-          },
-          {
-            "table_name": "test_packets",
-            "column_name": "source_ref"
-          },
-          {
-            "table_name": "test_packets",
-            "column_name": "summary"
-          },
-          {
-            "table_name": "test_packets",
-            "column_name": "domain"
-          },
-          {
-            "table_name": "test_packets",
-            "column_name": "embedding_dim"
-          }
-        ],
-        "actualFieldNames": [
-          "content",
-          "content_embedding_768",
-          "content_hash",
-          "domain",
-          "embedding_digest",
-          "embedding_dim",
-          "id",
-          "kmeans_cluster",
-          "label",
-          "legacy_domain",
-          "lexical_identifiers",
-          "lexical_imported_modules",
-          "lexical_keywords",
-          "lexical_symbols",
-          "normalized_domain",
-          "normalized_domain_confidence",
-          "packet_key",
-          "page_rank_score",
-          "qdrant_point_id",
-          "qdrant_vector_dim",
-          "relative_path",
-          "representation_id",
-          "representation_revision",
-          "som_cluster",
-          "source_group",
-          "source_ref",
-          "split_name",
-          "structural_calls",
-          "structural_exports",
-          "structural_imports",
-          "structural_path",
-          "structural_symbol_kind",
-          "structural_symbol_name",
-          "summary",
-          "summary_hash",
-          "text",
-          "used_concepts"
-        ],
-        "aliasFamilies": {
-          "source_ref": [
-            "source_ref",
-            "relative_path"
-          ],
-          "feature_id": [],
-          "qdrant_point_id": [
-            "qdrant_point_id",
-            "id"
-          ],
-          "neo4j_node": []
-        },
-        "canonicalJoins": [
-          "source_ref",
-          "qdrant_point_id"
-        ],
-        "expectedAliasesMissing": [
-          "featureId",
-          "feature_id",
-          "sourceRef"
-        ],
-        "expectedAliasesPresent": [
-          "source_ref"
-        ]
-      },
       {
         "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\offline-synthesis-mapreduce.duckdb",
         "relPath": "docs/reports/offline-synthesis-mapreduce.duckdb",
@@ -6594,6 +5175,1425 @@
         ],
         "expectedAliasesPresent": [
           "feature_id"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\offline-synthesis-mapreduce.duckdb",
+        "relPath": ".tmp/offline-synthesis-mapreduce.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=cold_feature_rollups, cold_hot_path_rollups, cold_parent_atlas_cards, cold_profile_card_candidates, cold_source_ref_rollups",
+          "views=none"
+        ],
+        "tables": [
+          "cold_feature_rollups",
+          "cold_hot_path_rollups",
+          "cold_parent_atlas_cards",
+          "cold_profile_card_candidates",
+          "cold_source_ref_rollups"
+        ],
+        "views": [],
+        "columns": [
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "feature_id"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "packet_count"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "atlas_file_count"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "qdrant_point_count"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "avg_confidence"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "max_confidence"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "semantic_confidence"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "behavior_score"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "primary_cluster_id"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "primary_centroid_id"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "cluster_ids"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "top_file_paths"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "source_refs"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "synthesized_summary"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "next_actions"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "dominant_status"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "has_blocked"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "atlas_version"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "synthesized_at"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "updated_at"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "pad_file_count"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "pad_qdrant_count"
+          },
+          {
+            "table_name": "cold_feature_rollups",
+            "column_name": "pad_centroid_count"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "id"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "route"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "latency_ms"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "captured_at"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "source_refs"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "feature_ids"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "qdrant_hits"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "cache_hit"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "cache_tier"
+          },
+          {
+            "table_name": "cold_hot_path_rollups",
+            "column_name": "runtime_hot_path_score"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "source_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "rel_path"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "file_path"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "feature_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "related_feature_ids"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "workspace_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "file_ext"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "tags"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "line_count"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "is_route"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "is_svelte_comp"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "has_auth"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "has_zod"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "drizzle_refs"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "imports"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "exports"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "route_handlers"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "cluster_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "centroid_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "qdrant_point_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "alias_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "ingest_source"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "created_at"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "updated_at"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "som_cluster"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "neo4j_node_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "nes_card_id"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "lane_ids"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "atlas_version"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "afm_indexed_at"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "source_kind"
+          },
+          {
+            "table_name": "cold_parent_atlas_cards",
+            "column_name": "cold_storage_ready"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "source_id"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "rel_path"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "file_path"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "feature_id"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "related_feature_ids"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "source_kind"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "line_count"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "is_route"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "is_svelte_comp"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "has_auth"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "has_zod"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "drizzle_refs"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "imports"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "exports"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "route_handlers"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "tags"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "som_cluster"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "centroid_id"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "qdrant_point_id"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "cluster_id"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "atlas_version"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "cold_storage_ready"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "karpathy_blend"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "pagerank_score"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "attention_score"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "feature_dominant_status"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "feature_avg_confidence"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "feature_primary_cluster"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "feature_behavior_score"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "has_vector"
+          },
+          {
+            "table_name": "cold_profile_card_candidates",
+            "column_name": "has_centroid"
+          },
+          {
+            "table_name": "cold_source_ref_rollups",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "cold_source_ref_rollups",
+            "column_name": "pagerank_score"
+          },
+          {
+            "table_name": "cold_source_ref_rollups",
+            "column_name": "karpathy_blend"
+          },
+          {
+            "table_name": "cold_source_ref_rollups",
+            "column_name": "attention_score"
+          }
+        ],
+        "actualFieldNames": [
+          "afm_indexed_at",
+          "alias_id",
+          "atlas_file_count",
+          "atlas_version",
+          "attention_score",
+          "avg_confidence",
+          "behavior_score",
+          "cache_hit",
+          "cache_tier",
+          "captured_at",
+          "centroid_id",
+          "cluster_id",
+          "cluster_ids",
+          "cold_storage_ready",
+          "created_at",
+          "dominant_status",
+          "drizzle_refs",
+          "exports",
+          "feature_avg_confidence",
+          "feature_behavior_score",
+          "feature_dominant_status",
+          "feature_id",
+          "feature_ids",
+          "feature_primary_cluster",
+          "file_ext",
+          "file_path",
+          "has_auth",
+          "has_blocked",
+          "has_centroid",
+          "has_vector",
+          "has_zod",
+          "id",
+          "imports",
+          "ingest_source",
+          "is_route",
+          "is_svelte_comp",
+          "karpathy_blend",
+          "lane_ids",
+          "latency_ms",
+          "line_count",
+          "max_confidence",
+          "neo4j_node_id",
+          "nes_card_id",
+          "next_actions",
+          "packet_count",
+          "pad_centroid_count",
+          "pad_file_count",
+          "pad_qdrant_count",
+          "pagerank_score",
+          "primary_centroid_id",
+          "primary_cluster_id",
+          "qdrant_hits",
+          "qdrant_point_count",
+          "qdrant_point_id",
+          "rel_path",
+          "related_feature_ids",
+          "route",
+          "route_handlers",
+          "runtime_hot_path_score",
+          "semantic_confidence",
+          "som_cluster",
+          "source_id",
+          "source_kind",
+          "source_ref",
+          "source_refs",
+          "synthesized_at",
+          "synthesized_summary",
+          "tags",
+          "top_file_paths",
+          "updated_at",
+          "workspace_id"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "source_ref",
+            "file_path"
+          ],
+          "feature_id": [
+            "feature_id",
+            "feature_ids"
+          ],
+          "qdrant_point_id": [
+            "qdrant_point_id",
+            "id"
+          ],
+          "neo4j_node": []
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "feature_id",
+          "qdrant_point_id"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "sourceRef"
+        ],
+        "expectedAliasesPresent": [
+          "feature_id",
+          "source_ref"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\atlas.duckdb",
+        "relPath": ".tmp/ingest/atlas.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=card_enriched, cluster_summary, edges_all, lane_summary, node_degree, node_degree_agg, nodes_all, parent_atlas_full, sourceref_patch",
+          "views=none"
+        ],
+        "tables": [
+          "card_enriched",
+          "cluster_summary",
+          "edges_all",
+          "lane_summary",
+          "node_degree",
+          "node_degree_agg",
+          "nodes_all",
+          "parent_atlas_full",
+          "sourceref_patch"
+        ],
+        "views": [],
+        "columns": [
+          {
+            "table_name": "card_enriched",
+            "column_name": "card_id"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "title"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "sourceRef"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "som_row"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "som_col"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "som_index"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "reward_avg"
+          },
+          {
+            "table_name": "card_enriched",
+            "column_name": "reward_count"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "som_row"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "som_col"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "card_count"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "avg_reward"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "total_outcomes"
+          },
+          {
+            "table_name": "cluster_summary",
+            "column_name": "cards_with_rewards"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "lane"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "from_node_id"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "to_node_id"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "edge_type"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "weight"
+          },
+          {
+            "table_name": "edges_all",
+            "column_name": "column0"
+          },
+          {
+            "table_name": "lane_summary",
+            "column_name": "lane"
+          },
+          {
+            "table_name": "lane_summary",
+            "column_name": "node_count"
+          },
+          {
+            "table_name": "lane_summary",
+            "column_name": "unique_sources"
+          },
+          {
+            "table_name": "node_degree",
+            "column_name": "node_id"
+          },
+          {
+            "table_name": "node_degree",
+            "column_name": "out_degree"
+          },
+          {
+            "table_name": "node_degree_agg",
+            "column_name": "node_id"
+          },
+          {
+            "table_name": "node_degree_agg",
+            "column_name": "total_degree"
+          },
+          {
+            "table_name": "nodes_all",
+            "column_name": "lane"
+          },
+          {
+            "table_name": "nodes_all",
+            "column_name": "node_id"
+          },
+          {
+            "table_name": "nodes_all",
+            "column_name": "title"
+          },
+          {
+            "table_name": "nodes_all",
+            "column_name": "sourceRef"
+          },
+          {
+            "table_name": "nodes_all",
+            "column_name": "payload_json"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "lane"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "node_id"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "title"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "sourceRef"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "degree"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "som_row"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "som_col"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "som_index"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "reward_avg"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "reward_count"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "cluster_size"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "cluster_avg_reward"
+          },
+          {
+            "table_name": "parent_atlas_full",
+            "column_name": "payload_json"
+          },
+          {
+            "table_name": "sourceref_patch",
+            "column_name": "atlas_id"
+          },
+          {
+            "table_name": "sourceref_patch",
+            "column_name": "filePath"
+          },
+          {
+            "table_name": "sourceref_patch",
+            "column_name": "feature"
+          },
+          {
+            "table_name": "sourceref_patch",
+            "column_name": "import_errors"
+          }
+        ],
+        "actualFieldNames": [
+          "atlas_id",
+          "avg_reward",
+          "card_count",
+          "card_id",
+          "cards_with_rewards",
+          "cluster_avg_reward",
+          "cluster_size",
+          "column0",
+          "degree",
+          "edge_type",
+          "feature",
+          "filePath",
+          "from_node_id",
+          "import_errors",
+          "lane",
+          "node_count",
+          "node_id",
+          "out_degree",
+          "payload_json",
+          "reward_avg",
+          "reward_count",
+          "som_col",
+          "som_index",
+          "som_row",
+          "sourceRef",
+          "title",
+          "to_node_id",
+          "total_degree",
+          "total_outcomes",
+          "unique_sources",
+          "weight"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "sourceRef",
+            "filePath"
+          ],
+          "feature_id": [
+            "feature"
+          ],
+          "qdrant_point_id": [],
+          "neo4j_node": [
+            "node_id",
+            "filePath",
+            "sourceRef"
+          ]
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "feature_id",
+          "graph_node"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "feature_id",
+          "source_ref"
+        ],
+        "expectedAliasesPresent": [
+          "sourceRef"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-snapshot-5k-768.duckdb",
+        "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-snapshot-5k-768.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=vector_snapshot_packets_5k_768",
+          "views=none"
+        ],
+        "tables": [
+          "vector_snapshot_packets_5k_768"
+        ],
+        "views": [],
+        "columns": [
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "packet_key"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "feature_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "title_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "summary"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "legacy_domain"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "normalized_domain"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "representation_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "representation_revision"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "embedding_digest"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "qdrant_vector_dim"
+          },
+          {
+            "table_name": "vector_snapshot_packets_5k_768",
+            "column_name": "semantic_embedding_768"
+          }
+        ],
+        "actualFieldNames": [
+          "embedding_digest",
+          "feature_id",
+          "legacy_domain",
+          "normalized_domain",
+          "packet_key",
+          "qdrant_vector_dim",
+          "representation_id",
+          "representation_revision",
+          "semantic_embedding_768",
+          "source_ref",
+          "summary",
+          "title_id"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "source_ref"
+          ],
+          "feature_id": [
+            "feature_id"
+          ],
+          "qdrant_point_id": [],
+          "neo4j_node": []
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "feature_id"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "sourceRef"
+        ],
+        "expectedAliasesPresent": [
+          "feature_id",
+          "source_ref"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-vector-snapshots\\atlas-vector-index-lanes.duckdb",
+        "relPath": ".tmp/atlas-vector-snapshots/atlas-vector-index-lanes.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=vector_snapshot_packets",
+          "views=none"
+        ],
+        "tables": [
+          "vector_snapshot_packets"
+        ],
+        "views": [],
+        "columns": [
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "packet_key"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "feature_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "title_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "summary"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "legacy_domain"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "normalized_domain"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "representation_id"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "representation_revision"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "embedding_digest"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "qdrant_vector_dim"
+          },
+          {
+            "table_name": "vector_snapshot_packets",
+            "column_name": "semantic_embedding_768"
+          }
+        ],
+        "actualFieldNames": [
+          "embedding_digest",
+          "feature_id",
+          "legacy_domain",
+          "normalized_domain",
+          "packet_key",
+          "qdrant_vector_dim",
+          "representation_id",
+          "representation_revision",
+          "semantic_embedding_768",
+          "source_ref",
+          "summary",
+          "title_id"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "source_ref"
+          ],
+          "feature_id": [
+            "feature_id"
+          ],
+          "qdrant_point_id": [],
+          "neo4j_node": []
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "feature_id"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "sourceRef"
+        ],
+        "expectedAliasesPresent": [
+          "feature_id",
+          "source_ref"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\data\\atlas-ml\\atlas-analytics.duckdb",
+        "relPath": "data/atlas-ml/atlas-analytics.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=domain_training_rows, snapshot_packets, test_packets",
+          "views=none"
+        ],
+        "tables": [
+          "domain_training_rows",
+          "snapshot_packets",
+          "test_packets"
+        ],
+        "views": [],
+        "columns": [
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "packet_key"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "label"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "text"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "source_group"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "content_hash"
+          },
+          {
+            "table_name": "domain_training_rows",
+            "column_name": "split_name"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "id"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "relative_path"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "content"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "legacy_domain"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "normalized_domain"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "normalized_domain_confidence"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "lexical_keywords"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "lexical_identifiers"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "lexical_symbols"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "lexical_imported_modules"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_symbol_name"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_symbol_kind"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_path"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_imports"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_calls"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "structural_exports"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "representation_id"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "representation_revision"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "embedding_digest"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "qdrant_vector_dim"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "content_embedding_768"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "kmeans_cluster"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "som_cluster"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "qdrant_point_id"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "page_rank_score"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "used_concepts"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "content_hash"
+          },
+          {
+            "table_name": "snapshot_packets",
+            "column_name": "summary_hash"
+          },
+          {
+            "table_name": "test_packets",
+            "column_name": "packet_key"
+          },
+          {
+            "table_name": "test_packets",
+            "column_name": "source_ref"
+          },
+          {
+            "table_name": "test_packets",
+            "column_name": "summary"
+          },
+          {
+            "table_name": "test_packets",
+            "column_name": "domain"
+          },
+          {
+            "table_name": "test_packets",
+            "column_name": "embedding_dim"
+          }
+        ],
+        "actualFieldNames": [
+          "content",
+          "content_embedding_768",
+          "content_hash",
+          "domain",
+          "embedding_digest",
+          "embedding_dim",
+          "id",
+          "kmeans_cluster",
+          "label",
+          "legacy_domain",
+          "lexical_identifiers",
+          "lexical_imported_modules",
+          "lexical_keywords",
+          "lexical_symbols",
+          "normalized_domain",
+          "normalized_domain_confidence",
+          "packet_key",
+          "page_rank_score",
+          "qdrant_point_id",
+          "qdrant_vector_dim",
+          "relative_path",
+          "representation_id",
+          "representation_revision",
+          "som_cluster",
+          "source_group",
+          "source_ref",
+          "split_name",
+          "structural_calls",
+          "structural_exports",
+          "structural_imports",
+          "structural_path",
+          "structural_symbol_kind",
+          "structural_symbol_name",
+          "summary",
+          "summary_hash",
+          "text",
+          "used_concepts"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "source_ref",
+            "relative_path"
+          ],
+          "feature_id": [],
+          "qdrant_point_id": [
+            "qdrant_point_id",
+            "id"
+          ],
+          "neo4j_node": []
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "qdrant_point_id"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "feature_id",
+          "sourceRef"
+        ],
+        "expectedAliasesPresent": [
+          "source_ref"
+        ]
+      },
+      {
+        "filePath": "C:\\Users\\james\\Videos\\deeds-web-app\\duckdb\\atlas.duckdb",
+        "relPath": "duckdb/atlas.duckdb",
+        "exists": true,
+        "status": "READY",
+        "evidence": [
+          "tables=cards_raw, outcomes_raw, training_examples",
+          "views=atlas_cards_enriched, cluster_summary, parent_atlas_index"
+        ],
+        "tables": [
+          "cards_raw",
+          "outcomes_raw",
+          "training_examples"
+        ],
+        "views": [
+          "atlas_cards_enriched",
+          "cluster_summary",
+          "parent_atlas_index"
+        ],
+        "columns": [
+          {
+            "table_name": "cards_raw",
+            "column_name": "id"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "sourceRef"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "kind"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "reward_count"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "reward_total"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "reward_avg"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "som_bmu_row"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "som_bmu_col"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "som_bmu_distance"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "vector64_compressed"
+          },
+          {
+            "table_name": "cards_raw",
+            "column_name": "created_at"
+          },
+          {
+            "table_name": "outcomes_raw",
+            "column_name": "id"
+          },
+          {
+            "table_name": "outcomes_raw",
+            "column_name": "cardId"
+          },
+          {
+            "table_name": "outcomes_raw",
+            "column_name": "reward"
+          },
+          {
+            "table_name": "outcomes_raw",
+            "column_name": "sourceRef"
+          },
+          {
+            "table_name": "outcomes_raw",
+            "column_name": "created_at"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "id"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "instruction"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "input"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "output"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "reward"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "som_cluster_row"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "som_cluster_col"
+          },
+          {
+            "table_name": "training_examples",
+            "column_name": "enrichment_phase"
+          }
+        ],
+        "actualFieldNames": [
+          "cardId",
+          "created_at",
+          "enrichment_phase",
+          "id",
+          "input",
+          "instruction",
+          "kind",
+          "output",
+          "reward",
+          "reward_avg",
+          "reward_count",
+          "reward_total",
+          "som_bmu_col",
+          "som_bmu_distance",
+          "som_bmu_row",
+          "som_cluster_col",
+          "som_cluster_row",
+          "sourceRef",
+          "vector64_compressed"
+        ],
+        "aliasFamilies": {
+          "source_ref": [
+            "sourceRef"
+          ],
+          "feature_id": [],
+          "qdrant_point_id": [
+            "id"
+          ],
+          "neo4j_node": [
+            "sourceRef"
+          ]
+        },
+        "canonicalJoins": [
+          "source_ref",
+          "qdrant_point_id",
+          "graph_node"
+        ],
+        "expectedAliasesMissing": [
+          "featureId",
+          "feature_id",
+          "source_ref"
+        ],
+        "expectedAliasesPresent": [
+          "sourceRef"
         ]
       },
       {

@@ -15,6 +15,25 @@
  * is not installed in this repo (confirmed via `SELECT extname FROM
  * pg_extension`, 2026-08-26). indexKind is reported explicitly so callers
  * don't have to infer the ranking algorithm from the function name.
+ *
+ * Identity join, two lanes (2026-08-25, operator-approved per
+ * PACKET-CHUNK-GRANULARITY-01 Option B in openspec/changes/
+ * parent-atlas-neural-prefill-encoder/tasks.md):
+ *  1. `source_ref_content_hash_exact` — exact (source_ref, content_hash) match
+ *     directly against atlas_packets. Primary lane, unchanged.
+ *  2. `chunk_packet_identity_link_exact_canonical` — additive fallback via
+ *     atlas_chunk_packet_identity_links, restricted to match_method =
+ *     'EXACT_CANONICAL_ID' rows only (4,517/105,762 admitted per the
+ *     2026-08-25 S512-ID4 deterministic-readback proof,
+ *     docs/reports/s512-chunk-packet-identity-readback-v1.json). Per that
+ *     bridge's own governing document (parent-atlas-semantic-512-
+ *     canonicalization/tasks.md, S512-ID2/ID3): UNRESOLVED/AMBIGUOUS rows
+ *     are NEVER substituted for a real admitted link — this lane's SQL
+ *     hard-filters to EXACT_CANONICAL_ID and nothing else, regardless of
+ *     confidence/candidate_packet_keys. Each returned candidate's
+ *     `identity_resolution_source` field is set per-row from SQL (not a
+ *     single hardcoded literal for the whole result set) so downstream
+ *     consumers can always tell which lane produced a given match.
  */
 
 import type { Database } from 'drizzle-orm';
@@ -31,11 +50,15 @@ export interface PostgresFtsSearchOptions {
 
 export const POSTGRES_FTS_INDEX_KIND = 'postgres_tsvector_english' as const;
 
+export type PostgresFtsIdentityResolutionSource =
+  | 'source_ref_content_hash_exact'
+  | 'chunk_packet_identity_link_exact_canonical';
+
 export interface PostgresFtsCandidate extends CandidateForIdentityResolution {
   retrieved_via: 'postgres_fts';
   indexKind: typeof POSTGRES_FTS_INDEX_KIND;
   retrieval_algorithm: 'postgres_fts_ts_rank_cd';
-  identity_resolution_source: 'source_ref_content_hash_exact';
+  identity_resolution_source: PostgresFtsIdentityResolutionSource;
   title?: string;
   snippet?: string;
 }
@@ -111,7 +134,9 @@ export async function searchPostgresFts(
       ORDER BY lexical_score DESC, ci.id
       LIMIT ${lexicalLimit}
     ),
-    canonical AS (
+    canonical_exact AS (
+      -- Lane 1 (primary, unchanged): exact (source_ref, content_hash) match directly
+      -- against atlas_packets.
       SELECT
         p.packet_id::text AS id,
         p.packet_key,
@@ -121,6 +146,7 @@ export async function searchPostgresFts(
         coalesce(p.feature_label, l.symbol, l.relative_path) AS title,
         l.snippet,
         l.lexical_score,
+        'source_ref_content_hash_exact' AS identity_resolution_source,
         count(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,
         row_number() OVER (
           PARTITION BY p.packet_key
@@ -132,17 +158,67 @@ export async function searchPostgresFts(
        AND p.content_hash = l.content_hash
       WHERE p.packet_key IS NOT NULL
         AND p.feature_id IS NOT NULL
+    ),
+    canonical_bridge AS (
+      -- Lane 2 (additive fallback, operator-approved 2026-08-25, PACKET-CHUNK-GRANULARITY-01
+      -- Option B): chunks the exact lane above did NOT already resolve, admitted only via
+      -- atlas_chunk_packet_identity_links rows with match_method = 'EXACT_CANONICAL_ID'.
+      -- UNRESOLVED/AMBIGUOUS rows are structurally excluded by this filter, never substituted.
+      SELECT
+        p.packet_id::text AS id,
+        p.packet_key,
+        p.source_ref,
+        p.feature_id,
+        p.content_hash,
+        coalesce(p.feature_label, l.symbol, l.relative_path) AS title,
+        l.snippet,
+        l.lexical_score,
+        'chunk_packet_identity_link_exact_canonical' AS identity_resolution_source,
+        count(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,
+        row_number() OVER (
+          PARTITION BY p.packet_key
+          ORDER BY l.lexical_score DESC, l.lexical_id
+        ) AS packet_rank
+      FROM lexical AS l
+      JOIN public.atlas_chunk_packet_identity_links AS link
+        ON link.chunk_index_id = l.lexical_id::uuid
+       AND link.match_method = 'EXACT_CANONICAL_ID'
+      JOIN public.atlas_packets AS p
+        ON p.packet_key = link.canonical_packet_key
+      WHERE p.packet_key IS NOT NULL
+        AND p.feature_id IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM public.atlas_packets ep
+          WHERE ep.source_ref = l.source_ref AND ep.content_hash = l.content_hash
+        )
+    ),
+    canonical AS (
+      SELECT * FROM canonical_exact
+      UNION ALL
+      SELECT * FROM canonical_bridge
     )
     SELECT id, packet_key, source_ref, feature_id, content_hash,
-           lexical_score, title, snippet
+           lexical_score, title, snippet, identity_resolution_source
     FROM canonical
     WHERE identity_match_count = 1
       AND packet_rank = 1
     ORDER BY lexical_score DESC, packet_key ASC
     LIMIT ${boundedLimit}
-  `) as Array<Record<string, unknown>>;
+  `);
+  // db.execute() with the real production driver (drizzle-orm/node-postgres, confirmed live
+  // 2026-08-25 — sveltekit-frontend/src/lib/server/db/client.ts uses the same driver) returns a
+  // node-postgres QueryResult object ({ rows, rowCount, ... }), NOT a bare array. The previous
+  // `as Array<Record<string, unknown>>` cast on the raw execute() result was never actually
+  // exercised against this driver — confirmed by running it and hitting `result.map is not a
+  // function`. Unwrap `.rows` when present so this works with the real driver, while still
+  // tolerating a bare-array return (e.g. a different driver, or a test double) for compatibility.
+  const rows = (
+    result && typeof result === 'object' && 'rows' in result
+      ? (result as { rows: unknown }).rows
+      : result
+  ) as Array<Record<string, unknown>>;
 
-  return result.map((row) => ({
+  return rows.map((row) => ({
     id: String(row.id ?? ''),
     packet_key: String(row.packet_key ?? ''),
     source_ref: String(row.source_ref ?? ''),
@@ -152,7 +228,11 @@ export async function searchPostgresFts(
     retrieved_via: 'postgres_fts' as const,
     indexKind: POSTGRES_FTS_INDEX_KIND,
     retrieval_algorithm: 'postgres_fts_ts_rank_cd' as const,
-    identity_resolution_source: 'source_ref_content_hash_exact' as const,
+    identity_resolution_source: (
+      row.identity_resolution_source === 'chunk_packet_identity_link_exact_canonical'
+        ? 'chunk_packet_identity_link_exact_canonical'
+        : 'source_ref_content_hash_exact'
+    ) as PostgresFtsIdentityResolutionSource,
     title: row.title == null ? undefined : String(row.title),
     snippet: row.snippet == null ? undefined : String(row.snippet),
   }));

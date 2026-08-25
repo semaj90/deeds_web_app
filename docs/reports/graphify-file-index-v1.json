@@ -5,35 +5,26 @@
   "source_table": "atlas_packets",
   "packet_jsonl": ".tmp/atlas/graphify-file-index-v1/packets.jsonl",
   "ast_jsonl": ".tmp/atlas/graphify-file-index-v1/ast-entities.jsonl",
-  "packet_count": 61659,
+  "packet_count": 100,
   "invalid_rows": 0,
-  "packet_checksum": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
+  "packet_checksum": "6eb5dc696af3d01d783e45ccf1e527b756bf3516f5c98ea08bc376e7953d5e78",
   "ast_exit_code": 0,
   "ast_receipt": {
     "schema": "atlas.ast-entity-prefill-graphify-receipt.v2",
     "config": ".okf\\pipelines\\ast-entity-prefill.yaml",
-    "packets_selected": 3293,
-    "files_resolved": 2951,
-    "files_unresolved": 342,
+    "packets_selected": 100,
+    "files_resolved": 99,
+    "files_unresolved": 1,
     "unresolved_samples": [
-      "src/AGENTS.md",
-      "src/lib/adapters/legal-corpus.ts",
-      "src/lib/AGENTS.md",
-      "src/lib/ai/AGENTS.md",
-      "src/lib/ai/e2b/AGENTS.md",
-      "src/lib/ai/onnx/AGENTS.md",
-      "src/lib/cache/AGENTS.md",
-      "src/lib/client/AGENTS.md",
-      "src/lib/client/ui/AGENTS.md",
-      "src/lib/components/admin/AGENTS.md"
+      "src/AGENTS.md"
     ],
-    "entity_candidates": 42404,
+    "entity_candidates": 449,
     "ast_grep": true,
     "canonical_writes": false,
     "symbol_registry_resolved": 0,
     "canonical_entity_resolved": 0,
     "coverage": {
-      "structural_entity": 0.8961433343455816,
+      "structural_entity": 0.99,
       "packet_identity": 1,
       "feature_identity": 1,
       "source_revision": 1,
@@ -61,6 +52,6 @@
     "payload"
   ],
   "canonical_writes": false,
-  "generated_at": "2026-08-25T01:51:16.190Z",
+  "generated_at": "2026-08-25T18:34:50.165Z",
   "report": "docs/reports/graphify-file-index-v1.json"
 }

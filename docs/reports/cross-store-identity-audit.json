@@ -1,6 +1,6 @@
 {
   "gate": "ATLAS_CROSS_STORE_IDENTITY_PROVEN",
-  "run_at": "2026-08-24T01:33:41.461Z",
+  "run_at": "2026-08-25T22:02:13.298Z",
   "counts": {
     "postgres": {
       "atlas_packets": 61659,
@@ -10,58 +10,58 @@
       "som_enriched": 61660
     },
     "qdrant": {
-      "total_points": 106338,
-      "directory_cluster_points": 0,
-      "code_points": 106338,
-      "with_packet_key": 54070,
-      "with_source_ref": 106338,
-      "with_canonical_id": 576,
-      "with_projection_revision": 576,
-      "with_content_projection_revision": 576,
-      "with_signature_projection_revision": 528,
-      "active_content_projection": 576,
-      "active_signature_projection": 528,
-      "content_hash_present": 100,
+      "total_points": 52380,
+      "directory_cluster_points": 26190,
+      "code_points": 26190,
+      "with_packet_key": 0,
+      "with_source_ref": 52380,
+      "with_canonical_id": 0,
+      "with_projection_revision": 52380,
+      "with_content_projection_revision": 0,
+      "with_signature_projection_revision": 0,
+      "active_content_projection": 0,
+      "active_signature_projection": 0,
+      "content_hash_present": 92,
       "sampled_hashes": [
         {
-          "source_ref": "1",
-          "content_hash": "0852bd8c141bccf6"
+          "source_ref": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+          "content_hash": "981f4c3e67375a55"
         },
         {
-          "source_ref": "sveltekit-frontend/src/AGENTS.md",
-          "content_hash": "19cf4dd92a0829d1"
+          "source_ref": "src/routes/(app)/demos/+page.svelte",
+          "content_hash": "b593e1bef5f69ff2"
         },
         {
-          "source_ref": "src/AGENTS.md",
-          "content_hash": "7765ecd953daf907"
+          "source_ref": "src/routes/(app)/demos/notifications/+page.svelte",
+          "content_hash": "20cdafb7059bdf3f"
         },
         {
-          "source_ref": "src/AGENTS.md",
-          "content_hash": "b33a95adc12f82d6"
+          "source_ref": "src/routes/(app)/admin/codebase-index/+page.svelte",
+          "content_hash": "7bf5783879c0d416"
         },
         {
-          "source_ref": "sveltekit-frontend/src/hooks.server.ts",
-          "content_hash": "1ad8934d9cefa0be"
+          "source_ref": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+          "content_hash": "282646a4da6c65ce19703e4b0d728b90f13e7ad8fabb8f381d11c3fe92407105"
         },
         {
-          "source_ref": "src/hooks.server.ts",
-          "content_hash": "2a352e73a1aa39f6"
+          "source_ref": "src/lib/server/analytics/unified-research-query.ts",
+          "content_hash": "05c55d7081df0e4a"
         },
         {
-          "source_ref": "src/hooks.server.ts",
-          "content_hash": "4f3dc89c12d99e11"
+          "source_ref": "src/routes/(app)/demos/bits-ui/+page.svelte",
+          "content_hash": "421c0999f0ab6c99"
         },
         {
-          "source_ref": "src/hooks.server.ts",
-          "content_hash": "5438eb5d9a3024c6"
+          "source_ref": "src/lib/server/helpers/docker-discovery.ts",
+          "content_hash": "6a029b0e2b3d967c"
         },
         {
-          "source_ref": "src/hooks.server.ts",
-          "content_hash": "5e08c4ca6ae813a4"
+          "source_ref": "src/lib/server/embedding-cache.ts",
+          "content_hash": "0908348cf3ba309c"
         },
         {
-          "source_ref": "src/hooks.server.ts",
-          "content_hash": "776613949fb19716"
+          "source_ref": "src/lib/utils/webgpu-array-utils.ts",
+          "content_hash": "0e4c841ad5be8828"
         }
       ],
       "error": null
@@ -76,27 +76,27 @@
   "checks": {
     "content_hash_match": {
       "checked": 10,
-      "matched": 2,
-      "rate": 0.2,
+      "matched": 0,
+      "rate": 0,
       "pass": false
     },
     "pg_qdrant_count_parity": {
       "pg": 52380,
-      "qdrant": 106338,
-      "qdrant_total": 106338,
-      "qdrant_dir_clusters": 0,
-      "diff_pct": "50.74",
+      "qdrant": 26190,
+      "qdrant_total": 52380,
+      "qdrant_dir_clusters": 26190,
+      "diff_pct": "50.00",
       "pass": false
     },
     "qdrant_packet_key_coverage": {
-      "total": 106338,
-      "with_key": 54070,
-      "rate": "50.85",
+      "total": 52380,
+      "with_key": 0,
+      "rate": "0.00",
       "pass": false
     },
     "qdrant_source_ref_coverage": {
-      "total": 106338,
-      "with_ref": 106338,
+      "total": 52380,
+      "with_ref": 52380,
       "rate": "100.00",
       "pass": true
     },
@@ -109,10 +109,10 @@
   },
   "gate_result": "FAIL",
   "failures": [
-    "PG (52380) vs Qdrant code points (106338) diverges by 50.74% — 53958 points in Qdrant without Postgres counterpart (packet_key backfill needed)",
-    "Qdrant packet_key missing on 52268 points"
+    "PG (52380) vs Qdrant code points (26190) diverges by 50.00% — -26190 points in Qdrant without Postgres counterpart (packet_key backfill needed)",
+    "Qdrant packet_key missing on 52380 points"
   ],
   "warnings": [
-    "Content-hash match rate 20.0% below 99%"
+    "Content-hash match rate 0.0% below 99%"
   ]
 }

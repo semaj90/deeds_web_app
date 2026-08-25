@@ -31,13 +31,19 @@ services:
   # NOTE: Stop native postgres.exe first to free port 5432
   # Optimizations: AIO (async I/O), skip-scan indexes, temporal constraints
   postgres:
-    image: pgvector/pgvector:pg18
+    # 2026-08-25: pgvector/pgvector:pg18 + ParadeDB pg_search 0.25.1 (bookworm build),
+    # committed locally via `docker commit legal-ai-postgres pgvector-pgsearch:pg18-local`.
+    # Base image remains pgvector/pgvector:pg18; this tag only adds the pg_search .deb.
+    # Data lives in the postgres_data named volume (below), unaffected by this image swap.
+    image: pgvector-pgsearch:pg18-local
     container_name: legal-ai-postgres
     restart: unless-stopped
     command:
       - "postgres"
       - "-c"
       - "io_method=worker"
+      - "-c"
+      - "shared_preload_libraries=pg_search"
     deploy:
       resources:
         limits:

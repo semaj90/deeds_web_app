@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-25T04:37:56.872Z",
+  "generatedAt": "2026-08-25T18:34:50.304Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -1944,8 +1944,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 252,
-    "declaredSidecars": 36,
+    "manualSqlFiles": 254,
+    "declaredSidecars": 39,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",

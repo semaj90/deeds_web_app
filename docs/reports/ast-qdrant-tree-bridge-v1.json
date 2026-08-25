@@ -1,0 +1,37 @@
+{
+  "schema_version": "atlas-ast-qdrant-tree-bridge-v1",
+  "generated_at": "2026-08-25T17:06:41.299Z",
+  "collection": "codebase_chunks_768",
+  "read_only": true,
+  "qdrant": {
+    "points_with_tree_node_id": 4527,
+    "distinct_tree_node_ids": 4527,
+    "duplicate_tree_node_point_groups": 0
+  },
+  "atlas_ast_nodes": {
+    "matched_rows": 0,
+    "matched_tree_node_ids": 0,
+    "ambiguous_tree_node_ids": 0
+  },
+  "atlas_packets": {
+    "matched_rows": 4527,
+    "matched_tree_node_ids": 4527,
+    "ambiguous_tree_node_ids": 0
+  },
+  "span_resolution": {
+    "qdrant_carries_byte_span": false,
+    "ast_carries_byte_span": true,
+    "packet_rows_with_byte_span": 0,
+    "packet_carries_byte_span": false,
+    "packet_path_only_ast_matches": 1140,
+    "packet_exact_span_ast_matches": 0,
+    "status": "REQUIRES_QDRANT_SPAN_OR_REVIEWED_CHUNK_BRIDGE"
+  },
+  "gates": {
+    "qdrant_tree_nodes_present": true,
+    "ast_tree_node_join_visible": false,
+    "packet_tree_node_join_visible": true,
+    "unique_packet_tree_node_identity": true,
+    "span_identity_proven": false
+  }
+}

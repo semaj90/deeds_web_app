@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb3a.revision.lineage.readback.v1",
-  "generatedAt": "2026-08-20T19:08:42.412Z",
+  "generatedAt": "2026-08-25T19:22:42.568Z",
   "readOnly": true,
   "collection": "codebase_chunks_768",
   "canonicalWrites": false,

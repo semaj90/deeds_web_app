@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.atlas-packet-content-hash-lineage.v1",
+  "generatedAt": "2026-08-25T21:32:27.004Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "status": "READY",
+  "authorities": {
+    "packets": 61660,
+    "packets_content_hash": 332,
+    "packets_sha256": 4715,
+    "artifacts": 58312,
+    "artifacts_content_hash": 58305,
+    "source_refs": 22487,
+    "source_refs_content_hash": 22487,
+    "chunks": 52417,
+    "chunks_content_hash": 52380
+  },
+  "classifications": {
+    "no_artifact_hash": 3356,
+    "artifact_hash_unique": 58303,
+    "artifact_hash_ambiguous": 1,
+    "no_source_ref_hash": 56977,
+    "source_ref_hash_unique": 1601,
+    "source_ref_hash_ambiguous": 3082,
+    "no_chunk_hash": 57180,
+    "chunk_hash_unique": 332,
+    "chunk_hash_ambiguous": 4148,
+    "packets_with_unique_artifact_hash": 58207,
+    "chunk_source_hash_agreements": 6685,
+    "chunk_artifact_hash_agreements": 0
+  },
+  "samples": {
+    "unique_artifact_candidates": [
+      {
+        "packet_key": "packet:0003260092b1",
+        "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+        "packet_sha256": "a76f01d8a371ec85939d443d73395b90ebac5d9f9744857f2e90fc5429e72b81",
+        "artifact_content_hash": "68a75c6bdfe32a42c0e95555e0f20d8d50b428803ebb25319aebc66f00ca6ed4",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0003850e84ca",
+        "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+        "packet_sha256": "262fe09f9fdf919a68a916d551f70b6136dd1c5ec599255afaf36bfd4a3998ea",
+        "artifact_content_hash": "de7b0cd1fda754067fcf5d2e99718ba76a5a55e146018397902bd045c62686ef",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0003ab694534",
+        "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+        "packet_sha256": "2bbc964e88cac5b24299188ab8417f4d7b77d1bbc984d3140b99b52790ff523c",
+        "artifact_content_hash": "1094a5c9860b49a0d2fba7d6c65a1043f1bfd4312c7d85fb8b37d4433c27d0c3",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0003dda5e534",
+        "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+        "packet_sha256": "dd98858bf9e8a21378924868158a41e97739a2e2ec5305b5c7d8aa262b2bddba",
+        "artifact_content_hash": "a0812238b34ae05bdd629b1af6565bc012c6946508fe0b861b982bec6117b4b4",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0004b466d863",
+        "source_ref": ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+        "packet_sha256": "01cacc4cbc16f1f3d32f5b370831812aa225a4c92536401a79f1c83e5d6d3eb1",
+        "artifact_content_hash": "57caa1111385a84df40daae5108f365b01ad50566040b599c73d04bff223ae0c",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0004f849be72",
+        "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+        "packet_sha256": "3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
+        "artifact_content_hash": "5285f565250c9e796ff01e8a6da9f594acac7a8a73a7b33aa12b727acaee64f9",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0006ca4a45e3",
+        "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+        "packet_sha256": "2a74c8970a6801e595d38fc61e4f6ffa22ce815b9440ce9930a5a92391c68f1e",
+        "artifact_content_hash": "34e0150e2eb1d6bbee212a59c5394de651d34320c2cf409707f306c806ead254",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0008d535a1f6",
+        "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+        "packet_sha256": "e1f466b7a37d5fcb0d58ce1366c53fcbf828c640b28a11aed190b71a537f4cdb",
+        "artifact_content_hash": "66555bd6ec5098f1709975d0134b6a742f3cb8af872f8a8fa0408775123611cb",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0009951ee430",
+        "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+        "packet_sha256": "a8f889d3a9a34aa1155365204bde9e0360b6b7fe1b65090110179f0fe7acfd28",
+        "artifact_content_hash": "a6e19c9d4aaafde8506b82411493abd96a9667e22bd84cc9245879fbac7f252e",
+        "artifact_hash_length": 64
+      },
+      {
+        "packet_key": "packet:0009a56456fc",
+        "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+        "packet_sha256": "d63e7eb9f25f9ef940a3942c8bf0026625c39b0317cea826141c8e6d3f7ec896",
+        "artifact_content_hash": "aae62138b124855ff5c078bf910bc584bca7a6dd621d3efb4395c46b0d146e16",
+        "artifact_hash_length": 64
+      }
+    ]
+  },
+  "recommendation": "REVIEW_REQUIRED: atlas_artifacts provides packet-keyed candidate hashes, but hash equivalence to codebase_chunk_index chunks is not proven. Generate an apply-bounded preview only after confirming whether the FTS index is chunk- or file-hash based."
+}

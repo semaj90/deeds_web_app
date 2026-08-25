@@ -1,0 +1,314 @@
+{
+  "generated": "2026-08-25T21:19:21.424Z",
+  "qdrant": {
+    "collection": "codebase_chunks_sparse_test_v1",
+    "total_points": 500,
+    "collection_points": 500,
+    "bounded": true,
+    "max_points": 500,
+    "with_packet_key": 0,
+    "with_source_ref": 500,
+    "with_feature_id": 0,
+    "with_domain_class": 0,
+    "null_payloads": 0,
+    "collisions": 0,
+    "collision_points": 0
+  },
+  "postgres": {
+    "total_packets": "61660",
+    "with_packet_key": "61660",
+    "with_source_ref": "61660",
+    "with_feature_id": "61660",
+    "with_domain_class": "61660",
+    "qdrant_linked": "52417",
+    "feature_alignment": {
+      "qdrant_unique_feature_ids": 0,
+      "matched_unique_feature_ids": 0,
+      "matched_packet_rows": 0,
+      "canonical_distinct_feature_ids": 39482
+    },
+    "feature_projection_gap": {
+      "missing_unique_feature_ids": 39482,
+      "missing_packet_rows": 61660,
+      "by_namespace": [
+        {
+          "namespace": "sveltekit-frontend",
+          "missing_unique_feature_ids": 13785,
+          "missing_packet_rows": 19898
+        },
+        {
+          "namespace": "neschrom97",
+          "missing_unique_feature_ids": 8178,
+          "missing_packet_rows": 8178
+        },
+        {
+          "namespace": "",
+          "missing_unique_feature_ids": 5074,
+          "missing_packet_rows": 6130
+        },
+        {
+          "namespace": "scripts",
+          "missing_unique_feature_ids": 2401,
+          "missing_packet_rows": 8838
+        },
+        {
+          "namespace": "llama-cpp-turboquant-gemma4",
+          "missing_unique_feature_ids": 1623,
+          "missing_packet_rows": 2381
+        },
+        {
+          "namespace": "docs",
+          "missing_unique_feature_ids": 1391,
+          "missing_packet_rows": 1602
+        },
+        {
+          "namespace": "crates",
+          "missing_unique_feature_ids": 1070,
+          "missing_packet_rows": 3749
+        },
+        {
+          "namespace": "simd-bridge",
+          "missing_unique_feature_ids": 809,
+          "missing_packet_rows": 3075
+        },
+        {
+          "namespace": "claude-mem",
+          "missing_unique_feature_ids": 679,
+          "missing_packet_rows": 807
+        },
+        {
+          "namespace": "turbovec",
+          "missing_unique_feature_ids": 473,
+          "missing_packet_rows": 1163
+        },
+        {
+          "namespace": "logs",
+          "missing_unique_feature_ids": 318,
+          "missing_packet_rows": 512
+        },
+        {
+          "namespace": "memory",
+          "missing_unique_feature_ids": 209,
+          "missing_packet_rows": 236
+        },
+        {
+          "namespace": "next_steps",
+          "missing_unique_feature_ids": 188,
+          "missing_packet_rows": 190
+        },
+        {
+          "namespace": "packages",
+          "missing_unique_feature_ids": 116,
+          "missing_packet_rows": 150
+        },
+        {
+          "namespace": "scratch",
+          "missing_unique_feature_ids": 74,
+          "missing_packet_rows": 77
+        },
+        {
+          "namespace": "drizzle",
+          "missing_unique_feature_ids": 73,
+          "missing_packet_rows": 74
+        },
+        {
+          "namespace": "proto",
+          "missing_unique_feature_ids": 51,
+          "missing_packet_rows": 53
+        },
+        {
+          "namespace": "lawpdfs",
+          "missing_unique_feature_ids": 42,
+          "missing_packet_rows": 42
+        },
+        {
+          "namespace": "pgvector-precompiled",
+          "missing_unique_feature_ids": 42,
+          "missing_packet_rows": 48
+        },
+        {
+          "namespace": "services",
+          "missing_unique_feature_ids": 35,
+          "missing_packet_rows": 65
+        },
+        {
+          "namespace": "backups",
+          "missing_unique_feature_ids": 31,
+          "missing_packet_rows": 31
+        },
+        {
+          "namespace": "qdrant-windows",
+          "missing_unique_feature_ids": 29,
+          "missing_packet_rows": 182
+        },
+        {
+          "namespace": "reports",
+          "missing_unique_feature_ids": 28,
+          "missing_packet_rows": 33
+        },
+        {
+          "namespace": "storage",
+          "missing_unique_feature_ids": 27,
+          "missing_packet_rows": 174
+        },
+        {
+          "namespace": "tmp",
+          "missing_unique_feature_ids": 27,
+          "missing_packet_rows": 37
+        },
+        {
+          "namespace": "archive",
+          "missing_unique_feature_ids": 25,
+          "missing_packet_rows": 25
+        },
+        {
+          "namespace": "docker",
+          "missing_unique_feature_ids": 25,
+          "missing_packet_rows": 44
+        },
+        {
+          "namespace": "data",
+          "missing_unique_feature_ids": 24,
+          "missing_packet_rows": 37
+        },
+        {
+          "namespace": "vscode-extension",
+          "missing_unique_feature_ids": 22,
+          "missing_packet_rows": 32
+        },
+        {
+          "namespace": "granite-docling-258M",
+          "missing_unique_feature_ids": 18,
+          "missing_packet_rows": 18
+        },
+        {
+          "namespace": "llm",
+          "missing_unique_feature_ids": 13,
+          "missing_packet_rows": 13
+        },
+        {
+          "namespace": "tools",
+          "missing_unique_feature_ids": 13,
+          "missing_packet_rows": 13
+        },
+        {
+          "namespace": "ai",
+          "missing_unique_feature_ids": 12,
+          "missing_packet_rows": 14
+        },
+        {
+          "namespace": "phase13graph_exportgenerator",
+          "missing_unique_feature_ids": 10,
+          "missing_packet_rows": 10
+        },
+        {
+          "namespace": "tests",
+          "missing_unique_feature_ids": 10,
+          "missing_packet_rows": 10
+        },
+        {
+          "namespace": "ace",
+          "missing_unique_feature_ids": 9,
+          "missing_packet_rows": 10
+        },
+        {
+          "namespace": "artifacts",
+          "missing_unique_feature_ids": 6,
+          "missing_packet_rows": 6
+        },
+        {
+          "namespace": "docker-compose",
+          "missing_unique_feature_ids": 6,
+          "missing_packet_rows": 7
+        },
+        {
+          "namespace": "mcp",
+          "missing_unique_feature_ids": 5,
+          "missing_packet_rows": 5
+        },
+        {
+          "namespace": "minio-data",
+          "missing_unique_feature_ids": 5,
+          "missing_packet_rows": 69
+        },
+        {
+          "namespace": "atlas",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "datasets",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "db",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "graph",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 6
+        },
+        {
+          "namespace": "python",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "retrieval",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 7
+        },
+        {
+          "namespace": "sql",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "training-datasets",
+          "missing_unique_feature_ids": 4,
+          "missing_packet_rows": 4
+        },
+        {
+          "namespace": "duckdb",
+          "missing_unique_feature_ids": 3,
+          "missing_packet_rows": 3
+        },
+        {
+          "namespace": "ecosystem",
+          "missing_unique_feature_ids": 3,
+          "missing_packet_rows": 3
+        }
+      ]
+    }
+  },
+  "equations": {
+    "payloadCoverage": "points_with_feature_id / scanned_qdrant_points",
+    "uniqueFeatureCoverage": "unique_qdrant_feature_ids / scanned_qdrant_points",
+    "canonicalFeatureAlignment": "unique_qdrant_feature_ids_matching_atlas_packets / unique_qdrant_feature_ids",
+    "canonicalFeatureCoverage": "unique_qdrant_feature_ids_matching_atlas_packets / distinct_atlas_packets_feature_ids",
+    "packetCoverage": "points_with_packet_key / scanned_qdrant_points",
+    "collisionRate": "points_in_duplicate_packet_key_groups / scanned_qdrant_points",
+    "denominatorPolicy": "Qdrant points are the projection denominator; canonical alignment is reported separately"
+  },
+  "metrics": {
+    "payload_feature_coverage": 0,
+    "unique_feature_coverage": 0,
+    "canonical_feature_alignment": 0,
+    "canonical_feature_coverage": 0,
+    "packet_key_coverage": 0,
+    "duplicate_packet_point_rate": 0
+  },
+  "gates": {
+    "qdrant_point_count": true,
+    "postgres_packet_count": true,
+    "packet_key_coverage_90pct": false,
+    "source_ref_coverage_95pct": true,
+    "no_collisions": true,
+    "minimal_null_payloads": true
+  },
+  "status": "partial",
+  "collision_details": []
+}

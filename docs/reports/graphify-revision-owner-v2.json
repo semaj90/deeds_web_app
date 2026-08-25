@@ -5,11 +5,11 @@
     "schema": "atlas.graphify-revision-authority.v2",
     "authorityRevision": "atlas.graphify-revision-authority.workspace-manifest-plus-source-sha256.v2",
     "workspaceRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
-    "workspaceRevision": "sha256:8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
+    "workspaceRevision": "sha256:1e7e4cf2e15772957f4a577cd07965df9d44764968cf857de256834d9ae3ee13",
     "workspaceRevisionKind": "SHA256_SOURCE_MANIFEST",
-    "workspaceSourceManifestDigest": "8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
-    "baseGitCommitOid": "dcc4898338c7991f695a7c34d0932f93590b7800",
-    "baseGitTreeOid": "6901bf9dfcc64328e3d0b24ae7027d62b0a035ca",
+    "workspaceSourceManifestDigest": "1e7e4cf2e15772957f4a577cd07965df9d44764968cf857de256834d9ae3ee13",
+    "baseGitCommitOid": "35ad08e35e55aa493db72f65bdd142a29b4ff690",
+    "baseGitTreeOid": "e004fcb429b14c0cf2dfa7309f354439ffaee31e",
     "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts",
     "sourceRevision": "sha256:fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
     "sourceRevisionKind": "SHA256_EXACT_UTF8_SOURCE_BYTES",
@@ -22,7 +22,7 @@
     "gitCommitIsProvenanceOnly": true,
     "canonicalWritesAllowed": false,
     "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-    "authorityChecksum": "99833f3e144919b72da1ef1c4c66425be6716eb5f99177b8fde75adb5f8b2e01"
+    "authorityChecksum": "64b8f9a3efa9c9d1fc90f8ddabf9fe555efd140f5458fe2afb8bb510c912a467"
   },
   "storage": {
     "graphifyRunsPresent": true,
@@ -50,7 +50,7 @@
   "canonicalWriteAttempted": false,
   "readOnly": true,
   "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-  "ownerChecksum": "4e93ff4b9a0ea60819d07b2925ad75a98214219c78c5191786e9d9123486eb5b",
+  "ownerChecksum": "da191f8544d14b82d2666e5fd049866fd47a7937d07d0b13d0eb7c1e708a5e85",
   "schemaObservation": {
     "schema": "atlas.graphify-source-inventory-schema.v2",
     "graphifyRunsPresent": true,
@@ -75,17 +75,23 @@
       "byte_length",
       "code_source_revision",
       "content_hash",
+      "created_at",
       "file_id",
       "first_seen_run_id",
+      "git_blob_oid",
       "language",
       "last_seen_run_id",
       "parse_error",
       "parse_status",
       "parser_name",
       "parser_version",
+      "producer_revision",
       "source_ref",
       "source_revision",
-      "workspace_id"
+      "source_revision_authority",
+      "updated_at",
+      "workspace_id",
+      "workspace_revision"
     ],
     "requiredRunColumnsPresent": true,
     "requiredFileColumnsPresent": true,
@@ -96,21 +102,21 @@
   "workspaceOrigin": {
     "record": {
       "schema": "atlas.workspace-revision.v1",
-      "workspaceRevision": "sha256:8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
+      "workspaceRevision": "sha256:1e7e4cf2e15772957f4a577cd07965df9d44764968cf857de256834d9ae3ee13",
       "repositoryId": "semaj90/deeds_web_app",
       "gitObjectFormat": "sha1",
-      "baseCommitOid": "dcc4898338c7991f695a7c34d0932f93590b7800",
-      "baseTreeOid": "6901bf9dfcc64328e3d0b24ae7027d62b0a035ca",
+      "baseCommitOid": "35ad08e35e55aa493db72f65bdd142a29b4ff690",
+      "baseTreeOid": "e004fcb429b14c0cf2dfa7309f354439ffaee31e",
       "gitHeadRef": "refs/heads/main",
       "dirty": true,
-      "sourceCount": 23428,
-      "sourceManifestDigest": "8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
+      "sourceCount": 23487,
+      "sourceManifestDigest": "1e7e4cf2e15772957f4a577cd07965df9d44764968cf857de256834d9ae3ee13",
       "sourceRevisionAlgorithm": "atlas.code.source-revision.v1",
-      "generatedAt": "2026-08-25T04:59:34.190Z",
+      "generatedAt": "2026-08-25T17:53:54.760Z",
       "readOnlyObservation": true,
       "canonicalAuthority": false,
       "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-      "checksum": "7d1de8cc8ed020b5b0a116bc77f6da2c43706eac7c4fc3b2e4d38ce44147f1d9"
+      "checksum": "f4534fc35b44722384116e2eb157207cf3eaefe643cc772cd9b1c22078d14a24"
     },
     "skipped": [
       {

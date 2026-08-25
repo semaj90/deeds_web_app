@@ -23,8 +23,13 @@ await loadAtlasEnv();
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
-const BATCH_SIZE = 256;
-const LIMIT = 52380;
+const numericArg = (name, fallback) => {
+  const value = process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+const BATCH_SIZE = Math.max(1, Math.min(1000, Math.floor(numericArg('batch-size', 256))));
+const LIMIT = Math.max(1, Math.min(52380, Math.floor(numericArg('limit', 52380))));
 const CANONICAL_DIMENSION = 768;
 
 const ZERO_UUID = '00000000-0000-0000-0000-000000000000';
@@ -48,6 +53,27 @@ console.log('');
 
 const pool = new Pool({ connectionString: PG_URL });
 
+async function loadUniqueCanonicalPackets() {
+  const result = await pool.query(`
+    SELECT p.source_ref, p.content_hash, p.packet_key, p.workspace_id,
+           NULL::text AS source_revision, p.workspace_revision
+    FROM atlas_packets p
+    JOIN (
+      SELECT source_ref, content_hash
+      FROM atlas_packets
+      WHERE source_ref IS NOT NULL AND content_hash IS NOT NULL
+      GROUP BY source_ref, content_hash
+      HAVING count(*) = 1
+    ) unique_packets
+      ON unique_packets.source_ref = p.source_ref
+     AND unique_packets.content_hash = p.content_hash
+  `);
+  return new Map(result.rows.map((row) => [
+    `${row.source_ref}|${row.content_hash}`,
+    row,
+  ]));
+}
+
 function parseHalfvec(text) {
   if (typeof text !== 'string') throw new TypeError(`embedding must be a string, got ${typeof text}`);
   const body = text.trim();
@@ -69,6 +95,8 @@ const startTime = Date.now();
 let currentCursor = ZERO_UUID;
 
 try {
+  const canonicalPackets = await loadUniqueCanonicalPackets();
+  console.log(`   Unique canonical packet/hash matches: ${canonicalPackets.size}`);
   while (scannedRows < LIMIT) {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - scannedRows);
     const query = `
@@ -101,7 +129,10 @@ try {
       let embedding;
       try {
         validateQdrantProjectionMetadataV1(row);
+        const canonical = canonicalPackets.get(`${row.relative_path}|${row.content_hash}`);
+        if (!canonical) throw new Error('CANONICAL_PACKET_HASH_MATCH_REQUIRED');
         embedding = parseHalfvec(row.embedding_text);
+        row.canonical_packet = canonical;
       } catch (err) {
         const reason = err instanceof Error ? err.message : String(err);
         console.error(`   Row ${row.id}: Projection rejected: ${reason}`);
@@ -119,12 +150,16 @@ try {
         id: row.id,
         vector: { [QDRANT_VECTOR_NAME]: embedding },
         payload: {
+          packet_key: row.canonical_packet.packet_key,
+          workspace_id: row.canonical_packet.workspace_id,
+          source_revision: row.canonical_packet.source_revision,
+          workspace_revision: row.canonical_packet.workspace_revision,
           postgres_id: row.id,
           chunk_id: row.chunk_id,
           source_ref: row.relative_path,
           content_hash: row.content_hash,
           representation_name: 'semantic_768',
-          representation_id: null,
+          representation_id: 'semantic_768',
           embedding_model: row.embedding_model,
           model_revision: null,
           model_revision_state: 'NOT_PROVEN',

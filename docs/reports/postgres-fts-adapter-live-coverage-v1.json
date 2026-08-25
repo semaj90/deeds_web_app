@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.postgres-fts-adapter-live-coverage.v1",
+  "generatedAt": "2026-08-25T21:16:21.230Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "perQueryResults": [
+    {
+      "query": "IngestionJobStatus",
+      "candidateCount": 2,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 2
+    },
+    {
+      "query": "GpuConfig",
+      "candidateCount": 1,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 1
+    },
+    {
+      "query": "SystemStatus",
+      "candidateCount": 6,
+      "exactLaneCount": 2,
+      "bridgeLaneCount": 4
+    },
+    {
+      "query": "ErrorPatchLogInsert",
+      "candidateCount": 1,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 1
+    },
+    {
+      "query": "extractLegalEntities",
+      "candidateCount": 1,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 1
+    },
+    {
+      "query": "CourtroomScene",
+      "candidateCount": 1,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 1
+    },
+    {
+      "query": "embedding search",
+      "candidateCount": 9,
+      "exactLaneCount": 1,
+      "bridgeLaneCount": 8
+    },
+    {
+      "query": "packet identity",
+      "candidateCount": 0,
+      "exactLaneCount": 0,
+      "bridgeLaneCount": 0
+    }
+  ],
+  "summary": {
+    "totalCandidates": 21,
+    "totalExactLane": 3,
+    "totalBridgeLane": 18,
+    "bridgeLaneContributedAnyResults": true
+  },
+  "status": "READY"
+}

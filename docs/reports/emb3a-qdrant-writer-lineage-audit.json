@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb3a.qdrant.writer.lineage.audit.v1",
-  "generatedAt": "2026-08-21T17:07:30.875Z",
+  "generatedAt": "2026-08-25T20:19:35.283Z",
   "readOnly": true,
   "collection": "codebase_chunks_768",
   "requiredPayloadFields": [
@@ -16,19 +16,34 @@
     {
       "file": "sveltekit-frontend/src/lib/server/workers/qdrant-sync-worker.ts",
       "exists": true,
+      "role": "ACTIVE_APPLICATION_SURFACE",
       "payloadLike": true,
       "fields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": true,
+        "source_revision": true,
+        "representation_revision": true
+      },
+      "directFields": {
         "packet_key": true,
         "source_ref": false,
         "workspace_revision": false,
         "source_revision": false,
         "representation_revision": false
       },
-      "status": "REVISION_FIELDS_MISSING"
+      "delegation": {
+        "mode": "SHARED_PAYLOAD_BUILDER",
+        "builder": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
+        "callDetected": true
+      },
+      "promotionBlocked": false,
+      "status": "LINEAGE_COMPLETE_VIA_SHARED_BUILDER"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
       "exists": true,
+      "role": "ACTIVE_APPLICATION_SURFACE",
       "payloadLike": false,
       "fields": {
         "packet_key": true,
@@ -37,11 +52,21 @@
         "source_revision": true,
         "representation_revision": true
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": true,
+        "source_revision": true,
+        "representation_revision": true
+      },
+      "delegation": null,
+      "promotionBlocked": false,
       "status": "LINEAGE_COMPLETE_CANDIDATE"
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts",
       "exists": true,
+      "role": "ACTIVE_APPLICATION_SURFACE",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -50,11 +75,21 @@
         "source_revision": true,
         "representation_revision": true
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": true,
+        "source_revision": true,
+        "representation_revision": true
+      },
+      "delegation": null,
+      "promotionBlocked": false,
       "status": "LINEAGE_COMPLETE_CANDIDATE"
     },
     {
       "file": "scripts/atlas/backfill-packets-to-qdrant.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -63,11 +98,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/backfill-packets-to-qdrant-ollama.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -76,11 +121,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/qdrant-upsert-worker.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -89,11 +144,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/backfill-qdrant-payloads-from-postgres.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -102,11 +167,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/backfill-qdrant-payload-upsert.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -115,11 +190,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/backfill-qdrant-payload-complete.mjs",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -128,11 +213,21 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     },
     {
       "file": "scripts/atlas/backfill-qdrant-identity-payload.mts",
       "exists": true,
+      "role": "LEGACY_BACKFILL_OR_WORKER",
       "payloadLike": true,
       "fields": {
         "packet_key": true,
@@ -141,13 +236,22 @@
         "source_revision": false,
         "representation_revision": false
       },
+      "directFields": {
+        "packet_key": true,
+        "source_ref": true,
+        "workspace_revision": false,
+        "source_revision": false,
+        "representation_revision": false
+      },
+      "delegation": null,
+      "promotionBlocked": true,
       "status": "REVISION_FIELDS_MISSING"
     }
   ],
   "writerCount": 9,
-  "completeWriterCount": 1,
+  "completeWriterCount": 2,
   "liveApplicationOwner": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
   "status": "WRITER_CONTRACT_PRESENT_PROJECTION_POPULATION_OPEN",
-  "conclusion": "The live SvelteKit writer contains the EMB3A lineage fields; Qdrant population and non-zero upstream revision values still require proof.",
+  "conclusion": "The live SvelteKit writer emits the EMB3A lineage fields directly or through the verified shared payload builder; Qdrant population and non-zero upstream revision values still require proof.",
   "canonicalWrites": false
 }

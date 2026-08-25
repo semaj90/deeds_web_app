@@ -31,11 +31,18 @@ const ROOT  = path.resolve(__dir, '../..');
 // ── Config ────────────────────────────────────────────────────────────────────
 const VERBOSE    = process.argv.includes('--verbose');
 const STRICT     = process.argv.includes('--strict');  // Fail on any gap
+const maxPointsArg = process.argv.find((arg) => arg.startsWith('--max-points='));
+const MAX_POINTS = maxPointsArg ? Math.max(1, Number.parseInt(maxPointsArg.split('=')[1], 10)) : 0;
+const collectionArg = process.argv.find((arg) => arg.startsWith('--collection='));
+const outputArg = process.argv.find((arg) => arg.startsWith('--out='));
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
-const COLLECTION = 'codebase_chunks_768';
+const COLLECTION = collectionArg?.slice('--collection='.length).trim() || 'codebase_chunks_768';
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
 const REPORT_DIR = path.resolve(ROOT, 'docs/reports');
+const REPORT_PATH = outputArg
+  ? path.resolve(ROOT, outputArg.slice('--out='.length))
+  : path.join(REPORT_DIR, 'qdrant-payload-coverage-audit.json');
 
 // ── Qdrant client helpers ─────────────────────────────────────────────────────
 
@@ -68,10 +75,11 @@ async function auditQdrantPayloads() {
     missing_domain_class: 0,
     null_payloads: 0,
     packet_keys: new Map(),  // Track duplicates
+    feature_ids: new Set(),
     orphans: [],
   };
 
-  let pointId = null;
+  let offset = null;
   const batchSize = 500;
   let hasMore = true;
 
@@ -79,7 +87,7 @@ async function auditQdrantPayloads() {
     // Use scroll endpoint with proper POST request
     const body = {
       limit: batchSize,
-      ...(pointId && { point_id_from: pointId }),
+      ...(offset !== null && { offset }),
       with_payload: true,
       with_vector: false,
     };
@@ -100,6 +108,7 @@ async function auditQdrantPayloads() {
     if (points.length === 0) break;
 
     for (const point of points) {
+      if (MAX_POINTS > 0 && stats.total_points >= MAX_POINTS) break;
       stats.total_points++;
       const payload = point.payload || {};
 
@@ -110,8 +119,10 @@ async function auditQdrantPayloads() {
       if (payload.source_ref) stats.with_source_ref++;
       else stats.missing_source_ref++;
 
-      if (payload.feature_id) stats.with_feature_id++;
-      else stats.missing_feature_id++;
+      if (payload.feature_id) {
+        stats.with_feature_id++;
+        stats.feature_ids.add(String(payload.feature_id));
+      } else stats.missing_feature_id++;
 
       if (payload.domain_class) stats.with_domain_class++;
       else stats.missing_domain_class++;
@@ -134,10 +145,10 @@ async function auditQdrantPayloads() {
         }
       }
 
-      pointId = point.id;
     }
 
-    hasMore = points.length === batchSize;
+    offset = data.result?.next_page_offset ?? null;
+    hasMore = Boolean(offset) && !(MAX_POINTS > 0 && stats.total_points >= MAX_POINTS);
 
     if (VERBOSE && stats.total_points % 5000 === 0) {
       process.stdout.write(`\r  Scanned: ${stats.total_points}   `);
@@ -145,23 +156,26 @@ async function auditQdrantPayloads() {
   }
 
   // Detect collisions
-  const collisions = Array.from(stats.packet_keys.entries())
+    const collisions = Array.from(stats.packet_keys.entries())
     .filter(([_, info]) => info.count > 1)
     .map(([key, info]) => ({ packet_key: key, count: info.count, qdrant_ids: info.qdrant_ids }));
 
-  return { stats, collisions };
+  const collisionPoints = collisions.reduce((sum, collision) => sum + collision.count, 0);
+
+  return { stats, collisions, collisionPoints };
 }
 
 /**
  * Compare Postgres vs Qdrant row counts
  */
-async function auditPostgresState(pool) {
+async function auditPostgresState(pool, qdrantFeatureIds) {
   const { rows: pgStats } = await pool.query(`
     SELECT
       COUNT(*) as total,
       COUNT(CASE WHEN packet_key IS NOT NULL THEN 1 END) as with_packet_key,
       COUNT(CASE WHEN source_ref IS NOT NULL THEN 1 END) as with_source_ref,
       COUNT(CASE WHEN feature_id IS NOT NULL THEN 1 END) as with_feature_id,
+      COUNT(DISTINCT feature_id) as distinct_feature_ids,
       COUNT(CASE WHEN domain_class IS NOT NULL THEN 1 END) as with_domain_class
     FROM atlas_packets
   `);
@@ -172,9 +186,49 @@ async function auditPostgresState(pool) {
     WHERE cci.qdrant_id IS NOT NULL
   `);
 
+  const featureIds = [...qdrantFeatureIds];
+  const { rows: featureAlignmentRows } = featureIds.length
+    ? await pool.query(`
+        SELECT COUNT(DISTINCT feature_id)::int AS matched_unique_feature_ids,
+               COUNT(*)::int AS matched_packet_rows
+        FROM atlas_packets
+        WHERE feature_id = ANY($1::text[])
+      `, [featureIds])
+    : { rows: [{ matched_unique_feature_ids: 0, matched_packet_rows: 0 }] };
+
+  const { rows: featureGapRows } = await pool.query(`
+    SELECT split_part(feature_id, '.', 1) AS namespace,
+           COUNT(DISTINCT feature_id)::int AS missing_unique_feature_ids,
+           COUNT(*)::int AS missing_packet_rows
+    FROM atlas_packets
+    WHERE feature_id IS NOT NULL
+      AND NOT (feature_id = ANY($1::text[]))
+    GROUP BY split_part(feature_id, '.', 1)
+    ORDER BY missing_unique_feature_ids DESC, namespace ASC
+    LIMIT 50
+  `, [featureIds]);
+  const { rows: featureGapTotals } = await pool.query(`
+    SELECT COUNT(*)::int AS missing_packet_rows,
+           COUNT(DISTINCT feature_id)::int AS missing_unique_feature_ids
+    FROM atlas_packets
+    WHERE feature_id IS NOT NULL
+      AND NOT (feature_id = ANY($1::text[]))
+  `, [featureIds]);
+
   return {
     packets: pgStats[0],
     qdrant_linked: qdrantLinkedRows[0]?.qdrant_linked ?? 0,
+    feature_alignment: {
+      qdrant_unique_feature_ids: featureIds.length,
+      matched_unique_feature_ids: Number(featureAlignmentRows[0]?.matched_unique_feature_ids ?? 0),
+      matched_packet_rows: Number(featureAlignmentRows[0]?.matched_packet_rows ?? 0),
+      canonical_distinct_feature_ids: Number(pgStats[0]?.distinct_feature_ids ?? 0),
+    },
+    feature_projection_gap: {
+      missing_unique_feature_ids: Number(featureGapTotals[0]?.missing_unique_feature_ids ?? 0),
+      missing_packet_rows: Number(featureGapTotals[0]?.missing_packet_rows ?? 0),
+      by_namespace: featureGapRows,
+    },
   };
 }
 
@@ -184,9 +238,9 @@ async function auditPostgresState(pool) {
 function writeReport(report) {
   try {
     mkdirSync(REPORT_DIR, { recursive: true });
-    const reportPath = path.join(REPORT_DIR, 'qdrant-payload-coverage-audit.json');
-    writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
-    console.log(`\nReport: ${reportPath}`);
+    mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
+    writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2) + '\n');
+    console.log(`\nReport: ${REPORT_PATH}`);
   } catch (err) {
     console.error(`Failed to write report: ${err.message}`);
   }
@@ -207,7 +261,7 @@ async function main() {
     console.log(`  Vector dim: ${collInfo.config?.params?.vectors?.size}`);
 
     console.log('\nAuditing Qdrant payloads...');
-    const { stats: qdrantStats, collisions } = await auditQdrantPayloads();
+    const { stats: qdrantStats, collisions, collisionPoints } = await auditQdrantPayloads();
 
     console.log(`\n  Total scanned: ${qdrantStats.total_points}`);
     console.log(`  With packet_key: ${qdrantStats.with_packet_key} (${percent(qdrantStats.with_packet_key, qdrantStats.total_points)}%)`);
@@ -228,7 +282,7 @@ async function main() {
 
     // ── Postgres state ───────────────────────────────────────────────────────────
     console.log('\nAuditing Postgres atlas_packets...');
-    const pgAudit = await auditPostgresState(pool);
+    const pgAudit = await auditPostgresState(pool, qdrantStats.feature_ids);
     const pgPackets = pgAudit.packets;
 
     console.log(`  Total packets: ${pgPackets.total}`);
@@ -269,12 +323,16 @@ async function main() {
       qdrant: {
         collection: COLLECTION,
         total_points: qdrantStats.total_points,
+        collection_points: collInfo.points_count,
+        bounded: MAX_POINTS > 0,
+        max_points: MAX_POINTS || null,
         with_packet_key: qdrantStats.with_packet_key,
         with_source_ref: qdrantStats.with_source_ref,
         with_feature_id: qdrantStats.with_feature_id,
         with_domain_class: qdrantStats.with_domain_class,
         null_payloads: qdrantStats.null_payloads,
         collisions: collisions.length,
+        collision_points: collisionPoints,
       },
       postgres: {
         total_packets: pgPackets.total,
@@ -283,9 +341,44 @@ async function main() {
         with_feature_id: pgPackets.with_feature_id,
         with_domain_class: pgPackets.with_domain_class,
         qdrant_linked: pgAudit.qdrant_linked,
+        feature_alignment: pgAudit.feature_alignment,
+        feature_projection_gap: pgAudit.feature_projection_gap,
+      },
+      equations: {
+        payloadCoverage: 'points_with_feature_id / scanned_qdrant_points',
+        uniqueFeatureCoverage: 'unique_qdrant_feature_ids / scanned_qdrant_points',
+        canonicalFeatureAlignment: 'unique_qdrant_feature_ids_matching_atlas_packets / unique_qdrant_feature_ids',
+        canonicalFeatureCoverage: 'unique_qdrant_feature_ids_matching_atlas_packets / distinct_atlas_packets_feature_ids',
+        packetCoverage: 'points_with_packet_key / scanned_qdrant_points',
+        collisionRate: 'points_in_duplicate_packet_key_groups / scanned_qdrant_points',
+        denominatorPolicy: 'Qdrant points are the projection denominator; canonical alignment is reported separately',
+      },
+      metrics: {
+        payload_feature_coverage: qdrantStats.total_points
+          ? qdrantStats.with_feature_id / qdrantStats.total_points
+          : 0,
+        unique_feature_coverage: qdrantStats.total_points
+          ? pgAudit.feature_alignment.qdrant_unique_feature_ids / qdrantStats.total_points
+          : 0,
+        canonical_feature_alignment: pgAudit.feature_alignment.qdrant_unique_feature_ids
+          ? pgAudit.feature_alignment.matched_unique_feature_ids /
+            pgAudit.feature_alignment.qdrant_unique_feature_ids
+          : 0,
+        canonical_feature_coverage: pgAudit.feature_alignment.canonical_distinct_feature_ids
+          ? pgAudit.feature_alignment.matched_unique_feature_ids /
+            pgAudit.feature_alignment.canonical_distinct_feature_ids
+          : 0,
+        packet_key_coverage: qdrantStats.total_points
+          ? qdrantStats.with_packet_key / qdrantStats.total_points
+          : 0,
+        duplicate_packet_point_rate: qdrantStats.total_points
+          ? collisionPoints / qdrantStats.total_points
+          : 0,
       },
       gates,
-      status: allPass ? 'pass' : 'partial',
+      status: MAX_POINTS > 0 && qdrantStats.total_points < Number(collInfo.points_count ?? 0)
+        ? 'partial_bounded'
+        : (allPass ? 'pass' : 'partial'),
       collision_details: VERBOSE ? collisions.slice(0, 10) : [],
     };
 

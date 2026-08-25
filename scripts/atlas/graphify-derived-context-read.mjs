@@ -9,7 +9,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,6 +17,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const reportPath = path.resolve(root, 'docs/reports/atlas-derived-context-read-v1.json');
 const node = process.execPath;
 const python = process.env.ATLAS_PYTHON?.trim() || 'python';
+const rerankerInput = process.env.ATLAS_RERANKER_RETRIEVAL_INPUT?.trim() || '';
 
 const steps = [
   {
@@ -50,10 +51,24 @@ const steps = [
     command: node,
     args: ['scripts/atlas/audit-live-source-lineage-tables.mjs'],
   },
+  {
+    id: 'ATLAS_RERANKER_PAIR_COMPILE',
+    command: node,
+    args: rerankerInput ? ['scripts/atlas/compile-atlas-reranker-pairs.mjs', `--input=${rerankerInput}`] : [],
+    skip: !rerankerInput || !existsSync(path.resolve(root, rerankerInput)),
+  },
 ];
 
 const results = [];
 for (const step of steps) {
+  if (step.skip) {
+    results.push({
+      id: step.id,
+      status: 'SKIPPED_INPUT_UNAVAILABLE',
+      reason: 'Set ATLAS_RERANKER_RETRIEVAL_INPUT to a frozen retrieval-envelope JSONL artifact',
+    });
+    continue;
+  }
   const started = Date.now();
   try {
     const output = execFileSync(step.command, step.args, {
@@ -89,12 +104,14 @@ function readJson(relativePath) {
 const contextual = readJson('docs/reports/contextual-tree-readiness-report.json');
 const latentSom = readJson('docs/reports/latent-som-join-key-audit.json');
 const sourceLineage = readJson('docs/reports/live-source-lineage-table-audit.json');
+const rerankerPairs = readJson('docs/reports/atlas-reranker-pairs-v1.json');
 const derivedReadiness = {
   contextualTree: contextual?.summary?.overall ?? contextual?.overall ?? contextual?.status ?? 'NOT_REPORTED',
   latentCoveragePct: latentSom?.latent_coverage?.coverage_pct ?? null,
   somCoveragePct: latentSom?.som_coverage?.coverage_pct ?? null,
   sourceLineage: sourceLineage?.status ?? 'NOT_REPORTED',
   databaseContext: sourceLineage?.databaseConnection?.status ?? 'NOT_REPORTED',
+  rerankerPairs: rerankerPairs?.status ?? 'INPUT_NOT_PROVIDED',
 };
 const degraded = results.some((step) => step.status !== 'PASS')
   || derivedReadiness.contextualTree !== 'READY'

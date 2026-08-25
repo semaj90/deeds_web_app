@@ -27,6 +27,7 @@ const APPLY = process.env.ATLAS_GRAPHIFY_REVISION_CANARY === '1';
 const COMMIT = process.env.ATLAS_GRAPHIFY_REVISION_CANARY_COMMIT === '1';
 const WORKSPACE_ID = process.env.ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID?.trim() || null;
 const SELECTED_SOURCE = process.env.ATLAS_GRAPHIFY_CANARY_SOURCE?.replaceAll('\\', '/') || null;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 if (!DATABASE_URL) throw new Error('DATABASE_URL_REQUIRED');
 if (process.env.NODE_ENV === 'production') throw new Error('GRAPHIFY_REVISION_CANARY_REFUSES_PRODUCTION');
@@ -123,6 +124,19 @@ if (!workspaceId) {
     selectedSourceRef,
     canonicalWriteAttempted: false,
     requiredEnv: 'ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID=<existing non-production workspace UUID>',
+  }, null, 2));
+  await pool.end();
+  process.exit(3);
+}
+
+if (!UUID_RE.test(workspaceId)) {
+  console.log(JSON.stringify({
+    status: 'GRAPHIFY_CANARY_WORKSPACE_ID_INVALID',
+    workspaceId,
+    workspaceRevision: record.workspaceRevision,
+    selectedSourceRef,
+    canonicalWriteAttempted: false,
+    requiredFormat: 'UUID_NON_PRODUCTION_WORKSPACE',
   }, null, 2));
   await pool.end();
   process.exit(3);

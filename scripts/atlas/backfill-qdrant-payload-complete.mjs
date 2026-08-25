@@ -3,7 +3,9 @@
  * H.5: Backfill Qdrant Payload with canonical Postgres fields
  *
  * Uses qdrant_point_id from atlas_higher_hop_index (populated by H.4) to call
- * the correct Qdrant set_payload endpoint with explicit point IDs.
+ * the correct Qdrant set_payload endpoint with explicit point IDs. Canonical
+ * packet metadata is read from atlas_packets; higher-hop rows only provide the
+ * projection linkage and derived fields.
  *
  * Only processes rows where identity_lane = 'source_ref_key->qdrant' (vector-backed).
  * Skips mcp_tool_stub / schema_stub / qdrant_gap lanes.
@@ -53,10 +55,21 @@ console.log('╚═════════════════════�
 
 // ── Qdrant helper ─────────────────────────────────────────────────────────────
 async function qdrantPost(path, body) {
+  const encodePointId = (value) => {
+    const raw = String(value).trim();
+    return /^\d+$/.test(raw) ? raw : JSON.stringify(raw);
+  };
+  // Keep u64 point IDs as their original JSON integer text. Converting them
+  // through Number first can round values above Number.MAX_SAFE_INTEGER.
+  const bodyText = Array.isArray(body?.points)
+    ? `{"payload":${JSON.stringify(body.payload ?? {})},"points":[${body.points.map(encodePointId).join(',')}]}`
+    : Array.isArray(body?.ids)
+      ? `{"ids":[${body.ids.map(encodePointId).join(',')}],"with_payload":${body.with_payload === true ? 'true' : 'false'}}`
+      : JSON.stringify(body);
   const res = await fetch(`${QDRANT_URL}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: bodyText,
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`Qdrant ${res.status} on ${path}: ${text.slice(0, 200)}`);
@@ -86,7 +99,7 @@ async function backfill(client) {
       h.tree_node_id,
       h.som_cluster
     FROM atlas_higher_hop_index h
-    LEFT JOIN atlas_codebase_packets p ON p.packet_key = h.packet_key
+    LEFT JOIN atlas_packets p ON p.packet_key = h.packet_key
     WHERE h.qdrant_point_id IS NOT NULL
       AND h.identity_lane IN ('source_ref_key->qdrant', 'packet_spine', 'source_ref')
     ORDER BY h.updated_at DESC
@@ -136,8 +149,10 @@ async function backfill(client) {
       const raw = String(row.qdrant_point_id).trim();
       // Qdrant supports integer IDs and UUID IDs
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw);
-      const pointId = isUuid ? raw : parseInt(raw, 10);
-      if (!isUuid && isNaN(pointId)) { batchFail++; continue; }
+      // Qdrant integer IDs may exceed JavaScript's safe integer range. Keep
+      // them as decimal strings so updates do not silently retarget a point.
+      const pointId = raw;
+      if (!isUuid && !/^\d+$/.test(pointId)) { batchFail++; continue; }
 
       const payload = {
         packet_key:      row.packet_key    || null,
@@ -190,7 +205,10 @@ async function verify(client) {
     LIMIT 20
   `);
 
-  const ids = result.rows.map(r => parseInt(r.qdrant_point_id)).filter(n => !isNaN(n));
+  // Preserve u64 point IDs as strings; Number/parseInt can round them.
+  const ids = result.rows
+    .map(r => String(r.qdrant_point_id ?? '').trim())
+    .filter(id => /^\d+$/.test(id) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
 
   const data = await qdrantPost(`/collections/${COLLECTION_NAME}/points`, { ids, with_payload: true });
   const points = data.result || [];

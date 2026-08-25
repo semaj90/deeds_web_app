@@ -65,6 +65,66 @@ export interface RetrievalResult {
   };
 }
 
+export interface GoRetrievalBm25CompatResponse {
+  results?: Array<Record<string, unknown>>;
+  error?: string;
+  /** Real lane owner per LEXICAL-OWNER-02 — expected 'postgres_fts', not true BM25. */
+  lane?: string;
+  /** Compatibility label for pre-rename callers — expected 'bm25'. */
+  legacy_lane?: string;
+  capability?: { trueBm25?: boolean };
+}
+
+export interface ParsedGoRetrievalBm25Result {
+  ids: string[];
+  ranked: Array<{ feature_id: string; bm25_score: number; rank: number }>;
+  laneMeta: {
+    lane: string | null;
+    legacyLane: string | null;
+    trueBm25: boolean | null;
+  };
+}
+
+/**
+ * Pure parser for the Go retrieval `/search/bm25` compatibility response — extracted from
+ * `GoRetrievalOrchestrator.queryPostgresBM25()` (2026-08-25) so the response contract can be
+ * unit-tested without mocking `fetch` or the orchestrator's other three external dependencies
+ * (embedding service, Qdrant, Neo4j).
+ *
+ * Per LEXICAL-OWNER-02 (openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md): the
+ * route is a compatibility shim over PostgreSQL FTS, not true BM25. This parser MUST tolerate
+ * `lane: 'postgres_fts'`, `legacy_lane: 'bm25'`, and `capability.trueBm25` fields being present
+ * (or absent — the actual Go service is not checked into this repo, so its real response shape
+ * cannot be verified from here) without inferring scoring semantics from the route name itself.
+ * The output field `bm25_score` is kept for backward compatibility with existing RRF callers,
+ * not as a claim that the upstream score is true BM25 — `laneMeta.trueBm25` carries whatever the
+ * service actually reports (or `null` if it reports nothing), and callers wanting to distinguish
+ * true BM25 from the FTS compatibility shim should read `laneMeta`, not the field name.
+ */
+export function parseGoRetrievalBm25Response(
+  data: GoRetrievalBm25CompatResponse,
+  httpOk: boolean,
+  httpStatus: number,
+): ParsedGoRetrievalBm25Result {
+  if (!httpOk || data.error) {
+    throw new Error(data.error ?? `BM25 service returned ${httpStatus}`);
+  }
+  const results = data.results ?? [];
+  return {
+    ids: results.map((r) => String(r.id ?? r.source_ref ?? '')),
+    ranked: results.map((r, idx) => ({
+      feature_id: String(r.id ?? r.source_ref ?? ''),
+      bm25_score: Number(r.score ?? 0),
+      rank: idx,
+    })),
+    laneMeta: {
+      lane: typeof data.lane === 'string' ? data.lane : null,
+      legacyLane: typeof data.legacy_lane === 'string' ? data.legacy_lane : null,
+      trueBm25: typeof data.capability?.trueBm25 === 'boolean' ? data.capability.trueBm25 : null,
+    },
+  };
+}
+
 export class GoRetrievalOrchestrator {
   private goRetrievalUrl = ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100';
   private turbovecUrl = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791';
@@ -183,17 +243,12 @@ export class GoRetrievalOrchestrator {
         body: JSON.stringify({ query, limit: topK }),
         signal: AbortSignal.timeout(1200),
       });
-      const data = (await response.json()) as { results?: Array<Record<string, unknown>>; error?: string };
-      if (!response.ok || data.error) throw new Error(data.error ?? `BM25 service returned ${response.status}`);
-      const results = data.results ?? [];
+      const data = (await response.json()) as GoRetrievalBm25CompatResponse;
+      const parsed = parseGoRetrievalBm25Response(data, response.ok, response.status);
 
       return {
-        ids: results.map((r) => String(r.id ?? r.source_ref ?? '')),
-        ranked: results.map((r, idx) => ({
-          feature_id: String(r.id ?? r.source_ref ?? ''),
-          bm25_score: Number(r.score ?? 0),
-          rank: idx
-        })),
+        ids: parsed.ids,
+        ranked: parsed.ranked,
         duration_ms: Date.now() - start
       };
     } catch (err) {

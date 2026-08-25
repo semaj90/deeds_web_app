@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.atlas-packets-content-hash-backfill.v1",
+  "generatedAt": "2026-08-25T15:05:11.913Z",
+  "mode": "REPLAY",
+  "limit": 1000,
+  "status": "PASS",
+  "gates": {
+    "CH_BF_01": {
+      "name": "DATABASE_CONTEXT_PROVEN",
+      "proven": true,
+      "live": {
+        "database_name": "legal_ai_db",
+        "current_user": "legal_admin",
+        "current_schema": "public"
+      }
+    },
+    "CH_BF_02": {
+      "name": "UNAMBIGUOUS_SELECTION_DETERMINISTIC",
+      "proven": false,
+      "orderBy": [
+        "packet_key"
+      ],
+      "selectedCount": 0,
+      "requestedLimit": 1000,
+      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "joinDefinition": "atlas_packets.source_ref = codebase_chunk_index.source_ref, count(DISTINCT codebase_chunk_index.content_hash) = 1, atlas_packets.content_hash IS NULL"
+    },
+    "CH_BF_03": {
+      "name": "UPDATE_ONLY_APPLY_PROVEN",
+      "proven": null,
+      "attempted": false,
+      "reason": "SKIPPED_REPLAY"
+    },
+    "CH_BF_04": {
+      "name": "INDEPENDENT_READBACK_PROVEN",
+      "proven": null,
+      "attempted": false,
+      "reason": "SKIPPED_REPLAY"
+    },
+    "CH_BF_05": {
+      "name": "IDEMPOTENT_REPLAY_PROVEN",
+      "proven": true,
+      "priorReceiptPath": "docs/reports/atlas-packets-content-hash-backfill-v1-apply_bounded.json",
+      "remainingEligibleAfterApply": 0,
+      "note": "remainingEligibleAfterApply counts packets still matching the same unambiguous-selection criteria with content_hash still NULL. Zero means the prior apply was complete for the frozen selection at that time; a nonzero value here means NEW eligible packets appeared since (e.g. new codebase_chunk_index rows), not a replay failure."
+    }
+  },
+  "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "counts": {
+    "selected": 0,
+    "updated": 0,
+    "alreadyPopulated": 0,
+    "readbackMatched": 0
+  },
+  "replay": {
+    "attempted": true,
+    "selectionChecksumMatch": false,
+    "secondApplyChangedRows": 0
+  },
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false
+}

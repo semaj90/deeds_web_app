@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.cugraph-induced-subgraph-proof.v1",
+  "backend": "cugraph",
+  "read_only": true,
+  "canonical_authority": false,
+  "graph_revision": "graph-snapshot-parity-fixture",
+  "status": "EXECUTED",
+  "writes_performed": false,
+  "input_node_count": 162234,
+  "input_edge_count": 108156,
+  "requested_vertex_count": 16,
+  "selected_vertex_count": 16,
+  "missing_requested_vertices": 0,
+  "extracted_vertex_count": 16,
+  "extracted_edge_count": 8,
+  "offset_count": 2,
+  "elapsed_ms": 2762.592820000009,
+  "semantics": "induced weighted graph; both edge endpoints must be selected"
+}

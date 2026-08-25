@@ -35,7 +35,7 @@ const QDRANT_COLLECTION = 'codebase_chunks_768';
 const PG_TABLES = ['parent_atlas_documents', 'route_runtime_packets', 'codebase_chunk_index', 'atlas_feature_map_synthesized', 'atlas_feature_synthesis'];
 const SOURCE_REF_ALIASES = new Set(['source_ref', 'sourceRef', 'sourceRefs', 'file_path', 'filePath', 'relative_path', 'relPath', 'path']);
 const FEATURE_ID_ALIASES = new Set(['feature_id', 'featureId', 'feature_ids', 'featureIds', 'feature', 'feature_label', 'featureLabel']);
-const QDRANT_POINT_ALIASES = new Set(['qdrant_point_id', 'qdrantPointId', 'point_id', 'pointId', 'id']);
+const QDRANT_POINT_ALIASES = new Set(['qdrant_point_id', 'qdrantPointId', 'qdrant_id', 'qdrantId', 'point_id', 'pointId', 'id']);
 const GRAPH_NODE_ALIASES = new Set(['neo4j_node', 'neo4jNode', 'node_id', 'nodeId', 'graph_node', 'graphNode', 'filePath', 'sourceRef']);
 const CANONICAL_ALIAS_GROUPS = {
   source_ref: SOURCE_REF_ALIASES,
@@ -51,6 +51,7 @@ const REQUIRE_READY_CANONICALS = {
   couchdb: ['source_ref'],
   packets: ['source_ref', 'feature_id'],
 };
+const REQUIRED_POSTGRES_TABLES = new Set(['parent_atlas_documents', 'codebase_chunk_index']);
 const EXPECTED_QDRANT_PAYLOAD_KEYS = ['source_ref', 'file_path', 'feature_id', 'qdrant_point_id', 'som_cluster'];
 const EXPECTED_DUCKDB_COLUMNS = ['source_ref', 'feature_id', 'sourceRef', 'featureId'];
 const EXPECTED_NEO4J_PROPERTIES = ['filePath', 'sourceRef', 'feature_id', 'featureId', 'file_path', 'source_ref'];
@@ -351,15 +352,18 @@ async function inspectPostgres(e, report) {
       summary.push(`${tableName}:${status}:${rowCount}`);
     }
 
-    const allReady = tableStatuses.every((entry) => entry.status === 'READY');
-    const anyMismatch = tableStatuses.some((entry) => entry.status === 'FIELD_NAME_MISMATCH');
-    const anyAbsent = tableStatuses.some((entry) => entry.status === 'DATA_ABSENT');
-    const anyUnavailable = tableStatuses.some((entry) => entry.status === 'SOURCE_UNAVAILABLE');
-    const anyMissing = tableStatuses.some((entry) => entry.status === 'MATERIALIZATION_MISSING');
+    const requiredStatuses = tableStatuses.filter((entry) => REQUIRED_POSTGRES_TABLES.has(entry.tableName));
+    const optionalStatuses = tableStatuses.filter((entry) => !REQUIRED_POSTGRES_TABLES.has(entry.tableName));
+    const requiredReady = requiredStatuses.length === REQUIRED_POSTGRES_TABLES.size && requiredStatuses.every((entry) => entry.status === 'READY');
+    const anyMismatch = requiredStatuses.some((entry) => entry.status === 'FIELD_NAME_MISMATCH');
+    const anyAbsent = requiredStatuses.some((entry) => entry.status === 'DATA_ABSENT');
+    const anyUnavailable = requiredStatuses.some((entry) => entry.status === 'SOURCE_UNAVAILABLE');
+    const anyMissing = requiredStatuses.some((entry) => entry.status === 'MATERIALIZATION_MISSING');
+    const optionalDegraded = optionalStatuses.some((entry) => entry.status !== 'READY');
 
     return finalizeLane(lane, {
       evidence: summary,
-      ready: allReady,
+      ready: requiredReady,
       fieldNameMismatch: anyMismatch,
       dataAbsent: anyAbsent,
       sourceUnavailable: anyUnavailable,
@@ -367,7 +371,7 @@ async function inspectPostgres(e, report) {
       actualFieldNames: uniqueStrings(tableStatuses.flatMap((entry) => entry.actualFieldNames ?? [])),
       expectedAliasesPresent: uniqueStrings(tableStatuses.flatMap((entry) => entry.expectedAliasesPresent ?? [])),
       expectedAliasesMissing: uniqueStrings(tableStatuses.flatMap((entry) => entry.expectedAliasesMissing ?? [])),
-      preferredStatus: allReady ? 'READY' : anyUnavailable ? 'SOURCE_UNAVAILABLE' : anyMissing ? 'MATERIALIZATION_MISSING' : anyMismatch ? 'FIELD_NAME_MISMATCH' : 'DATA_ABSENT',
+      preferredStatus: !requiredReady ? (anyUnavailable ? 'SOURCE_UNAVAILABLE' : anyMissing ? 'MATERIALIZATION_MISSING' : anyMismatch ? 'FIELD_NAME_MISMATCH' : 'DATA_ABSENT') : optionalDegraded ? 'PARTIAL_OPTIONAL_SURFACES' : 'READY',
     });
   } catch (error) {
     return finalizeLane(lane, {

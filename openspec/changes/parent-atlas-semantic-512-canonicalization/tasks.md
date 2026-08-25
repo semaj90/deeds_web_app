@@ -444,11 +444,49 @@ linkage row.
       identity (tier 4) — the current `relative_path + qualified_symbol` bridge attempt is
       itself empirically dead (0 hits) because `atlas_packets.function_symbol` is populated on
       only 61/61,660 rows.
-- [ ] S512-ID4 — Linkage read-back determinism: **PENDING**, blocked on S512-ID3. Once any
-      linkage exists, re-running the linker against the same Postgres snapshot must reproduce
-      identical `match_method`/`confidence`/`canonicalPacketKey` for every previously-linked
-      row (idempotency proof), before S512-10 is allowed to consume
-      `atlas_chunk_packet_identity_links` rows as its ADMITTED source.
+      **Qdrant tier audit (2026-08-25):** `atlas_packets.qdrant_point_id` is populated for
+      only 6,451/61,660 packets (10.5%), `qdrant_collection` for 6,365, and 10 duplicate point
+      IDs exist. This is below the 95% admission target and remains `REVIEW`, so Qdrant IDs are
+      not an admitted replacement for the missing packet/chunk bridge.
+- [x] S512-ID4 — Linkage read-back determinism: **PROVEN_READ_ONLY**. The restored verifier
+      `sveltekit-frontend/scripts/atlas/verify-s512-chunk-packet-identity-readback.mts` read the
+      live snapshot twice under `REPEATABLE READ READ ONLY`; both checksums were
+      `aeeef8bffa0fbb19c6ae9437aa9bc3c4f76922124b723fe43abe2bb488e9e5f6` across `105,762`
+      rows. This proves deterministic readback only; S512-ID3 still blocks bridge admission.
+      `sveltekit-frontend/scripts/atlas/verify-s512-chunk-packet-identity-readback.mts` was
+      restored as a read-only repeatable-snapshot checksum verifier. It does not admit bridge
+      rows; S512-ID3 remains the separate operator gate.
+
+**Cross-reference (2026-08-25)**: `openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`'s
+`PACKET-CHUNK-GRANULARITY-01` entry independently arrived at this same table/decision while
+investigating why the new `searchPostgresFts()` lexical adapter's `(source_ref, content_hash)`
+join has low coverage for multi-chunk files. That entry was corrected to point back here rather
+than re-deciding S512-ID3/ID4 — this remains the one authoritative gate for whether
+`atlas_chunk_packet_identity_links` is safe for any consumer (FTS or otherwise) to rely on. Live
+check that session found the table is still a single frozen snapshot from this gate family's
+`codebase_chunks_768` addendum run (`algorithm_revision:
+'atlas.chunk-packet-identity-linker.v1'`, `observed_at: 2026-08-21T15:03:58Z`,
+`match_method` counts `UNRESOLVED: 101,237`, `EXACT_CANONICAL_ID: 4,517`, `AMBIGUOUS: 8`) — no
+new rows or rebuild since S512-ID2.
+
+- [x] **S512-ID3 — RESOLVED via explicit operator decision (2026-08-25), scoped narrowly.** The
+  operator directly chose "Option B" from `PACKET-CHUNK-GRANULARITY-01`'s three named options —
+  route the FTS identity join through this bridge table (`EXACT_CANONICAL_ID` rows only), keep
+  `atlas_packets` file-granular — via explicit instruction in the neural-prefill-encoder session,
+  not inferred by an agent. This is the operator decision this gate was waiting on. **Scope of
+  what's actually admitted**: only `searchPostgresFts()` in `postgres-fts.adapter.ts` now consumes
+  the bridge, and only its 4,517 `EXACT_CANONICAL_ID` rows — `UNRESOLVED`/`AMBIGUOUS` rows remain
+  excluded by a hard SQL predicate, not convention. This does NOT resolve the two unlocks
+  originally named above (Qdrant-tier population is still `REVIEW` at 10.5%; the
+  `atlas_source_refs` content-hash bridge is still empirically dead) — it resolves a narrower,
+  different question: whether the already-admitted `EXACT_CANONICAL_ID` subset may be consumed by
+  one specific caller. See `MCP-FILE-TOPK`/`PACKET-CHUNK-GRANULARITY-01`-adjacent entry in
+  `parent-atlas-neural-prefill-encoder/tasks.md` (dated 2026-08-25, "PACKET-CHUNK-GRANULARITY-01
+  resolved") for the implementation and measured coverage (`408` exact + `2,811` bridge-additional
+  = `3,219/52,380`, ~6.1%, up from ~0.78%).
+  - [ ] Any OTHER consumer wanting to rely on this bridge table still needs its own explicit
+    admission decision — this resolution is scoped to the FTS adapter only, not a blanket
+    "bridge table is now canonical" declaration.
 
 **Until S512-ID3/ID4 close, S512-10's real result stands as reported above (0 ADMITTED,
 53,379 REVIEW under the reconciler's own weaker source_ref-only signal) and S512-11 through

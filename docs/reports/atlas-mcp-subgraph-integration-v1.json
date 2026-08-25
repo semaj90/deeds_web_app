@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.mcp-subgraph-integration-report.v1",
+  "status": "WIRED_READ_ONLY",
+  "selectionTrace": {
+    "schema": "atlas.mcp-tool-selection-trace.v1",
+    "owner": "sveltekit-frontend/src/lib/server/ai/tool-selection.ts",
+    "stateSource": "DETERMINISTIC_QUERY_HEURISTIC",
+    "canonicalAuthority": false
+  },
+  "subgraph": {
+    "typescriptReference": "packages/parent-atlas/src/core/spectral-graph-clustering.ts",
+    "pythonExecutor": "python/atlas_subgraph_cugraph.py",
+    "proofReport": "docs/reports/atlas-subgraph-cugraph-proof-v1.json",
+    "canonicalAuthority": false,
+    "checksumParity": "PENDING"
+  },
+  "nativeBoundary": {
+    "nodeApiLibtorch": "EXISTING_CHALLENGER_BOUNDARY",
+    "cugraphCpp": "NOT_WIRED_TO_NODE",
+    "promotion": "BLOCKED_ON_TYPED_PARITY"
+  },
+  "writes": false
+}

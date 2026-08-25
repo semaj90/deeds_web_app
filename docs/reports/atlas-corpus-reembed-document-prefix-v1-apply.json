@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.corpus-reembed-document-prefix.v1",
+  "generatedAt": "2026-08-25T18:45:45.079Z",
+  "dryRun": false,
+  "writesPerformed": false,
+  "newEmbeddingModelTag": "embeddinggemma:latest:eg-task-prefix-v1",
+  "limit": null,
+  "processed": 52325,
+  "updated": 52324,
+  "skippedAlreadyDone": 0,
+  "errors": [
+    {
+      "id": "e0944ad6-30b1-44ee-95bb-e12111af70ca",
+      "message": "Ollama 500: {\"error\":\"the input length exceeds the context length\"}"
+    }
+  ],
+  "sampleDimensionCheck": {
+    "id": "00438fe4-90dc-4712-afaf-fda961ada3a4",
+    "dimension": 768,
+    "first3": [
+      -0.09564291685819626,
+      0.008996658958494663,
+      -0.061036527156829834
+    ]
+  },
+  "startedAt": "2026-08-25T18:45:45.079Z",
+  "finishedAt": "2026-08-25T19:34:00.207Z"
+}

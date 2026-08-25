@@ -62,7 +62,7 @@ export function formatEmbeddingGemmaInput(
     case 'code_query':
       return `task: code retrieval query | query: ${normalizedContent}`;
     case 'document':
-      return `title: ${title?.trim() || 'none'}\ntext: ${normalizedContent}`;
+      return `title: ${title?.trim() || 'none'} | text: ${normalizedContent}`;
   }
 }
 

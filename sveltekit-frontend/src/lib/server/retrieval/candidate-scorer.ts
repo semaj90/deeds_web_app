@@ -20,6 +20,9 @@
 
 import { z } from 'zod';
 import { blendScores, DEFAULT_BLEND_WEIGHTS, type BlendWeights } from './runtime-reranker.js';
+import { staticDynamicScore, type StaticDynamicLabel } from './static-dynamic-classifier.js';
+import { provenanceScore } from '../classifier/code-symbol-provenance.js';
+import type { SourceKind } from '../classifier/source-kind-classifier.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -42,9 +45,49 @@ export interface FusedCandidateInput {
   crossEncoderScore?: number;
   crossEncoderScoreNormalized?: number;
 
+  // Pre-classified upstream labels (from static-dynamic-classifier.ts /
+  // code-symbol-provenance.ts) folded into `domainScore` when the caller hasn't already supplied
+  // an explicit `domainScore`. Classification itself happens upstream, not in this deterministic,
+  // I/O-free scoring stage — these are just labels to convert to a blend input.
+  staticDynamicLabel?: StaticDynamicLabel;
+  codeSymbolProvenance?: Extract<SourceKind, 'ai_generated' | 'code' | 'unknown'>;
+
   // Preserved for identity — scorer must not change these
   qdrantPointId?: string;
   packetId?: string;
+}
+
+/**
+ * `domainScore` composite version marker — distinguishes this unified-symbol-rank composite
+ * (static-vs-dynamic + user-vs-AI-generated provenance, averaged) from `domainScore`'s prior
+ * dormant/unpopulated state or any future different composite definition. Bump when the formula
+ * changes. See openspec/changes/parent-atlas-unified-symbol-ranking/design.md.
+ */
+export const DOMAIN_SCORE_COMPOSITE_VERSION = 'unified-symbol-rank-v1';
+
+/**
+ * Fold `staticDynamicLabel`/`codeSymbolProvenance` into a single `domainScore` composite when the
+ * caller hasn't already supplied an explicit `domainScore`. Returns `undefined` (never a
+ * fabricated 0.5) when neither input signal is available — `blendScores()` already skips
+ * `undefined` signals correctly. When exactly one signal is available, that signal alone is the
+ * composite (no averaging against a missing half).
+ */
+export function computeDomainScoreComposite(
+  candidate: Pick<FusedCandidateInput, 'domainScore' | 'staticDynamicLabel' | 'codeSymbolProvenance'>,
+): number | undefined {
+  if (candidate.domainScore !== undefined) return candidate.domainScore;
+
+  const sd = candidate.staticDynamicLabel !== undefined
+    ? staticDynamicScore(candidate.staticDynamicLabel)
+    : undefined;
+  const prov = candidate.codeSymbolProvenance !== undefined
+    ? provenanceScore(candidate.codeSymbolProvenance)
+    : undefined;
+
+  if (sd === undefined && prov === undefined) return undefined;
+  if (sd === undefined) return prov;
+  if (prov === undefined) return sd;
+  return (sd + prov) / 2;
 }
 
 export interface ScoredCandidate extends FusedCandidateInput {
@@ -114,7 +157,10 @@ function deterministicScore(
     astScore:               candidate.astScore ?? (candidate.scoreSource === 'ast_tree' ? normalisedFusion : undefined),
     graphScore:             candidate.graphScore,
     pagerankScore:          candidate.pagerankScore,
-    domainScore:            candidate.domainScore,
+    // unified-symbol-rank composite (DOMAIN_SCORE_COMPOSITE_VERSION): folds
+    // staticDynamicLabel/codeSymbolProvenance into domainScore when the caller hasn't already
+    // supplied one directly. See computeDomainScoreComposite().
+    domainScore:            computeDomainScoreComposite(candidate),
     crossEncoderScore:      candidate.crossEncoderScore,
     crossEncoderScoreNormalized: candidate.crossEncoderScoreNormalized,
   };

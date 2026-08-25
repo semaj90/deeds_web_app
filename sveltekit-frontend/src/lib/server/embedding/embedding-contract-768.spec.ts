@@ -41,7 +41,7 @@ describe('EmbeddingGemma MRL contract', () => {
       'task: code retrieval query | query: where is Graphify wired',
     );
     expect(formatEmbeddingGemmaInput('document', 'function body', '  parser.ts  ')).toBe(
-      'title: parser.ts\ntext: function body',
+      'title: parser.ts | text: function body',
     );
     expect(() => formatEmbeddingGemmaInput('document', '   ')).toThrow(
       'EMBEDDINGGEMMA_EMPTY_INPUT',

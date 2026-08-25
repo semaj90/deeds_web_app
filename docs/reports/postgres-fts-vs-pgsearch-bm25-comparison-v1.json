@@ -1,0 +1,333 @@
+{
+  "schema": "atlas.postgres-fts-vs-pgsearch-bm25-comparison.v1",
+  "generatedAt": "2026-08-25T21:16:47.011Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "scopeNote": "NOT a Recall@K/NDCG/MRR benchmark -- no ground truth exists for this corpus. Measures result count, latency, and top-10 overlap only. Descriptive, not evaluative.",
+  "perQueryResults": [
+    {
+      "query": "IngestionJobStatus",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 49.4,
+        "top3": [
+          {
+            "path": "src/lib/server/embedding/embedding-repository.ts",
+            "score": 0.761904776096344
+          },
+          {
+            "path": "src/lib/server/embedding/embedding-repository.ts",
+            "score": 0.7368420958518982
+          },
+          {
+            "path": "src/lib/server/embedding/embedding-repository.ts",
+            "score": 0.7222222089767456
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 10,
+        "latencyMs": 69.95,
+        "top3": [
+          {
+            "path": "src/lib/server/embedding/embedding-repository.ts",
+            "score": 16.063831329345703
+          },
+          {
+            "path": "src/lib/server/embedding/embedding-repository.ts",
+            "score": 15.540164947509766
+          },
+          {
+            "path": "src/lib/server/embedding/ingestion-queue.ts",
+            "score": 14.534822463989258
+          }
+        ]
+      },
+      "top10OverlapCount": 5,
+      "top10JaccardApprox": 0.333
+    },
+    {
+      "query": "GpuConfig",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 2.14,
+        "top3": [
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 0.782608687877655
+          },
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 0.7368420958518982
+          },
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 0.7058823704719543
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 4,
+        "latencyMs": 4.8,
+        "top3": [
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 14.369925498962402
+          },
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 13.679011344909668
+          },
+          {
+            "path": "src/lib/server/ai/types.ts",
+            "score": 13.679011344909668
+          }
+        ]
+      },
+      "top10OverlapCount": 4,
+      "top10JaccardApprox": 0.4
+    },
+    {
+      "query": "SystemStatus",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 2.07,
+        "top3": [
+          {
+            "path": "src/lib/types/global.ts",
+            "score": 0.782608687877655
+          },
+          {
+            "path": "src/lib/types/global.ts",
+            "score": 0.7222222089767456
+          },
+          {
+            "path": "src/lib/types/global.ts",
+            "score": 0.6666666865348816
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 10,
+        "latencyMs": 4.93,
+        "top3": [
+          {
+            "path": "src/lib/components/ai/EnhancedFileUpload.svelte",
+            "score": 11.714327812194824
+          },
+          {
+            "path": "src/lib/components/yorha/_simulations/YoRHaSystemStatus.svelte",
+            "score": 11.117416381835938
+          },
+          {
+            "path": "src/lib/types/yorha-interface.ts",
+            "score": 11.095932960510254
+          }
+        ]
+      },
+      "top10OverlapCount": 0,
+      "top10JaccardApprox": 0
+    },
+    {
+      "query": "ErrorPatchLogInsert",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 1.93,
+        "top3": [
+          {
+            "path": "src/lib/server/db/schema-phase78.ts",
+            "score": 0.761904776096344
+          },
+          {
+            "path": "src/lib/server/db/schema-phase78.ts",
+            "score": 0.6875
+          },
+          {
+            "path": "src/lib/server/db/schema-phase78.ts",
+            "score": 0.6666666865348816
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 2,
+        "latencyMs": 3.97,
+        "top3": [
+          {
+            "path": "src/lib/server/db/schema-phase78.ts",
+            "score": 16.01759147644043
+          },
+          {
+            "path": "src/lib/server/db/schema-phase78.ts",
+            "score": 11.518939971923828
+          }
+        ]
+      },
+      "top10OverlapCount": 2,
+      "top10JaccardApprox": 0.2
+    },
+    {
+      "query": "extractLegalEntities",
+      "postgresFts": {
+        "resultCount": 6,
+        "latencyMs": 1.83,
+        "top3": [
+          {
+            "path": "src/lib/server/rag/tag-extractor.ts",
+            "score": 0.5454545617103577
+          },
+          {
+            "path": "src/lib/server/services/langextract-service.ts",
+            "score": 0.5454545617103577
+          },
+          {
+            "path": "src/lib/server/rag/tag-extractor.ts",
+            "score": 0.1666666716337204
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 6,
+        "latencyMs": 3.65,
+        "top3": [
+          {
+            "path": "src/lib/server/rag/tag-extractor.ts",
+            "score": 12.904574394226074
+          },
+          {
+            "path": "src/lib/server/rag/tag-extractor.ts",
+            "score": 12.904574394226074
+          },
+          {
+            "path": "src/types/ambient.d.ts",
+            "score": 9.62444019317627
+          }
+        ]
+      },
+      "top10OverlapCount": 6,
+      "top10JaccardApprox": 1
+    },
+    {
+      "query": "CourtroomScene",
+      "postgresFts": {
+        "resultCount": 5,
+        "latencyMs": 1.35,
+        "top3": [
+          {
+            "path": "src/lib/courtroom/courtroom-scene.svelte.ts",
+            "score": 0.6153846383094788
+          },
+          {
+            "path": "src/routes/(app)/demos/courtroom-sim/+page.svelte",
+            "score": 0.1666666716337204
+          },
+          {
+            "path": "src/lib/courtroom/timeline-engine.svelte.ts",
+            "score": 0.1666666716337204
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 7,
+        "latencyMs": 3.67,
+        "top3": [
+          {
+            "path": "src/lib/courtroom/timeline-engine.svelte.ts",
+            "score": 9.078542709350586
+          },
+          {
+            "path": "src/routes/(app)/demos/courtroom-sim/+page.svelte",
+            "score": 8.894118309020996
+          },
+          {
+            "path": "src/routes/(app)/demos/courtroom-sim/+page.svelte",
+            "score": 8.894118309020996
+          }
+        ]
+      },
+      "top10OverlapCount": 5,
+      "top10JaccardApprox": 0.714
+    },
+    {
+      "query": "embedding search",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 21.51,
+        "top3": [
+          {
+            "path": "scripts/ai/smoke_scenario_pipeline.mjs",
+            "score": 0.4739997088909149
+          },
+          {
+            "path": "src/lib/data/route-groups-config.ts",
+            "score": 0.4285714328289032
+          },
+          {
+            "path": "src/routes/api/analytics/research-graph/+server.ts",
+            "score": 0.4257540702819824
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 10,
+        "latencyMs": 33.98,
+        "top3": [
+          {
+            "path": "docs/dimension-policy.md",
+            "score": 8.920372009277344
+          },
+          {
+            "path": "src/lib/server/ace/context-assembler.ts",
+            "score": 8.864269256591797
+          },
+          {
+            "path": "src/lib/server/streaming/chunked-response.ts",
+            "score": 8.731789588928223
+          }
+        ]
+      },
+      "top10OverlapCount": 1,
+      "top10JaccardApprox": 0.053
+    },
+    {
+      "query": "packet identity",
+      "postgresFts": {
+        "resultCount": 10,
+        "latencyMs": 5.94,
+        "top3": [
+          {
+            "path": "docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md",
+            "score": 0.4660201668739319
+          },
+          {
+            "path": "docs/PHASE-1-SESSION-83-MIGRATION-SUMMARY.md",
+            "score": 0.43779346346855164
+          },
+          {
+            "path": "docs/architecture/grpc-binary-memory-registry-plan.md",
+            "score": 0.4067796766757965
+          }
+        ]
+      },
+      "pgSearchBm25": {
+        "resultCount": 10,
+        "latencyMs": 13.11,
+        "top3": [
+          {
+            "path": "docs/PHASE-1-SESSION-83-MIGRATION-SUMMARY.md",
+            "score": 14.174383163452148
+          },
+          {
+            "path": "packages/parent-atlas/src/core/packet-validator-materializer.ts",
+            "score": 13.982843399047852
+          },
+          {
+            "path": "packages/parent-atlas/src/core/packet-validator-materializer.ts",
+            "score": 13.185274124145508
+          }
+        ]
+      },
+      "top10OverlapCount": 4,
+      "top10JaccardApprox": 0.25
+    }
+  ]
+}

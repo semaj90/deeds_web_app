@@ -68,6 +68,9 @@ export const atlasPackets = pgTable('atlas_packets', {
   sourceKind: text('source_kind').default('codebase'),
   sourcePath: text('source_path'),
   sourceRefKey: text('source_ref_key'),
+  // Canonical chunk/file hash used for exact lexical identity joins.
+  // This is distinct from sha256, which is a legacy Qdrant payload hash.
+  contentHash: text('content_hash'),
 
   // Scoring
   rewardPrior: doublePrecision('reward_prior').default(0),
@@ -78,6 +81,8 @@ export const atlasPackets = pgTable('atlas_packets', {
   treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   redisCentroidKey: text('redis_centroid_key'),
   domainClass: text('domain_class'),
+  domainMemberships: text('domain_memberships').array().default(sql`'{}'::text[]`),
+  primaryDomain: text('primary_domain'),
   tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
   lineageVersion: text('lineage_version'),
   ledgerType: text('ledger_type'),
@@ -163,4 +168,3 @@ export const atlasPackets = pgTable('atlas_packets', {
 
 export type AtlasPacket = typeof atlasPackets.$inferSelect;
 export type NewAtlasPacket = typeof atlasPackets.$inferInsert;
-

@@ -5,13 +5,13 @@
   "journalLastTag": "0040_kanban_task_lifecycle",
   "expectedSnapshotPath": "sveltekit-frontend\\drizzle\\meta\\0040_snapshot.json",
   "availableSnapshotTail": [
-    "0035_snapshot.json",
     "0036_snapshot.json",
     "0037_snapshot.json",
     "0038_snapshot.json",
-    "0039_snapshot.json"
+    "0039_snapshot.json",
+    "0041_snapshot.json"
   ],
-  "generatedAt": "2026-08-21T01:55:39.801Z",
+  "generatedAt": "2026-08-25T18:42:02.017Z",
   "canonicalWrites": false,
   "diagnostics": [
     "The Drizzle journal references a snapshot that is absent from drizzle/meta."

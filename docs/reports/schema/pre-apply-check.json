@@ -1,32 +1,37 @@
 {
-  "status": "PRE_APPLY_CLEAR",
-  "blockCount": 0,
+  "status": "PRE_APPLY_BLOCKED",
+  "blockCount": 1,
   "warnCount": 3,
   "noteCount": 2,
-  "blocks": [],
+  "blocks": [
+    {
+      "check": "SNAPSHOT_EXISTS",
+      "message": "Missing snapshot for last journal entry: drizzle\\meta\\0040_snapshot.json"
+    }
+  ],
   "warns": [
     {
       "check": "MIGRATION_SQL_EXISTS",
-      "message": "SQL file for last journal entry not found: drizzle\\0037_0037_phase_102_noun_reranker.sql (may have been applied externally)"
+      "message": "SQL file for last journal entry not found: drizzle\\0040_0040_kanban_task_lifecycle.sql (may have been applied externally)"
     },
     {
       "check": "TABLES_FILTER_RISKY",
       "message": "tablesFilter may be missing protections for: kg_nodes, kg_edges, warden_, embedded_summaries"
     },
     {
-      "check": "LIVE_SCHEMA",
-      "message": "live-schema-redacted.json not found — run schema:inspect before applying migrations (drift check unavailable)"
+      "check": "LIVE_SCHEMA_STALE",
+      "message": "live-schema-redacted.json is 112.8h old — re-run schema:inspect for accurate drift check"
     }
   ],
   "notes": [
     {
       "check": "JOURNAL_LAST",
-      "message": "Last journal entry: idx=37 tag=0037_phase_102_noun_reranker"
+      "message": "Last journal entry: idx=40 tag=0040_kanban_task_lifecycle"
     },
     {
       "check": "TABLES_FILTER",
-      "message": "tablesFilter present with ~77 exclusion patterns"
+      "message": "tablesFilter present with ~119 exclusion patterns"
     }
   ],
-  "generatedAt": "2026-07-19T06:38:00.156Z"
+  "generatedAt": "2026-08-25T18:41:17.049Z"
 }

@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.atlas-packets-content-hash-source.v1",
+  "generatedAt": "2026-08-25T21:33:28.617Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "status": "READY",
+  "hashAuthorities": {
+    "atlas_packets.content_hash": {
+      "hashInput": "NO_LIVE_WRITER",
+      "grain": null,
+      "writer": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs (demo/e2e script, never run against the live table)",
+      "note": "schema/atlas-packets.ts does not declare this column — live-DB-only schema drift."
+    },
+    "atlas_packets.sha256": {
+      "hashInput": "sha256(qdrant_payload.content || source_ref)",
+      "grain": "per-qdrant-point, partial one-time backfill",
+      "writer": "scripts/atlas/ingest-qdrant-to-atlas-packets.mjs:188",
+      "note": "Different column from content_hash. Not comparable to codebase_chunk_index.content_hash."
+    },
+    "codebase_chunk_index.content_hash": {
+      "hashInput": "sha256(`${relPath}:${chunkIndex}:${chunkText}`)",
+      "grain": "per-chunk",
+      "writer": "scripts/atlas/index-full-repo-for-search.mjs:381",
+      "note": "FIXED JOIN TARGET of packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts."
+    },
+    "atlas_source_refs.content_hash": {
+      "hashInput": "codebase_chunk_index.content_hash when present, else sha256(`${path}#${symbol}`)",
+      "grain": "per-symbol (one file fans out to many rows)",
+      "writer": "sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs:520",
+      "note": "Fallback branch hashes a path+symbol string, not real content."
+    },
+    "atlas_artifacts.content_hash": {
+      "hashInput": "sha256(atlas_packets.summary)",
+      "grain": "per-packet, but hashes summary text not file/chunk bytes",
+      "writer": "scripts/phase85/p3-backfill-artifact-registry.mjs",
+      "note": "Structurally cannot agree with any content-derived hash."
+    }
+  },
+  "eligibleSet": {
+    "no_chunk_hash": 57180,
+    "chunk_hash_unique_eligible": 332,
+    "chunk_hash_ambiguous": 4148,
+    "alreadyPopulatedWithinUniqueSet": 332,
+    "pendingUniqueBackfill": 0
+  },
+  "samples": {
+    "unique_eligible_candidates": []
+  },
+  "recommendation": "NO_PENDING_BACKFILL: 332 unique hash matches are already populated; the remaining packets require an operator decision on packet/chunk granularity."
+}

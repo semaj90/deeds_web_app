@@ -39,7 +39,7 @@ async function auditEmbeddingOutput() {
     returned_dimension: null,
     qdrant_collection_config: null,
     postgres_pgvector_schema: null,
-    policy_expectation: 384,
+    policy_expectation: 768,
     checks: [],
     status: 'UNKNOWN',
   };
@@ -186,17 +186,13 @@ async function auditEmbeddingOutput() {
   if (results.status === 'PASS') {
     console.log('✅ RECOMMENDATION: Policy is correct.\n');
     console.log('   Next steps:');
-    console.log('   1. Create new Qdrant collection (codebase_chunks_384)');
-    console.log('   2. Re-embed all packets using verified 384-dim pipeline');
-    console.log('   3. Restore Qdrant from new embeddings');
-    console.log('   4. Retire legacy codebase_chunks_768 collection\n');
+    console.log('   1. Keep the canonical semantic_768 contract unchanged');
+    console.log('   2. Verify identity and source-revision coverage\n');
   } else if (results.status === 'FAIL') {
     console.log('❌ MISMATCH DETECTED.\n');
     console.log('   Next steps:');
-    console.log('   1. Revise policy to match actual output dimension');
-    console.log('   2. Update schema (Postgres pgvector, Qdrant collection)');
-    console.log('   3. Regenerate embedding dimension constant in code');
-    console.log('   4. Re-run this audit to verify\n');
+    console.log('   1. Verify semantic_768 identity and source-revision coverage');
+    console.log('   2. Re-run the bounded 768 coverage audit\n');
   } else if (results.status === 'ERROR') {
     console.log('❌ ERROR: Could not complete audit.\n');
     console.log(`   Error: ${results.error}`);

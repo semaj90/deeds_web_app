@@ -1,6 +1,6 @@
 {
   "schema": "atlas_migration_owner_audit_v1",
-  "generatedAt": "2026-08-25T04:56:17.212Z",
+  "generatedAt": "2026-08-25T21:09:58.172Z",
   "writes": false,
   "live": {
     "reachable": true,
@@ -21,7 +21,13 @@
           "parse_error",
           "first_seen_run_id",
           "last_seen_run_id",
-          "code_source_revision"
+          "code_source_revision",
+          "workspace_revision",
+          "source_revision_authority",
+          "producer_revision",
+          "git_blob_oid",
+          "created_at",
+          "updated_at"
         ],
         "rowCount": 0
       },
@@ -178,8 +184,8 @@
           {
             "file": "drizzle/manual/20260825_graphify_files_compatibility_v1.sql",
             "entry": {
-              "status": "manual_sidecar",
-              "reason": "Unapplied additive compatibility candidate for the existing legacy graphify_files table. Adds nullable lineage metadata and indexes only; requires read-only preflight before application and does not backfill rows."
+              "status": "applied",
+              "reason": "Applied additive compatibility migration for the existing legacy graphify_files table. Added nullable lineage metadata and indexes only; no rows were backfilled and canonical ownership was unchanged."
             }
           }
         ]
@@ -200,14 +206,18 @@
           "parse_error",
           "first_seen_run_id",
           "last_seen_run_id",
-          "code_source_revision"
+          "code_source_revision",
+          "workspace_revision",
+          "source_revision_authority",
+          "producer_revision",
+          "git_blob_oid",
+          "created_at",
+          "updated_at"
         ],
         "rowCount": 0,
-        "expectedMissing": [
-          "workspace_revision"
-        ]
+        "expectedMissing": []
       },
-      "classification": "LIVE_COLUMN_MISMATCH"
+      "classification": "LIVE_SHAPE_ALIGNED"
     },
     {
       "id": "graphify_file_search_projection",
@@ -668,6 +678,7 @@
       "graphify_file_search_projection"
     ],
     "liveShapeAligned": [
+      "graphify_source_inventory",
       "callable_search_projection",
       "observation_feature_rows_active",
       "symbol_registry"

@@ -147,6 +147,77 @@ export const subgraphSynthesisRequestSchema = z.object({
 }).strict();
 export type SubgraphSynthesisRequestV1 = z.infer<typeof subgraphSynthesisRequestSchema>;
 
+export const subgraphExtractionEdgeSchema = z.object({
+  source_vertex_ordinal: z.number().int().nonnegative(),
+  target_vertex_ordinal: z.number().int().nonnegative(),
+  edge_family: z.enum(SPECTRAL_EDGE_FAMILIES),
+  weight: z.number().finite().nonnegative(),
+}).strict();
+export type SubgraphExtractionEdgeV1 = z.infer<typeof subgraphExtractionEdgeSchema>;
+
+export const subgraphExtractionResultSchema = z.object({
+  schema: z.literal('atlas.subgraph-extraction-result.v1').default('atlas.subgraph-extraction-result.v1'),
+  graph_revision: revision,
+  selected_vertex_ordinals: z.array(z.number().int().nonnegative()),
+  extracted_vertex_ordinals: z.array(z.number().int().nonnegative()),
+  extracted_edges: z.array(subgraphExtractionEdgeSchema),
+  truncated: z.boolean(),
+  canonical_authority: z.literal(false).default(false),
+}).strict();
+export type SubgraphExtractionResultV1 = z.infer<typeof subgraphExtractionResultSchema>;
+
+/**
+ * Extracts the induced subgraph for an explicit vertex set.
+ *
+ * This is intentionally a pure CPU reference primitive. A cuGraph adapter may
+ * use the same input/output contract later, but neither implementation owns
+ * canonical relationships or silently expands the seed set.
+ */
+export function extractInducedSubgraph(input: {
+  graphRevision: string;
+  vertexOrdinals: readonly number[];
+  edges: readonly SubgraphExtractionEdgeV1[];
+  selectedVertexOrdinals: readonly number[];
+  includeEdgeFamilies?: readonly (typeof SPECTRAL_EDGE_FAMILIES)[number][];
+  maximumVertices: number;
+  maximumEdges: number;
+}): SubgraphExtractionResultV1 {
+  const maximumVertices = Math.max(1, Math.min(100_000, Math.trunc(input.maximumVertices)));
+  const maximumEdges = Math.max(1, Math.min(1_000_000, Math.trunc(input.maximumEdges)));
+  const vertexSet = new Set(input.vertexOrdinals.filter(Number.isSafeInteger));
+  const selected = [...new Set(input.selectedVertexOrdinals)]
+    .filter((ordinal) => vertexSet.has(ordinal))
+    .sort((a, b) => a - b)
+    .slice(0, maximumVertices);
+  const selectedSet = new Set(selected);
+  const families = new Set(input.includeEdgeFamilies ?? SPECTRAL_EDGE_FAMILIES);
+  const extractedEdges = input.edges
+    .map((edge) => subgraphExtractionEdgeSchema.parse(edge))
+    .filter((edge) =>
+      edge.source_vertex_ordinal !== edge.target_vertex_ordinal
+      && selectedSet.has(edge.source_vertex_ordinal)
+      && selectedSet.has(edge.target_vertex_ordinal)
+      && families.has(edge.edge_family),
+    )
+    .sort((a, b) =>
+      a.source_vertex_ordinal - b.source_vertex_ordinal
+      || a.target_vertex_ordinal - b.target_vertex_ordinal
+      || a.edge_family.localeCompare(b.edge_family)
+      || a.weight - b.weight,
+    );
+  const truncated = selected.length < new Set(input.selectedVertexOrdinals).size
+    || extractedEdges.length > maximumEdges;
+
+  return subgraphExtractionResultSchema.parse({
+    graph_revision: input.graphRevision,
+    selected_vertex_ordinals: [...new Set(input.selectedVertexOrdinals)].sort((a, b) => a - b),
+    extracted_vertex_ordinals: selected,
+    extracted_edges: extractedEdges.slice(0, maximumEdges),
+    truncated,
+    canonical_authority: false,
+  });
+}
+
 function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   if (value && typeof value === 'object') {

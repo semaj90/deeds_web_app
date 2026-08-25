@@ -8,7 +8,9 @@
 const path = require('path');
 const { strict: assert } = require('assert');
 
-const addonPath = path.join(__dirname, 'build', 'Release', 'tensorrt_bridge.node');
+const addonPath = process.env.ATLAS_ADDON_PATH
+  ? path.resolve(process.env.ATLAS_ADDON_PATH)
+  : path.join(__dirname, 'build', 'Release', 'tensorrt_bridge.node');
 const a = require(addonPath);
 
 let passed = 0;

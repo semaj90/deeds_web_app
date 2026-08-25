@@ -22,6 +22,21 @@ export type { CrossEncoderCandidate, CrossEncoderRankedResult, CrossEncoderReran
 // CrossEncoder orchestrator (5-signal blend with graceful fallback)
 export { crossencoderRerankOrchestrate, turboVecRerankWithCEFallback } from './crossencoder/crossencoder-rerank-orchestrator.js';
 export type { CrossEncoderRerankOptions, CrossEncoderRerankResult } from './crossencoder/crossencoder-rerank-orchestrator.js';
+export {
+  AtlasRerankerFeatureRowV1Schema,
+  AtlasOntologyTupleV1Schema,
+  AtlasPairJudgmentV1Schema,
+  ATLAS_RERANKER_FEATURE_NAMES,
+  toAtlasRerankerFeatureVector,
+  onlineFeatureRowFromJudgment,
+  hasPromotableEvidence
+} from './crossencoder/atlas-reranker-contract.js';
+export type {
+  AtlasRerankerFeatureRowV1,
+  AtlasOntologyTupleV1,
+  AtlasPairJudgmentV1,
+  AtlasRerankerFeatureName
+} from './crossencoder/atlas-reranker-contract.js';
 
 // GPU acceleration bridge (LibTorch N-API + Rust SIMD)
 export { batchCosineSimilarity, clusterEmbeddings, attentionScoreChunks, getCudaMemoryInfo, isCudaAvailable } from './gpu/libtorch-bridge.js';

@@ -97,6 +97,27 @@ try {
     Object.entries(base.rows[0]).map(([k, v]) => [k, Number(v)]),
   );
 
+  // Existing chunk-to-packet bridge is measured separately. It is a
+  // rebuildable identity aid, not a replacement for the hash-qualified join.
+  const bridge = await pool.query(`
+    SELECT
+      (SELECT count(*) FROM public.atlas_chunk_packet_identity_links) AS bridge_rows,
+      (SELECT count(*) FROM public.atlas_chunk_packet_identity_links
+        WHERE match_method = 'EXACT_CANONICAL_ID') AS exact_bridge_rows,
+      (SELECT count(*) FROM public.codebase_chunk_index ci
+        WHERE ci.source_ref IS NOT NULL AND ci.content_hash IS NOT NULL
+          AND EXISTS (
+            SELECT 1 FROM public.atlas_chunk_packet_identity_links l
+            JOIN public.atlas_packets p ON p.packet_key = l.canonical_packet_key
+            WHERE l.chunk_index_id = ci.id
+          )) AS eligible_chunks_with_packet_bridge,
+      (SELECT count(*) FROM public.codebase_chunk_index
+        WHERE source_ref IS NOT NULL AND content_hash IS NOT NULL) AS eligible_chunks
+  `);
+  report.identityBridge = Object.fromEntries(
+    Object.entries(bridge.rows[0]).map(([k, v]) => [k, Number(v)]),
+  );
+
   // ---- Per-frozen-query: raw lexical hits vs canonical-joined hits ----
   for (const query of FROZEN_QUERIES) {
     const lexical = await pool.query(
@@ -156,7 +177,9 @@ try {
       'Per explicit instruction, do NOT relax the join to source_ref-only as a fix — ' +
       'that reintroduces ambiguous-match risk (see ambiguous_source_ref_groups below). ' +
       'The real fix is backfilling atlas_packets.content_hash from its own source of truth ' +
-      'before this adapter can bind any canonical packet_key.'
+      'before this adapter can bind any canonical packet_key. An existing '
+      + 'chunk-to-packet bridge is reported separately, but it is partial and '
+      + 'does not replace the hash-qualified staleness check.'
     : report.summary.exactJoinCoverageOfChunks < 0.5
       ? 'LOW_COVERAGE: investigate hash-semantics mismatch before promoting.'
       : 'COVERAGE_ACCEPTABLE_FOR_FURTHER_EVAL';

@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.qdrant-bm25-sparse-slot-semantics.v1",
+  "generatedAt": "2026-08-25T17:56:00.000Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "collection": "sc_deedscodebase_deeds-web-app",
+  "collectionConfig": {
+    "denseVector": { "name": "dense", "size": 768, "distance": "Cosine" },
+    "sparseVector": { "name": "bm25", "modifier": "idf" }
+  },
+  "sampleSparseVectorShape": {
+    "nonZeroIndices": 158,
+    "maxIndex": 2105113340,
+    "sampleIndices": [19522071, 75456649, 84640901, 85891315, 88743764, 98892209, 100532018, 108710752, 115522025, 134120697],
+    "sampleValues": [1.3871921, 1.0129496, 1.0129496, 1.0129496, 1.0129496, 1.0129496, 1.0129496, 1.0129496, 1.0129496, 1.5820224],
+    "interpretation": "Indices are large, sparsely-distributed integers (max ~2.1e9), not small sequential vocabulary IDs. This is a hashing-vectorizer term encoding (token -> hash -> large integer space), not an explicit persisted vocabulary. Values are small positive floats (1.0-1.6 range in sample), consistent with an IDF-weighted term frequency, not raw integer counts."
+  },
+  "payloadSchemaObserved": {
+    "sampleFields": ["filePath", "relativePath", "content", "startLine", "endLine", "language", "type", "contentHash"],
+    "filePathExample": "C:\\Users\\james\\Videos\\deeds-web-app\\SESSIONS-115-118-FINAL-HANDOFF.md",
+    "note": "camelCase field names and absolute Windows filesystem paths. Does not match this repo's own indexing conventions anywhere else in the codebase (snake_case columns, repo-relative POSIX source_ref paths). Also indexes session-log markdown files as generic 'code' chunks, not source code specifically."
+  },
+  "writerSearch": {
+    "searchedPaths": ["sveltekit-frontend/src", "scripts", "python"],
+    "pattern": "sc_deedscodebase_deeds-web-app / sc_deedscodebase",
+    "matchesFound": 0,
+    "conclusion": "No writer for this collection exists anywhere in this repository's own codebase."
+  },
+  "conclusion": {
+    "encoderIdentity": "UNKNOWN_LIKELY_EXTERNAL_TOOL",
+    "reasoning": "The hashing-vectorizer index scheme, the payload schema shape, and the complete absence of any writer in this repo together indicate this collection was almost certainly created by an external tool (e.g. a local IDE/editor semantic-search extension) that scanned this workspace independently of the Parent Atlas pipeline, not something Parent Atlas built or owns.",
+    "trueBm25Semantics": "PARTIALLY_CONSISTENT_WITH_BM25_STYLE_WEIGHTING_BUT_UNVERIFIED_K1_B_PARAMS",
+    "recommendation": "DO_NOT_ADOPT as the true-BM25 owner candidate for LEXICAL-OWNER-02. Even if its scoring weighting resembles BM25-style IDF weighting, it is not a Parent-Atlas-owned, revisioned, identity-joined artifact — it has no CandidateOrdinal/source_ref/content_hash identity mapping at all, and cannot be joined to atlas_packets. Choosing a true-BM25 owner (per LEXICAL-OWNER-02's remaining open item) should evaluate pg_search or a purpose-built, Parent-Atlas-owned sparse encoder instead of adopting this orphaned collection."
+  },
+  "correctionAppended_2026-08-25": {
+    "correctedClaim": "encoderIdentity was reasoned partly from 'hashing-vectorizer index scheme' at sampleSparseVectorShape.interpretation above. That specific mechanism claim was an overclaim.",
+    "correction": "Qdrant sparse vectors are (index, value) pairs with unsigned 32-bit indices; large, irregular indices are legal output of hashing, an explicit vocabulary mapping, a neural sparse encoder, or any other external scheme. Qdrant itself does not persist or expose a human-readable vocabulary just because a vector is sparse. modifier: 'idf' only tells Qdrant to apply shard-level inverse-document-frequency statistics to sparse query dimensions at query time -- it says nothing about how the sparse indices/values were produced. Therefore: 'idf modifier present' + 'irregular large indices' + 'no writer/vocabulary artifact found in this repo' is strong evidence of an OPAQUE EXTERNAL ENCODER of unknown mechanism, not specific proof of a hashing vectorizer.",
+    "correctedFieldStatus": {
+      "sparseRepresentation": "PROVEN",
+      "idfModifier": "PROVEN",
+      "encoderProvenance": "UNKNOWN",
+      "termVocabularyMapping": "UNKNOWN",
+      "parentAtlasWriter": "NOT_FOUND",
+      "atlasPacketsIdentityJoin": "ABSENT",
+      "canonicalLexicalOwnership": "REJECTED"
+    },
+    "explicitlyNotLabeled": ["BM25_PROVEN", "PARENT_ATLAS_SPARSE_OWNER"],
+    "recommendationUnchanged": "DO_NOT_ADOPT stands -- the disqualifying reasons (no writer, no identity join, non-matching payload conventions) are unaffected by this correction and remain independently sufficient. The correction narrows the encoder-mechanism claim only.",
+    "quarantineStatus": "EXTERNAL_UNOWNED -- read-only inspection artifact only; no promotion, no canonical repair (do not backfill packet_key onto these points -- that would fabricate revision-qualification that does not exist), no reuse as training truth.",
+    "source": "User-provided technical review, 2026-08-25, incorporating current Qdrant docs on sparse vector semantics and modifier:idf behavior."
+  }
+}

@@ -318,9 +318,10 @@
     },
     {
       "file": "manual/20260825_graphify_files_compatibility_v1.sql",
-      "status": "manual_sidecar",
-      "reason": "Unapplied additive compatibility candidate for the existing legacy graphify_files table. Adds nullable lineage metadata and indexes only; requires read-only preflight before application and does not backfill rows.",
+      "status": "applied",
+      "reason": "Applied additive compatibility migration for the existing legacy graphify_files table. Added nullable lineage metadata and indexes only; no rows were backfilled and canonical ownership was unchanged.",
       "appliedBy": "operator",
+      "appliedAt": "2026-08-25",
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
     },

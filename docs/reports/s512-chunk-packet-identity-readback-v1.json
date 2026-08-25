@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.s512-chunk-packet-identity-readback.v1",
+  "status": "READBACK_DETERMINISTIC",
+  "readOnly": true,
+  "admittedRows": 4517,
+  "unresolvedRows": 101237,
+  "ambiguousRows": 8,
+  "totalRows": 105762,
+  "methodCounts": {
+    "EXACT_CANONICAL_ID": 4517,
+    "UNRESOLVED": 101237,
+    "AMBIGUOUS": 8
+  },
+  "firstChecksum": "aeeef8bffa0fbb19c6ae9437aa9bc3c4f76922124b723fe43abe2bb488e9e5f6",
+  "secondChecksum": "aeeef8bffa0fbb19c6ae9437aa9bc3c4f76922124b723fe43abe2bb488e9e5f6",
+  "algorithmRevisions": [
+    "atlas.chunk-packet-identity-linker.v1"
+  ],
+  "note": "Deterministic readback does not authorize bridge consumption; S512-ID3 admission remains pending."
+}

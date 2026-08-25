@@ -7,6 +7,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { createHash } from 'node:crypto';
 import {
   normalizeRecentToolUsage,
   selectToolDescriptors,
@@ -49,6 +50,56 @@ export interface ToolSelectionResult {
   bootstrap: boolean;
   always_include: string[];
   recent_tools: string[];
+  selection_trace: ToolSelectionTrace;
+}
+
+export interface ToolSelectionTrace {
+  schema: 'atlas.mcp-tool-selection-trace.v1';
+  trace_id: string;
+  routing_state: 'RETRIEVE' | 'GRAPH' | 'VALIDATE' | 'RECOVER' | 'SYNTHESIZE';
+  state_source: 'DETERMINISTIC_QUERY_HEURISTIC';
+  candidate_count: number;
+  selected_tools: string[];
+  selector_source: 'qdrant' | 'fallback';
+  embedding_dimension: 768 | null;
+  read_only: true;
+}
+
+function inferRoutingState(query: string, signals: string[]): ToolSelectionTrace['routing_state'] {
+  const text = query.toLowerCase();
+  if (/repair|fix|recover|failure|error|retry/.test(text)) return 'RECOVER';
+  if (/validate|verify|audit|prove|check|contract/.test(text)) return 'VALIDATE';
+  if (/summar|synth|explain|compose|answer/.test(text)) return 'SYNTHESIZE';
+  if (signals.some((signal) => ['graph', 'topology', 'cluster', 'som'].includes(signal))) return 'GRAPH';
+  return 'RETRIEVE';
+}
+
+function buildSelectionTrace(input: {
+  query: string;
+  signals: string[];
+  selectedTools: string[];
+  candidateCount: number;
+  source: ToolSelectionResult['source'];
+  embedOk: boolean;
+}): ToolSelectionTrace {
+  const traceSeed = JSON.stringify({
+    query: input.query,
+    signals: input.signals,
+    selected_tools: input.selectedTools,
+    source: input.source,
+  });
+  const traceId = createHash('sha256').update(traceSeed).digest('hex').slice(0, 32);
+  return {
+    schema: 'atlas.mcp-tool-selection-trace.v1',
+    trace_id: traceId,
+    routing_state: inferRoutingState(input.query, input.signals),
+    state_source: 'DETERMINISTIC_QUERY_HEURISTIC',
+    candidate_count: input.candidateCount,
+    selected_tools: input.selectedTools,
+    selector_source: input.source,
+    embedding_dimension: input.embedOk ? 768 : null,
+    read_only: true,
+  };
 }
 
 const MAX_TOOL_RESULTS = 30;
@@ -673,5 +724,13 @@ export async function selectToolsForQuery(input: ToolSelectionInput): Promise<To
       .filter((tool) => selection.reasonByTool[tool.name] === 'always_include')
       .map((tool) => tool.name),
     recent_tools: recentUsage.map((entry) => entry.name),
+    selection_trace: buildSelectionTrace({
+      query: input.query,
+      signals,
+      selectedTools: mcpNames,
+      candidateCount: rankedNames.length,
+      source,
+      embedOk: vector !== null,
+    }),
   };
 }

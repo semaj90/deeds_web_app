@@ -7,6 +7,7 @@ import {
   spectralClusteringPlanSchema,
   spectralGraphEdgeRecipeSchema,
   spectralGraphProjectionPlanSchema,
+  extractInducedSubgraph,
   subgraphSynthesisRequestSchema,
 } from '../dist/index.js';
 
@@ -133,4 +134,26 @@ test('subgraph synthesis is bounded and still requires exact source promotion', 
   });
   assert.equal(request.maximum_vertices, 5000);
   assert.equal(request.exact_source_promotion_required, true);
+});
+
+test('induced subgraph keeps only edges whose two endpoints are selected', () => {
+  const result = extractInducedSubgraph({
+    graphRevision: 'graph-r2',
+    vertexOrdinals: [0, 1, 2, 3],
+    selectedVertexOrdinals: [2, 0, 3],
+    edges: [
+      { source_vertex_ordinal: 0, target_vertex_ordinal: 2, edge_family: 'AST_CALL', weight: 1 },
+      { source_vertex_ordinal: 2, target_vertex_ordinal: 1, edge_family: 'AST_CALL', weight: 1 },
+      { source_vertex_ordinal: 3, target_vertex_ordinal: 0, edge_family: 'NARY_INCIDENCE', weight: 0.5 },
+      { source_vertex_ordinal: 3, target_vertex_ordinal: 3, edge_family: 'AST_CALL', weight: 1 },
+    ],
+    includeEdgeFamilies: ['AST_CALL', 'NARY_INCIDENCE'],
+    maximumVertices: 10,
+    maximumEdges: 10,
+  });
+
+  assert.deepEqual(result.extracted_vertex_ordinals, [0, 2, 3]);
+  assert.equal(result.extracted_edges.length, 2);
+  assert.equal(result.canonical_authority, false);
+  assert.equal(result.truncated, false);
 });

@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.reranker-pair-compile-receipt.v1",
+  "status": "EMPTY_INPUT_AFTER_FILTERS",
+  "inputPath": "docs\\reports\\atlas-reranker-retrieval-input-v1.jsonl",
+  "outputPath": "docs\\reports\\atlas-reranker-pairs-v1.jsonl",
+  "inputEnvelopeCount": 1,
+  "pairCount": 0,
+  "splitCounts": {
+    "train": 0,
+    "validation": 0,
+    "test": 0
+  },
+  "revisionGroupCount": 1,
+  "excluded": {
+    "INVALID_SOURCEREVISION": 128
+  },
+  "artifactChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "databaseWrites": false,
+  "vectorWrites": false,
+  "modelWrites": false,
+  "promotion": "BLOCKED_UNTIL_HELD_OUT_EVALUATION"
+}

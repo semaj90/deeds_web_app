@@ -353,6 +353,7 @@
     "atlas:lexical:fts:index:plan": "node scripts/atlas/plan-graphify-bm25-index.mjs --limit=10",
     "atlas:graphify:workflow:receipt": "node scripts/atlas/prepare-graphify-daily-workflow-receipt.mjs",
     "atlas:graphify:lexical-owner:read": "node ../scripts/atlas/audit-graphify-lexical-owner.mjs",
+    "atlas:fts:hash-lineage:read": "node ../scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs",
     "atlas:qdrant:sparse-config:read": "node ../scripts/atlas/audit-qdrant-sparse-configuration.mjs",
     "atlas:graphify:pipeline:768:dry": "node ../scripts/atlas/test-graphify-embedding-alignment.mjs",
     "atlas:phase1.5:ast-grep:dry": "node ../scripts/atlas/phase1.5-ast-grep-extraction.mjs --dry-run --limit=100",

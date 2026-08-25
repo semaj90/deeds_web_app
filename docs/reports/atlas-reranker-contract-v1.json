@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.reranker-contract-report.v1",
+  "status": "CONTRACT_WIRED_READ_ONLY",
+  "model": "AtlasRerankerV1",
+  "model_type": "FEATURE_AUGMENTED_CROSS_ENCODER",
+  "canonical_dense_stage": "EmbeddingGemma:semantic_768",
+  "feature_vector_width": 16,
+  "feature_order_owner": "packages/parent-atlas-retrieval/src/crossencoder/atlas-reranker-contract.ts",
+  "pair_compiler": "scripts/atlas/compile-atlas-reranker-pairs.mjs",
+  "online_features_exclude": [
+    "repairSuccess",
+    "testSuccess",
+    "exactPromotionOutcome",
+    "derived_synthesis_only_evidence"
+  ],
+  "existing_teacher_or_baseline": "mixedbread-ai/mxbai-rerank-base-v2",
+  "training": {
+    "pair_corpus": "NOT_COMPILED",
+    "hard_negatives": "NOT_PROVEN",
+    "leakage_split": "NOT_PROVEN",
+    "promotion": "BLOCKED"
+  },
+  "runtime": {
+    "existing_crossencoder_boundary": "AVAILABLE",
+    "pytorch_atlas_model": "NOT_IMPLEMENTED",
+    "triton_onnx_tensorrt": "CHALLENGER",
+    "native_node_api": "CHALLENGER"
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "model_artifact": false
+  }
+}

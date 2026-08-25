@@ -1,0 +1,170 @@
+{
+  "schema": "AtlasMcpTopologyToolRoutingReceiptV1",
+  "generatedAt": "2026-08-25T19:20:52.568Z",
+  "mode": "FIXTURE_READ_ONLY",
+  "status": "PROVEN_FIXTURE_ONLY",
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": false,
+    "note": "Production adoption remains gated by live revision, identity, and executor receipts."
+  },
+  "query": "find the MCP tool for topology-aware retrieval",
+  "topology": {
+    "dimension": 4,
+    "finite": true,
+    "graphRevision": "fixture-graph-r1",
+    "topologyBasisRevision": "fixture-topology-4d-r1",
+    "ordinalMapChecksum": "sha256:fixture-ordinal-map-r1"
+  },
+  "memoryLanes": [
+    {
+      "lane": "POSTGRES_FTS",
+      "revision": "fts-r1",
+      "state": "PROVEN"
+    },
+    {
+      "lane": "SEMANTIC_768",
+      "revision": "embeddinggemma-r1",
+      "state": "IMPLEMENTED_UNPROVEN"
+    },
+    {
+      "lane": "GRAPH_PPR",
+      "revision": "graph-r1",
+      "state": "IMPLEMENTED_UNPROVEN"
+    },
+    {
+      "lane": "CUDA_GRAPH_RERANK",
+      "revision": "cuda-graph-r1",
+      "state": "IMPLEMENTED_UNPROVEN"
+    }
+  ],
+  "hmmViterbi": {
+    "observations": [
+      "LEXICAL",
+      "SEMANTIC",
+      "GRAPH",
+      "RERANK"
+    ],
+    "path": [
+      "LEXICAL",
+      "SEMANTIC",
+      "GRAPH",
+      "RERANK"
+    ]
+  },
+  "routing": {
+    "selected": {
+      "name": "atlas.search.lexical",
+      "lane": "POSTGRES_FTS",
+      "executor": "GO_POSTGRES",
+      "emits": "LEXICAL",
+      "base": 0.78,
+      "requires": [
+        "fts"
+      ],
+      "dependencyReady": true,
+      "score": 0.9,
+      "status": "PROVEN",
+      "revision": "fts-r1"
+    },
+    "candidates": [
+      {
+        "name": "atlas.search.lexical",
+        "lane": "POSTGRES_FTS",
+        "executor": "GO_POSTGRES",
+        "emits": "LEXICAL",
+        "base": 0.78,
+        "requires": [
+          "fts"
+        ],
+        "dependencyReady": true,
+        "score": 0.9,
+        "status": "PROVEN",
+        "revision": "fts-r1"
+      },
+      {
+        "name": "atlas.search.semantic",
+        "lane": "SEMANTIC_768",
+        "executor": "QDRANT",
+        "emits": "SEMANTIC",
+        "base": 0.82,
+        "requires": [
+          "semantic_768"
+        ],
+        "dependencyReady": true,
+        "score": 0.82,
+        "status": "IMPLEMENTED_UNPROVEN",
+        "revision": "embeddinggemma-r1"
+      },
+      {
+        "name": "atlas.graph.ppr",
+        "lane": "GRAPH_PPR",
+        "executor": "PYTHON_RAPIDS",
+        "emits": "GRAPH",
+        "base": 0.72,
+        "requires": [
+          "graph_snapshot",
+          "topology_4d"
+        ],
+        "dependencyReady": true,
+        "score": 0.8,
+        "status": "IMPLEMENTED_UNPROVEN",
+        "revision": "graph-r1"
+      },
+      {
+        "name": "atlas.graph.subgraph",
+        "lane": "GRAPH_SUBGRAPH",
+        "executor": "PYTHON_RAPIDS",
+        "emits": "GRAPH",
+        "base": 0.66,
+        "requires": [
+          "graph_snapshot",
+          "candidate_ordinals"
+        ],
+        "dependencyReady": true,
+        "score": 0.74,
+        "status": "IMPLEMENTED_UNPROVEN",
+        "revision": null
+      },
+      {
+        "name": "atlas.rerank.cuda_graph",
+        "lane": "CUDA_GRAPH_RERANK",
+        "executor": "NAPI_LIBTORCH",
+        "emits": "RERANK",
+        "base": 0.61,
+        "requires": [
+          "semantic_768",
+          "candidate_ordinals",
+          "cuda_graph"
+        ],
+        "dependencyReady": false,
+        "score": 0,
+        "status": "BLOCKED",
+        "revision": "cuda-graph-r1"
+      }
+    ]
+  },
+  "checks": {
+    "topology4d": true,
+    "revisionQualified": true,
+    "viterbiPath": true,
+    "candidateOrdering": true,
+    "noCanonicalWrites": true,
+    "noProjectionWrites": true
+  },
+  "canonicalWrite": false,
+  "projectionWrite": false,
+  "evidenceRefs": [
+    "packages/parent-atlas-retrieval/src/gpu/cuda-stream-manager.ts",
+    "packages/parent-atlas-retrieval/src/gpu/libtorch-bridge.ts",
+    "sveltekit-frontend/src/mcp/tools/repair_tools.ts",
+    "scripts/atlas/lib/topology-recovery-selector.mjs"
+  ],
+  "gaps": [
+    "Live source and graph revisions are not supplied by this fixture proof.",
+    "CUDA_GRAPH_RERANK is not marked proven without a native capture/replay receipt.",
+    "MCP tool dispatch and ACE packet persistence remain separate production gates."
+  ]
+}

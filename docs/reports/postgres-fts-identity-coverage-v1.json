@@ -1,14 +1,14 @@
 {
   "schema": "atlas.postgres-fts-identity-coverage.v1",
-  "generatedAt": "2026-08-25T05:32:40.654Z",
+  "generatedAt": "2026-08-25T21:32:17.086Z",
   "readOnly": true,
   "databaseWrites": false,
   "baseCoverage": {
     "chunks_with_ref_and_hash": 52380,
-    "exact_source_ref_content_hash_matches": 0,
-    "source_ref_only_matches_no_hash_agreement": 52380,
+    "exact_source_ref_content_hash_matches": 408,
+    "source_ref_only_matches_no_hash_agreement": 51972,
     "unmatched_no_source_ref_at_all": 0,
-    "atlas_packets_content_hash_populated": 0,
+    "atlas_packets_content_hash_populated": 332,
     "atlas_packets_total": 61660,
     "ambiguous_source_ref_groups": 0,
     "ambiguous_source_ref_packet_rows": 0
@@ -39,8 +39,8 @@
     {
       "query": "SystemStatus",
       "rawLexicalHits": 76,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
+      "canonicalBoundHits": 2,
+      "bindRate": 0.02631578947368421
     },
     {
       "query": "ErrorPatchLogInsert",
@@ -63,8 +63,8 @@
     {
       "query": "embedding search",
       "rawLexicalHits": 2108,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
+      "canonicalBoundHits": 1,
+      "bindRate": 0.0004743833017077799
     },
     {
       "query": "packet identity",
@@ -74,11 +74,17 @@
     }
   ],
   "summary": {
-    "exactJoinCoverageOfChunks": 0,
-    "atlasPacketsContentHashPopulationRate": 0,
+    "exactJoinCoverageOfChunks": 0.007789232531500573,
+    "atlasPacketsContentHashPopulationRate": 0.005384365877392151,
     "totalFrozenQueryLexicalHits": 2868,
-    "totalFrozenQueryCanonicalBoundHits": 0,
-    "overallBindRate": 0
+    "totalFrozenQueryCanonicalBoundHits": 3,
+    "overallBindRate": 0.0010460251046025104
   },
-  "recommendation": "DO_NOT_PROMOTE: atlas_packets.content_hash is 0% populated, so the exact (source_ref, content_hash) join structurally cannot bind any row right now — this is a hash-semantics/population gap in atlas_packets, not a query bug. Per explicit instruction, do NOT relax the join to source_ref-only as a fix — that reintroduces ambiguous-match risk (see ambiguous_source_ref_groups below). The real fix is backfilling atlas_packets.content_hash from its own source of truth before this adapter can bind any canonical packet_key."
+  "recommendation": "LOW_COVERAGE: investigate hash-semantics mismatch before promoting.",
+  "identityBridge": {
+    "bridge_rows": 105762,
+    "exact_bridge_rows": 4517,
+    "eligible_chunks_with_packet_bridge": 3013,
+    "eligible_chunks": 52380
+  }
 }
