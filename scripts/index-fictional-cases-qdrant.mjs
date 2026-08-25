@@ -141,7 +141,9 @@ async function main() {
 			vectors: {
 				content: { size: 768, distance: 'Cosine', on_disk: true },
 			},
-			sparse_vectors: { bm25: {} },
+		// IDF is applied by Qdrant from the collection document statistics.
+		// The lane remains BM42-compatible until exact BM25 k1/b parity is proven.
+			sparse_vectors: { bm25: { modifier: 'idf' } },
 			hnsw_config: { m: 16, ef_construct: 128, on_disk: true },
 			on_disk_payload: true,
 			quantization_config: {

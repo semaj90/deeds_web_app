@@ -18,6 +18,10 @@
     "vectorName": {
       "type": "string",
       "enum": [
+        "semantic_768",
+        "semantic_mrl_512",
+        "semantic_mrl_256",
+        "semantic_mrl_128",
         "dense_384",
         "dense_768_legacy",
         "title_384",
@@ -40,7 +44,7 @@
     "dimensions": {
       "type": "integer",
       "exclusiveMinimum": 0,
-      "description": "Vector dimensionality (768 canonical; 384 reference-only legacy)"
+      "description": "Vector dimensionality (semantic_768 canonical; native MRL 512/256/128 reference lanes; 384 legacy)"
     },
     "representation": {
       "type": "string",

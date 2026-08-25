@@ -71,7 +71,7 @@ async function ensureSparseConfig(collection: string): Promise<void> {
 	try {
 		await qdrantFetch(`/collections/${collection}`, {
 			method: 'PATCH',
-			body: JSON.stringify({ sparse_vectors: { bm25: {} } }),
+			body: JSON.stringify({ sparse_vectors: { bm25: { modifier: 'idf' } } }),
 		});
 		console.log(`  Sparse vector 'bm25' ensured on ${collection}`);
 	} catch (e: any) {

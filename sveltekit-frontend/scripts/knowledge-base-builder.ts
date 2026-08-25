@@ -367,7 +367,7 @@ async function ensureKnowledgeCollection(collection: string): Promise<void> {
     if (!collectionSupportsSparse) {
       try {
         await qdrant.updateCollection(collection, {
-          sparse_vectors: { bm25: {} },
+					sparse_vectors: { bm25: { modifier: 'idf' } },
         });
         collectionSupportsSparse = true;
         console.log('[kb-builder] Added sparse vector support to existing collection');
@@ -384,7 +384,7 @@ async function ensureKnowledgeCollection(collection: string): Promise<void> {
         distance: 'Cosine',
       },
       sparse_vectors: {
-        bm25: {},
+		bm25: { modifier: 'idf' },
       },
     });
     collectionSupportsSparse = true;

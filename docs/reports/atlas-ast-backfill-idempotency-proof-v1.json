@@ -1,0 +1,115 @@
+{
+  "schema": "atlas.ast-backfill-idempotency-proof.v1",
+  "generatedAt": "2026-08-25T05:02:42.778Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "applyBlocked": true,
+  "applyBlockedReason": "AST-ID-06 has 4 unresolved operator decisions (path/case/method-scope/vendored-tree) — see parent-atlas-neural-prefill-encoder/tasks.md",
+  "steps": {
+    "AST_BF_01_select_candidates": {
+      "requestedLimit": 1000,
+      "selected": 1000,
+      "source": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl"
+    },
+    "AST_BF_02_construct_rows": {
+      "total": 1000,
+      "valid": 1000,
+      "invalid": 0
+    },
+    "AST_BF_03_idempotency_proof": {
+      "comparedPairs": 1000,
+      "mismatches": 0,
+      "proven": true
+    },
+    "AST_BF_04_batch_uniqueness": {
+      "totalValidRows": 1000,
+      "uniqueTreeNodeIds": 983,
+      "duplicatesWithinBatch": 17,
+      "sampleDuplicateGroups": [
+        [
+          "claude-mem/openclaw/src/index.test.ts#function:startWorkerMock",
+          "claude-mem/openclaw/src/index.test.ts#function:startWorkerMock"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:t",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:t",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:t",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:t"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:l",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:l",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:l"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:u",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:u"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:i",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:i",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:i"
+        ]
+      ]
+    },
+    "AST_BF_05_collision_with_existing": {
+      "bridgedKeyCount": 7565,
+      "alreadyPresentInAtlasAstNodes": 0,
+      "netNewIfApplied": 1000
+    },
+    "AST_BF_06_constraint_validation": {
+      "invalidRows": 0,
+      "violationCounts": {},
+      "sampleViolations": []
+    },
+    "AST_BF_07_case_consistency_within_batch": {
+      "distinctCaseFoldedKeys": 780,
+      "groupsWithCaseVariants": 196,
+      "proven": false,
+      "sampleCaseVariantGroups": [
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:yo",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:Yo"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:ho",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:Ho"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:Zn",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:zn"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:di",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:Di"
+        ],
+        [
+          "claude-mem/plugin/ui/viewer-bundle.js#function:hi",
+          "claude-mem/plugin/ui/viewer-bundle.js#function:Hi"
+        ]
+      ]
+    },
+    "AST_BF_08_parent_linkage": {
+      "note": "Bounded proof does not resolve real class-parent tree_node_id linkage; all proposed rows use parent_tree_node_id=NULL (ROOT). A real apply would need a second pass once class rows are already committed, or a two-phase insert.",
+      "methodCandidatesInBatch": 48
+    },
+    "AST_BF_09_dry_run_summary": {
+      "candidatesConsidered": 1000,
+      "rowsConstructedValid": 1000,
+      "rowsConstructedInvalid": 0,
+      "netNewIfApplied": 1000,
+      "databaseWrites": 0
+    },
+    "AST_BF_10_apply_gate": {
+      "status": "BLOCKED",
+      "reason": "AST-ID-06 has 4 unresolved operator decisions (path/case/method-scope/vendored-tree) — see parent-atlas-neural-prefill-encoder/tasks.md",
+      "unblockConditions": [
+        "AST-ID-06 path-relativity decision",
+        "AST-ID-06 case-normalization policy",
+        "AST-ID-06 method/chunk-extraction-scope policy",
+        "AST-ID-06 vendored/legacy-tree exclusion policy"
+      ]
+    }
+  },
+  "status": "DRY_RUN_PROVEN"
+}

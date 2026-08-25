@@ -3471,3 +3471,52 @@ comments, not a table rename); (3) bounded XGBoost GPU proof; (4) resolve the re
 instrumentation; (6) Graphify FANOUT sequencing; (7) docker-compose canonical-file decision; (8)
 the tensor-residency production-entry-point operator decision (memory-architecture-freeze tasks.md
 2.14); (9) the remaining CANONICAL_OWNER decisions from the memory-architecture audit pass.
+
+### Session handoff — 2026-08-26 (cross-reference: `PARSER_MANIFEST_ALIGNMENT` and
+`TREE_NODE_ID_STABILITY` gates get real, quantified evidence from a separate change's AST audit)
+
+A separate, concurrent thread of work in
+`openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md` (sections `AST-ID-01` through
+`AST-ID-06`, dated 2026-08-26) independently audited exactly the two gates this file's own
+"Graph Identity Audit" Proof Gates table (line ~1169 above) marks `FAIL` at `10`/`0` — not by
+re-deriving from scratch, but with hard, reproducible numbers this table didn't yet have. Recording
+the cross-reference here so this ledger's `FAIL` rows carry real evidence instead of a stale
+percentage; **not re-scoring the percentages myself** — that's this file's own convention to do
+deliberately, and the new evidence changes the *kind* of gap more than it changes the number.
+
+- **`PARSER_MANIFEST_ALIGNMENT` (`FAIL`, `10`, "runtime still mismatches the declared parser
+  story")** — confirmed true, and now precisely why: `atlas_ast_nodes` (this file's own tree-node
+  identity table) is written from `codebase_chunk_index.symbol`/`.kind` — **one row per embeddable
+  text chunk**, not a recursive AST walk — while the declared/expected parser story is exhaustive
+  ast-grep declaration extraction. Quantified the mismatch by declaration kind across the full
+  `59,915`-candidate corpus: `function 4.86%`, `interface 19.49%`, `type 19.39%`, `class 7.59%`,
+  **`method 0.05%` (7/14,543)** — class methods are essentially never captured at all, because a
+  chunk-representative symbol was never meant to enumerate every nested declaration. This is an
+  architectural mismatch between two different design intents (chunk-representative symbol vs.
+  exhaustive declaration extraction), not a bug fixable by re-running the existing populator.
+- **`TREE_NODE_ID_STABILITY` (`FAIL`, `0`, "tree node identity is still provisional")** — confirmed
+  true, with a second, independent, previously-undocumented cause found: `atlas_ast_nodes` has
+  **inconsistent path casing for the same file, live in production data** — proven directly (two
+  rows for `CollaborativeEvidenceCanvas.svelte` with differently-cased `source_ref_key` values;
+  `3,498/11,067` rows have uppercase in `relative_path`, `7,569` don't; `633/7,565` keyed rows
+  collide with another row once case-folded). Also found a path-relativity split (candidate paths
+  are repo-root-relative in places, `atlas_ast_nodes` is `sveltekit-frontend`-app-relative only) —
+  a second, independent identity-stability problem from the casing one, not the same bug twice.
+- **Also directly relevant to this section's "Inventory the parser manifest vs runtime
+  implementation" checklist item (line ~1158, still unchecked)**: found the root `src/` tree (196
+  files, confirmed via `git log` to be entirely from one prior commit,
+  `a2e4dab329`, "restore orphaned root src tree, retire Atlas v1...") and the vendored
+  `llama-cpp-turboquant-gemma4/` fork-build directory (`10,729` candidates, `17.9%` of the whole
+  corpus) are currently being parsed by the Graphify AST scope as if they were live application
+  source — inflating the denominator for any of this table's completeness percentages that are
+  computed against "the corpus."
+- **Not done in that thread, deliberately, matching this file's own promotion discipline**: no
+  `atlas_ast_nodes` rows were synthesized to force these numbers up, and 4 explicit operator
+  decisions were recorded instead of guessed at (path-relativity convention, case-normalization
+  policy, method/chunk-extraction-scope policy, vendored/legacy-tree exclusion policy) — see
+  `## AST-ID-06` in that file for the consolidated list.
+
+**Not re-triaged here**: whether this changes `PARSE_NODE_IDENTITY`/`PACKET_TO_SYMBOL_LINEAGE`/
+other rows in the same table, or the overall gate percentages — that's a deliberate call for
+whoever next reconciles this table, not something to silently recompute from one AST-focused
+audit pass.

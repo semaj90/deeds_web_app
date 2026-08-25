@@ -1,0 +1,238 @@
+{
+  "schema": "atlas.ast-nodes-bridge-census.v1",
+  "generatedAt": "2026-08-25T03:13:59.110Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "inputCandidatesPath": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl",
+  "atlasAstNodesBridgeQuery": {
+    "status": "OK",
+    "bridgedKeyCount": 7565
+  },
+  "totals": {
+    "total": 59915,
+    "matched": 3804,
+    "unmatched": 56111,
+    "unkeyable": 0
+  },
+  "matchRate": 6.35,
+  "breakdownByLanguage": {
+    "typescript": 34541,
+    "javascript": 25374
+  },
+  "breakdownBySourcePrefix": {
+    "sveltekit-frontend": 25658,
+    "llama-cpp-turboquant-gemma4": 10729,
+    "src": 10153,
+    "scripts": 8621,
+    "claude-mem": 3738,
+    "packages": 861,
+    "vscode-extension": 101,
+    "phase13graph_exportgenerator": 14,
+    ".vscode": 11,
+    "crates": 8,
+    "datasets": 7,
+    "(root)": 5,
+    "tests": 4,
+    "drizzle": 3,
+    "$lib": 1,
+    "simd-bridge": 1
+  },
+  "breakdownByStorageKind": {
+    "function": 47343,
+    "type": 10563,
+    "class": 1963,
+    "enum": 46
+  },
+  "breakdownByUnresolvedCause": {
+    "no_existing_atlas_ast_nodes_prefix": 49762,
+    "existing_file_key_or_symbol_mismatch": 3780,
+    "existing_prefix_missing_file": 2569
+  },
+  "existingPrefixMismatch": {
+    "bySourcePrefix": {
+      "src": 3780
+    },
+    "byStorageKind": {
+      "function": 3009,
+      "type": 697,
+      "class": 74
+    },
+    "samples": [
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "constructor",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:constructor"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "initializeCUDAThreadPool",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:initializeCUDAThreadPool"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "initializeQuantizationLUT",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:initializeQuantizationLUT"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "quantizeGemmaOutput",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:quantizeGemmaOutput"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "decodeBase64ToBytes",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:decodeBase64ToBytes"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "parallelQuantization",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:parallelQuantization"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "quantizationKernel",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:quantizationKernel"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "quantizeValue",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:quantizeValue"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "scaleToTargetLength",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:scaleToTargetLength"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "calculateQuantizationMetadata",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:calculateQuantizationMetadata"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "calculateScalingFactor",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:calculateScalingFactor"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "generateCacheKey",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:generateCacheKey"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "checkQuantizationCache",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:checkQuantizationCache"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "cacheQuantizationResult",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:cacheQuantizationResult"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "processGemmaLegalOutput",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:processGemmaLegalOutput"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "getMetrics",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:getMetrics"
+      },
+      {
+        "relativePath": "src/lib/ai/base64-fp32-quantizer.ts",
+        "symbolName": "clearCache",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/base64-fp32-quantizer.ts#function:clearCache"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "LokiCitationEntry",
+        "symbolKind": "interface",
+        "astKind": "interface_declaration",
+        "generatedKey": "src/lib/ai/citation-cache.ts#type:LokiCitationEntry"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "ensureLoki",
+        "symbolKind": "function",
+        "astKind": "function_declaration",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:ensureLoki"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "getDB",
+        "symbolKind": "function",
+        "astKind": "function_declaration",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:getDB"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "upgrade",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:upgrade"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "buildFuseIndex",
+        "symbolKind": "function",
+        "astKind": "function_declaration",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:buildFuseIndex"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "saveCitationLocal",
+        "symbolKind": "function",
+        "astKind": "function_declaration",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:saveCitationLocal"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "getCitation",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:getCitation"
+      },
+      {
+        "relativePath": "src/lib/ai/citation-cache.ts",
+        "symbolName": "saveCitation",
+        "symbolKind": "method",
+        "astKind": "method_definition",
+        "generatedKey": "src/lib/ai/citation-cache.ts#function:saveCitation"
+      }
+    ]
+  }
+}

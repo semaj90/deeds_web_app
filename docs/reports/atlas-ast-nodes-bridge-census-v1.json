@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.ast-nodes-bridge-census.v1",
+  "generatedAt": "2026-08-25T02:45:24.037Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "inputCandidatesPath": "docs/reports/graphify-ast-declaration-candidates-v1.jsonl",
+  "atlasAstNodesBridgeQuery": {
+    "status": "OK",
+    "bridgedKeyCount": 7565
+  },
+  "totals": {
+    "total": 3712,
+    "matched": 0,
+    "unmatched": 3712,
+    "unkeyable": 0
+  },
+  "matchRate": 0,
+  "breakdownByLanguage": {
+    "typescript": 2942,
+    "javascript": 770
+  },
+  "breakdownBySourcePrefix": {
+    "claude-mem": 3699,
+    ".vscode": 11,
+    "$lib": 1,
+    "(root)": 1
+  },
+  "breakdownByStorageKind": {
+    "function": 2997,
+    "type": 602,
+    "class": 112,
+    "enum": 1
+  },
+  "breakdownByUnresolvedCause": {
+    "no_matching_atlas_ast_nodes_row": 3712
+  }
+}

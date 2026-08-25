@@ -1,0 +1,180 @@
+diff --git a/packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts b/packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts
+--- a/packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts
++++ b/packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts
+@@
+-import { sql, desc } from 'drizzle-orm';
++import { sql } from 'drizzle-orm';
+@@
+ export interface BM25Candidate extends CandidateForIdentityResolution {
+   retrieved_via: 'bm25';
++  retrieval_algorithm: 'postgres_fts_ts_rank_cd';
++  identity_resolution_source: 'source_ref_content_hash_exact';
+   title?: string;
+   snippet?: string;
+ }
++
++interface PostgresFtsCanonicalRow {
++  id: string;
++  packet_key: string;
++  source_ref: string;
++  feature_id: string;
++  content_hash: string;
++  lexical_score: number | string;
++  title: string | null;
++  snippet: string | null;
++}
++
++function boundLimit(limit: number): number {
++  if (!Number.isFinite(limit)) return 20;
++  return Math.max(1, Math.min(Math.trunc(limit), 200));
++}
++
++function globToSqlLikePattern(pattern: string): string {
++  return pattern
++    .replace(/([\\%_])/g, '\\$1')
++    .replace(/\*/g, '%')
++    .replace(/\?/g, '_');
++}
+@@
+ export async function searchPostgresBM25(
+   options: Postgres25TextSearchOptions
+ ): Promise<BM25Candidate[]> {
+   const { db, query, limit, sourceScope, requireSourceRef = true } = options;
+-
+-  if (!query.trim()) {
+-    return [];
+-  }
+-
+-  // Normalize query: remove special characters, tokenize
+-  const tokens = query
+-    .toLowerCase()
+-    .replace(/[^\w\s]/g, ' ')
+-    .split(/\s+/)
+-    .filter(Boolean)
+-    .join(' & '); // PostgreSQL tsquery format
+-
+-  // TODO: Wire real Postgres query
+-  // ...
+-
+-  // Placeholder response
+-  return [
+-    {
+-      id: 'bm25:001',
+-      packet_key: 'ace:packet:bm25:001',
+-      source_ref: 'src/lib/server/db/client.ts',
+-      feature_id: 'db.client',
+-      content_hash: 'hash001',
+-      score: 0.95,
+-      retrieved_via: 'bm25',
+-      title: 'Database Client',
+-      snippet: 'Postgres database connection pool...'
+-    }
+-  ];
++
++  const trimmed = query.trim();
++  if (!trimmed) return [];
++
++  const boundedLimit = boundLimit(limit);
++  const lexicalLimit = Math.min(1000, Math.max(boundedLimit * 5, boundedLimit));
++
++  const sourceRefClause = requireSourceRef
++    ? sql`AND ci.source_ref IS NOT NULL`
++    : sql``;
++
++  const sourceScopeClause =
++    sourceScope && sourceScope.length > 0
++      ? sql`AND (${sql.join(
++          sourceScope.map((pattern) =>
++            sql`ci.source_ref LIKE ${globToSqlLikePattern(pattern)} ESCAPE '\\'`
++          ),
++          sql` OR `
++        )})`
++      : sql``;
++
++  const result = await db.execute(sql`
++    WITH q AS (
++      SELECT websearch_to_tsquery('english', ${trimmed}) AS tsq
++    ),
++    lexical AS (
++      SELECT
++        ci.id::text AS lexical_id,
++        ci.source_ref,
++        ci.relative_path,
++        ci.symbol,
++        ci.content_hash,
++        COALESCE(ci.summary, LEFT(ci.content, 240), '') AS snippet,
++        ts_rank_cd(ci.search_vector, q.tsq, 32)::double precision AS lexical_score
++      FROM codebase_chunk_index ci
++      CROSS JOIN q
++      WHERE ci.search_vector @@ q.tsq
++        AND ci.content_hash IS NOT NULL
++        ${sourceRefClause}
++        ${sourceScopeClause}
++      ORDER BY lexical_score DESC, ci.id
++      LIMIT ${lexicalLimit}
++    ),
++    canonical AS (
++      SELECT
++        p.packet_id::text AS id,
++        p.packet_key,
++        p.source_ref,
++        p.feature_id,
++        p.content_hash,
++        COALESCE(p.feature_label, l.symbol, l.relative_path) AS title,
++        l.snippet,
++        l.lexical_score,
++        COUNT(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,
++        ROW_NUMBER() OVER (
++          PARTITION BY p.packet_key
++          ORDER BY l.lexical_score DESC, l.lexical_id
++        ) AS packet_rank
++      FROM lexical l
++      JOIN atlas_packets p
++        ON p.source_ref = l.source_ref
++       AND p.content_hash = l.content_hash
++      WHERE p.packet_key IS NOT NULL
++        AND p.feature_id IS NOT NULL
++    )
++    SELECT
++      id,
++      packet_key,
++      source_ref,
++      feature_id,
++      content_hash,
++      lexical_score,
++      title,
++      snippet
++    FROM canonical
++    WHERE identity_match_count = 1
++      AND packet_rank = 1
++    ORDER BY lexical_score DESC, packet_key ASC
++    LIMIT ${boundedLimit}
++  `);
++
++  const rows = result.rows as PostgresFtsCanonicalRow[];
++
++  return rows
++    .map((row) => ({
++      id: row.id,
++      packet_key: row.packet_key,
++      source_ref: row.source_ref,
++      feature_id: row.feature_id,
++      content_hash: row.content_hash,
++      score: Number(row.lexical_score),
++      retrieved_via: 'bm25' as const,
++      retrieval_algorithm: 'postgres_fts_ts_rank_cd' as const,
++      identity_resolution_source: 'source_ref_content_hash_exact' as const,
++      title: row.title ?? undefined,
++      snippet: row.snippet ?? undefined
++    }))
++    .filter((candidate) => Number.isFinite(candidate.score));
+ }
+@@
+- * BM25 relevance scorer (fallback if ts_rank_cd unavailable)
++ * Legacy heuristic scorer.
+  *
+- * Simplified scoring based on token matches, position, density.
+- * Used if PostgreSQL full-text index is unavailable or disabled.
++ * @deprecated This is not corpus-statistics-backed BM25 and must not be used
++ *             as evidence that the BM25 lane is proven.
+  */

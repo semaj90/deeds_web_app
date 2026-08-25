@@ -34,7 +34,9 @@ const pool = new Pool({
   password: process.env.POSTGRES_PASSWORD || '123456',
 });
 
-const LANGEXTRACT_ENDPOINT = 'http://127.0.0.1:8091'; // LangExtract service
+const LANGEXTRACT_ENDPOINT = process.env.LANGEXTRACT_URL
+  || process.env.NLP_SIDECAR_URL
+  || 'http://127.0.0.1:8095'; // miniforge NLP/LangExtract sidecar
 const GEMMA4_ENDPOINT = 'http://127.0.0.1:8090'; // For error pattern classification
 
 // Common error keywords for pattern detection

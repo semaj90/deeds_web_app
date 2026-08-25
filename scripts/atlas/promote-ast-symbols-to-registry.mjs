@@ -22,7 +22,7 @@
  *
  * Usage:
  *   node scripts/atlas/promote-ast-symbols-to-registry.mjs                       # dry-run, all eligible
- *   node scripts/atlas/promote-ast-symbols-to-registry.mjs --apply --limit=50    # bounded live apply
+ *   node scripts/atlas/promote-ast-symbols-to-registry.mjs --apply --limit=50 --offset=20 # next bounded tranche
  *
  * Exit codes: 0 = success, 1 = missing --limit with --apply, 2 = Postgres error
  */
@@ -43,6 +43,7 @@ const PROMOTABLE_KINDS = new Set(['function', 'method', 'class', 'interface', 't
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const LIMIT = Number((args.find((a) => a.startsWith('--limit=')) || '').split('=')[1] || 0) || null;
+const OFFSET = Math.max(0, Number((args.find((a) => a.startsWith('--offset=')) || '').split('=')[1] || 0) || 0);
 const INPUT = path.resolve(ROOT, (args.find((a) => a.startsWith('--input=')) || '').slice(8)
   || '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
 
@@ -97,10 +98,11 @@ async function main() {
     excludedVariables,
     eligibleDeclarationLike: eligible.length,
     uniqueCandidatesAfterDedup: uniqueCandidates.length,
+    offset: OFFSET,
     rowsAttempted: 0,
     rowsInserted: 0,
     rowsAlreadyRegistered: 0,
-    sample: uniqueCandidates.slice(0, 5).map(([canonicalKey, row]) => ({
+    sample: uniqueCandidates.slice(OFFSET, OFFSET + 5).map(([canonicalKey, row]) => ({
       canonicalKey,
       stableSymbolId: stableSymbolIdFor(canonicalKey),
       kind: row.kind,
@@ -118,7 +120,7 @@ async function main() {
     return;
   }
 
-  const batch = uniqueCandidates.slice(0, LIMIT);
+  const batch = uniqueCandidates.slice(OFFSET, OFFSET + LIMIT);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   try {
     for (const [canonicalKey, row] of batch) {

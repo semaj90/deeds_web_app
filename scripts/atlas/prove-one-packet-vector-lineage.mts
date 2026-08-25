@@ -21,6 +21,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { loadRepoEnv, resolveDatabaseUrl, resolveRedisConfig } from '../../packages/parent-atlas/src/env.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');
@@ -154,6 +155,16 @@ function recordGate(gate: ProofResult) {
   else if (gate.status === 'FAIL') proof.summary.failedGates++;
 }
 
+async function createReadOnlyRedisClient() {
+  const { default: Redis } = await import('ioredis');
+  const config = resolveRedisConfig(loadRepoEnv());
+  return new Redis(config.url, {
+    password: config.password,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+  });
+}
+
 async function main() {
   console.log('[prove-lineage] Starting ONE_PACKET_VECTOR_LINEAGE proof...\n');
 
@@ -165,7 +176,7 @@ async function main() {
     try {
       const { Pool } = await import('pg');
       const pool = new Pool({
-        connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:legal@localhost:5434/legal_ai_db',
+        connectionString: resolveDatabaseUrl(loadRepoEnv()),
         max: 1,
         idleTimeoutMillis: 5000,
         connectionTimeoutMillis: 5000,
@@ -270,11 +281,7 @@ async function main() {
     // GATE L3: 768d model and dimension match policy
     // ════════════════════════════════════════════════════════════════════════════
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        lazyConnect: true,
-        maxRetriesPerRequest: 1,
-      });
+      const redis = await createReadOnlyRedisClient();
       await redis.connect().catch(() => {});
 
       const start = Date.now();
@@ -321,11 +328,7 @@ async function main() {
     // GATE L4: 384d routing projection is independently identified in Redis
     // ════════════════════════════════════════════════════════════════════════════
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        lazyConnect: true,
-        maxRetriesPerRequest: 1,
-      });
+      const redis = await createReadOnlyRedisClient();
       await redis.connect().catch(() => {});
 
       const start = Date.now();
@@ -371,11 +374,7 @@ async function main() {
     // GATE L5: Redis entry preserves packet identity
     // ════════════════════════════════════════════════════════════════════════════
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        lazyConnect: true,
-        maxRetriesPerRequest: 1,
-      });
+      const redis = await createReadOnlyRedisClient();
       await redis.connect().catch(() => {});
 
       const start = Date.now();
@@ -421,11 +420,7 @@ async function main() {
     // GATE L6: Redis entry preserves workspace revision
     // ════════════════════════════════════════════════════════════════════════════
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        lazyConnect: true,
-        maxRetriesPerRequest: 1,
-      });
+      const redis = await createReadOnlyRedisClient();
       await redis.connect().catch(() => {});
 
       const start = Date.now();

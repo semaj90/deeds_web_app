@@ -1,12 +1,12 @@
 # ONE_PACKET_VECTOR_LINEAGE Proof Report
 
-**Proof ID**: proof-1785210798897
-**Timestamp**: 2026-07-28T03:53:18.897Z
-**Packet Key**: packet:1f794f097f8d
+**Proof ID**: proof-1787629380451
+**Timestamp**: 2026-08-25T03:43:00.451Z
+**Packet Key**: packet:23c36b43ac97
 
 ## Identity
-- **Source Ref**: sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte
-- **Feature ID**: sveltekit-frontend.CitationSaveForm
+- **Source Ref**: turbovec/target/release/deps/libmemoffset-7115b333bf16ce7b.rlib
+- **Feature ID**: turbovec.libmemoffset-7115b333bf16ce7b
 - **Content Hash**: (none)
 - **Workspace Revision**: 
 
@@ -22,22 +22,22 @@
 - **Backend**: (none)
 - **Model**: warden-nomic
 - **Present**: false
-- **Cache Key**: gpu:warden:cache:384d:packet:1f794f097f8d
+- **Cache Key**: gpu:warden:cache:384d:packet:23c36b43ac97
 - **Read Succeeded**: false
 
 ## Gates
 
 | ID | Description | Status | Details |
 |----|-------------|--------|---------|
-| L1 | Canonical packet exists in Postgres | PASS | 166ms |
-| L2 | 768d vector exists in Qdrant | PASS | 242ms |
-| L3 | 768d model and dimension match policy | SKIP | 62ms |
-| L4 | 384d routing projection is independently identified | SKIP | 63ms |
-| L5 | Redis entry preserves packet identity | SKIP | 65ms |
-| L6 | Redis entry preserves workspace revision | SKIP | 68ms |
+| L1 | Canonical packet exists in Postgres | PASS | 19ms |
+| L2 | 768d vector exists in Qdrant | PASS | 40ms |
+| L3 | 768d model and dimension match policy | SKIP | 1ms |
+| L4 | 384d routing projection is independently identified | SKIP | 1ms |
+| L5 | Redis entry preserves packet identity | SKIP | 1ms |
+| L6 | Redis entry preserves workspace revision | SKIP | - |
 | L7 | Cache output contains no raw canonical evidence | PASS | - |
 | L8 | 384d route leads to 768d query | SKIP | - |
-| L9 | Direct 768d fallback succeeds | PASS | 112ms |
+| L9 | Direct 768d fallback succeeds | PASS | 5ms |
 | L10 | Repeated run preserves identity | SKIP | - |
 
 ## Summary

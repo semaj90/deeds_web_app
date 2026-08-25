@@ -2281,8 +2281,10 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(resp)
 }
 
-// httpSearchBM25 exposes the canonical PostgreSQL sparse lane separately from
-// dense Qdrant retrieval. Fusion remains in the TypeScript retrieval runtime.
+// httpSearchBM25 retains the historical route name while exposing the
+// PostgreSQL native FTS lane separately from dense Qdrant retrieval. Fusion
+// remains in the TypeScript retrieval runtime. This is not canonical BM25:
+// true_bm25 stays false until a term-statistics/IDF implementation is proven.
 func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -2327,7 +2329,22 @@ func (s *retrievalServer) httpSearchBM25(w http.ResponseWriter, r *http.Request)
 		}
 		results = append(results, map[string]any{"id": id, "source_ref": sourceRef, "file_path": filePath, "summary": summary, "snippet": snippet, "score": score})
 	}
-	json.NewEncoder(w).Encode(map[string]any{"results": results, "lane": "bm25", "read_only": true, "total_ms": time.Since(started).Milliseconds(), "capability": map[string]any{"schema": "atlas.indexed-rpc-capability.v1", "capabilityId": "go-retrieval:bm25:v1", "operation": "BM25_SEARCH", "executor": "GO_RETRIEVAL", "proofState": "PROVEN", "canonicalAuthority": false}})
+	json.NewEncoder(w).Encode(map[string]any{
+		"results":     results,
+		"lane":        "postgres_fts",
+		"legacy_lane": "bm25",
+		"read_only":   true,
+		"total_ms":    time.Since(started).Milliseconds(),
+		"capability": map[string]any{
+			"schema":             "atlas.indexed-rpc-capability.v1",
+			"capabilityId":       "go-retrieval:postgres-fts:v1",
+			"operation":          "POSTGRES_FTS_SEARCH",
+			"executor":           "GO_RETRIEVAL",
+			"proofState":         "PROVEN",
+			"trueBm25":           false,
+			"canonicalAuthority": false,
+		},
+	})
 }
 
 func (s *retrievalServer) httpStats(w http.ResponseWriter, r *http.Request) {

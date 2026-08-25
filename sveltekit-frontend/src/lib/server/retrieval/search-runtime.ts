@@ -328,18 +328,19 @@ export interface SearchResult {
     promotionAttempted?: boolean;
     /**
      * KAG hypergraph neighbor evidence (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration,
-     * KAG-01/KAG-02), purely additive/informational — NEVER used for
-     * scoring, fusion, or reranking above. Populated from
-     * `kag-mutual-index-v1.ts::buildKagMutualIndexV1()` against real
-     * `OntologyLinkedTupleV1`/`HyperedgeV1` rows.
+     * KAG-01/KAG-02/KAG-06), purely additive/informational — NEVER used for
+     * scoring, fusion, or reranking above. Populated by
+     * `lookupHypergraphNeighbors()` (below) via
+     * `kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsV1()`, which
+     * reads real `atlas_ontology_linked_tuples`/`atlas_hyperedges` rows and
+     * runs them through `kag-mutual-index-v1.ts::buildKagMutualIndexV1()`.
      *
-     * Deliberately always `undefined` right now: no live Postgres table
-     * persists either contract yet (checked directly — zero `INSERT INTO`
-     * across `ontology-linked-tuple-cache.ts`/`feature-doc-enrichment.ts`,
-     * the two real callers of `OntologyLinkedTupleV1`). This field exists
-     * so a caller can type-check against its eventual shape now, without
-     * this file fabricating placeholder data pretending a real evidence
-     * source exists. Populate it only after that persistence work lands.
+     * Still commonly `undefined` in practice: both source tables are
+     * near-empty in production as of KAG-06 (only proven with fixture rows
+     * that were deleted after verification), and the field is only emitted
+     * when a canonicalId actually has ≥1 matching hyperedge. Fail-open by
+     * construction — a DB error or empty match set omits the field rather
+     * than throwing.
      */
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
   };
@@ -546,6 +547,7 @@ export class SearchRuntime {
           proofContext,
         );
         const topPackets = hydrated.envelopes;
+        const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets);
 
         return {
           packets: topPackets,
@@ -580,6 +582,7 @@ export class SearchRuntime {
             rerankModel: 'degraded-no-rerank',
             rerankerUsed: false,
             promotionAttempted: false,
+            ...(hypergraphNeighborsDegraded ? { hypergraphNeighbors: hypergraphNeighborsDegraded } : {}),
           },
         };
       }
@@ -759,6 +762,8 @@ export class SearchRuntime {
         },
       );
 
+      const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets);
+
       return {
         packets: finalPackets,
         metadata: {
@@ -786,6 +791,7 @@ export class SearchRuntime {
           rerankModel: reranked[0]?.model_version ?? 'mixedbread-ai/mxbai-rerank-base-v2',
           rerankerUsed: reranked.length > 0,
           promotionAttempted: true,
+          ...(hypergraphNeighbors ? { hypergraphNeighbors } : {}),
         },
       };
     } catch (error) {
@@ -1015,6 +1021,31 @@ export class SearchRuntime {
     });
 
     return result.results;
+  }
+
+  /**
+   * KAG "next steps" item 1 (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration):
+   * looks up real hypergraph neighbor evidence for the final packet set via
+   * `kag-hypergraph-reader-v1.ts`. Purely additive/informational — called
+   * only after ranking is final, and never allowed to throw into the main
+   * search path (fail-open, returns undefined on any error so `provenance`
+   * simply omits the field, matching its pre-existing optional contract).
+   */
+  private async lookupHypergraphNeighbors(
+    packets: FeatureEnvelope[],
+  ): Promise<Array<{ canonicalId: string; hyperedgeIds: string[] }> | undefined> {
+    const canonicalIds = packets
+      .map((p) => p.packet_key ?? p.source_ref)
+      .filter((v): v is string => Boolean(v));
+    if (canonicalIds.length === 0) return undefined;
+    try {
+      const { readKagHypergraphNeighborsV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      const receipt = await readKagHypergraphNeighborsV1(canonicalIds);
+      return receipt.neighbors.length > 0 ? receipt.neighbors : undefined;
+    } catch (error) {
+      console.warn('[search-runtime] hypergraph neighbor lookup failed (non-blocking):', error);
+      return undefined;
+    }
   }
 
   /**

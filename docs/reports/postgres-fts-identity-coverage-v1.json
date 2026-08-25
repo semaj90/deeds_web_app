@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.postgres-fts-identity-coverage.v1",
+  "generatedAt": "2026-08-25T05:32:40.654Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "baseCoverage": {
+    "chunks_with_ref_and_hash": 52380,
+    "exact_source_ref_content_hash_matches": 0,
+    "source_ref_only_matches_no_hash_agreement": 52380,
+    "unmatched_no_source_ref_at_all": 0,
+    "atlas_packets_content_hash_populated": 0,
+    "atlas_packets_total": 61660,
+    "ambiguous_source_ref_groups": 0,
+    "ambiguous_source_ref_packet_rows": 0
+  },
+  "frozenQueries": [
+    "IngestionJobStatus",
+    "GpuConfig",
+    "SystemStatus",
+    "ErrorPatchLogInsert",
+    "extractLegalEntities",
+    "CourtroomScene",
+    "embedding search",
+    "packet identity"
+  ],
+  "perQueryResults": [
+    {
+      "query": "IngestionJobStatus",
+      "rawLexicalHits": 15,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "GpuConfig",
+      "rawLexicalHits": 33,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "SystemStatus",
+      "rawLexicalHits": 76,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "ErrorPatchLogInsert",
+      "rawLexicalHits": 39,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "extractLegalEntities",
+      "rawLexicalHits": 6,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "CourtroomScene",
+      "rawLexicalHits": 5,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "embedding search",
+      "rawLexicalHits": 2108,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    },
+    {
+      "query": "packet identity",
+      "rawLexicalHits": 586,
+      "canonicalBoundHits": 0,
+      "bindRate": 0
+    }
+  ],
+  "summary": {
+    "exactJoinCoverageOfChunks": 0,
+    "atlasPacketsContentHashPopulationRate": 0,
+    "totalFrozenQueryLexicalHits": 2868,
+    "totalFrozenQueryCanonicalBoundHits": 0,
+    "overallBindRate": 0
+  },
+  "recommendation": "DO_NOT_PROMOTE: atlas_packets.content_hash is 0% populated, so the exact (source_ref, content_hash) join structurally cannot bind any row right now — this is a hash-semantics/population gap in atlas_packets, not a query bug. Per explicit instruction, do NOT relax the join to source_ref-only as a fix — that reintroduces ambiguous-match risk (see ambiguous_source_ref_groups below). The real fix is backfilling atlas_packets.content_hash from its own source of truth before this adapter can bind any canonical packet_key."
+}

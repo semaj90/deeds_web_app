@@ -15,7 +15,9 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { selectRecoveryPacketsBatch } from './lib/topology-recovery-selector.mjs';
+import { loadRepoEnv, resolveDatabaseUrl, resolveRedisConfig } from './connection-config.mjs';
 
 const { values: args } = parseArgs({
   options: {
@@ -121,18 +123,13 @@ function fingerprint(errorClass, modelName, featureId) {
 
 // ── Database / Redis setup ────────────────────────────────────────────────────
 
-const pool = new pg.Pool({
-  host:     process.env.PGHOST     ?? '127.0.0.1',
-  port:     parseInt(process.env.PGPORT     ?? '5434', 10),
-  database: process.env.PGDATABASE ?? 'legal_ai_db',
-  user:     process.env.PGUSER     ?? 'legal_admin',
-  password: process.env.PGPASSWORD ?? process.env.DB_PASSWORD ?? '',
-});
-
+const runtimeEnv = loadRepoEnv();
+const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(runtimeEnv) });
+const redisConfig = resolveRedisConfig(runtimeEnv);
 const redis = new Redis({
-  host:               process.env.REDIS_HOST     ?? '127.0.0.1',
-  port:               parseInt(process.env.REDIS_PORT ?? '6379', 10),
-  password:           process.env.REDIS_PASSWORD ?? 'redis',
+  host:               redisConfig.host,
+  port:               redisConfig.port,
+  password:           redisConfig.password,
   lazyConnect:        true,
   enableOfflineQueue: false,
   retryStrategy:      () => null,
@@ -140,7 +137,7 @@ const redis = new Redis({
 
 // ── MAP phase ─────────────────────────────────────────────────────────────────
 
-async function mapPhase() {
+export async function mapPhase() {
   const result = await pool.query(`
     SELECT
       id,
@@ -177,7 +174,7 @@ async function mapPhase() {
 
 // ── REDUCE phase ──────────────────────────────────────────────────────────────
 
-function reducePhase(mapped) {
+export function reducePhase(mapped) {
   // Group by (error_class, model_name, task_id)
   const clusters = new Map();
 
@@ -398,7 +395,17 @@ async function run() {
   }
 }
 
-run().catch(err => {
-  console.error('[mapreduce] Fatal:', err.message);
-  process.exit(1);
-});
+// mapPhase/reducePhase are exported so other read-only tools (e.g. a
+// temporal-ledger schema-validation proof) can reuse the real
+// production classification logic instead of duplicating it. Guard the
+// CLI run so importing this module for those exports doesn't also
+// trigger a live Postgres/Redis run. Uses fileURLToPath, NOT
+// `file://${process.argv[1]}` string-building — see root CLAUDE.md's
+// "isMainModule CLI guard" lesson (that pattern never matches on
+// Windows and was found broken in 35 files repo-wide on 2026-08-12).
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  run().catch(err => {
+    console.error('[mapreduce] Fatal:', err.message);
+    process.exit(1);
+  });
+}

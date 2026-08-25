@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.grounded-domain-proposal-report.v1",
+  "generatedAt": "2026-08-24T00:00:00.000Z",
+  "status": "READ_ONLY_PROVEN",
+  "implementation": {
+    "source": "packages/parent-atlas/src/core/grounded-domain-proposal.ts",
+    "publicExport": "packages/parent-atlas/src/index.ts",
+    "test": "packages/parent-atlas/test/grounded-domain-proposal.test.mjs"
+  },
+  "behavior": {
+    "requiresExactGroundedInterval": true,
+    "requiresExplicitDomainMapping": true,
+    "candidateStatus": "REVIEW_REQUIRED",
+    "canonicalAuthority": false,
+    "deterministicCandidateId": true,
+    "preservesEvidenceMetadata": true
+  },
+  "validation": {
+    "typescriptCompile": "PASS",
+    "focusedAdapterTests": { "passed": 2, "failed": 0 },
+    "relatedContractTests": { "passed": 9, "failed": 0 },
+    "phaseB2DryRun": { "processed": 100, "failed": 0, "writes": false },
+    "staticStructuralIntegrationProof": "PASS",
+    "live8095Proof": "NOT_RUN"
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "conceptPromotion": false
+  },
+  "remainingGate": "adapt packet-level Phase B output to source-grounded observations, review candidates, validate ontology/domain mappings, then run a separately authorized bounded promotion"
+}

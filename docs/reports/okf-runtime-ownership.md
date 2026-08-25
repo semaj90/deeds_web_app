@@ -1,8 +1,8 @@
 # Parent Atlas OKF runtime ownership audit
 
-Generated: 2026-08-20T18:42:52.190Z
+Generated: 2026-08-25T04:30:23.880Z
 Status: PROVEN_READ_ONLY_AUDIT
-Files scanned: 27186
+Files scanned: 27631
 
 | Capability | Expected role | Classification | Status | Anchor evidence |
 | --- | --- | --- | --- | --- |

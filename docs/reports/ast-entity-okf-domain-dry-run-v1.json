@@ -5,15 +5,15 @@
   "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-okf-domain.jsonl",
   "taxonomy_revision": "parent-atlas-domain-taxonomy-v1",
   "counts": {
-    "total": 4365,
-    "classified": 3535,
-    "fallback": 830,
+    "total": 42404,
+    "classified": 34047,
+    "fallback": 8357,
     "noEvidence": 0,
-    "identityResolved": 4365
+    "identityResolved": 42404
   },
   "coverage": {
     "identity": 1,
-    "classified": 0.8098510882016037,
+    "classified": 0.8029195358928403,
     "evidence": 1
   },
   "canonical_writes": false,

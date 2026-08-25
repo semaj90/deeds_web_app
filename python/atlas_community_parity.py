@@ -16,11 +16,14 @@ can evaluate outputs from any two executors.
 
 from __future__ import annotations
 
+import argparse
 from collections import Counter
+import json
+from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
-from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score, pair_confusion_matrix
 
 
 class PartitionAssignmentV1(BaseModel):
@@ -90,17 +93,10 @@ def _singleton_ratio(labels: list[str]) -> float:
 
 
 def _pairwise_membership_agreement(left: list[str], right: list[str]) -> float:
-    n = len(left)
-    if n <= 1:
+    if len(left) <= 1:
         return 1.0
-    agreed = 0
-    total = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            total += 1
-            if (left[i] == left[j]) == (right[i] == right[j]):
-                agreed += 1
-    return agreed / total if total else 1.0
+    matrix = pair_confusion_matrix(left, right)
+    return float((matrix[0, 0] + matrix[1, 1]) / matrix.sum())
 
 
 def compare_community_partitions_v1(
@@ -176,3 +172,57 @@ def compare_community_partitions_v1(
         status=status,
         reasonCodes=reasons,
     )
+
+
+def _read_jsonl_assignments(path: Path) -> list[PartitionAssignmentV1]:
+    rows: list[PartitionAssignmentV1] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        raw = json.loads(line)
+        rows.append(
+            PartitionAssignmentV1(
+                nodeId=str(raw.get("gpuNodeId", raw.get("nodeId", ""))),
+                communityId=str(raw.get("communityId", "")),
+            )
+        )
+        if not rows[-1].nodeId or not rows[-1].communityId:
+            raise ValueError(f"invalid assignment at {path}:{line_number}")
+    return rows
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Compare frozen community partitions by node ID.")
+    parser.add_argument("--oracle", type=Path, required=True, help="NetworkX community JSONL")
+    parser.add_argument("--challenger", type=Path, required=True, help="cuGraph community JSONL")
+    parser.add_argument("--graph-revision", required=True)
+    parser.add_argument("--projection-revision", required=True)
+    parser.add_argument("--topology-hash", required=True)
+    parser.add_argument("--oracle-modularity", type=float, required=True)
+    parser.add_argument("--challenger-modularity", type=float, required=True)
+    parser.add_argument("--output", type=Path, default=None)
+    args = parser.parse_args()
+
+    receipt = compare_community_partitions_v1(
+        CommunityParityInputV1(
+            graphRevision=args.graph_revision,
+            projectionRevision=args.projection_revision,
+            topologyHash=args.topology_hash,
+            algorithm="louvain",
+            oracleBackend="networkx",
+            challengerBackend="cugraph",
+            oracleAssignments=_read_jsonl_assignments(args.oracle),
+            challengerAssignments=_read_jsonl_assignments(args.challenger),
+            oracleModularity=args.oracle_modularity,
+            challengerModularity=args.challenger_modularity,
+        )
+    )
+    rendered = json.dumps(receipt.model_dump(mode="json"), sort_keys=True)
+    if args.output:
+        args.output.write_text(rendered + "\n", encoding="utf-8")
+    print(rendered)
+    return 0 if receipt.status == "PROVEN" else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

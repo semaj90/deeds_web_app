@@ -1,114 +1,32 @@
 {
-  "generated_at": "2026-06-19T20:30:43.265Z",
+  "generated_at": "2026-08-25T03:32:22.418Z",
   "postgres": {
-    "packets_with_concepts": 17985,
-    "total_concept_refs": 42571
+    "packets_with_concepts": 58360,
+    "total_concept_refs": 220669
   },
   "neo4j": {
-    "total_edges": 33293,
-    "packets_with_edges": 8744,
-    "concepts_reached": 10,
-    "atlas_edges": 33293,
-    "atlas_packets": 8744,
-    "atlas_concepts": 10,
+    "total_edges": 173158,
+    "packets_with_edges": 51451,
+    "concepts_reached": 8777,
+    "atlas_edges": 0,
+    "atlas_packets": 0,
+    "atlas_concepts": 0,
     "duplicate_pairs": 0
   },
   "degree_distribution": {
     "singleton": 0,
     "low": 0,
     "mid": 0,
-    "high": 10
+    "high": 0
   },
-  "top_concepts": [
-    {
-      "concept": "general_abstractions",
-      "degree": 5044
-    },
-    {
-      "concept": "infrastructure_config",
-      "degree": 3932
-    },
-    {
-      "concept": "emergent_topology",
-      "degree": 3358
-    },
-    {
-      "concept": "test_harness",
-      "degree": 3260
-    },
-    {
-      "concept": "observability_telemetry",
-      "degree": 3185
-    },
-    {
-      "concept": "agent_intelligence",
-      "degree": 3054
-    },
-    {
-      "concept": "database_orm",
-      "degree": 3044
-    },
-    {
-      "concept": "ui_components",
-      "degree": 2936
-    },
-    {
-      "concept": "api_endpoints",
-      "degree": 2834
-    },
-    {
-      "concept": "native_accelerators",
-      "degree": 2646
-    }
-  ],
-  "supernodes": [
-    {
-      "concept": "general_abstractions",
-      "degree": 5044
-    },
-    {
-      "concept": "infrastructure_config",
-      "degree": 3932
-    },
-    {
-      "concept": "emergent_topology",
-      "degree": 3358
-    },
-    {
-      "concept": "test_harness",
-      "degree": 3260
-    },
-    {
-      "concept": "observability_telemetry",
-      "degree": 3185
-    },
-    {
-      "concept": "agent_intelligence",
-      "degree": 3054
-    },
-    {
-      "concept": "database_orm",
-      "degree": 3044
-    },
-    {
-      "concept": "ui_components",
-      "degree": 2936
-    },
-    {
-      "concept": "api_endpoints",
-      "degree": 2834
-    },
-    {
-      "concept": "native_accelerators",
-      "degree": 2646
-    }
-  ],
-  "coverage_pct": 0.48618293021962744,
+  "top_concepts": [],
+  "supernodes": [],
+  "coverage_pct": 0,
   "gate": {
-    "edges": true,
+    "edges": false,
     "duplicates": true,
     "coverage": false,
-    "supernodes": false,
+    "supernodes": true,
     "pass": false
   }
 }

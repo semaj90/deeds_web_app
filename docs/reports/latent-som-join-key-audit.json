@@ -1,40 +1,40 @@
 {
-  "timestamp": "2026-06-20T00:40:04.874Z",
+  "timestamp": "2026-08-25T04:51:28.914Z",
   "db_stats": {
-    "total": 17985,
-    "packet_key_count": 17985,
-    "source_ref_count": 17985,
-    "qdrant_point_id_count": 0,
-    "payload_qdrant_point_id_count": 77,
+    "total": 61660,
+    "packet_key_count": 61660,
+    "source_ref_count": 61660,
+    "qdrant_point_id_count": 6451,
+    "payload_qdrant_point_id_count": 61,
     "metadata_qdrant_point_id_count": 0,
-    "latent64_count": 3136,
-    "som_index_count": 4109
+    "latent64_count": 7522,
+    "som_index_count": 61660
   },
   "latent_coverage": {
-    "total_keys": 781,
-    "matched": 781,
-    "unmatched": 0,
-    "coverage_pct": "100.00"
+    "total_keys": 5000,
+    "matched": 1636,
+    "unmatched": 3364,
+    "coverage_pct": "32.72"
   },
   "som_coverage": {
-    "total_keys": 781,
-    "matched": 781,
-    "unmatched": 0,
-    "coverage_pct": "100.00"
+    "total_keys": 32310,
+    "matched": 2665,
+    "unmatched": 29645,
+    "coverage_pct": "8.25"
   },
   "qdrant": {
     "collection": "codebase_chunks_768",
-    "payloads_loaded": 781,
+    "payloads_loaded": 5000,
     "error": null
   },
   "latent_identity_reasons": {
-    "total": 781,
-    "addressable": 781,
-    "matched": 781,
+    "total": 5000,
+    "addressable": 5000,
+    "matched": 5000,
     "unmatched": 0,
     "coverage_pct": "100.00",
     "reason_counts": {
-      "matched": 781,
+      "matched": 5000,
       "qdrant_point_not_found": 0,
       "non_packet_vector": 0,
       "missing_identity_payload": 0,
@@ -43,18 +43,119 @@
     "unmatched_examples": []
   },
   "som_identity_reasons": {
-    "total": 781,
-    "addressable": 781,
-    "matched": 781,
-    "unmatched": 0,
-    "coverage_pct": "100.00",
+    "total": 32310,
+    "addressable": 32310,
+    "matched": 2665,
+    "unmatched": 29645,
+    "coverage_pct": "8.25",
     "reason_counts": {
-      "matched": 781,
+      "matched": 2665,
       "qdrant_point_not_found": 0,
       "non_packet_vector": 0,
       "missing_identity_payload": 0,
-      "identity_not_in_postgres": 0
+      "identity_not_in_postgres": 29645
     },
-    "unmatched_examples": []
+    "unmatched_examples": [
+      {
+        "key": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0004791e-40fe-4736-be3b-d84796ac5476",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "000700dd-d698-4589-a3b3-62c404909095",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "000d381c-017b-4154-900c-f87e54e79539",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0010432e-9be2-4faf-9fc6-f6c26db3fe44",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "00113f4e-919d-4799-8eb1-b5e65f5a72fc",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "00127e7c-b8b8-49cd-a3f1-04033827d5d6",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0013b0dd-ebf5-4f1e-9d64-4134bacc9490",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0014482f-cc66-4466-9464-ee57a482acb8",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0014ead0-2982-4e1a-bb8f-81b8aadd8d60",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0016a3ab-3b9c-4e83-8527-48ee65f434b8",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "00173130-6713-4be9-aafe-804c2d7f5899",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "001873a1-fa8b-48f4-afbf-c1ce9ffacf5b",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "001938cd-b242-4fb0-a783-6f3fa0b4f194",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "001b6a7e-f6d1-4e13-b5b5-550377e8e724",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "001c5b43-f0d5-4e60-8a22-d1de44136304",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "001e1899-3709-47c5-a2a1-75619cc2e38f",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "00271993-e370-4102-a285-97e20a775ff6",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0028a5cb-46a2-4032-bb13-b0d4c1c5f058",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "002a48cf-46f2-439b-8bed-7d641186fd04",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "002ac5f2-bcc5-4f09-9fab-6fe6a56f7b5c",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "002f8724-e13f-4cd5-9c97-40f30608de94",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "0030d459-c801-44be-826b-04762d45590d",
+        "reason": "identity_not_in_postgres"
+      },
+      {
+        "key": "00318766-7e63-41e3-9ac0-cb2265d385d6",
+        "reason": "identity_not_in_postgres"
+      }
+    ]
   }
 }

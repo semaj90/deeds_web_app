@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.ast-domain-baselines-dry.v1",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "databaseWrites": false,
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entity-okf-domain.jsonl",
+  "featureContract": {
+    "extractor": "ast-grep",
+    "nlp": "tokenized structural/evidence fields",
+    "dimensions": 256,
+    "hash": "sha256-modulo"
+  },
+  "labelSource": "OKF candidate domain_id",
+  "models": {
+    "naiveBayes": {
+      "accuracy": 0.8049490538573508,
+      "macroF1": 0.7508268853580299,
+      "evaluated": 687
+    },
+    "logisticRegression": {
+      "accuracy": 0.8355167394468704,
+      "macroF1": 0.7872023816863509,
+      "evaluated": 687
+    }
+  },
+  "dataset": {
+    "selected": 3535,
+    "train": 2848,
+    "test": 687,
+    "labels": [
+      "agent",
+      "auth",
+      "cache",
+      "database",
+      "graph",
+      "ml",
+      "network",
+      "retrieval",
+      "ui"
+    ],
+    "astGrepRows": 3535,
+    "astGrepProvenance": "candidate schema or evidence marker"
+  },
+  "status": "PASS_READ_ONLY_BASELINES"
+}

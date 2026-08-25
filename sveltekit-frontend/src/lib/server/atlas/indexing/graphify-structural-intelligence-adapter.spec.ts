@@ -9,6 +9,7 @@ function materialization(status: 'PROVEN' | 'RECOVERED_WITH_ERRORS'): Structural
   return {
     sourceRef: 'src/routes/api/cases/[id]/+server.ts',
     sourceRevision: 'src-r1',
+    sourceRevisionAuthority: nativeReady ? 'PROVEN' : 'UNPROVEN',
     provider: 'treesitter-chunker-8095',
     status,
     evidence: {
@@ -96,6 +97,11 @@ describe('Graphify structural intelligence adapter', () => {
         }],
       },
       revisions,
+      groundedDomainMapping: {
+        extractionClassToDomain: new Map([['authorization_behavior', 'software.security']]),
+        taxonomyRevision: 'atlas-taxonomy-test',
+        evidenceRefPrefix: 'evidence:test',
+      },
     });
 
     expect(result.receipt.status).toBe('COMPILED_NATIVE');
@@ -105,6 +111,9 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.compatibilityChunkIdCount).toBe(0);
     expect(result.receipt.astGrepObservationCount).toBe(1);
     expect(result.receipt.langExtractObservationCount).toBe(1);
+    expect(result.receipt.groundedDomainCandidateCount).toBe(1);
+    expect(result.groundedDomainCandidates[0]?.domainId).toBe('software.security');
+    expect(result.groundedDomainCandidates[0]?.canonicalAuthority).toBe(false);
     expect(result.receipt.canonicalIdentityCreated).toBe(false);
     expect(result.fabric?.symbol_nominations[0]?.upstream_symbol_id).toBe('symbol-patch');
     expect(result.fabric?.ast_grep_observations[0]?.upstream_node_id).toBe('node-patch');
@@ -119,6 +128,7 @@ describe('Graphify structural intelligence adapter', () => {
     });
 
     expect(result.receipt.status).toBe('COMPILED_NONPROMOTABLE');
+    expect(result.groundedDomainCandidates).toEqual([]);
     expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
     expect(result.receipt.provenanceStatus).toBe('NATIVE_RECOVERED');
     expect(result.fabric).not.toBeNull();

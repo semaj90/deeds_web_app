@@ -22,7 +22,7 @@
   "schemaReconciliationRequired": false,
   "sampleLimit": 10,
   "sampleCount": 0,
-  "currentGitHead": "7fe3c52136d3395a0480d3af44f5f46ee969bcf3",
+  "currentGitHead": "dcc4898338c7991f695a7c34d0932f93590b7800",
   "samples": [],
   "nextGate": "CANONICAL_GRAPHIFY_SOURCE_INVENTORY_WRITER_AND_SINGLE_ROW_READBACK"
 }

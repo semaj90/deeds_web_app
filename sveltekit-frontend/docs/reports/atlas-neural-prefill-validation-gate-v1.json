@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.neural-prefill-validation-gate.v1",
+  "generatedAt": "2026-08-25T01:32:49.255Z",
+  "overall": "DEGRADED",
+  "checks": [
+    {
+      "name": "embedding_geometry",
+      "verdict": "DEGRADED",
+      "detail": "DB unreachable in this environment: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"
+    },
+    {
+      "name": "tang_labeling_honesty",
+      "verdict": "PASS",
+      "detail": "candidate-shortlist docs consistently label the approach \"Tang-inspired\", no overclaim found"
+    },
+    {
+      "name": "metadata_index_ownership",
+      "verdict": "DEGRADED",
+      "detail": "DB unreachable in this environment: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"
+    },
+    {
+      "name": "qlora_write_restrictions",
+      "verdict": "PASS",
+      "detail": "canonicalWritesAllowed/onlineTrainingAllowed/trainableBaseWeights all locked false, even at maximal (fabricated-favorable) evidence input"
+    },
+    {
+      "name": "parameter_lookup_compatibility",
+      "verdict": "PASS",
+      "detail": "semantic_768 self-match succeeds; semantic_mrl_256 cross-representation match is correctly rejected"
+    },
+    {
+      "name": "daily_nlp_prefill_chain",
+      "verdict": "PASS",
+      "detail": "graphify-nlp-prefill-dry.mjs present and self-documents as read-only (not re-executed by this gate — see file header)"
+    }
+  ]
+}

@@ -11,7 +11,10 @@ export const CANONICAL_EMBEDDING_DIMENSION = ATLAS_CANONICAL_SEMANTIC_DIMENSION;
 
 export const CanonicalRepresentationNameSchema = z.enum([
   ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+  // Legacy compatibility name; do not compare it to semantic_mrl_512 without
+  // a matching model, prompt, normalization, and representation revision.
   'semantic_768',
+  'semantic_512',
   'semantic_mrl_512',
   'semantic_mrl_256',
   'semantic_mrl_128',

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.neural-prefill-validation-receipt.v1",
-  "generatedAt": "2026-08-24T21:45:48.330Z",
+  "generatedAt": "2026-08-25T03:52:59.806Z",
   "status": "PASS",
   "readinessPercent": 70,
   "readOnly": true,
@@ -49,6 +49,12 @@
       "status": "PASS",
       "evidence": "Bounded daily dry receipt status: PASS.",
       "next": "A failure must leave the existing Graphify receipt intact and continue in degraded mode."
+    },
+    {
+      "id": "AST_DOMAIN_BASELINES",
+      "status": "PASS",
+      "evidence": "AST-grep/NLP baseline receipt covers 3535 labeled rows; logistic macro-F1=0.787, Naive Bayes macro-F1=0.751. Candidate labels remain non-promotional.",
+      "next": "Replace candidate labels with reviewed ground truth before model promotion."
     },
     {
       "id": "INDEX_METADATA",

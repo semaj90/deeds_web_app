@@ -46,6 +46,20 @@ declare module '@xenova/transformers' {
 	}
 }
 
+// Optional local/ONNX inference lane. The canonical EmbeddingGemma server
+// does not depend on this package; runtime callers must still feature-detect it.
+declare module '@huggingface/transformers' {
+
+	const AutoTokenizer: any;
+	const AutoModel: any;
+	const TextStreamer: any;
+	const env: any;
+	const pipeline: any;
+	const transformers: any;
+	export { AutoTokenizer, AutoModel, TextStreamer, env, pipeline };
+	export default transformers;
+}
+
 declare module '@huggingface/inference' {
 	export class HfInference {
 		constructor(token?: string);

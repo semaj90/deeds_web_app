@@ -4,6 +4,8 @@ import {
   adaptAstGrepMatches,
   adaptGroundedLangExtract,
   adaptSidecarGroundedExtractions,
+  buildGroundedDomainCandidates,
+  type GroundedDomainCandidateV1,
   compileStructuralExtractionFabric,
   type StructuralExtractionFabricResultV1,
 } from '@deeds/parent-atlas';
@@ -33,6 +35,7 @@ export type GraphifyStructuralIntelligenceReceipt = {
   referenceFactCount: number;
   astGrepObservationCount: number;
   langExtractObservationCount: number;
+  groundedDomainCandidateCount: number;
   compatibilityNodeIdCount: number;
   compatibilityFileIdCount: number;
   compatibilityChunkIdCount: number;
@@ -42,6 +45,7 @@ export type GraphifyStructuralIntelligenceReceipt = {
 
 export type GraphifyStructuralIntelligenceResult = {
   fabric: StructuralExtractionFabricResultV1 | null;
+  groundedDomainCandidates: GroundedDomainCandidateV1[];
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
 
@@ -68,11 +72,17 @@ export function compileGraphifyStructuralIntelligence(input: {
     adapter: string;
     fabric: string;
   };
+  groundedDomainMapping?: {
+    extractionClassToDomain: ReadonlyMap<string, string>;
+    taxonomyRevision: string;
+    evidenceRefPrefix?: string;
+  };
 }): GraphifyStructuralIntelligenceResult {
   const { materialization } = input;
   if (!materialization.evidence) {
     return {
       fabric: null,
+      groundedDomainCandidates: [],
       receipt: {
         schema: 'atlas.graphify-structural-intelligence-receipt.v1',
         sourceRef: materialization.sourceRef,
@@ -91,6 +101,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         referenceFactCount: 0,
         astGrepObservationCount: 0,
         langExtractObservationCount: 0,
+        groundedDomainCandidateCount: 0,
         compatibilityNodeIdCount: 0,
         compatibilityFileIdCount: 0,
         compatibilityChunkIdCount: 0,
@@ -150,6 +161,17 @@ export function compileGraphifyStructuralIntelligence(input: {
     producer_revision: input.revisions.fabric,
   });
 
+  const groundedDomainCandidates = input.groundedDomainMapping
+    ? buildGroundedDomainCandidates({
+      observations: groundedLangExtract.observations,
+      extractionClassToDomain: input.groundedDomainMapping.extractionClassToDomain,
+      taxonomyRevision: input.groundedDomainMapping.taxonomyRevision,
+      producerRevision: input.revisions.adapter,
+      evidenceRefPrefix: input.groundedDomainMapping.evidenceRefPrefix
+        ?? `langextract:${materialization.evidence.file_path}`,
+    })
+    : [];
+
   const compatibilityCount =
     enriched.receipt.compatibility_node_id_count
     + enriched.receipt.compatibility_file_id_count
@@ -167,6 +189,7 @@ export function compileGraphifyStructuralIntelligence(input: {
 
   return {
     fabric,
+    groundedDomainCandidates,
     receipt: {
       schema: 'atlas.graphify-structural-intelligence-receipt.v1',
       sourceRef: materialization.sourceRef,
@@ -185,6 +208,7 @@ export function compileGraphifyStructuralIntelligence(input: {
       referenceFactCount: fabric.receipt.reference_fact_count,
       astGrepObservationCount: fabric.receipt.ast_grep_observation_count,
       langExtractObservationCount: fabric.receipt.grounded_langextract_count,
+      groundedDomainCandidateCount: groundedDomainCandidates.length,
       compatibilityNodeIdCount: enriched.receipt.compatibility_node_id_count,
       compatibilityFileIdCount: enriched.receipt.compatibility_file_id_count,
       compatibilityChunkIdCount: enriched.receipt.compatibility_chunk_id_count,

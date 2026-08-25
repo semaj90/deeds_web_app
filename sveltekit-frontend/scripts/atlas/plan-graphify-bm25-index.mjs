@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+// NAMING NOTE (2026-08-26, docs-only, no rename): "bm25" here is historical.
+// The live index is PostgreSQL native tsvector/GIN full-text search; pg_search
+// is not installed (confirmed via `SELECT extname FROM pg_extension`).
+// Classify as POSTGRES_FTS_AST, not BM25_AST. See
+// parent-atlas-workstation-todo.md's 2026-08-23/26 session handoffs and
+// scripts/atlas/audit-graphify-lexical-owner.mjs, which already makes this
+// distinction explicit at the query layer.
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';

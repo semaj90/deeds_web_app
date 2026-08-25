@@ -2775,6 +2775,50 @@ docker exec legal-ai-qdrant curl -s http://localhost:6333/collections
 
 **Overview**: Native C++ addons bridge TypeScript ↔ CUDA/LibTorch/simdjson for 2-6,500× performance gains.
 
+### GPU/CPU boundary (added 2026-08-26 — clarifies a recurring question)
+
+**RTX/CUDA cores accelerate tensor math (PyTorch's ATen backend) — nothing else.** If a task isn't
+matrix multiplication, cosine/dot-product batches, top-k, AE/SOM/kmeans, or model inference, GPU
+does not help it, no matter how slow it is. Concretely:
+
+- ✅ GPU-accelerable: embeddings, cosine/matmul, top-k, rerank batches, AE/SOM/kmeans, PyTorch/ATen
+  tensor ops, LibTorch inference.
+- ❌ NOT GPU-accelerable: AST/tree-sitter parsing (ast-grep, ts-morph — branchy tree-walking, not
+  matrix math), JSON parsing/validation, CRUD, joins, PostgreSQL FTS. This is CPU work; the only
+  real speedup lever for these is **CPU parallelism** (a worker-thread/worker-process pool across
+  files), not a GPU port. Example: the AST-grep symbol extraction pass
+  (`scripts/atlas/lib/ast-grep-symbol-extraction.mjs`) takes ~20 minutes because it's a plain
+  sequential `for` loop with zero parallelism — confirmed by reading the file, not assumed. A
+  worker pool would help; a GPU rewrite would not.
+- **simdjson** (`lib/server/gpu/simdjson-bridge.ts`, below) is the one exception that looks
+  GPU-adjacent but isn't — it's AVX2/SSE4.2 **SIMD on the CPU**, not GPU. Don't conflate "SIMD
+  acceleration" with "GPU acceleration"; they're different hardware paths. simdjson and TurboVec
+  are both CPU-side (AVX2 SIMD for JSON; 4-bit quantized RAM ANN for vector prefilter) and can be
+  used together, but neither one runs on the RTX GPU.
+
+**NetworkX vs. Neo4j — both are real, they are not alternatives to each other.** Confirmed live in
+this repo (`python/parent_atlas_networkx_pagerank.py`,
+`python/graph_snapshot_parity_networkx_oracle.py`, `python/atlas_compute/typed_graph_runtime.py`,
+`python/graph_snapshot_parity_cugraph_oracle.py`):
+- **NetworkX** = a Python in-memory graph *library*, CPU-only, used here as the **reference/parity
+  oracle** — e.g. `graph_snapshot_parity_networkx_oracle.py` computes ground-truth PageRank that a
+  GPU cuGraph challenger (`graph_snapshot_parity_cugraph_oracle.py`) is checked against. It can
+  build and emit a graph as JSON (nodes/edges), but it is not a database — nothing persists between
+  runs unless something else writes the output somewhere.
+- **Neo4j** = the persistent graph **database** — a topology *mirror* per this file's own Postgres-
+  is-truth rule (Postgres is truth; Qdrant/Redis/Neo4j are rebuildable mirrors). It's what a live
+  query traverses; NetworkX is what a one-off Python script computes and checks against.
+- Before adding a new graph computation anywhere, check both: is this a persistent, queryable
+  topology (→ likely belongs behind the existing Neo4j mirror path) or a one-off/parity-check
+  computation (→ a NetworkX script, matching the existing oracle pattern)? Also check the
+  TypeScript side first — `src/lib/server/graph/graph-analysis-runner.ts` and its adapters
+  (`pagerank-analysis-adapter.ts`, `kcore-analysis-adapter.ts`, `betweenness-analysis-adapter.ts`,
+  `cheirank-analysis-adapter.ts`) already write real graph-algorithm output to Postgres
+  (`graph_community_assignments`, `graph_communities`, `graph_node_metrics`) — confirmed live,
+  wired, with passing tests. Per the "5 competing PageRank implementations" finding above (Aug 9
+  audit), this repo already has more graph-algorithm owners than it needs; check that section
+  before adding another one.
+
 ### Architecture Layers
 
 ```

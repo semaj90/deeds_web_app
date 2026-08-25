@@ -14,6 +14,13 @@
 // Adapters
 export { searchPostgresBM25, scoreBM25, filterBySourceScope, validateBM25Results } from './adapters/postgres-bm25.adapter.js';
 export type { Postgres25TextSearchOptions, BM25Candidate } from './adapters/postgres-bm25.adapter.js';
+export {
+  searchPostgresFts,
+  scorePostgresFtsFallback,
+  validatePostgresFtsResults,
+  POSTGRES_FTS_INDEX_KIND,
+} from './adapters/postgres-fts.adapter.js';
+export type { PostgresFtsSearchOptions, PostgresFtsCandidate } from './adapters/postgres-fts.adapter.js';
 
 export { searchQdrantANN, validateQdrantResults, filterQdrantBySourceScope, mergeBM25AndQdrant, hashQueryForCache } from './adapters/qdrant-recall.adapter.js';
 export type { QdrantRecallOptions, QdrantRecallResult, EmbeddingCache } from './adapters/qdrant-recall.adapter.js';

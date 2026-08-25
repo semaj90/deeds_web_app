@@ -9,6 +9,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { buildAstSourceRefKey, normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -21,6 +22,13 @@ const resolutionPath = path.resolve(ROOT, (args.find((arg) => arg.startsWith('--
   || '.tmp/atlas/graphify-file-index-v1/ast-symbol-resolution.jsonl');
 const PROMOTABLE_KINDS = new Set(['function', 'method', 'class', 'interface', 'type', 'enum']);
 const PRODUCER_REVISION = 'atlas-ast-symbol-version-materializer-v1';
+
+function astNodeKindFor(kind) {
+  // The live atlas_ast_nodes extractor normalizes TypeScript interfaces to
+  // `type` and class methods to `function`; preserve the nomination kind in
+  // callable_metadata while using the storage kind for the bridge lookup.
+  return normalizeAstNodeKind(kind);
+}
 
 const digest = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
 const readJsonl = async (file) => (await fs.readFile(file, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
@@ -114,8 +122,8 @@ async function main() {
       const candidateNodes = await pool.query(
         `SELECT tree_node_id, node_kind
          FROM atlas_ast_nodes
-         WHERE source_ref_key = $1 || '#' || $2 || ':' || $3`,
-        [row.source_ref, row.kind, row.qualified_name || row.name],
+         WHERE source_ref_key = $1`,
+        [buildAstSourceRefKey(row.source_ref, astNodeKindFor(row.kind), row.qualified_name || row.name)],
       );
       const identityBridgeOutcome = candidateNodes.rowCount === 0
         ? 'UNRESOLVED'

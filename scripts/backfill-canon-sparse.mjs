@@ -1,5 +1,5 @@
 /**
- * Recreate legal_canon_chunks with named dense + BM42 sparse vector support.
+ * Recreate legal_canon_chunks with named dense + BM42/IDF sparse vector support.
  *
  * The existing collection uses unnamed vectors which can't coexist with sparse.
  * Since there are only 59 points, we save → recreate → re-upsert.
@@ -227,8 +227,12 @@ async function main() {
 			vectors: {
 				content: { size: 768, distance: 'Cosine', on_disk: true },
 			},
+			// Qdrant applies collection-wide inverse document frequency to the
+			// sparse lane. This is an IDF-enabled BM42-compatible lane, not a
+			// claim of exact textbook BM25 (k1/b and vocabulary receipts remain
+			// separate promotion requirements).
 			sparse_vectors: {
-				bm25: {},
+				bm25: { modifier: 'idf' },
 			},
 			hnsw_config: { m: 16, ef_construct: 128, on_disk: true },
 			on_disk_payload: true,

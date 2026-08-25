@@ -1,8 +1,16 @@
--- Step 1: Add PostgreSQL tsvector column for canonical BM25 search
+-- Step 1: Add PostgreSQL tsvector column for lexical search
 -- Uses trigger-maintained column (maintains on INSERT/UPDATE)
 -- Weighted field tokenization: relative_path (A), symbol (A), summary (B), content (C), semantic_tags (B)
 -- This enables ts_rank / websearch_to_tsquery ranking
--- Fallback: trigram (ILIKE) remains as explicit fallback, not primary BM25
+-- Fallback: trigram (ILIKE) remains as explicit fallback
+--
+-- NAMING NOTE (added 2026-08-26, not a rename -- docs/comments only, see
+-- parent-atlas-workstation-todo.md's 2026-08-23/26 session handoffs):
+-- despite the "bm25" name below, this is PostgreSQL's native tsvector/GIN
+-- full-text search, NOT true BM25 ranking. The pg_search extension is not
+-- installed (confirmed live via `SELECT extname FROM pg_extension`,
+-- 2026-08-26 -- only plpgsql/pg_trgm/pgcrypto/vector). Classify as
+-- POSTGRES_FTS_AST, not BM25_AST, until pg_search is installed and used.
 
 -- 1. Add the search_vector column (regular column, not generated)
 ALTER TABLE codebase_chunk_index

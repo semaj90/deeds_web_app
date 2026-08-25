@@ -1,15 +1,15 @@
 {
   "schema": "atlas.ast-symbol-version-materialization.v1",
-  "mode": "APPLY",
+  "mode": "DRY_RUN",
   "inputNominations": 42398,
   "canonicalDeclarationCandidates": 10170,
   "excludedVariables": 32228,
-  "limit": 200,
-  "rowsAttempted": 200,
-  "rowsInserted": 100,
-  "rowsAlreadyPresent": 100,
-  "projectionRowsUpserted": 200,
-  "databaseWrites": true,
+  "limit": 20,
+  "rowsAttempted": 0,
+  "rowsInserted": 0,
+  "rowsAlreadyPresent": 0,
+  "projectionRowsUpserted": 0,
+  "databaseWrites": false,
   "sample": [
     {
       "nominationId": "ast-grep-nomination:05692e88296afd1acbf3688a815114d37d916906",
@@ -71,10 +71,5 @@
       "qualifiedName": "updateKanbanStatus",
       "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
     }
-  ],
-  "identityBridgeOutcomes": {
-    "RESOLVED": 3,
-    "UNRESOLVED": 197,
-    "AMBIGUOUS": 0
-  }
+  ]
 }

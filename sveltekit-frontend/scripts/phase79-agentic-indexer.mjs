@@ -125,7 +125,7 @@ async function ensureCollection(name) {
     // Ensure sparse vectors are configured
     try {
       await qdrantFetch(`/collections/${name}`, 'PATCH', {
-        sparse_vectors: { bm42: {} },
+        sparse_vectors: { bm42: { modifier: 'idf' } },
       });
       console.log(`  Sparse vector "bm42" ensured on "${name}"`);
     } catch {
@@ -142,7 +142,7 @@ async function ensureCollection(name) {
       on_disk: true,
       hnsw_config: { m: 16, ef_construct: 200 },
     },
-    sparse_vectors: { bm42: {} },
+    sparse_vectors: { bm42: { modifier: 'idf' } },
     quantization_config: {
       scalar: { type: 'int8', quantile: 0.99, always_ram: false },
     },

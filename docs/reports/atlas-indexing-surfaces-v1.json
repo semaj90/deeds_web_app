@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-24T21:50:57.966Z",
+  "generatedAt": "2026-08-25T04:37:56.872Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -583,6 +583,21 @@
         "table": "atlas_callable_search",
         "name": "atlas_callable_search_search_vector_gin",
         "definition": "CREATE INDEX atlas_callable_search_search_vector_gin ON public.atlas_callable_search USING gin (search_vector)"
+      },
+      {
+        "table": "atlas_class_search_index_v1",
+        "name": "atlas_class_search_index_v1_embedding_hnsw",
+        "definition": "CREATE INDEX atlas_class_search_index_v1_embedding_hnsw ON public.atlas_class_search_index_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64') WHERE (embedding IS NOT NULL)"
+      },
+      {
+        "table": "atlas_class_search_index_v1",
+        "name": "atlas_class_search_index_v1_metadata_gin",
+        "definition": "CREATE INDEX atlas_class_search_index_v1_metadata_gin ON public.atlas_class_search_index_v1 USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_class_search_index_v1",
+        "name": "atlas_class_search_index_v1_search_gin",
+        "definition": "CREATE INDEX atlas_class_search_index_v1_search_gin ON public.atlas_class_search_index_v1 USING gin (search_vector)"
       },
       {
         "table": "atlas_embeddings_384",
@@ -1564,7 +1579,7 @@
           }
         },
         "points": 106338,
-        "indexedVectors": 106696,
+        "indexedVectors": 115914,
         "status": "green"
       },
       {
@@ -1877,8 +1892,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
-        "indexedVectors": 0,
+        "points": 137,
+        "indexedVectors": 137,
         "status": "green"
       },
       {
@@ -1887,7 +1902,7 @@
           "size": 1,
           "distance": "Cosine"
         },
-        "points": 0,
+        "points": 1,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -1929,7 +1944,7 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 251,
+    "manualSqlFiles": 252,
     "declaredSidecars": 36,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",

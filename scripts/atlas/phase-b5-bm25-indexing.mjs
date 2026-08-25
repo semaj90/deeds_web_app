@@ -2,6 +2,16 @@
 /**
  * Phase B Pass 5: BM25 Full-Text Indexing
  *
+ * CLASSIFICATION NOTE (2026-08-26, docs-only, not a rename — see openspec/
+ * changes/parent-atlas-neural-prefill-encoder/tasks.md's DBCTX-01/BM25
+ * cleanup entries): this is LEGACY_MIXED_LEXICAL_PIPELINE, NOT the daily
+ * Graphify lexical owner. It mixes the Go /api/index service, Redis cache
+ * warming, and a "TF-IDF style" helper that is actually per-document
+ * frequency counting, not real BM25/TF-IDF. Do not expand this file into a
+ * canonical lexical owner — the canonical Postgres lexical lane is
+ * `postgres_tsvector_english` (see postgres-fts.adapter.ts /
+ * postgres-fts.ts / audit-graphify-lexical-owner.mjs).
+ *
  * Final pass that:
  * 1. Sends summaries to Go search service (:8096) for BM25 indexing
  * 2. Warms Redis BitFrost cache with top search terms

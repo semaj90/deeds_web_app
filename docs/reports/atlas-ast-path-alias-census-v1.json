@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.ast-path-alias-census.v1",
+  "generatedAt": "2026-08-25T03:25:48.851Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "candidatesPath": "docs/reports/graphify-ast-declaration-candidates-active-v3.jsonl",
+  "bridgeKeysPath": ".tmp/atlas/atlas-ast-nodes-source-ref-keys.txt",
+  "bridgeKeyCount": 7565,
+  "totalCandidates": 39033,
+  "rawMatches": 0,
+  "aliasMatches": 3794,
+  "matchedCandidates": 3794,
+  "uniqueCandidateCoverage": 9.72,
+  "byPolicy": {
+    "ACTIVE_APP_RELATIVE_V1": 3794
+  },
+  "ambiguousSamples": [],
+  "pathPolicy": "ACTIVE_APP_RELATIVE_V1",
+  "policyDecisionRequired": true,
+  "canonicalAuthorityChanged": false
+}

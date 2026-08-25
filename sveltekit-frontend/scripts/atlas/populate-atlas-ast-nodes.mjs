@@ -18,16 +18,39 @@ import pg from 'pg';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { pathToFileURL } from 'url';
+import { buildAstSourceRefKey } from '../../../scripts/atlas/lib/ast-source-ref-key.mjs';
 
 const { Pool } = pg;
 const isDryRun  = process.argv.includes('--dry-run');
 const isVerify  = process.argv.includes('--verify');
 const limitArg  = process.argv.find(a => a.startsWith('--limit=')) ?? '--limit=0';
 const limit     = parseInt(limitArg.split('=')[1]) || 0;
+const scopeArg  = process.argv.find(a => a.startsWith('--scope='));
+const scopePath = scopeArg ? path.resolve(scopeArg.slice('--scope='.length).trim()) : null;
+const graphifyParse = process.argv.includes('--graphify-parse');
+const declarationsOnly = process.argv.includes('--declarations-only');
+const graphifyReportArg = process.argv.find(a => a.startsWith('--out='));
+const graphifyReportPath = graphifyReportArg
+  ? path.resolve(graphifyReportArg.slice('--out='.length).trim())
+  : null;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath   = path.resolve(__dirname, '../../.env');
+const REPO_ROOT = path.resolve(__dirname, '../../..');
+const FRONTEND_ROOT = path.resolve(__dirname, '../..');
+const inventoryArg = process.argv.find(a => a.startsWith('--inventory='));
+const inventoryPath = path.resolve(inventoryArg?.slice('--inventory='.length).trim()
+  || path.join(REPO_ROOT, '.tmp/atlas/graphify-file-index-v1/packets.jsonl'));
+const candidatesArg = process.argv.find(a => a.startsWith('--candidates-out='));
+const candidatesOutputPath = candidatesArg
+  ? path.resolve(candidatesArg.slice('--candidates-out='.length).trim())
+  : null;
+
+const astGrep = graphifyParse
+  ? await import(pathToFileURL(path.join(FRONTEND_ROOT, 'node_modules/@ast-grep/napi/index.js')).href)
+  : null;
 
 function loadEnv(envFile) {
   try {
@@ -106,6 +129,169 @@ function detectLanguage(relativePath) {
   return map[ext] || 'typescript';
 }
 
+function astLanguage(relativePath) {
+  const ext = path.extname(relativePath || '').toLowerCase();
+  if (ext === '.ts' || ext === '.mts' || ext === '.cts') return astGrep?.Lang.TypeScript ?? null;
+  if (ext === '.tsx') return astGrep?.Lang.Tsx ?? null;
+  if (['.js', '.jsx', '.mjs', '.cjs'].includes(ext)) return astGrep?.Lang.JavaScript ?? null;
+  return null;
+}
+
+function resolveGraphifyFile(sourceRef) {
+  const raw = String(sourceRef || '').replace(/\\/g, '/').replace(/^\.\//, '');
+  const candidates = [
+    path.resolve(REPO_ROOT, raw),
+    path.resolve(FRONTEND_ROOT, raw),
+    raw.startsWith('$lib/') ? path.resolve(FRONTEND_ROOT, 'src/lib', raw.slice(5)) : null,
+  ].filter(Boolean);
+  return candidates.find((candidate) => existsSync(candidate)) ?? null;
+}
+
+function astName(node) {
+  const names = new Set([
+    'identifier', 'type_identifier', 'property_identifier',
+    'private_property_identifier', 'shorthand_property_identifier_pattern',
+  ]);
+  return node.children().find((child) => names.has(child.kind()))?.text() ?? null;
+}
+
+function graphifyAstCandidates(sourceRef, absolutePath, sourceText) {
+  const language = astLanguage(sourceRef);
+  if (!language) return { skipped: true, candidates: [] };
+  const root = astGrep.parse(language, sourceText).root();
+  const kinds = new Map([
+    ['function_declaration', 'function'],
+    ['generator_function_declaration', 'function'],
+    ['class_declaration', 'class'],
+    ['method_definition', 'method'],
+    ['interface_declaration', 'interface'],
+    ['type_alias_declaration', 'type'],
+    ['enum_declaration', 'enum'],
+    ['variable_declarator', 'variable'],
+  ]);
+  const candidates = [];
+  const visit = (node) => {
+    const symbolKind = kinds.get(node.kind());
+    if (symbolKind && (!declarationsOnly || symbolKind !== 'variable')) {
+      const name = astName(node);
+      if (name) {
+        const range = node.range();
+        candidates.push({
+          source_ref: sourceRef,
+          relative_path: sourceRef,
+          symbol_name: name,
+          symbol_kind: symbolKind,
+          ast_kind: node.kind(),
+          start_byte: Buffer.byteLength(sourceText.slice(0, range.start.index), 'utf8'),
+          end_byte: Buffer.byteLength(sourceText.slice(0, range.end.index), 'utf8'),
+          start_line: range.start.line + 1,
+          start_column: range.start.column,
+          end_line: range.end.line + 1,
+          end_column: range.end.column,
+        });
+      }
+    }
+    for (const child of node.children()) visit(child);
+  };
+  visit(root);
+  return { skipped: false, candidates };
+}
+
+function loadGraphifyPacketIndex() {
+  if (!existsSync(inventoryPath)) return new Map();
+  const index = new Map();
+  for (const line of readFileSync(inventoryPath, 'utf8').split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    try {
+      const packet = JSON.parse(line);
+      if (packet.source_ref && !index.has(packet.source_ref)) index.set(packet.source_ref, packet);
+    } catch {
+      // The scope audit already reports malformed inventory rows separately.
+    }
+  }
+  return index;
+}
+
+function graphifyInventorySha256() {
+  if (!existsSync(inventoryPath)) return null;
+  return crypto.createHash('sha256').update(readFileSync(inventoryPath)).digest('hex');
+}
+
+async function runGraphifyParseProbe() {
+  if (!scopePath) throw new Error('--graphify-parse requires --scope=...');
+  const scope = JSON.parse(readFileSync(scopePath, 'utf8'));
+  const refs = Array.isArray(scope.includedSourceRefs) ? scope.includedSourceRefs.filter(Boolean) : [];
+  const boundedRefs = limit ? refs.slice(0, limit) : refs;
+  const packetIndex = loadGraphifyPacketIndex();
+  const inventorySha256 = graphifyInventorySha256();
+  const report = {
+    schema: 'atlas.graphify-ast-node-candidate-probe.v1',
+    status: 'DRY_RUN',
+    readOnly: true,
+    databaseWrites: false,
+    scopePath,
+    inventoryPath,
+    inventorySha256,
+    scopeFiles: refs.length,
+    filesConsidered: boundedRefs.length,
+    filesResolved: 0,
+    filesMissing: 0,
+    filesParsed: 0,
+    filesSkippedUnsupported: 0,
+    packetIdentityResolved: 0,
+    packetTreeNodeResolved: 0,
+    sourceRevisionResolved: 0,
+    candidateCount: 0,
+    candidatePolicy: declarationsOnly ? 'DECLARATION_LIKE_ONLY' : 'ALL_NAMED_DECLARATIONS',
+    candidatesByKind: {},
+    missingSample: [],
+    sampleCandidates: [],
+    candidatesOutputPath,
+    extractor: 'ast-grep-napi',
+  };
+  const allCandidates = [];
+  for (const sourceRef of boundedRefs) {
+    const absolutePath = resolveGraphifyFile(sourceRef);
+    if (!absolutePath) {
+      report.filesMissing++;
+      if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
+      continue;
+    }
+    report.filesResolved++;
+    const extracted = graphifyAstCandidates(sourceRef, absolutePath, readFileSync(absolutePath, 'utf8'));
+    if (extracted.skipped) {
+      report.filesSkippedUnsupported++;
+      continue;
+    }
+    report.filesParsed++;
+    const packet = packetIndex.get(sourceRef);
+    if (packet) {
+      report.packetIdentityResolved++;
+      if (packet.tree_node_id) report.packetTreeNodeResolved++;
+      if (packet.source_revision) report.sourceRevisionResolved++;
+    }
+    report.candidateCount += extracted.candidates.length;
+    for (const candidate of extracted.candidates) {
+      if (packet) {
+        candidate.packet_key = packet.packet_key ?? null;
+        candidate.feature_id = packet.feature_id ?? null;
+        candidate.graphify_packet_tree_node_id = packet.tree_node_id ?? null;
+        candidate.source_revision = packet.source_revision ?? null;
+        candidate.workspace_revision = packet.workspace_revision ?? null;
+        candidate.domain_class = packet.domain_class ?? null;
+      }
+      if (candidatesOutputPath) allCandidates.push(candidate);
+      report.candidatesByKind[candidate.symbol_kind] = (report.candidatesByKind[candidate.symbol_kind] ?? 0) + 1;
+      if (report.sampleCandidates.length < 10) report.sampleCandidates.push(candidate);
+    }
+  }
+  if (candidatesOutputPath) {
+    writeFileSync(candidatesOutputPath, `${allCandidates.map((candidate) => JSON.stringify(candidate)).join('\n')}\n`);
+  }
+  if (graphifyReportPath) writeFileSync(graphifyReportPath, `${JSON.stringify(report, null, 2)}\n`);
+  console.log(JSON.stringify(report, null, 2));
+}
+
 function normalizedSignatureFromSymbol(symbol, kind) {
   // Without tree-sitter parsing we can't extract real types.
   // Use empty string per contract (optional, improves disambiguation only).
@@ -140,6 +326,10 @@ async function verify(client) {
 }
 
 async function main() {
+  if (graphifyParse) {
+    await runGraphifyParseProbe();
+    return;
+  }
   const client = await pool.connect();
 
   if (isVerify) {
@@ -149,13 +339,21 @@ async function main() {
     return;
   }
 
-  console.log(`Mode: ${isDryRun ? 'DRY-RUN' : 'APPLY'}  limit=${limit || 'all'}`);
+  let scopeRefs = null;
+  if (scopePath) {
+    const scope = JSON.parse(readFileSync(scopePath, 'utf8'));
+    scopeRefs = Array.isArray(scope.includedSourceRefs) ? scope.includedSourceRefs.filter(Boolean) : [];
+    if (!scopeRefs.length) throw new Error(`Scope report has no includedSourceRefs: ${scopePath}`);
+  }
+  console.log(`Mode: ${isDryRun ? 'DRY-RUN' : 'APPLY'}  limit=${limit || 'all'}  scope=${scopePath ? scopeRefs.length : 'database-default'}`);
 
   try {
     // ── Phase 1: Populate atlas_ast_nodes from chunk-level symbol+kind ─────────
     console.log('\n[1/3] Loading chunks with symbol+kind from codebase_chunk_index…');
 
     const limitClause = limit ? `LIMIT ${limit}` : '';
+    const scopeClause = scopeRefs ? 'AND (source_ref = ANY($1::text[]) OR relative_path = ANY($1::text[]))' : '';
+    const chunkParams = scopeRefs ? [scopeRefs] : [];
     const { rows: chunks } = await client.query(`
       SELECT
         id,
@@ -170,9 +368,10 @@ async function main() {
       FROM codebase_chunk_index
       WHERE symbol IS NOT NULL AND symbol != ''
         AND kind   IS NOT NULL AND kind   != ''
+        ${scopeClause}
       ORDER BY relative_path, line_start
       ${limitClause}
-    `);
+    `, chunkParams);
 
     console.log(`  Found ${chunks.length} eligible chunks`);
 
@@ -249,7 +448,7 @@ async function main() {
         normalized_node_hash: crypto.createHash('sha256').update(sk).digest('hex'),
         source_content_hash:  contentHash,
         parser_name:          'tree-sitter',
-        source_ref_key:       row.source_ref ? `${row.source_ref}#${mappedKind}:${symbol}` : null,
+        source_ref_key:       buildAstSourceRefKey(row.source_ref, mappedKind, symbol),
       });
     }
 

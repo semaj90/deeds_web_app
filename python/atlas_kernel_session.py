@@ -50,6 +50,8 @@ ANALYZER_IMPORTS: dict[str, tuple[str, ...]] = {
     "LANGEXTRACT": ("langextract",),
     "STANZA_POS": ("stanza",),
     "PYTORCH": ("torch",),
+    "NETWORKX": ("networkx",),
+    "NX_CUGRAPH": ("nx_cugraph",),
     "CUVS": ("cuvs",),
     "CUGRAPH": ("cugraph",),
 }

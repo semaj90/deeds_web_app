@@ -37,6 +37,7 @@ const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? 'http://12
 const EMBED_MODEL = String(args.get('model') ?? env.EMBEDDINGGEMMA_MODEL ?? env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest');
 const TURBOVEC_URL = String(args.get('turbovec-http') ?? env.TURBOVEC_PYTHON_URL ?? 'http://127.0.0.1:8791').replace(/\/+$/, '');
 const WITH_TURBOVEC = args.get('with-turbovec') === 'true';
+const QDRANT_TRANSPORT = String(args.get('transport') ?? env.ATLAS_QDRANT_TRANSPORT ?? 'auto').toLowerCase();
 const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/atlas-embedding-ranking-diagnostic-v1.json'));
 
 const VECTOR_COLUMNS = ['content_embedding_768', 'content_embedding', 'embedding_768', 'embedding'];
@@ -168,16 +169,24 @@ async function embedQuery() {
   return { vector: null, endpoint: null, model: EMBED_MODEL, errors };
 }
 
-async function fetchQdrant() {
+async function fetchQdrant(transportReceipt) {
   const qdrantPath = `/collections/${COLLECTION}/points/scroll`;
   const requestBody = JSON.stringify({ limit: LIMIT, with_payload: true, with_vector: true });
   let body;
-  try {
-    body = await jsonFetch(`${QDRANT_URL}${qdrantPath}`, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: requestBody,
-    });
-  } catch (hostError) {
-    if (process.env.ATLAS_DOCKER_FALLBACK === '0') throw hostError;
+  const useDockerInternal = QDRANT_TRANSPORT === 'docker-internal';
+  if (!useDockerInternal) {
+    try {
+      body = await jsonFetch(`${QDRANT_URL}${qdrantPath}`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: requestBody,
+      });
+      transportReceipt.effective = 'HOST_REST';
+      transportReceipt.endpoint = QDRANT_URL;
+    } catch (hostError) {
+      transportReceipt.hostError = hostError.message;
+      if (QDRANT_TRANSPORT === 'host-rest' || process.env.ATLAS_DOCKER_FALLBACK === '0') throw hostError;
+    }
+  }
+  if (!body) {
     const { stdout } = await execFileAsync('docker', [
       'exec', 'legal-ai-go-retrieval', 'wget', '-q', '-O', '-',
       `http://qdrant:6333${qdrantPath}`,
@@ -185,6 +194,8 @@ async function fetchQdrant() {
       `--post-data=${requestBody}`,
     ], { timeout: 120_000, windowsHide: true, maxBuffer: 64 * 1024 * 1024 });
     body = JSON.parse(stdout);
+    transportReceipt.effective = 'DOCKER_INTERNAL';
+    transportReceipt.endpoint = 'http://qdrant:6333';
   }
   return (body?.result?.points ?? []).map((point) => {
     const payload = point.payload ?? {};
@@ -263,9 +274,10 @@ async function turbovecProbe(rows) {
 
 async function main() {
   const started = Date.now();
-  const report = { schema: 'atlas.embedding-ranking-diagnostic.v1', generatedAt: new Date().toISOString(), readOnly: true, query: QUERY, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME }, postgres: {}, embeddinggemma: {}, ranking: {}, turbovec: {} };
+  const qdrantTransport = { requested: QDRANT_TRANSPORT.toUpperCase(), effective: null, endpoint: null, hostError: null };
+  const report = { schema: 'atlas.embedding-ranking-diagnostic.v1', generatedAt: new Date().toISOString(), readOnly: true, query: QUERY, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, transport: qdrantTransport }, postgres: {}, embeddinggemma: {}, ranking: {}, turbovec: {} };
   try {
-    const qdrantRows = await fetchQdrant();
+    const qdrantRows = await fetchQdrant(qdrantTransport);
     const [postgresResult, embedding] = await Promise.all([
       fetchPostgres(qdrantRows.map((row) => row.sourceRef), qdrantRows.map((row) => row.pointId))
         .catch((error) => ({ table: 'codebase_chunk_index', vectorColumn: null, vectorCounts: {}, rows: [], columns: [], error: error.message })),

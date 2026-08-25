@@ -34,8 +34,12 @@ const nativeStructuralInclude = process.env.GRAPHIFY_NATIVE_STRUCTURAL_INCLUDE |
 const nativeStructuralReachabilityOut = process.env.GRAPHIFY_NATIVE_STRUCTURAL_REACHABILITY_OUT?.trim() || '';
 const neuralPrefill = process.env.GRAPHIFY_NEURAL_PREFILL === '1';
 const neuralPrefillShortlist = process.env.GRAPHIFY_NEURAL_PREFILL_SHORTLIST === '1';
+const neuralPrefillBaselines = process.env.GRAPHIFY_NEURAL_PREFILL_BASELINES === '1';
 const neuralPrefillOnly = process.env.GRAPHIFY_NEURAL_PREFILL_ONLY === '1';
+const derivedContext = process.env.GRAPHIFY_DERIVED_CONTEXT === '1';
 let neuralPrefillStatus = 'NOT_RUN';
+let neuralBaselineStatus = 'NOT_RUN';
+let derivedContextStatus = 'NOT_RUN';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 function stable(value) {
@@ -78,7 +82,9 @@ function writeNeuralPrefillDailyReceipt(state) {
   const reportPaths = [
     'docs/reports/atlas-graphify-nlp-prefill-dry-v1.json',
     'docs/reports/atlas-neural-prefill-validation-v1.json',
+    'docs/reports/ast-domain-baselines-dry-v1.json',
     'docs/reports/atlas-candidate-shortlist-receipt-v1.json',
+    'docs/reports/atlas-derived-context-read-v1.json',
   ];
   const children = reportPaths.filter((relativePath) => existsSync(path.resolve(ROOT, relativePath))).map((relativePath) => {
     const content = readFileSync(path.resolve(ROOT, relativePath), 'utf8');
@@ -88,8 +94,13 @@ function writeNeuralPrefillDailyReceipt(state) {
     schema: 'atlas.graphify-neural-prefill-daily-receipt.v1',
     generatedAt: new Date().toISOString(),
     wrapper: 'scripts/startup/run-graphify-daily-startup.mjs',
-    optIn: neuralPrefill || neuralPrefillShortlist,
+    optIn: neuralPrefill || neuralPrefillShortlist || neuralPrefillBaselines,
     shortlistOptIn: neuralPrefillShortlist,
+    baselinesOptIn: neuralPrefillBaselines,
+    baselineRequested: neuralPrefill || neuralPrefillBaselines,
+    baselineStatus: neuralBaselineStatus,
+    derivedContextOptIn: derivedContext,
+    derivedContextStatus,
     readOnly: true,
     canonicalWrites: false,
     qdrantWrites: false,
@@ -137,6 +148,21 @@ try {
     timeout: 60 * 1000
   });
 
+  if (derivedContext) {
+    if (!quiet) console.log('[graphify:daily] Running optional derived-context read lane...');
+    try {
+      execSync('node scripts/atlas/graphify-derived-context-read.mjs', {
+        cwd: ROOT,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 35 * 60 * 1000,
+      });
+      derivedContextStatus = 'PASS';
+    } catch (derivedContextError) {
+      derivedContextStatus = 'DEGRADED';
+      console.warn(`[graphify:daily] Derived-context lane degraded; continuing existing Graphify chain: ${derivedContextError.message}`);
+    }
+  }
+
   // Optional read-only neural/AST/NLP prefill. This is deliberately before
   // the mutating daily chain and fail-open while the lane is in progress.
   if (neuralPrefill) {
@@ -147,6 +173,14 @@ try {
         stdio: quiet ? 'ignore' : 'inherit',
         timeout: 20 * 60 * 1000,
       });
+      if (neuralPrefill || neuralPrefillBaselines) {
+        execSync('npm run atlas:ast-domain:baselines:dry', {
+          cwd: FRONTEND,
+          stdio: quiet ? 'ignore' : 'inherit',
+          timeout: 5 * 60 * 1000,
+        });
+        neuralBaselineStatus = 'PASS';
+      }
       execSync('npm run atlas:neural:prefill:validate', {
         cwd: FRONTEND,
         stdio: quiet ? 'ignore' : 'inherit',
@@ -163,6 +197,7 @@ try {
       if (!quiet) console.log('[graphify:daily] Neural prefill dry pass validated.');
     } catch (prefillError) {
       neuralPrefillStatus = 'DEGRADED';
+      if (neuralPrefill || neuralPrefillBaselines) neuralBaselineStatus = 'DEGRADED';
       console.warn(`[graphify:daily] Neural prefill degraded; continuing existing Graphify chain: ${prefillError.message}`);
     }
   }
@@ -181,7 +216,23 @@ try {
     }
   }
 
-  if (neuralPrefill || neuralPrefillShortlist) {
+  if (neuralPrefillBaselines && !neuralPrefill) {
+    try {
+      execSync('npm run atlas:ast-domain:baselines:dry', {
+        cwd: FRONTEND,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 5 * 60 * 1000,
+      });
+      neuralBaselineStatus = 'PASS';
+      neuralPrefillStatus = 'PASS';
+    } catch (baselineError) {
+      neuralBaselineStatus = 'DEGRADED';
+      neuralPrefillStatus = 'DEGRADED';
+      console.warn(`[graphify:daily] AST-domain baselines degraded; continuing existing Graphify chain: ${baselineError.message}`);
+    }
+  }
+
+  if (neuralPrefill || neuralPrefillShortlist || neuralPrefillBaselines || derivedContext) {
     writeNeuralPrefillDailyReceipt({
       status: neuralPrefillStatus,
       neuralPrefill,
@@ -191,7 +242,7 @@ try {
   }
 
   if (neuralPrefillOnly) {
-    if (!neuralPrefill && !neuralPrefillShortlist) {
+    if (!neuralPrefill && !neuralPrefillShortlist && !neuralPrefillBaselines) {
       throw new Error('GRAPHIFY_NEURAL_PREFILL_ONLY requires an opt-in neural lane');
     }
     console.log('graphify:daily neural-prefill-only complete');

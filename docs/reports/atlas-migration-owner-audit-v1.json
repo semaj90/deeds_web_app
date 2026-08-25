@@ -1,0 +1,679 @@
+{
+  "schema": "atlas_migration_owner_audit_v1",
+  "generatedAt": "2026-08-25T04:56:17.212Z",
+  "writes": false,
+  "live": {
+    "reachable": true,
+    "tables": {
+      "graphify_files": {
+        "exists": true,
+        "columns": [
+          "file_id",
+          "workspace_id",
+          "source_ref",
+          "source_revision",
+          "content_hash",
+          "byte_length",
+          "language",
+          "parser_name",
+          "parser_version",
+          "parse_status",
+          "parse_error",
+          "first_seen_run_id",
+          "last_seen_run_id",
+          "code_source_revision"
+        ],
+        "rowCount": 0
+      },
+      "atlas_file_search_index_v1": {
+        "exists": false,
+        "columns": [],
+        "rowCount": null
+      },
+      "atlas_callable_search": {
+        "exists": true,
+        "columns": [
+          "symbol_version_id",
+          "stable_symbol_id",
+          "tree_node_id",
+          "packet_key",
+          "candidate_ordinal",
+          "source_ref",
+          "source_revision",
+          "workspace_revision",
+          "qualified_name",
+          "node_kind",
+          "relative_path",
+          "signature_normalized",
+          "parameter_names",
+          "parameter_types",
+          "return_types",
+          "imports",
+          "calls",
+          "callable_metadata",
+          "search_vector",
+          "projection_revision",
+          "producer_revision",
+          "created_at",
+          "updated_at",
+          "parent_qualified_name",
+          "domain_id",
+          "domain_confidence",
+          "secondary_domains",
+          "taxonomy_revision",
+          "inferred_uses",
+          "enrichment_metadata"
+        ],
+        "rowCount": 0
+      },
+      "atlas_observation_feature_rows": {
+        "exists": true,
+        "columns": [
+          "packet_key",
+          "feature_revision",
+          "source_ref",
+          "source_version_receipt_id",
+          "workspace_revision",
+          "representation_id",
+          "representation_revision",
+          "tree_node_id",
+          "ontology_classes",
+          "ast_observation_kinds",
+          "langextract_classes",
+          "flattened_tags",
+          "ontology_mask",
+          "ast_pattern_mask",
+          "structural_flags",
+          "evidence_refs",
+          "kmeans_cluster_id",
+          "som_row",
+          "som_col",
+          "community_id",
+          "pagerank",
+          "personalized_pagerank",
+          "producer_revision",
+          "input_digest",
+          "created_at",
+          "updated_at"
+        ],
+        "rowCount": 0
+      },
+      "atlas_symbol_registry": {
+        "exists": true,
+        "columns": [
+          "stable_symbol_id",
+          "canonical_key",
+          "language",
+          "symbol_kind",
+          "canonical_name",
+          "canonical_qualified_name",
+          "created_from_nomination_id",
+          "created_from_source_ref",
+          "created_from_source_revision",
+          "registry_revision",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "rowCount": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "graphify_source_inventory",
+      "table": "graphify_files",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260821_graphify_source_inventory.sql",
+          "drizzle/manual/20260822_graphify_revision_authority_v2.sql",
+          "drizzle/manual/20260825_graphify_files_compatibility_v1.sql"
+        ],
+        "columns": [
+          "byte_length",
+          "code_source_revision",
+          "content_hash",
+          "created_at",
+          "file_id",
+          "first_seen_run_id",
+          "git_blob_oid",
+          "language",
+          "last_seen_run_id",
+          "parse_error",
+          "parse_status",
+          "parser_name",
+          "parser_version",
+          "producer_revision",
+          "source_ref",
+          "source_revision",
+          "source_revision_authority",
+          "updated_at",
+          "workspace_id",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260821_graphify_source_inventory.sql",
+            "entry": {
+              "status": "manual_sidecar",
+              "reason": "Unapplied Graphify source-inventory owner schema. It preserves legacy source_revision, records exact content_hash authority, and requires a non-production readback canary before row population or FANOUT admission."
+            }
+          },
+          {
+            "file": "drizzle/manual/20260822_graphify_revision_authority_v2.sql",
+            "entry": {
+              "status": "manual_sidecar",
+              "reason": "Additive Graphify workspace and code-source revision columns. Unapplied; preserves legacy repository/source revisions and does not backfill or promote rows."
+            }
+          },
+          {
+            "file": "drizzle/manual/20260825_graphify_files_compatibility_v1.sql",
+            "entry": {
+              "status": "manual_sidecar",
+              "reason": "Unapplied additive compatibility candidate for the existing legacy graphify_files table. Adds nullable lineage metadata and indexes only; requires read-only preflight before application and does not backfill rows."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "file_id",
+          "workspace_id",
+          "source_ref",
+          "source_revision",
+          "content_hash",
+          "byte_length",
+          "language",
+          "parser_name",
+          "parser_version",
+          "parse_status",
+          "parse_error",
+          "first_seen_run_id",
+          "last_seen_run_id",
+          "code_source_revision"
+        ],
+        "rowCount": 0,
+        "expectedMissing": [
+          "workspace_revision"
+        ]
+      },
+      "classification": "LIVE_COLUMN_MISMATCH"
+    },
+    {
+      "id": "graphify_file_search_projection",
+      "table": "atlas_file_search_index_v1",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260824_graphify_file_search_bitmap_v1.sql"
+        ],
+        "columns": [
+          "candidate_ordinal",
+          "concept_ids",
+          "content_hash",
+          "created_at",
+          "domain_class",
+          "domain_memberships",
+          "embedding",
+          "embedding_digest",
+          "embedding_dimension",
+          "evidence_refs",
+          "feature_bitmap",
+          "feature_id",
+          "feature_label",
+          "file_url",
+          "metadata",
+          "object_ref",
+          "ontology",
+          "packet_key",
+          "packet_ontology",
+          "payload",
+          "predicate",
+          "primary_domain",
+          "provenance",
+          "representation_revision",
+          "routing",
+          "search_vector",
+          "source_ref",
+          "source_ref_hash",
+          "source_revision",
+          "subject_ref",
+          "title_id",
+          "tokens",
+          "tree_node_id",
+          "updated_at",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260824_graphify_file_search_bitmap_v1.sql",
+            "entry": {
+              "status": "manual_sidecar",
+              "reason": "Additive Graphify file search projection with PostgreSQL 18 tsvector/GIN, pgvector 768, JSONB metadata, concept arrays, and explicit candidate bitmap. Unapplied until export, schema, and rollback proofs pass."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "candidate_ordinal",
+          "packet_key",
+          "embedding",
+          "feature_bitmap",
+          "search_vector"
+        ]
+      },
+      "classification": "SIDEcar_UNAPPLIED"
+    },
+    {
+      "id": "callable_search_projection",
+      "table": "atlas_callable_search",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260824_atlas_callable_search_v1.sql",
+          "drizzle/manual/20260824_atlas_callable_enrichment_v1.sql"
+        ],
+        "columns": [
+          "callable_metadata",
+          "calls",
+          "candidate_ordinal",
+          "created_at",
+          "domain_confidence",
+          "domain_id",
+          "enrichment_metadata",
+          "imports",
+          "inferred_uses",
+          "node_kind",
+          "packet_key",
+          "parameter_names",
+          "parameter_types",
+          "parent_qualified_name",
+          "producer_revision",
+          "projection_revision",
+          "qualified_name",
+          "relative_path",
+          "return_types",
+          "search_vector",
+          "secondary_domains",
+          "signature_normalized",
+          "source_ref",
+          "source_revision",
+          "stable_symbol_id",
+          "symbol_version_id",
+          "taxonomy_revision",
+          "tree_node_id",
+          "updated_at",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260824_atlas_callable_search_v1.sql",
+            "entry": {
+              "status": "applied",
+              "reason": "Additive callable-search projection and nullable callable metadata columns. Preserves atlas_symbol_versions and creates an idempotent projection backfill with simple-token FTS, B-tree, array GIN, and JSONB path indexes."
+            }
+          },
+          {
+            "file": "drizzle/manual/20260824_atlas_callable_enrichment_v1.sql",
+            "entry": {
+              "status": "applied",
+              "reason": "Additive domain, parent-container, inferred-use, taxonomy, and JSONB evidence fields on the rebuildable callable-search projection. No canonical identity writes or destructive operations."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "symbol_version_id",
+          "stable_symbol_id",
+          "tree_node_id",
+          "packet_key",
+          "candidate_ordinal",
+          "source_ref",
+          "source_revision",
+          "workspace_revision",
+          "qualified_name",
+          "node_kind",
+          "relative_path",
+          "signature_normalized",
+          "parameter_names",
+          "parameter_types",
+          "return_types",
+          "imports",
+          "calls",
+          "callable_metadata",
+          "search_vector",
+          "projection_revision",
+          "producer_revision",
+          "created_at",
+          "updated_at",
+          "parent_qualified_name",
+          "domain_id",
+          "domain_confidence",
+          "secondary_domains",
+          "taxonomy_revision",
+          "inferred_uses",
+          "enrichment_metadata"
+        ],
+        "rowCount": 0,
+        "expectedMissing": []
+      },
+      "classification": "LIVE_SHAPE_ALIGNED"
+    },
+    {
+      "id": "observation_feature_rows_active",
+      "table": "atlas_observation_feature_rows",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260819_atlas_observation_feature_rows.sql"
+        ],
+        "columns": [
+          "ast_observation_kinds",
+          "ast_pattern_mask",
+          "community_id",
+          "created_at",
+          "evidence_refs",
+          "feature_revision",
+          "flattened_tags",
+          "input_digest",
+          "kmeans_cluster_id",
+          "langextract_classes",
+          "ontology_classes",
+          "ontology_mask",
+          "packet_key",
+          "pagerank",
+          "personalized_pagerank",
+          "producer_revision",
+          "representation_id",
+          "representation_revision",
+          "som_col",
+          "som_row",
+          "source_ref",
+          "source_version_receipt_id",
+          "structural_flags",
+          "tree_node_id",
+          "updated_at",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [
+          "src/lib/server/db/schema/atlas-observation-feature-rows.ts"
+        ],
+        "present": true
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260819_atlas_observation_feature_rows.sql",
+            "entry": {
+              "status": "applied",
+              "reason": "Active ORF packet_key + feature_revision metadata/filter contract. Aligned with Drizzle schema, observation repository, materializer, and spectral exporter; semantic ANN remains owned by the 768 vector lane."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "packet_key",
+          "feature_revision",
+          "source_ref",
+          "source_version_receipt_id",
+          "workspace_revision",
+          "representation_id",
+          "representation_revision",
+          "tree_node_id",
+          "ontology_classes",
+          "ast_observation_kinds",
+          "langextract_classes",
+          "flattened_tags",
+          "ontology_mask",
+          "ast_pattern_mask",
+          "structural_flags",
+          "evidence_refs",
+          "kmeans_cluster_id",
+          "som_row",
+          "som_col",
+          "community_id",
+          "pagerank",
+          "personalized_pagerank",
+          "producer_revision",
+          "input_digest",
+          "created_at",
+          "updated_at"
+        ],
+        "rowCount": 0,
+        "expectedMissing": []
+      },
+      "classification": "LIVE_SHAPE_ALIGNED"
+    },
+    {
+      "id": "observation_feature_rows_superseded_candidate",
+      "table": "atlas_observation_feature_rows",
+      "expectedStatus": "superseded_unapplied",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260819_atlas_observation_feature_rows_v1.sql"
+        ],
+        "columns": [
+          "ast_observation_kinds",
+          "authority_weight",
+          "candidate_id",
+          "canonical_authority",
+          "community_id",
+          "created_at",
+          "embedding_revision",
+          "feature_payload",
+          "feature_row_checksum",
+          "graph_degree",
+          "kmeans_cluster",
+          "langextract_classes",
+          "observation_refs",
+          "ontology_classes",
+          "pagerank",
+          "ppr",
+          "recency",
+          "registry_revision",
+          "row_identity_checksum",
+          "row_ordinal",
+          "semantic_768",
+          "som_cell",
+          "source_ref",
+          "source_revision",
+          "tags",
+          "updated_at",
+          "validation_passed",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260819_atlas_observation_feature_rows_v1.sql",
+            "entry": {
+              "status": "superseded_unapplied",
+              "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "packet_key",
+          "feature_revision",
+          "source_ref",
+          "source_version_receipt_id",
+          "workspace_revision",
+          "representation_id",
+          "representation_revision",
+          "tree_node_id",
+          "ontology_classes",
+          "ast_observation_kinds",
+          "langextract_classes",
+          "flattened_tags",
+          "ontology_mask",
+          "ast_pattern_mask",
+          "structural_flags",
+          "evidence_refs",
+          "kmeans_cluster_id",
+          "som_row",
+          "som_col",
+          "community_id",
+          "pagerank",
+          "personalized_pagerank",
+          "producer_revision",
+          "input_digest",
+          "created_at",
+          "updated_at"
+        ],
+        "rowCount": 0,
+        "expectedMissing": [
+          "candidate_id",
+          "semantic_768",
+          "row_ordinal"
+        ]
+      },
+      "classification": "SUPERSEDED_TABLE_NAME_COLLISION"
+    },
+    {
+      "id": "symbol_registry",
+      "table": "atlas_symbol_registry",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/manual/20260818_atlas_symbol_registry_v1.sql"
+        ],
+        "columns": [
+          "alias_kind",
+          "byte_end",
+          "byte_start",
+          "canonical_key",
+          "canonical_name",
+          "canonical_qualified_name",
+          "created_at",
+          "created_from_nomination_id",
+          "created_from_source_ref",
+          "created_from_source_revision",
+          "declaration_hash",
+          "evidence_refs",
+          "language",
+          "parent_route",
+          "producer_revision",
+          "qualified_name",
+          "reference_kind",
+          "registry_revision",
+          "resolution_basis",
+          "resolution_status",
+          "signature_normalized",
+          "source_ref",
+          "source_revision",
+          "stable_symbol_id",
+          "status",
+          "symbol_kind",
+          "target_stable_symbol_id",
+          "target_text",
+          "updated_at",
+          "upstream_chunk_id",
+          "upstream_file_id",
+          "upstream_node_id",
+          "upstream_symbol_id",
+          "workspace_revision"
+        ],
+        "expectedMissing": []
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/manual/20260818_atlas_symbol_registry_v1.sql",
+            "entry": {
+              "status": "applied",
+              "reason": "Creates the additive canonical symbol registry, aliases, revisioned symbol versions, and structural-reference resolution indexes. Applied and read back on PostgreSQL 18.4; no symbol rows were inserted."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "stable_symbol_id",
+          "canonical_key",
+          "language",
+          "symbol_kind",
+          "canonical_name",
+          "canonical_qualified_name",
+          "created_from_nomination_id",
+          "created_from_source_ref",
+          "created_from_source_revision",
+          "registry_revision",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "rowCount": 0,
+        "expectedMissing": []
+      },
+      "classification": "LIVE_SHAPE_ALIGNED"
+    }
+  ],
+  "summary": {
+    "missingManifestRegistration": [],
+    "sidecarUnapplied": [
+      "graphify_file_search_projection"
+    ],
+    "liveShapeAligned": [
+      "callable_search_projection",
+      "observation_feature_rows_active",
+      "symbol_registry"
+    ],
+    "superseded": [
+      "observation_feature_rows_superseded_candidate"
+    ]
+  }
+}

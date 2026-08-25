@@ -5,11 +5,11 @@
     "schema": "atlas.graphify-revision-authority.v2",
     "authorityRevision": "atlas.graphify-revision-authority.workspace-manifest-plus-source-sha256.v2",
     "workspaceRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
-    "workspaceRevision": "sha256:315a0cb19bf2528188750fa4bba35a3d01ad0a029498748748646a46cbc3e943",
+    "workspaceRevision": "sha256:8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
     "workspaceRevisionKind": "SHA256_SOURCE_MANIFEST",
-    "workspaceSourceManifestDigest": "315a0cb19bf2528188750fa4bba35a3d01ad0a029498748748646a46cbc3e943",
-    "baseGitCommitOid": "7fe3c52136d3395a0480d3af44f5f46ee969bcf3",
-    "baseGitTreeOid": "83bdcb2561814d7da13c46d83650438fae9f8287",
+    "workspaceSourceManifestDigest": "8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
+    "baseGitCommitOid": "dcc4898338c7991f695a7c34d0932f93590b7800",
+    "baseGitTreeOid": "6901bf9dfcc64328e3d0b24ae7027d62b0a035ca",
     "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts",
     "sourceRevision": "sha256:fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
     "sourceRevisionKind": "SHA256_EXACT_UTF8_SOURCE_BYTES",
@@ -22,7 +22,7 @@
     "gitCommitIsProvenanceOnly": true,
     "canonicalWritesAllowed": false,
     "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-    "authorityChecksum": "51de3624a075b6252269504658c54429df384590a7bf2cfd2a271b264e2523a4"
+    "authorityChecksum": "99833f3e144919b72da1ef1c4c66425be6716eb5f99177b8fde75adb5f8b2e01"
   },
   "storage": {
     "graphifyRunsPresent": true,
@@ -50,7 +50,7 @@
   "canonicalWriteAttempted": false,
   "readOnly": true,
   "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-  "ownerChecksum": "ee41c3716170cb97ac8699ae0d2104a35f782ca6e4c7c620b315754a3e4e5646",
+  "ownerChecksum": "4e93ff4b9a0ea60819d07b2925ad75a98214219c78c5191786e9d9123486eb5b",
   "schemaObservation": {
     "schema": "atlas.graphify-source-inventory-schema.v2",
     "graphifyRunsPresent": true,
@@ -96,21 +96,21 @@
   "workspaceOrigin": {
     "record": {
       "schema": "atlas.workspace-revision.v1",
-      "workspaceRevision": "sha256:315a0cb19bf2528188750fa4bba35a3d01ad0a029498748748646a46cbc3e943",
+      "workspaceRevision": "sha256:8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
       "repositoryId": "semaj90/deeds_web_app",
       "gitObjectFormat": "sha1",
-      "baseCommitOid": "7fe3c52136d3395a0480d3af44f5f46ee969bcf3",
-      "baseTreeOid": "83bdcb2561814d7da13c46d83650438fae9f8287",
+      "baseCommitOid": "dcc4898338c7991f695a7c34d0932f93590b7800",
+      "baseTreeOid": "6901bf9dfcc64328e3d0b24ae7027d62b0a035ca",
       "gitHeadRef": "refs/heads/main",
       "dirty": true,
-      "sourceCount": 23169,
-      "sourceManifestDigest": "315a0cb19bf2528188750fa4bba35a3d01ad0a029498748748646a46cbc3e943",
+      "sourceCount": 23428,
+      "sourceManifestDigest": "8d6ab3d74e8a0c45af89a8fb8e14bde4b574ebe24d965c925604da501d8d2abe",
       "sourceRevisionAlgorithm": "atlas.code.source-revision.v1",
-      "generatedAt": "2026-08-23T21:13:00.347Z",
+      "generatedAt": "2026-08-25T04:59:34.190Z",
       "readOnlyObservation": true,
       "canonicalAuthority": false,
       "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
-      "checksum": "f1c3f97f19488806e69bc14c2fd51aeedb08f200a4777bb8c887f3d46b0c38ab"
+      "checksum": "7d1de8cc8ed020b5b0a116bc77f6da2c43706eac7c4fc3b2e4d38ce44147f1d9"
     },
     "skipped": [
       {
@@ -144,10 +144,6 @@
       {
         "sourceRef": "data/external-docs/normalized/drizzle/migrations.md",
         "reason": "Code source content must be non-empty"
-      },
-      {
-        "sourceRef": "docker-compose.yaml",
-        "reason": "ENOENT: no such file or directory, stat 'C:\\Users\\james\\Videos\\deeds-web-app\\docker-compose.yaml'"
       },
       {
         "sourceRef": "docs/architecture/runtime-owner-deduplication.md",
@@ -232,18 +228,6 @@
       {
         "sourceRef": "next_steps/completed/vlm-history/MULTIMODAL_IMPLEMENTATION_ROADMAP.md",
         "reason": "NOT_VALID_UTF8_SOURCE"
-      },
-      {
-        "sourceRef": "openspec/changes/parent-atlas-llama-server-chat-consolidation/README.md",
-        "reason": "ENOENT: no such file or directory, stat 'C:\\Users\\james\\Videos\\deeds-web-app\\openspec\\changes\\parent-atlas-llama-server-chat-consolidation\\README.md'"
-      },
-      {
-        "sourceRef": "openspec/changes/parent-atlas-llama-server-chat-consolidation/tasks.md",
-        "reason": "ENOENT: no such file or directory, stat 'C:\\Users\\james\\Videos\\deeds-web-app\\openspec\\changes\\parent-atlas-llama-server-chat-consolidation\\tasks.md'"
-      },
-      {
-        "sourceRef": "openspec/changes/phase-alignment-hmm-prefill-dag-20260822/tasks.md",
-        "reason": "ENOENT: no such file or directory, stat 'C:\\Users\\james\\Videos\\deeds-web-app\\openspec\\changes\\phase-alignment-hmm-prefill-dag-20260822\\tasks.md'"
       },
       {
         "sourceRef": "packages/atlas-core/src/classification/aggregation.test.ts",

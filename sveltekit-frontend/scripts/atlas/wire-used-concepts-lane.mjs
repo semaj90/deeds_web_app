@@ -223,7 +223,7 @@ async function validateUsedConceptsCoverage() {
   const result = await pgPool.query(`
     SELECT COUNT(*) total,
            COUNT(CASE WHEN used_concepts IS NOT NULL AND array_length(used_concepts, 1) > 0 THEN 1 END) populated,
-           AVG(array_length(used_concepts, 1)) avg_concepts_per_packet
+           AVG(COALESCE(cardinality(used_concepts), 0))::float8 avg_concepts_per_packet
     FROM atlas_packets
   `);
 
@@ -234,7 +234,8 @@ async function validateUsedConceptsCoverage() {
   console.log(`  Total packets: ${metrics.total}`);
   console.log(`  used_concepts populated: ${metrics.populated} (${percentage}%)`);
   console.log(`  Missing: ${metrics.total - metrics.populated}`);
-  console.log(`  Avg concepts per packet: ${(metrics.avg_concepts_per_packet || 0).toFixed(1)}\n`);
+  const averageConcepts = Number(metrics.avg_concepts_per_packet ?? 0);
+  console.log(`  Avg concepts per packet: ${averageConcepts.toFixed(1)}\n`);
 
   const pass = percentage >= 80;
   console.log(`  Acceptance Gate (≥80%): ${pass ? '✅ PASS' : '❌ FAIL'}\n`);
@@ -246,7 +247,7 @@ async function fetchPacketsNeedingConcepts() {
   const result = await pgPool.query(`
     SELECT packet_key
     FROM atlas_packets
-    WHERE used_concepts IS NULL OR array_length(used_concepts, 1) = 0
+    WHERE COALESCE(cardinality(used_concepts), 0) = 0
     ORDER BY packet_key
     LIMIT $1
   `, [BATCH_SIZE]);

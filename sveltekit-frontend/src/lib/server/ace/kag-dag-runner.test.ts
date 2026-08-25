@@ -52,6 +52,7 @@ describe('KagDagRunner', () => {
         runner.register({
             name: 'write_audit',
             dependsOn: ['record_cache'],
+            alwaysRun: true,
             run: async (ctx) => {
                 return {};
             }
@@ -69,7 +70,7 @@ describe('KagDagRunner', () => {
             'record_cache'
         ];
         for (const name of executionPlan) {
-            runner.register({ name: name as any, dependsOn: [], run: async () => ({}) });
+            runner.register({ name, dependsOn: [], alwaysRun: name === 'record_cache', run: async () => ({}) });
         }
 
         const result = await runner.execute('What is the meaning of life?', 'hash123');

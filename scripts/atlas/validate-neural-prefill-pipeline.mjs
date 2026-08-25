@@ -18,6 +18,7 @@ const files = {
   shortlistReceipt: 'docs/reports/atlas-candidate-shortlist-receipt-v1.json',
   dailyReceipt: 'docs/reports/atlas-graphify-nlp-prefill-dry-v1.json',
   aggregateReceipt: 'docs/reports/atlas-observation-feature-aggregation-v1.json',
+  domainBaselineReceipt: 'docs/reports/ast-domain-baselines-dry-v1.json',
   materializationReceipt: 'docs/reports/observation-feature-row-materialization.json',
   indexingAudit: 'docs/reports/atlas-indexing-surfaces-v1.json',
 };
@@ -85,6 +86,23 @@ const daily = JSON.parse(await read(files.dailyReceipt).catch(() => '{}'));
 add('DAILY_NLP_PREFILL', daily.status === 'PASS' ? 'PASS' : daily.status ? 'DEGRADED' : 'PENDING',
   daily.status ? `Bounded daily dry receipt status: ${daily.status}.` : 'No daily dry receipt found.',
   'A failure must leave the existing Graphify receipt intact and continue in degraded mode.');
+
+const domainBaseline = JSON.parse(await read(files.domainBaselineReceipt).catch(() => '{}'));
+const baselineValid = domainBaseline.schema === 'atlas.ast-domain-baselines-dry.v1'
+  && domainBaseline.readOnly === true
+  && domainBaseline.databaseWrites === false
+  && domainBaseline.canonicalWrites === false
+  && domainBaseline.status === 'PASS_READ_ONLY_BASELINES'
+  && typeof domainBaseline.models?.naiveBayes?.macroF1 === 'number'
+  && typeof domainBaseline.models?.logisticRegression?.macroF1 === 'number'
+  && Number(domainBaseline.dataset?.astGrepRows ?? 0) > 0;
+add('AST_DOMAIN_BASELINES', baselineValid ? 'PASS' : 'BLOCKED',
+  baselineValid
+    ? `AST-grep/NLP baseline receipt covers ${domainBaseline.dataset.selected} labeled rows; logistic macro-F1=${domainBaseline.models.logisticRegression.macroF1.toFixed(3)}, Naive Bayes macro-F1=${domainBaseline.models.naiveBayes.macroF1.toFixed(3)}. Candidate labels remain non-promotional.`
+    : 'AST-domain baseline receipt is missing, malformed, or not read-only.',
+  baselineValid
+    ? 'Replace candidate labels with reviewed ground truth before model promotion.'
+    : 'Run atlas:ast-domain:baselines:dry and inspect its receipt.');
 
 const indexing = JSON.parse(await read(files.indexingAudit).catch(() => '{}'));
 add('INDEX_METADATA', await exists(files.indexingAudit) ? 'DEGRADED' : 'PENDING',

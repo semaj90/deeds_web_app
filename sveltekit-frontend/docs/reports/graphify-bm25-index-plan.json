@@ -2,7 +2,7 @@
   "schemaVersion": "atlas.graphify-bm25-index-plan.v1",
   "readOnly": true,
   "canonicalWriteAttempted": false,
-  "generatedAt": "2026-08-24T03:11:18.706Z",
+  "generatedAt": "2026-08-24T22:09:50.422Z",
   "limit": 10,
   "status": "BM25_INDEX_PLAN_READY",
   "candidates": [],

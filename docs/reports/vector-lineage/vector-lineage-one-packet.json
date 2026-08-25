@@ -1,11 +1,11 @@
 {
-  "proofId": "proof-1785210798897",
-  "timestamp": "2026-07-28T03:53:18.897Z",
-  "packetKey": "packet:1f794f097f8d",
+  "proofId": "proof-1787629380451",
+  "timestamp": "2026-08-25T03:43:00.451Z",
+  "packetKey": "packet:23c36b43ac97",
   "identity": {
-    "sourceRef": "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte",
+    "sourceRef": "turbovec/target/release/deps/libmemoffset-7115b333bf16ce7b.rlib",
     "treeNodeId": null,
-    "featureId": "sveltekit-frontend.CitationSaveForm",
+    "featureId": "turbovec.libmemoffset-7115b333bf16ce7b",
     "contentHash": null,
     "workspaceRevision": ""
   },
@@ -26,7 +26,7 @@
     "model": "warden-nomic",
     "modelVersion": "",
     "present": false,
-    "cacheKey": "gpu:warden:cache:384d:packet:1f794f097f8d",
+    "cacheKey": "gpu:warden:cache:384d:packet:23c36b43ac97",
     "writeSucceeded": false,
     "readSucceeded": false,
     "ttlSeconds": null
@@ -49,12 +49,12 @@
       "description": "Canonical packet exists in Postgres",
       "status": "PASS",
       "details": {
-        "packetKey": "packet:1f794f097f8d",
-        "sourceRef": "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte",
-        "featureId": "sveltekit-frontend.CitationSaveForm",
+        "packetKey": "packet:23c36b43ac97",
+        "sourceRef": "turbovec/target/release/deps/libmemoffset-7115b333bf16ce7b.rlib",
+        "featureId": "turbovec.libmemoffset-7115b333bf16ce7b",
         "rowsFound": 1
       },
-      "latencyMs": 166
+      "latencyMs": 19
     },
     {
       "gateId": "L2",
@@ -62,10 +62,10 @@
       "status": "PASS",
       "details": {
         "collection": "codebase_chunks_768",
-        "pointsCount": 54224,
+        "pointsCount": 106338,
         "qdrantUrl": "http://localhost:6333"
       },
-      "latencyMs": 242
+      "latencyMs": 40
     },
     {
       "gateId": "L3",
@@ -80,41 +80,41 @@
           "role": "CANONICAL_SEMANTIC"
         }
       },
-      "latencyMs": 62
+      "latencyMs": 1
     },
     {
       "gateId": "L4",
       "description": "384d routing projection is independently identified",
       "status": "SKIP",
       "details": {
-        "cacheKey": "gpu:warden:cache:384d:packet:1f794f097f8d",
+        "cacheKey": "gpu:warden:cache:384d:packet:23c36b43ac97",
         "vectorFound": false,
         "dimensions": null
       },
-      "latencyMs": 63
+      "latencyMs": 1
     },
     {
       "gateId": "L5",
       "description": "Redis entry preserves packet identity",
       "status": "SKIP",
       "details": {
-        "identityKey": "atlas:identity:384d:packet:1f794f097f8d",
+        "identityKey": "atlas:identity:384d:packet:23c36b43ac97",
         "identityFound": false,
         "preservesPacketKey": false
       },
-      "latencyMs": 65
+      "latencyMs": 1
     },
     {
       "gateId": "L6",
       "description": "Redis entry preserves workspace revision",
       "status": "SKIP",
       "details": {
-        "revisionKey": "atlas:revision:384d:packet:1f794f097f8d",
+        "revisionKey": "atlas:revision:384d:packet:23c36b43ac97",
         "revisionFound": false,
         "expected": "",
         "actual": null
       },
-      "latencyMs": 68
+      "latencyMs": 0
     },
     {
       "gateId": "L7",
@@ -143,7 +143,7 @@
         "httpStatus": 200,
         "fallbackAccessible": true
       },
-      "latencyMs": 112
+      "latencyMs": 5
     },
     {
       "gateId": "L10",

@@ -1,34 +1,34 @@
 {
   "schema": "atlas.graphify-nlp-prefill-dry-receipt.v1",
-  "generatedAt": "2026-08-24T21:45:47.634Z",
+  "generatedAt": "2026-08-25T01:47:14.319Z",
   "readOnly": true,
   "databaseWrites": false,
   "qdrantWrites": false,
   "valkeyWrites": false,
   "canonicalPromotion": false,
-  "requestedLimit": 1000,
+  "requestedLimit": 10,
   "steps": [
     {
       "label": "graphify-file-export",
       "status": "PASS",
-      "elapsedMs": 20430
+      "elapsedMs": 5104
     },
     {
       "label": "ast-identity-enrichment",
       "status": "PASS",
-      "elapsedMs": 316
+      "elapsedMs": 257
     },
     {
       "label": "okf-domain-classification",
       "status": "PASS",
-      "elapsedMs": 819
+      "elapsedMs": 654
     },
     {
       "label": "observation-feature-aggregation",
       "status": "PASS",
-      "elapsedMs": 214
+      "elapsedMs": 129
     }
   ],
   "status": "PASS",
-  "elapsedMs": 21779
+  "elapsedMs": 6144
 }

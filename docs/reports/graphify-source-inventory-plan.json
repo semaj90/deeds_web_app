@@ -4,12 +4,12 @@
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "durableOwnerBound": false,
-  "workspaceRevision": "sha256:6e05f0ad3537072538d7e2a1f853215fdd449b5025ecf7dc7cea8c740c662ed2",
-  "sourceManifestDigest": "6e05f0ad3537072538d7e2a1f853215fdd449b5025ecf7dc7cea8c740c662ed2",
-  "sourceManifestSourceCount": 23166,
-  "repositoryRevision": "7fe3c52136d3395a0480d3af44f5f46ee969bcf3",
+  "workspaceRevision": "sha256:e29780d0955dcf24c0b93f3e1da5b24522f9099230a1cb921d9735c8f930de45",
+  "sourceManifestDigest": "e29780d0955dcf24c0b93f3e1da5b24522f9099230a1cb921d9735c8f930de45",
+  "sourceManifestSourceCount": 23428,
+  "repositoryRevision": "dcc4898338c7991f695a7c34d0932f93590b7800",
   "selectedWriteCount": 100,
-  "skippedSourceCount": 90,
+  "skippedSourceCount": 86,
   "records": [
     {
       "sourceRef": "__tests__/data-hashing.spec.ts",
@@ -170,7 +170,7 @@
       "codeSourceRevision": "sha256:b3ad0907595e524f14d6954bead502c077ab72253b86cbfa468b2147568f81cc",
       "contentHash": "b3ad0907595e524f14d6954bead502c077ab72253b86cbfa468b2147568f81cc",
       "byteLength": 6150,
-      "gitBlobOid": "2b3bfe60ec5e856af4fd6eb826ad90f31159bebc"
+      "gitBlobOid": "566d2fa16f1927283f63ef327301076b32920796"
     },
     {
       "sourceRef": ".claude/LLMS.md",
@@ -275,7 +275,7 @@
       "codeSourceRevision": "sha256:3e528f3f7c2eff99db3ac71e9c91b92255acb3f0478f02fd8d36f45d591bb76d",
       "contentHash": "3e528f3f7c2eff99db3ac71e9c91b92255acb3f0478f02fd8d36f45d591bb76d",
       "byteLength": 7347,
-      "gitBlobOid": "7532be12e15150cdf4030b65b7adf11f7f51c0ce"
+      "gitBlobOid": "6f0c54ee8db9d1198ceaa428db266b06dfb81a94"
     },
     {
       "sourceRef": ".claude/skills/codebase-mapping-json-ingestion.md",
@@ -380,7 +380,7 @@
       "codeSourceRevision": "sha256:01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
       "contentHash": "01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
       "byteLength": 1580,
-      "gitBlobOid": "b3aae8cb5f46350bda0136a548cbd5052884352a"
+      "gitBlobOid": "179cf29ab26c64c61e865802710a93c76ef148ec"
     },
     {
       "sourceRef": ".cline/rules/20-validation.md",
@@ -415,14 +415,14 @@
       "codeSourceRevision": "sha256:01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
       "contentHash": "01e0adabf4537779105a26dda0f4e0b79eb6d13ccd685e399d0bbacbd074a327",
       "byteLength": 1580,
-      "gitBlobOid": "b3aae8cb5f46350bda0136a548cbd5052884352a"
+      "gitBlobOid": "179cf29ab26c64c61e865802710a93c76ef148ec"
     },
     {
       "sourceRef": ".clinerules/10-backend-retrieval.md",
       "codeSourceRevision": "sha256:50b1d55fb7ebd98daa5dc2f48308daf0c4a3d588beca30cc3aa496edbe9b777b",
       "contentHash": "50b1d55fb7ebd98daa5dc2f48308daf0c4a3d588beca30cc3aa496edbe9b777b",
       "byteLength": 3488,
-      "gitBlobOid": "5f5cb443b370c0b2f37093f6400838688b34774f"
+      "gitBlobOid": "c12982c271b148619c2fd5e6b3ba3f3dc1762284"
     },
     {
       "sourceRef": ".clinerules/15-agent-loop-safety.md",
@@ -604,7 +604,49 @@
       "codeSourceRevision": "sha256:0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
       "contentHash": "0241858968e1c0107b31103ce056da53514fbd2de167fdf4fd093fe04d147deb",
       "byteLength": 1086,
-      "gitBlobOid": "9907d56a5bd1e45d74ec5d18be8f7068592c5722"
+      "gitBlobOid": "c1fcb7967c2e91be97aa2be8bea103fbef345a2f"
+    },
+    {
+      "sourceRef": ".okf/concepts/cluster-run-lineage-gap.yaml",
+      "codeSourceRevision": "sha256:862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
+      "contentHash": "862f4a5c3fbb8cf484b69d7db829a29da012c7b294b09c38bfde4874eed91f8f",
+      "byteLength": 594,
+      "gitBlobOid": "8ca68337993dc377071ae0d62949a097f9eaddd0"
+    },
+    {
+      "sourceRef": ".okf/concepts/concept-edge-ledger-gap.yaml",
+      "codeSourceRevision": "sha256:2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
+      "contentHash": "2b145ce6b82214951087dbc9bb6e530b92b395c8a43dca9b6d8ad86c67a85bce",
+      "byteLength": 562,
+      "gitBlobOid": "2355d00ea597cec03b805cb53bbfa52d190eb40b"
+    },
+    {
+      "sourceRef": ".okf/concepts/domain-lineage-gap.yaml",
+      "codeSourceRevision": "sha256:c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
+      "contentHash": "c0f7acdf23eabdd0ef12e4ff54c2aa33513e944548e2b999cc824544da5eacef",
+      "byteLength": 534,
+      "gitBlobOid": "7be5c2f51f385d0dacad97ae943ab02c742870db"
+    },
+    {
+      "sourceRef": ".okf/concepts/representation-fragmentation-gap.yaml",
+      "codeSourceRevision": "sha256:02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
+      "contentHash": "02858778b10ecd8ac5464d668dff530d8be1f90b1904e787386ef046855b538a",
+      "byteLength": 789,
+      "gitBlobOid": "4cfedb65573cef2a0f9a94cb4ceaabd97a7586bb"
+    },
+    {
+      "sourceRef": ".okf/concepts/som-run-lineage-gap.yaml",
+      "codeSourceRevision": "sha256:ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
+      "contentHash": "ba81c1421ae2fe88be3c47ddd2b8d3b8e3aa7de2c0f1ce67aa36c5614487cf8c",
+      "byteLength": 548,
+      "gitBlobOid": "ff52f231563742179633dc41c03de04fd254b32d"
+    },
+    {
+      "sourceRef": ".okf/concepts/topology-schema-drift-gap.yaml",
+      "codeSourceRevision": "sha256:b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
+      "contentHash": "b7be6697f7725a3273358966d746c1418b88c6559610c2b10337edee772d5ae1",
+      "byteLength": 625,
+      "gitBlobOid": "8fd1f9eb55bb8fb7d0d0ded4a3de227b33c78d77"
     },
     {
       "sourceRef": ".okf/domains/feature-intelligence.yaml",
@@ -650,10 +692,17 @@
     },
     {
       "sourceRef": ".okf/manifest.yaml",
-      "codeSourceRevision": "sha256:9cd7c556407d9d4f221141fedea8b250b093d0483805382e3d4c73b933298261",
-      "contentHash": "9cd7c556407d9d4f221141fedea8b250b093d0483805382e3d4c73b933298261",
-      "byteLength": 5101,
-      "gitBlobOid": "1d7b28613159863dbf5e5ed339cbd02bc1afb2a7"
+      "codeSourceRevision": "sha256:09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
+      "contentHash": "09965014c694909e0769408f4ce5ef19fd7d115102a6c8471ef80cbc060e8778",
+      "byteLength": 5619,
+      "gitBlobOid": "22f296be786dc4e08286deea749a980de3154de8"
+    },
+    {
+      "sourceRef": ".okf/pipelines/ast-entity-prefill.yaml",
+      "codeSourceRevision": "sha256:e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
+      "contentHash": "e72e9a5ae78bd95deaf9df4b3e3a82d3f4edb8411f4b4479186a094c15e074fc",
+      "byteLength": 1042,
+      "gitBlobOid": "b37226d91ffe8f75ec8c283d0a323c77b7fa8839"
     },
     {
       "sourceRef": ".okf/pipelines/retrieval-ranking-synthesis.md",
@@ -661,55 +710,6 @@
       "contentHash": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
       "byteLength": 9357,
       "gitBlobOid": "7838c9bf5ca950edf08b695b1a8d9a15c6480a63"
-    },
-    {
-      "sourceRef": ".okf/pipelines/web-sources.md",
-      "codeSourceRevision": "sha256:a28a55a71f0ee1c506974676fbb0d8aed4eb7bcf3b24f11cf20cdbe453a41315",
-      "contentHash": "a28a55a71f0ee1c506974676fbb0d8aed4eb7bcf3b24f11cf20cdbe453a41315",
-      "byteLength": 3296,
-      "gitBlobOid": "000de63e729d1c50bf908df67dfc0903f0ea8ea2"
-    },
-    {
-      "sourceRef": ".okf/predicates/feature-relationships.yaml",
-      "codeSourceRevision": "sha256:1d552621fd67aaa39d9032f6747c513863a721bfe2aaba8e2b79f13041861370",
-      "contentHash": "1d552621fd67aaa39d9032f6747c513863a721bfe2aaba8e2b79f13041861370",
-      "byteLength": 2855,
-      "gitBlobOid": "7bf0cda383e65ebc13bacd04891c80516c18d966"
-    },
-    {
-      "sourceRef": ".okf/runbooks/admin-dashboard-setup.md",
-      "codeSourceRevision": "sha256:ed185303365fcdafbdb1f118d53c0ecc4c60276d349ed08123223c9050b604e2",
-      "contentHash": "ed185303365fcdafbdb1f118d53c0ecc4c60276d349ed08123223c9050b604e2",
-      "byteLength": 10948,
-      "gitBlobOid": "cda6441daa9b33475743c21b3e3558f6ff5c4347"
-    },
-    {
-      "sourceRef": ".okf/systems/deep-research.md",
-      "codeSourceRevision": "sha256:77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a",
-      "contentHash": "77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a",
-      "byteLength": 10589,
-      "gitBlobOid": "dc0f2302691d2d4ae84e82b6593851f56a303d6b"
-    },
-    {
-      "sourceRef": ".okf/systems/hyperrag.md",
-      "codeSourceRevision": "sha256:3996a6d01c424510089975e5d8ac04b4e7fb8d5198c67690f1deea80e68a2460",
-      "contentHash": "3996a6d01c424510089975e5d8ac04b4e7fb8d5198c67690f1deea80e68a2460",
-      "byteLength": 6521,
-      "gitBlobOid": "18e445ecbf5b008b249fd6997c9bf58d7ad5399a"
-    },
-    {
-      "sourceRef": ".okf/tools/gemma4-synthesis.md",
-      "codeSourceRevision": "sha256:80fcd672f85b31efd5306b687f91038d25e30bafecc19ca17c2e0b7f5345f9b9",
-      "contentHash": "80fcd672f85b31efd5306b687f91038d25e30bafecc19ca17c2e0b7f5345f9b9",
-      "byteLength": 7682,
-      "gitBlobOid": "cafd463eba23bd1c57d26069ce0cd2164af09d74"
-    },
-    {
-      "sourceRef": ".okf/tools/ml-ranking-sidecar.md",
-      "codeSourceRevision": "sha256:eeefbff4f906ce8073d9d535be0c1767162211d96d03b9219220350443220606",
-      "contentHash": "eeefbff4f906ce8073d9d535be0c1767162211d96d03b9219220350443220606",
-      "byteLength": 9219,
-      "gitBlobOid": "43205eedb4dfcfee35ee61446aed5bdc20659ba6"
     }
   ],
   "authority": {

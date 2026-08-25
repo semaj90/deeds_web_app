@@ -1,0 +1,289 @@
+{
+  "schema": "atlas.derived-context-read.v1",
+  "generatedAt": "2026-08-25T04:51:35.952Z",
+  "status": "DEGRADED_READ_ONLY",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "readiness": {
+    "contextualTree": "SOURCE_UNAVAILABLE",
+    "latentCoveragePct": "32.72",
+    "somCoveragePct": "8.25",
+    "sourceLineage": "SOURCE_LINEAGE_OWNER_SCHEMA_INCOMPLETE",
+    "databaseContext": "READBACK_PROVEN"
+  },
+  "databaseConnection": {
+    "source": "DATABASE_URL",
+    "fingerprint": {
+      "schema": "atlas.database-connection-fingerprint.v1",
+      "databaseName": "legal_ai_db",
+      "currentUser": "legal_admin",
+      "sessionUser": "legal_admin",
+      "currentSchema": "public",
+      "configuredSearchPath": "\"$user\", public",
+      "effectiveSearchPath": "{pg_catalog,public}",
+      "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+      "serverAddress": "172.18.0.10/32",
+      "serverPort": 5432,
+      "relations": [
+        {
+          "schemaName": "public",
+          "relationName": "analysis_pass_results",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "atlas_ast_nodes",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "atlas_packets",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "atlas_source_refs",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "atlas_source_revisions",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "codebase_chunk_index",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "file_index",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "graphify_files",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "storage_files",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        },
+        {
+          "schemaName": "public",
+          "relationName": "uploaded_files",
+          "kind": "r",
+          "visibleInSearchPath": true,
+          "selectable": true
+        }
+      ],
+      "fingerprintSha256": "eb6bbb6a70ef3efb1392f9a53ff33b159b79650396df969960086c36290eb886"
+    },
+    "status": "READBACK_PROVEN"
+  },
+  "projectionOwners": {
+    "contextualTree": "packages/parent-atlas/src/core/contextual-tree-snapshot.ts",
+    "topology": "packages/parent-atlas/src/core/atlas-topology-v1.ts",
+    "featureAlignment": "packages/parent-atlas/src/core/feature-signal-alignment.ts",
+    "ontology": "packages/parent-atlas/src/core/hypergraph-retrieval.ts",
+    "runtime": "python/atlas_kernel_session.py"
+  },
+  "runtimePolicy": {
+    "networkx": "CPU_DERIVED_GRAPH_ORACLE",
+    "nxCugraph": "SEPARATE_RAPIDS_EXECUTOR",
+    "freeThreadedPython": "CAPABILITY_PROBE_ONLY",
+    "defaultParallelism": "PROCESS_POOL_OR_EXTERNAL_GPU_RUNTIME",
+    "canonicalAuthority": false
+  },
+  "results": [
+    {
+      "id": "AST_IDENTITY_READ",
+      "status": "PASS",
+      "durationMs": 1215,
+      "outputTail": "{\n  \"schema\": \"atlas.ast-entity-prefill-identity-receipt.v1\",\n  \"input_path\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp\\\\atlas\\\\graphify-file-index-v1\\\\ast-entities.jsonl\",\n  \"output_path\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp\\\\atlas\\\\graphify-file-index-v1\\\\ast-entity-identity.jsonl\",\n  \"input_candidates\": 42404,\n  \"resolved\": 42404,\n  \"unresolved\": 0,\n  \"status\": \"READ_ONLY_COMPLETE\",\n  \"database_writes\": false,\n  \"canonical_entity_writes\": false,\n  \"docker_fallback_attempted\": false\n}\n"
+    },
+    {
+      "id": "DOMAIN_SUGGESTIONS_READ",
+      "status": "PASS",
+      "durationMs": 3296,
+      "outputTail": "{\n  \"schema\": \"atlas.ast-entity-okf-domain-dry-run-receipt.v1\",\n  \"status\": \"READ_ONLY_COMPLETE\",\n  \"input\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp\\\\atlas\\\\graphify-file-index-v1\\\\ast-entity-identity.jsonl\",\n  \"output\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\.tmp\\\\atlas\\\\graphify-file-index-v1\\\\ast-entity-okf-domain.jsonl\",\n  \"taxonomy_revision\": \"parent-atlas-domain-taxonomy-v1\",\n  \"counts\": {\n    \"total\": 42404,\n    \"classified\": 34047,\n    \"fallback\": 8357,\n    \"noEvidence\": 0,\n    \"identityResolved\": 42404\n  },\n  \"coverage\": {\n    \"identity\": 1,\n    \"classified\": 0.8029195358928403,\n    \"evidence\": 1\n  },\n  \"canonical_writes\": false,\n  \"database_writes\": false,\n  \"ontology_tuple_writes\": false\n}\n"
+    },
+    {
+      "id": "CONTEXTUAL_TREE_AUDIT",
+      "status": "PASS",
+      "durationMs": 8096,
+      "outputTail": "Wrote C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\contextual-tree-readiness-report.json\nWrote C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\contextual-tree-readiness-report.md\nOverall: SOURCE_UNAVAILABLE\nREADY 3 / FIELD_NAME_MISMATCH 1 / SOURCE_UNAVAILABLE 1 / DATA_ABSENT 1\n"
+    },
+    {
+      "id": "LATENT_SOM_JOIN_AUDIT",
+      "status": "PASS",
+      "durationMs": 3913,
+      "outputTail": "◇ injected env (206) from .env // tip: ◈ secrets for agents [www.dotenvx.com]\n◇ injected env (18) from .env.local // tip: ⌁ auth for agents [www.vestauth.com]\n=== Running Latent/SOM Join-Key Audit ===\n\nDatabase Stats: {\n  total: 61660,\n  packet_key_count: 61660,\n  source_ref_count: 61660,\n  qdrant_point_id_count: 6451,\n  payload_qdrant_point_id_count: 61,\n  metadata_qdrant_point_id_count: 0,\n  latent64_count: 7522,\n  som_index_count: 61660\n}\nFetched 61660 rows from database for mapping check.\nLoaded SOM assignments: 32310 entries.\nLoaded latent index: 5000 entries.\nLoaded 5000 Qdrant payloads for denominator classification.\n\nWritten JSON report: C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\latent-som-join-key-audit.json\nWritten Markdown report: C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\latent-som-join-key-audit.md\n\n=== Audit Complete ===\n"
+    },
+    {
+      "id": "RUNTIME_CAPABILITY_READ",
+      "status": "PASS",
+      "durationMs": 6673,
+      "outputTail": "d\": \"NX_CUGRAPH\",\r\n      \"available\": false,\r\n      \"detail\": \"none of nx_cugraph imported\",\r\n      \"owner_runtime\": \"IPYTHON_KERNEL\",\r\n      \"package_or_binary\": \"nx_cugraph\",\r\n      \"version\": null\r\n    },\r\n    {\r\n      \"analyzer_id\": \"PYTORCH\",\r\n      \"available\": true,\r\n      \"detail\": \"import torch succeeded\",\r\n      \"owner_runtime\": \"IPYTHON_KERNEL\",\r\n      \"package_or_binary\": \"torch\",\r\n      \"version\": \"2.8.0+cu128\"\r\n    },\r\n    {\r\n      \"analyzer_id\": \"SOUFFLE\",\r\n      \"available\": false,\r\n      \"detail\": \"none of souffle found on PATH\",\r\n      \"owner_runtime\": \"EXTERNAL_PROCESS\",\r\n      \"package_or_binary\": \"souffle\",\r\n      \"version\": null\r\n    },\r\n    {\r\n      \"analyzer_id\": \"STANZA_POS\",\r\n      \"available\": false,\r\n      \"detail\": \"none of stanza imported\",\r\n      \"owner_runtime\": \"IPYTHON_KERNEL\",\r\n      \"package_or_binary\": \"stanza\",\r\n      \"version\": null\r\n    },\r\n    {\r\n      \"analyzer_id\": \"TREESITTER_CHUNKER\",\r\n      \"available\": true,\r\n      \"detail\": \"import chunker succeeded\",\r\n      \"owner_runtime\": \"IPYTHON_KERNEL\",\r\n      \"package_or_binary\": \"chunker\",\r\n      \"version\": \"4.0.0\"\r\n    },\r\n    {\r\n      \"analyzer_id\": \"TREE_SITTER\",\r\n      \"available\": true,\r\n      \"detail\": \"import tree_sitter succeeded\",\r\n      \"owner_runtime\": \"IPYTHON_KERNEL\",\r\n      \"package_or_binary\": \"tree_sitter\",\r\n      \"version\": \"0.25.2\"\r\n    },\r\n    {\r\n      \"analyzer_id\": \"TS_MORPH\",\r\n      \"available\": false,\r\n      \"detail\": \"host-owned analyzer; intentionally not imported into Python kernel\",\r\n      \"owner_runtime\": \"TYPESCRIPT_HOST\",\r\n      \"package_or_binary\": \"ts-morph\",\r\n      \"version\": null\r\n    }\r\n  ],\r\n  \"pid\": 13964,\r\n  \"python_runtime\": {\r\n    \"abi_flags\": \"\",\r\n    \"executable\": \"C:\\\\Python313\\\\python.exe\",\r\n    \"free_threaded_build\": false,\r\n    \"gil_enabled\": true,\r\n    \"implementation\": \"CPython\",\r\n    \"ipykernel_version\": \"7.2.0\",\r\n    \"python_abi\": \"cp313-win_amd64\",\r\n    \"version\": \"3.13.5\"\r\n  },\r\n  \"schema\": \"atlas.kernel-runtime-probe.v1\"\r\n}\r\n",
+      "manifest": {
+        "canonical_authority": false,
+        "capabilities": [
+          {
+            "analyzer_id": "AST_GREP",
+            "available": true,
+            "detail": "import ast_grep_py succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "ast_grep_py",
+            "version": "0.44.1"
+          },
+          {
+            "analyzer_id": "CODEQL",
+            "available": false,
+            "detail": "none of codeql found on PATH",
+            "owner_runtime": "EXTERNAL_PROCESS",
+            "package_or_binary": "codeql",
+            "version": null
+          },
+          {
+            "analyzer_id": "CUGRAPH",
+            "available": false,
+            "detail": "none of cugraph imported",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "cugraph",
+            "version": null
+          },
+          {
+            "analyzer_id": "CUSPARSE",
+            "available": false,
+            "detail": "native CUDA library; availability is probed by the GPU executor layer",
+            "owner_runtime": "NATIVE_LIBRARY",
+            "package_or_binary": "cuSPARSE",
+            "version": null
+          },
+          {
+            "analyzer_id": "CUVS",
+            "available": false,
+            "detail": "none of cuvs imported",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "cuvs",
+            "version": null
+          },
+          {
+            "analyzer_id": "LANGEXTRACT",
+            "available": true,
+            "detail": "import langextract succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "langextract",
+            "version": "0.1.0"
+          },
+          {
+            "analyzer_id": "NETWORKX",
+            "available": true,
+            "detail": "import networkx succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "networkx",
+            "version": "3.3"
+          },
+          {
+            "analyzer_id": "NX_CUGRAPH",
+            "available": false,
+            "detail": "none of nx_cugraph imported",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "nx_cugraph",
+            "version": null
+          },
+          {
+            "analyzer_id": "PYTORCH",
+            "available": true,
+            "detail": "import torch succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "torch",
+            "version": "2.8.0+cu128"
+          },
+          {
+            "analyzer_id": "SOUFFLE",
+            "available": false,
+            "detail": "none of souffle found on PATH",
+            "owner_runtime": "EXTERNAL_PROCESS",
+            "package_or_binary": "souffle",
+            "version": null
+          },
+          {
+            "analyzer_id": "STANZA_POS",
+            "available": false,
+            "detail": "none of stanza imported",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "stanza",
+            "version": null
+          },
+          {
+            "analyzer_id": "TREESITTER_CHUNKER",
+            "available": true,
+            "detail": "import chunker succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "chunker",
+            "version": "4.0.0"
+          },
+          {
+            "analyzer_id": "TREE_SITTER",
+            "available": true,
+            "detail": "import tree_sitter succeeded",
+            "owner_runtime": "IPYTHON_KERNEL",
+            "package_or_binary": "tree_sitter",
+            "version": "0.25.2"
+          },
+          {
+            "analyzer_id": "TS_MORPH",
+            "available": false,
+            "detail": "host-owned analyzer; intentionally not imported into Python kernel",
+            "owner_runtime": "TYPESCRIPT_HOST",
+            "package_or_binary": "ts-morph",
+            "version": null
+          }
+        ],
+        "pid": 13964,
+        "python_runtime": {
+          "abi_flags": "",
+          "executable": "C:\\Python313\\python.exe",
+          "free_threaded_build": false,
+          "gil_enabled": true,
+          "implementation": "CPython",
+          "ipykernel_version": "7.2.0",
+          "python_abi": "cp313-win_amd64",
+          "version": "3.13.5"
+        },
+        "schema": "atlas.kernel-runtime-probe.v1"
+      }
+    },
+    {
+      "id": "SOURCE_LINEAGE_READ",
+      "status": "PASS",
+      "durationMs": 347,
+      "outputTail": "{\n  \"status\": \"SOURCE_LINEAGE_OWNER_SCHEMA_INCOMPLETE\",\n  \"reportPath\": \"docs\\\\reports\\\\live-source-lineage-table-audit.json\",\n  \"canonicalWrites\": false\n}\n"
+    }
+  ],
+  "fallbackPolicy": "CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT"
+}

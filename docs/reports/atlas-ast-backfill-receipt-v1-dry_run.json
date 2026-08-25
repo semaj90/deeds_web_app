@@ -1,0 +1,233 @@
+{
+  "schema": "atlas.ast-backfill-receipt.v1",
+  "generatedAt": "2026-08-25T05:20:55.199Z",
+  "mode": "DRY_RUN",
+  "limit": 1000,
+  "status": "DRY_RUN_COMPLETE",
+  "gates": {
+    "AST_BF_01": {
+      "name": "DATABASE_CONTEXT_PROVEN",
+      "proven": true,
+      "connectionSource": "DATABASE_URL",
+      "live": {
+        "database_name": "legal_ai_db",
+        "current_user": "legal_admin",
+        "current_schema": "public",
+        "configured_search_path": "\"$user\", public",
+        "server_address": "172.18.0.10/32",
+        "server_port": 5432
+      },
+      "baselineReportPath": "docs/reports/live-source-lineage-table-audit.json",
+      "baselineReadError": null,
+      "baselineFingerprint": {
+        "schema": "atlas.database-connection-fingerprint.v1",
+        "databaseName": "legal_ai_db",
+        "currentUser": "legal_admin",
+        "sessionUser": "legal_admin",
+        "currentSchema": "public",
+        "configuredSearchPath": "\"$user\", public",
+        "effectiveSearchPath": "{pg_catalog,public}",
+        "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+        "serverAddress": "172.18.0.10/32",
+        "serverPort": 5432,
+        "relations": [
+          {
+            "schemaName": "public",
+            "relationName": "analysis_pass_results",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "atlas_ast_nodes",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "atlas_packets",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "atlas_source_refs",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "atlas_source_revisions",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "codebase_chunk_index",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "file_index",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "graphify_files",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "storage_files",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          },
+          {
+            "schemaName": "public",
+            "relationName": "uploaded_files",
+            "kind": "r",
+            "visibleInSearchPath": true,
+            "selectable": true
+          }
+        ],
+        "fingerprintSha256": "eb6bbb6a70ef3efb1392f9a53ff33b159b79650396df969960086c36290eb886"
+      },
+      "comparedFields": [
+        "databaseName",
+        "currentUser",
+        "currentSchema",
+        "configuredSearchPath",
+        "serverPort"
+      ],
+      "note": "Compares core identity fields against audit-live-source-lineage-tables.mjs's last report, not a full relation-set hash match (that hash is sensitive to which candidate tables that script happens to probe, which is not a meaningful equality condition for this gate)."
+    },
+    "AST_BF_02": {
+      "name": "SOURCE_SCOPE_FROZEN",
+      "proven": true,
+      "scopePolicy": "ACTIVE_APP_RELATIVE_V1",
+      "scopeReportPath": "docs/reports/graphify-ast-scope-active-app-v1.json",
+      "scopeReadError": null,
+      "inventorySha256": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
+      "includedFiles": 9547,
+      "excludedPrefixes": [
+        "claude-mem",
+        "llama-cpp-turboquant-gemma4",
+        "src"
+      ],
+      "note": "excludedPrefixes (claude-mem, llama-cpp-turboquant-gemma4, legacy root src) are this harness's frozen defaults for AST_BF_02, matching AST-ID-04's findings. Still PROVISIONAL pending the formal AST-ID-06 operator freeze of this exact policy."
+    },
+    "AST_BF_03": {
+      "name": "SOURCE_LINEAGE_PROVEN",
+      "proven": false,
+      "lineageOwner": "public.graphify_files",
+      "requiredColumns": [
+        "source_ref",
+        "source_revision",
+        "content_hash",
+        "workspace_revision"
+      ],
+      "tablePresent": true,
+      "hasWorkspaceRevisionColumn": false,
+      "rowCount": 0,
+      "blockedReason": "graphify_files missing workspace_revision column (compatibility migration unapplied)",
+      "note": "This is the current hard blocker (per DBCTX-01 correction entry, TABLE-AUDIT-02, and audit-atlas-migration-owners.mjs). The candidate JSONL's own source_revision/workspace_revision fields are synthetic placeholders (\"workspace:0\", 0) baked in at generation time, not derived from this table — they do not satisfy this gate."
+    },
+    "AST_BF_04": {
+      "name": "CANDIDATE_ARTIFACT_FROZEN",
+      "proven": true,
+      "candidateArtifactPath": "docs/reports/graphify-ast-declaration-candidates-v2.jsonl",
+      "candidateArtifactSha256": "c15de830fafefdcee2d3a6c38d9ef012f970f874d7df1ef8d653014156d6b463",
+      "candidateArtifactRowCount": 59915,
+      "parserName": "ast-grep",
+      "parserVersion": "UNKNOWN_NOT_TRACKED_IN_ARTIFACT",
+      "grammarRevision": "UNKNOWN_NOT_TRACKED_IN_ARTIFACT",
+      "inventoryChecksum": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
+      "artifactReadError": null,
+      "note": "parserVersion/grammarRevision are honestly UNKNOWN — the v2 candidate JSONL does not currently record them per-row or in a sidecar manifest. Recording as unknown rather than guessing; this is itself a gap worth closing before a real apply."
+    },
+    "AST_BF_05": {
+      "name": "IDENTITY_POLICY_PROVEN",
+      "proven": true,
+      "sourceRefPolicy": "ACTIVE_APP_RELATIVE_V1",
+      "nodeKindPolicyRevision": "ast-source-ref-key.v1-kind-aliases",
+      "qualifiedNamePolicyRevision": "ast-source-ref-key.v1-whitespace-collapse",
+      "casePolicy": "CASE_SENSITIVE_EXACT_PROVISIONAL",
+      "status": "PROVISIONAL_PENDING_AST_ID_06_OPERATOR_FREEZE",
+      "repoId": "00000000-0000-0000-0000-000000000000",
+      "repoIdSource": "live atlas_ast_nodes.repo_id convention (nil UUID), confirmed via direct query 2026-08-26"
+    },
+    "AST_BF_06": {
+      "name": "BOUNDED_SELECTION_DETERMINISTIC",
+      "proven": true,
+      "orderBy": [
+        "normalized_source_ref",
+        "byte_start",
+        "node_kind",
+        "qualified_name",
+        "candidate_key"
+      ],
+      "inScopeCandidateTotal": 35293,
+      "selectedCount": 1000,
+      "requestedLimit": 1000,
+      "selectionChecksum": "8acaa579eeb13b0135bb3da729d4a0a583925ea97fa171c522e09a52ec0f5ef6"
+    },
+    "AST_BF_07": {
+      "name": "INSERT_ONLY_APPLY_PROVEN",
+      "proven": null,
+      "attempted": false,
+      "reason": "SKIPPED_DRY_RUN"
+    },
+    "AST_BF_08": {
+      "name": "INDEPENDENT_READBACK_PROVEN",
+      "proven": null,
+      "attempted": false,
+      "reason": "SKIPPED_DRY_RUN"
+    },
+    "AST_BF_09": {
+      "name": "IDEMPOTENT_REPLAY_PROVEN",
+      "proven": null,
+      "attempted": false,
+      "reason": "SKIPPED_DRY_RUN"
+    },
+    "AST_BF_10": {
+      "name": "RECEIPT_COMPLETE_NO_CROSS_STORE_WRITES",
+      "proven": true,
+      "qdrantWrites": false,
+      "neo4jWrites": false,
+      "valkeyWrites": false
+    }
+  },
+  "databaseContextChecksum": "d940f7350a59c1c8a17ef16b86382bd2f062919aa644f2589b1a048ba3055907",
+  "sourceInventoryChecksum": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
+  "candidateArtifactChecksum": "c15de830fafefdcee2d3a6c38d9ef012f970f874d7df1ef8d653014156d6b463",
+  "selectionChecksum": "8acaa579eeb13b0135bb3da729d4a0a583925ea97fa171c522e09a52ec0f5ef6",
+  "counts": {
+    "selected": 1000,
+    "inserted": 0,
+    "alreadyPresent": 0,
+    "rejected": 0,
+    "readbackMatched": 0
+  },
+  "replay": {
+    "attempted": false,
+    "inserted": null,
+    "selectionChecksumMatch": null,
+    "readbackChecksumMatch": null
+  },
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false
+}

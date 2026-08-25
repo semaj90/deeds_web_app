@@ -8,6 +8,7 @@ import { searchResultToHyperRagResult } from './canonical-hyperrag-adapter.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { SearchMetadataFilterSchema } from './search-contract.js';
 import { RustNapiSearchBackend } from '$lib/server/search/rust-napi-search-backend.js';
+import { persistKagDagRunFromSteps } from '$lib/server/features/ai/ace/kag-dag-runner.js';
 
 const SearchShadowSchema = z.object({
   enabled: z.boolean(),
@@ -297,6 +298,22 @@ export async function runSemanticSearchWorkflow(
       // Report persistence is opt-in and must not fail the live search path.
     }
   }
+
+  // Durable Postgres audit trail (kag_dag_runs/kag_dag_nodes/kag_dag_edges) —
+  // unlike the JSON report above, this is always-on (not gated behind
+  // persistReport): it closes the "provisioned tables, zero live writer"
+  // gap found in the 2026-08-26 audit
+  // (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md).
+  // Fire-and-forget: persistKagDagRunFromSteps() fails open internally and
+  // must never block or fail the live search response.
+  void persistKagDagRunFromSteps({
+    query,
+    workflowState: result.workflowState,
+    steps: workflowDag,
+    finalJson: { topPacketKeys: result.topPacketKeys, topK: result.topK },
+  }).catch((error) => {
+    console.warn('[semantic-search-workflow] kag_dag audit persistence failed (non-blocking):', error);
+  });
 
   return result;
 }

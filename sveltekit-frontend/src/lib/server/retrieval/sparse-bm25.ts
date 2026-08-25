@@ -1,9 +1,13 @@
 /**
- * Sparse (BM25-style) lexical search over `legal_documents.content_tsv`.
+ * PostgreSQL sparse FTS / cover-density ranking over `legal_documents.content_tsv`.
  *
- * Postgres `ts_rank_cd` (cover density) is the closest built-in to BM25 — it
- * weights hits by term frequency and proximity, normalised by document length.
- * For our scale (up to ~1M docs) this is faster than an external Lucene index.
+ * NAMING NOTE (2026-08-26, docs-only, no rename — see openspec/changes/
+ * parent-atlas-neural-prefill-encoder/tasks.md's DBCTX-01/BM25 cleanup
+ * entries): despite the filename, this executes `plainto_tsquery` +
+ * `ts_rank_cd` against a native tsvector/GIN index — PostgreSQL full-text
+ * search, not BM25. pg_search is not installed in this repo. Classify this
+ * lane as `postgres_tsvector_english` cover-density ranking, not
+ * "BM25-style", when recording it in a receipt or provenance field.
  *
  * Pairs with rrf-fuse.ts: dense Qdrant hits + this lane → fused result.
  *
@@ -38,7 +42,7 @@ export interface SparseSearchOptions {
 }
 
 /**
- * Run a BM25-style query against legal_documents.
+ * Run a PostgreSQL sparse FTS (cover-density ranked) query against legal_documents.
  *
  * Uses `plainto_tsquery` (forgiving — strips operators) for end-user input.
  * For advanced query syntax (`& | !`), call `to_tsquery` paths separately.

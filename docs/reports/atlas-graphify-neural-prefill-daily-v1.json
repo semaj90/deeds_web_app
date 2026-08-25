@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.graphify-neural-prefill-daily-receipt.v1",
+  "generatedAt": "2026-08-25T00:51:53.613Z",
+  "wrapper": "scripts/startup/run-graphify-daily-startup.mjs",
+  "optIn": true,
+  "shortlistOptIn": false,
+  "baselinesOptIn": true,
+  "baselineRequested": true,
+  "baselineStatus": "PASS",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false,
+  "status": "PASS",
+  "neuralPrefill": false,
+  "neuralPrefillShortlist": false,
+  "fallbackPolicy": "CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT",
+  "children": [
+    {
+      "path": "docs/reports/atlas-graphify-nlp-prefill-dry-v1.json",
+      "checksum": "02fc8814cdff707be9bb06131d74604efed8aa2c88a4dd2124b7c43720a7d030"
+    },
+    {
+      "path": "docs/reports/atlas-neural-prefill-validation-v1.json",
+      "checksum": "6ea88a320a9011feaa94b63fe2b1a0c228c0251701509c50b43be92e13e3f65b"
+    },
+    {
+      "path": "docs/reports/ast-domain-baselines-dry-v1.json",
+      "checksum": "e5afe5bc57ac558c7f8816070e8d5de0d1b3810b49748c6993eddb5ffb95bc10"
+    },
+    {
+      "path": "docs/reports/atlas-candidate-shortlist-receipt-v1.json",
+      "checksum": "bc89c8bc1109a9ae095971d8595e9b4548610b82b16daee7ad06002523a7b3db"
+    }
+  ],
+  "outputChecksum": "8b04e63fac888fa0a2303c94fdcdac30e982302665f9d25a6466bf7dd7aff88b"
+}

@@ -1,0 +1,683 @@
+{
+  "schema": "atlas.ast-bridge-revision-comparison.v1",
+  "generatedAt": "2026-08-25T03:16:39.728Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "inputCandidatesPath": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl",
+  "counts": {
+    "candidateRows": 59915,
+    "existingAstRows": 7565,
+    "graphifyFiles": 0,
+    "sharedFiles": 799,
+    "mismatchedCandidateRows": 3780,
+    "filesWithRevisionDrift": 0,
+    "filesWithHashDrift": 0,
+    "filesWithMissingCurrentSource": 0
+  },
+  "byClassification": {
+    "REVISION_AUTHORITY_UNAVAILABLE": 554
+  },
+  "byParserVersion": {
+    "tree-sitter:chunk-index-v1": 3218
+  },
+  "samples": [
+    {
+      "file": "src/lib/ai/base64-fp32-quantizer.ts",
+      "candidateKeyCount": 17,
+      "existingKeyCount": 8,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "329b09391c54c085d8af70b2cdedb6f2ba29fb86b52ed0928a390d1d3166a365",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/base64-fp32-quantizer.ts#file:base64-fp32-quantizer.ts",
+        "src/lib/ai/base64-fp32-quantizer.ts#function:quantizeGemmaLegalOutput",
+        "src/lib/ai/base64-fp32-quantizer.ts#type:CUDAThreadContext",
+        "src/lib/ai/base64-fp32-quantizer.ts#type:GemmaOutputQuantization",
+        "src/lib/ai/base64-fp32-quantizer.ts#type:QuantizationResult",
+        "src/lib/ai/base64-fp32-quantizer.ts#function:processGemmaResponse",
+        "src/lib/ai/base64-fp32-quantizer.ts#type:QuantizationOptions",
+        "src/lib/ai/base64-fp32-quantizer.ts#class:Base64FP32Quantizer"
+      ]
+    },
+    {
+      "file": "src/lib/ai/citation-cache.ts",
+      "candidateKeyCount": 13,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "491b1ab4ac038e324bc32c9efe77f2b95ad9d48364c02c0d38769e85ae4871b3",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/citation-cache.ts#file:citation-cache.ts",
+        "src/lib/ai/citation-cache.ts#type:CachedCitation",
+        "src/lib/ai/citation-cache.ts#type:CitationSearchResult"
+      ]
+    },
+    {
+      "file": "src/lib/ai/client-cache.ts",
+      "candidateKeyCount": 24,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "d94481fdc75234fe393eecd4c3a68020ebb35bccbaa405e8140ddec44557387e",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/client-cache.ts#file:client-cache.ts"
+      ]
+    },
+    {
+      "file": "src/lib/ai/client-embed.ts",
+      "candidateKeyCount": 5,
+      "existingKeyCount": 7,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "14e2f199f2ef3a122cd1c65e08ff9c9b99ccc3a8442d1c0f27e2c6bac4568851",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/client-embed.ts#file:client-embed.ts",
+        "src/lib/ai/client-embed.ts#function:cosineSimilarity",
+        "src/lib/ai/client-embed.ts#function:preloadEmbeddingModel",
+        "src/lib/ai/client-embed.ts#function:batchCosineSimilarity",
+        "src/lib/ai/client-embed.ts#function:stableSoftmax",
+        "src/lib/ai/client-embed.ts#function:isEmbeddingModelReady",
+        "src/lib/ai/client-embed.ts#function:embedText"
+      ]
+    },
+    {
+      "file": "src/lib/ai/client-llm-synthesis.ts",
+      "candidateKeyCount": 1,
+      "existingKeyCount": 4,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "511a0802775a0033f960def27761be25f053178ceccd25c936811793e08a2d89",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/client-llm-synthesis.ts#file:client-llm-synthesis.ts",
+        "src/lib/ai/client-llm-synthesis.ts#type:SynthesisResult",
+        "src/lib/ai/client-llm-synthesis.ts#function:synthesize",
+        "src/lib/ai/client-llm-synthesis.ts#function:warmSynthesisCache"
+      ]
+    },
+    {
+      "file": "src/lib/ai/client-quality.ts",
+      "candidateKeyCount": 4,
+      "existingKeyCount": 11,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "d45605b4a460c55bebb5c8c723595856842d9e82dbebac8263cc89ea15dcfa57",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/client-quality.ts#file:client-quality.ts",
+        "src/lib/ai/client-quality.ts#function:makeQualityDecision",
+        "src/lib/ai/client-quality.ts#type:RetrievalSignals",
+        "src/lib/ai/client-quality.ts#type:QualityFeedback",
+        "src/lib/ai/client-quality.ts#type:SynthesisQuality",
+        "src/lib/ai/client-quality.ts#function:recordFeedback",
+        "src/lib/ai/client-quality.ts#function:getThresholds",
+        "src/lib/ai/client-quality.ts#function:scoreRetrievalConfidence"
+      ]
+    },
+    {
+      "file": "src/lib/ai/client-router.ts",
+      "candidateKeyCount": 1,
+      "existingKeyCount": 13,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "1498984b5410f51247fbfd4a1e88cd77a71079278f95092d500c4a57e1b870af",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/client-router.ts#file:client-router.ts",
+        "src/lib/ai/client-router.ts#function:agenticScore",
+        "src/lib/ai/client-router.ts#function:getWasmWorker",
+        "src/lib/ai/client-router.ts#function:shouldEscalateToServer",
+        "src/lib/ai/client-router.ts#function:fetchCapabilities",
+        "src/lib/ai/client-router.ts#function:classifyIntent",
+        "src/lib/ai/client-router.ts#function:isLitertReady",
+        "src/lib/ai/client-router.ts#function:getCachedLitertReady"
+      ]
+    },
+    {
+      "file": "src/lib/ai/e2b/inference.ts",
+      "candidateKeyCount": 2,
+      "existingKeyCount": 5,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "fbc6d35484348f2f84c65ecd9b4b3e42a6f6dc83710dadcba6467e6923e6221f",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/e2b/inference.ts#file:inference.ts",
+        "src/lib/ai/e2b/inference.ts#function:runE2bInference",
+        "src/lib/ai/e2b/inference.ts#function:runE2bInferenceDetailed",
+        "src/lib/ai/e2b/inference.ts#type:E2bInferenceResult",
+        "src/lib/ai/e2b/inference.ts#type:E2bInferenceOptions"
+      ]
+    },
+    {
+      "file": "src/lib/ai/e2b/session.ts",
+      "candidateKeyCount": 8,
+      "existingKeyCount": 6,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "75394ad2ce7f406d8096bce232648f8caf7d657a74728085f69e78ff9f3587b7",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/e2b/session.ts#file:session.ts",
+        "src/lib/ai/e2b/session.ts#function:disposeE2bSession",
+        "src/lib/ai/e2b/session.ts#function:isE2bSessionReady",
+        "src/lib/ai/e2b/session.ts#function:getE2bLoadError",
+        "src/lib/ai/e2b/session.ts#function:getWebGPUInfo",
+        "src/lib/ai/e2b/session.ts#function:getE2bSession"
+      ]
+    },
+    {
+      "file": "src/lib/ai/emotion-context.ts",
+      "candidateKeyCount": 2,
+      "existingKeyCount": 14,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "463cb73ed6b1fdcd194c3b6607a9bccf692b07ef2661a38b19b4af52861ef4f8",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/emotion-context.ts#file:emotion-context.ts",
+        "src/lib/ai/emotion-context.ts#type:BehavioralSignal",
+        "src/lib/ai/emotion-context.ts#function:updateFaceEmotion",
+        "src/lib/ai/emotion-context.ts#type:FaceEmotion",
+        "src/lib/ai/emotion-context.ts#function:analyzeWebcamFrame",
+        "src/lib/ai/emotion-context.ts#function:updateTextEmotion",
+        "src/lib/ai/emotion-context.ts#function:getEmotionState",
+        "src/lib/ai/emotion-context.ts#function:updateBehavior"
+      ]
+    },
+    {
+      "file": "src/lib/ai/gemma4-e2b-client.ts",
+      "candidateKeyCount": 7,
+      "existingKeyCount": 10,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "d34d0c01369fd2b75678740c9b3052cf9aef4c51e809bec44145f202ada9aedf",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/gemma4-e2b-client.ts#file:gemma4-e2b-client.ts",
+        "src/lib/ai/gemma4-e2b-client.ts#type:E2BStatus",
+        "src/lib/ai/gemma4-e2b-client.ts#function:unloadE2B",
+        "src/lib/ai/gemma4-e2b-client.ts#function:getE2BLoadError",
+        "src/lib/ai/gemma4-e2b-client.ts#function:isE2BReady",
+        "src/lib/ai/gemma4-e2b-client.ts#function:generateE2B",
+        "src/lib/ai/gemma4-e2b-client.ts#function:isE2BAvailable",
+        "src/lib/ai/gemma4-e2b-client.ts#function:initE2B"
+      ]
+    },
+    {
+      "file": "src/lib/ai/model-ids.ts",
+      "candidateKeyCount": 7,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "4bcf60c3bf640cf1bd328f2dd547cb14715fa70593a0b0e2564f014a7d1d5fd9",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/model-ids.ts#file:model-ids.ts",
+        "src/lib/ai/model-ids.ts#type:TurboQuantLevel",
+        "src/lib/ai/model-ids.ts#type:InferenceSource"
+      ]
+    },
+    {
+      "file": "src/lib/ai/onnx/inference.ts",
+      "candidateKeyCount": 10,
+      "existingKeyCount": 5,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "21c97914fcd5ce9575752f9e20eec3a407ca867cd35b48df79e8b6902b629c2f",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/onnx/inference.ts#file:inference.ts",
+        "src/lib/ai/onnx/inference.ts#type:OnnxInferenceResult",
+        "src/lib/ai/onnx/inference.ts#function:isOnnxAvailable",
+        "src/lib/ai/onnx/inference.ts#function:runOnnxInference",
+        "src/lib/ai/onnx/inference.ts#type:OnnxInferenceOptions"
+      ]
+    },
+    {
+      "file": "src/lib/ai/onnx/session.ts",
+      "candidateKeyCount": 5,
+      "existingKeyCount": 7,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "1f62ed6d014a07f33b2567615fb6f3df64c89d1136d61aa4d6b7e6516d44547b",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/onnx/session.ts#file:session.ts",
+        "src/lib/ai/onnx/session.ts#function:isSessionCached",
+        "src/lib/ai/onnx/session.ts#function:getProviderLabel",
+        "src/lib/ai/onnx/session.ts#function:getOnnxSession",
+        "src/lib/ai/onnx/session.ts#function:invalidateGPUDevice",
+        "src/lib/ai/onnx/session.ts#function:getActiveProvider",
+        "src/lib/ai/onnx/session.ts#function:clearSessionCache"
+      ]
+    },
+    {
+      "file": "src/lib/ai/unified-generation.ts",
+      "candidateKeyCount": 7,
+      "existingKeyCount": 6,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "9906d85c8da152ccdc9cb5a3e9f607d1ba1f1fda50ffe1f0ba75f14a23ff5325",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ai/unified-generation.ts#file:unified-generation.ts",
+        "src/lib/ai/unified-generation.ts#type:GenerationRequest",
+        "src/lib/ai/unified-generation.ts#function:generateText",
+        "src/lib/ai/unified-generation.ts#function:isE2bReady",
+        "src/lib/ai/unified-generation.ts#function:chat",
+        "src/lib/ai/unified-generation.ts#type:GenerationResponse"
+      ]
+    },
+    {
+      "file": "src/lib/ambient-events.d.ts",
+      "candidateKeyCount": 1,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "93e18aa42c5c89edf705f6396f9bbaac409abf31f47037123f03f504e822a73c",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/ambient-events.d.ts#file:ambient-events.d.ts"
+      ]
+    },
+    {
+      "file": "src/lib/cache/cache-invalidation.ts",
+      "candidateKeyCount": 3,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "8baf3d7958efe1a9dc5155e736372eed35fcc256e0bd9a3865ab433ccfe5a9fc",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/cache/cache-invalidation.ts#file:cache-invalidation.ts"
+      ]
+    },
+    {
+      "file": "src/lib/cache/cache-service.svelte.ts",
+      "candidateKeyCount": 14,
+      "existingKeyCount": 4,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "5cba4cd607dd431422ae9142d2cc0cf13b66b85bc4e85cc4b22bca63aaf94061",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/cache/cache-service.svelte.ts#file:cache-service.svelte.ts",
+        "src/lib/cache/cache-service.svelte.ts#class:UnifiedCacheService",
+        "src/lib/cache/cache-service.svelte.ts#type:CacheStrategy",
+        "src/lib/cache/cache-service.svelte.ts#function:useCache"
+      ]
+    },
+    {
+      "file": "src/lib/cache/indexdb-cache.svelte.ts",
+      "candidateKeyCount": 14,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "551eaa7c4ee3f755261965802cef334a9bfd6922eab4d52b8b3d9c0d22e27b7c",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/cache/indexdb-cache.svelte.ts#file:indexdb-cache.svelte.ts",
+        "src/lib/cache/indexdb-cache.svelte.ts#class:IndexedDBCache",
+        "src/lib/cache/indexdb-cache.svelte.ts#function:useCache"
+      ]
+    },
+    {
+      "file": "src/lib/cache/loki-cache.svelte.ts",
+      "candidateKeyCount": 17,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "ab054df562f1cec96f24aab9f97ad92027aad1f6b1755d7551a410f670e64f57",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/cache/loki-cache.svelte.ts#file:loki-cache.svelte.ts",
+        "src/lib/cache/loki-cache.svelte.ts#class:LokiCache",
+        "src/lib/cache/loki-cache.svelte.ts#function:useLokiCache"
+      ]
+    },
+    {
+      "file": "src/lib/cache/offline-fetch.ts",
+      "candidateKeyCount": 3,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "08b0a896aae82d174f222c96f31d3a08678a27afa60f8b1d5c3e59956d3946c2",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/cache/offline-fetch.ts#file:offline-fetch.ts",
+        "src/lib/cache/offline-fetch.ts#function:offlineFetch",
+        "src/lib/cache/offline-fetch.ts#function:offlineMutate"
+      ]
+    },
+    {
+      "file": "src/lib/client-logging.ts",
+      "candidateKeyCount": 1,
+      "existingKeyCount": 5,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "6d87c93fb704dcafdec6147946bf29ca3c542349ebac147b8cce5134274e9042",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/client-logging.ts#file:client-logging.ts",
+        "src/lib/client-logging.ts#function:logWarn",
+        "src/lib/client-logging.ts#function:logError",
+        "src/lib/client-logging.ts#type:LogFields",
+        "src/lib/client-logging.ts#function:logInfo"
+      ]
+    },
+    {
+      "file": "src/lib/client/db/loki-client.ts",
+      "candidateKeyCount": 2,
+      "existingKeyCount": 4,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "233dd023a2c45e4eab3160f73b4974d3ff52de562e790da611f1b88b9e597aab",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/client/db/loki-client.ts#file:loki-client.ts",
+        "src/lib/client/db/loki-client.ts#type:EditorCacheDocument",
+        "src/lib/client/db/loki-client.ts#function:saveDraft",
+        "src/lib/client/db/loki-client.ts#function:loadDraft"
+      ]
+    },
+    {
+      "file": "src/lib/client/subscribeEmbedding.svelte.ts",
+      "candidateKeyCount": 5,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "2701122a8ff60ecaad63711539f59c0e86bc2d6c1af59acd87545cef7447c1ca",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/client/subscribeEmbedding.svelte.ts#function:subscribeEmbedding",
+        "src/lib/client/subscribeEmbedding.svelte.ts#function:getCachedEmbedding",
+        "src/lib/client/subscribeEmbedding.svelte.ts#type:EmbeddingStreamEvent"
+      ]
+    },
+    {
+      "file": "src/lib/client/workflow-event-stream.ts",
+      "candidateKeyCount": 7,
+      "existingKeyCount": 4,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "ca38d5ad6fd1b8560503a6d9f9238a95a69916d4e204288faf31ae6be9e54647",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/client/workflow-event-stream.ts#file:workflow-event-stream.ts",
+        "src/lib/client/workflow-event-stream.ts#type:WorkflowEventType",
+        "src/lib/client/workflow-event-stream.ts#type:WorkflowEvent",
+        "src/lib/client/workflow-event-stream.ts#class:WorkflowEventStream"
+      ]
+    },
+    {
+      "file": "src/lib/components/evidence/board-history.svelte.ts",
+      "candidateKeyCount": 8,
+      "existingKeyCount": 8,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "30cca0941ecf9fbc4f1c446920e89ae3ab0840dd03fc2c78f76b0fd89b656fb5",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/evidence/board-history.svelte.ts#file:board-history.svelte.ts",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createAddNodeCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createDeleteConnectionCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#type:BoardCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createDeleteNodeCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createAddConnectionCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createMoveCommand",
+        "src/lib/components/evidence/board-history.svelte.ts#function:createBulkMoveCommand"
+      ]
+    },
+    {
+      "file": "src/lib/components/evidence/board-persistence.svelte.ts",
+      "candidateKeyCount": 9,
+      "existingKeyCount": 9,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "28a2c946d8104656e3e51e95101b2bc0a72b3a13060495635e9b34550889ca18",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/evidence/board-persistence.svelte.ts#file:board-persistence.svelte.ts",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:saveLayout",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:scheduleSave",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:scheduleServerSave",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:loadLayout",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:flushSave",
+        "src/lib/components/evidence/board-persistence.svelte.ts#function:flushServerSave",
+        "src/lib/components/evidence/board-persistence.svelte.ts#type:BoardLayout"
+      ]
+    },
+    {
+      "file": "src/lib/components/ui/gaming/core/GamingEvolutionManager.ts",
+      "candidateKeyCount": 7,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "22cc62ba61dd6c2734105d058096c186cb1036e86b8c510843266f5ca58cc29a",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/ui/gaming/core/GamingEvolutionManager.ts#class:GamingEvolutionManager"
+      ]
+    },
+    {
+      "file": "src/lib/components/ui/gaming/core/useGamingEvolution.js",
+      "candidateKeyCount": 5,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "b614d2855835d2f30a41561a8942f91285c852f287a5b8d76c61bb727288fa6f",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/ui/gaming/core/useGamingEvolution.js#function:useGamingEvolution"
+      ]
+    },
+    {
+      "file": "src/lib/components/ui/gaming/effects/audio-effects.ts",
+      "candidateKeyCount": 6,
+      "existingKeyCount": 2,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "97886f2c28cd4db3789c532c0ec592616116cff87589a0034b4694588035d264",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/ui/gaming/effects/audio-effects.ts#file:audio-effects.ts",
+        "src/lib/components/ui/gaming/effects/audio-effects.ts#class:RetroAudioEngine"
+      ]
+    },
+    {
+      "file": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
+      "candidateKeyCount": 3,
+      "existingKeyCount": 2,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "97ad6e55a93487be38644a46fd376bbdbe2db101c07d91670765e30b74789f87",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts#type:Toast",
+        "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts#type:ToastType"
+      ]
+    },
+    {
+      "file": "src/lib/config/database.ts",
+      "candidateKeyCount": 2,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "7c8242984b47fa82e5cb7d8b5b1fda4826c7d9d7eca01310dcc58a1e1da47013",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/config/database.ts#file:database.ts",
+        "src/lib/config/database.ts#function:getPoolConfig",
+        "src/lib/config/database.ts#type:PoolConfig"
+      ]
+    },
+    {
+      "file": "src/lib/config/env.server.ts",
+      "candidateKeyCount": 5,
+      "existingKeyCount": 23,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "372a77dbed6790f1263aa96c1c503ca48083697cf06d2d44da3f90a149513f02",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/config/env.server.ts#file:env.server.ts",
+        "src/lib/config/env.server.ts#function:getDatabaseUrl",
+        "src/lib/config/env.server.ts#function:getTritonUrl",
+        "src/lib/config/env.server.ts#function:getRedisUrl",
+        "src/lib/config/env.server.ts#function:getRabbitMQManagementUrl",
+        "src/lib/config/env.server.ts#function:getQdrantUrl",
+        "src/lib/config/env.server.ts#function:getNeo4jConfig",
+        "src/lib/config/env.server.ts#function:getMcpMulticoreUrl"
+      ]
+    },
+    {
+      "file": "src/lib/config/env.ts",
+      "candidateKeyCount": 4,
+      "existingKeyCount": 2,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "416098f396800257e1be28785bea314c864dd40370c16123929cfb5855765138",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/config/env.ts#file:env.ts",
+        "src/lib/config/env.ts#type:EnvConfig"
+      ]
+    },
+    {
+      "file": "src/lib/courtroom/courtroom-scene.svelte.ts",
+      "candidateKeyCount": 23,
+      "existingKeyCount": 3,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "8c7d576cef71035a80039158c48328e41dbddbacf63c1ea843c65521559d9f2c",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/courtroom/courtroom-scene.svelte.ts#file:courtroom-scene.svelte.ts",
+        "src/lib/courtroom/courtroom-scene.svelte.ts#type:ModelDef",
+        "src/lib/courtroom/courtroom-scene.svelte.ts#class:CourtroomScene"
+      ]
+    },
+    {
+      "file": "src/lib/courtroom/timeline-engine.svelte.ts",
+      "candidateKeyCount": 14,
+      "existingKeyCount": 4,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "2889e25723d7d1e1cdfdb1d300f1464134d7eb42163737c97aca61a0c3eeaaa2",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/courtroom/timeline-engine.svelte.ts#file:timeline-engine.svelte.ts",
+        "src/lib/courtroom/timeline-engine.svelte.ts#class:TimelineEngine",
+        "src/lib/courtroom/timeline-engine.svelte.ts#type:TimelineKeyframe",
+        "src/lib/courtroom/timeline-engine.svelte.ts#type:TimelineState"
+      ]
+    },
+    {
+      "file": "src/lib/db/client-db.ts",
+      "candidateKeyCount": 12,
+      "existingKeyCount": 12,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "0a4c9a264a643b7b461eada29ae34cb0236f6a6ad22417e5fb1dc14720b97e0e",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/db/client-db.ts#file:client-db.ts",
+        "src/lib/db/client-db.ts#type:DocumentCache",
+        "src/lib/db/client-db.ts#type:LegalEntity",
+        "src/lib/db/client-db.ts#type:UserPreferences",
+        "src/lib/db/client-db.ts#type:GraphVisualizationData",
+        "src/lib/db/client-db.ts#type:AIAnalysisCache",
+        "src/lib/db/client-db.ts#class:LegalAIClientDB",
+        "src/lib/db/client-db.ts#type:VectorSearchCache"
+      ]
+    },
+    {
+      "file": "src/lib/db/queries/route-health-queries.ts",
+      "candidateKeyCount": 1,
+      "existingKeyCount": 25,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "16c06a8f5e53618cf3f7b8fa45472206de87fb5575257259ae189381d74e21d8",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/db/queries/route-health-queries.ts#file:route-health-queries.ts",
+        "src/lib/db/queries/route-health-queries.ts#function:createErrorCluster",
+        "src/lib/db/queries/route-health-queries.ts#function:getInteractions",
+        "src/lib/db/queries/route-health-queries.ts#function:getAllRouteMetadata",
+        "src/lib/db/queries/route-health-queries.ts#function:getEnrichedRouteMetadata",
+        "src/lib/db/queries/route-health-queries.ts#function:getRouteMetadata",
+        "src/lib/db/queries/route-health-queries.ts#function:getSuggestionCount",
+        "src/lib/db/queries/route-health-queries.ts#function:updateRouteStatus"
+      ]
+    },
+    {
+      "file": "src/lib/features/poi/services/poi.ts",
+      "candidateKeyCount": 9,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "280ca3e204c12fd2c7e6481fa2732e5037a78e5543925fdbd192fa86f7e6df43",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/features/poi/services/poi.ts#file:poi.ts"
+      ]
+    },
+    {
+      "file": "src/lib/gpu/global-gpu-manager.ts",
+      "candidateKeyCount": 11,
+      "existingKeyCount": 1,
+      "graphifyRevision": null,
+      "existingRevisions": [],
+      "currentFileSha256": "0e8ad8659b45824f0dc44c6922524520cb0db8af30090b8e9dcefb9ad154db29",
+      "graphifyContentHash": null,
+      "classification": "REVISION_AUTHORITY_UNAVAILABLE",
+      "existingKeys": [
+        "src/lib/gpu/global-gpu-manager.ts#file:global-gpu-manager.ts"
+      ]
+    }
+  ]
+}

@@ -1,51 +1,52 @@
 {
   "schema": "atlas.ast-symbol-registry-promotion-report.v1",
-  "mode": "DRY_RUN",
+  "mode": "APPLY",
   "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-nominations.jsonl",
   "registryRevision": "promotion:ast-nominations:v1",
-  "limit": null,
+  "limit": 20,
   "inputNominations": 42398,
   "excludedVariables": 32228,
   "eligibleDeclarationLike": 10170,
   "uniqueCandidatesAfterDedup": 10170,
-  "rowsAttempted": 0,
+  "offset": 20,
+  "rowsAttempted": 20,
   "rowsInserted": 0,
-  "rowsAlreadyRegistered": 0,
+  "rowsAlreadyRegistered": 20,
   "sample": [
     {
-      "canonicalKey": "symbol-key:05692e88296afd1acbf3688a815114d37d916906",
-      "stableSymbolId": "stable-symbol:724245877356ccc9f1de0f2afc29e13f5fa2f99af54f2c8d08db6a453d05f6ab",
-      "kind": "function",
-      "qualifiedName": "main",
-      "sourceRef": "packages/atlas-core/src/cli.ts"
-    },
-    {
-      "canonicalKey": "symbol-key:66650d5e5cbb1defcb00b02e5f6f751b657d1c88",
-      "stableSymbolId": "stable-symbol:b1dad2db636411a5a16fb8641af767e81e815311a09b9dcc215f3f09ad3f2f52",
+      "canonicalKey": "symbol-key:66faf094ca7dfb8856fdba5e2a8649b3ccb4b013",
+      "stableSymbolId": "stable-symbol:e98a34f945b29741097d74998238206cb1eacd2b7b0eabb7293f191d7508d290",
       "kind": "type",
-      "qualifiedName": "ErrorFixingStateType",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+      "qualifiedName": "PolicyTaskType",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
     },
     {
-      "canonicalKey": "symbol-key:fb507112af415c145c5995fb4fed2006232b7ba3",
-      "stableSymbolId": "stable-symbol:0099a4262a53f5cec33f6fe2692808ae27f54b4e838e69487b2317372dc4a6ce",
+      "canonicalKey": "symbol-key:85217e5029ce966eabe4f3212767ae324aad2a47",
+      "stableSymbolId": "stable-symbol:4ee3db2c8d96e97ef956f355eb74a6ed41e214777c2ff46bc45adafb5427f80c",
       "kind": "interface",
-      "qualifiedName": "KanbanErrorFixingTask",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+      "qualifiedName": "PolicyTask",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
     },
     {
-      "canonicalKey": "symbol-key:1f0cffb7592b00798934f4f51f73bfd1c2eecfb9",
-      "stableSymbolId": "stable-symbol:6bb4cee33cb7321b03ac01625d85d5327e25583b4e1a5806af5554da9bf178f4",
+      "canonicalKey": "symbol-key:5d82b97858d2d8a23466a0e209fa0b2402a8d885",
+      "stableSymbolId": "stable-symbol:1477e49d1f445e52ccf09c6fe97def9f63b6410797271bfc132bdc8735f1f2b8",
       "kind": "interface",
-      "qualifiedName": "ErrorFixSuggestion",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+      "qualifiedName": "TaskRoute",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
     },
     {
-      "canonicalKey": "symbol-key:63d943bb2aa81d5f88adb09f0589aa38e8ddef12",
-      "stableSymbolId": "stable-symbol:eb9460fb949a07f2fb3954d25bbbfb3072cb6557ce61880b05daa6f30da87cbd",
+      "canonicalKey": "symbol-key:00b5064f2e1c5387769e68e90eacfba819f34966",
+      "stableSymbolId": "stable-symbol:53f511eaa2e2caed42d250dd4f56ad9e3974777752245627782f22f12ba22fc2",
       "kind": "function",
-      "qualifiedName": "loadErrorFixingPackets",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+      "qualifiedName": "classifyPacketTask",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
+    },
+    {
+      "canonicalKey": "symbol-key:8b37b2aac65b23543788cce5b7ba48b6bb66cdab",
+      "stableSymbolId": "stable-symbol:10f3fa36f1c3e519df4b790dda5133004253b644401f4ceb0bb7f151a18a015b",
+      "kind": "function",
+      "qualifiedName": "getTaskRoute",
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
     }
   ],
   "errors": []

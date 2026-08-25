@@ -122,6 +122,21 @@ async function validateHMMAgenticError() {
     const featureCoveragePct = matchedPackets / totalPackets;
     const gate2Pass = featureCoveragePct >= HMM_VALIDATION_GATES.feature_coverage.min;
 
+    const treeCoverageRes = await pgPool.query(`
+      SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE tree_node_id IS NOT NULL)::int AS populated,
+        COUNT(*) FILTER (WHERE source_ref NOT LIKE 'cluster:%')::int AS ast_applicable,
+        COUNT(*) FILTER (
+          WHERE source_ref NOT LIKE 'cluster:%' AND tree_node_id IS NOT NULL
+        )::int AS ast_applicable_populated
+      FROM atlas_packets
+    `);
+    const treeCoverage = treeCoverageRes.rows[0];
+    const astApplicablePct = treeCoverage.ast_applicable > 0
+      ? (100 * treeCoverage.ast_applicable_populated / treeCoverage.ast_applicable)
+      : 0;
+
     console.log(`   Matched packets: ${matchedPackets}/${totalPackets} (${(100 * featureCoveragePct).toFixed(2)}%)`);
     console.log(`   Expected: ≥${(100 * HMM_VALIDATION_GATES.feature_coverage.min).toFixed(0)}%`);
     console.log(`   Status: ${gate2Pass ? '✅ PASS' : '⚠️ PARTIAL (expected after LangExtract)'}\n`);
@@ -165,7 +180,7 @@ async function validateHMMAgenticError() {
     console.log(`   Successful domain selections: ${successfulSelections}/${totalMappingKeys}`);
     console.log(`   Failed domains: ${failedDomains}`);
     console.log(`   Expected: [${HMM_VALIDATION_GATES.recovery_packet_count.min}, ${HMM_VALIDATION_GATES.recovery_packet_count.max}]`);
-    console.log(`   Status: ${gate3Pass ? '✅ PASS' : '⚠️ PARTIAL (expected after tree_node_id/concept_ids)'}\n`);
+    console.log(`   Status: ${gate3Pass ? '✅ PASS' : '⚠️ PARTIAL (feature/domain coverage remains incomplete)'}\n`);
 
     if (VERBOSE) {
       console.log('   Domain selection breakdown:');
@@ -256,15 +271,16 @@ async function validateHMMAgenticError() {
     console.log('Recovery Packet Selection:');
     console.log(`  - Viable domains: ${successfulSelections}/${totalMappingKeys}`);
     console.log(`  - Expected: [${HMM_VALIDATION_GATES.recovery_packet_count.min}, ${HMM_VALIDATION_GATES.recovery_packet_count.max}]`);
-    console.log(`  - Blocker: tree_node_id propagation (only 5% of PageRank synced)`);
+    console.log(`  - AST-applicable tree_node_id coverage: ${treeCoverage.ast_applicable_populated}/${treeCoverage.ast_applicable} (${astApplicablePct.toFixed(2)}%)`);
+    console.log('  - Blocker: grounded concept/domain feature coverage; tree propagation is not the current gate');
     console.log();
 
     console.log('Next Steps:');
-    console.log('  1. ⏳ Session 105: Propagate tree_node_id (unblocks Gate 3)');
-    console.log('  2. ⏳ Session 105: Wire used_concepts lane (unblocks Gate 2)');
-    console.log('  3. ⏳ Session 106: Implement HMM state machine + confidence scoring');
-    console.log('  4. ⏳ Session 107: Integrate with MapReduce error signal grouping');
-    console.log('  5. ⏳ Session 107: Wire ACE recovery packet dispatch');
+    console.log('  1. ⏳ Produce grounded concept/domain labels from the approved LangExtract/ontology lane');
+    console.log('  2. ⏳ Re-run feature coverage and recovery selection with the same read-only snapshot');
+    console.log('  3. ⏳ Implement HMM state machine + confidence scoring');
+    console.log('  4. ⏳ Integrate with MapReduce error signal grouping');
+    console.log('  5. ⏳ Wire ACE recovery packet dispatch');
 
     process.exit(passCount >= 2 ? 0 : 1);
 

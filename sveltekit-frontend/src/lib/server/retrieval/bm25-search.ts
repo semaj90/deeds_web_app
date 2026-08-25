@@ -1,8 +1,14 @@
 /**
- * BM25 Search via PostgreSQL trigram similarity
- *
- * Uses pg_trgm for fast full-text similarity search with GIN indexing.
- * Not exact BM25 but highly correlated and production-ready.
+ * @deprecated Compatibility wrapper — function/type names here retain the
+ * "bm25" label for existing callers, but this delegates to
+ * `postgres-fts.js`'s `searchCodeLexical()`, which is PostgreSQL native
+ * tsvector/GIN full-text search (ts_rank/websearch_to_tsquery), not BM25.
+ * pg_search is not installed in this repo. New callers should import
+ * `searchCodeLexical` from `$lib/server/search/postgres-fts.js` directly
+ * and treat the lane as `postgres_tsvector_english`. See openspec/changes/
+ * parent-atlas-neural-prefill-encoder/tasks.md's DBCTX-01/BM25 cleanup
+ * entries for the naming rationale. Kept as-is (no export renames here)
+ * to avoid a mechanical break across this file's callers.
  */
 
 import { searchCodeLexical } from '$lib/server/search/postgres-fts.js';

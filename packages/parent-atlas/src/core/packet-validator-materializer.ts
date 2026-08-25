@@ -1,7 +1,7 @@
 /**
  * @fileoverview Canonical Packet Validator & Materializer
  *
- * Central registry validator for the atlas_packet_registry:
+ * Canonical packet validator over the atlas_packet_runtime_v1 read model.
  * - Validates packet invariants using canonical identity contract
  * - Materializes packets from canonical Postgres truth → Qdrant/Neo4j/Redis mirrors
  * - Telemetry collection (breadth/provenance/trace_id tracking)
@@ -207,16 +207,39 @@ export interface MaterializationReport {
 }
 
 /**
- * PacketValidator: Central validation and gate-checking for atlas_packet_registry
+ * PacketValidator: Central validation and gate-checking for the canonical
+ * atlas_packets-based runtime view.
  */
+export interface PacketValidatorMirrorClients {
+  /** @qdrant/js-client-rest QdrantClient instance. Optional — if omitted,
+   *  materializeToMirrors() reports Qdrant sync as not_implemented rather
+   *  than fabricating success. */
+  qdrantClient?: any;
+  /** Qdrant collection to upsert packet vectors into. Required if
+   *  qdrantClient is provided — this class does not choose a default
+   *  collection (this repo has more than one live 768-dim collection;
+   *  picking one here would be an unreviewed architectural decision). */
+  qdrantCollection?: string;
+  /** neo4j-driver Driver (or anything exposing .session()). Optional —
+   *  if omitted, materializeToMirrors() reports Neo4j sync as
+   *  not_implemented rather than fabricating success. */
+  neo4jDriver?: any;
+}
+
 export class PacketValidator {
   private pgClient: any; // pg.Client
   private redisClient: any; // ioredis.Redis
+  private qdrantClient: any; // @qdrant/js-client-rest QdrantClient, optional
+  private qdrantCollection: string | undefined;
+  private neo4jDriver: any; // neo4j-driver Driver, optional
   private validationCache: Map<string, ValidationResult> = new Map();
 
-  constructor(pgClient: any, redisClient: any) {
+  constructor(pgClient: any, redisClient: any, mirrorClients?: PacketValidatorMirrorClients) {
     this.pgClient = pgClient;
     this.redisClient = redisClient;
+    this.qdrantClient = mirrorClients?.qdrantClient ?? null;
+    this.qdrantCollection = mirrorClients?.qdrantCollection;
+    this.neo4jDriver = mirrorClients?.neo4jDriver ?? null;
   }
 
   /**
@@ -427,26 +450,74 @@ export class PacketValidator {
       timestamp: new Date()
     };
 
-    // Materialize to Qdrant (if embedding available)
+    // Materialize to Qdrant (if embedding available).
+    // Real upsert only when a client + collection were injected via the
+    // constructor (see PacketValidatorMirrorClients) — this class never
+    // picks a default collection itself (this repo has more than one
+    // live 768-dim collection; that's a reviewed operator decision, not
+    // something to guess here). No injected client -> honest
+    // not_implemented, never a fabricated synced: true (PACKET-MATERIALIZER-01).
     if (packet.embedding_status === 'complete' && packet.embedding_768d) {
-      try {
-        const pointId = packet.qdrant_point_id || BigInt(crypto.randomBytes(6).readUIntBE(0, 6));
-        // Use canonical envelope shape for payload
-        report.mirrors.qdrant = { synced: true, pointId };
-      }
-      catch (e) {
-        report.mirrors.qdrant.error = `${e}`;
+      if (this.qdrantClient && this.qdrantCollection) {
+        try {
+          const pointId = packet.qdrant_point_id ?? BigInt(crypto.randomBytes(6).readUIntBE(0, 6));
+          await this.qdrantClient.upsert(this.qdrantCollection, {
+            wait: true,
+            points: [{
+              id: pointId.toString(),
+              vector: packet.embedding_768d,
+              payload: {
+                packet_key: envelope.packet_key,
+                source_ref: envelope.source_ref,
+                feature_id: envelope.feature_id,
+                trace_id: envelope.trace_id,
+              },
+            }],
+          });
+          report.mirrors.qdrant = { synced: true, pointId };
+        } catch (e) {
+          report.mirrors.qdrant = { synced: false, pointId: packet.qdrant_point_id ?? null, error: `${e}` };
+        }
+      } else {
+        report.mirrors.qdrant = {
+          synced: false,
+          pointId: packet.qdrant_point_id ?? null,
+          error: 'not_implemented: PacketValidator has no Qdrant client/collection wired in',
+        };
       }
     }
 
-    // Materialize to Neo4j (create/update node)
-    try {
-      const nodeId = packet.neo4j_node_id || crypto.randomUUID();
-      // Include trace_id in Neo4j node metadata for audit trail
-      report.mirrors.neo4j = { synced: true, nodeId };
-    }
-    catch (e) {
-      report.mirrors.neo4j.error = `${e}`;
+    // Materialize to Neo4j (create/update node). Real MERGE only when a
+    // driver was injected via the constructor — same reasoning as Qdrant.
+    if (this.neo4jDriver) {
+      const session = this.neo4jDriver.session();
+      try {
+        const nodeId = packet.neo4j_node_id ?? crypto.randomUUID();
+        await session.run(
+          `MERGE (p:AtlasPacket {packet_key: $packetKey})
+           SET p.node_id = $nodeId, p.source_ref = $sourceRef, p.feature_id = $featureId,
+               p.trace_id = $traceId, p.updated_at = datetime()
+           RETURN p.node_id AS nodeId`,
+          {
+            packetKey,
+            nodeId,
+            sourceRef: envelope.source_ref,
+            featureId: envelope.feature_id,
+            traceId: envelope.trace_id,
+          },
+        );
+        report.mirrors.neo4j = { synced: true, nodeId };
+      } catch (e) {
+        report.mirrors.neo4j = { synced: false, nodeId: packet.neo4j_node_id ?? null, error: `${e}` };
+      } finally {
+        await session.close();
+      }
+    } else {
+      report.mirrors.neo4j = {
+        synced: false,
+        nodeId: packet.neo4j_node_id ?? null,
+        error: 'not_implemented: PacketValidator has no Neo4j driver wired in',
+      };
     }
 
     // Materialize to Redis (cache key)
@@ -487,7 +558,7 @@ export class PacketValidator {
   private async fetchPacketFromCanonical(packetKey: string): Promise<AtlasPacketRegistry | null> {
     try {
       const result = await this.pgClient.query(
-        'SELECT * FROM atlas_packet_registry WHERE packet_key = $1',
+        'SELECT * FROM atlas_packet_runtime_v1 WHERE packet_key = $1',
         [packetKey]
       );
       return result.rows[0] || null;

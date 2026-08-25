@@ -30,6 +30,7 @@ const startedAt = new Date().toISOString();
 let status = 'PASS';
 try {
   run('npm', ['run', 'atlas:graphify:nlp:passes:dry'], 20 * 60 * 1000);
+  run('npm', ['run', 'atlas:ast-domain:baselines:dry'], 5 * 60 * 1000);
   run('npm', ['run', 'atlas:neural:prefill:validate'], 60 * 1000);
 } catch (error) {
   status = 'DEGRADED';
@@ -47,6 +48,9 @@ console.log(JSON.stringify({
   qdrantWrites: false,
   valkeyWrites: false,
   trainingStarted: false,
+  baselineModels: ['naive_bayes', 'logistic_regression'],
+  baselineReport: 'docs/reports/ast-domain-baselines-dry-v1.json',
+  baselinePromotion: 'BLOCKED_WEAK_CANDIDATE_LABELS',
   fallback: 'CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT',
 }, null, 2));
 

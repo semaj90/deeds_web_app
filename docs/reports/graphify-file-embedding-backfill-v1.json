@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-file-embedding-backfill.v1",
-  "generatedAt": "2026-08-24T17:30:52.852Z",
+  "generatedAt": "2026-08-24T22:09:50.654Z",
   "apply": false,
   "scope": {
     "table": "codebase_chunk_index",
@@ -43,5 +43,5 @@
       "textHash": "64996261185e943a2cb5dbf702a03917a732be9968925ba3c5c5e00a9093f696"
     }
   ],
-  "elapsedMs": 106
+  "elapsedMs": 291
 }

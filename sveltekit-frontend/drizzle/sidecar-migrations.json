@@ -309,6 +309,30 @@
       "validationCommand": "node scripts/atlas/enrich-ast-callable-search.mjs"
     },
     {
+      "file": "manual/20260825_atlas_packet_runtime_view_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive canonical packet read model over atlas_packets plus decomposed feature/metric tables. Repoints PacketValidator reads away from atlas_packet_registry; no table writes or registry backfill.",
+      "appliedBy": "operator",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs && npm --prefix packages/parent-atlas run test:packet-validator-materializer"
+    },
+    {
+      "file": "manual/20260825_graphify_files_compatibility_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied additive compatibility candidate for the existing legacy graphify_files table. Adds nullable lineage metadata and indexes only; requires read-only preflight before application and does not backfill rows.",
+      "appliedBy": "operator",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
+      "file": "manual/20260819_atlas_observation_feature_rows.sql",
+      "status": "applied",
+      "reason": "Active ORF packet_key + feature_revision metadata/filter contract. Aligned with Drizzle schema, observation repository, materializer, and spectral exporter; semantic ANN remains owned by the 768 vector lane.",
+      "appliedBy": "operator",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-observation-feature-row-contract.mjs && node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
       "file": "manual/20260819_atlas_observation_feature_rows_v1.sql",
       "status": "superseded_unapplied",
       "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied.",

@@ -20,6 +20,10 @@ const { mockRecordPromotionIntent } = vi.hoisted(() => ({
   mockRecordPromotionIntent: vi.fn(),
 }));
 
+const { mockReadKagHypergraphNeighborsV1 } = vi.hoisted(() => ({
+  mockReadKagHypergraphNeighborsV1: vi.fn(),
+}));
+
 vi.mock('./retrieve-candidates.js', () => ({
   retrieveAllCandidates: mockRetrieveAllCandidates,
 }));
@@ -37,6 +41,10 @@ vi.mock('./promote-results-outbox.js', () => ({
   recordPromotionIntent: mockRecordPromotionIntent,
 }));
 
+vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
+  readKagHypergraphNeighborsV1: mockReadKagHypergraphNeighborsV1,
+}));
+
 import { createSearchRuntime } from './search-runtime.js';
 import type { SearchResult } from './search-runtime.js';
 
@@ -51,6 +59,13 @@ describe('search runtime bridge', () => {
     mockHydrateCandidates.mockReset();
     mockHydrateCandidatesWithProof.mockReset();
     mockRecordPromotionIntent.mockReset();
+    mockReadKagHypergraphNeighborsV1.mockReset();
+    mockReadKagHypergraphNeighborsV1.mockResolvedValue({
+      requestedCanonicalIds: 0,
+      matchedTuples: 0,
+      matchedHyperedges: 0,
+      neighbors: [],
+    });
   });
 
   it('retrieves from multiple lanes, reranks canonically, and returns feature envelopes', async () => {
@@ -203,6 +218,128 @@ describe('search runtime bridge', () => {
     }));
     expect(result.provenance.rerankModel).toBe('mixedbread-ai/mxbai-rerank-base-v2');
     expect(result.provenance.rerankerUsed).toBe(true);
+    expect(result.provenance.hypergraphNeighbors).toBeUndefined();
+  });
+
+  it('populates provenance.hypergraphNeighbors from real KAG rows without altering packets/metadata (KAG next-steps item 1)', async () => {
+    mockRetrieveAllCandidates.mockResolvedValue([
+      {
+        id: 'chunk-bm25',
+        packetKey: 'packet-1',
+        sourceRef: 'src/lib/example.ts',
+        summary: 'bm25 summary',
+        content: 'bm25 content',
+        score: 0.9,
+        scoreSource: 'postgres_trigram',
+      },
+      {
+        id: 'chunk-qdrant-2',
+        packetKey: 'packet-2',
+        sourceRef: 'src/lib/other.ts',
+        summary: 'qdrant summary 2',
+        content: 'qdrant content 2',
+        score: 0.81,
+        scoreSource: 'qdrant',
+      },
+    ]);
+    const hydratedPackets = [
+      {
+        packet_key: 'packet-1',
+        source_ref: 'src/lib/example.ts',
+        relative_path: 'src/lib/example.ts',
+        summary: 'qdrant summary',
+        content: 'qdrant content',
+        retrieved_rank: 1,
+        cross_encoder_score: 0.92,
+        blended_score: 0.91,
+        rank_after: 1,
+        model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
+      },
+      {
+        packet_key: 'packet-2',
+        source_ref: 'src/lib/other.ts',
+        relative_path: 'src/lib/other.ts',
+        summary: 'qdrant summary 2',
+        content: 'qdrant content 2',
+        retrieved_rank: 2,
+        cross_encoder_score: 0.81,
+        blended_score: 0.79,
+        rank_after: 2,
+        model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
+      },
+    ] as any;
+    mockHydrateCandidates.mockResolvedValue(hydratedPackets);
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes: hydratedPackets,
+      proof: {
+        canonicalJoinedCount: 2,
+        canonicalJoinMissingCount: 0,
+        workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0,
+        sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 1,
+        graphScoreMissingCount: 1,
+        summaryResolvedCount: 2,
+        summaryStaleRejectedCount: 0,
+        validationReasons: {},
+      },
+    });
+    mockRerankCanonicalFeatureEnvelopes.mockResolvedValue({
+      results: [
+        {
+          chunk_id: 'chunk-qdrant',
+          packet_key: 'packet-1',
+          source_ref: 'src/lib/example.ts',
+          relative_path: 'src/lib/example.ts',
+          summary: 'qdrant summary',
+          content: 'qdrant content',
+          retrieved_rank: 1,
+          cross_encoder_score: 0.92,
+          blended_score: 0.91,
+          rank_after: 1,
+          model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
+        },
+      ],
+      provenance: {
+        cacheStatus: 'miss',
+        cacheKey: 'rerank:v1:test',
+        modelVersion: 'mixedbread-ai/mxbai-rerank-base-v2',
+        rendererVersion: 'search-runtime-v1',
+        authScope: 'public',
+        topK: 2,
+        maxLength: 4096,
+        crossEncoderAttempted: true,
+        crossEncoderUsed: true,
+        fallbackUsed: false,
+        latencyMs: 3,
+      },
+    });
+    mockRecordPromotionIntent.mockResolvedValue(1);
+    mockReadKagHypergraphNeighborsV1.mockResolvedValue({
+      requestedCanonicalIds: 1,
+      matchedTuples: 1,
+      matchedHyperedges: 1,
+      neighbors: [{ canonicalId: 'packet-1', hyperedgeIds: ['hyperedge:abc123'] }],
+    });
+
+    const runtime = createSearchRuntime({ userId: 'user-1' });
+    const result = await runtime.search({
+      text: 'canonical rerank spine',
+      topK: 2,
+    });
+
+    // Additive contract: packets/metadata are unaffected by the hypergraph lookup.
+    expect(result.packets).toHaveLength(1);
+    expect(result.packets[0]?.packet_key).toBe('packet-1');
+    expect(result.metadata.candidatesReranked).toBe(1);
+
+    // The new evidence is attached to provenance only.
+    expect(mockReadKagHypergraphNeighborsV1).toHaveBeenCalledWith(['packet-1']);
+    expect(result.provenance.hypergraphNeighbors).toEqual([
+      { canonicalId: 'packet-1', hyperedgeIds: ['hyperedge:abc123'] },
+    ]);
   });
 
   it('accepts hostile query strings as data and preserves the search contract', async () => {

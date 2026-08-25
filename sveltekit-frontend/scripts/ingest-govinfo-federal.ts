@@ -334,7 +334,7 @@ async function ensureQdrantCollection(): Promise<void> {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				vectors:     { size: 768, distance: 'Cosine', on_disk: true },
-				sparse_vectors: { bm25: {} },
+				sparse_vectors: { bm25: { modifier: 'idf' } },
 				hnsw_config: { on_disk: true },
 			}),
 		});
@@ -345,7 +345,7 @@ async function ensureQdrantCollection(): Promise<void> {
 			await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ sparse_vectors: { bm25: {} } }),
+				body: JSON.stringify({ sparse_vectors: { bm25: { modifier: 'idf' } } }),
 			});
 		} catch { /* already configured */ }
 	}
