@@ -7497,3 +7497,30 @@ Qdrant's own upgrade guidance (1.18.2 -> 1.19.0, no skipped minors). No data los
 drift, no collection loss. turbo4 quantization was NOT adopted for any canonical collection per
 the explicit operator instruction earlier in this tranche — remains a future, separately-decided
 challenger lane.
+
+## Post-push status check (2026-08-26)
+
+**multihop-codebase-map.enriched.json clarified**: this is a derived, regenerable snapshot (61,660
+nodes, up to 29 fields each — source_ref, Karpathy authority scores, Qdrant match status, SOM/
+cluster info) built by `scripts/atlas/regenerate-multihop-with-enrichment.mjs` by reading live
+Postgres + Qdrant + Redis. It is NOT a source of truth and nothing writes it back into the
+canonical stores. It was untracked from git this session (`git rm --cached` + `.gitignore` entry,
+which is what produced the 921,373-line "deletion" in the push commit) because the correctly-
+regenerated version is 114.5MB, well past this repo's own pre-commit size rejection threshold.
+It remains rg-searchable via an explicit negation entry in `.rgignore` even though git no longer
+tracks it — two independent ignore systems, deliberately configured differently for this one file.
+
+**Parent Atlas workstation status re-checked post-Qdrant-upgrade** (unchanged from the pre-upgrade
+read — today's Qdrant 1.19 migration and Ornith 1.5 launcher work did not touch the canonical
+packet spine):
+- `canonicalSpine: NEEDS_REBUILD` (still explicit, not yet actioned)
+- Identity coverage: `source_ref`/`feature_id` both 100% (61,660/61,660) — solid, unchanged
+- Summary coverage: 11.2% (6,886/61,660) — still below its own 50% gate
+- Phase lanes 11-25: 2/15 marked `implemented`, but both still run in `execution_mode: mock`;
+  remaining 13 are `partial`/`planned`/`eval-only`, each with a named open gap
+- Workstation's own next-action recommendation unchanged: rebuild the canonical packet spine
+  before trusting any downstream Qdrant/Redis/Neo4j mirror — this remains the real next milestone,
+  not incremental phase-lane work.
+
+No new work performed in this entry — recording the status check itself for continuity, per this
+file's own convention of logging what was measured even when the answer is "unchanged."
