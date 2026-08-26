@@ -96,13 +96,14 @@ async function loadKarpathyScores(redis) {
 
 // ── Qdrant ANN search (named vector "content") ────────────────────────────────
 async function qdrantSearch(client, vector, limit) {
-  const result = await client.search(COLLECTION, {
-    vector: { name: 'content', vector },
+  const result = await client.query(COLLECTION, {
+    query: vector,
+    using: 'content',
     limit,
     with_payload: true,
     with_vector: false,
   });
-  return result ?? [];
+  return result?.points ?? [];
 }
 
 // ── sourceRef normalization ───────────────────────────────────────────────────

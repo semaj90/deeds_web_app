@@ -82,12 +82,28 @@ export async function batchSearch(
   const qdrant = getQdrantManager();
   const t0 = Date.now();
 
-  // Try native batch path via multiQuerySearch (uses /query/batch internally)
+  // Use the native Query API batch path when the aligned SDK exposes it.
   try {
-    if (typeof (qdrant as any).batchQuery === 'function') {
-      const raw = await (qdrant as any).batchQuery({ collection, queries });
+    if (typeof (qdrant.client as any).queryBatch === 'function') {
+      const searches = queries.map((q) => {
+        const profile = efProfile ?? inferEfProfile({ limit: q.limit ?? 10 });
+        const vector = q.vectorName
+          ? { name: q.vectorName, vector: q.vector }
+          : q.vector;
+        return {
+          query: Array.isArray(vector) ? vector : vector.vector,
+          ...(Array.isArray(vector) ? {} : { using: vector.name }),
+          limit: q.limit ?? 10,
+          score_threshold: q.scoreThreshold ?? 0.0,
+          with_payload: true,
+          with_vector: false,
+          params: { hnsw_ef: efForProfile(profile) },
+          ...(q.filter ? { filter: q.filter } : {}),
+        };
+      });
+      const raw = await (qdrant.client as any).queryBatch(collection, { searches });
       return {
-        results: raw,
+        results: (raw as Array<{ points?: BatchSearchResult[] }>).map((result) => result.points ?? []),
         collection,
         durationMs: Date.now() - t0,
         nativeBatch: true,
@@ -120,7 +136,13 @@ export async function batchSearch(
           searchRequest['filter'] = q.filter;
         }
 
-        const raw = await (qdrant.client as any).search(collection, searchRequest);
+        const vector = searchRequest.vector as number[] | { name: string; vector: number[] };
+        const queryRequest = Array.isArray(vector)
+          ? { ...searchRequest, vector: undefined, query: vector }
+          : { ...searchRequest, vector: undefined, query: vector.vector, using: vector.name };
+        delete queryRequest.vector;
+        const response = await (qdrant.client as any).query(collection, queryRequest);
+        const raw = response?.points ?? [];
 
         return (raw as any[]).map((r: any) => ({
           id: r.id,

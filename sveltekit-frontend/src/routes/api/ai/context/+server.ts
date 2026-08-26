@@ -83,8 +83,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 			if (embedding?.length === 768) {
 				const client = getQdrantClient();
-				const results = await client.search('legal_documents', {
-					vector: embedding,
+				const { points: results } = await client.query('legal_documents', {
+					query: embedding,
 					limit,
 					with_payload: true
 				});

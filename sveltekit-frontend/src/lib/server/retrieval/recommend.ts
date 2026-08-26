@@ -128,26 +128,24 @@ export async function recommend(params: RecommendParams): Promise<RecommendRespo
   const positiveSet = new Set(positiveIds.map(String));
 
   try {
-    const recommendRequest: Record<string, unknown> = {
+    const recommendQuery: Record<string, unknown> = {
       positive: positiveIds,
+      strategy: params.strategy ?? 'average_vector',
+    };
+    if (negativeIds.length > 0) recommendQuery.negative = negativeIds;
+
+    const queryRequest: Record<string, unknown> = {
+      query: { recommend: recommendQuery },
       limit,
       with_payload: true,
       with_vector: false,
       score_threshold: params.scoreThreshold ?? 0.0,
-      strategy: params.strategy ?? 'average_vector',
     };
+    if (params.vectorName) queryRequest.using = params.vectorName;
+    if (params.filter) queryRequest.filter = params.filter;
 
-    if (negativeIds.length > 0) {
-      recommendRequest['negative'] = negativeIds;
-    }
-    if (params.vectorName) {
-      recommendRequest['using'] = params.vectorName;
-    }
-    if (params.filter) {
-      recommendRequest['filter'] = params.filter;
-    }
-
-    const raw = await (qdrant.client as any).recommend(collection, recommendRequest);
+    const response = await (qdrant.client as any).query(collection, queryRequest);
+    const raw = response?.points ?? [];
 
     const results: RecommendResult[] = (raw as any[])
       // Belt-and-suspenders: exclude any positive IDs that Qdrant returned

@@ -111,15 +111,23 @@ export class QdrantApiWrapper {
     async search(collectionName: string, options: {
 	vector: number[]; limit?: number; offset?: number; score_threshold?: number; with_payload?: boolean; with_vector?: boolean; filter?: any }) {
         try {
-            const response = await this.client.search(collectionName, options);
+            const response = await this.client.query(collectionName, {
+                query: options.vector,
+                limit: options.limit,
+                offset: options.offset,
+                score_threshold: options.score_threshold,
+                with_payload: options.with_payload,
+                with_vector: options.with_vector,
+                filter: options.filter,
+            });
             logger.debug(`Search completed in ${collectionName}`, {
                 component: 'QdrantApiWrapper',
                 service: 'qdrant',
                 collection: collectionName,
-                resultsCount: response.length,
+                resultsCount: response.points.length,
                 scoreThreshold: options.score_threshold
             });
-            return response;
+            return response.points;
         } catch (error) {
             logger.error(`Search failed in ${collectionName}`, error, {
                 component: 'QdrantApiWrapper',

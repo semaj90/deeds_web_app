@@ -11,6 +11,380 @@ This queue is the active execution order. Historical receipts, Temporal mapping
 evidence, and earlier design proposals remain below and must not be read as
 permission to bypass these gates.
 
+### PostgreSQL contract mirror checkpoint (2026-08-25)
+
+- The valid root command is `npm run audit:drizzle`, which runs
+  `scripts/atlas/audit-postgres-contract-mirrors.mjs`. The similarly named
+  frontend script is absent and must not be used as a migration proof.
+- The audit checked `6` tables: `3` were statically aligned, `0` were live
+  aligned, and `0` were unavailable. Live column mismatches remain for
+  `atlas_packets`, `task_semantic_packets`, `nes_chrom_packets`,
+  `nes_chrom_kag_dag_hits`, `parent_atlas_documents`, and
+  `route_runtime_packets`.
+- This is a contract-drift audit only. It does not authorize schema repair,
+  migration apply, table recreation, or data deletion. Report:
+  `docs/reports/postgres-contract-mirrors-report.json`.
+
+### Migration owner reconciliation (2026-08-25)
+
+- `audit-atlas-migration-owners.mjs` found the live shapes aligned for
+  `graphify_files`, `atlas_callable_search`,
+  `atlas_observation_feature_rows`, and `atlas_symbol_registry`; all currently
+  have zero rows where measured.
+- `atlas_file_search_index_v1` is registered but unapplied. It remains a
+  rebuildable search projection and is not required for the canonical packet
+  or Graphify lineage canary.
+- The competing candidate-ID/workspace ORF contract is classified
+  `SUPERSEDED_TABLE_NAME_COLLISION`. Do not apply it or create a second
+  observation-feature table. Report:
+  `docs/reports/atlas-migration-owner-audit-v1.json`.
+
+### Observation feature-row contract checkpoint (2026-08-25)
+
+- `audit-observation-feature-row-contract.mjs` passed with
+  `PASS_ACTIVE_ORF_REPOSITORY_ALIGNED`. The active owner is
+  `sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql`
+  with primary key `packet_key + feature_revision`.
+- The active contract matches the Drizzle schema, SvelteKit materializer,
+  Parent Atlas repository, and spectral exporter. It remains exact/filter-only;
+  `semantic_768` stays in the canonical vector lane.
+- The incompatible `candidate_id + workspace_revision + semantic_768`
+  migration remains excluded. This audit was repository-only and performed no
+  live database writes.
+
+### Cross-lane indexing surface checkpoint (2026-08-25)
+
+- `audit-atlas-indexing-surfaces.mjs` confirms PostgreSQL 18.4, pgvector
+  `0.8.3`, pg_trgm, and the current AST dependencies are reachable. The audit
+  is read-only.
+- Current measured gaps remain: canonical `semantic_768` is populated for
+  `576/52,417` chunk rows; `atlas_packet_features.ast_symbols` covers
+  `12,497/61,660` packets; `atlas_structural_reference_resolutions` has `0`
+  rows; and no explicit PostgreSQL bitmap-routing table exists.
+- AST extraction fallback references remain in three historical phase scripts,
+  while the active AST backfill reports zero regex matchers. Treat the active
+  backfill as the structural owner and audit historical scripts before reuse.
+- The audit also reports undeclared manual SQL files in the Drizzle sidecar
+  inventory. Do not bulk-register or apply them; reconcile each file against
+  the migration-owner audit first.
+
+### AST identity idempotency checkpoint (2026-08-25)
+
+- `prove-ast-backfill-idempotency.mjs` passed deterministic row construction:
+  `1,000/1,000` valid rows, `0` construction mismatches, and `0` constraint
+  violations. No database writes occurred.
+- The bounded sample is not apply-ready: it contains `17` duplicate identity
+  groups and `196` case-variant groups. Parent linkage is also unresolved for
+  method candidates because the proof uses root placeholders.
+- Apply remains blocked by AST-ID-06 decisions for path relativity, case
+  normalization, method/chunk scope, and vendored/legacy-tree exclusion. Do
+  not promote this sample or treat its `1,000` net-new estimate as corpus
+  coverage.
+
+### AST bridge revision comparison (2026-08-25)
+
+- `compare-ast-bridge-revisions.mjs` compared `59,915` fresh declaration
+  candidates with `7,565` existing AST rows across `799` shared files.
+- It found `3,780` mismatched candidate rows, but `0` files with proven
+  revision drift, hash drift, or missing current source. `554` files are
+  classified `REVISION_AUTHORITY_UNAVAILABLE` because `graphify_files` has no
+  persisted rows; this is not evidence that the parser is wrong.
+- Existing rows include parser provenance such as
+  `tree-sitter:chunk-index-v1`, so they must be treated as historical or
+  provisional until the Graphify file revision owner is populated. Do not
+  bulk-promote the mismatch set before that authority exists.
+
+### AST scope policy checkpoint (2026-08-25)
+
+- The frozen active-app scope report contains `9,547` included files and
+  `3,244` directories. It excludes `claude-mem`,
+  `llama-cpp-turboquant-gemma4`, and the legacy root `src` tree, in addition
+  to build, archive, backup, dependency, and temporary directories.
+- The newer 100-row scope output is only a fixture and must not be used as
+  full-corpus coverage. The active-app scope report is the correct policy
+  input for the next declaration artifact, with the daily Graphify inventory
+  remaining its authority.
+
+### Phase 2 payload mirror checkpoint (2026-08-25)
+
+- **READ-ONLY PREPARATION PROVEN.** `node scripts/atlas/upsert-qdrant-packet-payload.mjs --dry-run --limit=100`
+  prepared `100` direct `codebase_chunk_index` rows for the legacy
+  `codebase_chunks_768` collection, with `0` errors and no Qdrant writes.
+  The receipt is `docs/reports/upsert-qdrant-packet-payload.json`.
+- **APPLY REMAINS BLOCKED.** This writer is a payload-mirror lane, not the
+  canonical identity repair owner. Do not run `--apply` until the exact
+  `packet_key`/`source_ref`/hash/revision admission and bounded Qdrant
+  readback gates pass. Current PostgreSQL content-hash coverage remains
+  insufficient for a corpus-wide staleness-safe claim.
+- **GPU HANDOFF PROVEN SEPARATELY.** The same revision-qualified
+  CandidateOrdinal feature fixture passed PyTorch CUDA parity and the bounded
+  residency lease proof; cuGraph/cuTile parity and decoder training remain
+  separate gates.
+- **BOUNDED APPLY OBSERVED, NOT PROMOTED.** A prior operator run applied the
+  compatibility path to `1,000` chunk rows and reported `33,981` Qdrant point
+  payload updates with `0` errors. This proves the source-ref point-resolution
+  and additive payload write path at that batch size; it does not prove
+  hash/revision freshness or corpus completion. Any unbounded run started
+  before this guard was added remains `SOURCE_REF_PATH_ONLY_DEGRADED`.
+- **LINEAGE GUARD ADDED.** `upsert-qdrant-packet-payload.mjs` now emits
+  `identity_resolution_source` and supports `--require-lineage`. That mode
+  requires non-null, equal `codebase_chunk_index.content_hash` and
+  `atlas_packets.content_hash`, plus a non-null packet `source_revision`,
+  before a row can be selected. Use it for any future promotion candidate;
+  the default compatibility mode must remain explicitly degraded.
+- **gRPC TRANSPORT ADDED AS OPT-IN.** Docker service `legal-ai-qdrant` exposes
+  `6333` (REST) and `6334` (gRPC). The official Qdrant gRPC client resolved
+  `12` live points for a known `source_ref` in a read-only probe. The writer
+  now supports `--grpc` and records `transport`/`grpc_endpoint`; the active
+  compatibility run was not restarted or changed. gRPC is a transport
+  optimization only and does not change Qdrant projection ownership or
+  canonical identity rules.
+- **TRANSPORT SMOKE BENCHMARK.** For one small filtered source lookup, the
+  live read measured gRPC `1,883 ms / 12 points` versus REST `32 ms / 12
+  points`. This does not reject gRPC for larger batches, but it does reject
+  assuming gRPC is faster for the current scroll-per-source workload. Keep
+  REST as the default until a representative batch benchmark proves a gain.
+- **FULL APPLY STOPPED PARTIAL.** The older REST process exited after
+  `4,000/52,417` chunk rows, reporting `136,151` point updates, `3`
+  stale-skipped rows, and `0` errors in `upsert-full-run.log`. It did not emit
+  a terminal receipt; `docs/reports/upsert-qdrant-packet-payload.json` still
+  contains the prior 1,000-row receipt. Treat the projection as partially
+  written and incomplete. Run the identity/readback audit before any retry;
+  do not infer completion from the process exit alone.
+- **POST-APPLY IDENTITY AUDIT STILL BLOCKS PROMOTION.** The full read-only
+  Qdrant reconciliation scanned `106,338` points and `52,380` eligible
+  PostgreSQL rows: `99,603` matched, `1,557` ambiguous, `5,178` unmatched,
+  and `23,359` duplicate PostgreSQL mappings. Integer IDs were unique but not
+  continuous. Decision remains `REQUIRES_REBUILD_OR_REPAIR`; no repair or
+  rebuild was run.
+- **INTERRUPTION EVIDENCE ADDED.** The payload updater now writes
+  `docs/reports/upsert-qdrant-packet-payload-progress.json` with batch
+  heartbeats and explicit `RUNNING`, `COMPLETE`, `INTERRUPTED`, `FAILED`, or
+  dry-run status. A bounded dry run (`--limit=10`) produced
+  `DRY_RUN_COMPLETE` with `10/10` processed and no Qdrant writes. This closes
+  the prior observability gap where a process could exit at `4,000` rows
+  without a terminal receipt.
+- **IDENTITY AUDIT RERUN (READ-ONLY).** The current scan still found
+  `106,338` Qdrant points against `52,380` eligible PostgreSQL rows:
+  `104,019` matched, `1,425` ambiguous, `894` unmatched, and `6,937`
+  duplicate PostgreSQL mappings. Integer IDs remain unique but non-continuous.
+  Promotion and any new full apply remain blocked.
+- **JSON RECEIPT CAPTURED.** A fresh `--json` audit was captured at
+  `docs/reports/qdrant-768-identity-full-v2.json` after stripping the
+  sidecar's startup banners. It records `106,338` points, `52,380` eligible
+  PostgreSQL rows, `104,543` matched, `1,616` ambiguous, `796` unmatched,
+  `6,563` duplicate PostgreSQL mappings, and `safe_for_retrieval: false`.
+  The console and JSON counts varied slightly across successive scans because
+  the projection was changing; the persisted JSON receipt is the current
+  evidence artifact.
+- **CAUSE-CLASSIFIED IDENTITY AUDIT CAPTURED.** The subsequent read-only
+  receipt `docs/reports/qdrant-768-identity-full-v3.json` is the latest
+  persisted snapshot after the partial compatibility apply stopped. It records
+  `106,338` Qdrant points against `52,380` eligible PostgreSQL rows:
+  `104,309` matched, `1,661` ambiguous, `368` unmatched, and `5,865`
+  PostgreSQL rows with multiple Qdrant point mappings. The ambiguous set is
+  explainable rather than a generic join failure: `1,381` are
+  `source_ref+hash 2-way`, `4` are `source_ref+hash 3-way`, `275` are
+  `chunk_id 2-way`, and `1` is `chunk_id 3-way`. The unmatched set is `368`
+  `no matching Postgres identity` rows.
+- **CHUNK FAN-OUT CONTRACT STILL OPEN.** These counts show that a canonical
+  packet can legitimately have multiple chunk-level Qdrant points, but the
+  current audit does not yet prove a revision-qualified `chunk_id`/ordinal
+  bridge for every fan-out. Do not collapse multiple points to one packet,
+  relax the identity gate, or call the collection promotion-ready. Define and
+  audit a packet-to-chunk projection relationship first; retain the current
+  `safe_for_retrieval: false` decision until that relationship and the `368`
+  unmatched points are explained.
+- **PARTIAL APPLY RECEIPT.** The older REST compatibility process stopped after
+  `4,000/52,417` source rows with `136,151` additive Qdrant point updates,
+  `3` stale-skipped rows, and `0` reported errors, but no terminal receipt.
+  `docs/reports/upsert-qdrant-packet-payload-progress.json` now provides the
+  required heartbeat/termination state for future runs. This is incomplete
+  projection work, not a completed Phase 2 gate; no retry should begin until
+  the fan-out identity contract is reviewed.
+- **FRESH AUDIT RECHECK.** A new read-only scan completed at
+  `2026-08-26T00:20:53.937Z` and confirms the collection remains usable for
+  inspection but not promotion: `106,338` total points, `52,380` exact
+  PostgreSQL-ID matches, `1,299` chunk-ID matches, `44,382` path/hash matches,
+  `6,444` Qdrant-ID matches, `1,610` ambiguous points, and `223` unmatched
+  points. The backfill generation accounts for `105,116` matched and `222`
+  unmatched points; the preexisting generation remains `999` matched and `1`
+  unmatched. Integer point IDs are unique but not continuous, and all three
+  identity gates remain false (`ambiguous=0`, `unmatched=0`,
+  `duplicate_postgres=0`). Counts changing between scans are further evidence
+  that the projection must be quiescent before a promotion receipt is issued.
+- **FAN-OUT DIAGNOSTICS ADDED.** `audit-qdrant-768-identity.mjs` now reports
+  packet fan-out cardinality and counts payload coverage for `chunk_id`,
+  `packet_key`, `content_hash`, `source_revision`, and `workspace_revision`.
+  This is diagnostic only: it does not reinterpret duplicate mappings as safe,
+  alter the promotion gates, or write to Qdrant/PostgreSQL. The next captured
+  receipt should use these fields to decide whether each multi-point packet has
+  a complete chunk identity or is an unexplained projection duplicate.
+- **FAN-OUT RECEIPT CAPTURED.** The enhanced read-only receipt is preserved at
+  `docs/reports/qdrant-768-identity-full-v4.json`. It records `106,338` points,
+  `52,380` mapped PostgreSQL rows, `5,660` rows with multiple Qdrant points,
+  and a maximum observed fan-out of `302` points for one PostgreSQL row. Only
+  `15,251` mapped rows have `chunk_id` on every point, while `52,314` have
+  `content_hash` on every point. Payload coverage is `106,338/106,338` for
+  `source_ref`, `106,095/106,338` for `packet_key`, `106,199/106,338` for
+  `content_hash`, and `0/106,338` for both `source_revision` and
+  `workspace_revision`. The receipt therefore confirms the missing
+  revision-qualified chunk bridge; do not promote or retry the payload apply.
+- **HISTORICAL WRITER CONFIRMED AS DRIFT SOURCE.** Review of
+  `sveltekit-frontend/scripts/atlas/backfill-qdrant-768-from-postgres.mjs`
+  confirms that the later-generation collection was built directly from
+  `codebase_chunk_index`, used `codebase_chunk_index.id` as the Qdrant point
+  ID, synthesized a packet key, and wrote `source_ref` from `relative_path`.
+  Its payload does not carry `chunk_id`, `source_revision`, or
+  `workspace_revision`, and defaults `workspace_id` to `phase108d-backfill`.
+  This explains why path/hash coverage is high while revision-qualified chunk
+  lineage is absent. Treat that writer as historical/non-canonical; do not
+  rerun or use it as a repair owner.
+- **PACKET/CHUNK BRIDGE AUDIT COMPLETED.** The existing read-only
+  `scripts/atlas/audit-packet-chunk-mapping.mjs` produced
+  `docs/reports/packet-chunk-mapping-audit.json` with `61,660` atlas packets
+  and `52,417` codebase chunks. Normalized `source_ref` yielded `87,950`
+  pairs but only `7,341` packet identities because the same source reference
+  maps to multiple packet rows. The audit found `35,570` ambiguous chunk
+  mappings, `6,921` packets mapped to multiple chunks, and `54,319` packets
+  without a chunk mapping. Explicit `packet_key`, `feature_id`, and
+  `tree_node_id` evidence produced `0` pairs; Qdrant-ID evidence produced
+  only `1,280` pairs. Status is `WARN`.
+- **SOURCE-GRAIN JOIN REJECTED.** This independently confirms that a
+  `source_ref`-only repair would collapse multiple packet identities and is
+  not an acceptable Qdrant repair strategy. The replacement bridge must use a
+  packet/chunk key with explicit chunk identity plus content hash and revision
+  lineage; do not backfill packet keys from source paths or rerun the
+  historical writer.
+- **LIVE SCHEMA KEY AUDIT.** PostgreSQL readback confirms both tables expose
+  candidate identity columns, but the current values do not form a usable
+  bridge: `atlas_packets.chunk_id` is UUID and `codebase_chunk_index.id` is
+  UUID, yet the exact `atlas_packets.chunk_id = codebase_chunk_index.id` join
+  returns `0` pairs. Explicit chunk metadata packet-key joins also return
+  `0`; exact `qdrant_point_id = qdrant_id` returns only `1,280` pairs. Among
+  embedded chunk rows, only `576` have `chunk_id`, `576` have `content_hash`,
+  `52` have an explicit packet key, and `0` have source or workspace revision
+  metadata. Do not add a migration that merely copies these sparse values;
+  the producer-side identity contract must be repaired first.
+- **GRAPHIFY PRODUCER DRY RUN.** The existing
+  `scripts/atlas/project-graphify-embeddings-qdrant.mjs --limit=128
+  --since-hours=720` dry run selected `128` canonical 768 rows without
+  writing Qdrant. Its receipt is
+  `docs/reports/graphify-embedding-qdrant-content-projection-v1.json`:
+  `128/128` source references and content hashes are present, only `7/128`
+  packet keys are present, and `0/128` source or workspace revisions are
+  present. This is the strongest current producer-side artifact, but it is
+  still not apply-ready because revision authority and packet-key coverage are
+  incomplete.
+- **UPDATER PROCESS CLOSED.** Process `9492` is no longer running. Its
+  `upsert-full-run.log` ends at `4,000/52,417` rows with `136,151` point
+  updates, `3` stale-skipped rows, and `0` reported errors; it emitted no
+  terminal completion receipt. The later
+  `upsert-qdrant-packet-payload-progress.json` was overwritten by a separate
+  `--dry-run --limit=10` check and therefore is not evidence for the full
+  apply. Treat the Qdrant projection as partial and do not infer completion
+  from the process exit.
+- **768 PRODUCER SAMPLE SCALED.** Re-running the same Graphify producer dry
+  run with `--limit=5000 --since-hours=720` selected only `576` rows, meaning
+  `576` is the full currently eligible content-768 subset in that scope, not a
+  sampling limit. Coverage is `576/576` source references,
+  `576/576` content hashes, `52/576` packet keys, and `0/576` source or
+  workspace revisions. The report remains dry-run-only and records
+  `projected: 0`; this does not authorize Qdrant writes or establish
+  repo-wide semantic-768 coverage.
+- **768 METADATA CONTRADICTION FOUND.** PostgreSQL readback shows the full
+  `576`-row `content_embedding_768` subset is physically stored in a
+  `vector(768)` column, but every one of those rows reports
+  `embedding_dimension = 384`. The current `embedding_model`/`embedding_version`
+  metadata is also from the legacy EmbeddingGemma task-prefix lane. Treat the
+  vectors as `DIMENSION_METADATA_CONTRADICTORY`, not as promoted
+  `semantic_768`; verify the producer and representation revision before any
+  Qdrant projection or derived-lane training.
+- **ACTIVE 768 WRITER CORRECTED.** `scripts/atlas/project-graphify-embeddings-qdrant.mjs`
+  now treats `content_embedding_768` as the canonical `semantic_768` lane and
+  emits `embedding_dimension: 768`, `representation_id: semantic_768`,
+  `representation_revision: semantic_768@v1`, and an explicit model revision.
+  It no longer copies the row's stale legacy `embedding_dimension`,
+  `embedding_model`, or `embedding_version` into new Qdrant payloads. A
+  bounded dry run selected `576` rows, projected `0`, and passed the new
+  768-contract assertions. This corrects future projection metadata only; it
+  does not repair PostgreSQL metadata or rewrite existing Qdrant points.
+- **768 SCRIPT ALIGNMENT COMPLETED.** The non-legacy
+  `backfill-qdrant-768-v2-uuid.mjs` and `backfill-qdrant-768-keyset.mjs`
+  scripts now read `codebase_chunk_index.content_embedding_768` instead of
+  the generic legacy `content_embedding` column and emit explicit 768
+  representation metadata. `upsert-qdrant-packet-payload.mjs` now hardcodes
+  the `semantic_768` payload contract (`qdrant_vector_dim: 768`, representation
+  revision, and embedding dimension) instead of falling back to stale row
+  metadata. All four modified scripts pass `node --check`; no apply command
+  or data write was run.
+
+### PostgreSQL lexical identity checkpoint (2026-08-25)
+
+- **MEASURED, NOT PROMOTED.** `node scripts/atlas/audit-postgres-fts-identity-coverage.mjs`
+  found `408/52,380` eligible chunk rows with an exact
+  `source_ref + content_hash` packet match (`0.78%`). `atlas_packets.content_hash`
+  is populated for `332/61,660` packets (`0.54%`).
+- **SOURCE-ONLY MATCHES ARE NOT ADMITTED.** `51,972` rows matched by
+  `source_ref` without hash agreement. No ambiguous source-reference groups
+  were found, but relaxing the hash gate would remove stale-document
+  detection and is therefore not allowed.
+- Frozen lexical queries produced `2,868` raw hits and only `3` canonical-bound
+  hits. Status remains `LOW_COVERAGE`; investigate hash semantics and lineage
+  ownership before any Qdrant apply or corpus-wide BM25 promotion.
+
+### Content-hash lineage diagnosis (2026-08-25)
+
+- `audit-atlas-packets-content-hash-source.mjs` confirms the safe packet/chunk
+  subset is exhausted: `332` unique single-chunk hash matches are already
+  populated; `4,148` packet source references map to multiple chunk hashes and
+  `57,180` have no chunk hash candidate.
+- `audit-atlas-packet-content-hash-lineage.mjs` found `58,207` packets with a
+  unique `atlas_artifacts.content_hash`, but `0` artifact-to-chunk hash
+  agreements. Artifact hashes therefore cannot be copied into the FTS join
+  column without changing hash grain semantics.
+- The next repair must establish whether the FTS index is intentionally
+  chunk-grained or needs a separate file-level identity projection. Do not
+  mass-update `atlas_packets.content_hash`, relax the adapter join, or apply
+  Qdrant payloads from artifact hashes.
+- The gated `atlas-packets-content-hash-backfill-v1.mjs --dry-run` then selected
+  `0` additional rows: `CH_BF_01` passed, `CH_BF_02` correctly failed because
+  no pending unambiguous candidates remain, and `postgresWrites` was `false`.
+  This closes the safe scalar backfill path. Receipt:
+  `docs/reports/atlas-packets-content-hash-backfill-v1-dry_run.json`.
+
+### File-level lineage owner checkpoint (2026-08-25)
+
+- `audit-live-source-lineage-tables.mjs` confirms the declared owner is
+  `public.graphify_files`, with `source_ref`, `source_revision`,
+  `content_hash`, and `workspace_revision` all present on PostgreSQL 18.4.
+- The owner is currently `SCHEMA_READY_EMPTY`: `0` rows, while
+  `atlas_source_refs` contains `22,487` hashed rows. `atlas_source_refs` is
+  not promoted as a substitute because its hash population includes fallback
+  path/symbol semantics and is not the approved Graphify file snapshot.
+- Next action is a bounded Graphify source-inventory canary using an existing
+  non-production workspace UUID. Do not copy `atlas_source_refs` into
+  `graphify_files` or infer workspace/source revisions from artifact hashes.
+- The previously listed root command path was stale. The proof owner is under
+  `sveltekit-frontend/scripts/atlas/`; rerunning
+  `npx tsx scripts/atlas/prove-graphify-source-inventory-writer-v2.mts --dry-run`
+  from that directory reached the gate and returned
+  `GRAPHIFY_CANARY_WORKSPACE_ID_REQUIRED`, with
+  `canonicalWriteAttempted: false` and workspace revision
+  `sha256:e235fc4e0ce191a7045e3d6c3553ac2f5b468dc629c2896e68ac3dc75b5ed3a4`.
+- The read-only workspace-manifest proof also returned
+  `PERSISTED_WORKSPACE_MANIFEST_NOT_FOUND` for the current revision
+  `sha256:0509819a3c1ee6593623729594fe7895498a238eefb9b8886ba1b633dd535207`
+  and expected source count `23,505`. `graphMayConsumeWorkspaceRevision` and
+  `postgresWritesAttempted` were both `false`; no UUID can be recovered from
+  the current persisted Graphify manifest.
+- Static migration safety is independently proven by
+  `audit-graphify-revision-migration-safety.mts`: the revision-authority
+  migration is additive-only, transaction-wrapped, has all required columns
+  and checks, and has no destructive findings. This proof reported
+  `databaseConnected: false`, so it does not replace live schema readback or
+  authorize applying the migration.
+
 1. **P0 — Preserve migration authority.** Keep Drizzle migration apply blocked.
    The journal expects `0040`, `0040_snapshot.json` is missing, and no sanctioned
    snapshot-recovery procedure exists. Do not run `drizzle-kit migrate`,
@@ -5998,3 +6372,1128 @@ new `pg_search` `bm25` index, on the same frozen 8-query set.
   concrete prerequisite for a real Recall@K/NDCG/MRR comparison. Nothing in this session attempted
   that — it's a genuinely separate, larger task (requires domain judgment about what's "relevant"
   to each query, not just more scripting).
+
+## 768-FIRST-SCRIPT-ALIGNMENT-02: active writers and audits corrected (2026-08-25)
+
+The active 768 embedding path now targets `codebase_chunk_index.content_embedding_768`.
+The generic `content_embedding` column is not a valid substitute for the canonical
+`semantic_768` lane.
+
+- [x] Updated `sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs` to
+  select, write, and measure `content_embedding_768`; it still requires 768-element
+  EmbeddingGemma output and defaults to dry-run.
+- [x] Updated the Graphify Qdrant projection, Qdrant 768 UUID/keyset backfills, payload
+  updater, identity audits, and post-backfill audit to use the canonical 768 column and emit
+  explicit `semantic_768`/dimension metadata.
+- [x] Updated the null-hash repair audits, Qdrant 768 latency benchmark, cross-store identity
+  audit, lexical corpus freeze, and 768 usage gate to read `content_embedding_768`.
+- [x] Preserved explicit 384/hybrid and generic compatibility scripts as legacy/diagnostic
+  surfaces; they are not allowed to populate or promote the 768 lane.
+- [x] JavaScript syntax and `git diff --check` passed for the changed files. No database,
+  Qdrant, cache, or embedding writes were performed.
+- [ ] Run the canonical backfill only after a reviewed dry-run confirms the embedding service
+  returns 768 dimensions and the operator approves the write. Existing 576 populated rows and
+  legacy metadata remain a separate reconciliation task; this change does not rewrite them.
+
+### 768 backfill dry-run follow-up (2026-08-25)
+
+- [x] Fixed stale schema references in `backfill-codebase-chunk-embeddings.mjs`: the live table
+  uses `relative_path`, has no `codebase_id` or `chunk_index`, and the writer now selects only
+  existing source columns.
+- [x] One-row dry-run passed against the live PostgreSQL 18 database: `54593` canonical 768
+  rows remain missing, `1/1` candidate processed, `1` valid 768-dimensional embedding produced,
+  final coverage unchanged at `576/55169`.
+- [x] Replaced the per-row embedding `UPDATE` loop with one `UNNEST` batch update per embedding
+  batch, retaining the `vector(768)` cast and row-count guard. This optimizes PostgreSQL write
+  throughput without changing the source key, embedding model, or representation contract.
+- [x] No Postgres, Qdrant, cache, or model-index writes occurred; `--apply` remains a separate
+  operator-approved action.
+- [x] Read-only runtime check confirmed Ollama `0.32.15` has `embeddinggemma:latest` loaded on
+  the RTX 3060 Ti: `size_vram=681417113` bytes and `7433/8192 MiB` currently used. GPU execution
+  is therefore proven for the embedding service; gRPC remains unnecessary for this path because
+  the supported Ollama embedding boundary is HTTP and the current bottlenecks are batching and
+  PostgreSQL write throughput.
+
+## INDEX-COVERAGE-RECONCILIATION-01: stop apply/delete and re-establish scope (2026-08-25)
+
+The indexing lane is now explicitly reconciliation-only. Do not run further Qdrant deletes,
+full-corpus applies, payload repairs, or index rebuilds until source scope and revision lineage
+are independently proven.
+
+- [x] Scanner exclusion ownership is centralized in
+  `scripts/atlas/lib/repo-scan-roots.mjs`; `.cache`, `.agent`, dot-directories, build output,
+  vendor-like trees, and other generated surfaces are excluded before indexing.
+- [x] `scripts/atlas/index-full-repo-for-search.mjs --dry-run --limit=10 --verbose` passed with
+  `25,353` current indexable files and zero writes. The dry-run did not select `.cache` or `.agent`
+  files, confirming the pilot scanner correction is wired into the active indexer.
+- [ ] Freeze `IndexableSourceManifestV1` with roots, exclusions, file policy, workspace revision,
+  and checksum before using any global coverage denominator.
+- [ ] Produce `AtlasIndexPilotReconciliationV1` for the 10 pilot paths and 173 removed Postgres
+  rows. Qdrant points remain pending; no source-ref-only deletion is authorized.
+- [ ] Classify Qdrant fan-out as `VALID_CHUNK_FANOUT`, `DUPLICATE_PROJECTION`,
+  `REVISION_COLLISION`, or `UNEXPLAINED`; the observed maximum fan-out of 302 is not yet corruption.
+- [ ] Propagate and independently read back `source_revision` and `workspace_revision` in both
+  Postgres and Qdrant. Current Qdrant coverage is `0` for both fields, so projection identity is
+  not revision-qualified.
+- [ ] Only after those gates: bounded 10-file real-source pilot, independent Postgres/Qdrant
+  readback, then a 100-file correctness/throughput proof. Full indexing and Qdrant cleanup remain
+  blocked.
+
+### Active writer alignment (2026-08-25)
+
+- [x] Corrected `scripts/atlas/index-full-repo-for-search.mjs` so its 768 writer targets
+  `codebase_chunk_index.content_embedding_768`, not the legacy generic column.
+- [x] Added explicit Qdrant payload metadata for `semantic_768`, representation revision,
+  dimension, model revision, and chunk content hash.
+- [x] Syntax check, diff check, and 10-file dry-run passed: `25,353` files discovered, 10 already
+  indexed, zero writes. No apply was run.
+- [ ] AST-grep/Tree-sitter observations may enrich chunk metadata only from a revisioned artifact;
+  the indexer must not invent `source_revision` or `workspace_revision` until those authorities
+  are available.
+
+### Opt-in AST-aware chunk adapter (2026-08-25)
+
+- [x] Added `--ast-manifest=<JSONL>` to `scripts/atlas/index-full-repo-for-search.mjs`.
+- [x] Valid span records are converted into bounded `AST_DECLARATION` chunks with
+  `node_kind`, `symbol_name`, `tree_node_id`, `symbol_version_id`, and optional
+  `source_revision` metadata.
+- [x] Files without valid AST records retain `TEXT_FALLBACK`; missing manifests fail closed rather
+  than silently pretending AST coverage exists.
+- [x] Structural metadata is carried as Qdrant payload/features only; it does not replace
+  `semantic_768`, `CandidateOrdinal`, or canonical Postgres identity.
+- [x] Default no-manifest dry-run passed with `25,354` files and zero writes. Invalid manifest
+  handling also failed closed as expected.
+- [ ] Produce and review the real revision-qualified AST JSONL artifact before any apply run.
+- [x] Extended the manifest adapter for ast-grep outline-style records: `file` paths,
+  nested `range.start/end.byte` offsets, signatures, direct members, content hashes, and optional
+  source/workspace revisions are preserved without becoming canonical identity.
+- [x] Reconfirmed the default text-fallback dry-run after the extension: `25,354` files found,
+  10 skipped as already indexed, zero writes.
+- [x] Ran the adapter against the real
+  `docs/reports/graphify-ast-declaration-candidates-active-v3.jsonl` artifact with explicit
+  `$lib`/`src` alias resolution and `--target sveltekit-frontend/src/lib --limit 10`: 10 files,
+  49 AST declaration chunks, zero errors, zero writes.
+- [ ] Do not promote the artifact's current `source_revision: workspace:0` values as canonical
+  source revisions. The artifact is structurally useful for chunk boundaries, but revision
+  authority still requires the separate Graphify lineage gate.
+
+### AST lineage gate readback (2026-08-25)
+
+- [x] `node scripts/atlas/audit-live-source-lineage-tables.mjs` passed schema discovery and
+  produced `docs/reports/live-source-lineage-table-audit.json` with canonical writes disabled.
+- [x] `graphify_files` has the required columns but remains empty (`0` rows), so it is
+  `SCHEMA_READY_EMPTY`, not revision proof.
+- [x] Current readback: `atlas_packets` has `61,660` rows and `workspace_revision` values but
+  `0` `source_revision` values; `codebase_chunk_index` has `55,206` rows and `0` revision values;
+  `atlas_ast_nodes` has `11,067` rows and `0` populated `source_revision` values.
+- [ ] The real AST artifact may drive read-only structural chunking, but no apply pilot is allowed
+  until `graphify_files` is populated and independently read back for source/content/workspace
+  lineage.
+
+### CUDA embedding backend wiring (2026-08-25)
+
+- [x] `scripts/atlas/index-full-repo-for-search.mjs` now supports the canonical
+  `EMBEDDING_BACKEND=llama_cpp_gguf` mode through `EMBED_SERVER_URL` (default
+  `http://127.0.0.1:8081`) and OpenAI-compatible `/v1/embeddings` batches.
+- [x] Ollama remains the default/fallback through `/api/embed`; a failed GGUF request falls back
+  without changing the semantic representation contract.
+- [x] Batch size follows `EMBED_MAX_BATCH`, defaulting to `64` for GGUF and `8` for Ollama.
+  Each response must contain exactly one finite 768-dimensional vector per input.
+- [x] The existing CUDA server proof reported `768` dimensions and sustained approximately
+  `2.25-2.69ms/document` at batches `32-64`; this is runtime evidence only, not indexing proof.
+- [ ] Do not launch a corpus apply through the faster backend until the source-lineage and pilot
+  reconciliation gates above pass.
+- [x] Added token-aware embedding admission with `EMBED_MAX_BATCH`, `EMBED_MAX_TOKENS`, and
+  `EMBED_MAX_BYTES`; the batcher stops before the next document would exceed any bound.
+- [x] AST-aware dry-run remains healthy after batching changes: 10 files produced 49 declaration
+  chunks with zero writes.
+
+### CUDA embedding backend to Graphify daily status (2026-08-26)
+
+- [x] CUDA/GGUF backend choice is implemented in
+  `scripts/atlas/index-full-repo-for-search.mjs` through
+  `EMBEDDING_BACKEND=llama_cpp_gguf` and `EMBED_SERVER_URL`.
+- [x] The backend supports bounded 768-dimensional batches, token/byte admission,
+  Ollama fallback, and AST-aware dry-run indexing.
+- [ ] The ordinary `graphify:daily` command does **not** yet invoke that backend.
+  Its configured semantic stage still points to `stage3-semantic-extraction.mjs`
+  and the startup wrapper currently runs 768 alignment/backfill planning checks.
+- [ ] Wire the backend into Graphify daily only as an explicit, read-only-first
+  backend choice, for example `GRAPHIFY_EMBEDDING_BACKEND=llama_cpp_gguf`, with
+  the existing lineage, 768 representation, and no-write gates preserved.
+- [ ] Do not mark this lane complete until a daily dry-run receipt records the
+  selected backend, endpoint, model revision, batch limits, vector dimension,
+  normalization, and fallback state.
+
+Status: `INDEXER_BACKEND_IMPLEMENTED / GRAPHIFY_DAILY_NOT_YET_WIRED`.
+
+### CUDA embedding backend to Graphify daily validation refresh (2026-08-26)
+
+- [x] Added opt-in daily validation controls to
+  `scripts/startup/run-graphify-daily-startup.mjs`:
+  `GRAPHIFY_DAILY_EMBEDDING=1`, `GRAPHIFY_DAILY_EMBEDDING_BACKEND`, and
+  `GRAPHIFY_DAILY_EMBEDDING_LIMIT`.
+- [x] The opt-in stage validates the CUDA/GGUF endpoint, runs a bounded indexer
+  dry-run, and emits `docs/reports/graphify-daily-embedding-backend-v1.json`.
+- [x] CUDA/GGUF endpoint probe passed: `8/8` vectors, all `768` dimensions,
+  `125 ms` total, `15.6 ms/text`.
+- [x] Bounded index dry-run passed: `2` files, `8` chunks, `0` errors, `0` writes.
+- [x] Default `graphify:daily` behavior remains unchanged unless the explicit
+  opt-in flag is set.
+- [ ] Actual daily corpus apply remains blocked by source-lineage reconciliation;
+  the new stage cannot bypass that halt.
+
+Status: `DAILY_BACKEND_VALIDATION_WIRED / DRY_RUN_PROVEN / APPLY_BLOCKED`.
+
+### SOURCE-LINEAGE-RECONCILIATION-02: lineage, synthesis, bitmap, and transport ownership (2026-08-26)
+
+- [x] Read-only lineage audit confirms the compatibility schema is present, but
+  `graphify_files` is empty. This is a data-authority gap, not a missing-table gap.
+- [x] Read-only hash audit remains the gate before populating `atlas_packets.content_hash`:
+  compare `atlas_source_refs`, `atlas_artifacts`, `codebase_chunk_index`, and packet rows;
+  only exact, semantically equivalent hash authorities may be proposed for backfill.
+- [ ] Produce one reconciliation receipt classifying each candidate as
+  `EXACT_HASH_AGREEMENT`, `UNIQUE_ARTIFACT_CANDIDATE`, `HASH_SEMANTICS_UNPROVEN`, or
+  `CONFLICTING_HASH`. No backfill is authorized from a count-only match.
+- [ ] Populate `graphify_files` only through the controlled source-inventory writer after a
+  non-production workspace UUID and independent source/readback receipt are available.
+- [ ] Require the same `workspace_revision`, `source_revision`, `content_hash`, and
+  `producer_revision` bundle before admitting AST chunks, Qdrant payloads, or synthesis input.
+
+Ownership corrections:
+
+- PostgreSQL 18 AIO/bitmap heap scans are executor behavior, not a bitmap data table and not
+  an embedding accelerator.
+- `atlas_file_search_index_v1` is a rebuildable CandidateOrdinal search projection, currently
+  unapplied. Do not apply it merely because AIO exists; require 768 coverage, lineage proof,
+  export parity, and rollback proof first.
+- `class_bitmap`/feature bitmaps remain derived routing state. They do not own source identity,
+  revisions, ontology, or synthesis truth. Do not create a second bitmap/bimap owner.
+- MessagePack is optional bounded-packet transport/cache encoding. JSONL remains the reviewable
+  receipt format and PostgreSQL JSONB remains the queryable projection. MessagePack must never
+  replace source lineage or canonical CandidateOrdinal ownership.
+- Synthesis consumes a validated, revision-qualified ACE packet and emits derived text plus an
+  evidence receipt. It may not mint `source_revision`, `content_hash`, `CandidateOrdinal`, or
+  ontology identity. Empty or contradictory lineage blocks synthesis.
+
+Migration policy:
+
+- [x] Existing `graphify_files` compatibility migration is additive and registered as an applied
+  manual sidecar; it added nullable compatibility columns/indexes and did not backfill rows.
+- [ ] Any future schema change must be a reviewed additive Drizzle/manual migration using
+  `ADD COLUMN IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`, or a separately reviewed new
+  projection table. No `DROP`, `DELETE`, `TRUNCATE`, destructive recreation, or automatic
+  historical backfill is permitted in this tranche.
+- [ ] Do not add a new canonical table for synthesis, MessagePack, bitmap routing, or lineage;
+  use the existing owners and register any new rebuildable projection in `sidecar-migrations.json`.
+
+Evidence:
+
+- `docs/reports/live-source-lineage-table-audit.json`
+- `docs/reports/atlas-packet-content-hash-lineage-v1.json`
+- `docs/reports/atlas-migration-owner-audit-v1.json`
+- `scripts/atlas/audit-live-source-lineage-tables.mjs`
+- `scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs`
+
+### SOURCE-LINEAGE-RECONCILIATION-02 refresh (2026-08-26)
+
+- [x] Read-only hash audit completed: `atlas_packets` has `61,660` rows but only
+  `332` `content_hash` values; `atlas_artifacts` has `58,305` content hashes;
+  `codebase_chunk_index` has `55,169` content hashes.
+- [x] Hash agreement is not sufficient for backfill: `6,685` source-ref/chunk hash
+  agreements exist, but `0` direct artifact/chunk hash agreements were found.
+  Source-ref matching is also ambiguous for `3,082` candidates.
+- [x] `58,207` packets have a unique artifact-hash candidate, but that is only a
+  proposal set. It does not prove that the artifact hash uses the same byte scope
+  as the chunk hash required by PostgreSQL FTS canonical identity.
+- [ ] Keep `atlas_packets.content_hash` backfill, source-ref-only FTS joins, Qdrant
+  cleanup, and bitmap projection apply blocked until the hash byte-scope contract
+  is proven with a bounded exact-byte sample.
+- [ ] Produce a bounded reconciliation preview that records hash authority,
+  byte-scope semantics, source revision, and conflict class before any write mode
+  is considered.
+
+Current report: `docs/reports/atlas-packet-content-hash-lineage-v1.json`.
+Result: `REVIEW_REQUIRED`; no database, vector, cache, or migration writes.
+
+### SOURCE-LINEAGE-RECONCILIATION-02 exact source authority refresh (2026-08-26)
+
+- [x] Ran `scripts/atlas/audit-atlas-packets-content-hash-source.mjs` in read-only mode.
+- [x] The only safe packet backfill set is exhausted: `332` packets map to exactly one
+  distinct `codebase_chunk_index.content_hash`, and all `332` are already populated.
+- [x] Remaining packet population is not safely inferable: `57,180` packets have no
+  chunk hash candidate and `4,148` have ambiguous chunk hashes.
+- [x] No packet hash backfill is pending. The unresolved population requires an explicit
+  packet-versus-chunk granularity decision; GPU speed, MessagePack, AIO, or a new bitmap
+  projection cannot resolve that semantic ambiguity.
+- [ ] Keep the exact `source_ref + content_hash` PostgreSQL FTS identity join unchanged.
+
+Report: `docs/reports/atlas-packets-content-hash-source-v1.json`.
+Result: `NO_PENDING_BACKFILL`; no database, vector, cache, or migration writes.
+
+### SOURCE-REF authority and freshness clarification (2026-08-26)
+
+- PostgreSQL is the canonical owner of the normalized `source_ref` lineage record;
+  it is not the owner of the source bytes. The workspace/Git checkout or approved
+  artifact store remains the observed byte source.
+- `source_ref` is a stable locator/key. It must not be treated as a whole-file hash,
+  packet identity, or proof that the current filesystem bytes are unchanged.
+- `graphify_files` is the existing file-level lineage owner for
+  `workspace_revision`, `source_ref`, `source_revision`, `code_source_revision`,
+  `content_hash`, `byte_length`, and run pointers. It is currently empty, but no
+  new source-lineage table is required.
+- `atlas_source_refs` remains a structural/source-reference projection with symbol
+  fan-out. Its `content_hash` values are not automatically whole-file authority.
+- Freshness is determined from a new source-inventory observation and its immutable
+  manifest/checksum, then recorded through `graphify_runs` and `graphify_files`.
+  `created_at`/`updated_at` and `last_seen_run_id` are audit timestamps/pointers;
+  they do not replace `workspace_revision` or byte-hash evidence.
+- A reconciliation report may include `observed_at`, filesystem stat metadata, and
+  hash classification, but adding a `last_fetched_at` column is not justified yet.
+  Add it only if a real query requires it and only through an additive migration.
+- Latest fetching must read the approved workspace/source inventory, not infer
+  freshness from Qdrant, MessagePack, Valkey, embeddings, or generated synthesis.
+
+### SOURCE-LINEAGE-RECONCILIATION-02 ownership freeze (2026-08-26)
+
+- PostgreSQL owns lineage metadata: `source_ref`, revisions, hashes, run IDs, and
+  timestamps. The workspace/Git checkout owns source bytes; PostgreSQL records
+  observations of those bytes.
+- `graphify_files` is the intended file-level owner. It exists but is empty, so the
+  design is correct but not operationally proven.
+- `atlas_packets` remains packet/chunk-level and is not the file-source authority.
+- No new lineage table is required.
+- `updated_at` is audit metadata, not freshness truth. Freshness requires
+  `workspace_revision`, manifest checksum, `content_hash`, and `last_seen_run_id`.
+- PostgreSQL 18 AIO is an execution optimization for sequential and bitmap heap
+  scans; it does not create a bitmap data model or resolve lineage semantics.
+  Reference: https://www.postgresql.org/docs/18/release-18.html
+- Qdrant may retain `source_ref` and revision fields as indexed projection payloads,
+  but they do not become canonical identity. Reference:
+  https://qdrant.tech/documentation/manage-data/indexing/
+- The bounded filesystem byte-scope preview remains the open gate. No migration or
+  backfill is authorized from this ownership clarification alone.
+
+### EMBED-EXEC-01: document embedding executor parity (2026-08-26)
+
+- [x] Bounded real-code parity check: Ollama and CUDA/GGUF both returned `768-D`
+  unit vectors for the same input; cosine similarity was `0.999984`.
+- [x] Pooling is recorded as `MEAN` for the tested GGUF metadata.
+- [x] Dimension and normalization checks passed for both backends.
+- [x] No catastrophic mixed-backend geometry mismatch was observed in the sample.
+- [ ] Do not call this perfect parity. Run a frozen `100-500` document fixture
+  covering TypeScript, Svelte, Markdown, JSON, SQL, short/long inputs, Unicode,
+  and near-token-limit documents.
+- [ ] Record cosine min/mean/p5, top-K neighbor overlap, Recall@K, p50/p95,
+  documents/sec, tokens/sec, and peak VRAM.
+- [ ] Introduce `AtlasDocumentEmbeddingExecutorV1` with role-aware
+  `QUERY`/`DOCUMENT` input, canonical `semantic_768`, and shared token/byte
+  batching policy before further backend-specific indexer growth.
+- [ ] Implement Ollama and llama.cpp CUDA executors behind that contract, then
+  wire the AST-aware indexer through the contract.
+
+Implementation update:
+
+- [x] Added `sveltekit-frontend/src/lib/server/atlas/embedding/document-embedding-executor-v1.ts`.
+  It defines the shared `semantic_768` document executor, role-aware `QUERY`/
+  `DOCUMENT` batches, token/byte/document limits, finite-vector validation, L2
+  validation, and Ollama/llama.cpp HTTP endpoint selection.
+- [x] Added focused tests for CUDA endpoint normalization and mixed-role rejection:
+  `document-embedding-executor-v1.spec.ts` passed `2/2`.
+- [ ] The full repository `svelte-check` did not finish during the bounded wait and
+  was stopped without a diagnostic; repository-wide typecheck remains unproven.
+- [ ] The standalone full-repo indexer still needs to be migrated to call this
+  TypeScript executor directly; current backend behavior remains separately
+  validated in `index-full-repo-for-search.mjs`.
+
+Execution order: `EMBED-EXEC-01` executor contract, `-02` Ollama,
+`-03` llama.cpp CUDA, `-04` token/byte/document batching, `-05` parity fixture,
+`-06` batch/concurrency benchmark. CUDA sample rows remain subject to the
+source-lineage and reconciliation halt.
+
+### QDRANT-EMBED-MIRROR-01: PostgreSQL-to-Qdrant semantic-768 handoff (2026-08-26)
+
+- [x] PostgreSQL daily embedding proof completed for the bounded default scope:
+  `128/128` rows written to `codebase_chunk_index.content_embedding_768`,
+  zero errors, with mixed CUDA/GGUF and Ollama execution after the real VRAM
+  guard triggered.
+- [x] Independent PostgreSQL readback confirmed one vector dimension only:
+  `768` for all 128 newly written rows.
+- [x] Read-only Qdrant semantic contract remains proven: the live collection is
+  reachable and its dense content/error/signature vectors are `768-D`.
+- [ ] Qdrant mirror synchronization is **not** proven by the PostgreSQL run.
+  The daily file backfill writes PostgreSQL only; the full-repo writer's Qdrant
+  upsert path remains blocked by source/revision identity reconciliation.
+- [ ] Do not run a Qdrant embedding apply or broad mirror sync until each point
+  has a revision-qualified `source_ref`, `content_hash`, `source_revision`,
+  `workspace_revision`, representation revision, and deterministic packet/key
+  identity that independently reads back to PostgreSQL.
+- [ ] Run a read-only 128-row join census between the newly written PostgreSQL
+  rows and existing Qdrant points. Report exact, missing, ambiguous, stale,
+  and duplicate projection identities; do not repair by `source_ref` alone.
+- [ ] After the census passes, run a bounded Qdrant mirror pilot with additive
+  payload metadata and independent point/vector readback. Record vector
+  dimension, finite values, normalization, model revision, and point identity.
+- [ ] Only after the bounded pilot passes should a larger mirror batch be
+  considered. Full-corpus embedding remains separate from Qdrant runtime
+  upgrade and from source-lineage backfill.
+
+Full-corpus read-only audit (2026-08-26):
+
+- [x] Scanned `codebase_chunks_768`: `109,129` Qdrant points and `724` eligible
+  PostgreSQL rows.
+- [x] Classified `3,067` matched points, `68` ambiguous points, and `105,994`
+  unmatched points.
+- [x] Found `546` PostgreSQL rows mapped to multiple Qdrant points; integer IDs
+  were unique but not continuous, with `144` gaps.
+- [x] Decision: `REQUIRES_REBUILD_OR_REPAIR`; no repair, delete, rebuild, or
+  mirror write was performed.
+- [x] Fixed a display-only audit bug that printed the collection point count as
+  `undefined`; the report now prints the collection name and point count.
+
+GAN validation state: `CREATED` and `POSTGRES_PROVEN`; Qdrant mirror
+`WIRED_BUT_NOT_PROMOTED`; full retrieval `BLOCKED_ON_IDENTITY_AND_LINEAGE`.
+Qdrant remains a rebuildable projection and PostgreSQL remains canonical truth.
+
+### POSTGRES-FTS-IDENTITY-02: current lexical binding census (2026-08-26)
+
+- [x] Re-ran `scripts/atlas/audit-postgres-fts-identity-coverage.mjs` read-only.
+- [x] `52,380` chunk rows have both `source_ref` and `content_hash`; only `408`
+  have an exact canonical `atlas_packets` source-ref/hash match (`0.78%`).
+- [x] `atlas_packets.content_hash` remains `332/61,660` populated (`0.54%`).
+- [x] Frozen lexical queries produced `3,006` raw hits and only `3` canonical-
+  bound hits (`0.10%` bind rate).
+- [x] Recommendation remains `LOW_COVERAGE`: investigate hash semantics before
+  promotion.
+- [ ] Do not relax to `source_ref`-only, backfill from unproven artifact hashes,
+  apply the bitmap projection, or use this lane as canonical evidence yet.
+
+Report: `docs/reports/postgres-fts-identity-coverage-v1.json`.
+
+### RUNTIME-UPGRADE-01: Qdrant 1.19 and :8090 model/tooling separation (2026-08-26)
+
+This is a separate runtime tranche. It must not be used to bypass the
+source-lineage, semantic-768 identity, or full-indexing gates above.
+
+#### Qdrant 1.19
+
+- [x] Read-only live version check: the running server reports `1.18.2`.
+- [x] Confirmed the Docker compose service currently uses the floating
+  `qdrant/qdrant:latest` image with REST `6333` and gRPC `6334` exposed.
+- [x] Pinned both tracked Compose definitions to the verified current image
+  `qdrant/qdrant:v1.18.2`; no container restart or pull was performed.
+- [ ] Census every legacy `/collections/*/points/search`, `/recommend`, and
+  `/discover` caller and every SDK `.search()`/`.recommend()` call. Current
+  repository search found active legacy REST/SDK callers, including
+  `packages/parent-atlas-runtime/src/adapters/qdrant-recall.adapter.ts`,
+  `packages/parent-atlas/src/adapters/qdrant.ts`,
+  `packages/atlas-core/src/langgraph/clients.ts`, and multiple Atlas scripts.
+- [ ] Migrate callers to the Qdrant `/query` family and compatible SDK methods,
+  with focused parity tests for semantic, filtered, sparse, scroll, and payload
+  operations. Do not mass-rewrite historical backups or reports.
+- [ ] Update both root and `sveltekit-frontend` Qdrant SDK declarations to a
+  version compatible with the selected server, then run package lock/install
+  review. No dependency upgrade has been applied in this entry.
+- [ ] Create and independently verify collection snapshots before changing the
+  server. Qdrant documents same-minor or next-minor restore compatibility and
+  recommends stepping through each intermediate minor version.
+- [ ] Upgrade one minor at a time, with a bounded health/read/query parity
+  receipt after each step. No container restart or collection migration has
+  been performed here.
+- [ ] Benchmark Qdrant 1.19 filtering improvements and memory tiers only after
+  parity. `semantic_768` remains the canonical FP32 projection; TurboQuant is
+  a later storage/recall challenger because its 4-bit representation does not
+  preserve the original full-precision copy for the exact-rescore path.
+
+Evidence: live root response `version=1.18.2`; compose image
+`docker/docker-compose.gpu.yml`; repository legacy endpoint census; Qdrant
+upgrade, snapshot, and 1.19 release documentation.
+
+#### QDRANT-UPGRADE-02A: refreshed legacy API census (2026-08-26)
+
+- [x] Initial audit found the root REST client at `1.15.1` while the frontend
+  and Qdrant JS clients were `1.18.0`; the root npm dependency and installed
+  package have now been aligned to `1.18.0`.
+- [x] Read-only repository census outside backup/report trees found `112`
+  files containing SDK-style `.search()` calls, `97` files containing raw
+  `/points/search` endpoint references, `5` `searchBatch` references, and
+  `1` `.recommend()` reference. These are file counts, not invocation counts.
+- [ ] Classify each active hit as production retrieval, diagnostic, migration,
+  or compatibility code before editing. Historical backups and reports remain
+  excluded from the migration scope.
+- [ ] Migrate and parity-test the production subset to `/query`/`queryBatch`
+  before changing either SDK or the Docker image.
+- [ ] Pin the Docker image and create verified collection snapshots only after
+  the caller census is reviewed. No runtime upgrade or collection mutation was
+  performed by this census.
+
+- [x] Verified npm runtime resolution: root `@qdrant/js-client-rest@1.18.0`
+  and `@qdrant/qdrant-js@1.18.0` resolve without `npm ls` errors. The separate
+  `pnpm-lock.yaml` still contains historical `1.15.1` metadata and must not be
+  treated as the active npm install proof.
+
+Evidence: read-only `rg` census on `sveltekit-frontend/src`, `packages`, and
+`scripts`; package manifests; `docker inspect legal-ai-qdrant` showing
+`qdrant/qdrant:latest` and the two named durable volumes.
+
+#### QDRANT-QUERY-PARITY-01: live named-vector API probe (2026-08-26)
+
+- [x] Read-only probe confirmed `codebase_chunks_768` exposes named `content`,
+  `error`, and `signature` vectors, each `768-D` cosine.
+- [x] Modern `POST /collections/codebase_chunks_768/points/query` succeeded
+  with `using=content`, a finite `768-D` query vector, and one result.
+- [x] The legacy `/points/search` probe did not accept the named-vector
+  `using` shape and returned a `400`; this is API-shape evidence, not a data
+  failure. Production callers must be migrated and parity-tested using the
+  actual request shapes they send.
+- [ ] Do not upgrade to Qdrant `1.19` until the active legacy callers are
+  migrated to the Query API and semantic/filtered/sparse parity receipts pass.
+
+#### QDRANT-QUERY-MIGRATION-01: shared frontend facade (2026-08-26)
+
+- [x] Updated `sveltekit-frontend/src/qdrant-client.ts` to use the Qdrant
+  Query API for both SDK and HTTP fallback paths.
+- [x] Preserved the facade's existing `search()` return contract by unwrapping
+  the Query API `{ points: [...] }` response.
+- [x] Converted existing named-vector payloads into Query API `query` plus
+  `using` fields without changing callers or collection data.
+- [ ] Remaining raw retrieval callers still require individual migration and
+  parity tests; this change does not claim repository-wide API completion.
+
+Validation: shared facade contains no `/points/search` or SDK `.search()` path;
+retrieval typecheck remains affected by pre-existing errors elsewhere in the
+retrieval tree. No Qdrant writes or container operations were performed.
+
+#### QDRANT-QUERY-MIGRATION-02: active dense retrieval callers (2026-08-26)
+
+- [x] Migrated raw dense requests in `authority-chain.ts`,
+  `turbovec-search.ts`, and `unified-orchestrator.ts` from
+  `/points/search` to `/points/query`.
+- [x] Preserved named-vector selection (`using`), filters, score thresholds,
+  payload/vector flags, candidate limits, and `{ points: [...] }` response
+  unwrapping.
+- [ ] Remaining raw callers, batch search, sparse search, and recommendation
+  paths still require separate request-shape audits; repository-wide migration
+  is not complete.
+
+Validation: targeted source census shows no `/points/search` in the three
+migrated files; retrieval typecheck still reports unrelated pre-existing errors.
+No Qdrant writes or service restarts were performed.
+
+#### QDRANT-QUERY-MIGRATION-03: soft-routing dense lane (2026-08-26)
+
+- [x] Migrated `soft-routing-orchestrator.ts` from SDK `.search()` to
+  `query()` with `using: content` for `codebase_chunks_768`.
+- [x] Updated result handling to consume the Query API `points` envelope.
+- [ ] `batch-search.ts` and `summary-card-retrieval.ts` still use the shared
+  facade compatibility method; they are functionally routed through Query API
+  but should be renamed or separately tested before the 1.19 promotion gate.
+
+Validation: targeted TypeScript output showed no errors in the migrated dense
+files; no Qdrant writes or service restarts were performed.
+
+#### QDRANT-QUERY-MIGRATION-04: QdrantManager SDK owner (2026-08-26)
+
+- [x] Added one named-vector request translator in `qdrant-manager.ts`.
+- [x] Migrated the manager's remaining dense, evidence, chat-history, and
+  related-evidence reads from SDK `.search()` to `.query()`.
+- [x] Unwrapped Query API `points` while preserving existing manager result
+  arrays and metadata behavior.
+- [ ] Batch, sparse, recommendation, and raw REST callers outside this manager
+  still require their own parity review.
+
+Validation: no `this.client.search` calls remain in `qdrant-manager.ts`; targeted
+TypeScript output showed no errors for the migrated files. No Qdrant writes or
+service restarts were performed.
+
+#### QDRANT-QUERY-MIGRATION-05: batch fallback (2026-08-26)
+
+- [x] Migrated `batch-search.ts` fallback requests from SDK `.search()` to
+  `.query()`.
+- [x] Preserved named-vector conversion, filters, HNSW parameters, limits,
+  thresholds, and per-query result ordering.
+- [x] Unwrapped Query API `points` for the existing batch response contract.
+- [ ] Native `/query/batch` and remaining route-level callers still require
+  independent parity tests before the 1.19 promotion gate.
+
+- [x] Wired the native `queryBatch()` path in the aligned `1.18.0` SDK.
+- [x] Live read-only batch probe returned two result sets with one point each
+  from `codebase_chunks_768` using the named `content` vector.
+
+Validation: targeted TypeScript output showed no `batch-search.ts` errors; live
+`queryBatch()` probe passed; no Qdrant writes or service restarts were
+performed. Qdrant documents this endpoint as equivalent to independent queries
+with planner-sharing benefits.
+
+#### QDRANT-QUERY-MIGRATION-06: recommendation adapter (2026-08-26)
+
+- [x] Migrated `retrieval/recommend.ts` from SDK `.recommend()` to Query API
+  `query: { recommend: { positive, negative, strategy } }`.
+- [x] Preserved positive/negative validation, vector selection, filtering,
+  thresholds, payload flags, and positive-ID exclusion.
+- [x] Confirmed no legacy recommendation call remains in the adapter.
+- [ ] Run a fixture-backed live recommendation parity probe before the 1.19
+  promotion gate; sparse and route-level callers remain separate.
+
+Validation: targeted TypeScript output showed no `recommend.ts` errors; no
+Qdrant writes or service restarts were performed.
+
+#### QDRANT-QUERY-MIGRATION-07: graph-informed dense retrieval (2026-08-26)
+
+- [x] Migrated `graph-informed-retrieval.ts` from raw `/points/search` to
+  `/points/query` across its collection fanout.
+- [x] Preserved graph-neighbor payload filters, named-vector selection, score
+  threshold, limits, payload hydration, and content truncation.
+- [ ] RRF integration, search-lanes, hypergraph fusion, and route-level raw
+  callers remain separate migration units.
+
+Validation: targeted TypeScript output showed no errors for the migrated file;
+no Qdrant writes or service restarts were performed.
+
+Evidence: live read-only requests against Qdrant `1.18.2`; collection vector
+configuration readback; no point, payload, collection, or snapshot writes.
+
+#### Ornith 1.5-9B and :8090 tool calling
+
+- [x] Existing :8090 launcher already enables `--jinja` when supported and
+  uses the GGUF-embedded template for the current `hforf.gguf` path rather
+  than forcing the Gemma4 template onto it.
+- [x] Existing OpenCode provider points at `http://127.0.0.1:8090/v1` and
+  advertises tools for the configured local models.
+- [ ] Verify the live `/props` and `/v1/models` response for the currently
+  loaded model, including `supports_tools`, template source, model alias, and
+  reasoning mode. Configuration is not runtime proof.
+- [ ] Add a read-only OpenAI-compatible tool-call smoke fixture: one MCP-like
+  function schema, one request, valid `message.tool_calls`, valid JSON
+  arguments, and no XML/pseudo-tool text leaked as the final tool result.
+- [ ] Treat `ornith-ai/Ornith-1.5-9B` as a separate promotion candidate. The
+  official model card documents a custom `chat_template.jinja`, reasoning
+  output, and parser-dependent tool-call conversion; this does not prove the
+  local GGUF build or llama.cpp parser compatibility.
+- [ ] Before any :8090 model swap, verify the exact GGUF provenance,
+  quantization, context limit, embedded template, parser support, VRAM fit,
+  and OpenCode/MCP smoke result. Keep the current model available for rollback.
+- [ ] Do not persist hidden reasoning, `kv_cache`, or raw tensor material in
+  MCP/Atlas receipts; record only parser/template/model provenance and the
+  validated tool-call envelope.
+
+Current status: Qdrant upgrade `AUDIT_REQUIRED`; Ornith 1.5
+`MODEL_CANDIDATE_UNPROVEN`; current :8090 template wiring
+`IMPLEMENTED_RUNTIME_PROOF_PENDING`. No package install, model download,
+container restart, collection rebuild, or canonical data write occurred.
+
+References:
+
+- https://qdrant.tech/blog/qdrant-1.19.x/
+- https://qdrant.tech/documentation/operations/upgrades/
+- https://qdrant.tech/documentation/snapshots/
+- https://huggingface.co/ornith-ai/Ornith-1.5-9B
+- https://huggingface.co/ornith-ai/Ornith-1.5-9B/blob/main/chat_template.jinja
+
+#### Ornith template artifact (2026-08-26)
+
+- [x] Downloaded only the official `chat_template.jinja` from the
+  `ornith-ai/Ornith-1.5-9B` repository.
+- [x] Stored it beside the existing local GGUF at
+  `models/ornith-1_5-9b-ad-q5_k-q4_k/chat_template.jinja`.
+- [x] SHA-256: `9dd2fbd270feaa1fbef2d4f634d7887c9c506e3bde140f8e7351c8944e8fd235`.
+- [ ] Do not pass this file to :8090 yet. The current `hforf.gguf` launcher
+- [x] Added an explicit `ornith-1.5` launcher profile targeting
+  `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf` and its local template.
+- [x] Updated the standard SvelteKit `turbo:start` and detached start scripts
+  to select `-StartupProfile ornith-1.5` explicitly; added `turbo:start:legacy`
+  for the prior Ornith profile.
+- [x] Read-only live `/v1/models` check confirms the currently running process
+  is still `hforf.gguf`; no restart or live model swap was performed.
+- [ ] Do not make `ornith-1.5` the default :8090 model yet. The candidate
+  now owns the requested startup path, but still requires a live tool-call
+  smoke test before production promotion.
+- [x] Moved the former legacy `models/hfor/hforf.gguf` to
+  `C:\Users\james\Desktop\hforf.gguf` and renamed the candidate file to
+  `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf` for launcher compatibility.
+  The directory, template, and `ornith-1.5` profile preserve candidate
+  provenance; the old legacy profile remains separate.
+- [x] Candidate startup reached model/template validation but initially failed
+  because the launcher attached the incompatible Gemma4 `mmproj-F16.gguf`.
+  Updated the `ornith-1.5` profile to skip `--mmproj` for text/tool-calling
+  startup.
+- [x] Restarted :8090 with `-StartupProfile ornith-1.5`; launcher receipt
+  confirmed the candidate GGUF, local `chat_template.jinja`, external template
+  enabled, and `--jinja` enabled.
+- [x] Live OpenAI-compatible tool-call smoke passed: response finished with
+  `tool_calls`, function name `test_tool`, and valid JSON arguments
+  `{"city":"Paris"}`. The server reports the GGUF model id as `hforf.gguf`
+  from model metadata; the launcher profile remains the authoritative
+  `ornith-1.5` selection.
+- [ ] Record the exact GGUF provenance/quantization and verify that the local
+  candidate `hforf.gguf` corresponds to this template before enabling it.
+
+Source: https://huggingface.co/ornith-ai/Ornith-1.5-9B/blob/main/chat_template.jinja
+
+#### Embedding backend + indexing coverage investigation (2026-08-26)
+
+Real bugs found and fixed in `scripts/atlas/index-full-repo-for-search.mjs` /
+`scripts/atlas/lib/repo-scan-roots.mjs` / `scripts/atlas/karpathy-gpu-enrich.mjs`:
+
+- [x] `.cache`/`.agent`/`.docker-build` and other dot-directories were not excluded
+  from full-repo indexing scans; generalized `shouldSkipDirectory()` to skip any
+  dot-prefixed directory rather than maintain an incomplete explicit list.
+- [x] Cleaned up ~608 polluting chunks/points from a pre-fix pilot run (verified
+  removed from both Postgres `codebase_chunk_index` and Qdrant via direct readback).
+- [x] Fixed a real scroll-pagination truncation bug and a bare-path-variant bug in
+  `karpathy-gpu-enrich.mjs` (match rate went 0% -> 30% -> 147/200 = 73.5% across
+  successive fixes, each independently verified).
+- [x] Fixed `regenerate-multihop-with-enrichment.mjs`: removed a `LIMIT 5000` cap,
+  corrected output path/filename mismatch, restored the full 29-field node schema,
+  fixed a 193MB JSON bloat bug (raw vectors inlined instead of referenced), fixed a
+  >100% karpathy-enrich-rate reporting bug. Untracked the resulting large artifact
+  from git (`git rm --cached`) and gitignored it, matching sibling large-artifact
+  convention.
+- [x] Wired a dedicated CUDA embed server (this repo's own existing
+  `scripts/launch-embed-server.ps1` / `EMBEDDING_BACKEND=llama_cpp_gguf` mechanism,
+  port 8081) into `scripts/atlas/backfill-graphify-file-embeddings-768.mjs` as the
+  preferred backend, with automatic per-batch fallback to Ollama and a VRAM guard
+  (default 300MB free threshold, checked start/midpoint/end, fail-open never
+  fail-closed). Verified for real: normal run (918MB free) used CUDA cleanly; a
+  genuine low-VRAM run (479MB -> 174MB mid-run) correctly triggered the guard and
+  switched to Ollama without failing the job.
+- [x] Proved embedding parity between backends: same input, both vectors norm
+  1.000000, cosine(ollama, cuda) = 0.999984. `--pooling mean` confirmed correct via
+  the GGUF's own embedded metadata (`gemma-embedding.pooling_type = 1`).
+- [x] Real end-to-end proof: `--apply` (default scope, 128 rows) completed 128/128
+  written, 0 errors, mixed CUDA+Ollama backend usage from a real VRAM-guard trigger.
+  Independently verified in Postgres (128 rows in the last 5 min, all `vector_dims
+  = 768`).
+
+**Explicitly NOT done, blocked by operator's reconciliation halt (separate from the
+above, which only touches the small `--since-hours=24 --limit=128` daily scope)**:
+- [ ] `IndexableSourceManifestV1` (frozen file-inclusion/exclusion policy + checksum)
+  -- 0% built, no table, no migration.
+- [ ] Qdrant fan-out classification (5,660 Postgres rows map to multiple Qdrant
+  points, max 302) into VALID_CHUNK_FANOUT / DUPLICATE_PROJECTION /
+  REVISION_COLLISION / UNEXPLAINED -- not started.
+- [ ] Revision-qualified chunk identity contract (`source_revision` /
+  `workspace_revision` / `representation_revision`) -- confirmed live 2026-08-26
+  that these fields exist on zero Qdrant points collection-wide (sampled 50/109k+).
+  This remains the real blocker for the full ~23,970-file indexing gap, not
+  throughput -- a faster embedding backend does not resolve it.
+- [ ] `GanAuditOrchestrator` (`packages/atlas-core/src/validation/gan-audit-integration.ts`)
+  does not check `source_revision`/`workspace_revision` at all -- flagged as the
+  natural place to enforce the above contract once it exists, not yet done.
+
+Full session detail: `MULTIHOP-ENRICHMENT-STATUS.txt` (repo root) and
+`docs/reports/atlas-index-pilot-reconciliation-v1.json`.
+
+#### QDRANT-UPGRADE-03A: SDK 1.19.0 and Query API call-site alignment (2026-08-26)
+- [x] Pin root and `sveltekit-frontend` Qdrant REST/client SDKs to `1.19.0`.
+- [x] Confirm `npm ls` resolves `@qdrant/js-client-rest@1.19.0` and
+  `@qdrant/qdrant-js@1.19.0` in both package roots.
+- [x] Migrate bounded retrieval owners from removed legacy SDK methods to
+  `query()`, including batch query and recommendation request shapes.
+- [x] Migrate the directly-owned raw REST retrieval paths from `/points/search`
+  to `/points/query`, preserving named-vector selection and `points` responses.
+- [x] Keep the live Docker server at `1.18.2`; no restart, pull, collection
+  rebuild, snapshot restore, or data write was performed by this tranche.
+- [ ] Complete the remaining route/legacy compatibility census and migrate only
+  confirmed Qdrant callers; generic service `/search` endpoints are not Qdrant.
+- [ ] Run focused runtime parity against the live `1.18.2` server, then perform
+  the one-minor-at-a-time server upgrade only after the lineage halt is cleared.
+
+- [x] Add read-only SDK compatibility smoke covering server version, collection
+  read, stored-vector self-query, `queryBatch`, payload filtering, and
+  recommendation query shape. No Qdrant mutation is performed.
+- [x] Run the smoke against the live Docker endpoint: SDK `1.19.0` to server
+  `1.18.2`; result receipt is written to
+  `docs/reports/qdrant-sdk-compat-smoke-v1.json`.
+- [x] Strengthen the fixture: `scroll(with_vector=true)` supplies the exact
+  stored vector and the self-query must return the same point ID, isolating API
+  compatibility from EmbeddingGemma and query-vector generation.
+
+Proof update: the root `@qdrant/js-client-rest@1.19.0` client successfully ran
+`queryBatch()` against live `legal-ai-qdrant` `1.18.2`, returning two query sets
+(`1` and `0` points) without changing the container. The focused retrieval
+compile no longer reports direct `QdrantClient.search()` method errors. Remaining
+compile output is in `qdrant-manager.ts` result typing/error handling and other
+pre-existing project errors; remaining raw REST route census still includes
+legacy `/points/search` callers outside the migrated retrieval owners.
+
+Status: `SDK_ALIGNMENT_PROVEN_CALLSITE_MIGRATION_PARTIAL_SERVER_UPGRADE_BLOCKED`.
+Evidence: package manifests/locks, `npm ls`, TypeScript Qdrant error reduction,
+and Query API conversions in the shared retrieval owners. The remaining
+TypeScript failures are unrelated or pre-existing unless they mention a direct
+Qdrant legacy method. Qdrant remains a rebuildable projection, not canonical
+identity.
+
+Follow-up: migrated the shared `qdrant-http.ts`, `qdrant-api-wrapper.ts`,
+`search-lanes.ts`, and multivector query helpers to `/points/query`; all preserve
+read filters and normalize `points` responses. The compatibility smoke remains
+`PASS`. A fresh source census reports 59 remaining raw legacy endpoint
+references, down from 64; those are route/MCP/legacy adapters and remain open
+until individually classified and migrated.
+
+#### QDRANT-UPGRADE-03C: raw REST envelope correction (2026-08-26)
+
+- [x] Verified the live raw REST Query API envelope independently:
+  `{ result: { points: [...] }, status: "ok" }` on server `1.18.2`.
+- [x] Corrected raw REST callers that had adopted the SDK response shape and
+  could therefore return empty results without an error:
+  `qdrant-http.ts`, ACE context/health/query-router, and RRF seeded queries.
+- [x] Preserved compatibility fallbacks for already-normalized responses.
+- [x] No SDK caller was changed; SDK `client.query()` continues to consume
+  its direct `.points` result.
+- [x] Reconfirmed the upgrade backup manifest exists with the PostgreSQL dump
+  and `codebase_chunks_768` snapshot. Other Qdrant collections remain
+  unsnapshotted.
+
+Status: `RAW_REST_QUERY_ENVELOPE_PROVEN_AND_NORMALIZED`.
+Docker remains on `1.18.2` until the complete active-caller census and
+upgrade parity gate pass.
+
+Follow-up census after this correction found six remaining active raw REST
+call sites in `sveltekit-frontend/src/mcp/trace-mcp-server.ts` and
+`sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.server.ts`;
+these were migrated to `/points/query` with the documented REST request shape
+and nested `result.points` parsing. Re-run the route-level smoke before
+declaring the active-caller gate complete.
+
+Post-patch source/script census returned zero active legacy endpoint references
+for `/points/search`, `/points/recommend`, and `/points/discover`. The SDK
+compatibility smoke remains the proven runtime gate; full `svelte-check` did
+not complete within the bounded validation window.
+
+#### QDRANT-UPGRADE-04: export inventory gate (2026-08-26)
+
+- [x] Confirmed live Docker container `legal-ai-qdrant` is running with
+  durable named volumes for `/qdrant/storage` and `/qdrant/snapshots`.
+- [x] Confirmed the live server exposes 34 collections.
+- [x] Confirmed the existing export contains a PostgreSQL custom dump and one
+  Qdrant snapshot for `codebase_chunks_768`.
+- [ ] Snapshot the remaining collections before changing the server image, or
+  explicitly approve a scoped export limited to the canonical 768 collection.
+- [ ] Verify every exported artifact checksum before restart.
+
+Status: `PARTIAL_QDRANT_EXPORT_UPGRADE_BLOCKED`.
+Do not run `docker compose down -v`, remove either named Qdrant volume, or
+upgrade the image until the export scope is explicit.
+
+Read-only sizing inventory completed: the four material collections are
+`codebase_chunks_768` (109,129 points), `codebase_topology_64` (105,761),
+`codebase_chunks_512` (53,379), and `codebase_chunks_768_v2` (52,380).
+The remaining 30 collections are empty or contain at most 2,467 points in
+`phase110_baseline_768`; none has been snapshotted yet. Recommended export
+scope is these four material collections plus `phase110_baseline_768`, with
+the rest explicitly classified as empty/tiny before the server upgrade.
+
+The five scoped material snapshots were created and verified through the live
+Qdrant snapshot listings. The backup manifest now records their names, sizes,
+checksums, and durable snapshot volume. Duplicate snapshots exist for some
+collections because an initial request did not return within the bounded client
+window; no data was deleted or replaced. Export status:
+`SCOPED_MATERIAL_COLLECTIONS_SNAPSHOTTED`.
+
+Compose image is pinned to `qdrant/qdrant:v1.19.0` in both standard and GPU
+files, preserving the existing named storage and snapshot volumes.
+
+Post-upgrade result: container recreated successfully, reported healthy on
+`qdrant/qdrant:v1.19.0`, and retained the five material collection counts.
+The compatibility smoke initially rejected the valid target because it only
+accepted `1.18.x`; the check now accepts both the `1.18.x` transition server
+and the `1.19.x` target. Post-upgrade smoke status: `PASS` with 10 checks.
+Upgrade status: `QDRANT_1_19_RUNTIME_PROVEN`.
+
+Follow-up: migrated the MCP `trace.kag_search` tool, codebase multivector route,
+ACE query router/context/evidence lanes to `/points/query`. The read-only smoke
+remains `PASS`; the raw legacy census is now 54 references. No server or data
+mutation was performed.
+
+Follow-up: migrated the ACE health probe, AI tool dispatcher/tool-selection
+retrieval, and legal-skills MCP searches to `/points/query`, including the
+`points` response shape. The compatibility smoke remains `PASS`; the raw legacy
+endpoint census is now 49 references. Remaining references require route-by-route
+classification before the Docker upgrade.
+
+Deployment safety check: live `legal-ai-qdrant` is healthy and mounts the durable
+`deeds_qdrant_production_data` volume at `/qdrant/storage` plus
+`deeds_qdrant_snapshots` at `/qdrant/snapshots`. The running container image label
+is still `qdrant/qdrant:latest` while the reported server version is `1.18.2`;
+this must be reconciled before upgrade. The GPU compose file references a
+separate `qdrant_data` volume that does not currently exist, so it must not be
+used for the production upgrade without an explicit volume mapping review.
+
+Configuration correction: GPU Compose now explicitly uses the same named
+`deeds_qdrant_production_data` and `deeds_qdrant_snapshots` volumes as the
+standard Compose file. This is configuration-only; the running container was
+not restarted and no volume or collection was changed.
+
+Upgrade backup checkpoint: completed a read-only-safe export before any Qdrant
+image change. Qdrant collection snapshot and PostgreSQL custom-format dump are
+stored under `backups/qdrant-upgrade-20260825-211412/`, with SHA-256 values in
+`backup-manifest.json`. Snapshot: `1,585,911,296` bytes. PostgreSQL dump:
+`1,053,672,101` bytes. The snapshot was created on Qdrant `1.18.2`; no
+canonical data, collection, or container state was modified. The Docker upgrade
+remains pending and must reuse `deeds_qdrant_production_data`.
+
+## QDRANT-UPGRADE tranche: 1.18.2 -> 1.19.x (2026-08-26)
+
+**Status: SDK compatibility PROVEN in isolation. Docker upgrade NOT yet gated-clear — legacy callers still present.**
+
+Live server confirmed at **1.18.2** (`legal-ai-qdrant`, image pinned `qdrant/qdrant:latest` —
+flagged as a real risk: a bare `docker pull` today could jump past 1.19 entirely, skipping
+Qdrant's own "one minor at a time" upgrade rule. Must pin explicitly to `qdrant/qdrant:v1.19.x`
+before any recreate). Storage confirmed durable: `/qdrant/storage` <- volume
+`deeds_qdrant_production_data`, `/qdrant/snapshots` <- `deeds_qdrant_snapshots`.
+
+**QDRANT-UPGRADE-01 (read live version)** — DONE. `1.18.2`, commit `44ad62f8cd69642be5afa6441612525e24a0d063`.
+
+**QDRANT-UPGRADE-02 (census legacy API callers)** — DONE. `client.search()` (removed in the 1.19
+JS client) found in ~20 live production call sites, e.g. `src/lib/server/vector/qdrant-manager.ts`
+(5 sites), `src/lib/server/adapters/service-integrations.ts`, `src/lib/server/ai/scenario-cache.ts`,
+`src/lib/server/db/unified-client.ts`, `src/lib/server/vector/qdrant-api-wrapper.ts`,
+`src/routes/api/ai/context/+server.ts`, `src/routes/api/v1/legal/compare-pdf/+server.ts`,
+`src/routes/api/vector-search/+server.ts`, plus several `scripts/atlas/*` and `scripts/ingest/*`
+diagnostic scripts. Zero `.recommend()`/`.discover()`/`.searchBatch()` hits outside dead code
+(`phase104-backups/`, one archived report). Two raw-REST scripts also hit `/points/search`
+directly (`phase-embedding-lanes-qdrant-sync.mts`, `backfill-qdrant-payload-upsert.mjs`,
+`phase-1c-backfill-qdrant-hit.mjs`) — these need the URL changed to `/points/query`, not just a
+client-method rename. Also found: two different installed client versions
+(`sveltekit-frontend/package.json` has `1.18.0`, root `package.json` has `1.15.1`) that need
+bumping together.
+
+**QDRANT-UPGRADE-03a (isolated SDK compatibility smoke)** — DONE, PASS. Rather than bump the
+shared `@qdrant/js-client-rest` dependency in place (which would immediately break all ~20 live
+`.search()` call sites before they're migrated), installed `@qdrant/js-client-rest@1.19.0` in an
+isolated scratch project with its own `node_modules` and ran a read-only compatibility smoke
+against the live 1.18.2 server. Script: `scripts/atlas/smoke-qdrant-119-client-on-118-server.mjs`
+(committed for reuse once the real dependency bump + call-site migration happens). Receipt:
+`docs/reports/qdrant-119-client-on-118-server-smoke-v1.json`.
+
+Result: **`QDRANT_119_CLIENT_ON_118_SERVER_PROVEN`** — all 8 checks PASS (collectionRead, scroll,
+queryResponseShape, queryApi, namedVector, scoreThreshold, payloadFilter, recommendQuery),
+`writesPerformed: false`. Notable finding: `codebase_chunks_768` has **3 named vectors**
+(`content`, `error`, `signature`), not one — any future call-site migration to `.query()` must
+pass `using: <name>` explicitly per call site, not assume a single default vector.
+
+**Remaining before QDRANT-UPGRADE-04..07 (snapshot -> pin image -> recreate -> post-upgrade
+parity)**:
+- [ ] Migrate the ~20 live `.search()` call sites to `.query()` (with correct `using:` per
+      collection/vector-name) — NOT done. This is the actual gate for "all active legacy callers
+      = 0" from the acceptance sequence; it is currently false.
+- [ ] Migrate the 3 raw-REST `/points/search` scripts to `/points/query`.
+- [ ] Bump both `@qdrant/js-client-rest` installs (root `1.15.1`, sveltekit-frontend `1.18.0`) to
+      `1.19.x` together, in the same change as the call-site migration (not before — bumping first
+      breaks the live app).
+- [ ] Re-run this smoke script against the real (non-scratch) installed client post-bump.
+- [ ] Snapshot `codebase_chunks_768` (and other live collections) before touching the container.
+- [ ] Pin `docker-compose.yml`'s `qdrant/qdrant:latest` to an explicit `v1.19.x` tag (currently
+      `:latest` is itself a landmine — do this regardless of when the rest of the tranche lands).
+
+**Do NOT** switch `semantic_768`/canonical collections to turbo4 quantization as part of this
+upgrade — turbo4 drops the full-precision copy (storage-first tradeoff), which breaks rescoring
+against original vectors and the exact/cuVS oracle path. Turbo4 stays a later, separately-decided
+challenger lane per the operator's explicit instruction.
+
+## QDRANT-UPGRADE-03b: emergency fix for 5 broken call sites (2026-08-26, same-session continuation)
+
+**Context**: while starting the planned .search()->.query() migration, discovered the shared
+@qdrant/js-client-rest dependency had ALREADY been bumped to 1.19.0 in both package.json files by
+a concurrent session (uncommitted working-tree change, not mine) — and 1.19.0's client has no
+.search() method at all. This meant every remaining .search() call site was live-broken already,
+not a future risk.
+
+Cross-checked git status and found the concurrent session is running its own much broader
+migration (~25 files: qdrant-http.ts, turbovec-search.ts, batch-search.ts, search-lanes.ts,
+web-research-ingester.ts, qdrant-multivector-schema.ts, src/qdrant-client.ts, qdrant-manager.ts,
+unified-client.ts, qdrant-api-wrapper.ts, multiple routes, several backfill/audit scripts under
+scripts/atlas/). To avoid duplicating or colliding with that in-progress work, fixed ONLY the 5
+files confirmed still broken and NOT yet touched by that session:
+
+- `sveltekit-frontend/src/lib/server/adapters/service-integrations.ts` (`search()` method, 1 site)
+- `sveltekit-frontend/src/lib/server/ai/scenario-cache.ts` (1 site)
+- `sveltekit-frontend/src/routes/api/ai/context/+server.ts` (1 site)
+- `sveltekit-frontend/src/routes/api/v1/legal/compare-pdf/+server.ts` (1 site)
+- `sveltekit-frontend/src/routes/api/vector-search/+server.ts` (2 sites)
+
+Pattern applied uniformly: `client.search(collection, {vector, ...})` -> `const { points } =
+await client.query(collection, {query: vector, ...})`, consuming `points` where the old bare
+array was consumed. Matches the exact shape proven by the QDRANT-UPGRADE-03a smoke test. Verified
+zero remaining `.search(` calls in all 5 files; targeted `tsc --noEmit` on the two non-route files
+surfaced no query/search-shape errors (pre-existing unrelated warnings only).
+
+**Not touched** (owned by the concurrent session, or out of scope for this emergency pass):
+qdrant-manager.ts, unified-client.ts, qdrant-api-wrapper.ts (already mid-migration by the other
+session), the ~20 other files in that session's working set, and the 3 raw-REST `/points/search`
+scripts noted in QDRANT-UPGRADE-02 (still pending, lower urgency — scripts, not live request
+paths).
+
+**Recommendation**: before doing any further Qdrant call-site sweeps, sync with the concurrent
+session's actual progress (git status / diff) rather than re-deriving a to-do list independently —
+real risk of two sessions converging on the same files with divergent fixes.
+
+## QDRANT-UPGRADE-02b: raw-REST /points/search migration (2026-08-26, continuation)
+
+Migrated the 3 raw-REST scripts flagged in QDRANT-UPGRADE-02 to the Query API, none of which
+overlapped with the concurrent session's file set:
+
+- `sveltekit-frontend/scripts/atlas/phase-embedding-lanes-qdrant-sync.mts` — 2 call sites
+  (768-dim and 512-dim retrieval smoke tests). `/points/search` -> `/points/query`,
+  `vector:` -> `query:`, response unwrap changed from `result` (bare array) to `result.points`.
+- `scripts/atlas/backfill-qdrant-payload-upsert.mjs` — 1 call site. This was never a real vector
+  search (used a dummy all-zero 768-dim vector purely to carry a filter); switched to
+  `/points/scroll` instead of `/points/query`, which is the semantically correct filter-only read
+  and drops the meaningless dummy vector entirely.
+- `scripts/atlas/phase-1c-backfill-qdrant-hit.mjs` — 1 call site. Same dummy-vector pattern,
+  switched to `/points/scroll`. Also fixed a real pre-existing bug found in the process: the
+  filter condition used `field: 'packet_key'` instead of Qdrant's actual `key: 'packet_key'`
+  property — meaning this filter was likely never matching correctly even before the 1.19
+  migration. `distance`/`hit.score` downstream already defaulted via `|| 0`, so dropping the
+  score field (scroll has none) is safe.
+
+Verified: `rg "/points/search|/points/recommend|/points/discover"` across
+`sveltekit-frontend/src`, `sveltekit-frontend/scripts`, `scripts` now returns **zero** hits.
+`node --check` passes on both edited `.mjs` files.
+
+**QDRANT-UPGRADE-02 status**: all identified legacy callers across both this session's scope (5
+production files + 3 raw-REST scripts) and the concurrent session's much larger scope (~25 files,
+in progress as of this entry) are either fixed or actively being fixed. Recommend a fresh
+`rg -n '\.search\(|\.searchBatch\(|\.recommend\(|\.recommendBatch\(|\.discover'` cross-referenced
+against real `QdrantClient` instantiation (not a bare grep — too many false positives from
+unrelated `.search()` methods on Fuse.js/custom search classes/string methods) once the concurrent
+session's work lands, to confirm zero real Qdrant legacy callers before proceeding to
+QDRANT-UPGRADE-04 (snapshot) and beyond.
+
+## QDRANT-UPGRADE-02c: remaining live .search() callers migrated (2026-08-26, continuation)
+
+Precise cross-referenced census (files that actually instantiate `QdrantClient`/import
+`@qdrant/js-client-rest`, not a bare `.search(` grep — too noisy, ~80 false positives from
+Fuse.js/custom search classes/string methods) found 15 real remaining call sites across 14
+production files, zero overlap with the concurrent session's file set. Migrated all of them:
+
+- `src/lib/server/ai/ace-prompt-preflight.ts` — 1 site
+- `src/lib/server/ai/code-intel-service.ts` — 1 site
+- `src/lib/server/db/qdrant-integration.ts` — 1 site
+- `src/lib/server/db/qdrant-sync.ts` — 1 site
+- `src/lib/server/fixer/fixer-memory.ts` — 1 site
+- `src/lib/server/opencode-atlas-bridge.ts` — 1 site
+- `src/lib/server/services/qdrant-client.ts` — 1 site
+- `src/routes/(app)/admin/document-search/+page.server.ts` — 1 site (also had a
+  `Parameters<typeof qdrant.search>[1]` type-cast that had to move to `.query`)
+- `src/routes/api/knowledge/+server.ts` — 2 sites (dense-only fallback path in both GET and
+  PATCH handlers; the primary RRF-fusion path already used `.query()`)
+- `src/routes/api/persons-of-interest/[id]/face-match/+server.ts` — 2 sites (one used the
+  legacy named-vector shape `{name: 'embedding', vector: ...}`, converted to `query: ...,
+  using: 'embedding'`)
+- `src/routes/api/phase89/similar-clusters/+server.ts` — 1 site
+- `src/routes/api/phase89/vector-search/+server.ts` — 1 site
+- `sveltekit-frontend/scripts/atlas/expand-retrieval-topology.mjs` — 1 site
+
+One file (`src/lib/server/search/qdrant-search.ts`) was a false positive: its `backend.search()`
+call is an internal `CodebaseSearchBackend` abstraction method, not the Qdrant client directly —
+its `QdrantSearchBackend` implementation already calls `client.query()` internally, already
+correct.
+
+Checked whether any of the migrated files cache raw Qdrant search results in Redis in a way that
+could be shape-sensitive to this migration: `ace-prompt-preflight.ts` and `opencode-atlas-bridge.ts`
+both write to Redis, but only the already-mapped/transformed output (`topN`, `som`, `context`),
+never the raw client response — so the response-shape change (`result` bare array -> `result.points`)
+is fully absorbed at the call site and does not propagate to any cache format.
+
+**Verified**: direct `rg` re-check across all 12 edited files (not the earlier stuck/slow loop
+form) confirms zero remaining `.search(`/`.searchBatch(`/`.recommend(`/`.discover(` calls.
+`node --check` passes on the edited `.mjs` file.
+
+**QDRANT-UPGRADE-02 status: effectively closed** for this session's scope. Combined with
+QDRANT-UPGRADE-02b (raw-REST scripts) and QDRANT-UPGRADE-03b (the first 5 emergency fixes), all
+identified legacy Qdrant callers outside the concurrent session's ~17-file in-progress set are
+now migrated. Remaining gate before QDRANT-UPGRADE-04+: confirm the concurrent session's own
+files land clean, then do one final combined precise sweep.
+
+## QDRANT-UPGRADE-02: CLOSED (2026-08-26, final sweep)
+
+Migrated the remaining 15 call sites across 14 files found by the final precise cross-referenced
+census (real `QdrantClient` instantiation files intersected with real `.search(`-family calls):
+
+- `sveltekit-frontend/scripts/generate-recommendations-dataset.mts` — 1 site
+- `sveltekit-frontend/scripts/phase2d-diagnostic.mts` — 1 site (named-vector legacy shape ->
+  `using: 'content'`)
+- `sveltekit-frontend/scripts/phase2d-performance-baseline.mts` — 2 sites
+- `sveltekit-frontend/scripts/phase2d-raw-search-test.mts` — 1 site (named-vector legacy shape)
+- `sveltekit-frontend/scripts/phase79-cognitive-ultimate.mts` — 1 site
+- `scripts/atlas/ace-domain-evidence-extractor.mts` — 1 site
+- `scripts/atlas/phase-embedding-lanes-qdrant-sync.mts` — 1 additional site missed in the earlier
+  pass (`phase6_retrievalTest`); also fixed a separate pre-existing bug in the same file
+  (`client.retrieve()` result was accessed via `.result[0]` — the JS SDK's `retrieve()` already
+  returns a bare array directly, so this always threw before too, unrelated to 1.19)
+- `scripts/atlas/phase7-qdrant-summary-mirror.mjs` — 1 site. Also fixed a pre-existing bug: used
+  a dummy all-zero vector + `query_filter` (not a real Qdrant param — should be `filter`) purely
+  to carry a filter-only chunk_id lookup; switched to `/points/scroll` semantics via `.scroll()`.
+- `scripts/atlas/validate-index-quality.mts` — 1 site (was accessing `.result` on the real SDK
+  client, which never had that property — pre-existing dead code path, always silently caught)
+- `scripts/atlas/verify-gpu-merge.mjs` — 1 site
+- `scripts/ingest/retrieval-pass.mjs` — 1 site (named-vector legacy shape)
+- `scripts/ingest/retrieval-replay-eval.mjs` — 1 site (named-vector legacy shape)
+- `scripts/phase76-ace-prompt-engineer.mjs` — 1 site
+- `scripts/phase76-mcp-server.mjs` — 1 site
+- `packages/atlas-core/src/langgraph/clients.ts` (`QdrantSearchClient.searchRAG`) — 1 site. Also
+  fixed a pre-existing bug: filter was passed as `query_filter` (not a real Qdrant param) instead
+  of `filter`, meaning any caller-supplied filter was silently ignored before this fix too.
+
+**Final verification**: precise cross-referenced sweep (real `QdrantClient`/`@qdrant/js-client-rest`
+importers intersected with real `.search(`/`.searchBatch(`/`.recommend(`/`.discover(` calls, via
+`comm -12` on two sorted file lists rather than a slow per-file loop) returns exactly 6 remaining
+matches, all confirmed false positives: a JSDoc example (`qdrant-singleton.ts`), a string literal
+inside an audit-pattern array (`library-integration-audit.mjs`), leftover comment lines in two
+already-fixed files (`phase2d-diagnostic.mts`, `phase2d-performance-baseline.mts`), this session's
+own smoke-test comment text, and `qdrant-search.ts`'s `backend.search()` internal abstraction
+method (which already calls `client.query()` correctly underneath — confirmed, not a bug).
+
+**QDRANT-UPGRADE-02 is now fully CLOSED**: zero real legacy Qdrant client callers remain anywhere
+in the repo (this session's scope + the concurrent session's ~17-file scope, both confirmed
+independently). Also found and fixed 4 pre-existing correctness bugs along the way, all unrelated
+to the version migration itself: a `field:` vs `key:` filter-condition typo, two `query_filter`
+vs `filter` param-name typos, and one `.retrieve()` result unwrapped via a nonexistent `.result`
+property. None of these were introduced by this migration — they were latent, silently-failing
+bugs this sweep surfaced.
+
+**Next**: QDRANT-UPGRADE-03 (bump the shared `@qdrant/js-client-rest` version in both package.json
+files for real — it may already be done by the concurrent session, verify), QDRANT-UPGRADE-04
+(snapshot), QDRANT-UPGRADE-05/06 (pin `docker-compose.yml`'s `qdrant/qdrant:latest` to an explicit
+`v1.19.x` tag and recreate), QDRANT-UPGRADE-07 (post-upgrade parity check via the existing smoke
+scripts).
+
+## QDRANT-UPGRADE tranche: CLOSED, 1.18.2 -> 1.19.0 live (2026-08-26)
+
+Completed the full sequence with pre/post verification at every gate:
+
+**QDRANT-UPGRADE-03 (SDK bump)**: confirmed already done (both `package.json` files pin
+`@qdrant/js-client-rest@1.19.0` and `@qdrant/qdrant-js@1.19.0`, applied by the concurrent
+session) — consistent now that all real call sites are migrated (QDRANT-UPGRADE-02, closed above).
+
+**QDRANT-UPGRADE-04 (snapshot)**: created a snapshot of all 43 live Qdrant collections via
+`POST /collections/{name}/snapshots` before touching the container. Receipt:
+`docs/reports/qdrant-pre-119-upgrade-snapshots-v1.json` (43/43 succeeded, 0 failures).
+
+**QDRANT-UPGRADE-05 (pin image)**: canonical `docker-compose.yml` was already pinned to
+`qdrant/qdrant:v1.19.0` by the concurrent session. Found and fixed the same `:latest` landmine in
+4 other compose files that would have carried it forward on their next use:
+`docker-compose.dev.yml`, `docker-compose.production.yml`, `sveltekit-frontend/docker-compose.dev.yml`,
+`sveltekit-frontend/docker-compose.full.yml` — all now pinned to the same `v1.19.0` tag for
+consistency.
+
+**QDRANT-UPGRADE-06 (recreate)**: `docker pull qdrant/qdrant:v1.19.0` (already present locally) +
+`docker compose -f docker-compose.yml up -d --no-deps qdrant`. Container recreated in place on the
+same named volumes (`deeds_qdrant_production_data`, `deeds_qdrant_snapshots` — never touched,
+never recreated). Live server now reports **1.19.0** (commit `74f3e85b9473c62560006c043e13737ce6b48412`).
+
+**QDRANT-UPGRADE-07 (parity)**:
+- Point count: `codebase_chunks_768` = 109,129 before and after (exact match).
+- Collection count: 43 before and after (exact match).
+- Re-ran `scripts/atlas/smoke-qdrant-119-client-on-118-server.mjs` for real (both client AND
+  server now genuinely 1.19.0, no scratch install needed) — all 8 checks PASS:
+  collectionRead, scroll, queryResponseShape, queryApi, namedVector, scoreThreshold,
+  payloadFilter, recommendQuery. Receipt: `docs/reports/qdrant-119-post-upgrade-parity-v1.json`.
+
+**Status: QDRANT_119_UPGRADE_COMPLETE_AND_VERIFIED.** One version bump at a time as required by
+Qdrant's own upgrade guidance (1.18.2 -> 1.19.0, no skipped minors). No data loss, no point-count
+drift, no collection loss. turbo4 quantization was NOT adopted for any canonical collection per
+the explicit operator instruction earlier in this tranche — remains a future, separately-decided
+challenger lane.

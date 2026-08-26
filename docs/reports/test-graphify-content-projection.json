@@ -1,8 +1,12 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-08-24T22:09:51.254Z",
+  "generatedAt": "2026-08-26T03:31:59.893Z",
   "apply": false,
   "sourceColumn": "content_embedding_768",
+  "representationId": "semantic_768",
+  "representationRevision": "semantic_768@v1",
+  "modelRevision": "embeddinggemma:latest",
+  "dimension": 768,
   "qdrant": {
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
@@ -21,8 +25,11 @@
     "tags",
     "semantic_tags",
     "content_hash",
-    "embedding_model",
-    "embedding_version",
+    "representation_id",
+    "representation_name",
+    "representation_revision",
+    "embedding_dimension",
+    "model_revision",
     "projection_revision",
     "content_projection_revision",
     "signature_projection_revision",
@@ -36,28 +43,55 @@
   "selected": 4,
   "projected": 0,
   "skipped": 0,
+  "identityCoverage": {
+    "selected": 4,
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768@v1",
+    "dimension": 768,
+    "packetKey": 4,
+    "sourceRef": 0,
+    "contentHash": 4,
+    "sourceRevision": 0,
+    "workspaceRevision": 0
+  },
   "errors": [],
   "sample": [
     {
-      "id": "87737546-81ea-4253-86c6-1594793859bf",
-      "qdrantId": "2f957591-4836-f0a7-9ecd-a73fff3aac5f",
-      "sourceRef": "src/lib/server/ace/codeintel-datastore.ts"
+      "id": "1ae79974-3eb1-449f-aa7e-07f14655296d",
+      "qdrantId": "8397336a-3a62-465d-a2cf-ec53054d51d6",
+      "packetKey": "8397336a-3a62-465d-a2cf-ec53054d51d6",
+      "sourceRef": null,
+      "contentHash": "f468ef841fe25d0c92bd9df252bfa1b8ca47ab0a087be51a654635cc24f3c083",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
-      "id": "879ae2c4-70b7-4d02-88be-df14647d6014",
-      "qdrantId": "9020400d-1083-025c-92fc-251aa39ee865",
-      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts"
+      "id": "318bc320-96cc-4097-8b47-7dde35d278a8",
+      "qdrantId": "3bd95bde-7304-4fff-b031-a5e2de180b55",
+      "packetKey": "3bd95bde-7304-4fff-b031-a5e2de180b55",
+      "sourceRef": null,
+      "contentHash": "6fc16c35d857ccd3c83711b1a50e744b6c66754c3fd4277beffbee615db91181",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
-      "id": "89267199-d704-4408-a0a7-12b9f376a0c8",
-      "qdrantId": "1703176200",
-      "sourceRef": "src/lib/services/voice-commands.ts"
+      "id": "356f26d3-9f8a-4020-9007-de969684db89",
+      "qdrantId": "5d0404cd-f01b-4dd6-9f59-cd3fdcbfde6e",
+      "packetKey": "5d0404cd-f01b-4dd6-9f59-cd3fdcbfde6e",
+      "sourceRef": null,
+      "contentHash": "286d4008cfdb9ebec243c653438ef0eadd5afd70a5b3f2176677f3c2129183a8",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
-      "id": "8a83b91a-43b8-4512-a693-d8f28523342d",
-      "qdrantId": "7ffd9621-5c4b-eda1-bdee-48b593edc686",
-      "sourceRef": "src/lib/services/voice-commands.ts"
+      "id": "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
+      "qdrantId": "f802342d-f49a-4446-a6ee-4de8371741f4",
+      "packetKey": "f802342d-f49a-4446-a6ee-4de8371741f4",
+      "sourceRef": null,
+      "contentHash": "2b68ab32da70c76020f9b2916de5bc2b8bdd1550eaa385c3929fe0a89e17883d",
+      "sourceRevision": null,
+      "workspaceRevision": null
     }
   ],
-  "elapsedMs": 523
+  "elapsedMs": 2114
 }

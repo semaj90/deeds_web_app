@@ -141,12 +141,12 @@ async function validateIndexQuality(): Promise<void> {
       // Query Qdrant
       let qdrantResults: QueryResult[] = [];
       try {
-        const qdrantRes = await qdrantClient.search('codebase_chunks_384', {
-          vector: queryVec,
+        const qdrantRes = await qdrantClient.query('codebase_chunks_384', {
+          query: queryVec,
           limit: topK,
         });
 
-        qdrantResults = qdrantRes.result.map((hit) => ({
+        qdrantResults = qdrantRes.points.map((hit) => ({
           packet_key: hit.payload?.packet_key as string,
           score: hit.score,
         }));

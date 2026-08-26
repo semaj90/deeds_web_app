@@ -109,7 +109,7 @@ async function loadPostgresIdentities() {
       embedding_model,
       updated_at
     FROM codebase_chunk_index
-    WHERE content_embedding IS NOT NULL
+    WHERE content_embedding_768 IS NOT NULL
     ORDER BY id
   `);
 
@@ -248,6 +248,9 @@ async function main() {
         payload_representation_id: point.payload.representation_id ?? null,
         payload_packet_version: point.payload.packet_version ?? null,
         payload_model_revision: point.payload.model_revision ?? null,
+        payload_packet_key: point.payload.packet_key ?? point.payload.packetKey ?? null,
+        payload_source_revision: point.payload.source_revision ?? point.payload.sourceRevision ?? null,
+        payload_workspace_revision: point.payload.workspace_revision ?? point.payload.workspaceRevision ?? null,
         match_state: result.state,
         match_reason: result.reason,
         postgres_uuid: result.row?.id ?? null
@@ -273,6 +276,15 @@ async function main() {
 
     // Find duplicates (multiple Qdrant points mapping to same Postgres row)
     const duplicateCount = Array.from(duplicatePostgresMappings.values()).filter(ids => ids.length > 1).length;
+    const reasonDistribution = (items) => items.reduce((counts, item) => {
+      counts[item.match_reason] = (counts[item.match_reason] ?? 0) + 1;
+      return counts;
+    }, {});
+    const duplicateSamples = Array.from(duplicatePostgresMappings.entries())
+      .filter(([, ids]) => ids.length > 1)
+      .sort((a, b) => b[1].length - a[1].length)
+      .slice(0, 25)
+      .map(([postgresId, qdrantPointIds]) => ({ postgres_id: postgresId, qdrant_point_ids: qdrantPointIds }));
 
     // Integer ID analysis
     const intIds = qdrantPoints.map(p => p.id).sort((a, b) => a - b);
@@ -297,6 +309,37 @@ async function main() {
       const key = classif.payload_packet_version ?? 'NULL';
       pktDist[key] = (pktDist[key] ?? 0) + 1;
     }
+
+    // A canonical packet may fan out to multiple chunk-level Qdrant points.
+    // Keep this separate from the legacy zero-duplicates promotion gate until
+    // every point has a revision-qualified chunk bridge.
+    const fanoutByPostgres = new Map();
+    for (const classif of classifications) {
+      if (!classif.postgres_uuid || ['MATCHED_AMBIGUOUS', 'UNMATCHED'].includes(classif.match_state)) continue;
+      const entry = fanoutByPostgres.get(classif.postgres_uuid) ?? {
+        point_count: 0,
+        chunk_id_count: 0,
+        content_hash_count: 0,
+      };
+      entry.point_count += 1;
+      if (classif.payload_chunk_id) entry.chunk_id_count += 1;
+      if (classif.payload_content_hash) entry.content_hash_count += 1;
+      fanoutByPostgres.set(classif.postgres_uuid, entry);
+    }
+    const fanoutEntries = [...fanoutByPostgres.values()];
+    const fanoutDistribution = {};
+    for (const entry of fanoutEntries) {
+      const key = String(entry.point_count);
+      fanoutDistribution[key] = (fanoutDistribution[key] ?? 0) + 1;
+    }
+    const payloadFieldCounts = {
+      chunk_id: classifications.filter((item) => item.payload_chunk_id).length,
+      source_ref: classifications.filter((item) => item.payload_source_ref).length,
+      content_hash: classifications.filter((item) => item.payload_content_hash).length,
+      packet_key: classifications.filter((item) => item.payload_packet_key).length,
+      source_revision: classifications.filter((item) => item.payload_source_revision).length,
+      workspace_revision: classifications.filter((item) => item.payload_workspace_revision).length,
+    };
 
     const report = {
       timestamp: new Date().toISOString(),
@@ -332,9 +375,31 @@ async function main() {
         gap_details: gaps
       },
       duplicate_postgres_mappings: duplicateCount,
+      match_reason_distribution: reasonDistribution(classifications),
+      ambiguous_reason_distribution: reasonDistribution(
+        classifications.filter((item) => item.match_state === 'MATCHED_AMBIGUOUS'),
+      ),
+      unmatched_reason_distribution: reasonDistribution(
+        classifications.filter((item) => item.match_state === 'UNMATCHED'),
+      ),
+      duplicate_postgres_mapping_samples: duplicateSamples,
       payload_field_coverage: {
         representation_id_distribution: reprDist,
-        packet_version_distribution: pktDist
+        packet_version_distribution: pktDist,
+        field_counts: payloadFieldCounts,
+      },
+      packet_fanout: {
+        mapped_postgres_rows: fanoutEntries.length,
+        one_point_rows: fanoutEntries.filter((entry) => entry.point_count === 1).length,
+        multi_point_rows: fanoutEntries.filter((entry) => entry.point_count > 1).length,
+        max_points_per_postgres_row: fanoutEntries.reduce((max, entry) => Math.max(max, entry.point_count), 0),
+        fanout_distribution: fanoutDistribution,
+        rows_with_chunk_id_on_every_point: fanoutEntries.filter(
+          (entry) => entry.chunk_id_count === entry.point_count,
+        ).length,
+        rows_with_content_hash_on_every_point: fanoutEntries.filter(
+          (entry) => entry.content_hash_count === entry.point_count,
+        ).length,
       },
       verification_gates: {
         gate_ambiguous_matches_zero: stats.matched_ambiguous === 0,
@@ -354,7 +419,7 @@ async function main() {
     if (OUTPUT_FORMAT === 'summary') {
       console.log(`📋 Reconciliation Summary:`);
       console.log('');
-      console.log(`  Collection: ${report.total_qdrant_points} points`);
+      console.log(`  Collection: ${report.collection} (${report.audit_results.total_qdrant_points} points)`);
       console.log(`    Preexisting (ID 1-1001): ${report.audit_results.preexisting_points}`);
       console.log(`    Backfill (ID 1002+): ${report.audit_results.backfill_points}`);
       console.log(`    Postgres eligible rows: ${report.audit_results.total_eligible_postgres_rows}`);

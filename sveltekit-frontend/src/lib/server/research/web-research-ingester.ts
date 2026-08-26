@@ -249,15 +249,16 @@ export async function searchResearchChunks(opts: {
     : undefined;
 
   try {
-    const results = await qdrant.client.search(RESEARCH_COLLECTION, {
-      vector: { name: 'content', vector: opts.queryEmbedding },
+    const results = await qdrant.client.query(RESEARCH_COLLECTION, {
+      query: opts.queryEmbedding,
+      using: 'content',
       limit: opts.limit ?? 10,
       score_threshold: opts.scoreThreshold ?? 0.55,
       filter,
       with_payload: true,
     });
 
-    return (results ?? []).map((r) => ({
+    return (results.points ?? []).map((r) => ({
       chunk_id: r.payload?.chunk_id as string ?? '',
       source: r.payload?.source as ResearchSource ?? 'web_page',
       url: r.payload?.url as string ?? '',

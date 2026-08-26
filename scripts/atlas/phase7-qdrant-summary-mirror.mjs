@@ -103,12 +103,15 @@ async function main() {
           source: 'phase7-qdrant-mirror',
         };
 
-        // Qdrant: search by chunk_id to find the point
+        // Qdrant: filter-only lookup by chunk_id to find the point (never a
+        // real vector search — was carrying a dummy vector purely to satisfy
+        // the legacy /points/search endpoint; /points/scroll is the correct
+        // filter-only read, and also fixes a pre-existing bug where the
+        // filter used `query_filter` instead of Qdrant's actual `filter` key).
         // Note: Assuming chunk_id is indexed in Qdrant payload
-        const searchResult = await qdrant.search(QDRANT_COLLECTION, {
-          vector: new Array(768).fill(0), // Dummy vector (only using filter)
+        const searchResult = await qdrant.scroll(QDRANT_COLLECTION, {
           limit: 1,
-          query_filter: {
+          filter: {
             must: [
               {
                 key: 'chunk_id',
@@ -120,13 +123,13 @@ async function main() {
           },
         });
 
-        if (searchResult.result.length === 0) {
+        if (searchResult.points.length === 0) {
           // Point doesn't exist in Qdrant yet; skip (not an error)
           skipped++;
           continue;
         }
 
-        const point = searchResult.result[0];
+        const point = searchResult.points[0];
         const pointId = point.id;
 
         // Upsert payload back to Qdrant

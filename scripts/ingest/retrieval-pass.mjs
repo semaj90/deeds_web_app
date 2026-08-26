@@ -97,8 +97,9 @@ async function embedText(text) {
 
 async function qdrantSearch(vec, top) {
   const client = new QdrantClient({ url: QDRANT_URL });
-  const resp = await client.search(COLLECTION, {
-    vector: { name: 'content', vector: vec },
+  const { points: resp } = await client.query(COLLECTION, {
+    query: vec,
+    using: 'content',
     limit: top,
     with_payload: true,
     with_vector: false,

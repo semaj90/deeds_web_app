@@ -216,12 +216,11 @@ try {
         kind,
         chunk_id,
         content_hash,
-        content_embedding::text AS embedding_text,
+        content_embedding_768::text AS embedding_text,
         domain,
-        embedding_model,
         updated_at
       FROM codebase_chunk_index
-      WHERE content_embedding IS NOT NULL
+      WHERE content_embedding_768 IS NOT NULL
         AND id > $1
       ORDER BY id
       LIMIT $2
@@ -270,8 +269,9 @@ try {
           content_hash: row.content_hash,
           representation_id: 'semantic_768',
           dimension: CANONICAL_DIMENSION,
-          model_revision: '2026-07-29',
-          embedding_model: row.embedding_model,
+          model_revision: 'embeddinggemma:latest',
+          representation_revision: 'semantic_768@v1',
+          embedding_dimension: CANONICAL_DIMENSION,
           domain: row.domain,
           symbol: row.symbol,
           kind: row.kind,

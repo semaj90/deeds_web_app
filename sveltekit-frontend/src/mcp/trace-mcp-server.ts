@@ -2491,11 +2491,12 @@ server.registerTool(
       // --- L1: per-chunk lens summaries (Qdrant summary_lenses_768) ---
       const lensPromise =
         lensTopK > 0 && vec.length > 0
-          ? fetch(`${QDRANT}/collections/summary_lenses_768/points/search`, {
+          ? fetch(`${QDRANT}/collections/summary_lenses_768/points/query`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                vector: { name: 'summary', vector: vec },
+                query: vec,
+                using: 'summary',
                 limit: lensTopK,
                 with_payload: true,
                 filter: lensType
@@ -2505,24 +2506,25 @@ server.registerTool(
               signal: AbortSignal.timeout(8_000),
             })
               .then((r) => r.json())
-              .catch(() => ({ result: [] }))
+              .catch(() => ({ result: { points: [] } }))
           : Promise.resolve({ result: [] });
 
       // --- L2: cluster narratives (Qdrant cluster_narratives, named vector "narrative") ---
       const clusterPromise =
         clusterTopK > 0 && vec.length > 0
-          ? fetch(`${QDRANT}/collections/cluster_narratives/points/search`, {
+          ? fetch(`${QDRANT}/collections/cluster_narratives/points/query`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                vector: { name: 'narrative', vector: vec },
+                query: vec,
+                using: 'narrative',
                 limit: clusterTopK,
                 with_payload: true,
               }),
               signal: AbortSignal.timeout(8_000),
             })
               .then((r) => r.json())
-              .catch(() => ({ result: [] }))
+              .catch(() => ({ result: { points: [] } }))
           : Promise.resolve({ result: [] });
 
       // --- L3: directory cards (Redis wiki:note:dir:dir:* substring) ---
@@ -7856,11 +7858,12 @@ server.registerTool(
       });
       if (embedRes.ok) {
         const { embedding } = (await embedRes.json()) as { embedding: number[] };
-        const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+        const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: { name: 'content', vector: embedding },
+            query: embedding,
+            using: 'content',
             limit: topK,
             with_payload: ['filePath', 'chunkText', 'tags', 'stableKey', 'featureIds', 'trustTier'],
             score_threshold: 0.3,
@@ -7868,8 +7871,8 @@ server.registerTool(
           signal: AbortSignal.timeout(6000),
         });
         if (qdRes.ok) {
-          const { result } = (await qdRes.json()) as { result: unknown[] };
-          (pack.lanes as Record<string, unknown>).semantic = result ?? [];
+          const body = (await qdRes.json()) as { result?: { points?: unknown[] } };
+          (pack.lanes as Record<string, unknown>).semantic = body.result?.points ?? [];
           (pack.retrievalTrace as string[]).push('semantic:ok');
         }
       }
@@ -8306,11 +8309,12 @@ server.registerTool(
     let hits: Array<{ id: string | number; score: number; payload: Record<string, unknown> }> = [];
     for (const vecParam of [{ name: 'content', vector }, vector as unknown]) {
       try {
-        const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+        const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: vecParam,
+            query: Array.isArray(vecParam) ? vecParam : vecParam.vector,
+            ...(Array.isArray(vecParam) ? {} : { using: vecParam.name }),
             limit: limit * 2,
             score_threshold,
             with_payload: true,
@@ -8318,9 +8322,9 @@ server.registerTool(
           }),
           signal: AbortSignal.timeout(8_000),
         });
-        const d = (await r.json()) as { result?: typeof hits };
-        if (d.result?.length) {
-          hits = d.result;
+        const d = (await r.json()) as { result?: { points?: typeof hits } };
+        if (d.result?.points?.length) {
+          hits = d.result.points;
           break;
         }
       } catch {
@@ -10047,12 +10051,12 @@ server.registerTool(
       const qdrantUrl = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
       const collectionName = 'codebase_chunks_768';
 
-      const res = await fetch(`${qdrantUrl}/collections/${collectionName}/points/search`, {
+      const res = await fetch(`${qdrantUrl}/collections/${collectionName}/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: new Array(768).fill(0.1),
-          limit: 0,
+          query: new Array(768).fill(0.1),
+          limit: 1,
           with_payload: true,
         }),
       });

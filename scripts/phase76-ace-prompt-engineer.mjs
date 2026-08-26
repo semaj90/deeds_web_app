@@ -104,8 +104,8 @@ async function buildContextualPrompt(userTask, previousContext = '') {
 
   // 4. Search Qdrant for relevant documentation
   console.log('🔍 [Agent] Searching knowledge base...');
-  const searchResults = await qdrant.search(COLLECTION_NAME, {
-    vector: embedding,
+  const { points: searchResults } = await qdrant.query(COLLECTION_NAME, {
+    query: embedding,
     limit: 3,
     score_threshold: 0.5
   });

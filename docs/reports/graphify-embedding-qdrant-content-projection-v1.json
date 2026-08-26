@@ -1,13 +1,18 @@
 {
   "schema": "atlas.graphify-embedding-qdrant-projection.v1",
-  "generatedAt": "2026-08-24T01:33:17.727Z",
-  "apply": true,
+  "generatedAt": "2026-08-26T00:50:16.618Z",
+  "apply": false,
   "sourceColumn": "content_embedding_768",
+  "representationId": "semantic_768",
+  "representationRevision": "semantic_768@v1",
+  "modelRevision": "embeddinggemma:latest",
+  "dimension": 768,
   "qdrant": {
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "vectorName": "content",
-    "projectionRevision": "graphify-content-768-v1"
+    "projectionRevision": "graphify-content-768-v1",
+    "transport": "HOST_HTTP"
   },
   "payloadFields": [
     "canonical_id",
@@ -20,8 +25,11 @@
     "tags",
     "semantic_tags",
     "content_hash",
-    "embedding_model",
-    "embedding_version",
+    "representation_id",
+    "representation_name",
+    "representation_revision",
+    "embedding_dimension",
+    "model_revision",
     "projection_revision",
     "content_projection_revision",
     "signature_projection_revision",
@@ -29,39 +37,70 @@
   ],
   "scope": {
     "sinceHours": 720,
-    "limit": 576
+    "limit": 5000
   },
-  "status": "PASS",
+  "status": "DRY_RUN",
   "selected": 576,
-  "projected": 576,
+  "projected": 0,
   "skipped": 0,
+  "identityCoverage": {
+    "selected": 576,
+    "representationId": "semantic_768",
+    "representationRevision": "semantic_768@v1",
+    "dimension": 768,
+    "packetKey": 52,
+    "sourceRef": 576,
+    "contentHash": 576,
+    "sourceRevision": 0,
+    "workspaceRevision": 0
+  },
   "errors": [],
   "sample": [
     {
       "id": "87737546-81ea-4253-86c6-1594793859bf",
       "qdrantId": "2f957591-4836-f0a7-9ecd-a73fff3aac5f",
-      "sourceRef": "src/lib/server/ace/codeintel-datastore.ts"
+      "packetKey": null,
+      "sourceRef": "src/lib/server/ace/codeintel-datastore.ts",
+      "contentHash": "f7c233e8fd76fd5b",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
       "id": "879ae2c4-70b7-4d02-88be-df14647d6014",
       "qdrantId": "9020400d-1083-025c-92fc-251aa39ee865",
-      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts"
+      "packetKey": null,
+      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "contentHash": "3007c8f58652fd24",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
       "id": "89267199-d704-4408-a0a7-12b9f376a0c8",
       "qdrantId": "1703176200",
-      "sourceRef": "src/lib/services/voice-commands.ts"
+      "packetKey": null,
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "contentHash": "cc918714ae9f635d",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
       "id": "8a83b91a-43b8-4512-a693-d8f28523342d",
       "qdrantId": "7ffd9621-5c4b-eda1-bdee-48b593edc686",
-      "sourceRef": "src/lib/services/voice-commands.ts"
+      "packetKey": null,
+      "sourceRef": "src/lib/services/voice-commands.ts",
+      "contentHash": "57c241b1fb02cf08",
+      "sourceRevision": null,
+      "workspaceRevision": null
     },
     {
       "id": "8aa04d29-34d4-4305-a56d-337e73ab85b1",
       "qdrantId": "492392135",
-      "sourceRef": "src/lib/server/graph/codebase-cluster-detection.ts"
+      "packetKey": "sha256:e7a3a2de9e086a7c3a9c74984ff2bc965680dc77996b529796a0be5c49f664f2",
+      "sourceRef": "src/lib/server/graph/codebase-cluster-detection.ts",
+      "contentHash": "1e9606065daf56fa",
+      "sourceRevision": null,
+      "workspaceRevision": null
     }
   ],
-  "elapsedMs": 973
+  "elapsedMs": 371
 }

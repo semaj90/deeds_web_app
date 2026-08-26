@@ -29,8 +29,9 @@
   VRAM yourself or Ollama isn't running.
 
 .PARAMETER StartupProfile
-  One of: gemma4-direct (default tool-calling profile), ornith (Ornith 9B,
-  embedded chat template, no override), gemma4-thinking (reasoning on,
+  One of: gemma4-direct (default tool-calling profile), ornith (legacy Ornith 9B,
+  embedded chat template, no override), ornith-1.5 (candidate Ornith 1.5 9B,
+  local template), gemma4-thinking (reasoning on,
   budget 2048). Bundles model + chat-template-file + reasoning mode so you
   pick ONE coherent config. When omitted (and -SelectProfile isn't passed
   either), the launcher falls back to legacy env-var resolution
@@ -85,7 +86,7 @@ param(
   [switch] $TextOnly,
   [switch] $NoEvict,
   [switch] $StatusOnly,
-  [ValidateSet('gemma4-direct', 'ornith', 'gemma4-thinking')]
+  [ValidateSet('gemma4-direct', 'ornith', 'ornith-1.5', 'gemma4-thinking')]
   [string] $StartupProfile,
   [switch] $SelectProfile
 )
@@ -140,13 +141,23 @@ function Get-TurboStartupProfiles {
     },
     [pscustomobject]@{
       Id = 'ornith'
-      DisplayName = 'Ornith 9B - Embedded Template'
+      DisplayName = 'Ornith 1.0 9B - Embedded Template (legacy)'
       Model = Join-Path $modelRoot 'hfor\hforf.gguf'
       Alias = 'ornith-9b'
       # Ornith's model card does not require a separate custom template file.
       # Use its embedded tokenizer.chat_template unless a functional template
       # test proves the Gemma4 override is actually compatible.
       TemplateFile = $null
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      SpecType = 'none'
+    },
+    [pscustomobject]@{
+      Id = 'ornith-1.5'
+      DisplayName = 'Ornith 1.5 9B - Candidate Template'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
+      Alias = 'ornith-1.5-9b'
+      TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
       Reasoning = 'off'
       ReasoningBudget = 0
       SpecType = 'none'
@@ -440,6 +451,15 @@ $model = if ($activeTurboProfile) {
     elseif ($ollamaBlob) { $ollamaBlob }
     else { $null }
 }
+
+# --alias is REQUIRED whenever a profile is active: multiple profiles can point at
+# files that share a basename (e.g. ornith vs ornith-1.5 both ship a file literally
+# named hforf.gguf in different directories, and llama-server's own GGUF metadata
+# reports the same internal name for both). Without --alias, /props.model_alias and
+# /v1/models both collapse to the same ambiguous string and callers (the health check
+# below, OpenCode, any client) cannot tell which candidate is actually live. Must be
+# resolved here (before the health-check block) so both consumers see the same value.
+$modelAlias = if ($activeTurboProfile -and $activeTurboProfile.Alias) { $activeTurboProfile.Alias } else { $null }
 
 # Diagnostic receipt: which precedence tier actually resolved $model. Mirrors
 # the $model if/elseif chain above exactly - keep both in sync if the chain
@@ -800,7 +820,11 @@ if (-not $StatusOnly) {
             $supportsTools = $false
             $modelOk = $false
             $runningModelAlias = $null
-            $targetModelAlias = Split-Path -Leaf $model
+            # Prefer the profile's declared Alias over the raw filename: two profiles
+            # (e.g. ornith / ornith-1.5) can point at files that both happen to be named
+            # hforf.gguf, so a bare basename comparison cannot tell them apart. When no
+            # profile is active (legacy env-var resolution), fall back to basename.
+            $targetModelAlias = if ($modelAlias) { $modelAlias } else { Split-Path -Leaf $model }
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
@@ -838,7 +862,7 @@ if (-not $StatusOnly) {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
                 $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
-                $targetModelAlias = Split-Path -Leaf $model
+                $targetModelAlias = if ($modelAlias) { $modelAlias } else { Split-Path -Leaf $model }
                 $runningModelAlias = $props.model_alias
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
@@ -938,6 +962,15 @@ $baseArgs = @(
   '-t',      $threads
 )
 
+if ($modelAlias) {
+  if (Test-LlamaFlag $llama '--alias') {
+    $baseArgs = $baseArgs + @('--alias', $modelAlias)
+    Write-Host "Model alias: --alias $modelAlias (disambiguates from other profiles sharing the same GGUF filename)" -ForegroundColor Cyan
+  } else {
+    Write-Host "Model alias: profile '$($activeTurboProfile.Id)' wants alias '$modelAlias' but this llama-server build has no --alias flag — /props.model_alias will stay ambiguous" -ForegroundColor Yellow
+  }
+}
+
 # -- Parallel slots check (Multi-core / Concurrent processing) -------------
 $slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
 if (Test-LlamaFlag $llama '--parallel') {
@@ -989,7 +1022,11 @@ if ($TurboDraftModel -and -not $draftRequiresAtomicBot) {
   }
 }
 
-if (-not $TextOnly -and (Test-Path $mmproj)) {
+$skipCandidateMmproj = $activeTurboProfile -and $activeTurboProfile.Id -eq 'ornith-1.5'
+if ($skipCandidateMmproj) {
+  Write-Host 'Multimodal projector: skipped for Ornith 1.5 candidate (text/tool-calling profile)' -ForegroundColor Cyan
+}
+if (-not $TextOnly -and -not $skipCandidateMmproj -and (Test-Path $mmproj)) {
   $baseArgs = @('-m', $model, '--mmproj', $mmproj) + $baseArgs[2..($baseArgs.Length - 1)]
 }
 

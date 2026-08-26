@@ -296,8 +296,8 @@ async function phase5_verifySync(
         { ids: [row.id] }
       );
 
-      if (retrievedPoint.result && retrievedPoint.result.length > 0) {
-        const point = retrievedPoint.result[0];
+      if (retrievedPoint && retrievedPoint.length > 0) {
+        const point = retrievedPoint[0];
 
         // Verify vector length (should be 512)
         if (point.vector && Array.isArray(point.vector)) {
@@ -351,21 +351,21 @@ async function phase6_retrievalTest(
     const sampleEmbedding = originalEmbeddings[0].content_embedding;
     const query512 = quantize768to512(sampleEmbedding);
 
-    const searchResult = await client.search(
+    const searchResult = await client.query(
       COLLECTIONS.fallback_512d.name,
       {
-        vector: query512,
+        query: query512,
         limit: 5,
         score_threshold: 0.5
       }
     );
 
-    console.log(`✓ Search returned ${searchResult.result.length} results`);
-    if (searchResult.result.length > 0) {
-      console.log(`  Top result: ID=${searchResult.result[0].id}, score=${searchResult.result[0].score.toFixed(4)}`);
+    console.log(`✓ Search returned ${searchResult.points.length} results`);
+    if (searchResult.points.length > 0) {
+      console.log(`  Top result: ID=${searchResult.points[0].id}, score=${searchResult.points[0].score.toFixed(4)}`);
     }
 
-    return { success: true, resultsCount: searchResult.result.length };
+    return { success: true, resultsCount: searchResult.points.length };
   } catch (err) {
     console.error(`✗ Retrieval test failed: ${err.message}`);
     return { success: false };

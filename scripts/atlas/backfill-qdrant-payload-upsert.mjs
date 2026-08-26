@@ -69,16 +69,16 @@ async function qdrantRequest(method, path, body = null) {
   });
 }
 
-// Search Qdrant for points matching source_ref
+// Search Qdrant for points matching source_ref (Query API — legacy /points/search
+// removed in Qdrant 1.19; named-vector selection moves to top-level `using`, and
+// the dummy query vector is unnecessary here since we only care about the filter —
+// but the Query API still requires a `query` for a plain filter-scroll-like lookup,
+// so scroll is used instead, which is the correct read for filter-only lookups).
 async function searchQdrantBySourceRef(sourceRef) {
   const response = await qdrantRequest(
     'POST',
-    '/collections/codebase_chunks_768/points/search',
+    '/collections/codebase_chunks_768/points/scroll',
     {
-      vector: {
-        name: 'content',
-        vector: new Array(768).fill(0) // Dummy vector, we're using filter only
-      },
       filter: {
         must: [{ key: 'source_ref', match: { value: sourceRef } }]
       },
@@ -87,7 +87,7 @@ async function searchQdrantBySourceRef(sourceRef) {
       with_payload: true
     }
   );
-  return response.data?.result || [];
+  return response.data?.result?.points || [];
 }
 
 // Update payload for specific points

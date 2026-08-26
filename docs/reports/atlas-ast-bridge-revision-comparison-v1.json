@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-bridge-revision-comparison.v1",
-  "generatedAt": "2026-08-25T03:16:39.728Z",
+  "generatedAt": "2026-08-25T23:24:54.081Z",
   "readOnly": true,
   "databaseWrites": false,
   "inputCandidatesPath": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl",

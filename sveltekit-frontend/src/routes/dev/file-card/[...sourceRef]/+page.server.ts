@@ -132,11 +132,11 @@ export const load = async ({ params }) => {
     if (row.qdrant_point_id) {
       try {
         const pointId = /^\d+$/.test(row.qdrant_point_id) ? parseInt(row.qdrant_point_id, 10) : row.qdrant_point_id;
-        const qdrantRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/recommend`, {
+        const qdrantRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            positive: [pointId],
+            query: { recommend: { positive: [pointId], negative: [] } },
             limit: 5,
             with_payload: true
           }),
@@ -144,7 +144,7 @@ export const load = async ({ params }) => {
         });
         if (qdrantRes.ok) {
           const data = await qdrantRes.json();
-          similarFiles = data.result
+          similarFiles = data.result?.points
             ?.map(r => r.payload?.source_ref || r.payload?.file_path || r.payload?.file || r.id)
             ?.filter(ref => ref && ref !== sourceRef) || [];
         }

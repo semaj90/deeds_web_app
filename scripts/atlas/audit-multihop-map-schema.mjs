@@ -6,7 +6,7 @@
  */
 
 import { resolve } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -52,31 +52,31 @@ const REQUIRED_FIELDS = [
   'canonical'
 ];
 
-console.log('📋 Verifying node schema template...\n');
+console.log('📋 Verifying node schema against the generated artifact...\n');
 
-// Read the generator script and check createNodeTemplate function
-const generatorPath = resolve(__dirname, 'regenerate-multihop-with-enrichment.mjs');
-const generatorCode = readFileSync(generatorPath, 'utf-8');
-
-// Parse the template
-const templateMatch = generatorCode.match(/function createNodeTemplate\(\) \{([\s\S]*?)\};\s*}/);
-if (!templateMatch) {
-  console.error('❌ createNodeTemplate function not found');
+// 2026-08-26: this audit used to regex-parse the generator's SOURCE CODE for
+// a `createNodeTemplate()` function -- brittle (fails on any valid rewrite
+// that builds nodes a different way) and not actually validating what
+// matters, which is the OUTPUT DATA's schema. Read the real generated
+// artifact instead and check its actual node keys.
+const artifactPath = resolve(ROOT, 'sveltekit-frontend/docs/graph/multihop-codebase-map.enriched.json');
+let templateFields = [];
+if (existsSync(artifactPath)) {
+  const artifact = JSON.parse(readFileSync(artifactPath, 'utf-8'));
+  const sampleNode = artifact.nodes?.[0];
+  if (sampleNode) {
+    templateFields = Object.keys(sampleNode);
+    console.log(`   Sampled 1 node from ${artifact.nodes.length} in the generated artifact.\n`);
+  }
+}
+if (templateFields.length === 0) {
+  console.error('❌ No generated artifact found (or it has zero nodes) -- run the generator first');
   process.exit(1);
 }
 
-const templateBody = templateMatch[1];
-const templateFields = [];
-
-// Extract all fields (more lenient regex to catch all values)
-const fieldRegex = /(\w+):\s*(?:[^,}]+)/g;
-let match;
-while ((match = fieldRegex.exec(templateBody)) !== null) {
-  const field = match[1];
-  if (field && field.match(/^[a-z]/)) {  // Only lowercase field names
-    templateFields.push(field);
-  }
-}
+// Generator source is still read for the enrichment-integration-point checks below.
+const generatorPath = resolve(__dirname, 'regenerate-multihop-with-enrichment.mjs');
+const generatorCode = readFileSync(generatorPath, 'utf-8');
 
 // Verify all required fields present
 let missing = [];
@@ -113,7 +113,7 @@ console.log('📋 Verifying enrichment integration points...\n');
 const checks = [
   {
     name: 'fetchPostgresPackets',
-    pattern: /async function fetchPostgresPackets\(\)/,
+    pattern: /async function fetchPostgresPackets\(/,
     essential: true
   },
   {

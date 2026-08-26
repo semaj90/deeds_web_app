@@ -20,8 +20,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Search for similar clusters using cosine similarity
 		const qdrant = getQdrantClient();
-		const searchResults = await qdrant.search('phase89_error_clusters', {
-			vector: embedding,
+		const { points: searchResults } = await qdrant.query('phase89_error_clusters', {
+			query: embedding,
 			limit: limit + 1, // +1 to exclude the query cluster itself
 			with_payload: true,
 			with_vector: false

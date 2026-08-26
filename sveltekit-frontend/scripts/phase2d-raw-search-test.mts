@@ -17,11 +17,9 @@ try {
   console.log('    - vector: Array(768).fill(0.5)');
   console.log('    - limit: 10\n');
 
-  const result = await client.search('codebase_chunks_768', {
-    vector: {
-      name: 'content',
-      vector: Array(768).fill(0.5),
-    },
+  const { points: result } = await client.query('codebase_chunks_768', {
+    query: Array(768).fill(0.5),
+    using: 'content',
     limit: 10,
     with_payload: true,
   });

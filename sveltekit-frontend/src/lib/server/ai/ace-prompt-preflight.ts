@@ -591,11 +591,12 @@ export async function buildAcePromptPreflight(
   if (queryEmbedding) {
     const search = async (collection: string, limit: number) => {
       try {
-        return await qdrant.search(collection, {
-          vector: queryEmbedding!,
+        const { points } = await qdrant.query(collection, {
+          query: queryEmbedding!,
           limit,
           with_payload: true,
         });
+        return points;
       } catch {
         return [];
       }

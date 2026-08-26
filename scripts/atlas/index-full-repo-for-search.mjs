@@ -21,7 +21,7 @@
  * Strategy per file:
  *   1. Split into sliding-window chunks (~800 chars, 100-char overlap)
  *   2. Embed each chunk via Ollama embeddinggemma:latest (768-dim)
- *   3. Upsert chunk into codebase_chunk_index (halfvec(768) content_embedding)
+ *   3. Upsert chunk into codebase_chunk_index.content_embedding_768 (vector(768))
  *   4. Upsert point into Qdrant codebase_chunks_768 (named vector "content")
  *
  * Idempotent: uses content_hash ON CONFLICT (qdrant_id) DO UPDATE.
@@ -76,9 +76,12 @@ function getArgValue(flagName) {
 const LIMIT = Number.parseInt(getArgValue('--limit') ?? '0', 10) || 0;
 const TARGET = getArgValue('--target');
 const ROOTS_ARG = getArgValue('--roots');
+const AST_MANIFEST_PATH = getArgValue('--ast-manifest');
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
+const EMBEDDING_BACKEND = String(process.env.EMBEDDING_BACKEND ?? 'ollama').toLowerCase();
+const EMBED_SERVER_URL = (process.env.EMBED_SERVER_URL ?? process.env.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081').replace(/\/$/, '');
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://127.0.0.1:6333';
 const DATABASE_URL = process.env.DATABASE_URL ??
   'postgres://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -92,7 +95,9 @@ const COLLECTION   = 'codebase_chunks_768';
 const CENTROID_TTL = 24 * 3600;
 const CHUNK_SIZE   = 800;   // chars
 const CHUNK_OVERLAP = 100;  // chars
-const EMBED_BATCH  = 8;     // parallel embed calls per batch
+const EMBED_BATCH  = Math.max(1, Number.parseInt(process.env.EMBED_MAX_BATCH ?? (EMBEDDING_BACKEND === 'llama_cpp_gguf' ? '64' : '8'), 10) || 8);
+const EMBED_MAX_TOKENS = Math.max(1, Number.parseInt(process.env.EMBED_MAX_TOKENS ?? '512', 10) || 512);
+const EMBED_MAX_BYTES = Math.max(1, Number.parseInt(process.env.EMBED_MAX_BYTES ?? '200000', 10) || 200000);
 const LARGE_FILE_BYTES = 200_000;  // 200KB — switch to smart-chunking for large files
 const MAX_CHUNKS_PER_FILE = 50;    // cap chunks per file even for large ones
 const GENERATED_PATTERNS = [
@@ -102,6 +107,9 @@ const GENERATED_PATTERNS = [
   /package-lock\.json$/i,
   /pnpm-lock\.yaml$/i,
 ];
+
+const AST_MAX_CHUNK_CHARS = 12_000;
+let AST_MANIFEST = new Map();
 
 // ── Scan targets ─────────────────────────────────────────────────────────────
 const SCAN_DIRS = TARGET
@@ -160,6 +168,135 @@ function chunkText(text, size, overlap) {
 
 function isGeneratedFile(relPath) {
   return GENERATED_PATTERNS.some((pattern) => pattern.test(relPath));
+}
+
+function normalizeRepoPath(value) {
+  return String(value ?? '')
+    .replaceAll('\\', '/')
+    .replace(/^\.\//, '')
+    .replace(/^\//, '');
+}
+
+function astManifestKeys(relPath) {
+  const normalized = normalizeRepoPath(relPath);
+  const keys = [normalized];
+  if (normalized.startsWith('sveltekit-frontend/')) {
+    keys.push(normalized.slice('sveltekit-frontend/'.length));
+  }
+  if (normalized.startsWith('sveltekit-frontend/src/lib/')) {
+    keys.push(`$lib/${normalized.slice('sveltekit-frontend/src/lib/'.length)}`);
+  }
+  if (normalized.startsWith('sveltekit-frontend/src/routes/')) {
+    keys.push(`$routes/${normalized.slice('sveltekit-frontend/src/routes/'.length)}`);
+  }
+  if (normalized.startsWith('src/')) {
+    keys.push(`sveltekit-frontend/${normalized}`);
+    keys.push(`$lib/${normalized.slice('src/'.length)}`);
+  }
+  return [...new Set(keys)];
+}
+
+function astRowsForPath(relPath) {
+  for (const key of astManifestKeys(relPath)) {
+    const rows = AST_MANIFEST.get(key);
+    if (rows?.length) return rows;
+  }
+  return [];
+}
+
+function firstValue(row, names) {
+  for (const name of names) {
+    if (row?.[name] !== undefined && row?.[name] !== null && row[name] !== '') return row[name];
+  }
+  return null;
+}
+
+function byteOffset(row, side) {
+  const direct = firstValue(row, side === 'start'
+    ? ['start_byte', 'startByte', 'byte_start', 'byteStart']
+    : ['end_byte', 'endByte', 'byte_end', 'byteEnd']);
+  if (direct !== null) return Number(direct);
+  const nested = row?.range?.[side] ?? row?.span?.[side] ?? row?.byte_range?.[side];
+  if (typeof nested === 'number') return nested;
+  if (nested && typeof nested === 'object') {
+    return Number(firstValue(nested, ['byte', 'offset', 'index']));
+  }
+  return Number.NaN;
+}
+
+/**
+ * Load an optional AST observation JSONL artifact. The artifact is an input
+ * projection only; it does not become structural authority and rows without
+ * exact byte spans are ignored so text fallback remains available.
+ */
+function loadAstManifest(filePath) {
+  if (!filePath) return new Map();
+  const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(REPO_ROOT, filePath);
+  const bySource = new Map();
+  const lines = fs.readFileSync(absolutePath, 'utf8').split(/\r?\n/);
+
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    let row;
+    try { row = JSON.parse(line); } catch { continue; }
+    const sourceRef = normalizeRepoPath(firstValue(row, ['source_ref', 'sourceRef', 'relative_path', 'relativePath', 'file_path', 'filePath', 'file', 'path']));
+    const startByte = byteOffset(row, 'start');
+    const endByte = byteOffset(row, 'end');
+    if (!sourceRef || !Number.isInteger(startByte) || !Number.isInteger(endByte) || endByte <= startByte) continue;
+    const item = {
+      source_ref: sourceRef,
+      start_byte: startByte,
+      end_byte: endByte,
+      node_kind: firstValue(row, ['node_kind', 'nodeKind', 'documentKind', 'kind']) ?? 'AST_DECLARATION',
+      symbol_name: firstValue(row, ['symbol_name', 'symbolName', 'qualified_symbol', 'qualifiedSymbol', 'name', 'symbol']),
+      tree_node_id: firstValue(row, ['tree_node_id', 'treeNodeId']),
+      symbol_version_id: firstValue(row, ['symbol_version_id', 'symbolVersionId']),
+      source_revision: firstValue(row, ['source_revision', 'sourceRevision']),
+      workspace_revision: firstValue(row, ['workspace_revision', 'workspaceRevision']),
+      signature: firstValue(row, ['normalized_signature', 'normalizedSignature', 'signature']),
+      direct_members: firstValue(row, ['direct_members', 'directMembers', 'members']),
+      ast_content_hash: firstValue(row, ['content_hash', 'contentHash', 'source_content_hash', 'sourceContentHash']),
+      ast_status: firstValue(row, ['ast_status', 'astStatus']) ?? 'PARSED',
+    };
+    const rows = bySource.get(sourceRef) ?? [];
+    rows.push(item);
+    bySource.set(sourceRef, rows);
+  }
+
+  for (const rows of bySource.values()) {
+    rows.sort((a, b) => a.start_byte - b.start_byte || b.end_byte - a.end_byte);
+  }
+  return bySource;
+}
+
+function buildAstChunks(text, relPath, rows) {
+  if (!rows?.length) return [];
+  const chunks = [];
+  for (const row of rows.slice(0, MAX_CHUNKS_PER_FILE)) {
+    if (row.start_byte < 0 || row.end_byte > Buffer.byteLength(text, 'utf8')) continue;
+    const prefix = Buffer.from(text, 'utf8').subarray(0, row.start_byte).toString('utf8');
+    const body = Buffer.from(text, 'utf8').subarray(row.start_byte, row.end_byte).toString('utf8');
+    if (!body.trim() || body.length > AST_MAX_CHUNK_CHARS) continue;
+    chunks.push({
+      text: body,
+      start: prefix.length,
+      end: prefix.length + body.length,
+      chunk_kind: 'ast-declaration',
+      chunk_source: 'AST_DECLARATION',
+      ast_status: row.ast_status,
+      node_kind: row.node_kind,
+      symbol_name: row.symbol_name,
+      tree_node_id: row.tree_node_id,
+      symbol_version_id: row.symbol_version_id,
+      source_revision: row.source_revision,
+      workspace_revision: row.workspace_revision,
+      signature: row.signature,
+      direct_members: row.direct_members,
+      ast_content_hash: row.ast_content_hash,
+      source_ref: relPath,
+    });
+  }
+  return chunks;
 }
 
 /**
@@ -221,24 +358,63 @@ function chunkLargeText(text, ext, maxChunks = MAX_CHUNKS_PER_FILE) {
   if (paragraphs.length >= 4) {
     const chunks = [];
     let buf = '';
+    const flushBuf = () => {
+      if (buf.trim().length > 40) chunks.push({ text: buf.trim(), start: 0, end: buf.length, chunk_kind: 'large-text' });
+      buf = '';
+    };
     for (const para of paragraphs) {
+      if (chunks.length >= maxChunks) break;
+      // A single paragraph larger than CHUNK_SIZE (e.g. a big table or
+      // unbroken text block, no blank-line breaks inside it) was previously
+      // pushed whole via `buf = para` -- confirmed live 2026-08-26 this
+      // produced chunks Ollama rejected with "input length exceeds the
+      // context length" (AGENTS.md: 10/40 chunk embeds failed this way).
+      // Split any oversized paragraph itself via the sliding-window chunker
+      // instead of ever letting one through unsplit.
+      if (para.length > CHUNK_SIZE) {
+        flushBuf();
+        for (const sub of chunkText(para, CHUNK_SIZE, CHUNK_OVERLAP)) {
+          if (chunks.length >= maxChunks) break;
+          if (sub.text.trim().length > 40) chunks.push({ ...sub, chunk_kind: 'large-text' });
+        }
+        continue;
+      }
       if (buf.length + para.length + 2 > CHUNK_SIZE) {
-        if (buf.trim().length > 40) chunks.push({ text: buf.trim(), start: 0, end: buf.length, chunk_kind: 'large-text' });
+        flushBuf();
         buf = para;
-        if (chunks.length >= maxChunks) break;
       } else {
         buf += (buf ? '\n\n' : '') + para;
       }
     }
-    if (buf.trim().length > 40 && chunks.length < maxChunks) {
-      chunks.push({ text: buf.trim(), start: 0, end: buf.length, chunk_kind: 'large-text' });
-    }
+    if (chunks.length < maxChunks) flushBuf();
     if (chunks.length >= 4) return chunks;
   }
   return chunkText(text, CHUNK_SIZE, CHUNK_OVERLAP).slice(0, maxChunks).map((chunk) => ({
     ...chunk,
     chunk_kind: 'large-text',
   }));
+}
+
+function estimateEmbeddingTokens(text) {
+  // Conservative approximation for queue admission; llama.cpp remains the
+  // authority on the actual tokenizer and server-side microbatch capacity.
+  return Math.max(1, Math.ceil(Buffer.byteLength(text, 'utf8') / 4));
+}
+
+function nextEmbeddingBatch(chunks, offset) {
+  const batch = [];
+  let tokenCount = 0;
+  let byteCount = 0;
+  for (let index = offset; index < chunks.length && batch.length < EMBED_BATCH; index += 1) {
+    const chunk = chunks[index];
+    const nextTokens = estimateEmbeddingTokens(chunk.content);
+    const nextBytes = Buffer.byteLength(chunk.content, 'utf8');
+    if (batch.length > 0 && (tokenCount + nextTokens > EMBED_MAX_TOKENS || byteCount + nextBytes > EMBED_MAX_BYTES)) break;
+    batch.push(chunk);
+    tokenCount += nextTokens;
+    byteCount += nextBytes;
+  }
+  return { batch, tokenCount, byteCount };
 }
 
 /** Walk a directory, returning relative paths */
@@ -260,16 +436,52 @@ function walk(dir, results = []) {
 }
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
-async function embedText(text) {
-  const r = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+let ggufFallbackLogged = false;
+
+function embeddingsFromResponse(data) {
+  if (Array.isArray(data?.embeddings)) return data.embeddings;
+  if (Array.isArray(data?.data)) return data.data.map((item) => item?.embedding ?? null);
+  if (Array.isArray(data?.embedding)) return [data.embedding];
+  return [];
+}
+
+async function requestEmbeddingBatch(url, body, label) {
+  const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: EMBED_MODEL, prompt: text }),
-    signal: AbortSignal.timeout(30_000),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(120_000),
   });
-  if (!r.ok) throw new Error(`Ollama embed ${r.status}: ${await r.text()}`);
-  const d = await r.json();
-  return d.embedding ?? null;
+  if (!response.ok) throw new Error(`${label} embed ${response.status}: ${(await response.text()).slice(0, 200)}`);
+  const embeddings = embeddingsFromResponse(await response.json());
+  const expected = body.input?.length ?? 1;
+  if (embeddings.length !== expected) {
+    throw new Error(`${label} embedding count mismatch: got ${embeddings.length}, expected ${expected}`);
+  }
+  return embeddings;
+}
+
+async function embedBatch(texts) {
+  if (EMBEDDING_BACKEND === 'llama_cpp_gguf') {
+    try {
+      return await requestEmbeddingBatch(
+        `${EMBED_SERVER_URL}/v1/embeddings`,
+        { model: EMBED_MODEL, input: texts },
+        'llama_cpp_gguf',
+      );
+    } catch (error) {
+      if (!ggufFallbackLogged) {
+        console.warn(`[embedding] GGUF/CUDA backend unavailable; falling back to Ollama: ${error.message}`);
+        ggufFallbackLogged = true;
+      }
+    }
+  }
+
+  return requestEmbeddingBatch(
+    `${OLLAMA_URL}/api/embed`,
+    { model: EMBED_MODEL, input: texts },
+    'Ollama',
+  );
 }
 
 // ── Qdrant upsert ─────────────────────────────────────────────────────────────
@@ -291,7 +503,7 @@ async function upsertPostgres(pool, chunk, embedding) {
   const vecStr = `[${embedding.join(',')}]`;
   await pool.query(
     `INSERT INTO codebase_chunk_index
-       (qdrant_id, chunk_id, relative_path, content, content_embedding,
+       (qdrant_id, chunk_id, relative_path, content, content_embedding_768,
         domain, tags, metadata,
         language, extension, embedding_model, embedding_dimension, content_hash,
         line_start, line_end, indexed_at, updated_at)
@@ -301,7 +513,7 @@ async function upsertPostgres(pool, chunk, embedding) {
              $14, $15, NOW(), NOW())
      ON CONFLICT (qdrant_id) DO UPDATE SET
        content           = EXCLUDED.content,
-       content_embedding = EXCLUDED.content_embedding,
+       content_embedding_768 = EXCLUDED.content_embedding_768,
        content_hash      = EXCLUDED.content_hash,
        domain            = EXCLUDED.domain,
        tags              = EXCLUDED.tags,
@@ -362,9 +574,11 @@ async function processFile(absPath, pool, stats) {
   const isLarge  = fileSize > LARGE_FILE_BYTES;
   const maxChunks = isGeneratedFile(relPath) ? 10 : MAX_CHUNKS_PER_FILE;
 
-  // Choose chunking strategy based on file size and type
-  let rawChunks;
-  if (isLarge) {
+  // Prefer exact AST declaration spans when a reviewed artifact supplied them.
+  // Files without valid observations retain the existing text fallback.
+  const astChunks = buildAstChunks(text, relPath, astRowsForPath(relPath));
+  let rawChunks = astChunks;
+  if (rawChunks.length === 0 && isLarge) {
     if (ext === '.json') {
       rawChunks = chunkLargeJson(text, relPath, maxChunks);
       if (VERBOSE) console.log(`  [large-json] ${relPath} (${(fileSize/1024).toFixed(0)}KB) → ${rawChunks.length} semantic chunks`);
@@ -372,7 +586,7 @@ async function processFile(absPath, pool, stats) {
       rawChunks = chunkLargeText(text, ext, maxChunks);
       if (VERBOSE) console.log(`  [large-text] ${relPath} (${(fileSize/1024).toFixed(0)}KB) → ${rawChunks.length} para chunks`);
     }
-  } else {
+  } else if (rawChunks.length === 0) {
     rawChunks = chunkText(text, CHUNK_SIZE, CHUNK_OVERLAP).slice(0, maxChunks);
   }
 
@@ -421,6 +635,17 @@ async function processFile(absPath, pool, stats) {
       file_hash:     fileHash,
       key_path:      c.key_path ?? null,
       chunk_kind:    c.chunk_kind ?? (isLarge ? 'large-text' : 'text'),
+      chunk_source:   c.chunk_source ?? 'TEXT_FALLBACK',
+      ast_status:     c.ast_status ?? (astChunks.length > 0 ? 'PARSED' : 'UNAVAILABLE'),
+      node_kind:      c.node_kind ?? null,
+      symbol_name:    c.symbol_name ?? null,
+      tree_node_id:   c.tree_node_id ?? null,
+      symbol_version_id: c.symbol_version_id ?? null,
+      source_revision: c.source_revision ?? null,
+      workspace_revision: c.workspace_revision ?? null,
+      signature: c.signature ?? null,
+      direct_members: c.direct_members ?? null,
+      ast_content_hash: c.ast_content_hash ?? null,
       topology,
       qdrant_tags: [
         domainClass,
@@ -440,6 +665,17 @@ async function processFile(absPath, pool, stats) {
         packet_key: qdrantId,
         key_path: c.key_path ?? null,
         chunk_kind: c.chunk_kind ?? (isLarge ? 'large-text' : 'text'),
+        chunk_source: c.chunk_source ?? 'TEXT_FALLBACK',
+        ast_status: c.ast_status ?? (astChunks.length > 0 ? 'PARSED' : 'UNAVAILABLE'),
+        node_kind: c.node_kind ?? null,
+        symbol_name: c.symbol_name ?? null,
+        tree_node_id: c.tree_node_id ?? null,
+        symbol_version_id: c.symbol_version_id ?? null,
+        source_revision: c.source_revision ?? null,
+        workspace_revision: c.workspace_revision ?? null,
+        signature: c.signature ?? null,
+        direct_members: c.direct_members ?? null,
+        ast_content_hash: c.ast_content_hash ?? null,
         topology,
         qdrant_tags: [
           domainClass,
@@ -462,6 +698,10 @@ async function processFile(absPath, pool, stats) {
   const existingIds = await alreadyIndexed(pool, chunks.map(c => c.qdrant_id));
   const toIndex = chunks.filter(c => !existingIds.has(c.qdrant_id));
 
+  if (VERBOSE && astChunks.length > 0) {
+    console.log(`  [ast] ${relPath} -> ${astChunks.length} declaration chunks (alias-resolved manifest)`);
+  }
+
   if (toIndex.length === 0) {
     stats.skipped++;
     return;
@@ -482,11 +722,27 @@ async function processFile(absPath, pool, stats) {
   }
 
   // Embed in micro-batches
-  for (let i = 0; i < toIndex.length; i += EMBED_BATCH) {
-    const batch = toIndex.slice(i, i + EMBED_BATCH);
-    await Promise.all(batch.map(async (chunk) => {
+  let succeededChunks = 0;
+  for (let i = 0; i < toIndex.length;) {
+    const admission = nextEmbeddingBatch(toIndex, i);
+    const batch = admission.batch;
+    if (batch.length === 0) break;
+    i += batch.length;
+    if (VERBOSE) {
+      console.log(`  [embed-batch] docs=${batch.length} estimated_tokens=${admission.tokenCount} bytes=${admission.byteCount}`);
+    }
+    let embeddings;
+    try {
+      embeddings = await embedBatch(batch.map((chunk) => chunk.content));
+    } catch (err) {
+      if (VERBOSE) console.error(`  ERROR embedding batch ${relPath}: ${err.message}`);
+      stats.errors += batch.length;
+      continue;
+    }
+
+    await Promise.all(batch.map(async (chunk, batchIndex) => {
       try {
-        const embedding = await embedText(chunk.content);
+        const embedding = embeddings[batchIndex];
         if (!embedding || embedding.length !== 768) {
           stats.errors++;
           return;
@@ -510,6 +766,23 @@ async function processFile(absPath, pool, stats) {
           key_path:     chunk.key_path,
           content:      chunk.content.slice(0, 500),
           qdrant_tags:  chunk.qdrant_tags,
+          representation_id: 'semantic_768',
+          representation_name: 'semantic_768',
+          representation_revision: 'semantic_768@v1',
+          embedding_dimension: 768,
+          model_revision: EMBED_MODEL,
+          content_hash: chunk.content_hash,
+          chunk_source: chunk.chunk_source,
+          ast_status: chunk.ast_status,
+          node_kind: chunk.node_kind,
+          symbol_name: chunk.symbol_name,
+          tree_node_id: chunk.tree_node_id,
+          symbol_version_id: chunk.symbol_version_id,
+          signature: chunk.signature,
+          direct_members: chunk.direct_members,
+          ast_content_hash: chunk.ast_content_hash,
+          ...(chunk.source_revision ? { source_revision: chunk.source_revision } : {}),
+          ...(chunk.workspace_revision ? { workspace_revision: chunk.workspace_revision } : {}),
           repo:         'deeds-web-app',
           // centroid routing hints — used by HyperRAG/RRF to find related clusters
           routing_hints: {
@@ -520,6 +793,7 @@ async function processFile(absPath, pool, stats) {
         await upsertQdrant(chunk.qdrant_id, embedding, payload);
         await upsertPostgres(pool, chunk, embedding);
         stats.chunks++;
+        succeededChunks++;
         // Accumulate for Redis centroid warming (post-run)
         stats.centroidAcc[chunk.domain_class] = stats.centroidAcc[chunk.domain_class] ?? [];
         stats.centroidAcc[chunk.domain_class].push(embedding);
@@ -533,11 +807,36 @@ async function processFile(absPath, pool, stats) {
     }));
   }
   stats.files++;
-  if (VERBOSE) console.log(`  ✓ ${relPath} (${toIndex.length} new chunks)`);
+  // Report actual successes, not attempted count -- confirmed live 2026-08-26
+  // this previously logged toIndex.length unconditionally even when some
+  // chunks failed (e.g. AGENTS.md: 40 attempted, 10 "input length exceeds
+  // context length" errors, only 30 rows actually written -- but the old
+  // line claimed "(40 new chunks)" regardless).
+  if (succeededChunks === toIndex.length) {
+    if (VERBOSE) console.log(`  ✓ ${relPath} (${succeededChunks} new chunks)`);
+  } else if (succeededChunks > 0) {
+    console.log(`  ⚠ ${relPath} (${succeededChunks}/${toIndex.length} chunks -- ${toIndex.length - succeededChunks} failed, see ERROR lines above)`);
+  } else {
+    stats.filesFullyFailed = (stats.filesFullyFailed ?? 0) + 1;
+    console.log(`  ✗ ${relPath} (0/${toIndex.length} chunks succeeded)`);
+  }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  if (AST_MANIFEST_PATH) {
+    try {
+      AST_MANIFEST = loadAstManifest(AST_MANIFEST_PATH);
+      console.log(`AST manifest: ${AST_MANIFEST_PATH} (${AST_MANIFEST.size} source files with valid spans)`);
+    } catch (err) {
+      console.error(`[FAIL] Unable to load AST manifest: ${err.message}`);
+      process.exitCode = 1;
+      return;
+    }
+  } else {
+    console.log('AST manifest: not supplied; TEXT_FALLBACK remains active');
+  }
+
   console.log('╔══════════════════════════════════════════════════════════════╗');
   console.log('║  Full-Repo Indexer (chunks → Postgres + Qdrant)             ║');
   console.log(`║  Mode: ${APPLY ? 'APPLY   ' : 'DRY-RUN '}  Target: ${(TARGET ?? 'all').padEnd(42)}║`);
@@ -602,6 +901,9 @@ async function main() {
   console.log(`Chunks indexed   : ${stats.chunks}`);
   console.log(`Files skipped    : ${stats.skipped} (already indexed)`);
   console.log(`Errors           : ${stats.errors}`);
+  if (stats.filesFullyFailed) {
+    console.log(`Files 0% indexed : ${stats.filesFullyFailed} (all chunks failed -- see ✗ lines above)`);
+  }
   console.log(`Elapsed          : ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
 
   if (domainEntries.length > 0) {

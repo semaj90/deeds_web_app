@@ -208,11 +208,11 @@ async function collectSemanticEvidence(client: any, packetKey: string, sourceRef
     } else {
       // TurboVec empty/unavailable — fall back to direct Qdrant ANN (source of truth, not a mirror).
       const qdrant = getQdrantClient();
-      const hits = await qdrant.search('codebase_chunks_768', {
-        vector: embedding,
+      const hits = await qdrant.query('codebase_chunks_768', {
+        query: embedding,
         limit: 20,
         with_payload: true,
-      }).catch(() => [] as any[]);
+      }).then((r) => r.points).catch(() => [] as any[]);
       neighborPacketKeys = (hits as any[])
         .map((h) => h.payload?.packet_key)
         .filter((k): k is string => typeof k === 'string' && k.length > 0 && k !== packetKey);

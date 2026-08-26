@@ -7,7 +7,7 @@ import { CANONICAL_EMBEDDING_DIM } from './lib/server/embedding/embedding-contra
 
 // Type definitions
 interface SearchRequestBody {
-    vector?: number[];
+    vector?: number[] | { name: string; vector: number[] };
     limit?: number;
     with_payload?: boolean;
     filter?: Record<string, unknown>;
@@ -78,14 +78,14 @@ interface SdkClientLike {
         createPayloadIndex?: (name: string, body: PayloadIndexBody) => Promise<unknown>;
     };
     points?: {
-        search?: (opts: Record<string, unknown>) => Promise<SearchHit[]>;
+        query?: (opts: Record<string, unknown>) => Promise<{ points?: SearchHit[] }>;
         upsert?: (opts: Record<string, unknown>) => Promise<unknown>;
         delete?: (opts: Record<string, unknown>) => Promise<unknown>;
     };
     createCollection?: (name: string, body: CreateCollectionBody) => Promise<unknown>;
     getCollections?: () => Promise<CollectionsListResponse>;
     createPayloadIndex?: (name: string, body: PayloadIndexBody) => Promise<unknown>;
-    search?: (collectionName: string, body: SearchRequestBody) => Promise<SearchHit[]>;
+    query?: (collectionName: string, body: Record<string, unknown>) => Promise<{ points?: SearchHit[] }>;
     upsert?: (collectionName: string, body: Record<string, unknown>) => Promise<unknown>;
     delete?: (collectionName: string, body: Record<string, unknown>) => Promise<unknown>;
 }
@@ -164,12 +164,21 @@ async function httpCreatePayloadIndex(collectionName: string, body: PayloadIndex
     throw new Error('createPayloadIndex failed (all HTTP endpoints tried)');
 }
 
-async function httpSearch(collectionName: string, body: SearchRequestBody): Promise<SearchHit[]> {
-    return (await httpRequest(
-        `/collections/${encodeURIComponent(collectionName)}/points/search`,
+function toQueryRequest(body: SearchRequestBody): Record<string, unknown> {
+    const { vector, ...rest } = body;
+    if (vector && !Array.isArray(vector)) {
+        return { ...rest, query: vector.vector, using: vector.name };
+    }
+    return { ...rest, query: vector };
+}
+
+async function httpQuery(collectionName: string, body: SearchRequestBody): Promise<SearchHit[]> {
+    const response = await httpRequest(
+        `/collections/${encodeURIComponent(collectionName)}/points/query`,
         'POST',
-        body
-    )) as SearchHit[];
+        toQueryRequest(body)
+    ) as { points?: SearchHit[] };
+    return response.points ?? [];
 }
 
 async function httpUpsert(
@@ -240,17 +249,20 @@ const qdrant = {
         const sdk = await tryCreateSdkClient();
         if (sdk) {
             try {
-                if (sdk.points?.search) {
-                    return await sdk.points.search({ collection_name: collectionName, ...body });
+                const queryBody = toQueryRequest(body);
+                if (sdk.points?.query) {
+                    const response = await sdk.points.query({ collection_name: collectionName, ...queryBody });
+                    return response.points ?? [];
                 }
-                if (typeof sdk.search === 'function') {
-                    return await sdk.search(collectionName, body);
+                if (typeof sdk.query === 'function') {
+                    const response = await sdk.query(collectionName, queryBody);
+                    return response.points ?? [];
                 }
             } catch (e) {
-                console.warn('[Qdrant] SDK search failed, falling back to HTTP', e);
+                console.warn('[Qdrant] SDK query failed, falling back to HTTP', e);
             }
         }
-        return await httpSearch(collectionName, body);
+        return await httpQuery(collectionName, body);
     },
 
     async upsert(collectionName: string, points: Array<Record<string, unknown>>): Promise<unknown> {

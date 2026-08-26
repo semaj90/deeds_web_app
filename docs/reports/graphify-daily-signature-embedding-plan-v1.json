@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-rff-embedding-backfill.v1",
-  "generatedAt": "2026-08-24T22:09:55.147Z",
+  "generatedAt": "2026-08-26T03:32:07.152Z",
   "apply": false,
   "signatureOnly": true,
   "model": "embeddinggemma:latest",
@@ -21,32 +21,32 @@
   },
   "sample": [
     {
-      "id": "93590876-8f40-45ad-9bba-b0dd5dcdfe6b",
-      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
+      "id": "1ae79974-3eb1-449f-aa7e-07f14655296d",
+      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
       "missingError": true,
       "missingSignature": true
     },
     {
-      "id": "942b8fad-d5ea-4040-a6bc-b1c44ad9aa0f",
-      "sourceRef": "src/routes/api/routes/[routeId]/interactions/+server.ts",
+      "id": "318bc320-96cc-4097-8b47-7dde35d278a8",
+      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
       "missingError": true,
       "missingSignature": true
     },
     {
-      "id": "94b3bfcd-2beb-4855-9f05-e9f8c0e05a01",
-      "sourceRef": "src/lib/utils/security.ts",
+      "id": "356f26d3-9f8a-4020-9007-de969684db89",
+      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
       "missingError": true,
       "missingSignature": true
     },
     {
-      "id": "9630adda-8721-42fc-aeb0-7064b9713a12",
-      "sourceRef": "src/lib/services/voice-commands.ts",
+      "id": "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
+      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
       "missingError": true,
       "missingSignature": true
     },
     {
-      "id": "965cb8fd-ed71-41c2-936e-64a12bc830ad",
-      "sourceRef": "src/lib/ai/ollama-config.ts",
+      "id": "493a437f-c1a6-4e0e-8d6a-20874ff03f48",
+      "sourceRef": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
       "missingError": true,
       "missingSignature": true
     }

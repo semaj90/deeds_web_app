@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-08-26T00:35:06.436Z",
+  "totalNodes": 61660,
+  "withMissingCoreFields": 0,
+  "qdrantMatchRate": 0.09461563412260784,
+  "karpathyEnrichRate": 1,
+  "qdrantPagesScanned": 107
+}

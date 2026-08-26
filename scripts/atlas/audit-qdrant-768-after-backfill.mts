@@ -368,13 +368,13 @@ function buildIdentityQuery(columns: Set<string>): string {
   return `
     SELECT ${selectParts.join(', ')}
     FROM codebase_chunk_index
-    WHERE content_embedding IS NOT NULL
+    WHERE content_embedding_768 IS NOT NULL
     ORDER BY id ASC
   `;
 }
 
 function buildEmbeddingQuery(columns: Set<string>): string {
-  const selectParts = ['id::text AS id', 'content_embedding::text AS embedding_text'];
+  const selectParts = ['id::text AS id', 'content_embedding_768::text AS embedding_text'];
   if (columns.has('content_hash')) selectParts.push('content_hash');
   if (columns.has('embedding_model')) selectParts.push('embedding_model');
   if (columns.has('embedding_normalized')) selectParts.push('embedding_normalized');
@@ -390,7 +390,7 @@ function identityBlockersFromColumns(columns: string[]): string[] {
   const blockers: string[] = [];
   if (!columns.includes('id')) blockers.push('MISSING_ID_COLUMN');
   if (!columns.includes('relative_path')) blockers.push('MISSING_RELATIVE_PATH_COLUMN');
-  if (!columns.includes('content_embedding')) blockers.push('MISSING_CONTENT_EMBEDDING_COLUMN');
+  if (!columns.includes('content_embedding_768')) blockers.push('MISSING_CONTENT_EMBEDDING_768_COLUMN');
   if (!columns.includes('embedding_model')) blockers.push('MISSING_EMBEDDING_MODEL_COLUMN');
   return blockers;
 }

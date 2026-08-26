@@ -98,20 +98,24 @@ async function backfillQdrantHit() {
   for (let i = 0; i < packets.length; i++) {
     const packet = packets[i];
 
-    // Search Qdrant by packet_key
-    const response = await qdrantRequest('POST', '/collections/codebase_chunks_768/points/search', {
-      vector: [],
+    // Search Qdrant by packet_key (filter-only lookup — Query API's legacy
+    // /points/search endpoint is removed in Qdrant 1.19, and this was never a
+    // real vector search anyway (dummy empty vector); /points/scroll is the
+    // correct filter-only read. Also fixes a pre-existing bug: the filter
+    // condition used `field:` instead of Qdrant's actual `key:` property, so
+    // this filter was likely never matching correctly before either.)
+    const response = await qdrantRequest('POST', '/collections/codebase_chunks_768/points/scroll', {
       limit: 1,
       filter: {
         must: [{
-          field: 'packet_key',
+          key: 'packet_key',
           match: { value: packet.packet_key }
         }]
       },
       with_payload: true
     });
 
-    const hits = response.data?.result || [];
+    const hits = response.data?.result?.points || [];
 
     if (hits.length > 0) {
       const hit = hits[0];

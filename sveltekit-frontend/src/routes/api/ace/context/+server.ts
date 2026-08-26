@@ -63,12 +63,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // 3. Search Qdrant for initial candidates (extra headroom for reranking)
     const qdrantLimit = policy.maxChunks * 2;
     const searchResp = await fetch(
-      `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+      `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: { name: 'content', vector },
+          query: vector,
+          using: 'content',
           limit: qdrantLimit,
           with_payload: true,
         }),
@@ -79,7 +80,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     let qdrantResults: Record<string, unknown>[] = [];
     if (searchResp.ok) {
       const searchData = await searchResp.json();
-      qdrantResults = searchData?.result ?? [];
+      qdrantResults = searchData?.result?.points ?? searchData?.points ?? [];
     } else {
       console.warn('[ace/context] Qdrant search failed:', searchResp.status);
     }

@@ -19,6 +19,10 @@ const COLLECTION = String(arg('collection', env.QDRANT_CODE_COLLECTION ?? 'codeb
 const VECTOR_NAME = String(arg('vector-name', 'content'));
 if (!['content', 'signature'].includes(VECTOR_NAME)) throw new Error(`Unsupported vector-name: ${VECTOR_NAME}`);
 const SOURCE_COLUMN = VECTOR_NAME === 'signature' ? 'signature_embedding' : 'content_embedding_768';
+const REPRESENTATION_ID = VECTOR_NAME === 'signature' ? 'ast_semantic_rpc_768' : 'semantic_768';
+const REPRESENTATION_REVISION = String(arg('representation-revision', VECTOR_NAME === 'signature' ? 'ast_semantic_rpc_768@v1' : 'semantic_768@v1'));
+const MODEL_REVISION = String(arg('model-revision', 'embeddinggemma:latest'));
+const CANONICAL_DIMENSION = 768;
 const PROJECTION_REVISION = String(arg('projection-revision', `graphify-${VECTOR_NAME}-768-v1`));
 const OUT = path.resolve(REPO_ROOT, String(arg('out', `docs/reports/graphify-embedding-qdrant-${VECTOR_NAME}-projection-v1.json`)));
 let qdrantTransport = 'HOST_HTTP';
@@ -65,7 +69,7 @@ async function jsonFetch(url, options = {}) {
 async function main() {
   const started = Date.now();
   const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-embedding-qdrant-projection' });
-  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION, transport: qdrantTransport }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'embedding_model', 'embedding_version', 'projection_revision', 'content_projection_revision', 'signature_projection_revision', 'projection_revisions'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, identityCoverage: null, errors: [] };
+  const report = { schema: 'atlas.graphify-embedding-qdrant-projection.v1', generatedAt: new Date().toISOString(), apply: APPLY, sourceColumn: SOURCE_COLUMN, representationId: REPRESENTATION_ID, representationRevision: REPRESENTATION_REVISION, modelRevision: MODEL_REVISION, dimension: CANONICAL_DIMENSION, qdrant: { url: QDRANT_URL, collection: COLLECTION, vectorName: VECTOR_NAME, projectionRevision: PROJECTION_REVISION, transport: qdrantTransport }, payloadFields: ['canonical_id', 'packet_key', 'source_ref', 'repo_id', 'chunk_id', 'domain', 'language', 'tags', 'semantic_tags', 'content_hash', 'representation_id', 'representation_name', 'representation_revision', 'embedding_dimension', 'model_revision', 'projection_revision', 'content_projection_revision', 'signature_projection_revision', 'projection_revisions'], scope: { sinceHours: SINCE_HOURS, limit: LIMIT }, status: 'FAIL', selected: 0, projected: 0, skipped: 0, identityCoverage: null, errors: [] };
   try {
     const collection = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}`);
     report.qdrant.transport = qdrantTransport;
@@ -84,6 +88,9 @@ async function main() {
     const countPresent = (field) => result.rows.filter((row) => row[field] !== null && String(row[field]).trim() !== '').length;
     report.identityCoverage = {
       selected: result.rows.length,
+      representationId: REPRESENTATION_ID,
+      representationRevision: REPRESENTATION_REVISION,
+      dimension: CANONICAL_DIMENSION,
       packetKey: countPresent('packet_key'),
       sourceRef: countPresent('source_ref'),
       contentHash: countPresent('content_hash'),
@@ -101,7 +108,7 @@ async function main() {
           const id = pointId(row.qdrant_id);
           const prior = existingPayloads.get(String(id)) ?? {};
           const projectionRevisions = { ...(prior.projection_revisions ?? {}), [VECTOR_NAME]: PROJECTION_REVISION };
-          return { id, vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { ...prior, canonical_id: row.id, packet_key: row.packet_key ?? prior.packet_key ?? null, source_ref: row.source_ref, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, embedding_model: row.embedding_model, embedding_version: row.embedding_version, projection_revision: PROJECTION_REVISION, [`${VECTOR_NAME}_projection_revision`]: PROJECTION_REVISION, projection_revisions: projectionRevisions, graphify_embedding_projected_at: new Date().toISOString() } };
+          return { id, vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { ...prior, canonical_id: row.id, packet_key: row.packet_key ?? prior.packet_key ?? null, source_ref: row.source_ref, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, representation_id: REPRESENTATION_ID, representation_name: REPRESENTATION_ID, representation_revision: REPRESENTATION_REVISION, embedding_dimension: CANONICAL_DIMENSION, model_revision: MODEL_REVISION, projection_revision: PROJECTION_REVISION, [`${VECTOR_NAME}_projection_revision`]: PROJECTION_REVISION, projection_revisions: projectionRevisions, graphify_embedding_projected_at: new Date().toISOString() } };
         });
         await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=true`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ points }) });
         report.projected += points.length;

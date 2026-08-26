@@ -298,8 +298,8 @@ export async function generateClaudePlan(params: { goal: string; scope: string }
 	const queryEmbedding = await generateSingleEmbedding(params.goal);
 	const qdrant = getQdrantClient();
 	// Canonical EmbeddingGemma semantic_768 retrieval lane.
-	const hits = await qdrant.search('codebase_chunks_768_v2', {
-		vector: queryEmbedding,
+	const { points: hits } = await qdrant.query('codebase_chunks_768_v2', {
+		query: queryEmbedding,
 		limit: 3,
 		with_payload: true
 	});

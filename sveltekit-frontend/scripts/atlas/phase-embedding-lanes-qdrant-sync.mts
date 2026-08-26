@@ -308,28 +308,30 @@ async function phase6TestRetrieval() {
   const testVector = sample.result.points[0].vector;
   const testId = sample.result.points[0].id;
 
-  // Test search in primary
-  const search768 = await qdrantRequest('POST', '/collections/codebase_chunks_768/points/search', {
-    vector: testVector,
+  // Test search in primary (Query API — legacy /points/search removed in Qdrant 1.19)
+  const search768 = await qdrantRequest('POST', '/collections/codebase_chunks_768/points/query', {
+    query: testVector,
     limit: 3,
     with_payload: true
   });
 
-  console.log(`Primary 768-dim search (${search768.result?.length || 0} results):`);
-  for (const result of search768.result || []) {
+  const search768Points = search768.result?.points || [];
+  console.log(`Primary 768-dim search (${search768Points.length} results):`);
+  for (const result of search768Points) {
     console.log(`  Score: ${result.score.toFixed(4)}, ID: ${result.id}`);
   }
 
   // Test search in fallback with projected vector
   const projectedVector = quantize768to512(testVector);
-  const search512 = await qdrantRequest('POST', '/collections/codebase_chunks_512/points/search', {
-    vector: projectedVector,
+  const search512 = await qdrantRequest('POST', '/collections/codebase_chunks_512/points/query', {
+    query: projectedVector,
     limit: 3,
     with_payload: true
   });
 
-  console.log(`Fallback 512-dim search (${search512.result?.length || 0} results):`);
-  for (const result of search512.result || []) {
+  const search512Points = search512.result?.points || [];
+  console.log(`Fallback 512-dim search (${search512Points.length} results):`);
+  for (const result of search512Points) {
     console.log(`  Score: ${result.score.toFixed(4)}, ID: ${result.id}`);
   }
 

@@ -1,9 +1,13 @@
 {
   "schema": "atlas.graphify-lexical-owner.v1",
-  "generatedAt": "2026-08-24T22:09:54.200Z",
+  "generatedAt": "2026-08-26T03:32:06.152Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "extensions": [
+    {
+      "extname": "pg_search",
+      "extversion": "0.25.1"
+    },
     {
       "extname": "pg_trgm",
       "extversion": "1.6"
@@ -165,6 +169,10 @@
       "indexdef": "CREATE INDEX idx_codebase_chunk_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)"
     },
     {
+      "indexname": "idx_codebase_chunk_pgsearch_bm25",
+      "indexdef": "CREATE INDEX idx_codebase_chunk_pgsearch_bm25 ON public.codebase_chunk_index USING bm25 (id, content, relative_path) WITH (key_field=id)"
+    },
+    {
       "indexname": "idx_codebase_chunk_semantic_tags_gin",
       "indexdef": "CREATE INDEX idx_codebase_chunk_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)"
     },
@@ -196,13 +204,16 @@
     }
   ],
   "counts": {
-    "total": 52417,
-    "search_vector": 52417,
+    "total": 55206,
+    "search_vector": 55206,
     "ast_symbols": 17800,
-    "content_embedding_768": 576,
-    "content_embedding": 52380
+    "content_embedding_768": 724,
+    "content_embedding": 55169
   },
   "owner": "POSTGRES_FTS_TSVECTOR_TS_RANK_CD",
-  "findings": [],
+  "findings": [
+    "pg_search extension is installed; query ownership still requires a live pg_search scorer/index proof.",
+    "pg_search is available but is not promoted as the owner by this receipt."
+  ],
   "status": "PASS"
 }

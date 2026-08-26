@@ -400,11 +400,12 @@ async function searchQdrantWithVectors(
   const maxCandidates = getTurboVecMaxCandidates(limit);
   const candidateLimit = Math.max(limit, Math.min(maxCandidates, limit * 4));
 
-  const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/search`, {
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vector: vectorField,
+      query: Array.isArray(vectorField) ? vectorField : vectorField.vector,
+      ...(Array.isArray(vectorField) ? {} : { using: vectorField.name }),
       limit: candidateLimit,
       score_threshold: 0,
       with_payload: true,
@@ -415,8 +416,8 @@ async function searchQdrantWithVectors(
   });
 
   if (!res.ok) return [];
-  const data = (await res.json()) as { result?: QdrantScrollPoint[] };
-  return Array.isArray(data.result) ? data.result : [];
+  const data = (await res.json()) as { result?: { points?: QdrantScrollPoint[] } };
+  return Array.isArray(data.result?.points) ? data.result.points : [];
 }
 
 async function searchTurboVecNative(

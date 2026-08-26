@@ -78,18 +78,18 @@ export const GET: RequestHandler = async ({ locals }) => {
 
       if (vec?.length) {
         const sResp = await fetch(
-          `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768/points/search`,
+          `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768/points/query`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ vector: vec, limit: 1, with_payload: false }),
+            body: JSON.stringify({ query: vec, limit: 1, with_payload: false }),
             signal: T(8000),
           },
         );
-        const sData = await sResp.json() as { result?: unknown[] };
+        const sData = await sResp.json() as { result?: { points?: unknown[] }; points?: unknown[] };
         checks.semanticSearch = {
           ok: sResp.ok,
-          hitsReturned: sData.result?.length ?? 0,
+          hitsReturned: sData.result?.points?.length ?? sData.points?.length ?? 0,
           latencyMs: Date.now() - ssStart,
         };
       } else {

@@ -110,7 +110,7 @@ export async function searchVector(opts: {
   withPayload?: boolean;
 }): Promise<QdrantHit[]> {
   const body: any = {
-    vector: opts.vector,
+    query: opts.vector,
     limit: opts.limit ?? 10,
     with_payload: opts.withPayload ?? true,
   };
@@ -118,7 +118,7 @@ export async function searchVector(opts: {
   if (opts.scoreThreshold) body.score_threshold = opts.scoreThreshold;
   if (opts.filter) body.filter = opts.filter;
 
-  const r = await fetch(`${QDRANT_URL}/collections/${opts.collection}/points/search`, {
+  const r = await fetch(`${QDRANT_URL}/collections/${opts.collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal: AbortSignal.timeout(QDRANT_TIMEOUT),
@@ -127,10 +127,12 @@ export async function searchVector(opts: {
 
   if (!r.ok) throw new Error(`Qdrant search failed: ${r.status} ${await r.text()}`);
   const data = await parseQdrantJsonResponse<any>(r, {
-    qdrantOperation: 'search',
+    qdrantOperation: 'query',
     onTrace: logTrace
   });
-  return data?.result ?? [];
+  // Raw REST responses wrap Query API points under `result.points`.
+  // Keep the helper's public contract as a plain point array.
+  return data?.result?.points ?? data?.points ?? [];
 }
 
 /**

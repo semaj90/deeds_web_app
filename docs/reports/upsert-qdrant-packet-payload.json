@@ -1,10 +1,15 @@
 {
-  "generated_at": "2026-07-05T22:35:32.135Z",
+  "generated_at": "2026-08-26T00:01:29.833Z",
   "collection": "codebase_chunks_768",
   "strategy": "direct-codebase-chunk-index",
-  "mode": "apply",
-  "total_packets": 58365,
-  "chunk_rows": 200,
-  "qdrant_points_updated": 200,
-  "errors": 0
+  "transport": "HTTP_REST",
+  "grpc_endpoint": null,
+  "lineage_required": false,
+  "mode": "dry-run",
+  "total_packets": 61660,
+  "chunk_rows": 10,
+  "qdrant_points_updated": 0,
+  "errors": 0,
+  "identity_resolution_source": "SOURCE_REF_PATH_ONLY_DEGRADED",
+  "write_policy": "NO_QDRANT_WRITES"
 }

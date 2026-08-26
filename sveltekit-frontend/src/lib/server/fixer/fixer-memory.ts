@@ -141,8 +141,8 @@ export async function recallFixerPatternSemantic(
 ): Promise<FixerPatternHit[]> {
   const q = qdrantClient();
   try {
-    const results = await q.search(QDRANT_COLL, {
-      vector: queryEmbedding,
+    const { points: results } = await q.query(QDRANT_COLL, {
+      query: queryEmbedding,
       limit,
       score_threshold: 0.70,
       with_payload: true,

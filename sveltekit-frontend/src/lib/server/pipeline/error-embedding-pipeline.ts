@@ -89,17 +89,18 @@ async function findSimilarCluster(
 	embedding: number[],
 ): Promise<{ clusterId: string | null; score: number }> {
 	try {
-		const results = await qdrant.client.search(COLLECTION, {
-			vector: { name: 'error', vector: embedding },
+		const results = await qdrant.client.query(COLLECTION, {
+			query: embedding,
+			using: 'error',
 			limit: 1,
 			score_threshold: CLUSTER_SIMILARITY_THRESHOLD,
 			with_payload: ['clusterId'],
 		});
 
-		if (results.length > 0 && results[0].score >= CLUSTER_SIMILARITY_THRESHOLD) {
-			const payload = results[0].payload as Record<string, unknown> | undefined;
+		if (results.points.length > 0 && results.points[0].score >= CLUSTER_SIMILARITY_THRESHOLD) {
+			const payload = results.points[0].payload as Record<string, unknown> | undefined;
 			const clusterId = (payload?.clusterId as string) || null;
-			return { clusterId, score: results[0].score };
+			return { clusterId, score: results.points[0].score };
 		}
 	} catch {
 		// Collection empty or search failed — no cluster match
@@ -184,14 +185,15 @@ export async function searchSimilarErrors(
 		await ensureCollection();
 		const embedding = await generateSingleEmbedding(query);
 
-		const results = await qdrant.client.search(COLLECTION, {
-			vector: { name: 'error', vector: embedding },
+		const results = await qdrant.client.query(COLLECTION, {
+			query: embedding,
+			using: 'error',
 			limit,
 			score_threshold: scoreThreshold,
 			with_payload: true,
 		});
 
-		return results.map((hit) => {
+		return results.points.map((hit) => {
 			const p = (hit.payload ?? {}) as Record<string, unknown>;
 			return {
 				id: hit.id,

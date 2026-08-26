@@ -48,8 +48,8 @@ export const POST: RequestHandler = async (event) => {
 
 		// Search evidence_items collection
 		try {
-			const evidenceResults = await client.search('evidence_items', {
-				vector: embedding,
+			const { points: evidenceResults } = await client.query('evidence_items', {
+				query: embedding,
 				limit,
 				score_threshold: threshold,
 				with_payload: true
@@ -70,8 +70,8 @@ export const POST: RequestHandler = async (event) => {
 
 		// Search legal_documents collection
 		try {
-			const docResults = await client.search('legal_documents', {
-				vector: embedding,
+			const { points: docResults } = await client.query('legal_documents', {
+				query: embedding,
 				limit,
 				score_threshold: threshold,
 				with_payload: true

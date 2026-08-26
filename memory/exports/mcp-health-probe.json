@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-08-22T20:58:20.438Z",
+  "timestamp": "2026-08-26T02:57:35.883Z",
   "configPath": "C:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
-  "totalMcpEntries": 1,
+  "totalMcpEntries": 2,
   "liveMcp": 1,
   "mcpUpButDisabled": 0,
   "customHttpOnly": 0,
   "broken": 0,
   "notListening": 0,
-  "localStdio": 0,
+  "localStdio": 1,
   "wsl2DockerNotes": {
     "rule": "Loopback 127.0.0.1 works when MCPs run on Windows host. Docker containers calling host services need host.docker.internal.",
     "detected": {
@@ -22,7 +22,7 @@
       "url": "http://127.0.0.1:8788/mcp",
       "enabledInConfig": true,
       "toolsListStatus": 200,
-      "toolsListMs": 81,
+      "toolsListMs": 228,
       "toolCount": 175,
       "sampleTools": [
         "kb.organize_messy_text",
@@ -33,8 +33,15 @@
       ],
       "mcpHealthy": true,
       "healthEndpointStatus": 200,
-      "healthBody": "{\"ok\":true,\"degraded\":false,\"version\":\"1.0.0\",\"uptime\":8459.5367682,\"dependencies\":{\"mcp\":true,\"post",
+      "healthBody": "{\"ok\":true,\"degraded\":false,\"version\":\"1.0.0\",\"uptime\":43790.3465697,\"dependencies\":{\"mcp\":true,\"pos",
       "classification": "live_mcp"
+    },
+    {
+      "name": "atlas-tools",
+      "type": "local",
+      "command": "node ./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+      "enabledInConfig": true,
+      "classification": "local_stdio_not_probed"
     }
   ]
 }

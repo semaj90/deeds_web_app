@@ -178,14 +178,17 @@ services:
   # Qdrant Vector Database
   # ========================================================================
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.19.0
     container_name: legal-ai-qdrant
     environment:
       QDRANT_API_KEY: qdrant_key
       QDRANT__SERVICE__HTTP_PORT: 6333
       QDRANT__SERVICE__GRPC_PORT: 6334
     volumes:
-      - qdrant_data:/qdrant/storage
+      # Use the same durable production volumes as docker-compose.yml.
+      # Do not let the GPU profile create a separate empty Qdrant store.
+      - qdrant_production_data:/qdrant/storage
+      - qdrant_snapshots:/qdrant/snapshots
     ports:
       - "6333:6333"
       - "6334:6334"
@@ -275,7 +278,11 @@ volumes:
     driver: local
   redis_data:
     driver: local
-  qdrant_data:
+  qdrant_production_data:
+    name: deeds_qdrant_production_data
+    driver: local
+  qdrant_snapshots:
+    name: deeds_qdrant_snapshots
     driver: local
   minio_data:
     driver: local

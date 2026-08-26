@@ -88,8 +88,9 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
       // Primary search: poi_profiles collection (dedicated POI vectors)
       try {
-        const poiResults = await qdrant.search('poi_profiles', {
-          vector: { name: 'embedding', vector: queryVector },
+        const { points: poiResults } = await qdrant.query('poi_profiles', {
+          query: queryVector,
+          using: 'embedding',
           limit: 20,
           score_threshold: 0.7,
           with_payload: true,
@@ -116,8 +117,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
       // Fallback: evidence_items collection (broader, lower threshold)
       if (qdrantMatches.length === 0) {
-        const results = await qdrant.search('evidence_items', {
-          vector: queryVector,
+        const { points: results } = await qdrant.query('evidence_items', {
+          query: queryVector,
           limit: 20,
           score_threshold: 0.5,
           with_payload: true,

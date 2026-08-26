@@ -93,8 +93,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
     const client = getQdrantClient();
 
-    const results = await client.search('legal_documents', {
-      vector: embedding,
+    const { points: results } = await client.query('legal_documents', {
+      query: embedding,
       limit: topK,
       score_threshold: 0.3,
       with_payload: true,

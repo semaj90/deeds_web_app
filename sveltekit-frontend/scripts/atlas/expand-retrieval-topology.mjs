@@ -36,8 +36,8 @@ async function lane1AnnSearch(qdrantClient, sourceRef, featureId, limit) {
   // Lane 1: Atlas-tools semantic search using Qdrant ANN
   try {
     const embedding = await computeEmbedding(`${sourceRef} ${featureId}`);
-    const result = await qdrantClient.search('codebase_chunks_768', {
-      vector: embedding,
+    const { points: result } = await qdrantClient.query('codebase_chunks_768', {
+      query: embedding,
       limit,
       with_payload: true,
       score_threshold: 0.6,

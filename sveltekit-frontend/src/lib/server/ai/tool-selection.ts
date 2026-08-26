@@ -619,17 +619,17 @@ async function searchToolManifest(
   };
 
   try {
-    const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+    const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) return [];
-    const d = await res.json() as { result?: Array<{ score: number; payload?: Record<string, unknown> }> };
+    const d = await res.json() as { points?: Array<{ score: number; payload?: Record<string, unknown> }> };
 
     const signalSet = new Set(signals);
-    return (d.result ?? [])
+    return (d.points ?? [])
       .map((hit) => {
         const ontology = (hit.payload?.ontology as string[] | undefined) ?? [];
         const boost = ontology.filter((tag) => signalSet.has(tag)).length * 0.05;

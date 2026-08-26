@@ -502,17 +502,17 @@ Return ONLY valid JSON: { "events": [...] }`;
           ? { must: [{ key: 'case_id', match: { any: caseIds } }] }
           : undefined;
 
-        const searchRes = await fetch(`${qdrantUrl}/collections/evidence_items/points/search`, {
+        const searchRes = await fetch(`${qdrantUrl}/collections/evidence_items/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vector, limit: topK + 1, filter, with_payload: true, score_threshold: 0.5 }),
+          body: JSON.stringify({ query: vector, limit: topK + 1, filter, with_payload: true, score_threshold: 0.5 }),
           signal: AbortSignal.timeout(10_000),
         });
         if (!searchRes.ok) {
           return { content: [{ type: 'text', text: JSON.stringify({ error: `Qdrant search ${searchRes.status}` }) }] };
         }
 
-        const hits = ((await searchRes.json() as { result?: Array<{ id: string; score: number; payload?: Record<string, unknown> }> }).result ?? [])
+        const hits = ((await searchRes.json() as { points?: Array<{ id: string; score: number; payload?: Record<string, unknown> }> }).points ?? [])
           .filter((h) => String(h.id) !== String(evidenceId))
           .slice(0, topK)
           .map((h) => ({
@@ -618,15 +618,15 @@ Return JSON with exactly these fields:
               ? { must: [{ key: 'charge_code', match: { value: chargeCode } }] }
               : { must: [{ key: 'doc_type', match: { any: ['opinion', 'judgment', 'ruling', 'statute_interpretation'] } }] };
 
-            const searchRes = await fetch(`${qdrantUrl}/collections/legal_documents/points/search`, {
+            const searchRes = await fetch(`${qdrantUrl}/collections/legal_documents/points/query`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ vector: embedding, limit, filter, with_payload: true, score_threshold: 0.45 }),
+              body: JSON.stringify({ query: embedding, limit, filter, with_payload: true, score_threshold: 0.45 }),
               signal: AbortSignal.timeout(10_000),
             });
 
             if (searchRes.ok) {
-              const hits = ((await searchRes.json() as { result?: Array<{ score: number; payload?: Record<string, unknown> }> }).result ?? [])
+              const hits = ((await searchRes.json() as { points?: Array<{ score: number; payload?: Record<string, unknown> }> }).points ?? [])
                 .map((h) => ({
                   citation:   h.payload?.citation ?? h.payload?.title,
                   outcome:    String(h.payload?.outcome ?? h.payload?.summary ?? '').slice(0, 200),

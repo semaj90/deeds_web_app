@@ -164,7 +164,7 @@ services:
 
   # Qdrant — vector search (72 INT8-quantized collections)
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.19.0
     container_name: legal-ai-qdrant
     restart: unless-stopped
     deploy:

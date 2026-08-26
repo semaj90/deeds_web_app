@@ -97,8 +97,8 @@ const tools = {
     handler: async (args) => {
       const { collection = 'phase76_knowledge_base', vector, limit = 10, scoreThreshold = 0.5 } = args;
 
-      const results = await qdrant.search(collection, {
-        vector,
+      const { points: results } = await qdrant.query(collection, {
+        query: vector,
         limit,
         score_threshold: scoreThreshold,
         with_payload: true

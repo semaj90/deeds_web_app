@@ -376,11 +376,12 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
       results = queryRes.points;
     } catch (hybridErr) {
       console.warn('[Knowledge] RRF fusion unavailable, falling back to dense-only:', hybridErr instanceof Error ? hybridErr.message : hybridErr);
-      results = await qd.search('knowledge_base', {
-        vector: queryEmbedding,
+      const fallback = await qd.query('knowledge_base', {
+        query: queryEmbedding,
         limit,
         score_threshold: 0.6,
       });
+      results = fallback.points;
     }
 
     const matches = results.map(r => ({
@@ -457,11 +458,12 @@ export const PATCH: RequestHandler = async ({ request, locals }) => {
       searchResults = searchRes.points;
     } catch (hybridErr) {
       console.warn('[Knowledge] PATCH RRF fusion unavailable, falling back to dense-only:', hybridErr instanceof Error ? hybridErr.message : hybridErr);
-      searchResults = await qd.search('knowledge_base', {
-        vector: queryEmbedding,
+      const fallback = await qd.query('knowledge_base', {
+        query: queryEmbedding,
         limit: max_context_chunks,
         score_threshold: 0.6,
       });
+      searchResults = fallback.points;
     }
 
     const contextText = searchResults

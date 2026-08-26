@@ -197,12 +197,13 @@ async function fetchNeighborChunks(
 			const vectorPayload = buildVectorPayload(collection, queryVector);
 
 			const res = await fetch(
-				`${cfg.qdrantUrl}/collections/${collection}/points/search`,
+				`${cfg.qdrantUrl}/collections/${collection}/points/query`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						vector: vectorPayload,
+						query: Array.isArray(vectorPayload) ? vectorPayload : vectorPayload.vector,
+						...(Array.isArray(vectorPayload) ? {} : { using: vectorPayload.name }),
 						limit: cfg.maxExpansionChunks,
 						with_payload: true,
 						score_threshold: cfg.scoreThreshold,
@@ -215,7 +216,7 @@ async function fetchNeighborChunks(
 			if (!res.ok) return [] as UnifiedRetrievalResult[];
 			const data = await res.json();
 
-			return ((data.result ?? []) as Array<Record<string, unknown>>)
+			return ((data.result?.points ?? []) as Array<Record<string, unknown>>)
 				.map((r) => {
 					const payload = r.payload as Record<string, unknown> | undefined;
 					// Truncate content to budget

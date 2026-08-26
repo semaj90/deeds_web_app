@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.qdrant-runtime-upgrade-smoke.v1",
+  "generatedAt": "2026-08-26T05:12:41.225Z",
+  "serverVersion": "1.19.0",
+  "clientVersion": "1.19.0",
+  "collection": "codebase_chunks_768",
+  "vectorName": "content",
+  "pointCountAfter": 109129,
+  "checks": {
+    "collectionRead": "PASS",
+    "scroll": "PASS",
+    "queryResponseShape": "PASS",
+    "queryApi": "PASS",
+    "namedVector": "PASS",
+    "scoreThreshold": "PASS",
+    "payloadFilter": "PASS",
+    "recommendQuery": "PASS",
+    "noWritesPerformed": true
+  },
+  "writesPerformed": false,
+  "status": "QDRANT_119_CLIENT_ON_118_SERVER_PROVEN"
+}

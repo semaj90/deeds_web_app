@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-file-embedding-backfill.v1",
-  "generatedAt": "2026-08-24T22:09:54.747Z",
+  "generatedAt": "2026-08-26T03:32:06.794Z",
   "apply": false,
   "scope": {
     "table": "codebase_chunk_index",
@@ -10,7 +10,16 @@
     "declaredType": "vector(768)"
   },
   "model": "embeddinggemma:latest",
+  "embedBackend": "ollama",
   "ollamaUrl": "http://127.0.0.1:11434",
+  "embedServerUrl": null,
+  "vram": {
+    "minFreeMbThreshold": 300,
+    "freeMbAtStart": 280,
+    "freeMbAtMidpoint": null,
+    "freeMbAtEnd": 283,
+    "guardTriggered": true
+  },
   "status": "DRY_RUN",
   "selected": 128,
   "embedded": 0,
@@ -19,35 +28,35 @@
   "errors": [],
   "sample": [
     {
-      "id": "93590876-8f40-45ad-9bba-b0dd5dcdfe6b",
-      "relativePath": "src/routes/api/cases/[id]/similar/+server.ts",
-      "sourceRef": "src/routes/api/cases/[id]/similar/+server.ts",
-      "textHash": "84ab2837792479d2ba1fc967ff185adcec1613034cecc12d3725f9f0063c621a"
+      "id": "82a9af4a-c4b2-4a5e-9fdb-252c663c3af9",
+      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
+      "sourceRef": null,
+      "textHash": "94ca3402d1ed4c2b974d1671f4a5bacd29e826cc3bc211285bae84c7ac1370d6"
     },
     {
-      "id": "942b8fad-d5ea-4040-a6bc-b1c44ad9aa0f",
-      "relativePath": "src/routes/api/routes/[routeId]/interactions/+server.ts",
-      "sourceRef": "src/routes/api/routes/[routeId]/interactions/+server.ts",
-      "textHash": "e80f7e62931d0943f2bc5c8d0b0a20e3e0ad019abc26b8ac758e7e1e31c83b9c"
+      "id": "f58154a8-6356-4e38-9150-84cdc3592108",
+      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
+      "sourceRef": null,
+      "textHash": "97434183b897b8a1bead980597ca3de34f8c4d468ebdac251da50f37a81cc81a"
     },
     {
-      "id": "94b3bfcd-2beb-4855-9f05-e9f8c0e05a01",
-      "relativePath": "src/lib/utils/security.ts",
-      "sourceRef": "src/lib/utils/security.ts",
-      "textHash": "da971e6c52cbe9872813036aa3c74e875747234e001648e2ac3f8db4df88ffaf"
+      "id": "4b2bc59b-2c8c-46d9-ba0c-1c466d927098",
+      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
+      "sourceRef": null,
+      "textHash": "4d4bcab170fe17926bd042ff8ec263c2e091a68f8574b172b28735bfe30ae095"
     },
     {
-      "id": "9630adda-8721-42fc-aeb0-7064b9713a12",
-      "relativePath": "src/lib/services/voice-commands.ts",
-      "sourceRef": "src/lib/services/voice-commands.ts",
-      "textHash": "64996261185e943a2cb5dbf702a03917a732be9968925ba3c5c5e00a9093f696"
+      "id": "165d6e9f-d676-4f8d-a804-ebd6fd704b8a",
+      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
+      "sourceRef": null,
+      "textHash": "22c7aa99c80060d288716a11cbd42ac81ebbbc3bd6f90e75f4ca94dad97d8d65"
     },
     {
-      "id": "965cb8fd-ed71-41c2-936e-64a12bc830ad",
-      "relativePath": "src/lib/ai/ollama-config.ts",
-      "sourceRef": "src/lib/ai/ollama-config.ts",
-      "textHash": "97c492e20bcb39450b16455cf26331cd7d6011e54836d2f59fb52c539e1b9ebe"
+      "id": "85bd8bc9-a881-4d6b-aa8f-f4b7e058a322",
+      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
+      "sourceRef": null,
+      "textHash": "1e0fbb0f60aa95736d908ac6ea59132dc39bba23a939273df5cff769120d7bde"
     }
   ],
-  "elapsedMs": 152
+  "elapsedMs": 306
 }

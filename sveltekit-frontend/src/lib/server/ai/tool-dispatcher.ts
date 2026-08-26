@@ -46,11 +46,12 @@ async function dispatchQdrant(args: Record<string, unknown>): Promise<string> {
 		const embedData = await embedRes.json() as { embedding?: number[] };
 		if (!embedData.embedding?.length) return 'Qdrant: embed returned empty vector';
 
-		const searchRes = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+		const searchRes = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector: { name: 'content', vector: embedData.embedding },
+				query: embedData.embedding,
+				using: 'content',
 				limit,
 				with_payload: true,
 				with_vector: false,
@@ -58,8 +59,8 @@ async function dispatchQdrant(args: Record<string, unknown>): Promise<string> {
 			signal: AbortSignal.timeout(10_000),
 		});
 		if (!searchRes.ok) return `Qdrant search failed: HTTP ${searchRes.status}`;
-		const searchData = await searchRes.json() as { result?: Array<{ payload?: { file_path?: string; chunk_text?: string }; score?: number }> };
-		const points = searchData.result ?? [];
+		const searchData = await searchRes.json() as { points?: Array<{ payload?: { file_path?: string; chunk_text?: string }; score?: number }> };
+		const points = searchData.points ?? [];
 		if (!points.length) return 'No Qdrant results found';
 		return points.map(p => `[${p.score?.toFixed(3)}] ${p.payload?.file_path ?? ''}: ${(p.payload?.chunk_text ?? '').slice(0, 200)}`).join('\n');
 	} catch (err) {

@@ -939,6 +939,11 @@ sveltekit-frontend/docs/graph/codebase-graph.json
 sveltekit-frontend/docs/graph/sveltekit-route-map.md
 docs/graph/repo-root-atlas.json
 
+# Multihop enriched map (full atlas_packets corpus, regenerate-multihop-with-enrichment.mjs) —
+# ~115MB at 61,660 packets even compact-serialized (2026-08-26). Regenerable via
+# `node scripts/atlas/regenerate-multihop-with-enrichment.mjs`.
+sveltekit-frontend/docs/graph/multihop-codebase-map.enriched.json
+
 # index-codebase-fast.mjs probe runs (non --publish-canonical): timestamped receipt +
 # graph/map copies, one per run. Same >10MB-per-file class as codebase-graph.json above —
 # gitignored, but see .rgignore for the rg-searchable override.

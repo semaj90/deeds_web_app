@@ -91,14 +91,12 @@ interface QdrantHit {
 async function qdrantSearch(embedding: number[], limit = 10, collection = 'codebase_chunks_768_v2'): Promise<QdrantHit[]> {
   const qdrantUrl = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333';
   try {
-    const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
+    const res = await fetch(`${qdrantUrl}/collections/${collection}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: {
-          name: 'content',
-          vector: embedding,
-        },
+        query: embedding,
+        using: 'content',
         limit,
         with_payload: true,
         with_vector: false,
@@ -106,8 +104,8 @@ async function qdrantSearch(embedding: number[], limit = 10, collection = 'codeb
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) return [];
-    const data = await res.json() as { result?: QdrantHit[] };
-    return data.result ?? [];
+    const data = await res.json() as { result?: { points?: QdrantHit[] }; points?: QdrantHit[] };
+    return data.result?.points ?? data.points ?? [];
   } catch {
     return [];
   }

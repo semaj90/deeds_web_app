@@ -219,21 +219,20 @@ await test('5. Raw Client Search with Synthetic Embedding', async () => {
   const client = getQdrantClient();
 
   try {
-    const result = await client.search('codebase_chunks_768', {
-      vector: {
-        name: 'content',  // Named vector in Qdrant
-        vector: Array(768).fill(0.5),  // 768-dim to match collection
-      },
+    const queryResponse = await client.query('codebase_chunks_768', {
+      query: Array(768).fill(0.5),  // 768-dim to match collection
+      using: 'content',  // Named vector in Qdrant
       limit: 10,
       with_payload: true
     });
+    const result = queryResponse?.points;
     const duration = Date.now() - start;
 
     if (!result) {
       return {
         test: 'Raw Search Synthetic',
         status: 'FAIL',
-        message: 'client.search returned null/undefined',
+        message: 'client.query returned null/undefined',
         duration_ms: duration
       };
     }

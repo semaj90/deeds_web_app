@@ -66,8 +66,8 @@ async function main() {
       const startTime = Date.now();
 
       // Sample query
-      const searchResult = await qdrant.search('codebase_chunks_768', {
-        vector: new Array(768).fill(0.5), // dummy vector
+      const searchResult = await qdrant.query('codebase_chunks_768', {
+        query: new Array(768).fill(0.5), // dummy vector
         limit: 10
       });
 

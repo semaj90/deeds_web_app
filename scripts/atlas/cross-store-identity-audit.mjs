@@ -74,8 +74,8 @@ async function countPostgres768Eligible(pool) {
     const r2 = await pool.query(`
       SELECT COUNT(*) AS cnt
       FROM codebase_chunk_index
-      WHERE content_embedding IS NOT NULL
-        AND vector_dims(content_embedding) = 768
+      WHERE content_embedding_768 IS NOT NULL
+        AND vector_dims(content_embedding_768) = 768
     `);
     results.codebase_chunks = parseInt(r2.rows[0].cnt);
     log(`  Postgres codebase_chunk_index 768-dim: ${results.codebase_chunks}`);
@@ -86,7 +86,7 @@ async function countPostgres768Eligible(pool) {
       const r2b = await pool.query(`
         SELECT COUNT(*) AS cnt
         FROM codebase_chunk_index
-        WHERE content_embedding IS NOT NULL
+        WHERE content_embedding_768 IS NOT NULL
       `);
       results.codebase_chunks = parseInt(r2b.rows[0].cnt);
       log(`  Postgres codebase_chunk_index (any dim): ${results.codebase_chunks}`);

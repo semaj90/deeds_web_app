@@ -161,14 +161,14 @@ async function searchQdrant(
     const qdrant = getQdrantClient();
 
     const signal = AbortSignal.timeout(timeout);
-    const searchRes = await qdrant.search('codebase_chunks_768', {
-      vector: Array.from(vector),
+    const searchRes = await qdrant.query('codebase_chunks_768', {
+	      query: Array.from(vector),
       limit,
       with_payload: true,
       with_vector: false,
     });
 
-    return searchRes.map((point) => ({
+    return searchRes.points.map((point) => ({
       id: String(point.id),
       source: 'qdrant',
       score: point.score,

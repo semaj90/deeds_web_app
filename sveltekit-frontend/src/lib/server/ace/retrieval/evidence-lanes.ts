@@ -128,14 +128,14 @@ export class QdrantDenseLane {
     embedding: number[],
     limit: number = 20
   ): Promise<AceEvidence[]> {
-      const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/search`, {
+      const response = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: embedding,
+        query: embedding,
         limit,
         with_payload: true,
-        with_vectors: false
+        with_vector: false
       })
     });
 
@@ -144,7 +144,7 @@ export class QdrantDenseLane {
     }
 
     const data = await response.json() as any;
-    return data.result.map((point: any) => ({
+    return data.points.map((point: any) => ({
       ...normalizeQdrantPayloadIdentity(point.payload),
       evidenceKind: 'semantic' as const,
       rawScore: point.score,

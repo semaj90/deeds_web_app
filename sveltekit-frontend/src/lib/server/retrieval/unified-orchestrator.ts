@@ -318,15 +318,13 @@ async function qdrantSearch(
       assertSemantic768(Array.from(queryVector));
 
       const denseRes = await fetch(
-        `http://${config.qdrant.host}:${config.qdrant.port}/collections/${collection}/points/search`,
+        `http://${config.qdrant.host}:${config.qdrant.port}/collections/${collection}/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: {
-              name: 'content',
-              vector: Array.from(queryVector)
-            },
+            query: Array.from(queryVector),
+            using: 'content',
             limit,
             with_payload: true,
             with_vector: false,
@@ -337,8 +335,8 @@ async function qdrantSearch(
       );
 
       if (!denseRes.ok) throw new Error(`Qdrant search failed for ${collection}: ${denseRes.status}`);
-      const denseData = await denseRes.json() as { result: Array<{ id: string; score: number; payload: any }> };
-      const denseHits = denseData.result || [];
+       const denseData = await denseRes.json() as { result?: { points?: Array<{ id: string; score: number; payload: any }> } };
+       const denseHits = denseData.result?.points || [];
 
       for (const [idx, hit] of denseHits.entries()) {
         const existing = denseHitsById.get(hit.id);

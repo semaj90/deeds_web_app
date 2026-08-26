@@ -41,11 +41,12 @@ export class QdrantPostgreSQLService {
 
     async search(collectionName: string, vector: number[], limit: number = 10) {
         try {
-            return await this.qdrant.search(collectionName, {
-                vector,
+            const { points } = await this.qdrant.query(collectionName, {
+                query: vector,
                 limit,
                 with_payload: true
             });
+            return points;
         } catch (error) {
             console.error('Qdrant search error:', error);
             return [];

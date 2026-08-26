@@ -85,7 +85,7 @@ export const actions: Actions = {
       const qdrant = getQdrantClient();
 
       const searchOpts: Record<string, unknown> = {
-        vector,
+        query: vector,
         limit,
         with_payload: true,
         score_threshold: 0.45,
@@ -94,7 +94,7 @@ export const actions: Actions = {
         searchOpts.filter = { must: [{ key: 'case_id', match: { value: case_id } }] };
       }
 
-      const searchRes = await qdrant.search(qdrantCollection, searchOpts as Parameters<typeof qdrant.search>[1]);
+      const { points: searchRes } = await qdrant.query(qdrantCollection, searchOpts as Parameters<typeof qdrant.query>[1]);
 
       // Group chunks by document (evidence_id / source_path)
       const docMap = new Map<string, SearchResult>();

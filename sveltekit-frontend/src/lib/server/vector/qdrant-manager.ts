@@ -25,6 +25,14 @@ import {
   buildQdrantSearchRequest,
 } from './vector-contracts.js';
 
+function toQdrantQueryRequest(request: Record<string, any>): Record<string, any> {
+  const { vector, ...rest } = request;
+  if (vector && !Array.isArray(vector)) {
+    return { ...rest, query: vector.vector, using: vector.name };
+  }
+  return { ...rest, query: vector };
+}
+
 // Compatibility export for callers that still import the singleton helper
 export { getQdrantClient } from './qdrant-singleton.js';
 
@@ -900,7 +908,10 @@ export class QdrantManager {
                 searchRequest.filter = this.buildQdrantFilter(params.filter);
               }
 
-              const results = await this.client.search(collectionName, searchRequest);
+              const results = (await this.client.query(
+                collectionName,
+                toQdrantQueryRequest(searchRequest),
+              )).points ?? [];
 
               const responseTime = Date.now() - startTime;
 
@@ -975,7 +986,10 @@ export class QdrantManager {
             searchRequest.filter = this.buildQdrantFilter(params.filter);
           }
 
-          const results = await this.client.search(collectionName, searchRequest);
+          const results = (await this.client.query(
+            collectionName,
+            toQdrantQueryRequest(searchRequest),
+          )).points ?? [];
 
           const responseTime = Date.now() - startTime;
 
@@ -1042,14 +1056,15 @@ export class QdrantManager {
         }
 
         try {
-          const results = await this.client.search(this.collections.evidence, {
-            vector: { name: 'content', vector: params.queryEmbedding },
+          const results = (await this.client.query(this.collections.evidence, {
+            query: params.queryEmbedding,
+            using: 'content',
             limit: params.limit ?? 10,
             score_threshold: params.scoreThreshold ?? 0.5,
             filter: { must: mustConditions },
             with_payload: true,
             with_vector: false,
-          });
+          })).points ?? [];
 
           return {
             results: results.map((r) => ({
@@ -1144,7 +1159,10 @@ export class QdrantManager {
       with_payload: true,
     };
 
-    const results = await this.client.search(this.collections.chat_history, searchRequest);
+    const results = (await this.client.query(
+      this.collections.chat_history,
+      toQdrantQueryRequest(searchRequest),
+    )).points ?? [];
     return results.map((r) => ({
       content: r.payload?.content,
       role: r.payload?.role,
@@ -1573,7 +1591,10 @@ export class QdrantManager {
       with_payload: true,
     };
 
-    const results = await this.client.search(this.collections.evidence, searchRequest);
+    const results = (await this.client.query(
+      this.collections.evidence,
+      toQdrantQueryRequest(searchRequest),
+    )).points ?? [];
     return results
       .filter((r) => r.id !== evidenceId)
       .slice(0, limit)

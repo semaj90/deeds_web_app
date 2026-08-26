@@ -12,7 +12,7 @@
  * Strong repair candidate requirements:
  *   1. Postgres row has non-empty authoritative stored `content`.
  *   2. sha256(content).slice(0,16) is reproducible.
- *   3. Postgres row has a 768-dim finite content_embedding.
+ *   3. Postgres row has a 768-dim finite content_embedding_768.
  *   4. Qdrant point with id == codebase_chunk_index.id exists.
  *   5. Qdrant vector is 768-dim finite.
  *   6. Qdrant payload postgres_id, when present, equals the row UUID.
@@ -147,10 +147,10 @@ function classify(row, point) {
     return { classification: 'MISSING_SOURCE_CONTENT', repairable: false, reason: 'Postgres row has no stored chunk content.' };
   }
   if (!row.embedding_text) {
-    return { classification: 'MISSING_POSTGRES_EMBEDDING', repairable: false, reason: 'Postgres content_embedding is absent.' };
+    return { classification: 'MISSING_POSTGRES_EMBEDDING', repairable: false, reason: 'Postgres content_embedding_768 is absent.' };
   }
   if (!vectorValid(pgVector)) {
-    return { classification: 'INVALID_POSTGRES_EMBEDDING', repairable: false, reason: 'Postgres content_embedding is not finite 768d.' };
+    return { classification: 'INVALID_POSTGRES_EMBEDDING', repairable: false, reason: 'Postgres content_embedding_768 is not finite 768d.' };
   }
   if (!point) {
     return { classification: 'MISSING_QDRANT_POINT', repairable: false, reason: 'No Qdrant point exists with id equal to the Postgres row UUID.' };
@@ -210,7 +210,7 @@ async function main() {
       chunk_id,
       qdrant_id::text AS qdrant_id,
       content,
-      content_embedding::text AS embedding_text,
+      content_embedding_768::text AS embedding_text,
       embedding_model,
       updated_at
     FROM codebase_chunk_index

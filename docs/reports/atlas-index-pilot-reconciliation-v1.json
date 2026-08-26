@@ -1,0 +1,105 @@
+{
+  "schema": "atlas_index_pilot_reconciliation_v1",
+  "generatedAt": "2026-08-26T01:05:00.000Z",
+  "pilotRunRevision": null,
+  "note_on_pilotRunRevision": "No source_revision/workspace_revision concept existed on any of these writes -- confirmed live that Qdrant has zero points with either key populated (0/50 sampled, 2026-08-26). This receipt cannot assign a real revision id because the underlying writes never carried one. That gap is exactly INDEX-COVERAGE-05/06 in the proposed tranche, not something this receipt can retroactively supply.",
+
+  "batches": [
+    {
+      "batchId": "pilot-1-cache-agent",
+      "trigger": "node scripts/atlas/index-full-repo-for-search.mjs --apply --limit=10 --verbose",
+      "runAt": "2026-08-25T~23:55Z (approx, before .cache/.agent exclusion fix)",
+      "files": [
+        { "relativePath": "sveltekit-frontend/.agent/workflows/agentic-error-fixing.md", "contentHash": null, "classification": "AGENT_WORKFLOW" },
+        { "relativePath": "sveltekit-frontend/.agent/workflows/error-fixing-strategy.md", "contentHash": null, "classification": "AGENT_WORKFLOW" },
+        { "relativePath": "sveltekit-frontend/.cache/ace/context-packs/ace_context_local-json-hit_v1.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/d9-verifier/0aefb06409d30bcc.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/d9-verifier/18e924c96cf72a44.json", "contentHash": null, "classification": "GENERATED_CACHE" },
+        { "relativePath": "sveltekit-frontend/.cache/d9-verifier/1b1d36c14e179b86.json", "contentHash": null, "classification": "GENERATED_CACHE" }
+      ],
+      "postgresRowsCreatedByPilot": 173,
+      "postgresRowsRemoved": 173,
+      "postgresRowsCurrentlyPresent": 0,
+      "postgresIdentityEvidence": "exact relative_path match against the 10 file list above, DELETE run immediately after the pilot with no intervening writes to those paths -- NOT a content_hash/timestamp-correlated proof, an identity-by-name-and-timing inference",
+      "qdrantPointsMatched": 173,
+      "qdrantPointIds": null,
+      "qdrantPointIdEvidenceNote": "point IDs were not individually recorded before deletion -- deletion used a filter (source_ref/relative_path IN <the 10 paths>) with wait=true, and a post-delete readback scroll against one of the 10 paths (d9-verifier/0aefb06409d30bcc.json) confirmed 0 remaining points. This proves the FILTER matched and removed points for that path at that time; it does not independently prove every removed point's content_hash matched what the pilot itself wrote, since point IDs were never captured going in.",
+      "qdrantPointsRemoved": true,
+      "qdrantPointsCurrentlyPresent_asOf_2026-08-26": 0,
+      "classification_summary": "8 GENERATED_CACHE, 2 AGENT_WORKFLOW, 0 REAL_SOURCE, 0 AMBIGUOUS",
+      "decision": "DELETE_QDRANT",
+      "decisionAlreadyExecuted": true,
+      "writesPerformed": true,
+      "correctionNote": "This batch's Qdrant points were deleted in the same session, BEFORE this receipt was written -- this receipt is a retroactive reconstruction, not a pre-decision gate. Flagged explicitly per operator instruction: do not let a prior turn's summary claim 'Qdrant points still present' stand uncorrected."
+    },
+    {
+      "batchId": "pilot-2-docker-build",
+      "trigger": "node scripts/atlas/index-full-repo-for-search.mjs --apply --limit=50 --verbose",
+      "runAt": "2026-08-26T~00:15Z (approx, before general dot-directory exclusion fix)",
+      "files": "49 unique files under sveltekit-frontend/.docker-build/ (duplicate build-staging mirror of scripts/atlas/*.mjs and package-lock.json) -- full path list captured to scratchpad docker-build-unique.txt during cleanup, not reproduced in full here",
+      "postgresRowsCreatedByPilot": 435,
+      "postgresRowsRemoved": 435,
+      "postgresRowsCurrentlyPresent": 0,
+      "postgresIdentityEvidence": "exact relative_path LIKE 'sveltekit-frontend/.docker-build/%' prefix match, DELETE run immediately after the pilot",
+      "note_on_count_discrepancy": "The pilot's own stdout reported 'Chunks indexed: 439' for this run (a 50-file batch), but only 435 rows were found under the .docker-build/ prefix afterward. The 4-row gap was not reconciled -- plausibly a small number of the 50 files in that batch were not under .docker-build/ and are still present elsewhere as legitimately-indexed rows, or a minor counting difference in the pilot's own stats vs. the prefix query. Flagged as an open small discrepancy, not silently resolved.",
+      "qdrantPointsMatched": 49,
+      "qdrantPointIds": null,
+      "qdrantPointsRemoved": true,
+      "qdrantPointsCurrentlyPresent_asOf_2026-08-26": 0,
+      "classification_summary": "49 GENERATED_CACHE (build-staging duplicate, not the AGENT_WORKFLOW/GENERATED_CACHE/REAL_SOURCE/AMBIGUOUS enum's closest literal fit -- see note)",
+      "classification_note": "None of the four provided enum values exactly describes 'duplicate build-staging mirror of real source files.' Classified as GENERATED_CACHE as the closest fit (build output, not authored source), but this is a genuinely distinct category (DUPLICATE_SOURCE_MIRROR) that the reconciliation schema may want to add explicitly in a future revision.",
+      "decision": "DELETE_QDRANT",
+      "decisionAlreadyExecuted": true,
+      "writesPerformed": true
+    },
+    {
+      "batchId": "pilot-3-agents-md-partial-refix",
+      "trigger": "node scripts/atlas/index-full-repo-for-search.mjs --apply --roots=sveltekit-frontend --target=sveltekit-frontend --verbose (unintentionally broad invocation, exited early via broken pipe after 5 files)",
+      "runAt": "2026-08-26T~00:30Z",
+      "files": [
+        { "relativePath": "sveltekit-frontend/AGENTS.md", "contentHash": null, "classification": "REAL_SOURCE" }
+      ],
+      "note": "This file was indexed TWICE across two different runs: first attempt (part of the 100-file pilot, pre-paragraph-split-fix) wrote 30/40 chunks with 10 silent embed failures (chunker bug, since fixed). Those 30 rows were deleted from both stores BEFORE the second attempt. Second attempt (post-fix) wrote 50/50 chunks, 0 errors -- this is the currently-live state.",
+      "postgresRowsCreatedByPilot_firstAttempt": 30,
+      "postgresRowsRemoved_beforeRefix": 30,
+      "postgresRowsCreatedByPilot_secondAttempt": 50,
+      "postgresRowsCurrentlyPresent": 50,
+      "qdrantPointsRemoved_beforeRefix": 30,
+      "qdrantPointsCurrentlyPresent_asOf_2026-08-26": 50,
+      "classification_summary": "1 REAL_SOURCE, correctly re-indexed after a chunker bugfix",
+      "decision": "KEEP_BOTH_CURRENT_STATE",
+      "decisionAlreadyExecuted": true,
+      "writesPerformed": true,
+      "note_also": "4 additional files were touched by the same broad, unintentional invocation before it exited (create_metadata_spine.sql, currentcodebase_map.md, data/atlas-tensor-proof/entropy_norm_coverage_r1.json, and one more) -- these were NOT cleaned up or reconciled in this receipt because they are plausible REAL_SOURCE/legitimate files, not confirmed noise, and the operator's instruction to halt further apply/delete work arrived before this could be verified. Flagged as OPEN, not resolved."
+    }
+  ],
+
+  "totals": {
+    "filesTouchedAcrossAllPilots": "10 + 49 + 1(+~4 unreconciled) = ~64-68",
+    "postgresRowsNetCurrentlyFromPilots": "50 (AGENTS.md only -- all GENERATED_CACHE/AGENT_WORKFLOW/duplicate-mirror rows removed from both stores)",
+    "qdrantPointsNetCurrentlyFromPilots": "50 (AGENTS.md only, same as above)"
+  },
+
+  "openItems": [
+    "4 files from the unintentional broad sveltekit-frontend invocation (pilot-3) were never reconciled -- not confirmed as noise or real source beyond a glance at filenames.",
+    "Batch 2's 439-vs-435 chunk count discrepancy was never fully explained.",
+    "No point IDs were captured before either delete -- future deletes should record the exact ID list returned by the matching scroll/count BEFORE issuing a delete, so a receipt like this can cite point IDs directly rather than reasoning from path+timing.",
+    "source_revision/workspace_revision do not exist anywhere in this collection (0/50 sampled, and per operator's own broader audit, 0/109,129+ collection-wide) -- this receipt cannot retroactively assign identity-safe revision correlation to any of these writes, including the ones already reverted. This is the deeper, unresolved problem the operator flagged: raw indexing throughput was never actually the real blocker."
+  ],
+
+  "haltStatus": {
+    "furtherApplyWork": "HALTED per explicit operator instruction, 2026-08-26",
+    "furtherDeleteWork": "HALTED per explicit operator instruction, 2026-08-26",
+    "explicitlyBlockedUntilGatesPass": [
+      "Deleting any further Qdrant pilot points",
+      "Full 23,970-file indexing run",
+      "Any Qdrant HNSW index build/rebuild",
+      "Any bulk source_ref-only payload repair/write",
+      "Promotion of any of this indexing work to ACE/KAG consumption"
+    ]
+  }
+}

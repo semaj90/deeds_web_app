@@ -95,17 +95,15 @@ export async function executeMultiVectorRetrieval(
   let contentMs = 0;
   try {
     const contentStart = performance.now();
-    const contentResponse = await qdrant.search(collection, {
-      vector: {
-        name: 'content',
-        vector: request.queryEmbedding,
-      },
+    const contentResponse = await qdrant.query(collection, {
+      query: request.queryEmbedding,
+      using: 'content',
       limit: config.topK,
       with_payload: true,
       score_threshold: 0.5,
     });
 
-    contentResults = contentResponse
+    contentResults = contentResponse.points
       .map((point) => {
         const payload = (point.payload ?? {}) as Record<string, any>;
         const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
@@ -135,17 +133,15 @@ export async function executeMultiVectorRetrieval(
   let summaryMs = 0;
   try {
     const summaryStart = performance.now();
-    const summaryResponse = await qdrant.search(collection, {
-      vector: {
-        name: 'error', // Remapped from 'error' to 'summary' semantics
-        vector: request.queryEmbedding,
-      },
+    const summaryResponse = await qdrant.query(collection, {
+      query: request.queryEmbedding,
+      using: 'error', // Remapped from 'error' to 'summary' semantics
       limit: config.topK,
       with_payload: true,
       score_threshold: 0.5,
     });
 
-    summaryResults = summaryResponse
+    summaryResults = summaryResponse.points
       .map((point) => {
         const payload = (point.payload ?? {}) as Record<string, any>;
         const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
@@ -175,17 +171,15 @@ export async function executeMultiVectorRetrieval(
   let titleMs = 0;
   try {
     const titleStart = performance.now();
-    const titleResponse = await qdrant.search(collection, {
-      vector: {
-        name: 'signature', // Remapped from 'signature' to 'title' semantics
-        vector: request.queryEmbedding,
-      },
+    const titleResponse = await qdrant.query(collection, {
+      query: request.queryEmbedding,
+      using: 'signature', // Remapped from 'signature' to 'title' semantics
       limit: config.topK,
       with_payload: true,
       score_threshold: 0.5,
     });
 
-    titleResults = titleResponse
+    titleResults = titleResponse.points
       .map((point) => {
         const payload = (point.payload ?? {}) as Record<string, any>;
         const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
@@ -219,14 +213,14 @@ export async function executeMultiVectorRetrieval(
     // Lexical retrieval via Qdrant full-text search on keywords payload
     // (Note: requires BM25 indexing to be enabled on 'keywords' field)
     try {
-      const keywordResponse = await (qdrant as any).search(collection, {
+      const keywordResponse = await (qdrant as any).query(collection, {
         query: request.query, // Natural language query for BM25
         using: 'keywords', // Vector name or payload field name
         limit: config.topK,
         with_payload: true,
       });
 
-        keywordResults = keywordResponse
+        keywordResults = keywordResponse.points
           .map((point: any) => {
             const payload = (point.payload ?? {}) as Record<string, any>;
             const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];

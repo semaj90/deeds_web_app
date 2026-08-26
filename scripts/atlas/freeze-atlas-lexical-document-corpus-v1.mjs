@@ -2,7 +2,7 @@
 /**
  * LEXICAL-02B: read-only freeze of the canonical BM25 document input corpus.
  * Reuses the same corpus that already feeds semantic_768 (codebase_chunk_index
- * rows with content_embedding + content_hash populated) rather than inventing
+ * rows with content_embedding_768 + content_hash populated) rather than inventing
  * a second document set for a lexical challenger. No writes performed.
  */
 import fs from 'node:fs';
@@ -27,8 +27,8 @@ const report = {
   step: 'LEXICAL-02B',
   corpusDefinition: {
     table: 'codebase_chunk_index',
-    predicate: 'content_embedding IS NOT NULL AND content_hash IS NOT NULL',
-    rationale: 'Reuses the exact corpus already feeding semantic_768 (content_embedding column) '
+    predicate: 'content_embedding_768 IS NOT NULL AND content_hash IS NOT NULL',
+    rationale: 'Reuses the exact corpus already feeding semantic_768 (content_embedding_768 column) '
       + 'so the lexical challenger is benchmarked against the same documents the dense lane already '
       + 'indexes, not a separately-invented corpus.',
   },
@@ -51,7 +51,7 @@ try {
       count(*)::bigint AS eligible_chunks,
       count(DISTINCT source_ref)::bigint AS distinct_source_refs
     FROM public.codebase_chunk_index
-    WHERE content_embedding IS NOT NULL AND content_hash IS NOT NULL
+    WHERE content_embedding_768 IS NOT NULL AND content_hash IS NOT NULL
   `);
   const total = await pool.query(`SELECT count(*)::bigint AS total FROM public.codebase_chunk_index`);
   const sourceRefCommitSha = await pool.query(`

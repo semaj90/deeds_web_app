@@ -257,11 +257,13 @@ async function queryQdrantVectorSignal(
     if (seedRefs.length > 0) {
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
       if (cleanedSeeds.length > 0) {
-        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/search`, {
+        const seededVector = buildVectorPayload(collections[0], truncateEmbeddingForCollection(embedding, collections[0]));
+        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: buildVectorPayload(collections[0], truncateEmbeddingForCollection(embedding, collections[0])),
+            query: Array.isArray(seededVector) ? seededVector : seededVector.vector,
+            ...(Array.isArray(seededVector) ? {} : { using: seededVector.name }),
             limit: denseLimit,
             score_threshold: 0.001,
             with_payload: true,
@@ -282,9 +284,12 @@ async function queryQdrantVectorSignal(
 
         if (seededRes.ok) {
           const seededData = await seededRes.json();
-          const seeded = Array.isArray((seededData as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
-            ? ((seededData as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
-            : [];
+          const seeded = (seededData as {
+            result?: { points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> };
+            points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>;
+          }).result?.points ?? (seededData as {
+            points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>;
+          }).points ?? [];
 
           if (seeded.length > 0) {
             return seeded.map((r) => {
@@ -357,11 +362,13 @@ async function queryQdrantVectorSignal(
     const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
     if (!cleanedSeeds.length) return [];
 
-    const res = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+    const seededVector = buildVectorPayload('codebase_chunks_768', truncateEmbeddingForCollection(embedding, 'codebase_chunks_768'));
+    const res = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: buildVectorPayload('codebase_chunks_768', truncateEmbeddingForCollection(embedding, 'codebase_chunks_768')),
+        query: Array.isArray(seededVector) ? seededVector : seededVector.vector,
+        ...(Array.isArray(seededVector) ? {} : { using: seededVector.name }),
         limit: denseLimit,
         score_threshold: 0.001,
         with_payload: true,
@@ -382,9 +389,12 @@ async function queryQdrantVectorSignal(
 
     if (!res.ok) return [];
     const data = await res.json();
-    const seeded = Array.isArray((data as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
-      ? ((data as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
-      : [];
+    const seeded = (data as {
+      result?: { points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> };
+      points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>;
+    }).result?.points ?? (data as {
+      points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>;
+    }).points ?? [];
 
     return seeded.map((r) => {
       const payload = (r.payload ?? {}) as Record<string, unknown>;
@@ -415,11 +425,13 @@ async function queryTopology64Signal(
   ]);
   if (!topologyVector) return [];
 
-  const topologyRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_topology_64/points/search`, {
+  const topologyVectorPayload = buildVectorPayload('codebase_topology_64', Array.from(topologyVector));
+  const topologyRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_topology_64/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      vector: buildVectorPayload('codebase_topology_64', Array.from(topologyVector)),
+      query: Array.isArray(topologyVectorPayload) ? topologyVectorPayload : topologyVectorPayload.vector,
+      ...(Array.isArray(topologyVectorPayload) ? {} : { using: topologyVectorPayload.name }),
       limit: denseLimit,
       score_threshold: 0.001,
       with_payload: true,
@@ -431,6 +443,8 @@ async function queryTopology64Signal(
   const topologyData = await topologyRes.json();
   const topologyRows = Array.isArray((topologyData as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
     ? ((topologyData as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
+    : Array.isArray((topologyData as { points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).points)
+      ? ((topologyData as { points: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).points ?? [])
     : [];
 
   return topologyRows.map((r) => {

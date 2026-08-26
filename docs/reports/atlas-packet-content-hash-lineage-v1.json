@@ -1,6 +1,6 @@
 {
   "schema": "atlas.atlas-packet-content-hash-lineage.v1",
-  "generatedAt": "2026-08-25T21:32:27.004Z",
+  "generatedAt": "2026-08-26T02:09:54.714Z",
   "readOnly": true,
   "databaseWrites": false,
   "status": "READY",
@@ -12,8 +12,8 @@
     "artifacts_content_hash": 58305,
     "source_refs": 22487,
     "source_refs_content_hash": 22487,
-    "chunks": 52417,
-    "chunks_content_hash": 52380
+    "chunks": 55206,
+    "chunks_content_hash": 55169
   },
   "classifications": {
     "no_artifact_hash": 3356,

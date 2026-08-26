@@ -25,6 +25,9 @@
 # Codebase graph — large gitignored JSON, but searchable for offline analytics
 !sveltekit-frontend/docs/graph/codebase-graph.json
 
+# Multihop enriched map — large gitignored JSON, but searchable for offline analytics
+!sveltekit-frontend/docs/graph/multihop-codebase-map.enriched.json
+
 # index-codebase-fast.mjs probe runs (2026-08-11) — timestamped receipt + graph/map copies
 # per non --publish-canonical run, gitignored but rg-searchable for offline diffing.
 !sveltekit-frontend/docs/graph/.build/

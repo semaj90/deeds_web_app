@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-25T21:35:58.266Z",
+  "generatedAt": "2026-08-26T02:09:54.714Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -1294,14 +1294,14 @@
         "content_hash",
         "source_ref"
       ],
-      "row_count": 52417,
+      "row_count": 55206,
       "source_ref_count": 52417,
       "source_revision_count": 0,
       "workspace_revision_count": 0,
-      "content_hash_count": 52380,
+      "content_hash_count": 55169,
       "content_digest_count": 0,
       "source_content_count": 0,
-      "content_count": 52417
+      "content_count": 55206
     },
     {
       "tableName": "file_index",

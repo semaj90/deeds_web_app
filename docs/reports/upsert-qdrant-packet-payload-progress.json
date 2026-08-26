@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.qdrant-payload-upsert-progress.v1",
+  "mode": "dry-run",
+  "strategy": "direct-codebase-chunk-index",
+  "transport": "HTTP_REST",
+  "lineage_required": false,
+  "total_rows": 10,
+  "started_at": "2026-08-26T00:01:29.820Z",
+  "status": "DRY_RUN_COMPLETE",
+  "heartbeat_at": "2026-08-26T00:01:29.831Z",
+  "processed_rows": 10,
+  "error": null
+}

@@ -212,14 +212,14 @@ export class QdrantSearchClient {
     limit: number = 10,
     filter?: Record<string, unknown>
   ): Promise<QdrantSearchResult[]> {
-    const response = await this.qdrant.search('codebase_chunks_768', {
-      vector: queryEmbedding,
+    const response = await this.qdrant.query('codebase_chunks_768', {
+      query: queryEmbedding,
       with_payload: true,
       limit,
-      ...(filter && { query_filter: filter }),
+      ...(filter && { filter }),
     });
 
-    return response.map((point: any) => ({
+    return response.points.map((point: any) => ({
       id: point.id,
       score: point.score,
       payload: point.payload || {},

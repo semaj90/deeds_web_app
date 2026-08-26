@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-06-10T16:37:44.504Z
+Generated: 2026-08-26T00:17:00.345Z
 
 - FP16 mode: auto (default)
 - FP32 compare: false
@@ -9,28 +9,28 @@ Generated: 2026-06-10T16:37:44.504Z
 
 | File | PR | Auth | Attn | CPU | GPU | Δ | Peak | Mean | Blend |
 |---|---|---|---|---|---|---|---|---|---|
-| src/lib/server/db/client.ts | 7.062 | 10702.526 | 0.006 | 0.633 | 0.006 | -0.628 | 0.006 | 0.006 | 0.702 |
-| src/lib/server/ai/hermes/skills/registry.ts | 6.464 | 0.000 | 0.000 | 0.000 | 0.006 | 0.006 | 0.006 | 0.006 | 0.359 |
-| src/lib/server/ollama.ts | 3.413 | 5299.567 | 0.006 | 0.572 | 0.006 | -0.566 | 0.006 | 0.006 | 0.300 |
-| src/lib/server/env.server.ts | 5.278 | 0.000 | 0.006 | 0.642 | 0.006 | -0.636 | 0.006 | 0.006 | 0.279 |
-| src/lib/server/db/schema-postgres.ts | 4.050 | 249.917 | 0.006 | 0.632 | 0.006 | -0.626 | 0.006 | 0.006 | 0.202 |
-| src/lib/server/redis.ts | 3.904 | 73.950 | 0.006 | 0.595 | 0.006 | -0.590 | 0.006 | 0.006 | 0.187 |
-| src/lib/server/middleware/cache-headers.ts | 3.173 | 0.000 | 0.006 | 0.624 | 0.006 | -0.618 | 0.006 | 0.006 | 0.134 |
-| scripts/atlas/_atlas-utils.mjs | 3.000 | 0.149 | 0.000 | 0.000 | 0.006 | 0.006 | 0.006 | 0.006 | 0.121 |
-| src/lib/config/env.server.ts | 2.715 | 61.000 | 0.006 | 0.634 | 0.006 | -0.629 | 0.006 | 0.006 | 0.105 |
-| src/lib/server/observability/langfuse.ts | 2.453 | 11.200 | 0.006 | 0.590 | 0.006 | -0.584 | 0.006 | 0.006 | 0.085 |
-| src/lib/server/grpc/embedding-client.ts | 1.851 | 1087.117 | 0.006 | 0.618 | 0.006 | -0.612 | 0.006 | 0.006 | 0.074 |
-| src/lib/server/observability/inference-log.ts | 2.130 | 1.033 | 0.006 | 0.606 | 0.006 | -0.600 | 0.006 | 0.006 | 0.063 |
-| src/lib/server/vector/qdrant-manager.ts | 1.809 | 313.317 | 0.006 | 0.572 | 0.006 | -0.566 | 0.006 | 0.006 | 0.050 |
-| src/lib/server/cache.ts | 1.899 | 69.533 | 0.006 | 0.637 | 0.006 | -0.632 | 0.006 | 0.006 | 0.049 |
-| src/lib/server/analysis/worker.ts | 1.903 | 5.000 | 0.006 | 0.623 | 0.006 | -0.617 | 0.006 | 0.006 | 0.047 |
-| src/lib/server/gpu/simdjson-bridge.ts | 1.852 | 0.000 | 0.006 | 0.617 | 0.006 | -0.611 | 0.006 | 0.006 | 0.044 |
-| src/lib/server/neo4j-driver.ts | 1.837 | 0.000 | 0.006 | 0.636 | 0.006 | -0.630 | 0.006 | 0.006 | 0.043 |
-| src/lib/server/minio-client.ts | 1.834 | 7.583 | 0.006 | 0.584 | 0.006 | -0.579 | 0.006 | 0.006 | 0.043 |
-| src/lib/server/db/relations.ts | 1.835 | 0.000 | 0.006 | 0.647 | 0.006 | -0.641 | 0.006 | 0.006 | 0.043 |
-| src/lib/server/services/error-analysis/types.ts | 1.825 | 0.000 | 0.006 | 0.635 | 0.006 | -0.629 | 0.006 | 0.006 | 0.042 |
-| src/lib/server/lucia.ts | 1.778 | 75.833 | 0.006 | 0.635 | 0.006 | -0.630 | 0.006 | 0.006 | 0.041 |
-| src/lib/server/db/schema/library-documents.ts | 1.796 | 9.000 | 0.006 | 0.642 | 0.006 | -0.636 | 0.006 | 0.006 | 0.040 |
-| src/lib/server/agents/agents-card-store.ts | 1.798 | 0.000 | 0.006 | 0.613 | 0.006 | -0.607 | 0.006 | 0.006 | 0.040 |
-| src/lib/server/gpu/libtorch-bridge.ts | 1.787 | 0.000 | 0.006 | 0.591 | 0.006 | -0.585 | 0.006 | 0.006 | 0.039 |
-| src/routes/api/test/redis-direct/+server.ts | 1.779 | 0.000 | 0.006 | 0.605 | 0.006 | -0.599 | 0.006 | 0.006 | 0.039 |
+| sveltekit-frontend/src/lib/server/agent/tools/analyze-imports.ts | 0.150 | 0.450 | 0.005 | 0.650 | 0.005 | -0.645 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents-md/schema.ts | 0.150 | 0.450 | 0.005 | 0.654 | 0.005 | -0.649 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ai/caching-layer.ts | 0.150 | 0.450 | 0.005 | 0.648 | 0.005 | -0.643 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agent/tools/ripgrep-search.ts | 0.150 | 0.450 | 0.005 | 0.643 | 0.005 | -0.638 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents/ontology-sortation-agent.ts | 0.150 | 0.450 | 0.005 | 0.638 | 0.005 | -0.633 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts | 0.150 | 0.450 | 0.005 | 0.633 | 0.005 | -0.628 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agent/subagents.ts | 0.150 | 0.450 | 0.005 | 0.615 | 0.005 | -0.610 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agent/supervisor.ts | 0.150 | 0.450 | 0.005 | 0.624 | 0.005 | -0.619 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agent/tools/analyze-file.ts | 0.150 | 0.450 | 0.005 | 0.621 | 0.005 | -0.616 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents-md/parse-agents-md.ts | 0.150 | 0.450 | 0.005 | 0.623 | 0.005 | -0.618 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents/memory-encoding-agent.ts | 0.150 | 0.450 | 0.005 | 0.620 | 0.005 | -0.615 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/ace-wiki.ts | 0.150 | 0.450 | 0.005 | 0.608 | 0.005 | -0.603 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/adaptive-prefetch.ts | 0.150 | 0.450 | 0.005 | 0.605 | 0.005 | -0.600 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/codeintel-datastore.ts | 0.150 | 0.450 | 0.005 | 0.614 | 0.005 | -0.609 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/acp/tools/phase89.ts | 0.150 | 0.450 | 0.005 | 0.612 | 0.005 | -0.607 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agents-md/resolve-directory-context.ts | 0.150 | 0.450 | 0.005 | 0.609 | 0.005 | -0.604 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/context-assembler.ts | 0.150 | 0.450 | 0.005 | 0.595 | 0.005 | -0.590 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ai/ab-test.ts | 0.150 | 0.450 | 0.005 | 0.603 | 0.005 | -0.598 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace-ingest-progress.ts | 0.150 | 0.450 | 0.005 | 0.585 | 0.005 | -0.580 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/ace-agent.ts | 0.150 | 0.450 | 0.005 | 0.591 | 0.005 | -0.586 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ace/cluster-tags-cache.ts | 0.150 | 0.450 | 0.005 | 0.588 | 0.005 | -0.583 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/ai/cached-stream.ts | 0.150 | 0.450 | 0.005 | 0.590 | 0.005 | -0.585 | 0.005 | 0.005 | 0.302 |

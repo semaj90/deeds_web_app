@@ -129,12 +129,13 @@ async function searchAuthorityCollections(
 				try {
 					const vectorPayload = buildVectorPayload(collection, vector);
 					const res = await fetch(
-						`${qdrantUrl}/collections/${collection}/points/search`,
+						`${qdrantUrl}/collections/${collection}/points/query`,
 						{
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
-								vector: vectorPayload,
+								query: Array.isArray(vectorPayload) ? vectorPayload : vectorPayload.vector,
+								...(Array.isArray(vectorPayload) ? {} : { using: vectorPayload.name }),
 								limit,
 								with_payload: true,
 								score_threshold: scoreThreshold,
@@ -144,7 +145,7 @@ async function searchAuthorityCollections(
 					);
 					if (!res.ok) return [];
 					const data = await res.json();
-					return ((data.result ?? []) as Array<Record<string, unknown>>).map(
+					return ((data.result?.points ?? []) as Array<Record<string, unknown>>).map(
 						(r) => {
 							const payload = r.payload as Record<string, unknown> | undefined;
 							const raw = String(

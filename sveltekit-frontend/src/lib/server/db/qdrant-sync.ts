@@ -255,8 +255,8 @@ export async function searchQdrant(
 > {
   try {
     // @ts-ignore
-    const searchResult = await qdrant.search(COLLECTION_NAME, {
-      vector: queryEmbedding,
+    const { points: searchResult } = await qdrant.query(COLLECTION_NAME, {
+      query: queryEmbedding,
       limit,
       filter,
     });

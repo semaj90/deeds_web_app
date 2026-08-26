@@ -20,6 +20,7 @@
  *   node scripts/atlas/upsert-qdrant-packet-payload.mjs --dry-run
  *   node scripts/atlas/upsert-qdrant-packet-payload.mjs --apply
  *   node scripts/atlas/upsert-qdrant-packet-payload.mjs --apply --limit=500
+ *   node scripts/atlas/upsert-qdrant-packet-payload.mjs --apply --require-lineage
  */
 
 import pg from 'pg';
@@ -27,6 +28,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { createQdrantGrpcPayloadClient } from './qdrant-grpc-payload-client.mjs';
 
 const { Pool } = pg;
 const __dir = dirname(fileURLToPath(import.meta.url));
@@ -35,6 +37,8 @@ const env = loadRepoEnv(process.env);
 
 const DATABASE_URL = resolveDatabaseUrl(env);
 const QDRANT_URL   = env.QDRANT_URL   || 'http://127.0.0.1:6333';
+const QDRANT_GRPC_HOST = env.QDRANT_GRPC_HOST || '127.0.0.1';
+const QDRANT_GRPC_PORT = Number(env.QDRANT_GRPC_PORT || 6334);
 const COLLECTION   = 'codebase_chunks_768';
 
 const APPLY     = process.argv.includes('--apply');
@@ -42,9 +46,50 @@ const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
 const MAX_ROWS  = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
 const VERBOSE   = process.argv.includes('--verbose');
+const USE_GRPC  = process.argv.includes('--grpc');
+// Filter-based set_payload: skips the scroll-for-IDs round trip entirely and
+// writes directly via a source_ref filter selector. Verified live 2026-08-25
+// on a --limit=20 pilot: 20/20 rows, 0 errors, readback-confirmed on 5 real
+// points spanning one file's chunks, all carrying this run's atlas_enriched_at
+// timestamp. ~100x faster wall-clock than the scroll+write path in practice
+// (20 rows completed in seconds vs. ~10-15 min/1000 rows previously).
+const USE_FILTER_WRITE = process.argv.includes('--filter-write');
+const QDRANT_TRANSPORT = USE_GRPC ? 'GRPC' : 'HTTP_REST';
+const grpcPayloadClient = USE_GRPC
+  ? createQdrantGrpcPayloadClient({ host: QDRANT_GRPC_HOST, port: QDRANT_GRPC_PORT })
+  : null;
+// Path-only matching is retained for compatibility, but is explicitly degraded.
+// Promotion-safe runs must require packet/chunk hash and packet revision evidence.
+const REQUIRE_LINEAGE = process.argv.includes('--require-lineage');
 
 // Concurrency for Qdrant scroll + payload calls (keep low to avoid overwhelming Qdrant)
 const QDRANT_CONCURRENCY = 8;
+const PROGRESS_PATH = join(ROOT, 'docs', 'reports', 'upsert-qdrant-packet-payload-progress.json');
+let progressState = null;
+
+function writeProgress(status, counters = {}, error = null) {
+  if (!progressState) return;
+  try {
+    mkdirSync(dirname(PROGRESS_PATH), { recursive: true });
+    writeFileSync(PROGRESS_PATH, JSON.stringify({
+      schema: 'atlas.qdrant-payload-upsert-progress.v1',
+      ...progressState,
+      status,
+      heartbeat_at: new Date().toISOString(),
+      ...counters,
+      error: error ? String(error?.stack ?? error) : null,
+    }, null, 2));
+  } catch (writeError) {
+    console.error(`Could not write progress receipt: ${writeError.message}`);
+  }
+}
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.once(signal, () => {
+    writeProgress('INTERRUPTED', {}, `received ${signal}`);
+    process.exit(128 + (signal === 'SIGINT' ? 2 : 15));
+  });
+}
 
 function canonicalize(sourceRef) {
   if (!sourceRef) return null;
@@ -131,6 +176,14 @@ function deriveTags(featureId, conceptIds, packetKey, summary) {
 
 async function getQdrantPointIds(canonicalRef) {
   // Find Qdrant point IDs for a given canonicalSourceRef or relative_path.
+  if (grpcPayloadClient) {
+    try {
+      return await grpcPayloadClient.findPointIds(COLLECTION, [
+        canonicalRef,
+        canonicalRef.startsWith('sveltekit-frontend/') ? canonicalRef.slice('sveltekit-frontend/'.length) : `sveltekit-frontend/${canonicalRef}`,
+      ]);
+    } catch { return []; }
+  }
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
       method: 'POST',
@@ -149,6 +202,11 @@ async function getQdrantPointIds(canonicalRef) {
             { key: 'relative_path', match: { value: 'sveltekit-frontend/' + canonicalRef } },
             { key: 'file_path', match: { value: canonicalRef } },
             { key: 'file_path', match: { value: 'sveltekit-frontend/' + canonicalRef } },
+            // source_ref (snake_case) is the actual live payload field in
+            // codebase_chunks_768, confirmed 2026-08-25 -- was missing here
+            // entirely, which silently broke this lookup for real rows.
+            { key: 'source_ref', match: { value: canonicalRef } },
+            { key: 'source_ref', match: { value: 'sveltekit-frontend/' + canonicalRef } },
           ]
         },
       }),
@@ -161,6 +219,17 @@ async function getQdrantPointIds(canonicalRef) {
 }
 
 async function getQdrantPointIdsForPacket(pkt, canonicalRef) {
+  if (grpcPayloadClient) {
+    try {
+      const sourceRef = pkt.source_ref ?? pkt.file_path ?? pkt.source_path ?? pkt.metadata?.path ?? canonicalRef;
+      const refs = [...new Set([
+        sourceRef,
+        canonicalRef,
+        canonicalRef?.startsWith('sveltekit-frontend/') ? canonicalRef.slice('sveltekit-frontend/'.length) : `sveltekit-frontend/${canonicalRef}`,
+      ].filter(Boolean))];
+      return await grpcPayloadClient.findPointIds(COLLECTION, refs);
+    } catch { return []; }
+  }
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
       method: 'POST',
@@ -182,22 +251,53 @@ async function getQdrantPointIdsForPacket(pkt, canonicalRef) {
 }
 
 async function setQdrantPayload(pointIds, payload) {
+  if (grpcPayloadClient) {
+    try {
+      await grpcPayloadClient.setPayload(COLLECTION, pointIds, payload);
+      return true;
+    } catch { return false; }
+  }
   try {
     const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payload, points: pointIds }),
+      body: JSON.stringify({ payload, points: pointIds.map(normalizeQdrantPointId) }),
       signal: AbortSignal.timeout(20_000),
     });
     return res.ok;
   } catch { return false; }
 }
 
+// Verified live 2026-08-25 (see USE_FILTER_WRITE comment above) -- wired
+// into the main apply loop behind --filter-write.
+async function setQdrantPayloadByFilter(filter, payload) {
+  try {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload, filter }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    return res.ok;
+  } catch { return false; }
+}
+
+function normalizeQdrantPointId(pointId) {
+  // Qdrant's point-ID JSON encoding requires an unsigned integer or a UUID --
+  // a numeric-looking STRING (e.g. Postgres qdrant_id::varchar "1533550521")
+  // is neither, and set_payload rejects it with a 400. Coerce all-digit
+  // strings to a raw JSON number; leave UUIDs (and anything else) untouched.
+  if (typeof pointId === 'string' && /^\d+$/.test(pointId) && Number.isSafeInteger(Number(pointId))) {
+    return Number(pointId);
+  }
+  return pointId;
+}
+
 async function setQdrantPayloadOne(pointId, payload) {
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/payload?wait=false`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ payload, points: [pointId] }),
+    body: JSON.stringify({ payload, points: [normalizeQdrantPointId(pointId)] }),
     signal: AbortSignal.timeout(20_000),
   });
   if (!res.ok) {
@@ -227,7 +327,11 @@ function buildPayload(pkt, canonicalRef, enrichedAt) {
     packetKey: pkt.packet_key ?? null,
     qdrant_point_id: pkt.qdrant_point_id ?? pkt.qdrant_id ?? null,
     qdrant_collection: pkt.qdrant_collection ?? COLLECTION,
-    qdrant_vector_dim: pkt.qdrant_vector_dim ?? pkt.embedding_dimension ?? 768,
+    qdrant_vector_dim: 768,
+    representation_id: 'semantic_768',
+    representation_name: 'semantic_768',
+    representation_revision: 'semantic_768@v1',
+    embedding_dimension: 768,
     community_id: pkt.community_id ?? null,
     community_conf: pkt.community_confidence ?? 0.25,
     concept_ids: Array.isArray(pkt.concept_ids) ? pkt.concept_ids : [],
@@ -250,9 +354,19 @@ function buildPayload(pkt, canonicalRef, enrichedAt) {
   };
 }
 
-async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
+async function directChunkIndexSync(pool, totalPackets, maxRows, isDry, packetColumns) {
   const limitSql = Number.isFinite(maxRows) ? 'LIMIT $1' : '';
   const params = Number.isFinite(maxRows) ? [maxRows] : [];
+  const packetHasContentHash = packetColumns.has('content_hash');
+  const packetHasSourceRevision = packetColumns.has('source_revision');
+  const packetHashSql = packetHasContentHash ? 'ap.content_hash AS packet_content_hash' : 'NULL::text AS packet_content_hash';
+  const packetRevisionSql = packetHasSourceRevision ? 'ap.source_revision AS packet_source_revision' : 'NULL::text AS packet_source_revision';
+  const lineageWhere = REQUIRE_LINEAGE
+    ? `AND cci.content_hash IS NOT NULL
+       AND ${packetHasContentHash ? 'ap.content_hash IS NOT NULL' : 'false'}
+       AND ${packetHasContentHash ? 'cci.content_hash = ap.content_hash' : 'false'}
+       AND ${packetHasSourceRevision ? 'ap.source_revision IS NOT NULL' : 'false'}`
+    : '';
   const result = await pool.query(`
     SELECT
       cci.qdrant_id,
@@ -263,6 +377,8 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
       cci.community_id AS qdrant_community_id,
       cci.embedding_dimension,
       cci.content_hash,
+      ${packetHashSql},
+      ${packetRevisionSql},
       ap.packet_key,
       ap.source_ref,
       ap.feature_id,
@@ -284,12 +400,27 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
       LIMIT 1
     ) ap ON true
     WHERE cci.qdrant_id IS NOT NULL
+      ${lineageWhere}
     ORDER BY cci.updated_at DESC NULLS LAST, cci.qdrant_id
     ${limitSql}
   `, params);
 
   const rows = result.rows;
   console.log(`Total packets: ${totalPackets} | Vector-backed chunk rows: ${rows.length}`);
+  progressState = {
+    mode: isDry ? 'dry-run' : 'apply',
+    strategy: 'direct-codebase-chunk-index',
+    transport: QDRANT_TRANSPORT,
+    lineage_required: REQUIRE_LINEAGE,
+    total_rows: rows.length,
+    started_at: new Date().toISOString(),
+  };
+  writeProgress(isDry ? 'DRY_RUN_STARTED' : 'RUNNING', {
+    processed_rows: 0,
+    qdrant_points_updated: 0,
+    stale_skipped: 0,
+    errors: 0,
+  });
 
   const enrichedAt = new Date().toISOString();
   if (isDry) {
@@ -302,18 +433,24 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
       console.log(`    source_ref: ${payload.source_ref}`);
     }
     console.log('\n(dry-run — no Qdrant writes; run with --apply to commit)');
+    writeProgress('DRY_RUN_COMPLETE', { processed_rows: rows.length });
     return {
       mode: 'dry-run',
       total_packets: totalPackets,
       chunk_rows: rows.length,
-      qdrant_points_updated: rows.length,
+      qdrant_points_updated: 0,
       errors: 0,
+      identity_resolution_source: REQUIRE_LINEAGE
+        ? 'SOURCE_REF_CONTENT_HASH_SOURCE_REVISION'
+        : 'SOURCE_REF_PATH_ONLY_DEGRADED',
+      write_policy: 'NO_QDRANT_WRITES',
     };
   }
 
   let processed = 0;
   let updated = 0;
   let errors = 0;
+  let staleIdSkipped = 0;
   for (let i = 0; i < rows.length; i += QDRANT_CONCURRENCY) {
     const batch = rows.slice(i, i + QDRANT_CONCURRENCY);
     await Promise.all(batch.map(async (row) => {
@@ -323,8 +460,48 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
           row.qdrant_relative_path,
           enrichedAt,
         );
-        await setQdrantPayloadOne(row.qdrant_id, payload);
-        updated++;
+        // row.qdrant_id (from codebase_chunk_index) was confirmed 2026-08-25
+        // to commonly be stale -- it does not resolve via direct point
+        // lookup for rows checked. Resolve real, live point IDs via a
+        // source_ref/relative_path filter scroll instead of trusting the
+        // stored qdrant_id directly, and write payload to those.
+        const refCandidate = row.qdrant_relative_path ?? row.source_ref ?? null;
+        if (!refCandidate) { staleIdSkipped++; return; }
+
+        if (USE_FILTER_WRITE) {
+          // Skips the scroll entirely -- one filtered write per row instead
+          // of one scroll + one write. Can't report an exact points-updated
+          // count (Qdrant's filter set_payload response has no such field),
+          // so this path counts rows written, not points touched.
+          const filter = {
+            should: [
+              { key: 'source_ref', match: { value: refCandidate } },
+              { key: 'source_ref', match: { value: 'sveltekit-frontend/' + refCandidate } },
+            ],
+          };
+          const ok = await setQdrantPayloadByFilter(filter, payload);
+          if (ok) {
+            updated += 1;
+          } else {
+            errors++;
+            if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): setQdrantPayloadByFilter returned not-ok`);
+          }
+          return;
+        }
+
+        const realIds = await getQdrantPointIds(refCandidate);
+        if (realIds.length === 0) {
+          staleIdSkipped++;
+          if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): no live point resolved, skipped`);
+          return;
+        }
+        const ok = await setQdrantPayload(realIds, payload);
+        if (ok) {
+          updated += realIds.length;
+        } else {
+          errors++;
+          if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): setQdrantPayload returned not-ok`);
+        }
       } catch (error) {
         errors++;
         if (VERBOSE) console.error(`  ${row.qdrant_id}: ${error.message}`);
@@ -332,10 +509,22 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
     }));
     processed += batch.length;
     if (processed % 1000 === 0 || processed === rows.length) {
-      process.stdout.write(`\r  Processed ${processed}/${rows.length} chunks (updated: ${updated}, err: ${errors})`);
+      process.stdout.write(`\r  Processed ${processed}/${rows.length} chunks (updated: ${updated}, stale-skipped: ${staleIdSkipped}, err: ${errors})`);
+      writeProgress('RUNNING', {
+        processed_rows: processed,
+        qdrant_points_updated: updated,
+        stale_skipped: staleIdSkipped,
+        errors,
+      });
     }
   }
   process.stdout.write('\n');
+  writeProgress('COMPLETE', {
+    processed_rows: processed,
+    qdrant_points_updated: updated,
+    stale_skipped: staleIdSkipped,
+    errors,
+  });
 
   return {
     mode: 'apply',
@@ -343,6 +532,10 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry) {
     chunk_rows: rows.length,
     qdrant_points_updated: updated,
     errors,
+    identity_resolution_source: REQUIRE_LINEAGE
+      ? 'SOURCE_REF_CONTENT_HASH_SOURCE_REVISION'
+      : 'SOURCE_REF_PATH_ONLY_DEGRADED',
+    write_policy: 'SET_PAYLOAD_MERGE_ON_EXISTING_POINTS',
   };
 }
 
@@ -408,7 +601,7 @@ async function main() {
   const totalPackets = totalRows[0]?.total ?? 0;
 
   if (hasChunkIndex) {
-    const report = await directChunkIndexSync(pool, totalPackets, MAX_ROWS, DRY_RUN);
+    const report = await directChunkIndexSync(pool, totalPackets, MAX_ROWS, DRY_RUN, columns);
     await pool.end();
     const reportDir = join(ROOT, 'docs', 'reports');
     mkdirSync(reportDir, { recursive: true });
@@ -416,6 +609,9 @@ async function main() {
       generated_at: new Date().toISOString(),
       collection: COLLECTION,
       strategy: 'direct-codebase-chunk-index',
+      transport: QDRANT_TRANSPORT,
+      grpc_endpoint: USE_GRPC ? `${QDRANT_GRPC_HOST}:${QDRANT_GRPC_PORT}` : null,
+      lineage_required: REQUIRE_LINEAGE,
       ...report,
     }, null, 2));
     console.log('\n══ Summary ══════════════════════════════════════');
@@ -506,6 +702,20 @@ async function main() {
   let processed = 0, updated = 0, notFound = 0, errors = 0;
   const refsArray = [...refGroups.entries()];
   const enrichedAt = new Date().toISOString();
+  progressState = {
+    mode: 'apply',
+    strategy: 'packet-reference-groups',
+    transport: QDRANT_TRANSPORT,
+    lineage_required: REQUIRE_LINEAGE,
+    total_rows: refsArray.length,
+    started_at: new Date().toISOString(),
+  };
+  writeProgress('RUNNING', {
+    processed_rows: 0,
+    qdrant_points_updated: 0,
+    refs_not_in_qdrant: 0,
+    errors: 0,
+  });
 
   // Process with limited concurrency to avoid overwhelming Qdrant
   for (let i = 0; i < refsArray.length; i += QDRANT_CONCURRENCY) {
@@ -560,7 +770,11 @@ async function main() {
         packetKey:          pkt.packet_key ?? null,
         qdrant_point_id:    pkt.qdrant_point_id ?? null,
         qdrant_collection:  pkt.qdrant_collection ?? COLLECTION,
-        qdrant_vector_dim:  pkt.qdrant_vector_dim ?? 768,
+        qdrant_vector_dim:  768,
+        representation_id:  'semantic_768',
+        representation_name: 'semantic_768',
+        representation_revision: 'semantic_768@v1',
+        embedding_dimension: 768,
 
         // Community & enrichment
         community_id:       pkt.community_id ?? null,
@@ -595,8 +809,20 @@ async function main() {
 
     processed += batch.length;
     process.stdout.write(`\r  Processed ${processed}/${refsArray.length} refs (updated: ${updated} points, miss: ${notFound}, err: ${errors})`);
+    writeProgress('RUNNING', {
+      processed_rows: processed,
+      qdrant_points_updated: updated,
+      refs_not_in_qdrant: notFound,
+      errors,
+    });
   }
   process.stdout.write('\n');
+  writeProgress('COMPLETE', {
+    processed_rows: processed,
+    qdrant_points_updated: updated,
+    refs_not_in_qdrant: notFound,
+    errors,
+  });
 
   await pool.end();
 
@@ -606,6 +832,8 @@ async function main() {
   const report = {
     generated_at: new Date().toISOString(),
     mode: 'apply',
+    transport: QDRANT_TRANSPORT,
+    grpc_endpoint: USE_GRPC ? `${QDRANT_GRPC_HOST}:${QDRANT_GRPC_PORT}` : null,
     total_packets: packets.length,
     unique_refs: refGroups.size,
     refs_processed: processed,
@@ -624,4 +852,8 @@ async function main() {
   console.log('\n  ✅ Qdrant payload enriched. Pre-filtering on feature_id/community_id/tags now available.');
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+main().catch(err => {
+  writeProgress('FAILED', {}, err);
+  console.error(err);
+  process.exit(1);
+});

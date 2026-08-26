@@ -48,12 +48,10 @@ async function searchNamedVector(
     const collection = vectorName === 'latent_64' ? 'codebase_topology_64' : 'codebase_chunks_768';
 
     const response = await qdrant.post(
-      `/collections/${collection}/points/search`,
+      `/collections/${collection}/points/query`,
       {
-        vector: {
-          name: vectorName,
-          vector: vector,
-        },
+        query: vector,
+        using: vectorName,
         limit: limit,
         with_payload: true,
       }
@@ -61,7 +59,7 @@ async function searchNamedVector(
 
     const responseAny = response as any;
 
-    const hits = Array.isArray(responseAny.result) ? responseAny.result : [];
+    const hits = Array.isArray(responseAny.points) ? responseAny.points : [];
     return hits.map((hit: any) => ({
       id: hit.id,
       score: hit.score,

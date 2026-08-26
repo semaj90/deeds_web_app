@@ -67,8 +67,8 @@ async function generateEmbedding(text: string): Promise<number[]> {
 async function findSimilarFixes(embedding: number[]) {
   if (embedding.length === 0) return [];
   try {
-    const res = await qdrant.search('phase79_knowledge_base', {
-      vector: embedding,
+    const { points: res } = await qdrant.query('phase79_knowledge_base', {
+      query: embedding,
       limit: 3,
       with_payload: true
     });

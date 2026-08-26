@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.graphify-workspace-manifest-completeness-proof.v1",
+  "status": "PERSISTED_WORKSPACE_MANIFEST_NOT_FOUND",
+  "complete": false,
+  "graphMayConsumeWorkspaceRevision": false,
+  "workspaceRevision": "sha256:0509819a3c1ee6593623729594fe7895498a238eefb9b8886ba1b633dd535207",
+  "sourceManifestDigest": "0509819a3c1ee6593623729594fe7895498a238eefb9b8886ba1b633dd535207",
+  "expectedSourceCount": 23505,
+  "observedMatchingRuns": 0,
+  "requestedWorkspaceId": null,
+  "readOnly": true,
+  "canonicalWritesAttempted": false,
+  "producerRevision": "atlas.graphify-workspace-manifest-completeness-proof.2026-08-22.v1"
+}

@@ -2,8 +2,9 @@
 /**
  * Full-Corpus Embedding Backfill for codebase_chunk_index
  *
- * Backfills content_embedding (768-dim, embeddinggemma:latest) for all codebase chunks
- * where content_embedding IS NULL.
+ * Backfills content_embedding_768 (768-dim, embeddinggemma:latest) for all codebase chunks
+ * where content_embedding_768 IS NULL. The generic content_embedding column is legacy
+ * compatibility storage and is not the canonical semantic_768 writer target.
  *
  * Pipeline:
  *   1. Fetch chunks from Postgres (batch-friendly select)
@@ -110,16 +111,14 @@ async function fetchChunksNeedingEmbeddings(afterId = null, limit = 0) {
     const res = await client.query(`
       SELECT
         id,
-        codebase_id,
-        file_path,
+        relative_path AS file_path,
         content,
-        chunk_index,
         line_start,
         line_end,
         token_count,
         content_hash
       FROM codebase_chunk_index
-      WHERE content_embedding IS NULL
+      WHERE content_embedding_768 IS NULL
         AND content IS NOT NULL
         AND LENGTH(TRIM(content)) > 0
         ${cursorClause}
@@ -201,21 +200,32 @@ async function updateChunksWithEmbeddings(updates) {
 
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    const ids = [];
+    const vectorLiterals = [];
 
     for (const { id, embedding } of updates) {
       if (!isValidEmbedding(embedding)) {
         throw new Error(`Invalid embedding for chunk ${id}: dim=${embedding?.length ?? 0}`);
       }
 
-      // Store embedding as vector type (pgvector)
-      const embeddingArray = Array.from(embedding);
-      await client.query(
-        `UPDATE codebase_chunk_index
-         SET content_embedding = $1, updated_at = now()
-         WHERE id = $2`,
-        [embeddingArray, id]
-      );
+      ids.push(id);
+      vectorLiterals.push(`[${Array.from(embedding).join(',')}]`);
+    }
+
+    await client.query('BEGIN');
+
+    // One typed batch update avoids one PostgreSQL round trip per embedding.
+    // The explicit cast preserves pgvector's vector(768) dimension check.
+    const result = await client.query(
+      `UPDATE codebase_chunk_index AS c
+       SET content_embedding_768 = u.embedding::vector(768), updated_at = now()
+       FROM unnest($1::uuid[], $2::text[]) AS u(id, embedding)
+       WHERE c.id = u.id`,
+      [ids, vectorLiterals]
+    );
+
+    if (result.rowCount !== updates.length) {
+      throw new Error(`Batch update count mismatch: updated ${result.rowCount}, expected ${updates.length}`);
     }
 
     await client.query('COMMIT');
@@ -238,7 +248,7 @@ async function getEmbeddingCoverage() {
     const res = await client.query(`
       SELECT
         COUNT(*) as total,
-        COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) as populated
+        COUNT(CASE WHEN content_embedding_768 IS NOT NULL THEN 1 END) as populated
       FROM codebase_chunk_index
       WHERE content IS NOT NULL
         AND LENGTH(TRIM(content)) > 0

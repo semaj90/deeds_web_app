@@ -178,15 +178,13 @@ export async function searchByContentEmbedding(
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
   const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/search`,
+    `${qdrantUrl}/collections/${collectionName}/points/query`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: {
-          name: 'content_embedding',
-          vector: queryEmbedding
-        },
+        query: queryEmbedding,
+        using: 'content_embedding',
         limit: topK,
         filter
       })
@@ -197,8 +195,8 @@ export async function searchByContentEmbedding(
     throw new Error(`Search failed: ${await searchRes.text()}`);
   }
 
-  const { result } = await searchRes.json();
-  return result;
+  const { points, result } = await searchRes.json();
+  return points ?? result ?? [];
 }
 
 /**
@@ -307,15 +305,13 @@ async function searchByEmbedding(
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
   const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/search`,
+    `${qdrantUrl}/collections/${collectionName}/points/query`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: {
-          name: vectorName,
-          vector: queryEmbedding
-        },
+        query: queryEmbedding,
+        using: vectorName,
         limit: topK,
         filter
       })
@@ -326,8 +322,8 @@ async function searchByEmbedding(
     throw new Error(`Search (${vectorName}) failed: ${await searchRes.text()}`);
   }
 
-  const { result } = await searchRes.json();
-  return result;
+  const { points, result } = await searchRes.json();
+  return points ?? result ?? [];
 }
 
 /**

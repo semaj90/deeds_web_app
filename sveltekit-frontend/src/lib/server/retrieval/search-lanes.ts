@@ -376,7 +376,7 @@ export class QdrantLane extends SearchLaneBase {
     const limit = context.topK;
 
     const body: Record<string, unknown> = {
-      vector: Array.from(queryVector),
+      query: Array.from(queryVector),
       limit,
       with_payload: true,
     };
@@ -384,7 +384,7 @@ export class QdrantLane extends SearchLaneBase {
 
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), this.timeout);
-    const res = await fetch(`${this.url}/collections/${this.collection}/points/search`, {
+    const res = await fetch(`${this.url}/collections/${this.collection}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -395,10 +395,10 @@ export class QdrantLane extends SearchLaneBase {
     if (!res.ok) throw new Error(`Qdrant search failed: ${res.status}`);
 
     const data = (await res.json()) as {
-      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
+      points: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
     };
 
-    const results = (data.result ?? []).map((point, i) => ({
+    const results = (data.points ?? []).map((point, i) => ({
       ...(() => {
         const laneMetadata = this.embeddingLane === 'dense_384'
           ? VECTOR_CONFIG_LANES.dense_384
@@ -535,7 +535,8 @@ export class QdrantLane384 extends SearchLaneBase {
 
     // Use named vector syntax for collections with multiple vector configs
     const body: Record<string, unknown> = {
-      vector: { name: this.namedVector, vector: Array.from(queryVector) },
+      query: Array.from(queryVector),
+      using: this.namedVector,
       limit,
       with_payload: true,
     };
@@ -543,7 +544,7 @@ export class QdrantLane384 extends SearchLaneBase {
 
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), this.timeout);
-    const res = await fetch(`${this.url}/collections/${this.collection}/points/search`, {
+    const res = await fetch(`${this.url}/collections/${this.collection}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -557,10 +558,10 @@ export class QdrantLane384 extends SearchLaneBase {
     }
 
     const data = (await res.json()) as {
-      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
+      points: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
     };
 
-    const results = (data.result ?? []).map((point, i) => ({
+    const results = (data.points ?? []).map((point, i) => ({
       ...(() => {
         const laneMetadata = getVectorLaneMetadata('dense_384');
         const dense384Metadata = VECTOR_CONFIG_LANES.dense_384;

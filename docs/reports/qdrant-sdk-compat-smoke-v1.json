@@ -1,0 +1,70 @@
+{
+  "schema": "QdrantSdkCompatibilitySmokeV1",
+  "generatedAt": "2026-08-26T05:07:23.001Z",
+  "sdk": "@qdrant/js-client-rest@1.19.0",
+  "serverVersion": "1.19.0",
+  "collection": "codebase_chunks_768",
+  "vectorName": "content",
+  "dimension": 768,
+  "readOnly": true,
+  "writesPerformed": false,
+  "checks": [
+    {
+      "name": "server-reachable",
+      "passed": true,
+      "serverVersion": "1.19.0",
+      "url": "http://127.0.0.1:6333"
+    },
+    {
+      "name": "server-is-supported-upgrade-range",
+      "passed": true,
+      "serverVersion": "1.19.0"
+    },
+    {
+      "name": "collections-list",
+      "passed": true,
+      "collectionCount": 43
+    },
+    {
+      "name": "collection-read",
+      "passed": true,
+      "collection": "codebase_chunks_768"
+    },
+    {
+      "name": "scroll-read-only-seed",
+      "passed": true,
+      "found": true
+    },
+    {
+      "name": "stored-vector-read",
+      "passed": true,
+      "dimension": 768
+    },
+    {
+      "name": "named-vector-self-query",
+      "passed": true,
+      "pointCount": 16,
+      "seedPointId": 1
+    },
+    {
+      "name": "query-batch",
+      "passed": true,
+      "resultSets": 2,
+      "pointCounts": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "payload-filtered-query",
+      "passed": true,
+      "pointCount": 1
+    },
+    {
+      "name": "recommend-query-shape",
+      "passed": true,
+      "pointCount": 1
+    }
+  ],
+  "status": "PASS"
+}

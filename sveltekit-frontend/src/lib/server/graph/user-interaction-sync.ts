@@ -179,8 +179,8 @@ export async function searchSimilarUserQueries(
 	try {
 		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 
-		const results = await qdrant.client.search('user_searches', {
-			vector: queryVector,
+		const results = await qdrant.client.query('user_searches', {
+			query: queryVector,
 			limit,
 			score_threshold: 0.4,
 			filter: {
@@ -189,7 +189,7 @@ export async function searchSimilarUserQueries(
 			with_payload: true,
 		});
 
-		return results.map((r) => ({
+		return results.points.map((r) => ({
 			query: String((r.payload as Record<string, unknown>)?.query ?? ''),
 			eventType: String((r.payload as Record<string, unknown>)?.eventType ?? ''),
 			score: r.score,

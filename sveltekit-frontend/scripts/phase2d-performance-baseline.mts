@@ -127,8 +127,8 @@ async function benchmarkRawSearch(
   // Warmup
   for (let i = 0; i < warmupRuns; i++) {
     try {
-      await client.search(collection, {
-        vector: Array(768).fill(0.5),
+      await client.query(collection, {
+        query: Array(768).fill(0.5),
         limit: 10,
         with_payload: true
       } as any);
@@ -144,8 +144,8 @@ async function benchmarkRawSearch(
   for (let i = 0; i < iterations; i++) {
     const opStart = performance.now();
     try {
-      await client.search(collection, {
-        vector: Array(768).fill(0.5 + Math.random() * 0.1),
+      await client.query(collection, {
+        query: Array(768).fill(0.5 + Math.random() * 0.1),
         limit: 10,
         with_payload: true
       } as any);

@@ -14,8 +14,8 @@ const qdrantClient = {
     filter?: Record<string, unknown>;
   }): Promise<unknown[]> {
     try {
-      const results = await getQdrantClient().search(params.collectionName, {
-        vector: params.vector,
+      const { points: results } = await getQdrantClient().query(params.collectionName, {
+        query: params.vector,
         limit: params.limit ?? 10,
         filter: params.filter as any,
         with_payload: true,

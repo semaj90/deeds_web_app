@@ -97,12 +97,12 @@ async function classifyRow(row) {
   // 2. Postgres embedding present, finite, 768-dim?
   // pgvector columns come back from node-postgres as a "[0.1,0.2,...]" string,
   // not a parsed array — must parse before use.
-  if (!row.content_embedding) {
+  if (!row.content_embedding_768) {
     return { ...row, classification: 'MISSING_POSTGRES_EMBEDDING', recomputedHash };
   }
   let pgVec;
   try {
-    pgVec = JSON.parse(row.content_embedding);
+    pgVec = JSON.parse(row.content_embedding_768);
   } catch {
     return { ...row, classification: 'INVALID_POSTGRES_EMBEDDING', recomputedHash };
   }
@@ -155,9 +155,9 @@ async function classifyRow(row) {
 
 async function main() {
   const { rows } = await pool.query(
-    `SELECT id, source_ref, content, content_embedding
+    `SELECT id, source_ref, content, content_embedding_768
      FROM codebase_chunk_index
-     WHERE chunk_id IS NULL AND content_hash IS NULL AND content_embedding IS NOT NULL
+     WHERE chunk_id IS NULL AND content_hash IS NULL AND content_embedding_768 IS NOT NULL
      ORDER BY random()
      LIMIT $1`,
     [SAMPLE],

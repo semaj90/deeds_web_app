@@ -80,8 +80,8 @@ export async function findPacketsForOpenCode(
           const qdrant = getQdrantClient();
           const embedding = new Array(768).fill(0.1); // Placeholder embedding — should be real on integration
 
-          const searchResult = await qdrant.search('codebase_chunks_768', {
-            vector: embedding,
+          const { points: searchResult } = await qdrant.query('codebase_chunks_768', {
+            query: embedding,
             limit: 10,
             score_threshold: 0.7,
             with_payload: true

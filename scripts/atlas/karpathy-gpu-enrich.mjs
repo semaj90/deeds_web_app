@@ -143,6 +143,8 @@ function getPayloadPath(payload = {}) {
     payload.filepath ??
     payload.stable_key ??
     payload.stableKey ??
+    payload.source_ref ??
+    payload.sourceRef ??
     null
   );
 }
@@ -164,9 +166,19 @@ function getNeo4jPath(record = {}) {
 function qdrantPathVariants(path) {
   const normalized = normalizeRepoPath(path);
   if (!normalized) return [];
-  // Use canonical helper variants + legacy repo-prefixed forms for completeness.
+  // _canonVariants (canonical-source-ref.mjs's sourceRefVariants) defines
+  // "canonical" as the sveltekit-frontend/-PREFIXED form for src/... paths --
+  // the opposite convention from this file's own normalizeRepoPath(), which
+  // strips that prefix. Confirmed live 2026-08-26: real Qdrant points (e.g.
+  // src/hooks.server.ts) store source_ref/file_path/etc. as the BARE form
+  // exclusively, but _canonVariants() never emits the bare form for these
+  // paths -- only prefixed and double-prefixed variants -- so such files
+  // were permanently unmatchable regardless of the pagination fix above.
+  // Always include the bare normalized form explicitly rather than trusting
+  // the shared helper to produce it.
   const canonicalVariants = _canonVariants(normalized);
   return [...new Set([
+    normalized,
     ...canonicalVariants,
     `deeds-web-app/${normalized}`,
     `deeds-web-app/sveltekit-frontend/${normalized}`,
@@ -257,6 +269,17 @@ const NOISE_PATH_PREFIXES = [
   'scratch/',
   'logs/',
   'reports/backup',
+  // Generated build/type-check artifacts -- these can carry Neo4j PageRank
+  // (cross-referenced heavily) but are never indexed as real source in
+  // Qdrant, so they were showing up as permanent, unfixable "misses" in the
+  // funnel. Aligned with canonical-source-ref.mjs's GENERATED_ROOTS list
+  // (2026-08-26 finding: .svelte-kit/types/... generated proxy files were
+  // ~half of a 200-candidate top-PageRank batch's misses).
+  '.svelte-kit/',
+  'build/',
+  '.opencode/',
+  'dist/',
+  'coverage/',
 ];
 
 function isNoisePath(filePath) {
@@ -275,13 +298,18 @@ async function fetchTopByPageRank(limit) {
        AND NOT n.filePath CONTAINS 'deeds_labs'
        AND NOT n.filePath CONTAINS '/backup'
        AND NOT n.filePath CONTAINS 'scratch/'
+       AND NOT n.filePath CONTAINS '.svelte-kit/'
+       AND NOT n.filePath CONTAINS '/build/'
+       AND NOT n.filePath CONTAINS '.opencode/'
+       AND NOT n.filePath CONTAINS '/dist/'
+       AND NOT n.filePath CONTAINS '/coverage/'
      RETURN coalesce(n.stableKey, n.filePath, n.relativePath) AS stableKey,
             n.graphPageRank AS pr,
             coalesce(n.graphAuthorityScore, 0) AS authority,
             coalesce(n.communityId, -1) AS community,
             n.filePath AS filePath,
             n.id AS neo4jId
-     ORDER BY pr DESC LIMIT $limit`,
+     ORDER BY pr DESC, stableKey ASC LIMIT $limit`,
     { limit: limit * 2 }, // Fetch more for dedupe
   );
   
@@ -335,46 +363,60 @@ async function fetchEmbeddingsBatch(filePaths) {
 
   for (let i = 0; i < filePaths.length; i += QDRANT_BATCH_SIZE) {
     const chunk = filePaths.slice(i, i + QDRANT_BATCH_SIZE);
+    const chunkNormalized = new Set(chunk.map(fp => normalizeRepoPath(fp)).filter(Boolean));
     try {
       const allVariants = chunk.flatMap(fp => qdrantPathVariants(fp));
-      const filterKeys = ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey', 'sourceRef'];
+      const filterKeys = ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey', 'sourceRef', 'source_ref'];
       const should = filterKeys.map(k => ({
         key: k,
         match: { any: allVariants }
       }));
 
-      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filter: { should },
-          limit: chunk.length * 10,
-          with_vector: true,
-          with_payload: true,
-        }),
-        signal: AbortSignal.timeout(45_000),
-      });
-      if (!res.ok) continue;
-      const raw = await res.text();
-      const data = (gpu && typeof gpu.simdJsonParse === 'function')
-        ? JSON.parse(gpu.simdJsonParse(raw))
-        : JSON.parse(raw);
-      for (const pt of (data.result?.points ?? [])) {
-        const rawFp = getPayloadPath(pt.payload);
-        const fp = normalizeRepoPath(rawFp);
-        if (!fp) continue;
-        const vec = pt.vector?.content ?? pt.vector;
-        if (Array.isArray(vec) && vec.length === 768) {
-          if (!result.has(fp)) {
-            result.set(fp, new Float32Array(vec));
-            // Record which payload field was the match source
-            const matchedField = filterKeys.find(k => pt.payload?.[k] != null) ?? 'unknown';
-            _matchedByField.set(fp, matchedField);
+      // A `should` filter this broad (9 keys x ~6 variants/file) can match far
+      // more points than a single un-paginated scroll call returns -- confirmed
+      // live 2026-08-26: a 10-file batch hit its `limit` cap exactly (100/100)
+      // and silently dropped one real match past the cutoff. Paginate via
+      // next_page_offset until either every file in this chunk is resolved or
+      // a bounded number of pages is exhausted (safety cap, not expected to
+      // hit in practice for QDRANT_BATCH_SIZE=25).
+      const PAGE_LIMIT = chunk.length * 10;
+      const MAX_PAGES = 20;
+      let offset = undefined;
+      for (let page = 0; page < MAX_PAGES; page++) {
+        const body = { filter: { should }, limit: PAGE_LIMIT, with_vector: true, with_payload: true };
+        if (offset !== undefined) body.offset = offset;
+        const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(45_000),
+        });
+        if (!res.ok) break;
+        const raw = await res.text();
+        const data = (gpu && typeof gpu.simdJsonParse === 'function')
+          ? JSON.parse(gpu.simdJsonParse(raw))
+          : JSON.parse(raw);
+        const points = data.result?.points ?? [];
+        for (const pt of points) {
+          const rawFp = getPayloadPath(pt.payload);
+          const fp = normalizeRepoPath(rawFp);
+          if (!fp) continue;
+          const vec = pt.vector?.content ?? pt.vector;
+          if (Array.isArray(vec) && vec.length === 768) {
+            if (!result.has(fp)) {
+              result.set(fp, new Float32Array(vec));
+              // Record which payload field was the match source
+              const matchedField = filterKeys.find(k => pt.payload?.[k] != null) ?? 'unknown';
+              _matchedByField.set(fp, matchedField);
+            }
           }
+          // Phase B: capture cluster_key from payload for reverse index
+          const ck = pt.payload?.cluster_key ?? pt.payload?.clusterId ?? pt.payload?.cluster_id;
+          if (ck && !_pathToCluster.has(fp)) _pathToCluster.set(fp, String(ck));
         }
-        // Phase B: capture cluster_key from payload for reverse index
-        const ck = pt.payload?.cluster_key ?? pt.payload?.clusterId ?? pt.payload?.cluster_id;
-        if (ck && !_pathToCluster.has(fp)) _pathToCluster.set(fp, String(ck));
+        const allResolved = [...chunkNormalized].every(fp => result.has(fp));
+        offset = data.result?.next_page_offset ?? null;
+        if (allResolved || offset === null || offset === undefined || points.length === 0) break;
       }
     } catch (err) {
       console.warn(`[karpathy] Qdrant batch error: ${err.message}`);

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-25T18:34:50.304Z",
+  "generatedAt": "2026-08-25T23:20:52.156Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -30,11 +30,12 @@
     "reachable": true,
     "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
     "extensions": {
+      "pg_search": "0.25.1",
       "pg_trgm": "1.6",
       "vector": "0.8.3"
     },
     "vectorExtension": "0.8.3",
-    "lexicalOwner": "POSTGRES_FTS_TSVECTOR_GIN_TS_RANK_CD",
+    "lexicalOwner": "UNVERIFIED_PG_SEARCH_AVAILABLE",
     "denseOwner": "POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE",
     "canonicalDenseRepresentation": "semantic_768",
     "canonicalDenseColumn": "codebase_chunk_index.content_embedding_768",
@@ -1579,7 +1580,7 @@
           }
         },
         "points": 106338,
-        "indexedVectors": 115914,
+        "indexedVectors": 116376,
         "status": "green"
       },
       {

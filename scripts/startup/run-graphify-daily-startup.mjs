@@ -37,9 +37,13 @@ const neuralPrefillShortlist = process.env.GRAPHIFY_NEURAL_PREFILL_SHORTLIST ===
 const neuralPrefillBaselines = process.env.GRAPHIFY_NEURAL_PREFILL_BASELINES === '1';
 const neuralPrefillOnly = process.env.GRAPHIFY_NEURAL_PREFILL_ONLY === '1';
 const derivedContext = process.env.GRAPHIFY_DERIVED_CONTEXT === '1';
+const dailyEmbeddingOptIn = process.env.GRAPHIFY_DAILY_EMBEDDING === '1';
+const dailyEmbeddingBackend = String(process.env.GRAPHIFY_DAILY_EMBEDDING_BACKEND ?? 'ollama').trim().toLowerCase();
+const dailyEmbeddingLimit = Math.max(1, Number.parseInt(process.env.GRAPHIFY_DAILY_EMBEDDING_LIMIT ?? '10', 10) || 10);
 let neuralPrefillStatus = 'NOT_RUN';
 let neuralBaselineStatus = 'NOT_RUN';
 let derivedContextStatus = 'NOT_RUN';
+let dailyEmbeddingStatus = 'NOT_REQUESTED';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 function stable(value) {
@@ -109,6 +113,26 @@ function writeNeuralPrefillDailyReceipt(state) {
     children,
   };
   const outputPath = path.resolve(ROOT, 'docs/reports/atlas-graphify-neural-prefill-daily-v1.json');
+  mkdirSync(path.dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify({ ...payload, outputChecksum: sha256(payload) }, null, 2)}\n`, 'utf8');
+}
+
+function writeDailyEmbeddingReceipt(state) {
+  const payload = {
+    schema: 'atlas.graphify-daily-embedding-backend.v1',
+    generatedAt: new Date().toISOString(),
+    wrapper: 'scripts/startup/run-graphify-daily-startup.mjs',
+    optIn: dailyEmbeddingOptIn,
+    backend: dailyEmbeddingBackend,
+    endpoint: process.env.EMBED_SERVER_URL ?? process.env.OLLAMA_EMBED_BASE_URL ?? null,
+    limit: dailyEmbeddingLimit,
+    readOnly: true,
+    canonicalWrites: false,
+    qdrantWrites: false,
+    postgresWrites: false,
+    ...state,
+  };
+  const outputPath = path.resolve(ROOT, 'docs/reports/graphify-daily-embedding-backend-v1.json');
   mkdirSync(path.dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, `${JSON.stringify({ ...payload, outputChecksum: sha256(payload) }, null, 2)}\n`, 'utf8');
 }
@@ -239,6 +263,52 @@ try {
       neuralPrefillShortlist,
       fallbackPolicy: 'CONTINUE_WITH_EXISTING_GRAPHIFY_RECEIPT',
     });
+  }
+
+  // Optional embedding backend validation and bounded index dry-run. This is
+  // separate from the mutating daily chain so a faster server cannot bypass
+  // the current source-lineage halt.
+  if (dailyEmbeddingOptIn) {
+    const allowedBackends = new Set(['ollama', 'llama_cpp_gguf']);
+    if (!allowedBackends.has(dailyEmbeddingBackend)) {
+      dailyEmbeddingStatus = 'INVALID_BACKEND';
+      writeDailyEmbeddingReceipt({ status: dailyEmbeddingStatus, error: `Unsupported backend: ${dailyEmbeddingBackend}` });
+      throw new Error(`GRAPHIFY_DAILY_EMBEDDING_BACKEND_UNSUPPORTED:${dailyEmbeddingBackend}`);
+    }
+
+    try {
+      if (dailyEmbeddingBackend === 'llama_cpp_gguf') {
+        if (!quiet) console.log('[graphify:daily] Validating CUDA/GGUF embedding backend...');
+        execSync('node scripts/atlas/audit-onnx-embedding-server.mjs', {
+          cwd: ROOT,
+          stdio: quiet ? 'ignore' : 'inherit',
+          timeout: 60 * 1000,
+        });
+      }
+
+      const dryRunCommand = [
+        'node scripts/atlas/index-full-repo-for-search.mjs',
+        '--dry-run',
+        `--limit=${dailyEmbeddingLimit}`,
+      ].join(' ');
+      if (!quiet) console.log(`[graphify:daily] Running bounded embedding index dry-run (${dailyEmbeddingBackend}, ${dailyEmbeddingLimit} files)...`);
+      execSync(dryRunCommand, {
+        cwd: ROOT,
+        env: { ...process.env, EMBEDDING_BACKEND: dailyEmbeddingBackend },
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 10 * 60 * 1000,
+      });
+      dailyEmbeddingStatus = 'DRY_RUN_PASS';
+      writeDailyEmbeddingReceipt({ status: dailyEmbeddingStatus, dryRun: true });
+    } catch (embeddingError) {
+      dailyEmbeddingStatus = 'DEGRADED';
+      writeDailyEmbeddingReceipt({
+        status: dailyEmbeddingStatus,
+        dryRun: true,
+        error: embeddingError instanceof Error ? embeddingError.message : String(embeddingError),
+      });
+      console.warn(`[graphify:daily] Embedding backend validation degraded; continuing existing Graphify chain: ${embeddingError.message}`);
+    }
   }
 
   if (neuralPrefillOnly) {

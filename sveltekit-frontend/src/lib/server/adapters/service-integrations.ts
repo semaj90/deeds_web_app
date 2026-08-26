@@ -363,8 +363,8 @@ export class QdrantAdapter implements QdrantClient {
     vector: number[],
     limit?: number
   ): Promise<QdrantSearchResult<any>[]> {
-    const results = await this.client.search(collection, {
-      vector: vector,
+    const { points: results } = await this.client.query(collection, {
+      query: vector,
       limit: limit || 10,
       with_payload: true,
       with_vector: false,

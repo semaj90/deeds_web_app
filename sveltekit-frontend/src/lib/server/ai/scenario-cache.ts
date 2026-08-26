@@ -214,8 +214,8 @@ export async function lookupScenario(query: string): Promise<ScenarioCacheResult
     }
 
     const qdrantClient = qdrant.client;
-    const searchRes = await qdrantClient.search('scenario_cache', {
-      vector: embedding,
+    const { points: searchRes } = await qdrantClient.query('scenario_cache', {
+      query: embedding,
       limit: 1,
       score_threshold: SCENARIO_HIT_THRESHOLD,
       with_payload: true,

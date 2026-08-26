@@ -119,10 +119,19 @@ function mergedEnv(extra = {}) {
     DEV_GPU_LLM_BACKEND: devGpuLlmBackend,
     LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? `http://127.0.0.1:${synthPort}/v1`,
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
-    // Ornith (hforf.gguf) is the current production target for the text-only
+    // Ornith 1.5 (alias "ornith-1.5-9b", launch-turboquant.ps1 profile
+    // "ornith-1.5") is the current production target for the text-only
     // TurboQuant lane; EXPECTED_LLAMA_MODEL/TURBO_MODEL/LOCAL_GEMMA_MODEL let an
     // operator repoint this without editing code. See "verifyLlamaServerModelLoaded"
     // below for the fail-closed identity check this default feeds.
+    //
+    // NOTE (2026-08-26): the legacy Ornith 1.0 candidate and the current Ornith
+    // 1.5 candidate both ship a GGUF file literally named hforf.gguf (in
+    // different directories) — comparing against that bare filename can no
+    // longer distinguish them. launch-turboquant.ps1 now passes --alias so
+    // /props.model_alias reports a unique string per profile ("ornith-9b" vs
+    // "ornith-1.5-9b"); this default must track whichever profile is actually
+    // launched below (see the -StartupProfile arg passed to launch-turboquant.ps1).
     //
     // LOCAL_GEMMA_MODEL is a legacy env var name kept for backward
     // compatibility with launch-turboquant.ps1 and existing .env files - it
@@ -130,7 +139,7 @@ function mergedEnv(extra = {}) {
     // Gemma). Treat it as "the resolved expected/target model", not literally
     // "the Gemma model". Prefer EXPECTED_LLAMA_MODEL or TURBO_MODEL in new
     // config; LOCAL_GEMMA_MODEL remains the lowest-priority explicit override.
-    LOCAL_GEMMA_MODEL: envFromFiles.EXPECTED_LLAMA_MODEL ?? envFromFiles.TURBO_MODEL ?? envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'hforf.gguf'),
+    LOCAL_GEMMA_MODEL: envFromFiles.EXPECTED_LLAMA_MODEL ?? envFromFiles.TURBO_MODEL ?? envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'ornith-1.5-9b'),
     TURBO_PORT: isLiteRT ? synthPort : (envFromFiles.TURBO_PORT ?? '8090'),
     TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
     LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
@@ -490,12 +499,24 @@ async function main() {
 
       await checkForDuplicateLlamaServerProcesses();
       await checkVramHeadroom();
+      // -StartupProfile pins model resolution to the "ornith-1.5" profile
+      // explicitly (Model + Alias + TemplateFile bundled in launch-turboquant.ps1),
+      // rather than relying on env vars or the legacy on-disk fallback chain.
+      // That legacy chain checks models/hfor/hforf.gguf first — a path that no
+      // longer exists after the Ornith 1.0 -> Desktop / Ornith 1.5 -> :8090 swap
+      // — so leaving this unset would silently fall through to a stale or null
+      // model resolution. Override via TURBO_STARTUP_PROFILE env var if a
+      // different profile (e.g. "ornith" for the legacy model, once restored)
+      // is intentionally wanted for a dev:gpu run.
+      const startupProfile = process.env.TURBO_STARTUP_PROFILE || 'ornith-1.5';
       await runChecked('pwsh', [
         '-NoProfile',
         '-ExecutionPolicy',
         'Bypass',
         '-File',
         launcherScript,
+        '-StartupProfile',
+        startupProfile,
         '-Detached',
         '-TextOnly',
       ], { cwd: REPO_ROOT, env: launcherEnv });
@@ -506,7 +527,8 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? 'hforf.gguf';
+      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'gemma4-legal', 'gemma4-thinking': 'gemma4-legal-thinking' };
+      const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? profileAliasMap[startupProfile] ?? 'ornith-1.5-9b';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
 

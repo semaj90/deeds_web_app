@@ -163,13 +163,14 @@ async function searchCollection(
 ): Promise<Array<{ id: string | number; score: number; payload?: Record<string, unknown>; _collection: string }>> {
 	try {
 		const vectorPayload = buildVectorPayload(collection, vector);
-		const body: Record<string, unknown> = {
-			vector: vectorPayload,
+      const body: Record<string, unknown> = {
+        query: Array.isArray(vectorPayload) ? vectorPayload : vectorPayload.vector,
+        ...(Array.isArray(vectorPayload) ? {} : { using: vectorPayload.name }),
 			limit,
 			with_payload: true,
 		};
 		if (filter) body.filter = filter;
-		const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/search`, {
+    const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
@@ -177,8 +178,8 @@ async function searchCollection(
 		});
 		if (!res.ok) return [];
 		const raw = await res.text();
-		const data = fastJsonParse<{ result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }>(raw);
-		return (data.result ?? []).map((r) => ({ ...r, _collection: collection }));
+        const data = fastJsonParse<{ result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>; points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }>(raw);
+        return (data.points ?? data.result ?? []).map((r) => ({ ...r, _collection: collection }));
 	} catch {
 		return [];
 	}

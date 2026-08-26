@@ -48,8 +48,8 @@ interface QdrantCollection {
 
 const POSTGRES_VECTOR_COLUMNS: VectorUsage[] = [
   // CANONICAL_NATIVE — primary embedding columns for active retrieval
-  { column: 'content_embedding', table: 'codebase_chunk_index',     dim: 768, tag: 'CANONICAL_NATIVE',            note: 'Primary code chunk embeddings, mirrors to codebase_chunks_768' },
-  { column: 'embedding',         table: 'atlas_packets',             dim: 768, tag: 'LEGACY',                      note: 'Populated but NOT used for ANN — use codebase_chunk_index.content_embedding' },
+  { column: 'content_embedding_768', table: 'codebase_chunk_index', dim: 768, tag: 'CANONICAL_NATIVE',            note: 'Primary semantic_768 code chunk embeddings, mirrors to codebase_chunks_768' },
+  { column: 'embedding',         table: 'atlas_packets',             dim: 768, tag: 'LEGACY',                      note: 'Populated but NOT used for ANN — use codebase_chunk_index.content_embedding_768' },
   { column: 'embedding',         table: 'codebase_topology',         dim: 768, tag: 'CANONICAL_NATIVE',            note: 'Topology node embeddings' },
   { column: 'embedding',         table: 'legal_documents',           dim: 768, tag: 'CANONICAL_NATIVE',            note: 'Legal document embeddings' },
   { column: 'embedding',         table: 'document_chunks',           dim: 768, tag: 'CANONICAL_NATIVE',            note: 'Document chunk embeddings' },
@@ -155,13 +155,13 @@ async function auditPopulation(client: pg.PoolClient) {
     FROM atlas_packets
   `);
 
-  // Check codebase_chunk_index.content_embedding — should be populated
+  // Check codebase_chunk_index.content_embedding_768 — should be populated
   const chunkCheck = await client.query(`
     SELECT
       COUNT(*) AS total,
-      COUNT(content_embedding) AS embedded
+      COUNT(content_embedding_768) AS embedded
     FROM codebase_chunk_index
-    WHERE content_embedding IS NOT NULL
+    WHERE content_embedding_768 IS NOT NULL
   `);
 
   return {
@@ -214,7 +214,7 @@ async function main() {
       console.log(`    authority_score (Gate 1):  ${ap.authority_score_populated} populated`);
       console.log();
       console.log(`  codebase_chunk_index (${ci.total} rows):`);
-      console.log(`    content_embedding (768):   ${ci.embedded} populated (CANONICAL_NATIVE)`);
+      console.log(`    content_embedding_768 (768): ${ci.embedded} populated (CANONICAL_NATIVE)`);
       console.log();
     }
 
@@ -280,7 +280,7 @@ async function main() {
       } else {
         console.log(`  ✅ atlas_packets.embedding is all NULL (correctly deprecated)`);
       }
-      console.log(`  ${chunksEmbedded ? '✅' : '❌'} codebase_chunk_index.content_embedding populated (${population.codebase_chunk_index.embedded}/${population.codebase_chunk_index.total})`);
+      console.log(`  ${chunksEmbedded ? '✅' : '❌'} codebase_chunk_index.content_embedding_768 populated (${population.codebase_chunk_index.embedded}/${population.codebase_chunk_index.total})`);
       console.log(`  ${gate1Done      ? '✅' : '⚠️ '} pagerank_raw + authority_score populated (Gate 1)`);
       console.log(`  ✅ ${liveCount768} live 768-dim vector columns confirmed in Postgres`);
       console.log();

@@ -331,8 +331,8 @@ class DatabaseManager {
                 try {
                     const qFilter = Object.keys(filter).length ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) } : undefined;
 
-                    const qRes = await qdrantClient.search(collection, {
-                        vector: queryEmbedding,
+                    const qRes = await qdrantClient.query(collection, {
+                        query: queryEmbedding,
                         limit,
                         score_threshold: threshold,
                         with_payload: true,
@@ -342,7 +342,7 @@ class DatabaseManager {
                     qdrantTime = Date.now() - qStart;
 
                     // Hydrate from Postgres
-                    const ids = qRes.map(r => String(r.id));
+                    const ids = qRes.points.map(r => String(r.id));
                     if (ids.length > 0) {
                         try {
                             const runtimeDb = this.getRuntimeDb();
@@ -350,7 +350,7 @@ class DatabaseManager {
                             // Drizzle query commented out as type-safe selection requires proper schema setup which might be in flux
                             // Fallback to simpler logic or direct use of payload from Qdrant if available
                             */
-                            for (const r of qRes) {
+                            for (const r of qRes.points) {
                                 results.push({
                                   id: String(r.id),
                                   score: r.score,

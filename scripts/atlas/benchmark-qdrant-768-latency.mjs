@@ -58,13 +58,13 @@ async function benchmark() {
     // Step 2: Fetch sample embeddings from Postgres to use as queries
     console.log('\n[2/4] Fetching sample embeddings...');
     const sampleRes = await pool.query(`
-      SELECT content_embedding FROM codebase_chunk_index
-      WHERE content_embedding IS NOT NULL
+      SELECT content_embedding_768 FROM codebase_chunk_index
+      WHERE content_embedding_768 IS NOT NULL
       ORDER BY RANDOM()
       LIMIT $1;
     `, [QUERY_COUNT]);
 
-    const samples = sampleRes.rows.map(r => r.content_embedding);
+    const samples = sampleRes.rows.map(r => r.content_embedding_768);
     console.log(`  ✅ Fetched ${samples.length} sample embeddings`);
 
     if (samples.length === 0) {

@@ -5487,16 +5487,17 @@ async function fetchCaseChunks(
           .then((r) => r.results)
           .catch(() => [])
       : await qdrantMgr.client
-          .search('evidence_items', {
-            vector: { name: 'content', vector: embedding },
+          .query('evidence_items', {
+            query: embedding,
+            using: 'content',
             limit: 10,
             score_threshold: 0.45,
             with_payload: true,
             ...(graphFilter ? { filter: graphFilter } : {}),
           })
-          .catch(() => []);
+          .catch(() => ({ points: [] } as any));
 
-    const chunks: RAGChunk[] = results
+    const chunks: RAGChunk[] = (Array.isArray(results) ? results : results.points)
       .map((r: any) => ({
         content: String(r.payload?.content ?? r.payload?.content_preview ?? ''),
         score: r.score,
@@ -5627,16 +5628,17 @@ async function fetchRAGChunks(
   try {
     const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
     const probe = await qdrantMgr.client
-      .search('research_summaries', {
-        vector: embedding,
+      .query('research_summaries', {
+        query: embedding,
         limit: 5,
         with_payload: true,
         score_threshold: 0.3,
       })
-      .catch(() => [] as any[]);
-    if (probe.length >= 2) {
+      .catch(() => ({ points: [] } as any));
+    const probePoints = Array.isArray(probe) ? probe : probe.points;
+    if (probePoints.length >= 2) {
       const counts = new Map<number, number>();
-      for (const pt of probe) {
+      for (const pt of probePoints) {
         const c = pt.payload?.som_cluster;
         if (c != null && typeof c === 'number') counts.set(c, (counts.get(c) ?? 0) + 1);
       }

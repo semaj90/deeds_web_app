@@ -72,7 +72,7 @@ async function loadPostgresIdentities() {
 
   const res = await pool.query(`
     SELECT id FROM codebase_chunk_index
-    WHERE content_embedding IS NOT NULL
+    WHERE content_embedding_768 IS NOT NULL
     ORDER BY id
   `);
 

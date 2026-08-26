@@ -167,12 +167,13 @@ export class SoftRoutingOrchestrator {
     const startTime = Date.now();
 
     try {
-      const results = await this.qdrant.search('codebase_chunks_768', {
-        vector: request.query_embedding,
+      const results = await this.qdrant.query('codebase_chunks_768', {
+        query: request.query_embedding,
+        using: 'content',
         limit: request.top_k * 2, // Over-fetch for deduplication
       });
 
-      const rawResults = Array.isArray(results) ? results : ((results as { result?: any[] }).result ?? []);
+      const rawResults = results.points ?? [];
       const candidates: RetrievalCandidate[] = rawResults.map((hit, rank) => ({
         packet_key: hit.payload?.packet_key as string,
         source_ref: hit.payload?.source_ref as string,

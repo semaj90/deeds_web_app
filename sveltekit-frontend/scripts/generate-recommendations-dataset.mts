@@ -125,8 +125,8 @@ async function searchSimilarPatches(embedding: number[], limit = 10): Promise<Ar
   rank: number;
 }>> {
   try {
-    const results = await qdrant.search('phase79_knowledge_base', {
-      vector: embedding,
+    const { points: results } = await qdrant.query('phase79_knowledge_base', {
+      query: embedding,
       limit,
       with_payload: true
     });

@@ -3,7 +3,7 @@
  * Lane B Recovery: Qdrant 768 v2 Clean Collection Backfill
  *
  * Rebuilds from Postgres using UUID-based Qdrant IDs (avoids integer allocation).
- * Uses keyset pagination, halfvec parsing, validates all 52,380 vectors.
+ * Uses keyset pagination, 768-vector parsing, and canonical packet/hash admission.
  * No checkpointing (single-run, non-resumable for safety—if interrupted, restart from zero).
  *
  * Usage:
@@ -101,10 +101,10 @@ try {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - scannedRows);
     const query = `
       SELECT id, relative_path, chunk_id, content_hash,
-             content_embedding::text AS embedding_text,
-             embedding_model, updated_at
+             content_embedding_768::text AS embedding_text,
+             updated_at
       FROM codebase_chunk_index
-      WHERE content_embedding IS NOT NULL
+      WHERE content_embedding_768 IS NOT NULL
         AND id > $1
       ORDER BY id
       LIMIT $2
@@ -160,9 +160,11 @@ try {
           content_hash: row.content_hash,
           representation_name: 'semantic_768',
           representation_id: 'semantic_768',
-          embedding_model: row.embedding_model,
-          model_revision: null,
-          model_revision_state: 'NOT_PROVEN',
+          embedding_model: 'embeddinggemma:latest',
+          embedding_dimension: CANONICAL_DIMENSION,
+          representation_revision: 'semantic_768@v1',
+          model_revision: 'embeddinggemma:latest',
+          model_revision_state: 'DECLARED_NOT_VERIFIED',
           qdrant_point_id: qdrantPointId,
           projection_revision: 'v2_uuid_clean',
           indexed_at: new Date().toISOString()

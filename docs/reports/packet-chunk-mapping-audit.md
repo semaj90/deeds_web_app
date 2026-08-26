@@ -1,6 +1,6 @@
 # Packet/Chunk Mapping Audit
 
-Generated: 2026-08-25T16:59:53.429Z
+Generated: 2026-08-26T00:27:58.373Z
 Status: WARN
 
 ## Summary
@@ -25,42 +25,6 @@ Status: WARN
 ```json
 [
   {
-    "id": "7cc9ccf5-284f-4850-97f1-b507a59c819e",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "2de82a06-4b76-39f1-2ea5-93751c8622a3"
-  },
-  {
-    "id": "c9276dae-0d44-4610-bb3a-1b0761573025",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "3f18cd44-c6df-7d3d-e51a-0c110f3cc224"
-  },
-  {
-    "id": "7e772e02-5660-49a5-806d-1c4ff0129f54",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "3368aa7b-aef7-2fb8-2d51-d0a46c9c5527"
-  },
-  {
-    "id": "a84c11d3-f66a-4b4f-9663-d8201145f056",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "116f0db7-dba3-5f21-dcbd-7bceaee6c048"
-  },
-  {
-    "id": "89533630-dfb6-49b1-833b-17732bcd0784",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "37a44ba8-fdc5-a8fe-0856-13dbf68c2f5d"
-  },
-  {
-    "id": "226a0905-8bc8-4035-b3c0-6e150224d825",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "3cb3e712-bf79-6b00-10af-292143c8629a"
-  },
-  {
     "id": "0e807030-12f0-4473-a5fc-40cfaacab380",
     "source_ref": "",
     "relative_path": "",
@@ -83,6 +47,42 @@ Status: WARN
     "source_ref": "",
     "relative_path": "",
     "qdrant_id": "0ca1bc2e-b6f5-cb0e-987b-d345a21eeca2"
+  },
+  {
+    "id": "979b1a34-b719-4dd2-85b0-1f794a62740d",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "3153980c-d6ba-1072-8ffe-969d90c3758f"
+  },
+  {
+    "id": "e1971097-bb04-4146-a1d2-e89bfe4a2dc7",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "1d606307-3811-acda-1616-93b980975a8e"
+  },
+  {
+    "id": "93429a7d-dd18-4432-8db0-0728b185a407",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "40d1e02f-6715-7dcc-9a00-11cd432aeeff"
+  },
+  {
+    "id": "ee336e6f-be09-43d6-9f67-8c6fceda4bc6",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "103d360e-4e47-afd1-e2c8-6d7acca8e861"
+  },
+  {
+    "id": "eaa356d5-c148-4ee6-9581-1040ff5a1ba1",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "1c62d382-8c52-3d57-ca17-41c1bd9454e0"
+  },
+  {
+    "id": "4ad3ee46-6919-4869-a8b3-9724ecaf8983",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "27225610-6982-106e-37a5-101311179841"
   }
 ]
 ```
@@ -91,93 +91,93 @@ Status: WARN
 ```json
 [
   {
-    "chunk_id": "fff9c969-67ff-4035-9b3e-2ab53ce1dc02",
-    "source_ref": "src/lib/components/ai/AskAI.svelte",
-    "relative_path": "src/lib/components/ai/AskAI.svelte",
+    "chunk_id": "3e177985-ec95-461f-a2b9-1dfe262d4fc9",
+    "source_ref": "src/routes/(app)/evidence/upload/+page.svelte",
+    "relative_path": "src/routes/(app)/evidence/upload/+page.svelte",
     "packet_keys": [
-      "ace:packet:bf1ba0960873",
-      "packet:fd332143ebba"
+      "ace:packet:12dd351825f2",
+      "packet:255a5c0cd907"
     ]
   },
   {
-    "chunk_id": "48b5ea69-df09-4afc-9a37-00522ee7c5bf",
-    "source_ref": "src/routes/api/library/documents/[documentId]/+server.ts",
-    "relative_path": "src/routes/api/library/documents/[documentId]/+server.ts",
+    "chunk_id": "40d9083c-c8eb-4778-95f1-d1abe035425b",
+    "source_ref": "src/routes/(app)/admin/codebase-index/+page.svelte",
+    "relative_path": "src/routes/(app)/admin/codebase-index/+page.svelte",
     "packet_keys": [
-      "ace:packet:d9d032471c1a",
-      "packet:ef9304444044"
+      "ace:packet:717acaa37a87",
+      "packet:d8628b36a885"
     ]
   },
   {
-    "chunk_id": "144ab32c-f194-4a46-a5b1-c1bd8bd162d4",
-    "source_ref": "src/lib/server/unified/legal-ai-service.ts",
-    "relative_path": "src/lib/server/unified/legal-ai-service.ts",
+    "chunk_id": "5dfc2dfb-12f1-43bf-8024-c55c91a13ace",
+    "source_ref": "src/lib/components/dashboard/gamification-types.ts",
+    "relative_path": "src/lib/components/dashboard/gamification-types.ts",
     "packet_keys": [
-      "ace:packet:89fae5beb02d",
-      "packet:a603f38b3028"
+      "ace:packet:1b512a2b7cae",
+      "packet:66de67b1f8b3"
     ]
   },
   {
-    "chunk_id": "bf643b39-7d60-4d5a-9fdd-ca8a47b01d5c",
-    "source_ref": "src/lib/server/reconstruction/scene-compiler.ts",
-    "relative_path": "src/lib/server/reconstruction/scene-compiler.ts",
+    "chunk_id": "3e23656a-bf5a-4c98-910c-277ffa053886",
+    "source_ref": "src/routes/(app)/cases/[id]/board/+page.svelte",
+    "relative_path": "src/routes/(app)/cases/[id]/board/+page.svelte",
     "packet_keys": [
-      "ace:packet:02b21744c68f",
-      "packet:c08285d4a340"
+      "ace:packet:8bc579effe53",
+      "packet:3c275cde759f"
     ]
   },
   {
-    "chunk_id": "48bf981e-b0ae-412b-bf09-bdc1cb711c53",
-    "source_ref": "src/routes/api/codebase/auto-research/+server.ts",
-    "relative_path": "src/routes/api/codebase/auto-research/+server.ts",
+    "chunk_id": "17444229-26c2-4aad-8009-43f3ce5205bd",
+    "source_ref": "src/lib/server/engagement/idle-reengagement.ts",
+    "relative_path": "src/lib/server/engagement/idle-reengagement.ts",
     "packet_keys": [
-      "ace:packet:cf66d7e0d0a9",
-      "packet:7057de19ac80"
+      "ace:packet:df77f988cbb3",
+      "packet:57b8e2db930d"
     ]
   },
   {
-    "chunk_id": "bc875738-a4a4-4a3b-8668-7fcf5e7da53b",
-    "source_ref": "src/lib/components/evidence/DraggableEvidenceNode.svelte",
-    "relative_path": "src/lib/components/evidence/DraggableEvidenceNode.svelte",
+    "chunk_id": "9a004262-02ea-4165-a964-7b367946c4e7",
+    "source_ref": "src/lib/server/ml/recommendation-metrics.ts",
+    "relative_path": "src/lib/server/ml/recommendation-metrics.ts",
     "packet_keys": [
-      "ace:packet:0d952c0c1f45",
-      "packet:0dfe7d28a987"
+      "ace:packet:c51223d5373f",
+      "packet:d801b2ea0052"
     ]
   },
   {
-    "chunk_id": "aac88f4d-df5b-44e7-a403-41a5a6f4f94c",
-    "source_ref": "src/lib/server/reconstruction/aesthetic-presets.ts",
-    "relative_path": "src/lib/server/reconstruction/aesthetic-presets.ts",
+    "chunk_id": "3e39eeae-86d1-488d-a4c6-7aed859f5311",
+    "source_ref": "src/lib/server/gpu/pytorch-graph.ts",
+    "relative_path": "src/lib/server/gpu/pytorch-graph.ts",
     "packet_keys": [
-      "ace:packet:98442a594d30",
-      "packet:d8d110d5ce64"
+      "ace:packet:c53ac78221aa",
+      "packet:fc5108ed4814"
     ]
   },
   {
-    "chunk_id": "4821e199-c90a-46bc-adde-e249e1f7a020",
-    "source_ref": "src/routes/api/statutes/+server.ts",
-    "relative_path": "src/routes/api/statutes/+server.ts",
+    "chunk_id": "1771d290-0427-4a67-9d00-5eb214d8ad45",
+    "source_ref": "src/lib/server/db/schema/error_timeline.ts",
+    "relative_path": "src/lib/server/db/schema/error_timeline.ts",
     "packet_keys": [
-      "ace:packet:c045fd4f0b5d",
-      "packet:ff27d64e625e"
+      "ace:packet:41516a9c7c2a",
+      "packet:762983603633"
     ]
   },
   {
-    "chunk_id": "074e8c2c-c08c-4412-9b9e-8f652d823a6c",
-    "source_ref": "src/routes/(app)/couchdb-analytics/ClusterInspector.svelte",
-    "relative_path": "src/routes/(app)/couchdb-analytics/ClusterInspector.svelte",
+    "chunk_id": "1784c17f-bc94-41a8-9882-97e430190c4d",
+    "source_ref": "src/lib/server/indexer/ast-chunker.ts",
+    "relative_path": "src/lib/server/indexer/ast-chunker.ts",
     "packet_keys": [
-      "ace:packet:93a84b238108",
-      "packet:2e3c4fc6c170"
+      "ace:packet:0bc6e63377c6",
+      "packet:40386029557b"
     ]
   },
   {
-    "chunk_id": "91ee8218-b84b-4071-bc8d-4ec88b9a4aae",
-    "source_ref": "src/routes/api/phase89/graph/top-errors/+server.ts",
-    "relative_path": "src/routes/api/phase89/graph/top-errors/+server.ts",
+    "chunk_id": "7829086c-2496-4fea-9409-be89930db7a7",
+    "source_ref": "src/types/webgpu.d.ts",
+    "relative_path": "src/types/webgpu.d.ts",
     "packet_keys": [
-      "ace:packet:9870feefc4f5",
-      "packet:d5be75d566e7"
+      "ace:packet:78601ae219c9",
+      "packet:17d153e1288d"
     ]
   }
 ]

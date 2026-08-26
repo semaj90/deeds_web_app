@@ -26,15 +26,15 @@ async function embedQuery(text: string): Promise<number[]> {
 
 async function qdrantSearch(vector: number[], collection: string, limit: number): Promise<KAGHit[]> {
   const base = ENV.QDRANT_URL;
-  const res = await fetch(`${base}/collections/${collection}/points/search`, {
+  const res = await fetch(`${base}/collections/${collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vector, limit, with_payload: true }),
+    body: JSON.stringify({ query: vector, limit, with_payload: true }),
     signal: AbortSignal.timeout(8_000),
   });
   if (!res.ok) return [];
-  const { result } = await res.json() as { result: Array<{ id: unknown; score: number; payload: Record<string, unknown> }> };
-  return (result ?? []).map(h => ({
+  const { points } = await res.json() as { points: Array<{ id: unknown; score: number; payload: Record<string, unknown> }> };
+  return (points ?? []).map(h => ({
     path: (h.payload?.path ?? h.payload?.relative_path ?? null) as string | null,
     score: h.score,
     source: 'qdrant' as const,
