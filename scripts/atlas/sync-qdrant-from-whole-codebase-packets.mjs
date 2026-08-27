@@ -25,7 +25,7 @@ async function syncQdrant(pool) {
     let success = 0;
 
     for (const packet of packets.rows) {
-      const searchRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+      const searchRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

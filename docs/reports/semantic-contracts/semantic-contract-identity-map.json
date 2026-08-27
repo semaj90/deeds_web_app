@@ -7,6 +7,54 @@
       "DUPLICATE_CANONICAL_OWNER_CANDIDATE": 2
     }
   },
+  "sveltekit-frontend/src/lib/schemas/packet-canonical.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/ace/cluster-ace-packet.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/ace/cluster-packet-consumer.test.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/agents/agents-card-store.cluster-packet.test.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
   "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -39,6 +87,46 @@
       "INLINE_REPR_LITERAL_DRIFT": 1
     }
   },
+  "sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 9
+    }
+  },
   "sveltekit-frontend/src/lib/server/atlas/board/fabric-gpu-benchmark.spec.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -63,6 +151,22 @@
       "INLINE_REPR_LITERAL_DRIFT": 3
     }
   },
+  "sveltekit-frontend/src/lib/server/atlas/classification/query-router-v2-integration.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 7
+    }
+  },
   "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -81,11 +185,11 @@
     }
   },
   "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.ts": {
-    "role": "PARTIAL_IMPORTER",
-    "importsCanonicalRepresentation": true,
-    "importsCanonicalDimension": true,
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
     "findingCounts": {
-      "DIM_LITERAL_ALONGSIDE_IMPORT": 1
+      "INLINE_REPR_LITERAL_DRIFT": 1
     }
   },
   "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts": {
@@ -97,12 +201,36 @@
       "INLINE_DIM_LITERAL_DRIFT": 3
     }
   },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/cluster-feature-projection-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/cluster-feature-projection-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
   "sveltekit-frontend/src/lib/server/atlas/contracts/dense-lane-policy.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
     "importsCanonicalDimension": false,
     "findingCounts": {
       "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/external-doc-projection-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 1
     }
   },
   "sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.spec.ts": {
@@ -136,6 +264,204 @@
     "importsCanonicalDimension": false,
     "findingCounts": {
       "INLINE_REPR_LITERAL_DRIFT": 4
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/observation-routing-fabric.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 5,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-router-feature-row-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-retrieval-port.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/embedding/document-embedding-executor-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/embedding/document-embedding-executor-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 4,
+      "INLINE_DIM_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-executor-receipt-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-executor-receipt-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-task-representation-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "DUPLICATE_CANONICAL_OWNER_CANDIDATE": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/evidence/pre-fanout-evidence-bundle-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 5
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 5
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 5
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/graph/fanout-admission-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/graph/fanout-admission-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/graph/graph-qdrant-fanout-alignment.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/graph/graph-qdrant-fanout-alignment.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-packet-dry-run.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-packet-dry-run.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/neural/ae-artifact-reconciliation.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/neural/ae-artifact-reconciliation.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2,
+      "INLINE_DIM_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/neural/neural-encoder-manifest-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/neural/neural-execution-policy.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/neural-routing/encoder-manifest.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 1
     }
   },
   "sveltekit-frontend/src/lib/server/atlas/pass-fabric-proof.spec.ts": {
@@ -178,6 +504,14 @@
       "INLINE_REPR_LITERAL_DRIFT": 3
     }
   },
+  "sveltekit-frontend/src/lib/server/atlas/policy/aligned-policy-lanes.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
   "sveltekit-frontend/src/lib/server/atlas/pos-concept-tagging-lane.spec.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -202,6 +536,133 @@
       "INLINE_REPR_LITERAL_DRIFT": 2
     }
   },
+  "sveltekit-frontend/src/lib/server/atlas/recommendations/recommendation-evidence-bundle-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/recommendations/recommendation-evidence-bundle-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-knn-client.spec.ts": {
+    "role": "PARTIAL_IMPORTER",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": true,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2,
+      "DIM_LITERAL_ALONGSIDE_IMPORT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-knn-client.ts": {
+    "role": "PARTIAL_IMPORTER",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": true,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 4
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-semantic768-client.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 13,
+      "INLINE_DIM_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-semantic768-client.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 5,
+      "INLINE_DIM_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/compact-knn-topk.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/knn-context-graph.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/progressive-knn-graph-contracts.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/progressive-knn-rapids-runner.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 4,
+      "INLINE_DIM_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-candidate-ordinal-adapter-v1.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.test.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "DUPLICATE_CANONICAL_OWNER_CANDIDATE": 3,
+      "INLINE_REPR_LITERAL_DRIFT": 1
+    }
+  },
   "sveltekit-frontend/src/lib/server/atlas/retrieval/rapids-sidecar-client.spec.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -209,6 +670,56 @@
     "findingCounts": {
       "INLINE_REPR_LITERAL_DRIFT": 6,
       "INLINE_DIM_LITERAL_DRIFT": 6
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/runtime/algorithm-execution-manifest.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/runtime/io-aware-execution.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/runtime/known-execution-manifests.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 6
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/spectral/spectral-multihop-contracts.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1,
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/spectral/spectral-rtx-alignment-fixture-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_DIM_LITERAL_DRIFT": 1
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 1
     }
   },
   "sveltekit-frontend/src/lib/server/atlas/tensors/latent-lod-contract.spec.ts": {
@@ -227,6 +738,23 @@
       "INLINE_REPR_LITERAL_DRIFT": 1
     }
   },
+  "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2,
+      "INLINE_DIM_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/atlas/vector/ace-packet-vector.test.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
   "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
@@ -242,6 +770,14 @@
     "findingCounts": {}
   },
   "sveltekit-frontend/src/lib/server/embedding/embedding-contract.spec.ts": {
+    "role": "NO_CANONICAL_IMPORT",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": false,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 3
+    }
+  },
+  "sveltekit-frontend/src/lib/server/embedding/embedding-contract.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
     "importsCanonicalDimension": false,
@@ -322,28 +858,28 @@
       "REPR_LITERAL_ALONGSIDE_IMPORT": 3
     }
   },
-  "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/current/+server.test.ts": {
-    "role": "NO_CANONICAL_IMPORT",
+  "sveltekit-frontend/src/lib/server/vector/embeddinggemma-prefix384.ts": {
+    "role": "PARTIAL_IMPORTER",
     "importsCanonicalRepresentation": false,
-    "importsCanonicalDimension": false,
+    "importsCanonicalDimension": true,
+    "findingCounts": {
+      "INLINE_REPR_LITERAL_DRIFT": 2
+    }
+  },
+  "sveltekit-frontend/src/lib/server/vector/retrieval-semantics.ts": {
+    "role": "PARTIAL_IMPORTER",
+    "importsCanonicalRepresentation": false,
+    "importsCanonicalDimension": true,
     "findingCounts": {
       "INLINE_REPR_LITERAL_DRIFT": 1
     }
   },
-  "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/proof/+server.test.ts": {
+  "sveltekit-frontend/src/routes/api/admin/atlas/synthesize/+server.ts": {
     "role": "NO_CANONICAL_IMPORT",
     "importsCanonicalRepresentation": false,
     "importsCanonicalDimension": false,
     "findingCounts": {
-      "INLINE_REPR_LITERAL_DRIFT": 1
-    }
-  },
-  "sveltekit-frontend/src/routes/api/admin/atlas/phase-lanes/proof/+server.test.ts": {
-    "role": "NO_CANONICAL_IMPORT",
-    "importsCanonicalRepresentation": false,
-    "importsCanonicalDimension": false,
-    "findingCounts": {
-      "INLINE_REPR_LITERAL_DRIFT": 1
+      "INLINE_REPR_LITERAL_DRIFT": 2
     }
   },
   "sveltekit-frontend/src/routes/api/atlas/concept-tagging/server.route.test.ts": {

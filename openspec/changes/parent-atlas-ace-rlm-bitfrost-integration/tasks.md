@@ -724,7 +724,375 @@ This closes the gap between "unit-tested against mocks" and "actually
 compatible with the live schema" for both functions — no code changes
 were needed, everything matched on the first try.
 
-## Next steps (2026-08-25, session pause — nothing below started; item 1 done 2026-08-25/26, see KAG-06 above; item 4 audited 2026-08-26, see audit section above; KAG-08 DAG runner fixed+wired 2026-08-26, see KAG-08 above)
+## KAG-09: taxonomy-assignment review pipeline wired end-to-end, three real bugs fixed (2026-08-26)
+
+Continuation of a pasted handoff that picked up exactly where this file's
+own KAG-04/KAG-05 sections above left off (`atlas_hyperedges`/
+`atlas_hyperedge_members` schema-vs-contract alignment, and the residual
+Postgres-before-Redis ordering bug in `taxonomy-topology-packet.ts` that
+KAG-04's 2026-08-25 fix left half-closed). Also closes out roadmap steps
+1–3 of "wire `promoteTaxonomyAssignmentV1` into something live," which
+didn't have a tracked home before this session.
+
+### Migration/contract audit (KAG-05A/05B from the handoff)
+
+- [x] **Verified already done, not re-done**: `drizzle/manual/20260824_kag_contract_alignment_v1.sql`
+  (applied 2026-08-24, `sidecar-migrations.json`) already adds
+  `contract_hyperedge_id`/`packet_key`/`workspace_revision`/`source_revision`/
+  `graph_revision`/`producer_revision`/`evidence_refs`/`checksum`/`lifecycle`/
+  `provenance` to `atlas_hyperedges`, column-for-column matching
+  `HyperedgeV1Schema` and the exact `INSERT` in
+  `materialize-kag-contracts-v1.mts`. No `CandidateOrdinal` added anywhere
+  in this table; the dynamic evidence-event hypergraph tables
+  (`atlas_evidence_entities`/`atlas_evidence_event_hyperedges`) were not
+  touched or aliased. `atlas_hyperedge_members` already matched
+  (`member_id`/`member_role`/`ordinal`) from the original 2026-07-16
+  migration.
+
+### Bug 1 — Postgres-before-Redis cache admission (closes KAG-04's residual gap)
+
+- [x] KAG-04 (2026-08-25, above) fixed write *ordering* but not write
+  *conditionality*: `persistOntologyLinkedTuples(...).catch(warn)` then
+  `writeOntologyLinkedTupleCachePlan(...)` ran unconditionally regardless
+  of whether the Postgres write actually succeeded — a Postgres failure
+  could still leave Redis serving a tuple that doesn't exist in canonical
+  storage.
+- [x] Fixed in `taxonomy-topology-packet.ts`: persistence now runs first,
+  its per-tuple `errors` array is used to filter to only the tuples that
+  actually landed in Postgres, and only that filtered set is cached
+  (cache plan is only rebuilt when the filtered set differs from the full
+  set, to avoid wasted work in the common all-succeeded case). Failures
+  logged as `DEGRADED_PERSISTENCE`, still fail-open at the MCP-response
+  level per the existing convention.
+- [x] `taxonomy-topology-packet.spec.ts`'s one smoke test still passes.
+
+### Bug 2 — silent hop-budget truncation in `hypergraph-retrieval-v1.ts`
+
+- [x] `retrieveHypergraphContextV1()`'s `truncated` flag was only set when
+  `maxRelations`/`maxEntities` caps were hit — never when the hop budget
+  itself cut off exploration with more graph still reachable. Violates
+  this repo's own "no silent caps" rule (root CLAUDE.md: "silent
+  truncation reads as covered everything when it didn't").
+- [x] Fixed: after the hop loop, `frontier.length > 0` unambiguously means
+  the loop stopped because of the hop budget with unexplored entities
+  remaining (the only other exit path naturally empties `frontier`) — now
+  sets `truncated = true` in that case.
+- [x] Added 2 new tests on a genuine 3-hop chain (A→R1→B→R2→C→R3→D):
+  `maxHops:1` → `R3`/`D` correctly excluded AND `truncated:true`;
+  `maxHops:3` → fully explored, `truncated:false`. 5/5 in that spec pass.
+
+### Bug 3 — `promoteTaxonomyAssignmentV1` had no status gate
+
+- [x] `entity-concept-taxonomy-v1.ts::promoteTaxonomyAssignmentV1` gated on
+  non-empty `evidenceRefs` but never checked `candidate.status` — a
+  merely `'proposed'`/`'review_required'` (or even `'rejected'`) candidate
+  could be promoted into canonical `HyperedgeV1` truth just by having
+  evidence attached. **The pre-existing test for this function
+  demonstrated the bug directly**: it built a fresh `status: 'proposed'`
+  candidate and called `promoteTaxonomyAssignmentV1` on it, and it
+  succeeded.
+- [x] Added `if (candidate.status !== 'promoted') throw
+  TAXONOMY_PROMOTION_REQUIRES_PROMOTED_STATUS:<id>:<status>`. Updated the
+  existing test to simulate the (then-unbuilt) review transition; added a
+  new test proving `'proposed'`/`'review_required'`/`'rejected'` are all
+  now refused. 5/5 pass.
+- [x] Found via a targeted `rg` search for existing synthesis call sites
+  before assuming none existed — the first pass had missed this function
+  entirely (see "Honest scope / what's NOT done" below for why that
+  matters).
+
+### Gate-alignment: Postgres CHECK constraints (found via a "review all gates" pass)
+
+- [x] `atlas_hyperedges.checksum` (must match `HyperedgeV1Schema`'s
+  `^[0-9a-f]{64}$`) and `.lifecycle` (must be one of
+  `OBSERVED`/`DERIVED`/`SUPERSEDED`, same enum as sibling
+  `atlas_ontology_linked_tuples.lifecycle`) had zero matching Postgres
+  `CHECK` constraints — a raw SQL insert or any future second producer
+  bypassing the Zod contract could write a malformed row with nothing at
+  the DB layer to catch it.
+  `drizzle/manual/20260826_atlas_hyperedges_gate_alignment_v1.sql`
+  (applied; table had 0 rows at authoring time, no backfill needed).
+
+### `semantic_768`/`semantic_512` mislabel (found during the tsgo error sweep, unrelated to the above but fixed in the same pass)
+
+- [x] `routes/api/admin/atlas/synthesize/+server.ts:195` had a live type
+  error: `representationId: 'semantic_768'` passed to
+  `createAtlasRapidsSemantic512Client().exactKnn()`, whose type demands the
+  literal `'semantic_512'`. `git blame` traced it to commit `a2e4dab329`
+  ("retire Atlas v1 in favor of v2/semantic_768 alignment"), which flipped
+  only this string literal without updating the client call — breaking
+  internal consistency with the `vector.length === 512` filter and the
+  512-client a few lines away. The original, internally-consistent value
+  (commit `9e2883741a`) was `'semantic_512'`. **Not a re-litigation of the
+  768-vs-512 canonical/primary policy** (root CLAUDE.md, 2026-08-23 final
+  decision — 768 stays primary elsewhere, untouched by this fix): this is
+  correctly labeling a legitimate 512-dim exact-rerank *secondary* lane,
+  which that same policy explicitly permits as long as it's labeled
+  correctly. Reverted to `'semantic_512'`.
+
+### Roadmap steps 1–3: wiring `promoteTaxonomyAssignmentV1` into something live
+
+Before this session `TaxonomyAssignmentCandidateV1`/`promoteTaxonomyAssignmentV1`
+had a schema, a constructor, and (after Bug 3 above) a correct gate — and
+zero live callers anywhere. Built all three roadmap steps, each proven
+live against real Postgres with explicit-and-verified cleanup (this
+module has no wrapping transaction to roll back — it's the live write
+path — so every proof script deletes its own rows and asserts the
+deletion):
+
+- [x] **Step 3 (persistence)**:
+  `sveltekit-frontend/src/lib/server/atlas/kag-hyperedge-postgres.ts::persistHyperedges()`
+  — the missing in-process Postgres writer for `HyperedgeV1` (before this,
+  only the offline `materialize-kag-contracts-v1.mts` CLI script, reading
+  a JSONL file, could write these). Per-edge transactional (header +
+  members atomic together; one bad edge's `ROLLBACK` doesn't affect
+  siblings in the same batch). 4/4 mocked tests +
+  `scripts/atlas/kag-persist-hyperedges-live-proof-v1.mts` (write →
+  readback with checksum/ordinal intact → verified delete).
+- [x] **Step 2 (review surface)**: new table
+  `atlas_taxonomy_assignment_candidates`
+  (`drizzle/manual/20260826_atlas_taxonomy_assignment_candidates_v1.sql`)
+  + `kag-taxonomy-candidate-postgres.ts` (`persistTaxonomyAssignmentCandidates`,
+  `listPendingTaxonomyAssignmentCandidates`,
+  `decideTaxonomyAssignmentCandidateV1`) + admin route `GET`/`POST
+  /api/admin/atlas/taxonomy-candidates`. `decideTaxonomyAssignmentCandidateV1`
+  commits the candidate's status flip **before** attempting the hyperedge
+  write (KAG-05E discipline extended to this new call site) — if the
+  hyperedge write then fails, the candidate stays correctly `'promoted'`
+  with `promoted_hyperedge_id` left `NULL`, a real queryable degraded
+  state (`outcome: 'promoted_degraded'`), never silently reported as a
+  full success. 7 + 5 mocked/route tests +
+  `scripts/atlas/kag-taxonomy-candidate-review-live-proof-v1.mts` (persist
+  → pending queue → reject → promote → hyperedge created and linked →
+  already-decided guard fires → verified cleanup).
+- [x] **Step 1 (candidate producer)**: deliberately did **not** build a
+  new speculative multi-signal fusion job pulling live KNN + community +
+  graph + lexical + NLP scores from five different subsystems — that
+  would have been unverifiable within this session and duplicative of
+  whatever the real fusion design turns out to need. Instead,
+  `taxonomy-candidate-producer-v1.ts::deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1()`
+  derives candidates from `OntologyLinkedTupleV1` rows a live pipeline is
+  *already* producing (`taxonomy-topology-packet.ts`, the same call site
+  Bug 1 above touches) — `label_kind='ontology'` tuples with a resolvable
+  concept id and non-empty evidence become one candidate each
+  (`ACTIVE_VERIFIED` + confidence ≥ 0.85 auto-proposes, else
+  `review_required`). Wired directly into that live pipeline's existing
+  fail-open persistence block. 6 unit tests +
+  `scripts/atlas/kag-taxonomy-candidate-producer-live-proof-v1.mts` (real
+  tuple persisted → derived → persisted → visible in the real pending
+  queue → verified cleanup).
+
+### Honest scope / what's explicitly NOT done
+
+- **The producer only knows `semanticScore`/`nlpEvidenceRefs`.**
+  `communityAffinity`/`graphSupport`/`lexicalSupport` are left `null`
+  rather than fabricated, because this producer genuinely has no
+  community/graph/lexical signal to report. `TaxonomyAssignmentCandidateV1`'s
+  shape already supports a richer producer populating those fields — none
+  exists yet. **Do not read a `null` here as "signal absent," read it as
+  "no producer has attempted to compute this signal."**
+- **No review UI.** The review surface is an authenticated JSON API
+  (`GET`/`POST /api/admin/atlas/taxonomy-candidates`) only — no Kanban-style
+  or other UI page consumes it yet. `human-review-projection-v1.ts`
+  (`KanbanRecommendationProjectionV1`) is a *different* contract for a
+  different recommendation kind; it was not reused or extended.
+- **No auto-promotion.** Every promotion requires an explicit
+  `POST .../taxonomy-candidates` call with a human-supplied `reviewedBy` —
+  there is no threshold rule that auto-flips `'proposed'` straight to
+  `'promoted'` without a decision call. (The producer's `'proposed'` vs
+  `'review_required'` split is a *prioritization* hint for whoever reviews
+  the queue, not a bypass of the review step itself.)
+- **`gate inventory` finding — corrected, then fixed narrower than first
+  described (2026-08-26, later same session)**: originally flagged 2
+  differently-named error codes for the same "revision mismatch" concept
+  (`HYPEREDGE_WORKSPACE_REVISION_MISMATCH` in
+  `hyperedge-projection-adapters-v1.ts` vs. bare
+  `WORKSPACE_REVISION_MISMATCH` in `incidence-projection-v1.ts`) as an
+  inconsistency to rename. **That was wrong** — checked the wider repo
+  before renaming anything and found both shapes are an established,
+  repeated repo-wide dual convention: `<MODULE>_WORKSPACE_REVISION_MISMATCH`
+  (≥8 other call sites — `CODE_ARCHAEOLOGY_`, `PRE_FANOUT_ONTOLOGY_`,
+  `GRAPHIFY_BINDING_`, `GRAPHIFY_RUN_`, `GRAPH_SOURCE_BINDING_`,
+  `CANDIDATE_`, `FANOUT_ORDINAL_MAP_`, `BLOCKED_`) and bare
+  `WORKSPACE_REVISION_MISMATCH` (≥4 other call sites —
+  `fanout-admission-v1.ts`, `query-adaptive-feature-compiler.ts`,
+  `search-runtime-adapter.ts`, `classification-envelope-v1.ts`). Renaming
+  `incidence-projection-v1.ts`'s bare form would have made it inconsistent
+  with its *real* siblings. **Left both untouched, no rename.**
+- [x] The genuinely isolated inconsistency was narrower: within
+  `entity-concept-taxonomy-v1.ts` itself, 3 throws were bare prose
+  strings (`'taxonomy promotion requires evidence'`,
+  `'concept cannot be broader than itself'`,
+  `'concept hierarchy relation requires evidence'`) sitting next to the
+  coded `TAXONOMY_PROMOTION_REQUIRES_PROMOTED_STATUS:<id>:<status>` throw
+  in the same file. No test pinned the exact prose (verified via grep
+  before changing). Recoded to
+  `TAXONOMY_PROMOTION_REQUIRES_EVIDENCE:<candidateId>`,
+  `CONCEPT_BROADER_THAN_SELF:<parentConceptId>`, and
+  `CONCEPT_HIERARCHY_REQUIRES_EVIDENCE:<parentConceptId>:<childConceptId>`
+  respectively — all now `CODE:detail` shaped, consistent within this one
+  file. 5/5 in `entity-concept-taxonomy-v1.test.ts` still pass.
+- **`materialize-kag-contracts-v1.mts`'s own open question is unchanged**:
+  KAG-05 above (2026-08-25) already noted it still has no real, reviewed
+  canonical input source. `persistHyperedges()` (this section) gives a
+  *second*, in-process way to write the same tables — it does not answer
+  that question, and the CLI script's need for a real producer decision
+  stands exactly as it did before this session.
+
+Verification across everything in this section: 33 unit/mocked tests
+across 7 spec files passing, 4 live-Postgres proof scripts (all
+non-destructive, all cleanup-verified), full-repo `npx tsgo --noEmit`
+clean except 85 pre-existing unrelated errors (one of which — the
+`semantic_768`/`512` mislabel above — this session's fixes actually
+reduced by one).
+
+### Next steps arising from this section
+
+1. **Build a real signal-fusion producer** for
+  `communityAffinity`/`graphSupport`/`lexicalSupport` (community
+  detection / PageRank / BM25-or-trigram scores respectively), populating
+  the same `TaxonomyAssignmentCandidateV1` shape more fully. Needs an
+  operator decision on where it lives (a new scheduled job, or folded into
+  an existing enrichment pass) before building — same "needs a decision,
+  not a unilateral fix" shape as KAG-05/KAG-04's other open items.
+2. **Decide on a review UI**, or confirm the JSON API is sufficient for
+  now. If a UI is wanted, `human-review-projection-v1.ts`'s Kanban pattern
+  is the nearest precedent but is NOT wired to this candidate type today.
+3. ~~**Rename the two `*_REVISION_MISMATCH` error codes**~~ — done, but not
+  as originally framed. See the corrected "gate inventory" note above:
+  both codes turned out to already match a real, wider repo convention
+  and were left as-is; the actual fix was recoding 3 unrelated bare-prose
+  throws within `entity-concept-taxonomy-v1.ts` to match that file's own
+  `CODE:detail` style.
+4. **`materialize-kag-contracts-v1.mts` producer selection** — still
+  exactly as open as KAG-05 (2026-08-25) left it; not advanced by this
+  session's work.
+5. **New, more urgent item found while investigating a downstream roadmap
+  question (2026-08-26): a second, independent, evidence-gated N-ary
+  relationship contract already exists.**
+  `openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`'s
+  `KAG-HYP-01: ontology tuple to hyperedge synthesis (2026-08-26)` section
+  built `synthesizeOntologyHyperedge()` →
+  `FeatureRelationshipV1`/`atlas.feature-relationship.v1`
+  (`packages/parent-atlas/src/core/feature-intelligence.ts`) the same day
+  as this file's `promoteTaxonomyAssignmentV1()` →
+  `HyperedgeV1`/`atlas.hyperedge.v1` — neither aware of the other. Full
+  comparison recorded as a cross-reference note in that file's KAG-HYP-01
+  section (not duplicated here). **Not resolved, no side picked** — this
+  is a real "One Canonical Runtime Owner Per Capability" governance
+  question (root CLAUDE.md), needs an explicit operator decision before
+  either side gets extended further.
+
+## KAG pipeline wiring — status closure (2026-08-26, later same session)
+
+**Status: `APPLY_PROVEN`** (root CLAUDE.md's enforced status vocabulary —
+`CREATED`/`WIRED`/`DRY_RUN_PROVEN`/`APPLY_PROVEN`/`NOT_PROVEN`; not
+"LIVE_PROVEN", which isn't one of the five enforced terms). `APPLY_PROVEN`
+is the correct term here specifically because every proof in KAG-09 above
+did real writes against the live Postgres instance, read them back, and
+verified deletion — not a dry run.
+
+The 3-step roadmap opened earlier this same file (search "roadmap steps
+1–3" in KAG-09 above) is closed:
+
+| Step | Status |
+|---|---|
+| 1 — candidate producer | `APPLY_PROVEN` |
+| 2 — review/promotion surface | `APPLY_PROVEN` |
+| 3 — hyperedge persistence | `APPLY_PROVEN` |
+
+Evidence (all already itemized in KAG-09 above, not re-proven here): 33
+unit/mocked tests across 7 spec files, 4 non-destructive live-Postgres
+proof scripts, 0 residual proof rows, 0 new `tsgo` errors in any touched
+file. The honest-scope note in KAG-09 stands unchanged: the producer
+populates `semanticScore`/NLP evidence only;
+`communityAffinity`/`graphSupport`/`lexicalSupport` are `null` (absence of
+a producer for that signal), never fabricated as `0`.
+
+**Not claiming**: this does not mean "KAG is done" in any broader sense —
+only that the specific 3-step wiring gap (candidate → review → hyperedge,
+all the way to Postgres) that existed at the start of this session is
+closed. Signal richness (KAG-07 below), the `materialize-kag-contracts-v1.mts`
+producer-selection question, and the review-UI decision are all still
+open exactly as items 1/2/4 above describe.
+
+## KAG-07: signal enrichment (proposed design, NOT started)
+
+Feeds the *same* `TaxonomyAssignmentCandidateV1` shape from established
+evidence owners — this is explicitly not a new "fusion service": no new
+service, no new orchestrator, just more producers writing into the
+contract that already exists and is already proven end-to-end.
+
+- `semanticScore` — done (KAG-09's producer, from `OntologyLinkedTupleV1.confidence`)
+- `lexicalSupport` — proposed source: Postgres FTS/trigram lane (not yet identified which existing module owns this read path — needs inspection, not assumed)
+- `graphSupport` — proposed source: Graphify/graph-authority structural evidence (candidate owner: `src/lib/server/graph/graph-analysis-runner.ts` + its adapters, per this repo's own "NetworkX vs. Neo4j" note in root CLAUDE.md — unverified whether that's the right hook)
+- `communityAffinity` — proposed source: promoted community/Leiden assignment (candidate owner: `graph_community_assignments` table per root CLAUDE.md — unverified)
+- Rule carried forward unchanged from KAG-09: **missing signal = `null`, never a fabricated `0`.**
+
+**Proposed but not yet designed further**: attaching provenance to each
+signal (a `score` + `evidenceRefs` + `producerRevision` +
+`workspaceRevision` shape per signal, not just a bare number) so a
+candidate can say *why* it has `graphSupport=0.82`, not merely store the
+value. This is a real, reasonable idea — flagging it as unstarted design,
+not implementing it speculatively here, since it changes
+`TaxonomyAssignmentCandidateV1`'s schema shape and should go through the
+same review this file's other schema changes have (KAG-03/KAG-04 above).
+
+**Explicitly not claiming the candidate-owner guesses above are correct**
+— `graph-analysis-runner.ts` and `graph_community_assignments` are named
+here as places to *check first*, per this repo's own Duplication
+Prevention rule ("grep first... a file existing is not evidence it's
+live"), not as confirmed integration points. Whoever picks up KAG-07
+should verify live callers/data freshness on each before wiring, exactly
+as KAG-09's own producer avoided assuming an unverified live signal
+source.
+
+### Cross-reference note: adjacent work already tracked elsewhere (checked before writing this, not assumed)
+
+A broader priority ranking was proposed alongside this update, covering
+whole-file/chunk byte-hash semantics (`BYTE-01`), `atlas_chunk_packet_identity_links`
+census work, a `StructuralGraphSnapshotV1`/`CandidateOrdinalMapV1` graph
+artifact pipeline, Arrow IPC/mmap proofs, NetworkX→cuGraph parity, a
+`[N,4,4,6]→[N,96]` feature fabric, Go retrieval orchestration, ACE context
+packing, and post-Qdrant-1.19-upgrade cleanup items. Before appending that
+here, checked whether it already has a tracked home — **it does**:
+
+- `atlas_chunk_packet_identity_links` and whole-file/chunk hash semantics
+  are the **live, actively-tracked subject of
+  `openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md`**
+  (root-level `openspec/`, not `sveltekit-frontend/openspec/` — same
+  distinction that mattered for finding *this* file). That file already
+  has named proof gates (e.g. `S512-15`) and session-by-session history
+  for exactly this table.
+- `CandidateOrdinalMapV1`/`StructuralGraphSnapshotV1`-shaped work already
+  has three addendum documents under
+  `openspec/changes/parent-atlas-candidate-feature-execution-fabric/`
+  (`candidate-snapshot-contract-addendum.md`,
+  `fanout-admission-addendum.md`,
+  `fanout-executor-ordinal-normalization-addendum.md`).
+- Qdrant version was checked live for this update: `1.19.0` confirmed
+  running (`curl 127.0.0.1:6333/`). The remaining post-upgrade items
+  proposed (legacy search/recommend/discover caller sweep, parity checks,
+  revision-qualified payload lineage, filter-field decisions,
+  filter-aware HNSW rebuild) were not independently verified and are not
+  recorded here — they belong wherever the Qdrant 1.19 upgrade itself was
+  tracked, not duplicated into this KAG/ACE/Bitfrost file.
+
+**Not recording the proposed P0–P9 cross-cutting priority order in this
+file.** This file's scope is KAG/ACE/RLM/Bitfrost integration; a
+priority ranking spanning byte-hash semantics, GPU graph parity, ACE
+packing, and retrieval orchestration is a cross-cutting program decision.
+Root CLAUDE.md already names `MASTER-FEATURE-TODO-2026-05-20.md` as "the
+master phase plan for lane completion and backlog tracking" — that, or
+whichever of the two openspec files above already owns each item, is
+where that ranking belongs. Duplicating it here risks exactly the
+same-thing-two-names drift this repo's own Duplication Prevention rule
+warns about (found 3 separate times already this session: the
+`*_REVISION_MISMATCH` naming, the two `KAG-04` sections above, and the
+two `parent-atlas-graph-retrieval-proof` folders across the two openspec
+roots).
+
+## Next steps (2026-08-25, session pause — nothing below started; item 1 done 2026-08-25/26, see KAG-06 above; item 4 audited 2026-08-26, see audit section above; KAG-08 DAG runner fixed+wired 2026-08-26, see KAG-08 above; item 2 (`materialize-kag-contracts-v1.mts` producer selection) still NOT advanced as of KAG-09's 2026-08-26 work — see KAG-09's own "Next steps" for what that session added instead)
 
 Committed and pushed to `origin/main` (`dcc4898338`). This session's real
 work is closed out; these are the genuinely open threads to pick up next,
@@ -790,3 +1158,744 @@ roughly in priority order:
 No new work should start on any of these without re-reading the relevant
 section above first — several looked simpler than they turned out to be
 (see KAG-05's two real bugs, NE-ID-06/07's corrected root-cause chain).
+
+## KAG-OWNER-01–07: field-level audit of the two competing relationship contracts (2026-08-26)
+
+Continuation of the cross-reference note above (item 5, "second, independent N-ary
+relationship contract"). Per operator direction: this is a read-only audit, no merge, no
+delete, no rename, no repository consolidation — those are all explicitly listed as NOT to do
+yet. Read both contracts and their real consumers directly rather than inferring from names.
+
+| Question | `atlas.hyperedge.v1` (`HyperedgeV1`) | `atlas.feature-relationship.v1` (`FeatureRelationshipV1`) |
+|---|---|---|
+| Input | `OntologyLinkedTupleV1` (code-entity POS/tag/ontology tagging) | `OntologyTupleV1` (`external-doc-knowledge-fabric.js` — doc/LangExtract-style concept/tool/retrieval tuples) |
+| Output identity | `hyperedgeId = "hyperedge:" + sha256({predicate, participants, workspaceRevision, sourceRevision}).slice(0,32)` | `relationship_id = "hyperedge:" + sha256({predicate, participantKeys, source_ref, source_revision, relation_revision}).slice(0,40)` |
+| Workspace revision | required field | **absent from the schema entirely** |
+| Graph/source revision | `graphRevision` + `sourceRevision`, both required | `source_revision` only; no separate graph-revision axis |
+| Evidence refs mandatory | yes, enforced (`TAXONOMY_PROMOTION_REQUIRES_EVIDENCE` throws on empty) | sourced from `tuple.evidence_span_refs`, not schema-enforced non-empty |
+| Human promotion required | **yes, enforced** — `candidate.status !== 'promoted'` throws | **no promotion state machine at all** — pure function returns `ELIGIBLE` directly from `evidence_state`+`lifecycle` inputs |
+| Can proposed evidence become truth without review | no (this session's fix closed exactly this gap) | **yes, structurally** — any caller passing `evidence_state: 'ACTIVE_VERIFIED'` gets `ELIGIBLE` immediately |
+| Member cardinality | n-ary, `.min(2)` | n-ary, `.min(1)`, plus explicit `participant_count`/`relationship_degree`/`relationship_degree_kind` (unary/binary/ternary/nary) and per-role `cardinality` constraints — genuinely richer |
+| Checksum field | yes, `checksum: ^[0-9a-f]{64}$`, DB `CHECK` added this session | **no checksum field in the schema at all** |
+| Postgres destination | `atlas_hyperedges`/`atlas_hyperedge_members` — live, populated, write/read/delete proven | `atlas_relationships`/`atlas_relationship_members`/`atlas_relationship_cardinality`/`atlas_relationship_evidence`/`atlas_relationship_embeddings` — **checked live 2026-08-26: `atlas_relationships` does not exist in the database.** Migration written, never applied. Not merely unproven — currently non-functional. |
+| Downstream consumers | `kag-hypergraph-reader-v1.ts` → `SearchResult.provenance.hypergraphNeighbors`, live | `hypergraph-retrieval.ts`/`hypergraph-ppr.ts`/`hypergraph-fusion-facade.ts`/`hypergraph-query-policy.ts` (1,638 lines), but FI-16H says "frontend live import/adoption remains unproven" |
+
+**Verdict (operator-confirmed, matches the evidence)**: do not pick one canonical owner for
+all N-ary relationships. The two domains are genuinely different (code-entity taxonomy vs.
+general doc-derived concept/tool/app-completion relationships) and were independently
+reinvented, not accidentally copied. `HyperedgeV1` has the stronger governance claim for its
+own domain (promotion gate, evidence enforcement, checksum, live Postgres proof);
+`FeatureRelationshipV1` has legitimately richer domain modeling (degree/cardinality) for its
+own domain but zero working persistence today.
+
+**Proposed resolution (recorded, NOT implemented)**: domain-scoped canonical ownership, not a
+universal winner —
+- `CANONICAL_OWNER` for taxonomy classification (`ENTITY_CLASSIFIED_AS`, `CONCEPT_BROADER_THAN`): `HyperedgeV1`
+- `CANONICAL_OWNER` for Feature Intelligence relationships (doc/concept/tool/app-completion facts): `FeatureRelationshipV1`, once its Postgres path is actually live-proven
+- A non-persistent, non-canonical shared kernel type (`AtlasRelationshipKernelV1`: relationshipId, participants[canonicalId/role/ordinal], evidenceRefs, workspaceRevision, sourceRevision, graphRevision?, producerRevision, checksum) that both domain contracts can compile to/from for shared graph-projection/StructuralGraphSnapshotV1 tooling — never independently writable, never a third owner.
+- An explicit `RelationshipAuthority` discriminator (`KAG_TAXONOMY` | `FEATURE_INTELLIGENCE`) plus a namespaced relation-type list per authority, so the same semantic fact can never be independently minted by both systems — that, not "two schemas exist," is the actual forbidden state.
+- Neither side migrates its rows into the other's tables; neither repository is replaced by the other.
+
+**Not done in this pass** (per explicit operator instruction): defining `AtlasRelationshipKernelV1` in code, implementing either kernel adapter, applying the `atlas_relationships` migration, proving FI persistence live, or freezing the relation-type namespace. All of these are the next tranche (`REL-OWNER-01` through `REL-OWNER-08`, `REL-FI-01`), not started.
+
+**Explicitly safe to continue in parallel, unaffected by this open question**: `StructuralGraphSnapshotV1` production-artifact validation, NetworkX/cuGraph PageRank/PPR work, and `KAG-07` real signal-owner discovery (read-only) — none of these require deciding which ontology-synthesis function owns canonical truth.
+
+### REL-OWNER-01 through 07 — status correction (2026-08-26, later session)
+
+The paragraph directly above is **stale**. Re-reading the live tree found the shared-kernel work
+already implemented (name landed as `RelationshipKernelV1`, not `AtlasRelationshipKernelV1` — same
+design, different literal name) and this session closed the remaining gap:
+
+- **REL-OWNER-01/02** (freeze domain ownership) — **DONE this session.** Recorded a
+  `n_ary_relationship_synthesis` capability entry in
+  `docs/architecture/runtime-ownership-registry.json` naming `HyperedgeV1`
+  (`sveltekit-frontend/src/lib/server/graph/hyperedge-contract.ts`) `CANONICAL_OWNER` for
+  `KAG_TAXONOMY` and `FeatureRelationshipV1`
+  (`packages/parent-atlas/src/core/feature-intelligence.ts`) `CANONICAL_OWNER` for
+  `FEATURE_INTELLIGENCE`, per this repo's own "One Canonical Runtime Owner Per Capability"
+  governance section (root CLAUDE.md).
+- **REL-OWNER-03/04/05** (define the shared kernel type + both adapters) — **already DONE, found
+  pre-existing.** `packages/parent-atlas/src/core/relationship-kernel.ts` defines
+  `RelationshipKernelV1`/`buildRelationshipKernel` with the exact field set proposed above
+  (relationshipId, authority, relationType, participants[canonicalId/role/ordinal/entityType/
+  entityRevision/sourceRef], evidenceRefs, sourceRef, sourceRevision, workspaceRevision,
+  graphRevision, relationshipRevision, producerRevision, checksum). Both adapters exist:
+  `hyperedgeToRelationshipKernel()` in `hyperedge-contract.ts` (KAG_TAXONOMY) and
+  `featureRelationshipToKernel()` in `relationship-kernel.ts` (FEATURE_INTELLIGENCE). Neither the
+  kernel schema nor either adapter exposes a standalone constructor/writer — confirmed by reading
+  both files in full; the kernel can only be reached through one of the two adapters.
+- **REL-OWNER-06** (prove lossless round-trip) — **already DONE, found pre-existing + re-verified
+  live this session.** `packages/parent-atlas/test/relationship-kernel.test.mjs` (3/3 pass before
+  this session's additions) proves `FeatureRelationshipV1 → kernel` is deterministic regardless of
+  input participant order (same checksum). `sveltekit-frontend/src/lib/server/graph/
+  hyperedge-contract.spec.ts` (`'keeps shared kernel fields aligned while retaining domain-scoped
+  authority'`, 6/6 pass, re-run live this session) proves both adapters preserve their respective
+  domain's revision fields (`kag.workspaceRevision === hyperedge.workspaceRevision`,
+  `fi.workspaceRevision === null` since Feature Intelligence has no workspace concept) while
+  sharing one `schema` literal and one checksum algorithm.
+- **REL-OWNER-07** (freeze the relation-type namespace, reject cross-domain collisions) — **DONE
+  this session.** Added `KAG_TAXONOMY_RELATION_TYPES` (`['ENTITY_CLASSIFIED_AS',
+  'CONCEPT_BROADER_THAN']` — the complete, grep-confirmed list of every predicate string
+  `entity-concept-taxonomy-v1.ts` can produce) and `assertRelationTypeNamespace(relationType,
+  authority)` to `relationship-kernel.ts`, wired directly into `buildRelationshipKernel()` so both
+  adapters enforce it unconditionally. The asymmetry the guard encodes is real, not incidental:
+  `KAG_TAXONOMY` is closed-vocabulary (a human wrote every possible predicate literal), while
+  `FEATURE_INTELLIGENCE` is open-vocabulary by design — `ontology-hyperedge-synthesis.ts` line 126
+  sets `relationship_type: tuple.predicate` directly from NLP-extracted text, so it cannot be
+  enumerated. The only enforceable direction is therefore "an open vocabulary must never mint one
+  of the closed vocabulary's reserved names," which is exactly what the guard checks. 4 new tests
+  added and passing (`packages/parent-atlas/test/relationship-kernel.test.mjs`, now 11/11 total).
+  Confirmed via grep across every known `FeatureRelationshipV1` consumer
+  (`adaptive-hypergraph-chain.ts`, `executor-plans.ts`, `hypergraph-fusion-facade.ts`,
+  `hypergraph-ppr.ts`, `hypergraph-query-policy.ts`, `hypergraph-retrieval.ts`,
+  `relationship-query-repository.ts`) that none hardcode a relation-type literal — they all
+  propagate whatever `FeatureRelationshipV1.relationship_type` already carries — so wiring the
+  guard into the shared builder could not silently break an existing caller.
+- **REL-OWNER-08** (feed both adapters into the `StructuralGraphSnapshotV1` producer) — **DONE
+  this session, found mostly pre-wired.** `buildIncidenceProjectionFromRelationshipKernelsV1()`
+  (`sveltekit-frontend/src/lib/server/atlas/graph/incidence-projection-v1.ts`) already accepts
+  `RelationshipKernelV1[]` generically — it has no authority-specific branch, so kernels from
+  either adapter flow through identically, and `buildStructuralGraphSnapshotFromIncidenceV1()`
+  consumes that projection's node/edge counts without caring which domain produced them. What was
+  missing was proof the two domains can coexist in one call without an id or namespace collision.
+  Added `GPH-PROJ` test `'REL-OWNER-08 projects a KAG_TAXONOMY hyperedge and a
+  FEATURE_INTELLIGENCE relationship into one incidence graph without ID or namespace collision'`
+  (`incidence-projection-v1.spec.ts`, 7/7 pass) that builds one `HyperedgeV1` and one
+  `FeatureRelationshipV1` sharing a common entity (`concept:retrieval`), compiles both to kernels,
+  and asserts: 2 distinct relation nodes, exactly 2 incidence edges into the shared entity (one per
+  relation, not merged/duplicated), and `nodeKind` correctly carries `ENTITY_CLASSIFIED_AS` vs
+  `DOC_RELATES_CONCEPTS` as the domain tag.
+  **Real finding surfaced by writing this test**: both domains' `relationshipId`/`relationship_id`
+  generators independently chose the literal text prefix `hyperedge:` (`hyperedge-contract.ts`'s
+  `createHyperedgeV1` uses a 32-hex-char slice; `ontology-hyperedge-synthesis.ts`'s
+  `synthesizeOntologyHyperedge` uses a 40-hex-char slice) — so relation *node ids* are not
+  authority-namespaced by convention. This is safe, not a bug: `buildIncidenceProjectionV1`
+  already throws `DUPLICATE_RELATION_ID` on any literal id collision (astronomically unlikely
+  given they're independent sha256 outputs of different lengths), and REL-OWNER-07's
+  `assertRelationTypeNamespace` guard is what actually keeps the two domains distinguishable on
+  the graph — `nodeKind`/`relationType`, not the id prefix, is the real domain tag. Recorded here
+  so a future reader doesn't mistake the shared `hyperedge:` prefix for an intentional shared
+  namespace.
+- **REL-FI-01** (apply the `atlas_relationships` migration, live-prove Feature Intelligence
+  Postgres persistence) — still **NOT started**, and now doubly confirmed dead-simple to state:
+  `scripts/atlas/audit-ontology-hyperedge-synthesis.mjs` is a real, live, read-only audit script
+  that already runs `synthesizeOntologyHyperedge()` end to end and writes a receipt to
+  `docs/reports/kag-hyp-synthesis-audit-v1.json` — but its own report schema hardcodes
+  `canonical_persistence_attempted: false`. The synthesis logic is proven; only the Postgres
+  write-path is missing. This is real, scoped, and unstarted work, not a design gap.
+
+**Verification commands** (all re-run live this session, all green):
+```bash
+cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json   # exit 0
+cd packages/parent-atlas && node --test test/relationship-kernel.test.mjs test/ontology-hyperedge-synthesis.test.mjs test/feature-intelligence.test.mjs   # 11/11 pass
+cd sveltekit-frontend && npx vitest run src/lib/server/graph/hyperedge-contract.spec.ts   # 6/6 pass
+cd sveltekit-frontend && npx vitest run src/lib/server/atlas/graph/incidence-projection-v1.spec.ts   # 7/7 pass
+```
+
+**Remaining tranche**: only `REL-FI-01` (apply the `atlas_relationships` migration, live-prove
+Feature Intelligence Postgres persistence) is left unstarted from the original REL-OWNER-01
+through REL-FI-01 list.
+
+### REL-FI-01 — BLOCKED (2026-08-26): the drafted migration collides with two unrelated live tables
+
+Attempted to apply `sveltekit-frontend/drizzle/manual/20260817_atlas_feature_intelligence_v1.sql`
+live (`docker exec legal-ai-postgres psql ... -v ON_ERROR_STOP=1 < ...`). It failed partway
+through with `ERROR: column "domain" does not exist` on `CREATE INDEX
+atlas_features_domain_status_idx ON atlas_features(domain, status)`. Root cause, confirmed via
+`\d atlas_features` live: **`atlas_features` already exists as a completely different, unrelated
+table** — AST-derived structural feature facts (`tree_node_id`, `feature_namespace`,
+`feature_type`, `normalized_value`, `schema_id`/`schema_version` FK to `atlas_schema_registry`,
+`extractor_version`, `content_hash`), not the Feature Intelligence "product feature" concept
+(`feature_key`, `feature_label`, `domain`, `parent_feature_id`, `status`, aliases) that
+`feature-intelligence-repository.ts::upsertFeature()` assumes. The migration's own `CREATE TABLE
+IF NOT EXISTS atlas_features (...)` therefore silently no-opped onto the wrong table before the
+`CREATE INDEX` statement exposed the mismatch.
+
+Checked every other table the migration and its sibling
+(`20260818_atlas_dynamic_hyperedge_entities_v1.sql`) would create
+(`atlas_relationships`, `atlas_evidence`, `atlas_feature_aliases`, `atlas_relationship_members`,
+`atlas_relationship_cardinality`, `atlas_relationship_evidence`, `atlas_relationship_embeddings`,
+`atlas_feature_embeddings`, `atlas_feature_state_receipts`, `atlas_dynamic_hyperedge_candidates`)
+— **found a second collision**: `atlas_feature_evidence` also already exists live, as an entirely
+different table (packet-level multi-modal evidence extraction keyed on `packet_key`/
+`content_hash`/`ast_evidence`/`lsp_evidence`/`document_evidence`/`ontology_evidence`/
+`ml_evidence`), not the Feature Intelligence `feature_id`/`evidence_id`/`relation_type`/`polarity`
+join table the migration expects. No other table name collided.
+
+**No damage done**: both colliding tables were confirmed `count(*) = 0` (empty) after the aborted
+run; `CREATE EXTENSION IF NOT EXISTS vector` was a no-op (already installed); the migration run
+stopped at the second statement (the failing index) so nothing past `atlas_features`'s no-op
+`CREATE TABLE` executed. No data was read, written, or at risk.
+
+**Why this is a stop-and-report finding, not a quick fix**: renaming two table names inside a
+drafted-but-never-applied migration is mechanically trivial, but those names are the permanent
+public API of the Feature Intelligence persistence layer (`feature-intelligence-repository.ts`
+hardcodes them in every query) — picking the replacement names is a naming decision with the same
+lasting-consequence shape as the semantic_512/768 five-round flip-flop and the 5-competing-
+PageRank-implementations incident this repo's own CLAUDE.md already documents as a recurring
+failure mode. Per this session's own established pattern (investigate and report before acting on
+architectural ownership questions), this was not resolved unilaterally.
+
+**Not done, blocked pending an operator naming decision**: renaming `atlas_features` →
+(candidate: `atlas_fi_features`) and `atlas_feature_evidence` → (candidate: `atlas_fi_evidence`)
+consistently across the migration SQL, `feature-intelligence-repository.ts`, and
+`feature-intelligence.ts` doc comments; then re-applying the corrected migration; then running the
+live persist → read-back → cleanup proof this session had planned to do next.
+
+### REL-FI-01 — RESOLVED (2026-08-26, same session): operator chose the `atlas_fi_*` rename
+
+Operator selected "Rename to atlas_fi_* (recommended)". Completed end to end:
+
+1. Renamed `atlas_features` → `atlas_fi_features` and `atlas_feature_evidence` →
+   `atlas_fi_evidence` (table names, every derived index name, and the one FK constraint name)
+   throughout `drizzle/manual/20260817_atlas_feature_intelligence_v1.sql` and
+   `packages/parent-atlas/src/core/feature-intelligence-repository.ts`. Confirmed via grep that no
+   other file in the FeatureRelationshipV1 consumer graph (`adaptive-hypergraph-chain.ts`,
+   `executor-plans.ts`, `hypergraph-fusion-facade.ts`, `hypergraph-ppr.ts`,
+   `hypergraph-query-policy.ts`, `hypergraph-retrieval.ts`, `relationship-query-repository.ts`)
+   issues raw SQL against either old name, so the rename could not silently break another caller.
+2. Applied both `20260817_atlas_feature_intelligence_v1.sql` (renamed) and its sibling
+   `20260818_atlas_dynamic_hyperedge_entities_v1.sql` live (`docker exec legal-ai-postgres psql -v
+   ON_ERROR_STOP=1`) — both exit 0. Live-confirmed all 13 expected tables now exist:
+   `atlas_fi_features`, `atlas_fi_evidence`, `atlas_relationships`, `atlas_relationship_members`,
+   `atlas_relationship_cardinality`, `atlas_relationship_evidence`, `atlas_relationship_embeddings`,
+   `atlas_feature_embeddings`, `atlas_feature_state_receipts`, `atlas_dynamic_hyperedge_candidates`,
+   `atlas_feature_aliases`, `atlas_evidence`, `atlas_evidence_entities`. Registered both files in
+   `sveltekit-frontend/drizzle/sidecar-migrations.json`.
+3. Wrote a real live proof, `scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts`:
+   `upsertFeature` → `insertEvidence` → `persistRelationship` (a real `FeatureRelationshipV1` built
+   via `buildFeatureRelationship`) → `findRelationshipsForEntities` read-back → explicit cleanup
+   with a post-cleanup zero-row verification query. **First run failed** with a genuine,
+   previously-undiscovered bug: `error: column "r.relationship_key" must appear in the GROUP BY
+   clause or be used in an aggregate function` inside `findRelationshipsForEntities()`. Root cause:
+   the query's outer `SELECT r.*, ... GROUP BY r.relationship_id` relied on Postgres's
+   functional-dependency optimization (grouping by a table's primary key lets you select its other
+   columns un-aggregated) — but `r` there is a row from the `rels` CTE, not a base table, so
+   Postgres has no primary-key metadata for it and the optimization doesn't apply. This bug could
+   not have been caught by any test in the suite before this session, because this was the literal
+   first time this table/query pair existed live — the migration had never been applied before.
+   **Fixed** by replacing the outer `JOIN atlas_relationship_members m USING (relationship_id) ...
+   GROUP BY r.relationship_id` with three independent correlated subqueries (one each for
+   participants, cardinality, evidence_refs), matching the pattern already used for cardinality and
+   evidence_refs in the same query — removes the redundant join, removes the GROUP BY entirely, and
+   is strictly simpler than the original. Re-ran the live proof: **all steps pass, `cleanupVerified:
+   true`, zero residue.** Re-ran the full `packages/parent-atlas` test suite: **267/267 pass**
+   (confirms the query rewrite changed nothing observable for any existing caller/test).
+
+**Verification commands** (all re-run live this session, all green):
+```bash
+cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json   # exit 0
+cd packages/parent-atlas && node --test test/*.test.mjs   # 267/267 pass
+cd sveltekit-frontend && npx tsx ../scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts
+  # {"...", "cleanupVerified": true}
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "\d atlas_fi_features"
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "\d atlas_relationships"
+```
+
+**REL-OWNER-01 through REL-FI-01 is now fully closed.** Every item from the original tranche list
+is DONE and live-proven: domain ownership frozen in the registry, the shared kernel + both
+adapters implemented and round-trip-proven, the relation-type namespace guard wired and tested,
+mixed-domain `StructuralGraphSnapshotV1` feed proven, and Feature Intelligence Postgres persistence
+now live-proven end to end (including a real bug found and fixed along the way).
+
+### REL-OWNER-08 refinement — explicit `authority` on projection nodes (2026-08-26, same session)
+
+External review of the closed tranche correctly identified one real remaining gap in the
+mixed-domain incidence projection: a relation node's domain was only *inferable* from
+`nodeKind`/`relationType` via the REL-OWNER-07 reserved-namespace guard, never stated explicitly.
+Closed it:
+
+- Added `authority: relationshipAuthoritySchema.nullable().optional()` to `HyperRelationV1Schema`
+  (`sveltekit-frontend/src/lib/server/atlas/graph/hyper-relation-v1.ts`) — optional because a
+  hand-built `HyperRelationV1` from a non-relationship-kernel producer (e.g. a tree-sitter
+  `CALL_BINDING` fact) has no domain authority to report.
+- `buildIncidenceProjectionFromRelationshipKernelsV1()` now carries `kernel.authority` through
+  onto the `HyperRelationV1` it constructs.
+- `IncidenceProjectionNodeV1` gained an `authority: RelationshipAuthority | null` field — always
+  `null` on entity nodes, and on relation nodes either the real authority (when the relation came
+  from a kernel) or `null` (when it did not).
+- Extended the mixed-domain `GPH-PROJ` test to assert `authority === 'KAG_TAXONOMY'` /
+  `'FEATURE_INTELLIGENCE'` on the two relation nodes and `authority === null` on every entity node.
+- Added the fail-closed collision test the review specifically asked for: two kernels from
+  different authorities sharing one literal `relationshipId` throws `DUPLICATE_RELATION_ID`, it
+  does not silently coalesce them into one graph node. Confirms the existing Set-based dedup in
+  `buildIncidenceProjectionV1` already had this property; there was no code bug, only a missing
+  test proving it.
+- Added the "unknown relationship authority is rejected" test the review asked for — confirmed via
+  test that it's the zod `relationshipAuthoritySchema` enum (not the namespace guard, which only
+  checks known-authority cases) that rejects an unrecognized authority string. This is correct
+  layering, not a gap: `assertRelationTypeNamespace` and schema validation are two independent
+  checks, not one check duplicating the other.
+
+**Two of the review's requested REL-OWNER-07 test cases were already covered** before this
+refinement (FEATURE_INTELLIGENCE minting a KAG-reserved type → reject; KAG_TAXONOMY minting an
+unregistered type → reject) — see the REL-OWNER-07 section above. **"Missing evidence → reject
+where domain requires it"** was also already covered, at the correct layer: `buildRelationshipKernel()`
+itself does not require non-empty `evidenceRefs` (kernel construction is an identity/projection
+concern, not an evidence-completeness policy), but `buildIncidenceProjectionFromRelationshipKernelsV1()`
+does (`EVIDENCE_MISSING:` throw, proven in `GPH-PROJ-07`) — evidence-completeness is enforced where
+the kernel is consumed for graph execution, not baked into kernel identity itself.
+
+**Verification** (all re-run live this session, all green):
+```bash
+cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json   # exit 0
+cd packages/parent-atlas && node --test test/relationship-kernel.test.mjs   # 6/6 pass
+cd sveltekit-frontend && npx vitest run src/lib/server/atlas/graph/incidence-projection-v1.spec.ts src/lib/server/graph/hyperedge-contract.spec.ts   # 14/14 pass
+cd sveltekit-frontend && npx tsgo --noEmit   # 0 errors in any file touched this session
+```
+
+### What was explicitly NOT started this session (correctly sequenced, not skipped)
+
+An external review proposed a much larger roadmap on top of this closed tranche:
+`RelationshipGraphProjectionV1` as a new named contract, binding relation/entity ordinals into
+two explicit coordinate namespaces against `CandidateOrdinalMapV1`, a `GRAPH-PROD-01..05` /
+`GRAPH-PPR-01` / `GRAPH-NEIGHBOR-01` production-snapshot-and-PageRank-parity tranche, a
+`QDRANT-SPARSE-01..06` / `QDRANT-POST-01..06` BM25/IDF-scope capability audit, and an
+`FTS-ID-01..03` investigation into why only 21/374 raw Postgres FTS lexical hits (5.6%) currently
+bind to a safe canonical packet identity. **None of this was started in this session** — it is
+real, well-scoped future work, correctly sequenced by the review as separate tranches from
+REL-OWNER-08, not evidence of anything left undone in the tranche this session actually closed.
+Two structural points from that review are worth recording now so a future session doesn't have to
+re-derive them:
+- The existing `IncidenceProjectionNodeV1.gpuNodeId` scheme already implements the "two coordinate
+  namespaces" property the review asked for as a new type: entities are pushed first (dense
+  ordinals `0..entityCount-1`), relations are pushed after (dense ordinals continuing from there) —
+  so `kind: 'entity' | 'relation'` plus contiguous-by-construction ordinal ranges already gives a
+  reader everything `CandidateOrdinal` vs `RelationshipOrdinal` would, without a second parallel
+  type. A future session should read this file before deciding whether `RelationshipGraphProjectionV1`
+  needs to be a new contract or just a rename/thin-wrapper over what's already here.
+- The FTS finding (21/374 bind rate) is a real, separate, already-diagnosed problem — the review
+  correctly says not to weaken identity matching to raise recall, and to classify the 354
+  unresolved hits by failure reason before touching ranking/tokenization. That work has its own
+  clear next step (`FTS-ID-01`) and does not block or depend on anything in this tranche.
+
+### GRAPH-PROD-01 — DONE (2026-08-26, same session): first production `StructuralGraphSnapshotV1`
+
+User chose "do all 3" from a follow-up direction question (prove the mechanism on empty data /
+populate real relationship data / redirect to Neo4j) and asked to continue with the layers. Before
+writing any code, checked real row counts live: `atlas_hyperedges = 0`, `atlas_relationships = 0`,
+`atlas_packets = 61,660`. **Zero real relationship data exists in either domain** — everything
+proven in this session and the prior one was fixtures or a single throwaway proof row, immediately
+cleaned up. Built the mechanism honestly against that reality rather than deferring:
+
+1. **`readAllHyperedgesFromPostgres()`** added to `kag-hyperedge-postgres.ts` — the first bulk
+   reader for `atlas_hyperedges`/`atlas_hyperedge_members` (only a writer, `persistHyperedges()`,
+   existed before). Reconstructs `HyperedgeV1` via `HyperedgeV1Schema.parse()` using the
+   **stored** checksum (round-trip fidelity, not re-derivation).
+2. **`listAllRelationships()`** added to `feature-intelligence-repository.ts` — the first
+   unfiltered bulk reader for `atlas_relationships` (the existing `findRelationshipsForEntities()`
+   requires a non-empty entity-id filter).
+3. **`incidence-edge-arrow-artifact-v1.ts`** (new) — the first real implementation of the
+   `edgeArtifact.format === 'ARROW_IPC'` field `StructuralGraphSnapshotV1` has always declared.
+   `apache-arrow@21.1.0` was a listed dependency with **zero import sites anywhere in the repo**
+   before this file.
+   **Real bug caught and fixed before this could be trusted as a checksum source**: the first
+   implementation used `tableFromArrays()`, which auto-dictionary-encodes plain `string[]` columns
+   (`Dictionary<Int32, Utf8>`) — and each independently-built dictionary gets its own internal id
+   embedded in the IPC dictionary-batch header, so two calls with byte-identical logical content
+   produced **different** IPC bytes (confirmed live: 1744 vs 1776 bytes for the same two-row
+   table). This would have silently broken every downstream determinism/checksum-based proof
+   (GRAPH-PROD-02 explicitly asked for "artifact checksum readback determinism"). Root-caused via
+   a targeted byte-diff script, fixed by building each column explicitly with
+   `vectorFromArray(values, new Utf8())` / `new Int32()` (never letting the library choose
+   dictionary encoding), then `new Table({...})` instead of `tableFromArrays()`/`makeTable()` (the
+   latter's TS type signature doesn't accept a record of `Vector<T>`, only raw typed arrays).
+   Confirmed live: same-content calls now produce byte-identical IPC output. 4 new tests
+   (`incidence-edge-arrow-artifact-v1.spec.ts`), all pass, including one that pins the
+   determinism property so a regression here fails loudly.
+4. **`scripts/atlas/graph-prod-01-build-production-structural-snapshot-v1.mts`** (new) — the
+   production driver: reads real hyperedges + real relationships → converts both through their
+   existing adapters into `RelationshipKernelV1` → filters to kernels matching
+   `--workspace-revision` (a real multi-revision corpus must be pre-filtered to one revision before
+   reaching `buildIncidenceProjectionFromRelationshipKernelsV1`, which throws on ANY mismatch
+   across a batch — excluded kernels are counted and reported, not silently dropped) → derives the
+   entity list from kernel participants → builds the incidence projection → serializes edges to a
+   real Arrow IPC file on disk → builds and validates the `StructuralGraphSnapshotV1` descriptor →
+   re-serializes the same projection a second time and confirms the checksum matches (inline
+   GRAPH-PROD-02 determinism check) → writes a JSON receipt.
+   **Second real bug caught and fixed by actually running it**: the first run threw
+   `ENOENT` because the graph-revision string (`graph:ws:0084288f26`) was used verbatim in a
+   Windows file path — colons are reserved characters in Windows paths (drive-letter separator).
+   The path-sanitizing regex had `:` in its allowed-character class by mistake; removed it.
+
+**Live run result (honest, on real — currently empty — data):**
+```json
+{
+  "realHyperedgesRead": 0, "realFeatureRelationshipsRead": 0,
+  "kernelsBuilt": 0, "kernelsIncluded": 0, "kernelsExcludedByRevisionMismatch": 0,
+  "projection": { "entityCount": 0, "relationCount": 0, "unresolvedParticipantCount": 0 },
+  "edgeArtifactBytes": 1008,
+  "edgeArtifactChecksum": "66fbc8d1f44ceaf4531da3e1e9f4f2e373b59eeeb59d4237cc96b406b03aa354",
+  "snapshot": { "nodeCount": 0, "edgeCount": 0, "canonicalAuthority": false, ... },
+  "artifactChecksumDeterministic": true
+}
+```
+Independently re-verified outside the script: re-read the on-disk `.arrow` file, recomputed its
+sha256 by hand, and re-parsed it with `tableFromIPC()` — byte count, checksum, and 7-field schema
+all matched the script's own report exactly. **This is a genuine, complete GRAPH-PROD-01 proof of
+the mechanism, not a placeholder** — every revision binding, checksum, and file write in the
+script runs the identical code path a future non-empty production run would use. What it does
+**not** prove yet: PageRank/PPR on a real edge set (there are no edges), or CPU↔GPU parity — those
+require real relationship data first (the "populate real KAG/FI relationship data" direction from
+the same 3-way user choice, not yet started) or a redirect to the pre-existing Neo4j/
+`codebase-graph.json` topology (the third direction, also not yet started).
+
+**Verification** (all re-run live this session, all green):
+```bash
+cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json   # exit 0
+cd sveltekit-frontend && npx vitest run src/lib/server/atlas/graph/incidence-edge-arrow-artifact-v1.spec.ts   # 4/4 pass
+cd sveltekit-frontend && npx tsx ../scripts/atlas/graph-prod-01-build-production-structural-snapshot-v1.mts
+  # {"...", "artifactChecksumDeterministic": true}
+cd sveltekit-frontend && npx tsgo --noEmit   # 0 errors in any file touched this session
+```
+
+**Not started** (the other two of the "do all 3" directions, correctly deferred as separate,
+larger tranches): populating `atlas_hyperedges`/`atlas_relationships` with real data by running the
+KAG taxonomy-promotion pipeline and/or `synthesizeOntologyHyperedge()` against real repo content;
+redirecting NetworkX/cuGraph PageRank-parity work at the pre-existing, already-populated Neo4j +
+`docs/graph/codebase-graph.json` topology instead of the (currently empty) HyperedgeV1/
+FeatureRelationshipV1 layer.
+
+### Follow-up (same day) — the "redirect to real topology" leg was already satisfied elsewhere
+
+Before building anything for the Neo4j-redirect leg, checked real state first:
+
+- **Leg 2 (populate real KAG/FI data)**: confirmed there is **no existing CLI/script that produces
+  real `OntologyLinkedTupleV1` rows** (`atlas_ontology_linked_tuples` is also 0 rows, live-checked).
+  This isn't "run an existing pipeline" — it's "build an NLP/ontology-extraction pipeline from
+  scratch." Genuinely large, unscoped, correctly not started.
+- **Leg 3 (Neo4j redirect)**: found real, populated data (Neo4j: 621,162 nodes, 30 relationship
+  types, ~370K edges, 3,667 nodes already carry `pageRank`/`graphAuthorityScore` from a **prior**
+  run by the already-registered `CANONICAL_OWNER` — `neo4j-gds-client.ts::runPageRankClient()`, per
+  `docs/architecture/runtime-ownership-registry.json`'s `graph_analysis` entry). Before building a
+  new NetworkX/cuGraph parity script against it (which would risk becoming the "6th competing
+  PageRank implementation" this repo's own CLAUDE.md explicitly warns against — 5 were already
+  found and catalogued in one prior audit), checked whether the parity work the review asked for
+  already existed anywhere. **It does, and it already passed, on real (not literal-Neo4j, but
+  real-scale, non-fixture) production data**:
+  `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`, data refreshed
+  2026-08-26T13:13 (same day as this session):
+  ```
+  nodeCount: 162,234 real nodes, edgeCount: 108,156 real edges
+  source: graphify/frozen-graph-snapshot-v2.json (486MB, real production corpus,
+          identity-contract-v1 + tree-sitter-typescript-v1 — i.e. the AST/tree-sitter
+          structural graph, a THIRD graph substrate distinct from both Neo4j and the
+          HyperedgeV1/FeatureRelationshipV1 layer)
+  status: PASS
+  pagerankTopKOverlap: 1, pagerankCorrelation: 1, pagerankMaxDelta: ~4.9e-9
+  louvainCommunityAgreement: 1 (ARI=1.0, NMI=1.0, 54,078 == 54,078 communities both backends)
+  componentCount: exact match (54,078 == 54,078)
+  ```
+  This is real graph-scale, both-backend-executed PageRank + Louvain parity — not a toy fixture,
+  and essentially a perfect result. Operator, presented with this finding, chose to treat leg 3 as
+  satisfied by this existing proof rather than duplicate it against the literal Neo4j graph.
+
+### "Find a way to wire up" (2026-08-26, same session): RelationshipKernelV1 → Neo4j projector
+
+User asked for a concrete architectural wiring, not more design discussion. Read the real
+consumer code first rather than guess: **zero files under `ace/`, `hyperrag/`, or `acp/` import
+anything from this session's graph layer** (grep confirmed). ACE's actual multi-hop consumer,
+`multihop-contextual-tree.ts`, talks to Neo4j directly via Cypher, matching entry nodes on
+`stableKey`/`sourceRef`/`id` and walking a **hardcoded** relationship-type whitelist
+(`IMPORTS|CONTAINS|BELONGS_TO_CLUSTER|REFERENCES|EVIDENCE_FOR|DOCUMENTS|CONSULTED`) that does
+**not** include `ENTITY_CLASSIFIED_AS`/`CONCEPT_BROADER_THAN`. So the one correct wiring point —
+following this repo's own Postgres-is-truth/Neo4j-is-mirror pattern — is a projector that writes
+`RelationshipKernelV1` into Neo4j using the same `stableKey` identity, making KAG/FI relationships
+*present* in the graph. It does **not**, by itself, make them traversed — extending the hardcoded
+whitelist is a separate, deliberate decision this projector does not make unilaterally.
+
+Built `relationship-kernel-neo4j-projector-v1.ts`, with a hybrid shape matching REL-OWNER-08's own
+no-flattening rule: a kernel with exactly 2 participants (both real KAG predicates always are)
+writes a direct binary edge; a kernel with more participants (real Feature Intelligence
+relationships can be genuinely N-ary) writes an `:AtlasRelation` hub node plus one `INCIDENT_TO`
+edge per participant — the same shape `incidence-projection-v1.ts` already uses for Postgres/Arrow.
+Cypher relationship types can't be parameterized, so `relationType` is validated
+(`^[A-Z][A-Z0-9_]*$`) before string-interpolation — proven live via a fixture using a
+Cypher-injection-shaped string, confirmed skipped, not executed.
+
+**Two real bugs found and fixed by actually running this against live Neo4j, not by review:**
+
+1. **Participant-ordinal canonicalization bug.** `buildRelationshipKernel()`'s
+   `canonicalizeParticipants()` sorts participants by **role name alphabetically**, then
+   reassigns `ordinal` 0/1/2... — it does not preserve the caller's original construction order.
+   The first version of both the projector and its proof assumed `ordinal 0 == "first/subject"
+   participant` in a directionally-meaningful sense; live run failed with `expected 1 binary edge
+   read back, got 0` because the projector — correctly, given its own logic — wrote the edge in
+   the opposite direction from what the read-back query (wrongly) assumed. Fixed by renaming the
+   projector's edge properties from `subjectRole`/`objectRole` to `fromRole`/`toRole` (never
+   implying a semantic direction the data never asserted) and fixing the proof to derive expected
+   order from the kernel's own post-canonicalization `participants` array, never from
+   pre-canonicalization construction order. The original test fixture also used the wrong role
+   names (`subject`/`object`) — the real KAG predicate (`entity-concept-taxonomy-v1.ts`) uses
+   `entity`/`concept` — fixed to match.
+2. **Incomplete-cleanup bug.** An earlier interrupted run (background task that produced no
+   visible output before this turn) left real residue in Neo4j uncleaned. A later run's narrower
+   `DELETE n` (only the exact edge this run tracked) then failed with
+   `Neo.ClientError.Schema.ConstraintValidationFailed: node still has relationships` — a node from
+   the interrupted run's leftover writes. Manually verified and removed the residue
+   (`DETACH DELETE` by marker, confirmed `count(n) = 0` afterward), then hardened the proof script
+   itself to use `DETACH DELETE` unconditionally in its own cleanup, rather than assuming it only
+   ever needs to undo exactly what its own current run created.
+
+**Final live run, clean, exit 0:**
+```json
+{
+  "projection": {"kernelsAttempted": 2, "binaryEdgesWritten": 1, "hubNodesWritten": 1, "incidentEdgesWritten": 3, "skipped": []},
+  "binaryReadBack": {"authority": "KAG_TAXONOMY", ...},
+  "hubReadBack": [/* 3 rows, correct role/ordinal, verified as a set match */],
+  "unsafeRelationTypeRejected": true,
+  "cleanupVerified": true
+}
+```
+
+**What this does and does not achieve**: the mechanism for projecting either domain's relationship
+kernels into real Neo4j, preserving N-ary structure, is now proven live. It is proven on synthetic
+fixtures only (0 real rows exist in either source table, same honesty constraint as GRAPH-PROD-01)
+and **does not yet make anything traversable** by `multihop-contextual-tree.ts` — that requires
+someone to deliberately decide to extend its hardcoded relationship-type whitelist, which this
+session did not do.
+
+**Files**: `sveltekit-frontend/src/lib/server/atlas/graph/relationship-kernel-neo4j-projector-v1.ts`,
+`scripts/atlas/relationship-kernel-neo4j-projector-live-proof-v1.mts`.
+
+**Correction for a stale operator note this session**: "Neo4j PageRank limitations → pivot to
+NetworkX/cuGraph" is now recorded in the root `CLAUDE.md` (search "Correction (2026-08-26,
+operator note)") — Neo4j's own GDS PageRank run (3,667 scored nodes) predates and is superseded by
+the NetworkX↔cuGraph parity pipeline as the trusted compute path; this does not affect the
+projector above, which writes graph *structure*, not PageRank scores.
+
+**Update, same session**: the NLP sidecar ACP registration WAS done next (see section below).
+
+### ACP registration for the miniforge NLP sidecar (2026-08-26, same session)
+
+Closes the specific gap this file's Aug 9 audit already documented: `ACPToolRegistry.ts` had zero
+references to the sidecar, so agents couldn't discover it via `GET /api/acp/tools`. Checked the
+real running container first rather than guess at its capabilities: `docker ps` confirmed
+`miniforge-nlp-sidecar` live on `:8095`; `GET /health` and `GET /openapi.json` gave real schemas.
+
+**Real finding that reframes "wire GPU scripts to the sidecar"**: the sidecar's own
+`/health` response is unambiguous —
+`capabilities: {spacy:true, langextract:true, tree_sitter:true, treesitter_chunker:true,
+ast_grep:true, networkx:true, torch:false, nx_cugraph:false, cugraph:false, cuvs:false, cupy:false}`.
+**This service has zero GPU capability of its own.** The real GPU/RAPIDS path
+(`atlas:cugraph:pagerank` in this same file's `BASH_WORKER_ACTIONS`) already goes through a
+completely separate mechanism — `bashWorkerExecute()` → `scripts/atlas/opencode-bash-worker.mjs`
+→ WSL2 bash with `useRapidsEnv: true` (conda RAPIDS activation) — that has nothing to do with this
+sidecar and was already wired before this session. So "wire GPU scripts to the sidecar" was not a
+coherent action as literally stated; the two systems don't overlap.
+
+Registered 3 new ACP tools against the sidecar's real endpoints (`ACPToolRegistry.ts`):
+- `nlp:capabilities` — `GET /health` (capability/health probe)
+- `nlp:analyze` — `POST /analyze` (multi-pass structural/lexical/linguistic/semantic extraction;
+  input schema matches the real `AnalyzeRequest` OpenAPI model exactly)
+- `nlp:ast-chunk` — `POST /ast/chunk` (tree-sitter/ast-grep structural chunking; input schema
+  matches the real `AstChunkRequest` model, output is the real `AstEvidenceResponseV2` shape)
+
+All 3 support `dryRun` (added to `DRY_RUN_TOOLS`), follow the existing HTTP-tool handler pattern
+(`fetch` + `AbortSignal.timeout`, matching `knowledgeSearch`/`langextractExtract`), and read the
+endpoint from `ENV.NLP_SIDECAR_URL ?? ENV.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095'` (both
+env vars already existed in `env.server.ts`, unused until now).
+
+**Live-proved against the real running container**
+(`scripts/atlas/acp-nlp-sidecar-tools-live-proof-v1.mts`, exit 0):
+```json
+{
+  "nlpToolsRegistered": true,
+  "capabilities": {"success": true, "data": {"status": "ok", "capabilities": {"spacy": true, ...}}},
+  "analyze": {"success": true, "entityCount": 0},
+  "astChunk": {"success": true, "schema": "atlas.ast.evidence.v1", "chunkCount": 2, "syntaxStatus": "CLEAN"},
+  "dryRunModeWorks": true
+}
+```
+`entityCount: 0` on the analyze call is expected, not a bug — a single short generic test sentence
+doesn't reliably trigger spaCy NER; not worth a larger fixture just to prove the tool executes.
+
+**Verification** (all re-run live this session, all green):
+```bash
+cd sveltekit-frontend && npx tsgo --noEmit   # 0 errors in ACPToolRegistry.ts
+cd sveltekit-frontend && npx tsx ../scripts/atlas/acp-nlp-sidecar-tools-live-proof-v1.mts   # exit 0
+```
+
+**Still separate, un-started, correctly scoped as its own decision**: wiring real GPU *compute*
+scripts (beyond the existing `atlas:cugraph:pagerank` bash-worker path) to anything — there is
+currently no second GPU-capable service to wire them to. If GPU capability is later added to the
+sidecar (torch/cugraph/cuvs/cupy flip to true), that would be a natural trigger to revisit this,
+not before.
+
+### Real networkx usage added to the sidecar, then re-checked for nx-cugraph fit (2026-08-26, same session)
+
+User asked to align the "sidecar's networkx capability" to WSL2/RAPIDS conda. Investigation first
+(grep, not guess): `python/miniforge_nlp_sidecar.py` had **zero call sites** for the already-
+imported `networkx` module — `NETWORKX_AVAILABLE: true` in `/health` was purely "the package
+happens to be importable" (a transitive dependency of langextract/spacy), not a real feature. The
+one place in this repo that DOES compute real networkx PageRank (`cugraph-pagerank.py`) only uses
+it as a CPU fallback when cuGraph is absent — nx-cugraph can't help that branch either, since it
+also requires cuGraph to dispatch to. So "accelerate the sidecar's networkx" had no real target as
+stated. Reported this and asked; operator chose to add a real networkx feature first.
+
+**Added**: `_compute_entity_graph_metrics()` in `miniforge_nlp_sidecar.py` — builds a directed
+subject→object graph from `/analyze`'s extracted `relationships` (currently populated only by
+`_code_relationships()`'s regex extraction: `imports`/`extends`/`implements`) and computes
+real PageRank (`networkx.pagerank`, falling back to `degree_centrality` if PageRank fails to
+converge) per entity. Uses `backend="cugraph"` when `NX_CUGRAPH_AVAILABLE` (not currently true in
+this container — the switch is forward-compat, not yet exercised). New `entity_graph_metrics`
+field added to `AnalyzeResponse` (additive, backward-compatible).
+
+**Explicitly not confused with a different real thing**: this is a **per-document** entity
+centrality score (how central an entity is within one document's own asserted relationships), not
+`atlas_packets.page_rank_score` (a **cross-file, corpus-wide** authority score computed by
+`cugraph-pagerank.py` from a completely different import graph). Both are real, both use
+PageRank, and they must never be conflated as the same signal — documented explicitly in the new
+function's docstring for exactly this reason.
+
+**Live-verified** (rebuilt the Docker image, checked version drift before deploying — Dockerfile
+pins only `langextract==1.6.0`; all other packages unpinned, but this rebuild happened to resolve
+identical versions to what was already running: `ast-grep-py 0.45.2`, `tree-sitter-language-pack
+0.9.0`, `treesitter-chunker 4.0.0` — confirmed via `docker run --rm ... pip list` before
+`docker compose up -d`, so no silent dependency drift). Real test with a code snippet containing
+imports/extends/implements: relationships extracted correctly, `entity_graph_metrics` populated
+with real PageRank scores, `"backend": "networkx"` (correctly, since `nx_cugraph` isn't installed
+in this container). Re-ran the `nlp:*` ACP tool proof afterward — 3/3 still pass, no regression.
+
+**Verification**:
+```bash
+docker run --rm deeds-miniforge-nlp-sidecar:latest python -m pip list | grep -E "tree-sitter|ast-grep|langextract"
+docker compose -f docker/miniforge-nlp-sidecar/docker-compose.yml up -d
+curl -X POST http://127.0.0.1:8095/analyze -H "Content-Type: application/json" \
+  -d '{"text":"import { Foo } from \"./foo\"; class Widget extends Foo {}","source_type":"codebase"}'
+  # -> relationships: [...], entity_graph_metrics: {"backend":"networkx","scores":{...}}
+cd sveltekit-frontend && npx tsx ../scripts/atlas/acp-nlp-sidecar-tools-live-proof-v1.mts   # exit 0
+```
+
+**This repo now has three distinct real graph substrates, correctly kept separate, at three
+different maturity levels**:
+1. **Neo4j** (621K nodes, 30 rel types) — topology mirror, canonical PageRank owner exists and has
+   run once (3,667 scored nodes). No fresh NetworkX/cuGraph parity check against it specifically.
+2. **`graphify/frozen-graph-snapshot-v2.json`** (162,234 real nodes / 108,156 real edges after
+   resolution) — AST/tree-sitter structural graph. NetworkX↔cuGraph PageRank + Louvain parity
+   `PASS`, real data, done.
+3. **HyperedgeV1/FeatureRelationshipV1 → RelationshipKernelV1 → StructuralGraphSnapshotV1**
+   (this session's REL-OWNER-08/GRAPH-PROD-01 work) — mechanism fully proven, `0` real edges (no
+   upstream producer has ever run against real content).
+
+Do not conflate these three when a future session says "the graph" — always name which one.
+
+### Session handoff (2026-08-26, end of session): next priority is real relationship data, not more plumbing
+
+Operator agreed with the recommendation to prioritize **populating real relationship data**
+(`atlas_hyperedges`/`atlas_relationships` are still 0 rows each) over further graph/ACP plumbing.
+**Deliberately not started this session** — building a real NLP/ontology-tuple extraction pipeline
+from scratch (confirmed earlier: no existing CLI/entrypoint produces real `OntologyLinkedTupleV1`
+rows) is large, new, unscoped work, and this session's context budget was too depleted (~33%
+remaining) to start it responsibly. Starting and running out of room mid-build would leave an
+unverified, half-finished pipeline — the opposite of this session's discipline of proving every
+piece live before moving on.
+
+**For the next session, in priority order**:
+1. **Populate real relationship data** (the actual bottleneck — everything downstream, ACE packets,
+   ranking, DAG synthesis, is starved without it). Requires designing/building a real ontology-tuple
+   extraction pipeline; no existing entrypoint to extend, so scope this fresh.
+2. **Audit TurboVec sidecar compression** — a real, existing component (CUDA prefilter, 4-bit RAM
+   ANN) that was flagged as genuinely unexamined this session. Worth checking before assuming it
+   needs work.
+3. **Check `daily-graphify-board.js` + `phase89:board-workflow`** before designing any new
+   "pick best actions" recommendation engine — that board may already do ranking/recommendation
+   work the operator described wanting.
+4. **Do not** re-open nx_cugraph/WSL2 alignment — checked twice this session, no real target exists
+   for it yet (see the two sections above this one).
+
+### GRAPH-PPR-01 upgraded to RUNTIME_SMOKE_PROVEN on the real 162K corpus (2026-08-26, follow-on session)
+
+Operator pasted a large architecture-alignment document (pgvector/Qdrant/CUDA/CandidateOrdinal/ACE
+layering — canonical semantic_768 stays in Postgres, indexes are rebuildable executors, GPU receives
+ordinals/bounded rows not raw corpora). Before treating any of its proposed tranches (RAPIDS-01/02,
+GRAPH-PPR-01, GRAPH-FEATURE-01, etc.) as new work, audited what already exists — per this session's
+own established discipline (audit before building). Finding: **far more of this was already built
+than the document assumed.**
+
+**Already real, found by reading code (not assumed from file names)**:
+- `python/atlas_rapids_sidecar.py` — real FastAPI sidecar (WSL2 `atlas-rapids-cu13` conda env, port
+  8098) with fail-closed `/v1/knn/exact` (cuVS brute_force) and a quarantined-experimental
+  `/v1/knn/cagra`, both with packetKey+sourceRevision identity contracts, dimension/corpus/GPU-memory
+  guards.
+- `python/atlas_rapids_graph_runtime.py` — a **resident, revision-qualified cuGraph PageRank runtime**
+  with `/v1/graph/load`, `/v1/graph/resident`, `/v1/graph/pagerank`. Already supports personalized
+  PageRank (seed nodes + weights → `cugraph.pagerank(personalization=...)`), candidate-filtered
+  scoring (exactly "CandidateOrdinal shortlist" from the operator's doc), revision-mismatch rejection,
+  GPU-memory floor checks, and a receipt schema (`atlas.graph-pagerank-receipt.v1`) with node/edge
+  table hashes for parity verification. This already **is** GRAPH-PPR-01 as specified — it did not
+  need to be built.
+- `sveltekit-frontend/docs/reports/graph-snapshot-parity/{manifest.json,nodes.parquet,edges.parquet}`
+  — the real production graph artifact referenced elsewhere in this file's own "graph_snapshot_parity"
+  sections: 162,234 nodes, 108,156 edges, `graphRevision dff9006fef66e63fb55b98de3feaeb0409ef940c...`.
+- `sveltekit-frontend/src/lib/server/atlas/graph/atlas-rapids-pagerank-client.ts` +
+  `src/routes/api/admin/atlas/graph/projection/load/+server.ts` — a real, revision-checked TypeScript
+  client and an admin route that already POST to `/v1/graph/load`. **But** the client's own spec file
+  is 100% `vi.stubGlobal('fetch', ...)` mocked — it had never actually been exercised against a live
+  sidecar or the real artifact. Correctly classified per this file's own evidence rules as
+  `STATICALLY_REFERENCED`, not `RUNTIME_SMOKE_PROVEN`, before today.
+
+**What was actually done this session** (not a rebuild — a live-proof pass, exactly matching this
+file's established methodology): started the WSL2 sidecar for real (`atlas-rapids-cu13`, confirmed
+live GPU: RTX 3060 Ti, torch 2.13.0+cu130, cuvs/cugraph/cuml 26.06.00), then drove it directly against
+the real artifact:
+1. `POST /v1/graph/load` with the real `graphRevision`/`projectionRevision` — loaded 162,234 nodes /
+   108,156 edges onto GPU in 1.09s, `nodeTableHash`/`edgeTableHash` matched the manifest exactly.
+2. `POST /v1/graph/pagerank` (global, no seeds) — **failed** on first real run:
+   `CUGRAPH_INVALID_INPUT vertex type of graph and precomputed_vertex_out_weight_sums must match`.
+3. Reproduced directly in a WSL2 python REPL (not guessed) — the error message is misleading; it is
+   **not** a vertex-id dtype mismatch (both sides were confirmed int64 by direct inspection). The real
+   cause: `edges.parquet`'s `weight` column is `int64`, and `cugraph.pagerank`'s
+   `precomputed_vertex_out_weight` requires the summed weight ("sums") column to be `float64`. Casting
+   `edges_df["weight"]` to `float64` immediately after the parquet read fixed it, confirmed in the REPL
+   before touching the real file.
+4. **Fixed live**: `python/atlas_rapids_graph_runtime.py` — one-line cast
+   (`self.edges_df["weight"] = self.edges_df["weight"].astype("float64")`) added right after the
+   edges parquet read, with a comment recording the misleading error text so a future reader doesn't
+   re-diagnose the same red herring.
+5. Restarted the sidecar, re-ran the full sequence for real:
+   - Global PageRank top-5 on the real graph: real `packetKey`/`nodeKey` identities returned, 52ms
+     kernel time, `didConverge: true`.
+   - **Personalized PageRank (PPR)** with 3 real seed node keys sampled from the actual corpus:
+     correct propagation (seed nodes ranked highest, a non-seed neighbor packet appeared at rank 4/5
+     via real graph propagation) — this is the literal "CandidateOrdinal seeded PPR" the operator's
+     document asked for, proven against real data, not a fixture.
+   - **Candidate-filtered scoring** (`candidateNodeKeys`, the bounded-shortlist mode): mechanically
+     correct — returned exactly the requested 2 candidates in the requested count/shape. Both scored
+     0.0 for this particular seed/candidate pair; not investigated further (plausible directed/PPR
+     reachability, but could also be a second real issue) — flagged, not chased, to keep this pass
+     bounded.
+
+**New finding, NOT fixed (out of scope for the sidecar, belongs to the exporter)**: sampling real
+`graph_node_key` values surfaced a naming bug — some keys are double-prefixed,
+e.g. `packet:packet:8a51153e20db` instead of `packet:8a51153e20db`. This is cosmetic for the sidecar
+(it round-trips whatever string it's given) but is a real identity-hygiene defect in whatever producer
+wrote `graph-snapshot-parity/nodes.parquet` (likely `scripts/atlas/export-graph-snapshot-parity-parquet.mts`
+or its upstream identity contract). Left unfixed and unclassified beyond this note — do not silently
+"clean" it by stripping the prefix without checking whether some other consumer already depends on the
+doubled form.
+
+**Net effect on the runtime-ownership classification** (per this file's own vocabulary): GRAPH-PPR-01
+moves from `STATICALLY_REFERENCED` to `RUNTIME_SMOKE_PROVEN` — real GPU, real 162K/108K corpus, real
+personalized-PageRank propagation, real bug found and fixed by execution rather than review. The
+TypeScript client (`atlas-rapids-pagerank-client.ts`) and admin route remain themselves unexercised
+end-to-end (this proof drove the sidecar directly over `curl`, not through the SvelteKit layer) — that
+last hop is a small, bounded follow-up, not a new build.
+
+**This does not change the prior handoff's priority order.** Real relationship data
+(`atlas_hyperedges`/`atlas_relationships`, still 0 rows) remains priority 1 — proving that the GPU
+graph executor works does not manufacture the graph edges themselves. What this session's pass adds:
+confidence that when real hyperedge/relationship data does land in Postgres and gets exported through
+the existing `export-graph-snapshot-parity-parquet.mts` → `atlas_rapids_graph_runtime.py` path, the
+GPU PPR layer underneath it is proven, not speculative. The operator's large architecture document's
+core framing (Postgres canonical semantic_768 / CandidateOrdinal identity, executors are rebuildable,
+GPU receives ordinals+bounded rows never raw corpora, don't create a second index/graph/cache
+authority) matches what's already built here — it is describing this repo's actual shape more often
+than it is proposing new shape. Treat future re-reads of that document as a confirmation checklist
+against real code, not a build spec, since most of GPU-SEM/GRAPH-PPR/CandidateOrdinal it names already
+has a concrete implementation in this repo.
+
+**Left running**: the WSL2 RAPIDS sidecar (`python/atlas_rapids_sidecar_graph.py`, PID varies per
+`wsl -d Ubuntu -e bash -lc "pgrep -f atlas_rapids_sidecar_graph"`) is still up on `127.0.0.1:8098`
+with the 162K graph resident, for anyone continuing this thread without a cold restart. It is a local
+dev process with no persistence — killing it is always safe; the artifact and fix are what's durable.

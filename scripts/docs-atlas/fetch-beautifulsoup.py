@@ -19,7 +19,9 @@ def main() -> int:
         return 2
     try:
         result = fetch_beautifulsoup(sys.argv[1])
-        print(json.dumps(result.to_dict(), ensure_ascii=False))
+        # Keep the subprocess boundary safe on Windows legacy code pages;
+        # JSON consumers decode the escaped Unicode back to the original text.
+        print(json.dumps(result.to_dict(), ensure_ascii=True))
         return 0
     except Exception as exc:  # noqa: BLE001 - CLI boundary returns typed failure
         print(json.dumps({"error": type(exc).__name__, "message": str(exc)}))

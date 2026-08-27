@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.graph-prod-01.production-snapshot-build.v1",
+  "workspaceRevision": "ws:0084288f26",
+  "graphRevision": "graph:ws:0084288f26",
+  "realHyperedgesRead": 0,
+  "realFeatureRelationshipsRead": 0,
+  "kernelsBuilt": 0,
+  "kernelsIncluded": 0,
+  "kernelsExcludedByRevisionMismatch": 0,
+  "projection": {
+    "entityCount": 0,
+    "relationCount": 0,
+    "unresolvedParticipantCount": 0,
+    "nodeTableHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "edgeTableHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "projectionHash": "de593b91a4228d2be11a576c77296618d9723a464e777424f6c443e38ed223b1"
+  },
+  "edgeArtifactPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_ws_0084288f26.arrow",
+  "edgeArtifactBytes": 1008,
+  "edgeArtifactChecksum": "66fbc8d1f44ceaf4531da3e1e9f4f2e373b59eeeb59d4237cc96b406b03aa354",
+  "snapshot": {
+    "schema": "atlas.structural-graph-snapshot.v1",
+    "workspaceRevision": "ws:0084288f26",
+    "graphRevision": "graph:ws:0084288f26",
+    "candidateSnapshotRevision": "ws:0084288f26",
+    "ordinalMapChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "nodeCount": 0,
+    "edgeCount": 0,
+    "edgeArtifact": {
+      "format": "ARROW_IPC",
+      "checksum": "66fbc8d1f44ceaf4531da3e1e9f4f2e373b59eeeb59d4237cc96b406b03aa354",
+      "ref": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_ws_0084288f26.arrow"
+    },
+    "canonicalAuthority": false
+  },
+  "artifactChecksumDeterministic": true
+}

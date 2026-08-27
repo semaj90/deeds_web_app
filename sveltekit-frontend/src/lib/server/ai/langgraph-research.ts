@@ -243,7 +243,8 @@ async function expandViaTopology(
 		// Search Qdrant for chunks from neighbor paths using same query vector
 		const neighborPaths = neighborResult.rows.map(r => r.relative_path);
 		const body = {
-			vector: { name: 'content', vector: queryVector },
+			query: queryVector,
+			using: 'content',
 			limit: limit * 2,
 			with_payload: true,
 			filter: {
@@ -251,7 +252,7 @@ async function expandViaTopology(
 			},
 		};
 
-		const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+		const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
@@ -259,12 +260,12 @@ async function expandViaTopology(
 		}).catch(() => null);
 
 		if (!res?.ok) return [];
-		const data = await res.json() as { result?: Array<{
+		const data = await res.json() as { result?: { points?: Array<{
 			score: number;
 			payload?: Record<string, unknown>;
-		}> };
+		}> } };
 
-		return (data.result ?? []).slice(0, limit).map(h => ({
+		return (data.result?.points ?? []).slice(0, limit).map(h => ({
 			path:       (h.payload?.file_path ?? h.payload?.relativePath ?? '') as string,
 			content:    ((h.payload?.content ?? '') as string).slice(0, 400),
 			score:      h.score * 0.9, // slight penalty for topology-expanded results
@@ -316,7 +317,8 @@ async function searchQdrant(
 	const fetchLimit = (pathHints?.length && !tagFilter?.length) ? limit * 3 : limit;
 
 	const body: Record<string, unknown> = {
-		vector:       { name: vectorName, vector },
+		query:        vector,
+		using:        vectorName,
 		limit:        fetchLimit,
 		with_payload: true,
 	};
@@ -327,7 +329,7 @@ async function searchQdrant(
 			must: [{ key: 'tags', match: { any: tagFilter } }],
 		};
 	}
-	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
 		method:  'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body:    JSON.stringify(body),
@@ -335,13 +337,13 @@ async function searchQdrant(
 	}).catch(() => null);
 
 	if (!res?.ok) return [];
-	const data = await res.json() as { result?: Array<{
+	const data = await res.json() as { result?: { points?: Array<{
 		id: number | string;
 		score: number;
 		payload?: Record<string, unknown>;
-	}> };
+	}> } };
 
-	return (data.result ?? []).map(h => ({
+	return (data.result?.points ?? []).map(h => ({
 		path:       (h.payload?.file_path ?? h.payload?.relativePath ?? '') as string,
 		content:    ((h.payload?.content ?? '') as string).slice(0, 400),
 		score:      h.score,

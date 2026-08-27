@@ -1,8 +1,8 @@
 {
   "schema_version": "semantic-contract-reconciliation-v1",
   "scope": "BOUNDED — TypeScript/Zod contract layer only (sveltekit-frontend/src/**/*.ts)",
-  "generated_at": "2026-08-11T19:13:00.731Z",
-  "repository_commit": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "generated_at": "2026-08-27T03:16:06.799Z",
+  "repository_commit": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
   "canonical_owner": {
     "file": "sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts",
     "representationConst": "SEMANTIC_REPRESENTATION_ID",
@@ -22,12 +22,45 @@
     "768-as-dimension detection is heuristic (z.literal(768), width:/dimension:/.min(/.max( context) — may miss or over-match unrelated numeric 768 usages"
   ],
   "summary": {
-    "files_scanned": 3544,
-    "files_with_768_reference": 44,
-    "hard_failures": 0,
-    "warnings": 102
+    "files_scanned": 4164,
+    "files_with_768_reference": 109,
+    "hard_failures": 4,
+    "warnings": 286
   },
-  "hard_failures": [],
+  "hard_failures": [
+    {
+      "type": "DUPLICATE_CANONICAL_OWNER",
+      "file": "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-task-representation-v1.ts",
+      "line": 4,
+      "constName": "EMBEDDINGGEMMA_NATIVE_DIMENSION",
+      "severity": "HARD_FAIL",
+      "message": "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-task-representation-v1.ts:4 declares 'export const EMBEDDINGGEMMA_NATIVE_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
+    },
+    {
+      "type": "DUPLICATE_CANONICAL_OWNER",
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
+      "line": 8,
+      "constName": "ATLAS_CANONICAL_SEMANTIC_REPRESENTATION",
+      "severity": "HARD_FAIL",
+      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:8 declares 'export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
+    },
+    {
+      "type": "DUPLICATE_CANONICAL_OWNER",
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
+      "line": 9,
+      "constName": "ATLAS_CANONICAL_SEMANTIC_DIMENSION",
+      "severity": "HARD_FAIL",
+      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:9 declares 'export const ATLAS_CANONICAL_SEMANTIC_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
+    },
+    {
+      "type": "DUPLICATE_CANONICAL_OWNER",
+      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
+      "line": 10,
+      "constName": "ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION",
+      "severity": "HARD_FAIL",
+      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:10 declares 'export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
+    }
+  ],
   "warnings_top50": [
     {
       "type": "DOCUMENTED_CLIENT_BOUNDARY_DUPLICATE",
@@ -46,6 +79,76 @@
       "message": "sveltekit-frontend/src/lib/ai/model-ids.ts:105 'export const SERVER_EMBEDDING_DIMS' is a documented client/server-boundary duplicate (cannot import $lib/server code into client-bundled files)."
     },
     {
+      "type": "INLINE_DIM_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/schemas/packet-canonical.ts",
+      "line": 65,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/schemas/packet-canonical.ts:65 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_DIM_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/schemas/packet-canonical.ts",
+      "line": 262,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/schemas/packet-canonical.ts:262 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ace/cluster-ace-packet.ts",
+      "line": 24,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ace/cluster-ace-packet.ts:24 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ace/cluster-packet-consumer.test.ts",
+      "line": 28,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ace/cluster-packet-consumer.test.ts:28 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ace/cluster-packet-consumer.test.ts",
+      "line": 45,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ace/cluster-packet-consumer.test.ts:45 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts",
+      "line": 112,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts:112 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/agents/agents-card-store.cluster-packet.test.ts",
+      "line": 44,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/agents/agents-card-store.cluster-packet.test.ts:44 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts",
+      "line": 73,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts:73 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts",
+      "line": 120,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts:120 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts",
+      "line": 145,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/agents/regen/section-builders.test.ts:145 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
       "type": "INLINE_REPR_LITERAL_DRIFT",
       "file": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
       "line": 78,
@@ -62,9 +165,9 @@
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
       "file": "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts",
-      "line": 533,
+      "line": 537,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts:533 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/analysis/analysis-contracts.spec.ts:537 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
@@ -79,6 +182,118 @@
       "line": 9,
       "severity": "WARN",
       "message": "sveltekit-frontend/src/lib/server/analysis/analysis-pass-current.spec.ts:9 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_DIM_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts",
+      "line": 67,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts:67 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts",
+      "line": 2,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts:2 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts",
+      "line": 5,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts:5 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts",
+      "line": 6,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/invalidation-plan.ts:6 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts",
+      "line": 7,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts:7 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts",
+      "line": 27,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/retrieval-plan.ts:27 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.spec.ts",
+      "line": 5,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.spec.ts:5 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 4,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:4 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 20,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:20 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 27,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:27 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 32,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:32 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 38,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:38 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 41,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:41 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 44,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:44 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 47,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:47 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts",
+      "line": 50,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/search-runtime-policy.ts:50 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
@@ -138,249 +353,67 @@
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts",
-      "line": 9,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/query-router-v2-integration.spec.ts",
+      "line": 89,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts:9 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/query-router-v2-integration.spec.ts:89 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts",
-      "line": 53,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/query-router-v2-integration.spec.ts",
+      "line": 93,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts:53 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts",
-      "line": 11,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classifier-feature-manifest.spec.ts:11 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/query-router-v2-integration.spec.ts:93 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 38,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 4,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:38 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:4 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 52,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 45,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:52 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:45 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 52,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 46,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:52 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:46 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 53,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 47,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:53 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:47 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 54,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:54 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 55,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:55 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts",
-      "line": 78,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/canonical-chunk-contract.spec.ts:78 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
-      "line": 222,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts:222 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
-      "line": 232,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts:232 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
-      "line": 227,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts:227 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
-      "line": 237,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts:237 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts",
-      "line": 247,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts:247 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/dense-lane-policy.ts",
-      "line": 11,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/dense-lane-policy.ts:11 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.spec.ts",
-      "line": 11,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.spec.ts:11 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.spec.ts",
-      "line": 43,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.spec.ts:43 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 20,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:20 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 94,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:94 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 95,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:95 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 117,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:117 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 155,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:155 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 173,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:173 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 22,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:22 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_DIM_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts",
-      "line": 96,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.spec.ts:96 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts",
-      "line": 16,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts:16 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts",
-      "line": 30,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts:30 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts",
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
       "line": 48,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts:48 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:48 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts",
-      "line": 61,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 49,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/contracts/graphify-task-candidate.spec.ts:61 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:49 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/pass-fabric-proof.spec.ts",
-      "line": 12,
+      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
+      "line": 50,
       "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/pass-fabric-proof.spec.ts:12 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/phase-lane-proof.spec.ts",
-      "line": 12,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/phase-lane-proof.spec.ts:12 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/phase-lane-proof.spec.ts",
-      "line": 17,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/phase-lane-proof.spec.ts:17 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/phase-lane-registry.spec.ts",
-      "line": 14,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/phase-lane-registry.spec.ts:14 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/phase-lane-registry.spec.ts",
-      "line": 18,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/phase-lane-registry.spec.ts:18 hardcodes a semantic_768/768 literal without importing the canonical constant."
+      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:50 hardcodes a semantic_768/768 literal without importing the canonical constant."
     }
   ],
-  "warnings_total": 102
+  "warnings_total": 286
 }

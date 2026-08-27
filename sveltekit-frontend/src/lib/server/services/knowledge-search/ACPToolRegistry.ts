@@ -76,6 +76,11 @@ const CONFIG = {
   endpoints: {
     ollama: ENV.OLLAMA_BASE_URL,
     qdrant: ENV.QDRANT_URL,
+    // Confirmed live 2026-08-26: miniforge-nlp-sidecar container on :8095,
+    // capabilities {spacy, langextract, tree_sitter, treesitter_chunker,
+    // ast_grep, networkx} all true; {torch, nx_cugraph, cugraph, cuvs, cupy}
+    // all false — this sidecar is CPU-only, has no GPU path of its own.
+    nlpSidecar: ENV.NLP_SIDECAR_URL ?? ENV.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
   },
   models: {
     embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
@@ -775,7 +780,129 @@ const handlers: Record<string, HandlerFn> = {
     } catch (error: any) {
       return fail(error.message ?? String(error), startTime);
     }
-  }
+  },
+
+  // -------------------------------------------------------------------------
+  // NLP sidecar tools (2026-08-26) — closes the "zero ACP tool registrations"
+  // gap this repo's own Aug 9 audit documented. The sidecar (miniforge-nlp-
+  // sidecar, :8095) is CPU-only — no GPU capability of its own — so these are
+  // structural/linguistic extraction tools, not GPU compute tools.
+  // -------------------------------------------------------------------------
+
+  async nlpCapabilities(_args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'probe', target: 'nlp-sidecar', detail: `GET ${CONFIG.endpoints.nlpSidecar}/health` },
+      ], startTime);
+    }
+
+    try {
+      const response = await fetch(`${CONFIG.endpoints.nlpSidecar}/health`, {
+        signal: AbortSignal.timeout(CONFIG.timeouts.default),
+      });
+      if (!response.ok) return fail(`NLP sidecar health check failed: HTTP ${response.status}`, startTime);
+      const data = await response.json();
+      return { success: true, kind: 'result', data, duration: Date.now() - startTime };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  async nlpAnalyze(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { text, source_type, extraction_mode, document_id, source_ref, packet_key, language, max_chars, passes } = args ?? {};
+
+    const sourceTypes = new Set(['plain_text', 'docling_markdown', 'docling_json', 'ocr_text', 'transcript', 'codebase', 'general']);
+    const extractionModes = new Set(['entities', 'relationships', 'concepts', 'full']);
+    const passNames = new Set(['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded']);
+
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return fail('text must be a non-empty string', startTime);
+    }
+    if (text.length > 200_000) return fail('text exceeds max length (200000 chars)', startTime);
+    if (source_type !== undefined && !sourceTypes.has(source_type)) return fail('source_type is invalid', startTime);
+    if (extraction_mode !== undefined && !extractionModes.has(extraction_mode)) return fail('extraction_mode is invalid', startTime);
+    if (max_chars !== undefined && (!Number.isInteger(max_chars) || max_chars < 1 || max_chars > 200_000)) {
+      return fail('max_chars must be an integer between 1 and 200000', startTime);
+    }
+    if (passes !== undefined && (!Array.isArray(passes) || passes.some((pass: unknown) => typeof pass !== 'string' || !passNames.has(pass)))) {
+      return fail('passes contains an invalid pass name', startTime);
+    }
+
+    const body = {
+      text,
+      source_type: source_type ?? 'plain_text',
+      extraction_mode: extraction_mode ?? 'full',
+      document_id: document_id ?? null,
+      source_ref: source_ref ?? null,
+      packet_key: packet_key ?? null,
+      language: language ?? null,
+      max_chars: typeof max_chars === 'number' ? max_chars : 50000,
+      ...(Array.isArray(passes) ? { passes } : {}),
+    };
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'analyze', target: 'nlp-sidecar', detail: `POST /analyze — ${text.length} chars, mode=${body.extraction_mode}, source_type=${body.source_type}` },
+      ], startTime);
+    }
+
+    try {
+      const response = await fetch(`${CONFIG.endpoints.nlpSidecar}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(CONFIG.timeouts.llm),
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        return fail(`NLP sidecar /analyze failed: HTTP ${response.status}${detail ? ` — ${detail.slice(0, 300)}` : ''}`, startTime);
+      }
+      const data = await response.json();
+      return { success: true, kind: 'result', data, duration: Date.now() - startTime };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
+
+  async nlpAstChunk(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const { source, language, filePath, sourceRevision } = args ?? {};
+
+    if (!source || typeof source !== 'string') return fail('source must be a non-empty string', startTime);
+    if (source.length > 200_000) return fail('source exceeds max length (200000 chars)', startTime);
+    if (!language || typeof language !== 'string') return fail('language must be a non-empty string', startTime);
+    if (language.length > 64) return fail('language exceeds max length (64 chars)', startTime);
+    if (!filePath || typeof filePath !== 'string') return fail('filePath must be a non-empty string', startTime);
+    if (filePath.length > 2_000) return fail('filePath exceeds max length (2000 chars)', startTime);
+    if (!sourceRevision || typeof sourceRevision !== 'string') return fail('sourceRevision must be a non-empty string', startTime);
+    if (sourceRevision.length > 256) return fail('sourceRevision exceeds max length (256 chars)', startTime);
+
+    if (options?.dryRun) {
+      return planResult([
+        { action: 'chunk', target: 'nlp-sidecar', detail: `POST /ast/chunk — ${filePath} (${language}, ${source.length} chars)` },
+      ], startTime);
+    }
+
+    try {
+      const response = await fetch(`${CONFIG.endpoints.nlpSidecar}/ast/chunk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source, language, filePath, sourceRevision }),
+        signal: AbortSignal.timeout(CONFIG.timeouts.default),
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        return fail(`NLP sidecar /ast/chunk failed: HTTP ${response.status}${detail ? ` — ${detail.slice(0, 300)}` : ''}`, startTime);
+      }
+      const data = await response.json();
+      return { success: true, kind: 'result', data, duration: Date.now() - startTime };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -867,6 +994,7 @@ const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
   'langextract:extract', 'langextract:batch', 'search:hyperrag',
+  'nlp:capabilities', 'nlp:analyze', 'nlp:ast-chunk',
   'phase89:board-workflow', 'graph:snapshot-parity:validate',
   'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry',
   'atlas.kanban.list', 'atlas.kanban.show',
@@ -1084,7 +1212,7 @@ export const TOOLS: Record<string, ACPTool> = {
     name: 'metrics:snapshot',
     description: 'Get error-analysis system metrics + 24h history',
     category: 'error-analysis',
-    inputSchema: { type: 'object', properties: {} },
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     outputSchema: { type: 'object' },
     examples: [
       {
@@ -1191,6 +1319,81 @@ export const TOOLS: Record<string, ACPTool> = {
       { input: { query: 'context assembler', mode: 'codebase' }, output: {}, description: 'Search codebase for context assembler' }
     ],
     handler: handlers.searchHyperRag
+  },
+
+  // -------------------------------------------------------------------------
+  // NLP sidecar tools
+  // -------------------------------------------------------------------------
+
+  'nlp:capabilities': {
+    name: 'nlp:capabilities',
+    description: 'Health/capability probe for the miniforge NLP sidecar (spacy, langextract, tree-sitter, ast-grep, networkx availability). CPU-only service — no GPU capability.',
+    category: 'code',
+    inputSchema: { type: 'object', properties: {} },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: {},
+        output: { status: 'ok', capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, networkx: true, torch: false, cugraph: false } },
+        description: 'Check which NLP sidecar capabilities are actually available'
+      }
+    ],
+    handler: handlers.nlpCapabilities
+  },
+  'nlp:analyze': {
+    name: 'nlp:analyze',
+    description: 'Run the NLP sidecar\'s multi-pass analysis (structural/lexical/linguistic/semantic/sequence/rerank) over text, extracting entities/relationships/concepts/chunks/features.',
+    category: 'code',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Text to analyze (max 200,000 chars)', maxLength: 200000 },
+        source_type: { type: 'string', enum: ['plain_text', 'docling_markdown', 'docling_json', 'ocr_text', 'transcript', 'codebase', 'general'], default: 'plain_text' },
+        extraction_mode: { type: 'string', enum: ['entities', 'relationships', 'concepts', 'full'], default: 'full' },
+        document_id: { type: 'string' },
+        source_ref: { type: 'string' },
+        packet_key: { type: 'string' },
+        language: { type: 'string' },
+        max_chars: { type: 'integer', minimum: 1, maximum: 200000, default: 50000 },
+        passes: { type: 'array', items: { type: 'string', enum: ['structural', 'lexical', 'linguistic', 'semantic', 'sequence', 'rerank', 'grounded'] } }
+      },
+      required: ['text'],
+      additionalProperties: false
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { text: 'The court held that...', extraction_mode: 'entities' },
+        output: { document_id: 'auto', entities: [], relationships: [], concepts: [] },
+        description: 'Extract entities from a legal passage'
+      }
+    ],
+    handler: handlers.nlpAnalyze
+  },
+  'nlp:ast-chunk': {
+    name: 'nlp:ast-chunk',
+    description: 'Run tree-sitter/ast-grep structural chunking over source code, returning AstEvidenceResponseV2 (chunks + edges + syntax status). CPU-only, not a GPU pass.',
+    category: 'code',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        source: { type: 'string', description: 'Source code (max 200,000 chars)', maxLength: 200000 },
+        language: { type: 'string', description: 'Language identifier (e.g. typescript, python)', minLength: 1, maxLength: 64 },
+        filePath: { type: 'string', minLength: 1, maxLength: 2000 },
+        sourceRevision: { type: 'string', description: 'Content hash or revision identifier for provenance', minLength: 1, maxLength: 256 }
+      },
+      additionalProperties: false,
+      required: ['source', 'language', 'filePath', 'sourceRevision']
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { source: 'export function foo() {}', language: 'typescript', filePath: 'src/foo.ts', sourceRevision: 'sha256:abc' },
+        output: { schema: 'atlas.ast.evidence.v1', engine: 'tree-sitter', chunks: [], syntax_status: 'CLEAN' },
+        description: 'Chunk a TypeScript file via tree-sitter'
+      }
+    ],
+    handler: handlers.nlpAstChunk
   },
   'phase89:board-workflow': {
     name: 'phase89:board-workflow',

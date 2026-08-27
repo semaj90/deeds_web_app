@@ -123,10 +123,11 @@ services:
       VALKEY_URL: redis://:redis@valkey:6379/0
       # Qdrant vector database
       QDRANT_HTTP_URL: http://qdrant:6333
+      QDRANT_URL: http://qdrant:6333
       QDRANT_GRPC_HOST: qdrant
       QDRANT_GRPC_PORT: "6334"
       QDRANT_COLLECTION: codebase_chunks_768
-      QDRANT_VECTOR_NAME: semantic_768
+      QDRANT_VECTOR_NAME: content
       # Embedding service (semantic_768 producer)
       EMBEDDING_BASE_URL: http://legal-ai-go-embedding:8097
       EMBEDDING_REPRESENTATION: semantic_768

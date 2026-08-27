@@ -251,7 +251,8 @@ async function qdrantSearch(
   }
 
   const body: Record<string, unknown> = {
-    vector:       { name: 'content', vector },
+    query:        vector,
+    using:        'content',
     limit:        topK * 5, // oversample for downstream reranking
     with_payload: true,
     // Stage 1.7: pull the named `content` vector inline so GPU BatchCosine
@@ -262,15 +263,15 @@ async function qdrantSearch(
   if (must.length > 0) body.filter = { must };
 
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body),
       signal:  AbortSignal.timeout(10_000),
     });
     if (!res.ok) return [];
-    const d = await res.json() as { result?: QdrantHit[] };
-    return d.result ?? [];
+    const d = await res.json() as { result?: { points?: QdrantHit[] } };
+    return d.result?.points ?? [];
   } catch {
     return [];
   }

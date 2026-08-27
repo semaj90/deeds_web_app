@@ -16,7 +16,7 @@ import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
-const REPORT_PATH = path.join(REPO_ROOT, 'docs/reports/postgres-fts-identity-coverage-v1.json');
+const REPORT_PATH = path.join(REPO_ROOT, 'docs/reports/postgres-fts-canonical-coverage-v2.json');
 
 // Frozen query set — 6 real symbol names sampled from codebase_chunk_index
 // (2026-08-26) + 2 generic natural-language queries. Hardcoded so replay is
@@ -33,20 +33,26 @@ const FROZEN_QUERIES = [
 ];
 
 const env = loadRepoEnv(process.env);
+const statementTimeoutMs = Number(process.env.ATLAS_FTS_AUDIT_TIMEOUT_MS || 60000);
+const maxQueries = Math.max(1, Math.min(FROZEN_QUERIES.length,
+  Number(process.env.ATLAS_FTS_AUDIT_MAX_QUERIES || FROZEN_QUERIES.length)));
+const auditQueries = FROZEN_QUERIES.slice(0, maxQueries);
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(env),
   max: 1,
   connectionTimeoutMillis: 5000,
-  statement_timeout: 20000,
+  statement_timeout: statementTimeoutMs,
 });
 
 const report = {
-  schema: 'atlas.postgres-fts-identity-coverage.v1',
+  schema: 'atlas.postgres-fts-canonical-coverage.v2',
   generatedAt: new Date().toISOString(),
   readOnly: true,
   databaseWrites: false,
   baseCoverage: null,
   frozenQueries: FROZEN_QUERIES,
+  queriesRequested: auditQueries,
+  statementTimeoutMs,
   perQueryResults: [],
   summary: null,
   recommendation: null,
@@ -118,14 +124,10 @@ try {
     Object.entries(bridge.rows[0]).map(([k, v]) => [k, Number(v)]),
   );
 
-  // ---- Per-frozen-query: raw lexical hits vs canonical-joined hits ----
-  for (const query of FROZEN_QUERIES) {
-    const lexical = await pool.query(
-      `SELECT count(*)::int AS n FROM public.codebase_chunk_index ci
-       WHERE ci.search_vector @@ websearch_to_tsquery('english', $1)`,
-      [query],
-    );
-    const canonical = await pool.query(`
+  // ---- Per-frozen-query: one lexical lane, two alternative identity lanes ----
+  for (const query of auditQueries) {
+    try {
+      const canonical = await pool.query(`
       WITH q AS (SELECT websearch_to_tsquery('english', $1) AS tsq),
       lexical AS (
         SELECT ci.id::text AS lexical_id, ci.source_ref, ci.content_hash,
@@ -137,52 +139,100 @@ try {
         ORDER BY lexical_score DESC, ci.id
         LIMIT 100
       ),
-      canonical AS (
-        SELECT p.packet_key,
-               count(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,
-               row_number() OVER (PARTITION BY p.packet_key ORDER BY l.lexical_score DESC) AS packet_rank
-        FROM lexical AS l
+      exact AS (
+        SELECT l.lexical_id, p.packet_key
+        FROM lexical l
         JOIN public.atlas_packets AS p
           ON p.source_ref = l.source_ref AND p.content_hash = l.content_hash
         WHERE p.packet_key IS NOT NULL AND p.feature_id IS NOT NULL
+      ),
+      bridge AS (
+        SELECT l.lexical_id, p.packet_key
+        FROM lexical l
+        JOIN public.atlas_chunk_packet_identity_links link
+          ON link.chunk_index_id = l.lexical_id::uuid
+         AND link.match_method = 'EXACT_CANONICAL_ID'
+        JOIN public.atlas_packets p ON p.packet_key = link.canonical_packet_key
+        WHERE p.packet_key IS NOT NULL AND p.feature_id IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM exact e WHERE e.lexical_id = l.lexical_id
+          )
+      ),
+      resolved AS (
+        SELECT lexical_id, packet_key FROM exact
+        UNION
+        SELECT lexical_id, packet_key FROM bridge
+      ),
+      rejected AS (
+        SELECT DISTINCT l.lexical_id, link.match_method
+        FROM lexical l
+        JOIN public.atlas_chunk_packet_identity_links link
+          ON link.chunk_index_id = l.lexical_id::uuid
+        WHERE link.match_method IN ('AMBIGUOUS', 'UNRESOLVED')
       )
-      SELECT count(*)::int AS n FROM canonical WHERE identity_match_count = 1 AND packet_rank = 1
+      SELECT
+        (SELECT count(*)::int FROM lexical) AS raw_lexical_hits,
+        (SELECT count(DISTINCT lexical_id)::int FROM exact) AS hash_exact_hits,
+        (SELECT count(DISTINCT lexical_id)::int FROM bridge) AS bridge_exact_canonical_hits,
+        (SELECT count(DISTINCT e.lexical_id)::int FROM exact e JOIN bridge b USING (lexical_id)) AS overlap_between_lanes,
+        (SELECT count(DISTINCT packet_key)::int FROM resolved) AS deduplicated_canonical_hits,
+        (SELECT count(DISTINCT lexical_id)::int FROM rejected WHERE match_method = 'AMBIGUOUS') AS ambiguous_rejected,
+        (SELECT count(DISTINCT lexical_id)::int FROM rejected WHERE match_method = 'UNRESOLVED') AS unresolved_rejected
     `, [query]);
-    report.perQueryResults.push({
-      query,
-      rawLexicalHits: lexical.rows[0].n,
-      canonicalBoundHits: canonical.rows[0].n,
-      bindRate: lexical.rows[0].n > 0 ? canonical.rows[0].n / lexical.rows[0].n : null,
-    });
+      const row = canonical.rows[0];
+      const result = Object.fromEntries(Object.entries(row).map(([key, value]) => [key, Number(value)]));
+      report.perQueryResults.push({
+        query,
+        rawLexicalHits: result.raw_lexical_hits,
+        hashExactHits: result.hash_exact_hits,
+        bridgeExactCanonicalHits: result.bridge_exact_canonical_hits,
+        overlapBetweenLanes: result.overlap_between_lanes,
+        deduplicatedCanonicalHits: result.deduplicated_canonical_hits,
+        ambiguousRejected: result.ambiguous_rejected,
+        unresolvedRejected: result.unresolved_rejected,
+        bindRate: result.raw_lexical_hits > 0 ? result.deduplicated_canonical_hits / result.raw_lexical_hits : null,
+      });
+    } catch (error) {
+      report.perQueryResults.push({
+        query,
+        status: 'QUERY_TIMEOUT_OR_ERROR',
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   await pool.query('ROLLBACK');
 
   const bc = report.baseCoverage;
-  const totalHits = report.perQueryResults.reduce((s, r) => s + r.rawLexicalHits, 0);
-  const totalBound = report.perQueryResults.reduce((s, r) => s + r.canonicalBoundHits, 0);
+  const successfulQueries = report.perQueryResults.filter((r) => Number.isFinite(r.rawLexicalHits));
+  const totalHits = successfulQueries.reduce((s, r) => s + r.rawLexicalHits, 0);
+  const totalHashExact = successfulQueries.reduce((s, r) => s + r.hashExactHits, 0);
+  const totalBridgeExact = successfulQueries.reduce((s, r) => s + r.bridgeExactCanonicalHits, 0);
+  const totalOverlap = successfulQueries.reduce((s, r) => s + r.overlapBetweenLanes, 0);
+  const totalBound = successfulQueries.reduce((s, r) => s + r.deduplicatedCanonicalHits, 0);
+  const ambiguousRejected = successfulQueries.reduce((s, r) => s + r.ambiguousRejected, 0);
+  const unresolvedRejected = successfulQueries.reduce((s, r) => s + r.unresolvedRejected, 0);
   report.summary = {
     exactJoinCoverageOfChunks: bc.chunks_with_ref_and_hash > 0
       ? bc.exact_source_ref_content_hash_matches / bc.chunks_with_ref_and_hash : 0,
     atlasPacketsContentHashPopulationRate: bc.atlas_packets_total > 0
       ? bc.atlas_packets_content_hash_populated / bc.atlas_packets_total : 0,
-    totalFrozenQueryLexicalHits: totalHits,
-    totalFrozenQueryCanonicalBoundHits: totalBound,
+    successfulFrozenQueries: successfulQueries.length,
+    timedOutOrFailedFrozenQueries: report.perQueryResults.length - successfulQueries.length,
+    rawLexicalHits: totalHits,
+    hashExactHits: totalHashExact,
+    bridgeExactCanonicalHits: totalBridgeExact,
+    overlapBetweenLanes: totalOverlap,
+    deduplicatedCanonicalHits: totalBound,
+    ambiguousRejected,
+    unresolvedRejected,
     overallBindRate: totalHits > 0 ? totalBound / totalHits : null,
   };
-  report.recommendation = report.summary.atlasPacketsContentHashPopulationRate === 0
-    ? 'DO_NOT_PROMOTE: atlas_packets.content_hash is 0% populated, so the exact ' +
-      '(source_ref, content_hash) join structurally cannot bind any row right now — ' +
-      'this is a hash-semantics/population gap in atlas_packets, not a query bug. ' +
-      'Per explicit instruction, do NOT relax the join to source_ref-only as a fix — ' +
-      'that reintroduces ambiguous-match risk (see ambiguous_source_ref_groups below). ' +
-      'The real fix is backfilling atlas_packets.content_hash from its own source of truth ' +
-      'before this adapter can bind any canonical packet_key. An existing '
-      + 'chunk-to-packet bridge is reported separately, but it is partial and '
-      + 'does not replace the hash-qualified staleness check.'
-    : report.summary.exactJoinCoverageOfChunks < 0.5
-      ? 'LOW_COVERAGE: investigate hash-semantics mismatch before promoting.'
-      : 'COVERAGE_ACCEPTABLE_FOR_FURTHER_EVAL';
+  report.recommendation = report.summary.timedOutOrFailedFrozenQueries > 0
+    ? 'DO_NOT_PROMOTE: combined coverage is partial because one or more frozen queries timed out or failed; rerun with a bounded query set.'
+    : totalBound > 0
+      ? 'CONTINUE_REVIEW: hash-exact and exact-canonical bridge are alternative identity lanes in one lexical result set; do not count them as separate relevance votes.'
+      : 'DO_NOT_PROMOTE: no canonical candidates were bound; preserve strict identity rejection.';
 } catch (error) {
   report.status = 'ERROR';
   report.error = error instanceof Error ? error.message : String(error);

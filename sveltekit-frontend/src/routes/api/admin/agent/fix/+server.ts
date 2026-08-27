@@ -42,10 +42,10 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		const vector = embedData.embedding;
 
 		// Search Qdrant for similar fixes
-		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/search`, {
+		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase76_knowledge_base/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ vector, limit: 5,
+			body: JSON.stringify({ query: vector, limit: 5,
 				with_payload: true,
 				filter: { should: [
 						{
@@ -67,7 +67,7 @@ async function queryKnowledgeBase(filePath: string, errorContext: string): Promi
 		}
 
 		const searchData = await searchResponse.json();
-		const results = searchData?.result|| [];
+		const results = searchData?.result?.points || [];
 
 		// Concatenate relevant knowledge
 		const knowledge = results

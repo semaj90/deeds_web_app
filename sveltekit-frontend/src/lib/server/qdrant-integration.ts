@@ -47,13 +47,20 @@ export async function upsertVectors(points: PointStruct[]): Promise<UpsertRespon
  */
 export async function searchVectors(searchRequest: SearchRequest): Promise<SearchResponse> {
     try {
-        const response = await fetch(`${env.QDRANT_URL}/collections/${QDRANT_COLLECTION_NAME}/points/search`, {
+        const response = await fetch(`${env.QDRANT_URL}/collections/${QDRANT_COLLECTION_NAME}/points/query`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'api-key': env.QDRANT_API_KEY as string
             },
-            body: JSON.stringify(searchRequest)
+            body: JSON.stringify({
+                query: searchRequest.vector,
+                limit: searchRequest.limit,
+                filter: searchRequest.filter,
+                with_payload: searchRequest.with_payload,
+                with_vector: searchRequest.with_vector,
+                score_threshold: searchRequest.score_threshold,
+            })
         });
 
         if (!response.ok) {
@@ -61,10 +68,15 @@ export async function searchVectors(searchRequest: SearchRequest): Promise<Searc
             throw new Error(`Qdrant search error, ${response.status} - ${errorBody}`);
         }
 
-        return await parseQdrantJsonResponse<SearchResponse>(response, {
+        const parsed = await parseQdrantJsonResponse<{
+            result?: { points?: SearchResponse['result'] };
+            status: string;
+            time: number;
+        }>(response, {
             qdrantOperation: 'search',
             onTrace: logTrace
         });
+        return { ...parsed, result: parsed.result?.points ?? [] };
     } catch (error) {
         console.error('Error searching vectors in Qdrant: ', error);
         throw error;

@@ -60,12 +60,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const embedding = await generateEmbedding(query);
 
     // Search Qdrant
-    const qdrantUrl = QDRANT_URL + '/collections/' + KNOWLEDGE_COLLECTION + '/points/search';
+    const qdrantUrl = QDRANT_URL + '/collections/' + KNOWLEDGE_COLLECTION + '/points/query';
     const response = await fetch(qdrantUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: embedding,
+        query: embedding,
         limit: 5,
         with_payload: true,
       }),
@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
     const searchResults = await response.json();
 
-    const results = (searchResults?.result || []).map((hit: Record<string, any>) => ({
+    const results = (searchResults?.result?.points || []).map((hit: Record<string, any>) => ({
       title: hit.payload?.title ?? hit.payload?.source ?? 'Unknown',
       snippet: hit.payload?.content?.substring(0, 200) ?? hit.payload?.text?.substring(0, 200) ?? '',
       score: hit.score,

@@ -31,6 +31,7 @@ if (!fs.existsSync(tmpDir)) {
 // ─── Configuration ───────────────────────────────────────────────────────
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+const LLAMA_MODEL = process.env.GRAPHIFY_LLM_MODEL || process.env.LLAMA_MODEL || 'ornith-1.5-9b';
 const LIMIT = parseInt(process.env.LIMIT || '50');
 const DRY_RUN = process.env.DRY_RUN === 'true';
 const GEMMA4_ENABLED = process.env.GEMMA4_ENABLED !== 'false';
@@ -65,7 +66,7 @@ Return a JSON object with:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'hforf',
+				model: LLAMA_MODEL,
 				messages: [{ role: 'user', content: prompt }],
 				temperature: 0.3,
 				max_tokens: 512,
@@ -75,7 +76,7 @@ Return a JSON object with:
 		});
 
 		if (!response.ok) {
-			if (VERBOSE) console.log(`Gemma4 error (${response.status}), falling back to mock`);
+				if (VERBOSE) console.log(`Graphify model ${LLAMA_MODEL} error (${response.status}), falling back to mock`);
 			return extractFeaturesMock(sourceCode, filePath);
 		}
 
@@ -314,7 +315,7 @@ async function updateKanbanBoard(ganResults, cacheEntries) {
 
 async function runHealthChecks() {
 	const checks = {
-		gemma4: { ok: false, message: 'not checked' },
+		gemma4: { ok: false, model: LLAMA_MODEL, message: 'not checked' },
 		redis: { ok: false, message: 'not checked' },
 		qdrant: { ok: false, message: 'not checked' }
 	};
@@ -325,7 +326,7 @@ async function runHealthChecks() {
 			signal: AbortSignal.timeout(3000)
 		});
 		checks.gemma4.ok = res.ok;
-		checks.gemma4.message = res.ok ? 'online' : 'offline';
+		checks.gemma4.message = res.ok ? `online (${LLAMA_MODEL})` : 'offline';
 	} catch (err) {
 		checks.gemma4.message = err.message;
 	}
@@ -368,7 +369,7 @@ async function runHealthChecks() {
 
 async function main() {
 	console.log('[graphify-audit] Starting Graphify Audit with LangExtract');
-	console.log(`  Gemma4: ${GEMMA4_ENABLED ? 'enabled' : 'disabled'}`);
+	console.log(`  Graphify model: ${GEMMA4_ENABLED ? LLAMA_MODEL : 'disabled'}`);
 	console.log(`  Limit: ${LIMIT} files`);
 	console.log(`  Dry-run: ${DRY_RUN}`);
 	console.log();

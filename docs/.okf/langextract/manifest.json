@@ -1,0 +1,154 @@
+{
+  "schema": "atlas.langextract-okf-manifest.v1",
+  "output_namespace": "docs/.okf/langextract",
+  "source_revision": "langextract:1.6.0",
+  "documents": [
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:repository",
+      "source_ref": "docs/.okf/langextract/repository",
+      "source_url": "https://github.com/google/langextract",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:06.880Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract GitHub repository",
+      "content_hash": "0deda348b618b3655a251f295bcb4f86d772b7626e7f22505ad21f91809359ee",
+      "raw_checksum": "e6f9e417c2c8978a1fe8e53a7a854afd01d075be2ef1131f758c08a9c40c61ce",
+      "normalized_checksum": "0deda348b618b3655a251f295bcb4f86d772b7626e7f22505ad21f91809359ee",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\repository.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:readme",
+      "source_ref": "docs/.okf/langextract/readme",
+      "source_url": "https://github.com/google/langextract/blob/main/README.md",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:08.096Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract README",
+      "content_hash": "b1cfb8146c441d546b5e9de6793672819766edee24fa0b517070d0add2d755a4",
+      "raw_checksum": "bf663ce946e44943c3eb70a8aa4a6219f15ce61482529accbf8d5edad882c7e0",
+      "normalized_checksum": "b1cfb8146c441d546b5e9de6793672819766edee24fa0b517070d0add2d755a4",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\readme.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:pyproject",
+      "source_ref": "docs/.okf/langextract/pyproject",
+      "source_url": "https://github.com/google/langextract/blob/main/pyproject.toml",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:09.113Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract package metadata",
+      "content_hash": "fd1caa2a2eddf414d8ecf7e69263c343075bac870b87db339c354a6694f0ecf5",
+      "raw_checksum": "1aca2cae264dacc53bcc7cd608e658c867abdb85379534b10867e089f69cbbee",
+      "normalized_checksum": "fd1caa2a2eddf414d8ecf7e69263c343075bac870b87db339c354a6694f0ecf5",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\pyproject.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:releases",
+      "source_ref": "docs/.okf/langextract/releases",
+      "source_url": "https://github.com/google/langextract/releases",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:10.430Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract releases",
+      "content_hash": "e18214b9bb9411871f8e903f0050ffb803e8662cd6b0f5efcdd7994afc9f765c",
+      "raw_checksum": "30fb66979f3f10157e76aa1586625ddd5c2bae066ea2dbf26ab782b270c6b503",
+      "normalized_checksum": "e18214b9bb9411871f8e903f0050ffb803e8662cd6b0f5efcdd7994afc9f765c",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\releases.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:pypi",
+      "source_ref": "docs/.okf/langextract/pypi",
+      "source_url": "https://pypi.org/project/langextract/",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:11.025Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract PyPI project",
+      "content_hash": "1a36efa04eddc5a9287153dbc2450d91ee9558112725c24a2d7fad00307a70ee",
+      "raw_checksum": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+      "normalized_checksum": "1a36efa04eddc5a9287153dbc2450d91ee9558112725c24a2d7fad00307a70ee",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\pypi.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:providers",
+      "source_ref": "docs/.okf/langextract/providers",
+      "source_url": "https://github.com/google/langextract/blob/main/langextract/providers/README.md",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:12.295Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract provider integrations",
+      "content_hash": "089f69d44aa442a00d715515089a011d7a08a305ccd62f6f7f4a8a908cf74eb4",
+      "raw_checksum": "b7173f2cca75d829d1dd8e57db15ccab2840736929fcf728bc64dcf913173839",
+      "normalized_checksum": "089f69d44aa442a00d715515089a011d7a08a305ccd62f6f7f4a8a908cf74eb4",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\providers.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    },
+    {
+      "schema_version": "atlas.langextract-okf-document.v1",
+      "source_id": "langextract:longer-text-example",
+      "source_ref": "docs/.okf/langextract/longer-text-example",
+      "source_url": "https://github.com/google/langextract/blob/main/docs/examples/longer_text_example.md",
+      "source_revision": "langextract:1.6.0",
+      "fetched_at": "2026-08-26T19:26:13.484Z",
+      "fetcher": "BEAUTIFULSOUP_HTTP",
+      "title": "LangExtract grounded long-document example",
+      "content_hash": "4eb41de5b77846999fb94634e2f3ba11d0a019f4f9f4eb53c66d9a6835d13011",
+      "raw_checksum": "21387dd10b34a2b9fa3b016a4f03fa8d8d50a1b617a4c6e0bfa59038417167f8",
+      "normalized_checksum": "4eb41de5b77846999fb94634e2f3ba11d0a019f4f9f4eb53c66d9a6835d13011",
+      "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\longer-text-example.md",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "canonical_authority": false,
+      "tags": [
+        "langextract",
+        "official_docs",
+        "derived_okf"
+      ]
+    }
+  ]
+}

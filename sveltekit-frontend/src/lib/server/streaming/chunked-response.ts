@@ -256,13 +256,13 @@ export async function* streamRAGResponse(
 		if (embedding.length > 0) {
 			try {
 				const searchResponse = await fetch(
-          `${QDRANT_URL}/collections/${qdrantCollection}/points/search`,
+          `${QDRANT_URL}/collections/${qdrantCollection}/points/query`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             signal: AbortSignal.timeout(10_000),
             body: JSON.stringify({
-              vector: embedding,
+              query: embedding,
               limit: 5,
               with_payload: true,
             }),
@@ -271,7 +271,7 @@ export async function* streamRAGResponse(
 
 				if (searchResponse.ok) {
 					const searchResults = await searchResponse.json();
-					context = searchResults.result
+					context = searchResults.result?.points
 						?.map((r: any) => r.payload?.text ?? '')
 						.join('\n\n') ?? '';
 				}

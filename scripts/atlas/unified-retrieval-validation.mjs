@@ -90,7 +90,7 @@ async function validateUnifiedPipeline() {
   try {
     const stageStart = Date.now();
     const res = await fetch(
-      `${SERVICES.QDRANT}/collections/codebase_chunks_768/points/search`,
+      `${SERVICES.QDRANT}/collections/codebase_chunks_768/points/query`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

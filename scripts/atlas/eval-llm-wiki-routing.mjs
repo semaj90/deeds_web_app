@@ -80,10 +80,10 @@ async function embed(text) {
 
 // ── Qdrant search ─────────────────────────────────────────────────────────────
 async function qdrantSearch(vector, topK = 3) {
-  const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+  const r = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ vector, limit: topK, with_payload: true, score_threshold: 0.3 }),
+    body:    JSON.stringify({ query: vector, using: 'content', limit: topK, with_payload: true, score_threshold: 0.3 }),
     signal:  AbortSignal.timeout(5_000),
   });
   if (!r.ok) {
@@ -91,7 +91,7 @@ async function qdrantSearch(vector, topK = 3) {
     throw new Error(`Qdrant search failed: ${r.status}`);
   }
   const j = await r.json();
-  return j.result ?? [];
+  return j.result?.points ?? [];
 }
 
 // ── Redis ACE card check ──────────────────────────────────────────────────────

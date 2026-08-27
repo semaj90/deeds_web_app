@@ -36,10 +36,10 @@ export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 		}
 
 		// Search for similar components
-		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase89_code_units/points/search`, {
+		const searchResponse = await fetch(`${QDRANT_URL}/collections/phase89_code_units/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ vector, limit: 10,
+			body: JSON.stringify({ query: vector, limit: 10,
 				with_payload: true,
 				score_threshold: 0.7
 			}),
@@ -51,7 +51,7 @@ export const GET: RequestHandler = async ({ params, fetch, locals }) => {
 		}
 
 		const searchData = await searchResponse.json();
-		const results = searchData?.result|| [];
+		const results = searchData?.result?.points || [];
 
 		// Filter out the original component and format results
 		const related = results

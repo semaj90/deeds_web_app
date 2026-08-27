@@ -61,7 +61,11 @@ describe('Ornith 9B runtime plan', () => {
     const plan = planOrnithRuntime({ workload: 'KERNEL_EXPERIMENT', linuxAvailable: true, producerRevision: 'test' });
     expect(plan.primaryRuntime).toBe('PYTORCH_COMPILE_INDUCTOR');
     expect(plan.challengerRuntimes).toContain('PYTORCH_CUSTOM_TRITON');
+    expect(plan.challengerRuntimes).toContain('CUSTOM_QSA_LUT');
     expect(ornithRuntimeCapabilities('PYTORCH_CUSTOM_TRITON').openAiCompatibleServing).toBe(false);
+    expect(ornithRuntimeCapabilities('CUSTOM_QSA_LUT').supportsQuantizedLocalInference).toBe(true);
+    expect(ornithRuntimeCapabilities('CUSTOM_QSA_LUT').supportsModelInternalInstrumentation).toBe(true);
     expect(plan.reasons.some((reason) => reason.includes('Gated-DeltaNet'))).toBe(true);
   });
 });
+

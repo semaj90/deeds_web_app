@@ -125,7 +125,9 @@ export const VECTOR_MANIFESTS = {
     contentSha256: '',
     workspaceRevision: '',
     status: 'ACTIVE' as const,
-    qdrantVectorSlot: 'semantic_768',
+    // The logical representation is semantic_768; the live Qdrant
+    // projection stores it in the physical named slot `content`.
+    qdrantVectorSlot: 'content',
     postgresColumn: 'content_embedding_768',
   },
   semanticMrl512: {

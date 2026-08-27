@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:pyproject",
+  "source_ref": "docs/.okf/langextract/pyproject",
+  "source_url": "https://github.com/google/langextract/blob/main/pyproject.toml",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:09.113Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract package metadata",
+  "content_hash": "fd1caa2a2eddf414d8ecf7e69263c343075bac870b87db339c354a6694f0ecf5",
+  "raw_checksum": "1aca2cae264dacc53bcc7cd608e658c867abdb85379534b10867e089f69cbbee",
+  "normalized_checksum": "fd1caa2a2eddf414d8ecf7e69263c343075bac870b87db339c354a6694f0ecf5",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\pyproject.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://github.com/google/langextract/blob/main/pyproject.toml"
+}

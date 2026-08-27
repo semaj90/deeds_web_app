@@ -298,7 +298,7 @@ async function bruteForceTopK(
 }
 
 async function qdrantSearch(query: number[], k: number) {
-  const response = await qdrantFetch(`/collections/${QDRANT_COLLECTION}/points/search`, {
+  const response = await qdrantFetch(`/collections/${QDRANT_COLLECTION}/points/query`, {
     method: 'POST',
     body: JSON.stringify({
       vector: { name: QDRANT_DENSE_VECTOR, vector: query },

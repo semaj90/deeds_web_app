@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:longer-text-example",
+  "source_ref": "docs/.okf/langextract/longer-text-example",
+  "source_url": "https://github.com/google/langextract/blob/main/docs/examples/longer_text_example.md",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:13.484Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract grounded long-document example",
+  "content_hash": "4eb41de5b77846999fb94634e2f3ba11d0a019f4f9f4eb53c66d9a6835d13011",
+  "raw_checksum": "21387dd10b34a2b9fa3b016a4f03fa8d8d50a1b617a4c6e0bfa59038417167f8",
+  "normalized_checksum": "4eb41de5b77846999fb94634e2f3ba11d0a019f4f9f4eb53c66d9a6835d13011",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\longer-text-example.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://github.com/google/langextract/blob/main/docs/examples/longer_text_example.md"
+}

@@ -120,9 +120,9 @@ async function qdrantSearch(
   limit: number,
   filter?: Record<string, unknown>
 ) {
-  const body: Record<string, unknown> = { vector, limit, with_payload: true };
+  const body: Record<string, unknown> = { query: vector, limit, with_payload: true };
   if (filter) body.filter = filter;
-  const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+  const res = await fetch(`${QDRANT_URL}/collections/${collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -133,7 +133,7 @@ async function qdrantSearch(
     throw new Error(`[qdrantSearch] Qdrant search failed on collection ${collection}: ${res.status} ${errorText}`);
   }
   const data = await res.json();
-  return data.result ?? [];
+  return data.result?.points ?? [];
 }
 
 async function embedQuery(text: string): Promise<number[] | null> {

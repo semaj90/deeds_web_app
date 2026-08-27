@@ -185,12 +185,12 @@ export class QdrantKnowledgeStore {
     const qdrantFilter = this.buildFilter(filters);
 
     const response = await fetch(
-      `${this.config.url}/collections/${this.config.collection}/points/search`,
+      `${this.config.url}/collections/${this.config.collection}/points/query`,
       {
         method: 'POST',
         headers: this.getHeaders(),
         body: JSON.stringify({
-          vector: queryEmbedding,
+          query: queryEmbedding,
           limit: topK,
           score_threshold: threshold,
           with_payload: true,
@@ -205,7 +205,7 @@ export class QdrantKnowledgeStore {
     }
 
     const data = await response.json();
-    const results: QdrantSearchResult[] = data?.result || [];
+    const results: QdrantSearchResult[] = data?.result?.points || [];
 
     return results.map((r: any) => this.mapToSearchResult(r));
   }

@@ -1,18 +1,9 @@
 {
   "schema": "atlas.postgres-fts-identity-coverage.v1",
-  "generatedAt": "2026-08-26T02:44:59.165Z",
+  "generatedAt": "2026-08-26T21:07:58.261Z",
   "readOnly": true,
   "databaseWrites": false,
-  "baseCoverage": {
-    "chunks_with_ref_and_hash": 52380,
-    "exact_source_ref_content_hash_matches": 408,
-    "source_ref_only_matches_no_hash_agreement": 51972,
-    "unmatched_no_source_ref_at_all": 0,
-    "atlas_packets_content_hash_populated": 332,
-    "atlas_packets_total": 61660,
-    "ambiguous_source_ref_groups": 0,
-    "ambiguous_source_ref_packet_rows": 0
-  },
+  "baseCoverage": null,
   "frozenQueries": [
     "IngestionJobStatus",
     "GpuConfig",
@@ -23,68 +14,9 @@
     "embedding search",
     "packet identity"
   ],
-  "perQueryResults": [
-    {
-      "query": "IngestionJobStatus",
-      "rawLexicalHits": 15,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    },
-    {
-      "query": "GpuConfig",
-      "rawLexicalHits": 33,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    },
-    {
-      "query": "SystemStatus",
-      "rawLexicalHits": 76,
-      "canonicalBoundHits": 2,
-      "bindRate": 0.02631578947368421
-    },
-    {
-      "query": "ErrorPatchLogInsert",
-      "rawLexicalHits": 39,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    },
-    {
-      "query": "extractLegalEntities",
-      "rawLexicalHits": 6,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    },
-    {
-      "query": "CourtroomScene",
-      "rawLexicalHits": 5,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    },
-    {
-      "query": "embedding search",
-      "rawLexicalHits": 2165,
-      "canonicalBoundHits": 1,
-      "bindRate": 0.00046189376443418013
-    },
-    {
-      "query": "packet identity",
-      "rawLexicalHits": 667,
-      "canonicalBoundHits": 0,
-      "bindRate": 0
-    }
-  ],
-  "summary": {
-    "exactJoinCoverageOfChunks": 0.007789232531500573,
-    "atlasPacketsContentHashPopulationRate": 0.005384365877392151,
-    "totalFrozenQueryLexicalHits": 3006,
-    "totalFrozenQueryCanonicalBoundHits": 3,
-    "overallBindRate": 0.000998003992015968
-  },
-  "recommendation": "LOW_COVERAGE: investigate hash-semantics mismatch before promoting.",
-  "identityBridge": {
-    "bridge_rows": 105762,
-    "exact_bridge_rows": 4517,
-    "eligible_chunks_with_packet_bridge": 3013,
-    "eligible_chunks": 52380
-  }
+  "perQueryResults": [],
+  "summary": null,
+  "recommendation": null,
+  "status": "ERROR",
+  "error": "canceling statement due to statement timeout"
 }

@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.neo4j-identity-hydrate-receipt.v1",
+  "generatedAt": "2026-08-27T04:03:59.781Z",
+  "mode": "APPLY",
+  "writes": true,
+  "postgresPackets": 332,
+  "neo4jNodesScanned": 40754,
+  "matched": 370,
+  "alreadyHydrated": 0,
+  "unmatched": 40384,
+  "conflictingIdentifiers": 0,
+  "ambiguousIdentifiers": 0,
+  "appliedWrites": 370,
+  "sampleMatched": [
+    {
+      "path": "src/mcp/zod-to-json-schema-bridge/package.json",
+      "packet_id": "packet_50_1784513268274",
+      "packet_key": "ace:packet:53838a539084"
+    },
+    {
+      "path": "src/routes/api/admin/ai-chat/sessions/+server.ts",
+      "packet_id": "packet_92_1784513268274",
+      "packet_key": "ace:packet:c34901a242e1"
+    },
+    {
+      "path": "src/routes/api/admin/ai-chat/[sessionId]/+server.ts",
+      "packet_id": "packet_91_1784513268274",
+      "packet_key": "ace:packet:c6e2693b2ea3"
+    },
+    {
+      "path": "src/routes/(app)/code-intel/memory/+page.server.ts",
+      "packet_id": "packet_130_1784513268481",
+      "packet_key": "ace:packet:533b36a302bc"
+    },
+    {
+      "path": "src/types/third-party.d.ts",
+      "packet_id": "packet_80_1784513268574",
+      "packet_key": "ace:packet:024deb1c6154"
+    }
+  ],
+  "sampleUnmatched": [
+    "src/routes/api/library/ingest-dev-docs/+server.ts",
+    "src/lib/components/yorha/AGENTS.md",
+    "src/routes/(app)/demos/agentic-errors/analysis/AGENTS.md",
+    "src/lib/server/env.server.ts",
+    "src/lib/services/error-analysis/AGENTS.md"
+  ],
+  "hydrateChecksum": "69a03be9c58e9268725a65a0f5a29051123075f69c9308baac1d6b96570fefbb"
+}

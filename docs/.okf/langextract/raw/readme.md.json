@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:readme",
+  "source_ref": "docs/.okf/langextract/readme",
+  "source_url": "https://github.com/google/langextract/blob/main/README.md",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:08.096Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract README",
+  "content_hash": "b1cfb8146c441d546b5e9de6793672819766edee24fa0b517070d0add2d755a4",
+  "raw_checksum": "bf663ce946e44943c3eb70a8aa4a6219f15ce61482529accbf8d5edad882c7e0",
+  "normalized_checksum": "b1cfb8146c441d546b5e9de6793672819766edee24fa0b517070d0add2d755a4",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\readme.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://github.com/google/langextract/blob/main/README.md"
+}

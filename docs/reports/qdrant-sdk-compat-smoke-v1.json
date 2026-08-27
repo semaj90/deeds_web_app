@@ -1,6 +1,6 @@
 {
   "schema": "QdrantSdkCompatibilitySmokeV1",
-  "generatedAt": "2026-08-26T05:07:23.001Z",
+  "generatedAt": "2026-08-27T03:27:58.471Z",
   "sdk": "@qdrant/js-client-rest@1.19.0",
   "serverVersion": "1.19.0",
   "collection": "codebase_chunks_768",

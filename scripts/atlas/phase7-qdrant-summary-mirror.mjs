@@ -105,7 +105,7 @@ async function main() {
 
         // Qdrant: filter-only lookup by chunk_id to find the point (never a
         // real vector search — was carrying a dummy vector purely to satisfy
-        // the legacy /points/search endpoint; /points/scroll is the correct
+        // the legacy search endpoint; /points/scroll is the correct
         // filter-only read, and also fixes a pre-existing bug where the
         // filter used `query_filter` instead of Qdrant's actual `filter` key).
         // Note: Assuming chunk_id is indexed in Qdrant payload

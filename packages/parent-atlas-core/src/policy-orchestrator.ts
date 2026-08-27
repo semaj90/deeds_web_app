@@ -18,7 +18,7 @@
  *   // result.trace: RLM trace entry
  */
 
-import type { Packet, PacketIdentity } from './types';
+import type { Packet, PacketIdentity } from './types.js';
 
 export interface PolicyOrchestratorConfig {
   /**
@@ -360,7 +360,7 @@ export class ParentAtlasPolicyOrchestrator {
       evidence: selectedPackets.map((p) => ({
         packetId: p.id,
         score: 0.5, // TODO: get from policyScores
-        citation: p.sourceRef,
+        citation: p.source_ref,
         type: 'code'
       })),
       contextWindow: {

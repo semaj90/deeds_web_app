@@ -69,9 +69,9 @@ describe('HyperRagFusionService', () => {
   it('returns the canonical shape with reasons, signals, provenance, and graph paths', async () => {
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes('/collections/codebase_chunks_768/points/search')) {
+      if (url.includes('/collections/codebase_chunks_768/points/query')) {
         return new Response(JSON.stringify({
-          result: [{
+          result: { points: [{
             id: 'semantic-1',
             score: 0.91,
             payload: {
@@ -83,17 +83,17 @@ describe('HyperRagFusionService', () => {
               gpuCluster: 7,
             },
             vector: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)),
-          }],
+          }] },
         }), { status: 200 });
       }
 
-      if (url.includes('/collections/glyph_atlas/points/search')) {
+      if (url.includes('/collections/glyph_atlas/points/query')) {
         return new Response(JSON.stringify({
-          result: [{
+          result: { points: [{
             id: 'lens-1',
             score: 0.81,
             payload: { path: 'src/lib/server/retrieval/summary-lenses.ts', content: 'Summary lens body' },
-          }],
+          }] },
         }), { status: 200 });
       }
 
@@ -151,19 +151,19 @@ describe('HyperRagFusionService', () => {
 
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
-      if (url.includes('/collections/codebase_chunks_768/points/search')) {
+      if (url.includes('/collections/codebase_chunks_768/points/query')) {
         return new Response(JSON.stringify({
-          result: [{
+          result: { points: [{
             id: 'semantic-1',
             score: 0.91,
             payload: { stable_key: 'semantic-1', path: 'src/lib/server/retrieval/hyperrag-fusion-service.ts', content: 'Semantic match body' },
             vector: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)),
-          }],
+          }] },
         }), { status: 200 });
       }
 
-      if (url.includes('/collections/glyph_atlas/points/search')) {
-        return new Response(JSON.stringify({ result: [] }), { status: 200 });
+      if (url.includes('/collections/glyph_atlas/points/query')) {
+        return new Response(JSON.stringify({ result: { points: [] } }), { status: 200 });
       }
 
       if (url.includes('turbovec.test/search')) {

@@ -922,21 +922,23 @@ INSTRUCTIONS:
     filter?: any
   ) {
     try {
+      const vectorPayload = buildVectorPayload(collection, vector);
       const body = {
-        vector: buildVectorPayload(collection, vector),
+        query: Array.isArray(vectorPayload) ? vectorPayload : vectorPayload.vector,
+        ...(Array.isArray(vectorPayload) ? {} : { using: vectorPayload.name }),
         limit,
         filter,
         with_payload: true,
         with_vector: true,
       };
-      const res = await fetch(`${url}/collections/${collection}/points/search`, {
+      const res = await fetch(`${url}/collections/${collection}/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
       if (!res.ok) return [];
       const data = await res.json();
-      return (data.result ?? []).map((pt: any) => ({ ...pt, lane }));
+      return (data.result?.points ?? []).map((pt: any) => ({ ...pt, lane }));
     } catch {
       return [];
     }
@@ -1042,11 +1044,11 @@ INSTRUCTIONS:
     const collection = 'task_distillates';
 
     try {
-      const res = await fetch(`${qdrantUrl}/collections/${collection}/points/search`, {
+      const res = await fetch(`${qdrantUrl}/collections/${collection}/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: embedding,
+          query: embedding,
           limit: topK,
           with_payload: true,
         }),
@@ -1054,7 +1056,7 @@ INSTRUCTIONS:
 
       if (!res.ok) return null;
       const data = await res.json();
-      const hits = data.result || [];
+      const hits = data.result?.points || [];
 
       if (hits.length === 0) return null;
 

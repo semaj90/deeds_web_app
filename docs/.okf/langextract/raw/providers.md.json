@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:providers",
+  "source_ref": "docs/.okf/langextract/providers",
+  "source_url": "https://github.com/google/langextract/blob/main/langextract/providers/README.md",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:12.295Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract provider integrations",
+  "content_hash": "089f69d44aa442a00d715515089a011d7a08a305ccd62f6f7f4a8a908cf74eb4",
+  "raw_checksum": "b7173f2cca75d829d1dd8e57db15ccab2840736929fcf728bc64dcf913173839",
+  "normalized_checksum": "089f69d44aa442a00d715515089a011d7a08a305ccd62f6f7f4a8a908cf74eb4",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\providers.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://github.com/google/langextract/blob/main/langextract/providers/README.md"
+}

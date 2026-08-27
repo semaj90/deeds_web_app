@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.candidate-corpus-lineage-audit.v1",
+  "generatedAt": "2026-08-27T03:48:36.760Z",
+  "totalRowsAudited": 61660,
+  "admittedCount": 4951,
+  "excludedCount": 56709,
+  "admittedRatio": 0.08029516704508595,
+  "exclusions": {
+    "missingSourceRevision": 56708,
+    "missingSourceRef": 1,
+    "ambiguous": 0,
+    "breakdown": {
+      "MISSING_SOURCE_REVISION": 56708,
+      "MISSING_SOURCE_REF": 1
+    }
+  },
+  "sampleAdmitted": [
+    {
+      "canonicalId": "00a1065c-9748-4ccd-97f8-04370464bdd6",
+      "packetKey": "c6cd8b39d33db2aa",
+      "sourceRef": "proto:RetrievalService.StreamEvidence",
+      "treeNodeId": "b6e587ed-aaaf-4a8b-95e3-68eebaa71858",
+      "symbolVersionId": null,
+      "featureId": "grpc_service",
+      "workspaceRevision": "workspace-active-v1",
+      "sourceRevision": "98eae4cacad4847770e9978b7add341d28d5f45efbd45c0ad32802d8fa610f9c",
+      "graphRevision": "graph-tree:b6e587ed-aaaf-4a8b-95e3-68eebaa71858",
+      "semanticRevision": null,
+      "sourceKind": "rpc_method"
+    },
+    {
+      "canonicalId": "047e8f8d-73b1-408a-95e2-ab66610ac5fe",
+      "packetKey": "748e8cfa0abd4e6a",
+      "sourceRef": "proto:EmbeddingService.Health",
+      "treeNodeId": "c0c255d4-b096-4a8e-9335-20e9d1b5bc31",
+      "symbolVersionId": null,
+      "featureId": "grpc_service",
+      "workspaceRevision": "workspace-active-v1",
+      "sourceRevision": "e825dd0fe25cc671335b5fe643d1c358eaef65ce0b561da06ff3dc3e4ea2f285",
+      "graphRevision": "graph-tree:c0c255d4-b096-4a8e-9335-20e9d1b5bc31",
+      "semanticRevision": null,
+      "sourceKind": "rpc_method"
+    },
+    {
+      "canonicalId": "06cf846d-a475-4155-9d45-4b16e2eb7f5a",
+      "packetKey": "8d44b9719637706f",
+      "sourceRef": "proto:ChatAssistantService.GetHistory",
+      "treeNodeId": "3661d188-2570-40ee-b9c1-8346972af361",
+      "symbolVersionId": null,
+      "featureId": "grpc_service",
+      "workspaceRevision": "workspace-active-v1",
+      "sourceRevision": "8a3f4b4d633b03dc95e3793f4af222109222d6bebeda90de2815922726086327",
+      "graphRevision": "graph-tree:3661d188-2570-40ee-b9c1-8346972af361",
+      "semanticRevision": null,
+      "sourceKind": "rpc_method"
+    },
+    {
+      "canonicalId": "0796e064-a042-443e-aa88-8862d151ddbf",
+      "packetKey": "d1ae3babc408287b",
+      "sourceRef": "proto:RetrievalService.ExpandAstNeighbors",
+      "treeNodeId": "a37e66d9-8796-4040-a787-b64113467df2",
+      "symbolVersionId": null,
+      "featureId": "grpc_service",
+      "workspaceRevision": "workspace-active-v1",
+      "sourceRevision": "98eae4cacad4847770e9978b7add341d28d5f45efbd45c0ad32802d8fa610f9c",
+      "graphRevision": "graph-tree:a37e66d9-8796-4040-a787-b64113467df2",
+      "semanticRevision": null,
+      "sourceKind": "rpc_method"
+    },
+    {
+      "canonicalId": "0a9ecb2d-6992-458e-b8a9-042f2f8ff691",
+      "packetKey": "3bf3bc0c64d433c0",
+      "sourceRef": "proto:LibrarySearchService.GetDocumentToc",
+      "treeNodeId": "92e5199d-bc8e-4cff-ad97-57a4ec47a851",
+      "symbolVersionId": null,
+      "featureId": "grpc_service",
+      "workspaceRevision": "workspace-active-v1",
+      "sourceRevision": "1994c9237e5790651304df347fee23f9e47995a23bc22f963dccfd4d6423d606",
+      "graphRevision": "graph-tree:92e5199d-bc8e-4cff-ad97-57a4ec47a851",
+      "semanticRevision": null,
+      "sourceKind": "rpc_method"
+    }
+  ],
+  "lineageChecksum": "1758bd91dc69e3313b9cfa94ebdbe2a2c7c96d54f80a12740161600397038b79"
+}

@@ -387,13 +387,14 @@ async function searchVector(
   filter?: Record<string, unknown>
 ): Promise<Array<{ id: number | string; score: number; payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
-    vector: { name: vectorName, vector },
+    query: vector,
+    using: vectorName,
     limit,
     with_payload: true,
   };
   if (filter) body.filter = filter;
 
-  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -401,7 +402,7 @@ async function searchVector(
 
   if (!res.ok) return [];
   const data = await res.json();
-  return data.result ?? [];
+  return data.result?.points ?? [];
 }
 
 /**

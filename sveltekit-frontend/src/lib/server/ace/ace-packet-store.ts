@@ -201,7 +201,13 @@ export async function writeAcePacket(
     pipeline.set(taskKey(full.workspace_task_id), full.packet_id, 'EX', ttl);
   }
 
-  await pipeline.exec();
+  const results = await pipeline.exec();
+  const failures = (results ?? [])
+    .map(([error], index) => error ? { index, message: error.message } : null)
+    .filter((failure): failure is { index: number; message: string } => failure !== null);
+  if (failures.length > 0) {
+    throw new Error(`ACE Valkey pipeline failed for ${failures.length} command(s): ${failures.map((f) => `${f.index}:${f.message}`).join('; ')}`);
+  }
   return full;
 }
 

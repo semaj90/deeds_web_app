@@ -1,22 +1,22 @@
 # Feature Lineage Report
 
-Generated: 2026-06-06T01:12:12.943Z
+Generated: 2026-08-27T05:05:51.233Z
 
 ## Sampling
 
-- sample mode: yes
-- sample limit: 100
-- max discovery files: 25
-- warning: bounded sample; coverage is directional, not exhaustive
+- sample mode: no
+- sample limit: full
+- max discovery files: full
+- warning: none
 
 ## Coverage
 
-- total rows: 100
-- sourceRef rows: 100 (100%)
-- featureId rows: 100 (100%)
-- featureLabel rows: 100 (100%)
-- path rows: 100
-- taskId rows: 0
+- total rows: 6766
+- sourceRef rows: 6765 (99.99%)
+- featureId rows: 6765 (99.99%)
+- featureLabel rows: 6765 (99.99%)
+- path rows: 3312
+- taskId rows: 3454
 - runId rows: 0
 
 ## Higher-Hop Coverage
@@ -29,11 +29,11 @@ Generated: 2026-06-06T01:12:12.943Z
 
 ## Hop Coverage
 
-- sourceRef: 100 (100%)
-- featureId: 100 (100%)
-- featureLabel: 100 (100%)
-- path: 100 (100%)
-- taskId: 0 (0%)
+- sourceRef: 6765 (99.99%)
+- featureId: 6765 (99.99%)
+- featureLabel: 6765 (99.99%)
+- path: 3312 (48.95%)
+- taskId: 3454 (51.05%)
 - runId: 0 (0%)
 - somCluster: 0 (0%)
 - glyphRecord: 0 (0%)
@@ -105,487 +105,647 @@ Generated: 2026-06-06T01:12:12.943Z
 ## Higher-Hop Candidate Discovery
 
 - scanned roots: .tmp, docs/reports, memory, ../memory
-- scanned files: 25
+- scanned files: 500
 
 - somCluster
-  - candidate evidence exists anywhere: no
-  - candidate files found: none
-  - candidate field names found: none
-  - sample values: none
+  - candidate evidence exists anywhere: yes
+  - candidate files found: ../memory/GATE-2-INVESTIGATION-COMPLETE.md, ../memory/SESSION-104-PHASE-8-FINAL-OPERATIONAL.md, ../memory/SESSION-108-CARD-3-PROMOTION-POLICY-MASTER.md, ../memory/SESSION-108-CARD-3-REVISED-ACTUAL-STATE.md, ../memory/SESSION-108-CONTINUATION-PHASE-1-COMPLETE.md, ../memory/SESSION-108-FOUR-LAYER-REORGANIZATION.md, ../memory/SESSION-108-MASTER-ROADMAP-FINAL.md, ../memory/SESSION-108-P1-SOM-CONTRACT-FIX.md, ../memory/SESSION-115-118-PHASE-1-2-COMPLETE.md, ../memory/SESSION-141-GATE-2-BLOCKER-SUMMARY.md, ../memory/atlas/documents-atlas.latest.md, ../memory/exports/turboquant-template-matches.txt
+  - candidate field names found: som_cluster, somCluster, cluster_id, clusterId, centroid_id
+  - sample values: - 32,266 packets (52.33%) have NULL `som_cluster_id` | WHERE som_cluster_id IS NULL; | | **5** | SOM 20×20 topology derivation | ✅ LIVE | 32,000+ packets | som_cluster, som_row, som_col assigned | | number; // Flattened grid ID | 32,000+ (flattened) ✅ | page_rank_score, kmeans_cluster, som_cluster, community_id | SELECT COUNT(DISTINCT som_cluster) as unique_clusters FROM atlas_packets; | WHERE som_cluster IS NOT NULL | - For packets with NULL tree_node_id: derive from som_cluster | 42, page_rank=0.5, confidence=0.8
   - probable join key: som_cluster
   - why current lineage join is 0%: The lineage rows never project SOM cluster metadata, so this hop stays empty even though the artifacts may carry the field names.
 - glyphRecord
-  - candidate evidence exists anywhere: no
-  - candidate files found: none
-  - candidate field names found: none
-  - sample values: none
+  - candidate evidence exists anywhere: yes
+  - candidate files found: ../memory/atlas/documents-atlas.latest.md, ../memory/exports/turboquant-template-matches.txt, ../memory/atlas/documents-atlas.inverted.json, ../memory/knowledge/document-knowledge-report.md, ../memory/reports/directory-source-map.md, memory/runs/2026-06-01T21-49-00/plan.md, memory/runs/2026-06-02T14-53-38/plan.md, memory/runs/2026-06-02T14-55-15/plan.md, memory/runs/2026-06-03T19-42-51/plan.md, memory/runs/2026-06-09T04-15-12/plan.md, memory/runs/2026-06-13T19-23-38/plan.md, memory/runs/2026-06-13T21-48-06/plan.md
+  - candidate field names found: glyph_record, glyphRecord, glyphId, glyph
+  - sample values: "Accept either dedicated glyph_records table OR documented JSONB persistence fields", | "4. atlas_glyph_records (UTF-8 / SVG / Glyphs)", | "Tier A — Code Connectivity (G1–G9) | Gate | Check | Command | |------|-------|---------| | G1 | Static ESM imports | `… | .opencode/cards/index.json:31397: "title": "continue check for errors enhancements web search this is proper for nes ca… | .opencode/cards/index.json:33503: "title": "docker volume rm deeds_langfuse_data deeds_clickhouse_data/r/n```/r/n/r/nRe… | .opencode/cards/index.json:48935: "title": "rg /"grpoRewardScore|scoreGRPOReward|rewardScoreGPU/" src/lib/server/ src/r… | "summary": "Glyph Training Notes Smoke run summary (scripts/atlas/smoke-glyph-schema.mjs): sveltekit-frontend/src/lib/s… | "summary": "Create SVG Glyphs Table Timestamp: 2026-06-29T00:13:07.519Z Mode: APPLY Status: PASS Overview Creates the a… | "summary": "Higher-Hop Enrichment Fields Backfill Timestamp: 2026-06-15T08:24:32.416Z Mode: DRYRUN Status: PASS Backfil… | "summary": "Higher-Hop Enrichment Gate Verification Timestamp: 2026-06-15T08:25:33.373Z Status: PASS Gate Results | Gat…
   - probable join key: glyph_record
   - why current lineage join is 0%: Glyph metadata is not part of the current lineage surface, so any glyph-shaped evidence remains disconnected from the normalized rows.
 - qdrantHit
-  - candidate evidence exists anywhere: no
-  - candidate files found: none
-  - candidate field names found: none
-  - sample values: none
+  - candidate evidence exists anywhere: yes
+  - candidate files found: ../memory/atlas/documents-atlas.latest.md, ../memory/packets/CONTRACT.md, ../memory/packets/nes-chrom-packets.jsonl, ../memory/PARENT-ATLAS-LAYERED-IDENTITY-PIPELINE.md, ../memory/PHASE-1-DIAGNOSIS-COMPLETE.md, ../memory/PHASE-1-LEDGER-GATE-STATUS.md, ../memory/PHASE-3-WEEK-2-3-COMPLETION.md, ../memory/QDRANT-ARTIFACT-KIND-FULL-COLLECTION-PARITY-VERIFIED.md, ../memory/QDRANT-IDENTITY-LANE-CLASSIFICATION-FINAL.md, ../memory/QDRANT-POSTGRES-IDENTITY-AUDIT-COMPLETE.md, ../memory/SESSION-104-PHASE-8-FINAL-OPERATIONAL.md, ../memory/SESSION-108-CARD-2-COMPLETE.md
+  - candidate field names found: qdrant_hit, qdrantHit, qdrant_hits, qdrant_point_id, point_id
+  - sample values: "Expect: qdrant_hits rises, qdrant_point_id populated", | "qdrant_hits": ["chunk_88"], | "summary": "Higher-Hop Enrichment Fields Backfill Timestamp: 2026-06-15T08:24:32.416Z Mode: DRYRUN Status: PASS Backfil… | "summary": "Higher-Hop Enrichment Gate Verification Timestamp: 2026-06-15T08:25:33.373Z Status: PASS Gate Results | Gat… | 14 | 30 | 6 | 0 | 25 | 11
   - probable join key: qdrant_point_id
   - why current lineage join is 0%: The lineage auditor tracks sourceRef and featureId, but it does not yet hydrate raw Qdrant hit identifiers into the row set.
 - redisHotKey
-  - candidate evidence exists anywhere: no
-  - candidate files found: none
-  - candidate field names found: none
-  - sample values: none
+  - candidate evidence exists anywhere: yes
+  - candidate files found: ../memory/packets/CONTRACT.md, ../memory/atlas/documents-atlas.latest.md, ../memory/SESSION-104-PHASE-8-FINAL-OPERATIONAL.md, ../memory/exports/turboquant-template-matches.txt
+  - candidate field names found: redis_hot_key, redisHotKey, redis_key, redisKeys, hot_key
+  - sample values: "redis_hot_keys": [], | "summary": "Higher-Hop Enrichment Fields Backfill Timestamp: 2026-06-15T08:24:32.416Z Mode: DRYRUN Status: PASS Backfil… | "summary": "Higher-Hop Enrichment Gate Verification Timestamp: 2026-06-15T08:25:33.373Z Status: PASS Gate Results | Gat… | string; // BitFrost cache key | redis_key, mmap_offset, cache_version, ttl_seconds | sveltekit-frontend/docs_readme/deeds_labs_archive/svelte-check-errors.json:297673:class TensorRTLLMService { private te… | sveltekit-frontend/docs_readme/deeds_labs_archive/svelte-check-current.json:227938:class TensorRTLLMService { private t…
   - probable join key: redis_hot_key
   - why current lineage join is 0%: Redis key evidence may exist in reports or packet payloads, but the lineage rows do not carry a hot-key field today.
 - neo4jNode
-  - candidate evidence exists anywhere: no
-  - candidate files found: none
-  - candidate field names found: none
-  - sample values: none
+  - candidate evidence exists anywhere: yes
+  - candidate files found: ../memory/SESSION-104-PHASE-8-FINAL-OPERATIONAL.md, ../memory/atlas/documents-atlas.latest.md, memory/runs/2026-06-18T22-14-37/plan.md, memory/runs/2026-06-19T04-07-12/plan.md, ../memory/exports/turboquant-template-matches.txt, ../memory/GATE-2-INVESTIGATION-COMPLETE.md, ../memory/PARENT-ATLAS-LAYERED-IDENTITY-PIPELINE.md, ../memory/PHASE-1-DIAGNOSIS-COMPLETE.md, ../memory/QDRANT-POSTGRES-IDENTITY-AUDIT-COMPLETE.md, ../memory/SESSION-108-CARD-3-PROMOTION-POLICY-MASTER.md, ../memory/SESSION-108-CARD-3-REVISED-ACTUAL-STATE.md, ../memory/SESSION-108-CARD-3-REVISED-FINAL-ROADMAP.md
+  - candidate field names found: neo4j_node, neo4jNode, node_id, nodeId, graph_node
+  - sample values: neo4j_node_id: string; // Graph node reference | "Issue: /"neo4j_node_id coverage 40% — below 80%/"", | "/"neo4j_node_id coverage 40%/"", | 858b77e217 **Open — real remaining work**: - #9 HyperRAG fusion wiring (~80%, smoke passes, BM25+RRF+TurboVec lane not … | "summary": "Higher-Hop Enrichment Fields Backfill Timestamp: 2026-06-15T08:24:32.416Z Mode: DRYRUN Status: PASS Backfil… | .opencode/cards/index.json:11645: "title": "> yorha-legal-ai-frontend@1.0.0 test:run/n> cd sveltekit-frontend && vitest… | .opencode/cards/index.json:11651: "title": "> yorha-legal-ai-frontend@1.0.0 test:run/r/n> cd sveltekit-frontend && vite… | | **3** | tree_node_id Coverage | 58,365 / 61,659 (94.66%) | ✅ GOOD | | COUNT(CASE WHEN tree_node_id IS NULL THEN 1 END) null_tree_id, | ## Gate 3: tree_node_id Identity Coverage
   - probable join key: neo4j_node
   - why current lineage join is 0%: Neo4j node evidence is visible in graph-oriented artifacts, but the lineage auditor does not yet project those node identifiers into the normalized feature rows.
 
 ## Field Name Mismatch Discovery
 
 - qdrantHit
-  - actual field names found: none
-  - sample payload keys: none
-  - expected aliases missing: none
-  - expected aliases present: none
-  - recommended alias patch only: Qdrant alias discovery unavailable
+  - actual field names found: id, payload, payload.atlas_enriched, payload.atlas_enriched_at, payload.bm25_text, payload.canonicalSourceRef, payload.canonical_source_ref, payload.chunk_id, payload.cluster_key, payload.communityId, payload.communitySize, payload.community_conf, payload.community_id, payload.concept_ids, payload.content_hash, payload.domain_class, payload.embedding_ref, payload.feature_id, payload.feature_label, payload.filePath, payload.file_path, payload.graphAuthorityScore, payload.hash, payload.lane_ids, payload.ledger_type, payload.lineage_version, payload.metadata, payload.metadata.ae_epoch, payload.metadata.ae_timestamp, payload.metadata.ae_val_loss, payload.metadata.som_updated_at, payload.metadata.used_concepts, payload.packetKey, payload.packet_key, payload.packet_kind, payload.packet_version, payload.pagerank, payload.path, payload.payload_backfilled_at, payload.qdrant_collection, payload.qdrant_point_id, payload.qdrant_vector_dim, payload.relative_path, payload.representation_id, payload.som_cluster, payload.sourceRef, payload.sourceRefs, payload.source_ref, payload.source_ref_key, payload.tags, payload.tree_node_id
+  - sample payload keys: atlas_enriched, atlas_enriched_at, bm25_text, canonicalSourceRef, canonical_source_ref, chunk_id, cluster_key, communityId, communitySize, community_conf, community_id, concept_ids, content_hash, domain_class, embedding_ref, feature_id, feature_label, filePath, file_path, graphAuthorityScore, hash, lane_ids, ledger_type, lineage_version, metadata, packetKey, packet_key, packet_kind, packet_version, pagerank, path, payload_backfilled_at, qdrant_collection, qdrant_point_id, qdrant_vector_dim, relative_path, representation_id, som_cluster, sourceRef, sourceRefs, source_ref, source_ref_key, tags, tree_node_id
+  - expected aliases missing: point_id, qdrantHit, qdrant_hit, qdrant_hits, qdrant_point_id
+  - expected aliases present: id, payload.file_path, payload.source_ref
+  - recommended alias patch only: Qdrant alias discovery: map qdrantHit to actual fields (id, payload, payload.atlas_enriched, payload.atlas_enriched_at, payload.bm25_text, payload.canonicalSourceRef, payload.canonical_source_ref, payload.chunk_id, payload.cluster_key, payload.communityId, payload.communitySize, payload.community_conf); missing expected aliases: point_id, qdrantHit, qdrant_hit, qdrant_hits, qdrant_point_id; no writes.
 - neo4jNode
-  - actual field names found: none
-  - sample CodebaseFile property keys: none
-  - expected aliases missing: none
-  - expected aliases present: none
-  - recommended alias patch only: Neo4j alias discovery unavailable
+  - actual field names found: betweennessScore, communityId, community_id, community_id.high, community_id.low, elementId, filePath, graphAuthorityScore, graphPageRank, kcoreValue, kcoreValue.high, kcoreValue.low, keys, labels, leidenCommunity, leidenCommunity.high, leidenCommunity.low, louvainCommunity, louvainCommunity.high, louvainCommunity.low, pageRankScore, pagerank, properties, sourceRef, updated_at, updated_at.day, updated_at.day.high, updated_at.day.low, updated_at.hour, updated_at.hour.high, updated_at.hour.low, updated_at.minute, updated_at.minute.high, updated_at.minute.low, updated_at.month, updated_at.month.high, updated_at.month.low, updated_at.nanosecond, updated_at.nanosecond.high, updated_at.nanosecond.low, updated_at.second, updated_at.second.high, updated_at.second.low, updated_at.timeZoneId, updated_at.timeZoneOffsetSeconds, updated_at.timeZoneOffsetSeconds.high, updated_at.timeZoneOffsetSeconds.low, updated_at.year, updated_at.year.high, updated_at.year.low
+  - sample CodebaseFile property keys: betweennessScore, communityId, community_id, filePath, graphAuthorityScore, graphPageRank, kcoreValue, leidenCommunity, louvainCommunity, pageRankScore, pagerank, updated_at
+  - expected aliases missing: graph_node, neo4jNode, neo4j_node, nodeId, node_id, source_ref
+  - expected aliases present: filePath, sourceRef
+  - recommended alias patch only: Neo4j alias discovery: map neo4jNode to actual fields (betweennessScore, communityId, community_id, community_id.high, community_id.low, elementId, filePath, graphAuthorityScore, graphPageRank, kcoreValue, kcoreValue.high, kcoreValue.low); missing expected aliases: graph_node, neo4jNode, neo4j_node, nodeId, node_id, source_ref; no writes.
 
 ## Live Hop Sampling
 
-- routeRuntimePackets
+- route_runtime_packets
   - source: postgres
   - env: DATABASE_URL
-  - status: skipped
+  - status: sampled
+  - sampled count: 3
+  - detected join keys: none
+  - sample values: none
+  - interpretation: field-name mismatch in sampled live source
+- parent_atlas_documents
+  - source: postgres
+  - env: DATABASE_URL
+  - status: sampled
+  - sampled count: 3
+  - detected join keys: source_ref, rel_path, feature_id, qdrant_point_id
+  - sample values: src/lib/components/AGENTS.md | src/lib/components | AGENTS | 131 | sveltekit-frontend/src/routes/(app)/simulation/+page.svelte | sveltekit-frontend | sveltekit-frontend.+page | 092f65d1-23f3-4da3-8a3d-f2127975653f | src/routes/api/codebase-index/orchestrate/+server.ts | src/routes/api/codebase-index/orchestrate
+  - interpretation: postgres rows sampled successfully
+- atlas_feature_map_synthesized
+  - source: postgres
+  - env: DATABASE_URL
+  - status: sampled
   - sampled count: 0
   - detected join keys: none
   - sample values: none
-  - interpretation: skipped in sample mode
-- parentAtlasDocuments
+  - interpretation: data absent in sampled live source
+- atlas_feature_synthesis
   - source: postgres
   - env: DATABASE_URL
-  - status: skipped
+  - status: sampled
   - sampled count: 0
   - detected join keys: none
   - sample values: none
-  - interpretation: skipped in sample mode
-- atlasFeatureMapSynthesized
-  - source: postgres
-  - env: DATABASE_URL
-  - status: skipped
-  - sampled count: 0
-  - detected join keys: none
-  - sample values: none
-  - interpretation: skipped in sample mode
-- atlasFeatureSynthesis
-  - source: postgres
-  - env: DATABASE_URL
-  - status: skipped
-  - sampled count: 0
-  - detected join keys: none
-  - sample values: none
-  - interpretation: skipped in sample mode
+  - interpretation: data absent in sampled live source
 - qdrantHit
   - source: qdrant
   - env: QDRANT_URL
-  - status: skipped
-  - sampled count: 0
-  - detected join keys: none
-  - sample values: none
-  - interpretation: skipped in sample mode
+  - status: sampled
+  - sampled count: 3
+  - detected join keys: qdrant_point_id, source_ref, feature_id, file_path, som_cluster
+  - sample values: 1 | card:src/AGENTS.md:0852bd8c141bccf6-0852bd8c | 2 | 1932145650 | sveltekit-frontend/src/AGENTS.md | AGENTS | src/AGENTS.md | 0 | 3
+  - interpretation: Qdrant scroll sampled successfully
 - redisHotKey
   - source: redis
   - env: REDIS_URL
-  - status: skipped
-  - sampled count: 0
-  - detected join keys: none
-  - sample values: none
-  - interpretation: skipped in sample mode
+  - status: sampled
+  - sampled count: 3
+  - detected join keys: gpu:karpathy:summary, gpu:karpathy:scores, ace:path:cluster:1
+  - sample values: gpu:karpathy:summary | gpu:karpathy:scores | ace:path:cluster:1
+  - interpretation: bounded SCAN completed
 - neo4jNode
   - source: neo4j
   - env: NEO4J_URI
-  - status: skipped
-  - sampled count: 0
-  - detected join keys: none
-  - sample values: none
-  - interpretation: skipped in sample mode
+  - status: sampled
+  - sampled count: 3
+  - detected join keys: filePath
+  - sample values: CodebaseFile | C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/auth-store.svelte.ts | 4:4f7af8c7-380a-4f16-a9a7-74054ce03751:317579 | C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/hooks.client.ts | 4:4f7af8c7-380a-4f16-a9a7-74054ce03751:317580 | C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/hooks.server.ts | 4:4f7af8c7-380a-4f16-a9a7-74054ce03751:317581
+  - interpretation: CodebaseFile sample query completed
 
 ## Lineage Score
 
 - average lineage score: 36.36%
 - max lineage score: 36.36%
-- rows missing higher-hop stages: 100
+- rows missing higher-hop stages: 6766
 
 ## Higher-Hop Gap Groups
 
 - feature_id:feature:todo:fadfc0e985f4f0e151eaf542
-  - row count: 2
+  - row count: 6
   - featureIds: feature:todo:fadfc0e985f4f0e151eaf542
   - sourceRefs: .opencode/recommendations.json
   - paths: .opencode/recommendations.json
-  - missing stages: somCluster:2, glyphRecord:2, qdrantHit:2, redisHotKey:2, neo4jNode:2
+  - missing stages: somCluster:6, glyphRecord:6, qdrantHit:6, redisHotKey:6, neo4jNode:6
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | .opencode/recommendations.json -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:1e95eb7b2c97aa52a6ec0308
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:1e95eb7b2c97aa52a6ec0308
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:f831f8496459630481b6f126
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:f831f8496459630481b6f126
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:2aed3e03cc66e3e478a5479d
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:2aed3e03cc66e3e478a5479d
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:a33b97f7501a9583a2e63c2b
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:a33b97f7501a9583a2e63c2b
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:322cf977b5fa41f902b9321b
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:322cf977b5fa41f902b9321b
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:4ced48dea132da38f2ab7305
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:4ced48dea132da38f2ab7305
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:a11f763c236417569484b3e7
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:a11f763c236417569484b3e7
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:787ff44880ddd6be2d9388ce
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:787ff44880ddd6be2d9388ce
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:7c0dbd56784529c16e1cb60e
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:7c0dbd56784529c16e1cb60e
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:4afa9ddc2a7b74e522364100
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:4afa9ddc2a7b74e522364100
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:c3913a6ae582b02ec6366094
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:c3913a6ae582b02ec6366094
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:211e484d8c9f1b5087925e91
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:211e484d8c9f1b5087925e91
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:f85f7b428819c0244985ab85
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:f85f7b428819c0244985ab85
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:5855fc827e386a10b01a26db
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:5855fc827e386a10b01a26db
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:132472e27f5f5116545a7ccf
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:132472e27f5f5116545a7ccf
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:dc13d165afeb65f00c87fe15
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:dc13d165afeb65f00c87fe15
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:9289019adf7d2721550af764
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:9289019adf7d2721550af764
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:d8d7affddeaa909af27f7d69
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:d8d7affddeaa909af27f7d69
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 - feature_id:feature:todo:24b4111ad0e1777784a9bd1a
-  - row count: 1
+  - row count: 3
   - featureIds: feature:todo:24b4111ad0e1777784a9bd1a
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234
   - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234
-  - missing stages: somCluster:1, glyphRecord:1, qdrantHit:1, redisHotKey:1, neo4jNode:1
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
   - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
-  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:af15f2f3c8d9e6c470e05b29
+  - row count: 3
+  - featureIds: feature:todo:af15f2f3c8d9e6c470e05b29
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:c3dab502e86cc90f236e9a48
+  - row count: 3
+  - featureIds: feature:todo:c3dab502e86cc90f236e9a48
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:6ad7088a53bb671d7863d642
+  - row count: 3
+  - featureIds: feature:todo:6ad7088a53bb671d7863d642
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:0d3ab6734e763f3f7697cfc0
+  - row count: 3
+  - featureIds: feature:todo:0d3ab6734e763f3f7697cfc0
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:4f67c0fab5bbbbbd33051d65
+  - row count: 3
+  - featureIds: feature:todo:4f67c0fab5bbbbbd33051d65
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:f93d30a30e773e2e83395aca
+  - row count: 3
+  - featureIds: feature:todo:f93d30a30e773e2e83395aca
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:783118149f85dbce6bf6dd2a
+  - row count: 3
+  - featureIds: feature:todo:783118149f85dbce6bf6dd2a
+  - sourceRefs: src/lib/server/features/ai/ace/context-assembler.ts
+  - paths: src/lib/server/features/ai/ace/context-assembler.ts
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: src/lib/server/features/ai/ace/context-assembler.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | src/lib/server/features/ai/ace/context-assembler.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | src/lib/server/features/ai/ace/context-assembler.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:9ffab6bc4b9cd644239758c2
+  - row count: 3
+  - featureIds: feature:todo:9ffab6bc4b9cd644239758c2
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:2ace876ba56f2c0753161f4b
+  - row count: 3
+  - featureIds: feature:todo:2ace876ba56f2c0753161f4b
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:580c60d78636e391070bd061
+  - row count: 3
+  - featureIds: feature:todo:580c60d78636e391070bd061
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:039e09ca423789739c8c42c5
+  - row count: 3
+  - featureIds: feature:todo:039e09ca423789739c8c42c5
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:c32b8055c5900f49a4919f9c
+  - row count: 3
+  - featureIds: feature:todo:c32b8055c5900f49a4919f9c
+  - sourceRefs: src/service-worker.ts
+  - paths: src/service-worker.ts
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: src/service-worker.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | src/service-worker.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | src/service-worker.ts -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:002df24db7233c4b96982982
+  - row count: 3
+  - featureIds: feature:todo:002df24db7233c4b96982982
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:86ddf5ba1247b00bd1f4e72b
+  - row count: 3
+  - featureIds: feature:todo:86ddf5ba1247b00bd1f4e72b
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:63f45279017c8d6d13ef35c9
+  - row count: 3
+  - featureIds: feature:todo:63f45279017c8d6d13ef35c9
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:f5ffd5e75b0e0ea6ae82d22f
+  - row count: 3
+  - featureIds: feature:todo:f5ffd5e75b0e0ea6ae82d22f
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:1c1c05a2ad42be0af8be0757
+  - row count: 3
+  - featureIds: feature:todo:1c1c05a2ad42be0af8be0757
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:9776801fc047158c169943dd
+  - row count: 3
+  - featureIds: feature:todo:9776801fc047158c169943dd
+  - sourceRefs: scripts/atlas/phase-lane-completion.mjs
+  - paths: scripts/atlas/phase-lane-completion.mjs
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: scripts/atlas/phase-lane-completion.mjs -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | scripts/atlas/phase-lane-completion.mjs -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | scripts/atlas/phase-lane-completion.mjs -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:0255cb3ad2d2cf33a3f9450c
+  - row count: 3
+  - featureIds: feature:todo:0255cb3ad2d2cf33a3f9450c
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
+- feature_id:feature:todo:a0a4835aaffa64c8919de261
+  - row count: 3
+  - featureIds: feature:todo:a0a4835aaffa64c8919de261
+  - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313
+  - paths: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313
+  - missing stages: somCluster:3, glyphRecord:3, qdrantHit:3, redisHotKey:3, neo4jNode:3
+  - repair actions: rederive som_cluster from topology / cluster join | materialize glyph_record from SOM / glyph lane | backfill qdrant_point_id / qdrant payload join | replay runtime packet and restore redis hot key | relink or materialize neo4j node mapping
+  - sample lineages: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode | todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313 -> somCluster+glyphRecord+qdrantHit+redisHotKey+neo4jNode
 
 ## Feature Groups
 
 - feature:todo:fadfc0e985f4f0e151eaf542
-  - row count: 2
-  - labels: opencode-recommendations-json
+  - row count: 6
+  - labels: opencode-recommendations-json, Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi
   - sourceRefs: .opencode/recommendations.json
   - avg lineage score: 36.36%
 - feature:todo:1e95eb7b2c97aa52a6ec0308
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Knowledge Graph Tool Lanes**
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21
   - avg lineage score: 36.36%
 - feature:todo:f831f8496459630481b6f126
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22
   - avg lineage score: 36.36%
 - feature:todo:2aed3e03cc66e3e478a5479d
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23
   - avg lineage score: 36.36%
 - feature:todo:a33b97f7501a9583a2e63c2b
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24
   - avg lineage score: 36.36%
 - feature:todo:322cf977b5fa41f902b9321b
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25
   - avg lineage score: 36.36%
 - feature:todo:4ced48dea132da38f2ab7305
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28
   - avg lineage score: 36.36%
 - feature:todo:a11f763c236417569484b3e7
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Clustering quality cleanup (deferred)
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49
   - avg lineage score: 36.36%
 - feature:todo:787ff44880ddd6be2d9388ce
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55
   - avg lineage score: 36.36%
 - feature:todo:7c0dbd56784529c16e1cb60e
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Track C — Production Gap Remediation** (after DB audit)
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71
   - avg lineage score: 36.36%
 - feature:todo:4afa9ddc2a7b74e522364100
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Seed legal canon chunks (legal PDF ingest pipeline)
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74
   - avg lineage score: 36.36%
 - feature:todo:c3913a6ae582b02ec6366094
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add Playwright test fixtures for auth + DB seeding
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75
   - avg lineage score: 36.36%
 - feature:todo:211e484d8c9f1b5087925e91
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80
   - avg lineage score: 36.36%
 - feature:todo:f85f7b428819c0244985ab85
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Warm workspace-start plans
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86
   - avg lineage score: 36.36%
 - feature:todo:5855fc827e386a10b01a26db
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Warm legal/codebase summaries
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87
   - avg lineage score: 36.36%
 - feature:todo:132472e27f5f5116545a7ccf
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Remaining Lower-Priority**
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89
   - avg lineage score: 36.36%
 - feature:todo:dc13d165afeb65f00c87fe15
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 1: .env audit + dead-config archival
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90
   - avg lineage score: 36.36%
 - feature:todo:9289019adf7d2721550af764
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 2: Docker CPU limits + Caddy memory bump
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91
   - avg lineage score: 36.36%
 - feature:todo:d8d7affddeaa909af27f7d69
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 5C–5E: Model/GGUF cleanup
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93
   - avg lineage score: 36.36%
 - feature:todo:24b4111ad0e1777784a9bd1a
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Feature cluster grouping by `sourceRef` prefix
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234
   - avg lineage score: 36.36%
 - feature:todo:af15f2f3c8d9e6c470e05b29
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Stale feature detection (atlas entry exists, no recent git touch)
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235
   - avg lineage score: 36.36%
 - feature:todo:c3dab502e86cc90f236e9a48
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Duplicate system detection (two scripts/routes with overlapping sourceRefs)
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236
   - avg lineage score: 36.36%
 - feature:todo:6ad7088a53bb671d7863d642
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Retrieval hook inventory for Phase 11E:
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243
   - avg lineage score: 36.36%
 - feature:todo:0d3ab6734e763f3f7697cfc0
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259
   - avg lineage score: 36.36%
 - feature:todo:4f67c0fab5bbbbbd33051d65
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260
   - avg lineage score: 36.36%
 - feature:todo:f93d30a30e773e2e83395aca
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261
   - avg lineage score: 36.36%
 - feature:todo:783118149f85dbce6bf6dd2a
-  - row count: 1
-  - labels: src-lib-server-features-ai-ace-context-assembler-ts
+  - row count: 3
+  - labels: src-lib-server-features-ai-ace-context-assembler-ts, Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.
   - sourceRefs: src/lib/server/features/ai/ace/context-assembler.ts
   - avg lineage score: 36.36%
 - feature:todo:9ffab6bc4b9cd644239758c2
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Document the live 4x4 router matrix location and usage:
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263
   - avg lineage score: 36.36%
 - feature:todo:2ace876ba56f2c0753161f4b
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Create `schema-encoder.wgsl` for client-side reranking of documents.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278
   - avg lineage score: 36.36%
 - feature:todo:580c60d78636e391070bd061
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Establish SharedArrayBuffer zero-copy structures for Web Worker communication.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279
   - avg lineage score: 36.36%
 - feature:todo:039e09ca423789739c8c42c5
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280
   - avg lineage score: 36.36%
 - feature:todo:c32b8055c5900f49a4919f9c
-  - row count: 1
-  - labels: src-service-worker-ts
+  - row count: 3
+  - labels: src-service-worker-ts, Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio
   - sourceRefs: src/service-worker.ts
   - avg lineage score: 36.36%
 - feature:todo:002df24db7233c4b96982982
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290
   - avg lineage score: 36.36%
 - feature:todo:86ddf5ba1247b00bd1f4e72b
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291
   - avg lineage score: 36.36%
 - feature:todo:63f45279017c8d6d13ef35c9
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292
   - avg lineage score: 36.36%
 - feature:todo:f5ffd5e75b0e0ea6ae82d22f
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299
   - avg lineage score: 36.36%
 - feature:todo:1c1c05a2ad42be0af8be0757
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300
   - avg lineage score: 36.36%
 - feature:todo:9776801fc047158c169943dd
-  - row count: 1
-  - labels: scripts-atlas-phase-lane-completion-mjs
+  - row count: 3
+  - labels: scripts-atlas-phase-lane-completion-mjs, Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
   - sourceRefs: scripts/atlas/phase-lane-completion.mjs
   - avg lineage score: 36.36%
 - feature:todo:0255cb3ad2d2cf33a3f9450c
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312
   - avg lineage score: 36.36%
 - feature:todo:a0a4835aaffa64c8919de261
-  - row count: 1
-  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - row count: 3
+  - labels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Use directory-role analysis plus AST maps to separate missing features from redundant features.
   - sourceRefs: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313
   - avg lineage score: 36.36%
 
@@ -593,7 +753,7 @@ Generated: 2026-06-06T01:12:12.943Z
 
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21
   - featureId: feature:todo:1e95eb7b2c97aa52a6ec0308
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Knowledge Graph Tool Lanes**
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21
   - taskId: n/a
   - runId: n/a
@@ -606,7 +766,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22
   - featureId: feature:todo:f831f8496459630481b6f126
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22
   - taskId: n/a
   - runId: n/a
@@ -619,7 +779,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23
   - featureId: feature:todo:2aed3e03cc66e3e478a5479d
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23
   - taskId: n/a
   - runId: n/a
@@ -632,7 +792,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24
   - featureId: feature:todo:a33b97f7501a9583a2e63c2b
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24
   - taskId: n/a
   - runId: n/a
@@ -645,7 +805,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25
   - featureId: feature:todo:322cf977b5fa41f902b9321b
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25
   - taskId: n/a
   - runId: n/a
@@ -658,7 +818,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28
   - featureId: feature:todo:4ced48dea132da38f2ab7305
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28
   - taskId: n/a
   - runId: n/a
@@ -671,7 +831,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49
   - featureId: feature:todo:a11f763c236417569484b3e7
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Clustering quality cleanup (deferred)
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49
   - taskId: n/a
   - runId: n/a
@@ -684,7 +844,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55
   - featureId: feature:todo:787ff44880ddd6be2d9388ce
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55
   - taskId: n/a
   - runId: n/a
@@ -697,7 +857,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71
   - featureId: feature:todo:7c0dbd56784529c16e1cb60e
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Track C — Production Gap Remediation** (after DB audit)
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71
   - taskId: n/a
   - runId: n/a
@@ -710,7 +870,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74
   - featureId: feature:todo:4afa9ddc2a7b74e522364100
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Seed legal canon chunks (legal PDF ingest pipeline)
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74
   - taskId: n/a
   - runId: n/a
@@ -723,7 +883,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75
   - featureId: feature:todo:c3913a6ae582b02ec6366094
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add Playwright test fixtures for auth + DB seeding
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75
   - taskId: n/a
   - runId: n/a
@@ -736,7 +896,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80
   - featureId: feature:todo:211e484d8c9f1b5087925e91
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80
   - taskId: n/a
   - runId: n/a
@@ -749,7 +909,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86
   - featureId: feature:todo:f85f7b428819c0244985ab85
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Warm workspace-start plans
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86
   - taskId: n/a
   - runId: n/a
@@ -762,7 +922,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87
   - featureId: feature:todo:5855fc827e386a10b01a26db
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Warm legal/codebase summaries
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87
   - taskId: n/a
   - runId: n/a
@@ -775,7 +935,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89
   - featureId: feature:todo:132472e27f5f5116545a7ccf
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, **Remaining Lower-Priority**
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89
   - taskId: n/a
   - runId: n/a
@@ -788,7 +948,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90
   - featureId: feature:todo:dc13d165afeb65f00c87fe15
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 1: .env audit + dead-config archival
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90
   - taskId: n/a
   - runId: n/a
@@ -801,7 +961,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91
   - featureId: feature:todo:9289019adf7d2721550af764
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 2: Docker CPU limits + Caddy memory bump
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91
   - taskId: n/a
   - runId: n/a
@@ -814,7 +974,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93
   - featureId: feature:todo:d8d7affddeaa909af27f7d69
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Track 5C–5E: Model/GGUF cleanup
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93
   - taskId: n/a
   - runId: n/a
@@ -827,7 +987,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234
   - featureId: feature:todo:24b4111ad0e1777784a9bd1a
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Feature cluster grouping by `sourceRef` prefix
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234
   - taskId: n/a
   - runId: n/a
@@ -840,7 +1000,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235
   - featureId: feature:todo:af15f2f3c8d9e6c470e05b29
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Stale feature detection (atlas entry exists, no recent git touch)
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235
   - taskId: n/a
   - runId: n/a
@@ -853,7 +1013,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236
   - featureId: feature:todo:c3dab502e86cc90f236e9a48
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Duplicate system detection (two scripts/routes with overlapping sourceRefs)
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236
   - taskId: n/a
   - runId: n/a
@@ -866,7 +1026,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: .opencode/recommendations.json
   - featureId: feature:todo:fadfc0e985f4f0e151eaf542
-  - featureLabels: opencode-recommendations-json
+  - featureLabels: opencode-recommendations-json, Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi
   - path: .opencode/recommendations.json
   - taskId: n/a
   - runId: n/a
@@ -879,7 +1039,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243
   - featureId: feature:todo:6ad7088a53bb671d7863d642
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Retrieval hook inventory for Phase 11E:
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243
   - taskId: n/a
   - runId: n/a
@@ -892,7 +1052,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259
   - featureId: feature:todo:0d3ab6734e763f3f7697cfc0
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259
   - taskId: n/a
   - runId: n/a
@@ -905,7 +1065,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260
   - featureId: feature:todo:4f67c0fab5bbbbbd33051d65
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260
   - taskId: n/a
   - runId: n/a
@@ -918,7 +1078,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261
   - featureId: feature:todo:f93d30a30e773e2e83395aca
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261
   - taskId: n/a
   - runId: n/a
@@ -931,7 +1091,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: src/lib/server/features/ai/ace/context-assembler.ts
   - featureId: feature:todo:783118149f85dbce6bf6dd2a
-  - featureLabels: src-lib-server-features-ai-ace-context-assembler-ts
+  - featureLabels: src-lib-server-features-ai-ace-context-assembler-ts, Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.
   - path: src/lib/server/features/ai/ace/context-assembler.ts
   - taskId: n/a
   - runId: n/a
@@ -944,7 +1104,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263
   - featureId: feature:todo:9ffab6bc4b9cd644239758c2
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Document the live 4x4 router matrix location and usage:
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263
   - taskId: n/a
   - runId: n/a
@@ -957,7 +1117,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278
   - featureId: feature:todo:2ace876ba56f2c0753161f4b
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Create `schema-encoder.wgsl` for client-side reranking of documents.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278
   - taskId: n/a
   - runId: n/a
@@ -970,7 +1130,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279
   - featureId: feature:todo:580c60d78636e391070bd061
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Establish SharedArrayBuffer zero-copy structures for Web Worker communication.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279
   - taskId: n/a
   - runId: n/a
@@ -983,7 +1143,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280
   - featureId: feature:todo:039e09ca423789739c8c42c5
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280
   - taskId: n/a
   - runId: n/a
@@ -996,7 +1156,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: src/service-worker.ts
   - featureId: feature:todo:c32b8055c5900f49a4919f9c
-  - featureLabels: src-service-worker-ts
+  - featureLabels: src-service-worker-ts, Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio
   - path: src/service-worker.ts
   - taskId: n/a
   - runId: n/a
@@ -1009,7 +1169,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290
   - featureId: feature:todo:002df24db7233c4b96982982
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290
   - taskId: n/a
   - runId: n/a
@@ -1022,7 +1182,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291
   - featureId: feature:todo:86ddf5ba1247b00bd1f4e72b
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291
   - taskId: n/a
   - runId: n/a
@@ -1035,7 +1195,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292
   - featureId: feature:todo:63f45279017c8d6d13ef35c9
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292
   - taskId: n/a
   - runId: n/a
@@ -1048,7 +1208,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: .opencode/recommendations.json
   - featureId: feature:todo:fadfc0e985f4f0e151eaf542
-  - featureLabels: opencode-recommendations-json
+  - featureLabels: opencode-recommendations-json, Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi
   - path: .opencode/recommendations.json
   - taskId: n/a
   - runId: n/a
@@ -1061,7 +1221,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299
   - featureId: feature:todo:f5ffd5e75b0e0ea6ae82d22f
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299
   - taskId: n/a
   - runId: n/a
@@ -1074,7 +1234,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300
   - featureId: feature:todo:1c1c05a2ad42be0af8be0757
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300
   - taskId: n/a
   - runId: n/a
@@ -1087,7 +1247,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: scripts/atlas/phase-lane-completion.mjs
   - featureId: feature:todo:9776801fc047158c169943dd
-  - featureLabels: scripts-atlas-phase-lane-completion-mjs
+  - featureLabels: scripts-atlas-phase-lane-completion-mjs, Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
   - path: scripts/atlas/phase-lane-completion.mjs
   - taskId: n/a
   - runId: n/a
@@ -1100,7 +1260,7 @@ Generated: 2026-06-06T01:12:12.943Z
   - missingHigherHopStages: somCluster, glyphRecord, qdrantHit, redisHotKey, neo4jNode
 - sourceRef: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312
   - featureId: feature:todo:0255cb3ad2d2cf33a3f9450c
-  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
+  - featureLabels: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md, Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
   - path: todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312
   - taskId: n/a
   - runId: n/a

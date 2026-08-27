@@ -74,16 +74,16 @@ export const ff1Tools = {
         ? { must: [{ key: 'path', match: { value: params.filterPath } }] }
         : undefined;
 
-      const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+      const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector: embedding, limit: k, with_payload: true, filter, score_threshold: 0.4 }),
+        body: JSON.stringify({ query: embedding, limit: k, with_payload: true, filter, score_threshold: 0.4 }),
         signal: AbortSignal.timeout(8_000),
       });
       const { result } = await sRes.json() as {
-        result: Array<{ payload: Record<string, string>; score: number }>;
+        result?: { points?: Array<{ payload: Record<string, string>; score: number }> };
       };
-      return result.map(r =>
+      return (result?.points ?? []).map(r =>
         `[score=${r.score.toFixed(2)} path=${r.payload.path ?? '?'}]\n` +
         `${(r.payload.content ?? r.payload.summary ?? '').slice(0, 500)}`
       ).join('\n\n---\n\n');

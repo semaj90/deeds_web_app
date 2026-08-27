@@ -214,8 +214,8 @@ async function findQdrantPayloads(sourceRef, featureId, packetKey) {
     const qdrantUrl = process.env.QDRANT_URL || 'http://localhost:6333';
     const collection = 'codebase_chunks_768';
 
-    // Search Qdrant for matching payloads
-    const searchUrl = `${qdrantUrl}/collections/${collection}/points/search`;
+    // Filter-only payload lookup uses Scroll, not vector search.
+    const searchUrl = `${qdrantUrl}/collections/${collection}/points/scroll`;
 
     const result = spawnSync('curl', [
       '-s',

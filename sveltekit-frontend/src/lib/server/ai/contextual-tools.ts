@@ -575,11 +575,11 @@ export async function executeContextualTool(
             durationMs: Date.now() - start,
             metadata,
           };
-        const searchRes = await fetch(`${envCS.QDRANT_URL}/collections/legal_cases/points/search`, {
+        const searchRes = await fetch(`${envCS.QDRANT_URL}/collections/legal_cases/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: csEmb.vectors[0],
+            query: csEmb.vectors[0],
             limit: Number(args.limit ?? 5),
             with_payload: true,
             score_threshold: 0.3,
@@ -595,7 +595,7 @@ export async function executeContextualTool(
             metadata,
           };
         const csData = await searchRes.json();
-        const csResults = csData.result ?? [];
+        const csResults = csData.result?.points ?? [];
         if (csResults.length === 0)
           return {
             ok: true,

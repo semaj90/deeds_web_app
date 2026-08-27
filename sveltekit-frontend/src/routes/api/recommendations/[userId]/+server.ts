@@ -75,12 +75,12 @@ async function fetchCandidates(
 ): Promise<DocumentCandidate[]> {
 	try {
 		const searchResp = await fetch(
-			`${QDRANT_URL}/collections/legal_documents/points/search`,
+			`${QDRANT_URL}/collections/legal_documents/points/query`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					vector: queryEmbedding,
+					query: queryEmbedding,
 					limit: limit * 3, // Fetch 3x to allow re-ranking
 					with_payload: true,
 					with_vector: true,
@@ -93,7 +93,7 @@ async function fetchCandidates(
 		if (!searchResp.ok) return [];
 
 		const searchData = await searchResp.json();
-		const results = searchData?.result ?? [];
+		const results = searchData?.result?.points ?? [];
 
 		return results.map((r: Record<string, any>) => {
 			const payload = r.payload ?? {};

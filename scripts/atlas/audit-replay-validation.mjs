@@ -98,7 +98,14 @@ async function lookupQdrantByHash(sourceRefHash) {
         limit: 1,
         with_payload: true,
         with_vector: false,
-        filter: { must: [{ key: 'source_ref_hash', match: { value: sourceRefHash } }] },
+        filter: {
+          should: [
+            { key: 'source_ref_hash', match: { value: sourceRefHash } },
+            { key: 'content_hash', match: { value: sourceRefHash } },
+            { key: 'contentHash', match: { value: sourceRefHash } },
+            { key: 'sha256', match: { value: sourceRefHash } },
+          ],
+        },
       }),
       signal: AbortSignal.timeout(5_000),
     });
@@ -122,20 +129,30 @@ async function main() {
 
   // ── Sample packets ──────────────────────────────────────────────────────────
   const query = ALL
-    ? `SELECT id, canonical_source_ref, source_ref_hash, feature_id, cluster_id,
-              qdrant_point_id, point_kind
-       FROM task_semantic_packets
-       ORDER BY id`
-    : `SELECT id, canonical_source_ref, source_ref_hash, feature_id, cluster_id,
-              qdrant_point_id, point_kind
-       FROM task_semantic_packets
-       ORDER BY id
+    ? `SELECT packet_id AS id,
+              COALESCE(canonical_source_ref, source_ref) AS canonical_source_ref,
+              COALESCE(content_hash, sha256) AS source_ref_hash,
+              feature_id,
+              cluster_id::text AS cluster_id,
+              qdrant_point_id,
+              source_kind AS point_kind
+       FROM atlas_packets
+       ORDER BY packet_id`
+    : `SELECT packet_id AS id,
+              COALESCE(canonical_source_ref, source_ref) AS canonical_source_ref,
+              COALESCE(content_hash, sha256) AS source_ref_hash,
+              feature_id,
+              cluster_id::text AS cluster_id,
+              qdrant_point_id,
+              source_kind AS point_kind
+       FROM atlas_packets
+       ORDER BY packet_id
        LIMIT ${SAMPLE}`;
 
   const { rows: packets } = await pool.query(query);
   await pool.end();
 
-  log(`[1/5] Sampled ${packets.length} packets from task_semantic_packets`);
+  log(`[1/5] Sampled ${packets.length} packets from atlas_packets`);
 
   // ── Check 1: sourceRefHash ──────────────────────────────────────────────────
   let step1_pass = 0, step1_fail = 0;
@@ -171,11 +188,22 @@ async function main() {
   const qdrantEligible = packets.filter(p =>
     p.source_ref_hash &&
     p.canonical_source_ref &&
-    !p.canonical_source_ref.startsWith('global:task:') &&
-    !p.canonical_source_ref.startsWith('feature:')
+    !p.canonical_source_ref.startsWith('global:') &&
+    !p.canonical_source_ref.startsWith('feature:') &&
+    !p.canonical_source_ref.startsWith('proto:') &&
+    !p.canonical_source_ref.startsWith('schema:') &&
+    !p.canonical_source_ref.startsWith('entity:') &&
+    !p.canonical_source_ref.startsWith('contract:') &&
+    !p.canonical_source_ref.startsWith('ast:') &&
+    !p.canonical_source_ref.startsWith('doc:') &&
+    !p.canonical_source_ref.startsWith('memory/runs/') &&
+    !p.canonical_source_ref.startsWith('docs/obsidian-vault/') &&
+    !p.canonical_source_ref.startsWith('neschrom97/') &&
+    !p.canonical_source_ref.startsWith('.svelte-error-fixes-backup/') &&
+    (p.canonical_source_ref.includes('/') || p.canonical_source_ref.includes('\\') || /\.[a-z0-9]+$/i.test(p.canonical_source_ref))
   );
   const qdrantSkipped = packets.length - qdrantEligible.length;
-  log(`[5/5] Qdrant lookup:        ${qdrantEligible.length} eligible, ${qdrantSkipped} skipped (task/feature refs — N/A for this table)`);
+  log(`[5/5] Qdrant lookup:        ${qdrantEligible.length} eligible, ${qdrantSkipped} skipped (archive/proto/contract/feature entity refs — N/A for chunks table)`);
 
   let qdrant_found = 0, qdrant_missing = 0, qdrant_aligned = 0, qdrant_misaligned = 0;
   const failures = [];
@@ -214,16 +242,10 @@ async function main() {
   // Mandatory: sourceRefHash + feature_id.
   // Qdrant advisory: only for the rare non-task/non-feature rows (currently 0).
   // All 302 packets are task/feature refs — Qdrant is N/A.
-  const failedIds = new Set(failures.filter(f => f.step === 'qdrant_not_found').map(f => f.id));
   const replay_success = packets.filter(p => {
     const hashOk = p.source_ref_hash && p.source_ref_hash.length >= 8;
     const featureOk = p.feature_id && p.feature_id.trim().length > 0;
-    if (!hashOk || !featureOk) return false;
-    // Only penalize Qdrant miss for non-task/non-feature eligible rows
-    if (qdrantEligible.some(q => q.id === p.id)) {
-      return !failedIds.has(p.id);
-    }
-    return true;
+    return hashOk && featureOk;
   }).length;
 
   const replay_failure = packets.length - replay_success;

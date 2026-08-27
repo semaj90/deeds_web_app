@@ -182,7 +182,9 @@ async function main() {
     url: lang.url,
     port: lang.port,
     pathName: '/health',
-    validate: (body) => body?.services?.llama_server_available === true,
+    // The sidecar's current provenance-v2 health contract reports its own
+    // status/capabilities; it no longer exposes the retired services wrapper.
+    validate: (body) => body?.status === 'ok' && body?.capabilities?.langextract === true,
     fallback: async (error, started) => {
       const fallbackProbe = await httpProbe({
         service_name: 'gemma4-llama-server',

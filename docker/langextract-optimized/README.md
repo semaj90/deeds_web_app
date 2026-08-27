@@ -32,7 +32,7 @@ cd docker/langextract-optimized
 docker build -t deeds-langextract-optimized:latest .
 docker run -d -p 8095:8095 --name langextract-optimized \
     -e LANGEXTRACT_PROVIDER=openai \
-    -e LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct \
+    -e LANGEXTRACT_MODEL_ID=ornith-1.5-9b \
     -e LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1 \
     -e LANGEXTRACT_API_KEY=local \
     --memory=512m \
@@ -84,7 +84,7 @@ curl -X POST http://localhost:8095/analyze \
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
 | `LANGEXTRACT_PROVIDER` | `openai` | LangExtract provider for the model backend |
-| `LANGEXTRACT_MODEL_ID` | `gemma4-legal-iq4xs-direct` | llama-server model ID or alias |
+| `LANGEXTRACT_MODEL_ID` | `ornith-1.5-9b` | llama-server model ID or alias |
 | `LANGEXTRACT_BASE_URL` | `http://host.docker.internal:8090/v1` | OpenAI-compatible llama-server base URL |
 | `LANGEXTRACT_API_KEY` | `local` | API key passed to the OpenAI-compatible client |
 | `LLAMA_SERVER_URL` | `http://host.docker.internal:8090/v1` | Compatibility alias for the same backend URL |

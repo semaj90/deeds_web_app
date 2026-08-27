@@ -133,12 +133,11 @@ async function enrichQdrantPayloads(packets) {
     try {
       // Search Qdrant for points matching source_ref + packet_key
       const searchRes = await fetch(
-        `${QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+        `${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: { name: 'content', vector: new Array(768).fill(0) },
             filter: {
               must: [
                 { key: 'source_ref', match: { value: packet.source_ref } },
@@ -159,7 +158,7 @@ async function enrichQdrantPayloads(packets) {
       }
 
       const searchBody = await searchRes.json();
-      const points = searchBody.result || [];
+      const points = searchBody.result?.points || [];
 
       // Upsert points with Phase D enrichment
       const pointsToUpdate = points.map(p => ({

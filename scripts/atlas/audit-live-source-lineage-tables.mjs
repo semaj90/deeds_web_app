@@ -4,7 +4,10 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { buildDatabaseConnectionFingerprint, connectionSource } from './lib/database-connection-fingerprint.mjs';
 
-const reportPath = path.join(REPO_ROOT, 'docs', 'reports', 'live-source-lineage-table-audit.json');
+const reportPath = path.resolve(
+  process.env.ATLAS_LINEAGE_REPORT_PATH ??
+    path.join(REPO_ROOT, 'docs', 'reports', 'live-source-lineage-table-audit.json'),
+);
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(env),

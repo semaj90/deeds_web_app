@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { buildRelationshipKernel } from '@deeds/parent-atlas/core/relationship-kernel';
+import type { RelationshipKernelV1 } from '@deeds/parent-atlas/core/relationship-kernel';
 
 export const HyperedgeParticipantV1Schema = z
   .object({
@@ -129,4 +131,26 @@ export function projectHyperedgeIncidence(edge: HyperedgeV1): HyperedgeIncidence
     incidenceWeight: 1,
     graphRevision: edge.graphRevision,
   }));
+}
+
+/** Compile KAG taxonomy semantics into the shared non-persistent kernel. */
+export function hyperedgeToRelationshipKernel(edge: HyperedgeV1): RelationshipKernelV1 {
+  return buildRelationshipKernel({
+    relationshipId: edge.hyperedgeId,
+    authority: 'KAG_TAXONOMY',
+    relationType: edge.predicate,
+    participants: edge.participants.map((participant) => ({
+      canonicalId: participant.canonicalId,
+      role: participant.role,
+      ordinal: participant.ordinal ?? 0,
+      entityType: null,
+      entityRevision: null,
+      sourceRef: null,
+    })),
+    evidenceRefs: edge.evidenceRefs,
+    workspaceRevision: edge.workspaceRevision,
+    sourceRevision: edge.sourceRevision,
+    graphRevision: edge.graphRevision,
+    producerRevision: edge.producerRevision,
+  });
 }

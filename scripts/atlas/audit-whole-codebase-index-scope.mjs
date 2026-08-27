@@ -11,8 +11,9 @@
  * Output: JSON + Markdown reports
  */
 
-import { execSync } from 'child_process';
-import fs from 'fs/promises';
+import { spawn } from 'child_process';
+import fs from 'fs';
+import fsp from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -23,6 +24,7 @@ const EXCLUDE_PATTERNS = [
   '.git',
   'node_modules',
   '.svelte-kit',
+  '.next',
   '.vite',
   'dist',
   'build',
@@ -34,6 +36,43 @@ const EXCLUDE_PATTERNS = [
   '.opencode',
   'deeds_labs',
   '.claude',
+  '.agent',
+  '.cline',
+  '.clinerules',
+  '.parent-atlas',
+  '.python311',
+  '.venv',
+  '.venv-cu130',
+  '.venv-gemma4',
+  '.venv_turbovec',
+  '.venv-py313-backup',
+  '.svelte-error-fixes-backup',
+  '.opencode',
+  '.tmp',
+  'archive',
+  'backups',
+  'deeds_labs',
+  'logs',
+  'tmp',
+  'reports',
+  'external-docs',
+  'claude-mem',
+  'crates',
+  'mcp-server-mcp',
+  'gsd_archives',
+  'memory',
+  'llama-cpp-turboquant-gemma4',
+  'neschrom97',
+  'target',
+  '.vscode',
+  'screenshots',
+  'obsidian-vault',
+  'docs_readme',
+  'phase104-backups',
+  'scratch',
+  'scratch',
+  'phase104-backups',
+  'docs_readme',
 ];
 
 const FILE_TYPE_PATTERNS = {
@@ -52,12 +91,18 @@ const FILE_TYPE_PATTERNS = {
  * Scan repo with ripgrep and classify files
  */
 async function auditCodebaseScope() {
-  const excludeArgs = EXCLUDE_PATTERNS.map(p => `--glob=!${p}`).join(' ');
-
   try {
-    // Use rg to list all files
-    const cmd = `rg --files -uuu ${excludeArgs}`;
-    const fileList = execSync(cmd, { cwd: REPO_ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+    // Stream the file list so large repositories do not overflow cmd.exe's buffer.
+    const excludeArgs = EXCLUDE_PATTERNS.flatMap((pattern) => [`--glob=!${pattern}`, `--glob=!${pattern}/**`, `--glob=!**/${pattern}/**`]);
+    const fileList = await new Promise((resolve, reject) => {
+      const child = spawn('rg', ['--files', '-uuu', ...excludeArgs], { cwd: REPO_ROOT, windowsHide: true });
+      const chunks = [];
+      let stderr = '';
+      child.stdout.on('data', (chunk) => chunks.push(chunk));
+      child.stderr.on('data', (chunk) => { stderr += chunk; });
+      child.on('error', reject);
+      child.on('close', (code) => code === 0 ? resolve(Buffer.concat(chunks).toString('utf8').split('\n').filter(Boolean)) : reject(new Error(`rg exited ${code}: ${stderr.trim()}`)));
+    });
 
     const classification = {
       source_code: [],
@@ -108,7 +153,8 @@ async function auditCodebaseScope() {
         indexable: type === 'source_code' || type === 'config' || type === 'sql' || type === 'docs' || type === 'test',
       });
 
-      if (type !== 'build_artifact' && type !== 'cold_artifact') {
+      const indexable = ['source_code', 'config', 'sql', 'docs', 'test'].includes(type);
+      if (indexable) {
         stats.indexable_files += 1;
         stats.indexable_size_bytes += size;
       }
@@ -218,9 +264,9 @@ async function main() {
   const jsonPath = path.join(REPO_ROOT, 'docs/reports/whole-codebase-index-scope.json');
   const mdPath = path.join(REPO_ROOT, 'docs/reports/whole-codebase-index-scope.md');
 
-  await fs.mkdir(path.dirname(jsonPath), { recursive: true });
-  await fs.writeFile(jsonPath, JSON.stringify(jsonReport, null, 2));
-  await fs.writeFile(mdPath, mdReport);
+  await fsp.mkdir(path.dirname(jsonPath), { recursive: true });
+  await fsp.writeFile(jsonPath, JSON.stringify(jsonReport, null, 2));
+  await fsp.writeFile(mdPath, mdReport);
 
   console.log(`[phase-d-scope] ✅ Scope audit complete`);
   console.log(`[phase-d-scope] JSON: ${jsonPath}`);

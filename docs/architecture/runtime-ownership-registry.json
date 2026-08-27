@@ -92,6 +92,40 @@
         "evidence": "Validates PacketTopologyEnvelope at-rest shape across Postgres/Qdrant/Redis/Neo4j/ACP-RPC handoffs. Confirmed live 2026-08-09 via full read; re-exported by src/lib/server/hyperrag/packet-topology-envelope.ts and consumed by src/lib/server/acp/packet-envelope-validator.ts."
       },
       "known_existing_duplication": []
+    },
+    "n_ary_relationship_synthesis": {
+      "note": "REL-OWNER-01/02 (2026-08-26). Two independently-built n-ary relationship contracts were found to be real, evidence-gated, and non-overlapping in domain — NOT competing duplicates. Resolution is domain-scoped dual ownership, not merge-to-one. See openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md 'KAG-OWNER-01-07' section for the full field-level audit this entry is derived from.",
+      "owners": [
+        {
+          "domain": "KAG_TAXONOMY",
+          "classification": "CANONICAL_OWNER",
+          "path": "sveltekit-frontend/src/lib/server/graph/hyperedge-contract.ts",
+          "export": "createHyperedgeV1 / HyperedgeV1",
+          "evidence": "Persists to Postgres atlas_hyperedges/atlas_hyperedge_members (APPLY_PROVEN, live write+readback+delete proof 2026-08-26). Promotion gated by TaxonomyAssignmentCandidateV1.status === 'promoted' (sveltekit-frontend/src/lib/server/atlas/taxonomy/entity-concept-taxonomy-v1.ts::promoteTaxonomyAssignmentV1)."
+        },
+        {
+          "domain": "FEATURE_INTELLIGENCE",
+          "classification": "CANONICAL_OWNER",
+          "path": "packages/parent-atlas/src/core/feature-intelligence.ts",
+          "export": "buildFeatureRelationship / FeatureRelationshipV1",
+          "evidence": "Synthesized by packages/parent-atlas/src/core/ontology-hyperedge-synthesis.ts::synthesizeOntologyHyperedge (2/2 tests pass). REL-FI-01, resolved 2026-08-26: drizzle/manual/20260817_atlas_feature_intelligence_v1.sql originally collided on table name with two unrelated live tables (atlas_features = AST structural-feature facts; atlas_feature_evidence = packet-level multi-modal evidence extraction; both confirmed empty at collision time). Operator chose rename; atlas_features/atlas_feature_evidence renamed to atlas_fi_features/atlas_fi_evidence in the migration and feature-intelligence-repository.ts, applied live (13 tables confirmed present), and APPLY_PROVEN via a full persist->read-back->cleanup live proof (scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts). That proof surfaced and fixed a real GROUP BY bug in findRelationshipsForEntities() (see tasks.md REL-FI-01 section) -- 267/267 package tests pass post-fix."
+        }
+      ],
+      "shared_kernel": {
+        "classification": "COMPATIBILITY",
+        "path": "packages/parent-atlas/src/core/relationship-kernel.ts",
+        "export": "RelationshipKernelV1 / buildRelationshipKernel",
+        "evidence": "Non-persistent, non-canonical, never independently writable -- built only via hyperedgeToRelationshipKernel() (sveltekit-frontend/src/lib/server/graph/hyperedge-contract.ts) or featureRelationshipToKernel() (packages/parent-atlas/src/core/relationship-kernel.ts). Carries an explicit RelationshipAuthority discriminator ('KAG_TAXONOMY' | 'FEATURE_INTELLIGENCE'). Round-trip/cross-domain-distinctness proven live 2026-08-26: packages/parent-atlas/test/relationship-kernel.test.mjs (3/3 pass) and sveltekit-frontend/src/lib/server/graph/hyperedge-contract.spec.ts ('keeps shared kernel fields aligned while retaining domain-scoped authority'). This is REL-OWNER-03/04/05/06 -- DONE, contrary to the still-stale 'not started' note in tasks.md as of the last edit to this file."
+      },
+      "relation_type_namespace": {
+        "status": "RUNTIME_SMOKE_PROVEN",
+        "note": "REL-OWNER-07, done 2026-08-26. assertRelationTypeNamespace() in packages/parent-atlas/src/core/relationship-kernel.ts is wired into buildRelationshipKernel() itself (both adapters call through it), rejecting any FEATURE_INTELLIGENCE relationType in the closed KAG_TAXONOMY_RELATION_TYPES list ('ENTITY_CLASSIFIED_AS','CONCEPT_BROADER_THAN') and any KAG_TAXONOMY relationType outside it. 4 tests, packages/parent-atlas/test/relationship-kernel.test.mjs, 11/11 total pass."
+      },
+      "structural_graph_snapshot_feed": {
+        "status": "APPLY_PROVEN",
+        "note": "REL-OWNER-08 done 2026-08-26 (fixture mixed-domain proof, 7/7 pass) + explicit `authority` field added to IncidenceProjectionNodeV1/HyperRelationV1 (not just inferred from nodeKind). GRAPH-PROD-01 done same session: scripts/atlas/graph-prod-01-build-production-structural-snapshot-v1.mts is the first PRODUCTION StructuralGraphSnapshotV1 builder, reading real (currently 0-row) atlas_hyperedges/atlas_relationships via new bulk readers (readAllHyperedgesFromPostgres, listAllRelationships), through the same adapters, into a real Arrow IPC edge artifact (first apache-arrow usage anywhere in the repo -- fixed a real dictionary-encoding non-determinism bug in the process, see tasks.md GRAPH-PROD-01 section). Live run produced a correct, schema-valid, checksum-deterministic 0-node/0-edge snapshot, independently re-verified by re-reading the on-disk .arrow file. PageRank/PPR/CPU-GPU-parity remain NOT_PROVEN pending real relationship data or a redirect to the pre-existing Neo4j/codebase-graph.json topology."
+      },
+      "known_existing_duplication": []
     }
   }
 }

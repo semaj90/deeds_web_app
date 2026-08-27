@@ -70,15 +70,13 @@ async function testBatchSummaries() {
     }
 
     const qdrantRes = await fetch(
-      `${SERVICES.QDRANT}/collections/codebase_chunks_768/points/search`,
+      `${SERVICES.QDRANT}/collections/codebase_chunks_768/points/query`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: {
-            name: 'content',
-            vector: embedding
-          },
+          query: embedding,
+          using: 'content',
           limit: 20,
           with_payload: true,
           with_vector: false,
@@ -87,7 +85,7 @@ async function testBatchSummaries() {
       }
     );
     const qdrantData = await qdrantRes.json();
-    qdrantChunks = qdrantData.result || [];
+    qdrantChunks = qdrantData.result?.points || [];
     recordGate('Qdrant named-vector search', 'LIVE_PASS', `${qdrantChunks.length} candidates retrieved (top score: ${qdrantChunks[0]?.score?.toFixed(3) || 'N/A'})`);
   } catch (err) {
     recordGate('Qdrant named-vector search', 'FAIL', err.message);

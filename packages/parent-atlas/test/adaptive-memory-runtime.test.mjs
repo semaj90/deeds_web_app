@@ -106,3 +106,26 @@ test('T-MAC can be represented as low-bit challenger without canonical authority
   assert.equal(plan.canonical_authority, false);
   assert.equal(plan.challenger_only, true);
 });
+
+test('QSA_LUT can be represented as low-bit challenger with QSA_SUBSPACE_LUT strategy', () => {
+  const plan = lowBitRuntimePlanSchema.parse({
+    plan_revision: 'qsa-r1',
+    model_id: 'deepreinforce-ai/Ornith-1.0-9B',
+    model_revision: 'ornith-r1',
+    weight_format: 'INT4_GGUF',
+    executor: 'QSA_LUT',
+    target_device: 'GPU',
+    multiplication_strategy: 'QSA_SUBSPACE_LUT',
+    kernel_family: 'qsa-table-lookup',
+    kernel_revision: 'kernel-qsa-v1',
+    tuning_profile_checksum: sha,
+    model_is_natively_compatible: true,
+    conversion_is_lossless: true,
+    challenger_only: true,
+    producer_revision: 'producer-r1',
+  });
+  assert.equal(plan.executor, 'QSA_LUT');
+  assert.equal(plan.multiplication_strategy, 'QSA_SUBSPACE_LUT');
+  assert.equal(plan.canonical_authority, false);
+});
+

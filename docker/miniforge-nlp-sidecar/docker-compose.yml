@@ -15,6 +15,13 @@ services:
       LANGEXTRACT_URL: http://127.0.0.1:8095
       MINIFORGE_SIDECAR_URL: http://127.0.0.1:8095
       NLP_SIDECAR_URL: http://127.0.0.1:8095
+      LANGEXTRACT_RUNTIME: official
+      LANGEXTRACT_PROVIDER: ${LANGEXTRACT_PROVIDER:-openai}
+      LANGEXTRACT_MODEL: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
+      LANGEXTRACT_MODEL_ID: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
+      LANGEXTRACT_BASE_URL: ${LANGEXTRACT_BASE_URL:-http://host.docker.internal:8090/v1}
+      LANGEXTRACT_API_KEY: ${LANGEXTRACT_API_KEY:-local}
+      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:-http://host.docker.internal:8090/v1}
       UVICORN_LOG_LEVEL: info
     healthcheck:
       test:

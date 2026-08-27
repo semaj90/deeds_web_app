@@ -1,14 +1,14 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-08-25T23:16:23.135Z
+Generated: 2026-08-26T23:40:14.357Z
 
 ## Summary
 
 - tables checked: 6
 - static aligned: 3
-- live aligned: 0
+- live aligned: 2
 - live unavailable: 0
-- blockers: 9
+- blockers: 7
 
 ## Packet Spine
 
@@ -46,31 +46,31 @@ Generated: 2026-08-25T23:16:23.135Z
 
 ## nes_chrom_packets
 
-- classification: COLUMN_MISMATCH
-- repair_class: APPLY_EXISTING_SQL
-- static: COLUMN_MISMATCH
-- live: COLUMN_MISMATCH
+- classification: LIVE_DB_ALIGNED
+- repair_class: ADD_DRIZZLE_MIRROR
+- static: INDEX_MISMATCH
+- live: LIVE_DB_ALIGNED
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts
-- manual sources: sveltekit-frontend/drizzle/manual/0035_phase_20_packet_metadata_topology.sql, sveltekit-frontend/drizzle/manual/20260601_nes_chrom_packets_and_kag_dag_hits.sql, sveltekit-frontend/drizzle/manual/20260606_nes_chrom_live_alignment.sql, sveltekit-frontend/drizzle/manual/atlas_dict_tables.sql
+- manual sources: sveltekit-frontend/drizzle/manual/0035_phase_20_packet_metadata_topology.sql, sveltekit-frontend/drizzle/manual/20260601_nes_chrom_packets_and_kag_dag_hits.sql, sveltekit-frontend/drizzle/manual/20260606_nes_chrom_live_alignment.sql, sveltekit-frontend/drizzle/manual/20260826_restore_nes_chrom_packets_v1.sql, sveltekit-frontend/drizzle/manual/atlas_dict_tables.sql
 - static columns: betweenness, canonical, chunk_id, community_confidence, community_id, community_source, confidence_score, created_at, domain_class, eigenvector, embedding, feature_code, feature_id, feature_ids, feature_label, file_path, id, identity_lane, kag_dag_run_id, kag_node_key, kmeans_cluster, lane, lane_ids, ledger_type, lineage_version, metadata, model, neo4j_node_id, packet_key, packet_type, packet_zstd, pagerank, payload, payload_backfilled_at, permissions, qdrant_point_id, query_hash, redis_centroid_key, som_cluster, som_code, som_col, som_index, som_row, source_ref, source_ref_id, source_refs, summary, tags, token_budget, topology, updated_at, vectors
-- static indexes: idx_nes_chrom_packets_betweenness, idx_nes_chrom_packets_community_confidence_idx, idx_nes_chrom_packets_community_id_idx, idx_nes_chrom_packets_community_source_idx, idx_nes_chrom_packets_domain_class_idx, idx_nes_chrom_packets_eigenvector, idx_nes_chrom_packets_feature_id, idx_nes_chrom_packets_feature_id_idx, idx_nes_chrom_packets_feature_ids_gin, idx_nes_chrom_packets_feature_label_idx, idx_nes_chrom_packets_feature_source, idx_nes_chrom_packets_kmeans_cluster_idx, idx_nes_chrom_packets_lane_ids_gin, idx_nes_chrom_packets_ledger_type_idx, idx_nes_chrom_packets_lineage_version_idx, idx_nes_chrom_packets_metadata_gin, idx_nes_chrom_packets_neo4j_node_id, idx_nes_chrom_packets_packet_key_idx, idx_nes_chrom_packets_pagerank, idx_nes_chrom_packets_permissions_gin, idx_nes_chrom_packets_redis_centroid_key, idx_nes_chrom_packets_som_cluster, idx_nes_chrom_packets_som_index_idx, idx_nes_chrom_packets_source_ref, idx_nes_chrom_packets_source_ref_idx, idx_nes_chrom_packets_tags_gin, idx_nes_chrom_packets_topology_gin, idx_nes_chrom_packets_vectors_gin, nes_chrom_packets_chunk_id_idx, nes_chrom_packets_confidence_score_idx, nes_chrom_packets_embedding_hnsw, nes_chrom_packets_feature_code_idx, nes_chrom_packets_feature_id_idx, nes_chrom_packets_kag_run_idx, nes_chrom_packets_norm_source_ref_trgm_idx, nes_chrom_packets_packet_key_key, nes_chrom_packets_packet_zstd_idx, nes_chrom_packets_payload_gin, nes_chrom_packets_qdrant_point_idx, nes_chrom_packets_query_hash_idx, nes_chrom_packets_som_code_idx, nes_chrom_packets_source_ref_id_idx, nes_chrom_packets_source_ref_idx, nes_chrom_packets_source_ref_trgm_idx, nes_chrom_packets_source_refs_gin, nes_chrom_packets_summary_trgm_idx
-- live columns: none
-- live indexes: none
-- live rows: n/a
+- static indexes: idx_nes_chrom_packets_betweenness, idx_nes_chrom_packets_community_confidence_idx, idx_nes_chrom_packets_community_id_idx, idx_nes_chrom_packets_community_source_idx, idx_nes_chrom_packets_domain_class_idx, idx_nes_chrom_packets_eigenvector, idx_nes_chrom_packets_feature_id, idx_nes_chrom_packets_feature_id_idx, idx_nes_chrom_packets_feature_ids_gin, idx_nes_chrom_packets_feature_label_idx, idx_nes_chrom_packets_feature_source, idx_nes_chrom_packets_kmeans_cluster_idx, idx_nes_chrom_packets_lane_ids_gin, idx_nes_chrom_packets_ledger_type_idx, idx_nes_chrom_packets_lineage_version_idx, idx_nes_chrom_packets_metadata_gin, idx_nes_chrom_packets_neo4j_node_id, idx_nes_chrom_packets_packet_key_idx, idx_nes_chrom_packets_pagerank, idx_nes_chrom_packets_permissions_gin, idx_nes_chrom_packets_redis_centroid_key, idx_nes_chrom_packets_som_cluster, idx_nes_chrom_packets_som_index_idx, idx_nes_chrom_packets_source_ref, idx_nes_chrom_packets_source_ref_idx, idx_nes_chrom_packets_tags_gin, idx_nes_chrom_packets_topology_gin, idx_nes_chrom_packets_vectors_gin, nes_chrom_packets_chunk_id_idx, nes_chrom_packets_confidence_score_idx, nes_chrom_packets_embedding_hnsw, nes_chrom_packets_feature_code_idx, nes_chrom_packets_feature_id_idx, nes_chrom_packets_feature_ids_gin, nes_chrom_packets_kag_run_idx, nes_chrom_packets_kmeans_cluster_idx, nes_chrom_packets_lane_ids_gin, nes_chrom_packets_metadata_gin, nes_chrom_packets_norm_source_ref_trgm_idx, nes_chrom_packets_packet_key_key, nes_chrom_packets_packet_zstd_idx, nes_chrom_packets_payload_gin, nes_chrom_packets_qdrant_point_idx, nes_chrom_packets_query_hash_idx, nes_chrom_packets_som_code_idx, nes_chrom_packets_som_index_idx, nes_chrom_packets_source_ref_id_idx, nes_chrom_packets_source_ref_idx, nes_chrom_packets_source_ref_trgm_idx, nes_chrom_packets_source_refs_gin, nes_chrom_packets_summary_trgm_idx, nes_chrom_packets_tags_gin
+- live columns: id, packet_key, query_hash, chunk_id, source_ref, source_refs, feature_id, feature_label, packet_type, lane, model, summary, file_path, community_id, community_confidence, community_source, domain_class, permissions, topology, vectors, ledger_type, lineage_version, metadata, tags, canonical, identity_lane, payload_backfilled_at, pagerank, betweenness, eigenvector, neo4j_node_id, redis_centroid_key, som_row, som_col, som_index, kmeans_cluster, payload, embedding, qdrant_point_id, kag_dag_run_id, kag_node_key, token_budget, feature_ids, som_cluster, lane_ids, source_ref_id, feature_code, som_code, confidence_score, packet_zstd, created_at, updated_at
+- live indexes: idx_nes_chrom_packets_betweenness, idx_nes_chrom_packets_community_confidence_idx, idx_nes_chrom_packets_community_id_idx, idx_nes_chrom_packets_community_source_idx, idx_nes_chrom_packets_domain_class_idx, idx_nes_chrom_packets_eigenvector, idx_nes_chrom_packets_feature_id, idx_nes_chrom_packets_feature_id_idx, idx_nes_chrom_packets_feature_ids_gin, idx_nes_chrom_packets_feature_label_idx, idx_nes_chrom_packets_feature_source, idx_nes_chrom_packets_kmeans_cluster_idx, idx_nes_chrom_packets_lane_ids_gin, idx_nes_chrom_packets_ledger_type_idx, idx_nes_chrom_packets_lineage_version_idx, idx_nes_chrom_packets_metadata_gin, idx_nes_chrom_packets_neo4j_node_id, idx_nes_chrom_packets_packet_key_idx, idx_nes_chrom_packets_pagerank, idx_nes_chrom_packets_permissions_gin, idx_nes_chrom_packets_redis_centroid_key, idx_nes_chrom_packets_som_cluster, idx_nes_chrom_packets_som_index_idx, idx_nes_chrom_packets_source_ref, idx_nes_chrom_packets_source_ref_idx, idx_nes_chrom_packets_tags_gin, idx_nes_chrom_packets_topology_gin, idx_nes_chrom_packets_vectors_gin, nes_chrom_packets_chunk_id_idx, nes_chrom_packets_confidence_score_idx, nes_chrom_packets_embedding_hnsw, nes_chrom_packets_feature_code_idx, nes_chrom_packets_feature_id_idx, nes_chrom_packets_feature_ids_gin, nes_chrom_packets_kag_run_idx, nes_chrom_packets_kmeans_cluster_idx, nes_chrom_packets_lane_ids_gin, nes_chrom_packets_metadata_gin, nes_chrom_packets_norm_source_ref_trgm_idx, nes_chrom_packets_packet_key_key, nes_chrom_packets_packet_zstd_idx, nes_chrom_packets_payload_gin, nes_chrom_packets_pkey, nes_chrom_packets_qdrant_point_idx, nes_chrom_packets_query_hash_idx, nes_chrom_packets_som_code_idx, nes_chrom_packets_som_index_idx, nes_chrom_packets_source_ref_id_idx, nes_chrom_packets_source_ref_idx, nes_chrom_packets_source_ref_trgm_idx, nes_chrom_packets_source_refs_gin, nes_chrom_packets_summary_trgm_idx, nes_chrom_packets_tags_gin
+- live rows: 0
 
 ## nes_chrom_kag_dag_hits
 
-- classification: COLUMN_MISMATCH
-- repair_class: APPLY_EXISTING_SQL
+- classification: LIVE_DB_ALIGNED
+- repair_class: null
 - static: SQL_AND_DRIZZLE_ALIGNED
-- live: COLUMN_MISMATCH
+- live: LIVE_DB_ALIGNED
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts
-- manual sources: sveltekit-frontend/drizzle/manual/20260601_nes_chrom_packets_and_kag_dag_hits.sql, sveltekit-frontend/drizzle/manual/20260606_nes_chrom_live_alignment.sql
+- manual sources: sveltekit-frontend/drizzle/manual/20260601_nes_chrom_packets_and_kag_dag_hits.sql, sveltekit-frontend/drizzle/manual/20260606_nes_chrom_live_alignment.sql, sveltekit-frontend/drizzle/manual/20260826_restore_nes_chrom_packets_v1.sql
 - static columns: chunk_id, created_at, evidence, hit_type, id, metadata, node_key, packet_id, run_id, score, source_ref
 - static indexes: nes_chrom_kag_dag_hits_chunk_idx, nes_chrom_kag_dag_hits_evidence_gin, nes_chrom_kag_dag_hits_metadata_gin, nes_chrom_kag_dag_hits_node_key_idx, nes_chrom_kag_dag_hits_packet_idx, nes_chrom_kag_dag_hits_run_idx, nes_chrom_kag_dag_hits_source_ref_idx
-- live columns: none
-- live indexes: none
-- live rows: n/a
+- live columns: id, packet_id, run_id, chunk_id, source_ref, hit_type, score, node_key, evidence, metadata, created_at
+- live indexes: nes_chrom_kag_dag_hits_chunk_idx, nes_chrom_kag_dag_hits_evidence_gin, nes_chrom_kag_dag_hits_metadata_gin, nes_chrom_kag_dag_hits_node_key_idx, nes_chrom_kag_dag_hits_packet_idx, nes_chrom_kag_dag_hits_pkey, nes_chrom_kag_dag_hits_run_idx, nes_chrom_kag_dag_hits_source_ref_idx
+- live rows: 0
 
 ## parent_atlas_documents
 
@@ -106,8 +106,6 @@ Generated: 2026-08-25T23:16:23.135Z
 - task_semantic_packets: live COLUMN_MISMATCH
 - atlas_packets: static COLUMN_MISMATCH
 - atlas_packets: live COLUMN_MISMATCH
-- nes_chrom_packets: static COLUMN_MISMATCH
-- nes_chrom_packets: live COLUMN_MISMATCH
-- nes_chrom_kag_dag_hits: live COLUMN_MISMATCH
+- nes_chrom_packets: static INDEX_MISMATCH
 - parent_atlas_documents: live COLUMN_MISMATCH
 - route_runtime_packets: live COLUMN_MISMATCH

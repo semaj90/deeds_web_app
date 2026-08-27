@@ -13,6 +13,29 @@ month) is in `openspec/changes/codereview-semantic-dimension-regression-aug22/ta
 audit/proof-sequence value (the S180-6B live-storage corrections, the writer-lineage findings)
 but the frozen `semantic_512`-as-canonical conclusion itself no longer applies.
 
+## Current Atlas Pipeline Handoff (2026-08-26)
+
+This document is retained as the historical `semantic_512` proof sequence.
+The active pipeline is `semantic_768` and is tracked in
+`openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`.
+
+Current superseding status:
+
+- `S512-ID3`: **RESOLVED**, narrowly scoped to the explicit canonical linkage
+  decision recorded below.
+- `S512-ID4`: **PROVEN_READ_ONLY** for deterministic linkage readback.
+- `S512-10` and later spectral/latent promotion gates remain blocked where
+  they require admitted rows, revision-qualified source authority, or parity
+  evidence; resolving identity linkage did not authorize projection writes.
+- Native `semantic_768`, PostgreSQL, Qdrant, AST, and graph stages now follow
+  the staged order: source authority -> structural evidence -> canonical
+  binding -> integrity -> retrieval -> derived topology/ranking -> reviewed
+  promotion.
+
+Use this file for historical S512 evidence only. Do not reopen the old 512-D
+canonicalization decision or interpret its unchecked downstream items as
+current 768-D implementation tasks.
+
 Operator correction (2026-08-19): the persisted EmbeddingGemma test corpus that actually exists is 512-dimensional; a production/canonical 768-dimensional Qdrant corpus was not created. Do not promote an assumed 768 store merely because EmbeddingGemma's native output is 768.
 
 Live-storage correction (2026-08-19): the read-only S180-6B audit proved that live `atlas_packets` has complete `source_ref` but **no literal `source_revision` column**. Do not synthesize source revision from `workspace_revision`, `representation_revision`, vector dimension, timestamps, or Qdrant point IDs. Source freshness is a separate mutation-awareness proof.
@@ -433,7 +456,29 @@ linkage row.
       no chunk-side `tree_node_id`, no `sha256`/content_hash convergence to `atlas_packets`).
       Manifest: `data/atlas-ml/chunk-packet-identity-links.ndjson` (53,379 lines). Receipt:
       `data/atlas-ml/chunk-packet-identity-links-receipt.json`.
-- [ ] S512-ID3 — Canonical `atlas_packets` linkage: **PENDING, operator decision required.**
+- [x] S512-ID3 — Canonical `atlas_packets` linkage: **RESOLVED 2026-08-25 (this entry was
+      stale — the resolution happened in `parent-atlas-neural-prefill-encoder/tasks.md`'s
+      "PACKET-CHUNK-GRANULARITY-01 resolved: Option B applied, S512-ID3/ID4 closed" section
+      and was never synced back here; the two dead-end sub-option findings recorded below
+      under the old PENDING text remain accurate and worth keeping, they just describe
+      investigation that happened after the real closure elsewhere, not before it).**
+      **Operator explicitly chose Option B**: keep `atlas_packets` file-granular, route the FTS
+      identity join through `atlas_chunk_packet_identity_links` instead. Implemented in
+      `packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts::searchPostgresFts()`
+      as an additive second identity lane (`canonical_bridge`), hard-filtered in SQL to
+      `match_method = 'EXACT_CANONICAL_ID'` only — `UNRESOLVED`/`AMBIGUOUS` rows are excluded by
+      the predicate itself, so the "never substitute" rule below still holds. Lane 2 only fires
+      for chunks Lane 1 didn't already resolve. 14 unit tests added
+      (`postgres-fts.adapter.test.ts`); a real production bug was found and fixed along the way
+      (`result.map is not a function` — `db.execute()` via `drizzle-orm/node-postgres` returns a
+      `QueryResult` object, not a bare array; the file's own `LIVE_QUERY_PROVEN` header comment
+      had not actually been exercised against the real driver until this pass). Measured live
+      coverage improvement: exact lane alone covered 408/52,380 chunks (~0.78%); the bridge lane
+      adds 2,811 more, combined 3,219/52,380 (~6.1%) — a ~7.9x increase. Verified through the
+      adapter's own real code path (not just a mirrored query): 8 frozen queries now return 21
+      total candidates (3 exact lane, 18 bridge lane) where the same queries returned 0 before
+      this fix. This closes S512-ID3 — original PENDING text preserved below for the record of
+      what was investigated and ruled out before the operator decision.
       Cannot proceed until at least one tier produces real EXACT/UNIQUE_DERIVATION candidates.
       Two independent unlocks exist, either is sufficient, neither was attempted this session
       (both are population/backfill decisions for the operator, not something to infer):
@@ -448,6 +493,40 @@ linkage row.
       only 6,451/61,660 packets (10.5%), `qdrant_collection` for 6,365, and 10 duplicate point
       IDs exist. This is below the 95% admission target and remains `REVIEW`, so Qdrant IDs are
       not an admitted replacement for the missing packet/chunk bridge.
+      **Unlock (b), both sub-options re-investigated and confirmed dead ends (2026-08-26,
+      queried live, not re-derived from this file's prior text) — recorded so neither is
+      retried:**
+      - **`tree_node_id` sub-option**: found something the original census didn't check —
+        `atlas_packets.tree_node_id` is **UUID-format** for 61,659/61,660 rows
+        (`^[0-9a-f]{8}-[0-9a-f]{4}-...$`), while `atlas_ast_nodes.tree_node_id` is **sha256-hex
+        format** (per its own `20260716b_atlas_ast_nodes_alter.sql` definition, "sha256 of
+        structural key"). These are not the same identity space at all — confirmed
+        `SELECT count(*) FROM atlas_packets p JOIN atlas_ast_nodes a ON p.tree_node_id =
+        a.tree_node_id` returns **0**. No amount of populating a chunk-side, properly-computed
+        structural-key sha256 would ever match these values; `atlas_packets.tree_node_id`
+        appears to be some other, unrelated UUID (possibly assigned at packet-creation time),
+        not a real AST coordinate. Dead end confirmed by format incompatibility, not just
+        unpopulated data.
+      - **content_hash-bridge sub-option, an untried join**: tried a join not attempted in the
+        original S512-ID0 census — `atlas_packets.file_path = atlas_source_refs.relative_path`
+        (previously only `source_ref_key`-to-`source_ref_key`, namespace A vs B, and the dead
+        `relative_path+qualified_symbol` vs `file_path+function_symbol` combination were
+        tried). This one produces real rows (4,217), but is not usable: only **442/61,660
+        distinct packets (0.7%)** participate at all, and the join is heavily many-to-many
+        (some packets match up to 50 `atlas_source_refs` rows for the same file — likely a
+        pagination artifact in how that table was populated, not 50 real distinct symbols).
+        With `atlas_packets.byte_start`/`byte_end` 100% NULL, there is no signal to disambiguate
+        which of the ~10-average candidates is correct. Per this same file's own
+        `atlas_chunk_packet_identity_linker.py` rule (2+ candidates → `AMBIGUOUS`, never guess),
+        this does not clear the bar for a "real, verified" bridge either. Dead end confirmed,
+        not merely unattempted.
+      **Net effect**: both named sub-options of unlock (b) require genuinely new upstream data
+      (a real shared AST/structural identity scheme between `atlas_packets` and
+      `atlas_ast_nodes`, or real byte-range data on `atlas_packets`) — neither is reachable via
+      a cleverer query against what already exists in these tables today. This narrows, but
+      does not resolve, S512-ID3: the operator decision is now more specifically "does new
+      upstream instrumentation get built to produce one of these two identity signals for
+      real," not "which existing column combination should we try next."
 - [x] S512-ID4 — Linkage read-back determinism: **PROVEN_READ_ONLY**. The restored verifier
       `sveltekit-frontend/scripts/atlas/verify-s512-chunk-packet-identity-readback.mts` read the
       live snapshot twice under `REPEATABLE READ READ ONLY`; both checksums were

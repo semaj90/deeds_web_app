@@ -128,6 +128,14 @@ export function retrieveHypergraphContextV1(input: {
 		frontier = [...nextFrontier];
 	}
 
+	// KAG-05I: the hop loop can also stop because budget.maxHops was reached
+	// while frontier still holds unexplored entities — that is coverage cut
+	// short just as much as hitting maxRelations/maxEntities, and must not be
+	// reported as complete (repo rule: no silent caps).
+	if (frontier.length > 0) {
+		truncated = true;
+	}
+
 	const seedSet = new Set(seeds.map((seed) => seed.canonicalId));
 	const relations = [...visitedRelations.values()]
 		.sort((a, b) => a.relationId.localeCompare(b.relationId))

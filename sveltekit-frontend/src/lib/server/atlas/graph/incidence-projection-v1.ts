@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import type { RelationshipAuthority, RelationshipKernelV1 } from '@deeds/parent-atlas/core/relationship-kernel';
 import type { HyperRelationV1 } from './hyper-relation-v1.js';
 
 export const INCIDENCE_PROJECTION_SCHEMA = 'atlas.incidence-projection.v1' as const;
@@ -15,6 +16,12 @@ export interface IncidenceProjectionNodeV1 {
 	canonicalId: string | null;
 	relationId: string | null;
 	nodeKind: string;
+	// REL-OWNER-08: explicit domain tag for relation nodes, not inferred from
+	// nodeKind/relationType by convention. Always null for entity nodes, and
+	// null for a relation node whose HyperRelationV1 was hand-built without an
+	// authority (e.g. a tree-sitter structural fact, not a relationship-kernel
+	// projection).
+	authority: RelationshipAuthority | null;
 }
 
 export interface IncidenceProjectionEdgeV1 {
@@ -86,7 +93,8 @@ export function buildIncidenceProjectionV1(input: {
 			kind: 'entity',
 			canonicalId: entity.canonicalId,
 			relationId: null,
-			nodeKind: entity.nodeKind
+			nodeKind: entity.nodeKind,
+			authority: null
 		});
 	}
 
@@ -99,7 +107,8 @@ export function buildIncidenceProjectionV1(input: {
 			kind: 'relation',
 			canonicalId: null,
 			relationId: relation.relationId,
-			nodeKind: relation.relationType
+			nodeKind: relation.relationType,
+			authority: relation.authority ?? null
 		});
 	}
 
@@ -146,6 +155,47 @@ export function buildIncidenceProjectionV1(input: {
 			edgeTableHash
 		})
 	};
+}
+
+/** Convert revision-qualified kernels into the existing derived incidence graph. */
+export function buildIncidenceProjectionFromRelationshipKernelsV1(input: {
+	workspaceRevision: string;
+	projectionRevision: string;
+	entities: readonly IncidenceProjectionEntityInput[];
+	kernels: readonly RelationshipKernelV1[];
+}): IncidenceProjectionV1 {
+	const relations: HyperRelationV1[] = input.kernels.map((kernel) => {
+		if (kernel.workspaceRevision !== input.workspaceRevision) {
+			throw new Error(`WORKSPACE_REVISION_MISMATCH:${kernel.relationshipId}`);
+		}
+		if (!kernel.sourceRevision) {
+			throw new Error(`SOURCE_REVISION_UNPROVEN:${kernel.relationshipId}`);
+		}
+		if (kernel.evidenceRefs.length === 0) {
+			throw new Error(`EVIDENCE_MISSING:${kernel.relationshipId}`);
+		}
+		if (kernel.participants.length < 2) {
+			throw new Error(`PARTICIPANT_COUNT_INVALID:${kernel.relationshipId}`);
+		}
+		return {
+			schema: 'atlas.hyper-relation.v1',
+			relationId: kernel.relationshipId,
+			relationType: kernel.relationType,
+			participants: kernel.participants.map(({ canonicalId, role, ordinal }) => ({ canonicalId, role, ordinal })),
+			evidenceRefs: kernel.evidenceRefs,
+			workspaceRevision: kernel.workspaceRevision,
+			sourceRevision: kernel.sourceRevision,
+			producerRevision: kernel.producerRevision,
+			authority: kernel.authority
+		};
+	});
+
+	return buildIncidenceProjectionV1({
+		workspaceRevision: input.workspaceRevision,
+		projectionRevision: input.projectionRevision,
+		entities: input.entities,
+		relations
+	});
 }
 
 export function reconstructRelationsFromIncidenceProjectionV1(

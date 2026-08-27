@@ -1058,12 +1058,12 @@ export async function bifrostChat(
           // Search Qdrant HTTP for similar cached response (filter by model + cache_key)
           const t0_qdrant = performance.now();
           const searchRes = await fetch(
-            `${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points/search`,
+            `${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points/query`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                vector: vec,
+                query: vec,
                 limit: 1,
                 score_threshold: L2_SEMANTIC_THRESHOLD,
                 with_payload: true,
@@ -1083,9 +1083,9 @@ export async function bifrostChat(
           if (searchRes.ok) {
             const searchText = await searchRes.text();
             const searchData = fastJsonParse<{
-              result?: Array<{ score: number; payload?: { response?: string } }>;
+              result?: { points?: Array<{ score: number; payload?: { response?: string } }> };
             }>(searchText);
-            const hit = searchData.result?.[0];
+            const hit = searchData.result?.points?.[0];
             if (hit && hit.score >= L2_SEMANTIC_THRESHOLD && hit.payload?.response) {
               try {
                 const parsed = JSON.parse(hit.payload.response) as {

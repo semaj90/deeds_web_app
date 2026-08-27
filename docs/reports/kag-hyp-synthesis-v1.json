@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.kag-hyp-synthesis-receipt.v1",
+  "status": "KAG_HYP_SYNTHESIS_CONTRACT_PROVEN_LOCAL_ONLY",
+  "writes_performed": false,
+  "canonical_persistence_attempted": false,
+  "implementation": {
+    "module": "packages/parent-atlas/src/core/ontology-hyperedge-synthesis.ts",
+    "exported_from": "packages/parent-atlas/src/index.ts",
+    "source_contract": "atlas.external-doc-ontology-tuple.v1",
+    "target_contract": "atlas.feature-relationship.v1",
+    "deterministic_participant_order": true,
+    "revision_qualified": true,
+    "evidence_required": true,
+    "minimum_participants": 2
+  },
+  "validation": {
+    "typescript_compile": "PASS",
+    "focused_tests": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "checks": [
+      "grounded ternary tuple produces a deterministic hyperedge",
+      "shuffled participant order preserves relationship identity",
+      "degraded evidence is rejected",
+      "superseded lifecycle is rejected",
+      "missing participant IDs are rejected"
+    ]
+  },
+  "open_gates": [
+    "real LangExtract JSONL/OKF dry-run receipt",
+    "multi-tuple revision consistency",
+    "reviewed persistence adapter"
+  ]
+}

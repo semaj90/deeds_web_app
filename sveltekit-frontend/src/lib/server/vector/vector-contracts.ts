@@ -196,8 +196,8 @@ export const COLLECTION_VECTOR_SCHEMAS: Record<
 };
 
 /**
- * Qdrant search payload shape for API calls
- * This is what gets sent to Qdrant's /points/search endpoint
+ * Internal vector request shape. qdrant-manager converts this representation
+ * to Qdrant 1.19's Query API before sending it over the wire.
  */
 export interface QdrantSearchPayload {
   vector: { name: CodebaseVectorName; vector: number[] };
@@ -211,7 +211,7 @@ export interface QdrantSearchPayload {
 }
 
 /**
- * Build complete Qdrant search request
+ * Build complete internal vector request
  */
 export function buildQdrantSearchRequest(
   params: DenseSearchParams

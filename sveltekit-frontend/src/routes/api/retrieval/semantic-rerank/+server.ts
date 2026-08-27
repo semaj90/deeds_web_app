@@ -14,6 +14,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { rerank, healthCheckReranker } from '$lib/server/retrieval/semantic-vector-reranker';
 import { qdrant } from '$lib/server/vector/qdrant-manager';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
+import { QDRANT_DENSE_VECTOR_NAME, QDRANT_HYBRID_COLLECTION } from '$lib/server/vector/retrieval-semantics.js';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');
@@ -37,10 +39,24 @@ export const GET: RequestHandler = async ({ url }) => {
 			);
 		}
 
-		// 1. Search Qdrant for the query
-		const qdrantResults = await (qdrant as any).search('codebase_chunks_768', query, topK, {
-			// optional filters or advanced params
+		// 1. Encode the query through the canonical 768-dim EmbeddingGemma lane.
+		const embedded = await tryEmbedCanonical(query);
+		if (!embedded || embedded.embedding.length !== 768) {
+			return json(
+				{ error: 'Canonical 768-dimensional query embedding unavailable' },
+				{ status: 503 },
+			);
+		}
+
+		// 2. Query Qdrant through the shared Query API-backed manager contract.
+		const denseResponse = await qdrant.denseSearch({
+			query,
+			queryVector: embedded.embedding,
+			vectorName: QDRANT_DENSE_VECTOR_NAME,
+			collection: QDRANT_HYBRID_COLLECTION,
+			limit: topK,
 		});
+		const qdrantResults = denseResponse.results;
 
 		if (!qdrantResults || qdrantResults.length === 0) {
 			return json({
@@ -50,12 +66,12 @@ export const GET: RequestHandler = async ({ url }) => {
 			});
 		}
 
-		// 2. Rerank with semantic vector scores
+		// 3. Rerank with semantic vector scores
 		const startRerank = performance.now();
 		const candidates = await rerank(qdrantResults, { topK, verbose });
 		const rerankLatencyMs = Math.round(performance.now() - startRerank);
 
-		// 3. Return results with diagnostics
+		// 4. Return results with diagnostics
 		return json({
 			query,
 			timing: {

@@ -1,21 +1,21 @@
 # Atlas CHR97 Lineage Validation
 
-Generated: 2026-06-10T13:55:37.099Z
+Generated: 2026-08-26T23:45:56.706Z
 
-## Result: ✅ PASS (13/13 checks, 100.0% pass rate)
+## Result: ❌ FAIL (8/13 checks, 61.5% pass rate)
 
 > **Taxonomy note**: `nes_chrom_packets.feature_id` and `atlas_feature_map.feature_id` use different classification systems (fine-grained vs coarse). Exact label match is not expected. C1 checks structural source_ref presence only.
 
 | Check | Status | Message |
 |-------|--------|---------|
-| C1:ncp_in_atlas | ✅ | nes_chrom_packets in atlas_feature_map: 27/27 (100.0%) |
-| C2:ncp_feature_id | ✅ | nes_chrom_packets with feature_id: 27/27 (100.0%) |
-| C3:ncp_chunk_id | ✅ | nes_chrom_packets with chunk_id: 27/27 (100.0%) |
-| C4:ncp_kag_node_key | ✅ | nes_chrom_packets with kag_node_key: 27/27 (100.0%) |
-| C5:ncp_qdrant_reachability | ✅ | nes_chrom_packets qdrant_point_id: 20/27 have ID (74.1%); Qdrant reachable: 10/10 sampled (100.0%) |
-| C6:kag_hits_to_ncp | ✅ | nes_chrom_kag_dag_hits → nes_chrom_packets: 32/32 (100.0%) |
-| C7:kag_chunk_join | ✅ | kag_dag_hits chunk_id → nes_chrom_packets: 32/32 (100.0%) |
-| C8:kag_source_ref_join | ✅ | kag_dag_hits → nes_chrom_packets (source_ref OR chunk_id): 32/32 (100.0%) |
+| C1:ncp_in_atlas | ✅ | nes_chrom_packets in atlas_feature_map: 328/328 (100.0%) |
+| C2:ncp_feature_id | ✅ | nes_chrom_packets with feature_id: 328/328 (100.0%) |
+| C3:ncp_chunk_id | ✅ | nes_chrom_packets with chunk_id: 328/328 (100.0%) |
+| C4:ncp_kag_node_key | ❌ | nes_chrom_packets with kag_node_key: 0/328 (0.0%) |
+| C5:ncp_qdrant_reachability | ❌ | nes_chrom_packets qdrant_point_id: 0/328 have ID (0.0%); Qdrant reachable: 0/0 sampled (100.0%) |
+| C6:kag_hits_to_ncp | ❌ | nes_chrom_kag_dag_hits → nes_chrom_packets: 0/0 (0.0%) |
+| C7:kag_chunk_join | ❌ | kag_dag_hits chunk_id → nes_chrom_packets: 0/0 (0.0%) |
+| C8:kag_source_ref_join | ❌ | kag_dag_hits → nes_chrom_packets (source_ref OR chunk_id): 0/0 (0.0%) |
 | C9:sprite_engramKey | ✅ | chr97-sprites engramKey: 200/200 (100.0%) |
 | C10:sprite_hash | ✅ | chr97-sprites sprite.hash: 200/200 (100.0%) |
 | C11:sprite_reward_score | ✅ | chr97-sprites rankedCard.score > 0: 200/200 (100.0%) |

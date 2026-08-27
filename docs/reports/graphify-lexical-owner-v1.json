@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lexical-owner.v1",
-  "generatedAt": "2026-08-25T21:16:01.040Z",
+  "generatedAt": "2026-08-26T22:14:42.810Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "extensions": [
@@ -203,17 +203,28 @@
       "definition": "CREATE TRIGGER trig_update_codebase_chunk_search_vector BEFORE INSERT OR UPDATE ON public.codebase_chunk_index FOR EACH ROW EXECUTE FUNCTION compute_codebase_chunk_search_vector()"
     }
   ],
+  "documentSearchVectorProducer": {
+    "function": "public.compute_codebase_chunk_search_vector",
+    "configurations": [
+      "english",
+      "simple"
+    ],
+    "definitionAvailable": true
+  },
+  "queryConfiguration": "english",
+  "configurationAligned": false,
   "counts": {
-    "total": 52417,
-    "search_vector": 52417,
+    "total": 55206,
+    "search_vector": 55206,
     "ast_symbols": 17800,
-    "content_embedding_768": 576,
-    "content_embedding": 52380
+    "content_embedding_768": 724,
+    "content_embedding": 55169
   },
   "owner": "POSTGRES_FTS_TSVECTOR_TS_RANK_CD",
   "findings": [
     "pg_search extension is installed; query ownership still requires a live pg_search scorer/index proof.",
-    "pg_search is available but is not promoted as the owner by this receipt."
+    "pg_search is available but is not promoted as the owner by this receipt.",
+    "Document search_vector uses english, simple while queries use english; benchmark or define a shared configuration before claiming alignment."
   ],
   "status": "PASS"
 }

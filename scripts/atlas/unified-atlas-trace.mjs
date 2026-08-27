@@ -180,7 +180,7 @@ async function qdrantSearch(vector, collection, topK = 6, scoreThreshold = MIN_S
     body.vector = vector;
   }
 
-  const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+    const r = await fetch(`${QDRANT_URL}/collections/${collection}/points/query`, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(body),

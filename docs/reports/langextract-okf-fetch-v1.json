@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.langextract-okf-fetch-receipt.v1",
+  "status": "COMPLETE_DERIVED_CAPTURE",
+  "output_namespace": "docs/.okf/langextract",
+  "writes_performed": true,
+  "canonical_persistence_attempted": false,
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "requested": 7,
+  "fetched": 7,
+  "failed": 0,
+  "pages": [
+    {
+      "source_id": "repository",
+      "url": "https://github.com/google/langextract",
+      "status": "FETCHED",
+      "content_hash": "0deda348b618b3655a251f295bcb4f86d772b7626e7f22505ad21f91809359ee"
+    },
+    {
+      "source_id": "readme",
+      "url": "https://github.com/google/langextract/blob/main/README.md",
+      "status": "FETCHED",
+      "content_hash": "b1cfb8146c441d546b5e9de6793672819766edee24fa0b517070d0add2d755a4"
+    },
+    {
+      "source_id": "pyproject",
+      "url": "https://github.com/google/langextract/blob/main/pyproject.toml",
+      "status": "FETCHED",
+      "content_hash": "fd1caa2a2eddf414d8ecf7e69263c343075bac870b87db339c354a6694f0ecf5"
+    },
+    {
+      "source_id": "releases",
+      "url": "https://github.com/google/langextract/releases",
+      "status": "FETCHED",
+      "content_hash": "e18214b9bb9411871f8e903f0050ffb803e8662cd6b0f5efcdd7994afc9f765c"
+    },
+    {
+      "source_id": "pypi",
+      "url": "https://pypi.org/project/langextract/",
+      "status": "FETCHED",
+      "content_hash": "1a36efa04eddc5a9287153dbc2450d91ee9558112725c24a2d7fad00307a70ee"
+    },
+    {
+      "source_id": "providers",
+      "url": "https://github.com/google/langextract/blob/main/langextract/providers/README.md",
+      "status": "FETCHED",
+      "content_hash": "089f69d44aa442a00d715515089a011d7a08a305ccd62f6f7f4a8a908cf74eb4"
+    },
+    {
+      "source_id": "longer-text-example",
+      "url": "https://github.com/google/langextract/blob/main/docs/examples/longer_text_example.md",
+      "status": "FETCHED",
+      "content_hash": "4eb41de5b77846999fb94634e2f3ba11d0a019f4f9f4eb53c66d9a6835d13011"
+    }
+  ]
+}

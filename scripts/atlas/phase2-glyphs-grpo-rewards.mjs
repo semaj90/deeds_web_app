@@ -56,13 +56,12 @@ async function fetchGlyphsFromDB(db) {
 async function fetchQdrantChunks(limit = 100) {
   try {
     const body = JSON.stringify({
-      vector: new Array(768).fill(0), // dummy query vector
       limit,
       with_payload: true,
-      with_vectors: true
+      with_vector: true
     });
 
-    const resp = await fetch(`${QDRANT_ENDPOINT}/collections/${QDRANT_COLLECTION}/points/search`, {
+    const resp = await fetch(`${QDRANT_ENDPOINT}/collections/${QDRANT_COLLECTION}/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body
@@ -74,7 +73,7 @@ async function fetchQdrantChunks(limit = 100) {
     }
 
     const json = await resp.json();
-    return (json.result || []).map(pt => ({
+    return (json.result?.points || []).map(pt => ({
       id: pt.id,
       payload: pt.payload,
       vector: pt.vector?.data || []

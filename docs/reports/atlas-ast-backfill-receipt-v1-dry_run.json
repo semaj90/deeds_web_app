@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-backfill-receipt.v1",
-  "generatedAt": "2026-08-25T23:26:32.650Z",
+  "generatedAt": "2026-08-27T00:26:00.468Z",
   "mode": "DRY_RUN",
   "limit": 1000,
   "status": "DRY_RUN_COMPLETE",
@@ -14,7 +14,7 @@
         "current_user": "legal_admin",
         "current_schema": "public",
         "configured_search_path": "\"$user\", public",
-        "server_address": "172.18.0.21/32",
+        "server_address": "172.18.0.20/32",
         "server_port": 5432
       },
       "baselineReportPath": "docs/reports/live-source-lineage-table-audit.json",
@@ -28,7 +28,7 @@
         "configuredSearchPath": "\"$user\", public",
         "effectiveSearchPath": "{pg_catalog,public}",
         "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-        "serverAddress": "172.18.0.21/32",
+        "serverAddress": "172.18.0.20/32",
         "serverPort": 5432,
         "relations": [
           {
@@ -102,7 +102,7 @@
             "selectable": true
           }
         ],
-        "fingerprintSha256": "8b4e8734ad4d80c34ec6de8c9231373b824dba414aa5a3aab7a0a31fb127e132"
+        "fingerprintSha256": "a7b50678e5ca9697179eb35a9e4f1de820a4fd7367b135c7c7821c0f9eb62292"
       },
       "comparedFields": [
         "databaseName",
@@ -209,7 +209,7 @@
       "valkeyWrites": false
     }
   },
-  "databaseContextChecksum": "3b45fd152dc3e7c7db80f5179a2fba3c32036b740992f3ad9bc7a54043902e2f",
+  "databaseContextChecksum": "3098a9fe10bdce6d1bf4d25b1daa47b2575985a7911b4583bbb9e932c0f76dba",
   "sourceInventoryChecksum": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
   "candidateArtifactChecksum": "c15de830fafefdcee2d3a6c38d9ef012f970f874d7df1ef8d653014156d6b463",
   "selectionChecksum": "8acaa579eeb13b0135bb3da729d4a0a583925ea97fa171c522e09a52ec0f5ef6",

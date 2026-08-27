@@ -201,6 +201,15 @@
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_nes_chrom_packets_lane_ids_gin','nes_chrom_packets_embedding_hnsw','nes_chrom_kag_dag_hits_chunk_idx','nes_chrom_kag_dag_hits_source_ref_idx','nes_chrom_kag_dag_hits_node_key_idx','nes_chrom_kag_dag_hits_evidence_gin','nes_chrom_kag_dag_hits_metadata_gin');\""
     },
     {
+      "file": "manual/20260826_restore_nes_chrom_packets_v1.sql",
+      "status": "applied",
+      "reason": "Restores the proven NES/CHROM 768-D packet and KAG-hit projection contract additively after live-schema drift removed both tables. Creates missing tables/columns/indexes only; no deletes, truncates, rewrites, or backfills.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -P pager=off -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('nes_chrom_packets','nes_chrom_kag_dag_hits') ORDER BY table_name; SELECT indexname FROM pg_indexes WHERE schemaname='public' AND tablename='nes_chrom_packets' ORDER BY indexname;\""
+    },
+    {
       "file": "9998_create_agent_pickup_queue.sql",
       "status": "manual_sidecar",
       "reason": "Drizzle migration for agent_pickup_queue table to support agent pickup loop.",
@@ -261,7 +270,7 @@
       "appliedBy": "operator",
       "appliedAt": null,
       "requiresJournalEntry": false,
-      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-revision-migration.mts --migration=snapshot"
+      "validationCommand": "npx tsx scripts/atlas/audit-graph-snapshot-revision-migration-safety.mts"
     },
     {
       "file": "manual/20260822_graphify_revision_authority_v2.sql",
@@ -270,7 +279,7 @@
       "appliedBy": "operator",
       "appliedAt": null,
       "requiresJournalEntry": false,
-      "validationCommand": "ATLAS_MIGRATION_ROLLBACK_PROOF=1 npx tsx scripts/atlas/prove-graphify-revision-migration.mts --migration=graphify"
+      "validationCommand": "npx tsx scripts/atlas/audit-graphify-revision-migration-safety.mts"
     },
     {
       "file": "manual/20260818_atlas_symbol_registry_v1.sql",
@@ -350,6 +359,87 @@
       "appliedAt": "2026-08-24",
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/audit-kag-persistence-v1.mjs"
+    },
+    {
+      "file": "manual/20260826_atlas_hyperedges_gate_alignment_v1.sql",
+      "status": "applied",
+      "reason": "Closes a gate-alignment gap found during KAG hyperedge review: atlas_hyperedges.checksum and .lifecycle had Zod-level invariants (HyperedgeV1Schema regex, OntologyLinkedTupleLifecycleSchema-equivalent enum) with no matching Postgres CHECK, unlike sibling atlas_ontology_linked_tuples which already enforces its lifecycle enum at the DB layer. Table had 0 rows at authoring time; additive, no backfill.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT conname FROM pg_constraint WHERE conrelid = 'atlas_hyperedges'::regclass AND conname LIKE '%check%';\""
+    },
+    {
+      "file": "manual/20260826_atlas_taxonomy_assignment_candidates_v1.sql",
+      "status": "applied",
+      "reason": "New table for the taxonomy-assignment review surface (KAG wiring roadmap step 2): persists TaxonomyAssignmentCandidateV1 for review and tracks the proposed/review_required -> promoted/rejected transition, with promoted_hyperedge_id linking a promoted candidate to the atlas_hyperedges row it produced. Deliberately not a foreign key so a promoted-but-hyperedge-write-failed degraded state stays queryable. New table, zero pre-existing rows.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "npx tsx scripts/atlas/kag-taxonomy-candidate-review-live-proof-v1.mts (run from sveltekit-frontend/)"
+    },
+    {
+      "file": "manual/20260817_atlas_feature_intelligence_v1.sql",
+      "status": "applied",
+      "reason": "REL-FI-01: Feature Intelligence canonical Postgres persistence (atlas_relationships/atlas_relationship_members/atlas_relationship_cardinality/atlas_relationship_evidence/atlas_relationship_embeddings/atlas_feature_embeddings/atlas_feature_state_receipts/atlas_dynamic_hyperedge_candidates, plus atlas_validate_relationship()). Originally named two tables atlas_features/atlas_feature_evidence that collided with unrelated pre-existing live tables (AST structural-feature facts from 20260716_atlas_knowledge_layer.sql; packet-level multi-modal evidence extraction) -- confirmed both collision tables empty (0 rows), no data at risk, renamed to atlas_fi_features/atlas_fi_evidence in this file and in packages/parent-atlas/src/core/feature-intelligence-repository.ts before applying. See openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md 'REL-FI-01' section for the full collision writeup.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_fi_features','atlas_fi_evidence','atlas_relationships','atlas_relationship_members','atlas_relationship_cardinality','atlas_relationship_evidence','atlas_relationship_embeddings','atlas_feature_embeddings','atlas_feature_state_receipts','atlas_dynamic_hyperedge_candidates') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_dynamic_hyperedge_entities_v1.sql",
+      "status": "applied",
+      "reason": "Sibling migration to 20260817: query-time dynamic hyperedge support (atlas_evidence_entities, atlas_evidence_event_hyperedges view, atlas_dynamic_hyperedge_neighborhood()). No table-name collisions -- references only atlas_evidence, which does not collide. Applied in the same session as 20260817 once that migration's collision was resolved.",
+      "appliedBy": "claude",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name = 'atlas_evidence_entities';\""
+    },
+    {
+      "file": "manual/20260818_atlas_schema_object_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary schema-object registry required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_schema_object_registry','atlas_schema_object_aliases','atlas_schema_object_versions') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_test_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary test registry and execution receipt tables required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_test_registry','atlas_test_aliases','atlas_test_versions','atlas_test_execution_receipts') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_identity_alias_decisions_v1.sql",
+      "status": "applied",
+      "reason": "Reviewed identity-alias decision table required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_identity_alias_decisions');\""
+    },
+    {
+      "file": "manual/20260818_atlas_assertion_registry_v1.sql",
+      "status": "applied",
+      "reason": "Auxiliary assertion registry tables required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_assertion_registry','atlas_assertion_aliases','atlas_assertion_versions') ORDER BY table_name;\""
+    },
+    {
+      "file": "manual/20260818_atlas_algorithm_execution_receipts_v1.sql",
+      "status": "applied",
+      "reason": "Algorithm execution receipt table required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-26",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_algorithm_execution_receipts');\""
     }
   ]
 }

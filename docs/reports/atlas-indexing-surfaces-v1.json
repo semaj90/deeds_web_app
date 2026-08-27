@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-25T23:20:52.156Z",
+  "generatedAt": "2026-08-27T03:14:33.662Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -52,7 +52,7 @@
       },
       "codebase_chunk_index": {
         "exists": true,
-        "count": 52417
+        "count": 55206
       },
       "atlas_packet_features": {
         "exists": true,
@@ -442,23 +442,23 @@
       "codebaseChunkQdrantColumn": "qdrant_id",
       "codebaseChunkEmbeddings": {
         "exists": true,
-        "count": 576
+        "count": 724
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
-        "count": 52417
+        "count": 55206
       },
       "codebaseChunkQdrantIds": {
         "exists": true,
-        "count": 52417
+        "count": 55206
       },
       "codebaseChunk_content_embedding": {
         "exists": true,
-        "count": 52380
+        "count": 55169
       },
       "codebaseChunk_content_embedding_768": {
         "exists": true,
-        "count": 576
+        "count": 724
       },
       "codebaseChunk_content_embedding_384": {
         "exists": true,
@@ -474,7 +474,7 @@
       },
       "codebaseChunk_search_vector": {
         "exists": true,
-        "count": 52417
+        "count": 55206
       },
       "packetAstSymbols": {
         "exists": true,
@@ -541,6 +541,11 @@
         "definition": "CREATE INDEX idx_analysis_pass_provenance_gin ON public.analysis_pass_results USING gin (provenance)"
       },
       {
+        "table": "atlas_algorithm_execution_receipts",
+        "name": "atlas_algorithm_execution_receipts_manifest_gin",
+        "definition": "CREATE INDEX atlas_algorithm_execution_receipts_manifest_gin ON public.atlas_algorithm_execution_receipts USING gin (manifest jsonb_path_ops)"
+      },
+      {
         "table": "atlas_artifacts",
         "name": "idx_atlas_artifacts_metadata",
         "definition": "CREATE INDEX idx_atlas_artifacts_metadata ON public.atlas_artifacts USING gin (metadata)"
@@ -601,9 +606,39 @@
         "definition": "CREATE INDEX atlas_class_search_index_v1_search_gin ON public.atlas_class_search_index_v1 USING gin (search_vector)"
       },
       {
+        "table": "atlas_dynamic_hyperedge_candidates",
+        "name": "atlas_dynamic_hyperedge_participants_gin_idx",
+        "definition": "CREATE INDEX atlas_dynamic_hyperedge_participants_gin_idx ON public.atlas_dynamic_hyperedge_candidates USING gin (participants jsonb_path_ops)"
+      },
+      {
         "table": "atlas_embeddings_384",
         "name": "idx_ae384_content_hnsw",
         "definition": "CREATE INDEX idx_ae384_content_hnsw ON public.atlas_embeddings_384 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='128') WHERE ((vector_role = 'content'::text) AND (normalized = true))"
+      },
+      {
+        "table": "atlas_evidence",
+        "name": "atlas_evidence_payload_gin_idx",
+        "definition": "CREATE INDEX atlas_evidence_payload_gin_idx ON public.atlas_evidence USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_evidence",
+        "name": "atlas_evidence_search_gin_idx",
+        "definition": "CREATE INDEX atlas_evidence_search_gin_idx ON public.atlas_evidence USING gin (search_vector)"
+      },
+      {
+        "table": "atlas_evidence",
+        "name": "atlas_evidence_tags_gin_idx",
+        "definition": "CREATE INDEX atlas_evidence_tags_gin_idx ON public.atlas_evidence USING gin (tags)"
+      },
+      {
+        "table": "atlas_evidence_entities",
+        "name": "atlas_evidence_entities_metadata_gin_idx",
+        "definition": "CREATE INDEX atlas_evidence_entities_metadata_gin_idx ON public.atlas_evidence_entities USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "table": "atlas_feature_embeddings",
+        "name": "atlas_feature_embeddings_hnsw_cosine_idx",
+        "definition": "CREATE INDEX atlas_feature_embeddings_hnsw_cosine_idx ON public.atlas_feature_embeddings USING hnsw (embedding vector_cosine_ops)"
       },
       {
         "table": "atlas_feature_envelopes",
@@ -649,6 +684,11 @@
         "table": "atlas_features",
         "name": "idx_af_labels_gin",
         "definition": "CREATE INDEX idx_af_labels_gin ON public.atlas_features USING gin (labels)"
+      },
+      {
+        "table": "atlas_fi_features",
+        "name": "atlas_fi_features_metadata_gin_idx",
+        "definition": "CREATE INDEX atlas_fi_features_metadata_gin_idx ON public.atlas_fi_features USING gin (metadata jsonb_path_ops)"
       },
       {
         "table": "atlas_higher_hop_index",
@@ -874,6 +914,16 @@
         "table": "atlas_packets",
         "name": "idx_packets_used_concepts_gin",
         "definition": "CREATE INDEX idx_packets_used_concepts_gin ON public.atlas_packets USING gin (used_concepts)"
+      },
+      {
+        "table": "atlas_relationship_embeddings",
+        "name": "atlas_relationship_embeddings_hnsw_cosine_idx",
+        "definition": "CREATE INDEX atlas_relationship_embeddings_hnsw_cosine_idx ON public.atlas_relationship_embeddings USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "table": "atlas_relationships",
+        "name": "atlas_relationships_metadata_gin_idx",
+        "definition": "CREATE INDEX atlas_relationships_metadata_gin_idx ON public.atlas_relationships USING gin (metadata jsonb_path_ops)"
       },
       {
         "table": "atlas_retrieval_eval_times",
@@ -1221,6 +1271,101 @@
         "definition": "CREATE INDEX metadata_envelopes_relations_gin ON public.metadata_envelopes USING gin (relations)"
       },
       {
+        "table": "nes_chrom_kag_dag_hits",
+        "name": "nes_chrom_kag_dag_hits_evidence_gin",
+        "definition": "CREATE INDEX nes_chrom_kag_dag_hits_evidence_gin ON public.nes_chrom_kag_dag_hits USING gin (evidence)"
+      },
+      {
+        "table": "nes_chrom_kag_dag_hits",
+        "name": "nes_chrom_kag_dag_hits_metadata_gin",
+        "definition": "CREATE INDEX nes_chrom_kag_dag_hits_metadata_gin ON public.nes_chrom_kag_dag_hits USING gin (metadata)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_feature_ids_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_lane_ids_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_metadata_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_permissions_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_permissions_gin ON public.nes_chrom_packets USING gin (permissions)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_tags_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_topology_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_topology_gin ON public.nes_chrom_packets USING gin (topology)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "idx_nes_chrom_packets_vectors_gin",
+        "definition": "CREATE INDEX idx_nes_chrom_packets_vectors_gin ON public.nes_chrom_packets USING gin (vectors)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_embedding_hnsw",
+        "definition": "CREATE INDEX nes_chrom_packets_embedding_hnsw ON public.nes_chrom_packets USING hnsw (embedding vector_cosine_ops)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_feature_ids_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_lane_ids_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_metadata_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_norm_source_ref_trgm_idx",
+        "definition": "CREATE INDEX nes_chrom_packets_norm_source_ref_trgm_idx ON public.nes_chrom_packets USING gin (lower(source_ref) gin_trgm_ops)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_payload_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_payload_gin ON public.nes_chrom_packets USING gin (payload)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_source_ref_trgm_idx",
+        "definition": "CREATE INDEX nes_chrom_packets_source_ref_trgm_idx ON public.nes_chrom_packets USING gin (source_ref gin_trgm_ops)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_source_refs_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_source_refs_gin ON public.nes_chrom_packets USING gin (source_refs)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_summary_trgm_idx",
+        "definition": "CREATE INDEX nes_chrom_packets_summary_trgm_idx ON public.nes_chrom_packets USING gin (summary gin_trgm_ops)"
+      },
+      {
+        "table": "nes_chrom_packets",
+        "name": "nes_chrom_packets_tags_gin",
+        "definition": "CREATE INDEX nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)"
+      },
+      {
         "table": "packet_source_features",
         "name": "packet_source_features_keywords_gin",
         "definition": "CREATE INDEX packet_source_features_keywords_gin ON public.packet_source_features USING gin (keywords)"
@@ -1549,7 +1694,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 0,
+        "points": 10,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -1579,8 +1724,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 106338,
-        "indexedVectors": 116376,
+        "points": 109129,
+        "indexedVectors": 109983,
         "status": "green"
       },
       {
@@ -1893,8 +2038,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 137,
-        "indexedVectors": 137,
+        "points": 326,
+        "indexedVectors": 326,
         "status": "green"
       },
       {
@@ -1945,8 +2090,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 254,
-    "declaredSidecars": 39,
+    "manualSqlFiles": 257,
+    "declaredSidecars": 49,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",
@@ -2016,16 +2161,10 @@
       "severity": "high",
       "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
       "evidence": [
-        "576/52417",
+        "724/55206",
         "codebase_chunk_index.content_embedding_768",
         "codebase_chunk_index.content_embedding"
       ]
-    },
-    {
-      "id": "POSTGRES_BITMAP_TABLE_MISSING",
-      "severity": "medium",
-      "message": "No PostgreSQL table explicitly models bitmap-combinable routing state; current filtering relies on GIN/Valkey projections.",
-      "evidence": []
     },
     {
       "id": "PACKET_AST_SYMBOL_COVERAGE_LOW",

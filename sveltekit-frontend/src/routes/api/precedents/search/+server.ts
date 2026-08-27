@@ -68,11 +68,11 @@ async function searchQdrantCases(
 			? { must: [{ key: 'case_id', match: { value: caseId } }] }
 			: undefined;
 
-		const res = await fetch(`${QDRANT_URL}/collections/legal_cases/points/search`, {
+		const res = await fetch(`${QDRANT_URL}/collections/legal_cases/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector,
+				query: vector,
 				limit,
 				with_payload: true,
 				score_threshold: 0.30,
@@ -83,7 +83,7 @@ async function searchQdrantCases(
 
 		if (!res.ok) return [];
 		const data = await res.json();
-		const hits = data.result ?? [];
+		const hits = data.result?.points ?? [];
 
 		return hits.map((hit: Record<string, unknown>) => {
 			const payload = hit.payload as Record<string, unknown> | undefined;

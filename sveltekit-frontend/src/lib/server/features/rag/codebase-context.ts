@@ -283,13 +283,13 @@ async function searchQdrant(
   }
 
   const body: Record<string, unknown> = {
-    vector: { name: vectorName, vector },
+    query: { name: vectorName, vector },
     limit,
     with_payload: true,
   };
   if (filter) body.filter = filter;
 
-  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+  const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -298,7 +298,7 @@ async function searchQdrant(
 
   if (!res.ok) return [];
   const data = await res.json();
-  const results = data.result ?? [];
+  const results = data.result?.points ?? [];
   setCachedSearchResults(cacheCollection, query, results, filter).catch(() => {});
   return results;
 }

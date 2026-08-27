@@ -1,16 +1,16 @@
 {
   "schema": "atlas.graph-structural-quality.v1",
-  "generatedAt": "2026-08-23T22:13:00.606Z",
+  "generatedAt": "2026-08-26T23:20:25.849Z",
   "readOnly": true,
   "canonicalAuthority": false,
   "graphRevision": null,
   "projectionRevision": "codeGraph",
-  "nodeCount": 69009,
-  "relationshipCount": 3452,
-  "weaklyConnectedComponentCount": 66754,
-  "isolatedNodeCount": 66392,
-  "largestComponentNodeCount": 502,
-  "averageDegree": 0.1000449216768832,
+  "nodeCount": 0,
+  "relationshipCount": 0,
+  "weaklyConnectedComponentCount": 0,
+  "isolatedNodeCount": 0,
+  "largestComponentNodeCount": 0,
+  "averageDegree": 0,
   "communityCount": 66461,
   "singletonCommunityCount": 65774,
   "modularity": null,
@@ -30,9 +30,17 @@
   "reasonCodes": [
     "AVERAGE_DEGREE_TOO_LOW",
     "ISOLATED_NODE_RATIO_HIGH",
-    "MULTIPLE_WEAK_COMPONENTS",
     "COMMUNITY_SINGLETON_RATIO_HIGH",
     "COMMUNITY_COUNT_NEAR_NODE_COUNT"
   ],
-  "metricErrors": []
+  "metricErrors": [
+    {
+      "name": "degree",
+      "error": "Failed to invoke procedure `gds.degree.stream`: Caused by: org.neo4j.gds.core.loading.GraphNotFoundException: Graph with name `codeGraph` does not exist on database `neo4j`. It might exist on another database."
+    },
+    {
+      "name": "wcc",
+      "error": "Failed to invoke procedure `gds.wcc.stream`: Caused by: org.neo4j.gds.core.loading.GraphNotFoundException: Graph with name `codeGraph` does not exist on database `neo4j`. It might exist on another database."
+    }
+  ]
 }

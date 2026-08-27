@@ -585,15 +585,15 @@ export async function searchLlmOutputsBySimilarity(
 
   let hits: Array<{ id: number; score: number; payload: { path?: string; pathHash?: string } }> = [];
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${CODE_LLM_QDRANT_COLLECTION}/points/search`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${CODE_LLM_QDRANT_COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vector: vec, limit, with_payload: true }),
+      body: JSON.stringify({ query: vec, limit, with_payload: true }),
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return [];
     const d = await res.json();
-    hits = d.result ?? [];
+    hits = d.result?.points ?? [];
   } catch { return []; }
 
   if (!hits.length) return [];

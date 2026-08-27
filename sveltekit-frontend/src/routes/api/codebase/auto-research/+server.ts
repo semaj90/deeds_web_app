@@ -76,14 +76,15 @@ async function searchCodebase(
 ): Promise<Array<{ id: string; score: number; payload: Record<string, unknown> }>> {
 	try {
 		const body: Record<string, unknown> = {
-			vector: { name: 'content', vector: queryVector },
+			query: queryVector,
+			using: 'content',
 			limit,
 			with_payload: true,
 			score_threshold: 0.2,
 		};
 		if (filter) body.filter = filter;
 
-		const res = await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+		const res = await fetch(`${ENV.QDRANT_URL}/collections/${COLLECTION}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
@@ -91,7 +92,7 @@ async function searchCodebase(
 		});
 		if (!res.ok) return [];
 		const data = await res.json();
-		return (data.result ?? []).map((r: Record<string, unknown>) => ({
+		return (data.result?.points ?? []).map((r: Record<string, unknown>) => ({
 			id: String(r.id),
 			score: Number(r.score ?? 0),
 			payload: (r.payload as Record<string, unknown>) ?? {},

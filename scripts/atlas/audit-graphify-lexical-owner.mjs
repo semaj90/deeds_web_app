@@ -28,6 +28,9 @@ const report = {
   columns: [],
   indexes: [],
   triggers: [],
+  documentSearchVectorProducer: null,
+  queryConfiguration: 'english',
+  configurationAligned: false,
   counts: {},
   owner: 'UNVERIFIED',
   findings: [],
@@ -68,6 +71,22 @@ try {
   `);
   report.triggers = triggers.rows;
 
+  const producer = await pool.query(`
+    SELECT pg_get_functiondef('public.compute_codebase_chunk_search_vector()'::regprocedure)
+      AS definition
+  `);
+  const producerDefinition = producer.rows[0]?.definition ?? '';
+  const producerConfigurations = [...producerDefinition.matchAll(/to_tsvector\('([a-z_]+)'/gi)]
+    .map((match) => match[1].toLowerCase());
+  report.documentSearchVectorProducer = {
+    function: 'public.compute_codebase_chunk_search_vector',
+    configurations: [...new Set(producerConfigurations)],
+    definitionAvailable: Boolean(producerDefinition),
+  };
+  report.configurationAligned =
+    report.documentSearchVectorProducer.configurations.length === 1 &&
+    report.documentSearchVectorProducer.configurations[0] === report.queryConfiguration;
+
   const counts = await pool.query(`
     SELECT
       count(*)::bigint AS total,
@@ -87,6 +106,11 @@ try {
   if (hasTsvector && hasGin && hasTrigger) report.owner = 'POSTGRES_FTS_TSVECTOR_TS_RANK_CD';
   else report.findings.push('PostgreSQL FTS shape is incomplete or differs from the expected search_vector/GIN/trigger contract.');
   if (report.owner === 'POSTGRES_FTS_TSVECTOR_TS_RANK_CD' && hasSearch) report.findings.push('pg_search is available but is not promoted as the owner by this receipt.');
+  if (!report.documentSearchVectorProducer.definitionAvailable) {
+    report.findings.push('The search_vector producer function could not be inspected.');
+  } else if (!report.configurationAligned) {
+    report.findings.push(`Document search_vector uses ${report.documentSearchVectorProducer.configurations.join(', ') || 'UNKNOWN'} while queries use ${report.queryConfiguration}; benchmark or define a shared configuration before claiming alignment.`);
+  }
 } catch (error) {
   report.status = 'FAIL';
   report.findings.push(error.message);

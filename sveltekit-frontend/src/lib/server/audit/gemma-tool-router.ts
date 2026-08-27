@@ -318,12 +318,12 @@ export async function executeAuditTool(
 
         // search Qdrant
         const searchRes = await fetch(
-          `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+          `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              vector: queryVec,
+              query: queryVec,
               limit,
               with_payload: true,
               score_threshold: 0.3,
@@ -342,7 +342,7 @@ export async function executeAuditTool(
         }
 
         const searchData = await searchRes.json();
-        const hits = searchData.result ?? [];
+        const hits = searchData.result?.points ?? [];
         if (hits.length === 0) {
           return {
             ok: true,

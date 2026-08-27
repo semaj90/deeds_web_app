@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.acp.nlp.tool.review.v1",
+  "reviewedAt": "2026-08-26",
+  "status": "BOUNDARY_AND_LIVE_READONLY_PROOF_PROVEN",
+  "tools": ["nlp:capabilities", "nlp:analyze", "nlp:ast-chunk"],
+  "contract": {
+    "sidecar": "python/miniforge_nlp_sidecar_v2.py",
+    "astAliasFields": {
+      "filePath": "file_path",
+      "sourceRevision": "source_revision"
+    },
+    "astAliasConfirmed": true
+  },
+  "localGuards": [
+    "analysis text <= 200000 chars",
+    "analysis enum and max_chars validation",
+    "AST source <= 200000 chars",
+    "AST language/filePath/sourceRevision bounds",
+    "additionalProperties false in tool schemas"
+  ],
+  "validation": {
+    "focusedSuite": "PASS",
+    "tests": 4,
+    "sidecarContacted": true,
+    "initialBootstrapBlocker": "ROTORQUANT_MODEL_PATH missing",
+    "liveSmoke": {
+      "health": "PASS",
+      "analyze": "PASS",
+      "astChunk": "PASS",
+      "astSyntaxStatus": "CLEAN",
+      "astChunkCount": 2,
+      "langextractVersion": "1.6.0",
+      "astGrepVersion": "0.45.2",
+      "treeSitterVersion": "0.9.0",
+      "treesitterChunkerVersion": "4.0.0",
+      "provenanceObserved": true
+    },
+    "repositoryProof": {
+      "registered": true,
+      "liveCapabilities": true,
+      "liveAnalyze": true,
+      "liveAstChunk": true,
+      "dryRunPlans": true,
+      "gpuCapabilities": {
+        "torch": false,
+        "cugraph": false,
+        "cuvs": false,
+        "cupy": false
+      }
+    }
+  },
+  "writes": false,
+  "nextGate": "wire observations into the revision-qualified Graphify promotion queue; do not write directly from ACP",
+  "graphBoundary": {
+    "networkxHealthFlag": "import capability only",
+    "nlpSidecarGraphCompute": false,
+    "rapidsExecutor": "separate WSL2 lane",
+    "nxCugraphWiringRequired": false,
+    "reason": "The real graph caller already prefers direct cuGraph and uses NetworkX only as a CPU fallback."
+  }
+}

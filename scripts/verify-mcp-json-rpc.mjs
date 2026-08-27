@@ -263,7 +263,12 @@ async function main() {
 
   // Try a simple read-only tool
   const callOk = await testToolsCall('context.build_kv_packet', {
+    taskId: 'mcp-smoke-readonly',
     query: 'test',
+    hotFiles: [],
+    hotSymbols: [],
+    blockedAreas: [],
+    maxInputTokens: 1000,
   });
 
   console.log('\n═══════════════════════════════════════════════════════════════════');

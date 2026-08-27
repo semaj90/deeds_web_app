@@ -178,11 +178,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const vector = embedData.embedding;
 
 		// Search Qdrant with vector
-		const searchResponse = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/search`, {
+		const searchResponse = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector,
+				query: vector,
 				limit,
 				with_payload: true
 			}),
@@ -196,7 +196,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const data = await searchResponse.json();
 		return json({
-			files: data?.result || [],
+			files: data?.result?.points || [],
 			query
 		});
 	} catch (error) {

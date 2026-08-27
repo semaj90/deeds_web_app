@@ -942,14 +942,16 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 		Must []map[string]any `json:"must,omitempty"`
 	}
 	type qdrantReq struct {
-		Vector      any           `json:"vector"`
+		Query       any           `json:"query"`
+		Using       string        `json:"using,omitempty"`
 		Limit       int           `json:"limit"`
 		WithPayload bool          `json:"with_payload"`
 		Filter      *qdrantFilter `json:"filter,omitempty"`
 	}
 
 	body := qdrantReq{
-		Vector:      map[string]any{"name": "content", "vector": embedding},
+		Query:       embedding,
+		Using:       "content",
 		Limit:       req.Limit * 2,
 		WithPayload: true,
 	}
@@ -974,7 +976,7 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 	jsonBody, _ := json.Marshal(body)
 
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST",
-		s.cfg.QdrantURL+"/collections/legal_documents/points/search",
+		s.cfg.QdrantURL+"/collections/legal_documents/points/query",
 		strings.NewReader(string(jsonBody)))
 	httpReq.Header.Set("Content-Type", "application/json")
 
@@ -991,10 +993,12 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 	}
 
 	var qdResp struct {
-		Result []struct {
-			ID      any            `json:"id"`
-			Score   float64        `json:"score"`
-			Payload map[string]any `json:"payload"`
+		Result struct {
+			Points []struct {
+				ID      any            `json:"id"`
+				Score   float64        `json:"score"`
+				Payload map[string]any `json:"payload"`
+			} `json:"points"`
 		} `json:"result"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
@@ -1003,7 +1007,7 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 	}
 
 	var hits []libraryHit
-	for _, r := range qdResp.Result {
+	for _, r := range qdResp.Result.Points {
 		hit := libraryHit{
 			Score:     r.Score,
 			MatchType: "qdrant",
@@ -1031,13 +1035,13 @@ func (s *libraryServer) searchQdrantREST(ctx context.Context, embedding []float3
 // This collection is populated by the knowledge-base-builder and holds web-sourced legal reference content.
 func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	type qdrantReq struct {
-		Vector      []float32 `json:"vector"`
+		Query       []float32 `json:"query"`
 		Limit       int       `json:"limit"`
 		WithPayload bool      `json:"with_payload"`
 	}
 
 	body := qdrantReq{
-		Vector:      embedding,
+		Query:       embedding,
 		Limit:       req.Limit * 2,
 		WithPayload: true,
 	}
@@ -1045,7 +1049,7 @@ func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []flo
 	jsonBody, _ := json.Marshal(body)
 
 	httpReq, err := http.NewRequestWithContext(ctx, "POST",
-		s.cfg.QdrantURL+"/collections/knowledge_base/points/search",
+		s.cfg.QdrantURL+"/collections/knowledge_base/points/query",
 		strings.NewReader(string(jsonBody)))
 	if err != nil {
 		return nil
@@ -1065,10 +1069,12 @@ func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []flo
 	}
 
 	var qdResp struct {
-		Result []struct {
-			ID      any            `json:"id"`
-			Score   float64        `json:"score"`
-			Payload map[string]any `json:"payload"`
+		Result struct {
+			Points []struct {
+				ID      any            `json:"id"`
+				Score   float64        `json:"score"`
+				Payload map[string]any `json:"payload"`
+			} `json:"points"`
 		} `json:"result"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
@@ -1077,7 +1083,7 @@ func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []flo
 	}
 
 	var hits []libraryHit
-	for _, r := range qdResp.Result {
+	for _, r := range qdResp.Result.Points {
 		hit := libraryHit{
 			Score:     r.Score,
 			MatchType: "knowledge",
@@ -1128,7 +1134,7 @@ func (s *libraryServer) searchCodebaseChunks(ctx context.Context, embedding []fl
 func (s *libraryServer) searchCodebaseChunksNative(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	limit := uint64(req.Limit * 2)
 
-	contentVecName := "embedding"
+	contentVecName := "content"
 	queryReq := &qdrantclient.QueryPoints{
 		CollectionName: "codebase_chunks_768",
 		Query:          qdrantclient.NewQuery(embedding...),
@@ -1155,13 +1161,15 @@ func (s *libraryServer) searchCodebaseChunksNative(ctx context.Context, embeddin
 // searchCodebaseChunksREST performs dense-only ANN search on codebase_chunks_768 via REST.
 func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	type qdrantReq struct {
-		Vector      any  `json:"vector"`
-		Limit       int  `json:"limit"`
-		WithPayload bool `json:"with_payload"`
+		Query       any    `json:"query"`
+		Using       string `json:"using,omitempty"`
+		Limit       int    `json:"limit"`
+		WithPayload bool   `json:"with_payload"`
 	}
 
 	body := qdrantReq{
-		Vector:      map[string]any{"name": "embedding", "vector": embedding},
+		Query:       embedding,
+		Using:       "content",
 		Limit:       req.Limit * 2,
 		WithPayload: true,
 	}
@@ -1169,7 +1177,7 @@ func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding 
 	jsonBody, _ := json.Marshal(body)
 
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST",
-		s.cfg.QdrantURL+"/collections/codebase_chunks_768/points/search",
+		s.cfg.QdrantURL+"/collections/codebase_chunks_768/points/query",
 		strings.NewReader(string(jsonBody)))
 	httpReq.Header.Set("Content-Type", "application/json")
 
@@ -1186,10 +1194,12 @@ func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding 
 	}
 
 	var qdResp struct {
-		Result []struct {
-			ID      any            `json:"id"`
-			Score   float64        `json:"score"`
-			Payload map[string]any `json:"payload"`
+		Result struct {
+			Points []struct {
+				ID      any            `json:"id"`
+				Score   float64        `json:"score"`
+				Payload map[string]any `json:"payload"`
+			} `json:"points"`
 		} `json:"result"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
@@ -1198,7 +1208,7 @@ func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding 
 	}
 
 	var hits []libraryHit
-	for _, r := range qdResp.Result {
+	for _, r := range qdResp.Result.Points {
 		hit := libraryHit{
 			Score:     r.Score,
 			MatchType: "codebase",

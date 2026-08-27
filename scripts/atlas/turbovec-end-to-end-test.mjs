@@ -64,7 +64,7 @@ async function testTurboVecPipeline() {
   console.log('\n[STEP 3] Qdrant ANN search (:6333) on full 768-dim vectors...');
   let qdrantResults = [];
   try {
-    const qdRes = await fetch('http://127.0.0.1:6333/collections/codebase_chunks_768/points/search', {
+    const qdRes = await fetch('http://127.0.0.1:6333/collections/codebase_chunks_768/points/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

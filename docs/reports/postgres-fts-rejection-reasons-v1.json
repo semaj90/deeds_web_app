@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.postgres-fts-rejection-reasons.v1",
+  "generatedAt": "2026-08-27T02:39:21.506Z",
+  "readOnly": true,
+  "databaseWrites": false,
+  "queries": [
+    "IngestionJobStatus",
+    "GpuConfig",
+    "SystemStatus",
+    "ErrorPatchLogInsert",
+    "extractLegalEntities",
+    "CourtroomScene",
+    "embedding search",
+    "packet identity"
+  ],
+  "classificationRules": {
+    "MISSING_PACKET_SOURCE_REF": "No atlas_packets row has the lexical source_ref.",
+    "HASH_SCOPE_MISMATCH": "A packet shares source_ref but not the lexical content_hash.",
+    "MISSING_CHUNK_PACKET_BRIDGE": "No identity-link row exists for the lexical chunk.",
+    "AMBIGUOUS_BRIDGE": "An identity-link row is marked AMBIGUOUS.",
+    "UNRESOLVED_BRIDGE": "An identity-link row is marked UNRESOLVED.",
+    "PACKET_NOT_CANONICAL": "A candidate packet exists but lacks required canonical fields."
+  },
+  "counts": {
+    "UNRESOLVED_BRIDGE": 357,
+    "BRIDGE_EXACT_BOUND": 11,
+    "AMBIGUOUS_BRIDGE": 1,
+    "HASH_EXACT_BOUND": 4
+  },
+  "byQuery": [
+    {
+      "query": "IngestionJobStatus",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 13,
+        "BRIDGE_EXACT_BOUND": 2
+      }
+    },
+    {
+      "query": "GpuConfig",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 32,
+        "BRIDGE_EXACT_BOUND": 1
+      }
+    },
+    {
+      "query": "SystemStatus",
+      "counts": {
+        "AMBIGUOUS_BRIDGE": 1,
+        "UNRESOLVED_BRIDGE": 68,
+        "BRIDGE_EXACT_BOUND": 4,
+        "HASH_EXACT_BOUND": 3
+      }
+    },
+    {
+      "query": "ErrorPatchLogInsert",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 38,
+        "BRIDGE_EXACT_BOUND": 1
+      }
+    },
+    {
+      "query": "extractLegalEntities",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 5,
+        "BRIDGE_EXACT_BOUND": 1
+      }
+    },
+    {
+      "query": "CourtroomScene",
+      "counts": {
+        "BRIDGE_EXACT_BOUND": 1,
+        "UNRESOLVED_BRIDGE": 4
+      }
+    },
+    {
+      "query": "embedding search",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 99,
+        "BRIDGE_EXACT_BOUND": 1
+      }
+    },
+    {
+      "query": "packet identity",
+      "counts": {
+        "UNRESOLVED_BRIDGE": 99,
+        "HASH_EXACT_BOUND": 1
+      }
+    }
+  ],
+  "uniqueChunkCount": 373
+}

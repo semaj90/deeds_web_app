@@ -413,12 +413,12 @@ Phase: Phase 66-79 Error Analysis`.trim();
       }
 
       const searchResponse = await fetch(
-        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`,
+        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: Array.from(embedding),
+            query: Array.from(embedding),
             limit,
             with_payload: true,
           }),
@@ -431,7 +431,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData?.result || [];
+      const results = searchData?.result?.points || [];
 
       return json({
         success: true,
@@ -468,12 +468,12 @@ Phase: Phase 66-79 Error Analysis`.trim();
       }
 
       const searchResponse = await fetch(
-        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`,
+        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: Array.from(embedding),
+            query: Array.from(embedding),
             limit,
             with_payload: true,
           }),
@@ -486,7 +486,7 @@ Phase: Phase 66-79 Error Analysis`.trim();
       }
 
       const searchData = await searchResponse.json();
-      const results = searchData?.result || [];
+      const results = searchData?.result?.points || [];
 
       return json({
         success: true,

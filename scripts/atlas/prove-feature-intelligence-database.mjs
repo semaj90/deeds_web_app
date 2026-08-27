@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -14,7 +15,7 @@ const FRONTEND = path.join(ROOT, 'sveltekit-frontend');
 const APPLY = process.argv.includes('--apply');
 const FIXTURE = process.argv.includes('--fixture');
 const VERBOSE = process.argv.includes('--verbose');
-const DATABASE_URL = process.env.DATABASE_URL_MIGRATOR || process.env.DATABASE_URL || '';
+const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 if (!DATABASE_URL) { console.error('DATABASE_URL_MIGRATOR or DATABASE_URL is required'); process.exit(2); }
 
 const migrations = [
@@ -29,7 +30,7 @@ const migrations = [
 ];
 
 const requiredTables = [
-  'atlas_features','atlas_evidence','atlas_feature_evidence','atlas_relationships','atlas_relationship_members',
+  'atlas_fi_features','atlas_evidence','atlas_fi_evidence','atlas_relationships','atlas_relationship_members',
   'atlas_relationship_cardinality','atlas_relationship_evidence','atlas_relationship_embeddings','atlas_feature_embeddings',
   'atlas_feature_state_receipts','atlas_dynamic_hyperedge_candidates','atlas_evidence_entities',
   'atlas_symbol_registry','atlas_symbol_aliases','atlas_symbol_versions','atlas_structural_reference_resolutions',
@@ -188,7 +189,7 @@ try {
     ...(FIXTURE ? ['FIXTURE_RELATIONSHIP_VALIDATION','FIXTURE_DYNAMIC_HYPEREDGE','FIXTURE_READBACK'] : []),
   ];
   const status = requiredGateNames.every((name) => gates[name]) ? 'PROVEN' : 'DEGRADED';
-  const receipt = { schema: 'atlas.feature-intelligence-database-proof.v3', generated_at: new Date().toISOString(), apply_requested: APPLY, fixture_requested: FIXTURE, fixture_rolled_back: FIXTURE, migrations: migrationFiles.map(({name,checksum}) => ({name,checksum})), gates, details, status };
+  const receipt = { schema: 'atlas.feature-intelligence-database-proof.v4', generated_at: new Date().toISOString(), apply_requested: APPLY, fixture_requested: FIXTURE, fixture_rolled_back: FIXTURE, migrations: migrationFiles.map(({name,checksum}) => ({name,checksum})), gates, details, status };
   receipt.checksum = sha256(receipt);
   console.log(JSON.stringify(receipt, null, 2));
   if (status !== 'PROVEN') process.exitCode = 2;

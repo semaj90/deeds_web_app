@@ -52,9 +52,9 @@ export const lowBitRuntimePlanSchema = z.object({
   model_id: id,
   model_revision: revision,
   weight_format: z.enum(['TERNARY_1_58', 'INT1', 'INT2', 'INT3', 'INT4_GPTQ', 'INT4_GGUF']),
-  executor: z.enum(['BITNET_CPP', 'T_MAC', 'LLAMA_CPP', 'CUSTOM_ATLAS_LUT']),
+  executor: z.enum(['BITNET_CPP', 'T_MAC', 'LLAMA_CPP', 'CUSTOM_ATLAS_LUT', 'QSA_LUT']),
   target_device: z.enum(['CPU_X86', 'CPU_ARM', 'NPU', 'GPU']),
-  multiplication_strategy: z.enum(['LOOKUP_TABLE', 'DEQUANTIZE_GEMM', 'NATIVE_LOWBIT_KERNEL']),
+  multiplication_strategy: z.enum(['LOOKUP_TABLE', 'DEQUANTIZE_GEMM', 'NATIVE_LOWBIT_KERNEL', 'QSA_SUBSPACE_LUT']),
   kernel_family: z.string().min(1),
   kernel_revision: revision,
   tuning_profile_checksum: checksum.nullable().default(null),
@@ -69,6 +69,12 @@ export const lowBitRuntimePlanSchema = z.object({
   }
   if (value.executor === 'T_MAC' && !['TERNARY_1_58', 'INT1', 'INT2', 'INT3', 'INT4_GPTQ', 'INT4_GGUF'].includes(value.weight_format)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['weight_format'], message: 'T-MAC plan requires a supported low-bit representation' });
+  }
+  if (value.executor === 'QSA_LUT' && !['TERNARY_1_58', 'INT1', 'INT2', 'INT3', 'INT4_GPTQ', 'INT4_GGUF'].includes(value.weight_format)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['weight_format'], message: 'QSA_LUT plan requires a supported low-bit representation' });
+  }
+  if (value.multiplication_strategy === 'QSA_SUBSPACE_LUT' && value.executor !== 'QSA_LUT' && value.executor !== 'CUSTOM_ATLAS_LUT') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['multiplication_strategy'], message: 'QSA_SUBSPACE_LUT strategy requires QSA_LUT or CUSTOM_ATLAS_LUT executor' });
   }
   if (!value.model_is_natively_compatible && value.conversion_is_lossless) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['conversion_is_lossless'], message: 'a model outside the native format cannot claim lossless conversion without a separately proven conversion contract' });

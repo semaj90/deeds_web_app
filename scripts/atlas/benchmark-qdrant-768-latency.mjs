@@ -85,11 +85,12 @@ async function benchmark() {
 
       try {
         const searchRes = await Promise.race([
-          fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+          fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              vector: vector,
+              query: vector,
+              using: 'content',
               limit: 10,
               with_payload: false
             })
@@ -99,7 +100,7 @@ async function benchmark() {
 
         const elapsed = Date.now() - startTime;
 
-        if (searchRes.result) {
+        if (searchRes.result?.points) {
           latencies.push(elapsed);
           successCount++;
           if (VERBOSE && i % 10 === 0) {

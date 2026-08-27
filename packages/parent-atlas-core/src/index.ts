@@ -92,12 +92,12 @@ export type {
   ACEContext,
   SynthesisResult,
   PolicyOrchestrationResult
-} from './policy-orchestrator';
+} from './policy-orchestrator.js';
 
 export {
   ParentAtlasPolicyOrchestrator,
   createPolicyOrchestrator
-} from './policy-orchestrator';
+} from './policy-orchestrator.js';
 
 // ================================================================================
 // EXTENDED TYPES (Policy + Retrieval)
@@ -106,7 +106,6 @@ export {
 export type {
   PacketIdentity,
   Packet,
-  RetrievalResult,
   CacheEntry,
   GPUMetrics,
   RetrievalTrace,
@@ -116,7 +115,7 @@ export type {
   BenchmarkResult,
   AtlasConfig,
   HealthCheck
-} from './types';
+} from './types.js';
 
 /**
  * API version marker

@@ -1,6 +1,6 @@
 {
   "schema": "nes_glyph_backfill_report.v1",
-  "generatedAt": "2026-06-09T17:08:01.989Z",
+  "generatedAt": "2026-08-26T23:41:02.721Z",
   "mode": "dry-run",
   "inputs": {
     "sourceReportPath": "docs/reports/missing-features-review-latest.json",

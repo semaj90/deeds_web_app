@@ -2819,6 +2819,26 @@ this repo (`python/parent_atlas_networkx_pagerank.py`,
   audit), this repo already has more graph-algorithm owners than it needs; check that section
   before adding another one.
 
+**Correction (2026-08-26, operator note) — Neo4j is a topology mirror, NOT the canonical PageRank
+compute path.** The framing above ("Neo4j is what a live query traverses; NetworkX is what a
+one-off script checks against") undersold NetworkX/cuGraph's actual role. Neo4j's native GDS
+PageRank (`neo4j-gds-client.ts::runPageRankClient()`) was run once and hit real limitations
+(operator-reported); the project pivoted to the NetworkX↔cuGraph parity pipeline
+(`python/graph_snapshot_parity_networkx_oracle.py` /
+`python/graph_snapshot_parity_cugraph_oracle.py`, driven by
+`scripts/atlas/export-graph-snapshot-parity-parquet.mts`) as the trusted PageRank + Louvain
+compute path. That pipeline is live-proven on real production-scale data — 162,234 nodes / 108,156
+edges from the real `graphify/frozen-graph-snapshot-v2.json` corpus, `status: PASS`,
+`pagerankCorrelation: 1`, `louvainCommunityAgreement: 1` (ARI/NMI both 1.0) — see
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`. **Do not treat Neo4j's own
+GDS PageRank run (3,667 nodes carry stale `pageRank`/`graphAuthorityScore` properties from that
+earlier, since-superseded run) as the canonical PageRank source** — it predates the pivot and has
+not been reconciled with the NetworkX/cuGraph numbers. Neo4j otherwise remains exactly what it
+always was: the mirror a live query traverses for structural edges (`IMPORTS`, `CONTAINS`,
+`BELONGS_TO_CLUSTER`, etc.) — this correction is scoped to PageRank/community-detection
+authority specifically, not Neo4j's role as topology mirror in general.
+  before adding another one.
+
 ### Architecture Layers
 
 ```

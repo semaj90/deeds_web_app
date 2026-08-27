@@ -69,7 +69,7 @@ async function qdrantRequest(method, path, body = null) {
   });
 }
 
-// Search Qdrant for points matching source_ref (Query API — legacy /points/search
+// Read Qdrant points matching source_ref (filter-only lookup)
 // removed in Qdrant 1.19; named-vector selection moves to top-level `using`, and
 // the dummy query vector is unnecessary here since we only care about the filter —
 // but the Query API still requires a `query` for a plain filter-scroll-like lookup,

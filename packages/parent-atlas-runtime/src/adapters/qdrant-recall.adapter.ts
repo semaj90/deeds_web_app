@@ -39,11 +39,12 @@ export async function searchQdrantANN(
   }
 
   try {
-    const response = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+    const response = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: query_vector,
+        query: query_vector,
+        using: 'content',
         limit,
         score_threshold: threshold,
         with_payload,
@@ -56,14 +57,16 @@ export async function searchQdrantANN(
     }
 
     const data = (await response.json()) as {
-      result: Array<{
-        id: string;
-        score: number;
-        payload?: Record<string, unknown>;
-      }>;
+      result?: {
+        points?: Array<{
+          id: string;
+          score: number;
+          payload?: Record<string, unknown>;
+        }>;
+      };
     };
 
-    return data.result.map(hit => ({
+    return (data.result?.points ?? []).map(hit => ({
       qdrant_point_id: hit.id,
       packet_key: hit.payload?.packet_key as string | undefined,
       source_ref: hit.payload?.source_ref as string | undefined,
@@ -137,12 +140,13 @@ export function filterQdrantBySourceScope(
 
   return candidates.filter(c => {
     if (!c.source_ref) return false;
+    const sourceRef = c.source_ref;
     return sourceScope.some(pattern => {
       const regex = pattern
         .replace(/\./g, '\\.')
         .replace(/\*/g, '.*')
         .replace(/\?/g, '.');
-      return new RegExp(`^${regex}$`).test(c.source_ref);
+      return new RegExp(`^${regex}$`).test(sourceRef);
     });
   });
 }

@@ -38,6 +38,7 @@ export const OrnithRuntimeSchema = z.enum([
   'PYTORCH_COMPILE_INDUCTOR',
   'PYTORCH_CUSTOM_TRITON',
   'TENSORRT_LLM',
+  'CUSTOM_QSA_LUT',
 ]);
 export type OrnithRuntime = z.infer<typeof OrnithRuntimeSchema>;
 
@@ -145,6 +146,21 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
         requiresLinux: true,
         requiresModelConversionOrEngineBuild: false,
       };
+    case 'CUSTOM_QSA_LUT':
+      return {
+        runtime,
+        executionFramework: 'LLAMA_CPP',
+        supportsQuantizedLocalInference: true,
+        supportsFullTrainingAutograd: false,
+        supportsQLoRATraining: false,
+        supportsModelInternalInstrumentation: true,
+        supportsCustomTritonKernels: false,
+        supportsGatedDeltaNet: true,
+        supportsFullAttentionLayers: true,
+        openAiCompatibleServing: false,
+        requiresLinux: false,
+        requiresModelConversionOrEngineBuild: false,
+      };
   }
 }
 
@@ -193,8 +209,8 @@ export function planOrnithRuntime(input: {
       break;
     case 'KERNEL_EXPERIMENT':
       primaryRuntime = 'PYTORCH_COMPILE_INDUCTOR';
-      challengers.push('PYTORCH_CUSTOM_TRITON', 'PYTORCH_TRANSFORMERS');
-      reasons.push('Kernel experiments distinguish Gated-DeltaNet recurrent kernels, full-attention SDPA kernels, and Atlas-side GEMM/reduction kernels');
+      challengers.push('PYTORCH_CUSTOM_TRITON', 'PYTORCH_TRANSFORMERS', 'CUSTOM_QSA_LUT');
+      reasons.push('Kernel experiments distinguish QSA LUT (subspace lookup tables), Gated-DeltaNet recurrent kernels, and full-attention SDPA kernels');
       break;
   }
 

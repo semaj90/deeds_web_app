@@ -1,0 +1,476 @@
+{
+  "schema": "atlas.graphify-revision-owner.v2",
+  "status": "REVISION_OWNER_READY_FOR_CONTROLLED_CANARY",
+  "authority": {
+    "schema": "atlas.graphify-revision-authority.v2",
+    "authorityRevision": "atlas.graphify-revision-authority.workspace-manifest-plus-source-sha256.v2",
+    "workspaceRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "workspaceRevision": "sha256:7f2674afbd5283145e2385e0adfaec8e7d07c7a7979ee0b9d003ef548511360c",
+    "workspaceRevisionKind": "SHA256_SOURCE_MANIFEST",
+    "workspaceSourceManifestDigest": "7f2674afbd5283145e2385e0adfaec8e7d07c7a7979ee0b9d003ef548511360c",
+    "baseGitCommitOid": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
+    "baseGitTreeOid": "282d112a535b25c2fafa23ca27ed273263721016",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/code-revision-authority-v1.ts",
+    "sourceRevision": "sha256:fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
+    "sourceRevisionKind": "SHA256_EXACT_UTF8_SOURCE_BYTES",
+    "sourceContentDigest": "fdb36e1beac7541964613a50240d6c8a626a31cdc67f44726c252c8bc99ea701",
+    "sourceByteLength": 3254,
+    "workspaceRevisionCreatedByWriter": true,
+    "sourceRevisionCreatedByWriter": true,
+    "callerSuppliedWorkspaceRevisionAccepted": false,
+    "callerSuppliedSourceRevisionAccepted": false,
+    "gitCommitIsProvenanceOnly": true,
+    "canonicalWritesAllowed": false,
+    "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+    "authorityChecksum": "2d56ee0d9c0bffbf05ad760b8f9ff99a6be995ded7e3d034a7720f853ffaa99c"
+  },
+  "storage": {
+    "graphifyRunsPresent": true,
+    "graphifyFilesPresent": true,
+    "requiredRunColumnsPresent": true,
+    "requiredFileColumnsPresent": true,
+    "logicalWorkspaceRevisionColumnsPresent": true,
+    "logicalCodeSourceRevisionColumnPresent": true,
+    "productionWriterPath": "sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts",
+    "productionWriterPresent": true,
+    "productionWriterCreatesWorkspaceRevision": true,
+    "productionWriterCreatesSourceRevision": true,
+    "persistedMatchingRows": 0,
+    "notes": [
+      "Read-only independent v2 proof; no canonical write attempted.",
+      "Current materializer statically references the v2 two-table authority coordinates."
+    ]
+  },
+  "durableOwnerBound": true,
+  "revisionOwnerProven": false,
+  "fanoutMayConsumeAsCanonical": false,
+  "blockers": [
+    "CONTROLLED_PERSISTENCE_CANARY_NOT_PROVEN"
+  ],
+  "canonicalWriteAttempted": false,
+  "readOnly": true,
+  "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+  "ownerChecksum": "7d565b32e35596fea1febfe62cd8b683ed93b96ac7c9c2f8b09b0ceeac16b03f",
+  "schemaObservation": {
+    "schema": "atlas.graphify-source-inventory-schema.v2",
+    "graphifyRunsPresent": true,
+    "graphifyFilesPresent": true,
+    "runColumns": [
+      "base_revision",
+      "completed_at",
+      "configuration",
+      "dry_run",
+      "extraction_contract_version",
+      "parser_contract_version",
+      "repository_revision",
+      "run_id",
+      "source_manifest_digest",
+      "source_manifest_source_count",
+      "started_at",
+      "status",
+      "workspace_id",
+      "workspace_revision"
+    ],
+    "fileColumns": [
+      "byte_length",
+      "code_source_revision",
+      "content_hash",
+      "created_at",
+      "file_id",
+      "first_seen_run_id",
+      "git_blob_oid",
+      "language",
+      "last_seen_run_id",
+      "parse_error",
+      "parse_status",
+      "parser_name",
+      "parser_version",
+      "producer_revision",
+      "source_ref",
+      "source_revision",
+      "source_revision_authority",
+      "updated_at",
+      "workspace_id",
+      "workspace_revision"
+    ],
+    "requiredRunColumnsPresent": true,
+    "requiredFileColumnsPresent": true,
+    "v2Ready": true,
+    "missingRunColumns": [],
+    "missingFileColumns": []
+  },
+  "workspaceOrigin": {
+    "record": {
+      "schema": "atlas.workspace-revision.v1",
+      "workspaceRevision": "sha256:7f2674afbd5283145e2385e0adfaec8e7d07c7a7979ee0b9d003ef548511360c",
+      "repositoryId": "semaj90/deeds_web_app",
+      "gitObjectFormat": "sha1",
+      "baseCommitOid": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
+      "baseTreeOid": "282d112a535b25c2fafa23ca27ed273263721016",
+      "gitHeadRef": "refs/heads/main",
+      "dirty": true,
+      "sourceCount": 23602,
+      "sourceManifestDigest": "7f2674afbd5283145e2385e0adfaec8e7d07c7a7979ee0b9d003ef548511360c",
+      "sourceRevisionAlgorithm": "atlas.code.source-revision.v1",
+      "generatedAt": "2026-08-27T04:39:26.579Z",
+      "readOnlyObservation": true,
+      "canonicalAuthority": false,
+      "producerRevision": "atlas.graphify-revision-owner-v2.proof.v1",
+      "checksum": "0b45c6762097711d26bba2286b996d65db7f501d9912cf70ad858b40d0854ddd"
+    },
+    "skipped": [
+      {
+        "sourceRef": ".scripts/find-and-kill-udp8443.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/fix-ports-and-restart-vec-ai.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/git-commit-and-push.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/show-quic-diagnostics.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/start-core-services.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/start-quic-health.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": ".scripts/start-vector-and-ai.ps1",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "data/external-docs/normalized/drizzle/migrations.md",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "docs/architecture/runtime-owner-deduplication.md",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "docs/documents-atlas-index.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/documents-atlas-index.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/graph/repo-sveltekit-route-atlas.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/candidate-ordinal-corpus-v1.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/drizzle-audit-cleaned.json",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "docs/reports/drizzle-audit-current.json",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "docs/reports/neo4j-candidate-ordinal-join-v1.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/neschrom97-card-registry.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/runtime-owner-deduplication-report.md",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "docs/reports/source-manifest-projection-comparison-v1.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/structured-lexical-fanout.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "docs/reports/workspace-source-binding-observation.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "memory/PHASE-2-STEPS-3-4-COMPLETE.md",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "memory/atlas/documents-atlas.inverted.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "memory/atlas/documents-atlas.latest.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "memory/graphify/deep/deep-import-graph.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "memory/reports/directory-source-map.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "memory/reports/directory-source-map.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "models/embeddinggemma_300m_onnx/tokenizer.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "models/gemma3-client-onnx/tokenizer.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "next_steps/active/SCHEMA_MANIFEST.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "next_steps/active/SCHEMA_MANIFEST.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "next_steps/completed/vlm-history/MULTIMODAL_IMPLEMENTATION_ROADMAP.md",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "packages/atlas-core/src/classification/aggregation.test.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/ai-service.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/chat.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/embed.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/embeddings.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/events.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/ingest_new.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/legal_cuda_streaming.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "proto/archived/tensor.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/build-feature-dependency-groups.cjs",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/build-implementation-intent-aliases.cjs",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/ai-service.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/chat.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/embed.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/embeddings.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/events.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/ingest_new.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/legal_cuda_streaming.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/atlas/proto/archived/tensor.proto",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "scripts/config/__init__.py",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "simd-bridge/rust/graph-engine/index.d.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "simd-bridge/rust/hmm-repair/index.d.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/README.md",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/audit/2026-05-14_sveltekit-route-gap-atlas.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/documents-atlas-index.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/graph/deep-import-graph.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/graph/multihop-codebase-map.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/graph/nes-glyph-architecture.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/graph/sveltekit-route-gap-atlas.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/graph/sveltekit-route-map.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/reports/directory-map-verify-2026-06-14.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/reports/directory-map-verify-2026-06-15.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/reports/graph-probes/codebase-graph.2026-08-10T03-31-41-913Z-22904.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/reports/packet-hashmap.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/drizzle/archived/0001_create_documents.sql",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/drizzle/archived/_temp_check_constraints.sql",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/extraction-report-source-kind-1783576124318.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/memory/atlas/documents-atlas.latest.md",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/public/manifest.json",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/scripts/synth/sample-brief.md",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/agent/tools/policy-trainer.spec.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/obsidian/markdown-wiki-note.ts",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/obsidian/wiki-vault-watcher.ts",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/redis-streams.ts",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/shared-identity-resolver.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/centroids/+server.ts",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/api/wiki/watch/+server.ts",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/shims/camelcase-compat.mjs",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/static/gemma4_e2b_onnx/tokenizer.json",
+        "reason": "SOURCE_TOO_LARGE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/svelte-errors-new.json",
+        "reason": "NOT_VALID_UTF8_SOURCE"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/is-ready.test.mjs",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/migrations/init_test_schema.sql",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/routes.spec.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/setup-db.ts",
+        "reason": "Code source content must be non-empty"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/uploadMachine.test.ts",
+        "reason": "Code source content must be non-empty"
+      }
+    ]
+  }
+}

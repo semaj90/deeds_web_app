@@ -43,17 +43,15 @@ async function queryQdrant(embedding) {
   console.log('\n📍 Querying Qdrant with test vector...');
   
   const payload = {
-    vector: {
-      name: 'content',
-      vector: embedding
-    },
+    query: embedding,
+    using: 'content',
     limit: 10,
     with_payload: true,
     score_threshold: 0.35
   };
   
   const res = await fetch(
-    `${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`,
+    `${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -67,7 +65,7 @@ async function queryQdrant(embedding) {
   }
 
   const data = await res.json();
-  const results = data.result ?? [];
+  const results = data.result?.points ?? [];
   
   console.log(`   ✅ Retrieved ${results.length} results (score_threshold 0.35)`);
   return results;

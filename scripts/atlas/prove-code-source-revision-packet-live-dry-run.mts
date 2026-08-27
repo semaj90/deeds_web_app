@@ -11,6 +11,10 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local'), override: true });
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development' });
 
 const reportPath = path.join(process.cwd(), 'docs', 'reports', 'code-source-revision-packet-live-dry-run.json');
+const requestedLimit = Number(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] ?? 25);
+const sampleLimit = Number.isInteger(requestedLimit) && requestedLimit > 0
+  ? Math.min(requestedLimit, 1000)
+  : 25;
 const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -25,7 +29,7 @@ const report: Record<string, unknown> = {
   status: 'BLOCKED',
   canonicalWrites: false,
   qdrantWrites: false,
-  sampleLimit: 25,
+  sampleLimit,
   rowsSeen: 0,
   sourceContentRows: 0,
   readyRows: 0,
@@ -76,8 +80,8 @@ try {
     FROM public.atlas_packets
     WHERE packet_key IS NOT NULL
     ORDER BY packet_key
-    LIMIT 25
-  `);
+    LIMIT $1
+  `, [sampleLimit]);
   report.rowsSeen = result.rows.length;
   const sourceRefs = result.rows.map((row) => normalizeSourceRef(row.source_ref)).filter(Boolean);
   const graphifyAvailable = await pool.query(`SELECT to_regclass('public.graphify_files') IS NOT NULL AS available`);

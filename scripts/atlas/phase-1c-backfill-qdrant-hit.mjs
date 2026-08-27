@@ -99,7 +99,7 @@ async function backfillQdrantHit() {
     const packet = packets[i];
 
     // Search Qdrant by packet_key (filter-only lookup — Query API's legacy
-    // /points/search endpoint is removed in Qdrant 1.19, and this was never a
+    // search endpoint is removed in Qdrant 1.19, and this was never a
     // real vector search anyway (dummy empty vector); /points/scroll is the
     // correct filter-only read. Also fixes a pre-existing bug: the filter
     // condition used `field:` instead of Qdrant's actual `key:` property, so

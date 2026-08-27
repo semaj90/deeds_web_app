@@ -123,11 +123,11 @@ async function handleKnowledgeSearch(args: Record<string, unknown>): Promise<unk
 
     // Search Qdrant (use safeJsonPost to avoid unbounded response reads)
     const qdrantData = await safeJsonPost<{
-      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
+      result?: { points?: Array<{ id: string; score: number; payload: Record<string, unknown> }> };
     }>(
-      `${ENV.QDRANT_URL}/collections/${collection}/points/search`,
+      `${ENV.QDRANT_URL}/collections/${collection}/points/query`,
       {
-        vector: embedData.embedding,
+        query: embedData.embedding,
         limit,
         with_payload: true,
         score_threshold: 0.3,
@@ -140,14 +140,14 @@ async function handleKnowledgeSearch(args: Record<string, unknown>): Promise<unk
     }
 
     return {
-      results: qdrantData.result.map((r) => ({
+      results: (qdrantData.result?.points ?? []).map((r) => ({
         id: r.id,
         score: r.score,
         content: String(r.payload?.content ?? r.payload?.text ?? '').slice(0, 800),
         title: r.payload?.title ?? r.payload?.filename ?? null,
         source: r.payload?.source ?? null,
       })),
-      totalResults: qdrantData.result.length,
+      totalResults: qdrantData.result?.points?.length ?? 0,
       collection,
     };
   } catch (err) {

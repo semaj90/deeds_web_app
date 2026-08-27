@@ -44,6 +44,7 @@ const LIMIT        = limitArg  ? parseInt(limitArg.split('=')[1])  : null;
 const ONLY_REF     = sourceArg ? sourceArg.split('=').slice(1).join('=') : null;
 const BATCH        = 200;
 const FORCE        = argv.includes('--force');
+const ENRICH       = argv.includes('--enrich');
 
 // ── Env ───────────────────────────────────────────────────────────────────────
 function loadEnv() {
@@ -108,6 +109,47 @@ async function cachePacket(packetKey, payload) {
   } catch { /* non-fatal */ }
 }
 
+const enrichmentCache = new Map();
+async function loadPacketEnrichment(pool, sourceRef) {
+  if (enrichmentCache.has(sourceRef)) return enrichmentCache.get(sourceRef);
+  const result = await pool.query(
+    `SELECT ast_symbols, ast_imports, ast_exports, ast_facts_at,
+            content_embedding_768::text AS semantic_embedding,
+            embedding_model, embedding_version, embedding_dimension,
+            embedding_normalized
+      FROM codebase_chunk_index
+      WHERE source_ref = $1
+         OR source_ref = regexp_replace($1, '^sveltekit-frontend/', '')
+         OR $1 = 'sveltekit-frontend/' || source_ref
+      ORDER BY (content_embedding_768 IS NOT NULL) DESC, updated_at DESC NULLS LAST
+      LIMIT 200`,
+    [sourceRef]
+  ).catch(() => ({ rows: [] }));
+  const unique = (field) => [...new Set(result.rows.flatMap((row) => {
+    const value = row[field];
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === 'object' && Array.isArray(value)) return value;
+    return [];
+  }))];
+  const vectors = result.rows.filter((row) => row.semantic_embedding);
+  const enrichment = {
+    ast_symbols: unique('ast_symbols'),
+    ast_imports: unique('ast_imports'),
+    ast_exports: unique('ast_exports'),
+    ast_facts_at: result.rows.find((row) => row.ast_facts_at)?.ast_facts_at ?? null,
+    semantic_embedding: vectors.length === 1 ? vectors[0].semantic_embedding : null,
+    embedding_status: vectors.length === 1
+      ? 'VERIFIED_UNIQUE_SOURCE_VECTOR'
+      : vectors.length > 1 ? 'AMBIGUOUS_MULTIPLE_SOURCE_VECTORS' : 'MISSING_SEMANTIC_768',
+    embedding_model: vectors[0]?.embedding_model ?? null,
+    embedding_version: vectors[0]?.embedding_version ?? null,
+    embedding_dimension: vectors[0]?.embedding_dimension ?? null,
+    embedding_normalized: vectors[0]?.embedding_normalized ?? null,
+  };
+  enrichmentCache.set(sourceRef, enrichment);
+  return enrichment;
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   console.log(`[materialize-nes-packets] Starting (dry_run=${DRY_RUN} only_missing=${ONLY_MISSING} limit=${LIMIT ?? 'all'})`);
@@ -122,7 +164,7 @@ async function main() {
   if (ONLY_REF) {
     params.push(ONLY_REF);
     where = `WHERE (source_ref = $${params.length} OR source_ref = 'sveltekit-frontend/' || $${params.length})`;
-  } else if (ONLY_MISSING || !FORCE) {
+  } else if (ONLY_MISSING || (!FORCE && !ENRICH)) {
     where = 'WHERE packet_id IS NULL';
   } else {
     where = 'WHERE 1=1';
@@ -153,25 +195,32 @@ async function main() {
   let errors = 0;
 
   while (true) {
+    const pageLimit = LIMIT ? Math.min(BATCH, Math.max(0, LIMIT - done)) : BATCH;
+    if (pageLimit === 0) break;
+
     // Keyset pagination: stable under concurrent updates (no OFFSET drift)
-    const cursorClause = cursor ? ` AND normalized_path > $${params.length + 1}` : '';
+    const cursorClause = cursor ? ` AND f.normalized_path > $${params.length + 1}` : '';
     const cursorParams = cursor ? [...params, cursor] : params;
 
-    let queryWhere = 'WHERE packet_id IS NULL';
+    let queryWhere = ENRICH
+      ? `WHERE f.packet_id IS NOT NULL
+           AND ep.metadata->>'enrichment_version' IS DISTINCT FROM 'nes-chrom-enrichment-v1'`
+      : 'WHERE f.packet_id IS NULL';
     if (ONLY_REF) {
-      queryWhere = `WHERE (source_ref = $1 OR source_ref = 'sveltekit-frontend/' || $1)`;
+      queryWhere = `WHERE (f.source_ref = $1 OR f.source_ref = 'sveltekit-frontend/' || $1)`;
     } else if (FORCE) {
       queryWhere = 'WHERE 1=1';
     }
 
     const rows = await pool.query(
-      `SELECT normalized_path, source_ref, feature_id, related_feature_ids,
-              cluster_id, centroid_id, som_cluster, qdrant_point_id, lane_ids,
-              nes_card_id, indexed_at
-       FROM atlas_feature_map
+      `SELECT f.normalized_path, f.source_ref, f.feature_id, f.related_feature_ids,
+              f.cluster_id, f.centroid_id, f.som_cluster, f.qdrant_point_id, f.lane_ids,
+              f.indexed_at
+       FROM atlas_feature_map f
+       LEFT JOIN nes_chrom_packets ep ON ep.packet_key = f.packet_id
        ${queryWhere}${cursorClause}
-       ORDER BY normalized_path
-       LIMIT ${BATCH}`,
+       ORDER BY f.normalized_path
+       LIMIT ${pageLimit}`,
       cursorParams
     ).catch(err => { console.error('DB read error:', err.message); return { rows: [] }; });
 
@@ -180,7 +229,8 @@ async function main() {
 
     for (const row of rows.rows) {
       const packetKey  = buildPacketKey(row.source_ref, row.feature_id);
-      const payload    = buildPacketPayload(row);
+      const enrichment = await loadPacketEnrichment(pool, row.source_ref);
+      const payload    = buildPacketPayload({ ...row, ...enrichment });
       const queryHash  = sha8(`materialize:${row.source_ref}`);
 
       try {
@@ -188,12 +238,15 @@ async function main() {
         await pool.query(
           `INSERT INTO nes_chrom_packets
              (packet_key, query_hash, chunk_id, source_ref, source_refs, feature_id,
-              packet_type, lane, model, summary, payload, created_at, updated_at)
+              packet_type, lane, model, summary, metadata, payload, embedding,
+              created_at, updated_at)
            VALUES ($1, $2, $3, $4, $5::jsonb, $6,
                    'nes_chrom', 'atlas_materialized', 'materialize-nes-packets', NULL,
-                   $7::jsonb, NOW(), NOW())
+                   $7::jsonb, $8::jsonb, $9::vector(768), NOW(), NOW())
            ON CONFLICT (packet_key) DO UPDATE SET
              payload    = EXCLUDED.payload,
+             metadata   = COALESCE(nes_chrom_packets.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+             embedding  = COALESCE(EXCLUDED.embedding, nes_chrom_packets.embedding),
              feature_id = COALESCE(EXCLUDED.feature_id, nes_chrom_packets.feature_id),
              updated_at = NOW()`,
           [
@@ -203,7 +256,19 @@ async function main() {
             row.source_ref,
             JSON.stringify([row.source_ref]),
             row.feature_id ?? `feat:${slug(row.source_ref)}`,
+            JSON.stringify({
+              enrichment_version: 'nes-chrom-enrichment-v1',
+              ast_symbols: payload.ast_symbols ?? [],
+              ast_imports: payload.ast_imports ?? [],
+              ast_exports: payload.ast_exports ?? [],
+              ast_facts_at: payload.ast_facts_at ?? null,
+              semantic_embedding_status: payload.semantic_embedding_status,
+              embedding_model: payload.embedding_model ?? null,
+              embedding_version: payload.embedding_version ?? null,
+              representation_id: 'semantic_768',
+            }),
             JSON.stringify(payload),
+            row.semantic_embedding,
           ]
         );
 

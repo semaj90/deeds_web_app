@@ -104,19 +104,19 @@ export function createQdrantAdapter(baseUrl?: string): QdrantAdapter {
     options: { limit?: number; filter?: Record<string, unknown>; withPayload?: boolean } = {},
   ): Promise<QdrantSearchResult[]> {
     const body: Record<string, unknown> = {
-      vector,
+      query: vector,
       limit: options.limit ?? 10,
       with_payload: options.withPayload ?? true,
     };
     if (options.filter) body.filter = options.filter;
 
-    const data = await qdrantFetch(`/collections/${collection}/points/search`, {
+    const data = await qdrantFetch(`/collections/${collection}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    }) as { result?: QdrantSearchResult[] };
+    }) as { result?: { points?: QdrantSearchResult[] } };
 
-    return data.result ?? [];
+    return data.result?.points ?? [];
   }
 
   async function countPoints(collection: string, filter?: Record<string, unknown>): Promise<number> {

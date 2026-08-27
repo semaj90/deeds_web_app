@@ -483,11 +483,11 @@ async function searchQdrant(
   } else {
     body.vector = vector;
   }
-  const response = await fetchJson(`${qdrantUrl}/collections/${encodeURIComponent(collection)}/points/search`, {
+  const response = await fetchJson(`${qdrantUrl}/collections/${encodeURIComponent(collection)}/points/query`, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: JSON.stringify({ query: Array.isArray(body.vector) ? body.vector : (body.vector as { vector: number[] }).vector, using: vectorTarget?.mode === 'named' ? vectorTarget.vectorName : undefined, limit: body.limit, with_payload: body.with_payload, with_vector: body.with_vector }),
   });
-  const result = (response as { result?: QdrantPoint[] })?.result ?? [];
+  const result = (response as { result?: { points?: QdrantPoint[] } })?.result?.points ?? [];
   return Array.isArray(result) ? result : [];
 }
 

@@ -27,6 +27,8 @@ const INCLUDE_QDRANT_LINK_REPAIR = !/^(0|false|no|off)$/i.test(process.env.GRAPH
 const QDRANT_LINK_REPAIR_SCRIPT = process.env.GRAPHIFY_DAILY_QDRANT_LINK_SCRIPT?.trim() || 'atlas:packet-qdrant-links:startup';
 const INCLUDE_EMBEDDING_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_EMBEDDINGS ?? '');
 const EMBEDDING_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_EMBEDDING_SCRIPT?.trim() || 'worker:embedding:batch:startup:detached';
+const INCLUDE_DIRECTORY_STREAM = !/^(0|false|no|off)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_DIRECTORY_STREAM ?? 'true');
+const DIRECTORY_STREAM_SCRIPT = process.env.GRAPHIFY_DAILY_DIRECTORY_STREAM_SCRIPT?.trim() || 'atlas:graphify:directory-stream';
 
 mkdirSync(LOG_DIR, { recursive: true });
 mkdirSync(TMP_DIR, { recursive: true });
@@ -140,7 +142,8 @@ if (!redisGate.ok) {
 }
 
 const steps = [
-  ['graphify:daily', { required: true, name: 'Graphify Audit (Gemma4)' }],
+  ['graphify:audit:gemma4', { required: true, name: 'Graphify Audit (Gemma4)' }],
+  ...(INCLUDE_DIRECTORY_STREAM ? [[DIRECTORY_STREAM_SCRIPT, { required: false, name: 'Directory Graph JSONL stream' }]] : []),
   ['graphify:cluster-cards:generate', { required: false, name: 'Generate cluster-cards.jsonl' }],
   ['graphify:cluster-cards:validate', { required: false, name: 'Validate schema' }],
   ['graphify:cluster-cards:load', { required: false, name: 'Load into Postgres' }],

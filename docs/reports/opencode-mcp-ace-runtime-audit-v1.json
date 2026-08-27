@@ -1,0 +1,47 @@
+{
+  "schema": "opencode-mcp-ace-runtime-audit-v1",
+  "observedAt": "2026-08-27",
+  "model": {
+    "filesystemPath": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
+    "chatTemplatePath": "models/ornith-1_5-9b-ad-q5_k-q4_k/chat_template.jinja",
+    "apiModelId": "ornith-1.5-9b",
+    "status": "LIVE_READBACK_PROVEN"
+  },
+  "opencode": {
+    "activeModel": "llama-server/ornith-1.5-9b",
+    "mcpServers": ["trace", "atlas-tools"],
+    "jsonParse": "PASS",
+    "note": "The JSON contains a duplicate agent key; the last occurrence wins in JavaScript parsers. Active model values are aligned, but duplicate-key cleanup remains open."
+  },
+  "mcp": {
+    "trace": {
+      "endpoint": "http://127.0.0.1:8788/mcp",
+      "transport": "POST JSON-RPC over SSE",
+      "toolsListed": 175,
+      "status": "LIVE_PROVEN"
+    },
+    "atlasTools": {
+      "transport": "stdio",
+      "status": "LOCAL_PROTOCOL_PROVEN"
+    },
+    "verifierFix": "The smoke payload now includes required taskId and bounded fields."
+  },
+  "valkey": {
+    "container": "legal-ai-valkey",
+    "health": "HEALTHY",
+    "acePacketKeyCountAtAudit": 0,
+    "interpretation": "No active SvelteKit app container was running during the audit, so absence of ace:packet:* keys does not prove a write failure."
+  },
+  "bifrost": {
+    "configModel": "ornith-1.5-9b",
+    "runtime": "HEALTHY",
+    "restartRequiredToLoadConfig": true
+  },
+  "writes": false,
+  "openGates": [
+    "Remove duplicate opencode.json agent key.",
+    "Run the corrected MCP verifier.",
+    "Start or attach the SvelteKit runtime, then perform an authorized ACE write/readback smoke.",
+    "Reload Bifrost after config review and verify model routing."
+  ]
+}

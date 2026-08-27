@@ -65,7 +65,10 @@ const packetAgg = await pool.query(`
   SELECT
     feature_id,
     COUNT(*)::int                                        AS packet_count,
-    COUNT(*) FILTER (WHERE agent_pickup_ready = true)::int AS ready_count,
+    -- The live task_semantic_packets schema has no agent_pickup_ready column.
+    -- Pickup readiness is owned by agent_pickup_queue; keep this count at zero
+    -- rather than conflating packet validation with agent queue eligibility.
+    0::int                                               AS ready_count,
     MAX(id::text)                                        AS last_packet_id,
     MAX(updated_at)                                      AS last_updated
   FROM task_semantic_packets
@@ -84,16 +87,24 @@ process.stdout.write(`  ${packetAgg.rows.length} feature buckets with packets.\n
 // Queue uses integer IDs; join on packet_id text field which stores the packet id
 process.stdout.write('Loading agent_pickup_queue status...\n');
 
-const queueAgg = await pool.query(`
-  SELECT
-    q.packet_id,
-    q.status,
-    COUNT(*)::int AS queue_entries
-  FROM agent_pickup_queue q
-  WHERE q.status IS NOT NULL
-  GROUP BY q.packet_id, q.status
-  ORDER BY queue_entries DESC
+const queueTable = await pool.query(`
+  SELECT to_regclass('public.agent_pickup_queue') IS NOT NULL AS present
 `);
+const queueAgg = queueTable.rows[0]?.present
+  ? await pool.query(`
+      SELECT
+        q.packet_id,
+        q.status,
+        COUNT(*)::int AS queue_entries
+      FROM agent_pickup_queue q
+      WHERE q.status IS NOT NULL
+      GROUP BY q.packet_id, q.status
+      ORDER BY queue_entries DESC
+    `)
+  : { rows: [] };
+if (!queueTable.rows[0]?.present) {
+  process.stdout.write('  agent_pickup_queue is absent; pickup status remains null.\n');
+}
 
 // Map packet_id → most common status
 /** @type {Map<string, string>} */

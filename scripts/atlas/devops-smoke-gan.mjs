@@ -248,10 +248,10 @@ async function runSearchLanes() {
 
     qdrant_ann: async () => {
       try {
-        // Simulate Qdrant vector search
+        // Probe the live collection without issuing a meaningless search.
         const start = Date.now();
         execSync(
-          `curl -s -X POST http://127.0.0.1:6333/collections/codebase_chunks_768/points/search -H "Content-Type: application/json" -d '{}'`,
+          `curl -s http://127.0.0.1:6333/collections/codebase_chunks_768`,
           { stdio: 'pipe' }
         );
         return {

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-adapter-live-coverage.v1",
-  "generatedAt": "2026-08-25T21:16:21.230Z",
+  "generatedAt": "2026-08-26T21:10:07.349Z",
   "readOnly": true,
   "databaseWrites": false,
   "perQueryResults": [
@@ -39,25 +39,9 @@
       "candidateCount": 1,
       "exactLaneCount": 0,
       "bridgeLaneCount": 1
-    },
-    {
-      "query": "embedding search",
-      "candidateCount": 9,
-      "exactLaneCount": 1,
-      "bridgeLaneCount": 8
-    },
-    {
-      "query": "packet identity",
-      "candidateCount": 0,
-      "exactLaneCount": 0,
-      "bridgeLaneCount": 0
     }
   ],
-  "summary": {
-    "totalCandidates": 21,
-    "totalExactLane": 3,
-    "totalBridgeLane": 18,
-    "bridgeLaneContributedAnyResults": true
-  },
-  "status": "READY"
+  "summary": null,
+  "status": "ERROR",
+  "error": "Failed query: \n    WITH q AS (\n      SELECT websearch_to_tsquery('english', $1) AS tsq\n    ),\n    lexical AS (\n      SELECT\n        ci.id::text AS lexical_id,\n        ci.source_ref,\n        ci.relative_path,\n        ci.symbol,\n        ci.content_hash,\n        coalesce(ci.summary, left(ci.content, 240), '') AS snippet,\n        ts_rank_cd(ci.search_vector, q.tsq, 32)::double precision AS lexical_score\n      FROM public.codebase_chunk_index AS ci\n      CROSS JOIN q\n      WHERE ci.search_vector @@ q.tsq\n        AND ci.content_hash IS NOT NULL\n        AND ci.source_ref IS NOT NULL\n        \n      ORDER BY lexical_score DESC, ci.id\n      LIMIT $2\n    ),\n    canonical_exact AS (\n      -- Lane 1 (primary, unchanged): exact (source_ref, content_hash) match directly\n      -- against atlas_packets.\n      SELECT\n        p.packet_id::text AS id,\n        p.packet_key,\n        p.source_ref,\n        p.feature_id,\n        p.content_hash,\n        coalesce(p.feature_label, l.symbol, l.relative_path) AS title,\n        l.snippet,\n        l.lexical_score,\n        'source_ref_content_hash_exact' AS identity_resolution_source,\n        count(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,\n        row_number() OVER (\n          PARTITION BY p.packet_key\n          ORDER BY l.lexical_score DESC, l.lexical_id\n        ) AS packet_rank\n      FROM lexical AS l\n      JOIN public.atlas_packets AS p\n        ON p.source_ref = l.source_ref\n       AND p.content_hash = l.content_hash\n      WHERE p.packet_key IS NOT NULL\n        AND p.feature_id IS NOT NULL\n    ),\n    canonical_bridge AS (\n      -- Lane 2 (additive fallback, operator-approved 2026-08-25, PACKET-CHUNK-GRANULARITY-01\n      -- Option B): chunks the exact lane above did NOT already resolve, admitted only via\n      -- atlas_chunk_packet_identity_links rows with match_method = 'EXACT_CANONICAL_ID'.\n      -- UNRESOLVED/AMBIGUOUS rows are structurally excluded by this filter, never substituted.\n      SELECT\n        p.packet_id::text AS id,\n        p.packet_key,\n        p.source_ref,\n        p.feature_id,\n        p.content_hash,\n        coalesce(p.feature_label, l.symbol, l.relative_path) AS title,\n        l.snippet,\n        l.lexical_score,\n        'chunk_packet_identity_link_exact_canonical' AS identity_resolution_source,\n        count(*) OVER (PARTITION BY l.lexical_id) AS identity_match_count,\n        row_number() OVER (\n          PARTITION BY p.packet_key\n          ORDER BY l.lexical_score DESC, l.lexical_id\n        ) AS packet_rank\n      FROM lexical AS l\n      JOIN public.atlas_chunk_packet_identity_links AS link\n        ON link.chunk_index_id = l.lexical_id::uuid\n       AND link.match_method = 'EXACT_CANONICAL_ID'\n      JOIN public.atlas_packets AS p\n        ON p.packet_key = link.canonical_packet_key\n      WHERE p.packet_key IS NOT NULL\n        AND p.feature_id IS NOT NULL\n        AND NOT EXISTS (\n          SELECT 1 FROM public.atlas_packets ep\n          WHERE ep.source_ref = l.source_ref AND ep.content_hash = l.content_hash\n        )\n    ),\n    canonical AS (\n      SELECT * FROM canonical_exact\n      UNION ALL\n      SELECT * FROM canonical_bridge\n    )\n    SELECT id, packet_key, source_ref, feature_id, content_hash,\n           lexical_score, title, snippet, identity_resolution_source\n    FROM canonical\n    WHERE identity_match_count = 1\n      AND packet_rank = 1\n    ORDER BY lexical_score DESC, packet_key ASC\n    LIMIT $3\n  \nparams: embedding search,100,20"
 }

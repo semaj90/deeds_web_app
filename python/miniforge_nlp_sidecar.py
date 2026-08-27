@@ -47,7 +47,9 @@ except ImportError as exc:  # pragma: no cover - launcher/runtime only
     raise RuntimeError("uvicorn is required to run the NLP sidecar") from exc
 
 try:
-    import langextract  # type: ignore
+    from atlas_langextract_runtime import load_langextract
+
+    langextract = load_langextract()  # type: ignore
     LANGEXTRACT_AVAILABLE = True
 except Exception:
     langextract = None  # type: ignore
@@ -442,7 +444,48 @@ class AnalyzeResponse(BaseModel):
     control5: Optional[Control5] = None
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix] = None
     event_hypergraph: Optional[EventHypergraphPayload] = None
+    entity_graph_metrics: dict[str, Any] = Field(default_factory=dict)
     processing_time_ms: int
+
+
+def _compute_entity_graph_metrics(relationships: list["Relationship"]) -> dict[str, Any]:
+    """Real networkx usage (2026-08-26) — previously NETWORKX_AVAILABLE was a
+    true-but-unused capability flag (networkx is only a transitive dependency
+    of langextract/spacy; grep-confirmed zero call sites before this).
+
+    Builds a directed subject->object graph from this document's extracted
+    relationships and computes PageRank per entity — how central each entity
+    is within the relationships this document actually asserts about it, not
+    a corpus-wide authority score (that's atlas_packets.page_rank_score,
+    computed by cugraph-pagerank.py from a completely different, cross-file
+    import graph — the two must never be confused).
+
+    Uses the nx_cugraph backend when available (RAPIDS installed in this
+    process — not the case in the sidecar's own Docker container as of
+    2026-08-26; this only activates in a future run where nx_cugraph is
+    actually installed). Falls through to plain CPU networkx otherwise; a
+    per-document entity graph is small (bounded by 100 relationships), so GPU
+    dispatch overhead would dominate at this scale regardless — the backend
+    switch exists for correctness/forward-compat, not because it is expected
+    to matter yet.
+    """
+    if not NETWORKX_AVAILABLE or not relationships:
+        return {}
+    graph = networkx.DiGraph()
+    for rel in relationships:
+        graph.add_edge(rel.subject, rel.object, predicate=rel.predicate)
+    if graph.number_of_nodes() == 0:
+        return {}
+    try:
+        if NX_CUGRAPH_AVAILABLE:
+            scores = networkx.pagerank(graph, backend="cugraph")
+        else:
+            scores = networkx.pagerank(graph)
+    except Exception:
+        # PageRank can fail to converge on pathological small graphs;
+        # degree centrality always succeeds and is still a real metric.
+        scores = networkx.degree_centrality(graph)
+    return {"backend": "cugraph" if NX_CUGRAPH_AVAILABLE else "networkx", "scores": {str(k): float(v) for k, v in scores.items()}}
 
 
 class ExtractResponse(BaseModel):
@@ -488,6 +531,25 @@ def _capability_report() -> dict[str, Any]:
         "gpu": {"available": TORCH_AVAILABLE},
         "graph": {"networkx": NETWORKX_AVAILABLE, "cugraph": CUGRAPH_AVAILABLE, "nx_cugraph": NX_CUGRAPH_AVAILABLE},
         "vector": {"cuvs": CUVS_AVAILABLE, "cagra": CUVS_AVAILABLE},
+        "capabilityDetails": {
+            "networkx": {
+                "installed": NETWORKX_AVAILABLE,
+                "active": NETWORKX_AVAILABLE,
+                "owner": "entity_graph_metrics" if NETWORKX_AVAILABLE else None,
+                "scope": "per_document_entity_graph",
+            },
+            "nx_cugraph": {
+                "installed": NX_CUGRAPH_AVAILABLE,
+                "active": NX_CUGRAPH_AVAILABLE,
+                "owner": "entity_graph_metrics" if NX_CUGRAPH_AVAILABLE else None,
+            },
+            "rapids_graph_executor": {
+                "available": False,
+                "runtime": None,
+                "owner": "external_wsl2_rapids_executor",
+                "note": "The CPU NLP sidecar does not probe or own the external RAPIDS runtime.",
+            },
+        },
         "legacy": capabilities,
         "imports": _module_proof(),
     }
@@ -579,7 +641,7 @@ def _runtime_info() -> dict[str, Any]:
 
 def _module_proof() -> dict[str, Any]:
     langextract_module_path = _module_path(langextract) if LANGEXTRACT_AVAILABLE else None
-    langextract_version = _package_version("langextract")
+    langextract_version = getattr(langextract, "__atlas_runtime_version__", None) or _package_version("langextract")
     tree_sitter_pack_version = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack")
     ast_grep_version = _package_version("ast-grep-py", "ast_grep_py")
     treesitter_chunker_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker")
@@ -1928,6 +1990,8 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         metadata["grounded_extraction_used"] = grounded_used
         metadata["grounded_extractions"] = grounded_extractions
 
+    entity_graph_metrics = _compute_entity_graph_metrics(relationships[:100])
+
     return AnalyzeResponse(
         document_id=document_id,
         provider_revision=_provider_revision(),
@@ -1944,6 +2008,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         control5=control5,
         experiment_feature_matrix=experiment_feature_matrix,
         event_hypergraph=event_hypergraph,
+        entity_graph_metrics=entity_graph_metrics,
         processing_time_ms=int((time.perf_counter() - started) * 1000),
     )
 
@@ -2251,6 +2316,7 @@ def health() -> dict[str, Any]:
         "model": os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
         "runtime": _runtime_info(),
         "capabilities": _capabilities(),
+        "capabilityDetails": _capability_report()["capabilityDetails"],
         "imports": _module_proof(),
         "timestamp": int(time.time() * 1000),
     }

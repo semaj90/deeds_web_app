@@ -16,12 +16,14 @@ import { ENV } from '$lib/server/env.server.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 interface QdrantResponse {
-  result: Array<{
-    id: string | number;
-    score: number;
-    payload?: Record<string, unknown>;
-    vector?: number[];
-  }>;
+  result?: {
+    points?: Array<{
+      id: string | number;
+      score: number;
+      payload?: Record<string, unknown>;
+      vector?: number[];
+    }>;
+  };
 }
 
 interface RRFCandidate {
@@ -88,15 +90,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
     // Query content lane (768-dim)
     const contentResponse = await fetch(
-      `${qdrantUrl}/collections/codebase_chunks_768/points/search`,
+      `${qdrantUrl}/collections/codebase_chunks_768/points/query`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: {
-            name: 'content',
-            data: embedding,
-          },
+          query: embedding,
+          using: 'content',
           limit: limit * 2, // Fetch extra for better fusion
           with_payload: true,
         }),
@@ -111,18 +111,16 @@ export const GET: RequestHandler = async ({ url }) => {
     const contentResult = (await contentResponse.json()) as QdrantResponse;
 
     // Query semantic lane (768-dim, if available)
-    let semanticResult: QdrantResponse = { result: [] };
+    let semanticResult: QdrantResponse = { result: { points: [] } };
     try {
       const semanticResponse = await fetch(
-        `${qdrantUrl}/collections/codebase_chunks_768/points/search`,
+        `${qdrantUrl}/collections/codebase_chunks_768/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: {
-              name: 'semantic',
-              data: embedding,
-            },
+            query: embedding,
+            using: 'semantic',
             limit: limit * 2,
             with_payload: true,
           }),
@@ -141,7 +139,7 @@ export const GET: RequestHandler = async ({ url }) => {
     const candidates = new Map<string, RRFCandidate>();
 
     // Add content lane results
-    for (const [idx, hit] of contentResult.result.entries()) {
+    for (const [idx, hit] of (contentResult.result?.points ?? []).entries()) {
       const pointId = String(hit.id);
       candidates.set(pointId, {
         point_id: pointId,
@@ -155,7 +153,7 @@ export const GET: RequestHandler = async ({ url }) => {
     }
 
     // Add semantic lane results (merge with content)
-    for (const [idx, hit] of semanticResult.result.entries()) {
+    for (const [idx, hit] of (semanticResult.result?.points ?? []).entries()) {
       const pointId = String(hit.id);
       const existing = candidates.get(pointId);
       if (existing) {

@@ -68,17 +68,17 @@ async function qdrantContext(query: string): Promise<string> {
     if (!eRes.ok) return '';
     const { embedding } = await eRes.json() as { embedding: number[] };
 
-    const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+    const sRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vector: embedding, limit: 3, with_payload: true, score_threshold: 0.5 }),
+      body: JSON.stringify({ query: embedding, limit: 3, with_payload: true, score_threshold: 0.5 }),
       signal: AbortSignal.timeout(8_000),
     });
     if (!sRes.ok) return '';
     const { result } = await sRes.json() as {
-      result: Array<{ payload: { path?: string; content?: string; summary?: string }; score: number }>;
+      result?: { points?: Array<{ payload: { path?: string; content?: string; summary?: string }; score: number }> };
     };
-    return result
+    return (result?.points ?? [])
       .map(r => `// [${r.payload.path ?? '?'} score=${r.score.toFixed(2)}]\n` +
                 `${(r.payload.content ?? r.payload.summary ?? '').slice(0, 400)}`)
       .join('\n\n');

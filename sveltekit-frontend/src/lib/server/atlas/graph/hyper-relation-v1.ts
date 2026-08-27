@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { relationshipAuthoritySchema } from '@deeds/parent-atlas/core/relationship-kernel';
 
 export const HyperRelationParticipantV1Schema = z.object({
 	canonicalId: z.string().min(1),
@@ -14,7 +15,12 @@ export const HyperRelationV1Schema = z.object({
 	evidenceRefs: z.array(z.string().min(1)).min(1),
 	workspaceRevision: z.string().min(1),
 	sourceRevision: z.string().min(1),
-	producerRevision: z.string().min(1)
+	producerRevision: z.string().min(1),
+	// Optional: only relations built from a RelationshipKernelV1 (via
+	// buildIncidenceProjectionFromRelationshipKernelsV1) carry this. A
+	// hand-built HyperRelationV1 (e.g. tree-sitter CALL_BINDING facts) has no
+	// domain authority to report and stays null.
+	authority: relationshipAuthoritySchema.nullable().optional()
 }).strict().superRefine((relation, ctx) => {
 	const ordinals = new Set<number>();
 	for (const participant of relation.participants) {

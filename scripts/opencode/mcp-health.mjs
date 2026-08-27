@@ -1,14 +1,32 @@
 #!/usr/bin/env node
 import { spawnSync } from 'child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const TIMEOUT = 15_000;
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const FRONTEND_ROOT = path.join(ROOT, 'sveltekit-frontend');
+const NPM = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
-function runCmd(cmd, args = []) {
+function runCmd(cmd, args = [], cwd = ROOT, timeoutMs = TIMEOUT) {
   try {
-    const r = spawnSync(cmd, args, { encoding: 'utf8', timeout: TIMEOUT });
+    const r = spawnSync(cmd, args, { cwd, encoding: 'utf8', timeout: timeoutMs });
     return { status: r.status, stdout: r.stdout || '', stderr: r.stderr || '' };
   } catch (err) {
     return { status: null, error: String(err) };
+  }
+}
+
+function runFrontendScript(script) {
+  return runCmd(NPM, ['run', script, '--silent'], FRONTEND_ROOT);
+}
+
+function markProbe(results, name, probe, hint) {
+  if (probe.status === 0) results.healthy.push(name);
+  else {
+    results.degraded.push(name);
+    if (hint) results.hints[name] = hint;
   }
 }
 
@@ -17,50 +35,49 @@ const results = {
   healthy: [],
   degraded: [],
   broken: [],
+  notChecked: [],
   hints: {}
 };
 
-// 1) Try the JSON services health endpoint (preferred)
-const svcJson = runCmd('npm', ['run', 'services:health:json', '--silent']);
-if (svcJson.status === 0) {
-  try {
-    const parsed = JSON.parse(svcJson.stdout || svcJson.stderr || '{}');
-    // Expect shape like { healthy: [...], degraded: [...], broken: [...], hints: {...} }
-    if (Array.isArray(parsed.healthy)) results.healthy.push(...parsed.healthy);
-    if (Array.isArray(parsed.degraded)) results.degraded.push(...parsed.degraded);
-    if (Array.isArray(parsed.broken)) results.broken.push(...parsed.broken);
-    if (parsed.hints && typeof parsed.hints === 'object') Object.assign(results.hints, parsed.hints);
-  } catch (e) {
-    // fallback: treat as degraded
-    results.degraded.push('services');
-  }
-} else if (svcJson.status === 1 || svcJson.status === 2 || svcJson.status === null) {
-  // non-zero exit -> call the strict variant (human-readable) but mark degraded if it fails
-  const strict = runCmd('npm', ['run', 'services:health:strict', '--silent']);
-  if (strict.status === 0) results.healthy.push('services');
-  else results.degraded.push('services');
+// 1) Use the repository's actual MCP probe. It writes a structured report and
+// deliberately exits zero even when an optional endpoint is down.
+const mcpProbe = runCmd(process.execPath, [path.join(ROOT, 'scripts/atlas/mcp-opencode-health-probe.mjs')]);
+const mcpReportPath = path.join(ROOT, 'memory', 'exports', 'mcp-health-probe.json');
+try {
+  const report = JSON.parse(fs.readFileSync(mcpReportPath, 'utf8'));
+  if (report.broken > 0 || report.notListening > 0) {
+    results.degraded.push('trace-mcp');
+    results.hints['trace-mcp'] = 'Inspect memory/exports/mcp-health-probe.json';
+  } else if (report.liveMcp > 0) results.healthy.push('trace-mcp');
+  else results.degraded.push('trace-mcp');
+} catch {
+  results.degraded.push('trace-mcp');
+  results.hints['trace-mcp'] = mcpProbe.stderr.trim() || 'MCP probe report unavailable';
 }
 
-// 2) TRACE MCP (curl to :8788) — lightweight
-const trace = runCmd('npm', ['run', 'trace:smoke', '--silent']);
-if (trace.status === 0) results.healthy.push('trace-mcp');
-else results.degraded.push('trace-mcp');
+// 2) Exercise the configured local atlas-tools stdio server directly.
+markProbe(
+  results,
+  'atlas-tools-mcp',
+  runCmd(process.execPath, [path.join(ROOT, 'scripts/opencode/smoke-atlas-tools-mcp.mjs')], ROOT, 30_000),
+  'Run npm run smoke:atlas-tools'
+);
 
-// 3) Phase76 MCP health (local MCP tool on :3002) — optional
-const phase76 = runCmd('npm', ['run', 'phase76:mcp:health', '--silent']);
-if (phase76.status === 0) results.healthy.push('phase76-mcp');
-else results.degraded.push('phase76-mcp');
+// 3) Keep optional service health explicit. These historical npm aliases are
+// not present in the current package manifests, so report them as not checked.
+results.notChecked.push('services-health-aliases');
+results.hints['services-health-aliases'] = 'No services:health:*, trace:smoke, or phase76:mcp:health script is registered';
 
-// 4) TurboVec sidecar health (frontend sidecar)
-const turbovec = runCmd('npm', ['--prefix', 'sveltekit-frontend', 'run', 'turbovec:sidecar:health', '--silent']);
-if (turbovec.status === 0) results.healthy.push('turbovec-sidecar');
+const curl = process.platform === 'win32' ? 'curl.exe' : 'curl';
+const turbovecHealth = runCmd(curl, ['-fsS', 'http://127.0.0.1:8791/health']);
+if (turbovecHealth.status === 0) results.healthy.push('turbovec-sidecar');
 else {
   results.degraded.push('turbovec-sidecar');
-  results.hints['turbovec-sidecar'] = 'npm run atlas:hyperrag:sidecar';
+  results.hints['turbovec-sidecar'] = 'TurboVec HTTP health probe failed at http://127.0.0.1:8791/health';
 }
 
 // Normalize unique lists
-for (const k of ['healthy', 'degraded', 'broken']) {
+for (const k of ['healthy', 'degraded', 'broken', 'notChecked']) {
   results[k] = Array.from(new Set(results[k]));
 }
 

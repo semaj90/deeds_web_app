@@ -1,0 +1,2110 @@
+{
+  "generated_at": "2026-08-27T02:26:16.029Z",
+  "repo_root": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "exclusion_patterns": [
+    ".git",
+    "node_modules",
+    ".svelte-kit",
+    ".next",
+    ".vite",
+    "dist",
+    "build",
+    "coverage",
+    ".cache",
+    ".pytest_cache",
+    "__pycache__",
+    "models",
+    ".opencode",
+    "deeds_labs",
+    ".claude",
+    ".agent",
+    ".cline",
+    ".clinerules",
+    ".parent-atlas",
+    ".python311",
+    ".venv",
+    ".venv-cu130",
+    ".venv-gemma4",
+    ".venv_turbovec",
+    ".venv-py313-backup",
+    ".svelte-error-fixes-backup",
+    ".opencode",
+    ".tmp",
+    "archive",
+    "backups",
+    "deeds_labs",
+    "logs",
+    "tmp",
+    "reports",
+    "external-docs",
+    "claude-mem",
+    "crates",
+    "mcp-server-mcp",
+    "gsd_archives",
+    "memory",
+    "llama-cpp-turboquant-gemma4",
+    "neschrom97",
+    "target",
+    ".vscode",
+    "screenshots",
+    "obsidian-vault",
+    "docs_readme",
+    "phase104-backups",
+    "scratch",
+    "scratch",
+    "phase104-backups",
+    "docs_readme"
+  ],
+  "statistics": {
+    "total_files": 25535,
+    "total_size_bytes": 18472949483,
+    "indexable_files": 21512,
+    "indexable_size_bytes": 2075944484,
+    "by_type": {
+      "other": {
+        "count": 3744,
+        "size": 14406134112
+      },
+      "config": {
+        "count": 1346,
+        "size": 1150655161
+      },
+      "docs": {
+        "count": 4311,
+        "size": 782347880
+      },
+      "source_code": {
+        "count": 15197,
+        "size": 139663220
+      },
+      "sql": {
+        "count": 658,
+        "size": 3278223
+      },
+      "cold_artifact": {
+        "count": 40,
+        "size": 1073578036
+      },
+      "proto": {
+        "count": 117,
+        "size": 572356
+      },
+      "build_artifact": {
+        "count": 122,
+        "size": 916720495
+      }
+    },
+    "excluded_count": 0,
+    "excluded_size_bytes": 0
+  },
+  "files_by_type": {
+    "source_code": {
+      "count": 15197,
+      "total_size_bytes": 139663220,
+      "files": [
+        {
+          "path": ".eslintrc.cjs",
+          "size": 269,
+          "indexable": true
+        },
+        {
+          "path": "__tests__\\data-hashing.spec.ts",
+          "size": 4781,
+          "indexable": true
+        },
+        {
+          "path": "$lib\\utils\\file-reader.ts",
+          "size": 737,
+          "indexable": true
+        },
+        {
+          "path": ".ts",
+          "size": 0,
+          "indexable": true
+        },
+        {
+          "path": "workers\\atlas-cluster-worker.py",
+          "size": 10525,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\workers\\graphParseWorker.js",
+          "size": 1739,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\traceClient.ts",
+          "size": 4079,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\statusBar.ts",
+          "size": 2316,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\localGraphCache.ts",
+          "size": 3061,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\graphTree.ts",
+          "size": 4106,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\graphPanel.ts",
+          "size": 8165,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\gemmaAsk.ts",
+          "size": 4101,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\extension.ts",
+          "size": 2846,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\src\\claudePlan.ts",
+          "size": 4141,
+          "indexable": true
+        },
+        {
+          "path": "ace-pipeline-audit.mjs",
+          "size": 7691,
+          "indexable": true
+        },
+        {
+          "path": "check-neo4j.mjs",
+          "size": 950,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\traceClient.js",
+          "size": 3573,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\statusBar.js",
+          "size": 2789,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\localGraphCache.js",
+          "size": 2836,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\graphTree.js",
+          "size": 4353,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\graphPanel.js",
+          "size": 9040,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\gemmaAsk.js",
+          "size": 4313,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\extension.js",
+          "size": 3087,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\out\\claudePlan.js",
+          "size": 4356,
+          "indexable": true
+        },
+        {
+          "path": "backfill-qdrant-via-patch.mjs",
+          "size": 4033,
+          "indexable": true
+        },
+        {
+          "path": "backfill-qdrant-identity.mjs",
+          "size": 3005,
+          "indexable": true
+        },
+        {
+          "path": "backfill-qdrant-by-packet-key.mjs",
+          "size": 3893,
+          "indexable": true
+        },
+        {
+          "path": "backfill-payload-metadata.mjs",
+          "size": 2719,
+          "indexable": true
+        },
+        {
+          "path": "backfill-neo4j-cell-id.mjs",
+          "size": 4479,
+          "indexable": true
+        },
+        {
+          "path": "audit-opencode-state.mjs",
+          "size": 6150,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\media\\topology-viewer.js",
+          "size": 15051,
+          "indexable": true
+        },
+        {
+          "path": "verify_kag_dag_tables.mjs",
+          "size": 1095,
+          "indexable": true
+        },
+        {
+          "path": "verify-phase7-write.mjs",
+          "size": 4533,
+          "indexable": true
+        },
+        {
+          "path": "verify-gpu.py",
+          "size": 294,
+          "indexable": true
+        },
+        {
+          "path": "verify-cache-keys.js",
+          "size": 1166,
+          "indexable": true
+        },
+        {
+          "path": "uno.config.js",
+          "size": 601,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\tests\\test_llama_index.py",
+          "size": 6922,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\tests\\test_langchain.py",
+          "size": 5428,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\tests\\test_index.py",
+          "size": 5075,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\tests\\test_id_map.py",
+          "size": 3810,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\tests\\test_haystack.py",
+          "size": 7416,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\src\\lib.rs",
+          "size": 6089,
+          "indexable": true
+        },
+        {
+          "path": "cmd\\agent-sidecar\\main.go",
+          "size": 7406,
+          "indexable": true
+        },
+        {
+          "path": "ecosystem.prod.config.cjs",
+          "size": 1458,
+          "indexable": true
+        },
+        {
+          "path": "ecosystem.dev.config.cjs",
+          "size": 1227,
+          "indexable": true
+        },
+        {
+          "path": "ecosystem.config.cjs",
+          "size": 345,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\python\\turbovec\\__init__.py",
+          "size": 99,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\python\\turbovec\\llama_index.py",
+          "size": 8431,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\python\\turbovec\\langchain.py",
+          "size": 8182,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\python\\turbovec\\haystack.py",
+          "size": 11330,
+          "indexable": true
+        }
+      ]
+    },
+    "config": {
+      "count": 1346,
+      "total_size_bytes": 1150655161,
+      "files": [
+        {
+          "path": ".gpu-rerank-44384-1782059518577.json",
+          "size": 130411,
+          "indexable": true
+        },
+        {
+          "path": ".gpu-rerank-11976-1782023627227.json",
+          "size": 130411,
+          "indexable": true
+        },
+        {
+          "path": ".gitignore",
+          "size": 26283,
+          "indexable": true
+        },
+        {
+          "path": ".env",
+          "size": 12606,
+          "indexable": true
+        },
+        {
+          "path": ".mcp.json",
+          "size": 1086,
+          "indexable": true
+        },
+        {
+          "path": ".headroom-memory.json",
+          "size": 454,
+          "indexable": true
+        },
+        {
+          "path": ".cline-config.json",
+          "size": 1855,
+          "indexable": true
+        },
+        {
+          "path": ".eslintrc.json",
+          "size": 306,
+          "indexable": true
+        },
+        {
+          "path": ".npmrc",
+          "size": 78,
+          "indexable": true
+        },
+        {
+          "path": ".prettierrc",
+          "size": 209,
+          "indexable": true
+        },
+        {
+          "path": ".socraticode.json",
+          "size": 35,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\tsconfig.json",
+          "size": 341,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\package.json",
+          "size": 2567,
+          "indexable": true
+        },
+        {
+          "path": "vscode-extension\\package-lock.json",
+          "size": 1842,
+          "indexable": true
+        },
+        {
+          "path": "Cargo.toml",
+          "size": 463,
+          "indexable": true
+        },
+        {
+          "path": "big-tools-request.json",
+          "size": 21526,
+          "indexable": true
+        },
+        {
+          "path": "audit\\public-route-allowlist.json",
+          "size": 273,
+          "indexable": true
+        },
+        {
+          "path": "atlas.config.json",
+          "size": 3178,
+          "indexable": true
+        },
+        {
+          "path": "artifacts\\rust-ann-slot-manifest-example.json",
+          "size": 1722,
+          "indexable": true
+        },
+        {
+          "path": "artifacts\\parent-atlas-workstation-capabilities.json",
+          "size": 21981,
+          "indexable": true
+        },
+        {
+          "path": "vectors\\content_768_f32_row_map.json",
+          "size": 1575841,
+          "indexable": true
+        },
+        {
+          "path": "uuid_aliases.json",
+          "size": 620,
+          "indexable": true
+        },
+        {
+          "path": "configs\\atlas-glyph-label-registry.json",
+          "size": 1387,
+          "indexable": true
+        },
+        {
+          "path": "config\\vector-lanes.schema.json",
+          "size": 3307,
+          "indexable": true
+        },
+        {
+          "path": "config\\vector-lanes.json",
+          "size": 1976,
+          "indexable": true
+        },
+        {
+          "path": "CMakePresets.json",
+          "size": 1420,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\pyproject.toml",
+          "size": 1681,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec-python\\Cargo.toml",
+          "size": 328,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\turbovec\\Cargo.toml",
+          "size": 1035,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\meta\\_journal.json",
+          "size": 70,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\meta\\0000_snapshot.json",
+          "size": 60742,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\Cargo.toml",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_4bit_x86_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_4bit_x86_mt.json",
+          "size": 138,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_4bit_arm_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_4bit_arm_mt.json",
+          "size": 138,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_2bit_x86_st.json",
+          "size": 138,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_2bit_x86_mt.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_2bit_arm_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d3072_2bit_arm_mt.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_4bit_x86_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_4bit_x86_mt.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_4bit_arm_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_4bit_arm_mt.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_2bit_x86_st.json",
+          "size": 137,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_2bit_x86_mt.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_2bit_arm_st.json",
+          "size": 139,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\speed_d1536_2bit_arm_mt.json",
+          "size": 138,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\recall_glove_4bit.json",
+          "size": 414,
+          "indexable": true
+        },
+        {
+          "path": "turbovec\\benchmarks\\results\\recall_glove_2bit.json",
+          "size": 428,
+          "indexable": true
+        }
+      ]
+    },
+    "proto": {
+      "count": 117,
+      "total_size_bytes": 572356,
+      "files": [
+        {
+          "path": "docker\\cuvs-grpc\\protos\\cuvs_service.proto",
+          "size": 1110,
+          "indexable": false
+        },
+        {
+          "path": "parent-atlas-tensor-residency-integration\\sveltekit-frontend\\proto\\atlas_tensor.proto",
+          "size": 757,
+          "indexable": false
+        },
+        {
+          "path": "proto\\trace.proto",
+          "size": 6205,
+          "indexable": false
+        },
+        {
+          "path": "proto\\shared_ids.proto",
+          "size": 2220,
+          "indexable": false
+        },
+        {
+          "path": "proto\\packet_topology_envelope.proto",
+          "size": 5654,
+          "indexable": false
+        },
+        {
+          "path": "proto\\memory.proto",
+          "size": 7703,
+          "indexable": false
+        },
+        {
+          "path": "proto\\graph.proto",
+          "size": 6602,
+          "indexable": false
+        },
+        {
+          "path": "proto\\gpu.proto",
+          "size": 8435,
+          "indexable": false
+        },
+        {
+          "path": "proto\\generation.proto",
+          "size": 4762,
+          "indexable": false
+        },
+        {
+          "path": "parent_atlas_tensor_residency_integration_v2\\sveltekit-frontend\\proto\\atlas_tensor.proto",
+          "size": 757,
+          "indexable": false
+        },
+        {
+          "path": "proto\\atlas\\ae_train.proto",
+          "size": 4919,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\chat_assistant.proto",
+          "size": 10731,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\chr97_agent.proto",
+          "size": 1928,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\embedding.proto",
+          "size": 4140,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\codeintel_enrichment.proto",
+          "size": 5057,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\codeintel.proto",
+          "size": 7352,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\gpu_bridge.proto",
+          "size": 2290,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\evidence_metadata.proto",
+          "size": 3464,
+          "indexable": false
+        },
+        {
+          "path": "proto\\active\\library_search.proto",
+          "size": 8237,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\embedding.proto",
+          "size": 3212,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\embedding-service.proto",
+          "size": 5575,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\embed.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\cuda.proto",
+          "size": 7558,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\chat.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\case_scoring.proto",
+          "size": 10319,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\auth.proto",
+          "size": 6122,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\analytics-service.proto",
+          "size": 5859,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\ai-service.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\gpu_service.proto",
+          "size": 6521,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\gateway_streaming.proto",
+          "size": 5839,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\events.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\enhanced-rag.proto",
+          "size": 5610,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\embeddings.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\ingest_new.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\ingest.proto",
+          "size": 1257,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\ingest-service.proto",
+          "size": 9846,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\legal_ai.proto",
+          "size": 8346,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\legal-ai-services.proto",
+          "size": 7815,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\legal_ai_tensors.proto",
+          "size": 11336,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\timeline-service.proto",
+          "size": 3890,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\tensor_cache.proto",
+          "size": 10321,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\tensorstore.proto",
+          "size": 2023,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\tensor.proto",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\tasks.proto",
+          "size": 1229,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\search-service.proto",
+          "size": 3806,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\qlora_training.proto",
+          "size": 9055,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\qlora_service.proto",
+          "size": 1603,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\metrics.proto",
+          "size": 7655,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\metrics\\metrics.proto",
+          "size": 1087,
+          "indexable": false
+        },
+        {
+          "path": "proto\\archived\\legal_tensorrt.proto",
+          "size": 7067,
+          "indexable": false
+        }
+      ]
+    },
+    "sql": {
+      "count": 658,
+      "total_size_bytes": 3278223,
+      "files": [
+        {
+          "path": "verify-phase-106-107-complete.sql",
+          "size": 743,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\safe-vector-migration.sql",
+          "size": 5408,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\migrations\\109_unknown_packets_audit.sql",
+          "size": 1234,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\migrations\\0006_failed_jobs.sql",
+          "size": 862,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\migrations\\0001_create_reports_table.sql",
+          "size": 2132,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\migrations\\0001_ace_web_schema.sql",
+          "size": 3549,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0003_solid_scorpion.sql",
+          "size": 168,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0003_enhanced_legal_ai_system.sql",
+          "size": 18503,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0002_flaky_midnight.sql",
+          "size": 29704,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0001_vector_search.sql",
+          "size": 3594,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0001_lame_luke_cage.sql",
+          "size": 15659,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0000_rainy_domino.sql",
+          "size": 3558,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\0000_add_evidence_observations_ledger.sql",
+          "size": 1322,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\sync-summaries-topo.sql",
+          "size": 1770,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\proposed_20260530_unify_owner_columns_to_integer.sql",
+          "size": 2456,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\proposed_20260530_task_semantic_packets.sql",
+          "size": 8965,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\evidence_analysis_cache.sql",
+          "size": 1661,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\diagnosis_events.sql",
+          "size": 1660,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\diagnosis_embeddings.sql",
+          "size": 934,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\add-topo-to-centroids.sql",
+          "size": 2290,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260811_analysis_pass_results.sql",
+          "size": 1395,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260607_route_packet_rewards.sql",
+          "size": 6094,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260606_missing_tables.sql",
+          "size": 7587,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260604_add_lod_source_kind_columns.sql",
+          "size": 2687,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260507_retrieval_acceleration.sql",
+          "size": 4454,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260507_hypergraph_members.sql",
+          "size": 2863,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260421_ast_graph_tables.sql",
+          "size": 3615,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260420_web_search_index.sql",
+          "size": 1953,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260420_route_metadata.sql",
+          "size": 1619,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260416_synthesis_ace_knowledge_tables.sql",
+          "size": 3264,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260416_glyph_records.sql",
+          "size": 2437,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260402_indexing_ace_schema_merge.sql",
+          "size": 20403,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260323_pgvector_hnsw_indexes.sql",
+          "size": 3974,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260321_case_link_glossary_concept.sql",
+          "size": 509,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260319_reports_type_column.sql",
+          "size": 260,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260317_library_hash_unique.sql",
+          "size": 275,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260317_legal_library.sql",
+          "size": 12607,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260317_legal_citations_case_links.sql",
+          "size": 2947,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260317_constitution_sources.sql",
+          "size": 13755,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\20260316_onboarding_columns.sql",
+          "size": 231,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0100_repair_code_lexical_search_function.sql",
+          "size": 2401,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0100_add_summary_canonical_envelope.sql",
+          "size": 1742,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0099_add_pgvector_384_canonical.sql",
+          "size": 2187,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0053_parent_atlas_recovery_spine.sql",
+          "size": 5195,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0052_parent_atlas_summary_provenance_backfill.sql",
+          "size": 902,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0051_parent_atlas_summary_provenance.sql",
+          "size": 922,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0051_atlas_topology_eval_times.sql",
+          "size": 3187,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0051_atlas_identity_ledger.sql",
+          "size": 1048,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0050_eval_times_domain_ontology.sql",
+          "size": 1531,
+          "indexable": true
+        },
+        {
+          "path": "drizzle\\manual\\0049_atlas_retrieval_eval_times.sql",
+          "size": 1007,
+          "indexable": true
+        }
+      ]
+    },
+    "docs": {
+      "count": 4311,
+      "total_size_bytes": 782347880,
+      "files": [
+        {
+          "path": ".couchdb-state-report-2026-05-29.md",
+          "size": 7892,
+          "indexable": true
+        },
+        {
+          "path": ".codex-tsc-audit.txt",
+          "size": 16597,
+          "indexable": true
+        },
+        {
+          "path": ".codex-svelte-audit.txt",
+          "size": 81423,
+          "indexable": true
+        },
+        {
+          "path": ".codex-svelte-audit-latest.txt",
+          "size": 64081,
+          "indexable": true
+        },
+        {
+          "path": "2-CONTEXT.md",
+          "size": 3848,
+          "indexable": true
+        },
+        {
+          "path": "620_atlas_retrieval_contract_step1.txt",
+          "size": 6729,
+          "indexable": true
+        },
+        {
+          "path": "620_26.txt",
+          "size": 3115,
+          "indexable": true
+        },
+        {
+          "path": "620_pt2_next_steps_.txt",
+          "size": 3953,
+          "indexable": true
+        },
+        {
+          "path": "619_nextsteps_todopt1.3.txt",
+          "size": 2174,
+          "indexable": true
+        },
+        {
+          "path": "624_26__todo.txt",
+          "size": 9467,
+          "indexable": true
+        },
+        {
+          "path": "618__25todo.txt",
+          "size": 21950,
+          "indexable": true
+        },
+        {
+          "path": "61026__.txt",
+          "size": 5688,
+          "indexable": true
+        },
+        {
+          "path": "6_24_26___todo.txt",
+          "size": 33872,
+          "indexable": true
+        },
+        {
+          "path": "6_24_26__test.txt",
+          "size": 16137,
+          "indexable": true
+        },
+        {
+          "path": "6_23_26__todo.txt",
+          "size": 18776,
+          "indexable": true
+        },
+        {
+          "path": "6_23_26__.txt",
+          "size": 69541,
+          "indexable": true
+        },
+        {
+          "path": "6_23_26_nextsteps.txt",
+          "size": 9311,
+          "indexable": true
+        },
+        {
+          "path": "6_22_26___.txt",
+          "size": 206,
+          "indexable": true
+        },
+        {
+          "path": "6_22_26_todo_11pm.txt",
+          "size": 10894,
+          "indexable": true
+        },
+        {
+          "path": "6_21_todo_4pm_7.txt",
+          "size": 12207,
+          "indexable": true
+        },
+        {
+          "path": "6_20_26__todo_.txt",
+          "size": 20423,
+          "indexable": true
+        },
+        {
+          "path": "6_19_todo_pt1.txt",
+          "size": 15981,
+          "indexable": true
+        },
+        {
+          "path": "6_19_26_pt1.2_todo.txt",
+          "size": 5935,
+          "indexable": true
+        },
+        {
+          "path": "6_18_todo_pt3.txt",
+          "size": 3026,
+          "indexable": true
+        },
+        {
+          "path": "6_18_todopt2.txt",
+          "size": 13284,
+          "indexable": true
+        },
+        {
+          "path": "6_15_hyperrag_tod.txt",
+          "size": 4329,
+          "indexable": true
+        },
+        {
+          "path": "6_14_26__to_do_parent_atlas_registery.txt",
+          "size": 22614,
+          "indexable": true
+        },
+        {
+          "path": "6_14_26__todo_find_schema_matching.txt",
+          "size": 6276,
+          "indexable": true
+        },
+        {
+          "path": "6_14_26_codexended_614.txt",
+          "size": 13910,
+          "indexable": true
+        },
+        {
+          "path": "6_13_opencode_validation_skills.txt",
+          "size": 1364,
+          "indexable": true
+        },
+        {
+          "path": "6_13_26__.txt",
+          "size": 4164,
+          "indexable": true
+        },
+        {
+          "path": "6_13_26_todo.txt",
+          "size": 4585,
+          "indexable": true
+        },
+        {
+          "path": "7_15_26_next_steps.txt",
+          "size": 10348,
+          "indexable": true
+        },
+        {
+          "path": "6_11_todo.txt",
+          "size": 6394,
+          "indexable": true
+        },
+        {
+          "path": "6_11_26_phase5_cannonical_.txt",
+          "size": 24636,
+          "indexable": true
+        },
+        {
+          "path": "6_11_26_mem.txt",
+          "size": 16925,
+          "indexable": true
+        },
+        {
+          "path": "6_10_todo_parentatlas.txt",
+          "size": 6295,
+          "indexable": true
+        },
+        {
+          "path": "6_10_libtorch_review.txt",
+          "size": 11081,
+          "indexable": true
+        },
+        {
+          "path": "628_26pt2.txt",
+          "size": 3218,
+          "indexable": true
+        },
+        {
+          "path": "627_26__.txt",
+          "size": 1118,
+          "indexable": true
+        },
+        {
+          "path": "625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt",
+          "size": 32694,
+          "indexable": true
+        },
+        {
+          "path": "7-19_qdrantgpu_hnsw_ivfft_bm25_bm42_mcp_toolcalling_hmm.txt",
+          "size": 9332,
+          "indexable": true
+        },
+        {
+          "path": "6_9_26_todo.txt",
+          "size": 6463,
+          "indexable": true
+        },
+        {
+          "path": "6_9_26_hyperparentatlas.txt",
+          "size": 16196,
+          "indexable": true
+        },
+        {
+          "path": "6_9-26__todo.txt",
+          "size": 3428,
+          "indexable": true
+        },
+        {
+          "path": "6_8_todopt3.txt",
+          "size": 8289,
+          "indexable": true
+        },
+        {
+          "path": "6_8_10pm_todo.txt",
+          "size": 2213,
+          "indexable": true
+        },
+        {
+          "path": "6_3_phase_14_15_batchsummaries.txt",
+          "size": 4224,
+          "indexable": true
+        },
+        {
+          "path": "6_30_26__todopt2.txt",
+          "size": 21541,
+          "indexable": true
+        },
+        {
+          "path": "6_29_pt3todo.txt",
+          "size": 12019,
+          "indexable": true
+        }
+      ]
+    },
+    "test": {
+      "count": 0,
+      "total_size_bytes": 0,
+      "files": []
+    },
+    "generated": {
+      "count": 0,
+      "total_size_bytes": 0,
+      "files": []
+    },
+    "build_artifact": {
+      "count": 122,
+      "total_size_bytes": 916720495,
+      "files": [
+        {
+          "path": "tools\\llama-server\\llama-server.exe",
+          "size": 16751616,
+          "indexable": false
+        },
+        {
+          "path": "tools\\ffmpeg\\ffmpeg.exe",
+          "size": 202390528,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\rabbitmq-installer.exe",
+          "size": 15771016,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\python311.exe",
+          "size": 146,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\python-3.12.7-amd64.exe",
+          "size": 26538304,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\python-3.12.6-amd64.exe",
+          "size": 26527368,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\minio.exe",
+          "size": 112905216,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\envutil.exe",
+          "size": 2391040,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\envutil-service.exe",
+          "size": 1629184,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\envutil-prod.exe",
+          "size": 1629184,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\codex-x86_64-pc-windows-msvc.exe",
+          "size": 64916456,
+          "indexable": false
+        },
+        {
+          "path": "tools\\bin\\caddy.exe",
+          "size": 41458688,
+          "indexable": false
+        },
+        {
+          "path": "pgvector-precompiled\\lib\\vector.dll",
+          "size": 275456,
+          "indexable": false
+        },
+        {
+          "path": "pgvector-precompiled\\include\\server\\extension\\vector.dll",
+          "size": 275456,
+          "indexable": false
+        },
+        {
+          "path": "qdrant-windows\\qdrant.exe",
+          "size": 81152000,
+          "indexable": false
+        },
+        {
+          "path": "rustup-init.exe",
+          "size": 12814336,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-search-service\\search-server.exe",
+          "size": 33368064,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-health-aggregator\\health-aggregator.exe",
+          "size": 17925120,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-embedding-service\\embedding-server.exe",
+          "size": 25352192,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-retrieval-service\\retrieval-server.exe",
+          "size": 33836544,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-retrieval-service\\go-retrieval-service.exe",
+          "size": 33973248,
+          "indexable": false
+        },
+        {
+          "path": "services\\go-codeintel-service\\codeintel-service.exe",
+          "size": 25279488,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\tensor_bridge.obj",
+          "size": 19741,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\simdjson_bridge.obj",
+          "size": 348390,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\simdjson.obj",
+          "size": 324574,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\lstm_bridge.obj",
+          "size": 5720,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\graph_fallback_stubs.obj",
+          "size": 16576,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\cuvs_bridge.obj",
+          "size": 1771,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\tensorrt_bridge.dir\\Release\\binding.obj",
+          "size": 143704,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\cpp\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CompilerIdCUDA\\CompilerIdCUDA.exe",
+          "size": 467456,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\cuda_kernels.dir\\Release\\som_cache.obj",
+          "size": 834,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\cuda_kernels.dir\\Release\\lstm_gpu.obj",
+          "size": 6111,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\cuda_kernels.dir\\Release\\cuda_graph_bridge.obj",
+          "size": 1066,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\cpp\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CompilerIdCUDA\\CompilerIdCUDA\\x64\\Debug\\CMakeCUDACompilerId.cu.obj",
+          "size": 80323,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdCXX\\Debug\\CMakeCXXCompilerId.obj",
+          "size": 2405,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdCXX\\CompilerIdCXX.exe",
+          "size": 15360,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CompilerIdCXX\\Debug\\CMakeCXXCompilerId.obj",
+          "size": 2401,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CompilerIdCXX\\CompilerIdCXX.exe",
+          "size": 15360,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdCUDA\\CompilerIdCUDA.exe",
+          "size": 467456,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CompilerIdC\\CompilerIdC.exe",
+          "size": 14848,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CompilerIdC\\Debug\\CMakeCCompilerId.obj",
+          "size": 2334,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdCUDA\\CompilerIdCUDA\\x64\\Debug\\CMakeCUDACompilerId.cu.obj",
+          "size": 80131,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdC\\Debug\\CMakeCCompilerId.obj",
+          "size": 2338,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CompilerIdC\\CompilerIdC.exe",
+          "size": 14848,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cuvs\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CompilerIdCUDA\\CompilerIdCUDA.exe",
+          "size": 467456,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\tensorrt_bridge.dir\\Release\\tensor_bridge.obj",
+          "size": 19741,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\tensorrt_bridge.dir\\Release\\simdjson_bridge.obj",
+          "size": 348394,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\tensorrt_bridge.dir\\Release\\simdjson.obj",
+          "size": 324578,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\tensorrt_bridge.dir\\Release\\lstm_bridge.obj",
+          "size": 5724,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\tensorrt_bridge.dir\\Release\\graph_fallback_stubs.obj",
+          "size": 16580,
+          "indexable": false
+        }
+      ]
+    },
+    "cold_artifact": {
+      "count": 40,
+      "total_size_bytes": 1073578036,
+      "files": [
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant_data__legal_evidence.tar.gz",
+          "size": 237042,
+          "indexable": false
+        },
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant_data__codemod_memories.tar.gz",
+          "size": 371375,
+          "indexable": false
+        },
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant-data-384__ws-e38928570c6f912e.tar.gz",
+          "size": 529504685,
+          "indexable": false
+        },
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant-data-384__svelte_errors.tar.gz",
+          "size": 245266,
+          "indexable": false
+        },
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant-data-384__phase44_fingerprints.tar.gz",
+          "size": 272347,
+          "indexable": false
+        },
+        {
+          "path": "artifacts\\qdrant-volume-exports-2026-04-01\\deeds-web-app_qdrant-data-384__documents.tar.gz",
+          "size": 243114,
+          "indexable": false
+        },
+        {
+          "path": ".rag-metrics\\embeddings\\embeddings.jsonl.gz",
+          "size": 17777464,
+          "indexable": false
+        },
+        {
+          "path": "granite-docling-258M\\model.safetensors",
+          "size": 515093104,
+          "indexable": false
+        },
+        {
+          "path": "tools\\parent-atlas-qdrant-postgres-toolkit.zip",
+          "size": 7850,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\cpp\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-fallback\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "scripts\\unsloth-training\\COLAB_PACKAGE.zip",
+          "size": 403453,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cuvs\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cuvs\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cuvs\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774656,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cuvs\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda-cublas\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774656,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-verify-2026-05-31T08-06-57-567Z\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-verify-2026-05-31T08-06-57-567Z\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-verify-2026-05-31T08-06-57-567Z\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-verify-2026-05-31T08-06-45-478Z\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-verify-2026-05-31T08-06-45-478Z\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-clangd\\CMakeFiles\\feature_tests.bin",
+          "size": 18944,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-clangd\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 17408,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\cpp\\build-clangd\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 17408,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\build-x64-cuda\\cpp\\CMakeFiles\\CheckCUDA\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CXX.bin",
+          "size": 53248,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_CUDA.bin",
+          "size": 774144,
+          "indexable": false
+        },
+        {
+          "path": "simd-bridge\\build-x64-cuda\\CMakeFiles\\4.0.0\\CMakeDetermineCompilerABI_C.bin",
+          "size": 53248,
+          "indexable": false
+        }
+      ]
+    },
+    "other": {
+      "count": 3744,
+      "total_size_bytes": 14406134112,
+      "files": [
+        {
+          "path": "$$$BODY",
+          "size": 3,
+          "indexable": false
+        },
+        {
+          "path": ".clangd",
+          "size": 704,
+          "indexable": false
+        },
+        {
+          "path": ".env.local.example",
+          "size": 784,
+          "indexable": false
+        },
+        {
+          "path": ".gitmodules",
+          "size": 745,
+          "indexable": false
+        },
+        {
+          "path": "--since 2h",
+          "size": 2838,
+          "indexable": false
+        },
+        {
+          "path": ".env.local",
+          "size": 1027,
+          "indexable": false
+        },
+        {
+          "path": ".env.example.production",
+          "size": 9792,
+          "indexable": false
+        },
+        {
+          "path": ".env.example",
+          "size": 10302,
+          "indexable": false
+        },
+        {
+          "path": ".dockerignore",
+          "size": 602,
+          "indexable": false
+        },
+        {
+          "path": ".copilotignore",
+          "size": 909,
+          "indexable": false
+        },
+        {
+          "path": ".rgignore",
+          "size": 3325,
+          "indexable": false
+        },
+        {
+          "path": ".prettierignore",
+          "size": 258,
+          "indexable": false
+        },
+        {
+          "path": ".eslintignore",
+          "size": 156,
+          "indexable": false
+        },
+        {
+          "path": "1",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": ".wslconfig",
+          "size": 727,
+          "indexable": false
+        },
+        {
+          "path": ".env.sample",
+          "size": 313,
+          "indexable": false
+        },
+        {
+          "path": ".env.truncated-20260512-125944.bak",
+          "size": 973,
+          "indexable": false
+        },
+        {
+          "path": ".gitattributes",
+          "size": 794,
+          "indexable": false
+        },
+        {
+          "path": ".python-version",
+          "size": 7,
+          "indexable": false
+        },
+        {
+          "path": "apply-parent-atlas-policy-bundle.ps1",
+          "size": 1034,
+          "indexable": false
+        },
+        {
+          "path": "AGENTS.md.bak",
+          "size": 6607,
+          "indexable": false
+        },
+        {
+          "path": "adapter.log",
+          "size": 6127,
+          "indexable": false
+        },
+        {
+          "path": "adapter-err.log",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": ".vs\\deeds-web-app\\v17\\.wsuo",
+          "size": 12800,
+          "indexable": false
+        },
+        {
+          "path": ".vs\\deeds-web-app\\FileContentIndex\\f1076ea7-8168-4459-8b2e-82b989fdd1d6.vsidx",
+          "size": 4148615,
+          "indexable": false
+        },
+        {
+          "path": ".vs\\deeds-web-app\\FileContentIndex\\499be2e7-10b3-406b-abb5-348f05b2c4c8.vsidx",
+          "size": 2943729,
+          "indexable": false
+        },
+        {
+          "path": ".vs\\deeds-web-app\\FileContentIndex\\3ccfaa46-efee-4f6b-b484-ba0ac099243c.vsidx",
+          "size": 4646502,
+          "indexable": false
+        },
+        {
+          "path": ".vs\\deeds-web-app\\FileContentIndex\\135b0829-8797-43a3-a473-22c3a0b29881.vsidx",
+          "size": 4262183,
+          "indexable": false
+        },
+        {
+          "path": "build_errors.log",
+          "size": 33675,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\traceClient.js.map",
+          "size": 3155,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\statusBar.js.map",
+          "size": 2438,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\localGraphCache.js.map",
+          "size": 2920,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\graphTree.js.map",
+          "size": 4740,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\graphPanel.js.map",
+          "size": 5586,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\gemmaAsk.js.map",
+          "size": 3689,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\extension.js.map",
+          "size": 2418,
+          "indexable": false
+        },
+        {
+          "path": "vscode-extension\\out\\claudePlan.js.map",
+          "size": 3952,
+          "indexable": false
+        },
+        {
+          "path": "benchmarks\\retrieval-100.jsonl",
+          "size": 24922,
+          "indexable": false
+        },
+        {
+          "path": "audit-output.log",
+          "size": 1277,
+          "indexable": false
+        },
+        {
+          "path": "audit-4-layers.sh",
+          "size": 4460,
+          "indexable": false
+        },
+        {
+          "path": "vendor\\wheels\\.gitkeep",
+          "size": 0,
+          "indexable": false
+        },
+        {
+          "path": "CONSOLIDATION-COMMANDS.sh",
+          "size": 15783,
+          "indexable": false
+        },
+        {
+          "path": "vectors\\topology_features.jsonl",
+          "size": 19249560,
+          "indexable": false
+        },
+        {
+          "path": "vectors\\content_768_f32.arrow",
+          "size": 160911360,
+          "indexable": false
+        },
+        {
+          "path": "utputFormat",
+          "size": 47,
+          "indexable": false
+        },
+        {
+          "path": "upsert-full-run.log",
+          "size": 463,
+          "indexable": false
+        },
+        {
+          "path": "upsert-full-run-v2.log",
+          "size": 4413,
+          "indexable": false
+        },
+        {
+          "path": "upsert-1000-run.log",
+          "size": 578,
+          "indexable": false
+        },
+        {
+          "path": "configs\\templates\\hforf-qwen.jinja",
+          "size": 521,
+          "indexable": false
+        },
+        {
+          "path": "configs\\templates\\gemma4-tools.jinja.bak",
+          "size": 1374,
+          "indexable": false
+        }
+      ]
+    }
+  }
+}

@@ -59,18 +59,20 @@ const searchCodebase: Gemma4Tool = {
         : undefined;
 
       const qdrantResp = await fetch(
-        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/search`,
+        `${ENV.QDRANT_URL}/collections/codebase_chunks_768_v2/points/query`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vector, limit: topK, with_payload: true, ...(filter ? { filter } : {}) }),
+          body: JSON.stringify({ query: vector, limit: topK, with_payload: true, ...(filter ? { filter } : {}) }),
           signal: AbortSignal.timeout(10_000),
         },
       );
       if (!qdrantResp.ok) throw new Error(`Qdrant HTTP ${qdrantResp.status}`);
-      const qdrantData = await parseQdrantResponse<{ result?: Array<{ payload?: Record<string, unknown>; score: number }> }>(qdrantResp, 'search');
+      const qdrantData = await parseQdrantResponse<{
+        result?: { points?: Array<{ payload?: Record<string, unknown>; score: number }> };
+      }>(qdrantResp, 'query');
 
-      const hits = (qdrantData.result ?? []).map(r => {
+      const hits = (qdrantData.result?.points ?? []).map(r => {
         const p = r.payload ?? {};
         return `[${(r.score * 100).toFixed(0)}%] ${p.relative_path ?? p.file_path ?? 'unknown'} — ${String(p.summary ?? p.content ?? '').slice(0, 200)}`;
       });
@@ -259,17 +261,19 @@ const webSearch: Gemma4Tool = {
         const vec = eData.embedding;
         if (vec?.length) {
           const sResp = await fetch(
-            `${ENV.QDRANT_URL}/collections/research_summaries/points/search`,
+            `${ENV.QDRANT_URL}/collections/research_summaries/points/query`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ vector: vec, limit: topK, with_payload: true }),
+              body: JSON.stringify({ query: vec, limit: topK, with_payload: true }),
               signal: AbortSignal.timeout(8_000),
             },
           );
           if (sResp.ok) {
-            const sData = await parseQdrantResponse<{ result?: Array<{ payload?: Record<string, unknown>; score: number }> }>(sResp, 'search');
-            const hits = sData.result ?? [];
+            const sData = await parseQdrantResponse<{
+              result?: { points?: Array<{ payload?: Record<string, unknown>; score: number }> };
+            }>(sResp, 'query');
+            const hits = sData.result?.points ?? [];
             if (hits.length) {
               return '[Stored research fallback]\n' + hits.map(h => {
                 const p = h.payload ?? {};

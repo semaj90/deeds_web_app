@@ -112,14 +112,15 @@ async function qdrantSearch(vector, { topK = DEFAULT_TOP_K, ontologyFilter = [] 
   }
 
   const body = {
-    vector: { name: 'content', vector },
+    query: vector,
+    using: 'content',
     limit: topK * 2, // oversample, then re-rank by ontology overlap below
     with_payload: true,
     filter,
   };
 
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -127,7 +128,7 @@ async function qdrantSearch(vector, { topK = DEFAULT_TOP_K, ontologyFilter = [] 
     });
     if (!res.ok) throw new Error(`Qdrant HTTP ${res.status}`);
     const d = await res.json();
-    return d.result ?? [];
+    return d.result?.points ?? [];
   } catch (e) {
     return [];
   }

@@ -1,20 +1,39 @@
 # Go Retrieval Smoke
 
 Status: PASS
-Generated: 2026-07-23T01:48:54.192Z
+Generated: 2026-08-27T01:34:41.974Z
 
-- HTTP: READY http://127.0.0.1:8100/health (2003ms)
-- gRPC/TCP: READY 127.0.0.1:50053 (4ms)
+- HTTP: READY http://127.0.0.1:8100/health (67ms)
+- gRPC/TCP: READY 127.0.0.1:50053 (2ms)
 
 ## HTTP Health
 
 ```json
 {
-  "embeddingServiceUp": false,
+  "dependencies": {
+    "embedding_service": {
+      "connected": true,
+      "required": true
+    },
+    "postgres": {
+      "connected": true,
+      "required": true
+    },
+    "qdrant": {
+      "connected": true,
+      "required": true
+    },
+    "redis": {
+      "connected": true,
+      "required": false
+    }
+  },
+  "embeddingServiceUp": true,
   "pgvectorConnected": true,
   "qdrantConnected": true,
+  "readiness_state": "READY_FULL",
   "redisConnected": true,
   "status": "healthy",
-  "timestamp": 1784771334317
+  "timestamp": 1787794482009
 }
 ```

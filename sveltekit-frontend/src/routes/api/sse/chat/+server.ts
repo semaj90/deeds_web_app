@@ -519,10 +519,11 @@ async function searchCollection(
       opts?: { timeoutMs?: number; maxResponseBytes?: number; fallback?: T }
     ) => Promise<T | undefined>;
 
-    const data = await safeJsonPost<{ result?: any[] }>(
-      `${QDRANT_URL}/collections/${collection}/points/search`,
+    const data = await safeJsonPost<{ result?: { points?: any[] } }>(
+      `${QDRANT_URL}/collections/${collection}/points/query`,
       {
-        vector: vectorPayload,
+        query: Array.isArray(vectorPayload) ? vectorPayload : vectorPayload.vector,
+        ...(Array.isArray(vectorPayload) ? {} : { using: vectorPayload.name }),
         limit,
         with_payload: true,
         score_threshold: RAG_SCORE_THRESHOLD,
@@ -542,7 +543,7 @@ async function searchCollection(
       });
       return [];
     }
-    const results = (data.result ?? []).map((r: Record<string, unknown>) => ({
+    const results = (data.result?.points ?? []).map((r: Record<string, unknown>) => ({
       ...r,
       _collection: collection,
     }));

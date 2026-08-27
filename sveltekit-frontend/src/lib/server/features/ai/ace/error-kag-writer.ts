@@ -202,12 +202,12 @@ export async function writeErrorToKag(entry: ErrorKagEntry): Promise<ErrorKagWri
     if (embedding) {
       try {
         const dedupRes = await fetch(
-          `${ENV.QDRANT_URL}/collections/knowledge_base/points/search`,
+          `${ENV.QDRANT_URL}/collections/knowledge_base/points/query`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              vector: embedding,
+              query: embedding,
               limit: 1,
               score_threshold: 0.85,
               with_payload: false,
@@ -216,8 +216,10 @@ export async function writeErrorToKag(entry: ErrorKagEntry): Promise<ErrorKagWri
           },
         );
         if (dedupRes.ok) {
-          const dedupData = (await dedupRes.json()) as { result?: Array<{ score: number }> };
-          const topScore = dedupData.result?.[0]?.score ?? 0;
+          const dedupData = (await dedupRes.json()) as {
+            result?: { points?: Array<{ score: number }> };
+          };
+          const topScore = dedupData.result?.points?.[0]?.score ?? 0;
           if (topScore >= 0.85) {
             return {
               ok: false,

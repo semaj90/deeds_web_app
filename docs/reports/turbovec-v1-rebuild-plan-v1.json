@@ -1,6 +1,6 @@
 {
   "schema": "atlas.turbovec-v1-rebuild-plan.v1",
-  "generatedAt": "2026-08-24T21:11:47.994Z",
+  "generatedAt": "2026-08-27T01:43:14.166Z",
   "readOnly": true,
   "writes": false,
   "sourceContract": {
@@ -22,13 +22,13 @@
   "sourceBuilder": {
     "path": "sveltekit-frontend\\scripts\\atlas\\build-turbovec-768-4bit.mts",
     "exists": true,
-    "bytes": 5781,
-    "modifiedAt": "2026-08-02T07:41:38.088Z"
+    "bytes": 9933,
+    "modifiedAt": "2026-08-24T21:21:58.661Z"
   },
   "qdrant": {
     "status": "REACHABLE",
     "httpStatus": 200,
-    "points": 106338,
+    "points": 109129,
     "vectors": {
       "content": {
         "size": 768,

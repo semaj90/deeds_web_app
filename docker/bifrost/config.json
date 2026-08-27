@@ -63,7 +63,7 @@
           "value": "local",
           "weight": 1,
           "models": [
-            "hforf.gguf"
+            "ornith-1.5-9b"
           ]
         }
       ],

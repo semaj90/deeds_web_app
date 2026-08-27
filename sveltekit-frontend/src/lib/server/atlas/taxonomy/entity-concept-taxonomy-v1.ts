@@ -190,8 +190,17 @@ export function promoteTaxonomyAssignmentV1(input: {
 	producerRevision: string;
 }): HyperedgeV1 {
 	const candidate = TaxonomyAssignmentCandidateV1Schema.parse(input.candidate);
+	// A candidate must have already cleared review (status transitioned to
+	// 'promoted' by whatever review step owns that decision) before this
+	// function is allowed to mint canonical truth. Without this check, a
+	// still-'proposed' or 'review_required' hypothesis — or one explicitly
+	// 'rejected' — could be promoted into a canonical HyperedgeV1 just by
+	// having non-empty evidenceRefs, defeating the whole point of `status`.
+	if (candidate.status !== 'promoted') {
+		throw new Error(`TAXONOMY_PROMOTION_REQUIRES_PROMOTED_STATUS:${candidate.candidateId}:${candidate.status}`);
+	}
 	const evidenceRefs = stableUnique([...candidate.evidenceRefs, ...input.promotionEvidenceRefs]);
-	if (evidenceRefs.length === 0) throw new Error('taxonomy promotion requires evidence');
+	if (evidenceRefs.length === 0) throw new Error(`TAXONOMY_PROMOTION_REQUIRES_EVIDENCE:${candidate.candidateId}`);
 	return createHyperedgeV1({
 		predicate: 'ENTITY_CLASSIFIED_AS',
 		participants: [
@@ -215,13 +224,49 @@ export function createConceptBroaderThanV1(input: {
 	evidenceRefs: readonly string[];
 	producerRevision: string;
 }): HyperedgeV1 {
-	if (input.parentConceptId === input.childConceptId) throw new Error('concept cannot be broader than itself');
-	if (stableUnique(input.evidenceRefs).length === 0) throw new Error('concept hierarchy relation requires evidence');
+	if (input.parentConceptId === input.childConceptId) throw new Error(`CONCEPT_BROADER_THAN_SELF:${input.parentConceptId}`);
+	if (stableUnique(input.evidenceRefs).length === 0) throw new Error(`CONCEPT_HIERARCHY_REQUIRES_EVIDENCE:${input.parentConceptId}:${input.childConceptId}`);
 	return createHyperedgeV1({
 		predicate: 'CONCEPT_BROADER_THAN',
 		participants: [
 			{ canonicalId: input.parentConceptId, role: 'broader', ordinal: 0 },
 			{ canonicalId: input.childConceptId, role: 'narrower', ordinal: 1 },
+		],
+		evidenceRefs: stableUnique(input.evidenceRefs),
+		workspaceRevision: input.workspaceRevision,
+		graphRevision: input.graphRevision,
+		sourceRevision: input.sourceRevision,
+		producerRevision: input.producerRevision,
+	});
+}
+
+/**
+ * Meronymy (part-whole) is a distinct ontological relation from hyponymy
+ * (IS_A/broader-than, above) — WordNet and standard ontologies keep the two
+ * separate, and this repo's real `taxonomy_edges` table already carries both
+ * as distinct `relation` values (IS_A/INHERITS_FROM vs PART_OF). Folding
+ * PART_OF into CONCEPT_BROADER_THAN would misrepresent "file X is part of
+ * cluster Y" as "cluster Y is a broader category of file X", which is false
+ * for a membership edge. See REL-OWNER discipline in relationship-kernel.ts:
+ * a new predicate is registered here, in lockstep with KAG_TAXONOMY_RELATION_TYPES,
+ * rather than forced into an existing one.
+ */
+export function createConceptPartOfV1(input: {
+	wholeConceptId: string;
+	partConceptId: string;
+	workspaceRevision: string;
+	graphRevision: string;
+	sourceRevision: string;
+	evidenceRefs: readonly string[];
+	producerRevision: string;
+}): HyperedgeV1 {
+	if (input.wholeConceptId === input.partConceptId) throw new Error(`CONCEPT_PART_OF_SELF:${input.wholeConceptId}`);
+	if (stableUnique(input.evidenceRefs).length === 0) throw new Error(`CONCEPT_PART_OF_REQUIRES_EVIDENCE:${input.wholeConceptId}:${input.partConceptId}`);
+	return createHyperedgeV1({
+		predicate: 'CONCEPT_PART_OF',
+		participants: [
+			{ canonicalId: input.wholeConceptId, role: 'whole', ordinal: 0 },
+			{ canonicalId: input.partConceptId, role: 'part', ordinal: 1 },
 		],
 		evidenceRefs: stableUnique(input.evidenceRefs),
 		workspaceRevision: input.workspaceRevision,

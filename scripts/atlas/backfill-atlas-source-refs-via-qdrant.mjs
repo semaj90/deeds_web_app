@@ -48,14 +48,15 @@ function buildPacketKey(sourceRef, packetId) {
 
 async function qdrantSearch(vector) {
   const body = {
-    vector: { name: VECTOR_NAME, vector },
+    query: vector,
+    using: VECTOR_NAME,
     limit: 3,
     with_payload: true,
     with_vector: false,
     score_threshold: MIN_SCORE,
   };
 
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -68,7 +69,7 @@ async function qdrantSearch(vector) {
   }
 
   const data = await res.json();
-  return data.result ?? [];
+  return data.result?.points ?? [];
 }
 
 // Check if Qdrant uses named vectors or flat vector
@@ -111,12 +112,12 @@ async function main() {
     function buildSearchBody(vector) {
       if (vectorFormat.startsWith('named:')) {
         const name = vectorFormat.slice(6);
-        return { vector: { name, vector }, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
+        return { query: vector, using: name, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
       }
       if (vectorFormat === 'named') {
-        return { vector: { name: VECTOR_NAME, vector }, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
+        return { query: vector, using: VECTOR_NAME, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
       }
-      return { vector, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
+      return { query: vector, limit: 3, with_payload: true, with_vector: false, score_threshold: MIN_SCORE };
     }
 
     // Check available columns
@@ -181,14 +182,14 @@ async function main() {
         let hits;
         try {
           const body = buildSearchBody(embedding);
-          const qdrantRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+          const qdrantRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
             signal: AbortSignal.timeout(12_000),
           });
           const data = await qdrantRes.json();
-          hits = data.result ?? [];
+          hits = data.result?.points ?? [];
         } catch (e) {
           console.error(`  ⚠ Qdrant search failed for ${row.packet_id}: ${e.message}`);
           failed++;

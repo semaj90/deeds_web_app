@@ -112,4 +112,47 @@ describe('retrieveHypergraphContextV1', () => {
 		expect(result.relations).toEqual([]);
 		expect(result.entityIds).toEqual(['A']);
 	});
+
+	// KAG-05I: bounded multi-hop retrieval proof. A -[R1]-> B -[R2]-> C -[R3]-> D
+	// is a genuine 3-hop chain; these two cases prove the hop budget actually
+	// stops expansion (not just that budgets exist) and that hitting it is
+	// reported via `truncated`, never silently.
+	const chain = [
+		relation({ relationId: 'R1', relationType: 'NEXT', participants: [{ canonicalId: 'A', role: 'from', ordinal: 0 }, { canonicalId: 'B', role: 'to', ordinal: 1 }] }),
+		relation({ relationId: 'R2', relationType: 'NEXT', participants: [{ canonicalId: 'B', role: 'from', ordinal: 0 }, { canonicalId: 'C', role: 'to', ordinal: 1 }] }),
+		relation({ relationId: 'R3', relationType: 'NEXT', participants: [{ canonicalId: 'C', role: 'from', ordinal: 0 }, { canonicalId: 'D', role: 'to', ordinal: 1 }] }),
+	];
+
+	it('stops expansion at the hop budget and reports truncated instead of claiming complete coverage', () => {
+		const result = retrieveHypergraphContextV1({
+			workspaceRevision: 'workspace:r1',
+			sourceRevision: 'source:r1',
+			queryRevision: 'query:q4',
+			mode: 'entity',
+			seeds: [{ canonicalId: 'A', score: 1, source: 'human', evidenceRef: 'seed:A' }],
+			relations: chain,
+			budget: { ...budget, maxHops: 1 },
+		});
+
+		expect(result.relations.map((item) => item.relationId)).toEqual(['R1', 'R2']);
+		expect(result.entityIds).toEqual(['A', 'B', 'C']);
+		expect(result.entityIds).not.toContain('D');
+		expect(result.truncated).toBe(true);
+	});
+
+	it('does not mark truncated once the reachable graph is fully explored within budget', () => {
+		const result = retrieveHypergraphContextV1({
+			workspaceRevision: 'workspace:r1',
+			sourceRevision: 'source:r1',
+			queryRevision: 'query:q5',
+			mode: 'entity',
+			seeds: [{ canonicalId: 'A', score: 1, source: 'human', evidenceRef: 'seed:A' }],
+			relations: chain,
+			budget: { ...budget, maxHops: 3 },
+		});
+
+		expect(result.relations.map((item) => item.relationId)).toEqual(['R1', 'R2', 'R3']);
+		expect(result.entityIds).toEqual(['A', 'B', 'C', 'D']);
+		expect(result.truncated).toBe(false);
+	});
 });

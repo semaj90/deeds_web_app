@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.semantic-768.contract-proof.v1",
-  "generatedAt": "2026-08-26T02:40:47.552Z",
+  "generatedAt": "2026-08-27T03:19:47.954Z",
   "status": "PROVEN",
   "contract": {
     "collection": "codebase_chunks_768",
@@ -42,13 +42,13 @@
         "url": "http://127.0.0.1:8090/health",
         "reachable": true,
         "status": 200,
-        "elapsedMs": 17,
+        "elapsedMs": 24,
         "payload": {
           "status": "ok"
         }
       },
       "models": [
-        "hforf.gguf"
+        "ornith-1.5-9b"
       ]
     },
     "embeddings": {
@@ -58,7 +58,7 @@
         "url": "http://127.0.0.1:11434/api/tags",
         "reachable": true,
         "status": 200,
-        "elapsedMs": 18,
+        "elapsedMs": 17,
         "payload": {
           "models": [
             {
@@ -140,14 +140,14 @@
         "url": "http://127.0.0.1:6333/collections/codebase_chunks_768",
         "reachable": true,
         "status": 200,
-        "elapsedMs": 103,
+        "elapsedMs": 65,
         "payload": {
           "result": {
             "status": "green",
             "optimizer_status": "ok",
-            "indexed_vectors_count": 106338,
+            "indexed_vectors_count": 109983,
             "points_count": 109129,
-            "segments_count": 3,
+            "segments_count": 4,
             "config": {
               "params": {
                 "vectors": {
@@ -205,39 +205,19 @@
                 "data_type": "keyword",
                 "points": 0
               },
-              "observed_at": {
+              "cluster_key": {
                 "data_type": "keyword",
-                "points": 0
-              },
-              "file_path": {
-                "data_type": "keyword",
-                "points": 109095
-              },
-              "agent_pickup_ready": {
-                "data_type": "keyword",
-                "points": 0
-              },
-              "som_cluster": {
-                "data_type": "integer",
-                "points": 106237
-              },
-              "topo_class": {
-                "data_type": "keyword",
-                "points": 0
-              },
-              "cluster_id": {
-                "data_type": "keyword",
-                "points": 0
-              },
-              "feature_id": {
-                "data_type": "keyword",
-                "points": 109128
+                "points": 20926
               },
               "updated_at": {
                 "data_type": "integer",
                 "points": 0
               },
-              "parent_centroid_id": {
+              "centroid_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "symbol_name": {
                 "data_type": "keyword",
                 "points": 0
               },
@@ -249,45 +229,53 @@
                 "data_type": "keyword",
                 "points": 109094
               },
-              "cluster_key": {
+              "file_path": {
                 "data_type": "keyword",
-                "points": 20926
+                "points": 109095
+              },
+              "repo": {
+                "data_type": "keyword",
+                "points": 2791
+              },
+              "cluster_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "agent_pickup_ready": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "topo_class": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "language": {
+                "data_type": "keyword",
+                "points": 2816
               },
               "point_kind": {
                 "data_type": "keyword",
                 "points": 1
               },
-              "kind": {
-                "data_type": "keyword",
-                "points": 9824
-              },
               "workspace_id": {
                 "data_type": "keyword",
                 "points": 52381
-              },
-              "tags": {
-                "data_type": "keyword",
-                "points": 106337
-              },
-              "centroid_id": {
-                "data_type": "keyword",
-                "points": 0
-              },
-              "error_id": {
-                "data_type": "keyword",
-                "points": 0
-              },
-              "status": {
-                "data_type": "keyword",
-                "points": 0
               },
               "sourceRefs": {
                 "data_type": "keyword",
                 "points": 106304
               },
-              "language": {
+              "kind": {
                 "data_type": "keyword",
-                "points": 2816
+                "points": 9824
+              },
+              "source_ref": {
+                "data_type": "keyword",
+                "points": 109129
+              },
+              "status": {
+                "data_type": "keyword",
+                "points": 0
               },
               "workspace_task_id": {
                 "data_type": "keyword",
@@ -297,17 +285,29 @@
                 "data_type": "keyword",
                 "points": 0
               },
-              "symbol_name": {
+              "feature_id": {
+                "data_type": "keyword",
+                "points": 109128
+              },
+              "som_cluster": {
+                "data_type": "integer",
+                "points": 106237
+              },
+              "tags": {
+                "data_type": "keyword",
+                "points": 106337
+              },
+              "error_id": {
                 "data_type": "keyword",
                 "points": 0
               },
-              "source_ref": {
+              "parent_centroid_id": {
                 "data_type": "keyword",
-                "points": 109129
+                "points": 0
               },
-              "repo": {
+              "observed_at": {
                 "data_type": "keyword",
-                "points": 2791
+                "points": 0
               }
             },
             "update_queue": {
@@ -315,7 +315,7 @@
             }
           },
           "status": "ok",
-          "time": 0.031269128
+          "time": 0.007359367
         }
       }
     }

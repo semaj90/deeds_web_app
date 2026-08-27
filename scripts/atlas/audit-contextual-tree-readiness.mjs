@@ -28,8 +28,8 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-const REPORT_JSON = path.join(ROOT, 'docs', 'reports', 'contextual-tree-readiness-report.json');
-const REPORT_MD = path.join(ROOT, 'docs', 'reports', 'contextual-tree-readiness-report.md');
+const REPORT_JSON = path.resolve(ROOT, process.env.CONTEXTUAL_TREE_REPORT_JSON ?? 'docs/reports/contextual-tree-readiness-report.json');
+const REPORT_MD = path.resolve(ROOT, process.env.CONTEXTUAL_TREE_REPORT_MD ?? 'docs/reports/contextual-tree-readiness-report.md');
 const DUCKDB_EXE = process.env.DUCKDB_PATH ?? 'C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const PG_TABLES = ['parent_atlas_documents', 'route_runtime_packets', 'codebase_chunk_index', 'atlas_feature_map_synthesized', 'atlas_feature_synthesis'];
@@ -328,12 +328,17 @@ async function inspectPostgres(e, report) {
       const expectedAliases = {
         parent_atlas_documents: ['source_ref', 'feature_id', 'qdrant_point_id', 'summary'],
         route_runtime_packets: ['source_refs', 'feature_ids', 'qdrant_hits', 'som_cluster'],
-        codebase_chunk_index: ['source_ref', 'feature_id', 'qdrant_point_id', 'som_cluster'],
+        // Chunk index owns chunk/source and Qdrant projection identity. The
+        // canonical feature identity is resolved through the packet join.
+        codebase_chunk_index: ['source_ref', 'qdrant_point_id', 'som_cluster'],
         atlas_feature_map_synthesized: ['source_ref', 'feature_id', 'qdrant_point_id', 'som_cluster'],
         atlas_feature_synthesis: ['source_ref', 'feature_id', 'primary_cluster_id', 'avg_confidence'],
       }[tableName] ?? [];
       const aliasCoverage = normalizeAliasCoverage(columns, expectedAliases);
-      const ready = rowCount > 0 && deriveReadyFromAliases(columns, REQUIRE_READY_CANONICALS.postgres);
+      const requiredJoins = tableName === 'codebase_chunk_index'
+        ? ['source_ref', 'qdrant_point_id']
+        : REQUIRE_READY_CANONICALS.postgres;
+      const ready = rowCount > 0 && deriveReadyFromAliases(columns, requiredJoins);
       const fieldNameMismatch = rowCount > 0 && !ready;
       const dataAbsent = exists && rowCount === 0;
       const status = dataAbsent ? 'DATA_ABSENT' : ready ? 'READY' : fieldNameMismatch ? 'FIELD_NAME_MISMATCH' : 'SOURCE_UNAVAILABLE';
@@ -523,7 +528,7 @@ async function inspectQdrant(e, report) {
       }
     }
     const aliasCoverage = normalizeAliasCoverage(actualFieldNames, EXPECTED_QDRANT_PAYLOAD_KEYS.map((key) => `payload.${key}`).concat(EXPECTED_QDRANT_PAYLOAD_KEYS));
-    const ready = points.length > 0 && deriveReadyFromAliases(actualFieldNames, REQUIRE_READY_CANONICALS.qdrant);
+    const ready = points.length > 0 && deriveReadyFromAliases([...actualFieldNames], REQUIRE_READY_CANONICALS.qdrant);
     const fieldNameMismatch = points.length > 0 && !ready;
     return finalizeLane(lane, {
       evidence: [`points=${points.length}`, `payloadKeys=${[...samplePayloadKeys].slice(0, 12).join(', ') || 'none'}`],

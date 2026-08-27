@@ -650,9 +650,10 @@ function mapResearchContextResponse(response: any): ResearchContextResponse {
 export async function searchChunksViaGrpc(
   query: string,
   limit = 10,
-  collection = 'codebase_chunks_768'
+  collection = 'codebase_chunks_768',
+  tags: string[] = []
 ): Promise<SearchChunksResponse | null> {
-  const response = await callGrpcMethod<any>('searchChunks', { query, limit, collection });
+  const response = await callGrpcMethod<any>('searchChunks', { query, limit, collection, tags });
   return response ? mapSearchChunksResponse(response) : null;
 }
 
@@ -758,11 +759,11 @@ export async function getResearchContextViaGrpc(opts: {
 // service. TTLs and deadlines come from rpc-cache.ts constants.
 
 export const retrievalClient = {
-  searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768') => {
-    const args = { query, limit, collection };
+  searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768', tags: string[] = []) => {
+    const args = { query, limit, collection, tags };
     const { value } = await withRpcCache(
       args,
-      async () => (await searchChunksViaGrpc(query, limit, collection)) ?? { results: [], totalMs: 0 },
+      async () => (await searchChunksViaGrpc(query, limit, collection, tags)) ?? { results: [], totalMs: 0 },
       { transport: 'grpc', method: 'SearchChunks', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.SearchChunks'] },
     );
     return value;

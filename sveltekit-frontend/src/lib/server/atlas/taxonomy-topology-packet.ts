@@ -8,6 +8,8 @@ import {
   writeOntologyLinkedTupleCachePlan,
 } from './ontology-linked-tuple-cache.js';
 import { persistOntologyLinkedTuples } from './ontology-linked-tuple-postgres.js';
+import { deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1 } from './taxonomy-candidate-producer-v1.js';
+import { persistTaxonomyAssignmentCandidates } from './kag-taxonomy-candidate-postgres.js';
 
 export const TaxonomyTupleSchema = z.object({
   source: z.string().min(1),
@@ -480,17 +482,75 @@ export async function buildTaxonomyTopologyPacket(
     blockedContentHashes: [],
   });
 
-  // Postgres is truth; Redis is cache — write there FIRST (project CLAUDE.md
-  // "Atlas Data Persistence + Retrieval Contract"). This was previously
-  // Redis-only; KAG-01/02 persistence
-  // (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) adds the
-  // missing truth layer. Fail-open to match the existing Redis write's own
-  // `.catch(() => {})` — a persistence failure must not break this MCP
-  // tool's response, but is worth a warning since it's the truth write now.
-  await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
-    console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed:', err);
+  // KAG-05E: Postgres is truth; Redis is cache — and the cache MUST NOT run
+  // ahead of truth. Persist to Postgres FIRST, then cache only the tuples
+  // that were actually written. A tuple whose Postgres write failed must
+  // never reach Redis — otherwise the cache can serve a tuple that doesn't
+  // exist in canonical storage, which breaks "Postgres is truth" outright.
+  // Fail-open at the MCP-response level (a persistence failure must not
+  // break this tool's response), but never fail-open on what gets cached.
+  const persistence = await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
+    console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed (DEGRADED_PERSISTENCE, no Redis cache this cycle):', err);
+    return { attempted: rawOntologyLinkedTuples.length, written: 0, errors: rawOntologyLinkedTuples.map((tuple) => ({ tupleId: tuple.tupleId, message: 'persistOntologyLinkedTuples threw' })) };
   });
-  await writeOntologyLinkedTupleCachePlan(ontologyCachePlan, 6 * 60 * 60).catch(() => {});
+
+  if (persistence.errors.length > 0) {
+    console.warn(
+      `[taxonomy-topology-packet] DEGRADED_PERSISTENCE: ${persistence.errors.length}/${persistence.attempted} tuples failed Postgres write; excluding them from Redis cache`,
+      persistence.errors
+    );
+  }
+
+  const failedTupleIds = new Set(persistence.errors.map((error) => error.tupleId));
+  const persistedTuples = rawOntologyLinkedTuples.filter((tuple) => !failedTupleIds.has(tuple.tupleId));
+
+  if (persistedTuples.length > 0) {
+    const cacheableCachePlan = persistedTuples.length === rawOntologyLinkedTuples.length
+      ? ontologyCachePlan
+      : buildOntologyLinkedTupleCachePlan({
+          packetId: packet.packet_id,
+          packetRevision: packet.packet_ulid ?? packet.packet_id,
+          featureId,
+          sourceRef: `taxonomy:${summary.nodeKey}`,
+          tuples: persistedTuples,
+          centroid: {
+            domainClass: summary.classifier.domainClass ?? 'unknown',
+            domainCentroidKey: `atlas:centroid:domain:${summary.classifier.domainClass ?? 'unknown'}`,
+            featureCentroidKey: `atlas:centroid:feature:${featureId}`,
+            kmeansCentroidKey: summary.topology.kmeansClusters[0] !== undefined
+              ? `atlas:centroid:kmeans:${summary.topology.kmeansClusters[0]}`
+              : null,
+            somCentroidKey: summary.topology.somCluster ? `atlas:centroid:som:${summary.topology.somCluster}` : null,
+            communityCentroidKey: null,
+            somCluster: summary.topology.somCluster,
+            somRow: summary.topology.somRow,
+            somCol: summary.topology.somCol,
+            kmeansClusters: summary.topology.kmeansClusters,
+            ontologyTags: summary.topology.ontologyTags,
+          },
+          revisions: {
+            workspaceRevision: String(process.env.WORKSPACE_REVISION ?? process.env.REPOSITORY_REVISION ?? 'unknown'),
+            ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
+            centroidVersion: String(summary.centroid.redisCentroidTrainedAt ?? summary.centroid.redisCentroidCount ?? '').trim() || null,
+          },
+          blockedContentHashes: [],
+        });
+    await writeOntologyLinkedTupleCachePlan(cacheableCachePlan, 6 * 60 * 60).catch(() => {});
+  }
+
+  // KAG taxonomy-candidate producer (roadmap step 1): derive review-surface
+  // candidates ONLY from tuples that actually made it into Postgres — same
+  // "don't build on top of unpersisted data" discipline as the cache write
+  // above. Fail-open (candidate persistence failure must not break this MCP
+  // tool's response), matching every other side-effect in this function.
+  if (persistedTuples.length > 0) {
+    const candidates = deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1(persistedTuples, 'taxonomy-topology-packet:v1');
+    if (candidates.length > 0) {
+      await persistTaxonomyAssignmentCandidates(candidates).catch((err) => {
+        console.warn('[taxonomy-topology-packet] taxonomy candidate persistence failed:', err);
+      });
+    }
+  }
 
   return { summary, packet };
 }

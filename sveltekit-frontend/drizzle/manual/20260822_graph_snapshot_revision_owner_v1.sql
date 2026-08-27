@@ -6,6 +6,8 @@
 -- Per-node source_revision is nullable and MUST NOT be fabricated during
 -- migration/backfill when no authoritative source revision owner is available.
 
+BEGIN;
+
 ALTER TABLE atlas_graph_snapshots_v2
   ADD COLUMN IF NOT EXISTS workspace_revision text,
   ADD COLUMN IF NOT EXISTS source_inventory_revision text,
@@ -100,3 +102,5 @@ COMMENT ON COLUMN atlas_graph_snapshots_v2.revision_checksum IS
 
 COMMENT ON COLUMN atlas_graph_nodes_v2.source_revision IS
   'Optional authoritative per-source revision. NULL means source revision authority is not proven for this node and canonical FANOUT must fail closed.';
+
+COMMIT;

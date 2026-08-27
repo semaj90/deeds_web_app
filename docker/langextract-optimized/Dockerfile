@@ -47,7 +47,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 # Configuration
 ENV LANGEXTRACT_PROVIDER=openai
-ENV LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct
+ENV LANGEXTRACT_MODEL_ID=ornith-1.5-9b
 ENV LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1
 ENV LANGEXTRACT_API_KEY=local
 ENV LLAMA_SERVER_URL=http://host.docker.internal:8090/v1

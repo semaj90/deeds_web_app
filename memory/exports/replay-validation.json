@@ -1,38 +1,141 @@
 {
-  "ts": "2026-06-20T15:46:43.424Z",
-  "sample": 314,
+  "ts": "2026-08-27T03:39:40.740Z",
+  "sample": 200,
   "threshold": 0.95,
   "passed": true,
-  "replay_rate": 0.9618,
-  "replay_success": 302,
-  "replay_failure": 12,
+  "replay_rate": 0.99,
+  "replay_success": 198,
+  "replay_failure": 2,
   "checks": {
     "source_ref_hash": {
-      "pass": 302,
-      "fail": 12,
-      "rate": 0.9618
+      "pass": 198,
+      "fail": 2,
+      "rate": 0.99
     },
     "feature_id": {
-      "pass": 309,
-      "fail": 5,
-      "rate": 0.9841
+      "pass": 200,
+      "fail": 0,
+      "rate": 1
     },
     "cluster_id": {
       "pass": 0,
-      "fail": 314,
+      "fail": 200,
       "rate": 0,
       "status": "optional_reserved"
     },
     "qdrant_found": {
-      "eligible": 0,
-      "skipped_task_refs": 314,
-      "found": 0,
-      "missing": 0
+      "eligible": 101,
+      "skipped_task_refs": 99,
+      "found": 5,
+      "missing": 96
     },
     "qdrant_alignment": {
-      "aligned": 0,
-      "misaligned": 0
+      "aligned": 2,
+      "misaligned": 3
     }
   },
-  "failures": []
+  "failures": [
+    {
+      "id": "packet:0004f849be72",
+      "canonical_source_ref": "tests/sprint5-6-monitoring.spec.ts",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0006ca4a45e3",
+      "canonical_source_ref": "logs/trace-mcp/launch-2026-06-25t22-12-53-881z.out",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0008d535a1f6",
+      "canonical_source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0009951ee430",
+      "canonical_source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0009a56456fc",
+      "canonical_source_ref": ".venv_turbovec/lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000b1b923bf4",
+      "canonical_source_ref": "logs/task-output/pipeline-test/startup-2026-05-13t00-19-01-475z.json",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000b2df0cfdf",
+      "canonical_source_ref": "tests/phase76-acp-tools.property.test.ts",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000db15dc8ef",
+      "canonical_source_ref": "src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "step": "feature_id_mismatch",
+      "packet_feature": "sveltekit-frontend.keyboard-shortcuts.svelte",
+      "qdrant_feature": "keyboard-shortcuts.svelte"
+    },
+    {
+      "id": "packet:000f10a13a57",
+      "canonical_source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000f50f509c8",
+      "canonical_source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/llms.md",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000f704e5207",
+      "canonical_source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:000fde9311af",
+      "canonical_source_ref": "src/routes/api/ai/bifrost/+server.ts",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:001007058f4a",
+      "canonical_source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0011712c94d1",
+      "canonical_source_ref": "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/workers/jobs/clean-server/llms.md",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0011a232d0b8",
+      "canonical_source_ref": ".venv_turbovec/lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:001789105fcc",
+      "canonical_source_ref": "logs/task-output/pipeline-test/startup-2026-06-13t15-21-32-591z.json",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:0017ebe58f96",
+      "canonical_source_ref": "scripts/run-migration.mjs",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:00191bed434b",
+      "canonical_source_ref": "crates/turbovec-napi/target/debug/.fingerprint/npyz-0bb0c4b019944695/dep-lib-npyz",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:001c3fdaad12",
+      "canonical_source_ref": "simd-bridge/cpp/build-x64-cuda-cublas/cmakefiles/checkcuda/zero_check.vcxproj.filters",
+      "step": "qdrant_not_found"
+    },
+    {
+      "id": "packet:001d358f9d1f",
+      "canonical_source_ref": "llama-cpp-turboquant-gemma4/ggml/src/ggml-cpu/hbm.cpp",
+      "step": "qdrant_not_found"
+    }
+  ]
 }

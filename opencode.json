@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+  "model": "llama-server/ornith-1.5-9b",
   "default_agent": "ornith-trace-audit",
   "provider": {
     "atomic": {
@@ -118,7 +118,7 @@
     "ornith-trace-audit": {
       "mode": "primary",
       "description": "Read-only repository auditor using native TRACE retrieval tools",
-      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
@@ -154,7 +154,7 @@
     "gemma4-function-caller": {
       "mode": "subagent",
       "description": "Gemma4 function calling auditor on port 8090",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
@@ -175,12 +175,12 @@
       }
     }
   },
-  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "small_model": "llama-server/ornith-1.5-9b",
   "agent": {
     "ornith-trace-audit": {
       "mode": "primary",
       "description": "Read-only repository auditor using native TRACE retrieval tools",
-      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
@@ -217,7 +217,7 @@
     "gemma4-function-caller": {
       "mode": "subagent",
       "description": "Gemma4 function calling auditor on port 8090",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",

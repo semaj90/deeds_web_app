@@ -27,7 +27,7 @@ docker run -d ^
     --name langextract-optimized ^
     -p 8095:8095 ^
     -e LANGEXTRACT_PROVIDER=openai ^
-    -e LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct ^
+    -e LANGEXTRACT_MODEL_ID=ornith-1.5-9b ^
     -e LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1 ^
     -e LANGEXTRACT_API_KEY=local ^
     -e LLAMA_SERVER_URL=http://host.docker.internal:8090/v1 ^

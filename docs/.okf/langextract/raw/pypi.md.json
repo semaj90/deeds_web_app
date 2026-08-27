@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:pypi",
+  "source_ref": "docs/.okf/langextract/pypi",
+  "source_url": "https://pypi.org/project/langextract/",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:11.025Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract PyPI project",
+  "content_hash": "1a36efa04eddc5a9287153dbc2450d91ee9558112725c24a2d7fad00307a70ee",
+  "raw_checksum": "32ed63159c77e21ee19ca1b9aa3213ccf0218eb59539560b132a8e68ef0e18ea",
+  "normalized_checksum": "1a36efa04eddc5a9287153dbc2450d91ee9558112725c24a2d7fad00307a70ee",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\pypi.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://pypi.org/project/langextract/"
+}

@@ -139,6 +139,15 @@ class ResidentGraph:
             edges_path,
             columns=["src_gpu_node_id", "dst_gpu_node_id", "weight"],
         )
+        # cugraph.pagerank's precomputed_vertex_out_weight requires a float sums
+        # column; parquet exporters commonly emit integer edge weights (this
+        # artifact's weight column is int64). Cast once here so both the graph's
+        # edge_attr and the out_weight_df built below agree on dtype — confirmed
+        # live (2026-08-26) that leaving weight as int64 makes cugraph_pagerank
+        # fail with the misleadingly-worded "vertex type of graph and
+        # precomputed_vertex_out_weight_sums must match" (the real mismatch is
+        # int64 sums vs the float64 cugraph expects, not a vertex dtype at all).
+        self.edges_df["weight"] = self.edges_df["weight"].astype("float64")
         self.parquet_read_ms = (time.perf_counter() - t0) * 1000
 
         self.node_count = len(identity_gpu)

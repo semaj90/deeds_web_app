@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.kag-hyp-synthesis-audit.v1",
+  "status": "NO_TUPLES_FOUND",
+  "input_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\corpus.jsonl",
+  "bounded_limit": 100,
+  "writes_performed": false,
+  "canonical_persistence_attempted": false,
+  "lines_read": 7,
+  "tuples_seen": 0,
+  "eligible": 0,
+  "rejected": 0,
+  "invalid": 0,
+  "rejection_counts": {},
+  "examples": []
+}

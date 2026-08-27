@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.structural-graph-pagerank-parity.v1",
+  "status": "FIXTURE_PARITY_PROVEN",
+  "canonicalAuthority": false,
+  "fixture": "sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json",
+  "nodeCount": 6,
+  "edgeCount": 5,
+  "networkx": {
+    "backend": "networkx",
+    "alpha": 0.85,
+    "maxIterations": 100,
+    "tolerance": 1e-8
+  },
+  "cugraph": {
+    "backend": "cugraph",
+    "version": "26.06.00",
+    "alpha": 0.85,
+    "maxIterations": 100,
+    "tolerance": 1e-8,
+    "renumber": false
+  },
+  "cpuGpuNodeCoverage": true,
+  "maxScoreDelta": 3.1659473653800063e-9,
+  "top3Cpu": ["symbol:b", "file:c", "file:a"],
+  "top3Gpu": ["symbol:b", "file:c", "file:a"],
+  "top3Overlap": 1,
+  "repeatDeterminism": {
+    "runsPerBackend": 2,
+    "cpuRepeatMaxDelta": 0,
+    "gpuRepeatMaxDelta": 0,
+    "cpuNodeCount": 6,
+    "gpuNodeCount": 6,
+    "status": "PROVEN"
+  },
+  "productionPromotion": "BLOCKED"
+}

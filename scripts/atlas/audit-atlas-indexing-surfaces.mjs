@@ -199,7 +199,9 @@ async function auditPostgres() {
     if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count > 0 && populated.codebaseChunk_content_embedding_768.count < tables.codebase_chunk_index.count) {
       finding('POSTGRES_CANONICAL_EMBEDDING_PARTIAL', 'high', 'The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.', [`${populated.codebaseChunk_content_embedding_768.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding_768', 'codebase_chunk_index.content_embedding']);
     }
-    if (bitmapTables.length === 0) finding('POSTGRES_BITMAP_TABLE_MISSING', 'medium', 'No PostgreSQL table explicitly models bitmap-combinable routing state; current filtering relies on GIN/Valkey projections.');
+    // BitmapAnd/BitmapOr are PostgreSQL planner strategies, not a required
+    // schema object. Keep the inventory for diagnostics, but do not report an
+    // absent table as an architecture failure.
     if (tables.atlas_packet_features.exists && populated.packetAstSymbols?.count < tables.atlas_packet_features.count * 0.5) {
       finding('PACKET_AST_SYMBOL_COVERAGE_LOW', 'medium', 'Fewer than half of atlas_packet_features rows have AST symbols.', [`${populated.packetAstSymbols.count}/${tables.atlas_packet_features.count}`]);
     }

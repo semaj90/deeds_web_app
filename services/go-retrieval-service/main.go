@@ -110,12 +110,16 @@ func loadConfig() config {
 	gpuEnabled := envOr("GPU_EMBED_ENABLED", "true") == "true"
 	embeddingBaseURL := envOrAny("EMBED_SERVICE_URL", "EMBEDDING_BASE_URL", "http://localhost:8097")
 	return config{
-		DatabaseURL:             mustEnv("DATABASE_URL"),
-		QdrantURL:               envOr("QDRANT_URL", "http://localhost:6333"),
-		QdrantHost:              envOr("QDRANT_GRPC_HOST", "localhost"),
-		QdrantPort:              qdPort,
-		QdrantCollection:        envOr("QDRANT_COLLECTION", "codebase_chunks_768"),
-		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "semantic_768"),
+		DatabaseURL: mustEnv("DATABASE_URL"),
+		// Accept the deployed HTTP name while retaining QDRANT_URL for local
+		// compatibility. Query execution uses this REST endpoint for Qdrant.
+		QdrantURL:        envOr("QDRANT_URL", envOr("QDRANT_HTTP_URL", "http://localhost:6333")),
+		QdrantHost:       envOr("QDRANT_GRPC_HOST", "localhost"),
+		QdrantPort:       qdPort,
+		QdrantCollection: envOr("QDRANT_COLLECTION", "codebase_chunks_768"),
+		// `semantic_768` is the representation id; the active collection stores
+		// that vector under the named Qdrant vector key `content`.
+		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "content"),
 		RedisURL:                envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
 		EmbeddingBaseURL:        embeddingBaseURL,
 		EmbeddingRepresentation: envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
@@ -1747,6 +1751,10 @@ func (s *retrievalServer) StreamEvidence(req *pb.EvidenceSearchRequest, stream p
 // ── SearchCodebase ─────────────────────────────────────────────────────────
 
 func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest) (*pb.CodebaseSearchResponse, error) {
+	return s.searchCodebase(ctx, req, nil)
+}
+
+func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSearchRequest, extraFilters []*qdrantclient.Condition) (*pb.CodebaseSearchResponse, error) {
 	atomic.AddInt64(&s.totalRequests, 1)
 	atomic.AddInt64(&s.codebaseSearches, 1)
 
@@ -1768,7 +1776,7 @@ func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSe
 		return &pb.CodebaseSearchResponse{}, nil
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, nil, limit)
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
 		return &pb.CodebaseSearchResponse{}, nil
@@ -1922,7 +1930,16 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 	// 1. Tags
 	if len(req.Tags) > 0 {
 		for _, tag := range req.Tags {
-			extraFilters = append(extraFilters, qdrantclient.NewMatch("qdrant_tags", tag))
+			// `tags` is the active codebase payload key. Keep the historical
+			// `qdrant_tags` key as a compatibility alternative for older points.
+			extraFilters = append(extraFilters, &qdrantclient.Condition{
+				ConditionOneOf: &qdrantclient.Condition_Filter{
+					Filter: &qdrantclient.Filter{Should: []*qdrantclient.Condition{
+						qdrantclient.NewMatch("tags", tag),
+						qdrantclient.NewMatch("qdrant_tags", tag),
+					}},
+				},
+			})
 		}
 	}
 
@@ -2261,18 +2278,38 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		Kinds        []string `json:"kinds"`
 		PathPrefixes []string `json:"path_prefixes"`
 		HTTPMethod   string   `json:"http_method"`
+		Tags         []string `json:"tags"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
-	resp, err := s.SearchCodebase(r.Context(), &pb.CodebaseSearchRequest{
+	if len(body.Tags) > 20 {
+		http.Error(w, "too many tags", http.StatusBadRequest)
+		return
+	}
+	var tagFilters []*qdrantclient.Condition
+	for _, rawTag := range body.Tags {
+		tag := strings.TrimSpace(rawTag)
+		if tag == "" || len(tag) > 200 {
+			continue
+		}
+		tagFilters = append(tagFilters, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: []*qdrantclient.Condition{
+					qdrantclient.NewMatch("tags", tag),
+					qdrantclient.NewMatch("qdrant_tags", tag),
+				}},
+			},
+		})
+	}
+	resp, err := s.searchCodebase(r.Context(), &pb.CodebaseSearchRequest{
 		Query:        body.Query,
 		Limit:        body.Limit,
 		Kinds:        body.Kinds,
 		PathPrefixes: body.PathPrefixes,
 		HttpMethod:   body.HTTPMethod,
-	})
+	}, tagFilters)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

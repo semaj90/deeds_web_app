@@ -46,7 +46,7 @@ async function searchQdrant(
 	id: string; score: number;
 	payload: Record<string, unknown> }>> {
   const body: Record<string, unknown> = {
-    vector: embedding,
+    query: embedding,
     limit: options.limit,
     score_threshold: options.threshold,
     with_payload: true
@@ -61,7 +61,7 @@ async function searchQdrant(
     }
   }
 
-  const response = await fetch(`${QDRANT_URL}/collections/${collection}/points/search`, {
+  const response = await fetch(`${QDRANT_URL}/collections/${collection}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify(body)
@@ -71,10 +71,10 @@ async function searchQdrant(
     throw new Error(`Qdrant search failed, ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: Array<{
+  const data = await response.json() as { result?: { points?: Array<{
 	id: string; score: number;
-	payload: Record<string, unknown> }> };
-  return data.result;
+	payload: Record<string, unknown> }> } };
+  return data.result?.points ?? [];
 }
 
 async function kbSearchHandler(request: KBSearchRequest): Promise<ToolResult<KBSearchResult>> {

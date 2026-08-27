@@ -1,0 +1,22 @@
+{
+  "schema_version": "atlas.langextract-okf-document.v1",
+  "source_id": "langextract:repository",
+  "source_ref": "docs/.okf/langextract/repository",
+  "source_url": "https://github.com/google/langextract",
+  "source_revision": "langextract:1.6.0",
+  "fetched_at": "2026-08-26T19:26:06.880Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "title": "LangExtract GitHub repository",
+  "content_hash": "0deda348b618b3655a251f295bcb4f86d772b7626e7f22505ad21f91809359ee",
+  "raw_checksum": "e6f9e417c2c8978a1fe8e53a7a854afd01d075be2ef1131f758c08a9c40c61ce",
+  "normalized_checksum": "0deda348b618b3655a251f295bcb4f86d772b7626e7f22505ad21f91809359ee",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\langextract\\raw\\repository.md",
+  "authority_class": "OFFICIAL_PRIMARY",
+  "canonical_authority": false,
+  "tags": [
+    "langextract",
+    "official_docs",
+    "derived_okf"
+  ],
+  "url": "https://github.com/google/langextract"
+}

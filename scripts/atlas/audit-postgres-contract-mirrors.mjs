@@ -66,6 +66,7 @@ const TABLES = [
       path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260601_nes_chrom_packets_and_kag_dag_hits.sql'),
       path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260606_nes_chrom_live_alignment.sql'),
       path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260601_add_alias_and_parent_atlas_indexes.sql'),
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260826_restore_nes_chrom_packets_v1.sql'),
     ],
     staticIdentityFields: ['packet_key', 'source_ref', 'feature_id', 'qdrant_point_id'],
   },

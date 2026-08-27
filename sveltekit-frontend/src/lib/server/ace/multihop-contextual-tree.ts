@@ -87,11 +87,11 @@ export async function retrieveMultihopContext(opts: MultihopOpts): Promise<Multi
   if (embedding) {
     const qdrantUrl = ENV.QDRANT_URL || 'http://127.0.0.1:6333';
     try {
-      const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768_v2/points/search`, {
+      const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768_v2/points/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vector: { name: 'content', vector: embedding },
+          query: { name: 'content', vector: embedding },
           limit: topK,
           with_payload: true
         }),
@@ -99,7 +99,7 @@ export async function retrieveMultihopContext(opts: MultihopOpts): Promise<Multi
       });
       if (res.ok) {
         const data = await res.json() as any;
-        const hits = data.result ?? [];
+        const hits = data.result?.points ?? [];
         laneIdsSet.add('qdrant');
         
         for (const hit of hits) {

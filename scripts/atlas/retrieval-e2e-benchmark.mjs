@@ -201,9 +201,10 @@ async function stage1_qdrantSearch(query, embedding) {
 
   try {
     const response = await postJson(
-      `${QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+      `${QDRANT_URL}/collections/codebase_chunks_768/points/query`,
       {
-        vector: embedding,
+        query: embedding,
+        using: 'content',
         limit: 10,
         score_threshold: 0.7,
       }
@@ -229,12 +230,12 @@ async function stage1_qdrantSearch(query, embedding) {
       };
     }
 
-    const hitCount = response.result?.length || 0;
+    const hitCount = response.result?.points?.length || 0;
     return {
       stage: 'qdrant_search',
       elapsed,
       hitCount,
-      hits: response.result || [],
+      hits: response.result?.points || [],
       hitRate: hitCount > 0 ? 1.0 : 0.0,
       passed: hitCount >= 5,
     };

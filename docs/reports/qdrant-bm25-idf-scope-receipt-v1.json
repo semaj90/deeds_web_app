@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.qdrant-bm25-idf-scope-receipt.v1",
+  "readOnly": true,
+  "writesPerformed": false,
+  "serverVersion": "1.19.0",
+  "sdkVersion": "1.19.0",
+  "atlasCollection": {
+    "name": "codebase_chunks_768",
+    "points": 109129,
+    "denseVectorNames": ["content", "error", "signature"],
+    "denseDimension": 768,
+    "sparseVectorNames": [],
+    "classification": "NO_SPARSE"
+  },
+  "observedSparseCollections": {
+    "idfEnabled": 1,
+    "legacySparseWithoutIdf": 1,
+    "noSparse": 41,
+    "idfCollectionIsAtlasAuthority": false
+  },
+  "idfScopeDecision": "NOT_DECIDED",
+  "candidateScopes": ["WORKSPACE", "REPOSITORY", "SHARD_GLOBAL"],
+  "sparseGenerator": "NOT_PINNED",
+  "promotionAllowed": false,
+  "reason": "The Atlas semantic collection has no sparse vector. The observed IDF-enabled collection is unrelated, and payload filtering alone does not prove tenant-isolated IDF statistics.",
+  "requiredBeforePopulation": [
+    "Choose IDF corpus scope",
+    "Revision-pin sparse vector generator, tokenizer, and vocabulary",
+    "Benchmark pg_search BM25 against PostgreSQL FTS on identity-bound candidates",
+    "Run bounded sparse population and readback proof"
+  ],
+  "sourceReport": "docs/reports/qdrant-sparse-configuration-audit-v1.json"
+}

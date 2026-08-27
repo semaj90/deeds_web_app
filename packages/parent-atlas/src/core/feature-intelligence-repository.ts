@@ -45,7 +45,7 @@ export function createFeatureIntelligenceRepository(pool: Pool) {
       const feature = featureSchema.parse(input);
       await withTransaction(pool, async (client) => {
         const row = await client.query<{ feature_id: string }>(`
-          INSERT INTO atlas_features (
+          INSERT INTO atlas_fi_features (
             feature_id, feature_key, feature_label, domain, parent_feature_id,
             status, feature_revision, producer_revision, metadata
           ) VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, $7, $8, '{}'::jsonb)
@@ -101,7 +101,7 @@ export function createFeatureIntelligenceRepository(pool: Pool) {
           `${evidence.evidence_kind} ${evidence.relation_type} ${evidence.source_ref}`]);
 
         await client.query(`
-          INSERT INTO atlas_feature_evidence (
+          INSERT INTO atlas_fi_evidence (
             feature_id, evidence_id, relation_type, polarity, confidence, relationship_id
           ) VALUES ($1, $2, $3, $4, $5, NULLIF($6, ''))
           ON CONFLICT (feature_id, evidence_id, relation_type) DO UPDATE SET
@@ -228,10 +228,11 @@ export function createFeatureIntelligenceRepository(pool: Pool) {
           ORDER BY r.confidence DESC, r.relationship_id LIMIT $3
         )
         SELECT r.*,
-          COALESCE(jsonb_agg(jsonb_build_object(
+          COALESCE((SELECT jsonb_agg(jsonb_build_object(
             'role', m.role, 'entity_type', m.entity_type, 'entity_id', m.entity_id,
             'entity_revision', m.entity_revision, 'source_ref', m.source_ref
-          ) ORDER BY m.member_ordinal), '[]'::jsonb) AS participants,
+          ) ORDER BY m.member_ordinal) FROM atlas_relationship_members m
+            WHERE m.relationship_id = r.relationship_id), '[]'::jsonb) AS participants,
           COALESCE((SELECT jsonb_agg(jsonb_build_object(
             'role', c.role, 'min', c.minimum_count,
             'max', CASE WHEN c.maximum_count IS NULL THEN 'many'::text ELSE c.maximum_count::text END
@@ -239,9 +240,48 @@ export function createFeatureIntelligenceRepository(pool: Pool) {
             WHERE c.relationship_id = r.relationship_id), '[]'::jsonb) AS cardinality,
           COALESCE((SELECT jsonb_agg(re.evidence_id ORDER BY re.evidence_id)
             FROM atlas_relationship_evidence re WHERE re.relationship_id = r.relationship_id), '[]'::jsonb) AS evidence_refs
-        FROM rels r JOIN atlas_relationship_members m USING (relationship_id)
-        GROUP BY r.relationship_id ORDER BY r.confidence DESC, r.relationship_id
+        FROM rels r ORDER BY r.confidence DESC, r.relationship_id
       `, [ids, [...relationshipTypes], boundedLimit]);
+
+      return result.rows.map((row) => featureRelationshipSchema.parse({
+        schema: 'atlas.feature-relationship.v1',
+        relationship_id: String(row.relationship_id), relationship_type: String(row.relationship_type),
+        participant_count: Number(row.participant_count), relationship_degree: Number(row.relationship_degree),
+        relationship_degree_kind: String(row.relationship_degree_kind), participants: row.participants,
+        cardinality: (row.cardinality as Array<Record<string, unknown>>).map((item) => ({
+          role: item.role, min: Number(item.min), max: item.max === 'many' ? 'many' : Number(item.max),
+        })),
+        source_ref: String(row.source_ref), source_revision: String(row.source_revision),
+        relationship_revision: String(row.relationship_revision), producer_revision: String(row.producer_revision),
+        evidence_refs: row.evidence_refs, confidence: Number(row.confidence), metadata: row.metadata ?? {},
+      }));
+    },
+
+    /**
+     * GRAPH-PROD-01: bulk read every real FeatureRelationshipV1 currently
+     * persisted, unfiltered by entity. atlas_relationships has 0 real rows as
+     * of 2026-08-26 -- this exists for when that changes.
+     */
+    async listAllRelationships(limit = 1000): Promise<FeatureRelationshipV1[]> {
+      const boundedLimit = Math.max(1, Math.min(limit, 5000));
+      const result = await pool.query<QueryResultRow>(`
+        SELECT r.*,
+          COALESCE((SELECT jsonb_agg(jsonb_build_object(
+            'role', m.role, 'entity_type', m.entity_type, 'entity_id', m.entity_id,
+            'entity_revision', m.entity_revision, 'source_ref', m.source_ref
+          ) ORDER BY m.member_ordinal) FROM atlas_relationship_members m
+            WHERE m.relationship_id = r.relationship_id), '[]'::jsonb) AS participants,
+          COALESCE((SELECT jsonb_agg(jsonb_build_object(
+            'role', c.role, 'min', c.minimum_count,
+            'max', CASE WHEN c.maximum_count IS NULL THEN 'many'::text ELSE c.maximum_count::text END
+          ) ORDER BY c.role) FROM atlas_relationship_cardinality c
+            WHERE c.relationship_id = r.relationship_id), '[]'::jsonb) AS cardinality,
+          COALESCE((SELECT jsonb_agg(re.evidence_id ORDER BY re.evidence_id)
+            FROM atlas_relationship_evidence re WHERE re.relationship_id = r.relationship_id), '[]'::jsonb) AS evidence_refs
+        FROM atlas_relationships r
+        ORDER BY r.relationship_id
+        LIMIT $1
+      `, [boundedLimit]);
 
       return result.rows.map((row) => featureRelationshipSchema.parse({
         schema: 'atlas.feature-relationship.v1',

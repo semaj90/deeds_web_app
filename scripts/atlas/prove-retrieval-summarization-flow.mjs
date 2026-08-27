@@ -150,11 +150,12 @@ async function embedQuery() {
 async function qdrantShortlist(vector) {
   const started = Date.now();
   try {
-    const search = await fetchJson(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+    const search = await fetchJson(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: { name: QDRANT_VECTOR_NAME, vector },
+        query: vector,
+        using: QDRANT_VECTOR_NAME,
         limit: Math.max(TOP_K * 2, 10),
         filter: {
           must_not: [
@@ -166,7 +167,7 @@ async function qdrantShortlist(vector) {
       }),
       timeoutMs: 30_000,
     });
-    const hits = (search?.result ?? []).map((hit) => ({
+    const hits = (search?.result?.points ?? []).map((hit) => ({
       id: String(hit.id ?? ''),
       score: Number(hit.score ?? 0),
       packet_key: hit.payload?.packet_key ?? hit.payload?.packetKey ?? null,

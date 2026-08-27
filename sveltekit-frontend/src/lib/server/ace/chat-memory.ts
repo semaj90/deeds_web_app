@@ -108,11 +108,11 @@ export async function recallPastChats(
   const startedAt = Date.now();
 
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: { name: VECTOR_NAME, vector: queryEmbedding },
+        query: { name: VECTOR_NAME, vector: queryEmbedding },
         limit,
         score_threshold: scoreThreshold,
         with_payload: true,
@@ -127,7 +127,7 @@ export async function recallPastChats(
       return [];
     }
     const data = (await res.json()) as {
-      result?: Array<{
+      result?: { points?: Array<{
         id: string | number;
         score: number;
         payload?: {
@@ -136,10 +136,10 @@ export async function recallPastChats(
           content?: string;
           timestamp?: number;
         };
-      }>;
+      }> };
     };
 
-    const hits = (data.result ?? [])
+    const hits = (data.result?.points ?? [])
       .filter((p) => p.payload?.content && p.payload?.sessionId)
       .map((p) => ({
         id: p.id,

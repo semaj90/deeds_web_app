@@ -1,0 +1,41 @@
+{
+  "schema": "AtlasLangExtractProviderFixtureReceiptV1",
+  "status": "LIVE_SIDECAR_PROVIDER_NOT_CONFIGURED",
+  "sidecar": "http://127.0.0.1:8095",
+  "endpoint": "/analyze",
+  "runtime": {
+    "langextract_version": "1.6.0",
+    "provider_revision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.2|tree-sitter=0.9.0|chunker=4.0.0",
+    "langextract_imported": true,
+    "ast_grep_available": true,
+    "tree_sitter_available": true,
+    "networkx_available": true,
+    "cugraph_available": false,
+    "cuda_available": false
+  },
+  "fixture": {
+    "document_id": "fixture-langextract-1",
+    "source_ref": "fixture/src/retrieval.ts",
+    "packet_key": "fixture-packet-1",
+    "source_type": "codebase",
+    "language": "typescript",
+    "text_sha256": "4e5aa29d529cc09a050df3203745ae845d8f0be26bfcddc7b39382c195d62bc7"
+  },
+  "observed": {
+    "http_status": 200,
+    "response_document_id": "fixture-langextract-1",
+    "response_source_ref": "fixture/src/retrieval.ts",
+    "response_packet_key": "fixture-packet-1",
+    "concept_count": 6,
+    "entity_count": 0,
+    "fallback": true,
+    "grounded_official_provider_extraction": false
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "redis": false,
+    "filesystem_canonical_state": false
+  },
+  "next_gate": "Configure a supported LangExtract provider/model and rerun the same fixture; require grounded char intervals and alignment metadata before promotion."
+}

@@ -94,7 +94,7 @@ async function searchQdrant(
 		};
 		if (must.length > 0) searchBody.filter = { must };
 
-		const resp = await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points/search`, {
+		const resp = await fetch(`${ENV.QDRANT_URL}/collections/audio_segments/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(searchBody),
@@ -102,7 +102,7 @@ async function searchQdrant(
 		if (!resp.ok) return [];
 
 		const { result } = await resp.json();
-		return (result || []).map((hit: any) => ({
+		return (result?.points || []).map((hit: any) => ({
 			evidenceId: hit.payload?.evidenceId ?? '',
 			segmentIndex: hit.payload?.segmentIndex ?? 0,
 			startMs: hit.payload?.startMs ?? 0,
@@ -185,11 +185,11 @@ async function searchTranscripts(
 		if (evidenceId) must.push({ key: 'evidenceId', match: { value: evidenceId } });
 		if (caseId) must.push({ key: 'caseId', match: { value: caseId } });
 
-		const resp = await fetch(`${ENV.QDRANT_URL}/collections/evidence_items/points/search`, {
+		const resp = await fetch(`${ENV.QDRANT_URL}/collections/evidence_items/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector: embedding,
+				query: embedding,
 				limit,
 				with_payload: true,
 				score_threshold: 0.4,
@@ -199,7 +199,7 @@ async function searchTranscripts(
 		if (!resp.ok) return [];
 
 		const { result } = await resp.json();
-		return (result || []).map((hit: any) => ({
+		return (result?.points || []).map((hit: any) => ({
 			evidenceId: hit.payload?.evidenceId ?? '',
 			text: (hit.payload?.text ?? '').slice(0, 500),
 			title: hit.payload?.fileName ?? '',

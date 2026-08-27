@@ -229,12 +229,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 					const searchCtrl = new AbortController();
 					const searchTid = setTimeout(() => searchCtrl.abort(), 5000);
 					const searchRes = await fetch(
-						`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`,
+						`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`,
 						{
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
-								vector,
+								query: vector,
 								limit: 3,
 								with_payload: false,
 								score_threshold: 0.0,
@@ -244,8 +244,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 					).finally(() => clearTimeout(searchTid));
 
 					if (searchRes.ok) {
-						const searchBody = (await searchRes.json()) as { result?: unknown[] };
-						sampleQueryOk = Array.isArray(searchBody.result);
+						const searchBody = (await searchRes.json()) as { result?: { points?: unknown[] } };
+						sampleQueryOk = Array.isArray(searchBody.result?.points);
 					}
 				}
 			}

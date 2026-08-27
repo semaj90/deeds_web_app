@@ -46,19 +46,18 @@ function inferSectionFromCard(card) {
 async function fetchQdrantData(sourceRef) {
   try {
     const body = JSON.stringify({
-      vector: new Array(768).fill(0),
       filter: { must: [{ key: 'source_ref', match: { value: sourceRef } }] },
       limit: 1,
       with_payload: true,
-      with_vectors: false
+      with_vector: false
     });
 
-    const resp = await fetch(`${QDRANT_ENDPOINT}/collections/${QDRANT_COLLECTION}/points/search`, {
+    const resp = await fetch(`${QDRANT_ENDPOINT}/collections/${QDRANT_COLLECTION}/points/scroll`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body
     });
     if (!resp.ok) return null;
     const json = await resp.json();
-    const res = json.result && json.result[0];
+    const res = json.result?.points?.[0];
     if (!res) return null;
     return { centroidId: res.payload?.centroid_id ?? res.payload?.centroidId ?? null, somCluster: res.payload?.som_cluster ?? null };
   } catch (err) {

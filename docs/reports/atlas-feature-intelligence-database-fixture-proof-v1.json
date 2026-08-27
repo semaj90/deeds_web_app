@@ -1,0 +1,113 @@
+{
+  "schema": "atlas.feature-intelligence-database-proof.v4",
+  "generated_at": "2026-08-26T21:28:32.795Z",
+  "apply_requested": false,
+  "fixture_requested": true,
+  "fixture_rolled_back": true,
+  "migrations": [
+    {
+      "name": "20260817_atlas_feature_intelligence_v1.sql",
+      "checksum": "02fe8fe2ec07e3792d139e5d5f3c81114e0570b8416f5b79020081c8b8b5908c"
+    },
+    {
+      "name": "20260818_atlas_dynamic_hyperedge_entities_v1.sql",
+      "checksum": "a3ced410c5c3a88e34144bd69afe2fb409e64ff1fe8787a159954a2abb8d8e92"
+    },
+    {
+      "name": "20260818_atlas_symbol_registry_v1.sql",
+      "checksum": "bda64b62037cc0aa4ef1f2ba2a823ac5aeab77e38d90d93fab4dc53d497c5014"
+    },
+    {
+      "name": "20260818_atlas_schema_object_registry_v1.sql",
+      "checksum": "50d3a67d701b43e535fe29b3ac895b42e3ede06ad8d607c31b4476ad6ac55877"
+    },
+    {
+      "name": "20260818_atlas_test_registry_v1.sql",
+      "checksum": "457071bda895f19099b63eb4817deffa5d01d96350999c8b18f9b05ce97fded8"
+    },
+    {
+      "name": "20260818_atlas_identity_alias_decisions_v1.sql",
+      "checksum": "44702fa664d34dd691a51750661882fc2cc716dfed623cb9b0fa95385f4a649a"
+    },
+    {
+      "name": "20260818_atlas_assertion_registry_v1.sql",
+      "checksum": "33837244fc472cb280184eefaf0aa69df0c7151cfc380528f67d11f15d3b265f"
+    },
+    {
+      "name": "20260818_atlas_algorithm_execution_receipts_v1.sql",
+      "checksum": "6f2467734a42741dff299e9af3edcc71e90e7003396197c0b9954e26fc666adb"
+    }
+  ],
+  "gates": {
+    "PGVECTOR_EXTENSION": true,
+    "REQUIRED_TABLES_EXIST": true,
+    "REQUIRED_FUNCTIONS_EXIST": true,
+    "EVIDENCE_ENTITY_FK_TO_EVIDENCE": true,
+    "SCHEMA_REGISTRY_VERSION_PROVENANCE": true,
+    "SYMBOL_REGISTRY_NATIVE_PROVENANCE": true,
+    "TEST_EXECUTION_RECEIPT_SURFACE": true,
+    "REVIEWED_ALIAS_DECISION_SURFACE": true,
+    "ASSERTION_IDENTITY_SURFACE": true,
+    "ALGORITHM_EXECUTION_RECEIPT_SURFACE": true,
+    "FIXTURE_RELATIONSHIP_VALIDATION": true,
+    "FIXTURE_DYNAMIC_HYPEREDGE": true,
+    "FIXTURE_READBACK": true
+  },
+  "details": {
+    "server": {
+      "database": "legal_ai_db",
+      "username": "legal_admin",
+      "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+      "version_num": "180004"
+    },
+    "pgvector": {
+      "extname": "vector",
+      "extversion": "0.8.3"
+    },
+    "missing_tables": [],
+    "missing_functions": [],
+    "schema_registry_version_columns": [
+      "schema_object_version_id",
+      "stable_schema_object_id",
+      "object_key",
+      "object_kind",
+      "qualified_name",
+      "source_ref",
+      "source_revision",
+      "schema_revision",
+      "parent_stable_schema_object_id",
+      "catalog_oid",
+      "catalog_locator",
+      "definition_hash",
+      "producer_revision",
+      "created_at"
+    ],
+    "algorithm_execution_columns": [
+      "execution_id",
+      "workflow_id",
+      "action_id",
+      "dag_node_id",
+      "stage",
+      "logical_lane",
+      "algorithm_class",
+      "algorithm",
+      "geometry",
+      "metric",
+      "compute_backend",
+      "compilation_mode",
+      "transport",
+      "serialization",
+      "source_snapshot_revision",
+      "representation_revision",
+      "graph_snapshot_revision",
+      "relationship_snapshot_revision",
+      "input_checksum",
+      "output_checksum",
+      "manifest_checksum",
+      "manifest",
+      "recorded_at"
+    ]
+  },
+  "status": "PROVEN",
+  "checksum": "9e17125644acd23d5ec6eac0ddd7c71181537fb1542cf00fdd70166397a43aaf"
+}

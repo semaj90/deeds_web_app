@@ -52,7 +52,7 @@ export function buildPacketKey(sourceRef, featureId) {
  * @returns {object} JSONB payload for nes_chrom_packets
  */
 export function buildPacketPayload(row) {
-  return {
+  const payload = {
     source_ref:      row.source_ref,
     feature_id:      row.feature_id,
     cluster_id:      row.cluster_id,
@@ -65,6 +65,19 @@ export function buildPacketPayload(row) {
     indexed_at:      row.indexed_at,
     packet_key:      buildPacketKey(row.source_ref, row.feature_id),
   };
+
+  if (Array.isArray(row.ast_symbols) && row.ast_symbols.length) payload.ast_symbols = row.ast_symbols;
+  if (Array.isArray(row.ast_imports) && row.ast_imports.length) payload.ast_imports = row.ast_imports;
+  if (Array.isArray(row.ast_exports) && row.ast_exports.length) payload.ast_exports = row.ast_exports;
+  if (row.ast_facts_at) payload.ast_facts_at = row.ast_facts_at;
+  if (row.embedding_status) payload.semantic_embedding_status = row.embedding_status;
+  if (row.embedding_model) payload.embedding_model = row.embedding_model;
+  if (row.embedding_version) payload.embedding_version = row.embedding_version;
+  if (row.embedding_dimension != null) payload.embedding_dimension = Number(row.embedding_dimension);
+  if (row.embedding_normalized != null) payload.embedding_normalized = Boolean(row.embedding_normalized);
+  payload.representation_id = 'semantic_768';
+
+  return payload;
 }
 
 /**

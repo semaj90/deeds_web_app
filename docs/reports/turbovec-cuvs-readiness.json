@@ -1,0 +1,16 @@
+{
+  "run": "2026-08-27T01:44:07.895Z",
+  "dry_run": false,
+  "dependencies": {
+    "turbovec": {
+      "status": "OK",
+      "version": "v2.1.0",
+      "ready_for_use": true
+    },
+    "cuvs": {
+      "status": "OK",
+      "version": "v1.5.0",
+      "ready_for_use": true
+    }
+  }
+}

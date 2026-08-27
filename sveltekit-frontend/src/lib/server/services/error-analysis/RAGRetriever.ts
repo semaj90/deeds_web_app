@@ -143,11 +143,11 @@ export class RAGRetriever {
 	 * Query Qdrant vector database
 	 */
 	private async queryQdrant(embedding: number[], topK?: number): Promise<VectorSearchResult[]> {
-		const response = await fetch(`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points/search`, {
+		const response = await fetch(`${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector: embedding,
+				query: embedding,
 				limit: topK || this.config.topK,
 				with_payload: true,
 				score_threshold: this.config.similarityThreshold
@@ -160,7 +160,7 @@ export class RAGRetriever {
 		}
 
 		const data = await response.json();
-		return (data?.result|| []).map((r: any) => ({
+		return (data?.result?.points || []).map((r: any) => ({
 			id: r.id,
 			score: r.score,
 			payload: r?.payload|| {}

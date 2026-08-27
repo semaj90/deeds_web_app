@@ -52,7 +52,14 @@ async function main() {
   console.log('\n══ MCP + TurboVec Probe ════════════════════════════════');
 
   const trace = OPENCODE.mcp.trace;
-  const turbovec = OPENCODE.mcp.turbovec;
+  // TurboVec is an optional service entry. The current OpenCode config routes
+  // Atlas tools through TRACE/atlas-tools, so absence must be reported rather
+  // than treated as a probe failure.
+  const turbovec = OPENCODE.mcp.turbovec ?? {
+    enabled: false,
+    url: 'http://127.0.0.1:8791/mcp',
+    source: 'not-configured'
+  };
 
   console.log(`\n  TRACE  config: enabled=${trace.enabled}, url=${trace.url}`);
   const traceProbe = await probeMCP(trace.url);
@@ -74,6 +81,7 @@ async function main() {
     },
     turbovec: {
       configEnabled: turbovec.enabled,
+      configSource: turbovec.source ?? 'opencode.json',
       mcpEndpoint: tvMcpProbe,
       healthEndpoint: tvHealthProbe,
       verdict: turbovec.enabled

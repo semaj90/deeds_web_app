@@ -155,12 +155,13 @@ export async function queryQdrantCascade(
 
 		const qdrantFilter = mustFilters.length > 0 ? { must: mustFilters } : undefined;
 
-		// Search Qdrant with named vector 'content'
-		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+		// Query API: `semantic_768` is stored in the physical `content` slot.
+		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				vector: { name: 'content', vector: queryEmbedding },
+				query: queryEmbedding,
+				using: 'content',
 				limit,
 				score_threshold: 0.3,
 				filter: qdrantFilter,
@@ -169,8 +170,8 @@ export async function queryQdrantCascade(
 			signal: AbortSignal.timeout(10_000),
 		});
 		if (!res.ok) return null;
-		const parsed = (await res.json().catch(() => null)) as { result?: any[] } | null;
-		const results = parsed?.result ?? [];
+		const parsed = (await res.json().catch(() => null)) as { result?: { points?: any[] } } | null;
+		const results = parsed?.result?.points ?? [];
 
 		if (results.length === 0) return null;
 

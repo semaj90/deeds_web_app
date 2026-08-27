@@ -25,17 +25,18 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     psutil \
     beautifulsoup4 \
     spacy \
-    langextract \
+    langextract==1.6.0 \
     treesitter-chunker \
     tree-sitter \
     tree-sitter-language-pack \
     ast-grep-py \
-  && python -m pip install -e /app/python
+  && python -m pip check
 
 EXPOSE 8095
 
 ENV MINIFORGE_SIDECAR_HOST=0.0.0.0 \
-    MINIFORGE_SIDECAR_PORT=8095
+    MINIFORGE_SIDECAR_PORT=8095 \
+    LANGEXTRACT_RUNTIME=official
 
 # v2 preserves native Consiliency IDs/hierarchy and LangExtract grounding while
 # reusing the legacy analysis implementation. Rollback is a one-line command

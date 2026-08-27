@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.structural-graph-production-parity.v1",
+  "status": "PASS",
+  "canonicalAuthority": false,
+  "artifact": "sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json",
+  "graphRevision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+  "nodeCount": 162234,
+  "edgeCount": 108156,
+  "networkx": { "status": "PROVEN", "componentCount": 54078 },
+  "cugraph": { "status": "PROVEN", "version": "26.06.00", "componentCount": 54078 },
+  "pagerank": { "top50Overlap": 1, "correlation": 1, "maxDelta": 4.888482368395049e-9 },
+  "louvainCommunityAgreement": 1,
+  "unresolvedCount": 0,
+  "revisionAuthority": "BLOCKED",
+  "sourceReadback": "docs/reports/graph-snapshot-revision-readback.json"
+}

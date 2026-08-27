@@ -1,6 +1,6 @@
 {
   "schema": "atlas.qdrant-sparse-configuration-audit.v1",
-  "generated_at": "2026-08-25T21:30:53.192Z",
+  "generated_at": "2026-08-27T01:09:56.008Z",
   "mode": "READ_ONLY",
   "writes_performed": false,
   "qdrant_url": "http://127.0.0.1:6333",
@@ -145,7 +145,7 @@
     {
       "name": "codebase_chunks_384_hybrid",
       "collection_status": "green",
-      "points_count": 0,
+      "points_count": 10,
       "indexed_vectors_count": 0,
       "dense_vectors": {
         "content": {
@@ -175,8 +175,8 @@
     {
       "name": "codebase_chunks_768",
       "collection_status": "green",
-      "points_count": 106338,
-      "indexed_vectors_count": 115914,
+      "points_count": 109129,
+      "indexed_vectors_count": 109983,
       "dense_vectors": {
         "content": {
           "size": 768,
@@ -612,8 +612,8 @@
     {
       "name": "sc_deedscodebase_deeds-web-app",
       "collection_status": "green",
-      "points_count": 137,
-      "indexed_vectors_count": 137,
+      "points_count": 326,
+      "indexed_vectors_count": 326,
       "dense_vectors": {
         "dense": {
           "size": 768,

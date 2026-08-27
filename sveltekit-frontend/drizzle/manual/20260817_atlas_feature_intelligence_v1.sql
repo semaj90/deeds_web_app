@@ -7,12 +7,12 @@
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
-CREATE TABLE IF NOT EXISTS atlas_features (
+CREATE TABLE IF NOT EXISTS atlas_fi_features (
   feature_id text PRIMARY KEY DEFAULT (uuidv7()::text),
   feature_key text NOT NULL UNIQUE,
   feature_label text NOT NULL,
   domain text NOT NULL,
-  parent_feature_id text REFERENCES atlas_features(feature_id),
+  parent_feature_id text REFERENCES atlas_fi_features(feature_id),
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'deprecated', 'superseded')),
   feature_revision text NOT NULL,
   producer_revision text NOT NULL,
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS atlas_features (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS atlas_features_domain_status_idx ON atlas_features(domain, status);
-CREATE INDEX IF NOT EXISTS atlas_features_revision_idx ON atlas_features(feature_revision);
-CREATE INDEX IF NOT EXISTS atlas_features_metadata_gin_idx ON atlas_features USING gin(metadata jsonb_path_ops);
+CREATE INDEX IF NOT EXISTS atlas_fi_features_domain_status_idx ON atlas_fi_features(domain, status);
+CREATE INDEX IF NOT EXISTS atlas_fi_features_revision_idx ON atlas_fi_features(feature_revision);
+CREATE INDEX IF NOT EXISTS atlas_fi_features_metadata_gin_idx ON atlas_fi_features USING gin(metadata jsonb_path_ops);
 
 CREATE TABLE IF NOT EXISTS atlas_feature_aliases (
-  feature_id text NOT NULL REFERENCES atlas_features(feature_id) ON DELETE CASCADE,
+  feature_id text NOT NULL REFERENCES atlas_fi_features(feature_id) ON DELETE CASCADE,
   alias text NOT NULL,
   normalized_alias text NOT NULL,
   source_ref text,
@@ -54,8 +54,8 @@ CREATE INDEX IF NOT EXISTS atlas_evidence_search_gin_idx ON atlas_evidence USING
 CREATE INDEX IF NOT EXISTS atlas_evidence_payload_gin_idx ON atlas_evidence USING gin(payload jsonb_path_ops);
 CREATE INDEX IF NOT EXISTS atlas_evidence_tags_gin_idx ON atlas_evidence USING gin(tags);
 
-CREATE TABLE IF NOT EXISTS atlas_feature_evidence (
-  feature_id text NOT NULL REFERENCES atlas_features(feature_id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS atlas_fi_evidence (
+  feature_id text NOT NULL REFERENCES atlas_fi_features(feature_id) ON DELETE CASCADE,
   evidence_id text NOT NULL REFERENCES atlas_evidence(evidence_id) ON DELETE CASCADE,
   relation_type text NOT NULL,
   polarity text NOT NULL DEFAULT 'supports' CHECK (polarity IN ('supports', 'refutes', 'neutral')),
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS atlas_feature_evidence (
   created_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (feature_id, evidence_id, relation_type)
 );
-CREATE INDEX IF NOT EXISTS atlas_feature_evidence_evidence_idx ON atlas_feature_evidence(evidence_id, feature_id);
+CREATE INDEX IF NOT EXISTS atlas_fi_evidence_evidence_idx ON atlas_fi_evidence(evidence_id, feature_id);
 
 CREATE TABLE IF NOT EXISTS atlas_relationships (
   relationship_id text PRIMARY KEY DEFAULT (uuidv7()::text),
@@ -88,10 +88,10 @@ CREATE INDEX IF NOT EXISTS atlas_relationships_revision_idx ON atlas_relationshi
 CREATE INDEX IF NOT EXISTS atlas_relationships_source_revision_idx ON atlas_relationships(source_ref, source_revision);
 CREATE INDEX IF NOT EXISTS atlas_relationships_metadata_gin_idx ON atlas_relationships USING gin(metadata jsonb_path_ops);
 
-ALTER TABLE atlas_feature_evidence
-  DROP CONSTRAINT IF EXISTS atlas_feature_evidence_relationship_id_fkey;
-ALTER TABLE atlas_feature_evidence
-  ADD CONSTRAINT atlas_feature_evidence_relationship_id_fkey
+ALTER TABLE atlas_fi_evidence
+  DROP CONSTRAINT IF EXISTS atlas_fi_evidence_relationship_id_fkey;
+ALTER TABLE atlas_fi_evidence
+  ADD CONSTRAINT atlas_fi_evidence_relationship_id_fkey
   FOREIGN KEY (relationship_id) REFERENCES atlas_relationships(relationship_id) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS atlas_relationship_members (
@@ -145,7 +145,7 @@ CREATE INDEX IF NOT EXISTS atlas_relationship_embeddings_hnsw_cosine_idx
   ON atlas_relationship_embeddings USING hnsw (embedding vector_cosine_ops);
 
 CREATE TABLE IF NOT EXISTS atlas_feature_embeddings (
-  feature_id text NOT NULL REFERENCES atlas_features(feature_id) ON DELETE CASCADE,
+  feature_id text NOT NULL REFERENCES atlas_fi_features(feature_id) ON DELETE CASCADE,
   feature_revision text NOT NULL,
   embedding_model_revision text NOT NULL,
   projection_revision text NOT NULL,
@@ -160,7 +160,7 @@ CREATE INDEX IF NOT EXISTS atlas_feature_embeddings_hnsw_cosine_idx
 
 CREATE TABLE IF NOT EXISTS atlas_feature_state_receipts (
   receipt_id text PRIMARY KEY DEFAULT (uuidv7()::text),
-  feature_id text NOT NULL REFERENCES atlas_features(feature_id) ON DELETE CASCADE,
+  feature_id text NOT NULL REFERENCES atlas_fi_features(feature_id) ON DELETE CASCADE,
   feature_revision text NOT NULL,
   evidence_snapshot_revision text NOT NULL,
   state_revision text NOT NULL,

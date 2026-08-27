@@ -192,7 +192,7 @@ async function qdrantUpsertSearch(vector) {
     timeoutMs: 30_000,
   });
 
-  const search = await fetchJson(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+    const search = await fetchJson(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

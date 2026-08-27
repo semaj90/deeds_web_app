@@ -96,7 +96,7 @@ async function validatePipeline() {
   console.log('\n[GATE 4] Qdrant named-vector "content" search');
   let qdrantResults = [];
   try {
-    const res = await fetch(`${SERVICES.QDRANT}/collections/codebase_chunks_768/points/search`, {
+    const res = await fetch(`${SERVICES.QDRANT}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

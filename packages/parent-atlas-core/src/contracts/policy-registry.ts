@@ -106,7 +106,9 @@ export class DefaultPolicyRegistry implements PolicyRegistry {
   private policies: Map<RetrievalUseCase, RetrievalPolicy>;
 
   constructor() {
-    this.policies = new Map(Object.entries(DEFAULT_POLICIES));
+    this.policies = new Map(
+      Object.entries(DEFAULT_POLICIES) as Array<[RetrievalUseCase, RetrievalPolicy]>
+    );
   }
 
   getPolicy(useCase: RetrievalUseCase): RetrievalPolicy {

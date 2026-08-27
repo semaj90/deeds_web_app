@@ -38,22 +38,23 @@ async function qdrantSearch(
 	limit:  number,
 ): Promise<Array<{ id: string | number; score: number; payload: Record<string, unknown> }>> {
 	const body: Record<string, unknown> = {
-		vector:      { name: 'content', vector },
+		query:       vector,
+		using:       'content',
 		limit,
 		with_payload: true,
 		with_vector:  false,
 	};
 	if (filter) body.filter = filter;
 
-	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/query`, {
 		method:  'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body:    JSON.stringify(body),
 		signal:  AbortSignal.timeout(8_000),
 	});
 	if (!res.ok) return [];
-	const data = await res.json() as { result?: Array<{ id: string | number; score: number; payload: Record<string, unknown> }> };
-	return data.result ?? [];
+	const data = await res.json() as { result?: { points?: Array<{ id: string | number; score: number; payload: Record<string, unknown> }> } };
+	return data.result?.points ?? [];
 }
 
 function buildFilter(tags: string[], clusters: number[]): Record<string, unknown> | null {

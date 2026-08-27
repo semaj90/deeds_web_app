@@ -40,10 +40,14 @@ const derivedContext = process.env.GRAPHIFY_DERIVED_CONTEXT === '1';
 const dailyEmbeddingOptIn = process.env.GRAPHIFY_DAILY_EMBEDDING === '1';
 const dailyEmbeddingBackend = String(process.env.GRAPHIFY_DAILY_EMBEDDING_BACKEND ?? 'ollama').trim().toLowerCase();
 const dailyEmbeddingLimit = Math.max(1, Number.parseInt(process.env.GRAPHIFY_DAILY_EMBEDDING_LIMIT ?? '10', 10) || 10);
+const nesPacketMaterialization = process.env.GRAPHIFY_NES_PACKET_MATERIALIZATION === '1';
+const nesPacketApply = process.env.GRAPHIFY_NES_PACKET_APPLY === '1';
+const nesPacketLimit = Math.max(1, Number.parseInt(process.env.GRAPHIFY_NES_PACKET_LIMIT ?? '128', 10) || 128);
 let neuralPrefillStatus = 'NOT_RUN';
 let neuralBaselineStatus = 'NOT_RUN';
 let derivedContextStatus = 'NOT_RUN';
 let dailyEmbeddingStatus = 'NOT_REQUESTED';
+let nesPacketStatus = 'NOT_REQUESTED';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 function stable(value) {
@@ -133,6 +137,22 @@ function writeDailyEmbeddingReceipt(state) {
     ...state,
   };
   const outputPath = path.resolve(ROOT, 'docs/reports/graphify-daily-embedding-backend-v1.json');
+  mkdirSync(path.dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify({ ...payload, outputChecksum: sha256(payload) }, null, 2)}\n`, 'utf8');
+}
+
+function writeNesPacketReceipt(state) {
+  const payload = {
+    schema: 'atlas.graphify-daily-nes-packet-materialization.v1',
+    generatedAt: new Date().toISOString(),
+    wrapper: 'scripts/startup/run-graphify-daily-startup.mjs',
+    optIn: nesPacketMaterialization,
+    applyRequested: nesPacketApply,
+    limit: nesPacketLimit,
+    onlyMissing: true,
+    ...state,
+  };
+  const outputPath = path.resolve(ROOT, 'docs/reports/graphify-daily-nes-packet-materialization-v1.json');
   mkdirSync(path.dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, `${JSON.stringify({ ...payload, outputChecksum: sha256(payload) }, null, 2)}\n`, 'utf8');
 }
@@ -334,6 +354,38 @@ try {
     stdio: 'inherit',
     timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
   });
+
+  // NES/CHROM is a derived packet projection over the refreshed feature map.
+  // Keep it opt-in and bounded so restoring the table cannot silently trigger
+  // a corpus-wide packet/cache write during an ordinary daily run.
+  if (nesPacketMaterialization) {
+    const nesArgs = [
+      'node scripts/atlas/materialize-nes-packets.mjs',
+      '--only-missing',
+      `--limit=${nesPacketLimit}`,
+      nesPacketApply ? '' : '--dry-run',
+    ].filter(Boolean).join(' ');
+    if (!quiet) {
+      console.log(`[graphify:daily] NES/CHROM packet stage ${nesPacketApply ? 'APPLY' : 'DRY-RUN'} (limit=${nesPacketLimit})...`);
+    }
+    try {
+      execSync(nesArgs, {
+        cwd: ROOT,
+        stdio: quiet ? 'ignore' : 'inherit',
+        timeout: 30 * 60 * 1000,
+      });
+      nesPacketStatus = nesPacketApply ? 'APPLY_PASS' : 'DRY_RUN_PASS';
+      writeNesPacketReceipt({ status: nesPacketStatus, command: nesArgs });
+    } catch (nesError) {
+      nesPacketStatus = 'DEGRADED';
+      writeNesPacketReceipt({
+        status: nesPacketStatus,
+        command: nesArgs,
+        error: nesError instanceof Error ? nesError.message : String(nesError),
+      });
+      console.warn(`[graphify:daily] NES/CHROM packet stage degraded; continuing daily completion: ${nesError.message}`);
+    }
+  }
 
   // Read-only BM25 plan consumes the completed Graphify run when the control plane is installed.
   // It never creates an index receipt or mutates Postgres.

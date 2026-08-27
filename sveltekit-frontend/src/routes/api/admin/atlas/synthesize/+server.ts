@@ -192,7 +192,15 @@ export const POST: RequestHandler = async (event) => {
         exactSemanticReceipt = await exactClient.exactKnn({
           query: {
             vector: semanticReceipt.queryVector,
-            representationId: 'semantic_768',
+            // Restored 2026-08-26: commit a2e4dab329 ("retire Atlas v1 in
+            // favor of v2/semantic_768 alignment") mechanically flipped this
+            // literal to 'semantic_768' without updating the client call,
+            // leaving it inconsistent with createAtlasRapidsSemantic512Client()
+            // and the vector.length === 512 filter a few lines above. This is
+            // the legitimate 512-dim exact-rerank secondary lane (policy-
+            // compliant per root CLAUDE.md's Aug 23 truncation rule) — 768
+            // remains canonical/primary elsewhere and is unaffected by this fix.
+            representationId: 'semantic_512',
             representationRevision: semanticReceipt.representationRevision,
           },
           corpus: exactEligibleRows.map((score) => ({

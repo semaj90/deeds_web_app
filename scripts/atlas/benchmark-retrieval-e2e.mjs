@@ -341,11 +341,12 @@ async function embedQuery(query, retries = 2) {
 async function qdrantSearch(vector, topK = 10) {
   const start = now();
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/search`, {
+    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: { name: 'content', vector },
+        query: vector,
+        using: 'content',
         limit: topK,
         with_payload: true,
         with_vector: ['content'],

@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.candidate-ordinal-corpus-receipt.v1",
+  "generatedAt": "2026-08-27T03:47:32.953Z",
+  "dryRun": false,
+  "shuffleTest": false,
+  "rowCount": 4951,
+  "candidateSnapshotRevision": "corpus-snapshot:workspace-active-v1:v1",
+  "ordinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+  "sampleFirst5": [
+    {
+      "ordinal": 0,
+      "id": "00a1065c-9748-4ccd-97f8-04370464bdd6",
+      "sourceRef": "proto:RetrievalService.StreamEvidence"
+    },
+    {
+      "ordinal": 1,
+      "id": "047e8f8d-73b1-408a-95e2-ab66610ac5fe",
+      "sourceRef": "proto:EmbeddingService.Health"
+    },
+    {
+      "ordinal": 2,
+      "id": "06cf846d-a475-4155-9d45-4b16e2eb7f5a",
+      "sourceRef": "proto:ChatAssistantService.GetHistory"
+    },
+    {
+      "ordinal": 3,
+      "id": "0796e064-a042-443e-aa88-8862d151ddbf",
+      "sourceRef": "proto:RetrievalService.ExpandAstNeighbors"
+    },
+    {
+      "ordinal": 4,
+      "id": "0a9ecb2d-6992-458e-b8a9-042f2f8ff691",
+      "sourceRef": "proto:LibrarySearchService.GetDocumentToc"
+    }
+  ],
+  "sampleLast5": [
+    {
+      "ordinal": 4946,
+      "id": "packet:ffa00673e2d0",
+      "sourceRef": "src/lib/server/ace/ngram-retrieval.ts"
+    },
+    {
+      "ordinal": 4947,
+      "id": "packet:ffae6c1c9446",
+      "sourceRef": "src/routes/(app)/code-intel/wiki/+page.server.ts"
+    },
+    {
+      "ordinal": 4948,
+      "id": "packet:ffb32e42e4d9",
+      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/context/+server.ts"
+    },
+    {
+      "ordinal": 4949,
+      "id": "packet:ffb570772442",
+      "sourceRef": "src/lib/server/db/migrations/meta/_journal.json"
+    },
+    {
+      "ordinal": 4950,
+      "id": "packet:ffca48d56b54",
+      "sourceRef": "src/lib/components/legal-ai/collectiondetail.svelte"
+    }
+  ]
+}

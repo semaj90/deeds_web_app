@@ -84,11 +84,21 @@ async function auditPostgres() {
       ORDER BY table_name, ordinal_position
     `);
 
-    const tables = [
+    const requestedTables = [
       'atlas_packets', 'nes_chrom_packets', 'task_semantic_packets',
       'atlas_higher_hop_index', 'atlas_feature_map', 'parent_atlas_documents',
       'retrieval_provenance'
     ];
+    const existingTables = new Set(tablesResult.rows.map((row) => row.table_name));
+    const tables = requestedTables.filter((table) => existingTables.has(table));
+    const missingTables = requestedTables.filter((table) => !existingTables.has(table));
+
+    if (missingTables.length > 0) {
+      report.stores.postgres.missing_tables = missingTables;
+      report.recommendations.push(
+        `Postgres tables absent from this deployment: ${missingTables.join(', ')}`,
+      );
+    }
 
     for (const table of tables) {
       const countResult = await pool.query(`SELECT COUNT(*) FROM ${table}`);

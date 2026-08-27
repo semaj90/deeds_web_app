@@ -178,13 +178,14 @@ async function queryQdrantSemanticFallback(embeddingText, qdrantUrl) {
     if (!Array.isArray(embedding) || embedding.length === 0) return null;
     
     const body = {
-      vector: { name: 'content', vector: embedding },
+      query: embedding,
+      using: 'content',
       limit: 1,
       with_payload: true,
       score_threshold: 0.60
     };
     
-    const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+    const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -193,7 +194,7 @@ async function queryQdrantSemanticFallback(embeddingText, qdrantUrl) {
     
     if (res.ok) {
       const data = await res.json();
-      const hits = data.result || [];
+      const hits = data.result?.points || [];
       if (hits.length > 0) {
         const top = hits[0];
         const rawPath = top.payload?.file_path || top.payload?.sourceRef || top.payload?.source_ref || top.payload?.path;
