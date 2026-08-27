@@ -175,6 +175,31 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
   }
   if (Boolean(run.dry_run)) throw new Error('GRAPHIFY_RUN_DRY_RUN_MISMATCH');
 
+  const runReadback = await input.client.query(
+    `SELECT run_id, workspace_id, repository_revision, workspace_revision,
+            source_manifest_digest, parser_contract_version,
+            extraction_contract_version, dry_run
+       FROM public.graphify_runs
+      WHERE run_id = $1`,
+    [runId],
+  );
+  if (runReadback.rowCount !== 1 || !runReadback.rows[0]) {
+    throw new Error('GRAPHIFY_RUN_INDEPENDENT_READBACK_FAILED');
+  }
+  const persistedRun = runReadback.rows[0];
+  if (String(persistedRun.run_id) !== runId || String(persistedRun.workspace_id) !== workspaceId) {
+    throw new Error('GRAPHIFY_RUN_WORKSPACE_ID_READBACK_MISMATCH');
+  }
+  if (String(persistedRun.repository_revision) !== record.baseCommitOid || String(persistedRun.workspace_revision) !== record.workspaceRevision) {
+    throw new Error('GRAPHIFY_RUN_REVISION_READBACK_MISMATCH');
+  }
+  if (normalizeDigest(persistedRun.source_manifest_digest) !== record.sourceManifestDigest) {
+    throw new Error('GRAPHIFY_RUN_SOURCE_MANIFEST_READBACK_MISMATCH');
+  }
+  if (String(persistedRun.parser_contract_version) !== parserContractVersion || String(persistedRun.extraction_contract_version) !== extractionContractVersion || Boolean(persistedRun.dry_run)) {
+    throw new Error('GRAPHIFY_RUN_CONTRACT_READBACK_MISMATCH');
+  }
+
   const files: GraphifySourceInventoryWriterReceiptV2['files'] = [];
   for (const binding of selected) {
     // Legacy source_revision remains Git/base-commit provenance. For untracked
@@ -234,6 +259,30 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     }
     if (String(row.last_seen_run_id) !== runId) {
       throw new Error(`GRAPHIFY_LAST_SEEN_RUN_MISMATCH:${binding.sourceRef}`);
+    }
+
+    const fileReadback = await input.client.query(
+      `SELECT file_id, workspace_id, source_ref, source_revision,
+              content_hash, code_source_revision, byte_length, last_seen_run_id
+         FROM public.graphify_files
+        WHERE file_id = $1`,
+      [row.file_id],
+    );
+    if (fileReadback.rowCount !== 1 || !fileReadback.rows[0]) {
+      throw new Error(`GRAPHIFY_FILE_INDEPENDENT_READBACK_FAILED:${binding.sourceRef}`);
+    }
+    const persistedFile = fileReadback.rows[0];
+    if (String(persistedFile.file_id) !== String(row.file_id) || String(persistedFile.workspace_id) !== workspaceId) {
+      throw new Error(`GRAPHIFY_FILE_IDENTITY_READBACK_MISMATCH:${binding.sourceRef}`);
+    }
+    if (normalizeSourceRef(persistedFile.source_ref) !== binding.sourceRef || String(persistedFile.source_revision) !== legacySourceRevision) {
+      throw new Error(`GRAPHIFY_FILE_SOURCE_READBACK_MISMATCH:${binding.sourceRef}`);
+    }
+    if (normalizeDigest(persistedFile.content_hash) !== binding.contentDigest || String(persistedFile.code_source_revision) !== binding.sourceRevision) {
+      throw new Error(`GRAPHIFY_FILE_REVISION_READBACK_MISMATCH:${binding.sourceRef}`);
+    }
+    if (Number(persistedFile.byte_length) !== binding.byteLength || String(persistedFile.last_seen_run_id) !== runId) {
+      throw new Error(`GRAPHIFY_FILE_LINKAGE_READBACK_MISMATCH:${binding.sourceRef}`);
     }
 
     files.push({

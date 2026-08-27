@@ -70,11 +70,41 @@ function clientFor(input: {
           }],
         };
       }
+      if (text.includes('FROM public.graphify_runs')) {
+        return {
+          rowCount: 1,
+          rows: [{
+            run_id: runId,
+            workspace_id: workspaceId,
+            repository_revision: f.record.baseCommitOid,
+            workspace_revision: f.record.workspaceRevision,
+            source_manifest_digest: f.record.sourceManifestDigest,
+            parser_contract_version: 'parser:v1',
+            extraction_contract_version: 'extract:v1',
+            dry_run: false,
+          }],
+        };
+      }
       if (text.includes('INSERT INTO public.graphify_files')) {
         return {
           rowCount: 1,
           rows: [{
             file_id: fileId,
+            source_ref: 'src/x.ts',
+            source_revision: f.record.baseCommitOid,
+            content_hash: input.contentDigest ?? f.entry.contentDigest,
+            code_source_revision: f.entry.sourceRevision,
+            byte_length: input.byteLength ?? f.entry.byteLength,
+            last_seen_run_id: runId,
+          }],
+        };
+      }
+      if (text.includes('FROM public.graphify_files')) {
+        return {
+          rowCount: 1,
+          rows: [{
+            file_id: fileId,
+            workspace_id: workspaceId,
             source_ref: 'src/x.ts',
             source_revision: f.record.baseCommitOid,
             content_hash: input.contentDigest ?? f.entry.contentDigest,
@@ -109,8 +139,10 @@ describe('GraphifySourceInventoryWriterV2', () => {
     expect(receipt.readbackVerified).toBe(true);
     expect(client.queries[0]).toContain('ON CONFLICT (workspace_id, workspace_revision, parser_contract_version)');
     expect(client.queries[0]).toContain('WHERE workspace_revision IS NOT NULL');
-    expect(client.queries[1]).toContain('ON CONFLICT (workspace_id, source_ref, code_source_revision)');
-    expect(client.queries[1]).toContain('WHERE code_source_revision IS NOT NULL');
+    expect(client.queries[1]).toContain('FROM public.graphify_runs');
+    expect(client.queries[2]).toContain('ON CONFLICT (workspace_id, source_ref, code_source_revision)');
+    expect(client.queries[2]).toContain('WHERE code_source_revision IS NOT NULL');
+    expect(client.queries[3]).toContain('FROM public.graphify_files');
   });
 
   it('fails closed when persisted bytes disagree with the canonical binding', async () => {
