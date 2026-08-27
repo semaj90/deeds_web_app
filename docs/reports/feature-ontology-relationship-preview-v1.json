@@ -1,0 +1,768 @@
+{
+  "schema": "atlas.feature-ontology-relationship-preview.v1",
+  "status": "READ_ONLY_PREVIEW_COMPLETE",
+  "canonical_writes": false,
+  "source_table": "feature_ontology_tuples",
+  "predicate": "USES_CONCEPT",
+  "producer_revision": "feature-ontology-relationship-preview:v1",
+  "limit": 603,
+  "tuples_seen": 603,
+  "relationships_previewed": 603,
+  "rejected": 0,
+  "feature_ids_previewed": 7,
+  "feature_headers_previewed": 7,
+  "evidence_previewed": 603,
+  "matching_atlas_evidence_rows": 0,
+  "evidence_materialization_required": true,
+  "rejected_rows": [],
+  "relationship_ids_are_preview_only": true,
+  "feature_headers": [
+    {
+      "feature_id": "sveltekit-frontend.trace-reranker",
+      "feature_key": "sveltekit-frontend.trace-reranker",
+      "feature_label": "trace-reranker.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/ai/trace-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "sveltekit-frontend.langextract-reranker",
+      "feature_key": "sveltekit-frontend.langextract-reranker",
+      "feature_label": "langextract-reranker.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/retrieval/langextract-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "sveltekit-frontend.cross-encoder-reranker",
+      "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+      "feature_label": "cross-encoder-reranker.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "sveltekit-frontend.langgraph-research",
+      "feature_key": "sveltekit-frontend.langgraph-research",
+      "feature_label": "langgraph-research.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/ai/langgraph-research.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "sveltekit-frontend.langgraph-client",
+      "feature_key": "sveltekit-frontend.langgraph-client",
+      "feature_label": "langgraph-client.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/ai/langgraph-client.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "sveltekit-frontend.langgraph-dag",
+      "feature_key": "sveltekit-frontend.langgraph-dag",
+      "feature_label": "langgraph-dag.ts",
+      "domain": "backend",
+      "source_ref": "src/lib/server/ai/langgraph-dag.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    },
+    {
+      "feature_id": "valkey",
+      "feature_key": "valkey",
+      "feature_label": "valkey.ts",
+      "domain": "cache",
+      "source_ref": "src/lib/server/valkey.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1"
+    }
+  ],
+  "evidence_sample": [
+    {
+      "evidence_id": "feature_ontology_tuples:005b1dba-aeae-48b7-b8fd-a332603082cd",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/ai/trace-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "005b1dba-aeae-48b7-b8fd-a332603082cd",
+        "packet_key": "packet:1e3a39aef4df",
+        "feature_key": "sveltekit-frontend.trace-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:1e3a39aef4df",
+        "object_type": "concept",
+        "object_id": "concept:input-cachestatus",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.trace-reranker src/lib/server/ai/trace-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:006c5242-7f4f-486e-af49-02ca70d97b02",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/retrieval/langextract-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "006c5242-7f4f-486e-af49-02ca70d97b02",
+        "packet_key": "packet:41b0d5a374fb",
+        "feature_key": "sveltekit-frontend.langextract-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:41b0d5a374fb",
+        "object_type": "concept",
+        "object_id": "concept:builddeterministicprovenance",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.langextract-reranker src/lib/server/retrieval/langextract-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:00b8b5e3-5cfb-4c5f-a08e-04649500ec5b",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/ai/trace-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "00b8b5e3-5cfb-4c5f-a08e-04649500ec5b",
+        "packet_key": "packet:1e3a39aef4df",
+        "feature_key": "sveltekit-frontend.trace-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:1e3a39aef4df",
+        "object_type": "concept",
+        "object_id": "concept:buildtracererankprovenance",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.trace-reranker src/lib/server/ai/trace-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:00cf2cec-8a91-4d53-82b8-440ebf4fb9ec",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/retrieval/langextract-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "00cf2cec-8a91-4d53-82b8-440ebf4fb9ec",
+        "packet_key": "packet:41b0d5a374fb",
+        "feature_key": "sveltekit-frontend.langextract-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:41b0d5a374fb",
+        "object_type": "concept",
+        "object_id": "concept:rerankedcandidate",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.langextract-reranker src/lib/server/retrieval/langextract-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:01d6e416-cc3f-4ff3-a8a9-78d0e29acb6f",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/ai/trace-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "01d6e416-cc3f-4ff3-a8a9-78d0e29acb6f",
+        "packet_key": "packet:1e3a39aef4df",
+        "feature_key": "sveltekit-frontend.trace-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:1e3a39aef4df",
+        "object_type": "concept",
+        "object_id": "concept:cachestatus",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.trace-reranker src/lib/server/ai/trace-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:01de55b6-22a2-4601-9e54-99761baa13bc",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "01de55b6-22a2-4601-9e54-99761baa13bc",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:22d924cb73a1",
+        "object_type": "concept",
+        "object_id": "concept:candidate-featurelabel",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.cross-encoder-reranker src/lib/server/retrieval/cross-encoder-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:021196aa-8054-4049-98f5-9d0d15b21b6f",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "021196aa-8054-4049-98f5-9d0d15b21b6f",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:22d924cb73a1",
+        "object_type": "concept",
+        "object_id": "concept:options-blendweights",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.cross-encoder-reranker src/lib/server/retrieval/cross-encoder-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:028323f5-53bd-48c3-a17f-63b3d1732a54",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "028323f5-53bd-48c3-a17f-63b3d1732a54",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:22d924cb73a1",
+        "object_type": "concept",
+        "object_id": "concept:math-max",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.cross-encoder-reranker src/lib/server/retrieval/cross-encoder-reranker.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:02d668d5-7a1b-45ba-9922-e42631c27455",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/ai/langgraph-research.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "02d668d5-7a1b-45ba-9922-e42631c27455",
+        "packet_key": "packet:fab344aa357b",
+        "feature_key": "sveltekit-frontend.langgraph-research",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:fab344aa357b",
+        "object_type": "concept",
+        "object_id": "concept:client-research",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.langgraph-research src/lib/server/ai/langgraph-research.ts"
+    },
+    {
+      "evidence_id": "feature_ontology_tuples:03d3da2e-d2ac-4b6d-9c53-3f80f098d21e",
+      "evidence_kind": "ontology_tuple",
+      "source_ref": "src/lib/server/ai/langgraph-research.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "evidence_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "confidence": 0.7,
+      "payload": {
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "03d3da2e-d2ac-4b6d-9c53-3f80f098d21e",
+        "packet_key": "packet:fab344aa357b",
+        "feature_key": "sveltekit-frontend.langgraph-research",
+        "predicate": "USES_CONCEPT",
+        "subject_type": "packet",
+        "subject_id": "packet:packet:fab344aa357b",
+        "object_type": "concept",
+        "object_id": "concept:export",
+        "evidence": null
+      },
+      "tags": [
+        "feature_ontology_tuples",
+        "USES_CONCEPT"
+      ],
+      "search_text": "USES_CONCEPT sveltekit-frontend.langgraph-research src/lib/server/ai/langgraph-research.ts"
+    }
+  ],
+  "sample": [
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:0127c74b316d07a07b1efe6ebacb3c53",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langgraph-dag",
+          "source_ref": "src/lib/server/ai/langgraph-dag.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:lanecounts",
+          "source_ref": "src/lib/server/ai/langgraph-dag.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/ai/langgraph-dag.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:a100c961-47dc-4f3c-90ac-ea6585ad4e4a"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "a100c961-47dc-4f3c-90ac-ea6585ad4e4a",
+        "packet_key": "packet:535843f8452c",
+        "feature_key": "sveltekit-frontend.langgraph-dag",
+        "feature_label": "langgraph-dag.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:02300873c011179c286e746182c555f7",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langgraph-research",
+          "source_ref": "src/lib/server/ai/langgraph-research.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:query",
+          "source_ref": "src/lib/server/ai/langgraph-research.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/ai/langgraph-research.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:7605dd9f-1af9-4ebf-9235-305984e8c26d"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "7605dd9f-1af9-4ebf-9235-305984e8c26d",
+        "packet_key": "packet:fab344aa357b",
+        "feature_key": "sveltekit-frontend.langgraph-research",
+        "feature_label": "langgraph-research.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:0293d009a9ef357d0b699a53a93f7193",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langgraph-client",
+          "source_ref": "src/lib/server/ai/langgraph-client.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:searchruntimequery",
+          "source_ref": "src/lib/server/ai/langgraph-client.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/ai/langgraph-client.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:784ba1f0-27b4-4d8f-ba85-6a8fdb27eaa8"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "784ba1f0-27b4-4d8f-ba85-6a8fdb27eaa8",
+        "packet_key": "packet:23045e5018cd",
+        "feature_key": "sveltekit-frontend.langgraph-client",
+        "feature_label": "langgraph-client.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:02a3a8c4e2fc3cd0d47ca95ceed565e7",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langextract-reranker",
+          "source_ref": "src/lib/server/retrieval/langextract-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:concepttokens",
+          "source_ref": "src/lib/server/retrieval/langextract-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/retrieval/langextract-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:c063f72d-546c-43c6-9891-6111b5bffa71"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "c063f72d-546c-43c6-9891-6111b5bffa71",
+        "packet_key": "packet:41b0d5a374fb",
+        "feature_key": "sveltekit-frontend.langextract-reranker",
+        "feature_label": "langextract-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:03b8e14b9987038a1ebe67a085212e59",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.cross-encoder-reranker",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:provenancebase",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:55067b34-302a-4541-b066-5abf412cf7e4"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "55067b34-302a-4541-b066-5abf412cf7e4",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "feature_label": "cross-encoder-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:045abefeae30220526f9c57fe1129de2",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.cross-encoder-reranker",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:body-results",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:5f718276-d4a6-4cd2-8cff-28caf21ff53c"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "5f718276-d4a6-4cd2-8cff-28caf21ff53c",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "feature_label": "cross-encoder-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:0475a8897ac923ee5206559199ae1675",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.cross-encoder-reranker",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:bge-reranker-v2-m3",
+          "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:1fe6a967-4662-410c-aab5-44b0a10acc1c"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "1fe6a967-4662-410c-aab5-44b0a10acc1c",
+        "packet_key": "packet:22d924cb73a1",
+        "feature_key": "sveltekit-frontend.cross-encoder-reranker",
+        "feature_label": "cross-encoder-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:04d3fd9316713a7b04ba46ac893f5f19",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langextract-reranker",
+          "source_ref": "src/lib/server/retrieval/langextract-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:rerankcontext",
+          "source_ref": "src/lib/server/retrieval/langextract-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/retrieval/langextract-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:b99eb6b3-8642-4e02-ade2-d565867ec1f3"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "b99eb6b3-8642-4e02-ade2-d565867ec1f3",
+        "packet_key": "packet:41b0d5a374fb",
+        "feature_key": "sveltekit-frontend.langextract-reranker",
+        "feature_label": "langextract-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:04decc122a7331fe4f78d177b63b7f8e",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.trace-reranker",
+          "source_ref": "src/lib/server/ai/trace-reranker.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:candidate",
+          "source_ref": "src/lib/server/ai/trace-reranker.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/ai/trace-reranker.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:076f61c8-748b-4392-b59b-640e5ba00a5b"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "076f61c8-748b-4392-b59b-640e5ba00a5b",
+        "packet_key": "packet:1e3a39aef4df",
+        "feature_key": "sveltekit-frontend.trace-reranker",
+        "feature_label": "trace-reranker.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    },
+    {
+      "schema": "atlas.feature-relationship.v1",
+      "relationship_id": "rel:feature-ontology:04e207ce600cbc081e613ac21f2e5fcb",
+      "relationship_type": "USES_CONCEPT",
+      "participants": [
+        {
+          "role": "subject",
+          "entity_type": "feature",
+          "entity_id": "sveltekit-frontend.langgraph-client",
+          "source_ref": "src/lib/server/ai/langgraph-client.ts"
+        },
+        {
+          "role": "object",
+          "entity_type": "concept",
+          "entity_id": "concept:set",
+          "source_ref": "src/lib/server/ai/langgraph-client.ts"
+        }
+      ],
+      "cardinality": [],
+      "source_ref": "src/lib/server/ai/langgraph-client.ts",
+      "source_revision": "ontology:atlas-ontology-v1:atlas-packets-ontology-v1",
+      "relationship_revision": "feature-ontology-relationship-preview:v1",
+      "producer_revision": "feature-ontology-relationship-preview:v1",
+      "evidence_refs": [
+        "feature_ontology_tuples:2738f6a1-1d8b-4b3e-9bbc-044c3c411d46"
+      ],
+      "confidence": 0.7,
+      "metadata": {
+        "preview_only": true,
+        "source_table": "feature_ontology_tuples",
+        "source_tuple_id": "2738f6a1-1d8b-4b3e-9bbc-044c3c411d46",
+        "packet_key": "packet:23045e5018cd",
+        "feature_key": "sveltekit-frontend.langgraph-client",
+        "feature_label": "langgraph-client.ts",
+        "domain_class": "backend",
+        "ontology_version": "atlas-ontology-v1",
+        "extractor_version": "atlas-packets-ontology-v1"
+      },
+      "participant_count": 2,
+      "relationship_degree": 2,
+      "relationship_degree_kind": "binary"
+    }
+  ]
+}

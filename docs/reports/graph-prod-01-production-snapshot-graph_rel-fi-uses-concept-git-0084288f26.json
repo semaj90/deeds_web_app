@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.graph-prod-01.production-snapshot-build.v1",
+  "workspaceRevision": "git:0084288f26",
+  "graphRevision": "graph:rel-fi-uses-concept-git-0084288f26",
+  "realHyperedgesRead": 62802,
+  "realFeatureRelationshipsRead": 603,
+  "kernelsBuilt": 63405,
+  "kernelsIncluded": 63405,
+  "kernelsExcludedByRevisionMismatch": 0,
+  "projection": {
+    "entityCount": 41968,
+    "relationCount": 63405,
+    "unresolvedParticipantCount": 0,
+    "nodeTableHash": "7b7323dbd7ca74ccbeabe4abfd32449c88e68845535bd278cd9ba835b9fb28c3",
+    "edgeTableHash": "ced29af0865f90ed014ecea4a93c7603cf544f9b4c514acb9bc278bdd67148ce",
+    "projectionHash": "3acdd4bbffffafacec89fd7d84602974c96ac7b3f266646bd11d4eb7798eba66"
+  },
+  "edgeArtifactPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_rel-fi-uses-concept-git-0084288f26.arrow",
+  "edgeArtifactBytes": 10889264,
+  "edgeArtifactChecksum": "ddc3e70d4e2c7caa689e4cbae4fe274c53480c44e00d01bf3982d76e7d349b82",
+  "snapshot": {
+    "schema": "atlas.structural-graph-snapshot.v1",
+    "workspaceRevision": "git:0084288f26",
+    "graphRevision": "graph:rel-fi-uses-concept-git-0084288f26",
+    "candidateSnapshotRevision": "git:0084288f26",
+    "ordinalMapChecksum": "7b7323dbd7ca74ccbeabe4abfd32449c88e68845535bd278cd9ba835b9fb28c3",
+    "nodeCount": 105373,
+    "edgeCount": 126810,
+    "edgeArtifact": {
+      "format": "ARROW_IPC",
+      "checksum": "ddc3e70d4e2c7caa689e4cbae4fe274c53480c44e00d01bf3982d76e7d349b82",
+      "ref": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_rel-fi-uses-concept-git-0084288f26.arrow"
+    },
+    "canonicalAuthority": false
+  },
+  "artifactChecksumDeterministic": true
+}

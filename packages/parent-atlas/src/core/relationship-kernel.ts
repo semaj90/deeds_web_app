@@ -145,6 +145,12 @@ export function featureRelationshipToKernel(
     evidenceRefs: relationship.evidence_refs,
     sourceRef: relationship.source_ref,
     sourceRevision: relationship.source_revision,
+    workspaceRevision: typeof relationship.metadata.workspace_revision === 'string'
+      ? relationship.metadata.workspace_revision
+      : null,
+    graphRevision: typeof relationship.metadata.graph_revision === 'string'
+      ? relationship.metadata.graph_revision
+      : null,
     relationshipRevision: relationship.relationship_revision,
     producerRevision: relationship.producer_revision,
   });
