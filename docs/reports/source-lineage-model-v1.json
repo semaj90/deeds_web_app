@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.source-lineage-model.v1",
+  "generatedAt": "2026-08-27T19:56:42.519Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "observation": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-binding-observation.json",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "bindingRows": 23626
+  },
+  "layers": {
+    "stableSourceIdentity": "SCHEMA_PRESENT",
+    "sourceVersionObservation": "GRAPHIFY_BACKED_PROVEN",
+    "legacyAliasBinding": "MISSING",
+    "workspaceSourceBinding": "MISSING",
+    "currentProjection": "READ_ONLY_QUERY_SHAPE_PROVEN_NOT_DURABLE_VIEW"
+  },
+  "tables": {
+    "atlas_packets": 140,
+    "atlas_source_refs": 23,
+    "graphify_files": 20
+  },
+  "stableSourceIdentity": {
+    "rows": 22487,
+    "source_refs": 22487
+  },
+  "sourceVersionObservation": {
+    "rows": 768,
+    "source_refs": 768,
+    "content_hash_present": 768,
+    "source_revision_present": 768,
+    "workspace_revision_present": 128
+  },
+  "stableIdentityCoverage": {
+    "graphify_source_refs": 768,
+    "graphify_refs_in_registry": 0,
+    "graphify_refs_missing_registry": 768
+  },
+  "currentProjection": {
+    "packet_rows": 61660,
+    "packet_source_refs": 61659,
+    "exact_current_projection": 661,
+    "source_revision_joined": 661,
+    "current_workspace_joined": 128
+  },
+  "projectionChecksum": "61a6ca7cc22d2113a6efa44f112c0ddee80391d406a16c806778d843f268045b",
+  "policy": {
+    "sourceRef": "locator_only",
+    "canonicalSource": "stable_identity",
+    "sourceRevision": "content_version",
+    "workspaceRevision": "observed_version_set",
+    "alias": "evidence_backed_relation",
+    "normalizedMatch": "review_only_until_explicit_alias_approval"
+  },
+  "status": "IDENTITY_AND_VERSION_LAYERS_AVAILABLE_BINDING_LAYER_MISSING",
+  "nextGate": "PROVE_OR_INCUBATE_EXPLICIT_ALIAS_AND_WORKSPACE_SOURCE_BINDING_RELATIONS"
+}

@@ -1,0 +1,255 @@
+{
+  "schema": "atlas.graphify-packet-lineage-census-v1",
+  "generatedAt": "2026-08-27T19:45:29.061Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "packetSourceColumn": "source_ref",
+  "packetContentHashColumn": "content_hash",
+  "packetSourceRevisionColumn": null,
+  "sourceRevisionAuthorityColumn": "code_source_revision",
+  "gitProvenanceColumn": "graphify_files.source_revision",
+  "packetWorkspaceRevisionColumn": "workspace_revision",
+  "counts": {
+    "packet_rows": 61660,
+    "packet_rows_with_source_ref": 61659,
+    "exact_source_ref": 661,
+    "missing_graphify_source": 60998,
+    "duplicate_source_ref": 0,
+    "source_revision_match": 0,
+    "stale_packet": 128
+  },
+  "classificationCounts": {
+    "IDENTITY_UNRESOLVED": 1,
+    "MISSING_GRAPHIFY_SOURCE": 60998,
+    "PACKET_CONTENT_HASH_UNAVAILABLE": 618,
+    "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 43
+  },
+  "packetContentIntegrity": {
+    "identity_unresolved": 1,
+    "chunk_source_missing": 57179,
+    "packet_chunk_hash_ambiguous": 4148,
+    "packet_content_hash_unavailable": 0,
+    "packet_chunk_hash_exact": 332,
+    "packet_chunk_hash_mismatch": 0
+  },
+  "sourceContentIntegrity": {
+    "observedBindingPath": "docs/reports/workspace-source-binding-observation.json",
+    "workspaceBindingMatches": 768,
+    "hashExact": 768,
+    "hashMismatch": 0,
+    "observationMissing": 0,
+    "revisionExact": 768,
+    "revisionMismatch": 0
+  },
+  "reconciliation": {
+    "graphify_files_total_rows": 768,
+    "graphify_distinct_source_refs": 768,
+    "workspace_binding_matches": 768,
+    "source_digest_matches": 768,
+    "latest_batch_selection_checksum": "f48ed93306f0e95611c4a74d9e5b6de8c820d31beaf78052668a2530c69508a9",
+    "latest_batch_applied": true,
+    "latest_batch_readback_count": 128,
+    "latest_batch_report": ".tmp/atlas/graphify-source-inventory-batch-v1.json",
+    "latest_batch_readback_report": "docs/reports/graphify-source-inventory-batch-readback-v1.json"
+  },
+  "unmatchedSourceRefSamples": {
+    "packetOnly": [
+      {
+        "source_ref": "1",
+        "count": 1
+      },
+      {
+        "source_ref": "61026__.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_10_libtorch_review.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_10_todo_parentatlas.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_11_26_mem.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_11_26_phase5_cannonical_.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_11_todo.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_13_26_todo.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_13_26__.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "___6_13-codexout_.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_13_opencode_validation_skills.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_14_26_codexended_614.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_14_26__todo_find_schema_matching.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_14_26__to_do_parent_atlas_registery.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_15_hyperrag_tod.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "618__25todo.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_18_todopt2.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_18_todo_pt3.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "6_19_26_pt1.2_todo.txt",
+        "count": 1
+      },
+      {
+        "source_ref": "619_nextsteps_todopt1.3.txt",
+        "count": 1
+      }
+    ],
+    "graphifyOnly": [
+      {
+        "source_ref": ".claude/AGENT_CONSTITUTION.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/AGENT_RECOMMENDATIONS.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/agents/drizzle-inspector.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/agents/obsidian-cartographer.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/agents/sveltekit-route-auditor.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/agents/topology-medic.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/CLAUDE.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/audit-components.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/audit-duplication.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/deep-audit.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/graphify.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/nes-arch.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/prune-codebase.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/shallow-wiring-analysis.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/commands/wire-modules.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/DISTILLED_MEMORY.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/FORBIDDEN.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/GPU_RULES.md",
+        "count": 1
+      },
+      {
+        "source_ref": ".claude/hooks/LLMS.md",
+        "count": 1
+      }
+    ]
+  },
+  "gates": {
+    "sourceBinding": {
+      "exact": 661,
+      "missing": 60998,
+      "unresolved": 1,
+      "duplicate": 0,
+      "proven": false
+    },
+    "packetContentIntegrity": {
+      "exact": 332,
+      "unavailable": 0,
+      "ambiguous": 4148,
+      "mismatch": 0,
+      "proven": true
+    },
+    "sourceContentIntegrity": {
+      "exact": 768,
+      "mismatch": 0,
+      "observationMissing": 0,
+      "proven": true
+    },
+    "sourceRevisionBinding": {
+      "exact": 768,
+      "mismatch": 0,
+      "available": true,
+      "proven": true
+    },
+    "exactSourceRefAvailable": true,
+    "exactContentHashAvailable": true,
+    "sourceRevisionMatchAvailable": true,
+    "sourceRevisionMatchStatus": "PACKET_LOCAL_FIELD_NOT_REQUIRED_JOIN_DERIVED_SOURCE_REVISION_PROVEN",
+    "workspaceRevisionStatus": "MEASURED",
+    "cleanForBackfill": false
+  }
+}

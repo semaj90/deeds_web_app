@@ -1,16 +1,286 @@
 {
   "schema": "atlas.observation-feature-aggregation-receipt.v1",
-  "generatedAt": "2026-08-25T01:47:14.309Z",
+  "generatedAt": "2026-08-27T17:28:09.388Z",
   "readOnly": true,
   "writes": false,
-  "inputIdentityRows": 0,
-  "inputDomainRows": 0,
-  "outputProjectionRows": 0,
-  "aggregatedSymbolRows": 0,
-  "collisionRowsReduced": 0,
-  "fallbackProjectionRows": 0,
+  "inputIdentityRows": 4365,
+  "inputDomainRows": 4365,
+  "outputProjectionRows": 174,
+  "aggregatedSymbolRows": 4365,
+  "collisionRowsReduced": 4191,
+  "fallbackProjectionRows": 63,
   "outputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\observation-feature-projection-plan.jsonl",
-  "planChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-  "sample": [],
+  "planChecksum": "a75ddd8e44336aa89d99de992eec0e0f24c5ec921a8032380f5890869518271c",
+  "sample": [
+    {
+      "schema": "atlas.observation-feature-projection-plan-row.v1",
+      "packetKey": "ace:packet:047c77e6863e",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "sourceRef": "packages/atlas-core/src/smoke-test.ts",
+      "sourceRevision": "workspace:0",
+      "treeNodeId": "6165a6e3-7261-4d42-8f42-02e7e7927143",
+      "symbolCount": 4,
+      "symbolNames": [
+        "mockPacket",
+        "orchestrator",
+        "reader",
+        "task"
+      ],
+      "symbolKinds": [
+        "variable"
+      ],
+      "astObservationKinds": [
+        "VARIABLE_DECL"
+      ],
+      "primaryDomains": [
+        "agent",
+        "retrieval"
+      ],
+      "fallbackDomainCount": 0,
+      "flattenedTags": [
+        "ast=variable_decl",
+        "domain=agent",
+        "domain=retrieval"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "ca731115c54998121ed664fc2141fa2507b2227cdd1b27554df61b35afb87718"
+    },
+    {
+      "schema": "atlas.observation-feature-projection-plan-row.v1",
+      "packetKey": "ace:packet:04abe0bfe254",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "sourceRevision": "workspace:0",
+      "treeNodeId": "b2406e75-39d2-4940-b796-f8eaab381911",
+      "symbolCount": 23,
+      "symbolNames": [
+        "addBlocker",
+        "addEvent",
+        "blockers",
+        "computeDepth",
+        "constructor",
+        "DagReducer",
+        "depth",
+        "dfs",
+        "existing",
+        "incoming",
+        "key",
+        "nodeDepth",
+        "outgoing",
+        "reduce",
+        "reducer",
+        "roots",
+        "scored",
+        "severity",
+        "severityRank",
+        "severityScore",
+        "visited"
+      ],
+      "symbolKinds": [
+        "class",
+        "method",
+        "variable"
+      ],
+      "astObservationKinds": [
+        "CLASS_DECL",
+        "FUNCTION_DECL",
+        "VARIABLE_DECL"
+      ],
+      "primaryDomains": [
+        "agent"
+      ],
+      "fallbackDomainCount": 0,
+      "flattenedTags": [
+        "ast=class_decl",
+        "ast=function_decl",
+        "ast=variable_decl",
+        "domain=agent"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "eb2e8d1ea5302edf6ecdd22f60a3cc13a9f2a46a7c75129858a24493f96fed8c"
+    },
+    {
+      "schema": "atlas.observation-feature-projection-plan-row.v1",
+      "packetKey": "ace:packet:05c077ba0f26",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "sourceRef": "src/lib/client/search-client.ts",
+      "sourceRevision": "workspace:0",
+      "treeNodeId": "e837d5f4-16de-47dc-9090-835bd78114c4",
+      "symbolCount": 16,
+      "symbolNames": [
+        "data",
+        "getSearchFilters",
+        "getSearchSuggestions",
+        "params",
+        "res",
+        "response",
+        "searchCases",
+        "searchLaws",
+        "SearchQuery",
+        "SearchResponse",
+        "SearchResult",
+        "trackSearch",
+        "unifiedSearch"
+      ],
+      "symbolKinds": [
+        "function",
+        "interface",
+        "variable"
+      ],
+      "astObservationKinds": [
+        "FUNCTION_DECL",
+        "INTERFACE_DECL",
+        "VARIABLE_DECL"
+      ],
+      "primaryDomains": [
+        "retrieval"
+      ],
+      "fallbackDomainCount": 0,
+      "flattenedTags": [
+        "ast=function_decl",
+        "ast=interface_decl",
+        "ast=variable_decl",
+        "domain=retrieval"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "7f451a330b4013bbce429f57c9af3b09ebe636a3a18625e5050f4f26d17e7ec0"
+    },
+    {
+      "schema": "atlas.observation-feature-projection-plan-row.v1",
+      "packetKey": "ace:packet:0604a02ade1f",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "sourceRef": "src/lib/config/env.server.ts",
+      "sourceRevision": "workspace:0",
+      "treeNodeId": "4f8b80d0-4d83-4103-9766-84a93bce8efc",
+      "symbolCount": 60,
+      "symbolNames": [
+        "Config",
+        "CONFIG",
+        "ConfigSchema",
+        "endpoint",
+        "fallbackHost",
+        "fallbackPassword",
+        "fallbackPort",
+        "fallbackUser",
+        "getCodebaseIndexUrl",
+        "getCouchDbUrl",
+        "getCudaServiceUrl",
+        "getDatabaseUrl",
+        "getEnvironmentInfo",
+        "getMcpMulticoreUrl",
+        "getMinioConfig",
+        "getNeo4jConfig",
+        "getObjectStoragePort",
+        "getObjectStorageUseSSL",
+        "getOllamaUrl",
+        "getOrchestratorUrl",
+        "getQdrantUrl",
+        "getRabbitMQManagementAuth",
+        "getRabbitMQManagementUrl",
+        "getRabbitMQUrl",
+        "getRagServiceUrl",
+        "getRedisHost",
+        "getRedisPassword",
+        "getRedisPort",
+        "getRedisUrl",
+        "getTritonUrl",
+        "getTrtLlmUrl",
+        "hasPlaceholderAuth",
+        "input",
+        "isDocker",
+        "isDockerEnvironment",
+        "isProduction",
+        "LEGACY",
+        "LOCALHOST",
+        "LOOPBACK_IP",
+        "normalizeObjectStorageEndpoint",
+        "normalizeObjectStorageUrl",
+        "normalizeRedisUrl",
+        "parsed",
+        "parsedPort",
+        "pass",
+        "port",
+        "raw",
+        "redisPassword",
+        "scheme",
+        "url",
+        "user"
+      ],
+      "symbolKinds": [
+        "function",
+        "type",
+        "variable"
+      ],
+      "astObservationKinds": [
+        "FUNCTION_DECL",
+        "TYPE_ALIAS",
+        "VARIABLE_DECL"
+      ],
+      "primaryDomains": [
+        "agent",
+        "auth",
+        "cache",
+        "database",
+        "graph",
+        "network",
+        "retrieval",
+        "ui"
+      ],
+      "fallbackDomainCount": 2,
+      "flattenedTags": [
+        "ast=function_decl",
+        "ast=type_alias",
+        "ast=variable_decl",
+        "domain=agent",
+        "domain=auth",
+        "domain=cache",
+        "domain=database",
+        "domain=general",
+        "domain=graph",
+        "domain=network",
+        "domain=retrieval",
+        "domain=ui"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "c5086a980cd5c184f9960290d86577f7075e8f1f26836f6820dfbfc290512c0d"
+    },
+    {
+      "schema": "atlas.observation-feature-projection-plan-row.v1",
+      "packetKey": "ace:packet:068730e767d2",
+      "featureRevision": "atlas-ast-entity-prefill-v2",
+      "sourceRef": "packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
+      "sourceRevision": "workspace:0",
+      "treeNodeId": "dccd3b2f-0949-46c5-b3e2-2fe60a85a728",
+      "symbolCount": 7,
+      "symbolNames": [
+        "args",
+        "graph",
+        "initialState",
+        "isDryRun",
+        "isVerbose",
+        "main",
+        "result"
+      ],
+      "symbolKinds": [
+        "function",
+        "variable"
+      ],
+      "astObservationKinds": [
+        "FUNCTION_DECL",
+        "VARIABLE_DECL"
+      ],
+      "primaryDomains": [
+        "agent"
+      ],
+      "fallbackDomainCount": 0,
+      "flattenedTags": [
+        "ast=function_decl",
+        "ast=variable_decl",
+        "domain=agent"
+      ],
+      "canonicalWrite": false,
+      "inputDigest": "5b60634224b4fcc4cd8bd3898de2a9f71cd504a045520a75f2a7a5d65aad2c4e"
+    }
+  ],
   "nextGate": "REVIEW_AGGREGATED_PLAN_BEFORE_MATERIALIZER_APPLY"
 }

@@ -90,6 +90,7 @@ async function main() {
   const dirtyOutput = await git(['diff', '--name-only', '-z', 'HEAD']);
   const dirtyPaths = new Set(dirtyOutput.split('\0').filter(Boolean).map((item) => item.replace(/\\/g, '/')));
   const files = await currentSourceFiles();
+  const outputSourceRef = path.relative(REPO_ROOT, OUT).replace(/\\/g, '/');
 
   const entries: WorkspaceSourceManifestEntryV1[] = [];
   const tracked = new Map<string, boolean>();
@@ -97,6 +98,12 @@ async function main() {
   const skipped: Array<{ sourceRef: string; reason: string }> = [];
 
   for (const sourceRef of files) {
+    // The receipt is derived evidence, not source input. Including it would
+    // make each write change the next workspace revision digest.
+    if (sourceRef === outputSourceRef) {
+      skipped.push({ sourceRef, reason: 'OBSERVATION_OUTPUT_EXCLUDED' });
+      continue;
+    }
     const absolute = path.resolve(REPO_ROOT, sourceRef);
     if (absolute !== REPO_ROOT && !absolute.startsWith(`${REPO_ROOT}${path.sep}`)) {
       skipped.push({ sourceRef, reason: 'PATH_OUTSIDE_REPOSITORY' });

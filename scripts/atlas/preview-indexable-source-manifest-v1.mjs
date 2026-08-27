@@ -16,8 +16,20 @@ const outputDir = path.resolve(ROOT, value('--output-dir', '.tmp/atlas/indexable
 const outputPath = path.join(outputDir, 'manifest.jsonl');
 const reportPath = path.join(ROOT, 'docs/reports/indexable-source-manifest-v1.json');
 const maxBytes = 64 * 1024 * 1024;
-const excluded = new Set(['.git', 'node_modules', '.svelte-kit', 'dist', 'build', '.next', '.vite', '.venv', '.venv-cu130', '.venv-gemma4', '.venv_turbovec', '.venv-py313-backup', '.python311', '.cache', '.pytest_cache', '__pycache__', '.agent', '.opencode', '.tmp', 'backups', 'archive', 'tmp', 'logs', 'coverage', 'reports', 'external-docs', 'claude-mem', 'models', 'crates', 'mcp-server-mcp', 'gsd_archives', 'memory', 'target', '.vscode', 'screenshots', 'obsidian-vault', 'scratch', 'phase104-backups', 'docs_readme', 'llama-cpp-turboquant-gemma4', 'neschrom97', '.svelte-error-fixes-backup', '.claude', '.cline', '.clinerules', '.parent-atlas', 'deeds_labs']);
+const excluded = new Set(['.git', 'node_modules', '.svelte-kit', 'dist', 'build', '.next', '.vite', '.venv', '.venv-cu130', '.venv-gemma4', '.venv_turbovec', '.venv-py313-backup', '.python311', '.cache', '.pytest_cache', '__pycache__', '.agent', '.opencode', '.tmp', 'backups', 'archive', 'tmp', 'logs', 'coverage', 'reports', 'external-docs', 'claude-mem', 'models', 'crates', 'turbovec', 'gpu-*', 'mcp-server-mcp', 'gsd_archives', 'datasets', 'memory', 'target', '.vscode', 'screenshots', 'obsidian-vault', 'scratch', 'phase104-backups', 'docs_readme', 'llama*', 'llama-cpp-turboquant-gemma4', 'legal-bert*', 'gemma3_*', 'llms.txt', 'llms-full.txt', 'neschrom97', '.svelte-error-fixes-backup', '.claude', '.cline', '.clinerules', '.parent-atlas', 'tools/agentic-research/src', 'deeds_labs']);
 const extensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts', '.py', '.go', '.rs', '.svelte', '.md', '.json', '.yaml', '.yml', '.sql', '.sh']);
+
+function isExcludedName(name) {
+  return excluded.has(name) || [...excluded].some((pattern) => pattern.endsWith('*') && name.startsWith(pattern.slice(0, -1)));
+}
+
+function isExcludedPath(relativePath) {
+  const normalized = relativePath.replaceAll('\\', '/');
+  return [...excluded].some((pattern) => {
+    if (pattern.includes('/')) return normalized === pattern || normalized.startsWith(`${pattern}/`);
+    return isExcludedName(normalized.split('/').at(-1) ?? '') || normalized.split('/').includes(pattern);
+  });
+}
 
 function gitRevision() {
   try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim(); }
@@ -38,11 +50,11 @@ async function walk(dir, rows) {
   try { entries = await fsp.readdir(dir, { withFileTypes: true }); } catch { return; }
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
     if (rows.length >= limit) return;
-    if (excluded.has(entry.name)) continue;
     const absolutePath = path.join(dir, entry.name);
+    const relativePath = path.relative(ROOT, absolutePath).replaceAll('\\', '/');
+    if (isExcludedName(entry.name) || isExcludedPath(relativePath)) continue;
     if (entry.isDirectory()) { await walk(absolutePath, rows); continue; }
     if (!entry.isFile() || !extensions.has(path.extname(entry.name).toLowerCase())) continue;
-    const relativePath = path.relative(ROOT, absolutePath).replaceAll('\\', '/');
     let sizeBytes = null;
     let contentHash = null;
     let status = 'HASHED';

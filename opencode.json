@@ -3,34 +3,6 @@
   "model": "llama-server/ornith-1.5-9b",
   "default_agent": "ornith-trace-audit",
   "provider": {
-    "atomic": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Atomic Chat (Ornith :1337)",
-      "options": {
-        "baseURL": "http://127.0.0.1:1337/v1",
-        "apiKey": "local"
-      },
-      "models": {
-        "unsloth/Ornith-1_0-9B-Q4_K_S": {
-          "name": "Ornith 1.0 9B Q4_K_S (65K)",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        },
-        "ornith": {
-          "name": "Ornith 1.0 9B Q4_K_S (65K)",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        }
-      }
-    },
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "llama-server (:8090)",
@@ -39,56 +11,10 @@
         "apiKey": "local"
       },
       "models": {
-        "hforf.gguf": {
-          "name": "HForF GGUF (tool-calling)",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        },
         "ornith-1.5-9b": {
-          "name": "Ornith 1.5 9B (candidate tool-calling)",
+          "name": "Ornith 1.5 9B (Qwen-compatible tool-calling)",
           "tools": true,
           "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        },
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        },
-        "unsloth/Ornith-1_0-9B-Q4_K_S": {
-          "name": "Ornith 1.0 9B 65K",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        }
-      }
-    },
-    "gemma4-adapter": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Gemma4 Adapter (:8091)",
-      "options": {
-        "baseURL": "http://127.0.0.1:8091/v1",
-        "apiKey": "local"
-      },
-      "models": {
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
-          "tools": true,
-          "reasoning": false,
           "limit": {
             "context": 65536,
             "output": 4096
@@ -114,67 +40,6 @@
       "timeout": 30000
     }
   },
-  "agent": {
-    "ornith-trace-audit": {
-      "mode": "primary",
-      "description": "Read-only repository auditor using native TRACE retrieval tools",
-      "model": "llama-server/ornith-1.5-9b",
-      "temperature": 0,
-      "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "grep": "allow",
-        "glob": "allow",
-        "lsp": "allow",
-        "bash": "ask",
-        "Get-Location": "allow",
-        "git status": "allow",
-        "git diff": "allow",
-        "rg": "allow",
-        "atlas.*": "allow",
-        "ace.*": "allow",
-        "trace.*": "allow",
-        "kag.*": "allow",
-        "taxonomy.*": "allow",
-        "clusters.*": "allow",
-        "hypergraph.*": "allow",
-        "knowledge.*": "allow",
-        "codebase.*": "allow",
-        "ops.*": "allow",
-        "runtime.*": "allow",
-        "LLMS.md.*": "allow",
-        "evidence.*": "allow",
-        "image.*": "allow",
-        "shell.*": "allow",
-        "edit": "deny"
-      }
-    },
-    "gemma4-function-caller": {
-      "mode": "subagent",
-      "description": "Gemma4 function calling auditor on port 8090",
-      "model": "llama-server/ornith-1.5-9b",
-      "temperature": 0,
-      "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "grep": "allow",
-        "glob": "allow",
-        "lsp": "allow",
-        "bash": "ask",
-        "atlas.*": "allow",
-        "ace.*": "allow",
-        "trace.*": "allow",
-        "kag.*": "allow",
-        "codebase.*": "allow",
-        "ops.*": "allow",
-        "edit": "deny"
-      }
-    }
-  },
   "small_model": "llama-server/ornith-1.5-9b",
   "agent": {
     "ornith-trace-audit": {
@@ -183,7 +48,7 @@
       "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "prompt": "When a tool is needed, use the provider's native structured tool-calling mechanism. Do not narrate, imitate, or manually print tool invocations in ordinary response content. Never expose raw tool-call syntax to the user. Wait for actual tool results before making claims based on them. Use exact TRACE tool names exposed by the connected MCP server. Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -214,13 +79,13 @@
       },
       "options": {}
     },
-    "gemma4-function-caller": {
+    "ornith-function-caller": {
       "mode": "subagent",
-      "description": "Gemma4 function calling auditor on port 8090",
+      "description": "Ornith 1.5 function-calling auditor on llama-server :8090",
       "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
+      "prompt": "When a tool is needed, use the provider's native structured tool-calling mechanism. Do not narrate, imitate, or manually print tool invocations in ordinary response content. Never expose raw tool-call syntax to the user. Wait for actual tool results before making claims based on them. Prefer TRACE MCP retrieval tools. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",

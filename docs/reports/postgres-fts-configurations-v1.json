@@ -1,12 +1,17 @@
 {
   "schema": "atlas.postgres-fts-configurations.v1",
-  "generatedAt": "2026-08-26T18:40:36.514Z",
+  "generatedAt": "2026-08-27T19:58:15.504Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "queryConfigurations": [
     "english",
     "simple"
   ],
+  "queryConfiguration": "english",
+  "documentConfiguration": "MIXED",
+  "searchVectorProducer": "compute_codebase_chunk_search_vector",
+  "ginIndexPresent": true,
+  "configurationAligned": false,
   "queries": [
     "getUserById",
     "semantic_768",

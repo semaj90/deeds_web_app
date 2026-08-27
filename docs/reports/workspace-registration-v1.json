@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.workspace-registration.v1",
+  "mode": "dry-run",
+  "canonicalAuthority": "postgresql",
+  "table": "public.workspaces",
+  "proposedWorkspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "title": "deeds-web-app non-production Graphify canary",
+  "description": "Explicitly registered non-production workspace for bounded Graphify lineage proof.",
+  "canonicalWriteAttempted": false,
+  "status": "DRY_RUN_READY_FOR_REVIEW",
+  "nextStep": "Re-run with --apply --confirm=I_UNDERSTAND_NON_PRODUCTION_WORKSPACE_REGISTRATION and ATLAS_NON_PRODUCTION_DATABASE=1"
+}

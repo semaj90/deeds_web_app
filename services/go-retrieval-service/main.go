@@ -142,6 +142,28 @@ func envOr(key, fallback string) string {
 	return fallback
 }
 
+// buildCodebaseTagFilters is the single compatibility owner for codebase tag
+// filtering. `tags` is canonical; `qdrant_tags` remains a legacy read path
+// while older points are migrated from PostgreSQL authority.
+func buildCodebaseTagFilters(rawTags []string) []*qdrantclient.Condition {
+	filters := make([]*qdrantclient.Condition, 0, len(rawTags))
+	for _, rawTag := range rawTags {
+		tag := strings.TrimSpace(rawTag)
+		if tag == "" || len(tag) > 200 {
+			continue
+		}
+		filters = append(filters, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: []*qdrantclient.Condition{
+					qdrantclient.NewMatch("tags", tag),
+					qdrantclient.NewMatch("qdrant_tags", tag),
+				}},
+			},
+		})
+	}
+	return filters
+}
+
 func envOrAny(keys ...string) string {
 	if len(keys) == 0 {
 		return ""
@@ -1928,20 +1950,7 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 	var extraFilters []*qdrantclient.Condition
 
 	// 1. Tags
-	if len(req.Tags) > 0 {
-		for _, tag := range req.Tags {
-			// `tags` is the active codebase payload key. Keep the historical
-			// `qdrant_tags` key as a compatibility alternative for older points.
-			extraFilters = append(extraFilters, &qdrantclient.Condition{
-				ConditionOneOf: &qdrantclient.Condition_Filter{
-					Filter: &qdrantclient.Filter{Should: []*qdrantclient.Condition{
-						qdrantclient.NewMatch("tags", tag),
-						qdrantclient.NewMatch("qdrant_tags", tag),
-					}},
-				},
-			})
-		}
-	}
+	extraFilters = append(extraFilters, buildCodebaseTagFilters(req.Tags)...)
 
 	// 2. SourceFilter
 	if len(req.SourceFilter) > 0 {
@@ -2288,21 +2297,7 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "too many tags", http.StatusBadRequest)
 		return
 	}
-	var tagFilters []*qdrantclient.Condition
-	for _, rawTag := range body.Tags {
-		tag := strings.TrimSpace(rawTag)
-		if tag == "" || len(tag) > 200 {
-			continue
-		}
-		tagFilters = append(tagFilters, &qdrantclient.Condition{
-			ConditionOneOf: &qdrantclient.Condition_Filter{
-				Filter: &qdrantclient.Filter{Should: []*qdrantclient.Condition{
-					qdrantclient.NewMatch("tags", tag),
-					qdrantclient.NewMatch("qdrant_tags", tag),
-				}},
-			},
-		})
-	}
+	tagFilters := buildCodebaseTagFilters(body.Tags)
 	resp, err := s.searchCodebase(r.Context(), &pb.CodebaseSearchRequest{
 		Query:        body.Query,
 		Limit:        body.Limit,

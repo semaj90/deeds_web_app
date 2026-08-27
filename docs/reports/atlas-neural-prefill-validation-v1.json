@@ -1,6 +1,6 @@
 {
   "schema": "atlas.neural-prefill-validation-receipt.v1",
-  "generatedAt": "2026-08-25T03:52:59.806Z",
+  "generatedAt": "2026-08-27T17:28:12.928Z",
   "status": "PASS",
   "readinessPercent": 70,
   "readOnly": true,

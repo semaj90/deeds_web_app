@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.graphify-source-inventory-batch-readback-v1",
+  "status": "GRAPHIFY_SOURCE_BATCH_READBACK_PROVEN",
+  "readOnly": true,
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "selectionChecksum": "e7c1d6b32faeef6971969efc0dc13986386c0a1715a929a1f14111f6cdbf69f6",
+  "selectedSourceCount": 128,
+  "readbackRowCount": 128,
+  "readbackUniqueSourceCount": 128,
+  "matchedSourceCount": 128,
+  "mismatches": [],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "packets": false
+  }
+}

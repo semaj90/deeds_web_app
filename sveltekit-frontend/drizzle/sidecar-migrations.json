@@ -440,6 +440,13 @@
       "appliedAt": "2026-08-26",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.atlas_algorithm_execution_receipts');\""
+    },
+    {
+      "file": "manual/20260827_source_lineage_relations_v1.sql",
+      "status": "design_unapplied",
+      "reason": "Incubation schema for stable source aliases and workspace-scoped source-version bindings. Not applied; owner and producer approval remain required.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/validate-source-lineage-relations-v1.mjs"
     }
   ]
 }

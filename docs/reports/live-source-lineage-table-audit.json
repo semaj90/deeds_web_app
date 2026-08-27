@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-27T04:38:30.463Z",
+  "generatedAt": "2026-08-27T15:19:38.011Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -1553,7 +1553,7 @@
       "configuredSearchPath": "\"$user\", public",
       "effectiveSearchPath": "{pg_catalog,public}",
       "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-      "serverAddress": "172.18.0.20/32",
+      "serverAddress": "172.18.0.23/32",
       "serverPort": 5432,
       "relations": [
         {
@@ -1627,7 +1627,7 @@
           "selectable": true
         }
       ],
-      "fingerprintSha256": "a7b50678e5ca9697179eb35a9e4f1de820a4fd7367b135c7c7821c0f9eb62292"
+      "fingerprintSha256": "8537a000a167fd8c329d74db0eef8c7e9b8d4f08e64c8f389d0bd23003417d58"
     },
     "status": "READBACK_PROVEN"
   }

@@ -1,0 +1,104 @@
+{
+  "schema": "atlas.source-admission-parity-receipt.v1",
+  "readOnly": true,
+  "writesPerformed": false,
+  "gitOracle": "git check-ignore --no-index",
+  "scanner": "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts",
+  "manifest": ".tmp/atlas/indexable-source-manifest-v1/manifest.jsonl",
+  "counts": {
+    "CANONICAL_SCOPE_OVER_GIT": 3,
+    "EXACT": 3
+  },
+  "observations": [
+    {
+      "path": "packages/parent-atlas/src/core/compute-dag-policy.ts",
+      "git": {
+        "ignored": false,
+        "matchingRule": ".gitignore:807:!packages/parent-atlas/src/core/**\tpackages/parent-atlas/src/core/compute-dag-policy.ts"
+      },
+      "scanner": {
+        "admitted": true
+      },
+      "manifest": {
+        "admitted": true,
+        "status": "HASHED"
+      },
+      "classification": "EXACT"
+    },
+    {
+      "path": "packages/parent-atlas/src/core/ace-synthesis-graph.ts",
+      "git": {
+        "ignored": false,
+        "matchingRule": ".gitignore:807:!packages/parent-atlas/src/core/**\tpackages/parent-atlas/src/core/ace-synthesis-graph.ts"
+      },
+      "scanner": {
+        "admitted": true
+      },
+      "manifest": {
+        "admitted": true,
+        "status": "HASHED"
+      },
+      "classification": "EXACT"
+    },
+    {
+      "path": "crates/atlas_packet_parser/src/lib.rs",
+      "git": {
+        "ignored": false,
+        "matchingRule": null
+      },
+      "scanner": {
+        "admitted": false
+      },
+      "manifest": {
+        "admitted": false,
+        "status": "ABSENT"
+      },
+      "classification": "CANONICAL_SCOPE_OVER_GIT"
+    },
+    {
+      "path": "gsd_archives/phase-2f1-baseline/schema-backup/admin-chat.ts",
+      "git": {
+        "ignored": false,
+        "matchingRule": null
+      },
+      "scanner": {
+        "admitted": false
+      },
+      "manifest": {
+        "admitted": false,
+        "status": "ABSENT"
+      },
+      "classification": "CANONICAL_SCOPE_OVER_GIT"
+    },
+    {
+      "path": "sveltekit-frontend/models/naive-bayes-rejected-errors.json",
+      "git": {
+        "ignored": true,
+        "matchingRule": ".gitignore:580:sveltekit-frontend/models/\tsveltekit-frontend/models/naive-bayes-rejected-errors.json"
+      },
+      "scanner": {
+        "admitted": false
+      },
+      "manifest": {
+        "admitted": false,
+        "status": "ABSENT"
+      },
+      "classification": "EXACT"
+    },
+    {
+      "path": "memory/atlas/documents-atlas.latest.md",
+      "git": {
+        "ignored": false,
+        "matchingRule": ".gitignore:986:!/memory/atlas/**\tmemory/atlas/documents-atlas.latest.md"
+      },
+      "scanner": {
+        "admitted": false
+      },
+      "manifest": {
+        "admitted": false,
+        "status": "ABSENT"
+      },
+      "classification": "CANONICAL_SCOPE_OVER_GIT"
+    }
+  ]
+}

@@ -211,6 +211,7 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     const fileInsert = await input.client.query(
       `INSERT INTO public.graphify_files (
          workspace_id,
+         workspace_revision,
          source_ref,
          source_revision,
          content_hash,
@@ -219,19 +220,23 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
          parse_status,
          first_seen_run_id,
          last_seen_run_id
-       ) VALUES ($1,$2,$3,$4,$5,$6,'UNPROCESSED',$7,$7)
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,'UNPROCESSED',$8,$8)
        ON CONFLICT (workspace_id, source_ref, code_source_revision)
          WHERE code_source_revision IS NOT NULL
-       DO UPDATE SET last_seen_run_id = EXCLUDED.last_seen_run_id
+      DO UPDATE SET
+         workspace_revision = EXCLUDED.workspace_revision,
+         source_revision = EXCLUDED.source_revision,
+         last_seen_run_id = EXCLUDED.last_seen_run_id
        WHERE lower(public.graphify_files.content_hash) IN (
                lower(EXCLUDED.content_hash),
                lower('sha256:' || EXCLUDED.content_hash)
              )
          AND public.graphify_files.byte_length = EXCLUDED.byte_length
-       RETURNING file_id, source_ref, source_revision, content_hash,
+      RETURNING file_id, workspace_revision, source_ref, source_revision, content_hash,
                  code_source_revision, byte_length, last_seen_run_id`,
       [
         workspaceId,
+        record.workspaceRevision,
         binding.sourceRef,
         legacySourceRevision,
         binding.contentDigest,
@@ -248,6 +253,9 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     if (normalizeSourceRef(row.source_ref) !== binding.sourceRef) {
       throw new Error(`GRAPHIFY_SOURCE_REF_READBACK_MISMATCH:${binding.sourceRef}`);
     }
+    if (String(row.workspace_revision) !== record.workspaceRevision) {
+      throw new Error(`GRAPHIFY_FILE_WORKSPACE_REVISION_MISMATCH:${binding.sourceRef}`);
+    }
     if (String(row.code_source_revision) !== binding.sourceRevision) {
       throw new Error(`GRAPHIFY_CODE_SOURCE_REVISION_MISMATCH:${binding.sourceRef}`);
     }
@@ -262,7 +270,7 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     }
 
     const fileReadback = await input.client.query(
-      `SELECT file_id, workspace_id, source_ref, source_revision,
+      `SELECT file_id, workspace_id, workspace_revision, source_ref, source_revision,
               content_hash, code_source_revision, byte_length, last_seen_run_id
          FROM public.graphify_files
         WHERE file_id = $1`,
@@ -274,6 +282,9 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     const persistedFile = fileReadback.rows[0];
     if (String(persistedFile.file_id) !== String(row.file_id) || String(persistedFile.workspace_id) !== workspaceId) {
       throw new Error(`GRAPHIFY_FILE_IDENTITY_READBACK_MISMATCH:${binding.sourceRef}`);
+    }
+    if (String(persistedFile.workspace_revision) !== record.workspaceRevision) {
+      throw new Error(`GRAPHIFY_FILE_WORKSPACE_REVISION_READBACK_MISMATCH:${binding.sourceRef}`);
     }
     if (normalizeSourceRef(persistedFile.source_ref) !== binding.sourceRef || String(persistedFile.source_revision) !== legacySourceRevision) {
       throw new Error(`GRAPHIFY_FILE_SOURCE_READBACK_MISMATCH:${binding.sourceRef}`);

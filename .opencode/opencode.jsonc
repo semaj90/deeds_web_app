@@ -1,9 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "shell": "pwsh",
-  "model": "llama-server/hforf.gguf",
-  "small_model": "llama-server/hforf.gguf",
-  "default_agent": "hforf-trace-audit",
+  "model": "llama-server/ornith-1.5-9b",
+  "small_model": "llama-server/ornith-1.5-9b",
+  "default_agent": "ornith-trace-audit",
   "provider": {
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
@@ -13,8 +13,10 @@
         "apiKey": "local",
       },
       "models": {
-        "hforf.gguf": {
-          "name": "Ornith 1.0 9B",
+        // Tool formatting is server-owned. Ornith 1.5's embedded tokenizer
+        // template is Qwen-compatible; launch-turboquant.ps1 enables --jinja.
+        "ornith-1.5-9b": {
+          "name": "Ornith 1.5 9B",
           "tools": true,
           "reasoning": true,
           "limit": {
@@ -36,41 +38,6 @@
           "limit": {
             "context": 65536,
             "output": 4096,
-          },
-        },
-      },
-    },
-    "gemma4-adapter": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Gemma4 Adapter (:8091)",
-      "options": {
-        "baseURL": "http://127.0.0.1:8091/v1",
-        "apiKey": "local",
-      },
-      "models": {
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096,
-          },
-        },
-        "hforf.gguf": {
-          "name": "Ornith 1.0 9B (sanitized)",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 4096,
-          },
-          "options": {
-            "temperature": 0.6,
-            "topP": 0.95,
-            "topK": 20,
-            "stream": true,
-            "maxTokens": 4096,
           },
         },
       },
@@ -91,13 +58,13 @@
     },
   },
   "agent": {
-    "hforf-trace-audit": {
+    "ornith-trace-audit": {
       "mode": "primary",
-      "description": "Read-only repository auditor using native TRACE retrieval tools on hforf.gguf",
-      "model": "llama-server/hforf.gguf",
+      "description": "Read-only repository auditor using native TRACE retrieval tools on Ornith 1.5 9B",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0.8,
       "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Emit at most one tool call per assistant turn. Never batch, parallelize, or concatenate multiple tool calls in one turn. Wait for each tool result before issuing the next tool call. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "prompt": "When a tool is needed, use the provider's native structured tool-calling mechanism. Do not narrate, imitate, or manually print tool invocations in ordinary response content. Never expose raw tool-call syntax to the user. Wait for actual tool results before making claims based on them. Emit at most one tool call per assistant turn. Never batch or parallelize tool calls. Use exact TRACE tool names exposed by the connected MCP server. Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -127,13 +94,13 @@
         "edit": "deny",
       },
     },
-    "gemma4-function-caller": {
+    "ornith-function-caller": {
       "mode": "subagent",
-      "description": "hforf.gguf function calling auditor, routed through the tool-call sanitizer adapter (:8091 -> :8090)",
-      "model": "llama-server/hforf.gguf",
+      "description": "Ornith 1.5 function-calling auditor on llama-server :8090",
+      "model": "llama-server/ornith-1.5-9b",
       "temperature": 0.8,
       "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
+      "prompt": "When a tool is needed, use the provider's native structured tool-calling mechanism. Do not narrate, imitate, or manually print tool invocations in ordinary response content. Never expose raw tool-call syntax to the user. Wait for actual tool results before making claims based on them. Prefer TRACE MCP retrieval tools. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",

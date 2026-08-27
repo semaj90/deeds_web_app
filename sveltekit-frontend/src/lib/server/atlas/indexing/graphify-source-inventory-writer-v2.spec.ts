@@ -90,6 +90,7 @@ function clientFor(input: {
           rowCount: 1,
           rows: [{
             file_id: fileId,
+            workspace_revision: f.record.workspaceRevision,
             source_ref: 'src/x.ts',
             source_revision: f.record.baseCommitOid,
             content_hash: input.contentDigest ?? f.entry.contentDigest,
@@ -105,6 +106,7 @@ function clientFor(input: {
           rows: [{
             file_id: fileId,
             workspace_id: workspaceId,
+            workspace_revision: f.record.workspaceRevision,
             source_ref: 'src/x.ts',
             source_revision: f.record.baseCommitOid,
             content_hash: input.contentDigest ?? f.entry.contentDigest,

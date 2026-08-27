@@ -2,13 +2,13 @@
   "schema": "atlas.indexable-source-manifest.v1",
   "readOnly": true,
   "canonicalWrites": false,
-  "workspaceRevision": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
-  "sourceRevision": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
+  "workspaceRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
+  "sourceRevision": "880b69baf405e49850a3ab88f98cefb720e8fdb1",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app",
   "sampleLimit": 50000,
-  "rowCount": 21129,
+  "rowCount": 16629,
   "counts": {
-    "HASHED": 21127,
+    "HASHED": 16627,
     "SOURCE_TOO_LARGE": 2
   },
   "exclusions": [
@@ -40,12 +40,19 @@
     "claude-mem",
     "coverage",
     "crates",
+    "datasets",
     "deeds_labs",
     "dist",
     "docs_readme",
     "external-docs",
+    "gemma3_*",
+    "gpu-*",
     "gsd_archives",
+    "legal-bert*",
+    "llama*",
     "llama-cpp-turboquant-gemma4",
+    "llms-full.txt",
+    "llms.txt",
     "logs",
     "mcp-server-mcp",
     "memory",
@@ -58,7 +65,9 @@
     "scratch",
     "screenshots",
     "target",
-    "tmp"
+    "tmp",
+    "tools/agentic-research/src",
+    "turbovec"
   ],
   "maxHashBytes": 67108864,
   "output": ".tmp/atlas/indexable-source-manifest-v1/manifest.jsonl"

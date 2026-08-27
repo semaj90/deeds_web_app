@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.kernel-dag-validator-proof-receipt.v1",
+  "status": "PROVEN_FIXTURE_ONLY",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checks": {
+    "accepted": true,
+    "cycle": true,
+    "unknownFunction": true,
+    "forbiddenRelation": true,
+    "staleCandidateOrdinal": true,
+    "staleGraphOrdinal": true,
+    "workspaceMismatch": true,
+    "graphMismatch": true,
+    "semanticMismatch": true,
+    "missingEvidence": true,
+    "argumentSchema": true,
+    "unauthorizedMutation": true,
+    "missingValidator": true,
+    "runtimeUnavailable": true,
+    "budgetOverflow": true
+  },
+  "acceptedValidatedDagChecksum": "6b3399da89cfe9c26d7e80c426a59c0eabec21cdcacd6d99718f3049cf77d2bd",
+  "candidateChecksum": "e0a2644cb468ca58fa0ffa81c0ab6226da741310a9777678f6a8513f67b5b67c",
+  "contract": {
+    "candidateSchema": "atlas.kernel-dag-candidate.v1",
+    "receiptSchema": "atlas.kernel-dag-validation-receipt.v1",
+    "typedRepairSchema": "atlas.typed-repair-dag.v1",
+    "authority": "model proposes; frozen kernel + lineage + runtime + policy authorize"
+  },
+  "notProven": [
+    "live lineage-qualified CandidateOrdinal",
+    "live runtime capability receipt",
+    "live tool execution",
+    "neural decoder checkpoint"
+  ]
+}

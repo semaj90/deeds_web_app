@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.lineage-qualified-candidate-cohort-v1",
+  "generatedAt": "2026-08-27T19:37:56.033Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "authority": {
+    "source": "public.graphify_files.code_source_revision",
+    "workspace": "public.graphify_files.workspace_revision",
+    "packetChunk": "atlas_packets.(source_ref,content_hash) = codebase_chunk_index.(source_ref,content_hash)",
+    "graphRevision": "packet graph_revision only when explicitly populated; no tree-node fallback",
+    "semanticRevision": "atlas_packets.representation_revision only when explicitly populated"
+  },
+  "fallbackPolicy": {
+    "workspaceRevision": false,
+    "sourceRevision": false,
+    "graphRevision": false,
+    "semanticRevision": false
+  },
+  "counts": {
+    "total_packets": 61660,
+    "packets_with_source_ref": 61659,
+    "exact_graphify_source": 661,
+    "workspace_revision_present": 128,
+    "source_revision_present": 661,
+    "packet_chunk_exact": 43,
+    "packet_chunk_ambiguous": 465,
+    "graph_revision_present": 0,
+    "semantic_revision_present": 661,
+    "source_chunk_qualified": 11,
+    "fully_qualified": 0
+  },
+  "sampleExactJoins": [
+    {
+      "packet_key": "packet:002461508185",
+      "source_ref": "data/external-docs/raw/drizzle/queries.md",
+      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "source_revision": "sha256:20f7b92ab8dd2fc4885d1f0f3c88e17c4d912092f85468566a7ad99c316f356c",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:01b9e9c83754",
+      "source_ref": "docs/engram-cache-architecture.md",
+      "workspace_revision": null,
+      "source_revision": "sha256:e0074f7cc033e5ec9e48fbab06bb48b6cc74b9c2e67b1bd6c0a80c31be7d5a60",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:01c814243512",
+      "source_ref": "docs/PHASE-17-RUNTIME-RECOVERY-CHECKLIST.md",
+      "workspace_revision": null,
+      "source_revision": "sha256:47048aa174a867650113b3825a8d9e69904964255b6ba93352bf28ef74d31bce",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:0260260b50e6",
+      "source_ref": "docs/phase100/feature-graph.json",
+      "workspace_revision": null,
+      "source_revision": "sha256:e5937361a4a352bf82d101570af8273bd7654fbe5c780b8fa5c811a4da100d08",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:027a8a87b4d1",
+      "source_ref": "docs/PHASE-14-15-IMPLEMENTATION-COMPLETE.md",
+      "workspace_revision": null,
+      "source_revision": "sha256:0cb53d646a7518a84d8c675763ce306f1a7c0999d43ff950877e02e7682322c6",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:02acbc232ff9",
+      "source_ref": "docs/AGENTIC-LOOP-FROZEN.md",
+      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "source_revision": "sha256:eb91cf877bc7f2f876652db38ec71360fa855ce3c9ba5e9d4df80a10924e8c72",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:02f0a1ba4b19",
+      "source_ref": ".github/agents/legal-library-engineer.agent.md",
+      "workspace_revision": null,
+      "source_revision": "sha256:0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:02ffd4e0b5af",
+      "source_ref": "docs/profile-cards/data/scripts_memory_graphify_gds_98714cf0f2af.json",
+      "workspace_revision": null,
+      "source_revision": "sha256:c4d3eed823dcb1ec2e27150f57b01ff7a5a11f19dfc5df59256c2cca4771808c",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:0329d6adfaa4",
+      "source_ref": "docs/packets/rg-toc.json",
+      "workspace_revision": null,
+      "source_revision": "sha256:a56bd198853651146a58ba9ed4eb1683c756575278e5094db3d149a669e080d1",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:033ccfdab9b8",
+      "source_ref": "docs/profile-cards/data/scripts_memory_graphify_gds_5cabb44eb71f.json",
+      "workspace_revision": null,
+      "source_revision": "sha256:ab9630058e2fdf965f299ed73c7f9f42a12d261874929a7653db77c08710bfaa",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    }
+  ],
+  "promotionStatus": "COHORT_BLOCKED",
+  "nextGate": "GRAPH_OR_SEMANTIC_REVISION_OWNER_REQUIRED"
+}

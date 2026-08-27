@@ -1,6 +1,6 @@
 {
   "schema": "atlas.candidate-corpus-lineage-audit.v1",
-  "generatedAt": "2026-08-27T03:48:36.760Z",
+  "generatedAt": "2026-08-27T19:27:34.747Z",
   "totalRowsAudited": 61660,
   "admittedCount": 4951,
   "excludedCount": 56709,

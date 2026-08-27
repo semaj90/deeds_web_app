@@ -12,6 +12,7 @@ const { hyperedgeToRelationshipKernel } = await import('../../sveltekit-frontend
 const { buildIncidenceProjectionFromRelationshipKernelsV1 } = await import('../../sveltekit-frontend/src/lib/server/atlas/graph/incidence-projection-v1.ts');
 const { buildStructuralGraphSnapshotFromIncidenceV1 } = await import('../../sveltekit-frontend/src/lib/server/atlas/graph/structural-graph-snapshot-from-incidence-v1.ts');
 const { serializeIncidenceEdgesToArrowIpc, checksumArrowIpc } = await import('../../sveltekit-frontend/src/lib/server/atlas/graph/incidence-edge-arrow-artifact-v1.ts');
+const { buildGraphRevisionV1 } = await import('./lib/graph-revision-v1.mjs');
 
 /**
  * GRAPH-PROD-01: the first *production* StructuralGraphSnapshotV1 builder —
@@ -20,13 +21,10 @@ const { serializeIncidenceEdgesToArrowIpc, checksumArrowIpc } = await import('..
  * respective adapters into the shared RelationshipKernelV1, projects them into
  * one incidence graph, and emits a real Arrow IPC edge artifact.
  *
- * As of 2026-08-26 both source tables have 0 real rows (see
- * openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md
- * "REL-OWNER-01 through REL-FI-01"), so this run's honest outcome is a
- * correctly-wired, checksummed, zero-node/zero-edge snapshot. That is a
- * genuine proof of the mechanism, not a placeholder — every revision binding,
- * checksum, and artifact write in this script runs the same code path a
- * future non-empty run would use.
+ * The source tables contain real historical rows. This builder excludes any
+ * kernel whose workspace revision is not the explicitly requested current
+ * revision, so a stale corpus produces an honest non-authoritative empty
+ * snapshot instead of being relabeled as current evidence.
  *
  * A kernel whose workspaceRevision does not match --workspace-revision is
  * EXCLUDED from the snapshot (not a fatal error) and counted in the report —
@@ -37,20 +35,27 @@ const { serializeIncidenceEdgesToArrowIpc, checksumArrowIpc } = await import('..
 
 const { Pool } = pg;
 
-function parseArg(name: string, fallback: string): string {
+function parseRequiredArg(name: string): string {
   const prefix = `--${name}=`;
   const found = process.argv.find((value) => value.startsWith(prefix));
-  return found ? found.slice(prefix.length) : fallback;
+  const value = found?.slice(prefix.length).trim();
+  if (!value) throw new Error(`GRAPH_PROD_ARG_REQUIRED:--${name}=...`);
+  return value;
 }
 
 async function main() {
-  const workspaceRevision = parseArg('workspace-revision', 'ws:0084288f26');
-  const graphRevision = parseArg('graph-revision', `graph:${workspaceRevision}`);
+  const workspaceRevision = parseRequiredArg('workspace-revision');
+  const candidateSnapshotRevision = parseRequiredArg('candidate-snapshot-revision');
+  const ordinalMapChecksum = parseRequiredArg('ordinal-map-checksum');
+  if (process.argv.some((value) => value.startsWith('--graph-revision='))) {
+    throw new Error('GRAPH_PROD_GRAPH_REVISION_DERIVED_ONLY');
+  }
 
   const report: Record<string, unknown> = {
     schema: 'atlas.graph-prod-01.production-snapshot-build.v1',
     workspaceRevision,
-    graphRevision,
+    candidateSnapshotRevision,
+    ordinalMapChecksum,
   };
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -71,6 +76,10 @@ async function main() {
     report.kernelsBuilt = allKernels.length;
     report.kernelsIncluded = included.length;
     report.kernelsExcludedByRevisionMismatch = excludedByRevision;
+    const graphIdentity = buildGraphRevisionV1({ workspaceRevision, kernels: included });
+    const graphRevision = graphIdentity.graphRevision;
+    report.graphRevision = graphRevision;
+    report.graphIdentity = graphIdentity;
 
     const entityIds = new Set<string>();
     const entities: Array<{ canonicalId: string; nodeKind: string }> = [];
@@ -109,8 +118,8 @@ async function main() {
     const snapshot = buildStructuralGraphSnapshotFromIncidenceV1({
       projection,
       graphRevision,
-      candidateSnapshotRevision: workspaceRevision,
-      ordinalMapChecksum: projection.nodeTableHash,
+      candidateSnapshotRevision,
+      ordinalMapChecksum,
       edgeArtifact: { format: 'ARROW_IPC', checksum: artifactChecksum, ref: artifactPath },
     });
     report.snapshot = snapshot;

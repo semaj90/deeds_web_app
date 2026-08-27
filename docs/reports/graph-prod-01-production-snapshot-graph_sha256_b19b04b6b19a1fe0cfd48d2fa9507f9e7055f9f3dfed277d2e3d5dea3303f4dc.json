@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.graph-prod-01.production-snapshot-build.v1",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "graphRevision": "graph:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "realHyperedgesRead": 62802,
+  "realFeatureRelationshipsRead": 603,
+  "kernelsBuilt": 63405,
+  "kernelsIncluded": 0,
+  "kernelsExcludedByRevisionMismatch": 63405,
+  "projection": {
+    "entityCount": 0,
+    "relationCount": 0,
+    "unresolvedParticipantCount": 0,
+    "nodeTableHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "edgeTableHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "projectionHash": "1d66152347ef3c248d2366f97b9718ffa42118ff4f20673f5fa02555a002676f"
+  },
+  "edgeArtifactPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_sha256_b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc.arrow",
+  "edgeArtifactBytes": 1008,
+  "edgeArtifactChecksum": "66fbc8d1f44ceaf4531da3e1e9f4f2e373b59eeeb59d4237cc96b406b03aa354",
+  "snapshot": {
+    "schema": "atlas.structural-graph-snapshot.v1",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "graphRevision": "graph:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "candidateSnapshotRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "ordinalMapChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "nodeCount": 0,
+    "edgeCount": 0,
+    "edgeArtifact": {
+      "format": "ARROW_IPC",
+      "checksum": "66fbc8d1f44ceaf4531da3e1e9f4f2e373b59eeeb59d4237cc96b406b03aa354",
+      "ref": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-graph_sha256_b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc.arrow"
+    },
+    "canonicalAuthority": false
+  },
+  "artifactChecksumDeterministic": true
+}

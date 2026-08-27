@@ -52,3 +52,57 @@ symbols, or start training.
 4. Add graph/SOM/PageRank features only when their revisions and checksums
    join to that snapshot.
 5. Produce a replayable ranking receipt before any ACE or QLoRA export.
+
+## 2026-08-27 gate update
+
+Script-level proof is still required before copying the decoder contracts into
+`packages/parent-atlas`:
+
+- Preflight: `PASS` read-only, readiness `70%`.
+- Shortlist: `EXECUTED_UNPROVEN`, Recall@24 `0.333`, labeled evaluation absent.
+- Replay admission: `PROVEN` for the comparable corpus; 10,135 rows admitted
+  by both policies, with zero mismatches.
+- Cache namespace proof: `FAIL`, 2/5 required namespaces ready.
+- Semantic cache audit: `PASS` structurally, but no live BitFrost/centroid/SOM
+  keys observed.
+- Canonical packet/source content-hash lineage: `BLOCKED`.
+- Latest read-only census: 1 `IDENTITY_UNRESOLVED`, 60,998
+  `MISSING_GRAPHIFY_SOURCE`, and 4,148 ambiguous packet/chunk joins; source
+  integrity is proven for 768 observed Graphify rows, but canonical packet
+  lineage remains blocked.
+- Reference samples indicate a source-grain/scope mismatch: historical packet
+  artifact names and `$lib` aliases are not equivalent to current Graphify
+  workspace paths. A canonical resolver/bridge is required; fuzzy joins and
+  mass revision stamping remain prohibited.
+- The read-only resolver census reports 405 raw exact matches, 621
+  basename-only diagnostic candidates, 2,665 ambiguous basename matches, and
+  57,968 unresolved references. Only exact or independently content-proven
+  mappings may enter a lineage-qualified candidate snapshot.
+- Neural decoder training: `BLOCKED` until lineage and held-out ranking gates
+  pass.
+
+Promotion boundary:
+
+`scripts/atlas` proof lanes → revision-qualified CandidateOrdinal → held-out
+ranking → Valkey MISS/HIT replay → deterministic DAG-template replay →
+`packages/parent-atlas` integration → decoder challenger.
+
+The first DAG incubation fixture is now proven read-only through
+`scripts/atlas/prove-frozen-dag-v1.mjs`: deterministic topology, reversed-input
+checksum invariance, cycle rejection, topological generations, ready-set
+derivation, execution replay, and mutation transitions through rollback. The
+generation definition is `longest_dependency_distance_from_source`; the
+current fixture checksum is
+`2a74d304f27f0f98cc4e84548f645658bdf89d337faa6a5c2cf17a442d520584`. Temporal
+ledger integration, live bounded replay, and neural DAG evaluation remain
+unproven.
+
+The existing Parent Atlas temporal ledger, runtime, and PostgreSQL repository
+fixture suites passed 16/16 tests. This closes the fixture-level event replay
+substrate gate while leaving live bounded replay, source lineage, ranking
+quality, cache MISS/HIT, and decoder evaluation open.
+
+The replay admission refresh is now `PROVEN` for the comparable corpus, with
+10,135 rows admitted by both policies and zero manifest-only or scanner-only
+rows. This closes admission-policy parity only; it is not evidence that the
+neural decoder is ready for promotion.

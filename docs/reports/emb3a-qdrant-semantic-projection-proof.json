@@ -58,11 +58,11 @@
       "quantization_config": null
     },
     "payload_schema": {
-      "representation_name": {
+      "indexed_at": {
         "data_type": "keyword",
         "points": 52380
       },
-      "projection_revision": {
+      "representation_name": {
         "data_type": "keyword",
         "points": 52380
       },
@@ -70,11 +70,15 @@
         "data_type": "keyword",
         "points": 45472
       },
-      "source_ref": {
+      "model_revision_state": {
         "data_type": "keyword",
         "points": 52380
       },
-      "embedding_model": {
+      "chunk_id": {
+        "data_type": "keyword",
+        "points": 16805
+      },
+      "source_ref": {
         "data_type": "keyword",
         "points": 52380
       },
@@ -82,11 +86,7 @@
         "data_type": "keyword",
         "points": 52380
       },
-      "model_revision_state": {
-        "data_type": "keyword",
-        "points": 52380
-      },
-      "indexed_at": {
+      "embedding_model": {
         "data_type": "keyword",
         "points": 52380
       },
@@ -94,9 +94,9 @@
         "data_type": "keyword",
         "points": 52380
       },
-      "chunk_id": {
+      "projection_revision": {
         "data_type": "keyword",
-        "points": 16805
+        "points": 52380
       }
     },
     "update_queue": {

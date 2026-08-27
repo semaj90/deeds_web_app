@@ -1,0 +1,708 @@
+{
+  "schema": "atlas.qdrant-sparse-configuration-audit.v1",
+  "generated_at": "2026-08-27T02:32:53.733Z",
+  "mode": "READ_ONLY",
+  "writes_performed": false,
+  "qdrant_url": "http://127.0.0.1:6333",
+  "status": "READY",
+  "collections": [
+    {
+      "name": "BifrostSemanticCachePlugin",
+      "collection_status": "green",
+      "points_count": 5,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "agent_memory_observations",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "audio_segments",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "case_chunks",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "chat_messages",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "message": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "chunks_web_search",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "cluster_narratives",
+      "collection_status": "green",
+      "points_count": 18,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "narrative": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "code_llm_outputs",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_384",
+      "collection_status": "green",
+      "points_count": 1,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 384,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_384_hybrid",
+      "collection_status": "green",
+      "points_count": 10,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 384,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_512",
+      "collection_status": "green",
+      "points_count": 53379,
+      "indexed_vectors_count": 50149,
+      "dense_vectors": {
+        "size": 512,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_768",
+      "collection_status": "green",
+      "points_count": 109129,
+      "indexed_vectors_count": 109983,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_768_v2",
+      "collection_status": "green",
+      "points_count": 52380,
+      "indexed_vectors_count": 52380,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        },
+        "signature": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_chunks_sparse_test_v1",
+      "collection_status": "green",
+      "points_count": 500,
+      "indexed_vectors_count": 500,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {
+        "lexical_v1": {}
+      },
+      "classification": "LEGACY_SPARSE_NO_IDF",
+      "idfVectors": [],
+      "legacyVectors": [
+        {
+          "name": "lexical_v1",
+          "modifier": null
+        }
+      ]
+    },
+    {
+      "name": "codebase_topology_128",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "latent_128": {
+          "size": 128,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "codebase_topology_64",
+      "collection_status": "green",
+      "points_count": 105761,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "latent_64": {
+          "size": 64,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "court_opinions",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "diagnosis_embeddings",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "diagnosis": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "document_knowledge_768",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "document_tags",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "embedding_cache",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "embedding": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "error_embeddings",
+      "collection_status": "green",
+      "points_count": 6,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "error": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "evidence_items",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "evidence_items_clip_512",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 512,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "evidence_vectors",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "external_programming_docs_768",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "feature_maps",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "summary": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "fictional_case_chunks",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "fixer_memory_768",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "knowledge_base",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "legal_canon_chunks",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "legal_cases",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "description": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "legal_documents",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "legal_glossary",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "llm_response_cache",
+      "collection_status": "green",
+      "points_count": 9,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "query": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "phase110_baseline_768",
+      "collection_status": "green",
+      "points_count": 2467,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "poi_profiles",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "embedding": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "research_memory_768",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "content": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "sc_deedscodebase_deeds-web-app",
+      "collection_status": "green",
+      "points_count": 326,
+      "indexed_vectors_count": 326,
+      "dense_vectors": {
+        "dense": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {
+        "bm25": {
+          "modifier": "idf"
+        }
+      },
+      "classification": "IDF_ENABLED",
+      "idfVectors": [
+        "bm25"
+      ],
+      "legacyVectors": []
+    },
+    {
+      "name": "sc_deedssocraticode_metadata",
+      "collection_status": "green",
+      "points_count": 1,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 1,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "summary_lenses_768",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "summary": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "synthesis_memory_768",
+      "collection_status": "green",
+      "points_count": 8,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "synthesis": {
+          "size": 768,
+          "distance": "Cosine"
+        }
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    },
+    {
+      "name": "topic_clusters",
+      "collection_status": "green",
+      "points_count": 0,
+      "indexed_vectors_count": 0,
+      "dense_vectors": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "sparse_vectors": {},
+      "classification": "NO_SPARSE",
+      "idfVectors": [],
+      "legacyVectors": []
+    }
+  ],
+  "counts": {
+    "total": 43,
+    "idf_enabled": 1,
+    "mixed_idf_and_legacy": 0,
+    "legacy_sparse_no_idf": 1,
+    "no_sparse": 41,
+    "unavailable": 0
+  },
+  "promotion": {
+    "idf_rollout_proven": false,
+    "existing_collections_rebuilt": false,
+    "true_bm25_promotion_allowed": false
+  }
+}

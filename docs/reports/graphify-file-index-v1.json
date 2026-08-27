@@ -3,33 +3,37 @@
   "read_only": true,
   "canonical_authority": "postgres",
   "source_table": "atlas_packets",
-  "packet_jsonl": ".tmp/atlas/graphify-file-index-lineage-preview/packets.jsonl",
-  "ast_jsonl": ".tmp/atlas/graphify-file-index-lineage-preview/ast-entities.jsonl",
-  "packet_count": 128,
+  "packet_jsonl": ".tmp/atlas/graphify-file-index-v1/packets.jsonl",
+  "ast_jsonl": ".tmp/atlas/graphify-file-index-v1/ast-entities.jsonl",
+  "packet_count": 1000,
   "invalid_rows": 0,
-  "packet_checksum": "92f235228f8635e3f63c8e2749ddf99eedc8bc57f9319f765e424c3605648082",
+  "packet_checksum": "a31b8e04341fe1e1caf6aa6a61dfe8099a22ecb4e3f461eeddf2927c918abe8d",
   "ast_exit_code": 0,
   "ast_receipt": {
     "schema": "atlas.ast-entity-prefill-graphify-receipt.v2",
     "config": ".okf\\pipelines\\ast-entity-prefill.yaml",
-    "packets_selected": 128,
-    "files_resolved": 122,
-    "files_unresolved": 6,
+    "packets_selected": 1000,
+    "files_resolved": 915,
+    "files_unresolved": 85,
     "unresolved_samples": [
       "src/AGENTS.md",
       "src/lib/adapters/legal-corpus.ts",
       "src/lib/AGENTS.md",
       "src/lib/ai/AGENTS.md",
       "src/lib/ai/e2b/AGENTS.md",
-      "src/lib/ai/onnx/AGENTS.md"
+      "src/lib/ai/onnx/AGENTS.md",
+      "src/lib/cache/AGENTS.md",
+      "src/lib/client/AGENTS.md",
+      "src/lib/client/ui/AGENTS.md",
+      "src/lib/components/admin/AGENTS.md"
     ],
-    "entity_candidates": 1250,
+    "entity_candidates": 4365,
     "ast_grep": true,
     "canonical_writes": false,
     "symbol_registry_resolved": 0,
     "canonical_entity_resolved": 0,
     "coverage": {
-      "structural_entity": 0.953125,
+      "structural_entity": 0.915,
       "packet_identity": 1,
       "feature_identity": 1,
       "source_revision": 1,
@@ -38,7 +42,7 @@
       "ontology": 1,
       "semantic_768": 0
     },
-    "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-lineage-preview\\ast-entities.jsonl"
+    "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-entities.jsonl"
   },
   "ast_extractor": "ast-grep-napi",
   "lexical_owner": "postgres_tsvector_gin_ts_rank_cd",
@@ -57,6 +61,6 @@
     "payload"
   ],
   "canonical_writes": false,
-  "generated_at": "2026-08-27T01:53:51.201Z",
+  "generated_at": "2026-08-27T17:28:07.210Z",
   "report": "docs/reports/graphify-file-index-v1.json"
 }

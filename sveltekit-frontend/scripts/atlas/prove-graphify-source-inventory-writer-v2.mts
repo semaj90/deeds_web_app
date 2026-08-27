@@ -176,6 +176,58 @@ try {
   if (COMMIT) await pool.query('COMMIT');
   else await pool.query('ROLLBACK');
 
+  // The writer performs independent SELECT readback inside the transaction.
+  // Preserve that proof for rollback mode; committed mode additionally
+  // verifies the rows from a separate connection after COMMIT.
+  let independentReadbackVerified = receipt.readbackVerified;
+  if (COMMIT) {
+    const verificationPool = new pg.Pool({
+      connectionString: DATABASE_URL,
+      max: 1,
+      connectionTimeoutMillis: 5_000,
+      statement_timeout: 15_000,
+    });
+    try {
+      const persistedRun = await verificationPool.query(
+        `SELECT run_id, workspace_id, repository_revision, workspace_revision,
+                source_manifest_digest, parser_contract_version,
+                extraction_contract_version, dry_run
+           FROM public.graphify_runs
+          WHERE run_id = $1`,
+        [receipt.runId],
+      );
+      const persistedFile = await verificationPool.query(
+        `SELECT file_id, workspace_id, source_ref, source_revision,
+                content_hash, code_source_revision, byte_length, last_seen_run_id
+           FROM public.graphify_files
+          WHERE file_id = $1`,
+        [receipt.files[0]!.fileId],
+      );
+      const runRow = persistedRun.rows[0];
+      const fileRow = persistedFile.rows[0];
+      independentReadbackVerified = persistedRun.rowCount === 1
+        && persistedFile.rowCount === 1
+        && String(runRow?.run_id) === receipt.runId
+        && String(runRow?.workspace_id) === workspaceId
+        && String(runRow?.repository_revision) === receipt.repositoryRevision
+        && String(runRow?.workspace_revision) === receipt.workspaceRevision
+        && String(runRow?.source_manifest_digest) === receipt.sourceManifestDigest
+        && String(runRow?.parser_contract_version) === receipt.parserContractVersion
+        && String(runRow?.extraction_contract_version) === receipt.extractionContractVersion
+        && !Boolean(runRow?.dry_run)
+        && String(fileRow?.file_id) === receipt.files[0]!.fileId
+        && String(fileRow?.workspace_id) === workspaceId
+        && String(fileRow?.source_ref) === receipt.files[0]!.sourceRef
+        && String(fileRow?.source_revision) === receipt.files[0]!.legacySourceRevision
+        && String(fileRow?.code_source_revision) === receipt.files[0]!.sourceRevision
+        && String(fileRow?.last_seen_run_id) === receipt.runId
+        && Number(fileRow?.byte_length) === receipt.files[0]!.byteLength;
+    } finally {
+      await verificationPool.end();
+    }
+    if (!independentReadbackVerified) throw new Error('GRAPHIFY_REVISION_OWNER_INDEPENDENT_READBACK_FAILED');
+  }
+
   console.log(JSON.stringify({
     status: COMMIT
       ? 'GRAPHIFY_REVISION_OWNER_CONTROLLED_PERSISTENCE_COMMITTED'
@@ -187,6 +239,7 @@ try {
     sourceRevision: receipt.files[0]?.sourceRevision,
     repositoryRevision: receipt.repositoryRevision,
     readbackVerified: receipt.readbackVerified,
+    independentReadbackVerified,
     canonicalWriteAttempted: true,
     durableMutationCommitted: COMMIT,
   }, null, 2));

@@ -45,6 +45,10 @@ const DEFAULT_EXCLUDE_PATTERNS = [
   '.python311',
   '__pycache__',
   'target',
+  'crates',
+  'datasets',
+  'gsd_archives',
+  'mcp-server-mcp',
   '.github',
   '.vscode',
   '.idea',
@@ -65,6 +69,8 @@ const DEFAULT_EXCLUDE_PATTERNS = [
   'reports',
   'external-docs',
   'claude-mem',
+  'memory',
+  'models',
   'logs',
   'tmp',
   'target',
@@ -74,6 +80,11 @@ const DEFAULT_EXCLUDE_PATTERNS = [
   'scratch',
   'phase104-backups',
   'docs_readme',
+  'gemma3_*',
+  'legal-bert*',
+  'llama*',
+  'llms.txt',
+  'llms-full.txt',
   '.DS_Store',
 ];
 
@@ -90,12 +101,13 @@ function inferLanguage(filePath: string): FileEntry['language'] {
  * Simple glob-like matching (not full .gitignore spec).
  */
 function shouldIgnore(relativePath: string, excludePatterns: string[], includePatterns?: string[]): boolean {
-  const pathParts = relativePath.split(/[/\\]/);
+  const normalizedPath = relativePath.replaceAll('\\', '/');
+  const pathParts = normalizedPath.split('/');
 
   // Check include patterns first (explicit inclusion overrides exclusion)
   if (includePatterns && includePatterns.length > 0) {
     for (const pattern of includePatterns) {
-      if (matchPattern(relativePath, pattern) || matchPattern(pathParts[0], pattern)) {
+      if (matchPattern(normalizedPath, pattern) || matchPattern(pathParts[0], pattern)) {
         return false; // Explicitly included, do not ignore
       }
     }
@@ -103,8 +115,11 @@ function shouldIgnore(relativePath: string, excludePatterns: string[], includePa
 
   // Check exclude patterns
   for (const pattern of excludePatterns) {
+    // `.gitignore` uses `core` for a root crash-dump file. It must not hide
+    // source directories such as packages/parent-atlas/src/core.
+    if ((pattern === 'core' || pattern === 'core.[0-9]*') && pathParts.length > 1 && pathParts[0] !== 'core') continue;
     // Match against any path component (directory or file)
-    if (matchPattern(relativePath, pattern) || pathParts.some(part => matchPattern(part, pattern))) {
+    if (matchPattern(normalizedPath, pattern) || pathParts.some(part => matchPattern(part, pattern))) {
       return true; // Should ignore
     }
   }

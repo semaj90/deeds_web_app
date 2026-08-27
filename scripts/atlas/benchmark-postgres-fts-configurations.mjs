@@ -35,12 +35,39 @@ const report = {
   readOnly: true,
   table: 'codebase_chunk_index',
   queryConfigurations: ['english', 'simple'],
+  queryConfiguration: 'english',
+  documentConfiguration: 'UNKNOWN',
+  searchVectorProducer: null,
+  ginIndexPresent: false,
+  configurationAligned: false,
   queries,
   results: [],
   summary: {},
 };
 
 try {
+  const producer = await pool.query(`
+    SELECT pg_get_functiondef(p.oid) AS definition
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'compute_codebase_chunk_search_vector'
+    ORDER BY p.oid DESC
+    LIMIT 1
+  `);
+  const definition = String(producer.rows[0]?.definition ?? '');
+  report.searchVectorProducer = definition ? 'compute_codebase_chunk_search_vector' : null;
+  const usesEnglish = definition.includes("to_tsvector('english'");
+  const usesSimple = definition.includes("to_tsvector('simple'");
+  report.documentConfiguration = usesEnglish && usesSimple ? 'MIXED' : usesEnglish ? 'english' : usesSimple ? 'simple' : 'UNKNOWN';
+  const indexes = await pool.query(`
+    SELECT 1 FROM pg_indexes
+    WHERE schemaname = 'public' AND tablename = 'codebase_chunk_index'
+      AND indexdef ILIKE '%gin%' AND indexdef ILIKE '%search_vector%'
+    LIMIT 1
+  `);
+  report.ginIndexPresent = indexes.rowCount > 0;
+  report.configurationAligned = report.documentConfiguration === report.queryConfiguration;
+
   for (const query of queries) {
     const rows = {};
     for (const configuration of report.queryConfigurations) {

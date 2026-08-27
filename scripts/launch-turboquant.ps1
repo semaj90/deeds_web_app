@@ -31,7 +31,7 @@
 .PARAMETER StartupProfile
   One of: gemma4-direct (default tool-calling profile), ornith (legacy Ornith 9B,
   embedded chat template, no override), ornith-1.5 (candidate Ornith 1.5 9B,
-  local template), gemma4-thinking (reasoning on,
+  local template, reasoning on), gemma4-thinking (reasoning on,
   budget 2048). Bundles model + chat-template-file + reasoning mode so you
   pick ONE coherent config. When omitted (and -SelectProfile isn't passed
   either), the launcher falls back to legacy env-var resolution
@@ -106,7 +106,7 @@ function Test-LlamaServerHealth {
   }
 }
 
-if (Test-LlamaServerHealth) {
+if ((Test-LlamaServerHealth) -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
   Write-Host "✅ llama-server is already running on :8090" -ForegroundColor Green
   Write-Host "   URL: http://127.0.0.1:8090"
   Write-Host "   Skipping launch" -ForegroundColor Cyan
@@ -158,8 +158,8 @@ function Get-TurboStartupProfiles {
       Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf'
       Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k\chat_template.jinja'
-      Reasoning = 'off'
-      ReasoningBudget = 0
+      Reasoning = 'on'
+      ReasoningBudget = 2048
       SpecType = 'none'
     },
     [pscustomobject]@{
@@ -806,6 +806,14 @@ Write-Host ""
 # have supports_system_role:false and silently drop system prompts — that is the
 # exact failure mode that caused the duplicate-process VRAM blowout (Jun 9 2026).
 # Kill and restart whenever: ctx mismatch OR props check fails OR /props unavailable.
+$targetReasoningMode = if ($activeTurboProfile) {
+    $activeTurboProfile.Reasoning
+} elseif ($env:TURBO_REASONING) {
+    $env:TURBO_REASONING
+} else {
+    'off'
+}
+
 if (-not $StatusOnly) {
     try {
         $slotsInfo = Invoke-RestMethod ("http://127.0.0.1:$port/slots") -TimeoutSec 2 -ErrorAction Stop
@@ -819,6 +827,7 @@ if (-not $StatusOnly) {
             $jinjaOk = $false
             $supportsTools = $false
             $modelOk = $false
+            $reasoningOk = $false
             $runningModelAlias = $null
             # Prefer the profile's declared Alias over the raw filename: two profiles
             # (e.g. ornith / ornith-1.5) can point at files that both happen to be named
@@ -829,7 +838,17 @@ if (-not $StatusOnly) {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
                 $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
+                $runningReasoningFormat = $props.default_generation_settings.params.reasoning_format
+                $reasoningOk = if ($targetReasoningMode -eq 'on') {
+                    ($runningReasoningFormat -and $runningReasoningFormat -ne 'none') -or
+                    (($props.chat_template_caps.supports_preserve_reasoning -eq $true) -and ([string]$props.chat_template -match '<think>'))
+                } else { $runningReasoningFormat -eq 'none' }
                 $runningModelAlias = $props.model_alias
+                $runningReasoningFormat = $props.default_generation_settings.params.reasoning_format
+                $reasoningOk = if ($targetReasoningMode -eq 'on') {
+                    ($runningReasoningFormat -and $runningReasoningFormat -ne 'none') -or
+                    (($props.chat_template_caps.supports_preserve_reasoning -eq $true) -and ([string]$props.chat_template -match '<think>'))
+                } else { $runningReasoningFormat -eq 'none' }
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
             } catch {
@@ -839,7 +858,7 @@ if (-not $StatusOnly) {
                 $modelOk = $false
             }
 
-            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk) {
+            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
                 Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                 exit 0
             } else {
@@ -848,6 +867,7 @@ if (-not $StatusOnly) {
                 if (-not $jinjaOk)     { $reason += "supports_system_role:false (stale --chat-template or missing --jinja)" }
                 if (-not $supportsTools) { $reason += "supports_tools:false (wrong template — needs custom_pub_chat_template_gemma4.jinja)" }
                 if (-not $modelOk)     { $reason += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
+                if (-not $reasoningOk) { $reason += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
                 Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
@@ -866,7 +886,7 @@ if (-not $StatusOnly) {
                 $runningModelAlias = $props.model_alias
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
-                if ($jinjaOk -and $supportsTools -and $modelOk) {
+                if ($jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
                     Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                     exit 0
                 } else {
@@ -874,6 +894,7 @@ if (-not $StatusOnly) {
                     if (-not $jinjaOk)     { $reason2 += "supports_system_role:false" }
                     if (-not $supportsTools) { $reason2 += "supports_tools:false (needs custom_pub_chat_template_gemma4.jinja)" }
                     if (-not $modelOk)     { $reason2 += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
+                    if (-not $reasoningOk) { $reason2 += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
                     Write-Host "TurboQuant on :$port needs restart — $($reason2 -join '; ')" -ForegroundColor Cyan
                     $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                     if ($runningPids) {
@@ -1087,9 +1108,9 @@ if ($kvProfile -eq 'atomicbot') {
 # -- Reasoning: --reasoning on/off (+ --reasoning-budget) and --reasoning-format --
 # reasoning-format deepseek instructs llama-server to place parsed reasoning in
 # reasoning_content rather than leaving it mixed into visible content when the
-# template/model emits compatible reasoning markers. reasoning off is the right
-# default for tool-loop reliability (hidden thinking is not wanted mid-loop);
-# the gemma4-thinking profile flips it on with a bounded budget.
+# template/model emits compatible reasoning markers. Each named profile owns
+# its reasoning mode and OpenCode receives parsed reasoning_content separately
+# from visible content when reasoning is enabled.
 $reasoningMode = if ($activeTurboProfile) {
     $activeTurboProfile.Reasoning
 } elseif ($env:TURBO_REASONING) {

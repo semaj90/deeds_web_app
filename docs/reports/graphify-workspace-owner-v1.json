@@ -1,0 +1,543 @@
+{
+  "schema": "atlas.graphify-workspace-owner-v1",
+  "generatedAt": "2026-08-27T19:45:23.529Z",
+  "readOnly": true,
+  "canonicalWrites": false,
+  "candidateOwner": "public.workspaces.id",
+  "graphifyRunWorkspaceForeignKey": false,
+  "ownerContractStatus": "OWNER_CONTRACT_GAP",
+  "tables": [
+    {
+      "table_schema": "public",
+      "table_name": "graphify_files"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "graphify_runs"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "workspaces"
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "graphify_files",
+      "column_name": "file_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "workspace_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "content_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "byte_length",
+      "data_type": "bigint",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "language",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "parser_name",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "parser_version",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "parse_status",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "parse_error",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "first_seen_run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "last_seen_run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "code_source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "workspace_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_revision_authority",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "producer_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "git_blob_oid",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "workspace_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "repository_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "base_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "parser_contract_version",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "extraction_contract_version",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "started_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "completed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "status",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "dry_run",
+      "data_type": "boolean",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "configuration",
+      "data_type": "jsonb",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "workspace_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "source_manifest_digest",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_runs",
+      "column_name": "source_manifest_source_count",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "title",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "description",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "case_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "created_by",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "workspaces",
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_byte_length_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "byte_length"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_code_source_revision_sha256_v2",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "code_source_revision"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_content_hash_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "content_hash"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_content_hash_sha256_v2",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "content_hash"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_file_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "file_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_first_seen_run_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "column_name": "first_seen_run_id",
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "run_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_first_seen_run_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "first_seen_run_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_last_seen_run_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "column_name": "last_seen_run_id",
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "run_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_last_seen_run_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "last_seen_run_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_parse_status_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "parse_status"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "column_name": "file_id",
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "file_id"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_source_ref_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "source_ref"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_source_revision_authority_compat_v1",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "source_revision_authority"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_workspace_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_files",
+      "foreign_column_name": "workspace_id"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_configuration_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "configuration"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_dry_run_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "dry_run"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_extraction_contract_version_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "extraction_contract_version"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_parser_contract_version_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "parser_contract_version"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "column_name": "run_id",
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "run_id"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_repository_revision_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "repository_revision"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_run_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "run_id"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_source_manifest_digest_sha256_v2",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "source_manifest_digest"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_source_manifest_source_count_v2",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "source_manifest_source_count"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_source_manifest_source_count_v3",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "source_manifest_source_count"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_started_at_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "started_at"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_status_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "status"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_workspace_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "workspace_id"
+    },
+    {
+      "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_workspace_revision_sha256_v2",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "graphify_runs",
+      "foreign_column_name": "workspace_revision"
+    },
+    {
+      "table_name": "workspaces",
+      "constraint_name": "workspaces_created_at_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "created_at"
+    },
+    {
+      "table_name": "workspaces",
+      "constraint_name": "workspaces_id_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "id"
+    },
+    {
+      "table_name": "workspaces",
+      "constraint_name": "workspaces_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "column_name": "id",
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "id"
+    },
+    {
+      "table_name": "workspaces",
+      "constraint_name": "workspaces_title_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "title"
+    },
+    {
+      "table_name": "workspaces",
+      "constraint_name": "workspaces_updated_at_not_null",
+      "constraint_type": "CHECK",
+      "column_name": null,
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "updated_at"
+    }
+  ],
+  "counts": {
+    "workspaces": 0,
+    "graphify_runs": 3,
+    "graphify_files": 768
+  },
+  "conclusion": "public.workspaces can hold UUIDs, but Graphify lineage does not currently enforce it as the workspace owner."
+}

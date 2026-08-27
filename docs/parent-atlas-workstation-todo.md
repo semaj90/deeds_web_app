@@ -1,8 +1,8 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-08-20
+Updated: 2026-08-27
 
-## Pasted Phase 6/85 claim reconciliation (2026-08-20)
+## Historical checkpoint and deferred-lanes appendix (2026-08-20)
 
 The supplied Phase 6/85 note describes a newer Query Routing V2/PyTorch
 EmbeddingGemma classifier tranche, but that tranche is not present in this
@@ -41,7 +41,45 @@ does not carry classifier feature/model/prompt/label revisions or an
 EmbeddingGemma `classification_mrl_128` vector. Evidence is recorded in
 `docs/reports/query-routing-live-producer-audit.json`.
 
-The percentages below are planning estimates for the workstation roadmap. They are not substitutes for the explicit `PROVEN`, `PASS`, `DEGRADED`, or `NOT_PROVEN` gates in the OpenSpecs.
+This section is retained as a historical checkpoint. Its percentages and
+August 20 claims are not the current promotion status.
+
+## Current proof-gated status (2026-08-27)
+
+| Lane | Current state | Next gate |
+| --- | --- | --- |
+| Replay admission | `PROVEN` — 10,135/10,135 | Preserve scope/checksum |
+| Frozen DAG | `PROVEN / FROZEN` — checksum `2a74d304...` | No more topology work |
+| Graphify source-byte integrity | `PROVEN` — 640 observed rows | Expand exact current-source coverage |
+| Packet/chunk integrity | `PROVEN_PARTIAL` — 332 exact, 4,148 ambiguous | Quarantine ambiguous cases |
+| Source lineage coverage | `BLOCKED` — 61,126 packet refs lack exact Graphify joins | Classify/materialize eligible current sources |
+| CandidateOrdinal | Contract exists; promotion blocked | Freeze qualified cohort |
+| CandidateFeatureMatrix | Not promotion-grade | Build from qualified cohort |
+| Ranking | Diagnostic only | Held-out Recall/MRR/NDCG |
+| Valkey prefill | Infrastructure exists | Deterministic MISS → HIT proof |
+| Live repair DAG | Not promotion-proven | One bounded real execution |
+| Neural DAG | Not trained | Dataset → challenger → held-out evaluation |
+| Package promotion | Deferred correctly | Complete `scripts/atlas` proof gates first |
+
+Current critical path:
+
+```text
+source coverage / lineage
+  → LineageQualifiedCandidateOrdinalMapV1
+  → CandidateFeatureMatrix
+  → held-out ranking
+  → deterministic Valkey replay
+  → ContextManifest
+  → bounded frozen-DAG execution
+  → neural decoder evaluation
+  → packages/atlas* promotion
+```
+
+## Historical completion estimates (2026-08-20)
+
+The percentages below are historical planning estimates. They are not
+substitutes for the explicit `PROVEN`, `PASS`, `DEGRADED`, or `NOT_PROVEN`
+gates above.
 
 ## Current completion view
 
@@ -63,7 +101,7 @@ The percentages below are planning estimates for the workstation roadmap. They a
 | TensorRT/LibTorch native lane | 40% | CUDA/TensorRT/LibTorch sources and OpenSpecs remain present | Build, backend identity, and runtime execution proofs |
 | Performance lane | 25% | simdjson and multi-threading are candidates, not active architecture | Benchmark current bottleneck before promotion |
 
-**Heuristic workstation estimate: 68%.** The primary remaining correctness gap is grounded execution with durable receipts, not missing GPU packages.
+**Historical heuristic estimate: 68%.** This is retained for context only.
 
 ## Explicitly not deleted
 
@@ -91,6 +129,19 @@ These items are future work and must not block AST correctness or the workstatio
 6. CAGRA benchmark only after the recorded architecture decision is explicitly revised; it remains quarantined.
 7. Redis/Valkey cache warming and TTL policy expansion after current packet usage and rebuild-cost telemetry exists.
 8. ONNX embedding lane only as an explicit alternative to the current Ollama embedding owner; never mix it with llama-server chat ownership.
+
+Deferred lane policy:
+
+- NetworkX remains the CPU oracle/compiler for the frozen execution DAG;
+  cuGraph/nx-cugraph is a derived large-graph analytics executor where its
+  supported operations apply. Do not reopen DAG topology work for GPU parity.
+- The sparse lane is a challenger evaluation among PostgreSQL lexical,
+  Qdrant BM25, experimental BM42, SPLADE, and miniCOIL. The legacy
+  `lexical_v1` log-TF codec is not BM25 or BM42, and no sparse promotion is
+  authorized without labeled ranking and identity-parity evidence.
+- DSpark and speculative decoding are serving-performance experiments only;
+  benchmark target compatibility, tool/reasoning parity, latency, and VRAM
+  after lineage, ranking, cache, and bounded execution gates.
 
 ## Safe execution order
 
@@ -914,3 +965,228 @@ elsewhere in the same file before assuming the fix was correct. `npx tsgo
   not mechanical)
 - `topology-ontology.ts` 4-entry port
 - The 15 unread src/ collisions (start with `learning-loop.ts`, the size-reversal flag)
+
+## Neural decoder gate checkpoint (2026-08-27)
+
+The neural decoder remains deliberately outside `packages/parent-atlas` until
+the script-level proof lanes are complete. `scripts/atlas` is the current
+proving ground; the decoder and DAG contracts are not yet wired to package
+execution.
+
+Current evidence:
+
+- `atlas:graphify:neural-prefill:preflight`: `PASS`, read-only, readiness `70%`.
+- `atlas:neural:prefill:shortlist:dry`: `EXECUTED_UNPROVEN`; 512 inputs,
+  96 shortlist, exact semantic 768 rerank, Recall@24 `0.333`, no labeled
+  NDCG proof.
+- `audit-ranker-envelope-readiness.mjs`: `WARN`; active ranker and ontology
+  readiness remain unresolved.
+- `audit-replay-semantic-admission-v1.mts`: `PROVEN` for the comparable corpus;
+  10,135 manifest rows and 10,135 scanner rows agree with zero replay-only or
+  indexer-only eligible paths.
+- `audit-bitfrost-semantic-cache.mjs`: `PASS` audit, but zero BitFrost,
+  centroid, or SOM keys were observed.
+- `audit-cache-namespace-proof.mjs`: `FAIL`; only 2 of 5 required namespaces
+  were ready.
+- Canonical packet/source content-hash lineage and a lineage-qualified
+  CandidateOrdinal snapshot remain unproven.
+- The packet-lineage census now classifies the gap: 1 packet is
+  `IDENTITY_UNRESOLVED`, 60,998 are `MISSING_GRAPHIFY_SOURCE`, and 4,148
+  packet/chunk joins are ambiguous; no source-level canonical packet lineage
+  is currently promotable.
+- The new source-reference samples show a grain/scope mismatch, not a safe
+  hash-only repair: packet references include historical `.txt`/basename
+  artifacts and `$lib` aliases, while Graphify-only references are current
+  workspace paths such as `.claude/...`. Build an explicit canonical source
+  resolver or bounded source bridge before attempting any backfill; do not
+  fuzzy-join or stamp revisions.
+- The representative Git/scanner/manifest oracle is recorded in
+  `docs/reports/source-admission-parity-v1.json`: 3 paths are `EXACT` and 3
+  are intentionally `CANONICAL_SCOPE_EXCLUDES_GIT_VISIBLE` (Git-visible
+  archives or reference data excluded from the canonical code corpus). Git
+  tracking is therefore an input, not the canonical admission authority.
+- The corrected multi-domain census now separates packet/chunk integrity from
+  source integrity: 332 packet/chunk hashes are exact, 4,148 are ambiguous,
+  and all 768 Graphify rows match the workspace-observed source-byte digest.
+  Graphify source-revision binding is now proven for the 768 observed rows via
+  `code_source_revision`; `source_revision` remains separately recorded as
+  Git/base-commit provenance.
+- The packet-targeted batches have now selected and committed 640 deterministic
+  missing source refs with the first-batch checksum
+  `e7c1d6b32faeef6971969efc0dc13986386c0a1715a929a1f14111f6cdbf69f6`.
+  Independent readback proved all three bounded batches; the initial broad
+  readback failure was an accounting defect caused by a reused run identifier,
+  not a source mismatch. The latest batch receipt records selection checksum
+  `9946353cdf321cd79ea5558f6bd784d14fc4d3686bd8803dd6cc49b581c61ae4`,
+  `latest_batch_applied=true`, and `latest_batch_readback_count=128`. The
+  fourth batch used selection checksum
+  `42f00214e3f7d2af6751ced04148d15c93a23dded5e5e5fc1ce6b7c15556739a`.
+  The fifth batch used selection checksum
+  `6bd9f922c178b04b29cca6765f6d8ce35c7b7b4eaa0aba760d191430799d859c`.
+  The 44,451 value is the batch planner's observation-scope gap; the current
+  packet census separately reports 60,998 packet refs without an exact
+  `graphify_files.source_ref` join.
+- The read-only source-reference resolver now quantifies the bridge needed
+  before lineage promotion: 405 raw exact matches, 621 basename-only
+  candidates, 2,665 ambiguous basename matches, and 57,968 unresolved refs.
+  Basename matches remain diagnostic-only until packet/chunk content or an
+  explicit canonical bridge proves identity; no fuzzy resolver is authorized.
+- The next lineage implementation gate is therefore a read-only canonical
+  source-ref bridge design, not another Graphify batch. It must classify each
+  proposed mapping as exact, content-proven, explicit-bridge, ambiguous, or
+  unresolved and preserve the source-level versus packet/chunk hash domains.
+- The read-only source-reference resolver audit is recorded in
+  `docs/reports/graphify-source-ref-resolution-v1.json`: 405 raw exact refs,
+  621 basename-only candidates, 2,665 ambiguous basename candidates, and
+  57,968 unresolved refs. A separate exact packet-hash → chunk-hash →
+  Graphify-source bridge is available for 39 packet identities. Basename and
+  normalized matches remain diagnostic only; only exact refs or this
+  independently verified bridge can enter the promotion path. The next
+  implementation gate is a canonical resolver for historical aliases, not
+  fuzzy backfill.
+- Decoder training and Parent Atlas package integration remain blocked.
+- The new packet-source coverage classifier records 17,208 packet refs that
+  match the current workspace observation exactly, of which 405 are already
+  present in Graphify and 16,803 are eligible missing sources for a future
+  bounded batch. It also records 2,854 normalized aliases, 5,230 ambiguous
+  candidates, 970 historical-artifact refs, 2,862 non-canonical-scope refs,
+  and 32,535 unresolved refs. The eligible missing-source count is now 16,675;
+  the refreshed selection checksum is
+  `cf23888c4970b2f4514dc2bdf1467eb0efa4292c34c81865e9393807c589af90`.
+- The existing `audit-candidate-corpus-lineage-v1.mjs` remains diagnostic-only:
+  it reports 4,951 candidates but assigns the prohibited fallback
+  `workspace-active-v1` and derives `graph-tree:<tree_node_id>` as a graph
+  revision. That receipt must not seed CandidateOrdinal promotion. A new
+  cohort producer must join exact packet/source refs to `graphify_files` and
+  carry the measured workspace/source revisions without fallbacks.
+- The new exact-join cohort audit finds 661 packet rows joined to Graphify,
+  128 with the repaired `graphify_files.workspace_revision`, and 11 with
+  exact source-plus-packet/chunk identity. The writer now persists and reads
+  back workspace revision; the remaining cohort blocker is explicit graph
+  revision ownership. No synthetic workspace revision or tree-node graph
+  revision may fill that gap.
+- An existing structural graph receipt is not compatible with this cohort:
+  it uses `workspaceRevision=ws:0084288f26` and
+  `graphRevision=graph:ws:0084288f26`, while the current source manifest is
+  SHA-256 revision `sha256:b19b04...`. Reuse is therefore rejected until a
+  graph snapshot is rebuilt and independently bound to the current workspace
+  revision.
+- The current-revision structural graph proof was run with the SHA-256
+  workspace revision and produced a deterministic empty, non-authoritative
+  artifact: 62,802 hyperedges and 603 feature relationships were read, but
+  all 63,405 kernels were excluded for workspace-revision mismatch. This
+  proves the graph projector path, not graph evidence for the current cohort;
+  relationship revision ownership must be repaired before PPR or graph
+  features can enter CandidateOrdinal.
+- `GraphRevisionV1` is now fixture-proven in
+  `scripts/atlas/prove-graph-revision-v1.mjs`: relationship order is invariant,
+  relationship addition and workspace changes alter the digest, and mixed
+  workspace or missing-checksum kernels are rejected. The production snapshot
+  builder now requires explicit workspace/candidate/ordinal inputs, rejects a
+  caller-supplied graph revision, and derives `graphRevision` from the included
+  relationship kernel set. The current live rebuild derived an empty,
+  deterministic graph revision because all 63,405 available kernels remain
+  historical.
+- The read-only `SourceRefBindingCandidateV1` audit now confirms that the
+  existing `atlas_source_refs` registry has 22,487 rows, but it is not yet an
+  approved alias/binding authority. It classifies packet refs as 17,208
+  `EXACT`, 855 `NORMALIZED_EXACT` review candidates, 2,548 `AMBIGUOUS`, and
+  41,048 `UNRESOLVED`. Only exact current-workspace bindings are promotable;
+  normalized matches remain review-only until an explicit durable alias
+  relation is approved. Report: `docs/reports/source-ref-binding-v1.json`.
+- The binding audit does not write `atlas_source_refs`, `atlas_packets`, or
+  Graphify rows. It establishes the missing relational boundary: packet ref →
+  canonical source → observed `sourceRevision` and `workspaceRevision`.
+  `atlas_packets.source_revision` is not required when that revision is
+  derived through the proven source binding.
+- The graph-revision owner audit identifies the current stale producer values:
+  all 62,802 `atlas_hyperedges` rows carry `workspace_revision=git:0084288f26`
+  and `graph_revision=taxonomy-edges-v1-2026-05-08`, while the current source
+  observation is `sha256:b19b04...`. The 24 `graph_analysis_runs` rows use
+  `workspace:parent-atlas`, also not the current observation. This is an owner
+  and materializer alignment problem, not evidence that the relationship rows
+  are current. Report: `docs/reports/graph-revision-owner-v1.json`.
+- The four-layer source-lineage audit confirms that `atlas_source_refs` is a
+  stable-identity layer with 22,487 rows and Graphify is a proven source-version
+  observation layer with 768 rows. The durable alias relation and the
+  workspace-scoped source-binding relation are both absent. A read-only current
+  projection joins 661 packet rows to Graphify, but only 128 currently carry
+  the active workspace revision. Report: `docs/reports/source-lineage-model-v1.json`.
+- The same audit found `0/768` Graphify source refs currently overlap the
+  `atlas_source_refs.source_ref_key` registry. The proposed foreign keys are
+  structurally valid, but applying the migration before reconciling these
+  identity namespaces would create no usable binding rows. Identity
+  reconciliation is therefore required before migration application.
+- The PostgreSQL FTS receipt is operational but not aligned: the
+  `compute_codebase_chunk_search_vector` producer is detected, the
+  `search_vector` GIN index is present, but the document producer is `MIXED`
+  while the query lane uses `english` (`configurationAligned=false`). This is
+  an independent lexical-lane gate and does not weaken or redefine the
+  canonical `semantic_768` representation. Report:
+  `docs/reports/postgres-fts-configurations-v1.json`.
+- The `MIXED` FTS result is explained by the producer definition: natural
+  language fields use `english`, while AST identifiers/imports/exports use
+  `simple`. Preserve this dual-tokenization for now; do not replace the whole
+  vector with one dictionary. A future identifier lane may justify a second
+  vector, but that requires a focused benchmark and separate index ownership.
+
+Required order before package promotion:
+
+1. Approve the source-binding authority and explicit aliases; do not promote
+   normalized, basename, suffix, or fuzzy matches.
+2. Repair or identify the relationship graph-revision owner, then rebuild a
+   current-workspace graph snapshot; do not derive graph revision from a
+   tree-node ID.
+3. Prove packet-to-Graphify source and content-hash lineage; do not mass-stamp
+   workspace revisions.
+4. Produce a revision-qualified CandidateOrdinal snapshot and complete feature
+   matrix input.
+5. Run labeled held-out ranking evaluation; the current synthetic exact-rerank
+   receipt is diagnostic only.
+6. Prove Valkey prefill MISS/HIT replay and required namespace readiness.
+7. Replay deterministic DAG templates through the script-level validator.
+8. Only then wire the proven pure contracts into `packages/parent-atlas`.
+9. Train or benchmark a neural decoder challenger last, behind explicit
+   approval and promotion gates.
+
+The pure DAG authority boundary is now fixture-proven in
+`scripts/atlas/prove-kernel-dag-validator-v1.mjs`. `KernelDagCandidateV1`
+is non-authoritative and non-executable; the validator binds it to frozen
+kernel, lineage, runtime-capability, permission, and budget inputs before
+`TypedRepairDagV1` can be constructed. The fixture covers acceptance plus
+cycle, unknown function, forbidden relation, stale candidate/graph ordinals,
+revision mismatches, missing evidence, argument-schema failure,
+unauthorized mutation, missing validator, unavailable runtime capability, and
+budget overflow. Report: `docs/reports/kernel-dag-validator-v1.json`.
+
+This remains `PROVEN_FIXTURE_ONLY`: live lineage-qualified CandidateOrdinal,
+live runtime capability evidence, live tool execution, and a trained neural
+decoder are not proven. AST identifier tokenization remains separate from
+English FTS tokenization, and `semantic_768` remains unchanged.
+
+The ReAct role is bounded exception replanning only. OaK remains the frozen
+typed kernel, and the neural decoder remains a proposal generator rather than
+an execution authority.
+
+### DAG incubation evidence
+
+`node scripts/atlas/prove-frozen-dag-v1.mjs` is now `PROVEN` for the isolated
+read-only fixture. It proves deterministic node/edge ordering, reversed-input
+checksum invariance, acyclicity, topological generations, ready-set
+derivation, execution-state replay, and the orthogonal mutation transitions
+through `ROLLED_BACK`. Generation semantics are explicitly
+`longest_dependency_distance_from_source`. The current DAG checksum is
+`2a74d304f27f0f98cc4e84548f645658bdf89d337faa6a5c2cf17a442d520584`. This does not yet
+prove the append-only PostgreSQL event projection, live bounded replay, or
+neural DAG quality. Those remain promotion gates.
+
+The existing Parent Atlas temporal ledger, runtime, and PostgreSQL repository
+fixture suites also passed 16/16 tests. This proves the fixture-level event
+and projection substrate; it does not prove live database readback or neural
+decoder promotion.
+
+Replay admission is now `PROVEN` for the full comparable code corpus:
+`admittedByBoth=10135`, `replayOnlyEligible=0`, and
+`indexerOnlyEligible=0`. The receipt is read-only and remains limited to the
+scanner-comparable extensions; it does not prove packet lineage, ranking
+quality, Valkey MISS/HIT behavior, or decoder readiness.

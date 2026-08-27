@@ -1,0 +1,82 @@
+{
+  "schema": "atlas.graph-revision-owner.v1",
+  "generatedAt": "2026-08-27T19:48:19.693Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "expectedWorkspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "presentTables": [
+    "atlas_graph_snapshots_v2",
+    "atlas_hyperedges",
+    "atlas_ontology_tuples",
+    "atlas_relationships",
+    "atlas_taxonomy_assignment_candidates",
+    "graph_analysis_runs"
+  ],
+  "revisionTables": {
+    "atlas_hyperedges": {
+      "rows": 62802,
+      "graph_revision_present": 62802,
+      "graph_revision_distinct": 1,
+      "workspace_revision_present": 62802,
+      "workspace_revision_distinct": 1,
+      "revisionSamples": [
+        {
+          "graph_revision": "taxonomy-edges-v1-2026-05-08",
+          "workspace_revision": "git:0084288f26"
+        }
+      ]
+    },
+    "atlas_ontology_tuples": {
+      "rows": 0,
+      "graph_revision_present": 0,
+      "graph_revision_distinct": 0,
+      "workspace_revision_present": 0,
+      "workspace_revision_distinct": 0,
+      "revisionSamples": []
+    },
+    "atlas_taxonomy_assignment_candidates": {
+      "rows": 0,
+      "graph_revision_present": 0,
+      "graph_revision_distinct": 0,
+      "workspace_revision_present": 0,
+      "workspace_revision_distinct": 0,
+      "revisionSamples": []
+    },
+    "graph_analysis_runs": {
+      "rows": 24,
+      "graph_revision_present": 24,
+      "graph_revision_distinct": 5,
+      "workspace_revision_present": 24,
+      "workspace_revision_distinct": 1,
+      "revisionSamples": [
+        {
+          "graph_revision": "1e01c4a8adbe381f69c974cc31d77bdd017d9f1bb99f45a08d8d46ff5fe95383",
+          "workspace_revision": "workspace:parent-atlas"
+        },
+        {
+          "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1",
+          "workspace_revision": "workspace:parent-atlas"
+        },
+        {
+          "graph_revision": "ae0533576dcdb7cc4fc14bcbb773a4a7e935b86f854063f2149f894277ed5dc0",
+          "workspace_revision": "workspace:parent-atlas"
+        },
+        {
+          "graph_revision": "d9fb40249115d14b393b80959b36475e54577310b81645c08e60fc77bff272a9",
+          "workspace_revision": "workspace:parent-atlas"
+        },
+        {
+          "graph_revision": "fd522e94dbb6b1e13ca3f52f2886afcb4d811be6d82ee7375eaa441452f8d019",
+          "workspace_revision": "workspace:parent-atlas"
+        }
+      ]
+    }
+  },
+  "ownerCandidates": {
+    "atlasGraphSnapshotsV2": "UNAVAILABLE",
+    "graphAnalysisRuns": "ANALYSIS_OWNER_CANDIDATE",
+    "relationshipRows": "NOT_AN_OWNER_UNTIL_WRITER_BINDS_CURRENT_WORKSPACE"
+  },
+  "status": "GRAPH_REVISION_OWNER_DATA_PRESENT_REQUIRES_CURRENT_BINDING_CHECK",
+  "nextGate": "TRACE_GRAPH_SNAPSHOT_OR_ANALYSIS_WRITER_TO_CURRENT_WORKSPACE_REVISION"
+}

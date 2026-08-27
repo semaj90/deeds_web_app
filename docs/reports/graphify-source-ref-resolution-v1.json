@@ -1,0 +1,838 @@
+{
+  "schema": "atlas.graphify-source-ref-resolution-v1",
+  "generatedAt": "2026-08-27T19:19:58.179Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "matchingPolicy": {
+    "rawExact": "promotion_eligible_only_with_independent_content_and_revision_proof",
+    "normalizedExact": "diagnostic_only_until_canonical_normalizer_is_approved",
+    "basenameUnique": "diagnostic_only_requires_content_hash_or_explicit_bridge",
+    "basenameAmbiguous": "rejected",
+    "unresolved": "rejected",
+    "crossDomainHashEqualityUsed": false
+  },
+  "counts": {
+    "packetSourceRefs": 61659,
+    "graphifySourceRefs": 512,
+    "exactPacketChunkGraphifyBridges": 39,
+    "RAW_EXACT": 405,
+    "NORMALIZED_EXACT": 0,
+    "BASENAME_UNIQUE": 621,
+    "BASENAME_AMBIGUOUS": 2665,
+    "UNRESOLVED": 57968
+  },
+  "samples": {
+    "NORMALIZED_EXACT": [],
+    "BASENAME_UNIQUE": [
+      {
+        "sourceRef": "CLAUDE.md",
+        "basename": "CLAUDE.md",
+        "graphifySourceRef": ".claude/CLAUDE.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/CLAUDE.md",
+        "basename": "CLAUDE.md",
+        "graphifySourceRef": ".claude/CLAUDE.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/docker-compose.yml",
+        "basename": "docker-compose.yml",
+        "graphifySourceRef": "docker-compose.yml",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/.github/copilot-instructions.md",
+        "basename": "copilot-instructions.md",
+        "graphifySourceRef": ".github/copilot-instructions.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/.mcp.json",
+        "basename": ".mcp.json",
+        "graphifySourceRef": ".mcp.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "data/external-docs/normalized/drizzle/migrations.md",
+        "basename": "migrations.md",
+        "graphifySourceRef": "data/external-docs/raw/drizzle/migrations.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "docs/reports/codebase-semantics-neo4j-report.json",
+        "basename": "codebase-semantics-neo4j-report.json",
+        "graphifySourceRef": "docs/graph/codebase-semantics-neo4j-report.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "feature-registry.json",
+        "basename": "feature-registry.json",
+        "graphifySourceRef": "docs/atlas/feature-registry.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "granite-docling-258M/config.json",
+        "basename": "config.json",
+        "graphifySourceRef": "docker/bifrost/config.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "karpathy-wiki/project/trace-kag-web-development-guide.md",
+        "basename": "trace-kag-web-development-guide.md",
+        "graphifySourceRef": "docs/architecture/trace-kag-web-development-guide.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "karpathy-wiki/project/trace-runtime-split.md",
+        "basename": "trace-runtime-split.md",
+        "graphifySourceRef": "docs/architecture/trace-runtime-split.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/AGENTS.md",
+        "basename": "AGENTS.md",
+        "graphifySourceRef": "AGENTS.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/CLAUDE.md",
+        "basename": "CLAUDE.md",
+        "graphifySourceRef": ".claude/CLAUDE.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/CMakePresets.json",
+        "basename": "CMakePresets.json",
+        "graphifySourceRef": "CMakePresets.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/examples/model-conversion/scripts/utils/__init__.py",
+        "basename": "__init__.py",
+        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/.gemini/settings.json",
+        "basename": "settings.json",
+        "graphifySourceRef": ".claude/settings.json",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/gguf/__init__.py",
+        "basename": "__init__.py",
+        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llama-cpp-turboquant-gemma4/gguf-py/tests/__init__.py",
+        "basename": "__init__.py",
+        "graphifySourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llm/karpathy_llmwiki.md",
+        "basename": "karpathy_llmwiki.md",
+        "graphifySourceRef": "docs/codebase_atlas/karpathy_llmwiki.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "llm/repo_root_map.md",
+        "basename": "repo_root_map.md",
+        "graphifySourceRef": "docs/codebase_atlas/repo_root_map.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "next_steps/completed/production-history/PRODUCTION_AUDIT_2026-03-15.md",
+        "basename": "PRODUCTION_AUDIT_2026-03-15.md",
+        "graphifySourceRef": "docs/legacy-reference/PRODUCTION_AUDIT_2026-03-15.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "packages/parent-atlas/docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+        "basename": "AGENT-TASK-PACKAGES-2026-06-13.md",
+        "graphifySourceRef": "docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-1.0-BASELINE.md",
+        "basename": "ATLAS-1.0-BASELINE.md",
+        "graphifySourceRef": "docs/atlas/ATLAS-1.0-BASELINE.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md",
+        "basename": "ATLAS-2.0-PHASE-2-COMPLETION.md",
+        "graphifySourceRef": "docs/atlas/ATLAS-2.0-PHASE-2-COMPLETION.md",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
+        "basename": "ATLAS-3.0-HYPERRAG-RUNTIME.md",
+        "graphifySourceRef": "docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
+        "packetCount": 1
+      }
+    ],
+    "BASENAME_AMBIGUOUS": [
+      {
+        "sourceRef": "claude-mem/cursor-hooks/README.md",
+        "basename": "README.md",
+        "graphifySourceRefs": [
+          "datasets/README.md",
+          "docker/langextract-optimized/README.md",
+          "docs/codebase_atlas/README.md",
+          "docs/legacy-reference/README.md"
+        ],
+        "candidateCount": 4,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/docker/claude-mem/README.md",
+        "basename": "README.md",
+        "graphifySourceRefs": [
+          "datasets/README.md",
+          "docker/langextract-optimized/README.md",
+          "docs/codebase_atlas/README.md",
+          "docs/legacy-reference/README.md"
+        ],
+        "candidateCount": 4,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/package.json",
+        "basename": "package.json",
+        "graphifySourceRefs": [
+          "crates/atlas_packet_parser/package.json",
+          "crates/turbovec-napi/package.json"
+        ],
+        "candidateCount": 2,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/skills/do/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/openclaw/skills/make-plan/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/package.json",
+        "basename": "package.json",
+        "graphifySourceRefs": [
+          "crates/atlas_packet_parser/package.json",
+          "crates/turbovec-napi/package.json"
+        ],
+        "candidateCount": 2,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/package.json",
+        "basename": "package.json",
+        "graphifySourceRefs": [
+          "crates/atlas_packet_parser/package.json",
+          "crates/turbovec-napi/package.json"
+        ],
+        "candidateCount": 2,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/babysit/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/design-is/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/do/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/how-it-works/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/knowledge-agent/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/learn-codebase/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/make-plan/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/mem-search/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/oh-my-issues/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/pathfinder/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/smart-explore/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/timeline-report/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/version-bump/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/weekly-digests/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/plugin/skills/wowerpoint/SKILL.md",
+        "basename": "SKILL.md",
+        "graphifySourceRefs": [
+          ".claude/skills/bits-ui-svelte5/SKILL.md",
+          ".claude/skills/drizzle-schema-review/SKILL.md",
+          ".claude/skills/metadata-context-analysis/SKILL.md",
+          ".claude/skills/trace-mcp-tooling/SKILL.md",
+          ".claude/skills/uno-css-design-system/SKILL.md",
+          ".opencode/skills/mcp-toolchain/SKILL.md",
+          ".opencode/skills/metadata-context-analysis/SKILL.md",
+          ".opencode/skills/rg-atlas/SKILL.md",
+          ".opencode/skills/trace-mcp-tooling/SKILL.md",
+          ".parent-atlas/skills/claim-verifier/SKILL.md"
+        ],
+        "candidateCount": 10,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/ragtime/README.md",
+        "basename": "README.md",
+        "graphifySourceRefs": [
+          "datasets/README.md",
+          "docker/langextract-optimized/README.md",
+          "docs/codebase_atlas/README.md",
+          "docs/legacy-reference/README.md"
+        ],
+        "candidateCount": 4,
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "claude-mem/README.md",
+        "basename": "README.md",
+        "graphifySourceRefs": [
+          "datasets/README.md",
+          "docker/langextract-optimized/README.md",
+          "docs/codebase_atlas/README.md",
+          "docs/legacy-reference/README.md"
+        ],
+        "candidateCount": 4,
+        "packetCount": 1
+      }
+    ],
+    "UNRESOLVED": [
+      {
+        "sourceRef": "1",
+        "normalizedSourceRef": "1",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "61026__.txt",
+        "normalizedSourceRef": "61026__.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_10_libtorch_review.txt",
+        "normalizedSourceRef": "6_10_libtorch_review.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_10_todo_parentatlas.txt",
+        "normalizedSourceRef": "6_10_todo_parentatlas.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_11_26_mem.txt",
+        "normalizedSourceRef": "6_11_26_mem.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_11_26_phase5_cannonical_.txt",
+        "normalizedSourceRef": "6_11_26_phase5_cannonical_.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_11_todo.txt",
+        "normalizedSourceRef": "6_11_todo.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_13_26_todo.txt",
+        "normalizedSourceRef": "6_13_26_todo.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_13_26__.txt",
+        "normalizedSourceRef": "6_13_26__.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "___6_13-codexout_.txt",
+        "normalizedSourceRef": "___6_13-codexout_.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_13_opencode_validation_skills.txt",
+        "normalizedSourceRef": "6_13_opencode_validation_skills.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_14_26_codexended_614.txt",
+        "normalizedSourceRef": "6_14_26_codexended_614.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_14_26__todo_find_schema_matching.txt",
+        "normalizedSourceRef": "6_14_26__todo_find_schema_matching.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_14_26__to_do_parent_atlas_registery.txt",
+        "normalizedSourceRef": "6_14_26__to_do_parent_atlas_registery.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_15_hyperrag_tod.txt",
+        "normalizedSourceRef": "6_15_hyperrag_tod.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "618__25todo.txt",
+        "normalizedSourceRef": "618__25todo.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_18_todopt2.txt",
+        "normalizedSourceRef": "6_18_todopt2.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_18_todo_pt3.txt",
+        "normalizedSourceRef": "6_18_todo_pt3.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_19_26_pt1.2_todo.txt",
+        "normalizedSourceRef": "6_19_26_pt1.2_todo.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "619_nextsteps_todopt1.3.txt",
+        "normalizedSourceRef": "619_nextsteps_todopt1.3.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_19_todo_pt1.txt",
+        "normalizedSourceRef": "6_19_todo_pt1.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "6_20_26__todo_.txt",
+        "normalizedSourceRef": "6_20_26__todo_.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "620_26.txt",
+        "normalizedSourceRef": "620_26.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "620_atlas_retrieval_contract_step1.txt",
+        "normalizedSourceRef": "620_atlas_retrieval_contract_step1.txt",
+        "packetCount": 1
+      },
+      {
+        "sourceRef": "620_pt2_next_steps_.txt",
+        "normalizedSourceRef": "620_pt2_next_steps_.txt",
+        "packetCount": 1
+      }
+    ]
+  },
+  "packetChunkGraphifyBridgeSamples": [
+    {
+      "packet_key": "packet:08007d10d8a0",
+      "packet_ref": "docs/graph/repo-workspace-map.md",
+      "chunk_ref": "docs/graph/repo-workspace-map.md"
+    },
+    {
+      "packet_key": "packet:087220309988",
+      "packet_ref": "docs/graph/batch-gpu-analysis-report.json",
+      "chunk_ref": "docs/graph/batch-gpu-analysis-report.json"
+    },
+    {
+      "packet_key": "packet:196138c47be8",
+      "packet_ref": "docs/ai-os/atlas-retry-index.json",
+      "chunk_ref": "docs/ai-os/atlas-retry-index.json"
+    },
+    {
+      "packet_key": "packet:1d7785eb7556",
+      "packet_ref": "docs/graph/contract-error-map.json",
+      "chunk_ref": "docs/graph/contract-error-map.json"
+    },
+    {
+      "packet_key": "packet:1daa458bdb73",
+      "packet_ref": "crates/atlas_packet_parser/wrapper.js",
+      "chunk_ref": "crates/atlas_packet_parser/wrapper.js"
+    },
+    {
+      "packet_key": "packet:225fa0b05a89",
+      "packet_ref": "crates/atlas_packet_parser/index.d.ts",
+      "chunk_ref": "crates/atlas_packet_parser/index.d.ts"
+    },
+    {
+      "packet_key": "packet:25ac9148f9bf",
+      "packet_ref": "crates/atlas_packet_parser/package.json",
+      "chunk_ref": "crates/atlas_packet_parser/package.json"
+    },
+    {
+      "packet_key": "packet:26c4544210c7",
+      "packet_ref": "docs/graph/karpathy-synthesis-scale-report.json",
+      "chunk_ref": "docs/graph/karpathy-synthesis-scale-report.json"
+    },
+    {
+      "packet_key": "packet:2813f4c5f0ad",
+      "packet_ref": "docs/codebase_atlas/karpathy_llmwiki.md",
+      "chunk_ref": "docs/codebase_atlas/karpathy_llmwiki.md"
+    },
+    {
+      "packet_key": "packet:35ab184c7b93",
+      "packet_ref": "docs/graph/repo-import-map.md",
+      "chunk_ref": "docs/graph/repo-import-map.md"
+    },
+    {
+      "packet_key": "packet:386b2c1e2307",
+      "packet_ref": "docs/codebase_atlas/index.md",
+      "chunk_ref": "docs/codebase_atlas/index.md"
+    },
+    {
+      "packet_key": "packet:41aaad7c7e65",
+      "packet_ref": "crates/atlas_packet_parser/Cargo.toml",
+      "chunk_ref": "crates/atlas_packet_parser/Cargo.toml"
+    },
+    {
+      "packet_key": "packet:4212b46a7842",
+      "packet_ref": "docs/graph/repo-engram-memory-report.md",
+      "chunk_ref": "docs/graph/repo-engram-memory-report.md"
+    },
+    {
+      "packet_key": "packet:547e1c54b3a0",
+      "packet_ref": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "chunk_ref": "docs/architecture/neo4j-graphrag-parent-atlas.md"
+    },
+    {
+      "packet_key": "packet:64838394f8dc",
+      "packet_ref": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "chunk_ref": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md"
+    },
+    {
+      "packet_key": "packet:64b8a0ed69b3",
+      "packet_ref": "crates/omni-bridge/build.rs",
+      "chunk_ref": "crates/omni-bridge/build.rs"
+    },
+    {
+      "packet_key": "packet:69de6f3a524e",
+      "packet_ref": "docs/graph/repo-env-map.md",
+      "chunk_ref": "docs/graph/repo-env-map.md"
+    },
+    {
+      "packet_key": "packet:6bd874a60226",
+      "packet_ref": "crates/turbovec-napi/wrapper.js",
+      "chunk_ref": "crates/turbovec-napi/wrapper.js"
+    },
+    {
+      "packet_key": "packet:79d6651669c5",
+      "packet_ref": "docs/codebase_atlas/feature_map.md",
+      "chunk_ref": "docs/codebase_atlas/feature_map.md"
+    },
+    {
+      "packet_key": "packet:7c61a052540c",
+      "packet_ref": "docs/atlas/cluster-cards.json",
+      "chunk_ref": "docs/atlas/cluster-cards.json"
+    },
+    {
+      "packet_key": "packet:810aee5c353d",
+      "packet_ref": "docs/codebase_atlas/repo_root_map.md",
+      "chunk_ref": "docs/codebase_atlas/repo_root_map.md"
+    },
+    {
+      "packet_key": "packet:83178ba18c48",
+      "packet_ref": "docs/graph/repo-language-map.json",
+      "chunk_ref": "docs/graph/repo-language-map.json"
+    },
+    {
+      "packet_key": "packet:8589ed47d789",
+      "packet_ref": "crates/atlas_packet_parser/build.rs",
+      "chunk_ref": "crates/atlas_packet_parser/build.rs"
+    },
+    {
+      "packet_key": "packet:8b5ff8a208e9",
+      "packet_ref": "docs/graph/repo-redis-ace-cards.md",
+      "chunk_ref": "docs/graph/repo-redis-ace-cards.md"
+    },
+    {
+      "packet_key": "packet:8d268e81f842",
+      "packet_ref": "crates/turbovec-napi/package.json",
+      "chunk_ref": "crates/turbovec-napi/package.json"
+    }
+  ],
+  "nextGate": "DESIGN_CANONICAL_SOURCE_REF_BRIDGE"
+}

@@ -4,12 +4,12 @@
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "durableOwnerBound": false,
-  "workspaceRevision": "sha256:83da899073596310ada1c5470a3a8180c4ead72a25844df520c2347ac621e451",
-  "sourceManifestDigest": "83da899073596310ada1c5470a3a8180c4ead72a25844df520c2347ac621e451",
-  "sourceManifestSourceCount": 23501,
-  "repositoryRevision": "35ad08e35e55aa493db72f65bdd142a29b4ff690",
-  "selectedWriteCount": 100,
-  "skippedSourceCount": 86,
+  "workspaceRevision": "sha256:1a045a3fc60b97d8a9b1b76ff47b12514070b986a252ad59b52ad61477f90d10",
+  "sourceManifestDigest": "1a045a3fc60b97d8a9b1b76ff47b12514070b986a252ad59b52ad61477f90d10",
+  "sourceManifestSourceCount": 23626,
+  "repositoryRevision": "53e0d6375385e6f85d6d86e3216d5de1bb15fd90",
+  "selectedWriteCount": 128,
+  "skippedSourceCount": 88,
   "records": [
     {
       "sourceRef": "__tests__/data-hashing.spec.ts",
@@ -710,6 +710,202 @@
       "contentHash": "e516d3a943d9862898dc062bc96b1d13678fcb25a146ea8470c93d387ea4a8ad",
       "byteLength": 9357,
       "gitBlobOid": "7838c9bf5ca950edf08b695b1a8d9a15c6480a63"
+    },
+    {
+      "sourceRef": ".okf/pipelines/web-sources.md",
+      "codeSourceRevision": "sha256:a28a55a71f0ee1c506974676fbb0d8aed4eb7bcf3b24f11cf20cdbe453a41315",
+      "contentHash": "a28a55a71f0ee1c506974676fbb0d8aed4eb7bcf3b24f11cf20cdbe453a41315",
+      "byteLength": 3296,
+      "gitBlobOid": "000de63e729d1c50bf908df67dfc0903f0ea8ea2"
+    },
+    {
+      "sourceRef": ".okf/predicates/feature-relationships.yaml",
+      "codeSourceRevision": "sha256:1d552621fd67aaa39d9032f6747c513863a721bfe2aaba8e2b79f13041861370",
+      "contentHash": "1d552621fd67aaa39d9032f6747c513863a721bfe2aaba8e2b79f13041861370",
+      "byteLength": 2855,
+      "gitBlobOid": "7bf0cda383e65ebc13bacd04891c80516c18d966"
+    },
+    {
+      "sourceRef": ".okf/runbooks/admin-dashboard-setup.md",
+      "codeSourceRevision": "sha256:ed185303365fcdafbdb1f118d53c0ecc4c60276d349ed08123223c9050b604e2",
+      "contentHash": "ed185303365fcdafbdb1f118d53c0ecc4c60276d349ed08123223c9050b604e2",
+      "byteLength": 10948,
+      "gitBlobOid": "cda6441daa9b33475743c21b3e3558f6ff5c4347"
+    },
+    {
+      "sourceRef": ".okf/systems/deep-research.md",
+      "codeSourceRevision": "sha256:77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a",
+      "contentHash": "77d46ae9c275ae0f8e4495ec9ed0dc498eeb0c0655682f67919f047f13f12f5a",
+      "byteLength": 10589,
+      "gitBlobOid": "dc0f2302691d2d4ae84e82b6593851f56a303d6b"
+    },
+    {
+      "sourceRef": ".okf/systems/hyperrag.md",
+      "codeSourceRevision": "sha256:3996a6d01c424510089975e5d8ac04b4e7fb8d5198c67690f1deea80e68a2460",
+      "contentHash": "3996a6d01c424510089975e5d8ac04b4e7fb8d5198c67690f1deea80e68a2460",
+      "byteLength": 6521,
+      "gitBlobOid": "18e445ecbf5b008b249fd6997c9bf58d7ad5399a"
+    },
+    {
+      "sourceRef": ".okf/tools/gemma4-synthesis.md",
+      "codeSourceRevision": "sha256:80fcd672f85b31efd5306b687f91038d25e30bafecc19ca17c2e0b7f5345f9b9",
+      "contentHash": "80fcd672f85b31efd5306b687f91038d25e30bafecc19ca17c2e0b7f5345f9b9",
+      "byteLength": 7682,
+      "gitBlobOid": "cafd463eba23bd1c57d26069ce0cd2164af09d74"
+    },
+    {
+      "sourceRef": ".okf/tools/ml-ranking-sidecar.md",
+      "codeSourceRevision": "sha256:eeefbff4f906ce8073d9d535be0c1767162211d96d03b9219220350443220606",
+      "contentHash": "eeefbff4f906ce8073d9d535be0c1767162211d96d03b9219220350443220606",
+      "byteLength": 9219,
+      "gitBlobOid": "43205eedb4dfcfee35ee61446aed5bdc20659ba6"
+    },
+    {
+      "sourceRef": ".opencode/agents/mcp-toolchain.md",
+      "codeSourceRevision": "sha256:0c867e08540777feab3dc43e8bdf33b28fae4f9e2f5221de0f2d07a1139d5e2a",
+      "contentHash": "0c867e08540777feab3dc43e8bdf33b28fae4f9e2f5221de0f2d07a1139d5e2a",
+      "byteLength": 1142,
+      "gitBlobOid": "af6944d294715cd80b4cb17e7777d4c499c62f9b"
+    },
+    {
+      "sourceRef": ".opencode/agents/metadata-context-analysis.md",
+      "codeSourceRevision": "sha256:c4c236a03e274957d7e55f6a0e8a01caed3294be6df14be4a1c012f325b9b381",
+      "contentHash": "c4c236a03e274957d7e55f6a0e8a01caed3294be6df14be4a1c012f325b9b381",
+      "byteLength": 554,
+      "gitBlobOid": "8f965266cc24bdd1288786df2b1669e7289f28ec"
+    },
+    {
+      "sourceRef": ".opencode/agents/rg-atlas.md",
+      "codeSourceRevision": "sha256:f0afd3b03a267bbd63e18d472b06db36a97f2597d5162bccaddd78bf476ed0c9",
+      "contentHash": "f0afd3b03a267bbd63e18d472b06db36a97f2597d5162bccaddd78bf476ed0c9",
+      "byteLength": 1049,
+      "gitBlobOid": "fc6bc4f612fea6f5554577b9b5e643fdeeea4a6b"
+    },
+    {
+      "sourceRef": ".opencode/agents/trace-mcp-tooling.md",
+      "codeSourceRevision": "sha256:1025202647a62e97262f7fe33238774931c6e28e5f494b994dcffcd3849cb371",
+      "contentHash": "1025202647a62e97262f7fe33238774931c6e28e5f494b994dcffcd3849cb371",
+      "byteLength": 860,
+      "gitBlobOid": "e37e11c2fd3b736b068cf7bd379bbfd54ec1fe20"
+    },
+    {
+      "sourceRef": ".opencode/command/mcp-engram.md",
+      "codeSourceRevision": "sha256:7c6ffa39624f2eb556c45127bc0bf95e6ac1cb6e4a969672b9f2d3524d8163c3",
+      "contentHash": "7c6ffa39624f2eb556c45127bc0bf95e6ac1cb6e4a969672b9f2d3524d8163c3",
+      "byteLength": 146,
+      "gitBlobOid": "30f3832b5d13aa8ca7275ed1b70b8395fab927fd"
+    },
+    {
+      "sourceRef": ".opencode/command/mcp-health.md",
+      "codeSourceRevision": "sha256:1b6150309ed32299db042216caa2debd9e347d7c26bc651a2ae0ef8091b02761",
+      "contentHash": "1b6150309ed32299db042216caa2debd9e347d7c26bc651a2ae0ef8091b02761",
+      "byteLength": 270,
+      "gitBlobOid": "456273fd891a1846b5d5e6ee1bf6ee6f07741f4d"
+    },
+    {
+      "sourceRef": ".opencode/command/mcp-langextract.md",
+      "codeSourceRevision": "sha256:cc36a2d3e24c782c990231d2a5e321a93f2989eb71802be21149e3f9b5e00098",
+      "contentHash": "cc36a2d3e24c782c990231d2a5e321a93f2989eb71802be21149e3f9b5e00098",
+      "byteLength": 173,
+      "gitBlobOid": "ae3b95fa22112e80b0cfde1b35660cfc43a06f2d"
+    },
+    {
+      "sourceRef": ".opencode/command/mcp-trace.md",
+      "codeSourceRevision": "sha256:c4508fd01544fb877d9345ea5b2de9ca13e2cfd868b9779dba973ee197f2fd8e",
+      "contentHash": "c4508fd01544fb877d9345ea5b2de9ca13e2cfd868b9779dba973ee197f2fd8e",
+      "byteLength": 147,
+      "gitBlobOid": "ae18f5a767eecb7fa6b6a9f019b26176828750f7"
+    },
+    {
+      "sourceRef": ".opencode/command/mcp-turbovec.md",
+      "codeSourceRevision": "sha256:7b22e2c977727997be387070d7a3a0fda037994a81c52ee655132ad3d3444793",
+      "contentHash": "7b22e2c977727997be387070d7a3a0fda037994a81c52ee655132ad3d3444793",
+      "byteLength": 144,
+      "gitBlobOid": "a6449114dda1daa7b6090ccfda7f06fd58a253f4"
+    },
+    {
+      "sourceRef": ".opencode/command/rg-atlas.md",
+      "codeSourceRevision": "sha256:c7435a9535e2f222fea2c91409cacb80964dc9c5e799ea28323bf650a78ccea2",
+      "contentHash": "c7435a9535e2f222fea2c91409cacb80964dc9c5e799ea28323bf650a78ccea2",
+      "byteLength": 241,
+      "gitBlobOid": "7617840568699e2cd3ac4eb6001b7f36eef27a57"
+    },
+    {
+      "sourceRef": ".opencode/skills/mcp-toolchain/SKILL.md",
+      "codeSourceRevision": "sha256:8dd0fb7b13d6933ef518c82b1c9f48911d24020e9ef8297541d871495a23a511",
+      "contentHash": "8dd0fb7b13d6933ef518c82b1c9f48911d24020e9ef8297541d871495a23a511",
+      "byteLength": 625,
+      "gitBlobOid": "83ece1b9c6c53909b9a2b6d33ae9b3a2bfe118b8"
+    },
+    {
+      "sourceRef": ".opencode/skills/metadata-context-analysis/SKILL.md",
+      "codeSourceRevision": "sha256:c1049a8e1b4b528bef57ef8de2fc37d04b4095350db4691e70c2870beb82488c",
+      "contentHash": "c1049a8e1b4b528bef57ef8de2fc37d04b4095350db4691e70c2870beb82488c",
+      "byteLength": 2008,
+      "gitBlobOid": "0cb4963a5ee052d0a6005cf522feb115ea0d6392"
+    },
+    {
+      "sourceRef": ".opencode/skills/rg-atlas/SKILL.md",
+      "codeSourceRevision": "sha256:3c8370d6beb6e00d94d94dcca83ed8d4689607fb4b7dee22fa8e8ebeda6735cc",
+      "contentHash": "3c8370d6beb6e00d94d94dcca83ed8d4689607fb4b7dee22fa8e8ebeda6735cc",
+      "byteLength": 690,
+      "gitBlobOid": "d19c120eca1c596302c68dc63477e42deb3840b3"
+    },
+    {
+      "sourceRef": ".opencode/skills/trace-mcp-tooling/SKILL.md",
+      "codeSourceRevision": "sha256:e96c7f0a6ad2511dd0d9497538259f9fff6d0707216ba283af2445a79e5ba446",
+      "contentHash": "e96c7f0a6ad2511dd0d9497538259f9fff6d0707216ba283af2445a79e5ba446",
+      "byteLength": 3541,
+      "gitBlobOid": "927e5b071d933da9da8f70c32b8017840c0b73ec"
+    },
+    {
+      "sourceRef": ".opencode/startup-briefing.json",
+      "codeSourceRevision": "sha256:a0ca048509a49514a11e905e3f5748f1653cee9498969af616f712a24352b2ec",
+      "contentHash": "a0ca048509a49514a11e905e3f5748f1653cee9498969af616f712a24352b2ec",
+      "byteLength": 75730,
+      "gitBlobOid": "41e4042a1caf602991f9abb9d5718333815a6011"
+    },
+    {
+      "sourceRef": ".opencode/startup-briefing.md",
+      "codeSourceRevision": "sha256:ebb6af9d82f006c641450600ad7f747fc986f3fdcd67f57c853a2704bc069fad",
+      "contentHash": "ebb6af9d82f006c641450600ad7f747fc986f3fdcd67f57c853a2704bc069fad",
+      "byteLength": 6706,
+      "gitBlobOid": "26b4b141bb41180eb434209511a5e0876b5f4b2b"
+    },
+    {
+      "sourceRef": ".opencode/system.md",
+      "codeSourceRevision": "sha256:3ce4d31ec8f83d5d0216dc8b6e4b3ca1636caf77b0863c4df17ff5be8a1e4574",
+      "contentHash": "3ce4d31ec8f83d5d0216dc8b6e4b3ca1636caf77b0863c4df17ff5be8a1e4574",
+      "byteLength": 3942,
+      "gitBlobOid": "4994f60bdf82b6b5ed4ea50b447edbe21e226364"
+    },
+    {
+      "sourceRef": ".parent-atlas/skills/claim-verifier/pyproject.toml",
+      "codeSourceRevision": "sha256:25d29d066c89d426585a6dcf8f08adee857c5cd0a19bb8d037be7cb3d82a3b98",
+      "contentHash": "25d29d066c89d426585a6dcf8f08adee857c5cd0a19bb8d037be7cb3d82a3b98",
+      "byteLength": 271,
+      "gitBlobOid": "5415dcc24007e2a819aa0ee9064e41d62a231f8d"
+    },
+    {
+      "sourceRef": ".parent-atlas/skills/claim-verifier/SKILL.md",
+      "codeSourceRevision": "sha256:ee90569bb1befa310637398ee634d3464b05c06f532a3fa7d44ddbaa3a0f8d33",
+      "contentHash": "ee90569bb1befa310637398ee634d3464b05c06f532a3fa7d44ddbaa3a0f8d33",
+      "byteLength": 754,
+      "gitBlobOid": "28496c328c8a15f38345bd64a529f6fc5817390f"
+    },
+    {
+      "sourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
+      "codeSourceRevision": "sha256:20b5781b5278ca476450243da8846525d5606c0f614a561e76da6f02c5cd3685",
+      "contentHash": "20b5781b5278ca476450243da8846525d5606c0f614a561e76da6f02c5cd3685",
+      "byteLength": 984,
+      "gitBlobOid": "af4d16639b0c83a4fe17bc0863c0324f1989e66a"
+    },
+    {
+      "sourceRef": ".parent-atlas/skills/file-repair/pyproject.toml",
+      "codeSourceRevision": "sha256:065312c5b633b117bbd5b9bb5c86dfe09aac8eb4eb2d8b228a5ca652f97e2b6e",
+      "contentHash": "065312c5b633b117bbd5b9bb5c86dfe09aac8eb4eb2d8b228a5ca652f97e2b6e",
+      "byteLength": 265,
+      "gitBlobOid": "d64aaa2a7f051108230298c8130b40351c5e0766"
     }
   ],
   "authority": {
