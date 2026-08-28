@@ -28,9 +28,28 @@
   relationship corpus is empty.
 - [x] **CANARY-03 — Prove semantic_768 retrieval replay.** The exact retrieval
   and ContextManifest replay returned 15/15 with an identical replay checksum.
+- [x] **CANARY-03A — Prove semantic representation at the chunk authority.**
+  The lineage-aware semantic cohort audit found 15/15 exact chunk rows with
+  768-dimensional vectors and producer metadata. Legacy packet-level
+  `representation_revision = 0` remains non-authoritative metadata.
 - [x] **CANARY-04 — Prove Workstation V1 canary orchestration.** Receipt status
   is `WORKSTATION_V1_PROVEN`; this is a read-only canary, not full-corpus
   promotion.
+- [x] **FANOUT-01 — Define and test `FanoutEvidenceBundleV1`.** The shared
+  derived envelope now binds lexical, semantic, structural, compiler,
+  ontology, multihop, and topology evidence to source revisions before
+  deterministic summary/prefill assembly.
+- [x] **FANOUT-02 — Compile bounded context from the fan-out bundle.** The
+  pure `FanoutContextCompilerV1` adapter enforces evidence ordering,
+  tokenizer/budget identity, and deterministic context-manifest checksums;
+  cache and DAG execution remain downstream.
+- [x] **FANOUT-03 — Normalize ACE packet fields.** The pure ACE adapter maps
+  lexical and concept fields into revision-bound evidence while preserving the
+  rule that ACE metadata alone cannot claim exact source spans or ontology
+  authority.
+- [x] **FANOUT-04 — Enforce exact grounded spans.** The grounded-evidence
+  adapter rejects invalid ranges and any extraction text that does not equal
+  the exact UTF-8 source slice.
 - [ ] **LINEAGE-01 — Reconcile the full source namespace.** The current audit
   reports zero exact manifest/projection joins, 205 truncated-hash candidates,
   770 source/hash mismatches, and 15,591 missing PostgreSQL chunk bindings.

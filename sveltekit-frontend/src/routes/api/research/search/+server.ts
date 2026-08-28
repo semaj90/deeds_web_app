@@ -14,6 +14,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { searchViaGoRetrieval } from '$lib/server/retrieval/go-retrieval-client.js';
 
 const bodySchema = z.object({
   query: z.string().min(1).max(1000),
@@ -40,6 +41,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const { query, sources, limit, scoreThreshold } = parsed.data;
 
   try {
+    const goResults = await searchViaGoRetrieval({
+      query,
+      topK: limit,
+      minScore: scoreThreshold,
+      scoreThreshold,
+      sourceFilter: sources,
+    });
+
+    if (goResults) {
+      const results = goResults.results.map((hit) => ({
+        chunk_id: String(hit.chunk_id ?? hit.chunkId ?? hit.id ?? ''),
+        source: String(hit.source ?? hit.source_type ?? hit.sourceType ?? 'web_page'),
+        url: String(hit.source_url ?? hit.sourceUrl ?? ''),
+        title: String(hit.title ?? hit.source_title ?? hit.sourceTitle ?? ''),
+        body: String(hit.content ?? hit.text ?? hit.snippet ?? ''),
+        score: Number(hit.score ?? 0),
+        semantic_tags: Array.isArray(hit.ontology) ? hit.ontology.map(String) : [],
+      }));
+      return json({ results, query });
+    }
+
     const { generateEmbedding } = await import('$lib/server/grpc/embedding-client.js');
     const embedding = await generateEmbedding(query);
 

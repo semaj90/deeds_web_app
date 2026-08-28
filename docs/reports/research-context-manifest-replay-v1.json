@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.research-context-manifest-replay.v1",
+  "readOnly": true,
+  "collection": "chunks_web_search",
+  "query": "PostgreSQL pgvector",
+  "pointCount": 11,
+  "aceSelectedCount": 11,
+  "contextSelectedCount": 11,
+  "rejectedCount": 0,
+  "manifestId": "context:d09873dfc53b2657bde10ae7",
+  "replayManifestId": "context:d09873dfc53b2657bde10ae7",
+  "manifestChecksum": "sha256:196fdc16a338a1d48c4d9bd7c0199bdb17d5ff1f66b7336bf6f00dbc7cbf1888",
+  "replayManifestChecksum": "sha256:196fdc16a338a1d48c4d9bd7c0199bdb17d5ff1f66b7336bf6f00dbc7cbf1888",
+  "deterministicReplay": true,
+  "externalEvidenceOnly": true,
+  "localIdentityAssigned": false,
+  "selectedSourceRefs": [],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "CONTEXT_MANIFEST_EXTERNAL_REPLAY_PROVEN",
+  "nextGate": "PROMPT_PLAN_EXTERNAL_REPLAY"
+}

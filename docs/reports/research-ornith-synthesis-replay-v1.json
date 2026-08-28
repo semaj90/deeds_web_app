@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.research-ornith-synthesis-replay.v1",
+  "readOnly": true,
+  "status": "ORNITH_EXTERNAL_SYNTHESIS_BLOCKED",
+  "error": "The operation was aborted due to timeout",
+  "toolsEnabled": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  }
+}

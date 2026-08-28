@@ -18,10 +18,12 @@ import pg from 'pg';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
-loadAtlasEnv(resolve('.'));
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+loadAtlasEnv(REPO_ROOT);
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const QDRANT_URL = (process.env.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
@@ -39,7 +41,7 @@ function guardReadOnly(sql) {
 
 function safeGitRevision() {
   try {
-    return execSync('git rev-parse HEAD', { cwd: resolve('..'), encoding: 'utf-8' }).trim();
+    return execSync('git rev-parse HEAD', { cwd: REPO_ROOT, encoding: 'utf-8' }).trim();
   } catch {
     return 'UNKNOWN';
   }
@@ -425,7 +427,7 @@ async function main() {
     report.lineage_classification_counts = lineageCounts;
 
     // ── Write reports ────────────────────────────────────────────────────────
-    const reportsDir = resolve('..', 'docs', 'reports');
+    const reportsDir = resolve(REPO_ROOT, 'docs', 'reports');
     mkdirSync(reportsDir, { recursive: true });
     const jsonPath = resolve(reportsDir, `latent-representation-identity-audit-${REPORT_DATE}.json`);
     const mdPath = resolve(reportsDir, `latent-representation-identity-audit-${REPORT_DATE}.md`);

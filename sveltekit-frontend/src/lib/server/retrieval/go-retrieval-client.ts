@@ -97,6 +97,8 @@ export interface GoRetrievalSearchParams {
   query: string;
   topK?: number;
   minScore?: number;
+  sourceFilter?: string[];
+  scoreThreshold?: number;
   caseId?: string;
   sectionTypes?: string[];
   filters?: Record<string, unknown>;
@@ -109,6 +111,15 @@ function normalizeBaseUrl(baseUrl: string): string {
 function normalizeLabel(value: unknown): string | undefined {
   const text = String(value ?? '').trim();
   return text ? text : undefined;
+}
+
+function normalizeNullable(value: unknown): string | null {
+  return normalizeLabel(value) ?? null;
+}
+
+function normalizeProjectionId(value: unknown): string | number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  return normalizeNullable(value);
 }
 
 function normalizeHit(item: Record<string, unknown>): GoRetrievalSearchHit {
@@ -153,18 +164,20 @@ function normalizeHit(item: Record<string, unknown>): GoRetrievalSearchHit {
   const packetKey = normalizeLabel(item.packet_key ?? item.packetKey ?? metadata.packet_key ?? metadata.packetKey);
   const sourceRef = normalizeLabel(item.source_ref ?? item.sourceRef ?? metadata.source_ref ?? metadata.sourceRef);
   const canonicalSourceRef = normalizeLabel(item.canonical_source_ref ?? item.canonicalSourceRef ?? metadata.canonical_source_ref ?? metadata.canonicalSourceRef);
-  const projectionId = item.qdrant_point_id ?? item.qdrantPointId ?? metadata.qdrant_point_id ?? metadata.qdrantPointId ?? item.id;
+  const projectionId = normalizeProjectionId(
+    item.qdrant_point_id ?? item.qdrantPointId ?? metadata.qdrant_point_id ?? metadata.qdrantPointId ?? item.id,
+  );
   const repoSearchIdentity = mapRepoSearchIdentityV1({
-    repositoryId: item.repository_id ?? item.repositoryId ?? metadata.repository_id ?? metadata.repositoryId,
+    repositoryId: normalizeNullable(item.repository_id ?? item.repositoryId ?? metadata.repository_id ?? metadata.repositoryId),
     symbolVersionId,
     packetKey,
-    contentHash: item.content_hash ?? item.contentHash ?? metadata.content_hash ?? metadata.contentHash,
+    contentHash: normalizeNullable(item.content_hash ?? item.contentHash ?? metadata.content_hash ?? metadata.contentHash),
     sourceRef,
     canonicalSourceRef,
-    workspaceRevision: item.workspace_revision ?? item.workspaceRevision ?? metadata.workspace_revision ?? metadata.workspaceRevision,
-    sourceRevision: item.source_revision ?? item.sourceRevision ?? metadata.source_revision ?? metadata.sourceRevision,
-    representationId: item.representation_id ?? item.representationId ?? metadata.representation_id ?? metadata.representationId,
-    representationRevision: item.representation_revision ?? item.representationRevision ?? metadata.representation_revision ?? metadata.representationRevision,
+    workspaceRevision: normalizeNullable(item.workspace_revision ?? item.workspaceRevision ?? metadata.workspace_revision ?? metadata.workspaceRevision),
+    sourceRevision: normalizeNullable(item.source_revision ?? item.sourceRevision ?? metadata.source_revision ?? metadata.sourceRevision),
+    representationId: normalizeNullable(item.representation_id ?? item.representationId ?? metadata.representation_id ?? metadata.representationId),
+    representationRevision: normalizeNullable(item.representation_revision ?? item.representationRevision ?? metadata.representation_revision ?? metadata.representationRevision),
     projectionId,
     projectionKind: 'qdrant',
   });
@@ -239,8 +252,9 @@ export async function searchViaGoRetrieval(
 ): Promise<GoRetrievalSearchResponse | null> {
   if (!(ENV.RAG_USE_GO_RETRIEVAL || ENV.GO_RETRIEVAL_HTTP_ENABLED)) return null;
 
-  const baseUrl = normalizeBaseUrl(ENV.GO_RETRIEVAL_HTTP_URL ?? ENV.RETRIEVAL_HTTP_URL);
+  const baseUrl = normalizeBaseUrl(ENV.GO_RETRIEVAL_HTTP_URL ?? ENV.RETRIEVAL_HTTP_URL ?? '');
   const endpoints = [
+    '/search/research',
     '/api/retrieval/search',
     '/search',
     '/search/evidence',
@@ -262,6 +276,8 @@ export async function searchViaGoRetrieval(
           top_k: params.topK ?? 10,
           minScore: params.minScore ?? 0,
           min_score: params.minScore ?? 0,
+          source_filter: params.sourceFilter ?? [],
+          score_threshold: params.scoreThreshold ?? params.minScore ?? 0,
           caseId: params.caseId ?? '',
           case_id: params.caseId ?? '',
           sectionTypes: params.sectionTypes ?? [],

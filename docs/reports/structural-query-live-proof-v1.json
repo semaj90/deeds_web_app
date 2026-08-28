@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.structural-query-live-proof.v1",
+  "mode": "READ_ONLY_LIVE_SIDECAR",
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/ast/chunk"
+  },
+  "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+  "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+  "sourceDigest": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+  "query": "which function calls CandidateOrdinal?",
+  "observationCount": 52,
+  "matchCount": 15,
+  "resultChecksum": "75d2b1f4fe4a872d451fb53a5e69b92dad3dfd867f1c7de2c1d8f9b2b997f2e5",
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "executable": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "status": "STRUCTURAL_QUERY_OBSERVATION_ADAPTER_PROVEN",
+  "nextGate": "STRUCT-11_ATLAS_IDENTITY_RESOLUTION"
+}

@@ -15,6 +15,8 @@
  *
  * Usage:
  *   node scripts/atlas/backfill-latent-vectors.mjs [--dry-run] [--limit=N] [--batch=100]
+ *   Legacy persistence additionally requires --legacy-unsafe-apply. This
+ *   writer is not the promotion producer for RepresentationArtifactV1.
  *
  * Exit codes: 0 = success, 1 = weights missing, 2 = Qdrant unreachable, 3 = DB error
  */
@@ -52,6 +54,7 @@ const REDIS_TTL   = 7 * 24 * 3600; // 7 days
 
 const args     = process.argv.slice(2);
 const APPLY    = args.includes('--apply');
+const LEGACY_UNSAFE_APPLY = args.includes('--legacy-unsafe-apply');
 const DRY_RUN  = !APPLY || args.includes('--dry-run');
 const RESUME   = args.includes('--resume');
 const limitArg = args.find(a => a.startsWith('--limit='));
@@ -236,6 +239,13 @@ function writeCheckpoint(checkpoint) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (APPLY && !LEGACY_UNSAFE_APPLY) {
+    throw new Error(
+      'LATENT_LEGACY_WRITER_APPLY_BLOCKED: use the revision-qualified canary producer; '
+      + 'explicit --legacy-unsafe-apply is required for diagnostic legacy persistence',
+    );
+  }
+
   console.log('\n╔══════════════════════════════════════════════════════════════════╗');
   console.log('║  backfill-latent-vectors.mjs — AE Encode: 768 → 128 → 64        ║');
   console.log(`╚══════════════════════════════════════════════════════════════════╝\n`);

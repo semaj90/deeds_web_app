@@ -151,3 +151,61 @@ live Graphify owner integration remain upstream correctness gates.
 - `A2A_RECEIPT_LINK_PASS`
 
 No task in this change may promote CAGRA, change RRF semantics, or alter canonical identity ownership.
+
+## Structural CST/AST retrieval lane — 2026-08-28
+
+The retrieval fabric is now explicitly modeled as lexical, sparse, dense,
+structural CST/AST/symbol, graph, and optional late-interaction lanes. Tree-sitter
+owns syntax/CST evidence; ast-grep owns structural matching; PostgreSQL remains
+canonical identity/revision authority; SearchRuntime remains the single RRF owner.
+Structural results must resolve to `CandidateOrdinal` before fusion.
+
+- [x] **STRUCT-08** Define and export `StructuralQueryPlanV1` with deterministic
+  query digest, literal terms, target symbols, node-kind hints, structural
+  predicates, and CST/AST/signature mode. The plan is non-authoritative and
+  non-executable until an executor is proven.
+- [x] **STRUCT-09** Add fixture validation proving `canonicalAuthority=false` and
+  `executable=false` for structural query plans.
+- [x] **STRUCT-10A** Implement a read-only observation query adapter consuming
+  `StructuralQueryPlanV1`; preserve source references, source revisions, byte
+  spans, captures, and extractor revisions. The adapter is deliberately not a
+  parser process, identity resolver, projection writer, or CandidateOrdinal
+  assigner.
+- [ ] **STRUCT-10B** Add the live Tree-sitter/ast-grep parser-process executor
+  behind the observation adapter; preserve grammar revision and source bytes in
+  its receipt.
+- [ ] **STRUCT-11** Resolve structural observations through the existing Atlas
+  identity bridge to `packetKey`, `canonicalId`, and `CandidateOrdinal`; reject
+  unresolved, ambiguous, stale, or mixed-workspace results.
+- [ ] **STRUCT-12** Emit a lane-local structural result envelope with rank/score
+  diagnostics only; do not compare structural scores directly with dense or
+  lexical scores.
+- [ ] **STRUCT-13** Feed the structural lane into the existing SearchRuntime
+  identity-resolution and RRF path as one logical contribution; do not add a
+  second fusion owner or a second canonical writer.
+- [ ] **STRUCT-14** Define `AtlasStructuralSparseV1` as a derived deterministic
+  feature representation for symbols, node kinds, CST/AST paths, calls, imports,
+  type references, grounded concepts, and evidence classes. Do not label it SPLADE
+  unless a learned SPLADE-style producer is actually implemented and evaluated.
+- [ ] **STRUCT-15** Prove bounded structural queries for declaration, call, import,
+  implementation, and revision/checksum lookup on a fixed source corpus.
+- [ ] **STRUCT-16** Add structural-vs-lexical-vs-dense ablation receipts with exact
+  CandidateOrdinal deduplication before RRF; no topology, ColBERT, TurboVec, or
+  PyTorch classifier is a prerequisite for this gate.
+
+### Current structural-lane status
+
+- Query-plan contract: `PROVEN_FIXTURE`.
+- Tree-sitter/ast-grep observation adapters: present and separately tested.
+- Observation query adapter: `PROVEN_FIXTURE` (`STRUCT-10A`).
+- Live Tree-sitter/ast-grep parser-process executor: `OPEN` (`STRUCT-10B`).
+- Live `:8095 /ast/chunk` -> observation-query proof runner: available;
+  execute `scripts/atlas/prove-structural-query-live-v1.mjs` to establish the
+  live receipt. This remains non-authoritative until `STRUCT-11` identity
+  resolution succeeds.
+- Go `LaneAST`: declared, but currently unsupported by the live lane service.
+- Structural sparse representation: `OPEN`.
+- CandidateOrdinal bridge and RRF integration: `OPEN`.
+- ColBERT/late interaction, TurboVec, AVX2, simdjson, PyTorch/logistic
+  classification, Arrow/mmap, ACP/A2A, and Mastra remain downstream or optional
+  lanes and must not block structural query-plan acceptance.

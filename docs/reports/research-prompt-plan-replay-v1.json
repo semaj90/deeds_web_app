@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.research-prompt-plan-replay.v1",
+  "readOnly": true,
+  "collection": "chunks_web_search",
+  "query": "PostgreSQL pgvector",
+  "pointCount": 11,
+  "contextManifestId": "context:d09873dfc53b2657bde10ae7",
+  "contextManifestChecksum": "196fdc16a338a1d48c4d9bd7c0199bdb17d5ff1f66b7336bf6f00dbc7cbf1888",
+  "promptPlanChecksum": "13dc96a9778ddab8c2073300e9c6283ad3efa1c854095e4f3e617a131af3c1f9",
+  "replayPromptPlanChecksum": "13dc96a9778ddab8c2073300e9c6283ad3efa1c854095e4f3e617a131af3c1f9",
+  "segmentCount": 12,
+  "evidenceSegmentCount": 11,
+  "deterministicReplay": true,
+  "externalEvidenceOnly": true,
+  "localIdentityAssigned": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "PROMPT_PLAN_EXTERNAL_REPLAY_PROVEN",
+  "nextGate": "ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY"
+}

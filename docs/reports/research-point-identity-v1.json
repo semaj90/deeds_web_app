@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.research-point-identity-v1",
+  "collection": "chunks_web_search",
+  "pointCount": 11,
+  "deterministicMatches": 11,
+  "uuidShapeMatches": 11,
+  "algorithm": "sha256-derived-uuid-shaped-v1",
+  "formalUuidV5": false,
+  "projectionIdentityOnly": true,
+  "canonicalAtlasIdentity": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "RESEARCH_POINT_IDENTITY_PROVEN",
+  "rows": [
+    {
+      "pointId": "17c9bf15-a251-5d79-b510-104b32b90340",
+      "expectedPointId": "17c9bf15-a251-5d79-b510-104b32b90340",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_7aa97ef0_6769746875625f69",
+      "segmentIndex": 0,
+      "contentChecksum": "sha256:1094e5126749045eb435cb9d9b685aebf59936c0b75e15b4078ab46dd1568b31"
+    },
+    {
+      "pointId": "19f434b0-97c5-5ea4-9421-497f4864f1f9",
+      "expectedPointId": "19f434b0-97c5-5ea4-9421-497f4864f1f9",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_7aa97ef0_6769746875625f69",
+      "segmentIndex": 1,
+      "contentChecksum": "sha256:5acc881225437bbfdfa5755433ac52a10878ad0f65d3a3ba69b1643bb377c442"
+    },
+    {
+      "pointId": "34fe5c64-6c2d-5dd2-9676-0ad418f0a0c8",
+      "expectedPointId": "34fe5c64-6c2d-5dd2-9676-0ad418f0a0c8",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_c744f266_6769746875625f69",
+      "segmentIndex": 0,
+      "contentChecksum": "sha256:c51f1e746afad93e4e468a639bf96f698ecb462dc5429ac34ef4400281c9be2f"
+    },
+    {
+      "pointId": "384fe20b-ba05-535a-a831-3d7a9c04a7b7",
+      "expectedPointId": "384fe20b-ba05-535a-a831-3d7a9c04a7b7",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 3,
+      "contentChecksum": "sha256:9920129aae3a0285e72016a14651b8094eed7fcaa58fc26c9a9539f2f9a7db27"
+    },
+    {
+      "pointId": "3a16b48e-e238-5d51-a660-4586da44d7af",
+      "expectedPointId": "3a16b48e-e238-5d51-a660-4586da44d7af",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 0,
+      "contentChecksum": "sha256:82481eb728685a68a18355dbdc23302e00b5d88bee61aaabf7edd70bcdf5fa2d"
+    },
+    {
+      "pointId": "73390d5b-3c20-5618-95d9-9132e8b6ceca",
+      "expectedPointId": "73390d5b-3c20-5618-95d9-9132e8b6ceca",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_7aa97ef0_6769746875625f69",
+      "segmentIndex": 2,
+      "contentChecksum": "sha256:aeed1f8c6d37f70c6ddceb5fdc4765748c19fff55136c1d008a38869cc07ee60"
+    },
+    {
+      "pointId": "78c35587-55e9-55d7-bff4-7944022345bd",
+      "expectedPointId": "78c35587-55e9-55d7-bff4-7944022345bd",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 5,
+      "contentChecksum": "sha256:4d4ef0d8fe8a99cf614eb9feaefce301377f8de41390ba7fbfb44f38e3f191a1"
+    },
+    {
+      "pointId": "90ff5441-be1b-52ce-8ba2-b9874fb61739",
+      "expectedPointId": "90ff5441-be1b-52ce-8ba2-b9874fb61739",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 2,
+      "contentChecksum": "sha256:3cf88f6516a2b596a13d169691329ffc77c0cc2dda7848058187ba260dca9416"
+    },
+    {
+      "pointId": "990d454c-c30d-507b-9ed0-f7fe5c9df8a2",
+      "expectedPointId": "990d454c-c30d-507b-9ed0-f7fe5c9df8a2",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 1,
+      "contentChecksum": "sha256:26c416e67bebec4337b15bacb9fa9ad4f29e9e6385bd3c95011c9160b45c780d"
+    },
+    {
+      "pointId": "9c2198c7-95fa-5644-b90f-0f3243a179ee",
+      "expectedPointId": "9c2198c7-95fa-5644-b90f-0f3243a179ee",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 4,
+      "contentChecksum": "sha256:18fdc8941227d9efef4fbf0098226564161bd0a29df779bf8c60058242c84ece"
+    },
+    {
+      "pointId": "a93d1d3a-72db-5d10-990a-6c1e9a4ec08a",
+      "expectedPointId": "a93d1d3a-72db-5d10-990a-6c1e9a4ec08a",
+      "deterministicMatch": true,
+      "uuidShape": true,
+      "source": "github_issue",
+      "parentExternalId": "rch_1624cf84_6769746875625f69",
+      "segmentIndex": 6,
+      "contentChecksum": "sha256:66e774a959f5176f2a8a1153d4cd45dc83527aee67e56d7ba4dbb5523819d0a8"
+    }
+  ]
+}

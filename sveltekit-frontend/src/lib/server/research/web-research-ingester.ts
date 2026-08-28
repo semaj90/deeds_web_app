@@ -13,6 +13,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { createHash } from 'node:crypto';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
@@ -46,6 +47,9 @@ export interface WebResearchChunk {
 }
 
 export const RESEARCH_COLLECTION = 'chunks_web_search';
+export const RESEARCH_INGESTION_SCHEMA_REVISION = 'atlas.research-ingest:v2';
+export const RESEARCH_EMBEDDING_REVISION = 'embeddinggemma:latest:semantic_768';
+export const RESEARCH_INGESTER_REVISION = 'web-research-ingester:v2';
 
 /** Qdrant vector config for chunks_web_search */
 const COLLECTION_CONFIG = {
@@ -62,21 +66,91 @@ const PAYLOAD_INDEXES = [
   { field: 'subreddit',   schema: 'keyword' as const },
   { field: 'repo',        schema: 'keyword' as const },
   { field: 'language',    schema: 'keyword' as const },
-  { field: 'fetched_at',  schema: 'keyword' as const },
+  { field: 'fetched_at',  schema: 'datetime' as const },
 ];
+
+export interface ResearchChunkPlan {
+  pointId: string;
+  chunkId: string;
+  parentId: string;
+  segmentIndex: number;
+  source: ResearchSource;
+  url: string;
+  contentChecksum: string;
+  embeddingDimension: 768;
+}
+export interface ResearchCollectionContract {
+  collection: string;
+  status: 'MISSING' | 'CONTRACT_MATCH' | 'CONTRACT_MISMATCH';
+  vector: { name: string; size: number | null; distance: string | null };
+  indexes: Record<string, string | null>;
+  mismatches: string[];
+}
 
 // ── Collection bootstrap ──────────────────────────────────────────────────────
 
 let _collectionReady = false;
 
+function collectionVector(info: any): any {
+  return info?.config?.params?.vectors ?? info?.result?.config?.params?.vectors ?? info?.vectors ?? info?.result?.vectors;
+}
+function collectionPayloadSchema(info: any): Record<string, any> {
+  return info?.payload_schema ?? info?.result?.payload_schema ?? {};
+}
+
+export async function inspectResearchCollectionContract(): Promise<ResearchCollectionContract> {
+  let info: any;
+  try {
+    info = await qdrant.client.getCollection(RESEARCH_COLLECTION);
+  } catch {
+    return {
+      collection: RESEARCH_COLLECTION,
+      status: 'MISSING',
+      vector: { name: 'content', size: null, distance: null },
+      indexes: Object.fromEntries(PAYLOAD_INDEXES.map(({ field }) => [field, null])),
+      mismatches: ['COLLECTION_MISSING'],
+    };
+  }
+
+  const vectors = collectionVector(info);
+  const content = vectors?.content ?? vectors;
+  const payloadSchema = collectionPayloadSchema(info);
+  const indexes = Object.fromEntries(PAYLOAD_INDEXES.map(({ field }) => [
+    field,
+    payloadSchema[field]?.data_type ?? payloadSchema[field]?.schema ?? null,
+  ]));
+  const mismatches: string[] = [];
+  if (!content || content.size !== 768) mismatches.push('VECTOR_CONTENT_SIZE');
+  if (!content || String(content.distance).toLowerCase() !== 'cosine') mismatches.push('VECTOR_CONTENT_DISTANCE');
+  for (const { field, schema } of PAYLOAD_INDEXES) {
+    if (indexes[field] !== schema) mismatches.push(`PAYLOAD_INDEX_${field}`);
+  }
+  return {
+    collection: RESEARCH_COLLECTION,
+    status: mismatches.length ? 'CONTRACT_MISMATCH' : 'CONTRACT_MATCH',
+    vector: { name: 'content', size: content?.size ?? null, distance: content?.distance ?? null },
+    indexes,
+    mismatches,
+  };
+}
+
 export async function ensureResearchCollection(): Promise<void> {
   if (_collectionReady) return;
 
+  let collectionExists = false;
   try {
-    const info = await qdrant.client.getCollection(RESEARCH_COLLECTION);
-    if (info) { _collectionReady = true; return; }
+    await qdrant.client.getCollection(RESEARCH_COLLECTION);
+    collectionExists = true;
   } catch {
     // Collection does not exist — create it
+  }
+  if (collectionExists) {
+    const contract = await inspectResearchCollectionContract();
+    if (contract.status !== 'CONTRACT_MATCH') {
+      throw new Error(`RESEARCH_COLLECTION_CONTRACT_MISMATCH:${contract.mismatches.join(',')}`);
+    }
+    _collectionReady = true;
+    return;
   }
 
   try {
@@ -85,14 +159,58 @@ export async function ensureResearchCollection(): Promise<void> {
       await qdrant.client.createPayloadIndex(RESEARCH_COLLECTION, {
         field_name: field,
         field_schema: schema,
-        wait: false,
+        wait: true,
       });
+    }
+    const contract = await inspectResearchCollectionContract();
+    if (contract.status !== 'CONTRACT_MATCH') {
+      throw new Error(`RESEARCH_COLLECTION_CONTRACT_MISMATCH:${contract.mismatches.join(',')}`);
     }
     console.log(`[research-ingester] Created collection: ${RESEARCH_COLLECTION}`);
     _collectionReady = true;
   } catch (err) {
     console.error('[research-ingester] Failed to create collection:', err);
+    throw err;
   }
+}
+
+export function researchPointId(input: {
+  source: ResearchSource;
+  parentExternalId: string;
+  url: string;
+  segmentIndex: number;
+  contentChecksum: string;
+}): string {
+  const digest = createHash('sha256')
+    .update(JSON.stringify({ ...input, ingestionSchemaRevision: RESEARCH_INGESTION_SCHEMA_REVISION }))
+    .digest('hex');
+  const hex = digest.slice(0, 32).split('');
+  hex[12] = '5';
+  hex[16] = ['8', '9', 'a', 'b'][parseInt(hex[16], 16) % 4];
+  const raw = hex.join('');
+  return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
+}
+
+export function planResearchChunks(chunks: WebResearchChunk[]): ResearchChunkPlan[] {
+  const planned: ResearchChunkPlan[] = [];
+  for (const chunk of chunks) {
+    const segments = chunkText(chunk.body, 800, 100);
+    for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
+      const content = `${chunk.title}\n\n${segments[segmentIndex]}`;
+      const contentChecksum = `sha256:${createHash('sha256').update(content, 'utf8').digest('hex')}`;
+      planned.push({
+        pointId: researchPointId({ source: chunk.source, parentExternalId: chunk.id, url: chunk.url, segmentIndex, contentChecksum }),
+        chunkId: `${chunk.id}_s${segmentIndex}`,
+        parentId: chunk.id,
+        segmentIndex,
+        source: chunk.source,
+        url: chunk.url,
+        contentChecksum,
+        embeddingDimension: 768,
+      });
+    }
+  }
+  return planned;
 }
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
@@ -144,6 +262,7 @@ export interface IngestResult {
   ingested: number;
   skipped: number;
   errors: number;
+  errorMessages?: string[];
 }
 
 /**
@@ -162,6 +281,7 @@ export async function ingestResearchChunks(
   let ingested = 0;
   let skipped = 0;
   let errors = 0;
+  const errorMessages: string[] = [];
 
   // Process in batches of 10 to avoid overwhelming Ollama
   const BATCH = 10;
@@ -183,9 +303,12 @@ export async function ingestResearchChunks(
             if (!embedding) { skipped++; continue; }
 
             const segId = `${chunk.id}_s${si}`;
+            const contentChecksum = `sha256:${createHash('sha256').update(segText, 'utf8').digest('hex')}`;
             points.push({
-              id: chunkIdToUint(segId),
-              vector: buildVectorPayload(RESEARCH_COLLECTION, embedding),
+              id: researchPointId({ source: chunk.source, parentExternalId: chunk.id, url: chunk.url, segmentIndex: si, contentChecksum }),
+              // Qdrant REST named-vector shape is { content: [...] }.
+              // Do not use the internal { name, vector } helper shape here.
+              vector: { content: embedding },
               payload: {
                 chunk_id: segId,
                 parent_id: chunk.id,
@@ -200,6 +323,12 @@ export async function ingestResearchChunks(
                 score: chunk.score,
                 fetched_at: chunk.fetched_at,
                 semantic_tags: chunk.semantic_tags ?? [],
+                content_checksum: contentChecksum,
+                embedding_model_id: 'embeddinggemma',
+                embedding_dimension: 768,
+                embedding_revision: RESEARCH_EMBEDDING_REVISION,
+                ingestion_schema_revision: RESEARCH_INGESTION_SCHEMA_REVISION,
+                ingester_revision: RESEARCH_INGESTER_REVISION,
               },
             });
           }
@@ -225,12 +354,13 @@ export async function ingestResearchChunks(
         } catch (err) {
           console.error('[research-ingester] chunk error:', err);
           errors++;
+          errorMessages.push(err instanceof Error ? err.message : String(err));
         }
       })
     );
   }
 
-  return { ingested, skipped, errors };
+  return { ingested, skipped, errors, errorMessages };
 }
 
 /**
@@ -271,16 +401,4 @@ export async function searchResearchChunks(opts: {
     console.error('[research-ingester] search error:', err);
     return [];
   }
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-/** Convert a string chunk ID into a stable 32-bit integer for Qdrant point ID */
-function chunkIdToUint(id: string): number {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < id.length; i++) {
-    hash ^= id.charCodeAt(i);
-    hash = (hash * 0x01000193) >>> 0;
-  }
-  return hash === 0 ? 1 : hash;
 }

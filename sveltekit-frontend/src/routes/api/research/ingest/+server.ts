@@ -13,6 +13,7 @@
  *   subreddit?: string   (reddit only)
  *   urls?: string[]      (web only)
  *   addTags?: boolean    (fire Gemma 4 tagging, default false — slow)
+ *   dryRun?: boolean     (plan/chunk/checksum only; never embeds or writes)
  *
  * Returns: { source, fetched, ingested, skipped, errors, durationMs }
  */
@@ -29,6 +30,7 @@ const bodySchema = z.object({
   subreddit: z.string().optional(),
   urls: z.array(z.string().url()).max(20).optional(),
   addTags: z.boolean().default(false),
+  dryRun: z.boolean().default(false),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -43,7 +45,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { source, query, limit, semantic, subreddit, urls, addTags } = parsed.data;
+  const { source, query, limit, semantic, subreddit, urls, addTags, dryRun } = parsed.data;
   const t0 = Date.now();
 
   try {
@@ -92,6 +94,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
     }
 
+    if (dryRun) {
+      const {
+        inspectResearchCollectionContract,
+        planResearchChunks,
+      } = await import('$lib/server/research/web-research-ingester.js');
+      const collectionContract = await inspectResearchCollectionContract();
+      const planned = planResearchChunks(chunks);
+      return json({
+        source,
+        query,
+        fetched: chunks.length,
+        estimatedChunks: planned.length,
+        embeddingModel: 'embeddinggemma',
+        embeddingDimension: 768,
+        collectionContract,
+        plannedPoints: planned,
+      ingested: 0,
+      skipped: 0,
+      errors: 0,
+      errorMessages: [],
+        dryRun: true,
+        wouldWrite: chunks.length > 0,
+        targetCollection: 'chunks_web_search',
+        durationMs: Date.now() - t0,
+      });
+    }
+
     const ingestResult = chunks.length
       ? await ingestResearchChunks(chunks, addTags)
       : { ingested: 0, skipped: 0, errors: 0 };
@@ -101,6 +130,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       query,
       fetched: chunks.length,
       ...ingestResult,
+      dryRun: false,
+      wouldWrite: ingestResult.ingested > 0,
+      targetCollection: 'chunks_web_search',
       durationMs: Date.now() - t0,
     });
   } catch (err) {

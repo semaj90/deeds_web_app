@@ -1,0 +1,169 @@
+{
+  "schema": "atlas.lineage-latent-cohort.v1",
+  "generatedAt": "2026-08-28T20:57:36.194Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "candidateCount": 15,
+  "rowsFound": 15,
+  "counts": {
+    "LEGACY_LATENT_IDENTITY_UNPROVEN": 15
+  },
+  "promotionEligible": false,
+  "latentAuthority": "atlas_packets fields are inspected only; no latent producer or representation ledger is inferred",
+  "nextGate": "LATENT_PRODUCER_AND_REPRESENTATION_LEDGER_REQUIRED",
+  "rows": [
+    {
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    },
+    {
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "hasLatent64": true,
+      "hasLatent128": false,
+      "latent64Model": null,
+      "sourceRepresentationId": null,
+      "representationRevision": "0",
+      "classification": "LEGACY_LATENT_IDENTITY_UNPROVEN"
+    }
+  ]
+}

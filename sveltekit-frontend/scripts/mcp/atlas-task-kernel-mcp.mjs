@@ -19,6 +19,7 @@ const TOOLS = [
   { name: 'atlas_expand', description: 'Expand read-only structural dependencies for one target.', inputSchema: { type: 'object', properties: { target: { type: 'string' } }, required: ['target'], additionalProperties: false } },
   { name: 'atlas_verify', description: 'Classify a task and return a safe evidence-gathering direction without editing or executing work.', inputSchema: { type: 'object', properties: { prompt: { type: 'string' }, context: { type: 'string' } }, required: ['prompt'], additionalProperties: false } },
   { name: 'atlas_validate_plan', description: 'Validate a proposed plan; it cannot authorize execution.', inputSchema: { type: 'object', properties: { intent: { type: 'string' }, domain: { type: 'string' }, errorSummary: { type: 'string' }, evidenceLines: { type: 'array', items: { type: 'string' } }, patchTargets: { type: 'array', items: { type: 'string' } }, proposedFix: { type: 'string' } }, required: ['intent', 'domain', 'errorSummary', 'evidenceLines', 'patchTargets'], additionalProperties: false } },
+  { name: 'atlas_research', description: 'Run one bounded, read-only research circuit through Atlas context selection. It never exposes arbitrary Python or storage operations.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 32 }, maxRounds: { type: 'number', minimum: 1, maximum: 3 } }, required: ['query'], additionalProperties: false } },
 ];
 
 const IMPLEMENTATIONS = {
@@ -27,6 +28,7 @@ const IMPLEMENTATIONS = {
   atlas_expand: ['find_dependencies', (a) => ({ target: a.target })],
   atlas_verify: ['classify_intent', (a) => ({ prompt: a.prompt, context: a.context })],
   atlas_validate_plan: ['build_recommendation', (a) => a],
+  atlas_research: ['build_agentic_rag_context', (a) => ({ query: a.query, maxCards: a.maxCards ?? 32 })],
 };
 
 let nextId = 1;
@@ -67,6 +69,20 @@ async function dispatch(method, params) {
   if (!implementation) throw new Error(`Unknown Atlas task capability: ${name}`);
   await ensureInternalReady();
   const result = await callInternal('tools/call', { name: implementation[0], arguments: implementation[1](params?.arguments ?? {}) });
+  if (name === 'atlas_research') {
+    const envelope = {
+      schema: 'atlas.local-research-mcp-result.v1',
+      query: params?.arguments?.query,
+      maxRounds: params?.arguments?.maxRounds ?? 3,
+      maxCards: params?.arguments?.maxCards ?? 32,
+      backend: 'atlas-task-kernel',
+      ldrToolServer: 'ldr-research',
+      ldrStatus: 'SEPARATE_STDIO_MCP_REGISTERED_NOT_CALLED',
+      result,
+      canonicalAuthority: false,
+    };
+    return { content: [{ type: 'text', text: JSON.stringify(envelope) }] };
+  }
   return { content: result?.content ?? [{ type: 'text', text: JSON.stringify(result ?? {}) }] };
 }
 

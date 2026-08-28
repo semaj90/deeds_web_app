@@ -2333,6 +2333,59 @@ func (s *retrievalServer) httpSearchEvidence(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(resp)
 }
 
+// httpSearchResearch exposes the research collection through the same HTTP
+// owner used by the gRPC GetResearchContext method.  SvelteKit callers should
+// use this endpoint instead of embedding and querying chunks_web_search
+// directly; the service remains a read-only retrieval executor.
+func (s *retrievalServer) httpSearchResearch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST only", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		Query          string   `json:"query"`
+		Limit          int32    `json:"limit"`
+		SourceFilter   []string `json:"source_filter"`
+		ScoreThreshold float32  `json:"score_threshold"`
+	}
+	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil || strings.TrimSpace(body.Query) == "" {
+		http.Error(w, "query is required", http.StatusBadRequest)
+		return
+	}
+	resp, err := s.GetResearchContext(r.Context(), &pb.ResearchContextRequest{
+		Query:          body.Query,
+		Limit:          body.Limit,
+		SourceFilter:   body.SourceFilter,
+		ScoreThreshold: body.ScoreThreshold,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	results := make([]map[string]any, 0, len(resp.GetResearch()))
+	for _, chunk := range resp.GetResearch() {
+		results = append(results, map[string]any{
+			"id":            chunk.GetId(),
+			"chunk_id":      chunk.GetChunkId(),
+			"source":        chunk.GetSource(),
+			"url":           chunk.GetUrl(),
+			"title":         chunk.GetTitle(),
+			"body":          chunk.GetBody(),
+			"score":         chunk.GetScore(),
+			"semantic_tags": chunk.GetSemanticTags(),
+		})
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"results":     results,
+		"lane":        "go-retrieval-research",
+		"collection":  collectionResearch,
+		"total_ms":    resp.GetTotalMs(),
+		"read_only":   true,
+		"canonicalAuthority": false,
+	})
+}
+
 func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST only", http.StatusMethodNotAllowed)
@@ -2547,6 +2600,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", srv.httpHealth)
 	mux.HandleFunc("/search/evidence", srv.httpSearchEvidence)
+	mux.HandleFunc("/search/research", srv.httpSearchResearch)
 	mux.HandleFunc("/search/codebase", srv.httpSearchCodebase)
 	mux.HandleFunc("/search/bm25", srv.httpSearchBM25)
 	mux.HandleFunc("/stats", srv.httpStats)

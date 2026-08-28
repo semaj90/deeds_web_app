@@ -79,11 +79,13 @@ async function main() {
     const treeNodeId = row.tree_node_id || (row.metadata && row.metadata.tree_node_id) || null;
     const symbolVersionId = (row.metadata && row.metadata.symbol_version_id) || null;
 
-    // Revision bundle
-    const sourceRevision = row.content_hash || row.sha256 || null;
-    const workspaceRevision = row.workspace_revision || 'workspace-active-v1';
+    // Only explicit revision metadata is admissible. Content hashes are
+    // evidence fields, not a substitute for sourceRevision, and synthetic
+    // workspace/graph revisions must never enter this audit's candidate set.
+    const sourceRevision = (row.metadata && row.metadata.source_revision) || null;
+    const workspaceRevision = row.workspace_revision || null;
     const semanticRevision = row.representation_revision || (row.metadata && row.metadata.embedding_digest) || null;
-    const graphRevision = row.tree_node_id ? `graph-tree:${row.tree_node_id}` : null;
+    const graphRevision = (row.metadata && row.metadata.graph_revision) || null;
 
     if (!sourceRef || sourceRef.trim() === '') {
       excludedMissingSourceRef++;
@@ -115,6 +117,9 @@ async function main() {
 
   const censusReceipt = {
     schema: 'atlas.candidate-corpus-lineage-audit.v1',
+    status: 'DIAGNOSTIC_ONLY',
+    promotionEligible: false,
+    syntheticRevisionFallbacksUsed: false,
     generatedAt: new Date().toISOString(),
     totalRowsAudited: rows.length,
     admittedCount,
@@ -136,7 +141,9 @@ async function main() {
   console.log('══════════════════════════════════════════════════════════');
   console.log(`Total packets audited:       ${rows.length}`);
   console.log(`Admitted candidates:        ${admittedCount} (${(censusReceipt.admittedRatio * 100).toFixed(2)}%)`);
-  console.log(`Excluded (missing revision): ${excludedMissingSourceRevision}`);
+  console.log(`Excluded candidates:         ${censusReceipt.excludedCount}`);
+  console.log(`  missing source revision:   ${excludedMissingSourceRevision}`);
+  console.log(`  missing source ref:        ${excludedMissingSourceRef}`);
   console.log(`Lineage Checksum:           ${censusReceipt.lineageChecksum}`);
   console.log(`Report written to:          ${REPORT_PATH}`);
   console.log('══════════════════════════════════════════════════════════');

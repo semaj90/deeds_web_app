@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.representation-check.v1",
+  "readOnly": true,
+  "postgresWrites": false,
+  "packetRows": [
+    {
+      "packet_id": "packet:196138c47be8",
+      "packet_key": "packet:196138c47be8",
+      "representation_revision": 0,
+      "source_ref": "docs/ai-os/atlas-retry-index.json"
+    },
+    {
+      "packet_id": "packet:d2c2643163a8",
+      "packet_key": "packet:d2c2643163a8",
+      "representation_revision": 0,
+      "source_ref": "docs/atlas/native-gemm-deferral.md"
+    },
+    {
+      "packet_id": "packet:db66369e866a",
+      "packet_key": "packet:db66369e866a",
+      "representation_revision": 0,
+      "source_ref": "crates/turbovec-napi/build.rs"
+    }
+  ],
+  "chunkRows": [
+    {
+      "source_ref": "crates/turbovec-napi/build.rs",
+      "embedding_model": "embeddinggemma:latest",
+      "embedding_version": "semantic_768:embeddinggemma:latest:fd5043d3abdfef4ee0934eb63c0d5977c5dba3d1d0f9025943b573a9c1d31268",
+      "embedding_dimension": 768,
+      "vec768": true
+    },
+    {
+      "source_ref": "docs/ai-os/atlas-retry-index.json",
+      "embedding_model": "embeddinggemma:latest",
+      "embedding_version": "semantic_768:embeddinggemma:latest:a5f00035d57d79b22bb00ef34e5750a56db13e86366692062cc044ef2bc036a8",
+      "embedding_dimension": 768,
+      "vec768": true
+    },
+    {
+      "source_ref": "docs/atlas/native-gemm-deferral.md",
+      "embedding_model": "embeddinggemma:latest",
+      "embedding_version": "semantic_768:embeddinggemma:latest:1d98fa2cbb8e2ac9f0542a675f1c5037506588eaa034dccf58494e98f1786bdd",
+      "embedding_dimension": 768,
+      "vec768": true
+    }
+  ],
+  "classifications": [
+    {
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "classification": "REPRESENTATION_REVISION_MISSING"
+    },
+    {
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "classification": "REPRESENTATION_REVISION_MISSING"
+    },
+    {
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "classification": "REPRESENTATION_REVISION_MISSING"
+    }
+  ]
+}

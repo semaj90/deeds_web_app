@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.latent-producer-contract.v1",
+  "readOnly": true,
+  "writer": "scripts/atlas/backfill-latent-vectors.mjs",
+  "observedPipeline": "semantic_768 → hidden_128 → latent_64",
+  "observedEncoding": "FP32 bytea",
+  "checks": {
+    "computes768To64": true,
+    "writesFloat32Bytea": true,
+    "declaresLatent64": true,
+    "bindsSemanticInput": false,
+    "bindsModelDigest": false,
+    "bindsProducerRevision": false,
+    "bindsCandidateSnapshot": false,
+    "bindsOrdinalChecksum": false,
+    "requiresWorkspaceRevision": false,
+    "requiresSourceRevision": false,
+    "hasExactChunkBinding": true,
+    "blocksOrdinaryApply": true
+  },
+  "missing": [
+    "bindsSemanticInput",
+    "bindsModelDigest",
+    "bindsProducerRevision",
+    "bindsCandidateSnapshot",
+    "bindsOrdinalChecksum",
+    "requiresWorkspaceRevision",
+    "requiresSourceRevision"
+  ],
+  "status": "PRODUCER_CONTRACT_INCOMPLETE",
+  "legacyApplyGuard": "PROVEN",
+  "promotionEligible": false,
+  "nextGate": "REPAIR_LATENT_WRITER_AND_ADD_ATOMIC_READBACK",
+  "writesPerformed": false
+}

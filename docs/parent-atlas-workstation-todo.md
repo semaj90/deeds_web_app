@@ -110,6 +110,24 @@ global corpus.
   second inverse-BM25 owner.
 - [ ] Reconcile Qdrant packet fan-out by exact packet/chunk identity and
   revision-qualified payloads; no bulk fan-out promotion yet.
+- [ ] Repair the latent producer before topology admission: the current
+  `scripts/atlas/backfill-latent-vectors.mjs` computes `768 → 128 → 64` and
+  writes FP32 `latent_64`, but can update by Qdrant point ID, packet key, or
+  source ref and uses a numeric epoch as the representation revision. Existing
+  latent rows remain diagnostic until exact chunk identity, current
+  `semantic_768` input, model/parameter digest, workspace/source revisions,
+  candidate snapshot, and ordinal checksum are persisted and read back.
+- [x] Add a read-only latent producer contract audit; current result is
+  `PRODUCER_CONTRACT_INCOMPLETE` with promotion disabled. Report:
+  `docs/reports/latent-producer-contract-v1.json`.
+- [x] Add typed `RepresentationArtifactV1` admission schema and focused tests;
+  the latent backfill still needs adaptation to emit and read back this
+  contract before topology promotion.
+- [x] Add the read-only latent canary plan for the 15-row CandidateOrdinal
+  cohort; it remains `BLOCKED_LEGACY_LATENT_PROVENANCE` until the producer is
+  repaired.
+- [x] Guard the legacy latent backfill so ordinary `--apply` is blocked;
+  diagnostic persistence requires an explicit `--legacy-unsafe-apply` flag.
 - [ ] Run one bounded read-only `TypedRepairDagV1` execution and link its
   `ExecutionReceiptV1` to validation, evidence, and ContextManifest checksums.
 - [ ] Run Valkey bypass first; later prove deterministic MISS → COMPUTE → HIT,
@@ -137,6 +155,116 @@ The global 61k-source corpus, current relationship graph, Qdrant fan-out,
 LSP graph, GPU parity, Valkey replay, learned ranking, and package promotion
 remain later gates. They must not be silently represented as complete because
 the 15-row canary is green.
+
+### Full-lane review reconciliation (2026-08-28)
+
+The before-fan-out checklist is not complete. Current evidence is:
+
+- Latent representation audit: schema/vector checks pass, but source-version
+  join and representation ledger remain `NOT_PROVEN`; legacy transport encoding
+  remains only `PARTIAL_PROVEN`.
+- SOM join audit: 2,665/32,310 assignments match canonical PostgreSQL identity
+  (`8.25%`); unmatched assignments remain historical/unresolved.
+- Qdrant fan-out: 109,129 points and 9,317 packet keys, but zero
+  `VALID_REVISIONED_CHUNK_FANOUT` groups; chunk ordinal coverage is `0` and
+  conflicts/revision-unproven rows remain excluded.
+- Representation check: 3/3 selected rows have 768 vectors, but all packet
+  `representation_revision` values are `0`; this is legacy packet metadata and
+  is not the semantic authority. The lineage-aware semantic cohort audit
+  separately proves the 15-row canary 15/15 through exact chunk rows and
+  producer metadata.
+- Latent canary audit: 15/15 packet rows found, but 15/15 are
+  `LEGACY_LATENT_IDENTITY_UNPROVEN`; no current latent producer/representation
+  ledger is admitted for routing.
+- BitFrost: focused policy tests pass, but live TTL, invalidation, stream,
+  cleanup, and `atlas_context` readback are not proven.
+- Grounded extraction: transport/alignment is partial; three-run deterministic
+  exact grounding remains unproven.
+- Higher-hop audit: retired-table failure is fixed; current read-only coverage
+  is partial, with glyph records absent and Neo4j coverage incomplete.
+
+Therefore the next full-lane order remains:
+
+```text
+semantic_768 representation revision
+  → exact CandidateOrdinal cohort
+  → latent/SOM identity parity
+  → PostgreSQL eligibility bitmap
+  → Qdrant/cuVS filter parity
+  → bounded topology fan-out
+```
+
+Do not run broad topology/Qdrant fan-out or promote latent/SOM routing until
+the representation and CandidateOrdinal revisions are bound.
+
+### Fan-out and ACE convergence gap (2026-08-28)
+
+The repository already contains ACE packet assembly, lexical/domain evidence,
+bounded KNN multihop synthesis, prefill artifact identity, recommendation
+lanes, and daily Graphify board wiring. The missing piece is their shared,
+revision-qualified admission envelope before DAG prefill:
+
+```text
+CandidateOrdinalMapV1
+  + source/packet/chunk identity
+  + semantic_768 binding
+  + structural AST/CST observations
+  + compiler/LSP resolutions when available
+  + approved relationship/ontology evidence
+  + lexical keyword/FTS evidence
+  + bounded multihop edges
+  + optional latent/SOM/topology features
+        ↓
+FanoutEvidenceBundleV1
+        ↓
+deterministic summary/concatenation + token budget
+        ↓
+ContextManifestV1 / PrefillArtifactV1
+        ↓
+KernelDagCandidateV1
+```
+
+Remaining gates before broad fan-out:
+
+- exact source/chunk/packet identity parity across PostgreSQL, Graphify,
+  Qdrant, and the 8095 structural observations;
+- per-field metadata/keyword extraction with source spans, extractor revision,
+  and content digest; current ACE assembly still consumes optional JSONB fields
+  and does not itself prove freshness;
+- deterministic multihop admission: bounded depth, edge-policy revision,
+  visited-set checksum, stable ordering, and source/revision validation;
+- one lexical owner: PostgreSQL FTS is the current baseline; inverse-BM25 or
+  Qdrant sparse BM25 remains a challenger until its index, IDF revision, and
+  parity receipt exist;
+- Ewin-Tang/low-rank recommendations must remain derived scores with a
+  producer/feature revision, never a second retrieval or fusion authority;
+- deterministic summary concatenation: ordered evidence, deduplication,
+  token budget, truncation policy, tokenizer revision, and final checksum;
+- ACE/BitFrost readback: uncached and cached manifests must match, with
+  revision-qualified keys and canonical reconstruction on miss/expiry/eviction;
+- daily Graphify control-plane proof: completed run, executor receipt, and
+  projection readback before treating the full tracked corpus as indexed.
+
+The 15-row semantic retrieval canary does not prove these full-lane gates. It
+proves only exact semantic retrieval, CandidateOrdinal binding, and stable
+ContextManifest replay for that bounded cohort.
+
+The typed `FanoutEvidenceBundleV1` envelope is now implemented and focused
+tested. It remains a derived, non-authoritative assembly artifact; it does not
+promote evidence, create relationships, or authorize DAG execution.
+
+The pure `FanoutContextCompilerV1` adapter is also implemented and tested. It
+enforces ordered evidence references, explicit tokenizer revision, and the
+bundle token budget before producing a manifest-compatible context payload.
+
+The ACE adapter is now implemented and tested as a pure normalization step. It
+maps existing lexical and `used_concepts` fields into revision-bound evidence,
+but it does not infer source spans or promote ontology claims. Span-grounded
+LangExtract/structural evidence must still be supplied by their own lanes.
+
+The grounded-evidence adapter is now implemented and tested. It admits
+Tree-sitter/compiler/LangExtract-style evidence only when the declared byte
+range reproduces the declared extraction text exactly.
 
 Current critical path:
 

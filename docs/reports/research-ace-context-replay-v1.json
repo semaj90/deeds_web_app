@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.research-ace-context-replay.v1",
+  "readOnly": true,
+  "collection": "chunks_web_search",
+  "query": "PostgreSQL pgvector",
+  "pointCount": 11,
+  "selectedCount": 11,
+  "rejectedCount": 0,
+  "selectionChecksum": "sha256:35262d3074830ab6592bb5c157540a585a85b209b3ce234dd6b93acce0758ad1",
+  "replaySelectionChecksum": "sha256:35262d3074830ab6592bb5c157540a585a85b209b3ce234dd6b93acce0758ad1",
+  "deterministicReplay": true,
+  "externalEvidenceOnly": true,
+  "localIdentityAssigned": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "ACE_EXTERNAL_REPLAY_PROVEN",
+  "nextGate": "CONTEXT_MANIFEST_EXTERNAL_REPLAY"
+}

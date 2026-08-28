@@ -14,6 +14,8 @@
     "./core/project-graph-revision-v1": "./dist/core/project-graph-revision-v1.js",
     "./core/treesitter-chunker-evidence-adapter": "./dist/core/treesitter-chunker-evidence-adapter.js",
     "./core/ast-grep-observation-adapter": "./dist/core/ast-grep-observation-adapter.js",
+    "./core/structural-query-plan-v1": "./dist/core/structural-query-plan-v1.js",
+    "./core/structural-query-executor-v1": "./dist/core/structural-query-executor-v1.js",
     "./core/langextract-grounding-adapter": "./dist/core/langextract-grounding-adapter.js",
     "./core/langextract-sidecar-metadata-adapter": "./dist/core/langextract-sidecar-metadata-adapter.js",
     "./core/symbol-registry-repository": "./dist/core/symbol-registry-repository.js",

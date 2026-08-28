@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.research-evidence-boundary-replay.v1",
+  "readOnly": true,
+  "requestId": "research-evidence:postgresql-pgvector",
+  "query": "PostgreSQL pgvector",
+  "collection": "chunks_web_search",
+  "resultCount": 5,
+  "parentCount": 3,
+  "maxSegmentsPerParent": 2,
+  "evidenceSetChecksum": "sha256:f0c6e5d87193d27ac277ec46ec227dfddc20f16df633c6955848aadc76b84e19",
+  "replayEvidenceSetChecksum": "sha256:f0c6e5d87193d27ac277ec46ec227dfddc20f16df633c6955848aadc76b84e19",
+  "deterministicReplay": true,
+  "externalEvidenceOnly": true,
+  "canonicalAuthority": false,
+  "localIdentityAssigned": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "EXT_EVIDENCE_SET_REPLAY_PROVEN",
+  "nextGate": "ACE_EXTERNAL_PARENT_DIVERSITY_REPLAY"
+}

@@ -45,6 +45,8 @@ export * from './core/external-doc-runtime-capabilities.js';
 export * from './core/external-doc-retrieval-proof.js';
 export * from './core/external-doc-retrieval-runtime.js';
 export * from './core/ast-grep-observation-adapter.js';
+export * from './core/structural-query-plan-v1.js';
+export * from './core/structural-query-executor-v1.js';
 export * from './core/langextract-grounding-adapter.js';
 export * from './core/langextract-sidecar-metadata-adapter.js';
 export * from './core/grounded-domain-proposal.js';

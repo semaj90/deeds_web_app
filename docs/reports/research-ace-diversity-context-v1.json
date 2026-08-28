@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.research-ace-diversity-context-replay.v1",
+  "readOnly": true,
+  "query": "PostgreSQL pgvector",
+  "sourceFilter": [
+    "github_issue"
+  ],
+  "collection": "chunks_web_search",
+  "evidenceSetCount": 5,
+  "aceSelectedCount": 5,
+  "contextSelectedCount": 5,
+  "promptSegmentCount": 6,
+  "evidenceSetChecksum": "67df26940122208f6e1e7f7f7092f7eae19f5690c2e97ebbc1f1724fef21c095",
+  "aceChecksum": "sha256:44dfa6e49069e546941970e30d30845ae7246689349691de96e75146bc504cdd",
+  "replayAceChecksum": "sha256:44dfa6e49069e546941970e30d30845ae7246689349691de96e75146bc504cdd",
+  "contextManifestId": "context:314e96d86a8420e1d9c77169",
+  "replayContextManifestId": "context:314e96d86a8420e1d9c77169",
+  "promptPlanChecksum": "e2dc83ce912e139fb0e05dbd8016f1de09d39d3d0a413d36fdf2594a03e6c592",
+  "replayPromptPlanChecksum": "e2dc83ce912e139fb0e05dbd8016f1de09d39d3d0a413d36fdf2594a03e6c592",
+  "deterministicReplay": true,
+  "externalEvidenceOnly": true,
+  "localIdentityAssigned": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "status": "ACE_DIVERSITY_CONTEXT_REPLAY_PROVEN",
+  "nextGate": "ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY"
+}

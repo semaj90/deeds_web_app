@@ -56,6 +56,12 @@
       "enabled": true,
       "timeout": 30000,
     },
+    "ldr-research": {
+      "type": "local",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"],
+      "enabled": true,
+      "timeout": 120000,
+    },
   },
   "agent": {
     "ornith-atlas-kernel": {
@@ -77,6 +83,7 @@
         "git diff": "allow",
         "rg": "allow",
         "atlas-task-kernel*": "allow",
+        "ldr-research*": "allow",
         "LLMS.md.*": "allow",
         "evidence.*": "allow",
         "image.*": "allow",
@@ -98,6 +105,7 @@
         "lsp": "allow",
         "bash": "ask",
         "atlas-task-kernel*": "allow",
+        "ldr-research*": "allow",
         "edit": "deny",
       },
     },
