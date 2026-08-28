@@ -49,6 +49,15 @@ type SourceRow = {
   semantic_revision: string | null;
 };
 
+type SemanticRow = {
+  source_ref: string;
+  content_hash: string;
+  content_embedding_768: unknown;
+  embedding_model: string | null;
+  embedding_version: string | null;
+  embedding_dimension: number | null;
+};
+
 const clean = (value: unknown): string | null => {
   const text = String(value ?? '').trim();
   return text || null;
@@ -115,7 +124,33 @@ async function main(): Promise<void> {
   const workspaces = new Set(rows.map((row) => row.workspace_revision));
   if (workspaces.size !== 1) throw new Error('CANARY_MIXED_WORKSPACE_REVISIONS');
   const workspaceRevision = rows[0]!.workspace_revision;
-  const semanticPresent = rows.filter((row) => Boolean(row.semantic_revision)).length;
+  const semanticResult = await pool.query<SemanticRow>(`
+    SELECT source_ref, content_hash, content_embedding_768, embedding_model, embedding_version, embedding_dimension
+    FROM public.codebase_chunk_index
+    WHERE source_ref = ANY($1::text[])
+  `, [rows.map((row) => row.source_ref)]);
+  const semanticBySource = new Map(semanticResult.rows.map((row) => [`${row.source_ref}\0${String(row.content_hash).toLowerCase()}`, row]));
+  const semanticBinding = (row: SourceRow) => {
+    const chunk = semanticBySource.get(`${row.source_ref}\0${String(row.chunk_content_hash).toLowerCase()}`);
+    const available = Boolean(chunk?.content_embedding_768) && Number(chunk?.embedding_dimension) === 768 && Boolean(clean(chunk?.embedding_model)) && Boolean(clean(chunk?.embedding_version));
+    return available ? {
+      semanticRevision: clean(chunk?.embedding_version),
+      representationBinding: {
+        representationId: 'semantic_768' as const,
+        family: 'EMBEDDINGGEMMA_MRL' as const,
+        dimensions: 768,
+        modelRevision: clean(chunk?.embedding_version)!,
+        projectionKind: 'NONE' as const,
+        sourceRepresentationId: null,
+        projectionRevision: null,
+        normalized: true as const,
+        available: true,
+        availabilityReason: null,
+      },
+    } : { semanticRevision: null, representationBinding: null };
+  };
+  const semanticByPacket = new Map(rows.map((row) => [row.packet_key, semanticBinding(row)]));
+  const semanticPresent = rows.filter((row) => Boolean(semanticByPacket.get(row.packet_key)?.semanticRevision)).length;
   const candidates = rows.map((row) => ({
     canonicalId: row.packet_key,
     packetKey: row.packet_key,
@@ -125,13 +160,14 @@ async function main(): Promise<void> {
     workspaceRevision: row.workspace_revision,
     sourceRevision: row.source_revision,
     graphRevision: null,
-    semanticRevision: row.semantic_revision,
+    semanticRevision: semanticByPacket.get(row.packet_key)?.semanticRevision ?? null,
     degradedIdentity: false,
     evidenceRefs: [
       `postgres:atlas_packets:${row.packet_id}`,
       `graphify:${row.source_ref}:${row.source_revision}`,
       `chunk:${row.source_ref}:${row.chunk_content_hash}`,
     ],
+    representationBindings: semanticByPacket.get(row.packet_key)?.representationBinding ? [semanticByPacket.get(row.packet_key)!.representationBinding] : [],
   }));
   const candidateSnapshotRevision = `lineage-qualified-canary:${workspaceRevision}:v1:${rows.length}`;
   const ordinalMap = materializeCandidateOrdinalMap({

@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.chunk-projection-identity-proof.v1",
+  "status": "CONTRACT_FIXTURE_PROVEN",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "contract": "sveltekit-frontend/src/lib/server/atlas/contracts/chunk-projection-identity-v2.ts",
+  "tests": { "passed": 3, "failed": 0 },
+  "proven": [
+    "packet plus chunk identity",
+    "dense chunk ordinal",
+    "source/workspace revision binding",
+    "byte-range validation",
+    "representation and projection revision binding",
+    "tamper-detecting identity checksum"
+  ],
+  "notProven": [
+    "Qdrant payload backfill",
+    "global fanout cleanup",
+    "AST packet span coverage",
+    "CandidateOrdinal admission"
+  ],
+  "nextGate": "CHUNK-BRIDGE-01_READ_ONLY_CANONICAL_CHUNK_CENSUS"
+}

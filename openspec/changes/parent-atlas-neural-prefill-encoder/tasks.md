@@ -1,5 +1,53 @@
 # Parent Atlas Neural Pre-Fill Encoder — Tasks
 
+## Current Architecture Correction (2026-08-28)
+
+- [x] Preserved `semantic_768` as the canonical 768-dimensional retrieval
+  representation; the exact 15-candidate retrieval and ContextManifestV1
+  replay are proven in current workstation receipts.
+- [x] Removed the implied nested dependency between `latent_128` and
+  `latent_64`. The current learned encoder is `768 -> 256 -> 64`.
+- [x] Classified `rff_128` as an independent deterministic projection
+  challenger, `ae_latent_128` as reserved/future, and `ae_latent_64` as the
+  current learned branch.
+- [x] Kept RRF ownership in SearchRuntime. Qdrant-native RRF is permitted only
+  for benchmark/parity comparison and does not create a second fusion owner.
+- [x] Kept topology admission outside the semantic retrieval -> ContextManifest
+  V1 critical path.
+- [ ] Track topology representation admission in the separate
+  `parent-atlas-topology-representation-admission` OpenSpec change.
+
+## Current Workstation Alignment (2026-08-28)
+
+- [x] **CANARY-01 — Prove the exact packet/chunk bridge.** The read-only
+  census found 15 exact source/content/revision-qualified rows. Ambiguous and
+  revision-unproven rows remain excluded.
+- [x] **CANARY-02 — Produce the lineage-qualified CandidateOrdinal canary.**
+  The canonical materializer produced 15 candidates with ordinal checksum
+  `86fee5d38619...`; graph revision remains `null` because the current
+  relationship corpus is empty.
+- [x] **CANARY-03 — Prove semantic_768 retrieval replay.** The exact retrieval
+  and ContextManifest replay returned 15/15 with an identical replay checksum.
+- [x] **CANARY-04 — Prove Workstation V1 canary orchestration.** Receipt status
+  is `WORKSTATION_V1_PROVEN`; this is a read-only canary, not full-corpus
+  promotion.
+- [ ] **LINEAGE-01 — Reconcile the full source namespace.** The current audit
+  reports zero exact manifest/projection joins, 205 truncated-hash candidates,
+  770 source/hash mismatches, and 15,591 missing PostgreSQL chunk bindings.
+- [ ] **LINEAGE-02 — Scale exact candidates to 128, then 768.** Never fill the
+  pool with basename, fuzzy, synthetic-revision, or Qdrant-only identities.
+- [ ] **RETRIEVAL-01 — Prove same-corpus Qdrant payload identity** only after
+  the CandidateOrdinal map and semantic projection share exact revisions.
+- [ ] **DAG-RUNTIME-01 — Execute one bounded read-only TypedRepairDag** and
+  link `ExecutionReceiptV1` to the validator, evidence, and ContextManifest.
+- [ ] **PACKAGE-01 — Resolve package type/build closure** before package
+  promotion; the canary receipt does not close package integration.
+
+The current canary does not authorize relationship, topology, Qdrant, Valkey,
+GPU, or neural writes. `semantic_768` remains the V1 exact oracle; topology,
+RRF challengers, cache residency, and learned ranking remain downstream.
+
+
 ## Status Rule
 
 A checked item means the named contract or code slice exists. It does not

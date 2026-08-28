@@ -1,6 +1,6 @@
 # QAS Owner Audit
 
-Generated: 2026-08-21T03:45:40.642Z
+Generated: 2026-08-28T18:17:15.743Z
 
 Status: **OWNER_AUDIT_PARTIAL**
 

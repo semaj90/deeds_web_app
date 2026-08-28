@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-map-receipt.v1",
-  "generatedAt": "2026-08-28T05:42:29.048Z",
+  "generatedAt": "2026-08-28T18:34:42.906Z",
   "mode": "READ_ONLY_CANARY_ARTIFACT",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -24,13 +24,13 @@
   "semantic": {
     "representationId": "semantic_768",
     "dimensions": 768,
-    "rowsWithRepresentationRevision": 0
+    "rowsWithRepresentationRevision": 15
   },
   "map": {
     "schema": "atlas.candidate-ordinal-map.v1",
     "rowCount": 15,
     "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
-    "ordinalMapChecksum": "201d699f239765115f8b2145b5a03bb1aa369a92a7af7bea0282cb072142f039",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
     "identityAuthority": false
   },
   "candidates": [
@@ -125,6 +125,6 @@
       "semanticRevision": null
     }
   ],
-  "status": "LINEAGE_QUALIFIED_MAP_SEMANTIC_PARTIAL",
-  "nextGate": "SEMANTIC_768_CURRENT_COHORT_RECONCILIATION"
+  "status": "LINEAGE_QUALIFIED_CANDIDATE_MAP_READY",
+  "nextGate": "GOLDEN_RETRIEVAL_READ_ONLY_REPLAY"
 }

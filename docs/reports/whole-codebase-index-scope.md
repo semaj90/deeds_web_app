@@ -1,38 +1,38 @@
 # Whole-Codebase Index Scope Audit
-Generated: 2026-08-27T02:26:16.030Z
+Generated: 2026-08-28T18:17:41.919Z
 Repo Root: C:\Users\james\Videos\deeds-web-app
 
 ## Summary
-- **Total Files**: 25535
-- **Total Size**: 17617.18 MB
-- **Indexable Files**: 21512
-- **Indexable Size**: 1979.77 MB
+- **Total Files**: 25677
+- **Total Size**: 17618.10 MB
+- **Indexable Files**: 21644
+- **Indexable Size**: 1980.61 MB
 
 ## Files by Type
 
 ### other
-- **Count**: 3744 (14.7%)
-- **Size**: 13738.76 MB
-
-### config
-- **Count**: 1346 (5.3%)
-- **Size**: 1097.35 MB
-
-### docs
-- **Count**: 4311 (16.9%)
-- **Size**: 746.11 MB
+- **Count**: 3754 (14.6%)
+- **Size**: 13738.85 MB
 
 ### source_code
-- **Count**: 15197 (59.5%)
-- **Size**: 133.19 MB
+- **Count**: 15313 (59.6%)
+- **Size**: 133.81 MB
 
-### sql
-- **Count**: 658 (2.6%)
-- **Size**: 3.13 MB
+### config
+- **Count**: 1349 (5.3%)
+- **Size**: 1097.37 MB
+
+### docs
+- **Count**: 4323 (16.8%)
+- **Size**: 746.31 MB
 
 ### cold_artifact
 - **Count**: 40 (0.2%)
 - **Size**: 1023.84 MB
+
+### sql
+- **Count**: 659 (2.6%)
+- **Size**: 3.13 MB
 
 ### proto
 - **Count**: 117 (0.5%)

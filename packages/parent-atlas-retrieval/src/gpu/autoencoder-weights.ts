@@ -1,4 +1,4 @@
-import { getRedis } from '$lib/server/redis.js';
+import { getBifrostRedis as getRedis } from '../bifrost/redis-adapter.js';
 
 export interface AutoencoderWeights {
 	W1: Float32Array; // [256 × 768] row-major

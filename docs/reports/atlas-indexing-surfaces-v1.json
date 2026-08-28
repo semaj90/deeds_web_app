@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-28T01:06:59.324Z",
+  "generatedAt": "2026-08-28T18:18:59.659Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -442,7 +442,7 @@
       "codebaseChunkQdrantColumn": "qdrant_id",
       "codebaseChunkEmbeddings": {
         "exists": true,
-        "count": 724
+        "count": 739
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
@@ -458,7 +458,7 @@
       },
       "codebaseChunk_content_embedding_768": {
         "exists": true,
-        "count": 724
+        "count": 739
       },
       "codebaseChunk_content_embedding_384": {
         "exists": true,
@@ -2161,7 +2161,7 @@
       "severity": "high",
       "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
       "evidence": [
-        "724/55206",
+        "739/55206",
         "codebase_chunk_index.content_embedding_768",
         "codebase_chunk_index.content_embedding"
       ]

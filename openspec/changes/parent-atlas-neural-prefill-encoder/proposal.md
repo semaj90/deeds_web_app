@@ -16,8 +16,9 @@ inference.
 
 ## What Changes
 
-- Define a nested autoencoder training contract for
-  `semantic_768 -> latent_128 -> latent_64 -> semantic_768`.
+- Define an independent learned autoencoder branch from `semantic_768` to
+  the currently implemented `ae_latent_64` path (`768 -> 256 -> 64`), while
+  reserving `ae_latent_128` for a separately versioned future producer.
 - Add a read-only NLP pre-fill stage over daily Graphify indexed files:
   AST-grep symbols, lexical terms, domain labels, ontology tuples, structural
   graph features, and provenance revisions.
@@ -76,3 +77,27 @@ inference.
 7. XGBoost GPU execution is proven separately from encoder inference.
 8. Latent projection and ACE pre-fill pass identity, revision, and replay
    checks before any bounded apply.
+
+## Current Representation Correction (2026-08-28)
+
+The original nested `semantic_768 -> latent_128 -> latent_64` wording is not
+the active architecture and must not be used as a dependency. `semantic_768`
+is the canonical retrieval representation and is independently proven by the
+15-candidate canary and exact retrieval replay.
+
+Derived representations are independent challenger branches:
+
+```text
+semantic_768
+  ├── rff_128       deterministic external projection; optional challenger
+  ├── ae_latent_128 reserved future learned producer; not currently available
+  └── ae_latent_64  current learned branch: 768 -> 256 -> 64
+```
+
+RFF generation belongs to a revisioned Atlas projection producer. Qdrant may
+store/search the resulting vector but does not generate it. RRF remains owned
+by SearchRuntime; Qdrant-native fusion is benchmark/parity-only.
+
+Topology representations are downstream of the canonical retrieval path and
+cannot block `semantic_768 -> ContextManifestV1`. They are governed by the
+separate `parent-atlas-topology-representation-admission` change.

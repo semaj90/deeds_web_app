@@ -1,7 +1,7 @@
 {
   "schema": "atlas.qdrant-packet-fanout-v1",
-  "startedAt": "2026-08-27T16:19:14.118Z",
-  "completedAt": "2026-08-27T16:19:18.880Z",
+  "startedAt": "2026-08-28T18:29:07.709Z",
+  "completedAt": "2026-08-28T18:29:11.981Z",
   "readOnly": true,
   "qdrantWrites": false,
   "postgresWrites": false,
@@ -21,9 +21,9 @@
   "pointsWithChunkId": 24062,
   "pointsWithChunkOrdinal": 0,
   "pointsWithContentHash": 106329,
-  "pointsWithSourceRevision": 0,
-  "pointsWithWorkspaceRevision": 0,
-  "pointsWithRepresentationRevision": 0,
+  "pointsWithSourceRevision": 15,
+  "pointsWithWorkspaceRevision": 15,
+  "pointsWithRepresentationRevision": 15,
   "classificationCounts": {
     "VALID_REVISIONED_CHUNK_FANOUT": 0,
     "STALE_REVISION_FANOUT": 0,

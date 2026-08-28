@@ -83,17 +83,28 @@ async function inspectCollection(collectionName) {
 function classifyCollection(collectionName, collectionInfo) {
   const name = collectionName.toLowerCase();
   const config = collectionInfo?.result?.config;
+  // Qdrant exposes collection vector settings under config.params.vectors.
+  // Keep the fallback for older/API-compatible response shapes.
+  const vectorsConfig = config?.params?.vectors ?? config?.vectors;
 
   // Extract vector dimensions from config
   let vectorDimensions = null;
-  if (config?.vectors?.size) {
-    vectorDimensions = config.vectors.size;
+  if (vectorsConfig?.size) {
+    vectorDimensions = vectorsConfig.size;
+  } else if (vectorsConfig && typeof vectorsConfig === 'object') {
+    // Named-vector collections store size on each named vector.
+    const sizes = Object.values(vectorsConfig)
+      .map((vector) => vector?.size)
+      .filter((size) => Number.isInteger(size));
+    if (sizes.length > 0 && sizes.every((size) => size === sizes[0])) {
+      vectorDimensions = sizes[0];
+    }
   }
 
   // Named vectors?
   let namedVectors = null;
-  if (config?.vectors && typeof config.vectors === 'object' && !config.vectors.size) {
-    namedVectors = Object.keys(config.vectors);
+  if (vectorsConfig && typeof vectorsConfig === 'object' && !vectorsConfig.size) {
+    namedVectors = Object.keys(vectorsConfig);
   }
 
   // Classify based on name and dimensions

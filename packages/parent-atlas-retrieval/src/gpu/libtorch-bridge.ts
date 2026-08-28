@@ -24,7 +24,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { Worker } from 'worker_threads';
 import { createHash } from 'crypto';
-import { getRedis } from '$lib/server/redis.js';
+import { getBifrostRedis as getRedis } from '../bifrost/redis-adapter.js';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -902,7 +902,7 @@ export async function queryBmuCached(
   if (dim === 0) return { bmuRow: 0, bmuCol: 0, gridW, gridH, source: 'cpu' };
 
   try {
-    const { getRedis } = await import('$lib/server/redis.js');
+    const { getBifrostRedis: getRedis } = await import('../bifrost/redis-adapter.js');
     const redis = getRedis();
 
     // Cache key: deterministic hash of first+last 8 floats (fast approximation)

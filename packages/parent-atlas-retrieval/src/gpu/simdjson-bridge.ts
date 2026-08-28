@@ -200,16 +200,23 @@ const MIN_NATIVE_BYTES = 1024;
 
 // ── Public API ─────────────────────────────────────────────────────────────────
 
+/** Return the UTF-8 byte length used by the native JSON boundary. */
+export function utf8ByteLength(input: string): number {
+	return Buffer.byteLength(input, 'utf8');
+}
+
 /**
  * Parse JSON with simdjson (large payloads) or V8 JSON.parse (small/fallback).
  * Results cached with 8 MB byte-budget LRU for 30 s.
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
 export function fastJsonParse<T = unknown>(input: string): T {
+	const inputBytes = utf8ByteLength(input);
+
 	// OOM guard — bail before any allocation
-	if (input.length > MAX_INPUT_BYTES) {
+	if (inputBytes > MAX_INPUT_BYTES) {
 		throw new RangeError(
-			`[simdjson-bridge] Input too large (${(input.length / 1e6).toFixed(1)} MB). ` +
+			`[simdjson-bridge] Input too large (${(inputBytes / 1e6).toFixed(1)} MB). ` +
 			`Max is ${MAX_INPUT_BYTES / 1e6} MB.`
 		);
 	}
@@ -220,10 +227,10 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	if (cached !== undefined) return cached as T;
 
 	stats.misses++;
-	stats.totalBytesParsed += input.length;
+	stats.totalBytesParsed += inputBytes;
 
 	let result: T;
-	const native = input.length >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+	const native = inputBytes >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
 
 	if (native) {
 		const start = performance.now();

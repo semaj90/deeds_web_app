@@ -1,0 +1,267 @@
+{
+  "schema": "atlas.lineage-qualified-semantic-coverage.v1",
+  "generatedAt": "2026-08-28T18:11:48.058Z",
+  "mode": "READ_ONLY_CANARY_RECONCILIATION",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "representation": {
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "distance": "Cosine",
+    "vectorName": "content",
+    "physicalContractProven": true
+  },
+  "postgres": {
+    "table": "codebase_chunk_index",
+    "keyColumn": "source_ref",
+    "vectorColumn": "content_embedding_768",
+    "candidatesWithVectorRows": 15
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "candidatesWithExactLineagePoints": 15
+  },
+  "counts": {
+    "candidates": 15,
+    "qdrantExactSemantic768": 15,
+    "postgresVectorPresent": 15,
+    "semanticQualified": 15
+  },
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "7252a838-1e9b-445a-8abd-0d5ad413567d"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "144079f0-43df-42f1-a363-e77fb913b76e"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "a4a643ab-c3fb-49d5-976b-845820c67a7e"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "822a81b8-5e81-4ff0-a645-b1ed7df2584e"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "bb0c9b56-45e4-46e5-8347-25ea009ddfea"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "a0e64259-6219-4c97-9b04-e22b9808c36b"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "5b9447df-c4b5-4634-853c-c06384abfc0b"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 9,
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "44318cbc-211b-4b57-8212-6a8b9f7abac6"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "76266fe6-4285-4dbb-8724-270c139fd4f8"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 11,
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "39a3a174-f87c-41ae-8221-1557c187c078"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "bc31cec8-73d5-4f4c-be58-3fafb1898bf9"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 13,
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "748c3951-eed7-4139-a2ea-aa279ce82796"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    },
+    {
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "postgres": {
+        "rows": 1,
+        "vectorRows": 1
+      },
+      "qdrantPoints": 2,
+      "qdrantExactLineagePoints": 1,
+      "qdrantPointIds": [
+        "01130d0c-6d1f-4fb4-8592-43f3550794d5"
+      ],
+      "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
+    }
+  ],
+  "writes": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "neo4jWrites": false,
+    "valkeyWrites": false,
+    "vectorDownloads": false
+  },
+  "status": "SEMANTIC_768_CANARY_PROVEN",
+  "nextGate": "GOLDEN_RETRIEVAL_READ_ONLY_REPLAY"
+}

@@ -1,66 +1,66 @@
 {
-  "generated_at": "2026-06-29T05:04:45.122Z",
+  "generated_at": "2026-08-28T18:17:18.220Z",
   "status": "PASS",
   "tables": {
     "atlas_summary_layers": {
-      "rows": 336
+      "rows": 18437
     }
   },
   "coverage": {
     "summary_rows": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "packet_join": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "source_ref": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "feature_id": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "feature_label": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "domain_class": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     },
     "ontology_label": {
-      "count": 336,
-      "percent": 100
+      "count": 470,
+      "percent": 2.55
     },
     "topology_label": {
-      "count": 336,
-      "percent": 100
+      "count": 3152,
+      "percent": 17.1
     },
     "summary_packet_key": {
-      "count": 336,
+      "count": 18437,
       "percent": 100
     }
   },
   "jsonb": {
     "metadata_pct": 100,
-    "keywords_pct": 0,
-    "entities_pct": 0
+    "keywords_pct": 3.69,
+    "entities_pct": 0.47
   },
   "traversal": {
     "multihop_ready": {
-      "count": 336,
-      "percent": 100
+      "count": 470,
+      "percent": 2.55
     },
     "joined_context": {
-      "count": 336,
-      "percent": 100
+      "count": 470,
+      "percent": 2.55
     },
     "gds_labels": {
-      "count": 336,
-      "percent": 100
+      "count": 470,
+      "percent": 2.55
     }
   },
   "notes": [

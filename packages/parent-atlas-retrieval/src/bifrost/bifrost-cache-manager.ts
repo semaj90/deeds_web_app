@@ -1,10 +1,16 @@
-import { getRedis } from '$lib/server/redis.js';
-import { ENV } from '$lib/server/env.server.js';
+import { getBifrostRedis as getRedis } from './redis-adapter.js';
 import crypto from 'crypto';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
+import {
+  BITFROST_RESIDENCY_POLICY_V1,
+  decideResidencyV1,
+  type BitFrostResidencyClass,
+  type ResidencyDecisionV1,
+  type ResidencyObservationV1,
+} from './residency-policy.js';
 
 const require = createRequire(import.meta.url);
 let __dirname = '';
@@ -39,6 +45,73 @@ try {
 export class BifrostCacheManager {
   private static PREFIX_KEY = 'bifrost:kv:prefix:';
   private static TTL = 3600 * 4; // 4 hour cache for hot prefixes
+  private static RESIDENCY_META_PREFIX = 'bf:meta:v1:';
+
+  /**
+   * Store cache metadata beside an artifact. The artifact remains disposable;
+   * canonical identity and revision validation happen before this method.
+   */
+  static async registerResidency(
+    prefillIdentity: string,
+    metadata: {
+      residencyClass: BitFrostResidencyClass;
+      utility: number;
+      hitCount: number;
+      lastAccessAt: string;
+      workspaceRevision: string;
+      candidateSnapshotRevision: string;
+      ordinalMapChecksum: string;
+      contextManifestChecksum: string;
+    },
+  ): Promise<void> {
+    const policy = BITFROST_RESIDENCY_POLICY_V1;
+    const observation: ResidencyObservationV1 = {
+      currentClass: metadata.residencyClass,
+      utility: metadata.utility,
+      hitCount: metadata.hitCount,
+      inactiveSeconds: 0,
+    };
+    const decision = decideResidencyV1(observation, policy);
+    const key = this.RESIDENCY_META_PREFIX + prefillIdentity;
+    const value = JSON.stringify({
+      schema: 'atlas.ace-residency-record.v1',
+      prefillIdentity,
+      ...metadata,
+      ttlSeconds: decision.ttlSeconds,
+      policyRevision: decision.policyRevision,
+      canonicalAuthority: false,
+    });
+    const redis = getRedis();
+    await redis.set(key, value, 'EX', decision.ttlSeconds);
+  }
+
+  static async getResidency(prefillIdentity: string): Promise<Record<string, unknown> | null> {
+    const raw = await getRedis().get(this.RESIDENCY_META_PREFIX + prefillIdentity).catch(() => null);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Apply a pure decision to an existing key; callers own authorization. */
+  static async applyResidencyDecision(
+    prefillIdentity: string,
+    observation: ResidencyObservationV1,
+  ): Promise<ResidencyDecisionV1> {
+    const decision = decideResidencyV1(observation, BITFROST_RESIDENCY_POLICY_V1);
+    if (!decision.changed) return decision;
+    const redis = getRedis();
+    const key = this.RESIDENCY_META_PREFIX + prefillIdentity;
+    if (decision.ttlOperation === 'EXPIRE_GT') {
+      await redis.expire(key, decision.ttlSeconds, 'GT');
+    } else {
+      await redis.expire(key, decision.ttlSeconds, 'LT');
+    }
+    return decision;
+  }
 
   /**
    * Get a cached KV-prefix token if available.

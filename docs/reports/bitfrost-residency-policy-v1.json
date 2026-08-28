@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.bitfrost-residency-policy-proof.v1",
+  "status": "WIRED_POLICY_ADAPTER_PROVEN_TESTS_ONLY",
+  "policyRevision": "bitfrost-residency-policy:v1",
+  "classes": ["HOT", "WARM", "COLD"],
+  "ttlSeconds": { "HOT": 2592000, "WARM": 604800, "COLD": 86400 },
+  "promotion": { "coldToWarmUtility": 0.4, "coldToWarmMinHits": 2, "warmToHotUtility": 0.75, "warmToHotMinHits": 5 },
+  "demotion": { "hotToWarmUtilityBelow": 0.25, "warmToColdUtilityBelow": 0.1, "inactiveSeconds": 1209600 },
+  "canonicalAuthority": false,
+  "validation": {
+    "command": "npx vitest run packages/parent-atlas-retrieval/tests/bifrost/residency-policy.spec.ts packages/parent-atlas-retrieval/tests/bifrost/bifrost-semantic-cache.spec.ts",
+    "testsPassed": 35,
+    "testsFailed": 0,
+    "adapter": "BifrostCacheManager residency methods compile through focused test transform"
+  },
+  "notProven": [
+    "Valkey EXPIRE GT/LT adapter behavior",
+    "CLIENT TRACKING invalidation",
+    "Streams event emission and acknowledgement",
+    "expiry-index cleanup",
+    "atlas_context integration",
+    "live Valkey apply/readback"
+  ]
+}

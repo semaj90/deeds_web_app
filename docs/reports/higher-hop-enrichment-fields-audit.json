@@ -1,16 +1,163 @@
 {
-  "timestamp": "2026-08-25T04:20:40.507Z",
-  "steps": [],
-  "field_coverage": {},
-  "field_samples": {},
-  "statistics": {
-    "total_packets_sampled": 0,
-    "som_cluster_coverage": 0,
-    "glyph_record_coverage": 0,
-    "qdrant_hit_coverage": 0,
-    "redis_hot_key_coverage": 0,
-    "neo4j_node_coverage": 0
+  "timestamp": "2026-08-28T18:42:47.355Z",
+  "steps": [
+    {
+      "step": "sample_packets",
+      "status": "ok",
+      "packet_count": 50
+    },
+    {
+      "step": "check_som_cluster",
+      "status": "ok",
+      "coverage": 49,
+      "total": 50,
+      "percent": "98.0"
+    },
+    {
+      "step": "check_glyph_record",
+      "status": "ok",
+      "coverage": 0,
+      "total": 50,
+      "percent": "0.0",
+      "table_missing": false
+    },
+    {
+      "step": "check_qdrant_hit",
+      "status": "ok",
+      "coverage": 100,
+      "total": 50,
+      "percent": "200.0"
+    },
+    {
+      "step": "check_redis_hot_key",
+      "status": "ok",
+      "coverage": 50,
+      "total": 50,
+      "percent": "100.0"
+    },
+    {
+      "step": "check_neo4j_node",
+      "status": "ok",
+      "coverage": 17,
+      "total": 50,
+      "percent": "34.0"
+    }
+  ],
+  "field_coverage": {
+    "som_cluster": "49/50",
+    "glyph_record": "0/50",
+    "qdrant_hit": "100/100",
+    "redis_hot_key": "50/50",
+    "neo4j_node": "17/50"
   },
-  "status": "FAIL",
-  "error": "relation \"atlas_codebase_packets\" does not exist"
+  "field_samples": {
+    "som_cluster": [
+      {
+        "packet_key": "ace:packet:22ad73cecbe0",
+        "source": "postgres",
+        "som_cluster": "0"
+      },
+      {
+        "packet_key": "ace:packet:9e7b58f1184e",
+        "source": "postgres",
+        "som_cluster": "0"
+      },
+      {
+        "packet_key": "ace:packet:affbbe3a9e23",
+        "source": "postgres",
+        "som_cluster": "0"
+      },
+      {
+        "packet_key": "ace:packet:39f69ae694e7",
+        "source": "postgres",
+        "som_cluster": "0"
+      },
+      {
+        "packet_key": "ace:packet:cc69d6a97e4f",
+        "source": "postgres",
+        "som_cluster": "0"
+      }
+    ],
+    "glyph_record": [],
+    "qdrant_hit": [
+      {
+        "point_id": 1,
+        "has_packet_key": true,
+        "source_ref": "1"
+      },
+      {
+        "point_id": 2,
+        "has_packet_key": true,
+        "source_ref": "sveltekit-frontend/src/AGENTS.md"
+      },
+      {
+        "point_id": 3,
+        "has_packet_key": true,
+        "source_ref": "src/AGENTS.md"
+      },
+      {
+        "point_id": 4,
+        "has_packet_key": true,
+        "source_ref": "src/AGENTS.md"
+      },
+      {
+        "point_id": 5,
+        "has_packet_key": true,
+        "source_ref": "sveltekit-frontend/src/hooks.server.ts"
+      }
+    ],
+    "redis_hot_key": [
+      {
+        "packet_key": "sha256:4ff58c17ae76b8b115e4cd94",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "ace:packet:22ad73cecbe0",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "ace:packet:9e7b58f1184e",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "ace:packet:affbbe3a9e23",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "ace:packet:39f69ae694e7",
+        "redis_key": "gpu:karpathy:scores"
+      }
+    ],
+    "neo4j_node": [
+      {
+        "packet_key": "ace:packet:22ad73cecbe0",
+        "neo4j_node_id": null
+      },
+      {
+        "packet_key": "ace:packet:9e7b58f1184e",
+        "neo4j_node_id": "a92b95b6-53f3-447e-890d-0f5013ec586d"
+      },
+      {
+        "packet_key": "ace:packet:b224e16895d0",
+        "neo4j_node_id": "6e7705b0-9df1-438a-926d-d622c830fcfc"
+      },
+      {
+        "packet_key": "ace:packet:50caa5a4a901",
+        "neo4j_node_id": "07f42ee8-f306-46b5-b269-b595d060bfc4"
+      },
+      {
+        "packet_key": "ace:packet:84c7792c1f9d",
+        "neo4j_node_id": "162a8159-34ee-46e3-8247-fba941b269c0"
+      }
+    ]
+  },
+  "statistics": {
+    "total_packets_sampled": 50,
+    "som_cluster_coverage": 49,
+    "glyph_record_coverage": 0,
+    "qdrant_hit_coverage": 100,
+    "redis_hot_key_coverage": 50,
+    "neo4j_node_coverage": 17
+  },
+  "status": "WARN"
 }

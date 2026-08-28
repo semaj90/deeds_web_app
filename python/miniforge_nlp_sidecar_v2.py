@@ -103,6 +103,9 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         legacy._grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
         return []
     try:
+        # The v2 facade is the active container entrypoint. Reuse the proven
+        # provider shim so schema/no-thinking/cache controls reach llama.cpp.
+        legacy._ensure_grounded_provider_controls()
         extract_fn = getattr(legacy.langextract, "extract", None)
         if extract_fn is None:
             legacy._grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
@@ -139,6 +142,8 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
             "temperature": 0.0,
         }
         if model_config_type is not None:
+            from langextract.providers.schemas.openai import OpenAISchema  # type: ignore
+
             extract_kwargs["config"] = model_config_type(
                 model_id=selected_model,
                 provider="openai",
@@ -149,6 +154,16 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
                     "reasoning_format": "none",
                     "reasoning_budget": extraction_reasoning_budget,
                     "chat_template_kwargs": {"enable_thinking": False},
+                    "seed": 1729,
+                    "top_p": 1.0,
+                    "reasoning_effort": "none",
+                    "cache_prompt": False,
+                    "openai_schema": OpenAISchema(
+                        legacy._grounded_output_schema(),
+                        schema_name="atlas_grounded_extraction_v1",
+                        strict=True,
+                        from_output_schema=True,
+                    ),
                 },
             )
         else:

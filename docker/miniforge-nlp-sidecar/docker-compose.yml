@@ -19,9 +19,12 @@ services:
       LANGEXTRACT_PROVIDER: ${LANGEXTRACT_PROVIDER:-openai}
       LANGEXTRACT_MODEL: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
       LANGEXTRACT_MODEL_ID: ${LANGEXTRACT_MODEL_ID:-ornith-1.5-9b}
-      LANGEXTRACT_BASE_URL: ${LANGEXTRACT_BASE_URL:-http://host.docker.internal:8090/v1}
+      # The model server runs on the Windows host. Do not allow a .env value
+      # of 127.0.0.1 to redirect container-local LangExtract inference back to
+      # the NLP sidecar itself.
+      LANGEXTRACT_BASE_URL: http://host.docker.internal:8090/v1
       LANGEXTRACT_API_KEY: ${LANGEXTRACT_API_KEY:-local}
-      LLAMA_SERVER_URL: ${LLAMA_SERVER_URL:-http://host.docker.internal:8090/v1}
+      LLAMA_SERVER_URL: http://host.docker.internal:8090/v1
       UVICORN_LOG_LEVEL: info
     healthcheck:
       test:

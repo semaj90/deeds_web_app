@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.retrieval-package-error-fix.v1",
+  "status": "PARTIAL_PROVEN",
+  "changes": [
+    {
+      "file": "packages/parent-atlas-retrieval/src/bifrost/bifrost-som-prefilter.ts",
+      "result": "package-local Redis adapter; removed nonexistent Qdrant manager dependency"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/gpu/autoencoder-scripts.test.ts",
+      "result": "replaced nonexistent qdrant-http test import with local mock"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/gpu/autoencoder-weights.ts",
+      "result": "uses package-local Redis adapter"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/gpu/gpu-pipeline.ts",
+      "result": "dynamic Redis reads/writes use package-local adapter"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/gpu/libtorch-bridge.ts",
+      "result": "Redis imports use package-local adapter"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/turbovec/boosted-reranker.ts",
+      "result": "Redis import uses package-local adapter"
+    },
+    {
+      "file": "packages/parent-atlas-retrieval/src/turbovec/cluster-aware-reranker.ts",
+      "result": "Redis import uses package-local adapter"
+    }
+  ],
+  "focusedTests": {
+    "command": "npx vitest run packages/parent-atlas-retrieval/src/gpu/autoencoder-scripts.test.ts packages/parent-atlas-retrieval/src/gpu/simdjson-bridge.spec.ts packages/parent-atlas-retrieval/tests/bifrost/residency-policy.spec.ts packages/parent-atlas-retrieval/tests/bifrost/bifrost-semantic-cache.spec.ts",
+    "passed": 39,
+    "failed": 0
+  },
+  "packageTypecheck": {
+    "status": "BLOCKED_BY_PREEXISTING_CROSS_PACKAGE_IMPORTS",
+    "remainingAreas": ["gpu/background-analyzer", "gpu/cuda-bridge", "gpu/mapreduce-cuda-analyzer", "turbovec non-Redis adapters"]
+  },
+  "writes": false,
+  "canonicalAuthority": false
+}

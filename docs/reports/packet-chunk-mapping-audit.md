@@ -1,21 +1,21 @@
 # Packet/Chunk Mapping Audit
 
-Generated: 2026-08-26T00:27:58.373Z
+Generated: 2026-08-28T18:29:53.544Z
 Status: WARN
 
 ## Summary
 
 - Atlas packets: 61,660
-- Codebase chunks: 52,417
-- Exact source_ref matches: 87,950
+- Codebase chunks: 55,206
+- Exact source_ref matches: 90,523
 - packet_key matches: 0
 - feature_id matches: 0
 - tree_node_id matches: 0
 - qdrant_id matches: 1,280
-- ambiguous mappings: 35,570
-- unmapped packets: 54,319
-- chunks mapped to multiple packets: 35,570
-- packets mapped to multiple chunks: 6,921
+- ambiguous mappings: 35,956
+- unmapped packets: 54,186
+- chunks mapped to multiple packets: 35,956
+- packets mapped to multiple chunks: 7,049
 - empty-path rows: 37
 - invalid source refs: 37
 
@@ -24,6 +24,36 @@ Status: WARN
 ### Empty-path rows
 ```json
 [
+  {
+    "id": "c9276dae-0d44-4610-bb3a-1b0761573025",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "3f18cd44-c6df-7d3d-e51a-0c110f3cc224"
+  },
+  {
+    "id": "7e772e02-5660-49a5-806d-1c4ff0129f54",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "3368aa7b-aef7-2fb8-2d51-d0a46c9c5527"
+  },
+  {
+    "id": "a84c11d3-f66a-4b4f-9663-d8201145f056",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "116f0db7-dba3-5f21-dcbd-7bceaee6c048"
+  },
+  {
+    "id": "89533630-dfb6-49b1-833b-17732bcd0784",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "37a44ba8-fdc5-a8fe-0856-13dbf68c2f5d"
+  },
+  {
+    "id": "226a0905-8bc8-4035-b3c0-6e150224d825",
+    "source_ref": "",
+    "relative_path": "",
+    "qdrant_id": "3cb3e712-bf79-6b00-10af-292143c8629a"
+  },
   {
     "id": "0e807030-12f0-4473-a5fc-40cfaacab380",
     "source_ref": "",
@@ -53,36 +83,6 @@ Status: WARN
     "source_ref": "",
     "relative_path": "",
     "qdrant_id": "3153980c-d6ba-1072-8ffe-969d90c3758f"
-  },
-  {
-    "id": "e1971097-bb04-4146-a1d2-e89bfe4a2dc7",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "1d606307-3811-acda-1616-93b980975a8e"
-  },
-  {
-    "id": "93429a7d-dd18-4432-8db0-0728b185a407",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "40d1e02f-6715-7dcc-9a00-11cd432aeeff"
-  },
-  {
-    "id": "ee336e6f-be09-43d6-9f67-8c6fceda4bc6",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "103d360e-4e47-afd1-e2c8-6d7acca8e861"
-  },
-  {
-    "id": "eaa356d5-c148-4ee6-9581-1040ff5a1ba1",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "1c62d382-8c52-3d57-ca17-41c1bd9454e0"
-  },
-  {
-    "id": "4ad3ee46-6919-4869-a8b3-9724ecaf8983",
-    "source_ref": "",
-    "relative_path": "",
-    "qdrant_id": "27225610-6982-106e-37a5-101311179841"
   }
 ]
 ```
@@ -91,93 +91,93 @@ Status: WARN
 ```json
 [
   {
-    "chunk_id": "3e177985-ec95-461f-a2b9-1dfe262d4fc9",
-    "source_ref": "src/routes/(app)/evidence/upload/+page.svelte",
-    "relative_path": "src/routes/(app)/evidence/upload/+page.svelte",
+    "chunk_id": "00c5c19b-71dd-4ee7-b363-a24a3ac2e270",
+    "source_ref": "src/lib/server/embedding/embed-schema.ts",
+    "relative_path": "src/lib/server/embedding/embed-schema.ts",
     "packet_keys": [
-      "ace:packet:12dd351825f2",
-      "packet:255a5c0cd907"
+      "ace:packet:3949f4499758",
+      "packet:9f94b776b3a7"
     ]
   },
   {
-    "chunk_id": "40d9083c-c8eb-4778-95f1-d1abe035425b",
-    "source_ref": "src/routes/(app)/admin/codebase-index/+page.svelte",
-    "relative_path": "src/routes/(app)/admin/codebase-index/+page.svelte",
+    "chunk_id": "6d02a319-af48-4235-8d06-88da8e672f00",
+    "source_ref": "src/lib/server/indexer/legal-chunker.ts",
+    "relative_path": "src/lib/server/indexer/legal-chunker.ts",
     "packet_keys": [
-      "ace:packet:717acaa37a87",
-      "packet:d8628b36a885"
+      "ace:packet:f89dd94b7512",
+      "packet:70ffd8ddfd61"
     ]
   },
   {
-    "chunk_id": "5dfc2dfb-12f1-43bf-8024-c55c91a13ace",
-    "source_ref": "src/lib/components/dashboard/gamification-types.ts",
-    "relative_path": "src/lib/components/dashboard/gamification-types.ts",
+    "chunk_id": "6d06971d-c469-4ddc-bfb2-52aa9919718e",
+    "source_ref": "src/routes/api/statutes/search/+server.ts",
+    "relative_path": "src/routes/api/statutes/search/+server.ts",
     "packet_keys": [
-      "ace:packet:1b512a2b7cae",
-      "packet:66de67b1f8b3"
+      "ace:packet:3dcdb9768f8f",
+      "packet:acdd07dfcd4e"
     ]
   },
   {
-    "chunk_id": "3e23656a-bf5a-4c98-910c-277ffa053886",
-    "source_ref": "src/routes/(app)/cases/[id]/board/+page.svelte",
-    "relative_path": "src/routes/(app)/cases/[id]/board/+page.svelte",
+    "chunk_id": "372aaa78-acd7-4b7b-bf51-87981cdfdb7d",
+    "source_ref": "src/lib/components/citations/CitationList.svelte",
+    "relative_path": "src/lib/components/citations/CitationList.svelte",
     "packet_keys": [
-      "ace:packet:8bc579effe53",
-      "packet:3c275cde759f"
+      "ace:packet:897e7cbf2b3a",
+      "packet:2605f6962a90"
     ]
   },
   {
-    "chunk_id": "17444229-26c2-4aad-8009-43f3ce5205bd",
-    "source_ref": "src/lib/server/engagement/idle-reengagement.ts",
-    "relative_path": "src/lib/server/engagement/idle-reengagement.ts",
+    "chunk_id": "6d098b63-504f-4f72-adbe-febc74fd4068",
+    "source_ref": "src/lib/workers/compute-worker.mjs",
+    "relative_path": "src/lib/workers/compute-worker.mjs",
     "packet_keys": [
-      "ace:packet:df77f988cbb3",
-      "packet:57b8e2db930d"
+      "ace:packet:3df0e909611c",
+      "packet:6b69df5a2956"
     ]
   },
   {
-    "chunk_id": "9a004262-02ea-4165-a964-7b367946c4e7",
-    "source_ref": "src/lib/server/ml/recommendation-metrics.ts",
-    "relative_path": "src/lib/server/ml/recommendation-metrics.ts",
+    "chunk_id": "6d13ac7d-28f8-4cf5-8594-b3a7dec9238c",
+    "source_ref": "src/lib/webgpu/som-webgpu-cache.ts",
+    "relative_path": "src/lib/webgpu/som-webgpu-cache.ts",
     "packet_keys": [
-      "ace:packet:c51223d5373f",
-      "packet:d801b2ea0052"
+      "ace:packet:356327d10270",
+      "packet:4ac67c393668"
     ]
   },
   {
-    "chunk_id": "3e39eeae-86d1-488d-a4c6-7aed859f5311",
-    "source_ref": "src/lib/server/gpu/pytorch-graph.ts",
-    "relative_path": "src/lib/server/gpu/pytorch-graph.ts",
+    "chunk_id": "b15c4176-240d-4d2a-badd-d186a83e1cc3",
+    "source_ref": "src/lib/server/api-metadata-extractor.ts",
+    "relative_path": "src/lib/server/api-metadata-extractor.ts",
     "packet_keys": [
-      "ace:packet:c53ac78221aa",
-      "packet:fc5108ed4814"
+      "ace:packet:8fa193413732",
+      "packet:8a6b327877ea"
     ]
   },
   {
-    "chunk_id": "1771d290-0427-4a67-9d00-5eb214d8ad45",
-    "source_ref": "src/lib/server/db/schema/error_timeline.ts",
-    "relative_path": "src/lib/server/db/schema/error_timeline.ts",
+    "chunk_id": "376c9c8d-dc0d-49a8-b32d-d72bdc08bf73",
+    "source_ref": "src/routes/api/analytics/focus/+server.ts",
+    "relative_path": "src/routes/api/analytics/focus/+server.ts",
     "packet_keys": [
-      "ace:packet:41516a9c7c2a",
-      "packet:762983603633"
+      "ace:packet:d9b33961c431",
+      "packet:a608d191dc25"
     ]
   },
   {
-    "chunk_id": "1784c17f-bc94-41a8-9882-97e430190c4d",
-    "source_ref": "src/lib/server/indexer/ast-chunker.ts",
-    "relative_path": "src/lib/server/indexer/ast-chunker.ts",
-    "packet_keys": [
-      "ace:packet:0bc6e63377c6",
-      "packet:40386029557b"
-    ]
-  },
-  {
-    "chunk_id": "7829086c-2496-4fea-9409-be89930db7a7",
+    "chunk_id": "6d185505-6b6c-42c8-a732-2427f9d95eaf",
     "source_ref": "src/types/webgpu.d.ts",
     "relative_path": "src/types/webgpu.d.ts",
     "packet_keys": [
       "ace:packet:78601ae219c9",
       "packet:17d153e1288d"
+    ]
+  },
+  {
+    "chunk_id": "00c61214-d292-4d0e-aebb-2548ef827f60",
+    "source_ref": "src/routes/+layout.svelte",
+    "relative_path": "src/routes/+layout.svelte",
+    "packet_keys": [
+      "ace:packet:cc69d6a97e4f",
+      "packet:18f5ecfbcd7a"
     ]
   }
 ]

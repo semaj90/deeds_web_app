@@ -1,6 +1,6 @@
 {
   "schema": "Neo4jCandidateOrdinalJoinReceiptV1",
-  "generatedAt": "2026-08-27T04:04:32.449Z",
+  "generatedAt": "2026-08-28T18:21:42.028Z",
   "writes": false,
   "candidateMapSource": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\candidate-ordinal-corpus-v1.json",
   "maxNodes": 25000,

@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.lineage-qualified-semantic-768-backfill-apply.v1",
+  "generatedAt": "2026-08-28T16:44:15.400Z",
+  "authorization": {
+    "explicit": true,
+    "envFlag": "ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1",
+    "scope": "frozen 15-candidate lineage canary"
+  },
+  "candidateMap": {
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "201d699f239765115f8b2145b5a03bb1aa369a92a7af7bea0282cb072142f039",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "count": 15
+  },
+  "representation": {
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "vectorName": "content",
+    "distance": "Cosine",
+    "model": "embeddinggemma:latest",
+    "modelRevision": "semantic_768:embeddinggemma:latest:batch:901386f3a18b9bc05605d0f00574c6e13227dec22945473abba57c81663ef68c"
+  },
+  "counts": {
+    "selected": 15,
+    "embedded": 15,
+    "postgresWritten": 15,
+    "postgresReadback": 15,
+    "qdrantUpserted": 15,
+    "qdrantReadback": 15
+  },
+  "writes": {
+    "postgresWrites": true,
+    "qdrantWrites": true
+  },
+  "status": "SEMANTIC_768_BACKFILL_AND_PROJECTION_PROVEN",
+  "errors": []
+}

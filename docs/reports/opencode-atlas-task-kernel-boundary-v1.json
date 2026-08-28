@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.opencode-task-kernel-boundary.v1",
+  "status": "WIRED_READ_ONLY_BOUNDARY",
+  "opencodeVersion": "1.18.18",
+  "defaultAgent": "ornith-atlas-kernel",
+  "curatedMcpServer": "atlas-task-kernel",
+  "curatedCapabilities": [
+    "atlas_context",
+    "atlas_inspect",
+    "atlas_expand",
+    "atlas_verify",
+    "atlas_validate_plan"
+  ],
+  "legacyRawAtlasServer": {
+    "name": "atlas-tools",
+    "enabled": false,
+    "reason": "Prevent model discovery of mixed read/write backend tools"
+  },
+  "backendAuthority": {
+    "postgres": "hidden behind Atlas",
+    "qdrant": "hidden behind Atlas",
+    "neo4j": "hidden behind Atlas",
+    "bitfrostValkey": "hidden behind Atlas",
+    "searchFusion": "hidden behind Atlas"
+  },
+  "mutationSurface": {
+    "applyPatch": "not exposed",
+    "recordOutcome": "not exposed",
+    "durableWrites": "not exposed"
+  },
+  "validation": {
+    "facadeSyntax": "PASS",
+    "initialize": "PASS",
+    "toolsList": "PASS",
+    "toolsListed": 5,
+    "atlasVerifyDelegation": "PASS",
+    "resolvedConfig": "PASS"
+  },
+  "canonicalAuthority": false,
+  "notes": [
+    "The facade currently delegates context construction to the existing ACE context builder.",
+    "BitFrost hit/set behavior remains an internal follow-up; it is not exposed as a model tool.",
+    "OpenCode 1.18.18 uses the project compatibility permission syntax; V2 migration is not claimed."
+  ]
+}

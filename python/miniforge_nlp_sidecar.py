@@ -806,7 +806,13 @@ def _ensure_grounded_provider_controls() -> None:
 
         def build_params(self: Any, prompt: str, config: dict[str, Any]) -> dict[str, Any]:
             params = original(self, prompt, config)
-            params.setdefault("chat_template_kwargs", {"enable_thinking": False})
+            extra_body = dict(params.get("extra_body") or {})
+            extra_body.setdefault("chat_template_kwargs", {"enable_thinking": False})
+            # Grounding determinism is measured independently of llama.cpp
+            # prompt-KV reuse. This is scoped to the proof/promotion lane and
+            # does not change the general analysis or chat paths.
+            extra_body.setdefault("cache_prompt", False)
+            params["extra_body"] = extra_body
             return params
 
         OpenAILanguageModel._build_chat_completions_params = build_params  # type: ignore[method-assign]

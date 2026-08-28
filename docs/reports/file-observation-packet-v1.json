@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.file-observation-packet-proof.v1",
+  "status": "CONTRACT_FIXTURE_PROVEN",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "contract": "sveltekit-frontend/src/lib/server/atlas/contracts/file-observation-packet-v1.ts",
+  "tests": {
+    "command": "npx vitest run sveltekit-frontend/src/lib/server/atlas/contracts/file-observation-packet-v1.spec.ts",
+    "passed": 3,
+    "failed": 0
+  },
+  "proven": [
+    "revision-qualified source identity envelope",
+    "CST/AST and lexical observation fields",
+    "evidence span validation",
+    "deterministic checksum under object-key reordering",
+    "canonicalAuthority is always false"
+  ],
+  "notProven": [
+    "live producer population",
+    "full workspace coverage",
+    "Postgres/Qdrant/Neo4j/Valkey materialization",
+    "CandidateOrdinal admission",
+    "multi-hop ACE fan-out"
+  ],
+  "nextGate": "OBS-02_CST_AST_DIGEST_SOURCE_COORDINATE_BINDING"
+}

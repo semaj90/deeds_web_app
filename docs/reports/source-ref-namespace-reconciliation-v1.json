@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.source-ref-namespace-reconciliation.v1",
+  "generatedAt": "2026-08-28T18:41:06.921Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "manifest": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\indexable-source-manifest-v1\\manifest.jsonl",
+    "admittedRows": 16566,
+    "distinctSourceRefs": 16566,
+    "namespaceCandidateRule": "sveltekit-frontend/<path> -> <path>",
+    "namespaceCandidateRefs": 26160
+  },
+  "projections": {
+    "postgresChunkRows": 43753,
+    "graphifyRows": 707,
+    "qdrant": "NOT_CHECKED_IN_THIS_READ_ONLY_PASS"
+  },
+  "classifications": {
+    "EXACT_CURRENT": 0,
+    "NAMESPACE_RULE_HASH_EXACT_REVIEW_ONLY": 0,
+    "HASH_TRUNCATED_NOT_PROVABLE": 205,
+    "CHUNK_SOURCE_MATCH_HASH_MISMATCH": 770,
+    "GRAPHIFY_SOURCE_MATCH_HASH_MISMATCH": 0,
+    "MISSING_POSTGRES_CHUNK": 15591,
+    "MISSING_GRAPHIFY": 0
+  },
+  "exactCurrent": 0,
+  "promotionEligible": false,
+  "canonicalAuthority": false,
+  "rules": [
+    "exact source_ref + content_hash only",
+    "no basename/normalized/suffix/fuzzy matching",
+    "Qdrant is not identity authority"
+  ],
+  "nextGate": "SOURCE_BINDING_RECONCILIATION_REQUIRED"
+}

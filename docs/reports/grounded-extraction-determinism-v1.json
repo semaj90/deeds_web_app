@@ -1,6 +1,6 @@
 {
   "schema": "atlas.grounded-extraction-determinism.v1",
-  "generatedAt": "2026-08-28T05:37:26.855Z",
+  "generatedAt": "2026-08-28T17:22:28.779Z",
   "mode": "READ_ONLY_THREE_RUN_PROOF",
   "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
   "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
@@ -27,18 +27,18 @@
   "sidecar": {
     "url": "http://127.0.0.1:8095",
     "endpoint": "/extract",
-    "timeoutMs": 180000
+    "timeoutMs": 120000
   },
   "runs": [
     {
       "runNumber": 1,
-      "elapsedMs": 25161,
+      "elapsedMs": 2204,
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
       "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "modelId": "ornith-1.5-9b",
       "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.2|tree-sitter=0.9.0|chunker=4.0.0",
-      "rawResponseChecksum": "7b03726bb99b24e0de11b16189b83c1d6ebb9e6b8a8a1b899b64101ad2bc12c0",
+      "rawResponseChecksum": "ac4bd47627e7064f493b602a85283a2eb9e12cc0aada2ebc09f7df6fdb16dba3",
       "rawResponsePreview": "{\"document_id\":\"sveltekit-frontend/src/lib/server/ai/trace-reranker.ts\",\"structure\":{\"chunks\":[{\"kind\":\"import_statement\",\"text\":\"import { sql } from 'drizzle-orm';\",\"start\":0,\"end\":34,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"sql\"],\"imports\":[\"import { sql } from 'drizzle-orm';\",\"{ sql }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"kind\":\"import_statement\",\"symbol\":null,\"qualified_name\":null,\"parent_symbol\":null,\"semantic_path\":\"atlas-input.ts\",\"signature_text\":null,\"exports\":[],\"semantic_text\":\"language: typescript\\nfile: atlas-input.ts\\nkind: import_statement\\nsemantic path: atlas-input.ts\\nimports: import { sql } from 'drizzle-orm';, { sql }\\ndependencies: sql\\ncontent:\\nimport { sql } from 'drizzle-orm';\"}},{\"kind\":\"import_statement\",\"text\":\"import { db } from '$lib/server/db/client.js';\",\"start\":35,\"end\":81,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"db\"],\"imports\":[\"import { db } from '$lib/server/db/client.js';\",\"{ db }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"k",
       "httpStatus": 200,
       "parseStatus": "PARSED",
@@ -56,203 +56,61 @@
     },
     {
       "runNumber": 2,
-      "elapsedMs": 34204,
+      "elapsedMs": 1995,
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
       "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "modelId": "ornith-1.5-9b",
       "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.2|tree-sitter=0.9.0|chunker=4.0.0",
-      "rawResponseChecksum": "c45eb54287078f89a1a9c61ff61ea0aa3c0f4154a73d209c17d07d777153317f",
+      "rawResponseChecksum": "b77b0b7e736b482ef9445b894fd696af26f93428be2f3c50480ce767be399490",
       "rawResponsePreview": "{\"document_id\":\"sveltekit-frontend/src/lib/server/ai/trace-reranker.ts\",\"structure\":{\"chunks\":[{\"kind\":\"import_statement\",\"text\":\"import { sql } from 'drizzle-orm';\",\"start\":0,\"end\":34,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"sql\"],\"imports\":[\"import { sql } from 'drizzle-orm';\",\"{ sql }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"kind\":\"import_statement\",\"symbol\":null,\"qualified_name\":null,\"parent_symbol\":null,\"semantic_path\":\"atlas-input.ts\",\"signature_text\":null,\"exports\":[],\"semantic_text\":\"language: typescript\\nfile: atlas-input.ts\\nkind: import_statement\\nsemantic path: atlas-input.ts\\nimports: import { sql } from 'drizzle-orm';, { sql }\\ndependencies: sql\\ncontent:\\nimport { sql } from 'drizzle-orm';\"}},{\"kind\":\"import_statement\",\"text\":\"import { db } from '$lib/server/db/client.js';\",\"start\":35,\"end\":81,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"db\"],\"imports\":[\"import { db } from '$lib/server/db/client.js';\",\"{ db }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"k",
       "httpStatus": 200,
       "parseStatus": "PARSED",
-      "modelExtractionCount": 11,
-      "alignedExtractionCount": 6,
-      "exactExtractionCount": 6,
-      "rejectedExtractionCount": 5,
-      "groundedExtractionUsed": true,
+      "modelExtractionCount": 0,
+      "alignedExtractionCount": 0,
+      "exactExtractionCount": 0,
+      "rejectedExtractionCount": 0,
+      "groundedExtractionUsed": false,
       "groundedExtractionError": null,
-      "normalizedExactSetChecksum": "e1c6e8f00c3afc501a3a75f5a85794e32a66604afbb79ce87da5cfef47071384",
-      "normalizedExactSet": [
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "getQdrantManager",
-          "start": 91,
-          "end": 107
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "getActiveSemanticVectorLane",
-          "start": 164,
-          "end": 191
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "SEMANTIC_REPRESENTATION_ID",
-          "start": 247,
-          "end": 273
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "SEMANTIC_DIMENSION",
-          "start": 275,
-          "end": 293
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "TraceRerankResult",
-          "start": 365,
-          "end": 382
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "MIN_JOIN_COVERAGE",
-          "start": 898,
-          "end": 915
-        }
-      ],
-      "rejectedExtractions": [
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "traceRerank",
-          "start": 1175,
-          "end": 1186,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "hybridSearch",
-          "start": 1571,
-          "end": 1583,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "detectIntentLenses",
-          "start": 1464,
-          "end": 1482,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "CanonicalTraceRow",
-          "start": 497,
-          "end": 514,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "summary_lenses",
-          "start": 1855,
-          "end": 1869,
-          "alignmentStatus": "match_fuzzy"
-        }
-      ],
+      "normalizedExactSetChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "normalizedExactSet": [],
+      "rejectedExtractions": [],
       "errorCode": null,
       "errorMessage": null
     },
     {
       "runNumber": 3,
-      "elapsedMs": 34124,
+      "elapsedMs": 2020,
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
       "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
       "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
       "modelId": "ornith-1.5-9b",
       "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.2|tree-sitter=0.9.0|chunker=4.0.0",
-      "rawResponseChecksum": "0cfc539206fa61081c726519fbd32531104bfd4a715dd197841b00769d767c9a",
+      "rawResponseChecksum": "ce3b8fc24e6ca7272260831ae45f50630abcee326526991c207392febb45f94d",
       "rawResponsePreview": "{\"document_id\":\"sveltekit-frontend/src/lib/server/ai/trace-reranker.ts\",\"structure\":{\"chunks\":[{\"kind\":\"import_statement\",\"text\":\"import { sql } from 'drizzle-orm';\",\"start\":0,\"end\":34,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"sql\"],\"imports\":[\"import { sql } from 'drizzle-orm';\",\"{ sql }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"kind\":\"import_statement\",\"symbol\":null,\"qualified_name\":null,\"parent_symbol\":null,\"semantic_path\":\"atlas-input.ts\",\"signature_text\":null,\"exports\":[],\"semantic_text\":\"language: typescript\\nfile: atlas-input.ts\\nkind: import_statement\\nsemantic path: atlas-input.ts\\nimports: import { sql } from 'drizzle-orm';, { sql }\\ndependencies: sql\\ncontent:\\nimport { sql } from 'drizzle-orm';\"}},{\"kind\":\"import_statement\",\"text\":\"import { db } from '$lib/server/db/client.js';\",\"start\":35,\"end\":81,\"symbol\":null,\"language\":\"typescript\",\"metadata\":{\"dependencies\":[\"db\"],\"imports\":[\"import { db } from '$lib/server/db/client.js';\",\"{ db }\"],\"complexity\":{\"cyclomatic\":1,\"cognitive\":0,\"nesting_depth\":0,\"lines_of_code\":1,\"logical_lines\":1},\"type\":\"import_statement\",\"k",
       "httpStatus": 200,
       "parseStatus": "PARSED",
-      "modelExtractionCount": 10,
-      "alignedExtractionCount": 3,
-      "exactExtractionCount": 3,
-      "rejectedExtractionCount": 7,
-      "groundedExtractionUsed": true,
+      "modelExtractionCount": 0,
+      "alignedExtractionCount": 0,
+      "exactExtractionCount": 0,
+      "rejectedExtractionCount": 0,
+      "groundedExtractionUsed": false,
       "groundedExtractionError": null,
-      "normalizedExactSetChecksum": "0c7421b0ed68ac1b221fde38ecacebdea7b0004c6e89a46aaadc51d873791d9c",
-      "normalizedExactSet": [
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "CANONICAL_COLLECTION",
-          "start": 827,
-          "end": 847
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "MIN_JOIN_COVERAGE",
-          "start": 898,
-          "end": 915
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "summary_lenses",
-          "start": 1855,
-          "end": 1869
-        }
-      ],
-      "rejectedExtractions": [
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "traceRerank",
-          "start": 1175,
-          "end": 1186,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "TRACE Reranker",
-          "start": 931,
-          "end": 945,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "Qdrant",
-          "start": 135,
-          "end": 141,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "hybridSearch",
-          "start": 1571,
-          "end": 1583,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "multi-stage retrieval",
-          "start": 1004,
-          "end": 1025,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "detectIntentLenses",
-          "start": 1464,
-          "end": 1482,
-          "alignmentStatus": "match_fuzzy"
-        },
-        {
-          "extractionClass": "CONCEPT",
-          "extractionText": "TraceRerankResult",
-          "start": 365,
-          "end": 382,
-          "alignmentStatus": "match_fuzzy"
-        }
-      ],
+      "normalizedExactSetChecksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "normalizedExactSet": [],
+      "rejectedExtractions": [],
       "errorCode": null,
       "errorMessage": null
     }
   ],
   "normalizedExactSetChecksums": [
     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "e1c6e8f00c3afc501a3a75f5a85794e32a66604afbb79ce87da5cfef47071384",
-    "0c7421b0ed68ac1b221fde38ecacebdea7b0004c6e89a46aaadc51d873791d9c"
+    "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
   ],
   "acceptance": {
     "allThreeParsed": true,
-    "identicalExactSets": false,
+    "identicalExactSets": true,
     "allRunsNonEmpty": false
   },
   "postgresWrites": false,
@@ -261,6 +119,6 @@
   "valkeyWrites": false,
   "relationshipWrites": false,
   "canonicalAuthority": false,
-  "status": "GROUNDING_NONDETERMINISTIC",
+  "status": "GROUNDING_EXACT_EMPTY_OR_REQUEST_FAILED",
   "nextGate": "REPAIR_GROUNDING_DETERMINISM_BEFORE_PROMOTION"
 }

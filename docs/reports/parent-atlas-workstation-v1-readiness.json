@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.workstation-v1-readiness.v1",
+  "status": "WORKSTATION_V1_PROVEN",
+  "gates": {
+    "sourceLineage": "PROVEN_CANARY",
+    "candidateOrdinal": "PROVEN_CANARY",
+    "semantic768": "PROVEN",
+    "retrievalReplay": "PROVEN",
+    "contextManifest": "PROVEN",
+    "dagValidator": "PROVEN_CANARY",
+    "readOnlyExecution": "PROVEN"
+  },
+  "bindingParity": {
+    "sameCandidateSnapshotRevision": true,
+    "sameOrdinalMapChecksum": true,
+    "sameWorkspaceRevision": true,
+    "graphRevision": null
+  },
+  "canary": {
+    "actualCandidateCount": 15,
+    "candidatePoolLimit": 768,
+    "contextTopK": 15,
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc"
+  },
+  "explicitlyDeferred": {
+    "currentRelationshipGraph": "OPTIONAL_CURRENT_RELATIONSHIP_CORPUS_EMPTY",
+    "neuralShortlist": "CHALLENGER_NOT_PROMOTED",
+    "cache": "BYPASS",
+    "trtLlm": "DEFERRED",
+    "mutationExecution": "NOT_RUN"
+  },
+  "sourceReports": [
+    "lineage-qualified-candidate-map-v1.json",
+    "parent-atlas-golden-retrieval-v1.json",
+    "parent-atlas-context-manifest-v1.json",
+    "parent-atlas-dag-runtime-v1.json"
+  ],
+  "writes": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "sourceWrites": false
+  },
+  "nextGate": "V1.1_SCALE_OR_OPTIONAL_GRAPH_RELATIONSHIP_CORPUS"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.postgres-fts-canonical-coverage.v2",
-  "generatedAt": "2026-08-27T02:36:56.764Z",
+  "generatedAt": "2026-08-28T18:18:58.846Z",
   "readOnly": true,
   "databaseWrites": false,
   "baseCoverage": {

@@ -13,8 +13,7 @@
  * - Total speedup: 35,000ms → 5,000ms = 7× on L2 hit
  */
 
-import { getRedis } from '../redis.js';
-import { getQdrantManager } from '../vector/qdrant-manager.js';
+import { getBifrostRedis as getRedis } from './redis-adapter.js';
 
 const SOM_CELL_PREFIX = 'som:cell:';
 const SOM_PREFILTER_CACHE_TTL = 300; // 5 minutes — SOM assignments are stable
@@ -148,7 +147,6 @@ export async function applyPrefilterToAnnSearch(
   queryEmbedding: number[],
   cachedSomCluster?: number
 ): Promise<{ results: unknown[]; prefilterUsed: boolean; prefilterTime: number }> {
-  const qdrantMgr = getQdrantManager();
   let prefilterTime = 0;
   let prefilterUsed = false;
 

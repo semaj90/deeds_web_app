@@ -1,0 +1,233 @@
+{
+  "schema": "atlas.chunk-bridge-v1",
+  "generatedAt": "2026-08-28T18:33:36.855Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "selection": {
+    "limit": 5000,
+    "source": "atlas_packets exact source_ref + content_hash against codebase_chunk_index"
+  },
+  "summary": {
+    "examined": 332,
+    "eligibleExactChunkIdentity": 15,
+    "counts": {
+      "EXACT_CHUNK_IDENTITY": 15,
+      "SOURCE_ONLY_AMBIGUOUS": 74,
+      "MISSING_ORDINAL": 0,
+      "REVISION_UNPROVEN": 243,
+      "CONTENT_MISMATCH": 0,
+      "SOURCE_MISMATCH": 0,
+      "MISSING_CHUNK": 0
+    },
+    "promotionEligible": true
+  },
+  "samples": [
+    {
+      "packetKey": "ace:packet:00735225f796",
+      "sourceRef": "src/routes/(app)/admin/memory-inspector/+page.server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "42b3dac1-3978-4889-9d88-1a86e3ac04a7",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0079b248e86d",
+      "sourceRef": "src/lib/components/ui/badge/index.ts",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:01614dcf3f9d",
+      "sourceRef": "src/routes/(app)/demos/detective-command/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "32ad0f80-80fe-4475-ba2b-b514c1f47056",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0235c44a7db5",
+      "sourceRef": "src/routes/(app)/demos/celestial-icons/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "072cbf4f-14cc-4a0c-b250-0b9333200d58",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:024deb1c6154",
+      "sourceRef": "src/types/third-party.d.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "bafca404-c44d-4b5c-8515-800e314e03b3",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:031d6e5777ba",
+      "sourceRef": "src/routes/api/auth/me/+server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "6834ac3e-c56e-4153-ac04-53a8f0d08905",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:03bb32d34276",
+      "sourceRef": "src/routes/(app)/cases/new/schema.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "31956f65-20b5-4bbb-bf4b-a74162541111",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:03c70f525e95",
+      "sourceRef": "src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "a1f69f42-2dac-498d-93b0-b72fdc0db0db",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:04fadf9892d7",
+      "sourceRef": "src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "4b293b84-c713-475c-b356-ae89e993c82f",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:06ee91e2a34e",
+      "sourceRef": "src/lib/types/app.d.ts",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:074b2faeac79",
+      "sourceRef": "src/routes/api/code-intel/memory-gain/rejected/+server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "f268cb03-f8e0-431d-b1e7-faafec0543f1",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:08286c6a1223",
+      "sourceRef": "src/lib/ai/HYPERGRAPH_USAGE.md",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "8c7da74b-9af7-4b69-b3e5-4238debcb633",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:08564c7dc67a",
+      "sourceRef": "src/routes/(app)/demos/detective-command/+page.svelte",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0a5831247e1e",
+      "sourceRef": "src/routes/(app)/reports/[id]/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "6291aec6-a9b9-4737-b578-1d1cf3f9545b",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0c7bd0120166",
+      "sourceRef": "src/routes/(app)/demos/gpu-cache/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "79e112d2-af8f-4505-b82c-cbaa8dc6d4af",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0dc03245181b",
+      "sourceRef": "src/routes/(app)/demos/webgpu-memory-palace/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "10230135-ef0d-4822-854b-fd267cca7470",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0ecb3e4ff611",
+      "sourceRef": "src/lib/server/ollama-service.ts",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:0f9623c33b59",
+      "sourceRef": "src/lib/server/tools/handlers/index.ts",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:1239ee31ae9a",
+      "sourceRef": "src/routes/(dev)/demo/bits-ui/+page.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "25746c1a-afab-4cb1-8ad2-95b367ff3817",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:12e4cf9a4ec5",
+      "sourceRef": "src/types/integrations.d.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "6cf8a698-8195-4e68-8677-87e706b8f017",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:148f4eec7db8",
+      "sourceRef": "src/routes/(app)/code-intel/audit/+page.server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "581bd49e-d45a-473e-b239-3d636b59db8b",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:15441e6df204",
+      "sourceRef": "src/routes/(app)/admin/phase78/monitor/+page.server.ts",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "6b361a17-59b8-43f5-be9c-a22cfbe62070",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:1552b7901973",
+      "sourceRef": "src/lib/components/ui/textarea/index.ts",
+      "classification": "SOURCE_ONLY_AMBIGUOUS",
+      "eligible": false,
+      "chunkId": null,
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:167afc4186fd",
+      "sourceRef": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveForm.svelte",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "d888f859-a962-464b-b098-ffa22078c892",
+      "representationRevision": null
+    },
+    {
+      "packetKey": "ace:packet:1680c471321f",
+      "sourceRef": "src/routes/(app)/demos/yorha/components/YoRHaModal.svelte",
+      "classification": "REVISION_UNPROVEN",
+      "eligible": false,
+      "chunkId": "42f81a62-8fbd-4ba0-a6d5-b130138214ee",
+      "representationRevision": null
+    }
+  ],
+  "authority": {
+    "candidateIdentity": "atlas_packets.packet_key",
+    "chunkIdentity": "codebase_chunk_index.id only after exact source_ref + content_hash match",
+    "qdrant": "not consulted; no Qdrant identity inference",
+    "fallback": "no basename, suffix, normalized, fuzzy, or synthetic revision fallback"
+  },
+  "nextGate": "BUILD_LINEAGE_QUALIFIED_CANDIDATE_CANARY_FROM_EXACT_CHUNK_BRIDGE"
+}

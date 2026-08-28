@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-27T04:26:39.284Z",
+  "generated": "2026-08-28T18:19:08.859Z",
   "qdrant": {
     "collection": "codebase_chunks_768",
     "total_points": 109129,
@@ -8,8 +8,8 @@
     "max_points": null,
     "with_packet_key": 109129,
     "with_source_ref": 109129,
-    "with_feature_id": 109128,
-    "with_domain_class": 109116,
+    "with_feature_id": 109113,
+    "with_domain_class": 109101,
     "null_payloads": 0,
     "collisions": 4351,
     "collision_points": 104163
@@ -294,7 +294,7 @@
     "denominatorPolicy": "Qdrant points are the projection denominator; canonical alignment is reported separately"
   },
   "metrics": {
-    "payload_feature_coverage": 0.9999908365329105,
+    "payload_feature_coverage": 0.9998533845265695,
     "unique_feature_coverage": 0.03894473512998378,
     "canonical_feature_alignment": 0.9536470588235294,
     "canonical_feature_coverage": 0.10265437414518008,

@@ -1,0 +1,468 @@
+{
+  "schema": "atlas.lineage-qualified-semantic-768-backfill-plan.v1",
+  "generatedAt": "2026-08-28T16:29:56.515Z",
+  "mode": "READ_ONLY_PLAN",
+  "candidateMap": {
+    "path": ".tmp\\atlas\\lineage-qualified-candidate-map-v1.json",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "201d699f239765115f8b2145b5a03bb1aa369a92a7af7bea0282cb072142f039",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "candidateCount": 15
+  },
+  "target": {
+    "representationId": "semantic_768",
+    "vectorName": "content",
+    "dimensions": 768,
+    "distance": "Cosine",
+    "model": "embeddinggemma:latest",
+    "ollamaUrl": "http://127.0.0.1:11434",
+    "qdrantUrl": "http://127.0.0.1:6333",
+    "qdrantCollection": "codebase_chunks_768",
+    "postgresTable": "codebase_chunk_index",
+    "postgresVectorColumn": "content_embedding_768",
+    "qdrantWritesPlanned": true,
+    "postgresWritesPlanned": true
+  },
+  "counts": {
+    "candidates": 15,
+    "uniqueExactSourceRows": 15,
+    "missingExactSourceRows": 0,
+    "ambiguousExactSourceRows": 0,
+    "usableTextRows": 15,
+    "postgresVectorRowsAlreadyPresent": 0,
+    "qdrantLineagePointsAlreadyPresent": 0,
+    "plannedEmbeddings": 15
+  },
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "48063b7e1d991eb9e9a3ee132d90b84ab5dbc989b776f5d78a670a4ceb721119",
+      "postgres": {
+        "id": "7252a838-1e9b-445a-8abd-0d5ad413567d",
+        "sourceRef": "docs/ai-os/atlas-retry-index.json",
+        "contentHash": "48063b7e1d991eb9e9a3ee132d90b84ab5dbc989b776f5d78a670a4ceb721119",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 49,
+        "embeddingTextHash": "6b70c8f27eccc6a03d652afc58c47c99762ae30c0864ed95c94d4eebd653eaf7"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "4dfc057b71ba76d7d7e384b4edb87e8639b36b23db070408f3b0ce88eeae6ae7",
+      "postgres": {
+        "id": "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383",
+        "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+        "contentHash": "4dfc057b71ba76d7d7e384b4edb87e8639b36b23db070408f3b0ce88eeae6ae7",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 160,
+        "embeddingTextHash": "38b3da625a721e3b60df1c531df36595e9339fcc3bfce807d14e16f43262a10d"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "102cc8a1f37c18650ee09e94d43f0781c6391f64477ff20e9ba80330991b2137",
+      "postgres": {
+        "id": "144079f0-43df-42f1-a363-e77fb913b76e",
+        "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+        "contentHash": "102cc8a1f37c18650ee09e94d43f0781c6391f64477ff20e9ba80330991b2137",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 188,
+        "embeddingTextHash": "9a3b4d3b9ca986115f63d65dcf6a863f92bee2b8e2c78afc92ca1be2fca7fcc4"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "e50467d7037af4958606fc43664908b447a7158f4abc5a767dfcbd7672ef3b89",
+      "postgres": {
+        "id": "a4a643ab-c3fb-49d5-976b-845820c67a7e",
+        "sourceRef": "crates/atlas_packet_parser/package.json",
+        "contentHash": "e50467d7037af4958606fc43664908b447a7158f4abc5a767dfcbd7672ef3b89",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 554,
+        "embeddingTextHash": "f39e1b7297d5843aff17a77f558eedb948d07becffcb2d597896b5cb710f091b"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "c769e34fd7331e08982cd0341d5f583bfd19ed38c903c1fb60e4bb209b842594",
+      "postgres": {
+        "id": "822a81b8-5e81-4ff0-a645-b1ed7df2584e",
+        "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+        "contentHash": "c769e34fd7331e08982cd0341d5f583bfd19ed38c903c1fb60e4bb209b842594",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 605,
+        "embeddingTextHash": "e4edecfdbb6a8bd9f16a3b141a808a1a06e614637e2a09aaf4ebcb0f4b50c08c"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "8b3241aa03573fe1abcacd9338fa2964907ba69f72f7eb311cfedaf863ec3d3e",
+      "postgres": {
+        "id": "bb0c9b56-45e4-46e5-8347-25ea009ddfea",
+        "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+        "contentHash": "8b3241aa03573fe1abcacd9338fa2964907ba69f72f7eb311cfedaf863ec3d3e",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 700,
+        "embeddingTextHash": "a55c315475ba9694e435d9c90320399791532cb703d85f4bdd51629bc089821d"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "cac374fc4a0ff7f70eebcd704d606de658f0ff29eaef9b4c32fd18bcd51813ba",
+      "postgres": {
+        "id": "a0e64259-6219-4c97-9b04-e22b9808c36b",
+        "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+        "contentHash": "cac374fc4a0ff7f70eebcd704d606de658f0ff29eaef9b4c32fd18bcd51813ba",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 520,
+        "embeddingTextHash": "85e1af32bedef5808451ef93504e02d01160a19c5e55ea5393aeab3fdbba926e"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "0d97c70ef825aeb29c339669e4d5ae5db298efb23d1dbffd2e2b4fa4b72d344f",
+      "postgres": {
+        "id": "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a",
+        "sourceRef": "crates/omni-bridge/build.rs",
+        "contentHash": "0d97c70ef825aeb29c339669e4d5ae5db298efb23d1dbffd2e2b4fa4b72d344f",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 110,
+        "embeddingTextHash": "8ad780f5f69cecb487faf1b6a8549c5d10914ea4493d542d9aa6958aa3f94904"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "6c7db5ed2cea58a79e091eb6084a96b0841a78ba1e82836c4cedf96988df90a1",
+      "postgres": {
+        "id": "5b9447df-c4b5-4634-853c-c06384abfc0b",
+        "sourceRef": "crates/turbovec-napi/wrapper.js",
+        "contentHash": "6c7db5ed2cea58a79e091eb6084a96b0841a78ba1e82836c4cedf96988df90a1",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 703,
+        "embeddingTextHash": "81b6011167de3f1fe9bb84720af4cea79c6969456cfade571cd83326eacd39ac"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 9,
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "800478665d96e762df3006ae1f1093db1285c46a1fef95ed506f9517e9e3cc1e",
+      "postgres": {
+        "id": "44318cbc-211b-4b57-8212-6a8b9f7abac6",
+        "sourceRef": "docs/atlas/cluster-cards.json",
+        "contentHash": "800478665d96e762df3006ae1f1093db1285c46a1fef95ed506f9517e9e3cc1e",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 1647,
+        "embeddingTextHash": "cc49cb9591c7b52deb21b502658fdfd3ef2cc9703e5f2e4dcf95f804dbc841a0"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "d28db26ef14292e8d2dbd6206545b551cd81862bdc55c38ef4bd0ad32f5937f6",
+      "postgres": {
+        "id": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+        "sourceRef": "crates/atlas_packet_parser/build.rs",
+        "contentHash": "d28db26ef14292e8d2dbd6206545b551cd81862bdc55c38ef4bd0ad32f5937f6",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 65,
+        "embeddingTextHash": "f54430e4f6db3a51fff1185e39256e06ca3eae72ad12d582bb224cc6b9dfe4c3"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 11,
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "cf3c54b0804782245bd42a9dab54ceebbeffba3c2f4619b869c209df0d4d0691",
+      "postgres": {
+        "id": "39a3a174-f87c-41ae-8221-1557c187c078",
+        "sourceRef": "crates/turbovec-napi/package.json",
+        "contentHash": "cf3c54b0804782245bd42a9dab54ceebbeffba3c2f4619b869c209df0d4d0691",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 684,
+        "embeddingTextHash": "365846dd3c091a991e8503b08cc726cbcc22db9006299dc0f8fdf58ed39a7fb6"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "ebe19262fdaeae74a73f5b23171ea7a669551a6fa5f1ab88d66f195b5f9cc457",
+      "postgres": {
+        "id": "bc31cec8-73d5-4f4c-be58-3fafb1898bf9",
+        "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+        "contentHash": "ebe19262fdaeae74a73f5b23171ea7a669551a6fa5f1ab88d66f195b5f9cc457",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 332,
+        "embeddingTextHash": "3f00fc9ef6cb589e143bdbf6d3c39e2631b70008ea5888794bc756df1e5d2130"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 13,
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "d457dee771e63bf6169286606506988217bb909a49ac4afd97a60aedf9705334",
+      "postgres": {
+        "id": "748c3951-eed7-4139-a2ea-aa279ce82796",
+        "sourceRef": "docs/atlas/native-gemm-deferral.md",
+        "contentHash": "d457dee771e63bf6169286606506988217bb909a49ac4afd97a60aedf9705334",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 655,
+        "embeddingTextHash": "d47909ae45b7b0e7c014864781a7d3c6cf141854f954190e8d39c1331dfd74ab"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    },
+    {
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateContentHash": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534",
+      "postgres": {
+        "id": "01130d0c-6d1f-4fb4-8592-43f3550794d5",
+        "sourceRef": "crates/turbovec-napi/build.rs",
+        "contentHash": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534",
+        "packetKey": null,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "representationId": null,
+        "representationRevision": null,
+        "vectorPresent": false,
+        "contentBytes": 65,
+        "embeddingTextHash": "3d77f191e743b793cf8f6edd24f509dd64ac7ff56cc20354d2f34082447dd0c0"
+      },
+      "qdrant": {
+        "status": "IDENTITY_PRESENT_LINEAGE_MISMATCH",
+        "points": 2,
+        "exactLineagePoints": 0
+      },
+      "classification": "EXACT_SOURCE_ROW_READY",
+      "plannedOperation": "GENERATE_768_AND_WRITE_POSTGRES_THEN_PROJECT_QDRANT"
+    }
+  ],
+  "writes": {
+    "applyAuthorized": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "vectorGeneration": false
+  },
+  "status": "SEMANTIC_768_BACKFILL_PLAN_READY",
+  "nextGate": "EXPLICIT_AUTHORIZATION_REQUIRED_FOR_VECTOR_GENERATION_AND_WRITES",
+  "errors": [],
+  "elapsedMs": 9065
+}

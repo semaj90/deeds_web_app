@@ -3,7 +3,7 @@
  * Audit: Higher-Hop Enrichment Fields
  *
  * Checks availability of five enrichment fields across mirrors:
- *   - somCluster (Postgres atlas_codebase_packets + Qdrant payload)
+ *   - somCluster (Postgres atlas_packets + Qdrant payload)
  *   - glyphRecord (atlas_svg_glyphs lookup by packet_key/source_ref)
  *   - qdrantHit (Qdrant codebase_chunks_768 payload direct match)
  *   - redisHotKey (gpu:karpathy:scores, gpu:karpathy:encoded, bifrost:*, etc.)
@@ -90,7 +90,7 @@ async function auditEnrichmentFields() {
 
     const sampleRes = await pool.query(
       `SELECT packet_key, source_ref, feature_id, som_cluster, created_at
-       FROM atlas_codebase_packets
+       FROM atlas_packets
        ORDER BY created_at DESC
        LIMIT 50`
     );

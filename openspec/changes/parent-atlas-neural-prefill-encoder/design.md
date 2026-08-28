@@ -20,7 +20,7 @@ Go retrieval / EmbeddingGemma semantic_768 query
 CandidateFeatureMatrixV2
         |
         +-- EmbeddingGemma native MRL: 768 -> 512/256/128
-        +-- learned Atlas autoencoder challenger: 768 -> 256 -> 128 -> 64
+        +-- learned Atlas autoencoder challenger: 768 -> 256 -> 64
         +-- CPU reference and optional LibTorch RTX inference
         v
 semantic_mrl_* admission/shortlist lanes
@@ -36,6 +36,28 @@ ACE pre-fill packet
         v
 bounded multi-hop retrieval and synthesis
 ```
+
+## Frozen Representation DAG
+
+The canonical retrieval branch is independent from topology compression:
+
+```text
+semantic_768
+  ├── exact retrieval -> CandidateOrdinalMapV1 -> ContextManifestV1
+  ├── rff_128 -> optional derived Qdrant/cuVS challenger
+  ├── ae_latent_128 -> reserved future producer
+  └── ae_latent_64 -> current learned encoder (768 -> 256 -> 64)
+```
+
+This is not a nested `768 -> 128 -> 64` invariant. `hidden_256` is internal
+model state, not a registered representation. Each derived branch requires
+its own `RepresentationArtifactV1`, input revision, producer revision,
+parameters digest, output digest, workspace revision, candidate snapshot
+revision, and ordinal-map checksum.
+
+`semantic_768` remains the V1 exact oracle. Topology, SOM, CouchDB, Valkey,
+RFF, and learned latent projections are optional downstream projections and
+must not block the proven retrieval-to-context path.
 
 ## Model Contract
 

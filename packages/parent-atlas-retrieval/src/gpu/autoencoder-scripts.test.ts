@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Redis } from 'ioredis';
-import * as qdrant from '../qdrant-http.js';
 import { getCachedAutoencoderWeights } from './autoencoder-weights.js';
 import { encode768to64Batch } from './encode-768-to-64.js';
+
+const qdrant = {
+	scrollPoints: vi.fn(),
+	upsertPoints: vi.fn()
+};
 
 // We can't easily test the .mjs scripts directly with vitest without some boilerplate,
 // so we'll test the core logic by exporting it or just testing the underlying functions.
@@ -15,11 +19,6 @@ vi.mock('ioredis', () => {
 	Redis.prototype.disconnect = vi.fn();
 	return { default: Redis, Redis };
 });
-
-vi.mock('../qdrant-http.js', () => ({
-	scrollPoints: vi.fn(),
-	upsertPoints: vi.fn()
-}));
 
 vi.mock('./autoencoder-weights.js', () => ({
 	getCachedAutoencoderWeights: vi.fn()

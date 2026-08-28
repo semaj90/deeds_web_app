@@ -1,0 +1,426 @@
+{
+  "schema": "atlas.lineage-qdrant-semantic-canary.v1",
+  "collection": "codebase_chunks_768",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "candidateCount": 15,
+  "pointsReturned": 30,
+  "exactMatches": 15,
+  "historicalPoints": 15,
+  "mismatches": [],
+  "missingPacketKeys": [],
+  "duplicatePacketKeys": [],
+  "promotionEligible": true,
+  "status": "CANARY_QDRANT_IDENTITY_PROVEN",
+  "canonicalAuthority": false,
+  "writes": false,
+  "matches": [
+    {
+      "pointId": "01130d0c-6d1f-4fb4-8592-43f3550794d5",
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:fd5043d3abdfef4ee0934eb63c0d5977c5dba3d1d0f9025943b573a9c1d31268",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "144079f0-43df-42f1-a363-e77fb913b76e",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:291832d023e8529d1740425fa76a9445d3ce0e0bb82787a8732168ac162645ff",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "39a3a174-f87c-41ae-8221-1557c187c078",
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:6528a33d34d91c48d1d326eab9cda4904fc0fc57b88d9f723c6971b71c36c3f1",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "44318cbc-211b-4b57-8212-6a8b9f7abac6",
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:a1b172a49a9d1733a290f7356c206c5801f0a72324f3dddeddf97d30539bb0a4",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "5b9447df-c4b5-4634-853c-c06384abfc0b",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:83157e31c15d7edf413068d0dff881c4410081892ea29fc3e80893244e287b7b",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "7252a838-1e9b-445a-8abd-0d5ad413567d",
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:a5f00035d57d79b22bb00ef34e5750a56db13e86366692062cc044ef2bc036a8",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "748c3951-eed7-4139-a2ea-aa279ce82796",
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:1d98fa2cbb8e2ac9f0542a675f1c5037506588eaa034dccf58494e98f1786bdd",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:fea29b92856b32923629d4aefbee190a0d7b9bd8628f6a552e4810116451ca14",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "822a81b8-5e81-4ff0-a645-b1ed7df2584e",
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:eae73ddfb07efc85380e9d02f994b6a9431573396d9d02a49dd1a411e9985b3d",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "a0e64259-6219-4c97-9b04-e22b9808c36b",
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:35dd8438740b96e5eec90f8990c22252e83911cc30aab834e9076e55ec753349",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "a4a643ab-c3fb-49d5-976b-845820c67a7e",
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:f808e536608b5e30bf95574aeefbe64837f1f0450254bb155f6a4efe231308a6",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "bb0c9b56-45e4-46e5-8347-25ea009ddfea",
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "bc31cec8-73d5-4f4c-be58-3fafb1898bf9",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:9b387b82c05a8ca982e59ba1df994a036d52bf5e4be010dab3bc5f246f8f0f7f",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:1396a2468c022278fdfa4c62310906c4c730fbf4ef51a395509118bbcd267980",
+      "embeddingDimension": 768,
+      "failures": []
+    },
+    {
+      "pointId": "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a",
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "representationId": "semantic_768",
+      "representationRevision": "semantic_768:embeddinggemma:latest:fa2905ddb43ca9aeae8d0a3a007439c0614f747ee359ef8ba086c8d919e677ce",
+      "embeddingDimension": 768,
+      "failures": []
+    }
+  ],
+  "historical": [
+    {
+      "pointId": "1255",
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "5432",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "13146",
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "15264",
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "20025",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "24575",
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "25037",
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "25348",
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "27737",
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "34039",
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "34838",
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "39367",
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "39624",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "40123",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    },
+    {
+      "pointId": "52486",
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": null,
+      "workspaceRevision": null,
+      "representationId": "semantic_768",
+      "representationRevision": null,
+      "embeddingDimension": null,
+      "failures": [
+        "SOURCE_REVISION_MISMATCH",
+        "WORKSPACE_REVISION_MISMATCH",
+        "EMBEDDING_DIMENSION_MISMATCH",
+        "REPRESENTATION_REVISION_MISSING"
+      ]
+    }
+  ]
+}

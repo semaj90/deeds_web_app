@@ -36,7 +36,7 @@
     "atlas-tools": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 30000
     }
   },

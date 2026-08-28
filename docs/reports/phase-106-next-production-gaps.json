@@ -1,365 +1,894 @@
 {
-  "generatedAt": "2026-07-05T21:50:11.815Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-08-28T18:17:38.814Z",
+  "mode": "report",
   "inputs": {
     "packetSource": "atlas_packets + atlas_packet_features + atlas_packet_metrics",
-    "limit": 20,
+    "limit": 250,
     "offset": 0
   },
   "summary": {
-    "rowsProcessed": 20,
+    "rowsProcessed": 250,
     "stateCounts": {
-      "QdrantBridgeError": 20
+      "SemanticError": 164,
+      "StructureError": 86
     },
     "topMissingFields": [
       [
+        "used_concepts",
+        250
+      ],
+      [
         "qdrant_point_id",
-        20
+        99
+      ],
+      [
+        "ast_symbols",
+        86
       ]
     ]
   },
   "nextActions": [
     {
       "packet_key": "0ba2345cd9c542fa",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:49d48e41",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "0bffe0382a0d44bb",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:84786dd5",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "0ee918abc8c53e8d",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:3df64b80",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "1703d9c005252a62",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:bef00376",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "175066b8a4ceee3c",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:9aa6c88e",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "17dc1fe9f5f8a021",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:22e93e07",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "1d5eba7211dea6f9",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:55ae22ab",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "1dc5ac2b3cd9bfe8",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:8cfd5203",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "25c824811a2efd81",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:579d4f74",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "271b5446f6a86a48",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:55ab2018",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "28e942decdcdb342",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:8fc864f8",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "313d57f685058b60",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:b0c613fb",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "322b9cf893125f07",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:07f5d5ad",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "32c7446a769f9c86",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:a929d204",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "35afe6ea3fdb17b8",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:fd0527ed",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "368c71501e9385c5",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:ee084cce",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "38da098bc2c36c22",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:cc906abe",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "3bf3bc0c64d433c0",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:ccf41087",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "3d0da82598d9064a",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:b16178da",
       "feature_id": "grpc_service"
     },
     {
       "packet_key": "3edd306a02055c3a",
-      "state": "QdrantBridgeError",
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply",
-      "title_id": "grpc_service",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:a5e60982",
       "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "3f73ebb0336ae4f3",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:9cbf0a99",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "40ce2356b07edded",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:73e75cce",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "43f38d7b75868c7c",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:f6f5eb79",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "4439c492e016f9d3",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:972dde00",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "482abc5766b6f8ed",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:c279143a",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "4d4c2e69d3f629ba",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:1f2d9472",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "53f30b2bfd5e68b9",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:b58eac9e",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "54fb19b574528f1a",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:92749240",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "58e6adafde74465d",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:35057735",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "613f572a65b1ffcc",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:e137b3c5",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "6274b1cfbc90f2e1",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:c60726a8",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "64090fce409bb5c9",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:317d6bc2",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "69af5ffe1b3af354",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:57702c38",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "748e8cfa0abd4e6a",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:1ed67e17",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "885c6c04322f6095",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:ff6c0d93",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "891b73e8db9c3bb7",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:50d70b19",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "8d44b9719637706f",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:b5b9ecc4",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "9b11b6f522def1a1",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:3341d19c",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "9f4573e52fce4175",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:4aa72a0e",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "a318d009a88a31fb",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:7db4478b",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "aae4f83738c25068",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:grpc-service:6ca89f87",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "ace:packet:001be68ca4b0",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:inference-stats:454d3cbf",
+      "feature_id": "inference-stats"
+    },
+    {
+      "packet_key": "ace:packet:0050126ac87d",
+      "state": "StructureError",
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:microinteraction:009aceca",
+      "feature_id": "MicroInteraction"
+    },
+    {
+      "packet_key": "ace:packet:0051e908c9be",
+      "state": "StructureError",
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:phase8-query-optimization-taxonomy:ab306967",
+      "feature_id": "phase8-query-optimization-taxonomy"
+    },
+    {
+      "packet_key": "ace:packet:006566131ba9",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:analyzer:d6f1e829",
+      "feature_id": "analyzer"
+    },
+    {
+      "packet_key": "ace:packet:00735225f796",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:memory-inspector:f82df03e",
+      "feature_id": "memory-inspector"
+    },
+    {
+      "packet_key": "ace:packet:0079b248e86d",
+      "state": "StructureError",
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:index:baaa585a",
+      "feature_id": "index"
+    },
+    {
+      "packet_key": "ace:packet:007d98744901",
+      "state": "StructureError",
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:addpoimodal:b9ec12d5",
+      "feature_id": "AddPoiModal"
+    },
+    {
+      "packet_key": "ace:packet:00907d16462d",
+      "state": "StructureError",
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:phasestatuspills:df1002a5",
+      "feature_id": "PhaseStatusPills"
+    },
+    {
+      "packet_key": "ace:packet:0098519ac98d",
+      "state": "SemanticError",
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply",
+      "title_id": "title:database:20c26871",
+      "feature_id": "database"
     }
   ],
   "evidence": [
     {
       "packet_key": "0ba2345cd9c542fa",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "0bffe0382a0d44bb",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "0ee918abc8c53e8d",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "1703d9c005252a62",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "175066b8a4ceee3c",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "17dc1fe9f5f8a021",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "1d5eba7211dea6f9",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "1dc5ac2b3cd9bfe8",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "25c824811a2efd81",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "271b5446f6a86a48",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "28e942decdcdb342",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "313d57f685058b60",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "322b9cf893125f07",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "32c7446a769f9c86",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "35afe6ea3fdb17b8",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "368c71501e9385c5",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "38da098bc2c36c22",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "3bf3bc0c64d433c0",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "3d0da82598d9064a",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
-        "qdrant_point_id"
+        "used_concepts"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     },
     {
       "packet_key": "3edd306a02055c3a",
-      "state": "QdrantBridgeError",
+      "state": "SemanticError",
       "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "3f73ebb0336ae4f3",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "40ce2356b07edded",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "43f38d7b75868c7c",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "4439c492e016f9d3",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "482abc5766b6f8ed",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "4d4c2e69d3f629ba",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "53f30b2bfd5e68b9",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "54fb19b574528f1a",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "58e6adafde74465d",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "613f572a65b1ffcc",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "6274b1cfbc90f2e1",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "64090fce409bb5c9",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "69af5ffe1b3af354",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "748e8cfa0abd4e6a",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "885c6c04322f6095",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "891b73e8db9c3bb7",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "8d44b9719637706f",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "9b11b6f522def1a1",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "9f4573e52fce4175",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "a318d009a88a31fb",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "aae4f83738c25068",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:001be68ca4b0",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts",
         "qdrant_point_id"
       ],
-      "lane": "qdrant_bridge",
-      "command": "npm run atlas:qdrant-payload:sync:apply"
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:0050126ac87d",
+      "state": "StructureError",
+      "missing_fields": [
+        "ast_symbols",
+        "used_concepts",
+        "qdrant_point_id"
+      ],
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:0051e908c9be",
+      "state": "StructureError",
+      "missing_fields": [
+        "ast_symbols",
+        "used_concepts"
+      ],
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:006566131ba9",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:00735225f796",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts",
+        "qdrant_point_id"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:0079b248e86d",
+      "state": "StructureError",
+      "missing_fields": [
+        "ast_symbols",
+        "used_concepts",
+        "qdrant_point_id"
+      ],
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:007d98744901",
+      "state": "StructureError",
+      "missing_fields": [
+        "ast_symbols",
+        "used_concepts"
+      ],
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:00907d16462d",
+      "state": "StructureError",
+      "missing_fields": [
+        "ast_symbols",
+        "used_concepts",
+        "qdrant_point_id"
+      ],
+      "lane": "ast_grep",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
+    },
+    {
+      "packet_key": "ace:packet:0098519ac98d",
+      "state": "SemanticError",
+      "missing_fields": [
+        "used_concepts"
+      ],
+      "lane": "langextract",
+      "command": "npm run atlas:phase8:step3:langextract:apply"
     }
   ]
 }

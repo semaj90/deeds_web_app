@@ -1,5 +1,5 @@
 {
-  "audit_date": "2026-08-26T23:30:30.785Z",
+  "audit_date": "2026-08-28T18:17:14.963Z",
   "fields": {
     "source_ref": {
       "exists_in": {
@@ -47,6 +47,38 @@
           {
             "table": "atlas_packets",
             "index": "idx_packets_source_feature_multi_hop"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_source"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_source_ref"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_source_ref_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_norm_source_ref_trgm_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_source_ref_id_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_source_ref_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_source_ref_trgm_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_source_refs_gin"
           },
           {
             "table": "task_semantic_packets",
@@ -117,6 +149,30 @@
             "index": "idx_packets_source_feature_multi_hop"
           },
           {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_id"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_id_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_ids_gin"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_source"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_feature_id_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_feature_ids_gin"
+          },
+          {
             "table": "task_semantic_packets",
             "index": "idx_task_semantic_packets_feature_id"
           }
@@ -127,7 +183,7 @@
     "som_cluster": {
       "exists_in": {
         "postgres": {
-          "table": "atlas_packets",
+          "table": "nes_chrom_packets",
           "column": "som_cluster",
           "type": "text"
         },
@@ -357,6 +413,10 @@
           {
             "table": "atlas_packets",
             "index": "idx_packets_centroid_cache"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_som_cluster"
           }
         ]
       },
@@ -388,6 +448,10 @@
           {
             "table": "atlas_packets",
             "index": "idx_atlas_packets_qdrant_point_id"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_qdrant_point_idx"
           }
         ]
       },
@@ -405,7 +469,53 @@
           "field": "packet_key",
           "type": "payload_key",
           "in_sample": true
-        }
+        },
+        "neo4j": [
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          },
+          {
+            "node_type": "Packet",
+            "property": "packet_key"
+          }
+        ]
       },
       "indexed": {
         "postgres": [
@@ -438,6 +548,14 @@
             "index": "idx_atlas_packets_packet_key_idx"
           },
           {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_packet_key_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_packet_key_key"
+          },
+          {
             "table": "task_semantic_packets",
             "index": "idx_task_semantic_packets_packet_key"
           },
@@ -452,7 +570,7 @@
     "community_id": {
       "exists_in": {
         "postgres": {
-          "table": "atlas_packets",
+          "table": "nes_chrom_packets",
           "column": "community_id",
           "type": "integer"
         },
@@ -674,6 +792,10 @@
           {
             "table": "atlas_packets",
             "index": "idx_atlas_packets_community_id_idx"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_community_id_idx"
           }
         ]
       },
@@ -718,7 +840,7 @@
     "embedding": {
       "exists_in": {
         "postgres": {
-          "table": "atlas_packets",
+          "table": "nes_chrom_packets",
           "column": "embedding",
           "type": "USER-DEFINED"
         }
@@ -732,6 +854,10 @@
           {
             "table": "atlas_packets",
             "index": "idx_atlas_packets_embedding_status"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_embedding_hnsw"
           }
         ]
       },
@@ -750,6 +876,46 @@
           {
             "table": "atlas_packets",
             "index": "idx_latent_64_not_null"
+          }
+        ]
+      },
+      "coverage": {}
+    },
+    "feature_ids": {
+      "exists_in": {
+        "postgres": {
+          "table": "nes_chrom_packets",
+          "column": "feature_ids",
+          "type": "ARRAY"
+        }
+      },
+      "indexed": {
+        "postgres": [
+          {
+            "table": "nes_chrom_packets",
+            "index": "idx_nes_chrom_packets_feature_ids_gin"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_feature_ids_gin"
+          }
+        ]
+      },
+      "coverage": {}
+    },
+    "som_code": {
+      "exists_in": {
+        "postgres": {
+          "table": "nes_chrom_packets",
+          "column": "som_code",
+          "type": "smallint"
+        }
+      },
+      "indexed": {
+        "postgres": [
+          {
+            "table": "nes_chrom_packets",
+            "index": "nes_chrom_packets_som_code_idx"
           }
         ]
       },
@@ -1649,6 +1815,381 @@
             }
           }
         },
+        "nes_chrom_packets": {
+          "row_count": "1992",
+          "columns": {
+            "id": {
+              "data_type": "uuid",
+              "udt_name": "uuid"
+            },
+            "packet_key": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "query_hash": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "chunk_id": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "source_ref": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "source_refs": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "feature_id": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "feature_label": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "packet_type": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "lane": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "model": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "summary": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "file_path": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "community_id": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "community_confidence": {
+              "data_type": "real",
+              "udt_name": "float4"
+            },
+            "community_source": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "domain_class": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "permissions": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "topology": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "vectors": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "ledger_type": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "lineage_version": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "metadata": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "tags": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "canonical": {
+              "data_type": "boolean",
+              "udt_name": "bool"
+            },
+            "identity_lane": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "payload_backfilled_at": {
+              "data_type": "timestamp with time zone",
+              "udt_name": "timestamptz"
+            },
+            "pagerank": {
+              "data_type": "real",
+              "udt_name": "float4"
+            },
+            "betweenness": {
+              "data_type": "real",
+              "udt_name": "float4"
+            },
+            "eigenvector": {
+              "data_type": "real",
+              "udt_name": "float4"
+            },
+            "neo4j_node_id": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "redis_centroid_key": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "som_row": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "som_col": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "som_index": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "kmeans_cluster": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "payload": {
+              "data_type": "jsonb",
+              "udt_name": "jsonb"
+            },
+            "embedding": {
+              "data_type": "USER-DEFINED",
+              "udt_name": "vector"
+            },
+            "qdrant_point_id": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "kag_dag_run_id": {
+              "data_type": "uuid",
+              "udt_name": "uuid"
+            },
+            "kag_node_key": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "token_budget": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "feature_ids": {
+              "data_type": "ARRAY",
+              "udt_name": "_text"
+            },
+            "som_cluster": {
+              "data_type": "text",
+              "udt_name": "text"
+            },
+            "lane_ids": {
+              "data_type": "ARRAY",
+              "udt_name": "_text"
+            },
+            "source_ref_id": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "feature_code": {
+              "data_type": "integer",
+              "udt_name": "int4"
+            },
+            "som_code": {
+              "data_type": "smallint",
+              "udt_name": "int2"
+            },
+            "confidence_score": {
+              "data_type": "smallint",
+              "udt_name": "int2"
+            },
+            "packet_zstd": {
+              "data_type": "bytea",
+              "udt_name": "bytea"
+            },
+            "created_at": {
+              "data_type": "timestamp with time zone",
+              "udt_name": "timestamptz"
+            },
+            "updated_at": {
+              "data_type": "timestamp with time zone",
+              "udt_name": "timestamptz"
+            }
+          },
+          "jsonb_keys": {},
+          "indexes": {
+            "idx_nes_chrom_packets_betweenness": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_betweenness ON public.nes_chrom_packets USING btree (betweenness)"
+            },
+            "idx_nes_chrom_packets_community_confidence_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_community_confidence_idx ON public.nes_chrom_packets USING btree (community_confidence)"
+            },
+            "idx_nes_chrom_packets_community_id_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_community_id_idx ON public.nes_chrom_packets USING btree (community_id)"
+            },
+            "idx_nes_chrom_packets_community_source_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_community_source_idx ON public.nes_chrom_packets USING btree (community_source)"
+            },
+            "idx_nes_chrom_packets_domain_class_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_domain_class_idx ON public.nes_chrom_packets USING btree (domain_class)"
+            },
+            "idx_nes_chrom_packets_eigenvector": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_eigenvector ON public.nes_chrom_packets USING btree (eigenvector)"
+            },
+            "idx_nes_chrom_packets_feature_id": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_feature_id ON public.nes_chrom_packets USING btree (feature_id)"
+            },
+            "idx_nes_chrom_packets_feature_id_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_feature_id_idx ON public.nes_chrom_packets USING btree (feature_id)"
+            },
+            "idx_nes_chrom_packets_feature_ids_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)"
+            },
+            "idx_nes_chrom_packets_feature_label_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_feature_label_idx ON public.nes_chrom_packets USING btree (feature_label)"
+            },
+            "idx_nes_chrom_packets_feature_source": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_feature_source ON public.nes_chrom_packets USING btree (feature_id, source_ref)"
+            },
+            "idx_nes_chrom_packets_kmeans_cluster_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_kmeans_cluster_idx ON public.nes_chrom_packets USING btree (kmeans_cluster)"
+            },
+            "idx_nes_chrom_packets_lane_ids_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)"
+            },
+            "idx_nes_chrom_packets_ledger_type_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_ledger_type_idx ON public.nes_chrom_packets USING btree (ledger_type)"
+            },
+            "idx_nes_chrom_packets_lineage_version_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_lineage_version_idx ON public.nes_chrom_packets USING btree (lineage_version)"
+            },
+            "idx_nes_chrom_packets_metadata_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)"
+            },
+            "idx_nes_chrom_packets_neo4j_node_id": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_neo4j_node_id ON public.nes_chrom_packets USING btree (neo4j_node_id)"
+            },
+            "idx_nes_chrom_packets_packet_key_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_packet_key_idx ON public.nes_chrom_packets USING btree (packet_key)"
+            },
+            "idx_nes_chrom_packets_pagerank": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_pagerank ON public.nes_chrom_packets USING btree (pagerank)"
+            },
+            "idx_nes_chrom_packets_permissions_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_permissions_gin ON public.nes_chrom_packets USING gin (permissions)"
+            },
+            "idx_nes_chrom_packets_redis_centroid_key": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_redis_centroid_key ON public.nes_chrom_packets USING btree (redis_centroid_key)"
+            },
+            "idx_nes_chrom_packets_som_cluster": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_som_cluster ON public.nes_chrom_packets USING btree (som_cluster)"
+            },
+            "idx_nes_chrom_packets_som_index_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_som_index_idx ON public.nes_chrom_packets USING btree (som_index)"
+            },
+            "idx_nes_chrom_packets_source_ref": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_source_ref ON public.nes_chrom_packets USING btree (source_ref)"
+            },
+            "idx_nes_chrom_packets_source_ref_idx": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_source_ref_idx ON public.nes_chrom_packets USING btree (source_ref)"
+            },
+            "idx_nes_chrom_packets_tags_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)"
+            },
+            "idx_nes_chrom_packets_topology_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_topology_gin ON public.nes_chrom_packets USING gin (topology)"
+            },
+            "idx_nes_chrom_packets_vectors_gin": {
+              "definition": "CREATE INDEX idx_nes_chrom_packets_vectors_gin ON public.nes_chrom_packets USING gin (vectors)"
+            },
+            "nes_chrom_packets_chunk_id_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_chunk_id_idx ON public.nes_chrom_packets USING btree (chunk_id)"
+            },
+            "nes_chrom_packets_confidence_score_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_confidence_score_idx ON public.nes_chrom_packets USING btree (confidence_score)"
+            },
+            "nes_chrom_packets_embedding_hnsw": {
+              "definition": "CREATE INDEX nes_chrom_packets_embedding_hnsw ON public.nes_chrom_packets USING hnsw (embedding vector_cosine_ops)"
+            },
+            "nes_chrom_packets_feature_code_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_feature_code_idx ON public.nes_chrom_packets USING btree (feature_code)"
+            },
+            "nes_chrom_packets_feature_id_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_feature_id_idx ON public.nes_chrom_packets USING btree (feature_id)"
+            },
+            "nes_chrom_packets_feature_ids_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)"
+            },
+            "nes_chrom_packets_kag_run_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_kag_run_idx ON public.nes_chrom_packets USING btree (kag_dag_run_id)"
+            },
+            "nes_chrom_packets_kmeans_cluster_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_kmeans_cluster_idx ON public.nes_chrom_packets USING btree (kmeans_cluster)"
+            },
+            "nes_chrom_packets_lane_ids_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)"
+            },
+            "nes_chrom_packets_metadata_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)"
+            },
+            "nes_chrom_packets_norm_source_ref_trgm_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_norm_source_ref_trgm_idx ON public.nes_chrom_packets USING gin (lower(source_ref) gin_trgm_ops)"
+            },
+            "nes_chrom_packets_packet_key_key": {
+              "definition": "CREATE UNIQUE INDEX nes_chrom_packets_packet_key_key ON public.nes_chrom_packets USING btree (packet_key)"
+            },
+            "nes_chrom_packets_packet_zstd_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_packet_zstd_idx ON public.nes_chrom_packets USING btree (packet_zstd)"
+            },
+            "nes_chrom_packets_payload_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_payload_gin ON public.nes_chrom_packets USING gin (payload)"
+            },
+            "nes_chrom_packets_pkey": {
+              "definition": "CREATE UNIQUE INDEX nes_chrom_packets_pkey ON public.nes_chrom_packets USING btree (id)"
+            },
+            "nes_chrom_packets_qdrant_point_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_qdrant_point_idx ON public.nes_chrom_packets USING btree (qdrant_point_id)"
+            },
+            "nes_chrom_packets_query_hash_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_query_hash_idx ON public.nes_chrom_packets USING btree (query_hash)"
+            },
+            "nes_chrom_packets_som_code_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_som_code_idx ON public.nes_chrom_packets USING btree (som_code)"
+            },
+            "nes_chrom_packets_som_index_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_som_index_idx ON public.nes_chrom_packets USING btree (som_index)"
+            },
+            "nes_chrom_packets_source_ref_id_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_source_ref_id_idx ON public.nes_chrom_packets USING btree (source_ref_id)"
+            },
+            "nes_chrom_packets_source_ref_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_source_ref_idx ON public.nes_chrom_packets USING btree (source_ref)"
+            },
+            "nes_chrom_packets_source_ref_trgm_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_source_ref_trgm_idx ON public.nes_chrom_packets USING gin (source_ref gin_trgm_ops)"
+            },
+            "nes_chrom_packets_source_refs_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_source_refs_gin ON public.nes_chrom_packets USING gin (source_refs)"
+            },
+            "nes_chrom_packets_summary_trgm_idx": {
+              "definition": "CREATE INDEX nes_chrom_packets_summary_trgm_idx ON public.nes_chrom_packets USING gin (summary gin_trgm_ops)"
+            },
+            "nes_chrom_packets_tags_gin": {
+              "definition": "CREATE INDEX nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)"
+            }
+          }
+        },
         "task_semantic_packets": {
           "row_count": "0",
           "columns": {
@@ -2106,7 +2647,6 @@
         }
       },
       "missing_tables": [
-        "nes_chrom_packets",
         "retrieval_provenance"
       ]
     },
@@ -2139,11 +2679,7 @@
         },
         "codebase_chunks_384": {
           "payload_schema": {
-            "source_ref": {
-              "data_type": "keyword",
-              "points": 1
-            },
-            "feature_id": {
+            "packet_key": {
               "data_type": "keyword",
               "points": 1
             },
@@ -2151,7 +2687,11 @@
               "data_type": "integer",
               "points": 0
             },
-            "packet_key": {
+            "source_ref": {
+              "data_type": "keyword",
+              "points": 1
+            },
+            "feature_id": {
               "data_type": "keyword",
               "points": 1
             }
@@ -2159,10 +2699,6 @@
         },
         "codebase_chunks_384_hybrid": {
           "payload_schema": {
-            "feature_id": {
-              "data_type": "keyword",
-              "points": 10
-            },
             "som_cluster": {
               "data_type": "integer",
               "points": 0
@@ -2172,6 +2708,10 @@
               "points": 10
             },
             "packet_key": {
+              "data_type": "keyword",
+              "points": 10
+            },
+            "feature_id": {
               "data_type": "keyword",
               "points": 10
             }
@@ -2182,17 +2722,17 @@
         },
         "codebase_chunks_768": {
           "payload_schema": {
+            "feature_id": {
+              "data_type": "keyword",
+              "points": 109113
+            },
             "source_ref": {
               "data_type": "keyword",
               "points": 109129
             },
             "som_cluster": {
               "data_type": "integer",
-              "points": 106237
-            },
-            "feature_id": {
-              "data_type": "keyword",
-              "points": 109128
+              "points": 106223
             }
           }
         },
@@ -2304,30 +2844,33 @@
       "status": "complete",
       "nodes": {
         "Packet": {
-          "count": 45,
+          "count": 12,
           "properties": [
-            "kcoreValue",
+            "packet_key",
+            "source_revision",
+            "canonical_id",
             "betweennessScore",
-            "graphPageRank",
             "louvainCommunity",
             "leidenCommunity",
-            "som_col",
+            "kcoreValue",
             "som_cluster_20x20",
-            "pagerank",
+            "graphPageRank",
             "som_row",
+            "som_col",
             "kCoreValue",
-            "pageRankScore",
+            "pagerank",
             "leiden_community_id",
+            "community_id",
+            "louvainCommunityId",
+            "pageRankScore",
             "som_bmu_row",
             "som_bmu_col",
             "id",
             "updated_at",
             "som_cluster",
             "path",
-            "louvainCommunityId",
             "symbol",
-            "kind",
-            "community_id"
+            "kind"
           ]
         }
       }
@@ -2340,7 +2883,7 @@
   "verdicts": {
     "packet_key": {
       "status": "PASS",
-      "stores": 2,
+      "stores": 3,
       "indexed": 1
     },
     "source_ref": {
@@ -2359,8 +2902,9 @@
       "indexed": 1
     },
     "feature_ids": {
-      "status": "NOT_FOUND",
-      "details": "Field not found in any store"
+      "status": "WARN",
+      "reason": "Field only in one store",
+      "stores": 1
     },
     "qdrant_point_id": {
       "status": "PASS",
@@ -2378,8 +2922,9 @@
       "indexed": 1
     },
     "som_code": {
-      "status": "NOT_FOUND",
-      "details": "Field not found in any store"
+      "status": "WARN",
+      "reason": "Field only in one store",
+      "stores": 1
     },
     "som_x": {
       "status": "WARN",
@@ -2458,6 +3003,6 @@
     }
   ],
   "recommendations": [
-    "Postgres tables absent from this deployment: nes_chrom_packets, retrieval_provenance"
+    "Postgres tables absent from this deployment: retrieval_provenance"
   ]
 }

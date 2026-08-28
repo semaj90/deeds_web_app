@@ -1,6 +1,6 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-08-27
+Updated: 2026-08-28
 
 ## Historical checkpoint and deferred-lanes appendix (2026-08-20)
 
@@ -60,6 +60,83 @@ August 20 claims are not the current promotion status.
 | Live repair DAG | Not promotion-proven | One bounded real execution |
 | Neural DAG | Not trained | Dataset → challenger → held-out evaluation |
 | Package promotion | Deferred correctly | Complete `scripts/atlas` proof gates first |
+
+## Active checkpoint (2026-08-28)
+
+The 15-row Workstation V1 canary is now proven end-to-end. This closes the
+canary only; it does not close the full Parent Atlas phases or promote the
+global corpus.
+
+| Gate | Status | Evidence / remaining work |
+| --- | --- | --- |
+| Exact packet → chunk bridge | `PROVEN_PARTIAL` | 15 exact; 74 source-only ambiguous; 243 revision-unproven |
+| Lineage-qualified CandidateOrdinal canary | `PROVEN` | 15 candidates; checksum `86fee5d38619...`; no synthetic revisions |
+| Semantic 768 canary | `PROVEN` | 15/15 current vectors bound and read back |
+| Golden retrieval | `PROVEN` | 15 hits; exact replay identical |
+| ContextManifest V1 | `PROVEN_CANARY` | Stable checksum `b6e19968ad9d...`; scale proof remains |
+| Frozen DAG validator | `PROVEN_FIXTURE` | Live execution and execution receipts remain open |
+| Workstation V1 | `PROVEN_CANARY` | Read-only canary; not full-corpus promotion |
+| Full source namespace parity | `BLOCKED` | Exact/approved-alias parity across Postgres, Graphify, and Qdrant remains open |
+| Current relationship corpus | `EMPTY/BLOCKED` | Do not manufacture `relationshipGraphRevision` |
+| CandidateOrdinal at 128/768 scale | `NOT_PROVEN` | Expand only exact lineage-qualified rows |
+| LSP/compiler semantic graph | `READ_ONLY_PROVEN` | Stable-symbol canonicalization and snapshot remain open |
+| Domain classification | `WIRED/POPULATED` | `primary_domain`/membership authority still unresolved |
+| FTS / lexical lane | `WIRED_PARTIAL` | Identity coverage and signal-density gates remain open |
+| Qdrant packet fan-out | `IDENTITY_UNPROVEN` | 4,351 fan-out groups; revision-qualified promotion is blocked |
+| Valkey/BitFrost | `OPTIONAL_PARTIAL` | V1 can bypass cache; MISS/HIT/invalidation replay remains open |
+| GPU/8098 | `PARALLEL_NOT_PROMOTED` | Environment and same-corpus parity remain open |
+| Neural ranking / DAG decoder | `CHALLENGER_NOT_PROMOTED` | Requires held-out corpus and live validated inputs |
+
+### Updated active TODO
+
+- [x] Prove exact packet → chunk bridge for the current 15-row canary.
+- [x] Produce a real 15-row `CandidateOrdinalMapV1` through the canonical owner.
+- [x] Prove semantic_768 exact retrieval and deterministic ContextManifest replay.
+- [ ] Extend the exact lineage cohort to 128, then 768; never fill with aliases,
+  basename matches, synthetic revisions, or Qdrant-only identity.
+- [ ] Implement `SourceRefNamespaceReconciliationV1` across the admitted
+  manifest, PostgreSQL chunks, Graphify, and Qdrant payloads.
+- [ ] Resolve the 74 ambiguous chunk mappings and 243 revision-unproven rows
+  through explicit source/content evidence or keep them excluded.
+- [ ] Complete current semantic_768 coverage for the expanded exact cohort and
+  prove model, representation, and vector revisions.
+- [ ] Prove `CandidateFeatureMatrixManifestV1` identity parity before graph,
+  centroid, GPU, or neural features are admitted.
+- [ ] Keep graph features absent in V1 when the current relationship corpus is
+  empty; implement current relationship production as a separate V1.1 gate.
+- [ ] Complete compiler-semantic/LSP stable-symbol canonicalization and derive
+  `CompilerSemanticGraphRevisionV1`.
+- [ ] Finish lexical field coverage and canonical identity binding; do not add a
+  second inverse-BM25 owner.
+- [ ] Reconcile Qdrant packet fan-out by exact packet/chunk identity and
+  revision-qualified payloads; no bulk fan-out promotion yet.
+- [ ] Run one bounded read-only `TypedRepairDagV1` execution and link its
+  `ExecutionReceiptV1` to validation, evidence, and ContextManifest checksums.
+- [ ] Run Valkey bypass first; later prove deterministic MISS → COMPUTE → HIT,
+  invalidation, expiry, eviction, and canonical reconstruction.
+- [ ] Keep 8095 as CPU structural evidence and 8098 as optional accelerator;
+  prove GPU environment and same-corpus parity independently.
+- [ ] Train/promote neural ranking or DAG decoding only after the qualified
+  corpus and held-out evaluation gates pass.
+- [ ] Promote packages only after the full replay receipt, not after the canary.
+
+### V1 completion boundary
+
+```text
+15 exact lineage rows
+  → CandidateOrdinalMapV1
+  → semantic_768 exact retrieval
+  → deterministic ContextManifestV1
+  → frozen validator
+  → bounded read-only DAG execution
+  → one linked ExecutionReceiptV1
+  → WORKSTATION_V1_PROVEN
+```
+
+The global 61k-source corpus, current relationship graph, Qdrant fan-out,
+LSP graph, GPU parity, Valkey replay, learned ranking, and package promotion
+remain later gates. They must not be silently represented as complete because
+the 15-row canary is green.
 
 Current critical path:
 

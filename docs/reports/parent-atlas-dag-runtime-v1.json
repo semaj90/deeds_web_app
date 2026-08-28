@@ -1,0 +1,68 @@
+{
+  "schema": "atlas.parent-atlas-dag-runtime-v1-proof.v1",
+  "status": "DAG_RUNTIME_READ_ONLY_PROVEN",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "runtimeCapability": {
+    "runtimeCapabilityRevision": "runtime:node:v22.17.1",
+    "availableFunctionIds": [
+      "resolve_code_evidence",
+      "run_verification"
+    ]
+  },
+  "candidate": {
+    "canonicalId": "packet:547e1c54b3a0",
+    "candidateOrdinal": 5,
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297"
+  },
+  "validation": {
+    "status": "ACCEPTED",
+    "candidateChecksum": "daca80cfcb31a7a2e0ed4d6ed0b9e4f2109a1192543862b2ab9a24a337fc130f",
+    "validatedDagChecksum": "6de308a28ef8d5a9d55df3e5816a9722f507773db8991c80ea89d7da6d53dc21",
+    "typedRepairSchema": "atlas.typed-repair-dag.v1",
+    "executable": true
+  },
+  "execution": {
+    "mode": "BOUNDED_READ_ONLY",
+    "tasks": [
+      {
+        "id": "resolve",
+        "status": "SUCCEEDED",
+        "result": {
+          "canonicalId": "packet:547e1c54b3a0",
+          "evidenceRefs": 3
+        }
+      },
+      {
+        "id": "verify",
+        "status": "SUCCEEDED",
+        "result": {
+          "command": "node --version",
+          "stdout": "v22.17.1"
+        }
+      }
+    ],
+    "executionChecksum": "7f4b098c8b354e9bdae0ced86f9eca59a628bdf232db3b12ed098cdae71a7767"
+  },
+  "bindings": {
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "semanticRevision": "semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969",
+    "graphRevision": null,
+    "contextManifestChecksum": "10d279e68e17420a60fb0b2939b55ee776fd84feb15901dd965fef2f6591c59b"
+  },
+  "writes": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "filesystemSourceWrites": false
+  },
+  "notProven": [
+    "mutation execution",
+    "live GPU runtime capability",
+    "neural decoder promotion"
+  ],
+  "nextGate": "WORKSTATION_V1_ORCHESTRATED_RECEIPT"
+}
