@@ -1,13 +1,18 @@
 import { createHash } from 'crypto';
+import {
+  SEMANTIC_DIMENSION,
+  SEMANTIC_REPRESENTATION_ID,
+} from '../../embedding/embedding-contract-768.js';
 
 /**
  * Persisted Parent Atlas semantic evidence is the native 768-d EmbeddingGemma
  * representation. Lower-dimensional MRL prefixes remain derived/reference
  * lanes and must carry their own representation identity.
  */
-export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = 'semantic_768' as const;
-export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = 768 as const;
-export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION = 768 as const;
+/** Compatibility aliases; canonical semantic identity is owned by embedding-contract-768. */
+export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = SEMANTIC_REPRESENTATION_ID;
+export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
+export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION = SEMANTIC_DIMENSION;
 export const ATLAS_SEMANTIC_PROJECTION_METHOD = 'embeddinggemma-native-768' as const;
 export const QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_768_v2' as const;
 export const QDRANT_SEMANTIC_VECTOR_NAME = null as null;

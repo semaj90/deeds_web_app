@@ -14,16 +14,16 @@
   },
   "counts": [
     {
-      "table": "atlas_hyperedges",
+      "table": "atlas_ontology_tuples",
       "rows": 0
+    },
+    {
+      "table": "atlas_hyperedges",
+      "rows": 62802
     },
     {
       "table": "atlas_hyperedge_members",
-      "rows": 0
-    },
-    {
-      "table": "atlas_ontology_tuples",
-      "rows": 0
+      "rows": 125604
     }
   ],
   "contractRegistry": [

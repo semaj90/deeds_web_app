@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T17:41:01.467Z",
+  "generatedAt": "2026-08-27T22:13:01.647Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -23,7 +23,7 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:scores",
-          "ttl": 455759,
+          "ttl": 439438,
           "ok": true
         }
       ],

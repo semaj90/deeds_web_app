@@ -1,6 +1,6 @@
 # Bitfrost Semantic Cache Audit
 
-Generated: 2026-08-27T17:41:01.467Z
+Generated: 2026-08-27T22:13:01.647Z
 Status: PASS
 Redis Container: legal-ai-valkey
 
@@ -16,7 +16,7 @@ Redis Container: legal-ai-valkey
 
 | Pattern | Count | Sample | TTL samples |
 |---|---:|---|---|
-| `gpu:karpathy:scores` | 1 | gpu:karpathy:scores | gpu:karpathy:scores:455759 |
+| `gpu:karpathy:scores` | 1 | gpu:karpathy:scores | gpu:karpathy:scores:439438 |
 | `gpu:karpathy:encoded` | 0 | none | none |
 | `bifrost:*` | 0 | none | none |
 | `centroid:*` | 0 | none | none |

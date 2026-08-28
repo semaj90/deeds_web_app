@@ -1,8 +1,8 @@
 {
   "schema_version": "semantic-contract-reconciliation-v1",
   "scope": "BOUNDED — TypeScript/Zod contract layer only (sveltekit-frontend/src/**/*.ts)",
-  "generated_at": "2026-08-27T03:16:06.799Z",
-  "repository_commit": "0084288f266275d9d99c2c4bda49991d8f0ca0c1",
+  "generated_at": "2026-08-27T22:15:34.417Z",
+  "repository_commit": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
   "canonical_owner": {
     "file": "sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts",
     "representationConst": "SEMANTIC_REPRESENTATION_ID",
@@ -23,44 +23,11 @@
   ],
   "summary": {
     "files_scanned": 4164,
-    "files_with_768_reference": 109,
-    "hard_failures": 4,
+    "files_with_768_reference": 108,
+    "hard_failures": 0,
     "warnings": 286
   },
-  "hard_failures": [
-    {
-      "type": "DUPLICATE_CANONICAL_OWNER",
-      "file": "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-task-representation-v1.ts",
-      "line": 4,
-      "constName": "EMBEDDINGGEMMA_NATIVE_DIMENSION",
-      "severity": "HARD_FAIL",
-      "message": "sveltekit-frontend/src/lib/server/atlas/embedding/embeddinggemma-task-representation-v1.ts:4 declares 'export const EMBEDDINGGEMMA_NATIVE_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
-    },
-    {
-      "type": "DUPLICATE_CANONICAL_OWNER",
-      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
-      "line": 8,
-      "constName": "ATLAS_CANONICAL_SEMANTIC_REPRESENTATION",
-      "severity": "HARD_FAIL",
-      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:8 declares 'export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
-    },
-    {
-      "type": "DUPLICATE_CANONICAL_OWNER",
-      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
-      "line": 9,
-      "constName": "ATLAS_CANONICAL_SEMANTIC_DIMENSION",
-      "severity": "HARD_FAIL",
-      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:9 declares 'export const ATLAS_CANONICAL_SEMANTIC_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
-    },
-    {
-      "type": "DUPLICATE_CANONICAL_OWNER",
-      "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts",
-      "line": 10,
-      "constName": "ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION",
-      "severity": "HARD_FAIL",
-      "message": "sveltekit-frontend/src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:10 declares 'export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION' as a semantic_768/768 literal — a second canonical owner alongside sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts."
-    }
-  ],
+  "hard_failures": [],
   "warnings_top50": [
     {
       "type": "DOCUMENTED_CLIENT_BOUNDARY_DUPLICATE",

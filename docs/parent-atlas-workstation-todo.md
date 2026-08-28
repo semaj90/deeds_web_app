@@ -75,6 +75,57 @@ source coverage / lineage
   → packages/atlas* promotion
 ```
 
+### Independent graph revision domains
+
+Keep these revisions independent. Tree-sitter/chunker changes affect only
+`astGraphRevision`; compiler configuration or LSP resolution changes affect
+`compilerSemanticGraphRevision`; ontology and Feature Intelligence changes
+affect `relationshipGraphRevision`.
+
+```text
+AstStructuralGraphSnapshot
+  astGraphRevision
+        +
+CompilerSemanticGraphSnapshot
+  compilerSemanticGraphRevision
+        +
+RelationshipGraphSnapshot
+  relationshipGraphRevision
+        +
+LineageQualifiedCandidateOrdinalMap
+        ↓
+CompositeGraphProjectionV1
+```
+
+The LSP contract is now `PROVEN_FIXTURE_AND_LIVE_READ_ONLY`: TypeScript and
+Svelte language servers answered bounded hover/definition requests without
+writes. Its results remain evidence until stable-symbol canonicalization and a
+compiler-semantic graph snapshot are independently proven.
+
+### CandidateOrdinal feature/GPU ABI
+
+Before cuVS, cuGraph, centroid routing, or neural feature tensors consume a
+candidate, prove one identity bundle:
+
+```text
+CandidateOrdinal
+  ↔ packet_key
+  ↔ tree_node_id
+  ↔ symbol_version_id
+  ↔ stable_symbol_id
+  ↔ sourceRef/sourceRevision
+  ↔ workspaceRevision
+  ↔ observation feature row
+  ↔ eligible AnalysisPassResult set
+```
+
+The matrix values remain derived. The identity manifest carries
+`candidateSnapshotRevision`, `ordinalMapChecksum`, `astGraphRevision`,
+`compilerSemanticGraphRevision`, `relationshipGraphRevision`,
+`semanticRevision`, and `featureRevision`. GPU/internal row IDs and Qdrant
+point IDs must resolve back through this manifest before they can affect
+ranking or ACE.
+
 ## Historical completion estimates (2026-08-20)
 
 The percentages below are historical planning estimates. They are not
@@ -92,12 +143,13 @@ gates above.
 | Process packets | 100% | Dense `content` 768 Qdrant write/readback and ContextManifest receipt are proven | Performance follow-up only; no correctness blocker |
 | Graph Phase 3–5 | 100% | DB/tool/endpoint/cache projections are proven against current extraction artifacts | Preserve dynamic extraction-count invariants |
 | Graph Phase 6 | 85% | Bounded dry-run and local trace simulation proven | Keep live multi-store write mode separately gated |
-| AST sidecar GPH-07–16 | 82% | `GraphifyStructuralMaterializer → AstProvider → 8095` boundary is created and fixture-tested; parity, determinism, failure isolation, and bounded incremental/tombstone proofs are complete | Wire the owner into live `graphify:daily` and emit the production receipt |
+| AST sidecar GPH-07–16 | 82% | `GraphifyStructuralMaterializer → AstProvider → 8095` is contract-tested and `PROVEN_WITH_LIVE_8095`; native provenance, identity-path gating, failure isolation, and bounded incremental/tombstone proofs are complete | Wire the owner into live `graphify:daily` and emit the production Graphify receipt |
+| Compiler-semantic/LSP lane | `PROVEN_FIXTURE_AND_LIVE_READ_ONLY` | TypeScript and Svelte language servers answered bounded read-only hover/definition requests; LSP observations remain revision-checked and non-canonical | Prove stable-symbol canonicalization and derive a production compiler-semantic graph snapshot |
 | Canonical identity RF4 | 70% | Resolver contract and degraded backend-ID fallback exist | Complete one live candidate acceptance proof |
 | RF5 within-lane dedup | 40% | Design is defined; full live fusion proof is not complete | One canonical entity, one logical lane, one vote |
 | Retrieval → ContextManifest | 65% | Process membership and manifest contracts exist; full grounded runtime loop is not proven | Runtime process retrieval and manifest round trip |
 | Grounded execution / receipts | 45% | Worker router and Kanban v1 are wired; end-to-end receipt feedback is not proven | Claim/runId → worker → ExecutionReceipt → validation |
-| GPU/RAPIDS sidecar | 55% | Dedicated 8098 sidecar is live-proven for exact cuVS `semantic_768` on a revision-qualified fixture; active 8095 container still reports optional GPU packages unavailable | Same-corpus Qdrant oracle comparison; CAGRA remains quarantined |
+| GPU/RAPIDS sidecar | 58% | 8098 is the separate accelerator owner; CPU NumPy ↔ cuVS cosine parity is proven on a deterministic 64×768 fixture (`docs/reports/cuvs-cosine-768-proof-v1.json`), but same-corpus identity parity remains open | GPU environment receipt, Qdrant oracle comparison, and CandidateOrdinal ABI; CAGRA remains quarantined |
 | TensorRT/LibTorch native lane | 40% | CUDA/TensorRT/LibTorch sources and OpenSpecs remain present | Build, backend identity, and runtime execution proofs |
 | Performance lane | 25% | simdjson and multi-threading are candidates, not active architecture | Benchmark current bottleneck before promotion |
 
@@ -117,18 +169,60 @@ The following remain in the repository or their dedicated runtime definitions:
 
 The lightweight `miniforge-nlp-sidecar` intentionally does not install PyTorch, cuVS, cuGraph, CAGRA, or CuPy. Its current capability result is `false` for those optional packages and `true` for NetworkX and treesitter-chunker. That is deferred capability, not deletion.
 
-## Deferred integration queue
+## Parallel accelerator track
 
-These items are future work and must not block AST correctness or the workstation control plane:
+The 8098 environment can be proven in parallel with the identity/revision
+spine. Environment proof grants no canonical, ranking, or graph authority and
+must not block AST correctness or the workstation control plane.
 
-1. Python 3.14 compatibility audit and pinned environment rebuild.
-2. Multi-threaded extraction/projection only after profiling identifies a bottleneck; preserve deterministic ordering and receipts.
+1. GPU-05/06/08: freeze a reproducible WSL2/Linux 8098 environment and emit
+   `GpuPythonEnvironmentReceiptV1` with Python, NumPy 2.x, CuPy 14.0.1+,
+   PyTorch, RAPIDS, CUDA, device, image digest, tensor smoke, and tiny cuVS
+   exact-KNN smoke. Python 3.14 normal builds are a current experiment;
+   free-threaded Python remains quarantined as a challenger.
+2. Multi-threaded extraction determinism for the upstream treesitter-chunker
+   capability; preserve canonical ordering and receipts. This is an Atlas
+   determinism gate, not GPU ownership.
 3. simdjson/Sonic benchmark against the current parser before any promotion.
-4. TensorRT/LibTorch backend build and live execution proof.
+4. TensorRT/LibTorch backend build and live execution proof, including
+   engine/context/stream ownership, memory limits, sticky-error policy, and
+   process isolation.
 5. Dedicated RAPIDS/cuVS sidecar health, exact-KNN oracle, and identity parity proof — exact live fixture now proven; same-corpus comparison remains open.
 6. CAGRA benchmark only after the recorded architecture decision is explicitly revised; it remains quarantined.
 7. Redis/Valkey cache warming and TTL policy expansion after current packet usage and rebuild-cost telemetry exists.
 8. ONNX embedding lane only as an explicit alternative to the current Ollama embedding owner; never mix it with llama-server chat ownership.
+
+### Structural and accelerator sidecar ownership
+
+`8095` and `8098` are separate runtimes:
+
+- `8095`: Python structural analysis sidecar; treesitter-chunker, AST spans,
+  hierarchy, symbols, calls/imports/exports, incremental extraction, and
+  structural evidence receipts. It does not own canonical IDs, revisions,
+  Qdrant, ranking, CUDA, cuGraph, or CAGRA.
+- `8098`: reproducible RAPIDS accelerator sidecar; PyTorch, cuVS, cuGraph,
+  CuPy/RMM, and later TensorRT experiments. It consumes revision-qualified
+  inputs and returns derived results keyed back through CandidateOrdinal. It
+  does not own AST identity, Postgres truth, Qdrant truth, or RRF.
+
+The next accelerator environment gate is `GpuPythonEnvironmentReceiptV1`:
+Python, NumPy, CuPy, PyTorch, CUDA, cuVS, cuGraph, cuDF, device identity,
+compute capability, image/environment digest, tensor smoke, and tiny cuVS
+exact-KNN smoke. RAPIDS 26.08 platform support for Python 3.14 does not
+authorize moving the full extension stack; the complete extension matrix must
+be proven first, and free-threaded Python remains quarantined.
+
+The latest read-only readiness audit separates the live lanes: WSL2 RAPIDS is
+reachable with cuGraph/cuVS/nx-cugraph `26.06.00`, while the Windows `.venv`
+PyTorch build reports `cudaAvailable: false`; the native TensorRT bridge and
+TensorRT environments are absent. Therefore RAPIDS topology capability is
+`PROVEN`, but the unified GPU pipeline remains `NOT_READY` until the intended
+8098 environment records CUDA tensor and cuVS smoke results.
+
+Upstream treesitter-chunker parallel APIs make extraction concurrency an
+existing capability, not an Atlas proof. Before `GPU-16`, compare workers
+1/2/4/8 for identical sorted chunks, boundaries, metadata, edges, and
+evidence checksum.
 
 Deferred lane policy:
 
@@ -149,18 +243,64 @@ Deferred lane policy:
 GPH-13 AST parity corpus
   → GPH-14 determinism and line-shift proof
   → GPH-15 parse-failure isolation
+  → LSP-01 server/project/capability receipt
+  → LSP-02 negotiated position-encoding byte proof
+  → LSP-03 read-only definition/reference synthesis
+  → CompilerSemanticGraphRevisionV1
   → Graphify replacement integration
   → RF4 live identity acceptance
   → RF5 canonical within-lane dedup
   → process-aware retrieval and ContextManifest runtime proof
   → worker claim/runId and ExecutionReceipt
   → validation outcome feedback
+  → SymbolFeatureAlignmentV1
+  → LineageQualifiedCandidateOrdinalMapV1
+  → CandidateFeatureMatrixManifestV1
+  → CompositeGraphProjectionV1
+  → GpuPythonEnvironmentReceiptV1  [parallel P0-B]
+  → cuVS exact and graph-revision parity
+  → filter/metric parity and GPU ordinal ABI
   → benchmark-gated GPU/performance promotion
 ```
 
 Do not mark `ast-extractor.ts` `SUPERSEDED` until the replacement owner, parity, Graphify reachability, and canonical identity gates are all proven.
 
 ## Graphify and ANN ownership boundary
+
+GPU graph parity is split by revision domain; there is no single universal
+`graphRevision`:
+
+- `GPU-12A`: AST parity under `astGraphRevision`.
+- `GPU-12B`: compiler-semantic parity under `compilerSemanticGraphRevision`.
+- `GPU-12C`: KAG/Feature Intelligence parity under
+  `relationshipGraphRevision`.
+- `GPU-12D`: composite projection parity over all three graph revisions plus
+  `candidateSnapshotRevision` and `ordinalMapChecksum`.
+
+The accelerator track is intentionally separate from candidate identity:
+
+```text
+P0-A  canonical source/revision spine
+      → CandidateOrdinalMapV1
+      → feature and graph manifests
+
+P0-B  WSL2/Linux 8098 environment
+      → GpuPythonEnvironmentReceiptV1
+      → exact cuVS smoke
+
+P1    same-corpus proof
+      CandidateOrdinalMapV1 + GpuPythonEnvironmentReceiptV1
+      → GPU-09 exact semantic_768 comparison
+```
+
+`CandidateOrdinalMapV1` owns only candidate identity coordinates:
+`workspaceRevision`, `candidateSnapshotRevision`, `ordinalMapChecksum`, and
+candidate rows. Graph feature revisions belong to
+`CandidateFeatureMatrixManifestV1` and `CompositeGraphProjectionV1`, not to the
+ordinal map itself.
+
+Multithreaded extraction is gated by incremental reparse, changed-range,
+included-range, and copy-per-thread parity proofs before `GPU-16` benchmarking.
 
 ### Three-plane model
 
@@ -1117,6 +1257,18 @@ Current evidence:
   structurally valid, but applying the migration before reconciling these
   identity namespaces would create no usable binding rows. Identity
   reconciliation is therefore required before migration application.
+- The authorized Graphify source batch applied 128 packet-targeted rows to
+  non-production workspace `625743d2-092b-4fa8-abe0-9dc094920c80` under the
+  current source-manifest revision, with independent readback proven. This
+  repaired workspace lineage on existing Graphify sources; it did not expand
+  the exact packet/source join, which remains 661. Report:
+  `docs/reports/graphify-source-inventory-batch-readback-v1.json`.
+- The source-reference audit now includes `feature_ontology_tuples` as a
+  separate population: 27,863 distinct tuple source refs, 322 raw-exact
+  Graphify matches, 416 basename-only diagnostic matches, 37 ambiguous
+  matches, and 27,088 unresolved. This confirms ontology tuples cannot inherit
+  packet-corpus coverage and require their own reviewed source-binding cohort.
+  Report: `docs/reports/graphify-source-ref-resolution-v1.json`.
 - The PostgreSQL FTS receipt is operational but not aligned: the
   `compute_codebase_chunk_search_vector` producer is detected, the
   `search_vector` GIN index is present, but the document producer is `MIXED`
@@ -1129,6 +1281,34 @@ Current evidence:
   `simple`. Preserve this dual-tokenization for now; do not replace the whole
   vector with one dictionary. A future identifier lane may justify a second
   vector, but that requires a focused benchmark and separate index ownership.
+- Feature-ontology relationship preview is now fail-closed on lineage. It no
+  longer substitutes the historical `git:0084288f26` workspace revision; the
+  materializer derives `workspace_revision` only through a unique exact
+  `feature_ontology_tuples.source_ref` → `graphify_files.source_ref` join and
+  accepts only source-manifest `sha256:` revisions. The 603-row dry run
+  prepared 0 relationships and rejected all 603 because the current tuples
+  have no exact Graphify workspace binding. No relationship apply is allowed
+  until that source-binding cohort exists. Report:
+  `docs/reports/feature-ontology-relationship-materialization-v1.json`.
+- Domain/ontology separation is now fixture-proven in
+  `scripts/atlas/prove-domain-ontology-taxonomy-v1.mjs`: domain classification,
+  ontology concept membership, and topology membership use distinct predicates
+  with evidence references. The production domain list remains flat with
+  aliases and scoring; `taxonomy_nodes`/`taxonomy_edges` remain the hierarchical
+  topology; `OntologyLinkedTupleV1` is the evidence-bearing bridge and reviewed
+  promotion still owns canonical `ENTITY_CLASSIFIED_AS`. Report:
+  `docs/reports/domain-ontology-taxonomy-proof-v1.json`.
+- AST structural revision is now independently fixture-proven in
+  `scripts/atlas/prove-ast-structural-revision-v1.mjs`. Its revision is bound
+  to source revisions/content digests, parser version, AST materializer, and
+  edge extractor; it is deterministic under input reordering and rejects
+  incomplete source bindings. This is separate from the KAG/FI relationship
+  graph revision. Report: `docs/reports/ast-structural-revision-v1.json`.
+- `graph-prod-01-build-production-structural-snapshot-v1.mts` is now explicitly
+  labeled as a `RelationshipGraphSnapshotV1` producer for the KAG/FI incidence
+  domain. It records `astGraphRevision: null`; AST structure must enter later
+  through a separate composite projection rather than being inferred from
+  hyperedges or ontology relationships.
 
 Required order before package promotion:
 
@@ -1190,3 +1370,173 @@ Replay admission is now `PROVEN` for the full comparable code corpus:
 `indexerOnlyEligible=0`. The receipt is read-only and remains limited to the
 scanner-comparable extensions; it does not prove packet lineage, ranking
 quality, Valkey MISS/HIT behavior, or decoder readiness.
+
+### REL-01A current-workspace ontology cohort census
+
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs` now provides a
+read-only exact-source census against the observed workspace revision
+`sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc`.
+The live result examined 90,600 tuples across 27,863 distinct source refs and
+found 144 unique current Graphify sources with 447 current-workspace tuples.
+Those tuples are exclusively `BELONGS_TO_DOMAIN`, `CLASSIFIED_AS`, and
+`IMPLEMENTS_FEATURE` (149 each); `eligibleUsesConceptTuples=0`, so no current
+relationship cohort exists for the existing `USES_CONCEPT` preview lane.
+The result is `CURRENT_RELATIONSHIP_COHORT_EMPTY`, not a promotion failure:
+exact joins are proven for the bounded source cohort, while 549 exact-bound
+tuples still lack a workspace revision and 89,604 examined tuples have no
+exact Graphify source. No database writes occurred.
+Report: `docs/reports/feature-ontology-current-cohort-v1.json`.
+
+REL-01B remains blocked until a current `USES_CONCEPT` cohort is produced or
+the relationship-kernel owner explicitly defines a reviewed mapping for the
+current taxonomy predicates. Do not reinterpret taxonomy predicates as
+`USES_CONCEPT`, stamp historical graph revisions, or add GPU to the
+Tree-sitter/chunker authority path. Keep 8095 CPU structural analysis and
+8098 optional GPU acceleration separate.
+
+The REL-01A integration bundle is now installed before package promotion:
+`scripts/atlas/lib/feature-ontology-current-cohort-v1.mjs` contains the pure
+fail-closed classifier and
+`packages/parent-atlas/test/feature-ontology-current-cohort-v1.test.mjs`
+passes 6/6. The live audit now limits its census to the intended
+`USES_CONCEPT` predicate rather than counting taxonomy rows: 603 tuples, 7
+exact source refs, 0 current Graphify bindings. The generated receipt remains
+`CURRENT_RELATIONSHIP_COHORT_EMPTY`; `relationshipGraphRevision` is not
+assigned. Bundle files were reviewed from
+`C:\Users\james\Downloads\parent-atlas-rel-01a-current-ontology-cohort.zip`;
+the ZIP's generated report and unrelated graph-revision scripts were not
+copied.
+
+The current `USES_CONCEPT` population is `603` rows from
+`atlas-packets-ontology-v1` across seven source refs. None has an exact
+Graphify row. Six are absent from the current workspace observation, while
+`src/lib/server/valkey.ts` is observed but not yet Graphify-materialized.
+This confirms the next gate is targeted source observation and Graphify
+coverage for this seven-file cohort, not a predicate rename and not
+taxonomy-to-`USES_CONCEPT` coercion.
+
+REL-01A now records the existing root-prefix convention as a review-only
+candidate: `sveltekit-frontend/` + frontend-relative ref. The refreshed
+receipt finds 6 observed alias source refs covering 595 of the 603 tuples;
+the seventh ref (`src/lib/server/valkey.ts`) has no observed alias because the
+current checkout has no matching `src/lib/server/valkey.ts` file. These are
+not eligible bindings yet. Approval must establish the alias contract and
+then a targeted Graphify batch must provide exact source observations before
+REL-01B can run.
+
+The refreshed workspace observation explains the seven-ref mismatch: six
+tracked files exist under repo-relative refs such as
+`sveltekit-frontend/src/lib/server/ai/langgraph-client.ts`, while the legacy
+ontology tuples use frontend-relative refs such as
+`src/lib/server/ai/langgraph-client.ts`. REL-01A correctly rejects this as
+non-exact rather than silently adding the `sveltekit-frontend/` prefix. The
+next source-binding decision is therefore to approve and version that one
+explicit root-prefix alias (or classify the tuples as historical), then rerun
+the census. No basename, suffix, or fuzzy resolver is allowed.
+
+REL-01A3 explicit alias review is now integrated and validated. Receipt:
+`docs/reports/feature-ontology-explicit-alias-v1.json`. The resolver proposes
+6 `ROOT_PREFIX_ALIAS` mappings covering 595 tuples, but keeps them
+`promotable: false`; the seventh `src/lib/server/valkey.ts` row is correctly
+classified `DUAL_NAMESPACE_COLLISION`. Selection checksum:
+`349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a`.
+`rel01bAllowed` remains false. No alias table, tuple, Graphify, or graph
+revision write was performed.
+
+SOURCE-REG-01 is now implemented as a literal-equality read-only audit at
+`scripts/atlas/audit-feature-ontology-alias-target-registry-v1.mjs`. The live
+receipt confirms the frozen checksum, but all six canonical
+`sveltekit-frontend/src/...` targets are currently missing from
+`atlas_source_refs` (`registeredUniqueTargets: 0`, `missingTargets: 6`).
+This is a registry reconciliation blocker, not a reason to apply the alias
+migration or run Graphify persistence. Registry `content_hash` remains
+identity metadata only and is not treated as freshness proof.
+
+The six-row source-registry insert is now `APPLIED_AND_READBACK_PROVEN` in
+`docs/reports/feature-ontology-alias-target-registry-apply-v1.json`. The
+Graphify batch runner was then updated to accept the approved alias receipt as
+an explicit selection input. Its dry run selected exactly the six canonical
+`sveltekit-frontend/src/...` refs with `canonicalWriteAttempted: false`.
+Graphify persistence remains a separate authorization gate.
+
+After the six-source Graphify apply/readback, the packet-lineage census
+`scripts/atlas/audit-feature-ontology-packet-lineage-v1.mjs` examined all 603
+`USES_CONCEPT` tuples. It records 595 `PACKET_CONTENT_LINEAGE_MISSING` rows
+and 8 `ALIAS_NOT_APPROVED` collision rows. Packet/chunk identity remains a
+separate hash domain from whole-source Graphify content. Fresh ontology
+evidence is still zero; REL-01B and relationship graph revision derivation
+remain blocked unless packet source revision can be proven or the ontology is
+regenerated.
+
+REL-01A4 evidence-freshness proof is now implemented as a separate read-only
+census at `scripts/atlas/audit-feature-ontology-evidence-freshness-v1.mjs`.
+Its first live result examines all 603 `USES_CONCEPT` tuples and finds 595
+`ALIAS_NOT_VERIFIED` rows plus 8 `DUAL_NAMESPACE_COLLISION` rows, with
+`eligibleFreshUsesConceptTuples: 0`. This is the correct fail-closed result:
+the alias review does not prove that the historical ontology assertions were
+extracted from the current source bytes. REL-01B and relationship graph
+revision derivation remain blocked until alias verification, current Graphify
+observations, and packet/source content lineage are all proven.
+
+The read-only alias review receipt is now generated at
+`docs/reports/feature-ontology-source-alias-review-v1.json`. It records 6
+observed alias source refs covering 595 tuples, 1 unresolved source ref, and
+0 promotable bindings. The `ACTIVE_APP_RELATIVE_V1` mapping remains
+`EXPLICIT_ALIAS_REVIEW_ONLY`; no canonical authority, Graphify lineage, or
+relationship graph revision changed. The next decision is explicit alias
+approval/versioning or historical classification, followed by targeted source
+observation for the approved six refs.
+
+REL-01A5 fresh ontology extractor ownership is now audited by the read-only
+`scripts/atlas/audit-feature-ontology-fresh-extractor-v1.mjs`. Receipt:
+`docs/reports/feature-ontology-fresh-extractor-v1.json`. All six approved source
+files exist, all six local SHA-256 digests match the workspace/Graphify source
+observations, and the bounded Graphify batch is present. The audit found no
+compatible current producer for revision-qualified `USES_CONCEPT` candidates:
+the legacy generator consumes database feature lanes, the registry materializer
+targets a different projection, and the Python code-enrichment lane emits
+concepts rather than ontology tuples. Status is
+`FRESH_ONTOLOGY_EXTRACTOR_OWNER_MISSING`; no Postgres, Qdrant, Neo4j, or Valkey
+writes occurred. Do not run REL-01B or relationship `--apply` until a reviewed
+fresh extractor owner is defined and its dry-run output is independently
+validated.
+
+AST-STRUCT-01 is now wired through the dedicated `:8095/ast/chunk` endpoint.
+`scripts/atlas/lib/treesitter-structural-observation-v1.mjs` adapts the
+`treesitter-chunker` response into revision-qualified
+`StructuralObservationV1` rows with stable evidence keys, byte ranges, chunk
+identity, and sorted structural edges. The read-only proof
+`scripts/atlas/audit-treesitter-structural-observation-v1.mjs` processed all 6
+approved current files: 555 chunks and 3,262 edges, 0 request failures. Receipt:
+`docs/reports/treesitter-structural-observation-v1.json`.
+
+This does not make Tree-sitter or the CPU sidecar an Atlas identity owner.
+Unresolved syntax edges remain unresolved until the separate identity adapter
+and LSP/compiler-semantic resolution gate proves them. `/extract` concept
+results remain review-only NLP candidates and are not substituted for AST
+structure or canonical ontology truth.
+
+REL-01A7 fresh ontology extraction is now wired as a bounded read-only dry run
+at `scripts/atlas/audit-feature-ontology-fresh-extraction-v1.mjs`. It calls the
+existing `:8095/extract` CPU NLP/Tree-sitter endpoint for the six approved,
+current Graphify sources and emits 300 `atlas.feature-ontology-fresh-candidate.v1`
+rows. All candidates carry source/workspace revisions and evidence references,
+but remain `REVIEW_REQUIRED` with `canonicalAuthority: false`. The live run
+completed 6/6 sources with 0 failures and 0 Postgres/Qdrant/Neo4j/Valkey writes.
+Receipt: `docs/reports/feature-ontology-fresh-extraction-v1.json`.
+
+The owner audit now reports `FRESH_ONTOLOGY_EXTRACTOR_OWNER_WIRED_REVIEW_ONLY`.
+This does not make the 300 candidates canonical and does not unlock REL-01B:
+the next gate is review of the candidate set, taxonomy/domain semantics, and
+evidence quality before any relationship preview or persistence.
+
+REL-01A6 fresh candidate authority contract is now implemented at
+`scripts/atlas/lib/feature-ontology-fresh-candidate-v1.mjs`. It validates only
+reviewable candidates carrying exact `sourceRevision` and `workspaceRevision`
+SHA-256 coordinates, source/evidence identity, `USES_CONCEPT`, and explicit
+`status: REVIEW_REQUIRED` plus `canonicalAuthority: false`. Focused tests pass
+3/3 at `packages/parent-atlas/test/feature-ontology-fresh-candidate-v1.test.mjs`.
+This is a contract boundary, not an extractor: no path-only concept inference,
+historical tuple rewrite, relationship materialization, or projection write is
+permitted. The next implementation decision is to select and review the actual
+fresh extractor producer before emitting candidate rows.

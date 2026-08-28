@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.current-feature-ontology-relationship-readback.v1",
+  "generatedAt": "2026-08-28T05:00:02.576Z",
+  "sourceMaterializationReport": "docs\\reports\\feature-ontology-relationship-materialization-v1.json",
+  "expectedRelationshipCount": 8,
+  "persistedRelationshipCount": 8,
+  "persistedRelationshipIds": [
+    "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+    "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+    "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+    "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+    "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+    "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+    "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+    "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+  ],
+  "expectedRelationshipIds": [
+    "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+    "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+    "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+    "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+    "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+    "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+    "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+    "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+  ],
+  "exactRelationshipIdSet": true,
+  "evidenceLinkCount": 8,
+  "featureEvidenceLinkCount": 8,
+  "evidenceRowCount": 8,
+  "distinctSourceRefs": [
+    "src/lib/server/valkey.ts"
+  ],
+  "distinctSourceRevisions": [
+    "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f"
+  ],
+  "distinctWorkspaceRevisions": [
+    "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+  ],
+  "previewOnlyValues": [
+    "false"
+  ],
+  "originatingTupleCount": 8,
+  "historicalTupleRefsPreserved": true,
+  "batchRelationshipCount": 8,
+  "mismatches": [],
+  "status": "CURRENT_RELATIONSHIP_APPLY_READBACK_PROVEN",
+  "canonicalWritesConfirmed": true,
+  "writesPerformedByThisAudit": false,
+  "nextGate": "REL-01A4_FRESHNESS_AND_REVIEW_OR_CANDIDATE_ALIGNMENT"
+}

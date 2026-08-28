@@ -1,0 +1,7 @@
+{
+  "scripts/atlas/lib/feature-ontology-current-cohort-v1.mjs": "df8b4335407e2c2cdfb2b1329c62f9d64eaeb2e62c32e4f02376a0fae2b08a23",
+  "scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs": "3f7eb0bce24154914ff2234df9c2e351ba7c8659860d168c509b3d6b611e427e",
+  "packages/parent-atlas/test/feature-ontology-current-cohort-v1.test.mjs": "d2cb6c44f288cd377603d3d8df0b9b937d80bf3fc6a523395a23365ae793ad68",
+  "README-INTEGRATE.md": "0df73f331652b3ad85a408d4d60bdbb2d9be9e9abad0eb61c3075aa521f0b505",
+  "INTEGRATION-CHECKLIST.txt": "b8574a953912be905d82cac86a8c4d97f1b5a8593642c8ceca14c7b0e31ce7d4"
+}

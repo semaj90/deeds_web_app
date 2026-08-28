@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.project-graph-revision-live-proof.v1",
+  "status": "PROVEN_LIVE_READ_ONLY",
+  "writes": false,
+  "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "source_count": 23626,
+  "project_graph_revision": "sha256:6a18fb1e748bed44cc070c6662fd7b40eb367c98131c54a84073529f003521b8",
+  "input_order_invariant": true,
+  "semantic_engine_revision": "typescript:5.9.3",
+  "project_config_checksum": "sha256:82a3bc5e864a2556cd3abd75c4efc92c5df4e7c9ab64a7745d68d6280149cee2",
+  "dependency_lock_checksum": "sha256:6e6609bb653163dcea83ce6e0c9b9015d62f9f8012be2875af09cf267fdd00db",
+  "virtual_document_count": 1,
+  "source_map_count": 1,
+  "svelte_virtual_source_proof": "docs/reports/svelte-virtual-source-binding-proof-v1.json",
+  "svelte_language_server_proof": "docs/reports/svelte-language-server-readonly-proof-v1.json",
+  "remaining": [
+    "exact source-map range to Tree-sitter node proof"
+  ]
+}

@@ -1,11 +1,10 @@
 #!/usr/bin/env tsx
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
-import { materializeWorkspaceRevisionOriginV1 } from '$lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 import { evaluateGraphifyWorkspaceManifestCompletenessV1 } from '$lib/server/atlas/indexing/graphify-workspace-manifest-completeness-v1.js';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
@@ -21,15 +20,27 @@ const REPORT_PATH = path.resolve(
 );
 const PRODUCER_REVISION = 'atlas.graphify-workspace-manifest-completeness-proof.2026-08-22.v1';
 const requestedWorkspaceId = process.env.ATLAS_GRAPHIFY_WORKSPACE_ID?.trim() || null;
+const OBSERVATION_PATH = path.resolve(
+  REPO_ROOT,
+  process.env.ATLAS_WORKSPACE_SOURCE_BINDING_OUT
+    ?? 'docs/reports/workspace-source-binding-observation.json',
+);
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
 
-const origin = materializeWorkspaceRevisionOriginV1({
-  workspaceRoot: REPO_ROOT,
-  repositoryId: 'semaj90/deeds_web_app',
-  producerRevision: PRODUCER_REVISION,
-});
+const observation = JSON.parse(await readFile(OBSERVATION_PATH, 'utf8')) as Record<string, any>;
+if (!observation.record || !Array.isArray(observation.bindings)) {
+  throw new Error('WORKSPACE_SOURCE_BINDING_OBSERVATION_REQUIRED');
+}
+// The observer is the single workspace-manifest authority. Re-scanning here
+// would make generated proof reports part of the manifest and create a second
+// revision domain.
+const origin = {
+  record: observation.record,
+  bindings: observation.bindings,
+  skipped: Array.isArray(observation.skipped) ? observation.skipped : [],
+};
 
 const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
 let report: Record<string, unknown>;

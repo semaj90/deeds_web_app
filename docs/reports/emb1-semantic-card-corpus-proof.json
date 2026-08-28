@@ -5,8 +5,8 @@
   "engine": "treesitter-chunker",
   "language": "typescript",
   "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-  "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-  "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+  "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+  "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
   "representationRevision": "structural-card-v1",
   "requiredKinds": [
     "FILE",
@@ -30,13 +30,13 @@
   "cards": [
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_ad216a05718122b22d197ea2",
+      "cardId": "sc_2ca4afb9b11a0cc38c430cf6",
       "kind": "FILE",
       "name": "fixtures/emb1/semantic-card-corpus.ts",
       "qualifiedName": "fixtures/emb1/semantic-card-corpus.ts",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
       "upstreamChunkId": null,
       "sourceSpan": {
@@ -60,13 +60,13 @@
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_a95f875c799d833310428b38",
+      "cardId": "sc_f6ff517d5e6232350abd8d50",
       "kind": "MODULE",
       "name": "fixtures/emb1/semantic-card-corpus",
       "qualifiedName": "fixtures/emb1/semantic-card-corpus.ts",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
       "upstreamChunkId": null,
       "sourceSpan": {
@@ -90,15 +90,15 @@
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_41b3a0fb9e4afe5f365a33f4",
+      "cardId": "sc_8842592ae1210db02dc28d01",
       "kind": "INTERFACE",
       "name": "User",
-      "qualifiedName": "User",
+      "qualifiedName": "export_statement.interface_declaration.User",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
-      "upstreamChunkId": "f9a01348f97b1dad4b4966a0198716daf483b3ffd32d66da887eae72f9968d16",
+      "upstreamChunkId": "4a315df932768947c3f4a89dcaee1a823129b0af",
       "nodeType": "interface_declaration",
       "sourceSpan": {
         "filePath": "fixtures/emb1/semantic-card-corpus.ts",
@@ -109,29 +109,30 @@
         "endLine": 2,
         "endColumn": 37
       },
-      "scopeChain": [],
+      "scopeChain": [
+        "export_statement",
+        "interface_declaration"
+      ],
       "sourceText": "interface User { id: string; }",
       "relationships": {
         "imports": [],
         "exports": [],
         "calls": [],
-        "references": [
-          "User"
-        ]
+        "references": []
       },
-      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND INTERFACE\nNAME User\nSCOPE module\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE interface User { id: string; }"
+      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND INTERFACE\nNAME User\nSCOPE export_statement > interface_declaration\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE interface User { id: string; }"
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_7d005afba4b4c0dae9045e28",
+      "cardId": "sc_362109d8cd9649a9d05b5865",
       "kind": "TYPE",
       "name": "UserId",
-      "qualifiedName": "UserId",
+      "qualifiedName": "export_statement.type_alias_declaration.UserId",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
-      "upstreamChunkId": "db62ce6b88798e8e57e077881ced23092e5ca233f3418a906b443018171cfc7f",
+      "upstreamChunkId": "e02470507109450778c5de419b051a6bc970858e",
       "nodeType": "type_alias_declaration",
       "sourceSpan": {
         "filePath": "fixtures/emb1/semantic-card-corpus.ts",
@@ -142,29 +143,30 @@
         "endLine": 3,
         "endColumn": 28
       },
-      "scopeChain": [],
+      "scopeChain": [
+        "export_statement",
+        "type_alias_declaration"
+      ],
       "sourceText": "type UserId = string;",
       "relationships": {
         "imports": [],
         "exports": [],
         "calls": [],
-        "references": [
-          "UserId"
-        ]
+        "references": []
       },
-      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND TYPE\nNAME UserId\nSCOPE module\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE type UserId = string;"
+      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND TYPE\nNAME UserId\nSCOPE export_statement > type_alias_declaration\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE type UserId = string;"
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_1baccabe5bf1e9192a0d7dc3",
+      "cardId": "sc_14a8531eedb8c4d2dd983cbb",
       "kind": "CLASS",
       "name": "UserService",
-      "qualifiedName": "UserService",
+      "qualifiedName": "export_statement.class_declaration.UserService",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
-      "upstreamChunkId": "db0595e926746b31100a8618c72623f0da593e2b84565af0aad9e2c4895876f5",
+      "upstreamChunkId": "3ab9b9bf95c4e96e88ca8f761935ad6c737d6a8a",
       "nodeType": "class_declaration",
       "sourceSpan": {
         "filePath": "fixtures/emb1/semantic-card-corpus.ts",
@@ -175,36 +177,30 @@
         "endLine": 6,
         "endColumn": 1
       },
-      "scopeChain": [],
+      "scopeChain": [
+        "export_statement",
+        "class_declaration"
+      ],
       "sourceText": "class UserService {\n  async getUser(id: UserId): Promise<User> { return helper(id); }\n}",
       "relationships": {
         "imports": [],
         "exports": [],
-        "calls": [
-          "helper"
-        ],
-        "references": [
-          "Promise",
-          "User",
-          "UserId",
-          "UserService",
-          "helper",
-          "id"
-        ]
+        "calls": [],
+        "references": []
       },
-      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND CLASS\nNAME UserService\nSCOPE module\nIMPORTS none\nEXPORTS none\nCALLS helper\nSOURCE class UserService {\n  async getUser(id: UserId): Promise<User> { return helper(id); }\n}"
+      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND CLASS\nNAME UserService\nSCOPE export_statement > class_declaration\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE class UserService {\n  async getUser(id: UserId): Promise<User> { return helper(id); }\n}"
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_0d85147bef1b7c9476f0e365",
+      "cardId": "sc_bc7e90eb96c63195a6de238b",
       "kind": "METHOD",
       "name": "getUser",
-      "qualifiedName": "getUser",
+      "qualifiedName": "export_statement.class_declaration.method_definition.getUser",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
-      "upstreamChunkId": "eaf4e38da00ba9f71002268adc2fe4472297933222bf74ec0dcfb0fbef528fa9",
+      "upstreamChunkId": "b30890d4ef04e87141d576043e4a6ea21e86e2fd",
       "nodeType": "method_definition",
       "sourceSpan": {
         "filePath": "fixtures/emb1/semantic-card-corpus.ts",
@@ -215,35 +211,31 @@
         "endLine": 5,
         "endColumn": 65
       },
-      "scopeChain": [],
+      "scopeChain": [
+        "export_statement",
+        "class_declaration",
+        "method_definition"
+      ],
       "sourceText": "async getUser(id: UserId): Promise<User> { return helper(id); }",
       "relationships": {
         "imports": [],
         "exports": [],
-        "calls": [
-          "helper"
-        ],
-        "references": [
-          "Promise",
-          "User",
-          "UserId",
-          "helper",
-          "id"
-        ]
+        "calls": [],
+        "references": []
       },
-      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND METHOD\nNAME getUser\nSCOPE module\nIMPORTS none\nEXPORTS none\nCALLS helper\nSOURCE async getUser(id: UserId): Promise<User> { return helper(id); }"
+      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND METHOD\nNAME getUser\nSCOPE export_statement > class_declaration > method_definition\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE async getUser(id: UserId): Promise<User> { return helper(id); }"
     },
     {
       "schema": "atlas.structural-memory-card.v1",
-      "cardId": "sc_6922547834123864c65c0e70",
+      "cardId": "sc_7be78e956049fc29b5f9dcc7",
       "kind": "FUNCTION",
       "name": "helper",
-      "qualifiedName": "helper",
+      "qualifiedName": "export_statement.function_declaration.helper",
       "sourceRef": "fixtures/emb1/semantic-card-corpus.ts",
-      "sourceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
-      "workspaceRevision": "5e088be9d4d54010b68c6cfc7c734672dac7a0e0",
+      "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspaceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
       "representationRevision": "structural-card-v1",
-      "upstreamChunkId": "47c480c0c38118015bd63a11fc6fa26cdc92f068f33e934e1a77f13d6c791da3",
+      "upstreamChunkId": "fc711653dcdc01b58fe7a068b21acc4fb50084e3",
       "nodeType": "function_declaration",
       "sourceSpan": {
         "filePath": "fixtures/emb1/semantic-card-corpus.ts",
@@ -254,18 +246,18 @@
         "endLine": 7,
         "endColumn": 59
       },
-      "scopeChain": [],
+      "scopeChain": [
+        "export_statement",
+        "function_declaration"
+      ],
       "sourceText": "function helper(id: string): User { return { id }; }",
       "relationships": {
         "imports": [],
         "exports": [],
         "calls": [],
-        "references": [
-          "User",
-          "id"
-        ]
+        "references": []
       },
-      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND FUNCTION\nNAME helper\nSCOPE module\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE function helper(id: string): User { return { id }; }"
+      "contextualizedText": "FILE fixtures/emb1/semantic-card-corpus.ts\nKIND FUNCTION\nNAME helper\nSCOPE export_statement > function_declaration\nIMPORTS none\nEXPORTS none\nCALLS none\nSOURCE function helper(id: string): User { return { id }; }"
     }
   ],
   "diagnostics": [],

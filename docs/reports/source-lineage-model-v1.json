@@ -1,12 +1,12 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-08-27T19:56:42.519Z",
+  "generatedAt": "2026-08-28T00:06:18.484Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-binding-observation.json",
-    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
-    "bindingRows": 23626
+    "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+    "bindingRows": 23683
   },
   "layers": {
     "stableSourceIdentity": "SCHEMA_PRESENT",
@@ -29,7 +29,7 @@
     "source_refs": 768,
     "content_hash_present": 768,
     "source_revision_present": 768,
-    "workspace_revision_present": 128
+    "workspace_revision_present": 256
   },
   "stableIdentityCoverage": {
     "graphify_source_refs": 768,
@@ -41,9 +41,9 @@
     "packet_source_refs": 61659,
     "exact_current_projection": 661,
     "source_revision_joined": 661,
-    "current_workspace_joined": 128
+    "current_workspace_joined": 0
   },
-  "projectionChecksum": "61a6ca7cc22d2113a6efa44f112c0ddee80391d406a16c806778d843f268045b",
+  "projectionChecksum": "a7bae64fcfa6873f663f7b7be4c751f275d65daf02ac5e921289219107d2dedf",
   "policy": {
     "sourceRef": "locator_only",
     "canonicalSource": "stable_identity",

@@ -10,6 +10,8 @@
     "./core/graph-snapshot-v2": "./dist/core/graph-snapshot-v2.js",
     "./core/structural-symbol": "./dist/core/structural-symbol.js",
     "./core/structural-extraction-fabric": "./dist/core/structural-extraction-fabric.js",
+    "./core/lsp-semantic-observation": "./dist/core/lsp-semantic-observation.js",
+    "./core/project-graph-revision-v1": "./dist/core/project-graph-revision-v1.js",
     "./core/treesitter-chunker-evidence-adapter": "./dist/core/treesitter-chunker-evidence-adapter.js",
     "./core/ast-grep-observation-adapter": "./dist/core/ast-grep-observation-adapter.js",
     "./core/langextract-grounding-adapter": "./dist/core/langextract-grounding-adapter.js",

@@ -14,6 +14,11 @@ import {
   type TreesitterChunkerChunkV1,
   type TreesitterChunkerXrefEdgeV1,
 } from './structural-symbol.js';
+import {
+  lspSemanticObservationSchema,
+  synthesizeLspStructuralReference,
+  type LspResolvedStructuralReferenceV1,
+} from './lsp-semantic-observation.js';
 
 const revision = z.string().min(1);
 
@@ -39,6 +44,7 @@ export const structuralExtractionInputSchema = z.object({
   langextract_revision: revision,
   chunks: z.array(treesitterChunkerChunkSchema),
   xref_edges: z.array(treesitterChunkerXrefEdgeSchema).default([]),
+  lsp_observations: z.array(lspSemanticObservationSchema).default([]),
   ast_grep_observations: z.array(astGrepObservationSchema).default([]),
   langextract_observations: z.array(groundedLangExtractObservationSchema).default([]),
   diagnostics: z.array(z.string()).default([]),
@@ -56,6 +62,9 @@ export const structuralExtractionReceiptSchema = z.object({
   path_affine_symbol_nomination_count: z.number().int().nonnegative(),
   reference_fact_count: z.number().int().nonnegative(),
   unresolved_xref_source_count: z.number().int().nonnegative().default(0),
+  lsp_observation_count: z.number().int().nonnegative().default(0),
+  lsp_resolved_reference_count: z.number().int().nonnegative().default(0),
+  lsp_revision_mismatch_count: z.number().int().nonnegative().default(0),
   ast_grep_observation_count: z.number().int().nonnegative(),
   grounded_langextract_count: z.number().int().nonnegative(),
   rejected_ungrounded_langextract_count: z.number().int().nonnegative(),
@@ -72,6 +81,7 @@ export type StructuralExtractionFabricResultV1 = {
   xref_edges: TreesitterChunkerXrefEdgeV1[];
   symbol_nominations: StructuralSymbolNominationV1[];
   reference_facts: StructuralReferenceFactV1[];
+  lsp_resolved_references: LspResolvedStructuralReferenceV1[];
   ast_grep_observations: AstGrepObservationV1[];
   langextract_observations: GroundedLangExtractObservationV1[];
   receipt: StructuralExtractionReceiptV1;
@@ -221,11 +231,29 @@ export function compileStructuralExtractionFabric(
   const groundedLangExtract = input.langextract_observations.map((item) =>
     groundedLangExtractObservationSchema.parse(item));
 
+  const lspResolvedReferences: LspResolvedStructuralReferenceV1[] = [];
+  const factsById = new Map(referenceFacts.map((fact) => [fact.reference_id, fact]));
+  let lspRevisionMismatches = 0;
+  for (const observation of input.lsp_observations) {
+    const fact = factsById.get(observation.reference_id);
+    if (!fact) {
+      fabricDiagnostics.push(`LSP_REFERENCE_UNRESOLVED:${observation.observation_id}:${observation.reference_id}`);
+      continue;
+    }
+    try {
+      lspResolvedReferences.push(synthesizeLspStructuralReference(fact, observation, options.producer_revision));
+    } catch (error) {
+      lspRevisionMismatches += 1;
+      fabricDiagnostics.push(`${error instanceof Error ? error.message : String(error)}:${observation.observation_id}`);
+    }
+  }
+
   return {
     chunks,
     xref_edges: input.xref_edges,
     symbol_nominations: symbolNominations,
     reference_facts: referenceFacts,
+    lsp_resolved_references: lspResolvedReferences,
     ast_grep_observations: input.ast_grep_observations,
     langextract_observations: groundedLangExtract,
     receipt: structuralExtractionReceiptSchema.parse({
@@ -238,6 +266,9 @@ export function compileStructuralExtractionFabric(
       native_symbol_nomination_count: nativeSymbolNominations,
       path_affine_symbol_nomination_count: pathAffineSymbolNominations,
       reference_fact_count: referenceFacts.length,
+      lsp_observation_count: input.lsp_observations.length,
+      lsp_resolved_reference_count: lspResolvedReferences.length,
+      lsp_revision_mismatch_count: lspRevisionMismatches,
       unresolved_xref_source_count: unresolvedXrefSources,
       ast_grep_observation_count: input.ast_grep_observations.length,
       grounded_langextract_count: groundedLangExtract.length,

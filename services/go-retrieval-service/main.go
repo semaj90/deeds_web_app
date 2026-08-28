@@ -577,6 +577,17 @@ type qdrantChunk struct {
 	SomCluster *int32
 	BmuRow     *int32
 	BmuCol     *int32
+	// Atlas identity is forwarded when present in the projection payload.
+	// These fields are metadata, not canonical authority owned by Qdrant.
+	SymbolVersionID        string
+	PacketKey              string
+	SourceRef              string
+	CanonicalSourceRef     string
+	ContentHash            string
+	WorkspaceRevision      string
+	SourceRevision         string
+	RepresentationID       string
+	RepresentationRevision string
 }
 
 type researchQdrantChunk struct {
@@ -858,6 +869,24 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 			clusterMetadata.BmuCol = *chunk.BmuCol
 		}
 	}
+	identityMetadata := map[string]string{
+		"projection_kind": "qdrant",
+	}
+	for key, value := range map[string]string{
+		"symbol_version_id":       chunk.SymbolVersionID,
+		"packet_key":              chunk.PacketKey,
+		"source_ref":              chunk.SourceRef,
+		"canonical_source_ref":    chunk.CanonicalSourceRef,
+		"content_hash":            chunk.ContentHash,
+		"workspace_revision":      chunk.WorkspaceRevision,
+		"source_revision":         chunk.SourceRevision,
+		"representation_id":       chunk.RepresentationID,
+		"representation_revision": chunk.RepresentationRevision,
+	} {
+		if value != "" {
+			identityMetadata[key] = value
+		}
+	}
 
 	return &pb.SearchChunkResult{
 		Id:             id,
@@ -874,6 +903,7 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 			FilePath:   chunk.FilePath,
 			RouteId:    chunk.RouteID,
 			Collection: collectionCodebase,
+			Metadata:   identityMetadata,
 		},
 		ScoreMetadata: &pb.RetrievalScoreMetadata{
 			Score:         chunk.Score,
@@ -989,6 +1019,15 @@ func qdrantPointsToChunks(points []*qdrantclient.ScoredPoint, isCodebase bool) [
 			continue
 		}
 		if isCodebase {
+			c.SymbolVersionID = qdrantFirstStr(payload, "symbol_version_id", "symbolVersionId")
+			c.PacketKey = qdrantFirstStr(payload, "packet_key", "packetKey")
+			c.SourceRef = qdrantFirstStr(payload, "source_ref", "sourceRef")
+			c.CanonicalSourceRef = qdrantFirstStr(payload, "canonical_source_ref", "canonicalSourceRef")
+			c.ContentHash = qdrantFirstStr(payload, "content_hash", "contentHash", "hash")
+			c.WorkspaceRevision = qdrantFirstStr(payload, "workspace_revision", "workspaceRevision")
+			c.SourceRevision = qdrantFirstStr(payload, "source_revision", "sourceRevision")
+			c.RepresentationID = qdrantFirstStr(payload, "representation_id", "representationId")
+			c.RepresentationRevision = qdrantFirstStr(payload, "representation_revision", "representationRevision")
 			c.FilePath = qdrantStr(payload, "file_path")
 			c.ChunkIndex = qdrantInt32(payload, "chunk_index")
 			c.ContentPreview = truncate(qdrantStr(payload, "content"), 500)
@@ -1074,6 +1113,15 @@ func (s *retrievalServer) qdrantSearchREST(ctx context.Context, collection, vect
 		}
 		if p := r.Payload; p != nil {
 			if isCodebase {
+				c.SymbolVersionID = anyStr(p["symbol_version_id"])
+				c.PacketKey = anyStr(p["packet_key"])
+				c.SourceRef = anyStr(p["source_ref"])
+				c.CanonicalSourceRef = anyStr(p["canonical_source_ref"])
+				c.ContentHash = anyStr(p["content_hash"])
+				c.WorkspaceRevision = anyStr(p["workspace_revision"])
+				c.SourceRevision = anyStr(p["source_revision"])
+				c.RepresentationID = anyStr(p["representation_id"])
+				c.RepresentationRevision = anyStr(p["representation_revision"])
 				c.FilePath = anyStr(p["file_path"])
 				c.Kind = anyStr(p["kind"])
 				c.HTTPMethod = anyStr(p["httpMethod"])
@@ -1818,16 +1866,25 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 	protoChunks := make([]*pb.CodebaseChunk, len(chunks))
 	for i, c := range chunks {
 		protoChunks[i] = &pb.CodebaseChunk{
-			ChunkId:        c.ID,
-			FilePath:       c.FilePath,
-			Kind:           c.Kind,
-			HttpMethod:     c.HTTPMethod,
-			RouteId:        c.RouteID,
-			Tags:           c.Tags,
-			ContentPreview: c.ContentPreview,
-			Score:          c.Score,
-			StartLine:      c.StartLine,
-			EndLine:        c.EndLine,
+			ChunkId:                c.ID,
+			FilePath:               c.FilePath,
+			Kind:                   c.Kind,
+			HttpMethod:             c.HTTPMethod,
+			RouteId:                c.RouteID,
+			Tags:                   c.Tags,
+			ContentPreview:         c.ContentPreview,
+			Score:                  c.Score,
+			StartLine:              c.StartLine,
+			EndLine:                c.EndLine,
+			PacketKey:              c.PacketKey,
+			SourceRef:              c.SourceRef,
+			CanonicalSourceRef:     c.CanonicalSourceRef,
+			SymbolVersionId:        c.SymbolVersionID,
+			ContentHash:            c.ContentHash,
+			WorkspaceRevision:      c.WorkspaceRevision,
+			SourceRevision:         c.SourceRevision,
+			RepresentationId:       c.RepresentationID,
+			RepresentationRevision: c.RepresentationRevision,
 		}
 	}
 
@@ -2577,6 +2634,15 @@ func qdrantStr(m map[string]*qdrantclient.Value, key string) string {
 	}
 	if iv, ok := v.GetKind().(*qdrantclient.Value_IntegerValue); ok {
 		return strconv.FormatInt(iv.IntegerValue, 10)
+	}
+	return ""
+}
+
+func qdrantFirstStr(m map[string]*qdrantclient.Value, keys ...string) string {
+	for _, key := range keys {
+		if value := qdrantStr(m, key); value != "" {
+			return value
+		}
 	}
 	return ""
 }

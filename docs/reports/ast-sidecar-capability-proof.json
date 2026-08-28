@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.ast.sidecar.proof.v3",
-  "generatedAt": "2026-08-26T22:51:05.907Z",
+  "generatedAt": "2026-08-28T02:39:51.871Z",
   "endpoint": "http://127.0.0.1:8095",
   "status": "PROVEN",
   "structuralStatus": "PROVEN",
@@ -29,7 +29,7 @@
   "runtime": {
     "health": {
       "status": "ok",
-      "model": "miniforge-nlp-sidecar",
+      "model": "ornith-1.5-9b",
       "contract": "provenance-v2"
     },
     "ast": {

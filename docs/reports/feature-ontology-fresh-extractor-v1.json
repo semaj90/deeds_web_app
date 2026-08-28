@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.feature-ontology-fresh-extractor.v1",
+  "generatedAt": "2026-08-28T02:10:06.643Z",
+  "mode": "READ_ONLY_AUDIT",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "approvalReceipt": "docs/reports/feature-ontology-explicit-alias-approval-v1.json",
+  "resolverRevision": "feature-ontology-explicit-alias:v1",
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "historicalProducer": "atlas-packets-ontology-v1",
+  "targetContract": "fresh revision-qualified USES_CONCEPT candidates",
+  "counts": {
+    "approvedSourceRefs": 6,
+    "historicalTuples": 595,
+    "currentSourcesReady": 6,
+    "graphifySourcesReady": 6,
+    "localDigestMatchesObservation": 6,
+    "compatibleFreshExtractors": 1
+  },
+  "sourceParity": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "fileExists": true,
+      "localContentDigest": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "expectedContentDigest": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 114
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "fileExists": true,
+      "localContentDigest": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "expectedContentDigest": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 63
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "fileExists": true,
+      "localContentDigest": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "expectedContentDigest": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 59
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "fileExists": true,
+      "localContentDigest": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "expectedContentDigest": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 72
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "fileExists": true,
+      "localContentDigest": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "expectedContentDigest": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 189
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "fileExists": true,
+      "localContentDigest": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "expectedContentDigest": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "localDigestMatchesObservation": true,
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "graphifySourceAvailable": true,
+      "historicalTupleCount": 98
+    }
+  ],
+  "extractorCandidates": [
+    {
+      "path": "scripts/atlas/audit-feature-ontology-fresh-extraction-v1.mjs",
+      "role": "bounded current-source review-only ontology candidate compiler",
+      "currentSourceInput": true,
+      "producesUsesConcept": true,
+      "status": "COMPATIBLE_REVIEW_ONLY_PRODUCER"
+    },
+    {
+      "path": "scripts/atlas/generate-ontology-tuples.mjs",
+      "role": "legacy multi-signal feature_ontology_tuples generator",
+      "currentSourceInput": false,
+      "producesUsesConcept": false,
+      "status": "INCOMPATIBLE_LEGACY_DATABASE_INPUT"
+    },
+    {
+      "path": "scripts/atlas/materialize-registry-ontology-tuples.mts",
+      "role": "registry AST/schema/research projection",
+      "currentSourceInput": false,
+      "producesUsesConcept": false,
+      "status": "INCOMPATIBLE_DIFFERENT_PROJECTION"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/langextract-code-enrich.py",
+      "role": "LangExtract-style code concept enrichment",
+      "currentSourceInput": true,
+      "producesUsesConcept": false,
+      "status": "INCOMPATIBLE_CONCEPTS_ONLY"
+    }
+  ],
+  "policy": {
+    "preserveHistoricalTuples": true,
+    "rewriteHistoricalTuples": false,
+    "materializeRelationships": false,
+    "requireFreshSourceRevision": true,
+    "requireCurrentGraphifyObservation": true,
+    "rejectPathOnlyConceptInference": true
+  },
+  "status": "FRESH_ONTOLOGY_EXTRACTOR_OWNER_WIRED_REVIEW_ONLY",
+  "nextGate": "REVIEW_FRESH_ONTOLOGY_CANDIDATES_BEFORE_REL_01B"
+}

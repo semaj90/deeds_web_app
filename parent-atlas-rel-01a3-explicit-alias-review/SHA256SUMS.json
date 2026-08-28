@@ -1,0 +1,7 @@
+{
+  "README-INTEGRATE.md": "9b2f6ca01da098b7ec65104ea516e9a866ff42234fc9541219da11ac8c5a2283",
+  "STATUS-TEMPLATE.md": "5d54d03291e7760ab7b238a632dc61277c6c3241d7c43bc471c15e69fe205436",
+  "packages/parent-atlas/test/feature-ontology-explicit-alias-v1.test.mjs": "10f4a2e49849b397a26b704d8f0558125910d3327f594cd85c200e792bf4544c",
+  "scripts/atlas/audit-feature-ontology-explicit-alias-v1.mjs": "c228eeedd0d732a828f87a2cf88c287d1c4ea2c4613fae7cef1c62651e9c36aa",
+  "scripts/atlas/lib/feature-ontology-explicit-alias-v1.mjs": "9fcd5f462958e0046e4c7b86639858210f8e37242e0e2bcb6a6e3678fd61dd79"
+}

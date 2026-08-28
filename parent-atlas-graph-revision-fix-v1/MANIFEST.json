@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.graph-revision-fix-bundle.v1",
+  "fileCount": 10,
+  "files": [
+    {
+      "path": "PATCH_README.md",
+      "sha256": "768e55bbc167cb696dce2484ab78b5e10b7d2962e82ea6b0c77d747b36914475",
+      "bytes": 4787
+    },
+    {
+      "path": "STATUS.md",
+      "sha256": "85e3a26adb52ad550cdf15e7d13492a17d151c1e26c65dc0ebf2ab1c91c1101d",
+      "bytes": 591
+    },
+    {
+      "path": "docs/reports/graph-revision-v1-determinism.json",
+      "sha256": "45b1ccf3b11e38949a023387aebeafa3c452193807809de383df729ef4ccb608",
+      "bytes": 779
+    },
+    {
+      "path": "scripts/atlas/graph-prod-01-build-production-structural-snapshot-v1.mts",
+      "sha256": "47bef048c4fcfc64c67569f0a54b77a1965b56515283ee131c64737af9062046",
+      "bytes": 9691
+    },
+    {
+      "path": "scripts/atlas/graph-rev-01-materialize-current-revision.mts",
+      "sha256": "3e60dd79f30454df32890daa9b7a4ef1913f35dca8710b61519f274a164ba502",
+      "bytes": 3840
+    },
+    {
+      "path": "scripts/atlas/lib/graph-revision-v1.mjs",
+      "sha256": "b171f5396444cead9db48877a2a76cb67d6861c3ae8c564c6be20fbc84071776",
+      "bytes": 7351
+    },
+    {
+      "path": "scripts/atlas/populate-hyperedges-from-taxonomy-edges-v1.mts",
+      "sha256": "7af57abc54d3a4c6e98081e8beeac0d71e4b33820c6cf40f8d457adf1f0669c9",
+      "bytes": 2625
+    },
+    {
+      "path": "scripts/atlas/prove-graph-revision-v1.mjs",
+      "sha256": "9d975c7cf0e9ed42e019d59c0d8a8ccf443c8de4ef9414205ee60a8315c9736d",
+      "bytes": 5752
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/graph/structural-graph-snapshot-from-incidence-v1.spec.ts",
+      "sha256": "740021aeb640f1a9e1e57517982946395316e599b7fa3b5592222b87c11489b5",
+      "bytes": 2748
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/graph/structural-graph-snapshot-from-incidence-v1.ts",
+      "sha256": "efdabf5a4e40147680359869fffb1c17c7968de3c908501b708a89f7997d048d",
+      "bytes": 2283
+    }
+  ],
+  "validation": {
+    "graphRevisionJsSyntax": "PASS",
+    "graphRevisionBoundedProof": "PROVEN_BOUNDED",
+    "typescriptIntegrationTests": "NOT_RUN_IN_BUNDLE_ENVIRONMENT"
+  },
+  "writesToLiveStores": false,
+  "candidatePromotionIncluded": false
+}

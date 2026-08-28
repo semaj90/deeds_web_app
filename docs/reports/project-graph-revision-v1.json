@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.project-graph-revision-proof.v1",
+  "status": "PROVEN_FIXTURE",
+  "deterministicOrdering": true,
+  "compilerEnvironmentChangeInvalidates": true,
+  "databaseWrites": false,
+  "inputs": [
+    "workspace_revision",
+    "project_config_checksum",
+    "compiler_options_checksum",
+    "dependency_lock_checksum",
+    "package_manifest_checksums",
+    "project_reference_checksums",
+    "declaration_file_checksums",
+    "source_revision_checksums",
+    "semantic_engine_revision",
+    "virtual_document_checksums",
+    "source_map_checksums"
+  ],
+  "remaining": [
+    "populate from the live workspace observation",
+    "include Svelte virtual-document and source-map receipts"
+  ]
+}

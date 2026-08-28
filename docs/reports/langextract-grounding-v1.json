@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.langextract-grounding-receipt.v1",
+  "generatedAt": "2026-08-28T05:03:24.623Z",
+  "mode": "READ_ONLY_SINGLE_SOURCE_PROBE",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/extract",
+    "httpStatus": 200,
+    "providerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.2|tree-sitter=0.9.0|chunker=4.0.0",
+    "modelId": null
+  },
+  "source": {
+    "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+    "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+    "byteLength": 16860,
+    "textSha256": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+  },
+  "request": {
+    "groundedExtractionRequired": true,
+    "extractionMode": "concepts",
+    "inputCharCount": 4000,
+    "sourceCharCount": 15998,
+    "inputSha256": "a3d26e1725c738fbb74cff4b62e5f6ea2e292065e8b4a4e41c884a2f412d62ad",
+    "timeoutMs": 90000
+  },
+  "output": {
+    "concepts": 50,
+    "entities": 6,
+    "entitiesWithExactIntervals": 6,
+    "groundedExtractions": 1,
+    "groundedExtractionUsed": true,
+    "relationships": 0
+  },
+  "semanticGrounding": {
+    "officialLangExtractProven": false,
+    "exactEntityOffsetsPresent": true,
+    "groundedConceptExtractionsPresent": true,
+    "ontologyAdmissionAllowed": false
+  },
+  "status": "GROUNDED_SEMANTIC_EXTRACTION_PROVEN_BOUNDED",
+  "nextGate": "CONFIGURE_OR_PROVE_OFFICIAL_LANGEXTRACT_GROUNDED_EXTRACTIONS"
+}

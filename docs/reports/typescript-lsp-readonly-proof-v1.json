@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.typescript-lsp-readonly-proof.v1",
+  "status": "PROVEN_READ_ONLY",
+  "writes": false,
+  "server": {
+    "id": "typescript-language-server",
+    "version": "5.3.0",
+    "command": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\.bin\\typescript-language-server.cmd"
+  },
+  "sourceRef": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+  "sourceRevision": "sha256:88298e4ad456199331330f8c8f9ca5cb44bdef1a4e7c9433362eeaf443118495",
+  "probeSymbol": "createNodeTreeSitterAstProvider",
+  "position": {
+    "line": 363,
+    "character": 16
+  },
+  "clientOfferedPositionEncodings": [
+    "utf-8",
+    "utf-16",
+    "utf-32"
+  ],
+  "negotiatedPositionEncoding": "utf-16-default",
+  "positionEncodingExplicitlyReturned": false,
+  "initializeError": null,
+  "definitionError": null,
+  "definitionCount": 1,
+  "stderr": null,
+  "error": null
+}

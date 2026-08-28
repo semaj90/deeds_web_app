@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-packet-lineage-census-v1",
-  "generatedAt": "2026-08-27T19:45:29.061Z",
+  "generatedAt": "2026-08-27T22:50:50.444Z",
   "readOnly": true,
   "postgresWrites": false,
   "packetSourceColumn": "source_ref",
@@ -16,7 +16,7 @@
     "missing_graphify_source": 60998,
     "duplicate_source_ref": 0,
     "source_revision_match": 0,
-    "stale_packet": 128
+    "stale_packet": 256
   },
   "classificationCounts": {
     "IDENTITY_UNRESOLVED": 1,
@@ -46,7 +46,7 @@
     "graphify_distinct_source_refs": 768,
     "workspace_binding_matches": 768,
     "source_digest_matches": 768,
-    "latest_batch_selection_checksum": "f48ed93306f0e95611c4a74d9e5b6de8c820d31beaf78052668a2530c69508a9",
+    "latest_batch_selection_checksum": "8067dc230b59e1bd643d54ee38356422886ca158bc457cf6d7296a016587cbf7",
     "latest_batch_applied": true,
     "latest_batch_readback_count": 128,
     "latest_batch_report": ".tmp/atlas/graphify-source-inventory-batch-v1.json",

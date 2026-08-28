@@ -14,7 +14,7 @@ import {
 export const WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION = 'atlas.workspace-revision-origin-runtime.2026-08-21.v1' as const;
 
 const DEFAULT_SOURCE_EXTENSIONS = new Set([
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.svelte',
+  '.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs', '.svelte',
   '.py', '.go', '.rs', '.java', '.kt', '.kts', '.cs',
   '.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp',
   '.sql', '.proto', '.graphql', '.gql',

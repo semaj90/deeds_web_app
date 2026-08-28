@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.lsp-semantic-observation-proof.v1",
+  "status": "PROVEN_FIXTURE_AND_LIVE_READ_ONLY",
+  "canonicalAuthority": false,
+  "databaseWrites": false,
+  "sourceRevisionGuard": true,
+  "workspaceRevisionGuard": true,
+  "structuralFabricWired": true,
+  "compilerSemanticRevisionIndependent": true,
+  "positionEncodingRecorded": true,
+  "positionEncodingByteMapping": "PROVEN_FIXTURE",
+  "projectRevisionRecorded": true,
+  "testsPassed": 10,
+  "testsFailed": 0,
+  "remaining": [
+    "stable-symbol canonicalization through the existing Postgres resolver",
+    "compiler-semantic graph snapshot over a bounded source cohort"
+  ],
+  "liveProof": [
+    "docs/reports/typescript-lsp-readonly-proof-v1.json",
+    "docs/reports/svelte-language-server-readonly-proof-v1.json"
+  ],
+  "projectGraphProof": "docs/reports/project-graph-revision-v1.json"
+}

@@ -105,9 +105,11 @@ echo "Generating Go stubs from $PROTO_SRC → $OUT_DIR"
   "--plugin=protoc-gen-go=$PROTOC_GEN_GO_BIN" \
   "--plugin=protoc-gen-go-grpc=$PROTOC_GEN_GO_GRPC_BIN" \
   --proto_path="$PROTO_ROOT_ARG" \
+  --proto_path="$(to_native_tool_path "$REPO_ROOT/proto")" \
   --go_out="$OUT_DIR_ARG" \
   --go_opt=paths=source_relative \
   --go_opt=Mproto/active/retrieval.proto=github.com/deeds-web-app/services/go-retrieval-service/proto/retrieval \
+  --go_opt=Mshared_ids.proto=github.com/deeds-web-app/services/go-retrieval-service/proto/shared \
   --go-grpc_out="$OUT_DIR_ARG" \
   --go-grpc_opt=paths=source_relative \
   --go-grpc_opt=Mproto/active/retrieval.proto=github.com/deeds-web-app/services/go-retrieval-service/proto/retrieval \
@@ -118,5 +120,16 @@ if [ -d "$OUT_DIR/proto/active" ]; then
   mv "$OUT_DIR/proto/active/"*.go "$OUT_DIR/"
   rm -rf "$OUT_DIR/proto"
 fi
+
+# Generate the imported shared message package locally for this standalone Go module.
+SHARED_OUT_DIR="$OUT_DIR/../shared"
+mkdir -p "$SHARED_OUT_DIR"
+"$PROTOC_BIN" \
+  "--plugin=protoc-gen-go=$PROTOC_GEN_GO_BIN" \
+  --proto_path="$(to_native_tool_path "$REPO_ROOT/proto")" \
+  --go_out="$(to_native_tool_path "$SHARED_OUT_DIR")" \
+  --go_opt=paths=source_relative \
+  --go_opt=Mshared_ids.proto=github.com/deeds-web-app/services/go-retrieval-service/proto/shared \
+  shared_ids.proto
 
 echo "✅ Generated $(ls "$OUT_DIR"/*.go 2>/dev/null | wc -l) files in $OUT_DIR"

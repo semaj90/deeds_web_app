@@ -1,0 +1,450 @@
+{
+  "schema": "atlas.feature-ontology-fresh-review-queue.v1",
+  "generatedAt": "2026-08-28T03:12:43.238Z",
+  "mode": "READ_ONLY_REVIEW_QUEUE",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "input": "docs/reports/feature-ontology-fresh-candidate-validation-v1.json",
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "queueChecksum": "e7c438ae856a238f8d0576409d857e9a1912bae5dd4b2221225b1bf805855084",
+  "counts": {
+    "queued": 24,
+    "pending": 24,
+    "approved": 0,
+    "rejected": 0,
+    "requiringGroundedSemanticReview": 22,
+    "structuralEvidencePresent": 24
+  },
+  "decisionPolicy": {
+    "allowed": [
+      "APPROVE",
+      "REJECT",
+      "REGENERATE_ONTOLOGY_REQUIRED"
+    ],
+    "defaultDecision": "PENDING_REVIEW",
+    "approvalRequires": [
+      "sourceRef exact",
+      "sourceRevision exact",
+      "workspaceRevision exact",
+      "concept identity reviewed",
+      "evidence span or approved structural mapping"
+    ],
+    "prohibitedAutomaticPromotion": true
+  },
+  "queue": [
+    {
+      "reviewId": "review:0001:fresh-multilane:8a57b8f6b3f70de53427bd3a9cfad25e",
+      "candidateId": "fresh-multilane:8a57b8f6b3f70de53427bd3a9cfad25e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:claude",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0002:fresh-multilane:35b5d7c647b7c7ea9f1ea5911413a290",
+      "candidateId": "fresh-multilane:35b5d7c647b7c7ea9f1ea5911413a290",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:codebase",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0003:fresh-multilane:ab7e9fcdfa2a1e65c5e94be7073f8e5e",
+      "candidateId": "fresh-multilane:ab7e9fcdfa2a1e65c5e94be7073f8e5e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:capabilities",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0004:fresh-multilane:fa1774c3feff9ed3c7fca8740b1a6371",
+      "candidateId": "fresh-multilane:fa1774c3feff9ed3c7fca8740b1a6371",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:canonicaltracerow",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0005:fresh-multilane:3425cbe7ad63b02ceb57513ef354eb23",
+      "candidateId": "fresh-multilane:3425cbe7ad63b02ceb57513ef354eb23",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:ace",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0006:fresh-multilane:d9c0cea0720844f9fa34e581e7c2f5a3",
+      "candidateId": "fresh-multilane:d9c0cea0720844f9fa34e581e7c2f5a3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:dag",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0007:fresh-multilane:2116509a795e255a2bde4fb92a89ed3e",
+      "candidateId": "fresh-multilane:2116509a795e255a2bde4fb92a89ed3e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:end",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0008:fresh-multilane:1dec7fa8e7a278fc5eaf2dee474e424a",
+      "candidateId": "fresh-multilane:1dec7fa8e7a278fc5eaf2dee474e424a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:env",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0009:fresh-multilane:38c20b67f460ad52fc19e4b8aae42b4e",
+      "candidateId": "fresh-multilane:38c20b67f460ad52fc19e4b8aae42b4e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:aware",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0010:fresh-multilane:cb4305178e6140a1bec45b972f63205c",
+      "candidateId": "fresh-multilane:cb4305178e6140a1bec45b972f63205c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:cross",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0011:fresh-multilane:a97f98b8a68230840086b7d3902a5348",
+      "candidateId": "fresh-multilane:a97f98b8a68230840086b7d3902a5348",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:entity",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0012:fresh-multilane:093d5c144017d078d5ade7061d3883e0",
+      "candidateId": "fresh-multilane:093d5c144017d078d5ade7061d3883e0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:encoder",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0013:fresh-multilane:630e4310ab00108d7204ea1a0f7743c3",
+      "candidateId": "fresh-multilane:630e4310ab00108d7204ea1a0f7743c3",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:atlas",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0014:fresh-multilane:bf0f6e037bacb4fb50ec361924643d99",
+      "candidateId": "fresh-multilane:bf0f6e037bacb4fb50ec361924643d99",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:array",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0015:fresh-multilane:4271372871cdaa514d14d290bdfaf593",
+      "candidateId": "fresh-multilane:4271372871cdaa514d14d290bdfaf593",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:grpo",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0016:fresh-multilane:b5d2c3797ca2acc59fcbedbffaee5f5c",
+      "candidateId": "fresh-multilane:b5d2c3797ca2acc59fcbedbffaee5f5c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:pipeline",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0017:fresh-multilane:b44e2b040ab04f44cf766f10d1d6145d",
+      "candidateId": "fresh-multilane:b44e2b040ab04f44cf766f10d1d6145d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:min-join-coverage",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0018:fresh-multilane:cc8ea4e1a47c8ad9a61005c0ab54ffc8",
+      "candidateId": "fresh-multilane:cc8ea4e1a47c8ad9a61005c0ab54ffc8",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:anonymous",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0019:fresh-multilane:0d00ce7581862199de03705127e45333",
+      "candidateId": "fresh-multilane:0d00ce7581862199de03705127e45333",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:concurrent",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0020:fresh-multilane:87c60a039d847876f247669b51d3bb1f",
+      "candidateId": "fresh-multilane:87c60a039d847876f247669b51d3bb1f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:code",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0021:fresh-multilane:2873ae65ed333284eb0c9f46050c6848",
+      "candidateId": "fresh-multilane:2873ae65ed333284eb0c9f46050c6848",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:falls",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0022:fresh-multilane:e8c7f98f91b340f9cf18e56c0519db6e",
+      "candidateId": "fresh-multilane:e8c7f98f91b340f9cf18e56c0519db6e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:canonical-collection",
+      "evidence": {
+        "structural": true,
+        "groundedText": false,
+        "requiresGroundedSemanticReview": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0023:fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "candidateId": "fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:mixedbread",
+      "evidence": {
+        "structural": true,
+        "groundedText": true,
+        "requiresGroundedSemanticReview": false
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    },
+    {
+      "reviewId": "review:0024:fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "candidateId": "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:stategraph",
+      "evidence": {
+        "structural": true,
+        "groundedText": true,
+        "requiresGroundedSemanticReview": false
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false,
+      "relationshipMaterializationAllowed": false
+    }
+  ],
+  "status": "REVIEW_QUEUE_READY_NOT_APPROVED",
+  "nextGate": "HUMAN_REVIEW_DECISIONS_AND_GROUNDED_SEMANTIC_EVIDENCE"
+}

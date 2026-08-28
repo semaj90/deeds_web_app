@@ -113,6 +113,14 @@ def normalize_langextract_extraction(item: Any) -> dict[str, Any]:
             start_pos = getattr(interval, "start_pos", None)
             end_pos = getattr(interval, "end_pos", None)
 
+    # The bundled compatibility extractor predates LangExtract's native
+    # CharInterval object and exposes the same coordinates as start_char /
+    # end_char. Preserve those exact offsets at the adapter boundary rather
+    # than treating an otherwise byte-grounded extraction as ungrounded.
+    if start_pos is None and end_pos is None:
+        start_pos = _field(item, "start_char")
+        end_pos = _field(item, "end_char")
+
     extraction_class = _field(item, "extraction_class", "label") or "UNKNOWN"
     extraction_text = _field(item, "extraction_text", "text") or ""
     attributes = _field(item, "attributes") or {}

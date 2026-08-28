@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.current-feature-ontology-relationship-apply-plan.v1",
+  "generatedAt": "2026-08-28T04:50:52.012Z",
+  "mode": "NON_PRODUCTION_REVIEW_ONLY",
+  "sourceMaterializationReport": "docs/reports/feature-ontology-relationship-materialization-v1.json",
+  "sourceGraphRevisionReport": "docs/reports/current-feature-ontology-graph-revision-v1.json",
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "relationshipGraphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025",
+  "relationshipCount": 8,
+  "relationshipIds": [
+    "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+    "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+    "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+    "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+    "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+    "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+    "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+    "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+  ],
+  "relationshipSelectionChecksum": "fb3a401d40b49cb7ef8e40e531c4cdd53a3e2653b790610bcaf5ceb4580fc6ae",
+  "preconditions": {
+    "materializationCanonicalWrites": true,
+    "graphRevisionReplayInvariant": true,
+    "rejectedUnboundTuples": 595,
+    "allSelectedRelationshipsCurrentBound": true
+  },
+  "writeBoundaries": {
+    "relationshipApplyAuthorized": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "neo4jWrites": false,
+    "valkeyWrites": false,
+    "tupleRewrites": false,
+    "historicalRowsRewritten": false
+  },
+  "status": "CURRENT_RELATIONSHIP_APPLY_PLAN_READY_FOR_EXPLICIT_AUTHORIZATION",
+  "nextGate": "EXPLICIT_NON_PRODUCTION_RELATIONSHIP_APPLY_AUTHORIZATION"
+}

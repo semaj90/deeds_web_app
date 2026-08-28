@@ -14,6 +14,7 @@ const row = (overrides = {}) => ({
   feature_id: 'feature:example',
   feature_label: 'Example feature',
   domain_class: 'backend',
+  workspace_revision: `sha256:${'d'.repeat(64)}`,
   subject_type: 'feature',
   subject_id: 'feature:example',
   predicate: 'USES_CONCEPT',
@@ -41,6 +42,11 @@ test('maps USES_CONCEPT into a deterministic preview relationship', () => {
 
 test('does not map taxonomy predicates into FI relationships', () => {
   assert.equal(previewFeatureOntologyRelationship(row({ predicate: 'CLASSIFIED_AS' })), null);
+});
+
+test('rejects missing or non-canonical workspace revisions instead of substituting history', () => {
+  assert.throws(() => previewFeatureOntologyRelationship(row({ workspace_revision: undefined })), /MISSING_WORKSPACE_REVISION/);
+  assert.throws(() => previewFeatureOntologyRelationship(row({ workspace_revision: 'git:old-head' })), /NON_CANONICAL_WORKSPACE_REVISION/);
 });
 
 test('rejects malformed rows without fabricating evidence', () => {

@@ -25,7 +25,7 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     psutil \
     beautifulsoup4 \
     spacy \
-    langextract==1.6.0 \
+    langextract[openai]==1.6.0 \
     treesitter-chunker \
     tree-sitter \
     tree-sitter-language-pack \

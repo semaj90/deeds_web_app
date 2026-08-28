@@ -1,5 +1,4 @@
 import pg from 'pg';
-import { execSync } from 'node:child_process';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 // See kag-persist-hyperedges-live-proof-v1.mts for why DATABASE_URL must be
@@ -48,22 +47,33 @@ const LIMIT = (() => {
 })();
 const BATCH_SIZE = 500;
 
-function gitHead(): string {
-  return execSync('git rev-parse --short HEAD', { cwd: new URL('../..', import.meta.url).pathname.replace(/^\/([A-Za-z]):/, '$1:') })
-    .toString()
-    .trim();
+function requiredRevision(name: string): string {
+  const idx = process.argv.indexOf(`--${name}`);
+  const value = idx >= 0 ? process.argv[idx + 1] : undefined;
+  if (!value || value.startsWith('--')) throw new Error(`TAXONOMY_BRIDGE_${name.toUpperCase()}_REQUIRED`);
+  return value;
+}
+
+function hasFlag(name: string): boolean {
+  return process.argv.includes(`--${name}`);
 }
 
 async function main() {
-  const workspaceRevision = `git:${gitHead()}`;
-  const sourceRevision = workspaceRevision;
-  const graphRevision = 'taxonomy-edges-v1-2026-05-08';
+  if (!hasFlag('historical-bridge')) throw new Error('TAXONOMY_BRIDGE_HISTORICAL_MODE_REQUIRED');
+  // This bridge is intentionally historical. Revisions must be supplied by
+  // the operator from evidence; never derive source/workspace identity from
+  // Git HEAD and never reuse a fixed graph revision as current authority.
+  const workspaceRevision = requiredRevision('workspace-revision');
+  const sourceRevision = requiredRevision('source-revision');
+  const graphRevision = requiredRevision('graph-revision');
   const producerRevision = 'taxonomy-edges-bridge.v1';
 
   const pool = new Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 2 });
 
   const report: Record<string, unknown> = {
     schema: 'atlas.populate-hyperedges-from-taxonomy-edges.v1',
+    mode: 'HISTORICAL_BRIDGE',
+    canonicalAuthority: false,
     limit: LIMIT,
   };
 

@@ -1,0 +1,124 @@
+{
+  "schema": "atlas.svelte-language-server-readonly-proof.v1",
+  "status": "PROVEN_LIVE_READ_ONLY",
+  "writes": false,
+  "server": {
+    "id": "svelte-language-server",
+    "version": "0.18.3",
+    "command": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\.bin\\svelteserver.cmd"
+  },
+  "sourceRef": "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
+  "sourceRevision": "sha256:740a5617df8857f425ae293e7d843fd5198e89912d383ba393b941510237bcd1",
+  "probeSymbol": "POIPhotoModalImpl",
+  "position": {
+    "line": 7,
+    "character": 9
+  },
+  "negotiatedPositionEncoding": "utf-16-default",
+  "serverCapabilities": {
+    "textDocumentSync": {
+      "openClose": true,
+      "change": 2,
+      "save": {
+        "includeText": false
+      }
+    },
+    "hoverProvider": true,
+    "completionProvider": {
+      "resolveProvider": true,
+      "triggerCharacters": [
+        ".",
+        "\"",
+        "'",
+        "`",
+        "/",
+        "@",
+        "<",
+        ">",
+        "*",
+        "#",
+        "$",
+        "+",
+        "^",
+        "(",
+        "[",
+        "@",
+        "-",
+        ":",
+        "|"
+      ],
+      "completionItem": {
+        "labelDetailsSupport": true
+      }
+    },
+    "documentFormattingProvider": true,
+    "colorProvider": true,
+    "documentSymbolProvider": true,
+    "definitionProvider": true,
+    "codeActionProvider": true,
+    "renameProvider": true,
+    "referencesProvider": true,
+    "selectionRangeProvider": true,
+    "signatureHelpProvider": {
+      "triggerCharacters": [
+        "(",
+        ",",
+        "<"
+      ],
+      "retriggerCharacters": [
+        ")"
+      ]
+    },
+    "semanticTokensProvider": {
+      "legend": {
+        "tokenModifiers": [
+          "declaration",
+          "static",
+          "async",
+          "readonly",
+          "defaultLibrary",
+          "local"
+        ],
+        "tokenTypes": [
+          "class",
+          "enum",
+          "interface",
+          "namespace",
+          "typeParameter",
+          "type",
+          "parameter",
+          "variable",
+          "enumMember",
+          "property",
+          "function",
+          "method",
+          "event"
+        ]
+      },
+      "range": true,
+      "full": true
+    },
+    "linkedEditingRangeProvider": true,
+    "implementationProvider": true,
+    "typeDefinitionProvider": true,
+    "inlayHintProvider": true,
+    "callHierarchyProvider": true,
+    "foldingRangeProvider": true,
+    "codeLensProvider": {
+      "resolveProvider": true
+    },
+    "documentHighlightProvider": true,
+    "workspaceSymbolProvider": true,
+    "diagnosticProvider": {
+      "interFileDependencies": true,
+      "workspaceDiagnostics": false
+    }
+  },
+  "hoverPresent": true,
+  "definitionCount": 1,
+  "initializeError": null,
+  "hoverError": null,
+  "definitionError": null,
+  "stderr": "Initialize language server at  file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend\nInitialize new ts service at  c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/tsconfig.json\nTrying to load configs for c:/Users/james/Videos/deeds-web-app/sveltekit-frontend\nThe following Vite config options will be overridden by SvelteKit:\n  - root\nLoaded config at  c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\svelte.config.js\nSnapshotManager File Statistics:\nProject files: 4644\nSvelte files: 923\nFrom node_modules: 0\nTotal: 4644",
+  "error": null
+}

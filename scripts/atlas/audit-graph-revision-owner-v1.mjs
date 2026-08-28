@@ -37,13 +37,21 @@ async function main() {
   `);
   const present = new Set(tables.rows.map((row) => row.table_name));
   const revisionTables = {};
+  const revisionlessTables = {};
   for (const table of present) {
     const columns = await pool.query(`
       SELECT column_name FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = $1
     `, [table]);
     const names = new Set(columns.rows.map((row) => row.column_name));
-    if (!names.has('graph_revision')) continue;
+    if (!names.has('graph_revision')) {
+      const count = await pool.query(`SELECT count(*)::integer AS rows FROM public.${table}`);
+      revisionlessTables[table] = {
+        rows: Number(count.rows[0]?.rows ?? 0),
+        reason: 'GRAPH_REVISION_COLUMN_UNAVAILABLE',
+      };
+      continue;
+    }
     const workspace = names.has('workspace_revision') ? 'workspace_revision' : 'NULL::text';
     const result = await pool.query(`
       SELECT count(*)::integer AS rows,
@@ -73,6 +81,7 @@ async function main() {
     postgresWrites: false,
     expectedWorkspaceRevision: workspaceRevision,
     presentTables: [...present].sort(),
+    revisionlessTables,
     revisionTables,
     ownerCandidates: {
       atlasGraphSnapshotsV2: snapshotOwner ? 'SCHEMA_OWNER_CANDIDATE' : 'UNAVAILABLE',
@@ -89,7 +98,7 @@ async function main() {
   await pool.end();
   console.log(JSON.stringify({
     schema: report.schema, status: report.status, readOnly: true,
-    expectedWorkspaceRevision: workspaceRevision, revisionTables, report: REPORT,
+    expectedWorkspaceRevision: workspaceRevision, revisionlessTables, revisionTables, report: REPORT,
   }, null, 2));
 }
 

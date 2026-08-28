@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graph-revision-owner.v1",
-  "generatedAt": "2026-08-27T19:48:19.693Z",
+  "generatedAt": "2026-08-27T23:29:49.359Z",
   "readOnly": true,
   "postgresWrites": false,
   "expectedWorkspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
@@ -12,6 +12,16 @@
     "atlas_taxonomy_assignment_candidates",
     "graph_analysis_runs"
   ],
+  "revisionlessTables": {
+    "atlas_graph_snapshots_v2": {
+      "rows": 2,
+      "reason": "GRAPH_REVISION_COLUMN_UNAVAILABLE"
+    },
+    "atlas_relationships": {
+      "rows": 603,
+      "reason": "GRAPH_REVISION_COLUMN_UNAVAILABLE"
+    }
+  },
   "revisionTables": {
     "atlas_hyperedges": {
       "rows": 62802,

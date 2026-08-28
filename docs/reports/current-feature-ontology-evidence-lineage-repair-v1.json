@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.current-feature-ontology-evidence-lineage-repair.v1",
+  "mode": "apply",
+  "planPath": "docs\\reports\\current-feature-ontology-evidence-lineage-repair-plan-v1.json",
+  "planSelectionChecksum": "dd92b7238fd8385bca322a9c3431f7280c4045fecd9f0f5b37bd043a230a7f7e",
+  "expectedRows": 8,
+  "relationshipRows": 8,
+  "evidenceRows": 8,
+  "writesPerformed": true,
+  "mismatches": [],
+  "status": "EVIDENCE_LINEAGE_REPAIR_APPLIED_READBACK_PROVEN"
+}

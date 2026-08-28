@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.go-retrieval-identity-wiring.v1",
+  "status": "CREATED_WIRED_PROVEN_LIVE",
+  "canonicalIdentity": "symbol_version_id > packet_key > content_hash > canonical_source_ref",
+  "projectionIdentity": "qdrant_point_id",
+  "uuidOrUlidPolicy": "opaque_projection_or_storage_id_only",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "proof": {
+    "atlasCoreFocusedTests": "3/3",
+    "atlasCoreTypeCheck": "passed",
+    "goRetrievalTests": "passed",
+    "goRetrievalBuild": "passed",
+    "liveResponseAfterServiceRestart": "executed_identity_metadata",
+    "serviceImageRebuiltWithCache": true,
+    "serviceRecreatedNoDeps": true,
+    "liveResponse": {
+      "endpoint": "/search/codebase",
+      "boundedLimit": 3,
+      "statusCode": 200,
+      "returnedFields": [
+        "chunk_id",
+        "file_path",
+        "packet_key",
+        "source_ref",
+        "canonical_source_ref",
+        "symbol_version_id",
+        "content_hash",
+        "workspace_revision",
+        "source_revision",
+        "representation_id",
+        "representation_revision"
+      ],
+      "canonicalIdentityFieldsObserved": true,
+      "projectionOnlyHits": false,
+      "health": "READY_FULL",
+      "observedCanonicalIdentityRows": 3,
+      "observedProjectionOnlyRows": 0
+    }
+  },
+  "nextGate": "source_ref_namespace_reconciliation_and_current_corpus_parity",
+  "files": [
+    "packages/atlas-core/src/retrieval/repo-search-identity.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-client.ts",
+    "services/go-retrieval-service/main.go"
+  ]
+}

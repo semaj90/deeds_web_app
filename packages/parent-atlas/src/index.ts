@@ -49,6 +49,8 @@ export * from './core/langextract-grounding-adapter.js';
 export * from './core/langextract-sidecar-metadata-adapter.js';
 export * from './core/grounded-domain-proposal.js';
 export * from './core/structural-extraction-fabric.js';
+export * from './core/lsp-semantic-observation.js';
+export * from './core/project-graph-revision-v1.js';
 export * from './core/treesitter-chunker-evidence-adapter.js';
 export * from './core/symbol-registry-repository.js';
 export * from './core/evidence-ledger-repository.js';

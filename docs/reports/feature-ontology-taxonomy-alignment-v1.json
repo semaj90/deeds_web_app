@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.feature-ontology-taxonomy-alignment.v1",
+  "generatedAt": "2026-08-28T03:18:38.894Z",
+  "mode": "READ_ONLY_VALIDATION",
+  "input": {
+    "path": "docs/reports/feature-ontology-grounded-review-snapshot-v1.json",
+    "snapshotChecksum": "fec39adde5561e357e257120d33b87f0a70c27956d7c0dc8befb01b01c9fce37"
+  },
+  "canonicalDomains": [
+    "auth",
+    "ui",
+    "retrieval",
+    "network",
+    "database",
+    "cache",
+    "agent",
+    "graph",
+    "ml"
+  ],
+  "counts": {
+    "candidates": 2,
+    "validReviewOnly": 2,
+    "blocked": 0,
+    "approved": 0,
+    "canonicalAuthority": 0
+  },
+  "rows": [
+    {
+      "candidateId": "fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "objectId": "concept:mixedbread",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "canonicalDomain": "retrieval",
+      "conceptHint": "RERANKER",
+      "domainValid": true,
+      "reviewRequired": true,
+      "approved": false,
+      "canonicalAuthority": false,
+      "status": "REVIEW_ONLY_VALID"
+    },
+    {
+      "candidateId": "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "objectId": "concept:stategraph",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "canonicalDomain": "agent",
+      "conceptHint": "WORKFLOW_ORCHESTRATION",
+      "domainValid": true,
+      "reviewRequired": true,
+      "approved": false,
+      "canonicalAuthority": false,
+      "status": "REVIEW_ONLY_VALID"
+    }
+  ],
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "relationshipMaterializationAllowed": false,
+  "status": "TAXONOMY_HINTS_REVIEW_ONLY_VALID",
+  "nextGate": "HUMAN_REVIEW_DECISION_REQUIRED",
+  "reportChecksum": "9f8b86462466d7a2dfaed9cecbab24b73ad6c5cc2ecfa5e0f6356f09317ecf68"
+}

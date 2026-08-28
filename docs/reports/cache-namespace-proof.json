@@ -1,6 +1,6 @@
 {
   "schema": "cache_namespace_proof.v1",
-  "generated_at": "2026-08-27T17:41:06.288Z",
+  "generated_at": "2026-08-27T22:13:10.687Z",
   "canonical_truth": "Postgres",
   "namespaces": [
     {
@@ -44,12 +44,12 @@
         {
           "key": "ace:cluster:members:unclassified:community-67456",
           "type": "zset",
-          "ttl_seconds": 455754
+          "ttl_seconds": 439430
         },
         {
           "key": "ace:path:cluster:1",
           "type": "string",
-          "ttl_seconds": 455754
+          "ttl_seconds": 439430
         }
       ],
       "status": "PASS"
@@ -65,12 +65,12 @@
         {
           "key": "gpu:karpathy:summary",
           "type": "string",
-          "ttl_seconds": 455754
+          "ttl_seconds": 439430
         },
         {
           "key": "gpu:karpathy:scores",
           "type": "hash",
-          "ttl_seconds": 455754
+          "ttl_seconds": 439430
         }
       ],
       "status": "PASS"

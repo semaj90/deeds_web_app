@@ -32,6 +32,12 @@ export type { GanAuditDependencies } from './validation/gan-audit-integration.js
 export { searchFeatureRegistry, generateTokenSavingsRecommendation } from './retrieval/feature-registry-search.js';
 export { analyzeRetrievalCoverage, detectRetrievalGaps, generateRetrievalRecommendations } from './retrieval/gan-retrieval-analysis.js';
 export type { SearchablePacket, RetrievalGap, SearchQualityMetrics } from './retrieval/gan-retrieval-analysis.js';
+export {
+  mapRepoSearchIdentityV1,
+  type RepoSearchIdentityInput,
+  type RepoSearchIdentityV1,
+  type SearchProjectionKind,
+} from './retrieval/repo-search-identity.js';
 
 // Packet ingestion (Phase 85 P5)
 export { PacketReader } from './packet-reader.js';

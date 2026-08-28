@@ -1,0 +1,99 @@
+{
+  "schema": "atlas.feature-ontology-alias-target-registry-reconciliation.v1",
+  "generatedAt": "2026-08-28T00:12:07.774Z",
+  "mode": "READ_ONLY_PLAN",
+  "readOnly": true,
+  "postgresWrites": false,
+  "canonicalAuthorityChanged": false,
+  "aliasApprovalRequired": true,
+  "aliasSelectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "counts": {
+    "selectedTargets": 6,
+    "registryInsertCandidates": 0,
+    "alreadyRegistered": 6,
+    "observationMissing": 0,
+    "duplicates": 0
+  },
+  "rows": [
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-client.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "byteLength": 16860,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-dag.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "byteLength": 12706,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-research.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "byteLength": 27657,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/trace-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "byteLength": 8450,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "byteLength": 30735,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/langextract-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "repoId": null,
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "contentDigest": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "byteLength": 8432,
+      "commitSha": null,
+      "registryMatchCount": 1,
+      "classification": "ALREADY_REGISTERED"
+    }
+  ],
+  "nextGate": "RECONCILE_TARGET_CLASSIFICATIONS"
+}

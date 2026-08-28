@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-cohort-v1",
-  "generatedAt": "2026-08-27T19:37:56.033Z",
+  "generatedAt": "2026-08-28T05:40:32.151Z",
   "readOnly": true,
   "postgresWrites": false,
   "authority": {
@@ -19,17 +19,49 @@
   "counts": {
     "total_packets": 61660,
     "packets_with_source_ref": 61659,
-    "exact_graphify_source": 661,
-    "workspace_revision_present": 128,
-    "source_revision_present": 661,
+    "exact_graphify_source": 778,
+    "workspace_revision_present": 373,
+    "source_revision_present": 778,
     "packet_chunk_exact": 43,
     "packet_chunk_ambiguous": 465,
     "graph_revision_present": 0,
-    "semantic_revision_present": 661,
-    "source_chunk_qualified": 11,
+    "semantic_revision_present": 778,
+    "source_chunk_qualified": 15,
     "fully_qualified": 0
   },
   "sampleExactJoins": [
+    {
+      "packet_key": "packet:0004f849be72",
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:3392b96b6392dce3d6f9495f37ff1fa4c42ca3a648687c79a7a5e1aba3ed58e0",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:001007058f4a",
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:0017ebe58f96",
+      "source_ref": "scripts/run-migration.mjs",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
+    {
+      "packet_key": "packet:001f13a6f8f0",
+      "source_ref": "scripts/packets/load-packets-postgres.mjs",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
+      "graph_revision": null,
+      "semantic_revision": "0"
+    },
     {
       "packet_key": "packet:002461508185",
       "source_ref": "data/external-docs/raw/drizzle/queries.md",
@@ -39,74 +71,42 @@
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:01b9e9c83754",
-      "source_ref": "docs/engram-cache-architecture.md",
-      "workspace_revision": null,
-      "source_revision": "sha256:e0074f7cc033e5ec9e48fbab06bb48b6cc74b9c2e67b1bd6c0a80c31be7d5a60",
+      "packet_key": "packet:0046c7db4fb2",
+      "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:4b93aee30149eaa7ab54b465db9694de597d12feadadb0351544cc0b35f73c7f",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:01c814243512",
-      "source_ref": "docs/PHASE-17-RUNTIME-RECOVERY-CHECKLIST.md",
-      "workspace_revision": null,
-      "source_revision": "sha256:47048aa174a867650113b3825a8d9e69904964255b6ba93352bf28ef74d31bce",
+      "packet_key": "packet:0055a733c702",
+      "source_ref": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:57a4837b0c7a57ee8c790abbf9d11c5b08801c1952e2d6cee9e0ec80dc83022b",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:0260260b50e6",
-      "source_ref": "docs/phase100/feature-graph.json",
-      "workspace_revision": null,
-      "source_revision": "sha256:e5937361a4a352bf82d101570af8273bd7654fbe5c780b8fa5c811a4da100d08",
+      "packet_key": "packet:0057df284547",
+      "source_ref": "scripts/atlas/test-p4-nats-wiring.mts",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:027a8a87b4d1",
-      "source_ref": "docs/PHASE-14-15-IMPLEMENTATION-COMPLETE.md",
-      "workspace_revision": null,
-      "source_revision": "sha256:0cb53d646a7518a84d8c675763ce306f1a7c0999d43ff950877e02e7682322c6",
+      "packet_key": "packet:00581022d8d5",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:7485d11e10600f3517f91b26ee759d1972548ab47000f621829d70c227aa4786",
       "graph_revision": null,
       "semantic_revision": "0"
     },
     {
-      "packet_key": "packet:02acbc232ff9",
-      "source_ref": "docs/AGENTIC-LOOP-FROZEN.md",
-      "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
-      "source_revision": "sha256:eb91cf877bc7f2f876652db38ec71360fa855ce3c9ba5e9d4df80a10924e8c72",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:02f0a1ba4b19",
-      "source_ref": ".github/agents/legal-library-engineer.agent.md",
-      "workspace_revision": null,
-      "source_revision": "sha256:0268185c9aa78fb9d2c985a470a4b5c30ac3fae34d507ece8c948978f5851449",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:02ffd4e0b5af",
-      "source_ref": "docs/profile-cards/data/scripts_memory_graphify_gds_98714cf0f2af.json",
-      "workspace_revision": null,
-      "source_revision": "sha256:c4d3eed823dcb1ec2e27150f57b01ff7a5a11f19dfc5df59256c2cca4771808c",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:0329d6adfaa4",
-      "source_ref": "docs/packets/rg-toc.json",
-      "workspace_revision": null,
-      "source_revision": "sha256:a56bd198853651146a58ba9ed4eb1683c756575278e5094db3d149a669e080d1",
-      "graph_revision": null,
-      "semantic_revision": "0"
-    },
-    {
-      "packet_key": "packet:033ccfdab9b8",
-      "source_ref": "docs/profile-cards/data/scripts_memory_graphify_gds_5cabb44eb71f.json",
-      "workspace_revision": null,
-      "source_revision": "sha256:ab9630058e2fdf965f299ed73c7f9f42a12d261874929a7653db77c08710bfaa",
+      "packet_key": "packet:0058e67db61b",
+      "source_ref": "scripts/tests/test-warmup-import.mjs",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_revision": "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
       "graph_revision": null,
       "semantic_revision": "0"
     }

@@ -41,6 +41,13 @@ async function main() {
     GROUP BY source_ref
     ORDER BY source_ref
   `);
+  const featureOntologyResult = await pool.query(`
+    SELECT source_ref, count(*)::integer AS tuple_count
+    FROM public.feature_ontology_tuples
+    WHERE NULLIF(btrim(source_ref), '') IS NOT NULL
+    GROUP BY source_ref
+    ORDER BY source_ref
+  `);
   const bridgeResult = await pool.query(`
     WITH exact_chunk AS (
       SELECT ap.packet_key,
@@ -76,6 +83,54 @@ async function main() {
     graphifyByBasename.get(basename).push(raw);
   }
 
+  const sampleLimit = 25;
+  const classifySourceRows = (rows, countField) => {
+    const result = {
+      sourceRefs: rows.length,
+      RAW_EXACT: 0,
+      NORMALIZED_EXACT: 0,
+      BASENAME_UNIQUE: 0,
+      BASENAME_AMBIGUOUS: 0,
+      UNRESOLVED: 0,
+    };
+    const rowSamples = {
+      NORMALIZED_EXACT: [],
+      BASENAME_UNIQUE: [],
+      BASENAME_AMBIGUOUS: [],
+      UNRESOLVED: [],
+    };
+    for (const row of rows) {
+      const raw = String(row.source_ref);
+      const rowCount = Number(row[countField] ?? 0);
+      if (graphifyByRaw.has(raw)) {
+        result.RAW_EXACT += 1;
+        continue;
+      }
+      const normalized = normalize(raw);
+      const normalizedMatches = [...new Set(graphifyByNormalized.get(normalized) ?? [])];
+      if (normalizedMatches.length === 1) {
+        result.NORMALIZED_EXACT += 1;
+        if (rowSamples.NORMALIZED_EXACT.length < sampleLimit) rowSamples.NORMALIZED_EXACT.push({ sourceRef: raw, normalizedSourceRef: normalized, graphifySourceRef: normalizedMatches[0], rowCount });
+        continue;
+      }
+      const basename = basenameOf(normalized);
+      const basenameMatches = [...new Set(graphifyByBasename.get(basename) ?? [])];
+      if (basenameMatches.length === 1) {
+        result.BASENAME_UNIQUE += 1;
+        if (rowSamples.BASENAME_UNIQUE.length < sampleLimit) rowSamples.BASENAME_UNIQUE.push({ sourceRef: raw, basename, graphifySourceRef: basenameMatches[0], rowCount });
+      } else if (basenameMatches.length > 1) {
+        result.BASENAME_AMBIGUOUS += 1;
+        if (rowSamples.BASENAME_AMBIGUOUS.length < sampleLimit) rowSamples.BASENAME_AMBIGUOUS.push({ sourceRef: raw, basename, graphifySourceRefs: basenameMatches.slice(0, 10), candidateCount: basenameMatches.length, rowCount });
+      } else {
+        result.UNRESOLVED += 1;
+        if (rowSamples.UNRESOLVED.length < sampleLimit) rowSamples.UNRESOLVED.push({ sourceRef: raw, normalizedSourceRef: normalized, rowCount });
+      }
+    }
+    return { counts: result, samples: rowSamples };
+  };
+
+  const packetClassification = classifySourceRows(packetResult.rows, 'packet_count');
+  const featureOntologyClassification = classifySourceRows(featureOntologyResult.rows, 'tuple_count');
   const counts = {
     packetSourceRefs: packetResult.rows.length,
     graphifySourceRefs: graphifyResult.rows.length,
@@ -86,39 +141,7 @@ async function main() {
     BASENAME_AMBIGUOUS: 0,
     UNRESOLVED: 0,
   };
-  const samples = {
-    NORMALIZED_EXACT: [],
-    BASENAME_UNIQUE: [],
-    BASENAME_AMBIGUOUS: [],
-    UNRESOLVED: [],
-  };
-  const sampleLimit = 25;
-  for (const row of packetResult.rows) {
-    const raw = String(row.source_ref);
-    if (graphifyByRaw.has(raw)) {
-      counts.RAW_EXACT += 1;
-      continue;
-    }
-    const normalized = normalize(raw);
-    const normalizedMatches = [...new Set(graphifyByNormalized.get(normalized) ?? [])];
-    if (normalizedMatches.length === 1) {
-      counts.NORMALIZED_EXACT += 1;
-      if (samples.NORMALIZED_EXACT.length < sampleLimit) samples.NORMALIZED_EXACT.push({ sourceRef: raw, normalizedSourceRef: normalized, graphifySourceRef: normalizedMatches[0], packetCount: Number(row.packet_count) });
-      continue;
-    }
-    const basename = basenameOf(normalized);
-    const basenameMatches = [...new Set(graphifyByBasename.get(basename) ?? [])];
-    if (basenameMatches.length === 1) {
-      counts.BASENAME_UNIQUE += 1;
-      if (samples.BASENAME_UNIQUE.length < sampleLimit) samples.BASENAME_UNIQUE.push({ sourceRef: raw, basename, graphifySourceRef: basenameMatches[0], packetCount: Number(row.packet_count) });
-    } else if (basenameMatches.length > 1) {
-      counts.BASENAME_AMBIGUOUS += 1;
-      if (samples.BASENAME_AMBIGUOUS.length < sampleLimit) samples.BASENAME_AMBIGUOUS.push({ sourceRef: raw, basename, graphifySourceRefs: basenameMatches.slice(0, 10), candidateCount: basenameMatches.length, packetCount: Number(row.packet_count) });
-    } else {
-      counts.UNRESOLVED += 1;
-      if (samples.UNRESOLVED.length < sampleLimit) samples.UNRESOLVED.push({ sourceRef: raw, normalizedSourceRef: normalized, packetCount: Number(row.packet_count) });
-    }
-  }
+  Object.assign(counts, packetClassification.counts);
 
   const report = {
     schema: 'atlas.graphify-source-ref-resolution-v1',
@@ -134,7 +157,11 @@ async function main() {
       crossDomainHashEqualityUsed: false,
     },
     counts,
-    samples,
+    samples: packetClassification.samples,
+    featureOntologyTuples: {
+      counts: featureOntologyClassification.counts,
+      samples: featureOntologyClassification.samples,
+    },
     packetChunkGraphifyBridgeSamples: bridgeResult.rows.slice(0, 25),
     nextGate: counts.BASENAME_UNIQUE || counts.NORMALIZED_EXACT ? 'DESIGN_CANONICAL_SOURCE_REF_BRIDGE' : 'EXPAND_WORKSPACE_OBSERVATION',
   };

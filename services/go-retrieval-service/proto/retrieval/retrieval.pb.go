@@ -7,6 +7,7 @@
 package retrieval
 
 import (
+	shared "github.com/deeds-web-app/services/go-retrieval-service/proto/shared"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -22,14 +23,16 @@ const (
 )
 
 type EvidenceSearchRequest struct {
-	state        protoimpl.MessageState `protogen:"open.v1"`
-	Query        string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	CaseId       string                 `protobuf:"bytes,2,opt,name=case_id,json=caseId,proto3" json:"case_id,omitempty"`
-	Limit        int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
-	Jurisdiction string                 `protobuf:"bytes,4,opt,name=jurisdiction,proto3" json:"jurisdiction,omitempty"`
-	Hop          *GraphHopPolicy        `protobuf:"bytes,5,opt,name=hop,proto3" json:"hop,omitempty"`
-	Prefilter    *PrefilterPolicy       `protobuf:"bytes,6,opt,name=prefilter,proto3" json:"prefilter,omitempty"`
-	Rank         *RankPolicy            `protobuf:"bytes,7,opt,name=rank,proto3" json:"rank,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Canonical run IDs — attach to correlate retrieval events with pipeline runs
+	Ids          *shared.RunIds   `protobuf:"bytes,10,opt,name=ids,proto3" json:"ids,omitempty"`
+	Query        string           `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	CaseId       string           `protobuf:"bytes,2,opt,name=case_id,json=caseId,proto3" json:"case_id,omitempty"`
+	Limit        int32            `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Jurisdiction string           `protobuf:"bytes,4,opt,name=jurisdiction,proto3" json:"jurisdiction,omitempty"`
+	Hop          *GraphHopPolicy  `protobuf:"bytes,5,opt,name=hop,proto3" json:"hop,omitempty"`
+	Prefilter    *PrefilterPolicy `protobuf:"bytes,6,opt,name=prefilter,proto3" json:"prefilter,omitempty"`
+	Rank         *RankPolicy      `protobuf:"bytes,7,opt,name=rank,proto3" json:"rank,omitempty"`
 	// Pre-computed query embedding (768-dim embeddinggemma). Skip embed step if set.
 	QueryEmbedding []float32 `protobuf:"fixed32,8,rep,packed,name=query_embedding,json=queryEmbedding,proto3" json:"query_embedding,omitempty"`
 	IncludeDebug   bool      `protobuf:"varint,9,opt,name=include_debug,json=includeDebug,proto3" json:"include_debug,omitempty"`
@@ -65,6 +68,13 @@ func (x *EvidenceSearchRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use EvidenceSearchRequest.ProtoReflect.Descriptor instead.
 func (*EvidenceSearchRequest) Descriptor() ([]byte, []int) {
 	return file_proto_active_retrieval_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *EvidenceSearchRequest) GetIds() *shared.RunIds {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
 }
 
 func (x *EvidenceSearchRequest) GetQuery() string {
@@ -1196,8 +1206,18 @@ type CodebaseChunk struct {
 	Score          float32                `protobuf:"fixed32,8,opt,name=score,proto3" json:"score,omitempty"`
 	StartLine      int32                  `protobuf:"varint,9,opt,name=start_line,json=startLine,proto3" json:"start_line,omitempty"`
 	EndLine        int32                  `protobuf:"varint,10,opt,name=end_line,json=endLine,proto3" json:"end_line,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Canonical Atlas identity and revision metadata. Qdrant IDs remain projection IDs.
+	PacketKey              string `protobuf:"bytes,11,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	SourceRef              string `protobuf:"bytes,12,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`
+	CanonicalSourceRef     string `protobuf:"bytes,13,opt,name=canonical_source_ref,json=canonicalSourceRef,proto3" json:"canonical_source_ref,omitempty"`
+	SymbolVersionId        string `protobuf:"bytes,14,opt,name=symbol_version_id,json=symbolVersionId,proto3" json:"symbol_version_id,omitempty"`
+	ContentHash            string `protobuf:"bytes,15,opt,name=content_hash,json=contentHash,proto3" json:"content_hash,omitempty"`
+	WorkspaceRevision      string `protobuf:"bytes,16,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
+	SourceRevision         string `protobuf:"bytes,17,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
+	RepresentationId       string `protobuf:"bytes,18,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
+	RepresentationRevision string `protobuf:"bytes,19,opt,name=representation_revision,json=representationRevision,proto3" json:"representation_revision,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *CodebaseChunk) Reset() {
@@ -1298,6 +1318,69 @@ func (x *CodebaseChunk) GetEndLine() int32 {
 		return x.EndLine
 	}
 	return 0
+}
+
+func (x *CodebaseChunk) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetCanonicalSourceRef() string {
+	if x != nil {
+		return x.CanonicalSourceRef
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetSymbolVersionId() string {
+	if x != nil {
+		return x.SymbolVersionId
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetContentHash() string {
+	if x != nil {
+		return x.ContentHash
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetWorkspaceRevision() string {
+	if x != nil {
+		return x.WorkspaceRevision
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetSourceRevision() string {
+	if x != nil {
+		return x.SourceRevision
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetRepresentationId() string {
+	if x != nil {
+		return x.RepresentationId
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetRepresentationRevision() string {
+	if x != nil {
+		return x.RepresentationRevision
+	}
+	return ""
 }
 
 type GraphHopPolicy struct {
@@ -3236,8 +3319,10 @@ var File_proto_active_retrieval_proto protoreflect.FileDescriptor
 
 const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/active/retrieval.proto\x12\x0fyorha.retrieval\"\xf6\x02\n" +
-	"\x15EvidenceSearchRequest\x12\x14\n" +
+	"\x1cproto/active/retrieval.proto\x12\x0fyorha.retrieval\x1a\x10shared_ids.proto\"\x9e\x03\n" +
+	"\x15EvidenceSearchRequest\x12&\n" +
+	"\x03ids\x18\n" +
+	" \x01(\v2\x14.yorha.shared.RunIdsR\x03ids\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\acase_id\x18\x02 \x01(\tR\x06caseId\x12\x14\n" +
 	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\"\n" +
@@ -3340,7 +3425,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x05chunk\x18\x01 \x01(\v2\x1e.yorha.retrieval.CodebaseChunkH\x00R\x05chunk\x12@\n" +
 	"\bprogress\x18\x02 \x01(\v2\".yorha.retrieval.RetrievalProgressH\x00R\bprogress\x127\n" +
 	"\x05error\x18\x03 \x01(\v2\x1f.yorha.retrieval.RetrievalErrorH\x00R\x05errorB\a\n" +
-	"\x05event\"\xa4\x02\n" +
+	"\x05event\"\xa1\x05\n" +
 	"\rCodebaseChunk\x12\x19\n" +
 	"\bchunk_id\x18\x01 \x01(\tR\achunkId\x12\x1b\n" +
 	"\tfile_path\x18\x02 \x01(\tR\bfilePath\x12\x12\n" +
@@ -3354,7 +3439,18 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\n" +
 	"start_line\x18\t \x01(\x05R\tstartLine\x12\x19\n" +
 	"\bend_line\x18\n" +
-	" \x01(\x05R\aendLine\"\x85\x01\n" +
+	" \x01(\x05R\aendLine\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\v \x01(\tR\tpacketKey\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\f \x01(\tR\tsourceRef\x120\n" +
+	"\x14canonical_source_ref\x18\r \x01(\tR\x12canonicalSourceRef\x12*\n" +
+	"\x11symbol_version_id\x18\x0e \x01(\tR\x0fsymbolVersionId\x12!\n" +
+	"\fcontent_hash\x18\x0f \x01(\tR\vcontentHash\x12-\n" +
+	"\x12workspace_revision\x18\x10 \x01(\tR\x11workspaceRevision\x12'\n" +
+	"\x0fsource_revision\x18\x11 \x01(\tR\x0esourceRevision\x12+\n" +
+	"\x11representation_id\x18\x12 \x01(\tR\x10representationId\x127\n" +
+	"\x17representation_revision\x18\x13 \x01(\tR\x16representationRevision\"\x85\x01\n" +
 	"\x0eGraphHopPolicy\x12\x12\n" +
 	"\x04mode\x18\x01 \x01(\x05R\x04mode\x12$\n" +
 	"\x0emax_hop_chunks\x18\x02 \x01(\x05R\fmaxHopChunks\x129\n" +
@@ -3608,68 +3704,70 @@ var file_proto_active_retrieval_proto_goTypes = []any{
 	(*HealthResponse)(nil),           // 38: yorha.retrieval.HealthResponse
 	nil,                              // 39: yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
 	nil,                              // 40: yorha.retrieval.ClusterSummaryResponse.MetadataEntry
+	(*shared.RunIds)(nil),            // 41: yorha.shared.RunIds
 }
 var file_proto_active_retrieval_proto_depIdxs = []int32{
-	14, // 0: yorha.retrieval.EvidenceSearchRequest.hop:type_name -> yorha.retrieval.GraphHopPolicy
-	15, // 1: yorha.retrieval.EvidenceSearchRequest.prefilter:type_name -> yorha.retrieval.PrefilterPolicy
-	16, // 2: yorha.retrieval.EvidenceSearchRequest.rank:type_name -> yorha.retrieval.RankPolicy
-	3,  // 3: yorha.retrieval.EvidenceSearchResponse.results:type_name -> yorha.retrieval.SearchResult
-	6,  // 4: yorha.retrieval.EvidenceSearchResponse.bundles:type_name -> yorha.retrieval.ContextBundle
-	9,  // 5: yorha.retrieval.EvidenceSearchResponse.timing:type_name -> yorha.retrieval.SearchTiming
-	6,  // 6: yorha.retrieval.EvidenceBundleEvent.bundle:type_name -> yorha.retrieval.ContextBundle
-	17, // 7: yorha.retrieval.EvidenceBundleEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
-	18, // 8: yorha.retrieval.EvidenceBundleEvent.error:type_name -> yorha.retrieval.RetrievalError
-	4,  // 9: yorha.retrieval.SearchResult.metadata:type_name -> yorha.retrieval.ChunkMetadata
-	5,  // 10: yorha.retrieval.SearchResult.rerank:type_name -> yorha.retrieval.RerankExplain
-	3,  // 11: yorha.retrieval.ContextBundle.hit:type_name -> yorha.retrieval.SearchResult
-	3,  // 12: yorha.retrieval.ContextBundle.siblings:type_name -> yorha.retrieval.SearchResult
-	7,  // 13: yorha.retrieval.ContextBundle.graph_neighbors:type_name -> yorha.retrieval.GraphNeighbor
-	8,  // 14: yorha.retrieval.ContextBundle.document_context:type_name -> yorha.retrieval.DocumentContext
-	13, // 15: yorha.retrieval.CodebaseSearchResponse.chunks:type_name -> yorha.retrieval.CodebaseChunk
-	13, // 16: yorha.retrieval.CodebaseChunkEvent.chunk:type_name -> yorha.retrieval.CodebaseChunk
-	17, // 17: yorha.retrieval.CodebaseChunkEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
-	18, // 18: yorha.retrieval.CodebaseChunkEvent.error:type_name -> yorha.retrieval.RetrievalError
-	39, // 19: yorha.retrieval.RetrievalSourceMetadata.metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
-	19, // 20: yorha.retrieval.SearchChunkResult.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
-	20, // 21: yorha.retrieval.SearchChunkResult.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
-	21, // 22: yorha.retrieval.SearchChunkResult.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	22, // 23: yorha.retrieval.SearchChunkResult.timestamps:type_name -> yorha.retrieval.TransportTimestamps
-	24, // 24: yorha.retrieval.SearchChunksResponse.results:type_name -> yorha.retrieval.SearchChunkResult
-	40, // 25: yorha.retrieval.ClusterSummaryResponse.metadata:type_name -> yorha.retrieval.ClusterSummaryResponse.MetadataEntry
-	30, // 26: yorha.retrieval.AstExpansionResponse.neighbors:type_name -> yorha.retrieval.AstNode
-	31, // 27: yorha.retrieval.AstExpansionResponse.edges:type_name -> yorha.retrieval.AstEdge
-	24, // 28: yorha.retrieval.TopologyResponse.neighbors:type_name -> yorha.retrieval.SearchChunkResult
-	21, // 29: yorha.retrieval.TopologyResponse.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	19, // 30: yorha.retrieval.ResearchContextChunk.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
-	20, // 31: yorha.retrieval.ResearchContextChunk.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
-	21, // 32: yorha.retrieval.ResearchContextChunk.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
-	22, // 33: yorha.retrieval.ResearchContextChunk.timestamps:type_name -> yorha.retrieval.TransportTimestamps
-	35, // 34: yorha.retrieval.ResearchContextResponse.research:type_name -> yorha.retrieval.ResearchContextChunk
-	0,  // 35: yorha.retrieval.RetrievalService.SearchEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
-	0,  // 36: yorha.retrieval.RetrievalService.StreamEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
-	10, // 37: yorha.retrieval.RetrievalService.SearchCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
-	10, // 38: yorha.retrieval.RetrievalService.StreamCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
-	23, // 39: yorha.retrieval.RetrievalService.SearchChunks:input_type -> yorha.retrieval.SearchChunksRequest
-	26, // 40: yorha.retrieval.RetrievalService.GetClusterSummary:input_type -> yorha.retrieval.ClusterSummaryRequest
-	28, // 41: yorha.retrieval.RetrievalService.ExpandAstNeighbors:input_type -> yorha.retrieval.AstExpansionRequest
-	32, // 42: yorha.retrieval.RetrievalService.GetTopologyContext:input_type -> yorha.retrieval.TopologyRequest
-	34, // 43: yorha.retrieval.RetrievalService.GetResearchContext:input_type -> yorha.retrieval.ResearchContextRequest
-	37, // 44: yorha.retrieval.RetrievalService.Health:input_type -> yorha.retrieval.HealthRequest
-	1,  // 45: yorha.retrieval.RetrievalService.SearchEvidence:output_type -> yorha.retrieval.EvidenceSearchResponse
-	2,  // 46: yorha.retrieval.RetrievalService.StreamEvidence:output_type -> yorha.retrieval.EvidenceBundleEvent
-	11, // 47: yorha.retrieval.RetrievalService.SearchCodebase:output_type -> yorha.retrieval.CodebaseSearchResponse
-	12, // 48: yorha.retrieval.RetrievalService.StreamCodebase:output_type -> yorha.retrieval.CodebaseChunkEvent
-	25, // 49: yorha.retrieval.RetrievalService.SearchChunks:output_type -> yorha.retrieval.SearchChunksResponse
-	27, // 50: yorha.retrieval.RetrievalService.GetClusterSummary:output_type -> yorha.retrieval.ClusterSummaryResponse
-	29, // 51: yorha.retrieval.RetrievalService.ExpandAstNeighbors:output_type -> yorha.retrieval.AstExpansionResponse
-	33, // 52: yorha.retrieval.RetrievalService.GetTopologyContext:output_type -> yorha.retrieval.TopologyResponse
-	36, // 53: yorha.retrieval.RetrievalService.GetResearchContext:output_type -> yorha.retrieval.ResearchContextResponse
-	38, // 54: yorha.retrieval.RetrievalService.Health:output_type -> yorha.retrieval.HealthResponse
-	45, // [45:55] is the sub-list for method output_type
-	35, // [35:45] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	41, // 0: yorha.retrieval.EvidenceSearchRequest.ids:type_name -> yorha.shared.RunIds
+	14, // 1: yorha.retrieval.EvidenceSearchRequest.hop:type_name -> yorha.retrieval.GraphHopPolicy
+	15, // 2: yorha.retrieval.EvidenceSearchRequest.prefilter:type_name -> yorha.retrieval.PrefilterPolicy
+	16, // 3: yorha.retrieval.EvidenceSearchRequest.rank:type_name -> yorha.retrieval.RankPolicy
+	3,  // 4: yorha.retrieval.EvidenceSearchResponse.results:type_name -> yorha.retrieval.SearchResult
+	6,  // 5: yorha.retrieval.EvidenceSearchResponse.bundles:type_name -> yorha.retrieval.ContextBundle
+	9,  // 6: yorha.retrieval.EvidenceSearchResponse.timing:type_name -> yorha.retrieval.SearchTiming
+	6,  // 7: yorha.retrieval.EvidenceBundleEvent.bundle:type_name -> yorha.retrieval.ContextBundle
+	17, // 8: yorha.retrieval.EvidenceBundleEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
+	18, // 9: yorha.retrieval.EvidenceBundleEvent.error:type_name -> yorha.retrieval.RetrievalError
+	4,  // 10: yorha.retrieval.SearchResult.metadata:type_name -> yorha.retrieval.ChunkMetadata
+	5,  // 11: yorha.retrieval.SearchResult.rerank:type_name -> yorha.retrieval.RerankExplain
+	3,  // 12: yorha.retrieval.ContextBundle.hit:type_name -> yorha.retrieval.SearchResult
+	3,  // 13: yorha.retrieval.ContextBundle.siblings:type_name -> yorha.retrieval.SearchResult
+	7,  // 14: yorha.retrieval.ContextBundle.graph_neighbors:type_name -> yorha.retrieval.GraphNeighbor
+	8,  // 15: yorha.retrieval.ContextBundle.document_context:type_name -> yorha.retrieval.DocumentContext
+	13, // 16: yorha.retrieval.CodebaseSearchResponse.chunks:type_name -> yorha.retrieval.CodebaseChunk
+	13, // 17: yorha.retrieval.CodebaseChunkEvent.chunk:type_name -> yorha.retrieval.CodebaseChunk
+	17, // 18: yorha.retrieval.CodebaseChunkEvent.progress:type_name -> yorha.retrieval.RetrievalProgress
+	18, // 19: yorha.retrieval.CodebaseChunkEvent.error:type_name -> yorha.retrieval.RetrievalError
+	39, // 20: yorha.retrieval.RetrievalSourceMetadata.metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata.MetadataEntry
+	19, // 21: yorha.retrieval.SearchChunkResult.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
+	20, // 22: yorha.retrieval.SearchChunkResult.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
+	21, // 23: yorha.retrieval.SearchChunkResult.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	22, // 24: yorha.retrieval.SearchChunkResult.timestamps:type_name -> yorha.retrieval.TransportTimestamps
+	24, // 25: yorha.retrieval.SearchChunksResponse.results:type_name -> yorha.retrieval.SearchChunkResult
+	40, // 26: yorha.retrieval.ClusterSummaryResponse.metadata:type_name -> yorha.retrieval.ClusterSummaryResponse.MetadataEntry
+	30, // 27: yorha.retrieval.AstExpansionResponse.neighbors:type_name -> yorha.retrieval.AstNode
+	31, // 28: yorha.retrieval.AstExpansionResponse.edges:type_name -> yorha.retrieval.AstEdge
+	24, // 29: yorha.retrieval.TopologyResponse.neighbors:type_name -> yorha.retrieval.SearchChunkResult
+	21, // 30: yorha.retrieval.TopologyResponse.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	19, // 31: yorha.retrieval.ResearchContextChunk.source_metadata:type_name -> yorha.retrieval.RetrievalSourceMetadata
+	20, // 32: yorha.retrieval.ResearchContextChunk.score_metadata:type_name -> yorha.retrieval.RetrievalScoreMetadata
+	21, // 33: yorha.retrieval.ResearchContextChunk.cluster_metadata:type_name -> yorha.retrieval.RetrievalClusterMetadata
+	22, // 34: yorha.retrieval.ResearchContextChunk.timestamps:type_name -> yorha.retrieval.TransportTimestamps
+	35, // 35: yorha.retrieval.ResearchContextResponse.research:type_name -> yorha.retrieval.ResearchContextChunk
+	0,  // 36: yorha.retrieval.RetrievalService.SearchEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
+	0,  // 37: yorha.retrieval.RetrievalService.StreamEvidence:input_type -> yorha.retrieval.EvidenceSearchRequest
+	10, // 38: yorha.retrieval.RetrievalService.SearchCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
+	10, // 39: yorha.retrieval.RetrievalService.StreamCodebase:input_type -> yorha.retrieval.CodebaseSearchRequest
+	23, // 40: yorha.retrieval.RetrievalService.SearchChunks:input_type -> yorha.retrieval.SearchChunksRequest
+	26, // 41: yorha.retrieval.RetrievalService.GetClusterSummary:input_type -> yorha.retrieval.ClusterSummaryRequest
+	28, // 42: yorha.retrieval.RetrievalService.ExpandAstNeighbors:input_type -> yorha.retrieval.AstExpansionRequest
+	32, // 43: yorha.retrieval.RetrievalService.GetTopologyContext:input_type -> yorha.retrieval.TopologyRequest
+	34, // 44: yorha.retrieval.RetrievalService.GetResearchContext:input_type -> yorha.retrieval.ResearchContextRequest
+	37, // 45: yorha.retrieval.RetrievalService.Health:input_type -> yorha.retrieval.HealthRequest
+	1,  // 46: yorha.retrieval.RetrievalService.SearchEvidence:output_type -> yorha.retrieval.EvidenceSearchResponse
+	2,  // 47: yorha.retrieval.RetrievalService.StreamEvidence:output_type -> yorha.retrieval.EvidenceBundleEvent
+	11, // 48: yorha.retrieval.RetrievalService.SearchCodebase:output_type -> yorha.retrieval.CodebaseSearchResponse
+	12, // 49: yorha.retrieval.RetrievalService.StreamCodebase:output_type -> yorha.retrieval.CodebaseChunkEvent
+	25, // 50: yorha.retrieval.RetrievalService.SearchChunks:output_type -> yorha.retrieval.SearchChunksResponse
+	27, // 51: yorha.retrieval.RetrievalService.GetClusterSummary:output_type -> yorha.retrieval.ClusterSummaryResponse
+	29, // 52: yorha.retrieval.RetrievalService.ExpandAstNeighbors:output_type -> yorha.retrieval.AstExpansionResponse
+	33, // 53: yorha.retrieval.RetrievalService.GetTopologyContext:output_type -> yorha.retrieval.TopologyResponse
+	36, // 54: yorha.retrieval.RetrievalService.GetResearchContext:output_type -> yorha.retrieval.ResearchContextResponse
+	38, // 55: yorha.retrieval.RetrievalService.Health:output_type -> yorha.retrieval.HealthResponse
+	46, // [46:56] is the sub-list for method output_type
+	36, // [36:46] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_proto_active_retrieval_proto_init() }

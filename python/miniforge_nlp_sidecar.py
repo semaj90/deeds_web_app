@@ -784,19 +784,89 @@ def _spacy_entities(text: str) -> list[Entity]:
     return out
 
 
+_grounded_extraction_error: Optional[str] = None
+_grounded_provider_patched = False
+
+
+def _ensure_grounded_provider_controls() -> None:
+    """Pass Ornith's no-thinking template control through LangExtract.
+
+    LangExtract's OpenAI provider forwards standard sampling kwargs but the
+    llama.cpp-specific chat_template_kwargs field is not part of its current
+    forwarding list. Keep this adapter local to the grounded extraction lane;
+    it does not alter the general analysis or chat paths.
+    """
+    global _grounded_provider_patched
+    if _grounded_provider_patched or not LANGEXTRACT_AVAILABLE or langextract is None:
+        return
+    try:
+        from langextract.providers.openai import OpenAILanguageModel  # type: ignore
+
+        original = OpenAILanguageModel._build_chat_completions_params
+
+        def build_params(self: Any, prompt: str, config: dict[str, Any]) -> dict[str, Any]:
+            params = original(self, prompt, config)
+            params.setdefault("chat_template_kwargs", {"enable_thinking": False})
+            return params
+
+        OpenAILanguageModel._build_chat_completions_params = build_params  # type: ignore[method-assign]
+        _grounded_provider_patched = True
+    except Exception as exc:
+        global _grounded_extraction_error
+        _grounded_extraction_error = f"GROUND_PROVIDER_CONTROL_PATCH_FAILED:{type(exc).__name__}:{str(exc)[:180]}"
+
+
+def _grounded_output_schema() -> dict[str, Any]:
+    """Return the strict LangExtract envelope for source-grounded concepts."""
+    item_schema = langextract.schema.extraction_item_schema(  # type: ignore[union-attr]
+        "CONCEPT",
+        attributes={
+            "concept_id": {"type": "string"},
+            "ontology_class": {"type": "string"},
+        },
+        additional_properties=False,
+    )
+    return langextract.schema.extractions_schema(item_schema, additional_properties=False)  # type: ignore[union-attr]
+
+
 def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
+    global _grounded_extraction_error
+    _grounded_extraction_error = None
     if not LANGEXTRACT_AVAILABLE or langextract is None:
+        _grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
+        return []
+    _ensure_grounded_provider_controls()
+    if _grounded_extraction_error:
         return []
     try:
         extract_fn = getattr(langextract, "extract", None)
         if extract_fn is None:
+            _grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
             return []
         result = getattr(extract_fn, "extract", extract_fn)(  # type: ignore[misc]
             text,
-            prompt_description="Extract grounded evidence for Parent Atlas. Return exact spans only.",
+            prompt_description=(
+                "Extract only concepts explicitly present in the supplied source text for Parent Atlas. "
+                "Return only the required JSON envelope. Every extraction must use extraction_class CONCEPT, "
+                "extraction_text copied verbatim as one contiguous substring, and attributes containing a "
+                "stable concept_id plus ontology_class. Never infer a concept from a filename, path, or summary. "
+                "If no exact source span supports a concept, return an empty extractions array."
+            ),
             model_id=model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
+            output_schema=_grounded_output_schema(),
+            extraction_passes=max(1, int(os.getenv("LANGEXTRACT_EXTRACTION_PASSES", "1"))),
+            max_workers=max(1, int(os.getenv("LANGEXTRACT_MAX_WORKERS", "1"))),
+            max_char_buffer=max(256, int(os.getenv("LANGEXTRACT_MAX_CHAR_BUFFER", "2000"))),
+            temperature=float(os.getenv("LANGEXTRACT_TEMPERATURE", "0")),
+            top_p=float(os.getenv("LANGEXTRACT_TOP_P", "1")),
+            seed=int(os.getenv("LANGEXTRACT_SEED", "1729")),
+            reasoning=False,
+            enable_fuzzy_alignment=False,
+            accept_match_lesser=False,
+            exact_alignment_algorithm="dp",
         )
-    except Exception:
+    except Exception as exc:
+        _grounded_extraction_error = f"{type(exc).__name__}:{str(exc)[:240]}"
         return []
 
     raw_extractions = getattr(result, "extractions", None) or []
@@ -806,13 +876,22 @@ def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dic
         extraction_text = getattr(item, "extraction_text", None) or getattr(item, "text", None) or ""
         if not extraction_text:
             continue
+        start_char = getattr(item, "start_char", None)
+        end_char = getattr(item, "end_char", None)
+        if not isinstance(start_char, int) or not isinstance(end_char, int):
+            continue
+        if start_char < 0 or end_char <= start_char or end_char > len(text):
+            continue
+        if text[start_char:end_char] != str(extraction_text):
+            continue
         extracted.append(
             {
                 "class": str(extraction_class),
                 "text": str(extraction_text),
-                "start_char": getattr(item, "start_char", None),
-                "end_char": getattr(item, "end_char", None),
+                "start_char": start_char,
+                "end_char": end_char,
                 "attributes": getattr(item, "attributes", None) or {},
+                "alignment_status": getattr(item, "alignment_status", None),
             }
         )
     return extracted
@@ -1988,7 +2067,18 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     if req.grounded_extraction_required:
         metadata["grounded_extraction_required"] = True
         metadata["grounded_extraction_used"] = grounded_used
+        metadata["grounded_generation_controls"] = {
+            "temperature": float(os.getenv("LANGEXTRACT_TEMPERATURE", "0")),
+            "top_p": float(os.getenv("LANGEXTRACT_TOP_P", "1")),
+            "seed": int(os.getenv("LANGEXTRACT_SEED", "1729")),
+            "reasoning": False,
+            "chat_template_kwargs": {"enable_thinking": False},
+            "provider_transport_shim": "llama-chat-template-v1" if _grounded_provider_patched else None,
+        }
         metadata["grounded_extractions"] = grounded_extractions
+        grounded_error = getattr(sys.modules.get("miniforge_nlp_sidecar"), "_grounded_extraction_error", None)
+        if grounded_error:
+            metadata["grounded_extraction_error"] = str(grounded_error)[:320]
 
     entity_graph_metrics = _compute_entity_graph_metrics(relationships[:100])
 

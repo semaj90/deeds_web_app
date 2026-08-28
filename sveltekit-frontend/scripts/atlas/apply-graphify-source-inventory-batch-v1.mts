@@ -16,6 +16,7 @@ const REPO_ROOT = path.resolve(HERE, '../../..');
 const observationPath = path.resolve(REPO_ROOT, process.env.ATLAS_WORKSPACE_SOURCE_BINDING_OUT ?? 'docs/reports/workspace-source-binding-observation.json');
 const outputPath = path.resolve(REPO_ROOT, process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_PLAN_OUT ?? '.tmp/atlas/graphify-source-inventory-batch-v1.json');
 const verifyOutputPath = path.resolve(REPO_ROOT, process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_VERIFY_OUT ?? 'docs/reports/graphify-source-inventory-batch-readback-v1.json');
+const explicitSelectionPath = process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_SELECTION?.trim() ? path.resolve(REPO_ROOT, process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_SELECTION.trim()) : null;
 const apply = process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_APPLY === '1';
 const verifyOnly = process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_VERIFY_ONLY === '1';
 const limit = Math.max(1, Math.min(128, Number(process.env.ATLAS_GRAPHIFY_SOURCE_BATCH_LIMIT ?? 128)));
@@ -125,16 +126,28 @@ const packetSources = await pool.query(`
 `);
 const packetRows = packetSources.rows;
 const observationByRef = new Map(bindings.map((binding) => [binding.sourceRef, binding]));
-const repairRows = packetRows.filter((row) => Number(row.graphify_rows) === 0 || Number(row.workspace_revision_rows) === 0);
-const selected = repairRows
-  .map((row) => observationByRef.get(String(row.source_ref)))
-  .filter((binding): binding is typeof bindings[number] => Boolean(binding))
-  .slice(0, limit);
+let selectionSource = 'packet_source_ref';
+let selected: typeof bindings = [];
+let missingFromWorkspaceObservation = 0;
+let ambiguousSourceRefs = packetRows.filter((row) => Number(row.graphify_rows) > 1).length;
+if (explicitSelectionPath) {
+  const selection = JSON.parse(await readFile(explicitSelectionPath, 'utf8')) as Record<string, unknown>;
+  if (selection.status !== 'APPROVED_FOR_LINEAGE_RESOLUTION' || selection.selectionChecksum !== '349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a' || !Array.isArray(selection.approvedPairs) || selection.approvedPairs.length !== 6) {
+    throw new Error('GRAPHIFY_SOURCE_BATCH_APPROVED_SELECTION_INVALID');
+  }
+  selectionSource = explicitSelectionPath;
+  const requestedRefs = selection.approvedPairs.map((pair) => String((pair as Record<string, unknown>).canonicalSourceRef ?? '').trim()).filter(Boolean);
+  selected = requestedRefs.map((sourceRef) => observationByRef.get(sourceRef)).filter((binding): binding is typeof bindings[number] => Boolean(binding)).slice(0, limit);
+  missingFromWorkspaceObservation = requestedRefs.filter((sourceRef) => !observationByRef.has(sourceRef)).length;
+  if (selected.length !== Math.min(limit, requestedRefs.length) || missingFromWorkspaceObservation > 0) throw new Error(`GRAPHIFY_SOURCE_BATCH_APPROVED_SELECTION_NOT_OBSERVED:${selected.length}:${requestedRefs.length}`);
+} else {
+  const repairRows = packetRows.filter((row) => Number(row.graphify_rows) === 0 || Number(row.workspace_revision_rows) === 0);
+  selected = repairRows.map((row) => observationByRef.get(String(row.source_ref))).filter((binding): binding is typeof bindings[number] => Boolean(binding)).slice(0, limit);
+  missingFromWorkspaceObservation = repairRows.filter((row) => Number(row.graphify_rows) === 0 && !observationByRef.has(String(row.source_ref))).length;
+}
 const selectionChecksum = createHash('sha256')
   .update(selected.map((binding) => `${binding.sourceRef}:${binding.sourceRevision}:${binding.contentDigest}`).join('\n'), 'utf8')
   .digest('hex');
-const missingFromWorkspaceObservation = repairRows.filter((row) => Number(row.graphify_rows) === 0 && !observationByRef.has(String(row.source_ref))).length;
-const ambiguousSourceRefs = packetRows.filter((row) => Number(row.graphify_rows) > 1).length;
 await pool.end();
 const plan: Record<string, unknown> = {
   schema: 'atlas.graphify-source-inventory-batch-v1',
@@ -147,6 +160,7 @@ const plan: Record<string, unknown> = {
   sourceManifestSourceCount: record.sourceCount,
   batchLimit: limit,
   selectionChecksum,
+  selectionSource,
   packetSourceRefsConsidered: packetRows.length,
   alreadyPresent: packetRows.filter((row) => Number(row.graphify_rows) > 0).length,
   selectedMissingSources: selected.length,

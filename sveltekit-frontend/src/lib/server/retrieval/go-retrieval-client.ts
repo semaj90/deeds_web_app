@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { mapRepoSearchIdentityV1, type RepoSearchIdentityV1 } from '../../../../../packages/atlas-core/src/retrieval/repo-search-identity.js';
 
 export interface GoRetrievalSearchHit {
   id?: string | number;
@@ -56,6 +57,23 @@ export interface GoRetrievalSearchHit {
   retrievalWinner?: string;
   provenance?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  symbol_version_id?: string;
+  symbolVersionId?: string;
+  packet_key?: string;
+  packetKey?: string;
+  content_hash?: string;
+  contentHash?: string;
+  workspace_revision?: string;
+  workspaceRevision?: string;
+  source_revision?: string;
+  sourceRevision?: string;
+  representation_id?: string;
+  representationId?: string;
+  representation_revision?: string | number;
+  representationRevision?: string | number;
+  qdrant_point_id?: string | number;
+  qdrantPointId?: string | number;
+  repo_search_identity?: RepoSearchIdentityV1;
 }
 
 export interface GoRetrievalSearchResponse {
@@ -131,6 +149,25 @@ function normalizeHit(item: Record<string, unknown>): GoRetrievalSearchHit {
     | string
     | number
     | undefined;
+  const symbolVersionId = normalizeLabel(item.symbol_version_id ?? item.symbolVersionId ?? metadata.symbol_version_id ?? metadata.symbolVersionId);
+  const packetKey = normalizeLabel(item.packet_key ?? item.packetKey ?? metadata.packet_key ?? metadata.packetKey);
+  const sourceRef = normalizeLabel(item.source_ref ?? item.sourceRef ?? metadata.source_ref ?? metadata.sourceRef);
+  const canonicalSourceRef = normalizeLabel(item.canonical_source_ref ?? item.canonicalSourceRef ?? metadata.canonical_source_ref ?? metadata.canonicalSourceRef);
+  const projectionId = item.qdrant_point_id ?? item.qdrantPointId ?? metadata.qdrant_point_id ?? metadata.qdrantPointId ?? item.id;
+  const repoSearchIdentity = mapRepoSearchIdentityV1({
+    repositoryId: item.repository_id ?? item.repositoryId ?? metadata.repository_id ?? metadata.repositoryId,
+    symbolVersionId,
+    packetKey,
+    contentHash: item.content_hash ?? item.contentHash ?? metadata.content_hash ?? metadata.contentHash,
+    sourceRef,
+    canonicalSourceRef,
+    workspaceRevision: item.workspace_revision ?? item.workspaceRevision ?? metadata.workspace_revision ?? metadata.workspaceRevision,
+    sourceRevision: item.source_revision ?? item.sourceRevision ?? metadata.source_revision ?? metadata.sourceRevision,
+    representationId: item.representation_id ?? item.representationId ?? metadata.representation_id ?? metadata.representationId,
+    representationRevision: item.representation_revision ?? item.representationRevision ?? metadata.representation_revision ?? metadata.representationRevision,
+    projectionId,
+    projectionKind: 'qdrant',
+  });
 
   return {
     ...(item as GoRetrievalSearchHit),
@@ -150,6 +187,23 @@ function normalizeHit(item: Record<string, unknown>): GoRetrievalSearchHit {
     sourceRef: normalizeLabel(item.sourceRef ?? item.source_ref ?? metadata.sourceRef ?? metadata.source_ref),
     canonical_source_ref: normalizeLabel(item.canonical_source_ref ?? item.canonicalSourceRef ?? metadata.canonical_source_ref ?? metadata.canonicalSourceRef ?? item.source_ref ?? item.sourceRef),
     canonicalSourceRef: normalizeLabel(item.canonicalSourceRef ?? item.canonical_source_ref ?? metadata.canonicalSourceRef ?? metadata.canonical_source_ref ?? item.sourceRef ?? item.source_ref),
+    symbol_version_id: symbolVersionId,
+    symbolVersionId,
+    packet_key: packetKey,
+    packetKey,
+    content_hash: repoSearchIdentity.contentHash ?? undefined,
+    contentHash: repoSearchIdentity.contentHash ?? undefined,
+    workspace_revision: repoSearchIdentity.workspaceRevision ?? undefined,
+    workspaceRevision: repoSearchIdentity.workspaceRevision ?? undefined,
+    source_revision: repoSearchIdentity.sourceRevision ?? undefined,
+    sourceRevision: repoSearchIdentity.sourceRevision ?? undefined,
+    representation_id: repoSearchIdentity.representationId ?? undefined,
+    representationId: repoSearchIdentity.representationId ?? undefined,
+    representation_revision: repoSearchIdentity.representationRevision ?? undefined,
+    representationRevision: repoSearchIdentity.representationRevision ?? undefined,
+    qdrant_point_id: repoSearchIdentity.projectionId ?? undefined,
+    qdrantPointId: repoSearchIdentity.projectionId ?? undefined,
+    repo_search_identity: repoSearchIdentity,
     metadata: metadata,
   };
 }

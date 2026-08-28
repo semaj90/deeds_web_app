@@ -5,6 +5,7 @@ import { createNodeTreeSitterAstProvider } from '$lib/server/atlas/indexing/node
 
 type Fixture = { name: string; source: string };
 type Chunk = { name?: string | null; kind?: string | null; start_line?: number; end_line?: number; start_byte?: number; end_byte?: number };
+type Edge = { type?: string; to_evidence_key?: string; evidence_start_line?: number; evidence_start_column?: number };
 
 const repoRoot = resolve(process.cwd(), '..');
 const reportDir = resolve(repoRoot, 'docs/reports');
@@ -30,6 +31,26 @@ function normalKind(kind: string | null | undefined): string {
 	return (kind ?? '').replace(/^ast_/, '').toUpperCase();
 }
 
+function edgeSemanticKey(edge: Edge): string {
+	// Provider-local DEFINE targets are intentionally different until native
+	// provenance IDs are adopted. Compare their evidence location, while
+	// retaining target identity for syntax-only and unresolved edges.
+	const target = edge.type === 'DEFINES' ? '' : edge.to_evidence_key ?? '';
+	return [
+		edge.type ?? '',
+		target,
+		edge.evidence_start_line ?? '',
+		edge.evidence_start_column ?? '',
+	].join('|');
+}
+
+function edgeSummary(edges: unknown): { count: number; byType: Record<string, number>; missing: string[]; extra: string[] } {
+	const typed = Array.isArray(edges) ? (edges as Edge[]) : [];
+	const byType: Record<string, number> = {};
+	for (const edge of typed) byType[edge.type ?? 'UNKNOWN'] = (byType[edge.type ?? 'UNKNOWN'] ?? 0) + 1;
+	return { count: typed.length, byType, missing: [], extra: [] };
+}
+
 const nodeProvider = createNodeTreeSitterAstProvider();
 const sidecarProvider = create8095AstProvider(sidecarUrl);
 const results: Array<Record<string, unknown>> = [];
@@ -53,6 +74,14 @@ for (const fixture of fixtures) {
 	const sidecarKinds = [...new Set(sidecarChunks.map((chunk) => normalKind(chunk.kind)).filter(Boolean))].sort();
 	const nodeSignatures = new Set(nodeChunks.map(signature));
 	const sidecarSignatures = new Set(sidecarChunks.map(signature));
+	const nodeEdges = (node.evidence?.edges ?? []) as Edge[];
+	const sidecarEdges = (sidecar.evidence?.edges ?? []) as Edge[];
+	const nodeEdgeKeys = new Set(nodeEdges.map(edgeSemanticKey));
+	const sidecarEdgeKeys = new Set(sidecarEdges.map(edgeSemanticKey));
+	const edgeMissing = [...sidecarEdgeKeys].filter((key) => !nodeEdgeKeys.has(key)).sort();
+	const edgeExtra = [...nodeEdgeKeys].filter((key) => !sidecarEdgeKeys.has(key)).sort();
+	const nodeEdgeSummary = edgeSummary(nodeEdges);
+	const sidecarEdgeSummary = edgeSummary(sidecarEdges);
 	const missingNames = sidecarNames.filter((name) => !nodeNames.includes(name));
 	const extraNames = nodeNames.filter((name) => !sidecarNames.includes(name));
 	const missingKinds = sidecarKinds.filter((kind) => !nodeKinds.includes(kind));
@@ -60,14 +89,21 @@ for (const fixture of fixtures) {
 	const spanMismatches = sidecarChunks.filter((chunk) => chunk.name && chunk.name !== '<anonymous>' && nodeNamedByIdentity.has(`${chunk.name}|${normalKind(chunk.kind)}`) && !nodeSignatures.has(signature(chunk))).length;
 	results.push({
 		name: fixture.name,
-		status: node.status === 'FAILED' || sidecar.status === 'FAILED' ? 'FAILED' : missingNames.length || missingKinds.length || spanMismatches || (node.evidence?.edges?.length ?? 0) !== (sidecar.evidence?.edges?.length ?? 0) ? 'DEGRADED' : 'PASS',
+		status: node.status === 'FAILED' || sidecar.status === 'FAILED' ? 'FAILED' : missingNames.length || missingKinds.length || spanMismatches || edgeMissing.length || edgeExtra.length ? 'DEGRADED' : 'PASS',
 		node: { status: node.status, chunkCount: nodeChunks.length, names: nodeNames, kinds: nodeKinds, diagnostics: node.diagnostics },
 		sidecar8095: { status: sidecar.status, chunkCount: sidecarChunks.length, names: sidecarNames, kinds: sidecarKinds, diagnostics: sidecar.diagnostics },
 		missingNames,
 		extraNames,
 		missingKinds,
 		spanMismatches,
-		edges: { node: node.evidence?.edges?.length ?? 0, sidecar8095: sidecar.evidence?.edges?.length ?? 0 },
+		edges: {
+			node: nodeEdgeSummary.count,
+			sidecar8095: sidecarEdgeSummary.count,
+			nodeByType: nodeEdgeSummary.byType,
+			sidecar8095ByType: sidecarEdgeSummary.byType,
+			semanticMissing: edgeMissing,
+			semanticExtra: edgeExtra,
+		},
 	});
 }
 
@@ -83,6 +119,11 @@ const report = {
 	filesChecked: fixtures.length,
 	canonicalWrites: false,
 	canonicalPromotionAllowed: false,
+	edgeComparison: {
+		comparableTypes: ['DEFINES', 'IMPORTS', 'EXPORTS', 'CALLS'],
+		nonComparableTypes: ['REFERENCES'],
+		nonComparableReason: '8095 REFERENCES edges are dependency evidence; Node challenger currently reports syntax/structural AST edges only.',
+	},
 	deferred: ['typed edge parity', 'native provenance parity', 'canonical identity parity', 'provider switch'],
 	results,
 };

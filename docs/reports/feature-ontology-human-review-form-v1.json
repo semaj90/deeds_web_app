@@ -1,0 +1,87 @@
+{
+  "schema": "atlas.feature-ontology-human-review-form.v1",
+  "generatedAt": "2026-08-28T03:19:33.786Z",
+  "mode": "HUMAN_REVIEW_INPUT_ONLY",
+  "instructions": [
+    "Set decision to ACCEPT, REJECT, or NEEDS_MORE_EVIDENCE only after inspecting the source span.",
+    "A decision here does not create a relationship or authorize persistence.",
+    "Do not set approved or canonicalAuthority to true in this generated form."
+  ],
+  "inputs": {
+    "groundedSnapshotChecksum": "fec39adde5561e357e257120d33b87f0a70c27956d7c0dc8befb01b01c9fce37",
+    "taxonomyAlignmentChecksum": "9f8b86462466d7a2dfaed9cecbab24b73ad6c5cc2ecfa5e0f6356f09317ecf68"
+  },
+  "rows": [
+    {
+      "reviewId": "review:0023:fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "candidateId": "fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:mixedbread",
+      "sourceSpan": {
+        "startChar": 32,
+        "endChar": 42,
+        "text": "Mixedbread"
+      },
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "taxonomyReviewHint": {
+        "canonicalDomain": "retrieval",
+        "conceptHint": "RERANKER",
+        "rationale": "Named provider appears in the cross-encoder reranker implementation.",
+        "evidenceBasis": "STRUCTURAL_EXACT",
+        "reviewRequired": true
+      },
+      "taxonomyAlignment": "REVIEW_ONLY_VALID",
+      "decision": null,
+      "reviewer": null,
+      "rationale": null,
+      "approved": false,
+      "canonicalAuthority": false
+    },
+    {
+      "reviewId": "review:0024:fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "candidateId": "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:stategraph",
+      "sourceSpan": {
+        "startChar": 9,
+        "endChar": 19,
+        "text": "StateGraph"
+      },
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "taxonomyReviewHint": {
+        "canonicalDomain": "agent",
+        "conceptHint": "WORKFLOW_ORCHESTRATION",
+        "rationale": "StateGraph is imported from the LangGraph workflow implementation.",
+        "evidenceBasis": "STRUCTURAL_EXACT",
+        "reviewRequired": true
+      },
+      "taxonomyAlignment": "REVIEW_ONLY_VALID",
+      "decision": null,
+      "reviewer": null,
+      "rationale": null,
+      "approved": false,
+      "canonicalAuthority": false
+    }
+  ],
+  "approvalBoundary": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "neo4jWrites": false,
+    "valkeyWrites": false,
+    "relationshipWrites": false,
+    "relationshipMaterializationAllowed": false
+  },
+  "status": "REVIEW_FORM_READY",
+  "nextGate": "HUMAN_REVIEW_DECISION_REQUIRED",
+  "formChecksum": "050cc5c256e68cb72b8697e318895070a6d55504db43d82b4d2c3c86e98e8dc8"
+}

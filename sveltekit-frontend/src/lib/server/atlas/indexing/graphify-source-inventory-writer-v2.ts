@@ -118,29 +118,32 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
        repository_revision,
        workspace_revision,
        source_manifest_digest,
+       source_manifest_source_count,
        parser_contract_version,
        extraction_contract_version,
        status,
        dry_run,
        configuration
-     ) VALUES ($1,$2,$3,$4,$5,$6,'RUNNING',false,$7::jsonb)
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,'RUNNING',false,$8::jsonb)
      ON CONFLICT (workspace_id, workspace_revision, parser_contract_version)
        WHERE workspace_revision IS NOT NULL
      DO UPDATE SET
        repository_revision = EXCLUDED.repository_revision,
        source_manifest_digest = EXCLUDED.source_manifest_digest,
+       source_manifest_source_count = EXCLUDED.source_manifest_source_count,
        extraction_contract_version = EXCLUDED.extraction_contract_version,
        configuration = public.graphify_runs.configuration || EXCLUDED.configuration
      WHERE public.graphify_runs.source_manifest_digest = EXCLUDED.source_manifest_digest
        AND public.graphify_runs.extraction_contract_version = EXCLUDED.extraction_contract_version
      RETURNING run_id, workspace_id, repository_revision, workspace_revision,
-               source_manifest_digest, parser_contract_version,
-               extraction_contract_version, dry_run`,
+               source_manifest_digest, source_manifest_source_count,
+               parser_contract_version, extraction_contract_version, dry_run`,
     [
       workspaceId,
       record.baseCommitOid,
       record.workspaceRevision,
       record.sourceManifestDigest,
+      record.sourceCount,
       parserContractVersion,
       extractionContractVersion,
       JSON.stringify({

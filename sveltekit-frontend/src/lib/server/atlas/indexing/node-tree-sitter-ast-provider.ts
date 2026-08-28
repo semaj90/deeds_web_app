@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import type {
   AtlasStructuralEvidence,
   AtlasStructuralEvidenceChunk,
+  AtlasStructuralEvidenceEdge,
 } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 import type {
   AstProvider,
@@ -244,7 +245,89 @@ function chunkForNode(
   };
 }
 
-function collectEvidence(tree: TreeLike, source: string): { chunks: AtlasStructuralEvidenceChunk[]; diagnostics: string[] } {
+function localEvidenceKey(chunk: AtlasStructuralEvidenceChunk): string {
+  return [
+    'node',
+    chunk.kind.toLowerCase(),
+    chunk.name ?? 'anonymous',
+    chunk.start_byte,
+    chunk.end_byte,
+  ].join(':');
+}
+
+function fileEvidenceKey(sourceRef: string): string {
+  return `file:${sourceRef.replaceAll('\\', '/')}`;
+}
+
+function edgeFor(
+  from: string,
+  to: string,
+  type: AtlasStructuralEvidenceEdge['type'],
+  chunk: AtlasStructuralEvidenceChunk,
+  resolved: boolean,
+  resolution: string,
+): AtlasStructuralEvidenceEdge {
+  return {
+    from_evidence_key: from,
+    to_evidence_key: to,
+    type,
+    evidence_start_line: chunk.start_line,
+    evidence_start_column: chunk.start_column,
+    evidence_end_line: chunk.end_line,
+    evidence_end_column: chunk.end_column,
+    resolved,
+    resolution,
+  };
+}
+
+function collectEdges(chunks: AtlasStructuralEvidenceChunk[], sourceRef: string): AtlasStructuralEvidenceEdge[] {
+  const fileKey = fileEvidenceKey(sourceRef);
+  const edges: AtlasStructuralEvidenceEdge[] = [];
+
+  for (const chunk of chunks) {
+    const sourceKey = chunk.kind === 'FILE' || !chunk.name ? fileKey : localEvidenceKey(chunk);
+
+    if (chunk.kind !== 'IMPORT' && chunk.kind !== 'EXPORT' && chunk.name) {
+      edges.push(edgeFor(fileKey, localEvidenceKey(chunk), 'DEFINES', chunk, true, 'local_node'));
+    }
+    for (const value of chunk.imports) {
+      edges.push(edgeFor(fileKey, value, 'IMPORTS', chunk, false, 'syntax_only'));
+    }
+    for (const value of chunk.exports) {
+      edges.push(edgeFor(fileKey, value, 'EXPORTS', chunk, false, 'syntax_only'));
+    }
+    for (const value of chunk.calls) {
+      edges.push(edgeFor(sourceKey, value, 'CALLS', chunk, false, 'unresolved_target'));
+    }
+  }
+
+  const unique = new Map<string, AtlasStructuralEvidenceEdge>();
+  for (const edge of edges) {
+    const key = [
+      edge.from_evidence_key,
+      edge.to_evidence_key,
+      edge.type,
+      edge.evidence_start_line,
+      edge.evidence_start_column,
+      edge.evidence_end_line,
+      edge.evidence_end_column,
+    ].join('\\0');
+    unique.set(key, edge);
+  }
+  return [...unique.values()].sort((a, b) =>
+    a.from_evidence_key.localeCompare(b.from_evidence_key) ||
+    a.to_evidence_key.localeCompare(b.to_evidence_key) ||
+    a.type.localeCompare(b.type) ||
+    a.evidence_start_line - b.evidence_start_line ||
+    a.evidence_start_column - b.evidence_start_column,
+  );
+}
+
+function collectEvidence(
+  tree: TreeLike,
+  source: string,
+  sourceRef: string,
+): { chunks: AtlasStructuralEvidenceChunk[]; edges: AtlasStructuralEvidenceEdge[]; diagnostics: string[] } {
   const chunks: AtlasStructuralEvidenceChunk[] = [];
   const diagnostics: string[] = [];
 
@@ -265,6 +348,7 @@ function collectEvidence(tree: TreeLike, source: string): { chunks: AtlasStructu
 
   return {
     chunks: chunks.sort((a, b) => a.start_byte - b.start_byte || a.end_byte - b.end_byte || a.kind.localeCompare(b.kind)),
+    edges: collectEdges(chunks, sourceRef),
     diagnostics: [...new Set(diagnostics)].sort(),
   };
 }
@@ -286,7 +370,7 @@ export function createNodeTreeSitterAstProvider(): AstProvider {
         const parser = new runtime.Parser();
         parser.setLanguage(runtime.grammar);
         const tree = parser.parse(input.source);
-        const { chunks, diagnostics } = collectEvidence(tree, input.source);
+        const { chunks, edges, diagnostics } = collectEvidence(tree, input.source, input.sourceRef);
         const evidence: AtlasStructuralEvidence = {
           schema: 'atlas.ast.evidence.v1',
           engine: 'node-tree-sitter',
@@ -295,7 +379,7 @@ export function createNodeTreeSitterAstProvider(): AstProvider {
           file_path: input.sourceRef,
           source_revision: input.sourceRevision,
           chunks,
-          edges: [],
+          edges,
           diagnostics,
           syntax_status: diagnostics.length > 0 ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
         };

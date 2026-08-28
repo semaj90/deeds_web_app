@@ -1,0 +1,90 @@
+{
+  "schema": "atlas.treesitter-structural-observation.v1",
+  "generatedAt": "2026-08-28T01:05:31.150Z",
+  "mode": "READ_ONLY_AUDIT",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/ast/chunk",
+    "engine": "treesitter-chunker"
+  },
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "sourceCount": 6,
+  "extractedCount": 6,
+  "failures": [],
+  "results": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "sourceDigest": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "sourceRevision": "sha256:86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "CLEAN",
+      "chunkCount": 59,
+      "edgeCount": 374,
+      "unresolvedEdgeCount": 338,
+      "observationChecksum": "sha256:6de42c0b1b9bf355a424cb90f41e2b0b5892a199d500343497500b78df61cd1a"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceDigest": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 80,
+      "edgeCount": 352,
+      "unresolvedEdgeCount": 297,
+      "observationChecksum": "sha256:a71f7752b94aa4e5bf94ec161611f5914551e96f9cf781785625e231bb24c892"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "sourceDigest": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "sourceRevision": "sha256:231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 132,
+      "edgeCount": 828,
+      "unresolvedEdgeCount": 741,
+      "observationChecksum": "sha256:391f40f7388a4e48639a7060351439bdcd93be05b6dd212277b2fdadbe44afb1"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "sourceDigest": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "CLEAN",
+      "chunkCount": 52,
+      "edgeCount": 316,
+      "unresolvedEdgeCount": 282,
+      "observationChecksum": "sha256:0cfce0793186a92ff40ca919b6cbec662f60687469eb2308a88e468afd6c36d7"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceDigest": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 186,
+      "edgeCount": 1128,
+      "unresolvedEdgeCount": 992,
+      "observationChecksum": "sha256:5d98f8b315a04b03977ab46bf41dc896489b6607162107ed357652b251cafabf"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "sourceDigest": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "sourceRevision": "sha256:e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "extractor": "treesitter-chunker:4.0.0",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 46,
+      "edgeCount": 264,
+      "unresolvedEdgeCount": 231,
+      "observationChecksum": "sha256:a5ac5bb9abe761d24f12db0914aa2e8f7a06996c9b2f8f0398adf4f235d89801"
+    }
+  ],
+  "canonicalAuthority": false,
+  "status": "STRUCTURAL_OBSERVATIONS_PROVEN",
+  "nextGate": "AST_IDENTITY_ADAPTER_AND_LSP_RESOLUTION"
+}

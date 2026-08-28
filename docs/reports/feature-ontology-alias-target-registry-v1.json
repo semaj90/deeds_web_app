@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.feature-ontology-alias-target-registry.v1",
+  "generatedAt": "2026-08-28T00:12:07.537Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "resolverRevision": "feature-ontology-explicit-alias:v1",
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "computedSelectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "expectedSelectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "registry": {
+    "table": "public.atlas_source_refs",
+    "matchingRule": "literal source_ref_key equality only",
+    "contentHashMeaning": "stable registry identity metadata; not freshness proof"
+  },
+  "status": "CANONICAL_ALIAS_TARGETS_REGISTERED_UNIQUE",
+  "counts": {
+    "selectedTargets": 6,
+    "counts": {
+      "CANONICAL_TARGET_REGISTERED_UNIQUE": 6,
+      "CANONICAL_TARGET_MISSING": 0,
+      "CANONICAL_TARGET_DUPLICATE": 0,
+      "REPO_ID_MISMATCH": 0,
+      "ALIAS_SELECTION_CHECKSUM_MISMATCH": 0
+    },
+    "registeredUniqueTargets": 6,
+    "missingTargets": 0,
+    "duplicateTargets": 0
+  },
+  "rows": [
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-client.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "registryContentHash": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-dag.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "registryContentHash": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-research.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "registryContentHash": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/trace-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "registryContentHash": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "registryContentHash": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/langextract-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "repoId": "deeds-web-app",
+      "sourceRefKey": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "registryContentHash": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "registryCommitSha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "registryCorpusVersion": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "registryMatchCount": 1,
+      "classification": "CANONICAL_TARGET_REGISTERED_UNIQUE"
+    }
+  ],
+  "nextGate": "ALIAS_APPROVAL_01"
+}

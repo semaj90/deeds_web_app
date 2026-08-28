@@ -196,6 +196,16 @@ message CodebaseChunk {
   float score = 8;
   int32 start_line = 9;
   int32 end_line = 10;
+  // Canonical Atlas identity and revision metadata. Qdrant IDs remain projection IDs.
+  string packet_key = 11;
+  string source_ref = 12;
+  string canonical_source_ref = 13;
+  string symbol_version_id = 14;
+  string content_hash = 15;
+  string workspace_revision = 16;
+  string source_revision = 17;
+  string representation_id = 18;
+  string representation_revision = 19;
 }
 
 // ── Policies ────────────────────────────────────────────────────────────

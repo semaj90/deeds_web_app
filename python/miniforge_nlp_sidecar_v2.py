@@ -98,18 +98,68 @@ async def request_timer(request: Request, call_next):
 def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
     """Run LangExtract and retain its actual grounding/alignment metadata."""
 
+    legacy._grounded_extraction_error = None
     if not legacy.LANGEXTRACT_AVAILABLE or legacy.langextract is None:
+        legacy._grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
         return []
     try:
         extract_fn = getattr(legacy.langextract, "extract", None)
         if extract_fn is None:
+            legacy._grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
             return []
-        result = getattr(extract_fn, "extract", extract_fn)(
-            text,
-            prompt_description="Extract grounded evidence for Parent Atlas. Return exact source-backed spans only.",
-            model_id=model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
-        )
-    except Exception:
+        data_module = getattr(legacy.langextract, "data", None)
+        example_data = getattr(data_module, "ExampleData", None)
+        extraction_type = getattr(data_module, "Extraction", None)
+        examples = None
+        if example_data is not None and extraction_type is not None:
+            examples = [
+                example_data(
+                    text="This module uses PostgreSQL for persistence.",
+                    extractions=[
+                        extraction_type(
+                            extraction_class="CONCEPT",
+                            extraction_text="PostgreSQL",
+                            attributes={"concept_id": "DATABASE"},
+                        )
+                    ],
+                )
+            ]
+        selected_model = model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
+        extraction_max_tokens = int(os.getenv("LANGEXTRACT_MAX_TOKENS", "256"))
+        extraction_reasoning_budget = int(os.getenv("LANGEXTRACT_REASONING_BUDGET", "0"))
+        factory = getattr(legacy.langextract, "factory", None)
+        model_config_type = getattr(factory, "ModelConfig", None)
+        extract_kwargs: dict[str, Any] = {
+            "text_or_documents": text,
+            "prompt_description": "Extract grounded evidence for Parent Atlas. Return exact source-backed spans only.",
+            "examples": examples,
+            "extraction_passes": 1,
+            "max_workers": 1,
+            "max_char_buffer": 2000,
+            "temperature": 0.0,
+        }
+        if model_config_type is not None:
+            extract_kwargs["config"] = model_config_type(
+                model_id=selected_model,
+                provider="openai",
+                provider_kwargs={
+                    "api_key": os.getenv("LANGEXTRACT_API_KEY", "local"),
+                    "base_url": os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1"),
+                    "max_tokens": extraction_max_tokens,
+                    "reasoning_format": "none",
+                    "reasoning_budget": extraction_reasoning_budget,
+                    "chat_template_kwargs": {"enable_thinking": False},
+                },
+            )
+        else:
+            extract_kwargs["model_id"] = selected_model
+            extract_kwargs["model_url"] = os.getenv("LANGEXTRACT_BASE_URL", "http://host.docker.internal:8090/v1")
+        result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
+    except Exception as error:
+        # Preserve a redacted diagnostic in the response metadata. The old
+        # behavior returned an empty list, making provider/runtime failures
+        # indistinguishable from a valid zero-extraction result.
+        legacy._grounded_extraction_error = f"{type(error).__name__}: {str(error)[:240]}"
         return []
 
     extracted: list[dict[str, Any]] = []

@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.current-feature-ontology-graph-revision.v1",
+  "generatedAt": "2026-08-28T04:50:51.949Z",
+  "mode": "READ_ONLY_DRY_RUN_DERIVATION",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "inputReport": "docs/reports/feature-ontology-relationship-materialization-v1.json",
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "kernelCount": 8,
+  "relationshipIds": [
+    "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+    "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+    "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+    "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+    "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+    "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+    "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+    "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+  ],
+  "graphIdentity": {
+    "schema": "atlas.graph-revision.v1",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "includedRelationshipIds": [
+      "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+      "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+      "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+      "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+      "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+      "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+      "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+      "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+    ],
+    "includedRelationshipChecksums": [
+      "d14889a8f554080b38738649239e686d885fb73352ade888f58a830461bc9e5b",
+      "f309141edc4ffe74dfd02c17b410508e06d2d195294a82a21811ab09b7781801",
+      "9bca7ebd47213f46d3487cef1911291e398d42c22a10506f10ff8848d1a8111c",
+      "928608e96ab6878277c595c7d21435054afac3b313d9a9f739ce34b17ce234c5",
+      "282d0fbb3bf03ad7750b0e55d2dccbfe5da854da8183319aec0a34b37a0970bd",
+      "4b3e3476a99e591720607aac9bd6f0fb5b14a04454e7fa2cc8c64059a91e319b",
+      "fe515924fdd322ae67a85444e7532919b6532f1db117923421530877754310bf",
+      "0598135ef980175ad1b7bfb08c942b3e1db1d6bb99c9dd637d76921a0aaae95a"
+    ],
+    "authoritySet": [
+      "FEATURE_INTELLIGENCE"
+    ],
+    "relationshipCount": 8,
+    "relationshipProducerRevisions": [
+      "feature-ontology-relationship-preview:v1"
+    ],
+    "projectionSchemaRevision": "atlas.relationship-graph-snapshot.v1",
+    "relationshipSetChecksum": "sha256:d82c3f46332020e6a46097c59f8e4f1aa8894724602a35c559e9cafc948bf269",
+    "graphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025"
+  },
+  "relationshipGraphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025",
+  "replay": {
+    "reversedInputGraphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025",
+    "reversedInputInvariant": true
+  },
+  "status": "CURRENT_RELATIONSHIP_GRAPH_REVISION_DERIVED_REVIEW_ONLY",
+  "nextGate": "HUMAN_REVIEW_AND_EXPLICIT_RELATIONSHIP_APPLY_AUTHORIZATION"
+}

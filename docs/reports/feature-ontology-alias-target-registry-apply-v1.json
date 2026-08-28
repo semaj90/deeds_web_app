@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.feature-ontology-alias-target-registry-apply.v1",
+  "generatedAt": "2026-08-28T00:12:02.747Z",
+  "status": "APPLIED_AND_READBACK_PROVEN",
+  "authorization": "AUTHORIZE NON-PRODUCTION SOURCE REGISTRY INSERT FOR SIX ALIAS TARGETS",
+  "approvalReceipt": "docs/reports/feature-ontology-explicit-alias-approval-v1.json",
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "rowCount": 6,
+  "readbackCount": 6,
+  "sourceRegistryOnly": true,
+  "aliasRowsWritten": false,
+  "tupleRowsWritten": false,
+  "graphifyRowsWritten": false,
+  "relationshipGraphRevisionDerived": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "rows": [
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "content_hash": "86d5275cfd5b097ff23e548af21bbe78e10b4815f173a798903f2b122f0ec896",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    },
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "content_hash": "1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    },
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "content_hash": "231b6894a2bb2a38584eb1e4f187eb1e89c18ef5f724b1c8cc1043b10ac53cae",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    },
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "content_hash": "37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    },
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "content_hash": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    },
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "repo_id": "deeds-web-app",
+      "source_type": "code",
+      "relative_path": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "content_hash": "e2421bd70077b7b52c75d3a7ff706eec5227c3a2cd0719a34cd386ca2e4e6ada",
+      "parser_name": "workspace-source-binding-observer",
+      "parser_version": "atlas.workspace-source-binding-observer.v1",
+      "commit_sha": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "corpus_version": "workspace:sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70"
+    }
+  ],
+  "nextGate": "RERUN_SOURCE_REGISTRY_AUDIT_THEN_GRAPHIFY_ALIAS_DRY_RUN"
+}

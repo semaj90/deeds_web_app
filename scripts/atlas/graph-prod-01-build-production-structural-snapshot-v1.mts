@@ -15,11 +15,15 @@ const { serializeIncidenceEdgesToArrowIpc, checksumArrowIpc } = await import('..
 const { buildGraphRevisionV1 } = await import('./lib/graph-revision-v1.mjs');
 
 /**
- * GRAPH-PROD-01: the first *production* StructuralGraphSnapshotV1 builder —
+ * GRAPH-PROD-01: the relationship-domain incidence snapshot builder —
  * reads real HyperedgeV1 rows (atlas_hyperedges) and real FeatureRelationshipV1
  * rows (atlas_relationships) from Postgres, converts both through their
  * respective adapters into the shared RelationshipKernelV1, projects them into
- * one incidence graph, and emits a real Arrow IPC edge artifact.
+ * one incidence graph, and emits a real Arrow IPC edge artifact. Despite the
+ * historical filename and compatibility schema, this is a
+ * RelationshipGraphSnapshotV1/RelationshipIncidenceSnapshot, not an AST
+ * StructuralGraphSnapshotV1. AST revisions are produced by the independent
+ * ast-structural-revision-v1 contract.
  *
  * The source tables contain real historical rows. This builder excludes any
  * kernel whose workspace revision is not the explicitly requested current
@@ -53,6 +57,9 @@ async function main() {
 
   const report: Record<string, unknown> = {
     schema: 'atlas.graph-prod-01.production-snapshot-build.v1',
+    snapshotKind: 'RelationshipGraphSnapshotV1',
+    graphDomain: 'KAG_FI_RELATIONSHIP',
+    astGraphRevision: null,
     workspaceRevision,
     candidateSnapshotRevision,
     ordinalMapChecksum,
@@ -122,7 +129,12 @@ async function main() {
       ordinalMapChecksum,
       edgeArtifact: { format: 'ARROW_IPC', checksum: artifactChecksum, ref: artifactPath },
     });
-    report.snapshot = snapshot;
+    report.snapshot = {
+      ...snapshot,
+      snapshotKind: 'RelationshipGraphSnapshotV1',
+      graphDomain: 'KAG_FI_RELATIONSHIP',
+      astGraphRevision: null,
+    };
 
     // GRAPH-PROD-02 (determinism): rebuild the same edge artifact from the
     // same projection and confirm the checksum is reproducible before

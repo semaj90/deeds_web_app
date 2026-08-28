@@ -3,7 +3,7 @@
 - status: **PROVEN**
 - cards: **7**
 - observed kinds: `CLASS, FILE, FUNCTION, INTERFACE, METHOD, MODULE, TYPE`
-- source revision: `5e088be9d4d54010b68c6cfc7c734672dac7a0e0`
+- source revision: `1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf`
 - representation revision: `structural-card-v1`
 - canonical writes: **false**
 

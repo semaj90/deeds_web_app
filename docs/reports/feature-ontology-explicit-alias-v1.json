@@ -1,0 +1,199 @@
+{
+  "schema": "atlas.feature-ontology-explicit-alias.v1",
+  "generatedAt": "2026-08-27T23:59:50.599Z",
+  "readOnly": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "gpuWrites": false,
+  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "resolverRevision": "feature-ontology-explicit-alias:v1",
+  "aliasPolicy": {
+    "transformation": "src/... -> sveltekit-frontend/src/...",
+    "resolutionKind": "ROOT_PREFIX_ALIAS",
+    "automaticPromotion": false,
+    "durableOwnerDesign": "atlas_source_aliases",
+    "requiredDurableStatusForPromotion": "VERIFIED",
+    "rewriteHistoricalTupleSourceRefs": false,
+    "fuzzyMatching": false,
+    "basenameMatching": false
+  },
+  "counts": {
+    "distinctUsesConceptSourceRefs": 7,
+    "tuplesCovered": 603,
+    "explicitAliasReviewReadySourceRefs": 6,
+    "explicitAliasReviewReadyTuples": 595,
+    "collisions": 1,
+    "unresolved": 0,
+    "promotableAliases": 0
+  },
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "candidates": [
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-client.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "tupleCount": 114,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-dag.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "tupleCount": 63,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/langgraph-research.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "tupleCount": 59,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/ai/trace-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "tupleCount": 72,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "tupleCount": 189,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/retrieval/langextract-reranker.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "tupleCount": 98,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "EXPLICIT_ALIAS_REVIEW_READY",
+      "promotable": false,
+      "reason": "current observation proves canonical target exists; durable VERIFIED alias is still required",
+      "observationAliasPresent": false,
+      "observationCanonicalPresent": true,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    },
+    {
+      "aliasSourceRef": "src/lib/server/valkey.ts",
+      "canonicalSourceRef": "sveltekit-frontend/src/lib/server/valkey.ts",
+      "tupleCount": 8,
+      "packetCount": 1,
+      "extractorVersions": [
+        "atlas-packets-ontology-v1",
+        "atlas-packets-ontology-v1"
+      ],
+      "resolutionKind": "ROOT_PREFIX_ALIAS",
+      "classification": "DUAL_NAMESPACE_COLLISION",
+      "promotable": false,
+      "reason": "legacy locator is itself an observed repo-root source",
+      "observationAliasPresent": true,
+      "observationCanonicalPresent": false,
+      "graphifyAliasRows": 0,
+      "graphifyCanonicalRows": 0,
+      "evidenceRefs": [
+        "docs/reports/workspace-source-binding-observation.json",
+        "feature_ontology_tuples:USES_CONCEPT"
+      ],
+      "resolverRevision": "feature-ontology-explicit-alias:v1"
+    }
+  ],
+  "status": "EXPLICIT_ALIAS_COHORT_BLOCKED_BY_COLLISION",
+  "nextGate": "RESOLVE_SOURCE_SCOPE_BEFORE_ALIAS_APPROVAL",
+  "relationshipGraphRevision": null,
+  "rel01bAllowed": false
+}

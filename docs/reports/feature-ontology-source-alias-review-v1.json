@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.feature-ontology-source-alias-review.v1",
+  "generatedAt": "2026-08-27T23:58:57.110Z",
+  "mode": "READ_ONLY_REVIEW",
+  "readOnly": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "canonicalAuthorityChanged": false,
+  "approvalRequired": true,
+  "approved": false,
+  "policy": "ACTIVE_APP_RELATIVE_V1",
+  "sourcePopulation": "feature_ontology_tuples predicate USES_CONCEPT",
+  "inputReport": "docs/reports/feature-ontology-current-cohort-v1.json",
+  "aliasRule": "sveltekit-frontend/<frontend-relative-source-ref>",
+  "counts": {
+    "sourceRefsExamined": 7,
+    "observedAliasSourceRefs": 6,
+    "unresolvedSourceRefs": 1,
+    "promotableBindings": 0
+  },
+  "candidates": [
+    {
+      "sourceRef": "src/lib/server/ai/langgraph-client.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/ai/langgraph-dag.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/ai/langgraph-research.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/ai/trace-reranker.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/retrieval/langextract-reranker.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+      "observedInWorkspace": true,
+      "resolution": "EXPLICIT_ALIAS_REVIEW_ONLY",
+      "promotable": false
+    },
+    {
+      "sourceRef": "src/lib/server/valkey.ts",
+      "proposedCanonicalSourceRef": "sveltekit-frontend/src/lib/server/valkey.ts",
+      "observedInWorkspace": false,
+      "resolution": "UNRESOLVED",
+      "promotable": false
+    }
+  ],
+  "decision": "REVIEW_REQUIRED_BEFORE_GRAPHIFY_LINEAGE_BINDING",
+  "nextGate": "APPROVE_EXPLICIT_SOURCE_REF_ALIAS_OR_CLASSIFY_LEGACY_TUPLES"
+}

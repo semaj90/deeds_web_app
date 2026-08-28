@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.cuvs-cosine-768-proof.v1",
+  "status": "CUVS_COSINE_768_PASS",
+  "cuvs_version": "26.06.00",
+  "metric": "cosine",
+  "score_transform": "canonicalSimilarity = 1 - cuvsCosineDistance",
+  "rows": 64,
+  "dimensions": 768,
+  "query_count": 4,
+  "top_k": 5,
+  "cpu_neighbor_checksum": "433356d446bcfbfecea001c94380c6e65dd6e451d0f6ba42899e6855a1627edf",
+  "gpu_neighbor_checksum": "433356d446bcfbfecea001c94380c6e65dd6e451d0f6ba42899e6855a1627edf",
+  "cpu_distance_checksum": "1b6c8ec1204c2b4f22a76463feb2d6456ea0a38d890f89b15aad0ee0c45c3d2b",
+  "gpu_distance_checksum": "b40879b3f93ed9e3bdf873e9fc502fbbddf3c664f7e62bf6e873626413cf656c",
+  "identity_match": true,
+  "score_match": true,
+  "canonical_authority": false,
+  "writes_attempted": false,
+  "report_path": "docs/reports/cuvs-cosine-768-proof-v1.json"
+}

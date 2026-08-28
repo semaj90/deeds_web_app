@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.feature-ontology-grounded-review-snapshot.v1",
+  "generatedAt": "2026-08-28T03:17:05.980Z",
+  "mode": "READ_ONLY_OPERATOR_REVIEW",
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "input": {
+    "validation": "docs/reports/feature-ontology-fresh-candidate-validation-v1.json",
+    "queue": "docs/reports/feature-ontology-fresh-review-queue-v1.json",
+    "validationChecksum": "887d4641f5cae2388806d22b0d6a919fcf8d4a4ce39659def0c51bafdbc1b9aa",
+    "queueChecksum": "e7c438ae856a238f8d0576409d857e9a1912bae5dd4b2221225b1bf805855084"
+  },
+  "counts": {
+    "groundedCandidates": 2,
+    "pending": 2,
+    "approved": 0
+  },
+  "candidates": [
+    {
+      "reviewId": "review:0023:fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "candidateId": "fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:mixedbread",
+      "sourceSpan": {
+        "startChar": 32,
+        "endChar": 42,
+        "text": "Mixedbread"
+      },
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "taxonomyReviewHint": {
+        "canonicalDomain": "retrieval",
+        "conceptHint": "RERANKER",
+        "rationale": "Named provider appears in the cross-encoder reranker implementation.",
+        "evidenceBasis": "STRUCTURAL_EXACT",
+        "reviewRequired": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false
+    },
+    {
+      "reviewId": "review:0024:fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "candidateId": "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "sourceRevision": "sha256:1840825b32ee43669794fb4f8647ca6468e2033304d39a3019a224b7dc49f215",
+      "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+      "objectId": "concept:stategraph",
+      "sourceSpan": {
+        "startChar": 9,
+        "endChar": 19,
+        "text": "StateGraph"
+      },
+      "evidenceModes": [
+        "SEMANTIC_INFERRED",
+        "STRUCTURAL_EXACT"
+      ],
+      "taxonomyReviewHint": {
+        "canonicalDomain": "agent",
+        "conceptHint": "WORKFLOW_ORCHESTRATION",
+        "rationale": "StateGraph is imported from the LangGraph workflow implementation.",
+        "evidenceBasis": "STRUCTURAL_EXACT",
+        "reviewRequired": true
+      },
+      "decision": "PENDING_REVIEW",
+      "approved": false,
+      "canonicalAuthority": false
+    }
+  ],
+  "relationshipMaterializationAllowed": false,
+  "status": "GROUNDED_CANDIDATES_READY_FOR_HUMAN_REVIEW",
+  "nextGate": "HUMAN_REVIEW_DECISION_REQUIRED",
+  "snapshotChecksum": "fec39adde5561e357e257120d33b87f0a70c27956d7c0dc8befb01b01c9fce37"
+}

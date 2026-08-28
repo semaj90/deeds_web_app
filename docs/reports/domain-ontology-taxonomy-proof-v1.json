@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.domain-ontology-taxonomy-proof-receipt.v1",
+  "status": "PROVEN_FIXTURE_ONLY",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "productionState": {
+    "domainTaxonomy": "FLAT_CANONICAL_DOMAIN_LIST_WITH_ALIAS_AND_SCORE_CLASSIFICATION",
+    "topologyTaxonomy": "HIERARCHICAL_TAXONOMY_NODES_AND_EDGES",
+    "ontologyTuples": "EVIDENCE_LINKED_TYPED_ASSERTIONS",
+    "promotion": "REVIEWED_TAXONOMY_ASSIGNMENT_TO_ENTITY_CLASSIFIED_AS_HYPEREDGE"
+  },
+  "fixture": {
+    "hierarchyDepth": 3,
+    "domainNodes": [
+      {
+        "domainId": "software",
+        "parentDomainId": null
+      },
+      {
+        "domainId": "software.retrieval",
+        "parentDomainId": "software"
+      },
+      {
+        "domainId": "software.retrieval.semantic",
+        "parentDomainId": "software.retrieval"
+      }
+    ],
+    "concepts": [
+      {
+        "conceptId": "concept:semantic-search",
+        "broaderConceptId": null,
+        "domainId": "software.retrieval.semantic"
+      },
+      {
+        "conceptId": "concept:embedding",
+        "broaderConceptId": "concept:semantic-search",
+        "domainId": "software.retrieval.semantic"
+      }
+    ],
+    "tuples": [
+      {
+        "tupleId": "tuple:domain",
+        "subject": "packet:1",
+        "predicate": "CLASSIFIED_AS",
+        "object": "software.retrieval",
+        "evidenceRefs": [
+          "source:src/search.ts"
+        ]
+      },
+      {
+        "tupleId": "tuple:concept",
+        "subject": "packet:1",
+        "predicate": "HAS_ONTOLOGY_TAG",
+        "object": "concept:embedding",
+        "evidenceRefs": [
+          "ast:symbol:embed"
+        ]
+      },
+      {
+        "tupleId": "tuple:topology",
+        "subject": "packet:1",
+        "predicate": "MEMBER_OF",
+        "object": "cluster:retrieval:7",
+        "evidenceRefs": [
+          "topology:receipt:1"
+        ]
+      },
+      {
+        "tupleId": "tuple:broader",
+        "subject": "concept:embedding",
+        "predicate": "BROADER_THAN",
+        "object": "concept:semantic-search",
+        "evidenceRefs": [
+          "ontology:def:1"
+        ]
+      }
+    ],
+    "domainCount": 3,
+    "conceptCount": 2,
+    "tupleCount": 4,
+    "hierarchyChecksum": "082e24e4d0f037c827e4695a9ece03251be481426508a7a91aaa5d1401dcab3d",
+    "conceptChecksum": "7c82049394bea0659ea8f9f3e0d10c7bc08e5f0d202350d67ac92f77fe9c2ab9",
+    "tupleSetChecksum": "6e3277f1211badf34f0c2862aa9528cb550537e5f05b08eab6f8b706a82a3a45"
+  },
+  "invariant": "domain classification, ontology concept membership, and topology membership are separate predicates",
+  "notProven": [
+    "durable current domain hierarchy owner",
+    "revision-qualified domain tuple backfill",
+    "live source lineage for all packets",
+    "promotion of unreviewed assignments"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.svelte-virtual-source-binding-proof.v1",
+  "status": "PROVEN_LIVE_READ_ONLY",
+  "writes": false,
+  "sourceRef": "src/routes/admin/cache/+page.svelte",
+  "sourceRevision": "sha256:f63d26d7bf83c35ecc3514da3ae95d5672b91b2065be3420544b47baa9e4368c",
+  "sourceContentDigest": "sha256:f63d26d7bf83c35ecc3514da3ae95d5672b91b2065be3420544b47baa9e4368c",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "observationBindingFound": true,
+  "observationContentDigestMatches": true,
+  "virtualDocument": {
+    "transform": "svelte2tsx",
+    "transformRevision": "package-local",
+    "virtualContentDigest": "sha256:b9e55a852d2b631b9d8aaa5fa98a643b132ffbeb2767c74f75ddb2e4bf4467bf",
+    "sourceMapChecksum": "sha256:092724e53bcf0bd35fbb20e0329e3c0aa73de756a2f1c04daad825ce64028d27",
+    "virtualByteLength": 4305,
+    "generatedPosition": {
+      "line": 13,
+      "column": 8
+    },
+    "originalMapping": {
+      "source": "C:/Users/james/Videos/deeds-web-app/src/routes/admin/cache/+page.svelte",
+      "line": 8,
+      "column": 8,
+      "name": null
+    }
+  },
+  "remaining": [
+    "exact source-map range to Tree-sitter node proof",
+    "Svelte Language Server semantic request proof"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.ast-structural-revision-proof-receipt.v1",
+  "status": "PROVEN_FIXTURE_ONLY",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checks": {
+    "reorderedInputInvariant": true,
+    "parserChangeChangesRevision": true,
+    "sourceRevisionChangeChangesRevision": true,
+    "astEdgeChangeChangesRevision": true,
+    "edgeExtractorChangeChangesRevision": true,
+    "incompleteSourceRejected": true
+  },
+  "astGraphRevision": "sha256:914f8880386436d3196c1bf0ecdf27bf742ab4bf10e756010cb89e89b6c55c1a",
+  "nodeTableChecksum": "e350f2771cdb28ff4062d276a95d399e0aaff272cfb57baabedd7c0afa0dd10f",
+  "edgeTableChecksum": "270cd54aa1b13f054a344b5cf36a1a903835ebec3641a77ba980709dbeb8c41e",
+  "semantics": {
+    "sourceAuthority": "sourceRevision/contentDigest",
+    "parserAuthority": "parserName/parserVersion",
+    "materializerAuthority": "materializerRevision/edgeExtractorRevision",
+    "separateFrom": "relationshipGraphRevision"
+  },
+  "notProven": [
+    "live atlas_ast_nodes materialization",
+    "current source-lineage coverage",
+    "composite AST plus relationship projection",
+    "NetworkX/cuGraph production replay"
+  ]
+}

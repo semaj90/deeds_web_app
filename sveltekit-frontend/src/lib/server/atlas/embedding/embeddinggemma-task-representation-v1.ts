@@ -1,7 +1,11 @@
 import { createHash } from 'node:crypto';
+import {
+  SEMANTIC_DIMENSION,
+} from '../../embedding/embedding-contract-768.js';
 
 export const EMBEDDINGGEMMA_MODEL_ID = 'google/embeddinggemma-300m' as const;
-export const EMBEDDINGGEMMA_NATIVE_DIMENSION = 768 as const;
+/** Compatibility alias; the canonical dimension is owned by embedding-contract-768. */
+export const EMBEDDINGGEMMA_NATIVE_DIMENSION = SEMANTIC_DIMENSION;
 export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [128, 256, 512, 768] as const;
 export type EmbeddingGemmaMrlDimension = (typeof EMBEDDINGGEMMA_MRL_DIMENSIONS)[number];
 

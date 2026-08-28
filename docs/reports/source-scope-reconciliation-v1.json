@@ -1,0 +1,363 @@
+{
+  "schema": "atlas.source-scope-reconciliation.v1",
+  "generatedAt": "2026-08-28T04:13:49.034Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "denominator": {
+    "manifest": ".tmp/atlas/indexable-source-manifest-v1/manifest.jsonl",
+    "manifestRows": 16629,
+    "distinctRefs": 16629,
+    "admittedRows": 16568,
+    "admittedDistinctRefs": 16568,
+    "manifestChecksum": "ac7a2300188a35c16b667b7ce347b11847fdc49f8e8f2b7c6ebdb747b7e9221b",
+    "buckets": {
+      "OTHER": 2432,
+      "DOCS": 1034,
+      "PACKAGES": 462,
+      "SCRIPTS": 2769,
+      "SERVICES": 42,
+      "SVELTEKIT_FRONTEND": 9829
+    }
+  },
+  "namespaceReconciliation": {
+    "resolverRevision": "feature-ontology-explicit-alias:v1",
+    "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+    "approvedAliasCount": 6,
+    "classificationRule": "EXACT_CURRENT > APPROVED_ALIAS_CURRENT > UNRESOLVED",
+    "exactCoverage": {
+      "postgresChunkIndex": {
+        "projectionDistinctRefs": 4677,
+        "admittedManifestExactMatches": 964,
+        "admittedManifestApprovedAliasMatches": 5,
+        "admittedManifestMissing": 15599,
+        "projectionOnlyRefs": 3708
+      },
+      "graphifyFiles": {
+        "projectionDistinctRefs": 885,
+        "admittedManifestExactMatches": 707,
+        "admittedManifestApprovedAliasMatches": 0,
+        "admittedManifestMissing": 15861,
+        "projectionOnlyRefs": 178
+      },
+      "qdrant": {
+        "projectionDistinctRefs": 6834,
+        "admittedManifestExactMatches": 3713,
+        "admittedManifestApprovedAliasMatches": 0,
+        "admittedManifestMissing": 12855,
+        "projectionOnlyRefs": 3116
+      }
+    }
+  },
+  "exclusionPolicy": {
+    "excludedBuckets": [
+      "NODE_MODULES",
+      "GIT",
+      "DIST",
+      "BUILD",
+      "ARCHIVE"
+    ],
+    "manifestExcludedRows": 0,
+    "status": "MANIFEST_DECLARED_SCOPE_RECORDED"
+  },
+  "postgres": {
+    "reachable": true,
+    "tables": [
+      "atlas_packets",
+      "codebase_chunk_index",
+      "feature_domain_facts",
+      "graphify_files"
+    ],
+    "projection": {
+      "codebaseChunkIndex": {
+        "total": 55206,
+        "identified": 55169,
+        "distinctrefs": 4677
+      },
+      "codebaseChunkBuckets": [
+        {
+          "bucket": "DOCS",
+          "count": 6473
+        },
+        {
+          "bucket": "EMPTY",
+          "count": 37
+        },
+        {
+          "bucket": "OTHER",
+          "count": 40594
+        },
+        {
+          "bucket": "PACKAGES",
+          "count": 1482
+        },
+        {
+          "bucket": "SCRIPTS",
+          "count": 3502
+        },
+        {
+          "bucket": "SERVICES",
+          "count": 329
+        },
+        {
+          "bucket": "SVELTEKIT_FRONTEND",
+          "count": 2789
+        }
+      ],
+      "embeddingCoverage": {
+        "total": 55206,
+        "semantic768": 724,
+        "searchvector": 55206,
+        "qdrantids": 55206
+      },
+      "graphify": {
+        "total": 885,
+        "distinctrefs": 885,
+        "currentworkspace": 373,
+        "contenthashes": 885
+      },
+      "packets": {
+        "total": 61660,
+        "domainclass": 61660,
+        "primarydomain": 0,
+        "taxonomylevel": 61660
+      },
+      "domainFacts": {
+        "total": 91658,
+        "distinctclasses": 40,
+        "classified": 91658
+      }
+    }
+  },
+  "retrieval": {
+    "healthUrl": "http://127.0.0.1:8100/health",
+    "reachable": true,
+    "status": 200,
+    "body": {
+      "dependencies": {
+        "embedding_service": {
+          "connected": true,
+          "required": true
+        },
+        "postgres": {
+          "connected": true,
+          "required": true
+        },
+        "qdrant": {
+          "connected": true,
+          "required": true
+        },
+        "redis": {
+          "connected": true,
+          "required": false
+        }
+      },
+      "embeddingServiceUp": true,
+      "pgvectorConnected": true,
+      "qdrantConnected": true,
+      "readiness_state": "READY_FULL",
+      "redisConnected": true,
+      "status": "healthy",
+      "timestamp": 1787890426981
+    }
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "collectionInfo": {
+      "result": {
+        "status": "green",
+        "optimizer_status": "ok",
+        "indexed_vectors_count": 109983,
+        "points_count": 109129,
+        "segments_count": 4,
+        "config": {
+          "params": {
+            "vectors": {
+              "content": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "error": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "signature": {
+                "size": 768,
+                "distance": "Cosine"
+              }
+            },
+            "shard_number": 1,
+            "replication_factor": 1,
+            "write_consistency_factor": 1,
+            "on_disk_payload": true
+          },
+          "hnsw_config": {
+            "m": 16,
+            "ef_construct": 200,
+            "full_scan_threshold": 10000,
+            "max_indexing_threads": 0,
+            "on_disk": false
+          },
+          "optimizer_config": {
+            "deleted_threshold": 0.2,
+            "vacuum_min_vector_number": 1000,
+            "default_segment_number": 0,
+            "max_segment_size": null,
+            "memmap_threshold": null,
+            "indexing_threshold": 10000,
+            "flush_interval_sec": 5,
+            "max_optimization_threads": null,
+            "prevent_unoptimized": null
+          },
+          "wal_config": {
+            "wal_capacity_mb": 32,
+            "wal_segments_ahead": 0,
+            "wal_retain_closed": 1
+          },
+          "quantization_config": {
+            "scalar": {
+              "type": "int8",
+              "quantile": 0.99,
+              "always_ram": false
+            }
+          }
+        },
+        "payload_schema": {
+          "next_action": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "feature_id": {
+            "data_type": "keyword",
+            "points": 109128
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 106304
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 106337
+          },
+          "workspace_id": {
+            "data_type": "keyword",
+            "points": 52381
+          },
+          "cluster_key": {
+            "data_type": "keyword",
+            "points": 20926
+          },
+          "file_path": {
+            "data_type": "keyword",
+            "points": 109095
+          },
+          "centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "repo": {
+            "data_type": "keyword",
+            "points": 2791
+          },
+          "semantic_path": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 1
+          },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 106237
+          },
+          "observed_at": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "summary_hash": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "error_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 2816
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 109094
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 109129
+          },
+          "updated_at": {
+            "data_type": "integer",
+            "points": 0
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "kind": {
+            "data_type": "keyword",
+            "points": 9824
+          }
+        },
+        "update_queue": {
+          "length": 0
+        }
+      },
+      "status": "ok",
+      "time": 0.002753513
+    },
+    "sampleReachable": true,
+    "samplePoints": 100,
+    "samplePayloadKeys": [
+      "packet_key",
+      "relative_path",
+      "source_ref"
+    ]
+  },
+  "gates": {
+    "manifestAvailable": true,
+    "postgresReachable": true,
+    "retrievalReady": true,
+    "qdrantCollectionReachable": true,
+    "excludedDirectoryLeakageInManifest": false,
+    "canonicalPostgresSemantic768Complete": false,
+    "manifestToPostgresExactCoverageComplete": false,
+    "manifestToGraphifyExactCoverageComplete": false,
+    "manifestToQdrantExactCoverageComplete": false,
+    "status": "READ_ONLY_SCOPE_AND_ALIGNMENT_RECORDED"
+  },
+  "nextGate": "RECONCILE_MANIFEST_TO_GRAPHIFY_POSTGRES_QDRANT_BY_SOURCE_REF_AND_REVISION"
+}

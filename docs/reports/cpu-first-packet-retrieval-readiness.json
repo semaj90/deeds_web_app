@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-11T01:20:28.512Z",
-  "status": "LIVE_PASS",
+  "generated_at": "2026-08-28T01:07:13.171Z",
+  "status": "WARN",
   "cutoff": "CPU fp32 packet truth and queryability first; GPU/TensorRT/cuVS only as acceleration lanes.",
   "lanes": {
     "postgres": {
@@ -16,31 +16,50 @@
         "fts": true
       },
       "counts": {
-        "total": 58365,
-        "with_packet_key": 58365,
-        "with_source_ref": 58365,
-        "with_feature_id": 58365,
-        "with_source_ref_key": 58365,
-        "with_qdrant_point_id": 4713,
-        "with_packet_summary": 4180,
-        "with_pgvector_embedding": 10,
+        "total": 61660,
+        "with_packet_key": 61660,
+        "with_source_ref": 61660,
+        "with_feature_id": 61660,
+        "with_source_ref_key": 61660,
+        "with_qdrant_point_id": 6451,
+        "with_packet_summary": 6886,
+        "with_pgvector_embedding": 61659,
         "packet_key_pct": 100,
         "source_ref_pct": 100,
         "feature_id_pct": 100,
         "source_ref_key_pct": 100,
-        "qdrant_point_id_pct": 8.08,
-        "packet_summary_pct": 7.16,
-        "pgvector_embedding_pct": 0.02
+        "qdrant_point_id_pct": 10.46,
+        "packet_summary_pct": 11.17,
+        "pgvector_embedding_pct": 100
       },
-      "fts_sample_count": 0,
-      "fts_samples": []
+      "fts_sample_count": 3,
+      "fts_samples": [
+        {
+          "packet_key": "packet:d6d1b7dc14e9",
+          "source_ref": "sveltekit-frontend/src/lib/graph/graph.remote.ts",
+          "feature_id": "sveltekit-frontend.graph.remote",
+          "rank": 0.14996298
+        },
+        {
+          "packet_key": "packet:f83ef3270cf5",
+          "source_ref": "sveltekit-frontend/src/routes/api/health/capabilities/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "rank": 0.11678365
+        },
+        {
+          "packet_key": "packet:6aadd81aa89b",
+          "source_ref": "sveltekit-frontend/src/routes/api/graph/bow-texture/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "rank": 0.077702306
+        }
+      ]
     },
     "qdrant": {
       "status": "LIVE_PASS",
       "url": "http://127.0.0.1:6333",
       "collection": "codebase_chunks_768",
-      "points": 55117,
-      "indexed_vectors": 144062,
+      "points": 109129,
+      "indexed_vectors": 109983,
       "named_vectors": [
         "content",
         "error",
@@ -49,13 +68,13 @@
       "content_vector_dim": 768
     },
     "redis": {
-      "status": "LIVE_PASS",
+      "status": "WARN",
       "container": "legal-ai-valkey",
       "counts": {
-        "bifrost:*": 50,
-        "bifrost:sem:packet:*": 25,
-        "bifrost:sem:feature:*": 25,
-        "ace:context:*": 25,
+        "bifrost:*": 0,
+        "bifrost:sem:packet:*": 0,
+        "bifrost:sem:feature:*": 0,
+        "ace:context:*": 0,
         "centroid:*": 0,
         "som:*": 0
       }

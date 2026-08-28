@@ -1,6 +1,6 @@
 # Domain Classification Readiness Audit
 
-Generated: 2026-08-24T16:56:48.093Z
+Generated: 2026-08-28T04:21:34.465Z
 Status: READY_WITH_GAPS
 
 ## Coverage

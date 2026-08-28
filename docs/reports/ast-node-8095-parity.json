@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.ast.node.8095.parity.v1",
-  "generatedAt": "2026-08-24T01:01:33.354Z",
+  "generatedAt": "2026-08-27T21:54:07.410Z",
   "status": "DEGRADED_COMPATIBILITY_GAP",
   "currentExecutor": "treesitter-chunker-8095",
   "challenger": "treesitter-node",
@@ -8,6 +8,18 @@
   "filesChecked": 6,
   "canonicalWrites": false,
   "canonicalPromotionAllowed": false,
+  "edgeComparison": {
+    "comparableTypes": [
+      "DEFINES",
+      "IMPORTS",
+      "EXPORTS",
+      "CALLS"
+    ],
+    "nonComparableTypes": [
+      "REFERENCES"
+    ],
+    "nonComparableReason": "8095 REFERENCES edges are dependency evidence; Node challenger currently reports syntax/structural AST edges only."
+  },
   "deferred": [
     "typed edge parity",
     "native provenance parity",
@@ -50,8 +62,42 @@
       "missingKinds": [],
       "spanMismatches": 2,
       "edges": {
-        "node": 0,
-        "sidecar8095": 13
+        "node": 8,
+        "sidecar8095": 13,
+        "nodeByType": {
+          "EXPORTS": 3,
+          "CALLS": 3,
+          "DEFINES": 2
+        },
+        "sidecar8095ByType": {
+          "EXPORTS": 2,
+          "CALLS": 2,
+          "REFERENCES": 7,
+          "DEFINES": 2
+        },
+        "semanticMissing": [
+          "CALLS|helper|1|0",
+          "CALLS|helper|1|7",
+          "DEFINES||1|7",
+          "DEFINES||2|0",
+          "EXPORTS|add|1|0",
+          "EXPORTS|helper|2|0",
+          "REFERENCES|a|1|0",
+          "REFERENCES|a|1|7",
+          "REFERENCES|b|1|0",
+          "REFERENCES|b|1|7",
+          "REFERENCES|helper|1|0",
+          "REFERENCES|helper|1|7",
+          "REFERENCES|x|2|0"
+        ],
+        "semanticExtra": [
+          "CALLS|helper|0|0",
+          "CALLS|helper|0|7",
+          "DEFINES||0|7",
+          "DEFINES||1|0",
+          "EXPORTS|add|0|0",
+          "EXPORTS|add|0|7"
+        ]
       }
     },
     {
@@ -95,8 +141,40 @@
       "missingKinds": [],
       "spanMismatches": 4,
       "edges": {
-        "node": 0,
-        "sidecar8095": 12
+        "node": 10,
+        "sidecar8095": 12,
+        "nodeByType": {
+          "DEFINES": 4,
+          "EXPORTS": 6
+        },
+        "sidecar8095ByType": {
+          "REFERENCES": 6,
+          "DEFINES": 4,
+          "EXPORTS": 2
+        },
+        "semanticMissing": [
+          "DEFINES||1|25",
+          "DEFINES||2|39",
+          "DEFINES||2|7",
+          "EXPORTS|Shape|1|7",
+          "EXPORTS|area|2|39",
+          "REFERENCES|Shape|1|0",
+          "REFERENCES|Shape|1|7",
+          "REFERENCES|Shape|2|0",
+          "REFERENCES|Shape|2|7",
+          "REFERENCES|Square|2|0",
+          "REFERENCES|Square|2|7"
+        ],
+        "semanticExtra": [
+          "DEFINES||0|25",
+          "DEFINES||0|7",
+          "DEFINES||1|39",
+          "EXPORTS|Shape|0|0",
+          "EXPORTS|Shape|0|7",
+          "EXPORTS|Square|0|0",
+          "EXPORTS|Square|1|0",
+          "EXPORTS|Square|1|7"
+        ]
       }
     },
     {
@@ -137,8 +215,34 @@
       "missingKinds": [],
       "spanMismatches": 1,
       "edges": {
-        "node": 0,
-        "sidecar8095": 9
+        "node": 4,
+        "sidecar8095": 9,
+        "nodeByType": {
+          "IMPORTS": 2,
+          "DEFINES": 2
+        },
+        "sidecar8095ByType": {
+          "IMPORTS": 2,
+          "REFERENCES": 5,
+          "EXPORTS": 1,
+          "DEFINES": 1
+        },
+        "semanticMissing": [
+          "DEFINES||3|13",
+          "EXPORTS|run|3|0",
+          "IMPORTS|import { readFile } from 'node:fs';|1|0",
+          "IMPORTS|{ readFile }|1|0",
+          "REFERENCES|readFile|1|0",
+          "REFERENCES|readFile|2|0",
+          "REFERENCES|readFile|3|0",
+          "REFERENCES|readFile|3|13",
+          "REFERENCES|readFile|3|19"
+        ],
+        "semanticExtra": [
+          "DEFINES||2|13",
+          "DEFINES||2|19",
+          "IMPORTS|node:fs|0|0"
+        ]
       }
     },
     {
@@ -174,8 +278,37 @@
       "missingKinds": [],
       "spanMismatches": 1,
       "edges": {
-        "node": 0,
-        "sidecar8095": 9
+        "node": 5,
+        "sidecar8095": 9,
+        "nodeByType": {
+          "CALLS": 2,
+          "DEFINES": 1,
+          "EXPORTS": 2
+        },
+        "sidecar8095ByType": {
+          "EXPORTS": 1,
+          "CALLS": 2,
+          "REFERENCES": 5,
+          "DEFINES": 1
+        },
+        "semanticMissing": [
+          "CALLS|items.map|1|0",
+          "CALLS|items.map|1|7",
+          "DEFINES||1|7",
+          "EXPORTS|outer|1|0",
+          "REFERENCES|items|1|0",
+          "REFERENCES|items|1|7",
+          "REFERENCES|item|1|0",
+          "REFERENCES|item|1|56",
+          "REFERENCES|item|1|7"
+        ],
+        "semanticExtra": [
+          "CALLS|items.map|0|0",
+          "CALLS|items.map|0|7",
+          "DEFINES||0|7",
+          "EXPORTS|outer|0|0",
+          "EXPORTS|outer|0|7"
+        ]
       }
     },
     {
@@ -207,8 +340,41 @@
       "missingKinds": [],
       "spanMismatches": 0,
       "edges": {
-        "node": 0,
-        "sidecar8095": 10
+        "node": 11,
+        "sidecar8095": 10,
+        "nodeByType": {
+          "CALLS": 9,
+          "IMPORTS": 2
+        },
+        "sidecar8095ByType": {
+          "IMPORTS": 2,
+          "REFERENCES": 5,
+          "CALLS": 3
+        },
+        "semanticMissing": [
+          "CALLS|expect|2|14",
+          "CALLS|it|2|14",
+          "CALLS|toBe|2|14",
+          "IMPORTS|import { describe, it, expect } from 'vitest';|1|0",
+          "IMPORTS|{ describe, it, expect }|1|0",
+          "REFERENCES|describe|1|0",
+          "REFERENCES|expect|1|0",
+          "REFERENCES|expect|2|14",
+          "REFERENCES|it|1|0",
+          "REFERENCES|it|2|14"
+        ],
+        "semanticExtra": [
+          "CALLS|describe|0|0",
+          "CALLS|expect(1 + 1).toBe|0|0",
+          "CALLS|expect(1 + 1).toBe|1|14",
+          "CALLS|expect(1 + 1).toBe|1|33",
+          "CALLS|expect|0|0",
+          "CALLS|expect|1|14",
+          "CALLS|expect|1|33",
+          "CALLS|it|0|0",
+          "CALLS|it|1|14",
+          "IMPORTS|vitest|0|0"
+        ]
       }
     },
     {
@@ -241,7 +407,11 @@
       "spanMismatches": 0,
       "edges": {
         "node": 0,
-        "sidecar8095": 0
+        "sidecar8095": 0,
+        "nodeByType": {},
+        "sidecar8095ByType": {},
+        "semanticMissing": [],
+        "semanticExtra": []
       }
     }
   ]

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.feature-ontology-human-review-validation.v1",
+  "generatedAt": "2026-08-28T03:20:07.102Z",
+  "mode": "READ_ONLY_FAIL_CLOSED",
+  "input": {
+    "path": "docs/reports/feature-ontology-human-review-form-v1.json",
+    "formChecksum": "050cc5c256e68cb72b8697e318895070a6d55504db43d82b4d2c3c86e98e8dc8"
+  },
+  "counts": {
+    "rows": 2,
+    "invalidRows": 2,
+    "accepted": 0,
+    "rejected": 0,
+    "needsMoreEvidence": 0
+  },
+  "invalidCandidateIds": [
+    "fresh-multilane:895c3e18dcf7307e7081cf6734aae04f",
+    "fresh-multilane:ee81574abc1baea55b16956a1da1ccd1"
+  ],
+  "approved": false,
+  "canonicalAuthority": false,
+  "relationshipMaterializationAllowed": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "relationshipWrites": false,
+  "status": "REVIEW_DECISIONS_INCOMPLETE",
+  "nextGate": "HUMAN_REVIEW_DECISION_REQUIRED",
+  "reportChecksum": "04d794bc439a30a8ed568b4b153b0c4d93de22389c2fcaf3ea771b090982494c"
+}

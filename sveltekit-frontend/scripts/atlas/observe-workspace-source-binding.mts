@@ -23,7 +23,7 @@ const MAX_SOURCE_BYTES = Number(process.env.ATLAS_WORKSPACE_SOURCE_MAX_BYTES ?? 
 const PRODUCER_REVISION = 'atlas.workspace-source-binding-observer.v1';
 
 const SOURCE_EXTENSIONS = new Set([
-  '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.svelte',
+  '.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs', '.svelte',
   '.py', '.go', '.rs', '.java', '.kt', '.kts', '.cs',
   '.c', '.cc', '.cpp', '.cxx', '.h', '.hh', '.hpp',
   '.sql', '.proto', '.graphql', '.gql',

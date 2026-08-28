@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.feature-ontology-explicit-alias-approval.v1",
+  "status": "APPROVED_FOR_LINEAGE_RESOLUTION",
+  "approvedAt": "2026-08-27",
+  "approvalBasis": "User explicitly approved selection checksum 349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "resolverRevision": "feature-ontology-explicit-alias:v1",
+  "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
+  "scope": "exactly the six reviewed USES_CONCEPT source refs from atlas-packets-ontology-v1",
+  "approvedPairCount": 6,
+  "rule": "src/lib/... -> sveltekit-frontend/src/lib/...",
+  "excluded": [
+    {
+      "aliasSourceRef": "src/lib/server/valkey.ts",
+      "reason": "DUAL_NAMESPACE_COLLISION"
+    }
+  ],
+  "approvedPairs": [
+    { "aliasSourceRef": "src/lib/server/ai/langgraph-client.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts", "tupleCount": 114 },
+    { "aliasSourceRef": "src/lib/server/ai/langgraph-dag.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts", "tupleCount": 63 },
+    { "aliasSourceRef": "src/lib/server/ai/langgraph-research.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/langgraph-research.ts", "tupleCount": 59 },
+    { "aliasSourceRef": "src/lib/server/ai/trace-reranker.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts", "tupleCount": 72 },
+    { "aliasSourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts", "tupleCount": 189 },
+    { "aliasSourceRef": "src/lib/server/retrieval/langextract-reranker.ts", "canonicalSourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts", "tupleCount": 98 }
+  ],
+  "canonicalAuthorityChanged": false,
+  "postgresWrites": false,
+  "graphifyWrites": false,
+  "tupleRewrites": false,
+  "relationshipGraphRevisionDerived": false,
+  "rel01bAllowed": false,
+  "nextGate": "SOURCE_REGISTRY_TARGETS_AND_GRAPHIFY_CANONICAL_OBSERVATIONS"
+}

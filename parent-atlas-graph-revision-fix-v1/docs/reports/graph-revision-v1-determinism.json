@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.graph-revision-v1.determinism-proof.v1",
+  "status": "PROVEN_BOUNDED",
+  "permutationInvariant": true,
+  "mutationSensitive": true,
+  "workspaceSensitive": true,
+  "policySensitive": true,
+  "projectionSchemaSensitive": true,
+  "failClosedMixedWorkspace": true,
+  "failClosedMissingRelationshipRevision": true,
+  "failClosedKernelGraphAuthority": true,
+  "failClosedDuplicateIdentityConflict": true,
+  "emptyRelationshipSetSupported": true,
+  "baselineGraphRevision": "graph:sha256:2e9f5616461044d19f2b14b76105ae17a8642701065c31bd2a2bd8f40d7d93e5",
+  "emptyGraphRevision": "graph:sha256:680fe89a232e1976f81f16f07e98c8fee8eb33756a324aa2a5f9b874bf47e867",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  }
+}

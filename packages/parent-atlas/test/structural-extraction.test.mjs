@@ -125,6 +125,29 @@ test('XRef edges keyed by native symbol_id resolve back to chunk node coordinate
   assert.equal(result.receipt.unresolved_xref_source_count, 0);
 });
 
+test('LSP observations enrich matching XRefs without becoming canonical authority', () => {
+  const result = compileStructuralExtractionFabric(baseInput({
+    chunks: [chunk(), chunk({
+      upstream_node_id: 'node-2', upstream_symbol_id: 'symbol-2', upstream_chunk_id: 'chunk-2',
+      symbol_name: 'authorizeCase', byte_start: 65, byte_end: 110, start_line: 4, end_line: 6,
+    })],
+    xref_edges: [{ src: 'symbol-1', dst: 'symbol-2', type: 'CALLS', weight: 1 }],
+    lsp_observations: [{
+      observation_id: 'lsp:definition:1', reference_id: 'treesitter-chunker-xref:symbol-1:symbol-2:CALLS:src-rev-1',
+      source_ref: 'src/routes/api/cases/[id]/+server.ts', source_tree_node_id: 'node-1', source_revision: 'src-rev-1', workspace_revision: 'ws-742',
+      server_id: 'typescript-language-server', server_revision: 'tsls:test', project_revision: 'tsconfig:test', project_config_checksum: `sha256:${'a'.repeat(64)}`, capability_checksum: `sha256:${'b'.repeat(64)}`, position_encoding: 'utf-16', operation: 'DEFINITION',
+      source_range: { start: { line: 1, character: 0 }, end: { line: 1, character: 5 } },
+      target_uri: 'file:///workspace/src/auth.ts', target_source_ref: 'src/auth.ts', target_range: null, target_text: 'authorizeCase',
+      target_upstream_node_id: 'node-2', result_status: 'resolved', evidence_refs: ['evidence:lsp'], checksum: `sha256:${'c'.repeat(64)}`, canonical_authority: false,
+    }],
+  }), { producer_revision: 'atlas-test' });
+
+  assert.equal(result.lsp_resolved_references.length, 1);
+  assert.equal(result.lsp_resolved_references[0].resolution_status, 'resolved');
+  assert.equal(result.lsp_resolved_references[0].canonical_authority, false);
+  assert.equal(result.receipt.lsp_resolved_reference_count, 1);
+});
+
 test('unknown XRef source is observable instead of silently dropped', () => {
   const result = compileStructuralExtractionFabric(baseInput({
     xref_edges: [{

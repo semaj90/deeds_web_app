@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.current-feature-ontology-evidence-lineage-repair-plan.v1",
+  "operation": "CURRENT_FEATURE_ONTOLOGY_EVIDENCE_LINEAGE_REPAIR",
+  "generatedAt": "2026-08-28T04:57:29.242Z",
+  "sourceMaterializationReport": "docs\\reports\\feature-ontology-relationship-materialization-v1.json",
+  "sourceReadbackReport": "docs\\reports\\current-feature-ontology-relationship-readback-v1.json",
+  "expectedRelationshipCount": 8,
+  "preparedRelationshipCount": 8,
+  "readbackStatus": "CURRENT_RELATIONSHIP_APPLY_READBACK_FAILED",
+  "selectionChecksum": "dd92b7238fd8385bca322a9c3431f7280c4045fecd9f0f5b37bd043a230a7f7e",
+  "rows": [
+    {
+      "relationshipId": "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+      "evidenceId": "feature_ontology_tuples:c605e3c2-72d9-4388-83f9-8f3c1335e4ba",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "c605e3c2-72d9-4388-83f9-8f3c1335e4ba"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+      "evidenceId": "feature_ontology_tuples:07f4a68a-5786-41dd-88f5-d73459242f9e",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "07f4a68a-5786-41dd-88f5-d73459242f9e"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+      "evidenceId": "feature_ontology_tuples:c0d36536-59f7-4ea6-b0e2-f9e23e21ff70",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "c0d36536-59f7-4ea6-b0e2-f9e23e21ff70"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+      "evidenceId": "feature_ontology_tuples:4138d324-fd76-46aa-a9f7-8a83f72b6e1c",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "4138d324-fd76-46aa-a9f7-8a83f72b6e1c"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+      "evidenceId": "feature_ontology_tuples:4201220a-4cd9-4b3b-b468-79ea0945bd9b",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "4201220a-4cd9-4b3b-b468-79ea0945bd9b"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+      "evidenceId": "feature_ontology_tuples:adc7e457-02e5-48ab-8e48-845b3eacb9a2",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "adc7e457-02e5-48ab-8e48-845b3eacb9a2"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+      "evidenceId": "feature_ontology_tuples:51c64b20-c576-452d-b36c-4f6893e09a38",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "51c64b20-c576-452d-b36c-4f6893e09a38"
+    },
+    {
+      "relationshipId": "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5",
+      "evidenceId": "feature_ontology_tuples:8043904b-7ac3-4918-a91e-8086926dca67",
+      "sourceRef": "src/lib/server/valkey.ts",
+      "sourceRevision": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "legacySourceRef": "src/lib/server/valkey.ts",
+      "sourceTupleId": "8043904b-7ac3-4918-a91e-8086926dca67"
+    }
+  ],
+  "repairFields": [
+    "atlas_evidence.source_revision = canonical source revision",
+    "atlas_evidence.payload.workspace_revision = current workspace revision",
+    "atlas_evidence.payload.source_content_hash = source digest",
+    "atlas_evidence.payload.legacy_source_ref preserved",
+    "atlas_evidence.payload.canonical_binding_checksum preserved"
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "tupleRewrites": false
+  },
+  "authorization": {
+    "required": true,
+    "exactPhrase": "AUTHORIZE NON-PRODUCTION EVIDENCE LINEAGE REPAIR FOR FROZEN 8-ROW PLAN",
+    "relationshipWritesAuthorized": false,
+    "graphRevisionAuthorized": false
+  },
+  "status": "EVIDENCE_LINEAGE_REPAIR_PLAN_READY_FOR_EXPLICIT_AUTHORIZATION",
+  "nextGate": "EXPLICIT_EVIDENCE_LINEAGE_REPAIR_AUTHORIZATION"
+}
