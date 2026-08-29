@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.nested-semantic-autoencoder-training-receipt.v1",
+  "source_semantic_snapshot_revision": "codebase_chunk_index:limit=0:rows=55169",
+  "row_identity_checksum": "f3a0c51dcb3202a55c5df18f6a245e66d65978b79d536569705269e692819668",
+  "config": {
+    "input_dim": 768,
+    "hidden_dim": 256,
+    "latent128_dim": 128,
+    "latent64_dim": 64,
+    "reconstruction_128_weight": 1.0,
+    "reconstruction_64_weight": 0.75,
+    "cosine_weight": 0.25,
+    "pairwise_weight": 0.1,
+    "seed": 684453
+  },
+  "model_checksum": "83882f6d0ae4b6e95be6d8bd1946dc0a43b3dbbc22fcaa47cb43dd9681d3037c",
+  "metrics": {
+    "reconstruction_mse_128": 0.00020446763664949685,
+    "reconstruction_mse_64": 0.0002845334238372743,
+    "reconstruction_cosine_128": 0.9214844703674316,
+    "reconstruction_cosine_64": 0.8907392024993896,
+    "knn_recall_128": 0.7634336475707034,
+    "knn_recall_64": 0.6871102248005801
+  },
+  "latent64_is_prefix_of_latent128": true,
+  "exact_semantic_promotion_required": true,
+  "canonical_authority": false,
+  "producer_revision": "atlas.train-latent-autoencoder.2026-08-29.v1",
+  "training_duration_s": 438.913959980011,
+  "device": "cuda",
+  "train_rows": 49653,
+  "val_rows": 5516,
+  "checkpoint_path": "checkpoints/nested_semantic_autoencoder_v1.pt",
+  "checkpoint_file_sha256": "e3e54a7df792a90c5fa09f413fd49d3c4bedfc3e09e963888103a4de655a1daa",
+  "receipt_checksum": "7ea6b6f891fd32f6b1a9a7ab7f2abfedb7f799273fc67ffe4005681d1b07ef02"
+}

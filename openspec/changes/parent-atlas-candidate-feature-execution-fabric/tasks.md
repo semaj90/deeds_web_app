@@ -324,7 +324,8 @@ npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"    # expect ~20, non
 - [x] GRAPH-RESOLVE-04 Run the bounded structural target-identity audit fail-closed: sampled unresolved observations carry source revisions but no canonical target source/symbol/revision identity, so `0` legacy resolver matches are promoted and `0` structural edges are admitted. See `scripts/atlas/audit-bounded-structural-target-identity-v1.mjs` and `docs/reports/bounded-structural-target-identity-v1.json`.
 - [x] GRAPH-RESOLVE-05 Add the pure LSP-to-`RevisionQualifiedSymbolResolutionV1` adapter: resolved LSP observations require target source, target source revision, stable symbol ID, and symbol-version ID; ambiguous/unresolved/incomplete targets reject closed. Focused package tests pass; no resolver rows, cache keys, edges, or graph revisions were written.
 - [x] GRAPH-RESOLVE-06A Add the pure injected-reader LSP target-identity enrichment layer: canonical URI mapping, exact target source revision/content digest, UTF-16 LSP range to UTF-8 byte range conversion, and exact tree-node/symbol-range/containing-symbol selection. Ambiguous, missing, and outside-workspace targets fail closed; focused package compile and tests pass 5/5. No persistence or edge admission is performed.
-- [ ] GRAPH-RESOLVE-06B Bind the enrichment layer to a live authoritative LSP/compiler producer and prove target identity on the bounded unresolved-edge sample. The current live census is fail-closed: 111 current Graphify sources have 0 exact `(source_ref, source_revision)` matches in `atlas_symbol_versions`, so identity enrichment attempted/admitted edges remain 0. A full read-only current-run nomination export now works: 440 nominations from 103 supported files, 8 explicit unsupported files, 0 failures, and 0 writes. The existing resolution artifact recognizes 0/440 as canonical declarations, so the export is not yet symbol-version authority or identity proof. Do not create synthetic symbol versions, use fuzzy aliases, or bulk-populate structural edges from unresolved/collision-prone matches. See `docs/reports/live-structural-target-identity-proof-v1.json`, `docs/reports/ast-symbol-version-materialization-v1.json`, and `sveltekit-frontend/scripts/atlas/native-structural-materializer.mts`.
+- [ ] GRAPH-RESOLVE-06B Bind the enrichment layer to a live authoritative LSP/compiler producer and prove target identity on the bounded unresolved-edge sample. The current live census is fail-closed: 111 current Graphify sources have 0 exact `(source_ref, source_revision)` matches in `atlas_symbol_versions`, so identity enrichment attempted/admitted edges remain 0. A full read-only current-run nomination export now works: 440 nominations from 103 supported files, 8 explicit unsupported files, 0 failures, and 0 writes. The active-registry resolver returns `0` canonical, `0` ambiguous, and `440` unresolved rows, confirming that no current nomination has an approved stable-symbol binding. The export and resolution artifacts are not symbol-version authority or identity proof. Do not create synthetic symbol versions, use fuzzy aliases, or bulk-populate structural edges from unresolved/collision-prone matches. See `docs/reports/live-structural-target-identity-proof-v1.json`, `docs/reports/ast-symbol-version-materialization-v1.json`, `docs/reports/ast-symbol-resolution-dry-run-v1.json`, and `sveltekit-frontend/scripts/atlas/native-structural-materializer.mts`.
+  - Revision hardening: `materialize-ast-symbol-versions.mjs` now requires both `source_revision` and `workspace_revision`; it no longer substitutes one revision axis for the other. Current 440-row dry-run remains `0` canonical candidates, `0` writes.
 - [ ] GRAPH-06D Prove `GraphOrdinalMapV1` and NetworkX↔cuGraph parity from the same frozen graph snapshot; executor-local graph ordinals must not become `CandidateOrdinal`, packet identity, or canonical graph identity.
 - [x] ALIGN-01A Characterize the SymbolFeatureAlignment prerequisite read-only: the available 15-row CandidateFeatureMatrix manifest is bound to the older `b19...` workspace revision, while the current source/binding cohort is `55ed...`; the active observation-feature contract is the ORF `(packet_key, feature_revision)` schema, while an incompatible candidate-id/vector migration remains non-active. No complete current CandidateOrdinal ↔ symbol version ↔ observation feature-row materializer exists, so alignment and GPU promotion remain blocked without synthetic joins.
 - [x] ALIGN-01B Re-run current-revision CandidateOrdinal materialization read-only after the 111-source index apply: it fails closed with `CANARY_EXACT_LINEAGE_COHORT_EMPTY`. The current chunk index still exposes per-chunk hashes/IDs while workspace bindings and Graphify expose whole-source digests; packet chunk IDs remain a separate legacy coordinate. No remapping, synthetic identity, or canonical/projection writes occurred.
@@ -354,6 +355,38 @@ cuVS/cuGraph/PyTorch, HyperGraphRAG, legal adapters, QLoRA, and domain-directed
 memory residency remain architecture or later optimization/promotion layers. They
 must consume revisioned artifacts and receipts; they do not become alternate
 canonical stores, identity owners, or fusion owners.
+
+### Phase 8 envelope reconciliation (2026-08-29)
+
+The shared `scripts/atlas/lib/envelope-builder.mjs` is present and is used by the
+current summary, lexical, LangExtract, Qdrant, Graphify, HyperRAG, topology-export,
+and contract-validation writers. This proves a reusable canonical envelope builder,
+not that every historical Phase 8 writer or storage projection has been replayed.
+
+The pasted Phase 8 report names three additional cache/materialization writers, but
+those exact script names are not present in the current checkout. Treat their
+retrofit status as unverified until an equivalent current producer is identified
+and run read-only. The envelope remains a control-plane packet: it may carry
+`packet_key`, `source_ref`, `feature_id`, concepts, routing hints, and optional
+projection pointers, but it does not establish `CandidateOrdinal`, `graphRevision`,
+stable symbol identity, or canonical embedding ownership.
+
+Required integration proof remains:
+
+```text
+PostgreSQL canonical packet/revision state
+  → canonical envelope builder + schema validation
+  → projection-specific receipt/checksum
+  → independent readback
+  → CandidateOrdinal / source / revision reconciliation
+```
+
+`graphRevision: null` remains valid for graph-independent envelopes. Missing
+`qdrant_point_id`, community, SOM, PageRank, or ontology fields must remain absent
+or explicitly nullable; they must not be filled with synthetic values. Phase 8
+envelope shape parity is therefore `PARTIALLY_PROVEN`, while cross-storage
+readback, revision-keyed cache replay, and full writer coverage remain open under
+`ALIGN-CONTEXT-01` and the lineage gates below.
 
 ### Alignment sequence and measured completion (2026-08-29)
 
@@ -431,7 +464,7 @@ P2    CandidateOrdinal 128 → 768 and full-feature promotion
 - [ ] PACKET-MATERIALIZER-INPUT-01 Reconcile the collector’s packet-key input contract before apply: `collect-runtime-evidence.mjs` now uses the shared `buildPacketKey(sourceRef, featureId)` helper when cards lack `packet_key`, producing the established `nes:<slug>:<sha8(source_ref)>` shape. The 8,170-card corpus contains 0 explicit `packet_key` values; a read-only full-corpus audit produced 8,170 non-empty unique keys with 0 live PostgreSQL collisions. These remain planned derived keys until apply identity ownership is approved. Do not silently rewrite existing evidence-card keys during ingestion.
 - [ ] PACKET-LINEAGE-EXCEPTIONS-01 Classify the two packet completeness anomalies before any apply path: one `codebase_chunk` row has an empty `source_ref`, and one `cluster-summary` row has no `workspace_id`. The packet contract validator now treats blank identity strings as missing and the live validation remains threshold-pass, but neither anomaly is repaired. `register-orphaned-chunks.mjs` was the admitting producer for the empty-source class; its orphan query and preparation path now reject blank `relative_path` values, and its default dry-run now prepares 58 valid registrations without that row. Keep both anomalies excluded from current Graphify/source-binding qualification until their owning producer and repair authority are proven; do not fill either field from packet keys or defaults.
 - [ ] PACKET-ORPHAN-CANARY-01 Prove the 58 orphan registration candidates before any apply: 58 non-empty source refs, 58 unique generated packet keys, and 0 packet-key collisions with `atlas_packets`. The apply path remains blocked because it still generates time/index-based `packet_*` primary IDs; do not authorize a canary until the packet-ID owner is resolved.
-- [ ] ALIGN-XJSON-01 Define `JsonDecodeProviderV1` and compare Node JSON, C++ simdjson, and Rust simd-json on a bounded fixture. The focused package spec passes 2/2 tests; the supported runtime audit imports the compiled native addon and reports `active_backend: native`; the addon probe reports CUDA available, simdjson backend `icelake (Intel/AMD AVX512)`, and 36 exports. Typed Node/C++/Rust checksum parity remains open. Keep key-selector experiments out of the first gate.
+- [ ] ALIGN-XJSON-01 Define `JsonDecodeProviderV1` and compare Node JSON, C++ simdjson, and Rust simd-json on a bounded fixture. Direct invocation of `packages/parent-atlas-retrieval/src/gpu/simdjson-bridge.spec.ts` now passes `2/2`; native-addon/runtime evidence exists, but typed Node/C++/Rust checksum parity remains open. The package-wide TypeScript check is not a standalone gate because this package imports SvelteKit `$lib` aliases/app-local modules and reports unrelated configuration errors. Keep key-selector experiments out of the first gate.
 - [ ] ALIGN-SYMBOL-01 Implement the missing current-cohort `SymbolFeatureAlignmentV1` materializer. It must bind `CandidateOrdinal`, packet/chunk identity, optional symbol/observation rows, feature revisions, and evidence references without fuzzy joins, fabricated IDs, or synthetic graph revisions. Existing schema/fixture contracts do not prove this materializer exists.
 - [ ] ALIGN-FILTER-01 Define one revision-bound `EligibilitySetV1` and prove equivalent admissible CandidateOrdinals across PostgreSQL planner filters, Qdrant payload filters, and cuVS bitset filtering. PostgreSQL AIO/bitmap scans remain planner behavior and must not become a second authority.
 - [ ] ALIGN-GRAPH-01 Bind one frozen `GraphProjectionArtifactV1` to `GraphOrdinalMapV1`, preserving all vertices `[0,V)` including isolated vertices, then compare direct NetworkX CPU output with direct cuGraph output from that same artifact. Do not use automatic nx-cugraph dispatch as the parity oracle.
@@ -439,7 +472,7 @@ P2    CandidateOrdinal 128 → 768 and full-feature promotion
 - [ ] ALIGN-ONTOLOGY-01 Require evidence-qualified `OntologyLinkedTupleV1` promotion before relationship or hypergraph revisions can feed retrieval or fanout. Domain classification, ontology proposals, and topology annotations remain non-authoritative until independently reviewed and revision-bound.
 - [ ] ALIGN-CONTEXT-01 Make BitFrost/Valkey and ACE/ContextManifest keys revision-addressed by candidate snapshot, representation, graph, feature, and artifact checksums. Cache hits may accelerate replay but cannot bypass canonical identity or evidence closure.
 - [ ] ALIGN-OPT-01 Keep TensorRT-RTX, cuTile, TurboVec, and learned routing as benchmarked challengers only. Do not add them to the correctness gate until the corresponding baseline, held-out evaluation, and replay receipt exist.
-- [ ] ALIGN-SIMD-01 Resolve the native bridge audit findings before promotion: 104 findings across 12 files, including 13 high, 58 medium, missing timeout bounds, fallback coverage, and possible concurrent GPU-job hazards. The audit is complete; remediation and replay are still open. See `docs/reports/simd-bridge-memory-audit.json`.
+- [ ] ALIGN-SIMD-01 Resolve the native bridge audit findings before promotion: 104 findings across 12 files, including 13 high, 58 medium, missing timeout bounds, fallback coverage, and possible concurrent GPU-job hazards. The audit is complete, the native addon load proof passes with `simdJsonParse`, `simdJsonValidate`, and `simdJsonExtractNumbers` exported, and the runtime checker now confirms the TypeScript bridge loads through the repository `tsx` loader with the native backend active; remediation, typed parity, and replay are still open. See `docs/reports/simd-bridge-memory-audit.json`.
 - [x] WEB-ALIGN-01 Route the primary `/api/websearch`, agent web-search tool, and MCP research tools through the shared SearXNG/DuckDuckGo adapter, including empty-result fallback behavior and provider metadata.
 - [ ] WEB-ALIGN-02 Audit remaining specialized direct SearXNG callers (`ldr/web-search-client`, `gemma4-tool-loop`, and `gemma4-agent`) and either adapt them to the shared provider contract or document their intentionally separate engine policy. Do not silently maintain competing fallback chains.
 
@@ -461,3 +494,58 @@ P2    CandidateOrdinal 128 → 768 and full-feature promotion
 - [ ] HGR-AGENT-01 Bind HyperGraphRAG expansion to reviewed `OntologyLinkedTupleV1`/`HyperRelationV1` evidence and a revision-qualified graph projection. Domain classification and ontology proposals remain non-authoritative until evidence closure and promotion receipt.
 - [ ] DAG-ERROR-01 Prove the agentic error-fixing boundary as `GroundedClaimValidationReceiptV1 → KernelDagCandidateV1 → KernelDagValidatorV1 → TypedRepairDagV1 → bounded executor → ExecutionReceiptV1`. Require authorization, lineage, tool allowlist, budget, readback, and explicit mutation policy; verified claims alone must never authorize writes.
 - [ ] ORNITH-ACE-01 Keep Ornith downstream of ACE/ContextManifest. Domain classification may select retrieval lanes, context token budgets, and approved residency plans, but only the canonicalized ContextManifest may enter synthesis or tool planning.
+
+## Current status reconciliation (2026-08-29)
+
+The current evidence closes several bounded lanes, but not the full Parent Atlas promotion path.
+These statuses are additive and do not rewrite historical task entries.
+
+- [x] **UTF8-BYTE-SPAN-01 / CSGR-3 producer handoff** — canonical UTF-8 byte-coordinate
+  conversion is covered by the focused structural/span suite (`8 passed`), and the rebuilt
+  `:8095` sidecar plus current edge planner now report `8,795` occurrence-positioned unresolved
+  edges and `1,711` legacy-only edges. No structural edge writes occurred.
+
+  **2026-08-29 hardening:** UTF-16 LSP offsets that split an astral surrogate pair now fail
+  closed with `LSP_POSITION_SPLITS_CODE_POINT`; package build, seven focused LSP/Tree-sitter
+  tests, the byte-offset replay (4/4), and diff validation pass. This strengthens the byte
+  boundary but does not establish compiler target identity or admit graph edges.
+- [x] **QDRANT-PROJ-03 bounded semantic parity** — the frozen 15-candidate PostgreSQL
+  `semantic_768` to Qdrant `content` projection repair and independent parity readback are
+  complete. Qdrant remains a rebuildable projection; duplicate same-collection points remain
+  review-only and are not deleted.
+- [x] **GPU-33 fixture ABI** — the `CandidateOrdinal`/`GraphOrdinal` executor boundary is
+  fixture-proven with dense local graph ordinals, zero unknown ordinals, and zero revision
+  mismatches. This is not live cuVS semantic parity or production ranking promotion.
+- [ ] **GRAPH-RESOLVE-06B / current symbol-feature alignment** — remains open. The live
+  bounded identity audit found `0` target identities in `500` sampled unresolved rows; the
+  current nomination dry-run found `440` unresolved nominations and `0` canonical symbol
+  matches. The current nomination namespace must be reconciled to the authoritative symbol
+  registry without synthetic IDs, fuzzy aliases, or writes.
+- [ ] **GRAPHIFY-RUN-OWNER-01 and GRAPH-REV-ADMIT-01** — remain blocked. A completed,
+  source-manifest-bound Graphify run and independent graph snapshot receipt are still required
+  before new graph revisions, graph-aware promotion, or graph-qualified 128/768 expansion.
+  Latest read-only audit confirms `runCount: 1`, `workspaceRowCount: 1`,
+  `completedOwnerCount: 0`, `currentStatus: RUNNING`, and `currentCompletedAt: null` for the
+  expected workspace revision. See `docs/reports/current-graphify-run-owner-v1.json`.
+- [ ] **15 → 128 → 768 scaling** — remains blocked for the full lineage/feature path. The
+  15-row semantic canary is valid; expansion must preserve exact source/chunk/revision bindings
+  and must not invent graph or feature revisions. Live 8098/cuVS semantic parity also remains
+  open even though the CandidateOrdinal round-trip fixture is proven. Latest read-only census:
+  `61,660` packets, `778` exact Graphify sources, `43` exact packet/chunk joins, `524`
+  ambiguous packet/chunk joins, `15` source/chunk-qualified candidates, and `0` fully qualified
+  candidates; `graph_revision_present: 0`.
+- [x] **latent_128 interpretation** — treated as a derived representation/routing artifact,
+  not a separate canonical lane or an independent blocker. It must remain revisioned and
+  evaluation-gated if activated; no corpus-wide latent rebuild is implied by this ledger.
+
+### Active gate order
+
+`GRAPHIFY-RUN-OWNER-01` → `GRAPH-RESOLVE-06B` identity enrichment →
+`GRAPHIFY-COMPLETE-01` → `GRAPH-REV-ADMIT-01` → current graph snapshot/CPU-GPU parity →
+`CandidateOrdinal` 128/768 qualification → live cuVS/cuGraph semantic/feature parity →
+ranking and mutation promotion. ACE, ContextManifest, Ornith, QLoRA, RL, Triton/cuTile, and
+cache-residency work remain downstream or challenger work and must consume revisioned artifacts
+and receipts.
+
+No PostgreSQL, Qdrant, Neo4j, Valkey, symbol-registry, or structural-edge writes were performed
+by this reconciliation.

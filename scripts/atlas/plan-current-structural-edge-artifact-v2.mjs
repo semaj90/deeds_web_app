@@ -112,12 +112,19 @@ async function main() {
         // source 2026-08-29); CSGR-2's resolver converts to 0-indexed LSP position at call time —
         // kept 1-indexed here so this report matches the sidecar's own raw contract, not a
         // downstream consumer's.
+        const occurrencePositions = Array.isArray(edge.occurrence_positions)
+          ? edge.occurrence_positions
+          : Array.isArray(edge.occurrencePositions)
+            ? edge.occurrencePositions
+            : [];
         unresolved.push({
           sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, type: edge.type ?? 'UNKNOWN',
           fromEvidenceKey: edge.from_evidence_key ?? null, toEvidenceKey: edge.to_evidence_key ?? null,
           resolved: edge.resolved === true, resolution: edge.resolution ?? null,
           evidenceStartLine: edge.evidence_start_line ?? null, evidenceStartColumn: edge.evidence_start_column ?? null,
           evidenceEndLine: edge.evidence_end_line ?? null, evidenceEndColumn: edge.evidence_end_column ?? null,
+          occurrencePositions,
+          positionSource: occurrencePositions.length > 0 ? 'PER_OCCURRENCE' : 'LEGACY_EDGE_POSITION',
         });
         continue;
       }
@@ -150,6 +157,8 @@ async function main() {
     nodeCount: canonicalNodes.length,
     edgeCount: canonicalEdges.length,
     unresolvedEdgeCount: unresolved.length,
+    occurrencePositionedUnresolvedEdgeCount: unresolved.filter((edge) => edge.positionSource === 'PER_OCCURRENCE').length,
+    legacyOnlyUnresolvedEdgeCount: unresolved.filter((edge) => edge.positionSource === 'LEGACY_EDGE_POSITION').length,
     nodes: canonicalNodes,
     edges: canonicalEdges,
     unresolvedEdges: unresolved,

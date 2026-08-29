@@ -40,4 +40,5 @@ test('LSP position encoding maps Unicode ranges to UTF-8 bytes', () => {
   assert.deepEqual(lspRangeToUtf8ByteRange(source, range, 'utf-16'), { byte_start: 12, byte_end: 18 });
   assert.deepEqual(lspRangeToUtf8ByteRange(source, { start: { line: 1, character: 6 }, end: { line: 1, character: 12 } }, 'utf-8'), { byte_start: 12, byte_end: 18 });
   assert.throws(() => lspRangeToUtf8ByteRange(source, { start: { line: 1, character: 3 }, end: { line: 1, character: 3 } }, 'utf-8'), /LSP_POSITION_SPLITS_CODE_POINT/);
+  assert.throws(() => lspRangeToUtf8ByteRange(source, { start: { line: 1, character: 2 }, end: { line: 1, character: 2 } }, 'utf-16'), /LSP_POSITION_SPLITS_CODE_POINT/);
 });

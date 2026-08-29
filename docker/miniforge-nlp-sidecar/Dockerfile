@@ -14,8 +14,6 @@ RUN apt-get update \
     git \
   && rm -rf /var/lib/apt/lists/*
 
-COPY python /app/python
-
 RUN python -m pip install --upgrade pip setuptools wheel \
   && python -m pip install \
     fastapi \
@@ -31,6 +29,10 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     tree-sitter-language-pack \
     ast-grep-py \
   && python -m pip check
+
+# Keep dependency installation independent from application source changes so
+# source-only rebuilds reuse the expensive Python package layer.
+COPY python /app/python
 
 EXPOSE 8095
 

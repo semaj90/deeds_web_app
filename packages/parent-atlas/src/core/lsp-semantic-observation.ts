@@ -95,6 +95,16 @@ export function lspPositionToUtf8ByteOffset(
   let jsOffset = 0;
   if (encoding === 'utf-16') {
     if (input.character > line.text.length) throw new Error('LSP_POSITION_CHARACTER_OUT_OF_RANGE');
+    if (
+      input.character > 0 &&
+      input.character < line.text.length &&
+      ((line.text.charCodeAt(input.character - 1) >= 0xd800 && line.text.charCodeAt(input.character - 1) <= 0xdbff &&
+        line.text.charCodeAt(input.character) >= 0xdc00 && line.text.charCodeAt(input.character) <= 0xdfff) ||
+        (line.text.charCodeAt(input.character - 1) >= 0xdc00 && line.text.charCodeAt(input.character - 1) <= 0xdfff &&
+          line.text.charCodeAt(input.character) >= 0xd800 && line.text.charCodeAt(input.character) <= 0xdbff))
+    ) {
+      throw new Error('LSP_POSITION_SPLITS_CODE_POINT');
+    }
     jsOffset = input.character;
   } else {
     let units = 0;

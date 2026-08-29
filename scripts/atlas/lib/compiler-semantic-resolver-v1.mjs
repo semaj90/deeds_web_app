@@ -146,6 +146,22 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
       writesPerformed: false,
     };
 
+    if (sourceText != null && sourceBuffer != null) {
+      const encodedSourceText = Buffer.from(sourceText, 'utf8');
+      if (!encodedSourceText.equals(sourceBuffer)) {
+        return {
+          ...base,
+          sourcePosition: null,
+          resolver: null,
+          result: {
+            status: 'STALE_SOURCE',
+            targets: [],
+            error: 'COMPILER_SEMANTIC_RESOLVER_SOURCE_TEXT_BUFFER_MISMATCH',
+          },
+        };
+      }
+    }
+
     let position;
     let sourcePosition;
     if (precomputedPosition) {

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'fs';
+import { execFileSync } from 'child_process';
 import { resolve } from 'path';
 import { pathToFileURL } from 'url';
 import os from 'os';
@@ -28,11 +29,45 @@ function hasAvx2() {
 }
 
 async function tryImportBridge() {
+  const tsxCli = resolve(root, 'node_modules/tsx/dist/cli.mjs');
+  if (existsSync(tsxCli)) {
+    try {
+      const probe = [
+        `import * as bridge from ${JSON.stringify(files.bridge)};`,
+        `console.log(JSON.stringify({`,
+        `  active_backend: bridge?.isSimdJsonAvailable?.() ? 'native' : 'json.parse',`,
+        `  bridge_exports: {`,
+        `    fastJsonParse: typeof bridge?.fastJsonParse === 'function',`,
+        `    isSimdJsonAvailable: typeof bridge?.isSimdJsonAvailable === 'function'`,
+        `  }`,
+        `}));`,
+      ].join('\n');
+      const output = execFileSync(process.execPath, [tsxCli, '-e', probe], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      const line = output.trim().split(/\r?\n/).reverse().find((entry) => entry.startsWith('{'));
+      if (!line) throw new Error('tsx bridge probe returned no JSON result');
+      const result = JSON.parse(line);
+      return { import_ok: true, loader: 'tsx', ...result };
+    } catch (error) {
+      return {
+        import_ok: false,
+        loader: 'tsx',
+        import_error: error instanceof Error ? error.message : String(error),
+        active_backend: 'unknown',
+        bridge_exports: { fastJsonParse: false, isSimdJsonAvailable: false },
+      };
+    }
+  }
+
   try {
     const bridgeUrl = pathToFileURL(resolve(root, 'sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts')).href;
     const bridge = await import(bridgeUrl);
     return {
       import_ok: true,
+      loader: 'node',
       active_backend: bridge?.isSimdJsonAvailable?.() ? 'native' : 'json.parse',
       bridge_exports: {
         fastJsonParse: typeof bridge?.fastJsonParse === 'function',
@@ -42,6 +77,7 @@ async function tryImportBridge() {
   } catch (error) {
     return {
       import_ok: false,
+      loader: 'node',
       import_error: error instanceof Error ? error.message : String(error),
       active_backend: 'unknown',
       bridge_exports: {

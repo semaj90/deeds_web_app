@@ -1,8 +1,8 @@
 # SIMD Bridge Memory & VRAM Safety Audit
 
 ## Execution Overview
-- **Run ID**: \`simd-audit-1788026885413\`
-- **Timestamp**: 2026-08-29T18:08:05.413Z
+- **Run ID**: \`simd-audit-1788043858916\`
+- **Timestamp**: 2026-08-29T22:50:58.916Z
 - **Scanned Files**: \`binding.cc\`, \`cuda_graph_bridge.cu\`, \`cuvs_bridge.cc\`, \`gpu_error_codes.h\`, \`libtorch_stubs.cc\`, \`lstm_bridge.cc\`, \`lstm_gpu.cu\`, \`pytorch_graph.cc\`, \`pytorch_graph_fp16.cc\`, \`simdjson_bridge.cc\`, \`som_cache.cu\`, \`tensor_bridge.cc\`
 
 ## Summary Statistics

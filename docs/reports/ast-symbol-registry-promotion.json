@@ -1,52 +1,52 @@
 {
   "schema": "atlas.ast-symbol-registry-promotion-report.v1",
-  "mode": "APPLY",
-  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-nominations.jsonl",
+  "mode": "DRY_RUN",
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\current-graphify-symbol-nominations-v1.jsonl",
   "registryRevision": "promotion:ast-nominations:v1",
-  "limit": 20,
-  "inputNominations": 42398,
-  "excludedVariables": 32228,
-  "eligibleDeclarationLike": 10170,
-  "uniqueCandidatesAfterDedup": 10170,
-  "offset": 20,
-  "rowsAttempted": 20,
+  "limit": null,
+  "inputNominations": 440,
+  "excludedVariables": 0,
+  "eligibleDeclarationLike": 440,
+  "uniqueCandidatesAfterDedup": 436,
+  "offset": 0,
+  "rowsAttempted": 0,
   "rowsInserted": 0,
-  "rowsAlreadyRegistered": 20,
+  "rowsAlreadyRegistered": 0,
   "sample": [
     {
-      "canonicalKey": "symbol-key:66faf094ca7dfb8856fdba5e2a8649b3ccb4b013",
-      "stableSymbolId": "stable-symbol:e98a34f945b29741097d74998238206cb1eacd2b7b0eabb7293f191d7508d290",
-      "kind": "type",
-      "qualifiedName": "PolicyTaskType",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
+      "canonicalKey": "upstream-symbol:f2b2d96e7306b131731185994d5a8678c3b0ea09",
+      "stableSymbolId": "stable-symbol:d4933f7e90e60636c732dc2f317a991911ee0dacb03c3e9452cd2167b499d004",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::identifyRootCause",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts"
     },
     {
-      "canonicalKey": "symbol-key:85217e5029ce966eabe4f3212767ae324aad2a47",
-      "stableSymbolId": "stable-symbol:4ee3db2c8d96e97ef956f355eb74a6ed41e214777c2ff46bc45adafb5427f80c",
+      "canonicalKey": "upstream-symbol:1e72b84584ad6e64e7ee246a7f593aeb7e45a184",
+      "stableSymbolId": "stable-symbol:455b442ecec8aae53abf336f68575e7181ce1629061748b0907b4193fdcf9290",
       "kind": "interface",
-      "qualifiedName": "PolicyTask",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
+      "qualifiedName": "export_statement::interface_declaration::GraphNode",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts"
     },
     {
-      "canonicalKey": "symbol-key:5d82b97858d2d8a23466a0e209fa0b2402a8d885",
-      "stableSymbolId": "stable-symbol:1477e49d1f445e52ccf09c6fe97def9f63b6410797271bfc132bdc8735f1f2b8",
-      "kind": "interface",
-      "qualifiedName": "TaskRoute",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
-    },
-    {
-      "canonicalKey": "symbol-key:00b5064f2e1c5387769e68e90eacfba819f34966",
-      "stableSymbolId": "stable-symbol:53f511eaa2e2caed42d250dd4f56ad9e3974777752245627782f22f12ba22fc2",
+      "canonicalKey": "upstream-symbol:e71eb0f9d95be06bc2dddf516dc3c5a382bbdbfa",
+      "stableSymbolId": "stable-symbol:0bb6dbfa71ac3b2e1ba6a69d532bb5c036f264ae49468843793d19dd35522f84",
       "kind": "function",
-      "qualifiedName": "classifyPacketTask",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
+      "qualifiedName": "function_declaration::mkRequest",
+      "sourceRef": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts"
     },
     {
-      "canonicalKey": "symbol-key:8b37b2aac65b23543788cce5b7ba48b6bb66cdab",
-      "stableSymbolId": "stable-symbol:10f3fa36f1c3e519df4b790dda5133004253b644401f4ceb0bb7f151a18a015b",
-      "kind": "function",
-      "qualifiedName": "getTaskRoute",
-      "sourceRef": "packages/atlas-core/src/policy-task-router.ts"
+      "canonicalKey": "upstream-symbol:ea6ebf1e632b937e574459ecf1e07ab4b0bdf74b",
+      "stableSymbolId": "stable-symbol:9a642cd63fe3dfb6844d6928ce6078228671c75051ac4686f62ed3428596c9d6",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::storePattern",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/PatternStorage.ts"
+    },
+    {
+      "canonicalKey": "upstream-symbol:61e881e23486cf531bd817fa88e64018c9a0af3f",
+      "stableSymbolId": "stable-symbol:6434fc7d6157f472f3957c12b17f8fc96fe72e0a7ba66e0413da132cbf5847cd",
+      "kind": "method",
+      "qualifiedName": "export_statement::class_declaration::method_definition::ensureConstraints",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts"
     }
   ],
   "errors": []

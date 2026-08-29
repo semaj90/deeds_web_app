@@ -698,6 +698,43 @@ completed authoritative Graphify run and live resolution rows remains a separate
 
 ## CSGR-5 — Full-corpus scaling (follow-up, not started)
 
+### Occurrence-position handoff (2026-08-29)
+
+The read-only `plan-current-structural-edge-artifact-v2.mjs` planner now preserves
+the sidecar's `occurrence_positions`/`occurrencePositions` field on unresolved
+edges and reports `occurrencePositionedUnresolvedEdgeCount` separately from
+`legacyOnlyUnresolvedEdgeCount`. A live 111-source planner replay completed with
+2,545 nodes, 1,334 resolved edges, and 10,506 unresolved edges. After a
+no-cache image rebuild and `:8095` recreation, 8,795 unresolved edges carry
+per-occurrence positions and 1,711 remain legacy-only. No edge writes occurred.
+
+The follow-up nomination resolution dry-run read 440 current Graphify
+nominations and found 436 unique declaration candidates, but 0 canonical
+registry matches and 440 unresolved nominations. It wrote only the read-only
+receipt `docs/reports/ast-symbol-resolution-dry-run-v1.json`; database writes
+remain false. `GRAPH-RESOLVE-06B` therefore remains open pending a
+nomination-to-registry read-only identity enrichment proof.
+
+The subsequent promotion-plan review remains review-only: all 440 nominations
+are declaration-like promotion candidates, representing 436 unique
+source/kind/name groups; two groups contain repeated declarations at distinct
+spans and require explicit review. Canonical symbols created and database
+writes remain zero. Receipt: `docs/reports/ast-symbol-promotion-review-v1.json`.
+
+A live namespace sample explains the zero-match result: current nominations use
+`upstream-symbol:<id>` keys, while active registry rows use
+`symbol-key:<digest>` canonical keys. This is diagnostic evidence only; it does
+not authorize alias creation or registry writes. Reconciliation must compare
+source revision, declaration span, content digest, and existing registry
+ownership before any promotion decision.
+
+A read-only live census found no existing `atlas_symbol_versions` row matching
+any of the 50 nomination source references, either with the current source
+revision or by source reference alone. This confirms that the namespace
+difference is accompanied by absent current symbol-version coverage, not just
+a lookup bug. Promotion remains unauthorized until the registration plan is
+reviewed and bounded explicitly.
+
 - [ ] Explicitly out of scope for this proposal's first pass. Track separately once CSGR-0–4 are
       proven on the bounded cohort. Do not attempt to run CSGR-2's resolver against the full
       24,465-source corpus without first estimating LSP request volume/latency at that scale — a
@@ -712,3 +749,38 @@ completed authoritative Graphify run and live resolution rows remains a separate
 - `scripts/atlas/plan-current-structural-edge-artifact-v2.mjs` — CSGR-0/CSGR-2's edit target.
 - `openspec/changes/parent-atlas-graph-runtime-enhancement/` — downstream consumer of
   `CompositeGraphProjectionV1`, not directly blocking or blocked by this proposal.
+
+## Current status reconciliation (2026-08-29)
+
+This section supersedes earlier same-day notes that described occurrence-position wiring as
+unbuilt. The latest read-only sidecar rebuild and live planner replay prove the producer path is
+wired and emitting occurrence-level positions, but they do not prove canonical target identity or
+edge admission.
+
+The resolver boundary is additionally fail-closed when both `sourceText` and `sourceBuffer` are
+provided: their UTF-8 bytes must match before `didOpen` or byte-offset conversion proceeds. This
+prevents compiler/LSP answers from being computed against text different from the revision-bound
+byte coordinate source. The check is syntax-validated and the focused LSP/Tree-sitter suite passes;
+live target identity enrichment and edge admission remain open.
+
+- [x] **CSGR-3 occurrence-position handoff** — the rebuilt `:8095` sidecar and
+  `plan-current-structural-edge-artifact-v2.mjs` now preserve occurrence positions. The current
+  111-source replay reports `8,795` occurrence-positioned unresolved edges and `1,711`
+  legacy-only unresolved edges, alongside `2,545` nodes and `1,334` resolved edges. No edge
+  writes occurred. This closes the producer/transport portion only; it does not classify the
+  remaining observations as admissible structural edges.
+- [ ] **GRAPH-RESOLVE-06B live target identity** — remains open and fail-closed. The bounded
+  audit sampled `500` unresolved rows with `500` source revisions present but `0` target
+  identities and `0` admitted edges. The current nomination dry-run found `440` nominations,
+  `436` unique declaration candidates, `0` canonical registry matches, and `440` unresolved
+  rows; the promotion review found two duplicate groups requiring explicit review. The
+  `upstream-symbol:*` versus `symbol-key:*` namespace difference is diagnostic evidence, not an
+  alias or registration authority. No synthetic symbol versions, fuzzy matches, registry writes,
+  or edge writes are allowed.
+- [ ] **GRAPHIFY-COMPLETE-01 / GRAPH-REV-ADMIT-01** — remain blocked until the authoritative
+  Graphify run is completed, terminal outcomes are classified, and a run-bound graph snapshot
+  receipt is independently verified. `graphRevision: null` remains valid for these shadow and
+  read-only artifacts.
+
+The source-registry contract is already proven separately for the current 111-source cohort
+(`EXISTING_EXACT: 111/111`); this reconciliation does not reopen or broaden that migration.

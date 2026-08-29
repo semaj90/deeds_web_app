@@ -51,11 +51,15 @@ async function main() {
     row,
   ]));
   const rows = [...unique.values()];
+  const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);
   const report = {
     schema: 'atlas.ast-symbol-version-materialization.v1',
     mode: APPLY ? 'APPLY' : 'DRY_RUN',
     inputNominations: nominations.length,
     canonicalDeclarationCandidates: rows.length,
+    revisionQualifiedCandidates: revisionQualifiedRows.length,
+    missingSourceRevision: rows.filter((row) => !row.source_revision).length,
+    missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,
     excludedVariables: nominations.filter((row) => row.kind === 'variable').length,
     limit: LIMIT,
     rowsAttempted: 0,
@@ -63,13 +67,13 @@ async function main() {
     rowsAlreadyPresent: 0,
     projectionRowsUpserted: 0,
     databaseWrites: false,
-    sample: rows.slice(0, 10).map((row) => ({ nominationId: row.nomination_id, kind: row.kind, qualifiedName: row.qualified_name, sourceRef: row.source_ref })),
+    sample: revisionQualifiedRows.slice(0, 10).map((row) => ({ nominationId: row.nomination_id, kind: row.kind, qualifiedName: row.qualified_name, sourceRef: row.source_ref })),
   };
   console.log(JSON.stringify(report, null, 2));
   if (!APPLY) { await writeReport(report); return; }
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
-  const batch = rows.slice(0, LIMIT);
+  const batch = revisionQualifiedRows.slice(0, LIMIT);
   try {
     const stableIds = [...new Set(batch.map((row) => resolutionByNomination.get(row.nomination_id).stable_symbol_id))];
     const active = await pool.query(
@@ -94,7 +98,7 @@ async function main() {
          RETURNING symbol_version_id`,
         [
           symbolVersionId, resolution.stable_symbol_id, row.source_ref, row.source_revision,
-          row.workspace_revision || row.source_revision, row.upstream_node_id, null,
+          row.workspace_revision, row.upstream_node_id, null,
           row.upstream_symbol_id, row.upstream_chunk_id, row.qualified_name || row.name,
           row.declaration_hash, row.signature_normalized || null, row.byte_start, row.byte_end,
           JSON.stringify(row.parent_route || []), PRODUCER_REVISION,
