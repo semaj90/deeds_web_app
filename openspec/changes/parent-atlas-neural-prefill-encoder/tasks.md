@@ -11846,3 +11846,33 @@ model — either about a different autoencoder or aspirational, not verified.
 commitment (GPU time, real training data, a script that doesn't exist yet) and deserves an
 explicit go-ahead before execution, not a default continuation. Scoped here so the next session
 doesn't have to re-derive any of the above.
+
+### `latent_64` — training script built, bounded proof run PROVEN (2026-08-29, same day)
+
+Built `python/train_latent_autoencoder.py` per the scope above: `psycopg2` read-only fetch from
+`codebase_chunk_index.content_embedding` (55,169 populated rows confirmed live — more than the
+~40,568 figure in root `CLAUDE.md`, data has grown since that was written), held-out val split
+(seeded, `0xA71A5` matching the model's own default seed), `AdamW` training loop, checkpoint save,
+and `build_training_receipt()` + `receipt_checksum()` at the end. Also discovered CUDA is actually
+available on this machine — `device_selected: cuda` — contrary to the LibTorch/RTX lane's separate
+"CPU/RTX parity" gap in the pasted table (that gap is about the *LibTorch native addon* path, a
+different lane; this training script uses PyTorch directly and picked up CUDA with no extra work).
+
+**Bounded proof run** (`--limit 2000 --epochs 5`, deliberately small — this is a pipeline proof,
+not a real training run): completed in 0.68s on GPU. `status: TRAINING_RECEIPT_PROVEN`. Loss
+0.386→0.163 over 5 epochs; `reconstruction_cosine_64` 0.53→0.70; `knn_recall_64` 0.45→0.52 — all
+moving the right direction, consistent with an undertrained-but-working model, not a claim of
+production quality at this scale. One real bug found and fixed during the proof: a keyword-arg
+name mismatch calling `build_training_receipt()` (`source_semantic_snapshot_revision` vs. the
+real parameter `source_snapshot_revision`) — caught by actually running it, not by review.
+
+Receipt confirms the discipline this lane needs held: `canonical_authority: false`,
+`exact_semantic_promotion_required: true` — this checkpoint is not being promoted as canonical
+semantic evidence, exactly per the module's own docstring ("exact semantic_768 remains the
+refinement oracle").
+
+**Not done**: a real, full-scale training run (all 55,169 rows, more epochs, real hyperparameter
+consideration) — the proof run's `--limit 2000 --epochs 5` was intentionally small to validate the
+pipeline without committing to a longer run blind. That's the next explicit decision point, not a
+default continuation — full-scale training is a bigger time/resource commitment than this bounded
+proof.
