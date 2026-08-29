@@ -1,7 +1,7 @@
 {
   "schema": "atlas.current-structural-edge-resolution.v1",
   "mode": "READ_ONLY_PLAN",
-  "generatedAt": "2026-08-29T21:26:14.427Z",
+  "generatedAt": "2026-08-29T21:33:57.955Z",
   "writes": {
     "postgres": false,
     "qdrant": false,
@@ -31,7 +31,7 @@
     "requestCount": 7514,
     "concurrency": 4,
     "timeoutMs": 5000,
-    "durationMs": 17506,
+    "durationMs": 17560,
     "avgMsPerRequest": 2,
     "counts": {
       "NODE_BUILTIN": 2216,
@@ -63,7 +63,8 @@
         "toEvidenceKey": "argv.includes",
         "status": "TIMEOUT",
         "targetCount": 0,
-        "error": "LSP_TIMEOUT:textDocument/definition"
+        "error": "LSP_TIMEOUT:textDocument/definition",
+        "positionConfidence": "POSITION_SHARED_WITH_1_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
@@ -73,7 +74,8 @@
         "toEvidenceKey": "argv.indexOf",
         "status": "TIMEOUT",
         "targetCount": 0,
-        "error": "LSP_TIMEOUT:textDocument/definition"
+        "error": "LSP_TIMEOUT:textDocument/definition",
+        "positionConfidence": "POSITION_SHARED_WITH_1_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
@@ -83,7 +85,8 @@
         "toEvidenceKey": "argv.indexOf",
         "status": "TIMEOUT",
         "targetCount": 0,
-        "error": "LSP_TIMEOUT:textDocument/definition"
+        "error": "LSP_TIMEOUT:textDocument/definition",
+        "positionConfidence": "POSITION_SHARED_WITH_1_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
@@ -93,7 +96,8 @@
         "toEvidenceKey": "new Date",
         "status": "TIMEOUT",
         "targetCount": 0,
-        "error": "LSP_TIMEOUT:textDocument/definition"
+        "error": "LSP_TIMEOUT:textDocument/definition",
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -103,7 +107,8 @@
         "toEvidenceKey": "path.join",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -113,7 +118,8 @@
         "toEvidenceKey": "fs.existsSync",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -123,7 +129,8 @@
         "toEvidenceKey": "fs.statSync",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -133,7 +140,8 @@
         "toEvidenceKey": "rl.on",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_6_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -143,7 +151,8 @@
         "toEvidenceKey": "line.trim",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_6_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -153,7 +162,8 @@
         "toEvidenceKey": "rows.push",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_6_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -163,7 +173,8 @@
         "toEvidenceKey": "JSON.parse",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_6_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -173,7 +184,8 @@
         "toEvidenceKey": "line.trim",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_3_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -183,7 +195,8 @@
         "toEvidenceKey": "rows.push",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_3_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -193,7 +206,8 @@
         "toEvidenceKey": "JSON.parse",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_3_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -203,7 +217,8 @@
         "toEvidenceKey": "sourceRef.startsWith",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_3_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -213,7 +228,8 @@
         "toEvidenceKey": "JSON.stringify",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -223,7 +239,8 @@
         "toEvidenceKey": "a.bucket.localeCompare",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -233,7 +250,8 @@
         "toEvidenceKey": "console.error",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_1_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
@@ -243,7 +261,8 @@
         "toEvidenceKey": "process.exit",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_1_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
@@ -253,7 +272,8 @@
         "toEvidenceKey": "console.log",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
@@ -263,7 +283,8 @@
         "toEvidenceKey": "console.log",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
@@ -273,7 +294,8 @@
         "toEvidenceKey": "console.error",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
@@ -283,7 +305,8 @@
         "toEvidenceKey": "console.log",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_UNIQUE"
       },
       {
         "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
@@ -293,7 +316,8 @@
         "toEvidenceKey": "SUBJECTS",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       },
       {
         "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
@@ -303,8 +327,58 @@
         "toEvidenceKey": "TraceCheckpointEvent",
         "status": "UNRESOLVED",
         "targetCount": 0,
-        "error": null
+        "error": null,
+        "positionConfidence": "POSITION_SHARED_WITH_2_SIBLINGS"
       }
-    ]
+    ],
+    "positionConfidenceCounts": {
+      "POSITION_UNIQUE": 504,
+      "POSITION_SHARED_WITH_6_SIBLINGS": 336,
+      "POSITION_SHARED_WITH_3_SIBLINGS": 664,
+      "POSITION_SHARED_WITH_1_SIBLINGS": 884,
+      "POSITION_SHARED_WITH_2_SIBLINGS": 1014,
+      "POSITION_SHARED_WITH_4_SIBLINGS": 570,
+      "POSITION_SHARED_WITH_15_SIBLINGS": 128,
+      "POSITION_SHARED_WITH_14_SIBLINGS": 285,
+      "POSITION_SHARED_WITH_9_SIBLINGS": 350,
+      "POSITION_SHARED_WITH_7_SIBLINGS": 336,
+      "POSITION_SHARED_WITH_48_SIBLINGS": 49,
+      "POSITION_SHARED_WITH_5_SIBLINGS": 678,
+      "POSITION_SHARED_WITH_11_SIBLINGS": 300,
+      "POSITION_SHARED_WITH_16_SIBLINGS": 170,
+      "POSITION_SHARED_WITH_23_SIBLINGS": 144,
+      "POSITION_SHARED_WITH_21_SIBLINGS": 44,
+      "POSITION_SHARED_WITH_34_SIBLINGS": 105,
+      "POSITION_SHARED_WITH_13_SIBLINGS": 182,
+      "POSITION_SHARED_WITH_8_SIBLINGS": 360,
+      "POSITION_SHARED_WITH_59_SIBLINGS": 60,
+      "POSITION_SHARED_WITH_20_SIBLINGS": 126,
+      "POSITION_SHARED_WITH_10_SIBLINGS": 154,
+      "POSITION_SHARED_WITH_31_SIBLINGS": 96,
+      "POSITION_SHARED_WITH_12_SIBLINGS": 208,
+      "POSITION_SHARED_WITH_94_SIBLINGS": 95,
+      "POSITION_SHARED_WITH_17_SIBLINGS": 36,
+      "POSITION_SHARED_WITH_41_SIBLINGS": 126,
+      "POSITION_SHARED_WITH_25_SIBLINGS": 104,
+      "POSITION_SHARED_WITH_70_SIBLINGS": 142,
+      "POSITION_SHARED_WITH_29_SIBLINGS": 120,
+      "POSITION_SHARED_WITH_19_SIBLINGS": 80,
+      "POSITION_SHARED_WITH_63_SIBLINGS": 128,
+      "POSITION_SHARED_WITH_26_SIBLINGS": 27,
+      "POSITION_SHARED_WITH_74_SIBLINGS": 150,
+      "POSITION_SHARED_WITH_87_SIBLINGS": 176,
+      "POSITION_SHARED_WITH_46_SIBLINGS": 188,
+      "POSITION_SHARED_WITH_18_SIBLINGS": 95,
+      "POSITION_SHARED_WITH_52_SIBLINGS": 106,
+      "POSITION_SHARED_WITH_56_SIBLINGS": 114,
+      "POSITION_SHARED_WITH_42_SIBLINGS": 86,
+      "POSITION_SHARED_WITH_24_SIBLINGS": 50,
+      "POSITION_SHARED_WITH_28_SIBLINGS": 29,
+      "POSITION_SHARED_WITH_33_SIBLINGS": 34,
+      "POSITION_SHARED_WITH_22_SIBLINGS": 69,
+      "POSITION_SHARED_WITH_27_SIBLINGS": 28
+    },
+    "uniquePositionResolvedCount": 330,
+    "sharedPositionResolvedCount": 7220
   }
 }

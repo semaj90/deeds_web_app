@@ -345,6 +345,92 @@ clear next step toward `unclassifiedCount == 0`.
 (`RESOLVED_INTERNAL`/`RESOLVED_WORKSPACE_MODULE`/`EXTERNAL_PACKAGE`/etc.) recorded in the second
 patch above is still just a mapping table, not implemented as a projection layer in the script.
 
+## CSGR-2, UNRESOLVED investigation — CRITICAL finding, revises confidence in the 78% terminal figure (2026-08-29)
+
+Set out to characterize the 2,176 `UNRESOLVED` cases per the still-open task from earlier in this
+file. Found something bigger: **this is not primarily a per-edge resolution failure — it's an
+upstream evidence-position precision problem affecting almost the entire `unresolved_target`
+corpus, not just the `UNRESOLVED`-labeled subset.**
+
+**Method**: sampled `diagnosticSamples` from the latest report, cross-referenced each against the
+real source line at its exact `evidenceStartLine`/`evidenceStartColumn`. First case
+(`toEvidenceKey: "path.join"`, `scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs:30`,
+col 6): the position lands on `REPORT_JSON` (`const REPORT_JSON = path.join(...)` — "const " is
+exactly 6 characters), not on `path.join` at all. Checked 8 total samples: some landed correctly
+on the actual call site, but 4 of the 8 — `rl.on`, `line.trim`, `rows.push`, `JSON.parse` — all
+shared the **identical** position (`line 129, col 21`, landing on `(resolve, reject) =>`, the
+start of a `new Promise((resolve, reject) => { ... })` executor) despite being 4 different,
+unrelated calls inside that executor body.
+
+**Quantified across the full corpus** (not just the sample):
+```
+totalEdges (unresolved_target):     9,730
+totalDistinctPositions:             2,019
+sharedPositions (>1 edge):          1,515
+edgesInSharedPositions:             9,226  (94.8% of all unresolved_target edges)
+edgesWithUniquePosition:              504  (5.2%)
+```
+
+**What this means**: for the 94.8% of edges sharing a position with siblings, the sidecar's
+`evidence_start_line`/`evidence_start_column` marks the *enclosing scope's* start (a function
+body, a block, an executor callback), not the individual call/reference's own leaf token. When a
+shared-position `textDocument/definition` query resolves successfully, CSGR-2 stamps that SAME
+result onto every sibling edge at that position — which may be correct for zero, one, or several
+of them, not verified per-edge. This is not a CSGR-2 bug to fix in this script; it's a
+characteristic of the upstream evidence source (the 8095 sidecar / `plan-current-structural-edge-artifact-v2.mjs`'s
+input) that this script has been silently trusting as leaf-precise.
+
+**Revises the "8,205/10,506 (78%) terminal" figure from the prior pass**: that count is real in
+the sense that *something* resolved at each position, but per-edge correctness for the ~9,226
+shared-position edges (out of 10,506 total corpus edges, syntax_only + unresolved_target combined)
+is **not independently verified**. Only the 504 uniquely-positioned edges plus the fully-classified
+`syntax_only` set (776, all individually positioned per-edge — not affected by this issue, since
+`syntax_only` classification never queries a position at all) have real per-edge confidence.
+
+**This is now the actual blocker, bigger than the original `UNRESOLVED` investigation task it grew
+out of.** Two possible paths forward, neither attempted this pass:
+1. **Fix the evidence source** — the AST sidecar/`plan-current-structural-edge-artifact-v2.mjs`
+   needs to emit a genuine leaf-token position per edge (the specific call/reference site), not an
+   enclosing-scope marker, for `CALLS`/`REFERENCES` edges. Out of scope for this OpenSpec change
+   (would touch the sidecar's own extraction logic, not this repo's compiler-semantic-resolver
+   layer) — flag for whoever owns that extractor.
+2. **Add a confidence tier to CSGR-2's own output** — tag each edge's result as
+   `POSITION_UNIQUE` vs `POSITION_SHARED_WITH_N_SIBLINGS`, so downstream consumers (the
+   `GRAPHIFY-COMPLETE-01` gate, any future graph promotion) can distinguish verified-per-edge
+   resolutions from "resolved at a shared marker, applies to N edges, individually unverified."
+   **DONE this same pass** — see below.
+
+### Position-confidence tagging — DONE (2026-08-29, same day)
+
+Implemented option 2 above directly in `plan-current-structural-edge-resolution-v1.mjs`:
+`positionConfidenceFor(edge)` precomputes a sibling-count map over the full `unresolvedTargetEdges`
+set (not just the sampled subset) and tags every result `POSITION_UNIQUE` or
+`POSITION_SHARED_WITH_N_SIBLINGS`. Report now also carries `positionConfidenceCounts`,
+`uniquePositionResolvedCount`, `sharedPositionResolvedCount`.
+
+**Full-corpus result, quantified precisely**:
+- Of the 7,550 "resolved" results (`NODE_BUILTIN` 2,216 + `RESOLVED_IN_REPO` 5,334 in
+  `unresolved_target`): **only 330 (4.4%) are individually verified** (`POSITION_UNIQUE`).
+  **7,220 (95.6%) are copied from a shared position** — not independently confirmed per edge.
+- Sibling fan-out ranges up to `POSITION_SHARED_WITH_94_SIBLINGS` (95 distinct edges collapsed
+  onto one query) — a small number of enclosing scopes (large functions, big object literals)
+  account for a disproportionate share of the corpus.
+- This does not change any edge's reported status — it makes the confidence gap visible instead
+  of silently claiming per-edge verification the current methodology doesn't actually have.
+
+**Net effect on the `unclassifiedCount == 0` target**: the honest terminal-and-verified count is
+much smaller than the raw 8,205/10,506 figure — 330 (unique unresolved_target resolutions) + 776
+(syntax_only, unaffected by this issue) = **1,106/10,506 individually verified**. The remaining
+~9,400 either need the upstream sidecar to emit leaf-precise positions (real fix), or an explicit,
+documented policy decision that "resolved via a shared enclosing-scope position" is an acceptable
+lower-confidence terminal status for this gate (a policy call, not a technical one — not made
+here).
+
+**Do not report `unclassifiedCount == 0` or promote this corpus as `COMPLETE` based on the current
+terminal counts** — the completion gate's own invariant (every observation gets a *deterministic,
+individually-verified* terminal status) is not actually satisfied for 94.8% of `unresolved_target`
+edges yet, even though they carry a non-`UNRESOLVED` status string today.
+
 **Replay-bound hardening (2026-08-29):** the read-only resolver plan now uses bounded worker
 concurrency (`ATLAS_CSGR2_CONCURRENCY`, default 4, maximum 8) and a bounded per-request timeout
 (`ATLAS_CSGR2_TIMEOUT_MS`, default 5,000ms). A 210-observation replay completed with 148

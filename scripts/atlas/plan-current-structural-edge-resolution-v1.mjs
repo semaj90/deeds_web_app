@@ -191,14 +191,38 @@ async function main() {
   const concurrency = Math.max(1, Math.min(8, Number(process.env.ATLAS_CSGR2_CONCURRENCY ?? 4)));
   const timeoutMs = Math.max(250, Math.min(15000, Number(process.env.ATLAS_CSGR2_TIMEOUT_MS ?? 5000)));
 
+  // Position-confidence tagging (2026-08-29) — found live that 94.8% of unresolved_target edges
+  // (9,226/9,730) share their evidenceStartLine/Column with at least one sibling edge: the
+  // upstream sidecar marks the ENCLOSING scope's start for many CALLS/REFERENCES it can't pin to
+  // a leaf token, not the individual occurrence's own position. When such a shared position
+  // resolves, the SAME result gets stamped onto every sibling edge — correct for at most one of
+  // them, unverified for the rest. See openspec/changes/parent-atlas-compiler-semantic-graph-resolution
+  // tasks.md's "UNRESOLVED investigation — CRITICAL finding" section for the full analysis. This
+  // does not fix the upstream imprecision (that's the sidecar's job); it makes the imprecision
+  // visible in this script's own output instead of silently reporting a false-confidence terminal
+  // status.
+  const siblingCountByPosition = new Map();
+  for (const e of unresolvedTargetEdges) {
+    if (e.evidenceStartLine == null || e.evidenceStartColumn == null) continue;
+    const key = `${e.sourceRef}:${e.evidenceStartLine}:${e.evidenceStartColumn}`;
+    siblingCountByPosition.set(key, (siblingCountByPosition.get(key) ?? 0) + 1);
+  }
+  function positionConfidenceFor(edge) {
+    if (edge.evidenceStartLine == null || edge.evidenceStartColumn == null) return null;
+    const key = `${edge.sourceRef}:${edge.evidenceStartLine}:${edge.evidenceStartColumn}`;
+    const count = siblingCountByPosition.get(key) ?? 1;
+    return count > 1 ? `POSITION_SHARED_WITH_${count - 1}_SIBLINGS` : 'POSITION_UNIQUE';
+  }
+
   async function processEdge(edge) {
+    const positionConfidence = positionConfidenceFor(edge);
     const language = languageForSourceRef(edge.sourceRef);
     if (!language) {
-      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language: null, fromEvidenceKey: edge.fromEvidenceKey, status: 'UNSUPPORTED_LANGUAGE' });
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language: null, fromEvidenceKey: edge.fromEvidenceKey, status: 'UNSUPPORTED_LANGUAGE', positionConfidence });
       return;
     }
     if (edge.evidenceStartLine == null || edge.evidenceStartColumn == null) {
-      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, status: 'NO_EVIDENCE_POSITION' });
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, status: 'NO_EVIDENCE_POSITION', positionConfidence });
       return;
     }
     if (!sourceCache.has(edge.sourceRef)) {
@@ -209,13 +233,13 @@ async function main() {
     }
     const source = sourceCache.get(edge.sourceRef);
     if (!source) {
-      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, status: 'SOURCE_FILE_NOT_FOUND' });
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, status: 'SOURCE_FILE_NOT_FOUND', positionConfidence });
       return;
     }
     const sourceText = source.buffer.toString('utf8');
     const importedBuiltin = importedNodeBuiltinReference(edge, sourceText);
     if (importedBuiltin) {
-      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: 'NODE_BUILTIN', targetCount: 0, builtin: importedBuiltin });
+      unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: 'NODE_BUILTIN', targetCount: 0, builtin: importedBuiltin, positionConfidence });
       return;
     }
     const resolver = source.absolutePath.startsWith(frontendRoot) ? frontendResolver : rootResolver;
@@ -241,7 +265,7 @@ async function main() {
       language,
       timeoutMs,
     });
-    unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: resolution.result.status, targetCount: resolution.result.targets.length, error: resolution.result.error ?? null });
+    unresolvedTargetResults.push({ sourceRef: edge.sourceRef, edgeType: edge.type, language, fromEvidenceKey: edge.fromEvidenceKey, toEvidenceKey: edge.toEvidenceKey, status: resolution.result.status, targetCount: resolution.result.targets.length, error: resolution.result.error ?? null, positionConfidence });
   }
   let nextIndex = 0;
   async function worker() {
@@ -267,6 +291,22 @@ async function main() {
     .sort((a, b) => (a.status === 'TIMEOUT' ? -1 : 0) - (b.status === 'TIMEOUT' ? -1 : 0))
     .slice(0, 25);
 
+  // Position-confidence summary: how much of the corpus has an individually-verified result vs.
+  // a result copied from a shared enclosing-scope position. See the positionConfidenceFor() doc
+  // comment above — this does not change any status, it qualifies how much to trust it.
+  const positionConfidenceCounts = {};
+  let uniquePositionResolvedCount = 0;
+  let sharedPositionResolvedCount = 0;
+  const RESOLVED_STATUSES = new Set(['RESOLVED_IN_REPO', 'NODE_BUILTIN']);
+  for (const r of unresolvedTargetResults) {
+    const bucket = r.positionConfidence ?? 'NO_POSITION';
+    positionConfidenceCounts[bucket] = (positionConfidenceCounts[bucket] ?? 0) + 1;
+    if (RESOLVED_STATUSES.has(r.status)) {
+      if (r.positionConfidence === 'POSITION_UNIQUE') uniquePositionResolvedCount += 1;
+      else if (r.positionConfidence?.startsWith('POSITION_SHARED')) sharedPositionResolvedCount += 1;
+    }
+  }
+
   const report = {
     schema: 'atlas.current-structural-edge-resolution.v1',
     mode: 'READ_ONLY_PLAN',
@@ -288,6 +328,9 @@ async function main() {
       counts: unresolvedTargetCounts,
       dimensions: unresolvedTargetDimensions,
       diagnosticSamples,
+      positionConfidenceCounts,
+      uniquePositionResolvedCount,
+      sharedPositionResolvedCount,
     },
   };
   fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
@@ -297,6 +340,9 @@ async function main() {
     unresolvedTargetSampleSize: sampled.length,
     unresolvedTargetTotal: unresolvedTargetEdges.length,
     unresolvedTargetCounts,
+    positionConfidenceCounts,
+    uniquePositionResolvedCount,
+    sharedPositionResolvedCount,
     avgMsPerRequest: report.unresolvedTarget.avgMsPerRequest,
     reportPath: path.relative(root, outputPath),
   }, null, 2));
