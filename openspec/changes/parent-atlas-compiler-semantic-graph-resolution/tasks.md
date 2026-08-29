@@ -526,6 +526,31 @@ neither measured. This function is a proven, independently-testable building blo
 is a separate, deliberate next step once those two questions are answered, not a natural
 continuation to take casually.
 
+## CSGR-3, wiring attempt — schema field added (safe/additive), edge-population deferred (2026-08-29, same day)
+
+Chose the lowest-risk wiring path: rather than changing `add_edge()`'s existing edge cardinality
+or existing fields (which would touch the 5 unverified consumers), added a new **optional**
+field to `AstEvidenceEdge` (`miniforge_nlp_sidecar.py`): `occurrence_positions:
+Optional[list[list[int]]] = None`. Purely additive — `evidence_start_line`/`evidence_start_column`
+stay exactly as they are today, unchanged, so no existing consumer's read path is affected even if
+this field stays unpopulated. Verified the file still parses cleanly
+(`python -c "import ast; ast.parse(...)"`) after the change.
+
+**Deliberately NOT populated yet.** Actually calling `find_occurrence_positions()` from
+`add_edge()`'s call sites requires converting its CHUNK-RELATIVE `(row, column)` results back to
+file-absolute positions: `absolute_row = chunk.start_line + occurrence_row`, but the column offset
+only applies correctly when `occurrence_row == 0` (the occurrence is on the chunk's own first
+line, so the chunk's own `start_column` must be added) — for any `occurrence_row > 0`, the column
+is already absolute (a full line width was consumed, no chunk-start offset applies). Getting this
+off-by-one wrong in a live service is exactly the class of subtle bug that needs a careful,
+dedicated test pass, not a rushed addition — deferred rather than guessed at.
+
+**Next concrete step, precisely scoped**: implement the chunk-relative→absolute conversion as its
+own small pure function (same side-effect-free convention, testable in isolation exactly like
+`find_occurrence_positions()` was), prove it against a chunk that does NOT start at file line 0 (to
+actually exercise the offset math, unlike this pass's test fixtures which all conveniently started
+at row 0), *then* wire the population into `add_edge()`'s call sites.
+
 **Do not report `unclassifiedCount == 0` or promote this corpus as `COMPLETE` based on the current
 terminal counts** — the completion gate's own invariant (every observation gets a *deterministic,
 individually-verified* terminal status) is not actually satisfied for 94.8% of `unresolved_target`

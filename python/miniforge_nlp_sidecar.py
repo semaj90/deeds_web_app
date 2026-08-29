@@ -226,6 +226,15 @@ class AstEvidenceEdge(BaseModel):
     evidence_end_column: int
     resolved: bool = False
     resolution: Optional[str] = None
+    # Additive, optional (2026-08-29, CSGR-3) — evidence_start_line/column above remain the
+    # enclosing CHUNK's boundary, unchanged, for backward compatibility with existing consumers.
+    # occurrence_positions carries every real per-occurrence [row_0indexed, column_0indexed] found
+    # by re-parsing the chunk with find_occurrence_positions() (atlas_structural_provenance.py) —
+    # None when not computed (e.g. unsupported language, parse failure), [] when computed but the
+    # name genuinely wasn't found, and >1 entries when the same name occurs multiple times in one
+    # chunk (the exact case that made 94.8% of unresolved_target edges share one chunk-level
+    # position — see openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md).
+    occurrence_positions: Optional[list[list[int]]] = None
 
 
 class AstEvidenceResponse(BaseModel):
