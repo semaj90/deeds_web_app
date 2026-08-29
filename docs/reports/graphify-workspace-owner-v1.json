@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-workspace-owner-v1",
-  "generatedAt": "2026-08-28T03:54:19.803Z",
+  "generatedAt": "2026-08-29T06:07:13.967Z",
   "readOnly": true,
   "canonicalWrites": false,
   "candidateOwner": "public.workspaces.id",
@@ -536,8 +536,8 @@
   ],
   "counts": {
     "workspaces": 0,
-    "graphify_runs": 4,
-    "graphify_files": 774
+    "graphify_runs": 5,
+    "graphify_files": 885
   },
   "conclusion": "public.workspaces can hold UUIDs, but Graphify lineage does not currently enforce it as the workspace owner."
 }

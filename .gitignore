@@ -472,6 +472,8 @@ src/proto/**
 !/services/go-search-service/
 !/services/go-retrieval-service/
 !/services/go-embedding-service/
+!/services/embedding-onnx-webgpu/
+!/services/atlas-gpu-8098/
 Ollama/ollama.exe
 Ollama/ollama\ app.exe
 Ollama/unins000.exe

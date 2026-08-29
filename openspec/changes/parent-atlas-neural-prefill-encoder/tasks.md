@@ -10713,6 +10713,119 @@ The audit remains read-only with `writesPerformed=false`.
   `HASH_SCOPE_MISMATCH`, and `UNRESOLVED` classifications.
 
 Receipt: `docs/reports/indexable-source-manifest-v1.json`.
+
+## EMBED-ABI-01: executor-neutral semantic embedding ABI (2026-08-28)
+
+- [x] Added `EmbeddingModelManifestV1` for the shared 768-dimensional
+  `semantic_768` contract, including model/tokenizer revisions, prompt revision,
+  pooling, normalization, executor IDs, and explicit non-authority status.
+- [x] Added `EmbeddingContextPlanV1` with role, input digest, token budget, and
+  optional canonical source/candidate coordinates. The plan is an input ABI,
+  not a canonical embedding writer.
+- [x] Added `FeatureTokenBindingV1` and a deterministic binding-set checksum for
+  future AST/CST/domain-feature remapping. Token bindings cannot create packet
+  identity or CandidateOrdinal.
+- [x] Added `AtlasEmbeddingRuntimeV1` with strict finite, L2-normalized,
+  768-dimensional output validation and executor-neutral output receipts.
+- [x] Wired the existing Ollama/llama.cpp document executor through the shared
+  semantic_768 validator without changing its transport or writer ownership.
+- [x] Updated the server ONNX path to prefer a model-provided pooled sentence
+  embedding output when available, avoiding unnecessary hidden-state transfer;
+  CPU/GPU I/O binding remains an optimization experiment, not an ABI gate.
+- [x] Added `OllamaEmbeddingRuntimeV1` behind the shared runtime ABI. It is a
+  read-only adapter and keeps exact executor replay digests separate from
+  cross-executor cosine/ranking parity.
+- [x] Tightened `EmbeddingContextPlanV1` so role, rendered model input,
+  rendered-input checksum, pooling, and normalization are decided before an
+  executor runs. Added canonical tokenizer tensor checksum support.
+- [ ] Run the existing 15-input canary through `OllamaEmbeddingRuntimeV1` and
+  record model, tokenizer, prompt, role, and output replay evidence.
+- [x] Added focused ABI tests for dimension rejection and stable input/output
+  digests. No PostgreSQL, Qdrant, cache, or model writes are performed.
+- [ ] Connect the existing Ollama writer and ONNX executors to this ABI only
+  after tokenizer/prompt parity and runtime-provider evidence are recorded.
+- [ ] Prove `FASTEMBED_CUDA` locally if it becomes a challenger; contract
+  presence is not runtime/provider proof and does not change the canonical
+  Ollama writer.
+- [x] Isolated `onnxruntime-node@1.29.0` on Windows x64 and proved a WebGPU-only
+  EmbeddingGemma session can be created with no CPU fallback; session inputs and
+  outputs were inspected and no durable writes occurred.
+- [x] Resolved tokenizer compatibility for the local ONNX artifact by isolating
+  `@huggingface/transformers@4.2.0`; the checked-in
+  `tokenizer.json` contains array-form BPE merges that `@xenova/transformers@2.17.2`
+  cannot load (`x.split is not a function`). No character-ID substitute was used.
+- [x] Isolated `@huggingface/transformers@4.2.0`; the real local tokenizer now
+  loads and the WebGPU session executes a 768-D finite, normalized vector.
+- [ ] Reconcile the local export output contract: it exposes only
+  `last_hidden_state`, so the current proof is explicitly
+  `LAST_HIDDEN_STATE_MEAN_POOL_L2`, not proof of the published
+  `sentence_embedding [B,768]` export until that artifact is matched or the
+  pooling path is formally accepted.
+- [x] Ran the WebGPU token-state pooling path three times with identical token
+  tensors: replay checksums matched `3/3` and maximum absolute replay delta was
+  `0`.
+- [x] Recorded the WebGPU replay result in the read-only readiness report,
+  including the three output digests, provider, tokenizer checksum, and
+  explicit `LAST_HIDDEN_STATE_MEAN_POOL_L2` output contract.
+- [ ] Run Ollama versus WebGPU geometry/ranking parity on the frozen 15-row
+  cohort; same-executor replay does not establish cross-executor parity.
+- [x] Added the read-only 15-row parity harness. Its first run correctly
+  failed closed because the local ONNX graph rejects a 628-token canonical
+  chunk against its fixed 512-token attention shape; no truncated-vs-untruncated
+  comparison is admitted.
+- [ ] Reconcile the local export's 512-token limit with the 2,048-token model
+  contract, or define a revisioned 512-token proof cohort before parity.
+- [x] Added `EmbeddingTileV1` to bind parent identity, source byte range, token
+  range, tokenizer/input checksums, semantic representation revisions, and
+  768-D vector checksum for bounded tile execution.
+- [x] Added deterministic tile-score aggregation by tile index. Tile metadata
+  remains derived/non-canonical and cannot create CandidateOrdinal identity.
+- [x] Focused Vitest validation passed for the tile, runtime, and Ollama adapter
+  contracts: 3 files, 6 tests.
+- [x] Corrected the WebGPU readiness receipt to separate runtime/token-state
+  inference from semantic equivalence: ORT 1.29 WebGPU replay is proven, the
+  local export is explicitly marked 512-token-limited, and pooling is owned by
+  the Atlas runtime.
+- [x] Audited repository model assets: `models/` and `static/` ONNX copies are
+  byte-identical and both declare a 512-token export limit; config metadata
+  separately declares 2048 maximum positions and a 512 sliding window. No
+  alternate 2048-capable ONNX graph is present locally.
+- [x] Bounded tokenizer check proved identical token IDs between the Python
+  fast tokenizer and Node tokenizer for a code-retrieval fixture; Python also
+  exposes byte offsets. Full role/document and 15-row parity remain open before
+  cross-runtime offsets may drive WebGPU tiles.
+- [x] Five-role tokenizer parity receipt passed: Python fast-tokenizer and Node
+  token IDs match for every role, with Python byte offsets available; this is a
+  fixture-level proof and does not yet prove the 15-row document cohort.
+- [x] 15-candidate tokenizer/tile-plan proof passed against canonical Postgres
+  chunk text: token IDs and offsets match 15/15; 16 bounded tile ranges were
+  planned, with one candidate requiring tiling. No embeddings or projections
+  were written.
+- [x] Corrected tile planning to convert tokenizer character offsets to UTF-8
+  byte offsets and ignore zero-width special-token offsets when deriving spans.
+- [x] Added a narrow tile-to-ACE adapter requiring admitted source text and
+  preserving CandidateOrdinal/snapshot coordinates; it rejects unqualified
+  revisions rather than manufacturing checksums. Adapter evidence remains
+  derived and non-canonical.
+- [x] Added deterministic tile aggregation by CandidateOrdinal so multiple
+  tiles from one parent produce one logical retrieval vote.
+- [x] Added a pure overlapping tile-range planner that maps tokenizer offsets
+  to bounded token/byte ranges; it does not call an embedding executor or write
+  artifacts.
+- [x] Added strict `TensorArtifactManifestV1` for Arrow IPC/mmap artifact
+  descriptors; artifacts remain derived and checksum-bound, not canonical.
+- [ ] Wire tile generation to the exact source/chunk admission path and prove
+  tile → CandidateOrdinal → ACE ContextManifest replay within the LLM budget.
+- [ ] Resolve the upstream workspace/source revision owner before expanding
+  tile generation beyond the proven 15-row cohort. The read-only audit found
+  61,660 packet workspace values but zero nonzero workspace revisions, zero
+  AST-node source revisions, and no complete representation-record owner.
+- [ ] Review the separate current-source cohort of 111 revision-qualified rows
+  as the next bounded expansion target; semantic coverage is still only 15/15
+  proven, so the 111 rows are not yet eligible for tile or Qdrant promotion.
+- [x] Read-only backfill planning confirmed the current candidate-map scope is
+  still 15 rows: 15 exact Postgres source rows, 15 vectors already present,
+  and 0 new embeddings planned. `--limit=111` does not expand that map.
 Rows: `.tmp/atlas/indexable-source-manifest-v1/manifest.jsonl`.
 
 ## GRAPH-ORDINAL-02: identity-grain coverage census (2026-08-27)
@@ -11192,3 +11305,227 @@ Receipts: `docs/reports/indexable-source-manifest-v1.json` and
 
 Receipt: `docs/reports/indexable-source-manifest-v1.json`.
 Rows: `.tmp/atlas/indexable-source-manifest-v1/manifest.jsonl`.
+
+## EMB-TILE-EXEC-01: bounded WebGPU tile execution proof (2026-08-28)
+
+- [x] Executed the proven 15-candidate tile plan without persistence writes.
+- [x] WebGPU-only ONNX Runtime session executed `16/16` planned tiles.
+- [x] Every tile returned finite, L2-normalized `semantic_768` output with
+  `768` dimensions.
+- [x] Kept this as a derived `EmbeddingTileV1` projection; canonical embedding
+  ownership and Postgres/Qdrant promotion remain unchanged.
+
+Receipt: `docs/reports/onnx-webgpu-embedding-tiles-v1.json`.
+
+- [ ] Materialize validated tile vectors into `EmbeddingTileV1` records and
+  build a `TensorArtifactManifestV1`; no projection writes are authorized by
+  this proof alone.
+
+## EMB-TILE-EXEC-02: exact full-token-slice WebGPU proof (2026-08-28)
+
+- [x] Reloaded canonical source text for the frozen 15-candidate cohort.
+- [x] Tokenized each complete rendered document once and sliced the original
+  token IDs/masks by the planned tile ranges.
+- [x] Executed `16/16` exact token slices through the WebGPU-only ONNX session,
+  padding only to the local 512-token export boundary.
+- [x] Every slice returned finite, L2-normalized `semantic_768` output with
+  `768` dimensions; no persistence or projection writes occurred.
+
+Receipt: `docs/reports/onnx-webgpu-embedding-token-slices-v1.json`.
+
+- [ ] Materialize these vectors into validated `EmbeddingTileV1` records and
+  produce the Arrow/mmap `TensorArtifactManifestV1`.
+
+## EMB-TILE-ARTIFACT-01: read-only Arrow tile artifact (2026-08-28)
+
+- [x] Validated the exact WebGPU tile receipt before artifact construction.
+- [x] Materialized `16` rows of `float32[768]` tile vectors into Arrow IPC.
+- [x] Bound the artifact to the candidate snapshot and ordinal-map checksums.
+- [x] Confirmed Postgres, Qdrant, Valkey, and canonical embedding writes are
+  all false.
+
+Artifact: `docs/reports/embedding-tile-artifacts/embedding-tiles-v1.arrow`.
+Manifest: `docs/reports/embedding-tile-artifacts/embedding-tiles-v1.manifest.json`.
+
+- [ ] Read the Arrow artifact back and verify row identity, vector dimensions,
+  vector checksums, and manifest/artifact checksums before 8098 consumption.
+
+## EMB-TILE-ARTIFACT-02: independent Arrow readback (2026-08-28)
+
+- [x] Reopened the Arrow IPC artifact independently from the writer.
+- [x] Verified `16` unique `CandidateOrdinal + tileIndex` rows and `768`
+  dimensions for every vector.
+- [x] Verified all vector checksums and the artifact checksum against their
+  source receipt/manifest.
+- [x] Verified `candidateSnapshotRevision` and `ordinalMapChecksum` bindings.
+
+Receipt: `docs/reports/embedding-tile-artifact-readback-v1.json`.
+
+- [ ] Consume the validated artifact through the 8098 executor without
+  changing canonical identity or introducing a second retrieval vote.
+
+## GPU-TILE-CONSUMER-01: 8098 owner audit (2026-08-28)
+
+- [x] Confirmed no process is listening on `8098`.
+- [x] Confirmed `services/topology-gpu` is a separate FastAPI lane defaulting
+  to `8107`, not the required Arrow tile consumer.
+- [x] Confirmed `docker/cuvs-grpc` is a separate legacy gRPC lane exposing
+  `50051`, with an older RAPIDS image and no `EmbeddingTileV1` contract.
+- [x] Did not start either mismatched lane or alter GPU/data state.
+
+Status: `8098_GPU_TILE_CONSUMER_OWNER_MISSING`.
+
+- [ ] Define or locate the approved WSL2 8098 owner before attempting cuVS or
+  PyTorch consumption. Do not silently alias `8107` or `50051` to `8098`.
+
+## GPU-TILE-CONSUMER-02: WSL2 RAPIDS environment audit (2026-08-28)
+
+- [x] WSL2 kernel responded as WSL2 and CUDA was visible.
+- [x] Configured `atlas-rapids-cu13` environment imports cuDF `26.06.01`,
+  cuGraph/cuVS `26.06.00`, PyTorch `2.13.0+cu130`, PyArrow `24.0.0`, FastAPI,
+  and Uvicorn.
+- [x] PyTorch reported one available device: NVIDIA GeForce RTX 3060 Ti.
+- [x] No database, cache, Qdrant, or GPU-resident production state was
+  changed by this audit.
+
+Status: `WSL2_RAPIDS_RUNTIME_PROVEN_8098_HOST_MISSING`.
+
+- [ ] Implement or approve the thin 8098 HTTP adapter for Arrow artifact
+  inspection and bounded cuVS/cuGraph/PyTorch execution.
+
+## GPU-TILE-CONSUMER-03: thin 8098 adapter created (2026-08-28)
+
+- [x] Added `services/atlas-gpu-8098/app.py` as a WSL2/Linux execution-only
+  FastAPI host.
+- [x] Added read-only Arrow inspection and bounded PyTorch CUDA exact tile scan
+  endpoints.
+- [x] Enforced artifact-root containment and explicit no-write responses.
+- [x] Kept cuVS/cuGraph integration separate until their adapter APIs are
+  exercised against the validated artifact.
+
+Status: `8098_ADAPTER_DIRECT_CUDA_PROVEN_HTTP_LIFECYCLE_OPEN`.
+
+- [x] Ran the adapter inside `atlas-rapids-cu13`: health reported CUDA and the
+  RTX 3060 Ti, Arrow inspection read `16` rows, and a bounded CUDA exact scan
+  returned three ranked tile rows.
+- [x] Started the adapter on `8098` and verified health, Arrow inspection
+  (`16` rows), and a bounded exact CUDA scan over HTTP.
+- [ ] Add the cuVS executor adapter and prove CandidateOrdinal round-trip before
+  wiring this service into Go Retrieval or SearchRuntime.
+
+Status: `8098_HTTP_CUDA_TILE_CONSUMER_PROVEN_CUVS_AND_SEARCH_WIRING_OPEN`.
+
+## GPU-TILE-CONSUMER-04: cuVS exact tile scan and parity (2026-08-28)
+
+- [x] Added the cuVS brute-force endpoint to the 8098 execution-only adapter.
+- [x] Fixed device-array readback using cuVS `copy_to_host()` semantics.
+- [x] Live HTTP cuVS scan returned the same top three CandidateOrdinals as the
+  independent PyTorch CUDA exact scan for the bounded artifact.
+- [x] Preserved `logicalLaneVote: NONE`, canonical identity ownership, and all
+  no-write guarantees.
+
+Status: `CUVS_EXACT_TILE_SCAN_AND_PYTORCH_PARITY_PROVEN_SEARCH_WIRING_OPEN`.
+
+- [ ] Prove the full CandidateOrdinal round-trip and bounded graph/feature
+  consumer path before exposing this executor to Go Retrieval or SearchRuntime.
+
+## GPU-TILE-CONSUMER-05: 8098 CandidateOrdinal round-trip (2026-08-29)
+
+- [x] Called PyTorch CUDA and cuVS executors with the same bounded query.
+- [x] Verified every returned ordinal exists in the validated Arrow artifact.
+- [x] Rejected duplicate/unknown ordinals and verified artifact checksum parity.
+- [x] PyTorch and cuVS returned identical ordered top-three CandidateOrdinals.
+- [x] Confirmed no logical retrieval vote and no canonical writes.
+
+Receipt: `docs/reports/8098-candidate-ordinal-roundtrip-v1.json`.
+
+- [ ] Add bounded graph/feature enrichment consumption, then expose the
+  executor through a typed Parent Atlas adapter; Go Retrieval/SearchRuntime
+  remain unwired.
+
+## GPU-TILE-CONSUMER-06: bounded graph-feature enrichment (2026-08-29)
+
+- [x] Added a read-only 8098 enrichment endpoint joining graph evidence by
+  `CandidateOrdinal`.
+- [x] Live HTTP enrichment consumed all `15` artifact candidates: `7` graph
+  feature rows present and `8` explicitly absent/masked.
+- [x] Preserved graph revision and feature revision metadata without treating
+  missing values as zero.
+- [x] Confirmed `rankingPromotion: false`, `logicalLaneVote: NONE`, and no
+  Postgres/Qdrant/Valkey writes.
+
+Status: `8098_BOUNDED_GRAPH_FEATURE_ENRICHMENT_PROVEN`.
+
+- [ ] Join the enriched rows into the existing 25-column feature-matrix
+  manifest and run a deterministic GPU/CPU feature replay before any agent or
+  SearchRuntime wiring.
+
+## GPU-TILE-CONSUMER-07: feature-matrix join and replay (2026-08-29)
+
+- [x] Joined the live 8098 enrichment response to the proven 15-row matrix
+  manifest using `CandidateOrdinal`.
+- [x] Snapshot and ordinal-map checksum bindings matched.
+- [x] Candidate universe matched exactly; graph presence mask remained `7`
+  present and `8` absent.
+- [x] Two independent enrichment calls produced identical output.
+- [x] Preserved no ranking promotion, no logical lane vote, and no writes.
+
+Receipt: `docs/reports/8098-feature-matrix-join-replay-v1.json`.
+
+- [ ] Add the typed Parent Atlas adapter that packages the joined feature rows
+  for ACE/PyTorch consumption without exposing raw executor details.
+
+## GPU-TILE-CONSUMER-08: typed Parent Atlas feature adapter (2026-08-29)
+
+- [x] Added `GpuFeatureEnrichmentResponseV1` validation and
+  `GpuFeatureEnrichmentBundleV1` packaging.
+- [x] Enforced exact CandidateOrdinal membership, duplicate rejection, stable
+  ordering, and snapshot/ordinal-map binding.
+- [x] Preserved optional graph presence, non-promotional ranking state, and
+  executor no-write guarantees.
+- [x] Focused adapter tests passed (`2/2`).
+- [x] Live 8098 response adapted successfully: `15` candidates, `7` present,
+  `8` absent, deterministic bundle checksum produced.
+
+Status: `GPU_FEATURE_ENRICHMENT_ADAPTER_LIVE_PROVEN_ACE_HANDOFF_OPEN`.
+
+- [ ] Convert the typed bundle into the existing ACE card/context selection
+  input and prove deterministic ContextManifest replay.
+
+## GPU-TILE-CONSUMER-09: ACE graph-card replay (2026-08-29)
+
+- [x] Added the typed GPU-bundle-to-ACE graph-card adapter.
+- [x] Emits cards only for observed graph features; absent rows remain excluded.
+- [x] Enforces workspace revision, source revision, CandidateOrdinal, graph
+  revision, and bundle checksum bindings.
+- [x] Focused adapter tests passed (`3/3`).
+- [x] Live ACE selection replay passed twice: `7` cards selected for ordinals
+  `1,2,7,8,10,12,14`, with identical selection checksums.
+- [x] Preserved `canonicalAuthority: false`; no synthesis or persistence was
+  performed.
+
+Status: `GPU_FEATURE_ACE_REPLAY_PROVEN_CONTEXT_MANIFEST_OPEN`.
+
+- [ ] Feed the selected cards into the existing ContextManifest compiler and
+  prove deterministic replay before Ornith synthesis or agent execution.
+
+## GPU-TILE-CONSUMER-10: ACE cards to ContextManifest replay (2026-08-29)
+
+- [x] Added the read-only `aceCardsToFanoutEvidenceBundleV1` adapter so selected
+  ACE cards enter the existing `FanoutContextCompilerV1` contract rather than a
+  parallel manifest format.
+- [x] Enforced workspace revision, candidate snapshot, ordinal-map checksum,
+  CandidateOrdinal, source reference, and source revision bindings.
+- [x] Focused GPU/ACE adapter tests passed (`4/4`).
+- [x] Live 8098 → GPU feature bundle → ACE selection → fanout compiler replay
+  passed twice for `7` selected CandidateOrdinals:
+  `1,2,7,8,10,12,14`.
+- [x] Replay checksum was identical:
+  `sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb`.
+- [x] Preserved `canonicalAuthority: false`, `rankingPromotion: false`, and
+  no PostgreSQL, Qdrant, Valkey, Neo4j, or synthesis writes.
+
+Status: `GPU_FEATURE_CONTEXT_MANIFEST_REPLAY_PROVEN_ORNITH_GATE_OPEN`.
+
+- [ ] Run the bounded Ornith synthesis/replay gate using only this compiled
+  ContextManifest; do not pass raw GPU, graph, or retrieval results directly.

@@ -1,4 +1,5 @@
 import { performance } from 'node:perf_hooks';
+import { validateSemantic768OutputV1 } from './embedding-runtime-v1.js';
 
 export type AtlasEmbeddingRoleV1 = 'QUERY' | 'DOCUMENT';
 export type AtlasDocumentEmbeddingExecutorIdV1 = 'OLLAMA' | 'LLAMA_CPP_CUDA';
@@ -79,13 +80,15 @@ function assertDocumentBatch(documents: readonly AtlasSemanticDocumentV1[], poli
 }
 
 function validateVector(value: unknown): Float32Array {
-  if (!Array.isArray(value) || value.length !== 768 || value.some((item) => !Number.isFinite(item))) {
+  if (!Array.isArray(value)) throw new Error('EMBEDDING_VECTOR_NOT_SEMANTIC_768');
+  try {
+    return validateSemantic768OutputV1(value);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'SEMANTIC_768_OUTPUT_NOT_L2_NORMALIZED') {
+      throw new Error('EMBEDDING_VECTOR_NOT_L2_NORMALIZED');
+    }
     throw new Error('EMBEDDING_VECTOR_NOT_SEMANTIC_768');
   }
-  const vector = Float32Array.from(value as number[]);
-  const norm = Math.hypot(...vector);
-  if (!Number.isFinite(norm) || Math.abs(norm - 1) > 1e-3) throw new Error('EMBEDDING_VECTOR_NOT_L2_NORMALIZED');
-  return vector;
 }
 
 function checksum(vectors: readonly Float32Array[]): string {

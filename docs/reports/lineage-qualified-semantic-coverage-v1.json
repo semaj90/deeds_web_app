@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-semantic-coverage.v1",
-  "generatedAt": "2026-08-28T18:11:48.058Z",
+  "generatedAt": "2026-08-29T06:08:38.675Z",
   "mode": "READ_ONLY_CANARY_RECONCILIATION",
   "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
   "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
@@ -38,8 +38,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "24575",
         "7252a838-1e9b-445a-8abd-0d5ad413567d"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -53,8 +54,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "40123",
         "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -68,8 +70,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "5432",
         "144079f0-43df-42f1-a363-e77fb913b76e"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -83,8 +86,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "34838",
         "a4a643ab-c3fb-49d5-976b-845820c67a7e"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -98,8 +102,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "27737",
         "822a81b8-5e81-4ff0-a645-b1ed7df2584e"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -113,8 +118,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "39367",
         "bb0c9b56-45e4-46e5-8347-25ea009ddfea"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -128,8 +134,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "34039",
         "a0e64259-6219-4c97-9b04-e22b9808c36b"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -143,8 +150,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "52486",
         "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -158,8 +166,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "20025",
         "5b9447df-c4b5-4634-853c-c06384abfc0b"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -173,8 +182,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "15264",
         "44318cbc-211b-4b57-8212-6a8b9f7abac6"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -188,8 +198,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "25348",
         "76266fe6-4285-4dbb-8724-270c139fd4f8"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -203,8 +214,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "13146",
         "39a3a174-f87c-41ae-8221-1557c187c078"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -218,8 +230,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "39624",
         "bc31cec8-73d5-4f4c-be58-3fafb1898bf9"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -233,8 +246,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "25037",
         "748c3951-eed7-4139-a2ea-aa279ce82796"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"
@@ -248,8 +262,9 @@
         "vectorRows": 1
       },
       "qdrantPoints": 2,
-      "qdrantExactLineagePoints": 1,
+      "qdrantExactLineagePoints": 2,
       "qdrantPointIds": [
+        "1255",
         "01130d0c-6d1f-4fb4-8592-43f3550794d5"
       ],
       "classification": "QDRANT_SEMANTIC_768_LINEAGE_EXACT"

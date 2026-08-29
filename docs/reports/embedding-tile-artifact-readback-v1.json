@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.embedding-tile-artifact-readback.v1",
+  "readOnly": true,
+  "status": "EMBEDDING_TILE_ARTIFACT_READBACK_PROVEN",
+  "rows": 16,
+  "checks": {
+    "artifactChecksum": true,
+    "rowCount": true,
+    "uniqueIdentity": true,
+    "vectorDimensions": true,
+    "vectorChecksums": true,
+    "candidateSnapshotRevision": true,
+    "ordinalMapChecksum": true
+  },
+  "errors": []
+}

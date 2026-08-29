@@ -12,7 +12,9 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
+import { createHash } from 'crypto';
 import { resolve } from 'path';
+import { validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
 
 // onnxruntime-node types
 type InferenceSession = import('onnxruntime-node').InferenceSession;
@@ -40,7 +42,37 @@ interface SessionInfo {
 	session: InferenceSession;
 	provider: string;
 	modelPath: string;
+	modelChecksum: string;
+	representationId: 'semantic_768';
+	representationRevision: string;
 	loadTimeMs: number;
+}
+
+const EMBEDDING_DIMENSIONS = 768;
+const EMBEDDING_MAX_TOKENS = 512;
+const EMBEDDING_REPRESENTATION_ID = 'semantic_768' as const;
+let tokenizerCache: Promise<any> | null = null;
+let embeddingRunQueue: Promise<void> = Promise.resolve();
+
+function sha256Bytes(bytes: Uint8Array): string {
+	return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+}
+
+async function ensureEmbeddingTokenizer(): Promise<any> {
+	if (tokenizerCache) return tokenizerCache;
+	tokenizerCache = (async () => {
+		const transformers = await import('@huggingface/transformers');
+		transformers.env.allowLocalModels = true;
+		transformers.env.allowRemoteModels = false;
+		const tokenizerDir = resolve(process.cwd(), 'static/embeddinggemma_300m_onnx');
+		return transformers.AutoTokenizer.from_pretrained(tokenizerDir, { local_files_only: true });
+	})();
+	try {
+		return await tokenizerCache;
+	} catch (error) {
+		tokenizerCache = null;
+		throw new Error(`EMBEDDINGGEMMA_TOKENIZER_UNAVAILABLE:${(error as Error).message}`);
+	}
 }
 
 /** Lazy-loaded onnxruntime-node module */
@@ -136,7 +168,9 @@ async function _createServerSession(
 ): Promise<SessionInfo> {
 	const ort = await ensureOrt();
 	const modelPath = resolveModelPath(modelId);
-	const eps = preferredEps ?? getServerProviders();
+	const requestedEps = preferredEps ?? getServerProviders();
+	const strictDirectML = process.env.EMBEDDING_BACKEND === 'onnx_directml' && process.env.ONNX_ALLOW_CPU_FALLBACK !== '1';
+	const eps = strictDirectML ? requestedEps.filter((ep) => ep === 'dml') : requestedEps;
 
 	console.info(`[ONNX-Server] Loading model: ${modelId} (${modelPath})`);
 	console.info(`[ONNX-Server] Trying providers: ${eps.join(' → ')}`);
@@ -145,15 +179,19 @@ async function _createServerSession(
 
 	// Read model into buffer
 	const modelBuffer = readFileSync(modelPath);
+	const modelChecksum = sha256Bytes(modelBuffer);
 
 	let lastError: Error | null = null;
 	for (const ep of eps) {
+		if (strictDirectML && ep !== 'dml') continue;
 		try {
 			const session = await ort.InferenceSession.create(
 				modelBuffer.buffer as ArrayBuffer,
 				{
 					executionProviders: [ep as any],
 					graphOptimizationLevel: 'all',
+					enableMemPattern: ep === 'dml' ? false : undefined,
+					executionMode: ep === 'dml' ? 'sequential' : undefined,
 				}
 			);
 
@@ -163,7 +201,15 @@ async function _createServerSession(
 			console.info(`[ONNX-Server] Inputs: ${session.inputNames.join(', ')}`);
 			console.info(`[ONNX-Server] Outputs: ${session.outputNames.join(', ')}`);
 
-			return { session, provider: ep, modelPath, loadTimeMs };
+			return {
+				session,
+				provider: ep,
+				modelPath,
+				modelChecksum,
+				representationId: EMBEDDING_REPRESENTATION_ID,
+				representationRevision: `${EMBEDDING_REPRESENTATION_ID}:${modelChecksum}`,
+				loadTimeMs,
+			};
 		} catch (err) {
 			console.warn(`[ONNX-Server] Provider "${ep}" failed for ${modelId}:`, (err as Error).message);
 			lastError = err as Error;
@@ -184,15 +230,32 @@ async function _createServerSession(
 export async function runEmbedding(text: string): Promise<number[] | null> {
 	try {
 		const ort = await ensureOrt();
-		const { session } = await getServerOnnxSession('embeddinggemma');
+		const { session, representationId } = await getServerOnnxSession('embeddinggemma');
+		if (representationId !== EMBEDDING_REPRESENTATION_ID) {
+			throw new Error('ONNX_REPRESENTATION_ID_MISMATCH');
+		}
 
 		// Simple tokenization: convert text to token IDs
 		// embeddinggemma expects input_ids and attention_mask
 		const inputNames = session.inputNames;
 
-		// Basic character-level tokenization (the model's tokenizer handles subword)
-		// For production, use a proper tokenizer — this provides basic functionality
-		const encoded = encodeText(text, 512);
+		const tokenizer = await ensureEmbeddingTokenizer();
+		const tokenized = await tokenizer(text, {
+			return_tensors: 'np',
+			padding: true,
+			truncation: true,
+			max_length: EMBEDDING_MAX_TOKENS,
+		});
+		const encoded = {
+			inputIds: Array.from(tokenized.input_ids.data as ArrayLike<number>, Number),
+			attentionMask: Array.from(tokenized.attention_mask.data as ArrayLike<number>, Number),
+			tokenTypeIds: tokenized.token_type_ids
+				? Array.from(tokenized.token_type_ids.data as ArrayLike<number>, Number)
+				: undefined,
+		};
+		if (encoded.inputIds.length === 0 || encoded.inputIds.length > EMBEDDING_MAX_TOKENS) {
+			throw new Error('ONNX_TOKEN_SEQUENCE_INVALID');
+		}
 
 		const feeds: Record<string, Tensor> = {};
 
@@ -203,13 +266,19 @@ export async function runEmbedding(text: string): Promise<number[] | null> {
 			feeds['attention_mask'] = new ort.Tensor('int64', BigInt64Array.from(encoded.attentionMask.map(BigInt)), [1, encoded.attentionMask.length]);
 		}
 		if (inputNames.includes('token_type_ids')) {
-			feeds['token_type_ids'] = new ort.Tensor('int64', new BigInt64Array(encoded.inputIds.length), [1, encoded.inputIds.length]);
+			feeds['token_type_ids'] = new ort.Tensor(
+				'int64',
+				BigInt64Array.from((encoded.tokenTypeIds ?? encoded.inputIds.map(() => 0)).map(BigInt)),
+				[1, encoded.inputIds.length]
+			);
 		}
 
-		const results = await session.run(feeds);
+		const run = embeddingRunQueue.then(() => session.run(feeds));
+		embeddingRunQueue = run.then(() => undefined, () => undefined);
+		const results = await run;
 
 		// Extract embedding from output (usually 'last_hidden_state' or 'sentence_embedding')
-		const outputName = session.outputNames[0];
+		const outputName = session.outputNames.find((name) => /sentence|embedding/i.test(name)) ?? session.outputNames[0];
 		const output = results[outputName];
 		if (!output) return null;
 
@@ -246,45 +315,22 @@ export async function runEmbedding(text: string): Promise<number[] | null> {
 				for (let j = 0; j < hiddenDim; j++) pooled[j] /= norm;
 			}
 
+			if (hiddenDim !== EMBEDDING_DIMENSIONS || pooled.some((value) => !Number.isFinite(value))) {
+				throw new Error(`ONNX_EMBEDDING_OUTPUT_INVALID:${hiddenDim}`);
+			}
 			return Array.from(pooled);
 		}
 
-		// Already pooled [1, hidden_dim]
-		return Array.from(data);
+		// Prefer the model's pooled sentence embedding when it is exposed. This avoids
+		// transferring and re-pooling the full [batch, sequence, hidden] tensor.
+		if (dims.length !== 2 || Number(dims[1]) !== EMBEDDING_DIMENSIONS || data.length !== EMBEDDING_DIMENSIONS) {
+			throw new Error(`ONNX_EMBEDDING_DIMENSION_MISMATCH:${dims.join('x')}`);
+		}
+		return Array.from(validateSemantic768OutputV1(data));
 	} catch (err) {
 		console.warn('[ONNX-Server] Embedding failed:', (err as Error).message);
 		return null;
 	}
-}
-
-/**
- * Basic text encoding for ONNX models.
- * Uses byte-level encoding as a universal fallback.
- * For production use, integrate the model's actual tokenizer.
- */
-function encodeText(text: string, maxLen: number): { inputIds: number[]; attentionMask: number[] } {
-	// Simple byte-pair-like encoding: map each character to its Unicode code point
-	// This is a fallback — real tokenizer would use SentencePiece/BPE
-	const chars = Array.from(text.slice(0, maxLen * 4)); // generous char limit
-	const inputIds: number[] = [1]; // BOS token
-	const attentionMask: number[] = [1];
-
-	for (const ch of chars) {
-		if (inputIds.length >= maxLen - 1) break; // leave room for EOS
-		inputIds.push(ch.codePointAt(0) ?? 0);
-		attentionMask.push(1);
-	}
-
-	inputIds.push(2); // EOS token
-	attentionMask.push(1);
-
-	// Pad to maxLen
-	while (inputIds.length < maxLen) {
-		inputIds.push(0);
-		attentionMask.push(0);
-	}
-
-	return { inputIds, attentionMask };
 }
 
 /**

@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.ollama-webgpu-semantic-768-parity.v1",
+  "generatedAt": "2026-08-29T05:55:24.575Z",
+  "readOnly": true,
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "model": "embeddinggemma:latest",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "renderedInputChecksum": "sha256:f843d3a9fb797757b29dd01760488a29570b828a95c40e480ee2f11b51974365",
+      "tokenCount": 28,
+      "ollamaCosineWebGpu": 0.015878229138987076,
+      "maxAbsDelta": 0.6511977924084961,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 1,
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "renderedInputChecksum": "sha256:d4ebd01970f0003aacf42a48bf9b58b03237c2fbcda8ca209058d2d17a7e07fa",
+      "tokenCount": 64,
+      "ollamaCosineWebGpu": -0.052907404692502574,
+      "maxAbsDelta": 0.7171600645488586,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 2,
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "renderedInputChecksum": "sha256:ac0ff0a004256d4b4336d69feba9c75dea60ad64145e10498bca19410a8fad8a",
+      "tokenCount": 58,
+      "ollamaCosineWebGpu": 0.0073838688920140096,
+      "maxAbsDelta": 0.7143581895669007,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 3,
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "renderedInputChecksum": "sha256:fee88e540d913c6fd3f8e5d3f3c5a183444083beca54f98907ea2159d2a2ff78",
+      "tokenCount": 219,
+      "ollamaCosineWebGpu": -0.07780500921840541,
+      "maxAbsDelta": 0.685958731388916,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 4,
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "renderedInputChecksum": "sha256:8cb4c213216bca1839b4f8795315e7e4f9bacc4620e1c956d9ccbc416406fc60",
+      "tokenCount": 230,
+      "ollamaCosineWebGpu": -0.0759219368955506,
+      "maxAbsDelta": 0.6994186602124328,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 5,
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "renderedInputChecksum": "sha256:ed71137e5e12e43e857356dce31dc691f7f2c6062440fe0ac101366b17c4c722",
+      "tokenCount": 217,
+      "ollamaCosineWebGpu": -0.014589712962615953,
+      "maxAbsDelta": 0.6654474978898925,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 6,
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "renderedInputChecksum": "sha256:9502ece199e849dc7cc49190b3085bd9f11a3fd5a6cf4fb5c6f5409d6dd1efe4",
+      "tokenCount": 180,
+      "ollamaCosineWebGpu": -0.021254740569616393,
+      "maxAbsDelta": 0.702198914119336,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 7,
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "renderedInputChecksum": "sha256:3d777f727ba6b9a69d0acd09a30ee4e5f38a0203f1fe924c8e818bac60f4bf55",
+      "tokenCount": 42,
+      "ollamaCosineWebGpu": -0.02815953825602106,
+      "maxAbsDelta": 0.7139149773875427,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 8,
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "renderedInputChecksum": "sha256:6bcb275aed3c4cecafc8c62105289a027c57704c14c31d79341f4bf46f2bf198",
+      "tokenCount": 236,
+      "ollamaCosineWebGpu": -0.06854481092369188,
+      "maxAbsDelta": 0.6892932433999328,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false
+  },
+  "status": "BLOCKED",
+  "errors": [
+    "WEBGPU_LOCAL_EXPORT_CONTEXT_LIMIT_512:628"
+  ]
+}

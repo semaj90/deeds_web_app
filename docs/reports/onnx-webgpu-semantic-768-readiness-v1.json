@@ -1,0 +1,106 @@
+{
+  "schema": "atlas.onnx-webgpu-semantic-768-readiness.v1",
+  "generatedAt": "2026-08-29T06:22:39.188Z",
+  "readOnly": true,
+  "requestedProvider": "webgpu",
+  "cpuFallbackAllowed": false,
+  "representationId": "semantic_768",
+  "dimensions": 768,
+  "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\model.onnx",
+  "modelChecksum": "sha256:e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
+  "tokenizerChecksum": "sha256:6852f8d561078cc0cebe70ca03c5bfdd0d60a45f9d2e0e1e4cc05b68e9ec329e",
+  "sequenceContract": {
+    "advertisedMaxInputTokens": 2048,
+    "localExportMaxInputTokens": 512,
+    "slidingWindowTokens": 512,
+    "status": "LOCAL_EXPORT_LIMITED"
+  },
+  "semanticEquivalence": {
+    "status": "NOT_PROVEN",
+    "reason": "LOCAL_EXPORT_SEQUENCE_OR_OUTPUT_CONTRACT_REQUIRES_SEPARATE_PARITY_PROOF"
+  },
+  "runtimePackageDir": "C:\\Users\\james\\Videos\\deeds-web-app\\services\\embedding-onnx-webgpu\\node_modules\\onnxruntime-node",
+  "runtime": {
+    "package": "onnxruntime-node",
+    "version": "1.29.0",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "session": {
+    "created": true,
+    "actualProvider": "webgpu",
+    "inputNames": [
+      "input_ids",
+      "attention_mask"
+    ],
+    "outputNames": [
+      "last_hidden_state"
+    ]
+  },
+  "inference": {
+    "executed": true,
+    "dimensions": 768,
+    "finite": true,
+    "normalized": true,
+    "outputName": "last_hidden_state",
+    "outputContract": "LAST_HIDDEN_STATE_MEAN_POOL_L2",
+    "poolingOwner": "ATLAS_RUNTIME",
+    "replayCount": 3,
+    "replayChecksums": [
+      "sha256:6a2cdad7e0e0a63a8e8217fe1dd1f8c349364e10a5cd08cda9777602b4353f41",
+      "sha256:6a2cdad7e0e0a63a8e8217fe1dd1f8c349364e10a5cd08cda9777602b4353f41",
+      "sha256:6a2cdad7e0e0a63a8e8217fe1dd1f8c349364e10a5cd08cda9777602b4353f41"
+    ],
+    "replayStable": true,
+    "replayMaxAbsDelta": 0
+  },
+  "tokenFixtures": [
+    {
+      "role": "RETRIEVAL_QUERY",
+      "renderedInput": "task: search result | query: WebGPU semantic retrieval probe",
+      "renderedInputChecksum": "sha256:82286e945662a11e5f147500e7fd417eecf050ff5723d85d740833ed8e6d898c",
+      "tokenTensorChecksum": "sha256:b462c29da523db20f5bb66f02069f9ff00bc4d505f2b8e4330a07fbaedf31f8e",
+      "inputIdsShape": [
+        1,
+        14
+      ],
+      "attentionMaskShape": [
+        1,
+        14
+      ],
+      "tokenCount": 14
+    },
+    {
+      "role": "CODE_RETRIEVAL_QUERY",
+      "renderedInput": "task: code retrieval | query: locate the embedding runtime",
+      "renderedInputChecksum": "sha256:6e2893ca9c39f8e1a7b8b711be35cec5917f59d1797f516ce488b0095bdb8088",
+      "tokenTensorChecksum": "sha256:a2b917f4d109dec415a3e15f34540c9a20936422e03896ba687a3e9899293e4c",
+      "inputIdsShape": [
+        1,
+        13
+      ],
+      "attentionMaskShape": [
+        1,
+        13
+      ],
+      "tokenCount": 13
+    },
+    {
+      "role": "RETRIEVAL_DOCUMENT",
+      "renderedInput": "title: none | text: WebGPU semantic retrieval probe",
+      "renderedInputChecksum": "sha256:d4fa85f115ae4191254872747b611347f5d475af4e821045d55092a706d55416",
+      "tokenTensorChecksum": "sha256:78074143eb5d0df9b05662f6019323fa69795fb6cc4a6a0222383894114e0046",
+      "inputIdsShape": [
+        1,
+        13
+      ],
+      "attentionMaskShape": [
+        1,
+        13
+      ],
+      "tokenCount": 13
+    }
+  ],
+  "status": "WEBGPU_RUNTIME_AND_TOKEN_STATE_INFERENCE_PROVEN",
+  "errors": []
+}

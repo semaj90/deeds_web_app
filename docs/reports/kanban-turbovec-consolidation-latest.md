@@ -1,6 +1,6 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-08-28T23:28:48.858Z
+Generated: 2026-08-29T05:06:56.250Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
@@ -15,9 +15,6 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:5**: 6 records, 6 open, clusters=5, 22, 36, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes. | Create `schema-encoder.wgsl` for client-side reranking of documents. | Option 2: ClusterCard schema + Redis/Qdrant wiring + API route | Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass
-- **lib:cluster:none**: 5 records, 5 open, clusters=none, families=lib
-  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › data
 - **lib:cluster:18**: 5 records, 5 open, clusters=18, 35, 49, families=lib
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: lib › ambient-events › d › ts | lib › models | lib › uno-shortcuts › ts | lib › phase89-graph-visualizer › mjs | lib › composables
@@ -36,6 +33,9 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:79**: 5 records, 5 open, clusters=79, 96, 110, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available. | Track 5C–5E: Model/GGUF cleanup | Unsloth + PyTorch install and validation
+- **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
+  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
+  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:48**: 4 records, 4 open, clusters=48, 65, 79, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats | Clustering quality cleanup (deferred)

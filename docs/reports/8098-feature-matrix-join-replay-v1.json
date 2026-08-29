@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.8098-feature-matrix-join-replay.v1",
+  "readOnly": true,
+  "status": "8098_FEATURE_MATRIX_JOIN_REPLAY_PROVEN",
+  "checks": {
+    "matrixManifestProven": true,
+    "artifactSnapshotMatch": true,
+    "artifactOrdinalMapMatch": true,
+    "candidateCount": true,
+    "ordinalJoinExact": true,
+    "graphPresentMaskExact": true,
+    "graphAbsentMaskExact": true,
+    "replayIdentical": true,
+    "rankingPromotion": true,
+    "logicalLaneVote": true,
+    "canonicalAuthority": true,
+    "noWrites": true
+  },
+  "errors": [],
+  "result": {
+    "candidateCount": 15,
+    "graphFeaturePresentCount": 7,
+    "graphFeatureAbsentCount": 8,
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100"
+  }
+}

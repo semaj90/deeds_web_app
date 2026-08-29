@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.8098-candidate-ordinal-roundtrip.v1",
+  "readOnly": true,
+  "status": "8098_CANDIDATE_ORDINAL_ROUNDTRIP_PROVEN",
+  "request": {
+    "baseUrl": "http://127.0.0.1:8098",
+    "artifactPath": "docs/reports/embedding-tile-artifacts/embedding-tiles-v1.arrow",
+    "limit": 3
+  },
+  "checks": {
+    "artifactReadback": true,
+    "pytorchRoundTrip": true,
+    "cuvsRoundTrip": true,
+    "pytorchCuvsOrdinalParity": true,
+    "noLogicalVote": true,
+    "canonicalWrites": false,
+    "artifactChecksum": "sha256:f80051033cb0c4afdfd1220c3a8ec040338d6061ac7b140fd9e4d3b8fdfff8d0"
+  },
+  "errors": [],
+  "results": {
+    "pytorch": [
+      {
+        "candidateOrdinal": 0,
+        "tileIndex": 0,
+        "score": 0.022651152685284615
+      },
+      {
+        "candidateOrdinal": 9,
+        "tileIndex": 0,
+        "score": 0.013026908040046692
+      },
+      {
+        "candidateOrdinal": 13,
+        "tileIndex": 0,
+        "score": 0.009435458108782768
+      }
+    ],
+    "cuvs": [
+      {
+        "candidateOrdinal": 0,
+        "tileIndex": 0,
+        "distance": 0.9773488640785217,
+        "score": 0.02265113592147827
+      },
+      {
+        "candidateOrdinal": 9,
+        "tileIndex": 0,
+        "distance": 0.9869731068611145,
+        "score": 0.013026893138885498
+      },
+      {
+        "candidateOrdinal": 13,
+        "tileIndex": 0,
+        "distance": 0.9905645251274109,
+        "score": 0.009435474872589111
+      }
+    ],
+    "candidateOrdinalSet": [
+      0,
+      9,
+      13
+    ]
+  }
+}

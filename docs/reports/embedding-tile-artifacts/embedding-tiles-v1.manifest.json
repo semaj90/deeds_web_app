@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.tensor-artifact-manifest.v1",
+  "artifactId": "embedding-tiles-v1",
+  "artifactType": "SEMANTIC_TILE_MATRIX",
+  "artifactFormat": "ARROW_IPC",
+  "artifactUri": "atlas-artifact://docs/reports/embedding-tile-artifacts/embedding-tiles-v1.arrow",
+  "artifactChecksum": "sha256:f80051033cb0c4afdfd1220c3a8ec040338d6061ac7b140fd9e4d3b8fdfff8d0",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "representationId": "semantic_768",
+  "representationRevision": "embeddinggemma-onnx-webgpu-local-v1",
+  "shape": {
+    "rows": 16,
+    "columns": 768
+  },
+  "dtype": "float32",
+  "rowIdentity": "CandidateOrdinal + tileIndex",
+  "rowCount": 16,
+  "columnCount": 768,
+  "sourceReceipt": "docs/reports/onnx-webgpu-embedding-token-slices-v1.json",
+  "canonicalAuthority": false,
+  "manifestChecksum": "sha256:f00c8cd7f6364c4430ec95acb98e1b4754161cb405ccb210b32c903baf24bd54"
+}

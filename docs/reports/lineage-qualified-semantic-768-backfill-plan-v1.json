@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-semantic-768-backfill-plan.v1",
-  "generatedAt": "2026-08-29T02:24:17.556Z",
+  "generatedAt": "2026-08-29T06:09:11.905Z",
   "mode": "READ_ONLY_PLAN",
   "candidateMap": {
     "path": ".tmp\\atlas\\lineage-qualified-candidate-map-v1.json",
@@ -464,5 +464,5 @@
   "status": "SEMANTIC_768_BACKFILL_PLAN_READY",
   "nextGate": "EXPLICIT_AUTHORIZATION_REQUIRED_FOR_VECTOR_GENERATION_AND_WRITES",
   "errors": [],
-  "elapsedMs": 6459
+  "elapsedMs": 6956
 }

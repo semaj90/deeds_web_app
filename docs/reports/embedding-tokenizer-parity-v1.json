@@ -1,0 +1,356 @@
+{
+  "schema": "atlas.embedding-tokenizer-parity.v1",
+  "readOnly": true,
+  "tokenizer": {
+    "modelDirectory": "models/embeddinggemma_300m_onnx",
+    "tokenizerChecksum": "sha256:acd01dbaf9b4098e35a990bd90acbe6687cfbebd0bdfbaa9643e034bc841806e",
+    "pythonBackend": "GemmaTokenizer",
+    "nodePackage": "@huggingface/transformers"
+  },
+  "fixtures": [
+    {
+      "role": "RETRIEVAL_QUERY",
+      "renderedInput": "task: search result | query: PostgreSQL bitmap scan",
+      "pythonTokenCount": 12,
+      "nodeTokenCount": 12,
+      "tokenIdsMatch": true,
+      "pythonTokenIds": [
+        2,
+        8071,
+        236787,
+        3927,
+        1354,
+        1109,
+        7609,
+        236787,
+        127764,
+        40173,
+        13952,
+        1
+      ],
+      "offsets": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          12
+        ],
+        [
+          12,
+          19
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          21,
+          27
+        ],
+        [
+          27,
+          28
+        ],
+        [
+          28,
+          39
+        ],
+        [
+          39,
+          46
+        ],
+        [
+          46,
+          51
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "role": "CODE_RETRIEVAL_QUERY",
+      "renderedInput": "task: code retrieval | query: CandidateOrdinal checksum",
+      "pythonTokenCount": 12,
+      "nodeTokenCount": 12,
+      "tokenIdsMatch": true,
+      "pythonTokenIds": [
+        2,
+        8071,
+        236787,
+        3393,
+        51139,
+        1109,
+        7609,
+        236787,
+        65077,
+        137072,
+        111085,
+        1
+      ],
+      "offsets": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          10,
+          20
+        ],
+        [
+          20,
+          22
+        ],
+        [
+          22,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          39
+        ],
+        [
+          39,
+          46
+        ],
+        [
+          46,
+          55
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "role": "RETRIEVAL_DOCUMENT",
+      "renderedInput": "title: none | text: PostgreSQL bitmap scan",
+      "pythonTokenCount": 11,
+      "nodeTokenCount": 11,
+      "tokenIdsMatch": true,
+      "pythonTokenIds": [
+        2,
+        3250,
+        236787,
+        7293,
+        1109,
+        1816,
+        236787,
+        127764,
+        40173,
+        13952,
+        1
+      ],
+      "offsets": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          11
+        ],
+        [
+          11,
+          13
+        ],
+        [
+          13,
+          18
+        ],
+        [
+          18,
+          19
+        ],
+        [
+          19,
+          30
+        ],
+        [
+          30,
+          37
+        ],
+        [
+          37,
+          42
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "role": "CLASSIFICATION_QUERY",
+      "renderedInput": "task: classification | query: graph revision owner",
+      "pythonTokenCount": 11,
+      "nodeTokenCount": 11,
+      "tokenIdsMatch": true,
+      "pythonTokenIds": [
+        2,
+        8071,
+        236787,
+        15241,
+        1109,
+        7609,
+        236787,
+        3753,
+        33847,
+        8123,
+        1
+      ],
+      "offsets": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          20
+        ],
+        [
+          20,
+          22
+        ],
+        [
+          22,
+          28
+        ],
+        [
+          28,
+          29
+        ],
+        [
+          29,
+          35
+        ],
+        [
+          35,
+          44
+        ],
+        [
+          44,
+          50
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "role": "CLUSTERING_QUERY",
+      "renderedInput": "task: clustering | query: semantic tile candidate",
+      "pythonTokenCount": 11,
+      "nodeTokenCount": 11,
+      "tokenIdsMatch": true,
+      "pythonTokenIds": [
+        2,
+        8071,
+        236787,
+        48527,
+        1109,
+        7609,
+        236787,
+        52322,
+        21965,
+        11054,
+        1
+      ],
+      "offsets": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          16
+        ],
+        [
+          16,
+          18
+        ],
+        [
+          18,
+          24
+        ],
+        [
+          24,
+          25
+        ],
+        [
+          25,
+          34
+        ],
+        [
+          34,
+          39
+        ],
+        [
+          39,
+          49
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "allTokenIdsMatch": true,
+  "offsetsAvailableInPython": true,
+  "status": "EMBEDDING_TOKENIZER_PARITY_PROVEN",
+  "writesPerformed": false
+}

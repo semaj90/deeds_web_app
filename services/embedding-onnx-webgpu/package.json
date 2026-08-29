@@ -1,0 +1,13 @@
+{
+  "name": "@parent-atlas/embedding-onnx-webgpu-proof",
+  "private": true,
+  "type": "module",
+  "description": "Isolated, read-only WebGPU capability proof for Parent Atlas semantic_768.",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "onnxruntime-node": "1.29.0"
+  }
+}
