@@ -1,0 +1,125 @@
+{
+  "schema": "atlas.current-graph-feature-gather-v1",
+  "mode": "NON_PRODUCTION_DERIVED_FEATURE_ARTIFACT",
+  "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+  "projectionRevision": "sha256:f5bb7eea13f304160f21d2e814ccac9200546fea77fb1ceda9f229afcfae5c01",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100",
+  "candidateCount": 7,
+  "features": [
+    {
+      "candidateOrdinal": 1,
+      "graphNodeCount": 3,
+      "pagerankMax": 0.04922279992242698,
+      "pagerankMean": 0.04432930369221141,
+      "pagerankSum": 0.1329879110766342,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 2,
+      "graphNodeCount": 3,
+      "pagerankMax": 0.06390328861307369,
+      "pagerankMean": 0.04432930369221141,
+      "pagerankSum": 0.1329879110766342,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 7,
+      "graphNodeCount": 2,
+      "pagerankMax": 0.06390328861307369,
+      "pagerankMean": 0.04922279992242698,
+      "pagerankSum": 0.09844559984485396,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 8,
+      "graphNodeCount": 4,
+      "pagerankMax": 0.04432930369221141,
+      "pagerankMean": 0.041882555577103624,
+      "pagerankSum": 0.1675302223084145,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 10,
+      "graphNodeCount": 2,
+      "pagerankMax": 0.06390328861307369,
+      "pagerankMean": 0.04922279992242698,
+      "pagerankSum": 0.09844559984485396,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 12,
+      "graphNodeCount": 7,
+      "pagerankMax": 0.04432930369221141,
+      "pagerankMean": 0.03873673657196504,
+      "pagerankSum": 0.2711571560037553,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    },
+    {
+      "candidateOrdinal": 14,
+      "graphNodeCount": 2,
+      "pagerankMax": 0.06390328861307369,
+      "pagerankMean": 0.04922279992242698,
+      "pagerankSum": 0.09844559984485396,
+      "presence": {
+        "pagerank": 1,
+        "graphNodeCount": 1
+      }
+    }
+  ],
+  "load": {
+    "schema": "atlas.graph-projection-load-receipt.v1",
+    "reused": false,
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "projectionRevision": "sha256:f5bb7eea13f304160f21d2e814ccac9200546fea77fb1ceda9f229afcfae5c01",
+    "nodeTableHash": "sha256:b433c8636a8486abce7cc631f5036709e20c1b3936e59094e00da7d2aa4a6d91",
+    "edgeTableHash": "sha256:9ba2a1be11879b81c0c9cada80d1793d24cbd58aeb9462aaff7cbaeb81338bb2",
+    "nodeCount": 23,
+    "edgeCount": 12,
+    "renumbered": false,
+    "storeTransposed": true,
+    "precomputedOutWeight": true,
+    "timings": {
+      "parquetReadMs": 207.153,
+      "graphBuildMs": 146.322,
+      "outWeightBuildMs": 44.027,
+      "totalLoadMs": 465.232
+    },
+    "gpuMemoryBefore": {
+      "free_mb": 6600.7,
+      "total_mb": 8191.5,
+      "used_mb": 1590.8
+    },
+    "gpuMemoryAfter": {
+      "free_mb": 6582.7,
+      "total_mb": 8191.5,
+      "used_mb": 1608.8
+    }
+  },
+  "executor": "cugraph.pagerank",
+  "graphFeaturePresenceReason": "CURRENT_GRAPH_ARTIFACT_AVAILABLE",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "CURRENT_GRAPH_FEATURE_GATHER_PROVEN_BOUNDED",
+  "nextGate": "FEATURE_MATRIX_JOIN_AND_RETRIEVAL_CHALLENGER_COMPARISON"
+}

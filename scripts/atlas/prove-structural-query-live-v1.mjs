@@ -9,20 +9,24 @@ import { adaptTreeSitterEvidence } from './lib/treesitter-structural-observation
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const sidecarUrl = process.env.ATLAS_NLP_SIDECAR_URL || 'http://127.0.0.1:8095';
-const sourceRef = process.env.ATLAS_STRUCTURAL_QUERY_SOURCE || 'sveltekit-frontend/src/lib/server/ai/trace-reranker.ts';
 const queryText = process.env.ATLAS_STRUCTURAL_QUERY || 'which function calls CandidateOrdinal?';
 const sha256 = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex');
 
 async function main() {
   const reportPath = path.join(root, 'docs/reports/treesitter-structural-observation-v1.json');
   const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  const map = JSON.parse(fs.readFileSync(path.join(root, '.tmp/atlas/lineage-qualified-candidate-map-v1.json'), 'utf8'));
+  const sourceRef = process.env.ATLAS_STRUCTURAL_QUERY_SOURCE || map.candidates?.[0]?.sourceRef;
+  if (!sourceRef) throw new Error('STRUCTURAL_QUERY_SOURCE_REQUIRED');
   const source = fs.readFileSync(path.join(root, sourceRef.replaceAll('/', path.sep)), 'utf8');
-  const sourceRevision = report.results?.find((row) => row.sourceRef === sourceRef)?.sourceRevision;
+  const sourceRevision = report.results?.find((row) => row.sourceRef === sourceRef)?.sourceRevision
+    ?? map.candidates?.find((row) => row.sourceRef === sourceRef)?.sourceRevision;
   if (!sourceRevision) throw new Error('STRUCTURAL_QUERY_SOURCE_REVISION_MISSING');
+  const language = /\.tsx?$/.test(sourceRef) ? 'typescript' : /\.jsx?$/.test(sourceRef) ? 'javascript' : 'typescript';
   const response = await fetch(`${sidecarUrl}/ast/chunk`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ source, language: 'typescript', filePath: sourceRef, sourceRevision }),
+    body: JSON.stringify({ source, language, filePath: sourceRef, sourceRevision }),
   });
   if (!response.ok) throw new Error(`STRUCTURAL_SIDECAR_HTTP_${response.status}`);
   const adapted = adaptTreeSitterEvidence({ sourceRef, sourceRevision, response: await response.json() });
@@ -48,25 +52,39 @@ async function main() {
     extractor_revision: adapted.extractor,
     canonical_authority: false,
   }));
-  const { classifyStructuralQueryV1, executeStructuralQueryV1 } = await import('../../packages/parent-atlas/dist/index.js');
+  const { classifyStructuralQueryV1, executeStructuralQueryV1, resolveStructuralIdentityV1 } = await import('../../packages/parent-atlas/dist/index.js');
   const result = executeStructuralQueryV1({ plan: classifyStructuralQueryV1(queryText), observations });
+  const identity = resolveStructuralIdentityV1({
+    queryResult: result,
+    workspaceRevision: map.workspaceRevision,
+    candidateEntries: map.candidates.map((candidate) => ({
+      candidateOrdinal: candidate.candidateOrdinal,
+      canonicalId: candidate.canonicalId,
+      packetKey: candidate.packetKey ?? null,
+      sourceRef: candidate.sourceRef,
+      sourceRevision: candidate.sourceRevision,
+      workspaceRevision: candidate.workspaceRevision,
+    })),
+  });
   const receipt = {
     schema: 'atlas.structural-query-live-proof.v1',
     mode: 'READ_ONLY_LIVE_SIDECAR',
-    sidecar: { url: sidecarUrl, endpoint: '/ast/chunk' },
+    sidecar: { url: sidecarUrl, endpoint: '/ast/chunk', language },
     sourceRef,
     sourceRevision,
     sourceDigest: `sha256:${sha256(source)}`,
     query: queryText,
     observationCount: observations.length,
     matchCount: result.matches.length,
+    candidateMap: { rowCount: map.rowCount, ordinalMapChecksum: map.ordinalMapChecksum },
+    identity: { resolvedCount: identity.resolvedCount, rejectedCount: identity.rejectedCount, statuses: [...new Set(identity.resolutions.map((row) => row.status))] },
     resultChecksum: result.resultChecksum,
     canonicalAuthority: false,
     promotionEligible: false,
     executable: false,
     writes: { postgres: false, qdrant: false, neo4j: false, valkey: false },
-    status: 'STRUCTURAL_QUERY_OBSERVATION_ADAPTER_PROVEN',
-    nextGate: 'STRUCT-11_ATLAS_IDENTITY_RESOLUTION',
+    status: identity.resolvedCount > 0 ? 'STRUCTURAL_QUERY_IDENTITY_BRIDGE_PROVEN_BOUNDED' : 'STRUCTURAL_QUERY_IDENTITY_BRIDGE_BLOCKED',
+    nextGate: identity.resolvedCount > 0 ? 'STRUCT-12_STRUCTURAL_RESULT_ENVELOPE' : 'STRUCT-11_SOURCE_OR_REVISION_RECONCILIATION',
   };
   const outputPath = path.join(root, 'docs/reports/structural-query-live-proof-v1.json');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });

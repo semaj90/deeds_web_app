@@ -1,0 +1,382 @@
+{
+  "schema": "atlas.lineage-pgvector-qdrant-parity.v1",
+  "generatedAt": "2026-08-29T02:20:58.265Z",
+  "mode": "READ_ONLY_EXACT_VECTOR_AND_SCORE_PARITY",
+  "contract": {
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "metric": "Cosine",
+    "postgresColumn": "content_embedding_768",
+    "qdrantCollection": "codebase_chunks_768",
+    "qdrantVectorName": "content",
+    "canonicalAuthority": "postgres"
+  },
+  "candidateMap": {
+    "path": ".tmp\\atlas\\lineage-qualified-candidate-map-v1.json",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "rowCount": 15
+  },
+  "tolerances": {
+    "vectorMaxAbsDiff": 0.00001,
+    "scoreAbsDiff": 0.00001
+  },
+  "counts": {
+    "candidates": 15,
+    "postgresRows": 15,
+    "qdrantPoints": 30,
+    "identityMatches": 15,
+    "vectorMatches": 15,
+    "scoreMatches": 15
+  },
+  "rankParity": true,
+  "query": {
+    "kind": "DETERMINISTIC_STORED_VECTOR_PROBE",
+    "dimensions": 768,
+    "source": "first valid PostgreSQL content_embedding_768 row",
+    "candidateOrdinal": 0
+  },
+  "rows": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "contentHash": "48063b7e1d991eb9e9a3ee132d90b84ab5dbc989b776f5d78a670a4ceb721119",
+      "qdrantPointId": "24575",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 1.0000000000000002,
+      "qdrantComputedScore": 1.0000000000000002,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "contentHash": "4dfc057b71ba76d7d7e384b4edb87e8639b36b23db070408f3b0ce88eeae6ae7",
+      "qdrantPointId": "40123",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.29998166336226795,
+      "qdrantComputedScore": 0.29998166336226795,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "contentHash": "102cc8a1f37c18650ee09e94d43f0781c6391f64477ff20e9ba80330991b2137",
+      "qdrantPointId": "5432",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.29566519150828474,
+      "qdrantComputedScore": 0.29566519150828474,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "contentHash": "e50467d7037af4958606fc43664908b447a7158f4abc5a767dfcbd7672ef3b89",
+      "qdrantPointId": "34838",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.36800168864169014,
+      "qdrantComputedScore": 0.36800168864169014,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "contentHash": "c769e34fd7331e08982cd0341d5f583bfd19ed38c903c1fb60e4bb209b842594",
+      "qdrantPointId": "27737",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.3183759677898542,
+      "qdrantComputedScore": 0.3183759677898542,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "contentHash": "8b3241aa03573fe1abcacd9338fa2964907ba69f72f7eb311cfedaf863ec3d3e",
+      "qdrantPointId": "39367",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.3890750950122997,
+      "qdrantComputedScore": 0.3890750950122997,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "contentHash": "cac374fc4a0ff7f70eebcd704d606de658f0ff29eaef9b4c32fd18bcd51813ba",
+      "qdrantPointId": "34039",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.3424729268850121,
+      "qdrantComputedScore": 0.3424729268850121,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "contentHash": "0d97c70ef825aeb29c339669e4d5ae5db298efb23d1dbffd2e2b4fa4b72d344f",
+      "qdrantPointId": "52486",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.18997358244753032,
+      "qdrantComputedScore": 0.18997358244753032,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "contentHash": "6c7db5ed2cea58a79e091eb6084a96b0841a78ba1e82836c4cedf96988df90a1",
+      "qdrantPointId": "20025",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.23341765421093175,
+      "qdrantComputedScore": 0.23341765421093175,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 9,
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "contentHash": "800478665d96e762df3006ae1f1093db1285c46a1fef95ed506f9517e9e3cc1e",
+      "qdrantPointId": "15264",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.5022777629174773,
+      "qdrantComputedScore": 0.5022777629174773,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "contentHash": "d28db26ef14292e8d2dbd6206545b551cd81862bdc55c38ef4bd0ad32f5937f6",
+      "qdrantPointId": "25348",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.2944671920761727,
+      "qdrantComputedScore": 0.2944671920761727,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 11,
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "contentHash": "cf3c54b0804782245bd42a9dab54ceebbeffba3c2f4619b869c209df0d4d0691",
+      "qdrantPointId": "13146",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.24769801987698037,
+      "qdrantComputedScore": 0.24769801987698037,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "contentHash": "ebe19262fdaeae74a73f5b23171ea7a669551a6fa5f1ab88d66f195b5f9cc457",
+      "qdrantPointId": "39624",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.36485088832493096,
+      "qdrantComputedScore": 0.36485088832493096,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 13,
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "contentHash": "d457dee771e63bf6169286606506988217bb909a49ac4afd97a60aedf9705334",
+      "qdrantPointId": "25037",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.3239625715777872,
+      "qdrantComputedScore": 0.3239625715777872,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    },
+    {
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "contentHash": "59469232b741939e8bcc63e04bbf9ed30f4822593d4b1c802f2425c490284534",
+      "qdrantPointId": "1255",
+      "identityFailures": [],
+      "postgresVectorDimensions": 768,
+      "qdrantVectorDimensions": 768,
+      "vector": {
+        "available": true,
+        "finite": true,
+        "maxAbsDiff": 0,
+        "l2Diff": 0,
+        "withinTolerance": true
+      },
+      "postgresScore": 0.1923127004474343,
+      "qdrantComputedScore": 0.1923127004474343,
+      "qdrantReportedScore": null,
+      "scoreAbsDiff": 0,
+      "scoreWithinTolerance": true
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "vectorGeneration": false
+  },
+  "canonicalAuthority": false,
+  "status": "PGVECTOR_QDRANT_EXACT_PARITY_PROVEN",
+  "nextGate": "SCALE_SEMANTIC_COHORT_TO_128"
+}

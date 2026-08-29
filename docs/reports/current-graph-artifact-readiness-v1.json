@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.current-graph-artifact-readiness.v1",
+  "generatedAt": "2026-08-29T00:27:16.112Z",
+  "mode": "READ_ONLY_AUDIT",
+  "inputProjection": {
+    "path": "docs/reports/structural-projection-plan-v1.json",
+    "schema": "atlas.structural-projection-plan-v1",
+    "status": "STRUCTURAL_PROJECTION_PLAN_READY",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "selectedSourceCount": 7,
+    "observedSourceCount": 7,
+    "observationCount": 16,
+    "uniqueGraphNodeKeyCount": 16,
+    "uniquePacketKeyCount": 7,
+    "observationDigest": "sha256:cf603f9a07cb5b71addd48d51a74bb4e3ad19a521b3f0475f5368cf865010973"
+  },
+  "currentRelationshipRevision": {
+    "path": "docs/reports/current-feature-ontology-graph-revision-v1.json",
+    "status": "CURRENT_RELATIONSHIP_GRAPH_REVISION_DERIVED_REVIEW_ONLY",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "relationshipGraphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025",
+    "kernelCount": 8,
+    "workspaceRevisionMatch": false,
+    "reviewOnly": true
+  },
+  "edgeEvidence": {
+    "explicitEdgeFields": [],
+    "explicitRevisionQualifiedEdges": 0,
+    "structuralObservationCallsPresent": 8,
+    "structuralObservationImportsPresent": 3,
+    "structuralObservationExportsPresent": 3,
+    "callsImportsExportsAreNotEdges": true
+  },
+  "gate": {
+    "currentObservationPlan": "PROVEN_BOUNDED",
+    "currentNodeIdentityObservation": "PROVEN_BOUNDED",
+    "currentRevisionQualifiedEdgeArtifact": "NOT_PROVEN",
+    "graphOrdinalMap": "NOT_PROVEN_FOR_CURRENT_ARTIFACT",
+    "cpuGpuParity": "PROVEN_FIXTURE_ONLY",
+    "historicalGraphReuseAllowed": false
+  },
+  "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER",
+  "nextGate": "CURRENT_REVISION_QUALIFIED_EDGE_MATERIALIZATION_READ_ONLY_PLAN",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphArtifacts": false
+  },
+  "canonicalAuthority": false
+}

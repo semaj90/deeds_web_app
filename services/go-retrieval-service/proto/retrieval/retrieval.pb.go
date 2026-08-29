@@ -946,8 +946,11 @@ type CodebaseSearchRequest struct {
 	HttpMethod      string                 `protobuf:"bytes,6,opt,name=http_method,json=httpMethod,proto3" json:"http_method,omitempty"`
 	PathPrefixes    []string               `protobuf:"bytes,7,rep,name=path_prefixes,json=pathPrefixes,proto3" json:"path_prefixes,omitempty"` // ["src/routes/api", "src/lib/server"]
 	IncludeDebug    bool                   `protobuf:"varint,8,opt,name=include_debug,json=includeDebug,proto3" json:"include_debug,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Optional exact packet-key allowlist for revision-qualified canary searches.
+	// This constrains the Qdrant projection; it does not create canonical identity.
+	PacketKeys    []string `protobuf:"bytes,9,rep,name=packet_keys,json=packetKeys,proto3" json:"packet_keys,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CodebaseSearchRequest) Reset() {
@@ -1034,6 +1037,13 @@ func (x *CodebaseSearchRequest) GetIncludeDebug() bool {
 		return x.IncludeDebug
 	}
 	return false
+}
+
+func (x *CodebaseSearchRequest) GetPacketKeys() []string {
+	if x != nil {
+		return x.PacketKeys
+	}
+	return nil
 }
 
 type CodebaseSearchResponse struct {
@@ -3405,7 +3415,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x06hop_ms\x18\x04 \x01(\x02R\x05hopMs\x12\x15\n" +
 	"\x06kag_ms\x18\x05 \x01(\x02R\x05kagMs\x12\x15\n" +
 	"\x06dag_ms\x18\x06 \x01(\x02R\x05dagMs\x12\x19\n" +
-	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\x96\x02\n" +
+	"\btotal_ms\x18\a \x01(\x02R\atotalMs\"\xb7\x02\n" +
 	"\x15CodebaseSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12%\n" +
@@ -3415,7 +3425,9 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\vhttp_method\x18\x06 \x01(\tR\n" +
 	"httpMethod\x12#\n" +
 	"\rpath_prefixes\x18\a \x03(\tR\fpathPrefixes\x12#\n" +
-	"\rinclude_debug\x18\b \x01(\bR\fincludeDebug\"\x8a\x01\n" +
+	"\rinclude_debug\x18\b \x01(\bR\fincludeDebug\x12\x1f\n" +
+	"\vpacket_keys\x18\t \x03(\tR\n" +
+	"packetKeys\"\x8a\x01\n" +
 	"\x16CodebaseSearchResponse\x126\n" +
 	"\x06chunks\x18\x01 \x03(\v2\x1e.yorha.retrieval.CodebaseChunkR\x06chunks\x12\x19\n" +
 	"\btotal_ms\x18\x02 \x01(\x02R\atotalMs\x12\x1d\n" +

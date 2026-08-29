@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.structural-provider-shadow-receipt.v1",
+  "query": "which function calls CandidateOrdinal?",
+  "queryDigest": "sha256:16c49f8b8a3cab5928dd64c215058ed1455f0849b76a0b312cfb82f2bdda3b47",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "sourceAllowlist": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json"
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js"
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts"
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json"
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml"
+    }
+  ],
+  "legacy": {
+    "candidateCount": 0,
+    "packetKeys": [],
+    "checksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "structural": {
+    "observationCount": 4,
+    "matchedCount": 1,
+    "exactIdentityCount": 1,
+    "candidateOrdinalCount": 1,
+    "packetKeys": [
+      "packet:225fa0b05a89"
+    ],
+    "checksum": "6ebb7b65b2ead4009fffbe16abbd41246c2ad2c7968ea32555089839e7e1079d",
+    "sourceErrors": []
+  },
+  "intersectionCount": 0,
+  "unionCount": 1,
+  "exactPacketOverlap": 0,
+  "newOnly": [
+    "packet:225fa0b05a89"
+  ],
+  "legacyOnly": [],
+  "staleRejected": 0,
+  "ambiguousRejected": 0,
+  "unresolvedRejected": 0,
+  "legacyEnteredRrf": true,
+  "structuralEnteredRrf": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "rrf": false
+  },
+  "status": "STRUCTURAL_SHADOW_LEGACY_EMPTY",
+  "receiptChecksum": "sha256:611a75da5bcd5a6a32de5c4f3fbd72a3bce07c9253bd5efec65423d22092a21c"
+}

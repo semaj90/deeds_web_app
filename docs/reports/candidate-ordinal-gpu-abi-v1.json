@@ -1,0 +1,172 @@
+{
+  "schema": "atlas.candidate-ordinal-gpu-abi-proof.v1",
+  "mode": "READ_ONLY_EXECUTOR_COORDINATE_ROUND_TRIP",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "matrix": {
+    "rowCount": 15,
+    "featureCount": 25,
+    "manifestChecksum": "sha256:fbc7abc28bd5eae484fdc3c20ce8970a08e21913e5833001074da106b6fd0bf8",
+    "ordinalsUnique": true
+  },
+  "executor": {
+    "graphNodeCount": 23,
+    "graphOrdinalDense": true,
+    "renumbering": false,
+    "unknownOrdinals": 0,
+    "revisionMismatches": 0
+  },
+  "decodedRows": [
+    {
+      "graphOrdinal": 0,
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "matrixRow": 2
+    },
+    {
+      "graphOrdinal": 1,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 2,
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "matrixRow": 1
+    },
+    {
+      "graphOrdinal": 3,
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "matrixRow": 14
+    },
+    {
+      "graphOrdinal": 4,
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "matrixRow": 10
+    },
+    {
+      "graphOrdinal": 5,
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "matrixRow": 8
+    },
+    {
+      "graphOrdinal": 6,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 7,
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "matrixRow": 1
+    },
+    {
+      "graphOrdinal": 8,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 9,
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "matrixRow": 8
+    },
+    {
+      "graphOrdinal": 10,
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "matrixRow": 2
+    },
+    {
+      "graphOrdinal": 11,
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "matrixRow": 8
+    },
+    {
+      "graphOrdinal": 12,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 13,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 14,
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "matrixRow": 7
+    },
+    {
+      "graphOrdinal": 15,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 16,
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "matrixRow": 1
+    },
+    {
+      "graphOrdinal": 17,
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "matrixRow": 2
+    },
+    {
+      "graphOrdinal": 18,
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "matrixRow": 7
+    },
+    {
+      "graphOrdinal": 19,
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "matrixRow": 8
+    },
+    {
+      "graphOrdinal": 20,
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "matrixRow": 10
+    },
+    {
+      "graphOrdinal": 21,
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "matrixRow": 12
+    },
+    {
+      "graphOrdinal": 22,
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "matrixRow": 14
+    }
+  ],
+  "checksums": {
+    "candidateOrdinalSet": "sha256:e994167b45cad6081dd187620abc417759e9f5459b5dcbc0ac8d96ef3a7c7ba2",
+    "decodedCoordinateSet": "sha256:bcf7ef4389f0d8d93cc7929d9e8c915bbf09997e4c515f4fbc41b2e07fdf3c91"
+  },
+  "featureRowsRemainRevisionBound": true,
+  "gpuExecutionObserved": false,
+  "rankingPromotion": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "CANDIDATE_ORDINAL_GPU_ABI_FIXTURE_PROVEN",
+  "nextGate": "LIVE_8098_CANDIDATE_ORDINAL_DECODE_AND_CUVS_EXACT_PARITY"
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.wsl2-rapids-sidecar-readiness.v1",
+  "generatedAt": "2026-08-28T17:36:47.000Z",
+  "status": "GPU_SVC_01_PROVEN_BOUNDED",
+  "runtime": {
+    "os": "Ubuntu 24.04.3 LTS / WSL2",
+    "pythonVersion": "3.14.6",
+    "environment": "atlas-rapids-cu13",
+    "deviceName": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": "8.6",
+    "driverVersion": "580.88",
+    "totalVramMiB": 8192
+  },
+  "packages": {
+    "torch": "2.13.0+cu130",
+    "cupy": "14.1.1",
+    "cuvs": "26.06.00",
+    "cugraph": "26.06.00",
+    "cudf": "26.06.01",
+    "cuml": "26.06.00"
+  },
+  "checks": {
+    "wslCudaVisible": true,
+    "dockerGpuPassthrough": true,
+    "torchCudaAvailable": true,
+    "sidecarSyntax": true,
+    "sidecarHealth": true,
+    "graphCapabilities": true,
+    "graphBackend": "cugraph.pagerank",
+    "graphBackendVersion": "26.06.00",
+    "graphImportError": null
+  },
+  "service": {
+    "host": "127.0.0.1",
+    "port": 8098,
+    "entrypoint": "python/atlas_rapids_sidecar_graph.py",
+    "supervision": "foreground-session-only",
+    "composeManaged": false
+  },
+  "authority": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "candidateOrdinalAuthority": false,
+    "rrfAuthority": false
+  },
+  "nextGate": "GRAPH_ORDINAL_CPU_GPU_PARITY"
+}

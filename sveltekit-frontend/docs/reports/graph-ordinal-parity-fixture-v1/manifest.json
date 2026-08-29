@@ -1,0 +1,9 @@
+{
+  "graphRevision": "graph:ordinal-parity-fixture-v1",
+  "projectionRevision": "projection:ordinal-parity-fixture-v1",
+  "producerRevision": "graph-ordinal-parity-fixture-v1",
+  "nodeCount": 6,
+  "edgeCount": 6,
+  "nodeTableHash": "ad14f10fc175e7af182d142ed820d6c0c5964451c6db5c872dbabf83a997f1ef",
+  "edgeTableHash": "291488132d52a1c4925104c95121daedc0d8c1afc18055f3d2f658a75992b93d"
+}

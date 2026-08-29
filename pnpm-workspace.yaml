@@ -1,3 +1,7 @@
 allowBuilds:
+  '@ast-grep/cli': set this to true or false
+  better-sqlite3: set this to true or false
+  duckdb: set this to true or false
   esbuild: set this to true or false
   protobufjs: set this to true or false
+  svelte-preprocess: set this to true or false

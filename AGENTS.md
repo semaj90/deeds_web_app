@@ -132,6 +132,95 @@ Startup does NOT require Redis/Qdrant/Neo4j. Engram MCP at `:8792` is the only r
 - `drizzle/meta/` must contain only JSON snapshot/journal files — no `.md` or `.txt`.
 - Sidecar migrations in `drizzle/` that are not in `_journal.json` must be listed in `drizzle/sidecar-migrations.json`.
 
+## Parent Atlas verified retrieval and analysis fabric (2026-08-29)
+
+The repository contains several analysis representations, but they share one authority order:
+
+```text
+source bytes / workspace revision
+        ↓
+8095 Tree-sitter CST + AST-grep structural observations
+        ↓
+canonical identity, source/content revisions, packet/chunk bindings
+        ↓
+PostgreSQL 18 canonical eligibility and evidence state
+        ↓
+PostgreSQL planner (FTS/GIN/B-tree/pgvector; AIO and bitmap scans are planner behavior)
+        ↓
+semantic_768 / EmbeddingGemma representation
+        ↓
+rebuildable projections: Qdrant, Go Retrieval, GPU/topology artifacts
+        ↓
+SearchRuntime lane normalization and single fusion owner
+        ↓
+ACE cards → ContextManifest → bounded agent/DAG execution
+```
+
+### Ownership rules
+
+- **PostgreSQL 18** owns packet/chunk identity, source and workspace revisions, eligibility, evidence, feature metadata, FTS state, and canonical `content_embedding_768` rows.
+- **PostgreSQL AIO/bitmap scans** are execution-plan optimizations. Do not create an application “AIO bitmap” abstraction or require a particular scan type for correctness; record `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` when performance is being evaluated.
+- **8095** owns Tree-sitter CST/AST observations, AST-grep structural matches, bounded NLP/extraction observations, and exact source spans. It does not own CandidateOrdinal, canonical ontology promotion, or GPU execution.
+- **Go Retrieval** is a read-only retrieval executor. It may query PostgreSQL, pgvector, Qdrant, cache, and the embedding service, and it may stream raw evidence/chunks. It must return revision/identity metadata and must not become the canonical writer or final RRF owner.
+- **Qdrant** is a rebuildable retrieval projection. Qdrant point IDs are projection IDs; they are never packet identity, source identity, or CandidateOrdinal. The logical `semantic_768` vector is stored under the Qdrant vector key `content`.
+- **SearchRuntime** owns cross-executor normalization, same-lane deduplication, and production fusion/RRF. Multiple executors for one logical lane produce one vote.
+- **8098** is the WSL2/Linux RAPIDS/cuVS/cuGraph executor lane. It is not a canonical store. Native-Windows TensorRT/LibTorch experiments are a separate lane. Current fixture ABI proofs do not imply that the live RAPIDS environment is installed or reachable.
+- **Neo4j/cuGraph/topology** are derived structural traversal and routing projections. SOM, latent, manifold, PageRank, and graph coordinates cannot create identity or an additional retrieval vote.
+
+### Structural and domain analysis
+
+Use the existing providers in this order:
+
+```text
+Tree-sitter CST
+  → exact node type, parent/field path, byte range, syntax facts
+AST-grep
+  → structural patterns, metavariables, syntax-aware matches
+compiler/LSP/Graphify
+  → symbols, definitions, references, typed/relationship observations
+.okf YAML/JSON manifests
+  → validated rule/artifact inputs, never direct executable authority
+LangExtract/Ornith
+  → structured proposals and grounded text spans, never invented byte identity
+```
+
+`.okf`, YAML, and JSON artifacts must pass schema validation, semantic validation, canonical serialization, and checksum generation before use. Large JSONL/NDJSON or Arrow IPC streams may be parsed in bounded batches; parsing/transport does not promote identity.
+
+### Embedding and chunk-stream contract
+
+Embed only after the canonical source/chunk eligibility join is established:
+
+```text
+exact source/chunk binding
+  → CandidateOrdinalMapV1
+  → canonical semantic_768 vector
+  → vector/revision receipt
+  → Qdrant or GPU projection
+```
+
+The canonical dense owner is `codebase_chunk_index.content_embedding_768` with `semantic_768`, 768 dimensions, and cosine distance. Qdrant and GPU vectors must be independently reconciled to that owner before promotion. Never fill a missing candidate with aliases, fuzzy paths, synthetic revisions, legacy 384 vectors, or an unrelated Qdrant point.
+
+Go Retrieval streaming is progressive delivery, not authority transfer:
+
+```text
+StreamCodebase / StreamEvidence
+  → bounded raw lane events
+  → canonical identity/revision normalization
+  → ACE eligibility and selection
+  → ContextManifest
+```
+
+Every streamed event must remain bounded, revision-qualified where applicable, and safe to discard/replay. Do not pass raw streamed results directly to an LLM. Do not treat chunk order, Qdrant point order, or transport offsets as CandidateOrdinal.
+
+### Current proof status
+
+- Structural CST/AST and AST-grep provider surfaces: present; promotion still requires exact source/revision evidence.
+- `.okf` documentation/analysis pipeline: present with schema-driven receipts; derived outputs remain non-canonical.
+- PostgreSQL `semantic_768` ↔ Qdrant `content` parity: frozen 15-candidate proof passed after projection repair.
+- CandidateFeatureMatrix manifest and graph A/B replay: proven for 15 candidates; graph features remain non-promotional.
+- CandidateOrdinal executor ABI: fixture-proven; live 8098/cuVS ABI remains open until a WSL RAPIDS interpreter with `torch` and `cuvs` is actually reachable.
+- Full-corpus source lineage, 128/768 scaling, learned sparse/classifier lanes, graph fan-out, and production mutation paths remain separate gates.
+
 ## Reference docs (load on demand, not at startup)
 
 - `docs/architecture/` — layer boundaries, retrieval lanes, trace/karpathy rules

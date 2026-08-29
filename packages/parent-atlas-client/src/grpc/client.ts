@@ -64,6 +64,7 @@ export interface GrpcCodebaseSearchRequest {
   httpMethod?: string;
   pathPrefixes?: string[];
   includeDebug?: boolean;
+  packetKeys?: string[];
 }
 
 export interface GrpcCodebaseChunk {
@@ -75,6 +76,15 @@ export interface GrpcCodebaseChunk {
   startLine?: number;
   endLine?: number;
   tags?: string[];
+  packetKey?: string;
+  sourceRef?: string;
+  canonicalSourceRef?: string;
+  symbolVersionId?: string;
+  contentHash?: string;
+  workspaceRevision?: string;
+  sourceRevision?: string;
+  representationId?: string;
+  representationRevision?: string;
 };
 
 export interface GrpcCodebaseSearchResponse {
@@ -90,14 +100,21 @@ function endpoint(config: GrpcClientConfig): string {
 function mapResponse(request: RetrievalRequest, response: GrpcCodebaseSearchResponse): RetrievalResult {
   const candidates = (response.chunks ?? []).map((chunk, index) => ({
     id: chunk.chunkId ?? chunk.filePath ?? `grpc-chunk-${index}`,
-    packet_key: chunk.chunkId ?? chunk.filePath ?? `grpc-chunk-${index}`,
-    source_ref: chunk.filePath ?? '',
+    packet_key: chunk.packetKey ?? chunk.chunkId ?? chunk.filePath ?? `grpc-chunk-${index}`,
+    source_ref: chunk.sourceRef ?? chunk.filePath ?? '',
     file_path: chunk.filePath ?? '',
     directory_path: '',
     function_symbol: '',
     feature_id: chunk.chunkId ?? '',
     feature_label: chunk.kind ?? 'codebase chunk',
     summary: chunk.contentPreview ?? '',
+    canonical_source_ref: chunk.canonicalSourceRef ?? chunk.sourceRef ?? chunk.filePath ?? '',
+    symbol_version_id: chunk.symbolVersionId ?? '',
+    content_hash: chunk.contentHash ?? '',
+    workspace_revision: chunk.workspaceRevision ?? '',
+    source_revision: chunk.sourceRevision ?? '',
+    representation_id: chunk.representationId ?? '',
+    representation_revision: chunk.representationRevision ?? '',
     retrievedVia: 'qdrant' as const,
     score: Number(chunk.score ?? 0),
     rank: index + 1,
@@ -235,6 +252,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         httpMethod: request.httpMethod ?? '',
         pathPrefixes: request.pathPrefixes ?? [],
         includeDebug: request.includeDebug ?? false,
+        packetKeys: request.packetKeys ?? [],
       }, deadline) as GrpcCodebaseSearchResponse;
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC SearchCodebase failed',
@@ -279,6 +297,7 @@ export class GrpcRetrievalClient implements RetrievalFacade {
         httpMethod: request.httpMethod ?? '',
         pathPrefixes: request.pathPrefixes ?? [],
         includeDebug: request.includeDebug ?? false,
+        packetKeys: request.packetKeys ?? [],
       }, deadline));
     } catch (error) {
       throw new GrpcTransportError(error instanceof Error ? error.message : 'gRPC StreamCodebase failed', undefined, error);

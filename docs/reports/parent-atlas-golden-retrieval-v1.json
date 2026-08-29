@@ -1,6 +1,6 @@
 {
   "schema": "atlas.parent-atlas-golden-retrieval.v1",
-  "generatedAt": "2026-08-28T18:34:49.703Z",
+  "generatedAt": "2026-08-29T00:50:59.643Z",
   "mode": "READ_ONLY_EXACT_REPLAY",
   "query": {
     "text": "Parent Atlas semantic retrieval lineage canary",
@@ -25,13 +25,20 @@
     "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
     "rowCount": 15
   },
+  "graphFeatureJoin": {
+    "status": "CURRENT_GRAPH_FEATURE_GATHER_PROVEN_BOUNDED",
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "featureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100",
+    "candidateFeatureCount": 7,
+    "attachedHitFeatureCount": 7
+  },
   "replay": {
-    "firstChecksum": "749315a1efa691d6f452c2b26716f27edca038a4c59d31cd774ed3a3660f53f5",
-    "secondChecksum": "749315a1efa691d6f452c2b26716f27edca038a4c59d31cd774ed3a3660f53f5",
+    "firstChecksum": "d1db484f15dfd70cc59ab33802d19fa883ed3abd5993c78683d252c46af98d2c",
+    "secondChecksum": "d1db484f15dfd70cc59ab33802d19fa883ed3abd5993c78683d252c46af98d2c",
     "identical": true
   },
   "contextManifest": {
-    "checksum": "b6e19968ad9de19b83dd66db63e54a563ae966e2c663e91934a00a587556db5f",
+    "checksum": "10f0864c3258c3afb7f6300bc622f606019d89ee97ce6c007209bf597dcdf9bf",
     "topK": 15,
     "candidateCount": 15
   },
@@ -40,6 +47,8 @@
     "neuralShortlist": false,
     "rrf": false,
     "topologyVote": false,
+    "graphFeaturesAttached": true,
+    "graphFeaturesAffectRanking": false,
     "tieBreak": "candidateOrdinal ASC"
   },
   "writes": {
@@ -68,109 +77,194 @@
         "canonicalId": "packet:547e1c54b3a0",
         "packetKey": "packet:547e1c54b3a0",
         "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
-        "score": 0.5044938
+        "score": 0.5044938,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 9,
         "canonicalId": "packet:7c61a052540c",
         "packetKey": "packet:7c61a052540c",
         "sourceRef": "docs/atlas/cluster-cards.json",
-        "score": 0.38915563
+        "score": 0.38915563,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 12,
         "canonicalId": "packet:c6c4bb257069",
         "packetKey": "packet:c6c4bb257069",
         "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
-        "score": 0.36565834
+        "score": 0.36565834,
+        "graphFeatures": {
+          "candidateOrdinal": 12,
+          "graphNodeCount": 7,
+          "pagerankMax": 0.04432930369221141,
+          "pagerankMean": 0.03873673657196504,
+          "pagerankSum": 0.2711571560037553,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 6,
         "canonicalId": "packet:64838394f8dc",
         "packetKey": "packet:64838394f8dc",
         "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
-        "score": 0.36234438
+        "score": 0.36234438,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 4,
         "canonicalId": "packet:41aaad7c7e65",
         "packetKey": "packet:41aaad7c7e65",
         "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
-        "score": 0.3421089
+        "score": 0.3421089,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 1,
         "canonicalId": "packet:1daa458bdb73",
         "packetKey": "packet:1daa458bdb73",
         "sourceRef": "crates/atlas_packet_parser/wrapper.js",
-        "score": 0.34093577
+        "score": 0.34093577,
+        "graphFeatures": {
+          "candidateOrdinal": 1,
+          "graphNodeCount": 3,
+          "pagerankMax": 0.04922279992242698,
+          "pagerankMean": 0.04432930369221141,
+          "pagerankSum": 0.1329879110766342,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 10,
         "canonicalId": "packet:8589ed47d789",
         "packetKey": "packet:8589ed47d789",
         "sourceRef": "crates/atlas_packet_parser/build.rs",
-        "score": 0.34060758
+        "score": 0.34060758,
+        "graphFeatures": {
+          "candidateOrdinal": 10,
+          "graphNodeCount": 2,
+          "pagerankMax": 0.06390328861307369,
+          "pagerankMean": 0.04922279992242698,
+          "pagerankSum": 0.09844559984485396,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 0,
         "canonicalId": "packet:196138c47be8",
         "packetKey": "packet:196138c47be8",
         "sourceRef": "docs/ai-os/atlas-retry-index.json",
-        "score": 0.3378281
+        "score": 0.3378281,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 13,
         "canonicalId": "packet:d2c2643163a8",
         "packetKey": "packet:d2c2643163a8",
         "sourceRef": "docs/atlas/native-gemm-deferral.md",
-        "score": 0.33440483
+        "score": 0.33440483,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 3,
         "canonicalId": "packet:25ac9148f9bf",
         "packetKey": "packet:25ac9148f9bf",
         "sourceRef": "crates/atlas_packet_parser/package.json",
-        "score": 0.31653202
+        "score": 0.31653202,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 2,
         "canonicalId": "packet:225fa0b05a89",
         "packetKey": "packet:225fa0b05a89",
         "sourceRef": "crates/atlas_packet_parser/index.d.ts",
-        "score": 0.29650834
+        "score": 0.29650834,
+        "graphFeatures": {
+          "candidateOrdinal": 2,
+          "graphNodeCount": 3,
+          "pagerankMax": 0.06390328861307369,
+          "pagerankMean": 0.04432930369221141,
+          "pagerankSum": 0.1329879110766342,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 8,
         "canonicalId": "packet:6bd874a60226",
         "packetKey": "packet:6bd874a60226",
         "sourceRef": "crates/turbovec-napi/wrapper.js",
-        "score": 0.2370655
+        "score": 0.2370655,
+        "graphFeatures": {
+          "candidateOrdinal": 8,
+          "graphNodeCount": 4,
+          "pagerankMax": 0.04432930369221141,
+          "pagerankMean": 0.041882555577103624,
+          "pagerankSum": 0.1675302223084145,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 11,
         "canonicalId": "packet:8d268e81f842",
         "packetKey": "packet:8d268e81f842",
         "sourceRef": "crates/turbovec-napi/package.json",
-        "score": 0.20880537
+        "score": 0.20880537,
+        "graphFeatures": null
       },
       {
         "candidateOrdinal": 7,
         "canonicalId": "packet:64b8a0ed69b3",
         "packetKey": "packet:64b8a0ed69b3",
         "sourceRef": "crates/omni-bridge/build.rs",
-        "score": 0.15658933
+        "score": 0.15658933,
+        "graphFeatures": {
+          "candidateOrdinal": 7,
+          "graphNodeCount": 2,
+          "pagerankMax": 0.06390328861307369,
+          "pagerankMean": 0.04922279992242698,
+          "pagerankSum": 0.09844559984485396,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       },
       {
         "candidateOrdinal": 14,
         "canonicalId": "packet:db66369e866a",
         "packetKey": "packet:db66369e866a",
         "sourceRef": "crates/turbovec-napi/build.rs",
-        "score": 0.14572015
+        "score": 0.14572015,
+        "graphFeatures": {
+          "candidateOrdinal": 14,
+          "graphNodeCount": 2,
+          "pagerankMax": 0.06390328861307369,
+          "pagerankMean": 0.04922279992242698,
+          "pagerankSum": 0.09844559984485396,
+          "presence": {
+            "pagerank": 1,
+            "graphNodeCount": 1
+          }
+        }
       }
     ],
-    "graphRevision": null,
-    "graphFeaturesPresent": false,
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "graphFeaturesPresent": true,
     "cacheMode": "BYPASS",
     "neuralShortlist": "DISABLED",
     "canonicalAuthority": false
@@ -181,105 +275,190 @@
       "canonicalId": "packet:547e1c54b3a0",
       "packetKey": "packet:547e1c54b3a0",
       "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
-      "score": 0.5044938
+      "score": 0.5044938,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 9,
       "canonicalId": "packet:7c61a052540c",
       "packetKey": "packet:7c61a052540c",
       "sourceRef": "docs/atlas/cluster-cards.json",
-      "score": 0.38915563
+      "score": 0.38915563,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 12,
       "canonicalId": "packet:c6c4bb257069",
       "packetKey": "packet:c6c4bb257069",
       "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
-      "score": 0.36565834
+      "score": 0.36565834,
+      "graphFeatures": {
+        "candidateOrdinal": 12,
+        "graphNodeCount": 7,
+        "pagerankMax": 0.04432930369221141,
+        "pagerankMean": 0.03873673657196504,
+        "pagerankSum": 0.2711571560037553,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 6,
       "canonicalId": "packet:64838394f8dc",
       "packetKey": "packet:64838394f8dc",
       "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
-      "score": 0.36234438
+      "score": 0.36234438,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 4,
       "canonicalId": "packet:41aaad7c7e65",
       "packetKey": "packet:41aaad7c7e65",
       "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
-      "score": 0.3421089
+      "score": 0.3421089,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 1,
       "canonicalId": "packet:1daa458bdb73",
       "packetKey": "packet:1daa458bdb73",
       "sourceRef": "crates/atlas_packet_parser/wrapper.js",
-      "score": 0.34093577
+      "score": 0.34093577,
+      "graphFeatures": {
+        "candidateOrdinal": 1,
+        "graphNodeCount": 3,
+        "pagerankMax": 0.04922279992242698,
+        "pagerankMean": 0.04432930369221141,
+        "pagerankSum": 0.1329879110766342,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 10,
       "canonicalId": "packet:8589ed47d789",
       "packetKey": "packet:8589ed47d789",
       "sourceRef": "crates/atlas_packet_parser/build.rs",
-      "score": 0.34060758
+      "score": 0.34060758,
+      "graphFeatures": {
+        "candidateOrdinal": 10,
+        "graphNodeCount": 2,
+        "pagerankMax": 0.06390328861307369,
+        "pagerankMean": 0.04922279992242698,
+        "pagerankSum": 0.09844559984485396,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 0,
       "canonicalId": "packet:196138c47be8",
       "packetKey": "packet:196138c47be8",
       "sourceRef": "docs/ai-os/atlas-retry-index.json",
-      "score": 0.3378281
+      "score": 0.3378281,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 13,
       "canonicalId": "packet:d2c2643163a8",
       "packetKey": "packet:d2c2643163a8",
       "sourceRef": "docs/atlas/native-gemm-deferral.md",
-      "score": 0.33440483
+      "score": 0.33440483,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 3,
       "canonicalId": "packet:25ac9148f9bf",
       "packetKey": "packet:25ac9148f9bf",
       "sourceRef": "crates/atlas_packet_parser/package.json",
-      "score": 0.31653202
+      "score": 0.31653202,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 2,
       "canonicalId": "packet:225fa0b05a89",
       "packetKey": "packet:225fa0b05a89",
       "sourceRef": "crates/atlas_packet_parser/index.d.ts",
-      "score": 0.29650834
+      "score": 0.29650834,
+      "graphFeatures": {
+        "candidateOrdinal": 2,
+        "graphNodeCount": 3,
+        "pagerankMax": 0.06390328861307369,
+        "pagerankMean": 0.04432930369221141,
+        "pagerankSum": 0.1329879110766342,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 8,
       "canonicalId": "packet:6bd874a60226",
       "packetKey": "packet:6bd874a60226",
       "sourceRef": "crates/turbovec-napi/wrapper.js",
-      "score": 0.2370655
+      "score": 0.2370655,
+      "graphFeatures": {
+        "candidateOrdinal": 8,
+        "graphNodeCount": 4,
+        "pagerankMax": 0.04432930369221141,
+        "pagerankMean": 0.041882555577103624,
+        "pagerankSum": 0.1675302223084145,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 11,
       "canonicalId": "packet:8d268e81f842",
       "packetKey": "packet:8d268e81f842",
       "sourceRef": "crates/turbovec-napi/package.json",
-      "score": 0.20880537
+      "score": 0.20880537,
+      "graphFeatures": null
     },
     {
       "candidateOrdinal": 7,
       "canonicalId": "packet:64b8a0ed69b3",
       "packetKey": "packet:64b8a0ed69b3",
       "sourceRef": "crates/omni-bridge/build.rs",
-      "score": 0.15658933
+      "score": 0.15658933,
+      "graphFeatures": {
+        "candidateOrdinal": 7,
+        "graphNodeCount": 2,
+        "pagerankMax": 0.06390328861307369,
+        "pagerankMean": 0.04922279992242698,
+        "pagerankSum": 0.09844559984485396,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     },
     {
       "candidateOrdinal": 14,
       "canonicalId": "packet:db66369e866a",
       "packetKey": "packet:db66369e866a",
       "sourceRef": "crates/turbovec-napi/build.rs",
-      "score": 0.14572015
+      "score": 0.14572015,
+      "graphFeatures": {
+        "candidateOrdinal": 14,
+        "graphNodeCount": 2,
+        "pagerankMax": 0.06390328861307369,
+        "pagerankMean": 0.04922279992242698,
+        "pagerankSum": 0.09844559984485396,
+        "presence": {
+          "pagerank": 1,
+          "graphNodeCount": 1
+        }
+      }
     }
   ]
 }

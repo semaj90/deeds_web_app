@@ -14,6 +14,7 @@ const qdrantUrl = String(process.env.QDRANT_URL ?? `http://${process.env.QDRANT_
 const collection = String(process.env.ATLAS_QDRANT_COLLECTION ?? 'codebase_chunks_768');
 const model = String(process.env.EMBEDDINGGEMMA_MODEL ?? process.env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest');
 const queryText = String(process.env.ATLAS_GOLDEN_QUERY ?? 'Parent Atlas semantic retrieval lineage canary');
+const graphFeaturePath = path.resolve(process.env.ATLAS_GRAPH_FEATURE_REPORT ?? path.join(ROOT, 'docs/reports/current-graph-feature-gather-v1.json'));
 const sha256 = (value) => crypto.createHash('sha256').update(String(value), 'utf8').digest('hex');
 
 async function embedQuery() {
@@ -41,6 +42,16 @@ function normalizeHits(points, byPacketKey) {
   }).sort((a, b) => b.score - a.score || a.candidateOrdinal - b.candidateOrdinal);
 }
 
+async function loadGraphFeatures() {
+  try {
+    const report = JSON.parse(await fs.readFile(graphFeaturePath, 'utf8'));
+    if (report.status !== 'CURRENT_GRAPH_FEATURE_GATHER_PROVEN_BOUNDED') return null;
+    return report;
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   const map = JSON.parse(await fs.readFile(mapPath, 'utf8'));
   const candidates = Array.isArray(map.candidates) ? map.candidates : [];
@@ -48,15 +59,17 @@ async function main() {
   if (candidates.some((candidate) => candidate.semanticRevision === null || candidate.representationBindings?.some((binding) => binding.representationId === 'semantic_768' && binding.available !== true) !== false)) throw new Error('GOLDEN_RETRIEVAL_SEMANTIC_BINDING_INCOMPLETE');
   const packetKeys = candidates.map((candidate) => candidate.packetKey).filter(Boolean);
   const byPacketKey = new Map(candidates.map((candidate) => [candidate.packetKey, candidate]));
+  const graphFeatures = await loadGraphFeatures();
+  const graphByOrdinal = new Map((graphFeatures?.features ?? []).map((feature) => [feature.candidateOrdinal, feature]));
   const vector = await embedQuery();
   const first = normalizeHits(await exactSearch(vector, packetKeys), byPacketKey);
   const second = normalizeHits(await exactSearch(vector, packetKeys), byPacketKey);
-  const normalized = (hits) => hits.map(({ candidateOrdinal, canonicalId, packetKey, sourceRef, score }) => ({ candidateOrdinal, canonicalId, packetKey, sourceRef, score }));
+  const normalized = (hits) => hits.map(({ candidateOrdinal, canonicalId, packetKey, sourceRef, score }) => ({ candidateOrdinal, canonicalId, packetKey, sourceRef, score, graphFeatures: graphByOrdinal.get(candidateOrdinal) ?? null }));
   const firstChecksum = sha256(JSON.stringify(normalized(first)));
   const secondChecksum = sha256(JSON.stringify(normalized(second)));
   const topK = Math.min(32, candidates.length);
-  const manifest = { schema: 'atlas.context-manifest.v1', queryText, candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, workspaceRevision: map.workspaceRevision, semanticRevision: [...new Set(candidates.map((candidate) => candidate.semanticRevision))][0], representationId: 'semantic_768', vectorName: 'content', candidatePoolLimit: 768, actualCandidateCount: candidates.length, topK, candidates: normalized(first).slice(0, topK), graphRevision: null, graphFeaturesPresent: false, cacheMode: 'BYPASS', neuralShortlist: 'DISABLED', canonicalAuthority: false };
-  const report = { schema: 'atlas.parent-atlas-golden-retrieval.v1', generatedAt: new Date().toISOString(), mode: 'READ_ONLY_EXACT_REPLAY', query: { text: queryText, embeddingEndpoint: embeddingUrl, model, dimensions: vector.length }, qdrant: { url: qdrantUrl, collection, vectorName: 'content', params: { exact: true }, candidateFilterCount: packetKeys.length, hitsFirst: first.length, hitsSecond: second.length }, candidateMap: { candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, workspaceRevision: map.workspaceRevision, rowCount: candidates.length }, replay: { firstChecksum, secondChecksum, identical: firstChecksum === secondChecksum }, contextManifest: { checksum: sha256(JSON.stringify(manifest)), topK: manifest.topK, candidateCount: manifest.candidates.length }, ranking: { exactSemantic768: true, neuralShortlist: false, rrf: false, topologyVote: false, tieBreak: 'candidateOrdinal ASC' }, writes: { postgresWrites: false, qdrantWrites: false, redisWrites: false, neo4jWrites: false }, status: first.length > 0 && firstChecksum === secondChecksum ? 'GOLDEN_RETRIEVAL_REPLAY_PROVEN' : 'GOLDEN_RETRIEVAL_REPLAY_BLOCKED', nextGate: first.length > 0 && firstChecksum === secondChecksum ? 'CONTEXT_MANIFEST_READ_ONLY_REPLAY' : 'QDRANT_EXACT_CANDIDATE_PROJECTION_RECONCILIATION', manifest, hits: normalized(first) };
+  const manifest = { schema: 'atlas.context-manifest.v1', queryText, candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, workspaceRevision: map.workspaceRevision, semanticRevision: [...new Set(candidates.map((candidate) => candidate.semanticRevision))][0], representationId: 'semantic_768', vectorName: 'content', candidatePoolLimit: 768, actualCandidateCount: candidates.length, topK, candidates: normalized(first).slice(0, topK), graphRevision: graphFeatures?.graphRevision ?? null, graphFeaturesPresent: graphFeatures !== null, cacheMode: 'BYPASS', neuralShortlist: 'DISABLED', canonicalAuthority: false };
+  const report = { schema: 'atlas.parent-atlas-golden-retrieval.v1', generatedAt: new Date().toISOString(), mode: 'READ_ONLY_EXACT_REPLAY', query: { text: queryText, embeddingEndpoint: embeddingUrl, model, dimensions: vector.length }, qdrant: { url: qdrantUrl, collection, vectorName: 'content', params: { exact: true }, candidateFilterCount: packetKeys.length, hitsFirst: first.length, hitsSecond: second.length }, candidateMap: { candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, workspaceRevision: map.workspaceRevision, rowCount: candidates.length }, graphFeatureJoin: graphFeatures ? { status: graphFeatures.status, graphRevision: graphFeatures.graphRevision, featureRevision: graphFeatures.featureRevision, candidateFeatureCount: graphFeatures.candidateCount, attachedHitFeatureCount: normalized(first).filter((hit) => hit.graphFeatures !== null).length } : { status: 'ABSENT_OPTIONAL_FEATURES' }, replay: { firstChecksum, secondChecksum, identical: firstChecksum === secondChecksum }, contextManifest: { checksum: sha256(JSON.stringify(manifest)), topK: manifest.topK, candidateCount: manifest.candidates.length }, ranking: { exactSemantic768: true, neuralShortlist: false, rrf: false, topologyVote: false, graphFeaturesAttached: graphFeatures !== null, graphFeaturesAffectRanking: false, tieBreak: 'candidateOrdinal ASC' }, writes: { postgresWrites: false, qdrantWrites: false, redisWrites: false, neo4jWrites: false }, status: first.length > 0 && firstChecksum === secondChecksum ? 'GOLDEN_RETRIEVAL_REPLAY_PROVEN' : 'GOLDEN_RETRIEVAL_REPLAY_BLOCKED', nextGate: first.length > 0 && firstChecksum === secondChecksum ? 'CONTEXT_MANIFEST_READ_ONLY_REPLAY' : 'QDRANT_EXACT_CANDIDATE_PROJECTION_RECONCILIATION', manifest, hits: normalized(first) };
   await fs.mkdir(path.dirname(reportPath), { recursive: true });
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify({ status: report.status, hits: first.length, replayIdentical: report.replay.identical, contextManifestChecksum: report.contextManifest.checksum, reportPath }, null, 2));

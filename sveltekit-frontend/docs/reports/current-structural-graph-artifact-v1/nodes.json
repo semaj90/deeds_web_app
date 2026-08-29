@@ -1,0 +1,120 @@
+{
+  "schema": "atlas.graph-node-table-v1",
+  "rows": [
+    {
+      "gpu_node_id": 0,
+      "graph_node_key": "occurrence:15b16f7867ac0d6478f42e11d1013b13c357f0d8019b209f7fa2fd73b63cbab3",
+      "packet_key": "packet:225fa0b05a89"
+    },
+    {
+      "gpu_node_id": 1,
+      "graph_node_key": "occurrence:1dcc1e1e35c91813f528a5209903f582aa8da2e41e7de9e48b6a8a4137680bc6",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 2,
+      "graph_node_key": "occurrence:28783d7233f991f0ee9bebe8e32aafb5f3bb64ac60d0e5eaa68dcf4358483b90",
+      "packet_key": "packet:1daa458bdb73"
+    },
+    {
+      "gpu_node_id": 3,
+      "graph_node_key": "occurrence:374cc3ad51b02da14d4145e0b5c39ebb90c550407f8f8026644b26abcad586f7",
+      "packet_key": "packet:db66369e866a"
+    },
+    {
+      "gpu_node_id": 4,
+      "graph_node_key": "occurrence:3eb30143b18437e3cd4d4e2d64cfa32ecd587ee855f891263ce753fe8f2a9f2b",
+      "packet_key": "packet:8589ed47d789"
+    },
+    {
+      "gpu_node_id": 5,
+      "graph_node_key": "occurrence:4eabcf6556d3e8c3dd47b96c042a31db06dc434616a1ae522773a78e749a143c",
+      "packet_key": "packet:6bd874a60226"
+    },
+    {
+      "gpu_node_id": 6,
+      "graph_node_key": "occurrence:52d272cdf1c2fe75996cba876b2543b05e6f2e73bcfd8ee1c9bc60b1a38f5922",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 7,
+      "graph_node_key": "occurrence:61c0d134873458bc531e0f1919fa4251bd6572bb6a30fb10e948151ddebc08fc",
+      "packet_key": "packet:1daa458bdb73"
+    },
+    {
+      "gpu_node_id": 8,
+      "graph_node_key": "occurrence:6351f765b130787db3aa912e18292514f4573ab710639f93e46e5bf201db3abc",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 9,
+      "graph_node_key": "occurrence:6ad152ed1e203afaf2f309c9c6eff18ed743ab23237e8b9399e2adf0f524384a",
+      "packet_key": "packet:6bd874a60226"
+    },
+    {
+      "gpu_node_id": 10,
+      "graph_node_key": "occurrence:6bfab9a0f5bd2d34ea9518dd55508bb089202d6da83f8cd3aada012d46181d9c",
+      "packet_key": "packet:225fa0b05a89"
+    },
+    {
+      "gpu_node_id": 11,
+      "graph_node_key": "occurrence:a7e189ebbcf27185c488865ab99f03d6dfc4b985af38e1177ffb38fcb9e44c07",
+      "packet_key": "packet:6bd874a60226"
+    },
+    {
+      "gpu_node_id": 12,
+      "graph_node_key": "occurrence:ab4a1a36820dbe82c2f74d46162c172ea37f9b93beaa724be1f143d493a90193",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 13,
+      "graph_node_key": "occurrence:b7f96839651294a864974476a7c4e44da9ae8e9ca177986e8e4f6aa741c0f55d",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 14,
+      "graph_node_key": "occurrence:f51ec74958399066ca9c35c6397edb23bf25c5dd7de1bebdb68e16fe5cd00b09",
+      "packet_key": "packet:64b8a0ed69b3"
+    },
+    {
+      "gpu_node_id": 15,
+      "graph_node_key": "occurrence:f667656abaa82eed67db4164c427077cffccffb04283634a6cbfc14525815abd",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 16,
+      "graph_node_key": "packet:packet:1daa458bdb73",
+      "packet_key": "packet:1daa458bdb73"
+    },
+    {
+      "gpu_node_id": 17,
+      "graph_node_key": "packet:packet:225fa0b05a89",
+      "packet_key": "packet:225fa0b05a89"
+    },
+    {
+      "gpu_node_id": 18,
+      "graph_node_key": "packet:packet:64b8a0ed69b3",
+      "packet_key": "packet:64b8a0ed69b3"
+    },
+    {
+      "gpu_node_id": 19,
+      "graph_node_key": "packet:packet:6bd874a60226",
+      "packet_key": "packet:6bd874a60226"
+    },
+    {
+      "gpu_node_id": 20,
+      "graph_node_key": "packet:packet:8589ed47d789",
+      "packet_key": "packet:8589ed47d789"
+    },
+    {
+      "gpu_node_id": 21,
+      "graph_node_key": "packet:packet:c6c4bb257069",
+      "packet_key": "packet:c6c4bb257069"
+    },
+    {
+      "gpu_node_id": 22,
+      "graph_node_key": "packet:packet:db66369e866a",
+      "packet_key": "packet:db66369e866a"
+    }
+  ]
+}

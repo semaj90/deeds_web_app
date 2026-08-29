@@ -1,12 +1,12 @@
 {
   "schema": "atlas.lineage-qualified-candidate-map-receipt.v1",
-  "generatedAt": "2026-08-28T18:34:42.906Z",
+  "generatedAt": "2026-08-28T23:25:53.535Z",
   "mode": "READ_ONLY_CANARY_ARTIFACT",
   "postgresWrites": false,
   "qdrantWrites": false,
   "neo4jWrites": false,
   "valkeyWrites": false,
-  "candidatePoolLimit": 768,
+  "candidatePoolLimit": 15,
   "actualCandidateCount": 15,
   "lineage": {
     "sourceRefEquality": true,

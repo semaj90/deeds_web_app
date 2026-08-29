@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.current-structural-graph-artifact-v1",
+  "mode": "NON_PRODUCTION_DERIVED_ARTIFACT",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+  "projectionRevision": "sha256:f5bb7eea13f304160f21d2e814ccac9200546fea77fb1ceda9f229afcfae5c01",
+  "producerRevision": "build-current-structural-graph-artifact-v1",
+  "nodeCount": 23,
+  "edgeCount": 12,
+  "nodeChecksum": "sha256:b433c8636a8486abce7cc631f5036709e20c1b3936e59094e00da7d2aa4a6d91",
+  "edgeChecksum": "sha256:9ba2a1be11879b81c0c9cada80d1793d24cbd58aeb9462aaff7cbaeb81338bb2",
+  "nodeTableHash": "sha256:b433c8636a8486abce7cc631f5036709e20c1b3936e59094e00da7d2aa4a6d91",
+  "edgeTableHash": "sha256:9ba2a1be11879b81c0c9cada80d1793d24cbd58aeb9462aaff7cbaeb81338bb2",
+  "nodes": "nodes.parquet",
+  "edges": "edges.parquet",
+  "sourcePlan": "docs/reports/current-structural-edge-artifact-plan-v1.json",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

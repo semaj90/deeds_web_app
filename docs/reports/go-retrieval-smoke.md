@@ -1,10 +1,10 @@
 # Go Retrieval Smoke
 
 Status: PASS
-Generated: 2026-08-28T21:56:14.006Z
+Generated: 2026-08-29T01:50:14.257Z
 
-- HTTP: READY http://127.0.0.1:8100/health (86ms)
-- gRPC/TCP: READY 127.0.0.1:50053 (3ms)
+- HTTP: READY http://127.0.0.1:8100/health (52ms)
+- gRPC/TCP: READY 127.0.0.1:50053 (2ms)
 
 ## HTTP Health
 
@@ -34,6 +34,6 @@ Generated: 2026-08-28T21:56:14.006Z
   "readiness_state": "READY_FULL",
   "redisConnected": true,
   "status": "healthy",
-  "timestamp": 1787954174067
+  "timestamp": 1787968214294
 }
 ```

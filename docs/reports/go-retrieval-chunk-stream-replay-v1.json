@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.go-retrieval-chunk-stream-replay.v1",
+  "generatedAt": "2026-08-29T01:28:00.000Z",
+  "status": "LIVE_PACKET_FILTERED_LINEAGE_PROVEN",
+  "service": {
+    "http": "http://127.0.0.1:8100",
+    "grpc": "127.0.0.1:50053",
+    "health": "READY_FULL",
+    "dependencies": {
+      "postgres": true,
+      "qdrant": true,
+      "embeddingService": true,
+      "redis": true
+    }
+  },
+  "request": {
+    "operation": "StreamCodebase",
+    "query": "function",
+    "limit": 15,
+    "packetKeysRequested": 15,
+    "filter": "exact packet_key allowlist",
+    "readOnly": true
+  },
+  "observed": {
+    "events": 15,
+    "chunkEvents": 15,
+    "packetKeyPresent": 15,
+    "uniquePacketKeysPresent": 8,
+    "sourceRefPresent": 15,
+    "workspaceRevisionPresent": 15,
+    "sourceRevisionPresent": 15,
+    "representationRevisionPresent": 15,
+    "errors": 0
+  },
+  "contract": {
+    "protobufDeclaresRevisionFields": true,
+    "goStreamSendsCodebaseChunkEvents": true,
+    "typescriptAdapterPreservesRevisionFields": true,
+    "packetKeyFilterForwarded": true,
+    "liveRevisionQualifiedStream": true
+  },
+  "authority": {
+    "canonicalWrites": 0,
+    "qdrantWrites": 0,
+    "redisWrites": 0,
+    "streamIsCanonicalAuthority": false,
+    "aceAdmission": false
+  },
+  "nextGate": "ACE-ADMISSION-EXTERNAL-OR-LOCAL-READBACK",
+  "evidence": [
+    "services/go-retrieval-service/main.go:1899-1911",
+    "services/go-retrieval-service/proto/retrieval/retrieval.pb.go:1197-1218",
+    "packages/parent-atlas-client/src/grpc/client.ts"
+  ]
+}

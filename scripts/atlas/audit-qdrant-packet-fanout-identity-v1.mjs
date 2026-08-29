@@ -17,7 +17,11 @@ dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env') });
 dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: true });
 
 const QDRANT_URL = (process.env.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/+$/, '');
-const COLLECTION = process.env.ATLAS_QDRANT_COLLECTION || process.env.QDRANT_COLLECTION || 'codebase_chunks_768';
+// This audit is specifically for the codebase packet projection. Do not let a
+// generic QDRANT_COLLECTION environment variable redirect it to an unrelated
+// collection such as legal_documents; callers must opt in with the Atlas-
+// namespaced override when auditing another codebase projection.
+const COLLECTION = process.env.ATLAS_QDRANT_COLLECTION || 'codebase_chunks_768';
 const REPORT_PATH = resolve(ROOT, 'docs/reports/qdrant-packet-fanout-v1.json');
 const BATCH_SIZE = 500;
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));

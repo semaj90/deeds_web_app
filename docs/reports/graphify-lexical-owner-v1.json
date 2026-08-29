@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-lexical-owner.v1",
-  "generatedAt": "2026-08-27T15:19:43.485Z",
+  "generatedAt": "2026-08-29T02:26:09.268Z",
   "readOnly": true,
   "table": "codebase_chunk_index",
   "extensions": [
@@ -217,7 +217,7 @@
     "total": 55206,
     "search_vector": 55206,
     "ast_symbols": 17800,
-    "content_embedding_768": 724,
+    "content_embedding_768": 739,
     "content_embedding": 55169
   },
   "owner": "POSTGRES_FTS_TSVECTOR_TS_RANK_CD",

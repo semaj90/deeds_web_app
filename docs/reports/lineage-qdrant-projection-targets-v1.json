@@ -1,0 +1,306 @@
+{
+  "schema": "atlas.lineage-qdrant-projection-targets.v1",
+  "mode": "READ_ONLY",
+  "collection": "codebase_chunks_768",
+  "candidateCount": 15,
+  "counts": {
+    "exactSingleTarget": 0,
+    "duplicateSameCollection": 15,
+    "projectionIdMismatch": 0,
+    "noTarget": 0
+  },
+  "candidates": [
+    {
+      "candidateOrdinal": 0,
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "postgresQdrantId": "5cf1b509-a592-43ca-9880-5dde971b1316",
+      "qdrantPointIds": [
+        "24575",
+        "7252a838-1e9b-445a-8abd-0d5ad413567d"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "24575"
+      ],
+      "authoritativeTarget": "24575",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "postgresQdrantId": "82da1b0e-73ed-4848-8543-08a470337c51",
+      "qdrantPointIds": [
+        "40123",
+        "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "40123"
+      ],
+      "authoritativeTarget": "40123",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "postgresQdrantId": "ffdd01be-5038-466d-97ed-a5212f861b65",
+      "qdrantPointIds": [
+        "5432",
+        "144079f0-43df-42f1-a363-e77fb913b76e"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "5432"
+      ],
+      "authoritativeTarget": "5432",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "postgresQdrantId": "50fb24c2-8471-4f68-97f6-ad7afee8a1ea",
+      "qdrantPointIds": [
+        "34838",
+        "a4a643ab-c3fb-49d5-976b-845820c67a7e"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "34838"
+      ],
+      "authoritativeTarget": "34838",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "postgresQdrantId": "5de87920-ec7a-44a6-a4be-28429300b2cd",
+      "qdrantPointIds": [
+        "27737",
+        "822a81b8-5e81-4ff0-a645-b1ed7df2584e"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "27737"
+      ],
+      "authoritativeTarget": "27737",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "postgresQdrantId": "94b70bd6-dad6-4e7b-b127-0a2f87d3659f",
+      "qdrantPointIds": [
+        "39367",
+        "bb0c9b56-45e4-46e5-8347-25ea009ddfea"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "39367"
+      ],
+      "authoritativeTarget": "39367",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "postgresQdrantId": "64c1cbfd-d7b9-4993-b2ca-5a066ae9859f",
+      "qdrantPointIds": [
+        "34039",
+        "a0e64259-6219-4c97-9b04-e22b9808c36b"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "34039"
+      ],
+      "authoritativeTarget": "34039",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "postgresQdrantId": "0be60016-e091-4f94-8298-983ea10d3493",
+      "qdrantPointIds": [
+        "52486",
+        "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "52486"
+      ],
+      "authoritativeTarget": "52486",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 8,
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "postgresQdrantId": "2bfe7e42-0fc6-4157-8b26-f21a0d96ac22",
+      "qdrantPointIds": [
+        "20025",
+        "5b9447df-c4b5-4634-853c-c06384abfc0b"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "20025"
+      ],
+      "authoritativeTarget": "20025",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 9,
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "postgresQdrantId": "40a6a18b-ac7c-4a2f-944d-8bb45591b013",
+      "qdrantPointIds": [
+        "15264",
+        "44318cbc-211b-4b57-8212-6a8b9f7abac6"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "15264"
+      ],
+      "authoritativeTarget": "15264",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 10,
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "postgresQdrantId": "5770ac59-2992-4106-b449-8dd71b0f95bc",
+      "qdrantPointIds": [
+        "25348",
+        "76266fe6-4285-4dbb-8724-270c139fd4f8"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "25348"
+      ],
+      "authoritativeTarget": "25348",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 11,
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "postgresQdrantId": "bddeffa8-54c4-4c54-8771-13358f117842",
+      "qdrantPointIds": [
+        "13146",
+        "39a3a174-f87c-41ae-8221-1557c187c078"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "13146"
+      ],
+      "authoritativeTarget": "13146",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 12,
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "postgresQdrantId": "db1d5fde-a2a2-4486-b48d-d3f5b46f363a",
+      "qdrantPointIds": [
+        "39624",
+        "bc31cec8-73d5-4f4c-be58-3fafb1898bf9"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "39624"
+      ],
+      "authoritativeTarget": "39624",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 13,
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "postgresQdrantId": "a46db8fd-d993-4440-bc2c-89d0cc1a6667",
+      "qdrantPointIds": [
+        "25037",
+        "748c3951-eed7-4139-a2ea-aa279ce82796"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "25037"
+      ],
+      "authoritativeTarget": "25037",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    },
+    {
+      "candidateOrdinal": 14,
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "postgresQdrantId": "e3179f50-4e4e-4f7a-99b1-5f7409924968",
+      "qdrantPointIds": [
+        "1255",
+        "01130d0c-6d1f-4fb4-8592-43f3550794d5"
+      ],
+      "pointCount": 2,
+      "matchingPointIds": [
+        "1255"
+      ],
+      "authoritativeTarget": "1255",
+      "targetMatchKind": [
+        "PAYLOAD_QDRANT_POINT_ID"
+      ],
+      "classification": "DUPLICATE_SAME_COLLECTION"
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "deletes": false
+  },
+  "status": "QDRANT_PROJECTION_TARGETS_CENSUSED",
+  "nextGate": "QDRANT_NAMED_VECTOR_UPDATE_REVIEW"
+}

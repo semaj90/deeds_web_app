@@ -3,15 +3,27 @@
   "mode": "READ_ONLY_LIVE_SIDECAR",
   "sidecar": {
     "url": "http://127.0.0.1:8095",
-    "endpoint": "/ast/chunk"
+    "endpoint": "/ast/chunk",
+    "language": "javascript"
   },
-  "sourceRef": "sveltekit-frontend/src/lib/server/ai/trace-reranker.ts",
-  "sourceRevision": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-  "sourceDigest": "sha256:37fda484ff6c0b6a24a72cb164aeb280bb8e4a94872c41937369171536f54cd3",
-  "query": "which function calls CandidateOrdinal?",
-  "observationCount": 52,
-  "matchCount": 15,
-  "resultChecksum": "75d2b1f4fe4a872d451fb53a5e69b92dad3dfd867f1c7de2c1d8f9b2b997f2e5",
+  "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+  "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+  "sourceDigest": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+  "query": "which function calls parse?",
+  "observationCount": 2,
+  "matchCount": 1,
+  "candidateMap": {
+    "rowCount": 15,
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297"
+  },
+  "identity": {
+    "resolvedCount": 1,
+    "rejectedCount": 0,
+    "statuses": [
+      "RESOLVED_EXACT"
+    ]
+  },
+  "resultChecksum": "d9008b8e322a03aee7bf80d459aeaaf90f6b8b77e5208025381e5568b392f67c",
   "canonicalAuthority": false,
   "promotionEligible": false,
   "executable": false,
@@ -21,6 +33,6 @@
     "neo4j": false,
     "valkey": false
   },
-  "status": "STRUCTURAL_QUERY_OBSERVATION_ADAPTER_PROVEN",
-  "nextGate": "STRUCT-11_ATLAS_IDENTITY_RESOLUTION"
+  "status": "STRUCTURAL_QUERY_IDENTITY_BRIDGE_PROVEN_BOUNDED",
+  "nextGate": "STRUCT-12_STRUCTURAL_RESULT_ENVELOPE"
 }

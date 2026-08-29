@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.graph-ordinal-cpu-gpu-replay-receipt.v1",
+  "status": "GRAPH_ORDINAL_CPU_GPU_REPLAY_PROVEN_BOUNDED",
+  "replayCount": 3,
+  "graphRevision": "graph:ordinal-parity-fixture-v1",
+  "ordinalMapChecksum": "ad14f10fc175e7af182d142ed820d6c0c5964451c6db5c872dbabf83a997f1ef",
+  "statuses": [
+    "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN",
+    "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN",
+    "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN"
+  ],
+  "maxAbsScoreErrors": [
+    0.0000007194331917148578,
+    0.0000007194331917148578,
+    0.0000007194331917148578
+  ],
+  "sameRankOrdering": [true, true, true],
+  "sidecar": {
+    "endpoint": "http://127.0.0.1:8098",
+    "backend": "cugraph.pagerank",
+    "supervision": "foreground-session-only"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "BOUNDED_CURRENT_GRAPH_ARTIFACT_PARITY"
+}

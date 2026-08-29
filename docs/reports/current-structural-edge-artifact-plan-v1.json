@@ -1,0 +1,830 @@
+{
+  "schema": "atlas.current-structural-edge-artifact-plan.v1",
+  "mode": "READ_ONLY_PLAN",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "endpoint": "/ast/chunk"
+  },
+  "selectedSourceCount": 7,
+  "nodeCount": 23,
+  "edgeCount": 12,
+  "nodes": [
+    {
+      "graphNodeKey": "occurrence:15b16f7867ac0d6478f42e11d1013b13c357f0d8019b209f7fa2fd73b63cbab3",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "export_statement",
+      "startByte": 76,
+      "endByte": 187,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:1dcc1e1e35c91813f528a5209903f582aa8da2e41e7de9e48b6a8a4137680bc6",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_signature",
+      "startByte": 225,
+      "endByte": 331,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:28783d7233f991f0ee9bebe8e32aafb5f3bb64ac60d0e5eaa68dcf4358483b90",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "variable_declarator",
+      "startByte": 42,
+      "endByte": 131,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:374cc3ad51b02da14d4145e0b5c39ebb90c550407f8f8026644b26abcad586f7",
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_item",
+      "startByte": 26,
+      "endByte": 64,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:3eb30143b18437e3cd4d4e2d64cfa32ecd587ee855f891263ce753fe8f2a9f2b",
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_item",
+      "startByte": 26,
+      "endByte": 64,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:4eabcf6556d3e8c3dd47b96c042a31db06dc434616a1ae522773a78e749a143c",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "variable_declarator",
+      "startByte": 152,
+      "endByte": 182,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:52d272cdf1c2fe75996cba876b2543b05e6f2e73bcfd8ee1c9bc60b1a38f5922",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "export_statement",
+      "startByte": 0,
+      "endByte": 100,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:61c0d134873458bc531e0f1919fa4251bd6572bb6a30fb10e948151ddebc08fc",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "variable_declarator",
+      "startByte": 6,
+      "endByte": 33,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:6351f765b130787db3aa912e18292514f4573ab710639f93e46e5bf201db3abc",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "interface_declaration",
+      "startByte": 7,
+      "endByte": 100,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:6ad152ed1e203afaf2f309c9c6eff18ed743ab23237e8b9399e2adf0f524384a",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_declaration",
+      "startByte": 300,
+      "endByte": 447,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:6bfab9a0f5bd2d34ea9518dd55508bb089202d6da83f8cd3aada012d46181d9c",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_signature",
+      "startByte": 91,
+      "endByte": 187,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:a7e189ebbcf27185c488865ab99f03d6dfc4b985af38e1177ffb38fcb9e44c07",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "variable_declarator",
+      "startByte": 340,
+      "endByte": 373,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:ab4a1a36820dbe82c2f74d46162c172ea37f9b93beaa724be1f143d493a90193",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "interface_declaration",
+      "startByte": 109,
+      "endByte": 216,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:b7f96839651294a864974476a7c4e44da9ae8e9ca177986e8e4f6aa741c0f55d",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "export_statement",
+      "startByte": 102,
+      "endByte": 216,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:f51ec74958399066ca9c35c6397edb23bf25c5dd7de1bebdb68e16fe5cd00b09",
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "function_item",
+      "startByte": 71,
+      "endByte": 109,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "occurrence:f667656abaa82eed67db4164c427077cffccffb04283634a6cbfc14525815abd",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "export_statement",
+      "startByte": 218,
+      "endByte": 331,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:1daa458bdb73",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:225fa0b05a89",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:64b8a0ed69b3",
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:6bd874a60226",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:8589ed47d789",
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:c6c4bb257069",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    },
+    {
+      "graphNodeKey": "packet:packet:db66369e866a",
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "nodeKind": "packet",
+      "startByte": null,
+      "endByte": null,
+      "canonicalAuthority": false
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeKey": "packet:packet:1daa458bdb73",
+      "targetNodeKey": "occurrence:28783d7233f991f0ee9bebe8e32aafb5f3bb64ac60d0e5eaa68dcf4358483b90",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/wrapper.js:4cc4b79b6cfd4781e59129bfcc622d726dd4f704:5a6c17fb61b765610cbcd4115d9f222b98a24f60"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:1daa458bdb73",
+      "targetNodeKey": "occurrence:61c0d134873458bc531e0f1919fa4251bd6572bb6a30fb10e948151ddebc08fc",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/wrapper.js:4cc4b79b6cfd4781e59129bfcc622d726dd4f704:147d26bf681b9aa966ad2f4c2fd89582168bfada"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:225fa0b05a89",
+      "targetNodeKey": "occurrence:6bfab9a0f5bd2d34ea9518dd55508bb089202d6da83f8cd3aada012d46181d9c",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/index.d.ts:0f27b88ccd188415a7e6abcc6fad9685f5630a87:a39ec78239d52184120b9c9e85a5ff8e78364d4d"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:64b8a0ed69b3",
+      "targetNodeKey": "occurrence:f51ec74958399066ca9c35c6397edb23bf25c5dd7de1bebdb68e16fe5cd00b09",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/omni-bridge/build.rs:41be1b08c1a7aad6412172aee7b7736c114fb4fd:8f74834a8a150890bae23afe0223c8d0c227c955"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:6bd874a60226",
+      "targetNodeKey": "occurrence:4eabcf6556d3e8c3dd47b96c042a31db06dc434616a1ae522773a78e749a143c",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/turbovec-napi/wrapper.js:27546c3fe9ee434570b20181ea9ccf502705ee70:dc22c3846e0a0bd715731fcd5db57a58f0504ae3"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:6bd874a60226",
+      "targetNodeKey": "occurrence:6ad152ed1e203afaf2f309c9c6eff18ed743ab23237e8b9399e2adf0f524384a",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/turbovec-napi/wrapper.js:27546c3fe9ee434570b20181ea9ccf502705ee70:f794c6a2efd8163f76fd653f31c3cd28f254e94c"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:6bd874a60226",
+      "targetNodeKey": "occurrence:a7e189ebbcf27185c488865ab99f03d6dfc4b985af38e1177ffb38fcb9e44c07",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/turbovec-napi/wrapper.js:27546c3fe9ee434570b20181ea9ccf502705ee70:10fd808edd5de34536c90c2e54395a97e55c493d"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:8589ed47d789",
+      "targetNodeKey": "occurrence:3eb30143b18437e3cd4d4e2d64cfa32ecd587ee855f891263ce753fe8f2a9f2b",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/build.rs:1527ae5f137a00dd7a8b04e4ee52238f3b6c9ad7:dd282de0cf5188e1ed2c68b595e6bfb9ca6a9e68"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:c6c4bb257069",
+      "targetNodeKey": "occurrence:1dcc1e1e35c91813f528a5209903f582aa8da2e41e7de9e48b6a8a4137680bc6",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/wrapper.d.ts:855d6496c7b1a3f6428c0af0d7a541bfdad25609:070b687f2a3839482f481a6f4223b7bd491f29ce"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:c6c4bb257069",
+      "targetNodeKey": "occurrence:6351f765b130787db3aa912e18292514f4573ab710639f93e46e5bf201db3abc",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/wrapper.d.ts:855d6496c7b1a3f6428c0af0d7a541bfdad25609:677b0091997be70e26b4d3d0a940948830335dab"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:c6c4bb257069",
+      "targetNodeKey": "occurrence:ab4a1a36820dbe82c2f74d46162c172ea37f9b93beaa724be1f143d493a90193",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/atlas_packet_parser/wrapper.d.ts:855d6496c7b1a3f6428c0af0d7a541bfdad25609:b6ee2a993995d04673bd4be1e4aa3bbf61a0777b"
+      ],
+      "canonicalAuthority": false
+    },
+    {
+      "sourceNodeKey": "packet:packet:db66369e866a",
+      "targetNodeKey": "occurrence:374cc3ad51b02da14d4145e0b5c39ebb90c550407f8f8026644b26abcad586f7",
+      "edgeType": "DEFINES",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "evidenceRefs": [
+        "ast:crates/turbovec-napi/build.rs:b26a47fb880aa342d02679b7026e7ad27e5cb2ca:06c0277c6a9f23628894d1f67cfedf8f238db957"
+      ],
+      "canonicalAuthority": false
+    }
+  ],
+  "unresolvedEdgeCount": 50,
+  "unresolvedEdges": [
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "IMPORTS",
+      "fromEvidenceKey": "4cc4b79b6cfd4781e59129bfcc622d726dd4f704",
+      "toEvidenceKey": "require('node:path')",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "147d26bf681b9aa966ad2f4c2fd89582168bfada",
+      "toEvidenceKey": "require",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "IMPORTS",
+      "fromEvidenceKey": "4cc4b79b6cfd4781e59129bfcc622d726dd4f704",
+      "toEvidenceKey": "require(path.join(\n  __dirname,\n  'atlas-packet-parser.win32-x64-msvc.node',\n))",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "5a6c17fb61b765610cbcd4115d9f222b98a24f60",
+      "toEvidenceKey": "require",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "5a6c17fb61b765610cbcd4115d9f222b98a24f60",
+      "toEvidenceKey": "path.join",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "5a6c17fb61b765610cbcd4115d9f222b98a24f60",
+      "toEvidenceKey": "__dirname",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "5a6c17fb61b765610cbcd4115d9f222b98a24f60",
+      "toEvidenceKey": "path",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f33d69b27462d3837d5a73eb0447893b95411969",
+      "toEvidenceKey": "chunkSize",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f33d69b27462d3837d5a73eb0447893b95411969",
+      "toEvidenceKey": "filePath",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f33d69b27462d3837d5a73eb0447893b95411969",
+      "toEvidenceKey": "outputDir",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f33d69b27462d3837d5a73eb0447893b95411969",
+      "toEvidenceKey": "parseLargeJsonToMsgpack",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "a39ec78239d52184120b9c9e85a5ff8e78364d4d",
+      "toEvidenceKey": "chunkSize",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "a39ec78239d52184120b9c9e85a5ff8e78364d4d",
+      "toEvidenceKey": "filePath",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "a39ec78239d52184120b9c9e85a5ff8e78364d4d",
+      "toEvidenceKey": "outputDir",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "a39ec78239d52184120b9c9e85a5ff8e78364d4d",
+      "toEvidenceKey": "parseLargeJsonToMsgpack",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "type": "CALLS",
+      "fromEvidenceKey": "8f74834a8a150890bae23afe0223c8d0c227c955",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "8f74834a8a150890bae23afe0223c8d0c227c955",
+      "toEvidenceKey": "napi_build",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "8f74834a8a150890bae23afe0223c8d0c227c955",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "IMPORTS",
+      "fromEvidenceKey": "27546c3fe9ee434570b20181ea9ccf502705ee70",
+      "toEvidenceKey": "require('./index.js')",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "dc22c3846e0a0bd715731fcd5db57a58f0504ae3",
+      "toEvidenceKey": "require",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "EXPORTS",
+      "fromEvidenceKey": "27546c3fe9ee434570b20181ea9ccf502705ee70",
+      "toEvidenceKey": "hashSourceRefs",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "f794c6a2efd8163f76fd653f31c3cd28f254e94c",
+      "toEvidenceKey": "native.hashSourceRefs",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "f794c6a2efd8163f76fd653f31c3cd28f254e94c",
+      "toEvidenceKey": "new BigUint64Array",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f794c6a2efd8163f76fd653f31c3cd28f254e94c",
+      "toEvidenceKey": "BigUint64Array",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f794c6a2efd8163f76fd653f31c3cd28f254e94c",
+      "toEvidenceKey": "native",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "CALLS",
+      "fromEvidenceKey": "10fd808edd5de34536c90c2e54395a97e55c493d",
+      "toEvidenceKey": "native.hashSourceRefs",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "10fd808edd5de34536c90c2e54395a97e55c493d",
+      "toEvidenceKey": "native",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "10fd808edd5de34536c90c2e54395a97e55c493d",
+      "toEvidenceKey": "refs",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "type": "CALLS",
+      "fromEvidenceKey": "dd282de0cf5188e1ed2c68b595e6bfb9ca6a9e68",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "dd282de0cf5188e1ed2c68b595e6bfb9ca6a9e68",
+      "toEvidenceKey": "napi_build",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "dd282de0cf5188e1ed2c68b595e6bfb9ca6a9e68",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "baac528a1a558f01d222182e4add4e0af80bd2b5",
+      "toEvidenceKey": "PacketChunkInfo",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "EXPORTS",
+      "fromEvidenceKey": "855d6496c7b1a3f6428c0af0d7a541bfdad25609",
+      "toEvidenceKey": "PacketChunkInfo",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "677b0091997be70e26b4d3d0a940948830335dab",
+      "toEvidenceKey": "PacketChunkInfo",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "471c953be84253edbca7e7853af844f7979bf021",
+      "toEvidenceKey": "PacketChunkInfo",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "471c953be84253edbca7e7853af844f7979bf021",
+      "toEvidenceKey": "PacketParserIndex",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "EXPORTS",
+      "fromEvidenceKey": "855d6496c7b1a3f6428c0af0d7a541bfdad25609",
+      "toEvidenceKey": "PacketParserIndex",
+      "resolved": false,
+      "resolution": "syntax_only"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "b6ee2a993995d04673bd4be1e4aa3bbf61a0777b",
+      "toEvidenceKey": "PacketChunkInfo",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "b6ee2a993995d04673bd4be1e4aa3bbf61a0777b",
+      "toEvidenceKey": "PacketParserIndex",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f161c2c615d03b22a635a0c8b5b1de7d2284e857",
+      "toEvidenceKey": "chunkSize",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f161c2c615d03b22a635a0c8b5b1de7d2284e857",
+      "toEvidenceKey": "filePath",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f161c2c615d03b22a635a0c8b5b1de7d2284e857",
+      "toEvidenceKey": "outputDir",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "f161c2c615d03b22a635a0c8b5b1de7d2284e857",
+      "toEvidenceKey": "parseLargeJsonToMsgpack",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "070b687f2a3839482f481a6f4223b7bd491f29ce",
+      "toEvidenceKey": "chunkSize",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "070b687f2a3839482f481a6f4223b7bd491f29ce",
+      "toEvidenceKey": "filePath",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "070b687f2a3839482f481a6f4223b7bd491f29ce",
+      "toEvidenceKey": "outputDir",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "070b687f2a3839482f481a6f4223b7bd491f29ce",
+      "toEvidenceKey": "parseLargeJsonToMsgpack",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "type": "CALLS",
+      "fromEvidenceKey": "06c0277c6a9f23628894d1f67cfedf8f238db957",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "06c0277c6a9f23628894d1f67cfedf8f238db957",
+      "toEvidenceKey": "napi_build",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    },
+    {
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "type": "REFERENCES",
+      "fromEvidenceKey": "06c0277c6a9f23628894d1f67cfedf8f238db957",
+      "toEvidenceKey": "setup",
+      "resolved": false,
+      "resolution": "unresolved_target"
+    }
+  ],
+  "errors": [],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphArtifacts": false
+  },
+  "canonicalAuthority": false,
+  "status": "CURRENT_STRUCTURAL_EDGE_PLAN_READY",
+  "nextGate": "NON_PRODUCTION_GRAPH_ORDINAL_ARTIFACT_BUILD_AND_CPU_GPU_PARITY",
+  "reportChecksum": "sha256:a78d77a8ae6709686993be873afab6bca6deaba20a52f0c0a46b480534715858"
+}

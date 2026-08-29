@@ -1,16 +1,16 @@
 # ONNX Embedding Server Audit
 
-- generated_at: 2026-08-26T02:15:35.130Z
+- generated_at: 2026-08-29T03:32:42.590Z
 - url: http://127.0.0.1:8081
-- status: PASS
+- status: FAIL
 - backend: unknown
 - dim: unknown
 - providers_available: unknown
 - providers_active: unknown
 - batch_size: 8
-- elapsed_ms: 125
-- vectors: 8
-- dimension_ok: true
+- elapsed_ms: n/a
+- vectors: 0
+- dimension_ok: false
 
 ## Routing
 

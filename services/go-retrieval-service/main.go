@@ -1846,6 +1846,13 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 		return &pb.CodebaseSearchResponse{}, nil
 	}
 
+	if len(req.PacketKeys) > 0 {
+		if len(req.PacketKeys) > 768 {
+			return &pb.CodebaseSearchResponse{}, nil
+		}
+		extraFilters = append(extraFilters, qdrantclient.NewMatchKeywords("packet_key", req.PacketKeys...))
+	}
+
 	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, extraFilters, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
@@ -2397,6 +2404,7 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		Kinds        []string `json:"kinds"`
 		PathPrefixes []string `json:"path_prefixes"`
 		HTTPMethod   string   `json:"http_method"`
+		PacketKeys   []string `json:"packet_keys"`
 		Tags         []string `json:"tags"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
@@ -2414,6 +2422,7 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		Kinds:        body.Kinds,
 		PathPrefixes: body.PathPrefixes,
 		HttpMethod:   body.HTTPMethod,
+		PacketKeys:   body.PacketKeys,
 	}, tagFilters)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -1,0 +1,153 @@
+{
+  "schema": "atlas.lineage-qdrant-projection-repair.v1",
+  "generatedAt": "2026-08-29T02:20:50.798Z",
+  "mode": "AUTHORIZED_PROJECTION_ONLY_FROM_POSTGRES",
+  "authorization": {
+    "explicit": true,
+    "dryRun": false,
+    "envFlag": "ATLAS_AUTHORIZE_QDRANT_PROJECTION_REPAIR=1",
+    "scope": "frozen 15-candidate lineage canary"
+  },
+  "collection": "codebase_chunks_768",
+  "candidateCount": 15,
+  "counts": {
+    "postgresRows": 15,
+    "qdrantPointsSeen": 30,
+    "pointsPlanned": 15,
+    "pointsWritten": 15,
+    "postgresWrites": 0,
+    "deletedPoints": 0
+  },
+  "points": [
+    {
+      "id": "1255",
+      "packetKey": "packet:db66369e866a",
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:e2ad3a3d509a1373cc38ccc20e1e650e47d55d3bb521e3e14c6f965b333cb9d5"
+    },
+    {
+      "id": "5432",
+      "packetKey": "packet:225fa0b05a89",
+      "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:cc32cb9e45bf50d9f0b078902dcb0ceb4d8c1c5e305314475117c5d02dacf2d2"
+    },
+    {
+      "id": "13146",
+      "packetKey": "packet:8d268e81f842",
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:5dcbd4e092d969926e3ddab3f060caf26e25a05fae56283cd85f607f763815c5"
+    },
+    {
+      "id": "15264",
+      "packetKey": "packet:7c61a052540c",
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:37e6eff5bed793723a1c5794b1c2c161850f132a9e8aee12b4737433f6c0802c"
+    },
+    {
+      "id": "20025",
+      "packetKey": "packet:6bd874a60226",
+      "sourceRef": "crates/turbovec-napi/wrapper.js",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:e59e6e64eb62d0bbd406b9dfa21ff69451dbf14d8f7718393f38f0775fcf1215"
+    },
+    {
+      "id": "24575",
+      "packetKey": "packet:196138c47be8",
+      "sourceRef": "docs/ai-os/atlas-retry-index.json",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:cf69e6b280448e9021e613842d47a02a2c6278eecf46c2bc067f0284ac505213"
+    },
+    {
+      "id": "25037",
+      "packetKey": "packet:d2c2643163a8",
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:02c530ffca4037312b837a20ce83e4ada58f2cfac8a5ee2aa3d4ed8fb1db5af0"
+    },
+    {
+      "id": "25348",
+      "packetKey": "packet:8589ed47d789",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:fa0ada88aec7bfa0ef6d6dc7289c55b5e0aad09b464012e90b962d249b84cb50"
+    },
+    {
+      "id": "27737",
+      "packetKey": "packet:41aaad7c7e65",
+      "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:ed3e8e7f3fabbd2c7246a861e10fd38bd5fedbca163bec60fdab2750a676d1e2"
+    },
+    {
+      "id": "34039",
+      "packetKey": "packet:64838394f8dc",
+      "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:9245bbcda79cff597dd6617cbff5b21e082a15798099597ca268ac4d597de920"
+    },
+    {
+      "id": "34838",
+      "packetKey": "packet:25ac9148f9bf",
+      "sourceRef": "crates/atlas_packet_parser/package.json",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:1e1745afec625fdfcf165304c33060b34ffd834350f97b20ce3614a5d1141dcb"
+    },
+    {
+      "id": "39367",
+      "packetKey": "packet:547e1c54b3a0",
+      "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:68f4557e51a0648b056848a52c5a8fa6b42a9d8ccef58d285324c0834430016c"
+    },
+    {
+      "id": "39624",
+      "packetKey": "packet:c6c4bb257069",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:5fa24872800a9db73b1a54f33f9e903d7acc341db51b25cfe922f6b408f6f1e2"
+    },
+    {
+      "id": "40123",
+      "packetKey": "packet:1daa458bdb73",
+      "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:202395a32a82a69547b1aa3f8484b0fcb437d08725d215b7722299670694a1e4"
+    },
+    {
+      "id": "52486",
+      "packetKey": "packet:64b8a0ed69b3",
+      "sourceRef": "crates/omni-bridge/build.rs",
+      "vectorDimensions": 768,
+      "targetMatchKind": "PAYLOAD_QDRANT_POINT_ID",
+      "canonicalVectorDigest": "sha256:acf8d2233b8b5e08230e94695b3fe248136f2246917991a890cdf2ac202bdb0e"
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": true,
+    "deletes": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "canonicalAuthority": false,
+  "status": "QDRANT_PROJECTION_REPAIR_APPLIED_READBACK_REQUIRED",
+  "nextGate": "PGVECTOR_QDRANT_EXACT_PARITY_REPLAY"
+}

@@ -1,0 +1,236 @@
+{
+  "schema": "atlas.current-graph-candidate-ordinal-roundtrip-v1",
+  "generatedAt": "2026-08-29T00:41:06.927Z",
+  "mode": "READ_ONLY_AUDIT",
+  "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+  "projectionRevision": "sha256:f5bb7eea13f304160f21d2e814ccac9200546fea77fb1ceda9f229afcfae5c01",
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "graphNodeCount": 23,
+  "boundNodeCount": 23,
+  "unboundNodeCount": 0,
+  "workspaceMismatches": 0,
+  "conflictingPacketOrdinals": [],
+  "mappingDigest": "sha256:c9fd1a7b1a0c1068b6213d2698b364e58271b4a2d7135b673dd92a201509a250",
+  "bindings": [
+    {
+      "graphOrdinal": 0,
+      "graphNodeKey": "occurrence:15b16f7867ac0d6478f42e11d1013b13c357f0d8019b209f7fa2fd73b63cbab3",
+      "packetKey": "packet:225fa0b05a89",
+      "candidateOrdinal": 2,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733"
+    },
+    {
+      "graphOrdinal": 1,
+      "graphNodeKey": "occurrence:1dcc1e1e35c91813f528a5209903f582aa8da2e41e7de9e48b6a8a4137680bc6",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 2,
+      "graphNodeKey": "occurrence:28783d7233f991f0ee9bebe8e32aafb5f3bb64ac60d0e5eaa68dcf4358483b90",
+      "packetKey": "packet:1daa458bdb73",
+      "candidateOrdinal": 1,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484"
+    },
+    {
+      "graphOrdinal": 3,
+      "graphNodeKey": "occurrence:374cc3ad51b02da14d4145e0b5c39ebb90c550407f8f8026644b26abcad586f7",
+      "packetKey": "packet:db66369e866a",
+      "candidateOrdinal": 14,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+    },
+    {
+      "graphOrdinal": 4,
+      "graphNodeKey": "occurrence:3eb30143b18437e3cd4d4e2d64cfa32ecd587ee855f891263ce753fe8f2a9f2b",
+      "packetKey": "packet:8589ed47d789",
+      "candidateOrdinal": 10,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+    },
+    {
+      "graphOrdinal": 5,
+      "graphNodeKey": "occurrence:4eabcf6556d3e8c3dd47b96c042a31db06dc434616a1ae522773a78e749a143c",
+      "packetKey": "packet:6bd874a60226",
+      "candidateOrdinal": 8,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56"
+    },
+    {
+      "graphOrdinal": 6,
+      "graphNodeKey": "occurrence:52d272cdf1c2fe75996cba876b2543b05e6f2e73bcfd8ee1c9bc60b1a38f5922",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 7,
+      "graphNodeKey": "occurrence:61c0d134873458bc531e0f1919fa4251bd6572bb6a30fb10e948151ddebc08fc",
+      "packetKey": "packet:1daa458bdb73",
+      "candidateOrdinal": 1,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484"
+    },
+    {
+      "graphOrdinal": 8,
+      "graphNodeKey": "occurrence:6351f765b130787db3aa912e18292514f4573ab710639f93e46e5bf201db3abc",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 9,
+      "graphNodeKey": "occurrence:6ad152ed1e203afaf2f309c9c6eff18ed743ab23237e8b9399e2adf0f524384a",
+      "packetKey": "packet:6bd874a60226",
+      "candidateOrdinal": 8,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56"
+    },
+    {
+      "graphOrdinal": 10,
+      "graphNodeKey": "occurrence:6bfab9a0f5bd2d34ea9518dd55508bb089202d6da83f8cd3aada012d46181d9c",
+      "packetKey": "packet:225fa0b05a89",
+      "candidateOrdinal": 2,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733"
+    },
+    {
+      "graphOrdinal": 11,
+      "graphNodeKey": "occurrence:a7e189ebbcf27185c488865ab99f03d6dfc4b985af38e1177ffb38fcb9e44c07",
+      "packetKey": "packet:6bd874a60226",
+      "candidateOrdinal": 8,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56"
+    },
+    {
+      "graphOrdinal": 12,
+      "graphNodeKey": "occurrence:ab4a1a36820dbe82c2f74d46162c172ea37f9b93beaa724be1f143d493a90193",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 13,
+      "graphNodeKey": "occurrence:b7f96839651294a864974476a7c4e44da9ae8e9ca177986e8e4f6aa741c0f55d",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 14,
+      "graphNodeKey": "occurrence:f51ec74958399066ca9c35c6397edb23bf25c5dd7de1bebdb68e16fe5cd00b09",
+      "packetKey": "packet:64b8a0ed69b3",
+      "candidateOrdinal": 7,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9"
+    },
+    {
+      "graphOrdinal": 15,
+      "graphNodeKey": "occurrence:f667656abaa82eed67db4164c427077cffccffb04283634a6cbfc14525815abd",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 16,
+      "graphNodeKey": "packet:packet:1daa458bdb73",
+      "packetKey": "packet:1daa458bdb73",
+      "candidateOrdinal": 1,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484"
+    },
+    {
+      "graphOrdinal": 17,
+      "graphNodeKey": "packet:packet:225fa0b05a89",
+      "packetKey": "packet:225fa0b05a89",
+      "candidateOrdinal": 2,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733"
+    },
+    {
+      "graphOrdinal": 18,
+      "graphNodeKey": "packet:packet:64b8a0ed69b3",
+      "packetKey": "packet:64b8a0ed69b3",
+      "candidateOrdinal": 7,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9"
+    },
+    {
+      "graphOrdinal": 19,
+      "graphNodeKey": "packet:packet:6bd874a60226",
+      "packetKey": "packet:6bd874a60226",
+      "candidateOrdinal": 8,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56"
+    },
+    {
+      "graphOrdinal": 20,
+      "graphNodeKey": "packet:packet:8589ed47d789",
+      "packetKey": "packet:8589ed47d789",
+      "candidateOrdinal": 10,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+    },
+    {
+      "graphOrdinal": 21,
+      "graphNodeKey": "packet:packet:c6c4bb257069",
+      "packetKey": "packet:c6c4bb257069",
+      "candidateOrdinal": 12,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50"
+    },
+    {
+      "graphOrdinal": 22,
+      "graphNodeKey": "packet:packet:db66369e866a",
+      "packetKey": "packet:db66369e866a",
+      "candidateOrdinal": 14,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+    }
+  ],
+  "status": "GRAPH_CANDIDATE_ORDINAL_ROUNDTRIP_PROVEN_BOUNDED",
+  "graphFeatureGathering": "NOT_RUN",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphFeatures": false
+  },
+  "canonicalAuthority": false,
+  "nextGate": "BOUNDED_GRAPH_FEATURE_GATHER_AND_CANDIDATE_ORDINAL_READBACK"
+}

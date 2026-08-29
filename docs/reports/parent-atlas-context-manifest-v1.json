@@ -3,10 +3,10 @@
   "mode": "READ_ONLY_CONTEXT_MANIFEST_REPLAY",
   "status": "CONTEXT_MANIFEST_REPLAY_PROVEN",
   "manifestSchema": "atlas.context-manifest.v1",
-  "manifestChecksum": "10d279e68e17420a60fb0b2939b55ee776fd84feb15901dd965fef2f6591c59b",
+  "manifestChecksum": "df77188e8c37e5476c93ceb2fd02fb79e59cf4568bb5cb31ceef3a21ab7827ae",
   "replay": {
-    "firstChecksum": "10d279e68e17420a60fb0b2939b55ee776fd84feb15901dd965fef2f6591c59b",
-    "secondChecksum": "10d279e68e17420a60fb0b2939b55ee776fd84feb15901dd965fef2f6591c59b",
+    "firstChecksum": "df77188e8c37e5476c93ceb2fd02fb79e59cf4568bb5cb31ceef3a21ab7827ae",
+    "secondChecksum": "df77188e8c37e5476c93ceb2fd02fb79e59cf4568bb5cb31ceef3a21ab7827ae",
     "identical": true
   },
   "candidateMap": {
@@ -19,7 +19,7 @@
     "candidateCount": 15,
     "selectedCount": 15,
     "candidateBucket": 16,
-    "graphRevision": null
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab"
   },
   "controls": {
     "cacheMode": "BYPASS",
@@ -36,7 +36,8 @@
     "schema": "atlas.context-manifest.v1",
     "requestId": "request:1af9277c0f9d33a7f6bd37e72f6ee765f47ce6bc4c5173e8a8a1bd10b1cd11a9",
     "snapshotId": "snapshot:9225e2d7b6eca36906837a01ccc0ede5521dadf31b2f05aecbdd10cecb78360a",
-    "graphRevision": null,
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "graphFeaturesPresent": true,
     "query": "Parent Atlas semantic retrieval lineage canary",
     "candidateBucket": 16,
     "candidateCount": 15,

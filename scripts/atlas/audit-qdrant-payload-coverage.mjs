@@ -258,7 +258,9 @@ async function main() {
     console.log('Fetching Qdrant collection info...');
     const collInfo = await getCollectionInfo();
     console.log(`  Points: ${collInfo.points_count}`);
-    console.log(`  Vector dim: ${collInfo.config?.params?.vectors?.size}`);
+    const vectors = collInfo.config?.params?.vectors;
+    const vectorDim = vectors?.size ?? vectors?.content?.size ?? 'unknown';
+    console.log(`  Vector dim: ${vectorDim}`);
 
     console.log('\nAuditing Qdrant payloads...');
     const { stats: qdrantStats, collisions, collisionPoints } = await auditQdrantPayloads();

@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.graph-ordinal-cpu-gpu-parity-receipt.v1",
+  "status": "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN",
+  "graphRevision": "graph:ordinal-parity-fixture-v1",
+  "workspaceRevision": "workspace:ordinal-parity-fixture-v1",
+  "projectionRevision": "projection:ordinal-parity-fixture-v1",
+  "ordinalMapChecksum": "ad14f10fc175e7af182d142ed820d6c0c5964451c6db5c872dbabf83a997f1ef",
+  "nodeCount": 6,
+  "edgeCount": 6,
+  "renumbered": true,
+  "unknownOrdinals": 0,
+  "cpuBackend": "networkx",
+  "gpuBackend": "cugraph.pagerank",
+  "parameters": {
+    "alpha": 0.85,
+    "tol": 1e-06,
+    "maxIter": 100
+  },
+  "maxAbsScoreError": 7.194331917148578e-07,
+  "sameRankOrdering": true,
+  "cpuOrder": [
+    "packet:c",
+    "packet:f",
+    "packet:b",
+    "packet:e",
+    "packet:a",
+    "packet:d"
+  ],
+  "gpuOrder": [
+    "packet:c",
+    "packet:f",
+    "packet:b",
+    "packet:e",
+    "packet:a",
+    "packet:d"
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

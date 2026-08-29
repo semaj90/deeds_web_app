@@ -199,6 +199,60 @@ Structural results must resolve to `CandidateOrdinal` before fusion.
 - Tree-sitter/ast-grep observation adapters: present and separately tested.
 - Observation query adapter: `PROVEN_FIXTURE` (`STRUCT-10A`).
 - Live Tree-sitter/ast-grep parser-process executor: `OPEN` (`STRUCT-10B`).
+- Exact-only structural identity bridge: bounded live proof passed against the
+  15-row lineage-qualified map; one JavaScript source resolved exactly with
+  `candidateOrdinal=0` under checksum
+  `86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297`.
+  Full-corpus identity resolution remains open (`STRUCT-11`).
+- Structural lane-local result envelope: implemented and fixture-covered;
+  scores remain diagnostic-only and `fusionReady=false` (`STRUCT-12`).
+- SearchRuntime bridge: implemented as a DI adapter over the existing `ast`
+  logical lane; exact identities only, deterministic deduplication, and no
+  second fusion owner. Focused integration tests remain to be run (`STRUCT-13`).
+- Structural hit coordinates now carry nullable `astGraphRevision` and
+  `compilerSemanticGraphRevision`, plus `patternId`, `patternRevision`, and
+  `scoreClass`; missing graph coordinates remain non-promotable rather than
+  being substituted with a tree-node or relationship revision.
+- Feature-gated live provider now exists with an explicit `sourceRefs` allowlist,
+  current source loader, existing 8095 client, exact identity bridge, and
+  existing SearchRuntime `ast` lane projection. Default production composition
+  remains unchanged until a caller supplies a current candidate map (`STRUCT-13`).
+- `StructuralProviderV1` contract and `legacy | shadow | structural` mode
+  resolver are now defined with bounded budgets and a non-authoritative receipt;
+  default mode remains `legacy` until shadow parity is proven.
+- Shadow parity receipt is implemented: legacy remains the sole RRF contributor;
+  structural-only, legacy-only, overlap, stale, ambiguous, and unresolved counts
+  are recorded deterministically (`STRUCT-13D`).
+- `STRUCT-13E` coverage audit is implemented and read-only: the current 15-source
+  CandidateOrdinal cohort has 15 packet rows but 0 legacy `function_symbol` rows;
+  legacy structural coverage reconciliation is required before `STRUCT-14`.
+- Structural projection planning is now available as a read-only 15-source plan;
+  code-capable sources produced 16 observations, while 8 non-code/document sources
+  were explicitly reported as unsupported. No legacy packet rows were populated.
+- Added an additive idempotency contract for future structural projection rows:
+  nullable `projection_key` plus a partial unique index. The migration is not applied;
+  existing structural facts remain untouched until the normal migration process runs.
+- Added and tested `GraphNodeKeyV1`: canonical symbol/packet/chunk identities are
+  preferred, exact source occurrences are projection-only fallbacks, and `treeNodeId`
+  is not an identity source.
+- Added a thin graph algorithm registry that delegates PageRank, Katz, K-truss,
+  cuVS, cuML, and related execution to library backends; Atlas retains policy,
+  identity, revisions, and receipts rather than reimplementing algorithms.
+- Added revision-qualified `GraphAlgorithmExecutionReceiptV1` binding the selected
+  policy decision to graph/workspace/ordinal checksums and library revision; focused
+  receipt tests pass and the receipt remains non-executing/non-authoritative.
+- Graph expansion now attaches that receipt when callers provide complete graph,
+  workspace, ordinal-map, and library revision coordinates; incomplete requests
+  remain backward-compatible but produce no falsely qualified receipt.
+- Added `GraphOrdinalMapV1` with deterministic graph-node sorting, dense executor
+  ordinals, revision binding, checksum, duplicate rejection, and reverse lookup;
+  it remains distinct from CandidateOrdinal and upstream/tree node IDs.
+- Added `GraphOrdinalEdgeCompilerV1` so NetworkX/cuGraph can consume the same
+  identity-keyed topology; unknown nodes, disallowed self-loops, and invalid
+  weights fail closed. Focused ordinal/edge tests pass.
+- Added `GraphOrdinalParityInputV1` to package one revision-bound ordinal map and
+  compiled edge list for independent CPU/GPU execution; focused parity-input tests
+  pass and the artifact remains non-authoritative/non-persistent.
 - Live `:8095 /ast/chunk` -> observation-query proof runner: available;
   execute `scripts/atlas/prove-structural-query-live-v1.mjs` to establish the
   live receipt. This remains non-authoritative until `STRUCT-11` identity

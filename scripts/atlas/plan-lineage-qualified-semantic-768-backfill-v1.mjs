@@ -108,7 +108,7 @@ async function main() {
     const missingColumns = required.filter((name) => !names.has(name));
     if (missingColumns.length) throw new Error(`SEMANTIC_PLAN_REQUIRED_COLUMNS_MISSING:${missingColumns.join(',')}`);
     const optional = ['id', 'relative_path', 'symbol', 'kind', 'summary', 'content', 'ast_symbols', 'content_hash', 'packet_key', 'source_revision', 'workspace_revision', 'representation_id', 'representation_revision'];
-    const selected = ['source_ref', ...optional.filter((name) => names.has(name))];
+    const selected = ['source_ref', 'content_embedding_768', ...optional.filter((name) => names.has(name))];
     const resultRows = [];
     for (const candidate of candidates) {
       const sourceRef = clean(candidate.sourceRef);

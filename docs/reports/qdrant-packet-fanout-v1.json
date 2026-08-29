@@ -1,41 +1,41 @@
 {
   "schema": "atlas.qdrant-packet-fanout-v1",
-  "startedAt": "2026-08-28T18:29:07.709Z",
-  "completedAt": "2026-08-28T18:29:11.981Z",
+  "startedAt": "2026-08-29T01:40:11.639Z",
+  "completedAt": "2026-08-29T01:40:11.675Z",
   "readOnly": true,
   "qdrantWrites": false,
   "postgresWrites": false,
   "payloadIndexWrites": false,
   "collection": "codebase_chunks_768",
   "qdrantUrl": "http://127.0.0.1:6333",
-  "limit": null,
-  "totalPoints": 109129,
-  "uniquePacketKeys": 9317,
-  "singlePointPacketKeys": 4966,
-  "multiPointPacketKeys": 4351,
-  "pointsInFanoutGroups": 104163,
-  "fanoutP50": 1,
-  "fanoutP95": 50,
-  "fanoutP99": 100,
-  "maxFanout": 755,
-  "pointsWithChunkId": 24062,
+  "limit": 15,
+  "totalPoints": 15,
+  "uniquePacketKeys": 4,
+  "singlePointPacketKeys": 1,
+  "multiPointPacketKeys": 3,
+  "pointsInFanoutGroups": 14,
+  "fanoutP50": 3,
+  "fanoutP95": 8,
+  "fanoutP99": 8,
+  "maxFanout": 8,
+  "pointsWithChunkId": 15,
   "pointsWithChunkOrdinal": 0,
-  "pointsWithContentHash": 106329,
-  "pointsWithSourceRevision": 15,
-  "pointsWithWorkspaceRevision": 15,
-  "pointsWithRepresentationRevision": 15,
+  "pointsWithContentHash": 15,
+  "pointsWithSourceRevision": 0,
+  "pointsWithWorkspaceRevision": 0,
+  "pointsWithRepresentationRevision": 0,
   "classificationCounts": {
     "VALID_REVISIONED_CHUNK_FANOUT": 0,
     "STALE_REVISION_FANOUT": 0,
     "MULTI_REPRESENTATION_FANOUT": 0,
-    "EXACT_DUPLICATE_PROJECTION": 2630,
-    "CONFLICTING_SOURCE": 1616,
-    "CHUNK_IDENTITY_MISSING": 2,
-    "REVISION_UNPROVEN": 5069,
+    "EXACT_DUPLICATE_PROJECTION": 0,
+    "CONFLICTING_SOURCE": 3,
+    "CHUNK_IDENTITY_MISSING": 0,
+    "REVISION_UNPROVEN": 1,
     "UNRESOLVED": 0
   },
-  "samePacketDifferentSourceRefConflicts": 1616,
-  "exactDuplicateProjectionGroups": 2630,
+  "samePacketDifferentSourceRefConflicts": 3,
+  "exactDuplicateProjectionGroups": 0,
   "promotionEligible": false,
   "sampleGroups": [
     {
@@ -50,7 +50,7 @@
     },
     {
       "packetKey": "ace:packet:3362030dfe23",
-      "pointCount": 21,
+      "pointCount": 3,
       "classification": "CONFLICTING_SOURCE",
       "sourceRefs": [
         "sveltekit-frontend/src/AGENTS.md",
@@ -61,7 +61,7 @@
     },
     {
       "packetKey": "ace:packet:b5aa13ce0a61",
-      "pointCount": 131,
+      "pointCount": 8,
       "classification": "CONFLICTING_SOURCE",
       "sourceRefs": [
         "sveltekit-frontend/src/hooks.server.ts",
@@ -72,242 +72,11 @@
     },
     {
       "packetKey": "ace:packet:83dc9fe1e87d",
-      "pointCount": 26,
+      "pointCount": 3,
       "classification": "CONFLICTING_SOURCE",
       "sourceRefs": [
         "sveltekit-frontend/src/lib/AGENTS.md",
         "src/lib/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:c113744e3e98",
-      "pointCount": 32,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/ai/AGENTS.md",
-        "src/lib/ai/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:73c63464e142",
-      "pointCount": 27,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/ai/e2b/AGENTS.md",
-        "src/lib/ai/e2b/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:b5295274e2b7",
-      "pointCount": 24,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/ai/onnx/AGENTS.md",
-        "src/lib/ai/onnx/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:756ddd25ac36",
-      "pointCount": 30,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/cache/AGENTS.md",
-        "src/lib/cache/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:6061bede0c9f",
-      "pointCount": 20,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/client/AGENTS.md",
-        "src/lib/client/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:4758b464fae1",
-      "pointCount": 18,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/client/ui/AGENTS.md",
-        "src/lib/client/ui/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:07a4d0a9076c",
-      "pointCount": 30,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
-        "src/lib/client/workflow-event-stream.ts"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:68433a7251c9",
-      "pointCount": 23,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
-        "src/lib/components/admin/AdminChatAssistant.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:d330df2e0574",
-      "pointCount": 32,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/AGENTS.md",
-        "src/lib/components/admin/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:c32688640945",
-      "pointCount": 26,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
-        "src/lib/components/admin/AiAnalysisPopup.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:41a50d8e7a45",
-      "pointCount": 65,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
-        "src/lib/components/admin/ContextualAssistantModal.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:cd2e638718bb",
-      "pointCount": 11,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/SummarizeButton.svelte",
-        "src/lib/components/admin/SummarizeButton.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:67d57bb1048d",
-      "pointCount": 80,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/admin/TraceCopilotPanel.svelte",
-        "src/lib/components/admin/TraceCopilotPanel.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:b54a07a56c35",
-      "pointCount": 30,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/agentic/AGENTS.md",
-        "src/lib/components/agentic/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:14711014c320",
-      "pointCount": 37,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/AGENTS.md",
-        "src/lib/components/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:87d1791c0efb",
-      "pointCount": 34,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/ai/AGENTS.md",
-        "src/lib/components/ai/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:75f21675a0bf",
-      "pointCount": 116,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/ai/Gemma270MWebAssembly.svelte",
-        "src/lib/components/ai/Gemma270MWebAssembly.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:8af6302dfbf2",
-      "pointCount": 50,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/ai/ThinkingStyleToggle.svelte",
-        "src/lib/components/ai/ThinkingStyleToggle.svelte"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:0236cbc259b8",
-      "pointCount": 27,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/analysis/AGENTS.md",
-        "src/lib/components/analysis/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:b7dd5be81b07",
-      "pointCount": 24,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/analytics/AGENTS.md",
-        "src/lib/components/analytics/AGENTS.md"
-      ],
-      "sourceRevisions": [],
-      "representationRevisions": []
-    },
-    {
-      "packetKey": "ace:packet:e61dc6df2c50",
-      "pointCount": 27,
-      "classification": "CONFLICTING_SOURCE",
-      "sourceRefs": [
-        "sveltekit-frontend/src/lib/components/cache/AGENTS.md",
-        "src/lib/components/cache/AGENTS.md"
       ],
       "sourceRevisions": [],
       "representationRevisions": []

@@ -5,6 +5,7 @@ import {
 	type GraphAlgorithmDecisionV1,
 	type GraphExpansionIntent
 } from './graph-algorithm-policy.js';
+import { buildGraphAlgorithmExecutionReceiptV1, type GraphAlgorithmExecutionReceiptV1 } from './graph-algorithm-receipt-v1.js';
 
 export interface AtlasGraphExpandRequest {
 	packetKey: string;
@@ -20,6 +21,11 @@ export interface AtlasGraphExpandRequest {
 	gpuAvailable?: boolean;
 	frozenSnapshotAvailable?: boolean;
 	resourceEnvelope?: Partial<ResourceEnvelopeV1>;
+	graphRevision?: string;
+	workspaceRevision?: string;
+	graphOrdinalMapChecksum?: string;
+	candidateOrdinalMapChecksum?: string | null;
+	algorithmLibraryRevision?: string;
 }
 
 export interface AtlasGraphNode {
@@ -43,6 +49,7 @@ export interface AtlasGraphExpandResult {
 	decision: GraphAlgorithmDecisionV1;
 	truncated: boolean;
 	reasonCodes: string[];
+	executionReceipt?: GraphAlgorithmExecutionReceiptV1;
 }
 
 const DEFAULT_MAX_NODES = 64;
@@ -75,6 +82,19 @@ function neo4jBfsPattern(direction: 'out' | 'in' | 'both', maxHops: number): str
 	return `(source)-[rels*1..${maxHops}]-(n)`;
 }
 
+function receiptFor(input: AtlasGraphExpandRequest, decision: GraphAlgorithmDecisionV1): GraphAlgorithmExecutionReceiptV1 | undefined {
+	if (!input.graphRevision || !input.workspaceRevision || !input.graphOrdinalMapChecksum || !input.algorithmLibraryRevision) return undefined;
+	return buildGraphAlgorithmExecutionReceiptV1({
+		decision,
+		graphRevision: input.graphRevision,
+		workspaceRevision: input.workspaceRevision,
+		graphOrdinalMapChecksum: input.graphOrdinalMapChecksum,
+		candidateOrdinalMapChecksum: input.candidateOrdinalMapChecksum,
+		algorithmLibraryRevision: input.algorithmLibraryRevision,
+		parameters: { direction: input.direction ?? 'both', maxHops: input.maxHops, maxNodes: input.maxNodes ?? DEFAULT_MAX_NODES },
+	});
+}
+
 /**
  * Bounded live-graph executor used by atlas.graph.expand.
  *
@@ -100,8 +120,9 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 		hasTarget: Boolean(input.targetPacketKey),
 		gpuAvailable: input.gpuAvailable,
 		frozenSnapshotAvailable: input.frozenSnapshotAvailable,
-		envelope: { ...envelope, maxGraphHops: maxHops, maxCandidates: maxNodes }
+		 envelope: { ...envelope, maxGraphHops: maxHops, maxCandidates: maxNodes }
 	});
+	const executionReceipt = receiptFor(input, decision);
 
 	if (maxHops === 0) {
 		return {
@@ -110,6 +131,7 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			hops: 0,
 			status: 'BOUNDARY_EXHAUSTED',
 			decision,
+			executionReceipt,
 			truncated: true,
 			reasonCodes: [...decision.reasonCodes, 'ZERO_HOP_ENVELOPE']
 		};
@@ -122,6 +144,7 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			hops: 0,
 			status: 'ALGORITHM_UNAVAILABLE',
 			decision,
+			executionReceipt,
 			truncated: false,
 			reasonCodes: [...decision.reasonCodes, `EXECUTOR_NOT_WIRED:${decision.backend}:${decision.algorithm}`]
 		};
@@ -194,6 +217,7 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			hops: observedHops,
 			status: truncated ? 'BOUNDARY_EXHAUSTED' : 'PROVEN',
 			decision,
+			executionReceipt,
 			truncated,
 			reasonCodes: [...decision.reasonCodes, truncated ? 'RESOURCE_BOUNDARY_REACHED' : 'BOUNDED_NEO4J_EXPANSION']
 		};

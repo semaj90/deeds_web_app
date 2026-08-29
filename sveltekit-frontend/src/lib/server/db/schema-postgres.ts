@@ -4921,6 +4921,7 @@ export const featureStructuralFacts = pgTable('feature_structural_facts', {
   calls: text('calls').array().notNull().default(sql`'{}'::text[]`),
   exports: text('exports').array().notNull().default(sql`'{}'::text[]`),
   contentHash: text('content_hash').notNull(),
+  projectionKey: text('projection_key'),
   parserVersion: text('parser_version').notNull(),
   processingPassId: uuid('processing_pass_id'),
   metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
