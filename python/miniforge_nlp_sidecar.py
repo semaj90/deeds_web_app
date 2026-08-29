@@ -328,6 +328,12 @@ class AstUnit(BaseModel):
     source_revision: str
     tree_node_id: str
     symbol_version_id: Optional[str] = None
+    # tree_node_id/symbol_version_id are sidecar-local digests (digest(source_ref, symbol,
+    # start, end, idx) / digest(source_ref, symbol, structural_revision)) — proposal
+    # coordinates, never authoritative Atlas identity. Consumers must not write these into
+    # atlas_symbol_versions, CandidateOrdinal, GraphNodeKey, or structural edges without an
+    # independent reviewed resolution. Literal[False] so this can never be silently flipped.
+    canonical_authority: Literal[False] = False
     language: str
     node_kind: str
     qualified_symbol: Optional[str] = None
@@ -357,6 +363,8 @@ class SemanticCodeCard(BaseModel):
     source_revision: str
     tree_node_id: str
     symbol_version_id: Optional[str] = None
+    # Same non-canonical boundary as AstUnit — see its comment above.
+    canonical_authority: Literal[False] = False
     language: str
     symbol: str
     kind: str
