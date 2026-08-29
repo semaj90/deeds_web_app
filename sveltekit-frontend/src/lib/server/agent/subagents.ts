@@ -16,6 +16,7 @@ import { ChatOllama } from '@langchain/ollama';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
   SPECIALIST_AGENT_NAMES,
   SPECIALIST_AGENT_PROFILES,
@@ -161,7 +162,7 @@ export function createSubagent(
 
 	const llm = new ChatOllama({
 		baseUrl: ENV.OLLAMA_BASE_URL,
-		model: 'gemma4-rotorquant:latest',
+		model: LLM_MODEL_ID,
 		temperature: options.temperature ?? 0.3,
 	});
 

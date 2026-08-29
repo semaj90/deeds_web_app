@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.live-structural-target-identity-proof.v1",
+  "status": "GRAPH_RESOLVE_06B_BLOCKED_NO_CURRENT_SYMBOL_OWNER_BINDING",
+  "mode": "READ_ONLY_LIVE_PROOF",
+  "inputObservationCount": 210,
+  "lspResolvedRepositoryCount": 148,
+  "lspUnresolvedCount": 52,
+  "outsideWorkspaceCount": 10,
+  "identityEnrichmentAttempted": 0,
+  "targetSourceRevisionPresent": 0,
+  "stableSymbolIdPresent": 0,
+  "symbolVersionIdPresent": 0,
+  "exactTreeNodeMatches": 0,
+  "exactSymbolRangeMatches": 0,
+  "exactContainingSymbolMatches": 0,
+  "identityNotFound": 0,
+  "identityAmbiguous": 0,
+  "sourceRevisionMissing": 111,
+  "revisionMismatch": 0,
+  "authorityCensus": {
+    "currentGraphifySources": 111,
+    "currentSourcesWithExactSymbolVersionBinding": 0,
+    "currentSymbolVersionRows": 0,
+    "totalSymbolVersionRows": 200,
+    "revisionBoundSymbolVersionRows": 200,
+    "joinKey": ["source_ref", "source_revision"],
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+  },
+  "admissionEligibleCount": 0,
+  "admittedEdgeCount": 0,
+  "canonicalAuthority": false,
+  "writes": { "postgres": false, "qdrant": false, "neo4j": false, "valkey": false, "edges": false },
+  "blockers": [
+    "CURRENT_GRAPHIFY_SOURCE_SYMBOL_VERSION_JOIN_EMPTY",
+    "DO_NOT_CREATE_SYNTHETIC_SYMBOL_VERSIONS",
+    "DO_NOT_USE_FUZZY_SOURCE_ALIASES",
+    "DO_NOT_ADMIT_STRUCTURAL_EDGES"
+  ],
+  "nextGate": "PROVE_OR_AUTHORIZE_CURRENT_SYMBOL_VERSION_MATERIALIZER_THEN_REPLAY_GRAPH_RESOLVE_06B",
+  "generatedAt": "2026-08-29"
+}

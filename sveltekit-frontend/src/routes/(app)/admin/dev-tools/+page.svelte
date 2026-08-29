@@ -843,7 +843,7 @@
 					<p>L2: Memory Cache (server, 5min TTL)</p>
 					<p>L3: Redis (server, configurable TTL)</p>
 					<p>L4: embeddinggemma:latest → 768d via gRPC/HTTP</p>
-					<p class="mt-2 text-black/40">Fallback: nomic-embed-text (384d)</p>
+					<p class="mt-2 text-black/40">Fallback: EmbeddingGemma MRL-512 evaluation lane</p>
 					<p class="text-black/40">Vector stores: pgvector + Qdrant ANN</p>
 				</div>
 			</div>
@@ -922,7 +922,7 @@
 					<p>KAG: Schema validation + W3C spec checks</p>
 					<p>DAG: Cluster dependency ordering + fix priority</p>
 					<p class="mt-2 text-black/40">Storage: pgvector (768-dim text) + Qdrant (Cosine ANN)</p>
-					<p class="text-black/40">Embedding: embeddinggemma:latest → nomic-embed-text fallback</p>
+					<p class="text-black/40">Embedding: embeddinggemma:latest → EmbeddingGemma MRL evaluation</p>
 					<p class="text-black/40">Search: /api/glossary/search, /api/statutes/search, /api/precedents/search</p>
 				</div>
 			</div>

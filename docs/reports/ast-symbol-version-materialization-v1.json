@@ -1,75 +1,14 @@
 {
   "schema": "atlas.ast-symbol-version-materialization.v1",
   "mode": "DRY_RUN",
-  "inputNominations": 42398,
-  "canonicalDeclarationCandidates": 10170,
-  "excludedVariables": 32228,
-  "limit": 20,
+  "inputNominations": 440,
+  "canonicalDeclarationCandidates": 0,
+  "excludedVariables": 0,
+  "limit": 10,
   "rowsAttempted": 0,
   "rowsInserted": 0,
   "rowsAlreadyPresent": 0,
   "projectionRowsUpserted": 0,
   "databaseWrites": false,
-  "sample": [
-    {
-      "nominationId": "ast-grep-nomination:05692e88296afd1acbf3688a815114d37d916906",
-      "kind": "function",
-      "qualifiedName": "main",
-      "sourceRef": "packages/atlas-core/src/cli.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:66650d5e5cbb1defcb00b02e5f6f751b657d1c88",
-      "kind": "type",
-      "qualifiedName": "ErrorFixingStateType",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:fb507112af415c145c5995fb4fed2006232b7ba3",
-      "kind": "interface",
-      "qualifiedName": "KanbanErrorFixingTask",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:1f0cffb7592b00798934f4f51f73bfd1c2eecfb9",
-      "kind": "interface",
-      "qualifiedName": "ErrorFixSuggestion",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:63d943bb2aa81d5f88adb09f0589aa38e8ddef12",
-      "kind": "function",
-      "qualifiedName": "loadErrorFixingPackets",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:567890e4be5678175e9abd03a071fce670259af3",
-      "kind": "function",
-      "qualifiedName": "classifyErrorFixingTasks",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:9217115312d83cc8c73d2154326374755d99831b",
-      "kind": "function",
-      "qualifiedName": "createKanbanTasks",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:c3aeff25e283562e093349b797696a5e84641011",
-      "kind": "function",
-      "qualifiedName": "scoreWithPolicyModel",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:eeb056e45dfc08a1396ae8964c551a19b357e22f",
-      "kind": "function",
-      "qualifiedName": "synthesizeErrorFixes",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    },
-    {
-      "nominationId": "ast-grep-nomination:dc1612ece6cbc5173a1d56e35517d72275fabd1b",
-      "kind": "function",
-      "qualifiedName": "updateKanbanStatus",
-      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
-    }
-  ]
+  "sample": []
 }

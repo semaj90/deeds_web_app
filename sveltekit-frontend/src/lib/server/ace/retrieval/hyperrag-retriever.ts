@@ -14,6 +14,7 @@ import type { AceEvidence } from '../contracts/ace-context-packet.js';
 import { LlamaTokenizerClient } from '../tokenizer/llama-tokenizer-client.js';
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 export interface HyperRagRetrieverConfig {
   workspaceRevision: string;
   specificationRevision: string;
@@ -42,7 +43,7 @@ export class HyperRagRetriever {
     this.cache = new RevisionAwareCache();
     this.tokenizer = new LlamaTokenizerClient({
       baseUrl: ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090',
-      model: 'gemma4-legal-iq4xs-direct.gguf'
+      model: LLM_MODEL_ID
     });
 
     this.redisExact = new RedisExactLane();

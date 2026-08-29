@@ -182,7 +182,7 @@ export const VECTOR_LANES = {
     status: 'REFERENCE_ONLY',
     sourceDimension: 768,
     projectionMethod: 'legacy_external_model',
-    projectionVersion: 'legacy-minilm-384-v1',
+    projectionVersion: 'legacy-embedding-384-v1',
     normalization: 'L2',
     collections: ['codebase_chunks_384_hybrid', 'codebase_chunks_384'],
     evidenceAuthority: false,

@@ -1,5 +1,5 @@
 /**
- * MARCO MiniLM Cross-Encoder Reranker
+ * Configured Cross-Encoder Reranker
  * 
  * Provides pointwise scoring for retrieval candidates using 
  * the Mixedbread reranker backend.

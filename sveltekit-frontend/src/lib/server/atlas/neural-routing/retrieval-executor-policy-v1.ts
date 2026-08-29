@@ -104,6 +104,7 @@ export function compileRetrievalPlanV1(
   const graphExecutors: RetrievalExecutorIdV1[] = [];
   const rerankExecutors: RetrievalExecutorIdV1[] = [];
   const decisions: string[] = [];
+  const effectiveCandidateBudget = Math.min(classification.budget.candidateBudget, envelope.maxCandidates);
 
   if (classification.retrievalNeeds.lexicalExact >= 0.35 || classification.retrievalNeeds.exactSymbol >= 0.35) {
     pushIfAvailable(lexicalExecutors, 'postgres_fts', available);
@@ -125,11 +126,11 @@ export function compileRetrievalPlanV1(
     pushIfAvailable(semanticExecutors, 'qdrant_hnsw_768', available);
 
     if (envelope.gpuAvailable && envelope.allowGpuAnn) {
-      if (classification.budget.candidateBudget >= 512) pushIfAvailable(semanticExecutors, 'cuvs_cagra_768', available);
+      if (effectiveCandidateBudget >= 512) pushIfAvailable(semanticExecutors, 'cuvs_cagra_768', available);
       pushIfAvailable(semanticExecutors, 'cuvs_bruteforce_768', available);
     }
 
-    if (envelope.allowDiskAnn && classification.budget.candidateBudget >= 1024) {
+    if (envelope.allowDiskAnn && effectiveCandidateBudget >= 1024) {
       pushIfAvailable(semanticExecutors, 'diskann_vamana_768', available);
     }
 

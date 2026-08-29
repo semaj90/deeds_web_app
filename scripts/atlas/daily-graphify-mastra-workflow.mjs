@@ -2,7 +2,12 @@
 /**
  * scripts/atlas/daily-graphify-mastra-workflow.mjs
  *
- * Mastra-based durable orchestrator for Daily Graphify pipeline.
+ * Legacy Mastra-labelled workflow shell for the Daily Graphify pipeline.
+ *
+ * This file does not import or execute Mastra. It is retained as a
+ * compatibility/legacy workflow surface until an explicit executor adapter
+ * and parity receipt are proven. Its PostgreSQL writes are workflow-log
+ * writes, not canonical Graphify-run completion or graph-snapshot authority.
  *
  * Wraps existing npm graphify:daily stages with:
  *   - Durable state persistence (workflow execution checkpoints)
@@ -14,7 +19,7 @@
  *   - Atlas packet identity audit trail (error_id → packet_key → immutable log)
  *
  * Architecture:
- *   - Mastra workflow with persistent state in PostgreSQL + Redis
+ *   - legacy workflow state persisted in PostgreSQL + Redis when enabled
  *   - Phases: A (Collection) → B (Analyze) → C (Plan) → D (Execute) → E (Test) → F (Re-evaluate) → G (Promote)
  *   - Gate decisions at F trigger promote (G) or rollback + replan
  *   - Non-blocking event emission (RabbitMQ / Redis pubsub)

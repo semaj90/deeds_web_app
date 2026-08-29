@@ -21,6 +21,7 @@ import { ChatOllama } from '@langchain/ollama';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { buildLangGraphConfig, getLangGraphCheckpointer } from '$lib/server/langgraph/checkpointer.js';
 import { recordOutcome } from '$lib/server/telemetry/tool-call-recorder.js';
 import {
@@ -99,7 +100,7 @@ export class SupervisorAgent {
 
 		this.routerLlm = new ChatOllama({
 			baseUrl: ENV.OLLAMA_BASE_URL,
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			temperature: 0, // deterministic routing
 		});
 

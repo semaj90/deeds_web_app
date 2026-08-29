@@ -47,7 +47,7 @@ export const load: PageServerLoad = async () => {
 				{ layer: 'L4', name: 'Postgres pgvector', ttl: 'persistent', scope: 'server' }
 			],
 			features: [
-				'✅ Client ONNX: EmbeddingGemma 300M (384-dim, 291 MB)',
+				'✅ Client ONNX: EmbeddingGemma 300M (768-dim, 291 MB)',
 				'✅ Client ONNX: Gemma4 E2B (120-255 tok/s, 1.5 GB)',
 				'✅ Server: Gemma4 9B via TurboQuant llama-server (:8090)',
 				'✅ WebGPU GPU acceleration (client, if available)',

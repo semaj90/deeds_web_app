@@ -10,10 +10,9 @@
  *   ROTORQUANT_MODEL_PATH   canonical
  *   TURBO_MODEL_PATH        deprecated compatibility alias (kept until callers migrate)
  *
- * LLM_MODEL_ID is derived automatically from the resolved path's filename —
- * do NOT introduce a second "chat model" env var. If ROTORQUANT_MODEL_PATH
- * points at gemma4-legal-iq4xs-direct.gguf, LLM_MODEL_ID is
- * gemma4-legal-iq4xs-direct.gguf, full stop.
+ * LLM_MODEL_ID uses the explicit llama-server alias when configured, then
+ * falls back to the resolved model filename for older launchers. The alias
+ * is still verified against GET /v1/models at runtime.
  */
 import path from 'node:path';
 import { ENV } from '$lib/server/env.server.js';
@@ -29,8 +28,8 @@ const resolvedModelPath = ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? n
 if (!resolvedModelPath) {
   throw new Error(
     '[llm-runtime-contract] ROTORQUANT_MODEL_PATH is required (deprecated alias: TURBO_MODEL_PATH). ' +
-      'Set it to the absolute path of the GGUF llama-server.exe is launched with — the app derives ' +
-      'the chat model id from this path; it does not discover it from GET /v1/models.'
+      'Set it to the absolute path of the GGUF llama-server.exe is launched with; ' +
+      'the chat alias may be supplied separately by LLAMA_SERVER_MODEL and is verified against GET /v1/models.'
   );
 }
 
@@ -42,9 +41,10 @@ export const TURBO_MMPROJ_PATH = ENV.TURBO_MMPROJ_PATH ?? null;
 
 /**
  * The only chat model identifier the app should send in `{ model: ... }`.
- * Derived from ROTORQUANT_MODEL_PATH's filename — never set independently.
+ * Prefer the launcher/API alias so requests address the loaded model rather
+ * than an internal GGUF filename.
  */
-export const LLM_MODEL_ID = path.basename(resolvedModelPath);
+export const LLM_MODEL_ID = ENV.LLAMA_SERVER_MODEL ?? path.basename(resolvedModelPath);
 
 export const OLLAMA_EMBED_BASE_URL =
   ENV.OLLAMA_EMBED_BASE_URL ?? ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';

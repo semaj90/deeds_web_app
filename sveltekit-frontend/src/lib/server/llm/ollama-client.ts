@@ -300,7 +300,7 @@ export function getModelConfig() {
 	return {
 		url: DEFAULT_URL,
 		chatModel: DEFAULT_MODEL,
-		embedModel: process.env.OLLAMA_MODEL_EMBED ?? 'nomic-embed-text',
+		embedModel: process.env.OLLAMA_MODEL_EMBED ?? 'embeddinggemma:latest',
 		bifrostEnabled: ENV.BIFROST_ENABLED,
 		bifrostUrl: ENV.BIFROST_URL,
 	};

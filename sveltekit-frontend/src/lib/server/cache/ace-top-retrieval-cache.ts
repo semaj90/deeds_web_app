@@ -23,8 +23,13 @@ export type AceTopRetrievalCacheEntry = {
   source?: 'redis' | 'snapshot' | 'miss';
 };
 
-export function buildAceTopRetrievalCacheKey(queryHash: string, topN = 20): string {
-  return `ace:retrieval:topn:${queryHash}:${topN}`;
+// Cache entries are index-derived, not eternal facts — 5 min matches the sibling
+// topo-candidate-cache.ts TTL (short enough to stay warm, long enough to be useful).
+const TOP_RETRIEVAL_TTL_SECONDS = 300;
+
+export function buildAceTopRetrievalCacheKey(queryHash: string, topN = 20, workspaceRevision?: number): string {
+  const revisionSuffix = workspaceRevision !== undefined ? `:rev${workspaceRevision}` : '';
+  return `ace:retrieval:topn:${queryHash}:${topN}${revisionSuffix}`;
 }
 
 export function buildAceTopRetrievalQueryHash(query: string): string {
@@ -82,7 +87,7 @@ export async function setAceTopRetrievalPointer(entry: AceTopRetrievalCacheEntry
   try {
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
-    await redis.set(entry.cacheKey, JSON.stringify(entry));
+    await redis.setex(entry.cacheKey, TOP_RETRIEVAL_TTL_SECONDS, JSON.stringify(entry));
   } catch {
     // ignore
   }

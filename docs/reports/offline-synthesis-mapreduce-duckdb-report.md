@@ -1,6 +1,6 @@
 # Offline Synthesis MapReduce DuckDB
 
-Generated: 2026-06-19T05:34:15.563Z
+Generated: 2026-08-29T18:15:25.190Z
 Mode: WRITE
 
 ## Summary

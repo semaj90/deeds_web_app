@@ -5689,9 +5689,15 @@ than assuming.
   `36` declared sidecars, leaving many manual SQL files untracked by the
   sidecar manifest. This is migration governance drift, not permission to
   replay every manual file.
-- [ ] Reconcile the feature-row migration owner and explicitly register or
+- [x] Reconcile the feature-row migration owner and explicitly register or
   retire each required manual sidecar through the project migration policy.
-  Preserve existing rows; use additive, idempotent migrations only.
+  Preserve existing rows; use additive, idempotent migrations only. **Proven
+  read-only 2026-08-29** by `docs/reports/atlas-migration-owner-audit-v1.json`:
+  `20260819_atlas_observation_feature_rows.sql` is the registered/applied
+  packet-key + feature-revision owner aligned with Drizzle and its consumers;
+  `20260819_atlas_observation_feature_rows_v1.sql` is registered as
+  `superseded_unapplied` and remains a table-name collision only. No migration
+  was applied and no existing rows were modified.
 - [x] Added the focused read-only owner audit at
   `docs/reports/atlas-migration-owner-audit-v1.json`. It confirms the active
   ORF migration is now registered, callable search and symbol registry are

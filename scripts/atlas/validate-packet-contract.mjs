@@ -58,9 +58,9 @@ async function main() {
     const { rows: [counts] } = await pool.query(`
       SELECT
         COUNT(*)                                           AS total,
-        COUNT(packet_key)                                  AS has_packet_key,
-        COUNT(source_ref)                                  AS has_source_ref,
-        COUNT(feature_id)                                  AS has_feature_id,
+        COUNT(NULLIF(BTRIM(packet_key), ''))               AS has_packet_key,
+        COUNT(NULLIF(BTRIM(source_ref), ''))               AS has_source_ref,
+        COUNT(NULLIF(BTRIM(feature_id), ''))               AS has_feature_id,
         COUNT(community_id)                                AS has_community_id,
         COUNT(community_source)                            AS has_community_source,
         COUNT(community_confidence)                        AS has_community_confidence,
@@ -68,9 +68,9 @@ async function main() {
         COUNT(summary)                                     AS has_summary,
         COUNT(payload->>'path')                            AS has_payload_path,
         COUNT(payload->>'bm25_text')                       AS has_payload_bm25_text,
-        COUNT(CASE WHEN packet_key  IS NULL THEN 1 END)    AS missing_packet_key,
-        COUNT(CASE WHEN source_ref  IS NULL THEN 1 END)    AS missing_source_ref,
-        COUNT(CASE WHEN feature_id  IS NULL THEN 1 END)    AS missing_feature_id,
+        COUNT(CASE WHEN NULLIF(BTRIM(packet_key), '') IS NULL THEN 1 END) AS missing_packet_key,
+        COUNT(CASE WHEN NULLIF(BTRIM(source_ref), '') IS NULL THEN 1 END) AS missing_source_ref,
+        COUNT(CASE WHEN NULLIF(BTRIM(feature_id), '') IS NULL THEN 1 END) AS missing_feature_id,
         COUNT(CASE WHEN community_id IS NULL THEN 1 END)   AS missing_community_id,
         COUNT(CASE WHEN permissions IS NOT NULL AND permissions != '{}'::jsonb THEN 1 END) AS has_permissions,
         COUNT(CASE WHEN metadata IS NOT NULL AND metadata != '{}'::jsonb THEN 1 END) AS has_metadata,
@@ -83,7 +83,8 @@ async function main() {
     const { rows: [addr] } = await pool.query(`
       SELECT COUNT(*) AS addressable
       FROM atlas_packets
-      WHERE packet_key IS NOT NULL AND source_ref IS NOT NULL AND source_ref != ''
+      WHERE NULLIF(BTRIM(packet_key), '') IS NOT NULL
+        AND NULLIF(BTRIM(source_ref), '') IS NOT NULL
     `);
 
     // ── 3. Metadata field coverage (inside payload JSONB) ────────────────────
@@ -142,7 +143,9 @@ async function main() {
       const { rows } = await pool.query(`
         SELECT packet_id, packet_key, source_ref, feature_id
         FROM atlas_packets
-        WHERE packet_key IS NULL OR source_ref IS NULL OR feature_id IS NULL
+        WHERE NULLIF(BTRIM(packet_key), '') IS NULL
+           OR NULLIF(BTRIM(source_ref), '') IS NULL
+           OR NULLIF(BTRIM(feature_id), '') IS NULL
         LIMIT 10
       `);
       invalidSamples = rows;

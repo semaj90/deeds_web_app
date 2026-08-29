@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.ornith-agentic-memory-boundary.v1",
+  "date": "2026-08-29",
+  "status": "ARCHITECTURE_ALIGNED",
+  "liveModel": {
+    "endpoint": "http://127.0.0.1:8090/v1",
+    "resolvedModel": "ornith-1.5-9b",
+    "role": "synthesis_and_tool_use"
+  },
+  "canonicalEmbedding": {
+    "model": "EmbeddingGemma",
+    "representation": "semantic_768",
+    "dimensions": 768,
+    "owner": "PostgreSQL"
+  },
+  "futureBoundaries": {
+    "legalAdapter": "revisioned_proposal_only",
+    "qloraMerge": "evaluation_and_promotion_required",
+    "bitfrostAce": "bounded_revision_keyed_context_and_residency",
+    "hypergraphRag": "evidence_qualified_projection_only",
+    "agenticErrorFixing": "verified_claim_to_admitted_dag_to_bounded_execution",
+    "domainMemorySwap": "bounded_context_and_artifact_selection_only"
+  },
+  "writesPerformed": false,
+  "canonicalModelOwnerChanged": false,
+  "activeCallersAligned": true,
+  "evidence": [
+    "GET /v1/models reported ornith-1.5-9b",
+    "SvelteKit active callers use the environment-backed runtime model contract",
+    "Core retrieval, HyperRAG, LDR, Ollama, and summary callers were aligned",
+    "AGENTS.md ownership rules updated",
+    "OpenSpec backlog updated"
+  ]
+}

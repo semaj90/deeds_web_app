@@ -94,7 +94,7 @@ INSERT INTO ai_engine_status (engine_name, is_online, capabilities, configuratio
   ('webgpu', false, '{"compute_shaders": true, "texture_streaming": true, "nes_orchestrator": true}', '{"memory_regions": ["PRG_ROM", "CHR_ROM", "PPU_MEMORY", "SPRITE_MEMORY"]}'),
   ('ollama', false, '{"text_generation": true, "legal_analysis": true, "cuda_acceleration": true}', '{"model": "gemma3-legal", "gpu_layers": 35}'),
   ('vllm', false, '{"webgpu_som_caching": true, "quic_streaming": true, "tensor_core_acceleration": true, "concurrent_streams": 1000}', '{"som_cache_size": "64x64", "similarity_threshold": 0.85}'),
-  ('fastembed', false, '{"gpu_embeddings": true, "batch_processing": true, "multiple_models": true, "cuda_acceleration": true}', '{"models": ["BAAI/bge-small-en-v1.5", "sentence-transformers/all-MiniLM-L6-v2"]}')
+  ('fastembed', false, '{"gpu_embeddings": true, "batch_processing": true, "multiple_models": true, "cuda_acceleration": true}', '{"models": ["google/embeddinggemma-300m"]}')
 ON CONFLICT (engine_name) DO NOTHING;
 
 -- Create trigger to update updated_at timestamp

@@ -1,5 +1,5 @@
 # Spec Supersedes Check
-Generated: 2026-06-28T22:41:35.793Z
+Generated: 2026-08-29T17:27:47.952Z
 Status: CURRENT
 Canonical ready: 100%
 

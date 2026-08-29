@@ -167,6 +167,16 @@ ACE cards → ContextManifest → bounded agent/DAG execution
 - **8098** is the WSL2/Linux RAPIDS/cuVS/cuGraph executor lane. It is not a canonical store. Native-Windows TensorRT/LibTorch experiments are a separate lane. Current fixture ABI proofs do not imply that the live RAPIDS environment is installed or reachable.
 - **Neo4j/cuGraph/topology** are derived structural traversal and routing projections. SOM, latent, manifold, PageRank, and graph coordinates cannot create identity or an additional retrieval vote.
 
+### Ornith, adapters, and agentic memory boundary
+
+- **Ornith** is the active synthesis and tool-use model served by the live llama-server endpoint. Resolve its model ID from `/v1/models` or the environment-backed model resolver; do not treat a hard-coded Gemma4 name as the active model authority. The current workstation runtime reports `ornith-1.5-9b`.
+- **Gemma4 lineage** describes the base/model family relationship, not a second active embedding or synthesis owner. The canonical dense embedding contract remains `EmbeddingGemma` → `semantic_768`; Ornith is not the embedding writer.
+- **Legal adapters and QLoRA merges** are future, revisioned artifacts. A legal/domain adapter may be proposed, evaluated, and merged only under a new model/adapter/parameter revision with immutable checksums, held-out evaluation, replay evidence, rollback metadata, and an explicit promotion receipt. Do not imply that an adapter is merged merely because it is available on disk.
+- **BitFrost/Valkey** caches revision- and checksum-addressed manifests, candidate lists, ACE cards, residency descriptors, and context plans. It must not become canonical storage for source truth, hidden thoughts, KV cache, tensors, or unvalidated adapter state.
+- **HyperGraphRAG and ontology links** consume evidence-qualified, revision-bound tuples and graph projections. Domain classification can route a request and choose bounded context/memory budgets, but it cannot promote identity, invent graph revisions, or add a retrieval vote.
+- **Agentic error fixing** must follow `verified claim → KernelDagCandidate → schema/lineage/authorization admission → bounded execution → independent readback`. A verified claim is not authorization to mutate.
+- **Memory swaps** are bounded residency/context decisions keyed by model, adapter, candidate snapshot, representation, graph/feature revisions, and artifact checksums. Swap only approved descriptors or evidence cards; never persist hidden reasoning or silently replace canonical evidence.
+
 ### Structural and domain analysis
 
 Use the existing providers in this order:

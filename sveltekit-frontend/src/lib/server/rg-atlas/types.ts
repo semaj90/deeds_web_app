@@ -10,7 +10,7 @@ export const rgSearchAtlasOptionsSchema = z.object({
   fileTypes: z.array(z.string()).optional().describe('Filter by file extensions (e.g. [".ts", ".svelte"])'),
   variantCount: z.number().int().min(1).max(5).optional().describe('Number of query variations to generate (default: 3)'),
   topKPerLane: z.number().int().min(1).max(100).optional().describe('Hits to fetch per variant from Qdrant (default: 20)'),
-  enableMarcoRerank: z.boolean().optional().describe('Enable MS-MARCO cross-encoder reranking'),
+  enableMarcoRerank: z.boolean().optional().describe('Enable the configured cross-encoder reranking tier'),
   enableLangExtract: z.boolean().optional().describe('Enable LangExtract GRPO validation'),
   persist: z.boolean().optional().describe('Persist result to PostgreSQL for replay (default: true)'),
   weights: z.object({
@@ -32,7 +32,7 @@ export interface RgSearchAtlasOptions {
   variantCount?:     number;
   /** Top-K per Qdrant variant in stage 6. Default 20. */
   topKPerLane?:      number;
-  /** Toggle MS-MARCO cross-encoder rerank (stage 7). Default true. */
+  /** Toggle configured cross-encoder rerank (stage 7). Default true. */
   enableMarcoRerank?: boolean;
   /** Toggle LangExtract validation (stage 8). Default true. */
   enableLangExtract?: boolean;
@@ -53,7 +53,7 @@ export interface RankedHit {
     rgMatch:      number;     // 1 if rg hit, 0 if qdrant-only
     karpathy:     number;     // blend from gpu:karpathy:scores (0 if not in hash)
     qdrantCosine: number;     // raw Qdrant cosine score
-    marco:        number;     // cross-encoder MS-MARCO pointwise (0-1)
+    marco:        number;     // configured cross-encoder pointwise score (0-1)
     langExtract:  number;     // grounding score from langextract-reranker (0-1)
     final:        number;     // weighted blend, the order key
   };

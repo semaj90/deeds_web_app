@@ -1,9 +1,7 @@
 {
-  "generated": "2026-07-20T02:07:48.604Z",
-  "mode": "apply",
-  "orphaned_found": 3294,
-  "registered": 3294,
-  "skipped": 0,
-  "total_chunk_packets": "3294",
-  "status": "registration_complete"
+  "generated": "2026-08-29T18:41:10.670Z",
+  "mode": "dry-run",
+  "orphaned_found": 58,
+  "would_register": 58,
+  "status": "dry_run_complete"
 }

@@ -104,8 +104,8 @@ export const SERVER_EMBEDDING_MODEL = 'embeddinggemma:latest';
 // even for a "server" constant declared in it.
 export const SERVER_EMBEDDING_DIMS = 768;
 
-/** Fallback embedding model (if embeddinggemma unavailable) */
-export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
+/** Canonical embedding fallback remains the same EmbeddingGemma ABI. */
+export const SERVER_EMBEDDING_FALLBACK = SERVER_EMBEDDING_MODEL;
 
 /** IBM Granite-Docling-258M — document understanding VLM lane (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';

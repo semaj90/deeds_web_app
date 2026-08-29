@@ -37,7 +37,7 @@ export const AI_CONFIG = {
 		models: {
 	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma4-rotorquant:latest',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
-			fallback: process.env.EMBEDDING_FALLBACK_MODEL || 'nomic-embed-text'
+			fallback: process.env.EMBEDDING_FALLBACK_MODEL || 'embeddinggemma:latest'
 		},
 	timeout: 60000,
 		maxRetries: 3,

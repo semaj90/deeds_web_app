@@ -1,6 +1,6 @@
 {
   "schema": "atlas.atlas-packets-content-hash-source.v1",
-  "generatedAt": "2026-08-28T18:41:37.045Z",
+  "generatedAt": "2026-08-29T16:09:17.867Z",
   "readOnly": true,
   "databaseWrites": false,
   "status": "READY",
@@ -37,14 +37,69 @@
     }
   },
   "eligibleSet": {
-    "no_chunk_hash": 57180,
-    "chunk_hash_unique_eligible": 332,
-    "chunk_hash_ambiguous": 4148,
+    "no_chunk_hash": 57112,
+    "chunk_hash_unique_eligible": 341,
+    "chunk_hash_ambiguous": 4207,
     "alreadyPopulatedWithinUniqueSet": 332,
-    "pendingUniqueBackfill": 0
+    "pendingUniqueBackfill": 9
   },
   "samples": {
-    "unique_eligible_candidates": []
+    "unique_eligible_candidates": [
+      {
+        "packet_key": "packet:00848415f727",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "25fbfe7e36a2e91f9153a5f613cdb8633b42371351b6cc0aeec122d81361ba2a"
+      },
+      {
+        "packet_key": "packet:0d409679f7ec",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "57664edfcc280ea61644b9873e205f4409703861aae998d821d10950c63da331"
+      },
+      {
+        "packet_key": "packet:406a8e69899b",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "5d8a0f38a550b5d244d35d8977af03e10099e2d2bdde09e746e542a9cb166378"
+      },
+      {
+        "packet_key": "packet:4f61a37ebd9e",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "8e35bd2f5ebb932daf90656e2e4c51258417234d06fb0f5aa191935056020825"
+      },
+      {
+        "packet_key": "packet:5555a5d1238e",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "2221bd0d492a34884f2d39e9f28648bb41efa180e43232ae69b328afc3fa1494"
+      },
+      {
+        "packet_key": "packet:67690efd8391",
+        "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "259e3c5d89cc606d16e1cb675798773b9837b2d2cf595c762f59f789f0c07011"
+      },
+      {
+        "packet_key": "packet:ce69de4e9b4a",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "e5ebb1916e54521ad1b599d73c4ed175a83494529a1288ec08c25302ffc4f8a6"
+      },
+      {
+        "packet_key": "packet:ea5f6ab84269",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "a47a20a8acc77e856f1a7b295ca98eb2453e189352c498a07c8ca28255c44b1c"
+      },
+      {
+        "packet_key": "packet:fe0021c326af",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+        "current_packet_content_hash": null,
+        "candidate_content_hash": "2bd842e26e138b845e859c797b289af9c79af7afbfd0e198c577fac78a2260da"
+      }
+    ]
   },
-  "recommendation": "NO_PENDING_BACKFILL: 332 unique hash matches are already populated; the remaining packets require an operator decision on packet/chunk granularity."
+  "recommendation": "SAFE_BACKFILL_ELIGIBLE: 9 packets remain pending; 341 packets total have a source_ref that maps to exactly one distinct codebase_chunk_index.content_hash value (single-chunk files). These can be backfilled by copying that chunk hash directly — same hash definition as the FTS join target, so the join will bind for real. The remaining ambiguous/no-match packets require an operator decision on packet/chunk granularity (see AST-ID-06-style UNRESOLVED entry in tasks.md) and are out of scope for this backfill."
 }

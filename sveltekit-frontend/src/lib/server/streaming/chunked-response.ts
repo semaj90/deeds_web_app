@@ -230,7 +230,7 @@ export async function* streamRAGResponse(
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({
-	model: 'nomic-embed-text:latest',
+	model: 'embeddinggemma:latest',
 					prompt: query
 				})
 			});

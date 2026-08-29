@@ -149,7 +149,7 @@ export async function storeAiQueryWithEmbedding(
 export async function cacheEmbedding(
 	textHash: string,
 	embedding: number[],
-	model: string = 'nomic-embed-text'
+	model: string = 'embeddinggemma:latest'
 ): Promise<void> {
 	try {
 		await db.insert(embeddingCache).values({

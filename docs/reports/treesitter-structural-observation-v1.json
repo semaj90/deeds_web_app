@@ -1,6 +1,6 @@
 {
   "schema": "atlas.treesitter-structural-observation.v1",
-  "generatedAt": "2026-08-29T08:51:25.679Z",
+  "generatedAt": "2026-08-29T17:10:44.072Z",
   "mode": "READ_ONLY_AUDIT",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -63,14 +63,14 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
-      "sourceDigest": "9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
+      "sourceDigest": "8771f67ece11f1f25f165190ea2bef335080ec1ecd841a2209c8bb4aa19b0049",
       "sourceRevision": "sha256:9b9e4dc3d0ec76314920cd7b64396bcd8da2f1e9e3718841dba091c0a75e709d",
       "extractor": "treesitter-chunker:4.0.0",
       "syntaxStatus": "RECOVERED_WITH_ERRORS",
       "chunkCount": 186,
       "edgeCount": 1128,
       "unresolvedEdgeCount": 992,
-      "observationChecksum": "sha256:5d98f8b315a04b03977ab46bf41dc896489b6607162107ed357652b251cafabf"
+      "observationChecksum": "sha256:20dd668b015b669be052f813b6cdb70f373f027d9564138ecd3815588bedbb4e"
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",

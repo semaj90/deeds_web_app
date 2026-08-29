@@ -15,6 +15,7 @@ import type { HyperRAGPacketState, HyperRAGPacketPipeline } from './hyperrag-rpc
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { makePacketUlid } from '$lib/server/identity/ulid.js';
 import { buildCanonicalAcePacketEnvelope } from '$lib/server/ace/canonical-packet-envelope.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -295,7 +296,7 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
    */
   private async summarizeChunk(chunk: string): Promise<string> {
     try {
-      const model = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+      const model = LLM_MODEL_ID;
       const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

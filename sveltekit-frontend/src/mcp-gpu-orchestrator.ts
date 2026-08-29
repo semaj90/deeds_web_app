@@ -150,9 +150,9 @@ class MCPGPUOrchestrator {
 			top_p: 0.9
 		});
 
-		// Nomic Embeddings Configuration
-		this.modelConfigs.set('nomic-embed-text', {
-			name: 'nomic-embed-text, latest',
+		// Canonical EmbeddingGemma configuration
+		this.modelConfigs.set('embeddinggemma:latest', {
+			name: 'embeddinggemma:latest',
 			port: 11436,
 			capabilities: ['vector_embedding', 'similarity_search'],
 			dimensions: 768,
@@ -365,8 +365,8 @@ class MCPGPUOrchestrator {
 			'/api/v1/embeddings',
 			{
 				texts: Array.isArray(task.data.text) ? task.data.text : [task.data.text],
-				model: task.config?.model ?? 'nomic-embed-text',
-				batch_size: task.config?.model === 'nomic-embed-text' ? 32 : 16
+				model: task.config?.model ?? 'embeddinggemma:latest',
+				batch_size: task.config?.model === 'embeddinggemma:latest' ? 32 : 16
 			},
 			{
 				preferredProtocol: 'http',

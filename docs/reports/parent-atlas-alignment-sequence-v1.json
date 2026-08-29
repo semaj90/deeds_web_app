@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.parent-atlas-alignment-sequence.v1",
+  "date": "2026-08-29",
+  "overallOpenSpec": {
+    "completedTasks": 110,
+    "totalTasks": 173,
+    "completionPercent": 63.6
+  },
+  "crossProviderBacklog": {
+    "completedTasks": 1,
+    "totalTasks": 17,
+    "completionPercent": 5.9
+  },
+  "sequence": [
+    { "phase": "A", "name": "canonical owner and lineage", "status": "BLOCKED_ON_OWNER_PROOF" },
+    { "phase": "B", "name": "symbol feature and eligibility alignment", "status": "IN_PROGRESS" },
+    { "phase": "C", "name": "current graph and CPU GPU parity", "status": "WAITING_ON_A_B" },
+    { "phase": "D", "name": "neural execution receipts", "status": "PLANNED" },
+    { "phase": "E", "name": "ontology HyperGraphRAG ACE residency replay", "status": "PLANNED" },
+    { "phase": "F", "name": "optimization challengers", "status": "BENCHMARK_ONLY" }
+  ],
+  "canonicalAuthority": "PostgreSQL",
+  "writesPerformed": false,
+  "productionReadinessClaim": false
+}

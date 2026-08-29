@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langextract-grounding-receipt.v1",
-  "generatedAt": "2026-08-29T00:14:16.181Z",
+  "generatedAt": "2026-08-29T17:11:01.796Z",
   "mode": "READ_ONLY_SINGLE_SOURCE_PROBE",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -27,7 +27,7 @@
     "inputCharCount": 4000,
     "sourceCharCount": 15998,
     "inputSha256": "a3d26e1725c738fbb74cff4b62e5f6ea2e292065e8b4a4e41c884a2f412d62ad",
-    "timeoutMs": 30000
+    "timeoutMs": 90000
   },
   "output": {
     "concepts": 50,

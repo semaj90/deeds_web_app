@@ -2552,11 +2552,11 @@
   },
   "sourceBindingObservation": {
     "path": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceRevision": "sha256:e235fc4e0ce191a7045e3d6c3553ac2f5b468dc629c2896e68ac3dc75b5ed3a4",
-    "sourceManifestDigest": "e235fc4e0ce191a7045e3d6c3553ac2f5b468dc629c2896e68ac3dc75b5ed3a4",
-    "sourceCount": 23501,
-    "boundSources": 23501,
-    "skippedSources": 86
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sourceManifestDigest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sourceCount": 24192,
+    "boundSources": 24192,
+    "skippedSources": 90
   },
   "nextGate": "GRAPHIFY_RUN_WRITER_AND_SOURCE_BINDING_READBACK"
 }

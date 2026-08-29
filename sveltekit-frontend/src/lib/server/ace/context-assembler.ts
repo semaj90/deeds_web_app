@@ -53,6 +53,8 @@ export interface ACEPacket {
   cache_key?: string;
   cache_ttl_seconds?: number;
   cached_at?: string;
+  workspace_revision?: number;
+  source_revision?: number;
 }
 
 export class ACEContextAssembler {
@@ -82,7 +84,9 @@ export class ACEContextAssembler {
       final_score: number;
       retrieval_trace: RetrievalTraceEntry[];
     }>,
-    sessionId?: string
+    sessionId?: string,
+    workspaceRevision?: number,
+    sourceRevision?: number
   ): Promise<ACEPacket> {
     const id = crypto.randomUUID();
     const retrievedAt = new Date().toISOString();
@@ -121,8 +125,21 @@ export class ACEContextAssembler {
       total_candidates_considered: candidates.length,
     };
 
-    const cacheKeyInput = `${queryText}|${queryEmbedding.slice(0, 10).join(',')}`;
+    // P3 fix: bind workspace/source revision into the cache key so a corpus/index
+    // change (not just a different query) invalidates the key. Previously this hashed
+    // only queryText + embedding prefix, so a stale packet could be served indefinitely
+    // unless a caller separately remembered to call validateCachedPacket().
+    const cacheKeyInput = [
+      queryText,
+      queryEmbedding.slice(0, 10).join(','),
+      workspaceRevision !== undefined ? `wsrev:${workspaceRevision}` : null,
+      sourceRevision !== undefined ? `srcrev:${sourceRevision}` : null,
+    ]
+      .filter((part) => part !== null)
+      .join('|');
     packet.cache_key = `ace:context:${crypto.createHash('sha256').update(cacheKeyInput).digest('hex')}`;
+    if (workspaceRevision !== undefined) packet.workspace_revision = workspaceRevision;
+    if (sourceRevision !== undefined) packet.source_revision = sourceRevision;
 
     // Store ACE cursor for session recovery (Phase B2 wiring)
     if (sessionId && packet.candidates.length > 0) {

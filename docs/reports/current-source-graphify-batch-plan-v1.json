@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-graphify-batch-plan.v1",
-  "generatedAt": "2026-08-29T08:04:38.725Z",
+  "generatedAt": "2026-08-29T19:05:18.189Z",
   "status": "CURRENT_GRAPHIFY_BATCH_PLAN_READY",
   "readOnly": true,
   "writes": {

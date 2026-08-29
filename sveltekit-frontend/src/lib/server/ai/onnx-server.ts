@@ -13,7 +13,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
 import { validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
 
 // onnxruntime-node types
@@ -25,6 +25,11 @@ const MODEL_PATHS: Record<string, string[]> = {
 	embeddinggemma: [
 		'static/embeddinggemma_300m_onnx/model.onnx',
 		'static/models/embeddinggemma_300m_onnx/model.onnx',
+		// Canonical local model storage (repo-root models/, gitignored — models/.gitignore
+		// excludes *.onnx). Found live 2026-08-30: the QInt8 quantized export already exists
+		// here (304MB), just never listed as a candidate — every prior candidate started with
+		// 'static/', so it was silently never found.
+		'models/embeddinggemma_300m_onnx/model.onnx',
 	],
 	gemma270m: [
 		'static/gemma3_270m_onnx/gemma3_270m_w8a16.onnx',
@@ -58,14 +63,19 @@ function sha256Bytes(bytes: Uint8Array): string {
 	return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
-async function ensureEmbeddingTokenizer(): Promise<any> {
+async function ensureEmbeddingTokenizer(modelDir: string): Promise<any> {
 	if (tokenizerCache) return tokenizerCache;
 	tokenizerCache = (async () => {
 		const transformers = await import('@huggingface/transformers');
 		transformers.env.allowLocalModels = true;
 		transformers.env.allowRemoteModels = false;
-		const tokenizerDir = resolve(process.cwd(), 'static/embeddinggemma_300m_onnx');
-		return transformers.AutoTokenizer.from_pretrained(tokenizerDir, { local_files_only: true });
+		// Derived from the resolved model.onnx's own directory rather than a separately
+		// hardcoded path — the model and its tokenizer.json/tokenizer_config.json always ship
+		// together in this repo's model directories, so a single source of truth for "where is
+		// this model" can't silently drift from "where is its tokenizer" the way the previous
+		// hardcoded 'static/embeddinggemma_300m_onnx' path did (found live 2026-08-30: the real
+		// model lives under repo-root models/, not static/).
+		return transformers.AutoTokenizer.from_pretrained(modelDir, { local_files_only: true });
 	})();
 	try {
 		return await tokenizerCache;
@@ -230,7 +240,7 @@ async function _createServerSession(
 export async function runEmbedding(text: string): Promise<number[] | null> {
 	try {
 		const ort = await ensureOrt();
-		const { session, representationId } = await getServerOnnxSession('embeddinggemma');
+		const { session, representationId, modelPath } = await getServerOnnxSession('embeddinggemma');
 		if (representationId !== EMBEDDING_REPRESENTATION_ID) {
 			throw new Error('ONNX_REPRESENTATION_ID_MISMATCH');
 		}
@@ -239,7 +249,7 @@ export async function runEmbedding(text: string): Promise<number[] | null> {
 		// embeddinggemma expects input_ids and attention_mask
 		const inputNames = session.inputNames;
 
-		const tokenizer = await ensureEmbeddingTokenizer();
+		const tokenizer = await ensureEmbeddingTokenizer(dirname(modelPath));
 		const tokenized = await tokenizer(text, {
 			return_tensors: 'np',
 			padding: true,

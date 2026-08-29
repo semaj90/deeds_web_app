@@ -210,7 +210,7 @@
 			<div class="layer">
 				<h4>L0: Client Inference (Browser ONNX)</h4>
 				<ul>
-					<li>✅ EmbeddingGemma 300M (291 MB, 384-dim)</li>
+					<li>✅ EmbeddingGemma 300M (291 MB, 768-dim)</li>
 					<li>✅ Gemma3 270M (418 MB, fallback text gen)</li>
 					<li>🎯 WebGPU → WASM SIMD → CPU fallback</li>
 				</ul>

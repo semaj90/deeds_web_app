@@ -1113,6 +1113,203 @@ audit, that classification decision has not been made) — running a
 backfill from a not-yet-classified owner risks the same "pick a winner
 silently" failure mode this file's governance section exists to prevent.
 
+## Patch (2026-08-29) — cuGraph/NetworkX PageRank parity is already computed and sitting unpromoted; not the same lane as the Aug 21 hardening doc's RAPIDS claim
+
+Investigated this session per an operator request to align the Neo4j→NetworkX/cuGraph PageRank
+picture. Confirmed live, on disk, not assumed:
+
+- **The parity oracle pipeline already ran successfully once** (Aug 12, per
+  `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`):
+  `status: PASS`, 162,234 nodes / 108,156 edges, `pagerankCorrelation: 1`,
+  `pagerankTopKOverlap: 1`, `pagerankMaxDelta: 4.89e-9`, Louvain ARI/NMI both 1.0. Both
+  `python/graph_snapshot_parity_networkx_oracle.py` and
+  `python/graph_snapshot_parity_cugraph_oracle.py` executed live against the frozen
+  `nodes.parquet`/`edges.parquet` artifact (producer revision
+  `identity-contract-v1+tree-sitter-typescript-v1`).
+- **The per-node scores from that run are still on disk, unused**:
+  `sveltekit-frontend/docs/reports/graph-snapshot-parity/cugraph-scores.ndjson` and
+  `networkx-scores.ndjson` (per-node `{gpuNodeId, pagerankRaw}`, written by the oracle's
+  `--scores-out` flag — confirmed by reading `graph_snapshot_parity_cugraph_oracle.py`'s
+  `write_ndjson()`), plus `cugraph-louvain.ndjson`/`networkx-louvain.ndjson`
+  (`{gpuNodeId, communityId}`). `nodes.parquet` itself carries the `gpu_node_id → graph_node_key`
+  join table needed to map these back to real node identity (confirmed via
+  `export-graph-snapshot-parity-parquet.mts`'s DuckDB projection query,
+  `row_number() OVER () - 1 AS gpu_node_id, key AS graph_node_key`).
+- **`atlas_graph_authority_scores` (the table `PageRankPromotionGate.validateRun()` reads,
+  `sveltekit-frontend/src/lib/server/graph/pagerank-promotion-gate.ts`) is source-agnostic** — it
+  keys on `(graph_snapshot_id, node_key)` plus a `run_id`/`algorithm` tag, and the gate validates
+  whatever `run_id` it's given (L1-norm sum≈1, no NaN/Infinity, percentile/band derivation,
+  identity match). Nothing in the gate assumes the scores came from Neo4j GDS.
+- **The gap**: nothing has ever joined the Aug 12 cuGraph NDJSON output through the
+  `gpu_node_id → graph_node_key` map and inserted it into `atlas_graph_authority_scores` as a new
+  `run_id`. So despite root `CLAUDE.md`'s Aug 26 correction explicitly saying Neo4j's own GDS
+  PageRank run (3,667 stale nodes) should **not** be treated as canonical, nothing has actually
+  replaced it in the table ACE/Karpathy-blend-adjacent consumers would read from. Proof exists;
+  promotion does not.
+
+**Not the same lane as `parent-atlas-graph-pagerank-okf-fanout-hardening`'s (2026-08-21) "Decide
+on RAPIDS/cuGraph GPU PageRank parity — genuinely NOT_PROVEN" note** — that doc is about
+`atlas-rapids-pagerank-client.ts` (a different RAPIDS PageRank client, exercised by
+`pagerank-parity.spec.ts` against a Neo4j GDS comparison), not about the
+`graph_snapshot_parity_*_oracle.py` pair this patch covers. Both are real, separately-tracked
+PageRank paths — do not conflate "RAPIDS parity not proven" (the Aug 21 doc's claim, about a
+different client) with "cuGraph/NetworkX parity not proven" (false — it was proven Aug 12, just
+never promoted). Flag this cross-doc terminology collision explicitly rather than let it cause a
+future session to re-litigate a already-proven parity result under the wrong name.
+
+**Not done this pass** (write path touches canonical authority scores that live ranking consumers
+may read from — scoping only, no Postgres write attempted):
+
+- [ ] Write a promotion script (proposed name: `scripts/atlas/promote-cugraph-pagerank-parity.mjs`)
+      that: reads `cugraph-scores.ndjson` + `nodes.parquet`'s `gpu_node_id → graph_node_key` map,
+      joins to real `node_key`, computes `pagerank_l1` (L1-normalize raw scores to sum=1 — reuse
+      whatever normalization `pagerank-authority-contract.ts` already formalizes, don't
+      reimplement), derives `authority_percentile`/`authority_band` the same way, and INSERTs into
+      `atlas_graph_authority_scores` with a fresh `run_id` and `algorithm` tag (e.g.
+      `cugraph-pagerank-parity-v1`, distinct from `neo4j-gds-pagerank-mutate-v1`).
+- [ ] Run the new `run_id` through `PageRankPromotionGate.validateRun()` — should PASS given the
+      Aug 12 receipt's own correctness proof, but must actually be run, not assumed.
+- [ ] **Explicit operator decision required before flipping any consumer** to read this new
+      `run_id` as canonical instead of the existing `neo4j-gds-pagerank-mutate-v1` one — this
+      changes live ACE/Karpathy-blend-adjacent ranking behavior for anything downstream of
+      `atlas_graph_authority_scores`, which is exactly the kind of hard-to-reverse, shared-system
+      change that needs confirmation before executing, not silent promotion.
+
+## Patch (2026-08-29, second pass) — audited all live PageRank stores to find "the right one"; corrected a wrong Aug 9 claim
+
+Continued the patch above by checking every PageRank-adjacent Postgres store live, not just the
+one this patch already knew about. Full inventory, by evidence quality:
+
+| Store | Live row count | Evidence quality |
+|---|---|---|
+| **`atlas_graph_authority_scores_v2` / `_runs_v2`** | 1 run (PASSED), 162,234 scores | **Strongest candidate.** `engine=networkx`, `algorithm_version=stage5-simple-pagerank-v1`, `validation_gate=NETWORKX_REFERENCE_PROVEN`, `topology_hash` = **exact match** to the Aug-12 parity receipt's `graphRevision` (`dff9006fef66e...`) — same frozen graph. Written by a real script (`stage5-pagerank-authority-validated.mjs`, per this file's own 2026-08-24 patch above) — **not** stdout-only, contradicting the Aug 9 ownership-registry claim below. |
+| `atlas_graph_authority_scores` / `_runs` (non-v2) | 1 run properly promoted (40,754 nodes, L1 sum=0.99999...) **+ 3 orphan snapshots with no matching run row** (2,902 / 3,255 / 3,253 nodes) | Messier — the orphan snapshots were inserted without a run row, so `PageRankPromotionGate.validateRun()` can't validate them (its `runData` query needs a matching `atlas_graph_authority_runs` row). One orphan snapshot's L1 sum is **0.923, not ≈1** — a real, live normalization bug in this table today. |
+| `graph_node_metrics` | 351,276 rows | Owned per the Aug 9 registry by `graph-analysis-runner.ts`'s Neo4j-GDS backend (`neo4j-gds-pagerank-mutate-v1`). This is the exact source root `CLAUDE.md`'s 2026-08-26 correction says should **not** be treated as canonical PageRank truth anymore. |
+| Neo4j node properties (`pageRank`/`graphAuthorityScore`) | 3,667 stale nodes | Same 2026-08-26 correction: predates the NetworkX/cuGraph pivot, unreconciled. |
+| Aug-12 oracle NDJSON (`cugraph-scores.ndjson`/`networkx-scores.ndjson`) | 162,234 rows on disk, 0 in any DB table | Most rigorously proven (independent cross-backend correlation=1, maxDelta=4.9e-9) but never promoted anywhere — see the first patch above. |
+
+**Correction to `docs/architecture/runtime-ownership-registry.json`** (edited this session): its
+`known_existing_duplication` entry for `atlas_graph_authority_scores_v2` claimed `FIXTURE_ONLY`,
+"writer functions have zero callers... only prints JSON to stdout." **Live-checked and wrong** —
+there's a real promoted run via a real writer script. Old entry kept in the registry (marked
+superseded) for audit trail rather than deleted, per this repo's archive-not-delete convention;
+a corrected entry added above it.
+
+**Why `_v2` is the strongest candidate, not yet declared the winner**:
+- Same graph revision as the independently-proven Aug-12 cuGraph↔NetworkX parity result — but
+  nobody has cross-checked whether `_v2`'s actual per-node PageRank *values* agree with the Aug-12
+  oracle's independently-computed values for that same graph. PageRank is deterministic given a
+  fixed graph/damping/iteration count, so if they match, that's strong additional confirmation;
+  if they don't, `stage5-simple-pagerank-v1` may differ from the oracle in a way worth
+  understanding before trusting it. **Not done this pass** — flagged as the next concrete check.
+- 54,078/162,234 existing rows carry the double `packet:packet:` prefix bug (writer fixed
+  2026-08-24 going forward; existing rows not backfilled) — a fresh re-run or a backfill rewrite
+  is needed before this table is fully joinable against `atlas_packets`/`codebase_chunk_index` at
+  its real 100% coverage rather than the current ~10% resolvable subset.
+- **The CANONICAL_OWNER decision itself has not been made** — per this file's own governance
+  section (the "one canonical owner per capability" rule), declaring `_v2` canonical unilaterally
+  here would repeat exactly the failure mode this file exists to prevent. This patch presents the
+  strongest-evidenced candidate and the specific gaps left before that call can be made
+  confidently — the call itself is left open for explicit operator/next-session decision.
+
+## Patch (2026-08-29, third pass) — ran the cross-check; `_v2`'s stored run does NOT match the oracle where it matters. Reverses this file's own prior-pass recommendation.
+
+Ran the specific check the second-pass patch above proposed: joined `_v2`'s live `pagerank_raw`
+values (exported to CSV) against `cugraph-scores.ndjson` via `nodes.parquet`'s
+`gpu_node_id → graph_node_key`, using DuckDB. Full methodology and numbers below — this
+supersedes the second-pass patch's "strongest candidate" framing for `_v2`.
+
+**Aggregate correlation looks perfect and is misleading**: 162,234/162,234 rows joined,
+`pearson_corr = 0.9999999999999997`. On its own this looks like strong confirmation.
+
+**Top-50 rank overlap is zero.** The nodes `_v2` ranks highest and the nodes the Aug-12 cuGraph
+oracle ranks highest — on the exact same frozen graph revision — **share no members at all**
+(`overlap_count = 0` out of 50). The near-perfect Pearson correlation is an artifact of 162,234
+nodes almost all having tiny, near-identical scores (a hugely fragmented graph — the Aug-12
+receipt itself reports `componentCount: 54078` on 162,234 nodes, average component size ~3) — a
+statistic dominated by the long flat tail, blind to disagreement at the ranked head, which is the
+part that actually matters for an "authority" signal.
+
+**The specific rows with the largest disagreement** are all `tree:*`-kind nodes (not `packet:*`),
+all sharing identical values within each side — oracle: `1.062295363830944e-05`, `_v2`:
+`2.4963940974148454e-06` — a consistent ~4.26x systematic ratio, not random noise. That points at
+a structural difference in how the two computations handle this graph (dangling-node/isolated-
+component treatment is the leading hypothesis given the 54,078-component fragmentation — cuGraph's
+`pagerank(alpha=0.85, max_iter=100, tol=1e-8)` vs `_v2`'s `stage5-simple-pagerank-v1`
+(`damping_factor: 0.85`, but only **10** `ran_iterations`, `did_converge: true`) — same damping,
+10x fewer iterations, and unconfirmed whether `stage5-simple-pagerank-v1` treats the graph as
+directed/undirected or redistributes dangling-node mass the same way cuGraph does. **Not
+confirmed** — would require reading the actual `stage5-pagerank-authority-validated.mjs`/algorithm
+source, not done this pass.
+
+**Corrected conclusion**: `_v2`'s existing stored run should **not** be trusted as equivalent to
+the properly cross-validated (networkx↔cugraph, correlation=1, maxDelta=4.9e-9) Aug-12 oracle
+result, despite matching graph revision hash. The graph identity/revision matching is real and
+useful (confirms both ran on the same frozen snapshot), but the *algorithm* that produced `_v2`'s
+numbers materially disagrees with the oracle at the top of the ranking — which is the part a
+downstream "authority" consumer (ACE/Karpathy blend) would actually use. **Neither existing
+Postgres table is "the right one" right now.** The only PageRank computation on this graph with
+independent cross-backend confirmation is the Aug-12 oracle's own NDJSON output — still unpromoted
+to any table (see first patch above).
+
+**Revised recommendation**: promote the Aug-12 oracle's NDJSON output directly (per the first
+patch's unstarted promotion-script task), rather than trying to rehabilitate `_v2`'s existing run.
+If `_v2`'s pipeline is kept going forward, its algorithm needs to be reconciled against the
+oracle's parameters (iteration count at minimum; dangling-node handling needs checking) before its
+future runs are trusted either.
+
+## Patch (2026-08-29, fourth pass) — cuGraph oracle output promoted, gate-validated, deliberately NOT flipped live
+
+Built and ran `sveltekit-frontend/scripts/atlas/promote-cugraph-pagerank-parity.mts` (dry-run
+default, `--apply` to write). Two real blockers were caught by inspecting the schema/live
+consumers *before* writing, not discovered by trial and error:
+
+1. `atlas_graph_authority_runs.algorithm` has `CHECK (algorithm = 'pagerank')` — a literal-only
+   constraint, no column exists to tag which implementation/backend produced a run. Fixed the
+   script to use the bare literal; the distinguishing tag (`cugraph-pagerank-parity-v1`) is
+   recorded here and in the script's own log output, not in the DB row.
+2. **`src/lib/server/retrieval/feature-matrix.ts` is a live ranking consumer** — it queries
+   `atlas_graph_authority_scores JOIN atlas_graph_authority_runs WHERE r.status = 'promoted'` with
+   **no run_id pin**. The existing run (`05d5c943-...`, Neo4j-GDS-sourced, 40,754 nodes) already
+   has `status = 'promoted'`. Inserting a second `'promoted'` row would have made this query
+   nondeterministically blend or collide with live ranking the moment the transaction committed —
+   caught before running `--apply`, not after. Fixed the script to insert with
+   `status = 'passed'` instead (a valid value per the table's CHECK constraint) — gate-validated,
+   inert, not read by `feature-matrix.ts`'s live query.
+
+**Result (live, this session)**:
+- `run_id = 625f3468-1a49-44ad-9fea-3a6ca25e7fa1`, `graph_snapshot_id = f5aa34f3-327e-42da-a4af-9dad15987b3a`
+- 162,234/162,234 score rows inserted, 0 duplicate node_key collisions, all node_key values
+  single-prefixed correctly (packet-kind nodes use `nodes.parquet`'s already-correct `packet_key`
+  column, not the double-prefixed `graph_node_key` — sidesteps the known Aug-24 bug rather than
+  promoting it forward)
+- `PageRankPromotionGate.validateRun()`: **all 7 gates PASS** — `PAGERANK_RAW_PRESERVED`,
+  `L1NORM_EXPLICITLY_APPLIED`, `L1_SUM_VALIDATION`, `AUTHORITY_PERCENTILE_DERIVED`,
+  `AMBIGUOUS_PAGE_RANK_SCORE_RETIRED`, `POSTGRES_PROMOTION_GATE`, `QDRANT_PAYLOAD_CONTRACT`.
+  `observedL1Sum = 1.000000000000185`, `rawFiniteCoverage = 1`, `normalizedFiniteCoverage = 1`,
+  `nodeParity = 1`, `duplicateNodeCount = 0`.
+
+**Still status='passed', not 'promoted' — deliberately.** This run is now the best-evidenced
+PageRank data in the database (independently cross-backend-proven source, gate-validated, correct
+node identity), but it is not live. Flipping it to `'promoted'` is a separate, explicit-operator
+step this script never performs, and it has a real wrinkle: `feature-matrix.ts`'s query has no
+run_id pin, so simply flipping the new run to `'promoted'` without ALSO retiring the existing
+Neo4j-GDS run's `'promoted'` status would recreate the exact nondeterministic-collision problem
+this pass just avoided. Any future flip must handle both sides atomically (e.g. an UPDATE that
+demotes the old run and promotes the new one in the same transaction) — not attempted here.
+
+**Recommended before declaring `_v2` canonical** (not started):
+- [ ] Cross-check `_v2`'s existing per-node `pagerank_raw` values against `cugraph-scores.ndjson`
+      (join via `nodes.parquet`'s `gpu_node_id → graph_node_key`, strip `_v2`'s double-`packet:`
+      prefix where present) for a sample of nodes — confirm agreement or characterize disagreement.
+- [ ] Re-run `stage5-pagerank-authority-validated.mjs` now that the double-prefix writer bug is
+      fixed, to get a clean full-coverage `_v2` snapshot without the prefix workaround.
+- [ ] Fix the 0.923 L1-sum normalization bug in the non-v2 `atlas_graph_authority_scores` orphan
+      snapshot (`2693eab9-fe04-4367-9a72-e0f0f1b8416c`) or determine whether that snapshot should
+      simply be deleted/archived as an incomplete run.
+- [ ] Only then: explicit CANONICAL_OWNER classification decision for the PageRank signal across
+      `_v2`, non-v2, and `graph_node_metrics` — recorded here, not re-derived from scratch again.
+
 ## Cross-references
 
 - See README.md for the full architecture, gate table, and patch order.

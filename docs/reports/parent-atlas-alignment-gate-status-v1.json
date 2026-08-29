@@ -1,0 +1,257 @@
+{
+  "schema": "atlas.parent-atlas-alignment-gate-status.v1",
+  "date": "2026-08-29",
+  "overallOpenSpec": { "completedTasks": 110, "totalTasks": 175, "completionPercent": 62.9 },
+  "crossProviderBacklog": { "completedTasks": 1, "totalTasks": 18, "completionPercent": 5.6 },
+  "lanes": {
+    "structural8095": "PROVEN_BOUNDED",
+    "typescriptLsp": "PROVEN_READ_ONLY",
+    "langExtract": "PROVEN_BOUNDED",
+    "currentSourceLineage111": "LINEAGE_PROVEN",
+    "gpuAceOrnith": "READ_ONLY_CHAIN_PROVEN",
+    "graphifyOwner": "BLOCKED",
+    "graphSnapshot": "BLOCKED",
+    "structuralEdges": "SHADOW_ONLY",
+    "semanticScale128_768": "BLOCKED_ON_GRAPH_OWNER",
+    "simdBridgeHardening": "AUDITED_HARDENING_OPEN"
+  },
+  "proven": [
+    "8095 structural provider",
+    "read-only TypeScript LSP",
+    "bounded LangExtract grounding",
+    "111/111 current source lineage",
+    "bounded GPU to ACE to Ornith chain",
+    "read-only DAG validation and mutation rejection"
+  ],
+  "blocked": [
+    "authoritative completed Graphify run",
+    "graphRevision ownership",
+    "full graph snapshot admission",
+    "CandidateOrdinal 128/768 expansion",
+    "mutation execution"
+  ],
+  "latestAudits": {
+    "runtimeEvidenceCollector": {
+      "status": "NOT_READ_ONLY",
+      "command": "node scripts/atlas/collect-runtime-evidence.mjs",
+      "postgres": {
+        "atlasPacketsBeforeReadback": 61660,
+        "recentUpdatesAfterRun": 0,
+        "writeAttempt": "FAILED",
+        "failure": "null value in column packet_id of relation atlas_packets violates not-null constraint"
+      },
+      "localArtifactsWritten": [
+        ".opencode/ndjson/enriched-candidates.ndjson",
+        ".opencode/ndjson/enriched-ledger.ndjson",
+        ".opencode/ndjson/cluster-summary.ndjson",
+        ".opencode/ndjson/graph-edges.ndjson",
+        ".opencode/ndjson/minified-ace-index.ndjson",
+        "docs/reports/offline-synthesis-mapreduce-duckdb-report.json",
+        "docs/reports/offline-synthesis-mapreduce.duckdb",
+        ".tmp/couchdb-archive-report.json",
+        "neschrom97/packets/cards.ndjson"
+      ],
+      "qdrantWrites": false,
+      "neo4jWrites": false,
+      "classification": "SIDE_EFFECTING_EVIDENCE_RUN",
+      "requiredFollowup": "Create a dry-run-only collector path before further evidence collection",
+      "hardeningApplied": {
+        "dryRunDefault": true,
+        "mixedModeRejected": true,
+        "writeCapableSubprocessesSkippedInDryRun": true,
+        "databaseConnectionsSkippedInDryRun": true,
+        "dryRunCardsParsed": 8170,
+        "dryRunCompleted": true,
+        "applyPreflight": {
+          "executedReadOnly": true,
+          "status": "BLOCKED",
+          "reason": "atlas_packets.packet_id is NOT NULL with no default; identity derivation is not yet bound",
+          "failClosedProof": {
+            "command": "node scripts/atlas/collect-runtime-evidence.mjs --apply",
+            "exitCode": 1,
+            "downstreamStagesStarted": false,
+            "writesPerformed": false
+          },
+          "packetIdCensus": {
+          "total": 61660,
+          "nullIds": 0,
+          "uuidShapedLength": 61,
+          "sha256Length": 0,
+          "packetKeyRows": 61660,
+              "divergentPacketIdBySourceKind": {
+                "codebase_chunk": 3294,
+                "rpc_method": 61
+              },
+              "producerAttribution": {
+                "codebaseChunk": "legacy orphan-chunk registration / packet_* producer surface",
+                "rpcMethod": "UUID-shaped RPC packet producer surface",
+                "authorityEstablished": false
+              },
+              "sourceKindEquivalence": {
+                "null": { "total": 58304, "equal": 58304, "different": 0 },
+                "codebase_chunk": { "total": 3294, "equal": 0, "different": 3294 },
+                "rpc_method": { "total": 61, "equal": 0, "different": 61 },
+                "cluster-summary": { "total": 1, "equal": 1, "different": 0 }
+              },
+          "constraintCensus": {
+            "primaryKey": "packet_id",
+            "uniqueKey": "packet_key",
+            "foreignKeysToPacketKey": 15,
+            "foreignKeysToPacketId": 2,
+            "packetIdKeyEquivalence": {
+              "total": 61660,
+              "equal": 58305,
+              "different": 3355,
+              "prefixedSha": 1,
+              "uuidShape": 61,
+              "nesShape": 0
+            }
+          }
+        }
+      },
+        "validation": "node --check scripts/atlas/collect-runtime-evidence.mjs; node scripts/atlas/collect-runtime-evidence.mjs --dry-run"
+      }
+    },
+      "packetAudit": {
+      "command": "node scripts/db-audit-atlas-packets.mjs",
+      "status": "READ_ONLY_COMPLETED",
+      "totalRows": 61660,
+      "nonNullPacketId": 61660,
+      "nonNullPacketKey": 61660,
+      "missingWorkspaceId": 1,
+      "missingSourceRef": 1,
+      "packetIdFormats": {
+        "prefixed": 58305,
+        "other": 3294,
+        "uuid": 61
+      },
+        "drizzleTypeMismatch": {
+        "column": "workspace_id",
+        "live": "character varying",
+          "expected": "text"
+        },
+        "anomalies": [
+          {
+            "packetId": "packet_0_1784513267148",
+            "packetKey": "ace:packet:e3b0c44298fc",
+            "sourceKind": "codebase_chunk",
+            "missingField": "source_ref",
+            "observedValue": ""
+          },
+          {
+            "packetId": "sha256:4ff58c17ae76b8b115e4cd94",
+            "packetKey": "sha256:4ff58c17ae76b8b115e4cd94",
+            "sourceKind": "cluster-summary",
+            "missingField": "workspace_id",
+            "observedValue": null
+          }
+        ],
+        "noWrites": true
+      },
+      "packetContractValidator": {
+        "command": "node scripts/atlas/validate-packet-contract.mjs --json --verbose",
+        "status": "PASS_WITH_BLANK_IDENTITY_DETECTION",
+        "contractPass": true,
+        "scopeLimit": "Coverage thresholds pass; incomplete legacy rows remain separately excluded from current lineage qualification",
+        "emptySourceRefStillOpen": true,
+        "invalidIdentitySample": {
+          "packetId": "packet_0_1784513267148",
+          "packetKey": "ace:packet:e3b0c44298fc",
+          "sourceRef": "",
+          "featureId": "unknown"
+        },
+        "producerHardening": {
+          "path": "scripts/atlas/register-orphaned-chunks.mjs",
+          "blankRelativePathRejected": true,
+          "existingInvalidRowRepaired": false,
+          "dryRun": {
+            "command": "node scripts/atlas/register-orphaned-chunks.mjs",
+            "orphanedSourceRefs": 58,
+            "preparedRegistrations": 58,
+            "blankSourceRefsPrepared": 0,
+            "writesPerformed": false
+          }
+        },
+        "noWrites": true
+      },
+      "packetMaterializerContract": {
+        "source": "scripts/atlas/packet-materializer-lib.mjs",
+        "rule": "packet_id must equal packet_key for materializer validation",
+        "status": "CANDIDATE_ACTIVE_RULE",
+        "collectorFallbackKey": "buildPacketKey(sourceRef, featureId)",
+        "requiredKeyShape": "nes:<slug>:<sha8(source_ref)>",
+        "collectorKeyContractMatch": true,
+          "cardCorpusKeyCensus": {
+            "cards": 8170,
+            "explicitPacketKeys": 0,
+            "materializerFormulaMatches": "PLANNED_DERIVATION_NOW_SHARED",
+            "missingPacketKeys": 8170,
+            "plannedKeyAudit": {
+              "nonEmpty": 8170,
+              "unique": 8170,
+              "duplicateKeys": 0,
+              "livePacketKeyCollisions": 0
+            }
+          },
+        "legacyRowsRewritten": false,
+        "authorityEstablished": false
+      },
+      "orphanRegistrationPreflight": {
+        "command": "read-only census over codebase_chunk_index orphan source refs",
+        "status": "CANDIDATES_CLEAN_ID_BLOCKED",
+        "candidateCount": 58,
+        "nonEmptySourceRefs": 58,
+        "uniqueGeneratedPacketKeys": 58,
+        "packetKeyCollisions": 0,
+        "duplicateGeneratedPacketKeys": 0,
+        "packetIdApplyStrategy": "packet_<batch-index>_<timestamp>",
+        "packetIdStrategyApproved": false,
+        "writesPerformed": false
+      },
+    "simdBridgeMemory": {
+      "sourceFiles": 12,
+      "findings": 104,
+      "high": 13,
+      "medium": 58,
+      "low": 33,
+      "report": "docs/reports/simd-bridge-memory-audit.json"
+    },
+    "simdJsonRuntime": {
+      "bridgePresent": true,
+      "nativeScanPresent": true,
+      "rustBuilderPresent": true,
+      "smokeFixturesPresent": true,
+      "avx2Available": false,
+      "activeBackend": "native",
+      "bridgeImportOk": true,
+      "nativeAddonLoad": true,
+      "nativeProbe": {
+        "cudaAvailable": true,
+        "simdJsonBackend": "icelake (Intel/AMD AVX512)",
+        "exportedFunctionCount": 36
+      },
+      "blocker": "AVX2 is not reported by the Windows runtime; typed Node/C++/Rust checksum parity remains open",
+      "runtimeCommand": "npx tsx scripts/atlas/check-simd-json-runtime.mjs",
+      "focusedSpec": {
+        "path": "packages/parent-atlas-retrieval/src/gpu/simdjson-bridge.spec.ts",
+        "testFilesPassed": 1,
+        "testsPassed": 2
+      }
+    }
+  },
+  "nextGate": "GRAPHIFY-RUN-OWNER-01",
+  "parallelWorkAllowed": true,
+  "graphRevisionNullAllowedFor": [
+    "non-authoritative shadow plans",
+    "graph-absent feature rows",
+    "read-only alignment receipts"
+  ],
+  "parallelWork": [
+    "ALIGN-XJSON-01",
+    "ALIGN-CONTEXT-01",
+    "MODEL-ORNITH-01",
+    "DAG-ERROR-01"
+  ],
+  "writesPerformed": "UNAUTHORIZED_LOCAL_ARTIFACTS; POSTGRES_CANONICAL_READBACK_UNCHANGED",
+  "productionReadiness": false
+}

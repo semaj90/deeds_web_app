@@ -36,13 +36,23 @@ export interface WebSearchResponse {
  * @param query - Search query (automatically appended with "legal" context)
  * @param maxResults - Maximum results to return (default 5)
  */
-export async function webSearch(query: string, maxResults: number = 5): Promise<WebSearchResponse> {
+export async function webSearch(
+  query: string,
+  maxResults: number = 5,
+  preferredEngines?: string[]
+): Promise<WebSearchResponse> {
   const start = performance.now();
 
   // Try SearXNG first if configured (self-hosted, best results)
   if (ENV.SEARXNG_URL) {
     try {
-      const results = await searxngSearch(query, maxResults);
+      const results = await searxngSearch(query, maxResults, preferredEngines);
+      // A healthy SearXNG HTTP response can still contain no results when
+      // every upstream engine times out or declines the query. Treat that as
+      // an unavailable provider so the fallback has a chance to answer.
+      if (results.length === 0) {
+        throw new Error('SearXNG returned no results');
+      }
       return {
         results,
         query,
@@ -50,7 +60,23 @@ export async function webSearch(query: string, maxResults: number = 5): Promise<
         searchMs: Math.round(performance.now() - start),
       };
     } catch (err) {
-      console.warn('[WebSearch] SearXNG failed, falling back to DuckDuckGo:', err);
+      console.warn('[WebSearch] SearXNG aggregate search failed, trying engine fallback:', err);
+    }
+
+    // Keep a reliable SearXNG engine-specific fallback when the aggregate
+    // engine set is unavailable or all upstream engines time out.
+    try {
+      const results = await searxngSearch(query, maxResults, ['wp']);
+      if (results.length > 0) {
+        return {
+          results,
+          query,
+          provider: 'searxng',
+          searchMs: Math.round(performance.now() - start),
+        };
+      }
+    } catch (err) {
+      console.warn('[WebSearch] SearXNG Wikipedia fallback failed:', err);
     }
   }
 
@@ -127,11 +153,16 @@ async function duckDuckGoSearch(query: string, maxResults: number): Promise<WebS
 }
 
 /** SearXNG meta-search engine (self-hosted, privacy-focused). */
-async function searxngSearch(query: string, maxResults: number): Promise<WebSearchResult[]> {
+async function searxngSearch(
+  query: string,
+  maxResults: number,
+  engines?: string[]
+): Promise<WebSearchResult[]> {
   const searchUrl = new URL('/search', ENV.SEARXNG_URL);
   searchUrl.searchParams.set('q', query);
   searchUrl.searchParams.set('format', 'json');
   searchUrl.searchParams.set('categories', 'general');
+  if (engines?.length) searchUrl.searchParams.set('engines', engines.join(','));
 
   const res = await fetch(searchUrl.toString(), {
     signal: AbortSignal.timeout(8000),

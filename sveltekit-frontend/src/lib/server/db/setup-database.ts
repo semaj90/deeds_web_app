@@ -36,7 +36,7 @@ export async function setupDatabase(): Promise<DatabaseSetupResult> {
                     id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
                     text_hash TEXT UNIQUE NOT NULL,
                     embedding vector(768) NOT NULL,
-                    model TEXT NOT NULL DEFAULT 'nomic-embed-text',
+                    model TEXT NOT NULL DEFAULT 'embeddinggemma:latest',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     access_count INTEGER DEFAULT 1

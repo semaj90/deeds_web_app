@@ -2,7 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { readdir, readFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -28,6 +28,10 @@ const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const LIMIT = Math.max(1, Number(limitArg?.split('=')[1] ?? process.env.ATLAS_NATIVE_STRUCTURAL_LIMIT ?? (APPLY ? 1000 : 50)));
 const includeArg = process.argv.find((arg) => arg.startsWith('--include='));
 const INCLUDE_PREFIX = includeArg?.slice('--include='.length).replaceAll('\\', '/').replace(/^\.\//, '') ?? '';
+const runIdArg = process.argv.find((arg) => arg.startsWith('--run-id='));
+const RUN_ID = runIdArg?.slice('--run-id='.length).trim() || '';
+const nominationOutputArg = process.argv.find((arg) => arg.startsWith('--output-nominations='));
+const NOMINATION_OUTPUT = nominationOutputArg?.slice('--output-nominations='.length).trim() || '';
 const PRODUCER_REVISION = 'atlas.native-structural-materializer.v1';
 const REGISTRY_REVISION = process.env.ATLAS_SYMBOL_REGISTRY_REVISION ?? 'atlas-symbol-registry-v1';
 
@@ -94,8 +98,34 @@ async function discoverSources(): Promise<string[]> {
   return files.sort((a, b) => sourceRef(a).localeCompare(sourceRef(b))).slice(0, LIMIT);
 }
 
+const runSourceMetadata = new Map<string, { sourceRevision: string | null; contentHash: string | null; workspaceRevision: string | null }>();
+
+async function discoverRunSources(runId: string): Promise<string[]> {
+  const result = await pool.query<{ source_ref: string; source_revision: string | null; content_hash: string | null; workspace_revision: string | null }>(
+    `SELECT source_ref, source_revision, content_hash, workspace_revision
+       FROM public.graphify_files
+      WHERE last_seen_run_id = $1
+      ORDER BY source_ref
+      LIMIT $2`,
+    [runId, LIMIT],
+  );
+  const files: string[] = [];
+  for (const row of result.rows) {
+    const absolute = path.resolve(REPO_ROOT, row.source_ref);
+    if (absolute.startsWith(`${REPO_ROOT}${path.sep}`)) {
+      files.push(absolute);
+      runSourceMetadata.set(row.source_ref, {
+        sourceRevision: row.source_revision,
+        contentHash: row.content_hash,
+        workspaceRevision: row.workspace_revision,
+      });
+    }
+  }
+  return files;
+}
+
 const workspace = workspaceRevision();
-const files = await discoverSources();
+const files = RUN_ID ? await discoverRunSources(RUN_ID) : await discoverSources();
 const materializer = new GraphifyStructuralMaterializer();
 const symbolRegistry = createSymbolRegistryRepository(pool);
 const evidenceLedger = createEvidenceLedgerRepository(pool);
@@ -110,6 +140,9 @@ const report = {
   canonical_write_gate: 'BLOCKED_SOURCE_REVISION_AUTHORITY_UNPROVEN' as const,
   limit: LIMIT,
   include_prefix: INCLUDE_PREFIX || null,
+  run_id: RUN_ID || null,
+  source_selection: RUN_ID ? 'GRAPHIFY_FILES_LAST_SEEN_RUN' : 'FILESYSTEM_DISCOVERY',
+  nomination_output: NOMINATION_OUTPUT || null,
   discovered_files: files.length,
   processed_files: 0,
   proven_native_files: 0,
@@ -117,6 +150,7 @@ const report = {
   compatibility_files: 0,
   no_symbols_files: 0,
   failed_files: 0,
+  unsupported_files: 0,
   evidence_rows_written: 0,
   symbol_nominations: 0,
   canonical_symbol_resolutions: 0,
@@ -124,15 +158,22 @@ const report = {
   evidence_entity_facts_written: 0,
   diagnostics: [] as Array<{ source_ref: string; messages: string[] }>,
   no_symbols_refs: [] as string[],
+  unsupported_refs: [] as string[],
   failures: [] as Array<{ source_ref: string; error: string }>,
 };
+const dryRunNominations: unknown[] = [];
 
 for (const absolutePath of files) {
   const ref = sourceRef(absolutePath);
   try {
     const source = await readFile(absolutePath, 'utf8');
     if (!source.trim()) continue;
-    const language = SUPPORTED[path.extname(absolutePath).toLowerCase()]!;
+    const language = SUPPORTED[path.extname(absolutePath).toLowerCase()];
+    if (!language) {
+      report.unsupported_files += 1;
+      report.unsupported_refs.push(ref);
+      continue;
+    }
     const sourceVersionAnchor = `content:${sha256(source)}`;
     const structural = await materializer.materialize({
       sourceRef: ref,
@@ -179,6 +220,19 @@ for (const absolutePath of files) {
     });
     if (!compiled.fabric) continue;
     report.symbol_nominations += compiled.fabric.symbol_nominations.length;
+    if (!APPLY && NOMINATION_OUTPUT) {
+      const runMetadata = runSourceMetadata.get(ref);
+      for (const nomination of compiled.fabric.symbol_nominations) {
+        dryRunNominations.push({
+          ...nomination,
+          source_revision: runMetadata?.sourceRevision ?? nomination.source_revision ?? null,
+          workspace_revision: runMetadata?.workspaceRevision ?? workspace,
+          source_content_hash: runMetadata?.contentHash ?? null,
+          source_version_anchor: sourceVersionAnchor,
+          canonical_authority: false,
+        });
+      }
+    }
 
     const evidenceRevision = `structural:${sha256({
       source_version_anchor: sourceVersionAnchor,
@@ -294,6 +348,14 @@ const status = report.failed_files > 0
     ? 'APPLY_BLOCKED_REVISION_OWNER_UNPROVEN'
     : 'DRY_RUN_COMPLETE';
 const finalReceipt = { ...report, status, output_checksum: sha256(report), producer_revision: PRODUCER_REVISION };
+if (!APPLY && NOMINATION_OUTPUT) {
+  const outputPath = path.resolve(REPO_ROOT, NOMINATION_OUTPUT);
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  dryRunNominations.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  await writeFile(outputPath, dryRunNominations.map((row) => JSON.stringify(row)).join('\n') + (dryRunNominations.length ? '\n' : ''), 'utf8');
+  (finalReceipt as Record<string, unknown>).nomination_output_rows = dryRunNominations.length;
+  (finalReceipt as Record<string, unknown>).nomination_output_checksum = sha256(dryRunNominations);
+}
 console.log(JSON.stringify(finalReceipt, null, 2));
 await pool.end();
 if (report.failed_files > 0 || APPLY) process.exitCode = 2;

@@ -21,17 +21,17 @@ export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 't
   /** Embedding model (Ollama :11434, 384-dim) */
   embedding: 'embeddinggemma:latest',
   /** Legal text reasoning / chat / agentic tool-calling (llama-server :8090, TurboQuant canonical) */
-  legal: 'gemma4-legal-iq4xs-direct.gguf',
+  legal: 'ornith-1.5-9b',
   /** Gemma 4 unified (llama-server :8090) — never Ollama */
-  gemma4: 'gemma4-legal-iq4xs-direct.gguf',
+  gemma4: 'ornith-1.5-9b',
   /** Vision+Legal (llama-server :8090) */
-  vision: 'gemma4-legal-iq4xs-direct.gguf',
+  vision: 'ornith-1.5-9b',
   /**
    * Structured-call translator (llama-server :8090 canonical).
    * Do NOT use Ollama for synthesis. Set FUNCTION_GEMMA_MODEL only if
    * a separate llama-server instance is running on a different port.
    */
-  tool: 'gemma4-legal-iq4xs-direct.gguf',
+  tool: 'ornith-1.5-9b',
 };
 
 export type VLMModel = string;
@@ -492,7 +492,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
         message.tool_calls = ollamaToolCalls;
       }
       ollamaResponse = {
-        model: ollamaBody.model ?? 'gemma4-rotorquant:latest',
+        model: ollamaBody.model ?? VLM_MODELS.gemma4,
         created_at: new Date().toISOString(),
         message,
         done: true,
@@ -506,7 +506,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
     } else {
       // /api/generate response format
       ollamaResponse = {
-        model: ollamaBody.model ?? 'gemma4-rotorquant:latest',
+        model: ollamaBody.model ?? VLM_MODELS.gemma4,
         created_at: new Date().toISOString(),
         response: content,
         done: true,

@@ -230,7 +230,7 @@ class AdapterImplementationProof {
     try {
       // Check for duplicate PacketRegistry, Retrieval, or Cache implementations
       const { stdout: psqlMatches } = await execAsync(
-        `grep -r "class.*PostgresPacketRegistry\\|class.*QdrantRetrieval\\|class.*ValkeyCache" ${SCRIPTS_ROOT} 2>/dev/null | wc -l`
+        `grep -r --exclude="adapter-implementation-proof.mjs" -E "class[[:space:]]+(PostgresPacketRegistry|QdrantRetrieval|ValkeyCache)\\b" ${SCRIPTS_ROOT} 2>/dev/null | wc -l`
       );
 
       const duplicates = parseInt(psqlMatches.trim());

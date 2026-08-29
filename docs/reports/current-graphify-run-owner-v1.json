@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-run-owner.v1",
-  "generatedAt": "2026-08-29T09:35:26.941Z",
+  "generatedAt": "2026-08-29T20:49:53.282Z",
   "mode": "READ_ONLY_RUN_OWNER_AUDIT",
   "readOnly": true,
   "writes": {
@@ -24,22 +24,22 @@
     "dry_run": false,
     "started_at": "2026-08-28T04:01:23.454Z",
     "completed_at": null,
-    "workspace_row_present": false
+    "workspace_row_present": true
   },
   "runCount": 1,
   "completedOwnerCount": 0,
-  "workspaceRowCount": 0,
+  "workspaceRowCount": 1,
   "ownerAssessment": {
     "runExists": true,
     "runCompleted": false,
-    "workspaceForeignRowExists": false,
+    "workspaceForeignRowExists": true,
     "sourceManifestBound": true,
     "authoritativeGraphRun": false
   },
   "promotion": {
     "graphRevisionAllowed": false,
     "edgeAdmissionAllowed": false,
-    "reason": "Current run is incomplete and the referenced workspace owner row is absent; no graph revision may be promoted from it."
+    "reason": "Current run is incomplete; the workspace owner exists, but no graph revision may be promoted until receipt-bound completion is proven."
   },
   "runs": [
     {
@@ -55,7 +55,7 @@
       "dry_run": false,
       "started_at": "2026-08-28T04:01:23.454Z",
       "completed_at": null,
-      "workspace_row_present": false
+      "workspace_row_present": true
     }
   ],
   "status": "GRAPHIFY_RUN_OWNER_BLOCKED"

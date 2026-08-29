@@ -6,7 +6,7 @@
 -- ============================================================================
 
 -- Legal documents have specific characteristics that require tuned HNSW parameters:
--- 1. High-dimensional vectors (768 dims from nomic-embed-text)
+-- 1. High-dimensional vectors (768 dims from EmbeddingGemma)
 -- 2. Cluster-heavy distribution (similar legal concepts group together)
 -- 3. Mixed query patterns (broad searches + precision lookups)
 -- 4. Batch insertions during document ingestion

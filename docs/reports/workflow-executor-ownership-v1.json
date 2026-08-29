@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.workflow-executor-ownership.v1",
+  "observedAt": "2026-08-29",
+  "status": "LANGGRAPH_BOUNDED_RUNTIME_PROVEN_MASTRA_DEFERRED",
+  "ownership": {
+    "workflowDefinition": "AtlasWorkflowSpecV1",
+    "executionEvidence": "WorkflowActionEventV1",
+    "executionCoordinates": "WorkflowExecutionCoordinatesV1",
+    "canonicalAuthority": "PostgreSQL receipts and Parent Atlas revision contracts",
+    "finalFusionOwner": "SearchRuntime"
+  },
+  "langgraph": {
+    "package": "@langchain/langgraph",
+    "installed": true,
+    "nativeStateGraphImports": [
+      "sveltekit-frontend/src/lib/server/langgraph/dispatcher-graph.ts",
+      "sveltekit-frontend/src/lib/server/ai/langgraph-dag.ts",
+      "packages/atlas-core/src/langgraph/worker.ts",
+      "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts"
+    ],
+    "declaredVersion": "1.4.7",
+    "resolvedCoreVersion": "1.2.4",
+    "requiredCoreRange": "^1.1.48",
+    "versionRangeCheck": "PASS",
+    "nativeImportCheck": "PROVEN",
+    "importError": null,
+    "promotionState": "WIRED_PROVEN_IMPORT_BOUNDARY"
+  },
+  "mastra": {
+    "directDependency": false,
+    "nativeRuntimeImports": false,
+    "transitiveLockfilePackageObserved": true,
+    "legacyScript": "scripts/atlas/daily-graphify-mastra-workflow.mjs",
+    "scriptRuntime": "legacy workflow shell with direct workflow-log SQL; no Mastra import",
+    "promotionState": "PLANNED_UNPROVEN_DEFERRED"
+  },
+  "contract": {
+    "path": "packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts",
+    "status": "PROVEN",
+    "testPath": "packages/parent-atlas/test/workflow-execution-coordinates-v1.test.mjs",
+    "separates": ["framework", "orchestrationRuntime", "checkpointProvider", "actionExecutor", "transport"],
+    "canonicalIdentityOwner": "workflow_action_event"
+  },
+  "adapterReplay": {
+    "path": "scripts/atlas/prove-langgraph-readonly-adapter-replay-v1.mjs",
+    "reportPath": "docs/reports/langgraph-readonly-adapter-replay-v1.json",
+    "status": "PROVEN",
+    "framework": "langgraph_stategraph",
+    "outputParity": true,
+    "actionOrderParity": true,
+    "checksumParity": true,
+    "writesPerformed": false
+  },
+  "failureReplay": {
+    "path": "scripts/atlas/prove-langgraph-failure-retry-replay-v1.mjs",
+    "reportPath": "docs/reports/langgraph-failure-retry-replay-v1.json",
+    "status": "PROVEN_BOUNDED",
+    "checkpointProvider": "memory",
+    "retry": true,
+    "cancellation": true,
+    "replay": true,
+    "durablePostgresCheckpoint": false,
+    "writesPerformed": false
+  },
+  "mastraDecision": {
+    "status": "DEFERRED",
+    "directDependencyAdded": false,
+    "adapterEvaluated": false,
+    "reason": "One proven workflow executor is sufficient; Mastra remains a separately authorized challenger.",
+    "activeWorkflowOwner": "LangGraph adapter behind AtlasWorkflowSpecV1"
+  },
+  "writesPerformed": false,
+  "nextGate": "WF-EXEC-05 keep Mastra deferred unless a separate adapter evaluation is explicitly authorized",
+  "evidence": [
+    "scripts/atlas/validate-langgraph-dependencies.mjs",
+    "sveltekit-frontend/package.json",
+    "sveltekit-frontend/src/lib/server/langgraph/dispatcher-graph.ts",
+    "scripts/atlas/daily-graphify-mastra-workflow.mjs"
+  ]
+}

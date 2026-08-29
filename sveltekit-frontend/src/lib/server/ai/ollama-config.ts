@@ -43,7 +43,7 @@ export const MODELS: Record<string, ModelConfig> = {
     type: 'embedding',
     capabilities: ['embeddings'],
     embeddingDimension: 768,
-    contextWindow: 8192,
+    contextWindow: 2048, // Per google/embeddinggemma-300m model card: 2048 max input tokens
     temperature: 0.0, // Deterministic embeddings
     systemPrompt: SYSTEM_EMBEDDING,
   },
@@ -58,8 +58,7 @@ export const FALLBACK_CHAIN = {
 		LLM_MODEL_ID, // canonical local synthesis model
 	],
 	embeddings: [
-		'embeddinggemma', // Primary Google's EmbeddingGemma
-		'nomic-embed-text', // Fallback: Nomic embedding model
+		'embeddinggemma', // Canonical EmbeddingGemma semantic_768 lane
 	]
 };
 
@@ -105,7 +104,7 @@ export const OLLAMA_CONFIG: OllamaConfig = {
  * Get model configuration with fallback support
  */
 export function getModelConfig(modelName: string = OLLAMA_CONFIG.defaultModel): ModelConfig {
-    return MODELS[modelName] || MODELS[OLLAMA_CONFIG.fallbackModels?.legal ?? 'nomic-embed-text'];
+    return MODELS[modelName] || MODELS[OLLAMA_CONFIG.fallbackModels?.legal ?? LLM_MODEL_ID];
 }
 
 /**

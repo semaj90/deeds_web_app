@@ -24,6 +24,7 @@ import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { resolve } from 'path';
 
@@ -112,7 +113,7 @@ export class AutonomousAgent {
     // Initialize Ollama LLM
     this.llm = new ChatOllama({
       baseUrl: ENV.OLLAMA_BASE_URL,
-      model: 'gemma4-rotorquant:latest',
+      model: LLM_MODEL_ID,
       temperature: this.config.temperature,
     });
 
@@ -1589,7 +1590,7 @@ export class AutonomousAgent {
       toolCount: this.tools.length,
       maxIterations: this.config.maxIterations,
       temperature: this.config.temperature,
-      model: 'gemma4-rotorquant:latest',
+      model: LLM_MODEL_ID,
       hasACEContext: !!(this.config.userId || this.config.caseId),
     };
   }

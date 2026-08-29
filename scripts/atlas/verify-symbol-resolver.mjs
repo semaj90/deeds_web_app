@@ -335,7 +335,9 @@ async function main() {
 
     const isHealthy = failCount === 0;
     console.log(`\n${isHealthy ? '✓ Symbol resolver is HEALTHY' : '✗ Symbol resolver has issues'}`);
-    console.log('[NEXT] Ready to populate CALLS/IMPORTS/USES/EXTENDS edges\n');
+    console.log(isHealthy
+      ? '[NEXT] Resolver infrastructure is available; current-edge promotion still requires revision-bound identity proof.\n'
+      : '[NEXT] Repair resolver/cache gates and prove revision-bound identity before populating structural edges.\n');
 
     process.exit(isHealthy ? 0 : 1);
 

@@ -19,6 +19,13 @@ const sourcePlanPath = path.resolve(process.env.ATLAS_SOURCE_GRAPHIFY_PLAN ?? pa
 const reportPath = path.join(root, 'docs/reports/current-structural-edge-artifact-plan-v2.json');
 const sidecarUrl = process.env.ATLAS_NLP_SIDECAR_URL ?? 'http://127.0.0.1:8095';
 const sha256 = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex');
+const PRODUCER_REVISION = 'atlas.structural-edge-planner.v2';
+
+function deriveEdgeIdentity({ sourceNodeKey, targetNodeKey, edgeType, sourceRef, sourceRevision, workspaceRevision, evidenceRefs }) {
+  const evidenceChecksum = `sha256:${sha256(JSON.stringify({ sourceRef, sourceRevision, workspaceRevision, evidenceRefs }))}`;
+  const edgeId = `edge:${sha256(JSON.stringify({ sourceNodeKey, targetNodeKey, edgeType, sourceRevision, evidenceChecksum }))}`;
+  return { edgeId, evidenceChecksum };
+}
 
 function languageFor(sourceRef) {
   if (/\.(tsx?|mts|cts)$/.test(sourceRef)) return 'typescript';
@@ -49,12 +56,16 @@ async function main() {
   const edges = [];
   const unresolved = [];
   const errors = [];
+  const unsupportedSourceRefs = [];
   let sourceCount = 0;
   let chunkCount = 0;
 
   for (const source of selected) {
     const language = languageFor(source.sourceRef);
-    if (!language) continue;
+    if (!language) {
+      unsupportedSourceRefs.push({ sourceRef: source.sourceRef, reason: 'STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED' });
+      continue;
+    }
     const sourcePath = path.join(root, source.sourceRef.replaceAll('/', path.sep));
     if (!fs.existsSync(sourcePath)) {
       errors.push({ sourceRef: source.sourceRef, error: 'SOURCE_FILE_NOT_FOUND' });
@@ -84,23 +95,43 @@ async function main() {
     const upstreamFileId = chunks.map((chunk) => chunk.upstream_file_id).find(Boolean);
     const fileKey = fileGraphNodeKey(source.sourceRef, source.sourceRevision, upstreamFileId, source.byteLength || Buffer.byteLength(sourceText, 'utf8'));
     if (fileKey) {
-      nodes.set(fileKey, { graphNodeKey: fileKey, sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, nodeKind: 'file', startByte: 0, endByte: Math.max(1, Number(source.byteLength) || Buffer.byteLength(sourceText, 'utf8')), upstreamFileId: String(upstreamFileId), canonicalAuthority: false });
+      nodes.set(fileKey, { graphNodeKey: fileKey, sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, producerRevision: PRODUCER_REVISION, nodeKind: 'file', startByte: 0, endByte: Math.max(1, Number(source.byteLength) || Buffer.byteLength(sourceText, 'utf8')), upstreamFileId: String(upstreamFileId), canonicalAuthority: false });
       byNativeId.set(String(upstreamFileId), fileKey);
     }
     for (const chunk of chunks) {
       const key = graphNodeKey(source.sourceRef, source.sourceRevision, chunk);
       if (!key) continue;
-      nodes.set(key, { graphNodeKey: key, sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, nodeKind: chunk.node_type ?? chunk.kind ?? 'unknown', startByte: Number(chunk.start_byte), endByte: Number(chunk.end_byte), upstreamNodeId: String(chunk.upstream_node_id), canonicalAuthority: false });
+      nodes.set(key, { graphNodeKey: key, sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, producerRevision: PRODUCER_REVISION, nodeKind: chunk.node_type ?? chunk.kind ?? 'unknown', startByte: Number(chunk.start_byte), endByte: Number(chunk.end_byte), upstreamNodeId: String(chunk.upstream_node_id), canonicalAuthority: false });
       for (const id of [chunk.upstream_node_id, chunk.upstream_chunk_id, chunk.upstream_symbol_id]) if (id) byNativeId.set(String(id), key);
     }
     for (const edge of Array.isArray(evidence.edges) ? evidence.edges : []) {
       const fromNodeKey = byNativeId.get(String(edge.from_evidence_key ?? '')) ?? null;
       const toNodeKey = byNativeId.get(String(edge.to_evidence_key ?? '')) ?? null;
       if (edge.resolved !== true || !fromNodeKey || !toNodeKey) {
-        unresolved.push({ sourceRef: source.sourceRef, type: edge.type ?? 'UNKNOWN', fromEvidenceKey: edge.from_evidence_key ?? null, toEvidenceKey: edge.to_evidence_key ?? null, resolved: edge.resolved === true, resolution: edge.resolution ?? null });
+        // evidence_start_line/column are 1-indexed (sidecar convention, verified against real
+        // source 2026-08-29); CSGR-2's resolver converts to 0-indexed LSP position at call time —
+        // kept 1-indexed here so this report matches the sidecar's own raw contract, not a
+        // downstream consumer's.
+        unresolved.push({
+          sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, type: edge.type ?? 'UNKNOWN',
+          fromEvidenceKey: edge.from_evidence_key ?? null, toEvidenceKey: edge.to_evidence_key ?? null,
+          resolved: edge.resolved === true, resolution: edge.resolution ?? null,
+          evidenceStartLine: edge.evidence_start_line ?? null, evidenceStartColumn: edge.evidence_start_column ?? null,
+          evidenceEndLine: edge.evidence_end_line ?? null, evidenceEndColumn: edge.evidence_end_column ?? null,
+        });
         continue;
       }
-      edges.push({ sourceNodeKey: fromNodeKey, targetNodeKey: toNodeKey, edgeType: String(edge.type ?? 'UNKNOWN'), sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, evidenceRefs: [`ast:${source.sourceRef}:${edge.from_evidence_key}:${edge.to_evidence_key}`], canonicalAuthority: false });
+      const evidenceRefs = [`ast:${source.sourceRef}:${edge.from_evidence_key}:${edge.to_evidence_key}`];
+      const identity = deriveEdgeIdentity({
+        sourceNodeKey: fromNodeKey,
+        targetNodeKey: toNodeKey,
+        edgeType: String(edge.type ?? 'UNKNOWN'),
+        sourceRef: source.sourceRef,
+        sourceRevision: source.sourceRevision,
+        workspaceRevision: source.workspaceRevision,
+        evidenceRefs,
+      });
+      edges.push({ sourceNodeKey: fromNodeKey, targetNodeKey: toNodeKey, edgeType: String(edge.type ?? 'UNKNOWN'), sourceRef: source.sourceRef, sourceRevision: source.sourceRevision, workspaceRevision: source.workspaceRevision, producerRevision: PRODUCER_REVISION, evidenceRefs, evidenceChecksum: identity.evidenceChecksum, edgeId: identity.edgeId, canonicalAuthority: false });
     }
   }
 
@@ -122,6 +153,8 @@ async function main() {
     nodes: canonicalNodes,
     edges: canonicalEdges,
     unresolvedEdges: unresolved,
+    unsupportedSourceRefs,
+    unsupportedSourceCount: unsupportedSourceRefs.length,
     errors,
     writes: { postgres: false, qdrant: false, neo4j: false, valkey: false, graphArtifacts: false },
     canonicalAuthority: false,

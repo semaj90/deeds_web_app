@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.structural-edge-target-replay.v1",
+  "mode": "READ_ONLY_SINGLE_EDGE_REPLAY",
+  "generatedAt": "2026-08-29T20:19:49.088Z",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphArtifacts": false
+  },
+  "canonicalAuthority": false,
+  "sourceRef": "sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
+  "sourceRevision": "sha256:88f9530fce3ecb4339ace8c13162209b4e256cdcf84fd743312ccbe292de4a14",
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "edgeType": "CALLS",
+  "fromEvidenceKey": "1a155f569d91e9ba1b9b254a096bbd052f9a282a",
+  "toEvidenceKey": "path.join",
+  "evidencePosition": {
+    "line": 7,
+    "column": 6
+  },
+  "timeoutMs": 15000,
+  "durationMs": 556,
+  "resolver": {
+    "server": "typescript-language-server",
+    "serverRevision": "5.3.0",
+    "resolverRevision": "atlas.compiler-semantic-resolver.2026-08-29.v1",
+    "negotiatedPositionEncoding": "utf-16-default"
+  },
+  "result": {
+    "status": "RESOLVED_IN_REPO",
+    "targets": [
+      {
+        "targetUri": "file:///c%3A/Users/james/Videos/deeds-web-app/sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
+        "targetRange": {
+          "start": {
+            "line": 6,
+            "character": 6
+          },
+          "end": {
+            "line": 6,
+            "character": 14
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  "replayChecksum": "sha256:e991ec0a59872198c46d439e420425fe748af7c827854090c5b46979b3dfc5e9"
+}

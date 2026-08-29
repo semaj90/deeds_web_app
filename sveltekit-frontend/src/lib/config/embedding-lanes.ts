@@ -123,7 +123,7 @@ export function selectEmbeddingLane(
       lanes,
       selected_lane: 'fallback-512d',
       fallback_chain: buildFallbackChain('fallback-512d', availableVramMb),
-      reasoning: `Auto-selected fallback-512d (VRAM: ${availableVramMb}MB ≥ ${lanes['fallback-512d'].minVramMb}MB, insufficient for 768d, using nomic-embed-text)`
+      reasoning: `Auto-selected EmbeddingGemma MRL-512 evaluation lane (VRAM: ${availableVramMb}MB ≥ ${lanes['fallback-512d'].minVramMb}MB)`
     };
   }
 
@@ -229,7 +229,7 @@ export function diagnosticLaneMatrix(): string {
   lines.push('=== Selection Logic ===');
   lines.push('1. If preferred lane specified and available → use it');
   lines.push('2. If VRAM ≥ 1800MB → primary-768d (embeddinggemma)');
-  lines.push('3. If VRAM ≥ 768MB → fallback-512d (nomic-embed-text)');
+  lines.push('3. If VRAM ≥ 768MB → EmbeddingGemma MRL-512 evaluation lane');
   lines.push('4. Else → multimodal-clip-512d (CLIP)');
   lines.push('');
 

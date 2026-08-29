@@ -60,18 +60,6 @@
 			capabilities: ['text-embedding', 'similarity-search', 'vector-generation'],
 			endpoint: getOllamaBaseUrl()
 		},
-		{
-			id: 'nomic-embed',
-			name: 'nomic-embed-text:latest',
-			displayName: 'Nomic Embeddings',
-			provider: 'ollama',
-			size: '274MB',
-			specialization: 'embedding',
-			status: 'offline',
-			performance: { tokensPerSecond: 400, memoryUsage: '512MB', responseTime: 100 },
-			capabilities: ['text-embedding', 'similarity-search'],
-			endpoint: getOllamaBaseUrl()
-		}
 	]);
 
 	let isOpen = $state(false);

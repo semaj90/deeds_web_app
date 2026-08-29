@@ -76,8 +76,8 @@ const DEEP_CROSS_ENCODER_MODEL =
   ENV.CROSS_ENCODER_MODEL ??
   'mixedbread-ai/mxbai-rerank-base-v2';
 const FAST_CROSS_ENCODER_MODEL =
-  process.env.MINILM_CROSS_ENCODER_MODEL ??
-  'cross-encoder/ms-marco-MiniLM-L6-v2';
+  process.env.CROSS_ENCODER_FAST_MODEL ??
+  'mixedbread-ai/mxbai-rerank-base-v2';
 
 export type CanonicalRerankTier = 'deep' | 'fast';
 
@@ -131,7 +131,7 @@ export interface RerankOptions {
   minScore?: number;
   /** Optional user ID for Langfuse analytics */
   userId?: string;
-  /** Canonical rerank tier: deep (MixedBread default) or fast (MiniLM) */
+  /** Canonical rerank tier: deep or fast Mixedbread cross-encoder profile */
   rerankTier?: CanonicalRerankTier;
   /** Explicit model version override for the cross-encoder backend */
   modelVersion?: string;

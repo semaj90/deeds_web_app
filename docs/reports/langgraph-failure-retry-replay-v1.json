@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.langgraph-failure-retry-replay.v1",
+  "status": "LANGGRAPH_FAILURE_RETRY_CANCELLATION_REPLAY_PROVEN",
+  "framework": "langgraph_stategraph",
+  "checkpointProvider": "memory",
+  "checkpointPersistence": "fixture_process_only",
+  "retry": {
+    "firstFailure": "FIXTURE_TRANSIENT_FAILURE",
+    "retryAttemptCount": 2,
+    "recovered": true
+  },
+  "cancellation": {
+    "requested": true,
+    "observedError": "WORKFLOW_CANCELLED",
+    "cooperativeCancellation": true
+  },
+  "replay": {
+    "outputA": {
+      "actions": [
+        "read_evidence",
+        "retryable_validation"
+      ],
+      "result": "validated"
+    },
+    "outputB": {
+      "actions": [
+        "read_evidence",
+        "retryable_validation"
+      ],
+      "result": "validated"
+    },
+    "checksumA": "e54424c92b367f1bafcb1494920eff1513d66844efe196d5f240c4beb5dfd4c6",
+    "checksumB": "e54424c92b367f1bafcb1494920eff1513d66844efe196d5f240c4beb5dfd4c6",
+    "identical": true
+  },
+  "sideEffects": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "sourceWrites": false,
+    "mutationExecutorInvoked": false
+  },
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "nextGate": "WF-EXEC-05 defer or evaluate Mastra only after durable adapter receipts are specified"
+}

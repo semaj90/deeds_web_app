@@ -1,11 +1,11 @@
 {
   "schema": "atlas.graphify-workspace-owner-v1",
-  "generatedAt": "2026-08-29T09:33:21.573Z",
+  "generatedAt": "2026-08-29T20:29:51.006Z",
   "readOnly": true,
   "canonicalWrites": false,
   "candidateOwner": "public.workspaces.id",
-  "graphifyRunWorkspaceForeignKey": false,
-  "ownerContractStatus": "OWNER_CONTRACT_GAP",
+  "graphifyRunWorkspaceForeignKey": true,
+  "ownerContractStatus": "OWNER_CONTRACT_PRESENT",
   "tables": [
     {
       "table_schema": "public",
@@ -375,6 +375,14 @@
     },
     {
       "table_name": "graphify_files",
+      "constraint_name": "graphify_files_workspace_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "column_name": "workspace_id",
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "id"
+    },
+    {
+      "table_name": "graphify_files",
       "constraint_name": "graphify_files_workspace_id_not_null",
       "constraint_type": "CHECK",
       "column_name": null,
@@ -479,6 +487,14 @@
     },
     {
       "table_name": "graphify_runs",
+      "constraint_name": "graphify_runs_workspace_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "column_name": "workspace_id",
+      "foreign_table_name": "workspaces",
+      "foreign_column_name": "id"
+    },
+    {
+      "table_name": "graphify_runs",
       "constraint_name": "graphify_runs_workspace_id_not_null",
       "constraint_type": "CHECK",
       "column_name": null,
@@ -535,9 +551,9 @@
     }
   ],
   "counts": {
-    "workspaces": 0,
+    "workspaces": 1,
     "graphify_runs": 5,
     "graphify_files": 885
   },
-  "conclusion": "public.workspaces can hold UUIDs, but Graphify lineage does not currently enforce it as the workspace owner."
+  "conclusion": "Graphify run workspace identity is referentially bound to public.workspaces."
 }

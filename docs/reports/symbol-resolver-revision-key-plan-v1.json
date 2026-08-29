@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.symbol-resolver-revision-key-plan.v1",
+  "readOnly": true,
+  "writesPerformed": false,
+  "status": "BLOCKED_MISSING_REVISION_COLUMNS",
+  "table": {
+    "exists": true,
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "bigint"
+      },
+      {
+        "column_name": "feature_id",
+        "data_type": "text"
+      },
+      {
+        "column_name": "packet_key",
+        "data_type": "text"
+      },
+      {
+        "column_name": "source_ref",
+        "data_type": "text"
+      },
+      {
+        "column_name": "node_type",
+        "data_type": "text"
+      },
+      {
+        "column_name": "confidence",
+        "data_type": "real"
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "timestamp without time zone"
+      }
+    ],
+    "rowCount": 58365
+  },
+  "keyContract": {
+    "proposedSchema": "atlas.symbol-resolver-cache-key.v1",
+    "requiredFields": [
+      "workspaceRevision",
+      "sourceRevision",
+      "featureId",
+      "packetKey"
+    ],
+    "currentRevisionFields": [],
+    "status": "BLOCKED_MISSING_REVISION_COLUMNS"
+  },
+  "cache": {
+    "namespace": "symbol:*:packets",
+    "keyCount": 0,
+    "writesPerformed": false
+  },
+  "nextGate": "GRAPH-RESOLVE-02 add or bind a revision-qualified producer; do not warm cache from legacy rows"
+}

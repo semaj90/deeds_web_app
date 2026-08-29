@@ -7,7 +7,7 @@
   "ordinalMapChecksum": "ad14f10fc175e7af182d142ed820d6c0c5964451c6db5c872dbabf83a997f1ef",
   "nodeCount": 6,
   "edgeCount": 6,
-  "renumbered": true,
+  "renumbered": false,
   "unknownOrdinals": 0,
   "cpuBackend": "networkx",
   "gpuBackend": "cugraph.pagerank",

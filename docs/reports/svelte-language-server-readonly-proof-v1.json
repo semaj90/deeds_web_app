@@ -1,124 +1,35 @@
 {
   "schema": "atlas.svelte-language-server-readonly-proof.v1",
-  "status": "PROVEN_LIVE_READ_ONLY",
+  "status": "DEGRADED_LSP_RESPONSE",
   "writes": false,
-  "server": {
-    "id": "svelte-language-server",
-    "version": "0.18.3",
-    "command": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\.bin\\svelteserver.cmd"
-  },
-  "sourceRef": "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
-  "sourceRevision": "sha256:740a5617df8857f425ae293e7d843fd5198e89912d383ba393b941510237bcd1",
   "probeSymbol": "POIPhotoModalImpl",
-  "position": {
-    "line": 7,
-    "character": 9
-  },
-  "negotiatedPositionEncoding": "utf-16-default",
-  "serverCapabilities": {
-    "textDocumentSync": {
-      "openClose": true,
-      "change": 2,
-      "save": {
-        "includeText": false
-      }
+  "resolution": {
+    "schema": "atlas.compiler-semantic-resolution.v1",
+    "requestId": "prove-svelte-language-server-readonly",
+    "workspaceRevision": null,
+    "sourceRef": "sveltekit-frontend/src/lib/client/ui/POIPhotoModal.svelte",
+    "sourceRevision": "sha256:740a5617df8857f425ae293e7d843fd5198e89912d383ba393b941510237bcd1",
+    "edgeType": null,
+    "sourceEvidenceRef": null,
+    "language": "svelte",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "sourcePosition": {
+      "byteOffset": 283,
+      "line": 7,
+      "character": 9
     },
-    "hoverProvider": true,
-    "completionProvider": {
-      "resolveProvider": true,
-      "triggerCharacters": [
-        ".",
-        "\"",
-        "'",
-        "`",
-        "/",
-        "@",
-        "<",
-        ">",
-        "*",
-        "#",
-        "$",
-        "+",
-        "^",
-        "(",
-        "[",
-        "@",
-        "-",
-        ":",
-        "|"
-      ],
-      "completionItem": {
-        "labelDetailsSupport": true
-      }
+    "resolver": {
+      "server": "svelte-language-server",
+      "serverRevision": "0.18.3",
+      "resolverRevision": "atlas.compiler-semantic-resolver.2026-08-29.v1",
+      "negotiatedPositionEncoding": "utf-16-default"
     },
-    "documentFormattingProvider": true,
-    "colorProvider": true,
-    "documentSymbolProvider": true,
-    "definitionProvider": true,
-    "codeActionProvider": true,
-    "renameProvider": true,
-    "referencesProvider": true,
-    "selectionRangeProvider": true,
-    "signatureHelpProvider": {
-      "triggerCharacters": [
-        "(",
-        ",",
-        "<"
-      ],
-      "retriggerCharacters": [
-        ")"
-      ]
-    },
-    "semanticTokensProvider": {
-      "legend": {
-        "tokenModifiers": [
-          "declaration",
-          "static",
-          "async",
-          "readonly",
-          "defaultLibrary",
-          "local"
-        ],
-        "tokenTypes": [
-          "class",
-          "enum",
-          "interface",
-          "namespace",
-          "typeParameter",
-          "type",
-          "parameter",
-          "variable",
-          "enumMember",
-          "property",
-          "function",
-          "method",
-          "event"
-        ]
-      },
-      "range": true,
-      "full": true
-    },
-    "linkedEditingRangeProvider": true,
-    "implementationProvider": true,
-    "typeDefinitionProvider": true,
-    "inlayHintProvider": true,
-    "callHierarchyProvider": true,
-    "foldingRangeProvider": true,
-    "codeLensProvider": {
-      "resolveProvider": true
-    },
-    "documentHighlightProvider": true,
-    "workspaceSymbolProvider": true,
-    "diagnosticProvider": {
-      "interFileDependencies": true,
-      "workspaceDiagnostics": false
+    "result": {
+      "status": "TIMEOUT",
+      "targets": [],
+      "error": "LSP_TIMEOUT:textDocument/definition"
     }
   },
-  "hoverPresent": true,
-  "definitionCount": 1,
-  "initializeError": null,
-  "hoverError": null,
-  "definitionError": null,
-  "stderr": "Initialize language server at  file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend\nInitialize new ts service at  c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/tsconfig.json\nTrying to load configs for c:/Users/james/Videos/deeds-web-app/sveltekit-frontend\nThe following Vite config options will be overridden by SvelteKit:\n  - root\nLoaded config at  c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\svelte.config.js\nSnapshotManager File Statistics:\nProject files: 4644\nSvelte files: 923\nFrom node_modules: 0\nTotal: 4644",
   "error": null
 }

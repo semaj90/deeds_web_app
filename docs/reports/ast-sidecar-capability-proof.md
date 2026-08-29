@@ -1,7 +1,7 @@
 # AST sidecar capability proof
 
 - structural status: **PROVEN**
-- LangExtract grounding status: **DEGRADED**
+- LangExtract grounding status: **PROVEN**
 - endpoint: http://127.0.0.1:8095
 - contract: provenance-v2
 - engine: treesitter-chunker 4.0.0
@@ -26,8 +26,8 @@
 - EDGE_TYPES_RECOGNIZED: PASS
 - NO_FAKE_CALL_SYMBOLS: PASS
 - GROUNDED_PROBE_COMPLETED: PASS
-- LANGEXTRACT_NATIVE_CHAR_INTERVAL: FAIL
-- LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE: FAIL
+- LANGEXTRACT_NATIVE_CHAR_INTERVAL: PASS
+- LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE: PASS
 
 The proof requires definition evidence plus at least one typed reference edge; it does not require every possible XRef edge kind to appear in one fixture.
 Native Consiliency IDs remain upstream provenance. This proof only establishes provenance completeness; GIS still owns canonical identity promotion.

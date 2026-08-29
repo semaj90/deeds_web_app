@@ -1,0 +1,117 @@
+{
+  "schema": "atlas.graphify-run-completion-plan.v1",
+  "generatedAt": "2026-08-29T20:40:04.022Z",
+  "mode": "READ_ONLY_COMPLETION_PLAN",
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphRevision": false
+  },
+  "inputs": {
+    "ownerAudit": "docs/reports/current-graphify-run-owner-v1.json",
+    "structuralPlan": "docs/reports/current-structural-edge-artifact-plan-v2.json",
+    "structuralResolution": "docs/reports/current-structural-edge-resolution-v1.json"
+  },
+  "currentRun": {
+    "runId": "14643371-f6f2-4131-906b-235a5c06619a",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sourceManifestDigest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "sourceManifestSourceCount": 24192,
+    "status": "RUNNING",
+    "completedAt": null,
+    "workspaceRowPresent": true
+  },
+  "structuralArtifact": {
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "selectedSourceCount": 111,
+    "processedSourceCount": 103,
+    "nodeCount": 2545,
+    "edgeCount": 1334,
+    "unresolvedEdgeCount": 10506,
+    "producerRevision": "atlas.structural-edge-planner.v2",
+    "unsupportedSourceCount": 8,
+    "unsupportedSourceRefs": [
+      {
+        "sourceRef": "scripts/unsloth-training/COLAB_PACKAGE/MEGA_DATASET_EXPANSION.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "simd-bridge/cpp/build_som_cache.sh",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/TODO-karpathy-gpu-features.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/docs/session-2026-05-04-graphify-recovery.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/couchdb/LLMS.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/(app)/citations/LLMS.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
+        "reason": "STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED"
+      }
+    ],
+    "nodeSetChecksum": "sha256:b14a4aadd896c517cc4fc019ad12e497cef658ecd075d75976ed1988d090a740",
+    "edgeSetChecksum": "sha256:7adec17d5309a77ea6537c55e92063ad50a5ffb7a5a3bc8dd7843ec102a39a7c",
+    "reportChecksum": "sha256:7e628abfc52d6459765f478288753b92be8dd0c8d5669781ec435eba677a7426"
+  },
+  "sourceSelection": {
+    "status": "CURRENT_GRAPHIFY_BATCH_PLAN_READY",
+    "selectedSourceCount": 111,
+    "counts": {
+      "currentGraphifyExact": 111,
+      "missingGraphifySource": 0,
+      "missingWorkspaceObservation": 0,
+      "ambiguousGraphifySource": 0,
+      "graphifyRevisionOrContentMismatch": 0
+    },
+    "selectionChecksum": "1027c9671b2150da95e104c9933e80cf75cb99846fad89e2f290eb34ddd308d1"
+  },
+  "checks": {
+    "ownerAuditAvailable": true,
+    "runExists": true,
+    "runCompleted": false,
+    "workspaceOwnerPresent": true,
+    "workspaceRevisionMatches": true,
+    "sourceSelectionComplete": true,
+    "structuralProcessingComplete": true,
+    "structuralPlanReady": true,
+    "unresolvedEdgesZero": false,
+    "resolutionReceiptComplete": false,
+    "unresolvedTargetUnclassifiedCount": null,
+    "syntaxUnclassifiedCount": null,
+    "nodeChecksumAvailable": true,
+    "edgeChecksumAvailable": true,
+    "producerRevisionPresent": true,
+    "edgeEvidenceComplete": true
+  },
+  "blockers": [
+    "CANONICAL_GRAPHIFY_RUN_NOT_COMPLETED",
+    "STRUCTURAL_RESOLUTION_RECEIPT_INCOMPLETE"
+  ],
+  "completionReceipt": {
+    "schema": "atlas.graphify-run-receipt.v1",
+    "allowed": false,
+    "graphRevision": null,
+    "reason": "Completion receipt cannot be admitted until all blockers are cleared."
+  },
+  "status": "COMPLETION_PLAN_BLOCKED",
+  "planChecksum": "sha256:eab22f2b69ab2e90d84199a69f399579eb6e0fc7c4980e8220303c14f8ea709b"
+}

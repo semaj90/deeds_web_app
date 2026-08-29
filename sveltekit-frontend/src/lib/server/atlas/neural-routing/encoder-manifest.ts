@@ -38,23 +38,23 @@ export const EncoderTrainingManifestV1Schema = z.object({
 export type EncoderTrainingManifestV1 = z.infer<typeof EncoderTrainingManifestV1Schema>;
 
 /**
- * Historical MiniLM classifier kept only as a benchmark until NLP-10 proves the
- * EmbeddingGemma feature router. It must not mint semantic Qdrant vectors.
+ * EmbeddingGemma classification encoder. It produces classification features,
+ * not canonical retrieval vectors or semantic Qdrant writes.
  */
 export const DEFAULT_INTENT_ENCODER_MANIFEST: EncoderTrainingManifestV1 = EncoderTrainingManifestV1Schema.parse({
   schemaVersion: 'atlas.encoder-training-manifest.v1',
   encoderId: 'parent-atlas-intent-domain-v1',
   task: 'intent_domain_classifier',
-  baseModel: 'sentence-transformers/all-MiniLM-L6-v2',
+  baseModel: 'google/embeddinggemma-300m',
   adaptation: 'lora',
   trainSplitRevision: 'UNBOUND',
   validationSplitRevision: 'UNBOUND',
   featureContractRevision: 'atlas.candidate-feature-matrix.v1',
   toolRegistryRevision: 'UNBOUND',
-  maxSequenceLength: 256,
+  maxSequenceLength: 2048,
   batchSize: 32,
   gradientAccumulationSteps: 1,
-  precision: 'fp16',
+  precision: 'fp32',
   targetModules: [],
   rankBudget: 32,
   quantization: 'none',
@@ -76,7 +76,7 @@ export const DEFAULT_TOOL_CROSS_ENCODER_MANIFEST: EncoderTrainingManifestV1 = En
   schemaVersion: 'atlas.encoder-training-manifest.v1',
   encoderId: 'parent-atlas-tool-cross-encoder-v1',
   task: 'tool_cross_encoder',
-  baseModel: 'cross-encoder/ms-marco-MiniLM-L-6-v2',
+  baseModel: 'mixedbread-ai/mxbai-rerank-base-v2',
   adaptation: 'lora',
   trainSplitRevision: 'UNBOUND',
   validationSplitRevision: 'UNBOUND',

@@ -356,3 +356,248 @@ This document records the proposal and the audit; it does **not** rule on:
 Those are exactly the kind of consequential, hard-to-reverse-if-wrong decisions this repo's own
 `CLAUDE.md` says should get an explicit `CANONICAL_OWNER` classification before code is written —
 deferred to whoever scopes the actual implementation tasks, informed by this record.
+
+## Addendum (2026-08-29): full data-plane restated, reconciled against a narrowly-scoped gate
+
+Delivered inline in a review-session chat message while `parent-atlas-compiler-semantic-graph-resolution`
+(CSGR) was mid-flight. Its explicit purpose: confirm that CSGR's narrow unit-of-work scoping
+("CSGR-1 only: shared persistent JSON-RPC client + Atlas resolver contract... no database writes,
+no graph revision yet, no 24k scaling") is a **work-boundary, not an architectural deletion** — the
+components it doesn't touch this pass (simdjson, MessagePack, Arrow/mmap, BitFrost, ACE packets,
+GPU tensor caching, ACP/A2A descriptors) remain part of the data plane this repo already committed
+to above; narrowing one change's task list must never be read as narrowing the architecture.
+
+**The restated layer stack** (same three-plane model as this document's "proposed model" section
+above, redrawn top-to-bottom as a literal pipeline rather than a layer list):
+
+```
+SOURCE / EXTERNAL INPUT
+  source files, Graphify JSON/NDJSON, LSP JSON-RPC, Qdrant payload JSON,
+  Go/MCP responses, external research
+        ↓
+FAST PARSE / VALIDATE
+  small control JSON  → native Node JSON + Zod
+  large JSON/NDJSON    → Rust simd-json or C simdjson, schema-bound decode, OKF/Zod validation
+        ↓
+CANONICAL CONTROL PLANE
+  PostgreSQL 18 (Drizzle/pgx) — sourceRevision, workspaceRevision, packetKey, symbolVersionId,
+  HyperRelationV1, CandidateOrdinalMapV1, GraphNodeKeyV1, GraphOrdinalMapV1
+        ↓
+RETRIEVAL PLANE (vector + graph, parallel)
+  pgvector (exact oracle) · Qdrant (semantic_768 projection, sparse challenger lanes) ·
+  NetworkX (CPU oracle) · TurboVec (challenger) · cuDF edge list → cuGraph (CAGRA later) ·
+  HyperGraph incidence projection
+        ↓
+FEATURE / GPU PLANE
+  CandidateFeatureMatrix — presence bitmaps, semantic_768 rows, graph scores, domain
+  probabilities, ontology features, centroid/SOM/topology hints — Arrow IPC/mmap → CUDA-resident
+  buffers, addressed via CandidateOrdinalGpuAbi/GraphOrdinalGpuAbi. cuVS/cuGraph/PyTorch/XGBoost
+  emit ordinals + scalar scores here — never giant JSON tensors.
+        ↓
+ACE CONTEXT PLANE
+  AcePacket/ACE cards — exact evidence refs, source spans, feature summaries, graph evidence,
+  ontology tuples, citations, checksums → ContextManifest → PromptPlan → Ornith synthesis →
+  grounded-claim validator (read-only) → DAG mutation barrier
+```
+
+**Wire-format layering, restated as a hard split** (extends this document's existing "wire format
+layering" section above with the specific codec-per-purpose table the chat message spelled out):
+
+| Format | Used for |
+|---|---|
+| JSON | configs, receipts, manifests, API/MCP control messages, debugging, small ACE envelopes |
+| MessagePack | compact binary control packets, scalar metadata, bounded arrays, ACP/A2A envelopes |
+| Arrow IPC / mmap | `CandidateFeatureMatrix`, semantic matrices, edge tables, large columnar batches |
+| GPU memory | semantic tensors, feature tensors, eligibility masks, ordinal maps |
+
+The load-bearing distinction is **control serialization vs. numerical storage** — not "JSON is slow,
+use MessagePack everywhere." A 2D JSON view of an `N×768` matrix can exist for diagnostics only; the
+canonical storage is Arrow/mmap/GPU-resident, never JSON, never MessagePack (unpacking thousands of
+scalar values back into an array defeats a compact binary format's purpose either way).
+
+**simdjson's actual place, corrected from a possible over-read of this document's earlier
+sections**: simdjson is not a semantic owner and this document never claimed it was — its real job
+is bulk NDJSON/JSON streams where its On-Demand API's parse-what-you-touch model pays off (large
+Graphify NDJSON, Qdrant dump/audit streams, packet-replay files, external evidence streams, bulk
+receipt processing) — never a control-plane JSON hop in front of every few-KB MCP response, where
+native `JSON.parse`/Zod is both simpler and not measurably slower. If a Rust sidecar for this is
+ever built, name it precisely: **C simdjson** (the original C++ library) vs. **Rust `simd-json`**
+(an independent Rust port with Serde compatibility, not a binding around the C library) are
+different things and conflating them in code comments or package names would recreate exactly the
+kind of naming confusion `CLAUDE.md`'s Duplication Prevention section exists to prevent. A plausible
+future service name: `atlas-packet-codec.rs` (Rust `simd-json`, typed Atlas packet structs,
+canonical validation, Arrow/MessagePack IPC) — not proposed as a task here, recorded as a naming
+convention for whenever it is.
+
+**cuGraph `GraphOrdinal` contract, concrete** — extends this document's existing `CandidateOrdinalMap`
+material with the graph-side equivalent, using `cugraph.Graph.from_cudf_edgelist(..., renumber=False,
+vertices=..., store_transposed=True)`. `renumber=False` is only valid when vertex IDs are already a
+single dense integer column in `[0, V)` — i.e. this is a **requirement on `GraphOrdinalMapV1`**, not
+an implementation detail: the ordinal map must assign every vertex (including symbols, concepts, and
+relation nodes from hypergraph compilation below) a dense `0..V-1` id before any cuGraph call, or
+`renumber=False` silently produces wrong results rather than erroring. The `vertices` argument is
+required whenever isolated vertices exist (cuGraph cannot infer them from `src`/`dst` columns alone)
+— `GraphOrdinalMapV1` must therefore explicitly enumerate all `V` vertices, not just the ones that
+appear in at least one edge. `store_transposed=True` avoids cuGraph computing the transposed
+adjacency internally on the first PageRank call — worth setting at graph-construction time if
+PageRank is a known downstream consumer, not left as a default. None of this is implemented; this is
+a contract requirement recorded before `GraphOrdinalMapV1` is built, so its first implementation
+doesn't have to be redone once someone reads the cuGraph constraints.
+
+**HyperGraphRAG n-ary facts compile to an incidence graph, not invented pairwise edges** — restates
+this document's `HyperRelationV1`/hyperedge material as a concrete worked compilation example: given
+the n-ary fact `(entity A, entity B, relation R17, entity C)`, do not flatten it into pairwise edges
+that didn't exist in the source fact. Instead, every entity *and* every relation gets its own
+`GraphNodeKey` and therefore its own `GraphOrdinal` — e.g. `symbol S9 → ordinal 0`,
+`symbol S22 → ordinal 1`, `concept C7 → ordinal 2`, `relation R17 → ordinal 3` — and the incidence
+edges are `(0,3)`, `(1,3)`, `(2,3)` (each entity connects to the relation node, not to each other
+directly). cuGraph can then run PageRank/BFS/PPR over this projection without destroying the
+original n-ary truth — the relation node itself is what's ranked/traversed, not a synthetic pairwise
+fact.
+
+**Postgres/pgvector/Qdrant split, reaffirmed with the specific default behavior that makes it
+correct**: pgvector defaults to **exact** nearest-neighbor search; HNSW/IVFFlat are explicit
+approximate indexes a query must opt into. That means eligibility filtering (which candidates are
+even allowed to be considered) belongs on the Postgres/canonical-identity side by default — Qdrant/
+cuVS/GPU are ranking and ANN speed layers on top of an eligibility set Postgres already decided, not
+the deciders of eligibility themselves. Qdrant's grouped search (bounding results per parent/tile ID)
+is the specific mechanism for preventing multiple tiles from one packet from flooding an ACE context
+window — worth using deliberately at the retrieval-plane layer rather than de-duplicating
+after the fact in ACE.
+
+**BitFrost/Valkey tensor-residency keying, restated as a contract, not just a Redis key name**:
+per this document's existing GPU-resident-executor findings above, residency state should be keyed
+by `candidateSnapshotRevision` + `ordinalMapChecksum` + `featureMatrixChecksum` +
+`representationRevision` + `deviceId` + `bufferId` + `leaseEpoch` — not by a bare cache-key string.
+Two contract names worth freezing for whenever this is built: `ResidentArtifactV1` (the CPU-canonical
+artifact once Arrow/mmap → H2D — `semanticMatrix[N×768]`, `featureMatrix[N×F]`, graph vertices/edges,
+bitmaps — reusable across cuVS/cuGraph/PyTorch-reranker consumers so nothing re-serializes the same
+tensor repeatedly) and `ArtifactAddressV1` (the transport descriptor — `deviceId`, `bufferId`,
+`dtype`, `shape`, `checksum`, `leaseEpoch`, `representationRevision` — sent instead of resending a
+50MB JSON object). This is where the tensor-residency integration bundle's Gate T4/T5 material
+(already found live and gated in this document's earlier sections) should eventually connect.
+
+**PyTorch consumes the feature fabric; it does not synthesize prose** — reaffirms this document's
+existing rule-ownership hierarchy: PyTorch's role is domain classifier, query router, reranker,
+low-rank heads, RL-policy experiments, dense graph feature heads — i.e. it produces
+`CandidateFeatureMatrix` rows, `DecisionVector`s, ordinals, and scalar scores. Natural-language
+synthesis, query decomposition, and DAG proposals stay Ornith's job, consuming ACE's already-compiled
+evidence — never raw PageRank arrays, raw `semantic_768` rows, raw SOM tensors, or raw cuGraph
+buffers sent to a synthesis model directly. This is the same "ACE turns numerical state into bounded
+evidence-bearing context" principle this document's `AcePacketV2` section already states, restated
+here because it's the reason the already-proven GPU→ACE→ContextManifest path (this document's Gate
+T2/T3 findings above) is architecturally load-bearing rather than merely a performance optimization.
+
+**CouchDB stays off the hot query path** — reaffirmed, not new: accepted-immutable-envelope archive,
+offline views, MapReduce rollups are fine; adding Postgres+CouchDB+Qdrant+GPU to one query's
+execution path would create a second consistency domain this repo's existing "Postgres is truth,
+others are mirrors" rule already forbids.
+
+**Correctness spine vs. performance data plane — the separation this addendum exists to make
+explicit**: the immediate gate ladder (feature manifest → graph ablation replay →
+`CandidateOrdinal` GPU ABI → `GraphOrdinal` GPU ABI → candidate/graph bridge → cuVS/cuGraph parity —
+i.e. what CSGR and its sibling changes are actually walking through gate-by-gate right now) is the
+correctness-proof sequence. The performance tranche around it (JSON-vs-simdjson profiling where
+actually justified by measured volume, Arrow IPC/mmap for GPU-resident tensors, BitFrost residency
+keying, compact MessagePack A2A descriptors) is real, already substantially designed and partially
+built per this document's findings above, and explicitly **not deleted or deprioritized** by any
+single change's narrow task list — it's simply sequenced to be built *around* a correctness spine
+that has to exist first, not built instead of one.
+
+## Addendum (2026-08-29, second pass): MODEL-CANON-01 closed, P0–P4 priority queue recorded
+
+**MODEL-CANON-01 (EmbeddingGemma canonicalization cleanup) — verified file-by-file, not
+blanket-applied.** Google's `google/embeddinggemma-300m` model card: 2048 max input tokens, 768
+output dimensions, MRL options 512/256/128. Four files were checked against a claimed cleanup
+list; two claims didn't match current state and were **not** acted on, two were real and fixed:
+
+| File | Claim | Verdict | Action |
+|---|---|---|---|
+| `sveltekit-frontend/src/lib/server/atlas/neural-routing/encoder-manifest.ts` | Declares `all-MiniLM-L6-v2`/`ms-marco-MiniLM-L-6-v2` | **Not found** — already `google/embeddinggemma-300m` + `mixedbread-ai/mxbai-rerank-base-v2` | None (claim stale/mismatched) |
+| `sveltekit-frontend/src/lib/server/ai/ollama-config.ts` | `embeddinggemma` context 8192; `nomic-embed-text` in active fallback | Context **confirmed** wrong (8192). `FALLBACK_CHAIN.embeddings` **already** `['embeddinggemma']` only — `nomic-embed-text` is a dead, unused `MODELS` registry entry, not active | Fixed `contextWindow: 8192 → 2048`. Left the dead registry entry (no active harm, out of scope to remove speculatively) |
+| `scripts/launch-embed-server.ps1` | `EMBED_CTX` defaults 4096; searches embeddinggemma→nomic→all-minilm | Both **confirmed exactly** | Fixed default `4096 → 2048` (both the doc comment and the actual `$ctxLen` assignment — the doc comment alone was fixed first and would have been a no-op without the second edit); narrowed the Ollama-manifest auto-discovery loop to `embeddinggemma` only |
+| `sveltekit-frontend/scripts/ensure-llama-server.mjs` | Defaults 2048 (claimed already fixed); still auto-discovers Nomic/MiniLM | Context **already correct** (2048, confirmed). No MiniLM anywhere in this file. `resolveOllamaEmbedBlob()`'s manifest scan is already embeddinggemma-only — but a hardcoded `nomic-embed-text-v1.5.Q4_K_M.gguf` local-file fallback path still sat in `EMBED_MODEL_CANDIDATES` | Removed that hardcoded fallback path |
+
+Net state now matches the intended `MODEL-CANON-01` contract: `google/embeddinggemma-300m` is the
+sole canonical dense encoder (`semantic_768`, 2048 max input, 768 output dims), no active dense
+fallback, `nomic-embed-text`/MiniLM reduced to inert/removed references, `mixedbread-ai/mxbai-rerank-base-v2`
+remains the separate cross-encoder reranker (never conflated with the dense encoder).
+
+**Correction on ownership wording, recorded as stated**: EmbeddingGemma should not itself be called
+the intent/domain classifier owner. Google positions it as producing vectors suitable for
+classification (and ships a classification-oriented prompt), but the PyTorch routing/head layer is
+what turns those vectors into actual domain/operation/retrieval/budget decisions — this document's
+existing "PyTorch consumes the feature fabric" rule (first 2026-08-29 addendum, above) already
+states this; this is the same rule applied specifically to the classification path.
+
+**`GraphOrdinalGpuInputV1` contract** — already recorded in this document's first 2026-08-29
+addendum ("cuGraph `GraphOrdinal` contract, concrete"); this pass adds the explicit field list and
+reaffirms the hard separation: `storeTransposed`, renumber-buffer layout, cuDF chunk size, and RMM
+pool size are runtime/executor choices and **must not** enter `GraphOrdinalMapV1` or canonical
+graph identity — matches this document's existing wire-format-layering discipline (control/identity
+vs. numeric/runtime state, never collapsed).
+
+**Revised priority queue, recorded for the next session** (supersedes no prior sequencing in this
+document — this is new, not a correction):
+
+```
+P0  DURABILITY CLEANUP     — MODEL-CANON-01                              DONE (this pass)
+P1  LIVE VECTOR GPU        — :8098 CandidateOrdinal decode,               BLOCKED
+    BOUNDARY                 CPU-exact ↔ cuVS-exact parity                (verified live 2026-08-29:
+                                                                            curl to 127.0.0.1:8098/health
+                                                                            unreachable — matches this
+                                                                            doc's existing finding that
+                                                                            the WSL2 RAPIDS env isn't
+                                                                            standing up yet)
+P2  LIVE GRAPH GPU         — GraphOrdinalGpuInputV1 → live cuGraph        BLOCKED (same :8098 dependency)
+    BOUNDARY                  computation → GraphOrdinal result
+P3  IDENTITY BRIDGE        — CandidateOrdinal ↔ packet/canonical          NOT STARTED
+                              identity ↔ GraphNodeKey ↔ GraphOrdinal
+P4  BEHAVIOR PROOF         — graph-ablation invariant (candidate          NOT STARTED
+                              admission/identity fixed, ranking may
+                              change) → CPU/GPU parity (tolerance,
+                              top-K overlap, rank correlation)
+PARALLEL                   — CSGR-2 (this session's own in-progress      IN PROGRESS
+                              work, see parent-atlas-compiler-semantic-
+                              graph-resolution), symbol identity,
+                              feature/pass evidence, relationship
+                              coverage expansion
+PERFORMANCE (after P0–P4)  — JSON profiling → simdjson (where           NOT STARTED, correctly
+                              justified) → Arrow IPC → mmap →             sequenced last per this
+                              residency → BitFrost → MessagePack →        document's "correctness
+                              ACP/A2A ArtifactAddressV1                   spine first" principle
+```
+
+**P1/P2 are honestly blocked, not silently skipped**: confirmed live this session that
+`http://127.0.0.1:8098/health` does not respond. This is a real environment gap (the WSL2 RAPIDS
+sidecar this document's earlier findings already describe as "reachable... while the Windows
+`.venv` PyTorch build reports `cudaAvailable: false`") — not something to fake a result for. Standing
+up that environment is a prerequisite for P1/P2, tracked here rather than silently deferred.
+
+## Addendum (2026-08-29, third pass): Ornith's model base and future QLoRA adapter merging
+
+Recorded per operator statement, not yet independently verified against code — flagged as such
+until checked in a future session:
+
+**Ornith (this document's "ACE CONTEXT PLANE ... Ornith synthesis" role) is built on Gemma4**,
+and will eventually need a **legal-domain LoRA/QLoRA adapter merged in**. That merge is future
+work, not started. When it happens, it becomes part of the same stack this document already
+separates by layer — not a new plane:
+
+- **BitFrost** — adapter weights (or adapter-swap state) would be a `ResidentArtifactV1`-shaped
+  GPU-resident buffer like any other tensor artifact this document already describes (§ "GPU
+  cache — cache tensors, don't serialize them repeatedly"), keyed the same way
+  (`representationRevision`/`deviceId`/`leaseEpoch`) — not a special case.
+- **ACE / HyperGraphRAG** — the adapter changes *how* Ornith synthesizes from an `AcePacket`, not
+  what an `AcePacket` contains. This document's existing rule ("ACE turns numerical state into
+  bounded evidence-bearing context") is unaffected by which adapter is merged into the base model
+  doing that synthesis.
+- **Parent Atlas workstation / agentic error-fixing** — an adapter swap is exactly the kind of
+  thing this document's memory-swap-by-domain-classification framing already anticipates (route
+  to a legal-tuned Ornith instance for legal-domain context, base Gemma4 otherwise) — this is a
+  routing decision at the PyTorch classifier layer this document already assigns that role to,
+  not a new architectural plane.
+
+**No action taken this pass.** This is a placeholder note so a future session doesn't have to
+re-derive where adapter-merging fits from scratch — the actual QLoRA merge work, its training
+data, and its promotion gate are all unscoped and unstarted.

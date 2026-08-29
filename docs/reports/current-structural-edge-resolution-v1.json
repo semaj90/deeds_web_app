@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.current-structural-edge-resolution.v1",
+  "mode": "READ_ONLY_PLAN",
+  "generatedAt": "2026-08-29T20:20:24.644Z",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphArtifacts": false
+  },
+  "canonicalAuthority": false,
+  "inputWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "totalUnresolvedEdges": 10506,
+  "syntaxOnly": {
+    "total": 776,
+    "sampled": 776,
+    "counts": {
+      "NODE_BUILTIN": 106,
+      "REPO_RESOLVABLE": 75,
+      "RESOLVED_INTERNAL": 468,
+      "EXTERNAL_MODULE": 81,
+      "UNKNOWN_SPECIFIER": 46
+    },
+    "siblingResolvedCount": 154
+  },
+  "unresolvedTarget": {
+    "total": 9730,
+    "sampled": 60,
+    "sampleIsPartial": true,
+    "requestCount": 16,
+    "concurrency": 2,
+    "timeoutMs": 15000,
+    "durationMs": 658,
+    "avgMsPerRequest": 41,
+    "counts": {
+      "NODE_BUILTIN": 44,
+      "RESOLVED_IN_REPO": 16
+    },
+    "dimensions": {
+      "NODE_BUILTIN|javascript|REFERENCES": 40,
+      "RESOLVED_IN_REPO|javascript|CALLS": 16,
+      "NODE_BUILTIN|javascript|CALLS": 4
+    },
+    "diagnosticSamples": []
+  }
+}

@@ -2,28 +2,48 @@
   "schema": "atlas.typescript-lsp-readonly-proof.v1",
   "status": "PROVEN_READ_ONLY",
   "writes": false,
-  "server": {
-    "id": "typescript-language-server",
-    "version": "5.3.0",
-    "command": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\.bin\\typescript-language-server.cmd"
-  },
-  "sourceRef": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
-  "sourceRevision": "sha256:88298e4ad456199331330f8c8f9ca5cb44bdef1a4e7c9433362eeaf443118495",
   "probeSymbol": "createNodeTreeSitterAstProvider",
-  "position": {
-    "line": 363,
-    "character": 16
+  "resolution": {
+    "schema": "atlas.compiler-semantic-resolution.v1",
+    "requestId": "prove-typescript-lsp-readonly",
+    "workspaceRevision": null,
+    "sourceRef": "src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+    "sourceRevision": "sha256:88298e4ad456199331330f8c8f9ca5cb44bdef1a4e7c9433362eeaf443118495",
+    "edgeType": null,
+    "sourceEvidenceRef": null,
+    "language": "typescript",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "sourcePosition": {
+      "byteOffset": 13846,
+      "line": 363,
+      "character": 16
+    },
+    "resolver": {
+      "server": "typescript-language-server",
+      "serverRevision": "5.3.0",
+      "resolverRevision": "atlas.compiler-semantic-resolver.2026-08-29.v1",
+      "negotiatedPositionEncoding": "utf-16-default"
+    },
+    "result": {
+      "status": "RESOLVED_IN_REPO",
+      "targets": [
+        {
+          "targetUri": "file:///c%3A/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+          "targetRange": {
+            "start": {
+              "line": 363,
+              "character": 16
+            },
+            "end": {
+              "line": 363,
+              "character": 47
+            }
+          }
+        }
+      ],
+      "error": null
+    }
   },
-  "clientOfferedPositionEncodings": [
-    "utf-8",
-    "utf-16",
-    "utf-32"
-  ],
-  "negotiatedPositionEncoding": "utf-16-default",
-  "positionEncodingExplicitlyReturned": false,
-  "initializeError": null,
-  "definitionError": null,
-  "definitionCount": 1,
-  "stderr": null,
   "error": null
 }

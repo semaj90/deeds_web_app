@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.langgraph-readonly-adapter-replay.v1",
+  "status": "LANGGRAPH_READONLY_ADAPTER_REPLAY_PROVEN",
+  "framework": "langgraph_stategraph",
+  "importResolution": "sveltekit-frontend\\node_modules\\@langchain\\langgraph\\dist\\index.cjs",
+  "workflow": {
+    "workflowId": "wf:langgraph-readonly-fixture",
+    "workflowRevision": 1,
+    "actionIds": [
+      "resolve_code_evidence",
+      "run_verification"
+    ],
+    "actionOrder": [
+      "resolve_code_evidence",
+      "run_verification"
+    ],
+    "mutationClasses": [
+      "READ",
+      "READ"
+    ]
+  },
+  "local": {
+    "output": {
+      "actions": [
+        "resolve_code_evidence",
+        "run_verification"
+      ],
+      "result": "verification-pass"
+    },
+    "checksum": "3e1c465ac40273cbc61ba04a27869bf3991db608a08a0cb1b06cb2c8bfc4b003"
+  },
+  "langgraph": {
+    "output": {
+      "actions": [
+        "resolve_code_evidence",
+        "run_verification"
+      ],
+      "result": "verification-pass"
+    },
+    "checksum": "3e1c465ac40273cbc61ba04a27869bf3991db608a08a0cb1b06cb2c8bfc4b003"
+  },
+  "parity": {
+    "outputParity": true,
+    "actionOrderParity": true,
+    "checksumParity": true,
+    "unexpectedActions": []
+  },
+  "sideEffects": {
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "filesystemSourceWrites": false,
+    "mutationExecutorInvoked": false
+  },
+  "canonicalAuthority": false,
+  "readOnly": true,
+  "nextGate": "WF-EXEC-04 checkpoint/failure/retry replay fixtures"
+}

@@ -1,5 +1,6 @@
 import { writeIntentSynthesisRecord, buildIntentSynthesisQueryHash } from '$lib/server/ace/intent-synthesis.js';
 import { ENV } from '../env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface Gemma4IntentLaneResult {
   synthesis: string;
@@ -27,7 +28,7 @@ export async function processGemma4IntentionLane(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-rotorquant:latest',
+      model: LLM_MODEL_ID,
       messages: [
         { role: 'system', content: 'You are a legal-ai engineering director parsing code paths.' },
         { role: 'user', content: basePrompt },
@@ -58,7 +59,7 @@ export async function processGemma4IntentionLane(
     summaryIds: [],
     authority: { targetClusterId, channel: 'gemma4-64k-experiment' },
     retrievalTrace: {
-      model: 'gemma4-rotorquant:latest',
+      model: LLM_MODEL_ID,
       temperature: 1.0,
       top_p: 0.95,
       top_k: 64,

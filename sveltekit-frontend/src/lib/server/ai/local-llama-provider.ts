@@ -34,6 +34,15 @@ export interface LlamaSessionDescriptor {
 let cachedSessionDescriptor: LlamaSessionDescriptor | null = null;
 
 function resolveLlamaServerModelId(): string {
+	const configuredModel = String(
+		ENV.LLAMA_SERVER_MODEL ??
+		ENV.GEMMA4_MODEL ??
+		ENV.ROTORQUANT_CHAT_MODEL ??
+		ENV.LLM_MODEL ??
+		''
+	).trim();
+	if (configuredModel) return configuredModel;
+
 	const modelPath = String(
 		ENV.ROTORQUANT_MODEL_PATH ??
 		ENV.TURBO_MODEL_PATH ??
@@ -45,7 +54,7 @@ function resolveLlamaServerModelId(): string {
 		if (base) return base;
 	}
 
-	return 'gemma4-legal-iq4xs-direct.gguf';
+	return 'ornith-1.5-9b';
 }
 
 /** Vercel AI SDK provider pointed at the local llama-server.exe synthesis lane */

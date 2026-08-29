@@ -28,6 +28,7 @@ import {
   assertSemantic768,
   CANONICAL_QDRANT_COLLECTION,
 } from '$lib/server/embedding/embedding-contract-768.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createCodebaseSearchBackendFromEnv } from '$lib/server/search/create-codebase-search-backend.js';
 import type { SearchBackendResult } from '$lib/server/search/search-backend.js';
 import {
@@ -586,7 +587,7 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: maxTokens,
         temperature,
@@ -603,7 +604,7 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
       extracted_entities: [], // TODO: wire LangExtract
       key_relations: [], // TODO: wire LangExtract
       confidence: 0.85,
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: LLM_MODEL_ID,
       timing: Date.now() - startTime
     };
   } catch (err) {

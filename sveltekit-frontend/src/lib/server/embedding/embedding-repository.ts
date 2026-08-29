@@ -6,7 +6,7 @@ export interface IngestionJobRequest {
     filename?: string; // Original filename
     mimeType?: string; // MIME type
     textContent?: string; // Already extracted text
-    model?: string; // Embedding model (default: nomic-embed-text)
+    model?: string; // Embedding model (default: embeddinggemma:latest)
     chunkSize?: number; // Override default chunk size
     chunkOverlap?: number; // Override default overlap
     metadata?: Record<string, any>; // Arbitrary metadata

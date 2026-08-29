@@ -28,13 +28,13 @@ describe('/api/retrieval/canonical-rerank', () => {
           rank_after: 1,
           cross_encoder_score: 0.91,
           blended_score: 0.91,
-          model_version: 'cross-encoder/ms-marco-MiniLM-L6-v2',
+          model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
         },
       ],
       provenance: {
         cacheStatus: 'miss',
         cacheKey: 'cache-key',
-        modelVersion: 'cross-encoder/ms-marco-MiniLM-L6-v2',
+        modelVersion: 'mixedbread-ai/mxbai-rerank-base-v2',
         rendererVersion: 'canonical-envelope-v1',
         authScope: 'public',
         topK: 1,
@@ -78,7 +78,7 @@ describe('/api/retrieval/canonical-rerank', () => {
     );
 
     const body = await response.json();
-    expect(body.provenance.modelVersion).toBe('cross-encoder/ms-marco-MiniLM-L6-v2');
-    expect(body.top[0].model_version).toBe('cross-encoder/ms-marco-MiniLM-L6-v2');
+    expect(body.provenance.modelVersion).toBe('mixedbread-ai/mxbai-rerank-base-v2');
+    expect(body.top[0].model_version).toBe('mixedbread-ai/mxbai-rerank-base-v2');
   });
 });

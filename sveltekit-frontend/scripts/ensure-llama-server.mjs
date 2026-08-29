@@ -270,13 +270,14 @@ const EMBED_HOST = process.env.EMBED_SERVER_HOST ?? '127.0.0.1';
 const EMBED_PORT = parseInt(process.env.EMBED_SERVER_PORT ?? '8081', 10);
 const EMBED_BASE = `http://${EMBED_HOST}:${EMBED_PORT}`;
 
-// Auto-discover embedding model blob via Ollama manifest (reads sha256 digest → blob path).
-// Tries embeddinggemma first, then nomic-embed-text, then all-minilm.
+// Auto-discover the canonical EmbeddingGemma blob via the Ollama manifest.
+// Do not silently substitute a different embedding model: semantic_768 parity
+// depends on one model/revision owning the embedding representation.
 function resolveOllamaEmbedBlob() {
   const home = process.env.USERPROFILE ?? process.env.HOME ?? 'C:\\Users\\james';
   const manifestRoot = path.join(home, '.ollama', 'models', 'manifests', 'registry.ollama.ai', 'library');
   const blobRoot     = path.join(home, '.ollama', 'models', 'blobs');
-  for (const tag of ['embeddinggemma', 'nomic-embed-text', 'all-minilm']) {
+  for (const tag of ['embeddinggemma']) {
     const mf = path.join(manifestRoot, tag, 'latest');
     if (!existsSync(mf)) continue;
     try {
@@ -304,7 +305,8 @@ const EMBED_MODEL_CANDIDATES = [
   path.join(workspaceRoot, 'models', 'embeddinggemma-300m.gguf'),
   // Fallback: Ollama blob (no Dense projection layers — lower quality embeddings)
   resolveOllamaEmbedBlob(),
-  path.join(workspaceRoot, 'models', 'nomic-embed-text-v1.5.Q4_K_M.gguf'),
+  // No active dense fallback beyond embeddinggemma — nomic-embed-text is legacy/explicit
+  // experiment only, not auto-discovered (per MODEL-CANON-01).
 ].filter(Boolean);
 
 const EMBED_MODEL = firstExisting(EMBED_MODEL_CANDIDATES);

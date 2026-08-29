@@ -16,6 +16,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { createRequire } from 'node:module';
+import { buildPacketKey } from './packet-materializer-lib.mjs';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -47,6 +48,34 @@ const DB_URL = ENV.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:54
 const REDIS_HOST = ENV.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT = parseInt(ENV.REDIS_PORT || '6379');
 const REDIS_PASS = ENV.REDIS_PASSWORD || ENV.REDIS_PASS || 'redis';
+const CLI_ARGS = new Set(process.argv.slice(2));
+const APPLY = CLI_ARGS.has('--apply');
+const DRY_RUN = CLI_ARGS.has('--dry-run') || !APPLY;
+
+if (APPLY && CLI_ARGS.has('--dry-run')) {
+  throw new Error('Choose exactly one mode: --dry-run or --apply');
+}
+
+async function assertApplyContract() {
+  const pool = new pg.Pool({ connectionString: DB_URL, connectionTimeoutMillis: 3000 });
+  try {
+    const result = await pool.query(`
+      SELECT column_name, is_nullable, column_default
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'atlas_packets'
+        AND column_name IN ('packet_id', 'packet_key', 'source_ref')
+    `);
+    const columns = new Map(result.rows.map((row) => [row.column_name, row]));
+    const packetId = columns.get('packet_id');
+    if (!packetId) throw new Error('Apply preflight failed: public.atlas_packets.packet_id is missing');
+    if (packetId.is_nullable === 'NO' && packetId.column_default == null) {
+      throw new Error('Apply preflight failed: atlas_packets.packet_id is NOT NULL with no default; derive and validate it before applying');
+    }
+  } finally {
+    await pool.end();
+  }
+}
 
 // ── Step 1: Load native simdjson addon ─────────────────────────────────────────
 const addon = (() => {
@@ -131,7 +160,13 @@ function parseSom(value) {
 
 // ── Main Pipeline Execution ───────────────────────────────────────────────────
 async function main() {
-  console.log('=== Starting Runtime Evidence Collection & Processing Pipeline ===\n');
+  console.log(`=== Starting Runtime Evidence Collection & Processing Pipeline (${DRY_RUN ? 'DRY-RUN' : 'APPLY'}) ===\n`);
+
+  if (APPLY) {
+    console.log('[Apply preflight] Checking atlas_packets identity contract...');
+    await assertApplyContract();
+    console.log('  ✓ Apply contract passed.\n');
+  }
 
   // A. SIMDJSON Parsing of cards
   console.log('[Step 1] Loading and parsing cards...');
@@ -156,27 +191,35 @@ async function main() {
   }
   console.log(`  ✓ Parsed ${rawCards.length} cards (simdjson loaded: ${!!addon}).\n`);
 
-  // B. Run MapReduce, DuckDB, CouchDB pipelines
-  console.log('[Step 2] Executing downstream pipeline scripts...');
-  try {
-    console.log('  Running neschrom97 materializer...');
-    execSync(`node scripts/atlas/materialize-neschrom97-ldjson.mjs --apply`, { cwd: ROOT, stdio: 'inherit' });
+  // B. Downstream materializers are intentionally excluded from the default
+  // evidence mode. Several child scripts write files even in their preview
+  // modes, so invoking them here would violate this command's read-only
+  // contract. Use the explicit --apply mode only after a separate review.
+  console.log('[Step 2] Downstream materialization...');
+  if (DRY_RUN) {
+    console.log('  DRY-RUN: no materializer, MapReduce, DuckDB, CouchDB, Postgres, or Valkey subprocess will run.');
+    console.log('  Planned apply stages: NES/CHROM LDJSON → MapReduce → DuckDB → CouchDB → Postgres/Valkey.\n');
+  } else {
+    try {
+      console.log('  Running neschrom97 materializer...');
+      execSync(`node scripts/atlas/materialize-neschrom97-ldjson.mjs --apply`, { cwd: ROOT, stdio: 'inherit' });
 
-    console.log('  Running MapReduce join...');
-    execSync(`node scripts/atlas/ndjson-mapreduce-join.mjs`, { cwd: ROOT, stdio: 'inherit' });
+      console.log('  Running MapReduce join...');
+      execSync(`node scripts/atlas/ndjson-mapreduce-join.mjs`, { cwd: ROOT, stdio: 'inherit' });
 
-    console.log('  Running DuckDB database synchronization...');
-    execSync(`node scripts/atlas/materialize-mapreduce-duckdb.mjs --write`, { cwd: ROOT, stdio: 'inherit' });
+      console.log('  Running DuckDB database synchronization...');
+      execSync(`node scripts/atlas/materialize-mapreduce-duckdb.mjs --write`, { cwd: ROOT, stdio: 'inherit' });
 
-    console.log('  Archiving to CouchDB...');
-    const couchUser = ENV.COUCHDB_USER || 'admin';
-    const couchPass = ENV.COUCHDB_PASSWORD || ENV.COUCHDB_PASS || 'deeds123';
-    const couchUrl = ENV.COUCHDB_URL || 'http://localhost:5984';
-    execSync(`node scripts/atlas/archive-to-couchdb.mjs --apply --url "${couchUrl}" --user "${couchUser}" --pass "${couchPass}"`, { cwd: ROOT, stdio: 'inherit' });
-  } catch (err) {
-    console.warn(`  ⚠️ Pipeline subprocess warning: ${err.message}`);
+      console.log('  Archiving to CouchDB...');
+      const couchUser = ENV.COUCHDB_USER || 'admin';
+      const couchPass = ENV.COUCHDB_PASSWORD || ENV.COUCHDB_PASS || 'deeds123';
+      const couchUrl = ENV.COUCHDB_URL || 'http://localhost:5984';
+      execSync(`node scripts/atlas/archive-to-couchdb.mjs --apply --url "${couchUrl}" --user "${couchUser}" --pass "${couchPass}"`, { cwd: ROOT, stdio: 'inherit' });
+    } catch (err) {
+      console.warn(`  ⚠️ Pipeline subprocess warning: ${err.message}`);
+    }
+    console.log('  ✓ Downstream materializations completed.\n');
   }
-  console.log('  ✓ Downstream materializations completed.\n');
 
   // C. LangExtract Similarity & Multi-hop Connection Ranking
   console.log('[Step 3] Running LangExtract Cosine Similarity & Multi-hop Ranking...');
@@ -248,6 +291,12 @@ async function main() {
   console.log(`  ✓ Ranked connection map computed for top ${rankedGraph.length} cards.\n`);
 
   // D. Database & Valkey Cache Backfill
+  if (DRY_RUN) {
+    console.log('[Step 4] Postgres & Redis/Valkey Cache Backfill...');
+    console.log(`  DRY-RUN: would consider ${Math.min(rawCards.length, 500)} cards; no connections or writes opened.`);
+    console.log('\n=== Runtime Evidence Collection & Processing Pipeline Finished (DRY-RUN) ===');
+    return;
+  }
   console.log('[Step 4] Performing Postgres & Redis/Valkey Cache Backfill...');
   const pool = new pg.Pool({ connectionString: DB_URL });
   
@@ -303,7 +352,7 @@ async function main() {
                         (Array.isArray(card.tags) && card.tags.length > 0 ? `repo.tag.${toSlug(card.tags[0])}` : null) ||
                         `repo.file.${toSlug(sourceRef)}`;
       const featureLabel = card.feature_label || titleize(path.basename(filePath));
-      const packetKey = card.packet_key || `nes:${sourceRef}`;
+      const packetKey = card.packet_key || buildPacketKey(sourceRef, featureId);
       const dirPath = directoryPathFromSourceRef(sourceRef);
 
       // Parse SOM coordinates robustly

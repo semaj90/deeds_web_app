@@ -34,7 +34,7 @@ const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
   objectStorageBucket: process.env?.SEAWEED_S3_BUCKET ?? process.env?.MINIO_BUCKET ?? 'knowledge-docs',
   redisUrl: ENV.REDIS_URL,
   ollamaUrl: ENV.OLLAMA_BASE_URL,
-  embeddingModel: process.env?.EMBEDDING_MODEL ?? 'nomic-embed-text:latest',
+	embeddingModel: process.env?.EMBEDDING_MODEL ?? 'embeddinggemma:latest',
   summaryModel: process.env?.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest'
 };
 

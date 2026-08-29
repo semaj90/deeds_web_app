@@ -157,7 +157,7 @@ async function main() {
     const { rows: orphans } = await pool.query(`
       SELECT DISTINCT cci.relative_path as source_ref
       FROM codebase_chunk_index cci
-      WHERE cci.relative_path IS NOT NULL
+      WHERE NULLIF(BTRIM(cci.relative_path), '') IS NOT NULL
         AND cci.relative_path NOT IN (SELECT source_ref FROM atlas_packets WHERE source_ref IS NOT NULL)
       ORDER BY cci.relative_path
       LIMIT $1
@@ -180,7 +180,8 @@ async function main() {
     // ── 2. Build registration payload ──────────────────────────────────────────
     console.log('\nPreparing registration payload...');
     const toRegister = orphans.map(o => {
-      const sourceRef = o.source_ref;
+      const sourceRef = String(o.source_ref ?? '').trim();
+      if (!sourceRef) throw new Error('SOURCE_REF_REQUIRED: refusing to prepare an orphan registration without a non-empty source_ref');
       const directoryPath = extractDirectoryPath(sourceRef);
       const featureId = extractFeatureId(sourceRef);
       const packetKey = generatePacketKey(sourceRef);

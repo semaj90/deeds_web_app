@@ -15,7 +15,7 @@ export async function enqueue(job: IngestionJobRequest): Promise<IngestionJobSta
         jobId,
         evidenceId: job.evidenceId,
         status: 'queued',
-        model: job.model ?? 'nomic-embed-text'
+        model: job.model ?? 'embeddinggemma:latest'
     };
     STATUS_STORE.set(jobId, initial);
 

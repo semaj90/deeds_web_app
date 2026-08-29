@@ -22,6 +22,7 @@
 import { resolve } from 'path';
 import { existsSync } from 'fs';
 import { createRequire } from 'module';
+import { createHash } from 'crypto';
 
 const esmRequire = createRequire(import.meta.url);
 
@@ -46,6 +47,7 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 	}
 
 	const paths = [
+		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
@@ -87,37 +89,12 @@ const lruCache   = new Map<string, CacheEntry>();
 let   cacheBytes = 0;
 
 /**
- * FNV-1a 32-bit hash — L1-cache-friendly: reads first 64 bytes + stride-sampled tail.
- * Keeps hot path (< 64 chars) entirely within a single L1 cache line.
+ * Derive a collision-resistant cache key from the complete UTF-8 input.
+ * A sampled/non-cryptographic key is unsafe here: a collision could return
+ * the wrong parsed value while still looking like a successful cache hit.
  */
 function fnv1aKey(input: string): string {
-	const len = input.length;
-	let hash = 0x811c9dc5 >>> 0;
-
-	// First 64 chars (≤ 256 bytes in UTF-16, fits in L1 D-cache)
-	const head = Math.min(len, 64);
-	for (let i = 0; i < head; i++) {
-		hash ^= input.charCodeAt(i);
-		hash = Math.imul(hash, 0x01000193) >>> 0;
-	}
-
-	// Stride-sample the tail (every 32 chars) to catch length + content variation
-	if (len > 64) {
-		const stride = Math.max(32, Math.floor((len - 64) / 8));
-		for (let i = 64; i < len; i += stride) {
-			hash ^= input.charCodeAt(i);
-			hash = Math.imul(hash, 0x01000193) >>> 0;
-		}
-		// Always include the last char (catches trailing-diff strings)
-		hash ^= input.charCodeAt(len - 1);
-		hash = Math.imul(hash, 0x01000193) >>> 0;
-	}
-
-	// Mix in length to differentiate same-prefix strings
-	hash ^= (len & 0xffff);
-	hash = Math.imul(hash, 0x01000193) >>> 0;
-
-	return hash.toString(36);
+	return createHash('sha256').update(input, 'utf8').digest('hex');
 }
 
 function approximateSize(value: unknown): number {
@@ -258,7 +235,7 @@ export function fastJsonParse<T = unknown>(input: string): T {
  * Falls back to try/catch JSON.parse if addon unavailable.
  */
 export function fastJsonValidate(input: string): boolean {
-	if (input.length > MAX_INPUT_BYTES) return false;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return false;
 
 	const native = getSimdJsonAddon();
 	if (native) {
@@ -282,7 +259,7 @@ export function fastJsonValidate(input: string): boolean {
  * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
 	const native = getSimdJsonAddon();
 	if (!native) return null;
 	try {
@@ -298,7 +275,7 @@ export function fastJsonExtractNumbers(input: string, pointer: string): Float64A
  * Example: fastJsonExtractField('{"model":"gemma4","status":"ok"}', "status") → "ok"
  */
 export function fastJsonExtractField(input: string, key: string): string | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8ByteLength(input) > MAX_INPUT_BYTES) return null;
 
 	// Fast regex — captures first occurrence of `"key": <value>`
 	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

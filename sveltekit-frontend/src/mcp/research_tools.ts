@@ -1,12 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { ENV } from '$lib/server/env.server.js';
+import { webSearch as canonicalWebSearch } from '$lib/server/retrieval/web-search.js';
+import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
-const SEARXNG_URL      = ENV.SEARXNG_URL;
 const LLAMA_SERVER_URL = ENV.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
 
 /**
  * Advanced research tools leveraging SearXNG and llama-server.
@@ -20,7 +20,7 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
   server.registerTool(
     'research.web_search',
     {
-      description: 'Search the web using SearXNG.',
+      description: 'Search the web using the canonical SearXNG/DuckDuckGo adapter.',
       inputSchema: z.object({
         query: z.string().describe('The search query'),
         engines: z.string().optional().describe('Comma-separated list of engines (e.g. "google,bing")'),
@@ -33,25 +33,20 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
       sessionId_web_search,
       async ({ query, engines, limit }) => {
         try {
-          const qp = new URLSearchParams({
-            q: query,
-            format: 'json',
-            pageno: '1',
-            ...(engines ? { engines } : {})
-          });
-
-          const res = await fetch(`${SEARXNG_URL}/search?${qp}`);
-          if (!res.ok) throw new Error(`SearXNG returned ${res.status}`);
-
-          const data = await res.json();
-          const results = (data.results || []).slice(0, limit).map((r: any) => ({
-            title: r.title,
-            url: r.url,
-            content: r.content || r.snippet
+          const response = await canonicalWebSearch(
+            query,
+            limit,
+            engines ? engines.split(',').map((engine) => engine.trim()).filter(Boolean) : undefined
+          );
+          const results = response.results.map((result) => ({
+            title: result.title,
+            url: result.url,
+            content: result.snippet,
+            source: result.source
           }));
 
           return {
-            content: [{ type: 'text', text: JSON.stringify(results, null, 2) }]
+            content: [{ type: 'text', text: JSON.stringify({ provider: response.provider, results }, null, 2) }]
           };
         } catch (err: any) {
           return { content: [{ type: 'text', text: `Web search failed: ${err.message}` }], isError: true };
@@ -83,7 +78,8 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
       'research.synthesize',
       sessionId_synthesize,
       async ({ query, case_id, temperature, max_tokens, skip_cache }) => {
-        for (const model of MODEL_PREFERENCE) {
+        const loadedModel = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, null);
+        for (const model of [loadedModel.resolvedModel]) {
           try {
             const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
               method:  'POST',
@@ -103,15 +99,10 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
             });
             if (!res.ok) {
               const text = await res.text().catch(() => '');
-              if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-                // Last model in preference list failed
-                return {
-                  content: [{ type: 'text', text: `synth failed: HTTP ${res.status} ${text.slice(0, 200)}` }],
-                  isError: true,
-                };
-              }
-              // Try next model in preference list
-              continue;
+              return {
+                content: [{ type: 'text', text: `synth failed: HTTP ${res.status} ${text.slice(0, 200)}` }],
+                isError: true,
+              };
             }
             const data = await res.json();
             const answer = data.choices?.[0]?.message?.content ?? '';
@@ -122,15 +113,10 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
               }]
             };
           } catch (err: any) {
-            if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-              // Last model in preference list failed
-              return {
-                content: [{ type: 'text', text: `synth unreachable: ${err.message ?? String(err)}` }],
-                isError: true,
-              };
-            }
-            // Try next model in preference list
-            continue;
+            return {
+              content: [{ type: 'text', text: `synth unreachable: ${err.message ?? String(err)}` }],
+              isError: true,
+            };
           }
         }
         return {
@@ -167,11 +153,9 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
           `${topic} best practices and limitations`
         ];
 
-        const searchResults = await Promise.all(facets.map(async (f) => {
-          const qp = new URLSearchParams({ q: f, format: 'json' });
-          const res = await fetch(`${SEARXNG_URL}/search?${qp}`);
-          return res.ok ? (await res.json()).results?.slice(0, 3) : [];
-        }));
+        const searchResults = await Promise.all(
+          facets.map(async (facet) => (await canonicalWebSearch(facet, 3)).results)
+        );
 
         return {
           content: [{

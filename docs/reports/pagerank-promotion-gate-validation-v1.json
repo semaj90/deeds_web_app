@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.pagerank-promotion-gate-validation.v1",
+  "status": "PROMOTION_GATE_VALIDATED_NOT_PROMOTED",
+  "mode": "READ_ONLY_VALIDATION",
+  "runId": "625f3468-1a49-44ad-9fea-3a6ca25e7fa1",
+  "graphSnapshotId": "f5aa34f3-327e-42da-a4af-9dad15987b3a",
+  "algorithm": "pagerank",
+  "dataChecks": {
+    "rowCount": 162234,
+    "distinctNodes": 162234,
+    "duplicateNodeCount": 0,
+    "nonFiniteCount": 0,
+    "observedL1Sum": 1.000000000000185,
+    "expectedL1Sum": 1,
+    "l1Tolerance": 0.000001,
+    "l1Valid": true,
+    "identityValid": true,
+    "didConverge": true,
+    "ranIterations": 100,
+    "normalizationTolerance": 0.00000001,
+    "runStatus": "passed"
+  },
+  "promotion": {
+    "authorityRunWritten": true,
+    "promotionGateValidated": true,
+    "consumerPromoted": false,
+    "canonicalAuthority": false
+  },
+  "wrapperCheck": {
+    "status": "PROVEN",
+    "reason": "The application PageRankPromotionGate.validateRun() passed against the exact run and graph snapshot using the repository database connection."
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "nextGate": "INDEPENDENT_CONSUMER_SAFETY_CHECK_THEN_SEPARATELY_AUTHORIZED_PROMOTION",
+  "generatedAt": "2026-08-29"
+}

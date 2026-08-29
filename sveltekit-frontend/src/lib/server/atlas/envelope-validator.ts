@@ -2,7 +2,7 @@
  * AtlasEnvelopeV1 — unordered-execution pass-result contract.
  *
  * Scope: this wraps an async PRODUCER'S RESULT for one pass over one
- * packet_key (e.g. one MiniLM rerank call, one AST-extract call, one
+ * packet_key (e.g. one cross-encoder rerank call, one AST-extract call, one
  * PageRank run row) before it is joined/materialized. It answers "is this
  * result current, non-duplicate, and correctly attributed" — NOT "what does
  * a packet look like at rest" (that's `db/packet-topology-envelope.ts`'s

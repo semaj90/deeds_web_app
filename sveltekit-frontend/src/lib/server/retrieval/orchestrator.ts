@@ -41,6 +41,7 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -223,7 +224,7 @@ async function correctiveRetrieval(
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${query}"`,
 				stream: false,
 				keep_alive: '2m',

@@ -26,12 +26,12 @@
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import semver from 'semver';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '..', '..', 'sveltekit-frontend');
-const require = createRequire(FRONTEND_ROOT + '/');
+const frontendRequire = createRequire(path.join(FRONTEND_ROOT, 'package.json'));
 
 async function readPackageJson(pkgName) {
   const pkgPath = path.join(FRONTEND_ROOT, 'node_modules', pkgName, 'package.json');
@@ -83,8 +83,13 @@ async function main() {
   // consumer needs actually resolves (this is exactly how the original
   // incident's root cause was confirmed).
   try {
-    await import('@langchain/core/language_models/stream');
-    await import('@langchain/langgraph');
+    // Resolve from the owning SvelteKit package. A bare dynamic import here
+    // resolves relative to this repo-level script and can accidentally test
+    // the root dependency tree instead of the runtime that owns the graph.
+    const streamPath = frontendRequire.resolve('@langchain/core/language_models/stream');
+    const langgraphPath = frontendRequire.resolve('@langchain/langgraph');
+    await import(pathToFileURL(streamPath).href);
+    await import(pathToFileURL(langgraphPath).href);
     console.log(JSON.stringify({ gate: 'LANGGRAPH_IMPORT_COMPATIBILITY', status: 'PROVEN' }));
   } catch (err) {
     console.log(

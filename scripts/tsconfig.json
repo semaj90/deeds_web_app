@@ -1,0 +1,18 @@
+{
+  "$comment": "Standalone Node/JS scripts under repo-root scripts/** (and the orphaned root-level src/lib/** tree). Deliberately separate from the repo-root tsconfig.json, which extends sveltekit-frontend/tsconfig.json without its own `include` — TS resolves an inherited `include` relative to the config file that DEFINES it, so the effective included set there is still only sveltekit-frontend/src/**/*, not scripts/** or root src/lib/**. Confirmed live 2026-08-29 while building a second compiler-semantic LSP resolver root for CSGR-2's OUTSIDE_RESOLVER_WORKSPACE_ROOT bucket (1,486 edges): typescript-language-server could reach `initialize` fine once pointed at the right binary, but every resolveDefinition on a plain Node builtin (`fs`) came back UNRESOLVED because these files were loose/out-of-project with no @types/node available. This file exists to give tsserver a real, nearest-ancestor project for these files. No $lib-style path aliasing needed here (checked live — 0 matches for '$lib' imports under scripts/atlas).",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "esModuleInterop": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["scripts/**/*.mjs", "scripts/**/*.mts", "scripts/**/*.ts", "src/lib/**/*.ts"],
+  "exclude": ["node_modules", "**/node_modules/**", "deeds_labs/**"]
+}

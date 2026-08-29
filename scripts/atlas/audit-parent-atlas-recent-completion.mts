@@ -36,6 +36,12 @@ import { access, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import pg from 'pg';
+import { loadAtlasEnv } from '../../sveltekit-frontend/scripts/atlas/load-atlas-env.mjs';
+
+const envBase = path.basename(process.cwd()).toLowerCase() === 'sveltekit-frontend'
+  ? process.cwd()
+  : path.resolve(process.cwd(), 'sveltekit-frontend');
+loadAtlasEnv(envBase);
 
 const execFileAsync = promisify(execFile);
 const { Pool } = pg;

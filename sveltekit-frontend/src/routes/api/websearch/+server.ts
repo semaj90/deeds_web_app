@@ -2,10 +2,11 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { webSearch } from '$lib/server/retrieval/web-search.js';
 
 const websearchSchema = z.object({
 	query: z.string().min(1).max(5000),
-	maxResults: z.number().min(1).max(20).default(5),
+	maxResults: z.number().int().min(1).max(20).default(5),
 	engines: z.array(z.string()).optional()
 });
 
@@ -25,39 +26,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { query, maxResults } = parsed.data;
 		recordSearchQuery({ query, pipeline: 'contextual', cacheHit: false, userId: locals.user.id });
 
-		const { ENV } = await import('$lib/server/env.server.js');
-		const searxngUrl = ENV.SEARXNG_URL;
-
 		try {
-			const searchUrl = new URL('/search', searxngUrl);
-			searchUrl.searchParams.set('q', query);
-			searchUrl.searchParams.set('format', 'json');
-			searchUrl.searchParams.set('categories', 'general');
+			const response = await webSearch(query, maxResults);
+			const results = response.results.map((result) => ({
+				title: result.title,
+				url: result.url,
+				content: result.snippet,
+				engine: result.source
+			}));
 
-			const res = await fetch(searchUrl.toString(), {
-				signal: AbortSignal.timeout(10_000)
-			});
-
-			if (res.ok) {
-				const data = await res.json();
-				const results = (data.results ?? []).slice(0, maxResults).map(
-					(r: Record<string, unknown>) => ({
-						title: r.title ?? '',
-						url: r.url ?? '',
-						content: r.content ?? '',
-						engine: r.engine ?? 'searxng'
-					})
-				);
-
-				return json({ success: true, data: results });
+			if (results.length > 0) {
+				return json({ success: true, data: results, provider: response.provider });
 			}
+
+			return json({ success: false, error: 'Search service returned no results', data: [], provider: response.provider });
 		} catch {
-			// SearXNG unavailable
+			// Shared adapter exhausted its configured providers.
 		}
 
-		return json({ success: false, error: 'Search service unavailable', data: [] });
+		return json({ success: false, error: 'Search service unavailable', data: [], provider: 'none' });
 	} catch (err) {
 		console.error('[/api/websearch] error:', err);
-		return json({ success: false, error: 'Web search failed', data: [] }, { status: 500 });
+		return json({ success: false, error: 'Web search failed', data: [], provider: 'none' }, { status: 500 });
 	}
 };

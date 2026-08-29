@@ -20,6 +20,7 @@ import { semanticDiffGate } from './semantic-diff-gate.js';
 import { storeSummaryArtifact } from './summary-qa.js';
 import { logArtifact } from './artifact-logger.js';
 import { extractPacketFeatures } from './feature-label-extractor.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface SummaryPipelineResult {
   packet_key: string;
@@ -38,7 +39,7 @@ export interface SummaryPipelineResult {
 async function generateSummaryViaLlamaServer(sourceRef: string, context: string): Promise<string | null> {
   try {
     const baseUrl = String(ENV.LLAMA_SERVER_URL ?? process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-    const model = ENV.GEMMA4_MODEL ?? process.env.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+    const model = LLM_MODEL_ID;
 
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-29T02:28:46.344Z",
+  "generatedAt": "2026-08-29T17:41:11.080Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -52,7 +52,7 @@
       },
       "codebase_chunk_index": {
         "exists": true,
-        "count": 55206
+        "count": 55853
       },
       "atlas_packet_features": {
         "exists": true,
@@ -442,15 +442,15 @@
       "codebaseChunkQdrantColumn": "qdrant_id",
       "codebaseChunkEmbeddings": {
         "exists": true,
-        "count": 739
+        "count": 1386
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
-        "count": 55206
+        "count": 55853
       },
       "codebaseChunkQdrantIds": {
         "exists": true,
-        "count": 55206
+        "count": 55853
       },
       "codebaseChunk_content_embedding": {
         "exists": true,
@@ -458,7 +458,7 @@
       },
       "codebaseChunk_content_embedding_768": {
         "exists": true,
-        "count": 739
+        "count": 1386
       },
       "codebaseChunk_content_embedding_384": {
         "exists": true,
@@ -474,7 +474,7 @@
       },
       "codebaseChunk_search_vector": {
         "exists": true,
-        "count": 55206
+        "count": 55853
       },
       "packetAstSymbols": {
         "exists": true,
@@ -1724,7 +1724,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 109129,
+        "points": 109776,
         "indexedVectors": 109983,
         "status": "green"
       },
@@ -2038,8 +2038,8 @@
             "distance": "Cosine"
           }
         },
-        "points": 326,
-        "indexedVectors": 326,
+        "points": 834,
+        "indexedVectors": 834,
         "status": "green"
       },
       {
@@ -2090,7 +2090,7 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 258,
+    "manualSqlFiles": 259,
     "declaredSidecars": 50,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
@@ -2161,7 +2161,7 @@
       "severity": "high",
       "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
       "evidence": [
-        "739/55206",
+        "1386/55853",
         "codebase_chunk_index.content_embedding_768",
         "codebase_chunk_index.content_embedding"
       ]

@@ -840,7 +840,7 @@ ${reportsList}
 
 ${relatedReports.length > 0 ? `**Database Stats:**
 - **Search Method**: PostgreSQL pg_vector cosine similarity
-- **Embedding Model**: nomic-embed-text (384 dimensions)
+- **Embedding Model**: embeddinggemma:latest (768 dimensions)
 - **Results**: Top ${relatedReports.length} matches
 - **Threshold**: > 0.7 similarity score
 

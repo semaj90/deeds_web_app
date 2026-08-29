@@ -582,7 +582,7 @@ async function embedQuery(text: string): Promise<number[] | null> {
     ? rawHost
     : `http://${rawHost.includes(':') ? rawHost : `${rawHost}:11434`}`;
 
-  for (const model of ['nomic-embed-text:latest', 'embeddinggemma:latest']) {
+  for (const model of ['embeddinggemma:latest']) {
     try {
       const res = await fetch(`${ollamaBase}/api/embeddings`, {
         method: 'POST',

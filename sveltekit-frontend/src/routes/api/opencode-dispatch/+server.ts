@@ -31,6 +31,7 @@ import {
   chooseOpenCodeAction,
   type OpenCodeRoutingDecision,
 } from '$lib/server/opencode/intent-router.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ============================================================================
 // VALIDATION SCHEMA & MIDDLEWARE
@@ -88,7 +89,7 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "...", "r
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         messages,
         temperature: 0.3,
         max_tokens: 256,

@@ -12,7 +12,7 @@ export const PGVECTOR_CONFIG = {
  }
  }, // Ollama with Gemma embeddings
   ollama: { url: process.env.OLLAMA_URL || `http://${['local', 'host'].join('')}:11436`, models: { embedding: 'embeddinggemma:latest', // Primary embedding model
- fallback: ['nomic-embed-text:latest'], // Fallback models
+ fallback: ['embeddinggemma:latest'], // Canonical fallback; preserve semantic_768 parity
  chat: 'gemma3:legal-latest' // Chat model}
  }, // CUDA service for GPU acceleration
   cuda: { url: process.env.CUDA_SERVICE_URL || `http://${['local', 'host'].join('')}:8097`, endpoints: { health: '/api/v1/health', search: '/api/v1/search', submit: '/api/v1/submit', workers: '/api/v1/workers', metrics: '/api/v1/metrics'}, // RTX 3060 Ti specifications

@@ -2460,18 +2460,7 @@ async function embedText(text: string): Promise<number[] | null> {
 					signal: AbortSignal.timeout(30_000),
 				});
 
-				if (!res.ok) {
-					// Fallback to nomic-embed-text
-					const fallback = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ model: 'nomic-embed-text:latest', prompt: text }),
-						signal: AbortSignal.timeout(30_000),
-					});
-					if (!fallback.ok) return null;
-					const data = await fallback.json();
-					return data.embedding;
-				}
+				if (!res.ok) return null;
 
 				const data = await res.json();
 				return data.embedding;

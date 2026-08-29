@@ -18,7 +18,7 @@ export const embeddings = pgTable("embeddings", {
 	embedding: vector({ dimensions: 384 }),
 	textHash: varchar("text_hash", { length: 64 }),
 	content: text(),
-	model: varchar({ length: 100 }).default('nomic-embed-text:latest'),
+	model: varchar({ length: 100 }).default('embeddinggemma:latest'),
 	documentType: varchar("document_type", { length: 50 }),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),

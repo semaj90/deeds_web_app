@@ -1828,7 +1828,7 @@ export function setupToolHandlers() {
         name: 'kb.rg_atlas_search',
         description:
           'Full RG-Atlas search pipeline: rg lexical sweep → GPU Karpathy blend → ' +
-          'multi-query Qdrant union → MS-MARCO cross-encoder rerank → LangExtract GRPO → ' +
+          'multi-query Qdrant union → configured cross-encoder rerank → LangExtract GRPO → ' +
           'cosine-weighted final blend. Returns ranked hits with per-stage score breakdown. ' +
           'Use for deep codebase search that combines lexical precision with semantic recall. ' +
           'Lighter alternatives: kb.search_cards (semantic only) or kb.trace_search (TRACE MCP).',
@@ -1840,7 +1840,7 @@ export function setupToolHandlers() {
             file_types:        { type: 'array',   items: { type: 'string' }, description: 'File extensions for rg. Default: ["ts","svelte"]' },
             variant_count:     { type: 'number',  description: 'Multi-query variants (1-5). Default: 3' },
             top_k_per_lane:    { type: 'number',  description: 'Qdrant hits per variant. Default: 20' },
-            enable_marco:      { type: 'boolean', description: 'Run MS-MARCO cross-encoder rerank. Default: true' },
+            enable_marco:      { type: 'boolean', description: 'Run configured cross-encoder rerank. Default: true' },
             enable_langextract:{ type: 'boolean', description: 'Run LangExtract GRPO validation. Default: false (slow)' },
             persist:           { type: 'boolean', description: 'Write run + hits to Postgres for replay. Default: false' },
           },

@@ -47,8 +47,8 @@ async function fetchEmbedding(
   // /api/embed's request schema only accepts model: 'embeddinggemma' | 'mock'.
   // The `model` param here is a cache-key label (e.g. 'embeddinggemma:latest'),
   // not a route selector — sending it verbatim always fails schema validation
-  // with a 400. embedText() on the server already does its own internal
-  // embeddinggemma -> nomic-embed-text fallback, so no client-side retry
+  // with a 400. embedText() on the server owns the canonical EmbeddingGemma
+  // lane, so no client-side model substitution retry is permitted.
   // with a different model name is needed here.
   const response = await fetch('/api/embed', {
     method: 'POST',

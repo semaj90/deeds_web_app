@@ -16,6 +16,7 @@ import { DebouncedDagLogger, type DagLogSink } from '$lib/server/observability/d
 import { assembleACEContext } from '$lib/server/features/ai/ace/context-assembler.js';
 import { runPacketConsumerPipeline } from '$lib/server/atlas/packet-consumer-pipeline.js';
 import { derivePacketInputsFromAceContext } from '$lib/server/atlas/packet-consumer-inputs.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface HermesQuery {
   query: string;
@@ -365,7 +366,7 @@ Plan the best tool(s) to call for this query. Return JSON:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal-iq4xs',
+          model: LLM_MODEL_ID,
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.3,
           max_tokens: 512,

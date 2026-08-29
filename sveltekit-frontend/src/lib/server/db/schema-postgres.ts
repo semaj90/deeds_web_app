@@ -5052,7 +5052,7 @@ export type PanelActivityLog    = typeof panelActivityLog.$inferSelect;
 export type NewPanelActivityLog = typeof panelActivityLog.$inferInsert;
 
 // === RG-ATLAS SEARCH PIPELINE (M2-2026-05-11) ===
-//   rg lexical → Karpathy blend → multi-query Qdrant → MS-MARCO → LangExtract
+//   rg lexical → Karpathy blend → multi-query Qdrant → configured cross-encoder → LangExtract
 //   → cosine-weighted final blend, persisted per-run for replay/audit.
 
 export const rgSearchRuns = pgTable('rg_search_runs', {

@@ -31,7 +31,7 @@
   EMBED_NGL              default: 99  (full GPU offload)
   EMBED_BATCH_SIZE       default: 512 (optimal throughput for embed requests)
   EMBED_UBATCH_SIZE      default: 128
-  EMBED_CTX              default: 4096 (embedding context; no generation needed)
+  EMBED_CTX              default: 2048 (embeddinggemma-300m model-card max input tokens)
 #>
 [CmdletBinding()]
 param(
@@ -106,7 +106,9 @@ $model = if ($env:EMBED_MODEL_PATH) {
   $ollamaBlob  = $null
   $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
   $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
-  foreach ($tag in @('embeddinggemma', 'nomic-embed-text', 'all-minilm')) {
+  # embeddinggemma is the sole canonical dense encoder (semantic_768) — no active dense
+  # fallback. nomic-embed-text/all-minilm are legacy/experiment only, not auto-discovered.
+  foreach ($tag in @('embeddinggemma')) {
     $mf = Join-Path $manifestRoot "$tag\latest"
     if (-not (Test-Path $mf)) { continue }
     try {
@@ -141,7 +143,7 @@ $port       = if ($env:EMBED_PORT)       { $env:EMBED_PORT }       else { '8081'
 $ngl        = if ($env:EMBED_NGL)        { $env:EMBED_NGL }        else { '99'   }
 $batchSize  = if ($env:EMBED_BATCH_SIZE) { $env:EMBED_BATCH_SIZE } else { '512'  }
 $ubatchSize = if ($env:EMBED_UBATCH_SIZE){ $env:EMBED_UBATCH_SIZE} else { '128'  }
-$ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '4096' }
+$ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '2048' }
 $threads    = [System.Environment]::ProcessorCount.ToString()
 
 Write-Host "`nEmbed server config:" -ForegroundColor Gray

@@ -1,6 +1,14 @@
 {
   "permissions": {
     "allow": [
+      "Read(sveltekit-frontend/.env.local)",
+      "Read(sveltekit-frontend/.env)",
+      "Grep(sveltekit-frontend/.env.local)",
+      "Grep(sveltekit-frontend/.env)",
+      "Read(.env.local)",
+      "Read(.env)",
+      "Grep(.env.local)",
+      "Grep(.env)",
       "Bash(npx svelte-kit sync)",
       "Bash(dir:*)",
       "Bash(npm run dev:full:redis-gpu:*)",

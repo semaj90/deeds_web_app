@@ -267,7 +267,7 @@ async function generateEnhancedTag(filePath: string, analysis: { summary: string
 		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'nomic-embed-text:latest', // Changed to a common embedding model
+			body: JSON.stringify({ model: 'embeddinggemma:latest',
 				prompt: analysis.summary
 			})
 		});

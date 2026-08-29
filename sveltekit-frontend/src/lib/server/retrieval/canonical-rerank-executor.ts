@@ -330,7 +330,7 @@ export class MixedbreadCanonicalReranker implements RuntimeReranker {
     this.tier = tier;
     this.version =
       tier === 'fast'
-        ? 'cross-encoder/ms-marco-MiniLM-L6-v2'
+        ? 'mixedbread-ai/mxbai-rerank-base-v2'
         : 'mixedbread-ai/mxbai-rerank-base-v2';
   }
 

@@ -2,11 +2,11 @@
 
 ## P0 — identity and revision closure
 
-- [ ] CAND-01 Define `CanonicalCandidateV1` with CandidateOrdinal + canonicalId + packetKey + treeNodeId + symbolVersionId + revision axes.
-- [ ] CAND-02 Add deterministic ordinal-map materializer and rerun determinism fixture twice.
-- [ ] CAND-03 Prove Qdrant point id, cuGraph gpuNodeId and CandidateOrdinal cannot substitute for canonicalId.
-- [ ] REV-01 Materialize `RevisionDependencyGraphV1` for source → AST → graph/semantic → candidate → feature → rerank artifacts.
-- [ ] CACHE-01 Define `ComputationArtifactV1` and content-addressed cache key contract.
+- [x] CAND-01 Define `CanonicalCandidateV1` with CandidateOrdinal + canonicalId + packetKey + treeNodeId + symbolVersionId + revision axes. Built and tested; live full-corpus admission remains separate.
+- [x] CAND-02 Add deterministic ordinal-map materializer and rerun determinism fixture twice. Fixture/replay proof exists; current 15→128→768 scaling remains open.
+- [x] CAND-03 Prove Qdrant point id, cuGraph gpuNodeId and CandidateOrdinal cannot substitute for canonicalId. Identity separation is proven at the contract/fixture boundary; live GPU parity remains separate.
+- [x] REV-01 Materialize `RevisionDependencyGraphV1` for source → AST → graph/semantic → candidate → feature → rerank artifacts. Contract is built and tested; live producer alignment remains open.
+- [x] CACHE-01 Define `ComputationArtifactV1` and content-addressed cache key contract. Contract is built and tested; production cache lifecycle proof remains separate.
 
 ## P0 — queue / artifact transport
 
@@ -78,6 +78,10 @@ GPU parity receipts pass. No executor or canonical-store promotion is implied.
 - [x] REV-OWNER-GRAPH-05E Audit the current graph artifact read-only: 16 graph-node observations exist but 0 explicit revision-qualified edges, so the artifact is blocked on its edge producer and cannot become the current graph-revision owner. See `docs/reports/current-graph-artifact-readiness-v1.json`.
 - [x] REV-OWNER-GRAPH-05F Characterize the legacy offline edge producer: `scripts/atlas/batch-offline-ingest.mjs` creates import-derived `DEPENDS_ON` edges, but its edge payload has no `sourceRevision`, `workspaceRevision`, or `graphRevision`; keep it outside current graph-snapshot promotion and do not backfill its edges into the canonical graph.
 - [ ] REV-OWNER-GRAPH-05B Trace one authoritative Graphify/source snapshot writer to a current `workspace_revision` and prove a bounded read-only binding before adding any `graph_revision` to candidate admission. Do not synthesize revisions or populate legacy rows to satisfy the gate.
+- [x] REV-OWNER-GRAPH-05B1 Run the registered Graphify source producer in exact run-bound dry-run mode for `14643371-f6f2-4131-906b-235a5c06619a`: 111/111 sources processed, 62 native, 39 recovered, 10 no-symbol, 0 hard failures, and 0 evidence/symbol writes. The run remains non-authoritative because source-revision authority is content-anchor-only and the attached database run remains `RUNNING`; NLP language-field and timeout diagnostics remain bounded follow-up work.
+- [x] REV-OWNER-GRAPH-05B2 Classify unsupported registered extensions before structural/NLP extraction: the same 111-source dry-run now reports 103 supported files (64 native, 39 recovered), 8 explicit unsupported files, 0 hard failures, and 0 writes. No malformed sidecar requests are emitted for Markdown/shell inputs; authoritative completion remains blocked by revision authority and run completion.
+- [x] REV-OWNER-GRAPH-05B3 Audit exact run-bound source bytes read-only: all 111 `graphify_files` rows for run `14643371-f6f2-4131-906b-235a5c06619a` match their stored content hashes, and all 111 have a stored `source_revision`. This proves byte availability/integrity only; it does not promote the legacy source-revision owner or complete the run. See `scripts/atlas/audit-current-graphify-source-revision-v1.mjs` and `docs/reports/current-graphify-source-revision-v1.json`.
+- [x] REV-OWNER-GRAPH-05B4 Compare the same 111 source refs against the run's repository revision read-only: all 111 exist in the Git tree, but 0/111 have a recorded `git_blob_oid`, so Git-backed source authority is not proven. No revision fields were populated and no run status was changed. See `scripts/atlas/audit-graphify-git-source-authority-v1.mjs` and `docs/reports/graphify-git-source-authority-v1.json`.
 - [x] REV-OWNER-GRAPH-05G Re-run the post-binding graph-owner and artifact audits: the expected current workspace revision is `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`, but `graph_analysis_runs` remains on `workspace:parent-atlas`, revisionless graph snapshot/relationship tables remain, and the current artifact still has 0 revision-qualified edges. The 111 source bindings therefore do not yet establish a graph-revision owner. See `docs/reports/graph-revision-owner-v1.json`, `docs/reports/current-graph-artifact-readiness-v1.json`, and `docs/reports/graphify-workspace-owner-v1.json`.
 - [x] REV-OWNER-GRAPH-05H Run the existing relationship snapshot builder with the current workspace revision and the frozen 15-row candidate snapshot: the revision-bound non-authoritative artifact succeeds with 8 included current Feature Intelligence relationships, 9 entities, 16 incidence edges, deterministic Arrow checksum, and derived `graphRevision=sha256:e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275`; 63,397 historical kernels are excluded. This proves the KAG/FI relationship path only, not an AST/Graphify edge owner or full-corpus admission. See `docs/reports/graph-prod-01-production-snapshot-sha256_e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275.json`.
 - [x] REV-OWNER-CODE-01 Prove the compatibility contract for exact content bytes plus preserved legacy Git `source_revision`.
@@ -86,7 +90,7 @@ GPU parity receipts pass. No executor or canonical-store promotion is implied.
 - [x] REV-OWNER-CODE-02G Audit the existing source-lineage bridge read-only: `atlas_source_refs` contains 22,493 stable identities, but only 6 Graphify refs are registered; packet source binding classifies 17,257 exact, 854 normalized-only, 2,549 ambiguous, and 40,999 unresolved. The workspace-source binding schema is available but has no proven producer/population. See `docs/reports/source-lineage-model-v1.json`, `docs/reports/source-ref-binding-v1.json`, and `docs/reports/live-source-lineage-table-audit.json`.
 - [x] REV-OWNER-CODE-02I Validate the source-lineage relation migration in a rollback-only transaction: alias and workspace-binding tables were visible during validation and absent after rollback; durable writes were false. The migration is structurally ready but not applied. See `scripts/atlas/validate-source-lineage-relations-v1.mjs`.
 - [x] REV-OWNER-CODE-02J Generate the read-only current Graphify batch plan: 111 sources have exact current source/workspace bindings with zero missing, ambiguous, or revision/content-mismatch rows; no canonical or projection writes were performed. See `docs/reports/current-source-graphify-batch-plan-v1.json`.
-- [ ] REV-OWNER-CODE-02K Reconcile the planned current Graphify sources against `atlas_source_refs` before any binding apply: the 111-row exact current Graphify plan has `0/111` exact registry matches, and `atlas_workspace_source_bindings` has a foreign key to the stable source registry. Exact Graphify observation alone is insufficient for durable binding admission.
+- [x] REV-OWNER-CODE-02K Reconcile the planned current Graphify sources against `atlas_source_refs` before binding admission: the initial plan showed `0/111` literal matches, so registry semantics were audited and the explicitly authorized registry reconciliation later established `111/111 EXISTING_EXACT` rows with validated composite-key/FK agreement. Exact Graphify observation alone remains insufficient, but the current registry/binding contract is now proven. See `docs/reports/current-source-registry-contract-v1.json`.
 - [x] REV-OWNER-CODE-02L Add and run the read-only registry reconciliation planner: 111 current exact Graphify rows become `REGISTRY_INSERT_CANDIDATE_REVIEW_ONLY`, 0 are already registered, and the plan checksum is `43a4cdc047c3d0e04aa441beafe41837254cc64f5d4c644acf06f31c269211a7`; no registry or binding writes occur. See `scripts/atlas/plan-current-source-registry-reconciliation-v1.mjs` and `docs/reports/current-source-registry-reconciliation-plan-v1.json`.
 - [x] REV-OWNER-CODE-02M Apply the explicitly authorized 111-row stable source-registry insert and prove exact readback: `insertedCount=111`, `readbackCount=111`, apply checksum equals the plan checksum, and no workspace-binding or projection writes occurred. See `scripts/atlas/apply-current-source-registry-reconciliation-v1.mjs` and `docs/reports/current-source-registry-reconciliation-apply-v1.json`.
 - [x] REV-OWNER-CODE-02H Prove one bounded current-workspace source binding using exact source/content/revision evidence, then populate the binding layer only through an explicitly approved additive migration and readback. Do not promote normalized-only, ambiguous, or unresolved matches.
@@ -152,7 +156,7 @@ npx vitest run \
   src/lib/server/queue/artifact-event-processing.spec.ts \
   src/lib/server/queue/event-fabric-dispatch.spec.ts
 
-npx tsx scripts/atlas/prove-queue-artifact-lifecycle.mts
+npx tsx sveltekit-frontend/scripts/atlas/prove-queue-artifact-lifecycle.mts
 ```
 
 Acceptance target:
@@ -180,8 +184,8 @@ marked otherwise; nothing here is speculative.
   (their implementation kept over an earlier local draft; theirs was more complete). Found and
   fixed a real production-breaking TDZ bug in their `outbox.ts` (`enqueueTask` self-shadowed its
   own `idempotencyKey` helper). Also fixed a missing `loadAtlasEnv()` call in two of their new
-  proof scripts (`prove-artifact-transport-readiness.mts`,
-  `prove-queue-artifact-lifecycle.mts`) that crashed with a SASL auth error before ever querying.
+  proof scripts (`sveltekit-frontend/scripts/atlas/prove-artifact-transport-readiness.mts`,
+  `sveltekit-frontend/scripts/atlas/prove-queue-artifact-lifecycle.mts`) that crashed with a SASL auth error before ever querying.
 - **QUEUE-05 steps 1–3 proven live** against production Postgres: applied
   `parent_atlas_artifact_transport_v1.sql` (4 new tables, additive-only), confirmed
   `ARTIFACT_TRANSPORT_STORE_READY`, then ran `prove-queue-artifact-lifecycle.mts` →
@@ -241,7 +245,7 @@ marked otherwise; nothing here is speculative.
 cd sveltekit-frontend
 npx vitest run src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.spec.ts
 npx vitest run src/lib/server/queue/outbox-authority.spec.ts src/lib/server/queue/event-fabric.spec.ts
-npx tsx scripts/atlas/prove-artifact-transport-readiness.mts   # expect ARTIFACT_TRANSPORT_STORE_READY
+npx tsx sveltekit-frontend/scripts/atlas/prove-artifact-transport-readiness.mts   # expect ARTIFACT_TRANSPORT_STORE_READY
 npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"    # expect ~20, none new
 ```
 
@@ -279,7 +283,9 @@ npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"    # expect ~20, non
 - [ ] Scale the exact parity proof from 15 to 128, then 768; preserve exact `source_ref`/`content_hash`/revision bindings and do not use aliases, fuzzy matches, or synthetic revisions.
 - [x] Wrap the `[15,25]` matrix in `CandidateFeatureMatrixManifestV1` and prove graph A/B replay: baseline and graph replays identical, 7 graph-present rows, 8 graph-absent rows, no ranking promotion; see `docs/reports/current-candidate-feature-matrix-manifest-v1.json`.
 - [x] Prove the fixture `CandidateOrdinalGpuAbiV1` decode boundary: 23 graph executor rows, zero unknown ordinals, zero revision mismatches, dense executor-local graph ordinals; see `docs/reports/candidate-ordinal-gpu-abi-v1.json`.
-- [ ] Prove the live 8098/cuVS executor ABI and exact semantic parity; fixture ABI success does not imply live GPU execution or ranking promotion. Current 8098 capability probe is blocked because the actual WSL `Ubuntu` distro has system Python only and cannot import `torch`/`cuvs`; no package installation was performed.
+- [ ] Prove live cuVS exact semantic parity at the representation/quality boundary; executor fixture success does not imply ranking promotion. The existing WSL `atlas-rapids-cu13` environment passes CUDA/cuGraph capability, graph parity, and the bounded 8098 PyTorch↔cuVS CandidateOrdinal round-trip. Cross-executor semantic recall/rank parity remains open.
+- [x] Prove the live 8098 graph capability and bounded NetworkX↔cuGraph PageRank parity without writes; see `docs/reports/graph-ordinal-cpu-gpu-parity-v1.json`.
+- [x] Prove the live 8098 PyTorch/cuVS CandidateOrdinal decode and ordinal-set parity without writes; see `docs/reports/8098-candidate-ordinal-roundtrip-v1.json`.
 - [ ] Prove graph-aware feature use in ranking separately; PageRank attachment currently does not affect ordering.
 - [ ] Keep neural shortlist/classifier, Valkey cache, relationship fan-out, and mutation execution outside this correctness gate until independently proven.
 - [x] REV-OWNER-GRAPH-05I Characterize the current 8095 structural edge producer without promotion: the read-only plan emits 23 nodes, 12 resolved edges, and 50 unresolved edges, but remains bound to the older `sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc` workspace revision rather than the current 111-source binding revision `sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`. The current artifact audit therefore reports 0 current revision-qualified edges. This is structural-provider evidence only; no Postgres, Qdrant, Neo4j, Valkey, or canonical graph writes occurred. See `docs/reports/current-structural-edge-artifact-plan-v1.json` and `docs/reports/current-graph-artifact-readiness-v1.json`.
@@ -301,4 +307,157 @@ npx tsc --noEmit -p tsconfig.json 2>&1 | grep -c "error TS"    # expect ~20, non
 - [x] REV-OWNER-GRAPH-05Y Characterize the remaining packet bridge after projection repair: the 111 current `atlas_packets` rows have UUID `chunk_id` values that do not match the new `fullrepo:<source_ref>:<segment>` chunk IDs. Legacy numeric Qdrant IDs are a separate coordinate system; do not infer CandidateOrdinal or rewrite packet IDs.
 - [x] REV-OWNER-GRAPH-05Z Audit legacy packet Qdrant IDs independently: all 111 current packet IDs were requested from `codebase_chunks_768`; Qdrant returned 20/111, with 20/20 source and legacy chunk-ID payload matches, but 0 content-hash matches. The bridge is therefore partial and cannot qualify the full cohort. Persisted read-only evidence: `docs/reports/current-packet-qdrant-bridge-v1.json`. No deletion, remapping, or identity promotion occurred.
 - [x] REV-OWNER-GRAPH-05AA Audit `GraphNodeInventoryV1` over the current derived structural plan: 2,545 unique graph-node keys across 103 processed sources share the current workspace revision, but all 2,545 lack a producer revision. The inventory is therefore non-authoritative and edge admission remains closed; no graph revision or durable graph/projection writes occurred. See `scripts/atlas/audit-current-graph-node-inventory-v1.mjs` and `docs/reports/current-graph-node-inventory-v1.json`.
-- [x] REV-OWNER-GRAPH-05AB Audit the current Graphify run owner read-only: the current workspace revision has one `graphify_runs` row, but it remains `RUNNING` with `completed_at = NULL`, and its `workspace_id` has no matching `public.workspaces` row. `source_manifest_digest` and source count are present, but no authoritative completed run exists; graph revision and edge admission remain closed. See `scripts/atlas/audit-current-graphify-run-owner-v1.mjs` and `docs/reports/current-graphify-run-owner-v1.json`.
+- [x] REV-OWNER-GRAPH-05AB Audit the current Graphify run owner read-only: the current workspace revision has one `graphify_runs` row, and its `workspace_id` now resolves to one matching `public.workspaces` row, but the run remains `RUNNING` with `completed_at = NULL`. `source_manifest_digest` and source count are present, but no authoritative completed run exists; graph revision and edge admission remain closed. See `scripts/atlas/audit-current-graphify-run-owner-v1.mjs` and `docs/reports/current-graphify-run-owner-v1.json`.
+- [x] REV-OWNER-CODE-02Q Trace the current inventory writer lifecycle read-only: `graphify-source-inventory-writer-v2.ts` creates/updates a `graphify_runs` row as `RUNNING` and writes/readbacks `graphify_files`, but does not finalize the run as `COMPLETED` or create a workspace owner. Treat it as source-inventory persistence, not the authoritative Graphify snapshot-completion owner; do not mark the live run complete from this audit.
+- [x] REV-OWNER-CODE-02R Characterize the remaining completion-owner split read-only: `daily-graphify-mastra-workflow.mjs` finalizes a separate `graphify_workflow_runs` table with status `COMPLETE`, while the canonical `graphify_runs` row remains `RUNNING`; no existing adapter bridges workflow completion to the canonical Graphify run with source/node/edge checksums. Do not treat the workflow table as the canonical snapshot owner or copy its status into `graphify_runs` without a receipt-bound completion step.
+- [x] GRAPH-06C0 Build and maintain the read-only `GraphifyRunCompletionPlanV1`: it joins the canonical run-owner audit with the current structural artifact, treats the source selection as complete (`111/111`, including 8 explicitly unsupported non-code files), and fails closed on incomplete run status and 10,506 unresolved edges. It computes node/edge checksums but assigns no `graphRevision` and performs no durable writes. See `scripts/atlas/plan-graphify-run-completion-v1.mjs` and `docs/reports/graphify-run-completion-plan-v1.json`.
+- [x] GRAPH-06A Confirm the graph-ownership gap is a snapshot-contract gap, not merely missing edge columns: the current node inventory has 2,545 unique keys under the current workspace revision but no producer revisions; the current Graphify run is incomplete, and no authoritative completed source snapshot owns a `graphRevision`. Keep `Candidate-128-SEMANTIC` conceptually separate from `Candidate-128-FULL-FEATURE`; graph absence must remain feature absence until full-feature admission is explicitly requested.
+- [x] GRAPH-06B Define, emit, and audit the revision-qualified graph-edge artifact contract read-only: the planner now emits stable `graphNodeKey` endpoints, exact source/revision evidence, `producerRevision`, deterministic `edgeId`, and `evidenceChecksum`; the audit passes all required fields across 2,545 nodes and 1,334 known-endpoint edges with 0 duplicate edge shapes and 0 unknown endpoints. This is still a non-authoritative plan with `graphRevision = null`; snapshot admission remains closed until the completed-source owner and replay gates pass. No legacy edges were mutated and no graph revision was synthesized. See `scripts/atlas/plan-current-structural-edge-artifact-v2.mjs`, `scripts/atlas/audit-current-structural-edge-contract-v1.mjs`, and `docs/reports/current-structural-edge-contract-v1.json`.
+- [x] GRAPH-06B1 Replay the current 111-source structural planner twice: both runs produced the same report checksum `sha256:3b4e9960c504b69f698c9f6db52d9da7f5f7845b912fdf4c7850ce5ec20938f8`, with 2,545 nodes, 1,334 resolved edges, and 10,506 unresolved observations. This proves deterministic shadow-plan replay only; it does not prove a completed Graphify run, graph ownership, or promotion.
+- [ ] GRAPH-06C Build the bounded 111-source edge snapshot from one completed Graphify/source snapshot, then emit a `GraphifyRunReceiptV1` and `GraphSnapshotV1` only after node/edge/source checksums and independent replay are stable.
+- [x] GRAPH-06C0 Correct the read-only completion-plan classification: the current source-selection plan is complete (`111/111` exact, zero missing/ambiguous/mismatch rows); the remaining coverage blocker is structural processing (`103/111`), not source selection. The completion plan now reports `STRUCTURAL_SOURCE_PROCESSING_INCOMPLETE` separately.
+- [x] GRAPH-06C1 Classify the eight selected non-code sources (`.md`/`.sh`) as `STRUCTURAL_LANGUAGE_ADAPTER_NOT_CONFIGURED` in the read-only structural artifact plan. Structural coverage now accounts for `103` processed code sources plus `8` explicitly unsupported sources; no source is silently omitted and no graph revision is admitted.
+- [x] GRAPH-06C2 Refine the unresolved-edge census read-only: `10,506` unresolved observations comprise `9,730` unresolved `CALLS`/`REFERENCES` targets and `776` syntax-only `IMPORTS`/`EXPORTS` observations (`308` imports, `468` exports). Keep all non-resolved observations non-admissible; do not convert syntax-only evidence into graph edges without a target identity.
+- [x] GRAPH-RESOLVE-01 Audit the existing symbol resolver/cache before structural-edge admission: PostgreSQL lookup/index/performance/confidence gates pass, but Valkey cache-key coverage fails (`0` keys; `0/3` sampled prefix caches populated) and the resolver reports `4,270` feature-ID collisions across `37,237` unique features. Keep the resolver available but non-promotional until revision-qualified identity and cache-key behavior are proven; no edges or graph revisions were written.
+- [x] GRAPH-RESOLVE-02 Plan the revision-qualified resolver/cache key contract read-only: `symbol_resolver` has no `workspace_revision`, `source_revision`, or `graph_revision` columns, so the current `symbol:<prefix>:packets` cache cannot be revision-safe; no cache keys were written. See `scripts/atlas/plan-symbol-resolver-revision-key-v1.mjs` and `docs/reports/symbol-resolver-revision-key-plan-v1.json`.
+- [x] GRAPH-RESOLVE-03 Define the pure `RevisionQualifiedSymbolResolutionV1` contract and revision-addressed cache-key builder in `packages/parent-atlas`; deterministic checksum/key tests pass and the contract remains non-authoritative. No live resolver rows, cache keys, structural edges, or graph revisions were written.
+- [x] GRAPH-RESOLVE-04 Run the bounded structural target-identity audit fail-closed: sampled unresolved observations carry source revisions but no canonical target source/symbol/revision identity, so `0` legacy resolver matches are promoted and `0` structural edges are admitted. See `scripts/atlas/audit-bounded-structural-target-identity-v1.mjs` and `docs/reports/bounded-structural-target-identity-v1.json`.
+- [x] GRAPH-RESOLVE-05 Add the pure LSP-to-`RevisionQualifiedSymbolResolutionV1` adapter: resolved LSP observations require target source, target source revision, stable symbol ID, and symbol-version ID; ambiguous/unresolved/incomplete targets reject closed. Focused package tests pass; no resolver rows, cache keys, edges, or graph revisions were written.
+- [x] GRAPH-RESOLVE-06A Add the pure injected-reader LSP target-identity enrichment layer: canonical URI mapping, exact target source revision/content digest, UTF-16 LSP range to UTF-8 byte range conversion, and exact tree-node/symbol-range/containing-symbol selection. Ambiguous, missing, and outside-workspace targets fail closed; focused package compile and tests pass 5/5. No persistence or edge admission is performed.
+- [ ] GRAPH-RESOLVE-06B Bind the enrichment layer to a live authoritative LSP/compiler producer and prove target identity on the bounded unresolved-edge sample. The current live census is fail-closed: 111 current Graphify sources have 0 exact `(source_ref, source_revision)` matches in `atlas_symbol_versions`, so identity enrichment attempted/admitted edges remain 0. A full read-only current-run nomination export now works: 440 nominations from 103 supported files, 8 explicit unsupported files, 0 failures, and 0 writes. The existing resolution artifact recognizes 0/440 as canonical declarations, so the export is not yet symbol-version authority or identity proof. Do not create synthetic symbol versions, use fuzzy aliases, or bulk-populate structural edges from unresolved/collision-prone matches. See `docs/reports/live-structural-target-identity-proof-v1.json`, `docs/reports/ast-symbol-version-materialization-v1.json`, and `sveltekit-frontend/scripts/atlas/native-structural-materializer.mts`.
+- [ ] GRAPH-06D Prove `GraphOrdinalMapV1` and NetworkX↔cuGraph parity from the same frozen graph snapshot; executor-local graph ordinals must not become `CandidateOrdinal`, packet identity, or canonical graph identity.
+- [x] ALIGN-01A Characterize the SymbolFeatureAlignment prerequisite read-only: the available 15-row CandidateFeatureMatrix manifest is bound to the older `b19...` workspace revision, while the current source/binding cohort is `55ed...`; the active observation-feature contract is the ORF `(packet_key, feature_revision)` schema, while an incompatible candidate-id/vector migration remains non-active. No complete current CandidateOrdinal ↔ symbol version ↔ observation feature-row materializer exists, so alignment and GPU promotion remain blocked without synthetic joins.
+- [x] ALIGN-01B Re-run current-revision CandidateOrdinal materialization read-only after the 111-source index apply: it fails closed with `CANARY_EXACT_LINEAGE_COHORT_EMPTY`. The current chunk index still exposes per-chunk hashes/IDs while workspace bindings and Graphify expose whole-source digests; packet chunk IDs remain a separate legacy coordinate. No remapping, synthetic identity, or canonical/projection writes occurred.
+- [x] ALIGN-01C Audit byte-scope identity read-only: 4,527 Qdrant points have unique `tree_node_id` values and join packet rows, but packet byte spans are absent, AST-node joins are absent, and exact packet-span-to-AST identity is `0`; 1,140 path-only matches remain non-promotional. CandidateOrdinal admission therefore still requires a reviewed packet/chunk span producer. See `docs/reports/atlas-byte-scope-reconciliation-v1.json` and `docs/reports/atlas-ast-qdrant-tree-bridge-v1.json`.
+- [x] ALIGN-01D Audit packet content-hash authority read-only: `codebase_chunk_index.content_hash` is the per-chunk FTS join target; `atlas_packets.content_hash` has no live writer, while packet `sha256` and artifact hashes use different grains. Only 341 packets map to one distinct chunk hash, 332 are already populated, and 9 remain safely eligible for the existing bounded hash backfill. 4,207 packet sources remain ambiguous and 57,112 have no chunk hash; no backfill or identity promotion was performed. See `scripts/atlas/audit-atlas-packets-content-hash-source.mjs` and `docs/reports/atlas-packets-content-hash-source-v1.json`.
+
+## Cross-provider alignment backlog (2026-08-29)
+
+### Architecture is broader than the current correctness queue
+
+The full Parent Atlas architecture remains:
+
+```text
+source / Graphify / LSP / external evidence
+  → bounded parse and schema validation
+  → PostgreSQL canonical identity, revisions, eligibility, FTS, semantic_768
+  → Qdrant / Neo4j / GPU / Arrow-mmap rebuildable projections
+  → SearchRuntime lane normalization and one fusion owner
+  → CandidateFeatureMatrix and bounded GPU enrichment
+  → ACE cards → ContextManifest → Ornith
+  → verified claim → admitted DAG → bounded execution/readback
+```
+
+The current gate ladder is intentionally narrower and must not be read as deleting
+the data plane. `simdjson`/`simd-json`, MessagePack, Arrow IPC/mmap, BitFrost/Valkey,
+cuVS/cuGraph/PyTorch, HyperGraphRAG, legal adapters, QLoRA, and domain-directed
+memory residency remain architecture or later optimization/promotion layers. They
+must consume revisioned artifacts and receipts; they do not become alternate
+canonical stores, identity owners, or fusion owners.
+
+### Alignment sequence and measured completion (2026-08-29)
+
+These percentages are task-state percentages for this OpenSpec change, not a
+production-readiness claim. `DONE` means the corresponding proof is wired and
+evidenced; architecture coverage alone does not count.
+
+| Phase | Sequence | Current state | Completion basis |
+|---|---|---|---:|
+| A | canonical source/run ownership and exact lineage | active blocker: completed Graphify owner and namespace reconciliation remain open | 0% of remaining owner gates |
+| B | symbol/feature/filter alignment | `ALIGN-01A..D` audits complete; current materializer and shared eligibility proof remain open | 4/6 = 66.7% |
+| C | graph projection and executor parity | fixture ABI exists; current frozen graph snapshot and live NetworkX↔cuGraph proof remain open | 0/2 live gates |
+| D | neural/runtime receipts | Ornith model is live; adapter, QLoRA, and neural execution receipts remain planned | 0/3 promotion gates |
+| E | ontology, HyperGraphRAG, ACE, and memory residency | contracts are documented; evidence-qualified promotion and revision-keyed replay remain open | 0/4 promotion gates |
+| F | optimization challengers | benchmark-only until baselines and replay receipts exist | 0% |
+
+Recommended order:
+
+```text
+A canonical owner/lineage
+  → B symbol + feature + eligibility alignment
+  → C current graph snapshot + CPU/GPU parity
+  → D neural execution receipts
+  → E ontology/HyperGraphRAG + ACE residency replay
+  → F optimization challengers
+```
+
+Current counts from this file: `110/174 = 63.2%` complete overall. The
+cross-provider backlog contains `1/18 = 5.6%` completed tasks; it is a focused
+alignment backlog and must not be used as the completion percentage for the
+entire Parent Atlas system.
+
+### Latest proof-log gate state (2026-08-29)
+
+| Lane | Result | Gate state | Evidence |
+|---|---|---|---|
+| 8095 structural CST/AST | live provider, syntax/XRef observations | `PROVEN_BOUNDED` | `docs/reports/structural-intelligence-integration-proof.json` |
+| TypeScript LSP | read-only definitions/references/symbol observations | `PROVEN_READ_ONLY` | `docs/reports/typescript-lsp-readonly-proof-v1.json` |
+| LangExtract grounding | bounded grounded extraction | `PROVEN_BOUNDED` | `docs/reports/langextract-grounding-v1.json` |
+| current source lineage | 111/111 current workspace rows, 0 missing/mismatch/ambiguous | `LINEAGE_PROVEN` | `docs/reports/current-source-cohort-lineage-v1.json` |
+| feature/GPU/ACE/Ornith | tile readback, ordinal roundtrip, feature replay, ContextManifest, synthesis, claim and read-only DAG validation | `READ_ONLY_CHAIN_PROVEN` | `docs/reports/parent-atlas-gpu-ace-ornith-readiness-v1.json` |
+| Graphify owner | canonical run still `RUNNING`; no completed owner | `BLOCKED` | `docs/reports/current-graphify-run-owner-v1.json` |
+| graph snapshot | 103 code sources processed + 8 explicitly unsupported non-code sources; 10,506 unresolved observations; no graph revision | `BLOCKED` | `docs/reports/graphify-run-completion-plan-v1.json` |
+| graph resolution | structural plan is deterministic, but unresolved targets remain non-admissible | `SHADOW_ONLY` | `docs/reports/current-structural-edge-resolution-v1.json` |
+| semantic scale | 15-row proof remains valid; 128/768 expansion not admitted | `BLOCKED_ON_LINEAGE_GRAPH_OWNER` | latest alignment sequence receipt |
+| SIMD/native bridge | audit reports 13 high and 58 medium findings, including timeout/fallback/concurrency gaps | `HARDENING_OPEN` | `docs/reports/simd-bridge-memory-audit.json` |
+
+This log closes the read-only reasoning spine but does not close canonical
+lineage, graph ownership, full-corpus scaling, or mutation execution. The next
+gate is `GRAPHIFY-RUN-OWNER-01`; do not mark graph revision, CandidateOrdinal
+128/768, HyperGraphRAG promotion, QLoRA merge, or repair execution complete from
+these proofs.
+
+`graphRevision: null` is an intentional valid value for non-authoritative shadow
+plans, graph-absent feature rows, and read-only alignment receipts. It must not
+be replaced with a synthetic revision. The graph-owner blocker is isolated: the
+remaining JSON/provider, context, model-boundary, ACE, and execution-admission
+tasks may proceed in parallel as long as they do not promote graph evidence or
+claim full-corpus graph qualification.
+
+Parallel work order while the owner remains unresolved:
+
+```text
+P0-A  preserve null graphRevision and fail-closed graph admission
+P0-B  JsonDecodeProvider / simdjson typed parity
+P0-C  BitFrost + ACE revision/checksum key audit
+P0-D  Ornith model/adapter receipt boundaries
+P0-E  grounded DAG admission and read-only execution receipt
+P1    completed Graphify owner → graph snapshot → graph parity
+P2    CandidateOrdinal 128 → 768 and full-feature promotion
+```
+
+- [ ] ALIGN-EVIDENCE-01 Split `collect-runtime-evidence.mjs` into an explicitly read-only evidence mode and a separately authorized apply mode. Dry-run is now the default, rejects mixed mode flags, skips all write-capable subprocesses and Postgres/Valkey connections, and was validated over 8,170 cards. Apply now performs a read-only `atlas_packets` identity preflight before any subprocess or local artifact write, and fails closed because `packet_id` is NOT NULL with no default. The apply path remains unsafe until packet identity derivation and a side-effect manifest are repaired. Do not treat apply mode as a read-only audit.
+- [ ] PACKET-ID-OWNER-01 Resolve the canonical `atlas_packets.packet_id` owner before enabling the collector apply path. The live table contains 61,660 non-null IDs, 61 IDs with UUID-shaped length, 0 64-character SHA-256 IDs, and all 61,660 rows have `packet_key`; existing producers disagree between UUID, packet-key, and truncated/full hash conventions. The live constraint census shows `packet_id` is the table primary key, while the majority of downstream foreign keys intentionally target unique `packet_key`; only packet identity-conflict/materialization-queue tables reference `packet_id`. A value census found `packet_id = packet_key` for 58,305 rows and different values for 3,355 rows, so equality cannot be assumed. By source kind, all 58,304 rows with NULL `source_kind` and the single `cluster-summary` row have equality, while all 3,294 `codebase_chunk` rows diverge with `packet_*` IDs and all 61 `rpc_method` rows diverge with UUID-shaped IDs. Source inspection points to legacy orphan-chunk registration and RPC packet producers. The current packet materializer explicitly rejects `packet_id != packet_key`, making equality a candidate active rule for new materialization but not proof that legacy rows can be rewritten. This characterizes legacy producers but does not establish a single owner. Do not derive a new ID in the collector or equate `packet_id` with `packet_key` until the registry contract and downstream expectations are reconciled.
+- [ ] PACKET-MATERIALIZER-INPUT-01 Reconcile the collector’s packet-key input contract before apply: `collect-runtime-evidence.mjs` now uses the shared `buildPacketKey(sourceRef, featureId)` helper when cards lack `packet_key`, producing the established `nes:<slug>:<sha8(source_ref)>` shape. The 8,170-card corpus contains 0 explicit `packet_key` values; a read-only full-corpus audit produced 8,170 non-empty unique keys with 0 live PostgreSQL collisions. These remain planned derived keys until apply identity ownership is approved. Do not silently rewrite existing evidence-card keys during ingestion.
+- [ ] PACKET-LINEAGE-EXCEPTIONS-01 Classify the two packet completeness anomalies before any apply path: one `codebase_chunk` row has an empty `source_ref`, and one `cluster-summary` row has no `workspace_id`. The packet contract validator now treats blank identity strings as missing and the live validation remains threshold-pass, but neither anomaly is repaired. `register-orphaned-chunks.mjs` was the admitting producer for the empty-source class; its orphan query and preparation path now reject blank `relative_path` values, and its default dry-run now prepares 58 valid registrations without that row. Keep both anomalies excluded from current Graphify/source-binding qualification until their owning producer and repair authority are proven; do not fill either field from packet keys or defaults.
+- [ ] PACKET-ORPHAN-CANARY-01 Prove the 58 orphan registration candidates before any apply: 58 non-empty source refs, 58 unique generated packet keys, and 0 packet-key collisions with `atlas_packets`. The apply path remains blocked because it still generates time/index-based `packet_*` primary IDs; do not authorize a canary until the packet-ID owner is resolved.
+- [ ] ALIGN-XJSON-01 Define `JsonDecodeProviderV1` and compare Node JSON, C++ simdjson, and Rust simd-json on a bounded fixture. The focused package spec passes 2/2 tests; the supported runtime audit imports the compiled native addon and reports `active_backend: native`; the addon probe reports CUDA available, simdjson backend `icelake (Intel/AMD AVX512)`, and 36 exports. Typed Node/C++/Rust checksum parity remains open. Keep key-selector experiments out of the first gate.
+- [ ] ALIGN-SYMBOL-01 Implement the missing current-cohort `SymbolFeatureAlignmentV1` materializer. It must bind `CandidateOrdinal`, packet/chunk identity, optional symbol/observation rows, feature revisions, and evidence references without fuzzy joins, fabricated IDs, or synthetic graph revisions. Existing schema/fixture contracts do not prove this materializer exists.
+- [ ] ALIGN-FILTER-01 Define one revision-bound `EligibilitySetV1` and prove equivalent admissible CandidateOrdinals across PostgreSQL planner filters, Qdrant payload filters, and cuVS bitset filtering. PostgreSQL AIO/bitmap scans remain planner behavior and must not become a second authority.
+- [ ] ALIGN-GRAPH-01 Bind one frozen `GraphProjectionArtifactV1` to `GraphOrdinalMapV1`, preserving all vertices `[0,V)` including isolated vertices, then compare direct NetworkX CPU output with direct cuGraph output from that same artifact. Do not use automatic nx-cugraph dispatch as the parity oracle.
+- [ ] ALIGN-NEURAL-01 Add revision-bound `NeuralExecutionReceiptV1` for PyTorch/LibTorch/TensorRT challengers. Record model/head/executor revisions, input artifact checksum, ordinal map checksum, output checksum, and numeric parity against the CPU reference before any ranking promotion.
+- [ ] ALIGN-ONTOLOGY-01 Require evidence-qualified `OntologyLinkedTupleV1` promotion before relationship or hypergraph revisions can feed retrieval or fanout. Domain classification, ontology proposals, and topology annotations remain non-authoritative until independently reviewed and revision-bound.
+- [ ] ALIGN-CONTEXT-01 Make BitFrost/Valkey and ACE/ContextManifest keys revision-addressed by candidate snapshot, representation, graph, feature, and artifact checksums. Cache hits may accelerate replay but cannot bypass canonical identity or evidence closure.
+- [ ] ALIGN-OPT-01 Keep TensorRT-RTX, cuTile, TurboVec, and learned routing as benchmarked challengers only. Do not add them to the correctness gate until the corresponding baseline, held-out evaluation, and replay receipt exist.
+- [ ] ALIGN-SIMD-01 Resolve the native bridge audit findings before promotion: 104 findings across 12 files, including 13 high, 58 medium, missing timeout bounds, fallback coverage, and possible concurrent GPU-job hazards. The audit is complete; remediation and replay are still open. See `docs/reports/simd-bridge-memory-audit.json`.
+- [x] WEB-ALIGN-01 Route the primary `/api/websearch`, agent web-search tool, and MCP research tools through the shared SearXNG/DuckDuckGo adapter, including empty-result fallback behavior and provider metadata.
+- [ ] WEB-ALIGN-02 Audit remaining specialized direct SearXNG callers (`ldr/web-search-client`, `gemma4-tool-loop`, and `gemma4-agent`) and either adapt them to the shared provider contract or document their intentionally separate engine policy. Do not silently maintain competing fallback chains.
+
+## Ornith, legal adaptation, and agentic memory backlog (2026-08-29)
+
+### Workflow executor ownership (2026-08-29)
+
+- [x] WF-EXEC-00 Audit the orchestration dependency and caller surface: native LangGraph `StateGraph` imports are present in the SvelteKit dispatcher/DAG and the LangGraph packages are installed; the root compatibility probe currently fails because it resolves `@langchain/core@1.1.45` while the active SvelteKit graph requires `@langchain/core >=1.1.48` (`@langchain/core/utils/uuid` does not export `v6`). Mastra has no direct dependency or native import in the SvelteKit runtime; the Mastra-named Graphify script is a legacy shell using direct workflow-log SQL and must not be treated as a Mastra runtime or canonical Graphify owner.
+- [x] WF-EXEC-01 Repair and re-run the LangGraph dependency compatibility gate in the owning package: the validator now resolves imports from `sveltekit-frontend/node_modules` instead of accidentally testing the root dependency tree; frontend `@langchain/langgraph@1.4.7` with `@langchain/core@1.2.4` passes the declared peer-range and native import gates. Adapter replay, checkpoint, and failure semantics remain separate tasks.
+- [x] WF-EXEC-02 Freeze workflow execution coordinates in `packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts`: framework, orchestration runtime, checkpoint provider, action executor, transport, workflow-spec checksum, and deterministic coordinate checksum are separate fields; `WorkflowActionEventV1` remains the identity owner and checkpoints remain non-canonical. TypeScript compilation and two focused tests pass.
+- [x] WF-EXEC-03 Prove a bounded local-vs-native LangGraph StateGraph read-only replay: the same two action IDs and order produce identical output/checksum, with no mutation executor or external-store writes. See `scripts/atlas/prove-langgraph-readonly-adapter-replay-v1.mjs` and `docs/reports/langgraph-readonly-adapter-replay-v1.json`. Full production workflow/event binding remains separate.
+- [x] WF-EXEC-04 Prove memory-checkpoint failure, retry, cooperative cancellation, and read-only replay semantics for the selected LangGraph adapter; the bounded fixture passes with no mutation or canonical-store writes. Durable Postgres checkpoint behavior remains a separate production gate. See `scripts/atlas/prove-langgraph-failure-retry-replay-v1.mjs` and `docs/reports/langgraph-failure-retry-replay-v1.json`.
+- [x] WF-EXEC-05 Decide against Mastra installation in this tranche: LangGraph now has bounded adapter, failure, retry, cancellation, and replay evidence, while Mastra has no direct dependency or native runtime import. Mastra remains `PLANNED/UNPROVEN` and may only be evaluated later as a separately authorized challenger adapter.
+
+- [ ] MODEL-ORNITH-01 Treat the live `/v1/models` response and environment-backed resolver as the synthesis model authority. Record the resolved model ID, loaded endpoint, model checksum/path when available, and context configuration in execution receipts; hard-coded Gemma4 aliases are compatibility labels only.
+- [ ] MODEL-ADAPTER-01 Define `LegalAdapterArtifactV1` for a legal/domain adapter proposal. Bind base model ID, adapter type, training/evaluation corpus revisions, tokenizer/prompt revisions, adapter checksum, license/provenance evidence, and rollback target. No live merge or model-owner change until held-out evaluation and replay pass.
+- [ ] MODEL-QLORA-01 Add a QLoRA adapter merge/evaluation receipt path. Keep the canonical base model and adapter separately addressable; produce a new merged model revision only after checksum, regression, safety, latency, and grounded-evidence evaluation. Do not write adapter weights to BitFrost/Valkey as canonical state.
+- [ ] MEMORY-SWAP-01 Define `DomainContextResidencyPlanV1` for domain-classified context budgets and memory/artifact swaps. Keys must include model/adapter, candidate snapshot, representation, graph/feature revisions, and artifact checksums; swaps may select bounded ACE cards or descriptors but may not persist hidden thoughts, KV cache, tensors, or unvalidated evidence.
+- [ ] HGR-AGENT-01 Bind HyperGraphRAG expansion to reviewed `OntologyLinkedTupleV1`/`HyperRelationV1` evidence and a revision-qualified graph projection. Domain classification and ontology proposals remain non-authoritative until evidence closure and promotion receipt.
+- [ ] DAG-ERROR-01 Prove the agentic error-fixing boundary as `GroundedClaimValidationReceiptV1 → KernelDagCandidateV1 → KernelDagValidatorV1 → TypedRepairDagV1 → bounded executor → ExecutionReceiptV1`. Require authorization, lineage, tool allowlist, budget, readback, and explicit mutation policy; verified claims alone must never authorize writes.
+- [ ] ORNITH-ACE-01 Keep Ornith downstream of ACE/ContextManifest. Domain classification may select retrieval lanes, context token budgets, and approved residency plans, but only the canonicalized ContextManifest may enter synthesis or tool planning.

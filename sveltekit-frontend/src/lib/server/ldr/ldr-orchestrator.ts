@@ -4,6 +4,7 @@
  */
 
 import { searchViaSearXNG, fetchAndExtractText, aggregateDocuments, type WebSearchResult, type ExtractedDocument } from './web-search-client';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * Strips leaked reasoning/thinking blocks from LLM output before it reaches
@@ -174,7 +175,7 @@ async function callGemma4Synthesis(
   temperature: number
 ): Promise<{ text: string; confidence: number }> {
   const llmUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
-  const model = process.env.LLAMA_SERVER_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+  const model = LLM_MODEL_ID;
 
   try {
     const res = await fetch(`${llmUrl}/chat/completions`, {
@@ -308,7 +309,7 @@ export async function streamLocalDeepResearchSynthesis(
     const userPrompt = buildUserPrompt(query, contextString);
 
     const llmUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
-    const model = process.env.LLAMA_SERVER_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+    const model = LLM_MODEL_ID;
 
     const res = await fetch(`${llmUrl}/chat/completions`, {
       method: 'POST',

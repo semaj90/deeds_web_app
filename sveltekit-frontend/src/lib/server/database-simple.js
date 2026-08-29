@@ -62,7 +62,7 @@ export async function initializeDatabase() {
  `;
     await sql`
  CREATE TABLE IF NOT EXISTS legal_embeddings (
- id UUID PRIMARY KEY DEFAULT gen_random_uuid(), document_id UUID, content TEXT NOT NULL, embedding VECTOR(768), metadata JSONB, model TEXT DEFAULT 'nomic-embed-text', created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+ id UUID PRIMARY KEY DEFAULT gen_random_uuid(), document_id UUID, content TEXT NOT NULL, embedding VECTOR(768), metadata JSONB, model TEXT DEFAULT 'embeddinggemma:latest', created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
  )
  `;
     console.log('[Database] Tables created');

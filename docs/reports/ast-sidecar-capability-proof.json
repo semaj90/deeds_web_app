@@ -1,10 +1,10 @@
 {
   "schemaVersion": "atlas.ast.sidecar.proof.v3",
-  "generatedAt": "2026-08-28T02:39:51.871Z",
+  "generatedAt": "2026-08-29T17:13:51.038Z",
   "endpoint": "http://127.0.0.1:8095",
   "status": "PROVEN",
   "structuralStatus": "PROVEN",
-  "groundingStatus": "DEGRADED",
+  "groundingStatus": "PROVEN",
   "gates": {
     "SIDECAR_HEALTH_PASS": true,
     "PROVENANCE_V2_CONTRACT": true,
@@ -23,8 +23,8 @@
     "EDGE_TYPES_RECOGNIZED": true,
     "NO_FAKE_CALL_SYMBOLS": true,
     "GROUNDED_PROBE_COMPLETED": true,
-    "LANGEXTRACT_NATIVE_CHAR_INTERVAL": false,
-    "LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE": false
+    "LANGEXTRACT_NATIVE_CHAR_INTERVAL": true,
+    "LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE": true
   },
   "runtime": {
     "health": {
@@ -66,9 +66,9 @@
       "hierarchy": true
     },
     "grounding": {
-      "extractionCount": 0,
-      "nativeCharInterval": false,
-      "alignmentStatusVisible": false,
+      "extractionCount": 2,
+      "nativeCharInterval": true,
+      "alignmentStatusVisible": true,
       "error": null
     }
   }

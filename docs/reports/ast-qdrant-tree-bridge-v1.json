@@ -1,6 +1,6 @@
 {
   "schema_version": "atlas-ast-qdrant-tree-bridge-v1",
-  "generated_at": "2026-08-28T18:21:47.604Z",
+  "generated_at": "2026-08-29T16:06:38.092Z",
   "collection": "codebase_chunks_768",
   "read_only": true,
   "qdrant": {

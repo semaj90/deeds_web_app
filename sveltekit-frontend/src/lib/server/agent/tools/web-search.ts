@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { webSearch as sharedWebSearch } from '$lib/server/retrieval/web-search.js';
 
 /**
  * Web Search Tool - SearXNG + DuckDuckGo Fallback
@@ -63,39 +64,27 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
 		searchQuery = `${query} documentation`;
 	}
 
-	// Try SearXNG first
-	const searxngUrl = ENV.SEARXNG_URL;
+	// Use the canonical adapter so SearXNG empty responses and provider
+	// failures receive the same fallback behavior as the HTTP routes.
 	try {
-		const searxngResults = await searchViaSearXNG(searxngUrl, searchQuery, maxResults);
-		if (searxngResults.length > 0) {
+		const response = await sharedWebSearch(searchQuery, maxResults);
+		if (response.results.length > 0) {
 			return {
 				query,
-				results: searxngResults,
-				totalResults: searxngResults.length,
+				results: response.results.map((result) => ({
+					title: result.title,
+					url: result.url,
+					snippet: result.snippet,
+					source: result.source
+				})),
+				totalResults: response.results.length,
 				duration: Date.now() - startTime,
 				searchType,
-				method: 'searxng'
+				method: response.provider === 'duckduckgo' ? 'duckduckgo' : 'searxng'
 			};
 		}
 	} catch (error) {
-		console.warn('[WebSearch] SearXNG failed, trying DuckDuckGo:', error);
-	}
-
-	// Try DuckDuckGo HTML scraping
-	try {
-		const duckduckgoResults = await searchViaDuckDuckGo(searchQuery, maxResults);
-		if (duckduckgoResults.length > 0) {
-			return {
-				query,
-				results: duckduckgoResults,
-				totalResults: duckduckgoResults.length,
-				duration: Date.now() - startTime,
-				searchType,
-				method: 'duckduckgo'
-			};
-		}
-	} catch (error) {
-		console.warn('[WebSearch] DuckDuckGo failed, using curated results:', error);
+		console.warn('[WebSearch] Canonical adapter failed, trying curated fallback:', error);
 	}
 
 	// Fallback to curated results
@@ -108,89 +97,6 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
 		searchType,
 		method: 'curated'
 	};
-}
-
-/**
- * Search via SearXNG API
- */
-async function searchViaSearXNG(searxngUrl: string, query: string, maxResults: number): Promise<SearchResult[]> {
-	const response = await fetch(`${searxngUrl}/search`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		body: new URLSearchParams({
-			q: query,
-			format: 'json',
-			language: 'en',
-			safesearch: '0',
-			time_range: '',
-			categories: 'general'
-		}),
-		signal: AbortSignal.timeout(5000) // 5s timeout
-	});
-
-	if (!response.ok) {
-		throw new Error(`SearXNG HTTP ${response.status}`);
-	}
-
-	const data = await response.json();
-
-	if (!data.results || !Array.isArray(data.results)) {
-		throw new Error('Invalid SearXNG response format');
-	}
-
-	return data.results.slice(0, maxResults).map((result: any) => ({
-		title: result.title || 'Untitled',
-		url: result.url || '',
-		snippet: result.content || result.description || '',
-		source: extractDomain(result.url || '')
-	}));
-}
-
-/**
- * Search via DuckDuckGo HTML scraping
- */
-async function searchViaDuckDuckGo(query: string, maxResults: number): Promise<SearchResult[]> {
-	const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
-
-	const response = await fetch(url, {
-		headers: {
-			'User-Agent':
-				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-		},
-		signal: AbortSignal.timeout(5000) // 5s timeout
-	});
-
-	if (!response.ok) {
-		throw new Error(`DuckDuckGo HTTP ${response.status}`);
-	}
-
-	const html = await response.text();
-
-	// Parse HTML to extract results
-	const results: SearchResult[] = [];
-	const resultRegex =
-		/<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>[\s\S]*?<a[^>]*class="result__snippet"[^>]*>([^<]+)<\/a>/g;
-
-	let match: RegExpExecArray | null;
-	while ((match = resultRegex.exec(html)) !== null && results.length < maxResults) {
-		const url = decodeURIComponent(match[1]);
-		const title = decodeHtml(match[2]);
-		const snippet = decodeHtml(match[3]);
-
-		// Skip DuckDuckGo internal links
-		if (!url.includes('duckduckgo.com')) {
-			results.push({
-				title,
-				url,
-				snippet,
-				source: extractDomain(url)
-			});
-		}
-	}
-
-	return results;
 }
 
 /**
@@ -314,32 +220,6 @@ function getCuratedResults(query: string, searchType: string): SearchResult[] {
 	}
 
 	return results;
-}
-
-/**
- * Extract domain from URL
- */
-function extractDomain(url: string): string {
-	try {
-		const urlObj = new URL(url);
-		return urlObj.hostname.replace('www.', '');
-	} catch {
-		return 'unknown';
-	}
-}
-
-/**
- * Decode HTML entities
- */
-function decodeHtml(html: string): string {
-	return html
-		.replace(/&amp;/g, '&')
-		.replace(/&lt;/g, '<')
-		.replace(/&gt;/g, '>')
-		.replace(/&quot;/g, '"')
-		.replace(/&#39;/g, "'")
-		.replace(/&nbsp;/g, ' ')
-		.trim();
 }
 
 /**

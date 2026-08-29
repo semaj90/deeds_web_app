@@ -63,7 +63,13 @@ const report = {
   promotion: {
     graphRevisionAllowed: false,
     edgeAdmissionAllowed: false,
-    reason: 'Current run is incomplete and the referenced workspace owner row is absent; no graph revision may be promoted from it.',
+    reason: current?.status !== 'COMPLETED' || !current?.completed_at
+      ? current?.workspace_row_present
+        ? 'Current run is incomplete; the workspace owner exists, but no graph revision may be promoted until receipt-bound completion is proven.'
+        : 'Current run is incomplete and the referenced workspace owner row is absent; no graph revision may be promoted from it.'
+      : completed.length !== 1
+        ? 'No unique completed authoritative Graphify run is available; no graph revision may be promoted.'
+        : 'Graph revision promotion is closed by policy until the completion contract is independently read back.',
   },
   runs,
   status: databaseError ? 'GRAPHIFY_RUN_OWNER_AUDIT_FAILED' : completed.length === 1 ? 'GRAPHIFY_RUN_OWNER_COMPLETE' : 'GRAPHIFY_RUN_OWNER_BLOCKED',
