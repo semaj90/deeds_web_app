@@ -256,3 +256,25 @@ def find_occurrence_positions(
     for name in result:
         result[name].sort()
     return result
+
+
+def occurrence_to_absolute_position(
+    chunk_start_line: int,
+    chunk_start_column: int,
+    occurrence_row: int,
+    occurrence_column: int,
+) -> tuple[int, int]:
+    """Converts one `find_occurrence_positions()` result (row/column relative to the re-parsed
+    CHUNK slice, both 0-indexed) into a file-absolute position.
+
+    The chunk's own first line is `chunk_start_line`, but that line's text only starts at
+    `chunk_start_column` within the full file line (the chunk is a byte slice starting mid-line
+    whenever `chunk_start_column > 0`) — so an occurrence on the chunk's own row 0 needs
+    `chunk_start_column` added to its column. Every subsequent row within the chunk is a full
+    line on its own, already absolute in the file's line-numbering once `chunk_start_line` is
+    added to the row — no column adjustment applies there, since that line didn't have any
+    chunk-prefix material stripped from its start.
+    """
+    if occurrence_row == 0:
+        return (chunk_start_line, chunk_start_column + occurrence_column)
+    return (chunk_start_line + occurrence_row, occurrence_column)
