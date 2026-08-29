@@ -7,9 +7,43 @@
   replay are proven in current workstation receipts.
 - [x] Removed the implied nested dependency between `latent_128` and
   `latent_64`. The current learned encoder is `768 -> 256 -> 64`.
+  **Corrected 2026-08-29 — this entry was wrong; see the correction directly
+  below.**
 - [x] Classified `rff_128` as an independent deterministic projection
   challenger, `ae_latent_128` as reserved/future, and `ae_latent_64` as the
-  current learned branch.
+  current learned branch. **Corrected 2026-08-29 — `ae_latent_128` is no
+  longer reserved/future; see the correction directly below.**
+
+### Correction (2026-08-29): the encoder is genuinely nested, not two independent branches
+
+The two `[x]` entries directly above were wrong and are superseded here rather than deleted, per
+this repo's archive-not-delete convention. Live code, read this session, contradicts both claims:
+
+`python/atlas_compute/latent_autoencoder.py:53` defines a single `NestedSemanticAutoencoder`, not
+two independent `768 -> 256 -> 64` and `768 -> 128` branches. Its actual shape:
+- One physical encoder produces `latent_128` (768 → 128).
+- `latent_64` is **not** a second learned branch — it is
+  `normalize(latent_128[:, :64])` (`decode64()` at line 88): an L2-renormalized 64-element prefix
+  of the same `latent_128` tensor, matching a Matryoshka-style nested-dimension design.
+- There is one training run, one checkpoint, one set of weights. `latent_128` and `latent_64` are
+  two evaluation/decode views of that one model, not independent representations with independent
+  lifecycles.
+
+This makes `ae_latent_128` **not** "reserved/future" — it is the model's primary learned output;
+`latent_64` is derived from it, not parallel to it. A real checkpoint now exists
+(`python/checkpoints/nested_semantic_autoencoder_v1.pt`, trained 2026-08-29 on 55,169 rows/50
+epochs) — see the `latent_64` lane sections further below in this file for the training history.
+That checkpoint's training run predates a later correction (source-grouped split, immutable
+snapshot checksum, `--require-cuda`, full determinism) and has **not yet been re-run** with those
+fixes — do not treat it as promotion-grade.
+
+**Also keep distinct** (a separate axis, not addressed by the above): the model's own *learned*
+`latent_128`/`latent_64` versus EmbeddingGemma's *native* Matryoshka Representation Learning
+truncation, `semantic_mrl_128` (the model's own built-in `768 -> 512/256/128` truncated output,
+no training required, no checkpoint). These are two different representations that happen to
+share a dimension — never conflate a `semantic_mrl_128` value with a learned `latent_128` value.
+A `semantic_768` vs. `semantic_mrl_128` vs. learned `latent_128` vs. learned `latent_64` recall
+comparison was requested this session and has not yet been built.
 - [x] Kept RRF ownership in SearchRuntime. Qdrant-native RRF is permitted only
   for benchmark/parity comparison and does not create a second fusion owner.
 - [x] Kept topology admission outside the semantic retrieval -> ContextManifest
