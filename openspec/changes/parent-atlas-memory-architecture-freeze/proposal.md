@@ -601,3 +601,127 @@ separates by layer — not a new plane:
 **No action taken this pass.** This is a placeholder note so a future session doesn't have to
 re-derive where adapter-merging fits from scratch — the actual QLoRA merge work, its training
 data, and its promotion gate are all unscoped and unstarted.
+
+## Addendum (2026-08-29, fourth pass): "stop building libraries horizontally — the missing piece is the vertical spine"
+
+Recorded per operator statement, verbatim structure preserved. **No code written this pass** —
+this is a governance/queue-freeze record only, same as the third pass above.
+
+**Thesis**: every layer already has real executors (NetworkX/cuGraph, PyTorch/LibTorch/TensorRT
+RTX, PostgreSQL/Qdrant/cuVS). The system doesn't need more libraries added horizontally — it needs
+one vertical spine every provider obeys: **typed envelope → revision binding → canonical identity
+→ ordinal coordinate → executor receipt → ACE evidence.** Without that spine, adding more
+executors just adds more competing sources of truth (the exact failure mode `CLAUDE.md`'s
+Duplication Prevention section already names).
+
+**Key selectors excluded from the simdjson proof, explicitly and for now**: simdjson's own docs
+label key selectors experimental and require C++20; ordinary On-Demand parsing should reach parity
+first. Key selectors become a performance challenger only after that.
+
+**`SymbolFeatureAlignmentV1` — flagged as probably the single biggest missing contract.** This is
+where AST/NLP/compiler-semantic facts, candidate coordinates, and features finally meet:
+`workspaceRevision, sourceRef, sourceRevision, observationId, observationRevision, treeNodeId,
+stableSymbolId, symbolVersionId, packetKey, candidateOrdinal, candidateSnapshotRevision,
+ordinalMapChecksum, featureRevision, evidenceRefs, alignmentStatus ∈ {SOURCE_ONLY, TREE_BOUND,
+SYMBOL_BOUND, PACKET_BOUND, CANDIDATE_BOUND, FULLY_ALIGNED}, alignmentChecksum,
+canonicalAuthority: false`. Load-bearing property: **absence is legal, fabrication isn't** — low
+AST symbol coverage is a coverage problem, not license to invent symbol IDs. CSGR-2 (this
+session's own work, see the sibling `parent-atlas-compiler-semantic-graph-resolution` change)
+fills the compiler-semantic-reference-resolution slice of this same envelope.
+
+**Graph: one artifact, multiple executors — not one pipeline per executor.**
+`GraphNodeKeyV1`/`GraphOrdinalMapV1`/`GraphProjectionArtifactV1` (dense `0..V-1` ordinals, edge
+list, `graphRevision` checksum) is the one canonical projection; NetworkX is the CPU oracle,
+direct cuGraph (`from_cudf_edgelist(..., renumber=False, vertices=all_graph_ordinals)`) is the GPU
+executor against that *same* projection — do not build a separate NetworkX graph and a separate
+cuGraph graph from different pipelines. `nx-cugraph` automatic backend dispatch is explicitly
+rejected as the promotion proof (unsupported ops can silently fall back to plain NetworkX,
+defeating the point of a GPU/CPU parity check) — use direct NetworkX and direct cuGraph, compare
+by `GraphOrdinal`. Keep `astGraphRevision` / `compilerSemanticGraphRevision` /
+`relationshipGraphRevision` / `compositeGraphProjectionRevision` as separate revision fields, per
+this document's pre-existing revision-binding rule.
+
+**Filtering: `EligibilitySetV1` is the one canonical filter contract, materialized three ways —
+not three separate filter systems.** `requestId, candidateSnapshotRevision, ordinalMapChecksum,
+filterRevision, filterPolicyChecksum, allowedCandidateOrdinals, eligibilityChecksum`, then
+materialized per-executor: Postgres → GIN/B-tree planner bitmap scan (note: Postgres 18's
+async-I/O is a planner/executor optimization on top of this, not a new "PostgreSQL AIO bitmap
+store" — don't invent one), Qdrant → payload filter/payload indexes, cuVS → bitmap
+bitset prefilter (cuVS brute-force already supports per-query bitmap filters and bitset
+prefilters natively — this is not something to build from scratch). Future gate named here:
+`FILTER_PARITY_01` — same `EligibilitySetV1` must produce matching admissible-ID sets across
+Postgres, Qdrant, and cuVS *before* performance is measured.
+
+**Classifier/executor split.** `EmbeddingGemma classification_mrl_128` deterministic query
+features feed a `QueryRouterTensorV1` (domain/operation/retrievalNeeds/budget) via a small PyTorch
+MLP head — PyTorch is the decision model, not an ontology authority. Reference inference stays
+PyTorch first; only then is PyTorch CPU/CUDA compared against LibTorch native-addon and TensorRT
+RTX against the same frozen input tensor, recorded as `TensorExecutionReceiptV1`: `modelRevision,
+headRevision, inputTensorRevision, executor ∈ {PYTORCH, LIBTORCH_NAPI, TENSORRT_RTX}, device,
+dtype, shape, inputChecksum, outputChecksum, maxAbsError, maxRelError, canonicalAuthority: false`.
+Explicit conclusion: the existing LibTorch addon is broad enough already — TensorRT RTX is an
+alternate optimized executor behind the same contract, not a reason to add another RTX tensor
+library in front of it.
+
+**Ontology/hypergraph — this is where the stalled ontology work belongs, and it isn't greenfield.**
+AST/LangExtract/LSP/classifier produce an `OntologyCandidateV1` → evidence → validation →
+promotion gate → `HyperrelationV1` (PostgreSQL truth, incidence projection into
+`GraphNodeKey`/`GraphOrdinal`/cuGraph). Hard rule restated: do not flatten an N-ary relation
+(`A relation B concept C`) into invented pairwise truths — store the N-ary relation in Postgres and
+create one incidence node for graph execution. Noted as already having real prior art in-repo
+(hyperedge contracts, ontology hyperedge synthesis code, KAG hyperedge surfaces, incidence
+projection tests) — this is a completion task, not a new capability.
+
+**Multi-hop/SOM/top-K/ACE ordering, frozen**: initial retrieval seeds → exact canonical admission
+→ bounded graph expansion → dedup by canonical identity → `CandidateFeatureMatrix` rank → optional
+SOM diversity compression → final top-K → ACE `ContextManifest`/`PromptPlan` → Ornith synthesis.
+SOM's role is explicitly **compression/diversity/routing, never truth**. Two new receipt contracts
+named: `SomSelectionReceiptV1` (`candidateSnapshotRevision, featureMatrixChecksum, somRevision,
+inputOrdinals, bmuAssignments, selectionPolicyRevision, selectedOrdinals, selectionChecksum,
+canonicalAuthority: false`) and `MultiHopTraversalReceiptV1` (`seedCandidateOrdinals, graphDomain,
+graphRevision, hopLimit, edgeTypes, nodeBudget, edgeBudget, visitedGraphOrdinals,
+returnedCandidateOrdinals, traversalChecksum`). ACE receives only the bounded evidence these
+receipts produce — never the raw SOM matrix or raw graph arrays directly. BitFrost's existing
+"revision-bound residency metadata, canonical validation happens before cache registration" role
+(already recorded elsewhere in this document) is confirmed as the correct conceptual fit, unchanged.
+
+**Later challengers, explicitly sequenced after correctness, not before**: cuTile (fused numerical
+kernels — normalization, projection, SOM BMU search, custom top-K — competing against an
+already-proven PyTorch/cuVS/CUDA baseline, not replacing it as a correctness prerequisite; Ampere
+compute-capability 8.x is a valid target); QLoRA (a *training* method — 4-bit frozen base + LoRA
+adapters, NF4 double-quant, paged optimizers — belongs only after frozen training/eval data exists
+and can prove actual synthesis lift; a small router MLP does not need QLoRA — this is the same
+adapter-merge future-work already flagged in the third-pass addendum above, now given an explicit
+ordering: after eval data, not before); Ewin Tang-style low-rank recommendation sampling (assumes
+special ℓ2-sampling query access to a near-low-rank matrix — not a general top-K replacement; if a
+genuinely low-rank user×concept/query-family×feature utility matrix ever exists, isolate it as a
+`QuantumInspiredRecommendationChallengerV1` benchmarked against exact top-K, never placed directly
+in the canonical RAG path).
+
+**Frozen queue (P0–P4), recorded verbatim as the priority order for future sessions**:
+- **P0 — Canonical completeness**: `semantic_768` population to 55,853/55,853 revision-bound; AST
+  symbol coverage expansion (CSGR-2A source freshness, CSGR-2B — the 111-file manual-SQL-sidecar
+  reconciliation, the 259-total/50-undeclared quarantine, remaining regex-correctness fallbacks).
+- **P1 — Alignment contracts**: `SIMD_ALIGN_01` (`JsonDecodeProviderV1` ↔ `StructuralObservationV1`
+  parser parity), `SYMBOL_ALIGN_01` (`StructuralObservationV1` ↔ `SymbolFeatureAlignmentV1`),
+  `FILTER_ABI_01` (`EligibilitySetV1` across Postgres/Qdrant/cuVS).
+- **P2 — Executor parity**: `CUVS_EXACT_01` (CPU exact vs. cuVS exact), `GRAPH_PARITY_01` (NetworkX
+  direct vs. cuGraph direct), `NATIVE_EXEC_01`/`TRT_RTX_01` (PyTorch vs. LibTorch N-API vs.
+  TensorRT RTX).
+- **P3 — Knowledge/multi-hop**: `ONTOLOGY_01` (candidate → evidence → promotion gate),
+  `HYPERGRAPH_01` (Postgres N-ary truth → incidence projection), `MULTIHOP_01` (bounded
+  GraphOrdinal traversal), `SOM_01` (diversity-compression challenger), `ACE_02` (bounded
+  graph/ontology facts into `ContextManifest`).
+- **P4 — Performance/learning** (deliberately last): Arrow/mmap resident artifacts, RMM reuse,
+  cuTile kernels, CAGRA, QLoRA adapters, Tang-style low-rank sampler, other recommendation
+  challengers.
+
+**Relationship to this document's existing content**: this addendum does not contradict anything
+recorded in the base proposal or the first three addenda — it names concrete contract types
+(`SymbolFeatureAlignmentV1`, `GraphNodeKeyV1`/`GraphOrdinalMapV1`/`GraphProjectionArtifactV1`,
+`EligibilitySetV1`, `TensorExecutionReceiptV1`, `SomSelectionReceiptV1`,
+`MultiHopTraversalReceiptV1`) for the same "typed envelope, revision-bound, canonical-identity"
+spine this document already commits to, and gives that spine a frozen build order. **Nothing in
+this addendum has been implemented.** The frozen P0–P4 queue supersedes any looser prioritization
+implied elsewhere in this document for future planning purposes — P0 (canonical completeness) is
+explicitly first, and P4 (performance/learning, including cuTile/CAGRA/QLoRA) is explicitly last.
