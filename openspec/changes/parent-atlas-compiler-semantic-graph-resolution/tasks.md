@@ -551,6 +551,45 @@ own small pure function (same side-effect-free convention, testable in isolation
 actually exercise the offset math, unlike this pass's test fixtures which all conveniently started
 at row 0), *then* wire the population into `add_edge()`'s call sites.
 
+## CSGR-3, live wiring — DONE and proven end-to-end (2026-08-29, same day)
+
+Built `occurrence_to_absolute_position()` (row-0 needs `chunk_start_column` added; any later row
+is already absolute) and proved it against a chunk simulated at file line 100 with 2 occurrences
+on different rows — this pass's earlier `find_occurrence_positions()` fixtures all conveniently
+started at row 0, so this specifically closed that gap. 10/10 tests pass in
+`test_atlas_structural_provenance.py`.
+
+Wired both into `add_edge()` in `miniforge_nlp_sidecar_v2.py`: one `find_occurrence_positions()`
+call per chunk (batched across all its `imports`/`exports`/`calls`/`dependencies` names, not
+per-edge — avoids redundant re-parsing), each result converted to file-absolute and attached as
+the new `occurrence_positions` field. Degrades safely to `None` on any failure (unsupported
+language, parse error, name genuinely not found by the sub-parse) — `evidence_start_line`/`column`
+are completely unchanged, so this remains additive-only for every existing consumer.
+
+**Proven live, no server boot needed** — `_native_ast_evidence()` is a plain function, called
+directly. New durable proof script: `python/prove_occurrence_positions_live_wiring.py` (not a
+throwaway — kept in the repo per this repo's no-delete-scratch-scripts convention). Ran against
+the exact real file that exhibited the bug this session
+(`scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs`): of 449 total edges, 369 (82%) now
+carry real `occurrence_positions`. The single clearest proof case — one `path.join` edge whose
+legacy `evidence_start_line/column` was `(36, 6)` (the chunk boundary) — now carries
+`occurrence_positions: [[40, 40], [45, 40], [50, 40]]`, correctly surfacing the 3 real, distinct
+call sites that single position previously collapsed. `status: PROVEN_LIVE_WIRING`.
+
+**Still not done** — out of scope for this pass, left as explicit follow-up:
+- `plan-current-structural-edge-artifact-v2.mjs` (this change's own consumer of `/ast/chunk`)
+  doesn't read `occurrence_positions` yet — it still only forwards `evidence_start_line/column`
+  into `unresolvedEdges`. Wiring CSGR-2's resolver to prefer per-occurrence positions when present
+  (and expand into N observations, per the earlier "N edges per occurrence" policy decision) is
+  the next real step toward shrinking the 94.8%-shared-position problem this whole investigation
+  started from — not done here, this pass only proves the sidecar-side data now exists to make
+  that possible.
+- No live smoke test against the actual running `:8095` FastAPI process (only the underlying
+  handler function, called directly) — the service itself would need restarting to pick this up;
+  not done this pass.
+- Re-parse CPU cost on `/ast/chunk` under real production load still not measured — the proof run
+  above (one 449-edge file) was fast, but that's one data point, not a load test.
+
 **Do not report `unclassifiedCount == 0` or promote this corpus as `COMPLETE` based on the current
 terminal counts** — the completion gate's own invariant (every observation gets a *deterministic,
 individually-verified* terminal status) is not actually satisfied for 94.8% of `unresolved_target`

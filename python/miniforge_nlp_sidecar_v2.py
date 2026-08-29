@@ -30,8 +30,10 @@ from pydantic import BaseModel, Field
 
 import miniforge_nlp_sidecar as legacy
 from atlas_structural_provenance import (
+    find_occurrence_positions,
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
+    occurrence_to_absolute_position,
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
 
@@ -594,11 +596,26 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         *,
         resolved: bool,
         resolution: str,
+        occurrence_map: dict[str, list[tuple[int, int]]] | None = None,
     ) -> None:
         candidate = (source_key, target_key, edge_type, chunk.start_line)
         if candidate in seen_edges:
             return
         seen_edges.add(candidate)
+        # CSGR-3 (2026-08-29): additive only — evidence_start_line/column below remain the
+        # chunk's own boundary, unchanged, exactly as before. occurrence_positions is a NEW
+        # optional field carrying every real per-occurrence position found by re-parsing this
+        # chunk, converted to file-absolute. None when not computed or the name genuinely wasn't
+        # found by the re-parse (a real possibility — e.g. a call inside a nested chunk that
+        # this chunk's own text doesn't include); never raises.
+        occurrence_positions: list[list[int]] | None = None
+        if occurrence_map is not None:
+            raw_positions = occurrence_map.get(target_key)
+            if raw_positions:
+                occurrence_positions = [
+                    list(occurrence_to_absolute_position(chunk.start_line, chunk.start_column, row, column))
+                    for row, column in raw_positions
+                ]
         edges.append(
             legacy.AstEvidenceEdge(
                 from_evidence_key=source_key,
@@ -610,22 +627,37 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 evidence_end_column=chunk.end_column,
                 resolved=resolved,
                 resolution=resolution,
+                occurrence_positions=occurrence_positions,
             )
         )
 
+    source_utf8_bytes = req.source.encode("utf-8")
     for index, chunk in enumerate(evidence_chunks):
         structural_key = chunk.upstream_symbol_id or chunk.upstream_node_id or chunk.upstream_chunk_id
         if structural_key and chunk.kind not in {"import", "export"} and chunk.name:
             add_edge(file_key, structural_key, "DEFINES", chunk, resolved=True, resolution="native_chunk")
         source_key = structural_key or file_key
+        chunk_deps = dependencies_by_chunk[index] if index < len(dependencies_by_chunk) else []
+        # One re-parse per chunk (not per edge) — batches every name this chunk needs into a
+        # single find_occurrence_positions() call. Never raises: an unsupported language or parse
+        # failure yields an empty map, and every add_edge() call below degrades to
+        # occurrence_positions=None exactly as it did before this change.
+        chunk_names = [*chunk.imports, *chunk.exports, *chunk.calls, *chunk_deps]
+        occurrence_map: dict[str, list[tuple[int, int]]] = {}
+        if chunk_names:
+            try:
+                chunk_text = source_utf8_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8", errors="ignore")
+                occurrence_map = find_occurrence_positions(chunk_text, language, chunk_names)
+            except Exception:
+                occurrence_map = {}
         for value in chunk.imports:
-            add_edge(file_key, value, "IMPORTS", chunk, resolved=False, resolution="syntax_only")
+            add_edge(file_key, value, "IMPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.exports:
-            add_edge(file_key, value, "EXPORTS", chunk, resolved=False, resolution="syntax_only")
+            add_edge(file_key, value, "EXPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.calls:
-            add_edge(source_key, value, "CALLS", chunk, resolved=False, resolution="unresolved_target")
-        for value in dependencies_by_chunk[index] if index < len(dependencies_by_chunk) else []:
-            add_edge(source_key, value, "REFERENCES", chunk, resolved=False, resolution="unresolved_target")
+            add_edge(source_key, value, "CALLS", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
+        for value in chunk_deps:
+            add_edge(source_key, value, "REFERENCES", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
 
     if not edges:
         fallback_edges, edge_diagnostics = legacy._symbol_graph_evidence(req.source, language, req.file_path)
