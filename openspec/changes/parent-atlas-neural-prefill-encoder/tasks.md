@@ -11804,3 +11804,45 @@ independently re-checked against live code/DB state before recording — this se
 snapshot isn't lost, not as a confirmed status. Before acting on any single lane above (e.g.
 starting the `latent_64` training run), re-verify its cited evidence live first, per this
 project's standing rule against trusting a claim without checking the referent.
+
+### `latent_64` lane — evidence re-verified live, training run scoped, not started (2026-08-29)
+
+**Re-verified live** (not trusted from the pasted snapshot): `class NestedSemanticAutoencoder(nn.Module)`
+confirmed at `python/atlas_compute/latent_autoencoder.py:53`, `def decode64(...)` at line 88. `find
+-iname "*.pt"` across the whole repo (excluding `node_modules`/`.venv*`) returned zero results —
+confirms no checkpoint exists anywhere. Both cited claims check out exactly as pasted.
+
+**Read the full module.** It's substantially more complete than "just an architecture" — already
+includes `nested_autoencoder_loss()` (weighted MSE + cosine + pairwise-cosine terms),
+`evaluate_nested_latents()` (reconstruction MSE/cosine + `knn_recall` at both 128 and 64 dims),
+and `build_training_receipt()` (checksummed, schema-versioned, `canonical_authority: false`,
+`exact_semantic_promotion_required: true`). What's genuinely missing is only the training loop
+itself and a real data source — confirmed via `grep -rl "NestedSemanticAutoencoder"` across all of
+`python/`: **zero other files reference this model at all**, so the "AdamW already owned by the
+Python autoencoder" line in the pasted snapshot doesn't correspond to real code for this specific
+model — either about a different autoencoder or aspirational, not verified.
+
+**What a training script needs, concretely** (none built yet):
+1. Data loader — query the canonical `semantic_768` source. Per root `CLAUDE.md`'s embedding
+   dimension policy, that's `codebase_chunk_index.content_embedding` (`vector(768)`, ~40,568 rows
+   populated). Existing Python DB pattern to reuse (not reinvent): `psycopg2` +
+   `psycopg2.extras.RealDictCursor`, same `DEFAULT_DATABASE_URL` connection string convention
+   already used in `python/atlas_semantic512_reconcile.py` and
+   `python/build_live_graph_fixture_semantic512.py`.
+2. Train/val split with a genuinely held-out set — `evaluate_nested_latents()`'s `knn_recall`
+   metrics must be computed on rows the model never trained on, matching this repo's own QLoRA
+   boundary discipline ("verified tournament tuples... held-out shadow evaluation") applied to
+   this lane too.
+3. Training loop — optimizer (AdamW is a reasonable default, standard for this kind of small MLP
+   autoencoder; batch iteration calling `model(batch)` → `nested_autoencoder_loss()` →
+   backward/step), checkpoint saving via `torch.save(model.state_dict(), ...)`, and a final call to
+   `build_training_receipt()` + `receipt_checksum()` so the resulting `.pt` carries the same
+   provenance discipline as everything else in this OpenSpec change.
+4. GPU/device selection — check CUDA availability, fall back to CPU explicitly logged (not
+   silent), matching this repo's "no-fallback receipt" pattern already required for the
+   LibTorch/RTX lane in the same readiness table.
+
+**Not started this pass** — writing and running this training script is a real resource
+commitment (GPU time, real training data, a script that doesn't exist yet) and deserves an
+explicit go-ahead before execution, not a default continuation. Scoped here so the next session
+doesn't have to re-derive any of the above.
