@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from atlas_structural_provenance import (
+    find_occurrence_positions,
     is_exact_langextract_alignment,
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
@@ -87,3 +88,64 @@ def test_ungrounded_langextract_result_remains_unpromotable():
     ))
     assert result["grounded"] is False
     assert result["char_interval"] is None
+
+
+# --- find_occurrence_positions (CSGR-3, 2026-08-29) ---
+# Regression test for the real live finding: treesitter-chunker's flat name-string lists made
+# every AstEvidenceEdge inside one chunk inherit the SAME chunk-level position — 94.8% of
+# unresolved_target edges shared a position with a sibling in the live corpus (see
+# openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md). These cases are the
+# exact real chunks that exhibited the bug, used here as regression fixtures.
+
+PROMISE_EXECUTOR_SOURCE = """
+async function readInput() {
+  return new Promise((resolve, reject) => {
+    const rl = readline.createInterface({ input: process.stdin });
+    const rows = [];
+    rl.on('line', (line) => {
+      const trimmed = line.trim();
+      if (trimmed) rows.push(JSON.parse(trimmed));
+    });
+    rl.on('close', () => resolve(rows));
+    rl.on('error', reject);
+  });
+}
+"""
+
+
+def test_find_occurrence_positions_disambiguates_previously_shared_chunk_position():
+    # Live-observed bug: rl.on / line.trim / rows.push / JSON.parse all previously reported the
+    # SAME position (the chunk's own start), because treesitter-chunker doesn't track
+    # per-occurrence positions. Each must now resolve to its own distinct, correct position.
+    result = find_occurrence_positions(
+        PROMISE_EXECUTOR_SOURCE, "javascript", ["rl.on", "line.trim", "rows.push", "JSON.parse"]
+    )
+    assert len(result["rl.on"]) == 3  # called 3 times: 'line', 'close', 'error'
+    assert len(result["line.trim"]) == 1
+    assert len(result["rows.push"]) == 1
+    assert len(result["JSON.parse"]) == 1
+    # All four occurrence sets must be at genuinely distinct positions from each other.
+    all_positions = result["line.trim"] + result["rows.push"] + result["JSON.parse"]
+    assert len(set(all_positions)) == len(all_positions)
+
+
+def test_find_occurrence_positions_finds_every_call_to_a_repeated_name():
+    source = (
+        "const REPORT_JSON = path.join(ROOT, 'a.json');\n"
+        "const REPORT_MD = path.join(ROOT, 'a.md');\n"
+        "const OTHER = path.join(ROOT, 'x');\n"
+    )
+    result = find_occurrence_positions(source, "javascript", ["path.join"])
+    assert len(result["path.join"]) == 3
+    rows = [row for row, _column in result["path.join"]]
+    assert rows == [0, 1, 2]  # one call per line, in source order
+
+
+def test_find_occurrence_positions_returns_empty_list_for_absent_name():
+    result = find_occurrence_positions("const x = 1;", "javascript", ["never.called"])
+    assert result == {"never.called": []}
+
+
+def test_find_occurrence_positions_never_raises_on_empty_or_invalid_input():
+    assert find_occurrence_positions("", "javascript", ["foo"]) == {"foo": []}
+    assert find_occurrence_positions("const x = ", "javascript", []) == {}

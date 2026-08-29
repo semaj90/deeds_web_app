@@ -499,6 +499,33 @@ the broader 8095/`/ast/chunk` grep either don't touch `.edges` at all or referen
 `.edges` field from a different data source (e.g. Neo4j graph exports) — a generic `.edges` grep
 is too noisy to trust without per-file confirmation, which this pass didn't have budget for.
 
+## CSGR-3, Option A core — `find_occurrence_positions()` built and proven, NOT wired into the live sidecar (2026-08-29, same day)
+
+Built the pure occurrence-finder from Option A above: `find_occurrence_positions(source_text,
+language, names)` in `python/atlas_structural_provenance.py`, matching this module's existing
+side-effect-free convention. Re-parses a chunk's own source slice with
+`tree_sitter_language_pack.get_parser()` (already a direct dependency — nothing new installed),
+walks the tree for `call_expression`/`call` nodes (matching dotted callee text like `"path.join"`
+against the name list) and bare `identifier`/`property_identifier` nodes (for
+imports/exports/references), and returns every real occurrence position per name — not just the
+first, resolving the ambiguous-match question from the prior patch: **every real occurrence
+becomes its own position**, the caller decides whether that means N edges or a representative one.
+
+**Proven against the exact real cases that exhibited the live bug**, not synthetic fixtures — the
+Promise-executor chunk (`rl.on`/`line.trim`/`rows.push`/`JSON.parse` previously all sharing one
+position) and the `path.join`-called-3× case. Added as durable regression tests in
+`python/test_atlas_structural_provenance.py` (4 new tests). Full suite: **7/7 pass**
+(`python -m pytest test_atlas_structural_provenance.py -v`), including the 3 pre-existing tests
+for this module — no regression.
+
+**Deliberately stopped here — not wired into `miniforge_nlp_sidecar_v2.py`'s live `/ast/chunk`
+endpoint.** Per the prior patch's own recommendation ("do not implement Option A blind"), the
+open questions that actually gate a live-service change are still open: whether any of the 5
+candidate consumers depend on today's cardinality, and the re-parse CPU cost on a hot endpoint —
+neither measured. This function is a proven, independently-testable building block; wiring it in
+is a separate, deliberate next step once those two questions are answered, not a natural
+continuation to take casually.
+
 **Do not report `unclassifiedCount == 0` or promote this corpus as `COMPLETE` based on the current
 terminal counts** — the completion gate's own invariant (every observation gets a *deterministic,
 individually-verified* terminal status) is not actually satisfied for 94.8% of `unresolved_target`
