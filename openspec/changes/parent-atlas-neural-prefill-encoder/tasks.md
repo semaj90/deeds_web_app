@@ -11910,3 +11910,45 @@ consideration) — the proof run's `--limit 2000 --epochs 5` was intentionally s
 pipeline without committing to a longer run blind. That's the next explicit decision point, not a
 default continuation — full-scale training is a bigger time/resource commitment than this bounded
 proof.
+
+### `latent_64`/`latent_128` — training script corrected, full-scale run LATENT_TRAIN_FULL_01 PROVEN (2026-08-29)
+
+Before the full-scale run, `train_latent_autoencoder.py` was corrected per an operator review that
+found the original bounded-proof script had 4 gaps that would have made a full run
+non-promotion-grade even if it completed cleanly: (1) row-random train/val split instead of
+source-grouped (chunk-leakage risk — rows from the same source file could land in both train and
+val), (2) the semantic snapshot wasn't immutably checksum-bound, (3) `--require-cuda` existed but
+silent CPU fallback wasn't actually prevented, (4) determinism wasn't enabled
+(`torch.use_deterministic_algorithms`, seeded RNGs, `CUBLAS_WORKSPACE_CONFIG` for deterministic
+CuBLAS matmul). All 4 were fixed and verified via a second bounded smoke test before the full run.
+
+**Full-scale run** (`--limit 0 --epochs 50 --require-cuda`, all 55,169 eligible `semantic_768`
+rows): completed in 456s on the RTX 3060 Ti. `status: TRAINING_RECEIPT_PROVEN`. Receipt:
+`docs/reports/latent-autoencoder-training-receipt-v2-full01.json`; checkpoint (gitignored per repo
+build-artifact policy): `python/checkpoints/nested_semantic_autoencoder_v2_full01.pt`.
+
+All 4 corrections confirmed live in the receipt, not just claimed:
+- `split_policy.splitPolicy: "SOURCE_REF_GROUPED_V1"`, 6,543 train sources / 726 val sources,
+  `sourceOverlap: 0`.
+- `training_snapshot.orderedRowIdentityChecksum` and `.semanticMatrixChecksum` both present,
+  `eligibleRowCount: 55169`.
+- `device: "cuda"`, `require_cuda: true`, `device_info.deviceName: "NVIDIA GeForce RTX 3060 Ti"`.
+- `deterministic_algorithms: true`, `seed: 684453`.
+
+Final metrics (49,622 train rows / 5,547 held-out val rows, held out by *source*, not just by
+row): `reconstruction_cosine_128: 0.9187`, `knn_recall_128: 0.8529`,
+`reconstruction_cosine_64: 0.8865`, `knn_recall_64: 0.7904` — meaningfully better than the bounded
+proof's 5-epoch/2000-row numbers (expected: full corpus, full schedule), and the 128→64 gap
+(cosine 0.9187 vs. 0.8865, knn_recall 0.8529 vs. 0.7904) is consistent with `latent_64` being a
+lossy prefix-and-renormalize view of `latent_128`, not an independently-optimized representation
+— matches the corrected nested-architecture description recorded earlier in this file.
+
+`canonical_authority: false`, `exact_semantic_promotion_required: true` held in the full-scale
+receipt exactly as in the bounded proof — this checkpoint is still not canonical semantic
+evidence; `semantic_768` remains the refinement oracle.
+
+**Still not done**: the `semantic_768` vs. `semantic_mrl_128` (EmbeddingGemma native MRL
+truncation) vs. this learned `latent_128` vs. this learned `latent_64` recall comparison the
+operator explicitly requested ("Measure it") — this full-scale receipt provides the `latent_128`/
+`latent_64` half of that comparison; `semantic_mrl_128` recall still needs to be measured
+separately and is not yet built.
