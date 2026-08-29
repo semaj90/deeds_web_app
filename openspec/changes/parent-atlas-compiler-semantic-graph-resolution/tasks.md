@@ -426,6 +426,79 @@ documented policy decision that "resolved via a shared enclosing-scope position"
 lower-confidence terminal status for this gate (a policy call, not a technical one — not made
 here).
 
+## CSGR-3 scoping — upstream root cause traced to the 8095 sidecar's `add_edge()`, fix path identified (2026-08-29, same day)
+
+Traced `evidence_start_line`/`evidence_start_column` back through the actual producer, not
+assumed. `plan-current-structural-edge-artifact-v2.mjs` is a pure pass-through — it POSTs to
+`http://127.0.0.1:8095/ast/chunk` and forwards whatever the sidecar returns. The real producer is
+`python/miniforge_nlp_sidecar_v2.py`.
+
+**Exact mechanism** (`add_edge()`, lines ~589-628): for every string in a chunk's `chunk.calls`,
+`chunk.imports`, `chunk.exports`, and per-chunk `dependencies` list, it constructs one
+`AstEvidenceEdge` — and every one of those edges gets `evidence_start_line=chunk.start_line`,
+`evidence_start_column=chunk.start_column` (the **chunk's own boundary**, not the specific
+occurrence's position). This is not a bug in this file's logic — it's a direct consequence of the
+data it has available: `chunk.calls`/`imports`/`exports`/`dependencies` are flat **name-string
+lists** attached to the chunk by the upstream `treesitter-chunker` package
+(confirmed via `pip show`: external MIT package, `github.com/ViperJuice/treesitter-chunker`,
+v4.0.0, "Semantic code chunker using Tree-sitter for intelligent code analysis") — that package's
+own data model has no per-occurrence position for an individual call/reference within a chunk. It
+is a RAG-style semantic chunker, not a reference-resolution tool; this mismatch, not a defect in
+either component, is the actual root cause.
+
+**Fix path identified, not yet built** — two options, one clearly better:
+
+- **Option A (recommended)**: `tree_sitter` and `tree-sitter-language-pack` are already direct
+  dependencies in this same Python environment (visible in the same `pip show` output) — nothing
+  new to install. Add a local occurrence-position pass: for each chunk, re-parse that chunk's own
+  source span (`chunk.start_byte:chunk.end_byte`, both already available) with the raw
+  `tree_sitter` bindings, walk the resulting AST to find the actual byte/line/column of each
+  call-expression/reference/import-name occurrence matching the strings already present in
+  `chunk.calls`/`imports`/`exports`/`dependencies`, and attach that per-occurrence position to
+  each edge instead of the chunk-level one. Natural home: `atlas_structural_provenance.py`
+  (already documented as "intentionally side-effect free" — the existing convention for this kind
+  of pure logic in this service) or a new sibling module, called from `add_edge()`'s call sites.
+  Self-contained — no external package changes, no new dependencies.
+- **Option B (not recommended)**: fork/patch the external `treesitter-chunker` package itself to
+  expose occurrence-level positions. Bigger surface, external-dependency risk, slower to land, and
+  Option A achieves the same result without it.
+
+**Real design questions Option A needs to answer before implementation** (not resolved here —
+flagged so the next pass doesn't skip them):
+- **Ambiguous name matching**: if a chunk's source contains the same call name multiple times
+  (e.g. `path.join` called 5 times in one function, matching the earlier `materialize-hidden-packet-pathmap-duckdb.mjs`
+  example), a name-string match against re-parsed AST nodes will find multiple candidate
+  occurrences for one `chunk.calls` entry — need a policy for whether that becomes N separate
+  edges (one per real occurrence — the architecturally correct answer, matches "one edge per
+  reference" that this whole change already assumes) or stays one edge with an ambiguous/first-match
+  position (a weaker interim step).
+- **Re-parse cost**: doing a second tree-sitter parse per chunk (on top of whatever
+  `treesitter-chunker` already did) adds real CPU cost to the `/ast/chunk` endpoint — needs a
+  timing measurement before assuming this is free, especially for large/hot files re-processed
+  often.
+- **Whether this becomes N edges instead of 1** changes `plan-current-structural-edge-artifact-v2.mjs`'s
+  and CSGR-2's own edge-count assumptions (`unresolvedEdgeCount`, `edgeSetChecksum`, etc.) — this
+  would not be purely additive at the sidecar layer; every consumer of `/ast/chunk`'s edge shape
+  needs to be identified before changing the cardinality (audit-before-build, per this repo's
+  standing rule) — not done this pass.
+
+**Recommendation**: do not implement Option A blind in the next session — first audit who else
+calls `/ast/chunk` and consumes its `edges` array (beyond this OpenSpec change's own scripts), so
+a cardinality change here doesn't silently break an unrelated consumer.
+
+**First pass at that audit, done this session**: 41 files under `scripts/` reference `8095` or
+`/ast/chunk`, but most are health/capability probes, not edge-shape consumers. Intersecting with
+files that also reference `.edges` narrows the real candidate list to 5:
+`plan-current-structural-edge-artifact-v1.mjs`, `plan-current-structural-edge-artifact-v2.mjs`
+(this change's own input producer), `audit-treesitter-structural-observation-v1.mjs`,
+`prove-ast-sidecar.mjs`, `build-emb1-semantic-card-corpus.mjs`. **Not independently verified which
+of these actually depend on today's chunk-level-position/one-edge-per-name-string shape** vs.
+would tolerate or benefit from a switch to per-occurrence positions/cardinality — that's real
+implementation-prep work for whoever picks up Option A, not resolved here. The other ~36 files in
+the broader 8095/`/ast/chunk` grep either don't touch `.edges` at all or reference an unrelated
+`.edges` field from a different data source (e.g. Neo4j graph exports) — a generic `.edges` grep
+is too noisy to trust without per-file confirmation, which this pass didn't have budget for.
+
 **Do not report `unclassifiedCount == 0` or promote this corpus as `COMPLETE` based on the current
 terminal counts** — the completion gate's own invariant (every observation gets a *deterministic,
 individually-verified* terminal status) is not actually satisfied for 94.8% of `unresolved_target`
