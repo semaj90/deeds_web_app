@@ -1930,7 +1930,7 @@ post-fan-out projection remain challenger work.
 Latest receipt: `docs/reports/graphify-rff-embedding-backfill-v1.json` is a
 read-only `DRY_RUN` (`apply: false`, `signatureOnly: true`, `selected: 4`,
 `written: 0`) generated on 2026-08-24. It exposes the unresolved dimension
-contract: `error_embedding` is `vector(384)` while `signature_embedding` is
+contract: `error_embedding` is `vector(768?)` while `signature_embedding` is
 `halfvec(768)`. The current receipt does not itself report
 `BLOCKED_DIMENSION_CONTRACT`; therefore classify this lane as
 `DRY_RUN / DIMENSION_CONTRACT_UNPROVEN`, not as an executed blocked apply.
@@ -11758,3 +11758,49 @@ Status: `FULL_CORPUS_GRAPH_REVISION_OWNER_BLOCKED_OWNER_CONTRACT_GAP`.
   available `885` Graphify files, but the corpus is not clean for backfill.
 - [x] Kept semantic backfill and CandidateOrdinal expansion blocked; no aliases,
   fuzzy joins, synthetic revisions, or projection writes were used.
+
+### Operator-provided lane readiness snapshot (2026-08-29) — pasted, NOT independently verified this session
+
+Pasted into the session as a fragment (table header not included in what was pasted — recorded
+as given, not reconstructed). This is an external/operator assessment, not something this
+session's CSGR-adjacent work checked or re-derived — flagged explicitly per this repo's evidence
+discipline (percentages/status below are reported claims, not verified facts):
+
+| Lane | Readiness | Evidence cited | Gap cited |
+|---|---|---|---|
+| `latent_64` hot representation | 30% | vector manifest, simulated Phase 5 bridge, residency tests; real decoder architecture exists (`python/atlas_compute/latent_autoencoder.py::NestedSemanticAutoencoder`, `decode64()`) | train it — no `.pt` checkpoint exists anywhere in the repo yet — then LibTorch parity |
+| LibTorch/RTX inference | 45% | native addon and GPU wrappers exist | model loading, CPU/RTX parity, no-fallback receipt |
+| XGBoost ranking/domain head | 55% | trainer, GPU device gate, feature export commands | post-fan-out latent features and live NDCG proof |
+| Logistic/NB baselines | 15% | available contracts/capability surfaces | reproducible baseline artifacts and comparison |
+| ACE/Valkey/SOM pre-fill | 40% | cache/SOM contracts and packet paths | projection wiring after latent promotion |
+| MiniCoil/uniCOIL/SPLADE bi-encoder sparse lane | 10% | discovery terms and sparse adapter surfaces only | model/runtime owner, vocabulary, sparse index, and recall proof |
+| Candidate matrix to low-rank shortlist | 50% | deterministic PyTorch nomination plus read-only PostgreSQL ORF receipt for `candidate_count=512` -> 96 CandidateOrdinals; embedding dimensions remain representation-specific | exact semantic_768 rerank, RRF join, and Recall/NDCG quality proof |
+| Daily Graphify NLP/AST prefill | 80% | bounded export -> AST identity -> OKF classification -> packet aggregation -> 174-row ORF materialization passes; optional startup preflight fails open with a degraded receipt | full daily adoption and canonical symbol promotion |
+| Parameter/artifact lookup | 65% | revision-aware lookup contract and compatibility tests | durable registry adoption and live artifact resolution |
+| QLoRA boundary | 55% | read-only gate forbids online training/canonical writes; artifact metadata contract added | verified tournament tuples, checkpoint, and held-out shadow evaluation |
+| Standalone cross-contract validation gate | 70% | `neural-prefill-validation-gate.mts` (deep, tsx-run, live functional checks) as a classified companion to the pre-existing `validate-neural-prefill-pipeline.mjs` (fast, plain-node, receipt/text-pattern checks; already wired into `neural-prefill-preflight.mjs` via `atlas:neural:prefill:validate`) — see NE-VALIDATE-01 correction, a near-duplicate-owner mistake caught and fixed before it shipped wired-in | decide whether to backport live-functional depth into the canonical `.mjs` validator, or keep the two-layer split permanently |
+
+Trainer inventory note (as pasted): Quaterion is selectable in the agent trainer schema and test
+fixtures, but no installed Quaterion package, trained artifact, or serving receipt has been found.
+AdamW/`weight_decay` is already owned by the Python autoencoder. XGBoost ranking is an existing
+contract/trainer direction, but a live qid-grouped LambdaMART receipt is not yet proven.
+
+**Overall weighted readiness (as pasted): approximately 43%.** Explicitly not a claim that 43% of
+production traffic is covered — native EmbeddingGemma MRL is the first compact-representation
+proof path; the learned, revisioned encoder and post-fan-out projection remain challenger work.
+
+Latest receipt cited: `docs/reports/graphify-rff-embedding-backfill-v1.json`, a read-only
+`DRY_RUN` (`apply: false`, `signatureOnly: true`, `selected: 4`, `written: 0`) generated
+2026-08-24. Exposes an unresolved dimension contract: `error_embedding` is `vector(768?)` while
+`signature_embedding` is `halfvec(768)`. The receipt does not itself report
+`BLOCKED_DIMENSION_CONTRACT` — classify this lane as `DRY_RUN / DIMENSION_CONTRACT_UNPROVEN`, not
+an executed blocked apply. No rows or projections were written. The RFF contract must still be
+reconciled before `latent_128` can be promoted after fan-out. A separate legacy Phase 1 dry-run
+reached Ollama and generated a 256-row sample, but its source still targets the legacy
+384-dimensional schema — execution evidence, not a successful write or 768 migration.
+
+**Not verified this session**: none of the percentages, file paths, or receipt claims above were
+independently re-checked against live code/DB state before recording — this section exists so the
+snapshot isn't lost, not as a confirmed status. Before acting on any single lane above (e.g.
+starting the `latent_64` training run), re-verify its cited evidence live first, per this
+project's standing rule against trusting a claim without checking the referent.
