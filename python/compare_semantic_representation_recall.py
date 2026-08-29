@@ -58,7 +58,7 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=0, help="0 = full corpus")
     parser.add_argument("--val-fraction", type=float, default=0.1)
     parser.add_argument("--seed", type=int, default=684453, help="must match the training run's split seed for a fair comparison")
-    parser.add_argument("--checkpoint", default="python/checkpoints/nested_semantic_autoencoder_v2_full01.pt")
+    parser.add_argument("--checkpoint", default="python/checkpoints/nested_semantic_autoencoder_v3_full01.pt")
     parser.add_argument("--k", type=int, default=10)
     parser.add_argument("--out", default="docs/reports/semantic-representation-recall-comparison-v1.json")
     args = parser.parse_args()
@@ -92,18 +92,22 @@ def main() -> None:
 
     with torch.no_grad():
         val_tensor = torch.from_numpy(val_768).to(device)
-        latent128, latent64 = model.encode(val_tensor)
+        latent256, latent128, latent64 = model.encode(val_tensor)
+        latent256_np = latent256.detach().cpu().numpy()
         latent128_np = latent128.detach().cpu().numpy()
         latent64_np = latent64.detach().cpu().numpy()
 
     mrl_128 = mrl_truncate(val_norm, 128)
     mrl_256 = mrl_truncate(val_norm, 256)
+    mrl_512 = mrl_truncate(val_norm, 512)
 
     representations = {
         "semantic_mrl_128": {"dims": 128, "vectors": mrl_128, "kind": "NATIVE_MRL_TRUNCATION"},
         "semantic_mrl_256": {"dims": 256, "vectors": mrl_256, "kind": "NATIVE_MRL_TRUNCATION"},
-        "latent_128": {"dims": 128, "vectors": latent128_np, "kind": "LEARNED_AUTOENCODER"},
+        "semantic_mrl_512": {"dims": 512, "vectors": mrl_512, "kind": "NATIVE_MRL_TRUNCATION"},
         "latent_64": {"dims": 64, "vectors": latent64_np, "kind": "LEARNED_AUTOENCODER"},
+        "latent_128": {"dims": 128, "vectors": latent128_np, "kind": "LEARNED_AUTOENCODER"},
+        "latent_256": {"dims": 256, "vectors": latent256_np, "kind": "LEARNED_AUTOENCODER"},
     }
 
     results = {}

@@ -201,8 +201,10 @@ def main() -> None:
             val_outputs = model(val_tensor)
             val_metrics = evaluate_nested_latents(
                 semantic_768=val_tensor.cpu().numpy(),
+                latent256=val_outputs["latent256"].cpu().numpy(),
                 latent128=val_outputs["latent128"].cpu().numpy(),
                 latent64=val_outputs["latent64"].cpu().numpy(),
+                decoded256=val_outputs["decoded256"].cpu().numpy(),
                 decoded128=val_outputs["decoded128"].cpu().numpy(),
                 decoded64=val_outputs["decoded64"].cpu().numpy(),
                 k=10,
@@ -259,7 +261,8 @@ def main() -> None:
             "deviceCapability": list(torch.cuda.get_device_capability(0)),
         }
     receipt["representations"] = {
-        "latent_128": {"dimensions": 128, "relationship": "PHYSICAL_BOTTLENECK"},
+        "latent_256": {"dimensions": 256, "relationship": "PHYSICAL_BOTTLENECK"},
+        "latent_128": {"dimensions": 128, "relationship": "PREFIX_OF_LATENT_256", "prefixLength": 128, "renormalized": True},
         "latent_64": {"dimensions": 64, "relationship": "PREFIX_OF_LATENT_128", "prefixLength": 64, "renormalized": True},
     }
     receipt["receipt_checksum"] = receipt_checksum(receipt)

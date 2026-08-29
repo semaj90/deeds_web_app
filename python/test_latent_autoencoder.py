@@ -10,20 +10,24 @@ from atlas_compute.latent_autoencoder import (
 )
 
 
-def test_nested_latent64_is_prefix_of_latent128():
+def test_nested_latent_prefix_chain():
     torch.manual_seed(7)
     model = NestedSemanticAutoencoder()
     source = torch.randn(8, 768)
-    latent128, latent64 = model.encode(source)
-    expected = torch.nn.functional.normalize(latent128[:, :64], p=2, dim=-1)
+    latent256, latent128, latent64 = model.encode(source)
+    expected128 = torch.nn.functional.normalize(latent256[:, :128], p=2, dim=-1)
+    expected64 = torch.nn.functional.normalize(latent128[:, :64], p=2, dim=-1)
+    assert latent256.shape == (8, 256)
     assert latent128.shape == (8, 128)
     assert latent64.shape == (8, 64)
-    assert torch.allclose(latent64, expected, atol=1e-6)
+    assert torch.allclose(latent128, expected128, atol=1e-6)
+    assert torch.allclose(latent64, expected64, atol=1e-6)
 
 
 def test_forward_reconstructs_to_semantic_768_shape():
     model = NestedSemanticAutoencoder()
     outputs = model(torch.randn(4, 768))
+    assert outputs['decoded256'].shape == (4, 768)
     assert outputs['decoded128'].shape == (4, 768)
     assert outputs['decoded64'].shape == (4, 768)
 
@@ -35,6 +39,7 @@ def test_nested_loss_is_finite():
     loss, metrics = nested_autoencoder_loss(outputs, config)
     assert torch.isfinite(loss)
     assert metrics['loss'] >= 0
+    assert metrics['mse256'] >= 0
     assert metrics['mse128'] >= 0
     assert metrics['mse64'] >= 0
 
