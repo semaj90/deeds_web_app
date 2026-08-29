@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.parent-atlas-gpu-ace-ornith-readiness.v1",
+  "mode": "READ_ONLY_PROMOTION_READINESS_AUDIT",
+  "status": "GPU_ACE_ORNITH_READONLY_CHAIN_PROVEN",
+  "gates": {
+    "tileReadback": true,
+    "gpuOrdinalRoundtrip": true,
+    "featureReplay": true,
+    "contextReplay": true,
+    "synthesisReplay": true,
+    "claimValidation": true,
+    "readOnlyDag": true,
+    "mutationBlocked": true
+  },
+  "proven": [
+    "tile artifact readback",
+    "CandidateOrdinal GPU roundtrip",
+    "feature-matrix graph replay",
+    "ACE to ContextManifest replay",
+    "Ornith synthesis replay",
+    "grounded claim validation",
+    "read-only agent DAG validation",
+    "mutation rejection"
+  ],
+  "notDone": [
+    "explicit user mutation authorization",
+    "patch plan creation",
+    "patch application",
+    "post-patch validators",
+    "full-corpus CandidateOrdinal expansion",
+    "graph-revision ownership for 128/768 scaling"
+  ],
+  "controls": {
+    "readOnly": true,
+    "canonicalAuthority": false,
+    "promotionToProduction": false,
+    "writesPerformed": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false
+  }
+}

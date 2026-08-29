@@ -1,49 +1,51 @@
 {
   "schema": "atlas.source-lineage-model.v1",
-  "generatedAt": "2026-08-28T00:06:18.484Z",
+  "generatedAt": "2026-08-29T09:30:33.780Z",
   "readOnly": true,
   "postgresWrites": false,
   "observation": {
     "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-binding-observation.json",
-    "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
-    "bindingRows": 23683
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "bindingRows": 24192
   },
   "layers": {
     "stableSourceIdentity": "SCHEMA_PRESENT",
     "sourceVersionObservation": "GRAPHIFY_BACKED_PROVEN",
-    "legacyAliasBinding": "MISSING",
-    "workspaceSourceBinding": "MISSING",
+    "legacyAliasBinding": "SCHEMA_PRESENT_REQUIRES_APPROVAL_AUDIT",
+    "workspaceSourceBinding": "SCHEMA_PRESENT_REQUIRES_PRODUCER_AUDIT",
     "currentProjection": "READ_ONLY_QUERY_SHAPE_PROVEN_NOT_DURABLE_VIEW"
   },
   "tables": {
     "atlas_packets": 140,
+    "atlas_source_aliases": 12,
     "atlas_source_refs": 23,
+    "atlas_workspace_source_bindings": 13,
     "graphify_files": 20
   },
   "stableSourceIdentity": {
-    "rows": 22487,
-    "source_refs": 22487
+    "rows": 22604,
+    "source_refs": 22604
   },
   "sourceVersionObservation": {
-    "rows": 768,
-    "source_refs": 768,
-    "content_hash_present": 768,
-    "source_revision_present": 768,
-    "workspace_revision_present": 256
+    "rows": 885,
+    "source_refs": 885,
+    "content_hash_present": 885,
+    "source_revision_present": 885,
+    "workspace_revision_present": 373
   },
   "stableIdentityCoverage": {
-    "graphify_source_refs": 768,
-    "graphify_refs_in_registry": 0,
+    "graphify_source_refs": 885,
+    "graphify_refs_in_registry": 117,
     "graphify_refs_missing_registry": 768
   },
   "currentProjection": {
     "packet_rows": 61660,
     "packet_source_refs": 61659,
-    "exact_current_projection": 661,
-    "source_revision_joined": 661,
-    "current_workspace_joined": 0
+    "exact_current_projection": 778,
+    "source_revision_joined": 778,
+    "current_workspace_joined": 111
   },
-  "projectionChecksum": "a7bae64fcfa6873f663f7b7be4c751f275d65daf02ac5e921289219107d2dedf",
+  "projectionChecksum": "0b040e1237ea68a7e87598411b842477ae769926191dc20741a9d6e58a7ef48a",
   "policy": {
     "sourceRef": "locator_only",
     "canonicalSource": "stable_identity",

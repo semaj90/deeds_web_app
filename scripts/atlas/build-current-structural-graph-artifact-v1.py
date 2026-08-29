@@ -12,8 +12,8 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PLAN = ROOT / "docs" / "reports" / "current-structural-edge-artifact-plan-v1.json"
-OUT = ROOT / "sveltekit-frontend" / "docs" / "reports" / "current-structural-graph-artifact-v1"
+PLAN = Path(os.environ.get("ATLAS_STRUCTURAL_EDGE_PLAN", ROOT / "docs" / "reports" / "current-structural-edge-artifact-plan-v1.json"))
+OUT = Path(os.environ.get("ATLAS_STRUCTURAL_GRAPH_ARTIFACT_OUT", ROOT / "sveltekit-frontend" / "docs" / "reports" / "current-structural-graph-artifact-v1"))
 
 
 def digest(value: str) -> str:
@@ -37,6 +37,11 @@ def main() -> None:
         "gpu_node_id": ordinal_by_key[key],
         "graph_node_key": key,
         "packet_key": node_metadata[key].get("packetKey"),
+        "source_ref": node_metadata[key].get("sourceRef"),
+        "source_revision": node_metadata[key].get("sourceRevision"),
+        "workspace_revision": node_metadata[key].get("workspaceRevision"),
+        "upstream_node_id": node_metadata[key].get("upstreamNodeId"),
+        "upstream_file_id": node_metadata[key].get("upstreamFileId"),
     } for key in node_keys]
     edges = []
     for edge in plan.get("edges", []):
@@ -52,7 +57,7 @@ def main() -> None:
         })
     edges.sort(key=lambda row: (row["src_gpu_node_id"], row["dst_gpu_node_id"], row["edge_type"]))
 
-    node_text = "\n".join(f"{row['gpu_node_id']}|{row['graph_node_key']}|{row['packet_key'] or ''}" for row in nodes)
+    node_text = "\n".join(f"{row['gpu_node_id']}|{row['graph_node_key']}|{row['packet_key'] or ''}|{row['source_ref'] or ''}|{row['source_revision'] or ''}|{row['workspace_revision'] or ''}" for row in nodes)
     edge_text = "\n".join(f"{row['src_gpu_node_id']}|{row['dst_gpu_node_id']}|{row['edge_type']}|{row['weight']}" for row in edges)
     node_checksum = f"sha256:{digest(node_text)}"
     edge_checksum = f"sha256:{digest(edge_text)}"
@@ -79,7 +84,7 @@ def main() -> None:
         "edgeTableHash": edge_checksum,
         "nodes": "nodes.parquet",
         "edges": "edges.parquet",
-        "sourcePlan": "docs/reports/current-structural-edge-artifact-plan-v1.json",
+        "sourcePlan": str(PLAN.relative_to(ROOT)).replace("\\", "/"),
         "writesPerformed": False,
         "canonicalAuthority": False,
     }

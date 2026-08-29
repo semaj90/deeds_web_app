@@ -45,4 +45,21 @@ describe('StructuralGraphSnapshotV1', () => {
     expect(descriptor.edgeCount).toBe(1);
     expect(descriptor.canonicalAuthority).toBe(false);
   });
+
+  it('keeps workspace and candidate snapshot revisions as separate coordinates', () => {
+    const descriptor = buildStructuralGraphSnapshotFromIncidenceV1({
+      projection: {
+        workspaceRevision: 'workspace:current:r1',
+        nodes: [{ gpuNodeId: 0 }],
+        edges: []
+      } as any,
+      graphRevision: 'graph:current:r1',
+      candidateSnapshotRevision: 'candidate:current:r1',
+      ordinalMapChecksum: hash,
+      edgeArtifact: { format: 'ARROW_IPC', checksum: hash, ref: 'artifacts/current-edges.arrow' }
+    });
+
+    expect(descriptor.workspaceRevision).toBe('workspace:current:r1');
+    expect(descriptor.candidateSnapshotRevision).toBe('candidate:current:r1');
+  });
 });

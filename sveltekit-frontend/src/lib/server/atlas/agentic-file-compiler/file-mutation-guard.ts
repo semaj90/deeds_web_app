@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { isAbsolute, normalize, relative, resolve, sep } from 'node:path';
-import { FileMutationPlanSchema, type FileMutationPlanV1 } from './contracts.js';
+import { FileMutationPlanSchema, mutationPlanIntentDigest, sha256Stable, type FileMutationPlanV1 } from './contracts.js';
 
 function sha256Bytes(bytes: Buffer): string {
 	return createHash('sha256').update(bytes).digest('hex');
@@ -28,6 +28,12 @@ export function preflightFileMutation(planInput: FileMutationPlanV1, workspaceRo
 	const allowedRoots = plan.allowedRoots.map((item) => resolve(root, item));
 	const forbiddenRoots = plan.forbiddenRoots.map((item) => resolve(root, item));
 	const errors: string[] = [];
+	const { approvalReceipt, planChecksum, ...planWithoutApproval } = plan;
+	const expectedPlanDigest = mutationPlanIntentDigest(planWithoutApproval);
+	if (approvalReceipt.approvedPlanDigest !== expectedPlanDigest) errors.push('approval receipt plan digest mismatch');
+	const { receiptChecksum, ...receiptWithoutChecksum } = approvalReceipt;
+	if (receiptChecksum !== sha256Stable(receiptWithoutChecksum)) errors.push('approval receipt checksum mismatch');
+	if (planChecksum !== sha256Stable({ ...planWithoutApproval, approvalReceipt })) errors.push('mutation plan checksum mismatch');
 
 	for (const candidate of [target, ...(destination ? [destination] : [])]) {
 		if (!allowedRoots.some((allowed) => isInside(allowed, candidate))) errors.push(`path outside allowedRoots: ${candidate}`);

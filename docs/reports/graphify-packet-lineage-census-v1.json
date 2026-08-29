@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-packet-lineage-census-v1",
-  "generatedAt": "2026-08-27T22:50:50.444Z",
+  "generatedAt": "2026-08-29T08:18:59.434Z",
   "readOnly": true,
   "postgresWrites": false,
   "packetSourceColumn": "source_ref",
@@ -12,16 +12,16 @@
   "counts": {
     "packet_rows": 61660,
     "packet_rows_with_source_ref": 61659,
-    "exact_source_ref": 661,
-    "missing_graphify_source": 60998,
+    "exact_source_ref": 778,
+    "missing_graphify_source": 60881,
     "duplicate_source_ref": 0,
     "source_revision_match": 0,
-    "stale_packet": 256
+    "stale_packet": 373
   },
   "classificationCounts": {
     "IDENTITY_UNRESOLVED": 1,
-    "MISSING_GRAPHIFY_SOURCE": 60998,
-    "PACKET_CONTENT_HASH_UNAVAILABLE": 618,
+    "MISSING_GRAPHIFY_SOURCE": 60881,
+    "PACKET_CONTENT_HASH_UNAVAILABLE": 735,
     "SOURCE_JOINED_PACKET_HASH_REQUIRES_CHUNK_GATE": 43
   },
   "packetContentIntegrity": {
@@ -34,21 +34,21 @@
   },
   "sourceContentIntegrity": {
     "observedBindingPath": "docs/reports/workspace-source-binding-observation.json",
-    "workspaceBindingMatches": 768,
-    "hashExact": 768,
+    "workspaceBindingMatches": 885,
+    "hashExact": 885,
     "hashMismatch": 0,
     "observationMissing": 0,
-    "revisionExact": 768,
+    "revisionExact": 885,
     "revisionMismatch": 0
   },
   "reconciliation": {
-    "graphify_files_total_rows": 768,
-    "graphify_distinct_source_refs": 768,
-    "workspace_binding_matches": 768,
-    "source_digest_matches": 768,
-    "latest_batch_selection_checksum": "8067dc230b59e1bd643d54ee38356422886ca158bc457cf6d7296a016587cbf7",
+    "graphify_files_total_rows": 885,
+    "graphify_distinct_source_refs": 885,
+    "workspace_binding_matches": 885,
+    "source_digest_matches": 885,
+    "latest_batch_selection_checksum": "b10d96c96e018e9b8317a918a768d025af7fa3c653ca9a7d5e45b2bb62a7efb9",
     "latest_batch_applied": true,
-    "latest_batch_readback_count": 128,
+    "latest_batch_readback_count": 6,
     "latest_batch_report": ".tmp/atlas/graphify-source-inventory-batch-v1.json",
     "latest_batch_readback_report": "docs/reports/graphify-source-inventory-batch-readback-v1.json"
   },
@@ -220,8 +220,8 @@
   },
   "gates": {
     "sourceBinding": {
-      "exact": 661,
-      "missing": 60998,
+      "exact": 778,
+      "missing": 60881,
       "unresolved": 1,
       "duplicate": 0,
       "proven": false
@@ -234,13 +234,13 @@
       "proven": true
     },
     "sourceContentIntegrity": {
-      "exact": 768,
+      "exact": 885,
       "mismatch": 0,
       "observationMissing": 0,
       "proven": true
     },
     "sourceRevisionBinding": {
-      "exact": 768,
+      "exact": 885,
       "mismatch": 0,
       "available": true,
       "proven": true

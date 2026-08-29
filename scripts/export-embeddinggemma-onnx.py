@@ -14,7 +14,7 @@ import onnxruntime as ort
 from onnxruntime.quantization import quantize_dynamic, QuantType
 import shutil
 
-def export_embeddinggemma_onnx():
+def export_embeddinggemma_onnx(max_sequence_length: int = 2048, quantize: bool = False):
     """Export EmbeddingGemma model to quantized ONNX format"""
 
     # Create output directory
@@ -35,7 +35,7 @@ def export_embeddinggemma_onnx():
 
     print('Preparing dummy input...')
     dummy_text = 'This is a sample legal document for embedding.'
-    inputs = tokenizer(dummy_text, return_tensors='pt', padding=True, truncation=True, max_length=512)
+    inputs = tokenizer(dummy_text, return_tensors='pt', padding=True, truncation=True, max_length=max_sequence_length)
 
     print('Exporting to ONNX...')
     onnx_path = output_dir / 'model.onnx'
@@ -60,11 +60,10 @@ def export_embeddinggemma_onnx():
 
     print('Applying quantization...')
     # Use correct quantization parameters
-    quantize_dynamic(
-        str(onnx_path),
-        str(onnx_path),
-        weight_type=QuantType.QInt8
-    )
+    if quantize:
+        quantized_path = output_dir / 'model_quantized.onnx'
+        quantize_dynamic(str(onnx_path), str(quantized_path), weight_type=QuantType.QInt8)
+        quantized_path.replace(onnx_path)
 
     print('Copying tokenizer files...')
     tokenizer_files = ['tokenizer.json', 'tokenizer.model', 'special_tokens_map.json', 'tokenizer_config.json']
@@ -84,8 +83,8 @@ def export_embeddinggemma_onnx():
         'embedding_dimension': 768,
         'tokenizer_type': 'Gemma3Tokenizer',
         'onnx_model': 'model.onnx',
-        'max_sequence_length': 512,
-        'quantized': True,
+        'max_sequence_length': max_sequence_length,
+        'quantized': quantize,
         'quantization_type': 'QInt8'
     }
 
@@ -94,7 +93,7 @@ def export_embeddinggemma_onnx():
 
     print('Testing ONNX model...')
     session = ort.InferenceSession(str(onnx_path))
-    test_inputs = tokenizer('Legal contract test.', return_tensors='np', padding=True, truncation=True, max_length=512)
+    test_inputs = tokenizer('Legal contract test.', return_tensors='np', padding=True, truncation=True, max_length=max_sequence_length)
     ort_inputs = {
         'input_ids': test_inputs['input_ids'].astype(np.int64),
         'attention_mask': test_inputs['attention_mask'].astype(np.int64)
@@ -110,4 +109,9 @@ def export_embeddinggemma_onnx():
     return str(output_dir)
 
 if __name__ == '__main__':
-    export_embeddinggemma_onnx()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--max-sequence-length', type=int, default=2048)
+    parser.add_argument('--quantize', action='store_true')
+    args = parser.parse_args()
+    export_embeddinggemma_onnx(max_sequence_length=args.max_sequence_length, quantize=args.quantize)

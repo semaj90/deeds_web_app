@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.graph-prod-01.production-snapshot-build.v1",
+  "snapshotKind": "RelationshipGraphSnapshotV1",
+  "graphDomain": "KAG_FI_RELATIONSHIP",
+  "astGraphRevision": null,
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "realHyperedgesRead": 62802,
+  "realFeatureRelationshipsRead": 603,
+  "kernelsBuilt": 63405,
+  "kernelsIncluded": 8,
+  "kernelsExcludedByRevisionMismatch": 63397,
+  "graphRevision": "sha256:e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275",
+  "graphIdentity": {
+    "schema": "atlas.graph-revision.v1",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "includedRelationshipIds": [
+      "rel:feature-ontology:0f05243430198fdacd1ae00561f88679",
+      "rel:feature-ontology:19444554885e1311624f3c328226d5c8",
+      "rel:feature-ontology:1b39782e78a4f03e422a26b38a8b453f",
+      "rel:feature-ontology:460c632247ee53232c25a26776a0edd7",
+      "rel:feature-ontology:ab5781a2ae9508fd1d67fc2b6a7b22f9",
+      "rel:feature-ontology:b00c71ee11bebfaf0f70544c6083c92a",
+      "rel:feature-ontology:bc1edd4110007ca7aef21efa592501d1",
+      "rel:feature-ontology:c264e7998c604b0d88cde38557c5b0d5"
+    ],
+    "includedRelationshipChecksums": [
+      "d14889a8f554080b38738649239e686d885fb73352ade888f58a830461bc9e5b",
+      "f309141edc4ffe74dfd02c17b410508e06d2d195294a82a21811ab09b7781801",
+      "9bca7ebd47213f46d3487cef1911291e398d42c22a10506f10ff8848d1a8111c",
+      "928608e96ab6878277c595c7d21435054afac3b313d9a9f739ce34b17ce234c5",
+      "282d0fbb3bf03ad7750b0e55d2dccbfe5da854da8183319aec0a34b37a0970bd",
+      "4b3e3476a99e591720607aac9bd6f0fb5b14a04454e7fa2cc8c64059a91e319b",
+      "fe515924fdd322ae67a85444e7532919b6532f1db117923421530877754310bf",
+      "0598135ef980175ad1b7bfb08c942b3e1db1d6bb99c9dd637d76921a0aaae95a"
+    ],
+    "authoritySet": [
+      "FEATURE_INTELLIGENCE"
+    ],
+    "relationshipCount": 8,
+    "relationshipProducerRevisions": [
+      "feature-ontology-relationship-preview:v1"
+    ],
+    "projectionSchemaRevision": "atlas.structural-graph-snapshot.v1",
+    "relationshipSetChecksum": "sha256:d82c3f46332020e6a46097c59f8e4f1aa8894724602a35c559e9cafc948bf269",
+    "graphRevision": "sha256:e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275"
+  },
+  "projection": {
+    "entityCount": 9,
+    "relationCount": 8,
+    "unresolvedParticipantCount": 0,
+    "nodeTableHash": "1abce3b13d819814f20b856c6048e7edb0acb4125cef4b47d72c7ab60ae9f5d4",
+    "edgeTableHash": "3e1a61639a73dbd13b8fb1645eeb2dafecce32485a391c422f478103370d5bcb",
+    "projectionHash": "674086877ace42fabe4a90b6d4487bfcc54efa5b610fa8c7920122aaeb5db68e"
+  },
+  "edgeArtifactPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-sha256_e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275.arrow",
+  "edgeArtifactBytes": 2592,
+  "edgeArtifactChecksum": "7ff1a6ce39567c04a2f5027d5e0361a7c1c3cb8e8b877b665cf0a7313a778511",
+  "snapshot": {
+    "schema": "atlas.structural-graph-snapshot.v1",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "graphRevision": "sha256:e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "nodeCount": 17,
+    "edgeCount": 16,
+    "edgeArtifact": {
+      "format": "ARROW_IPC",
+      "checksum": "7ff1a6ce39567c04a2f5027d5e0361a7c1c3cb8e8b877b665cf0a7313a778511",
+      "ref": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graph-artifacts\\structural-graph-snapshot-sha256_e6179c52ef51adf1bb0b8fe52bd544646a53aa11c543c3d598b5cb271d5ba275.arrow"
+    },
+    "canonicalAuthority": false,
+    "snapshotKind": "RelationshipGraphSnapshotV1",
+    "graphDomain": "KAG_FI_RELATIONSHIP",
+    "astGraphRevision": null
+  },
+  "artifactChecksumDeterministic": true
+}

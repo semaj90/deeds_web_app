@@ -1,82 +1,49 @@
 {
   "schema": "atlas.ornith-external-evidence-synthesis-replay.v1",
+  "mode": "READ_ONLY_ORNITH_CONTEXT_MANIFEST_SYNTHESIS_REPLAY",
   "status": "ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY_PROVEN",
-  "readOnly": true,
-  "query": "PostgreSQL pgvector",
   "model": "ornith-1.5-9b",
-  "seed": 1701,
-  "temperature": 0,
-  "topP": 1,
-  "reasoningEffort": "none",
-  "promptCache": false,
-  "evidenceCount": 11,
-  "evidenceChecksum": "sha256:a2172e3a46f5fe386db761a177ae8766c7dce58c1fb68555354720a6fc726d03",
-  "promptChecksum": "sha256:43bbd132928344fec69dd5b7f7196cfea0b66a2add2a4f7ac4a15e95098001c4",
-  "rawResponseChecksums": [
-    "sha256:36f8e7a8f93a57168f5fcdf0adfce8cc4f7ef737d62184124216802d27e60237",
-    "sha256:36f8e7a8f93a57168f5fcdf0adfce8cc4f7ef737d62184124216802d27e60237",
-    "sha256:36f8e7a8f93a57168f5fcdf0adfce8cc4f7ef737d62184124216802d27e60237"
+  "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+  "contextCompilerSchema": "atlas.fanout-context-compiler.v1",
+  "candidateOrdinals": [
+    1,
+    2,
+    7,
+    8,
+    10,
+    12,
+    14
   ],
-  "normalizedResponseChecksums": [
-    "sha256:7fbca467081b0ee1918698b0f2a12af242b4ba8cad505828e178f67790ac3cb3",
-    "sha256:7fbca467081b0ee1918698b0f2a12af242b4ba8cad505828e178f67790ac3cb3",
-    "sha256:7fbca467081b0ee1918698b0f2a12af242b4ba8cad505828e178f67790ac3cb3"
+  "evidenceRefs": [
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:1",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:2",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:7",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:8",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:10",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:12",
+    "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:14"
   ],
-  "schemaConstrained": true,
-  "citationsAreExternalPointIds": true,
-  "evidenceBindingsValidated": true,
-  "reviewPacket": {
-    "accepted": false,
+  "synthesis": {
+    "summary": "The ContextManifest lists PageRank graph features for several Rust crate files, with values ranging from a maximum of 0.06390328861307369 to a mean of 0.04432930369221141. Graph node counts vary from 2 to 7 across the referenced files.",
+    "evidenceRefs": [
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:1",
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:2"
+    ],
+    "confidence": 0.9
+  },
+  "responseChecksums": {
+    "first": "sha256:d3634040386642dc9266982f11fbbbabe2e080b8849a1d7e69797081d582629b",
+    "second": "sha256:d3634040386642dc9266982f11fbbbabe2e080b8849a1d7e69797081d582629b",
+    "identical": true
+  },
+  "grounded": true,
+  "controls": {
+    "rawRetrievalInjected": false,
     "canonicalAuthority": false,
-    "answer": "PostgreSQL pgvector is used as a vector store backend in SimpleMem via the VectorStoreBackend protocol. It requires PostgreSQL ≥ 15 with the pgvector extension (created via `CREATE EXTENSION IF NOT EXISTS vector`), and uses a `vector(1024)` column with an HNSW index on `vec vector_cosine_ops`. Semantic search uses the `<=>` cosine operator with `ScoreOrder.ASCENDING` (lower distance = better), keyword search uses case-insensitive `ILIKE`, and structured search uses parameterized `::jsonb @> ::jsonb`. It is enabled by setting `STORAGE_BACKEND=pgvector` (with `PG_DSN`), and LanceDB remains the default backend. Text columns use `VARCHAR(N)` rather than `TEXT` for broad compatibility. The backend implements insert, semantic_search, keyword_search, structured_search, count, get_all, optimize, and clear, uses thread-local connections, and is schema-bootstrap idempotent. It can also connect to InterSystems IRIS via iris-pgwire ≥ 1.7.3 without code changes, only by pointing PG_DSN at the pgwire endpoint.",
-    "uncertainty": "Low. All claims are directly supported by the supplied SimpleMem pull request evidence. The iris-pgwire details (≥ 1.7.3, no code changes, DSN-only switch) are drawn from the provided text.",
-    "citations": [
-      {
-        "pointId": "384fe20b-ba05-535a-a831-3d7a9c04a7b7",
-        "url": "https://github.com/aiming-lab/SimpleMem/pull/83",
-        "contentChecksum": "sha256:9920129aae3a0285e72016a14651b8094eed7fcaa58fc26c9a9539f2f9a7db27"
-      },
-      {
-        "pointId": "9c2198c7-95fa-5644-b90f-0f3243a179ee",
-        "url": "https://github.com/aiming-lab/SimpleMem/pull/83",
-        "contentChecksum": "sha256:18fdc8941227d9efef4fbf0098226564161bd0a29df779bf8c60058242c84ece"
-      },
-      {
-        "pointId": "990d454c-c30d-507b-9ed0-f7fe5c9df8a2",
-        "url": "https://github.com/aiming-lab/SimpleMem/pull/83",
-        "contentChecksum": "sha256:26c416e67bebec4337b15bacb9fa9ad4f29e9e6385bd3c95011c9160b45c780d"
-      },
-      {
-        "pointId": "3a16b48e-e238-5d51-a660-4586da44d7af",
-        "url": "https://github.com/aiming-lab/SimpleMem/pull/83",
-        "contentChecksum": "sha256:82481eb728685a68a18355dbdc23302e00b5d88bee61aaabf7edd70bcdf5fa2d"
-      },
-      {
-        "pointId": "90ff5441-be1b-52ce-8ba2-b9874fb61739",
-        "url": "https://github.com/aiming-lab/SimpleMem/pull/83",
-        "contentChecksum": "sha256:3cf88f6516a2b596a13d169691329ffc77c0cc2dda7848058187ba260dca9416"
-      }
-    ]
-  },
-  "reviewFlags": [
-    {
-      "code": "REPRESENTATION_DIMENSION_CONFLICT",
-      "claimed": 1024,
-      "observed": [
-        768
-      ]
-    }
-  ],
-  "promotionBlockers": [
-    "HUMAN_REVIEW_REQUIRED",
-    "EXTERNAL_CLAIM_NOT_CANONICAL"
-  ],
-  "writes": {
-    "postgres": false,
-    "qdrant": false,
-    "valkey": false,
-    "neo4j": false
-  },
-  "promotion": "REVIEW_ONLY",
-  "nextGate": "HUMAN_REVIEW_OR_GROUNDED_CLAIM_ADMISSION"
+    "mutationRequested": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false
+  }
 }

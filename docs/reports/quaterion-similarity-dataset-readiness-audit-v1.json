@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.quaterion-similarity-dataset-readiness-audit.v1",
+  "auditDate": "2026-08-29",
+  "status": "HELD_OUT_SIMILARITY_DATASET_MISSING",
+  "readOnly": true,
+  "existingArtifacts": {
+    "rerankerPairCompiler": {
+      "report": "docs/reports/atlas-reranker-pairs-v1.json",
+      "status": "EMPTY_INPUT_AFTER_FILTERS",
+      "pairCount": 0,
+      "promotion": "BLOCKED_UNTIL_HELD_OUT_EVALUATION"
+    },
+    "trainingRowsDryRun": {
+      "report": "docs/reports/training-rows-dry-run-report.json",
+      "rows": 113,
+      "matchedRows": 22,
+      "ambiguousRows": 0,
+      "heldOutSplit": false
+    },
+    "semanticTrainingRows": {
+      "report": "docs/reports/semantic-training-rows.json",
+      "mode": "dry-run",
+      "heldOutSplit": false
+    }
+  },
+  "requiredBeforeOptionalInstall": [
+    "replayed query/document roles",
+    "positive and hard-negative policy",
+    "source-revision grouping",
+    "train/held-out split checksum",
+    "CandidateOrdinal and evidence references",
+    "baseline metrics against frozen semantic_768"
+  ],
+  "writesPerformed": false,
+  "canonicalPromotion": false,
+  "nextGate": "BUILD_REVISION_BOUND_HELD_OUT_SIMILARITY_DATASET"
+}

@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.current-workspace-source-bindings-apply.v1",
+  "generatedAt": "2026-08-29T08:18:15.923Z",
+  "authorization": "AUTHORIZE NON-PRODUCTION WORKSPACE SOURCE BINDING MIGRATION FOR 111 CURRENT GRAPHIFY SOURCES",
+  "sourcePlan": "docs/reports/current-source-graphify-batch-plan-v1.json",
+  "migration": "sveltekit-frontend/drizzle/manual/20260827_source_lineage_relations_v1.sql",
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "producerRevision": "graphify-current-source-batch-v1:1027c9671b2150da95e104c9933e80cf75cb99846fad89e2f290eb34ddd308d1",
+  "selectedSourceCount": 111,
+  "insertedCount": 111,
+  "readbackCount": 111,
+  "committed": true,
+  "bindingChecksums": {
+    "count": 111,
+    "aggregate": "154651a454f0df42da4610699f0cdfca1682b9ae46908dba46eb5246c12768e9"
+  },
+  "registryWrites": false,
+  "graphifyRowsWritten": false,
+  "packetWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "status": "WORKSPACE_SOURCE_BINDINGS_INSERT_AND_READBACK_PROVEN",
+  "nextGate": "RERUN_LINEAGE_COHORT_AUDIT_THEN_REVIEW_GRAPH_REVISION_OWNER"
+}

@@ -44,24 +44,28 @@ const model = process.env.ORNITH_MODEL ?? 'ornith-1.5-9b';
 const prompt = [
   'Use only the supplied ContextManifest. Do not infer missing source facts.',
   'Return one JSON object only with keys summary, evidenceRefs, and confidence.',
+  'summary must be at most two short sentences; evidenceRefs must contain at most two IDs; confidence must be a number from 0 to 1.',
   'evidenceRefs must contain only IDs present in the ContextManifest.',
   `ContextManifest checksum: ${sha256(context)}`,
+  `Evidence references: ${context.evidenceRefs.join(' | ')}`,
   `ContextManifest:\n${context.contextText}`,
 ].join('\n\n');
 
 async function synthesize() {
   const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
     method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], max_tokens: 256, temperature: 0, top_p: 1, seed: 17, stream: false, response_format: { type: 'json_object' } }),
+    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], max_tokens: 256, temperature: 0, top_p: 1, seed: 17, stream: false, chat_template_kwargs: { enable_thinking: false }, response_format: { type: 'json_object' } }),
     signal: AbortSignal.timeout(90000),
   });
   if (!response.ok) throw new Error(`ORNITH_SYNTHESIS_HTTP_${response.status}:${await response.text()}`);
   const body = await response.json();
   const content = body?.choices?.[0]?.message?.content;
-  if (typeof content !== 'string' || content.trim().length === 0) throw new Error('ORNITH_SYNTHESIS_EMPTY');
+  if (typeof content !== 'string' || content.trim().length === 0) throw new Error(`ORNITH_SYNTHESIS_EMPTY:${JSON.stringify(body).slice(0, 2000)}`);
   const cleaned = content.replace(/<think>[\s\S]*?<\/think>\s*/g, '').trim();
-  const parsed = JSON.parse(cleaned);
+  let parsed;
+  try { parsed = JSON.parse(cleaned); } catch (error) { throw new Error(`ORNITH_SYNTHESIS_JSON_INVALID:${cleaned.slice(0, 2200)}:${error.message}`); }
   if (!parsed || typeof parsed !== 'object' || typeof parsed.summary !== 'string' || !Array.isArray(parsed.evidenceRefs) || typeof parsed.confidence !== 'number') throw new Error('ORNITH_SYNTHESIS_SCHEMA_INVALID');
+  if (parsed.evidenceRefs.length > 2 || parsed.confidence < 0 || parsed.confidence > 1) throw new Error('ORNITH_SYNTHESIS_BOUNDS_INVALID');
   const allowed = new Set(context.evidenceRefs);
   if (parsed.evidenceRefs.some((ref) => !allowed.has(ref))) throw new Error('ORNITH_SYNTHESIS_UNGROUNDED_EVIDENCE');
   return parsed;
@@ -80,6 +84,7 @@ const report = {
   contextCompilerSchema: context.schema,
   candidateOrdinals: context.candidateOrdinals,
   evidenceRefs: context.evidenceRefs,
+  synthesis: first,
   responseChecksums: { first: firstChecksum, second: secondChecksum, identical: firstChecksum === secondChecksum },
   grounded: true,
   controls: { rawRetrievalInjected: false, canonicalAuthority: false, mutationRequested: false, postgresWrites: false, qdrantWrites: false, valkeyWrites: false, neo4jWrites: false },

@@ -1,0 +1,104 @@
+{
+  "schema": "atlas.execution-receipt.v1",
+  "mode": "READ_ONLY_GROUNDED_DAG_EXECUTION",
+  "status": "DAG_EXECUTION_READONLY_PROVEN",
+  "validatedDagChecksum": "73c50d98e6549466cc6ffc26a10de4ae90cee3fe944541701644ecd3b6d1ecf9",
+  "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+  "claimReceiptId": "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+  "planned": [
+    {
+      "nodeId": "context",
+      "functionId": "consume_context_manifest",
+      "arguments": {
+        "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      },
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ]
+    },
+    {
+      "nodeId": "verify",
+      "functionId": "verify_grounded_claim",
+      "arguments": {
+        "receiptId": "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      },
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ]
+    }
+  ],
+  "executed": [
+    {
+      "nodeId": "context",
+      "functionId": "consume_context_manifest",
+      "arguments": {
+        "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      },
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ],
+      "argumentChecksum": "sha256:3c60f9301b3f89cd081f12214652d2c96f2686b91bea727a46fea7aa75d5bf85",
+      "output": {
+        "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      },
+      "outputChecksum": "sha256:3c60f9301b3f89cd081f12214652d2c96f2686b91bea727a46fea7aa75d5bf85"
+    },
+    {
+      "nodeId": "verify",
+      "functionId": "verify_grounded_claim",
+      "arguments": {
+        "receiptId": "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      },
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ],
+      "argumentChecksum": "sha256:329e19962ee1ff7afef46fad63050c4c51743d8e33edd66094c685a76f5c7bb4",
+      "output": {
+        "receiptId": "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "verdict": "VERIFIED"
+      },
+      "outputChecksum": "sha256:a0961e9bfb8aeb854766e108241dc57b3b5eee17290477941d5c60592ac2fbb9"
+    }
+  ],
+  "parity": {
+    "functionIdsEqual": true,
+    "argumentsEqual": true,
+    "evidenceRefsEqual": true,
+    "unexpectedTools": 0,
+    "unexpectedWrites": 0
+  },
+  "controls": {
+    "readOnly": true,
+    "mutationRequested": false,
+    "executionPerformed": true,
+    "canonicalAuthority": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "sourceWrites": false
+  },
+  "resultEvidence": [
+    {
+      "nodeId": "context",
+      "outputChecksum": "sha256:3c60f9301b3f89cd081f12214652d2c96f2686b91bea727a46fea7aa75d5bf85",
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ]
+    },
+    {
+      "nodeId": "verify",
+      "outputChecksum": "sha256:a0961e9bfb8aeb854766e108241dc57b3b5eee17290477941d5c60592ac2fbb9",
+      "evidenceRefs": [
+        "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+        "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+      ]
+    }
+  ],
+  "receiptChecksum": "sha256:7f5ffc7b7aeb73e9e479cfef6bf35b8c6433b219c43946f3e7fe9910a4a5b71a"
+}

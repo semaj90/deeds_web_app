@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.ornith-agent-dag-readonly-gate.v1",
+  "mode": "READ_ONLY_AGENT_DAG_VALIDATION",
+  "status": "ORNITH_AGENT_DAG_READONLY_GATE_PROVEN",
+  "candidateChecksum": "158ec38594c014c9151f688956e519074b51fdc69be8a4577c490bc0ebb3fdcf",
+  "validationReceipt": {
+    "schema": "atlas.kernel-dag-validation-receipt.v1",
+    "candidateChecksum": "158ec38594c014c9151f688956e519074b51fdc69be8a4577c490bc0ebb3fdcf",
+    "kernelRevision": "kernel:ornith-readonly-v1",
+    "kernelChecksum": "kernel-checksum:ornith-readonly-v1",
+    "validatorRevision": "atlas.kernel-dag-validator.v1",
+    "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "semanticRevision": "semantic_768:graph-feature-replay",
+    "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "runtimeCapabilityRevision": "runtime:ornith-readonly-v1",
+    "permissionPolicyRevision": "policy:read-only-v1",
+    "resourceBudgetRevision": "budget:ornith-readonly-v1",
+    "status": "ACCEPTED",
+    "unknownFunctions": [],
+    "rejectedRelations": [],
+    "cycleDetected": false,
+    "argumentSchemaFailures": [],
+    "argumentIdentityFailures": [],
+    "missingEvidence": [],
+    "revisionMismatches": [],
+    "unauthorizedMutations": [],
+    "missingValidators": [],
+    "runtimeCapabilitiesMissing": [],
+    "resourceBudgetExceeded": [],
+    "validatedDagChecksum": "c0c5f9b9b9c4e3ff608728af8880d8fec3306d3ce111a18499dce278aed4dbec"
+  },
+  "candidateOrdinals": [
+    1,
+    2,
+    7,
+    8,
+    10,
+    12,
+    14
+  ],
+  "evidenceRefs": [
+    "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb"
+  ],
+  "mutationNodes": [],
+  "controls": {
+    "readOnly": true,
+    "mutationNodes": 0,
+    "executableRepairDagCreated": false,
+    "canonicalAuthority": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false
+  }
+}

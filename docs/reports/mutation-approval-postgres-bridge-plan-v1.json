@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.mutation-approval-postgres-bridge-plan.v1",
+  "status": "READONLY_MIGRATION_PLAN",
+  "generatedAt": "2026-08-29",
+  "writesPerformed": false,
+  "currentApprovalTable": "workflow_approvals",
+  "observedFields": [
+    "run_id",
+    "approval_id",
+    "decision",
+    "decided_by",
+    "decided_at",
+    "note"
+  ],
+  "requiredAdditiveFields": [
+    { "field": "mutation_plan_digest", "type": "text", "purpose": "bind approval to exact mutation intent" },
+    { "field": "authorization_policy_revision", "type": "text", "purpose": "bind approval to policy" },
+    { "field": "expires_at", "type": "timestamptz", "purpose": "enforce approval freshness" },
+    { "field": "revoked_at", "type": "timestamptz", "purpose": "support explicit revocation" }
+  ],
+  "requiredReadbackChecks": [
+    "run_id matches mutation approval receipt",
+    "approval_id matches mutation approval receipt",
+    "decision is approved",
+    "decided_by matches approvedByUserId",
+    "mutation_plan_digest matches approvedPlanDigest",
+    "authorization_policy_revision matches receipt",
+    "expires_at is absent or in the future",
+    "revoked_at is null"
+  ],
+  "nextGate": "OPERATOR_APPROVE_ADDITIVE_WORKFLOW_APPROVAL_SCHEMA",
+  "canonicalAuthority": "POSTGRESQL_AFTER_MIGRATION_AND_READBACK_PROOF"
+}

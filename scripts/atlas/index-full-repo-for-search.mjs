@@ -77,6 +77,7 @@ const LIMIT = Number.parseInt(getArgValue('--limit') ?? '0', 10) || 0;
 const TARGET = getArgValue('--target');
 const ROOTS_ARG = getArgValue('--roots');
 const AST_MANIFEST_PATH = getArgValue('--ast-manifest');
+const SOURCE_PLAN_PATH = getArgValue('--source-plan');
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
@@ -117,10 +118,10 @@ const SCAN_DIRS = TARGET
   : (ROOTS_ARG ? parseRoots(ROOTS_ARG) : DEFAULT_SCAN_ROOTS);
 
 const INDEXABLE_EXTS = new Set([
-  '.ts', '.tsx', '.js', '.mjs', '.cjs',
+  '.ts', '.tsx', '.mts', '.cts', '.js', '.mjs', '.cjs',
   '.svelte', '.go', '.rs', '.py',
   '.md', '.sql', '.json', '.toml', '.yaml', '.yml',
-  '.cc', '.cpp', '.h', '.hpp', '.c',
+  '.cc', '.cpp', '.h', '.hpp', '.c', '.sh',
 ]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -503,16 +504,18 @@ async function upsertPostgres(pool, chunk, embedding) {
   const vecStr = `[${embedding.join(',')}]`;
   await pool.query(
     `INSERT INTO codebase_chunk_index
-       (qdrant_id, chunk_id, relative_path, content, content_embedding_768,
+       (qdrant_id, chunk_id, relative_path, source_ref,
+        content, content_embedding_768,
         domain, tags, metadata,
         language, extension, embedding_model, embedding_dimension, content_hash,
         line_start, line_end, indexed_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5::halfvec(768),
+     VALUES ($1, $2, $3, $3, $4, $5::halfvec(768),
              $6, $7::jsonb, $8::jsonb,
              $9, $10, $11, $12, $13,
              $14, $15, NOW(), NOW())
      ON CONFLICT (qdrant_id) DO UPDATE SET
        content           = EXCLUDED.content,
+       source_ref       = EXCLUDED.source_ref,
        content_embedding_768 = EXCLUDED.content_embedding_768,
        content_hash      = EXCLUDED.content_hash,
        domain            = EXCLUDED.domain,
@@ -550,8 +553,8 @@ async function alreadyIndexed(pool, qdrantIds) {
 }
 
 // ── Process one file ──────────────────────────────────────────────────────────
-async function processFile(absPath, pool, stats) {
-  const relPath = path.relative(REPO_ROOT, absPath).replace(/\\/g, '/');
+async function processFile(absPath, pool, stats, sourceRefOverride = null) {
+  const relPath = normalizeRepoPath(sourceRefOverride ?? path.relative(REPO_ROOT, absPath));
   const ext     = path.extname(absPath).toLowerCase();
   const lang    = detectLanguage(ext);
 
@@ -853,7 +856,28 @@ async function main() {
   }
   console.log(`\nTotal: ${allFiles.length} files\n`);
 
-  const filesToProcess = LIMIT > 0 ? allFiles.slice(0, LIMIT) : allFiles;
+  let filesToProcess = allFiles;
+  const sourcePlanRefsByPath = new Map();
+  if (SOURCE_PLAN_PATH) {
+    const sourcePlan = JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, SOURCE_PLAN_PATH), 'utf8'));
+    const sourceRefs = (Array.isArray(sourcePlan.records) ? sourcePlan.records : [])
+      .filter((row) => row.classification === 'CURRENT_GRAPHIFY_EXACT' && row.sourceRef)
+      .map((row) => normalizeRepoPath(row.sourceRef));
+    const absByRelativePath = new Map(allFiles.map((absPath) => [normalizeRepoPath(path.relative(REPO_ROOT, absPath)), absPath]));
+    for (const sourceRef of sourceRefs) {
+      const candidates = [sourceRef, `sveltekit-frontend/${sourceRef}`];
+      const absPath = candidates.map((candidate) => absByRelativePath.get(candidate)).find(Boolean)
+        ?? candidates.map((candidate) => path.resolve(REPO_ROOT, candidate))
+          .find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile() && INDEXABLE_EXTS.has(path.extname(candidate).toLowerCase()));
+      if (absPath) sourcePlanRefsByPath.set(absPath, sourceRef);
+    }
+    filesToProcess = allFiles.filter((absPath) => sourcePlanRefsByPath.has(absPath));
+    for (const [absPath] of sourcePlanRefsByPath) {
+      if (!filesToProcess.includes(absPath)) filesToProcess.push(absPath);
+    }
+    console.log(`[SOURCE-PLAN] Selected ${filesToProcess.length}/${sourceRefs.length} existing files from ${SOURCE_PLAN_PATH}`);
+  }
+  filesToProcess = LIMIT > 0 ? filesToProcess.slice(0, LIMIT) : filesToProcess;
 
   if (DRY_RUN) {
     console.log(`[DRY-RUN] Would process ${filesToProcess.length} files`);
@@ -874,7 +898,7 @@ async function main() {
   let processed = 0;
 
   for (const absPath of filesToProcess) {
-    await processFile(absPath, pool, stats);
+    await processFile(absPath, pool, stats, sourcePlanRefsByPath.get(absPath) ?? null);
     processed++;
 
     if (processed % 100 === 0 || processed === filesToProcess.length) {
@@ -974,6 +998,9 @@ async function main() {
 
   if (DRY_RUN) {
     console.log('\n[DRY-RUN] No data was written. Run with --apply to execute.');
+  } else if (stats.errors > 0) {
+    console.error(`\n❌ Full-repo indexing failed: ${stats.errors} chunk errors; partial writes may require readback/reconciliation.`);
+    process.exitCode = 1;
   } else {
     console.log('\n✅ Full-repo indexing complete.');
     console.log('Next: npm run graphify:gds  (rebuild PageRank/Louvain with new nodes)');

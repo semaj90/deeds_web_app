@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.current-workspace-packet-chunk-join.v1",
+  "mode": "READ_ONLY_CENSUS",
+  "workspaceRevisions": [
+    "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9"
+  ],
+  "counts": {
+    "binding_rows": 111,
+    "binding_sources": 111,
+    "graphify_exact_sources": 111,
+    "binding_chunk_content_matches": 0,
+    "packet_chunk_exact_sources": 0,
+    "packet_content_matches": 0
+  },
+  "chunkInventory": {
+    "chunk_rows": 55853,
+    "chunks_with_source_ref": 53064,
+    "chunks_with_relative_path": 55853,
+    "chunks_with_content_hash": 55816,
+    "indexed_relative_paths": 4746,
+    "indexed_source_refs": 4549
+  },
+  "pathCoverage": {
+    "binding_sources": 111,
+    "bindings_with_relative_path_chunks": 69,
+    "bindings_with_source_ref_chunks": 68
+  },
+  "hashGrain": {
+    "bindingContentDigest": "whole-source digest; exact Graphify file content hash",
+    "graphifyContentHash": "whole-source digest",
+    "codebaseChunkIndexContentHash": "per-chunk digest; not equal to a whole-source digest for multi-chunk files",
+    "exactJoinAllowedOnlyWhen": "a separately proven packet/chunk binding supplies the exact chunk digest"
+  },
+  "writes": {
+    "postgres": false,
+    "graphify": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "canonicalAuthority": false,
+  "status": "CURRENT_PACKET_CHUNK_JOIN_MISSING",
+  "nextGate": "CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION"
+}

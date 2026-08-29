@@ -1,6 +1,6 @@
 {
   "schema": "atlas.treesitter-structural-observation.v1",
-  "generatedAt": "2026-08-28T01:05:31.150Z",
+  "generatedAt": "2026-08-29T08:51:25.679Z",
   "mode": "READ_ONLY_AUDIT",
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -12,7 +12,7 @@
     "engine": "treesitter-chunker"
   },
   "selectionChecksum": "349253cdef7ba59e0a90d7fde6bfdec8526b6f4e1dbc9fb17797c9bd6120b79a",
-  "workspaceRevision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+  "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
   "sourceCount": 6,
   "extractedCount": 6,
   "failures": [],

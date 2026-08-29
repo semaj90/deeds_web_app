@@ -12,8 +12,11 @@ export function buildStructuralGraphSnapshotFromIncidenceV1(input: {
   ordinalMapChecksum: string;
   edgeArtifact: StructuralGraphSnapshotV1['edgeArtifact'];
 }): StructuralGraphSnapshotV1 {
-  if (input.projection.workspaceRevision !== input.candidateSnapshotRevision) {
-    throw new Error('CANDIDATE_SNAPSHOT_WORKSPACE_REVISION_MISMATCH');
+  if (!input.projection.workspaceRevision.trim()) {
+    throw new Error('GRAPH_SNAPSHOT_WORKSPACE_REVISION_REQUIRED');
+  }
+  if (!input.candidateSnapshotRevision.trim()) {
+    throw new Error('GRAPH_SNAPSHOT_CANDIDATE_SNAPSHOT_REVISION_REQUIRED');
   }
 
   return validateStructuralGraphSnapshotV1({

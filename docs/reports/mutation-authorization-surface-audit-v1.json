@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.mutation-authorization-surface-audit.v1",
+  "status": "APPROVAL_RESOLVER_PROVEN_READONLY",
+  "auditDate": "2026-08-29",
+  "readOnly": true,
+  "routingSurface": {
+    "patchApplyTool": "atlas.patch.apply",
+    "routingEligible": false,
+    "humanApprovalRequired": true,
+    "requiredPermissions": ["code:write"],
+    "preconditions": [
+      "approved_proposal",
+      "approval_token_valid",
+      "base_revision_matches"
+    ],
+    "status": "FAIL_CLOSED"
+  },
+  "planSurface": {
+    "schema": "atlas.file-mutation-plan.v1",
+    "authorizationPolicyRevision": "CARRIED_BY_APPROVAL_RECEIPT",
+    "approvalReceipt": true,
+    "approvalToken": "represented_by_receipt_checksum_and_plan_binding",
+    "status": "BOUND_AND_RESOLVED_READONLY"
+  },
+  "proof": {
+    "focusedTests": "15 passed / 15 total",
+    "mutationBarrier": "MUTATION_AUTHORIZATION_BARRIER_PROVEN",
+    "dagAdmission": "GROUNDED_TYPED_DAG_ADMISSION_PROVEN",
+    "readOnlyExecution": "DAG_EXECUTION_READONLY_PROVEN",
+    "writesPerformed": 0
+  },
+  "requiredNextGate": "CONNECT_RESOLVER_TO_POSTGRES_APPROVAL_READBACK",
+  "canonicalAuthority": false,
+  "executionPerformed": false,
+  "writesPerformed": false
+}

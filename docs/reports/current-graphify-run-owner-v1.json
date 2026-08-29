@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.current-graphify-run-owner.v1",
+  "generatedAt": "2026-08-29T09:35:26.941Z",
+  "mode": "READ_ONLY_RUN_OWNER_AUDIT",
+  "readOnly": true,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "databaseError": null,
+  "currentRun": {
+    "run_id": "14643371-f6f2-4131-906b-235a5c06619a",
+    "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "repository_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+    "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "source_manifest_source_count": 24192,
+    "parser_contract_version": "graphify.current-source-batch.v1",
+    "extraction_contract_version": "graphify.source-inventory.current-source.v1",
+    "status": "RUNNING",
+    "dry_run": false,
+    "started_at": "2026-08-28T04:01:23.454Z",
+    "completed_at": null,
+    "workspace_row_present": false
+  },
+  "runCount": 1,
+  "completedOwnerCount": 0,
+  "workspaceRowCount": 0,
+  "ownerAssessment": {
+    "runExists": true,
+    "runCompleted": false,
+    "workspaceForeignRowExists": false,
+    "sourceManifestBound": true,
+    "authoritativeGraphRun": false
+  },
+  "promotion": {
+    "graphRevisionAllowed": false,
+    "edgeAdmissionAllowed": false,
+    "reason": "Current run is incomplete and the referenced workspace owner row is absent; no graph revision may be promoted from it."
+  },
+  "runs": [
+    {
+      "run_id": "14643371-f6f2-4131-906b-235a5c06619a",
+      "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+      "repository_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_manifest_digest": "55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "source_manifest_source_count": 24192,
+      "parser_contract_version": "graphify.current-source-batch.v1",
+      "extraction_contract_version": "graphify.source-inventory.current-source.v1",
+      "status": "RUNNING",
+      "dry_run": false,
+      "started_at": "2026-08-28T04:01:23.454Z",
+      "completed_at": null,
+      "workspace_row_present": false
+    }
+  ],
+  "status": "GRAPHIFY_RUN_OWNER_BLOCKED"
+}

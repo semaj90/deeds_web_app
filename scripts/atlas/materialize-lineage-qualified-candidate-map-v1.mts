@@ -62,13 +62,14 @@ const clean = (value: unknown): string | null => {
   const text = String(value ?? '').trim();
   return text || null;
 };
+const requestedWorkspaceRevision = process.argv.find((value) => value.startsWith('--workspace-revision='))?.slice('--workspace-revision='.length) ?? null;
 
 async function main(): Promise<void> {
   const columns = await pool.query(`
     SELECT table_name, column_name
     FROM information_schema.columns
     WHERE table_schema = 'public'
-      AND table_name IN ('atlas_packets', 'codebase_chunk_index', 'graphify_files')
+      AND table_name IN ('atlas_packets', 'codebase_chunk_index', 'graphify_files', 'atlas_workspace_source_bindings')
   `);
   const has = (table: string, column: string): boolean => columns.rows.some((row) => row.table_name === table && row.column_name === column);
   if (!has('atlas_packets', 'packet_key') || !has('atlas_packets', 'source_ref')) throw new Error('CANARY_PACKET_IDENTITY_SCHEMA_REQUIRED');
@@ -76,6 +77,18 @@ async function main(): Promise<void> {
   if (!has('atlas_packets', 'representation_revision')) throw new Error('CANARY_SEMANTIC_REVISION_SCHEMA_REQUIRED');
   if (!has('codebase_chunk_index', 'source_ref') || !has('codebase_chunk_index', 'content_hash')) throw new Error('CANARY_CHUNK_IDENTITY_SCHEMA_REQUIRED');
   if (!has('graphify_files', 'source_ref') || !has('graphify_files', 'workspace_revision') || !has('graphify_files', 'code_source_revision') || !has('graphify_files', 'content_hash')) throw new Error('CANARY_GRAPHIFY_LINEAGE_SCHEMA_REQUIRED');
+  if (!has('atlas_workspace_source_bindings', 'canonical_source_ref') || !has('atlas_workspace_source_bindings', 'workspace_revision') || !has('atlas_workspace_source_bindings', 'source_revision') || !has('atlas_workspace_source_bindings', 'content_digest')) throw new Error('CANARY_WORKSPACE_BINDING_SCHEMA_REQUIRED');
+
+  const bindingRevisions = await pool.query<{ workspace_revision: string }>(`
+    SELECT DISTINCT workspace_revision::text AS workspace_revision
+    FROM public.atlas_workspace_source_bindings
+    WHERE repo_id = 'deeds-web-app'
+    ORDER BY workspace_revision::text
+  `);
+  const workspaceRevisions = bindingRevisions.rows.map((row) => clean(row.workspace_revision)).filter((value): value is string => Boolean(value));
+  const workspaceRevision = requestedWorkspaceRevision ?? (workspaceRevisions.length === 1 ? workspaceRevisions[0] : null);
+  if (!workspaceRevision || !/^sha256:[0-9a-fA-F]{64}$/.test(workspaceRevision)) throw new Error('CANARY_CURRENT_WORKSPACE_REVISION_REQUIRED');
+  if (workspaceRevisions.some((value) => value !== workspaceRevision)) throw new Error('CANARY_MIXED_WORKSPACE_BINDING_REVISIONS');
 
   const result = await pool.query<SourceRow>(`
     WITH chunk_by_source AS (
@@ -85,15 +98,28 @@ async function main(): Promise<void> {
       FROM public.codebase_chunk_index
       WHERE NULLIF(btrim(source_ref), '') IS NOT NULL
       GROUP BY source_ref
-    ), graphify_by_source AS (
-      SELECT source_ref,
-             count(*)::integer AS graphify_rows,
-             max(NULLIF(btrim(workspace_revision::text), '')) AS workspace_revision,
-             max(NULLIF(btrim(code_source_revision::text), '')) AS source_revision,
-             max(lower(content_hash)) AS source_content_hash
-      FROM public.graphify_files
-      WHERE NULLIF(btrim(source_ref), '') IS NOT NULL
-      GROUP BY source_ref
+    ), binding_by_source AS (
+      SELECT canonical_source_ref AS source_ref,
+             workspace_revision::text AS workspace_revision,
+             source_revision::text AS source_revision,
+             lower(content_digest::text) AS source_content_hash
+      FROM public.atlas_workspace_source_bindings
+      WHERE repo_id = 'deeds-web-app'
+        AND workspace_revision::text = $2
+      GROUP BY canonical_source_ref, workspace_revision, source_revision, content_digest
+    ), graphify_exact AS (
+      SELECT g.source_ref,
+             b.workspace_revision,
+             b.source_revision,
+             b.source_content_hash
+      FROM public.graphify_files g
+      JOIN binding_by_source b
+        ON b.source_ref = g.source_ref
+       AND b.workspace_revision = g.workspace_revision::text
+       AND lower(b.source_revision) = lower(g.code_source_revision::text)
+       AND b.source_content_hash = lower(g.content_hash::text)
+      GROUP BY g.source_ref, b.workspace_revision, b.source_revision, b.source_content_hash
+      HAVING count(*) = 1
     )
     SELECT ap.packet_id,
            ap.packet_key,
@@ -107,23 +133,24 @@ async function main(): Promise<void> {
              ELSE NULLIF(btrim(ap.representation_revision::text), '')
            END AS semantic_revision
     FROM public.atlas_packets ap
-    JOIN graphify_by_source g ON g.source_ref = ap.source_ref AND g.graphify_rows = 1
+    JOIN graphify_exact g ON g.source_ref = ap.source_ref
     JOIN chunk_by_source c ON c.source_ref = ap.source_ref AND c.distinct_chunk_hashes = 1
     WHERE ap.packet_key IS NOT NULL
       AND NULLIF(btrim(ap.source_ref), '') IS NOT NULL
       AND NULLIF(btrim(ap.content_hash), '') IS NOT NULL
       AND lower(btrim(ap.content_hash)) = c.chunk_content_hash
+      AND lower(btrim(ap.content_hash)) = g.source_content_hash
+      AND g.workspace_revision = $2
       AND g.workspace_revision ~ '^sha256:[0-9a-fA-F]{64}$'
       AND g.source_revision ~ '^sha256:[0-9a-fA-F]{64}$'
     ORDER BY ap.packet_key ASC, ap.packet_id ASC
     LIMIT $1
-  `, [limit]);
+  `, [limit, workspaceRevision]);
 
   const rows = result.rows;
   if (rows.length === 0) throw new Error('CANARY_EXACT_LINEAGE_COHORT_EMPTY');
-  const workspaces = new Set(rows.map((row) => row.workspace_revision));
-  if (workspaces.size !== 1) throw new Error('CANARY_MIXED_WORKSPACE_REVISIONS');
-  const workspaceRevision = rows[0]!.workspace_revision;
+  const resultWorkspaces = new Set(rows.map((row) => row.workspace_revision));
+  if (resultWorkspaces.size !== 1 || rows.some((row) => row.workspace_revision !== workspaceRevision)) throw new Error('CANARY_RESULT_WORKSPACE_REVISION_MISMATCH');
   const semanticResult = await pool.query<SemanticRow>(`
     SELECT source_ref, content_hash, content_embedding_768, embedding_model, embedding_version, embedding_dimension
     FROM public.codebase_chunk_index

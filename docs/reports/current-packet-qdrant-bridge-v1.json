@@ -1,0 +1,248 @@
+{
+  "schema": "atlas.current-packet-qdrant-bridge.v1",
+  "mode": "READ_ONLY_CENSUS",
+  "collection": "codebase_chunks_768",
+  "sourcePlan": "docs\\reports\\current-source-graphify-batch-plan-v1.json",
+  "counts": {
+    "plannedSources": 111,
+    "packetRows": 111,
+    "packetQdrantIds": 111,
+    "qdrantPointsFound": 20,
+    "sourceMatches": 20,
+    "chunkIdMatches": 20,
+    "contentHashMatches": 0
+  },
+  "samples": [
+    {
+      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+      "packetKey": "packet:009b58d2b2ef",
+      "packetChunkId": "5c2eafbf-8159-429b-b443-9d0b4ec7ecbd",
+      "packetQdrantPointId": "3468926114965153300",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
+      "packetKey": "packet:0059ae33a823",
+      "packetChunkId": "5f4a0ce4-8ebe-47ed-9f10-7a5d80de07ed",
+      "packetQdrantPointId": "1366625578992350500",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-supersedes-packet-aware.mjs",
+      "packetKey": "packet:008175dc0b39",
+      "packetChunkId": "c465fb60-8fb9-427e-9cbd-1dc2f88ac1cd",
+      "packetQdrantPointId": "332491984264641300",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "packetKey": "packet:001007058f4a",
+      "packetChunkId": "ae8bb6bb-3672-45db-b5d0-c1126db656a4",
+      "packetQdrantPointId": "6886802543670290000",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+      "packetKey": "packet:006c4ab14b4a",
+      "packetChunkId": "ed20cac1-88b3-436d-97af-132b459d12e8",
+      "packetQdrantPointId": "5350667518456185000",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+      "packetKey": "packet:00ab7c9f16af",
+      "packetChunkId": "2cd7a3c1-7614-474a-a996-3a1a79039aca",
+      "packetQdrantPointId": "8065334503129356000",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+      "packetKey": "packet:0057df284547",
+      "packetChunkId": "e60c656c-dac2-42ba-b94a-b00e77f222e5",
+      "packetQdrantPointId": "8503832260879195000",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/opencode/fill_empty_summaries.mjs",
+      "packetKey": "packet:01c32b8afad8",
+      "packetChunkId": "93537f1c-ad1d-4254-81b8-f3b125768b23",
+      "packetQdrantPointId": "119473774627576430",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/packets/load-packets-neo4j.mjs",
+      "packetKey": "packet:012d4ec32f58",
+      "packetChunkId": "6f9a1b31-3431-458d-840b-84d02dab3f58",
+      "packetQdrantPointId": "6267769855152071000",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "scripts/packets/load-packets-postgres.mjs",
+      "packetKey": "packet:001f13a6f8f0",
+      "packetChunkId": "7ddff4a8-71af-4953-a39f-4d91d6df563c",
+      "packetQdrantPointId": "1397439098277513500",
+      "packetContentHash": null,
+      "qdrantFound": false,
+      "qdrantChunkId": null,
+      "qdrantSourceRef": null,
+      "qdrantContentHash": null
+    }
+  ],
+  "matchedSamples": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "packetKey": "packet:a781e46325f5",
+      "packetChunkId": "9e43718d-4481-461c-bcd9-258bbe923989",
+      "packetQdrantPointId": "13ed8b17-388b-4cfb-90b8-0f8873187022",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "9e43718d-4481-461c-bcd9-258bbe923989",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "packetKey": "packet:84875a36a737",
+      "packetChunkId": "91bedce1-b74c-4589-8877-9cc261867ebf",
+      "packetQdrantPointId": "05cd58d3-aa55-43fa-ab75-71b0c82fa91a",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "91bedce1-b74c-4589-8877-9cc261867ebf",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "packetKey": "packet:804cec79a65c",
+      "packetChunkId": "717c963d-f53f-4182-8dd2-14b12347e22a",
+      "packetQdrantPointId": "50651aa6-ad4a-4296-8ee8-a95b922fbe7c",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "717c963d-f53f-4182-8dd2-14b12347e22a",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts",
+      "packetKey": "packet:aee624cb70b6",
+      "packetChunkId": "c638796b-3351-47a3-a14f-2e7628a012e9",
+      "packetQdrantPointId": "04be4edd-28d4-41a7-bebe-1d6344a613ca",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "c638796b-3351-47a3-a14f-2e7628a012e9",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts",
+      "qdrantContentHash": "63f0e638e221cd33"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
+      "packetKey": "packet:40a77f5816d3",
+      "packetChunkId": "5ea64ee8-820c-4c53-9c15-95957dc7b66b",
+      "packetQdrantPointId": "011e26f2-64f6-456d-b776-b51366ddc19b",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "5ea64ee8-820c-4c53-9c15-95957dc7b66b",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
+      "qdrantContentHash": "9feca655c7d07559"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/GRPOPolicy.ts",
+      "packetKey": "packet:ab64cc07fded",
+      "packetChunkId": "e057749f-c862-4789-b096-e08d6419ef0e",
+      "packetQdrantPointId": "109d6772-4730-4df2-8845-2c060c89438c",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "e057749f-c862-4789-b096-e08d6419ef0e",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/GRPOPolicy.ts",
+      "qdrantContentHash": "ae4b83c1237bde15"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/index.ts",
+      "packetKey": "packet:18eee38b5522",
+      "packetChunkId": "c7380a82-dda5-443f-8307-28f9e8e03f5f",
+      "packetQdrantPointId": "45b19dec-bfca-4249-ad3a-5de3b009f4f7",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "c7380a82-dda5-443f-8307-28f9e8e03f5f",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/index.ts",
+      "qdrantContentHash": "c3009037a0dc43cd"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/JSONLStorage.ts",
+      "packetKey": "packet:51c9a2f20895",
+      "packetChunkId": "eedea41e-f206-4ac1-b561-1e8aa11327e4",
+      "packetQdrantPointId": "11af9e68-fa72-438c-b3c0-e5e2e66e8ef5",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "eedea41e-f206-4ac1-b561-1e8aa11327e4",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/JSONLStorage.ts",
+      "qdrantContentHash": null
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
+      "packetKey": "packet:1b7ba3c5d8aa",
+      "packetChunkId": "5085bf38-b729-49a7-bbc8-a00e3b67abac",
+      "packetQdrantPointId": "00537352-b039-45bf-9009-b44d4ccf337d",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "5085bf38-b729-49a7-bbc8-a00e3b67abac",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
+      "qdrantContentHash": "20b8dbbb9181466f"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/LearningPipeline.ts",
+      "packetKey": "packet:ea0c45132fae",
+      "packetChunkId": "130dd5a2-5655-4f43-9a34-6c68812b1e60",
+      "packetQdrantPointId": "05e6cf4c-d729-417a-ac10-5a731fba5196",
+      "packetContentHash": null,
+      "qdrantFound": true,
+      "qdrantChunkId": "130dd5a2-5655-4f43-9a34-6c68812b1e60",
+      "qdrantSourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/LearningPipeline.ts",
+      "qdrantContentHash": "3cf693f8b121261a"
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "canonicalAuthority": false,
+  "status": "PACKET_QDRANT_BRIDGE_MISSING",
+  "nextGate": "PACKET_CHUNK_IDENTITY_BRIDGE"
+}

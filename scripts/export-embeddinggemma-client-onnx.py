@@ -19,7 +19,8 @@ import shutil
 def export_embedding_gemma_to_onnx(
     model_path: str = "models/embeddinggemma_300m",
     output_dir: str = "models/embeddinggemma_300m_onnx",
-    quantize: bool = True,
+    quantize: bool = False,
+    max_sequence_length: int = 2048,
     opset_version: int = 17
 ):
     """
@@ -28,7 +29,9 @@ def export_embedding_gemma_to_onnx(
     Args:
         model_path: Path to the HuggingFace model directory
         output_dir: Directory to save ONNX model and tokenizer files
-        quantize: Whether to apply dynamic quantization
+        quantize: Whether to apply dynamic quantization. Disabled by default
+            because the canonical export proof starts with FP32.
+        max_sequence_length: Maximum exported/tokenized sequence length.
         opset_version: ONNX opset version
     """
 
@@ -49,7 +52,7 @@ def export_embedding_gemma_to_onnx(
         return_tensors="pt",
         padding=True,
         truncation=True,
-        max_length=512
+        max_length=max_sequence_length
     )
 
     # For embedding models, disable cache and past_key_values
@@ -130,7 +133,7 @@ def export_embedding_gemma_to_onnx(
         "model_type": "embedding",
         "model_name": "EmbeddingGemma",
         "model_size": "300m",
-        "max_sequence_length": 512,
+        "max_sequence_length": max_sequence_length,
         "embedding_dimension": 768,
         "tokenizer_type": "Gemma3Tokenizer",
         "onnx_model": "model.onnx",
@@ -149,24 +152,25 @@ def export_embedding_gemma_to_onnx(
 
     # Test the exported model
     print("Testing exported ONNX model...")
-    test_onnx_model(output_dir / "model.onnx", tokenizer)
+    test_onnx_model(output_dir / "model.onnx", tokenizer, max_sequence_length)
 
     return output_dir
 
-def test_onnx_model(onnx_path: Path, tokenizer):
+def test_onnx_model(onnx_path: Path, tokenizer, max_sequence_length: int):
     """Test the exported ONNX model with a sample input."""
     try:
         # Create ONNX Runtime session
         session = ort.InferenceSession(str(onnx_path))
 
         # Prepare test input
-        test_text = "Legal contract analysis test document."
+        # Exercise the declared export boundary, not only a short happy-path input.
+        test_text = "Legal contract analysis test document. " * max_sequence_length
         inputs = tokenizer(
             test_text,
             return_tensors="np",
-            padding=True,
+            padding="max_length",
             truncation=True,
-            max_length=512
+            max_length=max_sequence_length
         )
 
         # Convert to the expected format
@@ -174,6 +178,12 @@ def test_onnx_model(onnx_path: Path, tokenizer):
             'input_ids': inputs['input_ids'].astype(np.int64),
             'attention_mask': inputs['attention_mask'].astype(np.int64)
         }
+
+        if ort_inputs['input_ids'].shape != (1, max_sequence_length):
+            raise ValueError(
+                f"Export boundary test produced {ort_inputs['input_ids'].shape}; "
+                f"expected (1, {max_sequence_length})"
+            )
 
         # Run inference
         outputs = session.run(None, ort_inputs)
@@ -189,6 +199,8 @@ def test_onnx_model(onnx_path: Path, tokenizer):
         masked_embeddings = embeddings * attention_mask[:, :, np.newaxis]
         sentence_embedding = masked_embeddings.sum(axis=1) / attention_mask.sum(axis=1, keepdims=True)
         print(f"Sentence embedding shape: {sentence_embedding.shape}")
+        if embeddings.shape[0] != 1 or embeddings.shape[1] != max_sequence_length or embeddings.shape[2] != 768:
+            raise ValueError(f"Unexpected output shape at export boundary: {embeddings.shape}")
 
     except Exception as e:
         print(f"ONNX model test failed: {e}")
@@ -202,8 +214,10 @@ def main():
                        help="Path to EmbeddingGemma model")
     parser.add_argument("--output-dir", default="models/embeddinggemma_300m_onnx",
                        help="Output directory for ONNX model")
-    parser.add_argument("--no-quantize", action="store_true",
-                       help="Skip quantization")
+    parser.add_argument("--quantize", action="store_true",
+                       help="Apply optional dynamic QInt8 quantization")
+    parser.add_argument("--max-sequence-length", type=int, default=2048,
+                       help="Maximum exported sequence length (default: 2048)")
     parser.add_argument("--opset-version", type=int, default=17,
                        help="ONNX opset version")
 
@@ -212,7 +226,8 @@ def main():
     export_embedding_gemma_to_onnx(
         model_path=args.model_path,
         output_dir=args.output_dir,
-        quantize=not args.no_quantize,
+        quantize=args.quantize,
+        max_sequence_length=args.max_sequence_length,
         opset_version=args.opset_version
     )
 

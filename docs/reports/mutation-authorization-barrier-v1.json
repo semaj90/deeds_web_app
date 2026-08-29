@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.mutation-authorization-barrier-proof.v1",
+  "mode": "READ_ONLY_MUTATION_AUTHORIZATION_PROBE",
+  "status": "MUTATION_AUTHORIZATION_BARRIER_PROVEN",
+  "rejection": {
+    "status": "REJECTED",
+    "unauthorizedMutations": [
+      "mutate:WRITE"
+    ],
+    "missingValidators": [
+      "mutate:post-patch-check"
+    ]
+  },
+  "controls": {
+    "synthesisCanAuthorizeWrite": false,
+    "writeDagAccepted": false,
+    "applyAttempted": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

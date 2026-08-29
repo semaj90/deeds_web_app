@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.ornith-grounded-claim-validation.v1",
+  "mode": "READ_ONLY_GROUNDED_CLAIM_VALIDATION",
+  "status": "ORNITH_GROUNDED_CLAIM_VALIDATION_PROVEN",
+  "claim": {
+    "schema": "atlas.claim.v1",
+    "claim_id": "claim:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "claim_revision": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "claim_type": "SEMANTICALLY_RELEVANT",
+    "subject_canonical_ids": [
+      "candidate:1",
+      "candidate:2",
+      "candidate:7",
+      "candidate:8",
+      "candidate:10",
+      "candidate:12",
+      "candidate:14"
+    ],
+    "evidence_refs": [
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:1",
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:2"
+    ],
+    "producer_revision": "ornith-external-evidence-synthesis-replay-v1",
+    "canonical_authority": false
+  },
+  "receipt": {
+    "schema": "atlas.claim-verification-receipt.v1",
+    "receipt_id": "receipt:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "claim_id": "claim:sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "claim_revision": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+    "policy_revision": "claim-policy:semantic-relevance-v1",
+    "evidence_refs": [
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:1",
+      "graph:sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab:2"
+    ],
+    "evidence_checksums": [
+      "8b8e75f8fc9a6cf26a848e4dfc08a058a59b7f602ad3c93f6f7ac00d4fa2bebd",
+      "b5b271ce141e6eaac440136a0a97bd4e18eb636cc2c8170231da0b6f991e22db"
+    ],
+    "verdict": "VERIFIED",
+    "satisfied_required_kinds": [],
+    "missing_required_kinds": [],
+    "deterministic_rule_proof_ref": null,
+    "codeql_path_evidence_ref": null,
+    "canonical_authority": false,
+    "producer_revision": "claim-verification-v1"
+  },
+  "evidenceCount": 2,
+  "contextManifestChecksum": "sha256:fb27228eb93dec30af148dba13b0546ed944b7f9dc2fb2edecf225462934cbbb",
+  "controls": {
+    "canonicalAuthority": false,
+    "mutationAllowed": false,
+    "postgresWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false
+  }
+}

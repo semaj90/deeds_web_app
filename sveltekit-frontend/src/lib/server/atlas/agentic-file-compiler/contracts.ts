@@ -4,6 +4,7 @@ import { z } from 'zod';
 export const ATLAS_WORKFLOW_SCHEMA = 'atlas.workflow-spec.v1' as const;
 export const ATLAS_WORKFLOW_ACTION_SCHEMA = 'atlas.workflow-action.v1' as const;
 export const ATLAS_FILE_MUTATION_PLAN_SCHEMA = 'atlas.file-mutation-plan.v1' as const;
+export const ATLAS_MUTATION_APPROVAL_RECEIPT_SCHEMA = 'atlas.mutation-approval-receipt.v1' as const;
 export const ATLAS_MASTRA_GRAPH_SCHEMA = 'atlas.mastra-workflow-graph.v1' as const;
 
 export function stableJson(value: unknown): string {
@@ -19,6 +20,21 @@ export function stableJson(value: unknown): string {
 export function sha256Stable(value: unknown): string {
 	return createHash('sha256').update(stableJson(value)).digest('hex');
 }
+
+export const MutationApprovalReceiptSchema = z.object({
+	schema: z.literal(ATLAS_MUTATION_APPROVAL_RECEIPT_SCHEMA),
+	approvalId: z.string().min(1),
+	runId: z.string().min(1),
+	approvedPlanDigest: z.string().length(64),
+	authorizationPolicyRevision: z.string().min(1),
+	approvedByUserId: z.number().int().positive(),
+	decision: z.literal('approved'),
+	approvedAt: z.string().datetime(),
+	expiresAt: z.string().datetime().nullable().optional(),
+	revokedAt: z.string().datetime().nullable().optional(),
+	receiptChecksum: z.string().length(64),
+}).strict();
+export type MutationApprovalReceiptV1 = z.infer<typeof MutationApprovalReceiptSchema>;
 
 export const DagNodeKindSchema = z.enum([
 	'CLASSIFY', 'RETRIEVE', 'RANK', 'EXACT_PROMOTE', 'COMPILE_CONTEXT', 'PREFILL',
@@ -155,9 +171,14 @@ export const FileMutationPlanSchema = z.object({
 	forbiddenRoots: z.array(z.string().min(1)).default([]),
 	contentRef: z.string().min(1).nullable().optional(),
 	validationNodeIds: z.array(z.string().min(1)).min(1),
+	approvalReceipt: MutationApprovalReceiptSchema,
 	planChecksum: z.string().min(1),
 }).strict();
 export type FileMutationPlanV1 = z.infer<typeof FileMutationPlanSchema>;
+
+export function mutationPlanIntentDigest(plan: Omit<FileMutationPlanV1, 'planChecksum' | 'approvalReceipt'>): string {
+	return sha256Stable(plan);
+}
 
 export function withChecksum<T extends Record<string, unknown>>(value: T, field: string = 'checksum'): T & Record<string, string> {
 	const clone: Record<string, unknown> = { ...value };

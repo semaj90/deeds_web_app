@@ -3201,6 +3201,29 @@ automatic model replacement.
 - [ ] NE-42 Add a final GAN status receipt distinguishing `CREATED`, `WIRED`,
   `PROVEN`, and `DONE`, with replay, cache, provenance, identity, and
   no-silent-fallback checks.
+
+## QUATERION-ISOQUANT-BOUNDARY (2026-08-29)
+
+- [x] Classified Quaterion as an optional similarity/metric-learning
+  reference: frozen EmbeddingGemma encoder plus a trainable ranking head.
+- [x] Classified IsoQuant as a separate tensor/KV-cache compression research
+  lane; it does not define embedding identity, ranking labels, or canonical
+  storage.
+- [x] Preserved `semantic_768` as the frozen canonical representation and
+  `CandidateFeatureMatrix` as the bounded feature input to any learned head.
+- [x] Kept both lanes non-canonical, offline-first, receipt-bound, and
+  evaluation-gated before Qdrant or PostgreSQL adoption.
+- [ ] Do not install Quaterion or IsoQuant implicitly. Any future experiment
+  must record an exact package/artifact revision, checksum, runtime, dataset,
+  and replay/quality receipt.
+- [x] Audited the active Python environment and production manifests: neither
+  Quaterion nor IsoQuant is installed or required; PyTorch presence alone does
+  not establish either dependency. Receipt:
+  `docs/reports/quaterion-isoquant-dependency-audit-v1.json`.
+- [x] Audited existing training artifacts: the reranker compiler has zero pairs
+  after filtering, and the 113-row training dry run has no held-out split or
+  explicit similarity-learning hard-negative contract. Receipt:
+  `docs/reports/quaterion-similarity-dataset-readiness-audit-v1.json`.
 - [x] NE-43 Complete the file-level wiring inventory above with exact command,
   report path, and owner revision for every lane before adding a new adapter.
 - [x] NE-44 Reuse the existing tournament/replay/QLoRA/GGUF owners identified
@@ -11529,3 +11552,203 @@ Status: `GPU_FEATURE_CONTEXT_MANIFEST_REPLAY_PROVEN_ORNITH_GATE_OPEN`.
 
 - [ ] Run the bounded Ornith synthesis/replay gate using only this compiled
   ContextManifest; do not pass raw GPU, graph, or retrieval results directly.
+
+## ORNITH-EXTERNAL-EVIDENCE-SYNTHESIS-REPLAY (2026-08-29)
+
+- [x] Added a bounded read-only synthesis proof consuming only the compiled
+  `atlas.fanout-context-compiler.v1` ContextManifest output.
+- [x] Disabled reasoning-channel ambiguity with `enable_thinking: false` and
+  bounded the response to a short JSON summary plus at most two evidence IDs.
+- [x] Validated every returned evidence reference against the compiled
+  ContextManifest; raw retrieval/GPU results were not injected.
+- [x] Ran the same request twice against Ornith `ornith-1.5-9b` with fixed
+  seed/temperature; both responses were schema-valid, grounded, and identical.
+- [x] Response checksum:
+  `sha256:d3634040386642dc9266982f11fbbbabe2e080b8849a1d7e69797081d582629b`.
+- [x] Preserved read-only controls: no PostgreSQL, Qdrant, Valkey, Neo4j, or
+  canonical writes; synthesis remains non-authoritative.
+
+Status: `ORNITH_EXTERNAL_EVIDENCE_SYNTHESIS_REPLAY_PROVEN_VALIDATOR_GATE_OPEN`.
+
+- [ ] Validate the synthesized JSON against the existing grounded-claim/
+  execution validator before exposing it to any agent or repair DAG.
+
+## ORNITH-GROUNDED-CLAIM-VALIDATION (2026-08-29)
+
+- [x] Persisted only the bounded, schema-validated Ornith response; no hidden
+  reasoning content or raw retrieval payload was persisted.
+- [x] Validated the response evidence references against the compiled
+  ContextManifest before claim construction.
+- [x] Passed the response through the existing `ClaimVerification` policy for
+  `SEMANTICALLY_RELEVANT` evidence.
+- [x] Verification receipt returned `VERIFIED` with `2` grounded graph-measurement
+  evidence observations.
+- [x] Preserved `canonical_authority: false` and all mutation controls false.
+
+Status: `ORNITH_GROUNDED_CLAIM_VALIDATION_PROVEN_AGENT_DAG_GATE_OPEN`.
+
+- [ ] Run the bounded kernel/DAG validator with this claim receipt as evidence;
+  no repair, patch, or durable mutation may be scheduled from synthesis alone.
+
+## ORNITH-AGENT-DAG-READONLY-GATE (2026-08-29)
+
+- [x] Validated the verified claim receipt and ContextManifest checksum as DAG
+  evidence using the existing kernel DAG validator.
+- [x] Accepted a two-node bounded DAG containing only context consumption and
+  grounded-claim verification; both functions are explicitly `READ`.
+- [x] CandidateOrdinal identity and graph revision bindings passed; resource
+  budget was exactly two nodes/two cost units.
+- [x] Confirmed zero mutation nodes and did not create an executable repair DAG.
+- [x] No PostgreSQL, Qdrant, Valkey, Neo4j, source, or projection writes.
+
+Status: `ORNITH_AGENT_DAG_READONLY_GATE_PROVEN_MUTATION_AUTHORIZATION_OPEN`.
+
+- [ ] Keep mutation authorization, patch planning, and repair execution behind
+  a separate explicit approval plus validation barrier.
+
+## MUTATION-AUTHORIZATION-BARRIER (2026-08-29)
+
+- [x] Proved that a synthesis-derived WRITE function is rejected under the
+  read-only policy.
+- [x] Rejection reported both unauthorized mutation and missing validator
+  evidence; no write was attempted.
+- [x] Confirmed the current agent path cannot create an accepted write DAG from
+  the verified claim/ContextManifest alone.
+
+Status: `MUTATION_AUTHORIZATION_BARRIER_PROVEN_EXPLICIT_APPROVAL_REQUIRED`.
+
+- [ ] Keep any future patch plan behind explicit user authorization, required
+  validation nodes, and the existing file mutation preflight.
+
+## DAG-ADMIT-01: grounded typed DAG admission (2026-08-29)
+
+- [x] Added a thin adapter from the verified claim, synthesis replay, and
+  ContextManifest receipts into the existing `KernelDagCandidateV1` validator.
+- [x] Validation-only admission passed with receipt, evidence, lineage,
+  structure, permission, runtime, and budget checks.
+- [x] Fail-closed cases passed for context checksum mismatch, stale ordinal map,
+  unknown tool, unauthorized mutation, and unavailable runtime capability.
+- [x] The admitted candidate remains non-authoritative and non-executable;
+  execution was not performed and no writes occurred.
+
+Status: `GROUNDED_TYPED_DAG_ADMISSION_PROVEN_EXECUTION_GATE_OPEN`.
+
+- [ ] Run one harmless read-only DAG execution and produce an independent
+  `ExecutionReceiptV1`; keep mutation execution blocked.
+
+## DAG-EXEC-01: bounded read-only execution (2026-08-29)
+
+- [x] Executed the two admitted read-only operations: ContextManifest
+  consumption and grounded-claim verification.
+- [x] Planned and executed function IDs, argument checksums, evidence refs, and
+  revision bindings matched exactly.
+- [x] Produced an independent `atlas.execution-receipt.v1` with two completed
+  nodes, zero unexpected tools, and zero unexpected writes.
+- [x] Kept mutation, source, PostgreSQL, Qdrant, Valkey, and Neo4j writes false.
+
+Status: `DAG_EXECUTION_READONLY_PROVEN_MUTATION_GATE_REMAINS_BLOCKED`.
+
+- [ ] Do not introduce a mutation canary without explicit authorization,
+  promotion evidence, transaction/readback/rollback design, and post-mutation
+  validators.
+
+## GPU-ACE-ORNITH-READINESS-AUDIT (2026-08-29)
+
+- [x] Aggregated the tile, GPU ordinal, feature-matrix, ACE, ContextManifest,
+  Ornith, claim, DAG, and mutation-barrier receipts.
+- [x] All eight read-only gates are green and cross-checked from their saved
+  reports.
+- [x] Confirmed the chain remains non-promotional and write-free.
+- [x] Recorded remaining work separately: explicit mutation authorization,
+  patch execution, post-patch validation, and full-corpus lineage expansion.
+
+Status: `GPU_ACE_ORNITH_READONLY_CHAIN_PROVEN_PROMOTION_OPEN`.
+
+## MUTATION-AUTHORIZATION-SURFACE-AUDIT (2026-08-29)
+
+- [x] Confirmed `atlas.patch.apply` is not routing-eligible and requires
+  `code:write`, human approval, an approved proposal, a valid approval token,
+  and a matching base revision.
+- [x] Added a required `atlas.mutation-approval-receipt.v1` to
+  `atlas.file-mutation-plan.v1`; the receipt binds to the mutation intent and
+  the full plan checksum includes the receipt.
+- [x] Added a read-only approval resolver that checks approval ID, run ID,
+  plan digest, policy revision, operator identity, decision, expiry, and
+  revocation from a supplied approval record.
+- [x] Confirmed focused authorization, routing, and mutation-preflight tests
+  pass: 15/15; no mutation was attempted.
+- [x] Recorded the gap in
+  `docs/reports/mutation-authorization-surface-audit-v1.json`.
+
+Status: `MUTATION_APPROVAL_RESOLVER_PROVEN_READONLY_CHAIN_UNCHANGED`.
+
+- [ ] Connect the resolver to read-only PostgreSQL approval readback and prove
+  issuer, expiry/revocation policy, and operator authorization independently
+  before any mutation plan can execute.
+- [ ] Do not add or apply a migration from this audit alone: the existing
+  `workflow_approvals` write path currently records run/approval IDs, decision,
+  approver, and timestamp, but does not yet expose plan digest, policy
+  revision, expiry, or revocation fields for the resolver to verify.
+- [x] Prepared the non-writing bridge plan in
+  `docs/reports/mutation-approval-postgres-bridge-plan-v1.json`.
+- [ ] Obtain explicit operator approval for the additive `workflow_approvals`
+  schema change before creating or applying a migration.
+
+## FULL-CORPUS-LINEAGE-RECHECK (2026-08-29)
+
+- [x] Re-ran the Graphify workspace-owner, lineage-cohort, and packet-lineage
+  audits without writes.
+- [x] Confirmed `graphify_runs=5`, `graphify_files=885`, and
+  `workspaces=0`; the workspace/run owner remains unresolved.
+- [x] Confirmed `61,660` packet rows, `778` exact Graphify source bindings,
+  `43` exact packet/chunk joins, `465` ambiguous packet/chunk joins,
+  `60,881` missing Graphify source bindings, and `0` graph revisions.
+- [x] Confirmed the bounded `15` source/chunk-qualified cohort remains the
+  only qualified execution cohort; fully qualified expansion remains `0`.
+- [x] Confirmed source content and Graphify source-revision integrity pass,
+  but `cleanForBackfill=false` because canonical packet source binding and
+  graph-revision ownership remain incomplete.
+
+Status: `FULL_CORPUS_LINEAGE_BLOCKED_NO_EXPANSION_AUTHORIZED`.
+
+- [ ] Establish the authoritative workspace/run and graph-revision owners,
+  then re-audit before expanding CandidateOrdinal coverage from 15 to 128.
+
+## FULL-CORPUS-GRAPH-REVISION-OWNER-AUDIT (2026-08-29)
+
+- [x] Ran the read-only Graphify workspace-owner audit before any 128/768
+  expansion.
+- [x] Confirmed `graphify_runs=5` and `graphify_files=885` are present.
+- [x] Confirmed the owner relation is not currently qualified:
+  `workspaces=0`, candidate owner `public.workspaces.id`, and
+  `graphifyRunWorkspaceForeignKey=false`.
+- [x] Kept full-corpus expansion blocked; no synthetic workspace or graph
+  revision was created.
+
+Status: `FULL_CORPUS_GRAPH_REVISION_OWNER_BLOCKED_OWNER_CONTRACT_GAP`.
+
+- [ ] Establish an operator-approved non-production workspace/run owner, or
+  explicitly document the authoritative existing owner, before expanding the
+  CandidateOrdinal cohort beyond the proven 15 rows.
+
+### Owner-gate refresh (2026-08-29)
+
+- [x] Re-ran the lineage-qualified cohort audit after the GPU/ACE/Ornith
+  read-only chain completed.
+- [x] Current counts remain: `61,660` packets, `778` exact Graphify sources,
+  `43` exact packet/chunk joins, `15` source/chunk-qualified candidates, and
+  `0` fully qualified candidates.
+- [x] `graph_revision_present=0`; promotion remains `COHORT_BLOCKED` with
+  `GRAPH_OR_SEMANTIC_REVISION_OWNER_REQUIRED`.
+- [x] Confirmed the completed 15-row semantic/ACE chain is independent of this
+  full-corpus owner gap.
+
+### Lineage census refresh (2026-08-29)
+
+- [x] Re-ran the read-only packet/source lineage census.
+- [x] Confirmed exact source binding for `778` packets and missing Graphify
+  source binding for `60,881` packets.
+- [x] Source content integrity and source-revision binding are proven for the
+  available `885` Graphify files, but the corpus is not clean for backfill.
+- [x] Kept semantic backfill and CandidateOrdinal expansion blocked; no aliases,
+  fuzzy joins, synthetic revisions, or projection writes were used.

@@ -52,7 +52,7 @@ async function embedWebGpu(session, tokenizer, text) {
   const encoded = await tokenizer(text, { return_tensors: 'np', truncation: true, max_length: 2048 });
   const ids = Array.from(encoded.input_ids.data, Number);
   const mask = Array.from(encoded.attention_mask.data, Number);
-  if (ids.length > 512) throw new Error(`WEBGPU_LOCAL_EXPORT_CONTEXT_LIMIT_512:${ids.length}`);
+  if (ids.length > 2048) throw new Error(`WEBGPU_MODEL_CONTEXT_LIMIT_2048:${ids.length}`);
   const result = await session.run({
     input_ids: new ort.Tensor('int64', BigInt64Array.from(ids, BigInt), [1, ids.length]),
     attention_mask: new ort.Tensor('int64', BigInt64Array.from(mask, BigInt), [1, mask.length]),

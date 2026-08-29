@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.current-source-registry-reconciliation-apply.v1",
+  "generatedAt": "2026-08-29T08:13:22.879Z",
+  "authorization": "AUTHORIZE NON-PRODUCTION SOURCE REGISTRY INSERT FOR 111 CURRENT GRAPHIFY SOURCES",
+  "sourcePlan": "docs/reports/current-source-registry-reconciliation-plan-v1.json",
+  "planSelectionChecksum": "43a4cdc047c3d0e04aa441beafe41837254cc64f5d4c644acf06f31c269211a7",
+  "applyChecksum": "43a4cdc047c3d0e04aa441beafe41837254cc64f5d4c644acf06f31c269211a7",
+  "selectedSourceCount": 111,
+  "insertedCount": 111,
+  "readbackCount": 111,
+  "committed": true,
+  "workspaceBindingsWritten": false,
+  "graphifyRowsWritten": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "status": "SOURCE_REGISTRY_INSERT_AND_READBACK_PROVEN",
+  "nextGate": "RERUN_SOURCE_REGISTRY_AUDIT_THEN_APPLY_WORKSPACE_BINDING_CANARY_ONLY_AFTER_EXPLICIT_APPROVAL"
+}

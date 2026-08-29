@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.quaterion-isoquant-dependency-audit.v1",
+  "auditDate": "2026-08-29",
+  "status": "OPTIONAL_DEPENDENCIES_ABSENT",
+  "pythonEnvironment": {
+    "quaterionInstalled": false,
+    "isoquantInstalled": false,
+    "torchInstalled": true
+  },
+  "productionManifests": {
+    "quaterionReference": false,
+    "isoquantReference": false
+  },
+  "ownership": {
+    "semantic_768": "canonical EmbeddingGemma representation",
+    "quaterion": "optional similarity-learning head",
+    "isoquant": "optional tensor/KV-cache compression experiment"
+  },
+  "writesPerformed": false,
+  "canonicalPromotion": false,
+  "nextGate": "HELD_OUT_DATASET_AND_EXACT_ARTIFACT_BEFORE_OPTIONAL_INSTALL"
+}

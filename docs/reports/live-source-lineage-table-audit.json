@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-27T15:19:38.011Z",
+  "generatedAt": "2026-08-29T08:02:39.116Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -1414,11 +1414,11 @@
       "columns": [
         "content_hash"
       ],
-      "row_count": 22487,
+      "row_count": 22493,
       "source_ref_count": 0,
       "source_revision_count": 0,
       "workspace_revision_count": 0,
-      "content_hash_count": 22487,
+      "content_hash_count": 22493,
       "content_digest_count": 0,
       "source_content_count": 0,
       "content_count": 0
@@ -1519,11 +1519,11 @@
         "source_revision",
         "workspace_revision"
       ],
-      "row_count": 0,
-      "source_ref_count": 0,
-      "source_revision_count": 0,
-      "workspace_revision_count": 0,
-      "content_hash_count": 0,
+      "row_count": 885,
+      "source_ref_count": 885,
+      "source_revision_count": 885,
+      "workspace_revision_count": 373,
+      "content_hash_count": 885,
       "content_digest_count": 0,
       "source_content_count": 0,
       "content_count": 0
@@ -1538,8 +1538,8 @@
       "workspace_revision"
     ],
     "missingColumns": [],
-    "rowCount": 0,
-    "status": "SCHEMA_READY_EMPTY"
+    "rowCount": 885,
+    "status": "SCHEMA_READY"
   },
   "diagnostics": [],
   "databaseConnection": {
@@ -1553,7 +1553,7 @@
       "configuredSearchPath": "\"$user\", public",
       "effectiveSearchPath": "{pg_catalog,public}",
       "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-      "serverAddress": "172.18.0.23/32",
+      "serverAddress": "172.18.0.22/32",
       "serverPort": 5432,
       "relations": [
         {
@@ -1627,7 +1627,7 @@
           "selectable": true
         }
       ],
-      "fingerprintSha256": "8537a000a167fd8c329d74db0eef8c7e9b8d4f08e64c8f389d0bd23003417d58"
+      "fingerprintSha256": "69b18cf29f53f50f14e60cf8e3a861bfa91565ffe2401f1d12f98699a2dddf2a"
     },
     "status": "READBACK_PROVEN"
   }
