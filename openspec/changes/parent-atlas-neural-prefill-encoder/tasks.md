@@ -11952,3 +11952,41 @@ truncation) vs. this learned `latent_128` vs. this learned `latent_64` recall co
 operator explicitly requested ("Measure it") — this full-scale receipt provides the `latent_128`/
 `latent_64` half of that comparison; `semantic_mrl_128` recall still needs to be measured
 separately and is not yet built.
+
+### Recall comparison built and run (2026-08-29): `semantic_mrl_256` beats the trained `latent_128`
+
+Built `python/compare_semantic_representation_recall.py`. Reproduces the exact source-grouped
+held-out split from the `LATENT_TRAIN_FULL_01` receipt above (same seed `684453` — confirmed:
+5,547 val rows / 726 val sources, identical to that receipt), so the numbers below are directly
+comparable to `LATENT_TRAIN_FULL_01`'s own `knn_recall_128`/`knn_recall_64`. No retraining or
+re-embedding — MRL truncations are prefix + L2-renormalize of the already-indexed/validated
+`semantic_768` source, per this file's own hard rule on how derived lanes may be produced.
+Receipt: `docs/reports/semantic-representation-recall-comparison-v1.json`.
+`canonical_authority: false` throughout — this is a benchmark, not a schema-promotion decision.
+
+`knn_recall@10` on the held-out set:
+
+| Representation | Dims | Kind | knn_recall@10 |
+|---|---|---|---|
+| `semantic_mrl_128` | 128 | native MRL, untrained | 0.7852 |
+| `latent_64` | 64 | learned autoencoder | 0.7904 |
+| `latent_128` | 128 | learned autoencoder | 0.8529 |
+| `semantic_mrl_256` | 256 | native MRL, untrained | **0.8575** |
+
+Two findings worth acting on:
+1. **`semantic_mrl_256` (0.8575) beats the trained `latent_128` (0.8529)** — a free prefix
+   truncation of EmbeddingGemma's own native MRL output outperforms the purpose-trained
+   autoencoder at a comparable dimension count, with zero training cost and zero checkpoint to
+   maintain. Per the earlier answer in this session on what a `semantic_mrl_256` field would
+   require: this now clears the "only build it if the benchmark proves it" bar this file already
+   sets. A new Postgres `semantic_mrl_256 vector(256)` column (or `halfvec(256)`) and a matching
+   Qdrant lane (new named vector or `codebase_chunks_256` collection, `projected_from_768d: true`
+   payload marker) are the concrete next step — not yet built.
+2. **`latent_64` (0.7904) beats `semantic_mrl_128` (0.7852)** despite half the dimensions — the
+   trained model is winning something real at the small end, just not at 256. This is a reason to
+   keep `latent_64` as a hot/small-footprint lane candidate even though `latent_128` loses to
+   `semantic_mrl_256` at the mid tier.
+
+Not yet done: actually adding the `semantic_mrl_256` Postgres column / Qdrant lane — this section
+only proves the benchmark justifies building it, per this file's standing rule against building
+derived lanes speculatively ahead of a benchmark.
