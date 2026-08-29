@@ -72,10 +72,17 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
   const workspaceUri = pathToFileURL(workspaceRoot).href;
 
   async function getServer(language) {
-    if (servers.has(language)) return servers.get(language);
     const config = SERVER_CONFIG[language];
     if (!config) throw new Error(`COMPILER_SEMANTIC_RESOLVER_UNSUPPORTED_LANGUAGE:${language}`);
     const command = resolve(serverBinaryRoot, config.commandRelative);
+    // Cache by resolved command path, not the requested `language` — 'typescript' and
+    // 'javascript' both map to the identical typescript-language-server binary/args (see
+    // SERVER_CONFIG above), so caching by language spawned two separate OS processes for what
+    // is functionally one server. Found live 2026-08-29: a resolver instance handling both
+    // .ts and .mjs files was observed spawning 2 typescript-language-server child processes
+    // where 1 would do — real, measurable memory waste, not theoretical (confirmed via
+    // `wmic process where "name='node.exe'"` during a live CSGR-2 full-corpus run).
+    if (servers.has(command)) return servers.get(command);
     if (!existsSync(command)) {
       throw new Error(`COMPILER_SEMANTIC_RESOLVER_BINARY_NOT_FOUND:${command} (serverBinaryRoot=${serverBinaryRoot}) — the LSP binary must actually exist at this path; a missing binary spawned via the Windows shell wrapper silently hangs to an initialize timeout instead of failing fast, which is exactly the failure mode this check exists to prevent.`);
     }
@@ -90,15 +97,18 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
       capabilities: { general: { positionEncodings: ['utf-16'] } },
       clientInfo: { name: clientName, version: clientVersion },
     }, 60000);
-    const entry = { lsp, config, initializeResult, openedUris: new Set() };
-    servers.set(language, entry);
+    const entry = { lsp, config, initializeResult, openedUris: new Set(), languagesServed: new Set() };
+    servers.set(command, entry);
     return entry;
   }
 
-  function ensureOpen(entry, { sourceAbsolutePath, sourceText }) {
+  // languageId is passed per-open (not baked into the cached server entry) because one shared
+  // typescript-language-server process now serves both 'typescript' and 'javascript' documents —
+  // each open must declare its own real languageId, not whichever config first spawned the server.
+  function ensureOpen(entry, { sourceAbsolutePath, sourceText, languageId }) {
     const uri = pathToFileURL(sourceAbsolutePath).href;
     if (!entry.openedUris.has(uri)) {
-      entry.lsp.didOpen({ uri, languageId: entry.config.languageId, text: sourceText });
+      entry.lsp.didOpen({ uri, languageId, text: sourceText });
       entry.openedUris.add(uri);
     }
     return uri;
@@ -174,7 +184,8 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
       negotiatedPositionEncoding: entry.initializeResult?.result?.capabilities?.positionEncoding ?? 'utf-16-default',
     };
 
-    const uri = ensureOpen(entry, { sourceAbsolutePath, sourceText: resolvedSourceText });
+    entry.languagesServed.add(language);
+    const uri = ensureOpen(entry, { sourceAbsolutePath, sourceText: resolvedSourceText, languageId: SERVER_CONFIG[language].languageId });
     let definitionResult;
     try {
       definitionResult = await entry.lsp.request('textDocument/definition', { textDocument: { uri }, position }, timeoutMs);
@@ -208,7 +219,14 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
     servers.clear();
   }
 
-  return { resolveDefinition, dispose, getOpenServerLanguages: () => [...servers.keys()] };
+  return {
+    resolveDefinition,
+    dispose,
+    // Distinct languages actually served across every spawned server process — NOT the same as
+    // "one entry per language" any more, since typescript/javascript now share one process. Kept
+    // as a diagnostic helper (zero callers currently) rather than removed outright.
+    getOpenServerLanguages: () => [...new Set(Array.from(servers.values()).flatMap((entry) => [...entry.languagesServed]))],
+  };
 }
 
 /**

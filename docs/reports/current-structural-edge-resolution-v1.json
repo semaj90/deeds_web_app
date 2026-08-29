@@ -1,7 +1,7 @@
 {
   "schema": "atlas.current-structural-edge-resolution.v1",
   "mode": "READ_ONLY_PLAN",
-  "generatedAt": "2026-08-29T20:20:24.644Z",
+  "generatedAt": "2026-08-29T21:26:14.427Z",
   "writes": {
     "postgres": false,
     "qdrant": false,
@@ -26,22 +26,285 @@
   },
   "unresolvedTarget": {
     "total": 9730,
-    "sampled": 60,
-    "sampleIsPartial": true,
-    "requestCount": 16,
-    "concurrency": 2,
-    "timeoutMs": 15000,
-    "durationMs": 658,
-    "avgMsPerRequest": 41,
+    "sampled": 9730,
+    "sampleIsPartial": false,
+    "requestCount": 7514,
+    "concurrency": 4,
+    "timeoutMs": 5000,
+    "durationMs": 17506,
+    "avgMsPerRequest": 2,
     "counts": {
-      "NODE_BUILTIN": 44,
-      "RESOLVED_IN_REPO": 16
+      "NODE_BUILTIN": 2216,
+      "RESOLVED_IN_REPO": 5334,
+      "TIMEOUT": 4,
+      "UNRESOLVED": 2176
     },
     "dimensions": {
-      "NODE_BUILTIN|javascript|REFERENCES": 40,
-      "RESOLVED_IN_REPO|javascript|CALLS": 16,
-      "NODE_BUILTIN|javascript|CALLS": 4
+      "NODE_BUILTIN|javascript|REFERENCES": 1321,
+      "NODE_BUILTIN|javascript|CALLS": 506,
+      "RESOLVED_IN_REPO|javascript|CALLS": 825,
+      "TIMEOUT|javascript|CALLS": 4,
+      "UNRESOLVED|javascript|CALLS": 124,
+      "UNRESOLVED|typescript|REFERENCES": 1191,
+      "RESOLVED_IN_REPO|typescript|REFERENCES": 2435,
+      "RESOLVED_IN_REPO|typescript|CALLS": 2025,
+      "UNRESOLVED|typescript|CALLS": 860,
+      "NODE_BUILTIN|typescript|REFERENCES": 295,
+      "RESOLVED_IN_REPO|javascript|REFERENCES": 49,
+      "UNRESOLVED|javascript|REFERENCES": 1,
+      "NODE_BUILTIN|typescript|CALLS": 94
     },
-    "diagnosticSamples": []
+    "diagnosticSamples": [
+      {
+        "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "e062b6006714f6ef198f324382cf4b2925d7e156",
+        "toEvidenceKey": "argv.includes",
+        "status": "TIMEOUT",
+        "targetCount": 0,
+        "error": "LSP_TIMEOUT:textDocument/definition"
+      },
+      {
+        "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "a432c3d1f597247c51b54376a5cdc7f3fde27a3c",
+        "toEvidenceKey": "argv.indexOf",
+        "status": "TIMEOUT",
+        "targetCount": 0,
+        "error": "LSP_TIMEOUT:textDocument/definition"
+      },
+      {
+        "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "42c8fd9db70b7d44abda05cf0717fed453bf73ec",
+        "toEvidenceKey": "argv.indexOf",
+        "status": "TIMEOUT",
+        "targetCount": 0,
+        "error": "LSP_TIMEOUT:textDocument/definition"
+      },
+      {
+        "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "478237de66d57f3bf8364f3c8d4183d73dc5c102",
+        "toEvidenceKey": "new Date",
+        "status": "TIMEOUT",
+        "targetCount": 0,
+        "error": "LSP_TIMEOUT:textDocument/definition"
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "path.join",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "fs.existsSync",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "fs.statSync",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "rl.on",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "line.trim",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "rows.push",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "JSON.parse",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "line.trim",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "rows.push",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "JSON.parse",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "sourceRef.startsWith",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "JSON.stringify",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "a.bucket.localeCompare",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "console.error",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "7d6a1da18df7376caba1edfc972e2255000deb78",
+        "toEvidenceKey": "process.exit",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "ae1dfcc1207db405ae1d03c63ab9900a0d093542",
+        "toEvidenceKey": "console.log",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "ae1dfcc1207db405ae1d03c63ab9900a0d093542",
+        "toEvidenceKey": "console.log",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "ae1dfcc1207db405ae1d03c63ab9900a0d093542",
+        "toEvidenceKey": "console.error",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+        "edgeType": "CALLS",
+        "language": "javascript",
+        "fromEvidenceKey": "ae1dfcc1207db405ae1d03c63ab9900a0d093542",
+        "toEvidenceKey": "console.log",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+        "edgeType": "REFERENCES",
+        "language": "typescript",
+        "fromEvidenceKey": "aa2c5b1e257e216b2125f64ca6d19542e7289995",
+        "toEvidenceKey": "SUBJECTS",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      },
+      {
+        "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+        "edgeType": "REFERENCES",
+        "language": "typescript",
+        "fromEvidenceKey": "aa2c5b1e257e216b2125f64ca6d19542e7289995",
+        "toEvidenceKey": "TraceCheckpointEvent",
+        "status": "UNRESOLVED",
+        "targetCount": 0,
+        "error": null
+      }
+    ]
   }
 }

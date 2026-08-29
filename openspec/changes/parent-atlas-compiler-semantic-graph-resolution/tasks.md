@@ -263,6 +263,88 @@ doesn't cover — not investigated further this pass, a real but small remaining
 (1,486), investigate `UNRESOLVED` (2,327), and the small residual 61 `UNKNOWN_SPECIFIER` (not
 pursued further — diminishing returns vs. the two larger open buckets).
 
+## CSGR-2, second resolver root — DONE (2026-08-29, same day) — plus an OOM detour and a concurrent-writer discovery
+
+Built the second LSP resolver root for `OUTSIDE_RESOLVER_WORKSPACE_ROOT` edges (`scripts/**`,
+root `src/lib/**` — confirmed live to cover all 1,486 edges in that bucket). Two real
+infrastructure bugs found and fixed before it worked, neither of which was a tsconfig/project
+problem in the way first assumed:
+
+1. **Binary path resolved from the wrong root.** `createCompilerSemanticResolver`'s
+   `getServer()` resolved `node_modules/.bin/typescript-language-server.cmd` relative to
+   `workspaceRoot` — fine when rooted at `sveltekit-frontend/` (which has its own
+   `node_modules`), but repo root has no `node_modules/.bin` of its own. Live-tested: pointing
+   `workspaceRoot` at repo root sent `initialize` to a nonexistent binary path; Windows'
+   `useShellWrapper` spawns a shell around the missing command instead of failing fast, so the
+   symptom was a 60s `LSP_TIMEOUT:initialize`, not a clear ENOENT. Fixed: added
+   `serverBinaryRoot` (defaults to `workspaceRoot`, decoupled) plus an `existsSync()` check that
+   fails loudly instead of silently hanging.
+2. **No project scope for `scripts/**`.** Root `tsconfig.json` extends
+   `sveltekit-frontend/tsconfig.json` without its own `include` — TS resolves an inherited
+   `include` relative to the file that *defines* it, so the effective included set was still only
+   `sveltekit-frontend/src/**/*`. Even after fixing (1), every resolution against a `scripts/atlas/*`
+   file came back `UNRESOLVED` because the file was loose/out-of-project with no `@types/node`.
+   Fixed: added `scripts/tsconfig.json` (new file, standalone, `allowJs`/`NodeNext`, no `$lib`
+   aliasing needed — checked live, 0 matches).
+3. **Server-instance dedup bug found while investigating a stalled full-corpus run**:
+   `SERVER_CONFIG['typescript']` and `SERVER_CONFIG['javascript']` point at the identical
+   `typescript-language-server` command/args, but `getServer()` cached by `language`, spawning
+   two OS processes for one functional server per resolver instance. Confirmed live via
+   `wmic process where "name='node.exe'"` during a hung run — 3 `typescript-language-server`
+   child processes where at most 2 were needed. Fixed: cache by resolved `command` path instead;
+   `languageId` now passed per-`didOpen()` call (from the caller's requested language) rather than
+   baked into the cached server entry, since one shared process now serves both languages.
+4. **OOM-hardening added alongside**: `spawnLspServer()` now injects
+   `NODE_OPTIONS=--max-old-space-size=2048` (overridable) for every spawned LSP server — added
+   after a live `Fatal process out of memory: Zone` crash during a full-corpus run. Separately,
+   `.vscode/settings.json` got `typescript.tsserver.maxTsServerMemory: 8192` — note this only caps
+   VS Code's *own* internal tsserver, not the CLI-spawned servers this resolver launches; both
+   fixes were needed, they cover different processes.
+
+**Concurrent-writer discovery mid-pass**: while (4) was being investigated, both this resolver
+file and the CSGR-2 planner script were found to have changed on disk in ways not made by this
+session (a `NODE_BUILTIN` classification path, `concurrency`/`dimensions`/`diagnosticSamples`
+report fields) — a separate in-workspace Codex agent session had been working the same problem
+concurrently and crashed mid-run (operator-confirmed; that crash's leftover ~3.9GB `node.exe`
+process, later identified as VS Code's own tsserver via `wmic`, was a contributing but distinct
+memory-pressure source from the actual OOM). Per explicit operator instruction, all work
+(this session's + Codex's) was committed and pushed together to `origin/main`
+(`50fe73f465`, `e8c187681e`) after a diff review found no secrets and no corrupted source files —
+Codex's ~130 files were not individually reviewed line-by-line.
+
+**Full-corpus result after all fixes** (`ATLAS_CSGR2_UNRESOLVED_TARGET_LIMIT=0`, completed cleanly
+this time — no OOM, no stall):
+
+| status | count |
+|---|---|
+| `RESOLVED_IN_REPO` | 5,334 |
+| `NODE_BUILTIN` (unresolved_target) | 2,216 |
+| `UNRESOLVED` | 2,176 |
+| `TIMEOUT` | 4 |
+| `RESOLVED_INTERNAL` (syntax_only) | 468 |
+| `NODE_BUILTIN` (syntax_only) | 106 |
+| `EXTERNAL_MODULE` | 81 |
+| `REPO_RESOLVABLE` | 75 |
+| `UNKNOWN_SPECIFIER` | 46 |
+
+**Terminal (RESOLVED_IN_REPO + both NODE_BUILTIN + RESOLVED_INTERNAL + EXTERNAL_MODULE):
+8,205/10,506 (78%)** — up from 6,632/10,506 (63%) at the start of this pass, driven almost
+entirely by the `OUTSIDE_RESOLVER_WORKSPACE_ROOT` bucket (previously 1,486 entirely unclassified)
+now resolving cleanly through the second resolver root. `NODE_BUILTIN` as a distinct terminal
+status (not present in this session's earlier runs) matches the frozen 9-value enum exactly —
+credit to the concurrent Codex work merged in.
+
+**Still open**: `UNKNOWN_SPECIFIER` (46, down from 658 originally — diminishing-returns territory,
+not pursued further), `TIMEOUT` (4, negligible), and the big one — **`UNRESOLVED` (2,176)** still
+needs the characterization task from the first CSGR-2 patch: are these real gaps, or a resolver
+nuance? This is now the single largest remaining not-yet-terminally-classified bucket and the
+clear next step toward `unclassifiedCount == 0`.
+
+**Not done this pass**: the terminology-alignment mapping from CSGR-2's actual output labels
+(`RESOLVED_IN_REPO`, `EXTERNAL_MODULE`, `REPO_RESOLVABLE`) onto the frozen 9-value enum
+(`RESOLVED_INTERNAL`/`RESOLVED_WORKSPACE_MODULE`/`EXTERNAL_PACKAGE`/etc.) recorded in the second
+patch above is still just a mapping table, not implemented as a projection layer in the script.
+
 **Replay-bound hardening (2026-08-29):** the read-only resolver plan now uses bounded worker
 concurrency (`ATLAS_CSGR2_CONCURRENCY`, default 4, maximum 8) and a bounded per-request timeout
 (`ATLAS_CSGR2_TIMEOUT_MS`, default 5,000ms). A 210-observation replay completed with 148
