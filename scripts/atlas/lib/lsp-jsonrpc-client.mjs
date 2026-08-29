@@ -20,10 +20,26 @@
 
 import { spawn } from 'node:child_process';
 
-export function spawnLspServer({ command, args = [], cwd, useShellWrapper = process.platform === 'win32' }) {
+// The `typescript-language-server`/`svelteserver` .cmd shims are themselves just `node <cli.js>`
+// — NODE_OPTIONS is read from the environment by that inner Node process regardless of how it was
+// launched (shell-wrapped or not), so this is the actual lever for capping their heap. Added
+// 2026-08-29 after a live OOM crash (`Fatal process out of memory: Zone`) from one of these
+// spawned servers — VS Code's own `typescript.tsserver.maxTsServerMemory` setting does NOT cover
+// this: it only caps VS Code's *internal* tsserver process, not a CLI-spawned
+// typescript-language-server binary like this one. 2048MB keeps two concurrent servers (the
+// frontend + repo-root resolver instances CSGR-2 now runs) comfortably under the ~10GB free
+// headroom measured live this session, alongside VS Code's own capped process.
+const DEFAULT_LSP_SERVER_MAX_OLD_SPACE_MB = 2048;
+
+export function spawnLspServer({ command, args = [], cwd, useShellWrapper = process.platform === 'win32', maxOldSpaceMb = DEFAULT_LSP_SERVER_MAX_OLD_SPACE_MB }) {
+  const env = { ...process.env };
+  if (maxOldSpaceMb) {
+    const extra = `--max-old-space-size=${maxOldSpaceMb}`;
+    env.NODE_OPTIONS = env.NODE_OPTIONS ? `${env.NODE_OPTIONS} ${extra}` : extra;
+  }
   const processHandle = useShellWrapper
-    ? spawn(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', [command, ...args].join(' ')], { cwd, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true })
-    : spawn(command, args, { cwd, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+    ? spawn(process.env.ComSpec ?? 'cmd.exe', ['/d', '/s', '/c', [command, ...args].join(' ')], { cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true })
+    : spawn(command, args, { cwd, env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
 
   let buffer = Buffer.alloc(0);
   let nextId = 1;
