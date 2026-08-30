@@ -27,12 +27,38 @@ function digest(value: unknown): string {
   return `sha256:${createHash('sha256').update(stable(value), 'utf8').digest('hex')}`;
 }
 
+function verifyProducerSetChecksum(producerSet: RepairFeatureProducerSetV1): void {
+  if (!/^sha256:[0-9a-f]{64}$/i.test(producerSet.producerSetChecksum)) {
+    throw new Error('REPAIR_BUNDLE_PRODUCER_SET_CHECKSUM_INVALID');
+  }
+  if (producerSet.producerCount !== producerSet.producers.length) {
+    throw new Error('REPAIR_BUNDLE_PRODUCER_SET_COUNT_MISMATCH');
+  }
+  const body = {
+    schema: producerSet.schema,
+    candidateSnapshotRevision: producerSet.candidateSnapshotRevision,
+    ordinalMapChecksum: producerSet.ordinalMapChecksum,
+    candidateRowCount: producerSet.candidateRowCount,
+    producerCount: producerSet.producerCount,
+    producers: producerSet.producers,
+    overlayRows: producerSet.overlayRows,
+    overlayFeatureStates: producerSet.overlayFeatureStates,
+    canonicalAuthority: false as const,
+    retrievalVote: false as const,
+    rankingPromotion: false as const,
+    mutationAuthority: false as const,
+  };
+  if (digest(body) !== producerSet.producerSetChecksum) {
+    throw new Error('REPAIR_BUNDLE_PRODUCER_SET_CHECKSUM_MISMATCH');
+  }
+}
+
 export function buildRepairCandidateFeatureBundleV1(input: {
   matrixInput: Omit<BuildRepairCandidateFeatureMatrixInputV1, 'overlayRows' | 'overlayFeatureStates'>;
   producerSet: RepairFeatureProducerSetV1;
 }): RepairCandidateFeatureBundleV1 {
   const { matrixInput, producerSet } = input;
-  if (!/^sha256:[0-9a-f]{64}$/i.test(producerSet.producerSetChecksum)) throw new Error('REPAIR_BUNDLE_PRODUCER_SET_CHECKSUM_INVALID');
+  verifyProducerSetChecksum(producerSet);
   if (producerSet.candidateSnapshotRevision !== matrixInput.candidateSnapshotRevision) throw new Error('REPAIR_BUNDLE_CANDIDATE_SNAPSHOT_MISMATCH');
   if (producerSet.ordinalMapChecksum !== matrixInput.ordinalMapChecksum) throw new Error('REPAIR_BUNDLE_ORDINAL_MAP_MISMATCH');
   if (producerSet.candidateRowCount !== matrixInput.identities.length) throw new Error('REPAIR_BUNDLE_ROW_COUNT_MISMATCH');
