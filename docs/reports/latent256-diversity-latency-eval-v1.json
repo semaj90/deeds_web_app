@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.latent256-diversity-latency-eval.v1",
+  "canonical_authority": false,
+  "note": "n=10 -- explicitly thin for a real p95 SLA measurement, this is a first-order sanity check on relative cost (pool fetch I/O vs in-process selection logic), not a load-test-grade latency benchmark.",
+  "pool_k": 50,
+  "final_k": 10,
+  "query_count": 10,
+  "summary_ms": {
+    "pool_fetch_ms": {
+      "min": 53.785800002515316,
+      "p50": 74.65815002797171,
+      "p95": 83.41827492695302,
+      "max": 83.46889994572848
+    },
+    "baseline_selection_ms": {
+      "min": 0.0018998980522155762,
+      "p50": 0.0025500194169580936,
+      "p95": 0.0029550225008279085,
+      "max": 0.00300002284348011
+    },
+    "exact_and_semantic_selection_ms": {
+      "min": 0.242499983869493,
+      "p50": 0.26269990485161543,
+      "p95": 0.30690499697811896,
+      "max": 0.319099985063076
+    },
+    "semantic_768_mmr_selection_ms": {
+      "min": 9.228800074197352,
+      "p50": 9.792099997866899,
+      "p95": 10.602335073053837,
+      "max": 10.784000041894615
+    }
+  },
+  "interpretation": "pool_fetch_ms (Ollama embed + pgvector ANN) is expected to dominate total latency; *_selection_ms values show the ADDITIONAL cost of each policy's own logic, added on top of the shared pool_fetch_ms for that query."
+}
