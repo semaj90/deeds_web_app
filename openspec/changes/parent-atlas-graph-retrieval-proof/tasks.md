@@ -1664,3 +1664,20 @@ general codebase corpus.
 **GPU/RAPIDS sidecar workstation status**: was 55% ("Dedicated 8098 sidecar is live-proven for
 exact cuVS `semantic_768` on a revision-qualified fixture... Same-corpus Qdrant oracle comparison"
 listed as the next step). That next step is now closed with real, reproducible evidence.
+
+## NEXT STEPS item 11 checked, found stale (2026-08-30)
+
+`sveltekit-frontend/src/lib/schemas/packet-canonical.ts` now declares
+`dimension: z.literal(768)` (line 65) and `dimension: 768` (line 262), not the `z.literal(384)`
+this item described when written (2026-08-10) — already corrected by intervening work (matches
+this repo's now-settled 768-canonical policy). Confirmed still zero importers
+(`grep -rln packet-canonical src/` returns nothing). The original risk (a future session mistaking
+a dead schema for live *and* getting the wrong dimension from it) is now half-resolved: it's still
+dead, but no longer wrong if someone does stumble on it. Rename/demotion still optional cleanup,
+not urgent. Item 10 (duplicate OpenSpec roots for this change slug, at both `openspec/changes/...`
+and `sveltekit-frontend/openspec/changes/...`) reconfirmed still real and still unresolved --
+genuinely a merge/rename/partition judgment call, not touched here.
+
+Items 1-9 and 12+ in the NEXT STEPS list above all gate on operator design decisions (identity
+disambiguator shape, overwrite trust policy vocabulary, which lane is actually blocking a real
+consumer) that this session did not have standing to make unilaterally -- not attempted.
