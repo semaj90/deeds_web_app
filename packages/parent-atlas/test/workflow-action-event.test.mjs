@@ -33,6 +33,26 @@ test('completed workflow action requires a canonical receipt ID', () => {
   assert.throws(() => workflowActionEventSchema.parse({ ...completed, receiptId: undefined }));
 });
 
+test('workflow event accepts bounded token, source-edit, and OpenSpec telemetry', () => {
+  const parsed = workflowActionEventSchema.parse({
+    ...completed,
+    lane: 'a2a',
+    transport: 'a2a',
+    tokensUsed: 12345,
+    filesEdited: ['src/lib/a.ts', 'src/lib/b.ts'],
+    openspecChange: 'parent-atlas-agentic-run-receipt-binding',
+  });
+  assert.equal(parsed.tokensUsed, 12345);
+  assert.deepEqual(parsed.filesEdited, ['src/lib/a.ts', 'src/lib/b.ts']);
+  assert.equal(parsed.openspecChange, 'parent-atlas-agentic-run-receipt-binding');
+});
+
+test('workflow event rejects invalid enriched telemetry', () => {
+  assert.throws(() => workflowActionEventSchema.parse({ ...completed, tokensUsed: -1 }));
+  assert.throws(() => workflowActionEventSchema.parse({ ...completed, filesEdited: [' src/lib/a.ts'] }));
+  assert.throws(() => workflowActionEventSchema.parse({ ...completed, openspecChange: ' bad-change ' }));
+});
+
 test('workflow event produces runtime evidence with the same action/tool/receipt/resource identities', () => {
   const { payload, receipt } = workflowActionEventToRuntimeEvidence(completed);
   assert.equal(payload.action.action_id, completed.actionId);
