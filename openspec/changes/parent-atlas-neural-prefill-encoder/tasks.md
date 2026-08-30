@@ -12557,3 +12557,35 @@ human-labeled golden query set (the one gap none of this silver-standard work ca
 throughout: `latent_256`'s conservative diversity gain looks like the safer production
 candidate of the two mechanisms measured — pending real (not silver) relevance verification
 before any activation decision.
+
+### Latency (2026-08-29): latent_256 selection is ~37x cheaper than MMR's
+
+`python/benchmark_latency.py`, n=10 (explicitly disclosed as thin for a real p95 SLA
+measurement — a first-order relative-cost sanity check, not a load-test-grade benchmark).
+Separates the dominant shared cost (Ollama embed + pgvector ANN retrieval) from each policy's
+own in-process selection logic. Receipt: `docs/reports/latent256-diversity-latency-eval-v1.json`.
+
+| Component | p50 | p95 |
+|---|---|---|
+| pool fetch (shared, embed + pgvector) | 74.7ms | 83.4ms |
+| `baseline` selection | 0.0025ms | 0.003ms |
+| `exact_and_semantic` (`latent_256`) selection | 0.263ms | 0.307ms |
+| `semantic_768_mmr` selection | 9.79ms | 10.6ms |
+
+`latent_256`'s selection is ~37x cheaper than MMR's O(pool×finalK) argmax loop, which costs a
+measurable ~13% on top of the dominant pool-fetch time at `pool=50` — a cost that will scale
+worse than `latent_256`'s single-pass greedy approach as `candidatePoolK` grows. This is a
+third real dimension favoring `latent_256`, independent of the diversity/recall tradeoff.
+
+### `LATENT-DIVERSITY-02` closeout (2026-08-29)
+
+All silver-standard-reachable work for this gate is now done: diversity gain, silver-relevance
+preservation, the MMR challenger (apples-to-apples), the full MMR lambda tradeoff curve, and
+latency. `latent_256`'s conservative policy wins or ties on every axis measured this session —
+diversity (real gain, near-zero recall cost), relevance (silver-preserved, slightly better MRR),
+and computational cost (~37x cheaper selection than MMR). The one thing none of this can
+establish is real (not silver) relevance — that gap is structural, not a gap in effort, and
+requires a human-labeled golden query set that does not exist in this repo. Building one
+legitimately is real, separate work for a future session, not something to approximate further
+here. Until then, this remains correctly classified as a credible shadow-production candidate,
+not a promoted one.
