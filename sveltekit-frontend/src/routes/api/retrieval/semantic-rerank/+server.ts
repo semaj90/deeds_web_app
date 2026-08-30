@@ -82,7 +82,8 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		// 3. Rerank with semantic vector scores
 		const startRerank = performance.now();
-		const candidates = await rerank(qdrantResults, { topK, verbose });
+		const normalizedResults = qdrantResults.map((r) => ({ ...r, id: String(r.id) }));
+		const candidates = await rerank(normalizedResults, { topK, verbose });
 		const rerankLatencyMs = Math.round(performance.now() - startRerank);
 
 		// 4. Return results with diagnostics
