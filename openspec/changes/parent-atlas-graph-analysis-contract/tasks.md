@@ -1318,3 +1318,28 @@ demotes the old run and promotes the new one in the same transaction) — not at
 - `openspec/changes/parent-atlas-pass-fabric/` — PF-G0 (canonical packet
   identity writer) is a shared prerequisite with Stage 3B.2 symbol extraction
   above; do not resolve independently in both places.
+
+### Cross-linked from a separate thread (2026-08-29): this golden set is the real unblock for `parent-atlas-neural-prefill-encoder`'s `LAMBDAMART-RANK-01`
+
+A separate session thread (recall/diversity/MMR benchmarking for `latent_256`, see
+`openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`'s `LATENT-DIVERSITY-02` /
+`MMR-LAMBDA-SWEEP-01` sections) independently confirmed the same conclusion this file already
+reached: no human-labeled golden query→relevant-packet set exists anywhere in this repo, and
+that thread's whole comparison methodology has been running on a **silver** standard (lexical
+keyword match) precisely because of that gap. `LAMBDAMART-RANK-01` in that thread is explicitly
+gated on the same golden set this file already scoped.
+
+**Attempted a quick feasibility check on the re-derivation path this file names** ("re-run the
+same live-tree AST/import-facts pipeline that populated `atlas_feature_v1`'s relationships") —
+`grep -rl "atlas_feature_v1" scripts/atlas/` returns **zero files**. That specific pipeline is
+not a standalone script under `scripts/atlas/` (it may live under a different path, inside a TS
+module, or as a one-off historical run — not determined this pass, session context ran out
+before a deeper search). This means "just re-run pipeline X" is not immediately actionable as
+stated; locating (or rebuilding) that pipeline is itself a prerequisite step, not assumed free.
+
+**No new work started here** — this is a cross-reference + one bounded feasibility check, not a
+methodology decision or an attempt to build the golden set. The two real blockers this file
+already names (stale `.claude/worktrees/...` paths in `IMPORTS`, generic-symbol noise in
+`CALLS`) remain exactly as scoped above. Whoever picks this up next should treat both
+`GA8`/`GA9` here and `LAMBDAMART-RANK-01` in the neural-prefill-encoder thread as consumers of
+the *same* eventual golden set — build it once, not twice.
