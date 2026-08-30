@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.latent256-dedup-threshold-evaluation.v1",
+  "canonical_authority": false,
+  "note": "Informs a config default. Does not itself promote or activate anything.",
+  "corpus_size": 55169,
+  "positive_pair_count": 942,
+  "negative_pair_count": 20000,
+  "ground_truth": "positive pairs = same content_hash (real duplicate content); negative pairs = random sample of different-content_hash pairs",
+  "sweep": [
+    {
+      "threshold": 0.9,
+      "duplicate_recall": 0.8715498938428875,
+      "false_positive_rate": 0.00015,
+      "precision_proxy": 0.9963592233009708,
+      "true_positives_above_threshold": 821,
+      "false_positives_above_threshold": 3
+    },
+    {
+      "threshold": 0.925,
+      "duplicate_recall": 0.8481953290870489,
+      "false_positive_rate": 5e-05,
+      "precision_proxy": 0.99875,
+      "true_positives_above_threshold": 799,
+      "false_positives_above_threshold": 1
+    },
+    {
+      "threshold": 0.95,
+      "duplicate_recall": 0.8365180467091295,
+      "false_positive_rate": 0.0,
+      "precision_proxy": 1.0,
+      "true_positives_above_threshold": 788,
+      "false_positives_above_threshold": 0
+    },
+    {
+      "threshold": 0.965,
+      "duplicate_recall": 0.8290870488322718,
+      "false_positive_rate": 0.0,
+      "precision_proxy": 1.0,
+      "true_positives_above_threshold": 781,
+      "false_positives_above_threshold": 0
+    },
+    {
+      "threshold": 0.975,
+      "duplicate_recall": 0.8237791932059448,
+      "false_positive_rate": 0.0,
+      "precision_proxy": 1.0,
+      "true_positives_above_threshold": 776,
+      "false_positives_above_threshold": 0
+    },
+    {
+      "threshold": 0.99,
+      "duplicate_recall": 0.8142250530785563,
+      "false_positive_rate": 0.0,
+      "precision_proxy": 1.0,
+      "true_positives_above_threshold": 767,
+      "false_positives_above_threshold": 0
+    }
+  ],
+  "recommended_threshold": 0.9,
+  "recommendation_policy": "max duplicate_recall among thresholds with false_positive_rate <= 0.01",
+  "duration_s": 0.025745153427124023
+}

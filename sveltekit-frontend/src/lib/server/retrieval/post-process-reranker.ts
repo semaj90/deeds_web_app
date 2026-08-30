@@ -79,6 +79,23 @@ export const DEFAULT_POST_PROCESS_CONFIG: PostProcessConfig = {
   latent256SimilarityThreshold: 0,
 };
 
+/**
+ * Evaluation-backed threshold recommendation for callers who deliberately enable
+ * `latent256SimilarityThreshold` (the default stays 0/disabled -- this constant does NOT change
+ * that default; enabling this feature is a separate, deliberate integration step).
+ *
+ * Swept against real ground truth: positive pairs = codebase_chunk_index rows sharing a
+ * content_hash (genuine duplicate content, 942 pairs across 797 groups); negative pairs =
+ * 20,000 random same-corpus pairs with different content_hash. 0.90 has the highest
+ * duplicate_recall (0.8715) among all six swept thresholds while false_positive_rate stays at
+ * 0.00015 (3/20,000). See python/evaluate_latent256_dedup_threshold.py and
+ * docs/reports/latent256-dedup-threshold-evaluation-v1.json for the full sweep and methodology.
+ *
+ * Honest caveat: even at 0.90, ~13% of genuine content-hash duplicates are NOT caught --
+ * latent_256 cosine similarity does not cluster every true duplicate pair near 1.0.
+ */
+export const EVALUATED_LATENT256_SIMILARITY_THRESHOLD = 0.90;
+
 // ── Augmented output ──────────────────────────────────────────────────────────
 
 export interface PostProcessedCandidate extends ScoredCandidate {
