@@ -1,0 +1,60 @@
+{
+  "model_name": "nested-semantic-autoencoder",
+  "architecture": "NestedSemanticAutoencoder (3-tier: 768 -> 384 -> 256, prefix-nested to 128 and 64)",
+  "checkpoint_revision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "checkpoint_file": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+  "training_receipt": "docs/reports/latent-autoencoder-training-receipt-v3-full01.json",
+  "recall_comparison_receipt": "docs/reports/semantic-representation-recall-comparison-v2.json",
+  "ann_exact_parity_receipt": "docs/reports/latent256-ann-exact-parity-v1.json",
+  "input_dim": 768,
+  "hidden_dim": 384,
+  "outputs": {
+    "latent_256": { "dims": 256, "relationship": "PHYSICAL_BOTTLENECK" },
+    "latent_128": { "dims": 128, "relationship": "PREFIX_OF_LATENT_256", "renormalized": true },
+    "latent_64": { "dims": 64, "relationship": "PREFIX_OF_LATENT_128", "renormalized": true }
+  },
+  "params": {
+    "total_including_decoders": 1454592,
+    "encoder_only": 394368,
+    "note": "Only the encoder (394,368 params) is needed at inference time. The three decoder heads (decoder256/decoder128/decoder64) exist only to compute reconstruction loss during training."
+  },
+  "size_bytes": {
+    "checkpoint_full_disk": 5825981,
+    "encoder_only_fp32_estimate": 1577472,
+    "encoder_only_fp16_estimate": 788736
+  },
+  "training": {
+    "corpus": "codebase_chunk_index.content_embedding, 55169 rows, all eligible",
+    "epochs": 50,
+    "split_policy": "SOURCE_REF_GROUPED_V1 (0 source overlap between train/val)",
+    "device": "NVIDIA GeForce RTX 3060 Ti (CUDA required, fail-closed)",
+    "deterministic": true,
+    "seed": 684453,
+    "duration_s": 696.5306856632233
+  },
+  "metrics_knn_recall_at_10_held_out": {
+    "latent_256": 0.8957093924643952,
+    "latent_128": 0.8571660356949703,
+    "latent_64": 0.7932576167297638
+  },
+  "metrics_ann_exact_parity_at_10_full_corpus": {
+    "mean_overlap": 0.9995,
+    "sample_size": 200,
+    "zero_overlap_queries": 0
+  },
+  "postgres_mirror": {
+    "table": "codebase_chunk_index",
+    "columns": ["latent_256", "latent_256_checkpoint_revision"],
+    "rows_backfilled": 55169,
+    "index": "idx_codebase_chunk_latent_256_hnsw (halfvec_cosine_ops)"
+  },
+  "qdrant_mirror": {
+    "collection": "codebase_chunks_latent256",
+    "points_upserted": 55169,
+    "vector_config": { "size": 256, "distance": "Cosine" }
+  },
+  "canonical_authority": false,
+  "exact_semantic_promotion_required": true,
+  "live_consumers": "NONE as of 2026-08-29 -- see README.md",
+  "trained_at": "2026-08-29"
+}
