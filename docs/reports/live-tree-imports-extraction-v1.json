@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.live-tree-imports-extraction.v1",
+  "status": "READ_ONLY_PROVEN",
+  "scope": "sveltekit-frontend/src/**/*.{ts,svelte} (excludes *.spec.ts/*.test.ts)",
+  "filesScanned": 4668,
+  "edgesExtracted": 9218,
+  "unresolvedSpecifiers": 946,
+  "unresolvedSamples": [
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ai/EnhancedFileUpload.svelte",
+      "specifier": "$lib/types/upload"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/detective/DetectiveBoard.svelte",
+      "specifier": "$lib/stores/unified/evidence-store"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/detective/index.ts",
+      "specifier": "./ContextMenu.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/RAGSearchComponent.svelte",
+      "specifier": "$lib/services/unified-service-registry"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "specifier": "./16bit/SNES16BitContainer.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "specifier": "./16bit/SNES16BitDialog.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "specifier": "./16bit/SNES16BitProgress.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "specifier": "./16bit/SNES16BitInput.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "specifier": "./16bit/SNES16BitCard.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/tooltip.ts",
+      "specifier": "./TooltipProvider.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+      "specifier": "$lib/components/evidence-graph/LegalHUD.svelte"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+      "specifier": "$lib/components/visualizations/WebGPUEvidenceGraphVisualization"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./services/enhanced-api-client.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./components/index.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./services/enhanced-file-upload.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./services/localStorage-file-fallback.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./services/ollama-integration-layer.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./database/drizzle-compatibility-fix.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/index.ts",
+      "specifier": "./services/hybrid-vector-operations.js"
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+      "specifier": "$lib/utils/xstate-svelte5"
+    }
+  ],
+  "outputPath": ".tmp/atlas/live-tree-imports-v1.ndjson",
+  "outputChecksum": "sha256:03416bd700f0c97fe7e18e877ce6234c65d694424de799f20489a02712d75989",
+  "databaseWrites": false,
+  "neo4jWrites": false,
+  "readOnly": true,
+  "note": "Every edge resolved against a real file on disk at extraction time -- avoids the stale-Neo4j-path failure mode found in the prior GA8 attempt. Root src/ (orphaned, archived 2026-08-22) is deliberately excluded."
+}
