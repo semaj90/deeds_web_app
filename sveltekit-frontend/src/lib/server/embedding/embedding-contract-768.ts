@@ -3,7 +3,14 @@
  *
  * Native EmbeddingGemma semantic_768 is the persisted/search authority.
  * truncateEmbeddingGemmaMrl() produces separately named reference lanes such
- * as semantic_512; derived prefixes never replace the native authority.
+ * as semantic_mrl_512; derived prefixes never replace the native authority.
+ *
+ * Naming note: "512" appears in two unrelated EmbeddingGemma contracts that
+ * must never be conflated — the MRL truncation width (semantic_mrl_512, a
+ * representation size) and the model's internal attention sliding window
+ * (512 tokens, an architecture parameter, unrelated to any embedding output
+ * dimension). Always write "semantic_mrl_512" (never bare "semantic_512")
+ * specifically so this ambiguity can't recur in code or comments.
  *
  * Active semantic embedding lane: semantic_768 (768-dim, EmbeddingGemma native).
  * latent_128 / latent_64 are topology/routing projections — NOT embedding APIs

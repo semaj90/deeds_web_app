@@ -1,6 +1,34 @@
 import { z } from 'zod';
 import crypto from 'crypto';
 
+/**
+ * The currently-live EmbeddingGemma semantic lane. Runtime retrieval code should prefer
+ * ActiveSemanticVectorNameEnum over the full VectorNameEnum below — it excludes every retired
+ * 384-dim lane, so a caller that only ever accepts an active vector name can't accidentally
+ * widen its own contract by reading VectorNameEnum. Migration/audit tooling that legitimately
+ * needs to see retired names should use LegacyVectorNameEnum or the full VectorNameEnum instead.
+ */
+export const ActiveSemanticVectorNameEnum = z.enum([
+  'semantic_768',
+  'semantic_mrl_512',
+  'semantic_mrl_256',
+  'semantic_mrl_128',
+]);
+export type ActiveSemanticVectorName = z.infer<typeof ActiveSemanticVectorNameEnum>;
+
+/** Retired/superseded 384-dim lanes. Migration-history and audit tooling only — never a valid
+ * input to a live retrieval/embedding call site. See embedding-contract-768.ts's own
+ * "384-dim is retired" rule for the runtime-side enforcement this enum mirrors. */
+export const LegacyVectorNameEnum = z.enum([
+  'dense_384',
+  'dense_768_legacy',
+  'title_384',
+  'summary_384',
+  'symbol_384',
+  'ontology_384',
+]);
+export type LegacyVectorName = z.infer<typeof LegacyVectorNameEnum>;
+
 export const VectorNameEnum = z.enum([
   'semantic_768',
   'semantic_mrl_512',
@@ -30,14 +58,35 @@ export type VectorStatus = z.infer<typeof VectorStatusEnum>;
 
 export const VectorManifestSchema = z.object({
   vectorName: VectorNameEnum,
+  /** Runtime model tag/alias this representation was produced with (e.g. an Ollama tag like
+   * "embeddinggemma:latest"). This is NOT the same thing as upstreamModelId — a runtime tag can
+   * move to point at a different artifact over time; upstreamModelId identifies the model family
+   * itself. Prefer runtimeModelDigest for anything that needs to prove which exact artifact ran. */
   model: z.string().min(1),
+  upstreamModelId: z.string().min(1).optional(),
+  /** Immutable resolved-artifact identity for the runtime tag in `model` (e.g. an Ollama layer
+   * digest). Left undefined for family-level static definitions that haven't been bound to one
+   * concrete run yet — required for anything claiming a specific materialized/promoted result,
+   * since a bare tag like "latest" can silently move out from under a stored reference. */
+  runtimeModelDigest: z.string().min(1).optional(),
+  maxInputTokens: z.number().int().positive().optional(),
+  slidingWindow: z.number().int().positive().optional(),
   modelRevision: z.string().optional(),
   dimensions: z.number().int().positive(),
   representation: VectorRepresentationEnum,
   distance: DistanceMetricEnum,
   normalized: z.boolean(),
-  contentSha256: z.string().regex(/^[a-f0-9]{64}$/),
-  workspaceRevision: z.string().min(1),
+  /** Set only once this representation has been materialized against real content (a specific
+   * indexing/backfill run) — undefined for the static family-level definitions in
+   * VECTOR_MANIFESTS below, which describe a representation's shape/contract, not one run's
+   * output. An empty string was previously used as a placeholder here despite the regex this
+   * field enforces, which only passed type-checking because `as const satisfies ...` does not
+   * runtime-validate Zod refinements — `VectorManifestSchema.parse()` on those entries would
+   * have thrown. Made genuinely optional so the static registry no longer needs a fake value. */
+  contentSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  /** Same rationale as contentSha256 — required for a materialized manifest instance, optional
+   * for a static family-level definition. */
+  workspaceRevision: z.string().min(1).optional(),
   createdAt: z.string().datetime().optional(),
   status: VectorStatusEnum.default('ACTIVE'),
   activatedAt: z.string().datetime().optional(),
@@ -88,8 +137,6 @@ export const VECTOR_MANIFESTS = {
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-07-15T00:00:00Z',
     postgresColumn: 'content_embedding_384',
@@ -104,8 +151,6 @@ export const VECTOR_MANIFESTS = {
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-06-01T00:00:00Z',
     deprecatedAt: '2026-07-15T00:00:00Z',
@@ -116,14 +161,15 @@ export const VECTOR_MANIFESTS = {
   },
   semantic768: {
     vectorName: 'semantic_768' as const,
-    model: 'google/embeddinggemma-300m',
+    model: 'embeddinggemma:latest',
+    upstreamModelId: 'google/embeddinggemma-300m',
     modelRevision: 'UNBOUND',
     dimensions: 768,
+    maxInputTokens: 2048,
+    slidingWindow: 512,
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'ACTIVE' as const,
     // The logical representation is semantic_768; the live Qdrant
     // projection stores it in the physical named slot `content`.
@@ -132,40 +178,43 @@ export const VECTOR_MANIFESTS = {
   },
   semanticMrl512: {
     vectorName: 'semantic_mrl_512' as const,
-    model: 'google/embeddinggemma-300m',
+    model: 'embeddinggemma:latest',
+    upstreamModelId: 'google/embeddinggemma-300m',
     modelRevision: 'UNBOUND',
     dimensions: 512,
+    maxInputTokens: 2048,
+    slidingWindow: 512,
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
   },
   semanticMrl256: {
     vectorName: 'semantic_mrl_256' as const,
-    model: 'google/embeddinggemma-300m',
+    model: 'embeddinggemma:latest',
+    upstreamModelId: 'google/embeddinggemma-300m',
     modelRevision: 'UNBOUND',
     dimensions: 256,
+    maxInputTokens: 2048,
+    slidingWindow: 512,
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
   },
   semanticMrl128: {
     vectorName: 'semantic_mrl_128' as const,
-    model: 'google/embeddinggemma-300m',
+    model: 'embeddinggemma:latest',
+    upstreamModelId: 'google/embeddinggemma-300m',
     modelRevision: 'UNBOUND',
     dimensions: 128,
+    maxInputTokens: 2048,
+    slidingWindow: 512,
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
   },
@@ -177,8 +226,6 @@ export const VECTOR_MANIFESTS = {
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-08-01T00:00:00Z',
     postgresColumn: undefined,
@@ -192,8 +239,6 @@ export const VECTOR_MANIFESTS = {
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'ACTIVE' as const,
     activatedAt: '2026-07-01T00:00:00Z',
     postgresColumn: 'latent_64',
@@ -207,8 +252,6 @@ export const VECTOR_MANIFESTS = {
     representation: 'sparse' as const,
     distance: 'Dot' as const,
     normalized: false,
-    contentSha256: '',
-    workspaceRevision: '',
     status: 'ACTIVE' as const,
     activatedAt: '2026-07-20T00:00:00Z',
     postgresColumn: 'embedding_sparse',
