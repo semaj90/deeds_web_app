@@ -1,0 +1,214 @@
+{
+  "schema": "atlas.latent256-silver-relevance-eval.v1",
+  "canonical_authority": false,
+  "note": "SILVER standard (lexical keyword match), NOT a human-labeled golden set. A bounded sanity check on relevance preservation, not a promotion gate. No nDCG (binary labels don't support graded relevance meaningfully). No Qdrant-native-MMR challenger (separate, not started).",
+  "pool_k": 50,
+  "final_k": 10,
+  "threshold": 0.9,
+  "query_count": 10,
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "silverRelevantInPool": 26,
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.34615384615384615,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.34615384615384615,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "JWT authentication middleware",
+      "silverRelevantInPool": 36,
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "silverRelevantInPool": 26,
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.2692307692307692,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "silverRelevantInPool": 37,
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "error handling and logging middleware",
+      "silverRelevantInPool": 36,
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "silverRelevantInPool": 33,
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.3333333333333333
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5
+        }
+      }
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "silverRelevantInPool": 27,
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.3333333333333333,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2962962962962963,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "silverRelevantInPool": 22,
+      "poolSize": 42,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5
+        }
+      }
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "silverRelevantInPool": 3,
+      "poolSize": 43,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        }
+      }
+    },
+    {
+      "query": "file upload validation and storage",
+      "silverRelevantInPool": 40,
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "avg_recall_at_10_silver": 0.2388348138348138,
+      "avg_mrr_at_10_silver": 0.7833333333333333,
+      "queries_with_zero_relevant_hits": 1
+    },
+    "exact_and_semantic": {
+      "avg_recall_at_10_silver": 0.2374621124621125,
+      "avg_mrr_at_10_silver": 0.8,
+      "queries_with_zero_relevant_hits": 1
+    }
+  },
+  "duration_s": 0.7122809886932373
+}
