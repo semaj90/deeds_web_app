@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.jetstream-agentic-workflow-envelope-proof.v1",
+  "status": "CONTRACT_COMPILED_AND_FOCUSED_TESTS_PROVEN",
+  "implementation": {
+    "contract": "packages/parent-atlas/src/core/jetstream-workflow-envelope-v1.ts",
+    "exported": true,
+    "schemaValidated": true,
+    "wrapsExistingWorkflowEvent": true,
+    "databaseAuthority": "postgres_outbox_and_temporal_action_ledger",
+    "jetstreamAuthority": "delivery_replay_only",
+    "mutationAdmission": "unchanged_and_required"
+  },
+  "tests": {
+    "passed": 3,
+    "identityDriftRejected": true,
+    "outboxBypassMutationRejected": true,
+    "readOnlyReplayAccepted": true
+  },
+  "validation": {
+    "typescriptBuild": true,
+    "focusedNodeTests": true,
+    "liveJetStreamConnection": false,
+    "databaseMigration": false,
+    "durableMutation": false
+  },
+  "notes": [
+    "The package npm wrapper failed because this checkout combines --no-workspaces with --workspace; direct tsc validation succeeded.",
+    "No NATS stream, consumer, or database rows were created by this proof."
+  ]
+}

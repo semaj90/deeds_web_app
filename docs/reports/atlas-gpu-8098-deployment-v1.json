@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.gpu-8098-deployment.v1",
+  "status": "COMPOSE_CONFIG_PROVEN_BUILD_AND_LIVE_EXECUTION_UNPROVEN",
+  "image": "rapidsai/base:26.08-cuda12-py3.13-amd64",
+  "service": "atlas-gpu-8098",
+  "profile": "atlas-gpu",
+  "port": 8098,
+  "runtime": {
+    "entrypoint": "services/atlas-gpu-8098/app.py",
+    "graphRuntime": "python/atlas_rapids_graph_runtime.py",
+    "artifactRoot": "/mnt/c/Users/james/Videos/deeds-web-app",
+    "readOnlyArtifactMount": true,
+    "canonicalWrites": false
+  },
+  "validation": {
+    "composeConfig": true,
+    "dockerBuild": false,
+    "containerStarted": false,
+    "liveCapability": false,
+    "networkParity": false
+  },
+  "notes": [
+    "The service is profile-gated and does not start with the default GPU stack.",
+    "The RAPIDS base image bundles cuDF, cuGraph, and cuVS according to its published image description.",
+    "The compose file reports an obsolete version-key warning; it is non-blocking for current Docker Compose."
+  ]
+}

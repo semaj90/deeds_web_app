@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.golden-relevance-review-queue-v1",
+  "status": "REVIEW_QUEUE_PREPARED",
+  "canonicalAuthority": false,
+  "inputPath": ".tmp\\atlas\\structural-proxy-golden-set-v1.ndjson",
+  "outputPath": ".tmp\\atlas\\golden-relevance-review-queue-v1.ndjson",
+  "sourceCorpusEntries": 646,
+  "sampledQueries": 60,
+  "proposedCandidateJudgments": 313,
+  "blankGrades": 313,
+  "hardNegativesIncluded": false,
+  "databaseWrites": false,
+  "productionActivation": false,
+  "inputChecksum": "sha256:65a3fb542405452e33e0340640c9a7b98d8d3a220692681a5d273de03e95359b",
+  "outputChecksum": "sha256:e2a51a3bd09e994a958e539df7a795ab6f70e20fb9de97b35bf87cf6618319dc",
+  "nextRequiredStep": "Reviewer fills grades 0-3, confidence, identity, evidenceRefs, and hard negatives before import."
+}

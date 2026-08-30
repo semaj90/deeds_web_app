@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.current-tree-bound-symbol-registry-canary-apply.v1",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "mode": "APPLY",
+  "authorization": {
+    "requiredFlag": "ATLAS_AUTHORIZE_SYMBOL_REGISTRY_CANARY=1",
+    "provided": true,
+    "explicitApplyFlag": true
+  },
+  "inputPath": ".tmp/atlas/current-tree-bound-symbol-registry-canary-v1.ndjson",
+  "inputChecksum": "sha256:71952fbebecdea2bb9c9eef87a5fe0668f7cfbd97a8c1e80f0a3369d419a905a",
+  "selectedRowCount": 5,
+  "attempted": 5,
+  "inserted": 5,
+  "alreadyPresent": 0,
+  "readback": 5,
+  "mismatches": [],
+  "databaseWrites": true,
+  "symbolVersionWrites": 0,
+  "edgeWrites": 0,
+  "readOnly": false,
+  "lockAcquired": true,
+  "status": "CANARY_APPLIED_AND_READBACK_PROVEN",
+  "nextGate": "MATERIALIZE_SYMBOL_VERSIONS_CANARY"
+}

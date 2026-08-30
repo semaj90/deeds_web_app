@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.graph-runtime-routing-alignment.v1",
+  "status": "ROUTE_CONSOLIDATION_PROVEN_LIVE_GPU_UNPROVEN",
+  "host": "services/atlas-gpu-8098/app.py",
+  "graphRouteOwner": "python/atlas_rapids_graph_runtime.py",
+  "routes": [
+    "/v1/graph/capabilities",
+    "/v1/graph/resident",
+    "/v1/graph/load",
+    "/v1/graph/pagerank"
+  ],
+  "checks": {
+    "pythonSyntax": true,
+    "routeImport": true,
+    "singlePageRankRoute": true,
+    "runtimeUnitTests": "5 passed",
+    "windowsRapidsProbe": {
+      "status": "BLOCKED",
+      "missing": ["nvtx", "cudf", "cugraph", "cuvs"],
+      "available": ["numpy", "cupy", "psycopg2"],
+      "sideEffectFree": true
+    },
+    "canonicalWrites": false,
+    "live8098GpuExecution": false,
+    "natsDataPlane": false,
+    "quicDataPlane": false,
+    "roundRobinGraphRouting": false
+  },
+  "workstationObservation": {
+    "wsl2": {
+      "ubuntuVersion": 2,
+      "state": "STOPPED"
+    },
+    "docker": {
+      "nats": "RUNNING",
+      "postgres": "RUNNING",
+      "qdrant": "RUNNING",
+      "goRetrieval": "RUNNING",
+      "atlasGpu8098": "NOT_RUNNING"
+    }
+  },
+  "routingPolicy": {
+    "networkx": "cpu_reference_oracle",
+    "cugraph": "8098_gpu_executor",
+    "searchRuntime": "fusion_and_lane_owner",
+    "nats": "telemetry_and_invalidation_only",
+    "quic": "experimental_transport_only"
+  }
+}

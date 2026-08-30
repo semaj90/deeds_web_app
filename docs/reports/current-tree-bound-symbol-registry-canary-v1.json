@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.current-tree-bound-symbol-registry-canary-plan.v1",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "status": "REVIEW_ONLY_CANARY_READY",
+  "inputPath": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
+  "outputPath": ".tmp/atlas/current-tree-bound-symbol-registry-canary-v1.ndjson",
+  "sourceRowCount": 353,
+  "eligibleRowCount": 273,
+  "remainingOnly": true,
+  "selectedRowCount": 5,
+  "limit": 5,
+  "selectedNominationIds": [
+    "treesitter-chunker:2eb2395a67a0eae0c900ff287179f2848780a406:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+    "treesitter-chunker:6b7cec4fc93e97e9fe2e633aca0465fd9a869645:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+    "treesitter-chunker:34e983b3e35c8d23b4e9d4a337559c7c17cf3b5e:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+    "treesitter-chunker:4ba0d68343626ece16d862cb571c187988f0fdff:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+    "treesitter-chunker:ab14c0de4423be3924d52d9f31023ebd29189907:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c"
+  ],
+  "outputChecksum": "sha256:71952fbebecdea2bb9c9eef87a5fe0668f7cfbd97a8c1e80f0a3369d419a905a",
+  "promotionAuthorized": false,
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "symbolVersionWrites": 0,
+  "edgeWrites": 0,
+  "readOnly": true,
+  "nextGate": "EXPLICIT_CANARY_AUTHORIZATION_AND_APPLY_ADAPTER"
+}

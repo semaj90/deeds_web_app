@@ -1,0 +1,823 @@
+{
+  "schema": "atlas.live-structural-producer-cohort.v1",
+  "gate": "GRAPH-RESOLVE-06B.4",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "sourceCount": 50,
+  "totals": {
+    "nominationCount": 440,
+    "exactSpanMatches": 440,
+    "exactNodeMatches": 440,
+    "failures": 0,
+    "sourcesProven": 50,
+    "sourcesIncomplete": 0
+  },
+  "results": [
+    {
+      "sourceRef": "scripts/atlas/append-dir-agents-llms.mjs",
+      "nominationCount": 8,
+      "status": "PROVEN",
+      "exactSpanMatches": 8,
+      "exactNodeMatches": 8,
+      "failures": [],
+      "sourceSha256": "sha256:af01f3a4c92ad9f34f00ca55edcc00630c549628fd06d8bb70c36f3bc469c53d",
+      "expectedSourceHashes": [
+        "sha256:af01f3a4c92ad9f34f00ca55edcc00630c549628fd06d8bb70c36f3bc469c53d"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 58,
+      "liveEdgeCount": 313,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-som-canonical-location.mjs",
+      "nominationCount": 4,
+      "status": "PROVEN",
+      "exactSpanMatches": 4,
+      "exactNodeMatches": 4,
+      "failures": [],
+      "sourceSha256": "sha256:a73390beef021ba869bd9b682fbf568ad8a0455e7c9325de03f0aff90feba278",
+      "expectedSourceHashes": [
+        "sha256:a73390beef021ba869bd9b682fbf568ad8a0455e7c9325de03f0aff90feba278"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 43,
+      "liveEdgeCount": 176,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/audit-supersedes-packet-aware.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:e99d40da4df68429e7cfe668c9bc1addf14c212fd1cb3bd785db4eff03e72aec",
+      "expectedSourceHashes": [
+        "sha256:e99d40da4df68429e7cfe668c9bc1addf14c212fd1cb3bd785db4eff03e72aec"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 13,
+      "liveEdgeCount": 57,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e",
+      "expectedSourceHashes": [
+        "sha256:b4b02492df5c3ad9317fa682da3c047ac153fe463e68a7ef2c9a761850b7ca0e"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 38,
+      "liveEdgeCount": 147,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+      "nominationCount": 15,
+      "status": "PROVEN",
+      "exactSpanMatches": 15,
+      "exactNodeMatches": 15,
+      "failures": [],
+      "sourceSha256": "sha256:cbfb9d2e14a2b5f012090953aed43728ba4f7497e45d26d24167a283dd3e4a0d",
+      "expectedSourceHashes": [
+        "sha256:cbfb9d2e14a2b5f012090953aed43728ba4f7497e45d26d24167a283dd3e4a0d"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 91,
+      "liveEdgeCount": 449,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/phase-16-h-glyph-bridge.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:b1a044cfac8444733d923d1af49c5e095ab2fd7f2057bfc1339fbbfecc0ad604",
+      "expectedSourceHashes": [
+        "sha256:b1a044cfac8444733d923d1af49c5e095ab2fd7f2057bfc1339fbbfecc0ad604"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 24,
+      "liveEdgeCount": 76,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/atlas/test-p4-nats-wiring.mts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629",
+      "expectedSourceHashes": [
+        "sha256:bc40de642906f5b31fb2345f27082c20cc0cdf6e08fdf439d70488a0f28cc629"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 31,
+      "liveEdgeCount": 83,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/opencode/fill_empty_summaries.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:9c85c2950ff45654608bf1be8efb23f3ac6df1b513eb05a5f79a8041649f44fb",
+      "expectedSourceHashes": [
+        "sha256:9c85c2950ff45654608bf1be8efb23f3ac6df1b513eb05a5f79a8041649f44fb"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 35,
+      "liveEdgeCount": 125,
+      "diagnosticCount": 35
+    },
+    {
+      "sourceRef": "scripts/packets/load-packets-neo4j.mjs",
+      "nominationCount": 2,
+      "status": "PROVEN",
+      "exactSpanMatches": 2,
+      "exactNodeMatches": 2,
+      "failures": [],
+      "sourceSha256": "sha256:ebcb4aea0137b099e2a822dc8e98e0b00cfb92735eb16bb903bbd9bcc2f59f64",
+      "expectedSourceHashes": [
+        "sha256:ebcb4aea0137b099e2a822dc8e98e0b00cfb92735eb16bb903bbd9bcc2f59f64"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 35,
+      "liveEdgeCount": 150,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/packets/load-packets-postgres.mjs",
+      "nominationCount": 2,
+      "status": "PROVEN",
+      "exactSpanMatches": 2,
+      "exactNodeMatches": 2,
+      "failures": [],
+      "sourceSha256": "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19",
+      "expectedSourceHashes": [
+        "sha256:8ff5b5e82b951394c31e643a9368ff03b83fc84d49e85162e0f3161f914c8b19"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 33,
+      "liveEdgeCount": 120,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "scripts/run-migration.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1",
+      "expectedSourceHashes": [
+        "sha256:89b20a2b4512d1e1f084880eb01dafd20b719af3544521cc4339e4d9017888b1"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 16,
+      "liveEdgeCount": 61,
+      "diagnosticCount": 15
+    },
+    {
+      "sourceRef": "scripts/tests/test-warmup-import.mjs",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62",
+      "expectedSourceHashes": [
+        "sha256:45a119320791a315e42b06d5d06b3a7f11675490891099474b23e98b89b90c62"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 3,
+      "liveEdgeCount": 13,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "src/lib/server/valkey.ts",
+      "nominationCount": 8,
+      "status": "PROVEN",
+      "exactSpanMatches": 8,
+      "exactNodeMatches": 8,
+      "failures": [],
+      "sourceSha256": "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f",
+      "expectedSourceHashes": [
+        "sha256:912d720a88dfe793c71e49f525793d656a0a0ba2d200343b7fb4bdfedc58c28f"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 28,
+      "liveEdgeCount": 114,
+      "diagnosticCount": 27
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/atlas/test-p4-summary-indexing.mjs",
+      "nominationCount": 2,
+      "status": "PROVEN",
+      "exactSpanMatches": 2,
+      "exactNodeMatches": 2,
+      "failures": [],
+      "sourceSha256": "sha256:ce5f88afc031a6745840dfc29115e45c22e5f867178077f081d3745f1eb2c496",
+      "expectedSourceHashes": [
+        "sha256:ce5f88afc031a6745840dfc29115e45c22e5f867178077f081d3745f1eb2c496"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 73,
+      "liveEdgeCount": 357,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/kb/graph-jsonl-to-cards.mjs",
+      "nominationCount": 29,
+      "status": "PROVEN",
+      "exactSpanMatches": 29,
+      "exactNodeMatches": 29,
+      "failures": [],
+      "sourceSha256": "sha256:bd27239075a773df5693f7b57a8b2dc0c06cb73dd85f2abe671cd23f66a71ef9",
+      "expectedSourceHashes": [
+        "sha256:bd27239075a773df5693f7b57a8b2dc0c06cb73dd85f2abe671cd23f66a71ef9"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 142,
+      "liveEdgeCount": 790,
+      "diagnosticCount": 142
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/mapreduce/map-worker.mjs",
+      "nominationCount": 8,
+      "status": "PROVEN",
+      "exactSpanMatches": 8,
+      "exactNodeMatches": 8,
+      "failures": [],
+      "sourceSha256": "sha256:b52986e1d4a2091124b9dc2d127c9a27a06e6f237fd2b9ed5072ba3c23f6ee5e",
+      "expectedSourceHashes": [
+        "sha256:b52986e1d4a2091124b9dc2d127c9a27a06e6f237fd2b9ed5072ba3c23f6ee5e"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 71,
+      "liveEdgeCount": 262,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/seed-hypergraph-edges-lane-c.mjs",
+      "nominationCount": 5,
+      "status": "PROVEN",
+      "exactSpanMatches": 5,
+      "exactNodeMatches": 5,
+      "failures": [],
+      "sourceSha256": "sha256:45f88002bdbf7603ce455435ec1af58442ab2849c21f66f9c4353e3ac35055f4",
+      "expectedSourceHashes": [
+        "sha256:45f88002bdbf7603ce455435ec1af58442ab2849c21f66f9c4353e3ac35055f4"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 59,
+      "liveEdgeCount": 256,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/scripts/tests/test-reports.mjs",
+      "nominationCount": 5,
+      "status": "PROVEN",
+      "exactSpanMatches": 5,
+      "exactNodeMatches": 5,
+      "failures": [],
+      "sourceSha256": "sha256:9b20b2c536e645277f7ae0e4ad741ee4be6834e99836409b58ccb1d91e32a97c",
+      "expectedSourceHashes": [
+        "sha256:9b20b2c536e645277f7ae0e4ad741ee4be6834e99836409b58ccb1d91e32a97c"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 30,
+      "liveEdgeCount": 129,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+      "nominationCount": 23,
+      "status": "PROVEN",
+      "exactSpanMatches": 23,
+      "exactNodeMatches": 23,
+      "failures": [],
+      "sourceSha256": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "expectedSourceHashes": [
+        "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 65,
+      "liveEdgeCount": 453,
+      "diagnosticCount": 64
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/CacheService.ts",
+      "nominationCount": 8,
+      "status": "PROVEN",
+      "exactSpanMatches": 8,
+      "exactNodeMatches": 8,
+      "failures": [],
+      "sourceSha256": "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56",
+      "expectedSourceHashes": [
+        "sha256:7105c941cdb7163f36bd5340be9dec298db584070f73cec2bd397d0e3ebebd56"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 12,
+      "liveEdgeCount": 46,
+      "diagnosticCount": 12
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
+      "nominationCount": 16,
+      "status": "PROVEN",
+      "exactSpanMatches": 16,
+      "exactNodeMatches": 16,
+      "failures": [],
+      "sourceSha256": "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f",
+      "expectedSourceHashes": [
+        "sha256:2d7d06c611884fa4675bcdd284733a2f76ebf73f32faf1667ad5c9439551233f"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 53,
+      "liveEdgeCount": 323,
+      "diagnosticCount": 53
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "nominationCount": 8,
+      "status": "PROVEN",
+      "exactSpanMatches": 8,
+      "exactNodeMatches": 8,
+      "failures": [],
+      "sourceSha256": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "expectedSourceHashes": [
+        "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 13,
+      "liveEdgeCount": 69,
+      "diagnosticCount": 13
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts",
+      "nominationCount": 20,
+      "status": "PROVEN",
+      "exactSpanMatches": 20,
+      "exactNodeMatches": 20,
+      "failures": [],
+      "sourceSha256": "sha256:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+      "expectedSourceHashes": [
+        "sha256:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 65,
+      "liveEdgeCount": 442,
+      "diagnosticCount": 65
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
+      "nominationCount": 18,
+      "status": "PROVEN",
+      "exactSpanMatches": 18,
+      "exactNodeMatches": 18,
+      "failures": [],
+      "sourceSha256": "sha256:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+      "expectedSourceHashes": [
+        "sha256:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 48,
+      "liveEdgeCount": 371,
+      "diagnosticCount": 48
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/GRPOPolicy.ts",
+      "nominationCount": 21,
+      "status": "PROVEN",
+      "exactSpanMatches": 21,
+      "exactNodeMatches": 21,
+      "failures": [],
+      "sourceSha256": "sha256:de548f223257954bdcf0f0fd3d04fd2b3d60ee8882d0394b6f08b233f36c9f36",
+      "expectedSourceHashes": [
+        "sha256:de548f223257954bdcf0f0fd3d04fd2b3d60ee8882d0394b6f08b233f36c9f36"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 107,
+      "liveEdgeCount": 519,
+      "diagnosticCount": 107
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/JSONLStorage.ts",
+      "nominationCount": 9,
+      "status": "PROVEN",
+      "exactSpanMatches": 9,
+      "exactNodeMatches": 9,
+      "failures": [],
+      "sourceSha256": "sha256:06f33dc43a003a3172cc5e30a95fa8ce0e01fec45fc3230ff1cfbd92c60db5c3",
+      "expectedSourceHashes": [
+        "sha256:06f33dc43a003a3172cc5e30a95fa8ce0e01fec45fc3230ff1cfbd92c60db5c3"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 14,
+      "liveEdgeCount": 74,
+      "diagnosticCount": 14
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
+      "nominationCount": 35,
+      "status": "PROVEN",
+      "exactSpanMatches": 35,
+      "exactNodeMatches": 35,
+      "failures": [],
+      "sourceSha256": "sha256:1815f9906de592dfbf73778eeea35287537d7c064cbda47b2537f7a41c1e480a",
+      "expectedSourceHashes": [
+        "sha256:1815f9906de592dfbf73778eeea35287537d7c064cbda47b2537f7a41c1e480a"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 122,
+      "liveEdgeCount": 713,
+      "diagnosticCount": 122
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/LearningPipeline.ts",
+      "nominationCount": 19,
+      "status": "PROVEN",
+      "exactSpanMatches": 19,
+      "exactNodeMatches": 19,
+      "failures": [],
+      "sourceSha256": "sha256:f36206bf3ba3f0d9db6e7c2220bd69d1c4c3c89e6322ef53beee7b4ec5d90cc0",
+      "expectedSourceHashes": [
+        "sha256:f36206bf3ba3f0d9db6e7c2220bd69d1c4c3c89e6322ef53beee7b4ec5d90cc0"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 52,
+      "liveEdgeCount": 296,
+      "diagnosticCount": 52
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/MetricsCollector.ts",
+      "nominationCount": 18,
+      "status": "PROVEN",
+      "exactSpanMatches": 18,
+      "exactNodeMatches": 18,
+      "failures": [],
+      "sourceSha256": "sha256:dd9199251b932521d82ee4ecf193d5a6a3aab8ff2b639d0672764c0aa801b5b4",
+      "expectedSourceHashes": [
+        "sha256:dd9199251b932521d82ee4ecf193d5a6a3aab8ff2b639d0672764c0aa801b5b4"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 70,
+      "liveEdgeCount": 378,
+      "diagnosticCount": 70
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/PatternStorage.ts",
+      "nominationCount": 7,
+      "status": "PROVEN",
+      "exactSpanMatches": 7,
+      "exactNodeMatches": 7,
+      "failures": [],
+      "sourceSha256": "sha256:24a72601db400ba167d129086ae7d98c8b61df47bc4ef2c5755ceec066bc2686",
+      "expectedSourceHashes": [
+        "sha256:24a72601db400ba167d129086ae7d98c8b61df47bc4ef2c5755ceec066bc2686"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 11,
+      "liveEdgeCount": 56,
+      "diagnosticCount": 11
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ToolInvoker.ts",
+      "nominationCount": 4,
+      "status": "PROVEN",
+      "exactSpanMatches": 4,
+      "exactNodeMatches": 4,
+      "failures": [],
+      "sourceSha256": "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2",
+      "expectedSourceHashes": [
+        "sha256:ed076cdbcfa3d4542e62d750767a63a3770dbb5c1310b05476e849c7c673caa2"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 8,
+      "liveEdgeCount": 36,
+      "diagnosticCount": 8
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/types.ts",
+      "nominationCount": 30,
+      "status": "PROVEN",
+      "exactSpanMatches": 30,
+      "exactNodeMatches": 30,
+      "failures": [],
+      "sourceSha256": "sha256:3407000d65c3fb0efb852b504736a2bfc853764a995d6ff384aa5d27ec3b5add",
+      "expectedSourceHashes": [
+        "sha256:3407000d65c3fb0efb852b504736a2bfc853764a995d6ff384aa5d27ec3b5add"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 60,
+      "liveEdgeCount": 196,
+      "diagnosticCount": 60
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
+      "nominationCount": 23,
+      "status": "PROVEN",
+      "exactSpanMatches": 23,
+      "exactNodeMatches": 23,
+      "failures": [],
+      "sourceSha256": "sha256:13787527659f6ca208aa97d81ba56d17e80cb3377c98a97734a0635c283e1da7",
+      "expectedSourceHashes": [
+        "sha256:13787527659f6ca208aa97d81ba56d17e80cb3377c98a97734a0635c283e1da7"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 73,
+      "liveEdgeCount": 438,
+      "diagnosticCount": 73
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+      "nominationCount": 12,
+      "status": "PROVEN",
+      "exactSpanMatches": 12,
+      "exactNodeMatches": 12,
+      "failures": [],
+      "sourceSha256": "sha256:f1e49bd644f01a3e3fb72eba3e11eb1252fc9969ce9b9880020deea3d934bf9d",
+      "expectedSourceHashes": [
+        "sha256:f1e49bd644f01a3e3fb72eba3e11eb1252fc9969ce9b9880020deea3d934bf9d"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 29,
+      "liveEdgeCount": 181,
+      "diagnosticCount": 29
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/RedisCacheService.ts",
+      "nominationCount": 21,
+      "status": "PROVEN",
+      "exactSpanMatches": 21,
+      "exactNodeMatches": 21,
+      "failures": [],
+      "sourceSha256": "sha256:f6fbb7d66e12e3066a025194e07fc3741341d15baa2b65581253e35b79951e9b",
+      "expectedSourceHashes": [
+        "sha256:f6fbb7d66e12e3066a025194e07fc3741341d15baa2b65581253e35b79951e9b"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 52,
+      "liveEdgeCount": 320,
+      "diagnosticCount": 52
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TagExtractor.ts",
+      "nominationCount": 9,
+      "status": "PROVEN",
+      "exactSpanMatches": 9,
+      "exactNodeMatches": 9,
+      "failures": [],
+      "sourceSha256": "sha256:6d52859fe78a949c7f4ea7a75ad9c5fcdab970c8e5da6223015ca55d80824591",
+      "expectedSourceHashes": [
+        "sha256:6d52859fe78a949c7f4ea7a75ad9c5fcdab970c8e5da6223015ca55d80824591"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 38,
+      "liveEdgeCount": 243,
+      "diagnosticCount": 38
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TfIdfRanker.ts",
+      "nominationCount": 15,
+      "status": "PROVEN",
+      "exactSpanMatches": 15,
+      "exactNodeMatches": 15,
+      "failures": [],
+      "sourceSha256": "sha256:ae604752e1bb0cde18dca91e2de2a13c1fdc59390f8af0666ce52f3f89dea479",
+      "expectedSourceHashes": [
+        "sha256:ae604752e1bb0cde18dca91e2de2a13c1fdc59390f8af0666ce52f3f89dea479"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 42,
+      "liveEdgeCount": 258,
+      "diagnosticCount": 42
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/report-auto-populator.ts",
+      "nominationCount": 7,
+      "status": "PROVEN",
+      "exactSpanMatches": 7,
+      "exactNodeMatches": 7,
+      "failures": [],
+      "sourceSha256": "sha256:b79d3a02fa2096a3b5c204df9d8fdf8cf86a994ff552db1e2a0bbc7491af2ed6",
+      "expectedSourceHashes": [
+        "sha256:b79d3a02fa2096a3b5c204df9d8fdf8cf86a994ff552db1e2a0bbc7491af2ed6"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 53,
+      "liveEdgeCount": 241,
+      "diagnosticCount": 53
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:a195a387fe0b2aec2c7a3613ff7b3df8cd9a641e29e9dc31a1425524ca0ac287",
+      "expectedSourceHashes": [
+        "sha256:a195a387fe0b2aec2c7a3613ff7b3df8cd9a641e29e9dc31a1425524ca0ac287"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 12,
+      "liveEdgeCount": 51,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:dca97486594622c42bed45bb87d9999c9989a3fd45d38c307585c5e34177ba17",
+      "expectedSourceHashes": [
+        "sha256:dca97486594622c42bed45bb87d9999c9989a3fd45d38c307585c5e34177ba17"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 12,
+      "liveEdgeCount": 51,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8",
+      "expectedSourceHashes": [
+        "sha256:e02678aef7c7579be7c1ba9441464b098a65d4eefe471e43250e9b4e474330e8"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 5,
+      "liveEdgeCount": 19,
+      "diagnosticCount": 4
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27",
+      "expectedSourceHashes": [
+        "sha256:57c99034d0c22587fe18d6b595be5e3ca15745c825afc1ed5e46da3dc97c8e27"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 6,
+      "liveEdgeCount": 22,
+      "diagnosticCount": 5
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "expectedSourceHashes": [
+        "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 6,
+      "liveEdgeCount": 22,
+      "diagnosticCount": 5
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/evidence/hash/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f",
+      "expectedSourceHashes": [
+        "sha256:03c2f124ccaf960d3b993362233dc11b80ca7c4e49b4544463467f76fbd7a33f"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 6,
+      "liveEdgeCount": 22,
+      "diagnosticCount": 5
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c",
+      "expectedSourceHashes": [
+        "sha256:d866f6facd9f8375969a150a0a064df86349db40f0ce4fc57b015f2507897a3c"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 5,
+      "liveEdgeCount": 19,
+      "diagnosticCount": 4
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/routes/api/v1/ai/cache-result/+server.ts",
+      "nominationCount": 1,
+      "status": "PROVEN",
+      "exactSpanMatches": 1,
+      "exactNodeMatches": 1,
+      "failures": [],
+      "sourceSha256": "sha256:d51f49a9e2c378a1703aaf67810cd409d66e9761de7dfff4669f33cd88e61198",
+      "expectedSourceHashes": [
+        "sha256:d51f49a9e2c378a1703aaf67810cd409d66e9761de7dfff4669f33cd88e61198"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 12,
+      "liveEdgeCount": 72,
+      "diagnosticCount": 11
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
+      "nominationCount": 4,
+      "status": "PROVEN",
+      "exactSpanMatches": 4,
+      "exactNodeMatches": 4,
+      "failures": [],
+      "sourceSha256": "sha256:e737c01c194819a1d8c719bae79ca017628a30561cefd2bb8d0c7e926eacf7f2",
+      "expectedSourceHashes": [
+        "sha256:e737c01c194819a1d8c719bae79ca017628a30561cefd2bb8d0c7e926eacf7f2"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 288,
+      "liveEdgeCount": 1518,
+      "diagnosticCount": 288
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/evidence.test.ts",
+      "nominationCount": 6,
+      "status": "PROVEN",
+      "exactSpanMatches": 6,
+      "exactNodeMatches": 6,
+      "failures": [],
+      "sourceSha256": "sha256:df0c9019ee48aa0b380beb18d0b8c8dea7e544295481347af94d1a60e9332948",
+      "expectedSourceHashes": [
+        "sha256:df0c9019ee48aa0b380beb18d0b8c8dea7e544295481347af94d1a60e9332948"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 29,
+      "liveEdgeCount": 226,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/code-intel/graph/impact.test.ts",
+      "nominationCount": 2,
+      "status": "PROVEN",
+      "exactSpanMatches": 2,
+      "exactNodeMatches": 2,
+      "failures": [],
+      "sourceSha256": "sha256:ccaabb1e6e9c8b7145e8b535208884ce163370d01335d43382bd1685d2a1fcc8",
+      "expectedSourceHashes": [
+        "sha256:ccaabb1e6e9c8b7145e8b535208884ce163370d01335d43382bd1685d2a1fcc8"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 11,
+      "liveEdgeCount": 95,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts",
+      "nominationCount": 2,
+      "status": "PROVEN",
+      "exactSpanMatches": 2,
+      "exactNodeMatches": 2,
+      "failures": [],
+      "sourceSha256": "sha256:3a34fc83c0e12e8398bd6107784bee40e1e330a22208660bc2b16bf7e705799e",
+      "expectedSourceHashes": [
+        "sha256:3a34fc83c0e12e8398bd6107784bee40e1e330a22208660bc2b16bf7e705799e"
+      ],
+      "httpStatus": 200,
+      "liveChunkCount": 11,
+      "liveEdgeCount": 98,
+      "diagnosticCount": 0
+    }
+  ],
+  "canonicalWrites": 0,
+  "structuralEdgeWrites": 0,
+  "databaseWrites": false,
+  "replayChecksum": "sha256:e017da411c7e3024b4913310d793691f87bedee40a2488fb310ba23e79403ba6",
+  "status": "LIVE_STRUCTURAL_PRODUCER_COHORT_PROVEN",
+  "readOnly": true,
+  "nextGate": "GRAPH-RESOLVE-06B.4_SECOND_REPLAY_AND_SEPARATE_EDGE_ADMISSION"
+}

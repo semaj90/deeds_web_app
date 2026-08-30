@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.latent256-orchestrator-identity-bridge-audit.v1",
+  "date": "2026-08-29",
+  "status": "OPT_IN_DEDUP_FIXTURE_PROVEN",
+  "scope": {
+    "rankingFormulaChanged": false,
+    "rankingOrderChanged": false,
+    "latent256ProviderCalled": "only when explicit config enabled",
+    "latent256HydrationPerformed": "only when explicit config enabled",
+    "liveDedupEnabled": false,
+    "canonicalWrites": 0
+  },
+  "preservedFields": [
+    "qdrantPointId",
+    "packetKey",
+    "sourceRef",
+    "sourceRevision",
+    "workspaceRevision"
+  ],
+  "identityRules": {
+    "qdrantPointIdIsCanonicalPacketKey": false,
+    "sourceRefFallsBackToPath": false,
+    "packetKeyFallsBackToPointId": false,
+    "qdrantPayloadSelection": [
+      "packet_key",
+      "source_ref",
+      "source_revision",
+      "workspace_revision",
+      "symbol_version_id",
+      "relative_path"
+    ]
+  },
+  "evidence": {
+    "testCommand": "npx vitest run src/lib/server/retrieval/unified-orchestrator.spec.ts src/lib/server/retrieval/post-process-reranker.spec.ts src/lib/server/retrieval/latent256-candidate-provider.spec.ts --reporter=dot",
+    "testFiles": 3,
+    "testsPassed": 16,
+    "testsFailed": 0,
+    "runtimeEnvironment": "temporary test-only model path and Ornith model identifier"
+  },
+  "nextGate": "OPT_IN_LIVE_DEDUP_READBACK_AND_QUALITY_REVIEW",
+  "canonicalAuthority": false
+}

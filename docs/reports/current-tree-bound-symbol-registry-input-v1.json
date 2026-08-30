@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.current-tree-bound-symbol-registry-input-plan.v1",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "status": "REVIEW_ONLY_PLAN_READY",
+  "sourceResolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+  "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "outputPath": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
+  "entryCount": 353,
+  "counts": {
+    "REGISTER_NEW_EXACT_REVIEW_ONLY": 353
+  },
+  "planChecksum": "sha256:6f38d0cb30de302ad02695ebbf89a77c2fdea3464741cf87e4ac758a8de34764",
+  "identityPolicy": "sourceRef + sourceRevision + kind + name + byte span; deterministic proposed IDs only",
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "aliasWrites": 0,
+  "symbolVersionWrites": 0,
+  "promotionAuthorized": false,
+  "readOnly": true,
+  "nextGate": "REVIEW_CURRENT_REGISTRY_INPUT_BEFORE_ANY_PROMOTION"
+}

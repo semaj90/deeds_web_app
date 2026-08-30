@@ -1,12 +1,12 @@
 {
   "schema": "atlas.golden-proxy-relevance-eval.v1",
   "canonical_authority": false,
-  "note": "Uses the STRUCTURAL_PROXY_IMPORTERS golden set (646 entries, sampled to 5) as ground truth -- a materially stronger signal than the earlier keyword-match silver standard, but still a structural PROXY, not human-verified. Entries where the query's known-relevant packets didn't appear in the retrieved top-50 pool at all are excluded (skipped_zero_relevant_in_pool) since no policy could recover them regardless of selection logic -- that's a retrieval-depth limitation, not a selection-policy result.",
+  "note": "Uses the STRUCTURAL_PROXY_IMPORTERS golden set (646 entries, sampled to 60) as ground truth -- a materially stronger signal than the earlier keyword-match silver standard, but still a structural PROXY, not human-verified. Entries where the query's known-relevant packets didn't appear in the retrieved top-50 pool at all are excluded (skipped_zero_relevant_in_pool) since no policy could recover them regardless of selection logic -- that's a retrieval-depth limitation, not a selection-policy result.",
   "golden_set_path": ".tmp/atlas/structural-proxy-golden-set-v1.ndjson",
   "golden_set_total_entries": 646,
-  "sample_size": 5,
-  "skipped_zero_relevant_in_pool": 5,
-  "evaluated_entries": 0,
+  "sample_size": 60,
+  "skipped_zero_relevant_in_pool": 48,
+  "evaluated_entries": 12,
   "pool_k": 50,
   "final_k": 10,
   "threshold": 0.9,
@@ -14,20 +14,20 @@
   "seed": 684453,
   "summary": {
     "baseline": {
-      "avg_recall_at_10_golden_proxy": null,
-      "avg_mrr_at_10_golden_proxy": null,
-      "n": 0
+      "avg_recall_at_10_golden_proxy": 0.08333333333333333,
+      "avg_mrr_at_10_golden_proxy": 0.016666666666666666,
+      "n": 12
     },
     "exact_and_semantic": {
-      "avg_recall_at_10_golden_proxy": null,
-      "avg_mrr_at_10_golden_proxy": null,
-      "n": 0
+      "avg_recall_at_10_golden_proxy": 0.08333333333333333,
+      "avg_mrr_at_10_golden_proxy": 0.013888888888888888,
+      "n": 12
     },
     "semantic_768_mmr": {
-      "avg_recall_at_10_golden_proxy": null,
-      "avg_mrr_at_10_golden_proxy": null,
-      "n": 0
+      "avg_recall_at_10_golden_proxy": 0.4583333333333333,
+      "avg_mrr_at_10_golden_proxy": 0.07463624338624338,
+      "n": 12
     }
   },
-  "duration_s": 2.0831077098846436
+  "duration_s": 16.616398096084595
 }

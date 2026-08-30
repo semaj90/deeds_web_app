@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.tree-bound-symbol-registry-reconciliation-plan.v1",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "status": "RECONCILIATION_REQUIRED",
+  "resolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+  "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "registryRowsRead": 10250,
+  "counts": {
+    "treeBound": 353,
+    "exactCurrent": 80,
+    "legacyNamespaceExactReviewOnly": 0,
+    "ambiguous": 0,
+    "contentOrRevisionConflict": 0,
+    "unresolved": 273
+  },
+  "policy": [
+    "exact canonical key first",
+    "explicit source namespace normalization only",
+    "legacy metadata matches are review-only",
+    "source revision mismatch is not promotion",
+    "no aliases or fuzzy matching"
+  ],
+  "planChecksum": "sha256:de914227a1d60dbdfc5c56e0b6fe1fbaef026ada2ace5705c2e71cfba5943bae",
+  "outputPath": ".tmp/atlas/tree-bound-symbol-registry-reconciliation-plan-v1.ndjson",
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "readOnly": true,
+  "nextGate": "SYMBOL_VERSION_EXACT_REVISION_REVIEW"
+}

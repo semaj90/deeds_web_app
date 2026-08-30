@@ -12663,3 +12663,78 @@ cases. Retrieval typecheck reports no errors for the hardened latent-256 or unif
 surfaces. The shared Vitest setup hangs during unrelated module initialization, so a setup-free
 `vitest.latent256.config.ts` was added for this bounded suite; provider and dedup tests now pass
 `16/16`. The opt-in caller remains disabled and production ranking remains unchanged.
+
+### Structural proxy retrieval evaluation rerun (2026-08-29)
+
+The existing `STRUCTURAL_PROXY_IMPORTERS` dataset contains 646 query entries.
+The bounded rerun used seed `684453`, sampled 60 entries, and evaluated 12;
+48 were excluded because none of their known relevant packets appeared in the
+shared top-50 retrieval pool. This is a retrieval-depth limitation, not
+evidence that a selector failed.
+
+On the 12 evaluable proxy entries:
+
+| policy | proxy Recall@10 | proxy MRR@10 |
+| --- | ---: | ---: |
+| baseline | 0.0833 | 0.0167 |
+| exact-and-semantic latent-256 policy | 0.0833 | 0.0139 |
+| semantic-768 MMR | 0.4583 | 0.0746 |
+
+Receipt: `docs/reports/golden-proxy-relevance-eval-v1.json`.
+This remains `PROXY_RELEVANCE_PROVEN`, not human-labeled golden relevance:
+the labels are structurally inferred importer relationships. It does not
+authorize latent-256 production activation, LambdaMART training, or ranking
+promotion. The next quality gate remains a human/evaluator-labeled,
+revision-bound query set with graded relevance and end-to-end pool coverage.
+
+### Live graded-evaluation readiness audit (2026-08-29)
+
+Reused the existing evaluation contract rather than creating another dataset
+schema. The read-only `gate-1-evaluation-audit.mts` audit reports:
+
+- `evaluation_relevance_corrected`: 33,216 rows across 50 queries and 31,874 packets
+- judgment source: `derived`
+- relevance grades: grade 1 only, 100%
+- confidence: 0.5 only, 100%
+- grades 0, 2, and 3: missing
+
+Verdict: `GOLD_RELEVANCE_GATE_BLOCKED`. These rows are derived blend output and
+cannot support XGBoost/LambdaMART promotion, Recall/NDCG/MRR claims, or a
+production ranking change. The next valid input is a revision-bound set of
+human/evaluator judgments covering grades 0-3; no database mutation was made.
+
+### Evaluation-table ownership reconciliation (2026-08-29)
+
+The live database contains both evaluation tables. The legacy
+`evaluation_relevance` table is empty and uses `(query_id, chunk_id)` with
+unqualified grades. The populated `evaluation_relevance_corrected` table
+contains 33,216 derived rows and carries `packet_key`, `source_ref`,
+`corpus_version`, graded `relevance_grade`, judgment source, confidence, and
+content/evidence fields.
+
+Future golden-set imports must target `evaluation_relevance_corrected` only.
+The legacy table must remain unused, and the existing derived rows must not be
+treated as human judgments. This is a contract-selection correction, not
+permission to mutate either table.
+
+### Golden relevance review queue prepared (2026-08-29)
+
+Added `scripts/atlas/prepare-golden-relevance-review-queue-v1.mjs` and
+prepared `.tmp/atlas/golden-relevance-review-queue-v1.ndjson` from the
+existing 646-entry structural proxy corpus. The deterministic sample contains
+60 queries and 313 proposed candidate judgments. Every grade, confidence,
+reviewer, and evidence reference is intentionally blank; proxy candidates are
+not treated as truth. The receipt is
+`docs/reports/golden-relevance-review-queue-v1.json`.
+
+This queue is `REVIEW_QUEUE_PREPARED`, not `GOLD_RELEVANCE_PROVEN`: reviewers
+must add grades 0-3, revision-qualified identities, evidence references, and
+hard negatives before import into `evaluation_relevance_corrected`. Database
+writes and production activation remain disabled.
+
+Added `scripts/atlas/validate-golden-relevance-review-queue-v1.mjs` as the
+fail-closed import guard. Validation currently returns
+`INCOMPLETE_FAIL_CLOSED`: 60 queries, 313 blank judgments, zero hard negatives,
+incomplete grade coverage, and `importAllowed: false`. The queue cannot become
+a golden corpus until reviewers provide grades 0-3, confidence/reviewer
+metadata, hard negatives, and revision-qualified evidence.

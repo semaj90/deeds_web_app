@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.live-structural-producer-replay.v1",
+  "gate": "GRAPH-RESOLVE-06B.4",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
+  "sourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+  "sourceSha256": "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+  "nominationSourceHashes": [
+    "sha256:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124"
+  ],
+  "engine": "treesitter-chunker",
+  "engineVersion": "4.0.0",
+  "nominationCount": 23,
+  "liveChunkCount": 65,
+  "liveEdgeCount": 453,
+  "diagnosticCount": 64,
+  "exactSpanMatches": 23,
+  "exactNodeMatches": 23,
+  "ambiguousSpans": 0,
+  "failures": [],
+  "canonicalWrites": 0,
+  "structuralEdgeWrites": 0,
+  "databaseWrites": false,
+  "replayChecksum": "sha256:d9a5ef01319f16b20c087505139eeced07300163839dc359ad0b494e3abc2ef1",
+  "status": "LIVE_STRUCTURAL_PRODUCER_REPLAY_PROVEN",
+  "readOnly": true,
+  "nextGate": "GRAPH-RESOLVE-06B.4_SECOND_REPLAY_AND_SEPARATE_EDGE_ADMISSION"
+}

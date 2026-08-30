@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.current-structural-symbol-resolution-proof.v1",
+  "status": "READ_ONLY_PROVEN",
+  "graphResolveGate": "GRAPH-RESOLVE-06B.2",
+  "snapshotPath": ".tmp/atlas/current-source-ast-snapshot-v1.ndjson",
+  "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "outputPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+  "snapshotChecksum": "sha256:1adb82b653cb4efcd1decad1bfa07ebbd5e5e37bf8dd6e1af78b5f220ae38de1",
+  "resolutionChecksum": "sha256:738843f08eef895dc82e3fb17ffd22d16b562b5b21788ee5a8cf1a9e77e8d6d8",
+  "namespaceRules": [
+    {
+      "id": "SVELTEKIT_FRONTEND_ROOT",
+      "from": "sveltekit-frontend/",
+      "to": ""
+    }
+  ],
+  "counts": {
+    "nominations": 440,
+    "invalidNominations": 0,
+    "sourceOnly": 87,
+    "astMatched": 353,
+    "treeBound": 353,
+    "treeNodeMissing": 0,
+    "exactFull": 353,
+    "exactSpanHash": 0,
+    "exactNodeHash": 0,
+    "ambiguousAstMatch": 0,
+    "noAstMatch": 0,
+    "sourceRevisionMismatch": 0,
+    "unsupportedSource": 0,
+    "stableSymbolBound": 0,
+    "stableSymbolMissing": 0,
+    "symbolVersionBound": 0,
+    "symbolVersionMissing": 0
+  },
+  "stableSymbolResolution": "NOT_ATTEMPTED",
+  "symbolVersionResolution": "NOT_ATTEMPTED",
+  "canonicalWrites": 0,
+  "structuralEdgeWrites": 0,
+  "databaseReads": 0,
+  "databaseWrites": 0,
+  "fuzzyMatches": 0,
+  "readOnly": true,
+  "nextGate": "GRAPH-RESOLVE-06B.3_TREE_TO_STABLE_SYMBOL"
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.current-tree-bound-symbol-registry-input-audit.v1",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "status": "REVIEW_INPUT_VALID",
+  "inputPath": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
+  "rowCount": 353,
+  "requiredFields": [
+    "nominationId",
+    "sourceRef",
+    "sourceRevision",
+    "workspaceRevision",
+    "sourceContentHash",
+    "byteStart",
+    "byteEnd",
+    "kind",
+    "canonicalKey",
+    "proposedStableSymbolId"
+  ],
+  "missingFields": [],
+  "invalidSpans": [],
+  "invalidKinds": [],
+  "duplicateCanonicalKeys": [],
+  "duplicateProposedStableSymbolIds": [],
+  "outputChecksum": "sha256:6f38d0cb30de302ad02695ebbf89a77c2fdea3464741cf87e4ac758a8de34764",
+  "promotionAuthorized": false,
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "readOnly": true,
+  "nextGate": "EXPLICIT_REVIEW_AND_AUTHORIZATION_REQUIRED"
+}

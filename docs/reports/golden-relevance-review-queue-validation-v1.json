@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.golden-relevance-review-queue-validation-v1",
+  "status": "INCOMPLETE_FAIL_CLOSED",
+  "canonicalAuthority": false,
+  "inputPath": ".tmp\\atlas\\golden-relevance-review-queue-v1.ndjson",
+  "queryCount": 60,
+  "judgmentCount": 313,
+  "completedJudgmentCount": 0,
+  "blankJudgmentCount": 313,
+  "hardNegativeCount": 0,
+  "hasAllGrades": false,
+  "errors": [],
+  "databaseWrites": false,
+  "importAllowed": false,
+  "nextRequiredStep": "Complete grades 0-3, reviewer/confidence metadata, and hard negatives; then rerun validation."
+}

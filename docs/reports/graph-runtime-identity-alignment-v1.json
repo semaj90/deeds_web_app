@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.graph-runtime-identity-alignment.v1",
+  "status": "IMPLEMENTED_SYNTAX_PROVEN_LIVE_EXECUTION_UNPROVEN",
+  "changes": {
+    "rapidsLoadBinding": [
+      "artifactChecksum",
+      "graphOrdinalMapChecksum",
+      "workspaceRevision",
+      "candidateSnapshotRevision"
+    ],
+    "pagerankBinding": [
+      "artifactChecksum",
+      "graphOrdinalMapChecksum",
+      "candidateSnapshotRevision",
+      "parameterManifestId",
+      "parameterChecksum"
+    ],
+    "gathererPropagation": true
+  },
+  "validation": {
+    "pythonSyntax": true,
+    "gitDiffCheck": true,
+    "live8098Execution": false,
+    "canonicalWrites": false,
+    "promotion": false
+  },
+  "notes": [
+    "Artifact checksum is an identity checksum unless the manifest supplies artifactChecksum.",
+    "Parameter manifest binding validates inline PageRank parameters; registry lookup remains a later gate.",
+    "Full proof requires a reachable WSL2 RAPIDS service and a manifest carrying current ordinal and snapshot bindings."
+  ]
+}

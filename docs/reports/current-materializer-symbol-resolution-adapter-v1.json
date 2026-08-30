@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.current-materializer-symbol-resolution-adapter.v1",
+  "status": "READ_ONLY_ADAPTER_READY",
+  "inputPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "treeResolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+  "outputPath": ".tmp/atlas/current-materializer-symbol-resolution-v1.ndjson",
+  "counts": {
+    "input": 440,
+    "treeBound": 353,
+    "canonical": 85,
+    "unresolved": 355,
+    "fuzzy": 0,
+    "aliases": 0
+  },
+  "outputChecksum": "sha256:fb7b0d2ce0b98839f422a20c1a45f8f2dc9c8fc7fc4839294d24aec4f9e4e812",
+  "registryRowsRead": 10255,
+  "fuzzyMatches": 0,
+  "aliasMatches": 0,
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "readOnly": true,
+  "nextGate": "MATERIALIZER_DRY_RUN"
+}

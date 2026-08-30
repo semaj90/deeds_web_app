@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.parent-atlas-capability-gap-audit.v1",
+  "generatedAt": "2026-08-29",
+  "mode": "READ_ONLY_REPOSITORY_AUDIT",
+  "status": "AUDIT_COMPLETE",
+  "goldenRetrieval": {
+    "status": "NOT_PROVEN",
+    "reason": "The replay script derives expected rows from current PostgreSQL feature labels, calls the retrieval endpoint without the query, and contains placeholder result matching.",
+    "evidence": [
+      "scripts/atlas/golden-retrieval-replay.mjs",
+      "docs/reports/parent-atlas-golden-retrieval-v1.json",
+      "python/benchmark_latent256_silver_relevance.py"
+    ]
+  },
+  "aceBitfrost": {
+    "status": "IMPLEMENTED_PARTIAL_PROOF",
+    "usableAfter": "canonical retrieval -> identity normalization -> bounded context assembly",
+    "risks": [
+      "multiple historical key namespaces remain (ff1, bitfrost, ace)",
+      "some BitFrost warming paths are integration stubs",
+      "revision/checksum-keyed live card replay is not proven"
+    ],
+    "evidence": [
+      "packages/parent-atlas-retrieval/src/bifrost",
+      "packages/atlas-core/src/langgraph/clients.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/cache-layers-orchestrator.ts",
+      "sveltekit-frontend/src/lib/server/acp/packet-assembler.ts"
+    ]
+  },
+  "ontologyAndConceptFeedback": {
+    "ontologyTuples": "SCHEMA_AND_FIXTURES_PRESENT_PROMOTION_OPEN",
+    "usedConcepts": "FIELD_PRESENT_NOT_REINFORCEMENT_SIGNAL",
+    "rlFromUsage": "NOT_PROVEN",
+    "reason": "used_concepts is currently sourced from tags/semantic metadata in snapshot code; reward and policy fields exist, but no verified execution-outcome loop trains or promotes a policy from concept usage.",
+    "evidence": [
+      "packages/parent-atlas/test/external-doc-knowledge-fabric.test.mjs",
+      "packages/parent-atlas/test/feature-intelligence.test.mjs",
+      "packages/atlas-duckdb/src/snapshots.ts",
+      "packages/parent-atlas-core/src/policy-orchestrator.ts"
+    ]
+  },
+  "graphAndGpu": {
+    "networkx": "CPU_ORACLE",
+    "cuGraph": "DERIVED_GPU_EXECUTOR",
+    "nary": "INCIDENCE_PROJECTION_SUPPORTED",
+    "forestSampling": "NO_PROMOTION_GRADE_RANDOM_FOREST_SURFACE_FOUND",
+    "tang": "TANG_INSPIRED_LOW_RANK_NOMINATION_ONLY",
+    "pagerank": "DERIVED_GRAPH_FEATURE_NOT_768D_SEMANTIC",
+    "liveFullCorpusParity": "OPEN",
+    "evidence": [
+      "python/parent_atlas_pagerank_reference.py",
+      "python/atlas_compute/typed_graph_runtime.py",
+      "python/atlas_compute/low_rank.py",
+      "python/atlas_semantic_ontology_projection.py",
+      "python/atlas_rapids_graph_runtime.py"
+    ]
+  },
+  "analyticsAndTransport": {
+    "mapReduce": "PRESENT_AS_OFFLINE_PIPELINES",
+    "duckdb": "OFFLINE_ANALYTICAL_STAGING",
+    "couchdb": "ARCHIVE_AND_INGEST_SURFACE_NOT_CANONICAL_GRAPH",
+    "mcp": "TOOL_TRANSPORT_ONLY",
+    "vibreti": "NO_REPOSITORY_MATCH_FOUND",
+    "evidence": [
+      "packages/parent-atlas/src/pipelines/mapreduce.ts",
+      "packages/atlas-duckdb/src/snapshots.ts",
+      "scripts/docs-atlas/couchdb-turbovec-ingest.mjs",
+      "packages/parent-atlas-client/src/mcp/client.ts"
+    ]
+  },
+  "agentEditingAndMemory": {
+    "memoryResidency": "POLICY_AND_DESCRIPTORS_PRESENT_LIVE_DAG_SWAP_UNPROVEN",
+    "opencodeEditing": "PROPOSAL_AND_GUARDED_PATCH_FIXTURES_PRESENT",
+    "durableMutationAdmission": "READ_ONLY_OR_FIXTURE_PROVEN; PRODUCTION NOT_PROVEN",
+    "evidence": [
+      "packages/parent-atlas/src/core/adaptive-memory-runtime.ts",
+      "packages/parent-atlas/src/core/adaptive-semantic-memory.ts",
+      "packages/parent-atlas/test/agentic-file-mutation.test.mjs",
+      "packages/parent-atlas/test/atlas-kernel-session.test.mjs"
+    ]
+  },
+  "writesPerformed": false,
+  "canonicalWrites": false,
+  "nextGates": [
+    "GOLDEN_RETRIEVAL_FIXTURE_01",
+    "ACE_BITFROST_REVISION_REPLAY_01",
+    "ONTOLOGY_TUPLE_PROMOTION_01",
+    "EXECUTION_OUTCOME_RECEIPT_01",
+    "LIVE_GRAPH_GPU_PARITY_01"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.golden-retrieval-stability-fixture.v1",
+  "fixtureType": "DETERMINISTIC_REPLAY_NOT_HUMAN_RELEVANCE",
+  "queryId": "parent-atlas-lineage-canary",
+  "query": "Parent Atlas semantic retrieval lineage canary",
+  "topK": 15,
+  "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+  "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+  "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+  "expectedCanonicalIds": [
+    "packet:547e1c54b3a0",
+    "packet:7c61a052540c",
+    "packet:c6c4bb257069",
+    "packet:64838394f8dc",
+    "packet:41aaad7c7e65",
+    "packet:1daa458bdb73",
+    "packet:8589ed47d789",
+    "packet:196138c47be8",
+    "packet:d2c2643163a8",
+    "packet:25ac9148f9bf",
+    "packet:225fa0b05a89",
+    "packet:6bd874a60226",
+    "packet:8d268e81f842",
+    "packet:64b8a0ed69b3",
+    "packet:db66369e866a"
+  ],
+  "humanRelevanceJudgments": false,
+  "canonicalWrites": false
+}
