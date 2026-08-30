@@ -65,6 +65,25 @@ describe('context tool DAG contracts', () => {
     expect(event.mutationRequested).toBe(false);
   });
 
+  it('preserves bounded agent/OpenSpec telemetry and normalizes edited files', () => {
+    const event = workflowActionFromDagNode({
+      dag: baseDag(),
+      nodeId: 'tool',
+      sequence: 4,
+      actionId: 'a-4',
+      kind: 'completed',
+      lane: 'a2a',
+      transport: 'a2a',
+      tokensUsed: 4321,
+      filesEdited: ['src/b.ts', 'src/a.ts', 'src/b.ts'],
+      openspecChange: 'parent-atlas-agentic-run-receipt-binding',
+      producerRevision: 'test',
+    });
+    expect(event.tokensUsed).toBe(4321);
+    expect(event.filesEdited).toEqual(['src/a.ts', 'src/b.ts']);
+    expect(event.openspecChange).toBe('parent-atlas-agentic-run-receipt-binding');
+  });
+
   it('rejects MCP calls claiming exact promotion without an exact-promotion ancestor', () => {
     const dag = baseDag();
     dag.nodes[2] = { ...dag.nodes[2], dependsOn: ['retrieve'] };
