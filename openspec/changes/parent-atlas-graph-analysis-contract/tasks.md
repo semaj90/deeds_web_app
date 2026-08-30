@@ -1377,14 +1377,22 @@ the *same* eventual golden set — build it once, not twice.
   set" since before this session without one being built. Building it is the actual next step
   for GA8/GA9 specifically: run the graph-feature-augmented ranking vs. baseline against the 646
   entries, measure real (not silver) recall/precision.
-- [ ] **`LAMBDAMART-RANK-01`'s real Recall@10/MRR@10/nDCG@10** (`parent-atlas-neural-prefill-
-  encoder/tasks.md`, `LATENT-DIVERSITY-02`) can now be computed for real, replacing the
-  keyword-match silver standard used throughout that thread's `latent_256`/MMR benchmarking.
-  Re-run `python/benchmark_apples_to_apples_diversity.py`'s query set against this golden set's
-  646 entries instead of (or alongside) the hand-picked 10-query/keyword-label set, once a
-  query↔golden-entry matching step is written (not built — the 646 entries use file summaries as
-  query text, not the free-text queries used in that benchmark; reconciling the two query styles
-  is a real design step, not mechanical).
+- [x] **CORRECTED, 2026-08-29 (later same day): `LAMBDAMART-RANK-01`'s real Recall@10/MRR@10 is
+  NOT directly computable from this golden set, and this was checked, not assumed.**
+  `python/benchmark_golden_proxy_relevance.py` attempted exactly the re-run described in the
+  now-superseded bullet above. A 5-entry smoke test found **zero** relevant packets appearing
+  anywhere in the top-50 semantic pool for **any** sampled entry. Traced to real ground truth,
+  not a benchmark bug — a diagnostic script's own `row_number() OVER (...)` bug (window function
+  computed only over 2 pre-filtered rows, giving a false "rank 1, 2" relative to each other, not
+  their true corpus-wide rank) was found and fixed before trusting the negative result; the
+  corrected check confirms it. **Real finding: `IMPORTS` is a structural code relationship, not
+  a semantic one — a file's summary does not reliably predict its importers' summaries.** The
+  golden set may still be valid for `GA8`'s graph-feature-augmented-ranking evaluation (which
+  doesn't need semantic proximity between query and relevant packet), but it does **not**
+  directly serve the `latent_256`/MMR semantic-retrieval Recall/MRR recomputation this bullet
+  originally planned. That specific use case needs different ground truth — likely the
+  operator-authored hand-labeling option (option 2 in this file's original methodology list),
+  not a structural proxy. Receipt: `docs/reports/golden-proxy-relevance-eval-v1.json`.
 - [ ] **Spot-check a sample of the 646 entries by hand** before trusting them further — this is
   a structural *proxy*, and the methodology's own selection note already flagged "structurally
   related != necessarily what a human would want retrieved" as a real risk, not a formality. No
