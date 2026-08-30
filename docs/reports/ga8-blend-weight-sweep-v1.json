@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.ga8-blend-weight-sweep.v1",
+  "canonical_authority": false,
+  "note": "Sweeps BLEND_SEMANTIC_WEIGHT (0.0=pagerank_only .. 1.0=semantic_only) over the same pool-construction as the confirmed full-scale GA8 ablation (benchmark_ga8_graph_feature_ablation.py). Pool built once per entry; all grid weights evaluated against that same pool -- no additional embedding calls per weight. Does not modify BLEND_SEMANTIC_WEIGHT in the live ablation script.",
+  "golden_set_total_entries": 646,
+  "sample_size": 646,
+  "skipped_unreachable": 0,
+  "evaluated_entries": 646,
+  "semantic_pool_k": 50,
+  "final_k": 10,
+  "weight_grid": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "seed": 684453,
+  "summary_by_weight": {
+    "0.0": {
+      "avg_recall_at_10": 0.26039063055314243,
+      "avg_mrr_at_10": 0.2854311022654676,
+      "n": 646
+    },
+    "0.1": {
+      "avg_recall_at_10": 0.2329845160169281,
+      "avg_mrr_at_10": 0.27372413877831836,
+      "n": 646
+    },
+    "0.2": {
+      "avg_recall_at_10": 0.2155525606403882,
+      "avg_mrr_at_10": 0.26394048847609214,
+      "n": 646
+    },
+    "0.3": {
+      "avg_recall_at_10": 0.19782763744835682,
+      "avg_mrr_at_10": 0.2483801415302963,
+      "n": 646
+    },
+    "0.4": {
+      "avg_recall_at_10": 0.1815757621916062,
+      "avg_mrr_at_10": 0.22793011941618752,
+      "n": 646
+    },
+    "0.5": {
+      "avg_recall_at_10": 0.16071890461837435,
+      "avg_mrr_at_10": 0.20421888053467002,
+      "n": 646
+    },
+    "0.6": {
+      "avg_recall_at_10": 0.1359742770638028,
+      "avg_mrr_at_10": 0.17022765246449456,
+      "n": 646
+    },
+    "0.7": {
+      "avg_recall_at_10": 0.11172189085217102,
+      "avg_mrr_at_10": 0.12850078627942405,
+      "n": 646
+    },
+    "0.8": {
+      "avg_recall_at_10": 0.06574552194017554,
+      "avg_mrr_at_10": 0.06906236178681999,
+      "n": 646
+    },
+    "0.9": {
+      "avg_recall_at_10": 0.04378799199931118,
+      "avg_mrr_at_10": 0.049149221091945555,
+      "n": 646
+    },
+    "1.0": {
+      "avg_recall_at_10": 0.04118891409063575,
+      "avg_mrr_at_10": 0.0444469015676446,
+      "n": 646
+    }
+  },
+  "best_weight_for_recall_at_10": "0.0",
+  "best_weight_for_mrr_at_10": "0.0",
+  "carried_over_default_weight_0_7": {
+    "avg_recall_at_10": 0.11172189085217102,
+    "avg_mrr_at_10": 0.12850078627942405,
+    "n": 646
+  }
+}

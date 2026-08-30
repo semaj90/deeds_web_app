@@ -1435,3 +1435,55 @@ obvious next experiment mirroring the `MMR_LAMBDA` sweep methodology already use
 absolute terms on this ground truth. This does not promote graph features into any live ranking
 path — that remains a separate, later, deliberate decision, same discipline as the `latent_256`
 thread throughout.
+
+### `BLEND_SEMANTIC_WEIGHT` sweep (2026-08-29, same day): caveat (3) resolved, and it changes the finding
+
+`python/sweep_ga8_blend_weight.py`, full 646-entry golden set, weight grid `[0.0 .. 1.0]` step
+0.1. Builds each entry's candidate pool exactly once (identical construction to the confirmed
+ablation, including the pool-dilution fix) and evaluates every grid weight against that same
+pool — no extra embedding calls per weight. The `weight=0.7` row reproduces the confirmed
+ablation's numbers to 12 decimal places (`0.11172189085217102` recall, exact match), which
+validates the harness is measuring the same thing.
+
+**Full grid result** (n=646):
+
+| weight (semantic share) | avg recall@10 | avg MRR@10 |
+|---|---|---|
+| 0.0 (pure PageRank) | **0.2604** | **0.2854** |
+| 0.1 | 0.2330 | 0.2737 |
+| 0.2 | 0.2156 | 0.2639 |
+| 0.3 | 0.1978 | 0.2484 |
+| 0.4 | 0.1816 | 0.2279 |
+| 0.5 | 0.1607 | 0.2042 |
+| 0.6 | 0.1360 | 0.1702 |
+| 0.7 (the "confirmed" default) | 0.1117 | 0.1285 |
+| 0.8 | 0.0657 | 0.0691 |
+| 0.9 | 0.0438 | 0.0491 |
+| 1.0 (pure semantic) | 0.0412 | 0.0444 |
+
+Recall and MRR decrease **monotonically** as semantic weight increases — every value beats 0.7,
+and the best value in the grid is 0.0 (drop semantic score from the ranking formula entirely).
+0.7 was never a good choice; it was a carried-over default that happened to still beat
+semantic-only, which is a much weaker claim than "0.7 is a good blend weight."
+
+**This is very likely NOT the finding it looks like, and must not be reported as "just use pure
+PageRank."** The golden set's relevance label is itself graph-structural — a packet counts as
+"relevant" iff it is a real `IMPORTS`-graph importer of the query file — and PageRank is a
+centrality measure computed from that same `IMPORTS` graph. A packet that is heavily imported
+(high PageRank, since PageRank is driven by in-edges) is, close to by construction, more likely
+to itself *be* an importer of other central files too (hub files import hub files). So "PageRank
+alone predicts IMPORTS-relevance well" is closer to measuring self-consistency of the import
+graph than it is to proving graph authority helps *semantic* retrieval quality. The monotonic
+decline as semantic weight rises may just mean the semantic signal is irrelevant noise **for
+this specific structural label**, not that graph authority is a generally superior ranking
+signal. Caveat (1) above (proxy, not human-verified ground truth) was always the load-bearing
+one; this sweep sharpens rather than resolves it — it shows the earlier 0.7-weight positive
+result was directionally real but the specific weight was arbitrary, and a naive reading of
+"sweep says use weight=0.0" would be a stronger, less warranted claim than the data supports.
+
+**What this does NOT change**: no production ranking path reads `BLEND_SEMANTIC_WEIGHT` or any
+graph-authority feature — this remains measurement-only (`canonical_authority: false`). The
+open, still-correct next step (from the original golden-set build) is a human-labeled semantic
+relevance set, which would let this exact same sweep methodology answer the real question
+(does graph authority help *semantic* relevance) without the circularity risk above.
+Receipt: `docs/reports/ga8-blend-weight-sweep-v1.json`.
