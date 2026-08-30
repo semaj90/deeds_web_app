@@ -12286,6 +12286,20 @@ or path fallbacks, changed no default path, and performed zero canonical writes.
 removed in this sample; this is wiring/safety proof only, not a quality or promotion result.
 Probe receipt: `docs/reports/latent256-opt-in-live-readonly-proof-v1.json`.
 
+**Opt-in pool cardinality tightened (2026-08-29)**: `latent256Dedup` now requires explicit
+`finalK` and `candidatePoolK`, rejects `candidatePoolK < finalK`, and requests the larger pool from
+the semantic, lexical, TurboVec, and Qdrant lanes only when the feature is enabled. The ranker
+accepts an explicit result limit, allowing the refill-aware selector to operate on real headroom;
+the default path remains top-10 and unchanged. Focused suites remain green (16 tests).
+
+**LATENT-DIVERSITY-02 refill evaluation (2026-08-29)**: the existing real-data benchmark was
+rerun with 10 EmbeddingGemma queries, a 50-row candidate pool, final K=10, exact content-hash
+collapse, and the evaluated latent threshold 0.90. All policies returned 10/10 rows for every
+query. Exact+semantic selection increased mean unique-source coverage from 6.6 (baseline) to 7.4
+(+12.12%); this supports the refill behavior on this sample but is not a labeled relevance
+evaluation and does not authorize global activation. Receipt:
+`docs/reports/latent256-diversity-refill-partial-eval-v1.json`.
+
 ### Threshold evaluated (2026-08-29) — and a bigger unwired gap found underneath it
 
 `EVALUATED_LATENT256_SIMILARITY_THRESHOLD = 0.90` — swept against real ground truth
@@ -12405,3 +12419,36 @@ production candidate... if it doesn't, that's a successful result too") — this
 clears that bar on the diversity axis specifically. It does **not** yet establish end-to-end
 retrieval quality (relevance), which is exactly what the deferred Recall/MRR/nDCG work would
 need to answer before any production activation decision.
+
+### Silver-standard relevance check (2026-08-29): relevance preserved, not just diversity
+
+Built the most honest version of a relevance check reachable without fabricating data:
+`python/benchmark_latent256_silver_relevance.py` uses a **silver standard**, not gold — a
+candidate is labeled "relevant" if its `source_ref` path lexically contains a keyword drawn
+from the query text itself (keywords chosen before seeing any results, so labeling can't leak
+from what search already returned). Explicitly flagged in the receipt as a bounded sanity check,
+not a promotion gate — a human or LLM-as-judge could disagree with individual labels.
+
+Same 10 real queries, `pool=50`/`finalK=10`, comparing `baseline` vs `exact_and_semantic+refill`:
+
+| Metric | baseline | exact_and_semantic + refill | Change |
+|---|---|---|---|
+| avg `recall@10` (silver) | 0.2388 | 0.2375 | ~-0.6% relative, noise-level at n=10 |
+| avg `MRR@10` (silver) | 0.783 | 0.800 | slightly better |
+
+Receipt: `docs/reports/latent256-silver-relevance-eval-v1.json`. Combined with the 12.1%
+unique-source diversity gain already found, this is a genuinely reassuring signal on **both**
+axes now measured: relevance essentially unchanged, diversity meaningfully improved.
+
+**Still explicitly not done** (named, not faked): a real human-labeled golden query set (silver
+keyword-match is not a substitute — it can't detect true relevance the query text doesn't
+lexically hint at, e.g. a synonym or an architecturally-related-but-differently-named file);
+`nDCG`/`α-nDCG` (binary silver labels don't support graded relevance meaningfully); the
+Qdrant-native-MMR challenger (a separate, real integration, not started). All three remain the
+actual remaining work under `LATENT-DIVERSITY-02`, not approximated further here.
+
+**Where this leaves the whole `latent_256` thread**: a fully-built, tested, and now
+twice-benchmarked (diversity + silver-relevance) candidate mechanism, with real positive signal
+on both axes measured, zero live callers by design, and an honest, named list of what a real
+production-activation decision would still need (golden set, nDCG, MMR challenger) before it
+graduates past "credible shadow-production candidate."
