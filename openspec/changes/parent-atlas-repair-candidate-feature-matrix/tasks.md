@@ -26,6 +26,8 @@
 - [x] Add focused Vitest coverage for base-plane preservation, deterministic receipts, CandidateOrdinal alignment, presence-state semantics, and non-finite rejection.
 - [x] Add tests for the live opaque CandidateSnapshotRevision token and bare ordinal-map checksum encoding.
 - [x] Add producer-artifact tamper tests and MRL derivation/representation fail-closed tests.
+- [x] Add persisted/untrusted producer tests: missing carried artifacts/rows fail with coded errors rather than generic runtime exceptions.
+- [x] Accept existing bare or `sha256:` row-level input checksums while keeping generated artifact/output/set receipts strictly `sha256:` prefixed.
 - [x] Add `scripts/atlas/prove-current-repair-candidate-feature-matrix-v1.mts` against the existing frozen CandidateOrdinal/base-matrix artifacts.
 - [x] Fix the proof harness to accept the real frozen cohort's snapshot/checksum serialization without rewriting either coordinate.
 - [ ] Run focused Vitest on the workstation.
@@ -37,6 +39,7 @@
 - [x] Add runtime derivation guards: MRL columns require `MRL_PREFIX_L2_RENORMALIZE` over `semantic_768`; latent query-similarity columns require `NESTED_AUTOENCODER_QUERY_PROJECTION` over `semantic_768`.
 - [x] Add `RepairFeatureProducerSetV1` and make it carry the full immutable producer artifacts, not summaries alone.
 - [x] Rebuild and verify producer summaries, overlay rows, states, and set checksum from the carried artifacts at bundle/presence admission boundaries.
+- [x] Add explicit runtime shape guards for persisted producer artifacts/sets before dereferencing arrays or state maps.
 - [x] Add `RepairCandidateFeatureBundleV1` binding the verified producer set checksum to the populated repair-matrix manifest checksum.
 - [x] Add `RepairMrlFeatureProducerV1` as the first executable derived producer contract: semantic_768 query/candidates -> prefix 512/256/128 -> L2 renormalize -> cosine scalar artifacts. This is fixture/contract capability only until real same-snapshot vector bytes are supplied.
 - [ ] Choose one live already-revisioned repair feature producer and join it to the same frozen candidate snapshot.
@@ -50,6 +53,7 @@
 - [x] Keep representation hydration separate from query-conditioned similarity: latent_256 candidate hydration may prove `latent256`, but never `latent256QuerySimilarity`.
 - [x] Map MRL/latent query-similarity availability only from a verified repair producer set.
 - [x] Reverify the full producer artifacts before propagating producer-set states into ContextManifest presence evidence.
+- [x] Add focused presence-evidence tests for conservative defaults, verified MRL `DERIVED` propagation, snapshot mismatch rejection, and carried-artifact tamper rejection.
 - [ ] Run the presence-evidence focused tests/workstation replay with the same candidate snapshot used by the repair matrix.
 
 ### Recommended live producer order
