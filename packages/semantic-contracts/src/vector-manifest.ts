@@ -16,6 +16,18 @@ export const ActiveSemanticVectorNameEnum = z.enum([
 ]);
 export type ActiveSemanticVectorName = z.infer<typeof ActiveSemanticVectorNameEnum>;
 
+/** Names allowed in symbol-facing cards and resolvers. Legacy 384 names fail closed here. */
+export const SymbolRepresentationNameEnum = z.enum([
+  'semantic_768',
+  'semantic_mrl_512',
+  'semantic_mrl_256',
+  'semantic_mrl_128',
+  'latent_256',
+  'latent_128',
+  'latent_64',
+]);
+export type SymbolRepresentationName = z.infer<typeof SymbolRepresentationNameEnum>;
+
 /** Retired/superseded 384-dim lanes. Migration-history and audit tooling only — never a valid
  * input to a live retrieval/embedding call site. See embedding-contract-768.ts's own
  * "384-dim is retired" rule for the runtime-side enforcement this enum mirrors. */
@@ -43,6 +55,7 @@ export const VectorNameEnum = z.enum([
   'latent_256',
   'latent_128',
   'latent_64',
+  'topology_ae64_v1',
   'late_interaction',
   'bm42_sparse',
 ]);
@@ -97,6 +110,20 @@ export const VectorManifestSchema = z.object({
   supersededBy: VectorNameEnum.optional().describe('If SUPERSEDED, which vector replaces this one'),
   postgresColumn: z.string().optional().describe('Source Postgres column (e.g., content_embedding_384)'),
   qdrantVectorSlot: z.string().optional().describe('Qdrant named vector slot (e.g., dense_384)'),
+  qdrantCollection: z.string().optional().describe('Qdrant collection when stored separately from the primary collection'),
+  storage: z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('PHYSICAL'),
+      postgresColumn: z.string().optional(),
+      qdrantCollection: z.string().optional(),
+      qdrantVectorSlot: z.string().optional(),
+    }),
+    z.object({
+      kind: z.literal('DERIVED'),
+      derivedFrom: z.string(),
+      derivation: z.enum(['MRL_PREFIX_L2_RENORMALIZE', 'NESTED_PREFIX_L2_RENORMALIZE']),
+    }),
+  ]).optional(),
 });
 
 export type VectorManifest = z.infer<typeof VectorManifestSchema>;
@@ -180,6 +207,7 @@ export const VECTOR_MANIFESTS = {
     // content_embedding_768 is a separate, much smaller, non-canonical column (1,386 rows) --
     // do not point this manifest entry at it.
     postgresColumn: 'content_embedding',
+    storage: { kind: 'PHYSICAL' as const, postgresColumn: 'content_embedding', qdrantVectorSlot: 'content' },
   },
   semanticMrl512: {
     vectorName: 'semantic_mrl_512' as const,
@@ -194,6 +222,7 @@ export const VECTOR_MANIFESTS = {
     normalized: true,
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
+    storage: { kind: 'DERIVED' as const, derivedFrom: 'semantic_768', derivation: 'MRL_PREFIX_L2_RENORMALIZE' as const },
   },
   semanticMrl256: {
     vectorName: 'semantic_mrl_256' as const,
@@ -208,6 +237,7 @@ export const VECTOR_MANIFESTS = {
     normalized: true,
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
+    storage: { kind: 'DERIVED' as const, derivedFrom: 'semantic_768', derivation: 'MRL_PREFIX_L2_RENORMALIZE' as const },
   },
   semanticMrl128: {
     vectorName: 'semantic_mrl_128' as const,
@@ -222,6 +252,7 @@ export const VECTOR_MANIFESTS = {
     normalized: true,
     status: 'REFERENCE_ONLY' as const,
     supersededBy: 'semantic_768' as const,
+    storage: { kind: 'DERIVED' as const, derivedFrom: 'semantic_768', derivation: 'MRL_PREFIX_L2_RENORMALIZE' as const },
   },
   title384: {
     vectorName: 'title_384' as const,
@@ -251,33 +282,47 @@ export const VECTOR_MANIFESTS = {
     distance: 'Cosine' as const,
     normalized: true,
     // Backfilled and parity-proven (55,169/55,169 rows, ANN-vs-exact overlap@10 = 0.9995), but
-    // deliberately has ZERO live retrieval consumers (query-time inference sidecar not yet
-    // built -- an explicit, recorded operator decision, not an oversight). REFERENCE_ONLY
-    // reflects "not authoritative for live retrieval today", not "unproven" or "abandoned".
+    // Candidate-side post-rank hydration is live-reachable but opt-in and default-off. It is
+    // not an independent latent query lane and remains non-authoritative.
     status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-08-29T00:00:00Z',
     postgresColumn: 'latent_256',
-    qdrantVectorSlot: 'latent_256',
+    qdrantCollection: 'codebase_chunks_latent256',
+    storage: { kind: 'PHYSICAL' as const, postgresColumn: 'latent_256', qdrantCollection: 'codebase_chunks_latent256' },
+  },
+  latent128: {
+    vectorName: 'latent_128' as const,
+    model: 'nested-semantic-autoencoder-v3-full01',
+    modelRevision: '1.0',
+    dimensions: 128,
+    representation: 'dense' as const,
+    distance: 'Cosine' as const,
+    normalized: true,
+    status: 'REFERENCE_ONLY' as const,
+    storage: { kind: 'DERIVED' as const, derivedFrom: 'latent_256', derivation: 'NESTED_PREFIX_L2_RENORMALIZE' as const },
   },
   latent64: {
     vectorName: 'latent_64' as const,
+    model: 'nested-semantic-autoencoder-v3-full01',
+    modelRevision: '3.0',
+    dimensions: 64,
+    representation: 'dense' as const,
+    distance: 'Cosine' as const,
+    normalized: true,
+    status: 'REFERENCE_ONLY' as const,
+    storage: { kind: 'DERIVED' as const, derivedFrom: 'latent_256', derivation: 'NESTED_PREFIX_L2_RENORMALIZE' as const },
+  },
+  topologyAe64: {
+    vectorName: 'topology_ae64_v1' as const,
     model: 'atlas-autoencoder-768x64-v1',
     modelRevision: '1.0',
     dimensions: 64,
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    // NOT ACTIVE: the Postgres codebase_chunk_index.latent_64 column has 0 populated rows
-    // (verified live 2026-08-30, docs/reports/semantic-representation-storage-audit-v1.json).
-    // The genuinely live latent_64 system is a DIFFERENT pipeline entirely -- Redis
-    // gpu:autoencoder:latent_64:* keys written by scripts/atlas/backfill-latent-vectors.mjs and
-    // consumed by train-som-20x20.mjs for SOM topology, which never wrote to this Postgres
-    // column. Do not conflate the two when reasoning about this manifest entry.
-    status: 'REFERENCE_ONLY' as const,
+    status: 'ACTIVE' as const,
     activatedAt: '2026-07-01T00:00:00Z',
-    supersededBy: 'latent_256' as const,
-    postgresColumn: 'latent_64',
-    qdrantVectorSlot: 'latent_64',
+    storage: { kind: 'PHYSICAL' as const },
   },
   bm42Sparse: {
     vectorName: 'bm42_sparse' as const,

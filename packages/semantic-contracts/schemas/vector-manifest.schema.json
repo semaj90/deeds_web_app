@@ -29,6 +29,7 @@
         "latent_256",
         "latent_128",
         "latent_64",
+        "topology_ae64_v1",
         "late_interaction",
         "bm42_sparse"
       ],
@@ -74,6 +75,35 @@
     "normalized": {
       "type": "boolean",
       "description": "Whether vector is L2-normalized (required for Cosine distance)"
+    },
+    "qdrantCollection": {
+      "type": "string",
+      "description": "Separate Qdrant collection when the representation is not a named slot in the primary collection"
+    },
+    "storage": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "PHYSICAL" },
+            "postgresColumn": { "type": "string" },
+            "qdrantCollection": { "type": "string" },
+            "qdrantVectorSlot": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["kind", "derivedFrom", "derivation"],
+          "properties": {
+            "kind": { "const": "DERIVED" },
+            "derivedFrom": { "type": "string" },
+            "derivation": { "enum": ["MRL_PREFIX_L2_RENORMALIZE", "NESTED_PREFIX_L2_RENORMALIZE"] }
+          },
+          "additionalProperties": false
+        }
+      ]
     },
     "contentSha256": {
       "type": "string",

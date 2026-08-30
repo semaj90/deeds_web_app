@@ -2,6 +2,8 @@
 export {
   VectorManifestSchema,
   VectorNameEnum,
+  ActiveSemanticVectorNameEnum,
+  SymbolRepresentationNameEnum,
   VectorRepresentationEnum,
   DistanceMetricEnum,
   hashVectorManifest,
@@ -9,6 +11,8 @@ export {
   VECTOR_MANIFESTS,
   type VectorManifest,
   type VectorName,
+  type ActiveSemanticVectorName,
+  type SymbolRepresentationName,
   type VectorRepresentation,
   type DistanceMetric,
 } from './vector-manifest.js';
