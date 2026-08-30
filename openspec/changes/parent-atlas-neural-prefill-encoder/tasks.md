@@ -12240,6 +12240,52 @@ caller-supplied config value, not defaulted to a number chosen by intuition).
 `postProcessCandidates()` — that wiring, plus picking a real threshold from an evaluation, are
 the next two concrete steps, not yet started.
 
+**Identity-preservation seam completed (2026-08-29)**: `unified-orchestrator.ts` now preserves
+the validated Qdrant projection ID and optional `packetKey`, `sourceRef`, `sourceRevision`, and
+`workspaceRevision` from dense hits in `RankedCandidate`. This is metadata plumbing only: the
+RRF score formula and ordering are unchanged, `PostgresLatent256CandidateProvider` is not called,
+no `latent_256` map is hydrated, and dedup remains disabled in the live path. The focused
+orchestrator, post-process-reranker, and latent-provider suites pass together (14 tests).
+This closes the prerequisite identity-preservation seam, not the live latent-dedup gate.
+
+**Narrow opt-in call site added (2026-08-29)**: `executeUnifiedRetrieval()` now has an
+explicit `latent256Dedup` configuration block. When `enabled: true`, it runs the standalone
+candidate-side combinator after the existing RRF ranking and only for candidates carrying a
+non-empty `packetKey`; candidates without that identity remain fail-open. The caller must supply
+checkpoint, candidate-snapshot, representation, and threshold revisions. The default config leaves
+the block absent, so normal retrieval does not hydrate latent vectors, add an RRF vote, or change
+ranking. This is a reversible integration seam, not promotion of `latent_256` to a canonical lane.
+
+**Qdrant identity envelope tightened (2026-08-29)**: the live Qdrant query now requests only
+the bounded identity/display payload subset (`packet_key`, `source_ref`, source/workspace
+revisions, `symbol_version_id`, and `relative_path`). `RankedCandidate.identity` records the
+projection point ID separately, preserves nullable canonical fields, and reports all missing
+identity fields. Neither a Qdrant point ID nor a display path is promoted as a packet identity.
+The incomplete-identity case is covered by the focused test suite.
+
+**LATENT-LIVE-01B fixture correction (2026-08-29)**: the opt-in orchestrator seam now calls the
+current `selectDiverseCandidates()` refill-aware combinator, not the superseded removed helper.
+Only candidates with both canonical `packetKey` and `sourceRef` enter the combinator; no display
+path fallback is used. A deterministic injected-provider fixture proves two identical vectors
+select the higher-ranked candidate while hydrating exactly the packet keys supplied by the caller.
+The focused suites pass together (16 tests). This remains a fixture proof; production activation
+still requires a real readback/quality review.
+
+**LATENT-LIVE-02 bounded provider readback (2026-08-29)**: a live read-only replay against five
+revision-qualified `codebase_chunk_index` rows found 5/5 vectors with the expected checkpoint,
+256 dimensions, finite values, zero missing rows, zero revision mismatches, and zero invalid
+shapes. Repeating the same request produced the identical receipt checksum
+(`2b752f1dbafb4b261bb89be5d29659f87e4ddf24465297f217e01a10e1b3761a`); canonical writes were 0.
+Probe: `sveltekit-frontend/scripts/atlas/prove-latent256-provider-live-readonly-v1.mts`.
+This proves the provider/readback seam only; it does not enable live dedup or prove retrieval lift.
+
+**LATENT-LIVE-03 opt-in end-to-end read-only fixture (2026-08-29)**: five live
+`codebase_chunk_index` candidates were passed through the configured orchestrator post-ranking
+hook and the real Postgres latent provider. The output retained 5/5 packet keys, used zero point-ID
+or path fallbacks, changed no default path, and performed zero canonical writes. No duplicate was
+removed in this sample; this is wiring/safety proof only, not a quality or promotion result.
+Probe receipt: `docs/reports/latent256-opt-in-live-readonly-proof-v1.json`.
+
 ### Threshold evaluated (2026-08-29) — and a bigger unwired gap found underneath it
 
 `EVALUATED_LATENT256_SIMILARITY_THRESHOLD = 0.90` — swept against real ground truth
@@ -12312,3 +12358,50 @@ larger pipeline-activation decision is made later) with zero further plumbing re
 still not called from anywhere live, by design. That remains the next, separate, deliberate
 decision: whether and where to actually invoke `applyLatent256SemanticDedup()` in production,
 now informed by a real measured tradeoff instead of a guess.
+
+### `applyLatent256SemanticDedup` → `selectDiverseCandidates`: refill fixes the regression (2026-08-29)
+
+A review correctly diagnosed the 4.1% coverage-loss finding above as a likely artifact of
+pruning within a fixed top-K with no replacement, and specified a refill-based selection API
+plus a Stage A/Stage B split (exact `content_hash` collapse before the learned representation
+has to justify itself). Built exactly that:
+
+- `latent256-dedup.ts` rewritten: `selectDiverseCandidates({candidates, finalK, candidatePoolK,
+  threshold, collapseExactContentHash})` walks a caller-chosen `candidatePoolK`, applies exact
+  `content_hash` collapse (Stage A, free, caller-supplied — no extra I/O) then latent_256
+  near-duplicate skip (Stage B), and refills from the remaining pool until `finalK` is reached
+  or the pool is honestly exhausted (`poolExhaustedBeforeFinalK`, never silently padded). No
+  live callers existed for the old `applyLatent256SemanticDedup`, so it was replaced outright,
+  not kept as a compat shim. 8 tests passing (`latent256-dedup.spec.ts`), including an explicit
+  refill-replaces-a-skipped-duplicate case and a rank-order-preservation case.
+
+**Direct test of the diagnostic hypothesis**
+(`python/benchmark_latent256_diversity_refill.py`, same 10 real queries, real embeddings, real
+pgvector retrieval, `pool=50`/`finalK=10`, mirrors `selectDiverseCandidates` exactly): the
+hypothesis was correct. With refill, the earlier 4.1% coverage *loss* becomes a **12.1%
+coverage gain**:
+
+| Policy | Avg unique sources / 10 | vs. baseline |
+|---|---|---|
+| baseline | 6.6 | — |
+| exact_hash_only + refill | 6.7 | +1.5% |
+| exact_and_semantic + refill | 7.4 | **+12.1%** |
+
+`finalCount == 10` on every one of the 10 queries — `poolExhaustedBeforeFinalK` never
+triggered at `pool=50`. Receipt: `docs/reports/latent256-diversity-refill-partial-eval-v1.json`.
+
+**Explicitly not attempted, and why** (both real, both out of reach this pass, neither
+fabricated): `Recall@10`/`MRR@10`/`nDCG@10`/α-nDCG require a labeled golden query set with
+known-relevant documents, which does not exist in this repo — building one legitimately is a
+separate, larger task, not something to approximate with unlabeled data. The Qdrant-native-MMR
+challenger (`EmbeddingGemma semantic_768` → Qdrant's native MMR) is a distinct, separate control
+experiment requiring its own integration, not yet started. Both remain named, scoped next steps
+under `LATENT-DIVERSITY-02 CANDIDATE_POOL_REFILL_EVAL`, not completed here.
+
+**Current honest status**: the refill result is a credible, real signal in favor of a shadow-
+production trial, but per the review's own standard ("if latent+refill removes the coverage
+regression while retaining most of the redundancy reduction, you have a credible shadow-
+production candidate... if it doesn't, that's a successful result too") — this partial result
+clears that bar on the diversity axis specifically. It does **not** yet establish end-to-end
+retrieval quality (relevance), which is exactly what the deferred Recall/MRR/nDCG work would
+need to answer before any production activation decision.
