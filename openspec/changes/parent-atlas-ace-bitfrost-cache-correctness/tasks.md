@@ -48,10 +48,79 @@ not confirmed clean.
 - [ ] `multi-lane-retrieval.ts`
 - [ ] Query-synthesis / prompt-build stage feeding Ornith
 
+## T4 — Cache identity / deterministic proof tranche — IMPLEMENTED, PROOF PENDING
+
+Web alignment checked before implementation against current upstream Valkey/vLLM/OpenTelemetry
+behavior: regular application `KEYS` traversal is not appropriate for production invalidation;
+prefix-cache identity should bind exact tokens plus runtime identity extras; cached-input-token
+telemetry is a distinct measured counter rather than an inferred savings number.
+
+- [x] Added `sveltekit-frontend/src/lib/server/cache/cache-identity-v2.ts`.
+      `CacheIdentityV2` uses SHA-256 over deterministic length-prefixed fields. Exact semantic
+      vectors are canonicalized to FP32 and hashed over every coordinate; exact token sequences
+      use u32 little-endian IDs. Physical keys include `cacheEpoch`.
+- [x] Preserved legacy `hashQuery()`/`hashEmbedding()`/key helpers for compatibility but marked
+      them non-promotion-grade. Added `hashQueryV2()`, `hashEmbeddingV2()`, `atlasRedisKeyV2()`,
+      and `atlasBifrostKeyV2()`.
+- [x] Migrated the unified `atlas-cache-cascade.ts` L1/L2 reads and L1 writes to V2 identities.
+      `invalidateAtlasCacheEpoch()` now performs O(1) logical invalidation by advancing
+      `atlas:graph_version` and `atlas:cache_epoch`; no `KEYS`/bulk `DEL` traversal remains on
+      this invalidation path. Old epoch-qualified entries are disposable and age out by TTL.
+- [x] Added `CacheExecutionReceiptV1` with the required bounded state machine:
+      `MISS → COMPUTE → WRITE → READBACK_HIT → INVALIDATE → POST_INVALIDATION_MISS`.
+      Promotion requires checksum parity, positive readback `PTTL`, initial/post-invalidation
+      `PTTL=-2`, and explicit `canonicalAuthority:false`.
+- [x] Added `sveltekit-frontend/scripts/atlas/prove-valkey-cache-execution-v1.mts`.
+      It operates on a unique proof namespace, records only bounded hashes/counts/timings, advances
+      the logical cache epoch, cleans its old proof key, and emits
+      `docs/reports/valkey-cache-execution-receipt-v1.json`.
+- [x] Added `parent-atlas-cache-receipt-projection-v1.ts`; a proven Valkey receipt advances only
+      `valkey_cache`. BitFrost, ACE prefill, and KV-prefix remain independent gates until their own
+      receipts exist. The admin HUD/report emitter consume the projection.
+- [x] HUD now distinguishes observed proof-cache hit rate from baseline-derived efficiency and
+      displays the count of proven cache tiers. Cache hits cannot raise token-savings telemetry.
+- [x] Added BitFrost `PrefixCacheIdentityV2` plus `getPrefixTokenV2()` / `registerPrefixV2()`.
+      Identity binds exact token IDs, model revision, tokenizer revision, prompt-template revision,
+      ContextManifest checksum, optional adapter revision, and optional cache salt. Existing
+      content-only prefix methods remain compatibility-only and cannot advance `kv_cache_identity`.
+- [ ] **PROOF PENDING:** execute focused unit tests/typechecks and the bounded live Valkey replay.
+- [ ] Add a BitFrost V2 live MISS→WRITE→HIT→identity-change MISS receipt before advancing
+      `bitfrost_cache` or `kv_cache_identity`.
+- [ ] Trace and migrate the actual prefill caller to V2 token/revision identity. Do not count the
+      compatibility-only `optimizeMessages()` path as KV proof.
+- [ ] Trace the live ACE assembler caller and pass authoritative workspace/source revisions;
+      optional revision parameters alone do not prove revision-qualified caching.
+- [ ] Add a cold/warm frozen-input replay before publishing token or wall-time savings. Use
+      runtime/provider cache-read/cache-write token counters when available; do not estimate from
+      prompt length, files, packet count, or hit count.
+- [ ] Consider single-flight miss suppression only after correctness proof. It is a resilience /
+      latency optimization, not a cache-correctness prerequisite.
+
+### T4 validation commands
+
+```bash
+cd sveltekit-frontend
+npx vitest run \
+  src/lib/server/cache/cache-identity-v2.spec.ts \
+  src/lib/server/cache/cache-execution-receipt-v1.spec.ts \
+  src/lib/server/atlas/tournament/parent-atlas-cache-receipt-projection-v1.spec.ts
+npm run check
+
+# Mutates only atlas:cache_epoch plus a unique short-lived proof key.
+npx tsx scripts/atlas/prove-valkey-cache-execution-v1.mts
+npx tsx scripts/atlas/emit-parent-atlas-tournament-progress-v1.mts
+
+cd ../packages/parent-atlas-retrieval
+npm run typecheck
+npx vitest run src/bifrost/bifrost-cache-manager.spec.ts
+```
+
+Do not mark T4 `PROVEN` until these commands execute successfully on the workstation and the live
+receipt validates.
+
 ## Run receipt
 
 See `parent-atlas-agentic-run-receipt-binding/tasks.md` T3 — this change is the first real
-`openspecChange` binding target for that new capability once it lands:
-`agentLabel: "Find optimizations in MCP/BitFrost/ACE synthesis path"`, `tokensUsed: 752970`,
-`durationMs: 77383`, `toolUses: 6`, `filesEdited: []` (fork was read-only; the 2 T1 fixes were
-applied by the coordinating session afterward, not by the fork itself).
+`openspecChange` binding target for that new capability once it lands. Historical agent metrics
+may be backfilled only if their actual workflow identity can be recovered; do not synthesize an
+event merely to raise Tournament EXP.
