@@ -1495,6 +1495,37 @@ Write back to L0-L3
 
 **Status**: ✅ **PRODUCTION READY** (April 12, 2026)
 
+**Naming clarification (verified live, 2026-08-30)**: there are two genuinely distinct systems that
+share a similar name, and prior sections of this file mix their spellings inconsistently. Keep them
+separate:
+- **"Bifrost"** (this spelling) — the real Go microservice at port 3040 (`go-microservice/cmd/bifrost/`)
+  and its TypeScript client `bifrostChat()` (`$lib/server/ollama.ts`). This is the L2 semantic-similarity
+  cache described in this section. The spelling "Bifrost" is correct for this system.
+- **"BitFrost"** (with a `t`) — the separate ACE/Karpathy GPU-authority Redis caching layer (SOM
+  cluster assignments, autoencoder latents, Karpathy blend scores). Verified live via `docker exec
+  legal-ai-valkey valkey-cli -a redis --scan --pattern '*'`: every real key in this layer is prefixed
+  `bitfrost:*` (e.g. `bitfrost:summary:*`, 4,827 keys) or `gpu:*` (`gpu:som:packet:{id}`,
+  `gpu:autoencoder:latent_64:{id}`, `gpu:karpathy:{scores,summary}`) — never `bifrost:*`. Real
+  scripts already use this spelling correctly: `scripts/atlas/audit-bitfrost-semantic-cache.mjs`.
+  Sections elsewhere in this file that say "BitFrost cache" or "bitfrost_cache_check" already have
+  it right; sections that describe this same GPU/Karpathy layer using "Bifrost" (single word, one
+  `f`) or the "Redis / Bifrost key pattern" contract (`bifrost:packet:*`, `centroid:directory:*`,
+  `centroid:feature:*`, `centroid:packet:*`) do not match live reality — those specific key shapes
+  return zero matches against the live instance. Treat the "Canonical Lineage Contract" section's
+  documented key pattern as aspirational/not-yet-implemented, not current state.
+- `gpu:karpathy:encoded` (the third documented Karpathy hash, alongside `scores`/`summary`) was
+  found absent live on 2026-08-30. `scripts/atlas/atlas-live-reconciliation-audit.mjs` flags
+  exactly this (`WARN: gpu:karpathy:encoded absent — run npm run karpathy:gpu`), so ran it —
+  **still absent afterward.** The script's own log explains why: `H6: ace:autoencoder:weights
+  missing — skipping 64-dim encode`. This is a deliberate, correct conditional skip, not a bug —
+  it matches this file's own "Why autoencoder is bypassed for attention scoring" note elsewhere
+  (untrained/random Xavier autoencoder weights produce flat, useless tanh output). `npm run
+  karpathy:gpu` did real, useful work regardless (200 candidates freshly scored into
+  `gpu:karpathy:scores`/`summary`, report at `next_steps/active/karpathy-gpu-recommendations.md`)
+  — but `gpu:karpathy:encoded` will stay empty until `ace:autoencoder:weights` exists, which needs
+  an actual trained autoencoder, not another script run. Not attempted here — out of scope for a
+  doc-accuracy pass.
+
 ### Architecture
 
 **3-Tier Cache** (Industry Best Practice):
