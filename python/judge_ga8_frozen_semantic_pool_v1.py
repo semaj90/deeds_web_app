@@ -1,8 +1,7 @@
-"""GA8-JUDGE-01 judging phase over an immutable semantic candidate pool.
+"""GA8-JUDGE-01 judging phase over immutable semantic candidate pools.
 
-No SQL, no Qdrant, no embedding calls, no graph reads, and no candidate discovery occur here.
-The judge sees query text plus anonymous bounded candidate evidence only. It assigns 0..3 grades
-in two deterministic presentation passes; disagreement is recorded, never silently averaged.
+No SQL, Qdrant, embedding, or graph reads occur here. The judge sees only query text plus
+anonymous bounded evidence. Two seeded passes assign 0..3 grades; disagreements are explicit.
 
 canonical_authority: false
 human_gold_relevance_set_proven: false
@@ -31,7 +30,7 @@ MAX_TOKENS = int(os.getenv("GA8_JUDGE_MAX_TOKENS", "3000"))
 PRESENTATION_SEED = int(os.getenv("GA8_JUDGE_PRESENTATION_SEED", "99173"))
 EVIDENCE_TRUNCATE = int(os.getenv("GA8_JUDGE_EVIDENCE_CHARS", "700"))
 PROMPT_REVISION = "ga8-llm-judge-graded-v2"
-PRESENTATION_POLICY_REVISION = "two-pass-seeded-anonymous-batches-v1"
+PRESENTATION_POLICY_REVISION = "two-pass-seeded-anonymous-batches-v2"
 
 RUBRIC = (
     "0 = not relevant; "
@@ -58,6 +57,53 @@ CANDIDATES:
 {candidates}
 """
 PROMPT_CHECKSUM = sha256_text(PROMPT_TEMPLATE + "\0" + RUBRIC)
+PRESENTATION_POLICY = {
+    "revision": PRESENTATION_POLICY_REVISION,
+    "passes": 2,
+    "batchSize": BATCH_SIZE,
+    "presentationSeed": PRESENTATION_SEED,
+    "evidenceChars": EVIDENCE_TRUNCATE,
+    "maxTokens": MAX_TOKENS,
+    "temperature": 0,
+    "anonymousSlots": True,
+}
+PRESENTATION_POLICY_CHECKSUM = sha256_json(PRESENTATION_POLICY)
+
+
+def pool_checksum_payload(pool: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "queryId": pool["queryId"],
+        "queryText": pool["queryText"],
+        "queryTextChecksum": pool["queryTextChecksum"],
+        "queryEmbeddingChecksum": pool["queryEmbeddingChecksum"],
+        "representationId": pool["representationId"],
+        "embeddingModelRevision": pool["embeddingModelRevision"],
+        "poolK": pool["poolK"],
+        "candidates": pool["candidates"],
+    }
+
+
+def validate_pool(pool: dict[str, Any]) -> None:
+    if pool.get("schema") != "atlas.frozen-semantic-candidate-pool.v1":
+        raise SystemExit("GA8_FROZEN_POOL_SCHEMA_MISMATCH")
+    if int(pool.get("labelInputsUsed", -1)) != 0 or int(pool.get("graphInputsUsed", -1)) != 0:
+        raise SystemExit("GA8_FROZEN_POOL_NOT_LABEL_GRAPH_INDEPENDENT")
+    if pool.get("canonicalAuthority") is not False:
+        raise SystemExit("GA8_FROZEN_POOL_AUTHORITY_INVALID")
+    if sha256_text(str(pool.get("queryText", ""))) != pool.get("queryTextChecksum"):
+        raise SystemExit(f"GA8_QUERY_TEXT_CHECKSUM_MISMATCH:{pool.get('queryId')}")
+    candidates = list(pool.get("candidates") or [])
+    ids = [str(c.get("candidateId")) for c in candidates]
+    if len(ids) != len(set(ids)):
+        raise SystemExit(f"GA8_FROZEN_POOL_DUPLICATE_CANDIDATE:{pool.get('queryId')}")
+    if [int(c.get("poolOrdinal", -1)) for c in candidates] != list(range(len(candidates))):
+        raise SystemExit(f"GA8_FROZEN_POOL_ORDINAL_GAP:{pool.get('queryId')}")
+    for candidate in candidates:
+        evidence = str(candidate.get("evidenceText") or "")
+        if sha256_text(evidence) != candidate.get("evidenceTextChecksum"):
+            raise SystemExit(f"GA8_EVIDENCE_TEXT_CHECKSUM_MISMATCH:{pool.get('queryId')}:{candidate.get('candidateId')}")
+    if sha256_json(pool_checksum_payload(pool)) != pool.get("candidatePoolChecksum"):
+        raise SystemExit(f"GA8_CANDIDATE_POOL_CHECKSUM_MISMATCH:{pool.get('queryId')}")
 
 
 def deterministic_seed(query_id: str, pass_no: int) -> int:
@@ -73,12 +119,7 @@ def llama_chat(prompt: str) -> str:
         "max_tokens": MAX_TOKENS,
         "stream": True,
     }
-    response = requests.post(
-        f"{LLAMA_URL}/v1/chat/completions",
-        json=payload,
-        stream=True,
-        timeout=240,
-    )
+    response = requests.post(f"{LLAMA_URL}/v1/chat/completions", json=payload, stream=True, timeout=240)
     response.raise_for_status()
     assembled = ""
     for line in response.iter_lines(decode_unicode=True):
@@ -96,8 +137,7 @@ def llama_chat(prompt: str) -> str:
 
 
 def parse_batch(text: str, expected_slots: list[str]) -> dict[str, int]:
-    start = text.find("{")
-    end = text.rfind("}")
+    start, end = text.find("{"), text.rfind("}")
     if start < 0 or end < start:
         raise ValueError("JUDGE_JSON_OBJECT_NOT_FOUND")
     try:
@@ -111,8 +151,7 @@ def parse_batch(text: str, expected_slots: list[str]) -> dict[str, int]:
     for item in judgments:
         if not isinstance(item, dict):
             raise ValueError("JUDGE_ITEM_NOT_OBJECT")
-        slot = item.get("slot")
-        grade = item.get("grade")
+        slot, grade = item.get("slot"), item.get("grade")
         if slot not in expected_slots or slot in result:
             raise ValueError("JUDGE_SLOT_INVALID_OR_DUPLICATE")
         if isinstance(grade, bool) or not isinstance(grade, (int, float)) or int(grade) != grade:
@@ -128,13 +167,11 @@ def parse_batch(text: str, expected_slots: list[str]) -> dict[str, int]:
 
 def judge_query_pass(pool: dict[str, Any], pass_no: int) -> tuple[dict[str, int], list[dict[str, Any]]]:
     candidates = list(pool["candidates"])
-    rng = random.Random(deterministic_seed(str(pool["queryId"]), pass_no))
-    rng.shuffle(candidates)
-
+    random.Random(deterministic_seed(str(pool["queryId"]), pass_no)).shuffle(candidates)
     grades: dict[str, int] = {}
     failures: list[dict[str, Any]] = []
-    for batch_index in range(0, len(candidates), BATCH_SIZE):
-        batch = candidates[batch_index : batch_index + BATCH_SIZE]
+    for batch_start in range(0, len(candidates), BATCH_SIZE):
+        batch = candidates[batch_start : batch_start + BATCH_SIZE]
         slot_to_candidate: dict[str, dict[str, Any]] = {}
         lines: list[str] = []
         for slot_index, candidate in enumerate(batch):
@@ -142,62 +179,65 @@ def judge_query_pass(pool: dict[str, Any], pass_no: int) -> tuple[dict[str, int]
             slot_to_candidate[slot] = candidate
             evidence = str(candidate.get("evidenceText") or "").strip().replace("\n", " ")[:EVIDENCE_TRUNCATE]
             lines.append(f"{slot}: {evidence or '(no evidence text)'}")
-        prompt = PROMPT_TEMPLATE.format(
-            query=str(pool["queryText"])[:2000],
-            rubric=RUBRIC,
-            candidates="\n".join(lines),
-        )
+        prompt = PROMPT_TEMPLATE.format(query=str(pool["queryText"])[:2000], rubric=RUBRIC, candidates="\n".join(lines))
         raw = llama_chat(prompt)
         try:
             parsed = parse_batch(raw, list(slot_to_candidate))
         except ValueError as exc:
             failures.append({
                 "pass": pass_no,
-                "batchStart": batch_index,
+                "batchStart": batch_start,
                 "candidateIds": [str(c["candidateId"]) for c in batch],
                 "error": str(exc),
                 "rawOutputChecksum": sha256_text(raw),
             })
             continue
         for slot, grade in parsed.items():
-            candidate_id = str(slot_to_candidate[slot]["candidateId"])
-            grades[candidate_id] = grade
+            grades[str(slot_to_candidate[slot]["candidateId"])] = grade
     return grades, failures
 
 
 def main() -> None:
     if not JUDGE_MODEL_REVISION:
         raise SystemExit("GA8_JUDGE_MODEL_REVISION_REQUIRED")
-    if BATCH_SIZE <= 0:
-        raise SystemExit("GA8_JUDGE_BATCH_SIZE_INVALID")
+    if BATCH_SIZE <= 0 or MAX_TOKENS <= 0 or EVIDENCE_TRUNCATE <= 0:
+        raise SystemExit("GA8_JUDGE_CONFIG_INVALID")
 
     pools = load_ndjson(FROZEN_POOL_PATH)
     if not pools:
         raise SystemExit("GA8_FROZEN_POOL_EMPTY")
+    query_ids = [str(pool.get("queryId")) for pool in pools]
+    if len(query_ids) != len(set(query_ids)):
+        raise SystemExit("GA8_DUPLICATE_QUERY_ID")
     for pool in pools:
-        if pool.get("schema") != "atlas.frozen-semantic-candidate-pool.v1":
-            raise SystemExit("GA8_FROZEN_POOL_SCHEMA_MISMATCH")
-        if int(pool.get("labelInputsUsed", -1)) != 0 or int(pool.get("graphInputsUsed", -1)) != 0:
-            raise SystemExit("GA8_FROZEN_POOL_NOT_LABEL_GRAPH_INDEPENDENT")
+        validate_pool(pool)
 
-    global_universe_payload = [
+    snapshot_revisions = {str(pool.get("candidateSnapshotRevision")) for pool in pools}
+    if len(snapshot_revisions) != 1 or "None" in snapshot_revisions:
+        raise SystemExit("GA8_CANDIDATE_SNAPSHOT_REVISION_MIXED_OR_MISSING")
+    candidate_snapshot_revision = next(iter(snapshot_revisions))
+    expected_snapshot_revision = sha256_json([
+        {"queryId": pool["queryId"], "candidatePoolChecksum": pool["candidatePoolChecksum"]}
+        for pool in pools
+    ])
+    if candidate_snapshot_revision != expected_snapshot_revision:
+        raise SystemExit("GA8_CANDIDATE_SNAPSHOT_REVISION_MISMATCH")
+
+    universe_payload = [
         {
             "queryId": pool["queryId"],
             "candidatePoolChecksum": pool["candidatePoolChecksum"],
             "judgePromptChecksum": PROMPT_CHECKSUM,
             "judgeModelRevision": JUDGE_MODEL_REVISION,
-            "presentationPolicyRevision": PRESENTATION_POLICY_REVISION,
+            "presentationPolicyChecksum": PRESENTATION_POLICY_CHECKSUM,
         }
         for pool in pools
     ]
-    judgment_universe_checksum = sha256_json(global_universe_payload)
+    judgment_universe_checksum = sha256_json(universe_payload)
 
     rows: list[dict[str, Any]] = []
     failures: list[dict[str, Any]] = []
-    stable_count = 0
-    disagreement_count = 0
-    high_disagreement_count = 0
-    ungraded_count = 0
+    stable_count = disagreement_count = high_disagreement_count = ungraded_count = 0
 
     for query_index, pool in enumerate(pools):
         pass1, failures1 = judge_query_pass(pool, 1)
@@ -208,12 +248,11 @@ def main() -> None:
             "candidatePoolChecksum": pool["candidatePoolChecksum"],
             "judgePromptChecksum": PROMPT_CHECKSUM,
             "judgeModelRevision": JUDGE_MODEL_REVISION,
-            "presentationPolicyRevision": PRESENTATION_POLICY_REVISION,
+            "presentationPolicyChecksum": PRESENTATION_POLICY_CHECKSUM,
         })
         for candidate in pool["candidates"]:
             candidate_id = str(candidate["candidateId"])
-            grade1 = pass1.get(candidate_id)
-            grade2 = pass2.get(candidate_id)
+            grade1, grade2 = pass1.get(candidate_id), pass2.get(candidate_id)
             stable = grade1 is not None and grade2 is not None and grade1 == grade2
             disagreement: str | None = None
             if grade1 is None or grade2 is None:
@@ -233,7 +272,7 @@ def main() -> None:
                 "candidateId": candidate_id,
                 "sourceRef": candidate["sourceRef"],
                 "candidatePoolChecksum": pool["candidatePoolChecksum"],
-                "candidateSnapshotRevision": pool["candidateSnapshotRevision"],
+                "candidateSnapshotRevision": candidate_snapshot_revision,
                 "relevanceGrade": grade1 if stable else None,
                 "pass1Grade": grade1,
                 "pass2Grade": grade2,
@@ -244,6 +283,7 @@ def main() -> None:
                 "judgePromptRevision": PROMPT_REVISION,
                 "judgePromptChecksum": PROMPT_CHECKSUM,
                 "presentationPolicyRevision": PRESENTATION_POLICY_REVISION,
+                "presentationPolicyChecksum": PRESENTATION_POLICY_CHECKSUM,
                 "queryJudgmentUniverseChecksum": query_universe_checksum,
                 "judgmentUniverseChecksum": judgment_universe_checksum,
                 "humanReviewed": False,
@@ -251,12 +291,16 @@ def main() -> None:
             })
         print(canonical_json({"event": "ga8_judge_progress", "queriesCompleted": query_index + 1, "queriesTotal": len(pools)}))
 
+    expected_row_count = sum(len(pool["candidates"]) for pool in pools)
+    if len(rows) != expected_row_count:
+        raise SystemExit("GA8_JUDGMENT_ROW_COVERAGE_MISMATCH")
     write_ndjson(OUT_PATH, rows)
     report = {
         "schema": "atlas.ga8-llm-judged-semantic-relevance-receipt.v2",
         "status": "LLM_SILVER_LABELS_CREATED",
         "evidenceTier": "LLM_JUDGED_PROXY",
         "humanGoldRelevanceSetProven": False,
+        "candidateSnapshotRevision": candidate_snapshot_revision,
         "frozenPoolPath": FROZEN_POOL_PATH,
         "judgmentPath": OUT_PATH,
         "judgmentUniverseChecksum": judgment_universe_checksum,
@@ -265,7 +309,9 @@ def main() -> None:
         "judgeModelRevision": JUDGE_MODEL_REVISION,
         "judgePromptRevision": PROMPT_REVISION,
         "judgePromptChecksum": PROMPT_CHECKSUM,
-        "presentationPolicyRevision": PRESENTATION_POLICY_REVISION,
+        "presentationPolicy": PRESENTATION_POLICY,
+        "presentationPolicyChecksum": PRESENTATION_POLICY_CHECKSUM,
+        "candidateRowsExpected": expected_row_count,
         "candidateRows": len(rows),
         "stableRows": stable_count,
         "disagreementRows": disagreement_count,
