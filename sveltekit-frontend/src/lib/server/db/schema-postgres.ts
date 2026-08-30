@@ -4445,6 +4445,19 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	summaryEmbedding: halfvec('summary_embedding', { dimensions: 768 }),
 	signatureEmbedding: halfvec('signature_embedding', { dimensions: 768 }),
 
+	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
+	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).
+	// canonical_authority: false always -- routing/reranking lane only, never the primary
+	// retrieval authority. latent_128/latent_64 are NOT stored separately: they're free
+	// prefix+renormalize views of latent_256, derived at query time.
+	// See openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md for the recall
+	// comparison that justified this column (latent_256 beats semantic_mrl_256, 0.8957 vs 0.8575).
+	latent256: halfvec('latent_256', { dimensions: 256 }),
+	// Model checksum from the training receipt that produced latent_256 for this row.
+	// A future retrain must not silently mix generations -- a mismatch here means the row
+	// needs re-encoding, not that the column is stale/broken.
+	latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
+
 	// 4D manifold coords: [som_x, som_y, semantic_z, grpo_w] — matches research_summaries.manifold4
 	manifold4: real('manifold4').array(),
 
