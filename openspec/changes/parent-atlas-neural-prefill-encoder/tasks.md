@@ -12239,3 +12239,36 @@ caller-supplied config value, not defaulted to a number chosen by intuition).
 `.hydrate()` for the top-N candidates and thread `latent256Map` through to
 `postProcessCandidates()` — that wiring, plus picking a real threshold from an evaluation, are
 the next two concrete steps, not yet started.
+
+### Threshold evaluated (2026-08-29) — and a bigger unwired gap found underneath it
+
+`EVALUATED_LATENT256_SIMILARITY_THRESHOLD = 0.90` — swept against real ground truth
+(`codebase_chunk_index` rows sharing a `content_hash`: 942 positive pairs / 797 groups, vs
+20,000 random different-`content_hash` negative pairs), per the explicit review instruction not
+to pick a number from intuition. 0.90 has the highest `duplicate_recall` (0.8715) of the six
+swept thresholds with `false_positive_rate` still at 0.00015 (3/20,000). Honest caveat: even at
+0.90, ~13% of genuine content-duplicate pairs aren't caught. Script:
+`python/evaluate_latent256_dedup_threshold.py`, receipt:
+`docs/reports/latent256-dedup-threshold-evaluation-v1.json`. Recorded as a documented constant
+(`post-process-reranker.ts`) — does **not** change `DEFAULT_POST_PROCESS_CONFIG` (stays
+disabled).
+
+**Attempting the final wiring step found a bigger gap than expected**: `grep -rln
+"postProcessCandidates" src/ --include="*.ts"` (excluding specs) returns **zero files**.
+`postProcessCandidates` — and by extension the entire Stage 3b (`candidate-scorer.ts`) → Stage
+4b (`post-process-reranker.ts`) pipeline both of those files' own docstrings describe — has no
+live caller anywhere in this repo, independent of anything this session added. Confirmed via a
+second check: `unified-orchestrator.ts` computes its own `finalScore` (line ~544) without
+importing either file; `grep -n "rerank\|dedup\|diversity\|blendScore\|finalScore"` against that
+file finds no reference to the Stage 3b/4b pipeline at all.
+
+This means "wire `latent_256` dedup into the live orchestrator" is not a small next step — it
+resolves to one of two materially different, larger decisions: (a) wire the entire dormant
+`candidate-scorer.ts → post-process-reranker.ts` pipeline into `unified-orchestrator.ts` for the
+first time (a real behavioral change to production scoring, far bigger than dedup alone), or
+(b) build a second, separate dedup call site outside that pipeline (risking exactly the
+competing-mechanism duplication this repo's own governance rules warn against). Per this
+session's standing discipline (verify before recommending, flag ambiguity rather than guess),
+this was **not** resolved unilaterally — recorded here for an explicit operator decision rather
+than picked silently. `LATENT256_SEMANTIC_DEDUP` and its evaluated threshold remain correct,
+tested, and ready to use the moment either path is chosen; neither has been started.
