@@ -12042,3 +12042,26 @@ manually reviewed before applying against a live table with real data):
 - Per the standing rule already in this file: this stays `canonical_authority: false` — a
   routing/reranking lane, never the primary retrieval authority, and never promoted ahead of
   `exact_semantic_768`.
+
+### `latent_256` Postgres column applied and fully backfilled (2026-08-29)
+
+Executed the recommendation above, in order:
+1. `latent_256 halfvec(256)` + `latent_256_checkpoint_revision varchar(64)` added to
+   `codebase_chunk_index` — Drizzle schema (`schema-postgres.ts`) and manual SQL sidecar
+   (`sveltekit-frontend/drizzle/manual/latent_256_columns.sql`, additive only:
+   `ADD COLUMN IF NOT EXISTS` + `CREATE INDEX CONCURRENTLY IF NOT EXISTS`). Applied against the
+   live `legal_ai_db`, verified via `\d codebase_chunk_index`.
+2. `python/backfill_latent_256.py` — a real `NestedSemanticAutoencoder.encode()` forward pass on
+   the `v3_full01` checkpoint (not a prefix truncation, since `latent_256` is a physical
+   bottleneck). Dry-run proven on 50 rows, then a 50-row `--apply` proven live
+   (`vector_dims(latent_256) = 256`, correct checkpoint revision), then the full corpus.
+3. Full backfill result: **55,119 rows written this run** (+ the 50-row proof = all 55,169
+   eligible rows), 635.8s. Post-backfill census: `total: 55169, backfilled: 55169,
+   distinct_revisions: 1` — full coverage, zero mixed-generation rows.
+
+`latent_128`/`latent_64` remain unstored — derived at query time as free prefix+renormalize views
+of `latent_256`, per the migration plan above.
+
+**Not yet done**: the Qdrant lane (new named vector or `codebase_chunks_latent256` collection,
+payload-marked with the checkpoint revision) and the ANN-vs-exact parity proof this session
+already scoped as the next step after indexing.
