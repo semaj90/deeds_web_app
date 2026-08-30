@@ -5,7 +5,11 @@
 </script>
 
 <div class="tournament-shell">
-	<TournamentExpBar progress={data.tournament.progress} gates={data.tournament.gates} />
+	<TournamentExpBar
+		progress={data.tournament.progress}
+		gates={data.tournament.gates}
+		agentic={data.tournament.agenticTelemetry}
+	/>
 </div>
 
 {@render children()}
