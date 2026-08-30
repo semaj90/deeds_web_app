@@ -12128,3 +12128,43 @@ yet — it exists and is correct, but nothing calls it); the same pipeline for `
 yet); Neo4j/graph-side wiring; and everything under the "vertical spine" governance addendum
 (`SymbolFeatureAlignmentV1`, `EligibilitySetV1`, etc.) recorded in
 `parent-atlas-memory-architecture-freeze/proposal.md`, which remains fully unimplemented.
+
+### Deep audit: why live-query wiring is blocked, and the operator decision made (2026-08-29)
+
+Before deferring, verified the actual blocker live rather than assuming it — three checks, all
+confirmed:
+
+1. **Zero live TS/JS consumers of `latent_256` exist.** `grep -rln "latent_256\|codebase_chunks_latent256\|latent256" src/` inside `sveltekit-frontend/` returns exactly one file: `schema-postgres.ts` (this session's own migration). Nothing in `src/lib/server/retrieval/` reads the new Postgres column or the new Qdrant collection.
+2. **The existing TS-side "autoencoder" retrieval code is dormant, not a wiring point.** `autoencoder-compression-pipeline.ts`'s own docstring says it uses "simple sum-pooling (data-efficient initialization)... For production accuracy, replace with trained PyTorch encoder weights" — exactly the gap this session's checkpoint fills. But its only consumer is the `$lib/gpu` barrel (`index.ts`), and `grep -rln "from.*\$lib/gpu['\"]" src/` outside `src/lib/gpu/` itself returns nothing — the whole lane is unreached dead code, confirmed via caller trace, not assumed from the filename. `autoencoder-cuvs-bridge.ts` (a second, adjacent file) already carries its own 2026-08-12 audit note admitting the same thing for a sibling path. Wiring `latent_256` into "the existing autoencoder lane" is therefore not a real option — there is no live lane to extend.
+3. **The real blocker is query-time inference, not retrieval code.** Encoding a fresh query into `latent_256` requires running the trained PyTorch model (`768→384→256` MLP) at request time. TypeScript cannot do this directly; it needs either (a) a persistent Python inference service, or (b) an ONNX export run in-process via the *already-real* `src/lib/ai/onnx/` path (`session.ts`, `inference.ts`, `gemma4-e2b-session.ts` all exist and are used for `gemma3_270m`/`embeddinggemma` client-side inference today — confirmed via `ls`, not assumed).
+
+**Operator decision, via `AskUserQuestion`**: presented four options —
+(a) new persistent FastAPI sidecar loading the `.pt` checkpoint, (b) ONNX export run through the
+existing `src/lib/ai/onnx/` path, (c) candidate-side-only reranking (no live query encoding,
+narrower scope), (d) stop here and defer live wiring entirely. **Chosen: (d), stop here.**
+
+**Follow-up technical clarification recorded** (asked after the decision, for a future session
+that revisits this): if a persistent sidecar is ever built, it should be **FastAPI + plain
+`torch.load()`, matching `miniforge_nlp_sidecar.py`'s exact existing pattern — NOT Triton
+Inference Server.** Triton is reserved in this repo's own inference cascade for the heavy models
+(`Triton TensorRT :8000` in the 8-tier cascade documented in root `CLAUDE.md`); this encoder is a
+3-layer MLP running sub-millisecond on the RTX 3060 Ti, and Triton's dynamic-batching
+multi-model-serving design would add process/VRAM overhead for zero benefit at this scale. The
+TS↔Python call, if built, should be plain REST (matching the sibling `:8095` sidecar), not gRPC —
+this repo has both patterns live (gRPC for `embedding-client.ts`/`retrieval-client.ts` on
+`:50051`/`:50053`; REST for the miniforge sidecar), and REST is the consistent choice for a
+single simple endpoint, not proto-maintenance overhead.
+
+**Why "stop" was the defensible choice, not just the path of least resistance** — verified live,
+not assumed: `:8095` (miniforge sidecar) and `:8090` (TurboQuant llama-server) are **both
+currently running** (`netstat` confirms both bound and LISTENING). A third persistent GPU-adjacent
+service on an 8GB card that's already shared between two live processes is a real VRAM-contention
+risk, not a hypothetical one — exactly the kind of decision this session's own vertical-spine
+governance addendum flags as requiring explicit classification before building, not silent
+addition. `:8098` (the RAPIDS/graph sidecar referenced earlier this session) remains **not
+running** — a second confirmed-still-open gap, unrelated to this lane, not touched here.
+
+**State this leaves, precisely**: `latent_256` is a **complete, correct, proven, indexed,
+ANN-parity-verified representation with zero live consumers.** That is a valid, intentional
+stopping point — not an unfinished pipeline — pending an explicit future decision on query-time
+inference infrastructure.
