@@ -12618,3 +12618,25 @@ both closed on everything reachable without a human-labeled golden set. `LAMBDAM
 (learned relevance ranking via XGBoost `rank:ndcg`, over the existing `CandidateFeatureMatrix`
 work) is the correctly-sequenced next experiment — explicitly gated on that golden set, and
 explicitly not started here.
+
+### Correction (2026-08-29, later same day): "zero live callers by design" is now stale
+
+The line above ("zero live callers by design") was accurate when written but is no longer
+accurate as of a subsequent commit in this same session — `selectDiverseCandidates()` is now
+called from `unified-orchestrator.ts::applyConfiguredLatent256Dedup()`, which is itself called
+from the main `rankCandidates`/orchestration path, gated behind `config.latent256Dedup?.enabled`.
+
+Verified before recording this correction (per this repo's own evidence-over-memory rule — a
+prior session's claim about repo state is not trustworthy without re-checking it): grepped for
+any call site setting `latent256Dedup: { enabled: true, ... }` anywhere in `src/` — zero matches.
+The integration is real, live, and reachable, but genuinely still opt-in and off by default —
+"unowned integration decision, deliberately deferred" is corrected to "integrated safely by a
+concurrent agent, still inert until a caller opts in," not "not yet wired at all."
+
+The wiring itself was checked for soundness, not just presence: `applyConfiguredLatent256Dedup`
+filters to only candidates with both `packetKey` and `sourceRef` before calling the dedup
+provider (no fabricated identity for incomplete hits), and its final filter step
+(`!candidate.packetKey || survivorKeys.has(candidate.packetKey)`) is fail-open — a candidate
+without a packet key survives untouched rather than being silently dropped. This matches the
+identity-safety discipline established throughout this thread. No changes made to this wiring;
+this section only corrects the stale status claim.
