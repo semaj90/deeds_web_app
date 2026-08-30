@@ -6,6 +6,7 @@ import { sql } from 'drizzle-orm';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { loadParentAtlasTournamentSnapshotV1 } from '$lib/server/atlas/tournament/parent-atlas-tournament-receipt-aggregator-v1.js';
 
 const LLM_WIKI_TOPICS = [
 	'backpropagation', 'tokenization', 'attention-mechanism', 'embedding-vectors',
@@ -14,7 +15,8 @@ const LLM_WIKI_TOPICS = [
 ] as const;
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Fallback data for demo / guest mode if databases aren't fully hydrated
+	// Fallback data for demo / guest mode if databases aren't fully hydrated.
+	// Tournament proof progress below does NOT use these fallbacks.
 	let pagerankScores: Array<{ path: string; score: number }> = [];
 	let cartridgeCount = 0;
 	let totalChunks = 0;
@@ -73,7 +75,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
-	// Dynamic simulated telemetry for real-world E2E routing validation traces
+	// 6. Load fail-closed proof progress from typed receipts. process.cwd() is
+	// normally sveltekit-frontend under Vite; support repo-root execution too.
+	const repoRoot = process.cwd().endsWith('sveltekit-frontend')
+		? resolve(process.cwd(), '..')
+		: process.cwd();
+	const tournament = await loadParentAtlasTournamentSnapshotV1(repoRoot);
+
+	// Dynamic simulated telemetry for the legacy E2E routing demo. These traces
+	// are intentionally NOT fed into tournament proof progress.
 	const routingTraces = [
 		{
 			id: 'real_001',
@@ -134,6 +144,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 			autoencoder: { device: 'cuda', gpu: 'NVIDIA GeForce RTX 3060 Ti', bestLoss: 0.0071 },
 			status: 'PASS'
 		},
+		tournament,
 		routingTraces
 	};
 };
