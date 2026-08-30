@@ -1,0 +1,305 @@
+{
+  "schema": "atlas.latent256-dedup-realworld-benchmark.v1",
+  "canonical_authority": false,
+  "note": "Measures real impact on real top-K retrieval results. Does not itself activate or wire anything.",
+  "threshold_used": 0.9,
+  "top_k": 50,
+  "query_count": 10,
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "candidates_before": 40,
+      "candidates_after": 31,
+      "removed_count": 9,
+      "unique_sources_before": 15,
+      "unique_sources_after": 15,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/db/pool.ts",
+          "cosine_768_relevance": 0.526695968370567
+        },
+        {
+          "source_ref": "src/lib/server/connections/connection-pool.ts",
+          "cosine_768_relevance": 0.44871237283642185
+        },
+        {
+          "source_ref": "src/lib/db/pool.ts",
+          "cosine_768_relevance": 0.43618396874511856
+        },
+        {
+          "source_ref": "src/lib/config/database.ts",
+          "cosine_768_relevance": 0.43251617110494145
+        },
+        {
+          "source_ref": "src/mcp/tools/vault-walker.tool.ts",
+          "cosine_768_relevance": 0.4307621581843776
+        }
+      ]
+    },
+    {
+      "query": "JWT authentication middleware",
+      "candidates_before": 41,
+      "candidates_after": 38,
+      "removed_count": 3,
+      "unique_sources_before": 18,
+      "unique_sources_after": 18,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/server/auth.ts",
+          "cosine_768_relevance": 0.4784907898719222
+        },
+        {
+          "source_ref": "src/lib/server/error-brain/middleware.ts",
+          "cosine_768_relevance": 0.42133160202651987
+        },
+        {
+          "source_ref": "src/lib/server/auth-helpers.ts",
+          "cosine_768_relevance": 0.40752698161284395
+        }
+      ]
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "candidates_before": 41,
+      "candidates_after": 33,
+      "removed_count": 8,
+      "unique_sources_before": 23,
+      "unique_sources_after": 22,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/server/evidence/services/drizzle-stub.ts",
+          "cosine_768_relevance": 0.5601468559703323
+        },
+        {
+          "source_ref": "src/lib/server/db/pgvector-utils.ts",
+          "cosine_768_relevance": 0.5386453500620252
+        },
+        {
+          "source_ref": "src/lib/db/migrations/20241211000004_add_vector_extension_and_functions.sql",
+          "cosine_768_relevance": 0.5340568566867755
+        },
+        {
+          "source_ref": "src/lib/db/migrations/20241211000004_add_vector_extension_and_functions.sql",
+          "cosine_768_relevance": 0.5305885273677342
+        },
+        {
+          "source_ref": "src/lib/server/embedding/knn-helper.ts",
+          "cosine_768_relevance": 0.5305616359197076
+        }
+      ]
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "candidates_before": 40,
+      "candidates_after": 32,
+      "removed_count": 8,
+      "unique_sources_before": 26,
+      "unique_sources_after": 21,
+      "removed_examples": [
+        {
+          "source_ref": "src/routes/(app)/demos/svelte5-components/+page.svelte",
+          "cosine_768_relevance": 0.6439404795171888
+        },
+        {
+          "source_ref": "src/lib/components/ui/Badge.svelte",
+          "cosine_768_relevance": 0.6013655889710162
+        },
+        {
+          "source_ref": "docs/atlas/feature-registry.json",
+          "cosine_768_relevance": 0.5982885594555247
+        },
+        {
+          "source_ref": "src/lib/components/ui/badge/Svelte5Badge.svelte",
+          "cosine_768_relevance": 0.5825861252834152
+        },
+        {
+          "source_ref": "src/lib/components/ui/Badge.svelte",
+          "cosine_768_relevance": 0.5810634806640569
+        }
+      ]
+    },
+    {
+      "query": "error handling and logging middleware",
+      "candidates_before": 40,
+      "candidates_after": 36,
+      "removed_count": 4,
+      "unique_sources_before": 16,
+      "unique_sources_after": 16,
+      "removed_examples": [
+        {
+          "source_ref": "docs/P1-ERROR-COLLECTION-WIRING.md",
+          "cosine_768_relevance": 0.5497195678252996
+        },
+        {
+          "source_ref": "src/lib/client-logging.ts",
+          "cosine_768_relevance": 0.4978268741999814
+        },
+        {
+          "source_ref": "src/lib/server/utils/graceful-error-handler.ts",
+          "cosine_768_relevance": 0.4789098053254892
+        },
+        {
+          "source_ref": "src/lib/server/production-logger.ts",
+          "cosine_768_relevance": 0.4772341694569229
+        }
+      ]
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "candidates_before": 41,
+      "candidates_after": 34,
+      "removed_count": 7,
+      "unique_sources_before": 22,
+      "unique_sources_after": 21,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/server/ai/caching-layer.ts",
+          "cosine_768_relevance": 0.5709567324899237
+        },
+        {
+          "source_ref": "src/lib/server/cache/report-template-cache.ts",
+          "cosine_768_relevance": 0.5497512920199791
+        },
+        {
+          "source_ref": "src/lib/server/cache/report-template-cache.ts",
+          "cosine_768_relevance": 0.5446835192528269
+        },
+        {
+          "source_ref": "src/lib/server/analytics/research-cache.ts",
+          "cosine_768_relevance": 0.5416555724712894
+        },
+        {
+          "source_ref": "src/lib/server/analytics/web-research-crawler.ts",
+          "cosine_768_relevance": 0.5288137646214611
+        }
+      ]
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "candidates_before": 40,
+      "candidates_after": 34,
+      "removed_count": 6,
+      "unique_sources_before": 26,
+      "unique_sources_after": 26,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/server/qdrant-http.ts",
+          "cosine_768_relevance": 0.549942954651637
+        },
+        {
+          "source_ref": "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+          "cosine_768_relevance": 0.5457650499383864
+        },
+        {
+          "source_ref": "services/go-index-worker/internal/upsert/qdrant.go",
+          "cosine_768_relevance": 0.5222765316929335
+        },
+        {
+          "source_ref": "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+          "cosine_768_relevance": 0.5217997735119136
+        },
+        {
+          "source_ref": "src/lib/server/research/web-research-ingester.ts",
+          "cosine_768_relevance": 0.5075837675796362
+        }
+      ]
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "candidates_before": 42,
+      "candidates_after": 37,
+      "removed_count": 5,
+      "unique_sources_before": 26,
+      "unique_sources_after": 25,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/server/db/migrate-test-rag.ts",
+          "cosine_768_relevance": 0.6104921065338481
+        },
+        {
+          "source_ref": "src/lib/shims/drizzle-node-postgres.ts",
+          "cosine_768_relevance": 0.6013379065978901
+        },
+        {
+          "source_ref": "src/lib/server/db/migrate-test-rag.ts",
+          "cosine_768_relevance": 0.5794789439557776
+        },
+        {
+          "source_ref": "src/lib/server/db/index-new.ts",
+          "cosine_768_relevance": 0.5754040707674156
+        },
+        {
+          "source_ref": "src/lib/server/db/migrations/004_case_management_readme.sql",
+          "cosine_768_relevance": 0.575216166616369
+        }
+      ]
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "candidates_before": 43,
+      "candidates_after": 36,
+      "removed_count": 7,
+      "unique_sources_before": 27,
+      "unique_sources_after": 26,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/client/workflow-event-stream.ts",
+          "cosine_768_relevance": 0.43336641024192013
+        },
+        {
+          "source_ref": "src/lib/server/queue/rabbitmq-connection.ts",
+          "cosine_768_relevance": 0.43149512445439453
+        },
+        {
+          "source_ref": "src/lib/client/workflow-event-stream.ts",
+          "cosine_768_relevance": 0.42968416018269406
+        },
+        {
+          "source_ref": "src/lib/client/workflow-event-stream.ts",
+          "cosine_768_relevance": 0.42353632321469004
+        },
+        {
+          "source_ref": "src/lib/client/workflow-event-stream.ts",
+          "cosine_768_relevance": 0.4217937868131777
+        }
+      ]
+    },
+    {
+      "query": "file upload validation and storage",
+      "candidates_before": 40,
+      "candidates_after": 34,
+      "removed_count": 6,
+      "unique_sources_before": 19,
+      "unique_sources_after": 18,
+      "removed_examples": [
+        {
+          "source_ref": "src/lib/components/ui/modular/FileUpload.svelte",
+          "cosine_768_relevance": 0.5463534373824831
+        },
+        {
+          "source_ref": "src/lib/components/FileUploadSection.svelte",
+          "cosine_768_relevance": 0.5260555943994301
+        },
+        {
+          "source_ref": "src/lib/components/yorha/evidence/UploadZone.svelte",
+          "cosine_768_relevance": 0.5099301816277436
+        },
+        {
+          "source_ref": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+          "cosine_768_relevance": 0.507236089675899
+        },
+        {
+          "source_ref": "src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+          "cosine_768_relevance": 0.5069839953474227
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_candidates_before": 408,
+    "total_removed": 63,
+    "avg_removed_pct_per_query": 0.154586270696594,
+    "avg_unique_source_ratio_change_pct": -0.04093706530777469
+  },
+  "duration_s": 2.1642730236053467
+}
