@@ -12272,3 +12272,43 @@ session's standing discipline (verify before recommending, flag ambiguity rather
 this was **not** resolved unilaterally — recorded here for an explicit operator decision rather
 than picked silently. `LATENT256_SEMANTIC_DEDUP` and its evaluated threshold remain correct,
 tested, and ready to use the moment either path is chosen; neither has been started.
+
+### Operator chose path (b), benchmarked on real data, standalone combinator built (2026-08-29)
+
+Operator decision: **(b)** — a separate, narrower call site, not wiring the dormant
+`candidate-scorer.ts`/`post-process-reranker.ts` pipeline into `unified-orchestrator.ts` for the
+first time. Correctly the lower-risk choice — doesn't touch unreviewed production scoring
+behavior, stays reversible.
+
+**Real-world impact benchmarked before building further** (`python/benchmark_latent256_dedup.py`,
+10 realistic code-search queries, real Ollama `embeddinggemma` embeddings, real top-50 pgvector
+retrieval on `codebase_chunk_index.content_embedding` — deliberately not via Qdrant
+`codebase_chunks_768`, whose `chunk_id` payload is a known inconsistent two-generation mix per
+this repo's own documented collection-split finding). Receipt:
+`docs/reports/latent256-dedup-realworld-benchmark-v1.json`.
+
+**Honest result, not spun positive**: avg 15.5% of top-K candidates removed per query (real
+redundancy exists), but avg unique-source coverage *decreased* 4.1%, not increased. Several
+queries showed unique-source count exactly unchanged (pruning only removed true within-file
+duplicates — harmless). Others (`React state management`: 26→21 sources, `Redis cache`: 22→21)
+showed near-duplicate content genuinely spanning multiple different files, so pruning cost
+source diversity in those specific cases. Conclusion recorded plainly: "near-duplicate" and
+"diverse sources" are not the same axis — the feature does exactly what it's named to do, and
+whether that tradeoff is worth enabling for a given caller is a product decision this benchmark
+informs but does not settle.
+
+**Standalone combinator built**: `latent256-dedup.ts` —
+`applyLatent256SemanticDedup(candidates, options)`, a thin function combining
+`PostgresLatent256CandidateProvider.hydrate()` with the same greedy dedup algorithm as
+`post-process-reranker.ts`, deliberately independent of the dormant `ScoredCandidate`/
+`blendedScore` pipeline. Deterministic (sorted by `relevanceScore` desc, `packetKey` asc
+tiebreak), fail-open on missing vectors, defaults to `EVALUATED_LATENT256_SIMILARITY_THRESHOLD`
+(0.90). 4 tests passing (`latent256-dedup.spec.ts`) with a fake provider, no live DB dependency
+in CI.
+
+**State this leaves**: a complete, tested, benchmarked, ready-to-call function. Genuinely usable
+by any future caller (a new API route, a script, or `unified-orchestrator.ts` itself if the
+larger pipeline-activation decision is made later) with zero further plumbing required — but
+still not called from anywhere live, by design. That remains the next, separate, deliberate
+decision: whether and where to actually invoke `applyLatent256SemanticDedup()` in production,
+now informed by a real measured tradeoff instead of a guess.
