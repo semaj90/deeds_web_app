@@ -26,20 +26,43 @@
 			filesReusePct: number | null;
 		};
 	};
+	type AgenticTelemetry = {
+		acceptedAgentTurns: number;
+		uniqueAgentActions: number;
+		tokensUsed: number | null;
+		wallTimeMs: number | null;
+		filesEdited: string[];
+		openspecChanges: string[];
+		receiptPaths: string[];
+	};
 
-	const { progress, gates = [] } = $props<{ progress: Progress; gates?: Gate[] }>();
+	const { progress, gates = [], agentic = null } = $props<{
+		progress: Progress;
+		gates?: Gate[];
+		agentic?: AgenticTelemetry | null;
+	}>();
 
 	const current = $derived(gates.find((gate) => gate.id === progress.currentGate) ?? null);
 	const recentFiles = $derived(
-		[...gates]
-			.reverse()
-			.flatMap((gate) => gate.filesEdited ?? [])
-			.filter((value, index, values) => values.indexOf(value) === index)
-			.slice(0, 4)
+		[...new Set([
+			...(agentic?.filesEdited ?? []),
+			...[...gates].reverse().flatMap((gate) => gate.filesEdited ?? [])
+		])].slice(0, 4)
 	);
 
 	function fmt(value: number | null): string {
 		return value === null ? '—' : `${value.toFixed(1)}%`;
+	}
+
+	function compactCount(value: number | null): string {
+		if (value === null) return '—';
+		return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+	}
+
+	function duration(value: number | null): string {
+		if (value === null) return '—';
+		if (value < 1000) return `${value}ms`;
+		return `${(value / 1000).toFixed(1)}s`;
 	}
 </script>
 
@@ -78,6 +101,10 @@
 		<div><span>Wall-time saved</span><strong>{fmt(progress.efficiency.wallTimeSavingsPct)}</strong></div>
 		<div><span>Files reused</span><strong>{fmt(progress.efficiency.filesReusePct)}</strong></div>
 		<div><span>Blocked gates</span><strong>{progress.blockedGates.length}</strong></div>
+		<div><span>Agent turns</span><strong>{agentic?.acceptedAgentTurns ?? 0}</strong></div>
+		<div><span>Unique actions</span><strong>{agentic?.uniqueAgentActions ?? 0}</strong></div>
+		<div><span>Measured tokens</span><strong>{compactCount(agentic?.tokensUsed ?? null)}</strong></div>
+		<div><span>Agent wall time</span><strong>{duration(agentic?.wallTimeMs ?? null)}</strong></div>
 	</div>
 
 	{#if recentFiles.length > 0}
@@ -93,7 +120,7 @@
 		<span><i class="dot proven"></i>PROVEN / DONE</span>
 		<span><i class="dot wired"></i>CREATED / WIRED / PARTIAL</span>
 		<span><i class="dot blocked"></i>BLOCKED / UNPROVEN</span>
-		<small>Efficiency telemetry never raises proof progress.</small>
+		<small>Measured work is telemetry; only validated receipts raise EXP.</small>
 	</div>
 </section>
 
