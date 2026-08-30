@@ -155,7 +155,7 @@ export interface RepairCandidateFeatureMatrixV1 {
 }
 
 function stable(value: unknown): string {
-  if (value === undefined) return '"__undefined__"';
+  if (value === undefined) return '\"__undefined__\"';
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   const record = value as Record<string, unknown>;
@@ -183,8 +183,23 @@ function float32Bytes(values: Float32Array): Uint8Array {
   return bytes;
 }
 
-function assertSha256(value: string, code: string): void {
+function assertPrefixedSha256(value: string, code: string): void {
   if (!/^sha256:[0-9a-f]{64}$/i.test(value)) throw new Error(code);
+}
+
+/**
+ * Candidate snapshot revisions are opaque revision tokens in Parent Atlas. The current live
+ * frozen cohort uses a qualified token such as
+ * `lineage-qualified-canary:sha256:<digest>:v1:15`, while other snapshots may use a bare
+ * `sha256:<digest>`. Preserve the exact token; do not rewrite it into a synthetic digest.
+ */
+function assertRevisionToken(value: string, code: string): void {
+  if (!value || value.trim() !== value || /\s/.test(value) || value.length > 512) throw new Error(code);
+}
+
+/** Existing ordinal-map receipts use both sha256:<hex> and bare 64-hex encodings. */
+function assertSha256Checksum(value: string, code: string): void {
+  if (!/^(?:sha256:)?[0-9a-f]{64}$/i.test(value)) throw new Error(code);
 }
 
 function assertFinite(value: number, code: string): void {
@@ -230,9 +245,9 @@ export function buildRepairCandidateFeatureMatrixV1(
     overlayFeatureStates,
   } = input;
 
-  assertSha256(baseMatrixManifestChecksum, 'REPAIR_BASE_MANIFEST_CHECKSUM_INVALID');
-  assertSha256(candidateSnapshotRevision, 'REPAIR_CANDIDATE_SNAPSHOT_REVISION_INVALID');
-  assertSha256(ordinalMapChecksum, 'REPAIR_ORDINAL_MAP_CHECKSUM_INVALID');
+  assertPrefixedSha256(baseMatrixManifestChecksum, 'REPAIR_BASE_MANIFEST_CHECKSUM_INVALID');
+  assertRevisionToken(candidateSnapshotRevision, 'REPAIR_CANDIDATE_SNAPSHOT_REVISION_INVALID');
+  assertSha256Checksum(ordinalMapChecksum, 'REPAIR_ORDINAL_MAP_CHECKSUM_INVALID');
   if (!producerRevision.trim()) throw new Error('REPAIR_PRODUCER_REVISION_REQUIRED');
 
   const rowCount = identities.length;
