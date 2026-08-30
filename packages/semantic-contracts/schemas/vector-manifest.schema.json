@@ -10,9 +10,7 @@
     "dimensions",
     "representation",
     "distance",
-    "normalized",
-    "contentSha256",
-    "workspaceRevision"
+    "normalized"
   ],
   "properties": {
     "vectorName": {
@@ -28,6 +26,9 @@
         "summary_384",
         "symbol_384",
         "ontology_384",
+        "latent_256",
+        "latent_128",
+        "latent_64",
         "late_interaction",
         "bm42_sparse"
       ],
@@ -36,6 +37,20 @@
     "model": {
       "type": "string",
       "description": "Model used to produce this vector (e.g., 'embeddinggemma:latest')"
+    },
+    "upstreamModelId": {
+      "type": "string",
+      "description": "Upstream model identity corresponding to the runtime tag"
+    },
+    "maxInputTokens": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "description": "Maximum admitted input tokens for the model contract"
+    },
+    "slidingWindow": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "description": "Model attention sliding-window setting; not the maximum input length"
     },
     "modelRevision": {
       "type": "string",
