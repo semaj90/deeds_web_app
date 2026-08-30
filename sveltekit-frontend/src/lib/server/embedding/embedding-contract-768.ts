@@ -75,14 +75,23 @@ export function formatEmbeddingGemmaInput(
 
 export type EmbeddingGemmaMrlDimension = (typeof EMBEDDINGGEMMA_MRL_DIMENSIONS)[number];
 
-export const TOPOLOGY_REPRESENTATIONS = {
+/**
+ * The NestedSemanticAutoencoder's learned latent family: semantic_768 -> latent_256 (physical,
+ * stored) -> latent_128/latent_64 (L2-renormalized prefixes of latent_256, derived at query
+ * time, not separately persisted). Distinct from, and must never be confused with, the OLDER
+ * SOM-topology autoencoder (renamed topology_ae64_v1 in vector-manifest.ts precisely because it
+ * used to share the name "latent_64" with this family despite being different weights entirely
+ * -- see packages/semantic-contracts/src/vector-manifest.ts for the full split rationale).
+ */
+export const LEARNED_LATENT_REPRESENTATIONS = {
+  latent_256: 256,
   latent_128: 128,
   latent_64: 64,
 } as const;
 
-export type TopologyRepresentationId = keyof typeof TOPOLOGY_REPRESENTATIONS;
+export type LearnedLatentRepresentationId = keyof typeof LEARNED_LATENT_REPRESENTATIONS;
 export type SemanticDimension = typeof SEMANTIC_DIMENSION;
-export type TopologyDimension = (typeof TOPOLOGY_REPRESENTATIONS)[TopologyRepresentationId];
+export type LearnedLatentDimension = (typeof LEARNED_LATENT_REPRESENTATIONS)[LearnedLatentRepresentationId];
 
 /**
  * Fail-closed guard for the active semantic lane. Throws rather than

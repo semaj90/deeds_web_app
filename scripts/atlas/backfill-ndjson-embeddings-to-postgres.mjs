@@ -67,6 +67,7 @@ const DB_URL  = env.DATABASE_URL
 const OLLAMA_RAW = (env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL = OLLAMA_RAW.startsWith('http') ? OLLAMA_RAW : `http://${OLLAMA_RAW}:11434`;
 const EMBED_MODEL = env.EMBED_MODEL ?? 'embeddinggemma:latest';
+if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function readNdjson(file) {

@@ -66,8 +66,8 @@ export interface SelectDiverseCandidatesInput {
 
 export interface SelectDiverseCandidatesResult {
   selected: RankedCandidate[];
-  skippedExactDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }>;
-  skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }>;
+  skippedExactDuplicate: Array<RankedCandidate & { duplicateOfCandidateId: string }>;
+  skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfCandidateId: string }>;
   /** True if the pool was exhausted before reaching finalK -- i.e. candidatePoolK was too small
    * relative to how much near-duplication existed in the pool. Signal to widen the pool, not a
    * silent-shrink bug (selected.length is reported honestly, never padded). */
@@ -118,7 +118,7 @@ export async function selectDiverseCandidates(
   const pool = candidates.slice(0, candidatePoolK);
 
   // Stage A: exact content-hash collapse (free, no representation needed).
-  const skippedExactDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
+  const skippedExactDuplicate: Array<RankedCandidate & { duplicateOfCandidateId: string }> = [];
   const stageAOutput: RankedCandidate[] = [];
   if (collapseExactContentHash) {
     const seenHash = new Map<string, string>(); // contentHash -> candidateId of the kept candidate
@@ -129,7 +129,7 @@ export async function selectDiverseCandidates(
       }
       const keeper = seenHash.get(c.contentHash);
       if (keeper) {
-        skippedExactDuplicate.push({ ...c, duplicateOfPacketKey: keeper });
+        skippedExactDuplicate.push({ ...c, duplicateOfCandidateId: keeper });
       } else {
         seenHash.set(c.contentHash, c.candidateId);
         stageAOutput.push(c);
@@ -148,7 +148,7 @@ export async function selectDiverseCandidates(
   });
 
   const selected: RankedCandidate[] = [];
-  const skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
+  const skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfCandidateId: string }> = [];
   const selectedVectors: Array<{ candidateId: string; vec: readonly number[] }> = [];
 
   for (const c of stageAOutput) {
@@ -160,7 +160,7 @@ export async function selectDiverseCandidates(
     }
     const dup = selectedVectors.find(sv => cosineSimilarity(vec, sv.vec) >= threshold);
     if (dup) {
-      skippedSemanticDuplicate.push({ ...c, duplicateOfPacketKey: dup.candidateId });
+      skippedSemanticDuplicate.push({ ...c, duplicateOfCandidateId: dup.candidateId });
     } else {
       selectedVectors.push({ candidateId: c.candidateId, vec });
       selected.push(c);

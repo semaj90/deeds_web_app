@@ -48,7 +48,7 @@ const stats = await pool.query(`
   SELECT
     (SELECT COUNT(*) FROM atlas_packets) AS atlas_packets,
     (SELECT COUNT(*) FROM codebase_chunk_index) AS chunks,
-    (SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding IS NOT NULL) AS chunks_with_embedding
+    (SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL) AS chunks_with_embedding
 `);
 console.log('\nAtlas workload:');
 console.log(' atlas_packets:', stats.rows[0].atlas_packets);

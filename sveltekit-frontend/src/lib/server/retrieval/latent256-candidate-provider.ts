@@ -18,7 +18,7 @@
  *     already treats "missing" as fail-open (candidate survives, per its own contract).
  *
  * Identity scope: as of 2026-08-29, latent_256 exists only for codebase_chunk_index rows, and
- * packetKeys here are that table's `id` (uuid, stringified) -- the same identity used as the
+ * candidateIds here are that table's `id` (uuid, stringified) -- the same identity used as the
  * Qdrant point id in codebase_chunks_latent256 (see provision_qdrant_latent256.py). If latent_256
  * is ever backfilled for a different table/candidate family, this provider's query needs
  * revisiting -- it is not a generic packetKey resolver.
@@ -105,7 +105,11 @@ function computeVectorsChecksum(vectors: ReadonlyMap<string, readonly number[]>)
   const digest = createHash('sha256');
   for (const [candidateId, vector] of [...vectors.entries()].sort(([a], [b]) => a.localeCompare(b))) {
     digest.update(candidateId);
-    digest.update(Buffer.from(new Float32Array(vector).buffer));
+    const bytes = Buffer.alloc(vector.length * 4);
+    for (let index = 0; index < vector.length; index += 1) {
+      bytes.writeFloatLE(vector[index]!, index * 4);
+    }
+    digest.update(bytes);
   }
   return digest.digest('hex');
 }

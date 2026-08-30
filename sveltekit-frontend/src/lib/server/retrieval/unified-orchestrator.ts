@@ -77,6 +77,8 @@ export interface RetrievalRequest {
 export type QdrantPointId = string | number;
 
 export interface CandidateIdentityV1 {
+  /** Canonical codebase_chunk_index.id; distinct from packet and projection coordinates. */
+  candidateId: string | null;
   /** Projection coordinate only; never treated as canonical packet identity. */
   qdrantPointId: QdrantPointId | null;
   packetKey: string | null;
@@ -96,6 +98,8 @@ export interface CandidateIdentityV1 {
 export interface RankedCandidate {
   id: string;
   identity: CandidateIdentityV1;
+  /** Exact codebase_chunk_index.id when the canonical Postgres join resolved it. */
+  candidateId?: string;
   /** Compatibility accessors; canonical callers should consume `identity`. */
   qdrantPointId: QdrantPointId;
   packetKey?: string;
@@ -491,13 +495,13 @@ async function turboVecPrefilter(
 async function postgresJoin(
   qdrantIds: string[],
   config: RetrievalConfig
-): Promise<Map<string, { relative_path: string; symbol: string; kind: string }>> {
+): Promise<Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>> {
   const pool = new Pool(config.postgres);
   try {
     if (qdrantIds.length === 0) return new Map();
 
     const res = await pool.query(
-      `SELECT qdrant_id, relative_path, symbol, kind
+      `SELECT id, qdrant_id, relative_path, symbol, kind
          FROM codebase_chunk_index
         WHERE qdrant_id = ANY($1::text[])
         LIMIT 20`,
@@ -507,6 +511,7 @@ async function postgresJoin(
     const map = new Map<string, any>();
     (res.rows || []).forEach((row) => {
       map.set(String(row.qdrant_id), {
+        candidateId: String(row.id),
         relative_path: row.relative_path,
         symbol: row.symbol,
         kind: row.kind
@@ -588,7 +593,12 @@ export function rankCandidates(
 
   return combined
     .map((result) => {
-      const pgData = postgresMap.get(result.id) || { relative_path: 'N/A', symbol: 'N/A', kind: 'N/A' };
+      const pgData = postgresMap.get(result.id) || {
+        candidateId: null,
+        relative_path: 'N/A',
+        symbol: 'N/A',
+        kind: 'N/A'
+      };
       const qdrant = qdrantById.get(result.id);
       const payload = qdrant?.payload ?? {};
       const packetKey = typeof payload.packet_key === 'string' && payload.packet_key.length > 0
@@ -619,7 +629,11 @@ export function rankCandidates(
       const missingFields = (['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'] as const)
         .filter(field => ({ packetKey, sourceRef, sourceRevision, workspaceRevision }[field] == null));
       const qdrantPointId = qdrant?.id ?? null;
+      const candidateId = typeof pgData.candidateId === 'string' && pgData.candidateId.length > 0
+        ? pgData.candidateId
+        : null;
       const identity: CandidateIdentityV1 = {
+        candidateId,
         qdrantPointId,
         packetKey: packetKey ?? null,
         sourceRef: sourceRef ?? null,
@@ -634,6 +648,7 @@ export function rankCandidates(
       return {
         id: result.id,
         identity,
+        ...(candidateId ? { candidateId } : {}),
         qdrantPointId: qdrantPointId ?? result.id,
         packetKey,
         sourceRef,
@@ -663,15 +678,25 @@ export async function applyConfiguredLatent256Dedup(
   if (!config?.enabled) return [...ranked];
 
   const dedupCandidates = ranked
-    .filter((candidate): candidate is RankedCandidate & { packetKey: string; sourceRef: string } =>
+    .filter((candidate): candidate is RankedCandidate & {
+      candidateId: string;
+      packetKey: string;
+      sourceRef: string;
+      identity: CandidateIdentityV1 & { candidateId: string };
+    } =>
+      typeof candidate.identity.candidateId === 'string' && candidate.identity.candidateId.length > 0 &&
       typeof candidate.packetKey === 'string' && candidate.packetKey.length > 0 &&
       typeof candidate.sourceRef === 'string' && candidate.sourceRef.length > 0)
     .map(candidate => ({
-      candidateId: candidate.packetKey,
+      candidateId: candidate.identity.candidateId,
       packetKey: candidate.packetKey,
       sourceRef: candidate.sourceRef,
       relevanceScore: candidate.score,
     }));
+  // The opt-in pass cannot safely satisfy finalK without enough exact canonical IDs.
+  // Preserve the production-ranked result unchanged rather than shrinking it or
+  // allowing candidatePoolK < finalK to reach the selector.
+  if (dedupCandidates.length < config.finalK) return [...ranked];
   const dedupResult = await selectDiverseCandidates({
     candidates: dedupCandidates,
     finalK: config.finalK,
@@ -683,7 +708,12 @@ export async function applyConfiguredLatent256Dedup(
     provider: config.provider,
   });
   const survivorKeys = new Set(dedupResult.selected.map(candidate => candidate.packetKey));
-  return ranked.filter(candidate => !candidate.packetKey || survivorKeys.has(candidate.packetKey));
+  return ranked.filter(candidate =>
+    !candidate.packetKey ||
+    typeof candidate.identity.candidateId !== 'string' ||
+    candidate.identity.candidateId.length === 0 ||
+    survivorKeys.has(candidate.packetKey)
+  );
 }
 
 /**

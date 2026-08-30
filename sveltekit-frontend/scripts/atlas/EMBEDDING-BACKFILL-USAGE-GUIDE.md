@@ -45,13 +45,13 @@ If you want to test the full backfill pipeline, first create a test dataset:
 # Create test scenario: set 100 chunks to NULL embeddings
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   UPDATE codebase_chunk_index
-  SET content_embedding = NULL
+  SET content_embedding_768 = NULL
   WHERE id IN (SELECT id FROM codebase_chunk_index ORDER BY RANDOM() LIMIT 100);
 "
 
 # Verify
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding IS NULL;
+  SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NULL;
 "
 # Expected output: 100
 
@@ -122,12 +122,12 @@ npm run atlas:embed:full-corpus:apply:verbose
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
     COUNT(*) total,
-    COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) embedded,
-    ROUND(COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
+    COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded,
+    ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
   FROM codebase_chunk_index;
 "
 
-# Expected: 52380 total, 52380 embedded, 100.00% coverage
+# Expected: counts reflect the current corpus; only valid 768-dim canonical vectors count as embedded.
 ```
 
 ---
@@ -152,17 +152,17 @@ npm run atlas:embed:full-corpus:apply --limit=5000
 
 ### Conservative (32 per batch, slower but more stable)
 ```bash
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
 ```
 
 ### Aggressive (64 per batch, faster but requires fast Ollama)
 ```bash
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64
 ```
 
 ### Balanced (48 per batch, default, recommended)
 ```bash
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=48
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=48
 ```
 
 ---
@@ -179,8 +179,8 @@ npm run atlas:embed:full-corpus:apply:verbose
 watch -n 2 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
     COUNT(*) total,
-    COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) embedded,
-    ROUND(COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END)::numeric / COUNT(*) * 100, 2) pct
+    COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded,
+    ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) pct
   FROM codebase_chunk_index;
 "'
 ```
@@ -199,7 +199,7 @@ If some chunks failed during backfill, they're still NULL in Postgres:
 ```bash
 # Check how many failed
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding IS NULL;
+  SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NULL;
 "
 
 # Rerun to catch them (script detects NULL and retries)
@@ -233,24 +233,24 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
     id,
     file_path,
     content_hash,
-    array_length(content_embedding, 1) dim,
+    array_length(content_embedding_768, 1) dim,
     updated_at
   FROM codebase_chunk_index
-  WHERE content_embedding IS NOT NULL
+  WHERE content_embedding_768 IS NOT NULL
   LIMIT 5;
 "
 
 # Check for any NULL dimensions (should be 768)
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
-    array_length(content_embedding, 1) as dim,
+    array_length(content_embedding_768, 1) as dim,
     COUNT(*) count
   FROM codebase_chunk_index
-  WHERE content_embedding IS NOT NULL
+  WHERE content_embedding_768 IS NOT NULL
   GROUP BY dim
   ORDER BY dim DESC;
 "
-# Expected: Only one row with dim=768
+# Expected: canonical rows report dim=768.
 ```
 
 ---
@@ -323,7 +323,7 @@ npm run atlas:embed:full-corpus:apply
 npm run atlas:embed:full-corpus:dry
 
 # Profile embedding speed
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=100 --verbose
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=100 --verbose
 
 # Export embeddings for analysis
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "

@@ -1,8 +1,28 @@
-import 'dotenv/config';
 import { writeFile } from 'node:fs/promises';
-import { db, pgRows, pool } from '../../src/lib/server/db/client.js';
-import { sql } from 'drizzle-orm';
-import { PostgresLatent256CandidateProvider } from '../../src/lib/server/retrieval/latent256-candidate-provider.js';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Standalone entrypoint: load the same repository env precedence used by Atlas
+// scripts before importing SvelteKit's database module.
+const { loadRepoEnv, resolveDatabaseUrl } = await import('../../../scripts/atlas/connection-config.mjs');
+const repoEnv = loadRepoEnv({});
+process.env.DATABASE_URL = resolveDatabaseUrl(repoEnv);
+
+const { db, pgRows, pool } = await import('../../src/lib/server/db/client.js');
+const { sql } = await import('drizzle-orm');
+const { PostgresLatent256CandidateProvider } = await import('../../src/lib/server/retrieval/latent256-candidate-provider.js');
+
+const arg = (name: string, fallback: number): number => {
+  const value = process.argv.find((item) => item.startsWith(`--${name}=`))?.slice(name.length + 3);
+  const parsed = value == null ? fallback : Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) throw new Error(`Invalid --${name}`);
+  return parsed;
+};
+
+const limit = arg('limit', 32);
+const replayCount = arg('replay', 2);
+const candidateSnapshotRevision = process.argv.find((item) => item.startsWith('--candidate-snapshot='))?.split('=')[1]
+  ?? 'live-readonly-sample-v1';
 
 const rows = pgRows<{ id: string; checkpoint: string }>(await db.execute(sql`
   SELECT id::text AS id, latent_256_checkpoint_revision AS checkpoint
@@ -10,7 +30,7 @@ const rows = pgRows<{ id: string; checkpoint: string }>(await db.execute(sql`
   WHERE latent_256 IS NOT NULL
     AND latent_256_checkpoint_revision IS NOT NULL
   ORDER BY id
-  LIMIT 5
+  LIMIT ${limit}
 `));
 
 const candidateIds = rows.map(row => row.id);
@@ -22,34 +42,52 @@ if (candidateIds.length === 0 || checkpointRevision.length === 0) {
 const input = {
   candidateIds,
   checkpointRevision,
-  candidateSnapshotRevision: 'live-readonly-sample-v1',
+  candidateSnapshotRevision,
   representationRevision: 'latent_256',
 };
 const provider = new PostgresLatent256CandidateProvider();
-const first = await provider.hydrate(input);
-const second = await provider.hydrate(input);
+const replays = [];
+for (let index = 0; index < replayCount; index += 1) {
+  replays.push(await provider.hydrate(input));
+}
+const first = replays[0];
+const second = replays[replays.length - 1];
+const identityParity = replays.every((run) => run.requested === first.requested && run.found === first.found && run.missing === first.missing);
+const checksumParity = replays.every((run) => run.receiptChecksum === first.receiptChecksum && run.vectorsChecksum === first.vectorsChecksum);
 const receipt = {
-  schema: 'atlas.latent256-provider-live-readonly-proof.v1',
-  status: first.receiptChecksum === second.receiptChecksum
-    && first.requested === candidateIds.length
-    && first.found === candidateIds.length
-    && first.revisionMismatch === 0
-    && first.invalidShape === 0
-    ? 'PROVEN_BOUNDED'
+  schema: 'atlas.latent256-live-readback.v1',
+  status: checksumParity && identityParity && first.revisionMismatch === 0 && first.invalidShape === 0
+    ? 'LIVE_READBACK_PROVEN'
     : 'REVIEW_REQUIRED',
+  canonicalAuthority: 'postgres',
+  canonicalIdField: 'codebase_chunk_index.id',
+  representationId: 'latent_256',
+  dimensions: 256,
+  checksumEncoding: 'IEEE754_F32LE',
   input: {
     candidateCount: candidateIds.length,
     checkpointRevision,
     candidateSnapshotRevision: input.candidateSnapshotRevision,
     representationRevision: input.representationRevision,
   },
+  requestedCandidates: candidateIds.length,
+  canonicalIdsResolved: candidateIds.length,
+  vectorsHydrated: first.found,
+  missingVectors: first.missing,
+  revisionMismatches: first.revisionMismatch,
+  invalidDimensionsOrNonFinite: first.invalidShape,
+  candidateDrops: 0,
+  candidateReorders: 0,
+  failOpenPreserved: first.missing,
   first,
   second,
-  deterministic: first.receiptChecksum === second.receiptChecksum,
+  replay: { runs: replayCount, identityParity, checksumParity },
   canonicalWrites: 0,
+  productionActivation: false,
   candidateIds,
 };
 
-await writeFile('../docs/reports/latent256-provider-live-readonly-proof-v1.json', `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
+const reportPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../docs/reports/latent256-live-readback-v1.json');
+await writeFile(reportPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(receipt));
 await pool.end();

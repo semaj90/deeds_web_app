@@ -13,6 +13,7 @@ const pool = new Pool({
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const EMBED_MODEL = process.env.EMBED_MODEL || 'embeddinggemma:latest';
+if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
 
 async function getEmbedding(text) {
   try {

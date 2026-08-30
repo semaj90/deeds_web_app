@@ -18,7 +18,7 @@
 // Callers use VLM_MODELS.embedding for embeddings ONLY.
 // Callers use VLM_MODELS.legal / .gemma4 / .tool for synthesis → routed to llama-server :8090.
 export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 'tool', string> = {
-  /** Embedding model (Ollama :11434, 384-dim) */
+  /** EmbeddingGemma model (Ollama :11434, native semantic_768) */
   embedding: 'embeddinggemma:latest',
   /** Legal text reasoning / chat / agentic tool-calling (llama-server :8090, TurboQuant canonical) */
   legal: 'ornith-1.5-9b',
@@ -970,7 +970,7 @@ export async function bifrostChat(
   );
   const effectiveModel = hasImages ? VLM_MODELS.vision : model;
 
-  // Ollama is embeddings-only in this deployment (embeddinggemma/nomic-embed-text) — it
+  // Ollama is embeddings-only in this deployment (EmbeddingGemma) — it
   // has no chat models loaded. Every bifrostChat() caller's model name is therefore a
   // gateway-routing tag, not a real Ollama model id; forwarding it under the `ollama/`
   // provider prefix (the old default below) always 404s at Bifrost before it can reach

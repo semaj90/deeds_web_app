@@ -49,6 +49,7 @@ const QDRANT_URL   = process.env.QDRANT_URL    ?? 'http://localhost:6333';
 const OLLAMA_URL   = process.env.OLLAMA_URL    ?? 'http://localhost:11434';
 const SK_URL       = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const EMBED_MODEL  = process.env.EMBED_MODEL   ?? 'embeddinggemma:latest';
+if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
 
 // ── Embedding ─────────────────────────────────────────────────────────────────
 let skAvailable = false;

@@ -9,14 +9,14 @@ import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 /**
  * Ollama Configuration for High-Performance AI Assistant
- * Using the canonical local synthesis model with legal-bert fallback
+ * Using the canonical local synthesis model; EmbeddingGemma owns embeddings.
  */
 // Model configurations aligned with the blueprint architecture
 export const MODELS: Record<string, ModelConfig> = {
   [LLM_MODEL_ID]: {
     name: LLM_MODEL_ID,
     type: 'local',
-    capabilities: ['text-generation', 'embeddings', 'legal-analysis'],
+    capabilities: ['text-generation', 'legal-analysis'],
     contextWindow: 8192,
     embeddingDimension: 768,
     temperature: 0.7,
@@ -30,13 +30,6 @@ export const MODELS: Record<string, ModelConfig> = {
       seed: 42,
       stop: ['User: ', 'Human: ', '\n\n\n'],
     },
-  },
-  'nomic-embed-text': {
-    name: 'nomic-embed-text',
-    type: 'embedding',
-    capabilities: ['embeddings'],
-    embeddingDimension: 768,
-    contextWindow: 8192,
   },
   embeddinggemma: {
     name: 'embeddinggemma',

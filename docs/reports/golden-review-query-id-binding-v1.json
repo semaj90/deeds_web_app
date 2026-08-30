@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.golden-review-query-id-binding-v1",
+  "status": "QUERY_IDS_BOUND",
+  "canonicalAuthority": false,
+  "inputPath": ".tmp\\atlas\\golden-relevance-review-pool-v1.ndjson",
+  "outputPath": ".tmp\\atlas\\golden-relevance-review-pool-bound-v1.ndjson",
+  "plannedQueries": 60,
+  "matchingQueryIds": 60,
+  "unresolvedQueryIds": 0,
+  "judgmentRowsInserted": 0,
+  "databaseWrites": false,
+  "outputChecksum": "sha256:a2f48361d9cfe31e089de4cd13de9bc303f8fc78f3cf2cabfdc8dc2976aa592f",
+  "nextRequiredStep": "Fill and independently validate judgments; do not import proxy hints."
+}

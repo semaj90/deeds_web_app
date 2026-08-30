@@ -408,24 +408,22 @@ async function discoverFromMcpFiles() {
   return tools;
 }
 
-// ── Embedding via Ollama (nomic first — fast, no GPU warmup; embeddinggemma fallback) ──
+// ── Canonical embedding via EmbeddingGemma only ──
 
-const EMBED_MODELS = ['nomic-embed-text:latest', 'embeddinggemma:latest'];
+const EMBED_MODEL = process.env.EMBEDDINGGEMMA_MODEL ?? process.env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest';
 
 async function embed(text) {
-  for (const model of EMBED_MODELS) {
-    try {
-      const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: text }),
-        signal: AbortSignal.timeout(15_000),
-      });
-      if (!res.ok) continue;
-      const d = await res.json();
-      if (Array.isArray(d.embedding) && d.embedding.length === 768) return d.embedding;
-    } catch { /* try next model */ }
-  }
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: EMBED_MODEL, prompt: text }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (Array.isArray(d.embedding) && d.embedding.length === 768 && d.embedding.every(Number.isFinite)) return d.embedding;
+  } catch { /* canonical embedding unavailable */ }
   return null;
 }
 

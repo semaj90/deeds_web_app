@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.latent256-identity-bridge-proof.v2",
+  "status": "OPT_IN_IDENTITY_BRIDGE_FIXTURE_PROVEN",
+  "scope": {
+    "canonicalCandidateCoordinate": "codebase_chunk_index.id",
+    "packetKeyIsCandidateId": false,
+    "qdrantPointIdIsCandidateId": false,
+    "missingCanonicalId": "fail-open; ranked candidate preserved",
+    "latent256ProductionActivation": false,
+    "retrievalVoteAdded": false,
+    "canonicalWrites": 0,
+    "databaseWrites": 0
+  },
+  "identityFixture": {
+    "candidateId": "chunk-a",
+    "packetKey": "a",
+    "qdrantPointId": "projection-a",
+    "providerHydrationKey": "chunk-a",
+    "coordinatesDeliberatelyDistinct": true
+  },
+  "checks": {
+    "canonicalPostgresJoinSelectsChunkId": true,
+    "latentProviderReceivesCanonicalChunkIds": true,
+    "projectionOnlyCandidatePreserved": true,
+    "duplicateMetadataUsesCandidateId": true,
+    "vectorsChecksumEncoding": "explicit-f32-le"
+  },
+  "validation": {
+    "testFiles": 3,
+    "testsPassed": 20,
+    "testsFailed": 0,
+    "commands": [
+      "npx vitest run src/lib/server/retrieval/unified-orchestrator.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1",
+      "npx vitest run src/lib/server/retrieval/latent256-candidate-provider.spec.ts src/lib/server/retrieval/latent256-dedup.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1"
+    ]
+  },
+  "nextGate": "BOUNDED_LIVE_LATENT256_READBACK_AND_HUMAN_QRELS",
+  "canonicalAuthority": false
+}

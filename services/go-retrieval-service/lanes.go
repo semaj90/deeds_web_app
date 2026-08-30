@@ -41,13 +41,23 @@ type LaneRequest struct {
 // LaneCandidate is a single result returned by a Searcher.
 // Scores are lane-local; do NOT compare across lanes.
 type LaneCandidate struct {
-	PacketKey     string         `json:"packet_key"`
-	SourceRef     string         `json:"source_ref"`
-	Lane          Lane           `json:"lane"`
-	Score         float32        `json:"score"`
-	Rank          int            `json:"rank"`
-	QdrantPointID string         `json:"qdrant_point_id,omitempty"`
-	Metadata      map[string]any `json:"metadata,omitempty"`
+	// CandidateID is the canonical codebase_chunk_index.id when the lane has
+	// an exact canonical bridge. It must remain empty when only a projection
+	// identifier is available; QdrantPointID is never a substitute.
+	CandidateID            string         `json:"candidate_id,omitempty"`
+	CandidateOrdinal       *int64         `json:"candidate_ordinal,omitempty"`
+	PacketKey              string         `json:"packet_key"`
+	SourceRef              string         `json:"source_ref"`
+	SymbolVersionID        string         `json:"symbol_version_id,omitempty"`
+	WorkspaceRevision      string         `json:"workspace_revision,omitempty"`
+	SourceRevision         string         `json:"source_revision,omitempty"`
+	RepresentationID       string         `json:"representation_id,omitempty"`
+	RepresentationRevision string         `json:"representation_revision,omitempty"`
+	Lane                   Lane           `json:"lane"`
+	Score                  float32        `json:"score"`
+	Rank                   int            `json:"rank"`
+	QdrantPointID          string         `json:"qdrant_point_id,omitempty"`
+	Metadata               map[string]any `json:"metadata,omitempty"`
 }
 
 // LaneResult holds a completed lane's candidates plus timing diagnostics.
@@ -62,10 +72,10 @@ type LaneResult struct {
 // LaneResponse is returned to callers (TypeScript SearchRuntime).
 // Results are lane-separated; fusion happens upstream.
 type LaneResponse struct {
-	RequestID string               `json:"request_id"`
-	Results   map[Lane]LaneResult  `json:"results"`
-	StartedAt time.Time            `json:"started_at"`
-	Duration  time.Duration        `json:"duration_ms"`
+	RequestID string              `json:"request_id"`
+	Results   map[Lane]LaneResult `json:"results"`
+	StartedAt time.Time           `json:"started_at"`
+	Duration  time.Duration       `json:"duration_ms"`
 }
 
 // Searcher is the interface every lane adapter must implement.

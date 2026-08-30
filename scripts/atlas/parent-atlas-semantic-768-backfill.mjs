@@ -10,7 +10,7 @@
  *   - Qdrant mirrors semantic neighbors only after the Postgres write succeeds.
  *   - Legacy content_embedding_384 is reported for migration visibility but never selected as canonical or written.
  *
- * Canonical representation:
+ * Legacy packet representation (not the active code-chunk authority):
  *   representation: semantic_768
  *   model:          embeddinggemma:latest (configurable)
  *   dimension:      768
@@ -19,7 +19,7 @@
  *
  * Usage:
  *   node backfill-embedding-lane-768.mjs --dry-run --max-packets=32
- *   node backfill-embedding-lane-768.mjs --apply --max-packets=5000 --batch-size=32
+ *   ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node backfill-embedding-lane-768.mjs --apply --max-packets=5000 --batch-size=32
  *   node backfill-embedding-lane-768.mjs --verify-only
  *
  * Environment:
@@ -83,9 +83,16 @@ function parseArgs(argv) {
 
 const options = parseArgs(process.argv.slice(2));
 
+if (options.apply && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
+  throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+}
+
 const DATABASE_URL = process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL;
 const OLLAMA_URL = (process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/\/$/, '');
 const MODEL = process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest';
+if (!/^embeddinggemma(?::|$)/i.test(MODEL)) {
+  throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${MODEL}`);
+}
 const MODEL_REVISION = process.env.MODEL_REVISION ?? MODEL;
 const PREPROCESSING_VERSION = process.env.PREPROCESSING_VERSION ?? 'semantic-768-v1';
 const REQUEST_TIMEOUT_MS = parsePositiveInteger(
@@ -138,6 +145,10 @@ function validateVector(vector, index) {
     if (!Number.isFinite(vector[i])) {
       throw new Error(`Embedding ${index} contains a non-finite value at offset ${i}`);
     }
+  }
+  const normSquared = vector.reduce((sum, value) => sum + value * value, 0);
+  if (!Number.isFinite(normSquared) || normSquared < 0.98 || normSquared > 1.02) {
+    throw new Error(`Embedding ${index} is not L2-normalized; normSquared=${normSquared}`);
   }
 }
 

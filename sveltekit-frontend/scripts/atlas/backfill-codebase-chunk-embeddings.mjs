@@ -20,9 +20,10 @@
  *
  * Flags:
  *   --dry-run        Show what would be embedded, don't write
- *   --apply          Execute the backfill (default: dry-run if omitted)
+ *   --apply          Execute the backfill (also requires
+ *                    ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1)
  *   --batch-size=N   Embeddings per gRPC/HTTP request (default: 48)
- *   --limit=N        Max chunks to process (default: all 40,754)
+ *   --limit=N        Max eligible chunks to process (default: all current eligible rows)
  *   --checkpoint=N   Progress log interval (default: 100)
  *   --timeout=N      gRPC/HTTP timeout in ms (default: 30000)
  *   --verbose        Detailed logging
@@ -45,7 +46,7 @@ await loadAtlasEnv();
 
 const PG_URL = process.env.DATABASE_URL;
 const OLLAMA_URL = (process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-const EMBEDDING_MODEL = 'embeddinggemma:latest';
+const EMBEDDING_MODEL = process.env.EMBEDDINGGEMMA_MODEL ?? process.env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest';
 
 if (!PG_URL) {
   console.error('[FAIL] DATABASE_URL not set');
@@ -188,7 +189,13 @@ async function embedBatch(texts) {
  * Validate embedding dimension (768-dim expected)
  */
 function isValidEmbedding(embedding) {
-  return embedding && embedding.length === 768;
+  if (!embedding || embedding.length !== 768) return false;
+  let normSquared = 0;
+  for (const value of embedding) {
+    if (!Number.isFinite(value)) return false;
+    normSquared += value * value;
+  }
+  return Number.isFinite(normSquared) && normSquared >= 0.98 && normSquared <= 1.02;
 }
 
 /**
@@ -218,10 +225,17 @@ async function updateChunksWithEmbeddings(updates) {
     // The explicit cast preserves pgvector's vector(768) dimension check.
     const result = await client.query(
       `UPDATE codebase_chunk_index AS c
-       SET content_embedding_768 = u.embedding::vector(768), updated_at = now()
+       SET content_embedding_768 = u.embedding::vector(768),
+           embedding_model = $3,
+           embedding_version = 'semantic_768:' || $3,
+           embedding_dimension = 768,
+           embedding_normalized = true,
+           embedding_created_at = COALESCE(embedding_created_at, now()),
+           updated_at = now()
        FROM unnest($1::uuid[], $2::text[]) AS u(id, embedding)
-       WHERE c.id = u.id`,
-      [ids, vectorLiterals]
+       WHERE c.id = u.id
+         AND c.content_embedding_768 IS NULL`,
+      [ids, vectorLiterals, EMBEDDING_MODEL]
     );
 
     if (result.rowCount !== updates.length) {
@@ -248,7 +262,9 @@ async function getEmbeddingCoverage() {
     const res = await client.query(`
       SELECT
         COUNT(*) as total,
-        COUNT(CASE WHEN content_embedding_768 IS NOT NULL THEN 1 END) as populated
+        COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) as populated,
+        COUNT(CASE WHEN content_embedding_768 IS NULL THEN 1 END) as missing,
+        COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension <> 768 THEN 1 END) as contaminated
       FROM codebase_chunk_index
       WHERE content IS NOT NULL
         AND LENGTH(TRIM(content)) > 0
@@ -257,7 +273,8 @@ async function getEmbeddingCoverage() {
     return {
       total: parseInt(row.total, 10),
       populated: parseInt(row.populated, 10),
-      missing: parseInt(row.total, 10) - parseInt(row.populated, 10),
+      missing: parseInt(row.missing, 10),
+      contaminated: parseInt(row.contaminated, 10),
       coveragePct: row.total > 0 ? ((parseInt(row.populated, 10) / parseInt(row.total, 10)) * 100).toFixed(2) : '0.00',
     };
   } finally {
@@ -352,6 +369,10 @@ async function backfillEmbeddings() {
 async function main() {
   try {
     log('INFO', `Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}`);
+
+    if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
+      throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+    }
 
     if (DRY_RUN) {
       log('INFO', 'Performing dry-run (no database writes)');

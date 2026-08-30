@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T07:36:32.747Z",
+  "generatedAt": "2026-08-30T07:56:58.307Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -22,27 +22,27 @@
       "ttlSamples": [
         {
           "key": "bitfrost:summary:packet:v1:packet:052e26c72e4d",
-          "ttl": 602930,
+          "ttl": 604239,
           "ok": true
         },
         {
           "key": "bitfrost:summary:packet:v1:packet:8a68ca1ca8a7",
-          "ttl": 602930,
+          "ttl": 604239,
           "ok": true
         },
         {
           "key": "bitfrost:summary:packet:v1:packet:32bce8852cc0",
-          "ttl": 602930,
+          "ttl": 604238,
           "ok": true
         },
         {
           "key": "bitfrost:summary:packet:v1:packet:0c0fd3a65758",
-          "ttl": 602930,
+          "ttl": 604238,
           "ok": true
         },
         {
           "key": "bitfrost:summary:packet:v1:packet:03d9c8b9c4a4",
-          "ttl": 602930,
+          "ttl": 604238,
           "ok": true
         }
       ],
@@ -66,27 +66,27 @@
       "ttlSamples": [
         {
           "key": "gpu:som:packet:4475",
-          "ttl": 244014,
+          "ttl": 242788,
           "ok": true
         },
         {
           "key": "gpu:som:packet:3706",
-          "ttl": 244014,
+          "ttl": 242788,
           "ok": true
         },
         {
           "key": "gpu:som:packet:111",
-          "ttl": 244013,
+          "ttl": 242788,
           "ok": true
         },
         {
           "key": "gpu:som:packet:1140",
-          "ttl": 244013,
+          "ttl": 242788,
           "ok": true
         },
         {
           "key": "gpu:som:packet:2920",
-          "ttl": 244013,
+          "ttl": 242788,
           "ok": true
         }
       ],
@@ -110,27 +110,27 @@
       "ttlSamples": [
         {
           "key": "gpu:som:cell:3:1",
-          "ttl": 244013,
+          "ttl": 242787,
           "ok": true
         },
         {
           "key": "gpu:som:cell:12:17",
-          "ttl": 244013,
+          "ttl": 242787,
           "ok": true
         },
         {
           "key": "gpu:som:cell:11:1",
-          "ttl": 244013,
+          "ttl": 242787,
           "ok": true
         },
         {
           "key": "gpu:som:cell:5:6",
-          "ttl": 244013,
+          "ttl": 242787,
           "ok": true
         },
         {
           "key": "gpu:som:cell:13:5",
-          "ttl": 244012,
+          "ttl": 242787,
           "ok": true
         }
       ],
@@ -142,7 +142,7 @@
       "key": "gpu:autoencoder:latent_64:*",
       "pattern": "gpu:autoencoder:latent_64:*",
       "ownership": "ACTIVE",
-      "note": "AE 64-dim latent cache, written by karpathy-gpu-enrich.mjs. ~5,000 keys live.",
+      "note": "Active trained LibTorch 768->128->64 autoencoder cache consumed by the SOM topology pipeline. This is distinct from the retired/random Karpathy H6 path (gpu:karpathy:encoded) and from the newer NestedSemanticAutoencoder latent_256/128/64 challenger, which has no live consumers. Active here means SOM/topology ownership, not canonical semantic retrieval authority.",
       "count": 5000,
       "sample": [
         "gpu:autoencoder:latent_64:2050",
@@ -154,27 +154,27 @@
       "ttlSamples": [
         {
           "key": "gpu:autoencoder:latent_64:2050",
-          "ttl": 243979,
+          "ttl": 242754,
           "ok": true
         },
         {
           "key": "gpu:autoencoder:latent_64:3343",
-          "ttl": 243979,
+          "ttl": 242753,
           "ok": true
         },
         {
           "key": "gpu:autoencoder:latent_64:816",
-          "ttl": 243979,
+          "ttl": 242753,
           "ok": true
         },
         {
           "key": "gpu:autoencoder:latent_64:3243",
-          "ttl": 243979,
+          "ttl": 242753,
           "ok": true
         },
         {
           "key": "gpu:autoencoder:latent_64:2034",
-          "ttl": 243979,
+          "ttl": 242753,
           "ok": true
         }
       ],
@@ -194,7 +194,7 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:scores",
-          "ttl": 598688,
+          "ttl": 597462,
           "ok": true
         }
       ],
@@ -214,7 +214,7 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:summary",
-          "ttl": 598687,
+          "ttl": 597462,
           "ok": true
         }
       ],
@@ -248,17 +248,17 @@
       "ttlSamples": [
         {
           "key": "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
-          "ttl": 328716,
+          "ttl": 327491,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
-          "ttl": 598686,
+          "ttl": 597461,
           "ok": true
         },
         {
           "key": "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
-          "ttl": 335593,
+          "ttl": 334367,
           "ok": true
         }
       ],
@@ -282,27 +282,27 @@
       "ttlSamples": [
         {
           "key": "embed:embeddinggemma:latest:ffc6b1ffa6e9fdcc",
-          "ttl": 80781,
+          "ttl": 79555,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:05119d06ad98a2a0",
-          "ttl": 80605,
+          "ttl": 79379,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:4f6592940c90014f",
-          "ttl": 80563,
+          "ttl": 79337,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:5011075a83c3c4e6",
-          "ttl": 80561,
+          "ttl": 79335,
           "ok": true
         },
         {
           "key": "embed:embeddinggemma:latest:45a57a03995f2fe0",
-          "ttl": 80675,
+          "ttl": 79449,
           "ok": true
         }
       ],
@@ -325,22 +325,22 @@
       "ttlSamples": [
         {
           "key": "ace:cluster:members:unclassified:community-67456",
-          "ttl": 232822,
+          "ttl": 231596,
           "ok": true
         },
         {
           "key": "ace:probe:embed:karpathy",
-          "ttl": 80285,
+          "ttl": 79059,
           "ok": true
         },
         {
           "key": "ace:path:cluster:1",
-          "ttl": 598685,
+          "ttl": 597460,
           "ok": true
         },
         {
           "key": "ace:cluster:members:unclassified:community-26562",
-          "ttl": 598685,
+          "ttl": 597459,
           "ok": true
         }
       ],

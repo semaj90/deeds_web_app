@@ -47,11 +47,11 @@ export async function buildCorpusSnapshot(
       CAST(c.tags->'calls' AS VARCHAR) AS structural_calls,
       CAST(c.tags->'exports' AS VARCHAR) AS structural_exports,
 
-      CASE WHEN c.content_embedding IS NOT NULL THEN 'semantic_768' ELSE NULL END AS representation_id,
+      CASE WHEN c.content_embedding_768 IS NOT NULL THEN 'semantic_768' ELSE NULL END AS representation_id,
       NULL::INTEGER AS representation_revision,
       NULL::VARCHAR AS embedding_digest,
-      CASE WHEN c.content_embedding IS NOT NULL THEN 768 ELSE NULL END AS qdrant_vector_dim,
-      CAST(c.content_embedding AS VARCHAR) AS content_embedding_768,
+      CASE WHEN c.content_embedding_768 IS NOT NULL THEN 768 ELSE NULL END AS qdrant_vector_dim,
+      CAST(c.content_embedding_768 AS VARCHAR) AS content_embedding_768,
       c.gpu_cluster AS kmeans_cluster,
       c.som_cluster,
       c.qdrant_id AS qdrant_point_id,
@@ -61,7 +61,7 @@ export async function buildCorpusSnapshot(
       c.content_hash,
       '' AS summary_hash
     FROM ${pgCatalog}.${pgSchema}.codebase_chunk_index AS c
-    WHERE c.content_embedding IS NOT NULL
+    WHERE c.content_embedding_768 IS NOT NULL
   `);
 
   // Analyze for query planning

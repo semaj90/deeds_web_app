@@ -12,7 +12,7 @@
 **File**: `sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs`
 
 **Features**:
-- ✅ Full-corpus embedding backfill (40,754 chunks in codebase_chunk_index)
+- ✅ Full-corpus embedding backfill plan for current eligible rows in codebase_chunk_index
 - ✅ HTTP/Ollama batch embedding (embeddinggemma:latest, 768-dim)
 - ✅ Postgres connection pooling (ioredis style: lazyConnect, maxRetries 1)
 - ✅ Batch processing: 32-64 chunks per request (optimal for RTX 3060 Ti)
@@ -40,11 +40,13 @@
 "atlas:embed:full-corpus:apply:verbose": "node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64 --verbose"
 ```
 
+The apply commands also require `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1`.
+
 **Usage**:
 ```bash
 npm run atlas:embed:full-corpus:dry              # Preview first 100
-npm run atlas:embed:full-corpus:apply            # Full backfill (64/batch)
-npm run atlas:embed:full-corpus:apply:verbose    # Full backfill + logging
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 npm run atlas:embed:full-corpus:apply            # Full backfill (64/batch)
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 npm run atlas:embed:full-corpus:apply:verbose    # Full backfill + logging
 ```
 
 ---
@@ -97,7 +99,7 @@ Covers:
          ↓
 ┌─────────────────────────────────────────┐
 │ Query: codebase_chunk_index             │
-│ WHERE content_embedding IS NULL         │
+│ WHERE content_embedding_768 IS NULL     │
 │ ORDER BY id ASC (deterministic)         │
 └─────────────────────────────────────────┘
          ↓
@@ -127,7 +129,7 @@ Covers:
 ┌─────────────────────────────────────────┐
 │ Postgres UPDATE (Atomic Transaction)    │
 │ UPDATE codebase_chunk_index             │
-│ SET content_embedding = $1,             │
+│ SET content_embedding_768 = $1,         │
 │     updated_at = now()                  │
 │ WHERE id = $2                           │
 │ • All-or-nothing per batch              │
@@ -158,7 +160,7 @@ FLAGS:
 
 EXAMPLES:
   node backfill-codebase-chunk-embeddings.mjs --dry-run --limit=100
-  node backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64 --verbose
+  ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64 --verbose
 ```
 
 ### Key Design Decisions
@@ -243,7 +245,7 @@ npm run atlas:embed:full-corpus:apply
 
 # Check failed chunks
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
-  "SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding IS NULL;"
+  "SELECT COUNT(*) FROM codebase_chunk_index WHERE content_embedding_768 IS NULL;"
 ```
 
 ---
@@ -279,7 +281,7 @@ Expected performance:
 - **Database**: Postgres (connection via DATABASE_URL)
 
 ### Downstream
-- **Output**: `codebase_chunk_index.content_embedding` (768-dim pgvector)
+- **Output**: `codebase_chunk_index.content_embedding_768` (canonical 768-dim pgvector)
 - **Used By**: 
   - Qdrant mirror indexing (via `qdrant-manager.ts`)
   - Retrieval pipelines (unified-orchestrator.ts)

@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.semantic-dimension-alignment.v1",
+  "status": "ALIGNED_WITH_LEGACY_SURFACES",
+  "canonicalModel": "embeddinggemma:latest",
+  "canonicalRepresentation": "semantic_768",
+  "canonicalDimensions": 768,
+  "supportedMrlDimensions": [768, 512, 256, 128],
+  "semantic384": {
+    "status": "LEGACY_READ_ONLY",
+    "activeSemanticLane": false,
+    "nativeEmbeddingGemmaBoundary": false
+  },
+  "learnedRepresentation": {
+    "model": "NestedSemanticAutoencoder",
+    "hiddenDimensions": [384],
+    "hiddenDimensionsRole": "INTERNAL_NEURAL_LAYER",
+    "storedRepresentation": "latent_256"
+  },
+  "updatedSurfaces": [
+    "packages/semantic-contracts/src/vector-manifest.ts",
+    "packages/semantic-contracts/src/index.ts",
+    "packages/semantic-contracts/schemas/vector-manifest.schema.json",
+    "sveltekit-frontend/src/lib/server/vector/lane-registry.ts",
+    "sveltekit-frontend/scripts/atlas/audit-representation-drift.mts",
+    "sveltekit-frontend/src/lib/server/ollama.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "scripts/atlas/phase-108-semantic-enrichment.mts",
+    "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs"
+  ],
+  "symbolFacingAllowlist": [
+    "semantic_768",
+    "semantic_mrl_512",
+    "semantic_mrl_256",
+    "semantic_mrl_128",
+    "latent_256",
+    "latent_128",
+    "latent_64"
+  ],
+  "phase17Policy": "historical_384_migration_replay_only",
+  "databaseWrites": false,
+  "productionActivation": false,
+  "representationDriftAudit": {
+    "status": "PASS",
+    "gatesPassed": 5,
+    "gatesFailed": 0,
+    "runtimeAlias": "dense_768 -> semantic_768",
+    "executed": "sveltekit-frontend/scripts/atlas/audit-representation-drift.mts"
+  },
+  "notes": [
+    "384-byte packed int4 buffers are not 384-dimensional semantic vectors.",
+    "The 384-wide autoencoder hidden layer is not a retrieval representation.",
+    "Legacy 384 schemas and replay fixtures remain available only for explicit migration or compatibility work."
+  ]
+}

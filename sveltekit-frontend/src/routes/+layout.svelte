@@ -12,6 +12,7 @@
     import { goto } from '$app/navigation';
     import { browser } from '$app/environment';
     import { registerServiceWorker } from '$lib/client/sw-register';
+    import { Toaster, toast } from 'svelte-sonner';
 
     let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
     let showDocumentWriter = $state(false);
@@ -45,13 +46,6 @@
 
     import GlobalCommandPalette from '$lib/components/ui/GlobalCommandPalette.svelte';
     let showCommandPalette = $state(false);
-    let toastApi = {
-        error: (message: string, options?: Record<string, unknown>) => {},
-        success: (message: string, options?: Record<string, unknown>) => {},
-        warning: (message: string, options?: Record<string, unknown>) => {},
-        info: (message: string, options?: Record<string, unknown>) => {},
-    };
-
     // Import webgpu modules dynamically to avoid SSR issues
     let webgpu: any = null;
     let cpuFallback: any = null;
@@ -63,13 +57,6 @@
         initializeStores();
 
         (async () => {
-            try {
-                const sonner = await import('svelte-sonner');
-                toastApi = sonner.toast;
-            } catch (error) {
-                console.warn('Toast system unavailable:', error);
-            }
-
             try {
                 const webgpuModule = await import('$lib/webgpu/webgpu-init');
                 webgpu = webgpuModule.webgpu;
@@ -97,10 +84,10 @@
         if (notifications.length > lastNotificationCount) {
             const latest = notifications[notifications.length - 1];
             if (latest) {
-                const toastFn = latest.type === 'error' ? toastApi.error
-                    : latest.type === 'success' ? toastApi.success
-                    : latest.type === 'warning' ? toastApi.warning
-                    : toastApi.info;
+                const toastFn = latest.type === 'error' ? toast.error
+                    : latest.type === 'success' ? toast.success
+                    : latest.type === 'warning' ? toast.warning
+                    : toast.info;
                 toastFn(latest.message, {
                     description: latest.title,
                     duration: latest.duration || 5000,
@@ -139,7 +126,7 @@
         // Listen for WebGPU device lost events for graceful degradation
         const handleDeviceLost = (event: Event) => {
             console.warn('WebGPU device lost, falling back to CPU:', event);
-            toastApi.warning('GPU acceleration unavailable', {
+            toast.warning('GPU acceleration unavailable', {
                 description: 'Switched to CPU fallback mode for compute operations',
                 duration: 8000,
             });
@@ -166,6 +153,7 @@
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
+<Toaster />
 <GlobalCommandPalette bind:open={showCommandPalette} />
 
 <!-- YoRHa Detective Sidebar -->

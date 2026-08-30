@@ -4,7 +4,7 @@
  * Phase 108: Semantic Enrichment Execution
  *
  * Executes three parallel semantic enrichment lanes:
- * 1. Vector Embeddings (384-dim, embeddinggemma:latest)
+ * 1. Vector Embeddings (native semantic_768, embeddinggemma:latest)
  * 2. NLP Feature Extraction (LangExtract, entity tagging)
  * 3. AST/Code Structure (tree-sitter, type inference)
  *
@@ -62,9 +62,9 @@ async function queryEmbeddingReadiness(pool: pg.Pool): Promise<EmbeddingStats> {
   return {
     totalPackets: total,
     readyForEmbedding: needsEmbedding,
-    estimatedTimeMinCPU: Math.ceil(needsEmbedding * 384 / 1000), // rough estimate: 1000 tokens/min on CPU
-    estimatedTimeMinGPU: Math.ceil(needsEmbedding * 384 / 25000), // rough estimate: 25K tokens/min on GPU (RTX 3060)
-    estimatedVRAMNeeded: Math.ceil((needsEmbedding * 384 * 4) / (1024 * 1024 * 1024)), // 384-dim float32 = 1.5KB per vector
+    estimatedTimeMinCPU: Math.ceil(needsEmbedding * 768 / 1000), // rough estimate: 1000 dimensions/min on CPU
+    estimatedTimeMinGPU: Math.ceil(needsEmbedding * 768 / 25000), // rough estimate: 25K dimensions/min on GPU (RTX 3060)
+    estimatedVRAMNeeded: Math.ceil((needsEmbedding * 768 * 4) / (1024 * 1024 * 1024)), // semantic_768 float32 = 3KB per vector
   };
 }
 
@@ -91,7 +91,7 @@ async function phase108SemanticEnrichment() {
 
       const stats = await queryEmbeddingReadiness(pool);
 
-      console.log('Lane 1: Vector Embeddings (embeddinggemma:latest, 384-dim)');
+      console.log('Lane 1: Vector Embeddings (embeddinggemma:latest, semantic_768 / 768-dim)');
       console.log(`  Packets ready:           ${stats.readyForEmbedding}`);
       console.log(`  Estimated time (CPU):    ${stats.estimatedTimeMinCPU} minutes`);
       console.log(`  Estimated time (GPU):    ${stats.estimatedTimeMinGPU} minutes`);
@@ -178,7 +178,7 @@ async function phase108SemanticEnrichment() {
         const packets = result.rows;
 
         console.log(`Found ${packets.length} packets needing embeddings`);
-        console.log(`Estimated time (GPU): ${Math.ceil(packets.length * 384 / 25000)} minutes`);
+        console.log(`Estimated time (GPU): ${Math.ceil(packets.length * 768 / 25000)} minutes`);
         console.log();
 
         // For now, just demonstrate the query structure

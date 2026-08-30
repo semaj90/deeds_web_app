@@ -96,8 +96,8 @@ export class PacketReader {
         ap.summary,
         ap.som_cluster,
         ap.metadata,
-        cci.content_embedding,
-        cci.embedding_dimension
+        cci.content_embedding_768 AS content_embedding,
+        768 AS embedding_dimension
       FROM atlas_packets ap
       LEFT JOIN codebase_chunk_index cci ON cci.source_ref = ap.source_ref
       WHERE ${whereClause}

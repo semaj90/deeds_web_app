@@ -2430,7 +2430,8 @@ async function createGraphNodes(
 
 /**
  * Generate a 768-dim embedding. Checks Redis/memory cache first, then
- * tries gRPC → embeddinggemma → nomic-embed-text. Caches result (60min TTL).
+ * tries the Go gRPC EmbeddingGemma lane, then direct EmbeddingGemma HTTP.
+ * Caches result (60min TTL).
  */
 async function embedText(text: string): Promise<number[] | null> {
 	const model = 'embeddinggemma:latest';

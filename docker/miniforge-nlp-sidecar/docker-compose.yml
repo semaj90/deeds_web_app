@@ -9,6 +9,8 @@ services:
       - "8095:8095"
     volumes:
       - ../..:/workspace:ro
+      # Source-only changes are visible without rebuilding the dependency image.
+      - ../../python:/app/python:ro
     environment:
       MINIFORGE_SIDECAR_HOST: 0.0.0.0
       MINIFORGE_SIDECAR_PORT: 8095

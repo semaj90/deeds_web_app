@@ -82,7 +82,8 @@ export async function tryEmbedCanonical(
       const embedding = await tryEmbedOnnx(text);
       if (embedding) {
         return {
-          model: opts?.model ?? 'embeddinggemma-onnx',
+          // The executor may be ONNX, but the model contract remains EmbeddingGemma.
+          model: opts?.model ?? 'embeddinggemma:latest',
           embedding,
           source: 'onnx-local',
         };

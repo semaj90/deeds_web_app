@@ -2,12 +2,6 @@
 // Keep this file clean to avoid poisoning the global type system
 
 
-declare module 'svelte-sonner' {
-  export const toast: any;
-  const mod: any;
-  export default mod;
-}
-
 declare module 'sveltekit-superforms' {
   const mod: any;
   export default mod;

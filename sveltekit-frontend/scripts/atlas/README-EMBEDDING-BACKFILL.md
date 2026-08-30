@@ -9,7 +9,7 @@ This directory contains the production-ready embedding backfill pipeline for the
 ### 1. Main Script
 **File**: `backfill-codebase-chunk-embeddings.mjs` (390 lines)
 
-Backfills 768-dim embeddings (embeddinggemma:latest) for all chunks in `codebase_chunk_index` where `content_embedding IS NULL`.
+Backfills canonical 768-dim EmbeddingGemma embeddings for eligible rows in `codebase_chunk_index` where `content_embedding_768 IS NULL`. The generic `content_embedding` column is legacy compatibility storage and is not written by this tool.
 
 **Features**:
 - ✅ Batch HTTP embedding (Ollama /api/embed)
@@ -109,10 +109,10 @@ npm run atlas:embed:full-corpus:apply
 npm run atlas:embed:full-corpus:apply:verbose
 
 # Custom batch size (32 = slower, more stable)
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
 
 # Limit to first 10K chunks
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=10000
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=10000
 ```
 
 ---
@@ -126,8 +126,8 @@ npm run atlas:embed:full-corpus:apply:verbose
 
 # Terminal 2: Watch progress
 watch -n 2 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
-  "SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) embedded, 
-   ROUND(COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END)::numeric / COUNT(*) * 100, 2) pct 
+  "SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded,
+   ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) pct
    FROM codebase_chunk_index;"'
 
 # Terminal 3: Check Ollama
@@ -144,7 +144,7 @@ curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | select(.name | contain
 | batch_size | 48 | 1-128 | Larger = faster but higher timeout risk |
 | timeout | 30000ms | 5000-60000 | HTTP request timeout |
 | checkpoint | 100 | 1-10000 | Progress log interval |
-| limit | 0 | 0-40754 | 0 = all chunks |
+| limit | 0 | 0-current | 0 = all eligible chunks |
 
 ### Environment Variables
 ```bash
@@ -181,10 +181,10 @@ docker start legal-ai-postgres  # if needed
 ### "Embedding dimension mismatch"
 **Cause**: Wrong embedding model or size changed
 ```bash
-# Verify dimension is 384
+# Verify dimension is 768
 curl -s http://127.0.0.1:11434/api/embed \
   -d '{"model":"embeddinggemma:latest","input":["test"]}' | jq '.embeddings[0] | length'
-# Expected: 384
+# Expected: 768
 ```
 
 ---
@@ -226,8 +226,8 @@ npm run atlas:embed:full-corpus:dry
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
     COUNT(*) total,
-    COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) embedded,
-    ROUND(COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
+    COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded,
+    ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
   FROM codebase_chunk_index;
 "
 
@@ -246,8 +246,8 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 
 ### Input
 - **Table**: `codebase_chunk_index`
-- **Columns**: `id`, `content`, `content_embedding` (target)
-- **Filter**: WHERE `content_embedding IS NULL`
+- **Columns**: `id`, `content`, `content_embedding_768` (canonical target)
+  - **Filter**: WHERE `content_embedding_768 IS NULL`
 
 ### Embedding Service
 - **Service**: Ollama
@@ -256,7 +256,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 - **Dimension**: 768-dim
 
 ### Output
-- **Updated**: `codebase_chunk_index.content_embedding` (pgvector)
+- **Updated**: `codebase_chunk_index.content_embedding_768` (canonical pgvector)
 - **Audit**: `codebase_chunk_index.updated_at` (timestamp)
 
 ### Downstream Usage

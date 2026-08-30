@@ -15,9 +15,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execFileSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.join(__dirname, '..', '..');
+const repoRoot = path.join(projectRoot, '..');
 
 interface ValidationGate {
   name: string;
@@ -67,27 +69,37 @@ const gates: Record<string, ValidationGate> = {
 
 // Canonical registry from semantic-contracts
 const CANONICAL_VECTORS = {
-  dense_384: { dimensions: 384, status: 'ACTIVE' },
+  semantic_768: { dimensions: 768, status: 'ACTIVE' },
+  semantic_mrl_512: { dimensions: 512, status: 'REFERENCE_ONLY' },
+  semantic_mrl_256: { dimensions: 256, status: 'REFERENCE_ONLY' },
+  semantic_mrl_128: { dimensions: 128, status: 'REFERENCE_ONLY' },
+  // Runtime lane alias for semantic_768; this is not a separate representation.
+  dense_768: { dimensions: 768, status: 'ACTIVE_ALIAS' },
+  dense_384: { dimensions: 384, status: 'REFERENCE_ONLY' },
   dense_768_legacy: { dimensions: 768, status: 'REFERENCE_ONLY' },
-  title_384: { dimensions: 384, status: 'ACTIVE' },
-  summary_384: { dimensions: 384, status: 'ACTIVE' },
-  symbol_384: { dimensions: 384, status: 'ACTIVE' },
-  ontology_384: { dimensions: 384, status: 'ACTIVE' },
-  latent_64: { dimensions: 64, status: 'ACTIVE' },
+  title_384: { dimensions: 384, status: 'REFERENCE_ONLY' },
+  summary_384: { dimensions: 384, status: 'REFERENCE_ONLY' },
+  symbol_384: { dimensions: 384, status: 'REFERENCE_ONLY' },
+  ontology_384: { dimensions: 384, status: 'REFERENCE_ONLY' },
+  latent_256: { dimensions: 256, status: 'REFERENCE_ONLY' },
+  latent_128: { dimensions: 128, status: 'REFERENCE_ONLY' },
+  latent_64: { dimensions: 64, status: 'REFERENCE_ONLY' },
+  topology_ae64_v1: { dimensions: 64, status: 'ACTIVE_TOPOLOGY_SOURCE' },
   late_interaction: { dimensions: 0, status: 'EXPERIMENTAL' },
   bm42_sparse: { dimensions: 8192, status: 'ACTIVE' },
 };
 
 const DEPRECATED_ALIASES = {
-  semantic_768: 'should not be used (replace with dense_384 or dense_768_legacy)',
-  dense_768: 'should not be used (replace with dense_384 or dense_768_legacy)',
-  content_embedding: 'should not be used (replace with content_embedding_384)',
+  dense_384: 'legacy-only; use semantic_768 for active semantic retrieval',
+  symbol_384: 'migration-only; symbol-facing contracts must fail closed',
+  content_embedding_384: 'legacy-only; use the canonical semantic_768 column',
   embedding_768d: 'should not be used (dead column)',
 };
 
 const CANONICAL_COLUMNS = {
-  content_embedding_384: 'dense_384 semantic vector',
-  content_embedding_768: 'dense_768_legacy semantic vector (read-only)',
+  content_embedding: 'semantic_768 canonical semantic vector',
+  content_embedding_384: 'legacy 384 semantic vector (read-only)',
+  content_embedding_768: 'legacy/alternate 768 vector (verify lineage before use)',
   latent_64: 'latent_64 topology vector',
   embedding_sparse: 'bm42_sparse sparse vector',
 };
@@ -99,10 +111,11 @@ console.log(`Project Root: ${projectRoot}\n`);
 console.log('⏳ Gate 1: Checking Qdrant payloads...');
 try {
   const qdrantRefs = new Set<string>();
-  const grepOutput = require('child_process').execSync(
-    `rg "vector.*:.*|named.*vector.*|qdrant.*vector" ${projectRoot}/src ${projectRoot}/services ${projectRoot}/tests --type ts --type go -o 2>/dev/null || true`,
-    { encoding: 'utf8' }
-  );
+  const grepOutput = execFileSync('rg', [
+    'vector.*:.*|named.*vector.*|qdrant.*vector',
+    'sveltekit-frontend/src', 'services',
+    '--type', 'ts', '--type', 'go', '-o', '--no-heading', '--no-line-number',
+  ], { cwd: repoRoot, encoding: 'utf8' });
 
   // Parse vector names from grep results (simplified)
   for (const line of grepOutput.split('\n').filter(Boolean)) {
@@ -175,10 +188,9 @@ try {
 // GATE 4: TypeScript alias usage
 console.log('⏳ Gate 4: Checking TypeScript aliases...');
 try {
-  const tsFiles = require('child_process').execSync(
-    `find ${projectRoot}/sveltekit-frontend/src -name "*.ts" -type f 2>/dev/null | head -30`,
-    { encoding: 'utf8' }
-  ).split('\n').filter(Boolean);
+  const tsFiles = execFileSync('rg', [
+    '--files', 'src', '--glob', '*.ts', '--glob', '!**/*.spec.ts', '--glob', '!**/*.test.ts',
+  ], { cwd: projectRoot, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean).map((file) => path.join(projectRoot, file));
 
   let tsViolations = 0;
   for (const filePath of tsFiles.slice(0, 10)) {
@@ -187,7 +199,7 @@ try {
     const content = fs.readFileSync(filePath, 'utf8');
 
     for (const [alias, reason] of Object.entries(DEPRECATED_ALIASES)) {
-      if (content.includes(alias) && !content.includes('dense_384') && !content.includes('latent_64')) {
+      if (content.includes(alias)) {
         tsViolations++;
         if (tsViolations <= 5) {
           gates.typescript_usage.violations.push(
@@ -214,12 +226,12 @@ try {
 
   if (fs.existsSync(testFilePath)) {
     const content = fs.readFileSync(testFilePath, 'utf8');
-    const denseMatches = (content.match(/vectorName:\s*['"]dense_768['"]/g) || []).length;
+    const denseMatches = (content.match(/vectorName:\s*['"]dense_384['"]/g) || []).length;
 
     if (denseMatches > 0) {
       gates.test_fixtures.failed = denseMatches;
       gates.test_fixtures.violations.push(
-        `❌ ${denseMatches} test fixtures use 'dense_768' (should use 'dense_384')`
+        `❌ ${denseMatches} test fixtures use legacy 'dense_384' in a canonical fixture`
       );
     } else {
       gates.test_fixtures.passed++;

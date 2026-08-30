@@ -12938,3 +12938,17 @@ browser tab/history entry rather than a code bug, no fix applied; (3) the four e
 `plan-semantic768-backfill-v1.mjs`, their reports, `prepare_golden_review_pool_v1.py`'s
 regenerated pool) remain uncommitted, correctly, pending a re-run against the real canonical
 column.
+
+### Semantic dimension reconciliation (2026-08-30)
+
+The active contract is frozen as `EmbeddingGemma → semantic_768` (768 dimensions), with
+native MRL references limited to `semantic_mrl_512`, `semantic_mrl_256`, and
+`semantic_mrl_128`. There is no active `semantic_384` or native EmbeddingGemma 384 tier.
+
+The number 384 remains valid only for the `NestedSemanticAutoencoder` internal hidden layer,
+packed-byte sizing, legacy schemas, and migration/replay fixtures. Those surfaces remain
+compatibility-only and must not be selected by active retrieval, ACE, cache, or reranking
+paths. `latent_256` is a separate learned derived representation; `latent_128` and
+`latent_64` are derived views, not EmbeddingGemma MRL representations.
+
+Reconciliation receipt: `docs/reports/semantic-dimension-alignment-v1.json`.

@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.golden-review-corpus-compatibility-v1",
+  "status": "COMPATIBLE_CORPUS_MISSING",
+  "canonicalAuthority": false,
+  "expected": {
+    "embeddingModel": "embeddinggemma:latest",
+    "embeddingDimension": 768,
+    "collection": "codebase_chunks_768"
+  },
+  "manifestsFound": 1,
+  "compatibleManifestCount": 0,
+  "manifests": [
+    {
+      "corpus_version": "2026-07-12-main-4ade5cfa",
+      "git_commit": "4ade5cfab32babdc6ee5b1ad56497cf8462e79e0",
+      "postgres_chunk_count": 40754,
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_count": 40568,
+      "embedding_model": "embeddinggemma:latest",
+      "embedding_dimension": 384,
+      "embedding_model_version": "v1.0",
+      "query_set_hash": "sha256:query-set-hash",
+      "judgment_set_hash": "pending"
+    }
+  ],
+  "databaseWrites": false,
+  "importAllowed": false,
+  "nextRequiredStep": "Create an approved 768-dimensional corpus manifest with current query/judgment checksums before judgment import."
+}

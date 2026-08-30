@@ -16,6 +16,7 @@ const LIMIT = Math.max(1, Math.min(2000, Number(arg('limit', 64))));
 const BATCH = Math.max(1, Math.min(32, Number(arg('batch-size', 8))));
 const SINCE_HOURS = Math.max(1, Math.min(720, Number(arg('since-hours', 24))));
 const MODEL = String(arg('model', env.EMBEDDINGGEMMA_MODEL ?? env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest'));
+if (!/^embeddinggemma(?::|$)/i.test(MODEL)) throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${MODEL}`);
 const OLLAMA_URL = String(arg('ollama-url', env.OLLAMA_URL ?? 'http://127.0.0.1:11434')).replace(/\/+$/, '');
 const OUT = path.resolve(REPO_ROOT, String(arg('out', 'docs/reports/graphify-rff-embedding-backfill-v1.json')));
 

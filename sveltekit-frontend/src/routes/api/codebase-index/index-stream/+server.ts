@@ -125,7 +125,7 @@ async function mirrorToPostgres(
 		await pool.query(
       `INSERT INTO codebase_chunk_index
 			   (qdrant_id, chunk_id, relative_path, symbol, kind, line_start, line_end, content,
-			    content_embedding, signature_embedding, summary_embedding,
+			    content_embedding_768, signature_embedding, summary_embedding,
 			    gpu_cluster, som_cluster, som_bmu_row, som_bmu_col, manifold4,
 			    page_rank_score, tags, cluster_summary, updated_at)
 			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18::jsonb, $19::jsonb, NOW())
@@ -133,7 +133,7 @@ async function mirrorToPostgres(
 			    chunk_id           = COALESCE(EXCLUDED.chunk_id, codebase_chunk_index.chunk_id),
 			    relative_path      = COALESCE(NULLIF(EXCLUDED.relative_path, ''), codebase_chunk_index.relative_path),
 			    content            = EXCLUDED.content,
-			    content_embedding  = COALESCE(EXCLUDED.content_embedding, codebase_chunk_index.content_embedding),
+			    content_embedding_768 = COALESCE(EXCLUDED.content_embedding_768, codebase_chunk_index.content_embedding_768),
 			    signature_embedding= COALESCE(EXCLUDED.signature_embedding, codebase_chunk_index.signature_embedding),
 			    summary_embedding  = COALESCE(EXCLUDED.summary_embedding, codebase_chunk_index.summary_embedding),
 			    gpu_cluster        = EXCLUDED.gpu_cluster,
@@ -293,7 +293,9 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 					let mirrored = 0;
 					for (const chunk of chunks) {
 						// Extract existing vectors from Qdrant scroll response
-						const contentVec = (chunk.vector as Record<string, number[]>)?.['content'] ?? null;
+						const contentVecRaw = (chunk.vector as Record<string, number[]>)?.['content'] ?? null;
+						// Only the canonical EmbeddingGemma semantic_768 vector may be mirrored.
+						const contentVec = contentVecRaw?.length === 768 ? contentVecRaw : null;
 						const sigVec     = (chunk.vector as Record<string, number[]>)?.['signature'] ?? null;
 
 						const ok = await mirrorToPostgres(chunk, summary, summaryVec, contentVec, sigVec);

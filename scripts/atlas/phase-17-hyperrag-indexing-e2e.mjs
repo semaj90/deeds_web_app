@@ -23,6 +23,8 @@ const asInt = (value, fallback) => {
 };
 const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex');
 
+// Historical 384-dim migration/e2e harness. It is retained for replay only;
+// the active Parent Atlas writer is semantic_768 via codebase_chunk_index.
 const CONFIG = {
   input: path.resolve(REPO_ROOT, String(args.get('input') ?? 'docs')),
   collection: String(args.get('collection') ?? process.env.QDRANT_COLLECTION ?? 'codebase_chunks_384_hybrid'),

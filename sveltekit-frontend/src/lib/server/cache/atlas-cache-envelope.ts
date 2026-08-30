@@ -31,7 +31,7 @@ export type AtlasRedisEnvelope = z.infer<typeof AtlasRedisEnvelopeSchema>;
 
 // L2 Bitfrost semantic envelope
 export const AtlasBifrostEnvelopeSchema = z.object({
-	embedding_model: z.literal('embeddinggemma').or(z.literal('nomic-embed-text')),
+	embedding_model: z.literal('embeddinggemma'),
 	embedding_dim: z.number().default(768),
 	query_hash: z.string(),
 	semantic_neighbors: z.array(z.number()),

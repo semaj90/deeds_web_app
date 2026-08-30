@@ -7,7 +7,7 @@
  * - atlas_packets.summary (trgm trigram for LIKE/similarity)
  * - atlas_packets.metadata JSONB (for feature extraction)
  * - codebase_chunk_index.content (trgm for FTS)
- * - codebase_chunk_index.content_embedding (pgvector cosine_ops)
+ * - codebase_chunk_index.content_embedding_768 (pgvector cosine_ops)
  *
  * Also adds partial indexes for performance:
  * - indexed packets only (summary IS NOT NULL)
@@ -72,12 +72,12 @@ const indexes = [
   {
     name: 'idx_codebase_chunk_embedding_cosine',
     table: 'codebase_chunk_index',
-    column: 'content_embedding (pgvector)',
+    column: 'content_embedding_768 (pgvector)',
     type: 'HNSW (pgvector)',
     sql: `CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_codebase_chunk_embedding_cosine
-          ON codebase_chunk_index USING hnsw (content_embedding vector_cosine_ops)
+          ON codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops)
           WITH (m = 16, ef_construction = 64)
-          WHERE content_embedding IS NOT NULL`,
+          WHERE content_embedding_768 IS NOT NULL`,
     purpose: 'HNSW vector similarity for cosine distance ANN search',
   },
   {
@@ -138,7 +138,7 @@ async function ginIndexAccelerate() {
         'SELECT COUNT(*) as count FROM atlas_packets WHERE summary IS NOT NULL'
       );
       const chunkCountRes = await pgPool.query(
-        'SELECT COUNT(*) as count FROM codebase_chunk_index WHERE content_embedding IS NOT NULL'
+        'SELECT COUNT(*) as count FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL'
       );
 
       const packetSummaryCount = parseInt(packetCountRes.rows[0].count);

@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.semantic768-backfill-plan-v1",
+  "status": "NON_PRODUCTION_BACKFILL_PLANNED",
+  "canonicalAuthority": false,
+  "contract": {
+    "model": "EmbeddingGemma",
+    "representation": "semantic_768",
+    "dimension": 768,
+    "destinationColumn": "content_embedding_768",
+    "sourceIdentity": [
+      "id",
+      "source_ref",
+      "content_hash"
+    ]
+  },
+  "counts": {
+    "total_rows": 55853,
+    "text_eligible_rows": 55816,
+    "no_generic_embedding": 684,
+    "generic_384": 52365,
+    "generic_768": 2804,
+    "canonical768_valid": 810,
+    "canonical768_contaminated": 576,
+    "canonical768_missing": 54430,
+    "canonical768_missing_with_generic": 54430,
+    "canonical768_missing_without_generic": 0
+  },
+  "actions": {
+    "preserveCanonicalValid": 810,
+    "reembedCanonicalMissing": 54430,
+    "reembedCanonicalMissingWithGeneric": 54430,
+    "reembedCanonicalMissingWithoutGeneric": 0,
+    "quarantineCanonicalContaminated": 576,
+    "doNotPromoteGeneric384": 52365,
+    "verifyGeneric768Independently": 2804
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "deletions": 0,
+  "approvalRequired": true,
+  "nextRequiredStep": "Approve a bounded backfill after verifying model, source bytes, checksum, and destination-column ownership."
+}

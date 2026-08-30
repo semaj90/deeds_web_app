@@ -5468,7 +5468,7 @@ server.registerTool(
       const result = {
         routing_provenance: {
           source_table: 'atlas_packets',
-          embedding_lane: 'dense_384',
+          embedding_lane: 'semantic_768',
           cell: { row: som_row, col: som_col },
           include_neighbors,
           som_assignment_health: 'unverified', // until SOM distribution audit passes

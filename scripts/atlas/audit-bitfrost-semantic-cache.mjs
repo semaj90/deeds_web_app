@@ -33,7 +33,7 @@ const FAMILIES = [
   { key: 'gpu:som:cell:*', pattern: 'gpu:som:cell:*', ownership: 'ACTIVE',
     note: 'SOM grid cell membership index. ~296 keys live across 20 cells.' },
   { key: 'gpu:autoencoder:latent_64:*', pattern: 'gpu:autoencoder:latent_64:*', ownership: 'ACTIVE',
-    note: 'AE 64-dim latent cache, written by karpathy-gpu-enrich.mjs. ~5,000 keys live.' },
+    note: 'Active trained LibTorch 768->128->64 autoencoder cache consumed by the SOM topology pipeline. This is distinct from the retired/random Karpathy H6 path (gpu:karpathy:encoded) and from the newer NestedSemanticAutoencoder latent_256/128/64 challenger, which has no live consumers. Active here means SOM/topology ownership, not canonical semantic retrieval authority.' },
   { key: 'gpu:karpathy:scores', pattern: 'gpu:karpathy:scores', exact: true, ownership: 'ACTIVE',
     note: 'PageRank/attention/authority blend hash. 1 key (hash with many fields), 24h TTL.' },
   { key: 'gpu:karpathy:summary', pattern: 'gpu:karpathy:summary', exact: true, ownership: 'ACTIVE',

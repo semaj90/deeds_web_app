@@ -2,7 +2,8 @@
 /**
  * Backfill canonical 768d embeddings for files indexed by daily Graphify.
  *
- * Default mode is dry-run. --apply is required for PostgreSQL writes.
+ * Default mode is dry-run. --apply plus explicit migration authorization is
+ * required for PostgreSQL writes.
  * Scope is bounded by updated_at so this does not re-embed the full corpus.
  * Qdrant/TurboVec are intentionally not written here; they are projections
  * rebuilt only after canonical PostgreSQL coverage is verified.
@@ -44,6 +45,10 @@ function vectorLiteral(vector) { return `[${vector.join(',')}]`; }
 function validateVector(vector) {
   if (!Array.isArray(vector) || vector.length !== 768 || vector.some((value) => !Number.isFinite(value))) {
     throw new Error(`Embedding must be a finite 768d array; received ${Array.isArray(vector) ? vector.length : 'non-array'}`);
+  }
+  const normSquared = vector.reduce((sum, value) => sum + value * value, 0);
+  if (!Number.isFinite(normSquared) || normSquared < 0.98 || normSquared > 1.02) {
+    throw new Error(`Embedding must be L2-normalized; received normSquared=${normSquared}`);
   }
 }
 function embeddingText(row) {
@@ -119,6 +124,12 @@ async function embedBatch(texts) {
 }
 async function main() {
   const started = Date.now();
+  if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
+    throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+  }
+  if (!/^embeddinggemma(?::|$)/i.test(MODEL)) {
+    throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${MODEL}`);
+  }
   const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-file-embedding-768-backfill' });
   useCudaEmbed = await probeCudaEmbedServer();
   const startVramFreeMb = await getFreeVramMb();
@@ -176,7 +187,7 @@ async function main() {
             const version = hash(`semantic_768:graphify:${MODEL}:${row.content_hash ?? hash(embeddingText(row))}`);
             const update = await client.query(`
               UPDATE codebase_chunk_index
-              SET content_embedding_768 = $1::vector(768), embedding_model = $2, embedding_version = $3, embedding_created_at = NOW(), updated_at = NOW()
+              SET content_embedding_768 = $1::vector(768), embedding_model = $2, embedding_version = $3, embedding_dimension = 768, embedding_normalized = true, embedding_created_at = COALESCE(embedding_created_at, NOW()), updated_at = NOW()
               WHERE id = $4::uuid AND content_embedding_768 IS NULL
             `, [vectorLiteral(vectors[index]), MODEL, version, row.id]);
             if (update.rowCount === 1) report.written += 1;

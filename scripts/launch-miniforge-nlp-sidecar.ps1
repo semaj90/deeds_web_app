@@ -9,7 +9,8 @@
 
   The launcher prefers an explicit MINIFORGE_PYTHON executable when provided,
   otherwise it falls back to `python` on PATH. Docker remains the default when
-  available. Set -UseLocalPython to run the facade directly.
+  available. Existing images are reused on normal startup; use -Rebuild after
+  dependency or image changes. Set -UseLocalPython to run the facade directly.
 #>
 [CmdletBinding()]
 param(
@@ -17,6 +18,7 @@ param(
   [switch] $UseDocker,
   [switch] $UseLocalPython,
   [switch] $UseLegacySidecar,
+  [switch] $Rebuild,
   [int] $Port = 8095
 )
 
@@ -68,7 +70,18 @@ function Start-DockerSidecar {
 
   Push-Location $repoRoot
   try {
-    docker compose -f $composeFile up -d --build
+    $composeArgs = @('-f', $composeFile, 'up', '-d')
+    $imageAvailable = $false
+    try {
+      $null = docker image inspect 'deeds-miniforge-nlp-sidecar:latest' 2>$null
+      $imageAvailable = $LASTEXITCODE -eq 0
+    } catch {
+      $imageAvailable = $false
+    }
+    if ($Rebuild -or -not $imageAvailable) {
+      $composeArgs += '--build'
+    }
+    docker compose @composeArgs
     if ($LASTEXITCODE -ne 0) {
       throw 'docker compose failed to start miniforge sidecar'
     }

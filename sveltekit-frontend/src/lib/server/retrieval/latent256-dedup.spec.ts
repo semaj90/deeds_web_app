@@ -58,7 +58,7 @@ describe('selectDiverseCandidates', () => {
     expect(result.selected).toHaveLength(3);
     expect(result.poolExhaustedBeforeFinalK).toBe(false);
     expect(result.skippedSemanticDuplicate).toEqual([
-      expect.objectContaining({ packetKey: 'b', duplicateOfPacketKey: 'a' }),
+      expect.objectContaining({ packetKey: 'b', duplicateOfCandidateId: 'a' }),
     ]);
   });
 
@@ -91,7 +91,7 @@ describe('selectDiverseCandidates', () => {
 
     expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'c']);
     expect(result.skippedExactDuplicate).toEqual([
-      expect.objectContaining({ packetKey: 'b', duplicateOfPacketKey: 'a' }),
+      expect.objectContaining({ packetKey: 'b', duplicateOfCandidateId: 'a' }),
     ]);
   });
 

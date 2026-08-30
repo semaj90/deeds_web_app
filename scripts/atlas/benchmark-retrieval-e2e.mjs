@@ -310,10 +310,7 @@ function sleep(ms) {
 
 async function embedQuery(query, retries = 2) {
   const start = now();
-  const models = [
-    env.ATLAS_EMBED_MODEL || 'embeddinggemma:latest',
-    'nomic-embed-text:latest',
-  ];
+  const models = [env.ATLAS_EMBED_MODEL || 'embeddinggemma:latest'];
 
   for (const model of models) {
     for (let attempt = 0; attempt <= retries; attempt++) {

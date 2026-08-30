@@ -22,9 +22,9 @@ describe('unified orchestrator RRF fusion', () => {
       { id: 'packet:a', file: 'src/a.ts', line: 12, score: 1.0, rank: 1 }
     ];
 
-    const postgresMap = new Map<string, { relative_path: string; symbol: string; kind: string }>([
-      ['packet:a', { relative_path: 'src/a.ts', symbol: 'findPacket', kind: 'function' }],
-      ['packet:b', { relative_path: 'src/b.ts', symbol: 'scanPackets', kind: 'function' }]
+    const postgresMap = new Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>([
+      ['packet:a', { candidateId: 'chunk-id-a', relative_path: 'src/a.ts', symbol: 'findPacket', kind: 'function' }],
+      ['packet:b', { candidateId: 'chunk-id-b', relative_path: 'src/b.ts', symbol: 'scanPackets', kind: 'function' }]
     ]);
 
     const ranked = rankCandidates(qdrantHits, turboVecHits, lexicalHits, postgresMap);
@@ -34,12 +34,14 @@ describe('unified orchestrator RRF fusion', () => {
     expect(ranked[0].symbol).toBe('findPacket');
     expect(ranked[0].kind).toBe('function');
     expect(ranked[0].qdrantPointId).toBe('packet:a');
+    expect(ranked[0].candidateId).toBe('chunk-id-a');
     expect(ranked[0].packetKey).toBe('chunk-uuid-a');
     expect(ranked[0].sourceRef).toBe('src/a.ts');
     expect(ranked[0].sourceRevision).toBe('src-rev-a');
     expect(ranked[0].workspaceRevision).toBe('workspace-rev-1');
     expect(ranked[0].identity).toMatchObject({
       qdrantPointId: 'packet:a',
+      candidateId: 'chunk-id-a',
       packetKey: 'chunk-uuid-a',
       sourceRef: 'src/a.ts',
       sourceRevision: 'src-rev-a',
@@ -73,7 +75,7 @@ describe('unified orchestrator RRF fusion', () => {
     ]);
   });
 
-  it('runs the opt-in latent pass only on packet-keyed candidates', async () => {
+  it('passes the canonical chunk ID to latent hydration, not packet or projection IDs', async () => {
     const ranked = rankCandidates(
       [
         { id: 'projection-a', score: 0.9, payload: { packet_key: 'a', source_ref: 'src/a.ts' } },
@@ -82,8 +84,8 @@ describe('unified orchestrator RRF fusion', () => {
       [],
       [],
       new Map([
-        ['projection-a', { relative_path: 'src/a.ts', symbol: 'a', kind: 'function' }],
-        ['projection-b', { relative_path: 'src/b.ts', symbol: 'b', kind: 'function' }],
+        ['projection-a', { candidateId: 'chunk-a', relative_path: 'src/a.ts', symbol: 'a', kind: 'function' }],
+        ['projection-b', { candidateId: 'chunk-b', relative_path: 'src/b.ts', symbol: 'b', kind: 'function' }],
       ]),
     );
     let hydratedKeys: string[] = [];
@@ -100,8 +102,8 @@ describe('unified orchestrator RRF fusion', () => {
           hydratedKeys = [...input.candidateIds];
           return {
             vectors: new Map([
-              ['a', Array.from({ length: 256 }, () => 1)],
-              ['b', Array.from({ length: 256 }, () => 1)],
+              ['chunk-a', Array.from({ length: 256 }, () => 1)],
+              ['chunk-b', Array.from({ length: 256 }, () => 1)],
             ]),
             requested: input.candidateIds.length,
             found: input.candidateIds.length,
@@ -115,7 +117,40 @@ describe('unified orchestrator RRF fusion', () => {
       },
     });
 
-    expect(hydratedKeys).toEqual(['a', 'b']);
+    expect(ranked.map(candidate => [candidate.candidateId, candidate.packetKey, candidate.qdrantPointId])).toEqual([
+      ['chunk-a', 'a', 'projection-a'],
+      ['chunk-b', 'b', 'projection-b'],
+    ]);
+    expect(hydratedKeys).toEqual(['chunk-a', 'chunk-b']);
     expect(output.map(candidate => candidate.packetKey)).toEqual(['a']);
+  });
+
+  it('fails open and preserves candidates when the canonical chunk ID is unavailable', async () => {
+    const ranked = rankCandidates(
+      [{ id: 'projection-only', score: 0.9, payload: { packet_key: 'packet-a', source_ref: 'src/a.ts' } }],
+      [],
+      [],
+      new Map([['projection-only', { relative_path: 'src/a.ts', symbol: 'a', kind: 'function' }]]),
+    );
+    let providerCalled = false;
+
+    const output = await applyConfiguredLatent256Dedup(ranked, {
+      enabled: true,
+      threshold: 0.9,
+      finalK: 1,
+      candidatePoolK: 1,
+      checkpointRevision: 'checkpoint-1',
+      candidateSnapshotRevision: 'snapshot-1',
+      representationRevision: 'latent_256-v1',
+      provider: {
+        async hydrate() {
+          providerCalled = true;
+          throw new Error('provider must not receive projection-only identity');
+        },
+      },
+    });
+
+    expect(providerCalled).toBe(false);
+    expect(output).toEqual(ranked);
   });
 });

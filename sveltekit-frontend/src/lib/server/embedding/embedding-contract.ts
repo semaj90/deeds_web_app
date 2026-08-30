@@ -60,9 +60,10 @@ export const EMBEDDING_CONTRACT = {
   pooling: 'mean' as const,
 
   /**
-   * Token limit (max input token length before truncation)
+   * EmbeddingGemma maximum input length before truncation.
+   * Generation-model output/context limits are separate contracts.
    */
-  max_tokens: 4096,
+  max_tokens: 2048,
 
   /**
    * Ollama service endpoint

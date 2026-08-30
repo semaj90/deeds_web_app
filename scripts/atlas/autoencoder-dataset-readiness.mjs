@@ -3,9 +3,9 @@
 /**
  * Autoencoder Dataset Readiness + QLoRA Adapter Training Export
  *
- * Prepares canonical packets for AE training pipeline (768→384→64)
+ * Prepares canonical packets for AE training pipeline (768→256→128→64)
  * and exports QLoRA adapter dataset with:
- *   - Input embeddings (384-dim from EmbeddingGemma)
+ *   - Input embeddings (768-dim from EmbeddingGemma)
  *   - Domain/ontology labels (from domain_class + feature_id)
  *   - Topology coordinates (from SOM + KMeans + PageRank)
  *   - Canonical feature vectors (from ast_symbols + lexical_features + entities)
@@ -48,7 +48,7 @@ const DESTINATION = process.argv.find(arg => arg.startsWith('--destination='))?.
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  Autoencoder Dataset Readiness + QLoRA Export                 ║');
-console.log('║  Prepare training data for 768→384→64 AE + adapter tuning      ║');
+console.log('║  Prepare training data for 768→256→128→64 AE + adapter tuning ║');
 console.log(`║  Mode: ${DRY_RUN ? 'ANALYZE'.padEnd(54) : (PREPARE ? 'PREPARE' : 'EXPORT').padEnd(54)}║`);
 console.log(`║  Limit: ${LIMIT.toString().padEnd(58)}║`);
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
@@ -99,7 +99,7 @@ async function analyzeDataset() {
   const embeddingRes = await pgPool.query(`
     SELECT
       COUNT(*) as total,
-      COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) as has_embedding,
+      COUNT(CASE WHEN content_embedding_768 IS NOT NULL THEN 1 END) as has_embedding,
       COUNT(CASE WHEN LENGTH(summary) > 10 THEN 1 END) as has_summary
     FROM codebase_chunk_index
   `);
@@ -171,7 +171,7 @@ async function prepareDataset() {
       ap.som_col,
       ap.page_rank_score,
       ap.community_id,
-      cci.content_embedding,
+      cci.content_embedding_768,
       apf.ast_symbols,
       apf.lexical_features,
       apf.entities,
@@ -179,7 +179,7 @@ async function prepareDataset() {
     FROM atlas_packets ap
     LEFT JOIN codebase_chunk_index cci ON ap.source_ref = cci.source_ref
     LEFT JOIN atlas_packet_features apf ON ap.packet_key = apf.packet_key
-    WHERE cci.content_embedding IS NOT NULL
+    WHERE cci.content_embedding_768 IS NOT NULL
     ORDER BY ap.packet_key
     LIMIT $1
   `;
@@ -195,10 +195,14 @@ async function prepareDataset() {
   let serialized = 0;
 
   for (const row of rows) {
-    // Embedding as array (384-dim)
-    const embedding = row.content_embedding ? row.content_embedding.split(',').map(Number) : null;
+    // PostgreSQL vector values may arrive as an array or bracketed text.
+    const embedding = Array.isArray(row.content_embedding_768)
+      ? row.content_embedding_768.map(Number)
+      : typeof row.content_embedding_768 === 'string'
+        ? row.content_embedding_768.replace(/^\[/, '').replace(/\]$/, '').split(',').map(Number)
+        : null;
 
-    if (!embedding || embedding.length !== 384) {
+    if (!embedding || embedding.length !== 768 || embedding.some(value => !Number.isFinite(value))) {
       console.log(`⚠️  Skipping ${row.packet_key}: invalid embedding`);
       continue;
     }
@@ -213,9 +217,9 @@ async function prepareDataset() {
       canonical_concepts: row.concept_ids || [],
       used_concepts: row.used_concepts || [],
 
-      // Input: 384-dim embedding (from EmbeddingGemma)
-      embedding_384: embedding,
-      embedding_dim: 384,
+      // Input: canonical 768-dim EmbeddingGemma representation
+      embedding_768: embedding,
+      embedding_dim: 768,
 
       // Topology (auxiliary labels for clustering)
       topology: {
@@ -252,11 +256,11 @@ async function prepareDataset() {
     created_at: new Date().toISOString(),
     format: FORMAT,
     total_records: serialized,
-    embedding_dim: 384,
+    embedding_dim: 768,
     schema: {
       packet_key: 'string (identity, not feature)',
       feature_id: 'string (grouping, not feature)',
-      embedding_384: 'number[384] (input)',
+      embedding_768: 'number[768] (input)',
       domain_class: 'string (label)',
       canonical_concepts: 'string[] (label)',
       used_concepts: 'string[] (label)',
@@ -276,7 +280,7 @@ async function prepareDataset() {
       valid: 'boolean (always true)',
     },
     usage: {
-      autoencoder_training: 'Input: embedding_384 → Target: compressed latent vectors',
+      autoencoder_training: 'Input: embedding_768 → Target: compressed latent vectors',
       supervised_labels: 'domain_class, canonical_concepts, used_concepts',
       auxiliary_loss: 'topology coordinates (optional for regularization)',
       filtering: 'Select has_topology=true for cleaner training',

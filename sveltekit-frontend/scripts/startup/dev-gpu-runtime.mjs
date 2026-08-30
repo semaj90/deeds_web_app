@@ -223,15 +223,12 @@ async function checkVramHeadroom(minFreeMb = 5000) {
 }
 
 /**
- * Detect duplicate llama-server.exe processes (Windows only). Only one
- * process can bind :8090, but a second/third instance can still be alive
- * holding VRAM without ever binding a port (stale, crashed mid-load, or
- * started against a different port) -- exactly the shape of process found
- * live during this session's investigation (2 llama-server.exe: one ~1KB
- * stub, one ~1GB resident). Log-only; does not kill anything here --
- * launch-turboquant.ps1 owns the port-8090 process lifecycle.
+ * Detect competing target-port llama-server.exe processes (Windows only).
+ * Ollama may run its own llama-server for embeddings on another port, so the
+ * total process count is not evidence of a duplicate Ornith server.
+ * Log-only; launch-turboquant.ps1 owns the target-port process lifecycle.
  */
-async function checkForDuplicateLlamaServerProcesses() {
+async function checkForDuplicateLlamaServerProcesses(targetPort = Number(process.env.TURBO_PORT ?? 8090)) {
   if (process.platform !== 'win32') return;
   try {
     const { execFile } = await import('node:child_process');
@@ -246,13 +243,27 @@ async function checkForDuplicateLlamaServerProcesses() {
       const cols = line.split('","').map((c) => c.replace(/(^")|("$)/g, ''));
       return { pid: cols[1], memUsage: cols[4] };
     });
-    if (procs.length > 1) {
+    const { stdout: portStdout } = await execFileAsync('powershell.exe', [
+      '-NoProfile', '-Command',
+      `@(Get-NetTCPConnection -LocalPort ${targetPort} -State Listen -ErrorAction SilentlyContinue | ` +
+        'Select-Object -ExpandProperty OwningProcess) -join ","',
+    ], { timeout: 5000 });
+    const targetOwners = portStdout.trim().split(',').map((pid) => pid.trim()).filter(Boolean);
+    const targetOwnerSet = new Set(targetOwners);
+    const targetProcs = procs.filter((p) => targetOwnerSet.has(p.pid));
+    if (targetProcs.length > 1) {
       console.warn(
-        `[dev:gpu] ⚠️  ${procs.length} llama-server.exe processes found: ` +
-        procs.map((p) => `PID ${p.pid} (${p.memUsage})`).join(', ') +
-        ' — only one can bind :8090; the rest are dead weight on VRAM/RAM. ' +
+        `[dev:gpu] ⚠️  ${targetProcs.length} llama-server.exe processes own target port :${targetPort}: ` +
+        targetProcs.map((p) => `PID ${p.pid} (${p.memUsage})`).join(', ') +
+        '. ' +
         'launch-turboquant.ps1 only manages the process bound to the target port; ' +
         'kill orphans manually if this persists across restarts.',
+      );
+    } else if (procs.length > 1) {
+      console.log(
+        `[dev:gpu] ${procs.length} llama-server.exe instances found; ` +
+        `${targetProcs.length} owns target port :${targetPort}. ` +
+        'Other instances may be alternate-port embedding runtimes.',
       );
     } else {
       console.log(`[dev:gpu] llama-server.exe already running (PID ${procs[0].pid}, ${procs[0].memUsage})`);

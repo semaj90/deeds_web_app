@@ -1,6 +1,6 @@
 # Full-Corpus Embedding Backfill: `backfill-codebase-chunk-embeddings.mjs`
 
-**Purpose**: Backfill 768-dim embeddings (`content_embedding`) for all chunks in `codebase_chunk_index` that are missing embeddings (WHERE `content_embedding IS NULL`).
+**Purpose**: Backfill canonical 768-dim EmbeddingGemma embeddings (`content_embedding_768`) for eligible chunks in `codebase_chunk_index` that are missing canonical vectors (WHERE `content_embedding_768 IS NULL`). The generic `content_embedding` column is legacy compatibility storage and is not written by this tool.
 
 **Status**: ✅ Production-ready. Handles 40K+ chunks with graceful failure recovery, atomic Postgres updates, and streaming progress logging.
 
@@ -27,7 +27,7 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
 ### 5-Step Pipeline
 
 1. **Read from Postgres** (atomic query, no write lock)
-   - Selects chunks WHERE `content_embedding IS NULL`
+   - Selects eligible chunks WHERE `content_embedding_768 IS NULL`
    - Filters out empty/null content (quality gate)
    - Deterministic order (ID ASC) prevents re-processing
    - Batch-friendly query structure
@@ -62,7 +62,7 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--dry-run` | true | Preview mode (no writes) |
-| `--apply` | false | Execute the backfill |
+| `--apply` | false | Execute the backfill; also requires `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1` |
 | `--batch-size=N` | 48 | Embeddings per HTTP request (1-128) |
 | `--limit=N` | 0 | Max chunks to process (0 = all) |
 | `--checkpoint=N` | 100 | Progress log every N chunks |
@@ -75,17 +75,17 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
 # Preview: dry-run the first 1000 chunks
 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --dry-run --limit=1000
 
-# Apply: full corpus, smaller batches for stability
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
+# Apply: full corpus, smaller batches for stability (explicit authorization required)
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
 
 # Apply: full corpus with debugging output
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --verbose --checkpoint=50
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --verbose --checkpoint=50
 
 # Apply: custom timeout for slow Ollama
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --timeout=60000
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --timeout=60000
 
 # Apply: limit to first 5000 for testing
-node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=5000
+ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=5000
 ```
 
 ---
@@ -196,7 +196,7 @@ watch -n 2 'curl -s http://127.0.0.1:11434/api/tags | jq ".models[] | .name"'
 
 # Terminal 3: Monitor Postgres
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
-  "SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) embedded FROM codebase_chunk_index; SELECT CURRENT_TIMESTAMP;"
+  "SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) embedded FROM codebase_chunk_index; SELECT CURRENT_TIMESTAMP;"
 ```
 
 ### Post-Backfill Verification
@@ -206,19 +206,19 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
     COUNT(*) total,
-    COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END) populated,
-    ROUND(COUNT(CASE WHEN content_embedding IS NOT NULL THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
+    COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END) populated,
+    ROUND(COUNT(CASE WHEN content_embedding_768 IS NOT NULL AND embedding_dimension = 768 THEN 1 END)::numeric / COUNT(*) * 100, 2) coverage_pct
   FROM codebase_chunk_index;
 "
 
 # Check embedding dimension
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
-    array_length(content_embedding, 1) dim,
+    array_length(content_embedding_768, 1) dim,
     COUNT(*) count
   FROM codebase_chunk_index
-  WHERE content_embedding IS NOT NULL
-  GROUP BY array_length(content_embedding, 1);
+  WHERE content_embedding_768 IS NOT NULL
+  GROUP BY array_length(content_embedding_768, 1);
 "
 ```
 
@@ -232,14 +232,14 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 |--------|------|---------|
 | `id` | INT | Primary key |
 | `content` | TEXT | Source text (read only) |
-| `content_embedding` | `vector(768)` | pgvector column (write target) |
+| `content_embedding_768` | `vector(768)` | canonical pgvector write target |
 | `updated_at` | TIMESTAMP | Audit trail |
 
 ### Query Plan
 
 ```sql
 SELECT id, content FROM codebase_chunk_index
-WHERE content_embedding IS NULL
+WHERE content_embedding_768 IS NULL
   AND content IS NOT NULL
   AND LENGTH(TRIM(content)) > 0
 ORDER BY id ASC
@@ -248,7 +248,7 @@ LIMIT :batch_size OFFSET :offset;
 
 **Indexes used:** Primary key on `id`
 
-**Optimization:** No index on `content_embedding` (only NULL checks, sequential scan fine for 40K rows)
+**Optimization:** Selects current eligible rows with missing canonical vectors; coverage is measured against the live corpus rather than a fixed row estimate.
 
 ---
 

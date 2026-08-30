@@ -1,5 +1,7 @@
 /**
- * Qdrant Multi-Vector Schema — Purpose-built vectors for different retrieval tasks
+ * Legacy Qdrant Multi-Vector Schema — retained for explicit 384-dim replay only.
+ * The active `codebase_chunks_768` contract is owned by the canonical Qdrant
+ * adapter and uses EmbeddingGemma `semantic_768` under the `content` vector.
  *
  * Named vectors (all 384-dim from EmbeddingGemma):
  *   content_embedding → Semantic search (code/text content)
@@ -91,8 +93,11 @@ interface HybridSearchRequest {
  */
 export async function createMultiVectorCollection(
   qdrantUrl: string,
-  collectionName: string = 'codebase_chunks_768'
+  collectionName: string = 'codebase_chunks_384_hybrid'
 ): Promise<void> {
+  if (collectionName === 'codebase_chunks_768') {
+    throw new Error('Legacy 384 multi-vector schema cannot create the canonical codebase_chunks_768 collection');
+  }
   const createRes = await fetch(`${qdrantUrl}/collections/${collectionName}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

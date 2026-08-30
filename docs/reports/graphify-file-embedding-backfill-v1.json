@@ -1,12 +1,12 @@
 {
   "schema": "atlas.graphify-file-embedding-backfill.v1",
-  "generatedAt": "2026-08-26T03:31:52.393Z",
+  "generatedAt": "2026-08-30T05:11:37.370Z",
   "apply": false,
   "scope": {
     "table": "codebase_chunk_index",
     "canonicalColumn": "content_embedding_768",
     "sinceHours": 24,
-    "limit": 4,
+    "limit": 1,
     "declaredType": "vector(768)"
   },
   "model": "embeddinggemma:latest",
@@ -15,42 +15,17 @@
   "embedServerUrl": null,
   "vram": {
     "minFreeMbThreshold": 300,
-    "freeMbAtStart": 294,
+    "freeMbAtStart": 562,
     "freeMbAtMidpoint": null,
-    "freeMbAtEnd": 295,
-    "guardTriggered": true
+    "freeMbAtEnd": 562,
+    "guardTriggered": false
   },
   "status": "DRY_RUN",
-  "selected": 4,
+  "selected": 0,
   "embedded": 0,
   "written": 0,
   "skipped": 0,
   "errors": [],
-  "sample": [
-    {
-      "id": "82a9af4a-c4b2-4a5e-9fdb-252c663c3af9",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "94ca3402d1ed4c2b974d1671f4a5bacd29e826cc3bc211285bae84c7ac1370d6"
-    },
-    {
-      "id": "f58154a8-6356-4e38-9150-84cdc3592108",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "97434183b897b8a1bead980597ca3de34f8c4d468ebdac251da50f37a81cc81a"
-    },
-    {
-      "id": "4b2bc59b-2c8c-46d9-ba0c-1c466d927098",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "4d4bcab170fe17926bd042ff8ec263c2e091a68f8574b172b28735bfe30ae095"
-    },
-    {
-      "id": "165d6e9f-d676-4f8d-a804-ebd6fd704b8a",
-      "relativePath": "sveltekit-frontend/docs/graph/hypergraph-clusters.md",
-      "sourceRef": null,
-      "textHash": "22c7aa99c80060d288716a11cbd42ac81ebbbc3bd6f90e75f4ca94dad97d8d65"
-    }
-  ],
-  "elapsedMs": 7118
+  "sample": [],
+  "elapsedMs": 197
 }

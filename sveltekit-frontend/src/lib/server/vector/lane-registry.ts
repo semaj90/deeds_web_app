@@ -75,13 +75,13 @@ export const VECTOR_LANES = {
     kind: 'routing',
     role: 'derived',
     modelId: 'atlas-autoencoder-768x64-v1',
-    vectorName: 'latent_64',
+    vectorName: 'topology_ae64_v1',
     collection: 'codebase_topology_64',
     dimension: 64,
     projection: 'latent',
     normalization: 'l2',
     status: 'partial',
-    notes: 'Derived routing lane for KMeans / SOM / TurboVec acceleration only.',
+    notes: 'Legacy trained topology representation for KMeans / SOM / TurboVec acceleration only; not interchangeable with nested latent_64.',
   },
 } as const satisfies Record<string, VectorLaneContract>;
 

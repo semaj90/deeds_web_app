@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.qdrant-semantic768-population-audit-v1",
+  "status": "PROJECTION_RECONCILIATION_BLOCKED",
+  "canonicalAuthority": false,
+  "collection": "codebase_chunks_768",
+  "totalPointIds": 109776,
+  "uniquePacketKeys": 9964,
+  "uniquePacketKeyCamelCase": 4480,
+  "uniqueSourceRefs": 6882,
+  "uniqueChunkIds": 23655,
+  "uniqueEmbeddingRefs": 4527,
+  "payloadPopulation": {
+    "representation_semantic_768": 53042,
+    "representation_embeddinggemma_768_native_v1": 52365,
+    "lineage_packet-identity-v1": 106288,
+    "qdrantVectorDimension_768": 106321,
+    "packetVersion_qdrant-backfill-v1": 1000,
+    "packetKind_qdrant_chunk": 4512,
+    "packetKind_mcp_tool_stub": 15,
+    "ledgerType_atlas_feature_packets": 4527
+  },
+  "vectorPopulation": {
+    "content": 109248,
+    "signature": 528,
+    "error": 0,
+    "missing": 0
+  },
+  "payloadFieldMissingCounts": {
+    "packetVersion": 108776,
+    "ledgerType": 105249,
+    "qdrantCollection": 3488,
+    "packetKind": 105249,
+    "lineageVersion": 3488,
+    "qdrantVectorDim": 3455,
+    "representationId": 3369,
+    "embeddingRef": 105249
+  },
+  "postgresSemantic768ChunkCount": 55169,
+  "databaseWrites": false,
+  "deletions": 0,
+  "nextRequiredStep": "Classify Qdrant populations by immutable artifact/projection revision and reconcile against PostgreSQL before any manifest registration or cleanup."
+}
