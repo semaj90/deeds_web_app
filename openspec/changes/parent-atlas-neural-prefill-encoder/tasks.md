@@ -12640,3 +12640,26 @@ provider (no fabricated identity for incomplete hits), and its final filter step
 without a packet key survives untouched rather than being silently dropped. This matches the
 identity-safety discipline established throughout this thread. No changes made to this wiring;
 this section only corrects the stale status claim.
+
+**Further correction, minutes later, same day**: the above was written from reading the working
+tree without first checking `git status`. `git diff` on `unified-orchestrator.ts` confirms the
+`selectDiverseCandidates`/`applyConfiguredLatent256Dedup` lines are all `+` additions in an
+**uncommitted** working-tree diff, not settled repo history — part of a large (~40-file)
+in-progress body of concurrent-agent work spanning many unrelated subsystems (Docker compose,
+ACE fanout adapter, RLM search adapter, bifrost cache managers, RAPIDS graph runtime, MCP tool
+selector, and more). "Live-wired" was premature; the correct status is "present and sound in the
+current working tree, not yet committed." Treat this integration as provisional until it's
+actually committed — a concurrent agent could still revise or abandon it before that happens.
+
+**LATENT-DIVERSITY-HARDEN-01 (2026-08-29)**: contract hardening applied in the working tree.
+`Latent256HydrateInput` now names the storage coordinate `candidateIds` rather than implying
+that `packetKey` is the provider identity. `candidateSnapshotRevision`, `representationRevision`,
+and `checkpointRevision` are required selector inputs; ad-hoc defaults were removed. Hydration
+receipts now include a deterministic `vectorsChecksum` and bind it plus the revision tuple into
+`receiptChecksum`. `selectDiverseCandidates()` rejects invalid `finalK`, insufficient
+`candidatePoolK`, and out-of-range thresholds before hydration. Regression coverage was updated
+for the new coordinate and provenance contract, including checksum lineage and invalid-config
+cases. Retrieval typecheck reports no errors for the hardened latent-256 or unified-orchestrator
+surfaces. The shared Vitest setup hangs during unrelated module initialization, so a setup-free
+`vitest.latent256.config.ts` was added for this bounded suite; provider and dedup tests now pass
+`16/16`. The opt-in caller remains disabled and production ranking remains unchanged.
