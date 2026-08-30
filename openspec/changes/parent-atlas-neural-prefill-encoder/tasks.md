@@ -12168,3 +12168,74 @@ running** — a second confirmed-still-open gap, unrelated to this lane, not tou
 ANN-parity-verified representation with zero live consumers.** That is a valid, intentional
 stopping point — not an unfinished pipeline — pending an explicit future decision on query-time
 inference infrastructure.
+
+### LATENT256_SEMANTIC_DEDUP: the one live wiring path that needs no query-time inference (2026-08-29)
+
+An operator review correctly identified that the "zero live consumers" state above was not the
+full story: candidate-side diversity pruning needs only *already-materialized* `latent_256`
+vectors for candidates a prior retrieval pass already returned — no query-latent inference, no
+new service, no violation of the EmbeddingGemma-only embedding-model rule. Built exactly that,
+and only that, per the review's explicit boundary (`LATENT-DIVERSITY-01`):
+
+```
+semantic_768 primary retrieval → top-N candidates → hydrate stored latent_256
+  by candidate identity → validate (checkpoint revision, dims, finite) →
+  semantic near-duplicate pruning → audit receipt → final context candidates
+```
+
+**Terminology correction accepted and applied**: this is `LATENT256_SEMANTIC_DEDUP`
+(threshold-based near-duplicate pruning), not MMR — real MMR iteratively trades relevance
+against redundancy against already-selected results; this only checks
+`cosine(candidate, alreadyKept) >= threshold`. The code was already named correctly
+(`latent256SimilarityThreshold`, `semanticDedupRemoved`); only this document's own prior chat
+description had called it MMR informally.
+
+**Two new files, boundary preserved exactly as specified**:
+- `post-process-reranker.ts` — stayed a pure function. Added `latent256SimilarityThreshold`
+  (0 = disabled, default 0 = byte-for-byte prior behavior) and a `latent256Map` parameter it
+  only ever reads, never fetches. Hardened `cosineSimilarity()` with an equal-dimension check
+  per the review's boundary-code-validates-its-own-assumptions point (the zero-norm guard was
+  already present).
+- `latent256-candidate-provider.ts` (new) — `Latent256CandidateProviderV1` hydration contract +
+  a Postgres-backed implementation. Validates `checkpointRevision` (rows with the wrong
+  revision are excluded, not silently accepted), dimension (`=256`), and finiteness
+  independently, with three distinct failure counters (`missing`/`revisionMismatch`/
+  `invalidShape`) so an audit trail can tell the three failure modes apart. Deterministic
+  `receiptChecksum` (order-independent over `packetKeys`). Live-smoke-tested against real
+  Postgres data (2 found/256-dim, 1 missing, wrong-revision correctly rejected as
+  `revisionMismatch`) before the mocked spec was written.
+
+**Full required test matrix, all passing (13 tests, 2 spec files)**: threshold=0 no-op,
+identical-vectors removed, below-threshold survives, missing-vector survives, wrong-checkpoint-
+revision treated absent, wrong-dimension treated absent, NaN/Infinity treated absent, tie-score
+deterministic winner (packetKey ascending, matching Step 2's existing sort tiebreaker — this
+codebase's `ScoredCandidate` has no `CandidateOrdinal` field, so `packetKey` is the actual
+deterministic tiebreaker in use, documented as such), rerun-identical result and checksum.
+
+**`model_registry` / `ae_meta.json` terminology corrected** per the EmbeddingGemma-only rule:
+`latent_256` is not a text embedding model and cannot embed text — it consumes an
+already-computed EmbeddingGemma `semantic_768` vector. Since the `model_capability` Postgres
+enum has no `representation_transform` value, added `standalone_embedding_model: false`,
+`query_text_capable: false`, `input_representation: "semantic_768"`,
+`output_representation: "latent_256"`, `base_embedding_model: "embeddinggemma"` to both the
+`model_registry.metadata` JSONB (verified live) and `ae_meta.json`, plus a
+`representation_taxonomy` block distinguishing the embedding model (EmbeddingGemma only), the
+native MRL semantic representations (`semantic_768`/`semantic_mrl_512/256/128`), and this
+learned experimental transform — so a future agent can't mistake "embedding, 256 dimensions"
+for a second embedding model and send it raw text.
+
+**Explicitly NOT done, per the corrected scope** (all deliberately out of bounds for this
+change): query-latent inference, any new FastAPI/gRPC service, activating the
+`codebase_chunks_latent256` collection as an independent search lane, an extra RRF vote, any
+identity writes, true `CrossRepresentationDiversityV1` MMR (a distinct, later feature — relevance
+and diversity from different representation spaces, still needs no query latent vector, but is a
+different algorithm than threshold pruning), and threshold selection from an actual evaluation
+fixture (duplicate-precision/recall sweep across `0.90`–`0.99` — the current threshold stays a
+caller-supplied config value, not defaulted to a number chosen by intuition).
+
+**Still open, the actual remaining integration step**: nothing calls
+`PostgresLatent256CandidateProvider` from the live retrieval orchestrator yet.
+`unified-orchestrator.ts` needs an explicit decision on where in its pipeline to call
+`.hydrate()` for the top-N candidates and thread `latent256Map` through to
+`postProcessCandidates()` — that wiring, plus picking a real threshold from an evaluation, are
+the next two concrete steps, not yet started.
