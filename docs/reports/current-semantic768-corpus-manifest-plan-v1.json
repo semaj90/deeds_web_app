@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.evaluation-corpus-manifest-v1",
+  "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED",
+  "canonicalAuthority": false,
+  "corpusVersion": "semantic768-8aa923696fef",
+  "gitCommit": "8aa923696fef46354cdbb29f865216d6fb6854ff",
+  "postgresPacketCount": null,
+  "postgresChunkCount": 55169,
+  "qdrantCollection": "codebase_chunks_768",
+  "qdrantPointCount": 109776,
+  "embeddingModel": "embeddinggemma:latest",
+  "embeddingDimension": 768,
+  "embeddingModelVersion": "current-workstation-contract",
+  "querySetHash": "sha256:3f3fade5bb160a90c95458acac46e5b27b7e14d76629ef6fe34f3c63349a52d9",
+  "judgmentSetHash": "pending",
+  "queryCount": 60,
+  "qdrantMetadataReachable": true,
+  "databaseWrites": false,
+  "importAllowed": false,
+  "nextRequiredStep": "Complete reviewed grades and compute judgmentSetHash before registering this manifest."
+}

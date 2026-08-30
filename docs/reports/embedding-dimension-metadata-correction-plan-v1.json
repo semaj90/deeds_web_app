@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.embedding-dimension-metadata-correction-plan-v1",
+  "status": "NON_PRODUCTION_METADATA_CORRECTION_PLANNED",
+  "canonicalAuthority": false,
+  "supersedes": "atlas.semantic768-backfill-plan-v1 (2026-08-29, wrong premise, not executed)",
+  "contract": {
+    "canonicalColumn": "content_embedding",
+    "canonicalColumnType": "halfvec(768)",
+    "dimensionVerificationMethod": "vector_dims(content_embedding::vector)",
+    "staleColumn": "embedding_dimension",
+    "correctionAction": "UPDATE codebase_chunk_index SET embedding_dimension = vector_dims(content_embedding::vector) WHERE content_embedding IS NOT NULL AND embedding_dimension IS DISTINCT FROM vector_dims(content_embedding::vector)",
+    "legacyColumnNote": "content_embedding_768 is a separate, much smaller, non-canonical column -- not touched by this plan"
+  },
+  "counts": {
+    "total_rows": 55853,
+    "content_embedding_populated": 55169,
+    "content_embedding_verified_768": 55169,
+    "content_embedding_verified_not_768": 0,
+    "metadata_says_768": 2804,
+    "metadata_stale_should_be_768": 52365,
+    "legacy_content_embedding_768_populated": 1386
+  },
+  "actions": {
+    "correctStaleMetadata": 52365,
+    "noReembedding": true,
+    "noContentEmbedding768Writes": true
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "deletions": 0,
+  "approvalRequired": true,
+  "nextRequiredStep": "Approve a bounded UPDATE of embedding_dimension only, driven by vector_dims(content_embedding::vector); do not re-embed and do not treat content_embedding_768 as canonical."
+}
