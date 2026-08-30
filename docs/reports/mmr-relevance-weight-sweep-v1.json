@@ -1,0 +1,787 @@
+{
+  "schema": "atlas.mmr-relevance-weight-sweep.v1",
+  "canonical_authority": false,
+  "note": "Renamed from 'lambda' to mmrRelevanceWeight to avoid collision with LambdaMART/LambdaRank's unrelated gradient-construction lambda, per review. 1.0 = pure relevance, 0.0 = pure diversity (Qdrant's own diversity param = 1 - mmrRelevanceWeight).",
+  "pool_k": 50,
+  "final_k": 10,
+  "mmr_relevance_weights": [
+    0.5,
+    0.6,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9,
+    0.95,
+    1.0
+  ],
+  "latent_256_reference_point": {
+    "avg_unique_sources": 7.4,
+    "avg_recall_at_10_silver": 0.2374621124621125
+  },
+  "baseline_reference_point": {
+    "avg_unique_sources": 6.6,
+    "avg_recall_at_10_silver": 0.2388348138348138
+  },
+  "recall_tolerance": 0.99,
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "silverRelevantInPool": 26,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 5,
+          "recallAt10": 0.19230769230769232,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 9,
+          "relevantInFinal": 5,
+          "recallAt10": 0.19230769230769232,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.3076923076923077,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.85": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.3076923076923077,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.9": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.3076923076923077,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.95": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.3076923076923077,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 5,
+          "relevantInFinal": 9,
+          "recallAt10": 0.34615384615384615,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "JWT authentication middleware",
+      "silverRelevantInPool": 36,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 8,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 8,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 8,
+          "relevantInFinal": 9,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.9": {
+          "uniqueSources": 6,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.95": {
+          "uniqueSources": 6,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 5,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "silverRelevantInPool": 26,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 3,
+          "recallAt10": 0.11538461538461539,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 4,
+          "recallAt10": 0.15384615384615385,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 4,
+          "recallAt10": 0.15384615384615385,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.2692307692307692,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.2692307692307692,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "silverRelevantInPool": 37,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 9,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 9,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.95": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "error handling and logging middleware",
+      "silverRelevantInPool": 36,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 8,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 8,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 7,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "0.95": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "silverRelevantInPool": 33,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 8,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 7,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.3333333333333333,
+          "duplicateRateAt10": 0.2
+        }
+      }
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "silverRelevantInPool": 27,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.25925925925925924,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2962962962962963,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.25925925925925924,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2962962962962963,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2962962962962963,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.3333333333333333,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.4
+        },
+        "1.0": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.3333333333333333,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.4
+        }
+      }
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "silverRelevantInPool": 22,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 9,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 8,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 8,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 7,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5,
+          "duplicateRateAt10": 0.4
+        }
+      }
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "silverRelevantInPool": 3,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 9,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 9,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0,
+          "duplicateRateAt10": 0.0
+        }
+      }
+    },
+    {
+      "query": "file upload validation and storage",
+      "silverRelevantInPool": 40,
+      "weights": {
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.6": {
+          "uniqueSources": 9,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.75": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.8": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.85": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.0
+        },
+        "0.95": {
+          "uniqueSources": 9,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.2
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0,
+          "duplicateRateAt10": 0.3
+        }
+      }
+    }
+  ],
+  "summary": {
+    "0.5": {
+      "avg_unique_sources": 9.7,
+      "avg_recall_at_10_silver": 0.187996912996913,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.0,
+      "meets_recall_tolerance": false
+    },
+    "0.6": {
+      "avg_unique_sources": 9.7,
+      "avg_recall_at_10_silver": 0.19664104664104665,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.0,
+      "meets_recall_tolerance": false
+    },
+    "0.7": {
+      "avg_unique_sources": 9.5,
+      "avg_recall_at_10_silver": 0.2041909041909042,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.0,
+      "meets_recall_tolerance": false
+    },
+    "0.75": {
+      "avg_unique_sources": 9.5,
+      "avg_recall_at_10_silver": 0.21104146104146104,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.0,
+      "meets_recall_tolerance": false
+    },
+    "0.8": {
+      "avg_unique_sources": 8.9,
+      "avg_recall_at_10_silver": 0.22051054551054552,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.02,
+      "meets_recall_tolerance": false
+    },
+    "0.85": {
+      "avg_unique_sources": 8.5,
+      "avg_recall_at_10_silver": 0.22421424921424923,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.04,
+      "meets_recall_tolerance": false
+    },
+    "0.9": {
+      "avg_unique_sources": 8.0,
+      "avg_recall_at_10_silver": 0.23083818083818083,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.08,
+      "meets_recall_tolerance": false
+    },
+    "0.95": {
+      "avg_unique_sources": 7.4,
+      "avg_recall_at_10_silver": 0.2342893592893593,
+      "avg_mrr_at_10_silver": 0.8,
+      "avg_duplicate_rate_at_10": 0.18,
+      "meets_recall_tolerance": false
+    },
+    "1.0": {
+      "avg_unique_sources": 6.6,
+      "avg_recall_at_10_silver": 0.2388348138348138,
+      "avg_mrr_at_10_silver": 0.7833333333333333,
+      "avg_duplicate_rate_at_10": 0.22999999999999998,
+      "meets_recall_tolerance": true
+    }
+  },
+  "dominance_verdict": "NO",
+  "dominance_verdict_detail": "No mmrRelevanceWeight in the swept range both meets the recall tolerance (>= baseline*0.99) and exceeds latent_256's diversity. latent_256 represents a genuinely useful conservative operating point not reachable by tuning MMR alone.",
+  "duration_s": 2.3446595668792725
+}
