@@ -13,6 +13,8 @@ import {
 const SHA_A = `sha256:${'a'.repeat(64)}`;
 const SHA_B = `sha256:${'b'.repeat(64)}`;
 const SHA_C = `sha256:${'c'.repeat(64)}`;
+const BARE_SHA_B = 'b'.repeat(64);
+const SNAPSHOT_TOKEN = `lineage-qualified-canary:${SHA_A}:v1:2`;
 
 function axis(index: number): Float32Array {
   const out = new Float32Array(768);
@@ -55,12 +57,41 @@ describe('RepairFeatureProducerV1', () => {
       artifacts: [artifact],
     });
 
+    expect(set.artifacts).toHaveLength(1);
     expect(set.overlayFeatureStates.postgres_fts_score).toBe('PROVEN');
     expect(set.overlayFeatureStates.latent_256_query_similarity).toBe('UNAVAILABLE');
     expect(set.overlayRows).toEqual([
       { candidateOrdinal: 0, values: { postgres_fts_score: 0.75 } },
       { candidateOrdinal: 1, values: { postgres_fts_score: 0.25 } },
     ]);
+  });
+
+  it('accepts the live opaque snapshot token and bare ordinal-map checksum encoding', () => {
+    const artifact = buildRepairFeatureProducerArtifactV1({
+      featureName: 'postgres_fts_score',
+      state: 'PROVEN',
+      candidateSnapshotRevision: SNAPSHOT_TOKEN,
+      ordinalMapChecksum: BARE_SHA_B,
+      candidateRowCount: 2,
+      producerId: 'fts-proof',
+      producerRevision: 'fts-rev-1',
+      derivation: 'OBSERVED_SCALAR',
+      inputChecksum: SHA_C,
+      rows: [
+        { candidateOrdinal: 0, value: 0.75 },
+        { candidateOrdinal: 1, value: 0.25 },
+      ],
+    });
+
+    const set = buildRepairFeatureProducerSetV1({
+      candidateSnapshotRevision: SNAPSHOT_TOKEN,
+      ordinalMapChecksum: BARE_SHA_B,
+      candidateRowCount: 2,
+      artifacts: [artifact],
+    });
+
+    expect(set.candidateSnapshotRevision).toBe(SNAPSHOT_TOKEN);
+    expect(set.ordinalMapChecksum).toBe(BARE_SHA_B);
   });
 
   it('rejects a complete-state artifact with missing candidate coverage', () => {
@@ -76,6 +107,28 @@ describe('RepairFeatureProducerV1', () => {
       inputChecksum: SHA_C,
       rows: [{ candidateOrdinal: 0, value: 0.75 }],
     })).toThrow('REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:postgres_fts_score');
+  });
+
+  it('rejects MRL feature metadata that claims a non-MRL derivation', () => {
+    expect(() => buildRepairFeatureProducerArtifactV1({
+      featureName: 'semantic_mrl_256_query_similarity',
+      state: 'DERIVED',
+      candidateSnapshotRevision: SHA_A,
+      ordinalMapChecksum: SHA_B,
+      candidateRowCount: 2,
+      producerId: 'bad-mrl',
+      producerRevision: 'bad-mrl-v1',
+      derivation: 'OBSERVED_SCALAR',
+      inputChecksum: SHA_C,
+      representationId: 'semantic_mrl_256',
+      representationRevision: 'semantic-rev-1:mrl256:l2-v1',
+      sourceRepresentationId: 'semantic_768',
+      sourceRepresentationRevision: 'semantic-rev-1',
+      rows: [
+        { candidateOrdinal: 0, value: 1 },
+        { candidateOrdinal: 1, value: 0 },
+      ],
+    })).toThrow('REPAIR_FEATURE_ARTIFACT_MRL_DERIVATION_INVALID:semantic_mrl_256_query_similarity');
   });
 });
 
@@ -99,6 +152,7 @@ describe('Repair MRL producer', () => {
     });
 
     expect(result.artifacts).toHaveLength(3);
+    expect(result.producerSet.artifacts).toHaveLength(3);
     for (const artifact of result.artifacts) {
       expect(artifact.state).toBe('DERIVED');
       expect(artifact.derivation).toBe('MRL_PREFIX_L2_RENORMALIZE');
@@ -172,7 +226,7 @@ describe('Repair candidate feature bundle', () => {
     expect(bundle.matrix.rankingPromotion).toBe(false);
   });
 
-  it('rejects persisted producer-set tampering before matrix construction', () => {
+  it('rejects persisted producer-set overlay tampering before matrix construction', () => {
     const mrl = buildRepairMrlFeatureProducerV1({
       candidateSnapshotRevision: SHA_A,
       ordinalMapChecksum: SHA_B,
@@ -208,7 +262,49 @@ describe('Repair candidate feature bundle', () => {
         identities: identities(),
       },
       producerSet: tampered,
-    })).toThrow('REPAIR_BUNDLE_PRODUCER_SET_CHECKSUM_MISMATCH');
+    })).toThrow('REPAIR_FEATURE_SET_CHECKSUM_MISMATCH');
+  });
+
+  it('rejects tampering inside a carried producer artifact even if summaries are untouched', () => {
+    const mrl = buildRepairMrlFeatureProducerV1({
+      candidateSnapshotRevision: SHA_A,
+      ordinalMapChecksum: SHA_B,
+      representationRevision: 'semantic-rev-1',
+      queryVector: axis(0),
+      queryRepresentationRevision: 'semantic-rev-1',
+      producerRevision: 'repair-mrl-v1',
+      candidates: [
+        { candidateOrdinal: 0, vector: axis(0), representationRevision: 'semantic-rev-1' },
+        { candidateOrdinal: 1, vector: axis(1), representationRevision: 'semantic-rev-1' },
+      ],
+    });
+    const firstArtifact = mrl.producerSet.artifacts[0]!;
+    const tamperedArtifact = {
+      ...firstArtifact,
+      rows: firstArtifact.rows.map((row) =>
+        row.candidateOrdinal === 0 ? { ...row, value: 0.123 } : row,
+      ),
+    };
+    const tamperedSet = {
+      ...mrl.producerSet,
+      artifacts: [tamperedArtifact, ...mrl.producerSet.artifacts.slice(1)],
+    };
+    const baseMatrix = buildCandidateFeatureMatrix([
+      { packet_key: 'packet:a' },
+      { packet_key: 'packet:b' },
+    ]);
+
+    expect(() => buildRepairCandidateFeatureBundleV1({
+      matrixInput: {
+        baseMatrix,
+        baseMatrixManifestChecksum: SHA_C,
+        candidateSnapshotRevision: SHA_A,
+        ordinalMapChecksum: SHA_B,
+        producerRevision: 'repair-matrix-v1',
+        identities: identities(),
+      },
+      producerSet: tamperedSet,
+    })).toThrow('REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_MISMATCH');
   });
 
   it('rejects a producer set from another candidate snapshot', () => {
