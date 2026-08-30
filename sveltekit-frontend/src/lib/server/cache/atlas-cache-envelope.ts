@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import { buildCacheIdentityV2, hashFloat32VectorV2, hashTextV2 } from './cache-identity-v2.js';
 
 // L1 Redis LRU result envelope
 export const AtlasRedisEnvelopeSchema = z.object({
@@ -107,16 +108,12 @@ export interface AtlasCacheVersions {
 	cache_epoch: number;
 }
 
-/**
- * Helper: generate Redis LRU key
- */
+/** Legacy compatibility helper. New call sites should prefer atlasRedisKeyV2. */
 export function atlasRedisKey(type: 'query' | 'packet' | 'tools' | 'kag', hash: string): string {
 	return `atlas:lru:${type}:${hash}`;
 }
 
-/**
- * Helper: generate Bitfrost key
- */
+/** Legacy compatibility helper. New call sites should prefer atlasBifrostKeyV2. */
 export function atlasBifrostKey(
 	type: 'query' | 'packet' | 'feature' | 'intent',
 	hash: string
@@ -124,24 +121,54 @@ export function atlasBifrostKey(
 	return `bifrost:sem:${type}:${hash}`;
 }
 
-/**
- * Helper: hash query for cache key
- */
+/** Legacy 32-bit compatibility hash. Do not use for promotion-grade cache identity. */
 export function hashQuery(query: string): string {
 	const encoder = new TextEncoder();
 	const data = encoder.encode(query);
 	let hash = 0;
 	for (let i = 0; i < data.length; i++) {
 		hash = (hash << 5) - hash + data[i];
-		hash = hash & hash; // 32-bit integer
+		hash = hash & hash;
 	}
 	return Math.abs(hash).toString(16);
 }
 
-/**
- * Helper: hash embedding vector
- */
+/** Legacy 10-coordinate compatibility hash. Do not use for promotion-grade cache identity. */
 export function hashEmbedding(embedding: number[]): string {
 	const truncated = embedding.slice(0, 10).map((v) => Math.round(v * 1000));
 	return truncated.join('-');
+}
+
+export function hashQueryV2(query: string): string {
+	return hashTextV2(query);
+}
+
+export function hashEmbeddingV2(embedding: readonly number[]): string {
+	return hashFloat32VectorV2(embedding);
+}
+
+export function atlasRedisKeyV2(
+	type: 'query' | 'packet' | 'tools' | 'kag',
+	payloadChecksum: string,
+	cacheEpoch: number
+): string {
+	return buildCacheIdentityV2({
+		tier: 'atlas-lru',
+		kind: type,
+		cacheEpoch,
+		payloadChecksum
+	}).cacheKey;
+}
+
+export function atlasBifrostKeyV2(
+	type: 'query' | 'packet' | 'feature' | 'intent',
+	payloadChecksum: string,
+	cacheEpoch: number
+): string {
+	return buildCacheIdentityV2({
+		tier: 'bitfrost-semantic',
+		kind: type,
+		cacheEpoch,
+		payloadChecksum
+	}).cacheKey;
 }
