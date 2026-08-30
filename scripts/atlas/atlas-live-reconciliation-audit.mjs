@@ -218,20 +218,28 @@ async function auditRedis() {
     });
     logFinding('Redis', 'karpathy_gpu_scores', karpResult);
 
-    // 4. gpu:karpathy:encoded HLEN
+    // 4. gpu:karpathy:encoded HLEN — LEGACY_KARPATHY_H6, RETIRED (2026-08-30).
+    // Verified live: absence is a deliberate, correct skip by karpathy-gpu-enrich.mjs when
+    // ace:autoencoder:weights doesn't exist (H6 log line), not a fixable gap. Re-running
+    // `npm run karpathy:gpu` does NOT populate this key without trained autoencoder weights,
+    // and training weights merely to satisfy this check is explicitly the wrong fix — the live
+    // learned representation is semantic_768 -> latent_256 (Postgres/Qdrant), not this 64-dim
+    // Redis path. Superseded by bitfrost:candidate:v1:* (bitfrost-hot-vector.ts). No longer
+    // reported as WARN so this stops looking like an actionable gap.
     const encResult = await runHealthCheck('Redis', async () => {
         const out = await redisCli('HLEN', 'gpu:karpathy:encoded');
         const n = parseInt(out, 10);
-        if (n > 0) return { message: `gpu:karpathy:encoded: ${n} compressed memory paths` };
-        throw new Error('WARN: gpu:karpathy:encoded absent — run npm run karpathy:gpu');
+        if (n > 0) return { message: `gpu:karpathy:encoded: ${n} compressed memory paths (legacy H6 path, superseded by bitfrost:candidate:v1:*)` };
+        return { message: 'LEGACY_KARPATHY_H6: retired, not required (superseded by bitfrost:candidate:v1:* / latent_256)' };
     });
     logFinding('Redis', 'karpathy_gpu_encoded', encResult);
 
-    // 5. ace:autoencoder:weights EXISTS
+    // 5. ace:autoencoder:weights EXISTS — same LEGACY_KARPATHY_H6 retirement as above. This key
+    // only ever fed the retired 64-dim gpu:karpathy:encoded path; do not train/recreate it.
     const aeResult = await runHealthCheck('Redis', async () => {
         const out = await redisCli('EXISTS', 'ace:autoencoder:weights');
-        if (parseInt(out, 10) > 0) return { message: 'ace:autoencoder:weights present (autoencoder trained)' };
-        throw new Error('WARN: ace:autoencoder:weights absent — run npm run graphify:full');
+        if (parseInt(out, 10) > 0) return { message: 'ace:autoencoder:weights present (legacy H6 path, autoencoder trained)' };
+        return { message: 'LEGACY_KARPATHY_H6: retired, not required (do not train solely to satisfy this check)' };
     });
     logFinding('Redis', 'ace_autoencoder_weights', aeResult);
 
