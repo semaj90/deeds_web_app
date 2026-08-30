@@ -1094,3 +1094,36 @@ Continued verifying the same pasted critique's P1 claims against live code.
   raised (no scalar producer for the 13th feature) was already the exact
   thing flagged as open in the first review-round entry above.** No new
   code changes made this round — this was a verification-only pass.
+
+### CFF-CONTEXTMANIFEST-02-DEEP-PRESENCE: blocked on a prerequisite the earlier entries missed (2026-08-30)
+
+Picked this up as the next open item. Before building deeper per-candidate presence propagation
+on top of `deriveFeaturePresenceFromACE()`, checked who actually calls
+`buildContextManifestFromACE()` in production. **Zero real callers found** --
+`grep -rln "buildContextManifestFromACE" src/` returns only `ace-context-manifest.ts` itself and
+its own `ace-context-manifest.spec.ts`. The underlying `compileContext()` it wraps
+(`context-compiler.parent-atlas.ts`) is in the same state -- only its own spec test calls it.
+The `ContextManifest` *type* is referenced in 2 real files (`execution-feedback.ts`, `types.ts`)
+but only as a type import on a function parameter, which doesn't establish that anything actually
+constructs and passes a real one at runtime yet.
+
+**This means the whole `CFF-CONTEXTMANIFEST-01-PRESENCE-MAP` addition from earlier this session
+(and the `compileContext`/`buildContextManifestFromACE` machinery it built on) is currently
+well-designed, tested, and additive-safe -- but not yet wired into any live request path.**
+Per this repo's own duplication-prevention rule ("if ownership can't be established, stop and
+record the ambiguity in an OpenSpec change -- don't implement past that point"), building
+`CFF-CONTEXTMANIFEST-02-DEEP-PRESENCE` (deeper per-candidate propagation) on top of a currently-
+unwired function would be adding a second speculative layer on top of a first one, not closing a
+real gap in a live path. **Not implemented this round -- deliberately stopped here instead of
+building further on dead code.**
+
+**Corrected next step, if this thread is picked up again**: before touching
+`deriveFeaturePresenceFromACE()` further, find (or build) the real call site -- whichever route
+or ACE pipeline stage is supposed to be constructing a `ContextManifest` from a live `ACEContext`
+and currently isn't. That's a wiring task (find/create the integration point), not a feature-depth
+task (make the presence map smarter). Once a real caller exists and is confirmed to have latent_256
+hydration data available (e.g. via `PostgresLatent256CandidateProvider`, live and tested per the
+origin merge earlier this session), *that* caller is the right place to pass an explicit
+`featurePresence` override with real per-candidate coverage -- not a change to the pure/sync
+`deriveFeaturePresenceFromACE()` default, which is deliberately conservative and synchronous by
+design (its own JSDoc: "without re-running retrieval").
