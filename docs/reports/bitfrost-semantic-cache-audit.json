@@ -1,21 +1,192 @@
 {
-  "generatedAt": "2026-08-27T22:13:01.647Z",
+  "generatedAt": "2026-08-30T07:36:32.747Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
     "passwordConfigured": true
   },
-  "summary": {
-    "gpuKarpathyScores": 1,
-    "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 0,
-    "centroidKeys": 0,
-    "somKeys": 0
-  },
-  "patterns": [
+  "families": [
+    {
+      "key": "bitfrost:summary:packet:v1:*",
+      "pattern": "bitfrost:summary:packet:v1:*",
+      "ownership": "ACTIVE",
+      "note": "ACE/Karpathy summary hot-cache. ~4,827 keys live at rewrite time.",
+      "count": 4826,
+      "sample": [
+        "bitfrost:summary:packet:v1:packet:052e26c72e4d",
+        "bitfrost:summary:packet:v1:packet:8a68ca1ca8a7",
+        "bitfrost:summary:packet:v1:packet:32bce8852cc0",
+        "bitfrost:summary:packet:v1:packet:0c0fd3a65758",
+        "bitfrost:summary:packet:v1:packet:03d9c8b9c4a4"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bitfrost:summary:packet:v1:packet:052e26c72e4d",
+          "ttl": 602930,
+          "ok": true
+        },
+        {
+          "key": "bitfrost:summary:packet:v1:packet:8a68ca1ca8a7",
+          "ttl": 602930,
+          "ok": true
+        },
+        {
+          "key": "bitfrost:summary:packet:v1:packet:32bce8852cc0",
+          "ttl": 602930,
+          "ok": true
+        },
+        {
+          "key": "bitfrost:summary:packet:v1:packet:0c0fd3a65758",
+          "ttl": 602930,
+          "ok": true
+        },
+        {
+          "key": "bitfrost:summary:packet:v1:packet:03d9c8b9c4a4",
+          "ttl": 602930,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "gpu:som:packet:*",
+      "pattern": "gpu:som:packet:*",
+      "ownership": "ACTIVE",
+      "note": "SOM BMU assignment per packet. ~5,000 keys live.",
+      "count": 5000,
+      "sample": [
+        "gpu:som:packet:4475",
+        "gpu:som:packet:3706",
+        "gpu:som:packet:111",
+        "gpu:som:packet:1140",
+        "gpu:som:packet:2920"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:som:packet:4475",
+          "ttl": 244014,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:packet:3706",
+          "ttl": 244014,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:packet:111",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:packet:1140",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:packet:2920",
+          "ttl": 244013,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "gpu:som:cell:*",
+      "pattern": "gpu:som:cell:*",
+      "ownership": "ACTIVE",
+      "note": "SOM grid cell membership index. ~296 keys live across 20 cells.",
+      "count": 296,
+      "sample": [
+        "gpu:som:cell:3:1",
+        "gpu:som:cell:12:17",
+        "gpu:som:cell:11:1",
+        "gpu:som:cell:5:6",
+        "gpu:som:cell:13:5"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:som:cell:3:1",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:cell:12:17",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:cell:11:1",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:cell:5:6",
+          "ttl": 244013,
+          "ok": true
+        },
+        {
+          "key": "gpu:som:cell:13:5",
+          "ttl": 244012,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "gpu:autoencoder:latent_64:*",
+      "pattern": "gpu:autoencoder:latent_64:*",
+      "ownership": "ACTIVE",
+      "note": "AE 64-dim latent cache, written by karpathy-gpu-enrich.mjs. ~5,000 keys live.",
+      "count": 5000,
+      "sample": [
+        "gpu:autoencoder:latent_64:2050",
+        "gpu:autoencoder:latent_64:3343",
+        "gpu:autoencoder:latent_64:816",
+        "gpu:autoencoder:latent_64:3243",
+        "gpu:autoencoder:latent_64:2034"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:autoencoder:latent_64:2050",
+          "ttl": 243979,
+          "ok": true
+        },
+        {
+          "key": "gpu:autoencoder:latent_64:3343",
+          "ttl": 243979,
+          "ok": true
+        },
+        {
+          "key": "gpu:autoencoder:latent_64:816",
+          "ttl": 243979,
+          "ok": true
+        },
+        {
+          "key": "gpu:autoencoder:latent_64:3243",
+          "ttl": 243979,
+          "ok": true
+        },
+        {
+          "key": "gpu:autoencoder:latent_64:2034",
+          "ttl": 243979,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
     {
       "key": "gpu:karpathy:scores",
       "pattern": "gpu:karpathy:scores",
+      "ownership": "ACTIVE",
+      "note": "PageRank/attention/authority blend hash. 1 key (hash with many fields), 24h TTL.",
       "count": 1,
       "sample": [
         "gpu:karpathy:scores"
@@ -23,157 +194,377 @@
       "ttlSamples": [
         {
           "key": "gpu:karpathy:scores",
-          "ttl": 439438,
+          "ttl": 598688,
           "ok": true
         }
       ],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "gpu:karpathy:summary",
+      "pattern": "gpu:karpathy:summary",
+      "ownership": "ACTIVE",
+      "note": "Run metadata for the last karpathy:gpu pass. 1 key, 24h TTL.",
+      "count": 1,
+      "sample": [
+        "gpu:karpathy:summary"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:karpathy:summary",
+          "ttl": 598687,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "gpu:karpathy:encoded",
       "pattern": "gpu:karpathy:encoded",
+      "ownership": "ASPIRATIONAL",
+      "note": "Blocked on ace:autoencoder:weights not existing (untrained autoencoder). This is a deliberate H6 conditional skip, not a bug -- see LEGACY_KARPATHY_H6 retirement in atlas-live-reconciliation-audit.mjs. Expected 0 until a trained AE is loaded.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "bifrost:*",
-      "pattern": "bifrost:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "key": "embed:v2:embeddinggemma:latest:*",
+      "pattern": "embed:v2:embeddinggemma:latest:*",
+      "ownership": "ACTIVE",
+      "note": "Embedding query cache, v2 key shape. Low steady-state count (cache-of-recent-queries, not bulk).",
+      "count": 3,
+      "sample": [
+        "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
+        "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
+        "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525"
+      ],
+      "ttlSamples": [
+        {
+          "key": "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
+          "ttl": 328716,
+          "ok": true
+        },
+        {
+          "key": "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
+          "ttl": 598686,
+          "ok": true
+        },
+        {
+          "key": "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
+          "ttl": 335593,
+          "ok": true
+        }
+      ],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "centroid:*",
-      "pattern": "centroid:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "key": "embed:embeddinggemma:latest:*",
+      "pattern": "embed:embeddinggemma:latest:*",
+      "ownership": "LEGACY",
+      "note": "Embedding query cache, v1 key shape (no embed:v2: prefix). Small residual count; embed:v2:* is the current shape.",
+      "count": 11,
+      "sample": [
+        "embed:embeddinggemma:latest:ffc6b1ffa6e9fdcc",
+        "embed:embeddinggemma:latest:05119d06ad98a2a0",
+        "embed:embeddinggemma:latest:4f6592940c90014f",
+        "embed:embeddinggemma:latest:5011075a83c3c4e6",
+        "embed:embeddinggemma:latest:45a57a03995f2fe0"
+      ],
+      "ttlSamples": [
+        {
+          "key": "embed:embeddinggemma:latest:ffc6b1ffa6e9fdcc",
+          "ttl": 80781,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:05119d06ad98a2a0",
+          "ttl": 80605,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:4f6592940c90014f",
+          "ttl": 80563,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:5011075a83c3c4e6",
+          "ttl": 80561,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:45a57a03995f2fe0",
+          "ttl": 80675,
+          "ok": true
+        }
+      ],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "som:*",
-      "pattern": "som:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "key": "ace:*",
+      "pattern": "ace:*",
+      "ownership": "ACTIVE",
+      "note": "Small set of ACE cluster/probe/path keys (ace:cluster:members:*, ace:probe:*, ace:path:*). Not the ace:context:*/ace:summary:*/etc. family listed below -- those are aspirational.",
+      "count": 4,
+      "sample": [
+        "ace:cluster:members:unclassified:community-67456",
+        "ace:probe:embed:karpathy",
+        "ace:path:cluster:1",
+        "ace:cluster:members:unclassified:community-26562"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:cluster:members:unclassified:community-67456",
+          "ttl": 232822,
+          "ok": true
+        },
+        {
+          "key": "ace:probe:embed:karpathy",
+          "ttl": 80285,
+          "ok": true
+        },
+        {
+          "key": "ace:path:cluster:1",
+          "ttl": 598685,
+          "ok": true
+        },
+        {
+          "key": "ace:cluster:members:unclassified:community-26562",
+          "ttl": 598685,
+          "ok": true
+        }
+      ],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "bifrost:sem:packet:*",
-      "pattern": "bifrost:sem:packet:*",
+      "key": "bitfrost:candidate:v1:*",
+      "pattern": "bitfrost:candidate:v1:*",
+      "ownership": "WARMED_PENDING",
+      "note": "BitFrost latent_256 hot-record contract (bitfrost-hot-vector.ts, added 2026-08-30). F32LE binary, revision-qualified sha256 keys, canonical_authority:false. Writer code exists and is test-verified (3/3 spec pass); zero live rows because nothing calls the writer in a live retrieval path yet.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "bifrost:sem:feature:*",
-      "pattern": "bifrost:sem:feature:*",
+      "key": "bitfrost:retrieval:v2:*",
+      "pattern": "bitfrost:retrieval:v2:*",
+      "ownership": "WARMED_PENDING",
+      "note": "Documented as an active family in prior notes; zero live rows at rewrite time -- treat as not-yet-warmed, not broken.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "bifrost:sem:intent:*",
-      "pattern": "bifrost:sem:intent:*",
+      "key": "bitfrost:retrieval:*",
+      "pattern": "bitfrost:retrieval:*",
+      "ownership": "LEGACY",
+      "note": "v1 retrieval cache key shape (no :v2: segment). Zero live rows -- either never populated on this instance or already fully superseded by bitfrost:retrieval:v2:*.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
-      "key": "reward:zset",
-      "pattern": "reward:zset",
+      "key": "bitfrost:ace:v1:*",
+      "pattern": "bitfrost:ace:v1:*",
+      "ownership": "WARMED_PENDING",
+      "note": "Documented ACE-specific BitFrost family. Zero live rows at rewrite time.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "bf:meta:v1:*",
+      "pattern": "bf:meta:v1:*",
+      "ownership": "WARMED_PENDING",
+      "note": "Documented BitFrost metadata family. Zero live rows at rewrite time.",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "centroid:directory:*",
+      "pattern": "centroid:directory:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "Part of the documented Canonical Lineage Contract key pattern (root CLAUDE.md). Confirmed live: this pattern is aspirational/not-yet-implemented, not current state.",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "centroid:feature:*",
+      "pattern": "centroid:feature:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "Same Canonical Lineage Contract family as centroid:directory:*. Zero live rows.",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "centroid:packet:*",
+      "pattern": "centroid:packet:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "Same Canonical Lineage Contract family. Zero live rows.",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:context:*",
       "pattern": "ace:context:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "Documented in an earlier version of this script as an active family; zero live rows confirmed at rewrite time.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:summary:*",
       "pattern": "ace:summary:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:query:*",
       "pattern": "ace:query:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:tree:*",
       "pattern": "ace:tree:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:authority:*",
       "pattern": "ace:authority:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:ontology:*",
       "pattern": "ace:ontology:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
     },
     {
       "key": "ace:memory:*",
       "pattern": "ace:memory:*",
+      "ownership": "ASPIRATIONAL",
+      "note": "See ace:context:* note.",
       "count": 0,
       "sample": [],
       "ttlSamples": [],
       "ok": true,
-      "error": null
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "reward:zset",
+      "pattern": "reward:zset",
+      "ownership": "ASPIRATIONAL",
+      "note": "Referenced in earlier audit passes; zero live rows confirmed at rewrite time.",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
+    },
+    {
+      "key": "bifrost:*",
+      "pattern": "bifrost:*",
+      "ownership": "NAMING_DRIFT_CHECK",
+      "note": "One-f spelling. Should stay at 0 -- if this ever shows real keys, something is writing to the wrong prefix (the real port-3040 Go Bifrost service does not use Redis key namespacing this way).",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null,
+      "driftFlag": null
     }
   ],
-  "nextSafeAction": "Use the warm planner to refresh the hot Bitfrost families from canonical Postgres rows."
+  "driftFlags": [],
+  "nextSafeAction": "Review any entries under \"Drift flags requiring attention\" before trusting ACTIVE-class families for retrieval decisions."
 }
