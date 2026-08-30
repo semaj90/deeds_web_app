@@ -13,6 +13,21 @@ import { createHash } from 'node:crypto';
 
 export type ContextLane = 'exact' | 'lexical' | 'dense' | 'graph' | 'bitfrost';
 
+/**
+ * Per-representation-family evidence state for a compiled context. Lets a
+ * consumer (synthesis, an eval harness) know exactly what's real vs. cheaply
+ * derived vs. simply absent, instead of silently treating missing optional
+ * evidence as if it existed.
+ *
+ * - PROVEN: real data verified present for this request's candidates.
+ * - DERIVED: computed on the fly from another PROVEN representation (e.g.
+ *   latent_128/64 prefix+renormalized from latent_256), not independently stored.
+ * - PARTIAL: real producer exists but corpus coverage is incomplete (e.g. AST
+ *   tags populated for only a fraction of candidates).
+ * - UNAVAILABLE: not present for this request; synthesis must not assume it.
+ */
+export type FeaturePresenceState = 'PROVEN' | 'DERIVED' | 'PARTIAL' | 'UNAVAILABLE';
+
 export const CONTEXT_COMPILER_SPEC_REFS = [
   'openspec:parent-atlas-agentic-completion#requirement:canonical-authority',
   'openspec:parent-atlas-agentic-completion#requirement:layered-retrieval',
@@ -147,6 +162,13 @@ export interface ContextManifest {
   rlm_cache_hits?: number;
   rlm_cache_misses?: number;
   ace_playbook_revision?: string;
+  /**
+   * Additive: per-representation-family evidence presence for this manifest.
+   * Absent for callers that haven't opted in yet. Never inferred by the
+   * compiler itself from candidate content -- callers pass what they actually
+   * know (e.g. whether latent_256 hydration succeeded for these candidates).
+   */
+  feature_presence?: Record<string, FeaturePresenceState>;
   /** Additive V2 identity envelope; absent for legacy candidates without revisions. */
   identity?: {
     candidate_ordinal_set_checksum: string;
@@ -203,6 +225,7 @@ export interface ContextCompileInput {
   ordinal_map_checksum?: string;
   model_revision?: string;
   prompt_template_revision?: string;
+  feature_presence?: Record<string, FeaturePresenceState>;
 }
 
 export interface ContextManifestPersistence {
@@ -588,6 +611,7 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
     ...(input.rlm_cache_hits !== undefined ? { rlm_cache_hits: input.rlm_cache_hits } : {}),
     ...(input.rlm_cache_misses !== undefined ? { rlm_cache_misses: input.rlm_cache_misses } : {}),
     ...(input.ace_playbook_revision ? { ace_playbook_revision: input.ace_playbook_revision } : {}),
+    ...(input.feature_presence ? { feature_presence: input.feature_presence } : {}),
     identity,
   };
 

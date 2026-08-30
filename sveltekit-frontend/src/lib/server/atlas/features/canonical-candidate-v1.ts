@@ -9,6 +9,7 @@ const candidateRepresentationId = z.enum([
   'semantic_mrl_512',
   'semantic_mrl_256',
   'semantic_mrl_128',
+  'latent_256',
   'latent_128',
   'latent_64',
 ]);
@@ -18,7 +19,7 @@ export const candidateRepresentationBindingV1Schema = z.object({
   family: z.enum(['EMBEDDINGGEMMA_MRL', 'LEARNED_LATENT']),
   dimensions: z.number().int().positive(),
   modelRevision: z.string().min(1),
-  projectionKind: z.enum(['NONE', 'MRL_PREFIX_TRUNCATION', 'LEARNED_AUTOENCODER']),
+  projectionKind: z.enum(['NONE', 'MRL_PREFIX_TRUNCATION', 'LEARNED_AUTOENCODER', 'NESTED_PREFIX_L2_RENORMALIZE']),
   sourceRepresentationId: candidateRepresentationId.nullable(),
   projectionRevision: z.string().min(1).nullable(),
   normalized: z.literal(true),
@@ -31,7 +32,7 @@ export const candidateRepresentationBindingV1Schema = z.object({
     semantic_mrl_256: 256,
     semantic_mrl_128: 128,
   };
-  const latentDimensions: Record<string, number> = { latent_128: 128, latent_64: 64 };
+  const latentDimensions: Record<string, number> = { latent_256: 256, latent_128: 128, latent_64: 64 };
   const expected = mrlDimensions[binding.representationId] ?? latentDimensions[binding.representationId];
   if (binding.dimensions !== expected) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dimensions'], message: 'REPRESENTATION_DIMENSION_MISMATCH' });
@@ -45,11 +46,14 @@ export const candidateRepresentationBindingV1Schema = z.object({
     }
   }
   if (binding.family === 'LEARNED_LATENT') {
-    if (binding.projectionKind !== 'LEARNED_AUTOENCODER' || binding.projectionRevision === null) {
+    const physical = binding.representationId === 'latent_256';
+    const expectedKind = physical ? 'LEARNED_AUTOENCODER' : 'NESTED_PREFIX_L2_RENORMALIZE';
+    const expectedSource = physical ? 'semantic_768' : 'latent_256';
+    if (binding.projectionKind !== expectedKind || binding.projectionRevision === null) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionRevision'], message: 'LEARNED_LATENT_PROJECTION_REVISION_REQUIRED' });
     }
-    if (binding.sourceRepresentationId !== 'semantic_768') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'LEARNED_LATENT_SOURCE_MUST_BE_SEMANTIC_768' });
+    if (binding.sourceRepresentationId !== expectedSource) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: physical ? 'LEARNED_LATENT_SOURCE_MUST_BE_SEMANTIC_768' : 'DERIVED_LATENT_SOURCE_MUST_BE_LATENT_256' });
     }
   }
   if (!binding.available && binding.availabilityReason === null) {
@@ -79,12 +83,35 @@ const canonicalCandidateV1BaseSchema = z.object({
   representationBindings: z.array(candidateRepresentationBindingV1Schema).default([]),
 }).strict();
 
+/** Validate representation bindings as a candidate-level set, not only as isolated rows. */
+export function assertRepresentationBindingSet(bindings: readonly CandidateRepresentationBindingV1[]): void {
+  const parsed = bindings.map((binding) => candidateRepresentationBindingV1Schema.parse(binding));
+  const byId = new Map(parsed.map((binding) => [binding.representationId, binding]));
+  if (byId.size !== parsed.length) throw new Error('REPRESENTATION_BINDING_DUPLICATE_ID');
+  for (const binding of parsed) {
+    if (!binding.available) continue;
+    const requiredSource = binding.sourceRepresentationId;
+    if (requiredSource && !byId.get(requiredSource)?.available) {
+      throw new Error(`REPRESENTATION_BINDING_SOURCE_UNAVAILABLE:${binding.representationId}:${requiredSource}`);
+    }
+  }
+}
+
 export const canonicalCandidateV1Schema = canonicalCandidateV1BaseSchema.superRefine((candidate, ctx) => {
   if (!candidate.degradedIdentity && candidate.packetKey === null && candidate.treeNodeId === null && candidate.symbolVersionId === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['degradedIdentity'],
       message: 'CANONICAL_CANDIDATE_STRONG_IDENTITY_REQUIRED',
+    });
+  }
+  try {
+    assertRepresentationBindingSet(candidate.representationBindings);
+  } catch (error) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['representationBindings'],
+      message: error instanceof Error ? error.message : 'REPRESENTATION_BINDING_SET_INVALID',
     });
   }
 });

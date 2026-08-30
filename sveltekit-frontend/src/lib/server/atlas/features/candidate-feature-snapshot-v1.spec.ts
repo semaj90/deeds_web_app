@@ -99,12 +99,24 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
             availabilityReason: null,
           },
           {
+            representationId: 'latent_256',
+            family: 'LEARNED_LATENT',
+            dimensions: 256,
+            modelRevision: 'atlas-autoencoder-v3',
+            projectionKind: 'LEARNED_AUTOENCODER',
+            sourceRepresentationId: 'semantic_768',
+            projectionRevision: 'ae:pending',
+            normalized: true,
+            available: false,
+            availabilityReason: 'TRAINING_NOT_PROMOTED',
+          },
+          {
             representationId: 'latent_64',
             family: 'LEARNED_LATENT',
             dimensions: 64,
-            modelRevision: 'atlas-autoencoder-768x64-v1',
-            projectionKind: 'LEARNED_AUTOENCODER',
-            sourceRepresentationId: 'semantic_768',
+            modelRevision: 'atlas-autoencoder-v3',
+            projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
+            sourceRepresentationId: 'latent_256',
             projectionRevision: 'ae:pending',
             normalized: true,
             available: false,
@@ -119,7 +131,7 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
 
     expect(map.candidates[0].candidateOrdinal).toBe(0);
     expect(map.candidates[0].representationBindings.map((binding) => binding.representationId))
-      .toEqual(['semantic_768', 'semantic_mrl_128', 'latent_64']);
+      .toEqual(['semantic_768', 'semantic_mrl_128', 'latent_256', 'latent_64']);
     expect(map.identityAuthority).toBe(false);
   });
 
@@ -132,8 +144,8 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
           family: 'LEARNED_LATENT',
           dimensions: 128,
           modelRevision: 'atlas-autoencoder-768x128-v1',
-          projectionKind: 'LEARNED_AUTOENCODER',
-          sourceRepresentationId: 'semantic_768',
+          projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
+          sourceRepresentationId: 'latent_256',
           projectionRevision: null,
           normalized: true,
           available: false,

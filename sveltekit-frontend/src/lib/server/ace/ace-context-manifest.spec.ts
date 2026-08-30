@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   attachContextManifestToACE,
   buildContextManifestFromACE,
+  deriveFeaturePresenceFromACE,
   deriveProcessPacketsFromACEContext,
 } from './ace-context-manifest';
 import type { ACEContext } from './types';
@@ -77,6 +78,45 @@ describe('buildContextManifestFromACE', () => {
       policy: { token_budget: 500, reserved_tokens: 0, max_packets: 10 },
     });
     expect(again.manifest.manifest_id).toBe(compiled.manifest.manifest_id);
+  });
+
+  it('deriveFeaturePresenceFromACE marks empty lanes UNAVAILABLE, populated lanes PROVEN', () => {
+    const empty = deriveFeaturePresenceFromACE(minimalACEContext());
+    expect(empty.semantic768).toBe('UNAVAILABLE');
+    expect(empty.graph).toBe('UNAVAILABLE');
+    // Not directly observable on ACEContext today -- honestly UNAVAILABLE, never assumed.
+    expect(empty.latent256).toBe('UNAVAILABLE');
+    expect(empty.ast).toBe('UNAVAILABLE');
+
+    const populated = deriveFeaturePresenceFromACE(
+      minimalACEContext({
+        ragChunks: [{ id: 'r1', content: 'x', score: 0.5 } as unknown as ACEContext['ragChunks'][number]],
+        kagNeighbors: [{ nodeId: 'n1', title: 't', relationship: 'DEPENDS_ON', score: 0.5 }],
+      }),
+    );
+    expect(populated.semantic768).toBe('PROVEN');
+    expect(populated.graph).toBe('PROVEN');
+  });
+
+  it('attaches feature_presence to the manifest by default, and lets a caller override it', () => {
+    const context = minimalACEContext({
+      ragChunks: [{ id: 'r1', content: 'x'.repeat(50), score: 0.5 } as unknown as ACEContext['ragChunks'][number]],
+    });
+
+    const defaulted = buildContextManifestFromACE(context, { request_id: 'req-presence-default' });
+    expect(defaulted.manifest.feature_presence?.semantic768).toBe('PROVEN');
+    expect(defaulted.manifest.feature_presence?.latent256).toBe('UNAVAILABLE');
+
+    const overridden = buildContextManifestFromACE(context, {
+      request_id: 'req-presence-override',
+      featurePresence: { semantic768: 'PROVEN', latent256: 'PARTIAL', latent128: 'DERIVED', latent64: 'DERIVED' },
+    });
+    expect(overridden.manifest.feature_presence).toEqual({
+      semantic768: 'PROVEN',
+      latent256: 'PARTIAL',
+      latent128: 'DERIVED',
+      latent64: 'DERIVED',
+    });
   });
 
   it('selects process packets into the manifest deterministically', () => {

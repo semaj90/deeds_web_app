@@ -1549,3 +1549,42 @@ is still the only way to close this cleanly.
 Receipt: `docs/reports/ga8-blend-weight-sweep-llm-judged-v1.json`. Underlying judgments:
 `.tmp/atlas/llm-judged-relevance-v1.ndjson` (gitignored, not committed — regenerable via
 `python/build_llm_judged_relevance_set.py`).
+
+### External critique review — GA8-HARDEN-FINAL claims checked against live code (2026-08-30)
+
+Same pasted external critique reviewed for the P0/P1 candidate-feature-fabric claims (see
+`parent-atlas-candidate-feature-execution-fabric/tasks.md`, same date) also proposed 6 hardening
+items against this GA8 ablation thread, framed as `GA8-HARDEN-FINAL`. Unlike the earlier
+candidate-fabric claims (all found stale/already-fixed), these were checked and found to be
+**real, currently unimplemented** — this pipeline genuinely does not yet have them:
+
+1. `pagerank_l1` NULL → fail closed — **not implemented.**
+   `pagerank-authority.ts::resolvePageRankAuthority()` returns `l1: null` on a non-finite value
+   and `pickPageRankAuthorityScore()` silently falls through to `raw` then `legacy` — a soft
+   fallback, not a fail-closed rejection.
+2. Graph provenance receipt SHA-256 verify + field-consistency parse — **not checked**; would
+   need to confirm whether `docs/reports/ga8-blend-weight-sweep-v1.json` /
+   `ga8-blend-weight-sweep-llm-judged-v1.json` are checksum-verified anywhere downstream, or only
+   produced and trusted as-written.
+3. LLM judge request explicit seed + model/server/sampler revision binding — **not implemented.**
+   `grep -n seed python/build_llm_judged_relevance_set.py` found zero hits; the judge calls
+   `ornith-1.5-9b` with no recorded seed, so a judgment is not deterministically replayable.
+4. nDCG eligibility rule (`any grade > 0` for nDCG, `grade >= 2` for MRR/recall) — **not
+   checked in detail**; nDCG/MRR computation exists widely across
+   `scripts/atlas/benchmark-retrieval-ndcg10.mjs` and others, but whether this specific
+   two-tier eligibility split is applied wasn't verified line-by-line.
+5. `metricRevision` constant (e.g. `NDCG_EXP2_GAIN_LOG2_DISCOUNT_V1`) — **not implemented.**
+   No such constant or equivalent metric-identity string found anywhere in `python/` or
+   `scripts/atlas/`.
+6. Degenerate min-max (zero-range) feature detection — **not implemented.** No
+   `DEGENERATE_FEATURE` marker or equivalent found; a min-max normalization over a zero-range
+   feature would currently produce a silent `0.5` rather than being flagged as meaningless.
+
+**This is a different situation from the candidate-feature-fabric review**: those claims
+described code that already existed (the critique was stale). These six describe gaps that are
+genuinely still open in this live, actively-developed GA8 measurement pipeline. **Not
+implemented this session** — flagging as a real, scoped follow-up rather than acting
+unprompted on a careful, self-aware research thread (see the circularity discussion two entries
+above) without explicit go-ahead. Whoever picks this up: items 1, 3, 5, 6 are the well-scoped,
+low-risk ones (single-function changes); items 2 and 4 need a closer read of the receipt/eval
+code before scoping.
