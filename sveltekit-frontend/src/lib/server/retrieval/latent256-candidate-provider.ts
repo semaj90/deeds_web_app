@@ -1,0 +1,182 @@
+/**
+ * Latent256CandidateProviderV1 — candidate-side hydration for the LATENT256_SEMANTIC_DEDUP
+ * post-process step in post-process-reranker.ts.
+ *
+ * Boundary: this file owns storage access and validation. postProcessCandidates() stays a pure
+ * function that only ever sees an already-validated ReadonlyMap<string, readonly number[]> --
+ * it never learns whether that map came from Postgres, Qdrant, mmap, or a test fixture.
+ *
+ * What this is NOT:
+ *   - Not a query-time encoder. It only hydrates ALREADY-MATERIALIZED latent_256 vectors for
+ *     candidate identities that a prior retrieval pass already produced (e.g. the top-N from
+ *     the primary semantic_768 search). There is no query-latent-vector step here and none is
+ *     needed for candidate-side diversity pruning.
+ *   - Not authoritative. Every hydrated vector is non-canonical
+ *     (models/nested-semantic-autoencoder/README.md: canonicalAuthority=false,
+ *     queryEncoder=false, activeRetrievalLane=false). A malformed or revision-mismatched row is
+ *     dropped from the result, never substituted or repaired -- the caller (postProcessCandidates)
+ *     already treats "missing" as fail-open (candidate survives, per its own contract).
+ *
+ * Identity scope: as of 2026-08-29, latent_256 exists only for codebase_chunk_index rows, and
+ * packetKeys here are that table's `id` (uuid, stringified) -- the same identity used as the
+ * Qdrant point id in codebase_chunks_latent256 (see provision_qdrant_latent256.py). If latent_256
+ * is ever backfilled for a different table/candidate family, this provider's query needs
+ * revisiting -- it is not a generic packetKey resolver.
+ */
+
+import { sql } from 'drizzle-orm';
+import { createHash } from 'node:crypto';
+import { db, pgRows } from '$lib/server/db/client';
+
+export const LATENT_256_DIM = 256;
+
+export interface Latent256HydrateInput {
+  /** Candidate identities to hydrate. In the current codebase_chunk_index scope, these are the
+   * table's `id` column values as strings. */
+  packetKeys: readonly string[];
+  /** Caller-supplied snapshot identity, recorded into the receipt for traceability. Not
+   * independently verified against a live source of truth -- no such tracked revision exists
+   * for codebase_chunk_index yet. Pass a stable value (e.g. the request id) if you have nothing
+   * more specific. */
+  candidateSnapshotRevision: string;
+  /** Caller-supplied representation family identity, recorded into the receipt. Same caveat as
+   * candidateSnapshotRevision -- informational, not independently verified. */
+  representationRevision: string;
+  /** The ONLY revision actually checked against live data: rows whose
+   * latent_256_checkpoint_revision does not equal this value are excluded from `vectors` and
+   * counted in `revisionMismatch`, never silently accepted. */
+  checkpointRevision: string;
+}
+
+export interface Latent256HydrateResult {
+  vectors: ReadonlyMap<string, readonly number[]>;
+  requested: number;
+  found: number;
+  missing: number;
+  revisionMismatch: number;
+  /** Rows present with the correct checkpoint revision but rejected by shape validation
+   * (wrong dimension, non-finite values). Distinct from `missing` (no row at all) and
+   * `revisionMismatch` (row exists, wrong checkpoint) so a caller can tell the three failure
+   * modes apart in an audit trail. */
+  invalidShape: number;
+  receiptChecksum: string;
+}
+
+export interface Latent256CandidateProviderV1 {
+  hydrate(input: Latent256HydrateInput): Promise<Latent256HydrateResult>;
+}
+
+function isValidLatent256(vec: number[]): boolean {
+  if (vec.length !== LATENT_256_DIM) return false;
+  for (const v of vec) {
+    if (!Number.isFinite(v)) return false;
+  }
+  return true;
+}
+
+function parseHalfvec(value: string): number[] {
+  return value
+    .slice(1, -1)
+    .split(',')
+    .map(Number);
+}
+
+function computeReceiptChecksum(input: {
+  packetKeys: readonly string[];
+  checkpointRevision: string;
+  found: number;
+  missing: number;
+  revisionMismatch: number;
+  invalidShape: number;
+}): string {
+  const digest = createHash('sha256');
+  digest.update(input.checkpointRevision);
+  digest.update(String(input.found));
+  digest.update(String(input.missing));
+  digest.update(String(input.revisionMismatch));
+  digest.update(String(input.invalidShape));
+  for (const key of [...input.packetKeys].sort()) digest.update(key);
+  return digest.digest('hex');
+}
+
+/** Postgres-backed implementation. Reads codebase_chunk_index.latent_256 directly -- this is the
+ * repo's own preferred proof-of-lineage source (see openspec/changes/parent-atlas-neural-prefill-encoder
+ * "For Parent Atlas I slightly prefer Postgres first for the proof because you can check the
+ * representation/checkpoint lineage in the same read"). A Qdrant-point-retrieval implementation
+ * of the same interface is a later optimization, not required for correctness. */
+export class PostgresLatent256CandidateProvider implements Latent256CandidateProviderV1 {
+  async hydrate(input: Latent256HydrateInput): Promise<Latent256HydrateResult> {
+    const { packetKeys, checkpointRevision } = input;
+    const requested = packetKeys.length;
+
+    if (requested === 0) {
+      return {
+        vectors: new Map(),
+        requested: 0,
+        found: 0,
+        missing: 0,
+        revisionMismatch: 0,
+        invalidShape: 0,
+        receiptChecksum: computeReceiptChecksum({
+          packetKeys, checkpointRevision, found: 0, missing: 0, revisionMismatch: 0, invalidShape: 0,
+        }),
+      };
+    }
+
+    interface Row extends Record<string, unknown> {
+      id: string;
+      latent_256: string | null;
+      latent_256_checkpoint_revision: string | null;
+    }
+
+    const rawResult = await db.execute(sql`
+      SELECT id::text AS id, latent_256::text AS latent_256, latent_256_checkpoint_revision
+      FROM codebase_chunk_index
+      WHERE id = ANY(${sql`ARRAY[${sql.join(packetKeys.map(k => sql`${k}::uuid`), sql`, `)}]`})
+    `);
+    const rows = pgRows<Row>(rawResult);
+
+    const rowByKey = new Map<string, Row>();
+    for (const row of rows) {
+      rowByKey.set(row.id, row);
+    }
+
+    const vectors = new Map<string, readonly number[]>();
+    let found = 0;
+    let revisionMismatch = 0;
+    let invalidShape = 0;
+
+    for (const key of packetKeys) {
+      const row = rowByKey.get(key);
+      if (!row || row.latent_256 == null) continue; // counted in `missing` below
+
+      if (row.latent_256_checkpoint_revision !== checkpointRevision) {
+        revisionMismatch++;
+        continue;
+      }
+
+      const vec = parseHalfvec(row.latent_256);
+      if (!isValidLatent256(vec)) {
+        invalidShape++;
+        continue;
+      }
+
+      vectors.set(key, vec);
+      found++;
+    }
+
+    const missing = requested - found - revisionMismatch - invalidShape;
+
+    return {
+      vectors,
+      requested,
+      found,
+      missing,
+      revisionMismatch,
+      invalidShape,
+      receiptChecksum: computeReceiptChecksum({
+        packetKeys, checkpointRevision, found, missing, revisionMismatch, invalidShape,
+      }),
+    };
+  }
+}

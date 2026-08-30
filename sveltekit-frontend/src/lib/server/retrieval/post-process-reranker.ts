@@ -53,6 +53,20 @@ export interface PostProcessConfig {
    * are allowed in the final top-K. 0 = disabled. Default: 3.
    */
   maxPerCluster: number;
+
+  /**
+   * Semantic dedup: if two candidates' latent_256 vectors have cosine
+   * similarity >= this threshold, only the top-scoring one is kept. Runs
+   * after prefix dedup, among candidates that survived it -- catches
+   * near-duplicate content that lives at different paths (prefix dedup
+   * can't see that; this can, using
+   * models/nested-semantic-autoencoder). Requires the caller to supply
+   * `latent256Map`; candidates missing from that map are never removed by
+   * this step (fail-open, not fail-closed -- absence is legal per that
+   * model's own canonical_authority: false contract). 0 = disabled.
+   * Default: 0 (opt-in; preserves exact prior behavior for existing callers).
+   */
+  latent256SimilarityThreshold: number;
 }
 
 export const DEFAULT_POST_PROCESS_CONFIG: PostProcessConfig = {
@@ -62,6 +76,7 @@ export const DEFAULT_POST_PROCESS_CONFIG: PostProcessConfig = {
   dislikedPacketKeys: new Set(),
   dedupPrefixDepth: 2,
   maxPerCluster: 3,
+  latent256SimilarityThreshold: 0,
 };
 
 // ── Augmented output ──────────────────────────────────────────────────────────
@@ -83,6 +98,8 @@ export interface PostProcessAdjustments {
   /** True if this candidate was removed as a near-duplicate (not in output). */
   dedupRemoved: boolean;
   antiClusterApplied: boolean;
+  /** True if this candidate was removed by latent_256 semantic-similarity dedup. */
+  semanticDedupRemoved: boolean;
 }
 
 /**
@@ -124,6 +141,23 @@ function clusterKey(c: ScoredCandidate & { cluster?: string }): string {
   return parts.slice(0, 2).join('/');
 }
 
+/** Cosine similarity between two equal-length vectors. Assumes non-zero norms
+ * (latent_256 rows are always L2-normalized by the encoder -- see
+ * models/nested-semantic-autoencoder/README.md). */
+/** Boundary code must validate its own assumptions even when upstream promises them (equal
+ * length, non-zero, normalized) -- don't rely solely on a doc comment elsewhere. */
+function cosineSimilarity(a: readonly number[], b: readonly number[]): number {
+  if (a.length !== b.length) return 0;
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
 function applyFreshnessBoost(
   score: number,
   updatedAt: Date | undefined,
@@ -161,6 +195,7 @@ export function postProcessCandidates(
   updatedAtMap: ReadonlyMap<string, Date> = new Map(),
   clusterMap: ReadonlyMap<string, string> = new Map(),
   audit?: { requestId: string; decisions: PostProcessDecision[] },
+  latent256Map: ReadonlyMap<string, readonly number[]> = new Map(),
 ): PostProcessedCandidate[] {
   if (candidates.length === 0) return [];
 
@@ -181,6 +216,7 @@ export function postProcessCandidates(
       dedupWinner: false,
       dedupRemoved: false,
       antiClusterApplied: false,
+      semanticDedupRemoved: false,
     };
 
     const fresh = applyFreshnessBoost(score, updatedAtMap.get(c.packetKey), cfg);
@@ -222,11 +258,40 @@ export function postProcessCandidates(
     dedupFiltered.push(c);
   }
 
+  // Step 3b: semantic dedup — remove lower-scoring candidates whose latent_256
+  // vector is near-identical to an already-kept, higher-scoring candidate.
+  // Catches near-duplicate content that lives at different paths, which
+  // prefix dedup (Step 3) can't see. O(n^2) is fine at this stage's typical
+  // scale (a few dozen candidates post-fusion, not the full corpus).
+  const semanticFiltered: WithAdj[] = [];
+  if (cfg.latent256SimilarityThreshold > 0 && latent256Map.size > 0) {
+    const keptVectors: readonly number[][] = [];
+    for (const c of dedupFiltered) {
+      const vec = latent256Map.get(c.packetKey);
+      if (!vec) {
+        // Fail-open: no latent_256 for this candidate, can't compare, keep it.
+        semanticFiltered.push(c);
+        continue;
+      }
+      const isDuplicate = keptVectors.some(
+        kept => cosineSimilarity(vec, kept) >= cfg.latent256SimilarityThreshold,
+      );
+      if (isDuplicate) {
+        c.adjustments.semanticDedupRemoved = true;
+        continue;
+      }
+      (keptVectors as number[][]).push(vec as number[]);
+      semanticFiltered.push(c);
+    }
+  } else {
+    semanticFiltered.push(...dedupFiltered);
+  }
+
   // Step 4: anti-cluster — cap per-cluster count in the output
   const clusterCounts = new Map<string, number>();
   const final: WithAdj[] = [];
 
-  for (const c of dedupFiltered) {
+  for (const c of semanticFiltered) {
     if (cfg.maxPerCluster > 0) {
       const key = clusterKey(c);
       const count = clusterCounts.get(key) ?? 0;
@@ -258,6 +323,15 @@ export function postProcessCandidates(
           decision: 'DROP',
           reason: 'SOURCE_DIVERSITY',
           detail: `dedupPrefixDepth=${cfg.dedupPrefixDepth} prefix=${sourcePrefix(c.sourceRef ?? '', cfg.dedupPrefixDepth)}`,
+        });
+      } else if (c.adjustments.semanticDedupRemoved) {
+        audit.decisions.push({
+          requestId: audit.requestId,
+          packetKey: c.packetKey,
+          inputRank,
+          decision: 'DROP',
+          reason: 'SOURCE_DIVERSITY',
+          detail: `latent256SimilarityThreshold=${cfg.latent256SimilarityThreshold}`,
         });
       } else {
         audit.decisions.push({

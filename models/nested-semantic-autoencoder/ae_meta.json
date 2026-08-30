@@ -1,5 +1,21 @@
 {
   "model_name": "nested-semantic-autoencoder",
+  "terminology_note": "NOT a text embedding model. It cannot embed text -- it consumes an already-computed EmbeddingGemma semantic_768 vector and produces a derived, non-authoritative transform. EmbeddingGemma remains the only embedding model in this repo (root CLAUDE.md's EmbeddingGemma-only rule). See standalone_embedding_model / query_text_capable below.",
+  "standalone_embedding_model": false,
+  "query_text_capable": false,
+  "input_representation": "semantic_768",
+  "output_representation": "latent_256",
+  "base_embedding_model": "embeddinggemma",
+  "representation_taxonomy": {
+    "embedding_model": ["embeddinggemma"],
+    "semantic_representations_native_mrl": ["semantic_768", "semantic_mrl_512", "semantic_mrl_256", "semantic_mrl_128"],
+    "learned_experimental_transform": {
+      "path": "semantic_768 -> latent_256",
+      "canonicalAuthority": false,
+      "queryEncoder": false,
+      "activeRetrievalLane": false
+    }
+  },
   "architecture": "NestedSemanticAutoencoder (3-tier: 768 -> 384 -> 256, prefix-nested to 128 and 64)",
   "checkpoint_revision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
   "checkpoint_file": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
