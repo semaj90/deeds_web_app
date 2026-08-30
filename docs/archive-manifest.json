@@ -315,5 +315,12 @@
     "sha256": "d6cdf9a4d9b80edd340e568265773b53c2590827fb9a8836a7473c03a49d92ea",
     "archived": "2026-08-30T00:00:00Z",
     "reason": "Legacy 384-dim embedding column superseded by canonical content_embedding (halfvec(768)). Verified zero rows had 384-only data with no corresponding 768 vector before drop (52,380 rows backed up as id+vector CSV). Part of the 768-canonicalization cleanup — see CLAUDE.md Embedding Dimensions Policy section."
+  },
+  {
+    "path": "atlas_graph_authority_scores rows (Postgres, live table, not a repo file) -- 3 orphaned PageRank score snapshots (graph_snapshot_id 2693eab9-fe04-4367-9a72-e0f0f1b8416c / c309d750-d167-4d44-a758-67dcf392e6d8 / 8129be75-9b01-43a4-a08c-3bdd39ec66c6), 9,410 rows total, dated 2026-07-22, no matching atlas_graph_authority_runs row (never promotion-gate-validated), one with a broken L1 sum (0.923 vs expected ~1.0)",
+    "archive_path": "deeds_labs/archive/2026-08-30/orphan_pagerank_snapshots_20260722_backup.csv",
+    "sha256": "5f4303b4d4f60f9f041833c483e8a2ea2fc9aaae1fd7284c746721c279618d40",
+    "archived": "2026-08-30T22:52:00Z",
+    "reason": "Backup-only, per operator decision -- NOT deleted from the live table. Investigated per openspec/changes/parent-atlas-graph-analysis-contract/tasks.md \"Recommended before declaring _v2 canonical\" item 3. Root cause: abandoned dev/test-scale PageRank runs (~3K nodes vs 40K-162K for real graphs) from before the current PageRankPromotionGate/run-row discipline existed, never promoted, never read by any live consumer (feature-matrix.ts requires a promoted run row via a real atlas_graph_authority_runs join, which orphan rows can never satisfy). This backup documents the data for potential future deletion; the live rows remain in place as of this entry."
   }
 ]

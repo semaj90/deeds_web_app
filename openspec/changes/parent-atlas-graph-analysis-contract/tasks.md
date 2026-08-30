@@ -1693,3 +1693,46 @@ item 4 (nDCG eligibility) remains not-applicable per the prior entry's finding (
 doesn't compute nDCG). No live sweep run executed in this session (would hit real Postgres +
 Ollama/llama-server, out of scope for a hardening-only pass) -- next real run of either sweep
 script will exercise the fail-closed paths for real for the first time.
+
+### Item 3 (0.923 L1-sum orphan snapshot) investigated and resolved (2026-08-30, same session)
+
+Picked up the third "Recommended before declaring _v2 canonical" item. First re-read the second/
+third/fourth-pass patches above closely: item 1 (cross-check `_v2` vs oracle) was already done in
+the third pass (found `_v2` unreliable at the ranking head despite near-1.0 aggregate correlation);
+item 2 (re-run `stage5-pagerank-authority-validated.mjs`) is superseded by the fourth pass's
+decision to promote the Aug-12 oracle NDJSON directly instead of rehabilitating `_v2`. Only item 3
+was still genuinely open.
+
+**Live investigation** (`atlas_graph_authority_scores`/`_runs`, columns are `run_id`/
+`graph_snapshot_id`, not `id` -- checked schema via `\d` before querying):
+- The 0.923 L1-sum snapshot is `graph_snapshot_id = 2693eab9-fe04-4367-9a72-e0f0f1b8416c`,
+  `run_id = 86b29855-611a-4b33-b438-5fa982e169dd`, 2,902 rows, created 2026-07-22.
+- **All three orphan snapshots share the same profile**: same day (2026-07-22), all three
+  `run_id`s have zero matching rows in `atlas_graph_authority_runs` (`has_run_row = 0` for all),
+  all are small dev-scale subsets (2,902 / 3,255 / 3,253 nodes) versus the real promoted graphs
+  (40,754 and 162,234 nodes) -- consistent with abandoned early test/dev runs from before the
+  current `PageRankPromotionGate`/run-row discipline existed, not partial writes of a real
+  production run.
+- **Only one of the three has the 0.923 bug** -- its two same-day siblings (`c309d750-...`,
+  `8129be75-...`) both sum to `1.0000000000000457`/`1.0000000000000762` (correct, within float
+  tolerance). This is a one-off computation defect in a single abandoned run, not a systemic bug
+  in whatever code produced that batch -- there is no live normalization code to "fix" here, since
+  none of the three were ever promoted or read by any consumer (confirmed: no run row means
+  `PageRankPromotionGate.validateRun()` could never have validated any of them, and
+  `feature-matrix.ts`'s live query only reads `status = 'promoted'` rows joined through a real
+  run row, which these can never satisfy).
+
+**Action taken**: backed up all 9,410 rows across the three orphan snapshots to
+`deeds_labs/archive/2026-08-30/orphan_pagerank_snapshots_20260722_backup.csv` (verified row count:
+9,411 lines = 1 header + 9,410 data rows = 2,902+3,255+3,253, exact match). **Operator decision:
+leave the rows in the live table** -- backup taken as documentation/precaution only, not followed
+by a delete. Re-raise this as a real deletion candidate only if a future session needs to
+(per this repo's archive-then-delete convention) rather than assuming today's backup implies
+removal is still pending.
+
+**Item 3 status: investigated, root-caused, and resolved** (not "fixed" in the sense of repairing
+live normalization code -- there was none to fix; resolved in the sense of determining these are
+dead, never-promoted, backed-up-not-deleted test artifacts, closing the open question).
+Item 4 (explicit CANONICAL_OWNER classification decision across `_v2`, non-v2, and
+`graph_node_metrics`) remains the one item from this list still requiring operator judgment,
+unchanged from the fourth-pass patch's framing.
