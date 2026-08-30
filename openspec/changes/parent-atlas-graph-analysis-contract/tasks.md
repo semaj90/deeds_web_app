@@ -1355,3 +1355,44 @@ already names (stale `.claude/worktrees/...` paths in `IMPORTS`, generic-symbol 
 `CALLS`) remain exactly as scoped above. Whoever picks this up next should treat both
 `GA8`/`GA9` here and `LAMBDAMART-RANK-01` in the neural-prefill-encoder thread as consumers of
 the *same* eventual golden set — build it once, not twice.
+
+### HANDOFF (2026-08-29): the golden set now exists — here's exactly what's built and what isn't
+
+**Built and pushed this session, in order**:
+1. `scripts/atlas/extract-live-tree-imports-v1.mjs` — fresh `IMPORTS` extraction, every edge
+   verified against a real file on disk at extraction time (not read back from Neo4j's stale
+   data). 4,668 files scanned, 9,218 edges. Output: `.tmp/atlas/live-tree-imports-v1.ndjson`
+   (gitignored — **not committed, re-run the script to regenerate it**). Report:
+   `docs/reports/live-tree-imports-extraction-v1.json`.
+2. `python/build_structural_proxy_golden_set_v1.py` — implements the already-chosen
+   `STRUCTURAL_PROXY_IMPORTERS` methodology on top of (1). 646 golden entries (query text = a
+   file's real summary, relevant packets = that file's real importers,
+   `min_importers_threshold=2`). Output: `.tmp/atlas/structural-proxy-golden-set-v1.ndjson`
+   (gitignored — **re-run both scripts in order to regenerate**). Report:
+   `docs/reports/structural-proxy-golden-set-build-v1.json`.
+
+**Explicitly NOT built** — the next real steps, in priority order:
+- [ ] **A GA8 ablation harness does not exist yet** (`find scripts/atlas -iname "*ablation*"`
+  returns nothing). This file has referenced "run the GA8 ablation harness against the golden
+  set" since before this session without one being built. Building it is the actual next step
+  for GA8/GA9 specifically: run the graph-feature-augmented ranking vs. baseline against the 646
+  entries, measure real (not silver) recall/precision.
+- [ ] **`LAMBDAMART-RANK-01`'s real Recall@10/MRR@10/nDCG@10** (`parent-atlas-neural-prefill-
+  encoder/tasks.md`, `LATENT-DIVERSITY-02`) can now be computed for real, replacing the
+  keyword-match silver standard used throughout that thread's `latent_256`/MMR benchmarking.
+  Re-run `python/benchmark_apples_to_apples_diversity.py`'s query set against this golden set's
+  646 entries instead of (or alongside) the hand-picked 10-query/keyword-label set, once a
+  query↔golden-entry matching step is written (not built — the 646 entries use file summaries as
+  query text, not the free-text queries used in that benchmark; reconciling the two query styles
+  is a real design step, not mechanical).
+- [ ] **Spot-check a sample of the 646 entries by hand** before trusting them further — this is
+  a structural *proxy*, and the methodology's own selection note already flagged "structurally
+  related != necessarily what a human would want retrieved" as a real risk, not a formality. No
+  human review has happened yet.
+- [ ] **Consider lowering/raising `MIN_IMPORTERS_THRESHOLD` (currently 2)** and re-running to see
+  how entry count and quality trade off — not explored, one knob with an obvious next experiment.
+- [ ] `NOT_STARTED`, unchanged from before this session: the two original graph-input blockers
+  (stale `.claude/worktrees/...` paths in the *existing* Neo4j `IMPORTS`, generic-symbol noise in
+  `CALLS`) are now moot for the golden-set purpose specifically (worked around via fresh
+  extraction), but remain real, separate data-quality problems in live Neo4j if anything else
+  still reads those edges — not investigated or fixed this session.
