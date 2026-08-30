@@ -12065,3 +12065,27 @@ of `latent_256`, per the migration plan above.
 **Not yet done**: the Qdrant lane (new named vector or `codebase_chunks_latent256` collection,
 payload-marked with the checkpoint revision) and the ANN-vs-exact parity proof this session
 already scoped as the next step after indexing.
+
+### Qdrant `codebase_chunks_latent256` collection provisioned and fully backfilled (2026-08-29)
+
+`python/provision_qdrant_latent256.py` — new dedicated collection (256-dim, Cosine), UUID point
+IDs matching `codebase_chunk_index.id` 1:1 (no separate ID-mapping table needed). Mirrors the
+already-populated Postgres `latent_256` column — does not recompute. Payload:
+`chunk_id, source_ref, content_hash, derived_from: "latent_256",
+latent_256_checkpoint_revision, canonical_authority: false`. Uses batched REST `PUT` with
+vectors kept in memory per this repo's documented Qdrant API hard rule (never shell/curl for
+bulk vector payloads — the ENOBUFS failure mode already recorded in root `CLAUDE.md`).
+
+Dry-run + 50-row apply proven live (`vector_len: 256`, correct point id, correct payload), then
+full backfill: **55,169/55,169 points upserted in 21.3s**. Verified via `GET /collections/
+codebase_chunks_latent256`: `points_count: 55169, status: green, vectors: {size: 256,
+distance: Cosine}`.
+
+Both stores (Postgres `codebase_chunk_index.latent_256` and Qdrant
+`codebase_chunks_latent256`) now hold the full corpus at the same checkpoint revision.
+
+**Not yet done**: the ANN-vs-exact parity proof. Scoped precisely: this is NOT the same
+methodology as the recall-comparison benchmark above (which computed knn_recall within the
+5,547-row held-out val set only). A true ANN-vs-exact proof must query the same scope Qdrant's
+live HNSW index actually searches — the full 55,169-point collection — and compare Qdrant's
+live top-k against exact brute-force top-k computed over that same full corpus.
