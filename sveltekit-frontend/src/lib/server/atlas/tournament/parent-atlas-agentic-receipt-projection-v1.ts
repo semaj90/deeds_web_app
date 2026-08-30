@@ -1,3 +1,4 @@
+import type { Dirent } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -58,7 +59,7 @@ async function readReceiptsJsonl(path: string): Promise<{ rows: unknown[]; diagn
 
 async function collectAgenticReceipts(repoRoot: string): Promise<{ accepted: AcceptedReceipt[]; sources: TournamentReceiptSourceV1[] }> {
 	const changesRoot = resolve(repoRoot, 'openspec', 'changes');
-	let entries: Awaited<ReturnType<typeof readdir>>;
+	let entries: Dirent[];
 	try {
 		entries = await readdir(changesRoot, { withFileTypes: true });
 	} catch (error) {
@@ -154,12 +155,11 @@ export async function applyParentAtlasAgenticReceiptProjectionV1(
 		};
 	});
 
-	const progress = calculateTournamentProgressV1(gates, {
-		agentTurns: accepted.length,
-		inputTokens: tokensUsed ?? undefined,
-		wallTimeMs: wallTimeMs ?? undefined,
-		filesEdited: filesEdited.length
-	});
+	// Recompute proof from the newly projected gate, but preserve any percentage
+	// efficiency telemetry already calculated from explicit baseline receipts.
+	// Raw agent token/time counters are exposed separately below; no savings are inferred.
+	const proofOnly = calculateTournamentProgressV1(gates);
+	const progress = { ...proofOnly, efficiency: snapshot.progress.efficiency };
 
 	return {
 		...snapshot,
