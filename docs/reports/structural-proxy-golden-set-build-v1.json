@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.structural-proxy-golden-set-build.v1",
+  "status": "READ_ONLY_PROVEN",
+  "canonical_authority": false,
+  "methodology": "STRUCTURAL_PROXY_IMPORTERS",
+  "methodology_source": "openspec/changes/parent-atlas-graph-analysis-contract/tasks.md, operator selected 2026-08-10",
+  "imports_source": ".tmp/atlas/live-tree-imports-v1.ndjson",
+  "candidate_targets_with_min_importers": 1256,
+  "golden_entries_built": 646,
+  "skipped_no_summary": 599,
+  "skipped_no_importer_row": 11,
+  "min_importers_threshold": 2,
+  "output_path": ".tmp/atlas/structural-proxy-golden-set-v1.ndjson",
+  "database_writes": false,
+  "neo4j_writes": false,
+  "read_only": true,
+  "risk_note": "This is a PROXY, not verified human relevance. Downstream consumers (GA8 ablation, LAMBDAMART-RANK-01) must treat it as weak/silver-tier ground truth, one step above the earlier keyword-match silver standard but still not human-labeled gold."
+}
