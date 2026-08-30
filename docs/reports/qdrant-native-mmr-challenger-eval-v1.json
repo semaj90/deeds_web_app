@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.qdrant-native-mmr-challenger-eval.v1",
+  "canonical_authority": false,
+  "note": "SILVER standard relevance (same as latent256-silver-relevance-eval-v1.json). Operates on semantic_768 via codebase_chunks_768's native Qdrant MMR -- no latent_256 involved. codebase_chunks_768 is a known two-generation collection; points with an unusable source_ref are conservatively treated as silver-non-relevant.",
+  "collection": "codebase_chunks_768",
+  "mmr_diversity_param": 0.5,
+  "pool_k": 50,
+  "final_k": 10,
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "finalCount": 10,
+      "relevantInFinal": 6,
+      "reciprocalRankAt10": 1.0,
+      "uniqueSourceRefs": 9
+    },
+    {
+      "query": "JWT authentication middleware",
+      "finalCount": 10,
+      "relevantInFinal": 5,
+      "reciprocalRankAt10": 1.0,
+      "uniqueSourceRefs": 10
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "finalCount": 10,
+      "relevantInFinal": 3,
+      "reciprocalRankAt10": 0.5,
+      "uniqueSourceRefs": 10
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "finalCount": 10,
+      "relevantInFinal": 9,
+      "reciprocalRankAt10": 1.0,
+      "uniqueSourceRefs": 9
+    },
+    {
+      "query": "error handling and logging middleware",
+      "finalCount": 10,
+      "relevantInFinal": 8,
+      "reciprocalRankAt10": 1.0,
+      "uniqueSourceRefs": 7
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "finalCount": 10,
+      "relevantInFinal": 5,
+      "reciprocalRankAt10": 1.0,
+      "uniqueSourceRefs": 9
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "finalCount": 10,
+      "relevantInFinal": 4,
+      "reciprocalRankAt10": 0.3333333333333333,
+      "uniqueSourceRefs": 10
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "finalCount": 10,
+      "relevantInFinal": 6,
+      "reciprocalRankAt10": 0.3333333333333333,
+      "uniqueSourceRefs": 10
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "finalCount": 10,
+      "relevantInFinal": 2,
+      "reciprocalRankAt10": 0.125,
+      "uniqueSourceRefs": 9
+    },
+    {
+      "query": "file upload validation and storage",
+      "finalCount": 10,
+      "relevantInFinal": 9,
+      "reciprocalRankAt10": 0.5,
+      "uniqueSourceRefs": 10
+    }
+  ],
+  "summary": {
+    "avg_final_count": 10,
+    "avg_relevant_in_final": 5.7,
+    "avg_mrr_at_10_silver": 0.6791666666666667,
+    "avg_unique_source_refs": 9.3
+  },
+  "comparison_note": "Compare against docs/reports/latent256-silver-relevance-eval-v1.json (exact_and_semantic avg_mrr_at_10_silver=0.800) and latent256-diversity-refill-partial-eval-v1.json (exact_and_semantic avg_unique_sources=7.4/10).",
+  "duration_s": 3.9583778381347656
+}
