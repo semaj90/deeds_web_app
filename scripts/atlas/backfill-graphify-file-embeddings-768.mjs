@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 /**
- * Backfill canonical 768d embeddings for files indexed by daily Graphify.
+ * Backfill canonical semantic_768 embeddings for files indexed by daily Graphify.
  *
  * Default mode is dry-run. --apply plus explicit migration authorization is
- * required for PostgreSQL writes.
- * Scope is bounded by updated_at so this does not re-embed the full corpus.
- * Qdrant/TurboVec are intentionally not written here; they are projections
- * rebuilt only after canonical PostgreSQL coverage is verified.
+ * required for PostgreSQL writes. Apply mode is authoritative and fail-closed:
+ * it requires the dedicated llama.cpp :8081 embedding server plus immutable
+ * runtime provenance. Qdrant/TurboVec are intentionally not written here.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -26,22 +25,42 @@ for (const arg of process.argv.slice(2)) {
 }
 
 const APPLY = flags.has('apply');
+const REQUIRE_EMBED_SERVER = APPLY || flags.has('require-embed-server');
 const LIMIT = Math.max(1, Math.min(5000, Number(args.get('limit') ?? 128)));
 const BATCH_SIZE = Math.max(1, Math.min(64, Number(args.get('batch-size') ?? 16)));
 const SINCE_HOURS = Math.max(1, Math.min(720, Number(args.get('since-hours') ?? 24)));
-const MODEL = String(args.get('model') ?? env.EMBEDDINGGEMMA_MODEL ?? env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest');
-const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
-// Dedicated GPU embed server (scripts/launch-embed-server.ps1, EMBEDDING_BACKEND=llama_cpp_gguf
-// in dev-gpu-runtime.mjs) -- OpenAI-compatible /v1/embeddings, measured live 2026-08-26 at
-// ~2.3-2.7ms/doc for batch=32-64 vs Ollama's per-request overhead. Preferred when reachable
-// (one-time health probe, not per-batch), falls back to Ollama automatically if not running --
-// this script never fails just because :8081 isn't up.
 const EMBED_SERVER_URL = String(args.get('embed-server-url') ?? env.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
-const NO_CUDA_EMBED = flags.has('no-cuda-embed');
-const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/graphify-file-embedding-backfill-v1.json'));
+const OUT = path.resolve(REPO_ROOT, String(args.get('out') ?? 'docs/reports/graphify-file-embedding-backfill-v2.json'));
 
-function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
-function vectorLiteral(vector) { return `[${vector.join(',')}]`; }
+const REPRESENTATION_ID = 'semantic_768';
+const CANONICAL_COLUMN = 'content_embedding';
+const PHYSICAL_TYPE = 'halfvec(768)';
+const UPSTREAM_MODEL_ID = 'google/embeddinggemma-300m';
+const MAX_INPUT_TOKENS = 2048;
+const FORMATTER_REVISION = 'graphify-embed-text-v1';
+const INPUT_POLICY_REVISION = 'embeddinggemma-token-prefix-2048-v1';
+const PROMPT_REVISION = 'unprompted-v0';
+const POOLING = 'mean';
+const NORMALIZATION = 'l2';
+
+const UPSTREAM_REVISION = String(args.get('upstream-revision') ?? env.EMBEDDINGGEMMA_UPSTREAM_REVISION ?? '').trim();
+const GGUF_SHA256 = String(args.get('gguf-sha256') ?? env.EMBEDDING_GGUF_SHA256 ?? '').trim().toLowerCase();
+const LLAMA_CPP_REVISION = String(args.get('llama-cpp-revision') ?? env.LLAMA_CPP_REVISION ?? '').trim();
+const TOKENIZER_SHA256 = String(args.get('tokenizer-sha256') ?? env.EMBEDDING_TOKENIZER_SHA256 ?? '').trim().toLowerCase();
+const EXECUTION_PROFILE_REVISION = String(args.get('execution-profile-revision') ?? env.EMBEDDING_EXECUTION_PROFILE_REVISION ?? '').trim();
+
+function hash(value) {
+  return crypto.createHash('sha256').update(value).digest('hex');
+}
+function hashJson(value) {
+  return hash(JSON.stringify(value));
+}
+function isSha256(value) {
+  return /^[a-f0-9]{64}$/.test(value);
+}
+function vectorLiteral(vector) {
+  return `[${vector.join(',')}]`;
+}
 function validateVector(vector) {
   if (!Array.isArray(vector) || vector.length !== 768 || vector.some((value) => !Number.isFinite(value))) {
     throw new Error(`Embedding must be a finite 768d array; received ${Array.isArray(vector) ? vector.length : 'non-array'}`);
@@ -51,161 +70,302 @@ function validateVector(vector) {
     throw new Error(`Embedding must be L2-normalized; received normSquared=${normSquared}`);
   }
 }
+
 function embeddingText(row) {
   const ast = Array.isArray(row.ast_symbols) ? row.ast_symbols.join(' ') : '';
-  return [row.relative_path, row.symbol, row.kind, row.summary, row.content, ast].filter(Boolean).join('\n').trim().slice(0, 12_000);
+  return [row.relative_path, row.symbol, row.kind, row.summary, row.content, ast]
+    .filter(Boolean)
+    .join('\n')
+    .trim();
 }
+
+function runtimeBinding() {
+  return {
+    upstreamModelId: UPSTREAM_MODEL_ID,
+    upstreamRevision: UPSTREAM_REVISION,
+    runtime: 'llama.cpp/llama-server',
+    endpoint: EMBED_SERVER_URL,
+    ggufSha256: GGUF_SHA256,
+    llamaCppRevision: LLAMA_CPP_REVISION,
+    tokenizerSha256: TOKENIZER_SHA256,
+    executionProfileRevision: EXECUTION_PROFILE_REVISION,
+    pooling: POOLING,
+    normalization: NORMALIZATION,
+    representationId: REPRESENTATION_ID,
+    dimensions: 768,
+    maxInputTokens: MAX_INPUT_TOKENS,
+    formatterRevision: FORMATTER_REVISION,
+    inputPolicyRevision: INPUT_POLICY_REVISION,
+    promptRevision: PROMPT_REVISION,
+  };
+}
+
+function requireRuntimeBinding() {
+  const missing = [];
+  if (!UPSTREAM_REVISION) missing.push('upstreamRevision');
+  if (!isSha256(GGUF_SHA256)) missing.push('ggufSha256');
+  if (!LLAMA_CPP_REVISION) missing.push('llamaCppRevision');
+  if (!isSha256(TOKENIZER_SHA256)) missing.push('tokenizerSha256');
+  if (!EXECUTION_PROFILE_REVISION) missing.push('executionProfileRevision');
+  if (missing.length > 0) {
+    throw new Error(`AUTHORITATIVE_EMBEDDING_PROVENANCE_REQUIRED:${missing.join(',')}`);
+  }
+}
+
 async function jsonFetch(url, body) {
-  const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(120_000) });
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(120_000),
+  });
   const text = await response.text();
   let result = {};
   try { result = JSON.parse(text); } catch { result = { raw: text }; }
   if (!response.ok) throw new Error(`${url} HTTP ${response.status}: ${text.slice(0, 300)}`);
   return result;
 }
-async function probeCudaEmbedServer() {
-  if (NO_CUDA_EMBED) return false;
+
+async function requireEmbedServer() {
   try {
-    const res = await fetch(`${EMBED_SERVER_URL}/health`, { signal: AbortSignal.timeout(1500) });
-    return res.ok;
-  } catch { return false; }
-}
-// VRAM guard: 690MB free with the embed server loaded was measured live
-// 2026-08-26 and explicitly classified as "TIGHT, MONITOR" not abundant --
-// this is a single shared 8GB card also holding the :8090 production
-// generation server. Fail open to Ollama (never hard-fail the run) if free
-// VRAM drops below the threshold. Checked once at startup and again at the
-// midpoint of a run, not per-batch (nvidia-smi has real process-spawn
-// overhead; this is a bounded --limit=128 job, not the halted bulk corpus
-// run where a tighter per-batch check would be worth the cost).
-const MIN_FREE_VRAM_MB = Number(args.get('min-free-vram-mb') ?? env.MIN_FREE_VRAM_MB ?? 300);
-async function getFreeVramMb() {
-  try {
-    const { execFile } = await import('node:child_process');
-    const { promisify } = await import('node:util');
-    const execFileAsync = promisify(execFile);
-    const { stdout } = await execFileAsync('nvidia-smi', [
-      '--query-gpu=memory.free', '--format=csv,noheader,nounits',
-    ], { timeout: 3000 });
-    const freeMb = Number(stdout.trim());
-    return Number.isFinite(freeMb) ? freeMb : null;
-  } catch {
-    return null; // nvidia-smi unavailable -- guard is advisory-only, never blocks the run
+    const response = await fetch(`${EMBED_SERVER_URL}/health`, { signal: AbortSignal.timeout(2000) });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  } catch (error) {
+    throw new Error(`AUTHORITATIVE_EMBED_SERVER_REQUIRED:${error.message}`);
   }
 }
-async function embedBatchCuda(texts) {
-  // OpenAI-compatible shape: { data: [{ embedding: [...] }, ...] } -- distinct
-  // from Ollama's { embeddings: [[...], ...] }.
+
+function tokenIds(result) {
+  if (!Array.isArray(result?.tokens)) throw new Error('TOKENIZE_RESPONSE_MISSING_TOKENS');
+  return result.tokens.map((token, index) => {
+    const value = typeof token === 'number' ? token : token?.id;
+    if (!Number.isInteger(value)) throw new Error(`TOKENIZE_RESPONSE_INVALID_TOKEN:index=${index}`);
+    return value;
+  });
+}
+
+async function tokenize(text) {
+  return tokenIds(await jsonFetch(`${EMBED_SERVER_URL}/tokenize`, {
+    content: text,
+    add_special: false,
+    parse_special: true,
+    with_pieces: false,
+  }));
+}
+
+async function prepareEmbeddingInput(row) {
+  const sourceText = embeddingText(row);
+  if (!sourceText) throw new Error(`EMPTY_GRAPHIFY_EMBED_INPUT:${row.id}`);
+
+  const originalTokens = await tokenize(sourceText);
+  let finalInput = sourceText;
+  let truncated = false;
+
+  if (originalTokens.length > MAX_INPUT_TOKENS) {
+    truncated = true;
+    const detokenized = await jsonFetch(`${EMBED_SERVER_URL}/detokenize`, {
+      tokens: originalTokens.slice(0, MAX_INPUT_TOKENS),
+    });
+    if (typeof detokenized?.content !== 'string' || !detokenized.content) {
+      throw new Error(`DETOKENIZE_RESPONSE_INVALID:${row.id}`);
+    }
+    finalInput = detokenized.content;
+  }
+
+  const admittedTokens = truncated ? await tokenize(finalInput) : originalTokens;
+  if (admittedTokens.length > MAX_INPUT_TOKENS) {
+    throw new Error(`TOKEN_ADMISSION_EXCEEDED:${row.id}:received=${admittedTokens.length}:max=${MAX_INPUT_TOKENS}`);
+  }
+
+  return {
+    id: row.id,
+    finalInput,
+    sourceTextChecksum: hash(sourceText),
+    finalInputChecksum: hash(finalInput),
+    originalTokenCount: originalTokens.length,
+    admittedTokenCount: admittedTokens.length,
+    truncated,
+  };
+}
+
+async function embedBatch(texts) {
   const result = await jsonFetch(`${EMBED_SERVER_URL}/v1/embeddings`, { input: texts });
-  const vectors = Array.isArray(result.data) ? result.data.map((d) => d.embedding) : null;
-  if (!vectors || vectors.length !== texts.length) throw new Error(`CUDA embed count mismatch: expected ${texts.length}`);
+  const vectors = Array.isArray(result.data) ? result.data.map((entry) => entry.embedding) : null;
+  if (!vectors || vectors.length !== texts.length) {
+    throw new Error(`AUTHORITATIVE_EMBED_COUNT_MISMATCH:expected=${texts.length}`);
+  }
   vectors.forEach(validateVector);
   return vectors;
 }
-async function embedBatchOllama(texts) {
-  const result = await jsonFetch(`${OLLAMA_URL}/api/embed`, { model: MODEL, input: texts, dimensions: 768, truncate: true, keep_alive: '30m' });
-  if (!Array.isArray(result.embeddings) || result.embeddings.length !== texts.length) throw new Error(`Embedding count mismatch: expected ${texts.length}`);
-  result.embeddings.forEach(validateVector);
-  return result.embeddings;
+
+function embeddingVersion(bindingChecksum, input) {
+  return hash([
+    REPRESENTATION_ID,
+    bindingChecksum,
+    FORMATTER_REVISION,
+    INPUT_POLICY_REVISION,
+    PROMPT_REVISION,
+    input.finalInputChecksum,
+  ].join('\n'));
 }
-// Resolved once at startup (see main()), not re-probed per batch -- avoids a
-// failed health check on every single batch if the CUDA server isn't running.
-let useCudaEmbed = false;
-async function embedBatch(texts) {
-  if (useCudaEmbed) {
-    try {
-      return await embedBatchCuda(texts);
-    } catch (error) {
-      console.error(`[embed] CUDA embed server call failed mid-run, falling back to Ollama for this batch: ${error.message}`);
-      return embedBatchOllama(texts);
-    }
-  }
-  return embedBatchOllama(texts);
-}
+
 async function main() {
   const started = Date.now();
   if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
     throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
   }
-  if (!/^embeddinggemma(?::|$)/i.test(MODEL)) {
-    throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${MODEL}`);
+  if (REQUIRE_EMBED_SERVER) {
+    requireRuntimeBinding();
+    await requireEmbedServer();
   }
-  const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 2, application_name: 'graphify-file-embedding-768-backfill' });
-  useCudaEmbed = await probeCudaEmbedServer();
-  const startVramFreeMb = await getFreeVramMb();
-  if (useCudaEmbed && startVramFreeMb !== null && startVramFreeMb < MIN_FREE_VRAM_MB) {
-    console.warn(`[embed] VRAM guard: ${startVramFreeMb}MB free < ${MIN_FREE_VRAM_MB}MB threshold -- falling back to Ollama for this entire run rather than risk an OOM on the shared 8GB card.`);
-    useCudaEmbed = false;
-  }
-  const embedBackend = useCudaEmbed ? 'llama_cpp_gguf_cuda' : 'ollama';
-  console.log(`[embed] backend: ${embedBackend}${useCudaEmbed ? ` (${EMBED_SERVER_URL})` : ` (${OLLAMA_URL})`}${startVramFreeMb !== null ? ` | VRAM free at start: ${startVramFreeMb}MB` : ''}`);
-  const report = { schema: 'atlas.graphify-file-embedding-backfill.v1', generatedAt: new Date().toISOString(), apply: APPLY, scope: { table: 'codebase_chunk_index', canonicalColumn: 'content_embedding_768', sinceHours: SINCE_HOURS, limit: LIMIT }, model: MODEL, embedBackend, ollamaUrl: OLLAMA_URL, embedServerUrl: useCudaEmbed ? EMBED_SERVER_URL : null, vram: { minFreeMbThreshold: MIN_FREE_VRAM_MB, freeMbAtStart: startVramFreeMb, freeMbAtMidpoint: null, freeMbAtEnd: null, guardTriggered: useCudaEmbed === false && startVramFreeMb !== null && startVramFreeMb < MIN_FREE_VRAM_MB }, status: 'FAIL', selected: 0, embedded: 0, written: 0, skipped: 0, errors: [] };
+
+  const binding = runtimeBinding();
+  const bindingChecksum = hashJson(binding);
+  const pool = new Pool({
+    connectionString: resolveDatabaseUrl(env),
+    max: 2,
+    application_name: 'graphify-file-embedding-768-backfill',
+  });
+
+  const report = {
+    schema: 'atlas.graphify-file-embedding-backfill.v2',
+    generatedAt: new Date().toISOString(),
+    apply: APPLY,
+    requireEmbedServer: REQUIRE_EMBED_SERVER,
+    scope: {
+      table: 'codebase_chunk_index',
+      representationId: REPRESENTATION_ID,
+      canonicalColumn: CANONICAL_COLUMN,
+      physicalType: PHYSICAL_TYPE,
+      sinceHours: SINCE_HOURS,
+      limit: LIMIT,
+    },
+    binding,
+    bindingChecksum,
+    inputPolicy: {
+      formatterRevision: FORMATTER_REVISION,
+      inputPolicyRevision: INPUT_POLICY_REVISION,
+      promptRevision: PROMPT_REVISION,
+      maxInputTokens: MAX_INPUT_TOKENS,
+    },
+    status: 'FAIL',
+    selected: 0,
+    embedded: 0,
+    written: 0,
+    skipped: 0,
+    truncatedInputs: 0,
+    inputLineageChecksum: null,
+    inputLineageSample: [],
+    errors: [],
+  };
+
   try {
     const schema = await pool.query(`
       SELECT format_type(a.atttypid, a.atttypmod) AS declared_type
-      FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace
-      WHERE n.nspname = 'public' AND c.relname = 'codebase_chunk_index' AND a.attname = 'content_embedding_768'
-        AND a.attnum > 0 AND NOT a.attisdropped
+      FROM pg_attribute a
+      JOIN pg_class c ON c.oid = a.attrelid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public'
+        AND c.relname = 'codebase_chunk_index'
+        AND a.attname = 'content_embedding'
+        AND a.attnum > 0
+        AND NOT a.attisdropped
     `);
-    if (schema.rowCount !== 1 || !/^(vector|halfvec)\(768\)$/.test(schema.rows[0].declared_type)) throw new Error(`content_embedding_768 is missing or has unexpected type: ${schema.rows[0]?.declared_type ?? 'missing'}`);
+    if (schema.rowCount !== 1 || schema.rows[0].declared_type !== PHYSICAL_TYPE) {
+      throw new Error(`content_embedding is missing or has unexpected type: ${schema.rows[0]?.declared_type ?? 'missing'}`);
+    }
     report.scope.declaredType = schema.rows[0].declared_type;
+
     const result = await pool.query(`
       SELECT id::text, relative_path, symbol, kind, summary, content, source_ref, content_hash, ast_symbols
       FROM codebase_chunk_index
-      WHERE content_embedding_768 IS NULL
+      WHERE content_embedding IS NULL
         AND updated_at >= NOW() - ($1 * INTERVAL '1 hour')
         AND COALESCE(content, summary, relative_path, source_ref, '') <> ''
       ORDER BY updated_at DESC, id
       LIMIT $2
     `, [SINCE_HOURS, LIMIT]);
+
     report.selected = result.rows.length;
-    report.sample = result.rows.slice(0, 5).map((row) => ({ id: row.id, relativePath: row.relative_path, sourceRef: row.source_ref, textHash: hash(embeddingText(row)) }));
-    if (!APPLY) { report.status = 'DRY_RUN'; }
-    else {
-      const midpointOffset = Math.floor(result.rows.length / 2);
-      let midpointChecked = false;
+    report.sample = result.rows.slice(0, 5).map((row) => ({
+      id: row.id,
+      relativePath: row.relative_path,
+      sourceRef: row.source_ref,
+      sourceTextChecksum: hash(embeddingText(row)),
+    }));
+
+    let preparedInputs = null;
+    if (REQUIRE_EMBED_SERVER) {
+      preparedInputs = [];
+      for (const row of result.rows) preparedInputs.push(await prepareEmbeddingInput(row));
+      report.truncatedInputs = preparedInputs.filter((entry) => entry.truncated).length;
+      const lineage = preparedInputs.map(({ finalInput: _finalInput, ...entry }) => entry);
+      report.inputLineageChecksum = hashJson(lineage);
+      report.inputLineageSample = lineage.slice(0, 5);
+    }
+
+    if (!APPLY) {
+      report.status = 'DRY_RUN';
+    } else {
       for (let offset = 0; offset < result.rows.length; offset += BATCH_SIZE) {
-        if (useCudaEmbed && !midpointChecked && offset >= midpointOffset) {
-          midpointChecked = true;
-          const midFreeMb = await getFreeVramMb();
-          report.vram.freeMbAtMidpoint = midFreeMb;
-          if (midFreeMb !== null && midFreeMb < MIN_FREE_VRAM_MB) {
-            console.warn(`[embed] VRAM guard: ${midFreeMb}MB free < ${MIN_FREE_VRAM_MB}MB threshold mid-run -- switching remaining batches to Ollama.`);
-            useCudaEmbed = false;
-            report.vram.guardTriggered = true;
-            report.vram.guardTriggeredAtOffset = offset;
-          }
-        }
         const rows = result.rows.slice(offset, offset + BATCH_SIZE);
-        const vectors = await embedBatch(rows.map(embeddingText));
+        const inputs = preparedInputs.slice(offset, offset + BATCH_SIZE);
+        const vectors = await embedBatch(inputs.map((entry) => entry.finalInput));
         report.embedded += vectors.length;
+
         const client = await pool.connect();
         try {
           await client.query('BEGIN');
           for (let index = 0; index < rows.length; index += 1) {
             const row = rows[index];
-            const version = hash(`semantic_768:graphify:${MODEL}:${row.content_hash ?? hash(embeddingText(row))}`);
+            const version = embeddingVersion(bindingChecksum, inputs[index]);
             const update = await client.query(`
               UPDATE codebase_chunk_index
-              SET content_embedding_768 = $1::vector(768), embedding_model = $2, embedding_version = $3, embedding_dimension = 768, embedding_normalized = true, embedding_created_at = COALESCE(embedding_created_at, NOW()), updated_at = NOW()
-              WHERE id = $4::uuid AND content_embedding_768 IS NULL
-            `, [vectorLiteral(vectors[index]), MODEL, version, row.id]);
+              SET content_embedding = $1::halfvec(768),
+                  embedding_model = $2,
+                  embedding_version = $3,
+                  embedding_dimension = 768,
+                  embedding_normalized = true,
+                  embedding_created_at = COALESCE(embedding_created_at, NOW()),
+                  updated_at = NOW()
+              WHERE id = $4::uuid
+                AND content_embedding IS NULL
+            `, [vectorLiteral(vectors[index]), UPSTREAM_MODEL_ID, version, row.id]);
             if (update.rowCount === 1) report.written += 1;
             else report.skipped += 1;
           }
           await client.query('COMMIT');
-        } catch (error) { await client.query('ROLLBACK'); throw error; }
-        finally { client.release(); }
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        } finally {
+          client.release();
+        }
       }
       report.status = 'PASS';
     }
-  } catch (error) { report.errors.push(error.message); }
-  finally { await pool.end(); }
-  report.vram.freeMbAtEnd = await getFreeVramMb();
+  } catch (error) {
+    report.errors.push(error.message);
+  } finally {
+    await pool.end();
+  }
+
   report.elapsedMs = Date.now() - started;
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(report, null, 2) + '\n', 'utf8');
-  console.log(JSON.stringify({ status: report.status, selected: report.selected, embedded: report.embedded, written: report.written, skipped: report.skipped, scope: report.scope, out: OUT, errors: report.errors }, null, 2));
+  console.log(JSON.stringify({
+    status: report.status,
+    selected: report.selected,
+    embedded: report.embedded,
+    written: report.written,
+    skipped: report.skipped,
+    truncatedInputs: report.truncatedInputs,
+    scope: report.scope,
+    bindingChecksum: report.bindingChecksum,
+    out: OUT,
+    errors: report.errors,
+  }, null, 2));
   if (report.status === 'FAIL') process.exit(1);
 }
+
 main();
