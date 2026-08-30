@@ -12794,3 +12794,124 @@ independent readback confirmed 60/60 rows. Receipt:
 No `evaluation_relevance_corrected` judgments were inserted. The rows are
 review scaffolding only; grading, evidence binding, and production ranking
 promotion remain separate gates.
+
+Added `scripts/atlas/bind-golden-review-query-ids-v1.mjs` and produced
+`.tmp/atlas/golden-relevance-review-pool-bound-v1.ndjson`. Exact text binding
+now resolves all 60 registered `evaluation_queries.id` values with zero
+unresolved IDs. This is file-level review-artifact binding only:
+`judgmentRowsInserted = 0`, database writes after registration are zero, and
+proxy hints remain non-authoritative. Receipt:
+`docs/reports/golden-review-query-id-binding-v1.json`.
+
+Added `scripts/atlas/audit-golden-review-corpus-compatibility-v1.mjs`.
+The only live `evaluation_corpora` manifest is
+`2026-07-12-main-4ade5cfa`: it records 384 dimensions, an older corpus count,
+and `judgment_set_hash = pending`. No compatible current
+`EmbeddingGemma`/`semantic_768` manifest was found, so judgment import remains
+blocked. Receipt: `docs/reports/golden-review-corpus-compatibility-v1.json`.
+
+Added `scripts/atlas/plan-current-semantic768-corpus-manifest-v1.mjs`. The
+read-only plan records 55,169 PostgreSQL chunks and 109,776 Qdrant points for
+`codebase_chunks_768`; this provider-count mismatch remains visible and
+unresolved. `judgmentSetHash` is still pending, and packet count is explicitly
+null because `codebase_chunk_index` has no `packet_key` column. Receipt:
+`docs/reports/current-semantic768-corpus-manifest-plan-v1.json`.
+
+Status remains `CURRENT_SEMANTIC768_MANIFEST_PLANNED`; no manifest registration,
+judgment import, or production promotion is allowed yet.
+
+### Qdrant semantic-768 population audit (2026-08-29)
+
+A full read-only scroll of `codebase_chunks_768` found 109,776 unique point
+IDs, but only 9,964 distinct snake-case `packet_key` values, 23,655 distinct
+`chunk_id` values, and mixed/incomplete payload populations. PostgreSQL has
+55,169 canonical embedded chunks. The collection therefore cannot be used as
+the current corpus manifest until its populations are classified by immutable
+projection/artifact revision and reconciled to PostgreSQL. No points were
+deleted or modified. Receipt:
+`docs/reports/qdrant-semantic768-population-audit-v1.json`.
+
+Detailed classification shows 53,042 records marked `semantic_768`, 52,365
+marked `embeddinggemma_768_native_v1`, and 528 signature-only vectors. A large
+remainder has missing lineage/payload fields. This confirms multiple historical
+projection populations rather than one current 55,169-row cohort. Keep the
+collection untouched until each population has an immutable revision and exact
+PostgreSQL identity mapping.
+
+### Canonical embedding-column correction (2026-08-29)
+
+The first manifest/review-pool pass incorrectly counted and searched the
+generic `content_embedding` column. Live schema verification shows
+`content_embedding` has 55,169 768-dimensional rows, but the canonical
+`content_embedding_768` column has 1,386 rows. Corrected
+`prepare_golden_review_pool_v1.py` and
+`plan-current-semantic768-corpus-manifest-v1.mjs` to use
+`content_embedding_768` explicitly, then regenerated the pool: 60 queries ×
+50 candidates = 3,000 blank judgments. The canonical-column deficit remains a
+promotion blocker; no Qdrant or PostgreSQL projection repair was attempted.
+
+Further tightened the canonical filter after live census found 576 rows with
+data in `content_embedding_768` but `embedding_dimension = 384`. Both the
+review-pool builder and manifest planner now require
+`content_embedding_768 IS NOT NULL AND embedding_dimension = 768`. The
+regenerated pool remains 3,000 candidates; the valid canonical PostgreSQL
+cohort is 810 rows. The contaminated 384-dimensional rows are excluded and
+no data was rewritten.
+
+### Semantic-768 backfill plan (2026-08-29)
+
+Added `scripts/atlas/plan-semantic768-backfill-v1.mjs` and produced
+`docs/reports/semantic768-backfill-plan-v1.json`. The read-only plan identifies
+810 valid canonical rows to preserve, 54,430 rows missing canonical 768 data
+for re-embedding, 576 dimension-contaminated rows to quarantine, 52,365
+generic 384 rows that must not be promoted, and 2,804 generic 768 rows needing
+independent verification. No PostgreSQL or Qdrant writes occurred; approval is
+required before any backfill or quarantine action.
+
+### CORRECTION (2026-08-29, same day, operator-directed): the "canonical embedding-column correction" above was backwards -- `content_embedding` IS canonical, `embedding_dimension` metadata is what's stale
+
+The three entries directly above this one ("Canonical embedding-column
+correction", "Qdrant semantic-768 population audit" as it relates to
+`content_embedding_768`, and this "Semantic-768 backfill plan") all rest on a
+false premise and must not be acted on. Root `CLAUDE.md`'s Embedding
+Dimensions Policy section is explicit, operator-confirmed (2026-08-23), and
+explicitly warns against re-deciding it silently after "5 rounds of churn in
+under a month" — `codebase_chunk_index.content_embedding` (not
+`content_embedding_768`) is the canonical Postgres mirror. The passes above
+inverted this by filtering on `embedding_dimension = 768` and concluding
+`content_embedding` was mostly missing 768-dim data (only 810/55,169 rows
+"valid" by that filter).
+
+**Verified live, operator-directed correction**, checked directly against
+Postgres rather than trusted from either side's prior claim:
+```sql
+SELECT vector_dims(content_embedding::vector) AS actual_dims, count(*)
+FROM codebase_chunk_index WHERE content_embedding IS NOT NULL
+GROUP BY vector_dims(content_embedding::vector);
+-- actual_dims | count
+--         768 | 55169   (100% -- no exceptions)
+```
+All 55,169 `content_embedding`-populated rows are genuinely, exactly
+768-dimensional -- the column's `halfvec(768)` type makes anything else
+physically impossible. `embedding_dimension` is a **separate, independently-set
+metadata column that is simply stale** for 52,365 of those rows (tagged `384`
+despite holding verified real 768-dim vectors). The `content_embedding_768`
+column the "corrected" passes switched to is a much smaller, different column
+(1,386 populated rows total) -- not a stricter view of the same canonical
+data, a different and far less populated one.
+
+**Do not run `plan-semantic768-backfill-v1.mjs`'s proposed backfill.** It
+would re-embed 54,430 rows that already have correct, real, canonical
+768-dim data in `content_embedding` -- wasted GPU/embedding-API cost solving
+a metadata-staleness problem with a full re-embedding pass. The actual fix
+(not yet implemented, no write attempted) is to correct the stale
+`embedding_dimension` metadata column to match each row's real
+`vector_dims(content_embedding::vector)`, not to re-embed or to switch which
+column is treated as canonical.
+
+Full correction recorded in root `CLAUDE.md`'s Embedding Dimensions Policy
+section ("`embedding_dimension` metadata column is unreliable — do not filter
+on it"). `prepare_golden_review_pool_v1.py`'s regenerated pool (3,000
+candidates from `content_embedding_768`) and the two `plan-*-v1.mjs` reports
+in this thread are left uncommitted pending a corrected re-run against
+`content_embedding` — not yet done here.

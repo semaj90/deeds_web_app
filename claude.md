@@ -126,6 +126,27 @@ derived-and-optional.
 - ❌ Never use different embedding models for the same dimension (embeddinggemma only for 768d)
 - ❌ Never silently re-decide this policy in a future session without first reading the reconciliation trace above — that exact failure mode is what produced 5 rounds of churn in under a month
 
+**`embedding_dimension` metadata column is unreliable — do not filter on it (found 2026-08-29,
+same-day correction of a concurrent-agent regression)**: a background agent working the same day
+built a review-pool/manifest/backfill-plan chain (`plan-current-semantic768-corpus-manifest-v1.mjs`,
+`plan-semantic768-backfill-v1.mjs`, `prepare_golden_review_pool_v1.py`) that filtered
+`codebase_chunk_index` on `embedding_dimension = 768`, found only 810 "valid" rows out of 55,169,
+and concluded the canonical `content_embedding` column was mostly missing 768-dim data — then
+"corrected" itself to treat the much-smaller `content_embedding_768` column (1,386 rows, only
+~810 passing that same filter) as canonical instead. **This was backwards.** Verified live via
+`vector_dims(content_embedding::vector)`: all 55,169 `content_embedding`-populated rows are
+genuinely, exactly 768-dimensional — the halfvec(768) column type makes anything else physically
+impossible. `embedding_dimension` is a separate, independently-set metadata column that is simply
+**stale** for 52,365 of those rows (tagged `384` despite holding real, verified 768-dim vectors).
+Trusting `embedding_dimension` over the actual vector data inverted the real picture: `content_embedding`
+(55,169 real rows) is still canonical per the policy above; `content_embedding_768` (a much smaller,
+separate column — do not confuse the two) is not. **Rule**: never gate a canonical-embedding
+audit/backfill/corpus-manifest script on `embedding_dimension` alone — verify real dimensionality
+via `vector_dims(column::vector)` (or trust the halfvec(768)/vector(768) column type itself) before
+concluding data is missing or wrong-dimensional. If `embedding_dimension` disagrees with the
+verified real dimension, the metadata column is what's wrong, not the vector. Do not use 384 as a
+filter/gate on `content_embedding` for this reason — use 768, verified structurally, every time.
+
 **Retrieval Decision Tree**:
 ```
 Query arrives

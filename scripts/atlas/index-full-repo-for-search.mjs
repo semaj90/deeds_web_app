@@ -90,7 +90,7 @@ const REDIS_HOST   = process.env.REDIS_HOST     ?? '127.0.0.1';
 const REDIS_PORT   = parseInt(process.env.REDIS_PORT ?? '6379', 10);
 const REDIS_PASS   = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
 const WARM_CENTROIDS = !process.argv.includes('--no-redis');
-const EMBED_MODEL  = 'embeddinggemma:latest';
+const EMBED_MODEL  = process.env.EMBEDDINGGEMMA_MODEL ?? process.env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest';
 const COLLECTION   = 'codebase_chunks_768';
 // TTL for centroid keys in Redis (24h)
 const CENTROID_TTL = 24 * 3600;
@@ -458,6 +458,15 @@ async function requestEmbeddingBatch(url, body, label) {
   const expected = body.input?.length ?? 1;
   if (embeddings.length !== expected) {
     throw new Error(`${label} embedding count mismatch: got ${embeddings.length}, expected ${expected}`);
+  }
+  for (const [index, embedding] of embeddings.entries()) {
+    if (!Array.isArray(embedding) || embedding.length !== 768 || embedding.some((value) => !Number.isFinite(value))) {
+      throw new Error(`${label} embedding ${index} is not a finite 768-dimensional vector`);
+    }
+    const normSquared = embedding.reduce((sum, value) => sum + value * value, 0);
+    if (!Number.isFinite(normSquared) || normSquared < 0.98 || normSquared > 1.02) {
+      throw new Error(`${label} embedding ${index} is not L2-normalized: normSquared=${normSquared}`);
+    }
   }
   return embeddings;
 }
@@ -827,6 +836,12 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
+    throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+  }
+  if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) {
+    throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
+  }
   if (AST_MANIFEST_PATH) {
     try {
       AST_MANIFEST = loadAstManifest(AST_MANIFEST_PATH);
