@@ -36,6 +36,36 @@ function identities() {
   ];
 }
 
+function semantic768Binding() {
+  return {
+    representationId: 'semantic_768' as const,
+    family: 'EMBEDDINGGEMMA_MRL' as const,
+    dimensions: 768,
+    modelRevision: 'embeddinggemma-full768-v1',
+    projectionKind: 'NONE' as const,
+    sourceRepresentationId: null,
+    projectionRevision: null,
+    normalized: true as const,
+    available: true,
+    availabilityReason: null,
+  };
+}
+
+function latent256Binding() {
+  return {
+    representationId: 'latent_256' as const,
+    family: 'LEARNED_LATENT' as const,
+    dimensions: 256,
+    modelRevision: 'nested-semantic-autoencoder-v3-full01',
+    projectionKind: 'LEARNED_AUTOENCODER' as const,
+    sourceRepresentationId: 'semantic_768' as const,
+    projectionRevision: 'nested-semantic-autoencoder-v3-full01',
+    normalized: true as const,
+    available: true,
+    availabilityReason: null,
+  };
+}
+
 function row(candidate: ReturnType<typeof materializeCandidateOrdinalMap>['candidates'][number], featureRevision = 'feature:1') {
   return {
     schema: 'atlas.candidate-feature-row.v1' as const,
@@ -69,23 +99,12 @@ function row(candidate: ReturnType<typeof materializeCandidateOrdinalMap>['candi
 }
 
 describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
-  it('carries MRL truncation and learned latent lineage without changing CandidateOrdinal identity', () => {
+  it('carries EmbeddingGemma MRL and the nested latent256->128->64 lineage without changing CandidateOrdinal identity', () => {
     const map = materializeCandidateOrdinalMap({
       candidates: [{
         ...identities()[0],
         representationBindings: [
-          {
-            representationId: 'semantic_768',
-            family: 'EMBEDDINGGEMMA_MRL',
-            dimensions: 768,
-            modelRevision: 'embeddinggemma-full768-v1',
-            projectionKind: 'NONE',
-            sourceRepresentationId: null,
-            projectionRevision: null,
-            normalized: true,
-            available: true,
-            availabilityReason: null,
-          },
+          semantic768Binding(),
           {
             representationId: 'semantic_mrl_128',
             family: 'EMBEDDINGGEMMA_MRL',
@@ -93,7 +112,20 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
             modelRevision: 'embeddinggemma-full768-v1',
             projectionKind: 'MRL_PREFIX_TRUNCATION',
             sourceRepresentationId: 'semantic_768',
-            projectionRevision: 'mrl-prefix-v1',
+            projectionRevision: 'mrl-prefix-l2-v1',
+            normalized: true,
+            available: true,
+            availabilityReason: null,
+          },
+          latent256Binding(),
+          {
+            representationId: 'latent_128',
+            family: 'LEARNED_LATENT',
+            dimensions: 128,
+            modelRevision: 'nested-semantic-autoencoder-v3-full01',
+            projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
+            sourceRepresentationId: 'latent_256',
+            projectionRevision: 'nested-prefix-l2-v1',
             normalized: true,
             available: true,
             availabilityReason: null,
@@ -102,13 +134,13 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
             representationId: 'latent_64',
             family: 'LEARNED_LATENT',
             dimensions: 64,
-            modelRevision: 'atlas-autoencoder-768x64-v1',
-            projectionKind: 'LEARNED_AUTOENCODER',
-            sourceRepresentationId: 'semantic_768',
-            projectionRevision: 'ae:pending',
+            modelRevision: 'nested-semantic-autoencoder-v3-full01',
+            projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
+            sourceRepresentationId: 'latent_256',
+            projectionRevision: 'nested-prefix-l2-v1',
             normalized: true,
-            available: false,
-            availabilityReason: 'TRAINING_NOT_PROMOTED',
+            available: true,
+            availabilityReason: null,
           },
         ],
       }],
@@ -119,31 +151,64 @@ describe('CanonicalCandidateV1 / CandidateOrdinalMapV1', () => {
 
     expect(map.candidates[0].candidateOrdinal).toBe(0);
     expect(map.candidates[0].representationBindings.map((binding) => binding.representationId))
-      .toEqual(['semantic_768', 'semantic_mrl_128', 'latent_64']);
+      .toEqual(['semantic_768', 'semantic_mrl_128', 'latent_256', 'latent_128', 'latent_64']);
     expect(map.identityAuthority).toBe(false);
   });
 
-  it('rejects a latent binding without a learned projection revision', () => {
+  it('rejects a physical latent_256 binding without a learned projection revision', () => {
     expect(() => materializeCandidateOrdinalMap({
       candidates: [{
         ...identities()[0],
-        representationBindings: [{
-          representationId: 'latent_128',
-          family: 'LEARNED_LATENT',
-          dimensions: 128,
-          modelRevision: 'atlas-autoencoder-768x128-v1',
-          projectionKind: 'LEARNED_AUTOENCODER',
-          sourceRepresentationId: 'semantic_768',
-          projectionRevision: null,
-          normalized: true,
-          available: false,
-          availabilityReason: 'TRAINING_NOT_PROMOTED',
-        }],
+        representationBindings: [
+          semantic768Binding(),
+          {
+            ...latent256Binding(),
+            projectionRevision: null,
+          },
+        ],
       }],
       candidateSnapshotRevision: 'candidate:s1',
       workspaceRevision: 'workspace:1',
       producerRevision: 'test:v1',
     })).toThrow('LEARNED_LATENT_PROJECTION_REVISION_REQUIRED');
+  });
+
+  it('rejects an available nested latent prefix when latent_256 is missing or unavailable', () => {
+    expect(() => materializeCandidateOrdinalMap({
+      candidates: [{
+        ...identities()[0],
+        representationBindings: [
+          semantic768Binding(),
+          {
+            representationId: 'latent_64',
+            family: 'LEARNED_LATENT',
+            dimensions: 64,
+            modelRevision: 'nested-semantic-autoencoder-v3-full01',
+            projectionKind: 'NESTED_PREFIX_L2_RENORMALIZE',
+            sourceRepresentationId: 'latent_256',
+            projectionRevision: 'nested-prefix-l2-v1',
+            normalized: true,
+            available: true,
+            availabilityReason: null,
+          },
+        ],
+      }],
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    })).toThrow('AVAILABLE_REPRESENTATION_SOURCE_UNAVAILABLE:latent_64:latent_256');
+  });
+
+  it('rejects duplicate representation IDs within one canonical candidate', () => {
+    expect(() => materializeCandidateOrdinalMap({
+      candidates: [{
+        ...identities()[0],
+        representationBindings: [semantic768Binding(), semantic768Binding()],
+      }],
+      candidateSnapshotRevision: 'candidate:s1',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'test:v1',
+    })).toThrow('CANDIDATE_REPRESENTATION_BINDING_DUPLICATE:semantic_768');
   });
 
   it('assigns deterministic ordinals independent of input order', () => {
