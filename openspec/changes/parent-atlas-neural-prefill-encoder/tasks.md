@@ -12915,3 +12915,26 @@ on it"). `prepare_golden_review_pool_v1.py`'s regenerated pool (3,000
 candidates from `content_embedding_768`) and the two `plan-*-v1.mjs` reports
 in this thread are left uncommitted pending a corrected re-run against
 `content_embedding` — not yet done here.
+
+### Session handoff (2026-08-30): SSR blockers + Qdrant scroll pagination fixed, three items still open
+
+Committed this session, in order: `71ca7b354f` (symbol-registry canary advisory lock),
+`03b9885256`/`0c33d94de0` (embedding-column policy correction: `content_embedding` confirmed
+canonical via `vector_dims()`, `embedding_dimension` metadata confirmed stale, not the data),
+`2a6389d175` (vector-manifest.ts: `semantic_mrl_512` naming, empty-string Zod bug,
+Active/Legacy vector split), `9e0e284b02` (BitFrost `latent_256` hot-record contract,
+independently re-run 3/3), `f74b20335a` (LEGACY_KARPATHY_H6 audit retirement),
+`611f6a0ac4` (fixed two SSR blockers: `ssr.noExternal: ['svelte-sonner']` +
+`/api/ai/emotion/+server.ts` browser/server boundary fix — verified live, `/` and `/api/health`
+both 200), `05b1457bc8` (paginated Qdrant scroll in `refreshMetadataCache()` — independently
+proven against live Qdrant: 83 pages, 83,000 points, clean termination on `next_page_offset:null`,
+no timeout; the exact fix for the boot-time `Failed to refresh metadata cache: TimeoutError`).
+
+**Still open, not started**: (1) BitFrost audit script rewrite around active/legacy/cold key
+families (currently still pattern-census style per the last review); (2) the `/codebase/index`
+404 — investigated, zero source references found (`.svelte`/`.ts`), concluded likely a stale
+browser tab/history entry rather than a code bug, no fix applied; (3) the four earlier
+`content_embedding_768`-premised scripts (`plan-current-semantic768-corpus-manifest-v1.mjs`,
+`plan-semantic768-backfill-v1.mjs`, their reports, `prepare_golden_review_pool_v1.py`'s
+regenerated pool) remain uncommitted, correctly, pending a re-run against the real canonical
+column.
