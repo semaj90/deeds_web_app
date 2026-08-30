@@ -1,0 +1,211 @@
+{
+  "schema": "atlas.latent256-diversity-refill-partial-eval.v1",
+  "canonical_authority": false,
+  "note": "Answers ONLY whether refill resolves the coverage regression. Does not include Recall@K/MRR/nDCG (no labeled golden set exists) or the Qdrant-native-MMR challenger -- both explicitly out of scope here.",
+  "pool_k": 50,
+  "final_k": 10,
+  "threshold": 0.9,
+  "query_count": 10,
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 5
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 5
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        }
+      }
+    },
+    {
+      "query": "JWT authentication middleware",
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 5
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 5
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        }
+      }
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 9
+        }
+      }
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        }
+      }
+    },
+    {
+      "query": "error handling and logging middleware",
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        }
+      }
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "poolSize": 41,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        }
+      }
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        }
+      }
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "poolSize": 42,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 6
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 7
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        }
+      }
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "poolSize": 43,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        }
+      }
+    },
+    {
+      "query": "file upload validation and storage",
+      "poolSize": 40,
+      "policies": {
+        "baseline": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_hash_only": {
+          "finalCount": 10,
+          "uniqueSources": 8
+        },
+        "exact_and_semantic": {
+          "finalCount": 10,
+          "uniqueSources": 9
+        }
+      }
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "avg_final_count": 10.0,
+      "avg_unique_sources": 6.6,
+      "min_final_count": 10
+    },
+    "exact_hash_only": {
+      "avg_final_count": 10.0,
+      "avg_unique_sources": 6.7,
+      "min_final_count": 10,
+      "unique_source_change_vs_baseline_pct": 0.015151515151515233
+    },
+    "exact_and_semantic": {
+      "avg_final_count": 10.0,
+      "avg_unique_sources": 7.4,
+      "min_final_count": 10,
+      "unique_source_change_vs_baseline_pct": 0.12121212121212133
+    }
+  },
+  "duration_s": 0.7460284233093262
+}
