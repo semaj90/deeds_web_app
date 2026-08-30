@@ -35,11 +35,19 @@
 		openspecChanges: string[];
 		receiptPaths: string[];
 	};
+	type CacheTelemetry = {
+		provenTiers: string[];
+		valkeyHitsObserved: number;
+		valkeyMissesObserved: number;
+		cacheHitPct: number | null;
+		receiptPaths: string[];
+	};
 
-	const { progress, gates = [], agentic = null } = $props<{
+	const { progress, gates = [], agentic = null, cache = null } = $props<{
 		progress: Progress;
 		gates?: Gate[];
 		agentic?: AgenticTelemetry | null;
+		cache?: CacheTelemetry | null;
 	}>();
 
 	const current = $derived(gates.find((gate) => gate.id === progress.currentGate) ?? null);
@@ -97,7 +105,9 @@
 	<div class="telemetry">
 		<div><span>Token saved</span><strong>{fmt(progress.efficiency.tokenSavingsPct)}</strong></div>
 		<div><span>KV reuse</span><strong>{fmt(progress.efficiency.kvReusePct)}</strong></div>
-		<div><span>ACE/BitFrost hit</span><strong>{fmt(progress.efficiency.cacheHitPct)}</strong></div>
+		<div><span>Observed cache hit</span><strong>{fmt(cache?.cacheHitPct ?? progress.efficiency.cacheHitPct)}</strong></div>
+		<div><span>Proven cache tiers</span><strong>{cache?.provenTiers.length ?? 0}</strong></div>
+		<div><span>Cache H/M</span><strong>{cache ? `${cache.valkeyHitsObserved}/${cache.valkeyMissesObserved}` : '—'}</strong></div>
 		<div><span>Wall-time saved</span><strong>{fmt(progress.efficiency.wallTimeSavingsPct)}</strong></div>
 		<div><span>Files reused</span><strong>{fmt(progress.efficiency.filesReusePct)}</strong></div>
 		<div><span>Blocked gates</span><strong>{progress.blockedGates.length}</strong></div>
