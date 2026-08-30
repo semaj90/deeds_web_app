@@ -36,12 +36,14 @@ if (!currentBaseProof?.graphManifest?.manifestChecksum) {
 const graphByOrdinal = new Map((graph.features ?? []).map((feature: any) => [feature.candidateOrdinal, feature]));
 const semanticByOrdinal = new Map((semantic.candidates ?? []).map((feature: any) => [feature.candidateOrdinal, feature]));
 
+// Reproduce prove-current-candidate-feature-matrix-manifest-v1.mts exactly. Do not silently add
+// a scalar simply because a semantic artifact exists; the anti-drift gate below binds this proof
+// to the checked-in base matrix owner before any repair overlay is added.
 const projections = map.candidates.map((candidate: any) => {
   const graphRow = graphByOrdinal.get(candidate.candidateOrdinal) as any;
   const semanticRow = semanticByOrdinal.get(candidate.candidateOrdinal) as any;
   return {
     packet_key: candidate.packetKey,
-    semantic_similarity_768: semanticRow?.semanticSimilarity768,
     authority_norm: graphRow?.pagerankMax,
     source_revision_match: candidate.sourceRevision ? 1 : undefined,
     representation_revision_match: semanticRow?.semanticRevision ? 1 : undefined,
@@ -57,7 +59,6 @@ const reconstructedBaseManifest = buildCandidateFeatureMatrixManifest({
   includeGraph: true,
 });
 
-// Fail closed if the checked-in base proof no longer describes the current reconstruction.
 if (reconstructedBaseManifest.manifestChecksum !== currentBaseProof.graphManifest.manifestChecksum) {
   throw new Error('REPAIR_PROOF_BASE_MANIFEST_DRIFT');
 }
@@ -84,15 +85,15 @@ const identities = map.candidates.map((candidate: any) => {
   };
 });
 
-// This proof is intentionally conservative. Existing base-plane features remain in the existing
-// [C,25] owner. None of the new repair-only challenger columns has a checked-in, revision-bound
-// producer artifact that can be joined to this exact 15-row candidate snapshot today, so every
-// overlay feature remains UNAVAILABLE. Future producers must supply explicit rows + state changes.
+// Existing base-plane features remain in the [C,25] owner. None of the new repair-only challenger
+// columns has a checked-in, revision-bound producer artifact that can be joined to this exact
+// candidate snapshot today, so every overlay feature remains UNAVAILABLE. Future producers must
+// supply explicit rows + state changes; the matrix contract will reject fabricated values.
 const overlayFeatureStates = Object.fromEntries(
   REPAIR_OVERLAY_FEATURE_NAMES.map((name) => [name, 'UNAVAILABLE']),
 ) as RepairOverlayFeatureStatesV1;
 
-const run0 = buildRepairCandidateFeatureMatrixV1({
+const build = () => buildRepairCandidateFeatureMatrixV1({
   baseMatrix,
   baseMatrixManifestChecksum: reconstructedBaseManifest.manifestChecksum,
   candidateSnapshotRevision: map.candidateSnapshotRevision,
@@ -101,15 +102,9 @@ const run0 = buildRepairCandidateFeatureMatrixV1({
   identities,
   overlayFeatureStates,
 });
-const run1 = buildRepairCandidateFeatureMatrixV1({
-  baseMatrix,
-  baseMatrixManifestChecksum: reconstructedBaseManifest.manifestChecksum,
-  candidateSnapshotRevision: map.candidateSnapshotRevision,
-  ordinalMapChecksum: map.ordinalMapChecksum,
-  producerRevision: 'repair-candidate-feature-matrix-v1',
-  identities,
-  overlayFeatureStates,
-});
+
+const run0 = build();
+const run1 = build();
 
 const basePlanePreserved = (() => {
   for (let row = 0; row < baseMatrix.candidate_count; row++) {
