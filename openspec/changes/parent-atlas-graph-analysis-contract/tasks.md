@@ -1487,3 +1487,65 @@ open, still-correct next step (from the original golden-set build) is a human-la
 relevance set, which would let this exact same sweep methodology answer the real question
 (does graph authority help *semantic* relevance) without the circularity risk above.
 Receipt: `docs/reports/ga8-blend-weight-sweep-v1.json`.
+
+### LLM-judged independent relevance test (2026-08-29, same day): the circularity hypothesis is confirmed, but so is a second, different circularity
+
+No human labeling capacity is available in this session. As a partial substitute for the
+still-open "human-labeled relevance set" next step, built an LLM-judged relevance signal instead
+(`python/build_llm_judged_relevance_set.py`) — explicitly labeled `evidence_tier:
+LLM_JUDGED_PROXY`, `not_human_verified: true` in every receipt, never conflated with the stronger
+human-verified tier. Local `ornith-1.5-9b` (the only live generation-capable model found; Ollama
+only serves embedding/vision models currently) judges, per sampled query, which of the top-50
+semantic-ANN candidates a developer would genuinely want as related context — given ONLY the
+query file's summary and each candidate's summary/path, blind to the `IMPORTS` graph and to
+PageRank scores entirely.
+
+**Real bug found and fixed en route**: the model is a thinking/reasoning model (`reasoning_content`
+streams before `content`, matching this repo's already-documented Gemma4 streaming behavior even
+though this isn't Gemma4). `max_tokens=900` was silently insufficient against a ~40-candidate
+judging prompt — reasoning consumed the entire budget, `content` stayed empty, and every judgment
+silently came back as zero relevant candidates (looked like "the model found nothing relevant,"
+was actually "the model never got to answer"). Caught by inspecting raw output, not by trusting
+the empty-array result. Fixed by raising to `max_tokens=4000`, confirmed real judgments after.
+
+Ran the full 60-entry sample, 0 skipped at build time. 33/60 entries had at least one LLM-judged
+relevant candidate (27 had none — a legitimate judgment, not a failure, and excluded from the
+sweep as "no positive signal to measure recall against," same exclusion logic used throughout
+this thread). Confirmed near-zero overlap with `IMPORTS`-derived relevance (2/60 entries had any
+overlapping packet at all) — this is testing a materially different relevance definition, not
+restating the same one under a different name.
+
+**Sweep result against this independent signal** (n=33, `python/sweep_llm_judged_relevance.py`,
+reuses `sweep_ga8_blend_weight.py`'s pool construction unchanged):
+
+| weight (semantic share) | avg recall@10 | avg MRR@10 |
+|---|---|---|
+| 0.0 (pure PageRank) | 0.3088 | 0.4454 |
+| 0.5 | 0.3882 | 0.4732 |
+| 0.9 | **0.4458** | 0.6556 |
+| 1.0 (pure semantic) | 0.4442 | **0.7410** |
+
+The trend **inverts** relative to the IMPORTS-based sweep: recall/MRR now rise (mostly)
+monotonically with semantic weight, peaking near-pure-semantic instead of near-pure-PageRank.
+This is real, useful confirmation of the circularity concern flagged in the prior section — on a
+relevance signal not derived from the `IMPORTS` graph, PageRank does not dominate; if anything
+blending it in hurts relative to semantic alone.
+
+**This result has its own alignment issue and must not be reported as clean vindication of
+"just use semantic similarity."** The LLM judge was shown only candidate/query *summary text* and
+asked to judge relevance from that text alone — the same textual signal the semantic-ANN
+embeddings are themselves computed from. So "semantic cosine score correlates with the LLM's
+text-based relevance judgment" is partly circular too, via a different mechanism than the
+PageRank case: not graph-structure alignment, but text-similarity alignment (both the retriever
+and the judge are operating on the same summary text). Put plainly: **neither sweep in this
+thread is a clean, independent verdict.** The IMPORTS-based sweep favors PageRank because PageRank
+is graph-derived and so is the label. The LLM-judged sweep favors semantic similarity because the
+judge and the ranker are both text-derived. The genuinely open question — does graph authority
+meaningfully improve ranking on a relevance definition independent of both the import graph and
+raw text similarity (i.e., actual human developer intent) — remains unresolved. A real
+human-labeled set, built from what developers actually click/want rather than from either proxy,
+is still the only way to close this cleanly.
+
+Receipt: `docs/reports/ga8-blend-weight-sweep-llm-judged-v1.json`. Underlying judgments:
+`.tmp/atlas/llm-judged-relevance-v1.ndjson` (gitignored, not committed — regenerable via
+`python/build_llm_judged_relevance_set.py`).

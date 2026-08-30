@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.ga8-blend-weight-sweep-llm-judged.v1",
+  "canonical_authority": false,
+  "evidence_tier": "LLM_JUDGED_PROXY",
+  "not_human_verified": true,
+  "note": "Same weight sweep as sweep_ga8_blend_weight.py (reuses its build_pool/eval_weight unchanged), but relevance ground truth is LLM-judged (ornith-1.5-9b judging candidate summaries against the query file's summary, blind to the IMPORTS graph and PageRank scores) instead of IMPORTS-derived. Tests whether the pure-PageRank dominance found on the IMPORTS-derived golden set (docs/reports/ga8-blend-weight-sweep-v1.json) survives on a relevance signal not computed from the same graph PageRank is computed from. Confirmed near-zero overlap between the two relevance definitions (2/60 entries had any overlapping packet) before running this -- this is testing a materially different label, not restating the same one.",
+  "llm_judged_relevance_source": ".tmp/atlas/llm-judged-relevance-v1.ndjson",
+  "llm_judged_total_records": 60,
+  "skipped_no_positive_signal": 27,
+  "skipped_unreachable": 0,
+  "evaluated_entries": 33,
+  "semantic_pool_k": 50,
+  "final_k": 10,
+  "weight_grid": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "summary_by_weight": {
+    "0.0": {
+      "avg_recall_at_10": 0.30883254541249805,
+      "avg_mrr_at_10": 0.44535834535834534,
+      "n": 33
+    },
+    "0.1": {
+      "avg_recall_at_10": 0.3239840605640132,
+      "avg_mrr_at_10": 0.4483886483886484,
+      "n": 33
+    },
+    "0.2": {
+      "avg_recall_at_10": 0.3239840605640132,
+      "avg_mrr_at_10": 0.4491101491101491,
+      "n": 33
+    },
+    "0.3": {
+      "avg_recall_at_10": 0.32903456561451827,
+      "avg_mrr_at_10": 0.4518398268398268,
+      "n": 33
+    },
+    "0.4": {
+      "avg_recall_at_10": 0.37376761034756295,
+      "avg_mrr_at_10": 0.4576118326118327,
+      "n": 33
+    },
+    "0.5": {
+      "avg_recall_at_10": 0.3881648292902365,
+      "avg_mrr_at_10": 0.4731842231842232,
+      "n": 33
+    },
+    "0.6": {
+      "avg_recall_at_10": 0.3985544396798469,
+      "avg_mrr_at_10": 0.5016354016354017,
+      "n": 33
+    },
+    "0.7": {
+      "avg_recall_at_10": 0.405661221786629,
+      "avg_mrr_at_10": 0.5203944203944204,
+      "n": 33
+    },
+    "0.8": {
+      "avg_recall_at_10": 0.4282154072196023,
+      "avg_mrr_at_10": 0.5687229437229437,
+      "n": 33
+    },
+    "0.9": {
+      "avg_recall_at_10": 0.4457872554015487,
+      "avg_mrr_at_10": 0.6555555555555556,
+      "n": 33
+    },
+    "1.0": {
+      "avg_recall_at_10": 0.44424204176218585,
+      "avg_mrr_at_10": 0.740981240981241,
+      "n": 33
+    }
+  },
+  "best_weight_for_recall_at_10": "0.9",
+  "best_weight_for_mrr_at_10": "1.0"
+}
