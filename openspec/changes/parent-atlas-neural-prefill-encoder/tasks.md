@@ -12525,3 +12525,35 @@ tunable and untested at other settings), and latency p50/p95 for any policy. The
 takeaway available right now: **`latent_256` is the more conservative, lower-risk diversity
 mechanism of the two real options measured; MMR is the more aggressive one.** Which is
 preferable is a product decision this data informs, not one it settles.
+
+### MMR_LAMBDA sweep (2026-08-29): no lambda dominates the latent_256 operating point
+
+`python/benchmark_mmr_lambda_sweep.py` fills in the `semantic_768_mmr` tradeoff curve beyond
+the single `λ=0.5` point already measured, across `{0.3, 0.5, 0.7, 0.9, 1.0}`. Sanity-checked:
+`λ=1.0` (pure relevance, no diversity term) correctly reduces to the exact baseline numbers
+(6.6 unique sources, 0.2388 recall, 0.783 MRR) — confirms the manual MMR implementation is
+correct, not just plausible-looking. Receipt: `docs/reports/mmr-lambda-sweep-eval-v1.json`.
+
+| λ | avg unique sources | avg recall@10 (silver) |
+|---|---|---|
+| 0.3 | 9.7 | 0.1908 |
+| 0.5 | 9.7 | 0.1880 |
+| 0.7 | 9.5 | 0.2042 |
+| 0.9 | 8.0 | 0.2308 |
+| 1.0 | 6.6 | 0.2388 (= baseline) |
+| — `latent_256` policy — | **7.4** | **0.2375** |
+
+**No lambda tested matches `latent_256`'s specific (diversity, recall) point.** The closest,
+`λ=0.9`, gets more diversity (8.0 vs. 7.4) but less recall (0.2308 vs. 0.2375) — a genuinely
+different, not strictly better-or-worse, point on the curve. `latent_256`'s policy sits closer
+to the top-left of this tradeoff (near-baseline recall, real diversity gain) than any single
+MMR lambda achieves simultaneously.
+
+**`LATENT-DIVERSITY-02` is now substantially answered on silver data**: diversity gain,
+silver-relevance preservation, MMR challenger (apples-to-apples), and the MMR operating-point
+curve are all real, committed, honest results. What remains unstarted, unchanged from before: a
+human-labeled golden query set (the one gap none of this silver-standard work can close),
+`nDCG`/`α-nDCG` (needs graded relevance), and latency p50/p95. The silver-standard verdict
+throughout: `latent_256`'s conservative diversity gain looks like the safer production
+candidate of the two mechanisms measured — pending real (not silver) relevance verification
+before any activation decision.
