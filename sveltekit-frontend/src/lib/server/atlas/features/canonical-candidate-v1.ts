@@ -9,49 +9,74 @@ const candidateRepresentationId = z.enum([
   'semantic_mrl_512',
   'semantic_mrl_256',
   'semantic_mrl_128',
+  'latent_256',
   'latent_128',
   'latent_64',
 ]);
+
+const mrlDimensions: Record<string, number> = {
+  semantic_768: 768,
+  semantic_mrl_512: 512,
+  semantic_mrl_256: 256,
+  semantic_mrl_128: 128,
+};
+const latentDimensions: Record<string, number> = {
+  latent_256: 256,
+  latent_128: 128,
+  latent_64: 64,
+};
 
 export const candidateRepresentationBindingV1Schema = z.object({
   representationId: candidateRepresentationId,
   family: z.enum(['EMBEDDINGGEMMA_MRL', 'LEARNED_LATENT']),
   dimensions: z.number().int().positive(),
   modelRevision: z.string().min(1),
-  projectionKind: z.enum(['NONE', 'MRL_PREFIX_TRUNCATION', 'LEARNED_AUTOENCODER']),
+  projectionKind: z.enum(['NONE', 'MRL_PREFIX_TRUNCATION', 'LEARNED_AUTOENCODER', 'NESTED_PREFIX_L2_RENORMALIZE']),
   sourceRepresentationId: candidateRepresentationId.nullable(),
   projectionRevision: z.string().min(1).nullable(),
   normalized: z.literal(true),
   available: z.boolean(),
   availabilityReason: z.string().min(1).nullable(),
 }).strict().superRefine((binding, ctx) => {
-  const mrlDimensions: Record<string, number> = {
-    semantic_768: 768,
-    semantic_mrl_512: 512,
-    semantic_mrl_256: 256,
-    semantic_mrl_128: 128,
-  };
-  const latentDimensions: Record<string, number> = { latent_128: 128, latent_64: 64 };
   const expected = mrlDimensions[binding.representationId] ?? latentDimensions[binding.representationId];
   if (binding.dimensions !== expected) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dimensions'], message: 'REPRESENTATION_DIMENSION_MISMATCH' });
   }
-  if (binding.family === 'EMBEDDINGGEMMA_MRL') {
-    if (binding.projectionKind !== (binding.representationId === 'semantic_768' ? 'NONE' : 'MRL_PREFIX_TRUNCATION')) {
+
+  if (binding.representationId in mrlDimensions) {
+    if (binding.family !== 'EMBEDDINGGEMMA_MRL') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['family'], message: 'MRL_FAMILY_MISMATCH' });
+    }
+    const isCanonical = binding.representationId === 'semantic_768';
+    if (binding.projectionKind !== (isCanonical ? 'NONE' : 'MRL_PREFIX_TRUNCATION')) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionKind'], message: 'MRL_PROJECTION_KIND_MISMATCH' });
     }
-    if (binding.sourceRepresentationId !== (binding.representationId === 'semantic_768' ? null : 'semantic_768')) {
+    if (binding.sourceRepresentationId !== (isCanonical ? null : 'semantic_768')) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'MRL_SOURCE_MISMATCH' });
     }
+    if (!isCanonical && binding.projectionRevision === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionRevision'], message: 'MRL_PROJECTION_REVISION_REQUIRED' });
+    }
   }
-  if (binding.family === 'LEARNED_LATENT') {
-    if (binding.projectionKind !== 'LEARNED_AUTOENCODER' || binding.projectionRevision === null) {
+
+  if (binding.representationId in latentDimensions) {
+    if (binding.family !== 'LEARNED_LATENT') {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['family'], message: 'LEARNED_LATENT_FAMILY_MISMATCH' });
+    }
+    const isPhysicalLatent = binding.representationId === 'latent_256';
+    const expectedProjection = isPhysicalLatent ? 'LEARNED_AUTOENCODER' : 'NESTED_PREFIX_L2_RENORMALIZE';
+    const expectedSource = isPhysicalLatent ? 'semantic_768' : 'latent_256';
+    if (binding.projectionKind !== expectedProjection) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionKind'], message: 'LEARNED_LATENT_PROJECTION_KIND_MISMATCH' });
+    }
+    if (binding.sourceRepresentationId !== expectedSource) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'LEARNED_LATENT_SOURCE_MISMATCH' });
+    }
+    if (binding.projectionRevision === null) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projectionRevision'], message: 'LEARNED_LATENT_PROJECTION_REVISION_REQUIRED' });
     }
-    if (binding.sourceRepresentationId !== 'semantic_768') {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRepresentationId'], message: 'LEARNED_LATENT_SOURCE_MUST_BE_SEMANTIC_768' });
-    }
   }
+
   if (!binding.available && binding.availabilityReason === null) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['availabilityReason'], message: 'UNAVAILABLE_REPRESENTATION_REASON_REQUIRED' });
   }
@@ -87,6 +112,39 @@ export const canonicalCandidateV1Schema = canonicalCandidateV1BaseSchema.superRe
       message: 'CANONICAL_CANDIDATE_STRONG_IDENTITY_REQUIRED',
     });
   }
+
+  const bindings = new Map<string, (typeof candidate.representationBindings)[number]>();
+  candidate.representationBindings.forEach((binding, index) => {
+    if (bindings.has(binding.representationId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['representationBindings', index, 'representationId'],
+        message: `CANDIDATE_REPRESENTATION_BINDING_DUPLICATE:${binding.representationId}`,
+      });
+      return;
+    }
+    bindings.set(binding.representationId, binding);
+  });
+
+  const requireAvailableSource = (representationId: string, sourceRepresentationId: string) => {
+    const binding = bindings.get(representationId);
+    if (!binding?.available) return;
+    const source = bindings.get(sourceRepresentationId);
+    if (!source?.available) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['representationBindings'],
+        message: `AVAILABLE_REPRESENTATION_SOURCE_UNAVAILABLE:${representationId}:${sourceRepresentationId}`,
+      });
+    }
+  };
+
+  requireAvailableSource('semantic_mrl_512', 'semantic_768');
+  requireAvailableSource('semantic_mrl_256', 'semantic_768');
+  requireAvailableSource('semantic_mrl_128', 'semantic_768');
+  requireAvailableSource('latent_256', 'semantic_768');
+  requireAvailableSource('latent_128', 'latent_256');
+  requireAvailableSource('latent_64', 'latent_256');
 });
 export type CanonicalCandidateV1 = z.infer<typeof canonicalCandidateV1Schema>;
 
