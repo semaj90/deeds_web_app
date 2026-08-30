@@ -11990,3 +11990,55 @@ Two findings worth acting on:
 Not yet done: actually adding the `semantic_mrl_256` Postgres column / Qdrant lane — this section
 only proves the benchmark justifies building it, per this file's standing rule against building
 derived lanes speculatively ahead of a benchmark.
+
+### Superseded by a 3-tier model (2026-08-29, same day): `latent_256` beats `semantic_mrl_256` outright
+
+The finding above (`semantic_mrl_256` beats the 2-tier `latent_128`) was correct for the model
+that existed at the time, but motivated extending the model rather than migrating schema around
+it. `NestedSemanticAutoencoder` was extended from a 2-tier (`latent_128`/`latent_64`) to a 3-tier
+nesting: one physical `latent_256` bottleneck, with `latent_128 = normalize(latent_256[:128])`
+and `latent_64 = normalize(latent_128[:64])` — same prefix-nesting principle as before, one level
+deeper. `hidden_dim` bumped 256→384 to give the wider bottleneck room. Full retrain:
+`LATENT_TRAIN_FULL_01` v3, same 55,169-row corpus/50-epoch/source-grouped-split/deterministic/
+`--require-cuda` discipline as the v2 run. Receipt:
+`docs/reports/latent-autoencoder-training-receipt-v3-full01.json`. Checkpoint (gitignored):
+`python/checkpoints/nested_semantic_autoencoder_v3_full01.pt`.
+
+Re-ran `compare_semantic_representation_recall.py` against the v3 checkpoint — same held-out
+split, directly comparable. Receipt:
+`docs/reports/semantic-representation-recall-comparison-v2.json`.
+
+**Definitive `knn_recall@10` table** (supersedes the 4-row table above):
+
+| Representation | Dims | Kind | knn_recall@10 |
+|---|---|---|---|
+| `semantic_mrl_128` | 128 | native MRL, untrained | 0.7852 |
+| `latent_64` | 64 | learned (3-tier) | 0.7933 |
+| `latent_128` | 128 | learned (3-tier) | **0.8572** |
+| `semantic_mrl_256` | 256 | native MRL, untrained | 0.8575 |
+| `latent_256` | 256 | learned (3-tier) | **0.8957** |
+| `semantic_mrl_512` | 512 | native MRL, untrained | 0.9183 |
+
+Two clean results: `latent_128` (0.8572) now **matches** `semantic_mrl_256` (0.8575) at half the
+storage. `latent_256` (0.8957) **beats** `semantic_mrl_256` outright and closes most of the gap to
+`semantic_mrl_512` (0.9183) at half its dimensions. The 3-tier learned model now matches or beats
+native MRL truncation at every comparable tier — this is the answer to "which lane is worth a new
+schema field," and it points at `latent_256`, not `semantic_mrl_256`.
+
+**Recommendation, not yet executed** (schema/migration work needs explicit go-ahead per this
+file's standing rule and the root `CLAUDE.md` Drizzle Safety Rule — generated SQL must be
+manually reviewed before applying against a live table with real data):
+- Add `latent_256 vector(256)` (or `halfvec(256)`) to `codebase_chunk_index`, populated by
+  `model.encode()` on the `v3_full01` checkpoint — NOT a prefix truncation, an actual model
+  forward pass, so a backfill script (not raw SQL) is required.
+- Qdrant: either a new named vector on the existing `codebase_chunks_768` point, or a dedicated
+  `codebase_chunks_latent256` collection, payload-marked `derived_from: "latent_256"`,
+  `checkpoint_revision: "<model_checksum from the v3 receipt>"` so a future retrain invalidates
+  stale points instead of silently mixing two model generations in one collection.
+- `latent_128`/`latent_64` remain derivable at query time from `latent_256` (prefix + renorm, free)
+  — they do not need their own stored column if `latent_256` is stored, mirroring how
+  `semantic_mrl_128`/`semantic_mrl_256` are already derived from stored `semantic_768` rather than
+  stored separately.
+- Per the standing rule already in this file: this stays `canonical_authority: false` — a
+  routing/reranking lane, never the primary retrieval authority, and never promoted ahead of
+  `exact_semantic_768`.
