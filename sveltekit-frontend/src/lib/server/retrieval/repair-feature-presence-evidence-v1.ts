@@ -4,7 +4,10 @@ import {
   type CandidateLatent256HydrationReceiptV1,
 } from '../atlas/features/candidate-latent256-hydration-receipt-v1.js';
 import type { FeaturePresenceState } from '../ace/context-compiler.parent-atlas.js';
-import type { RepairFeatureProducerSetV1 } from './repair-feature-producer-v1.js';
+import {
+  verifyRepairFeatureProducerSetV1,
+  type RepairFeatureProducerSetV1,
+} from './repair-feature-producer-v1.js';
 
 export const REPAIR_FEATURE_PRESENCE_EVIDENCE_SCHEMA =
   'atlas.repair-feature-presence-evidence.v1' as const;
@@ -47,32 +50,6 @@ function normalizeChecksum(value: string): string {
 
 function checksumEqual(a: string, b: string): boolean {
   return normalizeChecksum(a) === normalizeChecksum(b);
-}
-
-function verifyProducerSet(set: RepairFeatureProducerSetV1): void {
-  if (!/^sha256:[a-f0-9]{64}$/i.test(set.producerSetChecksum)) {
-    throw new Error('REPAIR_PRESENCE_PRODUCER_SET_CHECKSUM_INVALID');
-  }
-  if (set.producerCount !== set.producers.length) {
-    throw new Error('REPAIR_PRESENCE_PRODUCER_SET_COUNT_MISMATCH');
-  }
-  const body = {
-    schema: set.schema,
-    candidateSnapshotRevision: set.candidateSnapshotRevision,
-    ordinalMapChecksum: set.ordinalMapChecksum,
-    candidateRowCount: set.candidateRowCount,
-    producerCount: set.producerCount,
-    producers: set.producers,
-    overlayRows: set.overlayRows,
-    overlayFeatureStates: set.overlayFeatureStates,
-    canonicalAuthority: false,
-    retrievalVote: false,
-    rankingPromotion: false,
-    mutationAuthority: false,
-  };
-  if (sha256(body) !== set.producerSetChecksum) {
-    throw new Error('REPAIR_PRESENCE_PRODUCER_SET_CHECKSUM_MISMATCH');
-  }
 }
 
 function latent256Presence(receipt: CandidateLatent256HydrationReceiptV1): FeaturePresenceState {
@@ -137,7 +114,11 @@ export function buildRepairFeaturePresenceEvidenceV1(input: {
   let producerSetChecksum: string | null = null;
   if (input.repairProducerSet) {
     const set = input.repairProducerSet;
-    verifyProducerSet(set);
+
+    // The producer set is rebuilt from its full immutable artifacts before any state reaches
+    // ContextManifest. Summaries or overlay rows alone cannot assert availability.
+    verifyRepairFeatureProducerSetV1(set);
+
     if (set.candidateSnapshotRevision !== input.candidateSnapshotRevision) {
       throw new Error('REPAIR_PRESENCE_PRODUCER_SET_CANDIDATE_SNAPSHOT_MISMATCH');
     }
