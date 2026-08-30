@@ -401,5 +401,5 @@
     }
   },
   "comparison_note": "latent_256 policy (exact_and_semantic) reference point: avg_unique_sources=7.4, avg_recall_at_10_silver=0.2375, avg_mrr_at_10_silver=0.800 (docs/reports/apples-to-apples-diversity-eval-v1.json). baseline: avg_unique_sources=6.6, avg_recall_at_10_silver=0.2388.",
-  "duration_s": 1.2462737560272217
+  "duration_s": 1.2351691722869873
 }

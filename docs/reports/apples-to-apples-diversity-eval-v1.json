@@ -1,7 +1,7 @@
 {
   "schema": "atlas.apples-to-apples-diversity-eval.v1",
   "canonical_authority": false,
-  "note": "Closes the identity-space gap flagged in the earlier MMR challenger result: all four policies run against the SAME codebase_chunk_index pool with the SAME silver-standard relevance labels. semantic_768_mmr is standard MMR (relevance+redundancy both on content_embedding). exact_and_semantic_and_mmr is a first CrossRepresentationDiversityV1 data point (relevance from semantic_768, redundancy from latent_256), built here for the first time per the review's suggested architecture.",
+  "note": "All policies run against the SAME codebase_chunk_index pool with the SAME silver-standard relevance labels. Selection latency measures only in-memory policy selection after the shared database query and embedding step; it is not end-to-end retrieval latency.",
   "pool_k": 50,
   "final_k": 10,
   "mmr_lambda": 0.5,
@@ -17,28 +17,32 @@
           "uniqueSources": 5,
           "relevantInFinal": 9,
           "recallAt10": 0.34615384615384615,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.002299901098012924
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 6,
           "relevantInFinal": 9,
           "recallAt10": 0.34615384615384615,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.28989999555051327
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 5,
           "recallAt10": 0.19230769230769232,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.282800019718707
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 5,
           "recallAt10": 0.19230769230769232,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 8.736600051634014
         }
       }
     },
@@ -52,28 +56,32 @@
           "uniqueSources": 5,
           "relevantInFinal": 10,
           "recallAt10": 0.2777777777777778,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.00200001522898674
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 6,
           "relevantInFinal": 10,
           "recallAt10": 0.2777777777777778,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.25510007981210947
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.229400078766048
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.282800019718707
         }
       }
     },
@@ -87,28 +95,32 @@
           "uniqueSources": 8,
           "relevantInFinal": 6,
           "recallAt10": 0.23076923076923078,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.002100015990436077
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 7,
           "recallAt10": 0.2692307692307692,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.26510003954172134
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 3,
           "recallAt10": 0.11538461538461539,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 10.869299992918968
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 4,
           "recallAt10": 0.15384615384615385,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.257599944248796
         }
       }
     },
@@ -122,28 +134,32 @@
           "uniqueSources": 6,
           "relevantInFinal": 9,
           "recallAt10": 0.24324324324324326,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.00200001522898674
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 7,
           "relevantInFinal": 9,
           "recallAt10": 0.24324324324324326,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.30750001315027475
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 8,
           "recallAt10": 0.21621621621621623,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 10.287599987350404
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 8,
           "recallAt10": 0.21621621621621623,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 8.994099916890264
         }
       }
     },
@@ -157,28 +173,32 @@
           "uniqueSources": 6,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.001900014467537403
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 6,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.24540000595152378
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.361699922010303
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 8,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 8.860199945047498
         }
       }
     },
@@ -192,28 +212,32 @@
           "uniqueSources": 7,
           "relevantInFinal": 7,
           "recallAt10": 0.21212121212121213,
-          "reciprocalRankAt10": 0.3333333333333333
+          "reciprocalRankAt10": 0.3333333333333333,
+          "selectionDurationMs": 0.001900014467537403
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 7,
           "relevantInFinal": 8,
           "recallAt10": 0.24242424242424243,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 0.2391999587416649
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 7,
           "recallAt10": 0.21212121212121213,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 9.774199919775128
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 7,
           "recallAt10": 0.21212121212121213,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 8.924499968998134
         }
       }
     },
@@ -227,28 +251,32 @@
           "uniqueSources": 7,
           "relevantInFinal": 9,
           "recallAt10": 0.3333333333333333,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.001900014467537403
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 8,
           "relevantInFinal": 8,
           "recallAt10": 0.2962962962962963,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.28229993768036366
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 6,
           "recallAt10": 0.2222222222222222,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.548100060783327
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 5,
           "recallAt10": 0.18518518518518517,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 8.984499960206449
         }
       }
     },
@@ -262,28 +290,32 @@
           "uniqueSources": 6,
           "relevantInFinal": 6,
           "recallAt10": 0.2727272727272727,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 0.001900014467537403
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 8,
           "relevantInFinal": 5,
           "recallAt10": 0.22727272727272727,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 0.2706000814214349
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 5,
           "recallAt10": 0.22727272727272727,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 10.681300074793398
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 4,
           "recallAt10": 0.18181818181818182,
-          "reciprocalRankAt10": 0.5
+          "reciprocalRankAt10": 0.5,
+          "selectionDurationMs": 10.224099969491363
         }
       }
     },
@@ -297,28 +329,32 @@
           "uniqueSources": 8,
           "relevantInFinal": 0,
           "recallAt10": 0.0,
-          "reciprocalRankAt10": 0.0
+          "reciprocalRankAt10": 0.0,
+          "selectionDurationMs": 0.00200001522898674
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 8,
           "relevantInFinal": 0,
           "recallAt10": 0.0,
-          "reciprocalRankAt10": 0.0
+          "reciprocalRankAt10": 0.0,
+          "selectionDurationMs": 0.24209998082369566
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 0,
           "recallAt10": 0.0,
-          "reciprocalRankAt10": 0.0
+          "reciprocalRankAt10": 0.0,
+          "selectionDurationMs": 9.82010003644973
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 10,
           "relevantInFinal": 0,
           "recallAt10": 0.0,
-          "reciprocalRankAt10": 0.0
+          "reciprocalRankAt10": 0.0,
+          "selectionDurationMs": 8.915500016883016
         }
       }
     },
@@ -332,28 +368,32 @@
           "uniqueSources": 8,
           "relevantInFinal": 10,
           "recallAt10": 0.25,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.002100015990436077
         },
         "exact_and_semantic": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 10,
           "recallAt10": 0.25,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 0.2511999337002635
         },
         "semantic_768_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 10,
           "recallAt10": 0.25,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.725900017656386
         },
         "exact_and_semantic_and_mmr": {
           "finalCount": 10,
           "uniqueSources": 9,
           "relevantInFinal": 10,
           "recallAt10": 0.25,
-          "reciprocalRankAt10": 1.0
+          "reciprocalRankAt10": 1.0,
+          "selectionDurationMs": 9.071400039829314
         }
       }
     }
@@ -363,26 +403,34 @@
       "avg_final_count": 10.0,
       "avg_unique_sources": 6.6,
       "avg_recall_at_10_silver": 0.2388348138348138,
-      "avg_mrr_at_10_silver": 0.7833333333333333
+      "avg_mrr_at_10_silver": 0.7833333333333333,
+      "selection_p50_ms": 0.00200001522898674,
+      "selection_p95_ms": 0.002209952799603343
     },
     "exact_and_semantic": {
       "avg_final_count": 10.0,
       "avg_unique_sources": 7.4,
       "avg_recall_at_10_silver": 0.2374621124621125,
-      "avg_mrr_at_10_silver": 0.8
+      "avg_mrr_at_10_silver": 0.8,
+      "selection_p50_ms": 0.2601000596769154,
+      "selection_p95_ms": 0.2995800052303821
     },
     "semantic_768_mmr": {
       "avg_final_count": 10.0,
       "avg_unique_sources": 9.7,
       "avg_recall_at_10_silver": 0.187996912996913,
-      "avg_mrr_at_10_silver": 0.8
+      "avg_mrr_at_10_silver": 0.8,
+      "selection_p50_ms": 9.750049968715757,
+      "selection_p95_ms": 10.784700029762462
     },
     "exact_and_semantic_and_mmr": {
       "avg_final_count": 10.0,
       "avg_unique_sources": 9.5,
       "avg_recall_at_10_silver": 0.1835939085939086,
-      "avg_mrr_at_10_silver": 0.8
+      "avg_mrr_at_10_silver": 0.8,
+      "selection_p50_ms": 8.989299938548356,
+      "selection_p95_ms": 9.800514992093666
     }
   },
-  "duration_s": 0.9665184020996094
+  "duration_s": 0.984673261642456
 }

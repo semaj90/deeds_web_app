@@ -194,7 +194,9 @@ def run_query(conn, query_text: str, keywords: list[str]) -> dict:
 
     policies = {}
     for name, fn in policies_fns.items():
+        selection_started = time.perf_counter()
         selected = fn()
+        selection_duration_ms = (time.perf_counter() - selection_started) * 1000.0
         relevant_selected = [r for r in selected if r["silver_relevant"]]
         recall = len(relevant_selected) / silver_relevant_in_pool if silver_relevant_in_pool else None
         rr = 0.0
@@ -208,6 +210,7 @@ def run_query(conn, query_text: str, keywords: list[str]) -> dict:
             "relevantInFinal": len(relevant_selected),
             "recallAt10": recall,
             "reciprocalRankAt10": rr,
+            "selectionDurationMs": selection_duration_ms,
         }
 
     return {"query": query_text, "silverRelevantInPool": silver_relevant_in_pool, "poolSize": len(rows), "policies": policies}
@@ -233,17 +236,20 @@ def main() -> None:
         unique_sources = [r["policies"][policy]["uniqueSources"] for r in results]
         recalls = [r["policies"][policy]["recallAt10"] for r in results if r["policies"][policy]["recallAt10"] is not None]
         rrs = [r["policies"][policy]["reciprocalRankAt10"] for r in results]
+        durations = [r["policies"][policy]["selectionDurationMs"] for r in results]
         summary[policy] = {
             "avg_final_count": float(np.mean(final_counts)),
             "avg_unique_sources": float(np.mean(unique_sources)),
             "avg_recall_at_10_silver": float(np.mean(recalls)) if recalls else None,
             "avg_mrr_at_10_silver": float(np.mean(rrs)),
+            "selection_p50_ms": float(np.percentile(durations, 50)),
+            "selection_p95_ms": float(np.percentile(durations, 95)),
         }
 
     receipt = {
         "schema": "atlas.apples-to-apples-diversity-eval.v1",
         "canonical_authority": False,
-        "note": "Closes the identity-space gap flagged in the earlier MMR challenger result: all four policies run against the SAME codebase_chunk_index pool with the SAME silver-standard relevance labels. semantic_768_mmr is standard MMR (relevance+redundancy both on content_embedding). exact_and_semantic_and_mmr is a first CrossRepresentationDiversityV1 data point (relevance from semantic_768, redundancy from latent_256), built here for the first time per the review's suggested architecture.",
+        "note": "All policies run against the SAME codebase_chunk_index pool with the SAME silver-standard relevance labels. Selection latency measures only in-memory policy selection after the shared database query and embedding step; it is not end-to-end retrieval latency.",
         "pool_k": POOL_K,
         "final_k": FINAL_K,
         "mmr_lambda": MMR_LAMBDA,
