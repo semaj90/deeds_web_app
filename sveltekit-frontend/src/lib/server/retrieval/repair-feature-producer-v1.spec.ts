@@ -172,6 +172,45 @@ describe('Repair candidate feature bundle', () => {
     expect(bundle.matrix.rankingPromotion).toBe(false);
   });
 
+  it('rejects persisted producer-set tampering before matrix construction', () => {
+    const mrl = buildRepairMrlFeatureProducerV1({
+      candidateSnapshotRevision: SHA_A,
+      ordinalMapChecksum: SHA_B,
+      representationRevision: 'semantic-rev-1',
+      queryVector: axis(0),
+      queryRepresentationRevision: 'semantic-rev-1',
+      producerRevision: 'repair-mrl-v1',
+      candidates: [
+        { candidateOrdinal: 0, vector: axis(0), representationRevision: 'semantic-rev-1' },
+        { candidateOrdinal: 1, vector: axis(1), representationRevision: 'semantic-rev-1' },
+      ],
+    });
+    const tampered = {
+      ...mrl.producerSet,
+      overlayRows: mrl.producerSet.overlayRows.map((row) =>
+        row.candidateOrdinal === 0
+          ? { ...row, values: { ...row.values, semantic_mrl_512_query_similarity: 0.123 } }
+          : row,
+      ),
+    };
+    const baseMatrix = buildCandidateFeatureMatrix([
+      { packet_key: 'packet:a' },
+      { packet_key: 'packet:b' },
+    ]);
+
+    expect(() => buildRepairCandidateFeatureBundleV1({
+      matrixInput: {
+        baseMatrix,
+        baseMatrixManifestChecksum: SHA_C,
+        candidateSnapshotRevision: SHA_A,
+        ordinalMapChecksum: SHA_B,
+        producerRevision: 'repair-matrix-v1',
+        identities: identities(),
+      },
+      producerSet: tampered,
+    })).toThrow('REPAIR_BUNDLE_PRODUCER_SET_CHECKSUM_MISMATCH');
+  });
+
   it('rejects a producer set from another candidate snapshot', () => {
     const artifact = buildRepairFeatureProducerArtifactV1({
       featureName: 'postgres_fts_score',
