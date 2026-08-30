@@ -76,6 +76,39 @@ reads/writes `WorkflowActionEventV1` events, not a separate receipt type.
       permanently out of scope because `acp-mcp-telemetry.ts` already covers that surface at a
       finer grain than OpenSpec-change-level receipts are meant for.
 
+## T5 — Tournament EXP / proof-progress projection
+
+- [x] Add a fixed weighted gate denominator in
+      `sveltekit-frontend/src/lib/server/atlas/tournament/parent-atlas-tournament-progress-v1.ts`.
+      Progress is proof-weighted; token/cache/time savings are telemetry and cannot raise the
+      proof percentage.
+- [x] Add fail-closed receipt adapters in
+      `parent-atlas-tournament-receipt-aggregator-v1.ts` for the current structural, lineage,
+      semantic_768, PostgreSQL↔Qdrant parity, Qdrant canary, Go Retrieval stream, and bounded
+      low-rank/Tang-inspired shortlist receipts. Missing or unsupported receipts leave a gate
+      `UNPROVEN`.
+- [x] Preserve canary scope in the score. The current exact 15-row cohort contributes only
+      `15/128` completion to scalable identity/representation/projection gates; it cannot appear
+      as a full-corpus pass.
+- [x] Mount `TournamentExpBar.svelte` through the route-local Parent Atlas admin layout so it is
+      visible above every dashboard tab without rewriting the legacy 32KB page.
+- [x] Add `sveltekit-frontend/scripts/atlas/emit-parent-atlas-tournament-progress-v1.mts` to emit
+      `docs/reports/parent-atlas-tournament-progress-v1.json` from the same receipt aggregator
+      used by the UI.
+- [ ] After T1/T2 are proven, consume `WorkflowActionEventV1`/`receipts.jsonl` directly for the
+      `multi_agent_receipt` gate and run-efficiency counters. Do not create a second agent-run
+      identity schema.
+- [ ] Add measured token/cache/time fields only when the execution owner reports them. Never
+      infer token savings from file counts or cache presence, and never persist KV-cache contents
+      or hidden reasoning; only bounded aggregate counters/checksums are allowed.
+- [ ] Add explicit ACE/BitFrost/Valkey MISS→COMPUTE→HIT/invalidation receipts before those
+      memory gates can advance beyond `UNPROVEN`/`WIRED`.
+- [ ] Add PostgreSQL eligibility/index-plan receipt using result parity plus
+      `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` evidence; bitmap/AIO plan choice is planner telemetry,
+      not application authority.
+- [ ] Add TurboVec only after the indexed Postgres/Qdrant/Go Retrieval baseline is bound to the
+      same CandidateOrdinal snapshot and held-out Recall/NDCG/latency/memory receipt.
+
 ## Open questions (record, don't resolve here)
 
 - Who calls the recorder — is it always the human operator reviewing the task-notification, or
