@@ -66,6 +66,11 @@ export const WorkflowActionEventV1Schema = z.object({
   toolName: z.string().min(1).nullable(),
   mutationRequested: z.boolean(),
   validationRequired: z.boolean(),
+  /** Aggregate telemetry only; never hidden reasoning or KV-cache contents. */
+  tokensUsed: z.number().int().nonnegative().optional(),
+  /** Source/worktree edits are separate provenance from runtime artifact references. */
+  filesEdited: z.array(z.string().trim().min(1)).max(4096).optional(),
+  openspecChange: z.string().trim().min(1).optional(),
   producerRevision: z.string().min(1),
 }).strict();
 export type WorkflowActionEventV1 = z.infer<typeof WorkflowActionEventV1Schema>;
@@ -146,6 +151,9 @@ export function workflowActionFromDagNode(input: {
   lane: WorkflowActionEventV1['lane'];
   transport?: WorkflowActionEventV1['transport'];
   evidenceRefs?: readonly string[];
+  tokensUsed?: number;
+  filesEdited?: readonly string[];
+  openspecChange?: string;
   producerRevision: string;
 }): WorkflowActionEventV1 {
   const dag = validateContextToolDag(input.dag);
@@ -168,6 +176,9 @@ export function workflowActionFromDagNode(input: {
     toolName: node.toolName,
     mutationRequested: node.kind === 'MCP_TOOL_CALL' && !node.readOnly,
     validationRequired: node.requiresValidation,
+    tokensUsed: input.tokensUsed,
+    filesEdited: input.filesEdited ? [...new Set(input.filesEdited)].sort() : undefined,
+    openspecChange: input.openspecChange,
     producerRevision: input.producerRevision,
   });
 }
