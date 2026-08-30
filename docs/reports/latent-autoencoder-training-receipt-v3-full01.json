@@ -1,0 +1,88 @@
+{
+  "schema": "atlas.nested-semantic-autoencoder-training-receipt.v2",
+  "source_semantic_snapshot_revision": "codebase_chunk_index:limit=0:rows=55169",
+  "row_identity_checksum": "f3a0c51dcb3202a55c5df18f6a245e66d65978b79d536569705269e692819668",
+  "config": {
+    "input_dim": 768,
+    "hidden_dim": 384,
+    "latent256_dim": 256,
+    "latent128_dim": 128,
+    "latent64_dim": 64,
+    "reconstruction_256_weight": 1.0,
+    "reconstruction_128_weight": 0.85,
+    "reconstruction_64_weight": 0.7,
+    "cosine_weight": 0.25,
+    "pairwise_weight": 0.1,
+    "seed": 684453
+  },
+  "model_checksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "metrics": {
+    "reconstruction_mse_256": 0.0001123863912653178,
+    "reconstruction_mse_128": 0.00019797070126514882,
+    "reconstruction_mse_64": 0.00028478060266934335,
+    "reconstruction_cosine_256": 0.9568437337875366,
+    "reconstruction_cosine_128": 0.9239793419837952,
+    "reconstruction_cosine_64": 0.8906442523002625,
+    "knn_recall_256": 0.8957093924643952,
+    "knn_recall_128": 0.8571660356949703,
+    "knn_recall_64": 0.7932576167297638
+  },
+  "latent128_is_prefix_of_latent256": true,
+  "latent64_is_prefix_of_latent128": true,
+  "exact_semantic_promotion_required": true,
+  "canonical_authority": false,
+  "producer_revision": "atlas.train-latent-autoencoder.2026-08-29.v1",
+  "training_duration_s": 696.5306856632233,
+  "device": "cuda",
+  "train_rows": 49622,
+  "val_rows": 5547,
+  "checkpoint_path": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+  "seed": 684453,
+  "deterministic_algorithms": true,
+  "require_cuda": true,
+  "training_snapshot": {
+    "schema": "atlas.semantic768-training-snapshot.v1",
+    "orderedRowIdentityChecksum": "f3a0c51dcb3202a55c5df18f6a245e66d65978b79d536569705269e692819668",
+    "semanticMatrixChecksum": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+    "eligibleRowCount": 55169,
+    "embeddingDimension": 768
+  },
+  "split_policy": {
+    "schema": "atlas.source-grouped-split.v1",
+    "splitPolicy": "SOURCE_REF_GROUPED_V1",
+    "splitSeed": 684453,
+    "trainSourceCount": 6543,
+    "validationSourceCount": 726,
+    "trainSourceChecksum": "235600570b1d69dac5a580ad30901cedd6b43c2f6e90d50972e48e09ce623923",
+    "validationSourceChecksum": "32463263855ce4e7d9a509f19c4e7fa533c0a243c8c1a9c1fd53dab3eb3da8d0",
+    "sourceOverlap": 0
+  },
+  "device_info": {
+    "torchVersion": "2.8.0+cu128",
+    "cudaRuntimeVersion": "12.8",
+    "deviceName": "NVIDIA GeForce RTX 3060 Ti",
+    "deviceCapability": [
+      8,
+      6
+    ]
+  },
+  "representations": {
+    "latent_256": {
+      "dimensions": 256,
+      "relationship": "PHYSICAL_BOTTLENECK"
+    },
+    "latent_128": {
+      "dimensions": 128,
+      "relationship": "PREFIX_OF_LATENT_256",
+      "prefixLength": 128,
+      "renormalized": true
+    },
+    "latent_64": {
+      "dimensions": 64,
+      "relationship": "PREFIX_OF_LATENT_128",
+      "prefixLength": 64,
+      "renormalized": true
+    }
+  },
+  "receipt_checksum": "9f2a035ed6cb61a362ab2bdfebf4b22c9c195e4607f9fcff9010969ae042e3b2"
+}
