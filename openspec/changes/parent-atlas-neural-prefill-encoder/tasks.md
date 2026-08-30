@@ -12738,3 +12738,59 @@ fail-closed import guard. Validation currently returns
 incomplete grade coverage, and `importAllowed: false`. The queue cannot become
 a golden corpus until reviewers provide grades 0-3, confidence/reviewer
 metadata, hard negatives, and revision-qualified evidence.
+
+### EmbeddingGemma golden review pool prepared (2026-08-29)
+
+Added `python/prepare_golden_review_pool_v1.py` and prepared
+`.tmp/atlas/golden-relevance-review-pool-v1.ndjson` from 60 deterministic
+queries. Each query has its current top-50 PostgreSQL `semantic_768` pool:
+2,433 candidate judgments total. Every grade remains blank. Structural proxy
+overlap is exposed only as `proxyRelevantHint`, never as a label. The pool is
+bound to the `EmbeddingGemma`/`semantic_768` retrieval contract, while
+`candidateSnapshotRevision` and `ordinalMapChecksum` still require review-time
+binding. Receipt: `docs/reports/golden-relevance-review-pool-v1.json`.
+
+This remains `REVIEW_POOL_PREPARED`; import, reranker training, and production
+activation are prohibited until reviewers add grades 0-3, confidence,
+revision-qualified identities, evidence references, and hard-negative coverage.
+
+### Review-queue identity correction (2026-08-29)
+
+Corrected both review-queue producers so the structural retrieval packet key
+cannot be mistaken for PostgreSQL `evaluation_queries.id`. Items now expose
+`queryPacketKey` and leave `evaluationQueryId` explicitly null until a real
+evaluation-query binding is established. Queues were regenerated and the
+fail-closed validator remains passing as a guard with import still blocked.
+
+### Golden review query binding audit (2026-08-29)
+
+Added `scripts/atlas/audit-golden-review-query-bindings-v1.mjs`. The read-only
+audit found 60 review-pool queries, 52 existing `evaluation_queries` rows, and
+zero exact query-text bindings. The result is `BINDINGS_INCOMPLETE` with
+`importAllowed: false`. The review pool's `queryPacketKey` must not be
+converted into an `evaluation_queries.id`; an explicitly reviewed query record
+or approved external binding is required before judgment import.
+
+### Golden review query registration plan (2026-08-29)
+
+Added `scripts/atlas/plan-golden-review-query-registration-v1.mjs` and
+prepared `.tmp/atlas/golden-review-query-registration-plan-v1.ndjson` with 60
+deterministic proposed query keys. Every `evaluationQueryId`, domain,
+difficulty, revision, and approval field remains null/pending. The receipt is
+`docs/reports/golden-review-query-registration-plan-v1.json`.
+
+This is `REGISTRATION_PLAN_PREPARED`, not a registration: database writes are
+zero and explicit review approval is required before inserting any
+`evaluation_queries` rows.
+
+### Authorized non-production query registration (2026-08-29)
+
+After explicit operator authorization, inserted the 60 proposed review queries
+into `evaluation_queries` with `domain = golden_review_pending`,
+`difficulty = 1`, and no expected count. The transaction committed and an
+independent readback confirmed 60/60 rows. Receipt:
+`docs/reports/golden-review-query-registration-receipt-v1.json`.
+
+No `evaluation_relevance_corrected` judgments were inserted. The rows are
+review scaffolding only; grading, evidence binding, and production ranking
+promotion remain separate gates.

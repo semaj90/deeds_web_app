@@ -22,9 +22,9 @@ const queryIds = new Set();
 for (const [index, row] of rows.entries()) {
   const label = `row ${index + 1}`;
   if (row.schema !== 'atlas.golden-relevance-review-item.v1') errors.push(`${label}: wrong schema`);
-  if (!row.queryId || !row.querySourceRef || !row.queryText) errors.push(`${label}: missing query identity/text`);
-  if (queryIds.has(row.queryId)) errors.push(`${label}: duplicate queryId`);
-  queryIds.add(row.queryId);
+  if (!row.queryPacketKey || !row.querySourceRef || !row.queryText) errors.push(`${label}: missing query packet identity/text`);
+  if (queryIds.has(row.queryPacketKey)) errors.push(`${label}: duplicate queryPacketKey`);
+  queryIds.add(row.queryPacketKey);
   if (!Array.isArray(row.judgments) || row.judgments.length === 0) errors.push(`${label}: no candidate judgments`);
   const packetIds = new Set();
   for (const judgment of row.judgments ?? []) {

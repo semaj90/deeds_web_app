@@ -86,7 +86,8 @@ def main() -> None:
                 records.append({
                     "schema": "atlas.golden-relevance-review-pool-item.v1",
                     "reviewStatus": "PENDING",
-                    "queryId": entry["query_packet_key"],
+                    "queryPacketKey": entry["query_packet_key"],
+                    "evaluationQueryId": None,
                     "querySourceRef": entry["query_source_ref"],
                     "queryText": entry["query_text"],
                     "embeddingModel": EMBED_MODEL,

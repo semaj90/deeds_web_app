@@ -62,7 +62,8 @@ for (const entry of sampled) {
   queue.push({
     schema: 'atlas.golden-relevance-review-item.v1',
     reviewStatus: 'PENDING',
-    queryId: entry.query_packet_key,
+    queryPacketKey: entry.query_packet_key,
+    evaluationQueryId: null,
     querySourceRef: entry.query_source_ref,
     queryText: entry.query_text,
     candidateSource: 'STRUCTURAL_PROXY_IMPORTERS',

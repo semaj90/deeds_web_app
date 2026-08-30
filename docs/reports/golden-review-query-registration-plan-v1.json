@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.golden-review-query-registration-plan-v1",
+  "status": "REGISTRATION_PLAN_PREPARED",
+  "canonicalAuthority": false,
+  "sourceQueue": ".tmp\\atlas\\golden-relevance-review-pool-v1.ndjson",
+  "proposedRows": 60,
+  "assignedEvaluationQueryIds": 0,
+  "databaseWrites": false,
+  "approvalRequired": true,
+  "outputPath": ".tmp\\atlas\\golden-review-query-registration-plan-v1.ndjson",
+  "outputChecksum": "sha256:9ea9220f9da4c76a4e59473c9dc10d85cc29ce7942edd88a263cca5941e7f038",
+  "nextRequiredStep": "Review query text/source identity and explicitly approve registrations before any database insert."
+}

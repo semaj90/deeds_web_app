@@ -1,0 +1,435 @@
+{
+  "schema": "atlas.golden-review-query-binding-audit-v1",
+  "status": "BINDINGS_INCOMPLETE",
+  "canonicalAuthority": false,
+  "queuePath": ".tmp\\atlas\\golden-relevance-review-pool-v1.ndjson",
+  "queueQueryCount": 60,
+  "evaluationQueryCount": 52,
+  "exactTextBindings": 0,
+  "unresolvedBindings": 60,
+  "bindings": [
+    {
+      "queryPacketKey": "458c4b02-0fd9-4914-a451-ab90d4ee7869",
+      "querySourceRef": "src/lib/icons/yorha/IconLawBook.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "2d49b2e7-dcda-44fa-919a-1f9ddb3e0eed",
+      "querySourceRef": "src/lib/server/neo4j-driver.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0239dfc4-6ada-44b6-b4fd-bdf0c1428775",
+      "querySourceRef": "src/lib/server/db/schema/page-artifacts.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "2c5f5077-3223-4956-a6f4-8781320cdad6",
+      "querySourceRef": "src/lib/components/ui/dialog/DialogOverlay.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "d0b637ec-7319-44d2-9338-dcc8c4d40b8b",
+      "querySourceRef": "src/lib/components/ui/card/index.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "23727eea-5397-4a4c-8aa7-9bb5774b710f",
+      "querySourceRef": "src/lib/components/evidence/EvidenceNode.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0ba03784-1099-4d57-ba95-65e2e4c6198d",
+      "querySourceRef": "src/lib/server/tensor/topology-byte-mapper.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0ee4ed41-a49a-4285-bdc7-fac44c77d2f6",
+      "querySourceRef": "src/lib/server/observability/langfuse.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "4692899a-03e1-4077-99c5-feb75de24f71",
+      "querySourceRef": "src/lib/server/streaming/sse-utils.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "03f9aa82-5d0c-48ee-8ed5-e518df546de6",
+      "querySourceRef": "src/lib/components/legal-ai/CitationHighlighter.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "2572e7d6-4b4f-47d4-92e1-52344d78fbac",
+      "querySourceRef": "src/lib/server/retrieval/topology-search-client.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1dc075f5-849d-431c-b137-6d836fe9a4d6",
+      "querySourceRef": "src/lib/server/db/schema-canvas.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0532d8d3-5429-4bfa-ad57-b104bc043480",
+      "querySourceRef": "src/lib/server/gpu/cuda-bridge.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1246580d-193f-442b-bd3d-8b6213d52ebd",
+      "querySourceRef": "src/lib/types/sharedTypes.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "2e5723a7-54c3-4b5f-80aa-b12f3e364ee1",
+      "querySourceRef": "src/lib/server/cache-metrics.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "010b7bf9-cac5-4c01-bc42-3e53f5dfac58",
+      "querySourceRef": "src/lib/server/grpc/embedding-client.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "01e34683-5b59-4ac1-b1df-fcf5306eff25",
+      "querySourceRef": "src/lib/server/legal/constitution-registry.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "018fe48c-044b-46e2-80cc-367f1b2435bc",
+      "querySourceRef": "src/lib/server/ml/topic-clustering-worker.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1d632091-a710-4721-9b73-e97ca1d75b51",
+      "querySourceRef": "src/lib/icons/yorha/IconIntegrityShield.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0a564fef-b7a5-48be-8ca9-83dc938a757d",
+      "querySourceRef": "src/lib/server/ai/token-tracker.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1676ada2-a56a-478c-a53d-252d5d38366e",
+      "querySourceRef": "src/lib/components/ui/input/Input.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1dd40d63-932b-4071-b5e4-1ee4e89b3d59",
+      "querySourceRef": "src/lib/components/yorha/_simulations/YoRHaSystemStatus.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "71689ace-272f-4690-b3cb-7300c8e90e0e",
+      "querySourceRef": "src/lib/components/ui/AdaptiveRenderingEngine.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0ae7c406-7f47-47f8-b2a2-6a05b80e17c0",
+      "querySourceRef": "src/lib/components/ui/Button.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0f8997e4-f32e-41f3-b03e-882353831d8d",
+      "querySourceRef": "src/lib/server/embedding/embed.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1112dd0e-61f2-4d7c-874c-8428886e1144",
+      "querySourceRef": "src/lib/components/ui/dialog/DialogFooter.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "074869bd-9f47-4b3e-94f9-8b94f548ffca",
+      "querySourceRef": "src/lib/gpu/gpu-compute-pipeline.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0091d7f6-a7a0-4d17-8328-94f8d2a697fb",
+      "querySourceRef": "src/lib/server/engagement/idle-reengagement.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "008e3464-9b10-47f2-b186-dcf125159dcf",
+      "querySourceRef": "src/lib/server/legal/constitution-pipeline.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0e8f1e41-d39f-46b2-a18a-bc4ad5e4203f",
+      "querySourceRef": "src/lib/server/nlp/analyzer.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "12f118ba-730e-4824-8d88-8fe8dfeeda0d",
+      "querySourceRef": "src/lib/utils.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0b1ba5f8-6f33-4b87-a45a-336abd267eb8",
+      "querySourceRef": "src/lib/components/yorha/PhoenixEventMonitor.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0e0d4364-1938-4579-ad8a-76fcb76c785b",
+      "querySourceRef": "src/lib/stores/unified/notification-store.svelte.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "34439b6f-0ea7-4ad9-9a87-5d6889066502",
+      "querySourceRef": "src/routes/(app)/codebase-graph/CodebaseGraphCanvas.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "028d25e7-7124-4c90-8523-337dcb26203d",
+      "querySourceRef": "src/lib/components/ui/gaming/types/gaming-types.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "11dd3612-ae75-418e-a50d-a1ec0d29d357",
+      "querySourceRef": "src/lib/server/search/neo4j-rerank.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "3c2e7736-6a40-4557-b82d-d2bcff7110a2",
+      "querySourceRef": "src/lib/components/ui/select/SelectTrigger.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1a8de27d-6320-4e52-9672-6a71b91c7c3d",
+      "querySourceRef": "src/lib/server/utils/ollama-endpoint.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "01f35374-5f90-4e34-b377-e50db424d858",
+      "querySourceRef": "src/lib/server/connections/connection-pool.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "311baa5e-8922-4a29-ad7d-b10991178aff",
+      "querySourceRef": "src/lib/server/db/schema/library-documents.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "475ccb4b-c39b-4263-bf31-ca571a38d46f",
+      "querySourceRef": "src/lib/components/ui/FeedbackButtons.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "070d1e52-05f0-4f49-af41-b1f863e5a52b",
+      "querySourceRef": "src/lib/server/grpc/tool-calling-client.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "033af2fa-2760-47fa-9df2-54923f583247",
+      "querySourceRef": "src/lib/server/validation.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "006ab6ee-5898-4391-ae26-6f58af4070d5",
+      "querySourceRef": "src/lib/server/inference/turbo-prefix-cache.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "1c5d5bbb-15d9-4e44-8899-0418e59cdf22",
+      "querySourceRef": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "00413e6d-0428-4a24-9f65-45503d12dea9",
+      "querySourceRef": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "584ee800-16dc-40d8-be0d-edd571165f59",
+      "querySourceRef": "src/lib/components/ui/avatar/AvatarImage.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "96bb1f0d-5d21-4829-8ec7-21080caa38f9",
+      "querySourceRef": "src/lib/components/ui/ContextMenuItem.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "000700dd-d698-4589-a3b3-62c404909095",
+      "querySourceRef": "src/lib/server/db/schema-postgres.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "16550072-3002-412c-8d54-cdf26d29300e",
+      "querySourceRef": "src/lib/server/security/url-validator.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "20c435bb-e0e0-446d-83a4-6349a960d3b6",
+      "querySourceRef": "src/lib/server/utils/extract-component.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0a1c5e48-0a21-45d0-a1d4-c300c249e7db",
+      "querySourceRef": "src/lib/server/vector-cache.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0b96a071-2949-4d36-bba1-a5096b428a05",
+      "querySourceRef": "src/lib/gpu/shader-registry.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "01213772-a674-4ff7-af2e-539960d52a1d",
+      "querySourceRef": "src/lib/db/schema/ace-web.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "02712cb7-df45-4bd6-a234-e2856d0061cf",
+      "querySourceRef": "src/lib/server/db/warden-schema.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "0228b6ff-0af8-489f-b483-37a58adf7760",
+      "querySourceRef": "src/lib/server/ace/gemma4-codeintel.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "03f67b91-5fd3-4902-9717-c98d3e9b31ff",
+      "querySourceRef": "src/lib/types/enhanced-svelte5-types.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "13a893ff-82f2-42d1-bb5b-03028ef19d60",
+      "querySourceRef": "src/lib/components/ui/gaming/n64/Card.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "07756b0e-b157-4024-805f-a3fbcf221461",
+      "querySourceRef": "src/lib/components/cache/CacheMonitor.svelte",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    },
+    {
+      "queryPacketKey": "01ff6a91-6b7a-496e-9b3c-190aef01aa15",
+      "querySourceRef": "src/lib/server/db/schema/legal-cases.ts",
+      "evaluationQueryId": null,
+      "matchMethod": "UNRESOLVED",
+      "domain": null
+    }
+  ],
+  "databaseWrites": false,
+  "importAllowed": false,
+  "nextRequiredStep": "Create a reviewed evaluation_queries record or an explicitly approved external binding; never infer IDs from packet keys."
+}
