@@ -101,27 +101,49 @@ let fuseIndex: Fuse<ChunkMetadata> | null = null;
 let lastRefresh = 0;
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 
+const SCROLL_PAGE_SIZE = 1000;
+const SCROLL_PAYLOAD_FIELDS = [
+  'path', 'relativePath', 'symbol', 'kind', 'httpMethod', 'routeId', 'tags', 'signature', 'lineStart', 'lineEnd',
+];
+// Bounds the whole paginated refresh, not any single page — a single 10s timeout on one 10k-point
+// scroll call was the actual cause of the boot-time "Failed to refresh metadata cache:
+// TimeoutError" (Qdrant's Scroll API is meant to be paged, not pulled in one shot). Each page
+// gets its own short per-request timeout; this is the ceiling on the whole loop.
+const SCROLL_TOTAL_DEADLINE_MS = 20_000;
+
 export async function refreshMetadataCache(): Promise<void> {
   const now = Date.now();
   if (fuseIndex && now - lastRefresh < REFRESH_INTERVAL) return;
 
   try {
-    const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 10000, with_payload: true, with_vector: false }),
-      signal: AbortSignal.timeout(10_000),
-    });
+    const points: Array<{ payload: Record<string, unknown> }> = [];
+    let offset: string | number | null = null;
+    const deadline = Date.now() + SCROLL_TOTAL_DEADLINE_MS;
 
-    if (!res.ok) {
-      console.warn('[codebase-context] Qdrant scroll failed, using stale cache');
-      return;
-    }
+    do {
+      const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          limit: SCROLL_PAGE_SIZE,
+          offset: offset ?? undefined,
+          with_payload: { include: SCROLL_PAYLOAD_FIELDS },
+          with_vector: false,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
 
-    const data = await res.json();
-    const points = data.result?.points ?? [];
+      if (!res.ok) {
+        console.warn('[codebase-context] Qdrant scroll page failed, using stale cache');
+        return;
+      }
 
-    metadataCache = points.map((p: { payload: Record<string, unknown> }) => ({
+      const data = await res.json();
+      points.push(...(data.result?.points ?? []));
+      offset = data.result?.next_page_offset ?? null;
+    } while (offset != null && Date.now() < deadline);
+
+    metadataCache = points.map((p) => ({
       path: p.payload.path as string,
       relativePath: p.payload.relativePath as string,
       symbol: p.payload.symbol as string,
@@ -737,10 +759,10 @@ export async function searchCodebasePgVector(
       `SELECT id, relative_path, content, symbol, kind,
 			        gpu_cluster, som_cluster, page_rank_score,
 			        line_start, line_end, neo4j_meta,
-			        1 - (content_embedding <=> $1::halfvec) AS cosine_score
+			        1 - (content_embedding_768 <=> $1::vector) AS cosine_score
 			 FROM   codebase_chunk_index
-			 WHERE  content_embedding IS NOT NULL
-			   AND  1 - (content_embedding <=> $1::halfvec) > $2
+			 WHERE  content_embedding_768 IS NOT NULL
+			   AND  1 - (content_embedding_768 <=> $1::vector) > $2
 			 ORDER  BY cosine_score DESC
 			 LIMIT  $3`,
       [JSON.stringify(queryEmbedding), minScore, limit]
