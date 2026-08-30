@@ -12589,3 +12589,32 @@ requires a human-labeled golden query set that does not exist in this repo. Buil
 legitimately is real, separate work for a future session, not something to approximate further
 here. Until then, this remains correctly classified as a credible shadow-production candidate,
 not a promoted one.
+
+### MMR-LAMBDA-SWEEP-01, corrected and finalized (2026-08-29): verdict NO
+
+Terminology corrected per review: `lambda` renamed to `mmrRelevanceWeight` throughout, to avoid
+colliding with LambdaMART/LambdaRank's unrelated gradient-construction "lambda" (a future,
+gold-set-gated, explicitly not-yet-started concern). `python/benchmark_mmr_relevance_weight_sweep.py`
+fills the earlier coarse sweep's gap with the fine-grained grid `{0.50, 0.60, 0.70, 0.75, 0.80,
+0.85, 0.90, 0.95, 1.00}` — the exact range the review flagged as the interesting zone — and adds
+`duplicateRateAt10` (a `latent_256`-cosine redundancy measure, independent of the silver labels)
+plus an explicit Pareto dominance verdict (`recall@10 >= baseline*0.99` AND
+`uniqueSources > latent_256's 7.4`). Receipt: `docs/reports/mmr-relevance-weight-sweep-v1.json`.
+
+**Verdict: NO.** No swept `mmrRelevanceWeight` both clears the recall tolerance and beats
+`latent_256`'s diversity. Closest approach — `weight=0.95` — matches `latent_256`'s diversity
+*exactly* (7.4 unique sources) but recall (0.2343) falls just short of the tolerance bar
+(0.2364), landing at ~98.1% of baseline vs. the 99% allowed. `weight=1.0` trivially clears the
+recall bar (it reduces to baseline) but has zero diversity gain. Cross-validation finding: at
+`weight=0.95`, `avg_duplicate_rate_at_10=0.18` — 18% of MMR's own results still contain a
+`latent_256`-detectable near-duplicate despite MMR operating purely in `semantic_768` space,
+unaware of `latent_256` — the two representations' redundancy signals correlate but aren't
+identical.
+
+**Per the review's own decision tree, this settles cleanly**: "NO → `latent_256` represents a
+genuinely useful conservative operating point [not reachable by tuning MMR alone]." That is now
+a fully quantified, not hand-wavy, conclusion. `LATENT-DIVERSITY-02`/`MMR-LAMBDA-SWEEP-01` are
+both closed on everything reachable without a human-labeled golden set. `LAMBDAMART-RANK-01`
+(learned relevance ranking via XGBoost `rank:ndcg`, over the existing `CandidateFeatureMatrix`
+work) is the correctly-sequenced next experiment — explicitly gated on that golden set, and
+explicitly not started here.
