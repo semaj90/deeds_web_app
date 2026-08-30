@@ -31,6 +31,7 @@
     "./core/openspec-repository-ingestion": "./dist/core/openspec-repository-ingestion.js",
     "./core/openspec-materialization-pipeline": "./dist/core/openspec-materialization-pipeline.js",
     "./core/workflow-action-event": "./dist/core/workflow-action-event.js",
+    "./core/jetstream-workflow-envelope-v1": "./dist/core/jetstream-workflow-envelope-v1.js",
     "./core/workflow-action-adapters": "./dist/core/workflow-action-adapters.js",
     "./core/schema-object-registry": "./dist/core/schema-object-registry.js",
     "./core/postgres-schema-introspector": "./dist/core/postgres-schema-introspector.js",

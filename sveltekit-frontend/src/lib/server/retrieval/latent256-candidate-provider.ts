@@ -31,16 +31,11 @@ import { db, pgRows } from '$lib/server/db/client';
 export const LATENT_256_DIM = 256;
 
 export interface Latent256HydrateInput {
-  /** Candidate identities to hydrate. In the current codebase_chunk_index scope, these are the
-   * table's `id` column values as strings. */
-  packetKeys: readonly string[];
-  /** Caller-supplied snapshot identity, recorded into the receipt for traceability. Not
-   * independently verified against a live source of truth -- no such tracked revision exists
-   * for codebase_chunk_index yet. Pass a stable value (e.g. the request id) if you have nothing
-   * more specific. */
+  /** codebase_chunk_index.id values, deliberately distinct from Atlas packetKey. */
+  candidateIds: readonly string[];
+  /** Explicit caller-supplied snapshot identity. */
   candidateSnapshotRevision: string;
-  /** Caller-supplied representation family identity, recorded into the receipt. Same caveat as
-   * candidateSnapshotRevision -- informational, not independently verified. */
+  /** Explicit derived-representation identity. */
   representationRevision: string;
   /** The ONLY revision actually checked against live data: rows whose
    * latent_256_checkpoint_revision does not equal this value are excluded from `vectors` and
@@ -59,6 +54,7 @@ export interface Latent256HydrateResult {
    * `revisionMismatch` (row exists, wrong checkpoint) so a caller can tell the three failure
    * modes apart in an audit trail. */
   invalidShape: number;
+  vectorsChecksum: string;
   receiptChecksum: string;
 }
 
@@ -82,20 +78,35 @@ function parseHalfvec(value: string): number[] {
 }
 
 function computeReceiptChecksum(input: {
-  packetKeys: readonly string[];
+  candidateIds: readonly string[];
+  candidateSnapshotRevision: string;
+  representationRevision: string;
   checkpointRevision: string;
+  vectorsChecksum: string;
   found: number;
   missing: number;
   revisionMismatch: number;
   invalidShape: number;
 }): string {
   const digest = createHash('sha256');
+  digest.update(input.candidateSnapshotRevision);
+  digest.update(input.representationRevision);
   digest.update(input.checkpointRevision);
+  digest.update(input.vectorsChecksum);
   digest.update(String(input.found));
   digest.update(String(input.missing));
   digest.update(String(input.revisionMismatch));
   digest.update(String(input.invalidShape));
-  for (const key of [...input.packetKeys].sort()) digest.update(key);
+  for (const key of [...input.candidateIds].sort()) digest.update(key);
+  return digest.digest('hex');
+}
+
+function computeVectorsChecksum(vectors: ReadonlyMap<string, readonly number[]>): string {
+  const digest = createHash('sha256');
+  for (const [candidateId, vector] of [...vectors.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    digest.update(candidateId);
+    digest.update(Buffer.from(new Float32Array(vector).buffer));
+  }
   return digest.digest('hex');
 }
 
@@ -106,8 +117,8 @@ function computeReceiptChecksum(input: {
  * of the same interface is a later optimization, not required for correctness. */
 export class PostgresLatent256CandidateProvider implements Latent256CandidateProviderV1 {
   async hydrate(input: Latent256HydrateInput): Promise<Latent256HydrateResult> {
-    const { packetKeys, checkpointRevision } = input;
-    const requested = packetKeys.length;
+    const { candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision } = input;
+    const requested = candidateIds.length;
 
     if (requested === 0) {
       return {
@@ -117,9 +128,8 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
         missing: 0,
         revisionMismatch: 0,
         invalidShape: 0,
-        receiptChecksum: computeReceiptChecksum({
-          packetKeys, checkpointRevision, found: 0, missing: 0, revisionMismatch: 0, invalidShape: 0,
-        }),
+        vectorsChecksum: computeVectorsChecksum(new Map()),
+        receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum: computeVectorsChecksum(new Map()), found: 0, missing: 0, revisionMismatch: 0, invalidShape: 0 }),
       };
     }
 
@@ -132,7 +142,7 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
     const rawResult = await db.execute(sql`
       SELECT id::text AS id, latent_256::text AS latent_256, latent_256_checkpoint_revision
       FROM codebase_chunk_index
-      WHERE id = ANY(${sql`ARRAY[${sql.join(packetKeys.map(k => sql`${k}::uuid`), sql`, `)}]`})
+      WHERE id = ANY(${sql`ARRAY[${sql.join(candidateIds.map(k => sql`${k}::uuid`), sql`, `)}]`})
     `);
     const rows = pgRows<Row>(rawResult);
 
@@ -146,7 +156,7 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
     let revisionMismatch = 0;
     let invalidShape = 0;
 
-    for (const key of packetKeys) {
+    for (const key of candidateIds) {
       const row = rowByKey.get(key);
       if (!row || row.latent_256 == null) continue; // counted in `missing` below
 
@@ -167,6 +177,7 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
 
     const missing = requested - found - revisionMismatch - invalidShape;
 
+    const vectorsChecksum = computeVectorsChecksum(vectors);
     return {
       vectors,
       requested,
@@ -174,9 +185,8 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
       missing,
       revisionMismatch,
       invalidShape,
-      receiptChecksum: computeReceiptChecksum({
-        packetKeys, checkpointRevision, found, missing, revisionMismatch, invalidShape,
-      }),
+      vectorsChecksum,
+      receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum, found, missing, revisionMismatch, invalidShape }),
     };
   }
 }

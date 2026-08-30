@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
@@ -27,6 +28,28 @@ def post(path: str, body: dict) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+def artifact_checksum(manifest: dict) -> str:
+    identity = {
+        "graphRevision": manifest.get("graphRevision"),
+        "projectionRevision": manifest.get("projectionRevision"),
+        "nodeCount": manifest.get("nodeCount"),
+        "edgeCount": manifest.get("edgeCount"),
+        "nodeTableHash": manifest.get("nodeTableHash"),
+        "edgeTableHash": manifest.get("edgeTableHash"),
+    }
+    encoded = json.dumps(identity, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    return str(manifest.get("artifactChecksum") or hashlib.sha256(encoded).hexdigest())
+
+
+def parameter_checksum(alpha: float, tol: float, max_iter: int) -> str:
+    encoded = json.dumps(
+        {"alpha": float(alpha), "tol": float(tol), "maxIter": int(max_iter)},
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def main() -> None:
     manifest = json.loads((ARTIFACT / "manifest.json").read_text(encoding="utf-8"))
     nodes = json.loads((ARTIFACT / "nodes.json").read_text(encoding="utf-8"))["rows"]
@@ -37,14 +60,24 @@ def main() -> None:
         "artifactDir": "/mnt/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/reports/current-structural-graph-artifact-v1",
         "expectedGraphRevision": manifest["graphRevision"],
         "expectedProjectionRevision": manifest["projectionRevision"],
+        "expectedArtifactChecksum": artifact_checksum(manifest),
+        "expectedGraphOrdinalMapChecksum": manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum"),
+        "expectedWorkspaceRevision": manifest.get("workspaceRevision"),
+        "expectedCandidateSnapshotRevision": manifest.get("candidateSnapshotRevision"),
         "replaceResident": True,
     })
+    pagerank_parameter_checksum = parameter_checksum(0.85, 1e-6, 100)
     result = post("/v1/graph/pagerank", {
         "graphRevision": manifest["graphRevision"],
         "topK": len(nodes),
         "alpha": 0.85,
         "tol": 1e-6,
         "maxIter": 100,
+        "expectedArtifactChecksum": artifact_checksum(manifest),
+        "expectedGraphOrdinalMapChecksum": manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum"),
+        "candidateSnapshotRevision": manifest.get("candidateSnapshotRevision"),
+        "parameterManifestId": "atlas:pagerank:inline:v1",
+        "parameterChecksum": pagerank_parameter_checksum,
     })
     score_by_ordinal = {
         int(row.get("gpuNodeId", row.get("nodeId", row.get("id")))): float(row.get("score", row.get("pagerank")))

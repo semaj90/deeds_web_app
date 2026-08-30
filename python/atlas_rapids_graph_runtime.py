@@ -59,6 +59,10 @@ class GraphLoadRequest(BaseModel):
     artifactDir: str
     expectedGraphRevision: str | None = None
     expectedProjectionRevision: str | None = None
+    expectedArtifactChecksum: str | None = None
+    expectedGraphOrdinalMapChecksum: str | None = None
+    expectedWorkspaceRevision: str | None = None
+    expectedCandidateSnapshotRevision: str | None = None
     replaceResident: bool = False
 
 
@@ -76,6 +80,11 @@ class PageRankRequest(BaseModel):
     tol: float = _DEFAULT_TOL
     maxIter: int = _DEFAULT_MAX_ITER
     deadlineMs: int | None = None
+    expectedArtifactChecksum: str | None = None
+    expectedGraphOrdinalMapChecksum: str | None = None
+    candidateSnapshotRevision: str | None = None
+    parameterManifestId: str | None = None
+    parameterChecksum: str | None = None
 
 
 def normalize_seed_pairs(seeds: list[tuple[str, float]]) -> list[tuple[str, float]]:
@@ -112,6 +121,15 @@ def seed_checksum(seeds: list[tuple[str, float]]) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def parameter_checksum(alpha: float, tol: float, max_iter: int) -> str:
+    payload = json.dumps(
+        {"alpha": float(alpha), "tol": float(tol), "maxIter": int(max_iter)},
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 class ResidentGraph:
     def __init__(self, artifact_dir: Path, manifest: dict[str, Any]) -> None:
         if cudf is None or cugraph is None:
@@ -123,6 +141,20 @@ class ResidentGraph:
         self.node_table_hash = str(manifest["nodeTableHash"])
         self.edge_table_hash = str(manifest["edgeTableHash"])
         self.producer_revision = str(manifest.get("producerRevision") or "unknown")
+        self.workspace_revision = manifest.get("workspaceRevision")
+        self.candidate_snapshot_revision = manifest.get("candidateSnapshotRevision")
+        self.graph_ordinal_map_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
+        artifact_identity = {
+            "graphRevision": self.graph_revision,
+            "projectionRevision": self.projection_revision,
+            "nodeCount": manifest.get("nodeCount"),
+            "edgeCount": manifest.get("edgeCount"),
+            "nodeTableHash": self.node_table_hash,
+            "edgeTableHash": self.edge_table_hash,
+        }
+        self.artifact_checksum = str(manifest.get("artifactChecksum") or hashlib.sha256(
+            json.dumps(artifact_identity, separators=(",", ":"), sort_keys=True).encode("utf-8")
+        ).hexdigest())
         self.loaded_at = time.time()
 
         nodes_path = artifact_dir / "nodes.parquet"
@@ -239,6 +271,12 @@ class ResidentGraph:
             raise ValueError("PageRank requires at least one edge")
         if req.graphRevision != self.graph_revision:
             raise LookupError(f"resident revision {self.graph_revision} != requested {req.graphRevision}")
+        if req.expectedArtifactChecksum and req.expectedArtifactChecksum != self.artifact_checksum:
+            raise LookupError("artifact checksum does not match resident graph")
+        if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != self.graph_ordinal_map_checksum:
+            raise LookupError("graph ordinal map checksum does not match resident graph")
+        if req.candidateSnapshotRevision and req.candidateSnapshotRevision != self.candidate_snapshot_revision:
+            raise LookupError("candidate snapshot revision does not match resident graph")
         if not (0.0 < req.alpha < 1.0):
             raise ValueError("alpha must be > 0 and < 1")
         if not math.isfinite(req.tol) or req.tol <= 0:
@@ -249,6 +287,11 @@ class ResidentGraph:
             raise ValueError(f"topK must be in [1, {_MAX_RESULT_NODES}]")
         if req.deadlineMs is not None and req.deadlineMs <= 0:
             raise TimeoutError("deadlineMs must be positive")
+        if bool(req.parameterManifestId) != bool(req.parameterChecksum):
+            raise ValueError("parameterManifestId and parameterChecksum must be supplied together")
+        computed_parameter_checksum = parameter_checksum(req.alpha, req.tol, req.maxIter)
+        if req.parameterChecksum and req.parameterChecksum != computed_parameter_checksum:
+            raise ValueError("parameter checksum does not match PageRank parameters")
 
         normalized_seeds = normalize_seed_pairs([(seed.nodeKey, seed.weight) for seed in req.seeds])
         seed_ids = self.resolve_node_keys([node_key for node_key, _ in normalized_seeds], "seed") if normalized_seeds else []
@@ -319,6 +362,10 @@ class ResidentGraph:
             "algorithmRevision": _ALGORITHM_REVISION,
             "graphRevision": self.graph_revision,
             "projectionRevision": self.projection_revision,
+            "artifactChecksum": self.artifact_checksum,
+            "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
+            "workspaceRevision": self.workspace_revision,
+            "candidateSnapshotRevision": self.candidate_snapshot_revision,
             "nodeTableHash": self.node_table_hash,
             "edgeTableHash": self.edge_table_hash,
             "seedChecksum": checksum,
@@ -327,6 +374,8 @@ class ResidentGraph:
             "alpha": float(req.alpha),
             "tol": float(req.tol),
             "maxIter": int(req.maxIter),
+            "parameterManifestId": req.parameterManifestId,
+            "parameterChecksum": computed_parameter_checksum,
             "didConverge": True,
             "precomputedOutWeight": True,
             "cacheHit": cache_hit,
@@ -399,6 +448,26 @@ class GraphRuntimeManager:
             _fail("GRAPH_REVISION_MISMATCH", f"manifest {graph_revision} != expected {req.expectedGraphRevision}")
         if req.expectedProjectionRevision and req.expectedProjectionRevision != projection_revision:
             _fail("PROJECTION_REVISION_MISMATCH", f"manifest {projection_revision} != expected {req.expectedProjectionRevision}")
+        resident_artifact_identity = {
+            "graphRevision": graph_revision,
+            "projectionRevision": projection_revision,
+            "nodeCount": manifest.get("nodeCount"),
+            "edgeCount": manifest.get("edgeCount"),
+            "nodeTableHash": manifest.get("nodeTableHash"),
+            "edgeTableHash": manifest.get("edgeTableHash"),
+        }
+        artifact_checksum = str(manifest.get("artifactChecksum") or hashlib.sha256(
+            json.dumps(resident_artifact_identity, separators=(",", ":"), sort_keys=True).encode("utf-8")
+        ).hexdigest())
+        if req.expectedArtifactChecksum and req.expectedArtifactChecksum != artifact_checksum:
+            _fail("ARTIFACT_CHECKSUM_MISMATCH", f"manifest {artifact_checksum} != expected {req.expectedArtifactChecksum}")
+        ordinal_checksum = manifest.get("ordinalMapChecksum") or manifest.get("graphOrdinalMapChecksum")
+        if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != ordinal_checksum:
+            _fail("GRAPH_ORDINAL_MAP_CHECKSUM_MISMATCH", "graph ordinal map checksum does not match resident manifest")
+        if req.expectedWorkspaceRevision and req.expectedWorkspaceRevision != manifest.get("workspaceRevision"):
+            _fail("WORKSPACE_REVISION_MISMATCH", "workspace revision does not match resident manifest")
+        if req.expectedCandidateSnapshotRevision and req.expectedCandidateSnapshotRevision != manifest.get("candidateSnapshotRevision"):
+            _fail("CANDIDATE_SNAPSHOT_REVISION_MISMATCH", "candidate snapshot revision does not match resident manifest")
 
         with self._lock:
             if self._resident is not None and self._resident.graph_revision == graph_revision:
@@ -429,6 +498,10 @@ class GraphRuntimeManager:
                 "reused": False,
                 "graphRevision": resident.graph_revision,
                 "projectionRevision": resident.projection_revision,
+                "artifactChecksum": resident.artifact_checksum,
+                "graphOrdinalMapChecksum": resident.graph_ordinal_map_checksum,
+                "workspaceRevision": resident.workspace_revision,
+                "candidateSnapshotRevision": resident.candidate_snapshot_revision,
                 "nodeTableHash": resident.node_table_hash,
                 "edgeTableHash": resident.edge_table_hash,
                 "nodeCount": resident.node_count,

@@ -13,8 +13,9 @@ type AceEnvelopeInput = {
   used_concepts?: string[];
 };
 
-function evidenceId(kind: string, sourceRef: string, value: string): string {
-  const digest = createHash('sha256').update(`${kind}\0${sourceRef}\0${value}`).digest('hex').slice(0, 24);
+function evidenceId(kind: string, row: AceEnvelopeInput, value: string): string {
+  const extractorRevision = row.extraction_method ?? 'ace-packet-assembly:unknown';
+  const digest = createHash('sha256').update(`${kind}\0${row.source_ref}\0${row.source_revision}\0${extractorRevision}\0${value.trim()}`).digest('hex').slice(0, 24);
   return `ace:${kind.toLowerCase()}:${digest}`;
 }
 
@@ -24,7 +25,7 @@ function item(
   value: string,
 ): FanoutEvidenceItemV1 {
   return {
-    evidenceId: evidenceId(kind, row.source_ref, value),
+    evidenceId: evidenceId(kind, row, value),
     kind,
     sourceRef: row.source_ref,
     sourceRevision: row.source_revision,
@@ -44,7 +45,7 @@ export function aceEnvelopeToFanoutCandidate(
     ...(row.lexical_nouns ?? []).map((value) => ['LEXICAL' as const, value]),
     ...(row.lexical_verbs ?? []).map((value) => ['LEXICAL' as const, value]),
     ...(row.lexical_adverbs_ly ?? []).map((value) => ['LEXICAL' as const, value]),
-    ...(row.used_concepts ?? []).map((value) => ['ONTOLOGY' as const, value]),
+    ...(row.used_concepts ?? []).map((value) => ['CONCEPT_HINT' as const, value]),
   ];
   const evidence = values
     .filter(([, value]) => value.trim().length > 0)

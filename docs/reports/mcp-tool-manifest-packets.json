@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-16T16:09:50.545Z",
+  "generated_at": "2026-08-30T02:18:00.491Z",
   "dry_run": true,
-  "total_tools": 190,
+  "total_tools": 206,
   "by_domain": {
-    "rag_retrieval": 62,
+    "rag_retrieval": 65,
     "neo4j_context_graph": 14,
-    "mcp_agents": 84,
+    "mcp_agents": 96,
     "admin_observability": 2,
     "case_management": 6,
     "evidence_upload_storage": 6,
     "citation_engine": 1,
     "legal_reports": 6,
     "gpu_turbovec_libtorch": 4,
-    "redis_bitfrost_cache": 1,
+    "redis_bitfrost_cache": 2,
     "qdrant_vector_index": 4
   },
   "by_packet_kind": {
-    "tool_manifest": 116,
+    "tool_manifest": 132,
     "rpc_method": 74
   },
-  "description_pct": 95.8,
+  "description_pct": 91.7,
   "ontology_pct": 100,
   "postgres_inserted": 0,
   "qdrant_upserted": 0,
@@ -73,6 +73,19 @@
       "description": "Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks "
     },
     {
+      "packet_key": "890ee5a4d14fa589",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#ops__search_tools",
+      "tool_name": "ops.search_tools",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "reranking"
+      ],
+      "description": "Search the bounded tool catalog and return a compact always-include + recent + ranked subset. Use th"
+    },
+    {
       "packet_key": "363ce8194f9a4a29",
       "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#codebase__rg_search",
       "tool_name": "codebase.rg_search",
@@ -108,18 +121,6 @@
         "retrieval"
       ],
       "description": "Find the shortest dependency path between two files or symbols in Neo4j."
-    },
-    {
-      "packet_key": "8da50389eff06d73",
-      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__community_for_node",
-      "tool_name": "graph.community_for_node",
-      "domain": "neo4j_context_graph",
-      "ontology": [
-        "graph",
-        "neo4j",
-        "relationship"
-      ],
-      "description": "Get the GPU cluster, SOM cluster, and community membership for a node."
     }
   ],
   "sample_rpc_packets": [
@@ -229,6 +230,33 @@
       "transport": "mcp+llama",
       "file": "src/lib/server/ai/llama-tool-definitions.ts",
       "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "ops.search_tools",
+      "llama_name": "ops__search_tools",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "reranking"
+      ],
+      "description": "Search the bounded tool catalog and return a compact always-include + recent + ranked subset. Use this to avoid flooding the context window with every available tool.",
+      "examples": [
+        "use ops  search tools to search the bounded tool catalog and return a compact always-include + recent + ranked subset"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#ops__search_tools",
       "packet_kind": "tool_manifest"
     },
     {
@@ -1453,6 +1481,30 @@
       "packet_kind": "tool_manifest"
     },
     {
+      "tool_name": "schema-dependents:find",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Find all files/functions that depend on a database table. Returns Neo4j USES_DB edges (source_ref, operation, line_num) joined with Postgres packet metadata (packet_key, feature_id, feature_label, tree_node_id). Includes risk classification (high/medium/low) and migration impact assessment. Non-blocking: handles missing Neo4j/Postgres gracefully with degraded response.",
+      "examples": [
+        "use schema-dependents find to find all files/functions that depend on a database table"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#schema-dependents:find",
+      "packet_kind": "tool_manifest"
+    },
+    {
       "tool_name": "codebase:search",
       "llama_name": null,
       "domain": "rag_retrieval",
@@ -1503,6 +1555,79 @@
       "transport": "mcp",
       "file": "src/mcp/server.ts",
       "source_ref": "src/mcp/server.ts#codebase:ace_context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "phase18_reranker",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "reranking"
+      ],
+      "description": "",
+      "examples": [
+        "use phase18 reranker to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#phase18_reranker",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "atlas.identity_audit",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Validate packet_key, source_ref, content_hash parity across Postgres, Qdrant, Neo4j, and Redis.",
+      "examples": [
+        "use atlas.identity audit to validate packet_key, source_ref, content_hash parity across postgres, qdrant, neo4j, and redis"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#atlas.identity_audit",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "atlas.cross_store_proof",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Generate a gate-ready proof report for ATLAS_CROSS_STORE_IDENTITY_PROVEN validation.",
+      "examples": [
+        "use atlas.cross store proof to generate a gate-ready proof report for atlas_cross_store_identity_proven validation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#atlas.cross_store_proof",
       "packet_kind": "tool_manifest"
     },
     {
@@ -2602,6 +2727,30 @@
       "packet_kind": "tool_manifest"
     },
     {
+      "tool_name": "neo4j",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "",
+      "examples": [
+        "use neo4j to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#neo4j",
+      "packet_kind": "tool_manifest"
+    },
+    {
       "tool_name": "redis",
       "llama_name": null,
       "domain": "redis_bitfrost_cache",
@@ -2626,7 +2775,7 @@
       "packet_kind": "tool_manifest"
     },
     {
-      "tool_name": "summary",
+      "tool_name": "gemma4-opencode",
       "llama_name": null,
       "domain": "mcp_agents",
       "ontology": [
@@ -2636,7 +2785,7 @@
       ],
       "description": "",
       "examples": [
-        "use summary to perform the operation"
+        "use gemma4-opencode to perform the operation"
       ],
       "requires": [],
       "returns": null,
@@ -2646,55 +2795,7 @@
       "output_type": null,
       "transport": "mcp",
       "file": "src/mcp/trace-mcp-server.ts",
-      "source_ref": "src/mcp/trace-mcp-server.ts#summary",
-      "packet_kind": "tool_manifest"
-    },
-    {
-      "tool_name": "narrative",
-      "llama_name": null,
-      "domain": "mcp_agents",
-      "ontology": [
-        "mcp",
-        "agent",
-        "tooling"
-      ],
-      "description": "",
-      "examples": [
-        "use narrative to perform the operation"
-      ],
-      "requires": [],
-      "returns": null,
-      "service": null,
-      "method": null,
-      "input_type": null,
-      "output_type": null,
-      "transport": "mcp",
-      "file": "src/mcp/trace-mcp-server.ts",
-      "source_ref": "src/mcp/trace-mcp-server.ts#narrative",
-      "packet_kind": "tool_manifest"
-    },
-    {
-      "tool_name": "neo4j",
-      "llama_name": null,
-      "domain": "neo4j_context_graph",
-      "ontology": [
-        "graph",
-        "neo4j",
-        "relationship"
-      ],
-      "description": "",
-      "examples": [
-        "use neo4j to perform the operation"
-      ],
-      "requires": [],
-      "returns": null,
-      "service": null,
-      "method": null,
-      "input_type": null,
-      "output_type": null,
-      "transport": "mcp",
-      "file": "src/mcp/trace-mcp-server.ts",
-      "source_ref": "src/mcp/trace-mcp-server.ts#neo4j",
+      "source_ref": "src/mcp/trace-mcp-server.ts#gemma4-opencode",
       "packet_kind": "tool_manifest"
     },
     {
@@ -2722,7 +2823,7 @@
       "packet_kind": "tool_manifest"
     },
     {
-      "tool_name": "content",
+      "tool_name": "operator_token",
       "llama_name": null,
       "domain": "mcp_agents",
       "ontology": [
@@ -2732,7 +2833,7 @@
       ],
       "description": "",
       "examples": [
-        "use content to perform the operation"
+        "use operator token to perform the operation"
       ],
       "requires": [],
       "returns": null,
@@ -2742,7 +2843,199 @@
       "output_type": null,
       "transport": "mcp",
       "file": "src/mcp/trace-mcp-server.ts",
-      "source_ref": "src/mcp/trace-mcp-server.ts#content",
+      "source_ref": "src/mcp/trace-mcp-server.ts#operator_token",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "dir_path",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use dir path to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#dir_path",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "section",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use section to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#section",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "redis_only",
+      "llama_name": null,
+      "domain": "redis_bitfrost_cache",
+      "ontology": [
+        "cache",
+        "redis",
+        "temporal"
+      ],
+      "description": "",
+      "examples": [
+        "use redis only to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#redis_only",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "file_path",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use file path to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#file_path",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "issue",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use issue to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#issue",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "context_lines",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use context lines to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#context_lines",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "outcome",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use outcome to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#outcome",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "notes",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use notes to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#notes",
       "packet_kind": "tool_manifest"
     },
     {
@@ -2767,6 +3060,106 @@
       "transport": "mcp",
       "file": "src/mcp/trace-mcp-server.ts",
       "source_ref": "src/mcp/trace-mcp-server.ts#kb.hybrid_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "content",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use content to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#content",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "clusters.som_cell_lookup",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "retrieval",
+        "graph"
+      ],
+      "description": "Look up packets in a 20×20 SOM grid cell and its Moore-neighborhood (adjacent 8 cells). Returns packet_key, source_ref, feature_id, authority scores and SOM coordinates. Use to find topically-related code by spatial grid proximity.",
+      "examples": [
+        "use clusters.som cell lookup to look up packets in a 20×20 som grid cell and its moore-neighborhood (adjacent 8 cells)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/cluster-lenses.tool.ts",
+      "source_ref": "src/mcp/tools/cluster-lenses.tool.ts#clusters.som_cell_lookup",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "clusters.kmeans_members",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "graph"
+      ],
+      "description": "List packets belonging to one or more K-means clusters (cluster IDs 0–19). Returns source refs, authority scores, and SOM grid positions. Useful for understanding the semantic neighborhood of a cluster before drilling into individual packets.",
+      "examples": [
+        "use clusters.kmeans members to list packets belonging to one or more k-means clusters (cluster ids 0–19)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/cluster-lenses.tool.ts",
+      "source_ref": "src/mcp/tools/cluster-lenses.tool.ts#clusters.kmeans_members",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "ldr_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "legal"
+      ],
+      "description": "Execute Local Deep Research - autonomous web search, document extraction, and synthesis for legal queries. Returns synthesized answer with web sources.",
+      "examples": [
+        "use ldr research to execute local deep research - autonomous web search, document extraction, and synthesis for legal queries"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/ldr-research.ts",
+      "source_ref": "src/mcp/tools/ldr-research.ts#ldr_research",
       "packet_kind": "tool_manifest"
     },
     {
@@ -2803,9 +3196,9 @@
         "tooling",
         "reranking"
       ],
-      "description": "Rerank chunks after retrieval using MarcoReranker logic.",
+      "description": "Rerank chunks after retrieval using canonical packet-envelope signals (AST, LangExtract, Qdrant, source_ref, title_id, feature_id).",
       "examples": [
-        "use marco rerank chunks to rerank chunks after retrieval using marcoreranker logic"
+        "use marco rerank chunks to rerank chunks after retrieval using canonical packet-envelope signals (ast, langextract, qdrant, source_ref, title_id, feature_id)"
       ],
       "requires": [],
       "returns": null,
@@ -4211,7 +4604,8 @@
         "kinds",
         "http_method",
         "path_prefixes",
-        "include_debug"
+        "include_debug",
+        "packet_keys"
       ],
       "returns": [
         "chunks",
@@ -4248,7 +4642,8 @@
         "kinds",
         "http_method",
         "path_prefixes",
-        "include_debug"
+        "include_debug",
+        "packet_keys"
       ],
       "returns": [
         "chunk",

@@ -5,7 +5,7 @@ const RevisionSchema = z.string().min(1);
 
 export const FanoutEvidenceItemV1Schema = z.object({
   evidenceId: z.string().min(1),
-  kind: z.enum(['LEXICAL', 'SEMANTIC', 'STRUCTURAL', 'COMPILER', 'ONTOLOGY', 'MULTIHOP', 'TOPOLOGY']),
+  kind: z.enum(['LEXICAL', 'CONCEPT_HINT', 'DOMAIN_HINT', 'SEMANTIC', 'STRUCTURAL', 'COMPILER', 'ONTOLOGY', 'MULTIHOP', 'TOPOLOGY']),
   sourceRef: z.string().min(1),
   sourceRevision: RevisionSchema,
   extractorRevision: RevisionSchema,

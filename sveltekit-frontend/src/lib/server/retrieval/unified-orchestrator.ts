@@ -37,6 +37,8 @@ import {
   batchResolveParentAtlasContext,
   type ParentAtlasContext
 } from './parent-atlas-bridge.js';
+import { selectDiverseCandidates } from './latent256-dedup.js';
+import type { Latent256CandidateProviderV1 } from './latent256-candidate-provider.js';
 
 export interface RetrievalConfig {
   qdrant: { host: string; port: number };
@@ -45,6 +47,18 @@ export interface RetrievalConfig {
   postgres: { host: string; port: number; user: string; password: string; database: string };
   ollama: { host: string; port: number };
   gemma4: { host: string; port: number };
+  /** Experimental candidate-side dedup. Disabled unless explicitly enabled by a caller. */
+  latent256Dedup?: {
+    enabled: boolean;
+    threshold: number;
+    finalK: number;
+    candidatePoolK: number;
+    checkpointRevision: string;
+    candidateSnapshotRevision: string;
+    representationRevision: string;
+    /** Test/replay injection point; production defaults to the Postgres provider. */
+    provider?: Latent256CandidateProviderV1;
+  };
 }
 
 export interface RetrievalRequest {
@@ -60,8 +74,34 @@ export interface RetrievalRequest {
   filters?: SearchFilter;
 }
 
+export type QdrantPointId = string | number;
+
+export interface CandidateIdentityV1 {
+  /** Projection coordinate only; never treated as canonical packet identity. */
+  qdrantPointId: QdrantPointId | null;
+  packetKey: string | null;
+  sourceRef: string | null;
+  sourceRevision: string | null;
+  workspaceRevision: string | null;
+  symbolVersionId: string | null;
+  identitySource: 'QDRANT_PAYLOAD_V1' | 'NOT_AVAILABLE';
+  missingFields: readonly (
+    | 'packetKey'
+    | 'sourceRef'
+    | 'sourceRevision'
+    | 'workspaceRevision'
+  )[];
+}
+
 export interface RankedCandidate {
   id: string;
+  identity: CandidateIdentityV1;
+  /** Compatibility accessors; canonical callers should consume `identity`. */
+  qdrantPointId: QdrantPointId;
+  packetKey?: string;
+  sourceRef?: string;
+  sourceRevision?: string;
+  workspaceRevision?: string;
   score: number;
   path: string;
   symbol: string;
@@ -298,12 +338,13 @@ async function qdrantSearch(
   useRRF: boolean,
   useLexical: boolean,
   filters?: SearchFilter,
-  retrievalTier?: SearchTier
+  retrievalTier?: SearchTier,
+  limitOverride?: number,
 ): Promise<Array<{ id: string; score: number; payload: any }>> {
   const startTime = Date.now();
   try {
     const filter = buildQdrantFilter(filters);
-    const limit = filters?.per_lane_limit ?? 20;
+    const limit = limitOverride ?? filters?.per_lane_limit ?? 20;
     // Fail-closed: the semantic lane is 768-dim only. No legacy 384 collection fallback.
     resolveSemanticLane();
     const collections = [CANONICAL_QDRANT_COLLECTION];
@@ -327,7 +368,16 @@ async function qdrantSearch(
             query: Array.from(queryVector),
             using: 'content',
             limit,
-            with_payload: true,
+            // Request only the bounded payload needed for identity and display. In particular,
+            // do not allow arbitrary projection payload to become a ranking contract.
+            with_payload: [
+              'packet_key',
+              'source_ref',
+              'source_revision',
+              'workspace_revision',
+              'symbol_version_id',
+              'relative_path'
+            ],
             with_vector: false,
             filter,
             score_threshold: 0.3
@@ -530,17 +580,65 @@ export function rankCandidates(
   qdrantHits: Array<{ id: string; score: number; payload: any }>,
   turboVecHits: Array<{ id: string; score: number; rank: number }>,
   rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }>,
-  postgresMap: Map<string, any>
+  postgresMap: Map<string, any>,
+  resultLimit = 10,
 ): RankedCandidate[] {
   const combined = combineRRFLanes(buildRrfLaneMap(qdrantHits, turboVecHits, rgLexicalHits));
+  const qdrantById = new Map(qdrantHits.map((hit) => [hit.id, hit]));
 
   return combined
     .map((result) => {
       const pgData = postgresMap.get(result.id) || { relative_path: 'N/A', symbol: 'N/A', kind: 'N/A' };
+      const qdrant = qdrantById.get(result.id);
+      const payload = qdrant?.payload ?? {};
+      const packetKey = typeof payload.packet_key === 'string' && payload.packet_key.length > 0
+        ? payload.packet_key
+        : typeof payload.packetKey === 'string' && payload.packetKey.length > 0
+          ? payload.packetKey
+          : undefined;
+      const sourceRef = typeof payload.source_ref === 'string' && payload.source_ref.length > 0
+        ? payload.source_ref
+        : typeof payload.sourceRef === 'string' && payload.sourceRef.length > 0
+          ? payload.sourceRef
+          : undefined;
+      const sourceRevision = typeof payload.source_revision === 'string' && payload.source_revision.length > 0
+        ? payload.source_revision
+        : typeof payload.sourceRevision === 'string' && payload.sourceRevision.length > 0
+          ? payload.sourceRevision
+          : undefined;
+      const workspaceRevision = typeof payload.workspace_revision === 'string' && payload.workspace_revision.length > 0
+        ? payload.workspace_revision
+        : typeof payload.workspaceRevision === 'string' && payload.workspaceRevision.length > 0
+          ? payload.workspaceRevision
+          : undefined;
+      const symbolVersionId = typeof payload.symbol_version_id === 'string' && payload.symbol_version_id.length > 0
+        ? payload.symbol_version_id
+        : typeof payload.symbolVersionId === 'string' && payload.symbolVersionId.length > 0
+          ? payload.symbolVersionId
+          : null;
+      const missingFields = (['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'] as const)
+        .filter(field => ({ packetKey, sourceRef, sourceRevision, workspaceRevision }[field] == null));
+      const qdrantPointId = qdrant?.id ?? null;
+      const identity: CandidateIdentityV1 = {
+        qdrantPointId,
+        packetKey: packetKey ?? null,
+        sourceRef: sourceRef ?? null,
+        sourceRevision: sourceRevision ?? null,
+        workspaceRevision: workspaceRevision ?? null,
+        symbolVersionId,
+        identitySource: qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
+        missingFields,
+      };
       const breakdown = new Map(result.rrfBreakdown.map((item) => [item.lane, item.contribution]));
 
       return {
         id: result.id,
+        identity,
+        qdrantPointId: qdrantPointId ?? result.id,
+        packetKey,
+        sourceRef,
+        sourceRevision,
+        workspaceRevision,
         score: result.finalScore,
         path: pgData.relative_path,
         symbol: pgData.symbol,
@@ -554,7 +652,38 @@ export function rankCandidates(
       } satisfies RankedCandidate;
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
+    .slice(0, resultLimit);
+}
+
+/** Apply the opt-in candidate-side latent pass without fabricating identity for incomplete hits. */
+export async function applyConfiguredLatent256Dedup(
+  ranked: readonly RankedCandidate[],
+  config: RetrievalConfig['latent256Dedup'],
+): Promise<RankedCandidate[]> {
+  if (!config?.enabled) return [...ranked];
+
+  const dedupCandidates = ranked
+    .filter((candidate): candidate is RankedCandidate & { packetKey: string; sourceRef: string } =>
+      typeof candidate.packetKey === 'string' && candidate.packetKey.length > 0 &&
+      typeof candidate.sourceRef === 'string' && candidate.sourceRef.length > 0)
+    .map(candidate => ({
+      candidateId: candidate.packetKey,
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      relevanceScore: candidate.score,
+    }));
+  const dedupResult = await selectDiverseCandidates({
+    candidates: dedupCandidates,
+    finalK: config.finalK,
+    candidatePoolK: Math.min(config.candidatePoolK, dedupCandidates.length),
+    threshold: config.threshold,
+    checkpointRevision: config.checkpointRevision,
+    candidateSnapshotRevision: config.candidateSnapshotRevision,
+    representationRevision: config.representationRevision,
+    provider: config.provider,
+  });
+  const survivorKeys = new Set(dedupResult.selected.map(candidate => candidate.packetKey));
+  return ranked.filter(candidate => !candidate.packetKey || survivorKeys.has(candidate.packetKey));
 }
 
 /**
@@ -630,6 +759,13 @@ export async function executeUnifiedRetrieval(
       exactKeywords: request.filters?.keywords,
       expandedKeywords: request.filters?.keyword_variants
     });
+  const latent256Config = config.latent256Dedup;
+  if (latent256Config?.enabled && latent256Config.candidatePoolK < latent256Config.finalK) {
+    throw new Error('latent256 candidatePoolK must be >= finalK when enabled');
+  }
+  const retrievalLimit = latent256Config?.enabled
+    ? latent256Config.candidatePoolK
+    : (request.limit ?? 20);
 
   try {
     // STAGE 1: Embedding — fail-closed on the canonical semantic_768 lane only.
@@ -657,7 +793,7 @@ export async function executeUnifiedRetrieval(
       rustHits = await rustNapiSearch(
         queryVectors.dense768.vector,
         request.filters,
-        request.limit ?? 20
+        retrievalLimit
       );
       if (rustHits && rustHits.length > 0) {
         stages.push('rust_napi');
@@ -670,7 +806,8 @@ export async function executeUnifiedRetrieval(
           request.useRRF ?? true,
           request.useLexical ?? false,
           request.filters,
-          retrievalTier
+          retrievalTier,
+          retrievalLimit
         );
         stages.push('qdrant_search');
       }
@@ -682,7 +819,8 @@ export async function executeUnifiedRetrieval(
         request.useRRF ?? true,
         request.useLexical ?? false,
         request.filters,
-        retrievalTier
+        retrievalTier,
+        retrievalLimit
       );
       stages.push('qdrant_search');
     }
@@ -692,12 +830,12 @@ export async function executeUnifiedRetrieval(
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
     if (request.useRgPool ?? true) {
-      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, request.limit ?? 10, request.filters);
+      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, retrievalLimit, request.filters);
       stages.push('rg_pool_lexical');
     }
 
     // STAGE 3: TurboVec prefilter
-    const turboVecHits = await turboVecPrefilter(Array.from(embedding), config, request.limit ?? 10, request.filters);
+    const turboVecHits = await turboVecPrefilter(Array.from(embedding), config, retrievalLimit, request.filters);
     stages.push('turbovec_prefilter');
 
     // STAGE 4: Postgres join
@@ -728,10 +866,25 @@ export async function executeUnifiedRetrieval(
     }
 
     // STAGE 5: Ranking (now with Parent Atlas context)
-    const ranked = rankCandidates(qdrantHits, turboVecHits, rgLexicalHits, postgresMap);
+    const ranked = rankCandidates(
+      qdrantHits,
+      turboVecHits,
+      rgLexicalHits,
+      postgresMap,
+      latent256Config?.enabled ? latent256Config.candidatePoolK : 10,
+    );
+
+    // Optional candidate-side diversity pass. This is deliberately after canonical ranking,
+    // never an independent retrieval lane or RRF vote. Missing packet identity is fail-open:
+    // those candidates remain in the result and are not sent to the latent provider.
+    let rankedAfterLatent256 = ranked;
+    if (config.latent256Dedup?.enabled) {
+      rankedAfterLatent256 = await applyConfiguredLatent256Dedup(ranked, config.latent256Dedup);
+      stages.push('latent256_candidate_dedup');
+    }
 
     // Enhance ranked candidates with Parent Atlas context
-    const enhancedRanked = ranked.map(candidate => ({
+    const enhancedRanked = rankedAfterLatent256.map(candidate => ({
       ...candidate,
       parentAtlasContext: parentAtlasContextMap.get(candidate.path) ?? null
     }));

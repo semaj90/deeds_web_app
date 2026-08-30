@@ -18,7 +18,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
-import { bifrostKey } from '$lib/server/cache-keys.js';
+import { bifrostKey, bifrostRetrievalCacheKeyV2 } from '$lib/server/cache-keys.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -158,6 +158,14 @@ export interface QueryRouterOpts {
   featureHint?: string;    // feature_id if caller knows the feature
   limit?: number;
   collection?: string;
+	/** Optional complete identity tuple for revision-qualified cache access. */
+	workspaceRevision?: string;
+	candidateSnapshotRevision?: string;
+	ordinalMapChecksum?: string;
+	representationRevision?: string;
+	retrievalPolicyRevision?: string;
+	contextPolicyRevision?: string;
+	graphRevision?: string | null;
 }
 
 export interface RouteTrace {
@@ -195,7 +203,26 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   // ── Lane 1: Redis hot packet (exact query hash) ────────────────────────
   {
     const t0 = Date.now();
-    const hotKey = `bitfrost:retrieval:${queryHash}`;
+    const hasRevisionedIdentity = Boolean(
+			opts.workspaceRevision &&
+			opts.candidateSnapshotRevision &&
+			opts.ordinalMapChecksum &&
+			opts.representationRevision &&
+			opts.retrievalPolicyRevision &&
+			opts.contextPolicyRevision
+		);
+		const hotKey = hasRevisionedIdentity
+			? bifrostRetrievalCacheKeyV2({
+				queryHash,
+				workspaceRevision: opts.workspaceRevision!,
+				candidateSnapshotRevision: opts.candidateSnapshotRevision!,
+				ordinalMapChecksum: opts.ordinalMapChecksum!,
+				representationRevision: opts.representationRevision!,
+				retrievalPolicyRevision: opts.retrievalPolicyRevision!,
+				contextPolicyRevision: opts.contextPolicyRevision!,
+				graphRevision: opts.graphRevision,
+			})
+			: `bitfrost:retrieval:${queryHash}`;
     const cached = await redis.get(hotKey).catch(() => null);
     if (cached) {
       try {
@@ -562,8 +589,26 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   const packet = await writeAcePacket(packetInput, { asLatest: true });
 
   // Log to Bifrost telemetry key for future hot-path reuse
+  const retrievalCacheKey = opts.workspaceRevision &&
+    opts.candidateSnapshotRevision &&
+    opts.ordinalMapChecksum &&
+    opts.representationRevision &&
+    opts.retrievalPolicyRevision &&
+    opts.contextPolicyRevision
+    ? bifrostRetrievalCacheKeyV2({
+        queryHash,
+        workspaceRevision: opts.workspaceRevision,
+        candidateSnapshotRevision: opts.candidateSnapshotRevision,
+        ordinalMapChecksum: opts.ordinalMapChecksum,
+        representationRevision: opts.representationRevision,
+        retrievalPolicyRevision: opts.retrievalPolicyRevision,
+        contextPolicyRevision: opts.contextPolicyRevision,
+        graphRevision: opts.graphRevision,
+      })
+    : `bitfrost:retrieval:${queryHash}`;
+
   await redis.set(
-    `bitfrost:retrieval:${queryHash}`,
+    retrievalCacheKey,
     JSON.stringify({
       query_hash: queryHash,
       source_refs: packet.source_refs,

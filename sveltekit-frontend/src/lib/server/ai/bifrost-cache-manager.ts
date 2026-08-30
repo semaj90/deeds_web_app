@@ -40,6 +40,30 @@ export class BifrostCacheManager {
   private static PREFIX_KEY = 'bifrost:kv:prefix:';
   private static TTL = 3600 * 4; // 4 hour cache for hot prefixes
 
+  /** Build a revision-qualified retrieval key; null graph revision is explicit. */
+  static buildRetrievalCacheKeyV2(identity: {
+    queryHash: string;
+    workspaceRevision: string;
+    candidateSnapshotRevision: string;
+    ordinalMapChecksum: string;
+    representationRevision: string;
+    retrievalPolicyRevision: string;
+    contextPolicyRevision: string;
+    graphRevision?: string | null;
+  }): string {
+    const canonical = JSON.stringify({
+      queryHash: identity.queryHash,
+      workspaceRevision: identity.workspaceRevision,
+      candidateSnapshotRevision: identity.candidateSnapshotRevision,
+      ordinalMapChecksum: identity.ordinalMapChecksum,
+      representationRevision: identity.representationRevision,
+      retrievalPolicyRevision: identity.retrievalPolicyRevision,
+      contextPolicyRevision: identity.contextPolicyRevision,
+      graphRevision: identity.graphRevision ?? null,
+    });
+    return `bitfrost:retrieval:v2:${crypto.createHash('sha256').update(canonical).digest('hex')}`;
+  }
+
   /**
    * Get a cached KV-prefix token if available.
    * Useful for sharing system prompts across sessions.
@@ -96,7 +120,8 @@ export class BifrostCacheManager {
   /**
    * Log a retrieval call so Bifrost can reuse the same source_refs + cluster path.
    *
-   * Stored at:  bitfrost:retrieval:{queryHash}  (TTL 2h)
+   * Legacy storage at: bitfrost:retrieval:{queryHash} (TTL 2h).
+   * New callers must use buildRetrievalCacheKeyV2() so revisions cannot collide.
    * Shape: { query_hash, prompt_hash, source_refs, qdrant_point_ids,
    *          atlas_cluster_ids, feature_ids, cache_hit, tokens_in, tokens_out, latency_ms }
    *

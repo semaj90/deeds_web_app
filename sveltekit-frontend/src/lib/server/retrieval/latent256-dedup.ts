@@ -29,8 +29,10 @@ import { PostgresLatent256CandidateProvider, type Latent256CandidateProviderV1 }
 import { EVALUATED_LATENT256_SIMILARITY_THRESHOLD } from './post-process-reranker.js';
 
 export interface RankedCandidate {
-  /** codebase_chunk_index.id (uuid) -- see latent256-candidate-provider.ts's identity-scope note. */
-  packetKey: string;
+  /** codebase_chunk_index.id (uuid), used only by the latent artifact provider. */
+  candidateId: string;
+  /** Atlas packet identity, if already resolved. Never used as the latent provider key. */
+  packetKey?: string;
   sourceRef: string;
   /** Optional: enables Stage A exact-duplicate collapse. Caller-supplied (this module does no
    * extra I/O to fetch it) -- matches the same no-I/O boundary as post-process-reranker.ts. */
@@ -53,9 +55,9 @@ export interface SelectDiverseCandidatesInput {
   /** Defaults to EVALUATED_LATENT256_SIMILARITY_THRESHOLD (0.90, evaluation-backed -- NOT
    * promoted to a production default; see that constant's own doc comment). */
   threshold?: number;
-  checkpointRevision?: string;
-  candidateSnapshotRevision?: string;
-  representationRevision?: string;
+  checkpointRevision: string;
+  candidateSnapshotRevision: string;
+  representationRevision: string;
   provider?: Latent256CandidateProviderV1;
   /** Stage A toggle. Default true -- exact-content-hash collapse is free and should generally
    * run before the learned-representation stage justifies itself against it. */
@@ -82,8 +84,6 @@ export interface SelectDiverseCandidatesResult {
   thresholdUsed: number;
 }
 
-const DEFAULT_CHECKPOINT_REVISION = 'd6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259';
-
 function cosineSimilarity(a: readonly number[], b: readonly number[]): number {
   if (a.length !== b.length) return 0;
   let dot = 0, normA = 0, normB = 0;
@@ -103,10 +103,15 @@ export async function selectDiverseCandidates(
     candidates,
     finalK,
     threshold = EVALUATED_LATENT256_SIMILARITY_THRESHOLD,
-    checkpointRevision = DEFAULT_CHECKPOINT_REVISION,
+    checkpointRevision,
+    candidateSnapshotRevision,
+    representationRevision,
     collapseExactContentHash = true,
   } = input;
   const candidatePoolK = input.candidatePoolK ?? candidates.length;
+  if (!Number.isInteger(finalK) || finalK <= 0) throw new Error('LATENT256_FINAL_K_INVALID');
+  if (!Number.isInteger(candidatePoolK) || candidatePoolK < finalK) throw new Error('LATENT256_CANDIDATE_POOL_LT_FINAL_K');
+  if (!Number.isFinite(threshold) || threshold < -1 || threshold > 1) throw new Error('LATENT256_SIMILARITY_THRESHOLD_INVALID');
   const provider = input.provider ?? new PostgresLatent256CandidateProvider();
 
   // Pool is already in production-rank order -- never reordered.
@@ -116,7 +121,7 @@ export async function selectDiverseCandidates(
   const skippedExactDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
   const stageAOutput: RankedCandidate[] = [];
   if (collapseExactContentHash) {
-    const seenHash = new Map<string, string>(); // contentHash -> packetKey of the kept (best-ranked) candidate
+    const seenHash = new Map<string, string>(); // contentHash -> candidateId of the kept candidate
     for (const c of pool) {
       if (!c.contentHash) {
         stageAOutput.push(c);
@@ -126,7 +131,7 @@ export async function selectDiverseCandidates(
       if (keeper) {
         skippedExactDuplicate.push({ ...c, duplicateOfPacketKey: keeper });
       } else {
-        seenHash.set(c.contentHash, c.packetKey);
+        seenHash.set(c.contentHash, c.candidateId);
         stageAOutput.push(c);
       }
     }
@@ -136,28 +141,28 @@ export async function selectDiverseCandidates(
 
   // Stage B: semantic near-duplicate skip + refill, greedy in rank order.
   const hydration = await provider.hydrate({
-    packetKeys: stageAOutput.map(c => c.packetKey),
-    candidateSnapshotRevision: input.candidateSnapshotRevision ?? 'latent256-select-adhoc',
-    representationRevision: input.representationRevision ?? 'latent_256',
+    candidateIds: stageAOutput.map(c => c.candidateId),
+    candidateSnapshotRevision,
+    representationRevision,
     checkpointRevision,
   });
 
   const selected: RankedCandidate[] = [];
   const skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
-  const selectedVectors: Array<{ packetKey: string; vec: readonly number[] }> = [];
+  const selectedVectors: Array<{ candidateId: string; vec: readonly number[] }> = [];
 
   for (const c of stageAOutput) {
     if (selected.length >= finalK) break;
-    const vec = hydration.vectors.get(c.packetKey);
+    const vec = hydration.vectors.get(c.candidateId);
     if (!vec) {
       selected.push(c);
       continue;
     }
     const dup = selectedVectors.find(sv => cosineSimilarity(vec, sv.vec) >= threshold);
     if (dup) {
-      skippedSemanticDuplicate.push({ ...c, duplicateOfPacketKey: dup.packetKey });
+      skippedSemanticDuplicate.push({ ...c, duplicateOfPacketKey: dup.candidateId });
     } else {
-      selectedVectors.push({ packetKey: c.packetKey, vec });
+      selectedVectors.push({ candidateId: c.candidateId, vec });
       selected.push(c);
     }
   }

@@ -1,60 +1,60 @@
 {
-  "generated": "2026-06-13T03:45:02.762Z",
-  "qdrantFound": 20,
+  "generated": "2026-08-30T02:16:57.076Z",
+  "qdrantFound": 0,
   "gates": [
     {
       "name": "qdrant_manifest_coverage",
-      "pass": true,
-      "detail": "20/20"
+      "pass": false,
+      "detail": "0/20"
     },
     {
       "name": "embed_working",
       "pass": true,
-      "detail": "nomic-embed-text or embeddinggemma"
+      "detail": "embeddinggemma:latest (768-dim)"
     },
     {
       "name": "tool_selection_returns_results",
       "pass": true,
       "detail": "all 5 test queries returned tools"
+    },
+    {
+      "name": "registry_pickup_paths",
+      "pass": true,
+      "detail": "docs/reports/mcp-tool-registry-index.json present"
     }
   ],
   "results": [
     {
       "query": "find the top pagerank files in the codebase",
       "mcp_names": [
-        "codebase:graph_traverse",
-        "codebase:search",
-        "graph.pagerank_top",
         "wiki.search",
-        "search.dev_context"
+        "codebase:search",
+        "memory:prior_answer_lookup",
+        "karpathy.attention_rank_files",
+        "trace.kag_search"
       ],
       "llama_names": [
-        "codebase:graph_traverse",
-        "codebase:search",
-        "graph__pagerank_top",
         "wiki__search",
-        "search__dev_context"
+        "codebase:search",
+        "memory:prior_answer_lookup",
+        "karpathy__attention_rank_files",
+        "trace__kag_search"
       ],
       "hits": [
         {
-          "tool": "codebase:graph_traverse",
-          "score": "0.876"
+          "tool": "wiki.search"
         },
         {
-          "tool": "codebase:search",
-          "score": "0.852"
+          "tool": "codebase:search"
         },
         {
-          "tool": "graph.pagerank_top",
-          "score": "0.847"
+          "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "wiki.search",
-          "score": "0.782"
+          "tool": "karpathy.attention_rank_files"
         },
         {
-          "tool": "search.dev_context",
-          "score": "0.778"
+          "tool": "trace.kag_search"
         }
       ],
       "signals": [
@@ -65,44 +65,41 @@
         "ranking",
         "retrieval"
       ],
-      "embed_ok": true
+      "embed_ok": true,
+      "registry_ok": true,
+      "retrieval_source": "registry"
     },
     {
       "query": "search codebase for embedding timeout errors",
       "mcp_names": [
-        "codebase:export_bundle",
+        "wiki.search",
         "codebase:search",
-        "embedding:generate",
-        "codebase:concurrent_research",
-        "search.dev_context"
+        "memory:prior_answer_lookup",
+        "trace.kag_search",
+        "atlas.packet_search"
       ],
       "llama_names": [
-        "codebase:export_bundle",
+        "wiki__search",
         "codebase:search",
-        "embedding:generate",
-        "codebase:concurrent_research",
-        "search__dev_context"
+        "memory:prior_answer_lookup",
+        "trace__kag_search",
+        "atlas__packet_search"
       ],
       "hits": [
         {
-          "tool": "codebase:export_bundle",
-          "score": "0.807"
+          "tool": "wiki.search"
         },
         {
-          "tool": "codebase:search",
-          "score": "0.801"
+          "tool": "codebase:search"
         },
         {
-          "tool": "embedding:generate",
-          "score": "0.751"
+          "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "codebase:concurrent_research",
-          "score": "0.750"
+          "tool": "trace.kag_search"
         },
         {
-          "tool": "search.dev_context",
-          "score": "0.748"
+          "tool": "atlas.packet_search"
         }
       ],
       "signals": [
@@ -116,44 +113,41 @@
         "vector",
         "inference"
       ],
-      "embed_ok": true
+      "embed_ok": true,
+      "registry_ok": true,
+      "retrieval_source": "registry"
     },
     {
       "query": "inspect the parent atlas packet contract report",
       "mcp_names": [
+        "wiki.search",
+        "memory:prior_answer_lookup",
+        "codebase:search",
         "atlas.packet_search",
-        "atlas.coverage",
-        "kb.search_schema_contract",
-        "context.build_kv_packet",
-        "kb.rg_atlas_search"
+        "trace.kag_search"
       ],
       "llama_names": [
+        "wiki__search",
+        "memory:prior_answer_lookup",
+        "codebase:search",
         "atlas__packet_search",
-        "atlas__coverage",
-        "kb__search_schema_contract",
-        "context__build_kv_packet",
-        "kb__rg_atlas_search"
+        "trace__kag_search"
       ],
       "hits": [
         {
-          "tool": "atlas.packet_search",
-          "score": "0.840"
+          "tool": "wiki.search"
         },
         {
-          "tool": "atlas.coverage",
-          "score": "0.783"
+          "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "kb.search_schema_contract",
-          "score": "0.605"
+          "tool": "codebase:search"
         },
         {
-          "tool": "context.build_kv_packet",
-          "score": "0.586"
+          "tool": "atlas.packet_search"
         },
         {
-          "tool": "kb.rg_atlas_search",
-          "score": "0.583"
+          "tool": "trace.kag_search"
         }
       ],
       "signals": [
@@ -162,44 +156,41 @@
         "atlas_indexing",
         "retrieval"
       ],
-      "embed_ok": true
+      "embed_ok": true,
+      "registry_ok": true,
+      "retrieval_source": "registry"
     },
     {
       "query": "trace KAG search over legal evidence",
       "mcp_names": [
+        "wiki.search",
+        "memory:prior_answer_lookup",
+        "codebase:search",
         "trace.kag_search",
-        "trace.explain_retrieval",
-        "evidence:analyze_multimodal",
-        "evidence:search_similar",
-        "rag:search"
+        "atlas.packet_search"
       ],
       "llama_names": [
+        "wiki__search",
+        "memory:prior_answer_lookup",
+        "codebase:search",
         "trace__kag_search",
-        "trace__explain_retrieval",
-        "evidence:analyze_multimodal",
-        "evidence:search_similar",
-        "rag:search"
+        "atlas__packet_search"
       ],
       "hits": [
         {
-          "tool": "trace.kag_search",
-          "score": "0.894"
+          "tool": "wiki.search"
         },
         {
-          "tool": "trace.explain_retrieval",
-          "score": "0.846"
+          "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "evidence:analyze_multimodal",
-          "score": "0.803"
+          "tool": "codebase:search"
         },
         {
-          "tool": "evidence:search_similar",
-          "score": "0.793"
+          "tool": "trace.kag_search"
         },
         {
-          "tool": "rag:search",
-          "score": "0.792"
+          "tool": "atlas.packet_search"
         }
       ],
       "signals": [
@@ -210,55 +201,63 @@
         "evidence",
         "case_management",
         "kag",
-        "trace_memory"
+        "trace_memory",
+        "cache",
+        "memory",
+        "dense",
+        "lexical",
+        "graph"
       ],
-      "embed_ok": true
+      "embed_ok": true,
+      "registry_ok": true,
+      "retrieval_source": "registry"
     },
     {
       "query": "expand graph neighborhood from database module",
       "mcp_names": [
-        "graph.expand_neighborhood",
-        "kb.expand_neighbors",
-        "codebase:graph_neighbors",
-        "graph.community_for_node",
-        "topology.search_near"
+        "wiki.search",
+        "codebase:search",
+        "memory:prior_answer_lookup",
+        "trace.kag_search",
+        "atlas.packet_search"
       ],
       "llama_names": [
-        "graph__expand_neighborhood",
-        "kb__expand_neighbors",
-        "codebase:graph_neighbors",
-        "graph__community_for_node",
-        "topology__search_near"
+        "wiki__search",
+        "codebase:search",
+        "memory:prior_answer_lookup",
+        "trace__kag_search",
+        "atlas__packet_search"
       ],
       "hits": [
         {
-          "tool": "graph.expand_neighborhood",
-          "score": "0.919"
+          "tool": "wiki.search"
         },
         {
-          "tool": "kb.expand_neighbors",
-          "score": "0.835"
+          "tool": "codebase:search"
         },
         {
-          "tool": "codebase:graph_neighbors",
-          "score": "0.795"
+          "tool": "memory:prior_answer_lookup"
         },
         {
-          "tool": "graph.community_for_node",
-          "score": "0.760"
+          "tool": "trace.kag_search"
         },
         {
-          "tool": "topology.search_near",
-          "score": "0.742"
+          "tool": "atlas.packet_search"
         }
       ],
       "signals": [
         "graph",
         "neo4j",
         "topology",
+        "lexical",
+        "dense",
+        "ops",
+        "read",
         "retrieval"
       ],
-      "embed_ok": true
+      "embed_ok": true,
+      "registry_ok": true,
+      "retrieval_source": "registry"
     }
   ]
 }

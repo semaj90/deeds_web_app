@@ -9,11 +9,18 @@ describe('ACE fan-out adapter', () => {
     }, 3);
     expect(candidate.candidateOrdinal).toBe(3);
     expect(candidate.evidence).toHaveLength(2);
+    expect(candidate.evidence.find((entry) => entry.text === 'REDIS')?.kind).toBe('CONCEPT_HINT');
     expect(candidate.evidence.every((entry) => entry.sourceRevision === 'sha256:source')).toBe(true);
   });
 
   it('does not create evidence from empty lexical values', () => {
     const candidate = aceEnvelopeToFanoutCandidate({ packet_key: 'packet:a', source_ref: 'src/a.ts', source_revision: 'sha256:source', lexical_nouns: ['  ', 'cache'] }, 0);
     expect(candidate.evidence.map((entry) => entry.text)).toEqual(['cache']);
+  });
+
+  it('changes evidence identity when the source revision changes', () => {
+    const first = aceEnvelopeToFanoutCandidate({ packet_key: 'packet:a', source_ref: 'src/a.ts', source_revision: 'sha256:one', used_concepts: ['REDIS'] }, 0);
+    const second = aceEnvelopeToFanoutCandidate({ packet_key: 'packet:a', source_ref: 'src/a.ts', source_revision: 'sha256:two', used_concepts: ['REDIS'] }, 0);
+    expect(first.evidence[0]?.evidenceId).not.toBe(second.evidence[0]?.evidenceId);
   });
 });

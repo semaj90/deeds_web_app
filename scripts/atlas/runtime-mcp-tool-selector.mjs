@@ -3,7 +3,7 @@
  * runtime-mcp-tool-selector.mjs
  *
  * Selects the top-K MCP tools for a given query by:
- *   1. Embedding the query via Ollama (nomic-embed-text → embeddinggemma fallback)
+ *   1. Embedding the query via the canonical EmbeddingGemma Ollama model
  *   2. Searching codebase_chunks_768 filtered to source_kind='tool_manifest'
  *   3. Boosting by ontology overlap with detected query domain
  *   4. Returning tool names + llama_names ready for tools[] forwarding
@@ -31,6 +31,7 @@ const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollam
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const DEFAULT_TOP_K = 12;
+const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || process.env.EMBEDDING_MODEL || 'embeddinggemma:latest';
 
 // Query domain → ontology signals for boost scoring
 const DOMAIN_SIGNALS = {
@@ -74,19 +75,18 @@ function detectSignals(query) {
 // ── Embedding ─────────────────────────────────────────────────────────────────
 
 async function embed(text) {
-  for (const model of ['nomic-embed-text:latest', 'embeddinggemma:latest']) {
-    try {
-      const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt: text.slice(0, 1024) }),
-        signal: AbortSignal.timeout(20_000),
-      });
-      if (!res.ok) continue;
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: text.slice(0, 1024) }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (res.ok) {
       const d = await res.json();
       if (Array.isArray(d.embedding) && d.embedding.length === 768) return d.embedding;
-    } catch { /* try next */ }
-  }
+    }
+  } catch { /* canonical embedding provider unavailable */ }
   return null;
 }
 
@@ -213,6 +213,7 @@ const MCP_TO_LLAMA = Object.fromEntries(
  *     hits:        object[]   — raw Qdrant hits with reranked scores
  *     signals:     string[]   — detected ontology signals
  *     embed_ok:    boolean    — whether embedding succeeded
+ *     retrieval_source: 'qdrant' | 'registry' | 'default'
  *   }
  */
 export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) {
@@ -243,6 +244,7 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
         signals,
         embed_ok: false,
         registry_ok: true,
+        retrieval_source: 'registry',
       };
     }
 
@@ -256,14 +258,17 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
       signals,
       embed_ok:    false,
       registry_ok: false,
+      retrieval_source: 'default',
     };
   }
 
   const raw = vector ? await qdrantSearch(vector, { topK }) : [];
   let ranked = rerank(raw, signals, topK);
+  let retrieval_source = 'qdrant';
 
   if (ranked.length === 0) {
     ranked = await registrySearch(queryText, topK);
+    retrieval_source = ranked.length > 0 ? 'registry' : 'default';
   } else {
     const registryHits = await registrySearch(queryText, topK);
     const merged = new Map();
@@ -309,7 +314,15 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     llama_names.push(llamaName);
   }
 
-  return { mcp_names, llama_names, hits: ranked, signals, embed_ok: true, registry_ok: ranked.length > 0 };
+  return {
+    mcp_names,
+    llama_names,
+    hits: ranked,
+    signals,
+    embed_ok: true,
+    registry_ok: ranked.length > 0,
+    retrieval_source,
+  };
 }
 
 // ── Audit mode ────────────────────────────────────────────────────────────────
@@ -384,7 +397,7 @@ async function runAudit() {
   // Gate summary
   const gates = [
     { name: 'qdrant_manifest_coverage', pass: qdrantFound >= 16, detail: `${qdrantFound}/${allMcpNames.length}` },
-    { name: 'embed_working',           pass: results.every(r => r.embed_ok), detail: 'nomic-embed-text or embeddinggemma' },
+    { name: 'embed_working',           pass: results.every(r => r.embed_ok), detail: `${EMBEDDING_MODEL} (768-dim)` },
     { name: 'tool_selection_returns_results', pass: results.every(r => r.mcp_names.length > 0), detail: `all 5 test queries returned tools` },
     { name: 'registry_pickup_paths', pass: (await loadRegistry()).registry != null, detail: 'docs/reports/mcp-tool-registry-index.json present' },
   ];

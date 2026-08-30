@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,13 @@ import pyarrow.parquet as pq
 import torch
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+
+
+RUNTIME_ROOT = Path(__file__).resolve().parents[2] / "python"
+if str(RUNTIME_ROOT) not in sys.path:
+    sys.path.insert(0, str(RUNTIME_ROOT))
+
+from atlas_rapids_graph_runtime import install_graph_routes  # noqa: E402
 
 
 ARTIFACT_ROOT = Path(os.getenv("ATLAS_GPU_ARTIFACT_ROOT", "/mnt/c/Users/james/Videos/deeds-web-app")).resolve()
@@ -40,19 +48,9 @@ app = FastAPI(title="Parent Atlas GPU Executor", version="1.0.0")
 
 GRAPH_RESIDENT: dict[str, Any] = {}
 
-
-class GraphLoadRequest(BaseModel):
-    artifactDir: str = Field(min_length=1)
-    expectedGraphRevision: str = Field(min_length=1)
-    expectedProjectionRevision: str = Field(min_length=1)
-
-
-class PageRankRequest(BaseModel):
-    graphRevision: str = Field(min_length=1)
-    topK: int = Field(default=10, ge=1, le=100_000)
-    alpha: float = Field(default=0.85, gt=0.0, lt=1.0)
-    tol: float = Field(default=1e-6, gt=0.0)
-    maxIter: int = Field(default=100, ge=1, le=10_000)
+# Graph execution is owned by the revision-aware runtime. Tile endpoints below
+# remain in this host, but graph load/PageRank must share one validated manager.
+GRAPH_RUNTIME = install_graph_routes(app)
 
 
 def resolve_artifact(relative_path: str) -> Path:
@@ -109,129 +107,6 @@ def health() -> dict[str, Any]:
         "executionOnly": True,
         "cudaAvailable": bool(torch.cuda.is_available()),
         "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "writes": {"postgres": False, "qdrant": False, "valkey": False},
-    }
-
-
-@app.get("/v1/graph/capabilities")
-def graph_capabilities() -> dict[str, Any]:
-    try:
-        import cugraph  # type: ignore
-
-        backend = "cugraph.pagerank"
-        version = getattr(cugraph, "__version__", "unknown")
-        available = True
-        import_error = None
-    except Exception as exc:  # pragma: no cover - depends on RAPIDS runtime
-        backend = None
-        version = None
-        available = False
-        import_error = str(exc)
-    return {
-        "available": available and bool(torch.cuda.is_available()),
-        "backend": backend,
-        "backendVersion": version,
-        "importError": import_error,
-        "cudaAvailable": bool(torch.cuda.is_available()),
-        "executionOnly": True,
-        "writes": {"postgres": False, "qdrant": False, "valkey": False},
-    }
-
-
-@app.post("/v1/graph/load")
-def load_graph(request: GraphLoadRequest) -> dict[str, Any]:
-    artifact_dir = (ARTIFACT_ROOT / request.artifactDir).resolve()
-    if artifact_dir != ARTIFACT_ROOT and ARTIFACT_ROOT not in artifact_dir.parents:
-        raise HTTPException(status_code=400, detail="GRAPH_ARTIFACT_PATH_OUTSIDE_ALLOWED_ROOT")
-    manifest_path = artifact_dir / "manifest.json"
-    nodes_path = artifact_dir / "nodes.parquet"
-    edges_path = artifact_dir / "edges.parquet"
-    if not manifest_path.is_file() or not nodes_path.is_file() or not edges_path.is_file():
-        raise HTTPException(status_code=404, detail="GRAPH_ARTIFACT_FILES_NOT_FOUND")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("graphRevision") != request.expectedGraphRevision:
-        raise HTTPException(status_code=400, detail="GRAPH_REVISION_MISMATCH")
-    if manifest.get("projectionRevision") != request.expectedProjectionRevision:
-        raise HTTPException(status_code=400, detail="PROJECTION_REVISION_MISMATCH")
-    try:
-        import cudf  # type: ignore
-        import cugraph  # type: ignore
-    except Exception as exc:  # pragma: no cover - depends on RAPIDS runtime
-        raise HTTPException(status_code=503, detail=f"CUGRAPH_UNAVAILABLE:{exc}") from exc
-    if not torch.cuda.is_available():
-        raise HTTPException(status_code=503, detail="CUDA_DEVICE_UNAVAILABLE")
-    nodes = pq.read_table(nodes_path).to_pandas()
-    edges = pq.read_table(edges_path).to_pandas()
-    expected_ordinals = list(range(len(nodes)))
-    actual_ordinals = [int(value) for value in nodes["gpu_node_id"].tolist()]
-    if actual_ordinals != expected_ordinals:
-        raise HTTPException(status_code=400, detail="GRAPH_ORDINALS_NOT_DENSE")
-    vertices = cudf.Series(expected_ordinals)
-    edge_frame = cudf.DataFrame({
-        "src": [int(value) for value in edges["src_gpu_node_id"].tolist()],
-        "dst": [int(value) for value in edges["dst_gpu_node_id"].tolist()],
-        "weight": [float(value) for value in edges["weight"].tolist()],
-    })
-    graph = cugraph.Graph(directed=True)
-    graph.from_cudf_edgelist(
-        edge_frame,
-        source="src",
-        destination="dst",
-        edge_attr="weight",
-        vertices=vertices,
-        renumber=False,
-        store_transposed=True,
-    )
-    GRAPH_RESIDENT.clear()
-    GRAPH_RESIDENT.update({
-        "graphRevision": request.expectedGraphRevision,
-        "projectionRevision": request.expectedProjectionRevision,
-        "graph": graph,
-        "nodeKeys": [str(value) for value in nodes["graph_node_key"].tolist()],
-        "nodeCount": len(nodes),
-        "edgeCount": len(edges),
-    })
-    return {
-        "status": "GRAPH_LOADED_READ_ONLY",
-        "graphRevision": request.expectedGraphRevision,
-        "projectionRevision": request.expectedProjectionRevision,
-        "nodeCount": len(nodes),
-        "edgeCount": len(edges),
-        "renumbered": False,
-        "isolatedVerticesPreserved": True,
-        "canonicalAuthority": False,
-        "writes": {"postgres": False, "qdrant": False, "valkey": False},
-    }
-
-
-@app.post("/v1/graph/pagerank")
-def graph_pagerank(request: PageRankRequest) -> dict[str, Any]:
-    if GRAPH_RESIDENT.get("graphRevision") != request.graphRevision:
-        raise HTTPException(status_code=409, detail="GRAPH_NOT_LOADED_OR_REVISION_MISMATCH")
-    try:
-        import cugraph  # type: ignore
-
-        result = cugraph.pagerank(
-            GRAPH_RESIDENT["graph"],
-            alpha=request.alpha,
-            tol=request.tol,
-            max_iter=request.maxIter,
-        )
-    except Exception as exc:  # pragma: no cover - depends on RAPIDS runtime
-        raise HTTPException(status_code=503, detail=f"CUGRAPH_PAGERANK_FAILED:{exc}") from exc
-    rows = result.to_pandas().sort_values("vertex").to_dict("records")
-    node_keys = GRAPH_RESIDENT["nodeKeys"]
-    ranked = sorted(
-        ({"nodeKey": node_keys[int(row["vertex"])], "graphOrdinal": int(row["vertex"]), "score": float(row["pagerank"])} for row in rows),
-        key=lambda row: (-row["score"], row["nodeKey"]),
-    )[: request.topK]
-    return {
-        "status": "GRAPH_PAGERANK_READ_ONLY",
-        "backend": "cugraph.pagerank",
-        "graphRevision": request.graphRevision,
-        "rows": ranked,
-        "canonicalAuthority": False,
-        "logicalLaneVote": "NONE",
         "writes": {"postgres": False, "qdrant": False, "valkey": False},
     }
 

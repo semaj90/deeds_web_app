@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 // Canonical ACE cache key constants.
 // Import from here — never copy-paste key patterns across files.
 
@@ -48,6 +50,31 @@ export const bifrostRevisionedRetrievalKey = (
 	policyRevision: string,
 	requestHash: string
 ): string => `bifrost:retrieval:${workspaceRevision}:${policyRevision}:${requestHash}`;
+
+/** Full retrieval identity; graphRevision is explicit even when null. */
+export const bifrostRetrievalCacheKeyV2 = (identity: {
+	queryHash: string;
+	workspaceRevision: string;
+	candidateSnapshotRevision: string;
+	ordinalMapChecksum: string;
+	representationRevision: string;
+	retrievalPolicyRevision: string;
+	contextPolicyRevision: string;
+	graphRevision?: string | null;
+}): string => {
+	const canonical = JSON.stringify({
+		queryHash: identity.queryHash,
+		workspaceRevision: identity.workspaceRevision,
+		candidateSnapshotRevision: identity.candidateSnapshotRevision,
+		ordinalMapChecksum: identity.ordinalMapChecksum,
+		representationRevision: identity.representationRevision,
+		retrievalPolicyRevision: identity.retrievalPolicyRevision,
+		contextPolicyRevision: identity.contextPolicyRevision,
+		graphRevision: identity.graphRevision ?? null,
+	});
+	const digest = createHash('sha256').update(canonical).digest('hex');
+	return `bifrost:retrieval:v2:${digest}`;
+};
 
 export const bifrostEligibilityKey = (
 	workspaceRevision: string,

@@ -54,4 +54,32 @@ describe('RLM SearchRuntime adapter', () => {
 		await adapter.search({ ...request, workspaceRevision: 'workspace-r2' });
 		expect(keys[0]).not.toBe(keys[1]);
 	});
+
+	it('does not reuse a cached result across candidate-map revisions', async () => {
+		const keys: string[] = [];
+		const adapter = createRlmSearchAdapter({
+			cache: {
+				get: async (key) => { keys.push(key); return null; },
+				set: async () => undefined,
+			},
+			search: async () => response,
+		});
+		const environment = {
+			schema: 'atlas.rlm-environment.v1' as const,
+			contextArtifactId: 'context-r1',
+			candidateSnapshotRevision: 'candidates-r1',
+			ordinalMapChecksum: 'ordinal-r1',
+			candidateOrdinals: [1, 2, 3],
+			permittedOperations: ['FILTER' as const],
+			maxDepth: 1,
+			maxSubcalls: 1,
+			maxTokens: 100,
+			maxWallClockMs: 1000,
+			maxFetchedBytes: 1024,
+			maxCandidateExpansion: 10,
+		};
+		await adapter.search({ ...request, environment });
+		await adapter.search({ ...request, environment: { ...environment, candidateSnapshotRevision: 'candidates-r2' } });
+		expect(keys[0]).not.toBe(keys[1]);
+	});
 });

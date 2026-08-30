@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Golden Retrieval Replay
+ * LEGACY retrieval replay scaffold — not a golden relevance evaluation.
  *
- * Purpose: Validate that packet enrichment (titles, summaries, vectors) has
- * improved the retrieval stack. Run before training/policy tuning.
+ * This file dynamically discovers expected packets from live PostgreSQL and
+ * contains a placeholder retrieval call. It must not be used to claim a
+ * frozen golden or human-relevance result. Use
+ * prove-parent-atlas-golden-retrieval-v1.mjs for the deterministic semantic
+ * replay canary.
  *
  * Test Plan:
  * 1. Define golden queries (known intent → expected result)
@@ -221,7 +224,7 @@ function generateReport(results) {
 // ============================================================================
 
 async function main() {
-  console.log('[GOLDEN RETRIEVAL REPLAY] Starting validation...\n');
+  console.log('[LEGACY RETRIEVAL REPLAY SCAFFOLD] Starting diagnostic run...\n');
 
   if (isDryRun) {
     console.log('[DRY-RUN] Populating golden queries from Postgres');
@@ -259,11 +262,11 @@ async function main() {
 
   const passRate = report.pass_rate_pct;
   if (passRate >= 75) {
-    console.log('\n✅ GOLDEN RETRIEVAL PASSED');
+    console.log('\n⚠️ LEGACY SCAFFOLD THRESHOLD PASSED (NOT A GOLDEN PROOF)');
     console.log(`Pass rate: ${passRate}% (${report.passed}/${report.golden_query_count})`);
-    console.log('Retrieval stack is stable. Ready for Phase 2 training/policy tuning.');
+    console.log('This result is not frozen, human-judged, or promotion evidence.');
   } else {
-    console.log('\n⚠️  GOLDEN RETRIEVAL NEEDS TUNING');
+    console.log('\n⚠️  LEGACY SCAFFOLD NEEDS TUNING');
     console.log(`Pass rate: ${passRate}% (${report.passed}/${report.golden_query_count})`);
     console.log('Check lane contributions and RRF weights. May need enrichment retry.');
   }

@@ -1,8 +1,8 @@
 {
   "schema": "atlas.ast-backfill-receipt.v1",
-  "generatedAt": "2026-08-27T00:26:00.468Z",
+  "generatedAt": "2026-08-30T00:40:26.748Z",
   "mode": "DRY_RUN",
-  "limit": 1000,
+  "limit": 100,
   "status": "DRY_RUN_COMPLETE",
   "gates": {
     "AST_BF_01": {
@@ -14,7 +14,7 @@
         "current_user": "legal_admin",
         "current_schema": "public",
         "configured_search_path": "\"$user\", public",
-        "server_address": "172.18.0.20/32",
+        "server_address": "172.18.0.9/32",
         "server_port": 5432
       },
       "baselineReportPath": "docs/reports/live-source-lineage-table-audit.json",
@@ -28,7 +28,7 @@
         "configuredSearchPath": "\"$user\", public",
         "effectiveSearchPath": "{pg_catalog,public}",
         "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-        "serverAddress": "172.18.0.20/32",
+        "serverAddress": "172.18.0.9/32",
         "serverPort": 5432,
         "relations": [
           {
@@ -102,7 +102,7 @@
             "selectable": true
           }
         ],
-        "fingerprintSha256": "a7b50678e5ca9697179eb35a9e4f1de820a4fd7367b135c7c7821c0f9eb62292"
+        "fingerprintSha256": "00b2406e36705e721d9e00add05329494edd1beb5f33db579556610a161b1848"
       },
       "comparedFields": [
         "databaseName",
@@ -130,7 +130,7 @@
     },
     "AST_BF_03": {
       "name": "SOURCE_LINEAGE_PROVEN",
-      "proven": false,
+      "proven": true,
       "lineageOwner": "public.graphify_files",
       "requiredColumns": [
         "source_ref",
@@ -140,8 +140,8 @@
       ],
       "tablePresent": true,
       "hasWorkspaceRevisionColumn": true,
-      "rowCount": 0,
-      "blockedReason": "graphify_files has 0 rows — no source-lineage data available for any candidate",
+      "rowCount": 885,
+      "blockedReason": null,
       "note": "This is the current hard blocker (per DBCTX-01 correction entry, TABLE-AUDIT-02, and audit-atlas-migration-owners.mjs). The candidate JSONL's own source_revision/workspace_revision fields are synthetic placeholders (\"workspace:0\", 0) baked in at generation time, not derived from this table — they do not satisfy this gate."
     },
     "AST_BF_04": {
@@ -179,9 +179,9 @@
         "candidate_key"
       ],
       "inScopeCandidateTotal": 35293,
-      "selectedCount": 1000,
-      "requestedLimit": 1000,
-      "selectionChecksum": "8acaa579eeb13b0135bb3da729d4a0a583925ea97fa171c522e09a52ec0f5ef6"
+      "selectedCount": 100,
+      "requestedLimit": 100,
+      "selectionChecksum": "505deb2ded6bc6b02682284efe166d963c98911c0ba8e7eb097c2b8ba052f855"
     },
     "AST_BF_07": {
       "name": "INSERT_ONLY_APPLY_PROVEN",
@@ -209,12 +209,12 @@
       "valkeyWrites": false
     }
   },
-  "databaseContextChecksum": "3098a9fe10bdce6d1bf4d25b1daa47b2575985a7911b4583bbb9e932c0f76dba",
+  "databaseContextChecksum": "069c10376584dffdaf6ed2815b50ef8496c67cdb35c68ddf62efea878059b4b7",
   "sourceInventoryChecksum": "141e519366fa68affeb58f3cd085c6f3cf5ae472743e3e7c7ca42a0b54e365f7",
   "candidateArtifactChecksum": "c15de830fafefdcee2d3a6c38d9ef012f970f874d7df1ef8d653014156d6b463",
-  "selectionChecksum": "8acaa579eeb13b0135bb3da729d4a0a583925ea97fa171c522e09a52ec0f5ef6",
+  "selectionChecksum": "505deb2ded6bc6b02682284efe166d963c98911c0ba8e7eb097c2b8ba052f855",
   "counts": {
-    "selected": 1000,
+    "selected": 100,
     "inserted": 0,
     "alreadyPresent": 0,
     "rejected": 0,

@@ -9,17 +9,20 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { buildAstSourceRefKey, normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
+import { normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const LIMIT = Number((args.find((arg) => arg.startsWith('--limit=')) || '').split('=')[1] || 0) || null;
+const SKIP = Math.max(0, Number((args.find((arg) => arg.startsWith('--skip=')) || '').split('=')[1] || 0) || 0);
 const inputPath = path.resolve(ROOT, (args.find((arg) => arg.startsWith('--input=')) || '').slice(8)
   || '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
 const resolutionPath = path.resolve(ROOT, (args.find((arg) => arg.startsWith('--resolution=')) || '').slice(13)
   || '.tmp/atlas/graphify-file-index-v1/ast-symbol-resolution.jsonl');
+const astSnapshotPath = path.resolve(ROOT, (args.find((arg) => arg.startsWith('--ast-snapshot=')) || '').slice(15)
+  || '.tmp/atlas/current-source-ast-snapshot-v1.ndjson');
 const PROMOTABLE_KINDS = new Set(['function', 'method', 'class', 'interface', 'type', 'enum']);
 const PRODUCER_REVISION = 'atlas-ast-symbol-version-materializer-v1';
 
@@ -28,6 +31,10 @@ function astNodeKindFor(kind) {
   // `type` and class methods to `function`; preserve the nomination kind in
   // callable_metadata while using the storage kind for the bridge lookup.
   return normalizeAstNodeKind(kind);
+}
+
+function canonicalAstSourceRef(value) {
+  return String(value ?? '').replaceAll('\\', '/').replace(/^sveltekit-frontend\//, '');
 }
 
 const digest = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
@@ -40,7 +47,11 @@ const writeReport = async (report) => {
 
 async function main() {
   if (APPLY && !LIMIT) throw new Error('--apply requires an explicit --limit=N');
-  const [nominations, resolutions] = await Promise.all([readJsonl(inputPath), readJsonl(resolutionPath)]);
+  const [nominations, resolutions, astSnapshot] = await Promise.all([
+    readJsonl(inputPath),
+    readJsonl(resolutionPath),
+    readJsonl(astSnapshotPath),
+  ]);
   const resolutionByNomination = new Map(resolutions.map((row) => [row.nomination_id, row]));
   const candidates = nominations.filter((row) => {
     const resolution = resolutionByNomination.get(row.nomination_id);
@@ -52,6 +63,7 @@ async function main() {
   ]));
   const rows = [...unique.values()];
   const revisionQualifiedRows = rows.filter((row) => row.source_revision && row.workspace_revision);
+  const selectedRows = revisionQualifiedRows.slice(SKIP, LIMIT ? SKIP + LIMIT : undefined);
   const report = {
     schema: 'atlas.ast-symbol-version-materialization.v1',
     mode: APPLY ? 'APPLY' : 'DRY_RUN',
@@ -61,19 +73,21 @@ async function main() {
     missingSourceRevision: rows.filter((row) => !row.source_revision).length,
     missingWorkspaceRevision: rows.filter((row) => !row.workspace_revision).length,
     excludedVariables: nominations.filter((row) => row.kind === 'variable').length,
+    skip: SKIP,
     limit: LIMIT,
+    selectedCandidates: selectedRows.length,
     rowsAttempted: 0,
     rowsInserted: 0,
     rowsAlreadyPresent: 0,
     projectionRowsUpserted: 0,
     databaseWrites: false,
-    sample: revisionQualifiedRows.slice(0, 10).map((row) => ({ nominationId: row.nomination_id, kind: row.kind, qualifiedName: row.qualified_name, sourceRef: row.source_ref })),
+    sample: selectedRows.slice(0, 10).map((row) => ({ nominationId: row.nomination_id, kind: row.kind, qualifiedName: row.qualified_name, sourceRef: row.source_ref })),
   };
   console.log(JSON.stringify(report, null, 2));
   if (!APPLY) { await writeReport(report); return; }
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
-  const batch = revisionQualifiedRows.slice(0, LIMIT);
+  const batch = selectedRows;
   try {
     const stableIds = [...new Set(batch.map((row) => resolutionByNomination.get(row.nomination_id).stable_symbol_id))];
     const active = await pool.query(
@@ -123,19 +137,20 @@ async function main() {
       // NULL), 1 match -> RESOLVED (tree_node_id set), >1 matches ->
       // AMBIGUOUS (tree_node_id stays NULL rather than guessing which
       // candidate is correct).
-      const candidateNodes = await pool.query(
-        `SELECT tree_node_id, node_kind
-         FROM atlas_ast_nodes
-         WHERE source_ref_key = $1`,
-        [buildAstSourceRefKey(row.source_ref, astNodeKindFor(row.kind), row.qualified_name || row.name)],
+      const snapshotNodes = astSnapshot.filter((node) =>
+        canonicalAstSourceRef(node.sourceRef) === canonicalAstSourceRef(row.source_ref)
+        && String(node.graphifySourceRevision ?? '') === String(row.source_revision ?? '')
+        && Number(node.startByte) === Number(row.byte_start)
+        && Number(node.endByte) === Number(row.byte_end)
+        && (!row.upstream_node_id || String(node.upstreamNodeId ?? '') === String(row.upstream_node_id)),
       );
-      const identityBridgeOutcome = candidateNodes.rowCount === 0
+      const identityBridgeOutcome = snapshotNodes.length === 0
         ? 'UNRESOLVED'
-        : candidateNodes.rowCount === 1
+        : snapshotNodes.length === 1
           ? 'RESOLVED'
           : 'AMBIGUOUS';
-      const resolvedTreeNodeId = identityBridgeOutcome === 'RESOLVED' ? candidateNodes.rows[0].tree_node_id : null;
-      const resolvedNodeKind = identityBridgeOutcome === 'RESOLVED' ? candidateNodes.rows[0].node_kind : null;
+      const resolvedTreeNodeId = identityBridgeOutcome === 'RESOLVED' ? snapshotNodes[0].treeNodeId : null;
+      const resolvedNodeKind = identityBridgeOutcome === 'RESOLVED' ? astNodeKindFor(snapshotNodes[0].nodeKind) : null;
       report.identityBridgeOutcomes ??= { RESOLVED: 0, UNRESOLVED: 0, AMBIGUOUS: 0 };
       report.identityBridgeOutcomes[identityBridgeOutcome]++;
 

@@ -2,13 +2,18 @@
   "schema": "atlas.ast-symbol-resolution-dry-run-receipt.v1",
   "status": "READ_ONLY_COMPLETE",
   "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\current-graphify-symbol-nominations-v1.jsonl",
-  "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\graphify-file-index-v1\\ast-symbol-resolution.jsonl",
+  "output": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\current-ast-symbol-resolution-v1.jsonl",
   "input_nominations": 440,
-  "registry_keys": 10170,
+  "registry_keys": 10175,
   "canonical": 0,
   "ambiguous": 0,
   "unresolved": 440,
   "invalid": 0,
+  "revision_qualified_symbol_version_rows": 200,
+  "ast_snapshot_rows": 0,
+  "ast_resolution_counts": {
+    "NO_AST_MATCH": 440
+  },
   "canonical_writes": false,
   "database_writes": false
 }

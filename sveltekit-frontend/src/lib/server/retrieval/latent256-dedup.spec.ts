@@ -7,7 +7,7 @@ function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProv
     async hydrate(input: Latent256HydrateInput): Promise<Latent256HydrateResult> {
       const map = new Map<string, readonly number[]>();
       let found = 0;
-      for (const key of input.packetKeys) {
+      for (const key of input.candidateIds) {
         if (vectors[key]) {
           map.set(key, vectors[key]);
           found++;
@@ -15,9 +15,10 @@ function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProv
       }
       return {
         vectors: map,
-        requested: input.packetKeys.length,
+        requested: input.candidateIds.length,
         found,
-        missing: input.packetKeys.length - found,
+        missing: input.candidateIds.length - found,
+        vectorsChecksum: 'test-vectors',
         revisionMismatch: 0,
         invalidShape: 0,
         receiptChecksum: 'test-checksum',
@@ -26,17 +27,23 @@ function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProv
   };
 }
 
+const PROVENANCE = {
+  checkpointRevision: 'fixture-checkpoint-v1',
+  candidateSnapshotRevision: 'fixture-snapshot-v1',
+  representationRevision: 'fixture-latent256-v1',
+};
+
 describe('selectDiverseCandidates', () => {
   it('refills: a skipped semantic duplicate is replaced by the next-ranked candidate, finalK is still met', async () => {
     // Rank order: a, b(dup of a), c, d, e -- pool of 5, finalK=3.
     // Without refill: top-3-then-prune would yield [a, c] (b removed, no replacement) = 2 results.
     // With refill: b is skipped and c/d fill in -> [a, c, d] = 3 results, finalK honored.
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts' },
-      { packetKey: 'b', sourceRef: 'src/b.ts' },
-      { packetKey: 'c', sourceRef: 'src/c.ts' },
-      { packetKey: 'd', sourceRef: 'src/d.ts' },
-      { packetKey: 'e', sourceRef: 'src/e.ts' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts' },
+      { candidateId: 'c', packetKey: 'c', sourceRef: 'src/c.ts' },
+      { candidateId: 'd', packetKey: 'd', sourceRef: 'src/d.ts' },
+      { candidateId: 'e', packetKey: 'e', sourceRef: 'src/e.ts' },
     ];
     const provider = fakeProvider({
       a: [1, 0, 0], b: [1, 0, 0], // b is a near-duplicate of a
@@ -44,7 +51,7 @@ describe('selectDiverseCandidates', () => {
     });
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 3, candidatePoolK: 5, threshold: 0.99, provider,
+      candidates, finalK: 3, candidatePoolK: 5, threshold: 0.99, provider, ...PROVENANCE,
     });
 
     expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'c', 'd']);
@@ -57,13 +64,13 @@ describe('selectDiverseCandidates', () => {
 
   it('reports poolExhaustedBeforeFinalK honestly when the pool is too small to refill from', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts' },
-      { packetKey: 'b', sourceRef: 'src/b.ts' }, // dup of a, nothing left to refill with
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts' }, // dup of a, nothing left to refill with
     ];
     const provider = fakeProvider({ a: [1, 0], b: [1, 0] });
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider,
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider, ...PROVENANCE,
     });
 
     expect(result.selected).toHaveLength(1);
@@ -72,14 +79,14 @@ describe('selectDiverseCandidates', () => {
 
   it('Stage A exact content-hash collapse runs before Stage B and needs no representation', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
-      { packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' }, // exact duplicate of a
-      { packetKey: 'c', sourceRef: 'src/c.ts', contentHash: 'hash-2' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' }, // exact duplicate of a
+      { candidateId: 'c', packetKey: 'c', sourceRef: 'src/c.ts', contentHash: 'hash-2' },
     ];
     const provider = fakeProvider({}); // no latent_256 for anyone -- Stage A alone should still collapse b
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 3, candidatePoolK: 3, provider,
+      candidates, finalK: 3, candidatePoolK: 3, provider, ...PROVENANCE,
     });
 
     expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'c']);
@@ -90,13 +97,13 @@ describe('selectDiverseCandidates', () => {
 
   it('collapseExactContentHash: false disables Stage A entirely', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
-      { packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' },
     ];
     const provider = fakeProvider({});
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 2, candidatePoolK: 2, provider, collapseExactContentHash: false,
+      candidates, finalK: 2, candidatePoolK: 2, provider, collapseExactContentHash: false, ...PROVENANCE,
     });
 
     expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'b']);
@@ -105,13 +112,13 @@ describe('selectDiverseCandidates', () => {
 
   it('candidates with no hydrated latent_256 always survive Stage B (fail-open)', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts' },
-      { packetKey: 'b', sourceRef: 'src/b.ts' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts' },
     ];
     const provider = fakeProvider({ a: [1, 0, 0] }); // 'b' has no vector
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.5, provider,
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.5, provider, ...PROVENANCE,
     });
 
     expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'b']);
@@ -119,13 +126,13 @@ describe('selectDiverseCandidates', () => {
 
   it('never reorders by relevance -- selection preserves input rank order', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'z', sourceRef: 'src/z.ts' },
-      { packetKey: 'a', sourceRef: 'src/a.ts' },
+      { candidateId: 'z', packetKey: 'z', sourceRef: 'src/z.ts' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' },
     ];
     const provider = fakeProvider({ z: [1, 0], a: [0, 1] }); // not near-duplicates of each other
 
     const result = await selectDiverseCandidates({
-      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider,
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider, ...PROVENANCE,
     });
 
     // 'z' ranked first in input, must stay first in output -- no packetKey-based re-sort like
@@ -135,24 +142,32 @@ describe('selectDiverseCandidates', () => {
 
   it('is deterministic across repeated calls on the same input', async () => {
     const candidates: RankedCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/a.ts' },
-      { packetKey: 'b', sourceRef: 'src/b.ts' },
-      { packetKey: 'c', sourceRef: 'src/c.ts' },
+      { candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' },
+      { candidateId: 'b', packetKey: 'b', sourceRef: 'src/b.ts' },
+      { candidateId: 'c', packetKey: 'c', sourceRef: 'src/c.ts' },
     ];
     const provider = fakeProvider({ a: [1, 0, 0], b: [1, 0, 0], c: [0, 1, 0] });
 
-    const run1 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider });
-    const run2 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider });
+    const run1 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider, ...PROVENANCE });
+    const run2 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider, ...PROVENANCE });
 
     expect(run1.selected.map(c => c.packetKey)).toEqual(run2.selected.map(c => c.packetKey));
   });
 
   it('defaults to EVALUATED_LATENT256_SIMILARITY_THRESHOLD when no threshold is passed', async () => {
-    const candidates: RankedCandidate[] = [{ packetKey: 'a', sourceRef: 'src/a.ts' }];
+    const candidates: RankedCandidate[] = [{ candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' }];
     const provider = fakeProvider({ a: [1, 0, 0] });
 
-    const result = await selectDiverseCandidates({ candidates, finalK: 1, provider });
+    const result = await selectDiverseCandidates({ candidates, finalK: 1, provider, ...PROVENANCE });
 
     expect(result.thresholdUsed).toBe(0.9);
+  });
+
+  it('rejects invalid selection configuration before hydration', async () => {
+    const candidates: RankedCandidate[] = [{ candidateId: 'a', packetKey: 'a', sourceRef: 'src/a.ts' }];
+    const provider = fakeProvider({});
+    await expect(selectDiverseCandidates({ candidates, finalK: 0, ...PROVENANCE, provider })).rejects.toThrow('LATENT256_FINAL_K_INVALID');
+    await expect(selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 1, ...PROVENANCE, provider })).rejects.toThrow('LATENT256_CANDIDATE_POOL_LT_FINAL_K');
+    await expect(selectDiverseCandidates({ candidates, finalK: 1, threshold: 2, ...PROVENANCE, provider })).rejects.toThrow('LATENT256_SIMILARITY_THRESHOLD_INVALID');
   });
 });

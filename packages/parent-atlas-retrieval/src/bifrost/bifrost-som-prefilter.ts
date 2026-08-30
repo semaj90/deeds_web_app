@@ -7,7 +7,8 @@
  * - SOM prefilter: Retrieve packet IDs in same/adjacent SOM cells → reduce Qdrant ANN search space
  *
  * Performance impact:
- * - Stage 0 (SOM prefilter): O(1) Redis SMEMBERS on som:cell:<N>, ~2ms
+ * - Stage 0 (SOM prefilter): Redis SMEMBERS on som:cell:<N>; lookup latency is
+ *   independent of the number of keys, but result transfer is O(number of members).
  * - Stage 1 (Qdrant ANN): Reduced from 52K chunks to 4-8K candidates (92% reduction)
  * - Combined: L1 hit (2ms) → L2 hit (5s) → L3 miss (direct 35s ANN)
  * - Total speedup: 35,000ms → 5,000ms = 7× on L2 hit
@@ -19,14 +20,14 @@ const SOM_CELL_PREFIX = 'som:cell:';
 const SOM_PREFILTER_CACHE_TTL = 300; // 5 minutes — SOM assignments are stable
 
 export interface BifrostPrefilterOptions {
-  somCluster?: number;
+  somCluster?: number | null;
   maxCandidates?: number;
   nearbyHops?: number; // Include adjacent cells
 }
 
 export interface PrefilterResult {
   packetIds: string[];
-  somCluster: number;
+  somCluster: number | null;
   candidateCount: number;
   fromCache: boolean;
   prefilterLatency: number;
@@ -34,7 +35,8 @@ export interface PrefilterResult {
 
 /**
  * Retrieve all packet IDs in a specific SOM cell.
- * Uses Redis SMEMBERS for O(1) lookup after Phase 1d cache population.
+ * Uses Redis SMEMBERS after Phase 1d cache population. Redis set lookup is
+ * not a constant-size operation: the server returns every matching member.
  * Fallback: query Postgres if Redis cache is empty.
  */
 export async function getSomCellPackets(
@@ -106,7 +108,17 @@ export async function bifrostPrefilterAnn(
   opts: BifrostPrefilterOptions = {}
 ): Promise<PrefilterResult> {
   const startMs = Date.now();
-  const { somCluster = 0, maxCandidates = 8000, nearbyHops = 1 } = opts;
+  const { somCluster = null, maxCandidates = 8000, nearbyHops = 1 } = opts;
+
+  if (somCluster === null) {
+    return {
+      packetIds: [],
+      somCluster: null,
+      candidateCount: 0,
+      fromCache: false,
+      prefilterLatency: Date.now() - startMs
+    };
+  }
 
   // Stage 0: SOM cell lookup
   const cellPackets = await getSomCellPackets(somCluster);
@@ -150,7 +162,7 @@ export async function applyPrefilterToAnnSearch(
   let prefilterTime = 0;
   let prefilterUsed = false;
 
-  if (cachedSomCluster !== undefined) {
+  if (cachedSomCluster !== undefined && cachedSomCluster !== null) {
     const prefilterResult = await bifrostPrefilterAnn({ somCluster: cachedSomCluster });
     prefilterTime = prefilterResult.prefilterLatency;
 
@@ -190,7 +202,10 @@ export async function initializeSomCellCaches(): Promise<void> {
   // Group by som_cluster
   const cellMap = new Map<number, string[]>();
   for (const pkt of packets) {
-    const cell = pkt.som_cluster ?? 0;
+    if (pkt.som_cluster === null || pkt.som_cluster === undefined) {
+      continue;
+    }
+    const cell = pkt.som_cluster;
     if (!cellMap.has(cell)) {
       cellMap.set(cell, []);
     }
@@ -229,7 +244,8 @@ export async function verifySomCellHealth(): Promise<{
 
   const cellMap = new Map<number, number>();
   for (const pkt of withSom) {
-    const cell = pkt.som_cluster ?? 0;
+    const cell = pkt.som_cluster;
+    if (cell === null || cell === undefined) continue;
     cellMap.set(cell, (cellMap.get(cell) ?? 0) + 1);
   }
 

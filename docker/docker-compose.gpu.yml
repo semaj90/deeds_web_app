@@ -6,6 +6,36 @@ version: '3.8'
 
 services:
   # ========================================================================
+  # Parent Atlas RAPIDS graph/vector executor (read-only)
+  # ========================================================================
+  atlas-gpu-8098:
+    profiles: ["atlas-gpu"]
+    build:
+      context: ..
+      dockerfile: docker/atlas-gpu-8098/Dockerfile
+    image: atlas-gpu-8098:26.08-cuda12-py3.13
+    container_name: atlas-gpu-8098
+    environment:
+      ATLAS_GPU_8098_PORT: "8098"
+      ATLAS_GPU_ARTIFACT_ROOT: /mnt/c/Users/james/Videos/deeds-web-app
+      CUDA_VISIBLE_DEVICES: "0"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ..:/mnt/c/Users/james/Videos/deeds-web-app:ro
+    ports:
+      - "8098:8098"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - legal-ai-network
+    restart: unless-stopped
+
+  # ========================================================================
   # Legal AI GPU Service (Main Application)
   # ========================================================================
   legal-ai-gpu:

@@ -24,6 +24,16 @@ function requestHash(request: RlmSearchRequest): string {
 			query: request.query,
 			filters: request.filters ?? {},
 			topK: request.topK ?? 20,
+			workspaceRevision: request.workspaceRevision,
+			policyRevision: request.policyRevision,
+			environment: request.environment
+				? {
+					contextArtifactId: request.environment.contextArtifactId,
+					candidateSnapshotRevision: request.environment.candidateSnapshotRevision,
+					ordinalMapChecksum: request.environment.ordinalMapChecksum,
+					candidateOrdinals: request.environment.candidateOrdinals,
+				}
+				: null,
 		})))
 		.digest('hex')
 		.slice(0, 24);

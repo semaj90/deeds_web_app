@@ -1,6 +1,6 @@
 {
   "schema": "atlas.live-source-lineage-table-audit.v1",
-  "generatedAt": "2026-08-29T08:02:39.116Z",
+  "generatedAt": "2026-08-30T00:13:36.695Z",
   "status": "SOURCE_LINEAGE_OWNER_SCHEMA_READY",
   "canonicalWrites": false,
   "tables": [
@@ -82,11 +82,19 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_source_aliases"
+    },
+    {
+      "table_schema": "public",
       "table_name": "atlas_source_refs"
     },
     {
       "table_schema": "public",
       "table_name": "atlas_source_revisions"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_workspace_source_bindings"
     },
     {
       "table_schema": "public",
@@ -884,6 +892,24 @@
     },
     {
       "table_schema": "public",
+      "table_name": "atlas_workspace_source_bindings",
+      "column_name": "workspace_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_workspace_source_bindings",
+      "column_name": "source_revision",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
+      "table_name": "atlas_workspace_source_bindings",
+      "column_name": "content_digest",
+      "data_type": "text"
+    },
+    {
+      "table_schema": "public",
       "table_name": "canonical_chunks",
       "column_name": "content",
       "data_type": "text"
@@ -1414,11 +1440,11 @@
       "columns": [
         "content_hash"
       ],
-      "row_count": 22493,
+      "row_count": 22604,
       "source_ref_count": 0,
       "source_revision_count": 0,
       "workspace_revision_count": 0,
-      "content_hash_count": 22493,
+      "content_hash_count": 22604,
       "content_digest_count": 0,
       "source_content_count": 0,
       "content_count": 0
@@ -1462,14 +1488,14 @@
         "content_hash",
         "source_ref"
       ],
-      "row_count": 55206,
-      "source_ref_count": 52417,
+      "row_count": 55853,
+      "source_ref_count": 53064,
       "source_revision_count": 0,
       "workspace_revision_count": 0,
-      "content_hash_count": 55169,
+      "content_hash_count": 55816,
       "content_digest_count": 0,
       "source_content_count": 0,
-      "content_count": 55206
+      "content_count": 55853
     },
     {
       "tableName": "file_index",
@@ -1553,7 +1579,7 @@
       "configuredSearchPath": "\"$user\", public",
       "effectiveSearchPath": "{pg_catalog,public}",
       "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
-      "serverAddress": "172.18.0.22/32",
+      "serverAddress": "172.18.0.9/32",
       "serverPort": 5432,
       "relations": [
         {
@@ -1627,7 +1653,7 @@
           "selectable": true
         }
       ],
-      "fingerprintSha256": "69b18cf29f53f50f14e60cf8e3a861bfa91565ffe2401f1d12f98699a2dddf2a"
+      "fingerprintSha256": "00b2406e36705e721d9e00add05329494edd1beb5f33db579556610a161b1848"
     },
     "status": "READBACK_PROVEN"
   }

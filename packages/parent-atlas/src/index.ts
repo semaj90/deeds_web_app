@@ -68,6 +68,7 @@ export * from './core/structured-value-arrow.js';
 export * from './core/structured-value-parity.js';
 export * from './core/temporal-indexing-fabric.js';
 export * from './core/workflow-action-event.js';
+export * from './core/jetstream-workflow-envelope-v1.js';
 export * from './core/workflow-execution-coordinates-v1.js';
 export * from './core/revision-qualified-symbol-resolution-v1.js';
 export * from './core/lsp-target-identity-enrichment-v1.js';

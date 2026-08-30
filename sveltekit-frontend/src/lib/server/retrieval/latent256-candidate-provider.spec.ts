@@ -27,7 +27,7 @@ describe('PostgresLatent256CandidateProvider', () => {
   it('returns an empty result without querying when packetKeys is empty', async () => {
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: [],
+      candidateIds: [],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
@@ -42,13 +42,14 @@ describe('PostgresLatent256CandidateProvider', () => {
     });
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
     });
     expect(result.found).toBe(1);
     expect(result.vectors.get('a')).toHaveLength(LATENT_256_DIM);
+    expect(result.vectorsChecksum).toMatch(/^[0-9a-f]{64}$/);
   });
 
   it('treats a wrong checkpoint revision as absent (revisionMismatch, not found)', async () => {
@@ -57,7 +58,7 @@ describe('PostgresLatent256CandidateProvider', () => {
     });
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
@@ -73,7 +74,7 @@ describe('PostgresLatent256CandidateProvider', () => {
     });
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
@@ -92,7 +93,7 @@ describe('PostgresLatent256CandidateProvider', () => {
     });
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
@@ -105,7 +106,7 @@ describe('PostgresLatent256CandidateProvider', () => {
     mockExecute.mockResolvedValueOnce({ rows: [] });
     const provider = new PostgresLatent256CandidateProvider();
     const result = await provider.hydrate({
-      packetKeys: ['does-not-exist'],
+      candidateIds: ['does-not-exist'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
@@ -116,23 +117,31 @@ describe('PostgresLatent256CandidateProvider', () => {
     expect(result.invalidShape).toBe(0);
   });
 
-  it('produces an identical receiptChecksum for an identical rerun (deterministic, order-independent over packetKeys)', async () => {
+  it('produces an identical receiptChecksum for an identical rerun (deterministic, order-independent over candidateIds)', async () => {
     mockExecute.mockResolvedValue({
       rows: [{ id: 'a', latent_256: halfvecString(validVec), latent_256_checkpoint_revision: CHECKPOINT_REVISION }],
     });
     const provider = new PostgresLatent256CandidateProvider();
     const run1 = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
     });
     const run2 = await provider.hydrate({
-      packetKeys: ['a'],
+      candidateIds: ['a'],
       candidateSnapshotRevision: 'snap',
       representationRevision: 'rep',
       checkpointRevision: CHECKPOINT_REVISION,
     });
     expect(run1.receiptChecksum).toBe(run2.receiptChecksum);
+    expect(run1.vectorsChecksum).toBe(run2.vectorsChecksum);
+    const differentRepresentation = await provider.hydrate({
+      candidateIds: ['a'],
+      candidateSnapshotRevision: 'snap',
+      representationRevision: 'rep-2',
+      checkpointRevision: CHECKPOINT_REVISION,
+    });
+    expect(differentRepresentation.receiptChecksum).not.toBe(run1.receiptChecksum);
   });
 });

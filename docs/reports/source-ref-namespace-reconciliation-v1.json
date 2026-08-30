@@ -1,6 +1,6 @@
 {
   "schema": "atlas.source-ref-namespace-reconciliation.v1",
-  "generatedAt": "2026-08-28T21:41:00.726Z",
+  "generatedAt": "2026-08-30T00:32:49.703Z",
   "readOnly": true,
   "postgresWrites": false,
   "qdrantWrites": false,
@@ -12,7 +12,7 @@
     "namespaceCandidateRefs": 26160
   },
   "projections": {
-    "postgresChunkRows": 43753,
+    "postgresChunkRows": 44400,
     "graphifyRows": 707,
     "qdrant": "NOT_CHECKED_IN_THIS_READ_ONLY_PASS"
   },
@@ -20,9 +20,9 @@
     "EXACT_CURRENT": 0,
     "NAMESPACE_RULE_HASH_EXACT_REVIEW_ONLY": 0,
     "HASH_TRUNCATED_NOT_PROVABLE": 205,
-    "CHUNK_SOURCE_MATCH_HASH_MISMATCH": 770,
+    "CHUNK_SOURCE_MATCH_HASH_MISMATCH": 838,
     "GRAPHIFY_SOURCE_MATCH_HASH_MISMATCH": 0,
-    "MISSING_POSTGRES_CHUNK": 15591,
+    "MISSING_POSTGRES_CHUNK": 15523,
     "MISSING_GRAPHIFY": 0
   },
   "exactCurrent": 0,
