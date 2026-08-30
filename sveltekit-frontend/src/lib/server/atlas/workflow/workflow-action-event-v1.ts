@@ -87,6 +87,12 @@ export interface WorkflowActionEventV1 {
   };
   evidenceRefs?: string[];
   artifactRefs?: string[];
+  /** Aggregate execution telemetry only; never hidden reasoning or KV-cache contents. */
+  tokensUsed?: number;
+  /** Source/worktree files changed by this action. Distinct from build/data artifactRefs. */
+  filesEdited?: string[];
+  /** OpenSpec change slug this action is accountable to, when known. */
+  openspecChange?: string;
   startedAt?: string;
   emittedAt: string;
   finishedAt?: string;
@@ -114,19 +120,37 @@ function isFiniteNonNegative(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0;
 }
 
+function isNonEmptyTrimmedString(value: unknown): value is string {
+  return typeof value === 'string' && value.length > 0 && value.trim() === value;
+}
+
 export function validateWorkflowActionEvent(event: WorkflowActionEventV1): WorkflowEventValidationResult {
   const errors: string[] = [];
 
   if (event.schema !== 'atlas.workflow-action.v1') errors.push('schema must be atlas.workflow-action.v1');
-  if (!event.workflowId.trim()) errors.push('workflowId is required');
+  if (!isNonEmptyTrimmedString(event.workflowId)) errors.push('workflowId is required');
   if (!Number.isInteger(event.workflowRevision) || event.workflowRevision < 1) {
     errors.push('workflowRevision must be a positive integer');
   }
   if (!Number.isInteger(event.sequence) || event.sequence < 1) errors.push('sequence must be a positive integer');
-  if (!event.actionId.trim()) errors.push('actionId is required');
-  if (!event.dagNodeId.trim()) errors.push('dagNodeId is required');
+  if (!isNonEmptyTrimmedString(event.actionId)) errors.push('actionId is required');
+  if (!isNonEmptyTrimmedString(event.dagNodeId)) errors.push('dagNodeId is required');
   if (!Number.isInteger(event.attempt) || event.attempt < 0) errors.push('attempt must be a non-negative integer');
-  if (!event.operation.trim()) errors.push('operation is required');
+  if (!isNonEmptyTrimmedString(event.operation)) errors.push('operation is required');
+
+  if (event.tokensUsed !== undefined && (!Number.isInteger(event.tokensUsed) || event.tokensUsed < 0)) {
+    errors.push('tokensUsed must be a non-negative integer');
+  }
+  if (event.openspecChange !== undefined && !isNonEmptyTrimmedString(event.openspecChange)) {
+    errors.push('openspecChange must be a non-empty trimmed string');
+  }
+  if (event.filesEdited !== undefined) {
+    if (!Array.isArray(event.filesEdited)) {
+      errors.push('filesEdited must be an array');
+    } else if (event.filesEdited.some((file) => !isNonEmptyTrimmedString(file))) {
+      errors.push('filesEdited entries must be non-empty trimmed strings');
+    }
+  }
 
   const progress = event.progress;
   if (progress) {
