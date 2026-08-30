@@ -8,12 +8,12 @@ import {
   type RepairOverlayRowInputV1,
 } from './repair-candidate-feature-matrix-v1.js';
 
-export const REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA =
-  'atlas.repair-feature-producer-artifact.v1' as const;
-export const REPAIR_FEATURE_PRODUCER_SET_SCHEMA =
-  'atlas.repair-feature-producer-set.v1' as const;
+export const REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA = 'atlas.repair-feature-producer-artifact.v1' as const;
+export const REPAIR_FEATURE_PRODUCER_SET_SCHEMA = 'atlas.repair-feature-producer-set.v1' as const;
 
-export type RepairFeatureProducerStateV1 = Exclude<RepairFeaturePresenceState, 'UNAVAILABLE'>;
+// The runtime validator rejects UNAVAILABLE artifacts. Keeping the input type broad lets persisted
+// or untrusted data be checked rather than making the defensive branch unreachable to TypeScript.
+export type RepairFeatureProducerStateV1 = RepairFeaturePresenceState;
 
 export type RepairFeatureDerivationV1 =
   | 'OBSERVED_SCALAR'
@@ -47,8 +47,7 @@ export interface BuildRepairFeatureProducerArtifactInputV1 {
   rows: readonly RepairFeatureProducerRowV1[];
 }
 
-export interface RepairFeatureProducerArtifactV1
-  extends BuildRepairFeatureProducerArtifactInputV1 {
+export interface RepairFeatureProducerArtifactV1 extends BuildRepairFeatureProducerArtifactInputV1 {
   schema: typeof REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA;
   rows: readonly RepairFeatureProducerRowV1[];
   rowOrdinalChecksum: string;
@@ -97,10 +96,7 @@ function stable(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   const record = value as Record<string, unknown>;
-  return `{${Object.keys(record)
-    .sort()
-    .map((key) => `${JSON.stringify(key)}:${stable(record[key])}`)
-    .join(',')}}`;
+  return `{${Object.keys(record).sort().map((key) => `${JSON.stringify(key)}:${stable(record[key])}`).join(',')}}`;
 }
 
 function digest(value: unknown): string {
@@ -111,106 +107,14 @@ function assertSha256(value: string, code: string): void {
   if (!/^sha256:[0-9a-f]{64}$/i.test(value)) throw new Error(code);
 }
 
-function validateArtifactShape(artifact: RepairFeatureProducerArtifactV1): void {
-  if (artifact.schema !== REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA) {
-    throw new Error('REPAIR_FEATURE_ARTIFACT_SCHEMA_INVALID');
-  }
-  if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(artifact.featureName)) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${artifact.featureName}`);
-  }
-  if (
-    !REPAIR_FEATURE_PRESENCE_STATES.includes(artifact.state) ||
-    artifact.state === 'UNAVAILABLE'
-  ) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${artifact.featureName}`);
-  }
-  assertSha256(
-    artifact.candidateSnapshotRevision,
-    `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${artifact.featureName}`,
-  );
-  assertSha256(
-    artifact.ordinalMapChecksum,
-    `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${artifact.featureName}`,
-  );
-  assertSha256(
-    artifact.inputChecksum,
-    `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${artifact.featureName}`,
-  );
-  assertSha256(
-    artifact.outputChecksum,
-    `REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_INVALID:${artifact.featureName}`,
-  );
-  assertSha256(
-    artifact.artifactChecksum,
-    `REPAIR_FEATURE_ARTIFACT_CHECKSUM_INVALID:${artifact.featureName}`,
-  );
-  if (!Number.isInteger(artifact.candidateRowCount) || artifact.candidateRowCount <= 0) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_COUNT_INVALID:${artifact.featureName}`);
-  }
-  if (!artifact.producerId.trim() || !artifact.producerRevision.trim()) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${artifact.featureName}`);
-  }
+function normalizedRows(rows: readonly RepairFeatureProducerRowV1[]): RepairFeatureProducerRowV1[] {
+  return [...rows]
+    .map((row) => ({ ...row, inputRowChecksum: row.inputRowChecksum ?? null }))
+    .sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
+}
 
-  const ordinals = artifact.rows.map((row) => row.candidateOrdinal);
-  if (new Set(ordinals).size !== ordinals.length) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_DUPLICATE_ORDINAL:${artifact.featureName}`);
-  }
-  for (const row of artifact.rows) {
-    if (
-      !Number.isInteger(row.candidateOrdinal) ||
-      row.candidateOrdinal < 0 ||
-      row.candidateOrdinal >= artifact.candidateRowCount
-    ) {
-      throw new Error(
-        `REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${artifact.featureName}:${row.candidateOrdinal}`,
-      );
-    }
-    if (!Number.isFinite(row.value)) {
-      throw new Error(
-        `REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${artifact.featureName}:${row.candidateOrdinal}`,
-      );
-    }
-    if (row.inputRowChecksum != null) {
-      assertSha256(
-        row.inputRowChecksum,
-        `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${artifact.featureName}:${row.candidateOrdinal}`,
-      );
-    }
-  }
-
-  if (
-    (artifact.state === 'PROVEN' || artifact.state === 'DERIVED') &&
-    artifact.rows.length !== artifact.candidateRowCount
-  ) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${artifact.featureName}`);
-  }
-  if (
-    artifact.state === 'PARTIAL' &&
-    (artifact.rows.length === 0 || artifact.rows.length === artifact.candidateRowCount)
-  ) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${artifact.featureName}`);
-  }
-
-  const sortedRows = [...artifact.rows].sort(
-    (a, b) => a.candidateOrdinal - b.candidateOrdinal,
-  );
-  const expectedOrdinalChecksum = digest(sortedRows.map((row) => row.candidateOrdinal));
-  if (artifact.rowOrdinalChecksum !== expectedOrdinalChecksum) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_CHECKSUM_MISMATCH:${artifact.featureName}`);
-  }
-
-  const expectedOutputChecksum = digest(
-    sortedRows.map((row) => ({
-      candidateOrdinal: row.candidateOrdinal,
-      value: row.value,
-      inputRowChecksum: row.inputRowChecksum ?? null,
-    })),
-  );
-  if (artifact.outputChecksum !== expectedOutputChecksum) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_MISMATCH:${artifact.featureName}`);
-  }
-
-  const body = {
+function artifactBody(artifact: Omit<RepairFeatureProducerArtifactV1, 'artifactChecksum'>) {
+  return {
     schema: artifact.schema,
     featureName: artifact.featureName,
     state: artifact.state,
@@ -225,7 +129,7 @@ function validateArtifactShape(artifact: RepairFeatureProducerArtifactV1): void 
     representationRevision: artifact.representationRevision ?? null,
     sourceRepresentationId: artifact.sourceRepresentationId ?? null,
     sourceRepresentationRevision: artifact.sourceRepresentationRevision ?? null,
-    rows: sortedRows,
+    rows: normalizedRows(artifact.rows),
     rowOrdinalChecksum: artifact.rowOrdinalChecksum,
     outputChecksum: artifact.outputChecksum,
     canonicalAuthority: false as const,
@@ -233,91 +137,60 @@ function validateArtifactShape(artifact: RepairFeatureProducerArtifactV1): void 
     rankingPromotion: false as const,
     mutationAuthority: false as const,
   };
-  if (artifact.artifactChecksum !== digest(body)) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_CHECKSUM_MISMATCH:${artifact.featureName}`);
-  }
 }
 
-export function buildRepairFeatureProducerArtifactV1(
-  input: BuildRepairFeatureProducerArtifactInputV1,
-): RepairFeatureProducerArtifactV1 {
-  if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(input.featureName)) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${input.featureName}`);
-  }
-  if (input.state === 'UNAVAILABLE') {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${input.featureName}`);
-  }
-  assertSha256(
-    input.candidateSnapshotRevision,
-    `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${input.featureName}`,
-  );
-  assertSha256(
-    input.ordinalMapChecksum,
-    `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${input.featureName}`,
-  );
-  assertSha256(
-    input.inputChecksum,
-    `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${input.featureName}`,
-  );
-  if (!Number.isInteger(input.candidateRowCount) || input.candidateRowCount <= 0) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_COUNT_INVALID:${input.featureName}`);
-  }
-  if (!input.producerId.trim() || !input.producerRevision.trim()) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${input.featureName}`);
-  }
+export function verifyRepairFeatureProducerArtifactV1(artifact: RepairFeatureProducerArtifactV1): void {
+  if (artifact.schema !== REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA) throw new Error('REPAIR_FEATURE_ARTIFACT_SCHEMA_INVALID');
+  if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(artifact.featureName)) throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${artifact.featureName}`);
+  if (!REPAIR_FEATURE_PRESENCE_STATES.includes(artifact.state) || artifact.state === 'UNAVAILABLE') throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${artifact.featureName}`);
+  assertSha256(artifact.candidateSnapshotRevision, `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${artifact.featureName}`);
+  assertSha256(artifact.ordinalMapChecksum, `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${artifact.featureName}`);
+  assertSha256(artifact.inputChecksum, `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${artifact.featureName}`);
+  assertSha256(artifact.outputChecksum, `REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_INVALID:${artifact.featureName}`);
+  assertSha256(artifact.artifactChecksum, `REPAIR_FEATURE_ARTIFACT_CHECKSUM_INVALID:${artifact.featureName}`);
+  if (!Number.isInteger(artifact.candidateRowCount) || artifact.candidateRowCount <= 0) throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_COUNT_INVALID:${artifact.featureName}`);
+  if (!artifact.producerId.trim() || !artifact.producerRevision.trim()) throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${artifact.featureName}`);
 
-  const rows = [...input.rows]
-    .map((row) => ({ ...row, inputRowChecksum: row.inputRowChecksum ?? null }))
-    .sort((a, b) => a.candidateOrdinal - b.candidateOrdinal);
+  const rows = normalizedRows(artifact.rows);
   const ordinals = rows.map((row) => row.candidateOrdinal);
-  if (new Set(ordinals).size !== ordinals.length) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_DUPLICATE_ORDINAL:${input.featureName}`);
-  }
+  if (new Set(ordinals).size !== ordinals.length) throw new Error(`REPAIR_FEATURE_ARTIFACT_DUPLICATE_ORDINAL:${artifact.featureName}`);
   for (const row of rows) {
-    if (
-      !Number.isInteger(row.candidateOrdinal) ||
-      row.candidateOrdinal < 0 ||
-      row.candidateOrdinal >= input.candidateRowCount
-    ) {
-      throw new Error(
-        `REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${input.featureName}:${row.candidateOrdinal}`,
-      );
-    }
-    if (!Number.isFinite(row.value)) {
-      throw new Error(
-        `REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${input.featureName}:${row.candidateOrdinal}`,
-      );
-    }
-    if (row.inputRowChecksum != null) {
-      assertSha256(
-        row.inputRowChecksum,
-        `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${input.featureName}:${row.candidateOrdinal}`,
-      );
-    }
+    if (!Number.isInteger(row.candidateOrdinal) || row.candidateOrdinal < 0 || row.candidateOrdinal >= artifact.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${artifact.featureName}:${row.candidateOrdinal}`);
+    if (!Number.isFinite(row.value)) throw new Error(`REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${artifact.featureName}:${row.candidateOrdinal}`);
+    if (row.inputRowChecksum != null) assertSha256(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${artifact.featureName}:${row.candidateOrdinal}`);
   }
+  if ((artifact.state === 'PROVEN' || artifact.state === 'DERIVED') && rows.length !== artifact.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${artifact.featureName}`);
+  if (artifact.state === 'PARTIAL' && (rows.length === 0 || rows.length === artifact.candidateRowCount)) throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${artifact.featureName}`);
 
-  if (
-    (input.state === 'PROVEN' || input.state === 'DERIVED') &&
-    rows.length !== input.candidateRowCount
-  ) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${input.featureName}`);
+  if (artifact.rowOrdinalChecksum !== digest(ordinals)) throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_CHECKSUM_MISMATCH:${artifact.featureName}`);
+  const outputChecksum = digest(rows.map((row) => ({ candidateOrdinal: row.candidateOrdinal, value: row.value, inputRowChecksum: row.inputRowChecksum ?? null })));
+  if (artifact.outputChecksum !== outputChecksum) throw new Error(`REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_MISMATCH:${artifact.featureName}`);
+  if (artifact.artifactChecksum !== digest(artifactBody(artifact))) throw new Error(`REPAIR_FEATURE_ARTIFACT_CHECKSUM_MISMATCH:${artifact.featureName}`);
+}
+
+export function buildRepairFeatureProducerArtifactV1(input: BuildRepairFeatureProducerArtifactInputV1): RepairFeatureProducerArtifactV1 {
+  if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(input.featureName)) throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${input.featureName}`);
+  if (input.state === 'UNAVAILABLE') throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${input.featureName}`);
+  assertSha256(input.candidateSnapshotRevision, `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${input.featureName}`);
+  assertSha256(input.ordinalMapChecksum, `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${input.featureName}`);
+  assertSha256(input.inputChecksum, `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${input.featureName}`);
+  if (!Number.isInteger(input.candidateRowCount) || input.candidateRowCount <= 0) throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_COUNT_INVALID:${input.featureName}`);
+  if (!input.producerId.trim() || !input.producerRevision.trim()) throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${input.featureName}`);
+
+  const rows = normalizedRows(input.rows);
+  const ordinals = rows.map((row) => row.candidateOrdinal);
+  if (new Set(ordinals).size !== ordinals.length) throw new Error(`REPAIR_FEATURE_ARTIFACT_DUPLICATE_ORDINAL:${input.featureName}`);
+  for (const row of rows) {
+    if (!Number.isInteger(row.candidateOrdinal) || row.candidateOrdinal < 0 || row.candidateOrdinal >= input.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${input.featureName}:${row.candidateOrdinal}`);
+    if (!Number.isFinite(row.value)) throw new Error(`REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${input.featureName}:${row.candidateOrdinal}`);
+    if (row.inputRowChecksum != null) assertSha256(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${input.featureName}:${row.candidateOrdinal}`);
   }
-  if (
-    input.state === 'PARTIAL' &&
-    (rows.length === 0 || rows.length === input.candidateRowCount)
-  ) {
-    throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${input.featureName}`);
-  }
+  if ((input.state === 'PROVEN' || input.state === 'DERIVED') && rows.length !== input.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${input.featureName}`);
+  if (input.state === 'PARTIAL' && (rows.length === 0 || rows.length === input.candidateRowCount)) throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${input.featureName}`);
 
   const rowOrdinalChecksum = digest(ordinals);
-  const outputChecksum = digest(
-    rows.map((row) => ({
-      candidateOrdinal: row.candidateOrdinal,
-      value: row.value,
-      inputRowChecksum: row.inputRowChecksum ?? null,
-    })),
-  );
-  const body = {
+  const outputChecksum = digest(rows.map((row) => ({ candidateOrdinal: row.candidateOrdinal, value: row.value, inputRowChecksum: row.inputRowChecksum ?? null })));
+  const base: Omit<RepairFeatureProducerArtifactV1, 'artifactChecksum'> = {
     schema: REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA,
     featureName: input.featureName,
     state: input.state,
@@ -335,16 +208,13 @@ export function buildRepairFeatureProducerArtifactV1(
     rows,
     rowOrdinalChecksum,
     outputChecksum,
-    canonicalAuthority: false as const,
-    retrievalVote: false as const,
-    rankingPromotion: false as const,
-    mutationAuthority: false as const,
+    canonicalAuthority: false,
+    retrievalVote: false,
+    rankingPromotion: false,
+    mutationAuthority: false,
   };
-  const artifact: RepairFeatureProducerArtifactV1 = {
-    ...body,
-    artifactChecksum: digest(body),
-  };
-  validateArtifactShape(artifact);
+  const artifact: RepairFeatureProducerArtifactV1 = { ...base, artifactChecksum: digest(artifactBody(base)) };
+  verifyRepairFeatureProducerArtifactV1(artifact);
   return artifact;
 }
 
@@ -356,35 +226,20 @@ export function buildRepairFeatureProducerSetV1(input: {
 }): RepairFeatureProducerSetV1 {
   assertSha256(input.candidateSnapshotRevision, 'REPAIR_FEATURE_SET_CANDIDATE_SNAPSHOT_INVALID');
   assertSha256(input.ordinalMapChecksum, 'REPAIR_FEATURE_SET_ORDINAL_MAP_INVALID');
-  if (!Number.isInteger(input.candidateRowCount) || input.candidateRowCount <= 0) {
-    throw new Error('REPAIR_FEATURE_SET_ROW_COUNT_INVALID');
-  }
+  if (!Number.isInteger(input.candidateRowCount) || input.candidateRowCount <= 0) throw new Error('REPAIR_FEATURE_SET_ROW_COUNT_INVALID');
   if (input.artifacts.length === 0) throw new Error('REPAIR_FEATURE_SET_EMPTY');
 
-  const states = Object.fromEntries(
-    REPAIR_OVERLAY_FEATURE_NAMES.map((name) => [name, 'UNAVAILABLE']),
-  ) as RepairOverlayFeatureStatesV1;
-  const valuesByOrdinal = new Map<
-    number,
-    Partial<Record<RepairOverlayFeatureName, number>>
-  >();
+  const states = Object.fromEntries(REPAIR_OVERLAY_FEATURE_NAMES.map((name) => [name, 'UNAVAILABLE'])) as RepairOverlayFeatureStatesV1;
+  const valuesByOrdinal = new Map<number, Partial<Record<RepairOverlayFeatureName, number>>>();
   const seenFeatures = new Set<RepairOverlayFeatureName>();
   const summaries: RepairFeatureProducerSummaryV1[] = [];
 
   for (const artifact of input.artifacts) {
-    validateArtifactShape(artifact);
-    if (artifact.candidateSnapshotRevision !== input.candidateSnapshotRevision) {
-      throw new Error(`REPAIR_FEATURE_SET_CANDIDATE_SNAPSHOT_MISMATCH:${artifact.featureName}`);
-    }
-    if (artifact.ordinalMapChecksum !== input.ordinalMapChecksum) {
-      throw new Error(`REPAIR_FEATURE_SET_ORDINAL_MAP_MISMATCH:${artifact.featureName}`);
-    }
-    if (artifact.candidateRowCount !== input.candidateRowCount) {
-      throw new Error(`REPAIR_FEATURE_SET_ROW_COUNT_MISMATCH:${artifact.featureName}`);
-    }
-    if (seenFeatures.has(artifact.featureName)) {
-      throw new Error(`REPAIR_FEATURE_SET_DUPLICATE_FEATURE:${artifact.featureName}`);
-    }
+    verifyRepairFeatureProducerArtifactV1(artifact);
+    if (artifact.candidateSnapshotRevision !== input.candidateSnapshotRevision) throw new Error(`REPAIR_FEATURE_SET_CANDIDATE_SNAPSHOT_MISMATCH:${artifact.featureName}`);
+    if (artifact.ordinalMapChecksum !== input.ordinalMapChecksum) throw new Error(`REPAIR_FEATURE_SET_ORDINAL_MAP_MISMATCH:${artifact.featureName}`);
+    if (artifact.candidateRowCount !== input.candidateRowCount) throw new Error(`REPAIR_FEATURE_SET_ROW_COUNT_MISMATCH:${artifact.featureName}`);
+    if (seenFeatures.has(artifact.featureName)) throw new Error(`REPAIR_FEATURE_SET_DUPLICATE_FEATURE:${artifact.featureName}`);
     seenFeatures.add(artifact.featureName);
     states[artifact.featureName] = artifact.state;
 
@@ -393,7 +248,6 @@ export function buildRepairFeatureProducerSetV1(input: {
       values[artifact.featureName] = row.value;
       valuesByOrdinal.set(row.candidateOrdinal, values);
     }
-
     summaries.push({
       featureName: artifact.featureName,
       state: artifact.state,
@@ -415,7 +269,6 @@ export function buildRepairFeatureProducerSetV1(input: {
   const overlayRows: RepairOverlayRowInputV1[] = [...valuesByOrdinal.entries()]
     .sort(([a], [b]) => a - b)
     .map(([candidateOrdinal, values]) => ({ candidateOrdinal, values }));
-
   const body = {
     schema: REPAIR_FEATURE_PRODUCER_SET_SCHEMA,
     candidateSnapshotRevision: input.candidateSnapshotRevision,
@@ -430,9 +283,5 @@ export function buildRepairFeatureProducerSetV1(input: {
     rankingPromotion: false as const,
     mutationAuthority: false as const,
   };
-
-  return {
-    ...body,
-    producerSetChecksum: digest(body),
-  };
+  return { ...body, producerSetChecksum: digest(body) };
 }
