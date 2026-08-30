@@ -33,6 +33,8 @@ import psycopg2
 import psycopg2.extras
 import requests
 
+from ga8_hardening import normalize_pagerank, validate_pagerank_row, verify_graph_provenance_receipt
+
 DATABASE_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
 OLLAMA_URL = "http://127.0.0.1:11434"
 EMBED_MODEL = "embeddinggemma:latest"
@@ -143,12 +145,16 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
         # which is present on both (prefixed with "sveltekit-frontend/" on the authority side).
         pool_source_refs = ["sveltekit-frontend/" + r["relative_path"] for r in pool]
         cur.execute(
-            "SELECT source_ref, COALESCE(pagerank_l1, 0.0) AS pagerank_l1 "
+            "SELECT source_ref, pagerank_l1 "
             "FROM atlas_graph_authority_scores WHERE source_ref = ANY(%s)",
             (pool_source_refs,),
         )
-        pagerank_by_ref = {row["source_ref"]: row["pagerank_l1"] for row in cur.fetchall()}
-        pagerank_by_id = {r["id"]: pagerank_by_ref.get("sveltekit-frontend/" + r["relative_path"], 0.0) for r in pool}
+        pagerank_rows = cur.fetchall()
+        pagerank_by_ref = {row["source_ref"]: validate_pagerank_row(row["source_ref"], row["pagerank_l1"]) for row in pagerank_rows}
+        missing_refs = sorted(set(pool_source_refs) - set(pagerank_by_ref))
+        if missing_refs:
+            raise SystemExit(f"GA8_PAGERANK_MISSING:{missing_refs[0]}")
+        pagerank_by_id = {r["id"]: pagerank_by_ref["sveltekit-frontend/" + r["relative_path"]] for r in pool}
 
     for r in pool:
         cv = np.fromstring(r["content_embedding"].strip("[]"), sep=",", dtype=np.float32)
@@ -162,11 +168,9 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
     # entry." Flag it explicitly so downstream aggregation can exclude these entries from a
     # "pagerank helps" claim instead of silently averaging in meaningless blend results.
     pr_values = [r["pagerank"] for r in pool]
-    max_pr_raw = max(pr_values, default=0.0)
-    pagerank_degenerate = max_pr_raw <= 0.0 or (max(pr_values) - min(pr_values) <= 0.0)
-    max_pr = max_pr_raw or 1.0
-    for r in pool:
-        r["pagerank_norm"] = r["pagerank"] / max_pr
+    normalized, pagerank_degenerate, pagerank_range = normalize_pagerank(pr_values)
+    for r, normalized_value in zip(pool, normalized):
+        r["pagerank_norm"] = normalized_value
 
     semantic_only_ranked = sorted(pool, key=lambda r: -r["semantic_score"])
     blended_ranked = sorted(
@@ -179,12 +183,14 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
         "neighbor_rows_added": len(neighbor_rows),
         "pagerank_coverage": sum(1 for v in pagerank_by_id.values() if v > 0),
         "pagerank_degenerate": pagerank_degenerate,
+        "pagerank_range": pagerank_range,
         "semantic_only": eval_ranking([r["id"] for r in semantic_only_ranked], relevant_set, FINAL_K),
         "semantic_plus_pagerank": eval_ranking([r["id"] for r in blended_ranked], relevant_set, FINAL_K),
     }
 
 
 def main() -> None:
+    graph_provenance = verify_graph_provenance_receipt()
     entries = [json.loads(l) for l in open(GOLDEN_SET_PATH, "r", encoding="utf-8") if l.strip()]
     neighbors_map = load_imports_neighbors()
     rng = random.Random(SEED)
@@ -229,7 +235,10 @@ def main() -> None:
         "semantic_pool_k": SEMANTIC_POOL_K,
         "final_k": FINAL_K,
         "blend_semantic_weight": BLEND_SEMANTIC_WEIGHT,
+        "metric_revision": "RECALL_AT_10_MRR_AT_10_BINARY_RELEVANT_POOL_V1",
+        "pagerank_normalization": "MINMAX_ZERO_ON_DEGENERATE_V1",
         "seed": SEED,
+        "graph_provenance": graph_provenance,
         "summary": summary,
     }
     out_path = "docs/reports/ga8-graph-feature-ablation-v1.json"

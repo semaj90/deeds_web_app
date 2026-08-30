@@ -1645,3 +1645,51 @@ callers first (per this repo's own duplication-prevention discipline).
 
 Python syntax verified (`python -m py_compile`) on both edited files; no live run executed
 (would hit real Postgres + llama-server, out of scope for a hardening-only pass).
+
+### GA8-HARDEN-FINAL items 1/5/6 strengthened, item 2 implemented (2026-08-30, same session)
+
+Between the previous entry and this one, a concurrent process/session had already picked up
+items 1 and 6 and hardened them further than the first pass here, and implemented item 5's
+underlying concern (a metric-definition tag, applied to the real recall/MRR metrics rather than
+the nonexistent nDCG the critique assumed) -- via a new shared module `python/ga8_hardening.py`
+consumed by both `benchmark_ga8_graph_feature_ablation.py` and `sweep_ga8_blend_weight.py`:
+
+- **Item 1, strengthened**: `validate_pagerank_row()` now hard-fails (`SystemExit`) on NULL,
+  non-numeric, non-finite, or negative `pagerank_l1` -- a real fail-closed gate, not the
+  soft `CORRUPT` boolean flag the TypeScript side (`pagerank-authority.ts`) uses. The Python and
+  TypeScript sides of this system independently converged on the same underlying goal
+  (don't silently trust a broken pagerank_l1) via different call-site contracts appropriate to
+  each language's caller (Python's sweep scripts abort the whole run on bad data since a partial
+  sweep is meaningless; the TS side is invoked per-candidate inside a larger request and throws
+  scoped to that candidate) -- this divergence is intentional, not drift, and both are correct
+  for their own call site.
+- **Item 6, strengthened**: `normalize_pagerank()` now does true min-max normalization
+  (`(value - lo) / (hi - lo)`) with an explicit `degenerate: bool` return when `hi == lo`,
+  replacing the max-scaling approximation from the first pass. Both scripts now report
+  `pagerank_range` per entry and `degenerate_pagerank_entries` in the summary receipt.
+- **Item 5, underlying concern addressed**: both scripts' receipts now carry
+  `"metric_revision": "RECALL_AT_10_MRR_AT_10_BINARY_RELEVANT_POOL_V1"` and
+  `"pagerank_normalization": "MINMAX_ZERO_ON_DEGENERATE_V1"` -- exactly the kind of explicit
+  metric-identity tagging item 5 asked for, just applied to the metrics this pipeline actually
+  computes instead of the nDCG variant that doesn't exist here.
+
+- [x] **Item 2 (graph provenance receipt SHA-256 verify), implemented this turn**: added
+  `verify_graph_provenance_receipt()` to `ga8_hardening.py`. Reads
+  `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json` (the real networkx-vs-cugraph
+  parity proof that vouches for `atlas_graph_authority_scores.pagerank_l1` -- see CLAUDE.md's
+  2026-08-26 correction: this parity pipeline, not Neo4j's own GDS PageRank run, is the trusted
+  compute path GA8 reads from), computes a SHA-256 of the raw bytes, parses it, verifies required
+  top-level fields (`status`, `graphRevision`, `pagerankCorrelation`, `manifest`) and required
+  manifest fields (`nodeTableHash`, `edgeTableHash`, `graphRevision`) are present, and fails
+  closed (`SystemExit`) on a missing file, unparseable JSON, missing fields, or a non-`PASS`
+  status. Wired into both scripts' `main()` -- called once before any sweep work starts, result
+  embedded as `graph_provenance` in both final receipts. Verified live against the real receipt
+  (real SHA-256 computed, `status: PASS` confirmed) and against two synthetic failure cases
+  (missing file, non-PASS status) -- both correctly raised `SystemExit` with a distinguishing
+  error code. `python -m py_compile` clean on all three files.
+
+**GA8-HARDEN-FINAL is now fully addressed**: items 1, 2, 3, 5, 6 implemented and verified;
+item 4 (nDCG eligibility) remains not-applicable per the prior entry's finding (this pipeline
+doesn't compute nDCG). No live sweep run executed in this session (would hit real Postgres +
+Ollama/llama-server, out of scope for a hardening-only pass) -- next real run of either sweep
+script will exercise the fail-closed paths for real for the first time.
