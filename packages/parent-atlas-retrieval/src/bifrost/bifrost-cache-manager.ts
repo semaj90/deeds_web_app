@@ -12,6 +12,16 @@ import {
   type ResidencyObservationV1,
 } from './residency-policy.js';
 
+export type PrefixCacheIdentityV2 = {
+  tokenIds: readonly number[];
+  modelRevision: string;
+  tokenizerRevision: string;
+  promptTemplateRevision: string;
+  contextManifestChecksum: string;
+  adapterRevision?: string;
+  cacheSalt?: string;
+};
+
 const require = createRequire(import.meta.url);
 let __dirname = '';
 try {
@@ -28,29 +38,71 @@ try {
       path.resolve(__dirname, '../../../../../../../simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node'),
     ];
     const nativePath = candidatePaths.find((candidate) => existsSync(candidate));
-    if (nativePath) {
-      native = require(nativePath);
-    }
+    if (nativePath) native = require(nativePath);
   }
 } catch (e: any) {
   console.warn('[bifrost-cache] Native Rust bridge load failed, using JS fallback:', e.message);
 }
 
+function assertIdentityToken(value: string, name: string): void {
+  if (!value || value.trim() !== value) throw new Error(`${name} must be a non-empty trimmed string`);
+}
+
+/**
+ * Promotion-grade KV prefix identity. Exact token IDs are hashed as u32 LE and
+ * runtime/model identity fields are length-prefixed in a fixed order.
+ */
+export function buildPrefixCacheIdentityV2(input: PrefixCacheIdentityV2): string {
+  assertIdentityToken(input.modelRevision, 'modelRevision');
+  assertIdentityToken(input.tokenizerRevision, 'tokenizerRevision');
+  assertIdentityToken(input.promptTemplateRevision, 'promptTemplateRevision');
+  assertIdentityToken(input.contextManifestChecksum, 'contextManifestChecksum');
+  if (input.adapterRevision !== undefined) assertIdentityToken(input.adapterRevision, 'adapterRevision');
+  if (input.cacheSalt !== undefined) assertIdentityToken(input.cacheSalt, 'cacheSalt');
+
+  const hash = crypto.createHash('sha256');
+  hash.update('atlas.bifrost-prefix.v2\0', 'utf8');
+  const count = Buffer.allocUnsafe(4);
+  count.writeUInt32LE(input.tokenIds.length, 0);
+  hash.update(count);
+  const tokenBytes = Buffer.allocUnsafe(input.tokenIds.length * 4);
+  for (let i = 0; i < input.tokenIds.length; i++) {
+    const token = input.tokenIds[i];
+    if (!Number.isInteger(token) || token < 0 || token > 0xffff_ffff) {
+      throw new Error(`tokenIds[${i}] must be an unsigned 32-bit integer`);
+    }
+    tokenBytes.writeUInt32LE(token, i * 4);
+  }
+  hash.update(tokenBytes);
+
+  const fields: Array<[string, string]> = [
+    ['modelRevision', input.modelRevision],
+    ['tokenizerRevision', input.tokenizerRevision],
+    ['promptTemplateRevision', input.promptTemplateRevision],
+    ['contextManifestChecksum', input.contextManifestChecksum],
+    ['adapterRevision', input.adapterRevision ?? ''],
+    ['cacheSalt', input.cacheSalt ?? ''],
+  ];
+  for (const [name, value] of fields) {
+    const pair = Buffer.from(`${name}\0${value}`, 'utf8');
+    const length = Buffer.allocUnsafe(4);
+    length.writeUInt32LE(pair.length, 0);
+    hash.update(length).update(pair);
+  }
+  return hash.digest('hex');
+}
+
 /**
  * BifrostCacheManager
- * 
- * Manages KV-cache prefix tokens for the Bifrost gateway.
- * Based on 'PagedAttention' and 'Prefix Caching' patterns from vLLM/llama.cpp.
+ *
+ * Manages disposable KV-cache prefix references and residency metadata.
  */
 export class BifrostCacheManager {
   private static PREFIX_KEY = 'bifrost:kv:prefix:';
-  private static TTL = 3600 * 4; // 4 hour cache for hot prefixes
+  private static PREFIX_KEY_V2 = 'bifrost:kv:prefix:v2:';
+  private static TTL = 3600 * 4;
   private static RESIDENCY_META_PREFIX = 'bf:meta:v1:';
 
-  /**
-   * Store cache metadata beside an artifact. The artifact remains disposable;
-   * canonical identity and revision validation happen before this method.
-   */
   static async registerResidency(
     prefillIdentity: string,
     metadata: {
@@ -96,7 +148,6 @@ export class BifrostCacheManager {
     }
   }
 
-  /** Apply a pure decision to an existing key; callers own authorization. */
   static async applyResidencyDecision(
     prefillIdentity: string,
     observation: ResidencyObservationV1,
@@ -114,34 +165,38 @@ export class BifrostCacheManager {
   }
 
   /**
-   * Get a cached KV-prefix token if available.
-   * Useful for sharing system prompts across sessions.
+   * Legacy compatibility path: content-only identity is not promotion-grade KV identity.
    */
   static async getPrefixToken(content: string): Promise<string | null> {
     const hash = this.hashContent(content);
-    const redis = getRedis();
-    return await redis.get(this.PREFIX_KEY + hash);
+    return await getRedis().get(this.PREFIX_KEY + hash);
   }
 
-  /**
-   * Register a new KV-prefix token after a prefill.
-   */
+  /** Legacy compatibility path. Prefer registerPrefixV2(). */
   static async registerPrefix(content: string, token: string): Promise<void> {
     const hash = this.hashContent(content);
-    const redis = getRedis();
-    await redis.set(this.PREFIX_KEY + hash, token, 'EX', this.TTL);
+    await getRedis().set(this.PREFIX_KEY + hash, token, 'EX', this.TTL);
   }
 
-  /**
-   * Generate a stable hash for a prompt prefix.
-   */
+  static async getPrefixTokenV2(identity: PrefixCacheIdentityV2): Promise<string | null> {
+    const hash = buildPrefixCacheIdentityV2(identity);
+    return await getRedis().get(this.PREFIX_KEY_V2 + hash);
+  }
+
+  static async registerPrefixV2(identity: PrefixCacheIdentityV2, cacheToken: string): Promise<string> {
+    const hash = buildPrefixCacheIdentityV2(identity);
+    await getRedis().set(this.PREFIX_KEY_V2 + hash, cacheToken, 'EX', this.TTL);
+    return hash;
+  }
+
+  static prefixCacheKeyV2(identity: PrefixCacheIdentityV2): string {
+    return this.PREFIX_KEY_V2 + buildPrefixCacheIdentityV2(identity);
+  }
+
   private static hashContent(content: string): string {
     return crypto.createHash('sha256').update(content).digest('hex');
   }
 
-  /**
-   * Get a cached KAG context packet from the Bifrost (Redis) hot-path.
-   */
   static async getKagContext(cacheKey: string): Promise<any | null> {
     const redis = getRedis();
     const raw = await redis.get(`bifrost:kag:${cacheKey}`);
@@ -158,24 +213,10 @@ export class BifrostCacheManager {
     }
   }
 
-  /**
-   * Register a KAG context packet in the Bifrost hot-path.
-   */
   static async registerKagContext(cacheKey: string, packet: any): Promise<void> {
-    const redis = getRedis();
-    await redis.set(`bifrost:kag:${cacheKey}`, JSON.stringify(packet), 'EX', this.TTL);
+    await getRedis().set(`bifrost:kag:${cacheKey}`, JSON.stringify(packet), 'EX', this.TTL);
   }
 
-  /**
-   * Log a retrieval call so Bifrost can reuse the same source_refs + cluster path.
-   *
-   * Stored at:  bitfrost:retrieval:{queryHash}  (TTL 2h)
-   * Shape: { query_hash, prompt_hash, source_refs, qdrant_point_ids,
-   *          atlas_cluster_ids, feature_ids, cache_hit, tokens_in, tokens_out, latency_ms }
-   *
-   * A future query with the same queryHash skips Qdrant and reads this packet directly
-   * (same as Bifrost L2 semantic cache but at the sourceRef/cluster level).
-   */
   static async logRetrieval(opts: {
     queryHash: string;
     promptHash?: string;
@@ -206,10 +247,6 @@ export class BifrostCacheManager {
     await redis.set(key, JSON.stringify(packet), 'EX', 7200).catch(() => {});
   }
 
-  /**
-   * Look up a prior retrieval packet by query hash.
-   * Returns null on miss — caller falls through to Qdrant.
-   */
   static async getRetrieval(queryHash: string): Promise<{
     source_refs: string[];
     qdrant_point_ids: (string | number)[];
@@ -218,18 +255,17 @@ export class BifrostCacheManager {
     cache_hit: string;
     logged_at: string;
   } | null> {
-    const redis = getRedis();
-    const raw = await redis.get(`bitfrost:retrieval:${queryHash}`).catch(() => null);
+    const raw = await getRedis().get(`bitfrost:retrieval:${queryHash}`).catch(() => null);
     if (!raw) return null;
     try { return JSON.parse(raw); } catch { return null; }
   }
 
   /**
-   * Optimize a message list by identifying shareable prefixes.
+   * Compatibility-only optimization. It cannot advance kv_cache_identity because it
+   * lacks exact token IDs and model/tokenizer/template/adapter revisions.
    */
   static async optimizeMessages(messages: any[]): Promise<{ optimized: any[], cacheToken?: string }> {
     if (messages.length === 0) return { optimized: messages };
-    
     const systemPrompt = messages.find(m => m.role === 'system')?.content;
     if (systemPrompt) {
       const token = await this.getPrefixToken(systemPrompt);
@@ -240,7 +276,6 @@ export class BifrostCacheManager {
         };
       }
     }
-    
     return { optimized: messages };
   }
 }
