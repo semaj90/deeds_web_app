@@ -1329,13 +1329,25 @@ that thread's whole comparison methodology has been running on a **silver** stan
 keyword match) precisely because of that gap. `LAMBDAMART-RANK-01` in that thread is explicitly
 gated on the same golden set this file already scoped.
 
-**Attempted a quick feasibility check on the re-derivation path this file names** ("re-run the
-same live-tree AST/import-facts pipeline that populated `atlas_feature_v1`'s relationships") —
-`grep -rl "atlas_feature_v1" scripts/atlas/` returns **zero files**. That specific pipeline is
-not a standalone script under `scripts/atlas/` (it may live under a different path, inside a TS
-module, or as a one-off historical run — not determined this pass, session context ran out
-before a deeper search). This means "just re-run pipeline X" is not immediately actionable as
-stated; locating (or rebuilding) that pipeline is itself a prerequisite step, not assumed free.
+**Feasibility check completed (2026-08-29, second pass): the re-derivation path this file names
+is a dead end, not just unlocated.** `grep -rl "atlas_feature_v1"` returns nothing under
+`scripts/atlas/`. Broadened to `BELONGS_TO_FEATURE`/`SIMILAR_TOPOLOGY` across the whole repo —
+the one plausible writer candidate found, `src/lib/server/graph/pagerank-som-alignment.ts`
+(note: **root** `src/`, not `sveltekit-frontend/src/`), turns out to be genuinely orphaned code:
+an identical copy already sits archived at
+`deeds_labs/archive/2026-08-22/orphaned-root-src-tree/...` (root `src/` was flagged and archived
+as orphaned that day), and a repo-wide `.ts` search for any import of
+`pagerank-som-alignment` returns **zero references**. The live copy still on disk at the
+un-archived path is unwired dead code, not a runnable pipeline.
+
+**Conclusion**: "re-run the same live-tree AST/import-facts pipeline" does not point to a
+findable, live, runnable artifact. Either it was itself since orphaned/archived, it was a
+one-off Cypher/manual operation never captured as a reusable script, or it exists somewhere this
+two-pass search didn't reach. Building the golden set's structural-proxy labels therefore likely
+requires writing a **new** live-tree AST/import extraction step, not resurrecting an existing
+one — a materially bigger task than "re-run X." This is itself the useful finding: it changes
+the honest size estimate for unblocking `LAMBDAMART-RANK-01`/`GA8` from "re-run one script" to
+"build one script," and that should inform whoever scopes it next.
 
 **No new work started here** — this is a cross-reference + one bounded feasibility check, not a
 methodology decision or an attempt to build the golden set. The two real blockers this file
