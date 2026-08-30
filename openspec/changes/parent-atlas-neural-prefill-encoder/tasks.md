@@ -12452,3 +12452,36 @@ twice-benchmarked (diversity + silver-relevance) candidate mechanism, with real 
 on both axes measured, zero live callers by design, and an honest, named list of what a real
 production-activation decision would still need (golden set, nDCG, MMR challenger) before it
 graduates past "credible shadow-production candidate."
+
+### Qdrant-native-MMR challenger run (2026-08-29): MMR scores lower relevance than the latent_256 policy
+
+Built the control experiment the review specifically recommended:
+`python/benchmark_qdrant_native_mmr_challenger.py` — `query → EmbeddingGemma semantic_768 →
+Qdrant candidates → native MMR`, using Qdrant 1.19's built-in `mmr` query strategy directly on
+`codebase_chunks_768`'s `content` named vector. No `latent_256`, no query-side latent encoder —
+exactly the "requires no second embedding model" property the review named as the reason this
+control is useful. Same 10 real queries, same silver-standard keyword-match relevance labels as
+the earlier silver-relevance eval, so results are directly comparable.
+
+**Result**: `avg_mrr_at_10_silver` = 0.679 for `qdrant_native_mmr`, vs. 0.783 (`baseline`) and
+0.800 (`exact_and_semantic+refill`, this repo's `latent_256` policy). **MMR scores measurably
+lower relevance than both other policies** on this silver metric. Receipt:
+`docs/reports/qdrant-native-mmr-challenger-eval-v1.json`.
+
+**Honest caveat, not glossed over**: MMR's `avg_unique_source_refs` (9.3) is *not* directly
+comparable to the earlier diversity figure (7.4 unique sources for `exact_and_semantic+refill`)
+— they're measured on different collections with different identity schemes
+(`codebase_chunks_768`, a known two-generation collection per this repo's own documented split,
+vs. `codebase_chunk_index` directly). This is deliberately not presented as a diversity win for
+either side; a true apples-to-apples diversity comparison would need both policies operating
+over the same identity space, which hasn't been built.
+
+**LATENT-DIVERSITY-02 status, honestly**: two of the three requested comparisons are now real
+and committed (`exact_and_semantic+refill` vs. `baseline` on both diversity and silver-relevance;
+`qdrant_native_mmr` vs. both on silver-relevance). Remaining, still genuinely unstarted: a
+real human-labeled golden query set, `nDCG`/`α-nDCG` (need graded relevance the silver standard
+can't provide), an apples-to-apples MMR-vs-latent_256 diversity comparison on one identity
+space, and latency p50/p95 for any policy. Given the MMR relevance result just found, the
+practical read is: **the `latent_256` policy currently looks more promising than the MMR
+challenger on relevance**, but this whole comparison is still on a silver, not gold, standard —
+not a promotion decision on its own.
