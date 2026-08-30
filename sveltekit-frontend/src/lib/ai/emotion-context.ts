@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 /**
  * Emotion Context Module
@@ -207,8 +206,7 @@ export function updateBehavior(metrics: Parameters<typeof detectBehavioralSignal
  * @returns The updated EmotionState, or null if analysis failed
  */
 export async function analyzeWebcamFrame(
-	imageBase64: string,
-	ollamaUrl: string = '/api/ollama'
+	imageBase64: string
 ): Promise<EmotionState | null> {
 	if (!browser) return null;
 
@@ -223,31 +221,20 @@ export async function analyzeWebcamFrame(
 	};
 
 	try {
-		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+		const res = await fetch('/api/ai/emotion', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: LOCAL_VLM_MODEL,
-				messages: [
-					{
-						role: 'user',
-						content: 'What emotion is this person expressing? Respond with ONLY one word: happy, sad, angry, fear, surprise, disgust, or neutral.',
-						images: [imageBase64],
-					},
-				],
-				stream: false,
-				max_tokens: 32,
-			}),
+			body: JSON.stringify({ imageBase64 }),
 		});
 
 		if (!res.ok) return null;
 
-		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-		const responseText = (data?.choices?.[0]?.message?.content ?? '').toLowerCase().trim();
+		const data = await res.json() as { emotion?: string; confidence?: number };
+		const responseText = String(data?.emotion ?? '').toLowerCase().trim();
 
 		// Parse emotion from VLM response
 		let detectedEmotion: FaceEmotion = 'neutral';
-		let confidence = 0.6;
+		let confidence = typeof data.confidence === 'number' ? data.confidence : 0.6;
 
 		for (const [keyword, emotion] of Object.entries(EMOTION_MAP)) {
 			if (responseText.includes(keyword)) {

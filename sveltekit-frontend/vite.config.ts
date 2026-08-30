@@ -292,7 +292,16 @@ export default defineConfig(({ mode }) => {
       // Skip processing large binary assets (ONNX models, WASM files)
       assetsInlineLimit: 0, // Don't inline any assets (keeps them as separate files)
       rollupOptions: {
-        external: ['@xenova/transformers', 'piper-wasm', 'nats', 'dockerode', 'ssh2', '@napi-rs/canvas'],
+        external: [
+          '@xenova/transformers',
+          '@huggingface/transformers',
+          'nodejs-whisper',
+          'piper-wasm',
+          'nats',
+          'dockerode',
+          'ssh2',
+          '@napi-rs/canvas',
+        ],
         output: {
           manualChunks: (id) => {
             // Rolldown requires manualChunks to be a function, not an object
@@ -376,18 +385,23 @@ export default defineConfig(({ mode }) => {
         'simdjson-wasm',
         'onnxruntime-web',
         '@xenova/transformers',
-        '@huggingface/transformers', // v4.0.1 exports broken (.mjs missing) — browser-only dynamic import
+        '@huggingface/transformers', // Browser/WebGPU-only dependency; keep external to SSR bundling.
         'piper-wasm',
         'nats',
         'ssh2',
         'claude-mem-opencode', // subpath deep imports not in package exports map — keep as SSR external
       ],
+      // svelte-sonner ships raw .svelte source with no compiled SSR entry point. Keep it internal,
+      // Node tries to require() the .svelte file directly and fails with
+      // ERR_UNKNOWN_FILE_EXTENSION. noExternal forces Vite's own transform pipeline to compile it
+      // during SSR instead of handing it to Node untouched.
+      noExternal: ['svelte-sonner'],
     },
     resolve: {
       alias: {
         __SERVER__: serverInternals,
         __PUBLIC__: publicInternals,
-        // @huggingface/transformers v4.0.1 has broken exports (missing .mjs files) — point to .js directly
+        // Pin the browser bundle explicitly so SSR never evaluates the WebGPU-only package.
         '@huggingface/transformers': path.resolve('node_modules/@huggingface/transformers/dist/transformers.js'),
         // Shim worker_threads for onnxruntime-web (Emscripten WASM loaders import it at module level)
         worker_threads: path.resolve('src/lib/shims/worker-threads-browser-shim.js'),
