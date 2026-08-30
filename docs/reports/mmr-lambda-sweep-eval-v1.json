@@ -1,0 +1,405 @@
+{
+  "schema": "atlas.mmr-lambda-sweep-eval.v1",
+  "canonical_authority": false,
+  "note": "Fills in the semantic_768_mmr diversity/recall tradeoff curve beyond the single lambda=0.5 point already measured in apples-to-apples-diversity-eval-v1.json. lambda=1.0 included as a sanity-check upper bound (should reduce toward baseline behavior).",
+  "pool_k": 50,
+  "final_k": 10,
+  "lambda_values": [
+    0.3,
+    0.5,
+    0.7,
+    0.9,
+    1.0
+  ],
+  "queries": [
+    {
+      "query": "database connection pool retry logic",
+      "silverRelevantInPool": 26,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 9,
+          "relevantInFinal": 5,
+          "recallAt10": 0.19230769230769232,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 5,
+          "recallAt10": 0.19230769230769232,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.3076923076923077,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 5,
+          "relevantInFinal": 9,
+          "recallAt10": 0.34615384615384615,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "JWT authentication middleware",
+      "silverRelevantInPool": 36,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 9,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 8,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 6,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 5,
+          "relevantInFinal": 10,
+          "recallAt10": 0.2777777777777778,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "vector similarity search with cosine distance",
+      "silverRelevantInPool": 26,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 3,
+          "recallAt10": 0.11538461538461539,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 3,
+          "recallAt10": 0.11538461538461539,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 4,
+          "recallAt10": 0.15384615384615385,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.2692307692307692,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 6,
+          "recallAt10": 0.23076923076923078,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "React component state management with Svelte 5 runes",
+      "silverRelevantInPool": 37,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.21621621621621623,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 9,
+          "recallAt10": 0.24324324324324326,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "error handling and logging middleware",
+      "silverRelevantInPool": 36,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 7,
+          "relevantInFinal": 7,
+          "recallAt10": 0.19444444444444445,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "Redis cache invalidation after write",
+      "silverRelevantInPool": 33,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.24242424242424243,
+          "reciprocalRankAt10": 0.5
+        },
+        "1.0": {
+          "uniqueSources": 7,
+          "relevantInFinal": 7,
+          "recallAt10": 0.21212121212121213,
+          "reciprocalRankAt10": 0.3333333333333333
+        }
+      }
+    },
+    {
+      "query": "Qdrant collection provisioning and upsert",
+      "silverRelevantInPool": 27,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2222222222222222,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 9,
+          "relevantInFinal": 7,
+          "recallAt10": 0.25925925925925924,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 8,
+          "recallAt10": 0.2962962962962963,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 7,
+          "relevantInFinal": 9,
+          "recallAt10": 0.3333333333333333,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    },
+    {
+      "query": "PostgreSQL migration with drizzle-orm",
+      "silverRelevantInPool": 22,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5
+        },
+        "0.9": {
+          "uniqueSources": 8,
+          "relevantInFinal": 5,
+          "recallAt10": 0.22727272727272727,
+          "reciprocalRankAt10": 0.5
+        },
+        "1.0": {
+          "uniqueSources": 6,
+          "relevantInFinal": 6,
+          "recallAt10": 0.2727272727272727,
+          "reciprocalRankAt10": 0.5
+        }
+      }
+    },
+    {
+      "query": "WebSocket connection lifecycle",
+      "silverRelevantInPool": 3,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        },
+        "0.5": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        },
+        "0.9": {
+          "uniqueSources": 9,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 0,
+          "recallAt10": 0.0,
+          "reciprocalRankAt10": 0.0
+        }
+      }
+    },
+    {
+      "query": "file upload validation and storage",
+      "silverRelevantInPool": 40,
+      "lambdas": {
+        "0.3": {
+          "uniqueSources": 9,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.5": {
+          "uniqueSources": 9,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.7": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "0.9": {
+          "uniqueSources": 10,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        },
+        "1.0": {
+          "uniqueSources": 8,
+          "relevantInFinal": 10,
+          "recallAt10": 0.25,
+          "reciprocalRankAt10": 1.0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "0.3": {
+      "avg_unique_sources": 9.7,
+      "avg_recall_at_10_silver": 0.19077469077469078,
+      "avg_mrr_at_10_silver": 0.8
+    },
+    "0.5": {
+      "avg_unique_sources": 9.7,
+      "avg_recall_at_10_silver": 0.187996912996913,
+      "avg_mrr_at_10_silver": 0.8
+    },
+    "0.7": {
+      "avg_unique_sources": 9.5,
+      "avg_recall_at_10_silver": 0.2041909041909042,
+      "avg_mrr_at_10_silver": 0.8
+    },
+    "0.9": {
+      "avg_unique_sources": 8.0,
+      "avg_recall_at_10_silver": 0.23083818083818083,
+      "avg_mrr_at_10_silver": 0.8
+    },
+    "1.0": {
+      "avg_unique_sources": 6.6,
+      "avg_recall_at_10_silver": 0.2388348138348138,
+      "avg_mrr_at_10_silver": 0.7833333333333333
+    }
+  },
+  "comparison_note": "latent_256 policy (exact_and_semantic) reference point: avg_unique_sources=7.4, avg_recall_at_10_silver=0.2375, avg_mrr_at_10_silver=0.800 (docs/reports/apples-to-apples-diversity-eval-v1.json). baseline: avg_unique_sources=6.6, avg_recall_at_10_silver=0.2388.",
+  "duration_s": 1.2462737560272217
+}
