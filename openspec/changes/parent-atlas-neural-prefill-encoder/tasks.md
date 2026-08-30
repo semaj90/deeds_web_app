@@ -12485,3 +12485,43 @@ space, and latency p50/p95 for any policy. Given the MMR relevance result just f
 practical read is: **the `latent_256` policy currently looks more promising than the MMR
 challenger on relevance**, but this whole comparison is still on a silver, not gold, standard —
 not a promotion decision on its own.
+
+### Apples-to-apples diversity comparison closes the identity-space gap (2026-08-29)
+
+Built `python/benchmark_apples_to_apples_diversity.py` to remove the confound flagged in the
+MMR challenger result above: all four policies now run against the exact same
+`codebase_chunk_index` pool with the exact same silver relevance labels, eliminating the
+`codebase_chunks_768` two-generation-collection identity issue entirely. Also implements
+`semantic_768_mmr` (standard MMR, relevance and redundancy both on `content_embedding`) and a
+first `exact_and_semantic_and_mmr` data point — the review's own suggested
+`CrossRepresentationDiversityV1` shape (relevance from `semantic_768`, redundancy from
+`latent_256`), built here for the first time. Receipt:
+`docs/reports/apples-to-apples-diversity-eval-v1.json`.
+
+**Result, same 10 real queries, pool=50/finalK=10**:
+
+| Policy | avg unique sources | avg recall@10 (silver) | avg MRR@10 (silver) |
+|---|---|---|---|
+| `baseline` | 6.6 | 0.2388 | 0.783 |
+| `exact_and_semantic` (`latent_256`, refill) | 7.4 | 0.2375 | 0.800 |
+| `semantic_768_mmr` (pure MMR) | 9.7 | 0.1880 | 0.800 |
+| `exact_and_semantic_and_mmr` (cross-representation) | 9.5 | 0.1836 | 0.800 |
+
+**The real, load-bearing finding**: pure MMR trades a genuine 21% relative recall drop
+(0.2388 → 0.1880) for near-maximum diversity (9.7/10). The `latent_256` policy gets a smaller
+diversity gain (6.6 → 7.4) with essentially zero recall cost (0.2388 → 0.2375, noise-level). The
+cross-representation variant does **not** outperform plain MMR — it lands in the same aggressive
+diversity/recall tradeoff regime, not a clear improvement over either simpler policy. This is a
+genuinely useful, non-obvious result: the learned `latent_256` representation isn't "MMR but
+better," it's a materially different, more conservative operating point on the diversity/recall
+curve, at least at `MMR_LAMBDA=0.5` and `threshold=0.90` — neither swept here.
+
+**`LATENT-DIVERSITY-02` status now**: all three of the originally-requested comparisons have a
+real, honest data point (diversity, silver-relevance, and MMR challenger — now apples-to-apples).
+Still genuinely unstarted: a human-labeled golden query set (silver labels remain the
+methodology throughout — real, but weak), `nDCG`/`α-nDCG` (needs graded relevance), a
+`MMR_LAMBDA` sweep (only 0.5 tested — the operating point on the diversity/recall curve is
+tunable and untested at other settings), and latency p50/p95 for any policy. The practical
+takeaway available right now: **`latent_256` is the more conservative, lower-risk diversity
+mechanism of the two real options measured; MMR is the more aggressive one.** Which is
+preferable is a product decision this data informs, not one it settles.
