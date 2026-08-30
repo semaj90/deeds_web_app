@@ -12089,3 +12089,42 @@ methodology as the recall-comparison benchmark above (which computed knn_recall 
 5,547-row held-out val set only). A true ANN-vs-exact proof must query the same scope Qdrant's
 live HNSW index actually searches — the full 55,169-point collection — and compare Qdrant's
 live top-k against exact brute-force top-k computed over that same full corpus.
+
+### `latent_256` ANN-vs-exact parity PROVEN — pipeline complete end to end (2026-08-29)
+
+Built `python/prove_latent256_ann_exact_parity.py` per the scoping above. Ground truth: exact
+cosine top-10 in numpy over the full 55,169-row `latent_256` matrix fetched fresh from Postgres.
+Candidate: Qdrant's live `/points/search` HNSW result for the same query vector, same k=10, self
+excluded from both sides.
+
+20-query smoke: `mean_overlap_at_k: 0.995`, 0 zero-overlap queries. Full 200-query sample
+(seeded, `seed=684453`): **`status: ANN_EXACT_PARITY_PROVEN`, `mean_overlap_at_k: 0.9995`, 0
+zero-overlap queries out of 200.** Receipt: `docs/reports/latent256-ann-exact-parity-v1.json`.
+
+Qdrant's live HNSW index on `codebase_chunks_latent256` matches exact brute-force search
+essentially perfectly at the default `m`/`ef_construction` settings — no reconfiguration needed.
+
+**This closes the full pipeline scoped across this session, start to finish**:
+1. Recall comparison (`semantic_768` vs `semantic_mrl_128/256/512` vs 2-tier `latent_128/64`) →
+   found `semantic_mrl_256` beating the 2-tier `latent_128`.
+2. Extended `NestedSemanticAutoencoder` to a 3-tier nesting (`latent_256 → latent_128 →
+   latent_64`), full retrain (`LATENT_TRAIN_FULL_01` v3) → `latent_256` beat `semantic_mrl_256`
+   outright (0.8957 vs 0.8575), `latent_128` matched it at half the storage.
+3. Postgres migration: `latent_256 halfvec(256)` + `latent_256_checkpoint_revision` columns
+   added live, HNSW index, full 55,169-row backfill via a real model forward pass (not a prefix
+   truncation).
+4. Qdrant migration: `codebase_chunks_latent256` collection provisioned, full 55,169-point
+   backfill mirroring the Postgres column.
+5. ANN-vs-exact parity proof on the live Qdrant index — `0.9995` overlap@10.
+
+`canonical_authority: false` held at every step. This is a proven, indexed, ANN-parity-verified
+routing/reranking lane — not a promotion of `latent_256` to canonical retrieval authority; that
+remains `exact_semantic_768` per this file's standing discipline.
+
+**Genuinely still open** (unstarted, not scoped further this session): wiring `latent_256` into
+an actual live retrieval code path (nothing in `src/lib/server/retrieval/` reads this collection
+yet — it exists and is correct, but nothing calls it); the same pipeline for `latent_128`/
+`latent_64` query-time derivation (prefix+renorm from `latent_256`, free, but no code does it
+yet); Neo4j/graph-side wiring; and everything under the "vertical spine" governance addendum
+(`SymbolFeatureAlignmentV1`, `EligibilitySetV1`, etc.) recorded in
+`parent-atlas-memory-architecture-freeze/proposal.md`, which remains fully unimplemented.
