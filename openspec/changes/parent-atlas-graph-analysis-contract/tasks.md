@@ -1404,3 +1404,34 @@ the *same* eventual golden set — build it once, not twice.
   `CALLS`) are now moot for the golden-set purpose specifically (worked around via fresh
   extraction), but remain real, separate data-quality problems in live Neo4j if anything else
   still reads those edges — not investigated or fixed this session.
+
+### GA8 ablation CONFIRMED at full scale (2026-08-29, same day): PageRank measurably improves ranking
+
+`python/benchmark_ga8_graph_feature_ablation.py`, run against the complete 646-entry golden set
+(zero skipped). Two real bugs found and fixed en route (documented in the two commits directly
+preceding this one): a `packet_key`-vs-`source_ref` identity mismatch joining
+`atlas_graph_authority_scores`, and a pool-dilution flaw (injecting a query's *full* 1-hop
+`IMPORTS` neighbor set, not just the golden set's known-relevant packets, produced pools of
+hundreds-to-thousands of candidates for hub files and made top-10 recovery near-impossible
+regardless of ranking policy).
+
+**Full-sample result** (n=646, `BLEND_SEMANTIC_WEIGHT=0.7`, untuned):
+
+| Policy | avg recall@10 | avg MRR@10 |
+|---|---|---|
+| `semantic_only` | 0.0412 | 0.0444 |
+| `semantic_plus_pagerank` | **0.1117** (2.7x) | **0.1285** (2.9x) |
+
+This is now a credible, full-sample finding, not a smoke-scale artifact — confirmed identical
+direction and similar magnitude to the earlier n=10 run. **`GA8`'s central question (does adding
+graph authority features improve ranking on this proxy ground truth) has a real, positive,
+reproducible answer.** Receipt: `docs/reports/ga8-graph-feature-ablation-v1.json`.
+
+**Caveats that remain, honestly**: (1) ground truth is the `STRUCTURAL_PROXY_IMPORTERS` golden
+set — structural, not human-verified; (2) `BLEND_SEMANTIC_WEIGHT=0.7` was never swept — an
+obvious next experiment mirroring the `MMR_LAMBDA` sweep methodology already used in the
+`latent_256` thread; (3) absolute recall/MRR values are still low in absolute terms (0.11/0.13)
+— PageRank helps relative to the semantic-only baseline, but neither policy is "good" yet in
+absolute terms on this ground truth. This does not promote graph features into any live ranking
+path — that remains a separate, later, deliberate decision, same discipline as the `latent_256`
+thread throughout.
