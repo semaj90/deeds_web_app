@@ -1,40 +1,76 @@
 /**
- * applyLatent256SemanticDedup — standalone combinator for LATENT256_SEMANTIC_DEDUP.
+ * selectDiverseCandidates — non-destructive candidate selection using latent_256 semantic
+ * near-duplicate detection, with refill so a skipped duplicate is replaced by the next-ranked
+ * candidate rather than silently shrinking the result count.
  *
- * Deliberately NOT wired into unified-orchestrator.ts or any other live scoring path (per the
- * 2026-08-29 finding: postProcessCandidates itself has zero live callers repo-wide, and wiring
- * this into the orchestrator resolves to a much bigger decision -- either activating the entire
- * dormant candidate-scorer.ts -> post-process-reranker.ts pipeline for the first time, or
- * building a second competing scoring mechanism. Neither has been decided.
+ * Supersedes an earlier destructive applyLatent256SemanticDedup() (kept only in git history --
+ * zero live callers existed, so no compat shim needed) per review: "remove" encourages a
+ * destructive mental model where dedup can only shrink a fixed top-K with no replacement.
+ * selectDiverseCandidates always walks a LARGER candidatePoolK and refills until finalK is
+ * reached (or the pool is exhausted), so:
  *
- * This function is the deliberately-separate call site: any future caller (a new route, a
- * script, or unified-orchestrator.ts itself if that larger decision is later made) can call
- * this directly to get diversity-pruned results, without depending on candidate-scorer.ts's
- * ScoredCandidate/blendedScore machinery at all.
+ *   dedup may change WHICH candidates survive
+ *   but does not silently reduce requested result cardinality (as long as the pool is large
+ *   enough -- see the real-world benchmark below for how big that needs to be)
  *
- * Real-world benchmark (docs/reports/latent256-dedup-realworld-benchmark-v1.json, 10 realistic
- * queries against real top-50 pgvector retrieval): avg 15.5% of candidates removed per query,
- * but avg unique-source coverage DECREASED 4.1% -- this prunes true near-duplicate content, which
- * sometimes spans multiple distinct source files. That is a real tradeoff, not a pure win --
- * evaluate whether it fits a given use case before enabling it there.
+ * Two stages, in order:
+ *   Stage A (exact):    candidates sharing a caller-supplied contentHash collapse to the
+ *                        best-ranked one. Free, deterministic, no representation needed --
+ *                        this is what "duplicate" means before any learned model is involved.
+ *   Stage B (semantic):  latent_256 cosine similarity >= threshold, using the SAME greedy
+ *                        select-in-rank-order algorithm as before, but now with refill.
+ *
+ * Governance boundary preserved exactly as before: production rank order is immutable input,
+ * this function assigns no score and casts no extra retrieval vote. latent_256 remains
+ * canonicalAuthority=false, retrievalVote=false, standaloneTextEmbedding=false.
  */
 
 import { PostgresLatent256CandidateProvider, type Latent256CandidateProviderV1 } from './latent256-candidate-provider.js';
 import { EVALUATED_LATENT256_SIMILARITY_THRESHOLD } from './post-process-reranker.js';
 
-export interface Latent256DedupCandidate {
+export interface RankedCandidate {
   /** codebase_chunk_index.id (uuid) -- see latent256-candidate-provider.ts's identity-scope note. */
   packetKey: string;
   sourceRef: string;
-  /** Relevance score from whatever upstream retrieval produced this candidate (e.g. cosine
-   * similarity, RRF score) -- higher is better. Determines dedup precedence: a lower-scoring
-   * near-duplicate of a higher-scoring candidate is the one removed. */
-  relevanceScore: number;
+  /** Optional: enables Stage A exact-duplicate collapse. Caller-supplied (this module does no
+   * extra I/O to fetch it) -- matches the same no-I/O boundary as post-process-reranker.ts. */
+  contentHash?: string;
 }
 
-export interface Latent256DedupResult {
-  survivors: Latent256DedupCandidate[];
-  removed: Array<Latent256DedupCandidate & { duplicateOfPacketKey: string | null }>;
+export interface SelectDiverseCandidatesInput {
+  /** MUST already be in production-rank order (best first). This function never reorders by
+   * relevance -- it only selects a subset, in the input order, honoring exact/semantic
+   * near-duplicate skips with refill. */
+  candidates: readonly RankedCandidate[];
+  /** How many final candidates to return. Selection stops as soon as this many are chosen, or
+   * the pool is exhausted, whichever comes first. */
+  finalK: number;
+  /** How much of `candidates` to actually consider. Must be >= finalK for refill to have
+   * headroom -- if the pool is too small, near-duplicate skips can still reduce the result
+   * below finalK (there is nothing left to refill from; this is the exact failure mode the
+   * review diagnosed for a bare top-K-then-prune shape). Defaults to candidates.length. */
+  candidatePoolK?: number;
+  /** Defaults to EVALUATED_LATENT256_SIMILARITY_THRESHOLD (0.90, evaluation-backed -- NOT
+   * promoted to a production default; see that constant's own doc comment). */
+  threshold?: number;
+  checkpointRevision?: string;
+  candidateSnapshotRevision?: string;
+  representationRevision?: string;
+  provider?: Latent256CandidateProviderV1;
+  /** Stage A toggle. Default true -- exact-content-hash collapse is free and should generally
+   * run before the learned-representation stage justifies itself against it. */
+  collapseExactContentHash?: boolean;
+}
+
+export interface SelectDiverseCandidatesResult {
+  selected: RankedCandidate[];
+  skippedExactDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }>;
+  skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }>;
+  /** True if the pool was exhausted before reaching finalK -- i.e. candidatePoolK was too small
+   * relative to how much near-duplication existed in the pool. Signal to widen the pool, not a
+   * silent-shrink bug (selected.length is reported honestly, never padded). */
+  poolExhaustedBeforeFinalK: boolean;
+  poolConsidered: number;
   hydration: {
     requested: number;
     found: number;
@@ -46,19 +82,6 @@ export interface Latent256DedupResult {
   thresholdUsed: number;
 }
 
-export interface Latent256DedupOptions {
-  /** Defaults to EVALUATED_LATENT256_SIMILARITY_THRESHOLD (0.90, evaluation-backed -- see
-   * docs/reports/latent256-dedup-threshold-evaluation-v1.json). */
-  threshold?: number;
-  /** Defaults to the checkpoint revision the current latent_256 corpus was backfilled with. */
-  checkpointRevision?: string;
-  candidateSnapshotRevision?: string;
-  representationRevision?: string;
-  provider?: Latent256CandidateProviderV1;
-}
-
-/** Must match the checkpoint_revision stamped by python/backfill_latent_256.py's current run --
- * see models/nested-semantic-autoencoder/ae_meta.json. */
 const DEFAULT_CHECKPOINT_REVISION = 'd6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259';
 
 function cosineSimilarity(a: readonly number[], b: readonly number[]): number {
@@ -73,54 +96,78 @@ function cosineSimilarity(a: readonly number[], b: readonly number[]): number {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-/**
- * Prunes near-duplicate candidates by latent_256 similarity. Candidates without a hydrated
- * latent_256 vector always survive (fail-open, per canonicalAuthority:false).
- *
- * Deterministic: input candidates are sorted by relevanceScore descending, packetKey ascending
- * (tie-break) before pruning, so a rerun on the same input always produces the same result.
- */
-export async function applyLatent256SemanticDedup(
-  candidates: readonly Latent256DedupCandidate[],
-  options: Latent256DedupOptions = {},
-): Promise<Latent256DedupResult> {
-  const threshold = options.threshold ?? EVALUATED_LATENT256_SIMILARITY_THRESHOLD;
-  const checkpointRevision = options.checkpointRevision ?? DEFAULT_CHECKPOINT_REVISION;
-  const provider = options.provider ?? new PostgresLatent256CandidateProvider();
+export async function selectDiverseCandidates(
+  input: SelectDiverseCandidatesInput,
+): Promise<SelectDiverseCandidatesResult> {
+  const {
+    candidates,
+    finalK,
+    threshold = EVALUATED_LATENT256_SIMILARITY_THRESHOLD,
+    checkpointRevision = DEFAULT_CHECKPOINT_REVISION,
+    collapseExactContentHash = true,
+  } = input;
+  const candidatePoolK = input.candidatePoolK ?? candidates.length;
+  const provider = input.provider ?? new PostgresLatent256CandidateProvider();
 
-  const sorted = [...candidates].sort(
-    (a, b) => b.relevanceScore - a.relevanceScore || a.packetKey.localeCompare(b.packetKey),
-  );
+  // Pool is already in production-rank order -- never reordered.
+  const pool = candidates.slice(0, candidatePoolK);
 
+  // Stage A: exact content-hash collapse (free, no representation needed).
+  const skippedExactDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
+  const stageAOutput: RankedCandidate[] = [];
+  if (collapseExactContentHash) {
+    const seenHash = new Map<string, string>(); // contentHash -> packetKey of the kept (best-ranked) candidate
+    for (const c of pool) {
+      if (!c.contentHash) {
+        stageAOutput.push(c);
+        continue;
+      }
+      const keeper = seenHash.get(c.contentHash);
+      if (keeper) {
+        skippedExactDuplicate.push({ ...c, duplicateOfPacketKey: keeper });
+      } else {
+        seenHash.set(c.contentHash, c.packetKey);
+        stageAOutput.push(c);
+      }
+    }
+  } else {
+    stageAOutput.push(...pool);
+  }
+
+  // Stage B: semantic near-duplicate skip + refill, greedy in rank order.
   const hydration = await provider.hydrate({
-    packetKeys: sorted.map(c => c.packetKey),
-    candidateSnapshotRevision: options.candidateSnapshotRevision ?? 'latent256-dedup-adhoc',
-    representationRevision: options.representationRevision ?? 'latent_256',
+    packetKeys: stageAOutput.map(c => c.packetKey),
+    candidateSnapshotRevision: input.candidateSnapshotRevision ?? 'latent256-select-adhoc',
+    representationRevision: input.representationRevision ?? 'latent_256',
     checkpointRevision,
   });
 
-  const survivors: Latent256DedupCandidate[] = [];
-  const removed: Array<Latent256DedupCandidate & { duplicateOfPacketKey: string | null }> = [];
-  const keptVectors: Array<{ packetKey: string; vec: readonly number[] }> = [];
+  const selected: RankedCandidate[] = [];
+  const skippedSemanticDuplicate: Array<RankedCandidate & { duplicateOfPacketKey: string }> = [];
+  const selectedVectors: Array<{ packetKey: string; vec: readonly number[] }> = [];
 
-  for (const c of sorted) {
+  for (const c of stageAOutput) {
+    if (selected.length >= finalK) break;
     const vec = hydration.vectors.get(c.packetKey);
     if (!vec) {
-      survivors.push(c);
+      selected.push(c);
       continue;
     }
-    const dup = keptVectors.find(kv => cosineSimilarity(vec, kv.vec) >= threshold);
+    const dup = selectedVectors.find(sv => cosineSimilarity(vec, sv.vec) >= threshold);
     if (dup) {
-      removed.push({ ...c, duplicateOfPacketKey: dup.packetKey });
+      skippedSemanticDuplicate.push({ ...c, duplicateOfPacketKey: dup.packetKey });
     } else {
-      keptVectors.push({ packetKey: c.packetKey, vec });
-      survivors.push(c);
+      selectedVectors.push({ packetKey: c.packetKey, vec });
+      selected.push(c);
     }
   }
 
   return {
-    survivors,
-    removed,
+    selected,
+    skippedExactDuplicate,
+    skippedSemanticDuplicate,
+    poolExhaustedBeforeFinalK: selected.length < finalK,
+    poolConsidered: pool.length,
     hydration: {
       requested: hydration.requested,
       found: hydration.found,

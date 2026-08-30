@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyLatent256SemanticDedup, type Latent256DedupCandidate } from './latent256-dedup.js';
+import { selectDiverseCandidates, type RankedCandidate } from './latent256-dedup.js';
 import type { Latent256CandidateProviderV1, Latent256HydrateInput, Latent256HydrateResult } from './latent256-candidate-provider.js';
 
 function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProviderV1 {
@@ -26,57 +26,132 @@ function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProv
   };
 }
 
-describe('applyLatent256SemanticDedup', () => {
-  it('removes a lower-relevance near-duplicate and records duplicateOfPacketKey', async () => {
-    const candidates: Latent256DedupCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/foo.ts', relevanceScore: 0.9 },
-      { packetKey: 'b', sourceRef: 'src/bar.ts', relevanceScore: 0.8 },
-      { packetKey: 'c', sourceRef: 'src/baz.ts', relevanceScore: 0.7 },
+describe('selectDiverseCandidates', () => {
+  it('refills: a skipped semantic duplicate is replaced by the next-ranked candidate, finalK is still met', async () => {
+    // Rank order: a, b(dup of a), c, d, e -- pool of 5, finalK=3.
+    // Without refill: top-3-then-prune would yield [a, c] (b removed, no replacement) = 2 results.
+    // With refill: b is skipped and c/d fill in -> [a, c, d] = 3 results, finalK honored.
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts' },
+      { packetKey: 'b', sourceRef: 'src/b.ts' },
+      { packetKey: 'c', sourceRef: 'src/c.ts' },
+      { packetKey: 'd', sourceRef: 'src/d.ts' },
+      { packetKey: 'e', sourceRef: 'src/e.ts' },
     ];
-    const provider = fakeProvider({ a: [1, 0, 0], b: [1, 0, 0], c: [0, 1, 0] });
+    const provider = fakeProvider({
+      a: [1, 0, 0], b: [1, 0, 0], // b is a near-duplicate of a
+      c: [0, 1, 0], d: [0, 0, 1], e: [0.5, 0.5, 0],
+    });
 
-    const result = await applyLatent256SemanticDedup(candidates, { threshold: 0.99, provider });
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 3, candidatePoolK: 5, threshold: 0.99, provider,
+    });
 
-    expect(result.survivors.map(c => c.packetKey)).toEqual(['a', 'c']);
-    expect(result.removed).toEqual([
+    expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'c', 'd']);
+    expect(result.selected).toHaveLength(3);
+    expect(result.poolExhaustedBeforeFinalK).toBe(false);
+    expect(result.skippedSemanticDuplicate).toEqual([
       expect.objectContaining({ packetKey: 'b', duplicateOfPacketKey: 'a' }),
     ]);
   });
 
-  it('candidates with no hydrated vector always survive (fail-open)', async () => {
-    const candidates: Latent256DedupCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/foo.ts', relevanceScore: 0.9 },
-      { packetKey: 'b', sourceRef: 'src/bar.ts', relevanceScore: 0.8 },
+  it('reports poolExhaustedBeforeFinalK honestly when the pool is too small to refill from', async () => {
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts' },
+      { packetKey: 'b', sourceRef: 'src/b.ts' }, // dup of a, nothing left to refill with
+    ];
+    const provider = fakeProvider({ a: [1, 0], b: [1, 0] });
+
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider,
+    });
+
+    expect(result.selected).toHaveLength(1);
+    expect(result.poolExhaustedBeforeFinalK).toBe(true);
+  });
+
+  it('Stage A exact content-hash collapse runs before Stage B and needs no representation', async () => {
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
+      { packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' }, // exact duplicate of a
+      { packetKey: 'c', sourceRef: 'src/c.ts', contentHash: 'hash-2' },
+    ];
+    const provider = fakeProvider({}); // no latent_256 for anyone -- Stage A alone should still collapse b
+
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 3, candidatePoolK: 3, provider,
+    });
+
+    expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'c']);
+    expect(result.skippedExactDuplicate).toEqual([
+      expect.objectContaining({ packetKey: 'b', duplicateOfPacketKey: 'a' }),
+    ]);
+  });
+
+  it('collapseExactContentHash: false disables Stage A entirely', async () => {
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts', contentHash: 'hash-1' },
+      { packetKey: 'b', sourceRef: 'src/b.ts', contentHash: 'hash-1' },
+    ];
+    const provider = fakeProvider({});
+
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 2, candidatePoolK: 2, provider, collapseExactContentHash: false,
+    });
+
+    expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'b']);
+    expect(result.skippedExactDuplicate).toHaveLength(0);
+  });
+
+  it('candidates with no hydrated latent_256 always survive Stage B (fail-open)', async () => {
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts' },
+      { packetKey: 'b', sourceRef: 'src/b.ts' },
     ];
     const provider = fakeProvider({ a: [1, 0, 0] }); // 'b' has no vector
 
-    const result = await applyLatent256SemanticDedup(candidates, { threshold: 0.5, provider });
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.5, provider,
+    });
 
-    expect(result.survivors.map(c => c.packetKey)).toEqual(['a', 'b']);
+    expect(result.selected.map(c => c.packetKey)).toEqual(['a', 'b']);
+  });
+
+  it('never reorders by relevance -- selection preserves input rank order', async () => {
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'z', sourceRef: 'src/z.ts' },
+      { packetKey: 'a', sourceRef: 'src/a.ts' },
+    ];
+    const provider = fakeProvider({ z: [1, 0], a: [0, 1] }); // not near-duplicates of each other
+
+    const result = await selectDiverseCandidates({
+      candidates, finalK: 2, candidatePoolK: 2, threshold: 0.99, provider,
+    });
+
+    // 'z' ranked first in input, must stay first in output -- no packetKey-based re-sort like
+    // the pure-function reranker uses for tie-breaking (this function has no notion of score).
+    expect(result.selected.map(c => c.packetKey)).toEqual(['z', 'a']);
   });
 
   it('is deterministic across repeated calls on the same input', async () => {
-    const candidates: Latent256DedupCandidate[] = [
-      { packetKey: 'z', sourceRef: 'src/z.ts', relevanceScore: 0.5 },
-      { packetKey: 'a', sourceRef: 'src/a.ts', relevanceScore: 0.5 },
+    const candidates: RankedCandidate[] = [
+      { packetKey: 'a', sourceRef: 'src/a.ts' },
+      { packetKey: 'b', sourceRef: 'src/b.ts' },
+      { packetKey: 'c', sourceRef: 'src/c.ts' },
     ];
-    const provider = fakeProvider({ z: [1, 0], a: [1, 0] });
+    const provider = fakeProvider({ a: [1, 0, 0], b: [1, 0, 0], c: [0, 1, 0] });
 
-    const run1 = await applyLatent256SemanticDedup(candidates, { threshold: 0.99, provider });
-    const run2 = await applyLatent256SemanticDedup(candidates, { threshold: 0.99, provider });
+    const run1 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider });
+    const run2 = await selectDiverseCandidates({ candidates, finalK: 2, candidatePoolK: 3, threshold: 0.99, provider });
 
-    expect(run1.survivors.map(c => c.packetKey)).toEqual(run2.survivors.map(c => c.packetKey));
-    // tie-break by packetKey ascending -> 'a' sorts before 'z' and wins
-    expect(run1.survivors.map(c => c.packetKey)).toEqual(['a']);
+    expect(run1.selected.map(c => c.packetKey)).toEqual(run2.selected.map(c => c.packetKey));
   });
 
   it('defaults to EVALUATED_LATENT256_SIMILARITY_THRESHOLD when no threshold is passed', async () => {
-    const candidates: Latent256DedupCandidate[] = [
-      { packetKey: 'a', sourceRef: 'src/foo.ts', relevanceScore: 0.9 },
-    ];
+    const candidates: RankedCandidate[] = [{ packetKey: 'a', sourceRef: 'src/a.ts' }];
     const provider = fakeProvider({ a: [1, 0, 0] });
 
-    const result = await applyLatent256SemanticDedup(candidates, { provider });
+    const result = await selectDiverseCandidates({ candidates, finalK: 1, provider });
 
     expect(result.thresholdUsed).toBe(0.9);
   });
