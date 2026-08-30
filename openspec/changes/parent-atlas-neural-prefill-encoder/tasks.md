@@ -12952,3 +12952,74 @@ paths. `latent_256` is a separate learned derived representation; `latent_128` a
 `latent_64` are derived views, not EmbeddingGemma MRL representations.
 
 Reconciliation receipt: `docs/reports/semantic-dimension-alignment-v1.json`.
+
+### Session handoff (2026-08-30, second pass): content_embedding_768 script correction, BitFrost audit rewrite, SYMBOL-REPRESENTATION-FREEZE-01
+
+Continuation of the 8aa923696f handoff above. Five commits this pass, all pushed to main:
+
+1. `487bab1d8f` -- corrected three scripts that had drifted to query the wrong Postgres column
+   (`content_embedding_768`, ~1,386 rows) instead of canonical `content_embedding` (55,169
+   rows): `prepare_golden_review_pool_v1.py` reverted cleanly (regenerated pool matched the
+   pre-drift outputChecksum byte-for-byte), `plan-current-semantic768-corpus-manifest-v1.mjs`
+   fixed in place, `plan-semantic768-backfill-v1.mjs` rewritten entirely -- its old premise
+   (backfill/reembed content_embedding_768 as canonical) was backwards; it now plans the actual
+   fix, correcting the stale `embedding_dimension` metadata column via
+   `vector_dims(content_embedding::vector)`. All three verified live against Postgres before
+   commit. **Note**: after this commit, `plan-current-semantic768-corpus-manifest-v1.mjs` was
+   independently re-drifted back to `content_embedding_768` by a concurrent agent process
+   working in this same repo this session -- flagged to the operator rather than silently
+   re-reverted a second time (see the "concurrent agent conflict" thread mid-session). Worth a
+   fresh live check before trusting that specific script again.
+
+2. `7304dd4291` -- rewrote `audit-bitfrost-semantic-cache.mjs` from a flat key-pattern census
+   into 28 ownership-classified families (ACTIVE/LEGACY/ASPIRATIONAL/WARMED_PENDING/
+   NAMING_DRIFT_CHECK), every classification checked live against `legal-ai-valkey` first. New
+   drift-detection logic flags an ASPIRATIONAL family suddenly getting real keys, or an ACTIVE
+   family silently going to zero. First live run: 0 drift flags, 28/28 match. Note: a concurrent
+   edit later reclassified `gpu:autoencoder:latent_64:*` in this same file -- investigated and
+   found that edit conflated two genuinely different systems (see item 4 below); left untouched
+   pending the naming-collision fix, which then resolved the ambiguity at the source.
+
+3. `docs/reports/semantic-representation-storage-audit-v1.json` -- live verification receipt
+   (`information_schema.columns` + `vector_dims()` queries) confirming the frozen contract:
+   `content_embedding` is `halfvec(768)`, 55,169 populated, canonical; `latent_256` is
+   `halfvec(256)`, 55,169 populated, the NestedSemanticAutoencoder's physical bottleneck;
+   `latent_128` is not a persisted column (derived at query time); `content_embedding_768` and
+   `latent_64` (Postgres column, not Redis) are both confirmed non-canonical by population gap.
+
+4. `b23564c5c5` + `635af413b7` + `47badd00d3` (the last landed via a concurrent commit,
+   independently verified identical intent) -- SYMBOL-REPRESENTATION-FREEZE-01. Fixed
+   `vector-manifest.ts`'s `semantic768.postgresColumn` (was `content_embedding_768`, now
+   `content_embedding`). Added a `SymbolRepresentationNameEnum` (7 values: `semantic_768` + 3
+   MRL truncations + `latent_256` + 2 nested-AE derived prefixes) that structurally excludes
+   every legacy 384-dim name, for symbol-facing cards/resolvers to type against instead of the
+   broad `VectorNameEnum`. Resolved the most dangerous naming collision found this session: two
+   unrelated 64-dim systems were both called `latent_64` -- the OLD, genuinely-live,
+   Redis-backed SOM-topology autoencoder (`backfill-latent-vectors.mjs` ->
+   `gpu:autoencoder:latent_64:*` -> consumed by `train-som-20x20.mjs`) is now `topology_ae64_v1`
+   (status ACTIVE); the NEW nested-AE derived prefix keeps the `latent_64` name (status
+   REFERENCE_ONLY, matches its own README's "Live consumers: NONE"). Added a `storage`
+   discriminated union (`PHYSICAL` vs `DERIVED` with `derivation:
+   MRL_PREFIX_L2_RENORMALIZE | NESTED_PREFIX_L2_RENORMALIZE`) so "is this actually stored or
+   computed from a prefix at query time" is a structured field, not just a comment. Renamed
+   `embedding-contract-768.ts`'s `TOPOLOGY_REPRESENTATIONS` (misleadingly named -- it held the
+   nested-AE family, not the topology one) to `LEARNED_LATENT_REPRESENTATIONS`, added the
+   missing `latent_256` entry. 12/12 manifest entries validate against `VectorManifestSchema`;
+   `embedding-contract-768.spec.ts` 11/11 pass after the rename; `symbol_384` confirmed to have
+   zero live references anywhere in the repo (correctly inert already).
+
+Verification before stopping: `npx tsx` ad-hoc script re-run against final committed state
+(12/12 manifest entries valid, `symbol_384` rejected by the new enum, `topology_ae64_v1` valid
+against `VectorNameEnum`), local `main` confirmed identical to `origin/main` via
+`git log origin/main..HEAD` / `git log HEAD..origin/main` (both empty).
+
+**Still open, not started this pass**: `SymbolCard`/`SymbolCardV1` do not exist as implemented
+code anywhere in this repo (confirmed via repo-wide search) -- the review's proposed
+`interface SymbolCardV1 { ... }` contract is conceptual, not yet built. If/when it is built, it
+should type its `representation` field against the new `SymbolRepresentationNameEnum`. The
+earlier handoff's three still-open items (BitFrost audit script rewrite -- now done, see #2
+above; the `/codebase/index` 404 -- investigated, concluded stale browser tab, no fix needed;
+the four `content_embedding_768`-premised scripts -- now done, see #1 above) are all closed as
+of this pass. Go-retrieval/pgvector HNSW/DiskANN was investigated read-only (no DiskANN
+installed on the live container; HNSW halfvec_cosine_ops on `content_embedding` remains
+correct and unchanged) but no code was touched there -- purely informational for the operator.
