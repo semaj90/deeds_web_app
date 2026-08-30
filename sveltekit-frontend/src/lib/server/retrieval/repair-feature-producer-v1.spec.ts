@@ -262,7 +262,7 @@ describe('Repair candidate feature bundle', () => {
         identities: identities(),
       },
       producerSet: tampered,
-    })).toThrow('REPAIR_FEATURE_SET_CHECKSUM_MISMATCH');
+    })).toThrow('REPAIR_FEATURE_SET_OVERLAY_MISMATCH');
   });
 
   it('rejects tampering inside a carried producer artifact even if summaries are untouched', () => {
