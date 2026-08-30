@@ -20,10 +20,16 @@ const semantic = JSON.parse(readFileSync(semanticPath, 'utf8'));
 const graph = JSON.parse(readFileSync(graphPath, 'utf8'));
 const currentBaseProof = JSON.parse(readFileSync(baseManifestPath, 'utf8'));
 
-if (!/^sha256:[0-9a-f]{64}$/i.test(String(map.candidateSnapshotRevision ?? ''))) {
+const candidateSnapshotRevision = String(map.candidateSnapshotRevision ?? '');
+if (
+  !candidateSnapshotRevision ||
+  candidateSnapshotRevision.trim() !== candidateSnapshotRevision ||
+  /\s/.test(candidateSnapshotRevision) ||
+  candidateSnapshotRevision.length > 512
+) {
   throw new Error('REPAIR_PROOF_CANDIDATE_SNAPSHOT_REVISION_INVALID');
 }
-if (!/^sha256:[0-9a-f]{64}$/i.test(String(map.ordinalMapChecksum ?? ''))) {
+if (!/^(?:sha256:)?[0-9a-f]{64}$/i.test(String(map.ordinalMapChecksum ?? ''))) {
   throw new Error('REPAIR_PROOF_ORDINAL_MAP_CHECKSUM_INVALID');
 }
 if (!Array.isArray(map.candidates) || map.candidates.length === 0) {
