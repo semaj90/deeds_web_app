@@ -9,6 +9,7 @@
 		progress={data.tournament.progress}
 		gates={data.tournament.gates}
 		agentic={data.tournament.agenticTelemetry}
+		cache={data.tournament.cacheTelemetry}
 	/>
 </div>
 
