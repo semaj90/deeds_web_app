@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.semantic-representation-recall-comparison.v1",
+  "canonical_authority": false,
+  "note": "Benchmark only. Does not promote any representation or authorize a new schema field.",
+  "k": 10,
+  "val_row_count": 5547,
+  "val_source_count": 726,
+  "val_row_identity_checksum": "2e249a833813c90e6b0091b72fd6cb57d1622146f21b432a948b7c920602c093",
+  "split_seed": 684453,
+  "split_policy": "SOURCE_REF_GROUPED_V1",
+  "checkpoint_path": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+  "device": "cuda",
+  "results": {
+    "semantic_mrl_128": {
+      "dims": 128,
+      "kind": "NATIVE_MRL_TRUNCATION",
+      "knn_recall_at_10": 0.7851631512529295
+    },
+    "semantic_mrl_256": {
+      "dims": 256,
+      "kind": "NATIVE_MRL_TRUNCATION",
+      "knn_recall_at_10": 0.8574544798990446
+    },
+    "semantic_mrl_512": {
+      "dims": 512,
+      "kind": "NATIVE_MRL_TRUNCATION",
+      "knn_recall_at_10": 0.918334234721471
+    },
+    "latent_64": {
+      "dims": 64,
+      "kind": "LEARNED_AUTOENCODER",
+      "knn_recall_at_10": 0.7932576167297638
+    },
+    "latent_128": {
+      "dims": 128,
+      "kind": "LEARNED_AUTOENCODER",
+      "knn_recall_at_10": 0.8571660356949703
+    },
+    "latent_256": {
+      "dims": 256,
+      "kind": "LEARNED_AUTOENCODER",
+      "knn_recall_at_10": 0.8957093924643952
+    }
+  },
+  "ground_truth": "exact cosine top-k over the same held-out semantic_768 rows (L2-normalized), per representation"
+}
