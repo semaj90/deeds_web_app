@@ -12,6 +12,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server';
 import { getOllamaEndpoint, bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 interface VideoVLMJob {
 	evidenceId: string;
@@ -403,7 +404,7 @@ export class VideoVLMProcessor {
 		try {
 			const summaryText = await bifrostChat(
 				[{ role: 'user', content: summaryPrompt }],
-				'gemma4-legal-iq4xs-direct.gguf',
+				LLM_MODEL_ID,
 				{}
 			).catch(() => 'Video analysis summary unavailable');
 

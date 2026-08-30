@@ -1,19 +1,3484 @@
 {
-  "status": "EXPECTED_SNAPSHOT_MISSING",
+  "status": "SCHEMA_DRIFT_DETECTED",
   "comparisonMode": "expected_snapshot_vs_live",
-  "journalLastIndex": 40,
-  "journalLastTag": "0040_kanban_task_lifecycle",
-  "expectedSnapshotPath": "sveltekit-frontend\\drizzle\\meta\\0040_snapshot.json",
-  "availableSnapshotTail": [
-    "0036_snapshot.json",
-    "0037_snapshot.json",
-    "0038_snapshot.json",
-    "0039_snapshot.json",
-    "0041_snapshot.json"
+  "expected": {
+    "source": "drizzle_snapshot",
+    "tag": "0040_kanban_task_lifecycle",
+    "tableCount": 369
+  },
+  "actual": {
+    "source": "live_database",
+    "inspectedAt": "2026-08-30T20:32:35.009Z",
+    "tableCount": 525
+  },
+  "blockCount": 159,
+  "warnCount": 215,
+  "noteCount": 160,
+  "diffs": [
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "case_chunks",
+      "message": "Table \"case_chunks\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "codebase_audit_events",
+      "message": "Table \"codebase_audit_events\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_board_edges",
+      "message": "Table \"evidence_board_edges\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "rg_search_results",
+      "message": "Table \"rg_search_results\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "saved_citation_annotations",
+      "message": "Table \"saved_citation_annotations\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "search_centroids",
+      "message": "Table \"search_centroids\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "summary_cards",
+      "message": "Table \"summary_cards\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "token_map_cards",
+      "message": "Table \"token_map_cards\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "tool_execution_stats_7d",
+      "message": "Table \"tool_execution_stats_7d\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "tool_traces",
+      "message": "Table \"tool_traces\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "agent_memory_observations",
+      "message": "Table \"agent_memory_observations\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "ast_edges",
+      "message": "Table \"ast_edges\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "ast_file_features",
+      "message": "Table \"ast_file_features\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "ast_nodes",
+      "message": "Table \"ast_nodes\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "centroid_registry",
+      "message": "Table \"centroid_registry\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "context_buffers",
+      "message": "Table \"context_buffers\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "deep_research_reports",
+      "message": "Table \"deep_research_reports\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "error_logs",
+      "message": "Table \"error_logs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "intent_synthesis",
+      "message": "Table \"intent_synthesis\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "llm_context_cache",
+      "message": "Table \"llm_context_cache\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "lora_training_runs",
+      "message": "Table \"lora_training_runs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "policy_reranker_metadata",
+      "message": "Table \"policy_reranker_metadata\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "web_search_index",
+      "message": "Table \"web_search_index\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "packet_markdown_chunks",
+      "message": "Table \"packet_markdown_chunks\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_feature_dict",
+      "message": "Table \"atlas_feature_dict\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_lane_dict",
+      "message": "Table \"atlas_lane_dict\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_source_ref_dict",
+      "message": "Table \"atlas_source_ref_dict\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_source_ref_synthesis",
+      "message": "Table \"atlas_source_ref_synthesis\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "packet_binary_registry",
+      "message": "Table \"packet_binary_registry\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_frames",
+      "message": "Table \"evidence_frames\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_items",
+      "message": "Table \"evidence_items\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_media_assets",
+      "message": "Table \"evidence_media_assets\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_processing_jobs",
+      "message": "Table \"evidence_processing_jobs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "evidence_transcript_segments",
+      "message": "Table \"evidence_transcript_segments\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "model_analysis_results",
+      "message": "Table \"model_analysis_results\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "model_analysis_runs",
+      "message": "Table \"model_analysis_runs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "experiment_analysis_results",
+      "message": "Table \"experiment_analysis_results\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "experiment_analysis_runs",
+      "message": "Table \"experiment_analysis_runs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "graph_pathway_cards",
+      "message": "Table \"graph_pathway_cards\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "model_artifacts",
+      "message": "Table \"model_artifacts\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "engram_cards",
+      "message": "Table \"engram_cards\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "intent_eval_runs",
+      "message": "Table \"intent_eval_runs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "memory_registry",
+      "message": "Table \"memory_registry\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "entities",
+      "message": "Table \"entities\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "entity_edges",
+      "message": "Table \"entity_edges\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "semantic_cache",
+      "message": "Table \"semantic_cache\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "documents_atlas_entries",
+      "message": "Table \"documents_atlas_entries\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "feature_index_entries",
+      "message": "Table \"feature_index_entries\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "retrieval_cache_traces",
+      "message": "Table \"retrieval_cache_traces\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "agent_progress_log",
+      "message": "Table \"agent_progress_log\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "feature_registry",
+      "message": "Table \"feature_registry\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "feature_tasks",
+      "message": "Table \"feature_tasks\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "repo_function_registry",
+      "message": "Table \"repo_function_registry\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_cards",
+      "message": "Table \"atlas_cards\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "synthesis_logs",
+      "message": "Table \"synthesis_logs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "parent_atlas_jobs",
+      "message": "Table \"parent_atlas_jobs\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "parent_atlas_documents",
+      "message": "Table \"parent_atlas_documents\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "atlas_contract_fields",
+      "message": "Table \"atlas_contract_fields\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_TABLE",
+      "table": "retrieval_provenance",
+      "message": "Table \"retrieval_provenance\" expected from migration snapshot but not in live database"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ace_context_packets",
+      "message": "Table \"ace_context_packets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ace_context_sources",
+      "message": "Table \"ace_context_sources\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ace_hit_logs",
+      "message": "Table \"ace_hit_logs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "admin_raptor_summaries",
+      "message": "Table \"admin_raptor_summaries\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "admin_telemetry",
+      "message": "Table \"admin_telemetry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_actions",
+      "message": "Table \"agent_actions\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_context_files",
+      "message": "Table \"agent_context_files\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_context_files_history",
+      "message": "Table \"agent_context_files_history\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_context_relations",
+      "message": "Table \"agent_context_relations\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_os_events",
+      "message": "Table \"agent_os_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_scheduler_jobs",
+      "message": "Table \"agent_scheduler_jobs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "agent_tasks",
+      "message": "Table \"agent_tasks\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_acp_audit",
+      "message": "Table \"atlas_acp_audit\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_acp_progress",
+      "message": "Table \"atlas_acp_progress\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_agent_action_events",
+      "message": "Table \"atlas_agent_action_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_algorithm_execution_receipts",
+      "message": "Table \"atlas_algorithm_execution_receipts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_ast_nodes",
+      "message": "Table \"atlas_ast_nodes\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_chunk_packet_identity_links",
+      "message": "Table \"atlas_chunk_packet_identity_links\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_class_search_index_v1",
+      "message": "Table \"atlas_class_search_index_v1\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_cluster_models",
+      "message": "Table \"atlas_cluster_models\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_concepts",
+      "message": "Table \"atlas_concepts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_context_manifests",
+      "message": "Table \"atlas_context_manifests\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_document_classification",
+      "message": "Table \"atlas_document_classification\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_domain_ontology",
+      "message": "Table \"atlas_domain_ontology\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_dynamic_hyperedge_candidates",
+      "message": "Table \"atlas_dynamic_hyperedge_candidates\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_embeddings_384",
+      "message": "Table \"atlas_embeddings_384\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_embeddings_64_latent",
+      "message": "Table \"atlas_embeddings_64_latent\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_embeddings_768",
+      "message": "Table \"atlas_embeddings_768\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_enrichment_progress",
+      "message": "Table \"atlas_enrichment_progress\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_evidence",
+      "message": "Table \"atlas_evidence\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_execution_utility",
+      "message": "Table \"atlas_execution_utility\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_aliases",
+      "message": "Table \"atlas_feature_aliases\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_embeddings",
+      "message": "Table \"atlas_feature_embeddings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_envelopes",
+      "message": "Table \"atlas_feature_envelopes\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_evidence",
+      "message": "Table \"atlas_feature_evidence\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_map_history",
+      "message": "Table \"atlas_feature_map_history\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_packets",
+      "message": "Table \"atlas_feature_packets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_recommendation_index",
+      "message": "Table \"atlas_feature_recommendation_index\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_relationships",
+      "message": "Table \"atlas_feature_relationships\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_snapshots",
+      "message": "Table \"atlas_feature_snapshots\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_state_receipts",
+      "message": "Table \"atlas_feature_state_receipts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_feature_vectors",
+      "message": "Table \"atlas_feature_vectors\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_features",
+      "message": "Table \"atlas_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_fi_evidence",
+      "message": "Table \"atlas_fi_evidence\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_fi_features",
+      "message": "Table \"atlas_fi_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_graph_authority_runs",
+      "message": "Table \"atlas_graph_authority_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_graph_authority_scores",
+      "message": "Table \"atlas_graph_authority_scores\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_graph_facts",
+      "message": "Table \"atlas_graph_facts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_higher_hop_index",
+      "message": "Table \"atlas_higher_hop_index\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_hyperedge_members",
+      "message": "Table \"atlas_hyperedge_members\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_hyperedges",
+      "message": "Table \"atlas_hyperedges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_id_hierarchy_metadata",
+      "message": "Table \"atlas_id_hierarchy_metadata\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_identity_alias_decisions",
+      "message": "Table \"atlas_identity_alias_decisions\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_index_runs",
+      "message": "Table \"atlas_index_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_knowledge_objects",
+      "message": "Table \"atlas_knowledge_objects\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_latent_fixture",
+      "message": "Table \"atlas_latent_fixture\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_observation_feature_rows",
+      "message": "Table \"atlas_observation_feature_rows\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_ontology_concepts",
+      "message": "Table \"atlas_ontology_concepts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_ontology_linked_tuples",
+      "message": "Table \"atlas_ontology_linked_tuples\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_ontology_relations",
+      "message": "Table \"atlas_ontology_relations\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_ontology_tuples",
+      "message": "Table \"atlas_ontology_tuples\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packet_features",
+      "message": "Table \"atlas_packet_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packet_identity_aliases",
+      "message": "Table \"atlas_packet_identity_aliases\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packet_metrics",
+      "message": "Table \"atlas_packet_metrics\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packet_registry",
+      "message": "Table \"atlas_packet_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packets_identity_conflicts",
+      "message": "Table \"atlas_packets_identity_conflicts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_packets_materialization_queue",
+      "message": "Table \"atlas_packets_materialization_queue\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_projection_state",
+      "message": "Table \"atlas_projection_state\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_qdrant_repair_log",
+      "message": "Table \"atlas_qdrant_repair_log\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_recommendation_outcome_receipts",
+      "message": "Table \"atlas_recommendation_outcome_receipts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_registry_alignment",
+      "message": "Table \"atlas_registry_alignment\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_relationship_cardinality",
+      "message": "Table \"atlas_relationship_cardinality\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_relationship_embeddings",
+      "message": "Table \"atlas_relationship_embeddings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_relationship_evidence",
+      "message": "Table \"atlas_relationship_evidence\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_relationship_members",
+      "message": "Table \"atlas_relationship_members\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_relationships",
+      "message": "Table \"atlas_relationships\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_rpc_packets",
+      "message": "Table \"atlas_rpc_packets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_schema_registry",
+      "message": "Table \"atlas_schema_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_source_aliases",
+      "message": "Table \"atlas_source_aliases\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_source_refs",
+      "message": "Table \"atlas_source_refs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_summary_layers",
+      "message": "Table \"atlas_summary_layers\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_svg_glyphs",
+      "message": "Table \"atlas_svg_glyphs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_taxonomy_assignment_candidates",
+      "message": "Table \"atlas_taxonomy_assignment_candidates\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_tensor_artifacts",
+      "message": "Table \"atlas_tensor_artifacts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_tensor_residency_events",
+      "message": "Table \"atlas_tensor_residency_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_tensor_tile_members",
+      "message": "Table \"atlas_tensor_tile_members\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_tensor_tiles",
+      "message": "Table \"atlas_tensor_tiles\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_topology_clusters",
+      "message": "Table \"atlas_topology_clusters\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_topology_eval_times",
+      "message": "Table \"atlas_topology_eval_times\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_topology_features",
+      "message": "Table \"atlas_topology_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_topology_index",
+      "message": "Table \"atlas_topology_index\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_tree_nodes",
+      "message": "Table \"atlas_tree_nodes\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_typed_edges",
+      "message": "Table \"atlas_typed_edges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_validation_results",
+      "message": "Table \"atlas_validation_results\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_vector_registry",
+      "message": "Table \"atlas_vector_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_workspace_source_bindings",
+      "message": "Table \"atlas_workspace_source_bindings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "authorization_audit_log",
+      "message": "Table \"authorization_audit_log\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "benchmark_results",
+      "message": "Table \"benchmark_results\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "cache_probe_results",
+      "message": "Table \"cache_probe_results\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "cache_probe_runs",
+      "message": "Table \"cache_probe_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "chrom97_packets",
+      "message": "Table \"chrom97_packets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "classification_envelope",
+      "message": "Table \"classification_envelope\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_feature_edges",
+      "message": "Table \"code_feature_edges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_feature_embeddings",
+      "message": "Table \"code_feature_embeddings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_features",
+      "message": "Table \"code_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_relations_v1",
+      "message": "Table \"code_relations_v1\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_repos",
+      "message": "Table \"code_repos\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "code_retrieval_chunks",
+      "message": "Table \"code_retrieval_chunks\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "codebase_chunk_index_backup",
+      "message": "Table \"codebase_chunk_index_backup\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "codebase_chunk_index_stats",
+      "message": "Table \"codebase_chunk_index_stats\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "codebase_relationship_reports",
+      "message": "Table \"codebase_relationship_reports\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "community_reports_leiden",
+      "message": "Table \"community_reports_leiden\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "dag_hit_envelope_cache",
+      "message": "Table \"dag_hit_envelope_cache\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "directory_context_bindings",
+      "message": "Table \"directory_context_bindings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "dispatcher_state_history",
+      "message": "Table \"dispatcher_state_history\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "domain_taxonomy_v1",
+      "message": "Table \"domain_taxonomy_v1\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "encoder_provenance",
+      "message": "Table \"encoder_provenance\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "enhanced_graph_mappings",
+      "message": "Table \"enhanced_graph_mappings\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "episodic_events",
+      "message": "Table \"episodic_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "error_cluster_groups",
+      "message": "Table \"error_cluster_groups\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "error_signal_stream",
+      "message": "Table \"error_signal_stream\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_candidates",
+      "message": "Table \"evaluation_candidates\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_corpora",
+      "message": "Table \"evaluation_corpora\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_datasets",
+      "message": "Table \"evaluation_datasets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_evidence",
+      "message": "Table \"evaluation_evidence\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_judgments",
+      "message": "Table \"evaluation_judgments\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_queries",
+      "message": "Table \"evaluation_queries\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_relevance",
+      "message": "Table \"evaluation_relevance\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_relevance_corrected",
+      "message": "Table \"evaluation_relevance_corrected\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_results",
+      "message": "Table \"evaluation_results\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_runs",
+      "message": "Table \"evaluation_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_seed_queries",
+      "message": "Table \"evaluation_seed_queries\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "evaluation_splits",
+      "message": "Table \"evaluation_splits\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "execution_reviews",
+      "message": "Table \"execution_reviews\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_dependency_edges",
+      "message": "Table \"feature_dependency_edges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_domain",
+      "message": "Table \"feature_domain\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_lexical",
+      "message": "Table \"feature_lexical\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_maps",
+      "message": "Table \"feature_maps\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_records",
+      "message": "Table \"feature_records\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_semantic_facts",
+      "message": "Table \"feature_semantic_facts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_statistics",
+      "message": "Table \"feature_statistics\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "feature_structural",
+      "message": "Table \"feature_structural\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "features",
+      "message": "Table \"features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "file_hotness_scores",
+      "message": "Table \"file_hotness_scores\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "file_summaries",
+      "message": "Table \"file_summaries\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "fix_attempts",
+      "message": "Table \"fix_attempts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "fixer_patterns",
+      "message": "Table \"fixer_patterns\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "fixer_run_log",
+      "message": "Table \"fixer_run_log\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "gpu_candidate_eval",
+      "message": "Table \"gpu_candidate_eval\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graph_community_resolution_seeds",
+      "message": "Table \"graph_community_resolution_seeds\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graph_expansion_cache",
+      "message": "Table \"graph_expansion_cache\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graphify_audit_kanban",
+      "message": "Table \"graphify_audit_kanban\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graphify_bm25_index_runs",
+      "message": "Table \"graphify_bm25_index_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graphify_files",
+      "message": "Table \"graphify_files\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "graphify_runs",
+      "message": "Table \"graphify_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "grpo_memory_sticks",
+      "message": "Table \"grpo_memory_sticks\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "hermes_dag_runs",
+      "message": "Table \"hermes_dag_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "hypergraph_edge_members",
+      "message": "Table \"hypergraph_edge_members\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "indexing_jobs",
+      "message": "Table \"indexing_jobs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "llm_output_chunks",
+      "message": "Table \"llm_output_chunks\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "llm_outputs",
+      "message": "Table \"llm_outputs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "migrations",
+      "message": "Table \"migrations\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "model_weights",
+      "message": "Table \"model_weights\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ontology_domain_tuples",
+      "message": "Table \"ontology_domain_tuples\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ontology_edges",
+      "message": "Table \"ontology_edges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "ontology_keywords",
+      "message": "Table \"ontology_keywords\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "outcome_ledger",
+      "message": "Table \"outcome_ledger\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "packet_feature_keywords",
+      "message": "Table \"packet_feature_keywords\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "packet_features",
+      "message": "Table \"packet_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "packet_qdrant_bridge",
+      "message": "Table \"packet_qdrant_bridge\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "packet_source_features",
+      "message": "Table \"packet_source_features\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "packet_vector_bundles",
+      "message": "Table \"packet_vector_bundles\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "parent_atlas_records",
+      "message": "Table \"parent_atlas_records\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "parent_atlas_vectors",
+      "message": "Table \"parent_atlas_vectors\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "phase2f_evaluation_results",
+      "message": "Table \"phase2f_evaluation_results\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "phase2f_ground_truth",
+      "message": "Table \"phase2f_ground_truth\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "phase2f_ground_truth_expectations",
+      "message": "Table \"phase2f_ground_truth_expectations\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "projects",
+      "message": "Table \"projects\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "promotion_outbox",
+      "message": "Table \"promotion_outbox\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "proposed_tool_calls",
+      "message": "Table \"proposed_tool_calls\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "recommendation_events",
+      "message": "Table \"recommendation_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "registry_embedding_identity",
+      "message": "Table \"registry_embedding_identity\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "registry_enrichment_projection",
+      "message": "Table \"registry_enrichment_projection\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "registry_ontology_tuples",
+      "message": "Table \"registry_ontology_tuples\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "registry_topology_projection",
+      "message": "Table \"registry_topology_projection\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "retrieval_promotion_decisions",
+      "message": "Table \"retrieval_promotion_decisions\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "route_metadata",
+      "message": "Table \"route_metadata\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "screenshot_artifacts",
+      "message": "Table \"screenshot_artifacts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "semantic_memories",
+      "message": "Table \"semantic_memories\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "som_adjacency_matrix",
+      "message": "Table \"som_adjacency_matrix\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "spec_revisions",
+      "message": "Table \"spec_revisions\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "specs",
+      "message": "Table \"specs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "stories",
+      "message": "Table \"stories\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "symbol_resolver",
+      "message": "Table \"symbol_resolver\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "symbol_runtime_stats",
+      "message": "Table \"symbol_runtime_stats\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "task_registry",
+      "message": "Table \"task_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "task_semantic_packets",
+      "message": "Table \"task_semantic_packets\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "taxonomy_edges",
+      "message": "Table \"taxonomy_edges\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "taxonomy_nodes",
+      "message": "Table \"taxonomy_nodes\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "tool_call_events",
+      "message": "Table \"tool_call_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "tool_execution_audit",
+      "message": "Table \"tool_execution_audit\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "tool_registry",
+      "message": "Table \"tool_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "trace_events",
+      "message": "Table \"trace_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "trace_packet_events",
+      "message": "Table \"trace_packet_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "trace_runs",
+      "message": "Table \"trace_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "vault_md_index",
+      "message": "Table \"vault_md_index\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "vector_index_registry",
+      "message": "Table \"vector_index_registry\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_action_leases",
+      "message": "Table \"workflow_action_leases\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_action_receipts",
+      "message": "Table \"workflow_action_receipts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_approvals",
+      "message": "Table \"workflow_approvals\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_artifact_events",
+      "message": "Table \"workflow_artifact_events\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_artifacts",
+      "message": "Table \"workflow_artifacts\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_outbox",
+      "message": "Table \"workflow_outbox\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_runs",
+      "message": "Table \"workflow_runs\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "workflow_tasks",
+      "message": "Table \"workflow_tasks\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "chunk_hit_log",
+      "column": "promotion_state",
+      "message": "Column \"chunk_hit_log.promotion_state\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "chunk_hit_log",
+      "column": "promotion_boost",
+      "message": "Column \"chunk_hit_log.promotion_boost\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "chunk_hit_log",
+      "column": "base_score",
+      "message": "Column \"chunk_hit_log.base_score\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "gpu_cluster_centroids",
+      "column": "computed_at",
+      "message": "Column \"gpu_cluster_centroids.computed_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "jurisdictions",
+      "column": "created_at",
+      "message": "Column \"jurisdictions.created_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "jurisdictions",
+      "column": "updated_at",
+      "message": "Column \"jurisdictions.updated_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "legal_nodes",
+      "column": "tsv",
+      "message": "Column \"legal_nodes.tsv\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "library_document_versions",
+      "column": "amendment_note",
+      "message": "Column \"library_document_versions.amendment_note\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "qlora_examples",
+      "column": "som_clusters",
+      "message": "Column \"qlora_examples.som_clusters\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "qlora_examples",
+      "column": "retrieval_strategy",
+      "message": "Column \"qlora_examples.retrieval_strategy\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "qlora_examples",
+      "column": "used_in_run",
+      "message": "Column \"qlora_examples.used_in_run\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "rag_query_log",
+      "column": "query_embedding",
+      "message": "Column \"rag_query_log.query_embedding\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "rag_query_log",
+      "column": "entity_ca_codes",
+      "message": "Column \"rag_query_log.entity_ca_codes\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "id",
+      "message": "Column \"agent_observations.id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "session_type",
+      "message": "Column \"agent_observations.session_type\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "file_path",
+      "message": "Column \"agent_observations.file_path\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "observation_text",
+      "message": "Column \"agent_observations.observation_text\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "char_interval_start",
+      "message": "Column \"agent_observations.char_interval_start\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "som_cluster_id",
+      "message": "Column \"agent_observations.som_cluster_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "agent_observations",
+      "column": "timestamp",
+      "message": "Column \"agent_observations.timestamp\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "observation_id",
+      "message": "Column \"agent_observations.observation_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "agent_name",
+      "message": "Column \"agent_observations.agent_name\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "tool_name",
+      "message": "Column \"agent_observations.tool_name\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "input_hash",
+      "message": "Column \"agent_observations.input_hash\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "output_summary",
+      "message": "Column \"agent_observations.output_summary\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "decision_context",
+      "message": "Column \"agent_observations.decision_context\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "confidence",
+      "message": "Column \"agent_observations.confidence\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "bm25_tags",
+      "message": "Column \"agent_observations.bm25_tags\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "hnsw_embedding",
+      "message": "Column \"agent_observations.hnsw_embedding\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "agent_observations",
+      "column": "created_at",
+      "message": "Column \"agent_observations.created_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "ai_reports",
+      "column": "updated_at",
+      "message": "Column \"ai_reports.updated_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "ai_reports",
+      "column": "updatedAt",
+      "message": "Column \"ai_reports.updatedAt\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "group_id",
+      "message": "Column \"atlas_packets.group_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "packet_universe",
+      "message": "Column \"atlas_packets.packet_universe\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "som_cluster",
+      "message": "Column \"atlas_packets.som_cluster\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "content_embedding_384",
+      "message": "Column \"atlas_packets.content_embedding_384\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_status",
+      "message": "Column \"atlas_packets.embedding_status\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_timestamp",
+      "message": "Column \"atlas_packets.embedding_timestamp\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "extracted_entities",
+      "message": "Column \"atlas_packets.extracted_entities\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "keywords",
+      "message": "Column \"atlas_packets.keywords\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "error_pattern",
+      "message": "Column \"atlas_packets.error_pattern\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "feature_group_id",
+      "message": "Column \"atlas_packets.feature_group_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "taxonomy_level",
+      "message": "Column \"atlas_packets.taxonomy_level\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "bm25_indexed_at",
+      "message": "Column \"atlas_packets.bm25_indexed_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "bm25_score",
+      "message": "Column \"atlas_packets.bm25_score\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "bm25_terms",
+      "message": "Column \"atlas_packets.bm25_terms\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "page_rank_score",
+      "message": "Column \"atlas_packets.page_rank_score\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "kmeans_cluster_id",
+      "message": "Column \"atlas_packets.kmeans_cluster_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "routing_hints",
+      "message": "Column \"atlas_packets.routing_hints\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "k_core",
+      "message": "Column \"atlas_packets.k_core\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "ngrams",
+      "message": "Column \"atlas_packets.ngrams\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "trigrams",
+      "message": "Column \"atlas_packets.trigrams\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "engrams",
+      "message": "Column \"atlas_packets.engrams\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "used_concepts",
+      "message": "Column \"atlas_packets.used_concepts\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "topolog_cluster",
+      "message": "Column \"atlas_packets.topolog_cluster\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "topolog_confidence",
+      "message": "Column \"atlas_packets.topolog_confidence\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "topolog_method",
+      "message": "Column \"atlas_packets.topolog_method\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "topolog_applied_at",
+      "message": "Column \"atlas_packets.topolog_applied_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "repository_id",
+      "message": "Column \"atlas_packets.repository_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "directory_id",
+      "message": "Column \"atlas_packets.directory_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "file_id",
+      "message": "Column \"atlas_packets.file_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "module_id",
+      "message": "Column \"atlas_packets.module_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "symbol_id",
+      "message": "Column \"atlas_packets.symbol_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "chunk_id",
+      "message": "Column \"atlas_packets.chunk_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "recovery_lane",
+      "message": "Column \"atlas_packets.recovery_lane\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "som_cluster_id",
+      "message": "Column \"atlas_packets.som_cluster_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "ontology",
+      "message": "Column \"atlas_packets.ontology\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "packet_type_test",
+      "message": "Column \"atlas_packets.packet_type_test\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "packet_type",
+      "message": "Column \"atlas_packets.packet_type\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "packet_ontology",
+      "message": "Column \"atlas_packets.packet_ontology\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "parent_packet_key",
+      "message": "Column \"atlas_packets.parent_packet_key\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "related_packets",
+      "message": "Column \"atlas_packets.related_packets\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "telemetry",
+      "message": "Column \"atlas_packets.telemetry\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_eligible",
+      "message": "Column \"atlas_packets.embedding_eligible\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "summary_hash",
+      "message": "Column \"atlas_packets.summary_hash\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_version",
+      "message": "Column \"atlas_packets.embedding_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_claimed_at",
+      "message": "Column \"atlas_packets.embedding_claimed_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "embedding_claimed_by",
+      "message": "Column \"atlas_packets.embedding_claimed_by\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "feature_envelope",
+      "message": "Column \"atlas_packets.feature_envelope\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "domain_confidence",
+      "message": "Column \"atlas_packets.domain_confidence\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "title_generator_version",
+      "message": "Column \"atlas_packets.title_generator_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "file_purpose",
+      "message": "Column \"atlas_packets.file_purpose\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "thoroughness",
+      "message": "Column \"atlas_packets.thoroughness\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "app_criticality",
+      "message": "Column \"atlas_packets.app_criticality\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "test_coverage_pct",
+      "message": "Column \"atlas_packets.test_coverage_pct\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "file_understanding_computed_at",
+      "message": "Column \"atlas_packets.file_understanding_computed_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "file_understanding_method",
+      "message": "Column \"atlas_packets.file_understanding_method\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "openspec_id",
+      "message": "Column \"atlas_packets.openspec_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "gsd_id",
+      "message": "Column \"atlas_packets.gsd_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "enrichment_updated_at",
+      "message": "Column \"atlas_packets.enrichment_updated_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "som_cell_x",
+      "message": "Column \"atlas_packets.som_cell_x\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "som_cell_y",
+      "message": "Column \"atlas_packets.som_cell_y\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "ast_score",
+      "message": "Column \"atlas_packets.ast_score\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "community_boost",
+      "message": "Column \"atlas_packets.community_boost\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "rerank_features",
+      "message": "Column \"atlas_packets.rerank_features\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "pagerank_score",
+      "message": "Column \"atlas_packets.pagerank_score\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "som_distance",
+      "message": "Column \"atlas_packets.som_distance\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "predicted_domain",
+      "message": "Column \"atlas_packets.predicted_domain\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "classifier_kind",
+      "message": "Column \"atlas_packets.classifier_kind\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "classifier_version",
+      "message": "Column \"atlas_packets.classifier_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "pagerank_raw",
+      "message": "Column \"atlas_packets.pagerank_raw\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "authority_score",
+      "message": "Column \"atlas_packets.authority_score\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "semantic_anchor",
+      "message": "Column \"atlas_packets.semantic_anchor\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_packets",
+      "column": "ontology_version",
+      "message": "Column \"atlas_packets.ontology_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "citation_type",
+      "message": "Column \"citations.citation_type\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "title",
+      "message": "Column \"citations.title\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "annotation",
+      "message": "Column \"citations.annotation\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "is_key_authority",
+      "message": "Column \"citations.is_key_authority\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "tags",
+      "message": "Column \"citations.tags\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "citations",
+      "column": "embedding",
+      "message": "Column \"citations.embedding\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "centroid_id",
+      "message": "Column \"cluster_cards.centroid_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "collection",
+      "message": "Column \"cluster_cards.collection\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "source_refs",
+      "message": "Column \"cluster_cards.source_refs\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "method_anchors",
+      "message": "Column \"cluster_cards.method_anchors\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "top_chunk_ids",
+      "message": "Column \"cluster_cards.top_chunk_ids\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "top_file_paths",
+      "message": "Column \"cluster_cards.top_file_paths\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "top_tags",
+      "message": "Column \"cluster_cards.top_tags\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "summary_hints",
+      "message": "Column \"cluster_cards.summary_hints\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "cluster_summary",
+      "message": "Column \"cluster_cards.cluster_summary\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "representative_embedding",
+      "message": "Column \"cluster_cards.representative_embedding\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "authority_score",
+      "message": "Column \"cluster_cards.authority_score\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "member_count",
+      "message": "Column \"cluster_cards.member_count\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "cluster_cards",
+      "column": "last_rebuilt_at",
+      "message": "Column \"cluster_cards.last_rebuilt_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "cluster_cards",
+      "column": "id",
+      "message": "Column \"cluster_cards.id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "cluster_cards",
+      "column": "card",
+      "message": "Column \"cluster_cards.card\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "cluster_cards",
+      "column": "centroid_dim",
+      "message": "Column \"cluster_cards.centroid_dim\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "cluster_cards",
+      "column": "created_at",
+      "message": "Column \"cluster_cards.created_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "cluster_cards",
+      "column": "updated_at",
+      "message": "Column \"cluster_cards.updated_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "summary_embedding_384",
+      "message": "Column \"codebase_chunk_index.summary_embedding_384\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_dimension",
+      "message": "Column \"codebase_chunk_index.embedding_dimension\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_normalized",
+      "message": "Column \"codebase_chunk_index.embedding_normalized\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "error_embedding",
+      "message": "Column \"codebase_chunk_index.error_embedding\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "source_ref",
+      "message": "Column \"codebase_chunk_index.source_ref\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent_64",
+      "message": "Column \"codebase_chunk_index.latent_64\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent64_model",
+      "message": "Column \"codebase_chunk_index.latent64_model\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent64_meta",
+      "message": "Column \"codebase_chunk_index.latent64_meta\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent64_validated_at",
+      "message": "Column \"codebase_chunk_index.latent64_validated_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent64_msgpack",
+      "message": "Column \"codebase_chunk_index.latent64_msgpack\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_eligible",
+      "message": "Column \"codebase_chunk_index.embedding_eligible\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "summary_hash",
+      "message": "Column \"codebase_chunk_index.summary_hash\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_version",
+      "message": "Column \"codebase_chunk_index.embedding_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_dtype",
+      "message": "Column \"codebase_chunk_index.embedding_dtype\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "embedding_created_at",
+      "message": "Column \"codebase_chunk_index.embedding_created_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "encoder_id",
+      "message": "Column \"codebase_chunk_index.encoder_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent_embedding_valid",
+      "message": "Column \"codebase_chunk_index.latent_embedding_valid\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent_embedding_validated_at",
+      "message": "Column \"codebase_chunk_index.latent_embedding_validated_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "search_vector",
+      "message": "Column \"codebase_chunk_index.search_vector\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "ast_symbols",
+      "message": "Column \"codebase_chunk_index.ast_symbols\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "ast_imports",
+      "message": "Column \"codebase_chunk_index.ast_imports\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "ast_exports",
+      "message": "Column \"codebase_chunk_index.ast_exports\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "ast_facts_at",
+      "message": "Column \"codebase_chunk_index.ast_facts_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans_cluster",
+      "message": "Column \"codebase_chunk_index.kmeans_cluster\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "centroid_distance",
+      "message": "Column \"codebase_chunk_index.centroid_distance\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "second_cluster_id",
+      "message": "Column \"codebase_chunk_index.second_cluster_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "second_distance",
+      "message": "Column \"codebase_chunk_index.second_distance\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "cluster_margin",
+      "message": "Column \"codebase_chunk_index.cluster_margin\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans_model_version",
+      "message": "Column \"codebase_chunk_index.kmeans_model_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans_assigned_at",
+      "message": "Column \"codebase_chunk_index.kmeans_assigned_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans_vector_contract",
+      "message": "Column \"codebase_chunk_index.kmeans_vector_contract\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_cluster",
+      "message": "Column \"codebase_chunk_index.kmeans384_cluster\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_distance",
+      "message": "Column \"codebase_chunk_index.kmeans384_distance\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_id",
+      "message": "Column \"codebase_chunk_index.kmeans384_second_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_dist",
+      "message": "Column \"codebase_chunk_index.kmeans384_second_dist\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_margin",
+      "message": "Column \"codebase_chunk_index.kmeans384_margin\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_model_version",
+      "message": "Column \"codebase_chunk_index.kmeans384_model_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_assigned_at",
+      "message": "Column \"codebase_chunk_index.kmeans384_assigned_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "kmeans_distance",
+      "message": "Column \"codebase_chunk_index.kmeans_distance\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "content_embedding_768",
+      "message": "Column \"codebase_chunk_index.content_embedding_768\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent_256",
+      "message": "Column \"codebase_chunk_index.latent_256\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "codebase_chunk_index",
+      "column": "latent_256_checkpoint_revision",
+      "message": "Column \"codebase_chunk_index.latent_256_checkpoint_revision\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "context_timeline",
+      "column": "reconstruction_error",
+      "message": "Column \"context_timeline.reconstruction_error\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "context_timeline",
+      "column": "routing_cluster",
+      "message": "Column \"context_timeline.routing_cluster\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "document_chunks",
+      "column": "embedding",
+      "message": "Column \"document_chunks.embedding\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "case_id",
+      "message": "Column \"documents.case_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "description",
+      "message": "Column \"documents.description\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "file_path",
+      "message": "Column \"documents.file_path\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "file_type",
+      "message": "Column \"documents.file_type\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "summary",
+      "message": "Column \"documents.summary\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "embedding_id",
+      "message": "Column \"documents.embedding_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "documents",
+      "column": "metadata",
+      "message": "Column \"documents.metadata\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "evidence",
+      "column": "search_vector",
+      "message": "Column \"evidence.search_vector\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "evidence_vectors",
+      "column": "vector",
+      "message": "Column \"evidence_vectors.vector\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "evidence_vectors",
+      "column": "embedding",
+      "message": "Column \"evidence_vectors.embedding\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "evidence_vectors",
+      "column": "embedding_type",
+      "message": "Column \"evidence_vectors.embedding_type\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "evidence_vectors",
+      "column": "source_field",
+      "message": "Column \"evidence_vectors.source_field\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "evidence_vectors",
+      "column": "updated_at",
+      "message": "Column \"evidence_vectors.updated_at\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "feature_packet_bindings",
+      "column": "feature_id",
+      "message": "Column \"feature_packet_bindings.feature_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "feature_packet_bindings",
+      "column": "binding_type",
+      "message": "Column \"feature_packet_bindings.binding_type\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "feature_packet_bindings",
+      "column": "confidence",
+      "message": "Column \"feature_packet_bindings.confidence\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "feature_packet_bindings",
+      "column": "evidence_ids",
+      "message": "Column \"feature_packet_bindings.evidence_ids\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "glyph_records",
+      "column": "source_ref",
+      "message": "Column \"glyph_records.source_ref\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "glyph_records",
+      "column": "glyph_kind",
+      "message": "Column \"glyph_records.glyph_kind\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "glyph_records",
+      "column": "embedding_model",
+      "message": "Column \"glyph_records.embedding_model\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "glyph_records",
+      "column": "batch_id",
+      "message": "Column \"glyph_records.batch_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "s3_key",
+      "message": "Column \"legal_documents.s3_key\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "original_name",
+      "message": "Column \"legal_documents.original_name\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "mime_type",
+      "message": "Column \"legal_documents.mime_type\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "file_size",
+      "message": "Column \"legal_documents.file_size\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "case_id",
+      "message": "Column \"legal_documents.case_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "document_type",
+      "message": "Column \"legal_documents.document_type\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "legal_documents",
+      "column": "practice_area",
+      "message": "Column \"legal_documents.practice_area\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "legal_documents",
+      "column": "content_tsv",
+      "message": "Column \"legal_documents.content_tsv\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "legal_documents",
+      "column": "jurisdiction",
+      "message": "Column \"legal_documents.jurisdiction\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "llm_synthesis_events",
+      "column": "routing_hints",
+      "message": "Column \"llm_synthesis_events.routing_hints\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "recommendation_log",
+      "column": "superseded_by",
+      "message": "Column \"recommendation_log.superseded_by\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "recommendation_log",
+      "column": "updated_by",
+      "message": "Column \"recommendation_log.updated_by\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "research_summaries",
+      "column": "source_ref",
+      "message": "Column \"research_summaries.source_ref\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "research_summaries",
+      "column": "source_refs",
+      "message": "Column \"research_summaries.source_refs\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "id",
+      "message": "Column \"scenario_cache.id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "query_hash",
+      "message": "Column \"scenario_cache.query_hash\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "qdrant_collection",
+      "message": "Column \"scenario_cache.qdrant_collection\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "qdrant_point_ids",
+      "message": "Column \"scenario_cache.qdrant_point_ids\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "context_chunks",
+      "message": "Column \"scenario_cache.context_chunks\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "cached_result",
+      "message": "Column \"scenario_cache.cached_result\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "expires_at",
+      "message": "Column \"scenario_cache.expires_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "scenario_cache",
+      "column": "updated_at",
+      "message": "Column \"scenario_cache.updated_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "cache_id",
+      "message": "Column \"scenario_cache.cache_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "scenario_hash",
+      "message": "Column \"scenario_cache.scenario_hash\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "model_id",
+      "message": "Column \"scenario_cache.model_id\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "model_version",
+      "message": "Column \"scenario_cache.model_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "context_contract_version",
+      "message": "Column \"scenario_cache.context_contract_version\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "retrieval_manifest_hash",
+      "message": "Column \"scenario_cache.retrieval_manifest_hash\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "cached_response",
+      "message": "Column \"scenario_cache.cached_response\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "scenario_cache",
+      "column": "hit_count",
+      "message": "Column \"scenario_cache.hit_count\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "feature_label",
+      "message": "Column \"atlas_feature_map.feature_label\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "canonical_name",
+      "message": "Column \"atlas_feature_map.canonical_name\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "community_id",
+      "message": "Column \"atlas_feature_map.community_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "som_bmu_row",
+      "message": "Column \"atlas_feature_map.som_bmu_row\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "som_bmu_col",
+      "message": "Column \"atlas_feature_map.som_bmu_col\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "tree_node_id",
+      "message": "Column \"atlas_feature_map.tree_node_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "qdrant_point_ids",
+      "message": "Column \"atlas_feature_map.qdrant_point_ids\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "neo4j_node_id",
+      "message": "Column \"atlas_feature_map.neo4j_node_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "neo4j_node_ids",
+      "message": "Column \"atlas_feature_map.neo4j_node_ids\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "nes_card_id",
+      "message": "Column \"atlas_feature_map.nes_card_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "packet_keys",
+      "message": "Column \"atlas_feature_map.packet_keys\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "file_path",
+      "message": "Column \"atlas_feature_map.file_path\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "source_refs",
+      "message": "Column \"atlas_feature_map.source_refs\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "metadata",
+      "message": "Column \"atlas_feature_map.metadata\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "summary",
+      "message": "Column \"atlas_feature_map.summary\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "pagerank",
+      "message": "Column \"atlas_feature_map.pagerank\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "centrality",
+      "message": "Column \"atlas_feature_map.centrality\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "updated_at",
+      "message": "Column \"atlas_feature_map.updated_at\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "atlas_feature_map",
+      "column": "atlas_version",
+      "message": "Column \"atlas_feature_map.atlas_version\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "atlas_artifacts",
+      "column": "metadata",
+      "message": "Column \"atlas_artifacts.metadata\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "embedded_summaries",
+      "column": "embedding",
+      "message": "Column \"embedded_summaries.embedding\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "admin_ai_chat_sessions",
+      "column": "context_tag",
+      "message": "Column \"admin_ai_chat_sessions.context_tag\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "admin_ai_chat_sessions",
+      "column": "active",
+      "message": "Column \"admin_ai_chat_sessions.active\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "tree_node_id",
+      "message": "Column \"route_runtime_packets.tree_node_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "prompt_hash",
+      "message": "Column \"route_runtime_packets.prompt_hash\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "reward",
+      "message": "Column \"route_runtime_packets.reward\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "packet_uuid",
+      "message": "Column \"route_runtime_packets.packet_uuid\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "route_state",
+      "message": "Column \"route_runtime_packets.route_state\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "feature_id",
+      "message": "Column \"route_runtime_packets.feature_id\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "supersedes_packet_uuid",
+      "message": "Column \"route_runtime_packets.supersedes_packet_uuid\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "superseded_by",
+      "message": "Column \"route_runtime_packets.superseded_by\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "git_sha",
+      "message": "Column \"route_runtime_packets.git_sha\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "git_diff_rank",
+      "message": "Column \"route_runtime_packets.git_diff_rank\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "repair_reason",
+      "message": "Column \"route_runtime_packets.repair_reason\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "BLOCK",
+      "category": "MISSING_COLUMN",
+      "table": "route_runtime_packets",
+      "column": "repair_method",
+      "message": "Column \"route_runtime_packets.repair_method\" expected by migration but absent from live DB"
+    },
+    {
+      "level": "NOTE",
+      "category": "EXTRA_COLUMN",
+      "table": "concept_records",
+      "column": "metadata",
+      "message": "Column \"concept_records.metadata\" in live DB but not in snapshot (may be manual or sidecar migration)"
+    }
   ],
-  "generatedAt": "2026-08-25T18:42:02.017Z",
-  "canonicalWrites": false,
-  "diagnostics": [
-    "The Drizzle journal references a snapshot that is absent from drizzle/meta."
-  ]
+  "generatedAt": "2026-08-30T20:35:50.531Z"
 }

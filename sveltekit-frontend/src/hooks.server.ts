@@ -632,7 +632,7 @@ async function warmupChatModel(): Promise<WarmupStatus> {
     ENV.TURBOQUANT_BASE_URL ??
     'http://127.0.0.1:8090'
   ).replace(/\/$/, '');
-  const CHAT_MODEL = ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+  const CHAT_MODEL = ENV.LLAMA_SERVER_MODEL ?? ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? 'ornith-1.5-9b';
 
   try {
     const ping = await fetch(`${CHAT_BASE_URL}/v1/models`, { signal: AbortSignal.timeout(3000) });

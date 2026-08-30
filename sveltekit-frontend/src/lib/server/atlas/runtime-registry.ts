@@ -198,12 +198,12 @@ export const ATLAS_RUNTIME_REGISTRY: AtlasRuntimeRegistrySection[] = [
         notes: 'Legacy 384-dim retrieval projection lane retained for experiments and migration only; canonical dense retrieval is 768-dim.',
       },
       {
-        key: 'hforf-gguf',
-        title: 'HFORF GGUF lab lane',
-        path: 'models/hfor/hforf.gguf',
+        key: 'ornith-1.5-9b',
+        title: 'Ornith 1.5 9B local chat lane',
+        path: 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
         owner: 'model-routing',
         status: 'active',
-        notes: 'Current default local chat / synthesis lane for the admin atlas surface; RotorQuant remains fallback.',
+        notes: 'Current local chat/synthesis lane, served by llama-server :8090 and verified by /v1/models; the GGUF filename is hforf.gguf but the runtime identity is ornith-1.5-9b.',
       },
       {
         key: 'embeddinggemma-300m-onnx',

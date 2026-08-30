@@ -1,4 +1,5 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 
 interface BatchSummaryHints {
   featureId: string;
@@ -7,6 +8,22 @@ interface BatchSummaryHints {
   processedAt: string;
   model: string;
 }
+
+const batchSummaryHintsSchema = z.object({
+  featureId: z.string().min(1),
+  tupleCount: z.number().optional(),
+  hints: z
+    .array(
+      z.object({
+        tupleId: z.string(),
+        ontologyLabel: z.string().optional(),
+        confidence: z.number()
+      })
+    )
+    .min(1),
+  processedAt: z.string().optional(),
+  model: z.string().optional()
+});
 
 /**
  * POST /api/batch-summary/hints
@@ -18,17 +35,22 @@ interface BatchSummaryHints {
  * 3. Queues RabbitMQ job for server Gemma4 synthesis
  * 4. Returns acknowledgment
  */
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const hints = (await request.json()) as BatchSummaryHints;
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    // Validate hints structure
-    if (!hints.featureId || !hints.hints || hints.hints.length === 0) {
+  try {
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = batchSummaryHintsSchema.safeParse(rawBody);
+
+    if (!parsed.success) {
       return json(
-        { error: 'Invalid hints payload' },
+        { error: 'Invalid hints payload', issues: parsed.error.issues },
         { status: 400 }
       );
     }
+    const hints = parsed.data as BatchSummaryHints;
 
     // TODO: Write to Postgres/Redis for telemetry
     // TODO: Queue RabbitMQ job for server synthesis

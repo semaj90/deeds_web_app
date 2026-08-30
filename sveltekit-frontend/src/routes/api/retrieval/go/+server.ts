@@ -70,7 +70,14 @@ const RetrievalResponseSchema = z.object({
   ).optional()
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     const body = GoRetrievalRequestSchema.parse(await request.json()) as GoRetrievalFacadeRequest;
 

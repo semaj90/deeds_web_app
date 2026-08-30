@@ -11,6 +11,12 @@
 
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
+
+const UnifiedRetrievalBodySchema = z.object({
+  query: z.string().min(1),
+  limit: z.number().int().positive().max(500).optional()
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   const q = url.searchParams.get('q');
@@ -37,15 +43,19 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  try {
-    const body = (await request.json()) as {
-      query: string;
-      limit?: number;
-    };
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    if (!body.query) {
-      return json({ error: 'query required' }, { status: 400 });
+  try {
+    const parsed = UnifiedRetrievalBodySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsed.error.issues },
+        { status: 400 }
+      );
     }
+    const body = parsed.data;
 
     // Build redirect URL to canonical endpoint
     const limit = body.limit || 10;

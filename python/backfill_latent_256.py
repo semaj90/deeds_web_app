@@ -1,11 +1,15 @@
-"""Backfills codebase_chunk_index.latent_256 from content_embedding via a real model forward
-pass (NestedSemanticAutoencoder.encode()) -- NOT a prefix truncation, since latent_256 is a
-learned representation.
+"""Backfills codebase_chunk_index.latent_256 AND latent_64 from content_embedding via a real
+model forward pass (NestedSemanticAutoencoder.encode()) -- NOT a prefix truncation, since both
+are learned representations. The model already computes latent256/latent128/latent64 together
+in one forward pass; this writes both persistable outputs (latent_128 has no Postgres storage
+column yet, so it stays in-memory-only here -- adding it needs a schema migration, out of scope
+for this backfill).
 
-Writes latent_256 (halfvec(256)) and latent_256_checkpoint_revision (the model_checksum from
+Writes latent_256 (halfvec(256)) + latent_256_checkpoint_revision, and latent_64 (vector(64)) +
+latent64_model + latent_embedding_valid + latent_embedding_validated_at (the model_checksum from
 the training receipt, so a future retrain doesn't silently mix generations) after Postgres,
 per this repo's canonical packet truth flow (Postgres first, mirrors/cache after -- there is no
-Qdrant/Redis write in this script; that's a separate follow-up once this column is backfilled
+Qdrant/Redis write in this script; that's a separate follow-up once these columns are backfilled
 and verified).
 
 Dry-run by default. Pass --apply to write. Batches writes via execute_values for throughput on
@@ -38,11 +42,14 @@ def fetch_batch(conn, batch_size: int, offset: int) -> list[dict]:
             SELECT id::text AS id, content_embedding
             FROM codebase_chunk_index
             WHERE content_embedding IS NOT NULL
-              AND (latent_256_checkpoint_revision IS NULL OR latent_256_checkpoint_revision != %s)
+              AND (
+                latent_256_checkpoint_revision IS NULL OR latent_256_checkpoint_revision != %s
+                OR latent_64 IS NULL OR latent64_model IS NULL OR latent64_model != %s
+              )
             ORDER BY id
             LIMIT %s OFFSET %s
             """,
-            (CHECKPOINT_REVISION, batch_size, offset),
+            (CHECKPOINT_REVISION, CHECKPOINT_REVISION, batch_size, offset),
         )
         return cur.fetchall()
 
@@ -92,12 +99,15 @@ def main() -> None:
             )
             with torch.no_grad():
                 tensor = torch.from_numpy(vectors).to(device)
-                latent256, _latent128, _latent64 = model.encode(tensor)
+                latent256, _latent128, latent64 = model.encode(tensor)
                 latent256_np = latent256.detach().cpu().numpy()
+                latent64_np = latent64.detach().cpu().numpy()
 
             payload = [
                 (
                     "[" + ",".join(f"{v:.6f}" for v in latent256_np[i]) + "]",
+                    CHECKPOINT_REVISION,
+                    "[" + ",".join(f"{v:.6f}" for v in latent64_np[i]) + "]",
                     CHECKPOINT_REVISION,
                     rows[i]["id"],
                 )
@@ -108,7 +118,16 @@ def main() -> None:
                 with conn.cursor() as cur:
                     psycopg2.extras.execute_batch(
                         cur,
-                        "UPDATE codebase_chunk_index SET latent_256 = %s, latent_256_checkpoint_revision = %s WHERE id = %s::uuid",
+                        """
+                        UPDATE codebase_chunk_index
+                        SET latent_256 = %s,
+                            latent_256_checkpoint_revision = %s,
+                            latent_64 = %s,
+                            latent64_model = %s,
+                            latent_embedding_valid = true,
+                            latent_embedding_validated_at = now()
+                        WHERE id = %s::uuid
+                        """,
                         payload,
                         page_size=500,
                     )

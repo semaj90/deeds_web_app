@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.frozen-semantic768-training-snapshot.v1",
+  "tag": "v4",
+  "rowCount": 55169,
+  "embeddingDim": 768,
+  "matrixPath": "docs/reports/semantic768/frozen_semantic_768_v4_matrix.f32bin",
+  "matrixChecksum": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+  "matrixEncoding": "IEEE754_F32LE",
+  "matrixLayout": "row-major, shape [N, 768], no header",
+  "ordinalMapPath": "docs/reports/semantic768/frozen_semantic_768_v4_ordinal_map.json",
+  "ordinalMapChecksum": "c9f1b6306d71cdf96315c639212ec53c26025e0223099142a7bd21da68f73c8b",
+  "firstRowChecksum": "934405f6d449681026934a2f2b05620fe3fa8552bf148904931dcd82a27420b9",
+  "lastRowChecksum": "a67437b29c314f79d221701063e2ab6d15fafa95d064ec5cf304ac07713028f0",
+  "sourceRefCoverage": 4480,
+  "representationRevision": "semantic_768",
+  "canonicalSourceColumn": "codebase_chunk_index.content_embedding",
+  "producerRevision": "embeddinggemma:latest",
+  "trainingCodeRevision": "0cddd29d3914f1fff52007d4b85179171ca0fe1c",
+  "exporterCodeRevision": null,
+  "generatedAt": "2026-08-30T20:30:36Z",
+  "durationS": 23.74420428276062,
+  "status": "FROZEN_SNAPSHOT_PROVEN"
+}

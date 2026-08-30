@@ -1,9 +1,9 @@
 {
   "status": "MIGRATION_SAFETY_BLOCKED",
-  "fileCount": 363,
-  "blockCount": 157,
-  "warnCount": 342,
-  "noteCount": 312,
+  "fileCount": 367,
+  "blockCount": 160,
+  "warnCount": 345,
+  "noteCount": 316,
   "findings": [
     {
       "file": "drizzle\\0000_puzzling_mongu.sql",
@@ -5704,14 +5704,14 @@
           "level": "BLOCK",
           "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
           "line": 15,
-          "snippet": "parent_feature_id text REFERENCES atlas_features(feature_id),"
+          "snippet": "parent_feature_id text REFERENCES atlas_fi_features(feature_id),"
         },
         {
           "ruleId": "CREATE_INDEX_NO_CONCURRENT",
           "level": "WARN",
           "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
           "line": 24,
-          "snippet": "CREATE INDEX IF NOT EXISTS atlas_features_domain_status_idx ON atlas_features(domain, status);"
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_fi_features_domain_status_idx ON atlas_fi_features(domain, status);"
         }
       ]
     },
@@ -6278,6 +6278,65 @@
           "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
           "line": 51,
           "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_taxonomy_candidates_status"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260826_restore_nes_chrom_packets_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 64,
+          "snippet": "kag_dag_run_id uuid REFERENCES public.kag_dag_runs(id) ON DELETE SET NULL,"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 120,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS nes_chrom_packets_packet_key_key"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 122,
+          "snippet": "CREATE INDEX IF NOT EXISTS nes_chrom_packets_query_hash_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260827_source_lineage_relations_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 12,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_source_aliases ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 32,
+          "snippet": "REFERENCES atlas_source_refs (repo_id, source_ref_key)"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 35,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_source_aliases_canonical_idx"
         }
       ]
     },
@@ -7070,6 +7129,37 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\graphify_workspace_owner_backfill.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 29,
+          "snippet": "IF NOT EXISTS ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 34,
+          "snippet": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\latent_256_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 18,
+          "snippet": "ADD COLUMN IF NOT EXISTS latent_256 halfvec(256);"
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\llm_synthesis_events_phase11.sql",
       "findings": [
         {
@@ -7383,5 +7473,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-08-26T20:26:10.872Z"
+  "generatedAt": "2026-08-30T19:50:15.001Z"
 }

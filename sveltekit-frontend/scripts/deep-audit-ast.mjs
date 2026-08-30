@@ -32,7 +32,12 @@
 
 import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { resolve, relative }                  from 'node:path';
-import { glob }                        from 'glob';
+import globPackage from 'glob';
+import { promisify } from 'node:util';
+
+// The installed glob package is CommonJS/glob v7, whose default export uses
+// callbacks. Normalize it to the Promise API used by the audit gates.
+const glob = promisify(globPackage);
 import { verifyBatch, summarise, getCacheStats } from './lib/reference-verifier.mjs';
 
 const ROOT       = process.cwd();

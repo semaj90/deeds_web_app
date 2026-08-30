@@ -1,24 +1,26 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import { requireAdmin } from '$lib/server/auth-utils.js';
+
+const projectionLoadRequestSchema = z.object({
+  artifactDir: z.string().min(1),
+  graphRevision: z.string().min(1),
+  projectionRevision: z.string().optional(),
+  replaceResident: z.boolean().optional()
+});
 
 export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   const { request } = event;
   try {
-    const body = await request.json() as {
-      artifactDir?: string;
-      graphRevision?: string;
-      projectionRevision?: string;
-      replaceResident?: boolean;
-    };
-    if (!body.artifactDir?.trim()) {
-      return json({ ok: false, error: 'artifactDir is required' }, { status: 400 });
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = projectionLoadRequestSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json({ ok: false, error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
     }
-    if (!body.graphRevision?.trim()) {
-      return json({ ok: false, error: 'graphRevision is required' }, { status: 400 });
-    }
+    const body = parsed.data;
 
     const client = createAtlasRapidsPageRankClient();
     const receipt = await client.loadProjection({

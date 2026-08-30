@@ -1,18 +1,18 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "004b4b4f-ed73-42fe-b8e6-5fa8fce9da43",
-  "repositoryRevision": "1339eb29b2da3916ea415286a7bb9b4ac7e1ea79",
-  "generatedAt": "2026-08-30T08:20:00.800Z",
+  "runId": "e9bb3ef4-cc4c-45a4-9b80-94e6db5dd6cf",
+  "repositoryRevision": "8033a99e246242b327b2823ea119e53563992ce3",
+  "generatedAt": "2026-08-30T08:55:31.322Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
       "totalFiles": 32741,
-      "totalBytes": 363637797,
-      "currentRevision": "1339eb29b2da3916ea415286a7bb9b4ac7e1ea79",
-      "priorRevision": "b23564c5c5473a0a4d16224acbbc1ef8dceb5f42"
+      "totalBytes": 363646192,
+      "currentRevision": "8033a99e246242b327b2823ea119e53563992ce3",
+      "priorRevision": "47badd00d315bea95b7f8b5c0a2a7469ba1b4494"
     },
     "inventory": {
       "status": "PROVEN",
@@ -76,14 +76,14 @@
       "status": "PROVEN",
       "filesProcessed": 32741,
       "filesWithStructure": 12420,
-      "factCount": 129171,
+      "factCount": 129173,
       "functionCount": 47683,
       "classCount": 1891,
       "interfaceCount": 1883,
       "methodCount": 6430,
-      "importCount": 37749,
+      "importCount": 37750,
       "constCount": 7901,
-      "arrowCount": 25634,
+      "arrowCount": 25635,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,17 +289,17 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 128690,
+      "uniqueIds": 128692,
       "duplicateIds": 481,
-      "reusedIds": 128690,
+      "reusedIds": 128692,
       "supersededIds": 481
     },
     "lexical": {
       "status": "PROVEN",
       "filesProcessed": 32741,
       "entries": 32741,
-      "totalTokens": 32438485,
-      "totalUniqueTokens": 9394425,
+      "totalTokens": 32439536,
+      "totalUniqueTokens": 9394599,
       "topGlobalTerms": [
         {
           "term": "id",
@@ -307,11 +307,11 @@
         },
         {
           "term": "sveltekit",
-          "weight": 252496
+          "weight": 252499
         },
         {
           "term": "frontend",
-          "weight": 248516
+          "weight": 248519
         },
         {
           "term": "pagerank",
@@ -347,7 +347,7 @@
         },
         {
           "term": "if",
-          "weight": 202390
+          "weight": 202391
         },
         {
           "term": "app",
@@ -359,11 +359,11 @@
         },
         {
           "term": "name",
-          "weight": 188311
+          "weight": 188313
         },
         {
           "term": "//",
-          "weight": 184709
+          "weight": 184710
         },
         {
           "term": "0.15000000000000002",
@@ -371,7 +371,7 @@
         },
         {
           "term": "string",
-          "weight": 163791
+          "weight": 163796
         },
         {
           "term": "deeds",
@@ -2142,10 +2142,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 296091,
-      "containsEdges": 129171,
-      "importEdges": 37749,
-      "declaresEdges": 129171,
+      "entries": 296096,
+      "containsEdges": 129173,
+      "importEdges": 37750,
+      "declaresEdges": 129173,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2488,7 +2488,7 @@
       "status": "PROVEN",
       "postgresCanonicalRecords": 32741,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 296091,
+      "neo4jProjectionRecords": 296096,
       "redisProjectionRecords": 32741,
       "representationName": "semantic_768",
       "denseVectorName": "content",
@@ -2525,9 +2525,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 32719,
-      "invalidatedFiles": 22,
-      "reusedRatio": 0.9993280596194374
+      "reusedFiles": 32730,
+      "invalidatedFiles": 11,
+      "reusedRatio": 0.9996640298097187
     }
   },
   "outputs": {

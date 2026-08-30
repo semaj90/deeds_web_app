@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { degradedJson } from '$lib/server/api-response.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * Phase 109: Auto-tag Qdrant codebase chunks via LLM
@@ -30,7 +31,7 @@ const TAG_CATEGORIES = [
  * for chat/synthesis.
  */
 async function classifyChunk(content: string): Promise<string[]> {
-	const model = process.env.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+	const model = LLM_MODEL_ID;
 
 	const prompt = `Classify this TypeScript/Svelte code chunk into 1-3 of these exact categories: ${TAG_CATEGORIES.join(', ')}.
 Respond ONLY with comma-separated category names from the list above. Nothing else.

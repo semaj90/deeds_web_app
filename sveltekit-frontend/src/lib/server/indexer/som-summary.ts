@@ -23,6 +23,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { TTL } from '$lib/server/cache-keys.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface SomCellSummary {
   x: number;
@@ -143,7 +144,7 @@ Focus on structural patterns and data-flow, not individual files.`;
       if (!llmText) {
         llmText = (await bifrostChat(
           [{ role: 'user', content: prompt }],
-          'gemma4-legal-iq4xs-direct.gguf',
+          LLM_MODEL_ID,
           { temperature: 0.2, maxTokens: 180, timeoutMs: 60_000 }
         ).catch(() => '')).trim();
       }

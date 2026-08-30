@@ -27,6 +27,7 @@ import {
   AtlasState,
 } from '$lib/server/atlas/atlas-runtime-context.js';
 import { buildSemanticSignalPacket } from '$lib/server/atlas/semantic-signal-routing.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
   atlasRetrieveTool,
   atlasValidateChangeTool,
@@ -236,7 +237,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         'invoked, no Postgres/Qdrant/gRPC call was made, and "evidence" below is hardcoded. ' +
         'Do not treat this as a real retrieval result.',
       agent: {
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         state: runtime.state,
         confidence: runtime.confidence,
       },

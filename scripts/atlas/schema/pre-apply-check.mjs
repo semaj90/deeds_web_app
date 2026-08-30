@@ -60,20 +60,25 @@ if (!journal) {
         const lastIdx  = lastEntry.idx ?? 0;
         const lastTag  = lastEntry.tag ?? '';
         const snapPath = join(SNAPSHOTS, `${String(lastIdx).padStart(4, '0')}_snapshot.json`);
-        const sqlPath  = join(DRIZZLE, `${String(lastIdx).padStart(4, '0')}_${lastTag}.sql`);
+        const idxPrefix = String(lastIdx).padStart(4, '0');
+        // Journal tags commonly already contain the numeric prefix
+        // (for example `0040_kanban_task_lifecycle`). Avoid constructing
+        // the impossible `0040_0040_kanban_task_lifecycle.sql` path.
+        const sqlCandidates = [
+            join(DRIZZLE, `${lastTag}.sql`),
+            join(DRIZZLE, `${idxPrefix}_${lastTag}.sql`),
+        ];
 
         notes.push({ check: 'JOURNAL_LAST', message: `Last journal entry: idx=${lastIdx} tag=${lastTag}` });
 
         if (!existsSync(snapPath)) {
             blocks.push({ check: 'SNAPSHOT_EXISTS', message: `Missing snapshot for last journal entry: ${relative(FRONTEND, snapPath)}` });
         }
-        if (!existsSync(sqlPath)) {
-            // Some migrations are stored under different naming — check for any file starting with the idx
-            const idxPrefix = String(lastIdx).padStart(4, '0');
-            const altExists = existsSync(join(DRIZZLE, `${idxPrefix}_${lastTag}.sql`));
-            if (!altExists) {
-                warns.push({ check: 'MIGRATION_SQL_EXISTS', message: `SQL file for last journal entry not found: ${relative(FRONTEND, sqlPath)} (may have been applied externally)` });
-            }
+        if (!sqlCandidates.some(existsSync)) {
+            warns.push({
+                check: 'MIGRATION_SQL_EXISTS',
+                message: `SQL file for last journal entry not found; checked ${sqlCandidates.map((candidate) => relative(FRONTEND, candidate)).join(' and ')} (may have been applied externally)`,
+            });
         }
 
         // If --tag specified, verify it matches a real journal entry
@@ -105,8 +110,17 @@ if (!existsSync(CONFIG)) {
         notes.push({ check: 'TABLES_FILTER', message: `tablesFilter present with ~${exclusions} exclusion patterns` });
 
         // Check for known risky tables that should be excluded
+        const protectedByConfig = (table) => {
+            if (configContent.includes(`'!${table}'`) || configContent.includes(`"!${table}"`)) return true;
+            const wildcardPrefixes = new Set([
+                table.endsWith('_') ? table : `${table}_`,
+                table.includes('_') ? `${table.split('_', 1)[0]}_` : table,
+            ]);
+            return [...wildcardPrefixes].some((prefix) =>
+                configContent.includes(`'!${prefix}*'`) || configContent.includes(`"!${prefix}*"`));
+        };
         const riskyTables = ['kg_nodes', 'kg_edges', 'phase89_', 'warden_', 'ace_chunks', 'embedded_summaries'];
-        const missing = riskyTables.filter(t => !configContent.includes(t));
+        const missing = riskyTables.filter(t => !protectedByConfig(t));
         if (missing.length > 0) {
             warns.push({ check: 'TABLES_FILTER_RISKY', message: `tablesFilter may be missing protections for: ${missing.join(', ')}` });
         }

@@ -6,6 +6,7 @@
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { getRedis } from '$lib/server/redis.js';
@@ -149,7 +150,7 @@ ${text.slice(0, 8000)}`;
     const gemma4Url = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
 
     try {
-      return await traceLLM('entity-extraction-unified', { model: 'gemma4-legal-iq4xs-direct.gguf', prompt: text.slice(0, 500) }, async (gen) => {
+      return await traceLLM('entity-extraction-unified', { model: LLM_MODEL_ID, prompt: text.slice(0, 500) }, async (gen) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
@@ -158,7 +159,7 @@ ${text.slice(0, 8000)}`;
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gemma4-legal-iq4xs-direct.gguf',
+              model: LLM_MODEL_ID,
               messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt },

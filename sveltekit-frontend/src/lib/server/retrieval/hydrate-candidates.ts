@@ -147,6 +147,25 @@ export interface HydratedCandidatesWithProof {
   proof: HydrationProofSummary;
 }
 
+function buildLexicalSignal(candidate: FusedCandidate) {
+  // 'postgres_trigram' is a legacy label; the actual query (retrieve-candidates.ts)
+  // is real ts_rank() BM25 full-text search against the GIN-indexed search_vector
+  // column, pre-clamped to [0.5, 1.0]. Re-clamp defensively to the schema's [0,1].
+  if (candidate.scoreSource !== 'postgres_trigram') {
+    return undefined;
+  }
+
+  const score = Math.max(0, Math.min(1, asFiniteNumber(candidate.score)));
+
+  return {
+    name: 'lexical' as const,
+    score,
+    matched_terms: [],
+    query_coverage: score,
+    confidence: score,
+  };
+}
+
 function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | null) {
   if (candidate.embeddingLane !== 'dense_768') {
     return undefined;
@@ -506,6 +525,7 @@ function buildFeatureEnvelope(input: {
 }): FeatureEnvelope {
   const { candidate, row, rowIdentity } = input;
   const dense = buildDenseSignal(candidate, row.qdrant_id);
+  const lexical = buildLexicalSignal(candidate);
   const normalizedDomainClass = normalizeDomainClass(row.domain);
   const retrievalScore = asFiniteNumber(candidate.score);
   const fusionScore = asFiniteNumber(candidate.fusionScore);
@@ -542,6 +562,7 @@ function buildFeatureEnvelope(input: {
     // Vector identity (qdrant_id is the embedding reference)
     qdrant_point_id: row.qdrant_id || null,
     dense,
+    lexical,
 
     // Domain classification
     domain: row.domain || null,

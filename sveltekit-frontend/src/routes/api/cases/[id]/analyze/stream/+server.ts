@@ -5,6 +5,7 @@ import { cases } from '$lib/server/db/schema-postgres.js';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const analyzeStreamSchema = z.object({
 	analysisType: z.enum(['summary', 'legal_issues', 'risks', 'evidence_review']).optional().default('summary')
@@ -147,7 +148,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 				const responseStream = llmRouter.generateStream({
 					prompt,
 					provider: 'llama-server',
-					model: 'gemma4-legal-iq4xs-direct.gguf',
+					model: LLM_MODEL_ID,
 					temperature: 0.4,
 					maxTokens: 4096
 				});

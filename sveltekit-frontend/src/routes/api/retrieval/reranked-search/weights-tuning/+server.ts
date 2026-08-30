@@ -11,13 +11,20 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 
-interface WeightTuningRequest {
-  query: string;
-  limit?: number;
-  blends?: ('A' | 'B' | 'C')[];
-  customWeights?: { dense: number; lexical: number; proximity: number };
-}
+const WeightTuningRequestSchema = z.object({
+  query: z.string().min(1),
+  limit: z.number().int().positive().max(200).optional(),
+  blends: z.array(z.enum(['A', 'B', 'C'])).optional(),
+  customWeights: z.object({
+    dense: z.number().min(0).max(1),
+    lexical: z.number().min(0).max(1),
+    proximity: z.number().min(0).max(1)
+  }).optional()
+});
+
+type WeightTuningRequest = z.infer<typeof WeightTuningRequestSchema>;
 
 interface BlendResult {
   blendId: string;
@@ -73,12 +80,22 @@ async function testWeightCombination(
   };
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const startTime = Date.now();
 
   try {
-    const body: WeightTuningRequest = await request.json();
-    const { query, limit = 10, blends = ['A', 'B', 'C'], customWeights } = body;
+    const parsed = WeightTuningRequestSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const { query, limit = 10, blends = ['A', 'B', 'C'], customWeights } = parsed.data;
 
     if (!query || query.trim().length === 0) {
       return json({ error: 'Query required' }, { status: 400 });

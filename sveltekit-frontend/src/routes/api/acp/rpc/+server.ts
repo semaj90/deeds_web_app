@@ -26,6 +26,7 @@ import { z } from 'zod';
 import { runAcpRpcLoop } from '$lib/server/ai/acp-rpc-loop.js';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const acpRpcRequestSchema = z.object({
   query: z.string().min(1).max(4000),
@@ -73,7 +74,7 @@ export const POST: RequestHandler = async (event) => {
           for await (const chunk of runAcpRpcLoop(
             {
               llamaBaseUrl: LLAMA_BASE_URL,
-              model: 'gemma4-legal-iq4xs-direct.gguf',
+              model: LLM_MODEL_ID,
               temperature: 0.3,
               maxTokens: 2048,
               maxToolRounds: max_tool_rounds,

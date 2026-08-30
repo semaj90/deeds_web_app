@@ -24,6 +24,14 @@ const reportPath = path.resolve(root, 'docs/reports/current-tree-bound-symbol-re
 const connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const digest = (value) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 
+function assertLocalNonProductionDatabase(value) {
+  const url = new URL(value);
+  const database = decodeURIComponent(url.pathname.replace(/^\//, ''));
+  if (url.hostname !== '127.0.0.1' || url.port !== '5434' || database !== 'legal_ai_db') {
+    throw new Error(`NON_PRODUCTION_DATABASE_REQUIRED:${url.hostname}:${url.port}:${database}`);
+  }
+}
+
 const raw = await fs.readFile(inputPath, 'utf8');
 const rows = raw.split(/\r?\n/).filter(Boolean).map(JSON.parse);
 if (rows.length !== 5) throw new Error(`EXPECTED_FIVE_CANARY_ROWS:${rows.length}`);
@@ -74,6 +82,7 @@ if (!apply) {
   process.exit(0);
 }
 if (!authorized) throw new Error('EXPLICIT_SYMBOL_REGISTRY_CANARY_AUTHORIZATION_REQUIRED');
+assertLocalNonProductionDatabase(connectionString);
 
 const pool = new pg.Pool({ connectionString });
 try {
@@ -103,7 +112,7 @@ try {
   const readback = await pool.query(
     `SELECT stable_symbol_id, canonical_key, language, symbol_kind,
             canonical_name, canonical_qualified_name, created_from_nomination_id,
-            created_from_source_ref, created_from_source_revision
+            created_from_source_ref, created_from_source_revision, registry_revision, status
        FROM public.atlas_symbol_registry
       WHERE canonical_key = ANY($1::text[])
       ORDER BY canonical_key`,
@@ -113,7 +122,7 @@ try {
   const actualByKey = new Map(readback.rows.map((row) => [row.canonical_key, row]));
   for (const row of rows) {
     const actual = actualByKey.get(row.symbol_key);
-    if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.language !== row.language || actual.symbol_kind !== row.kind || actual.canonical_name !== row.name || actual.created_from_source_ref !== row.source_ref || actual.created_from_source_revision !== row.source_revision) {
+    if (!actual || actual.stable_symbol_id !== row.stable_symbol_id || actual.canonical_key !== row.symbol_key || actual.language !== row.language || actual.symbol_kind !== row.kind || actual.canonical_name !== row.name || actual.canonical_qualified_name !== row.qualified_name || actual.created_from_nomination_id !== row.nomination_id || actual.created_from_source_ref !== row.source_ref || actual.created_from_source_revision !== row.source_revision || actual.registry_revision !== 'atlas-current-tree-bound-symbol-canary-v1' || actual.status !== 'active') {
       report.mismatches.push({ canonicalKey: row.symbol_key, reason: !actual ? 'READBACK_MISSING' : 'READBACK_FIELD_MISMATCH' });
     }
   }

@@ -4,6 +4,7 @@
 import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * Extract keywords from text using the LangExtract service.
@@ -61,7 +62,7 @@ Keywords:`;
 
         const rawKeywords = await bifrostChat(
             [{ role: 'user', content: prompt }],
-            'gemma4-legal-iq4xs-direct.gguf',
+            LLM_MODEL_ID,
             { temperature: 0.3, maxTokens: 200, timeoutMs: 5_000 }
         ).catch((err) => {
             console.warn('⚠️ llama-server error:', err);

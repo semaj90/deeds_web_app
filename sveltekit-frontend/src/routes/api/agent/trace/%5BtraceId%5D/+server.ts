@@ -156,7 +156,11 @@ export const GET: RequestHandler = async ({ params, url }) => {
  * Archive a trace (soft delete for privacy/compliance).
  * Trace remains in DB with archived_at timestamp set.
  */
-export const DELETE: RequestHandler = async ({ params }) => {
+export const DELETE: RequestHandler = async ({ params, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const traceId = (params as { traceId?: string }).traceId;
 

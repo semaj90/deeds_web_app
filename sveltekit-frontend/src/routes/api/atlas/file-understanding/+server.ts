@@ -1,7 +1,17 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import pg from 'pg';
+import { z } from 'zod';
 import { requireUser } from '$lib/server/auth-utils.js';
+
+const fileUnderstandingUpdateSchema = z.object({
+  packet_key: z.string().min(1),
+  file_purpose: z.string().optional(),
+  thoroughness: z.string().optional(),
+  app_criticality: z.string().optional(),
+  test_coverage_pct: z.number().min(0).max(100).optional(),
+  reasoning: z.string().optional()
+});
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin@localhost/legal_ai_db',
@@ -187,7 +197,11 @@ export const POST: RequestHandler = async (event) => {
   requireUser(event);
   const client = await pool.connect();
   try {
-    const body = await event.request.json();
+    const rawBody = await event.request.json().catch(() => ({}));
+    const parsed = fileUnderstandingUpdateSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
+    }
     const {
       packet_key,
       file_purpose,
@@ -195,11 +209,7 @@ export const POST: RequestHandler = async (event) => {
       app_criticality,
       test_coverage_pct,
       reasoning,
-    } = body;
-
-    if (!packet_key) {
-      return json({ error: 'packet_key required' }, { status: 400 });
-    }
+    } = parsed.data;
 
     // Update packet with human-labeled values
     await client.query(

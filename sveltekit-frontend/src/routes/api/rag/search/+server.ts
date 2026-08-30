@@ -20,6 +20,12 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
+
+const RagSearchBodySchema = z.object({
+  query: z.string().min(1, 'query must not be empty'),
+  limit: z.number().int().positive().max(100).optional().default(10),
+});
 
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -49,16 +55,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const body = await request.json() as { query?: string; limit?: number };
-
-    if (!body.query) {
-      return json({ error: 'Missing query field', chunks: [] }, { status: 400 });
+    const rawBody = await request.json().catch(() => null);
+    const parsed = RagSearchBodySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json({ error: 'Invalid request body', issues: parsed.error.issues, chunks: [] }, { status: 400 });
     }
 
-    const limit = Math.min(body.limit || 10, 100);
+    const { query, limit } = parsed.data;
 
     // Redirect to canonical endpoint
-    const redirectUrl = `/api/retrieval/search-unified?q=${encodeURIComponent(body.query)}&topK=${limit}`;
+    const redirectUrl = `/api/retrieval/search-unified?q=${encodeURIComponent(query)}&topK=${limit}`;
     console.warn(`[DEPRECATED] POST /api/rag/search redirecting to ${redirectUrl}`);
 
     return new Response(null, {

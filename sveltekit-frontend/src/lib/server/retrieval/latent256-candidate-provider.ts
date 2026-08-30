@@ -45,10 +45,12 @@ export interface Latent256HydrateInput {
 
 export interface Latent256HydrateResult {
   vectors: ReadonlyMap<string, readonly number[]>;
+  outcomes: readonly Latent256HydrationOutcome[];
   requested: number;
   found: number;
   missing: number;
   revisionMismatch: number;
+  identityUnresolved: number;
   /** Rows present with the correct checkpoint revision but rejected by shape validation
    * (wrong dimension, non-finite values). Distinct from `missing` (no row at all) and
    * `revisionMismatch` (row exists, wrong checkpoint) so a caller can tell the three failure
@@ -56,6 +58,20 @@ export interface Latent256HydrateResult {
   invalidShape: number;
   vectorsChecksum: string;
   receiptChecksum: string;
+}
+
+export type Latent256HydrationStatus =
+  | 'AVAILABLE'
+  | 'MISSING'
+  | 'REVISION_MISMATCH'
+  | 'INVALID_SHAPE'
+  | 'IDENTITY_UNRESOLVED';
+
+export interface Latent256HydrationOutcome {
+  candidateOrdinal: number;
+  canonicalId: string | null;
+  codebaseChunkId: string | null;
+  status: Latent256HydrationStatus;
 }
 
 export interface Latent256CandidateProviderV1 {
@@ -86,6 +102,7 @@ function computeReceiptChecksum(input: {
   found: number;
   missing: number;
   revisionMismatch: number;
+  identityUnresolved: number;
   invalidShape: number;
 }): string {
   const digest = createHash('sha256');
@@ -96,6 +113,7 @@ function computeReceiptChecksum(input: {
   digest.update(String(input.found));
   digest.update(String(input.missing));
   digest.update(String(input.revisionMismatch));
+  digest.update(String(input.identityUnresolved));
   digest.update(String(input.invalidShape));
   for (const key of [...input.candidateIds].sort()) digest.update(key);
   return digest.digest('hex');
@@ -127,13 +145,15 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
     if (requested === 0) {
       return {
         vectors: new Map(),
+        outcomes: [],
         requested: 0,
         found: 0,
         missing: 0,
         revisionMismatch: 0,
+        identityUnresolved: 0,
         invalidShape: 0,
         vectorsChecksum: computeVectorsChecksum(new Map()),
-        receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum: computeVectorsChecksum(new Map()), found: 0, missing: 0, revisionMismatch: 0, invalidShape: 0 }),
+        receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum: computeVectorsChecksum(new Map()), found: 0, missing: 0, revisionMismatch: 0, identityUnresolved: 0, invalidShape: 0 }),
       };
     }
 
@@ -156,41 +176,58 @@ export class PostgresLatent256CandidateProvider implements Latent256CandidatePro
     }
 
     const vectors = new Map<string, readonly number[]>();
+    const outcomes: Latent256HydrationOutcome[] = [];
+    const seenIds = new Set<string>();
     let found = 0;
     let revisionMismatch = 0;
+    let identityUnresolved = 0;
     let invalidShape = 0;
 
-    for (const key of candidateIds) {
+    for (const [candidateOrdinal, key] of candidateIds.entries()) {
+      if (seenIds.has(key)) {
+        identityUnresolved++;
+        outcomes.push({ candidateOrdinal, canonicalId: null, codebaseChunkId: null, status: 'IDENTITY_UNRESOLVED' });
+        continue;
+      }
+      seenIds.add(key);
       const row = rowByKey.get(key);
-      if (!row || row.latent_256 == null) continue; // counted in `missing` below
+      if (!row || row.latent_256 == null) {
+        outcomes.push({ candidateOrdinal, canonicalId: key, codebaseChunkId: null, status: 'MISSING' });
+        continue;
+      }
 
       if (row.latent_256_checkpoint_revision !== checkpointRevision) {
         revisionMismatch++;
+        outcomes.push({ candidateOrdinal, canonicalId: key, codebaseChunkId: row.id, status: 'REVISION_MISMATCH' });
         continue;
       }
 
       const vec = parseHalfvec(row.latent_256);
       if (!isValidLatent256(vec)) {
         invalidShape++;
+        outcomes.push({ candidateOrdinal, canonicalId: key, codebaseChunkId: row.id, status: 'INVALID_SHAPE' });
         continue;
       }
 
       vectors.set(key, vec);
       found++;
+      outcomes.push({ candidateOrdinal, canonicalId: key, codebaseChunkId: row.id, status: 'AVAILABLE' });
     }
 
-    const missing = requested - found - revisionMismatch - invalidShape;
+    const missing = requested - found - revisionMismatch - invalidShape - identityUnresolved;
 
     const vectorsChecksum = computeVectorsChecksum(vectors);
     return {
       vectors,
+      outcomes,
       requested,
       found,
       missing,
       revisionMismatch,
+      identityUnresolved,
       invalidShape,
       vectorsChecksum,
-      receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum, found, missing, revisionMismatch, invalidShape }),
+      receiptChecksum: computeReceiptChecksum({ candidateIds, candidateSnapshotRevision, representationRevision, checkpointRevision, vectorsChecksum, found, missing, revisionMismatch, identityUnresolved, invalidShape }),
     };
   }
 }

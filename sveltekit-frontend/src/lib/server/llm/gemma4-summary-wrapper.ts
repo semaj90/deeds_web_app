@@ -8,6 +8,8 @@
  * - Graceful fallback to the live llama-server lane
  */
 
+import { LLM_MODEL_ID } from './runtime-contract.js';
+
 interface SummarizeRequest {
   prompt: string;
   maxTokens?: number;
@@ -75,7 +77,7 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         messages: [
           {
             role: 'system',
@@ -131,7 +133,7 @@ async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'hforf.gguf',
+      model: LLM_MODEL_ID,
       messages: [
         {
           role: 'system',
@@ -152,7 +154,7 @@ async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<
   const data = (await response.json()) as any;
   return {
     summary: data.choices?.[0]?.message?.content || '',
-    model: 'hforf.gguf',
+    model: LLM_MODEL_ID,
     totalTokens: data.usage?.prompt_tokens + data.usage?.completion_tokens
   };
 }

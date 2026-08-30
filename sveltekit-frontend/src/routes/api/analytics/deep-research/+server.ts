@@ -29,6 +29,7 @@ import { z } from 'zod';
 import { generateDeepResearch, invalidateDeepResearchCache } from '$lib/server/analytics/deep-research.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { startLdrResearch, searchLdrHistory } from '$lib/server/analytics/ldr-client.js';
 import { db } from '$lib/server/db/client.js';
 import { deepResearchReports } from '$lib/server/db/schema-postgres.js';
@@ -138,7 +139,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: LLM_MODEL_ID,
 				messages: [
 					{ role: 'system', content: system + caseContext },
 					{ role: 'user', content: selfPrompt },
@@ -171,14 +172,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					userId: Number(locals.user.id),
 					query: selfPrompt,
 					reportType: 'summary',
-					modelUsed: 'gemma4-legal-iq4xs-direct.gguf',
+				modelUsed: LLM_MODEL_ID,
 					markdownContent: answer,
 					metadata: {
 						pipelineHint: pipelineHint ?? 'ace',
 						caseId,
 						durationMs,
 						provider: 'llama-server',
-						model: 'gemma4-legal-iq4xs-direct.gguf',
+						model: LLM_MODEL_ID,
 					},
 				})
 				.returning();
@@ -189,7 +190,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				durationMs,
 				cached: false,
 				provider: 'llama-server',
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: LLM_MODEL_ID,
 				reportId: savedReport?.id,
 			});
 		} catch (dbErr) {
@@ -201,7 +202,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				durationMs,
 				cached: false,
 				provider: 'llama-server',
-				model: 'gemma4-legal-iq4xs-direct.gguf',
+				model: LLM_MODEL_ID,
 				warning: 'Report not persisted to database',
 			});
 		}

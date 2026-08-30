@@ -14,8 +14,22 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { Gemma4PolicyOrchestrator } from '$lib/gpu/gemma4-policy-orchestrator';
 import type { ScoredCandidate } from '$lib/gpu/gemma4-policy-orchestrator';
+
+const scoredCandidateSchema = z.object({}).passthrough();
+
+const policyOrchestratorRequestSchema = z.object({
+  query: z.string().min(1),
+  candidates: z.array(scoredCandidateSchema),
+  context: z
+    .object({
+      caseId: z.string().optional(),
+      userId: z.string().optional()
+    })
+    .optional()
+});
 
 // Singleton orchestrator (initialize on first request)
 let orchestrator: Gemma4PolicyOrchestrator | null = null;
@@ -49,10 +63,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = (await request.json()) as PolicyOrchestratorRequest;
-    if (!body.query || !body.candidates) {
-      return json({ error: 'Missing query or candidates' }, { status: 400 });
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = policyOrchestratorRequestSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
     }
+    // candidates.embedding/features are Float32Array at runtime, which JSON-safe Zod
+    // validation can't express — double-cast per this repo's JSONB convention.
+    const body = parsed.data as unknown as PolicyOrchestratorRequest;
 
     const orchestrator = await getOrchestrator();
 

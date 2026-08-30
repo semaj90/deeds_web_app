@@ -6,9 +6,10 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = LLM_MODEL_ID;
 
 /**
  * Assemble summary by reading streaming response from Gemma4.

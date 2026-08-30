@@ -52,8 +52,16 @@ for (let index = 0; index < replayCount; index += 1) {
 }
 const first = replays[0];
 const second = replays[replays.length - 1];
-const identityParity = replays.every((run) => run.requested === first.requested && run.found === first.found && run.missing === first.missing);
-const checksumParity = replays.every((run) => run.receiptChecksum === first.receiptChecksum && run.vectorsChecksum === first.vectorsChecksum);
+const identityParity = replays.every((run) =>
+  JSON.stringify(run.outcomes) === JSON.stringify(first.outcomes));
+const checksumParity = replays.every((run) =>
+  run.receiptChecksum === first.receiptChecksum && run.vectorsChecksum === first.vectorsChecksum);
+const counts = {
+  missing: first.missing,
+  revisionMismatches: first.revisionMismatch,
+  invalidDimensionsOrNonFinite: first.invalidShape,
+  identityUnresolved: first.identityUnresolved,
+};
 const receipt = {
   schema: 'atlas.latent256-live-readback.v1',
   status: checksumParity && identityParity && first.revisionMismatch === 0 && first.invalidShape === 0
@@ -71,18 +79,20 @@ const receipt = {
     representationRevision: input.representationRevision,
   },
   requestedCandidates: candidateIds.length,
-  canonicalIdsResolved: candidateIds.length,
+  canonicalIdsResolved: new Set(first.outcomes.filter((o) => o.canonicalId !== null).map((o) => o.canonicalId)).size,
   vectorsHydrated: first.found,
-  missingVectors: first.missing,
-  revisionMismatches: first.revisionMismatch,
-  invalidDimensionsOrNonFinite: first.invalidShape,
+  missingVectors: counts.missing,
+  revisionMismatches: counts.revisionMismatches,
+  invalidDimensionsOrNonFinite: counts.invalidDimensionsOrNonFinite,
+  ambiguousRows: 0,
+  identityUnresolved: counts.identityUnresolved,
   candidateDrops: 0,
   candidateReorders: 0,
-  failOpenPreserved: first.missing,
-  first,
-  second,
+  failOpenPreserved: counts.missing + counts.revisionMismatches + counts.invalidDimensionsOrNonFinite + counts.identityUnresolved,
+  outcomes: first.outcomes,
   replay: { runs: replayCount, identityParity, checksumParity },
   canonicalWrites: 0,
+  databaseWrites: false,
   productionActivation: false,
   candidateIds,
 };

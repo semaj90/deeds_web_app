@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { mcpTools } from '../mcp/index.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
@@ -2429,7 +2430,7 @@ export function setupToolHandlers() {
       }
 
       case 'answer:synthesize': {
-        const { query, context_packets, synthesis_model = 'gemma4-legal-iq4xs-direct.gguf', max_tokens = 1024, temperature = 0.3, include_citations = true } = args as {
+        const { query, context_packets, synthesis_model = LLM_MODEL_ID, max_tokens = 1024, temperature = 0.3, include_citations = true } = args as {
           query: string;
           context_packets: Array<{ packet_key: string; summary: string; feature_id: string }>;
           synthesis_model?: string;
@@ -3318,7 +3319,7 @@ export function setupToolHandlers() {
           const { bifrostChat } = await import('../lib/server/ollama.js');
           const content = await bifrostChat(
             [{ role: 'user', content: prompt }],
-            model ?? 'gemma4-legal-iq4xs-direct.gguf',
+            model ?? LLM_MODEL_ID,
             { maxTokens: maxTokens ?? 2048, temperature: temperature ?? 0.3 }
           );
           return {
@@ -3327,7 +3328,7 @@ export function setupToolHandlers() {
                 type: 'text',
                 text: JSON.stringify({
                   response: content,
-                  model: model ?? 'gemma4-legal-iq4xs-direct.gguf',
+                  model: model ?? LLM_MODEL_ID,
                   backend: 'llama-server-direct-fallback',
                 }),
               },
@@ -3455,7 +3456,7 @@ export function setupToolHandlers() {
             { role: 'system', content: acePrompt.systemPrompt },
             { role: 'user', content: aceQuery },
           ],
-          process.env.LLM_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
+          process.env.LLM_MODEL || LLM_MODEL_ID,
           { maxTokens: aceMaxTokens ?? 2048, temperature: 0.4 }
         );
 
@@ -3477,7 +3478,7 @@ export function setupToolHandlers() {
                   hasCaseContext: !!context.caseContext,
                   hasResearch: !!context.webSearchContext?.includes('Deep Research'),
                 },
-                model: process.env.LLM_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
+                model: process.env.LLM_MODEL || LLM_MODEL_ID,
               }),
             },
           ],

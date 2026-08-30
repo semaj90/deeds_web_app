@@ -2,9 +2,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
+const MODEL_PREFERENCE = [LLM_MODEL_ID];
 
 async function callLlamaServer(prompt: string, format?: 'json' | 'text', timeoutMs = 90_000): Promise<string> {
   for (const model of MODEL_PREFERENCE) {

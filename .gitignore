@@ -1073,3 +1073,6 @@ sveltekit-frontend/docs/reports/summary-envelope-build.json
 sveltekit-frontend/docs/reports/train-som-20x20-writeback.json
 sveltekit-frontend/memory/graphify/gds/*.json
 openspec/drafts/*.md
+
+# Large binary training-snapshot artifacts (not source; regenerable via python/export_frozen_semantic768_snapshot.py)
+docs/reports/semantic768/*.f32bin

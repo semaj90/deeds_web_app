@@ -21,7 +21,11 @@ const SelectToolsSchema = z.object({
   bootstrap: z.boolean().optional().default(false),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = SelectToolsSchema.safeParse(body);
   if (!parsed.success) {

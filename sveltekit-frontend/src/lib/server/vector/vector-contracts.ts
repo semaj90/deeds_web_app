@@ -365,8 +365,11 @@ export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
   },
 };
 
-/** Canonical source collection — dense (768-dim content). */
+/** Canonical native semantic source collection — EmbeddingGemma semantic_768. */
+export const CANONICAL_SOURCE_COLLECTION = 'codebase_chunks_768' as const;
+
+/** @deprecated Legacy 384 hybrid migration/reference lane; never canonical. */
 export const CANONICAL_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;
 
-/** Transitional dense-only collection — fallback when hybrid is not yet populated. */
+/** @deprecated Legacy 384 dense migration/reference lane; never canonical. */
 export const TRANSITIONAL_DENSE_COLLECTION = 'codebase_chunks_384' as const;

@@ -2,7 +2,7 @@
 /**
  * Phase 2/3: Qdrant 768 Identity Reconciliation Audit
  *
- * Read-only audit of all 53,381 Qdrant points against Postgres canonical state.
+ * Read-only audit of all Qdrant points against Postgres canonical state.
  * Determines whether the collection is safe for retrieval or requires rebuild/repair.
  *
  * Execution:
@@ -106,10 +106,11 @@ async function loadPostgresIdentities() {
       relative_path,
       chunk_id,
       content_hash,
+      source_ref,
       embedding_model,
       updated_at
     FROM codebase_chunk_index
-    WHERE content_embedding_768 IS NOT NULL
+    WHERE content_embedding IS NOT NULL
     ORDER BY id
   `);
 

@@ -13,6 +13,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createHash } from 'node:crypto';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -242,7 +243,7 @@ Tags:`;
 
     const content = await bifrostChat(
       [{ role: 'user', content: prompt }],
-      ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
+      LLM_MODEL_ID,
       { temperature: 0.1, maxTokens: 80, timeoutMs: 20_000 }
     ).catch(() => '');
 

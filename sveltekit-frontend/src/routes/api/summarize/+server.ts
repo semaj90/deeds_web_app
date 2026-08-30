@@ -1,19 +1,31 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { summarizeWithGemma4 } from '$lib/server/llm/gemma4-summary-wrapper';
 
-interface SummarizeRequest {
-  content: string;
-  maxTokens?: number;
-  temperature?: number;
-}
+const SummarizeRequestSchema = z.object({
+  content: z.string().min(1),
+  maxTokens: z.number().int().positive().max(4096).optional(),
+  temperature: z.number().min(0).max(2).optional()
+});
 
 /**
  * POST /api/summarize
  * Summarize code/feature content via Gemma4 RotorQuant
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const { content, maxTokens = 256, temperature = 0.3 } = (await request.json()) as SummarizeRequest;
+    const parsed = SummarizeRequestSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const { content, maxTokens = 256, temperature = 0.3 } = parsed.data;
 
     if (!content || content.trim().length === 0) {
       return json(

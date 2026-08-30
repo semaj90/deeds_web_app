@@ -1,4 +1,4 @@
-import { existsSync, promises as fs } from 'node:fs';
+import { existsSync, promises as fs, statSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 import { TaskPromotionGateSchema } from '../contracts/recommendation.js';
@@ -230,9 +230,21 @@ function hasBoardTasks(value: unknown): boolean {
   return tasks.length > 0;
 }
 
-async function readFirstPopulatedBoard(relativePaths: string[]): Promise<{ source: string | null; value: unknown | null }> {
-  for (const candidate of resolveCandidates(relativePaths)) {
-    if (!existsSync(candidate)) continue;
+async function readNewestPopulatedBoard(relativePaths: string[]): Promise<{ source: string | null; value: unknown | null }> {
+  const candidates = resolveCandidates(relativePaths)
+    .filter((candidate, index, all) => all.indexOf(candidate) === index)
+    .map((candidate, index) => {
+      if (!existsSync(candidate)) return null;
+      try {
+        return { candidate, index, mtimeMs: statSync(candidate).mtimeMs };
+      } catch {
+        return null;
+      }
+    })
+    .filter((entry): entry is { candidate: string; index: number; mtimeMs: number } => entry !== null)
+    .sort((a, b) => b.mtimeMs - a.mtimeMs || a.index - b.index);
+
+  for (const { candidate } of candidates) {
     const value = await readJsonIfExists(candidate);
     if (value && hasBoardTasks(value)) return { source: candidate, value };
   }
@@ -431,7 +443,7 @@ export function summarizeDailyGraphifyBoard(
 }
 
 export async function loadDailyGraphifyBoard(): Promise<DailyGraphifyBoardData> {
-  const boardResult = await readFirstPopulatedBoard([
+  const boardResult = await readNewestPopulatedBoard([
     path.join('docs', 'reports', 'atlas', 'atlas-kanban-tasks.json'),
     path.join('docs', 'reports', 'atlas-kanban-tasks.json'),
     path.join('docs', 'graph', 'kanban-board.json'),

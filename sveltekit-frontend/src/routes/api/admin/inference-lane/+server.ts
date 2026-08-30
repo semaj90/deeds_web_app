@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
@@ -24,7 +25,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			ctxMax: mainSlot?.n_ctx ?? 4096,
 			strategy: 'RotorQuant Q8_0',
 			flashAttn: true,
-			model: props.default_generation_settings?.model || ENV.ROTORQUANT_MODEL_PATH?.split(/[/\\\\]/).pop() || 'hforf.gguf'
+			model: props.default_generation_settings?.model || LLM_MODEL_ID
 		});
 	} catch (err) {
 		console.error('[Inference Lane API] Error:', err);

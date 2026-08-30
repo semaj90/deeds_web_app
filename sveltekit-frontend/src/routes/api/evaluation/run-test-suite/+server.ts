@@ -18,6 +18,7 @@
  */
 
 import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import {
   evaluateTestCase,
@@ -36,6 +37,12 @@ import {
 } from '$lib/server/evaluation/model-contracts.js';
 
 const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+
+const RunTestSuiteRequestSchema = z.object({
+  model: z.string().min(1, 'model is required'),
+  testCaseIds: z.array(z.string()).optional(),
+  maxConcurrent: z.number().int().positive().optional().default(1),
+});
 
 /**
  * Predefined test suite for Cline + Code extension evaluation
@@ -124,18 +131,22 @@ const TEST_SUITE: EvaluationTestCase[] = [
   },
 ];
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const body = await request.json();
-    const { model, testCaseIds, maxConcurrent = 1 } = body as {
-      model: ModelIdentifier;
-      testCaseIds?: string[];
-      maxConcurrent?: number;
-    };
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return error(401, 'Unauthorized');
+  }
 
-    if (!model) {
-      return error(400, 'model is required');
+  try {
+    const rawBody = await request.json().catch(() => null);
+    const parsedBody = RunTestSuiteRequestSchema.safeParse(rawBody);
+    if (!parsedBody.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsedBody.error.issues },
+        { status: 400 }
+      );
     }
+    const { testCaseIds, maxConcurrent } = parsedBody.data;
+    const model = parsedBody.data.model as ModelIdentifier;
 
     if (!MODEL_CAPABILITIES[model]) {
       return error(400, `Unknown model: ${model}`);

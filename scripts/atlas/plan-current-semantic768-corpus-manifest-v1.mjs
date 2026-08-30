@@ -25,7 +25,7 @@ try {
   const result = await pool.query(`
     SELECT COUNT(*)::int AS chunks
     FROM codebase_chunk_index
-    WHERE content_embedding_768 IS NOT NULL
+    WHERE content_embedding IS NOT NULL
   `);
   postgresChunkCount = result.rows[0].chunks;
   postgresPacketCount = null;

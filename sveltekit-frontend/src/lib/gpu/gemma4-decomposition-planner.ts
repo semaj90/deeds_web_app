@@ -10,6 +10,7 @@
 import type { DecomposedQuery, Subgoal } from './gemma4-policy-orchestrator';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const DECOMPOSITION_PROMPT = `You are an expert research assistant breaking down complex questions into focused search tasks.
 
@@ -88,7 +89,7 @@ Respond with ONLY valid JSON, no other text.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         messages: [
           {
             role: 'system',
@@ -237,7 +238,7 @@ export async function decomposeQueryFallback(
           content: `${DECOMPOSITION_PROMPT}\n\nUser Question: ${originalQuery}\n\nRespond with ONLY valid JSON.`
         }
       ],
-      'gemma4-legal-iq4xs-direct.gguf',
+      LLM_MODEL_ID,
       { temperature: 0.3, maxTokens: 1024 }
     );
 

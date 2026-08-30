@@ -6,15 +6,16 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { embeddingOrchestrator } from '$lib/server/retrieval/embedding-orchestrator';
 import { logger } from '$lib/server/logger';
 
-interface TestRequest {
-  text: string;
-  lane?: 'primary-768d' | 'fallback-512d' | 'multimodal-clip-512d';
-  type?: 'document' | 'query' | 'image' | 'audio';
-}
+const TestRequestSchema = z.object({
+  text: z.string().min(1, 'text must not be empty'),
+  lane: z.enum(['primary-768d', 'fallback-512d', 'multimodal-clip-512d']).optional(),
+  type: z.enum(['document', 'query', 'image', 'audio']).optional().default('query'),
+});
 
 interface TestResult {
   success: boolean;
@@ -28,17 +29,21 @@ interface TestResult {
   error?: string;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const body = (await request.json()) as TestRequest;
-    const { text, type = 'query' } = body;
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-    if (!text || text.trim().length === 0) {
+  try {
+    const rawBody = await request.json().catch(() => null);
+    const parsed = TestRequestSchema.safeParse(rawBody);
+    if (!parsed.success) {
       return json(
-        { error: 'Missing or empty text parameter' },
+        { error: 'Invalid request body', issues: parsed.error.issues },
         { status: 400 }
       );
     }
+    const { text, type } = parsed.data;
 
     // Embed the text
     const result = await embeddingOrchestrator.embed({

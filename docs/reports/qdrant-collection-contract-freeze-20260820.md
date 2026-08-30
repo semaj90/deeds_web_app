@@ -2,11 +2,12 @@
 
 ## Status
 
-`CONTRACT_PROVEN_LIVE_MIGRATION_BLOCKED`
+`HISTORICAL_FREEZE_SUPERSEDED_BY_LIVE_OWNER_RECONCILIATION_2026-08-30`
 
 ## Frozen dense contract
 
-- Collection target: `codebase_chunks_768_v2`
+- Active retrieval projection: `codebase_chunks_768`
+- Lineage/provenance projection under parity review: `codebase_chunks_768_v2`
 - Logical representation: `semantic_768`
 - Model lineage: EmbeddingGemma, native 768
 - Physical vector name: `content`
@@ -35,6 +36,14 @@ performed.
 - `qdrant-collection-contracts.spec.ts`: 8/8 passed
 - TypeScript no-emit compilation: passed with no diagnostics
 - `git diff --check`: passed; existing line-ending warnings remain in the dirty worktree
+
+## Current reconciliation
+
+The live Qdrant census shows `codebase_chunks_768` has the active rich retrieval
+payload and `109,776` points, while `codebase_chunks_768_v2` has a leaner
+identity/provenance payload and `52,380` points. This document's earlier wording
+that v2 was the canonical collection target is historical and must not redirect
+current callers. PostgreSQL remains the canonical vector/identity owner.
 
 ## Next gate
 

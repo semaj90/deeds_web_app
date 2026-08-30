@@ -1,0 +1,537 @@
+{
+  "schema_id": "atlas.qdrant.768.provenance.census.v1",
+  "status": "QDRANT_768_PROVENANCE_CENSUS_COMPLETE",
+  "observed_at": "2026-08-30T18:05:54.377Z",
+  "qdrant_url": "http://127.0.0.1:6333",
+  "sample_limit": 50,
+  "collections": [
+    {
+      "collection": "codebase_chunks_768_v2",
+      "status": "green",
+      "points_count": 52380,
+      "indexed_vectors_count": 52380,
+      "vectors": [
+        {
+          "vector_name": "content",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        },
+        {
+          "vector_name": "error",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        },
+        {
+          "vector_name": "signature",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        }
+      ],
+      "sparse_vectors": [],
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 100,
+        "full_scan_threshold": 10000,
+        "max_indexing_threads": 0,
+        "on_disk": false
+      },
+      "quantization_config": null,
+      "strict_mode_config": null,
+      "metadata": null,
+      "payload_schema_keys": [
+        "chunk_id",
+        "content_hash",
+        "embedding_model",
+        "indexed_at",
+        "model_revision_state",
+        "postgres_id",
+        "projection_revision",
+        "qdrant_point_id",
+        "representation_name",
+        "source_ref"
+      ]
+    },
+    {
+      "collection": "codebase_chunks_768",
+      "status": "green",
+      "points_count": 109776,
+      "indexed_vectors_count": 109983,
+      "vectors": [
+        {
+          "vector_name": "content",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        },
+        {
+          "vector_name": "error",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        },
+        {
+          "vector_name": "signature",
+          "size": 768,
+          "distance": "Cosine",
+          "datatype": null,
+          "on_disk": null
+        }
+      ],
+      "sparse_vectors": [],
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 200,
+        "full_scan_threshold": 10000,
+        "max_indexing_threads": 0,
+        "on_disk": false
+      },
+      "quantization_config": {
+        "scalar": {
+          "type": "int8",
+          "quantile": 0.99,
+          "always_ram": false
+        }
+      },
+      "strict_mode_config": null,
+      "metadata": null,
+      "payload_schema_keys": [
+        "agent_pickup_ready",
+        "centroid_id",
+        "cluster_id",
+        "cluster_key",
+        "error_id",
+        "feature_id",
+        "file_path",
+        "kind",
+        "language",
+        "next_action",
+        "observed_at",
+        "parent_centroid_id",
+        "path",
+        "point_kind",
+        "repo",
+        "semantic_path",
+        "som_cluster",
+        "sourceRefs",
+        "source_ref",
+        "status",
+        "summary_hash",
+        "symbol_name",
+        "tags",
+        "topo_class",
+        "updated_at",
+        "workspace_id",
+        "workspace_task_id"
+      ]
+    }
+  ],
+  "writers": [
+    {
+      "writer_generation": "v2_uuid_clean_backfill",
+      "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+      "source_sha256": "a192ed2351f37b94f99052535a86bb4b6b3636ff6436317825f0c5d6869bde2f",
+      "present": true,
+      "declared_collections": [
+        "codebase_chunks_768_v2"
+      ],
+      "collection_mentions": [
+        "codebase_chunks_768_v2",
+        "codebase_chunks_768"
+      ],
+      "vector_name_mentions": [
+        "content"
+      ],
+      "provenance_field_mentions": [
+        "representation_id",
+        "representation_name",
+        "representation_revision",
+        "embedding_model",
+        "model_revision",
+        "model_revision_state",
+        "projection_revision",
+        "workspace_revision",
+        "source_revision",
+        "packet_key",
+        "source_ref"
+      ],
+      "embedding_endpoint_mentions": [
+        "http://127.0.0.1:6333"
+      ]
+    },
+    {
+      "writer_generation": "v2_keyset_backfill",
+      "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-keyset.mjs",
+      "source_sha256": "210ec5c3d40a3c5fe2595e36c8d01cf8f849cb51ae4e43c1512ea83e71f535e2",
+      "present": true,
+      "declared_collections": [
+        "codebase_chunks_768",
+        "codebase_chunks_768_v2"
+      ],
+      "collection_mentions": [
+        "codebase_chunks_768"
+      ],
+      "vector_name_mentions": [
+        "content"
+      ],
+      "provenance_field_mentions": [
+        "representation_id",
+        "representation_revision",
+        "model_revision",
+        "source_ref"
+      ],
+      "embedding_endpoint_mentions": [
+        "http://127.0.0.1:6333"
+      ]
+    },
+    {
+      "writer_generation": "phase109_pointwise_backfill",
+      "path": "scripts/atlas/phase109-qdrant-pointwise-backfill.mts",
+      "source_sha256": "998bf7315fc8b9ba05926e0ba07cfe9d961831dc4c15cdb80a870fe8c66b150f",
+      "present": true,
+      "declared_collections": [
+        "codebase_chunks_768",
+        "codebase_chunks_768_v2"
+      ],
+      "collection_mentions": [
+        "codebase_chunks_768"
+      ],
+      "vector_name_mentions": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "provenance_field_mentions": [
+        "representation_id",
+        "representation_revision",
+        "embedding_model"
+      ],
+      "embedding_endpoint_mentions": [
+        "http://127.0.0.1:6333"
+      ]
+    },
+    {
+      "writer_generation": "qdrant_manager",
+      "path": "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts",
+      "source_sha256": "77afb2715e1601e992cc9a00eecd2aac4d6efbffe1cb87e83f0f1ed20c236744",
+      "present": true,
+      "declared_collections": [
+        "codebase_chunks_768",
+        "codebase_chunks_768_v2"
+      ],
+      "collection_mentions": [
+        "codebase_chunks_768_v2",
+        "codebase_chunks_768"
+      ],
+      "vector_name_mentions": [
+        "content"
+      ],
+      "provenance_field_mentions": [
+        "representation_id",
+        "representation_name",
+        "representation_revision",
+        "embedding_model",
+        "model_revision",
+        "model_revision_state",
+        "projection_revision",
+        "workspace_revision",
+        "source_revision",
+        "packet_key",
+        "symbol_version_id",
+        "source_ref"
+      ],
+      "embedding_endpoint_mentions": []
+    },
+    {
+      "writer_generation": "qdrant_sync_payload",
+      "path": "sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts",
+      "source_sha256": "587412525d3281e2ddcc199c09ea56f99125f8c6c095dffe51136716c3d8edbc",
+      "present": true,
+      "declared_collections": [
+        "codebase_chunks_768",
+        "codebase_chunks_768_v2"
+      ],
+      "collection_mentions": [],
+      "vector_name_mentions": [],
+      "provenance_field_mentions": [
+        "representation_id",
+        "representation_revision",
+        "workspace_revision",
+        "source_revision",
+        "packet_key",
+        "canonical_id",
+        "symbol_version_id",
+        "tree_node_id",
+        "source_ref"
+      ],
+      "embedding_endpoint_mentions": []
+    }
+  ],
+  "payload_cohorts": [
+    {
+      "schema_id": "atlas.embedding.provenance.cohort.v1",
+      "collection": "codebase_chunks_768_v2",
+      "vector_name": "__collection_payload__",
+      "point_id_generation": "UUID",
+      "writer_generation": "v2_uuid_clean",
+      "writer_revision": null,
+      "projection_revision": "v2_uuid_clean",
+      "representation_id": "semantic_768",
+      "representation_revision": null,
+      "point_count": 52380,
+      "sample_count": 50,
+      "model_id": "embeddinggemma",
+      "model_artifact_digest": null,
+      "embedding_runtime": null,
+      "embedding_runtime_revision": null,
+      "prompt_mode": null,
+      "prompt_revision": null,
+      "normalization": null,
+      "normalization_revision": null,
+      "exact_packet_links": 0,
+      "unresolved_links": 50,
+      "evidence_level": "PAYLOAD_OBSERVED",
+      "mixed_fields": [],
+      "status": "PARTIAL",
+      "canonical_authority": false,
+      "checksum": "c99120fd8d1f08b38e9a844f8fe29415e76e9415b9adac642688c99efade9095",
+      "vector_membership_observed": false,
+      "observed_payload_values": {
+        "representation": [
+          "representation_name=semantic_768"
+        ],
+        "representation_revision": [],
+        "model": [
+          "embedding_model=embeddinggemma"
+        ],
+        "model_revision": [
+          "model_revision_state=NOT_PROVEN"
+        ],
+        "prompt": [],
+        "normalization": [],
+        "writer": [
+          "projection_revision=v2_uuid_clean"
+        ],
+        "world": [],
+        "identity": [
+          "source_ref=crates/atlas_packet_parser/index.js",
+          "source_ref=docs/AGENTIC-LOOP-FROZEN.md",
+          "source_ref=docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+          "source_ref=docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md",
+          "source_ref=docs/documents-atlas-index.md",
+          "source_ref=docs/metadata-contract-schema.yaml",
+          "source_ref=packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+          "source_ref=packages/parent-atlas-retrieval/src/turbovec/authority-chain.ts",
+          "source_ref=packages/parent-atlas-retrieval/tests/bifrost/bifrost-semantic-cache.spec.ts",
+          "source_ref=scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat/+server.ts",
+          "source_ref=scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rerank/LLMS.md",
+          "source_ref=scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ast/analyze/+server.ts",
+          "source_ref=simd-bridge/cpp/build-x64-cuda/CMakeFiles/4.0.0/CompilerIdCXX/CMakeCXXCompilerId.cpp",
+          "source_ref=src/lib/components/ai/ContextualChatDemo.svelte",
+          "source_ref=src/lib/components/canvas/hybrid/types.ts",
+          "source_ref=src/lib/components/codebase/ClusterVisualization.svelte",
+          "source_ref=src/lib/components/codebase/CodebaseWikiDashboard.svelte",
+          "source_ref=src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+          "source_ref=src/lib/components/evidence/EvidenceViewModal.svelte",
+          "source_ref=src/lib/components/forms/EnhancedFileUpload.svelte",
+          "source_ref=src/lib/components/ui/tabs/Svelte5Tabs.svelte",
+          "source_ref=src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+          "source_ref=src/lib/server/analytics/unified-research-query.ts",
+          "source_ref=src/lib/server/db/meta/0000_snapshot.json",
+          "source_ref=src/lib/server/db/schema-postgres.ts",
+          "source_ref=src/lib/server/embedding-cache.ts",
+          "source_ref=src/lib/server/helpers/docker-discovery.ts",
+          "source_ref=src/lib/server/tools/registry.ts",
+          "source_ref=src/lib/server/triton-llm.ts",
+          "source_ref=src/lib/server/types/retrieval.ts",
+          "source_ref=src/lib/server/workers/audio-queue-consumer.ts",
+          "source_ref=src/lib/types/vector-jobs.ts",
+          "source_ref=src/lib/utils/webgpu-array-utils.ts",
+          "source_ref=src/lib/webgpu/webgpu-rag-service.ts",
+          "source_ref=src/lib/workers/compute-worker.mjs",
+          "source_ref=src/routes/(app)/admin/codebase-index/+page.svelte",
+          "source_ref=src/routes/(app)/demos/+page.svelte",
+          "source_ref=src/routes/(app)/demos/bits-ui/+page.svelte",
+          "source_ref=src/routes/(app)/demos/notifications/+page.svelte",
+          "source_ref=src/routes/(app)/demos/smart-positioning/+page.svelte",
+          "source_ref=src/routes/(app)/legal-corpus/[id]/+page.svelte",
+          "source_ref=src/routes/api/chat/stream/+server.ts",
+          "source_ref=src/routes/api/codebase-index/claude-assist/feedback/analysis/+server.ts",
+          "source_ref=src/routes/api/knowledge/search/+server.ts",
+          "source_ref=src/routes/api/phase109/tag-chunks/+server.ts",
+          "source_ref=src/routes/api/rag/search/+server.ts",
+          "source_ref=src/routes/api/synthesis/generate/+server.ts",
+          "source_ref=src/routes/api/synthesis/save/+server.ts",
+          "source_ref=src/routes/api/system/phase78/status/+server.ts",
+          "source_ref=src/service-worker.ts"
+        ]
+      }
+    },
+    {
+      "schema_id": "atlas.embedding.provenance.cohort.v1",
+      "collection": "codebase_chunks_768",
+      "vector_name": "__collection_payload__",
+      "point_id_generation": "NUMERIC",
+      "writer_generation": "UNKNOWN_WRITER_GENERATION",
+      "writer_revision": null,
+      "projection_revision": null,
+      "representation_id": "1550075d-9042-4953-bc75-90b50a9a8c5c",
+      "representation_revision": null,
+      "point_count": 109776,
+      "sample_count": 50,
+      "model_id": null,
+      "model_artifact_digest": null,
+      "embedding_runtime": null,
+      "embedding_runtime_revision": null,
+      "prompt_mode": null,
+      "prompt_revision": null,
+      "normalization": null,
+      "normalization_revision": null,
+      "exact_packet_links": 0,
+      "unresolved_links": 50,
+      "evidence_level": "PAYLOAD_OBSERVED",
+      "mixed_fields": [
+        "representation_id"
+      ],
+      "status": "MIXED_HISTORY",
+      "canonical_authority": false,
+      "checksum": "b6aadce2e924966ba0e760033c1e9c2dcf18cdb1cf11494bd1f68b90662c5477",
+      "vector_membership_observed": false,
+      "observed_payload_values": {
+        "representation": [
+          "representation_id=0354610c-cf1e-4f2e-ae77-d2eca78445d9",
+          "representation_id=06bdde4d-9596-4df8-941b-00c037a59f38",
+          "representation_id=0811c541-653f-4eda-81e1-0157f051a18e",
+          "representation_id=0a6775c2-701d-46ee-a0e8-999a9c9fce4f",
+          "representation_id=0bcb3991-d3fb-466a-88ea-c5c3eb2ce955",
+          "representation_id=1007f90f-8566-443c-aec5-8c6ef24b496a",
+          "representation_id=1550075d-9042-4953-bc75-90b50a9a8c5c",
+          "representation_id=18494e46-1c71-4d90-b9cf-a7efbc3564a4",
+          "representation_id=1c9d6b60-53ed-4002-aa82-56db78827f3d",
+          "representation_id=21ba11e3-fe87-411d-915a-abf6e5dfc15e",
+          "representation_id=27de4399-39d4-4c47-be0d-6d4cba0a3772",
+          "representation_id=48802094-b1be-4222-835b-81dc78131ea9",
+          "representation_id=494c4f7d-7a5b-4ee6-a098-fef7c5fb510e",
+          "representation_id=546c4044-bc4b-493d-af1b-afd2fbca8541",
+          "representation_id=59763f20-7b8c-4b26-9e98-ff93c5c1aa3e",
+          "representation_id=5e9ae087-ce00-4d25-a77f-94d34ef74856",
+          "representation_id=5f1c229e-037a-41fa-8bbd-823bcf607f35",
+          "representation_id=6215cce4-9ca4-4658-8570-8d880b12162c",
+          "representation_id=62bf1159-a0c8-4bce-b067-babee38cb9c0",
+          "representation_id=66f6f5da-5946-4fcf-8c0d-a34771c73384",
+          "representation_id=68d52a80-3085-481f-bb74-474d3ce7b120",
+          "representation_id=6b72f3c5-f565-4abf-a58a-faae1e245126",
+          "representation_id=6c10b5ed-752f-4fb3-b36d-8c8486597e8a",
+          "representation_id=6d09a91c-587b-47ee-aae0-b063bbb3ce2a",
+          "representation_id=6e548e1d-c1a0-49b1-8d55-68e0ae44a3f6",
+          "representation_id=71a241a8-692d-41e2-bdc9-6c182b62c4b0",
+          "representation_id=768abae8-d432-46aa-a6f0-9cd065ac169b",
+          "representation_id=7a3d9f01-c289-49c3-a1aa-e51629356723",
+          "representation_id=81866cf7-16ea-432f-a32a-4cf53111437a",
+          "representation_id=82cb3936-8b9a-419a-b9d6-32ae51fe0114",
+          "representation_id=839deff3-1a8e-4795-aeee-385be70c7dcf",
+          "representation_id=8875d104-1b77-4827-9b70-5f5346f7ec51",
+          "representation_id=88a6ec51-0d93-4400-88fa-8f6d93025b1e",
+          "representation_id=8a35710c-8df4-494f-b0b6-2e6c68dc333f",
+          "representation_id=8bd831f5-603d-4dea-878b-6dc6756afb63",
+          "representation_id=9131e87d-ec34-4089-a534-8ded422cfe8b",
+          "representation_id=94267709-854e-4c4d-a7e0-20feccbcf2d8",
+          "representation_id=9adb0ea7-1822-4684-ad0c-78da4404fb0a",
+          "representation_id=9d1e2871-b45c-45bd-8dba-1255b9b19368",
+          "representation_id=a576afa1-c5af-4df8-a919-6bb708656df7",
+          "representation_id=b7990f28-6554-4869-8500-bd3fbbe5a6c0",
+          "representation_id=bcc0056e-90f8-4800-9e51-7cbbe3850f57",
+          "representation_id=c415d9f3-e1b1-42b3-9586-e21e8bbe6170",
+          "representation_id=d2fc52b2-b1e0-4ec3-870b-81afa3479cdc",
+          "representation_id=dac4be52-025d-4c5e-8d91-f33ecaaecdbb",
+          "representation_id=dd416886-32dc-4967-b8b4-bd750423b5eb",
+          "representation_id=eae1e625-64c5-4778-b714-623c49443c7c",
+          "representation_id=f0c422e6-9b5a-423e-a07f-555e94bcd16d",
+          "representation_id=fd59a5ad-7294-4ddc-9a64-00d85771d8b4",
+          "representation_id=fffe10ea-a814-4ff4-aa16-5535da32ae18"
+        ],
+        "representation_revision": [],
+        "model": [],
+        "model_revision": [],
+        "prompt": [],
+        "normalization": [],
+        "writer": [],
+        "world": [],
+        "identity": [
+          "packet_key=ace:packet:07a4d0a9076c",
+          "packet_key=ace:packet:3362030dfe23",
+          "packet_key=ace:packet:4758b464fae1",
+          "packet_key=ace:packet:6061bede0c9f",
+          "packet_key=ace:packet:68433a7251c9",
+          "packet_key=ace:packet:73c63464e142",
+          "packet_key=ace:packet:756ddd25ac36",
+          "packet_key=ace:packet:83dc9fe1e87d",
+          "packet_key=ace:packet:b5295274e2b7",
+          "packet_key=ace:packet:b5aa13ce0a61",
+          "packet_key=ace:packet:c113744e3e98",
+          "packet_key=packet:6b86b273ff34",
+          "source_ref=1",
+          "source_ref=src/AGENTS.md",
+          "source_ref=src/hooks.server.ts",
+          "source_ref=src/lib/AGENTS.md",
+          "source_ref=src/lib/ai/AGENTS.md",
+          "source_ref=src/lib/ai/e2b/AGENTS.md",
+          "source_ref=src/lib/ai/onnx/AGENTS.md",
+          "source_ref=src/lib/cache/AGENTS.md",
+          "source_ref=src/lib/client/AGENTS.md",
+          "source_ref=src/lib/client/ui/AGENTS.md",
+          "source_ref=src/lib/client/workflow-event-stream.ts",
+          "source_ref=src/lib/components/admin/AdminChatAssistant.svelte",
+          "source_ref=sveltekit-frontend/src/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/hooks.server.ts",
+          "source_ref=sveltekit-frontend/src/lib/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/ai/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/ai/e2b/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/ai/onnx/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/cache/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/client/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/client/ui/AGENTS.md",
+          "source_ref=sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
+          "source_ref=sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+          "tree_node_id=0b6eaa41-70e8-4654-961c-a893da576627",
+          "tree_node_id=4091155e-6b31-4634-8191-9fa312b798f3",
+          "tree_node_id=45f18046-0978-4bd1-9a87-3aa74815c1f4",
+          "tree_node_id=537cdf58-7fd2-49f3-be21-fdb8972bd934",
+          "tree_node_id=591ad8ff-6b4e-457f-b5d6-5bbd413b094d",
+          "tree_node_id=676e6c0d-a847-474a-8f43-4f377c6ba202",
+          "tree_node_id=92a9c0dd-096a-47b8-b431-abb837c616ed",
+          "tree_node_id=a4972939-b925-4512-9184-d7cc623ae565",
+          "tree_node_id=ae7b9788-a276-4eb7-8e35-06d717d682d6",
+          "tree_node_id=b32ed195-20d4-45fc-8900-3c2a2f49edd3",
+          "tree_node_id=c169c741-551a-482d-8e8c-6288913ce0af",
+          "tree_node_id=e202f3a5-47af-4cd6-9820-7d3766660881"
+        ]
+      }
+    }
+  ],
+  "proof_scope": {
+    "prov_00_collection_contract": true,
+    "prov_01_writer_census": true,
+    "prov_02_payload_census": true,
+    "prov_03_exact_packet_lineage": false,
+    "prov_04_generation_cohort_promotion": false,
+    "prov_05_numerical_corroboration": false
+  },
+  "invariants": {
+    "canonical_authority": false,
+    "qdrant_writes_attempted": false,
+    "postgres_writes_attempted": false,
+    "vectors_requested": false,
+    "payload_only_scroll": true,
+    "collection_contract_is_not_historical_provenance": true,
+    "collection_payload_is_not_vector_specific_provenance": true
+  },
+  "checksum": "9850084336ddce27f0580770502a67cccee6b866aa873d4a77f322ba5219bc2f"
+}

@@ -10,6 +10,7 @@ import { clusterSummaries } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const resummarizeSchema = z.object({
 	model: z.string().min(1).max(100).optional(),
@@ -17,7 +18,7 @@ const resummarizeSchema = z.object({
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const DEFAULT_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const DEFAULT_MODEL = LLM_MODEL_ID;
 const EMBED_MODEL = 'embeddinggemma:latest';
 
 // ─── GET ─────────────────────────────────────────────────────────────────────

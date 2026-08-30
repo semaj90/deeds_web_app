@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-qualified-candidate-cohort-v1",
-  "generatedAt": "2026-08-29T22:45:22.581Z",
+  "generatedAt": "2026-08-30T20:41:15.223Z",
   "readOnly": true,
   "postgresWrites": false,
   "authority": {

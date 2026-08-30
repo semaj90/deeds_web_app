@@ -10,6 +10,7 @@ import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbi
 import { streamLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const trtStreamSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(50000),
@@ -37,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-legal-iq4xs-direct.gguf',
+					model: LLM_MODEL_ID,
 					messages: [{ role: 'user', content: prompt }],
 					stream: true,
 					temperature: temperature ?? 0.7,

@@ -15,9 +15,16 @@ function fakeProvider(vectors: Record<string, number[]>): Latent256CandidateProv
       }
       return {
         vectors: map,
+        outcomes: input.candidateIds.map((candidateId, candidateOrdinal) => ({
+          candidateOrdinal,
+          canonicalId: candidateId,
+          codebaseChunkId: candidateId,
+          status: vectors[candidateId] ? 'AVAILABLE' as const : 'MISSING' as const,
+        })),
         requested: input.candidateIds.length,
         found,
         missing: input.candidateIds.length - found,
+        identityUnresolved: 0,
         vectorsChecksum: 'test-vectors',
         revisionMismatch: 0,
         invalidShape: 0,

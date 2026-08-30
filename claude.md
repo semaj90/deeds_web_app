@@ -147,6 +147,31 @@ concluding data is missing or wrong-dimensional. If `embedding_dimension` disagr
 verified real dimension, the metadata column is what's wrong, not the vector. Do not use 384 as a
 filter/gate on `content_embedding` for this reason — use 768, verified structurally, every time.
 
+**2026-08-30 verification + cleanup (embedding_dimension backfill, latent lanes checked, legacy column dropped)**:
+Re-verified the above live rather than trusting the doc: `codebase_chunk_index.content_embedding`
+(halfvec(768)) has 55,169 populated rows, all confirmed genuinely 768-dim via `vector_dims()`.
+Backfilled the stale `embedding_dimension` metadata column from real `vector_dims()` (was 52,402
+rows mistagged `384` despite holding real 768-dim vectors; now 55,816 correctly say `768`, only 37
+rows — which genuinely have no embedding — still say `384`). Also checked the derived/latent lanes
+referenced elsewhere in this doc, since claims about them hadn't been verified against live data:
+- **latent_256** (`codebase_chunk_index.latent_256` halfvec(256) + Qdrant `codebase_chunks_latent256`):
+  real and fully live — 55,169 rows/points, a 1:1 match with the 768 corpus.
+- **latent_64** (`codebase_chunk_index.latent_64` vector(64) + would-be Qdrant `codebase_chunks_latent64`):
+  column exists but **zero rows populated**; the Qdrant collection doesn't exist. Schema-only,
+  matches this doc's own note elsewhere that the autoencoder producing it is untrained.
+- **latent_128**: no column, no Qdrant collection — does not exist anywhere in this repo. Any future
+  reference to a "latent128" lane is speculative/planned, not built — verify before citing it as real.
+- **Dropped `codebase_chunk_index.content_embedding_384` (legacy vector(384))**: verified zero rows
+  had 384-only data with no corresponding 768 vector (no data loss), archived all 52,380 populated
+  rows to `deeds_labs/archive/2026-08-30/content_embedding_384_backup.csv` per this repo's
+  archive-not-delete convention (manifest: `docs/archive-manifest.json`), then dropped the column.
+- **`codebase_chunks_768` vs `codebase_chunks_768_v2` (both still live, NOT deduped)**: checked
+  `src/lib/server/atlas/qdrant-collection-contracts.ts` directly — this is not stale duplication.
+  The plain `768` collection is explicitly documented in-code as the "older source contract"
+  (multi-vector: content/signature/error + sparse bm42); `768_v2` is the "EMB3A target contract"
+  (dense-only `content` vector, revision-filterable), an in-progress migration target referenced by
+  43 live files. Do not merge or delete either without the person driving the EMB3A migration.
+
 **Retrieval Decision Tree**:
 ```
 Query arrives

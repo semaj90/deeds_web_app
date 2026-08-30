@@ -273,7 +273,7 @@ Answer:`;
     try {
       return await bifrostChat(
         [{ role: 'user', content: prompt }],
-        'gemma4-legal-iq4xs-direct.gguf',
+        ENV.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
         { temperature: 0.7, maxTokens: 500 }
       );
     } catch (error) {

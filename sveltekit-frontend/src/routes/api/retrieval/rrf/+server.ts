@@ -71,7 +71,11 @@ interface RRFResponse {
 /**
  * POST handler: Accept lane results, perform RRF fusion, return unified ranking
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const startTime = Date.now();
     const body = await request.json();

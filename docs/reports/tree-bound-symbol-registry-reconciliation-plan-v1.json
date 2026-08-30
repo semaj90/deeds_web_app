@@ -4,14 +4,14 @@
   "status": "RECONCILIATION_REQUIRED",
   "resolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
   "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
-  "registryRowsRead": 10250,
+  "registryRowsRead": 10255,
   "counts": {
     "treeBound": 353,
-    "exactCurrent": 80,
+    "exactCurrent": 85,
     "legacyNamespaceExactReviewOnly": 0,
     "ambiguous": 0,
     "contentOrRevisionConflict": 0,
-    "unresolved": 273
+    "unresolved": 268
   },
   "policy": [
     "exact canonical key first",
@@ -20,7 +20,7 @@
     "source revision mismatch is not promotion",
     "no aliases or fuzzy matching"
   ],
-  "planChecksum": "sha256:de914227a1d60dbdfc5c56e0b6fe1fbaef026ada2ace5705c2e71cfba5943bae",
+  "planChecksum": "sha256:8b12c12afd2cf058f09aae2772b4eab66a76dc392789acf1e74db8a20ae6a7c8",
   "outputPath": ".tmp/atlas/tree-bound-symbol-registry-reconciliation-plan-v1.ndjson",
   "canonicalWrites": 0,
   "databaseWrites": 0,

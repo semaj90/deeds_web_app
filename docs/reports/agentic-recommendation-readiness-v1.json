@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.agentic-recommendation-readiness.v1",
+  "generatedAt": "2026-08-30T19:11:21.862Z",
+  "input": "docs\\reports\\agentic-recommendation-workflow.json",
+  "inputChecksum": "sha256:c0d3341341b2aa0c822a4c66d2e5de39747455afb6c892e2f1bced03662e8d7a",
+  "cardCount": 6,
+  "issueCount": 4,
+  "issues": [
+    {
+      "taskId": "rec-task-0003",
+      "code": "PLACEHOLDER_COMMAND",
+      "message": "Placeholder console.log command cannot be executed."
+    },
+    {
+      "taskId": "rec-task-0004",
+      "code": "PLACEHOLDER_COMMAND",
+      "message": "Placeholder console.log command cannot be executed."
+    },
+    {
+      "taskId": "rec-task-0005",
+      "code": "SELF_REFERENTIAL_COMMAND",
+      "message": "Validator/replay command cannot be remediation work."
+    },
+    {
+      "taskId": "rec-task-055050a3",
+      "code": "REMEDIATION_MISSING",
+      "message": "READY card has no recommended command."
+    }
+  ],
+  "executionAllowed": false,
+  "canonicalWrites": 0,
+  "productionActivation": false
+}

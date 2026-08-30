@@ -12,10 +12,24 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { rerank, healthCheckReranker } from '$lib/server/retrieval/semantic-vector-reranker';
 import { qdrant } from '$lib/server/vector/qdrant-manager';
 import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { QDRANT_DENSE_VECTOR_NAME, QDRANT_HYBRID_COLLECTION } from '$lib/server/vector/retrieval-semantics.js';
+
+const SemanticRerankBodySchema = z.object({
+  qdrantResults: z.array(z.object({
+    id: z.union([z.string(), z.number()]),
+    score: z.number(),
+    payload: z.record(z.string(), z.unknown()).optional()
+  }).passthrough()),
+  options: z.object({
+    topK: z.number().int().positive().max(500).optional(),
+    blendWeights: z.record(z.string(), z.number()).optional(),
+    verbose: z.boolean().optional()
+  }).optional().default({})
+});
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');
@@ -108,25 +122,27 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-	if (request.method !== 'POST') {
-		return json({ error: 'POST required' }, { status: 405 });
+export const POST: RequestHandler = async ({ request, locals }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
-		const body = await request.json();
-		const { qdrantResults, options = {} } = body;
-
-		if (!Array.isArray(qdrantResults)) {
+		const parsed = SemanticRerankBodySchema.safeParse(await request.json());
+		if (!parsed.success) {
 			return json(
-				{ error: 'Body must contain qdrantResults array' },
+				{ error: 'Invalid request body', issues: parsed.error.issues },
 				{ status: 400 }
 			);
 		}
+		const { qdrantResults, options = {} } = parsed.data;
+
+		// rerank() requires string ids; Qdrant point ids may arrive as numbers.
+		const normalizedResults = qdrantResults.map((r) => ({ ...r, id: String(r.id) }));
 
 		// Rerank
 		const startRerank = performance.now();
-		const candidates = await rerank(qdrantResults, { ...options, verbose: true });
+		const candidates = await rerank(normalizedResults, { ...options, verbose: true });
 		const rerankLatencyMs = Math.round(performance.now() - startRerank);
 
 		return json({

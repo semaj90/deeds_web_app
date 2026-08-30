@@ -63,7 +63,11 @@ const postSchema = z.object({
   event: z.string().min(1)
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ success: false, data: null, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const rawBody = await request.json();
     const result = postSchema.safeParse(rawBody);

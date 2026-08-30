@@ -13,6 +13,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { rgKeywordSearch, normalizeRgScore, type RgMatch } from '$lib/server/retrieval/rg-search-bridge';
 import { extractBM25Scores, extractQueryTerms, type BM25ScoreMap } from '$lib/server/retrieval/bm25-score-extractor';
 import { rerankerBlend, type QdrantResult, type RerankerCandidate } from '$lib/server/retrieval/reranker-blend';
@@ -20,11 +21,17 @@ import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
 import fetch from 'node-fetch';
 
-interface SearchRequest {
-  query: string;
-  limit?: number;
-  weights?: { qdrant: number; bm25: number; rg: number };
-}
+const SearchRequestSchema = z.object({
+  query: z.string().min(1),
+  limit: z.number().int().positive().max(500).optional(),
+  weights: z.object({
+    qdrant: z.number().min(0).max(1),
+    bm25: z.number().min(0).max(1),
+    rg: z.number().min(0).max(1)
+  }).optional()
+});
+
+type SearchRequest = z.infer<typeof SearchRequestSchema>;
 
 interface SearchResponse {
   candidates: RerankerCandidate[];
@@ -106,12 +113,22 @@ async function searchQdrant(queryEmbedding: number[], limit: number): Promise<Qd
   }
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const startTime = Date.now();
 
   try {
-    const body: SearchRequest = await request.json();
-    const { query, limit = 20, weights = { qdrant: 0.35, bm25: 0.35, rg: 0.3 } } = body;
+    const parsed = SearchRequestSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const { query, limit = 20, weights = { qdrant: 0.35, bm25: 0.35, rg: 0.3 } } = parsed.data;
 
     if (!query || query.trim().length === 0) {
       return json(

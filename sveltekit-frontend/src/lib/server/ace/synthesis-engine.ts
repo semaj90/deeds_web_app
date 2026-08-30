@@ -13,6 +13,7 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import type { AcePacket } from '$lib/server/cache/ace-packet-cache.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 
 export interface SynthesisRequest {
   query: string;
@@ -229,7 +230,7 @@ async function streamGemma4Synthesis(
   onEvent: (event: SynthesisStreamEvent) => void
 ): Promise<{ text: string; citations: Citation[] }> {
   const baseUrl = process.env.GEMMA4_BASE_URL ?? 'http://127.0.0.1:8090';
-  const model = process.env.GEMMA4_MODEL ?? 'gemma4';
+  const model = LLM_MODEL_ID;
   const url = `${baseUrl}/v1/chat/completions`;
 
   const response = await fetch(url, {

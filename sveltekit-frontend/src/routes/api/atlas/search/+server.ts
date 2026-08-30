@@ -46,6 +46,7 @@ import { z }       from 'zod';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
@@ -724,7 +725,7 @@ async function crossEncoderRerank(
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
-            model:       'gemma4-legal-iq4xs-direct.gguf',
+            model:       LLM_MODEL_ID,
             messages: [
               { role: 'system', content: 'Rate relevance 0-10. Reply with only a number.' },
               { role: 'user',   content: `Query: ${query.slice(0, 300)}\nDocument: ${doc}` },

@@ -1,16 +1,37 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { selectTool } from '$lib/server/retrieval/hmm-tool-selector';
 import type { ToolCandidateResult } from '$lib/server/retrieval/hmm-tool-selector';
 import { analyzeQueryRouting } from '$lib/server/nlp/query-routing.js';
 import { buildAceRoutingPacket } from '$lib/server/ace/ace-routing.js';
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const { query, query_embedding, top_k = 5, filters = {} } = await request.json();
+const ToolsSearchBodySchema = z.object({
+  query: z.string().min(1),
+  query_embedding: z.array(z.number()).optional(),
+  top_k: z.number().int().positive().max(100).optional().default(5),
+  filters: z.object({
+    repositoryId: z.string().optional(),
+    previousIntent: z.string().optional(),
+    taskState: z.string().optional(),
+    domainHint: z.string().optional(),
+    traceId: z.string().optional(),
+  }).passthrough().optional().default({})
+});
 
-    if (!query || typeof query !== 'string') {
-      return json({ error: 'query is required' }, { status: 400 });
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const parsed = ToolsSearchBodySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return json(
+        { error: 'Invalid request body', issues: parsed.error.issues },
+        { status: 400 }
+      );
     }
+    const { query, query_embedding, top_k = 5, filters = {} } = parsed.data;
 
     const analysis = await analyzeQueryRouting(query, {
       repositoryId: filters.repositoryId,

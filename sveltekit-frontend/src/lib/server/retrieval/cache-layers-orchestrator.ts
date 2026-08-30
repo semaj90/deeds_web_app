@@ -12,6 +12,7 @@
 
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface CacheLayerMetrics {
   layer: 'layer2_adapter' | 'layer3_exact' | 'layer4_semantic';
@@ -51,7 +52,7 @@ async function measureLayer2Adapter(
   const start = performance.now();
   try {
     const body = JSON.stringify({
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: LLM_MODEL_ID,
       temperature: 0,
       max_tokens: 96,
       stream: false,

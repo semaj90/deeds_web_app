@@ -60,6 +60,20 @@
 		sections: AtlasRuntimeRegistrySection[];
 	};
 
+	type DocumentGovernanceSummary = {
+		available: boolean;
+		totalDocuments: number;
+		openSpecChanges: number;
+		completedTasks: number;
+		totalTasks: number;
+		progressPercent: number | null;
+		archiveEligible: number;
+		conflicts: number;
+		etaMs: number | null;
+		etaConfidence: number | null;
+		registryChecksum: string | null;
+	};
+
 	type TaskPacketWorkflowStatus = {
 		mode: 'task' | 'queue' | 'next';
 		taskId: number | null;
@@ -89,6 +103,7 @@
 	type AtlasPageData = {
 		health: AtlasHealthStatus | null;
 		runtimeRegistry?: AtlasRuntimeRegistrySnapshot | null;
+		documentGovernance?: DocumentGovernanceSummary | null;
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
 		rotorquantModelPath?: string;
@@ -105,6 +120,7 @@
 	// ── Health & Collections ──────────────────────────────────────────────────
 	let health = $state<AtlasHealthStatus | null>(null);
 	let runtimeRegistry = $state<AtlasRuntimeRegistrySnapshot | null>(null);
+	let documentGovernance = $state<DocumentGovernanceSummary | null>(null);
 	let cacheStats = $state<AdminCacheStats | null>(null);
 	let healthLoading = $state(false);
 	let workflowTaskId = $state('');
@@ -117,6 +133,7 @@
 	$effect(() => {
 		health = data.health;
 		runtimeRegistry = data.runtimeRegistry ?? null;
+		documentGovernance = data.documentGovernance ?? null;
 		cacheStats = data.cacheStats ?? null;
 		workflowStatus = data.workflowStatus ?? workflowStatus;
 		if (data.workflowStatus?.taskId != null) workflowTaskId = String(data.workflowStatus.taskId);
@@ -673,8 +690,9 @@
 
 	let runtime = $derived.by(() => {
 		const models = health?.ollama?.models ?? [];
-		const rotorquantModelPath = data.rotorquantModelPath ?? 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf';
-		const hforfModelPath = data.hforfModelPath ?? 'models/hfor/hforf.gguf';
+		const rotorquantModelPath = data.rotorquantModelPath ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf';
+		const hforfModelPath = data.hforfModelPath ?? rotorquantModelPath;
+		const llmModelId = data.llmModelId ?? 'ornith-1.5-9b';
 		const embeddingOnnxPath = data.embeddingOnnxPath ?? 'models/embeddinggemma_300m_onnx/model.onnx';
 		const packetJepaPath = data.packetJepaPath ?? 'models/packet-jepa/packet-jepa.pt';
 		const rotorquantModel = 'gemma4-rotorquant:latest';
@@ -694,7 +712,7 @@
 			},
 			lab: {
 				registered: Boolean(hforfModelPath),
-				model: 'hforf.gguf',
+				model: llmModelId,
 				path: hforfModelPath,
 			},
 			onnx: {
@@ -901,6 +919,34 @@
 				<p class="text-[0.6rem] text-[#5c594c] leading-relaxed">
 					Last sync: {runtime.refreshedAt || 'pending'}
 				</p>
+			</div>
+
+			<!-- Document Governance -->
+			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">
+				<div class="flex items-start justify-between gap-3">
+					<div>
+						<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Document Governance</p>
+						<p class="mt-1 text-[0.62rem] text-[#5c594c] leading-relaxed">Generated registry for OpenSpec progress, document lineage, supersession, and archive readiness.</p>
+					</div>
+					<span class="px-2 py-1 border border-[#5c594c] bg-[#1c1b18] text-[0.6rem] font-bold uppercase tracking-wider text-[#d1cdb8]">
+						{documentGovernance?.available ? 'REGISTRY_READY' : 'REGISTRY_OFFLINE'}
+					</span>
+				</div>
+				{#if documentGovernance?.available}
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[0.65rem]">
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2"><div class="text-[#a39f90] font-bold uppercase">DOCUMENTS</div><div class="mt-1 text-[#efede4] font-mono">{documentGovernance.totalDocuments}</div></div>
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2"><div class="text-[#a39f90] font-bold uppercase">OPENSPEC</div><div class="mt-1 text-[#efede4] font-mono">{documentGovernance.openSpecChanges}</div></div>
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2"><div class="text-[#a39f90] font-bold uppercase">ARCHIVE READY</div><div class="mt-1 text-[#efede4] font-mono">{documentGovernance.archiveEligible}</div></div>
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2"><div class="text-[#a39f90] font-bold uppercase">CONFLICTS</div><div class="mt-1 text-[#efede4] font-mono">{documentGovernance.conflicts}</div></div>
+					</div>
+					<div class="space-y-1">
+						<div class="flex justify-between text-[0.62rem] text-[#a39f90] uppercase"><span>OpenSpec task progress</span><span>{documentGovernance.progressPercent == null ? 'UNAVAILABLE' : `${documentGovernance.progressPercent}%`}</span></div>
+						<div class="h-1.5 bg-[#34332c] overflow-hidden"><div class="h-full bg-[#8c9f7a] transition-all" style={`width: ${documentGovernance.progressPercent ?? 0}%`}></div></div>
+						<div class="text-[0.6rem] text-[#5c594c]">{documentGovernance.completedTasks}/{documentGovernance.totalTasks} tasks · ETA unavailable until a workflow receipt provides confidence.</div>
+					</div>
+				{:else}
+					<div class="text-center py-3 border border-[#c25953]/25 bg-[#c25953]/5 text-[#c25953] text-[0.7rem] font-bold uppercase tracking-wider">Governance registry unavailable</div>
+				{/if}
 			</div>
 
 			<!-- Runtime Registry -->

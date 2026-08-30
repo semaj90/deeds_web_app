@@ -10,6 +10,7 @@ import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 export interface GateG13Result {
   fact_id: string;
   packet_key: string;
@@ -169,7 +170,7 @@ RESPOND WITH ONLY A VALID JSON ARRAY. NO PREAMBLE. NO THINKING. NO MARKDOWN.`;
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: LLM_MODEL_ID,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
       stream: false,

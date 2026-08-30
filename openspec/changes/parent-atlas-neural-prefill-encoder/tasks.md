@@ -13023,3 +13023,57 @@ the four `content_embedding_768`-premised scripts -- now done, see #1 above) are
 of this pass. Go-retrieval/pgvector HNSW/DiskANN was investigated read-only (no DiskANN
 installed on the live container; HNSW halfvec_cosine_ops on `content_embedding` remains
 correct and unchanged) but no code was touched there -- purely informational for the operator.
+
+### SYMBOL-REP-LINEAGE-02 (2026-08-30)
+
+- [x] Added optional `checkpointRevision` to the TypeScript and JSON Schema vector-manifest
+  contracts. The nested `latent_256`, `latent_128`, and `latent_64` views now share the exact
+  checkpoint revision from `models/nested-semantic-autoencoder/ae_meta.json`.
+- [x] Corrected `latent_128.modelRevision` to `3.0`, matching the shared v3 full01 producer.
+- [x] Corrected the derivation chain: `latent_256` is the physical bottleneck,
+  `latent_128` is its normalized prefix, and `latent_64` is the normalized prefix of
+  `latent_128`.
+- [x] Added the seven-view registry invariant test: all symbol-facing views exist, have the
+  expected PHYSICAL/DERIVED classification, validate against `VectorManifestSchema`, and
+  preserve MRL versus nested-AE derivation families.
+
+Validation: `npx tsc -p packages/semantic-contracts/tsconfig.json --noEmit` and
+`npx vitest run packages/semantic-contracts/src/vector-manifest.test.ts --pool=threads
+--maxWorkers=1 --minWorkers=1` both pass (2/2 tests). This remains a contract/lineage proof;
+it does not promote latent retrieval or validate the pre-correction local v1 checkpoint.
+
+**LATENT256-LIVE-READBACK-01 revalidated (2026-08-30)**: the read-only provider replay ran
+against 32 live revision-qualified `codebase_chunk_index` IDs twice. It hydrated 32/32
+finite 256-dimensional vectors with zero missing vectors, revision mismatches, invalid shapes,
+drops, or reorders. Identity and explicit IEEE-754 F32LE checksum parity were both true;
+canonical writes and production activation remained zero. Receipt:
+`docs/reports/latent256-live-readback-v1.json`. This proves hydration/replay correctness only;
+human QRELS and retrieval promotion remain open.
+
+**GOLDEN-QRELS-CORPUS-01 re-audited (2026-08-30)**: corrected the read-only current
+`semantic_768` corpus planner to use canonical PostgreSQL `content_embedding`; it now reports
+55,169 chunks and 109,776 Qdrant projection points for the 60-query review set. The review
+queue remains fail-closed with 313 blank judgments, no hard negatives, and `importAllowed: false`.
+No judgment or canonical database writes occurred. Next action requires reviewer/evaluator
+grades and metadata, not another model or retrieval backend.
+
+**GOLDEN-QRELS-POOL-02 (2026-08-30)**: regenerated the reviewer-facing pool from the
+canonical `content_embedding` lane and rebound all 60 `evaluationQueryId` values. The pool
+contains 2,433 canonical candidate IDs; 2,433 grades remain blank, 193 candidates lack a
+summary, and no query/candidate revision bindings are present yet. Added
+`scripts/atlas/validate-golden-relevance-review-pool-v1.mjs` and receipt
+`docs/reports/golden-relevance-review-pool-validation-v1.json`. Status is
+`REVIEW_POOL_EVIDENCE_PARTIAL_GRADES_PENDING`; database writes and import remain zero.
+
+**GOLDEN-QRELS-EVIDENCE-03 (2026-08-30)**: updated the read-only pool builder to use a
+bounded excerpt from canonical `codebase_chunk_index.content` when `summary` is null. The
+rebuilt and rebound pool remains 60 queries / 2,433 candidates, now with zero missing reviewer
+evidence and zero structural errors. Validation status is
+`REVIEW_POOL_STRUCTURALLY_VALID_GRADES_PENDING`; all 2,433 grades and revision bindings are
+still intentionally pending, with database writes and import at zero.
+
+**OLLAMA-CUTOVER-AUDIT-01 (2026-08-30)**: added the read-only embedding transport inventory
+`scripts/atlas/audit-embedding-runtime-cutover-v1.mjs`. It found 605 Ollama-related source
+references, 49 llama-server/8081 references, and 31 files referencing both. This is an
+inventory only: parity, writer cutover, startup cutover, fallback removal, and production
+activation remain false. No embedding data or canonical rows were changed.

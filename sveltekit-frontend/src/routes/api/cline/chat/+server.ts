@@ -18,18 +18,41 @@
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { streamDirectToLlamaServer, wrapLlamaStreamAsSSE, kvCacheMonitor } from '$lib/server/ai/context-prompt-streamer.js';
 
 const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const body = await request.json();
-    const { model, messages, stream: shouldStream = true, temperature = 0.3, max_tokens = 2048, use_kv_cache = true } = body;
+const clineChatRequestSchema = z.object({
+  model: z.string().min(1),
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'system']),
+        content: z.string()
+      })
+    )
+    .min(1),
+  stream: z.boolean().optional().default(true),
+  temperature: z.number().optional().default(0.3),
+  max_tokens: z.number().int().optional().default(2048),
+  use_kv_cache: z.boolean().optional().default(true)
+});
 
-    if (!model || !Array.isArray(messages) || messages.length === 0) {
-      return error(400, 'Invalid request: model and messages required');
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return error(401, 'Unauthorized');
+  }
+
+  try {
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = clineChatRequestSchema.safeParse(rawBody);
+
+    if (!parsed.success) {
+      return error(400, `Invalid request: ${parsed.error.issues[0]?.message || 'validation failed'}`);
     }
+
+    const { model, messages, stream: shouldStream, temperature, max_tokens, use_kv_cache } = parsed.data;
 
     // Non-streaming response
     if (!shouldStream) {

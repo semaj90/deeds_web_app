@@ -1,6 +1,6 @@
 {
-  "id": "1b6b85ee-895b-444a-9e09-47826832da76",
-  "prevId": "ec20c139-4662-4742-b36c-e3b84b9deb00",
+  "id": "a97567c5-ac59-445d-9276-9e8a5b172b93",
+  "prevId": "1b6b85ee-895b-444a-9e09-47826832da76",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -12205,6 +12205,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "latent_256": {
+          "name": "latent_256",
+          "type": "halfvec(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latent_256_checkpoint_revision": {
+          "name": "latent_256_checkpoint_revision",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "manifold4": {
           "name": "manifold4",
           "type": "real[]",
@@ -18275,6 +18287,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "projection_key": {
+          "name": "projection_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "parser_version": {
           "name": "parser_version",

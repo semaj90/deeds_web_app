@@ -2,6 +2,7 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { basename } from 'node:path';
 import { ENV } from '../env.server.js';
 import { resolveLoadedLlamaModel, type ResolvedInferenceModel } from './llama-server-model-resolver.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 
 function resolveLlamaServerBaseUrl(): string {
 	const raw =
@@ -35,11 +36,7 @@ let cachedSessionDescriptor: LlamaSessionDescriptor | null = null;
 
 function resolveLlamaServerModelId(): string {
 	const configuredModel = String(
-		ENV.LLAMA_SERVER_MODEL ??
-		ENV.GEMMA4_MODEL ??
-		ENV.ROTORQUANT_CHAT_MODEL ??
-		ENV.LLM_MODEL ??
-		''
+		LLM_MODEL_ID
 	).trim();
 	if (configuredModel) return configuredModel;
 
@@ -54,7 +51,7 @@ function resolveLlamaServerModelId(): string {
 		if (base) return base;
 	}
 
-	return 'ornith-1.5-9b';
+	return LLM_MODEL_ID;
 }
 
 /** Vercel AI SDK provider pointed at the local llama-server.exe synthesis lane */

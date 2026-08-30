@@ -57,6 +57,11 @@
       "type": "string",
       "description": "Model version/revision for reproducibility"
     },
+    "checkpointRevision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Immutable learned-model checkpoint identity shared by derived outputs"
+    },
     "dimensions": {
       "type": "integer",
       "exclusiveMinimum": 0,

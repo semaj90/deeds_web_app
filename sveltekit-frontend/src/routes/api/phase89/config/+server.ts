@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 
 import { env } from '$env/dynamic/private';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// Ollama Configuration
 		ollama: { url: ENV.OLLAMA_BASE_URL,
 			models: { embedding: 'embeddinggemma:latest',
-				legal: 'hforf.gguf'
+				legal: LLM_MODEL_ID
 			}
 		},
 

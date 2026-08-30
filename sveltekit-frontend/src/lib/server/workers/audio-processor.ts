@@ -18,6 +18,7 @@ import { join } from 'path';
 import type { Redis } from 'ioredis';
 import { ENV } from '$lib/server/env.server';
 import { getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface AudioJob {
   evidenceId: string;
@@ -325,7 +326,7 @@ Respond in JSON format:
 
       const raw = await bifrostChat(
         [{ role: 'user', content: `${systemPrompt}\n\nTranscription:\n${text}` }],
-        'gemma4-legal-iq4xs-direct.gguf',
+        LLM_MODEL_ID,
         { temperature: 0.3, maxTokens: 512 }
       );
 

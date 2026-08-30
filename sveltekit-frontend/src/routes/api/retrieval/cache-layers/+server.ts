@@ -55,7 +55,11 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   // Parse JSON body
   let body: unknown;
   try {

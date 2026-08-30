@@ -1,3 +1,5 @@
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+
 /**
  * Dispatcher LangGraph MCP Tools — 9 Tool Schemas
  * Wired into server.ts via spread operator: ...DISPATCHER_TOOLS_SCHEMAS
@@ -243,8 +245,8 @@ export const DISPATCHER_TOOLS_SCHEMAS = [
         },
         synthesis_model: {
           type: 'string',
-          description: 'Model to use (e.g., gemma4-legal-iq4xs-direct.gguf)',
-          default: 'gemma4-legal-iq4xs-direct.gguf',
+          description: 'Model to use (defaults to the active llama-server model)',
+          default: LLM_MODEL_ID,
         },
         max_tokens: {
           type: 'number',

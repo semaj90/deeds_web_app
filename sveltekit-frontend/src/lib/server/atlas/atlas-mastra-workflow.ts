@@ -36,6 +36,7 @@ import {
   buildContextFromGo,
   validatePacketFromGo,
 } from './go-retrieval-grpc-client';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 
 /**
  * Main Atlas Retrieval Workflow
@@ -54,7 +55,7 @@ export const atlasRetrievalWorkflow = defineWorkflow({
   ],
 
   agent: {
-    model: 'gemma4-legal-iq4xs-direct.gguf',
+    model: LLM_MODEL_ID,
     instructions: async (requestContext) => {
       const context = (requestContext as any).atlasRuntime as AtlasRuntimeContext;
       return `
@@ -255,7 +256,7 @@ export const atlasMutationWorkflow = defineWorkflow({
   tools: [atlasValidateChangeTool, atlasApplyChangeTool, atlasInspectRuntimeTool],
 
   agent: {
-    model: 'gemma4-legal-iq4xs-direct.gguf',
+    model: LLM_MODEL_ID,
     instructions: async (requestContext) => {
       const context = (requestContext as any).atlasRuntime as AtlasRuntimeContext;
       return `

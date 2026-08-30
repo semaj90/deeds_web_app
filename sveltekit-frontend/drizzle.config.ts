@@ -14,7 +14,7 @@ export default {
   verbose: true,
   strict: true,
   tablesFilter: [
-    '!phase89_*', '!kg_*', '!ts_errors', '!file_index', '!cpg_*',
+    '!phase89_*', '!kg_*', '!warden_*', '!embedded_summaries', '!ts_errors', '!file_index', '!cpg_*',
     '!error_embedding_history', '!document_embeddings', '!enhanced_tags',
     '!recommendations', '!error_analysis', '!error_fix_history',
     '!learned_fix_patterns', '!raw_error_embeddings',

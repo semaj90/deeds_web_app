@@ -7,13 +7,13 @@
   "counts": {
     "input": 440,
     "treeBound": 353,
-    "canonical": 85,
-    "unresolved": 355,
+    "canonical": 90,
+    "unresolved": 350,
     "fuzzy": 0,
     "aliases": 0
   },
-  "outputChecksum": "sha256:fb7b0d2ce0b98839f422a20c1a45f8f2dc9c8fc7fc4839294d24aec4f9e4e812",
-  "registryRowsRead": 10255,
+  "outputChecksum": "sha256:b076aff7a890bcbfb4b6ad9728082b108c0f7b9e9ded2aa82bfc552ac2483dcf",
+  "registryRowsRead": 10260,
   "fuzzyMatches": 0,
   "aliasMatches": 0,
   "canonicalWrites": 0,

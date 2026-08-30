@@ -6,6 +6,7 @@
 
 import { db } from '$lib/server/db/client.js';
 import { gateG13FactExtraction } from '$lib/server/ingest/gate-g13-fact-extraction.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { ACEContextAssembler } from './context-assembler.js';
 import type { ACEPacket } from './context-assembler.js';
 
@@ -136,7 +137,7 @@ Provide a clear, evidence-based answer:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: LLM_MODEL_ID,
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.3,
         stream: false,

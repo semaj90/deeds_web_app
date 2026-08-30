@@ -1,8 +1,14 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 import { policyRerankerMetadata } from '$lib/server/db/schema-postgres.js';
 import { loadTorchModel, runPolicyInference } from '$lib/server/policy/inference.js';
+
+const policyInferenceRequestSchema = z.object({
+  features: z.array(z.number()),
+  somEmbedding: z.array(z.number())
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
@@ -10,12 +16,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   try {
-    const body = await request.json();
-    const { features, somEmbedding } = body;
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = policyInferenceRequestSchema.safeParse(rawBody);
 
-    if (!features || !somEmbedding) {
-      return json({ error: 'Missing features or somEmbedding' }, { status: 400 });
+    if (!parsed.success) {
+      return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
     }
+    const { features, somEmbedding } = parsed.data;
 
     // Fetch active policy model metadata
     const metadata = await db

@@ -59,7 +59,7 @@ def main() -> None:
                 cur.execute(
                     """
                     SELECT id::text AS candidate_id, relative_path, summary,
-                           content_hash
+                           LEFT(content, 2000) AS content_excerpt, content_hash
                     FROM codebase_chunk_index
                     WHERE content_embedding IS NOT NULL AND id::text <> %s
                     ORDER BY content_embedding <=> %s::halfvec
@@ -74,7 +74,8 @@ def main() -> None:
                         "candidateId": row["candidate_id"],
                         "rank": rank,
                         "sourceRef": row["relative_path"],
-                        "summary": row["summary"],
+                        "summary": row["summary"] or row["content_excerpt"],
+                        "summarySource": "CANONICAL_SUMMARY" if row["summary"] else "CANONICAL_CONTENT_EXCERPT",
                         "contentHash": row["content_hash"],
                         "proxyRelevantHint": row["candidate_id"] in proxy_ids,
                         "relevanceGrade": None,

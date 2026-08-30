@@ -1,4 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export type RetrievalLane = 'vector_rag' | 'thematic_raptor' | 'citation_graph' | 'agentic_multiquery' | 'hybrid';
@@ -35,7 +36,7 @@ Return ONLY a JSON object with: { "lane": "...", "reason": "...", "confidence": 
 		try {
 			const response = await bifrostChat(
 				[{ role: 'user', content: prompt }],
-				ENV.GEMMA4_MODEL,
+				LLM_MODEL_ID,
 				{ temperature: 0, maxTokens: 100 }
 			);
 

@@ -1,4 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export interface AdminRecommendation {
@@ -46,7 +47,7 @@ OUTPUT (JSON Array):
     try {
       const res = await bifrostChat(
         [{ role: 'user', content: prompt }],
-        ENV.GEMMA4_MODEL,
+        LLM_MODEL_ID,
         { temperature: 0.3, maxTokens: 1024, cacheKey: `rec:${query.slice(0, 32)}` }
       );
 

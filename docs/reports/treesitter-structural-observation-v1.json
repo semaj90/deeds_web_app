@@ -1,6 +1,6 @@
 {
   "schema": "atlas.treesitter-structural-observation.v1",
-  "generatedAt": "2026-08-30T00:51:22.206Z",
+  "generatedAt": "2026-08-30T20:55:08.199Z",
   "mode": "READ_ONLY_CURRENT_GRAPHIFY_COHORT",
   "postgresWrites": false,
   "qdrantWrites": false,

@@ -1,0 +1,112 @@
+{
+  "schema": "atlas.daily-graphify-readiness-audit.v1",
+  "auditedAt": "2026-08-30",
+  "status": "READ_ONLY_DRY_RUN_READY_PROMOTION_BLOCKED",
+  "embeddingMigration": {
+    "canonicalRepresentation": "semantic_768",
+    "canonicalPostgresColumn": "codebase_chunk_index.content_embedding",
+    "postgresColumnType": "halfvec(768)",
+    "postgresRows": 55853,
+    "canonicalVectorRows": 55169,
+    "legacy384VectorRows": 52380,
+    "metadataDimension768Rows": 3451,
+    "metadataDimension384Rows": 52402,
+    "metadataDimensionStatus": "STALE_REQUIRES_READ_ONLY_RECONCILIATION",
+    "legacy384ColumnPresent": true
+  },
+  "qdrant": {
+    "canonicalCandidates": [
+      {
+        "collection": "codebase_chunks_768",
+        "status": "ACTIVE_RETRIEVAL_PROJECTION",
+        "points": 109776,
+        "vectors": ["content", "error", "signature"],
+        "payloadRole": "rich retrieval and derived topology metadata",
+        "provenanceSampleStatus": "MIXED_HISTORY",
+        "exactPacketLinksInSample": 0
+      },
+      {
+        "collection": "codebase_chunks_768_v2",
+        "status": "LINEAGE_PROJECTION_REQUIRES_PARITY_PROOF",
+        "points": 52380,
+        "vectors": ["content", "error", "signature"],
+        "payloadRole": "lean identity/provenance payload",
+        "provenanceSampleStatus": "PARTIAL",
+        "exactPacketLinksInSample": 0
+      }
+    ],
+    "legacy384CollectionsPresent": ["codebase_chunks_384", "codebase_chunks_384_hybrid"],
+    "derivedMrlCollectionPresent": "codebase_chunks_512",
+    "latent256CollectionPresent": "codebase_chunks_latent256",
+    "requiredAction": "freeze_codebase_chunks_768_as_active_retrieval_projection_and_reconcile_v2_before_any_cutover"
+  },
+  "dailyGraphify": {
+    "scriptInventoryReady": true,
+    "canonicalBackfillTarget": "codebase_chunk_index.content_embedding",
+    "canonicalBackfillTargetCorrected": true,
+    "embeddingFallback": "ollama_remains_explicit_runtime_cutover_gap",
+    "ordinaryCommandIsApplyCapable": true,
+    "nativeStructuralDefault": "dry_run",
+    "graphifyRunOwner": "BLOCKED",
+    "symbolFeatureAlignment": "OPEN",
+    "live8098GpuProof": "OPEN",
+    "authoritativeGraphRevision": "BLOCKED",
+    "readOnlyDryRun": "ALLOWED",
+    "scheduledAuthoritativePromotion": "NOT_READY"
+  },
+  "architecture": {
+    "astCst": "8095 owns revision-qualified structural observations and UTF-8 byte spans",
+    "semantic": "EmbeddingGemma semantic_768 is canonical; MRL and learned representations are derived or challenger lanes",
+    "rpc": "protobuf/gRPC service envelopes may carry identity and revisions; transport is not authority",
+    "jsonb": "PostgreSQL queryable metadata and arrays",
+    "json": "bounded control envelopes and receipts",
+    "jsonl": "streaming audit/materialization inputs and outputs",
+    "arrow": "large numeric artifacts and feature matrices",
+    "gpu": "8098 is an executor/projection and still needs live RAPIDS parity proof",
+    "graph": "NetworkX remains CPU oracle; cuGraph is derived acceleration"
+  },
+  "activeCodeWarnings": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/vector/qdrant-multivector-schema.ts",
+      "finding": "contains an older 384-dimensional named-vector contract",
+      "status": "REVIEW_OR_RETIRE",
+      "promotionImpact": "must not be used for semantic_768 production retrieval"
+    },
+    {
+      "path": "scripts/atlas/backfill-graphify-file-embeddings-768.mjs",
+      "finding": "previously targeted content_embedding_768; corrected to content_embedding",
+      "status": "CORRECTED_AND_DRY_RUN_VERIFIED"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/go-service-integration.ts",
+      "finding": "unreferenced legacy bridge still documents a 384-dimensional query and payload vector shape",
+      "status": "UNWIRED_LEGACY_REVIEW",
+      "promotionImpact": "do not use as the active Go Retrieval contract"
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "graphArtifacts": false
+  },
+  "nextGates": [
+    "SOURCE_METADATA_RECONCILIATION_READ_ONLY",
+    "QDRANT_768_PROJECTION_OWNER_RECONCILIATION",
+    "GRAPHIFY_RUN_OWNER_01",
+    "GRAPH-RESOLVE-06B",
+    "LIVE_8098_RAPIDS_PARITY"
+  ],
+  "latestIdentityAudit": {
+    "script": "sveltekit-frontend/scripts/atlas/audit-qdrant-768-identity.mjs",
+    "postgresRowsLoaded": 55169,
+    "qdrantPoints": 109776,
+    "matched": 107796,
+    "ambiguous": 1299,
+    "unmatched": 681,
+    "duplicatePostgresMappings": 5634,
+    "safeForRetrieval": false,
+    "correction": "audit now reads canonical content_embedding; earlier 1386-row result was invalid because it read content_embedding_768"
+  }
+}

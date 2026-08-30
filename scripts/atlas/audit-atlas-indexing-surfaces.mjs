@@ -126,7 +126,7 @@ async function auditPostgres() {
     const populated = {};
     if (tables.codebase_chunk_index.exists) {
       const codeColumns = new Set(columns.codebase_chunk_index);
-      const vectorColumn = ['content_embedding_768', 'content_embedding', 'embedding', 'summary_embedding', 'signature_embedding'].find((name) => codeColumns.has(name));
+      const vectorColumn = ['content_embedding', 'content_embedding_768', 'embedding', 'summary_embedding', 'signature_embedding'].find((name) => codeColumns.has(name));
       const searchColumn = ['search_vector', 'bm25_search_vector'].find((name) => codeColumns.has(name));
       const qdrantColumn = ['qdrant_id', 'qdrant_point_id'].find((name) => codeColumns.has(name));
       populated.codebaseChunkEmbeddingColumn = vectorColumn ?? null;
@@ -174,8 +174,8 @@ async function auditPostgres() {
       lexicalOwner: pgSearch ? 'UNVERIFIED_PG_SEARCH_AVAILABLE' : 'POSTGRES_FTS_TSVECTOR_GIN_TS_RANK_CD',
       denseOwner: 'POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE',
       canonicalDenseRepresentation: 'semantic_768',
-      canonicalDenseColumn: tables.codebase_chunk_index.exists && columns.codebase_chunk_index.includes('content_embedding_768')
-        ? 'codebase_chunk_index.content_embedding_768'
+      canonicalDenseColumn: tables.codebase_chunk_index.exists && columns.codebase_chunk_index.includes('content_embedding')
+        ? 'codebase_chunk_index.content_embedding'
         : 'UNAVAILABLE',
       proposedSearchProjection: {
         table: 'atlas_file_search_index_v1',
@@ -195,9 +195,9 @@ async function auditPostgres() {
     if (tables.atlas_ast_nodes.exists && !populated.astNodesWithSymbols?.count) finding('AST_NODE_SYMBOL_COVERAGE_EMPTY', 'high', 'atlas_ast_nodes exists but has no populated qualified symbols.');
     if (tables.atlas_symbol_registry.exists && !populated.symbolRegistryActive?.count) finding('SYMBOL_REGISTRY_EMPTY', 'high', 'The stable symbol registry exists but has no active symbols.');
     if (tables.codebase_chunk_index.exists && !populated.codebaseChunkSearchVectors?.count) finding('BM25_VECTOR_EMPTY', 'high', 'codebase_chunk_index exists but has no populated search_vector rows.');
-    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count === 0) finding('POSTGRES_CANONICAL_EMBEDDING_EMPTY', 'high', 'The canonical 768-dimensional Postgres embedding column is present but empty; Qdrant is populated independently.', ['codebase_chunk_index.content_embedding_768', 'codebase_chunks_768_v2']);
-    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding_768?.count > 0 && populated.codebaseChunk_content_embedding_768.count < tables.codebase_chunk_index.count) {
-      finding('POSTGRES_CANONICAL_EMBEDDING_PARTIAL', 'high', 'The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.', [`${populated.codebaseChunk_content_embedding_768.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding_768', 'codebase_chunk_index.content_embedding']);
+    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding?.count === 0) finding('POSTGRES_CANONICAL_EMBEDDING_EMPTY', 'high', 'The canonical 768-dimensional Postgres embedding column is present but empty; Qdrant is populated independently.', ['codebase_chunk_index.content_embedding', 'codebase_chunks_768_v2']);
+    if (tables.codebase_chunk_index.exists && populated.codebaseChunk_content_embedding?.count > 0 && populated.codebaseChunk_content_embedding.count < tables.codebase_chunk_index.count) {
+      finding('POSTGRES_CANONICAL_EMBEDDING_PARTIAL', 'high', 'The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.', [`${populated.codebaseChunk_content_embedding.count}/${tables.codebase_chunk_index.count}`, 'codebase_chunk_index.content_embedding']);
     }
     // BitmapAnd/BitmapOr are PostgreSQL planner strategies, not a required
     // schema object. Keep the inventory for diagnostics, but do not report an

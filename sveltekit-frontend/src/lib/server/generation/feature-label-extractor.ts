@@ -18,6 +18,7 @@ import { buildFeatureLabels } from '../ai/feature-builder.js';
 import { extractQueryFeatures } from '../ai/feature-extraction.js';
 import { bifrostChat } from '../ollama.js';
 import { ENV } from '../env.server.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 import type { ArtifactStatus } from './artifact-logger.js';
 import crypto from 'crypto';
 import { z } from 'zod';
@@ -226,7 +227,7 @@ Return ONLY valid JSON in this format:
   try {
     const response = await bifrostChat(
       [{ role: 'user', content: prompt }],
-      ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-rotorquant:latest',
+      LLM_MODEL_ID,
       { temperature: 0.3, maxTokens: 150 }
     );
 
@@ -370,7 +371,7 @@ export async function extractPacketFeatures(input: {
     producer: {
       extractorVersion: '1.0.0',
       taxonomyVersion: '1.0.0',
-      modelId: useSynthesis ? (ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest') : null,
+      modelId: useSynthesis ? LLM_MODEL_ID : null,
       modelRevision: null,
       promptVersion: '1.0.0'
     },

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.indexing-surfaces.v1",
-  "generatedAt": "2026-08-29T17:41:11.080Z",
+  "generatedAt": "2026-08-30T20:38:53.989Z",
   "readOnly": true,
   "canonicalAuthority": "postgres",
   "ast": {
@@ -38,7 +38,7 @@
     "lexicalOwner": "UNVERIFIED_PG_SEARCH_AVAILABLE",
     "denseOwner": "POSTGRES_CODEBASE_CHUNK_INDEX_CONTENT_EMBEDDING_HALFvec_768_ACTIVE_LANE",
     "canonicalDenseRepresentation": "semantic_768",
-    "canonicalDenseColumn": "codebase_chunk_index.content_embedding_768",
+    "canonicalDenseColumn": "codebase_chunk_index.content_embedding",
     "proposedSearchProjection": {
       "table": "atlas_file_search_index_v1",
       "applied": false,
@@ -64,11 +64,11 @@
       },
       "atlas_symbol_registry": {
         "exists": true,
-        "count": 10220
+        "count": 10305
       },
       "atlas_symbol_versions": {
         "exists": true,
-        "count": 200
+        "count": 285
       },
       "atlas_structural_reference_resolutions": {
         "exists": true,
@@ -261,7 +261,6 @@
         "token_count",
         "neo4j_gpu_cluster",
         "output_meta",
-        "content_embedding_384",
         "summary_embedding_384",
         "embedding_dimension",
         "embedding_normalized",
@@ -304,7 +303,9 @@
         "content_embedding_768",
         "centroid_id",
         "reconstruction_error",
-        "routing_tier"
+        "routing_tier",
+        "latent_256",
+        "latent_256_checkpoint_revision"
       ],
       "atlas_packet_features": [
         "id",
@@ -437,12 +438,12 @@
       ]
     },
     "populated": {
-      "codebaseChunkEmbeddingColumn": "content_embedding_768",
+      "codebaseChunkEmbeddingColumn": "content_embedding",
       "codebaseChunkSearchColumn": "search_vector",
       "codebaseChunkQdrantColumn": "qdrant_id",
       "codebaseChunkEmbeddings": {
         "exists": true,
-        "count": 1386
+        "count": 55169
       },
       "codebaseChunkSearchVectors": {
         "exists": true,
@@ -459,10 +460,6 @@
       "codebaseChunk_content_embedding_768": {
         "exists": true,
         "count": 1386
-      },
-      "codebaseChunk_content_embedding_384": {
-        "exists": true,
-        "count": 52380
       },
       "codebaseChunk_summary_embedding": {
         "exists": true,
@@ -490,7 +487,7 @@
       },
       "symbolRegistryActive": {
         "exists": true,
-        "count": 10170
+        "count": 10255
       }
     },
     "bitmapTables": [],
@@ -1052,11 +1049,6 @@
       },
       {
         "table": "codebase_chunk_index",
-        "name": "idx_codebase_chunk_content_embedding_384_hnsw",
-        "definition": "CREATE INDEX idx_codebase_chunk_content_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_384 vector_cosine_ops) WITH (m='16', ef_construction='64')"
-      },
-      {
-        "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_content_embedding_768_hnsw",
         "definition": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
       },
@@ -1069,6 +1061,11 @@
         "table": "codebase_chunk_index",
         "name": "idx_codebase_chunk_latent64_hnsw",
         "definition": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "table": "codebase_chunk_index",
+        "name": "idx_codebase_chunk_latent_256_hnsw",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (latent_256 halfvec_cosine_ops) WHERE (latent_256 IS NOT NULL)"
       },
       {
         "table": "codebase_chunk_index",
@@ -1749,6 +1746,16 @@
         "status": "green"
       },
       {
+        "name": "codebase_chunks_latent256",
+        "vectors": {
+          "size": 256,
+          "distance": "Cosine"
+        },
+        "points": 55169,
+        "indexedVectors": 47000,
+        "status": "green"
+      },
+      {
         "name": "codebase_chunks_sparse_test_v1",
         "vectors": {
           "content": {
@@ -1846,7 +1853,7 @@
             "distance": "Cosine"
           }
         },
-        "points": 6,
+        "points": 12,
         "indexedVectors": 0,
         "status": "green"
       },
@@ -2090,8 +2097,8 @@
   },
   "drizzle": {
     "journalEntries": 41,
-    "manualSqlFiles": 259,
-    "declaredSidecars": 50,
+    "manualSqlFiles": 261,
+    "declaredSidecars": 51,
     "untrackedManualFiles": [
       "0009_hybrid_graph_indexes.sql",
       "0010_distilled_table_store.sql",
@@ -2161,8 +2168,7 @@
       "severity": "high",
       "message": "The canonical semantic_768 column is only partially populated; the active halfvec(768) lane must not be promoted as a substitute without a representation receipt.",
       "evidence": [
-        "1386/55853",
-        "codebase_chunk_index.content_embedding_768",
+        "55169/55853",
         "codebase_chunk_index.content_embedding"
       ]
     },

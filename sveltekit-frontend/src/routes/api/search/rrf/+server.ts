@@ -48,6 +48,10 @@ const WEIGHT_PRESETS: Record<
 };
 
 export const POST: RequestHandler = async (event) => {
+  if (!event.locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const parsed = querySchema.parse(await event.request.json());
     const { query, k, topK, minScore, useWeights } = parsed;

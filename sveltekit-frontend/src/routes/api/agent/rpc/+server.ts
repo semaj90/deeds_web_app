@@ -17,6 +17,7 @@
  */
 
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import '$lib/agent/register-tools';
 import {
   buildToolGatewayManifest,
@@ -27,6 +28,16 @@ import { ToolDiagnostics } from '$lib/agent/tool-diagnostic';
 import { recordAgentTrace } from '$lib/server/observability/agent-trace-recorder';
 import { ENV } from '$lib/server/env.server';
 import { createHash } from 'crypto';
+
+// Minimal JSON-RPC 2.0 envelope validation. `params` shape is intentionally
+// left open (dynamic per registered tool) — the gateway's own dispatch layer
+// validates per-tool parameters.
+const agentRpcRequestSchema = z.object({
+  jsonrpc: z.string().optional(),
+  method: z.string().min(1),
+  params: z.record(z.string(), z.unknown()).optional(),
+  id: z.union([z.string(), z.number(), z.null()]).optional(),
+});
 
 function stableStringify(value: unknown): string {
   if (value === null || value === undefined) return 'null';
@@ -40,10 +51,10 @@ function stableStringify(value: unknown): string {
  * Handle POST requests: tools/list, tools/call, or direct tool method names
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
-  let body: Record<string, unknown>;
+  let rawBody: unknown;
 
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch {
     return Response.json(
       {
@@ -55,6 +66,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     );
   }
 
+  const parsed = agentRpcRequestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return Response.json(
+      {
+        jsonrpc: '2.0',
+        error: { code: -32602, message: 'Invalid params', data: parsed.error.issues },
+        id: (rawBody as { id?: string | number | null })?.id ?? null,
+      },
+      { status: 400 }
+    );
+  }
+
+  const body = parsed.data;
   const method = String(body.method ?? '');
   const params = (body.params as Record<string, unknown> | undefined) ?? {};
 

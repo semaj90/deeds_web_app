@@ -308,5 +308,12 @@
     "archived": "2026-08-23T19:50:27Z",
     "reason": "Unused duplicate legacy compose stack; docker-compose.yml is the canonical active stack after Valkey and native Windows Ollama alignment.",
     "recovery": "Move the archive file back to the repository root as docker-compose.yaml after verifying compose ownership and references."
+  },
+  {
+    "path": "sveltekit-frontend Postgres column: codebase_chunk_index.content_embedding_384 (vector(384))",
+    "archive_path": "deeds_labs/archive/2026-08-30/content_embedding_384_backup.csv",
+    "sha256": "d6cdf9a4d9b80edd340e568265773b53c2590827fb9a8836a7473c03a49d92ea",
+    "archived": "2026-08-30T00:00:00Z",
+    "reason": "Legacy 384-dim embedding column superseded by canonical content_embedding (halfvec(768)). Verified zero rows had 384-only data with no corresponding 768 vector before drop (52,380 rows backed up as id+vector CSV). Part of the 768-canonicalization cleanup — see CLAUDE.md Embedding Dimensions Policy section."
   }
 ]

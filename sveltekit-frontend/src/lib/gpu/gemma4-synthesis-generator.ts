@@ -16,6 +16,7 @@ import {
   LlamaServerNoModelError,
   LlamaServerModelResponseInvalidError,
 } from '$lib/server/ai/llama-server-model-resolver.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * ACEContext has no `selectedPackets`/`evidence`/`contextWindow` fields —
@@ -176,7 +177,7 @@ async function callTurboQuantSynthesis(
   temperature: number
 ): Promise<SynthesisResponse | null> {
   const TURBO_QUANT_URL = process.env.TURBO_QUANT_URL || 'http://127.0.0.1:8090';
-  const configuredModel = process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+  const configuredModel = LLM_MODEL_ID;
   const timeout = 90_000; // 90s for thinking models
 
   try {
@@ -235,7 +236,7 @@ async function callOllamaSynthesis(
   temperature: number
 ): Promise<SynthesisResponse | null> {
   const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-  const configuredModel = process.env.GEMMA4_MODEL || 'hforf';
+  const configuredModel = LLM_MODEL_ID;
 
   try {
     const { resolvedModel } = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, configuredModel);

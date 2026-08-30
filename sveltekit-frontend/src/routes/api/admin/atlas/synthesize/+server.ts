@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
 import { loadMutationAwarenessV1 } from '$lib/server/atlas/graph/mutation-awareness.js';
@@ -22,6 +23,18 @@ const DEFAULT_CANDIDATE_LIMIT = 128;
 const MAX_CANDIDATES = 512;
 const DEFAULT_TOKEN_BUDGET = 8_192;
 const MAX_TOKEN_BUDGET = 32_768;
+
+const atlasSynthesisRequestSchema = z.object({
+  schema: z.literal('atlas.synthesis-request.v1').optional(),
+  snapshotId: z.string().min(1),
+  graphRevision: z.string().optional(),
+  query: z.string().min(1),
+  seedNodeKeys: z.array(z.string()).min(1),
+  edgeTypes: z.array(z.string()).optional(),
+  maxHops: z.number().int().min(1).optional(),
+  candidateLimit: z.number().int().min(1).optional(),
+  tokenBudget: z.number().int().min(1).optional()
+});
 
 function boundedInt(value: number | undefined, fallback: number, min: number, max: number): number {
   if (!Number.isFinite(value)) return fallback;
@@ -54,7 +67,12 @@ export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   const { request } = event;
   try {
-    const body = (await request.json()) as AtlasSynthesisRequestV1;
+    const rawBody = await request.json().catch(() => ({}));
+    const parsedBody = atlasSynthesisRequestSchema.safeParse(rawBody);
+    if (!parsedBody.success) {
+      return json({ ok: false, error: 'Invalid request body', issues: parsedBody.error.issues }, { status: 400 });
+    }
+    const body = parsedBody.data as AtlasSynthesisRequestV1;
     if (!body.snapshotId?.trim()) {
       return json({ ok: false, error: 'snapshotId is required' }, { status: 400 });
     }

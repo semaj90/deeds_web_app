@@ -6,23 +6,40 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { executeGoRetrievalSearch, type GoRetrievalFacadeRequest } from '$lib/server/retrieval/go-retrieval-facade.js';
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const body = await request.json();
+const MultiVectorRequestSchema = z.object({
+  query: z.string().min(1).optional(),
+  q: z.string().min(1).optional(),
+  rrf_weights: z.record(z.string(), z.number()).optional(),
+  rrfWeights: z.record(z.string(), z.number()).optional(),
+  include_summary: z.boolean().optional(),
+  includeSummary: z.boolean().optional(),
+  top_k: z.number().int().positive().max(200).optional(),
+  topK: z.number().int().positive().max(200).optional()
+}).refine((data) => Boolean(data.query || data.q), {
+  message: 'query is required'
+});
 
-    // Validate request
-    if (!body.query || typeof body.query !== 'string') {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const parsed = MultiVectorRequestSchema.safeParse(await request.json());
+    if (!parsed.success) {
       return json(
-        { error: 'Missing or invalid query parameter' },
+        { error: 'Invalid request body', issues: parsed.error.issues },
         { status: 400 }
       );
     }
+    const body = parsed.data;
 
     // Build facade request with multi-vector flag
     const facadeRequest: GoRetrievalFacadeRequest = {
-      query: body.q || body.query,
+      query: (body.q || body.query) as string,
       useMultiVector: true,
       rrfWeights: body.rrf_weights || body.rrfWeights,
       includeSummary: body.include_summary ?? body.includeSummary ?? false,

@@ -115,7 +115,7 @@ export const couchdb = {
  * embeddings-only per the "Ollama vs llama-server Boundary" hard rule (CLAUDE.md).
  */
 export const aceLLM = {
-  async summarize(text: string, model = 'gemma4-legal-iq4xs-direct.gguf'): Promise<string> {
+  async summarize(text: string, model = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b'): Promise<string> {
     try {
       return await bifrostChat(
         [{ role: 'user', content: 'Summarize the following content concisely:\n\n' + text.slice(0, 4000) }],

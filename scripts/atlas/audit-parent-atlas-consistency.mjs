@@ -86,15 +86,19 @@ async function main() {
       qdrant_points_matched_pg: 0,
       pgvector_record_fk_integrity: true,
       neo4j_source_ref_in_atlas: 0,
-      kanban_tasks_have_feature_id: true
+      kanban_tasks_have_feature_id: true,
+      kanban_tasks_have_identity: true,
+      kanban_feature_task_count: 0,
+      kanban_workflow_task_count: 0,
+      kanban_tasks_missing_identity: 0
     }
   };
 
   // === RETRIEVAL SMOKE TESTS ===
 
-  // 1. Qdrant query by feature_id
+  // 1. Qdrant semantic projection readback (feature_maps is retired).
   try {
-    const qdrantQueryRes = await fetch(`${QDRANT_URL}/collections/feature_maps/points/scroll`, {
+    const qdrantQueryRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768_v2/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -106,7 +110,7 @@ async function main() {
       const points = qdata.result?.points || [];
       results.smoke_tests.qdrant_query_feature = points.length > 0;
       if (points.length > 0) {
-        console.log('✓ Sample Qdrant point from feature_maps:', points[0]);
+        console.log('✓ Sample Qdrant point from codebase_chunks_768_v2:', points[0]);
       }
     }
   } catch (e) {
@@ -137,7 +141,10 @@ async function main() {
   // 4. Redis ACE packet lookup
   try {
     if (!redisReady) throw new Error('Redis offline');
-    const keys = await redis.keys('code:llm_output:path:*');
+    const keys = [
+      ...(await redis.keys('ace:packet:*')),
+      ...(await redis.keys('bitfrost:candidate:v1:*')),
+    ];
     if (keys.length > 0) {
       const redisType = await redis.type(keys[0]);
       if (redisType === 'string') {
@@ -180,7 +187,7 @@ async function main() {
 
   // 2. Qdrant sample points should line up with the Postgres task_semantic_packets mirror by source_ref.
   try {
-    const qdrantSample = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
+    const qdrantSample = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768_v2/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ limit: 20 }),
@@ -236,12 +243,33 @@ async function main() {
   let missingTasksCount = 0;
   if (fs.existsSync(kanbanTasksPath)) {
     const tasks = readJsonl(kanbanTasksPath);
-    const missing = tasks.filter(t => !t.feature);
+    const featureTasks = tasks.filter((t) => {
+      const featureId = t.feature_id ?? t.featureId ?? t.feature;
+      return typeof featureId !== 'string' || featureId.trim().length === 0;
+    });
+    const workflowTasks = featureTasks.filter((t) =>
+      typeof t.story_id === 'string' || typeof t.worker_id === 'string' || typeof t.bucket === 'string'
+    );
+    const missing = featureTasks.filter((t) => !workflowTasks.includes(t));
+    const invalidIdentity = tasks.filter((t) => {
+      const featureId = t.feature_id ?? t.featureId ?? t.feature;
+      const hasFeatureId = typeof featureId === 'string' && featureId.trim().length > 0;
+      const hasWorkflowIdentity = typeof t.task_id === 'string' &&
+        (typeof t.story_id === 'string' || typeof t.worker_id === 'string' || typeof t.bucket === 'string');
+      return !hasFeatureId && !hasWorkflowIdentity;
+    });
     missingTasksCount = missing.length;
     results.consistency_audits.kanban_tasks_have_feature_id = missing.length === 0;
+    results.consistency_audits.kanban_tasks_have_identity = invalidIdentity.length === 0;
+    results.consistency_audits.kanban_feature_task_count = tasks.length - featureTasks.length;
+    results.consistency_audits.kanban_workflow_task_count = workflowTasks.length;
+    results.consistency_audits.kanban_tasks_missing_identity = invalidIdentity.length;
     if (missing.length > 0) {
-      console.log(`⚠️ GAPS: Found ${missing.length} Kanban tasks lacking 'feature' field!`);
-      console.log('Sample gaps:', missing.slice(0, 5).map(t => ({ id: t.id, title: t.title })));
+      console.log(`⚠️ GAPS: Found ${missing.length} feature tasks lacking 'feature_id' field!`);
+      console.log('Sample gaps:', missing.slice(0, 5).map(t => ({ id: t.task_id, title: t.title })));
+    }
+    if (invalidIdentity.length > 0) {
+      console.log(`⚠️ GAPS: Found ${invalidIdentity.length} Kanban tasks lacking feature or workflow identity!`);
     }
   }
 

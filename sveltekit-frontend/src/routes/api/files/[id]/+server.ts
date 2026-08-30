@@ -5,6 +5,7 @@ import { uploadedFiles } from "$lib/server/db/schema.js";
 import { eq } from "drizzle-orm";
 import { deleteFileFromSeaweed } from "$lib/server/storage/seaweed.js";
 import { ENV } from "$lib/server/env.server.js";
+import { isUuid } from "$lib/server/validation.js";
 
 /**
  * DELETE /api/files/[id]
@@ -13,6 +14,10 @@ import { ENV } from "$lib/server/env.server.js";
 export const DELETE: RequestHandler = async ({ params, locals }) => {
   if (!locals.user && !ENV.DEV_BYPASS_AUTH) {
     return json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isUuid(params.id)) {
+    return json({ error: "Invalid file ID format" }, { status: 400 });
   }
 
   try {

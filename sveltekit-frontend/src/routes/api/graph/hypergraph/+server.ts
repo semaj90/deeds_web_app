@@ -9,6 +9,7 @@
  */
 
 import { json }           from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import {
   buildHypergraph4D,
@@ -23,18 +24,28 @@ import {
 const lastBuild = new Map<string, number>();
 const BUILD_COOLDOWN_MS = 5 * 60 * 1000;
 
+const HypergraphQuerySchema = z.object({
+  grade: z.enum(['A', 'B', 'C', 'D']).optional(),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+});
+
 // ── GET ────────────────────────────────────────────────────────────────────────
 export const GET: RequestHandler = async (event) => {
 	const { locals, url } = event;
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  const grade = url.searchParams.get('grade') as HyperEdgeGrade | null;
-  const limitParam = url.searchParams.get('limit');
-  const limit = limitParam ? Math.min(50, Math.max(1, parseInt(limitParam, 10))) : 10;
+  const queryParsed = HypergraphQuerySchema.safeParse({
+    grade: url.searchParams.get('grade') ?? undefined,
+    limit: url.searchParams.get('limit') ?? undefined,
+  });
+  if (!queryParsed.success) {
+    return json({ error: 'Invalid query parameters', issues: queryParsed.error.issues }, { status: 400 });
+  }
+  const { grade, limit } = queryParsed.data;
 
   if (grade) {
     // Return top edges of a specific grade
-    const edges = await queryTopHyperedges(grade, limit);
+    const edges = await queryTopHyperedges(grade as HyperEdgeGrade, limit);
     return json({ edges, total: edges.length });
   }
 

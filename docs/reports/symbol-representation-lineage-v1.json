@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.symbol-representation-lineage.v1",
+  "status": "PROVEN_CONTRACT",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "symbolRepresentationViews": 7,
+  "physicalViews": ["semantic_768", "latent_256"],
+  "derivedViews": ["semantic_mrl_512", "semantic_mrl_256", "semantic_mrl_128", "latent_128", "latent_64"],
+  "nestedAutoencoder": {
+    "model": "nested-semantic-autoencoder-v3-full01",
+    "modelRevision": "3.0",
+    "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+    "latent_256": { "dimensions": 256, "relationship": "PHYSICAL_BOTTLENECK" },
+    "latent_128": { "dimensions": 128, "derivedFrom": "latent_256" },
+    "latent_64": { "dimensions": 64, "derivedFrom": "latent_128" }
+  },
+  "checkpointFileModified": false,
+  "productionActivation": false,
+  "nextGate": "LATENT256_LIVE_READBACK"
+}

@@ -3,6 +3,7 @@ import { AdminAiChatService, formatBrowserContextForPrompt } from '$lib/server/a
 import { gatherAdminContext } from '$lib/server/admin/ai-chat-context.js';
 import { OperatorRouter } from '$lib/server/kag/operator-router.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 import { z } from 'zod';
 
@@ -84,7 +85,7 @@ Do NOT attempt to mutate data or generate code for production use.
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.GEMMA4_MODEL,
+        model: LLM_MODEL_ID,
         messages: [{ role: 'user', content: prompt }],
         stream: false
       })
@@ -96,7 +97,7 @@ Do NOT attempt to mutate data or generate code for production use.
 
     // 5. Log Assistant Reply
     await AdminAiChatService.logMessage(session.id, 'assistant', assistantReply, {
-      model: ENV.GEMMA4_MODEL,
+      model: LLM_MODEL_ID,
       context_used: true,
       hits: systemContext.agentic?.hits || [],
       graphPaths: systemContext.agentic?.graphPaths || [],

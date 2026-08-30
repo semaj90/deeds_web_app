@@ -5,6 +5,7 @@
  */
 
 import type { DispatcherState, NodeContext } from './types.js';
+import { LLM_MODEL_ID } from '../../llm/runtime-contract.js';
 import {
   updateSynthesisPath,
   recordToolCall,
@@ -36,7 +37,7 @@ export async function nodeSynthesizeAnswer(
     const { result, error, duration_ms } = await callMcpTool(ctx, 'answer:synthesize', {
       query: state.query,
       context_packets: state.candidates.slice(0, 5), // top 5 candidates
-      synthesis_model: 'gemma4-legal-iq4xs-direct.gguf',
+      synthesis_model: LLM_MODEL_ID,
       max_tokens: 1024,
       temperature: 0.3,
       include_citations: true,

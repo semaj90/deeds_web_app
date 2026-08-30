@@ -7,6 +7,7 @@ import { desc, eq, sql, count } from 'drizzle-orm';
 import { bifrostChat } from '$lib/server/ollama.js';
 import type { Actions, PageServerLoad } from './$types.js';
 import { evidenceSearchSchema } from './schema.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
 
@@ -126,7 +127,7 @@ export const actions: Actions = {
 
 			const analysisText = await bifrostChat(
 				[{ role: 'user', content: prompt }],
-				'gemma4-legal-iq4xs-direct.gguf',
+				LLM_MODEL_ID,
 				{ maxTokens: 2048, temperature: 0.3, timeoutMs: 30_000 }
 			);
 

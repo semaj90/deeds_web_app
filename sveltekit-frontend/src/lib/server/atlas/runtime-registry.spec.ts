@@ -55,7 +55,7 @@ describe('atlas runtime registry', () => {
       expect.arrayContaining([
         'gemma4-rotorquant-iq4xs-direct',
         'embeddinggemma-768d',
-        'hforf-gguf',
+        'ornith-1.5-9b',
         'embeddinggemma-300m-onnx',
         'packet-jepa-pt',
         'granite-docling-258m',

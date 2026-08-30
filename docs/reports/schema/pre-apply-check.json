@@ -1,28 +1,10 @@
 {
-  "status": "PRE_APPLY_BLOCKED",
-  "blockCount": 1,
-  "warnCount": 3,
-  "noteCount": 2,
-  "blocks": [
-    {
-      "check": "SNAPSHOT_EXISTS",
-      "message": "Missing snapshot for last journal entry: drizzle\\meta\\0040_snapshot.json"
-    }
-  ],
-  "warns": [
-    {
-      "check": "MIGRATION_SQL_EXISTS",
-      "message": "SQL file for last journal entry not found: drizzle\\0040_0040_kanban_task_lifecycle.sql (may have been applied externally)"
-    },
-    {
-      "check": "TABLES_FILTER_RISKY",
-      "message": "tablesFilter may be missing protections for: kg_nodes, kg_edges, warden_, embedded_summaries"
-    },
-    {
-      "check": "LIVE_SCHEMA_STALE",
-      "message": "live-schema-redacted.json is 112.8h old — re-run schema:inspect for accurate drift check"
-    }
-  ],
+  "status": "PRE_APPLY_CLEAR",
+  "blockCount": 0,
+  "warnCount": 0,
+  "noteCount": 3,
+  "blocks": [],
+  "warns": [],
   "notes": [
     {
       "check": "JOURNAL_LAST",
@@ -30,8 +12,12 @@
     },
     {
       "check": "TABLES_FILTER",
-      "message": "tablesFilter present with ~119 exclusion patterns"
+      "message": "tablesFilter present with ~121 exclusion patterns"
+    },
+    {
+      "check": "LIVE_SCHEMA_FRESH",
+      "message": "live-schema-redacted.json is 0.1h old (fresh)"
     }
   ],
-  "generatedAt": "2026-08-25T18:41:17.049Z"
+  "generatedAt": "2026-08-30T20:26:11.903Z"
 }

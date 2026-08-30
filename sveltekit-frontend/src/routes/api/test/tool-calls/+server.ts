@@ -1,14 +1,26 @@
 import { json } from '@sveltejs/kit';
+import { dev } from '$app/environment';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { parseToolCalls, hasToolCalls } from '$lib/server/ai/tool-call-parser.js';
 
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const { content } = await request.json() as { content: string };
+const ToolCallsTestBodySchema = z.object({
+  content: z.string().min(1)
+});
 
-    if (!content) {
-      return json({ error: 'No content provided' }, { status: 400 });
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  if (!dev) return json({ error: 'Test endpoints are dev-only' }, { status: 403 });
+
+  try {
+    const validated = ToolCallsTestBodySchema.safeParse(await request.json());
+    if (!validated.success) {
+      return json(
+        { error: 'Invalid request body', issues: validated.error.issues },
+        { status: 400 }
+      );
     }
+    const { content } = validated.data;
 
     const hasCalls = hasToolCalls(content);
     const parsed = parseToolCalls(content);

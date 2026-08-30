@@ -18,7 +18,13 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { requirePromotionGate, getAuthorizedBy } from '$lib/server/auth/promotion-gate';
+
+const PromoteBodySchema = z.object({
+  prediction_id: z.string().min(1),
+  target_domain: z.string().min(1).optional()
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   // 1. Authorization gate
@@ -26,18 +32,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ error: 'Unauthorized (missing PROMOTION_GATE role)' }, { status: 403 });
   }
 
-  // 2. Parse request
-  let body: { prediction_id: string; target_domain?: string };
+  // 2. Parse + validate request
+  let rawBody: unknown;
   try {
-    body = await request.json();
+    rawBody = await request.json();
   } catch {
     return json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { prediction_id, target_domain } = body;
-  if (!prediction_id) {
-    return json({ error: 'Missing prediction_id' }, { status: 400 });
+  const parsed = PromoteBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return json(
+      { error: 'Invalid request body', issues: parsed.error.issues },
+      { status: 400 }
+    );
   }
+
+  const { prediction_id, target_domain } = parsed.data;
 
   try {
     // 3. Load prediction from Postgres

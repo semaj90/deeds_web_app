@@ -11,6 +11,7 @@ import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbi
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { z } from 'zod';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const tensorrtSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(10000),
@@ -35,12 +36,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			try {
 				const text = await bifrostChat(
 					[{ role: 'user', content: prompt }],
-					'gemma4-legal-iq4xs-direct.gguf',
+					LLM_MODEL_ID,
 					{ temperature: temperature ?? 0.7, maxTokens: maxTokens ?? 2048, timeoutMs: 120_000 }
 				);
 				return json({
 					text,
-					model: 'gemma4-legal-iq4xs-direct.gguf',
+					model: LLM_MODEL_ID,
 					backend: 'llama-server',
 					trtAvailable: false
 				});

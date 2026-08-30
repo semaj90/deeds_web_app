@@ -17,6 +17,7 @@
 
 import { PassThrough, Readable } from 'node:stream';
 import type { ACEContext } from '$lib/server/ace/types.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface ContextStreamConfig {
   llamaBaseUrl: string;
@@ -229,7 +230,7 @@ export function wrapLlamaStreamAsSSE(stream: AsyncGenerator<any, void, unknown>)
             id: `chatcmpl-${Date.now()}-${index++}`,
             object: 'chat.completion.chunk',
             created: Math.floor(Date.now() / 1000),
-            model: 'gemma4-legal-iq4xs-direct.gguf',
+            model: LLM_MODEL_ID,
             choices: [
               {
                 index: 0,

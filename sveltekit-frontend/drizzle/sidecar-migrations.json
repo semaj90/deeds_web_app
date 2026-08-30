@@ -415,6 +415,15 @@
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('atlas_test_registry','atlas_test_aliases','atlas_test_versions','atlas_test_execution_receipts') ORDER BY table_name;\""
     },
     {
+      "file": "manual/kanban_task_lifecycle_baseline.sql",
+      "status": "applied",
+      "reason": "Reviewed Kanban-only persistence slice. Applied transactionally and read back on PostgreSQL 18.4; no task rows were inserted.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-08-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name LIKE 'kanban_%' ORDER BY table_name;\""
+    },
+    {
       "file": "manual/20260818_atlas_identity_alias_decisions_v1.sql",
       "status": "applied",
       "reason": "Reviewed identity-alias decision table required by the Feature Intelligence proof. Applied additively and read back on PostgreSQL 18.4; no rows were backfilled.",

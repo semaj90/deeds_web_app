@@ -251,7 +251,11 @@ export const GET: RequestHandler = async ({ url }) => {
 // DELETE /api/search/rg/cache
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const DELETE: RequestHandler = async ({ url }) => {
+export const DELETE: RequestHandler = async ({ url, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized', ok: false }, { status: 401 });
+  }
+
   try {
     const redis = await getRedis();
     if (!redis) {

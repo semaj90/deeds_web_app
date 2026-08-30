@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.golden-relevance-review-pool-validation-v1",
+  "status": "REVIEW_POOL_STRUCTURALLY_VALID_GRADES_PENDING",
+  "canonicalAuthority": false,
+  "inputPath": ".tmp\\atlas\\golden-relevance-review-pool-bound-v1.ndjson",
+  "queryCount": 60,
+  "candidateCount": 2433,
+  "blankGradeCount": 2433,
+  "completedGradeCount": 0,
+  "revisionBoundQueryCount": 0,
+  "revisionBoundCandidateCount": 0,
+  "missingEvidenceCount": 0,
+  "errors": [],
+  "databaseWrites": false,
+  "importAllowed": false,
+  "productionActivation": false,
+  "nextRequiredStep": "Complete blinded grades 0-3, reviewer/confidence metadata, hard negatives, and revision bindings; then rerun validation."
+}

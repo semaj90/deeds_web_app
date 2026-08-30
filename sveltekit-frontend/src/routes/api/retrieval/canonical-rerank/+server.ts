@@ -25,8 +25,12 @@ const CanonicalRerankRequestSchema = z.object({
   cachePolicy: z.enum(['enabled', 'disabled']).optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
-  const parsed = CanonicalRerankRequestSchema.safeParse(await request.json());
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const parsed = CanonicalRerankRequestSchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
     return json(

@@ -4,9 +4,15 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { getAuditStats, cleanupOldAuditLogs } from '$lib/server/dispatcher/dispatcher-audit-service.js';
+
+const CleanupQuerySchema = z.object({
+  cleanup: z.enum(['true', 'false']).optional(),
+  retention_days: z.coerce.number().int().min(7).optional().default(30),
+});
 
 /**
  * GET /api/dispatcher/audit/stats
@@ -55,8 +61,19 @@ export const POST: RequestHandler = async ({ url, locals }) => {
       );
     }
 
-    if (url.searchParams.get('cleanup') === 'true') {
-      const retention_days = Math.max(parseInt(url.searchParams.get('retention_days') || '30', 10), 7);
+    const queryParsed = CleanupQuerySchema.safeParse({
+      cleanup: url.searchParams.get('cleanup') ?? undefined,
+      retention_days: url.searchParams.get('retention_days') ?? undefined,
+    });
+    if (!queryParsed.success) {
+      return json(
+        { success: false, error: 'Invalid query parameters', issues: queryParsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    if (queryParsed.data.cleanup === 'true') {
+      const retention_days = queryParsed.data.retention_days;
       const deleted = await cleanupOldAuditLogs(db, retention_days);
 
       return json({

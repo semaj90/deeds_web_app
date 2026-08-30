@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.user) throw redirect(303, '/login?redirect=/admin/atlas');
@@ -13,15 +14,20 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
 
+	const documentGovernancePromise = fetch('/api/admin/atlas/document-governance')
+		.then(async (r) => (r.ok ? await r.json() : null))
+		.catch(() => null);
+
 	const cacheStatsPromise = locals.user.role === 'admin'
 		? fetch('/api/admin/cache-stats')
 			.then(async (r) => (r.ok ? await r.json() : null))
 			.catch(() => null)
 		: Promise.resolve(null);
 
-	const [health, runtimeRegistry, cacheStats] = await Promise.all([
+	const [health, runtimeRegistry, documentGovernance, cacheStats] = await Promise.all([
 		healthPromise,
 		runtimeRegistryPromise,
+		documentGovernancePromise,
 		cacheStatsPromise
 	]);
 
@@ -45,10 +51,12 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	return {
 		health,
 		runtimeRegistry,
+		documentGovernance,
 		cacheStats,
 		workflowStatus: workflowStatus?.status ?? null,
-		rotorquantModelPath: ENV.HFORF_MODEL_PATH ?? ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? 'models/hfor/hforf.gguf',
-		hforfModelPath: ENV.HFORF_MODEL_PATH ?? 'models/hfor/hforf.gguf',
+		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
+		hforfModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
+		llmModelId: LLM_MODEL_ID,
 		embeddingOnnxPath: 'models/embeddinggemma_300m_onnx/model.onnx',
 		packetJepaPath: 'models/packet-jepa/packet-jepa.pt',
 		embedModel: ENV.OLLAMA_EMBED_MODEL,

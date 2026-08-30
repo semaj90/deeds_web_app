@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { AdminAiChatService } from '$lib/server/admin/ai-chat-service.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * POST /api/admin/ai-chat/summarize-panel
@@ -86,7 +87,7 @@ schema changes, or destructive actions.
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:    ENV.GEMMA4_MODEL,
+        model:    LLM_MODEL_ID,
         messages: [{ role: 'user', content: prompt }],
         stream:   false,
       }),
@@ -118,7 +119,7 @@ schema changes, or destructive actions.
       style,
       summary,
       durationMs: Date.now() - t0,
-      model:      ENV.GEMMA4_MODEL,
+      model:      LLM_MODEL_ID,
       sessionId:  sessionId ?? null,
     });
   } catch (err) {

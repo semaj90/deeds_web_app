@@ -7,9 +7,17 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { createHash } from 'node:crypto';
 import { runLocalDeepResearch, streamLocalDeepResearchSynthesis, type LDRConfig } from '$lib/server/ldr/ldr-orchestrator';
 import { buildOkfTopicAnalysis } from '$lib/server/atlas/okf-topic-ingestion.js';
+
+const LdrResearchBodySchema = z.object({
+  query: z.string().min(1, 'query must not be empty'),
+  maxResults: z.number().int().positive().max(100).optional().default(15),
+  maxDocs: z.number().int().positive().max(50).optional().default(10),
+  temperature: z.number().min(0).max(2).optional().default(0.3),
+});
 
 function buildLdrOkf(query: string, synthesis: string, sources: Array<{ url: string; title: string }>) {
   const topicHash = createHash('sha256').update(query.trim().toLowerCase()).digest('hex').slice(0, 16);
@@ -92,18 +100,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   // Parse request
-  let body: { query?: string; maxResults?: number; maxDocs?: number; temperature?: number };
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: 'Invalid JSON body' }, { status: 400 });
+  const rawBody = await request.json().catch(() => null);
+  const parsed = LdrResearchBodySchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { query, maxResults = 15, maxDocs = 10, temperature = 0.3 } = body;
-
-  if (!query || query.trim().length === 0) {
-    return json({ error: 'Missing required field: query' }, { status: 400 });
-  }
+  const { query, maxResults, maxDocs, temperature } = parsed.data;
 
   const config: LDRConfig = {
     maxWebResults: maxResults,
