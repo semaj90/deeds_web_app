@@ -24,6 +24,7 @@ if (rows.length !== 5 || !rows[0]?.checkpoint) {
 const ranked = rows.map((row, index) => ({
   id: `projection-${index}`,
   identity: {
+    candidateId: row.id,
     qdrantPointId: `projection-${index}`,
     packetKey: row.id,
     sourceRef: row.sourceRef,
