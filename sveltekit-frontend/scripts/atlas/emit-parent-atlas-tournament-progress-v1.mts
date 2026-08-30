@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { applyParentAtlasAgenticReceiptProjectionV1 } from '../../src/lib/server/atlas/tournament/parent-atlas-agentic-receipt-projection-v1.js';
+import { applyParentAtlasCacheReceiptProjectionV1 } from '../../src/lib/server/atlas/tournament/parent-atlas-cache-receipt-projection-v1.js';
 import { loadParentAtlasTournamentSnapshotV1 } from '../../src/lib/server/atlas/tournament/parent-atlas-tournament-receipt-aggregator-v1.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -13,7 +14,8 @@ const REPO_ROOT = path.resolve(SVELTEKIT_ROOT, '..');
 const OUTPUT = path.resolve(REPO_ROOT, 'docs/reports/parent-atlas-tournament-progress-v1.json');
 
 const base = await loadParentAtlasTournamentSnapshotV1(REPO_ROOT);
-const snapshot = await applyParentAtlasAgenticReceiptProjectionV1(REPO_ROOT, base);
+const agentic = await applyParentAtlasAgenticReceiptProjectionV1(REPO_ROOT, base);
+const snapshot = await applyParentAtlasCacheReceiptProjectionV1(REPO_ROOT, agentic);
 await mkdir(path.dirname(OUTPUT), { recursive: true });
 await writeFile(OUTPUT, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
 
@@ -27,5 +29,6 @@ console.log(JSON.stringify({
 	remainingGateCount: snapshot.progress.remainingGates.length,
 	acceptedReceiptCount: snapshot.sources.filter((item) => item.accepted).length,
 	agenticTelemetry: snapshot.agenticTelemetry,
+	cacheTelemetry: snapshot.cacheTelemetry,
 	output: path.relative(REPO_ROOT, OUTPUT).replaceAll('\\', '/')
 }, null, 2));
