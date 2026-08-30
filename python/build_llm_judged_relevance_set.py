@@ -47,6 +47,12 @@ SEMANTIC_POOL_K = 50
 SAMPLE_SIZE = 60
 SEED = 684453
 SUMMARY_TRUNCATE = 220
+# GA8-HARDEN-FINAL item 3: an explicit sampler seed, bound into every judgment record and the
+# final receipt, so a judging run is replayable/auditable rather than an unrecorded one-off.
+# temperature=0 alone is not sufficient replay identity on llama.cpp -- the RNG seed is a
+# distinct axis from temperature and is not implied by it.
+JUDGE_SEED = 20260830
+JUDGE_TEMPERATURE = 0
 
 
 def embed_query(text: str) -> list[float]:
@@ -67,7 +73,8 @@ def llama_chat_stream(messages: list[dict], max_tokens: int = 4000) -> str:
         "model": JUDGE_MODEL,
         "messages": messages,
         "max_tokens": max_tokens,
-        "temperature": 0,
+        "temperature": JUDGE_TEMPERATURE,
+        "seed": JUDGE_SEED,
         "stream": True,
     }
     resp = requests.post(f"{LLAMA_URL}/v1/chat/completions", json=payload, stream=True, timeout=180)
@@ -181,6 +188,9 @@ def main() -> None:
                     "llm_judged_relevant_packet_keys": relevant_ids,
                     "imports_relevant_packet_keys": entry["relevant_packet_keys"],
                     "overlap_with_imports_relevant": len(set(relevant_ids) & set(entry["relevant_packet_keys"])),
+                    "judge_model": JUDGE_MODEL,
+                    "judge_seed": JUDGE_SEED,
+                    "judge_temperature": JUDGE_TEMPERATURE,
                 }
                 out.write(json.dumps(record) + "\n")
                 written += 1
@@ -196,6 +206,10 @@ def main() -> None:
         "written": written,
         "skipped_empty_pool": skipped_empty_pool,
         "out_path": OUT_PATH,
+        "judge_model": JUDGE_MODEL,
+        "judge_seed": JUDGE_SEED,
+        "judge_temperature": JUDGE_TEMPERATURE,
+        "sample_seed": SEED,
     }))
 
 

@@ -1588,3 +1588,60 @@ unprompted on a careful, self-aware research thread (see the circularity discuss
 above) without explicit go-ahead. Whoever picks this up: items 1, 3, 5, 6 are the well-scoped,
 low-risk ones (single-function changes); items 2 and 4 need a closer read of the receipt/eval
 code before scoping.
+
+### GA8-HARDEN-FINAL items 1/3/6 implemented (2026-08-30, same session)
+
+Picked up the three low-risk items flagged as open in the prior section, after checking real
+callers first (per this repo's own duplication-prevention discipline).
+
+- [x] **Item 1 (pagerank_l1 NULL fail-closed)**: `pagerank-authority.ts::resolvePageRankAuthority()`
+  now returns an additive `l1Status: 'ABSENT' | 'PRESENT' | 'CORRUPT'` field, distinguishing a
+  legitimately-absent `pagerank_l1` (rows predating this column -- normal, fallback to
+  raw/legacy is fine) from a present-but-non-finite value (NaN/Infinity -- a real data-integrity
+  bug). `pickPageRankAuthorityScore()` now throws `PAGERANK_L1_CORRUPT_FAIL_CLOSED` on the
+  CORRUPT case instead of silently substituting a different-source number with no caller-visible
+  signal. Verified both callers (`feature-row-v1.ts` already throws its own error on `null`, so
+  this composes cleanly; `canonical-hyperrag-adapter.ts` uses the non-throwing
+  `resolvePageRankAuthority()` directly, unaffected). New test file
+  `pagerank-authority.spec.ts` (7 tests), plus the 2 pre-existing `feature-row-v1.test.ts` tests
+  still pass -- 9/9 green. One unrelated pre-existing failure found in the same directory
+  (`pagerank-contract.test.ts` expects `PAGERANK_CONTRACT_VERSION` to be
+  `atlas.pagerank.authority.v1`, actual value is `atlas.pagerank-authority.v1` -- different file,
+  different constant, not touched by this change, not fixed here -- flagged for whoever owns
+  that contract next).
+- [x] **Item 3 (LLM judge seed + revision binding)**: `python/build_llm_judged_relevance_set.py`
+  had a `SEED` constant already, but only for *which queries get sampled* (`random.Random(SEED)`),
+  not for the actual `llama-server` judging call -- `temperature=0` alone is not sufficient
+  replay identity on llama.cpp (seed is a distinct axis). Added `JUDGE_SEED`/`JUDGE_TEMPERATURE`
+  constants, wired `"seed": JUDGE_SEED` into the `/v1/chat/completions` payload, and recorded
+  `judge_model`/`judge_seed`/`judge_temperature` in every per-entry ndjson record and the final
+  summary receipt, so a run's judgments are now traceable to the exact sampler config that
+  produced them.
+- [x] **Item 6 (degenerate zero-range feature detection)**: found the real min-max-style
+  normalization in `python/benchmark_ga8_graph_feature_ablation.py::run_entry()` --
+  `max_pr = max(...) or 1.0` -- which silently produces `pagerank_norm = 0` for every candidate
+  in a pool where every pagerank value is 0 (or all tied), indistinguishable from a legitimately
+  low-but-real signal. Added a `pagerank_degenerate` boolean per entry (zero max, or zero range
+  across the pool) and a `degenerate_pagerank_entries` count in the run summary/receipt, so a
+  reader can see how many entries contributed zero real discriminative power to the
+  `semantic_plus_pagerank` average instead of that being silently invisible.
+
+**Not done this round** (correcting the original review's framing, not just deferring):
+- **Item 2** (graph provenance receipt SHA-256 verify) -- still not checked; needs a closer read
+  of how `ga8-blend-weight-sweep-v1.json`/`-llm-judged-v1.json` are consumed downstream, if at
+  all, before scoping a fix.
+- **Items 4 and 5** (nDCG eligibility split, `metricRevision` constant like
+  `NDCG_EXP2_GAIN_LOG2_DISCOUNT_V1`) -- **the critique's framing doesn't match live code**: this
+  pipeline (`sweep_ga8_blend_weight.py`, `benchmark_ga8_graph_feature_ablation.py`,
+  `sweep_llm_judged_relevance.py`) computes only `recallAt10`/`reciprocalRankAt10`
+  (`eval_ranking()`); nDCG is not computed anywhere in this GA8 thread (confirmed via grep --
+  the only nDCG code in the repo is an older, unrelated `scripts/atlas/benchmark-retrieval-ndcg10.mjs`
+  that scores `community_confidence`, not this pipeline at all). Implementing an nDCG-specific
+  eligibility rule and metric-revision tag here would be inventing a metric this pipeline doesn't
+  use rather than hardening one it does. The underlying concern (tag the exact metric formula so
+  future comparisons can verify they're apples-to-apples) is still valid for the real
+  `recallAt10`/`reciprocalRankAt10` definitions here -- worth doing as its own follow-up, but
+  distinct from what the critique specifically asked for.
+
+Python syntax verified (`python -m py_compile`) on both edited files; no live run executed
+(would hit real Postgres + llama-server, out of scope for a hardening-only pass).

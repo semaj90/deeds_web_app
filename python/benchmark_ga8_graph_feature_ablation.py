@@ -155,7 +155,16 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
         r["semantic_score"] = cosine(cv / np.linalg.norm(cv), query_vec_norm)
         r["pagerank"] = pagerank_by_id.get(r["id"], 0.0)
 
-    max_pr = max((r["pagerank"] for r in pool), default=0.0) or 1.0
+    # GA8-HARDEN-FINAL item 6: a zero-range pagerank pool (every candidate scores 0, or all
+    # candidates tie) has no discriminative power at all -- normalizing it still produces a
+    # numeric pagerank_norm (silently 0 via the `or 1.0` divisor guard), which looks like a
+    # legitimate low-but-real signal rather than "this feature contributed nothing for this
+    # entry." Flag it explicitly so downstream aggregation can exclude these entries from a
+    # "pagerank helps" claim instead of silently averaging in meaningless blend results.
+    pr_values = [r["pagerank"] for r in pool]
+    max_pr_raw = max(pr_values, default=0.0)
+    pagerank_degenerate = max_pr_raw <= 0.0 or (max(pr_values) - min(pr_values) <= 0.0)
+    max_pr = max_pr_raw or 1.0
     for r in pool:
         r["pagerank_norm"] = r["pagerank"] / max_pr
 
@@ -169,6 +178,7 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
         "pool_size": len(pool),
         "neighbor_rows_added": len(neighbor_rows),
         "pagerank_coverage": sum(1 for v in pagerank_by_id.values() if v > 0),
+        "pagerank_degenerate": pagerank_degenerate,
         "semantic_only": eval_ranking([r["id"] for r in semantic_only_ranked], relevant_set, FINAL_K),
         "semantic_plus_pagerank": eval_ranking([r["id"] for r in blended_ranked], relevant_set, FINAL_K),
     }
@@ -195,6 +205,8 @@ def main() -> None:
     finally:
         conn.close()
 
+    degenerate_pagerank_entries = sum(1 for r in results if r.get("pagerank_degenerate"))
+
     summary = {}
     for policy in ["semantic_only", "semantic_plus_pagerank"]:
         recalls = [r[policy]["recallAt10"] for r in results if r[policy]["recallAt10"] is not None]
@@ -213,6 +225,7 @@ def main() -> None:
         "sample_size": len(sample),
         "skipped_unreachable_even_with_neighbors": skipped_unreachable,
         "evaluated_entries": len(results),
+        "degenerate_pagerank_entries": degenerate_pagerank_entries,
         "semantic_pool_k": SEMANTIC_POOL_K,
         "final_k": FINAL_K,
         "blend_semantic_weight": BLEND_SEMANTIC_WEIGHT,
