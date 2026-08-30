@@ -39,6 +39,11 @@ export const workflowActionEventSchema = z.object({
   resourceRefs: z.array(workflowResourceRefSchema).default([]),
   evidenceRefs: z.array(id).default([]),
   artifactRefs: z.array(id).default([]),
+  /** Aggregate execution telemetry only; no hidden reasoning or KV-cache contents. */
+  tokensUsed: z.number().int().nonnegative().optional(),
+  /** Source/worktree edits are distinct from build/data artifactRefs. */
+  filesEdited: z.array(z.string().trim().min(1)).max(4096).optional(),
+  openspecChange: z.string().trim().min(1).optional(),
   startedAt: z.string().datetime().optional(),
   completedAt: z.string().datetime().optional(),
   errorCode: z.string().min(1).optional(),
