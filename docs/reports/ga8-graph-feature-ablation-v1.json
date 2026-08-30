@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.ga8-graph-feature-ablation.v1",
+  "canonical_authority": false,
+  "note": "Candidate pool = semantic ANN top-50 UNION query's real 1-hop IMPORTS neighbors, guaranteeing relevant packets are reachable -- fixes the pool-construction flaw in the prior attempt (semantic-only ANN rarely contains true importers). Measures whether ranking policy (semantic-only vs semantic+pagerank blend) matters GIVEN a pool that contains the answer, not whether it can be found at all.",
+  "golden_set_total_entries": 646,
+  "sample_size": 10,
+  "skipped_unreachable_even_with_neighbors": 0,
+  "evaluated_entries": 10,
+  "semantic_pool_k": 50,
+  "final_k": 10,
+  "blend_semantic_weight": 0.7,
+  "seed": 684453,
+  "summary": {
+    "semantic_only": {
+      "avg_recall_at_10": 0.0024390243902439024,
+      "avg_mrr_at_10": 0.1,
+      "n": 10
+    },
+    "semantic_plus_pagerank": {
+      "avg_recall_at_10": 0.015989159891598916,
+      "avg_mrr_at_10": 0.043333333333333335,
+      "n": 10
+    }
+  }
+}
