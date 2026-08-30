@@ -21,8 +21,6 @@ export const REPAIR_FEATURE_DERIVATIONS = [
   'OTHER_DERIVED',
 ] as const;
 
-// The runtime validator rejects UNAVAILABLE artifacts. Keeping the input type broad lets persisted
-// or untrusted data be checked rather than making the defensive branch unreachable to TypeScript.
 export type RepairFeatureProducerStateV1 = RepairFeaturePresenceState;
 export type RepairFeatureDerivationV1 = (typeof REPAIR_FEATURE_DERIVATIONS)[number];
 
@@ -96,7 +94,7 @@ export interface RepairFeatureProducerSetV1 {
 }
 
 function stable(value: unknown): string {
-  if (value === undefined) return '\"__undefined__\"';
+  if (value === undefined) return '"__undefined__"';
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   const record = value as Record<string, unknown>;
@@ -115,6 +113,7 @@ function assertRevisionToken(value: string, code: string): void {
   if (!value || value.trim() !== value || /\s/.test(value) || value.length > 512) throw new Error(code);
 }
 
+/** Existing corpus/ordinal receipts use both sha256:<hex> and bare 64-hex encodings. */
 function assertSha256Checksum(value: string, code: string): void {
   if (!/^(?:sha256:)?[0-9a-f]{64}$/i.test(value)) throw new Error(code);
 }
@@ -212,25 +211,30 @@ function artifactBody(artifact: Omit<RepairFeatureProducerArtifactV1, 'artifactC
 }
 
 export function verifyRepairFeatureProducerArtifactV1(artifact: RepairFeatureProducerArtifactV1): void {
+  if (!artifact || typeof artifact !== 'object') throw new Error('REPAIR_FEATURE_ARTIFACT_NOT_OBJECT');
   if (artifact.schema !== REPAIR_FEATURE_PRODUCER_ARTIFACT_SCHEMA) throw new Error('REPAIR_FEATURE_ARTIFACT_SCHEMA_INVALID');
   if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(artifact.featureName)) throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${artifact.featureName}`);
   if (!REPAIR_FEATURE_PRESENCE_STATES.includes(artifact.state) || artifact.state === 'UNAVAILABLE') throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${artifact.featureName}`);
+  if (!Array.isArray(artifact.rows)) throw new Error(`REPAIR_FEATURE_ARTIFACT_ROWS_INVALID:${artifact.featureName}`);
   assertRevisionToken(artifact.candidateSnapshotRevision, `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${artifact.featureName}`);
   assertSha256Checksum(artifact.ordinalMapChecksum, `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${artifact.featureName}`);
   assertPrefixedSha256(artifact.inputChecksum, `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${artifact.featureName}`);
   assertPrefixedSha256(artifact.outputChecksum, `REPAIR_FEATURE_ARTIFACT_OUTPUT_CHECKSUM_INVALID:${artifact.featureName}`);
   assertPrefixedSha256(artifact.artifactChecksum, `REPAIR_FEATURE_ARTIFACT_CHECKSUM_INVALID:${artifact.featureName}`);
   if (!Number.isInteger(artifact.candidateRowCount) || artifact.candidateRowCount <= 0) throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_COUNT_INVALID:${artifact.featureName}`);
-  if (!artifact.producerId.trim() || !artifact.producerRevision.trim()) throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${artifact.featureName}`);
+  if (typeof artifact.producerId !== 'string' || typeof artifact.producerRevision !== 'string' || !artifact.producerId.trim() || !artifact.producerRevision.trim()) {
+    throw new Error(`REPAIR_FEATURE_ARTIFACT_PRODUCER_INVALID:${artifact.featureName}`);
+  }
   validateDerivationMetadata(artifact);
 
   const rows = normalizedRows(artifact.rows);
   const ordinals = rows.map((row) => row.candidateOrdinal);
   if (new Set(ordinals).size !== ordinals.length) throw new Error(`REPAIR_FEATURE_ARTIFACT_DUPLICATE_ORDINAL:${artifact.featureName}`);
   for (const row of rows) {
+    if (!row || typeof row !== 'object') throw new Error(`REPAIR_FEATURE_ARTIFACT_ROW_INVALID:${artifact.featureName}`);
     if (!Number.isInteger(row.candidateOrdinal) || row.candidateOrdinal < 0 || row.candidateOrdinal >= artifact.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${artifact.featureName}:${row.candidateOrdinal}`);
     if (!Number.isFinite(row.value)) throw new Error(`REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${artifact.featureName}:${row.candidateOrdinal}`);
-    if (row.inputRowChecksum != null) assertPrefixedSha256(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${artifact.featureName}:${row.candidateOrdinal}`);
+    if (row.inputRowChecksum != null) assertSha256Checksum(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${artifact.featureName}:${row.candidateOrdinal}`);
   }
   if ((artifact.state === 'PROVEN' || artifact.state === 'DERIVED') && rows.length !== artifact.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${artifact.featureName}`);
   if (artifact.state === 'PARTIAL' && (rows.length === 0 || rows.length === artifact.candidateRowCount)) throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${artifact.featureName}`);
@@ -244,6 +248,7 @@ export function verifyRepairFeatureProducerArtifactV1(artifact: RepairFeaturePro
 export function buildRepairFeatureProducerArtifactV1(input: BuildRepairFeatureProducerArtifactInputV1): RepairFeatureProducerArtifactV1 {
   if (!REPAIR_OVERLAY_FEATURE_NAMES.includes(input.featureName)) throw new Error(`REPAIR_FEATURE_ARTIFACT_FEATURE_INVALID:${input.featureName}`);
   if (input.state === 'UNAVAILABLE') throw new Error(`REPAIR_FEATURE_ARTIFACT_STATE_INVALID:${input.featureName}`);
+  if (!Array.isArray(input.rows)) throw new Error(`REPAIR_FEATURE_ARTIFACT_ROWS_INVALID:${input.featureName}`);
   assertRevisionToken(input.candidateSnapshotRevision, `REPAIR_FEATURE_ARTIFACT_CANDIDATE_SNAPSHOT_INVALID:${input.featureName}`);
   assertSha256Checksum(input.ordinalMapChecksum, `REPAIR_FEATURE_ARTIFACT_ORDINAL_MAP_INVALID:${input.featureName}`);
   assertPrefixedSha256(input.inputChecksum, `REPAIR_FEATURE_ARTIFACT_INPUT_CHECKSUM_INVALID:${input.featureName}`);
@@ -257,7 +262,7 @@ export function buildRepairFeatureProducerArtifactV1(input: BuildRepairFeaturePr
   for (const row of rows) {
     if (!Number.isInteger(row.candidateOrdinal) || row.candidateOrdinal < 0 || row.candidateOrdinal >= input.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_ORDINAL_OUT_OF_RANGE:${input.featureName}:${row.candidateOrdinal}`);
     if (!Number.isFinite(row.value)) throw new Error(`REPAIR_FEATURE_ARTIFACT_VALUE_NON_FINITE:${input.featureName}:${row.candidateOrdinal}`);
-    if (row.inputRowChecksum != null) assertPrefixedSha256(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${input.featureName}:${row.candidateOrdinal}`);
+    if (row.inputRowChecksum != null) assertSha256Checksum(row.inputRowChecksum, `REPAIR_FEATURE_ARTIFACT_ROW_INPUT_CHECKSUM_INVALID:${input.featureName}:${row.candidateOrdinal}`);
   }
   if ((input.state === 'PROVEN' || input.state === 'DERIVED') && rows.length !== input.candidateRowCount) throw new Error(`REPAIR_FEATURE_ARTIFACT_COMPLETE_STATE_INCOMPLETE:${input.featureName}`);
   if (input.state === 'PARTIAL' && (rows.length === 0 || rows.length === input.candidateRowCount)) throw new Error(`REPAIR_FEATURE_ARTIFACT_PARTIAL_STATE_NOT_PARTIAL:${input.featureName}`);
@@ -366,6 +371,7 @@ export function buildRepairFeatureProducerSetV1(input: {
   assertRevisionToken(input.candidateSnapshotRevision, 'REPAIR_FEATURE_SET_CANDIDATE_SNAPSHOT_INVALID');
   assertSha256Checksum(input.ordinalMapChecksum, 'REPAIR_FEATURE_SET_ORDINAL_MAP_INVALID');
   if (!Number.isInteger(input.candidateRowCount) || input.candidateRowCount <= 0) throw new Error('REPAIR_FEATURE_SET_ROW_COUNT_INVALID');
+  if (!Array.isArray(input.artifacts)) throw new Error('REPAIR_FEATURE_SET_ARTIFACTS_INVALID');
   if (input.artifacts.length === 0) throw new Error('REPAIR_FEATURE_SET_EMPTY');
 
   const body = buildProducerSetBody(input);
@@ -373,7 +379,14 @@ export function buildRepairFeatureProducerSetV1(input: {
 }
 
 export function verifyRepairFeatureProducerSetV1(set: RepairFeatureProducerSetV1): void {
+  if (!set || typeof set !== 'object') throw new Error('REPAIR_FEATURE_SET_NOT_OBJECT');
   if (set.schema !== REPAIR_FEATURE_PRODUCER_SET_SCHEMA) throw new Error('REPAIR_FEATURE_SET_SCHEMA_INVALID');
+  if (!Array.isArray(set.artifacts)) throw new Error('REPAIR_FEATURE_SET_ARTIFACTS_INVALID');
+  if (!Array.isArray(set.producers)) throw new Error('REPAIR_FEATURE_SET_PRODUCERS_INVALID');
+  if (!Array.isArray(set.overlayRows)) throw new Error('REPAIR_FEATURE_SET_OVERLAY_ROWS_INVALID');
+  if (!set.overlayFeatureStates || typeof set.overlayFeatureStates !== 'object' || Array.isArray(set.overlayFeatureStates)) {
+    throw new Error('REPAIR_FEATURE_SET_STATES_INVALID');
+  }
   assertRevisionToken(set.candidateSnapshotRevision, 'REPAIR_FEATURE_SET_CANDIDATE_SNAPSHOT_INVALID');
   assertSha256Checksum(set.ordinalMapChecksum, 'REPAIR_FEATURE_SET_ORDINAL_MAP_INVALID');
   assertPrefixedSha256(set.producerSetChecksum, 'REPAIR_FEATURE_SET_CHECKSUM_INVALID');
@@ -392,8 +405,6 @@ export function verifyRepairFeatureProducerSetV1(set: RepairFeatureProducerSetV1
   const rebuiltChecksum = digest(rebuiltBody);
   if (rebuiltChecksum !== set.producerSetChecksum) throw new Error('REPAIR_FEATURE_SET_CHECKSUM_MISMATCH');
 
-  // The checksum comparison above already binds all derived summaries/rows/states. These explicit
-  // comparisons produce clearer fail-closed errors for persisted tampering.
   if (stable(rebuiltBody.producers) !== stable(set.producers)) throw new Error('REPAIR_FEATURE_SET_SUMMARY_MISMATCH');
   if (stable(rebuiltBody.overlayRows) !== stable(set.overlayRows)) throw new Error('REPAIR_FEATURE_SET_OVERLAY_MISMATCH');
   if (stable(rebuiltBody.overlayFeatureStates) !== stable(set.overlayFeatureStates)) throw new Error('REPAIR_FEATURE_SET_STATE_MISMATCH');
