@@ -21,6 +21,7 @@ export const CANDIDATE_SCALAR_FEATURES = Object.freeze([
   'domainAffinity',
   'executionUtility',
   'memoryUtility',
+  'latentLocalityScore',
 ] as const);
 
 export const CANDIDATE_LANE_BITS = Object.freeze({
@@ -33,6 +34,7 @@ export const CANDIDATE_LANE_BITS = Object.freeze({
   domain: 1 << 6,
   execution: 1 << 7,
   memory: 1 << 8,
+  latent: 1 << 9,
 } as const);
 
 export type CandidateScalarFeatureName = typeof CANDIDATE_SCALAR_FEATURES[number];

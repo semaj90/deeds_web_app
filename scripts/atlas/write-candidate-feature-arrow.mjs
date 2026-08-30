@@ -28,6 +28,7 @@ const FEATURE_NAMES = [
   'domainAffinity',
   'executionUtility',
   'memoryUtility',
+  'latentLocalityScore',
 ];
 
 function parseArg(name, fallback = null) {

@@ -613,3 +613,484 @@ and receipts.
 
 No PostgreSQL, Qdrant, Neo4j, Valkey, symbol-registry, or structural-edge writes were performed
 by this reconciliation.
+
+### Daily Graphify readiness and 384→768 reconciliation (2026-08-30)
+
+- [x] **SEMANTIC-DIMENSION-LIVE-AUDIT** — live schema confirms the canonical
+  `codebase_chunk_index.content_embedding` lane is `halfvec(768)` with `55,169`
+  populated rows out of `55,853`. The migration is operationally live for the
+  canonical path. `embedding_dimension` remains stale (`3,451` rows tagged `768`
+  and `52,402` tagged `384`) and must not be used as the dimensionality authority.
+- [ ] **SEMANTIC-METADATA-RECONCILIATION** — prepare an exact, independently
+  read-back-verified metadata correction plan. Do not update or drop the legacy
+  `content_embedding_384` column until the owner, rollback, and migration receipt
+  are explicitly authorized.
+- [ ] **QDRANT-768-PROJECTION-OWNER** — two 768-dimensional collections remain
+  present, but the live census now distinguishes their roles: `codebase_chunks_768`
+  is the active retrieval projection (`109,776` points with rich payloads), while
+  `codebase_chunks_768_v2` is a smaller lineage/provenance projection (`52,380`
+  points) and is not equivalent. Freeze that distinction and require parity before
+  any v2 cutover. The 384 collections are legacy review targets; the 512 collection
+  remains a valid derived MRL lane and is not migration debris.
+- [ ] **QDRANT-768-PROVENANCE-03** — the bounded live census found `MIXED_HISTORY`
+  for `codebase_chunks_768` and `PARTIAL` provenance for `codebase_chunks_768_v2`,
+  with zero exact packet links in the 50-point sample from either collection.
+  Collection size/vector shape is therefore not sufficient for promotion; exact
+  PostgreSQL identity/revision reconciliation and numerical corroboration remain
+  required.
+- [ ] **QDRANT-768-IDENTITY-RECONCILIATION** — corrected the identity audit to
+  load the canonical `content_embedding` population (`55,169` rows); the prior
+  `1,386`-row result was invalid because it filtered the alternate
+  `content_embedding_768` column. The corrected full read-only audit found
+  `107,796` matched points, `1,299` ambiguous points, `681` unmatched points,
+  and `5,634` duplicate PostgreSQL mappings. Qdrant is therefore not safe for
+  promotion yet; repair must be based on exact identity/revision evidence, not
+  broad payload copying.
+- [x] **GRAPHIFY-READ-ONLY-DRY-RUN-READY** — the required daily Graphify script
+  inventory is complete and the native structural path defaults to non-authoritative
+  dry-run behavior. The ordinary `graphify:daily` family still contains
+  apply-capable stages, so it is not a production-promotion command.
+- [ ] **DAILY-GRAPHIFY-GPU-PROMOTION** — not ready. Graphify run ownership,
+  `GRAPH-RESOLVE-06B` symbol/version enrichment, authoritative graph revision,
+  and live `:8098` RAPIDS parity remain open. NetworkX/cuGraph and AST/CST
+  artifacts may proceed only as bounded read-only projections.
+- [x] **GRAPHIFY-768-BACKFILL-TARGET** — corrected the Graphify 768 backfill
+  script to inspect and write the canonical `content_embedding` column
+  (`halfvec(768)`), not the separate `content_embedding_768` compatibility
+  column. Automatic Ollama fallback remains a separate embedding-runtime
+  cutover decision and is not silently changed by this fix.
+- [ ] **QDRANT-LEGACY-384-SCHEMA-REVIEW** —
+  `sveltekit-frontend/src/lib/server/vector/qdrant-multivector-schema.ts`
+  still declares an older 384-dimensional named-vector contract. It has no
+  verified current caller in the audited path; keep it out of production
+  `semantic_768` retrieval until it is either migrated with a parity proof or
+  archived under the normal recovery process.
+- [ ] **GO-LEGACY-384-BRIDGE-REVIEW** — the unreferenced
+  `sveltekit-frontend/src/lib/server/retrieval/go-service-integration.ts`
+  still documents a 384-dimensional query/vector envelope. The active Go
+  service protobuf path must remain the contract owner; this bridge must be
+  migrated to `semantic_768` with identity/revision fields or archived before
+  it can be reused.
+
+See `docs/reports/daily-graphify-readiness-audit-v1.json` for the live evidence
+and the JSON/JSONL/JSONB/Arrow/RPC ownership split. Historical `.md`/`.txt`
+material under `docs/archive/` and `memory/atlas/documents-atlas.latest.md` still
+contains superseded 384-dimension claims; it is archival context, not an active
+runtime contract, and should be handled through archival reconciliation rather
+  than a bulk rewrite.
+
+### GRAPH-RESOLVE-06B.3 read-only registry replay (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-REPLAY** — current frozen-resolution input contains
+  `353` tree-bound rows. Exact registry replay resolved `85` canonical symbols and
+  `85` symbol versions; `268` rows remain registry-missing. Ambiguous matches,
+  revision mismatches, fuzzy matches, and database writes were all `0`. Next gate:
+  live producer replay; no structural edges are admitted.
+
+### Current Kanban / consistency reconciliation (2026-08-30)
+
+- [x] **KANBAN-POSTGRES-SIDECAR-01** — authorized additive Kanban sidecar applied
+  and read back: five `kanban_*` tables and expected indexes are present. No task
+  rows were inserted. The existing ownership is now confirmed: `0033_odd_moonstone.sql`
+  creates `kanban_tasks` with `feature_id NOT NULL`; `0040_kanban_task_lifecycle.sql`
+  owns lifecycle additions, not a second `feature_id` column.
+- [x] **KANBAN-BOARD-SOURCE-01** — admin loader selects the newest populated valid
+  board source; board tests pass `11/11`. The board remains file-backed.
+- [ ] **KANBAN-TASK-SYNC-01** — not proven. The file-backed export contains
+  `3,312` feature tasks with `feature_id` plus one valid workflow-only GAN task
+  identified by `task_id/story_id/worker_id`; database table existence does not
+  prove synchronization or import completeness.
+- [ ] **DRIZZLE-LEDGER-RECONCILIATION-01** — blocked: live schema comparison
+  reports `159` blockers and `215` warnings, while migration integrity still
+  reports `41` journal migrations without matching applied rows. Do not apply the
+  full migration chain.
+- [ ] **CONSISTENCY-CACHE-01** — Qdrant/PostgreSQL/Neo4j smoke checks pass, but
+  no ACE/BitFrost hot record was found. Cache warming/readback remains unproven.
+
+Evidence: `scripts/atlas/audit-parent-atlas-consistency.mjs`,
+`sveltekit-frontend/drizzle/manual/kanban_task_lifecycle_baseline.sql`,
+`docs/reports/schema/expected-vs-live.diff.json`, and
+`sveltekit-frontend/.tmp/consistency-audit-results.json`.
+
+### GRAPH-RESOLVE-06B.3 registry reconciliation plan (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-RECONCILIATION-PLAN** — read-only reconciliation
+  consumed the frozen `353` tree-bound resolutions and `10,255` active registry
+  rows. Exact current-key matches remain `85`; `268` are `UNRESOLVED`; ambiguous
+  matches and content/revision conflicts are both `0`. The plan checksum is
+  `sha256:8b12c12afd2cf058f09aae2772b4eab66a76dc392789acf1e74db8a20ae6a7c8`.
+- [x] **GRAPH-RESOLVE-06B.3-REVIEW-CANARY** — generated a five-row canary from
+  the unresolved pool for review only. It contains deterministic proposed IDs,
+  but `promotionAuthorized=false`, `symbolVersionWrites=0`, `edgeWrites=0`, and
+  database writes are `0`. Canary checksum:
+  `sha256:f69415d3ce50f73b637b249787966a2936a761246ccbf4a60b0729a50e9566ee`.
+- [ ] **GRAPH-RESOLVE-06B.3-PROMOTION-REVIEW** — blocked pending explicit review
+  of the five proposed registry entries and authorization for any non-production
+  insert. Proposed IDs are not canonical authority and must not be used for edge
+  admission until an authorized apply/readback proof succeeds.
+
+Evidence: `docs/reports/tree-bound-symbol-registry-reconciliation-plan-v1.json`,
+`.tmp/atlas/tree-bound-symbol-registry-reconciliation-plan-v1.ndjson`,
+`docs/reports/current-tree-bound-symbol-registry-input-v1.json`, and
+`docs/reports/current-tree-bound-symbol-registry-canary-v1.json`.
+
+### GRAPH-RESOLVE-06B.3 materializer adapter dry run (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-MATERIALIZER-ADAPTER** — the existing symbol-version
+  materializer contract was exercised read-only against all `440` nominations.
+  It recognized `353` tree-bound rows and `85` exact active canonical registry
+  matches. The remaining `355` rows are unresolved at this adapter boundary,
+  including the `268` tree-bound registry misses and `87` source-only rows.
+  Fuzzy matches and aliases were `0`; canonical and database writes were `0`.
+  Adapter checksum:
+  `sha256:fb7b0d2ce0b98839f422a20c1a45f8f2dc9c8fc7fc4839294d24aec4f9e4e812`.
+- [ ] **GRAPH-RESOLVE-06B.3-MATERIALIZER-APPLY** — not authorized or proven.
+  The adapter is ready for review, but proposed stable IDs remain non-canonical
+  until an explicit non-production insertion authorization and independent
+  readback are completed.
+
+Evidence: `scripts/atlas/adapt-tree-bound-symbol-registry-to-materializer-v1.mjs`,
+`docs/reports/current-materializer-symbol-resolution-adapter-v1.json`, and
+`.tmp/atlas/current-materializer-symbol-resolution-v1.ndjson`.
+
+### GRAPH-RESOLVE-06B.3 registry input audit (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-INPUT-AUDIT** — the `353`-row review input is
+  structurally valid: all required source/revision/span/key fields are present,
+  spans are valid, kinds are accepted, and canonical/proposed-key uniqueness is
+  clean. The audit checksum matches the generated input plan. It remains
+  review-only with `promotionAuthorized=false` and `canonicalWrites=0`.
+- [ ] **GRAPH-RESOLVE-06B.3-AUTHORIZED-APPLY** — still pending explicit review
+  and authorization; no registry or symbol-version insertion is performed by
+  this audit.
+
+Evidence: `scripts/atlas/audit-current-tree-bound-symbol-registry-input-v1.mjs`
+  and `docs/reports/current-tree-bound-symbol-registry-input-audit-v1.json`.
+
+### GRAPH-RESOLVE-06B.3 apply safety check (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-APPLY-DRY-RUN** — the existing five-row apply
+  adapter was invoked without `--apply` or authorization. It accepted the exact
+  canary checksum, attempted `0` rows, performed `0` readbacks, and recorded
+  `databaseWrites=false`, `symbolVersionWrites=0`, and `edgeWrites=0`.
+- [ ] **GRAPH-RESOLVE-06B.3-APPLY** — remains gated by both the explicit
+  `--apply` flag and `ATLAS_AUTHORIZE_SYMBOL_REGISTRY_CANARY=1`; no authorization
+  was supplied in this pass.
+
+Evidence: `scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs`
+  and `docs/reports/current-tree-bound-symbol-registry-canary-apply-v1.json`.
+
+### GRAPH-RESOLVE-06B.4 symbol-version materializer dry run (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.4-MATERIALIZER-DRY-RUN** — the existing materializer
+  was run with the current nomination, adapter, and AST snapshot artifacts. It
+  selected `85` revision-qualified canonical declaration candidates from `440`
+  nominations and attempted `0` writes. The downstream symbol-version apply is
+  therefore structurally ready, but not executed.
+- [ ] **GRAPH-RESOLVE-06B.4-APPLY-READBACK** — pending the five-row registry
+  approval/apply boundary and an explicitly bounded symbol-version insertion.
+
+Evidence: `scripts/atlas/materialize-ast-symbol-versions.mjs` and
+`docs/reports/ast-symbol-version-materialization-v1.json`.
+
+### GRAPH-RESOLVE-06B.4 database safety readback (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.4-NO-WRITE-READBACK** — after the canary and
+  materializer dry runs, the live database still reports `10,255` active symbol
+  registry rows, `285` symbol-version rows, and `285` callable-search rows. The
+  check itself was read-only; no promotion or materialization write occurred.
+
+Evidence: live read-only count query; apply remains separately gated.
+
+### AST-CST-FREEZE-01 bounded coverage replay (2026-08-30)
+
+- [x] **AST-CST-FREEZE-01-OBSERVATION-PROOF** — current Graphify source-bound
+  replay completed read-only for `111` source bindings. Tree-sitter produced
+  `1,592` AST rows with `1,592` chunks and `8,367` structural edges; `84` source
+  rows were extracted and `27` were classified unsupported. Failures were `0`.
+  The snapshot checksum remained
+  `sha256:1adb82b653cb4efcd1decad1bfa07ebbd5e5e37bf8dd6e1af78b5f220ae38de1`.
+- [ ] **AST-CST-FREEZE-01-COMPILER-ENRICHMENT** — compiler/LSP enrichment,
+  AST-grep fact coverage, and full stable-symbol/symbol-version join coverage
+  remain separate downstream measurements; unsupported languages are excluded,
+  not assigned synthetic identities.
+
+Evidence: `scripts/atlas/audit-treesitter-structural-observation-v1.mjs --current`
+  and `docs/reports/treesitter-structural-observation-v1.json`.
+
+### GRAPH-RESOLVE-06B.3 authorized canary apply (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-AUTHORIZED-CANARY** — the explicitly authorized
+  five-row non-production registry insert completed under the transaction-scoped
+  lock and passed readback: `5` attempted, `5` inserted, `5` read back, `0`
+  mismatches. Symbol-version and edge writes remained `0`.
+- [x] **GRAPH-RESOLVE-06B.4-DOWNSTREAM-REFRESH** — after the insert, the adapter
+  was refreshed read-only and now resolves `90` canonical declarations from the
+  `440` nominations; the symbol-version materializer dry run selected all `90`
+  revision-qualified candidates and performed `0` writes.
+- [ ] **GRAPH-RESOLVE-06B.4-SYMBOL-VERSION-APPLY** — remains a separate bounded
+  operation; no symbol versions or graph edges are admitted by this tranche.
+
+Evidence: `docs/reports/current-tree-bound-symbol-registry-canary-apply-v1.json`,
+`docs/reports/current-materializer-symbol-resolution-adapter-v1.json`, and
+`docs/reports/ast-symbol-version-materialization-v1.json`.
+
+### SYMBOL-REGISTRY-CANARY write-safety hardening (2026-08-30)
+
+- [x] **SYMBOL-REGISTRY-CANARY-NONPROD-GUARD** — the bounded writer now refuses
+  any target except `127.0.0.1:5434/legal_ai_db`.
+- [x] **SYMBOL-REGISTRY-CANARY-FULL-READBACK** — readback now compares canonical
+  key, qualified name, nomination ID, source lineage, registry revision, and
+  active status in addition to the stable ID and basic symbol fields.
+- [x] **SYMBOL-REGISTRY-CANARY-REPLAY** — explicit local rerun passed with the
+  frozen checksum: `5` already present, `5` read back, `0` mismatches, and no
+  symbol-version or edge writes. No additional rows were inserted.
+
+Evidence: `scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs`
+  and `docs/reports/current-tree-bound-symbol-registry-canary-apply-v1.json`.
+
+### GRAPH-RESOLVE-06B.3-CANARY / symbol-version boundary (2026-08-30)
+
+- [x] **GRAPH-RESOLVE-06B.3-CANARY-SELECTED** — the five authorized registry
+  nominations were matched back to the refreshed canonical adapter input. All
+  five are canonical and revision-qualified, with no unrelated nominations
+  included.
+- [x] **GRAPH-RESOLVE-06B.3-SYMBOL-VERSION-DRY-RUN** — the existing materializer
+  selected exactly `5` candidates using the frozen canary input and
+  `--limit=5`; source and workspace revisions were present for all five. The
+  run attempted `0` writes and produced no callable projection changes.
+- [ ] **GRAPH-RESOLVE-06B.3-SYMBOL-VERSION-APPLY** — not authorized in this
+  tranche. Stable-symbol registry insertion is complete; symbol-version,
+  callable-search, and graph-edge writes remain off.
+
+Evidence: `scripts/atlas/materialize-ast-symbol-versions.mjs` and
+`docs/reports/ast-symbol-version-materialization-v1.json`.
+
+### LIVE-FEATURE-JOIN-01 bounded matrix replay (2026-08-30)
+
+- [x] **LIVE-FEATURE-JOIN-01-CANARY-REPLAY** — the existing CandidateFeature
+  Matrix manifest proof replayed `15` candidates with `25` features. Baseline
+  and graph-enabled manifests were identical across repeated runs; `7` graph
+  rows were present and `8` were explicitly absent/masked. The result was
+  `GRAPH_FEATURE_MATRIX_REPLAY_PROVEN` with ranking promotion and writes both
+  disabled.
+- [ ] **LIVE-FEATURE-JOIN-01-LIVE-PRODUCER-JOIN** — full live AST/compiler/
+  ontology/latent producer integration is not yet proven. This canary validates
+  the existing matrix/ordinal/mask contract, not corpus-scale feature coverage.
+
+Evidence: `scripts/atlas/prove-current-candidate-feature-matrix-manifest-v1.mts`
+  and `docs/reports/current-candidate-feature-matrix-manifest-v1.json`.
+
+### LATENT-BIND-01 / feature ABI correction (2026-08-30)
+
+- [x] **LATENT-BIND-01** — `latent_256` is now admitted as the physical
+  `LEARNED_AUTOENCODER` representation sourced from `semantic_768`;
+  `latent_128` and `latent_64` use `NESTED_PREFIX_L2_RENORMALIZE` sourced from
+  `latent_256`. Candidate-level validation rejects duplicate bindings and any
+  available derived binding whose source representation is unavailable.
+- [x] **FEATURE-ABI-12-CORRECTION** — removed the temporary
+  `latentLocalityScore` scalar and `latent256Available` duplicate row field,
+  removed the latent lane bit, and restored the columnar/GPU fixture width to
+  `12`. A direct complete-chain contract check passed; an incomplete chain
+  correctly failed closed.
+- [ ] **LATENT-BRIDGE-01** — exact CandidateOrdinal to canonical chunk ID to
+  `latent_256` hydration and checkpoint readback remains a separate proof. No
+  latent retrieval vote or production ranking activation is enabled.
+
+Validation note: focused Vitest and full TypeScript commands started but did not
+complete within the bounded execution window; they are inconclusive, not marked
+as passed.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts`,
+`sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-columnar-v1.ts`,
+and the focused feature fixtures.
+
+### Latent-256 locality feature slot + ContextManifest feature-presence bridge (2026-08-30)
+
+- [x] **CFF-LATENT-01-ROW-SCHEMA** — added `latentLocalityScore` (nullable
+  score) and `latent256Available` (boolean) to `CandidateFeatureRowV1Schema`
+  in `candidate-feature-row-v1.ts`, mirroring the existing
+  `crossEncoderRawScore`/`crossEncoderAvailable`
+  `NULL_PLUS_AVAILABILITY_FLAG` pattern exactly, with a matching
+  `superRefine` invariant. Added `'latent'` to the `laneMask` enum.
+- [x] **CFF-LATENT-02-COLUMNAR-SYNC** — extended `CANDIDATE_SCALAR_FEATURES`
+  (12 → 13) and `CANDIDATE_LANE_BITS` (`latent: 1<<9`) in
+  `candidate-feature-columnar-v1.ts` to keep the GPU-facing columnar encoder
+  in sync with the row schema.
+- [x] **CFF-LATENT-03-FIXTURE-RIPPLE** — the 12→13 width change broke 6
+  hardcoded fixtures across `candidate-feature-gemm-v1.spec.ts`,
+  `candidate-feature-gpu-batch-request-v1.spec.ts`,
+  `candidate-feature-gpu-residency-v1.spec.ts`, and
+  `scripts/atlas/write-candidate-feature-arrow.mjs` (module-level
+  `FEATURE_COUNT`/`F` constants, `featureNames` literal arrays, and
+  `[rows,12]` GPU buffer shape tuples). All fixed and reconciled.
+- [x] **CFF-LATENT-04-TEST-GREEN** — full `src/lib/server/atlas/features/`
+  suite (9 files) now passes 42/42, including Arrow IPC readback.
+- [x] **CFF-CONTEXTMANIFEST-01-PRESENCE-MAP** — added an additive
+  `feature_presence?: Record<string, FeaturePresenceState>` field
+  (`'PROVEN'|'DERIVED'|'PARTIAL'|'UNAVAILABLE'`) to `ContextManifest` in
+  `context-compiler.parent-atlas.ts`, threaded through `compileContext()`
+  and `buildContextManifestFromACE()` in `ace-context-manifest.ts` via a
+  new `deriveFeaturePresenceFromACE()` conservative default (only
+  `semantic768`/`lexical`/`exact`/`graph` are derivable from `ACEContext`
+  today; `ast`/`compiler`/`latent256`/`latent128`/`latent64`/`som` default
+  `UNAVAILABLE` until a real producer wires them). Existing 14 `ContextManifest`
+  consumers unaffected (additive-only). 8/8 tests passing
+  (`ace-context-manifest.spec.ts`).
+- [ ] **CFF-LATENT-05-ROW-PRODUCER-JOIN** — not started: no live producer yet
+  populates `latentLocalityScore`/`latent256Available` on real
+  `CandidateFeatureRowV1` rows from `codebase_chunk_index.latent_256`. The
+  row slot and derive-at-query-time math (`retrieval/latent-derive.ts`,
+  tested against real production data, 4/4 passing) both exist; the join
+  between them does not yet.
+- [ ] **CFF-CONTEXTMANIFEST-02-DEEP-PRESENCE** — `deriveFeaturePresenceFromACE`
+  is a request-level heuristic over `ACEContext` array presence, not a
+  true per-candidate propagation from `CandidateFeatureRowV1.laneMask`/
+  `crossEncoderAvailable`/`latent256Available`. Wiring real candidate-level
+  availability through into the manifest is the next real step in this
+  bridge.
+
+Also this session (same date, adjacent but outside this fabric):
+verified/fixed the 768-dim embedding backfill (`embedding_dimension`
+metadata was stale on 52,402 rows, corrected via `vector_dims()`); ran a
+deep-audit fix pass (34 real auth/Zod fixes across 59 API routes); wired
+BM25 (`ts_rank` on `codebase_chunk_index.search_vector`) into
+`hydrate-candidates.ts`'s `FeatureEnvelope.lexical` (was silently dropped
+before, `canonical-rerank-executor.ts` already had a live 20% weight for
+it); extended `python/backfill_latent_256.py` to also persist `latent_64`
+(200/55,169 rows proven, verified idempotent); froze a checksummed
+`semantic_768` training snapshot (`python/export_frozen_semantic768_snapshot.py`,
+`docs/reports/semantic768-ae-training-snapshot-v4.json`, rowCount=55,169 —
+no corpus growth over the existing v3 checkpoint). No `AE_TRAIN_V4` run has
+been started. See session transcript for the full architecture discussion
+this was scoped from (Candidate Feature Fabric already exists and should
+not get a competing `RepairCandidateFeatureMatrix` owner — extend the
+existing row/snapshot/columnar chain instead, which is what CFF-LATENT-01
+through 04 above do).
+
+### External critique review (2026-08-30, same session, post-handoff-note)
+
+A pasted external analysis (transcript-style, unverified provenance) proposed
+two changes. Both were checked against the live repo before acting on either.
+
+- **Claim: revert `latentLocalityScore` (13th scalar) back to 12** — reasoning
+  given was that `Latent256CandidateProviderV1` only supports
+  candidate↔candidate diversity today, not a real query-side scalar producer,
+  so the slot is premature. **Not reverted this session** — user explicitly
+  deferred this to a future review rather than approving either the revert or
+  a rebuttal in-session. Recorded here as an open decision for next time:
+  `CFF-LATENT-05-ROW-PRODUCER-JOIN` (already logged above as `[ ]`) is exactly
+  the missing piece the critique is pointing at — the row/columnar/GEMM/Arrow
+  slot exists and is test-green, but nothing populates it from real data yet.
+  Whoever picks this up next should decide: build the join (keep 13), or
+  revert to 12 until a producer is designed. Do not do neither silently.
+- **Claim: the committed Graphify embedding writer
+  (`scripts/atlas/backfill-graphify-file-embeddings-768.mjs`) writes to
+  `content_embedding_768` instead of canonical `content_embedding`, and
+  silently falls back from a `:8081` executor to Ollama** — **checked and
+  found FALSE/stale against current main.** Read the live file directly:
+  `CANONICAL_COLUMN = 'content_embedding'` (line 44, with an explicit comment
+  distinguishing it from the smaller `content_embedding_768` compatibility
+  column), and the actual `UPDATE` statement (line 193) writes
+  `content_embedding = $1::halfvec(768)` plus `embedding_model`,
+  `embedding_version`, `embedding_dimension`, `embedding_normalized`,
+  `embedding_created_at` — real provenance, not absent. The Ollama fallback
+  (`embedBatch()`) is not silent: every fallback path (`useCudaEmbed` health
+  probe miss, VRAM guard below `MIN_FREE_VRAM_MB`, mid-run CUDA failure) is
+  `console.warn`/`console.error`-logged with an explicit "fail open, never
+  hard-fail" design rationale in the surrounding comments, and is a documented
+  deliberate choice, not an accidental promotion-boundary leak.
+  `rg "content_embedding_768"` across `scripts/` and `sveltekit-frontend/src`
+  returns zero live-code hits (comment-only reference in this same file).
+  `git log` shows this file's last change is today's
+  `f4d00849d6 Parent Atlas: Qdrant 1.19 upgrade, Ornith 1.5 promotion,
+  embedding backend hardening` — the critique appears to describe a
+  pre-hardening state of this script, not current main. **No fix applied;
+  none was needed.** The one genuinely real, smaller gap the critique also
+  raised — `.slice(0, 12_000)` truncates by JS string length, not by an
+  EmbeddingGemma-tokenizer-qualified token count — is accurate and still
+  open, but is a truncation-precision nit, not the "wrong physical target /
+  unsafe silent fallback" P0 blocker the critique framed it as.
+
+### External critique review, part 2 — LATENT-BIND-01 / LATENT-BRIDGE-01 (2026-08-30)
+
+### LATENT-BRIDGE-01 — read-only hydration receipt completed (2026-08-30)
+
+The existing PostgreSQL provider was strengthened with explicit per-ordinal
+outcomes and duplicate-ID detection. It now distinguishes `AVAILABLE`,
+`MISSING`, `REVISION_MISMATCH`, `INVALID_SHAPE`, and `IDENTITY_UNRESOLVED`;
+the latter is included in the receipt checksum and cannot be silently treated
+as a missing vector. The provider continues to use only the exact
+`codebase_chunk_index.id` supplied by the caller and never derives that ID from
+`packetKey`, a Qdrant point ID, or a path.
+
+The read-only runner
+`sveltekit-frontend/scripts/atlas/prove-latent256-provider-live-readonly-v1.mts`
+was updated to emit the outcome list rather than JSON-serializing `Map` objects
+and to record `databaseWrites: false`. The live replay used 32 ordered
+PostgreSQL chunk IDs and ran twice with the same checkpoint and representation
+inputs:
+
+- `LIVE_READBACK_PROVEN`
+- canonical IDs resolved: 32/32
+- vectors hydrated: 32/32
+- revision mismatches: 0
+- invalid dimensions/non-finite vectors: 0
+- ambiguous rows: 0; identity-unresolved rows: 0
+- candidate drops/reorders: 0/0
+- replay identity parity: true
+- replay checksum parity: true
+- canonical/database writes: 0/0
+- production activation: false
+
+Receipt: `docs/reports/latent256-live-readback-v1.json`.
+This proves the bounded PostgreSQL identity-to-vector hydration boundary and
+replay determinism only; it does not prove retrieval quality, QRELS promotion,
+full-corpus coverage, or production activation.
+
+Continued verifying the same pasted critique's P1 claims against live code.
+
+- **Claim: `CanonicalCandidateV1` is stale, lacks `latent_256`, treats nested
+  latents as direct autoencoder outputs from `semantic_768`** — **checked and
+  found FALSE/stale.** `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts`
+  already has `latent_256`/`latent_128`/`latent_64` in `candidateRepresentationId`
+  (lines 12-14), a `projectionKind` enum including
+  `NESTED_PREFIX_L2_RENORMALIZE` (line 22), and `superRefine` logic (lines
+  48-58) that already enforces exactly what the critique asked for: `latent_256`
+  is `LEARNED_AUTOENCODER` sourced from `semantic_768` (physical), while
+  `latent_128`/`latent_64` are `NESTED_PREFIX_L2_RENORMALIZE` sourced from
+  `latent_256` (derived) — not from `semantic_768` directly. The set-level
+  invariants the critique asked for also already exist:
+  `REPRESENTATION_BINDING_DUPLICATE_ID` (one binding per representationId,
+  line 90) and `REPRESENTATION_BINDING_SOURCE_UNAVAILABLE` (derived
+  availability requires source availability, lines 91-97) in
+  `assertRepresentationBindingSet()`. No fix needed.
+- **Claim: no identity bridge exists between `CandidateOrdinal` and
+  `codebase_chunk_index.id` for `latent_256`, so no `CandidateOrdinal` can
+  legitimately claim latent data yet** — **checked and found ALREADY BUILT.**
+  `sveltekit-frontend/src/lib/server/retrieval/latent256-candidate-provider.ts`
+  (`PostgresLatent256CandidateProvider`) does exactly this: takes
+  `codebase_chunk_index.id` values, reads `latent_256` +
+  `latent_256_checkpoint_revision` directly, buckets every requested id into
+  `found`/`missing`/`revisionMismatch`/`invalidShape`, and returns
+  `vectorsChecksum`/`receiptChecksum` — functionally equivalent to the
+  critique's proposed `CandidateLatent256HydrationReceiptV1`. Its own
+  docstring already states `canonicalAuthority=false`, `queryEncoder=false`,
+  `activeRetrievalLane=false` (matching the critique's own framing) and is
+  consumed by `post-process-reranker.ts`'s `LATENT256_SEMANTIC_DEDUP` step —
+  candidate↔candidate diversity pruning, confirmed live.
+- **What this confirms is still real** (the one part of the critique that
+  was already correctly identified before it arrived): that same provider's
+  docstring is explicit that it is "Not a query-time encoder... no
+  query-latent-vector step here and none is needed for candidate-side
+  diversity pruning." This is the same gap already logged above as
+  `CFF-LATENT-05-ROW-PRODUCER-JOIN` — `latentLocalityScore` on
+  `CandidateFeatureRowV1` has no real producer, because the only live
+  `latent_256` consumer does dedup, not a per-candidate relevance scalar.
+  **Net effect of this review round: every structural claim in the critique
+  (writer target, representation bindings, identity bridge) was already
+  fixed in code that predates the critique; the one substantive gap it
+  raised (no scalar producer for the 13th feature) was already the exact
+  thing flagged as open in the first review-round entry above.** No new
+  code changes made this round — this was a verification-only pass.

@@ -13,8 +13,11 @@
  * specifically so this ambiguity can't recur in code or comments.
  *
  * Active semantic embedding lane: semantic_768 (768-dim, EmbeddingGemma native).
- * latent_128 / latent_64 are topology/routing projections — NOT embedding APIs
- * and never substitutable for semantic_768 at retrieval time.
+ * The NestedSemanticAutoencoder learned family is latent_256 (physical) with
+ * latent_128 / latent_64 as L2-renormalized derived prefixes. These are learned
+ * challenger representations, NOT topology representations, NOT embedding APIs,
+ * and never substitutable for semantic_768 at retrieval time. The distinct older
+ * topology/SOM representation is named topology_ae64_v1 in vector-manifest.ts.
  *
  * 384-dim is retired: no runtime code may read or write it. 512/256/128 are
  * supported EmbeddingGemma MRL-derived reference representations.

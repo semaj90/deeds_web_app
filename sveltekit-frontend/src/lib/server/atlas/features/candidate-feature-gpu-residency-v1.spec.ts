@@ -8,7 +8,7 @@ import {
 } from './candidate-feature-gpu-residency-v1.js';
 
 const H = (value: string) => createHash('sha256').update(value).digest('hex');
-const FEATURE_COUNT = 12;
+const FEATURE_COUNT = 13;
 const PHYSICAL_ROWS = 32;
 
 function canonicalJson(value: unknown): string {
@@ -43,7 +43,7 @@ function pack() {
       'semanticRelevance', 'lexicalRelevance', 'astAffinity', 'graphAuthority',
       'personalizedPageRank', 'communityAffinity', 'manifold4OrientationSimilarity',
       'crossEncoderRawScore', 'crossEncoderCalibratedScore', 'domainAffinity',
-      'executionUtility', 'memoryUtility',
+      'executionUtility', 'memoryUtility', 'latentLocalityScore',
     ],
     featureValues: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),
     featurePresence: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),
@@ -85,13 +85,13 @@ function observation() {
     columnarChecksum: source.columnarChecksum,
     logicalRows: source.logicalRows,
     physicalRows: source.physicalRows,
-    featureCount: 12 as const,
+    featureCount: 13 as const,
     hostStagingMode: 'PINNED_ASYNC' as const,
     gpuExecutionObserved: true as const,
     ipcExported: false as const,
     buffers: [
-      { role: 'feature_values' as const, bufferId: 'b:values', dtype: 'f32' as const, shape: [PHYSICAL_ROWS, 12], sourceChecksum: source.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true as const, readbackVerified: true as const },
-      { role: 'feature_presence' as const, bufferId: 'b:presence', dtype: 'u8' as const, shape: [PHYSICAL_ROWS, 12], sourceChecksum: source.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true as const, readbackVerified: true as const },
+      { role: 'feature_values' as const, bufferId: 'b:values', dtype: 'f32' as const, shape: [PHYSICAL_ROWS, 13], sourceChecksum: source.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true as const, readbackVerified: true as const },
+      { role: 'feature_presence' as const, bufferId: 'b:presence', dtype: 'u8' as const, shape: [PHYSICAL_ROWS, 13], sourceChecksum: source.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true as const, readbackVerified: true as const },
       { role: 'valid_mask' as const, bufferId: 'b:valid', dtype: 'u8' as const, shape: [PHYSICAL_ROWS], sourceChecksum: source.validMaskChecksum, materializedChecksum: H('gpu-valid'), deviceAllocationObserved: true as const, readbackVerified: true as const },
       { role: 'lane_mask' as const, bufferId: 'b:lane', dtype: 'i32' as const, shape: [PHYSICAL_ROWS], sourceChecksum: source.laneMaskChecksum, materializedChecksum: H('gpu-lane-i32'), deviceAllocationObserved: true as const, readbackVerified: true as const },
       { role: 'degraded_identity' as const, bufferId: 'b:degraded', dtype: 'u8' as const, shape: [PHYSICAL_ROWS], sourceChecksum: source.degradedIdentityChecksum, materializedChecksum: H('gpu-degraded'), deviceAllocationObserved: true as const, readbackVerified: true as const },

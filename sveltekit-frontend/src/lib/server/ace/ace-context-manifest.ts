@@ -16,6 +16,7 @@ import {
   type ContextCandidate,
   type ContextLane,
   type ContextSelectionPolicy,
+  type FeaturePresenceState,
 } from './context-compiler.parent-atlas.js';
 import type { ACEContext } from './types.js';
 import { buildAtlasProcessPacket, type AtlasProcessPacket } from '../atlas/process-packets.js';
@@ -179,6 +180,38 @@ export interface ACEContextManifestOptions {
     cacheMisses?: number;
   };
   acePlaybookRevision?: string;
+  /**
+   * Per-representation-family evidence presence to attach to the manifest.
+   * Defaults to deriveFeaturePresenceFromACE(context) when omitted -- pass an
+   * explicit map only when the caller knows more than what's directly
+   * observable on the ACEContext (e.g. it ran latent_256 hydration itself and
+   * knows the real per-candidate hit rate).
+   */
+  featurePresence?: Record<string, FeaturePresenceState>;
+}
+
+/**
+ * Derives a conservative feature-presence map from what's directly observable
+ * on an already-assembled ACEContext. This is intentionally conservative: a
+ * lane with zero results is UNAVAILABLE, not PARTIAL -- the caller must
+ * explicitly upgrade a status if it has stronger knowledge (e.g. "latent_256
+ * hydration ran and covered 80% of candidates" should be passed as PARTIAL
+ * via featurePresence, not left to this default).
+ */
+export function deriveFeaturePresenceFromACE(context: ACEContext): Record<string, FeaturePresenceState> {
+  const has = (arr: unknown[] | undefined) => Array.isArray(arr) && arr.length > 0;
+  return {
+    semantic768: has(context.ragChunks) ? 'PROVEN' : 'UNAVAILABLE',
+    lexical: has(context.kbChunks) || has(context.docChunks) ? 'PROVEN' : 'UNAVAILABLE',
+    exact: has(context.caseChunks) ? 'PROVEN' : 'UNAVAILABLE',
+    graph: has(context.kagNeighbors) ? 'PROVEN' : 'UNAVAILABLE',
+    ast: 'UNAVAILABLE',
+    compiler: 'UNAVAILABLE',
+    latent256: 'UNAVAILABLE',
+    latent128: 'UNAVAILABLE',
+    latent64: 'UNAVAILABLE',
+    som: 'UNAVAILABLE',
+  };
 }
 
 /**
@@ -213,6 +246,7 @@ export function buildContextManifestFromACE(
     rlm_cache_hits: opts.rlmTrace?.cacheHits,
     rlm_cache_misses: opts.rlmTrace?.cacheMisses,
     ace_playbook_revision: opts.acePlaybookRevision,
+    feature_presence: opts.featurePresence ?? deriveFeaturePresenceFromACE(context),
   });
 }
 

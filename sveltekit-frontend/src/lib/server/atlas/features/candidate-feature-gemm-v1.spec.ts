@@ -40,7 +40,7 @@ function fixture() {
     domainAffinity: 0.5,
     executionUtility: 0.25,
     memoryUtility: null,
-    laneMask: ['semantic', 'graph'] as const,
+    laneMask: ['semantic', 'graph'] as ('semantic' | 'graph')[],
     degradedIdentity: false,
     evidenceRefs: candidate.evidenceRefs,
   }));
@@ -55,9 +55,9 @@ describe('candidate feature CPU GEMM reference', () => {
       head: {
         headId: 'head:graph-aware:v1',
         featureRevision: 'feature:test:v1',
-        featureCount: 12,
+        featureCount: 13,
         headCount: 2,
-        weights: [new Array(12).fill(1), new Array(12).fill(0.5)],
+        weights: [new Array(13).fill(1), new Array(13).fill(0.5)],
         bias: [0, 1],
       },
       producerRevision: 'gemm:test:v1',
@@ -73,7 +73,7 @@ describe('candidate feature CPU GEMM reference', () => {
     const columnar = fixture();
     const receipt = scoreCandidateFeatureHeadsCpu({
       columnar,
-      head: { headId: 'head:test:v1', featureRevision: 'feature:test:v1', featureCount: 12, headCount: 1, weights: [new Array(12).fill(0.25)], bias: [0.1] },
+      head: { headId: 'head:test:v1', featureRevision: 'feature:test:v1', featureCount: 13, headCount: 1, weights: [new Array(13).fill(0.25)], bias: [0.1] },
       producerRevision: 'gemm:test:v1',
     });
     assertCandidateFeatureGemmParity({ expected: receipt, actualScores: receipt.scores.map((row) => row.map((score) => score + 1e-7)) });
@@ -83,7 +83,7 @@ describe('candidate feature CPU GEMM reference', () => {
   it('fails closed when a head belongs to another feature revision', () => {
     expect(() => scoreCandidateFeatureHeadsCpu({
       columnar: fixture(),
-      head: { headId: 'head:wrong:v1', featureRevision: 'feature:wrong:v1', featureCount: 12, headCount: 1, weights: [new Array(12).fill(1)], bias: [0] },
+      head: { headId: 'head:wrong:v1', featureRevision: 'feature:wrong:v1', featureCount: 13, headCount: 1, weights: [new Array(13).fill(1)], bias: [0] },
       producerRevision: 'gemm:test:v1',
     })).toThrow('GEMM_FEATURE_REVISION_MISMATCH');
   });

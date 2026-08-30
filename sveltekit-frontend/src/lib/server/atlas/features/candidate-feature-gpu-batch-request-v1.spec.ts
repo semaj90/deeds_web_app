@@ -5,7 +5,7 @@ import { buildCandidateFeatureGpuResidencyLease } from './candidate-feature-gpu-
 
 const H = (value: string) => createHash('sha256').update(value).digest('hex');
 const R = 32;
-const F = 12;
+const F = 13;
 
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -26,8 +26,8 @@ function pack() {
     schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
     candidateSnapshotRevision: 'candidate:r1', ordinalMapChecksum: H('ordinal-map'), featureSnapshotChecksum: H('feature-snapshot'),
     workspaceRevision: 'workspace:r1', featureRevision: 'feature:r1', columnarChecksum: H('columnar'),
-    logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 12,
-    featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility'] as const,
+    logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 13,
+    featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility','latentLocalityScore'] as const,
     featureValues: Array(R * F).fill(0), featurePresence: Array(R * F).fill(0),
     validMask: [1,1,1,...Array(R - 3).fill(0)], laneMaskU16: [1,3,5,...Array(R - 3).fill(0)], degradedIdentity: [0,0,1,...Array(R - 3).fill(0)],
     featureValuesChecksum: H('feature-values'), featurePresenceChecksum: H('feature-presence'), validMaskChecksum: H('valid-mask'), laneMaskChecksum: H('lane-mask-u16'), degradedIdentityChecksum: H('degraded'), gpuPackChecksum: H('gpu-pack'),
@@ -43,10 +43,10 @@ function lease() {
     schema: 'atlas.candidate-feature-gpu-residency-observation.v1', leaseId: 'lease:batch:test:1', deviceId: 0, deviceName: 'test-cuda-device',
     sourceGpuPackChecksum: p.gpuPackChecksum, candidateSnapshotRevision: p.candidateSnapshotRevision, ordinalMapChecksum: p.ordinalMapChecksum,
     featureSnapshotChecksum: p.featureSnapshotChecksum, columnarChecksum: p.columnarChecksum, logicalRows: p.logicalRows, physicalRows: p.physicalRows,
-    featureCount: 12, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
+    featureCount: 13, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
     buffers: [
-      { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,12], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
-      { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,12], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,13], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,13], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'valid_mask', bufferId: 'gpu:valid', dtype: 'u8', shape: [R], sourceChecksum: p.validMaskChecksum, materializedChecksum: H('gpu-valid'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'lane_mask', bufferId: 'gpu:lane', dtype: 'i32', shape: [R], sourceChecksum: p.laneMaskChecksum, materializedChecksum: H('gpu-lane'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'degraded_identity', bufferId: 'gpu:degraded', dtype: 'u8', shape: [R], sourceChecksum: p.degradedIdentityChecksum, materializedChecksum: H('gpu-degraded'), deviceAllocationObserved: true, readbackVerified: true },
