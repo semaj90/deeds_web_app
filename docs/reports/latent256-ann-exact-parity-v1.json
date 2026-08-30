@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.latent256-ann-exact-parity.v1",
+  "canonical_authority": false,
+  "collection": "codebase_chunks_latent256",
+  "corpus_size": 55169,
+  "sample_size": 200,
+  "k": 10,
+  "seed": 684453,
+  "mean_overlap_at_k": 0.9995,
+  "zero_overlap_queries": 0,
+  "duration_s": 3.188279628753662,
+  "ground_truth": "exact cosine top-k over the full 55,169-row latent_256 corpus fetched from Postgres",
+  "candidate": "Qdrant live HNSW /points/search on codebase_chunks_latent256, same query vector, self excluded"
+}
