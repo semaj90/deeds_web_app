@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.golden-relevance-review-pool-v1",
+  "status": "REVIEW_POOL_PREPARED",
+  "canonicalAuthority": false,
+  "sourceCorpusEntries": 646,
+  "sampledQueries": 60,
+  "poolK": 50,
+  "candidateCount": 2433,
+  "blankGrades": 2433,
+  "embeddingModel": "embeddinggemma:latest",
+  "representation": "semantic_768",
+  "databaseWrites": false,
+  "productionActivation": false,
+  "inputChecksum": "sha256:65a3fb542405452e33e0340640c9a7b98d8d3a220692681a5d273de03e95359b",
+  "outputChecksum": "sha256:9b5c77410d878199b4a42f48a4dc9973ff542b9e90cfe47d8c8782a36bd4ac3f",
+  "nextRequiredStep": "Fill grades 0-3 and revision bindings through independent review; do not import proxy hints."
+}
