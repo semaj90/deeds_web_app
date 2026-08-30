@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.semantic-representation-storage-audit-v1",
+  "status": "MATCHES_FROZEN_CONTRACT",
+  "canonicalAuthority": true,
+  "generatedAt": "2026-08-30",
+  "verificationMethod": "Live queries against legal_ai_db.codebase_chunk_index via docker exec legal-ai-postgres psql -- not inferred from column names, docs, or prior session notes.",
+  "queries": {
+    "columnInventory": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name = 'codebase_chunk_index' AND column_name IN ('content_embedding','content_embedding_768','latent_256','latent_128','latent_64') ORDER BY column_name;",
+    "typeAndDims": "SELECT pg_typeof(content_embedding), vector_dims(content_embedding::vector), pg_typeof(latent_256), vector_dims(latent_256::vector) FROM codebase_chunk_index WHERE content_embedding IS NOT NULL AND latent_256 IS NOT NULL LIMIT 1;"
+  },
+  "columnInventory": [
+    { "column": "content_embedding", "dataType": "USER-DEFINED", "udtName": "halfvec", "role": "CANONICAL_SEMANTIC_768", "populated": 55169 },
+    { "column": "content_embedding_768", "dataType": "USER-DEFINED", "udtName": "vector", "role": "NON_CANONICAL_LEGACY_SMALLER_COLUMN", "populated": 1386 },
+    { "column": "latent_256", "dataType": "USER-DEFINED", "udtName": "halfvec", "role": "LEARNED_NESTED_AE_PHYSICAL_BOTTLENECK", "populated": 55169 },
+    { "column": "latent_64", "dataType": "USER-DEFINED", "udtName": "vector", "role": "LEGACY_PERSISTED_AE_COLUMN_UNPOPULATED", "populated": 0 }
+  ],
+  "columnAbsent": [
+    { "column": "latent_128", "expectedRole": "DERIVED_AT_QUERY_TIME_FROM_latent_256_PREFIX_NOT_PERSISTED" }
+  ],
+  "sampleTypeAndDims": {
+    "semanticType": "halfvec",
+    "semanticDims": 768,
+    "latentType": "halfvec",
+    "latentDims": 256
+  },
+  "frozenContractMatch": {
+    "content_embedding_is_halfvec_768": true,
+    "latent_256_is_halfvec_256": true,
+    "latent_128_not_persisted_as_own_column": true,
+    "content_embedding_768_confirmed_non_canonical_by_population_gap": true
+  },
+  "distinctFamiliesConfirmed": {
+    "semanticGeometryFamily": {
+      "owner": "EmbeddingGemma",
+      "canonical": "semantic_768 (content_embedding, halfvec(768))",
+      "derivedMrl": ["semantic_mrl_512", "semantic_mrl_256", "semantic_mrl_128"],
+      "derivationMethod": "prefix truncation of semantic_768 + L2 renormalize, no separate weights",
+      "note": "semantic_mrl_256 and latent_256 both contain 256 numbers but are DIFFERENT coordinate systems -- never cross-query them."
+    },
+    "learnedLatentFamily": {
+      "owner": "NestedSemanticAutoencoder (python/atlas_compute/latent_autoencoder.py)",
+      "canonical": "latent_256 (latent_256 column, halfvec(256), physical forward-pass output)",
+      "derivedNested": ["latent_128", "latent_64"],
+      "derivationMethod": "prefix truncation of latent_256 + L2 renormalize at query time, NOT separately persisted",
+      "liveConsumers": "NONE (per models/nested-semantic-autoencoder/README.md -- deliberate, not an oversight)",
+      "unrelatedLegacySystem": "Redis gpu:autoencoder:latent_64:* (written by scripts/atlas/backfill-latent-vectors.mjs, consumed by train-som-20x20.mjs) is a THIRD, separate system -- different weights, different pipeline, still genuinely ACTIVE via SOM training. Do not conflate with this latent_256 family."
+    },
+    "structuralFamily": {
+      "owner": "Tree-sitter (CST) + ast-grep (structural capture) + LSP (symbol resolution)",
+      "identities": ["treeNodeId", "stableSymbolId", "symbolVersionId"],
+      "note": "Not a vector space. Embeddings never manufacture symbol identity; ast-grep never manufactures stableSymbolId."
+    }
+  },
+  "vectorManifestDriftFound": {
+    "file": "packages/semantic-contracts/src/vector-manifest.ts",
+    "issue": "Prior session edits left semantic768 pointing at postgresColumn content_embedding_768 in some revisions while separately still listing an old latent_64 autoencoder entry as ACTIVE. Both conflict with this audit's live-verified reality: content_embedding is canonical (55,169 populated, halfvec(768)), and the Postgres latent_64 column is unpopulated (0 rows) -- the real active latent_64 lives only in Redis via a different pipeline entirely.",
+    "correctiveDirection": "semantic768 entry must point postgresColumn at content_embedding (not content_embedding_768); latent256 entry should point at latent_256 (halfvec(256)); no entry should claim the Postgres latent_64 column is ACTIVE since it has 0 rows.",
+    "actionTakenThisPass": "None yet -- recorded here as the next correction, not applied in this pass to keep this receipt bounded to verification only."
+  },
+  "indexingPolicyConfirmed": {
+    "pgvectorHnswOnHalfvec": "CURRENT -- content_embedding uses HNSW halfvec_cosine_ops, m=16 ef_construction=200. This is the correct, supported, unchanged path.",
+    "pgvectorExactScan": "ORACLE -- available for correctness verification, not the production path.",
+    "diskann": "CHALLENGER_EXPERIMENT_ONLY -- pgvectorscale (StreamingDiskANN) is referenced in docker/postgres/Dockerfile but is NOT installed on the live running container (pgvector-pgsearch:pg18-local has only the base vector 0.8.3 extension). Zero DiskANN indexes exist live. Not being migrated to; nothing about today's work touches this.",
+    "qdrantCuvs": "ALTERNATE_EXECUTOR -- Qdrant HNSW / future cuVS CAGRA are alternate executors of the same logical semantic lane, not a competing representation authority."
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "modelReembedding": false,
+  "nextRequiredStep": "Fix packages/semantic-contracts/src/vector-manifest.ts to point semantic768 at content_embedding (not content_embedding_768) and correct the latent_64/latent_256 ACTIVE claims, using this receipt as the source of truth rather than re-deriving column identity from names."
+}

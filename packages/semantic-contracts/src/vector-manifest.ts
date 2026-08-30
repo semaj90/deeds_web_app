@@ -40,6 +40,7 @@ export const VectorNameEnum = z.enum([
   'summary_384',
   'symbol_384',
   'ontology_384',
+  'latent_256',
   'latent_128',
   'latent_64',
   'late_interaction',
@@ -174,7 +175,11 @@ export const VECTOR_MANIFESTS = {
     // The logical representation is semantic_768; the live Qdrant
     // projection stores it in the physical named slot `content`.
     qdrantVectorSlot: 'content',
-    postgresColumn: 'content_embedding_768',
+    // Canonical column is content_embedding (halfvec(768), 55,169 populated rows, verified live
+    // via vector_dims() 2026-08-30 -- docs/reports/semantic-representation-storage-audit-v1.json).
+    // content_embedding_768 is a separate, much smaller, non-canonical column (1,386 rows) --
+    // do not point this manifest entry at it.
+    postgresColumn: 'content_embedding',
   },
   semanticMrl512: {
     vectorName: 'semantic_mrl_512' as const,
@@ -231,6 +236,29 @@ export const VECTOR_MANIFESTS = {
     postgresColumn: undefined,
     qdrantVectorSlot: 'title_384',
   },
+  // Learned nested-autoencoder family (semantic_768 -> latent_256 physical bottleneck ->
+  // latent_128/latent_64 derived-at-query-time prefix renormalizations of latent_256, NOT
+  // separate weights and NOT persisted as their own Postgres columns). This is a distinct
+  // representation from the semantic_768/semantic_mrl_* MRL family above -- latent_256 and
+  // semantic_mrl_256 both hold 256 numbers but live in different coordinate systems; never
+  // cross-query them. See models/nested-semantic-autoencoder/README.md for full provenance.
+  latent256: {
+    vectorName: 'latent_256' as const,
+    model: 'nested-semantic-autoencoder-v3-full01',
+    modelRevision: '3.0',
+    dimensions: 256,
+    representation: 'dense' as const,
+    distance: 'Cosine' as const,
+    normalized: true,
+    // Backfilled and parity-proven (55,169/55,169 rows, ANN-vs-exact overlap@10 = 0.9995), but
+    // deliberately has ZERO live retrieval consumers (query-time inference sidecar not yet
+    // built -- an explicit, recorded operator decision, not an oversight). REFERENCE_ONLY
+    // reflects "not authoritative for live retrieval today", not "unproven" or "abandoned".
+    status: 'REFERENCE_ONLY' as const,
+    activatedAt: '2026-08-29T00:00:00Z',
+    postgresColumn: 'latent_256',
+    qdrantVectorSlot: 'latent_256',
+  },
   latent64: {
     vectorName: 'latent_64' as const,
     model: 'atlas-autoencoder-768x64-v1',
@@ -239,8 +267,15 @@ export const VECTOR_MANIFESTS = {
     representation: 'dense' as const,
     distance: 'Cosine' as const,
     normalized: true,
-    status: 'ACTIVE' as const,
+    // NOT ACTIVE: the Postgres codebase_chunk_index.latent_64 column has 0 populated rows
+    // (verified live 2026-08-30, docs/reports/semantic-representation-storage-audit-v1.json).
+    // The genuinely live latent_64 system is a DIFFERENT pipeline entirely -- Redis
+    // gpu:autoencoder:latent_64:* keys written by scripts/atlas/backfill-latent-vectors.mjs and
+    // consumed by train-som-20x20.mjs for SOM topology, which never wrote to this Postgres
+    // column. Do not conflate the two when reasoning about this manifest entry.
+    status: 'REFERENCE_ONLY' as const,
     activatedAt: '2026-07-01T00:00:00Z',
+    supersededBy: 'latent_256' as const,
     postgresColumn: 'latent_64',
     qdrantVectorSlot: 'latent_64',
   },
