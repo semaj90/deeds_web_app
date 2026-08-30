@@ -112,20 +112,28 @@ def run_entry(conn, entry: dict, neighbors_map: dict[str, set[str]]) -> dict | N
         )
         semantic_rows = cur.fetchall()
 
-        # Neighbor rows (guarantee relevant packets are reachable)
-        neighbor_rows = []
-        if neighbor_refs:
+        # Inject ONLY the known-relevant packets that are missing from the semantic pool --
+        # NOT the full 1-hop neighbor set. For heavily-imported hub files (e.g. neo4j-driver.ts,
+        # langfuse.ts) the full neighbor set can run into the hundreds/thousands, which dilutes
+        # the pool so badly that top-10 recovery becomes near-impossible regardless of ranking
+        # policy -- that swamps the actual question (does ranking policy matter GIVEN the answer
+        # is reachable) with a retrieval-depth problem again. Injecting exactly the relevant
+        # packets keeps the pool bounded (~SEMANTIC_POOL_K + a handful) while still guaranteeing
+        # reachability, so ranking-policy differences are what's actually being measured.
+        pool_by_id = {r["id"]: r for r in semantic_rows}
+        missing_relevant_ids = [rid for rid in relevant_set if rid not in pool_by_id]
+        injected_rows = []
+        if missing_relevant_ids:
             cur.execute(
                 "SELECT id::text AS id, relative_path, content_embedding::text AS content_embedding "
-                "FROM codebase_chunk_index WHERE relative_path = ANY(%s) AND content_embedding IS NOT NULL",
-                (list(neighbor_refs),),
+                "FROM codebase_chunk_index WHERE id::text = ANY(%s) AND content_embedding IS NOT NULL",
+                (missing_relevant_ids,),
             )
-            neighbor_rows = cur.fetchall()
-
-        pool_by_id = {r["id"]: r for r in semantic_rows}
-        for r in neighbor_rows:
-            pool_by_id.setdefault(r["id"], r)
+            injected_rows = cur.fetchall()
+            for r in injected_rows:
+                pool_by_id[r["id"]] = r
         pool = list(pool_by_id.values())
+        neighbor_rows = injected_rows  # keep downstream field name/meaning: rows added beyond pure semantic ANN
 
         if not any(r["id"] in relevant_set for r in pool):
             return None  # still unreachable even with neighbor augmentation -- exclude, not a ranking-policy question
