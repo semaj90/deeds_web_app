@@ -3,6 +3,14 @@
  * canonical `graph_analysis_runs` / `graph_node_metrics` tables that
  * pagerank-analysis-adapter.ts (Neo4j-GDS) already writes.
  *
+ * IMPORTANT PROMOTION BOUNDARY:
+ * The current atlas-gpu-8098 PageRank HTTP contract returns a bounded top-K
+ * selection (client max 512), not a full V-row PageRank vector. Therefore this
+ * adapter MUST persist the bounded result as `pagerank_cugraph_shadow`, never
+ * canonical `pagerank`. Canonical PageRank promotion requires a separate
+ * FULL_VECTOR artifact + same-revision CPU/GPU parity proof before packetKey
+ * collapse.
+ *
  * This is a second BACKEND under one canonical capability, not a competing
  * owner — same registry pattern already used for neo4j-gds-pagerank,
  * neo4j-gds-louvain-leiden, neo4j-gds-cheirank, neo4j-gds-kcore (see
@@ -41,6 +49,22 @@ import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 const ALGORITHM_REVISION = graphAlgorithmRevision('pagerank');
 const PARAMETER_REVISION_PREFIX = 'cugraph-maxIter-alpha';
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
+const SHADOW_METRIC_NAME = 'pagerank_cugraph_shadow';
+
+export type CuGraphPageRankSelectionModeV1 = 'TOP_K_SHADOW';
+
+export interface CuGraphPageRankResultSemanticsV1 {
+	algorithm: 'pagerank';
+	backend: 'cugraph';
+	selectionMode: CuGraphPageRankSelectionModeV1;
+	vertexCount: number;
+	resultVertexCount: number;
+	resultCoverage: number;
+	graphRevision: string;
+	projectionRevision: string;
+	metricName: typeof SHADOW_METRIC_NAME;
+	canonicalMetricEligible: false;
+}
 
 export interface CuGraphPageRankAnalysisOptions {
 	maxIterations?: number;
@@ -54,6 +78,7 @@ export interface CuGraphPageRankAnalysisResult {
 	metricsWritten: number;
 	unresolvedPacketKeys: number;
 	excludedPacketKeys: number;
+	resultSemantics?: CuGraphPageRankResultSemanticsV1;
 	skippedReason?: string;
 }
 
@@ -141,6 +166,21 @@ export async function runCuGraphPageRankAnalysis(
 		.update(JSON.stringify(receipt.results.map((r) => ({ nodeKey: r.nodeKey, packetKey: r.packetKey, score: r.score }))))
 		.digest('hex');
 
+	const resultVertexCount = receipt.results.length;
+	const resultCoverage = nodeCount > 0 ? resultVertexCount / nodeCount : 0;
+	const resultSemantics: CuGraphPageRankResultSemanticsV1 = {
+		algorithm: 'pagerank',
+		backend: 'cugraph',
+		selectionMode: 'TOP_K_SHADOW',
+		vertexCount: nodeCount,
+		resultVertexCount,
+		resultCoverage,
+		graphRevision,
+		projectionRevision: receipt.projectionRevision,
+		metricName: SHADOW_METRIC_NAME,
+		canonicalMetricEligible: false,
+	};
+
 	const run: GraphAnalysisRun = GraphAnalysisRunSchema.parse({
 		runId,
 		algorithm: 'pagerank',
@@ -162,13 +202,23 @@ export async function runCuGraphPageRankAnalysis(
 		startedAt,
 		completedAt,
 		status: 'succeeded',
-		parameters: { maxIterations, dampingFactor, topK: limit },
-		metrics: { topNodesReturned: receipt.results.length, didConverge: receipt.didConverge, cacheHit: receipt.cacheHit },
+		parameters: { maxIterations, dampingFactor, topK: limit, selectionMode: resultSemantics.selectionMode },
+		metrics: {
+			topNodesReturned: resultVertexCount,
+			vertexCount: nodeCount,
+			resultCoverage,
+			metricName: SHADOW_METRIC_NAME,
+			canonicalMetricEligible: false,
+			didConverge: receipt.didConverge,
+			cacheHit: receipt.cacheHit,
+		},
 	});
 
 	// packetKey -> highest score seen, same discipline as the Neo4j-GDS adapter's
 	// byPacketKey dedup (graph_node_metrics' primary key is (runId, packetKey,
 	// metricName) — one row per packet per run).
+	// IMPORTANT: this packet collapse is SHADOW-ONLY. CPU/GPU canonical parity
+	// must compare the full GraphOrdinal/nodeKey result before this reduction.
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
 	for (const node of receipt.results as AtlasPageRankResultV1[]) {
@@ -190,7 +240,7 @@ export async function runCuGraphPageRankAnalysis(
 				runId,
 				packetKey,
 				symbolVersionId: null,
-				metricName: 'pagerank',
+				metricName: SHADOW_METRIC_NAME,
 				metricValue: score,
 				graphRevision,
 				algorithmRevision: ALGORITHM_REVISION,
@@ -268,5 +318,11 @@ export async function runCuGraphPageRankAnalysis(
 		pgClient.release();
 	}
 
-	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved, excludedPacketKeys: 0 };
+	return {
+		run,
+		metricsWritten: metricRows.length,
+		unresolvedPacketKeys: unresolved,
+		excludedPacketKeys: 0,
+		resultSemantics,
+	};
 }
