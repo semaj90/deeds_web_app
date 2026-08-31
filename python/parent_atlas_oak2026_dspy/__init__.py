@@ -10,6 +10,7 @@ This package is a Parent Atlas integration layer, not a fork of DSPy.
 from .contracts import (
     Oak2026ActionProposalV1,
     Oak2026KernelBindingV1,
+    Oak2026PreExecutionPacketV1,
     Oak2026ProgramBoundsV1,
     Oak2026RuntimeCountersV1,
     canonical_json_checksum_v1,
@@ -28,6 +29,7 @@ from .runtime import (
 __all__ = [
     "Oak2026ActionProposalV1",
     "Oak2026KernelBindingV1",
+    "Oak2026PreExecutionPacketV1",
     "Oak2026ProgramBoundsV1",
     "Oak2026RuntimeCountersV1",
     "build_oak2026_gepa_feedback_metric_v1",
