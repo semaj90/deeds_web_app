@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.oak-kernel-bound-planner.v1",
+  "status": "CONTRACT_PROVEN",
+  "implementation": "packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts",
+  "focusedTests": "5/5",
+  "packageBuild": "PASS",
+  "guards": [
+    "function must be declared by manifest",
+    "function catalog revision must match kernel revision",
+    "operator library revision must match manifest",
+    "every function operator must be declared",
+    "mutation policy requires explicit apply",
+    "lowered actions use bounded DagActionKind values",
+    "canonicalAuthority=false"
+  ],
+  "execution": "NOT_PERFORMED",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graph": 0,
+    "queue": 0
+  },
+  "kernelState": "DRAFT_ONLY",
+  "nextGate": "OAK-07-READONLY-REPLAY"
+}

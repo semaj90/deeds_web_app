@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.adaptive-dag-plan-contract.v1",
+  "status": "CONTRACT_PROVEN",
+  "implementation": "packages/parent-atlas/src/core/adaptive-dag-plan-v1.ts",
+  "actionKinds": [
+    "FETCH_POSTGRES",
+    "FETCH_QDRANT",
+    "FETCH_FILE",
+    "AST_SCAN",
+    "SIMDJSON_SCAN",
+    "GRAPH_EXPAND",
+    "WEB_SEARCH",
+    "RERANK",
+    "BUILD_CONTEXT",
+    "SYNTHESIZE"
+  ],
+  "focusedTests": "3/3",
+  "packageBuild": "PASS",
+  "guards": [
+    "undeclared dependency rejected",
+    "self dependency rejected",
+    "checksum sealed plan",
+    "mutating synthesis rejected",
+    "canonicalAuthority=false"
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graph": 0,
+    "queue": 0
+  },
+  "kernelBinding": "NOT_IMPLEMENTED",
+  "executionWiring": "NOT_IMPLEMENTED",
+  "nextGate": "OAK-07-KERNEL-BOUND-PLANNER"
+}

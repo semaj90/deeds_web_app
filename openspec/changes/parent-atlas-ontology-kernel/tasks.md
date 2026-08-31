@@ -62,13 +62,16 @@ as "just needs more time" — each needs something external):
   compiler/schema-validation infrastructure" as reusable groundwork was
   checked this session and does not hold up — see the correction note
   under OAK-08 below. Don't re-chase that pointer.)
-- OAK-07 `KernelBoundDagPlannerV1` — the ownership question is now
-  **resolved** (operator decision 2026-08-31: `atlas/research/*` stays
-  `EXPERIMENT`/parked; `web-research-ingester.ts` is canonical). OAK-07
-  itself is still not started — it now needs the actually-live evidence
-  routes traced first (see the OAK-07 section below), a real but smaller
-  and now-unblocked-in-principle task, not attempted this session.
-- OAK-11 benchmark — needs OAK-07 to exist first.
+- ~~OAK-07 `KernelBoundDagPlannerV1`~~ — **DONE 2026-08-31** (built by the
+  concurrent process, reconciled/verified/committed this session — see
+  the OAK-07 section below). The planner's core constraint is real: it
+  refuses to plan any operator not declared by the selected `F` function.
+  Not yet done: binding it to a real, live evidence-fetch executor (it
+  currently lowers into `AdaptiveDagPlanV1` action descriptors, which
+  nothing executes yet) — that's the natural next slice, not attempted
+  this session.
+- OAK-11 benchmark — needs a working executor behind OAK-07's plans, not
+  just the planner contract, to have anything real to benchmark against.
 - 6 of 24 operator kinds still unmapped (`FILTER`/`JOIN`/`PROJECT`/
   `GROUP`/`AGGREGATE`/`VALIDATE_SCHEMA`) — the first 5 are generic SQL
   primitives with no single owner to cite honestly; `VALIDATE_SCHEMA` has
@@ -592,9 +595,40 @@ Partial audit done at OAK-00 time (grep-verified, not assumed):
 
 ## OAK-07 — `KernelBoundDagPlannerV1`
 
-- [ ] Constrain `AdaptiveDagPlanV1` (from `parent-atlas-adaptive-dag-fabric`)
-  so the planner may only select actions the active kernel's `F` declares.
-  Not started.
+**Contract prerequisite added 2026-08-31:** `AdaptiveDagPlanV1` and the
+bounded `DagActionKind` catalog now exist in
+`packages/parent-atlas/src/core/adaptive-dag-plan-v1.ts`. The contract is
+checksum-sealed and rejects undeclared/self dependencies and mutating
+`SYNTHESIZE` actions; focused tests are 3/3 and the package build passes.
+This does not yet bind plans to an OaK function catalog or execute actions.
+Receipt: `docs/reports/adaptive-dag-plan-contract-v1.json`.
+
+**OAK-07 contract built 2026-08-31:** `KernelBoundDagPlannerV1` now binds
+one requested function to the manifest/catalog/operator-library revisions
+and lowers only its declared operators into `AdaptiveDagPlanV1`. It rejects
+undeclared functions/operators, revision mismatches, and mutation policies
+that require explicit apply. Package build passed and focused planner tests
+are 5/5. This is contract proof only; no action execution or kernel freeze
+is claimed. Receipt: `docs/reports/oak-kernel-bound-planner-v1.json`.
+
+- [x] **Core constraint built 2026-08-31 (by the concurrent process,
+  reconciled and committed this session at `e7ec116445` after full-suite
+  verification — 30/30 spec files, 126/126 tests green, not just this
+  change's own subset).** `planKernelBoundDagV1()` in
+  `kernel-bound-dag-planner-v1.ts` does exactly what this line asks:
+  given a manifest + catalog + operator library + one requested
+  `functionId`, it refuses to plan anything not declared by that
+  function's own `operatorGraph`, refuses a function not in the
+  manifest's `functionIds`, refuses catalog/operator-library/kernel
+  revision mismatches, and refuses `MUTATES_WITH_RECEIPT` functions
+  outright (mutation requires an explicit separate apply step, never
+  silent inside planning). Each surviving operator step lowers into one
+  `AdaptiveDagPlanV1` action via a real kind mapping
+  (`actionKindForOperator`) — any operator kind with no mapping throws
+  `KERNEL_BOUND_PLAN_UNMAPPED_OPERATOR` rather than silently
+  guessing. **This is the actual search-space reduction the operator's
+  queue asked for**: the planner selects one `F` function and lowers
+  only its registered operators, not the full capability surface.
 
   **Ownership question resolved 2026-08-31 (operator decision, recorded in
   `parent-atlas-adaptive-dag-fabric/tasks.md`): `atlas/research/*` is
