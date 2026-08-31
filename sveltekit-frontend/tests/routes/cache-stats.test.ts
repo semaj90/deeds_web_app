@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Unit tests for GET /api/admin/cache-stats
  *
