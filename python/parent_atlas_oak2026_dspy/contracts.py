@@ -174,6 +174,38 @@ def validate_runtime_bounds_v1(
         raise ValueError("OAK2026_RUNTIME_BOUND_EXCEEDED:max_cost_usd")
 
 
+def validate_evidence_classes_v1(
+    binding: Oak2026KernelBindingV1,
+    evidence_classes: Iterable[str],
+    *,
+    field_name: str = "evidence_classes",
+) -> tuple[str, ...]:
+    """Canonicalize and reject evidence classes outside frozen kernel S."""
+    normalized = _sorted_unique(evidence_classes)
+    allowed = set(binding.allowed_evidence_classes)
+    unknown = [value for value in normalized if value not in allowed]
+    if unknown:
+        raise ValueError(
+            f"OAK2026_UNKNOWN_EVIDENCE_CLASSES:{field_name}:{','.join(unknown)}"
+        )
+    return normalized
+
+
+def validate_evidence_refs_v1(
+    evidence_refs: Iterable[str],
+    *,
+    allowed_evidence_refs: Sequence[str],
+    field_name: str = "evidence_refs",
+) -> tuple[str, ...]:
+    """Canonicalize and reject references outside the admitted evidence packet."""
+    normalized = _sorted_unique(evidence_refs)
+    allowed = set(allowed_evidence_refs)
+    unknown = [ref for ref in normalized if ref not in allowed]
+    if unknown:
+        raise ValueError(f"OAK2026_UNKNOWN_EVIDENCE_REFS:{field_name}:{','.join(unknown)}")
+    return normalized
+
+
 def validate_action_proposal_v1(
     binding: Oak2026KernelBindingV1,
     proposal: Oak2026ActionProposalV1,
@@ -182,7 +214,8 @@ def validate_action_proposal_v1(
 ) -> None:
     if proposal.function_name not in binding.allowed_functions:
         raise ValueError(f"OAK2026_UNDECLARED_FUNCTION:{proposal.function_name}")
-    allowed_refs = set(allowed_evidence_refs)
-    unknown = [ref for ref in proposal.evidence_refs if ref not in allowed_refs]
-    if unknown:
-        raise ValueError(f"OAK2026_UNKNOWN_EVIDENCE_REFS:{','.join(unknown)}")
+    validate_evidence_refs_v1(
+        proposal.evidence_refs,
+        allowed_evidence_refs=allowed_evidence_refs,
+        field_name="action.evidence_refs",
+    )
