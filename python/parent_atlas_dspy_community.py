@@ -14,10 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-try:
-    import dspy  # type: ignore
-except ImportError:  # pragma: no cover
-    dspy = None
+from python.parent_atlas_oak2026_dspy.runtime import require_dspy
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,12 +56,6 @@ class CommunityEvidenceV1:
             representative_symbols=tuple(sorted(set(representative_symbols))),
             evidence_refs=refs,
         )
-
-
-def require_dspy() -> Any:
-    if dspy is None:
-        raise RuntimeError("DSPy is not installed in this Python environment")
-    return dspy
 
 
 def build_community_label_program_v1() -> Any:
