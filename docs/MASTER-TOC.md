@@ -3,12 +3,12 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `818cd1306cf0f6e18175f92f35da170af720cb21a3f2f10e8dcfdee0d9a6b6eb`
+Registry checksum: `7ab76861263eb31895f9b17dca58de2cf94c460a9433a9bd4d5ae0d0c06f264a`
 
 ## Project instructions
 
 - [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `9fa42675dff7`
-- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `77f3286ae01d`
+- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `23b368a5db84`
 - [llama-cpp-turboquant-gemma4/AGENTS.md](llama-cpp-turboquant-gemma4/AGENTS.md) — CANONICAL_CURRENT — `4e9830e84d20`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
@@ -53,14 +53,14 @@ Registry checksum: `818cd1306cf0f6e18175f92f35da170af720cb21a3f2f10e8dcfdee0d9a6
 - [parent-atlas-graph-pagerank-okf-fanout-hardening](openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening) — 3/4 tasks (75%)
 - [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof) — 157/284 tasks (55%)
 - [parent-atlas-graph-runtime-enhancement](openspec/changes/parent-atlas-graph-runtime-enhancement) — 2/8 tasks (25%)
-- [parent-atlas-graph-runtime-python-consolidation](openspec/changes/parent-atlas-graph-runtime-python-consolidation) — 0/14 tasks (0%)
+- [parent-atlas-graph-runtime-python-consolidation](openspec/changes/parent-atlas-graph-runtime-python-consolidation) — 5/15 tasks (33%)
 - [parent-atlas-graph-validation-fabric](openspec/changes/parent-atlas-graph-validation-fabric) — 8/14 tasks (57%)
 - [parent-atlas-graphify-recovery-proof-ladder](openspec/changes/parent-atlas-graphify-recovery-proof-ladder) — 0/9 tasks (0%)
 - [parent-atlas-kv-cache-adaptation-research](openspec/changes/parent-atlas-kv-cache-adaptation-research) — 3/15 tasks (20%)
 - [parent-atlas-live-graph-proof](openspec/changes/parent-atlas-live-graph-proof) — 0/0 tasks (n/a)
 - [parent-atlas-memory-architecture-freeze](openspec/changes/parent-atlas-memory-architecture-freeze) — 14/23 tasks (61%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 14/62 tasks (23%)
-- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1135/1671 tasks (68%)
+- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1139/1681 tasks (68%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 24/53 tasks (45%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 16/26 tasks (62%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 20/36 tasks (56%)

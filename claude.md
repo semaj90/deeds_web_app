@@ -1470,7 +1470,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
 - **Message Queue**: RabbitMQ (7 queues, 5 exchanges)
-- **MCP**: FastMCP agentic tool calling (88 tools live in `src/mcp/server.ts` as of 2026-08-31, verified via `grep -c "name: '"` — the "9 tools" figure once here was fictional, not just stale; see the "FastMCP Agentic Tools" section under Technology Stack for the finding, and the "MCP/Atlas status note" at the top of this file for TRACE's separate, larger tool count)
+- **MCP**: FastMCP agentic tool calling (108 tools live in `src/mcp/server.ts` as of 2026-08-31, verified by booting the process — the "9 tools" figure once here was fictional, not just stale; see the "FastMCP Agentic Tools" section under Technology Stack for the finding and the dynamic query-scoped selection now wired in, and the "MCP/Atlas status note" at the top of this file for TRACE's separate, larger tool count)
 
 ---
 
@@ -1548,13 +1548,60 @@ Embedding Dimensions Policy above; they were never deleted, just abandoned.)
 names below (`unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`,
 `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`,
 `system_health_check`) exist anywhere in `sveltekit-frontend/src/mcp/server.ts` or the rest of
-`src/` (checked 2026-08-31). The real server registers **88 tools** (`grep -c "name: '"
-sveltekit-frontend/src/mcp/server.ts`), namespaced like `cases:load`, `codebase:search`,
-`atlas.packet_search`, `evidence:analyze`, `kb.search_cards`, `graph.index`, `wiki.search`, etc. —
-a completely different naming scheme, not a renamed subset of the 9. Do not treat the 9 names as
-real tool names to call; read `src/mcp/server.ts`'s `ListToolsRequestSchema` handler directly for
-the current list, and see the "MCP/Atlas status note" at the top of this file for how tool counts
-are tracked going forward.
+`src/` (checked 2026-08-31). The real server registers **108 tools live** (verified 2026-08-31 by
+booting the actual process over stdio and sending a real `tools/list` JSON-RPC call — a static
+`grep -c "name: '"` on the file undercounts this at 88, since ~20 more tools are spread in at
+runtime from `DISPATCHER_TOOLS_SCHEMAS` and `getPhase109aToolDefinitions()`), namespaced like
+`cases:load`, `codebase:search`, `atlas.packet_search`, `evidence:analyze`, `kb.search_cards`,
+`graph.index`, `wiki.search`, etc. — a completely different naming scheme, not a renamed subset of
+the 9. Do not treat the 9 names as real tool names to call; read `src/mcp/server.ts`'s
+`ListToolsRequestSchema` handler directly for the current list, and see the "MCP/Atlas status
+note" at the top of this file for how tool counts are tracked going forward.
+
+**Dynamic tool-set selection (added 2026-08-31)**: `ListToolsRequestSchema` no longer only ever
+returns the full 108-tool list. It now calls `selectMcpToolSubset()`, which dynamically imports
+`scripts/atlas/runtime-mcp-tool-selector.mjs` — a semantic tool-picker that already existed in this
+repo (Qdrant-backed with a file-backed `docs/reports/mcp-tool-registry-index.json` registry
+fallback) but was never wired into any live `ListTools` handler — and filters down to a
+query-relevant top-K when the caller supplies `_meta.queryHint` (or `MCP_TOOL_QUERY_HINT` env var).
+With no hint, behavior is unchanged: full 108-tool list, same as before. Verified live: booting the
+real process and sending `tools/list` with `_meta.queryHint: "search codebase for embedding
+errors"` returned 8 tools (`codebase:search`, `atlas.packet_search`, `kb.search_cards`,
+`wiki.search`, etc.) instead of 108 — no tool was deleted or stubbed, only what a given call
+*advertises* changed. This is the fix for the earlier "88/108 tools always loaded" memory/context
+overhead question, not a physical multi-process split (that remains a possible future follow-up,
+not done here).
+
+**MCP-SELECT hardening pass (2026-08-31, same day, external review)**: three protocol-hardening
+corrections applied on top of the above, plus a live determinism check:
+- **MCP-SELECT-03 (done)**: the hint key is now the reverse-DNS-namespaced
+  `_meta['com.parentatlas.tool_query_hint']`, not a bare `_meta.queryHint` — MCP reserves
+  unnamespaced `_meta` keys and recommends reverse-DNS prefixes for custom ones.
+- **MCP-SELECT-04 (done)**: a filtered (hint-driven) `ListTools` response now returns
+  `_meta: { ttlMs: 0, cacheScope: 'private' }` so a query-scoped subset can never be cached and
+  reused as if it were the stable catalog. The unfiltered no-hint response carries no such hint
+  (it's the real stable catalog, caching it is fine).
+- **MCP-SELECT-05 (done, documentation)**: `selectMcpToolSubset()` carries an explicit hard-rule
+  comment that this is a context/discovery optimization ONLY, never an authorization boundary —
+  it fails open to the full list on any error, which is correct for availability but means it must
+  never be trusted to withhold a tool for security reasons. Auth stays entirely in `checkAuth()`
+  and per-handler guards, independent of this function.
+- **MCP-SELECT-06/07 (partially proven — real finding, not just a checkbox)**: live two-query
+  replay against the booted process confirmed the no-hint response is stable (108 tools, same
+  checksum) and same-query repeatability holds (`"search codebase for embedding errors"` run twice
+  → identical 8-tool subset, identical checksum). But **a genuinely different second query
+  ("trace graph pagerank authority scores") produced the identical 8-tool subset**, not an
+  independently different one. Root cause verified, not a selector bug: at the real `topK=16` used
+  here, the two queries *do* rank differently before filtering, but the differentiating tools
+  (`trace.kag_search`, `karpathy.attention_rank_files`, `ace.compact_search`, `ops.*`, `legal.*`)
+  all belong to *other* MCP servers, not this one — Qdrant's `tool_manifest` collection is still
+  empty (confirmed earlier in this file), so the registry-fallback path is doing the ranking, and
+  its "generic core" of this server's own tools (`wiki.search`, `codebase:search`,
+  `memory:prior_answer_lookup`, `atlas.packet_search`, etc.) dominates the top ranks for this
+  server's tool space regardless of query. **Real fix path**: populate the Qdrant `tool_manifest`
+  collection (the pre-existing `atlas:mcp:tool-manifest` script target) so the semantic path
+  actually engages instead of always falling through to the coarser registry ranking — not a code
+  change to the selector wiring itself.
 
 ### Evidence Pipeline (8 stages)
 1. Object storage upload + SHA-256 hash + PostgreSQL record
@@ -2714,25 +2761,38 @@ rg "pipelineMemory|crossPipelineChamps|trending|didYouMean" src/routes/api/analy
 # MUST return ≥4 hits (all four new fields returned in json())
 
 # G49: search-analytics.ts exports all 6 required read-side functions
-rg "export async function get" src/lib/server/analytics/search-analytics.ts
+# (path corrected 2026-08-31 deep-audit: analytics/search-analytics.ts is now
+# a barrel re-export; the real implementation lives under features/observability/)
+rg "export async function get" src/lib/server/features/observability/search-analytics.ts
 # MUST return ≥6 hits:
 #   getHotQueries, getClusterHeatMap, getChunkQualitySignals,
 #   getVariancePairs, getDidYouMeanSuggestions, getAllQuerySketches
+#   (a 7th, getQloraSmartSuggestions, is also present — bonus, not required)
 
 # G50: Chunk hit logging wired in ACE assembly (context-assembler.ts)
-rg "recordChunkHits" src/lib/server/ace/context-assembler.ts
+# (path corrected 2026-08-31 deep-audit: src/lib/server/ace/context-assembler.ts
+# is a legitimate 361-line facade re-exporting only the top-level entry points
+# — assembleACEContext, buildACEPromptCached, etc. — from the real 7,680-line
+# implementation below. recordChunkHits/fetchTopQueryTags/webSearchToUnified are
+# NOT separately re-exported through the facade, so grepping the facade path
+# gives a false fail even though the live pipeline genuinely calls all of them
+# internally from the re-exported entry points. Grep the real file.)
+rg "recordChunkHits" src/lib/server/features/ai/ace/context-assembler.ts
 # MUST return ≥1 hit — analytics must fire on every ACE retrieval pass
 
 # G51: P1-A prompt leaderboard → ACE queryTags (feedback loop closed)
-rg "fetchTopQueryTags|getTopPrompts|topQueryTags" src/lib/server/ace/context-assembler.ts
+rg "fetchTopQueryTags|getTopPrompts|topQueryTags" src/lib/server/features/ai/ace/context-assembler.ts
 # MUST return ≥1 hit — top prompts injected into ACEContext.queryTags
 
 # G52: P3-A cross-source reranking active in context assembler
-rg "webSearchToUnified|webUnified|P3-A" src/lib/server/ace/context-assembler.ts
+rg "webSearchToUnified|webUnified|P3-A" src/lib/server/features/ai/ace/context-assembler.ts
 # MUST return ≥2 hits — import + usage of webSearchToUnified in ragChunks merge
 
 # G53: ACE_PIPELINE_VERSION reflects post-P3-A state
-rg "ACE_PIPELINE_VERSION = '2\." src/lib/server/ace/context-assembler.ts
+# (version bumped 2026-08-31 deep-audit finding: real value is '3.0.0', not '2.x'
+# — functionally fine, 3.0.0 still satisfies "≥ 2.x invalidates stale rows", but
+# the old regex below would false-fail against the real file)
+rg "ACE_PIPELINE_VERSION = '3\." src/lib/server/features/ai/ace/context-assembler.ts
 # MUST return 1 hit — version ≥ 2.x invalidates stale ace_chunks cache rows
 
 # G54: P2-A cache key consolidation — generateCacheKey lives in cache-keys.ts
@@ -2744,6 +2804,34 @@ rg "from.*cache-keys" src/lib/server/cache/redis-exact-match.ts src/lib/server/a
 # MUST return 2 hits — both files import from canonical cache-keys.ts
 # If either file still has a local generateCacheKey/hashContext → DRY violation remains
 ```
+
+### G4/G5 open finding — 5 real unauthenticated + unvalidated API routes (2026-08-31 deep-audit)
+
+Not fixed yet (intentional — dev testing currently relies on `DEV_BYPASS_AUTH`, so adding real
+auth guards now would be premature). Recorded here per the Duplication Prevention rule ("record
+what you found, even when you don't fix it").
+
+Of 28 routes the graph's `hasAuth === false` flag surfaced under `/api/`, 12 are **false positives**
+(they call `requireAdmin(event)`, which the flag detector doesn't recognize — only
+`locals.user`/`getSession()`-style checks are tracked), and 10 more are correctly public by design
+(auth entry points, health/status checks). **5 are genuinely unauthenticated AND have zero Zod
+validation** (hand-rolled or none):
+
+| Route | Method | Input handling | Risk |
+|---|---|---|---|
+| `api/ai/emotion` | POST | Manual `typeof imageBase64 !== 'string'` check, no Zod | Unbounded local-LLM compute-cost abuse vector |
+| `api/batch-summary/jobs` | GET | Reads local files off disk (`readFileSync`), no input at all | Low — no params, but ungated file read |
+| `api/retrieval/dual-lane` | GET | `limit` bounded (`Math.min(..., 100)`); `q`/`corpus`/`workspace` raw unvalidated strings into DB query | Could leak indexed content to any caller |
+| `api/telemetry/implementation-clusters` | GET | Reads Redis-backed MCP telemetry, read-only | Low — no mutation, no secrets observed |
+| `api/phase102/retrieval-pipeline` | GET | Queries `codeFeatures` table, returns ranked results; file has explicit `// Mock implementation` / `// Mock scores` comments — looks like an early scaffold | Low-moderate — reachable unauthenticated, not production-hardened |
+
+Also not chased further: `api/trpc/[...procedure]` has no route-level auth guard, but tRPC's
+per-procedure auth (if any) lives inside `createContext`/`appRouter` middleware, invisible to a
+route-level static check — verify inside the router before assuming it's a gap.
+
+**When ready to fix**: add `requireAuth`/`requireAdmin` (matching this repo's existing pattern, not
+a new auth mechanism) to the 5 real gaps above, and add Zod schemas per the G5 convention. Do this
+as a deliberate pass once dev-bypass is no longer the active mode, not piecemeal.
 
 ### Decision Tree (post-gate)
 
@@ -3528,7 +3616,7 @@ semantic_vector × 0.60 + tag_score × 0.12 + ast_graph × 0.10 + som_boost × 0
 ### A2A / MCP / ACP Wiring (verified)
 - **A2A AgentCard**: `GET /.well-known/agent.json` — LIVE (`src/routes/.well-known/agent.json/+server.ts`)
 - **Agent API**: `POST /api/ai/agent` — native + A2A Task + SSE streaming — LIVE
-- **MCP**: `src/mcp/server.ts` — 88 tools (verified 2026-08-31, not the "29 tools" previously stated here), FastMCP, auth guard — LIVE
+- **MCP**: `src/mcp/server.ts` — 108 tools live (verified 2026-08-31 by booting the process, not the "29 tools" previously stated here), FastMCP, auth guard, dynamic query-scoped tool-set selection — LIVE
 - **ACP**: `GET /api/acp/tools`, `POST /api/acp/execute` — LIVE
 
 ### `using` / `await using` — Available Now (TS 5.2+)
