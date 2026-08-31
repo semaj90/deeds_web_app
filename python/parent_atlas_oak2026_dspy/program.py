@@ -31,12 +31,13 @@ def build_oak2026_kernel_program_v1(binding: Oak2026KernelBindingV1) -> Any:
     dp = require_dspy()
 
     class ClassifyTask(dp.Signature):
-        """Classify a Parent Atlas task using only the supplied frozen kernel context."""
+        """Classify evidence needs for a task already bound to one frozen OaK kernel."""
 
         task: str = dp.InputField()
         kernel_revision: str = dp.InputField()
+        bound_task_class: str = dp.InputField()
         allowed_evidence_classes: list[str] = dp.InputField()
-        task_class: str = dp.OutputField()
+        task_class: str = dp.OutputField(desc="Must equal bound_task_class")
         required_evidence_classes: list[str] = dp.OutputField()
         confidence: float = dp.OutputField()
 
@@ -83,8 +84,14 @@ def build_oak2026_kernel_program_v1(binding: Oak2026KernelBindingV1) -> Any:
             result = self.classify(
                 task=task,
                 kernel_revision=binding.kernel_revision,
+                bound_task_class=binding.task_class,
                 allowed_evidence_classes=list(binding.allowed_evidence_classes),
             )
+            task_class = str(result.task_class).strip()
+            if task_class != binding.task_class:
+                raise ValueError(
+                    f"OAK2026_TASK_CLASS_MISMATCH:{task_class}:{binding.task_class}"
+                )
             confidence = float(result.confidence)
             if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
                 raise ValueError("OAK2026_INVALID_CLASSIFICATION_CONFIDENCE")
@@ -94,7 +101,7 @@ def build_oak2026_kernel_program_v1(binding: Oak2026KernelBindingV1) -> Any:
                 field_name="classification.required_evidence_classes",
             )
             return dp.Prediction(
-                task_class=str(result.task_class),
+                task_class=binding.task_class,
                 required_evidence_classes=list(required),
                 confidence=confidence,
             )
@@ -107,9 +114,13 @@ def build_oak2026_kernel_program_v1(binding: Oak2026KernelBindingV1) -> Any:
             evidence_manifest: str,
             allowed_evidence_refs: Sequence[str],
         ) -> Oak2026ActionProposalV1:
+            if task_class != binding.task_class:
+                raise ValueError(
+                    f"OAK2026_TASK_CLASS_MISMATCH:{task_class}:{binding.task_class}"
+                )
             result = self.select(
                 task=task,
-                task_class=task_class,
+                task_class=binding.task_class,
                 allowed_functions=list(binding.allowed_functions),
                 evidence_manifest=evidence_manifest,
             )
@@ -189,7 +200,7 @@ def build_oak2026_kernel_program_v1(binding: Oak2026KernelBindingV1) -> Any:
                 allowed_evidence_refs=allowed_evidence_refs,
             )
             return dp.Prediction(
-                task_class=classified.task_class,
+                task_class=binding.task_class,
                 classification_confidence=classified.confidence,
                 required_evidence_classes=classified.required_evidence_classes,
                 function_name=proposal.function_name,
