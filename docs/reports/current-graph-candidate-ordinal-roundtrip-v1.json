@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graph-candidate-ordinal-roundtrip-v1",
-  "generatedAt": "2026-08-29T00:41:06.927Z",
+  "generatedAt": "2026-08-31T19:47:00.209Z",
   "mode": "READ_ONLY_AUDIT",
   "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
   "projectionRevision": "sha256:f5bb7eea13f304160f21d2e814ccac9200546fea77fb1ceda9f229afcfae5c01",

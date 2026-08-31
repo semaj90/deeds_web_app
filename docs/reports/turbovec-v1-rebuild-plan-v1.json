@@ -1,6 +1,6 @@
 {
   "schema": "atlas.turbovec-v1-rebuild-plan.v1",
-  "generatedAt": "2026-08-27T01:43:14.166Z",
+  "generatedAt": "2026-08-31T18:24:17.892Z",
   "readOnly": true,
   "writes": false,
   "sourceContract": {
@@ -28,7 +28,7 @@
   "qdrant": {
     "status": "REACHABLE",
     "httpStatus": 200,
-    "points": 109129,
+    "points": 109776,
     "vectors": {
       "content": {
         "size": 768,

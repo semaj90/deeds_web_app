@@ -21,8 +21,14 @@ const QDRANT_COLLECTION = 'codebase_chunks_768';
 const OUTPUT_FORMAT = process.argv.includes('--json') ? 'json'
   : process.argv.includes('--ndjson') ? 'ndjson'
   : 'summary';
+const logProgress = (...args) => {
+  (OUTPUT_FORMAT === 'summary' ? console.log : console.error)(...args);
+};
 
+const originalConsoleLog = console.log;
+if (OUTPUT_FORMAT !== 'summary') console.log = console.error;
 await loadAtlasEnv();
+console.log = originalConsoleLog;
 
 const PG_URL = process.env.DATABASE_URL;
 if (!PG_URL) {
@@ -32,10 +38,10 @@ if (!PG_URL) {
 
 const pool = new Pool({ connectionString: PG_URL });
 
-console.log(`🔍 Phase 2/3: Qdrant 768 Identity Reconciliation Audit`);
-console.log(`   Collection: ${QDRANT_COLLECTION}`);
-console.log(`   Output format: ${OUTPUT_FORMAT}`);
-console.log('');
+logProgress(`🔍 Phase 2/3: Qdrant 768 Identity Reconciliation Audit`);
+logProgress(`   Collection: ${QDRANT_COLLECTION}`);
+logProgress(`   Output format: ${OUTPUT_FORMAT}`);
+logProgress('');
 
 // ─────────────────────────────────────────────────────────────────────────
 // Scroll all Qdrant points with correct pagination
@@ -46,7 +52,7 @@ async function scrollAllPoints() {
   let offset = null;
   let batchCount = 0;
 
-  console.log('📍 Scrolling Qdrant collection...');
+  logProgress('📍 Scrolling Qdrant collection...');
 
   while (true) {
     const body = {
@@ -79,7 +85,7 @@ async function scrollAllPoints() {
     batchCount++;
 
     if (batchCount % 10 === 0) {
-      console.log(`   Fetched ${points.length} points (batch ${batchCount})`);
+      logProgress(`   Fetched ${points.length} points (batch ${batchCount})`);
     }
 
     if (!offset || batch.length < 1000) {
@@ -87,7 +93,7 @@ async function scrollAllPoints() {
     }
   }
 
-  console.log(`   ✅ Complete: ${points.length} total points`);
+  logProgress(`   ✅ Complete: ${points.length} total points`);
   return points;
 }
 
@@ -96,8 +102,8 @@ async function scrollAllPoints() {
 // ─────────────────────────────────────────────────────────────────────────
 
 async function loadPostgresIdentities() {
-  console.log('');
-  console.log('📚 Loading Postgres canonical identities...');
+  logProgress('');
+  logProgress('📚 Loading Postgres canonical identities...');
 
   const res = await pool.query(`
     SELECT
@@ -115,7 +121,7 @@ async function loadPostgresIdentities() {
   `);
 
   const rows = res.rows;
-  console.log(`   ✅ Loaded ${rows.length} eligible Postgres rows`);
+  logProgress(`   ✅ Loaded ${rows.length} eligible Postgres rows`);
   return rows;
 }
 
@@ -215,8 +221,8 @@ async function main() {
     const postgresRows = await loadPostgresIdentities();
     const lookups = buildLookupMaps(postgresRows);
 
-    console.log('');
-    console.log('🔗 Classifying all Qdrant points...');
+    logProgress('');
+    logProgress('🔗 Classifying all Qdrant points...');
 
     const classifications = [];
     const stats = {
@@ -252,6 +258,11 @@ async function main() {
         payload_packet_key: point.payload.packet_key ?? point.payload.packetKey ?? null,
         payload_source_revision: point.payload.source_revision ?? point.payload.sourceRevision ?? null,
         payload_workspace_revision: point.payload.workspace_revision ?? point.payload.workspaceRevision ?? null,
+        payload_candidate_ordinal: Number.isInteger(point.payload.candidate_ordinal)
+          ? point.payload.candidate_ordinal
+          : Number.isInteger(point.payload.candidateOrdinal)
+            ? point.payload.candidateOrdinal
+            : null,
         match_state: result.state,
         match_reason: result.reason,
         postgres_uuid: result.row?.id ?? null
@@ -287,9 +298,14 @@ async function main() {
       .slice(0, 25)
       .map(([postgresId, qdrantPointIds]) => ({ postgres_id: postgresId, qdrant_point_ids: qdrantPointIds }));
 
-    // Integer ID analysis
-    const intIds = qdrantPoints.map(p => p.id).sort((a, b) => a - b);
-    const uniqueIds = new Set(intIds);
+    // Qdrant permits integer and UUID point IDs. Continuity is only meaningful
+    // for the numeric subset; uniqueness applies to the complete collection.
+    const allPointIds = qdrantPoints.map((point) => String(point.id));
+    const uniqueIds = new Set(allPointIds);
+    const intIds = qdrantPoints
+      .map((point) => point.id)
+      .filter((id) => Number.isInteger(id))
+      .sort((a, b) => a - b);
     const gaps = [];
     for (let i = 0; i < intIds.length - 1; i++) {
       if (intIds[i + 1] - intIds[i] > 1) {
@@ -340,7 +356,13 @@ async function main() {
       packet_key: classifications.filter((item) => item.payload_packet_key).length,
       source_revision: classifications.filter((item) => item.payload_source_revision).length,
       workspace_revision: classifications.filter((item) => item.payload_workspace_revision).length,
+      candidate_ordinal: classifications.filter((item) => Number.isInteger(item.payload_candidate_ordinal)).length,
     };
+
+    const numericPointIds = qdrantPoints
+      .map((point) => point.id)
+      .filter((id) => Number.isInteger(id));
+    const numericPointIdSet = new Set(numericPointIds);
 
     const report = {
       timestamp: new Date().toISOString(),
@@ -368,10 +390,12 @@ async function main() {
         unmatched: stats.backfill_unmatched
       },
       integer_id_analysis: {
-        minimum_id: intIds[0],
-        maximum_id: intIds[intIds.length - 1],
-        unique_count: uniqueIds.size,
-        duplicate_ids: qdrantPoints.length - uniqueIds.size,
+        applicable: numericPointIds.length === qdrantPoints.length,
+        numeric_count: numericPointIds.length,
+        minimum_id: intIds.length ? intIds[0] : null,
+        maximum_id: intIds.length ? intIds[intIds.length - 1] : null,
+        unique_count: numericPointIdSet.size,
+        duplicate_ids: numericPointIds.length - numericPointIdSet.size,
         id_gaps: gaps.length,
         gap_details: gaps
       },
@@ -406,8 +430,9 @@ async function main() {
         gate_ambiguous_matches_zero: stats.matched_ambiguous === 0,
         gate_unmatched_zero: stats.unmatched === 0,
         gate_duplicate_postgres_zero: duplicateCount === 0,
-        gate_integer_ids_unique: uniqueIds.size === qdrantPoints.length,
-        gate_integer_ids_continuous: gaps.length === 0
+        gate_point_ids_unique: uniqueIds.size === qdrantPoints.length,
+        gate_candidate_ordinal_present: payloadFieldCounts.candidate_ordinal === qdrantPoints.length,
+        integer_id_continuity_observed: numericPointIds.length === qdrantPoints.length && gaps.length === 0
       },
       safe_for_retrieval:
         stats.matched_ambiguous === 0 &&
@@ -432,15 +457,13 @@ async function main() {
       console.log('');
       console.log(`  Data Quality:`);
       console.log(`    Duplicate Postgres mappings: ${duplicateCount}`);
-      console.log(`    Integer ID gaps: ${gaps.length}`);
-      console.log(`    Duplicate integer IDs: ${qdrantPoints.length - uniqueIds.size}`);
+      console.log(`    Point IDs unique: ${report.verification_gates.gate_point_ids_unique}`);
+      console.log(`    CandidateOrdinal payload coverage: ${payloadFieldCounts.candidate_ordinal}/${qdrantPoints.length}`);
       console.log('');
       console.log(`  Verification Gates:`);
       console.log(`    ✓ Ambiguous matches = 0: ${report.verification_gates.gate_ambiguous_matches_zero}`);
       console.log(`    ✓ Unmatched = 0: ${report.verification_gates.gate_unmatched_zero}`);
       console.log(`    ✓ Duplicate Postgres mappings = 0: ${report.verification_gates.gate_duplicate_postgres_zero}`);
-      console.log(`    ✓ Integer IDs unique: ${report.verification_gates.gate_integer_ids_unique}`);
-      console.log(`    ✓ Integer IDs continuous: ${report.verification_gates.gate_integer_ids_continuous}`);
       console.log('');
       console.log(`  Decision: ${report.safe_for_retrieval ? '✅ SAFE FOR RETRIEVAL' : '❌ REQUIRES REBUILD OR REPAIR'}`);
 
@@ -450,8 +473,8 @@ async function main() {
         if (stats.matched_ambiguous > 0) console.log(`    - ${stats.matched_ambiguous} ambiguous matches (need resolution)`);
         if (stats.unmatched > 0) console.log(`    - ${stats.unmatched} unmatched points (not in Postgres)`);
         if (duplicateCount > 0) console.log(`    - ${duplicateCount} Postgres rows have multiple Qdrant points`);
-        if (!report.verification_gates.gate_integer_ids_unique) console.log(`    - Duplicate integer point IDs detected`);
-        if (!report.verification_gates.gate_integer_ids_continuous) console.log(`    - Integer ID gaps detected (unsafe allocation)`);
+        if (!report.verification_gates.gate_point_ids_unique) console.log(`    - Duplicate Qdrant point IDs detected`);
+        if (!report.verification_gates.gate_candidate_ordinal_present) console.log(`    - CandidateOrdinal payload coverage is incomplete`);
       }
     } else if (OUTPUT_FORMAT === 'json') {
       console.log(JSON.stringify(report, null, 2));

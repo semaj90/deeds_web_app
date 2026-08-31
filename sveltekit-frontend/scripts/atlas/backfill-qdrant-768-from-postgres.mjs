@@ -38,6 +38,10 @@ import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
+
+if (APPLY) {
+  throw new Error('QDRANT_768_APPLY_BLOCKED_CANDIDATE_ORDINAL_BRIDGE_MISSING');
+}
 const RESUME = process.argv.includes('--resume');
 const BATCH_SIZE = Math.max(50, Math.min(1000, parseInt(process.argv.find(a => a.startsWith('--batch-size='))?.split('=')[1] ?? '256')));
 const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '52380');

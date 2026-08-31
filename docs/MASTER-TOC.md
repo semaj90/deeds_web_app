@@ -3,12 +3,12 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `7ab76861263eb31895f9b17dca58de2cf94c460a9433a9bd4d5ae0d0c06f264a`
+Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e795a3`
 
 ## Project instructions
 
 - [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `9fa42675dff7`
-- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `23b368a5db84`
+- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `e8c5575fd1e7`
 - [llama-cpp-turboquant-gemma4/AGENTS.md](llama-cpp-turboquant-gemma4/AGENTS.md) — CANONICAL_CURRENT — `4e9830e84d20`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
@@ -26,7 +26,7 @@ Registry checksum: `7ab76861263eb31895f9b17dca58de2cf94c460a9433a9bd4d5ae0d0c06f
 - [archive](openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822) — 13/13 tasks (100%)
 - [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 19/73 tasks (26%)
 - [codereview-inference-wiring-followup-aug22](openspec/changes/codereview-inference-wiring-followup-aug22) — 7/10 tasks (70%)
-- [codereview-semantic-dimension-regression-aug22](openspec/changes/codereview-semantic-dimension-regression-aug22) — 5/12 tasks (42%)
+- [codereview-semantic-dimension-regression-aug22](openspec/changes/codereview-semantic-dimension-regression-aug22) — 7/12 tasks (58%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 10/21 tasks (48%)
 - [docker-compose-duplication-remediation](openspec/changes/docker-compose-duplication-remediation) — 9/9 tasks (100%)
 - [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation) — 2/3 tasks (67%)
@@ -60,7 +60,7 @@ Registry checksum: `7ab76861263eb31895f9b17dca58de2cf94c460a9433a9bd4d5ae0d0c06f
 - [parent-atlas-live-graph-proof](openspec/changes/parent-atlas-live-graph-proof) — 0/0 tasks (n/a)
 - [parent-atlas-memory-architecture-freeze](openspec/changes/parent-atlas-memory-architecture-freeze) — 14/23 tasks (61%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 14/62 tasks (23%)
-- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1139/1681 tasks (68%)
+- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1150/1695 tasks (68%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 24/53 tasks (45%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 16/26 tasks (62%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 20/36 tasks (56%)
@@ -96,3 +96,11 @@ Registry checksum: `7ab76861263eb31895f9b17dca58de2cf94c460a9433a9bd4d5ae0d0c06f
 ## Runtime ETA
 
 - ETA unavailable: no current `WorkflowActionEventV1.progress.etaMs` receipt was consumed by this projection.
+
+## Latest verified retrieval findings
+
+- [Latent256 exact/Qdrant parity](reports/latent256-ann-exact-parity-bounded-v2.json) — atlas.latent256-ann-exact-parity.v1 — sample 15, k=10, mean overlap 1.
+- [Qdrant semantic identity canary](reports/lineage-qdrant-semantic-canary-v1.json) — CANARY_QDRANT_IDENTITY_BLOCKED — 30 points for 15 candidates; duplicates 15.
+- [Qdrant projection targets](reports/lineage-qdrant-projection-targets-v1.json) — QDRANT_PROJECTION_TARGETS_CENSUSED — same-collection duplicates 15, missing 0.
+- Rebuild safety warning: the existing Qdrant backfill tool reads canonical vectors but still requires packet/workspace lineage reconciliation before apply; it is not a promotion-ready blue/green rebuild.
+- Promotion note: Qdrant remains a rebuildable projection; duplicate ownership must be reconciled before cutover or deletion.

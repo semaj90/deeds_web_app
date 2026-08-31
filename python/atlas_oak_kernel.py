@@ -17,6 +17,7 @@ upstream. This is a shadow/read-only grounding boundary.
 from __future__ import annotations
 
 import importlib.metadata
+import hashlib
 import os
 from functools import lru_cache
 from typing import Any, Literal
@@ -76,6 +77,25 @@ def _adapter_locator() -> str | None:
     return value or None
 
 
+def _adapter_type() -> str | None:
+    """Return a non-sensitive adapter kind, never the configured locator."""
+
+    explicit = os.getenv("ATLAS_OAK_ADAPTER_TYPE", "").strip()
+    if explicit:
+        return explicit
+    locator = _adapter_locator()
+    if locator is None:
+        return None
+    return locator.split(":", 1)[0].lower() or "configured"
+
+
+def _adapter_fingerprint() -> str | None:
+    locator = _adapter_locator()
+    if locator is None:
+        return None
+    return hashlib.sha256(locator.encode("utf-8")).hexdigest()
+
+
 @lru_cache(maxsize=1)
 def _adapter() -> Any:
     if not OAKLIB_AVAILABLE or get_adapter is None:
@@ -106,7 +126,8 @@ def oak_health() -> dict[str, Any]:
         "available": OAKLIB_AVAILABLE,
         "oaklibVersion": _oaklib_version(),
         "adapterConfigured": _adapter_locator() is not None,
-        "adapterLocator": _adapter_locator(),
+        "adapterType": _adapter_type(),
+        "adapterFingerprint": _adapter_fingerprint(),
         "mode": "READ_ONLY_SHADOW",
         "canonicalAuthority": False,
         "paper": {

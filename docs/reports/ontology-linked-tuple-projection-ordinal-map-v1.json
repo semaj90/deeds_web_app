@@ -16,7 +16,7 @@
     {
       "name": "only_entity_and_tuple_classes_present_for_this_fixture",
       "ok": true,
-      "detail": "{'ENTITY', 'TUPLE'}"
+      "detail": "{'TUPLE', 'ENTITY'}"
     },
     {
       "name": "exactly_1_tuple_row_with_tupleId_set",
@@ -55,6 +55,6 @@
     }
   ],
   "pass": true,
-  "durationMs": 364.16,
+  "durationMs": 1323.69,
   "writesPerformed": false
 }

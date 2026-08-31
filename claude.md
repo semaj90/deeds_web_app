@@ -4354,3 +4354,101 @@ Sources:
 - [Svelte 5 Runes](https://svelte.dev/blog/runes) | [Migration Guide](https://svelte.dev/docs/svelte/v5-migration-guide)
 - [UnoCSS Svelte Scoped](https://unocss.dev/integrations/svelte-scoped) | [SvelteKit Setup](https://frontavo.com/blog/setting-up-unocss-with-sveltekit)
 - [Superforms Docs](https://superforms.rocks/) | [File Uploads](https://superforms.rocks/concepts/files)
+
+## Parent Atlas current identity and retrieval alignment (2026-08-31)
+
+This section supersedes older UUID/Qdrant notes above where they conflict with
+the current receipts. It is a policy projection, not a new identity authority.
+
+### Identifier policy
+
+- PostgreSQL remains canonical for packet, chunk, source, workspace, symbol,
+  feature, and revision identity.
+- UUIDv4 (`crypto.randomUUID()` / `gen_random_uuid()`) is for random operational
+  request, job, session, and event IDs.
+- UUIDv8 in `sveltekit-frontend/src/lib/utils/uuid.ts` is the deterministic
+  SHA-256-derived ID for explicitly derived artifacts.
+- UUIDv5 and ULID are compatibility formats only unless an existing persisted
+  contract proves their use. UUIDv7 is available in PostgreSQL 18 for future
+  time-ordered records, but must not trigger a mass identity rewrite.
+- Hex strings, Qdrant numeric IDs, UUIDs, and ULIDs are not interchangeable.
+  A hex-to-UUID/ULID conversion is allowed only with an existing namespace and
+  round-trip mapping receipt; never synthesize a canonical ID from formatting.
+
+### Indexed evidence and mirrored retrieval
+
+```text
+source bytes + workspace revision
+  -> Tree-sitter CST / AST-grep structural observations
+  -> stableSymbolId / symbolVersionId / treeNodeId evidence
+  -> PostgreSQL canonical chunk and feature identity
+  -> semantic_768 EmbeddingGemma vector
+  -> Qdrant / Go Retrieval / GPU named-vector projections
+  -> CandidateOrdinal normalization
+  -> SearchRuntime fusion
+  -> ACE cards -> ContextManifest -> synthesis
+```
+
+- AST/CST, AST-grep, SearXNG metadata enrichment, NLP extraction, RPC packets,
+  and Go Retrieval may mirror bounded evidence and metadata, but none may mint
+  canonical identity or become the final fusion owner.
+- Every mirrored record should carry `sourceRef`, `sourceRevision`,
+  `workspaceRevision` where applicable, representation/revision metadata, and
+  an evidence or projection checksum.
+- Go Retrieval is a read-only executor. Its output must normalize to the same
+  CandidateOrdinal universe as PostgreSQL, Qdrant, lexical, structural, and
+  GPU executors before ranking.
+- SearXNG results are external evidence inputs. Preserve provider URL/title/
+  snippet/published metadata and fetch provenance; do not treat search rank or
+  transport order as canonical relevance or identity.
+- Named vectors are representation slots, not separate retrieval votes:
+  `content` is semantic_768; MRL and latent views remain derived/challenger
+  lanes unless separately promoted by frozen evaluation evidence.
+- Qdrant point IDs may be numeric or UUID, but the chosen projection ID must be
+  deterministic and mapped to PostgreSQL identity. Index UUID-valued payloads as
+  UUID only when the field is actually a UUID; index `candidateOrdinal` as an
+  integer and `packetKey`/`sourceRef` as keyword metadata. A ULID stored as text
+  is not a UUID index and must retain its original namespace/format.
+- Retrieval filters run before ANN search. Payload indexes accelerate filtering;
+  they do not make a projection authoritative. Preserve the point-ID mapping
+  manifest when moving between numeric, UUID, or ULID projection generations.
+
+### Synthesis and helper boundary
+
+- Fetch helpers must validate bounded parameters before dispatch, preserve
+  request/revision checksums, and return stable typed envelopes. Concatenation,
+  splice, chunk, inverse, and pagination helpers must preserve source spans and
+  candidate ordinals rather than inventing IDs.
+- Raw retrieval hits must not be passed directly to a model. The required path
+  is retrieval -> filtering/reranking -> canonical ACE context -> ContextManifest
+  -> bounded Ornith synthesis/prefill/decode.
+- Ornith is the synthesis/tool-use consumer. It is not the EmbeddingGemma
+  semantic vector writer and must not receive hidden thoughts, KV cache, or
+  tensor state as persisted context.
+
+### GPU, JSON, bit encodings, and mmap
+
+- JSON/JSONL is for bounded control envelopes, receipts, and metadata. Do not
+  serialize bulk vectors or feature matrices through JSON.
+- Bitmaps and packed bit encodings select CandidateOrdinals or availability;
+  they do not replace canonical IDs. Record bit-width, endianness, layout
+  revision, and checksum in the artifact descriptor.
+- Large dense arrays use raw contiguous F32LE mmap or Arrow IPC metadata. RTX
+  PyTorch/ATen is the numerical executor; TypeScript owns descriptors, lineage,
+  admission, and receipt validation.
+- GPU memory swaps may move approved mmap/Arrow/tensor residency descriptors
+  keyed by candidate, representation, graph/feature revisions, and checksums.
+  Never persist hidden reasoning, KV cache, arbitrary tensor snapshots, or
+  unvalidated model state in Redis, Valkey, IndexedDB, or Qdrant.
+- CPU reference and RTX executor must compare CandidateOrdinal ordering,
+  availability masks, dimensions, checksums, and bounded numerical tolerances
+  before any GPU result is promotion-eligible.
+
+### Current Qdrant warning
+
+The 2026-08-31 read-only audits found 15 duplicate same-collection targets in
+the bounded canary and 5,634 duplicate PostgreSQL mappings in the full
+`codebase_chunks_768` collection. `codebase_chunks_768_v2` did not contain the
+canary rows. Do not cut over, delete, or treat the existing backfill utility as
+promotion-ready until an exact CandidateOrdinal/lineage map and blue/green
+alias readback are proven.

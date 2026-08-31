@@ -44,8 +44,10 @@
 
 ## 4. Investigate, don't assume (finding #4 — AST byte offsets)
 
-- [ ] 4.1 Check the actual node-tree-sitter native binding's documented return type for `startIndex`/`endIndex` (byte offset vs UTF-16 code-unit offset) — do not trust either the new code's assumption or the reviewer's hypothesis without checking the binding's own source/docs.
-- [ ] 4.2 If double-conversion is confirmed: write a test with a real multi-byte-character source file (emoji, accented text, or non-ASCII identifier) asserting the byte offsets line up with `Buffer.byteLength()` ground truth, before and after any fix — this exact class of bug is silent and easy to reintroduce.
+- [x] 4.1 **RESOLVED — verified against the installed native binding, 2026-08-31.** The runtime reports `startIndex=19` for a declaration preceded by `café` and `é`; the UTF-8 prefix is 21 bytes, matching the provider's `Buffer.byteLength(source.slice(0, startIndex), 'utf8')` conversion. This installed binding therefore exposes JavaScript string/code-unit indices at the provider boundary; the reviewer's claim that the live value is already a UTF-8 byte offset does not match the observed runtime.
+- [x] 4.2 **PROVEN — existing Unicode regression passed, 2026-08-31.** `node-tree-sitter-ast-provider.spec.ts` passed 6/6, including CRLF plus accented text before a declaration and a UTF-8 byte-slice readback assertion. No provider change was made because double-conversion was not confirmed.
+
+The separate embedding-runtime convergence issue remains open: `retrieval/embedding-service.ts` still exposes legacy Ollama/`dense_384` compatibility surfaces. It must be classified before changing callers; this AST finding does not authorize a retrieval migration.
 
 ## 5. Reconcile the Qdrant collection rename (findings #5, #6)
 

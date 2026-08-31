@@ -188,7 +188,7 @@ async function main() {
     writesPerformed: false,
     qdrantUrl: QDRANT_URL,
     candidateSnapshotRevision: ordinalMap.candidateSnapshotRevision,
-    ordinalMapChecksum: '9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b979c41a3a3',
+    ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
     candidateCount: candidates.length,
     sampleSize,
     collections: audits,

@@ -42,12 +42,11 @@ describe('embedQueryForLane — fail-closed dimension guard (dense_768)', () => 
     );
   });
 
-  it('does NOT reject the dense_384 lane truncating a genuine 768-dim model output — that is intentional, not corruption', async () => {
-    fetchSpy.mockResolvedValue(mockOllamaResponse(768));
+  it('rejects the retired dense_384 lane instead of deriving a new runtime vector', async () => {
     const { embedQueryForLane } = await import('../embedding-service.js');
 
-    const result = await embedQueryForLane('test query', 'dense_384');
-    expect(result.vector.length).toBe(384);
-    expect(result.dimension).toBe(384);
+    await expect(embedQueryForLane('test query', 'dense_384')).rejects.toThrow(
+      /EMBEDDING_LANE_RETIRED:dense_384/,
+    );
   });
 });

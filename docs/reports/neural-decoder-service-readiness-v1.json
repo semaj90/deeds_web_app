@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.neural-decoder-service-readiness.v1",
+  "status": "IMPLEMENTED_SHADOW",
+  "service": {
+    "module": "python/atlas_neural_decoder_service.py",
+    "defaultPort": 8121,
+    "reservedPorts": {
+      "8100": "go-retrieval/other service lane",
+      "8101": "topology-search"
+    },
+    "textSynthesis": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "representation": {
+    "input": "semantic_768",
+    "physical": "latent_256",
+    "derived": ["latent_128", "latent_64"],
+    "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+    "checkpointSha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5"
+  },
+  "proofs": {
+    "pythonCompile": "PASS",
+    "clientFocusedTests": "PASS_6_OF_6",
+    "liveHealth": "PASS",
+    "liveEncode": "PASS",
+    "liveProvenanceReadback": "PASS",
+    "featurePrefillAdapter": "PASS_GUARDED_OPT_IN_SEAM",
+    "featurePrefillAdapterTests": "PASS_6_OF_6",
+    "canonicalSemantic768Validation": "PASS_L2_DIMENSION_FINITE",
+    "prefillCacheReplay": "PASS_INJECTED_4_OF_4",
+    "liveValkeyCacheReplay": "NOT_RUN",
+    "fullTypecheck": "INCONCLUSIVE_TIMEOUT",
+    "containerBuild": "NOT_RUN",
+    "databaseWrites": 0,
+    "projectionWrites": 0,
+    "productionRetrievalWiring": false,
+    "productionTextSynthesisWiring": false
+  },
+  "nextGate": "QUALIFY_ACE_PREFILL_IDENTITY_AND_REPLACE_LEGACY_EMBEDDING_PATH_BEFORE_CALLER_WIRING",
+  "candidateOrdinalAudit": {
+    "artifact": "docs/reports/candidate-ordinal-corpus-v1.json",
+    "artifactSchema": "atlas.candidate-ordinal-map.v1",
+    "artifactCandidateCount": 4951,
+    "artifactCandidateSnapshotRevision": "corpus-snapshot:workspace-active-v1:v1",
+    "artifactOrdinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+    "qdrantCollection": "codebase_chunks_768",
+    "auditSampleSize": 256,
+    "qdrantPoints": 109776,
+    "qdrantContentVectorPoints": 109248,
+    "representedCandidateOrdinals": 3950,
+    "candidateCoveragePct": 79.782,
+    "identityQuality": {
+      "strong": 38023,
+      "sourceRefUnique": 44839,
+      "identityConflict": 933,
+      "unresolved": 25981
+    },
+    "payloadCandidateOrdinalField": "ABSENT_IN_1000_POINT_SAMPLE",
+    "runtimeBridgeDecision": "BLOCKED_EXACT_CANDIDATE_ORDINAL_BRIDGE_MISSING",
+    "canonicalWrites": false,
+    "evidenceCommand": "node scripts/atlas/audit-qdrant-candidate-coverage-v1.mjs --sample 256"
+  },
+  "callerAudit": {
+    "candidateOwner": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "prefillIdentityAvailableAtCaller": false,
+    "legacyEmbeddingPathsObserved": true,
+    "strictSemantic768Branch": "WIRED_BEHIND_EXISTING_FLAG",
+    "strictRuntimeProbe": {
+      "embeddingServer8121": "NOT_PROBED",
+      "embeddingServer8081": "HEALTHY_200",
+      "lineageEnvironmentKeysPresent": true,
+      "strictEmbeddingFlag": true,
+      "developmentAuthBypass": true,
+      "svelteKit5173": "HEALTHY_200",
+      "devBypassAuthProductionGuard": "IMPLEMENTED",
+      "authenticatedSearchProof": "PASS_200_2643MS",
+      "freshSearchProof": "PASS_200_CASCADE_4688MS",
+      "endToEndApplicationProof": "APP_SEARCH_PASS_STRICT_EMBEDDING_BRANCH_REACHABLE_DECODER_NOT_WIRED",
+      "candidateIdentityBridge": "MISSING_CANDIDATE_ORDINAL_AND_PREFILL_IDENTITY",
+      "searchReplay": "SECOND_REQUEST_CACHE_HIT",
+      "launcherFallbackNotice": "OLLAMA_L2_REPORTED_BY_DEV_GPU; STRICT_CANONICAL_BRANCH_REMAINS_FAIL_CLOSED",
+      "gpuFeatureFallbackNotice": "LIBTORCH_GRAPH_SIMILARITY_FELL_BACK_TO_CPU_DUE_TO_VRAM"
+    },
+    "decoderWiringAllowed": false,
+    "reason": "The caller must first receive a revision-qualified prefill identity and canonical semantic_768 provenance; the decoder remains opt-in and shadow-only."
+  },
+  "generatedAt": "2026-08-31T11:14:00-07:00"
+}

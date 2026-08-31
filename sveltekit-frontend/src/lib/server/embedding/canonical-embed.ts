@@ -8,6 +8,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 
 export type CanonicalEmbeddingResult = {
   model: string;
@@ -71,8 +72,11 @@ export async function embedSemantic768Canonical(
   if (!Array.isArray(embedding) || embedding.length !== 768) throw new Error(`SEMANTIC_768_INVALID_DIMENSIONS:${Array.isArray(embedding) ? embedding.length : 'missing'}`);
   const vector = embedding.map(Number);
   if (vector.some((value) => !Number.isFinite(value))) throw new Error('SEMANTIC_768_NON_FINITE');
-  const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
-  if (!(norm > 0)) throw new Error('SEMANTIC_768_ZERO_NORM');
+  try {
+    validateSemantic768OutputV1(vector);
+  } catch {
+    throw new Error('SEMANTIC_768_NOT_L2_NORMALIZED');
+  }
   if (body.model && body.model !== opts.model) throw new Error(`SEMANTIC_768_MODEL_MISMATCH:${body.model}`);
   return {
     representationId: 'semantic_768',

@@ -1127,3 +1127,23 @@ origin merge earlier this session), *that* caller is the right place to pass an 
 `featurePresence` override with real per-candidate coverage -- not a change to the pure/sync
 `deriveFeaturePresenceFromACE()` default, which is deliberately conservative and synchronous by
 design (its own JSDoc: "without re-running retrieval").
+
+### QDRANT-768-IDENTITY-AUDIT-02: live full-census diagnostic correction (2026-08-31)
+
+Ran the existing read-only `audit-qdrant-768-identity.mjs --json` against the live
+`codebase_chunks_768` collection. The census found 109,776 Qdrant points, 55,169 eligible
+PostgreSQL rows, 1,299 ambiguous mappings, 681 unmatched points, 5,634 PostgreSQL rows with
+multiple mapped Qdrant points, and zero CandidateOrdinal payloads. Qdrant point IDs are unique.
+
+The auditor was corrected so integer-ID continuity is observational only for the numeric subset;
+UUID point IDs are valid and do not fail retrieval safety. JSON mode now emits machine-parseable
+JSON on stdout while progress/env diagnostics go to stderr. The report remains
+`safe_for_retrieval: false` because identity ambiguity, unmatched points, duplicate canonical
+fanout, and absent CandidateOrdinal payloads remain unresolved. No database, Qdrant, or projection
+writes occurred. See `docs/reports/qdrant-768-identity-audit-live.json`.
+
+The independent read-only parity verifier agrees: `codebase_chunks_768` has 109,776 points versus
+55,169 PostgreSQL eligible rows, with 57,396 stale/mixed points and 2,789 missing projection rows;
+payload contract violations are zero. `--fix-stale` was not run. The projection remains blocked
+until the mixed historical cohort is reconciled and a revision-qualified CandidateOrdinal payload
+bridge is proven.

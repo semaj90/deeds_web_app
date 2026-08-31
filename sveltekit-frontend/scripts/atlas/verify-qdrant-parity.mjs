@@ -2,7 +2,10 @@
 /**
  * Qdrant Parity Verification — Atlas Knowledge Layer Production Gate
  *
- * Reconciles Postgres codebase_chunk_index against Qdrant codebase_chunks_384_hybrid.
+ * Reconciles Postgres codebase_chunk_index against the canonical Qdrant
+ * semantic_768 projection.
+ * Reconciles through payload.postgres_id when available; Qdrant point IDs are
+ * projection IDs and must not be compared directly to PostgreSQL chunk IDs.
  * Classifies every discrepancy into one of:
  *   valid_non_code   — atlas_packets row exists but no embedding (expected)
  *   stale_point      — Qdrant point has no matching Postgres row
@@ -18,10 +21,11 @@
 
 import pg from 'pg';
 
-const COLLECTION = 'codebase_chunks_384_hybrid';
+const COLLECTION = process.env.QDRANT_PARITY_COLLECTION ?? 'codebase_chunks_768';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const VERBOSE    = process.argv.includes('--verbose');
 const FIX_STALE  = process.argv.includes('--fix-stale');
+const CONFIRM_STALE_DELETE = process.env.ATLAS_CONFIRM_QDRANT_STALE_DELETE === '1';
 
 const pool = new pg.Pool({
   host:     process.env.PG_HOST     ?? 'localhost',
@@ -59,12 +63,14 @@ try {
 console.log('Loading Qdrant point IDs via scroll...');
 
 const qdrantIds    = new Set();
+const qdrantCanonicalIds = new Set();
 const qdrantPayloads = new Map();
+const canonicalPayloadId = (payload) => String(payload?.postgres_id ?? payload?.chunk_id ?? '').trim();
 let offset = null;
 let scrollCount = 0;
 
 while (true) {
-  const body = { limit: 500, with_payload: ['source_ref', 'packet_key', 'content_hash'], with_vector: false };
+  const body = { limit: 500, with_payload: ['source_ref', 'packet_key', 'content_hash', 'postgres_id', 'chunk_id'], with_vector: false };
   if (offset) body.offset = offset;
 
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
@@ -85,6 +91,8 @@ while (true) {
   for (const p of points) {
     qdrantIds.add(String(p.id));
     qdrantPayloads.set(String(p.id), p.payload ?? {});
+    const canonicalId = canonicalPayloadId(p.payload);
+    if (canonicalId) qdrantCanonicalIds.add(canonicalId);
   }
 
   offset = data.result?.next_page_offset;
@@ -105,17 +113,18 @@ const stale      = [];   // In Qdrant, not in Postgres
 const missing    = [];   // In Postgres, not in Qdrant
 const violations = [];   // In Qdrant but payload missing required fields
 
-// Points in Qdrant that have no Postgres row
+// Points in Qdrant that have no canonical PostgreSQL binding.
 for (const qid of qdrantIds) {
-  if (!pgIds.has(qid)) {
-    const payload = qdrantPayloads.get(qid);
-    stale.push({ id: qid, source_ref: payload?.source_ref ?? null });
+  const payload = qdrantPayloads.get(qid);
+  const canonicalId = canonicalPayloadId(payload);
+  if (!canonicalId || !pgIds.has(canonicalId)) {
+    stale.push({ id: qid, postgres_id: canonicalId || null, source_ref: payload?.source_ref ?? null });
   }
 }
 
 // Points in Postgres that are missing from Qdrant
 for (const pid of pgIds) {
-  if (!qdrantIds.has(pid)) {
+  if (!qdrantCanonicalIds.has(pid)) {
     missing.push({ id: pid, source_ref: pgSourceRefs.get(pid) });
   }
 }
@@ -126,7 +135,8 @@ for (const pid of pgIds) {
 // authoritative checks on recently backfilled collections.
 const REQUIRED_PAYLOAD = ['source_ref', 'packet_key'];
 for (const [qid, payload] of qdrantPayloads) {
-  if (!pgIds.has(qid)) continue; // already stale, skip
+  const canonicalId = canonicalPayloadId(payload);
+  if (!canonicalId || !pgIds.has(canonicalId)) continue; // already stale, skip
   const missingFields = REQUIRED_PAYLOAD.filter(f => !payload[f]);
   if (missingFields.length > 0) {
     violations.push({ id: qid, missing_fields: missingFields, source_ref: payload.source_ref ?? null });
@@ -151,7 +161,7 @@ if (VERBOSE || stale.length <= 50) {
   if (stale.length > 0) {
     console.log('\nStale Qdrant points:');
     for (const s of stale.slice(0, 50)) {
-      console.log(`  ${s.id}  source_ref=${s.source_ref ?? 'MISSING'}`);
+      console.log(`  ${s.id}  postgres_id=${s.postgres_id ?? 'MISSING'}  source_ref=${s.source_ref ?? 'MISSING'}`);
     }
     if (stale.length > 50) console.log(`  ... and ${stale.length - 50} more`);
   }
@@ -172,7 +182,11 @@ if (violations.length > 0) {
 }
 
 // ── Step 5: Fix stale points ─────────────────────────────────────────────────
-if (FIX_STALE && stale.length > 0) {
+if (FIX_STALE && stale.length > 0 && !CONFIRM_STALE_DELETE) {
+  console.error('QDRANT_STALE_DELETE_CONFIRMATION_REQUIRED: set ATLAS_CONFIRM_QDRANT_STALE_DELETE=1 only after reviewing the read-only report');
+}
+
+if (FIX_STALE && stale.length > 0 && CONFIRM_STALE_DELETE) {
   console.log(`\nDeleting ${stale.length} stale Qdrant points...`);
   const ids = stale.map(s => s.id);
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/delete`, {

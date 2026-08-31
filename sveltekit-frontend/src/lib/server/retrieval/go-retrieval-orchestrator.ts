@@ -24,6 +24,7 @@ import { qdrant } from '../vector/qdrant-manager.js';
 import { codebase_chunk_index, feature_statistics } from '../db/schema-postgres.js';
 import { mergeRRF, type RRFResult } from './multi-vector-rrf.js';
 import { getSourceRef, parseFeatureId } from './feature-identity.js';
+import { embedQueryForLane } from './embedding-service.js';
 
 import { ENV } from '$lib/server/env.server.js';
 export interface RetrievalQuery {
@@ -191,13 +192,8 @@ export class GoRetrievalOrchestrator {
   }
 
   private async embedQuery(query: string): Promise<number[]> {
-    const { tryEmbed } = await import('../embedding/ollama-embed.js');
-    const result = await tryEmbed(query, {
-      model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest',
-      expectedDimensions: 768,
-    });
-    if (!result?.embedding?.length) throw new Error('EmbeddingGemma query embedding unavailable');
-    return result.embedding;
+    const result = await embedQueryForLane(query, 'dense_768');
+    return Array.from(result.vector);
   }
 
   private async queryQdrantANN(embedding: number[], topK: number): Promise<any> {

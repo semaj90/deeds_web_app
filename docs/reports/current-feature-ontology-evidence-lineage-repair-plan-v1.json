@@ -1,12 +1,12 @@
 {
   "schema": "atlas.current-feature-ontology-evidence-lineage-repair-plan.v1",
   "operation": "CURRENT_FEATURE_ONTOLOGY_EVIDENCE_LINEAGE_REPAIR",
-  "generatedAt": "2026-08-28T04:57:29.242Z",
+  "generatedAt": "2026-08-31T19:51:38.553Z",
   "sourceMaterializationReport": "docs\\reports\\feature-ontology-relationship-materialization-v1.json",
   "sourceReadbackReport": "docs\\reports\\current-feature-ontology-relationship-readback-v1.json",
   "expectedRelationshipCount": 8,
   "preparedRelationshipCount": 8,
-  "readbackStatus": "CURRENT_RELATIONSHIP_APPLY_READBACK_FAILED",
+  "readbackStatus": "CURRENT_RELATIONSHIP_APPLY_READBACK_PROVEN",
   "selectionChecksum": "dd92b7238fd8385bca322a9c3431f7280c4045fecd9f0f5b37bd043a230a7f7e",
   "rows": [
     {
@@ -102,6 +102,6 @@
     "relationshipWritesAuthorized": false,
     "graphRevisionAuthorized": false
   },
-  "status": "EVIDENCE_LINEAGE_REPAIR_PLAN_READY_FOR_EXPLICIT_AUTHORIZATION",
+  "status": "EVIDENCE_LINEAGE_REPAIR_PLAN_BLOCKED",
   "nextGate": "EXPLICIT_EVIDENCE_LINEAGE_REPAIR_AUTHORIZATION"
 }

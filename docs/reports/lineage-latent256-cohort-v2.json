@@ -1,6 +1,6 @@
 {
   "schema": "atlas.lineage-latent256-cohort.v2",
-  "generatedAt": "2026-08-31T19:17:35.943Z",
+  "generatedAt": "2026-08-31T19:18:05.086Z",
   "readOnly": true,
   "postgresWrites": false,
   "qdrantWrites": false,

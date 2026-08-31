@@ -1556,3 +1556,84 @@ already maintains (`docs/architecture/runtime-ownership-registry.json` /
 section) — pure bookkeeping, zero behavior change, zero risk. Not done in this pass since it's
 still a real decision (confirming zero callers is not the same as confirming zero *intended future*
 callers) and the operator hasn't been asked.
+
+## OAK/DSPY/GEPA integration verification — 2026-08-31
+
+Status is intentionally split by the validation contract:
+
+| Lane | Status | Evidence |
+|---|---|---|
+| OaK Python adapter | **CREATED** | `python/atlas_oak_kernel.py`, `python/miniforge_nlp_sidecar_oak.py` |
+| DSPy repair adapter | **CREATED** | `python/parent_atlas_dspy_repair.py`, `python/parent_atlas_dspy_community.py` |
+| FastAPI availability | **PROVEN** | `fastapi 0.104.1` imports from the current environment |
+| OaK/DSPy contract tests | **PROVEN_BOUNDED** | `python -m pytest -q python/test_atlas_oak_kernel.py python/tests/test_parent_atlas_dspy_repair.py python/tests/test_parent_atlas_dspy_community.py` → 8 passed |
+| Python syntax | **PROVEN_BOUNDED** | `python -m py_compile` over the four adapter modules passed |
+| Live oaklib backend | **BLOCKED** | `oaklib` is not installed in the current environment |
+| Live DSPy program | **BLOCKED** | `dspy` is not installed in the current environment |
+| Live GEPA optimizer | **BLOCKED** | `gepa` is not installed in the current environment |
+| Production self-modification | **FORBIDDEN** | no promotion or mutation path was added |
+
+The copied adapters therefore provide a fail-closed contract and bounded tests, but they are
+not yet a live OaK 2026 ontology executor or a live DSPy/GEPA self-prompt repair loop. Do not
+mark OAK-08/OAK-09/OAK-11/OAK-12 complete from these results. Installation, model configuration,
+real execution receipts, deterministic replay, and promotion evidence remain required.
+
+The ownership boundary remains unchanged: OaK controls frozen kernel/function constraints, the
+existing bounded executor controls scheduling, DSPy/GEPA may propose offline program candidates,
+and PostgreSQL/Parent Atlas validators retain canonical authority. No SQLite ontology store, new
+identity scheme, or direct GEPA mutation is introduced by this verification.
+
+## Live sidecar verification — 2026-08-31
+
+The existing `miniforge-nlp-sidecar` container was checked without rebuilding or mutating
+PostgreSQL, Qdrant, Neo4j, or Valkey:
+
+| Gate | Status | Evidence |
+|---|---|---|
+| 8095 base health | **PROVEN_LIVE** | `GET http://127.0.0.1:8095/health` returned 200 and reported `langextract`, Tree-sitter, `treesitter-chunker`, and `ast-grep-py` active |
+| OAK health | **PROVEN_LIVE** | `GET http://127.0.0.1:8095/oak/health` returned `available:true`, `oaklibVersion:0.7.4`, `adapterConfigured:false`, `READ_ONLY_SHADOW` |
+| OaK kernel descriptor | **PROVEN_LIVE** | `GET http://127.0.0.1:8095/oak/kernel` returned the four frozen read-only functions and `canonicalAuthority:false` |
+| OAK adapter execution | **BLOCKED_SAFELY** | no `ATLAS_OAK_ADAPTER` configured; lookup/search/traverse must remain unavailable rather than downloading ontology state |
+| Live DSPy | **BLOCKED** | container import probe reports `dspy` unavailable |
+| Live GEPA | **BLOCKED** | container import probe reports `gepa` unavailable |
+| Container rebuild | **NOT_REQUIRED_FOR_OAK** | current image already contains `oaklib==0.7.4`; no rebuild was run |
+
+This proves the OAK/OaK FastAPI control surface is live in shadow mode, not that ontology
+lookup is configured and not that DSPy/GEPA self-prompt optimization is available. The next
+safe integration step is an explicit, revision-qualified read-only adapter locator followed by
+lookup/search replay. DSPy/GEPA remain an offline worker gate and must not be added to the 8095
+request path until their dependency pair and bounded evaluation receipt are available.
+
+### Adapter configuration census — 2026-08-31
+
+A repository-wide artifact search found no checked-in `.owl`, `.obo`, `.obob`, or ontology
+SQLite artifact suitable for configuring `ATLAS_OAK_ADAPTER`. The OaK sidecar therefore remains
+correctly health-only: no implicit ontology download, no SQLite fallback, and no guessed adapter
+locator. This is **BLOCKED_ON_EXPLICIT_ONTOLOGY_ARTIFACT**, not an implementation failure.
+
+The next required input is an operator-selected, checksum-recorded ontology artifact or a
+read-only PostgreSQL adapter implementation that reuses an existing Parent Atlas ontology owner.
+Until then, OAK health/kernel discovery is proven live, while lookup/search/traverse execution
+and deterministic ontology replay remain unproven.
+
+### PostgreSQL 18 OaK backend census — 2026-08-31
+
+Live read-only schema inspection confirms that PostgreSQL is the available durable OaK backend;
+no new ontology table is required for this integration:
+
+| Existing owner | Relevant lineage/evidence | OaK use |
+|---|---|---|
+| `atlas_ontology_tuples` | `source_ref`, `source_revision`, `workspace_revision`, `feature_revision`, `graph_revision`, `ontology_revision`, `evidence_refs`, `provenance` | primary read-only ontology tuple query source |
+| `atlas_ontology_linked_tuples` | `packet_key`, `source_ref`, `tree_node_id`, `evidence_span`, `ontology_ids`, `concept_ids`, `producer_revision` | grounded evidence lookup and span readback |
+| `atlas_ontology_concepts` | labels, aliases, namespace, schema version | bounded term lookup/search source |
+| `atlas_ontology_relations` | subject/object concepts, predicate, evidence, extractor version | bounded relation/traversal source |
+
+The PostgreSQL 18 AIO/bitmap capability remains an executor/planner optimization. The OaK
+adapter must issue bounded parameterized queries and record `EXPLAIN` evidence when performance
+is evaluated; it must not create an application-level AIO abstraction or claim that a physical
+bitmap plan is required for correctness.
+
+Current gate: **OAK-PG-ADAPTER-NEXT**. Implement or bind a read-only `AtlasOakPostgresAdapterV1`
+against these existing owners, return typed revision-qualified results, and replay one lookup,
+one search, and one bounded traversal twice. Until that adapter exists, the live 8095 OAK
+health/kernel endpoints are proven but ontology data operations remain unproven.

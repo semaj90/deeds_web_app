@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.graphify-file-embedding-backfill.v2",
+  "generatedAt": "2026-08-31T19:07:08.073Z",
+  "apply": false,
+  "requireEmbedServer": false,
+  "scope": {
+    "table": "codebase_chunk_index",
+    "representationId": "semantic_768",
+    "canonicalColumn": "content_embedding",
+    "physicalType": "halfvec(768)",
+    "sinceHours": 24,
+    "limit": 128,
+    "declaredType": "halfvec(768)"
+  },
+  "binding": {
+    "upstreamModelId": "google/embeddinggemma-300m",
+    "upstreamRevision": "",
+    "runtime": "llama.cpp/llama-server",
+    "endpoint": "http://127.0.0.1:8081",
+    "ggufSha256": "",
+    "llamaCppRevision": "",
+    "tokenizerSha256": "",
+    "executionProfileRevision": "",
+    "pooling": "mean",
+    "normalization": "l2",
+    "representationId": "semantic_768",
+    "dimensions": 768,
+    "maxInputTokens": 2048,
+    "formatterRevision": "graphify-embed-text-v1",
+    "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
+    "promptRevision": "unprompted-v0"
+  },
+  "bindingChecksum": "d178d5c922e5e842c6a689b9ace32a48a8780d603178fbaa83b8e1a061e457c2",
+  "inputPolicy": {
+    "formatterRevision": "graphify-embed-text-v1",
+    "inputPolicyRevision": "embeddinggemma-token-prefix-2048-v1",
+    "promptRevision": "unprompted-v0",
+    "maxInputTokens": 2048
+  },
+  "status": "DRY_RUN",
+  "selected": 0,
+  "embedded": 0,
+  "written": 0,
+  "skipped": 0,
+  "truncatedInputs": 0,
+  "inputLineageChecksum": null,
+  "inputLineageSample": [],
+  "errors": [],
+  "sample": [],
+  "elapsedMs": 108
+}

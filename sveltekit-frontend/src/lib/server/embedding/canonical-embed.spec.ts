@@ -30,3 +30,34 @@ describe('tryEmbedCanonical', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('embedSemantic768Canonical', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('rejects a non-normalized 768-vector before it can enter canonical retrieval', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/tokenize')) {
+        return new Response(JSON.stringify({ tokens: [1, 2] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({
+        model: 'embeddinggemma',
+        data: [{ embedding: new Array(768).fill(0.25) }],
+      }), { status: 200 });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { embedSemantic768Canonical } = await import('./canonical-embed.js');
+    await expect(embedSemantic768Canonical('strict semantic proof', {
+      model: 'embeddinggemma',
+      modelArtifactRevision: 'artifact-revision',
+      tokenizerRevision: 'tokenizer-revision',
+      inputPolicyRevision: 'input-policy-revision',
+      baseUrl: 'http://127.0.0.1:8081',
+    })).rejects.toThrow('SEMANTIC_768_NOT_L2_NORMALIZED');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-/** Read-only latent representation audit for the exact semantic canary. */
+/** Read-only latent_256 representation audit for the exact semantic canary. */
 import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const MAP = path.join(REPO_ROOT, '.tmp/atlas/lineage-qualified-candidate-map-v1.json');
-const REPORT = path.join(REPO_ROOT, 'docs/reports/lineage-latent-cohort-v1.json');
+const REPORT = path.join(REPO_ROOT, 'docs/reports/lineage-latent256-cohort-v2.json');
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1, connectionTimeoutMillis: 10000, statement_timeout: 60000 });
 const clean = (value) => { const text = String(value ?? '').trim(); return text || null; };
@@ -15,27 +15,37 @@ async function main() {
   const map = JSON.parse(fs.readFileSync(MAP, 'utf8'));
   const packetKeys = (map.candidates ?? []).map((candidate) => candidate.packetKey).filter(Boolean);
   if (!packetKeys.length) throw new Error('LATENT_COHORT_CANDIDATE_MAP_EMPTY');
-  const columns = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='atlas_packets'`);
+  const columns = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='codebase_chunk_index'`);
   const available = new Set(columns.rows.map((row) => row.column_name));
-  const optional = ['latent_64', 'latent_128', 'latent64_model', 'latent64_meta', 'latent64_msgpack', 'source_representation_id', 'projection_representation_id', 'representation_revision', 'workspace_revision', 'source_revision'];
-  const select = optional.map((name) => available.has(name) ? `ap.${name}` : `NULL AS ${name}`).join(', ');
-  const result = await pool.query(`SELECT ap.packet_key, ap.source_ref, ${select} FROM public.atlas_packets ap WHERE ap.packet_key = ANY($1::text[]) ORDER BY ap.packet_key`, [packetKeys]);
-  const rows = result.rows.map((row) => {
-    const has64 = row.latent_64 !== null && row.latent_64 !== undefined;
-    const has128 = row.latent_128 !== null && row.latent_128 !== undefined;
-    const hasProducer = Boolean(clean(row.latent64_model) || clean(row.latent64_meta));
-    const hasInput = clean(row.source_representation_id) === 'semantic_768';
-    const hasRevision = Boolean(clean(row.representation_revision) && String(row.representation_revision) !== '0');
-    const classification = !has64 && !has128
-      ? 'NO_LATENT_ARTIFACT'
-      : !hasProducer || !hasInput || !hasRevision
-        ? 'LEGACY_LATENT_IDENTITY_UNPROVEN'
-        : 'CURRENT_LATENT_COHORT_CANDIDATE';
-    return { packetKey: row.packet_key, sourceRef: row.source_ref, hasLatent64: has64, hasLatent128: has128, latent64Model: clean(row.latent64_model), sourceRepresentationId: clean(row.source_representation_id), representationRevision: clean(row.representation_revision), classification };
-  });
+  for (const required of ['source_ref', 'content_hash', 'latent_256']) if (!available.has(required)) throw new Error(`LATENT256_REQUIRED_COLUMN_MISSING:${required}`);
+  const optional = ['id', 'latent_256_checkpoint_revision', 'latent_256_representation_revision', 'embedding_model', 'embedding_version'];
+  const select = ['source_ref', 'content_hash', 'latent_256', ...optional.filter((name) => available.has(name)).map((name) => name === 'id' ? 'id::text AS id' : `"${name}"`)].join(', ');
+  const rows = [];
+  for (const candidate of map.candidates ?? []) {
+    const sourceRef = clean(candidate.sourceRef);
+    const hashRef = (candidate.evidenceRefs ?? []).find((value) => String(value).startsWith('chunk:'));
+    const contentHash = hashRef ? clean(String(hashRef).split(':').pop()) : null;
+    const result = sourceRef && contentHash
+      ? await pool.query(`SELECT ${select} FROM public.codebase_chunk_index WHERE source_ref=$1 AND lower(content_hash)=lower($2) ORDER BY ${available.has('id') ? 'id' : 'source_ref'}`, [sourceRef, contentHash])
+      : { rows: [] };
+    const row = result.rows.length === 1 ? result.rows[0] : null;
+    const hasVector = Boolean(row && row.latent_256 !== null && row.latent_256 !== undefined);
+    const checkpointRevision = clean(row?.latent_256_checkpoint_revision);
+    const representationRevision = clean(row?.latent_256_representation_revision);
+    const classification = result.rows.length === 0
+      ? 'LATENT256_CHUNK_ROW_MISSING'
+      : result.rows.length !== 1
+        ? 'LATENT256_CHUNK_ROW_AMBIGUOUS'
+        : !hasVector
+          ? 'LATENT256_VECTOR_MISSING'
+          : !checkpointRevision
+            ? 'LATENT256_CHECKPOINT_REVISION_MISSING'
+            : 'LATENT256_CURRENT_COHORT_CANDIDATE';
+    rows.push({ candidateOrdinal: candidate.candidateOrdinal, packetKey: candidate.packetKey, sourceRef, contentHash, codebaseChunkId: row?.id ?? null, hasLatent256: hasVector, checkpointRevision, representationRevision, classification });
+  }
   const counts = rows.reduce((acc, row) => { acc[row.classification] = (acc[row.classification] ?? 0) + 1; return acc; }, {});
   const report = {
-    schema: 'atlas.lineage-latent-cohort.v1',
+    schema: 'atlas.lineage-latent256-cohort.v2',
     generatedAt: new Date().toISOString(),
     readOnly: true,
     postgresWrites: false,
@@ -45,9 +55,9 @@ async function main() {
     candidateCount: packetKeys.length,
     rowsFound: rows.length,
     counts,
-    promotionEligible: counts.CURRENT_LATENT_COHORT_CANDIDATE === packetKeys.length,
-    latentAuthority: 'atlas_packets fields are inspected only; no latent producer or representation ledger is inferred',
-    nextGate: counts.CURRENT_LATENT_COHORT_CANDIDATE === packetKeys.length ? 'SOM_IDENTITY_PARITY_CANARY' : 'LATENT_PRODUCER_AND_REPRESENTATION_LEDGER_REQUIRED',
+    promotionEligible: counts.LATENT256_CURRENT_COHORT_CANDIDATE === packetKeys.length,
+    latentAuthority: 'codebase_chunk_index.latent_256 is inspected as the physical learned representation; derived latent_128/64 are not backfilled',
+    nextGate: counts.LATENT256_CURRENT_COHORT_CANDIDATE === packetKeys.length ? 'LATENT256_F32_DERIVATION_PARITY' : 'LATENT256_PRODUCER_AND_LINEAGE_REVIEW_REQUIRED',
     rows,
   };
   fs.mkdirSync(path.dirname(REPORT), { recursive: true });

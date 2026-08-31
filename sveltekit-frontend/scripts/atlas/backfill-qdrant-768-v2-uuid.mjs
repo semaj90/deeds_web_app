@@ -23,6 +23,10 @@ await loadAtlasEnv();
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
+
+if (APPLY) {
+  throw new Error('QDRANT_768_V2_APPLY_BLOCKED_CANDIDATE_ORDINAL_AND_SOURCE_REVISION_BRIDGE_MISSING');
+}
 const numericArg = (name, fallback) => {
   const value = process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
   const parsed = Number(value);
@@ -101,10 +105,10 @@ try {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - scannedRows);
     const query = `
       SELECT id, relative_path, chunk_id, content_hash,
-             content_embedding_768::text AS embedding_text,
+             content_embedding::text AS embedding_text,
              updated_at
       FROM codebase_chunk_index
-      WHERE content_embedding_768 IS NOT NULL
+      WHERE content_embedding IS NOT NULL
         AND id > $1
       ORDER BY id
       LIMIT $2

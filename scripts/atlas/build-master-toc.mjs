@@ -17,6 +17,13 @@ const checkOnly = process.argv.includes('--check');
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const repoPath = (value) => relative(repoRoot, value).split(sep).join('/');
+const readJson = (pathname) => {
+  try {
+    return JSON.parse(readFileSync(join(repoRoot, pathname), 'utf8'));
+  } catch {
+    return null;
+  }
+};
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
@@ -102,6 +109,9 @@ const registry = {
 const registryJson = JSON.stringify(registry, null, 2) + '\n';
 
 const openSpecs = records.filter((r) => r.kind === 'OPENSPEC' && r.path.endsWith('/tasks.md'));
+const qdrantIdentity = readJson('docs/reports/lineage-qdrant-semantic-canary-v1.json');
+const qdrantTargets = readJson('docs/reports/lineage-qdrant-projection-targets-v1.json');
+const latentParity = readJson('docs/reports/latent256-ann-exact-parity-bounded-v2.json');
 const toc = [
   '# Parent Atlas Master TOC',
   '',
@@ -130,6 +140,14 @@ const toc = [
   '## Runtime ETA',
   '',
   '- ETA unavailable: no current `WorkflowActionEventV1.progress.etaMs` receipt was consumed by this projection.',
+  '',
+  '## Latest verified retrieval findings',
+  '',
+  `- [Latent256 exact/Qdrant parity](reports/latent256-ann-exact-parity-bounded-v2.json) — ${latentParity?.schema ?? 'NOT_FOUND'} — ${latentParity ? `sample ${latentParity.sample_size}, k=${latentParity.k}, mean overlap ${latentParity.mean_overlap_at_k}` : 'not available'}.`,
+  `- [Qdrant semantic identity canary](reports/lineage-qdrant-semantic-canary-v1.json) — ${qdrantIdentity?.status ?? 'NOT_FOUND'} — ${qdrantIdentity ? `${qdrantIdentity.pointsReturned} points for ${qdrantIdentity.candidateCount} candidates; duplicates ${qdrantIdentity.duplicatePacketKeys?.length ?? 'n/a'}` : 'not available'}.`,
+  `- [Qdrant projection targets](reports/lineage-qdrant-projection-targets-v1.json) — ${qdrantTargets?.status ?? 'NOT_FOUND'} — ${qdrantTargets ? `same-collection duplicates ${qdrantTargets.counts?.duplicateSameCollection ?? 'n/a'}, missing ${qdrantTargets.counts?.noTarget ?? 'n/a'}` : 'not available'}.`,
+  '- Rebuild safety warning: the existing Qdrant backfill tool reads canonical vectors but still requires packet/workspace lineage reconciliation before apply; it is not a promotion-ready blue/green rebuild.',
+  '- Promotion note: Qdrant remains a rebuildable projection; duplicate ownership must be reconciled before cutover or deletion.',
   '',
 ].join('\n');
 

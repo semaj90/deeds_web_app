@@ -8,13 +8,14 @@
  *   - various client-side embed services
  *
  * Provides:
- * - Model selection (768-dim canonical, optional latent projections)
+ * - Model selection (768-dim canonical, derived representations only)
  * - Cache detection (Bifrost L1/L2)
- * - Fallback chain (gRPC → HTTP → Ollama)
+ * - Compatibility fallback chain for explicitly non-canonical callers
  * - Zero-copy tensor handling
  */
 
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
+import { embedSemantic768Canonical } from '$lib/server/embedding/canonical-embed.js';
 
 import { ENV } from '$lib/server/env.server.js';
 /**
@@ -50,7 +51,7 @@ export interface EmbeddingServiceConfig {
   /** Optional explicit model for the 768-dim source lane. */
   embed_model_768?: string;
 
-  /** Optional explicit model for the 384-dim legacy lane. */
+  /** Deprecated configuration retained only for migration diagnostics. */
   embed_model_384?: string;
 
   /** Ollama API URL (default: http://127.0.0.1:11434) */
@@ -111,7 +112,7 @@ export function getEmbeddingServiceConfig(): Required<EmbeddingServiceConfig> {
  * Priority order:
  * 1. L1 Redis exact-match cache (5ms)
  * 2. L2 Bifrost semantic cache (2-5s)
- * 3. Ollama embeddings (direct, 5-10s)
+ * 3. Compatibility embedding executor (non-canonical callers only)
  *
  * @param query String query or pre-embedded vector
  * @param target_dim Target dimension (default: config.target_dim)
@@ -215,22 +216,45 @@ export async function embedQueryForLane(
     // producing a dimensionally-valid but semantically-corrupted embedding that
     // passes every downstream check (Qdrant's own vector-size validation included)
     // while being cosine-scored against real 768-dim embeddings as if legitimate.
+    if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
+      return embedViaCanonicalRuntime(query, ENV.EMBEDDING_SERVER_MODEL ?? model, start);
+    }
     return embedViaOllama(query, 768, model, start, true);
   }
 
   if (lane === 'dense_384') {
-    const model = config.embed_model_384 || config.embed_model;
-    if (!config.embed_model_384) {
-      console.warn(
-        '[EmbeddingService] dense_384 lane falling back to canonical embedding model with explicit 384-dim truncation',
-      );
-    }
-    // requireExact768=false: this lane's whole purpose is truncating a 768-dim
-    // model output down to 384 — that is not corruption, do not reject it.
-    return embedViaOllama(query, 384, model, start, false);
+    throw new Error('EMBEDDING_LANE_RETIRED:dense_384:use_dense_768_or_official_mrl_lane');
   }
 
   throw new Error(`Unsupported embedding lane: ${lane}`);
+}
+
+async function embedViaCanonicalRuntime(
+  query: string,
+  model: string,
+  startTime: number,
+): Promise<EmbeddingResult> {
+  const modelArtifactRevision = ENV.EMBEDDING_MODEL_ARTIFACT_REVISION;
+  const tokenizerRevision = ENV.EMBEDDING_TOKENIZER_REVISION;
+  const inputPolicyRevision = ENV.EMBEDDING_INPUT_POLICY_REVISION;
+  if (!modelArtifactRevision || !tokenizerRevision || !inputPolicyRevision) {
+    throw new Error('SEMANTIC_768_STRICT_LINEAGE_CONFIGURATION_REQUIRED');
+  }
+  const result = await embedSemantic768Canonical(query, {
+    model,
+    modelArtifactRevision,
+    tokenizerRevision,
+    inputPolicyRevision,
+    baseUrl: ENV.EMBEDDING_BASE_URL,
+    timeoutMs: config.timeout_ms,
+  });
+  return {
+    vector: Float32Array.from(result.embedding),
+    model: result.model,
+    dimension: 768,
+    cached: false,
+    exec_ms: performance.now() - startTime,
+  };
 }
 
 /**
