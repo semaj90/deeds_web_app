@@ -233,6 +233,17 @@ export function checksumExperimentRunReceiptV1(value: ExperimentRunReceiptV1): s
   return checksumValue(experimentRunReceiptV1Schema.parse(value));
 }
 
+export function computeRelativeImprovementV1(input: {
+  baselineValue: number;
+  candidateValue: number;
+  optimizationDirection: ExperimentHypothesisV1['optimizationDirection'];
+}): number {
+  const scale = Math.max(Math.abs(input.baselineValue), Number.EPSILON);
+  return input.optimizationDirection === 'MAXIMIZE'
+    ? (input.candidateValue - input.baselineValue) / scale
+    : (input.baselineValue - input.candidateValue) / scale;
+}
+
 export function decideExperimentPromotionV1(input: {
   hypothesis: ExperimentHypothesisV1;
   receipt: ExperimentRunReceiptV1;
@@ -252,10 +263,17 @@ export function decideExperimentPromotionV1(input: {
   if (receipt.correctness.status !== 'PASS') reasons.push('CORRECTNESS_NOT_PROVEN');
   if (receipt.canonicalStateMutated) reasons.push('CANONICAL_STATE_MUTATED');
   if (receipt.writesOutsideWorktree) reasons.push('WRITE_ESCAPED_WORKTREE');
-
-  const improvement = receipt.benchmark.relativeImprovement;
   if (receipt.benchmark.targetMetric !== hypothesis.targetMetric) reasons.push('TARGET_METRIC_MISMATCH');
-  if (improvement < hypothesis.minimumRelativeImprovement) reasons.push('IMPROVEMENT_BELOW_FLOOR');
+
+  const derivedImprovement = computeRelativeImprovementV1({
+    baselineValue: receipt.benchmark.baselineValue,
+    candidateValue: receipt.benchmark.candidateValue,
+    optimizationDirection: hypothesis.optimizationDirection,
+  });
+  if (Math.abs(derivedImprovement - receipt.benchmark.relativeImprovement) > 1e-9) {
+    reasons.push('RELATIVE_IMPROVEMENT_MISMATCH');
+  }
+  if (derivedImprovement < hypothesis.minimumRelativeImprovement) reasons.push('IMPROVEMENT_BELOW_FLOOR');
 
   const blocked = reasons.some((reason) =>
     reason.endsWith('_MISMATCH') ||
@@ -282,7 +300,7 @@ export function describeAutoresearchFabricV1(): string {
     'OaK constrains legal concepts/functions; ACE supplies bounded evidence; Prime/ACP-style workers may propose code; Mastra/Atlas DAGs own durable execution.',
     'Existing GPU resource envelopes and admission receipts remain the VRAM admission owner; an experiment lease only binds that admission to one isolated run.',
     'PyTorch ATen is a preferred reference surface while cuTile, CUDA SIMT, Triton, CuTeDSL, cuVS and cuGraph are explicit challenger/provider labels.',
-    'Correctness is evaluated before performance, and performance may promote only when all identity, workload, mutation and improvement gates pass.',
+    'Correctness is evaluated before performance, and performance may promote only when all identity, workload, mutation and independently-derived improvement gates pass.',
     'BitFrost/Valkey may cache or coordinate experiment artifacts and leases but never determine promotion truth.',
     'Experiment outcomes are append-only evidence suitable for later ontology/hypergraph research memory and do-not-repeat retrieval.',
   ].join(' ');
