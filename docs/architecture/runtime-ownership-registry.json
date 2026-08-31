@@ -32,6 +32,40 @@
         { "path": "scripts/run-pagerank.ts", "classification": "COMPATIBILITY", "evidence": "Separate CouchDB + GPU path (couchdb:pagerank_scores Redis cache); untouched, not confirmed dead." }
       ]
     },
+    "neural_decoder_prefill": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.ts",
+        "export": "runNeuralDecoderPrefillCallerV1",
+        "evidence": "Added 2026-08-31 (openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md). Two modes only (DISABLED, SHADOW_READONLY -- ENABLED_PRODUCTION deliberately not yet a value, gated behind PREFILL-QUALITY-01 QRELS). Fail-open on decoder unavailable/rejected verified by test: resolvedPrefillChecksum identical across every mode/outcome. This is the single real-owner seam; do not build a second caller for the same capability."
+      },
+      "components": [
+        {
+          "name": "decoder-service",
+          "path": "python/atlas_neural_decoder_service.py",
+          "classification": "BACKEND",
+          "status": "RUNTIME_SMOKE_PROVEN",
+          "evidence": "FastAPI service proven live on host port 8121 (DECODER-LIVE-01: checkpoint revision/SHA matched between health and encode, output widths 256/128/64). Not containerized yet -- DECODER-CONTAINER-01 open."
+        },
+        {
+          "name": "decoder-qualified-prefill-identity",
+          "path": "sveltekit-frontend/src/lib/server/atlas/prefill/decoder-qualified-prefill-identity-v1.ts",
+          "classification": "CANONICAL_OWNER",
+          "status": "UNIT_PROVEN_NOT_LIVE",
+          "evidence": "Closes a stale-record-under-SET-NX cache-identity trap flagged before any live atlas:prefill:v1 Valkey wiring exists: folds checkpoint/representation/policy revisions + input latent checksum into a checksum, deliberately excluding executor coordinates and the decoder output checksum (unknown until after a MISS). 10/10 tests."
+        },
+        {
+          "name": "prefill-shadow-caller",
+          "path": "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts",
+          "classification": "ADAPTER",
+          "status": "UNIT_PROVEN_NOT_LIVE",
+          "evidence": "Wired into context-assembler.ts's one attachContextManifestToACE() call site (Parent Atlas preflight branch -- the only place in the repo that builds a ContextManifest). Derives basePrefillIdentityChecksum by composing the manifest's already-computed identity.candidate_ordinal_set_checksum + identity.evidence_revision_checksum (no new identity math). Gated behind ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED, default false, not enabled anywhere. Query-only scope: shadows the query embedding through the decoder, not per-candidate embeddings -- ACEContext.ragChunks does not carry per-candidate semantic_768 vectors through to manifest-build time (fetchRAGChunks() computes them transiently for reranking and discards them). Does not upgrade featurePresence.latent256 -- that stays correctly UNAVAILABLE until per-candidate wiring exists."
+        }
+      ],
+      "persistence_targets": [],
+      "known_existing_duplication": [],
+      "note": "No canonical Postgres/Valkey writes exist yet -- SHADOW_READONLY only. The Redis feature cache (atlas:neural-decoder-feature:v1:*) is a derived-feature cache, not a canonical persistence target."
+    },
     "rerank": {
       "owner": {
         "classification": "CANONICAL_OWNER",
