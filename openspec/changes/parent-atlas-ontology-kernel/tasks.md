@@ -618,6 +618,30 @@ deterministic contract proof only; no action execution, schema inspection,
 or kernel freeze is claimed. The next gate is the read-only schema-ledger
 canary.
 
+**OAK-CANARY-01 readiness 2026-08-31:** live schema inspection is healthy,
+but the read-only migration checks block any schema-ledger canary. The live
+database migration maximum is `0` while the Drizzle journal reaches `41`;
+`107` SQL files are outside the journal, `feature_registry` is missing from
+the migration-owner manifest, and migration hash/latest-applied parity is
+unproven. No migration or schema write was performed. Receipt:
+`docs/reports/oak-schema-ledger-canary-readiness-v1.json`. The next action is
+migration-owner and ledger reconciliation, not applying a new migration.
+
+**Migration reconciliation follow-up 2026-08-31:** `npm run audit:drizzle`
+confirmed the live database is reachable and checked eight contract mirrors:
+`3` are statically and live aligned, `feature_registry` is live-missing, and
+the remaining blockers are explicit static/live column or index mismatches on
+`kanban_tasks`, `task_semantic_packets`, `atlas_packets`,
+`nes_chrom_packets`, `parent_atlas_documents`, and `route_runtime_packets`.
+The audit performed no writes. Do not apply a feature-registry or Kanban
+migration until one migration owner and a reconciled ledger are selected.
+Evidence: `docs/reports/postgres-contract-mirrors-report.json`.
+
+**Historical-note correction:** older text below that says OAK-07 was not
+started predates the now-built adaptive plan and kernel-bound planner. The
+current status is contract + deterministic replay proven; action execution,
+schema-ledger canary, and kernel freeze remain open.
+
 - [x] **Core constraint built 2026-08-31 (by the concurrent process,
   reconciled and committed this session at `e7ec116445` after full-suite
   verification — 30/30 spec files, 126/126 tests green, not just this
@@ -890,10 +914,21 @@ cd .. && python python/parent_atlas_ontology/onto_py_01_parity_check.py
   should follow that pattern, but adding the dependency itself wasn't
   done without flagging it first, matching the same discipline applied
   to the OAK-03B/03C JVM decision above.
-- **ONTO-PY-03** (tuple → Arrow IPC round-trip): `pyarrow` is already
-  available — this is the most immediately buildable of the remaining
-  four gates, just not attempted in this pass (scope/time boundary, not
-  a blocker).
+- ~~**ONTO-PY-03** (tuple → Arrow IPC round-trip)~~ — **DONE 2026-08-31.**
+  `python/parent_atlas_ontology/arrow_adapter.py` — the nested-struct
+  Arrow schema the operator specified (`participants` as
+  `list<struct<entityId, entityKind, role, label>>`, one atomic nested
+  column rather than four parallel positional lists — the same
+  "position silently becomes semantics" risk this whole package exists
+  to avoid). `onto_py_03_arrow_parity_check.py` round-trips the same
+  fixture through REAL Arrow IPC bytes (`pa.ipc.new_stream`/
+  `open_stream`, not just an in-memory `Table` — the actual wire format
+  a Go/GPU consumer would read), and asserts 9 checks, all passing:
+  row count, tuple id, participant count/roles/order/entityIds, evidence
+  refs, confidence, evidence span, and canonical checksum parity.
+  **Result: PASS, 9/9.** Report at
+  `docs/reports/ontology-linked-tuple-arrow-parity-v1.json`. Run:
+  `python python/parent_atlas_ontology/onto_py_03_arrow_parity_check.py`.
   **ONTO-PY-04** (NetworkX projection → same frozen GraphOrdinal map →
   cuGraph projection parity): `networkx` is already available; cuGraph
   is a separate, heavier GPU-library question not checked this pass.

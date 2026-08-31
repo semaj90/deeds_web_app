@@ -1,0 +1,56 @@
+{
+  "gate": "ONTO-PY-03",
+  "description": "OntologyLinkedTupleV1 -> Arrow IPC (real wire-format bytes, not just an in-memory Table) -> round-trip, exact",
+  "fixturePath": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "arrowIpcByteLength": 7552,
+  "checks": [
+    {
+      "name": "row_count_preserved",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "tuple_id_preserved",
+      "ok": true,
+      "detail": "7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3"
+    },
+    {
+      "name": "participant_count_preserved",
+      "ok": true,
+      "detail": "got 4"
+    },
+    {
+      "name": "participant_roles_and_order_preserved",
+      "ok": true,
+      "detail": "['cause', 'effect', 'evidence', 'tool']"
+    },
+    {
+      "name": "participant_entity_ids_preserved",
+      "ok": true,
+      "detail": "['symbol:S1', 'symbol:S2', 'symbol:T7', 'tool_call:typecheck-run-42']"
+    },
+    {
+      "name": "evidence_refs_preserved",
+      "ok": true,
+      "detail": "('vitest:ontology-kernel-end-to-end.spec.ts:pre-fix-run:4-failed-of-21',)"
+    },
+    {
+      "name": "confidence_preserved",
+      "ok": true,
+      "detail": "0.93"
+    },
+    {
+      "name": "evidence_span_preserved",
+      "ok": true,
+      "detail": "OntologyLinkedTupleEvidenceSpanV1(sourceRef='src/lib/server/atlas/symbol-repair-example.ts', start=120, end=168)"
+    },
+    {
+      "name": "canonical_checksum_parity_via_arrow_ipc",
+      "ok": true,
+      "detail": "original=2aa08acf649137767028e18391b3f8053922dc8343b4f5e8966f24a00f65fea9 round_trip=2aa08acf649137767028e18391b3f8053922dc8343b4f5e8966f24a00f65fea9"
+    }
+  ],
+  "pass": true,
+  "durationMs": 1805.67,
+  "writesPerformed": false
+}
