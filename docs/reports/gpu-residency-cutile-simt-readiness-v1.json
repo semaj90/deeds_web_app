@@ -1,0 +1,169 @@
+{
+  "schema": "atlas.gpu-residency-cutile-simt-readiness.v1",
+  "generatedAt": "2026-08-31T14:30:00-07:00",
+  "repository": "semaj90/deeds_web_app",
+  "auditedHead": "68d66622aea3004d5dd700e694e969cb1efdc36c",
+  "status": "CONSOLIDATION_REQUIRED_BEFORE_CUTILE_OR_SIMT_PROMOTION",
+  "architectureDecision": {
+    "gpuResidencyRole": "RECONSTRUCTIBLE_PERFORMANCE_LAYER",
+    "identityAuthority": false,
+    "canonicalOwnerChanged": false,
+    "referenceExecutor": "PYTORCH",
+    "challengerExecutors": [
+      "CUTILE",
+      "CUDA_SIMT"
+    ],
+    "promotionExecutors": [
+      "CUVS",
+      "CUGRAPH"
+    ],
+    "allocatorPolicy": "SELECT_BY_PROVIDER_AND_REVISION_NOT_CONCRETE_RMM_CLASS_NAME"
+  },
+  "proven": [
+    {
+      "claim": "Candidate-feature owner-process CUDA residency exists with checksum validation, CandidateOrdinal gather, lease release, and no CUDA IPC or identity authority",
+      "evidence": [
+        "sveltekit-frontend/python/parent_atlas_tensor/gpu_resident_executor.py",
+        "scripts/atlas/prove-candidate-feature-gpu-residency.py"
+      ]
+    },
+    {
+      "claim": "PyTorch semantic-vector reference already performs L2 normalization plus bounded dot-product/cosine top-k on a resident CUDA tile",
+      "evidence": [
+        "sveltekit-frontend/python/parent_atlas_tensor/gpu_tile_cache.py",
+        "docs/reports/tensor-residency-gate-t2-t3-proof-2026-08-23.json"
+      ],
+      "observed": {
+        "matrixShape": [200, 768],
+        "topK": 10,
+        "gpuDevice": "NVIDIA GeForce RTX 3060 Ti",
+        "pinnedAsyncH2D": true,
+        "topKIndexParity": true,
+        "maxAbsValueDiff": 7.450580596923828e-9
+      }
+    },
+    {
+      "claim": "ACE utility ranking has been exercised against real GPU LRU pressure and the ordering footgun was fixed with promote_ranked()",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/atlas/tensors/ace-residency-policy.ts",
+        "sveltekit-frontend/python/parent_atlas_tensor/gpu_tile_cache.py",
+        "docs/reports/tensor-residency-gate-t4-proof-2026-08-23.json"
+      ]
+    },
+    {
+      "claim": "Generic artifact addresses already support GPU_RESIDENT locators and candidate-feature batch requests bind exact lease/device/buffer/checksum identity",
+      "evidence": [
+        "sveltekit-frontend/src/lib/server/queue/artifact-work-item-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-batch-request-v1.ts"
+      ]
+    }
+  ],
+  "duplicationFindings": [
+    {
+      "capability": "CANDIDATE_FEATURE_GPU_LEASE",
+      "status": "DUPLICATE_OWNER",
+      "owners": [
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.ts"
+      ],
+      "preferredConsolidationDirection": "Keep the residency-v1 family as the candidate-feature lease seam because CandidateFeatureGpuBatchRequestV1 already depends on it and it maps the real Python residency observation into ArtifactAddressV1; archive or explicitly supersede the unused resident-lease-v1 family only after caller census remains empty."
+    },
+    {
+      "capability": "NUMERIC_ARTIFACT_MANIFEST",
+      "status": "OVERLAPPING_CONTRACTS",
+      "owners": [
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-manifest-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-work-item-v1.ts"
+      ],
+      "preferredConsolidationDirection": "Do not add AtlasNumericArtifactV1 yet. First define which existing contract owns immutable numeric artifact lineage and which contract is only a storage/location projection."
+    }
+  ],
+  "gaps": [
+    {
+      "gate": "PRODUCTION_ENTRY_POINT",
+      "status": "NOT_PROVEN",
+      "detail": "The generic tensor-residency subsystem remains isolated from production request paths; proven GPU mechanisms are not equivalent to a live pipeline owner."
+    },
+    {
+      "gate": "REVISION_BOUND_RESIDENT_REUSE",
+      "status": "NOT_PROVEN",
+      "detail": "TensorRuntime.ensureGpu() checks presence by tileKey only and does not verify expected artifact checksum/revision before reuse."
+    },
+    {
+      "gate": "INVALIDATION_AND_EVICTION_RECEIPT",
+      "status": "NOT_PROVEN",
+      "detail": "ResidencyEvent and Valkey invalidation interfaces exist, but no live revision-change proof currently demonstrates deterministic GPU demotion/eviction plus an auditable receipt."
+    },
+    {
+      "gate": "GPU_PROVIDER_REGISTRY",
+      "status": "DECLARATION_ONLY",
+      "detail": "NumericBackendDescriptor exists but has no callers and does not yet bind provider kind plus provider/runtime revision to a proven execution receipt."
+    },
+    {
+      "gate": "CUTILE_PARITY",
+      "status": "NOT_STARTED",
+      "detail": "Do not implement until artifact/lease ownership and revision invalidation are canonicalized."
+    },
+    {
+      "gate": "CUDA_SIMT_PARITY",
+      "status": "NOT_STARTED",
+      "detail": "Keep as a separate challenger kernel implementation; do not mix SIMT and cuTile code inside one kernel."
+    },
+    {
+      "gate": "RMM_PROVIDER_SELECTION",
+      "status": "OPEN",
+      "detail": "Record provider/version and behavior rather than freezing a concrete RMM memory-resource class ABI."
+    }
+  ],
+  "externalCompatibility": {
+    "cuTile": {
+      "documentationReleaseObserved": "1.5.0",
+      "supportedGpuComputeCapability": "8.x-12.x",
+      "minimumDriverFamily": "R580",
+      "interKernelSimtInterop": true,
+      "intraKernelTileSimtMixing": false,
+      "dataModel": "ARRAYS_NOT_POINTERS",
+      "sources": [
+        "https://docs.nvidia.com/cuda/cutile-python/quickstart.html",
+        "https://docs.nvidia.com/cuda/cutile-python/interoperability.html",
+        "https://docs.nvidia.com/cuda/cutile-python/data.html"
+      ]
+    },
+    "rmm": {
+      "stableDocumentationObserved": "26.08",
+      "migrationBoundary": "26.06_CCCL_NATIVE_RESOURCE_MODEL",
+      "sources": [
+        "https://docs.rapids.ai/api/rmm/stable/migration_guide_2606/",
+        "https://docs.rapids.ai/api/rmm/stable/python/"
+      ]
+    }
+  },
+  "nextGateOrder": [
+    "CANONICALIZE_GPU_LEASE_AND_NUMERIC_ARTIFACT_OWNERSHIP",
+    "PROVE_REVISION_BOUND_RESIDENT_REUSE_REJECTS_STALE_ARTIFACT",
+    "PROVE_EXPLICIT_EVICTION_AND_VRAM_PRESSURE_RECEIPT",
+    "WIRE_ONE_BOUNDED_PRODUCTION_READ_ONLY_CALLER",
+    "ADD_REVISIONED_PYTORCH_PROVIDER_RECEIPT",
+    "ADD_CUTILE_NORMALIZE_DOT_CHALLENGER",
+    "ADD_CUDA_SIMT_NORMALIZE_DOT_CHALLENGER",
+    "RUN_CPU_PYTORCH_CUTILE_SIMT_PARITY",
+    "ONLY_THEN_REVISIT_CUVS_CUGRAPH_PROMOTION"
+  ],
+  "doNotDoYet": [
+    "Do not add a new AtlasNumericArtifactV1 beside the existing artifact manifests.",
+    "Do not add a third GPU residency lease owner.",
+    "Do not install or promote cuTile solely to prove feasibility.",
+    "Do not add a custom allocator or freeze RMM concrete class names.",
+    "Do not begin PageRank or CAGRA from this gate."
+  ],
+  "repositoryChanges": {
+    "runtimeCodeChanged": false,
+    "databaseWrites": false,
+    "gpuExecutionPerformedByThisAudit": false,
+    "productionWrites": false,
+    "documentationReceiptAdded": true
+  }
+}
