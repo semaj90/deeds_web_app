@@ -46,6 +46,8 @@ export * from './core/external-doc-retrieval-proof.js';
 export * from './core/external-doc-retrieval-runtime.js';
 export * from './core/ast-grep-observation-adapter.js';
 export * from './core/simdjson-typed-evidence-adapter.js';
+export * from './core/adaptive-dag-plan-v1.js';
+export * from './core/kernel-bound-dag-planner-v1.js';
 export * from './core/ontology-kernel-schema-v1.js';
 export * from './core/ontology-owl-projection-v1.js';
 export * from './core/schema-verification-receipt-v1.js';
