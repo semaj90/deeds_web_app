@@ -193,6 +193,16 @@ export async function executeOak2026AdaptiveDagV1(input: {
   const genericReceipts = await runBoundedExecutionPlan(tasks, input.limits);
   const completedAt = new Date().toISOString();
 
+  const writesPerformed = plan.actions.some((action) =>
+    actionRuntime.get(action.actionId)?.result?.writesPerformed === true,
+  );
+  if (input.context.executionMode === 'SHADOW' && writesPerformed) {
+    const firstWriter = plan.actions.find((action) =>
+      actionRuntime.get(action.actionId)?.result?.writesPerformed === true,
+    );
+    throw new Error(`OAK_SHADOW_HANDLER_REPORTED_WRITE:${firstWriter?.actionId ?? 'unknown'}`);
+  }
+
   const actions = plan.actions.map((action, index) => {
     const generic = genericReceipts[index]!;
     const runtime = actionRuntime.get(action.actionId);
@@ -212,11 +222,6 @@ export async function executeOak2026AdaptiveDagV1(input: {
       elapsedMs,
       error: generic.status === 'FAILED' ? generic.error ?? 'OAK_EXECUTION_FAILED' : null,
     });
-  });
-
-  const writesPerformed = plan.actions.some((action) => {
-    const runtime = actionRuntime.get(action.actionId);
-    return runtime?.result?.writesPerformed === true;
   });
 
   const deterministicBody = {
