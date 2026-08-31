@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.candidate-feature-gpu-lease-owner-decision.v1",
+  "date": "2026-08-31",
+  "auditedHead": "1523408a78988d4d106d53c4514ff1a34c55b294",
+  "status": "CANONICAL_OWNER_DECIDED_LEGACY_ARCHIVE_PENDING",
+  "capability": "CANDIDATE_FEATURE_GPU_LEASE",
+  "canonicalOwner": {
+    "module": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+    "schema": "atlas.candidate-feature-gpu-residency-lease.v1",
+    "type": "CandidateFeatureGpuResidencyLeaseV1",
+    "reasons": [
+      "It is already the lease consumed by CandidateFeatureGpuBatchRequestV1.",
+      "It binds the real owner-process CUDA residency observation into GPU_RESIDENT ArtifactAddressV1 values.",
+      "It carries candidateSnapshotRevision, ordinalMapChecksum, featureSnapshotChecksum, columnarChecksum, workspaceRevision, featureRevision and gpuPackChecksum lineage.",
+      "It binds deviceId/deviceName, host staging mode, opaque buffer IDs, source checksums and materialized resident checksums without exposing pointers or CUDA IPC.",
+      "It emits a separate release receipt instead of making a released lease look reusable."
+    ],
+    "downstream": [
+      "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-batch-request-v1.ts",
+      "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.spec.ts",
+      "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-batch-request-v1.spec.ts",
+      "sveltekit-frontend/python/parent_atlas_tensor/gpu_resident_executor.py",
+      "scripts/atlas/prove-candidate-feature-gpu-residency.py"
+    ]
+  },
+  "legacyImplementation": {
+    "module": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.ts",
+    "schema": "atlas.candidate-feature-gpu-resident-lease.v1",
+    "type": "CandidateFeatureGpuResidentLeaseV1",
+    "classification": "LEGACY_COMPATIBILITY_AND_HISTORICAL_PROOF_ONLY",
+    "productionCallersObserved": 0,
+    "nonProductionReferencesObserved": [
+      "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.spec.ts",
+      "sveltekit-frontend/scripts/atlas/prove-candidate-feature-gpu-resident-lease.mts",
+      "openspec/changes/parent-atlas-branch-merge-consolidation-aug20/swarm-reconciliation-2026-08-21-addendum.md"
+    ],
+    "evidenceWorthPreserving": [
+      "Real-CUDA physical resident checksum proof.",
+      "Release transition proof.",
+      "Post-release access rejection proof.",
+      "No raw pointer exposure.",
+      "No CUDA IPC export.",
+      "No identity authority or canonical writes."
+    ],
+    "notCanonicalBecause": [
+      "No batch-request consumer uses this schema.",
+      "It does not carry columnarChecksum, workspaceRevision, featureRevision or deviceName lineage present in the canonical owner.",
+      "It was independently built and never cross-referenced with the existing residency owner."
+    ]
+  },
+  "migrationPolicy": {
+    "newWriters": "MUST_USE_CANONICAL_OWNER",
+    "newReaders": "MUST_USE_CANONICAL_OWNER",
+    "legacySchemaMayCreateNewProductionLease": false,
+    "legacyProofArtifactsMayBeRetained": true,
+    "deleteWorkingProofScripts": false,
+    "archiveBeforeRemoval": true,
+    "databaseMigrationRequired": false,
+    "gpuBufferMigrationRequired": false,
+    "productionDataRewriteRequired": false
+  },
+  "invariants": [
+    "CandidateOrdinal remains snapshot-scoped execution identity, not canonical identity.",
+    "GPU residency remains a reconstructible performance layer.",
+    "ArtifactAddressV1 is a location/reference contract, not semantic authority.",
+    "Resident reuse must be bound to exact lease/checksum/revision identity.",
+    "No raw CUDA pointer or allocator-class name becomes an Atlas identifier.",
+    "cuTile, CUDA SIMT, cuVS and cuGraph remain executor implementations behind later promotion gates."
+  ],
+  "nextCodeGate": {
+    "id": "GPU-LEASE-CONSOLIDATE-02",
+    "status": "OPEN",
+    "steps": [
+      "Add an explicit deprecated/legacy marker to candidate-feature-gpu-resident-lease-v1.ts without changing its historical schema parser.",
+      "Move any reusable post-release assertions into canonical residency-v1 tests or a canonical release-receipt test.",
+      "Change the legacy proof script to historical-proof/compatibility status or archive it after the canonical proof covers the same safety invariants.",
+      "Run the canonical residency spec, batch-request spec and legacy spec together before removing any legacy builder/verifier export.",
+      "Search again for zero non-test/non-doc legacy callers before archive/removal."
+    ],
+    "requiredTests": [
+      "candidate-feature-gpu-residency-v1.spec.ts",
+      "candidate-feature-gpu-batch-request-v1.spec.ts",
+      "candidate-feature-gpu-resident-lease-v1.spec.ts"
+    ]
+  },
+  "afterConsolidation": [
+    "PROVE_REVISION_BOUND_RESIDENT_REUSE_REJECTS_STALE_ARTIFACT",
+    "PROVE_EXPLICIT_EVICTION_AND_VRAM_PRESSURE_RECEIPT",
+    "WIRE_ONE_BOUNDED_PRODUCTION_READ_ONLY_CALLER",
+    "ADD_REVISIONED_PYTORCH_PROVIDER_RECEIPT",
+    "ONLY_THEN_START_CUTILE_OR_CUDA_SIMT_PARITY"
+  ],
+  "writes": {
+    "runtimeCodeChanged": false,
+    "databaseWrites": false,
+    "gpuExecution": false,
+    "productionWrites": false,
+    "decisionReceiptOnly": true
+  }
+}
