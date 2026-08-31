@@ -29,13 +29,13 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 		vi.unstubAllGlobals();
 	});
 
-	it('writes graph_analysis_runs + graph_node_metrics transactionally when resident', async () => {
+	it('writes only shadow PageRank metrics for bounded top-K results', async () => {
 		const fetchMock = vi.fn(async (url: string) => {
 			if (url.endsWith('/v1/graph/resident')) {
 				return new Response(JSON.stringify({
 					schema: 'atlas.graph-residency.v1',
 					capability: { available: true, backend: 'cugraph.pagerank', backendVersion: '26.08', algorithmRevision: 'atlas.cugraph-pagerank.v1', maxSeeds: 64, maxResultNodes: 512, minGraphFreeGpuMb: 768, importError: null },
-					resident: { graphRevision: 'g-1', projectionRevision: 'p-1', nodeCount: 2, edgeCount: 1, nodeTableHash: 'n', edgeTableHash: 'e', loadedAtUnixMs: 1 },
+					resident: { graphRevision: 'g-1', projectionRevision: 'p-1', nodeCount: 4, edgeCount: 3, nodeTableHash: 'n', edgeTableHash: 'e', loadedAtUnixMs: 1 },
 				}), { status: 200, headers: { 'content-type': 'application/json' } });
 			}
 			return new Response(JSON.stringify({
@@ -56,8 +56,8 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 				didConverge: true,
 				precomputedOutWeight: true,
 				cacheHit: false,
-				nodeCount: 2,
-				edgeCount: 1,
+				nodeCount: 4,
+				edgeCount: 3,
 				results: [
 					{ rank: 1, gpuNodeId: 0, nodeKey: 'k0', packetKey: 'pk:0', score: 0.9 },
 					{ rank: 2, gpuNodeId: 1, nodeKey: 'k1', packetKey: null, score: 0.1 },
@@ -77,14 +77,40 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 		} as unknown as PoolClient;
 		const db = { connect: vi.fn(async () => fakeClient) } as unknown as Pool;
 
-		const result = await runCuGraphPageRankAnalysis(db, { sidecarUrl: 'http://127.0.0.1:8098' });
+		const result = await runCuGraphPageRankAnalysis(db, {
+			sidecarUrl: 'http://127.0.0.1:8098',
+			limit: 2,
+		});
 
 		expect(result.skippedReason).toBeUndefined();
 		expect(result.metricsWritten).toBe(1); // null-packetKey result excluded, not written
 		expect(result.unresolvedPacketKeys).toBe(1);
 		expect(result.run.backendActual).toBe('gpu-sidecar');
 		expect(result.run.gpuAccelerated).toBe(true);
+		expect(result.resultSemantics).toEqual({
+			algorithm: 'pagerank',
+			backend: 'cugraph',
+			selectionMode: 'TOP_K_SHADOW',
+			vertexCount: 4,
+			resultVertexCount: 2,
+			resultCoverage: 0.5,
+			graphRevision: 'g-1',
+			projectionRevision: 'p-1',
+			metricName: 'pagerank_cugraph_shadow',
+			canonicalMetricEligible: false,
+		});
+		expect(result.run.parameters).toMatchObject({ topK: 2, selectionMode: 'TOP_K_SHADOW' });
+		expect(result.run.metrics).toMatchObject({
+			metricName: 'pagerank_cugraph_shadow',
+			canonicalMetricEligible: false,
+			resultCoverage: 0.5,
+		});
 		expect(queries.map((q) => q.sql.trim().slice(0, 6))).toEqual(['BEGIN', 'INSERT', 'INSERT', 'COMMIT']);
+
+		const metricInsert = queries.find((q) => q.sql.includes('INSERT INTO graph_node_metrics'));
+		expect(metricInsert).toBeDefined();
+		expect(metricInsert?.params).toContain('pagerank_cugraph_shadow');
+		expect(metricInsert?.params).not.toContain('pagerank');
 		vi.unstubAllGlobals();
 	});
 });
