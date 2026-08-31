@@ -13292,3 +13292,252 @@ still intentionally pending, with database writes and import at zero.
 references, 49 llama-server/8081 references, and 31 files referencing both. This is an
 inventory only: parity, writer cutover, startup cutover, fallback removal, and production
 activation remain false. No embedding data or canonical rows were changed.
+
+**DECODER-PREFILL-ADAPTER-01 (2026-08-31)**: added the typed
+`atlas.neural-decoder-feature-prefill.v1` envelope to the server client. It
+binds `latent_256` output to an existing prefill identity, checkpoint revision,
+checkpoint SHA-256, and deterministic latent checksum while keeping
+`canonicalAuthority=false` and `writesPerformed=false`. Focused client tests
+now pass 3/3 and the Parent Atlas package TypeScript check passes. This closes
+the adapter contract only; `PREFILL-CALLER-01` remains open because no live
+prefill path invokes the adapter yet.
+
+### NEURAL-DECODER-PREFILL-ALIGNMENT-01 (2026-08-31)
+
+The decoder is now a separate shadow numerical service. It consumes canonical
+`semantic_768` vectors and returns the learned `latent_256` physical view plus
+the derived `latent_128` and `latent_64` views. It is not a text decoder and it
+does not own canonical identity, retrieval fusion, cache authority, or database
+writes.
+
+- [x] **DECODER-CONTRACT-01** — FastAPI service exists at
+  `python/atlas_neural_decoder_service.py` with bounded batches, finite-value
+  checks, exact dimensions, checkpoint revision validation, and noncanonical
+  write-free responses.
+- [x] **DECODER-CLIENT-01** — SvelteKit server client exists at
+  `sveltekit-frontend/src/lib/server/ai/neural-decoder-client.ts`; its response
+  parser requires checkpoint provenance and validates all three output widths.
+- [x] **DECODER-LIVE-01** — host HTTP health/encode proof passed on dedicated
+  port `8121`; live checkpoint revision and SHA-256 matched between health and
+  encode response; output widths were `256/128/64`.
+- [x] **DECODER-TEST-01** — focused client tests passed `2/2`; Python compile
+  passed; readiness report is `docs/reports/neural-decoder-service-readiness-v1.json`.
+- [ ] **DECODER-CONTAINER-01** — verify a PyTorch-capable image and add a
+  compose service without colliding with topology `8101`, Go Retrieval `8100`,
+  or the 8095 NLP sidecar. No speculative CUDA image is accepted.
+- [ ] **PREFILL-CALLER-01** — bind the decoder to the existing prefill/feature
+  owner through a read-only opt-in seam. No production caller currently invokes
+  the decoder client.
+- [ ] **PREFILL-CACHE-01** — prove cache MISS → decoder/feature work → revision-
+  qualified cache record → HIT replay. Existing prefill cache contracts are
+  fixture-proven. The injected decoder feature-cache replay now passes 4/4;
+  live Valkey wiring remains absent.
+- [ ] **PREFILL-REPLAY-01** — run the same frozen request twice and compare
+  latent checksums, prefill identity, ContextManifest identity, and reuse receipt.
+- [ ] **PREFILL-QUALITY-01** — complete human-labeled QRELS and held-out
+  nDCG/MRR/Recall evidence before any latent retrieval or prefill promotion.
+- [ ] **PREFILL-PROMOTION-01** — require explicit acceptance of lineage,
+  cache, replay, and quality receipts; keep production activation off until then.
+
+### PREFILL-IDENTITY-DECODER-01 / PREFILL-CALLER-01A / PREFILL-CALLER-01B (2026-08-31)
+
+Addressed a cache-identity trap flagged before any live Valkey wiring exists:
+the checked-in `atlas:prefill:v1` Valkey contract (prefill-contracts-v1.ts)
+uses SET NX EX (write-only-if-absent). If decoder provenance were attached
+only as sibling metadata on a prefill record -- without changing the
+*logical* prefill cache key -- a stale pre-decoder (or older-checkpoint)
+record would satisfy the same key, the NX write would no-op with
+ALREADY_EXISTS, and a caller would silently read a stale record until TTL
+expiry.
+
+- [x] **PREFILL-IDENTITY-DECODER-01** — added
+  `sveltekit-frontend/src/lib/server/atlas/prefill/decoder-qualified-prefill-identity-v1.ts`.
+  Composes on top of (does not replace) the existing `PrefillContentIdentityV1`
+  contract: `basePrefillIdentityChecksum` + `decoderContractRevision` +
+  `representationId` (`latent_256`) + `representationRevision` +
+  `checkpointRevision` + `checkpointSha256` + `latentInputChecksum` +
+  `decoderPolicyRevision` -> `decoderQualifiedPrefillIdentityChecksum`, using
+  the repo's own `canonicalSha256V1`/`canonicalEncodeV1` encoder (not raw
+  JSON). Deliberately excludes service URL/container ID (executor
+  coordinates, not logical output provenance) and `decoderOutputChecksum`
+  (unknown until after a cache MISS runs the decoder -- bound onto the
+  replay receipt instead, never the lookup key). 10/10 focused tests pass:
+  determinism, and independent sensitivity to every one of
+  `basePrefillIdentityChecksum` / `checkpointRevision` / `checkpointSha256` /
+  `latentInputChecksum` / `decoderPolicyRevision` / `decoderContractRevision` /
+  `representationRevision`, plus a `.strict()` rejection test proving
+  executor coordinates cannot leak into identity.
+
+- [x] **PREFILL-CALLER-01A** (partial layer, not yet a live production
+  caller) — added
+  `sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.ts`,
+  one layer above the existing guarded seam
+  (`neural-decoder-prefill-adapter.ts::prepareNeuralDecoderFeaturePrefill`,
+  DECODER-PREFILL-ADAPTER-01 above). Exposes exactly two modes —
+  `NeuralDecoderPrefillMode = 'DISABLED' | 'SHADOW_READONLY'`.
+  `ENABLED_PRODUCTION` is deliberately not a value yet (requires
+  PREFILL-QUALITY-01 first). Fail-open contract, verified by test, not just
+  asserted in a comment: `DISABLED` never touches decoder or cache;
+  `DECODER_UNAVAILABLE` (connectivity/config failure) and `DECODER_REJECTED`
+  (decoder answered but failed validation/checkpoint/dimension checks) both
+  preserve old prefill behavior. The load-bearing regression --
+  `resolvedPrefillChecksum` identical across `DISABLED`,
+  `DECODER_UNAVAILABLE`, `DECODER_REJECTED`, and both `HIT`/`MISS` outcomes
+  of `SHADOW_READONLY` -- is a real test, not a docstring claim:
+  `SHADOW_READONLY` records decoder provenance
+  (`decoderQualifiedPrefillIdentityChecksum`, checkpoint fields,
+  `latentInputChecksum`, `decoderOutputChecksum`) on the
+  `NeuralDecoderPrefillCallerReceiptV1` but `resolvedPrefillChecksum` always
+  equals `basePrefillIdentityChecksum` verbatim, and `canonicalWrites`/
+  `retrievalVotesAdded` are always `0` — it observes, it does not decide.
+
+- [x] **PREFILL-CALLER-01B** — same frozen request run twice against this
+  new caller: run 1 is a cache MISS (1 decoder call), run 2 is a cache HIT
+  (0 decoder calls), and `decoderQualifiedPrefillIdentityChecksum`,
+  `latentInputChecksum`, `decoderOutputChecksum`, and `resolvedPrefillChecksum`
+  are all identical across both runs. This is one layer stronger than the
+  existing PREFILL-CACHE-CONTRACT-01 fixture proof above (that one proved the
+  low-level cache-aside helper was internally deterministic; this proves the
+  same thing at the real caller-shaped seam, including the decoder-qualified
+  identity computation).
+
+All 22 focused tests pass across the three touched/new spec files
+(`decoder-qualified-prefill-identity-v1.spec.ts` 10/10,
+`neural-decoder-prefill-caller-v1.spec.ts` 6/6,
+`neural-decoder-client.spec.ts` 6/6, the latter re-run unchanged as a
+regression check). No Valkey, Postgres, Qdrant, or production writes were
+made or attempted.
+
+**Still open, correctly not touched here**: `PREFILL-CALLER-01` itself
+remains unchecked above — no real application owner (the caller census in
+DECODER-PREFILL-ADAPTER-01 names
+`context-assembler.ts` as the likely candidate, still blocked on that file
+lacking a revision-qualified prefill identity at its retrieval point) invokes
+`runNeuralDecoderPrefillCallerV1()` yet; this session only builds the seam a
+real owner would call. `DECODER-CONTAINER-01` and the live-Valkey half of
+`PREFILL-CACHE-01`/`PREFILL-REPLAY-01` (`PREFILL-VALKEY-01` in the informal
+lane-order this session used) still require operator action: a real
+`docker compose` service for the decoder on a non-colliding port, and an
+actual running Valkey instance to prove `GET` MISS → decoder → `SET NX EX` →
+`GET` HIT with real network round-trips, not an in-memory `Map` standing in
+for the cache. `PREFILL-QUALITY-01`/`PREFILL-PROMOTION-01` remain untouched
+and correctly gated behind human-labeled QRELS.
+
+Current classification: decoder `CREATED + PROVEN`; decoder-prefill integration
+`NOT WIRED`; promotion `BLOCKED`. The previous 70% validation receipt is a
+historical report and does not include this decoder service. No database,
+Qdrant, Valkey, Graphify, or production synthesis writes were performed.
+
+**PREFILL-CALLER-ADAPTER-01 (2026-08-31)**: added the guarded application
+seam `prepareNeuralDecoderFeaturePrefill()` in
+`sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-adapter.ts`.
+It is disabled unless `enabled: true`, validates the existing prefill identity
+before cache lookup or network execution, and returns `DISABLED` without
+calling either dependency by default. This is an explicit opt-in adapter, not
+live production wiring; `PREFILL-CALLER-01` remains open until an existing
+read-only application owner invokes it.
+
+The caller census identifies `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts`
+as the likely existing owner, but it currently contains legacy embedding
+paths and does not expose a revision-qualified prefill identity at the point
+where candidate/context work is assembled. Do not wire the decoder there until
+that identity and canonical `semantic_768` provenance are available.
+
+**EMBED-RUNTIME-VALIDATION-01 (2026-08-31)**: tightened
+`embedSemantic768Canonical()` to enforce the existing semantic contract's
+768-dimensional finite L2-normalized output. A focused regression rejects a
+non-normalized vector before it can enter canonical retrieval or decoder
+prefill. Combined embedding and decoder focused validation passed 8/8.
+
+**EMBED-ACE-BRIDGE-01 (2026-08-31)**: the shared ACE query-embedding helper
+now uses the strict `embedSemantic768Canonical()` executor when
+`ATLAS_CANONICAL_EMBEDDING_STRICT=true`. It requires model-artifact,
+tokenizer, and input-policy revisions and fails closed when they are absent;
+the legacy compatibility branch remains unchanged when strict mode is off.
+This is canonical embedding alignment, not neural-decoder caller wiring.
+
+The read-only environment probe found the embedding server healthy on `:8081`,
+all required lineage variable names present, and the running `dev:gpu`
+SvelteKit/Vite server healthy on `:5173`. Basic server health is proven;
+authenticated `/api/atlas/search` execution and end-to-end decoder caller
+proof remain pending.
+
+**AUTH-PROMOTION-GUARD-01 (2026-08-31)**: shared server environment loading
+now fails closed when `NODE_ENV=production` and `DEV_BYPASS_AUTH` parses true.
+Development `dev:gpu` behavior is unchanged; this prevents production startup
+from silently enabling the development authentication bypass.
+
+After startup completed, the development-bypassed `/api/atlas/search` request
+returned HTTP 200 in 2.643 seconds. A second request returned from the existing
+cache, so this proves application search availability and cache replay, not a
+fresh decoder invocation or end-to-end neural prefill wiring.
+
+A uniquely keyed development query then returned HTTP 200 through the cascade
+in 4.688 seconds, confirming the strict embedding-enabled application path is
+reachable after startup. The decoder was not invoked because no live feature
+prefill caller exists yet. Runtime logs also recorded libtorch graph-similarity
+CPU fallback under current VRAM pressure; this is an executor-performance
+finding, not a correctness or production-promotion proof.
+
+The route response still exposes projection-oriented Qdrant IDs rather than a
+proven CandidateOrdinal plus feature snapshot identity. That is the concrete
+missing bridge preventing safe decoder invocation; no fallback from Qdrant
+point ID or packet key is permitted.
+
+**PREFILL-CACHE-CONTRACT-01 (2026-08-31)**: the injected cache-aside replay
+seam now demonstrates MISS → one decoder call → revision-bound record → HIT,
+with identical latent checksum and no second decoder call. Focused client tests
+pass 4/4. This proves the cache contract only; no Valkey writes or live
+prefill caller were added.
+
+The Qdrant parity alias was repaired to point at the actual verifier, and the
+verifier now defaults to `codebase_chunks_768` rather than the legacy
+`codebase_chunks_384_hybrid`. Its reconciliation uses payload
+`postgres_id`/`chunk_id` when available instead of comparing projection point
+IDs directly to PostgreSQL IDs. The live result still reports 57,396 unmatched
+Qdrant points and 2,789 missing PostgreSQL candidates, so the collection is an
+older mixed projection cohort. No `--fix-stale` deletion was run.
+
+The verifier's destructive `--fix-stale` path now requires the explicit
+`ATLAS_CONFIRM_QDRANT_STALE_DELETE=1` environment confirmation after review;
+without it, the report remains read-only and no points are deleted.
+
+**PREFILL-CANDIDATE-ORDINAL-AUDIT-01 (2026-08-31)**: the read-only Qdrant
+CandidateOrdinal census was rerun against the persisted corpus map. The map
+contains 4,951 candidates, while `codebase_chunks_768` represents 3,950
+(79.782%); the audit observed 933 identity conflicts and 25,981 unresolved
+payload matches. A 1,000-point payload sample contained no `candidateOrdinal`
+field. The decoder remains shadow-only and the live caller remains unwired;
+packet keys and Qdrant point IDs must not be used as ordinal fallbacks.
+Evidence: `docs/reports/qdrant-candidate-coverage-v1.json` and
+`docs/reports/neural-decoder-service-readiness-v1.json`.
+
+The Qdrant 768 backfill writer census found two apply-capable scripts that
+could previously write without a proven CandidateOrdinal bridge. Both now fail
+closed on `--apply` with typed blocker errors. The v2 UUID script also reads
+the canonical `content_embedding` column instead of stale
+`content_embedding_768`; its dry-run remains available and correctly rejected
+an unbound sample row. No Qdrant writes were performed.
+
+The rerun also corrected a coverage-audit defect: the audit had hard-coded a
+stale ordinal-map checksum instead of reading the persisted map checksum. The
+script now propagates `ordinalMap.ordinalMapChecksum`; readback confirms the
+coverage report checksum matches `candidate-ordinal-corpus-v1.json`.
+
+The bounded `--sample 256` rerun preserved the same result: checksum parity
+true, 3,950 represented ordinals, 79.782% coverage, 933 conflicts, 25,981
+unresolved matches, and zero writes. This is a stable projection-identity
+blocker rather than a small-sample fluctuation.
+
+The read-only TurboVec rebuild plan confirms the same boundary: Qdrant
+`codebase_chunks_768` is reachable with 109,776 points and 768-dimensional
+`content`, but a 1,000-point payload sample contains no `candidateOrdinal`.
+The legacy `evidence_text.tvim` artifact is stale and requires rebuild, but
+rebuild remains blocked until external IDs are bound to the exact ordinal map
+and allowlist recall is proven. No artifact was overwritten.
+
+The Go Retrieval service was also revalidated from its module directory:
+`go test ./...` passed. Its lane envelope already carries optional
+`CandidateOrdinal` and its Qdrant reader accepts `candidate_ordinal` /
+`candidateOrdinal`; live payload absence therefore leaves the field unresolved
+and does not justify a packet-key or point-ID fallback.
