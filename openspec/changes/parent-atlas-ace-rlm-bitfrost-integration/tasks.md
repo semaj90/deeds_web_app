@@ -1159,6 +1159,56 @@ No new work should start on any of these without re-reading the relevant
 section above first — several looked simpler than they turned out to be
 (see KAG-05's two real bugs, NE-ID-06/07's corrected root-cause chain).
 
+## SIMD-01 / PERF0: partial benchmark, still open (2026-08-31)
+
+Ran a first real PERF0 measurement rather than leaving this purely theoretical, but this is
+**not** a closure — the pipeline this gate covers (live Neo4j/Postgres RLM persistence, the
+canonical producer-export decision below) is still unfinished, so payload sizes seen here are a
+snapshot, not the ceiling.
+
+**Measured** (native V8 `JSON.parse`, no simdjson):
+- Real RLM trace fixture (`docs/reports/rlm-environment-proof.json`, 1,845 bytes): **6.9 µs/parse**
+- Synthetic ACE context packet at this pipeline's documented upper bound (~13KB, 40 candidates):
+  **31.2 µs/parse**
+
+Both are 2-3 orders of magnitude below where simdjson's real gains show up (per CLAUDE.md's own
+GPU Acceleration Stack benchmarks: crossover ~1KB, meaningful wins at 10-100KB+, e.g. 12ms→2.4ms
+at 100KB). Against this pipeline's actual network/DB/LLM round-trip costs (seconds, not
+milliseconds), tens of microseconds of parse time is noise. **At current per-request payload
+sizes, JSON.parse is not a bottleneck and SIMD-01 is not justified — but this only covers
+per-request RLM/ACE payloads, not bulk file ingestion (see below), and not whatever payload shape
+shows up once live persistence and the producer-export decision actually land.**
+
+Web research (2026-08-31) on where JSON parsing genuinely is worth accelerating: simdjson Node
+bindings show ~5.5× real throughput on large files (`canada.json`: 236 ops/sec vs 42.67 ops/sec
+native) and the underlying library sustains 1-2 GB/s on modern hardware — but there's a real
+caveat that C++→JS object-marshaling overhead can eat the gain unless parsing lazily / extracting
+only needed fields (this repo's own `fastJsonExtractNumbers()` in `simdjson-bridge.ts` already
+does this correctly). For **bulk JSONL/large-file ingestion** specifically (as opposed to small
+per-request payloads), 2026 guidance is streaming (`readline`/`stream-json` over
+`createReadStream`), not a faster in-memory parser, to keep memory constant regardless of file
+size.
+
+That search directly surfaced a real, unrelated bug in the other blocked task below, not a
+hypothetical: **fixed** `scripts/atlas/materialize-kag-contracts-v1.mts` — it was doing
+`readFile()` the entire input file into memory, then `.split(/\r?\n/)` the entire string, and
+only *then* applying `--limit`, meaning `--limit` never actually bounded memory. Replaced with a
+`node:readline` line-by-line stream over `createReadStream` that stops reading once `limit` lines
+are collected. Verified live with a small real JSONL fixture: `inputLines: 2` confirmed the reader
+stopped exactly at `--limit=2` despite the file having 4 lines (one blank), and the existing
+Zod-validation/dry-run/rejection pipeline downstream is unchanged (both dummy records were
+correctly rejected by the real schemas; `canonicalWrites: false` as expected without `--apply`).
+This matters because the still-open "run the materializer against a reviewed Graphify/AST
+producer export" task above could plausibly hand it a large file (this repo's own
+`docs/graph/codebase-graph.json` is ~25MB) once a producer is selected — `--limit` now actually
+protects memory when that happens, whichever export is eventually chosen.
+
+**SIMD-01 remains open, not closed.** What would actually justify revisiting it: (a) live
+persistence lands and produces payloads meaningfully larger than the ~13KB upper bound measured
+here, or (b) the materializer needs to ingest genuinely large files where the *parse* step (not
+just the *read* step, now fixed) becomes measurably slow — re-run PERF0 against real numbers at
+that point rather than assuming the numbers above still hold.
+
 ## KAG-OWNER-01–07: field-level audit of the two competing relationship contracts (2026-08-26)
 
 Continuation of the cross-reference note above (item 5, "second, independent N-ary

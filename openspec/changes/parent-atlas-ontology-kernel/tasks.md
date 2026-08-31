@@ -308,14 +308,38 @@ Partial audit done at OAK-00 time (grep-verified, not assumed):
   real and already MCP-exposed**: `graph_expand_neighborhood`,
   `graph_shortest_path`, `hypergraph_expand_members`, `hypergraph_search`
   in the live TRACE MCP tool surface.
-- [ ] **Not yet done**: a full inventory of every existing retrieval/AST/
-  graph/validator function that should become an `AtlasKernelOperatorLibraryV1`
-  wrapper (the ~24 named operators in spec.md — `FILTER`, `JOIN`,
-  `LOOKUP_SYMBOL`, `SEARCH_SEMANTIC`, `RUN_TYPECHECK`, etc.). This audit
-  found the *shape* is real; it did not yet map each operator name to a
-  specific existing implementation file. That mapping is the actual OAK-01
-  deliverable and is not complete — do not treat this partial pass as
-  closing OAK-01.
+- [ ] **22/24 operators mapped to a real, grep-verified implementation (2026-08-31)** — still not
+  closing OAK-01: 2 remain genuinely unmapped, and every mapping below is a *candidate* pointer
+  found by inventory, not yet wired into `kernel-operator-library-v1.ts`'s actual executor
+  dispatch (that wiring is a separate, still-open step).
+
+  | Operator | Candidate implementation | Verified how |
+  |---|---|---|
+  | `FILTER`, `JOIN`, `PROJECT`, `GROUP`, `AGGREGATE` | Drizzle ORM query-builder primitives (`.where()`, `.innerJoin()`/`.leftJoin()`, `.select({...})`, `.groupBy()`, `sql`/`count()`/`sum()`) | Generic — these 5 aren't single named functions, they're `drizzle-orm`'s own query-builder API, used throughout `db/client.ts` consumers |
+  | `LOOKUP_SYMBOL` | `atlasSymbolRegistry` (`db/schema/atlas-structural-intelligence.ts:13`) | Already confirmed in `ontology-kernel-end-to-end.spec.ts`; re-verified table exists |
+  | `LOOKUP_PACKET` | `atlasPackets` (`db/schema/atlas-packets.ts:30`) | `pgTable('atlas_packets', ...)` confirmed |
+  | `SEARCH_LEXICAL` | `runRgSearchAtlas()` (`rg-atlas/run.ts:22`) | Already imported live in `src/mcp/server.ts` |
+  | `SEARCH_SEMANTIC` | `searchCodebaseAnn()` (`search/qdrant-search.ts:252`) | Exported function confirmed |
+  | `EXPAND_GRAPH` | `graph_expand_neighborhood` MCP tool / `expandGraphBounded()` (`graph/graph-retrieval-adapter.ts:32`) | Both confirmed real; the MCP tool is likely a thin wrapper over `expandGraphBounded` |
+  | `SHORTEST_PATH` | `graph_shortest_path` MCP tool (referenced in `ai/mcp-tool-dispatch.ts`, `ai/tool-shim.ts`) | Confirmed real via grep, matches the LLAMA_TO_MCP map in `scripts/atlas/runtime-mcp-tool-selector.mjs` |
+  | `BOUNDED_BFS` | `expandGraphBounded()` (`graph/graph-retrieval-adapter.ts:32`) | Same underlying function as `EXPAND_GRAPH` — shared implementation, hop-bounded by design (matches `graph-contract.ts`'s `maxHops` schema field, min 1 max 3) |
+  | `GET_CALLERS` | `graph_expand_neighborhood` MCP tool | Already confirmed in `ontology-kernel-end-to-end.spec.ts` |
+  | `GET_CALLEES` | **NOT MAPPED** | Checked `ts-morph-semantic-enrichment.ts`, `mcp-tool-dispatch.ts`, `tool-shim.ts`, the `atlas-tools-mcp.mjs` script — no direct callee-direction-specific function found. May share `graph_expand_neighborhood` with a reversed edge direction, but that reversal wasn't confirmed to exist as a callable option — do not assume it does |
+  | `GET_REFERENCES` | **NOT MAPPED** | Same search, same result — genuinely not found |
+  | `GET_SOURCE_SPAN` | `atlasSymbolVersions` (`db/schema/atlas-structural-intelligence.ts:48`) | Already confirmed in `ontology-kernel-end-to-end.spec.ts` |
+  | `GET_AST_EVIDENCE` | `adaptAstGrepMatches()` (`packages/parent-atlas/src/core/ast-grep-observation-adapter.ts:55`) | Exported function confirmed |
+  | `INTERSECT_ELIGIBILITY` | `assertSemantic768()` (`embedding/embedding-contract-768.ts:103`) | Confirmed real; gates representation ACTIVE/VERIFIED eligibility per the Phase 110 registry model referenced elsewhere in this repo (`api/retrieval/dual-lane`) |
+  | `RERANK` | `rerankCanonicalFeatureEnvelopes()` (`retrieval/canonical-rerank-executor.ts:690`) | Confirmed real; this is the repo's own designated canonical reranker (see CLAUDE.md's "14 reranker files" duplication-audit finding — this one is the confirmed-canonical owner) |
+  | `VALIDATE_SCHEMA` | Zod `.parse()`/`.safeParse()` | Generic — every `*V1Schema` in this repo already uses this; no single dedicated wrapper exists or is needed |
+  | `RUN_TEST` | `npm run test` (`vitest`, `package.json:16`) | External process invocation, not a TS function — confirmed script exists |
+  | `RUN_TYPECHECK` | `npm run check` (`svelte-check`, `package.json:15`) | Same — external process invocation, confirmed |
+  | `COMPARE_REVISION` | `assertFanoutBundleRevisions()` (`atlas/context/fanout-evidence-bundle-v1.ts:85`) | Confirmed real; asserts revision consistency across an evidence bundle — closest real match to "compare revisions" semantics |
+  | `BUILD_CONTEXT` | `assembleACEContext()` / `buildACEPromptCached()` (`features/ai/ace/context-assembler.ts:1443,4578`) | Already confirmed in `ontology-kernel-end-to-end.spec.ts` |
+
+  **Still not OAK-01-complete**: (1) `GET_CALLEES`/`GET_REFERENCES` have no confirmed implementation
+  — either a real gap in this repo's tooling, or an existing function under a name this audit
+  didn't think to search for; (2) none of the 22 candidate mappings above have actually been wired
+  into `kernel-operator-library-v1.ts`'s executor dispatch yet — this is an inventory, not a build.
 
 ## OAK-02 — `AtlasOntologyKernelSchemaV1`
 
