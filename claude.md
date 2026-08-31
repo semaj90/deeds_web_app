@@ -4452,3 +4452,53 @@ the bounded canary and 5,634 duplicate PostgreSQL mappings in the full
 canary rows. Do not cut over, delete, or treat the existing backfill utility as
 promotion-ready until an exact CandidateOrdinal/lineage map and blue/green
 alias readback are proven.
+
+## Neural Decoder Container + PyTorch/CUDA Pin Reference (2026-08-31)
+
+**TL;DR**: The Parent Atlas neural decoder (NestedSemanticAutoencoder,
+`semantic_768` → `latent_256`/`128`/`64`) is now a real `docker-compose` GPU
+service (`DECODER-CONTAINER-01`, closed), not just a manually-launched host
+process. Live-proven: real 768-dim encode call, `device: "cuda"`, checksums
+match. Full evidence trail:
+`openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md`
+(`DECODER-CONTAINER-01`, `PREFILL-CALLER-01` per-candidate wiring).
+
+| Item | Value |
+|---|---|
+| Service | `atlas-neural-decoder` in `docker/docker-compose.gpu.yml` (profile `atlas-gpu`) |
+| Dockerfile | `docker/atlas-neural-decoder/Dockerfile` |
+| Base image | `pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime` (pinned by tag **and** digest) |
+| Port | `8121` (matches `NEURAL_DECODER_URL` default; not `8100`/`8101`/`8095`) |
+| Checkpoint mount | `../models/nested-semantic-autoencoder:/models/nested-semantic-autoencoder:ro` |
+| VRAM footprint | ~200MB measured live (6384→6587MiB of 8192MiB) |
+
+**CUDA/PyTorch version note (verified via live web search, 2026-08-31) —
+don't copy the old `cu128` reference from historical proof logs**: `torch
+2.8.0+cu128`, seen in this repo's earlier host-process decoder proof, is now
+deprecated — PyTorch 2.12 CI removed CUDA 12.8 from its build matrix (week of
+2026-04-06). Current stable PyTorch as of this check is 2.12+/2.13.x. CUDA
+13.0 is PyTorch's own pip-wheel "stable" tier; CUDA 13.2 is still
+experimental there (nightly-only wheels), but Docker Hub ships
+maintainer-built `pytorch/pytorch:*-cuda13.2-*` release images independently
+of the pip wheel channel. cuTile (NVIDIA's tile-based kernel programming
+model) went stable on Ampere/compute-capability-8.x in CUDA 13.2 — this
+host's RTX 3060 Ti is 8.6, so 13.2 was chosen over 13.0 for forward-compat
+at zero measured cost (this decoder has no custom-kernel code path today).
+Before pinning any new PyTorch/CUDA Docker base image anywhere in this repo,
+verify current versions live (`docker manifest inspect` / `docker buildx
+imagetools inspect` + a real web search) — do not assume an old proof log's
+version string is still current.
+
+**Packaging gotcha (found via a real build failure, not hypothetical)**:
+`atlas_neural_decoder_service.py` imports `atlas_compute.latent_autoencoder`,
+but the real `python/atlas_compute/__init__.py` eagerly imports RAPIDS
+(`cugraph_ppr`, `cuvs_analytics`) modules this decoder never uses and a plain
+PyTorch image doesn't carry — importing the real package would crash at
+container startup. A minimal image must `COPY` only
+`latent_autoencoder.py` (verified self-contained: only imports
+numpy/torch/stdlib) plus a build-time-only empty `__init__.py` written
+inside the image — never copy the real package `__init__.py` for this
+service, and never edit the repo's real `atlas_compute/__init__.py` to work
+around it. Separately, this specific base image is Debian PEP-668
+"externally managed" — plain `pip install` fails there without
+`--break-system-packages` (safe for a single-purpose container).
