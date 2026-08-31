@@ -12,13 +12,14 @@ change described below is committed to disk, rebuilt clean, and passing.
 **A fresh session can resume directly from here — read this file top to
 bottom plus `spec.md`, no other context needed.**
 
-**Built and verified this session** (35/35 tests passing across 7 spec
+**Built and verified this session** (43/43 tests passing across 8 spec
 files in `packages/parent-atlas/src/core/`, package rebuilds clean, smoke
 test `scripts/atlas/oak-task-function-compiler-readiness-smoke-v1.mjs`
 PASS, report at `docs/reports/oak-task-function-compiler-readiness-v1.json`,
-**all of this committed and pushed to `main` at `4f600cec3f`** — do not
-re-derive, `git log`/`git show` it):
-- OAK-02 schema, OAK-03A OWL projection + `OntologyProfileReceiptV1`
+**all of this committed and pushed to `main`** — do not re-derive,
+`git log`/`git show` it):
+- OAK-02 schema, OAK-03A OWL projection + `OntologyProfileReceiptV1` +
+  `SchemaVerificationReceiptV1` output contract + policy-routing function
   (pure TS, no JVM, no reasoner adopted yet — see OAK-03 section), OAK-04
   operator library (**18 of 24 kinds**, each `implementationRef` verified
   real — not guessed), OAK-05 function compiler + a 3-function catalog,
@@ -88,7 +89,7 @@ it has repeatedly shipped real, relevant work mid-session.
 # 1. Rebuild the package after any source change (run from packages/parent-atlas)
 cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json
 
-# 2. Run all 7 ontology-kernel spec files (run from packages/parent-atlas — its
+# 2. Run all 8 ontology-kernel spec files (run from packages/parent-atlas — its
 #    own vitest, NOT sveltekit-frontend's, whose scope doesn't cover this package)
 cd packages/parent-atlas && node ../../node_modules/vitest/vitest.mjs run \
   src/core/ontology-kernel-end-to-end.spec.ts \
@@ -98,8 +99,9 @@ cd packages/parent-atlas && node ../../node_modules/vitest/vitest.mjs run \
   src/core/kernel-function-catalog-v1.spec.ts \
   src/core/oak-judge-feedback-v1.spec.ts \
   src/core/ontology-owl-projection-v1.spec.ts \
+  src/core/schema-verification-receipt-v1.spec.ts \
   --root .
-# Expect: 7 passed, 35 passed (0 known failures as of this handoff)
+# Expect: 8 passed, 43 passed (0 known failures as of this handoff)
 
 # 3. Re-run the OaK readiness smoke test (run from repo root — it imports
 #    directly from packages/parent-atlas/dist/index.js via pathToFileURL,
@@ -468,20 +470,52 @@ Partial audit done at OAK-00 time (grep-verified, not assumed):
   the disjoint/annotation-only split, n-ary reification, determinism, and
   the EL-vs-DL heuristic on both a clean-EL and a DL-required schema.
 
-  **OAK-03B (ELK subprocess adapter) and OAK-03C (HermiT subprocess
-  adapter) deliberately NOT attempted this pass.** Both require vendoring
-  a real external JVM binary (`elk.jar`/`HermiT.jar`) into or alongside
-  this repo — a materially more consequential action (a new runtime
-  dependency, license-distribution question, disk footprint) than a pure
-  TypeScript projection function, and shouldn't be done silently inside
-  the same pass that built the projection. This still needs the
-  operator's actual go-ahead on where the jars come from (vendored into
-  the repo vs. an operator-provisioned path vs. a documented manual
-  install step) before writing the subprocess-adapter code — the
-  `OntologyReasonerAdapter` Python interface shape (`profile()`/
+- [x] **`SchemaVerificationReceiptV1` output-side contract built
+  2026-08-31 — CREATED, explicitly NOT `WIRED`.**
+  `packages/parent-atlas/src/core/schema-verification-receipt-v1.ts` —
+  exactly the field shape the operator specified (`ontologyChecksum`,
+  `ontologyRevision`, `owlProfile`, `reasoner`, `reasonerVersion`,
+  `reasonerArtifactChecksum`, `consistent`, `unsatisfiableClasses`,
+  `classificationChecksum`, `outputArtifactChecksum`,
+  `invocationRevision`, `elapsedMs`, `writesPerformed: false` hard-typed
+  as `z.literal(false)`). Guardrails, both tested: refuses
+  `consistent=false` with zero named unsatisfiable classes (an
+  inconsistency claim with no cited cause isn't verifiable evidence);
+  refuses `consistent=true` with a non-empty `unsatisfiableClasses` list.
+  Also built `selectReasonerForOwlProfile()` — a single named function
+  implementing the operator's frozen policy
+  (`{EL_PROFILE: 'ELK', FULL_DL_REQUIRED: 'HERMIT'}`, `UNKNOWN` routes
+  conservatively to the stronger HermiT lane) so the routing decision
+  isn't scattered across call sites later.
+
+  **Checked directly before deciding not to build OAK-03B/03C**: this
+  environment has **no JVM at all** — `java -version` → `command not
+  found`, confirmed via direct execution, not assumed. Python exists
+  (`/c/Python313/python`) but that doesn't help without a JVM underneath
+  it (per the earlier research: HermiT/Pellet both need one, owlready2
+  just hides it behind a Python API). **OAK-03B (ELK subprocess adapter)
+  and OAK-03C (HermiT subprocess adapter) deliberately NOT attempted.**
+  Writing a subprocess adapter that shells out to `java -jar` in an
+  environment with no `java` binary would produce code that has never
+  actually run — this repo's own status-language rules
+  (`CREATED`/`WIRED`/`DRY_RUN_PROVEN`/`APPLY_PROVEN`/`NOT_PROVEN`) exist
+  specifically to prevent reporting that as more than `CREATED` even if
+  written. Still needs the operator's actual go-ahead on jar provenance
+  (vendored into the repo vs. an operator-provisioned path vs. a
+  documented manual install step) — and a JVM actually being available
+  somewhere this can run — before OAK-03B/03C can move past a docstring.
+  The `OntologyReasonerAdapter` Python class shape (`profile()`/
   `check_consistency()`/`classify()` → `SchemaVerificationReceiptV1`) is
-  already fully specified in the operator's message and ready to
-  implement the moment that's answered.
+  fully specified in the operator's message and ready to write the
+  moment a JVM + jars are actually reachable to test against — writing
+  the class body without anything to run it against would only produce
+  another `NOT_PROVEN` artifact, so it's held rather than added for its
+  own sake.
+
+  **Verified**: package rebuilt clean; **43/43 tests pass** across 8 spec
+  files (up from 35/7) — new `schema-verification-receipt-v1.spec.ts`
+  covers both guardrails, determinism, and all three policy-routing
+  cases (EL→ELK, DL→HermiT, UNKNOWN→HermiT).
 
 ## OAK-04 — `AtlasKernelOperatorLibraryV1`
 

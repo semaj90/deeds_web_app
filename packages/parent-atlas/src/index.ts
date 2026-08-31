@@ -48,6 +48,7 @@ export * from './core/ast-grep-observation-adapter.js';
 export * from './core/simdjson-typed-evidence-adapter.js';
 export * from './core/ontology-kernel-schema-v1.js';
 export * from './core/ontology-owl-projection-v1.js';
+export * from './core/schema-verification-receipt-v1.js';
 export * from './core/kernel-operator-library-v1.js';
 export * from './core/kernel-operator-library-symbol-repair-v0.js';
 export * from './core/kernel-function-v1.js';
