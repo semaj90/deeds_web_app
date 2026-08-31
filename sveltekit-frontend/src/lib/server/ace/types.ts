@@ -8,6 +8,7 @@ import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import type { AcePayload } from '$lib/server/ace/ace-payload-selector.js';
 import type { ContextManifest } from './context-compiler.parent-atlas.js';
 import type { AtlasProcessPacket } from '../atlas/process-packets.js';
+import type { NeuralDecoderPrefillCallerReceiptV1 } from '$lib/server/ai/neural-decoder-prefill-caller-v1.js';
 
 export interface ACEUserProfile {
 	userId: string;
@@ -284,6 +285,14 @@ export interface ACEContext {
   policyDecision: ACEPolicyDecision | null;
   /** Optional compiled manifest for exact packet injection receipts. */
   contextManifest?: ContextManifest | null;
+  /**
+   * PREFILL-CALLER-01 shadow receipt (SHADOW_READONLY only — never influences
+   * ranking, never a canonical write). Present only when
+   * NEURAL_DECODER_PREFILL_SHADOW_ENABLED is on and a manifest with a valid
+   * identity was available to bind to. See
+   * openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md.
+   */
+  neuralDecoderPrefillShadow?: NeuralDecoderPrefillCallerReceiptV1 | null;
   /** Live process packets derived from the current retrieval graph topology. */
   processPackets?: AtlasProcessPacket[] | null;
   /**

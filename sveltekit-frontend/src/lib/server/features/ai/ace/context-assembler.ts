@@ -113,6 +113,7 @@ import {
 import { selectAcePayloads } from '$lib/server/ace/ace-payload-selector.js';
 import { applyQloraBoost } from '$lib/server/retrieval/qlora-boost.js';
 import { embedText, embedTexts } from '$lib/server/embedding/embed.js';
+import { embedSemantic768Canonical } from '$lib/server/embedding/canonical-embed.js';
 import {
   loadCardPromotionStates,
   applyPromotionBoost,
@@ -1788,13 +1789,33 @@ export async function assembleACEContext(opts: {
         }).catch(() => { /* telemetry — never throw */ });
       }).catch(() => { /* non-blocking */ });
 
-      return attachContextManifestToACE(parentAtlasContext, {
-        request_id: opts.traceId ?? packet.query_hash ?? crypto.randomUUID(),
+      const requestId = opts.traceId ?? packet.query_hash ?? crypto.randomUUID();
+      const withManifest = attachContextManifestToACE(parentAtlasContext, {
+        request_id: requestId,
         feature_id: packet.feature_ids[0] ?? undefined,
         source_refs: packet.source_refs,
         processPackets: deriveProcessPacketsFromACEContext(parentAtlasContext),
         now: new Date(),
       });
+
+      // PREFILL-CALLER-01 (query-only shadow, opt-in, SHADOW_READONLY only).
+      // Disabled by default (ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED); when
+      // off this never embeds, never calls the decoder, never touches Redis.
+      if (ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED && withManifest.contextManifest) {
+        try {
+          const queryEmbedding = await getQueryEmbedding(opts.query);
+          const { runNeuralDecoderPrefillShadowForManifest } = await import('../../../ace/neural-decoder-prefill-shadow.js');
+          withManifest.neuralDecoderPrefillShadow = await runNeuralDecoderPrefillShadowForManifest(
+            withManifest.contextManifest,
+            queryEmbedding,
+            { requestId },
+          );
+        } catch (shadowErr) {
+          console.warn('[neural-decoder-prefill-shadow] skipped:', (shadowErr as Error)?.message ?? shadowErr);
+        }
+      }
+
+      return withManifest;
     } catch (err) {
       console.warn('[Parent Atlas Preflight] failed, falling back:', err);
     }
@@ -5318,6 +5339,24 @@ function weightKbScore(score: number, sourceType: keyof typeof KB_SOURCE_SCORE_W
 /** Generate query embedding (shared by both tiers). */
 async function getQueryEmbedding(query: string): Promise<number[] | null> {
   try {
+    if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
+      const modelArtifactRevision = ENV.EMBEDDING_MODEL_ARTIFACT_REVISION;
+      const tokenizerRevision = ENV.EMBEDDING_TOKENIZER_REVISION;
+      const inputPolicyRevision = ENV.EMBEDDING_INPUT_POLICY_REVISION;
+      if (!modelArtifactRevision || !tokenizerRevision || !inputPolicyRevision) {
+        throw new Error('SEMANTIC_768_STRICT_LINEAGE_CONFIGURATION_REQUIRED');
+      }
+      const result = await embedSemantic768Canonical(query, {
+        model: ENV.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma',
+        modelArtifactRevision,
+        tokenizerRevision,
+        inputPolicyRevision,
+        baseUrl: ENV.EMBEDDING_BASE_URL,
+        timeoutMs: 5_000,
+      });
+      return result.embedding;
+    }
+
     const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -40,6 +40,13 @@ function parseBoolean(value: string | undefined, defaultValue = false): boolean 
   }
 }
 
+const nodeEnvironment = privateEnv.NODE_ENV ?? 'development';
+const devBypassAuth = parseBoolean(privateEnv.DEV_BYPASS_AUTH, false);
+
+if (nodeEnvironment === 'production' && devBypassAuth) {
+  throw new Error('DEV_BYPASS_AUTH_FORBIDDEN_IN_PRODUCTION');
+}
+
 function parseInteger(value: string | undefined, fallback: number, name: string): number {
   if (!value?.trim()) return fallback;
 
@@ -52,7 +59,7 @@ function parseInteger(value: string | undefined, fallback: number, name: string)
 }
 
 export const ENV = Object.freeze({
-  NODE_ENV: privateEnv.NODE_ENV ?? 'development',
+  NODE_ENV: nodeEnvironment,
 
   DATABASE_URL: privateEnv.DATABASE_URL,
 
@@ -150,7 +157,7 @@ export const ENV = Object.freeze({
   CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL,
   ATLAS_RAPIDS_SIDECAR_URL: privateEnv.ATLAS_RAPIDS_SIDECAR_URL,
   COMMUNITY_TAXONOMY_ALGORITHM: privateEnv.COMMUNITY_TAXONOMY_ALGORITHM,
-  DEV_BYPASS_AUTH: parseBoolean(privateEnv.DEV_BYPASS_AUTH, false),
+  DEV_BYPASS_AUTH: devBypassAuth,
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL,
   EMBED_MODEL_PATH: privateEnv.EMBED_MODEL_PATH,
   EMBEDDING_BASE_URL: privateEnv.EMBEDDING_BASE_URL,
@@ -158,6 +165,10 @@ export const ENV = Object.freeze({
   EMBEDDING_MODEL_ARTIFACT_REVISION: privateEnv.EMBEDDING_MODEL_ARTIFACT_REVISION,
   EMBEDDING_TOKENIZER_REVISION: privateEnv.EMBEDDING_TOKENIZER_REVISION,
   EMBEDDING_INPUT_POLICY_REVISION: privateEnv.EMBEDDING_INPUT_POLICY_REVISION,
+  NEURAL_DECODER_URL: privateEnv.NEURAL_DECODER_URL,
+  // PREFILL-CALLER-01: default OFF. SHADOW_READONLY only -- never influences
+  // ranking, never a canonical write. See neural-decoder-prefill-shadow.ts.
+  NEURAL_DECODER_PREFILL_SHADOW_ENABLED: parseBoolean(privateEnv.NEURAL_DECODER_PREFILL_SHADOW_ENABLED, false),
   ATLAS_CANONICAL_EMBEDDING_STRICT: parseBoolean(privateEnv.ATLAS_CANONICAL_EMBEDDING_STRICT, false),
   EMBEDDING_PROVIDER: privateEnv.EMBEDDING_PROVIDER,
   ENABLE_CUVS_SEARCH: parseBoolean(privateEnv.ENABLE_CUVS_SEARCH, false),
