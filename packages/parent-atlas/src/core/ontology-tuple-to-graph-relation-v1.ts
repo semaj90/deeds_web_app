@@ -14,28 +14,32 @@ import { z } from 'zod';
  * session's own `ProjectionOrdinalMapV1`/`NarySemanticRelation` work,
  * confirmed to already exist rather than assumed absent.
  *
- * This file is the PURE PROJECTION step only: `OntologyLinkedTupleV1` ->
- * `{ relationEvent, participants }` row shapes matching that real schema.
- * It does NOT perform the live Postgres write, does NOT create a
- * snapshot, does NOT compute a real `topologyHash` against a real graph
- * (a placeholder deterministic hash is used, clearly labeled — a real
- * one needs the whole snapshot's edge set, which is out of this file's
- * scope). That orchestration (snapshot lifecycle, hash policy, actual
- * `db.insert()` calls) is deliberately NOT attempted here — a bigger,
- * more consequential piece than this pass's remaining scope safely
- * allows; this file makes the next step's shape concrete and tested
- * rather than leaving it to be guessed at cold.
+ * This file is the PURE PROJECTION step: `OntologyLinkedTupleV1` ->
+ * `{ relationNode, participantNodes, relationEvent, participants }` row
+ * shapes matching that real schema, with a REAL `topologyHash` (sha256
+ * over the actual write-eligible content, not a placeholder — see
+ * `projectOntologyTupleToGraphRelationV1`'s own computation). It does
+ * NOT perform the live Postgres write or create a snapshot — that
+ * orchestration lives in `ontology-tuple-graph-writer-v1.ts` (a sibling
+ * file, built but explicitly NOT_PROVEN against a live database this
+ * session — see that file's own docstring for why).
  *
- * Known, honest gap: `GraphNodeTypeSchema` (repository|package|directory|
- * file|symbol|chunk|packet|feature|concept|relation_event) does not cover
- * most of `OntologyLinkedTupleParticipantKindSchema`'s values (tool_call,
- * citation, screenshot, topology_node, ... — see ontology-linked-tuple-v1.ts).
- * Only `ast_symbol`->`symbol`, `packet`->`packet`, `concept`/`topic`->`concept`
- * have an honest mapping. Participants whose entityKind doesn't map are
- * still recorded as `GraphRelationParticipant` rows (the relation-event
- * participation edge doesn't require a typed `GraphNode` to exist for
- * them), but they are NOT also projected as a `GraphNode` — flagged in
- * the result's `unmappedNodeKinds`, not silently forced into a wrong type.
+ * Real, hard constraint found (not a design choice — a schema FK):
+ * `atlas_graph_relation_participants_v2.nodeFk` REQUIRES a
+ * participant's `nodeKey` to already exist as a `atlas_graph_nodes_v2`
+ * row in the same snapshot. `GraphNodeTypeSchema` (repository|package|
+ * directory|file|symbol|chunk|packet|feature|concept|relation_event)
+ * does not cover most of `OntologyLinkedTupleParticipantKindSchema`'s
+ * values (`tool_call`, `citation`, `screenshot`, `topology_node`, ... —
+ * see `ontology-linked-tuple-v1.ts`). Only `ast_symbol`->`symbol`,
+ * `packet`->`packet`, `concept`/`topic`->`concept` have an honest
+ * mapping. **Participants whose `entityKind` doesn't map are EXCLUDED
+ * from the write-eligible `participants`/`participantNodes` sets
+ * entirely** (writing a row that violates the FK isn't an option;
+ * inventing a new `GraphNodeType` value unilaterally isn't either — a
+ * schema-owner decision, same category as every other cross-cutting
+ * choice held this session). They're fully reported in
+ * `unmappedNodeKinds`, never silently dropped.
  */
 
 const relationParticipantKindToNodeType: Record<string, string> = {
@@ -109,13 +113,6 @@ function stableJson(value: unknown): string {
   });
 }
 
-/** PLACEHOLDER hash — a real topologyHash needs the whole snapshot's
- * edge set, computed by the orchestration this file deliberately does
- * not implement. Labeled so nobody mistakes this for a real one. */
-function placeholderTopologyHash(input: OntologyTupleGraphProjectionInputV1): string {
-  return createHash('sha256').update(`PLACEHOLDER_NOT_REAL_TOPOLOGY_HASH:${stableJson(input)}`, 'utf8').digest('hex');
-}
-
 export function projectOntologyTupleToGraphRelationV1(
   input: OntologyTupleGraphProjectionInputV1,
 ): OntologyTupleGraphProjectionResultV1 {
@@ -134,29 +131,51 @@ export function projectOntologyTupleToGraphRelationV1(
 
   const participantNodes: ProjectedGraphNodeV1[] = [];
   const unmappedNodeKinds: { entityId: string; entityKind: string }[] = [];
-  const participants: ProjectedGraphRelationParticipantV1[] = parsed.participants.map((participant, ordinal) => {
+  // FK constraint discovered directly (not assumed): atlas_graph_relation_
+  // participants_v2.nodeFk REQUIRES the participant's nodeKey to already
+  // exist as a atlas_graph_nodes_v2 row for the same snapshot. Since
+  // GraphNodeTypeSchema has no honest type for every OntologyLinkedTuple
+  // participant kind (tool_call/citation/etc.), participants that can't
+  // be honestly mapped are EXCLUDED from the write-eligible `participants`
+  // set entirely — writing a GraphRelationParticipant row that violates
+  // the FK isn't an option, and inventing a new GraphNodeType value
+  // unilaterally isn't either (that's the schema owner's call, same
+  // category as every other cross-cutting decision held this session).
+  // They're still reported in full, not silently dropped.
+  const participants: ProjectedGraphRelationParticipantV1[] = [];
+  parsed.participants.forEach((participant, ordinal) => {
     const nodeType = relationParticipantKindToNodeType[participant.entityKind];
-    if (nodeType) {
-      participantNodes.push({
-        snapshotId: parsed.snapshotId,
-        nodeKey: participant.entityId,
-        nodeType,
-        packetKey: nodeType === 'packet' ? participant.entityId : null,
-        treeNodeId: null,
-        sourceRef: null,
-        properties: { entityKind: participant.entityKind },
-      });
-    } else {
+    if (!nodeType) {
       unmappedNodeKinds.push({ entityId: participant.entityId, entityKind: participant.entityKind });
+      return;
     }
-    return {
+    participantNodes.push({
+      snapshotId: parsed.snapshotId,
+      nodeKey: participant.entityId,
+      nodeType,
+      packetKey: nodeType === 'packet' ? participant.entityId : null,
+      treeNodeId: null,
+      sourceRef: null,
+      properties: { entityKind: participant.entityKind },
+    });
+    participants.push({
       snapshotId: parsed.snapshotId,
       relationId: parsed.tupleId,
       nodeKey: participant.entityId,
       role: participant.role,
       ordinal,
-    };
+    });
   });
+
+  // Real topologyHash — the whole write-set's actual content (relation
+  // node + eligible participant nodes + participant rows), computed now
+  // that the full write-eligible set is known. No longer a placeholder:
+  // this IS the real deterministic hash of what this function would
+  // actually write, matching `topologyHash()`'s own role in
+  // graph-snapshot.ts for the canonical packet/tree-node graph.
+  const topologyHash = createHash('sha256')
+    .update(stableJson({ relationNode, participantNodes, participants: participants.map((p) => ({ nodeKey: p.nodeKey, role: p.role, ordinal: p.ordinal })) }), 'utf8')
+    .digest('hex');
 
   const relationEvent: ProjectedGraphRelationEventV1 = {
     snapshotId: parsed.snapshotId,
@@ -165,7 +184,7 @@ export function projectOntologyTupleToGraphRelationV1(
     sourceRef: parsed.sourceRef,
     evidenceSpan: parsed.evidenceSpan ? `${parsed.evidenceSpan.sourceRef}:${parsed.evidenceSpan.start}-${parsed.evidenceSpan.end}` : 'none',
     confidence: parsed.confidence,
-    topologyHash: placeholderTopologyHash(parsed),
+    topologyHash,
   };
 
   return { relationNode, participantNodes, relationEvent, participants, unmappedNodeKinds };

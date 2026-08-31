@@ -23,11 +23,16 @@ describe('projectOntologyTupleToGraphRelationV1', () => {
     expect(result.relationNode.nodeKey).toBe('relation_event:tuple:r17');
   });
 
-  it('projects all 4 participants as GraphRelationParticipant rows with preserved order/roles', () => {
+  it('projects only the 3 FK-safe participants as GraphRelationParticipant rows, excluding the unmapped one', () => {
     const result = projectOntologyTupleToGraphRelationV1(input);
-    expect(result.participants).toHaveLength(4);
-    expect(result.participants.map((p) => p.role)).toEqual(['cause', 'effect', 'evidence', 'tool']);
-    expect(result.participants.map((p) => p.ordinal)).toEqual([0, 1, 2, 3]);
+    // FK: atlas_graph_relation_participants_v2.nodeFk requires the
+    // participant's nodeKey to exist as a real atlas_graph_nodes_v2 row.
+    // tool_call has no honest GraphNodeType, so it's excluded here (still
+    // reported in unmappedNodeKinds), preserving original ordinal values
+    // for the ones that DO make it in.
+    expect(result.participants).toHaveLength(3);
+    expect(result.participants.map((p) => p.role)).toEqual(['cause', 'effect', 'evidence']);
+    expect(result.participants.map((p) => p.ordinal)).toEqual([0, 1, 2]);
   });
 
   it('maps ast_symbol participants to real symbol GraphNode rows', () => {
@@ -46,9 +51,16 @@ describe('projectOntologyTupleToGraphRelationV1', () => {
     expect(result.relationEvent.evidenceSpan).toBe('src/lib/server/atlas/symbol-repair-example.ts:120-168');
   });
 
-  it('is deterministic — same input yields the same placeholder topologyHash', () => {
+  it('computes a real topologyHash (sha256 of the actual write-eligible content) deterministically', () => {
     const a = projectOntologyTupleToGraphRelationV1(input);
     const b = projectOntologyTupleToGraphRelationV1(input);
     expect(a.relationEvent.topologyHash).toBe(b.relationEvent.topologyHash);
+    expect(a.relationEvent.topologyHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it('topologyHash changes if the write-eligible participant set changes', () => {
+    const a = projectOntologyTupleToGraphRelationV1(input);
+    const fewerParticipants = projectOntologyTupleToGraphRelationV1({ ...input, participants: input.participants.slice(0, 2) });
+    expect(a.relationEvent.topologyHash).not.toBe(fewerParticipants.relationEvent.topologyHash);
   });
 });

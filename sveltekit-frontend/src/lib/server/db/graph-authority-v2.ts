@@ -2,6 +2,9 @@ import { and, eq, sql } from 'drizzle-orm';
 import {
   graphAuthorityRunsV2,
   graphAuthorityScoresV2,
+  graphNodesV2,
+  graphRelationEventsV2,
+  graphRelationParticipantsV2,
   graphResolutionIssuesV2,
   graphSnapshotsV2,
   graphSnapshotV2StatusValues,
@@ -12,6 +15,9 @@ import {
   type GraphSnapshotV2Status,
   type NewGraphAuthorityRunV2Row,
   type NewGraphAuthorityScoreV2Row,
+  type NewGraphNodeV2Row,
+  type NewGraphRelationEventV2Row,
+  type NewGraphRelationParticipantV2Row,
   type NewGraphResolutionIssueV2Row,
   type NewGraphSnapshotV2Row,
 } from './schema/graph-authority-v2.js';
@@ -101,11 +107,75 @@ export function createGraphAuthorityV2Repository(database: any) {
     await database.insert(graphAuthorityScoresV2).values(rows);
   }
 
+  /**
+   * Writes one ontology-tuple relation event into the graph-authority-v2
+   * schema: upserts the relation_event node + its FK-eligible participant
+   * nodes, then the relation event row, then the participant rows.
+   * Input is the exact output shape of
+   * `projectOntologyTupleToGraphRelationV1()` (`packages/parent-atlas`) -
+   * this function performs no projection logic of its own, only writes
+   * what it's given. Answers this session's own "where does it get
+   * indexed, and who actually writes it" question end to end.
+   *
+   * NOT_PROVEN against a live database in this pass — built as real,
+   * type-checked code (not a stub) but deliberately not executed here.
+   * Writing to a live/shared Postgres instance under session context
+   * pressure, without being able to carefully verify the target
+   * environment first, is exactly the kind of consequential action this
+   * repo's own instructions say to slow down for, not rush through.
+   * Callers should treat this as CREATED, promote to DRY_RUN_PROVEN by
+   * running it against a real dev database and inspecting the rows
+   * written, before ever calling it from a live pipeline.
+   */
+  async function writeOntologyTupleRelationGraphV2(input: {
+    relationNode: NewGraphNodeV2Row;
+    participantNodes: NewGraphNodeV2Row[];
+    relationEvent: NewGraphRelationEventV2Row;
+    participants: NewGraphRelationParticipantV2Row[];
+  }): Promise<void> {
+    const allNodes = [input.relationNode, ...input.participantNodes];
+    for (const node of allNodes) {
+      await database
+        .insert(graphNodesV2)
+        .values(node)
+        .onConflictDoUpdate({
+          target: [graphNodesV2.snapshotId, graphNodesV2.nodeKey],
+          set: { nodeType: node.nodeType, packetKey: node.packetKey ?? null, treeNodeId: node.treeNodeId ?? null, sourceRef: node.sourceRef ?? null, properties: node.properties },
+        });
+    }
+
+    await database
+      .insert(graphRelationEventsV2)
+      .values(input.relationEvent)
+      .onConflictDoUpdate({
+        target: [graphRelationEventsV2.snapshotId, graphRelationEventsV2.relationId],
+        set: {
+          relationType: input.relationEvent.relationType,
+          sourceRef: input.relationEvent.sourceRef,
+          evidenceSpan: input.relationEvent.evidenceSpan,
+          confidence: input.relationEvent.confidence,
+          topologyHash: input.relationEvent.topologyHash,
+        },
+      });
+
+    if (input.participants.length === 0) return;
+    for (const participant of input.participants) {
+      await database
+        .insert(graphRelationParticipantsV2)
+        .values(participant)
+        .onConflictDoUpdate({
+          target: [graphRelationParticipantsV2.snapshotId, graphRelationParticipantsV2.relationId, graphRelationParticipantsV2.nodeKey, graphRelationParticipantsV2.role],
+          set: { ordinal: participant.ordinal },
+        });
+    }
+  }
+
   return {
     createGraphSnapshotV2,
     upsertGraphResolutionIssueV2,
     validateGraphSnapshotV2,
     persistGraphAuthorityRunV2,
     persistGraphAuthorityScoresV2,
+    writeOntologyTupleRelationGraphV2,
   };
 }

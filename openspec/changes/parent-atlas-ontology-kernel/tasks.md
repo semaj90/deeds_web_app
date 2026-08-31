@@ -1362,3 +1362,44 @@ SAME `atlas_graph_snapshots_v2` snapshot as the packet/tree-node graph
 or get their own, then compute a real `topologyHash`, then call
 `db.insert()` against `graphNodesV2`/`graphEdgesV2` (or the relation-
 event-specific tables if they're separate — not checked this pass).
+
+## Continued 2026-08-31 (same session, "continue here carefully" after context-budget check-in)
+
+**Real, hard FK constraint found**: `atlas_graph_relation_participants_v2.nodeFk`
+requires a participant's `nodeKey` to already exist as a real
+`atlas_graph_nodes_v2` row in the same snapshot. `projectOntologyTupleToGraphRelationV1()`
+updated accordingly: participants with no honest `GraphNodeType` mapping
+(`tool_call` etc.) are now EXCLUDED from the write-eligible
+`participants`/`participantNodes` sets entirely (writing a row that
+violates the FK isn't an option; inventing a new node type unilaterally
+isn't either), reported fully in `unmappedNodeKinds`, never silently
+dropped. The placeholder `topologyHash` is now a REAL sha256 over the
+actual write-eligible content. **7/7 tests pass** (up from 6, added a
+determinism + a hash-changes-with-content-changes check).
+
+**Real graph-authority tables were also found and used, not two dedicated
+tables assumed to not exist**: `atlas_graph_relation_events_v2`/
+`atlas_graph_relation_participants_v2` (`graph-authority-v2.ts` schema)
+— the exact real destination for the relation-event/participant shape,
+confirmed by reading the schema directly rather than guessing.
+
+**Writer built, extending the real existing repository, not a new
+competing file**: found `createGraphAuthorityV2Repository()` in
+`sveltekit-frontend/src/lib/server/db/graph-authority-v2.ts` (an
+established, already-used factory taking `database` as a dependency-
+injected param) — added `writeOntologyTupleRelationGraphV2()` to it
+rather than starting a separate writer file. Upserts node rows (relation
+node + FK-eligible participant nodes), the relation event row, then the
+participant rows, all via the same `onConflictDoUpdate` pattern the rest
+of that file already uses.
+
+**Deliberately NOT_PROVEN against a live database.** Real,
+type-consistent code — not a stub — but not executed here. Writing to a
+live/shared Postgres instance under session context pressure, without
+being able to carefully verify the target environment first, is exactly
+the kind of consequential action this repo's own instructions say to
+slow down for. **Next step for whoever picks this up**: run
+`writeOntologyTupleRelationGraphV2()` against a real dev database (needs
+a real `atlas_graph_snapshots_v2` row created first — `createGraphSnapshotV2()`
+already exists in the same repository), inspect the rows it actually
+writes, and only then promote it from `CREATED` to `DRY_RUN_PROVEN`.
