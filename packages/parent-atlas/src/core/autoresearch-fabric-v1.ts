@@ -1,5 +1,18 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import {
+  algorithmExecutionManifestSchema,
+  checksumAlgorithmExecutionManifest,
+  type AlgorithmExecutionManifestV1,
+} from './algorithm-execution-manifest.js';
+import {
+  gpuAdmissionReceiptSchema,
+  gpuAdmissionRequestSchema,
+  gpuResourceEnvelopeSchema,
+  type GpuAdmissionReceiptV1,
+  type GpuAdmissionRequestV1,
+  type GpuResourceEnvelopeV1,
+} from './gpu-resource-envelope.js';
 
 const revision = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
@@ -105,6 +118,7 @@ export const gpuExperimentLeaseV1Schema = z.object({
   schema: z.literal('atlas.gpu-experiment-lease.v1').default('atlas.gpu-experiment-lease.v1'),
   leaseId: z.string().min(1),
   experimentId: z.string().min(1),
+  operationId: z.string().min(1),
   deviceId: z.string().min(1),
   gpuResourceSnapshotRevision: revision,
   gpuAdmissionReceiptChecksum: checksum,
@@ -167,8 +181,8 @@ export const experimentRunReceiptV1Schema = z.object({
   compilerDiagnosticsChecksum: checksum.nullable().default(null),
   testDiagnosticsChecksum: checksum.nullable().default(null),
   evidenceRefs: z.array(z.string().min(1)).min(1),
-  canonicalStateMutated: z.literal(false),
-  writesOutsideWorktree: z.literal(false),
+  canonicalStateMutated: z.boolean(),
+  writesOutsideWorktree: z.boolean(),
   canonicalAuthority: z.literal(false).default(false),
 }).strict();
 
@@ -231,6 +245,54 @@ export function checksumExperimentWorktreeV1(value: ExperimentWorktreeV1): strin
 
 export function checksumExperimentRunReceiptV1(value: ExperimentRunReceiptV1): string {
   return checksumValue(experimentRunReceiptV1Schema.parse(value));
+}
+
+export function checksumGpuAdmissionReceiptForLeaseV1(value: GpuAdmissionReceiptV1): string {
+  return checksumValue(gpuAdmissionReceiptSchema.parse(value));
+}
+
+export function buildGpuExperimentLeaseV1(input: {
+  leaseId: string;
+  experimentId: string;
+  envelope: GpuResourceEnvelopeV1;
+  request: GpuAdmissionRequestV1;
+  receipt: GpuAdmissionReceiptV1;
+  expiresAt: string;
+  exclusive?: boolean;
+}): GpuExperimentLeaseV1 {
+  const envelope = gpuResourceEnvelopeSchema.parse(input.envelope);
+  const request = gpuAdmissionRequestSchema.parse(input.request);
+  const receipt = gpuAdmissionReceiptSchema.parse(input.receipt);
+
+  if (!receipt.admitted) throw new Error('AUTORESEARCH_GPU_LEASE_REQUIRES_ADMITTED_RECEIPT');
+  if (receipt.operation_id !== request.operation_id) throw new Error('AUTORESEARCH_GPU_LEASE_OPERATION_MISMATCH');
+  const expectedTotal = request.required_workspace_bytes + request.required_persistent_bytes;
+  if (receipt.required_total_bytes !== expectedTotal) throw new Error('AUTORESEARCH_GPU_LEASE_REQUIRED_BYTES_MISMATCH');
+
+  return gpuExperimentLeaseV1Schema.parse({
+    leaseId: input.leaseId,
+    experimentId: input.experimentId,
+    operationId: request.operation_id,
+    deviceId: envelope.device_id,
+    gpuResourceSnapshotRevision: envelope.snapshot_revision,
+    gpuAdmissionReceiptChecksum: checksumGpuAdmissionReceiptForLeaseV1(receipt),
+    maxPersistentBytes: request.required_persistent_bytes,
+    maxWorkspaceBytes: request.required_workspace_bytes,
+    expiresAt: input.expiresAt,
+    exclusive: input.exclusive ?? true,
+  });
+}
+
+export function executionManifestPairChecksumsV1(input: {
+  baseline: AlgorithmExecutionManifestV1;
+  candidate: AlgorithmExecutionManifestV1;
+}): { baselineExecutionManifestChecksum: string; candidateExecutionManifestChecksum: string } {
+  const baseline = algorithmExecutionManifestSchema.parse(input.baseline);
+  const candidate = algorithmExecutionManifestSchema.parse(input.candidate);
+  return {
+    baselineExecutionManifestChecksum: checksumAlgorithmExecutionManifest(baseline),
+    candidateExecutionManifestChecksum: checksumAlgorithmExecutionManifest(candidate),
+  };
 }
 
 export function computeRelativeImprovementV1(input: {
