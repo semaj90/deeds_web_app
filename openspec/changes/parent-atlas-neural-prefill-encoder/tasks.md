@@ -13907,7 +13907,7 @@ would require a separate, different change (embedding `routeQuery()`'s
   small, leaves headroom, not a concerning footprint on this 8GB card.
 - [x] Left running (`restart: unless-stopped`) as the actual point of this
   task -- a durable containerized service other things can call at
-  `NEURAL_DECODER_URL=http://127.0.0.1:8121`, replacing the earlier
+`NEURAL_DECODER_URL=http://127.0.0.1:8121`, replacing the earlier
   one-off host-process proof script.
 
 **Still open**: this container has not yet been wired as a `depends_on:
@@ -13917,3 +13917,119 @@ SvelteKit dev server, which runs outside this Docker stack per this repo's
 convention, connecting to `127.0.0.1:8121` directly). `PREFILL-QUALITY-01`/
 `PREFILL-PROMOTION-01` remain untouched and correctly gated behind
 human-labeled QRELS.
+
+### NEURAL-RUNTIME-SEPARATION-01 (2026-08-31) -- LIVE BOUNDARY CORRECTION
+
+The host CUDA probe and the containerized neural-decoder proof are different
+runtime scopes and must not be reported as one environment:
+
+```text
+Host Python/PyTorch 2.8.0+cu128
+  = bounded workstation reference/fixture environment
+  = CUDA available was observed
+  = not the decoder service contract
+
+atlas-neural-decoder :8121
+  = dedicated learned-projection service
+  = image atlas-neural-decoder:torch2.13.0-cu132
+  = PyTorch 2.13.0+cu132, CUDA device, checkpoint loaded
+  = semantic_768 -> latent_256 (physical) -> latent_128/latent_64 (derived)
+  = canonicalAuthority=false, textSynthesis=false, writesPerformed=false
+
+Ornith llama-server
+  = synthesis/tool-use owner
+  = does not own latent projection or canonical embedding identity
+
+PostgreSQL/Qdrant
+  = canonical source/lineage authority and rebuildable projection respectively
+  = neither is replaced by the decoder service
+```
+
+- [x] **NEURAL-RUNTIME-SEPARATION-01** -- corrected the ledger so the host
+  `2.8.0+cu128` observation is reference-only and the live `2.13.0+cu132`
+  container is the decoder-service proof. No version conflict is implied.
+- [x] **NEURAL-LINEAGE-01** -- live `/health` reported checkpoint revision
+  `d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259` and
+  checkpoint SHA-256 `ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb6165`;
+  representation and non-authority flags were also read back.
+- [ ] **NEURAL-REQUEST-REPLAY-01** -- run the same bounded real encode request
+  twice and compare output shape, finite values, representation revision, and
+  output checksum. Health alone does not prove numerical replay determinism.
+- [ ] **NEURAL-RESIDENCY-01** -- supply a valid FEAT-04 pack/gather envelope
+  and prove owner-process GPU residency/reuse. The current readiness check
+  found no ready envelope, so this is blocked rather than passed.
+- [ ] **CUTILE-CHALLENGER-01** -- compare a cuTile kernel against the PyTorch
+  reference only after the decoder input/artifact envelope is available.
+- [ ] **SIMT-CHALLENGER-01** -- compare a CUDA SIMT implementation against
+  the same PyTorch reference; it is not implied by CUDA availability.
+- [ ] **RMM-CHALLENGER-01** -- evaluate RMM as an allocator challenger only;
+  RMM was not installed in the host probe and is not an Atlas identity/cache
+  authority.
+
+**Separation receipt:** `docs/reports/neural-decoder-runtime-separation-v1.json`.
+The live container proof is `PROVEN_LIVE_BOUNDED`; request replay, FEAT-04
+residency, cuTile, SIMT, and RMM remain `OPEN`/`NOT_PROVEN`. The decoder is
+not a text prefill/synthesis model and must remain downstream of the typed
+prefill/feature contract until its consumer-side replay is proven.
+
+### DECODER-TOOLCHAIN-SEPARATION-01 (2026-08-31) -- CONTRACT CORRECTION
+
+- [x] The decoder base is a stable, digest-pinned
+  `pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime` image with digest
+  `sha256:d0a2f5993da1a5646d77a95d4185d3d9fc79e95dcbc960daf245a18c7d6b6411`.
+  The prior comment describing CUDA 13.2 as experimental/nightly-only was
+  stale for this released Docker artifact and has been removed.
+- [x] Decoder execution is classified as `PYTORCH_ATEN`; `torch.nn.Linear`,
+  normalization, and tensor operations are the primary implementation path.
+  `torch.compile`/CuTeDSL or Triton optimization is optional and not required
+  for the service contract.
+- [ ] **GPU-KERNEL-LAB-01** Create a separate devel-based kernel-lab scope for
+  cuTile/TileIR/PTXAS and CUDA SIMT parity. It must not enlarge or mutate the
+  decoder image and must consume the same revision-keyed GPU artifacts.
+- [ ] **GPU-PROVIDER-PARITY-01** Compare PyTorch ATen, cuTile, and SIMT on the
+  frozen MRL tournament only after FEAT-04 input and residency proofs exist.
+
+The decoder container remains a learned projection service, not the GPU cache,
+HNSW executor, graph executor, QLoRA trainer, or Ornith synthesis owner.
+
+### SEMANTIC-768-CURRENT-CORPUS-01: scoping pass, read-only (2026-08-31)
+
+Investigated `scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts` live against the real
+`codebase_chunk_index` schema before touching anything -- no writes, no code changes this pass.
+
+**Confirmed defects** (exact line numbers as of this commit):
+- Line 90: queries `FROM atlas_packets`, not `codebase_chunk_index`. Per this repo's own canonical
+  rule (`claude.md`), `atlas_packets` is packet identity/metadata; `codebase_chunk_index` is the
+  truth source for embeddings. Verified live: `codebase_chunk_index` has `id` (uuid PK),
+  `content_hash`, `source_ref`, `content_embedding_768 vector(768)`, `content_embedding
+  halfvec(768)`, `qdrant_id varchar(64)` (a direct Qdrant-point link).
+- Line 121: `workspaceRevision = 'workspace-active-v1'` -- hardcoded literal, not derived from any
+  real workspace state.
+- Line 125: `canonicalId = row.packet_id` -- should be `codebase_chunk_index.id`.
+- Line 130: `sourceRevision = row.content_hash || row.sha256 || 'unknown-rev'` -- silently
+  fabricates `'unknown-rev'` instead of failing closed (excluding the row) when no real hash is
+  present.
+
+**Also confirmed** (relevant to the rewrite): `tree_node_id` and `packet_key` are not top-level
+columns on `codebase_chunk_index` -- they live inside the `metadata` JSONB column
+(`metadata->>'tree_node_id'`, `metadata->>'packet_key'`), confirmed via this table's own existing
+index definitions (`idx_codebase_chunk_index_metadata_tree_node_id`,
+`idx_codebase_chunk_index_metadata_packet_key`).
+
+**Open question, not yet answered -- blocks the rewrite**: `codebase_chunk_index` has no
+`workspace_revision` column at all. Before rewriting the materializer, determine where a real
+per-row (or per-corpus) workspace revision should come from -- a join to `graphify_runs` (which
+this file's own canonical lineage sections reference elsewhere), a value in `metadata` JSONB not
+yet checked, or some other source. Do not hardcode a second fabricated literal in its place.
+
+**Same defect class likely applies** to `materialize-lineage-qualified-candidate-map-v1.mts` (uses
+`packet_key` as its canonical ID per the existing "QDRANT BLUE/GREEN PREREQUISITE AUDIT" note
+above) -- not re-verified this pass, assume it needs the same treatment until checked directly.
+
+**Next session should**: (1) resolve the workspace-revision question above via a live query, not
+assumption; (2) rewrite both materializers to query from `codebase_chunk_index`, bind
+`canonicalId` to `codebase_chunk_index.id`, fail closed (skip + count, do not fabricate) when
+`content_hash` is absent; (3) dry-run against live Postgres and diff row counts/checksums against
+the current (defective) map before trusting it; (4) only then re-run
+`audit-qdrant-768-identity.mjs` to check whether the 57,396 stale points / 2,789 missing rows
+figure changes.
