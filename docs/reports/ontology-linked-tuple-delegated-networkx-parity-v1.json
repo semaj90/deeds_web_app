@@ -1,0 +1,65 @@
+{
+  "gate": "ONTO-PY-04B",
+  "description": "Proves OntologyLinkedTupleAdapter.to_graph_projection() delegates end-to-end to the shared atlas_semantic_ontology_projection.py substrate (operator's 'layer mine on top of theirs' decision), not just that the bridge type-checks",
+  "fixturePath": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "checks": [
+    {
+      "name": "bridge_preserves_relation_id",
+      "ok": true,
+      "detail": "7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3"
+    },
+    {
+      "name": "bridge_preserves_relation_type_from_label",
+      "ok": true,
+      "detail": "CODE_REPAIR_CAUSAL_PATH"
+    },
+    {
+      "name": "bridge_preserves_all_4_participants_with_order",
+      "ok": true,
+      "detail": "['symbol:S1', 'symbol:S2', 'symbol:T7', 'tool_call:typecheck-run-42']"
+    },
+    {
+      "name": "bridge_preserves_roles",
+      "ok": true,
+      "detail": "['cause', 'effect', 'evidence', 'tool']"
+    },
+    {
+      "name": "bridge_preserves_evidence_refs",
+      "ok": true,
+      "detail": "('vitest:ontology-kernel-end-to-end.spec.ts:pre-fix-run:4-failed-of-21',)"
+    },
+    {
+      "name": "delegated_snapshot_has_correct_schema",
+      "ok": true,
+      "detail": "atlas.ontology-networkx-projection.v1"
+    },
+    {
+      "name": "delegated_snapshot_reifies_exactly_1_nary_relation_node",
+      "ok": true,
+      "detail": "1"
+    },
+    {
+      "name": "delegated_snapshot_has_4_participant_incidence_edges_no_pairwise_cliques",
+      "ok": true,
+      "detail": "got 4 (expected 1 relation node with 4 PARTICIPANT incidence edges, never C(4,2)=6 pairwise edges)"
+    },
+    {
+      "name": "delegated_snapshot_deterministic_across_two_calls",
+      "ok": true,
+      "detail": "0ef0265ba45e029c70ef6d95995a83acc8cb0189ae018aed8b10569ba0b32209 vs 0ef0265ba45e029c70ef6d95995a83acc8cb0189ae018aed8b10569ba0b32209"
+    },
+    {
+      "name": "delegated_snapshot_canonical_authority_false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delegated_snapshot_writes_performed_false",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "pass": true,
+  "durationMs": 596.96,
+  "writesPerformed": false
+}

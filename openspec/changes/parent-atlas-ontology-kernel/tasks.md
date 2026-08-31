@@ -686,6 +686,47 @@ proves two-run projection replay parity. Focused test: `1/1`. This is a CPU
 oracle/projection proof only; cuGraph parity, OWL reasoning, and all writes
 remain unperformed. Receipt: `docs/reports/oak-python-networkx-projection-v1.json`.
 
+**ONTO-PY-04B capability probe 2026-08-31:** the current Windows Python
+runtime has `torch` installed but neither `cudf` nor `cugraph`. cuGraph parity
+was therefore not attempted and no RAPIDS installation was performed. The
+NetworkX projection remains `NETWORKX_ORACLE_PROVEN`; GPU parity requires the
+configured WSL/Linux RAPIDS runtime.
+
+**WSL RAPIDS follow-up 2026-08-31:** the configured WSL2 runtime was also
+probed read-only. `cudf`, `cugraph`, and `torch` are unavailable there, and
+the RAPIDS service at `127.0.0.1:8098` is unreachable. GPU parity therefore
+remains open; no packages, services, or containers were started or changed.
+
+**ONTO-PY-04A BFS extension 2026-08-31:** the NetworkX CPU oracle now emits
+a revision-bound, depth-limited BFS receipt with deterministic GraphOrdinal
+distances and predecessors. The bounded traversal preserves path
+reconstruction while remaining derived and read-only. GPU parity is still
+open because cuGraph is unavailable. Receipt:
+`docs/reports/oak-python-networkx-projection-v1.json`.
+
+**ONTO-PY-04A validation 2026-08-31:** the broader semantic ontology
+projection suite passed `7` tests with `1` optional RDFLib test skipped because
+RDFLib is not installed; the dedicated snapshot/BFS suite passed `2/2`.
+NetworkX multigraph, n-ary reification, PageRank derivation, provenance
+identity, and bounded BFS behavior are validated. RDF interchange and
+cuGraph execution remain separate availability gates.
+
+**ONTO-PY-04 canonical-path validation 2026-08-31:** the existing
+`python/parent_atlas_ontology/graph_projection.py` contract was replayed with
+the real ontology fixture. `ONTO-PY-04` passed all bounded checks: one
+reified relation node, three externally-resolved participant edges, one
+explicitly skipped participant, no participant clique edges, stable role
+codes, and identical checksums across two runs. That existing path remains
+the canonical Python projection contract; snapshot/BFS helpers are derived
+serialization and traversal supplements only.
+Receipt: `docs/reports/ontology-linked-tuple-graph-projection-parity-v1.json`.
+
+**ONTO-PY-02 capability probe 2026-08-31:** the current Python environment
+does not provide `rdflib`, `owlrl`, or `pyshacl`. RDF/JSON-LD interchange,
+OWL-RL closure, and SHACL validation remain unavailable optional lanes; no
+dependency installation was performed. The NetworkX CPU projection remains
+independently proven.
+
 **Historical-note correction:** older text below that says OAK-07 was not
 started predates the now-built adaptive plan and kernel-bound planner. The
 current status is contract + deterministic replay proven; action execution,
@@ -1000,11 +1041,90 @@ two real gaps (not style nitpicks):
 
 **Run it**: `python python/parent_atlas_ontology/onto_py_validation_check.py`
 
-### ONTO-PY-02 through 05 — deliberately NOT attempted this session
+### Real duplication found and reconciled (2026-08-31): `atlas_semantic_ontology_projection.py`
 
-- **ONTO-PY-02** (tuple → RDFLib → RDF, deterministic replay): **`rdflib`
-  is not installed** in this environment — checked directly (`import
-  rdflib` → `ModuleNotFoundError`), not assumed. `pyarrow` (21.0.0) and
+While extending ONTO-PY-04, discovered a concurrent process had
+independently built `python/atlas_semantic_ontology_projection.py`
+(615 lines, own test suite, 7/7 passing) — a more general
+`SemanticAssertion`/`NarySemanticRelation` substrate doing the SAME
+"relation node, never a pairwise clique" NetworkX projection design as
+this session's own `graph_projection.py`, plus real RDFLib projection
+(closing ONTO-PY-02), PageRank, OWL-RL closure, SHACL validation, and an
+`owlready_reasoning_plan()`. Confirmed via grep that nothing bridged the
+two systems and neither referenced the other — a genuine, unresolved
+duplication, not a false alarm. A test file
+(`test_networkx_snapshot_replay.py`) had also been placed *inside* this
+session's own `parent_atlas_ontology/` package while importing from the
+*other* module — a real signal something needed reconciling, not
+something to silently work around.
+
+**Did not resolve this unilaterally** — presented the two systems to the
+operator directly rather than guessing which should win, per this
+change's own "when ownership can't be established, stop and record the
+ambiguity" discipline (already used for the JVM and rdflib decisions).
+**Operator decision: layer `OntologyLinkedTupleV1` on top of the shared
+substrate.** `atlas_semantic_ontology_projection.py` becomes the general
+projection substrate; `OntologyLinkedTupleV1` converts into its types
+and delegates, instead of `graph_projection.py` re-implementing the same
+projection logic a second time.
+
+**Built**:
+- `semantic_bridge.py` — `ontology_linked_tuple_to_nary_relation()`
+  converts `OntologyLinkedTupleV1` → `NarySemanticRelation`. Field
+  mappings stated explicitly, not silently guessed (a genuinely
+  ambiguous two-schema mapping): `relation_id`←`tupleId` (exact),
+  `relation_type`←`label` (closest fit), `source_revision`←
+  `provenance.sourceRevision` falling back to `relationRevision` falling
+  back to `"unknown"` (their schema requires non-empty; ours is fully
+  optional — a real gap-filling choice, documented as such), `domain_class`
+  left `None` (no honest mapping exists — using `labelKind` would have
+  been a guess, not a mapping).
+- `adapter.py` updated: `to_rdf()` and `to_graph_projection()` now
+  delegate to `atlas_semantic_ontology_projection.py`/
+  `networkx_snapshot.py` via the bridge. `to_rdf()`'s signature changed
+  (list of tuples, not one) and still correctly raises (from inside the
+  shared substrate now, not a local stub) since `rdflib` remains
+  uninstalled. `to_graph_projection()`'s signature changed too — no more
+  externally-supplied `ordinal_map`; the shared substrate self-assigns
+  dense ordinals from sorted node-identity strings.
+- `graph_projection.py` **kept, not deleted** — marked superseded as the
+  adapter's default path in its own docstring, but still real, tested,
+  and it surfaced a genuine still-open finding worth keeping on record
+  (no `relation:` prefix in `GraphNodeKeyV1` yet). Its own standalone
+  test (`onto_py_04_graph_projection_check.py`) was fixed to call
+  `project_to_graph()` directly instead of through the now-redirected
+  adapter method — preserving the concurrent process's own extension to
+  that test (`operational_projection_has_one_coordinate_universe`) rather
+  than breaking or silently discarding it. **Still 9/9 checks pass.**
+- **`onto_py_04b_delegated_networkx_check.py`** (new) — proves the
+  delegation actually works end to end against the real fixture, not
+  just that the bridge type-checks: bridge preserves relation id/type/
+  all 4 participants in order/roles/evidence refs; the delegated snapshot
+  reifies exactly 1 relation node with exactly 4 participant-incidence
+  edges (never `C(4,2)=6` pairwise edges); deterministic across two
+  calls; `canonical_authority`/`writes_performed` both `false`.
+  **Result: PASS, 11/11.** Notably, delegation resolves **all 4**
+  participants (including the `tool_call` one `graph_projection.py`'s
+  ordinal_map-bound design had to skip) — a genuine improvement, not
+  just a lateral move, since the shared substrate doesn't need an
+  externally pre-resolved ordinal.
+
+**Full sweep re-verified together** after reconciliation: all 5 ONTO-PY
+check scripts (01/03/validate/04/04b) plus both pytest suites
+(`test_atlas_semantic_ontology_projection.py`,
+`test_networkx_snapshot_replay.py`) — **9 passed, 1 skipped** (the skip
+is real and pre-existing, an optional-dependency guard inside the other
+module's own test suite, not something this reconciliation touched).
+
+### ONTO-PY-02, and 05 — remaining, updated status
+
+- **ONTO-PY-02** (tuple → RDFLib → RDF, deterministic replay): the
+  *code path* now exists — `adapter.to_rdf()` delegates to
+  `atlas_semantic_ontology_projection.build_rdflib_dataset()` (see
+  reconciliation section above) — but is still genuinely **NOT_PROVEN**:
+  **`rdflib` is not installed** in this environment — checked directly
+  (`import rdflib` → `ModuleNotFoundError`), not assumed, and re-
+  confirmed still true after the reconciliation. `pyarrow` (21.0.0) and
   `networkx` (3.3) ARE already installed, confirmed the same way. Held
   rather than silently `pip install`ing a new dependency without
   checking this repo's existing per-feature `python/requirements-*.txt`
@@ -1013,7 +1133,9 @@ two real gaps (not style nitpicks):
   scoped Python capability deps) — a `requirements-ontology-adapter.txt`
   should follow that pattern, but adding the dependency itself wasn't
   done without flagging it first, matching the same discipline applied
-  to the OAK-03B/03C JVM decision above.
+  to the OAK-03B/03C JVM decision above. Once `rdflib` is actually
+  installed, `to_rdf()` should already work with zero further code
+  changes — the delegation is real, only the dependency is missing.
 - ~~**ONTO-PY-03** (tuple → Arrow IPC round-trip)~~ — **DONE 2026-08-31.**
   `python/parent_atlas_ontology/arrow_adapter.py` — the nested-struct
   Arrow schema the operator specified (`participants` as
@@ -1029,10 +1151,59 @@ two real gaps (not style nitpicks):
   **Result: PASS, 9/9.** Report at
   `docs/reports/ontology-linked-tuple-arrow-parity-v1.json`. Run:
   `python python/parent_atlas_ontology/onto_py_03_arrow_parity_check.py`.
-  **ONTO-PY-04** (NetworkX projection → same frozen GraphOrdinal map →
-  cuGraph projection parity): `networkx` is already available; cuGraph
-  is a separate, heavier GPU-library question not checked this pass.
-  **ONTO-PY-05** (same semantic payload → `AtlasPassEnvelopeV2` →
+- ~~**ONTO-PY-04** (NetworkX projection)~~ — **NetworkX half DONE
+  2026-08-31, cuGraph half NOT built.** `python/parent_atlas_ontology/
+  graph_projection.py` — `project_to_graph()` projects one **relation
+  node per tuple** connected to every ordinal-resolvable participant
+  (`relation:{tupleId} -> ordinal:{N}` edges), **never pairwise
+  participant-to-participant edges** — exactly the operator's design,
+  verified by an explicit test (`no_pairwise_participant_to_participant_edges`).
+
+  **Real gap found while designing this** (checked directly against
+  `graph-node-key-v1.ts`'s actual regex, not assumed): a relation node
+  cannot be assigned a real, canonical `GraphNodeKeyV1` today — the
+  regex is `^(symbol|packet|chunk|occurrence):.+$`, no `relation:`
+  prefix exists. So relation nodes get their own **separate, local,
+  non-canonical** dense ordinal space (sorted-by-tupleId, same
+  determinism style as the real `buildGraphOrdinalMapV1`), clearly
+  documented as executor-local — not silently smuggled into the
+  canonical ordinal space. This is real, unattempted TS-side scope
+  (adding a `relation:` prefix, or an equivalent decision) flagged for
+  whoever owns `graph-node-key-v1.ts`, not fixed here.
+
+  `ordinal_map` is deliberately opaque and externally supplied — this
+  module never derives `entityKind → GraphNodeKeyV1` mappings itself
+  (that would be guessing at identity resolution that belongs on the
+  TS/Postgres side, the exact thing every adapter file in this package
+  is built to avoid). Participants whose `entityId` isn't in the
+  supplied map are **skipped and reported**, not crashed on and not
+  fabricated an ordinal for — verified with a real negative case, not
+  just a happy path: the fixture's 4th participant
+  (`tool_call:typecheck-run-42`) has no defined `GraphNodeKeyV1`
+  derivation, deliberately left out of the test's `ordinal_map`, and the
+  check confirms it's reported in `skippedParticipants` rather than
+  silently dropped or causing a crash.
+
+  Also built the compact GPU ABI the operator specified
+  (`GraphEdgeProjectionV1`: `sourceOrdinal`/`destinationOrdinal`/
+  `relationOrdinal`/`roleCode`), with `roleCode` a stable integer
+  encoding derived from the real `PARTICIPANT_ROLE_VALUES` set (sorted,
+  so deterministic across runs/versions).
+
+  `onto_py_04_graph_projection_check.py` — **8/8 checks pass**: exactly
+  one relation node, exactly 3 of 4 participants resolved (the 4th
+  correctly skipped), no participant-to-participant edges exist, edge
+  roles match the original tuple's roles, role codes are stable/distinct,
+  destination ordinals match the supplied map, and the whole projection
+  is deterministic (identical checksum across two independent runs).
+  Report at `docs/reports/ontology-linked-tuple-graph-projection-parity-v1.json`.
+  Run: `python python/parent_atlas_ontology/onto_py_04_graph_projection_check.py`.
+
+  **cuGraph parity NOT attempted**: a separate, heavier GPU-library
+  dependency question, same category as the JVM/rdflib decisions already
+  held pending operator input this session — not silently added.
+
+- **ONTO-PY-05** (same semantic payload → `AtlasPassEnvelopeV2` →
   checksum/revision replay): depends on `AtlasPassEnvelopeV2` existing
   as a real contract — not verified to exist in this repo yet; needs its
   own audit-first check before starting, same as everything else in this

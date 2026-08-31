@@ -15,6 +15,7 @@ import pyarrow as pa
 
 from parent_atlas_ontology.arrow_adapter import to_arrow_table
 from parent_atlas_ontology.models import OntologyLinkedTupleV1
+from parent_atlas_ontology.semantic_bridge import ontology_linked_tuples_to_nary_relations
 from parent_atlas_ontology.validation import validate_ontology_linked_tuple
 
 
@@ -36,32 +37,42 @@ class OntologyLinkedTupleAdapter:
         (see onto_py_03_arrow_parity_check.py, 9/9 PASS)."""
         return to_arrow_table(values)
 
-    def to_rdf(self, value: OntologyLinkedTupleV1):
-        """ONTO-PY-02, NOT BUILT. `rdflib` is not installed in this
-        environment (checked directly via `import rdflib` ->
-        ModuleNotFoundError, not assumed) — raising rather than silently
-        no-opping or returning a fake success, per this repo's own
-        CREATED/WIRED/NOT_PROVEN status discipline. Needs the operator's
-        go-ahead on adding python/requirements-ontology-adapter.txt
-        (matching the repo's existing per-feature requirements-*.txt
-        convention) before this method can be implemented and tested."""
-        raise RuntimeError(
-            "ONTO-PY-02 not built: rdflib is not installed in this environment. "
-            "See openspec/changes/parent-atlas-ontology-kernel/tasks.md ONTO-PY-02 "
-            "for the pending dependency decision."
-        )
+    def to_rdf(self, values: Sequence[OntologyLinkedTupleV1]):
+        """ONTO-PY-02, revised 2026-08-31 per the operator's decision to
+        layer on `atlas_semantic_ontology_projection.py` (the general
+        semantic substrate) rather than build a second, duplicate RDF
+        adapter. Converts to `NarySemanticRelation` via
+        `semantic_bridge.py` and delegates to that module's
+        `build_rdflib_dataset()`.
 
-    def to_graph_projection(self, values: Sequence[OntologyLinkedTupleV1], ordinal_map):
-        """ONTO-PY-04, NOT BUILT. NetworkX is available in this
-        environment (confirmed), but the frozen GraphOrdinal map / relation-
-        node n-ary projection design (participant A/B/C/D -> R17 <- rather
-        than pairwise edges, per the operator's own diagram) has not been
-        implemented or tested yet. Raising rather than returning a
-        half-built projection that looks done but silently drops the
-        n-ary structure — the exact failure mode this whole adapter
-        package exists to prevent."""
-        raise RuntimeError(
-            "ONTO-PY-04 not built: NetworkX/cuGraph n-ary relation-node projection "
-            "is not implemented yet. See openspec/changes/parent-atlas-ontology-kernel/"
-            "tasks.md ONTO-PY-04."
-        )
+        Still genuinely NOT_PROVEN in this environment: `rdflib` is not
+        installed (checked directly, not assumed), so the delegated call
+        raises `RuntimeError('rdflib is required for RDF projection')`
+        from inside `atlas_semantic_ontology_projection.py` itself — the
+        same honest failure as before, just now surfaced by the shared
+        substrate instead of a locally hand-written stub."""
+        from atlas_semantic_ontology_projection import build_rdflib_dataset
+
+        relations = ontology_linked_tuples_to_nary_relations(values)
+        return build_rdflib_dataset(assertions=(), relations=relations)
+
+    def to_graph_projection(self, values: Sequence[OntologyLinkedTupleV1], *, graph_revision: str) -> dict:
+        """ONTO-PY-04, revised 2026-08-31 per the operator's decision:
+        delegates to `atlas_semantic_ontology_projection.py` /
+        `networkx_snapshot.py` (the shared substrate, already proven —
+        `test_networkx_snapshot_replay.py`, 2/2 tests pass) instead of
+        `graph_projection.py`'s own hand-rolled NetworkX logic, which is
+        now superseded (kept on disk for its real, still-relevant
+        `GraphNodeKeyV1` finding — see that file's updated docstring —
+        but no longer the adapter's default path).
+
+        Signature changed from the superseded version: no more
+        `ordinal_map` parameter — the shared substrate assigns its own
+        internal dense ordinals from sorted node identity strings (see
+        `networkx_snapshot.py`'s `_canonical_graph_payload`), it does not
+        take an externally-supplied one. Returns the checksum-sealed
+        snapshot dict from `build_networkx_snapshot()`."""
+        from parent_atlas_ontology.networkx_snapshot import build_networkx_snapshot
+
+        relations = ontology_linked_tuples_to_nary_relations(values)
+        return build_networkx_snapshot(assertions=(), relations=relations, graph_revision=graph_revision)

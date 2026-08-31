@@ -1,0 +1,62 @@
+{
+  "gate": "ONTO-PY-04",
+  "description": "OntologyLinkedTupleV1 -> NetworkX n-ary relation-node projection (participants A/B/C -> R17, never pairwise edges)",
+  "note": "NetworkX parity is proven for the fixture. Operational ProjectionNodeKeyV1/ProjectionOrdinalMapV1 coordinates are now emitted for the future cuGraph path. cuGraph execution parity is still separate; tuple nodes remain non-canonical projection vertices.",
+  "operationalProjection": {
+    "nodeCount": 4,
+    "edgeCount": 3,
+    "coordinateSpace": "ProjectionOrdinal",
+    "canonicalAuthority": false
+  },
+  "fixturePath": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "checks": [
+    {
+      "name": "one_relation_node_per_tuple",
+      "ok": true,
+      "detail": "['relation:7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3']"
+    },
+    {
+      "name": "exactly_3_ordinal_resolved_participant_edges",
+      "ok": true,
+      "detail": "got 3"
+    },
+    {
+      "name": "1_participant_skipped_not_crashed",
+      "ok": true,
+      "detail": "({'tupleId': '7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3', 'entityId': 'tool_call:typecheck-run-42', 'entityKind': 'tool_call', 'role': 'tool', 'reason': 'entityId not present in supplied ordinal_map'},)"
+    },
+    {
+      "name": "no_pairwise_participant_to_participant_edges",
+      "ok": true,
+      "detail": "every edge must originate from the relation node, never participant->participant"
+    },
+    {
+      "name": "edge_roles_match_original_participant_roles",
+      "ok": true,
+      "detail": "{'evidence', 'cause', 'effect'}"
+    },
+    {
+      "name": "role_codes_are_stable_and_distinct",
+      "ok": true,
+      "detail": "[1, 4, 5]"
+    },
+    {
+      "name": "destination_ordinals_match_supplied_map",
+      "ok": true,
+      "detail": "[10, 11, 12]"
+    },
+    {
+      "name": "deterministic_checksum_across_two_independent_runs",
+      "ok": true,
+      "detail": "2ee53d00cc2ada52ba343201943bb39bbeb5c8b1942e4120c0584b4247be400e vs 2ee53d00cc2ada52ba343201943bb39bbeb5c8b1942e4120c0584b4247be400e"
+    },
+    {
+      "name": "operational_projection_has_one_coordinate_universe",
+      "ok": true,
+      "detail": "nodes=4, edges=3"
+    }
+  ],
+  "pass": true,
+  "durationMs": 0.65,
+  "writesPerformed": false
+}
