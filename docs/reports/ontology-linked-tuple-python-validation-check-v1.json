@@ -1,0 +1,34 @@
+{
+  "gate": "ONTO-PY-VALIDATE-01",
+  "description": "Proves OntologyLinkedTupleAdapter.validate() performs real enum/range enforcement, not a structural pass-through",
+  "checks": [
+    {
+      "name": "valid_fixture_passes",
+      "ok": true,
+      "detail": "returned the same object, no coercion"
+    },
+    {
+      "name": "rejects_bad_evidence_state",
+      "ok": true,
+      "detail": "1 validation issue(s): evidenceState 'NOT_A_REAL_STATE' not in ['ACTIVE_DEGRADED', 'ACTIVE_VERIFIED', 'FAILED', 'GATED', 'REFERENCE_ONLY', 'SUPERSEDED']"
+    },
+    {
+      "name": "rejects_out_of_range_confidence",
+      "ok": true,
+      "detail": "1 validation issue(s): confidence must be in [0, 1], got 1.5"
+    },
+    {
+      "name": "rejects_bad_participant_role",
+      "ok": true,
+      "detail": "1 validation issue(s): participants[0].role 'NOT_A_REAL_ROLE' not in ['actor', 'cause', 'citation', 'context', 'effect', 'evidence', 'input', 'manifold', 'output', 'packet', 'policy', 'screenshot', 's"
+    },
+    {
+      "name": "reports_all_issues_not_just_first",
+      "ok": true,
+      "detail": "expected 3 issues, got 3: [\"labelKind 'BOGUS' not in ['ontology', 'pos', 'tag']\", \"evidenceState 'BOGUS' not in ['ACTIVE_DEGRADED', 'ACTIVE_VERIFIED', 'FAILED', 'GATED', 'REFERENCE_ONLY', 'SUPERSEDED']\", 'confidence must be in [0, 1], got 99.0']"
+    }
+  ],
+  "pass": true,
+  "durationMs": 0.7,
+  "writesPerformed": false
+}

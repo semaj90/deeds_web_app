@@ -637,6 +637,55 @@ The audit performed no writes. Do not apply a feature-registry or Kanban
 migration until one migration owner and a reconciled ledger are selected.
 Evidence: `docs/reports/postgres-contract-mirrors-report.json`.
 
+**Live object correction 2026-08-31:** a direct read-only PostgreSQL catalog
+check confirms `kanban_tasks`, `kanban_task_dependencies`,
+`kanban_task_comments`, `kanban_task_events`, and `kanban_task_attempts` are
+present. Therefore Kanban is not a missing-table migration target; its
+remaining issue is static index/schema reconciliation. `feature_registry`
+remains the genuinely absent live table. This supersedes older summaries
+that described all `kanban_*` tables as absent; no database writes were made.
+
+**Feature-registry owner trace 2026-08-31:** the canonical Drizzle owner is
+already `src/lib/server/db/schema/feature-registry.ts`, with the base table
+defined by journaled migrations `0024_nebulous_mongoose.sql` and
+`0025_yellow_tony_stark.sql`. The separate
+`manual/0048_feature_registry_queries.sql` file owns only
+`feature_registry_queries` and must not be used to create `feature_registry`.
+The live mirror remains `LIVE_TABLE_MISSING`; therefore the next safe step is
+to reconcile why the journaled `0024/0025` history is absent from the live
+migration ledger, not to author a duplicate feature-registry migration.
+
+**Ledger direct readback 2026-08-31:** the configured local connection is
+`legal_ai_db`, schema `public`; `drizzle.__drizzle_migrations` exists but has
+zero rows. The same read-only query confirms `public.feature_registry` is
+absent while `public.kanban_tasks` is present. This rules out a populated
+ledger hidden under the wrong database and keeps migration repair blocked
+until the operator reconciles the empty ledger against the existing live
+objects and journal history.
+
+**Pre-apply guard hardening 2026-08-31:** `scripts/atlas/schema/pre-apply-
+check.mjs` now loads repository environment files and performs a read-only
+live-ledger sanity check. It correctly blocks with
+`MIGRATION_LEDGER_UNRECONCILED` when the Drizzle ledger has `0` rows while
+`4` known public schema objects exist. The guard syntax check passed; no
+migration was attempted. Receipt: `docs/reports/schema/pre-apply-check.json`.
+
+**Drizzle consistency follow-up 2026-08-31:** `drizzle-kit check` passes,
+showing the journal is internally parseable. The migration SQL safety lint
+remains blocked across historical and manual SQL (`160` BLOCKs, `347` WARNs,
+`318` notes), including destructive or lock-sensitive statements. This is
+not a reason to repair old files in bulk or apply them; migration ownership
+and live-ledger reconciliation remain prerequisites for any new migration.
+Receipt: `docs/reports/schema/migration-safety-report.json`.
+
+**ONTO-PY-04A 2026-08-31:** added the deterministic NetworkX snapshot
+boundary at `python/parent_atlas_ontology/networkx_snapshot.py`. It assigns
+derived GraphOrdinal values from sorted node identities, preserves n-ary
+relations as reified relation nodes, canonicalizes node/edge records, and
+proves two-run projection replay parity. Focused test: `1/1`. This is a CPU
+oracle/projection proof only; cuGraph parity, OWL reasoning, and all writes
+remain unperformed. Receipt: `docs/reports/oak-python-networkx-projection-v1.json`.
+
 **Historical-note correction:** older text below that says OAK-07 was not
 started predates the now-built adaptive plan and kernel-bound planner. The
 current status is contract + deterministic replay proven; action execution,
@@ -899,6 +948,57 @@ live, not assumed.
 cd sveltekit-frontend && npx tsx ../scripts/atlas/generate-ontology-linked-tuple-fixture-v1.mts
 cd .. && python python/parent_atlas_ontology/onto_py_01_parity_check.py
 ```
+
+### Review fix (2026-08-31): class boundary + real validation
+
+The operator reviewed ONTO-PY-01/03 against the original spec and found
+two real gaps (not style nitpicks):
+1. The spec'd one `OntologyLinkedTupleAdapter` class
+   (`validate()`/`to_rdf()`/`to_arrow()`/`to_graph_projection()`); the
+   session had built separate module-level functions instead.
+2. `models.py`'s `from_dict()` was structural-only — it trusted every
+   enum value (`labelKind`, `role`, `entityKind`, `evidenceState`, etc.)
+   was already valid because the fixture was TS-validated first. A raw
+   dict from anywhere else would have sailed through with a bad enum
+   value or an out-of-range `confidence` and nothing would have caught
+   it — a real gap against Zod's `.parse()` enforcement on the TS side,
+   not a hypothetical one.
+
+**Both fixed 2026-08-31**:
+- [x] **`enums.py`** — every enum value set copied verbatim from the real
+  TS `z.enum([...])` literals (cited by file/line in the docstring), not
+  approximated. States its own limitation honestly: no shared codegen
+  step exists between the two languages yet, so this file must be
+  re-synced by hand if the TS enums ever change.
+- [x] **`validation.py`** — `validate_ontology_linked_tuple()` performs
+  real enforcement: every enum field checked against its real value set,
+  `confidence` range-checked, `tokenIndex`/`evidenceSpan.start` range-
+  checked, `evidenceSpan.end >= start` checked, all five array-length
+  caps checked (`ontologyIds`≤32, `conceptIds`≤32, `participants`≤16,
+  `evidenceRefs`≤32, `provenance.sourceTables`≤12), every participant's
+  `entityKind`/`role` checked individually. **Collects every issue found
+  and raises once** (`OntologyLinkedTupleValidationError`), mirroring
+  Zod's multi-issue reporting rather than failing on the first problem.
+- [x] **`adapter.py`** — `OntologyLinkedTupleAdapter` class, exact method
+  shape from the spec. `validate()`/`to_arrow()` are real. `to_rdf()`/
+  `to_graph_projection()` **raise `RuntimeError` with a clear reason**
+  (rdflib not installed; NetworkX projection not implemented) rather than
+  silently no-opping or returning a fake success — the same
+  CREATED/NOT_PROVEN discipline applied everywhere else this session.
+  Confirmed both actually raise via direct execution, not assumed.
+- [x] **`onto_py_validation_check.py`** — proves the validator actually
+  rejects bad data, not just accepts good data (accepting the fixture
+  alone can't distinguish real validation from a no-op). **5/5 checks
+  pass**: valid fixture passes unchanged; bad top-level enum rejected;
+  out-of-range confidence rejected; bad *nested* participant-role enum
+  rejected; three simultaneous issues all reported in one raise (not
+  just the first). Report at
+  `docs/reports/ontology-linked-tuple-python-validation-check-v1.json`.
+- [x] Re-ran ONTO-PY-01 and ONTO-PY-03's parity checks after adding
+  `adapter.py` (which imports `arrow_adapter.py`) — both still **PASS**,
+  confirming the new class layer didn't disturb the existing modules.
+
+**Run it**: `python python/parent_atlas_ontology/onto_py_validation_check.py`
 
 ### ONTO-PY-02 through 05 — deliberately NOT attempted this session
 
