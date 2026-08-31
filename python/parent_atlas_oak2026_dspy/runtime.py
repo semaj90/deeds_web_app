@@ -7,7 +7,8 @@ module does not permit live program mutation.
 from __future__ import annotations
 
 import inspect
-from typing import Any
+import math
+from typing import Any, Callable
 
 try:
     import dspy  # type: ignore
@@ -19,6 +20,39 @@ def require_dspy() -> Any:
     if dspy is None:
         raise RuntimeError("DSPy is not installed in this Python environment")
     return dspy
+
+
+def build_oak2026_gepa_feedback_metric_v1(
+    *,
+    observation_factory: Callable[[Any, Any, Any, Any, Any], Any],
+    score_fn: Callable[[Any], tuple[float, str]],
+) -> Callable[[Any, Any, Any, Any, Any], dict[str, float | str]]:
+    """Adapt Parent Atlas receipt scoring to DSPy's current GEPA metric API.
+
+    DSPy GEPA currently calls metrics as
+    ``(gold, pred, trace, pred_name, pred_trace)``. Parent Atlas retains
+    ownership of how those execution/eval objects become a typed observation;
+    callers provide ``observation_factory`` rather than this helper guessing.
+    """
+
+    def metric(
+        gold: Any,
+        pred: Any,
+        trace: Any,
+        pred_name: Any,
+        pred_trace: Any,
+    ) -> dict[str, float | str]:
+        observation = observation_factory(gold, pred, trace, pred_name, pred_trace)
+        score, feedback = score_fn(observation)
+        score = float(score)
+        if not math.isfinite(score) or not 0.0 <= score <= 1.0:
+            raise ValueError("OAK2026_GEPA_SCORE_OUT_OF_RANGE")
+        feedback = str(feedback).strip()
+        if not feedback:
+            raise ValueError("OAK2026_GEPA_FEEDBACK_REQUIRED")
+        return {"score": score, "feedback": feedback}
+
+    return metric
 
 
 def build_oak2026_gepa_optimizer_v1(
