@@ -106,7 +106,9 @@ def oak_health() -> dict[str, Any]:
         "available": OAKLIB_AVAILABLE,
         "oaklibVersion": _oaklib_version(),
         "adapterConfigured": _adapter_locator() is not None,
-        "adapterLocator": _adapter_locator(),
+        # Never return the raw adapter locator: a future locator may contain a
+        # filesystem location, remote endpoint, or credentials-bearing DSN.
+        "adapterLocatorExposed": False,
         "mode": "READ_ONLY_SHADOW",
         "canonicalAuthority": False,
         "paper": {
