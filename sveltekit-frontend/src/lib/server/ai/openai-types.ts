@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod';
+import type { NeuralDecoderPrefillCallerReceiptV1 } from '$lib/server/ai/neural-decoder-prefill-caller-v1.js';
 
 // ── Request ────────────────────────────────────────────────────────────────
 
@@ -172,6 +173,15 @@ export interface OpenAIChatCompletionResponse {
     selectedLane?: 'redis' | 'turboquant' | 'bifrost' | 'ldr';
     fallbackReason?: string | null;
     timingTrace?: TimingTrace;
+    /**
+     * PREFILL-CALLER-01 shadow receipt, when the Parent Atlas preflight path
+     * ran with ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED on. SHADOW_READONLY
+     * only -- never influenced this response's content or ranking. Absent
+     * (not just null) when the flag is off or the preflight path wasn't
+     * taken, so callers can distinguish "not observed" from "observed, no
+     * decoder call needed" (cacheStatus: 'HIT').
+     */
+    neuralDecoderPrefillShadow?: NeuralDecoderPrefillCallerReceiptV1 | null;
   };
 }
 

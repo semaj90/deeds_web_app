@@ -55,6 +55,7 @@ import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { isVlmOrMmprojRequestModel } from '$lib/server/ai/request-classifiers.js';
 import { shouldUseDraftModel } from '$lib/server/ai/draft-model-policy.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
+import type { NeuralDecoderPrefillCallerReceiptV1 } from '$lib/server/ai/neural-decoder-prefill-caller-v1.js';
 import { attentionHeadRanker } from '$lib/server/ai/attention-head-ranker.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
 import { getRedis } from '$lib/server/redis.js';
@@ -2056,6 +2057,7 @@ export async function runChatCompletion(
       topoHit: !!aceStats.topo_hit,
       packetHit: !!aceStats.packet_hit,
       topK,
+      neuralDecoderPrefillShadow: aceCtx.neuralDecoderPrefillShadow ?? null,
     },
     topoPrefilter: aceStats.topoPrefilter ?? null,
     hmm: hmmResult
@@ -2103,6 +2105,7 @@ function wrapResponse(args: {
     topoHit?: boolean;
     packetHit?: boolean;
     topK?: number;
+    neuralDecoderPrefillShadow?: NeuralDecoderPrefillCallerReceiptV1 | null;
   };
   inferenceLane?: 'ldr' | 'turboquant' | 'bifrost';
   runtimeProfile?: string;
@@ -2198,6 +2201,7 @@ function wrapResponse(args: {
       topoHit: args.ace.topoHit,
       packetHit: args.ace.packetHit,
       topK: args.ace.topK,
+      neuralDecoderPrefillShadow: args.ace.neuralDecoderPrefillShadow,
       inferenceLane: args.inferenceLane,
       runtimeProfile: args.runtimeProfile,
       runtimeAvailable: args.runtimeAvailable,
