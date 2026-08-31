@@ -24,7 +24,7 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     beautifulsoup4 \
     spacy \
     langextract[openai]==1.6.0 \
-    oaklib==0.7.3 \
+    oaklib==0.7.4 \
     'psycopg[binary,pool]>=3.2,<4' \
     'networkx>=3.6,<4' \
     treesitter-chunker \
