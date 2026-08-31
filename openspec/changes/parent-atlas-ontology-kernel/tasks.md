@@ -1204,7 +1204,26 @@ module's own test suite, not something this reconciliation touched).
   held pending operator input this session — not silently added.
 
 - **ONTO-PY-05** (same semantic payload → `AtlasPassEnvelopeV2` →
-  checksum/revision replay): depends on `AtlasPassEnvelopeV2` existing
-  as a real contract — not verified to exist in this repo yet; needs its
-  own audit-first check before starting, same as everything else in this
-  file.
+  checksum/revision replay): **audit done 2026-08-31 — confirmed absent,
+  not just unverified.** `AtlasPassEnvelopeV2` (and every close-name
+  variant: `PassEnvelope`, `AtlasPassEnvelope`) does not exist anywhere
+  in this repo — checked `packages/parent-atlas`, `sveltekit-frontend/
+  src`, and `openspec/` (the only hit there is this file's own prior
+  note about it). No TS code, no Python, no other design doc.
+
+  **Deliberately not built here.** The operator's own field list for it
+  (`workspaceRevision`, `sourceRevision`, `graphRevision`,
+  `producerRevision`, `inputChecksum`, `outputChecksum`,
+  `idempotencyKey`) describes a general-purpose EXECUTION envelope
+  meant to wrap the output of any pass/adapter across this repo, not
+  something scoped to `OntologyLinkedTupleV1` specifically — inventing
+  it unilaterally from inside a Python-adapter task would mean deciding
+  a cross-cutting, repo-wide contract shape without operator sign-off,
+  the same category of decision this session has held for the JVM
+  (OAK-03B/03C) and rdflib (ONTO-PY-02) choices rather than making
+  silently. Same pattern as the earlier `AdaptiveDagPlanV1` finding this
+  session (also confirmed absent, then later built for real by the
+  concurrent process, then reconciled) — flagged here so whoever builds
+  `AtlasPassEnvelopeV2` for real (TS side, most likely, given every
+  other cross-cutting envelope contract in this repo lives there) knows
+  this Python adapter is a ready, waiting consumer.
