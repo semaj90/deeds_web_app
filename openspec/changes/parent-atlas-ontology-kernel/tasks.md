@@ -12,17 +12,21 @@ change described below is committed to disk, rebuilt clean, and passing.
 **A fresh session can resume directly from here — read this file top to
 bottom plus `spec.md`, no other context needed.**
 
-**Built and verified this session** (27/27 tests passing across 6 spec
+**Built and verified this session** (35/35 tests passing across 7 spec
 files in `packages/parent-atlas/src/core/`, package rebuilds clean, smoke
 test `scripts/atlas/oak-task-function-compiler-readiness-smoke-v1.mjs`
-PASS, report at `docs/reports/oak-task-function-compiler-readiness-v1.json`):
-- OAK-02 schema, OAK-04 operator library (**18 of 24 kinds**, each
-  `implementationRef` verified real — not guessed), OAK-05 function
-  compiler + a 3-function catalog, OAK-06 `QueryKernelGraphV1`, OAK-08
-  `OakJudgeFeedbackV1` contract + one real (not fabricated) fixture
-  grounded in this session's own F02 failure — schema/fixture only, **not**
-  a working judge, see the OAK-08 section below before treating this as
-  more than it is — OAK-10 freeze manifest (correctly capped at `DRAFT`).
+PASS, report at `docs/reports/oak-task-function-compiler-readiness-v1.json`,
+**all of this committed and pushed to `main` at `4f600cec3f`** — do not
+re-derive, `git log`/`git show` it):
+- OAK-02 schema, OAK-03A OWL projection + `OntologyProfileReceiptV1`
+  (pure TS, no JVM, no reasoner adopted yet — see OAK-03 section), OAK-04
+  operator library (**18 of 24 kinds**, each `implementationRef` verified
+  real — not guessed), OAK-05 function compiler + a 3-function catalog,
+  OAK-06 `QueryKernelGraphV1`, OAK-08 `OakJudgeFeedbackV1` contract + one
+  real (not fabricated) fixture grounded in this session's own F02
+  failure — schema/fixture only, **not** a working judge, see the OAK-08
+  section below before treating this as more than it is — OAK-10 freeze
+  manifest (correctly capped at `DRAFT`).
 - F01/F02 field-gap extensions closed per the user's second audit pass.
 - Three real collisions with a concurrent process's work caught via file
   mtime and reconciled (not duplicated) — see the "External audit
@@ -84,7 +88,7 @@ it has repeatedly shipped real, relevant work mid-session.
 # 1. Rebuild the package after any source change (run from packages/parent-atlas)
 cd packages/parent-atlas && node ../../node_modules/typescript/bin/tsc -p tsconfig.json
 
-# 2. Run all 6 ontology-kernel spec files (run from packages/parent-atlas — its
+# 2. Run all 7 ontology-kernel spec files (run from packages/parent-atlas — its
 #    own vitest, NOT sveltekit-frontend's, whose scope doesn't cover this package)
 cd packages/parent-atlas && node ../../node_modules/vitest/vitest.mjs run \
   src/core/ontology-kernel-end-to-end.spec.ts \
@@ -93,8 +97,9 @@ cd packages/parent-atlas && node ../../node_modules/vitest/vitest.mjs run \
   src/core/query-kernel-graph-v1.spec.ts \
   src/core/kernel-function-catalog-v1.spec.ts \
   src/core/oak-judge-feedback-v1.spec.ts \
+  src/core/ontology-owl-projection-v1.spec.ts \
   --root .
-# Expect: 6 passed, 27 passed (0 known failures as of this handoff)
+# Expect: 7 passed, 35 passed (0 known failures as of this handoff)
 
 # 3. Re-run the OaK readiness smoke test (run from repo root — it imports
 #    directly from packages/parent-atlas/dist/index.js via pathToFileURL,
@@ -412,6 +417,71 @@ Partial audit done at OAK-00 time (grep-verified, not assumed):
   (c) hand-rolled TS checker — no dependency, weakest guarantee, own
   scope definition needed. **Still no adoption — research only, per what
   was asked for both passes.**
+
+  **Architecture correction from the operator (2026-08-31): ELK is not
+  "ruled out" — it's a distinct, non-competing fast lane.** The earlier
+  research framed ELK as inferior to HermiT because it's EL-profile-only;
+  the operator's frozen design instead runs both, gated by declared
+  profile, never one "primary" and one "challenger":
+  ```
+  reasonerPolicy: { EL_PROFILE: 'ELK', FULL_DL_REQUIRED: 'HERMIT' }
+  ```
+  ELK handles the (likely common) case where a kernel schema only needs
+  EL-level checks — fast, incremental, multicore; HermiT is reserved for
+  schemas that actually need full DL semantics. This is the correct
+  framing; the prior research pass's "ELK ruled out" language was wrong
+  to the extent it implied ELK has no role — it has a real one, just not
+  as a HermiT substitute.
+
+- [x] **OAK-03A built 2026-08-31 — OWL projection + `OntologyProfileReceiptV1`
+  only, pure TypeScript, no JVM, no adoption of any reasoner.**
+  `packages/parent-atlas/src/core/ontology-owl-projection-v1.ts` —
+  `projectAtlasOntologyKernelSchemaToOwlV1()` deterministically compiles
+  an `AtlasOntologyKernelSchemaV1` into RDF/XML OWL: entity types →
+  `owl:Class`, binary relation types → `owl:ObjectProperty`, n-ary
+  relation types → a reified `owl:Class` (OWL properties are inherently
+  binary — this is the standard n-ary-relation pattern, not an
+  approximation), `DISJOINT_CLASSES` constraints (exactly 2 members) →
+  real `owl:disjointWith` axioms.
+
+  **Honest, found-not-guessed gap**: `kernelConstraintSchema` (OAK-02)
+  only carries `appliesTo: string[]` + free-text `description` for every
+  constraint kind — enough for `DISJOINT_CLASSES`, not enough to build
+  real `DOMAIN_RANGE`/`PROPERTY_RESTRICTION`/`CARDINALITY` axioms (no
+  domain-vs-range split, no restricted-property id, no cardinality
+  number in the schema today). Rather than fabricate those fields,
+  those three constraint kinds project as `rdfs:comment` annotations
+  only — visible and auditable, but not logically enforced by any
+  reasoner. The receipt's `axiomsCovered`/`axiomsAnnotatedOnly` arrays
+  make this split explicit and machine-checkable. `owlProfileHeuristic`
+  is clearly labeled a heuristic (not a real OWLAPI profile check this
+  repo hasn't adopted) — conservatively returns `OWL2_DL_REQUIRED`
+  whenever anything had to go annotation-only, so a wrong "this is EL"
+  can never silently route a DL-requiring schema to the weaker ELK lane
+  once OAK-03B exists. Before `DOMAIN_RANGE`/`PROPERTY_RESTRICTION`/
+  `CARDINALITY` can be genuinely reasoner-checked, `kernelConstraintSchema`
+  needs real structured fields for them — that's OAK-02 surface, flagged
+  here, not fixed here.
+
+  **Verified**: package rebuilt clean; **35/35 tests pass** across 7 spec
+  files (up from 27/6) — new `ontology-owl-projection-v1.spec.ts` covers
+  the disjoint/annotation-only split, n-ary reification, determinism, and
+  the EL-vs-DL heuristic on both a clean-EL and a DL-required schema.
+
+  **OAK-03B (ELK subprocess adapter) and OAK-03C (HermiT subprocess
+  adapter) deliberately NOT attempted this pass.** Both require vendoring
+  a real external JVM binary (`elk.jar`/`HermiT.jar`) into or alongside
+  this repo — a materially more consequential action (a new runtime
+  dependency, license-distribution question, disk footprint) than a pure
+  TypeScript projection function, and shouldn't be done silently inside
+  the same pass that built the projection. This still needs the
+  operator's actual go-ahead on where the jars come from (vendored into
+  the repo vs. an operator-provisioned path vs. a documented manual
+  install step) before writing the subprocess-adapter code — the
+  `OntologyReasonerAdapter` Python interface shape (`profile()`/
+  `check_consistency()`/`classify()` → `SchemaVerificationReceiptV1`) is
+  already fully specified in the operator's message and ready to
+  implement the moment that's answered.
 
 ## OAK-04 — `AtlasKernelOperatorLibraryV1`
 

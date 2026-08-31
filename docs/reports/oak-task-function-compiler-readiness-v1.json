@@ -1,6 +1,6 @@
 {
   "schema": "atlas.oak-task-function-compiler-readiness.v1",
-  "generatedAt": "2026-08-31T01:41:12.388Z",
+  "generatedAt": "2026-08-31T02:15:27.948Z",
   "smokeTest": "compile one task function from registered operators; execute twice against the same frozen graph/evidence/artifact inputs; require identical trace checksums; zero writes",
   "taskFunction": "fn:find_evidence_for_failed_typecheck",
   "taskFamily": "symbol_change_impact_analysis",
