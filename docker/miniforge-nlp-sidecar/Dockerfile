@@ -24,6 +24,9 @@ RUN python -m pip install --upgrade pip setuptools wheel \
     beautifulsoup4 \
     spacy \
     langextract[openai]==1.6.0 \
+    oaklib==0.7.3 \
+    'psycopg[binary,pool]>=3.2,<4' \
+    'networkx>=3.6,<4' \
     treesitter-chunker \
     tree-sitter \
     tree-sitter-language-pack \
@@ -40,7 +43,11 @@ ENV MINIFORGE_SIDECAR_HOST=0.0.0.0 \
     MINIFORGE_SIDECAR_PORT=8095 \
     LANGEXTRACT_RUNTIME=official
 
-# v2 preserves native Consiliency IDs/hierarchy and LangExtract grounding while
-# reusing the legacy analysis implementation. Rollback is a one-line command
-# change to /app/python/miniforge_nlp_sidecar.py if the proof gates fail.
-CMD ["python", "/app/python/miniforge_nlp_sidecar_v2.py"]
+# OAK (Ontology Access Kit) is available to the bounded OaK-style kernel.
+# Leave ATLAS_OAK_ADAPTER unset by default so a container never downloads or
+# selects ontology state implicitly. Deployment must provide an explicit,
+# revision-qualified read-only adapter locator.
+#
+# The wrapper preserves the v2 AST/LangExtract facade and only mounts the OAK
+# router. Rollback remains a one-line command change to v2 or legacy.
+CMD ["python", "/app/python/miniforge_nlp_sidecar_oak.py"]
