@@ -1,12 +1,12 @@
 {
   "schema": "atlas.openspec.workboard.v1",
-  "generatedAt": "2026-08-31T03:32:38.078Z",
+  "generatedAt": "2026-08-31T16:52:51.039Z",
   "source": "openspec/changes/*/tasks.md",
   "summary": {
-    "completedTasks": 2280,
-    "openTasks": 1914,
-    "totalTasks": 4194,
-    "progressFraction": 0.5436337625178826,
+    "completedTasks": 2282,
+    "openTasks": 1921,
+    "totalTasks": 4203,
+    "progressFraction": 0.5429455151082561,
     "progressBar": "[#####-----]",
     "eta": {
       "status": "UNKNOWN",
@@ -186,10 +186,10 @@
     {
       "change": "manual-migration-reconciliation",
       "completed": 25,
-      "total": 55,
-      "progressFraction": 0.45454545454545453,
-      "progressBar": "[#####-----]",
-      "open": 30
+      "total": 56,
+      "progressFraction": 0.44642857142857145,
+      "progressBar": "[####------]",
+      "open": 31
     },
     {
       "change": "parent-atlas-ace-bitfrost-cache-correctness",
@@ -434,17 +434,17 @@
     {
       "change": "parent-atlas-onnx-webgpu-embedding-promotion",
       "completed": 0,
-      "total": 11,
+      "total": 17,
       "progressFraction": 0,
       "progressBar": "[----------]",
-      "open": 11
+      "open": 17
     },
     {
       "change": "parent-atlas-ontology-kernel",
-      "completed": 27,
-      "total": 32,
-      "progressFraction": 0.84375,
-      "progressBar": "[########--]",
+      "completed": 29,
+      "total": 34,
+      "progressFraction": 0.8529411764705882,
+      "progressBar": "[#########-]",
       "open": 5
     },
     {

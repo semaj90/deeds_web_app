@@ -4,7 +4,8 @@ import {
     CallToolRequestSchema, ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { mcpTools } from '../mcp/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
@@ -94,6 +95,61 @@ async function executeTool(
   return handler(fakeRequest);
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// Dynamic tool-set selection (query-scoped advertised subset)
+//
+// This server declares ~88 tools. Every ListTools call previously
+// returned the full static array regardless of what the caller actually
+// needs, which is the whole memory/context cost this section addresses.
+// scripts/atlas/runtime-mcp-tool-selector.mjs already exists to solve
+// this (semantic Qdrant lookup over a tool_manifest collection, with a
+// file-backed docs/reports/mcp-tool-registry-index.json registry
+// fallback when Qdrant/Ollama are unavailable or the manifest is empty)
+// but was never wired into any live ListTools handler — this wires it in
+// rather than building a second, competing selection mechanism.
+//
+// Nothing is ever deleted or made defunct: every tool's schema and
+// handler stay exactly as implemented below. This only changes what a
+// given ListTools call *advertises* when the caller supplies a query
+// hint; with no hint (the default), behavior is unchanged — full list.
+// ─────────────────────────────────────────────────────────────────────
+const __mcpServerDir = dirname(fileURLToPath(import.meta.url));
+const MCP_TOOL_SELECTOR_PATH = join(__mcpServerDir, '..', '..', '..', 'scripts', 'atlas', 'runtime-mcp-tool-selector.mjs');
+
+type ToolSelectorFn = (query: string, opts?: { topK?: number }) => Promise<{ mcp_names: string[] }>;
+let _selectToolsForQuery: ToolSelectorFn | null | undefined;
+
+async function loadToolSelector(): Promise<ToolSelectorFn | null> {
+  if (_selectToolsForQuery !== undefined) return _selectToolsForQuery;
+  try {
+    const mod = await import(/* @vite-ignore */ MCP_TOOL_SELECTOR_PATH);
+    _selectToolsForQuery = typeof mod.selectToolsForQuery === 'function' ? mod.selectToolsForQuery : null;
+  } catch {
+    _selectToolsForQuery = null; // selector script unavailable — degrade to full list, never throw
+  }
+  return _selectToolsForQuery;
+}
+
+async function selectMcpToolSubset(allTools: any[], request: any): Promise<any[]> {
+  const queryHint: string | undefined =
+    request?.params?._meta?.queryHint ?? process.env.MCP_TOOL_QUERY_HINT;
+  if (!queryHint) return allTools; // no hint supplied → unchanged full-list behavior
+
+  const selectFn = await loadToolSelector();
+  if (!selectFn) return allTools;
+
+  try {
+    const topK = Number(process.env.MCP_TOOL_TOP_K) || 16;
+    const { mcp_names } = await selectFn(queryHint, { topK });
+    if (!mcp_names?.length) return allTools;
+    const names = new Set(mcp_names);
+    const filtered = allTools.filter((t) => names.has(t.name));
+    return filtered.length > 0 ? filtered : allTools; // never advertise zero tools
+  } catch {
+    return allTools; // selector call failed at runtime — degrade to full list, never throw
+  }
+}
+
 /**
  * Setup tool handlers for MCP server
  */
@@ -102,8 +158,8 @@ export function setupToolHandlers() {
   bootstrapACPRegistry();
   registerDispatcherToolsAsACP();
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: [
+  server.setRequestHandler(ListToolsRequestSchema, async (request) => {
+    const allTools = [
       {
         name: 'cases:load',
         description: 'Load legal cases with optional filtering',
@@ -2000,8 +2056,9 @@ export function setupToolHandlers() {
         inputSchema: tool.inputSchema as any,
       })),
 
-    ],
-  }));
+    ];
+    return { tools: await selectMcpToolSubset(allTools, request) };
+  });
 
   // ── SNES RPC Cache Bus — MCP read-only tool cache ────────────────────────
   //

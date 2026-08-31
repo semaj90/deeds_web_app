@@ -13,13 +13,13 @@ const graphTraverseRequestSchema = z.object({
   maxNodes: z.number().int().min(1).optional(),
   direction: z.enum(['outbound', 'inbound', 'both']).optional(),
   edgeTypes: z.array(z.string()).optional()
-});
+}).strict();
 
 export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   const { request } = event;
   try {
-    const rawBody = await request.json().catch(() => ({}));
+    const rawBody = await request.json().catch(() => null);
     const parsed = graphTraverseRequestSchema.safeParse(rawBody);
     if (!parsed.success) {
       return json({ ok: false, error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });

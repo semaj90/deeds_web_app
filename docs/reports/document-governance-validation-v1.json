@@ -1,7 +1,7 @@
 {
   "schema": "atlas.document.governance.validation.v1",
-  "registryChecksum": "226492d187bc9a8802e920fb9394766a481c4839a3fa982b0592f6eeb56c3407",
-  "records": 3032,
+  "registryChecksum": "818cd1306cf0f6e18175f92f35da170af720cb21a3f2f10e8dcfdee0d9a6b6eb",
+  "records": 3040,
   "status": "BLOCKED",
   "closureEligible": false,
   "archiveEligible": 0,
@@ -68,5 +68,5 @@
     "archives": 0,
     "registry": 0
   },
-  "generatedAt": "2026-08-31T03:33:52.737Z"
+  "generatedAt": "2026-08-31T16:55:13.376Z"
 }

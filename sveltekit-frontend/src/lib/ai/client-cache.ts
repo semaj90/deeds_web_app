@@ -45,11 +45,17 @@ interface LokiRouterEntry {
 	ts: number;
 }
 
-let loki: Loki | null = null;
-let replyCache: Collection<LokiReplyEntry> | null = null;
-let routerCache: Collection<LokiRouterEntry> | null = null;
+type LokiCollection<T extends object> = {
+	insert(value: T): T;
+	findOne(query: Partial<T>): T | null;
+	update(value: T): T;
+};
 
-function ensureLoki(): { replies: Collection<LokiReplyEntry>; router: Collection<LokiRouterEntry> } {
+let loki: Loki | null = null;
+let replyCache: LokiCollection<LokiReplyEntry> | null = null;
+let routerCache: LokiCollection<LokiRouterEntry> | null = null;
+
+function ensureLoki(): { replies: LokiCollection<LokiReplyEntry>; router: LokiCollection<LokiRouterEntry> } {
 	if (!loki) {
 		loki = new Loki('chat-session-cache.db', {
 			adapter: new Loki.LokiMemoryAdapter()

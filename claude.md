@@ -92,13 +92,26 @@ freeze. The freeze's own stated premise — "a production/canonical 768-dimensio
 was not created" — did not match what was actually populated, even at the time it was written.
 
 **Truncation rule (the part that makes this safe, not just a reversal)**: lower-dimensional
-projections (512 via MRL-prefix + L2-renorm, 384 for the Warden/Nomic routing lane, etc.) remain
-legitimate **derived, secondary** lanes — but a truncation may only be produced **from a 768-dim
-source that has already been indexed and validated**, never computed speculatively ahead of or
-in parallel with 768 indexing, and never treated as if it could stand in for 768 if the 768 index
-is incomplete or unvalidated. This is the same MRL-prefix mechanism the Aug 19 freeze doc
+projections via MRL-prefix + L2-renorm (512, 256, 128 — same mechanism, different prefix length)
+remain legitimate **derived, secondary** lanes — but a truncation may only be produced **from a
+768-dim source that has already been indexed and validated**, never computed speculatively ahead
+of or in parallel with 768 indexing, and never treated as if it could stand in for 768 if the
+768 index is incomplete or unvalidated. This is the same MRL-prefix mechanism the Aug 19 freeze doc
 describes for `semantic_512` — the only change is which lane is primary-and-required versus
 derived-and-optional.
+
+**384 is retired, not a routing lane** (2026-08-30, see the verification entry below): the former
+`content_embedding_384` column and the Warden/Nomic 384d routing lane it fed have been dropped —
+verified zero rows had 384-only data with no corresponding 768 vector, archived per this repo's
+archive-not-delete convention, then the column was removed. Do not reintroduce a 384d lane, and
+do not cite `gpu:warden:cache:384d:*` Redis keys as live — they predate the drop.
+
+**Autoencoder latent lanes are a separate mechanism from MRL truncation** — a trained encoder
+projection, not a vector prefix — and currently only `latent_256` is real and populated
+(`codebase_chunk_index.latent_256` + Qdrant `codebase_chunks_latent256`, 1:1 with the 768 corpus).
+`latent_64` is schema-only (column exists, zero rows — the autoencoder producing it is untrained).
+`latent_128` does not exist anywhere in this repo (no column, no Qdrant collection) — treat any
+reference to it as a planned/future lane, not a built one, until it's actually verified live.
 
 **PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
 - **Canonical storage**: Qdrant — **two 768-dim collections currently coexist**,
@@ -110,19 +123,23 @@ derived-and-optional.
 - **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 52,380 rows populated as of 2026-08-23)
 - **Retrieval path**: Qdrant ANN → Postgres join by source_ref → optional Neo4j topology expansion
 
-**SECONDARY ROUTING LANE(S)**: 512d (MRL-truncated) and 384d Warden/Nomic (optional, cost-optimized re-ranking)
+**SECONDARY ROUTING LANE(S)**: 512d, 256d, 128d — all MRL-truncated prefixes of the same 768d
+embeddinggemma vector (optional, cost-optimized re-ranking). 384d is retired (see above) — do not
+add it back as a lane.
 - **Purpose**: Fast re-ranking when VRAM pressure is high (skip GPU cost), or a smaller ANN index
   where full 768d recall isn't required
 - **Storage**: 512d → Qdrant `codebase_chunks_512` (derived, `projected_from_768d` payload field
-  confirms derivation); 384d → Redis cache (`gpu:warden:cache:384d:*` keys, generated on demand)
+  confirms derivation); 256d/128d MRL lanes are not yet built as separate Qdrant collections — do
+  not assume `codebase_chunks_256`/`codebase_chunks_128` exist without checking Qdrant collections live
 - **Use case**: Final ranking of top-K after primary 768d ANN retrieval, or a bounded secondary index
-- **NOT authoritative**: Neither lane produces final recall results on its own; both guide/derive from 768d
+- **NOT authoritative**: None of these lanes produce final recall results on their own; all guide/derive from 768d
 
 **HARD RULES** (non-negotiable):
 - ✅ Always use 768-dim embeddings from embeddinggemma as the primary source for Qdrant and Postgres
-- ✅ Any 512d/384d truncation must be produced from an already-indexed, already-validated 768d source — never speculatively ahead of it
-- ✅ 384d/512d routing lanes are OPTIONAL; don't block retrieval if their cache/collection misses
-- ❌ Never make a truncated (512d/384d) lane the primary retrieval authority
+- ✅ Any 512d/256d/128d truncation must be produced from an already-indexed, already-validated 768d source — never speculatively ahead of it
+- ✅ 512d/256d/128d routing lanes are OPTIONAL; don't block retrieval if their cache/collection misses
+- ❌ Never make a truncated (512d/256d/128d) lane the primary retrieval authority
+- ❌ Never reintroduce a 384d lane — it was retired 2026-08-30, verified zero-loss
 - ❌ Never use different embedding models for the same dimension (embeddinggemma only for 768d)
 - ❌ Never silently re-decide this policy in a future session without first reading the reconciliation trace above — that exact failure mode is what produced 5 rounds of churn in under a month
 
@@ -172,14 +189,18 @@ referenced elsewhere in this doc, since claims about them hadn't been verified a
   (dense-only `content` vector, revision-filterable), an in-progress migration target referenced by
   43 live files. Do not merge or delete either without the person driving the EMB3A migration.
 
-**Retrieval Decision Tree**:
+**Retrieval Decision Tree** (canonical — this merges what were two conflicting "canonical order"
+diagrams in this file; the "Query Flow (Canonical Order)" diagram further down now points here
+instead of restating its own order):
 ```
 Query arrives
   → Embed with embeddinggemma:latest (768-dim)
   → Qdrant ANN on codebase_chunks_768 (top-20)
   → Postgres join to get source_ref, summary, etc.
-  → Optional: Check Redis for 384d routing cache
-  → If cache hit: use 384d score for final re-ranking
+  → optional Neo4j topology expansion
+  → rerank (GPU cosine similarity)
+  → Optional: check Redis for the 512d MRL routing cache (NOT 384d — that lane is retired)
+  → If cache hit: use 512d score for final re-ranking
   → If cache miss: use 768d score directly
   → Return top-10 candidates to ACE context assembler
 ```
@@ -977,6 +998,11 @@ docker system prune --volumes
 
 ### Store Roles (Immutable)
 
+Same Postgres-is-truth / Qdrant-Redis-Neo4j-are-mirrors invariant as the "Storage Mirrors (All
+Synchronized)" table under Parent Atlas P0–P7 Roadmap further down — that table also covers
+DuckDB and CouchDB, so treat it as the fuller reference; this one is kept here only because the
+hard rules immediately below it are specific to this section.
+
 | Store | Role | Truth? | Rebuildable? |
 |-------|------|--------|-------------|
 | **Postgres pgvector** | Canonical truth | ✅ YES | No (restore from backup) |
@@ -1028,11 +1054,10 @@ FULL_MODEL_DIM              = 768 (native)
 INDEX_DIM_REQUIRED          = 768 (hard stop if different)
 ```
 
-**Hard stops:**
-- ❌ Do NOT write 384 vectors into the 768 canonical collection
-- ❌ Do NOT treat 384 as the canonical embedding dimension
-- ❌ Do NOT use AE 64-dim vectors for ANN search
-- ❌ Do NOT call 384 "EmbeddingGemma universal standard" (it is only a legacy routing lane)
+**Full policy (hard stops, MRL-truncation rule, the two coexisting Qdrant 768 collections, and the
+`embedding_dimension` metadata-column caveat) lives once, at "🧠 Embedding Dimensions Policy
+(CANONICAL — resolved 2026-08-23)" near the top of this file — read that instead of duplicating it
+here.**
 
 **Verify before any migration:**
 ```bash
@@ -1043,16 +1068,12 @@ Must report Ollama, Postgres, Qdrant, Redis dimensions and agree on 768.
 
 ### Query Flow (Canonical Order)
 
-```
-user query
-  → embed query (embeddinggemma, 768-dim)
-  → Redis exact/cache check
-  → Qdrant ANN top-K
-  → Postgres join by source_ref/source_id/chunk_id
-  → optional Neo4j topology expansion
-  → rerank (GPU cosine similarity)
-  → Gemma4 answer/summary
-```
+Same pipeline as the "Retrieval Decision Tree" earlier in this file — see that diagram for the
+canonical step order (Qdrant ANN → Postgres join → optional Neo4j expansion → GPU rerank →
+optional 512d MRL routing cache). One addition specific to this flow: an exact-match Redis lookup
+(L1 cache, keyed on the literal query) can short-circuit everything before the embed step even
+runs — that's a different mechanism from the 512d MRL re-ranking cache in the other diagram, so
+it's noted here rather than folded into that diagram. Final step after retrieval: Gemma4 answer/summary.
 
 **Critical**: Do NOT generate answers from Qdrant payloads alone. Always join back to Postgres truth before synthesis.
 
@@ -1449,7 +1470,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Real-Time**: Server-Sent Events (SSE)
 - **State Machines**: XState v5 (client orchestration) + RabbitMQ (server async)
 - **Message Queue**: RabbitMQ (7 queues, 5 exchanges)
-- **MCP**: FastMCP agentic tool calling (9 tools)
+- **MCP**: FastMCP agentic tool calling (88 tools live in `src/mcp/server.ts` as of 2026-08-31, verified via `grep -c "name: '"` — the "9 tools" figure once here was fictional, not just stale; see the "FastMCP Agentic Tools" section under Technology Stack for the finding, and the "MCP/Atlas status note" at the top of this file for TRACE's separate, larger tool count)
 
 ---
 
@@ -1497,20 +1518,43 @@ Write back to L0-L3
 - **2-stage codebase retrieval**: Fuse.js fuzzy recall → Qdrant dual-vector rerank (0.6 content + 0.4 signature)
 
 ### Qdrant Collections (768-dim)
+
+**This is a curated subset, not the full list** — live `GET /collections` (checked 2026-08-31)
+returns **43 collections total**, not 6. The 6 below are confirmed live and populated; notable
+collections missing from this short list include `evidence_vectors`, `court_opinions`,
+`poi_profiles`, `document_tags`, `knowledge_base`, `legal_canon_chunks`, plus the embedding/latent
+lanes documented elsewhere in this file (`codebase_chunks_512` — 53,379 points,
+`codebase_chunks_768_v2` — 52,380 points, `codebase_chunks_latent256` — 55,169 points). Run
+`curl http://127.0.0.1:6333/collections` for the current full list before assuming this table is
+exhaustive. (`codebase_chunks_384` / `codebase_chunks_384_hybrid` also still exist as collections
+but are near-empty — 1 and 10 points respectively — consistent with 384 being retired per the
+Embedding Dimensions Policy above; they were never deleted, just abandoned.)
+
 | Collection | Purpose | Status |
 |------------|---------|--------|
 | `evidence_items` | Evidence chunks + metadata | Active |
 | `legal_documents` | Legal document embeddings | Active |
 | `legal_cases` | Case description embeddings | Active |
-| `codebase_chunks_768` | Dual-vector code search | Active |
+| `codebase_chunks_768` | Dual-vector code search | Active (109,776 points) |
 | `chat_messages` | Chat context search | Active |
 | `embedding_cache` | Embedding lookup cache | Active |
 
 ### RabbitMQ Queues
 `cache.invalidate`, `document.embed`, `evidence.process`, `vector.index`, `chat.context`, `analytics.track`, `codebase.index`
 
-### FastMCP Agentic Tools (9)
-`unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`, `neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`, `system_health_check`
+### FastMCP Agentic Tools
+
+**This "(9)" list is fictional — verified against the live server, not just stale.** None of the 9
+names below (`unified_ast_query`, `cross_language_similarity`, `cuda_fix_priority`, `glyph_metadata`,
+`neo4j_dependency_graph`, `agentic_recommendation`, `batch_error_analysis`, `redis_cache_stats`,
+`system_health_check`) exist anywhere in `sveltekit-frontend/src/mcp/server.ts` or the rest of
+`src/` (checked 2026-08-31). The real server registers **88 tools** (`grep -c "name: '"
+sveltekit-frontend/src/mcp/server.ts`), namespaced like `cases:load`, `codebase:search`,
+`atlas.packet_search`, `evidence:analyze`, `kb.search_cards`, `graph.index`, `wiki.search`, etc. —
+a completely different naming scheme, not a renamed subset of the 9. Do not treat the 9 names as
+real tool names to call; read `src/mcp/server.ts`'s `ListToolsRequestSchema` handler directly for
+the current list, and see the "MCP/Atlas status note" at the top of this file for how tool counts
+are tracked going forward.
 
 ### Evidence Pipeline (8 stages)
 1. Object storage upload + SHA-256 hash + PostgreSQL record
@@ -1671,13 +1715,10 @@ curl http://localhost:5173/api/cache/exact-match/stats
 bash scripts/audit/backend-infrastructure-audit.sh
 ```
 
-This runs **15 infrastructure gates** checking:
-- Redis connection + memory
-- Bifrost semantic cache
-- Qdrant vector store
-- Ollama + GPU availability
-- RabbitMQ message flow
-- Langfuse observability
+Full breakdown of what this script checks (17 gates across 5 tiers, not 15 — see the "Backend
+Infrastructure Audit (17 Gates)" section further down in this file for the authoritative tier
+table) covers: Redis connection + memory, Bifrost semantic cache, Qdrant vector store, Ollama +
+GPU availability, RabbitMQ message flow, Langfuse observability, and codebase-index health.
 
 **See**: `BACKEND_INFRASTRUCTURE_AUDIT.md` for full gate definitions.
 
@@ -1713,7 +1754,7 @@ docker exec deeds-redis-prod redis-cli config set maxmemory-policy allkeys-lru
 | `/api/cache/exact-match/stats` | Monitoring endpoint | 48 |
 | `authority-chain.ts` | Langfuse embedding/search traces | +8 |
 | `rabbitmq-manager-fixed.ts` | Queue operation traces | +35 |
-| `BACKEND_INFRASTRUCTURE_AUDIT.md` | 15-gate service health checks | 500+ |
+| `BACKEND_INFRASTRUCTURE_AUDIT.md` | 17-gate service health checks | 500+ |
 
 ---
 
@@ -3436,54 +3477,10 @@ npm run turbo:start:detached
 
 ### Gemma4 TurboQuant caveat
 
-For Gemma 4, do not treat generic TurboQuant support as sufficient.
-
-Gemma 4 uses larger attention head dimensions than many llama.cpp TurboQuant examples:
-
-- SWA layers: `head_dim = 256`
-- global layers: `head_dim = 512`
-
-Some TurboQuant binaries advertise `turbo3`, `turbo4`, `tbq3_0`, or `tbq4_0` in `--help` but only implement fast attention kernels for `D=128`. Those builds launch successfully and our launcher's `-h` probe will pass them through, but they fail, crash, or produce invalid output on Gemma 4 attention. The launcher cannot detect this — operator owns binary↔model matching.
-
-**Stable default**:
-
-```bash
-TURBO_PROFILE=stock
-# equivalent KV: -ctk q8_0 -ctv q8_0
-```
-
-**Desired experimental Gemma 4 profile** — only with D=256/D=512-capable kernels:
-
-```bash
-TURBO_PROFILE=turboquant
-# equivalent KV: -ctk q8_0 -ctv turbo3
-```
-
-**Parity-safe fallback**:
-
-```bash
-TURBO_PROFILE=turboquant-safe
-# equivalent KV: -ctk q8_0 -ctv q8_0
-```
-
-Do **not** use `-ctk turbo3 -ctv turbo4` as a default. Keep K-cache at `q8_0`; compress V-cache first.
-
-**Fork pairing**:
-
-| Fork | Head dims | Gemma 4? | Path |
-|------|-----------|----------|------|
-| stock `ggml-org/llama.cpp` | all | n/a (no turbo*) | baseline |
-| [TheTom/llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant/releases) tqp-v0.1.1 prebuilt | D=128 | **No** — treat as not recommended for Gemma 4 unless D=256/512 support is confirmed in a future tag | suits Llama-3 8B / Qwen2.5 7B |
-| [test1111…/llama-cpp-turboquant-gemma4](https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4) | D=128/256/512 | **Yes** | only working experimental Gemma 4 path |
-
-**Source build for RTX 3060 Ti / Ampere sm_86**:
-
-```bash
-git clone https://github.com/test1111111111111112/llama-cpp-turboquant-gemma4
-cd llama-cpp-turboquant-gemma4
-cmake -B build -S . -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=86
-cmake --build build --config Release   # ~30 min
-```
+See the "KV Cache Policy" and "`TURBO_PROFILE` shortcut" subsections above (Post-Audit Alignment,
+May 3 2026) for the full head_dim=256/512 fork-compatibility rule, the TheTom-vs-test1111 fork
+table, the source-build command, and the `TURBO_PROFILE` values — this section previously
+duplicated all of that content verbatim; do not re-add it here.
 
 **TurboQuant is a manual runtime milestone.** Do not block ACE / KAG / hypergraph retrieval work on it. Retrieval lanes (Lane A cluster_context shipped, Lane B shared_resource shipped, Lane C SHARES_TAGS pending) improve agent quality even when the server stays on `q8_0/q8_0`. Lane B retrieval > TurboQuant runtime as a priority call.
 
@@ -3531,7 +3528,7 @@ semantic_vector × 0.60 + tag_score × 0.12 + ast_graph × 0.10 + som_boost × 0
 ### A2A / MCP / ACP Wiring (verified)
 - **A2A AgentCard**: `GET /.well-known/agent.json` — LIVE (`src/routes/.well-known/agent.json/+server.ts`)
 - **Agent API**: `POST /api/ai/agent` — native + A2A Task + SSE streaming — LIVE
-- **MCP**: `src/mcp/server.ts` — 29 tools, FastMCP, auth guard — LIVE
+- **MCP**: `src/mcp/server.ts` — 88 tools (verified 2026-08-31, not the "29 tools" previously stated here), FastMCP, auth guard — LIVE
 - **ACP**: `GET /api/acp/tools`, `POST /api/acp/execute` — LIVE
 
 ### `using` / `await using` — Available Now (TS 5.2+)
@@ -3906,11 +3903,16 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 The older embedded `gemma` chat template path was the source of the earlier system-role drop. The live server on `:8090` now reports `supports_system_role: true` and `supports_tool_calls: true`, which means the current launch path is using the corrected chat-template wiring.
 
-**Current rule**: keep the `--chat-template-file configs/templates/gemma4-opencode.jinja` override in the launcher so the runtime stays on the validated template path.
+**Current rule**: keep the `--chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja`
+override in the launcher so the runtime stays on the validated template path — this is the same file
+named in the "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" at the top of this document and is
+`scripts/launch-turboquant.ps1`'s own hard-coded default (`$defaultTemplate`). A prior revision of
+this section named `gemma4-opencode.jinja` instead; that was stale — the launcher's own gate
+explicitly flags `gemma4-opencode.jinja` as the wrong template (`supports_tools:false`).
 
 ```
 llama-server.exe -m model.gguf
-  --chat-template-file configs/templates/gemma4-opencode.jinja
+  --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja
   --jinja --reasoning-format none
   -c 65536 -ngl 99 -fa on -ctk q8_0 -ctv q8_0
   --cache-prompt --cache-reuse 256

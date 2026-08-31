@@ -73,3 +73,26 @@ decision. This change freezes the corrected validation order before any further 
 Step 1 (settings edited, not yet reloaded) is the only step attempted so far. Steps 2-11 not
 started. The Tier-0 reorder in `embedding-client.ts` remains in place as code but is **not**
 validated — treat it as an unvalidated change, not a completed promotion.
+
+## Future browser cache integration: IndexedDB + WebGPU Transformers.js
+
+- [ ] **12. Define `ClientInferenceCacheEntryV1`** for browser-only chat and
+      bounded preview inference results. Include model, representation,
+      tokenizer, input checksum, schema version, expiry, and
+      `canonicalAuthority: false`.
+- [ ] **13. Add a typed IndexedDB adapter** for client chat transcripts, model
+      load metadata, tokenizer metadata, and bounded inference hints. Use the
+      existing `idb` dependency or Dexie; do not move canonical chats, source
+      identity, embeddings, receipts, or hidden reasoning into browser storage.
+- [ ] **14. Keep in-memory acceleration optional**. LokiJS/`Map` may serve as an
+      L0 session cache; IndexedDB is the persistent browser cache. Cache misses,
+      expiry, quota errors, and schema upgrades must fall back safely.
+- [ ] **15. Cache model artifacts only through the Transformers.js/runtime
+      cache contract**. Store local metadata and checksums; browser cache state
+      is not model-promotion evidence.
+- [ ] **16. Add client replay tests** for cache hit/miss, revision mismatch,
+      expiry, reload persistence, deterministic input checksums, WebGPU
+      unavailable fallback labeling, and explicit `fallbackUsed` reporting.
+- [ ] **17. Promotion boundary**: browser WebGPU remains a challenger/preview
+      lane. It cannot write canonical vectors, alter CandidateOrdinal, promote
+      ontology tuples, or replace server retrieval/chat truth.

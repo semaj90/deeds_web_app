@@ -2,7 +2,7 @@
 
 > Generated from OpenSpec task ledgers. This is a navigation/progress projection, not task authority.
 
-Overall progress: [#####-----] 2280/4194 tasks
+Overall progress: [#####-----] 2282/4203 tasks
 ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## P10 dependency work packages
@@ -132,7 +132,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [docker-compose-duplication-remediation](openspec/changes/docker-compose-duplication-remediation/) [##########] 9/9 complete; 0 open
 - [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation/) [#######---] 2/3 complete; 1 open
 - [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22/) [#########-] 46/49 complete; 3 open
-- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation/) [#####-----] 25/55 complete; 30 open
+- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation/) [####------] 25/56 complete; 31 open
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/) [##--------] 2/9 complete; 7 open
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/) [##########] 65/67 complete; 2 open
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric/) [#####-----] 5/10 complete; 5 open
@@ -163,8 +163,8 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/) [#####-----] 24/53 complete; 29 open
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric/) [######----] 16/26 complete; 10 open
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers/) [######----] 20/36 complete; 16 open
-- [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/) [----------] 0/11 complete; 11 open
-- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel/) [########--] 27/32 complete; 5 open
+- [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/) [----------] 0/17 complete; 17 open
+- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel/) [#########-] 29/34 complete; 5 open
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof/) [#---------] 2/19 complete; 17 open
 - [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric/) [#---------] 6/43 complete; 37 open
 - [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration/) [######----] 22/40 complete; 18 open

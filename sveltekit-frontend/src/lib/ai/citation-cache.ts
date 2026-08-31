@@ -48,12 +48,18 @@ interface LokiCitationEntry {
 	ts: number;
 }
 
+type LokiCollection<T extends object> = {
+	insert(value: T): T;
+	findOne(query: Partial<T>): T | null;
+	update(value: T): T;
+};
+
 // ── LokiJS: Session Cache ────────────────────────────────────────────────
 
 let loki: Loki | null = null;
-let citationStore: Collection<LokiCitationEntry> | null = null;
+let citationStore: LokiCollection<LokiCitationEntry> | null = null;
 
-function ensureLoki(): Collection<LokiCitationEntry> | null {
+function ensureLoki(): LokiCollection<LokiCitationEntry> | null {
 	if (!browser) return null;
 
 	if (!loki) {
