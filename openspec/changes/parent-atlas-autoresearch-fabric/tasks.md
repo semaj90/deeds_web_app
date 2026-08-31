@@ -21,13 +21,13 @@ Status convention:
 - [x] **AUTORESEARCH-07** — Add `ExperimentPromotionDecisionV1` with `PROMOTE | REJECT | BLOCKED` semantics.
 - [x] **AUTORESEARCH-08** — Promotion independently recomputes relative improvement from raw baseline/candidate measurements and optimization direction; receipt-supplied improvement is never trusted alone.
 - [x] **AUTORESEARCH-09** — Correct-but-slower candidates reject cleanly; identity/provider/mutation/metric-consistency defects block.
-- [x] **AUTORESEARCH-10** — Add focused Vitest coverage for single-change admission, deterministic checksums, successful promotion, slower-candidate rejection and fabricated-improvement blocking.
+- [x] **AUTORESEARCH-10** — Add focused Vitest coverage for single-change admission, deterministic checksums, successful promotion, slower-candidate rejection, fabricated-improvement blocking, escaped-write blocking and GPU lease admission.
 - [ ] **AUTORESEARCH-11** — Run package TypeScript compile and focused `autoresearch-fabric-v1.spec.ts` on the workstation; record exact test/compile receipt.
 
 ## Existing-contract integration
 
-- [ ] **AUTORESEARCH-12** — Add adapter from `GpuResourceEnvelopeV1` + `GpuAdmissionReceiptV1` to `GpuExperimentLeaseV1`; prove one rejected insufficient-VRAM experiment and one admitted experiment.
-- [ ] **AUTORESEARCH-13** — Add adapter from baseline/candidate `AlgorithmExecutionManifestV1` values to their checksums in `ExperimentRunReceiptV1`; no duplicate execution-manifest schema.
+- [x] **AUTORESEARCH-12** — Add adapter from `GpuResourceEnvelopeV1` + `GpuAdmissionRequestV1` + `GpuAdmissionReceiptV1` to `GpuExperimentLeaseV1`; test both admitted and insufficient-VRAM paths.
+- [ ] **AUTORESEARCH-13** — `executionManifestPairChecksumsV1()` is implemented; add a focused test proving baseline/candidate `AlgorithmExecutionManifestV1` values are parsed and checksum-bound without duplicating the execution-manifest schema.
 - [ ] **AUTORESEARCH-14** — Add `AcePacketV2` evidence binding for experiment kickoff; ACE must contain only bounded evidence/skills, never raw matrices or GPU buffers.
 - [ ] **AUTORESEARCH-15** — Bind OaK `kernelRevision` and allowed function/operator set to experiment planning; undeclared OaK functions/providers fail closed before worker execution.
 - [ ] **AUTORESEARCH-16** — Lower admitted experiment plan to the existing bounded DAG executor / Mastra adapter; autoresearch does not become a scheduler owner.
