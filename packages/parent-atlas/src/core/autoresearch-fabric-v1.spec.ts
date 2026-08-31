@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildGpuExperimentLeaseV1,
   checksumExperimentHypothesisV1,
   checksumExperimentWorktreeV1,
   checksumHardwareProfileV1,
@@ -10,6 +11,11 @@ import {
   hardwareProfileV1Schema,
   experimentWorktreeV1Schema,
 } from './autoresearch-fabric-v1.js';
+import {
+  evaluateGpuAdmission,
+  gpuAdmissionRequestSchema,
+  gpuResourceEnvelopeSchema,
+} from './gpu-resource-envelope.js';
 
 const checksum = (ch: string) => ch.repeat(64);
 
@@ -126,6 +132,18 @@ function receipt(overrides: Record<string, unknown> = {}) {
   });
 }
 
+function gpuEnvelope(freeBytes = 6 * 1024 ** 3) {
+  return gpuResourceEnvelopeSchema.parse({
+    device_id: 'cuda:0',
+    snapshot_revision: 'gpu-snapshot:v1',
+    total_bytes: 8 * 1024 ** 3,
+    free_bytes: freeBytes,
+    safety_reserve_bytes: 1024 ** 3,
+    resident_workloads: [],
+    producer_revision: 'gpu-profiler:v1',
+  });
+}
+
 describe('Parent Atlas autoresearch fabric v1', () => {
   it('rejects a no-op or ambiguous single-change hypothesis', () => {
     expect(() => experimentHypothesisV1Schema.parse({
@@ -144,6 +162,51 @@ describe('Parent Atlas autoresearch fabric v1', () => {
     const hw = hardware();
     expect(checksumExperimentHypothesisV1(h)).toBe(checksumExperimentHypothesisV1({ ...h }));
     expect(checksumHardwareProfileV1(hw)).toBe(checksumHardwareProfileV1({ ...hw }));
+  });
+
+  it('binds an already-admitted GPU operation to an experiment lease', () => {
+    const request = gpuAdmissionRequestSchema.parse({
+      operation_id: 'op:exp:rmsnorm:cutile:001',
+      operation_kind: 'other',
+      required_workspace_bytes: 256 * 1024 ** 2,
+      required_persistent_bytes: 64 * 1024 ** 2,
+      may_evict: false,
+    });
+    const envelope = gpuEnvelope();
+    const admission = evaluateGpuAdmission({ envelope, request });
+    const lease = buildGpuExperimentLeaseV1({
+      leaseId: 'lease:1',
+      experimentId: hypothesis().experimentId,
+      envelope,
+      request,
+      receipt: admission,
+      expiresAt: '2026-09-01T00:00:00.000Z',
+    });
+    expect(lease.deviceId).toBe('cuda:0');
+    expect(lease.operationId).toBe(request.operation_id);
+    expect(lease.maxWorkspaceBytes).toBe(request.required_workspace_bytes);
+    expect(lease.canonicalAuthority).toBe(false);
+  });
+
+  it('cannot mint an experiment lease from an insufficient-VRAM admission receipt', () => {
+    const request = gpuAdmissionRequestSchema.parse({
+      operation_id: 'op:too-large',
+      operation_kind: 'other',
+      required_workspace_bytes: 7 * 1024 ** 3,
+      required_persistent_bytes: 0,
+      may_evict: false,
+    });
+    const envelope = gpuEnvelope(2 * 1024 ** 3);
+    const admission = evaluateGpuAdmission({ envelope, request });
+    expect(admission.admitted).toBe(false);
+    expect(() => buildGpuExperimentLeaseV1({
+      leaseId: 'lease:blocked',
+      experimentId: hypothesis().experimentId,
+      envelope,
+      request,
+      receipt: admission,
+      expiresAt: '2026-09-01T00:00:00.000Z',
+    })).toThrow('AUTORESEARCH_GPU_LEASE_REQUIRES_ADMITTED_RECEIPT');
   });
 
   it('promotes a correct admitted experiment that clears the measured improvement floor', () => {
@@ -197,5 +260,15 @@ describe('Parent Atlas autoresearch fabric v1', () => {
     });
     expect(decision.decision).toBe('BLOCKED');
     expect(decision.reasons).toContain('RELATIVE_IMPROVEMENT_MISMATCH');
+  });
+
+  it('preserves an escaped write as evidence and blocks promotion', () => {
+    const decision = decideExperimentPromotionV1({
+      hypothesis: hypothesis(),
+      receipt: receipt({ writesOutsideWorktree: true }),
+      promotedKernelRevision: 'kernel:unused',
+    });
+    expect(decision.decision).toBe('BLOCKED');
+    expect(decision.reasons).toContain('WRITE_ESCAPED_WORKTREE');
   });
 });
