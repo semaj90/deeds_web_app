@@ -1,0 +1,60 @@
+{
+  "gate": "OAK-PROJECTION-01",
+  "description": "Python NetworkX adapter migrated onto the ONE query-graph coordinate space (ProjectionOrdinalMapV1), mirroring packages/parent-atlas/src/core/projection-ordinal-map-v1.ts field-for-field and validation-rule-for-rule",
+  "fixturePath": "docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json",
+  "checks": [
+    {
+      "name": "projection_map_schema_correct",
+      "ok": true,
+      "detail": "atlas.projection-ordinal-map.v1"
+    },
+    {
+      "name": "canonical_authority_false",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "only_entity_and_tuple_classes_present_for_this_fixture",
+      "ok": true,
+      "detail": "{'TUPLE', 'ENTITY'}"
+    },
+    {
+      "name": "exactly_1_tuple_row_with_tupleId_set",
+      "ok": true,
+      "detail": "[ProjectionOrdinalRowV1(projectionOrdinal=4, projectionNodeKey='tuple:relation:7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3', nodeClass='TUPLE', graphOrdinal=None, graphNodeKey=None, tupleId='7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3', hyperedgeId=None)]"
+    },
+    {
+      "name": "4_entity_rows_for_4_participants",
+      "ok": true,
+      "detail": "got 4"
+    },
+    {
+      "name": "rows_sorted_and_ordinals_dense",
+      "ok": true,
+      "detail": "[(0, 'entity:symbol:S1'), (1, 'entity:symbol:S2'), (2, 'entity:symbol:T7'), (3, 'entity:tool_call:typecheck-run-42'), (4, 'tuple:relation:7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3')]"
+    },
+    {
+      "name": "deterministic_checksum_across_two_independent_conversions",
+      "ok": true,
+      "detail": "4c75c1ea195c3235652836b22462bd070700cc46ff2aa7064c983dcbf3d7cc40 vs 4c75c1ea195c3235652836b22462bd070700cc46ff2aa7064c983dcbf3d7cc40"
+    },
+    {
+      "name": "zero_skipped_nodes_for_this_fixture",
+      "ok": true,
+      "detail": "()"
+    },
+    {
+      "name": "refuses_non_entity_claiming_durable_graph_identity",
+      "ok": true,
+      "detail": "raised as expected"
+    },
+    {
+      "name": "refuses_tuple_row_missing_tupleId",
+      "ok": true,
+      "detail": "raised as expected"
+    }
+  ],
+  "pass": true,
+  "durationMs": 4355.25,
+  "writesPerformed": false
+}

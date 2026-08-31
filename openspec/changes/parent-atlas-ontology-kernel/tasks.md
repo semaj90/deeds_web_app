@@ -1227,3 +1227,82 @@ module's own test suite, not something this reconciliation touched).
   `AtlasPassEnvelopeV2` for real (TS side, most likely, given every
   other cross-cutting envelope contract in this repo lives there) knows
   this Python adapter is a ready, waiting consumer.
+
+## Architectural correction (2026-08-31): OaK is the agent-control pattern, OWL/HermiT is one construction-time validator inside it
+
+The operator corrected the framing this whole change had drifted toward:
+OWL/HermiT is not the center of the OaK work — it's one validator used
+*while building* the kernel schema `S`. OaK itself is `K=(S,F)`: schema +
+typed executable reasoning functions, frozen at inference time so a
+ReAct agent can only operate through them. Recorded the full mapping
+table (OaK concept → Parent Atlas contract) and the operator's updated
+9-item implementation queue in the conversation transcript — not
+duplicated verbatim here to avoid this file drifting out of sync with
+the source; read the transcript's "Updated implementation queue" if
+picking this up fresh. Two concrete corrections already actioned below
+(`OAK-PROJECTION-01`); the rest
+(`SYMBOL-SEMANTIC-BRIDGE-01`/`OAK-KERNEL-01`/`OAK-GPU-01`/
+`OAK-BFS-PARITY-01`/`OAK-REPAIR-01`/`DSPY-PROGRAM-01`/`GEPA-SHADOW-01`)
+are not started — several are blocked the same way as OAK-03B/C and
+ONTO-PY-02 (real external dependency decisions: `cudf`/`cugraph`/`dspy`
+all confirmed **not installed** in this environment via direct `import`
+checks, not assumed, same category as the JVM/rdflib holds already on
+record).
+
+## OAK-PROJECTION-01 — `ProjectionNodeKeyV1` + `ProjectionOrdinalMapV1` — **DONE 2026-08-31**
+
+The operator's exact correction to this session's own earlier
+`GraphNodeKeyV1`-gap finding (in the "Real duplication found" section
+above): OaK query-graph nodes (relation/tuple/tool/evidence) do **not**
+extend the durable `GraphNodeKeyV1`/`GraphOrdinal` coordinate space —
+they get their own, separate, non-canonical coordinate space instead.
+
+- [x] **TS contract**: `packages/parent-atlas/src/core/projection-
+  ordinal-map-v1.ts` — `ProjectionNodeKeyV1` (regex-prefixed,
+  `entity|tuple|hyperedge|tool|evidence:`), `ProjectionOrdinalMapV1`
+  (rows sorted + dense-ordinal-assigned, same determinism convention as
+  the durable `GraphOrdinalMapV1`), `buildProjectionOrdinalMapV1()`.
+  Guardrails, all tested: only `ENTITY` rows may cross-reference a real
+  `GraphNodeKeyV1`/`graphOrdinal` (non-`ENTITY` rows claiming durable
+  identity are refused); `TUPLE`/`HYPEREDGE` rows require their id field;
+  `projectionNodeKey` prefix must match `nodeClass`; duplicate keys and
+  missing revisions refused. **6/6 tests pass.** Whole-suite re-verified
+  after adding this: **31/31 spec files, 133/133 tests** (up from 30/126).
+- [x] **Python side migrated**: `python/parent_atlas_ontology/
+  projection_ordinal_map.py` — field-for-field mirror of the TS builder
+  (same validation rules, same sort/dense-ordinal convention), plus
+  `projection_ordinal_map_from_networkx_snapshot()` which converts the
+  shared substrate's NetworkX snapshot output into this coordinate
+  space, replacing `graph_projection.py`'s old ad-hoc `relation:{id}`/
+  `ordinal:{N}` labels for anything going through the adapter's
+  delegated path. `NARY_RELATION` node_kind → `TUPLE`; `ENTITY` →
+  `ENTITY`; `LITERAL_ASSERTION` is honestly **not mapped** (no fit among
+  the 5 classes) — skipped and reported, not force-fit, matching this
+  package's existing skip-and-report discipline. The real fixture never
+  produces `LITERAL_ASSERTION` nodes, so this is a documented future gap,
+  not something exercised or hidden.
+
+  **Rough edge found and left on record, not silently smoothed**: the
+  resulting `TUPLE` row's `projectionNodeKey` comes out as
+  `tuple:relation:<tupleId>` — double-labeled, because the underlying
+  NetworkX node id from the shared substrate is already `relation:{id}`.
+  Still a valid, correctly-prefixed key per the regex, just redundant;
+  worth a small cleanup later (strip the `relation:` sub-prefix before
+  applying `tuple:`) but not a correctness bug blocking this gate.
+
+  `onto_py_05_projection_ordinal_map_check.py` — **10/10 checks pass**
+  against the real ONTO-PY-01 fixture through the full delegated chain
+  (fixture → adapter → shared substrate → this new coordinate space):
+  correct schema, `canonicalAuthority: false`, exactly 1 `TUPLE` row + 4
+  `ENTITY` rows (matching the fixture's 1 tuple / 4 participants), rows
+  sorted with dense ordinals, deterministic checksum across two
+  independent conversions, zero unexpectedly-skipped nodes, and both
+  guardrail-rejection cases (non-`ENTITY` claiming durable identity;
+  `TUPLE` missing `tupleId`) mirrored from the TS spec and confirmed to
+  raise the same way in Python. Report at
+  `docs/reports/ontology-linked-tuple-projection-ordinal-map-v1.json`.
+
+  **Run it**: `python python/parent_atlas_ontology/oak_projection_01_check.py`
+  (renamed from an earlier `onto_py_05_...` filename that collided with
+  the existing ONTO-PY-05/`AtlasPassEnvelopeV2` item above — caught and
+  fixed before committing, not left as drift.)
