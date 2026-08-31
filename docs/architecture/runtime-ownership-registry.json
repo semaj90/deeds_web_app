@@ -14,7 +14,14 @@
         { "name": "neo4j-gds-pagerank", "path": "sveltekit-frontend/src/lib/server/graph/pagerank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
         { "name": "neo4j-gds-louvain-leiden", "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts::runCommunityAnalysis", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
         { "name": "neo4j-gds-cheirank", "path": "sveltekit-frontend/src/lib/server/graph/cheirank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
-        { "name": "neo4j-gds-kcore", "path": "sveltekit-frontend/src/lib/server/graph/kcore-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" }
+        { "name": "neo4j-gds-kcore", "path": "sveltekit-frontend/src/lib/server/graph/kcore-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
+        {
+          "name": "cugraph-rapids-pagerank",
+          "path": "sveltekit-frontend/src/lib/server/graph/cugraph-pagerank-adapter.ts",
+          "classification": "BACKEND",
+          "status": "UNIT_PROVEN_NOT_LIVE",
+          "evidence": "Wired 2026-08-31, selected via GraphAnalysisRequest.engine === 'cugraph-rapids' in graph-analysis-runner.ts. Writes the SAME canonical graph_analysis_runs/graph_node_metrics tables as the neo4j-gds backends (not a separate persistence lane). Corrects an earlier misclassification: python/atlas_rapids_graph_runtime.py was flagged 'EXPERIMENT (tested, never deployed)' in openspec/changes/parent-atlas-graph-runtime-python-consolidation's fork audit — that was wrong, the audit's caller-grep missed the services/ directory. It IS deployed: services/atlas-gpu-8098/app.py calls install_graph_routes(app) and is the real Docker CMD (docker/docker-compose.gpu.yml, profile 'atlas-gpu', real GPU reservation). A TS client (atlas-rapids-pagerank-client.ts) already existed with a passing spec but zero callers before this wiring. Fail-closed by design: if the sidecar is unreachable or has no resident graph projection loaded (POST /v1/graph/load, needs a reviewed GRAPH_SNAPSHOT_PARITY artifact), this adapter returns a skipped result rather than throwing or auto-loading — 3/3 new unit tests pass (cugraph-pagerank-adapter.spec.ts) covering unreachable, not-resident, and the full transactional-write happy path with mocked fetch/pg. NOT live-smoke-tested against a real running atlas-gpu profile + real GPU + a real resident graph — that requires operator-side infra (docker compose --profile atlas-gpu up, plus loading a real snapshot) not available from this session. Do not upgrade this status past UNIT_PROVEN_NOT_LIVE without that live proof."
+        }
       ],
       "persistence_targets": ["graph_analysis_runs", "graph_node_metrics", "graph_community_assignments", "graph_communities"],
       "known_existing_duplication": [

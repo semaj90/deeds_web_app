@@ -73,6 +73,29 @@ export interface AtlasGraphProjectionLoadReceiptV1 {
   gpuMemoryAfter?: Record<string, unknown> | null;
 }
 
+export interface AtlasGraphResidentStatusV1 {
+  schema: 'atlas.graph-residency.v1';
+  capability: {
+    available: boolean;
+    backend: string;
+    backendVersion: string | null;
+    algorithmRevision: string;
+    maxSeeds: number;
+    maxResultNodes: number;
+    minGraphFreeGpuMb: number;
+    importError: string | null;
+  };
+  resident: {
+    graphRevision: string;
+    projectionRevision: string;
+    nodeCount: number;
+    edgeCount: number;
+    nodeTableHash: string;
+    edgeTableHash: string;
+    loadedAtUnixMs: number;
+  } | null;
+}
+
 const MAX_SEEDS = 64;
 const MAX_CANDIDATES = 512;
 
@@ -117,6 +140,15 @@ export function createAtlasRapidsPageRankClient(
   }
 
   return {
+    /** GET /v1/graph/resident — check what's currently loaded before calling pagerank(). */
+    resident: async (timeoutMs = 5_000): Promise<AtlasGraphResidentStatusV1> => {
+      const response = await fetch(`${baseUrl}/v1/graph/resident`, { signal: AbortSignal.timeout(timeoutMs) });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`ATLAS_RAPIDS_GRAPH_HTTP_${response.status}:${detail}`);
+      }
+      return await response.json() as AtlasGraphResidentStatusV1;
+    },
     loadProjection: (input: AtlasGraphProjectionLoadRequestV1) =>
       requestJson<AtlasGraphProjectionLoadReceiptV1>('/v1/graph/load', input, 60_000),
     pagerank: async (input: AtlasPageRankRequestV1) => {

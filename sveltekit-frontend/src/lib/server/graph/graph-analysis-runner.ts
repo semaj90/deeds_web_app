@@ -27,6 +27,16 @@ export interface GraphAnalysisRequest {
   dampingFactor?: number;
   limit?: number;
   sidecarUrl?: string | null;
+  /**
+   * Which backend computes the result for algorithms with more than one
+   * (currently only 'pagerank'). Defaults to 'neo4j-gds', the existing
+   * canonical, RUNTIME_SMOKE_PROVEN backend — this field is additive and
+   * changes no default behavior. 'cugraph-rapids' calls the GPU sidecar at
+   * `sidecarUrl` (see cugraph-pagerank-adapter.ts); it requires a graph
+   * projection to already be resident there (fails closed with a skipped
+   * result if not — it does not auto-load one).
+   */
+  engine?: 'neo4j-gds' | 'cugraph-rapids';
 }
 
 export interface GraphAnalysisExecutionResult {
@@ -419,6 +429,15 @@ export async function runGraphAnalysis(
   }
 
   if (request.algorithm === 'pagerank') {
+    if (request.engine === 'cugraph-rapids') {
+      const result = await (await import('./cugraph-pagerank-adapter.js')).runCuGraphPageRankAnalysis(db, {
+        maxIterations: request.maxIterations,
+        dampingFactor: request.dampingFactor,
+        limit: request.limit,
+        sidecarUrl: request.sidecarUrl,
+      });
+      return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys, skippedReason: result.skippedReason };
+    }
     const result = await (await import('./pagerank-analysis-adapter.js')).runPageRankAnalysis(db, {
       maxIterations: request.maxIterations,
       dampingFactor: request.dampingFactor,
