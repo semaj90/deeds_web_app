@@ -1190,3 +1190,29 @@ the sole canonical owner of `CANDIDATE_FEATURE_GPU_LEASE`, unchanged by this pas
 that audit's own recommendation is "do not add a new contract yet; first define which existing
 contract owns immutable numeric artifact lineage", which is a design decision, not a mechanical
 archive like this one was.
+
+**Reconciliation with a concurrent decision receipt (same day, `docs/reports/
+candidate-feature-gpu-lease-owner-v1.json`)**: a different agent independently reached the same
+canonical-owner conclusion and the same caller-census facts (zero production callers of
+`resident-lease-v1`) via its own audit, landed in a separate commit
+(`705b4bd592`, "docs(atlas): canonicalize candidate feature GPU lease owner") that merged cleanly
+with the archival above (no file overlap). That receipt planned a *staged* process before
+archival/removal -- add a deprecated marker, migrate any worth-preserving test invariants into the
+canonical spec, re-verify callers, *then* archive (its own `GPU-LEASE-CONSOLIDATE-02` gate,
+recorded `status: "OPEN"`, not executed) -- whereas this entry went straight from independent
+verification to archival.
+
+The two are not actually in conflict on substance: that receipt's own `migrationPolicy` already
+states `archiveBeforeRemoval: true` and `deleteWorkingProofScripts: false` -- exactly what
+happened here (archived with SHA-256 + `.bak` copies per this repo's archive-not-delete
+convention, nothing deleted, fully recoverable via `git show` or the archive). The receipt's
+`evidenceWorthPreserving` list (real-CUDA physical resident checksum proof, release-transition
+proof, post-release-access-rejection proof) is intact in the archived `.spec.ts` file, just no
+longer imported into it live. `GPU-LEASE-CONSOLIDATE-02`'s own precondition -- "search again for
+zero non-test/non-doc legacy callers before archive/removal" -- is satisfied by the independent
+caller census performed before this archival, recorded above. Treat
+`GPU-LEASE-CONSOLIDATE-02` as closed by this entry rather than separately re-running it; if a
+future session wants the specific test invariants migrated into `candidate-feature-gpu-residency-
+v1.spec.ts` for extra belt-and-suspenders coverage, that remains a legitimate, low-priority
+follow-up, not a blocker -- the underlying safety properties are still proven, just not
+double-proven in the canonical spec file.
