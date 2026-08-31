@@ -13408,20 +13408,73 @@ All 22 focused tests pass across the three touched/new spec files
 regression check). No Valkey, Postgres, Qdrant, or production writes were
 made or attempted.
 
-**Still open, correctly not touched here**: `PREFILL-CALLER-01` itself
-remains unchecked above — no real application owner (the caller census in
-DECODER-PREFILL-ADAPTER-01 names
-`context-assembler.ts` as the likely candidate, still blocked on that file
-lacking a revision-qualified prefill identity at its retrieval point) invokes
-`runNeuralDecoderPrefillCallerV1()` yet; this session only builds the seam a
-real owner would call. `DECODER-CONTAINER-01` and the live-Valkey half of
+### PREFILL-CALLER-01 (query-only scope, 2026-08-31, same day)
+
+Wired the seam above into the one live application owner. Found by tracing
+`attachContextManifestToACE()`'s callers: it has exactly one call site in the
+entire repo -- the "Parent Atlas mode preflight" branch of
+`assembleACEContext()` (`context-assembler.ts`, ~line 1792). The main/default
+ACE retrieval path (the `traceGraph('ace-assembly', ...)` branch) never
+builds a manifest at all and is therefore out of scope for this step.
+
+The "revision-qualified prefill identity" blocker noted in the entry above
+turned out to already be solved one layer down: `compileContext()`
+(`context-compiler.parent-atlas.ts`) builds `manifest.identity`
+(`candidate_ordinal_set_checksum` + `evidence_revision_checksum`)
+unconditionally, for every compiled manifest. No new identity computation was
+needed -- `neural-decoder-prefill-shadow.ts`'s
+`deriveBasePrefillIdentityChecksumFromManifest()` just composes those two
+existing checksums into a `basePrefillIdentityChecksum` via the repo's
+canonical hash encoder.
+
+- [x] `sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts`
+  (new) — `runNeuralDecoderPrefillShadowForManifest()` calls
+  `runNeuralDecoderPrefillCallerV1` in `SHADOW_READONLY` mode only, backed by
+  a real Redis-backed `NeuralDecoderFeatureCache` (`getJson`/`setJsonWithTtl`,
+  24h TTL) instead of an in-memory `Map`. Fails closed unconditionally: every
+  branch (flag off, no embedding, wrong dimensionality, any thrown error) 
+  returns `null` and never throws into ACE assembly.
+- [x] Wired into `context-assembler.ts`'s one preflight call site, gated
+  behind new `ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED` (default `false`).
+  When off: zero behavior change, verified by reading the guard, not assumed
+  -- no embed call, no decoder call, no Redis touch. When on: embeds the
+  query (existing `getQueryEmbedding()`, same file), runs the shadow call,
+  attaches the receipt to a new `ACEContext.neuralDecoderPrefillShadow` field.
+- [x] 8/8 new focused tests (`neural-decoder-prefill-shadow.spec.ts`):
+  identity-derivation determinism + sensitivity, and three fail-closed paths
+  (flag off, embedding absent, wrong dimensionality).
+- [x] Scoped + full-repo `tsc --noEmit -p tsconfig.json --skipLibCheck`:
+  zero new errors. The 20 errors present repo-wide are all pre-existing and
+  unrelated (missing `@playwright/test`/`nodejs-whisper` type declarations,
+  one unrelated `FormData`/`GoRetrievalSearchHit` mismatch in
+  `evidence/upload`/`research/search` routes) -- confirmed by reading the
+  full output, not just grep-filtering for the touched files.
+
+**Scope, stated honestly**: this is the query-only wire (an explicit,
+user-confirmed choice over the alternative "thread per-candidate embeddings
+through `fetchRAGChunks()`" option). It proves the real end-to-end plumbing
+(manifest identity -> decoder -> Redis cache -> receipt) on live traffic
+reachable from a production route, once the flag is turned on. It does
+**not** prove per-candidate `latent_256` hydration -- `ACEContext.ragChunks`
+still discards its transient per-chunk embeddings after reranking
+(`fetchRAGChunks()`, ~line 5758), so `deriveFeaturePresenceFromACE()`'s
+`latent256: 'UNAVAILABLE'` default is correctly left alone and must not be
+inferred from this receipt.
+
+**Still open**: the flag defaults off and has not been enabled anywhere;
+turning it on for real traffic is an operator decision (it adds a decoder
+HTTP round-trip to the preflight path). Per-candidate wiring (thread
+embeddings through `fetchRAGChunks`' return shape so `featurePresence.latent256`
+can be upgraded truthfully) remains a separate, larger follow-up, not
+started. `DECODER-CONTAINER-01` and the live-Valkey half of
 `PREFILL-CACHE-01`/`PREFILL-REPLAY-01` (`PREFILL-VALKEY-01` in the informal
 lane-order this session used) still require operator action: a real
-`docker compose` service for the decoder on a non-colliding port, and an
-actual running Valkey instance to prove `GET` MISS → decoder → `SET NX EX` →
-`GET` HIT with real network round-trips, not an in-memory `Map` standing in
-for the cache. `PREFILL-QUALITY-01`/`PREFILL-PROMOTION-01` remain untouched
-and correctly gated behind human-labeled QRELS.
+`docker compose` service for the decoder on a non-colliding port, and a real
+running Valkey instance (the Redis cache added this pass uses the repo's
+existing shared Redis client, but has not been proven against a live decoder
+container end-to-end -- only against a mocked `fetch`). `PREFILL-QUALITY-01`/
+`PREFILL-PROMOTION-01` remain untouched and correctly gated behind
+human-labeled QRELS.
 
 Current classification: decoder `CREATED + PROVEN`; decoder-prefill integration
 `NOT WIRED`; promotion `BLOCKED`. The previous 70% validation receipt is a
@@ -13541,3 +13594,39 @@ The Go Retrieval service was also revalidated from its module directory:
 `CandidateOrdinal` and its Qdrant reader accepts `candidate_ordinal` /
 `candidateOrdinal`; live payload absence therefore leaves the field unresolved
 and does not justify a packet-key or point-ID fallback.
+
+### EMBED-SERVICE-CONVERGENCE-01 (2026-08-31)
+
+The retrieval embedding service now routes `dense_768` through the strict
+`embedSemantic768Canonical()` boundary when `ATLAS_CANONICAL_EMBEDDING_STRICT=true`.
+That means llama-server `:8081` `/v1/embeddings`, explicit model/artifact/tokenizer/input
+lineage, 2048-token admission, 768 dimensions, finite values, and L2 normalization are
+enforced before returning a query vector. In the same strict mode, `dense_384` is explicitly
+retired: the service rejects it rather than deriving or requesting a 384-dimensional query
+vector. It is not an EmbeddingGemma model or an official MRL dimension. Callers must use
+`semantic_768` or the official MRL-derived `512`/`256`/`128` representations where supported.
+
+AST-grep and Tree-sitter remain structural metadata producers; they do not create embedding
+vectors. Legacy Ollama behavior remains available only when strict mode is disabled and must
+not be used for canonical retrieval or canonical writes.
+
+Go Retrieval query embedding now uses the shared `dense_768` boundary rather than importing
+the legacy Ollama helper directly. Focused embedding/lane tests passed 6/6; the live strict
+probe returned a normalized 768 vector from `:8081` with no cache/database/Qdrant writes.
+The remaining 384 references are compatibility adapters, historical fixtures, or migration
+documentation and must not be enabled as runtime retrieval lanes. Full retrieval migration
+and revision-qualified cache adoption remain open.
+
+Follow-up sweep confirmed no active `QdrantLane384` registration or production caller. The
+remaining executable reference is the legacy-only `vector-index-registry.ts` inventory, plus
+explicit parsers/validators that preserve old artifacts. These are archival/migration surfaces,
+not replacement embedding paths; removal requires a separate consumer and artifact-retention
+check.
+
+QDRANT BLUE/GREEN PREREQUISITE AUDIT: the existing `materialize-candidate-ordinal-corpus-v1.mts`
+and `materialize-lineage-qualified-candidate-map-v1.mts` are not yet authoritative rebuild
+inputs. The former uses `atlas_packets.packet_id` as `canonicalId` and fabricates
+`workspace-active-v1`, `unknown-rev`, and `graph-tree:*` values; the latter still uses
+`packet_key` as its candidate canonical ID. Neither may populate a new Qdrant projection.
+Replace or bind the materializer to exact `codebase_chunk_index.id` plus verified source/workspace
+revisions before creating `codebase_chunks_768_v3`.
