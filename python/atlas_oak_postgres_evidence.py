@@ -13,7 +13,7 @@ Authority boundaries:
 from __future__ import annotations
 
 import os
-from typing import Any, Literal
+from typing import Any
 
 import psycopg
 from fastapi import APIRouter, HTTPException
@@ -79,6 +79,8 @@ def _query_for(request: LinkedTupleEvidenceRequest) -> tuple[str, list[Any]]:
 
     # Ordering by the durable tuple key gives deterministic output independent
     # of heap/index scan order. SUPERSEDED rows are excluded from live evidence.
+    # Fetch one extra row so the response can distinguish an exact-size result
+    # from a result that was actually truncated by the request bound.
     sql = f"""
         SELECT
           tuple_id,
@@ -111,7 +113,7 @@ def _query_for(request: LinkedTupleEvidenceRequest) -> tuple[str, list[Any]]:
         ORDER BY tuple_id
         LIMIT %s
     """
-    params.append(request.limit)
+    params.append(request.limit + 1)
     return sql, params
 
 
@@ -152,13 +154,15 @@ async def linked_tuple_evidence(request: LinkedTupleEvidenceRequest) -> dict[str
                 )
                 async with conn.cursor() as cur:
                     await cur.execute(sql, params)
-                    rows = await cur.fetchall()
+                    fetched_rows = await cur.fetchall()
     except psycopg.Error as error:
         raise HTTPException(
             status_code=503,
             detail=f"OAK_POSTGRES_EVIDENCE_QUERY_FAILED:{error.__class__.__name__}",
         ) from error
 
+    truncated = len(fetched_rows) > request.limit
+    rows = fetched_rows[: request.limit]
     requested_revision = request.relation_revision
     observed_revisions = sorted(
         {
@@ -184,7 +188,7 @@ async def linked_tuple_evidence(request: LinkedTupleEvidenceRequest) -> dict[str
         "observedRelationRevisions": observed_revisions,
         "revisionQualified": revision_qualified,
         "count": len(rows),
-        "truncated": len(rows) == request.limit,
+        "truncated": truncated,
         "tuples": rows,
         "canonicalAuthority": False,
         "writesPerformed": False,
