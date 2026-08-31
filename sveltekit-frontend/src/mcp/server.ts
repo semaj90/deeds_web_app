@@ -5,7 +5,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { mcpTools } from '../mcp/index.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
@@ -122,7 +122,9 @@ let _selectToolsForQuery: ToolSelectorFn | null | undefined;
 async function loadToolSelector(): Promise<ToolSelectorFn | null> {
   if (_selectToolsForQuery !== undefined) return _selectToolsForQuery;
   try {
-    const mod = await import(/* @vite-ignore */ MCP_TOOL_SELECTOR_PATH);
+    // pathToFileURL is required here, not just style: a raw Windows absolute
+    // path (C:\...) passed straight to import() throws ERR_UNSUPPORTED_ESM_URL_SCHEME.
+    const mod = await import(/* @vite-ignore */ pathToFileURL(MCP_TOOL_SELECTOR_PATH).href);
     _selectToolsForQuery = typeof mod.selectToolsForQuery === 'function' ? mod.selectToolsForQuery : null;
   } catch {
     _selectToolsForQuery = null; // selector script unavailable — degrade to full list, never throw
@@ -130,23 +132,37 @@ async function loadToolSelector(): Promise<ToolSelectorFn | null> {
   return _selectToolsForQuery;
 }
 
-async function selectMcpToolSubset(allTools: any[], request: any): Promise<any[]> {
+// Reverse-DNS-namespaced _meta key (MCP-SELECT-03). MCP explicitly permits
+// custom _meta values and recommends reverse-DNS prefixes to avoid clashing
+// with MCP-owned/reserved keys — a bare "queryHint" key is not namespaced.
+const MCP_TOOL_QUERY_HINT_META_KEY = 'com.parentatlas.tool_query_hint';
+
+// HARD RULE (MCP-SELECT-05): this selector is a context/discovery optimization
+// ONLY. It is not, and must never become, an authorization boundary. It fails
+// open to the full tool list on any error, missing hint, or selector
+// unavailability — correct for availability/context-cost, but that same
+// fail-open behavior means it must never be relied on to withhold a tool for
+// security reasons. Auth/permission checks (checkAuth(), requireAdmin-style
+// guards inside individual tool handlers) are the actual authorization
+// boundary and are completely independent of this function.
+async function selectMcpToolSubset(allTools: any[], request: any): Promise<{ tools: any[]; filtered: boolean }> {
   const queryHint: string | undefined =
-    request?.params?._meta?.queryHint ?? process.env.MCP_TOOL_QUERY_HINT;
-  if (!queryHint) return allTools; // no hint supplied → unchanged full-list behavior
+    request?.params?._meta?.[MCP_TOOL_QUERY_HINT_META_KEY] ?? process.env.MCP_TOOL_QUERY_HINT;
+  if (!queryHint) return { tools: allTools, filtered: false }; // no hint supplied → unchanged full-list behavior
 
   const selectFn = await loadToolSelector();
-  if (!selectFn) return allTools;
+  if (!selectFn) return { tools: allTools, filtered: false };
 
   try {
     const topK = Number(process.env.MCP_TOOL_TOP_K) || 16;
     const { mcp_names } = await selectFn(queryHint, { topK });
-    if (!mcp_names?.length) return allTools;
+    if (!mcp_names?.length) return { tools: allTools, filtered: false };
     const names = new Set(mcp_names);
     const filtered = allTools.filter((t) => names.has(t.name));
-    return filtered.length > 0 ? filtered : allTools; // never advertise zero tools
+    if (filtered.length === 0) return { tools: allTools, filtered: false }; // never advertise zero tools
+    return { tools: filtered, filtered: true };
   } catch {
-    return allTools; // selector call failed at runtime — degrade to full list, never throw
+    return { tools: allTools, filtered: false }; // selector call failed at runtime — degrade to full list, never throw
   }
 }
 
@@ -2057,7 +2073,15 @@ export function setupToolHandlers() {
       })),
 
     ];
-    return { tools: await selectMcpToolSubset(allTools, request) };
+    const { tools, filtered } = await selectMcpToolSubset(allTools, request);
+    if (!filtered) return { tools };
+    // MCP-SELECT-04: a query-filtered subset must never be cached as if it were
+    // the stable catalog. MCP (2026-07-28) allows ListTools responses to declare
+    // cacheability via _meta.ttlMs/_meta.cacheScope; a filtered response gets the
+    // conservative, explicit non-cacheable/private defaults. The unfiltered
+    // (no-hint) response is the real stable catalog and is left with no such
+    // hint, so normal caching behavior is unaffected for the common case.
+    return { tools, _meta: { ttlMs: 0, cacheScope: 'private' } };
   });
 
   // ── SNES RPC Cache Bus — MCP read-only tool cache ────────────────────────
