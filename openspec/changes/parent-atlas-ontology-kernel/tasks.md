@@ -1447,3 +1447,88 @@ tree-node snapshot lifecycle or get their own — still not decided, flagged ear
 **Next step for whoever continues this**: wire a real call site, or explicitly scope this as a
 standalone/on-demand capability rather than an always-on pipeline stage — that's a product decision,
 not a technical one, and shouldn't be made unilaterally.
+
+## SYMBOL-SEMANTIC-BRIDGE-01 — investigated, NOT implemented: real 4-way symbol-identity fragmentation found
+
+Started auditing this (the one item from the operator's 9-item queue not blocked by a missing
+dependency) before writing anything, per this repo's own "audit before you build" / "One Canonical
+Runtime Owner Per Capability" rules. The audit surfaced a real, live, unreconciled fragmentation —
+bigger than the single gap `ontology-tuple-to-graph-relation-v1.ts`'s docstring currently names —
+so implementation stopped here and this is recorded instead, per this repo's explicit instruction:
+*"If ownership can't be established, stop and record the ambiguity in an OpenSpec change — don't
+implement past that point."*
+
+**Four incompatible schemes for "the identity of an AST symbol node," all live/reachable, none
+reconciled with each other:**
+
+1. **`atlas_symbol_registry.stable_symbol_id`** (Postgres, confirmed live, **10,310 real rows**) —
+   format `stable-symbol:<sha256hex-64chars>`, produced by
+   `scripts/atlas/promote-ast-symbols-to-registry.mjs::stableSymbolIdFor(canonicalKey)`. This is
+   the real, populated authority — has FK-referencing tables (`atlas_symbol_aliases`,
+   `atlas_symbol_versions`, `atlas_structural_reference_resolutions`).
+2. **`packages/parent-atlas/src/core/symbol-registry-repository.ts::canonicalStableSymbolId()`** —
+   format `symbol:<sha256hex-sliced-to-40chars>`. Different prefix, different hash length, from a
+   different hash input shape, than #1. **Confirmed DEAD**: `createSymbolRegistryRepository`
+   (the only exported factory in this file) has exactly **one reference in the whole repo — its
+   own definition**. Zero callers anywhere (`grep -rn createSymbolRegistryRepository` across all
+   `.ts` files → 1 hit total). A real, load-bearing-looking module (has a symbol-resolution SQL
+   query, promotion logic, a `SymbolRegistryReadbackReceiptV1` schema) that nothing calls.
+3. **`packages/parent-atlas/src/core/graph-node-key-v1.ts::deriveGraphNodeKeyV1({symbolVersionId})`**
+   — format `symbol:<symbolVersionId>` (where `symbolVersionId` is meant to come from
+   `canonicalSymbolVersionId()`, itself only reachable from the dead #2 path). This is what this
+   session's own `GraphNodeKeyV1`/`ProjectionOrdinalMapV1`/`ontology-tuple-to-graph-relation-v1.ts`
+   work has been implicitly assuming is "the" durable symbol key format — it is a real, tested,
+   exported function, but nothing in the live write path (see #4) actually calls it with a real
+   `symbolVersionId` sourced from anywhere live.
+4. **`graph-snapshot-materializer.ts`'s actual live writer of `atlas_graph_nodes_v2` rows with
+   `node_type = 'symbol'`** (confirmed by reading the real materializer, not assumed) — keys every
+   symbol-type node as **`tree:${treeNode.nodeId}`** (line ~322), sourced from tree-sitter parse
+   output (`TREE_NODE_TYPE_MAP`), gated by `classifyCanonicalGraphEligibility()`'s real provenance
+   checks (`extractionMethod === 'tree_sitter'`, `structuralTruth === true`, rejects the
+   `batch-a-structural-materializer` heuristic producer — this file's own docstring records that
+   146,655 heuristic 'symbol' nodes were previously let in at full trust and are now excluded).
+   **This is the actual canonical `atlas_graph_nodes_v2` write path for symbol nodes** — and its
+   key format (`tree:<treeNodeId>`) matches **none** of #1, #2, or #3.
+
+**No reconciliation link found anywhere** (`grep`-checked, not assumed):
+`stable_symbol_id`↔`tree:<treeNodeId>`, `symbol_version_id`↔`node_key` — zero hits in
+`sveltekit-frontend/src`. A `tree:<treeNodeId>` node in the canonical graph snapshot and a
+`stable-symbol:<hash>` row in the real, 10,310-row-populated symbol registry describing the exact
+same physical function/class/interface have no queryable path between them today.
+
+**Consequence for `projectOntologyTupleToGraphRelationV1()`** (this session's own function): its
+docstring's `ast_symbol -> 'symbol'` mapping is honest about the `GraphNodeType` question but was
+silently assuming scheme #3 for what a "real" symbol `entityId` looks like. Given the actual live
+writer uses scheme #4, an `OntologyLinkedTupleV1` participant whose `entityId` happens to be a real
+`stable-symbol:<hash>` (scheme #1, the one an ontology/NLP extraction pipeline would most plausibly
+produce, since it's the one live, populated table) would **still fail to line up with any real node
+already in a canonical `atlas_graph_nodes_v2` snapshot** — it would write a new, disconnected
+`'symbol'` node keyed by the registry's id, coexisting in the same table as real tree-sourced
+`tree:<treeNodeId>` symbol nodes with completely incompatible keys. Not a bug in the code written
+this session (it does exactly what its own contract says — projects, doesn't invent identity), but
+a real blocker for ever making this bridge meaningful.
+
+**Not fixed here — this is a cross-cutting identity-authority decision, same category as every
+other schema-owner call held open this session.** Candidate resolutions (not chosen, listed only
+so whoever picks this up doesn't have to re-derive them):
+- (a) Make `stable_symbol_id` (#1, the real populated registry) the one canonical symbol identity,
+  and change `graph-snapshot-materializer.ts` to key symbol nodes by it instead of
+  `tree:<treeNodeId>` — highest-value fix (unifies the *actual* live write path) but touches a
+  file this repo's own governance treats as sensitive (real provenance-eligibility gating logic).
+- (b) Add a mapping/join table (`tree_node_id -> stable_symbol_id`) rather than changing either
+  writer — additive, lower-risk, but adds a permanent reconciliation-maintenance burden.
+- (c) Archive #2/#3 (`symbol-registry-repository.ts`, and `deriveGraphNodeKeyV1`'s
+  `symbolVersionId` branch specifically) as `DEAD`/`COMPATIBILITY` per this repo's own
+  classification vocabulary, since neither is reachable from any live write path today — smallest,
+  safest immediate action, doesn't require picking a winner between #1 and #4.
+- (d) Do nothing yet; `OntologyLinkedTupleV1` production for `ast_symbol` participants doesn't
+  exist as a live pipeline stage yet either (per the still-open `APPLY_PROVEN` gap above) — this
+  whole question may be moot until that producer exists and its own author picks a scheme.
+
+**Recommended immediate action if anyone wants a small, safe win here**: (c) — flag
+`symbol-registry-repository.ts` `DEAD` in whatever runtime-ownership registry/audit this repo
+already maintains (`docs/architecture/runtime-ownership-registry.json` /
+`runtime-ownership-baseline.json`, referenced in root CLAUDE.md's "One Canonical Runtime Owner"
+section) — pure bookkeeping, zero behavior change, zero risk. Not done in this pass since it's
+still a real decision (confirming zero callers is not the same as confirming zero *intended future*
+callers) and the operator hasn't been asked.
