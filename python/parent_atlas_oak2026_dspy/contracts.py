@@ -79,6 +79,7 @@ class Oak2026ProgramBoundsV1:
 @dataclass(frozen=True, slots=True)
 class Oak2026KernelBindingV1:
     kernel_revision: str
+    task_class: str
     schema_checksum: str
     function_catalog_checksum: str
     allowed_functions: tuple[str, ...]
@@ -90,6 +91,7 @@ class Oak2026KernelBindingV1:
         cls,
         *,
         kernel_revision: str,
+        task_class: str,
         schema_checksum: str,
         function_catalog_checksum: str,
         allowed_functions: Iterable[str],
@@ -103,6 +105,7 @@ class Oak2026KernelBindingV1:
             raise ValueError("allowed_evidence_classes must not be empty")
         return cls(
             kernel_revision=_require_nonempty("kernel_revision", kernel_revision),
+            task_class=_require_nonempty("task_class", task_class),
             schema_checksum=_require_sha256("schema_checksum", schema_checksum),
             function_catalog_checksum=_require_sha256(
                 "function_catalog_checksum", function_catalog_checksum
@@ -117,6 +120,7 @@ class Oak2026KernelBindingV1:
         return canonical_json_checksum_v1(
             {
                 "kernelRevision": self.kernel_revision,
+                "taskClass": self.task_class,
                 "schemaChecksum": self.schema_checksum,
                 "functionCatalogChecksum": self.function_catalog_checksum,
                 "allowedFunctions": list(self.allowed_functions),
@@ -238,11 +242,11 @@ class Oak2026PreExecutionPacketV1:
     """Wire-safe proposal packet consumed by the TypeScript admission boundary."""
 
     kernel_revision: str
+    task_class: str
     schema_checksum: str
     function_catalog_checksum: str
     binding_checksum: str
     program_revision: str
-    task_class: str
     required_evidence_classes: tuple[str, ...]
     classification_confidence: float
     function_name: str
@@ -265,6 +269,11 @@ class Oak2026PreExecutionPacketV1:
         confidence = float(classification_confidence)
         if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
             raise ValueError("OAK2026_INVALID_CLASSIFICATION_CONFIDENCE")
+        task_class = _require_nonempty("task_class", task_class)
+        if task_class != binding.task_class:
+            raise ValueError(
+                f"OAK2026_TASK_CLASS_MISMATCH:{task_class}:{binding.task_class}"
+            )
         required = validate_evidence_classes_v1(
             binding,
             required_evidence_classes,
@@ -277,11 +286,11 @@ class Oak2026PreExecutionPacketV1:
         )
         return cls(
             kernel_revision=binding.kernel_revision,
+            task_class=binding.task_class,
             schema_checksum=binding.schema_checksum,
             function_catalog_checksum=binding.function_catalog_checksum,
             binding_checksum=binding.binding_checksum,
             program_revision=_require_nonempty("program_revision", program_revision),
-            task_class=_require_nonempty("task_class", task_class),
             required_evidence_classes=required,
             classification_confidence=confidence,
             function_name=proposal.function_name,
@@ -294,11 +303,11 @@ class Oak2026PreExecutionPacketV1:
         return {
             "schema": "atlas.oak2026-dspy-proposal.v1",
             "kernelRevision": self.kernel_revision,
+            "taskClass": self.task_class,
             "schemaChecksum": self.schema_checksum,
             "functionCatalogChecksum": self.function_catalog_checksum,
             "bindingChecksum": self.binding_checksum,
             "programRevision": self.program_revision,
-            "taskClass": self.task_class,
             "requiredEvidenceClasses": list(self.required_evidence_classes),
             "classificationConfidence": self.classification_confidence,
             "functionName": self.function_name,
