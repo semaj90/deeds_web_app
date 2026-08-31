@@ -14,6 +14,8 @@ from .contracts import (
     Oak2026RuntimeCountersV1,
     canonical_json_checksum_v1,
     validate_action_proposal_v1,
+    validate_evidence_classes_v1,
+    validate_evidence_refs_v1,
     validate_runtime_bounds_v1,
 )
 from .program import build_oak2026_kernel_program_v1, decode_oak2026_arguments_v1
@@ -30,5 +32,7 @@ __all__ = [
     "decode_oak2026_arguments_v1",
     "require_dspy",
     "validate_action_proposal_v1",
+    "validate_evidence_classes_v1",
+    "validate_evidence_refs_v1",
     "validate_runtime_bounds_v1",
 ]
