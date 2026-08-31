@@ -1,30 +1,11 @@
 /**
- * cugraph-pagerank-adapter.ts — cuGraph/RAPIDS PageRank backend for the same
- * canonical `graph_analysis_runs` / `graph_node_metrics` tables that
- * pagerank-analysis-adapter.ts (Neo4j-GDS) already writes.
+ * cugraph-pagerank-adapter.ts — bounded cuGraph/RAPIDS PageRank challenger.
  *
- * This is a second BACKEND under one canonical capability, not a competing
- * owner — same registry pattern already used for neo4j-gds-pagerank,
- * neo4j-gds-louvain-leiden, neo4j-gds-cheirank, neo4j-gds-kcore (see
- * docs/architecture/runtime-ownership-registry.json's `graph_analysis`
- * capability). Selected via GraphAnalysisRequest.engine === 'cugraph-rapids'
- * in graph-analysis-runner.ts.
- *
- * Precondition (fail-closed, not auto-loaded): a graph projection must
- * already be resident in the atlas-gpu-8098 sidecar via POST /v1/graph/load
- * before this adapter can run. This adapter deliberately does not attempt to
- * load one itself — picking which frozen GRAPH_SNAPSHOT_PARITY artifact to
- * load is a separate operational decision (see
- * openspec/changes/parent-atlas-graph-runtime-python-consolidation), not
- * something to guess at from inside a PageRank call. If nothing is resident,
- * this returns a skipped result with a clear reason, matching this file's own
- * runSkippedAnalysis() convention in graph-analysis-runner.ts.
- *
- * packetKey resolution: the cuGraph service already resolves packet_key
- * directly from the loaded nodes.parquet artifact's own `packet_key` column
- * (see atlas_rapids_graph_runtime.py's ResidentGraph), so — unlike the
- * Neo4j-GDS adapter — there is no separate Postgres path->packetKey
- * resolution step here. A null packetKey result is skipped, not written.
+ * This adapter is a second BACKEND under one PageRank capability, not a
+ * competing identity owner. The current /v1/graph/pagerank endpoint returns a
+ * bounded result set (<=512 rows), so those rows MUST NOT be persisted under
+ * the promoted `pagerank` metric name. Full-vector promotion is a separate
+ * artifact/parity gate.
  */
 
 import type { Pool } from 'pg';
@@ -41,6 +22,8 @@ import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 const ALGORITHM_REVISION = graphAlgorithmRevision('pagerank');
 const PARAMETER_REVISION_PREFIX = 'cugraph-maxIter-alpha';
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
+const BOUNDED_SHADOW_METRIC_NAME = 'pagerank_cugraph_shadow';
+const BOUNDED_SELECTION_MODE = 'TOP_K_SHADOW';
 
 export interface CuGraphPageRankAnalysisOptions {
 	maxIterations?: number;
@@ -86,8 +69,8 @@ async function buildSkippedResult(
 		startedAt,
 		completedAt: new Date().toISOString(),
 		status: 'succeeded',
-		parameters: { reason },
-		metrics: { skipped: true, reason },
+		parameters: { reason, selectionMode: BOUNDED_SELECTION_MODE, canonicalMetricEligible: false },
+		metrics: { skipped: true, reason, metricName: BOUNDED_SHADOW_METRIC_NAME },
 	});
 	return { run, metricsWritten: 0, unresolvedPacketKeys: 0, excludedPacketKeys: 0, skippedReason: reason };
 }
@@ -125,7 +108,7 @@ export async function runCuGraphPageRankAnalysis(
 	const { graphRevision, nodeCount, edgeCount } = residentStatus.resident;
 	const startedAt = new Date().toISOString();
 	const inputHash = createHash('sha256')
-		.update(JSON.stringify({ algorithm: 'pagerank', backend: 'cugraph-rapids', graphRevision, maxIterations, dampingFactor, limit }))
+		.update(JSON.stringify({ algorithm: 'pagerank', backend: 'cugraph-rapids', graphRevision, maxIterations, dampingFactor, limit, selectionMode: BOUNDED_SELECTION_MODE }))
 		.digest('hex');
 
 	const receipt = await client.pagerank({
@@ -162,13 +145,25 @@ export async function runCuGraphPageRankAnalysis(
 		startedAt,
 		completedAt,
 		status: 'succeeded',
-		parameters: { maxIterations, dampingFactor, topK: limit },
-		metrics: { topNodesReturned: receipt.results.length, didConverge: receipt.didConverge, cacheHit: receipt.cacheHit },
+		parameters: {
+			maxIterations,
+			dampingFactor,
+			topK: limit,
+			selectionMode: BOUNDED_SELECTION_MODE,
+			canonicalMetricEligible: false,
+			metricName: BOUNDED_SHADOW_METRIC_NAME,
+		},
+		metrics: {
+			topNodesReturned: receipt.results.length,
+			didConverge: receipt.didConverge,
+			cacheHit: receipt.cacheHit,
+			promotionState: 'CHALLENGER_SHADOW',
+		},
 	});
 
-	// packetKey -> highest score seen, same discipline as the Neo4j-GDS adapter's
-	// byPacketKey dedup (graph_node_metrics' primary key is (runId, packetKey,
-	// metricName) — one row per packet per run).
+	// packetKey collapse is intentionally downstream of the graph executor. This
+	// bounded path is useful for shadow analysis only and cannot establish full
+	// node coverage or canonical PageRank authority.
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
 	for (const node of receipt.results as AtlasPageRankResultV1[]) {
@@ -190,7 +185,7 @@ export async function runCuGraphPageRankAnalysis(
 				runId,
 				packetKey,
 				symbolVersionId: null,
-				metricName: 'pagerank',
+				metricName: BOUNDED_SHADOW_METRIC_NAME,
 				metricValue: score,
 				graphRevision,
 				algorithmRevision: ALGORITHM_REVISION,
@@ -199,9 +194,6 @@ export async function runCuGraphPageRankAnalysis(
 		);
 	}
 
-	// Transactional, same shape as pagerank-analysis-adapter.ts: a
-	// graph_analysis_runs row with status='succeeded' must never exist without
-	// its full graph_node_metrics batch also having landed.
 	const pgClient = await db.connect();
 	try {
 		await pgClient.query('BEGIN');
@@ -240,11 +232,10 @@ export async function runCuGraphPageRankAnalysis(
 			],
 		);
 
-		// Same Postgres bound-parameter ceiling as pagerank-analysis-adapter.ts
-		// (65,535 per query / 7 columns each -> batch below ~9,362 rows).
 		const BATCH_SIZE = 3000;
 		for (let offset = 0; offset < metricRows.length; offset += BATCH_SIZE) {
 			const batch = metricRows.slice(offset, offset + BATCH_SIZE);
+			if (batch.length === 0) continue;
 			const values: string[] = [];
 			const params: unknown[] = [];
 			batch.forEach((m, i) => {
