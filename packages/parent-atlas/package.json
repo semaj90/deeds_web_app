@@ -19,6 +19,7 @@
     "./core/structural-identity-bridge-v1": "./dist/core/structural-identity-bridge-v1.js",
     "./core/structural-lane-result-v1": "./dist/core/structural-lane-result-v1.js",
     "./core/graph-node-key-v1": "./dist/core/graph-node-key-v1.js",
+    "./core/identity-v1": "./dist/core/identity-v1.js",
     "./core/langextract-grounding-adapter": "./dist/core/langextract-grounding-adapter.js",
     "./core/langextract-sidecar-metadata-adapter": "./dist/core/langextract-sidecar-metadata-adapter.js",
     "./core/symbol-registry-repository": "./dist/core/symbol-registry-repository.js",
