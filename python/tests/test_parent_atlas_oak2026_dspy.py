@@ -5,6 +5,7 @@ from python.parent_atlas_oak2026_dspy import (
     Oak2026KernelBindingV1,
     Oak2026ProgramBoundsV1,
     Oak2026RuntimeCountersV1,
+    build_oak2026_gepa_feedback_metric_v1,
     build_oak2026_gepa_optimizer_v1,
     canonical_json_checksum_v1,
     decode_oak2026_arguments_v1,
@@ -98,6 +99,42 @@ def test_action_arguments_must_decode_to_finite_object():
         decode_oak2026_arguments_v1('{bad-json}')
     with pytest.raises(ValueError, match="OAK2026_ACTION_ARGUMENTS_NONFINITE"):
         decode_oak2026_arguments_v1('{"score":NaN}')
+
+
+def test_gepa_feedback_adapter_has_current_five_argument_shape():
+    def observation_factory(gold, pred, trace, pred_name, pred_trace):
+        return {
+            "gold": gold,
+            "pred": pred,
+            "trace": trace,
+            "pred_name": pred_name,
+            "pred_trace": pred_trace,
+        }
+
+    metric = build_oak2026_gepa_feedback_metric_v1(
+        observation_factory=observation_factory,
+        score_fn=lambda observation: (0.75, f"pred={observation['pred']}"),
+    )
+    assert metric("g", "p", "t", "name", "pt") == {
+        "score": 0.75,
+        "feedback": "pred=p",
+    }
+
+
+def test_gepa_feedback_adapter_rejects_invalid_score_or_feedback():
+    metric_bad_score = build_oak2026_gepa_feedback_metric_v1(
+        observation_factory=lambda *args: args,
+        score_fn=lambda observation: (1.5, "bad"),
+    )
+    with pytest.raises(ValueError, match="OAK2026_GEPA_SCORE_OUT_OF_RANGE"):
+        metric_bad_score(None, None, None, None, None)
+
+    metric_empty_feedback = build_oak2026_gepa_feedback_metric_v1(
+        observation_factory=lambda *args: args,
+        score_fn=lambda observation: (0.5, ""),
+    )
+    with pytest.raises(ValueError, match="OAK2026_GEPA_FEEDBACK_REQUIRED"):
+        metric_empty_feedback(None, None, None, None, None)
 
 
 def test_gepa_requires_explicit_reflection_lm_before_dspy_import():
