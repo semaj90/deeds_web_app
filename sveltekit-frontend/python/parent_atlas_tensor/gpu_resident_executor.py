@@ -267,6 +267,35 @@ class CandidateFeatureGpuExecutor:
         }
         return {**payload, "gatherChecksum": _sha256(_stable_json(payload).encode("utf-8"))}
 
+    def reuse_materialized(self, source_lease_id: str, *, lease_id: str, ttl_seconds: float = 60.0) -> dict[str, Any]:
+        """Create a new lease over the exact resident tensors without another H2D transfer."""
+        source = self._active(source_lease_id)
+        if lease_id in self._leases:
+            raise ValueError(f"GPU_RESIDENCY_LEASE_ALREADY_EXISTS:{lease_id}")
+        if ttl_seconds <= 0:
+            raise ValueError("GPU_RESIDENCY_TTL_MUST_BE_POSITIVE")
+        now = datetime.now(timezone.utc)
+        expires = now + timedelta(seconds=float(ttl_seconds))
+        buffers = [
+            {**buffer, "bufferId": f"{lease_id}:{buffer['role']}"}
+            for buffer in source.observation["buffers"]
+        ]
+        body = {
+            **source.observation,
+            "leaseId": lease_id,
+            "buffers": buffers,
+            "issuedAt": _iso_utc(now),
+            "expiresAt": _iso_utc(expires),
+        }
+        observation = {**body, "observationChecksum": _sha256(_stable_json(body).encode("utf-8"))}
+        self._leases[lease_id] = _ResidentLease(
+            lease_id=lease_id,
+            expires_monotonic=time.monotonic() + float(ttl_seconds),
+            tensors=source.tensors,
+            observation=observation,
+        )
+        return observation
+
     def release(self, lease_id: str) -> dict[str, Any]:
         lease = self._active(lease_id)
         buffer_ids = sorted(buffer["bufferId"] for buffer in lease.observation["buffers"])
@@ -286,3 +315,17 @@ class CandidateFeatureGpuExecutor:
             return True
         except (KeyError, RuntimeError):
             return False
+
+    def same_resident_tensors(self, left_lease_id: str, right_lease_id: str) -> bool:
+        """Verify reuse by object identity without exposing device pointers."""
+        left = self._active(left_lease_id)
+        right = self._active(right_lease_id)
+        return all(left.tensors.get(role) is right.tensors.get(role) for role in BUFFER_ROLES)
+
+    def cuda_memory_stats(self) -> dict[str, int]:
+        """Return aggregate telemetry only; raw pointers never leave the executor."""
+        torch = self.torch
+        return {
+            "allocatedBytes": int(torch.cuda.memory_allocated(self.device)),
+            "reservedBytes": int(torch.cuda.memory_reserved(self.device)),
+        }

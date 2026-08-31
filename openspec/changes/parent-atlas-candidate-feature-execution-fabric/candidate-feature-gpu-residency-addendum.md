@@ -2,6 +2,20 @@
 
 Status: **IMPLEMENTED_UNPROVEN**
 
+### 2026-08-31 runtime separation update
+
+The live `atlas-neural-decoder` container is now a separate, proven learned
+projection runtime (`torch 2.13.0+cu132`, port `8121`). The workstation
+`torch 2.8.0+cu128` probe remains a reference environment only. Neither
+runtime changes this addendum's ownership rules: PyTorch/cuTile/SIMT/RMM are
+execution or allocation providers, while CandidateOrdinal, artifact
+checksums, and canonical PostgreSQL lineage remain outside the GPU cache.
+
+The decoder health/lineage proof does **not** close GPU-BATCH-01..10. Those
+gates still require a valid FEAT-04 pack/gather envelope and an owner-process
+residency receipt. cuTile, SIMT, and RMM remain challenger lanes until the
+PyTorch reference and residency input are available.
+
 This tranche extends the merged FEAT-03D/FEAT-04 physical-pack/CUDA-parity work through owner-process GPU residency and a lease-bound batch request. It does not alter canonical identity, FANOUT admission, graph revision authority, retrieval fusion, or external stores.
 
 ## Runtime path

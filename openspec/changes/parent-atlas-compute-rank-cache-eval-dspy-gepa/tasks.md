@@ -115,3 +115,43 @@ python -m pytest \
 ```
 
 These commands are proposed validation commands; their success must be recorded from the actual Windows/WSL2 checkout before any task is upgraded to runtime-proven.
+
+## DSPy / GEPA / sub-prompt deep audit — 2026-08-31
+
+The repository already has two separate surfaces and they must not be counted as one
+live optimizer:
+
+| Surface | Status | Evidence |
+|---|---|---|
+| TRACE sub-agent API/orchestrator | **WIRED** | `sveltekit-frontend/src/routes/api/trace/subagents/run/+server.ts`, `sveltekit-frontend/src/lib/server/agents/trace-subagent-orchestrator.ts` |
+| DSPy repair signatures/module | **CREATED / BOUNDED** | `python/parent_atlas_dspy_repair.py`, import-safe when DSPy is absent |
+| DSPy contract tests | **PROVEN_BOUNDED** | existing Python focused tests; does not prove a live DSPy runtime |
+| GEPA constructor contract | **CREATED** | `build_gepa_optimizer_v1()`; no live optimizer execution |
+| DSPy/GEPA runtime imports | **NOT_PROVEN / BLOCKED** | current audit records missing runtime dependencies |
+| Typed evidence-ref anti-invention validation | **OPEN** | output validator and serialized sidecar boundary are not yet wired |
+| Held-out split isolation | **OPEN** | train/validation/test IDs are not frozen in a receipt |
+| OaK judge → repair suggestion | **PARTIAL** | judge feedback contract exists; automatic bounded producer is absent |
+| Production self-modification | **FORBIDDEN** | no promotion or mutation path is authorized |
+
+The executable audit is `scripts/atlas/audit-dspy-gepa-subprompts-v1.mjs` and its
+read-only report is `docs/reports/dspy-gepa-subprompt-audit-v1.json`. It defines the
+ordered follow-up gates `SUBPROMPT-REPLAY-01`, `DSPY-SIDECAR-01`, `GEPA-VERSION-01`,
+`GEPA-HELDOUT-01`, `GEPA-SHADOW-01`, `OAK-JUDGE-01`, and `PROMOTION-01`.
+
+Do not mark the DSPy or GEPA tasks complete from the existence of signatures, a
+constructor, or sub-agent routing. A live promotion requires serialized promoted
+evidence, deterministic replay, frozen evaluation splits, hard-gate non-regression,
+human review, and an immutable receipt. GEPA remains an offline/shadow worker and
+must not write to PostgreSQL, Qdrant, Valkey, Neo4j, Graphify, or canonical identity.
+
+### Ordered follow-up checklist
+
+- [ ] SUBPROMPT-CENSUS-01 — classify existing prompt/sub-agent surfaces by orchestration, evidence acquisition, and model proposal.
+- [ ] SUBPROMPT-CONTRACT-01 — add a serialized request/response boundary carrying ContextManifest checksum and allowed evidence IDs.
+- [x] SUBPROMPT-REPLAY-01 — add read-only prompt replay mode comparing stable prompt-selection projections and checksums; live ACE-backed replay remains required for runtime proof.
+- [ ] DSPY-SIDECAR-01 — connect the TypeScript evidence owner to an isolated DSPy worker; no store access from the worker.
+- [ ] GEPA-VERSION-01 — prove pinned DSPy/GEPA imports in an isolated WSL2/container environment.
+- [ ] GEPA-HELDOUT-01 — freeze train/validation/test IDs and enforce held-out isolation.
+- [ ] GEPA-SHADOW-01 — run a bounded validation-only GEPA experiment with fixed seed, resumable log, and candidate checksum.
+- [ ] OAK-JUDGE-01 — map real bounded execution receipts to judge feedback and repair suggestions without auto-promotion.
+- [ ] PROMOTION-01 — require human review, held-out non-regression, and an immutable promotion receipt before any candidate is promoted.

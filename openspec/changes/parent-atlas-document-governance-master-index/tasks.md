@@ -88,3 +88,20 @@
 - [ ] 10.3 Select at most five clearly superseded non-instruction docs for archive canary.
 - [ ] 10.4 Run archive canary with explicit authorization, exact pre/post path checks, rollback-on-failure semantics where applicable, and no OpenSpec/CLAUDE moves.
 - [ ] 10.5 Record the canary workflow receipt under this OpenSpec change.
+
+## Master Feature TODO reconciliation — 2026-08-31
+
+- [x] **DOC-GOV-MASTER-TODO-01** Locate and checksum the archived Master Feature TODO: `docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20.md`; 1,468 lines, 466 checklist rows, 297 checked, SHA-256 `0e6e1206a9eb05f307466c75d7404ce72e4350adbf242414d3b7e2ee3ab00bea`.
+- [x] **DOC-GOV-MASTER-TODO-02** Record the historical TODO as an archived reference rather than a second active task authority.
+- [ ] **DOC-GOV-MASTER-TODO-03** Reconcile each still-open historical item to an existing OpenSpec change using exact source references and source revisions where available; do not copy or auto-close tasks.
+- [ ] **DOC-GOV-MASTER-TODO-04** Classify historical completion claims as `PROVEN`, `FIXTURE_ONLY`, `REFERENCE_ONLY`, or `UNPROVEN` from current receipts before any task is marked complete.
+- [ ] **DOC-GOV-MASTER-TODO-05** Generate a bounded crosswalk from historical TODO sections to OpenSpec task keys and include unresolved/ambiguous rows in the governance report.
+
+### Master Feature TODO crosswalk evidence — 2026-08-31
+
+Generated `docs/reports/master-feature-todo-openspec-crosswalk-v1.json` in review-only mode.
+It contains 466 archived checklist rows, 297 historically checked and 169 historically open;
+285 rows have lexical OpenSpec candidates, 113 of those are explicitly ambiguous, and 181 remain without a candidate. Every row retains
+the archived `sourceRef` and the TODO SHA-256 `sourceRevision`. These are candidate mappings only:
+no OpenSpec task was copied, closed, or merged. DOC-GOV-MASTER-TODO-05 remains open until
+ambiguous-match review is explicitly represented and human-reviewed.

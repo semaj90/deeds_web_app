@@ -52,6 +52,7 @@ async function main() {
   const semanticSource = arg('semantic-source');
   const ordinalMapPath = arg('ordinal-map');
   const output = arg('output');
+  const snapshotOutput = arg('snapshot-output');
   const queryOrdinal = Number(arg('query-ordinal', '0'));
   if (!semanticSource || !ordinalMapPath || !output) {
     throw new Error('REQUIRED: --semantic-source --ordinal-map --output');
@@ -134,6 +135,10 @@ async function main() {
 
   await fs.mkdir(path.dirname(path.resolve(output)), { recursive: true });
   await fs.writeFile(path.resolve(output), `${JSON.stringify(columnar, null, 2)}\n`, 'utf8');
+  if (snapshotOutput) {
+    await fs.mkdir(path.dirname(path.resolve(snapshotOutput)), { recursive: true });
+    await fs.writeFile(path.resolve(snapshotOutput), `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
+  }
 
   console.log(JSON.stringify({
     status: 'CANDIDATE_FEATURE_COLUMNAR_V1_WRITTEN',
@@ -143,6 +148,7 @@ async function main() {
     semanticOnlyControl: true,
     columnarChecksum: columnar.columnarChecksum,
     output: path.resolve(output),
+    snapshotOutput: snapshotOutput ? path.resolve(snapshotOutput) : null,
     storeWritesAttempted: false,
   }, null, 2));
 }

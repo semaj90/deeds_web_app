@@ -7,6 +7,9 @@ services:
     container_name: miniforge-nlp-sidecar
     ports:
       - "8095:8095"
+    networks:
+      - default
+      - legal-ai-network
     volumes:
       - ../..:/workspace:ro
       # Source-only changes are visible without rebuilding the dependency image.
@@ -27,6 +30,9 @@ services:
       LANGEXTRACT_BASE_URL: http://host.docker.internal:8090/v1
       LANGEXTRACT_API_KEY: ${LANGEXTRACT_API_KEY:-local}
       LLAMA_SERVER_URL: http://host.docker.internal:8090/v1
+      # Optional explicit read-only PostgreSQL OaK adapter. Keep empty by default;
+      # production must provide a reviewed, revision-qualified locator explicitly.
+      ATLAS_OAK_ADAPTER: ${ATLAS_OAK_ADAPTER:-}
       UVICORN_LOG_LEVEL: info
     healthcheck:
       test:
@@ -41,3 +47,8 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
+
+networks:
+  legal-ai-network:
+    external: true
+    name: deeds-web-app_legal-ai-network

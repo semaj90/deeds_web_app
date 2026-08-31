@@ -2,10 +2,11 @@ import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { buildCandidateFeatureGpuBatchRequest, verifyCandidateFeatureGpuBatchRequest } from './candidate-feature-gpu-batch-request-v1.js';
 import { buildCandidateFeatureGpuResidencyLease } from './candidate-feature-gpu-residency-v1.js';
+import { CANDIDATE_SCALAR_FEATURES } from './candidate-feature-columnar-v1.js';
 
 const H = (value: string) => createHash('sha256').update(value).digest('hex');
 const R = 32;
-const F = 13;
+const F = CANDIDATE_SCALAR_FEATURES.length;
 
 function canonicalJson(value: unknown): string {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -26,7 +27,7 @@ function pack() {
     schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
     candidateSnapshotRevision: 'candidate:r1', ordinalMapChecksum: H('ordinal-map'), featureSnapshotChecksum: H('feature-snapshot'),
     workspaceRevision: 'workspace:r1', featureRevision: 'feature:r1', columnarChecksum: H('columnar'),
-    logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 13,
+    logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 12,
     featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility'] as const,
     featureValues: Array(R * F).fill(0), featurePresence: Array(R * F).fill(0),
     validMask: [1,1,1,...Array(R - 3).fill(0)], laneMaskU16: [1,3,5,...Array(R - 3).fill(0)], degradedIdentity: [0,0,1,...Array(R - 3).fill(0)],
@@ -43,10 +44,10 @@ function lease() {
     schema: 'atlas.candidate-feature-gpu-residency-observation.v1', leaseId: 'lease:batch:test:1', deviceId: 0, deviceName: 'test-cuda-device',
     sourceGpuPackChecksum: p.gpuPackChecksum, candidateSnapshotRevision: p.candidateSnapshotRevision, ordinalMapChecksum: p.ordinalMapChecksum,
     featureSnapshotChecksum: p.featureSnapshotChecksum, columnarChecksum: p.columnarChecksum, logicalRows: p.logicalRows, physicalRows: p.physicalRows,
-    featureCount: 13, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
+    featureCount: 12, hostStagingMode: 'PINNED_ASYNC', gpuExecutionObserved: true, ipcExported: false,
     buffers: [
-      { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,13], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
-      { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,13], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'feature_values', bufferId: 'gpu:values', dtype: 'f32', shape: [R,F], sourceChecksum: p.featureValuesChecksum, materializedChecksum: H('gpu-values'), deviceAllocationObserved: true, readbackVerified: true },
+      { role: 'feature_presence', bufferId: 'gpu:presence', dtype: 'u8', shape: [R,F], sourceChecksum: p.featurePresenceChecksum, materializedChecksum: H('gpu-presence'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'valid_mask', bufferId: 'gpu:valid', dtype: 'u8', shape: [R], sourceChecksum: p.validMaskChecksum, materializedChecksum: H('gpu-valid'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'lane_mask', bufferId: 'gpu:lane', dtype: 'i32', shape: [R], sourceChecksum: p.laneMaskChecksum, materializedChecksum: H('gpu-lane'), deviceAllocationObserved: true, readbackVerified: true },
       { role: 'degraded_identity', bufferId: 'gpu:degraded', dtype: 'u8', shape: [R], sourceChecksum: p.degradedIdentityChecksum, materializedChecksum: H('gpu-degraded'), deviceAllocationObserved: true, readbackVerified: true },
@@ -87,5 +88,20 @@ describe('CandidateFeature GPU batch request', () => {
     const request = buildCandidateFeatureGpuBatchRequest({ actionId: 'action:test:substitution', lease: l, candidateOrdinals: [0,2], topK: 2, now: new Date('2026-08-22T03:01:00.000Z'), producerRevision: 'gpu-batch:test:v1' });
     const tampered = { ...request, buffers: request.buffers.map((buffer, index) => index === 0 ? { ...buffer, bufferId: 'gpu:attacker' } : buffer) };
     expect(verifyCandidateFeatureGpuBatchRequest({ request: tampered, lease: l, now: new Date('2026-08-22T03:01:30.000Z') })).toEqual({ status: 'REJECTED', reason: 'GPU_BATCH_BUFFER_SUBSTITUTION:feature_values' });
+  });
+
+  it('allows repeated requests to reuse one exact lease and rejects a revision-substituted request', () => {
+    const l = lease();
+    const now = new Date('2026-08-22T03:01:00.000Z');
+    const first = buildCandidateFeatureGpuBatchRequest({ actionId: 'action:test:reuse:1', lease: l, candidateOrdinals: [0, 1], topK: 1, now, producerRevision: 'gpu-batch:test:v1' });
+    const second = buildCandidateFeatureGpuBatchRequest({ actionId: 'action:test:reuse:2', lease: l, candidateOrdinals: [2], topK: 1, now, producerRevision: 'gpu-batch:test:v1' });
+    expect(verifyCandidateFeatureGpuBatchRequest({ request: first, lease: l, now })).toEqual({ status: 'PROVEN', reason: null });
+    expect(verifyCandidateFeatureGpuBatchRequest({ request: second, lease: l, now })).toEqual({ status: 'PROVEN', reason: null });
+    expect(first.buffers.map((buffer) => buffer.bufferId)).toEqual(second.buffers.map((buffer) => buffer.bufferId));
+
+    const { requestChecksum: _old, ...requestBody } = first;
+    const substitutedBody = { ...requestBody, candidateSnapshotRevision: 'candidate:r2' };
+    const substituted = { ...substitutedBody, requestChecksum: H(canonicalJson(substitutedBody)) };
+    expect(verifyCandidateFeatureGpuBatchRequest({ request: substituted, lease: l, now })).toEqual({ status: 'REJECTED', reason: 'GPU_BATCH_REVISION_MISMATCH:candidateSnapshotRevision' });
   });
 });

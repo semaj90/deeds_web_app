@@ -3,12 +3,12 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e795a3`
+Registry checksum: `b76d0e29bf7787db7252f49c7e8d042ebf04a65ab15047af92a43fe123aad04c`
 
 ## Project instructions
 
-- [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `9fa42675dff7`
-- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `e8c5575fd1e7`
+- [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `c41250dfa671`
+- [claude.md](claude.md) — CANONICAL_CURRENT — `349d13d1ead0`
 - [llama-cpp-turboquant-gemma4/AGENTS.md](llama-cpp-turboquant-gemma4/AGENTS.md) — CANONICAL_CURRENT — `4e9830e84d20`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
@@ -38,12 +38,13 @@ Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e7
 - [parent-atlas-agentic-file-compiler](openspec/changes/parent-atlas-agentic-file-compiler) — 10/21 tasks (48%)
 - [parent-atlas-agentic-repair-bundle-integration](openspec/changes/parent-atlas-agentic-repair-bundle-integration) — 18/85 tasks (21%)
 - [parent-atlas-agentic-run-receipt-binding](openspec/changes/parent-atlas-agentic-run-receipt-binding) — 2/11 tasks (18%)
+- [parent-atlas-autoresearch-fabric](openspec/changes/parent-atlas-autoresearch-fabric) — 8/8 tasks (100%)
 - [parent-atlas-branch-merge-consolidation-aug20](openspec/changes/parent-atlas-branch-merge-consolidation-aug20) — 18/35 tasks (51%)
 - [parent-atlas-candidate-feature-execution-fabric](openspec/changes/parent-atlas-candidate-feature-execution-fabric) — 194/291 tasks (67%)
 - [parent-atlas-code-ingestion-pipeline](openspec/changes/parent-atlas-code-ingestion-pipeline) — 23/35 tasks (66%)
 - [parent-atlas-compiler-semantic-graph-resolution](openspec/changes/parent-atlas-compiler-semantic-graph-resolution) — 19/32 tasks (59%)
-- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 17/60 tasks (28%)
-- [parent-atlas-document-governance-master-index](openspec/changes/parent-atlas-document-governance-master-index) — 5/59 tasks (8%)
+- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 18/69 tasks (26%)
+- [parent-atlas-document-governance-master-index](openspec/changes/parent-atlas-document-governance-master-index) — 7/64 tasks (11%)
 - [parent-atlas-error-research-lane](openspec/changes/parent-atlas-error-research-lane) — 0/0 tasks (n/a)
 - [parent-atlas-governed-compute-fabric](openspec/changes/parent-atlas-governed-compute-fabric) — 0/155 tasks (0%)
 - [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 2/26 tasks (8%)
@@ -53,14 +54,14 @@ Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e7
 - [parent-atlas-graph-pagerank-okf-fanout-hardening](openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening) — 3/4 tasks (75%)
 - [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof) — 157/284 tasks (55%)
 - [parent-atlas-graph-runtime-enhancement](openspec/changes/parent-atlas-graph-runtime-enhancement) — 2/8 tasks (25%)
-- [parent-atlas-graph-runtime-python-consolidation](openspec/changes/parent-atlas-graph-runtime-python-consolidation) — 5/15 tasks (33%)
+- [parent-atlas-graph-runtime-python-consolidation](openspec/changes/parent-atlas-graph-runtime-python-consolidation) — 5/18 tasks (28%)
 - [parent-atlas-graph-validation-fabric](openspec/changes/parent-atlas-graph-validation-fabric) — 8/14 tasks (57%)
 - [parent-atlas-graphify-recovery-proof-ladder](openspec/changes/parent-atlas-graphify-recovery-proof-ladder) — 0/9 tasks (0%)
 - [parent-atlas-kv-cache-adaptation-research](openspec/changes/parent-atlas-kv-cache-adaptation-research) — 3/15 tasks (20%)
 - [parent-atlas-live-graph-proof](openspec/changes/parent-atlas-live-graph-proof) — 0/0 tasks (n/a)
 - [parent-atlas-memory-architecture-freeze](openspec/changes/parent-atlas-memory-architecture-freeze) — 14/23 tasks (61%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 14/62 tasks (23%)
-- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1150/1695 tasks (68%)
+- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1167/1719 tasks (68%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 24/53 tasks (45%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 16/26 tasks (62%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 20/36 tasks (56%)
@@ -70,12 +71,13 @@ Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e7
 - [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric) — 6/43 tasks (14%)
 - [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 22/40 tasks (55%)
 - [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier) — 41/98 tasks (42%)
+- [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix) — 34/41 tasks (83%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 32/48 tasks (67%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 42/94 tasks (45%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
 - [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 0/0 tasks (n/a)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 0/31 tasks (0%)
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 13/29 tasks (45%)
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 18/49 tasks (37%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 3/18 tasks (17%)
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 5/64 tasks (8%)
 - [parent-atlas-unified-symbol-ranking](openspec/changes/parent-atlas-unified-symbol-ranking) — 17/17 tasks (100%)
@@ -104,3 +106,10 @@ Registry checksum: `0983d155ccd22e8d32c98a3a03ffb5aa8cce036dc218d84b9c5a21a738e7
 - [Qdrant projection targets](reports/lineage-qdrant-projection-targets-v1.json) — QDRANT_PROJECTION_TARGETS_CENSUSED — same-collection duplicates 15, missing 0.
 - Rebuild safety warning: the existing Qdrant backfill tool reads canonical vectors but still requires packet/workspace lineage reconciliation before apply; it is not a promotion-ready blue/green rebuild.
 - Promotion note: Qdrant remains a rebuildable projection; duplicate ownership must be reconciled before cutover or deletion.
+
+## Neural decoder and GPU runtime separation
+
+- [Neural decoder separation](reports/neural-decoder-runtime-separation-v1.json) — PROVEN_LIVE_BOUNDED — host PyTorch 2.8.0+cu128 is reference-only; decoder 2.13.0+cu132 on http://127.0.0.1:8121 owns learned projection only.
+- Decoder contract: `semantic_768` → physical `latent_256` → derived `latent_128`/`latent_64`; `canonicalAuthority=false`, `textSynthesis=false`, and `writesPerformed=false`.
+- Ornith remains the synthesis/tool-use owner; PostgreSQL remains canonical storage/lineage authority; Qdrant and GPU residency remain rebuildable execution/projection layers.
+- Open GPU gates: FEAT-04 envelope, owner-process residency reuse, decoder replay, cuTile parity, CUDA SIMT parity, and RMM allocator evaluation.

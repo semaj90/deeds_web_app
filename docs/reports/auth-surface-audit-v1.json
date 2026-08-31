@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.auth-surface-audit.v1",
+  "generatedAt": "2026-08-31T21:25:26.067Z",
+  "timestampMethod": "AUDIT_EXECUTION_TIME",
+  "scope": "flagged-route-central-hook-reconciliation",
+  "counts": {
+    "flaggedRoutes": 5,
+    "centrallyProtected": 5,
+    "publicAllowlisted": 0,
+    "productionBypassGuardPresent": true
+  },
+  "routeStatus": [
+    {
+      "route": "/api/ai/emotion",
+      "routeExists": true,
+      "centralizedHookDecision": "AUTH_REQUIRED",
+      "localGuard": "NOT_REQUIRED_FOR_CENTRAL_HOOK_PROOF"
+    },
+    {
+      "route": "/api/batch-summary/jobs",
+      "routeExists": true,
+      "centralizedHookDecision": "AUTH_REQUIRED",
+      "localGuard": "NOT_REQUIRED_FOR_CENTRAL_HOOK_PROOF"
+    },
+    {
+      "route": "/api/retrieval/dual-lane",
+      "routeExists": true,
+      "centralizedHookDecision": "AUTH_REQUIRED",
+      "localGuard": "NOT_REQUIRED_FOR_CENTRAL_HOOK_PROOF"
+    },
+    {
+      "route": "/api/telemetry/implementation-clusters",
+      "routeExists": true,
+      "centralizedHookDecision": "AUTH_REQUIRED",
+      "localGuard": "NOT_REQUIRED_FOR_CENTRAL_HOOK_PROOF"
+    },
+    {
+      "route": "/api/phase102/retrieval-pipeline",
+      "routeExists": true,
+      "centralizedHookDecision": "AUTH_REQUIRED",
+      "localGuard": "NOT_REQUIRED_FOR_CENTRAL_HOOK_PROOF"
+    }
+  ],
+  "tRPC": {
+    "status": "DEEP_MIDDLEWARE_REVIEW_REQUIRED",
+    "reason": "Route-level static analysis cannot prove procedure middleware authorization."
+  },
+  "separateConcerns": [
+    "Zod validation is separate from authorization.",
+    "Rate limiting and bounded LLM inputs are separate from authorization.",
+    "Centralized hook protection does not prove resource-level authorization."
+  ],
+  "writesPerformed": false
+}

@@ -1616,6 +1616,37 @@ read-only PostgreSQL adapter implementation that reuses an existing Parent Atlas
 Until then, OAK health/kernel discovery is proven live, while lookup/search/traverse execution
 and deterministic ontology replay remain unproven.
 
+### OAK-PG-ADAPTER implementation — 2026-08-31
+
+`python/atlas_oak_kernel.py` now supports an explicit PostgreSQL locator in
+`ATLAS_OAK_ADAPTER` (`postgres://` or `postgresql://`) without routing ontology persistence
+through OAK's SQLite convenience adapters. The adapter uses existing PostgreSQL owners:
+
+- `atlas_ontology_concepts` for bounded label/alias lookup and lexical search;
+- `atlas_ontology_relations` for bounded ancestor/descendant traversal;
+- the existing Parent Atlas tuple tables remain available for the next grounded-evidence
+  extension and are not duplicated.
+
+Each PostgreSQL request uses a read-only transaction, a bounded statement timeout, parameterized
+queries, explicit traversal depth limits, and stable input/output checksums. Responses retain
+`canonicalAuthority:false`; no mutation method was added.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Adapter code | **WIRED** | `AtlasPostgresOntologyAdapter` selected only for explicit PostgreSQL locator |
+| Host syntax | **PROVEN_BOUNDED** | `python -m py_compile python/atlas_oak_kernel.py` |
+| Existing OaK tests | **PROVEN_BOUNDED** | `python -m pytest -q python/test_atlas_oak_kernel.py` → 2 passed |
+| Live PostgreSQL adapter request | **PENDING_IMAGE_REFRESH** | running container still uses the pre-adapter image |
+| Live lookup/search/traverse replay | **PENDING_IMAGE_REFRESH** | requires one controlled sidecar rebuild/restart after review |
+| Canonical writes | **FORBIDDEN** | adapter is read-only shadow only |
+
+Follow-up verification: the running container bind-mounts the repository's `python/` directory,
+so the adapter source is available without rebuilding the image. An ephemeral container replay
+using the mounted source and an explicit PostgreSQL locator did not complete within 90 seconds and
+was stopped. This is recorded as **BLOCKED_ON_CONTAINER_TO_POSTGRES_REACHABILITY**; it is not
+evidence that the adapter query or PostgreSQL schema is invalid. The host-side adapter syntax and
+contract tests remain green, and no writes occurred.
+
 ### PostgreSQL 18 OaK backend census — 2026-08-31
 
 Live read-only schema inspection confirms that PostgreSQL is the available durable OaK backend;
@@ -1637,3 +1668,71 @@ Current gate: **OAK-PG-ADAPTER-NEXT**. Implement or bind a read-only `AtlasOakPo
 against these existing owners, return typed revision-qualified results, and replay one lookup,
 one search, and one bounded traversal twice. Until that adapter exists, the live 8095 OAK
 health/kernel endpoints are proven but ontology data operations remain unproven.
+
+### OAK-PG-ADAPTER live convergence update — 2026-08-31
+
+The sidecar was attached to the external `deeds-web-app_legal-ai-network` so it can reach the
+existing PostgreSQL 18 container. The source-only `/app/python` bind mount was verified in an
+ephemeral container and the previously reported `find_occurrence_positions` import error did not
+reproduce once the mount was visible. The sidecar is healthy after restart.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| PostgreSQL network attachment | **PROVEN_LIVE** | container has `deeds-web-app_legal-ai-network` plus its default network |
+| Mounted OaK source import | **PROVEN_BOUNDED** | `atlas_structural_provenance.find_occurrence_positions` imports from `/app/python` |
+| OaK adapter configuration | **PROVEN_LIVE** | `/oak/health` reports `adapterConfigured:true`, `adapterType:postgresql` |
+| Read-only lexical request | **PROVEN_LIVE** | `/oak/search` completed with bounded `limit=3`; current concept table returned zero matches |
+| Deterministic replay | **PROVEN_BOUNDED** | two identical `/oak/search` requests returned the same output checksum `5c0ec8292fe8f32e71d655baf1cb04e2d3e10cb6b16984d24b463c63b4627eda` |
+| Existing ontology data | **EMPTY_LIVE_OWNER** | `atlas_ontology_concepts`, `atlas_ontology_relations`, `atlas_ontology_tuples`, and `atlas_ontology_linked_tuples` each currently contain 0 rows |
+| Lookup/traversal positive-data proof | **BLOCKED_ON_EMPTY_DATA** | no canonical ontology rows are available for a positive lookup or relation traversal |
+| Canonical writes | **FORBIDDEN** | no inserts, migrations, projections, or ontology downloads performed |
+
+The adapter is now live and reachable, but the empty existing ontology owners mean this proves
+the bounded no-result path and replay determinism, not positive ontology semantics. Do not seed
+ontology rows as part of this integration. The next gate is an operator-authorized, separately
+audited ontology population/readback or a fixture-only adapter test; production promotion remains
+blocked while the durable ontology owner is empty.
+
+### OAK-PG-ADAPTER endpoint replay — 2026-08-31
+
+The configured sidecar also completed the remaining bounded no-result operations against the live
+PostgreSQL adapter:
+
+| Operation | Status | Evidence |
+|---|---|---|
+| `/oak/lookup` | **PROVEN_LIVE_EMPTY** | nonexistent entity returned `label:null` and a stable output checksum |
+| `/oak/traverse` | **PROVEN_LIVE_EMPTY** | bounded ancestor traversal (`limit=3`, `max_depth=2`) returned zero rows and a stable output checksum |
+| Mutation surface | **PROVEN_FORBIDDEN** | no mutation endpoint exists in the router; live write count remains zero |
+| Positive ontology semantics | **NOT_PROVEN** | all four existing ontology owners remain empty |
+
+The live adapter gate is therefore complete for connectivity, configuration, bounded empty-result
+behavior, and replay determinism. It is not complete for positive lookup/search/traversal until
+canonical ontology data exists or an isolated fixture is explicitly approved.
+
+### OAK-PG-ADAPTER fixture validation — 2026-08-31
+
+Added isolated adapter tests using a mocked query boundary. The fixture proves positive label and
+alias lookup, bounded lexical search, ancestor traversal parameter binding, mutation-free SQL
+intent, and request-level depth/limit rejection. It does not contact or mutate PostgreSQL.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Positive adapter lookup/search/traversal fixture | **PROVEN_BOUNDED** | `python/test_atlas_oak_kernel.py` |
+| Bounds validation | **PROVEN_BOUNDED** | invalid `max_depth=5` and `limit=101` rejected by Pydantic |
+| Read-only SQL intent | **PROVEN_BOUNDED** | fixture rejects INSERT/UPDATE/DELETE statements |
+| Focused test suite | **PROVEN_BOUNDED** | `4 passed` |
+| Live positive ontology semantics | **OPEN** | requires separately authorized populated data |
+
+### OAK governance validation — 2026-08-31
+
+Repository-wide governance validation was run after the adapter fixture update. The Master TOC
+replay passed and the OpenSpec workboard regenerated successfully. The broader document-governance
+validator remains blocked by 56 incomplete task ledgers across unrelated changes; those findings
+must not be reclassified as OaK implementation failures.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| Master TOC replay | **PROVEN_BOUNDED** | `npm run atlas:docs:toc:check` |
+| OpenSpec workboard regeneration | **PROVEN_BOUNDED** | 58 changes, 4,228 tasks, 1,924 open |
+| Repository document governance | **BLOCKED_EXTERNAL_LEDGER** | `document-governance-validation-v1.json`, 56 `UNCHECKED_TASKS` findings |
+| OaK change closure | **OPEN** | positive live ontology semantics and broader governance closure remain pending |

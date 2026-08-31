@@ -22,11 +22,13 @@ import { existsSync, createReadStream } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import readline from 'readline';
+import { pathToFileURL } from 'node:url';
 import { loadRepoEnv, resolveRedisUrl } from '../atlas/connection-config.mjs';
 
 const ROOT    = process.cwd();
 const TMP_DIR = path.join(ROOT, '.tmp');
 const DRY_RUN = process.argv.includes('--dry-run');
+const REPLAY = process.argv.includes('--replay');
 
 const intentArg = process.argv
   .slice(2)
@@ -78,7 +80,9 @@ async function loadRedis() {
   ];
   for (const p of candidates) {
     if (existsSync(p)) {
-      const { default: Redis } = await import(p + '/built/index.js').catch(() => import(p));
+      const moduleUrl = pathToFileURL(p + '/built/index.js').href;
+      const packageUrl = pathToFileURL(p).href;
+      const { default: Redis } = await import(moduleUrl).catch(() => import(packageUrl));
       const redis = new Redis(redisUrl, {
         lazyConnect: true,
         maxRetriesPerRequest: 1,
@@ -185,6 +189,25 @@ ${toolSection}
 7. Keep responses concise; use bullet lists for action items.`;
 }
 
+function stablePromptProjection(result) {
+  return {
+    intentHash: result.intentHash,
+    intent: result.intent,
+    domain: result.domain,
+    systemPrompt: result.systemPrompt,
+    tools: result.tools,
+    contextChunks: result.contextChunks,
+    sourceRefs: result.sourceRefs,
+    ttlSecs: result.ttlSecs,
+  };
+}
+
+function promptChecksum(result) {
+  return crypto.createHash('sha256')
+    .update(JSON.stringify(stablePromptProjection(result)))
+    .digest('hex');
+}
+
 async function main() {
   console.log('\n── Prompt Generator (Phase 11H) ──────────────────────────');
   console.log(`  intent   : "${intentArg}"`);
@@ -238,6 +261,28 @@ async function main() {
     ttlSecs,
     generatedAt:   new Date().toISOString(),
   };
+
+  if (REPLAY) {
+    const first = stablePromptProjection(result);
+    const second = stablePromptProjection({ ...result, generatedAt: new Date(Date.now() + 1000).toISOString() });
+    const firstChecksum = promptChecksum(result);
+    const secondChecksum = promptChecksum({ ...result, generatedAt: new Date(Date.now() + 1000).toISOString() });
+    const replay = {
+      schema: 'atlas.prompt-selection-replay.v1',
+      intentHash: ih,
+      runs: 2,
+      identicalProjection: JSON.stringify(first) === JSON.stringify(second),
+      identicalChecksum: firstChecksum === secondChecksum,
+      firstChecksum,
+      secondChecksum,
+      sourceRefs: result.sourceRefs,
+      contextChunks: result.contextChunks,
+      writesPerformed: false,
+    };
+    console.log(JSON.stringify(replay, null, 2));
+    if (redis) redis.disconnect();
+    process.exit(replay.identicalProjection && replay.identicalChecksum ? 0 : 1);
+  }
 
   if (DRY_RUN) {
     console.log(`\n  dry-run: would SET prompt:${ih} TTL ${ttlSecs}s`);

@@ -29,6 +29,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", help="Optional proof receipt JSON path")
     parser.add_argument("--device", type=int, default=0)
     parser.add_argument("--ttl-seconds", type=float, default=60.0)
+    parser.add_argument("--repeat", type=int, default=2, help="Number of same-process resident lease reuses to prove")
     parser.add_argument("--pageable", action="store_true", help="Use synchronous pageable staging instead of pinned async staging")
     return parser.parse_args()
 
@@ -79,6 +80,30 @@ def main() -> int:
     )
     gathered = executor.gather(lease_id, selected)
 
+    reuse_observations = []
+    reuse_results = []
+    memory_before_reuse = executor.cuda_memory_stats()
+    def gather_content(value: dict[str, Any]) -> dict[str, Any]:
+        return {key: item for key, item in value.items() if key not in {"leaseId", "gatherChecksum"}}
+    if args.repeat < 1:
+        raise ValueError("GPU_RESIDENCY_REPEAT_MUST_BE_POSITIVE")
+    for index in range(args.repeat):
+        reuse_lease_id = f"{lease_id}:reuse:{index + 1}"
+        reuse_observation = executor.reuse_materialized(lease_id, lease_id=reuse_lease_id, ttl_seconds=args.ttl_seconds)
+        reuse_gathered = executor.gather(reuse_lease_id, selected)
+        if gather_content(reuse_gathered) != gather_content(gathered):
+            raise ValueError(f"GPU_RESIDENCY_REUSE_GATHER_MISMATCH:{index + 1}")
+        reuse_observations.append(reuse_observation)
+        reuse_results.append({
+            "leaseId": reuse_lease_id,
+            "sourceLeaseId": lease_id,
+            "sourceGpuPackChecksum": reuse_observation["sourceGpuPackChecksum"],
+            "gatherChecksum": reuse_gathered["gatherChecksum"],
+            "contentParity": True,
+            "sharedTensorObject": executor.same_resident_tensors(lease_id, reuse_lease_id),
+            "h2dTransfer": False,
+        })
+
     expected_values = [float(value) for value in gather_reference.get("featureValues", [])]
     expected_presence = [int(value) for value in gather_reference.get("featurePresence", [])]
     expected_lane = [int(value) for value in gather_reference.get("laneMaskU16", [])]
@@ -100,6 +125,8 @@ def main() -> int:
         raise ValueError(f"GPU_RESIDENCY_GATHER_PARITY_FAILED:{parity}")
 
     release = executor.release(lease_id)
+    reuse_releases = [executor.release(item["leaseId"]) for item in reuse_results]
+    memory_after_release = executor.cuda_memory_stats()
     post_release_active = executor.has_active_lease(lease_id)
     post_release_access_blocked = False
     try:
@@ -121,6 +148,20 @@ def main() -> int:
         "observation": observation,
         "gather": gathered,
         "release": release,
+        "residentReuse": {
+            "requested": args.repeat,
+            "completed": len(reuse_results),
+            "h2dTransfers": 1,
+            "reuseH2dTransfers": 0,
+            "observations": reuse_observations,
+            "results": reuse_results,
+            "releases": reuse_releases,
+            "sameProcess": True,
+            "sameResidentTensorObjects": all(item["sharedTensorObject"] for item in reuse_results),
+            "memoryBeforeReuse": memory_before_reuse,
+            "memoryAfterRelease": memory_after_release,
+            "rawPointersExposed": False,
+        },
         "postReleaseAccessBlocked": post_release_access_blocked,
         "storeWrites": False,
         **parity,

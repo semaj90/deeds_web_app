@@ -72,6 +72,13 @@ const candidates = [
     // Governance outputs are projections and must not feed their own input
     // registry or make replay checksums depend on audit execution time.
     if (/^docs\/reports\/document-(governance|supersession)-/.test(path)) return false;
+    if (path === 'docs/reports/document-governance-validation-v1.json'
+      || path === 'docs/reports/graphify-daily-workflow-receipt.json'
+      || path === 'docs/reports/openspec-workboard-v1.json') return false;
+    // Workboard outputs contain generatedAt and are projections of the same
+    // OpenSpec task files already represented above. Including them would make
+    // a TOC replay checksum change whenever the workboard is regenerated.
+    if (path === 'docs/OPENSPEC-WORKBOARD.md' || path === 'docs/reports/openspec-workboard-v1.json') return false;
     return true;
   })
   .sort();
@@ -112,6 +119,7 @@ const openSpecs = records.filter((r) => r.kind === 'OPENSPEC' && r.path.endsWith
 const qdrantIdentity = readJson('docs/reports/lineage-qdrant-semantic-canary-v1.json');
 const qdrantTargets = readJson('docs/reports/lineage-qdrant-projection-targets-v1.json');
 const latentParity = readJson('docs/reports/latent256-ann-exact-parity-bounded-v2.json');
+const neuralDecoderSeparation = readJson('docs/reports/neural-decoder-runtime-separation-v1.json');
 const toc = [
   '# Parent Atlas Master TOC',
   '',
@@ -148,6 +156,13 @@ const toc = [
   `- [Qdrant projection targets](reports/lineage-qdrant-projection-targets-v1.json) — ${qdrantTargets?.status ?? 'NOT_FOUND'} — ${qdrantTargets ? `same-collection duplicates ${qdrantTargets.counts?.duplicateSameCollection ?? 'n/a'}, missing ${qdrantTargets.counts?.noTarget ?? 'n/a'}` : 'not available'}.`,
   '- Rebuild safety warning: the existing Qdrant backfill tool reads canonical vectors but still requires packet/workspace lineage reconciliation before apply; it is not a promotion-ready blue/green rebuild.',
   '- Promotion note: Qdrant remains a rebuildable projection; duplicate ownership must be reconciled before cutover or deletion.',
+  '',
+  '## Neural decoder and GPU runtime separation',
+  '',
+  `- [Neural decoder separation](reports/neural-decoder-runtime-separation-v1.json) — ${neuralDecoderSeparation?.status ?? 'NOT_FOUND'} — host PyTorch ${neuralDecoderSeparation?.separation?.hostReference?.torchVersion ?? 'n/a'} is reference-only; decoder ${neuralDecoderSeparation?.separation?.decoderService?.torchVersion ?? 'n/a'} on ${neuralDecoderSeparation?.separation?.decoderService?.url ?? 'n/a'} owns learned projection only.`,
+  '- Decoder contract: `semantic_768` → physical `latent_256` → derived `latent_128`/`latent_64`; `canonicalAuthority=false`, `textSynthesis=false`, and `writesPerformed=false`.',
+  '- Ornith remains the synthesis/tool-use owner; PostgreSQL remains canonical storage/lineage authority; Qdrant and GPU residency remain rebuildable execution/projection layers.',
+  '- Open GPU gates: FEAT-04 envelope, owner-process residency reuse, decoder replay, cuTile parity, CUDA SIMT parity, and RMM allocator evaluation.',
   '',
 ].join('\n');
 

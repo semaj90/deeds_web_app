@@ -3,28 +3,13 @@
 # remain the synthesis owner. See:
 # openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
 #
-# Pinned to PyTorch 2.13.0 / CUDA 13.2. NOT the earlier torch 2.8.0+cu128
-# seen in this repo's live host-process proof -- that combo is deprecated
-# and removed from PyTorch's own build matrix as of PyTorch 2.12 CI
-# (week of 2026-04-06, see
-# https://dev-discuss.pytorch.org/t/introducing-cuda-13-2-and-deprecating-cuda-12-8-release-2-12/3337).
-#
-# CUDA 13.2 vs 13.0: per PyTorch's own dev-discuss announcement, 13.0 is the
-# "stable" tier for PyTorch's *pip wheel* distribution and 13.2 is still
-# experimental there (nightly-only wheels). But this Docker Hub image is a
-# prebuilt release-version image the pytorch/pytorch maintainers publish
-# independently of the pip wheel channel, and this service has no
-# cuTile/Triton/custom-kernel code path (verified: only imports numpy/torch/
-# torch.nn/torch.nn.functional, plain nn.Linear layers through cuBLAS/cuDNN)
-# -- so the CUDA 13.0-vs-13.2 choice is not load-bearing for correctness here
-# either way. Chose 13.2 for forward-compat: it's the CUDA toolkit version
-# where cuTile went stable on Ampere/compute-capability-8.x (this host's RTX
-# 3060 Ti is 8.6), in case a future custom-kernel pass is added to this
-# service. Verified this specific image tag builds and the service starts
-# and answers /health correctly under it before committing to it (see
-# tasks.md DECODER-CONTAINER-01 entry) -- not assumed from the tag name
-# alone. Pinned by digest, not just tag, so a tag repush can't silently
-# change what gets built.
+# Pinned stable release image: PyTorch 2.13.0 / CUDA 13.2 / cuDNN 9. The
+# host's torch 2.8.0+cu128 environment is a separate reference/fixture scope;
+# it is not this service's dependency. This runtime image is intentionally
+# small and uses ordinary PyTorch/ATen operators for the decoder. cuTile,
+# CUDA SIMT, Triton, and RAPIDS remain separate challenger/provider scopes.
+# Verified by building this exact digest and reading back the live service
+# health/encode proof; pinned by digest so a tag repush cannot change it.
 FROM pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime@sha256:d0a2f5993da1a5646d77a95d4185d3d9fc79e95dcbc960daf245a18c7d6b6411
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

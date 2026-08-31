@@ -166,6 +166,16 @@ export function verifyCandidateFeatureGpuBatchRequest(input: {
   if (request.deviceId !== lease.deviceId) {
     return { status: 'REJECTED', reason: 'GPU_BATCH_DEVICE_MISMATCH' };
   }
+  const revisionPairs: Array<[string, string, string]> = [
+    ['candidateSnapshotRevision', request.candidateSnapshotRevision, lease.candidateSnapshotRevision],
+    ['ordinalMapChecksum', request.ordinalMapChecksum, lease.ordinalMapChecksum],
+    ['featureSnapshotChecksum', request.featureSnapshotChecksum, lease.featureSnapshotChecksum],
+    ['workspaceRevision', request.workspaceRevision, lease.workspaceRevision],
+    ['featureRevision', request.featureRevision, lease.featureRevision],
+  ];
+  for (const [field, actual, expected] of revisionPairs) {
+    if (actual !== expected) return { status: 'REJECTED', reason: `GPU_BATCH_REVISION_MISMATCH:${field}` };
+  }
   if (request.candidateOrdinals.some((ordinal) => ordinal >= lease.logicalRows)) {
     return { status: 'REJECTED', reason: 'GPU_BATCH_CANDIDATE_ORDINAL_OUT_OF_RANGE' };
   }

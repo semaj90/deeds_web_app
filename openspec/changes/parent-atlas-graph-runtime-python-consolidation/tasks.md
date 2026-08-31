@@ -169,3 +169,19 @@ zero-caller claim with a fresh grep (repo state moves).
   pattern this package mirrors on the Python/RAPIDS side.
 - Root `CLAUDE.md`, "Duplication Prevention" section — the Aug 9 2026 "5 competing PageRank
   implementations" finding this proposal's audit extends to the Python cluster.
+
+## GPU expansion dependency crosswalk (2026-08-31)
+
+The tensor-residency expansion workboard tracks shared dependencies without
+moving graph ownership here. This graph runtime owns only the graph side:
+
+- [ ] **GPU-EXP-14** GraphProjectionArtifactV1 with explicit `GraphOrdinal`,
+  graph revision, vertex checksum, edge checksum, and ordinal-map checksum.
+- [ ] **GPU-EXP-15** bounded multi-hop traversal with predecessor/path receipt;
+  depth policy is 2 normally, 3 expanded, 4 hard maximum.
+- [ ] **GPU-EXP-16** NetworkX oracle → cuGraph executor parity, including any
+  internal renumbering translation and deterministic replay.
+
+GPU cache, HNSW, QLoRA, and 4D coordinate tasks remain owned by their existing
+OpenSpecs. A graph result is derived evidence and cannot become CandidateOrdinal,
+canonical identity, or an additional retrieval vote.

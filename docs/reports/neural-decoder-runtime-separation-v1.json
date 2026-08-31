@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.neural-decoder-runtime-separation.v1",
+  "status": "PROVEN_LIVE_BOUNDED",
+  "observedAt": "2026-08-31",
+  "separation": {
+    "hostReference": {
+      "torchVersion": "2.8.0+cu128",
+      "cudaBuild": "12.8",
+      "cudaAvailable": true,
+      "role": "REFERENCE_FIXTURE_ENVIRONMENT"
+    },
+    "decoderService": {
+      "container": "atlas-neural-decoder",
+      "image": "atlas-neural-decoder:torch2.13.0-cu132",
+      "url": "http://127.0.0.1:8121",
+      "torchVersion": "2.13.0+cu132",
+      "device": "cuda",
+      "inputRepresentation": "semantic_768",
+      "physicalRepresentation": "latent_256",
+      "derivedRepresentations": ["latent_128", "latent_64"],
+      "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "checkpointSha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb6165",
+      "canonicalAuthority": false,
+      "textSynthesis": false,
+      "writesPerformed": false
+    },
+    "synthesisOwner": "ornith-1.5-9b",
+    "canonicalStorageOwner": "postgresql",
+    "projectionOwner": "qdrant"
+  },
+  "gates": {
+    "healthAndCheckpointLineage": "PROVEN_LIVE",
+    "decoderRequestReplay": "OPEN",
+    "feat04InputEnvelope": "BLOCKED_MISSING_INPUT",
+    "gpuResidencyReuse": "NOT_PROVEN",
+    "rmm": "NOT_PROVEN_NOT_INSTALLED",
+    "cutile": "NOT_PROVEN",
+    "cudaSimt": "NOT_PROVEN"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "NEURAL-REQUEST-REPLAY-01",
+  "reportBasis": "live health probe and container readiness evidence"
+}

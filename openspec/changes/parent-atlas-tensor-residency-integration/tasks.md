@@ -705,3 +705,146 @@ Stop rather than promote if any of the following is unresolved:
 - duplicate semantic vote;
 - GPU memory pressure without deterministic demotion;
 - n-ary event order confused with DAG execution order.
+
+## GPU CACHE / TILING / OFFLOAD / TOPOLOGY EXPANSION (2026-08-31)
+
+This ordered workboard is a coordination layer across existing owners. It does
+not create a second cache, graph, retrieval, or model authority. All items are
+read-only or contract-first until their stated proof exists.
+
+- [ ] **GPU-EXP-01** Freeze `AtlasNumericArtifactV1` with artifact kind/revision,
+  logical shape, dtype/layout, payload checksum, and `CandidateOrdinalMap` or
+  `GraphOrdinal` checksum.
+- [x] **GPU-EXP-02** Freeze `GpuArtifactKeyV1`; prohibit `latest` keys and bind
+  representation/graph/feature revisions plus device and materialization policy.
+- [ ] **GPU-EXP-03** Define CPU/RAM/WARM staging over Arrow or mmap artifacts;
+  preserve PostgreSQL/Qdrant as source/projection owners.
+- [ ] **GPU-EXP-04** Define NVMe/SSD COLD staging with checksum readback and
+  deterministic rematerialization; no implicit deletion or archive promotion.
+- [x] **GPU-EXP-05** Prove host-to-device materialization using the existing
+  PyTorch path and emit a residency receipt; no RMM dependency yet.
+- [x] **GPU-EXP-06** Add deterministic HOT/WARM/COLD eviction and revision-change
+  invalidation; stale buffers must become evictable, never silently reused.
+- [x] **GPU-EXP-07** Generate a valid FEAT-04 pack/gather envelope containing
+  values, presence, valid mask, lane metadata, and source checksums. The
+  read-only compiler is `scripts/atlas/build-feat04-envelope-v1.mts`; a real
+  15-row snapshot produced the envelope on 2026-08-31.
+- [x] **GPU-EXP-08** Run PyTorch CPU↔CUDA gather/normalize/mask/top-K parity on
+  the FEAT-04 envelope; record ordinals and output checksums.
+- [ ] **GPU-EXP-09** Characterize cuTile as a pure-kernel challenger against the
+  PyTorch reference; no mixed cuTile/SIMT kernel and no canonical writes.
+- [ ] **GPU-EXP-10** Characterize a CUDA SIMT implementation against the same
+  reference and artifact key; require bounded error and deterministic replay.
+- [ ] **GPU-EXP-11** Evaluate RMM as an allocator provider only, recording its
+  version/API revision; absence of RMM must not block PyTorch residency.
+- [ ] **GPU-EXP-12** Prove one H2D transfer followed by repeated resident reuse,
+  with eviction under measured VRAM pressure and no pointer leakage.
+- [ ] **GPU-EXP-13** Reconcile semantic HNSW/pgvector/Qdrant executors against
+  one CandidateOrdinal universe; HNSW remains an ANN executor, not a new lane.
+- [ ] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`
+  with vertex/edge checksums and an explicit `GraphOrdinal` mapping.
+- [ ] **GPU-EXP-15** Prove bounded multi-hop traversal on the frozen graph;
+  default depth <=2, expansion <=3, hard maximum <=4, with predecessors/paths.
+- [ ] **GPU-EXP-16** Run NetworkX CPU graph parity first, then cuGraph parity;
+  internal renumbering must not escape the projection adapter.
+- [ ] **GPU-EXP-17** Define `TopologyCoordinate4V1` only as derived metadata,
+  bound to graph/projection/ordinal revisions; it cannot mint identity or votes.
+- [ ] **GPU-EXP-18** Evaluate 4D manifold/SOM expansions against held-out graph
+  tasks; preserve structural features separately from retrieval identity.
+- [ ] **GPU-EXP-19** Keep QLoRA/GEPA as offline challengers with immutable base,
+  adapter, dataset, evaluation, and rollback receipts; no live self-modification.
+- [ ] **GPU-EXP-20** Emit a final cross-lane promotion receipt only when cache,
+  HNSW, graph traversal, topology, and QLoRA evidence pass independently.
+
+### Ownership and dependency crosswalk
+
+```text
+GPU-EXP-01..12  -> this tensor-residency change + candidate-feature FEAT-04
+GPU-EXP-13      -> semantic/retrieval owner; SearchRuntime remains fusion owner
+GPU-EXP-14..16  -> parent-atlas-graph-runtime-python-consolidation
+GPU-EXP-17..18  -> parent-atlas-topology-representation-admission
+GPU-EXP-19      -> atlas-feature-intelligence / DSPy-GEPA evaluation owners
+GPU-EXP-20      -> promotion governance; never an automatic mutation trigger
+```
+
+The live decoder proof (`atlas-neural-decoder:torch2.13.0-cu132`, `:8121`)
+closes neither GPU-EXP-05 nor GPU-EXP-12 by itself: it proves checkpoint
+availability and learned projection health, not feature-envelope residency or
+cache reuse. Ornith remains synthesis-only and is not part of this numerical
+executor track.
+
+### GPU-KERNEL-LAB-01 readiness correction (2026-08-31)
+
+The repository currently has no dedicated cuTile/SIMT kernel-lab image. The
+existing `atlas-gpu-8098` service is a separate RAPIDS CUDA 12 graph/vector
+executor and is not a substitute for the planned CUDA 13.2 devel lab. Keep
+`GPU-KERNEL-LAB-01` open until a separate, explicitly named lab is created and
+its PyTorch-reference parity receipt is available. Do not add cuTile or a
+custom SIMT compiler toolchain to `atlas-neural-decoder`.
+
+The available 15-row lineage map has a valid ordinal-map checksum but zero
+semantic revision coverage (`semanticRevision: null` on its candidates). It
+cannot seed a semantic feature snapshot. The readiness report records this as
+`ORDINAL_MAP_SEMANTIC_REVISION_MISSING`; the next producer must join exact
+`semantic_768` rows and their representation revisions before FEAT-04 can run.
+
+### GPU-EXP-07 input readiness audit (2026-08-31)
+
+The available `docs/reports/current-candidate-feature-matrix-manifest-v1.json`
+is a 15-candidate, 25-feature graph A/B replay manifest. It is not a
+`CandidateFeatureSnapshotV1` and cannot be used as FEAT-04 input because the
+production GPU layout is 12 columns. Do not truncate, reorder, or reinterpret
+those 25 columns. Readiness is recorded as `BLOCKED_ABI_MISMATCH` in
+`docs/reports/gpu-feat04-input-readiness-v1.json`; the next valid input must be
+a bounded 12-column snapshot compiled through the existing materializers.
+
+The existing `docs/reports/candidate-feature-gpu-parity-5k-v1.json` does have
+the correct 12-column parity receipt, but it is a flattened result and lacks
+the `pack` and `gather` objects required by the residency executor. It is
+therefore parity evidence, not a residency input. The envelope builder must
+receive the original validated snapshot, not reconstruct one from a receipt.
+
+### GPU-EXP-05/07/08 bounded proof (2026-08-31)
+
+The exact semantic cohort report supplied 15 candidates with exact chunk rows,
+768-dimensional vectors, producer metadata, and qualified source/workspace
+revisions. A read-only exporter produced `.tmp/atlas/semantic-768-cohort-v1.ndjson`;
+the existing feature materializer produced a validated 12-column snapshot and
+columnar artifact. `build-feat04-envelope-v1.mts` then produced a 15-row logical,
+32-row padded FEAT-04 envelope. The live Python proof passed on the RTX 3060 Ti:
+GPU execution was observed, ordinal/feature/presence/lane-mask/degraded-identity
+parity all passed, device readback matched source checksums, and post-release
+access was blocked. Receipt: `docs/reports/candidate-feature-gpu-residency-proof-v1.json`.
+This is bounded executor/residency proof only; repeated reuse, cuTile, SIMT, RMM,
+HNSW parity, graph GPU parity, and production promotion remain open.
+
+The batch-request contract now proves request-level reuse of one exact active
+lease and rejects independently checksum-valid requests whose candidate,
+ordinal-map, feature-snapshot, workspace, or feature revision differs from the
+lease. This is an integrity prerequisite for GPU-EXP-12, not proof of a
+persistent CUDA cache hit; runtime resident reuse and measured eviction remain
+open.
+
+The live CUDA proof now includes two same-process resident lease reuses over
+the exact FEAT-04 tensors: one initial H2D transfer, zero reuse H2D transfers,
+identical gathered content, shared resident tensor objects, and clean release.
+Receipt: `docs/reports/candidate-feature-gpu-residency-proof-v2.json`.
+GPU-EXP-12 remains open for measured VRAM-pressure eviction and pointer-leakage
+evidence.
+
+The v3 replay now derives the shared-tensor result from executor object identity
+and records aggregate CUDA allocation/reservation telemetry only. It reports
+`rawPointersExposed: false`, `sameResidentTensorObjects: true`, and post-release
+allocated bytes at zero while the CUDA allocator reservation remains observable.
+This strengthens the reuse proof without treating allocator reservation as
+eviction; explicit pressure/eviction testing remains open.
+
+### GPU cache contract proof (2026-08-31)
+
+`gpu-residency-cache-v1.ts` now owns the in-process contract-level cache. Its
+revision-qualified `GpuArtifactKeyV1` rejects movable `latest` identifiers,
+reuses exact entries, invalidates entries bound to a changed revision, and
+evicts least-recently-used entries deterministically under a byte budget.
+Focused cache tests pass 3/3. This closes the key/eviction contract gates only;
+the cache is not wired into the Python CUDA process, so GPU-EXP-12 still needs
+measured H2D-once/repeated-kernel reuse and VRAM-pressure evidence.
