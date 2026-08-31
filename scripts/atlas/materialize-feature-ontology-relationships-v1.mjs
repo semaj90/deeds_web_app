@@ -19,7 +19,17 @@ import { resolveCanonicalSourceBinding } from './lib/canonical-source-binding-v1
 const apply = process.argv.includes('--apply');
 const limitArg = process.argv.find((value) => value.startsWith('--limit='));
 const limit = Math.max(1, Math.min(Number(limitArg?.slice(8) ?? 603), 5000));
-const reportPath = path.resolve(REPO_ROOT, 'docs/reports/feature-ontology-relationship-materialization-v1.json');
+const argValue = (name, fallback) => {
+  const prefix = `--${name}=`;
+  const arg = process.argv.find((value) => value.startsWith(prefix));
+  return path.resolve(REPO_ROOT, arg ? arg.slice(prefix.length) : fallback);
+};
+const reportPath = argValue(
+  'report',
+  apply
+    ? 'docs/reports/feature-ontology-relationship-materialization-apply-v1.json'
+    : 'docs/reports/feature-ontology-relationship-materialization-readonly-v1.json',
+);
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
   max: 2,
@@ -27,9 +37,18 @@ const pool = new pg.Pool({
   query_timeout: 30000,
 });
 
-const observationPath = path.resolve(REPO_ROOT, 'docs/reports/workspace-source-binding-observation.json');
-const aliasApprovalPath = path.resolve(REPO_ROOT, 'docs/reports/feature-ontology-explicit-alias-approval-v1.json');
-const relationshipApplyPlanPath = path.resolve(REPO_ROOT, 'docs/reports/current-feature-ontology-relationship-apply-plan-v1.json');
+const observationPath = argValue(
+  'binding-observation',
+  'docs/reports/workspace-source-binding-observation.json',
+);
+const aliasApprovalPath = argValue(
+  'alias-approval',
+  'docs/reports/feature-ontology-explicit-alias-approval-v1.json',
+);
+const relationshipApplyPlanPath = argValue(
+  'apply-plan',
+  'docs/reports/current-feature-ontology-relationship-apply-plan-v1.json',
+);
 const readJson = (file) => fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
 
 if (apply) {
@@ -40,8 +59,14 @@ if (apply) {
   if (plan?.status !== 'CURRENT_RELATIONSHIP_APPLY_PLAN_READY_FOR_EXPLICIT_AUTHORIZATION' || plan.relationshipCount !== 8) throw new Error('RELATIONSHIP_APPLY_PLAN_NOT_FROZEN_OR_EXPECTED');
 }
 
+let snapshotClient = null;
 try {
-  const result = await pool.query(
+  if (!apply) {
+    snapshotClient = await pool.connect();
+    await snapshotClient.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  }
+  const readDb = snapshotClient ?? pool;
+  const result = await readDb.query(
     `SELECT t.id, t.packet_key, t.source_ref, t.feature_key, t.subject_type, t.subject_id,
             t.predicate, t.object_type, t.object_id, t.confidence, t.ontology_version,
             t.extractor_version, t.evidence, p.feature_id, p.feature_label, p.domain_class,
@@ -63,14 +88,21 @@ try {
   const observation = readJson(observationPath);
   const currentWorkspaceRevision = observation?.record?.workspaceRevision ?? observation?.workspaceRevision ?? null;
   const approvedAliases = buildApprovedAliasMap(readJson(aliasApprovalPath)?.approvedPairs ?? []);
-  const graphify = await pool.query(
+  const graphify = await readDb.query(
     `SELECT source_ref, workspace_revision, code_source_revision, source_revision, content_hash,
-            ARRAY['docs/reports/workspace-source-binding-observation.json']::text[] AS evidence_refs
+            ARRAY[$2]::text[] AS evidence_refs
        FROM public.graphify_files
       WHERE workspace_revision = $1
       ORDER BY source_ref, code_source_revision NULLS LAST, content_hash NULLS LAST`,
-    [currentWorkspaceRevision],
+    [currentWorkspaceRevision, path.relative(REPO_ROOT, observationPath).replaceAll('\\', '/')],
   );
+
+  if (snapshotClient) {
+    await snapshotClient.query('COMMIT');
+    snapshotClient.release();
+    snapshotClient = null;
+  }
+
   const bindingResults = result.rows.map((row) => resolveCanonicalSourceBinding({
     packetSourceRef: row.source_ref,
     currentWorkspaceRevision,
@@ -120,36 +152,42 @@ try {
       throw new Error(`FEATURE_RELATIONSHIP_MATERIALIZATION_MISSING_CANONICAL_SOURCE_REVISION:${row.id}`);
     }
     return featureEvidenceSchema.parse({
-    schema: 'atlas.feature-evidence.v1',
-    evidence_id: `feature_ontology_tuples:${row.id}`,
-    feature_id: row.feature_id ?? row.subject_id,
-    evidence_kind: 'ontology_tuple',
-    relation_type: row.predicate,
-    source_ref: row.source_ref,
-    source_revision: canonicalSourceRevision,
-    evidence_revision: PREVIEW_REVISION,
-    producer_revision: PREVIEW_REVISION,
-    confidence: Number(row.confidence),
-    // The FI evidence FK points to atlas_relationships. Insert the evidence
-    // header/link first, persist relationships second, then fill this FK.
-    relationship_id: null,
-    payload: {
-      ...(row.evidence ?? {}),
-      workspace_revision: row.workspace_revision,
-      source_content_hash: row.source_content_hash,
-      legacy_source_ref: row.legacy_source_ref,
-      canonical_binding_checksum: row.canonical_binding_checksum,
-    },
+      schema: 'atlas.feature-evidence.v1',
+      evidence_id: `feature_ontology_tuples:${row.id}`,
+      feature_id: row.feature_id ?? row.subject_id,
+      evidence_kind: 'ontology_tuple',
+      relation_type: row.predicate,
+      source_ref: row.source_ref,
+      source_revision: canonicalSourceRevision,
+      evidence_revision: PREVIEW_REVISION,
+      producer_revision: PREVIEW_REVISION,
+      confidence: Number(row.confidence),
+      relationship_id: null,
+      payload: {
+        ...(row.evidence ?? {}),
+        workspace_revision: row.workspace_revision,
+        source_content_hash: row.source_content_hash,
+        legacy_source_ref: row.legacy_source_ref,
+        canonical_binding_checksum: row.canonical_binding_checksum,
+      },
     });
   });
   const evidencePreview = admittedRows.map((row) => previewFeatureOntologyEvidence(row));
   const report = {
     schema: 'atlas.feature-ontology-relationship-materialization.v1',
-    mode: apply ? 'apply' : 'dry-run',
+    mode: apply ? 'APPLY' : 'READ_ONLY_SNAPSHOT',
+    isolationLevel: apply ? null : 'REPEATABLE READ',
+    transactionReadOnly: apply ? false : true,
     canonical_writes: false,
     source_table: 'feature_ontology_tuples',
     predicate: PREVIEW_PREDICATE,
     producer_revision: PREVIEW_REVISION,
+    inputFiles: {
+      bindingObservation: path.relative(REPO_ROOT, observationPath).replaceAll('\\', '/'),
+      aliasApproval: path.relative(REPO_ROOT, aliasApprovalPath).replaceAll('\\', '/'),
+      applyPlan: apply ? path.relative(REPO_ROOT, relationshipApplyPlanPath).replaceAll('\\', '/') : null,
+    },
+    reportPath: path.relative(REPO_ROOT, reportPath).replaceAll('\\', '/'),
     limit,
     tuples_seen: result.rows.length,
     tuples_admitted_by_canonical_binding: admittedRows.length,
@@ -193,21 +231,33 @@ try {
     report.canonical_writes = true;
     report.status = 'APPLY_COMPLETE';
   } else {
-    report.status = 'DRY_RUN_READY_FOR_REVIEW';
+    report.status = 'READ_ONLY_SNAPSHOT_READY_FOR_REVIEW';
   }
 
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify({
     status: report.status,
-    reportPath: path.relative(REPO_ROOT, reportPath),
+    reportPath: path.relative(REPO_ROOT, reportPath).replaceAll('\\', '/'),
     canonical_writes: report.canonical_writes,
+    isolationLevel: report.isolationLevel,
+    transactionReadOnly: report.transactionReadOnly,
     tuples_seen: report.tuples_seen,
     features_prepared: report.features_prepared,
     evidence_prepared: report.evidence_prepared,
     relationships_prepared: report.relationships_prepared,
     rejected: report.rejected,
   }, null, 2));
+} catch (error) {
+  if (snapshotClient) {
+    try {
+      await snapshotClient.query('ROLLBACK');
+    } finally {
+      snapshotClient.release();
+      snapshotClient = null;
+    }
+  }
+  throw error;
 } finally {
   await pool.end();
 }
