@@ -36,6 +36,46 @@ services:
     restart: unless-stopped
 
   # ========================================================================
+  # Parent Atlas neural decoder (DECODER-CONTAINER-01, numerical latent
+  # projection only, no text synthesis, no canonical writes). See
+  # openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md.
+  # ========================================================================
+  atlas-neural-decoder:
+    profiles: ["atlas-gpu"]
+    build:
+      context: ..
+      dockerfile: docker/atlas-neural-decoder/Dockerfile
+    image: atlas-neural-decoder:torch2.13.0-cu132
+    container_name: atlas-neural-decoder
+    environment:
+      ATLAS_NEURAL_DECODER_PORT: "8121"
+      ATLAS_NEURAL_DECODER_DEVICE: "auto"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # Read-only checkpoint mount. Matches DEFAULT_CHECKPOINTS[0] in
+      # atlas_neural_decoder_service.py exactly (absolute /models path).
+      - ../models/nested-semantic-autoencoder:/models/nested-semantic-autoencoder:ro
+    ports:
+      - "8121:8121"
+    healthcheck:
+      # No curl in the pytorch runtime base image; use Python (always present).
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8121/health', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - legal-ai-network
+    restart: unless-stopped
+
+  # ========================================================================
   # Legal AI GPU Service (Main Application)
   # ========================================================================
   legal-ai-gpu:

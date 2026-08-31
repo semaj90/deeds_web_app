@@ -13839,6 +13839,81 @@ path, not this one). The flag remains off everywhere. The Parent Atlas
 preflight branch is unchanged and intentionally still query-only --
 `codebaseContext` has no embedding source, so per-candidate wiring there
 would require a separate, different change (embedding `routeQuery()`'s
-`ranked_cards` content), not attempted here. `DECODER-CONTAINER-01` and
-`PREFILL-QUALITY-01`/`PREFILL-PROMOTION-01` remain exactly as open as before
-this pass.
+`ranked_cards` content), not attempted here. `PREFILL-QUALITY-01`/
+`PREFILL-PROMOTION-01` remain exactly as open as before this pass.
+`DECODER-CONTAINER-01` is now closed (see below).
+
+### DECODER-CONTAINER-01 (2026-08-31, same day) -- CLOSED, real container, real GPU, real proof
+
+- [x] `docker/atlas-neural-decoder/Dockerfile` (new) -- builds the decoder as
+  a docker-compose service (`atlas-neural-decoder`, `profiles: ["atlas-gpu"]`,
+  in `docker/docker-compose.gpu.yml` alongside the existing `atlas-gpu-8098`
+  service). Port `8121`, matching the script's own default and this repo's
+  existing non-collision list (not `8100` Go Retrieval, not `8101` topology,
+  not `8095` NLP sidecar). Real `GET /health` healthcheck via Python
+  `urllib` (no `curl` in the base image), `deploy.resources.reservations.
+  devices: [{driver: nvidia, capabilities: [gpu]}]` GPU passthrough matching
+  the proven `atlas-gpu-8098` pattern already in this file.
+- [x] Base image: pinned by tag AND digest,
+  `pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime@sha256:d0a2f5993d...`. NOT
+  the earlier `torch 2.8.0+cu128` seen in this repo's host-process proof --
+  verified live via web search that combo is now deprecated/removed from
+  PyTorch's own build matrix as of PyTorch 2.12 CI (2026-04-06). Considered
+  and rejected CUDA 13.0 (PyTorch's own "stable" pip-wheel tier) in favor of
+  13.2 after checking: this Docker Hub image is a maintainer-built release
+  image independent of the pip wheel channel, this service has zero
+  cuTile/Triton/custom-kernel code (verified: only imports numpy/torch/
+  torch.nn/torch.nn.functional, plain `nn.Linear` through cuBLAS/cuDNN, so
+  the 13.0-vs-13.2 choice isn't load-bearing for correctness either way), and
+  cuTile itself went stable on Ampere/compute-capability-8.x in CUDA 13.2
+  (this host's RTX 3060 Ti is 8.6) -- forward-compat for any future
+  custom-kernel pass, at zero measured cost.
+- [x] `atlas_compute` package-import problem found and fixed before it could
+  become a runtime failure: the app imports
+  `from atlas_compute.latent_autoencoder import ...`, but the real
+  `atlas_compute/__init__.py` eagerly imports `cugraph_ppr`/`cuvs_analytics`
+  (RAPIDS modules) this service never uses and this image does not carry --
+  importing the real package would crash at container startup. Fixed by
+  copying only `latent_autoencoder.py` (verified zero internal
+  `from .`/`from atlas_compute` imports) plus a build-time-only empty
+  `__init__.py` written inside the image -- the repository's real
+  `atlas_compute/__init__.py` is untouched and unaffected.
+- [x] Real build failure found and fixed (not hypothetical): this base image
+  is Debian PEP 668 "externally managed" -- plain `pip install` inside the
+  image failed with exit code 1 until `--break-system-packages` was added
+  (safe here: single-purpose container, no other Python consumer to
+  conflict with). Confirmed via an actual `docker compose build` run, not
+  assumed from documentation.
+- [x] Checkpoint mount: `../models/nested-semantic-autoencoder:/models/
+  nested-semantic-autoencoder:ro`, matching `DEFAULT_CHECKPOINTS[0]` in
+  `atlas_neural_decoder_service.py` exactly (absolute `/models/...` path).
+  The checkpoint file already exists in this repo's working tree at that
+  path (not gitignored-and-missing as an earlier grep pass mistakenly
+  suggested before a corrected, broader search found it).
+- [x] **Live proof, real infra, not mocked**: `docker compose -f
+  docker/docker-compose.gpu.yml --profile atlas-gpu build atlas-neural-decoder`
+  succeeded; `up -d` started the container; `docker ps` reports
+  `Up ... (healthy)` via Docker's own healthcheck (not just an external
+  curl probe). `GET /health` before any request: `status: "degraded"`,
+  `device: null` (correct -- lazy model load, matches the code). A real
+  `POST /v1/neural-decoder/encode` with a genuine 768-dim vector returned
+  HTTP 200 with correctly-shaped `latent_256`/`latent_128`/`latent_64`
+  outputs and `checkpointSha256: "ac5c069d714b..."` matching
+  `checkpointRevision` exactly. `GET /health` after: `status: "ok"`,
+  `device: "cuda"` (real GPU, not CPU fallback), `torchVersion:
+  "2.13.0+cu132"`, `checkpointPath: "/models/nested-semantic-autoencoder/
+  nested_semantic_autoencoder_v3_full01.pt"`. VRAM footprint measured via
+  host `nvidia-smi`: +~200MB (6384MiB -> 6587MiB of 8192MiB total) --
+  small, leaves headroom, not a concerning footprint on this 8GB card.
+- [x] Left running (`restart: unless-stopped`) as the actual point of this
+  task -- a durable containerized service other things can call at
+  `NEURAL_DECODER_URL=http://127.0.0.1:8121`, replacing the earlier
+  one-off host-process proof script.
+
+**Still open**: this container has not yet been wired as a `depends_on:
+condition: service_healthy` dependency of anything in this compose file --
+nothing in `docker-compose.gpu.yml` currently calls it (the consumer is the
+SvelteKit dev server, which runs outside this Docker stack per this repo's
+convention, connecting to `127.0.0.1:8121` directly). `PREFILL-QUALITY-01`/
+`PREFILL-PROMOTION-01` remain untouched and correctly gated behind
+human-labeled QRELS.
