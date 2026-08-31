@@ -113,6 +113,7 @@ export * from './core/gpu-trace-evidence.js';
 export * from './core/okf-mcp-surface.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
+export * from './core/autoresearch-fabric-v1.js';
 export * from './core/executor-plans.js';
 export * from './core/multiview-rerank.js';
 export * from './core/qlora-dataset-export.js';
