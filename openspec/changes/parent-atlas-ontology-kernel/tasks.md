@@ -1306,3 +1306,59 @@ they get their own, separate, non-canonical coordinate space instead.
   (renamed from an earlier `onto_py_05_...` filename that collided with
   the existing ONTO-PY-05/`AtlasPassEnvelopeV2` item above — caught and
   fixed before committing, not left as drift.)
+
+## "Where does it get indexed?" — real answer found, 2026-08-31
+
+Operator asked where an `OntologyLinkedTupleV1`-derived graph actually
+gets created/upserted/indexed in this repo. Checked directly rather than
+guessing: the real destination is Postgres —
+`atlas_graph_snapshots_v2`/`atlas_graph_nodes_v2`/`atlas_graph_edges_v2`
+(`sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.ts`),
+materialized via `graph-snapshot-materializer.ts`. Neo4j is a downstream
+mirror from there, not a separate write target — matches this repo's
+Postgres-is-truth rule.
+
+**Real find**: that schema's own `graph-snapshot.ts` already ships a
+`relation_event` `GraphNodeType` + `GraphRelationEventSchema`/
+`GraphRelationParticipantSchema` (`PARTICIPATES_IN` edge type) — an
+n-ary-relation representation nearly identical in spirit to this
+session's own `ProjectionOrdinalMapV1` work, confirmed to already exist
+rather than assumed absent (the audit-first discipline paying off again).
+
+**Built**: `packages/parent-atlas/src/core/
+ontology-tuple-to-graph-relation-v1.ts` — `projectOntologyTupleToGraphRelationV1()`,
+a pure projection from `OntologyLinkedTupleV1` shape into that real
+schema's row shapes (`relationNode`/`participantNodes`/`relationEvent`/
+`participants`). Deliberately scoped tight given remaining context
+budget this session: **does NOT** perform the live Postgres write,
+create a snapshot, or compute a real `topologyHash` (needs the whole
+snapshot's edge set — a `PLACEHOLDER_NOT_REAL_TOPOLOGY_HASH`-prefixed
+stand-in is used, clearly labeled so nobody mistakes it for real). That
+orchestration (snapshot lifecycle, hash policy, actual `db.insert()`
+calls) is a bigger, more consequential piece than this pass safely
+allows — not attempted, not guessed at.
+
+**Honest gap found while building**: `GraphNodeTypeSchema` doesn't cover
+most of `OntologyLinkedTupleParticipantKindSchema`'s values (`tool_call`,
+`citation`, `screenshot`, etc.) — only `ast_symbol`→`symbol`,
+`packet`→`packet`, `concept`/`topic`→`concept` have an honest mapping.
+Unmapped participants still get a real `GraphRelationParticipant` row
+(participation doesn't require a typed node), but are NOT also forced
+into a wrong `GraphNode` type — reported in `unmappedNodeKinds` instead.
+
+**Verified**: package rebuilds clean; **6/6 tests pass** (one relation
+node never a pairwise clique; all 4 participants preserved in order/
+role; 3 of 4 correctly mapped to real `symbol` nodes; the 4th honestly
+reported unmapped; evidenceSpan correctly serialized to the schema's
+required string shape; deterministic). Caught and fixed a real test-
+fixture bug in the same pass: an invalid placeholder UUID
+(`11111111-1111-1111-...`) failed Zod's strict RFC4122 variant-nibble
+check — not a bug in the production code, but worth recording since it's
+exactly the kind of thing that's easy to wave off as "just a test."
+
+**Next step for whoever continues this**: wire the actual snapshot
+orchestration — decide whether ontology-tuple relation graphs share the
+SAME `atlas_graph_snapshots_v2` snapshot as the packet/tree-node graph
+or get their own, then compute a real `topologyHash`, then call
+`db.insert()` against `graphNodesV2`/`graphEdgesV2` (or the relation-
+event-specific tables if they're separate — not checked this pass).

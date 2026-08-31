@@ -66,6 +66,7 @@ export * from './core/structural-identity-bridge-v1.js';
 export * from './core/structural-lane-result-v1.js';
 export * from './core/graph-node-key-v1.js';
 export * from './core/projection-ordinal-map-v1.js';
+export * from './core/ontology-tuple-to-graph-relation-v1.js';
 export * from './core/identity-v1.js';
 export * from './core/langextract-grounding-adapter.js';
 export * from './core/langextract-sidecar-metadata-adapter.js';
