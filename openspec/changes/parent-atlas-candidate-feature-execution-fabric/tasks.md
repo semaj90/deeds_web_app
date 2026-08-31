@@ -1147,3 +1147,46 @@ The independent read-only parity verifier agrees: `codebase_chunks_768` has 109,
 payload contract violations are zero. `--fix-stale` was not run. The projection remains blocked
 until the mixed historical cohort is reconciled and a revision-qualified CandidateOrdinal payload
 bridge is proven.
+
+### CANDIDATE_FEATURE_GPU_LEASE duplicate owner: resolved via archival (2026-08-31)
+
+`docs/reports/gpu-residency-cutile-simt-readiness-v1.json` (a concurrent audit, same day)
+re-confirmed a `DUPLICATE_OWNER` finding first flagged as an unresolved "operator decision" on
+2026-08-21 (`openspec/changes/parent-atlas-branch-merge-consolidation-aug20/
+swarm-reconciliation-2026-08-21-addendum.md`): `candidate-feature-gpu-residency-v1.ts` and
+`candidate-feature-gpu-resident-lease-v1.ts` implement the same capability (checksum-bound lease
+over GPU-resident candidate-feature buffers, build/verify/release lifecycle) with near-identical
+naming ("residency" vs "resident"). Both audits' preferred consolidation direction: keep
+`candidate-feature-gpu-residency-v1.ts` (it has a real caller,
+`candidate-feature-gpu-batch-request-v1.ts`); archive `resident-lease-v1` once its caller census
+is confirmed empty.
+
+Independently re-verified the caller census myself before acting, not trusted from either report:
+`residency-v1.ts` has a real production caller plus its own spec; `resident-lease-v1.ts` has zero
+callers anywhere in the repo outside its own spec and its own dedicated prove script
+(`prove-candidate-feature-gpu-resident-lease.mts`). Found and included two more files in the same
+orphaned family that neither prior report enumerated: that `.mts` prove script and its Python-side
+CUDA counterpart, `scripts/atlas/prove-candidate-feature-gpu-resident-lease.py` -- neither is
+referenced by any npm script or CI, and both exist solely to exercise the orphaned module.
+
+Archived all 4 files per this repo's archive-not-delete convention (SHA-256 recorded in
+`docs/archive-manifest.json`, copies in `deeds_labs/archive/2026-08-31/`, `git rm` from the live
+tree) rather than deleting them -- recoverable via `git show <pre-removal-commit>:<path>` or the
+`.bak` copies if this consolidation direction is ever revisited:
+- `sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.ts`
+- `sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.spec.ts`
+- `sveltekit-frontend/scripts/atlas/prove-candidate-feature-gpu-resident-lease.mts`
+- `scripts/atlas/prove-candidate-feature-gpu-resident-lease.py`
+
+Verified after removal: repo-wide grep for any remaining reference found only historical
+docs/reports (audit snapshots, session notes) -- no live code references. `tsc --noEmit -p
+tsconfig.json --skipLibCheck`: 77 errors (down from the pre-removal 79 baseline; consistent with
+removing dead code, zero new errors introduced). `candidate-feature-gpu-residency-v1.ts` remains
+the sole canonical owner of `CANDIDATE_FEATURE_GPU_LEASE`, unchanged by this pass.
+
+**Not addressed this pass**: the second finding in the same concurrent audit,
+`NUMERIC_ARTIFACT_MANIFEST` (`OVERLAPPING_CONTRACTS` across `tensor-artifact-contract.ts`,
+`tensor-artifact-manifest-v1.ts`, `representation-artifact-v1.ts`, `artifact-work-item-v1.ts`) --
+that audit's own recommendation is "do not add a new contract yet; first define which existing
+contract owns immutable numeric artifact lineage", which is a design decision, not a mechanical
+archive like this one was.

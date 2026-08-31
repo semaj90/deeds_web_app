@@ -322,5 +322,29 @@
     "sha256": "5f4303b4d4f60f9f041833c483e8a2ea2fc9aaae1fd7284c746721c279618d40",
     "archived": "2026-08-30T22:52:00Z",
     "reason": "Backup-only, per operator decision -- NOT deleted from the live table. Investigated per openspec/changes/parent-atlas-graph-analysis-contract/tasks.md \"Recommended before declaring _v2 canonical\" item 3. Root cause: abandoned dev/test-scale PageRank runs (~3K nodes vs 40K-162K for real graphs) from before the current PageRankPromotionGate/run-row discipline existed, never promoted, never read by any live consumer (feature-matrix.ts requires a promoted run row via a real atlas_graph_authority_runs join, which orphan rows can never satisfy). This backup documents the data for potential future deletion; the live rows remain in place as of this entry."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.ts",
+    "sha256": "df7ac8372d7bc55037f7d4f5940ea902b95749e28569034e2d4f61611caef697",
+    "archived": "2026-08-31",
+    "reason": "DUPLICATE_OWNER: same capability (checksum-bound lease over GPU-resident candidate-feature buffers, build/verify/release lifecycle) as candidate-feature-gpu-residency-v1.ts, with near-identical naming that differs only by \"resident\" vs \"residency\". First flagged as an unresolved operator decision in openspec/changes/parent-atlas-branch-merge-consolidation-aug20/swarm-reconciliation-2026-08-21-addendum.md (2026-08-21), re-confirmed by an independent audit on 2026-08-31 (docs/reports/gpu-residency-cutile-simt-readiness-v1.json), and independently re-verified here via a real caller-census grep, not assumed from either report: candidate-feature-gpu-residency-v1.ts has a real production caller (candidate-feature-gpu-batch-request-v1.ts) plus its own spec; this file has zero callers anywhere in the repo outside its own spec and its own dedicated prove script. Keeping candidate-feature-gpu-residency-v1.ts as the sole owner per both audits' preferred consolidation direction."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-resident-lease-v1.spec.ts",
+    "sha256": "43e7545d09b5473b499bebb485edf47722ce9bccd58b15c71b88d7dea2e6ecc9",
+    "archived": "2026-08-31",
+    "reason": "Spec file for the orphaned candidate-feature-gpu-resident-lease-v1.ts (same archival entry above); archived together as one unit."
+  },
+  {
+    "path": "sveltekit-frontend/scripts/atlas/prove-candidate-feature-gpu-resident-lease.mts",
+    "sha256": "0b2adf4ecf4649086ba6c75b04f1e1b8d9033e3373a416e068df5fae92c519cd",
+    "archived": "2026-08-31",
+    "reason": "CLI proof script whose sole purpose was proving candidate-feature-gpu-resident-lease-v1.ts (see that entry). Not referenced by any npm script or CI. Archived together as the same orphaned feature family."
+  },
+  {
+    "path": "scripts/atlas/prove-candidate-feature-gpu-resident-lease.py",
+    "sha256": "e77c6771a9c2baf8a0d49025a39ec18c09759ac83f2ea9003ad795721795c734",
+    "archived": "2026-08-31",
+    "reason": "Python-side CUDA proof counterpart to the same orphaned candidate-feature-gpu-resident-lease-v1.ts feature family (see that entry). Not referenced by any npm script or CI."
   }
 ]
