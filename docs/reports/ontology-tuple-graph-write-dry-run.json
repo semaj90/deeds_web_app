@@ -1,0 +1,101 @@
+{
+  "ranAt": "2026-08-31T05:30:23.263Z",
+  "snapshotId": "00000000-0000-4000-8000-00000000ac01",
+  "status": "DRY_RUN_PROVEN",
+  "assertions": [
+    {
+      "name": "node_count_matches_projection",
+      "pass": true,
+      "detail": {
+        "expected": 4,
+        "actual": 4
+      }
+    },
+    {
+      "name": "relation_event_row_written",
+      "pass": true
+    },
+    {
+      "name": "relation_event_topology_hash_matches",
+      "pass": true
+    },
+    {
+      "name": "participant_count_is_3_fk_safe_not_4",
+      "pass": true,
+      "detail": {
+        "actual": 3
+      }
+    },
+    {
+      "name": "tool_call_participant_excluded_from_write",
+      "pass": true
+    },
+    {
+      "name": "participant_roles_in_original_order",
+      "pass": true
+    }
+  ],
+  "unmappedNodeKinds": [
+    {
+      "entityId": "tool_call:typecheck-run-42-dry-run",
+      "entityKind": "tool_call"
+    }
+  ],
+  "rowsWritten": {
+    "nodes": [
+      {
+        "node_key": "relation_event:tuple:dry-run-r1",
+        "node_type": "relation_event",
+        "packet_key": null,
+        "source_ref": "src/lib/server/atlas/symbol-repair-example.ts"
+      },
+      {
+        "node_key": "symbol:S1-dry-run",
+        "node_type": "symbol",
+        "packet_key": null,
+        "source_ref": null
+      },
+      {
+        "node_key": "symbol:S2-dry-run",
+        "node_type": "symbol",
+        "packet_key": null,
+        "source_ref": null
+      },
+      {
+        "node_key": "symbol:T7-dry-run",
+        "node_type": "symbol",
+        "packet_key": null,
+        "source_ref": null
+      }
+    ],
+    "relationEvent": {
+      "relation_id": "tuple:dry-run-r1",
+      "relation_type": "CODE_REPAIR_CAUSAL_PATH",
+      "source_ref": "src/lib/server/atlas/symbol-repair-example.ts",
+      "evidence_span": "src/lib/server/atlas/symbol-repair-example.ts:120-168",
+      "confidence": 0.93,
+      "topology_hash": "31cf26e98249abd9d7f0f95aacda8bf31f416304e06e6e5a9a86d897122ef2e7"
+    },
+    "participants": [
+      {
+        "relation_id": "tuple:dry-run-r1",
+        "node_key": "symbol:S1-dry-run",
+        "role": "cause",
+        "ordinal": 0
+      },
+      {
+        "relation_id": "tuple:dry-run-r1",
+        "node_key": "symbol:S2-dry-run",
+        "role": "effect",
+        "ordinal": 1
+      },
+      {
+        "relation_id": "tuple:dry-run-r1",
+        "node_key": "symbol:T7-dry-run",
+        "role": "evidence",
+        "ordinal": 2
+      }
+    ]
+  },
+  "cleanedUp": true
+}

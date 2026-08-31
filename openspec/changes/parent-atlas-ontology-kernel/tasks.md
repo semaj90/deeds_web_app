@@ -1403,3 +1403,47 @@ slow down for. **Next step for whoever picks this up**: run
 a real `atlas_graph_snapshots_v2` row created first — `createGraphSnapshotV2()`
 already exists in the same repository), inspect the rows it actually
 writes, and only then promote it from `CREATED` to `DRY_RUN_PROVEN`.
+
+## DRY_RUN_PROVEN — 2026-08-31 (same session, continued after user "yes continue")
+
+Ran the deferred next step above. Confirmed live via `docker exec legal-ai-postgres psql \d`
+(not the Drizzle schema file) that `atlas_graph_snapshots_v2`/`atlas_graph_nodes_v2`/
+`atlas_graph_relation_events_v2`/`atlas_graph_relation_participants_v2` match this session's
+implementation exactly, including the `nodeFk` chain and `atlas_graph_snapshots_v2_status_check`
+(`BUILDING`/`VALIDATED`/`SUPERSEDED`/`FAILED`) — no drift found.
+
+**New proof script**: `scripts/atlas/prove-ontology-tuple-graph-write-v1.mts`. Follows the exact
+low-dependency convention of the existing `prove-exact-promotion-live-dry-run.mts` — raw `pg.Pool`
++ `loadAtlasEnv()`, not the `$lib/server/db/client` SvelteKit import (which drags in Langfuse
+observability + drizzle-cache unnecessarily for a one-off proof). Imports the real
+`projectOntologyTupleToGraphRelationV1()` from `packages/parent-atlas/src/index.js`, creates a
+real `BUILDING` snapshot row (confirmed via reading `graph-authority-v2.ts` that
+`writeOntologyTupleRelationGraphV2()` has no status precondition — only `persistGraphAuthorityRunV2`
+requires `VALIDATED`), performs the exact same upsert sequence as
+`writeOntologyTupleRelationGraphV2()` (node rows -> relation event row -> participant rows, same
+`ON CONFLICT ... DO UPDATE` semantics), reads every row back independently, asserts 6 checks, then
+deletes everything it wrote in FK-safe dependency order.
+
+**Result: `DRY_RUN_PROVEN`, 6/6 assertions passed** (`docs/reports/ontology-tuple-graph-write-dry-run.json`):
+- `node_count_matches_projection` — 4 nodes written (relation node + 3 FK-eligible participants)
+- `relation_event_row_written` — 1 row
+- `relation_event_topology_hash_matches` — the written row's `topology_hash` matches the real
+  sha256 the pure projection computed, byte for byte
+- `participant_count_is_3_fk_safe_not_4` — the `tool_call` participant was correctly excluded from
+  the write set (no honest `GraphNodeType` mapping — would have violated `nodeFk`)
+- `tool_call_participant_excluded_from_write` — confirmed absent from the written rows
+- `participant_roles_in_original_order` — `[cause, effect, evidence]`, ordinals preserved
+
+**Cleanup verified independently**, not just trusted from the script's own report: a separate
+`docker exec ... psql` count query against `atlas_graph_snapshots_v2` for the proof's snapshot_id
+after the run returned `0` — the dev database carries zero residue from this proof.
+
+**Status update**: `writeOntologyTupleRelationGraphV2()` and
+`projectOntologyTupleToGraphRelationV1()` are now `DRY_RUN_PROVEN` (were `CREATED`/`NOT_PROVEN`).
+Not yet `APPLY_PROVEN` — that would mean wired into a live pipeline call site (e.g. invoked from
+wherever `OntologyLinkedTupleV1` rows are actually produced), which is a separate, larger piece of
+work (needs a decision on whether ontology-tuple relation graphs share the canonical packet/
+tree-node snapshot lifecycle or get their own — still not decided, flagged earlier in this file).
+**Next step for whoever continues this**: wire a real call site, or explicitly scope this as a
+standalone/on-demand capability rather than an always-on pipeline stage — that's a product decision,
+not a technical one, and shouldn't be made unilaterally.
