@@ -1,35 +1,33 @@
 /**
- * cugraph-pagerank-adapter.ts — cuGraph/RAPIDS PageRank backend for the same
- * canonical `graph_analysis_runs` / `graph_node_metrics` tables that
- * pagerank-analysis-adapter.ts (Neo4j-GDS) already writes.
+ * cugraph-pagerank-adapter.ts — cuGraph/RAPIDS PageRank backend for the shared
+ * `graph_analysis_runs` / `graph_node_metrics` execution history.
  *
- * This is a second BACKEND under one canonical capability, not a competing
- * owner — same registry pattern already used for neo4j-gds-pagerank,
- * neo4j-gds-louvain-leiden, neo4j-gds-cheirank, neo4j-gds-kcore (see
- * docs/architecture/runtime-ownership-registry.json's `graph_analysis`
- * capability). Selected via GraphAnalysisRequest.engine === 'cugraph-rapids'
- * in graph-analysis-runner.ts.
+ * This is a second EXECUTOR under one logical PageRank capability, not a
+ * competing canonical owner. The current GPU runtime returns a bounded top-K
+ * result (max 512), so it MUST NOT write metric_name='pagerank' until an
+ * explicit frozen parity/promotion gate says the bounded GPU result is a valid
+ * replacement for the established full-corpus PageRank authority lane.
  *
- * Precondition (fail-closed, not auto-loaded): a graph projection must
- * already be resident in the atlas-gpu-8098 sidecar via POST /v1/graph/load
- * before this adapter can run. This adapter deliberately does not attempt to
- * load one itself — picking which frozen GRAPH_SNAPSHOT_PARITY artifact to
- * load is a separate operational decision (see
- * openspec/changes/parent-atlas-graph-runtime-python-consolidation), not
- * something to guess at from inside a PageRank call. If nothing is resident,
- * this returns a skipped result with a clear reason, matching this file's own
- * runSkippedAnalysis() convention in graph-analysis-runner.ts.
+ * Selected via GraphAnalysisRequest.engine === 'cugraph-rapids' in
+ * graph-analysis-runner.ts.
  *
- * packetKey resolution: the cuGraph service already resolves packet_key
- * directly from the loaded nodes.parquet artifact's own `packet_key` column
- * (see atlas_rapids_graph_runtime.py's ResidentGraph), so — unlike the
- * Neo4j-GDS adapter — there is no separate Postgres path->packetKey
- * resolution step here. A null packetKey result is skipped, not written.
+ * Precondition (fail-closed, not auto-loaded): a graph projection must already
+ * be resident in atlas-gpu-8098 via POST /v1/graph/load. Picking which frozen
+ * GRAPH_SNAPSHOT_PARITY artifact is resident is an operational decision and is
+ * intentionally not guessed inside a PageRank call.
+ *
+ * packetKey resolution: the cuGraph service reads packet_key directly from the
+ * loaded nodes.parquet artifact. Null packetKey results remain unresolved and
+ * are never written.
  */
 
 import type { Pool } from 'pg';
 import { randomUUID, createHash } from 'node:crypto';
-import { createAtlasRapidsPageRankClient, type AtlasPageRankResultV1, type AtlasGraphResidentStatusV1 } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
+import {
+	createAtlasRapidsPageRankClient,
+	type AtlasPageRankResultV1,
+	type AtlasGraphResidentStatusV1,
+} from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import {
 	GraphAnalysisRunSchema,
 	GraphMetricResultSchema,
@@ -41,6 +39,8 @@ import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 const ALGORITHM_REVISION = graphAlgorithmRevision('pagerank');
 const PARAMETER_REVISION_PREFIX = 'cugraph-maxIter-alpha';
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
+const MAX_GPU_RESULTS = 512;
+const CHALLENGER_METRIC_NAME = 'pagerank_cugraph';
 
 export interface CuGraphPageRankAnalysisOptions {
 	maxIterations?: number;
@@ -86,8 +86,8 @@ async function buildSkippedResult(
 		startedAt,
 		completedAt: new Date().toISOString(),
 		status: 'succeeded',
-		parameters: { reason },
-		metrics: { skipped: true, reason },
+		parameters: { reason, metricName: CHALLENGER_METRIC_NAME },
+		metrics: { skipped: true, reason, promotionState: 'CHALLENGER_SHADOW' },
 	});
 	return { run, metricsWritten: 0, unresolvedPacketKeys: 0, excludedPacketKeys: 0, skippedReason: reason };
 }
@@ -97,6 +97,9 @@ export async function runCuGraphPageRankAnalysis(
 	options: CuGraphPageRankAnalysisOptions = {},
 ): Promise<CuGraphPageRankAnalysisResult> {
 	const { maxIterations = 100, dampingFactor = 0.85, limit = 128, sidecarUrl = null } = options;
+	if (!Number.isInteger(limit) || limit < 1 || limit > MAX_GPU_RESULTS) {
+		throw new Error(`CUGRAPH_PAGERANK_LIMIT_OUT_OF_RANGE:${limit}:max=${MAX_GPU_RESULTS}`);
+	}
 	const client = createAtlasRapidsPageRankClient(sidecarUrl ?? undefined);
 
 	let residentStatus: AtlasGraphResidentStatusV1;
@@ -114,7 +117,7 @@ export async function runCuGraphPageRankAnalysis(
 
 	if (!residentStatus.resident) {
 		return buildSkippedResult(
-			'ATLAS_RAPIDS_GRAPH_NOT_RESIDENT: no graph projection loaded in the atlas-gpu-8098 sidecar — call POST /v1/graph/load with a reviewed GRAPH_SNAPSHOT_PARITY artifact first; this adapter does not auto-load one',
+			'ATLAS_RAPIDS_GRAPH_NOT_RESIDENT: no graph projection loaded in atlas-gpu-8098; call POST /v1/graph/load with a reviewed revision-qualified graph artifact first',
 			'unknown',
 			0,
 			0,
@@ -125,7 +128,15 @@ export async function runCuGraphPageRankAnalysis(
 	const { graphRevision, nodeCount, edgeCount } = residentStatus.resident;
 	const startedAt = new Date().toISOString();
 	const inputHash = createHash('sha256')
-		.update(JSON.stringify({ algorithm: 'pagerank', backend: 'cugraph-rapids', graphRevision, maxIterations, dampingFactor, limit }))
+		.update(JSON.stringify({
+			algorithm: 'pagerank',
+			backend: 'cugraph-rapids',
+			graphRevision,
+			maxIterations,
+			dampingFactor,
+			limit,
+			metricName: CHALLENGER_METRIC_NAME,
+		}))
 		.digest('hex');
 
 	const receipt = await client.pagerank({
@@ -134,6 +145,13 @@ export async function runCuGraphPageRankAnalysis(
 		alpha: dampingFactor,
 		maxIter: maxIterations,
 	});
+	if (receipt.operation !== 'pagerank') {
+		throw new Error(`CUGRAPH_PAGERANK_UNEXPECTED_OPERATION:${receipt.operation}`);
+	}
+	if (receipt.graphRevision !== graphRevision) {
+		throw new Error(`CUGRAPH_PAGERANK_GRAPH_REVISION_MISMATCH:${receipt.graphRevision}:${graphRevision}`);
+	}
+	if (!receipt.didConverge) throw new Error('CUGRAPH_PAGERANK_DID_NOT_CONVERGE');
 
 	const completedAt = new Date().toISOString();
 	const runId = randomUUID();
@@ -162,13 +180,26 @@ export async function runCuGraphPageRankAnalysis(
 		startedAt,
 		completedAt,
 		status: 'succeeded',
-		parameters: { maxIterations, dampingFactor, topK: limit },
-		metrics: { topNodesReturned: receipt.results.length, didConverge: receipt.didConverge, cacheHit: receipt.cacheHit },
+		parameters: {
+			maxIterations,
+			dampingFactor,
+			topK: limit,
+			resultScope: 'TOP_K_BOUNDED',
+			metricName: CHALLENGER_METRIC_NAME,
+		},
+		metrics: {
+			topNodesReturned: receipt.results.length,
+			didConverge: receipt.didConverge,
+			cacheHit: receipt.cacheHit,
+			kernelMs: receipt.timings.kernelMs,
+			resultSelectMs: receipt.timings.resultSelectMs,
+			nodeTableHash: receipt.nodeTableHash,
+			edgeTableHash: receipt.edgeTableHash,
+			executorAlgorithmRevision: receipt.algorithmRevision,
+			promotionState: 'CHALLENGER_SHADOW',
+		},
 	});
 
-	// packetKey -> highest score seen, same discipline as the Neo4j-GDS adapter's
-	// byPacketKey dedup (graph_node_metrics' primary key is (runId, packetKey,
-	// metricName) — one row per packet per run).
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
 	for (const node of receipt.results as AtlasPageRankResultV1[]) {
@@ -190,7 +221,7 @@ export async function runCuGraphPageRankAnalysis(
 				runId,
 				packetKey,
 				symbolVersionId: null,
-				metricName: 'pagerank',
+				metricName: CHALLENGER_METRIC_NAME,
 				metricValue: score,
 				graphRevision,
 				algorithmRevision: ALGORITHM_REVISION,
@@ -199,13 +230,9 @@ export async function runCuGraphPageRankAnalysis(
 		);
 	}
 
-	// Transactional, same shape as pagerank-analysis-adapter.ts: a
-	// graph_analysis_runs row with status='succeeded' must never exist without
-	// its full graph_node_metrics batch also having landed.
 	const pgClient = await db.connect();
 	try {
 		await pgClient.query('BEGIN');
-
 		await pgClient.query(
 			`INSERT INTO graph_analysis_runs (
 				run_id, algorithm, algorithm_revision, parameter_revision, workspace_revision,
@@ -240,11 +267,10 @@ export async function runCuGraphPageRankAnalysis(
 			],
 		);
 
-		// Same Postgres bound-parameter ceiling as pagerank-analysis-adapter.ts
-		// (65,535 per query / 7 columns each -> batch below ~9,362 rows).
 		const BATCH_SIZE = 3000;
 		for (let offset = 0; offset < metricRows.length; offset += BATCH_SIZE) {
 			const batch = metricRows.slice(offset, offset + BATCH_SIZE);
+			if (batch.length === 0) continue;
 			const values: string[] = [];
 			const params: unknown[] = [];
 			batch.forEach((m, i) => {
