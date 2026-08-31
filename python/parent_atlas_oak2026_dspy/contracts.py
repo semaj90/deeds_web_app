@@ -14,13 +14,23 @@ from dataclasses import dataclass
 from hashlib import sha256
 import json
 import math
+import re
 from typing import Any, Iterable, Mapping, Sequence
+
+_SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
 
 
 def _require_nonempty(name: str, value: str) -> str:
     value = str(value).strip()
     if not value:
         raise ValueError(f"{name} is required")
+    return value
+
+
+def _require_sha256(name: str, value: str) -> str:
+    value = str(value).strip()
+    if not _SHA256_RE.fullmatch(value):
+        raise ValueError(f"{name} must be a lowercase SHA-256 hex digest")
     return value
 
 
@@ -93,8 +103,8 @@ class Oak2026KernelBindingV1:
             raise ValueError("allowed_evidence_classes must not be empty")
         return cls(
             kernel_revision=_require_nonempty("kernel_revision", kernel_revision),
-            schema_checksum=_require_nonempty("schema_checksum", schema_checksum),
-            function_catalog_checksum=_require_nonempty(
+            schema_checksum=_require_sha256("schema_checksum", schema_checksum),
+            function_catalog_checksum=_require_sha256(
                 "function_catalog_checksum", function_catalog_checksum
             ),
             allowed_functions=functions,
@@ -132,9 +142,11 @@ class Oak2026ActionProposalV1:
         evidence_refs: Iterable[str],
         rationale: str = "",
     ) -> "Oak2026ActionProposalV1":
+        arguments = dict(arguments)
+        canonical_json_checksum_v1(arguments)
         return cls(
             function_name=_require_nonempty("function_name", function_name),
-            arguments=dict(arguments),
+            arguments=arguments,
             evidence_refs=_sorted_unique(evidence_refs),
             rationale=str(rationale),
         )
@@ -219,3 +231,78 @@ def validate_action_proposal_v1(
         allowed_evidence_refs=allowed_evidence_refs,
         field_name="action.evidence_refs",
     )
+
+
+@dataclass(frozen=True, slots=True)
+class Oak2026PreExecutionPacketV1:
+    """Wire-safe proposal packet consumed by the TypeScript admission boundary."""
+
+    kernel_revision: str
+    schema_checksum: str
+    function_catalog_checksum: str
+    binding_checksum: str
+    program_revision: str
+    task_class: str
+    required_evidence_classes: tuple[str, ...]
+    classification_confidence: float
+    function_name: str
+    arguments: Mapping[str, Any]
+    evidence_refs: tuple[str, ...]
+    canonical_authority: bool = False
+
+    @classmethod
+    def build(
+        cls,
+        *,
+        binding: Oak2026KernelBindingV1,
+        program_revision: str,
+        task_class: str,
+        required_evidence_classes: Iterable[str],
+        classification_confidence: float,
+        proposal: Oak2026ActionProposalV1,
+        allowed_evidence_refs: Sequence[str],
+    ) -> "Oak2026PreExecutionPacketV1":
+        confidence = float(classification_confidence)
+        if not math.isfinite(confidence) or not 0.0 <= confidence <= 1.0:
+            raise ValueError("OAK2026_INVALID_CLASSIFICATION_CONFIDENCE")
+        required = validate_evidence_classes_v1(
+            binding,
+            required_evidence_classes,
+            field_name="packet.required_evidence_classes",
+        )
+        validate_action_proposal_v1(
+            binding,
+            proposal,
+            allowed_evidence_refs=allowed_evidence_refs,
+        )
+        return cls(
+            kernel_revision=binding.kernel_revision,
+            schema_checksum=binding.schema_checksum,
+            function_catalog_checksum=binding.function_catalog_checksum,
+            binding_checksum=binding.binding_checksum,
+            program_revision=_require_nonempty("program_revision", program_revision),
+            task_class=_require_nonempty("task_class", task_class),
+            required_evidence_classes=required,
+            classification_confidence=confidence,
+            function_name=proposal.function_name,
+            arguments=dict(proposal.arguments),
+            evidence_refs=proposal.evidence_refs,
+            canonical_authority=False,
+        )
+
+    def to_wire(self) -> dict[str, Any]:
+        return {
+            "schema": "atlas.oak2026-dspy-proposal.v1",
+            "kernelRevision": self.kernel_revision,
+            "schemaChecksum": self.schema_checksum,
+            "functionCatalogChecksum": self.function_catalog_checksum,
+            "bindingChecksum": self.binding_checksum,
+            "programRevision": self.program_revision,
+            "taskClass": self.task_class,
+            "requiredEvidenceClasses": list(self.required_evidence_classes),
+            "classificationConfidence": self.classification_confidence,
+            "functionName": self.function_name,
+            "arguments": dict(self.arguments),
+            "evidenceRefs": list(self.evidence_refs),
+            "canonicalAuthority": False,
+        }
