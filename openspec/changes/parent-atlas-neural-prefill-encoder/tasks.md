@@ -13476,6 +13476,103 @@ container end-to-end -- only against a mocked `fetch`). `PREFILL-QUALITY-01`/
 `PREFILL-PROMOTION-01` remain untouched and correctly gated behind
 human-labeled QRELS.
 
+### PREFILL-YORHA-VISIBILITY-01 (2026-08-31, same day)
+
+Integration found while scanning for other consumers of `ACEContext`
+(TRACE MCP confirmed genuinely healthy first -- `GET /health` on `:8788`
+returns `ok:true`/postgres+redis both fine, and a real `POST /mcp
+tools/list` call returns live tools; this session's own MCP *client*
+connection was the thing reported as failed, not the service, so audits in
+this pass used direct HTTP/grep instead of `mcp__trace__*` tools). The
+`docs/graph/codebase-graph.json` cache the `/deep-audit` skill normally reads
+was found stale/mis-scoped for this work -- its `rel` paths point at
+`ace-vector-selection-slice/...` and `scripts/api-cleanup/.../backup-.../...`
+trees, not live `sveltekit-frontend/src`, and none of this session's touched
+files (new or old) appear in it at all. Gate checks below were done by direct
+grep against the real files instead of trusting the cached index; a fresh
+`npm run index:codebase:fast` re-scan is still owed (see checklist below).
+
+- [x] Wired `ACEContext.neuralDecoderPrefillShadow` into the OpenAI-compatible
+  v1 facade's existing `yorha.*` transparency block
+  (`openai-facade.ts`/`openai-types.ts`) -- purely observational, matches the
+  receipt's own `canonicalAuthority: false` contract. Absent (not `null`)
+  when the flag is off or the preflight path wasn't taken.
+- [x] Registered the `neural_decoder_prefill` capability in
+  `docs/architecture/runtime-ownership-registry.json` (owner +
+  3 components: decoder-service, decoder-qualified-prefill-identity,
+  prefill-shadow-caller). `node scripts/atlas/audit-runtime-ownership.mjs`
+  confirms zero new violations (11 capabilities checked, up from 10; the 2
+  reported violations are pre-existing and unrelated).
+- [x] Manual gate check (code cache unusable for this scope, see above):
+  G4/G5 not applicable (no route handlers touched), G11 clean (no hardcoded
+  localhost in any new file), G15 not applicable (server-only), no import
+  cycle introduced by `openai-types.ts` importing
+  `neural-decoder-prefill-caller-v1.ts` (checked: none of the neural-decoder
+  files import back from `openai-types`/`openai-facade`).
+- [ ] **G16 gap, minor**: `neural-decoder-prefill-adapter.ts` has no
+  dedicated spec file of its own -- it's exercised transitively by 2 tests in
+  `neural-decoder-client.spec.ts` ("keeps default disabled",
+  "requires existing prefill identity"), which covers its two branches, but
+  a dedicated `neural-decoder-prefill-adapter.spec.ts` would be more
+  discoverable. Not fixed this pass -- low priority, coverage exists.
+- [ ] `docs/graph/codebase-graph.json` should be regenerated
+  (`npm run index:codebase:fast` or `graphify:daily`) before the next
+  `/deep-audit` run on this area -- confirmed stale/mis-scoped, not just
+  >24h old.
+
+### Next checklist to finish this change (2026-08-31, consolidated)
+
+In dependency order -- each item names what specifically blocks it:
+
+1. **Enable the shadow flag somewhere real** (operator decision, zero code
+   needed) -- `ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED=true` in one
+   environment, confirm a `neuralDecoderPrefillShadow` receipt actually shows
+   up in a real `yorha.*` response. This is the cheapest possible next step
+   and the first genuinely live proof of the whole chain end-to-end (still
+   query-only).
+2. **DECODER-CONTAINER-01** -- add a `docker compose` service for
+   `atlas_neural_decoder_service.py` on a non-colliding port (not `8100`
+   Go Retrieval, not `8101` topology, not `8095` NLP sidecar; `8121` was only
+   ever the ad hoc host-proof port). Needs a real healthcheck
+   (`GET /health`) and `depends_on: condition: service_healthy` for anything
+   that calls it. No speculative CUDA image.
+3. **PREFILL-VALKEY-01 (live cache proof)** -- once (1) and (2) are real,
+   prove `GET` MISS -> decoder call -> `SET NX EX` -> `GET` HIT against the
+   actual running Valkey instance and the actual containerized decoder, not
+   the mocked `fetch` + shared Redis client used so far. Bind the TTL
+   decision (this pass's Redis shadow cache uses 24h; the original review
+   suggested a short bounded TTL like 60s for the first live proof -- pick
+   one deliberately, don't default silently).
+4. **PREFILL-REPLAY-01** -- with (3) proven, run the identical frozen
+   request twice against the *real* stack and confirm latent checksum,
+   `decoderQualifiedPrefillIdentityChecksum`, and `resolvedPrefillChecksum`
+   match across both runs. `PREFILL-CALLER-01B` already proved this
+   in-process with a mocked decoder; this is the same proof against real
+   infra.
+5. **Per-candidate wiring** (separate, larger, not started) -- thread the
+   transient per-chunk embeddings `fetchRAGChunks()` already computes for
+   reranking (~context-assembler.ts line 5758) through to
+   `buildContextManifestFromACE()`'s call site, so
+   `runNeuralDecoderPrefillShadowForManifest()` can run per selected
+   candidate instead of query-only, and
+   `deriveFeaturePresenceFromACE()`'s `latent256` can be upgraded from
+   `'UNAVAILABLE'` to `'PARTIAL'`/`'PROVEN'` truthfully. Do not upgrade
+   `featurePresence.latent256` without this -- it would misrepresent
+   candidate-level coverage that was never actually measured.
+6. **PREFILL-QUALITY-01** -- human-labeled QRELS + held-out
+   nDCG@10/MRR@10/judged-pool-recall@10/repair-success/token-cost/latency
+   p50/p95, baseline prefill vs. decoder-assisted prefill, on the same
+   held-out judgments. Blocked on (1)-(5) producing real traffic to measure,
+   not a code dependency.
+7. **PREFILL-PROMOTION-01** -- only after (6) produces evidence: explicit
+   human decision to move `NeuralDecoderPrefillMode` past `SHADOW_READONLY`
+   (a third `ENABLED_PRODUCTION` value would need to be added deliberately,
+   it does not exist today). Keep production activation off until then.
+8. **Housekeeping, not blocking**: regenerate
+   `docs/graph/codebase-graph.json` (stale/mis-scoped for this area, see
+   above); optionally add `neural-decoder-prefill-adapter.spec.ts` (G16, low
+   priority, coverage already exists transitively).
+
 Current classification: decoder `CREATED + PROVEN`; decoder-prefill integration
 `NOT WIRED`; promotion `BLOCKED`. The previous 70% validation receipt is a
 historical report and does not include this decoder service. No database,
@@ -13630,3 +13727,25 @@ inputs. The former uses `atlas_packets.packet_id` as `canonicalId` and fabricate
 `packet_key` as its candidate canonical ID. Neither may populate a new Qdrant projection.
 Replace or bind the materializer to exact `codebase_chunk_index.id` plus verified source/workspace
 revisions before creating `codebase_chunks_768_v3`.
+
+GRAPHIFY SEMANTIC RUNTIME PROOF: local EmbeddingGemma provenance is now pinned in the
+development environment from the verified GGUF, tokenizer artifact, llama.cpp binary, and
+deterministic launcher profile. Direct strict dry-run with `--require-embed-server` passed:
+`status=DRY_RUN`, `selected=0`, `embedded=0`, `written=0`, `errors=[]`. This proves the
+fail-closed runtime binding and zero-write behavior only; it does not prove Graphify lineage
+coverage or authorize semantic writes.
+### Current-source semantic lineage readback (2026-08-31)
+
+- [x] **SEMANTIC-768-CURRENT-COHORT-01 — Re-run the bounded current-source
+  lineage audit.** Read-only replay of the 111-row exact namespace/file-byte
+  cohort matched all 111 rows to the current workspace revision and Graphify
+  lineage. Counts: `graphifyMatched=111`, `currentWorkspaceMatched=111`,
+  `revisionQualified=111`, `missing=0`, `mismatched=0`, `ambiguous=0`.
+  Receipt: `docs/reports/current-source-cohort-lineage-v1.json`.
+  This proves only the bounded cohort; it does not establish full-corpus
+  semantic or Qdrant promotion readiness.
+- [ ] **SEMANTIC-768-CURRENT-CORPUS-01 — Reconcile the remaining mixed corpus.**
+  The current-source builder has no limit/output override and the broader
+  corpus still contains unresolved namespace/hash and duplicate projection
+  evidence. Do not materialize or backfill until an exact revision-qualified
+  CandidateOrdinal map is produced.
