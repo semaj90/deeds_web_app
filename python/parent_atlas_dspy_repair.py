@@ -14,10 +14,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
-try:
-    import dspy  # type: ignore
-except ImportError:  # pragma: no cover - runtime capability boundary
-    dspy = None
+from python.parent_atlas_oak2026_dspy.runtime import (
+    build_oak2026_gepa_optimizer_v1,
+    require_dspy,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -72,12 +72,6 @@ def atlas_repair_score_v1(observation: RepairMetricObservationV1) -> tuple[float
     return round(score, 6), feedback
 
 
-def require_dspy() -> Any:
-    if dspy is None:
-        raise RuntimeError("DSPy is not installed in this Python environment")
-    return dspy
-
-
 def build_repair_program_v1() -> Any:
     """Construct the DSPy program lazily using the installed DSPy API."""
     dp = require_dspy()
@@ -130,15 +124,12 @@ def build_repair_program_v1() -> Any:
 
 
 def build_gepa_optimizer_v1(metric: Any, *, reflection_lm: Any, log_dir: str, seed: int = 0) -> Any:
-    """Create the current DSPy GEPA optimizer with resumable logs/checkpoints."""
-    dp = require_dspy()
-    return dp.GEPA(
-        metric=metric,
+    """Compatibility wrapper over the shared OaK 2026 GEPA runtime helper."""
+    return build_oak2026_gepa_optimizer_v1(
+        metric,
         reflection_lm=reflection_lm,
         auto="light",
         log_dir=log_dir,
-        track_stats=True,
-        track_best_outputs=True,
         seed=seed,
     )
 
