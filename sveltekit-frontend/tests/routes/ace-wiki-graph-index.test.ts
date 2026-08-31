@@ -1,4 +1,4 @@
-﻿// @vitest-environment node
+// @vitest-environment node
 /**
  * ace-wiki-graph-index.test.ts
  *
