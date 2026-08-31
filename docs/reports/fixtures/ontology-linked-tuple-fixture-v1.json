@@ -1,0 +1,81 @@
+{
+  "tupleId": "7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3",
+  "schemaVersion": "ontology-linked-tuple.v1",
+  "packetKey": "packet:oak-fixture:repair-failure-r17",
+  "sourceRef": "src/lib/server/atlas/symbol-repair-example.ts",
+  "treeNodeId": "tree-node:t7",
+  "titleId": "title:0",
+  "surfaceText": "CODE_REPAIR_CAUSAL_PATH",
+  "tokenIndex": 0,
+  "partOfSpeech": null,
+  "label": "CODE_REPAIR_CAUSAL_PATH",
+  "labelKind": "ontology",
+  "labelSource": "manual",
+  "ontologyIds": [
+    "ontology:code-repair-causal-path"
+  ],
+  "conceptIds": [
+    "concept:symbol-change-impact"
+  ],
+  "participants": [
+    {
+      "entityId": "symbol:S1",
+      "entityKind": "ast_symbol",
+      "role": "cause",
+      "label": "caller symbol S1"
+    },
+    {
+      "entityId": "symbol:S2",
+      "entityKind": "ast_symbol",
+      "role": "effect",
+      "label": "target symbol S2 (failing)"
+    },
+    {
+      "entityId": "symbol:T7",
+      "entityKind": "ast_symbol",
+      "role": "evidence",
+      "label": "failing test T7"
+    },
+    {
+      "entityId": "tool_call:typecheck-run-42",
+      "entityKind": "tool_call",
+      "role": "tool",
+      "label": "tsc --noEmit invocation that surfaced the failure"
+    }
+  ],
+  "evidenceRefs": [
+    "vitest:ontology-kernel-end-to-end.spec.ts:pre-fix-run:4-failed-of-21"
+  ],
+  "relationRevision": "relation:code-repair-causal-path:v1",
+  "evidenceSpan": {
+    "sourceRef": "src/lib/server/atlas/symbol-repair-example.ts",
+    "start": 120,
+    "end": 168
+  },
+  "confidence": 0.93,
+  "evidenceState": "ACTIVE_VERIFIED",
+  "lifecycle": "OBSERVED",
+  "provenance": {
+    "sourceTables": [
+      "atlas_symbol_versions",
+      "atlas_callable_search"
+    ],
+    "labelerVersion": null,
+    "taggerVersion": null,
+    "ontologyVersion": "ontology-kernel:v0",
+    "nlpVersion": null,
+    "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "representationId": null,
+    "representationRevision": null,
+    "producerId": "onto-py-01-fixture-generator",
+    "producerRevision": "onto-py-01:v0",
+    "featureRevision": null,
+    "graphRevision": null,
+    "ontologyRevision": "ontology-kernel:v0",
+    "modelRevision": null,
+    "inputDigest": null,
+    "outputDigest": null,
+    "generatedAt": "2026-08-31T00:00:00.000Z",
+    "lastVerifiedAt": null
+  }
+}

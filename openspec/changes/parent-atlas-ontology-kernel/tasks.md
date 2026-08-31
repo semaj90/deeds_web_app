@@ -611,6 +611,13 @@ that require explicit apply. Package build passed and focused planner tests
 are 5/5. This is contract proof only; no action execution or kernel freeze
 is claimed. Receipt: `docs/reports/oak-kernel-bound-planner-v1.json`.
 
+**OAK-07 replay proof 2026-08-31:** the focused planner suite now replays
+the same manifest, catalog, function, arguments, and evidence twice and
+requires identical action and plan checksums (`6/6` focused tests). This is
+deterministic contract proof only; no action execution, schema inspection,
+or kernel freeze is claimed. The next gate is the read-only schema-ledger
+canary.
+
 - [x] **Core constraint built 2026-08-31 (by the concurrent process,
   reconciled and committed this session at `e7ec116445` after full-suite
   verification — 30/30 spec files, 126/126 tests green, not just this
@@ -795,3 +802,103 @@ is claimed. Receipt: `docs/reports/oak-kernel-bound-planner-v1.json`.
 get a frozen kernel vs. run the ordinary bounded DAG with candidate-only
 output) is described conceptually in spec.md but has no contract shape
 defined yet — first concrete design question for whoever picks up OAK-02.
+
+## ONTO-PY — Python execution/interoperability layer for `OntologyLinkedTupleV1`
+
+Separate from the OAK-XX kernel-construction queue above (this is about
+adding a Python-side adapter for an *existing* contract, not building any
+part of the kernel), but recorded in this file since it was scoped in the
+same conversation and touches adjacent territory (Python + reasoners).
+
+**Boundary, stated explicitly per the operator's design**: Postgres +
+`sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts`
+remain the sole semantic owner of `OntologyLinkedTupleV1`. This package is
+a typed VIEW/adapter only — it creates no new identity, no new envelope,
+and (checked directly in `models.py`'s own docstring) deliberately omits
+`create_identity()`/`mint_tuple_id()`/`guess_symbol()`/
+`resolve_canonical_id_from_embedding()`-shaped functions, since those are
+Parent Atlas authority operations, not adapter operations.
+
+**Located first, per the operator's `safe_next_command`, before writing
+any Python (audit-first discipline, same as everywhere else this
+session)**: the real schema is
+`sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts`
+(`OntologyLinkedTupleV1Schema`, `buildOntologyLinkedTupleId`,
+`buildOntologyLinkedTuplesFromClassification`,
+`buildOntologyLinkedTuplesFromFeatureRow`), and the real Postgres writer
+is `ontology-linked-tuple-postgres.ts`'s `persistOntologyLinkedTuples()`
+against `atlas_ontology_linked_tuples`
+(`drizzle/manual/20260825_atlas_ontology_linked_tuples.sql`) — confirmed
+live, not assumed.
+
+### ONTO-PY-01 — TS fixture → Python typed representation → checksum parity — **DONE 2026-08-31**
+
+- [x] **Fixture generator**: `scripts/atlas/generate-ontology-linked-tuple-fixture-v1.mts`
+  imports the REAL `OntologyLinkedTupleV1Schema` directly (not a hand-
+  copied shape) and validates one fixture through `.parse()` before
+  writing it — so the fixture can never silently drift from the
+  canonical contract. Per the operator's explicit instruction, it's a
+  **genuine 4-participant n-ary relation** (`cause`/`effect`/`evidence`/
+  `tool` roles over real schema-legal `entityKind` values), not a
+  trivial binary edge — exactly the shape a naive pairwise-edge
+  flattening would lose information on. Written to
+  `docs/reports/fixtures/ontology-linked-tuple-fixture-v1.json`.
+- [x] **Python typed model**: `python/parent_atlas_ontology/models.py` —
+  frozen dataclasses mirroring every real field name from the TS schema
+  (not the operator's simplified illustrative shape — the actual full
+  field set, so nothing here can drift from what Postgres persists).
+  `participants` stays a Python tuple for its immutability, but its
+  members are `OntologyParticipantV1` instances with named
+  `entityId`/`entityKind`/`role`/`label` fields — not positional values,
+  per the operator's own "position silently becomes semantics" warning.
+- [x] **Checksum parity**: `python/parent_atlas_ontology/checksum.py`
+  mirrors the exact stable-JSON + sha256 algorithm every TS file in
+  `packages/parent-atlas/src/core/` already uses (recursive key-sort,
+  then hash). **Stated normalization, not hidden**: keys with `None`
+  values are dropped before hashing on both sides, because Zod's
+  `.optional()` (non-nullable) fields are entirely absent from
+  `JSON.stringify` output when unset, while Python's `to_dict()` always
+  emits every field — dropping `None` keys makes the two sides compare
+  as the correct semantic equivalent, and `checksum.py`'s docstring says
+  this is a normalization, not a byte-identical-JSON claim.
+  `onto_py_01_parity_check.py` round-trips the fixture through
+  `from_dict()`/`to_dict()` and asserts 8 checks, all passing: tuple id
+  preserved, participant count/roles/order/entityIds preserved (the
+  specific n-ary-losing-information risk), evidence refs preserved,
+  confidence preserved, provenance preserved, and canonical checksum
+  parity. **Result: PASS, 8/8 checks.** Report at
+  `docs/reports/ontology-linked-tuple-python-adapter-parity-v1.json`
+  (exact path the operator specified).
+
+**Run it**:
+```bash
+cd sveltekit-frontend && npx tsx ../scripts/atlas/generate-ontology-linked-tuple-fixture-v1.mts
+cd .. && python python/parent_atlas_ontology/onto_py_01_parity_check.py
+```
+
+### ONTO-PY-02 through 05 — deliberately NOT attempted this session
+
+- **ONTO-PY-02** (tuple → RDFLib → RDF, deterministic replay): **`rdflib`
+  is not installed** in this environment — checked directly (`import
+  rdflib` → `ModuleNotFoundError`), not assumed. `pyarrow` (21.0.0) and
+  `networkx` (3.3) ARE already installed, confirmed the same way. Held
+  rather than silently `pip install`ing a new dependency without
+  checking this repo's existing per-feature `python/requirements-*.txt`
+  convention first (`requirements-atlas-live-graph.txt`,
+  `requirements-langextract.txt`, etc. already exist as precedent for
+  scoped Python capability deps) — a `requirements-ontology-adapter.txt`
+  should follow that pattern, but adding the dependency itself wasn't
+  done without flagging it first, matching the same discipline applied
+  to the OAK-03B/03C JVM decision above.
+- **ONTO-PY-03** (tuple → Arrow IPC round-trip): `pyarrow` is already
+  available — this is the most immediately buildable of the remaining
+  four gates, just not attempted in this pass (scope/time boundary, not
+  a blocker).
+  **ONTO-PY-04** (NetworkX projection → same frozen GraphOrdinal map →
+  cuGraph projection parity): `networkx` is already available; cuGraph
+  is a separate, heavier GPU-library question not checked this pass.
+  **ONTO-PY-05** (same semantic payload → `AtlasPassEnvelopeV2` →
+  checksum/revision replay): depends on `AtlasPassEnvelopeV2` existing
+  as a real contract — not verified to exist in this repo yet; needs its
+  own audit-first check before starting, same as everything else in this
+  file.
