@@ -1,4 +1,6 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 import path from 'node:path';
 import process from 'node:process';
 import pg from 'pg';
@@ -35,11 +37,26 @@ if (!inputPath) {
   throw new Error('KAG_INPUT_REQUIRED: pass --input=<contracts.jsonl>');
 }
 
-const lines = (await readFile(path.resolve(inputPath), 'utf8'))
-  .split(/\r?\n/)
-  .map((line) => line.trim())
-  .filter(Boolean)
-  .slice(0, limit);
+// Stream line-by-line rather than readFile()+split() — a full-file read followed by a
+// full-string split means --limit never actually bounds memory (the whole file is loaded
+// and the whole string is split before any truncation happens). This matters once a real
+// Graphify/AST producer export is selected as canonical input (task below) since those
+// exports can be large (this repo's own codebase-graph.json is ~25MB) — PERF0 benchmarking
+// (docs/reports/atlas-kag-perf0-json-parse-benchmark.md) showed JSON.parse itself is not a
+// bottleneck at this pipeline's payload sizes; the eager whole-file read was the real risk.
+const lines: string[] = [];
+{
+  const rl = createInterface({ input: createReadStream(path.resolve(inputPath), 'utf8'), crlfDelay: Infinity });
+  for await (const raw of rl) {
+    const line = raw.trim();
+    if (!line) continue;
+    lines.push(line);
+    if (lines.length >= limit) {
+      rl.close();
+      break;
+    }
+  }
+}
 
 const parsed: ParsedRecord[] = [];
 const rejected: Array<{ line: number; error: string }> = [];
