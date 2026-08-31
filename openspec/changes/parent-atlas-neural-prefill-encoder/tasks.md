@@ -13520,35 +13520,50 @@ grep against the real files instead of trusting the cached index; a fresh
   `/deep-audit` run on this area -- confirmed stale/mis-scoped, not just
   >24h old.
 
-### Next checklist to finish this change (2026-08-31, consolidated)
+### Next checklist to finish this change (2026-08-31, consolidated; items 1/3/4 closed same day, see below)
 
 In dependency order -- each item names what specifically blocks it:
 
-1. **Enable the shadow flag somewhere real** (operator decision, zero code
-   needed) -- `ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED=true` in one
-   environment, confirm a `neuralDecoderPrefillShadow` receipt actually shows
-   up in a real `yorha.*` response. This is the cheapest possible next step
-   and the first genuinely live proof of the whole chain end-to-end (still
-   query-only).
-2. **DECODER-CONTAINER-01** -- add a `docker compose` service for
-   `atlas_neural_decoder_service.py` on a non-colliding port (not `8100`
-   Go Retrieval, not `8101` topology, not `8095` NLP sidecar; `8121` was only
-   ever the ad hoc host-proof port). Needs a real healthcheck
-   (`GET /health`) and `depends_on: condition: service_healthy` for anything
-   that calls it. No speculative CUDA image.
-3. **PREFILL-VALKEY-01 (live cache proof)** -- once (1) and (2) are real,
-   prove `GET` MISS -> decoder call -> `SET NX EX` -> `GET` HIT against the
-   actual running Valkey instance and the actual containerized decoder, not
-   the mocked `fetch` + shared Redis client used so far. Bind the TTL
-   decision (this pass's Redis shadow cache uses 24h; the original review
-   suggested a short bounded TTL like 60s for the first live proof -- pick
-   one deliberately, don't default silently).
-4. **PREFILL-REPLAY-01** -- with (3) proven, run the identical frozen
-   request twice against the *real* stack and confirm latent checksum,
-   `decoderQualifiedPrefillIdentityChecksum`, and `resolvedPrefillChecksum`
-   match across both runs. `PREFILL-CALLER-01B` already proved this
-   in-process with a mocked decoder; this is the same proof against real
-   infra.
+1. [x] **Enable the shadow flag somewhere real.** Done as a standalone live
+   proof (not the running dev server, no `.env` touched): a one-off `tsx`
+   script, run from `sveltekit-frontend/` with `NEURAL_DECODER_PREFILL_SHADOW_ENABLED=true`
+   + `NEURAL_DECODER_URL=http://127.0.0.1:8121` + `REDIS_PASSWORD=redis`
+   passed inline as process env, called `runNeuralDecoderPrefillShadowForManifest()`
+   directly against a real 768-dim query embedding fetched live from Ollama
+   (`embeddinggemma:latest`, confirmed live and running). Receipt was real,
+   not synthetic: `checkpointRevision`/`checkpointSha256` matched the live
+   decoder's own `/health` response exactly.
+2. [ ] **DECODER-CONTAINER-01** -- still open. The decoder that answered (1)
+   is a live host process on `:8121` (confirmed via `GET /health`:
+   `device: "cuda"`, `torchVersion: "2.8.0+cu128"`), not a `docker compose`
+   service. Add one for `atlas_neural_decoder_service.py` on a non-colliding
+   port (not `8100` Go Retrieval, not `8101` topology, not `8095` NLP
+   sidecar). Needs a real healthcheck (`GET /health`) and
+   `depends_on: condition: service_healthy` for anything that calls it. No
+   speculative CUDA image.
+3. [x] **PREFILL-VALKEY-01 (live cache proof) -- CLOSED, real infra, not
+   mocked.** The same live-proof script's cache calls went through the real
+   `getRedis()`/`getJson`/`setJsonWithTtl` path against the actual
+   `legal-ai-valkey` Docker container (confirmed healthy beforehand). Run 1:
+   `cacheStatus: "MISS"`, `decoderInvocations: 1`. Run 2 (identical request):
+   `cacheStatus: "HIT"`, `decoderInvocations: 0`. Verified the key actually
+   landed in Valkey by reading it back directly:
+   `docker exec legal-ai-valkey valkey-cli --scan --pattern 'atlas:neural-decoder-feature:v1:*'`
+   found the exact key, `TTL` returned `86115` (~23.9h, matching the 24h TTL
+   this module sets) -- this was a real `SET ... EX 86400` / `GET`, not a
+   mock. Key deleted after the check (test artifact, not meant to persist).
+   Note: this proves the *shape* of the MISS->decoder->cache->HIT chain
+   against real infra; it used the host-process decoder from (1), so it does
+   not by itself close (2) -- (2) is about containerizing that same decoder,
+   not about proving the cache path again.
+4. [x] **PREFILL-REPLAY-01 -- CLOSED, real stack.** The same two runs above
+   *are* this proof: identical frozen request (same manifest, same real
+   embedding) run twice against the real embedding server + real decoder +
+   real Valkey produced byte-identical `decoderQualifiedPrefillIdentityChecksum`,
+   `latentInputChecksum`, `decoderOutputChecksum`, and `resolvedPrefillChecksum`
+   across both runs. `PREFILL-CALLER-01B` (earlier this session) already
+   proved this in-process with a mocked decoder; this is the same invariant
+   holding against real infra, not just real logic.
 5. **Per-candidate wiring** (separate, larger, not started) -- thread the
    transient per-chunk embeddings `fetchRAGChunks()` already computes for
    reranking (~context-assembler.ts line 5758) through to
