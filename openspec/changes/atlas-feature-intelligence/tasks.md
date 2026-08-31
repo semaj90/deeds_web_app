@@ -7,8 +7,8 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 ## P0 — Canonical boundary
 
 - [x] FI-01 Define `FeatureV1`, `FeatureCandidateV1`, `FeatureEvidenceV1`, `FeatureStateV1`, `FeatureStateReceiptV1` and canonical `FeatureRelationshipV1` relationship/arity contracts.
-- [ ] FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.**
-- [ ] FI-03 Add evidence identity normalization and canonical promotion.
+- [ ] FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner.
+- [ ] FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.**
 - [ ] FI-04 Add Postgres migrations/materializers for canonical features, evidence edges, relationships/hyperedges and state receipts. **Manual PostgreSQL 18 migration + transactional repository written; apply/readback proof pending.**
 
 ## P0 — Evidence ingestion

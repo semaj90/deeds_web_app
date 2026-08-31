@@ -1,20 +1,48 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-08-26T23:40:14.357Z
+Generated: 2026-08-31T03:16:06.979Z
 
 ## Summary
 
-- tables checked: 6
+- tables checked: 8
 - static aligned: 3
-- live aligned: 2
+- live aligned: 3
 - live unavailable: 0
-- blockers: 7
+- blockers: 10
 
 ## Packet Spine
 
 - canonical spine: packet_key / source_ref / feature_id / community_id
 - packet contract lane is read-only
 - live DB unavailability is a warning, not a crash
+
+## kanban_tasks
+
+- classification: LIVE_DB_ALIGNED
+- repair_class: ADD_DRIZZLE_MIRROR
+- static: INDEX_MISMATCH
+- live: LIVE_DB_ALIGNED
+- schema sources: sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts
+- manual sources: sveltekit-frontend/drizzle/manual/kanban_task_lifecycle_baseline.sql
+- static columns: assignee, attempt_count, claim_expires_at, claim_token, completed_at, created_at, current_run_id, failure_count, feature_id, feature_label, idempotency_key, lane, last_heartbeat_at, max_retries, priority, source_refs, started_at, status, task_id, updated_at, validation_command
+- static indexes: kanban_ready_idx, kanban_running_heartbeat_idx
+- live columns: task_id, feature_id, feature_label, source_refs, lane, status, validation_command, assignee, priority, claim_token, claim_expires_at, last_heartbeat_at, current_run_id, attempt_count, failure_count, max_retries, started_at, completed_at, idempotency_key, created_at, updated_at
+- live indexes: kanban_ready_idx, kanban_running_heartbeat_idx, kanban_tasks_pkey
+- live rows: 0
+
+## feature_registry
+
+- classification: LIVE_TABLE_MISSING
+- repair_class: APPLY_EXISTING_SQL
+- static: COLUMN_MISMATCH
+- live: LIVE_TABLE_MISSING
+- schema sources: sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts
+- manual sources: sveltekit-frontend/drizzle/manual/0048_feature_registry_queries.sql
+- static columns: chunk_ids, cluster_id, code_refs, description, feature_key, id, last_verified_at, retry_queries, source_refs, status, summary, tags, test_refs, title, trust_tier
+- static indexes: feature_registry_feature_key_key, feature_registry_queries_created_at_idx, feature_registry_queries_query_hash_idx, feature_registry_queries_savings_idx, feature_registry_queries_trace_id_idx, feature_registry_queries_user_id_idx
+- live columns: none
+- live indexes: none
+- live rows: n/a
 
 ## task_semantic_packets
 
@@ -56,7 +84,7 @@ Generated: 2026-08-26T23:40:14.357Z
 - static indexes: idx_nes_chrom_packets_betweenness, idx_nes_chrom_packets_community_confidence_idx, idx_nes_chrom_packets_community_id_idx, idx_nes_chrom_packets_community_source_idx, idx_nes_chrom_packets_domain_class_idx, idx_nes_chrom_packets_eigenvector, idx_nes_chrom_packets_feature_id, idx_nes_chrom_packets_feature_id_idx, idx_nes_chrom_packets_feature_ids_gin, idx_nes_chrom_packets_feature_label_idx, idx_nes_chrom_packets_feature_source, idx_nes_chrom_packets_kmeans_cluster_idx, idx_nes_chrom_packets_lane_ids_gin, idx_nes_chrom_packets_ledger_type_idx, idx_nes_chrom_packets_lineage_version_idx, idx_nes_chrom_packets_metadata_gin, idx_nes_chrom_packets_neo4j_node_id, idx_nes_chrom_packets_packet_key_idx, idx_nes_chrom_packets_pagerank, idx_nes_chrom_packets_permissions_gin, idx_nes_chrom_packets_redis_centroid_key, idx_nes_chrom_packets_som_cluster, idx_nes_chrom_packets_som_index_idx, idx_nes_chrom_packets_source_ref, idx_nes_chrom_packets_source_ref_idx, idx_nes_chrom_packets_tags_gin, idx_nes_chrom_packets_topology_gin, idx_nes_chrom_packets_vectors_gin, nes_chrom_packets_chunk_id_idx, nes_chrom_packets_confidence_score_idx, nes_chrom_packets_embedding_hnsw, nes_chrom_packets_feature_code_idx, nes_chrom_packets_feature_id_idx, nes_chrom_packets_feature_ids_gin, nes_chrom_packets_kag_run_idx, nes_chrom_packets_kmeans_cluster_idx, nes_chrom_packets_lane_ids_gin, nes_chrom_packets_metadata_gin, nes_chrom_packets_norm_source_ref_trgm_idx, nes_chrom_packets_packet_key_key, nes_chrom_packets_packet_zstd_idx, nes_chrom_packets_payload_gin, nes_chrom_packets_qdrant_point_idx, nes_chrom_packets_query_hash_idx, nes_chrom_packets_som_code_idx, nes_chrom_packets_som_index_idx, nes_chrom_packets_source_ref_id_idx, nes_chrom_packets_source_ref_idx, nes_chrom_packets_source_ref_trgm_idx, nes_chrom_packets_source_refs_gin, nes_chrom_packets_summary_trgm_idx, nes_chrom_packets_tags_gin
 - live columns: id, packet_key, query_hash, chunk_id, source_ref, source_refs, feature_id, feature_label, packet_type, lane, model, summary, file_path, community_id, community_confidence, community_source, domain_class, permissions, topology, vectors, ledger_type, lineage_version, metadata, tags, canonical, identity_lane, payload_backfilled_at, pagerank, betweenness, eigenvector, neo4j_node_id, redis_centroid_key, som_row, som_col, som_index, kmeans_cluster, payload, embedding, qdrant_point_id, kag_dag_run_id, kag_node_key, token_budget, feature_ids, som_cluster, lane_ids, source_ref_id, feature_code, som_code, confidence_score, packet_zstd, created_at, updated_at
 - live indexes: idx_nes_chrom_packets_betweenness, idx_nes_chrom_packets_community_confidence_idx, idx_nes_chrom_packets_community_id_idx, idx_nes_chrom_packets_community_source_idx, idx_nes_chrom_packets_domain_class_idx, idx_nes_chrom_packets_eigenvector, idx_nes_chrom_packets_feature_id, idx_nes_chrom_packets_feature_id_idx, idx_nes_chrom_packets_feature_ids_gin, idx_nes_chrom_packets_feature_label_idx, idx_nes_chrom_packets_feature_source, idx_nes_chrom_packets_kmeans_cluster_idx, idx_nes_chrom_packets_lane_ids_gin, idx_nes_chrom_packets_ledger_type_idx, idx_nes_chrom_packets_lineage_version_idx, idx_nes_chrom_packets_metadata_gin, idx_nes_chrom_packets_neo4j_node_id, idx_nes_chrom_packets_packet_key_idx, idx_nes_chrom_packets_pagerank, idx_nes_chrom_packets_permissions_gin, idx_nes_chrom_packets_redis_centroid_key, idx_nes_chrom_packets_som_cluster, idx_nes_chrom_packets_som_index_idx, idx_nes_chrom_packets_source_ref, idx_nes_chrom_packets_source_ref_idx, idx_nes_chrom_packets_tags_gin, idx_nes_chrom_packets_topology_gin, idx_nes_chrom_packets_vectors_gin, nes_chrom_packets_chunk_id_idx, nes_chrom_packets_confidence_score_idx, nes_chrom_packets_embedding_hnsw, nes_chrom_packets_feature_code_idx, nes_chrom_packets_feature_id_idx, nes_chrom_packets_feature_ids_gin, nes_chrom_packets_kag_run_idx, nes_chrom_packets_kmeans_cluster_idx, nes_chrom_packets_lane_ids_gin, nes_chrom_packets_metadata_gin, nes_chrom_packets_norm_source_ref_trgm_idx, nes_chrom_packets_packet_key_key, nes_chrom_packets_packet_zstd_idx, nes_chrom_packets_payload_gin, nes_chrom_packets_pkey, nes_chrom_packets_qdrant_point_idx, nes_chrom_packets_query_hash_idx, nes_chrom_packets_som_code_idx, nes_chrom_packets_som_index_idx, nes_chrom_packets_source_ref_id_idx, nes_chrom_packets_source_ref_idx, nes_chrom_packets_source_ref_trgm_idx, nes_chrom_packets_source_refs_gin, nes_chrom_packets_summary_trgm_idx, nes_chrom_packets_tags_gin
-- live rows: 0
+- live rows: 1992
 
 ## nes_chrom_kag_dag_hits
 
@@ -102,6 +130,9 @@ Generated: 2026-08-26T23:40:14.357Z
 
 ## Blockers
 
+- kanban_tasks: static INDEX_MISMATCH
+- feature_registry: static COLUMN_MISMATCH
+- feature_registry: live LIVE_TABLE_MISSING
 - task_semantic_packets: static COLUMN_MISMATCH
 - task_semantic_packets: live COLUMN_MISMATCH
 - atlas_packets: static COLUMN_MISMATCH

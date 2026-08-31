@@ -1,9 +1,9 @@
 {
   "schema": "atlas.ast-symbol-version-materialization.v1",
   "mode": "DRY_RUN",
-  "inputNominations": 5,
-  "canonicalDeclarationCandidates": 5,
-  "revisionQualifiedCandidates": 5,
+  "inputNominations": 440,
+  "canonicalDeclarationCandidates": 90,
+  "revisionQualifiedCandidates": 90,
   "missingSourceRevision": 0,
   "missingWorkspaceRevision": 0,
   "excludedVariables": 0,
@@ -17,34 +17,34 @@
   "databaseWrites": false,
   "sample": [
     {
-      "nominationId": "treesitter-chunker:e01e77e9a02d9064443c27b7249c27c8cfad169b:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
-      "kind": "method",
-      "qualifiedName": "export_statement::class_declaration::method_definition::validateAST",
-      "sourceRef": "src/lib/server/services/error-analysis/FixSynthesizer.ts"
+      "nominationId": "treesitter-chunker:0855b32e8d8980671a4304973e02761319a77cb4:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "kind": "function",
+      "qualifiedName": "export_statement::function_declaration::getContextCachePath",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
     },
     {
-      "nominationId": "treesitter-chunker:f12a2b79442c63cbc8348df2a63441463b4c1ff8:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
-      "kind": "method",
-      "qualifiedName": "export_statement::class_declaration::method_definition::applyFix",
-      "sourceRef": "src/lib/server/services/error-analysis/FixSynthesizer.ts"
+      "nominationId": "treesitter-chunker:0a39c9bfffbde4ee5c833910443576924d2f31a8:anchor:content:18e3bfd572b94a4cf8489303a13d25581bc2a5dc9282ef6a40f370a16e2a0124",
+      "kind": "function",
+      "qualifiedName": "function_declaration::writeRedisContextCache",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts"
     },
     {
-      "nominationId": "treesitter-chunker:36973b393e336ae2639beb895b298bf79d774361:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
-      "kind": "method",
-      "qualifiedName": "export_statement::class_declaration::method_definition::createBackup",
-      "sourceRef": "src/lib/server/services/error-analysis/FixSynthesizer.ts"
-    },
-    {
-      "nominationId": "treesitter-chunker:feff2594a0813021dfea4185d6cdd8c367285224:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+      "nominationId": "treesitter-chunker:0c59f9bf0e9f07cbf4e5873bd3979086ebc5427d:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
       "kind": "interface",
-      "qualifiedName": "export_statement::interface_declaration::FixSynthesizerConfig",
-      "sourceRef": "src/lib/server/services/error-analysis/FixSynthesizer.ts"
+      "qualifiedName": "export_statement::interface_declaration::EscalationAnalysis",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
     },
     {
-      "nominationId": "treesitter-chunker:c8827306f3a49b16618d425242531e4530cd734e:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
+      "nominationId": "treesitter-chunker:0ebadf1cf86b9fd6af7c979686ec886930acb3eb:anchor:content:de9b9390076e6dd35e2591db6aadae5722a15032491ad8246e607eb46e706c71",
+      "kind": "function",
+      "qualifiedName": "export_statement::function_declaration::getEscalationService",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/EscalationService.ts"
+    },
+    {
+      "nominationId": "treesitter-chunker:147feb64560bb30f29a17cf6e29a1aede93eacde:anchor:content:1e76394c1194114e2178c6feb776269a013d1bd7e0b539982194de2cc0ea252c",
       "kind": "method",
-      "qualifiedName": "export_statement::class_declaration::method_definition::rollbackFix",
-      "sourceRef": "src/lib/server/services/error-analysis/FixSynthesizer.ts"
+      "qualifiedName": "export_statement::class_declaration::method_definition::synthesizeFix",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "inspectedAt": "2026-08-30T20:32:35.009Z",
+  "inspectedAt": "2026-08-31T03:14:42.278Z",
   "pgSchema": "public",
-  "tableCount": 525,
+  "tableCount": 526,
   "enumCount": 45,
   "viewCount": 22,
   "sequenceCount": 98,
@@ -11318,7 +11318,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "atlas_assertion_versions",
-          "foreignColumn": "byte_start",
+          "foreignColumn": "byte_end",
           "updateRule": null,
           "deleteRule": null
         },
@@ -11470,7 +11470,7 @@
             "definition_hash"
           ],
           "foreignTable": "atlas_assertion_versions",
-          "foreignColumn": "definition_hash",
+          "foreignColumn": "stable_assertion_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -11964,7 +11964,7 @@
             "normalized_node_hash"
           ],
           "foreignTable": "atlas_ast_nodes",
-          "foreignColumn": "normalized_node_hash",
+          "foreignColumn": "repo_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -16136,7 +16136,7 @@
             "input_hash"
           ],
           "foreignTable": "atlas_embeddings_384",
-          "foreignColumn": "subject_type",
+          "foreignColumn": "vector_contract",
           "updateRule": null,
           "deleteRule": null
         },
@@ -16848,7 +16848,7 @@
             "input_hash"
           ],
           "foreignTable": "atlas_embeddings_768",
-          "foreignColumn": "vector_contract",
+          "foreignColumn": "vector_role",
           "updateRule": null,
           "deleteRule": null
         },
@@ -18189,7 +18189,7 @@
             "normalized_text_digest"
           ],
           "foreignTable": "atlas_extractions",
-          "foreignColumn": "source_revision_id",
+          "foreignColumn": "extractor_version",
           "updateRule": null,
           "deleteRule": null
         },
@@ -22301,7 +22301,7 @@
             "relationship_type"
           ],
           "foreignTable": "atlas_feature_relationships",
-          "foreignColumn": "source_feature_id",
+          "foreignColumn": "relationship_type",
           "updateRule": null,
           "deleteRule": null
         }
@@ -25319,7 +25319,7 @@
             "normalized_url"
           ],
           "foreignTable": "atlas_fetches",
-          "foreignColumn": "normalized_url",
+          "foreignColumn": "research_run_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -25552,7 +25552,7 @@
             "relation_type"
           ],
           "foreignTable": "atlas_fi_evidence",
-          "foreignColumn": "feature_id",
+          "foreignColumn": "evidence_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -26660,7 +26660,7 @@
             "snapshot_id"
           ],
           "foreignTable": "atlas_graph_authority_runs_v2",
-          "foreignColumn": "run_id",
+          "foreignColumn": "snapshot_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -27496,7 +27496,7 @@
             "snapshot_id"
           ],
           "foreignTable": "atlas_graph_authority_runs_v2",
-          "foreignColumn": "snapshot_id",
+          "foreignColumn": "run_id",
           "updateRule": "NO ACTION",
           "deleteRule": "RESTRICT"
         },
@@ -27779,7 +27779,7 @@
             "target_node_key"
           ],
           "foreignTable": "atlas_graph_nodes_v2",
-          "foreignColumn": "snapshot_id",
+          "foreignColumn": "node_key",
           "updateRule": "NO ACTION",
           "deleteRule": "RESTRICT"
         },
@@ -28134,7 +28134,7 @@
             "evidence_hash"
           ],
           "foreignTable": "atlas_graph_facts",
-          "foreignColumn": "predicate",
+          "foreignColumn": "evidence_hash",
           "updateRule": null,
           "deleteRule": null
         },
@@ -28327,7 +28327,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "atlas_graph_nodes_v2",
-          "foreignColumn": "packet_key",
+          "foreignColumn": "node_type",
           "updateRule": null,
           "deleteRule": null
         },
@@ -28357,7 +28357,7 @@
             "node_key"
           ],
           "foreignTable": "atlas_graph_nodes_v2",
-          "foreignColumn": "snapshot_id",
+          "foreignColumn": "node_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -28692,7 +28692,7 @@
             "relation_id"
           ],
           "foreignTable": "atlas_graph_relation_events_v2",
-          "foreignColumn": "relation_id",
+          "foreignColumn": "snapshot_id",
           "updateRule": "NO ACTION",
           "deleteRule": "RESTRICT"
         },
@@ -28733,7 +28733,7 @@
             "role"
           ],
           "foreignTable": "atlas_graph_relation_participants_v2",
-          "foreignColumn": "relation_id",
+          "foreignColumn": "snapshot_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -28763,7 +28763,7 @@
             "node_key"
           ],
           "foreignTable": "atlas_graph_nodes_v2",
-          "foreignColumn": "node_key",
+          "foreignColumn": "snapshot_id",
           "updateRule": "NO ACTION",
           "deleteRule": "RESTRICT"
         },
@@ -29022,7 +29022,7 @@
             "issue_fingerprint"
           ],
           "foreignTable": "atlas_graph_resolution_issues_v2",
-          "foreignColumn": "issue_fingerprint",
+          "foreignColumn": "snapshot_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -30702,7 +30702,7 @@
             "member_role"
           ],
           "foreignTable": "atlas_hyperedge_members",
-          "foreignColumn": "hyperedge_id",
+          "foreignColumn": "member_id",
           "updateRule": null,
           "deleteRule": null
         }
@@ -31750,7 +31750,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "atlas_identity_alias_decisions",
-          "foreignColumn": "new_key",
+          "foreignColumn": "old_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -31946,6 +31946,248 @@
           "type": "btree",
           "columns": "{entity_kind,stable_id,reviewed_at}",
           "definition": "CREATE INDEX idx_atlas_identity_alias_decisions_stable ON public.atlas_identity_alias_decisions USING btree (entity_kind, stable_id, reviewed_at DESC)"
+        }
+      ]
+    },
+    "atlas_identity_ledger": {
+      "columns": [
+        {
+          "name": "packet_key",
+          "position": 1,
+          "type": "text",
+          "dataType": "text",
+          "nullable": false,
+          "default": null,
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "feature_id",
+          "position": 2,
+          "type": "text",
+          "dataType": "text",
+          "nullable": true,
+          "default": null,
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "source_ref",
+          "position": 3,
+          "type": "text",
+          "dataType": "text",
+          "nullable": true,
+          "default": null,
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "qdrant_id",
+          "position": 4,
+          "type": "int8",
+          "dataType": "bigint",
+          "nullable": true,
+          "default": null,
+          "maxLength": null,
+          "precision": 64,
+          "scale": 0,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "som_cluster",
+          "position": 5,
+          "type": "int4",
+          "dataType": "integer",
+          "nullable": true,
+          "default": null,
+          "maxLength": null,
+          "precision": 32,
+          "scale": 0,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "kmeans_cluster",
+          "position": 6,
+          "type": "int4",
+          "dataType": "integer",
+          "nullable": true,
+          "default": null,
+          "maxLength": null,
+          "precision": 32,
+          "scale": 0,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "indexed_pg",
+          "position": 7,
+          "type": "bool",
+          "dataType": "boolean",
+          "nullable": true,
+          "default": "false",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "indexed_qdrant",
+          "position": 8,
+          "type": "bool",
+          "dataType": "boolean",
+          "nullable": true,
+          "default": "false",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "indexed_neo4j",
+          "position": 9,
+          "type": "bool",
+          "dataType": "boolean",
+          "nullable": true,
+          "default": "false",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "indexed_redis",
+          "position": 10,
+          "type": "bool",
+          "dataType": "boolean",
+          "nullable": true,
+          "default": "false",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "indexed_bitfrost",
+          "position": 11,
+          "type": "bool",
+          "dataType": "boolean",
+          "nullable": true,
+          "default": "false",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "verified_at",
+          "position": 12,
+          "type": "timestamptz",
+          "dataType": "timestamp with time zone",
+          "nullable": true,
+          "default": "now()",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        },
+        {
+          "name": "updated_at",
+          "position": 13,
+          "type": "timestamptz",
+          "dataType": "timestamp with time zone",
+          "nullable": true,
+          "default": "now()",
+          "maxLength": null,
+          "precision": null,
+          "scale": null,
+          "isIdentity": false,
+          "identityGeneration": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "atlas_identity_ledger_packet_key_not_null",
+          "type": "CHECK",
+          "columns": [],
+          "foreignTable": "atlas_identity_ledger",
+          "foreignColumn": "packet_key",
+          "updateRule": null,
+          "deleteRule": null
+        },
+        {
+          "name": "atlas_identity_ledger_pkey",
+          "type": "PRIMARY KEY",
+          "columns": [
+            "packet_key"
+          ],
+          "foreignTable": "atlas_identity_ledger",
+          "foreignColumn": "packet_key",
+          "updateRule": null,
+          "deleteRule": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "atlas_identity_ledger_pkey",
+          "unique": true,
+          "primary": true,
+          "valid": true,
+          "type": "btree",
+          "columns": "{packet_key}",
+          "definition": "CREATE UNIQUE INDEX atlas_identity_ledger_pkey ON public.atlas_identity_ledger USING btree (packet_key)"
+        },
+        {
+          "name": "idx_atlas_ledger_feature_id",
+          "unique": false,
+          "primary": false,
+          "valid": true,
+          "type": "btree",
+          "columns": "{feature_id}",
+          "definition": "CREATE INDEX idx_atlas_ledger_feature_id ON public.atlas_identity_ledger USING btree (feature_id)"
+        },
+        {
+          "name": "idx_atlas_ledger_indexed_status",
+          "unique": false,
+          "primary": false,
+          "valid": true,
+          "type": "btree",
+          "columns": "{indexed_pg,indexed_qdrant,indexed_neo4j,indexed_redis}",
+          "definition": "CREATE INDEX idx_atlas_ledger_indexed_status ON public.atlas_identity_ledger USING btree (indexed_pg, indexed_qdrant, indexed_neo4j, indexed_redis)"
+        },
+        {
+          "name": "idx_atlas_ledger_qdrant_id",
+          "unique": false,
+          "primary": false,
+          "valid": true,
+          "type": "btree",
+          "columns": "{qdrant_id}",
+          "definition": "CREATE INDEX idx_atlas_ledger_qdrant_id ON public.atlas_identity_ledger USING btree (qdrant_id)"
+        },
+        {
+          "name": "idx_atlas_ledger_source_ref",
+          "unique": false,
+          "primary": false,
+          "valid": true,
+          "type": "btree",
+          "columns": "{source_ref}",
+          "definition": "CREATE INDEX idx_atlas_ledger_source_ref ON public.atlas_identity_ledger USING btree (source_ref)"
         }
       ]
     },
@@ -32439,7 +32681,7 @@
             "schema_version"
           ],
           "foreignTable": "atlas_schema_registry",
-          "foreignColumn": "schema_id",
+          "foreignColumn": "schema_version",
           "updateRule": "NO ACTION",
           "deleteRule": "NO ACTION"
         },
@@ -33320,7 +33562,7 @@
             "feature_revision"
           ],
           "foreignTable": "atlas_observation_feature_rows",
-          "foreignColumn": "packet_key",
+          "foreignColumn": "feature_revision",
           "updateRule": null,
           "deleteRule": null
         },
@@ -34567,7 +34809,7 @@
             "object_concept_id"
           ],
           "foreignTable": "atlas_ontology_relations",
-          "foreignColumn": "subject_concept_id",
+          "foreignColumn": "predicate",
           "updateRule": null,
           "deleteRule": null
         }
@@ -39483,7 +39725,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "atlas_packets",
-          "foreignColumn": "primary_domain",
+          "foreignColumn": "domain_memberships",
           "updateRule": null,
           "deleteRule": null
         }
@@ -40873,7 +41115,7 @@
             "target_contract"
           ],
           "foreignTable": "atlas_projection_state",
-          "foreignColumn": "target_store",
+          "foreignColumn": "knowledge_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -41171,7 +41413,7 @@
             "outbox_event_id"
           ],
           "foreignTable": "atlas_qdrant_repair_log",
-          "foreignColumn": "outbox_event_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -41743,7 +41985,7 @@
             "packet_key"
           ],
           "foreignTable": "atlas_registry_alignment",
-          "foreignColumn": "registry_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -41878,7 +42120,7 @@
             "role"
           ],
           "foreignTable": "atlas_relationship_cardinality",
-          "foreignColumn": "role",
+          "foreignColumn": "relationship_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -42480,7 +42722,7 @@
             "entity_id"
           ],
           "foreignTable": "atlas_relationship_members",
-          "foreignColumn": "relationship_id",
+          "foreignColumn": "role",
           "updateRule": null,
           "deleteRule": null
         },
@@ -44112,7 +44354,7 @@
             "stable_schema_object_id"
           ],
           "foreignTable": "atlas_schema_object_aliases",
-          "foreignColumn": "alias_key",
+          "foreignColumn": "stable_schema_object_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -44904,7 +45146,7 @@
             "definition_hash"
           ],
           "foreignTable": "atlas_schema_object_versions",
-          "foreignColumn": "stable_schema_object_id",
+          "foreignColumn": "schema_revision",
           "updateRule": null,
           "deleteRule": null
         }
@@ -45113,7 +45355,7 @@
             "schema_version"
           ],
           "foreignTable": "atlas_schema_registry",
-          "foreignColumn": "schema_id",
+          "foreignColumn": "schema_version",
           "updateRule": null,
           "deleteRule": null
         },
@@ -46162,7 +46404,7 @@
             "repo_id"
           ],
           "foreignTable": "atlas_source_refs",
-          "foreignColumn": "repo_id",
+          "foreignColumn": "source_ref_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -47534,7 +47776,7 @@
             "stable_symbol_id"
           ],
           "foreignTable": "atlas_symbol_aliases",
-          "foreignColumn": "alias_key",
+          "foreignColumn": "stable_symbol_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -49402,7 +49644,7 @@
             "content_hash"
           ],
           "foreignTable": "atlas_tensor_artifacts",
-          "foreignColumn": "workspace_revision",
+          "foreignColumn": "content_hash",
           "updateRule": null,
           "deleteRule": null
         },
@@ -49879,7 +50121,7 @@
             "packet_key"
           ],
           "foreignTable": "atlas_tensor_tile_members",
-          "foreignColumn": "tile_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -49929,7 +50171,7 @@
             "row_offset"
           ],
           "foreignTable": "atlas_tensor_tile_members",
-          "foreignColumn": "tile_id",
+          "foreignColumn": "row_offset",
           "updateRule": null,
           "deleteRule": null
         }
@@ -50471,7 +50713,7 @@
             "stable_test_id"
           ],
           "foreignTable": "atlas_test_aliases",
-          "foreignColumn": "stable_test_id",
+          "foreignColumn": "alias_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -53815,7 +54057,7 @@
             "edge_version"
           ],
           "foreignTable": "atlas_typed_edges",
-          "foreignColumn": "edge_type",
+          "foreignColumn": "src_packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -54427,7 +54669,7 @@
             "vector_version"
           ],
           "foreignTable": "atlas_vector_registry",
-          "foreignColumn": "vector_version",
+          "foreignColumn": "source_ref",
           "updateRule": null,
           "deleteRule": null
         },
@@ -54681,7 +54923,7 @@
             "workspace_revision"
           ],
           "foreignTable": "atlas_workspace_source_bindings",
-          "foreignColumn": "repo_id",
+          "foreignColumn": "source_revision",
           "updateRule": null,
           "deleteRule": null
         },
@@ -54769,7 +55011,7 @@
             "canonical_source_ref"
           ],
           "foreignTable": "atlas_workspace_source_bindings",
-          "foreignColumn": "workspace_revision",
+          "foreignColumn": "canonical_source_ref",
           "updateRule": null,
           "deleteRule": null
         },
@@ -58278,7 +58520,7 @@
             "evidence_id"
           ],
           "foreignTable": "case_note_evidence_refs",
-          "foreignColumn": "note_id",
+          "foreignColumn": "evidence_id",
           "updateRule": null,
           "deleteRule": null
         }
@@ -63635,7 +63877,7 @@
             "kind"
           ],
           "foreignTable": "code_features",
-          "foreignColumn": "kind",
+          "foreignColumn": "source_ref",
           "updateRule": null,
           "deleteRule": null
         },
@@ -67907,7 +68149,7 @@
             "dst_community"
           ],
           "foreignTable": "codebase_relationship_reports",
-          "foreignColumn": "dst_community",
+          "foreignColumn": "src_community",
           "updateRule": null,
           "deleteRule": null
         },
@@ -72490,7 +72732,7 @@
             "binding_type"
           ],
           "foreignTable": "directory_context_bindings",
-          "foreignColumn": "agent_context_key",
+          "foreignColumn": "binding_type",
           "updateRule": null,
           "deleteRule": null
         },
@@ -74070,7 +74312,7 @@
             "version"
           ],
           "foreignTable": "domain_taxonomy_v1",
-          "foreignColumn": "version",
+          "foreignColumn": "domain_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -74642,7 +74884,7 @@
             "summary_type"
           ],
           "foreignTable": "embedded_summaries",
-          "foreignColumn": "source_hash",
+          "foreignColumn": "summary_type",
           "updateRule": null,
           "deleteRule": null
         },
@@ -75386,7 +75628,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "encoder_provenance",
-          "foreignColumn": "output_dimension",
+          "foreignColumn": "input_dimension",
           "updateRule": null,
           "deleteRule": null
         },
@@ -76555,7 +76797,7 @@
             "sequence_no"
           ],
           "foreignTable": "episodic_events",
-          "foreignColumn": "sequence_no",
+          "foreignColumn": "story_id",
           "updateRule": null,
           "deleteRule": null
         }
@@ -76769,7 +77011,7 @@
             "task_id"
           ],
           "foreignTable": "error_cluster_groups",
-          "foreignColumn": "task_id",
+          "foreignColumn": "error_class",
           "updateRule": null,
           "deleteRule": null
         },
@@ -78158,7 +78400,7 @@
             "user_id"
           ],
           "foreignTable": "error_suggestion_states",
-          "foreignColumn": "route_path",
+          "foreignColumn": "user_id",
           "updateRule": null,
           "deleteRule": null
         }
@@ -79655,7 +79897,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "evaluation_evidence",
-          "foreignColumn": "source_ref",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -80062,7 +80304,7 @@
             "packet_key"
           ],
           "foreignTable": "evaluation_judgments",
-          "foreignColumn": "query_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -84148,7 +84390,7 @@
             "tag_id"
           ],
           "foreignTable": "evidence_tags",
-          "foreignColumn": "evidence_id",
+          "foreignColumn": "tag_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -85121,7 +85363,7 @@
             "edge_type"
           ],
           "foreignTable": "feature_dependency_edges",
-          "foreignColumn": "to_feature",
+          "foreignColumn": "edge_type",
           "updateRule": null,
           "deleteRule": null
         },
@@ -85960,7 +86202,7 @@
             "entry_export"
           ],
           "foreignTable": "feature_file_edges",
-          "foreignColumn": "file_path",
+          "foreignColumn": "entry_export",
           "updateRule": null,
           "deleteRule": null
         },
@@ -86630,7 +86872,7 @@
             "source_ref"
           ],
           "foreignTable": "feature_lexical",
-          "foreignColumn": "source_ref",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -86992,7 +87234,7 @@
             "content_hash"
           ],
           "foreignTable": "feature_lexical_facts",
-          "foreignColumn": "extractor_version",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -87676,7 +87918,7 @@
             "ontology_version"
           ],
           "foreignTable": "feature_ontology_tuples",
-          "foreignColumn": "packet_key",
+          "foreignColumn": "subject_type",
           "updateRule": null,
           "deleteRule": null
         },
@@ -89835,7 +90077,7 @@
             "feature_key"
           ],
           "foreignTable": "features",
-          "foreignColumn": "feature_key",
+          "foreignColumn": "project_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -93906,7 +94148,7 @@
             "community_id"
           ],
           "foreignTable": "graph_communities",
-          "foreignColumn": "algorithm",
+          "foreignColumn": "community_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -94116,7 +94358,7 @@
             "packet_key"
           ],
           "foreignTable": "graph_community_assignments",
-          "foreignColumn": "run_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -94829,7 +95071,7 @@
             "metric_name"
           ],
           "foreignTable": "graph_node_metrics",
-          "foreignColumn": "run_id",
+          "foreignColumn": "packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -98748,7 +98990,7 @@
             "to_node_key"
           ],
           "foreignTable": "kag_dag_edges",
-          "foreignColumn": "run_id",
+          "foreignColumn": "to_node_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -99699,7 +99941,7 @@
             "child_task_id"
           ],
           "foreignTable": "kanban_task_dependencies",
-          "foreignColumn": "child_task_id",
+          "foreignColumn": "parent_task_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -104855,7 +105097,7 @@
             "chunk_id"
           ],
           "foreignTable": "llm_output_chunks",
-          "foreignColumn": "chunk_id",
+          "foreignColumn": "output_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -107390,7 +107632,7 @@
             "backend"
           ],
           "foreignTable": "model_registry",
-          "foreignColumn": "backend",
+          "foreignColumn": "name",
           "updateRule": null,
           "deleteRule": null
         },
@@ -109644,7 +109886,7 @@
             "object"
           ],
           "foreignTable": "ontology_domain_tuples",
-          "foreignColumn": "predicate",
+          "foreignColumn": "subject",
           "updateRule": null,
           "deleteRule": null
         },
@@ -109969,7 +110211,7 @@
             "edge_type"
           ],
           "foreignTable": "ontology_edges",
-          "foreignColumn": "source_packet_key",
+          "foreignColumn": "target_packet_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -112611,7 +112853,7 @@
             "page_number"
           ],
           "foreignTable": "page_artifacts",
-          "foreignColumn": "page_number",
+          "foreignColumn": "document_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -120652,7 +120894,7 @@
           "type": "CHECK",
           "columns": [],
           "foreignTable": "recommendation_log",
-          "foreignColumn": "created_by",
+          "foreignColumn": "approved_by",
           "updateRule": null,
           "deleteRule": null
         },
@@ -121627,7 +121869,7 @@
             "object"
           ],
           "foreignTable": "registry_ontology_tuples",
-          "foreignColumn": "subject",
+          "foreignColumn": "object",
           "updateRule": null,
           "deleteRule": null
         },
@@ -129364,7 +129606,7 @@
             "target_cell_id"
           ],
           "foreignTable": "som_adjacency_matrix",
-          "foreignColumn": "source_cell_id",
+          "foreignColumn": "target_cell_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -129650,7 +129892,7 @@
             "revision_number"
           ],
           "foreignTable": "spec_revisions",
-          "foreignColumn": "revision_number",
+          "foreignColumn": "spec_id",
           "updateRule": null,
           "deleteRule": null
         }
@@ -132512,7 +132754,7 @@
             "relation"
           ],
           "foreignTable": "taxonomy_edges",
-          "foreignColumn": "source_key",
+          "foreignColumn": "target_key",
           "updateRule": null,
           "deleteRule": null
         },
@@ -133958,7 +134200,7 @@
             "tokenizer_hash"
           ],
           "foreignTable": "token_artifacts",
-          "foreignColumn": "content_hash",
+          "foreignColumn": "tokenizer_hash",
           "updateRule": null,
           "deleteRule": null
         },
@@ -135469,7 +135711,7 @@
             "stable_key"
           ],
           "foreignTable": "topology_positions",
-          "foreignColumn": "stable_key",
+          "foreignColumn": "snapshot_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -143371,7 +143613,7 @@
             "approval_id"
           ],
           "foreignTable": "workflow_approvals",
-          "foreignColumn": "approval_id",
+          "foreignColumn": "run_id",
           "updateRule": null,
           "deleteRule": null
         },
@@ -148877,5 +149119,5 @@
       "increment": "1"
     }
   },
-  "structuralFingerprint": "b3edeba7a32b7d6ccd9a4528788dd992b5078f82bed941b0cdaafad48e6cd54c"
+  "structuralFingerprint": "f16e3c3b995c6da24178b5a205e447dab5f9033735328e83ee18a89f78374063"
 }

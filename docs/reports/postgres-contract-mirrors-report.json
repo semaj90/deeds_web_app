@@ -1,13 +1,17 @@
 {
-  "generatedAt": "2026-08-26T23:40:14.357Z",
+  "generatedAt": "2026-08-31T03:16:06.979Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
-    "tablesChecked": 6,
+    "tablesChecked": 8,
     "staticAligned": 3,
-    "liveAligned": 2,
+    "liveAligned": 3,
+    "liveMissing": 1,
     "liveUnavailable": 0,
     "blockers": [
+      "kanban_tasks: static INDEX_MISMATCH",
+      "feature_registry: static COLUMN_MISMATCH",
+      "feature_registry: live LIVE_TABLE_MISSING",
       "task_semantic_packets: static COLUMN_MISMATCH",
       "task_semantic_packets: live COLUMN_MISMATCH",
       "atlas_packets: static COLUMN_MISMATCH",
@@ -18,6 +22,300 @@
     ]
   },
   "tables": [
+    {
+      "tableName": "kanban_tasks",
+      "schemaSource": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\kanban-tasks.ts"
+      ],
+      "manualSource": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\kanban_task_lifecycle_baseline.sql"
+      ],
+      "static": {
+        "classification": "INDEX_MISMATCH",
+        "columns": [
+          "assignee",
+          "attempt_count",
+          "claim_expires_at",
+          "claim_token",
+          "completed_at",
+          "created_at",
+          "current_run_id",
+          "failure_count",
+          "feature_id",
+          "feature_label",
+          "idempotency_key",
+          "lane",
+          "last_heartbeat_at",
+          "max_retries",
+          "priority",
+          "source_refs",
+          "started_at",
+          "status",
+          "task_id",
+          "updated_at",
+          "validation_command"
+        ],
+        "indexes": [
+          "kanban_ready_idx",
+          "kanban_running_heartbeat_idx"
+        ],
+        "schemaColumns": [
+          "assignee",
+          "attempt_count",
+          "claim_expires_at",
+          "claim_token",
+          "completed_at",
+          "created_at",
+          "current_run_id",
+          "failure_count",
+          "feature_id",
+          "feature_label",
+          "idempotency_key",
+          "lane",
+          "last_heartbeat_at",
+          "max_retries",
+          "priority",
+          "source_refs",
+          "started_at",
+          "status",
+          "task_id",
+          "updated_at",
+          "validation_command"
+        ],
+        "manualColumns": [
+          "assignee",
+          "attempt_count",
+          "claim_expires_at",
+          "claim_token",
+          "completed_at",
+          "created_at",
+          "current_run_id",
+          "failure_count",
+          "feature_id",
+          "feature_label",
+          "idempotency_key",
+          "lane",
+          "last_heartbeat_at",
+          "max_retries",
+          "priority",
+          "source_refs",
+          "started_at",
+          "status",
+          "task_id",
+          "updated_at",
+          "validation_command"
+        ],
+        "schemaIndexes": [],
+        "manualIndexes": [
+          "kanban_ready_idx",
+          "kanban_running_heartbeat_idx"
+        ],
+        "columnDiffs": {
+          "onlyInA": [],
+          "onlyInB": []
+        },
+        "indexDiffs": {
+          "onlyInA": [],
+          "onlyInB": [
+            "kanban_ready_idx",
+            "kanban_running_heartbeat_idx"
+          ]
+        }
+      },
+      "live": {
+        "reachable": true,
+        "tableExists": true,
+        "classification": "LIVE_DB_ALIGNED",
+        "error": null,
+        "columns": [
+          "task_id",
+          "feature_id",
+          "feature_label",
+          "source_refs",
+          "lane",
+          "status",
+          "validation_command",
+          "assignee",
+          "priority",
+          "claim_token",
+          "claim_expires_at",
+          "last_heartbeat_at",
+          "current_run_id",
+          "attempt_count",
+          "failure_count",
+          "max_retries",
+          "started_at",
+          "completed_at",
+          "idempotency_key",
+          "created_at",
+          "updated_at"
+        ],
+        "indexes": [
+          "kanban_ready_idx",
+          "kanban_running_heartbeat_idx",
+          "kanban_tasks_pkey"
+        ],
+        "rowCount": 0,
+        "columnDiffs": {
+          "onlyInA": [],
+          "onlyInB": []
+        },
+        "indexDiffs": {
+          "onlyInA": [],
+          "onlyInB": []
+        }
+      },
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "identityFields": [
+        "task_id",
+        "feature_id",
+        "idempotency_key"
+      ]
+    },
+    {
+      "tableName": "feature_registry",
+      "schemaSource": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\feature-registry.ts"
+      ],
+      "manualSource": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\0048_feature_registry_queries.sql"
+      ],
+      "static": {
+        "classification": "COLUMN_MISMATCH",
+        "columns": [
+          "chunk_ids",
+          "cluster_id",
+          "code_refs",
+          "description",
+          "feature_key",
+          "id",
+          "last_verified_at",
+          "retry_queries",
+          "source_refs",
+          "status",
+          "summary",
+          "tags",
+          "test_refs",
+          "title",
+          "trust_tier"
+        ],
+        "indexes": [
+          "feature_registry_feature_key_key",
+          "feature_registry_queries_created_at_idx",
+          "feature_registry_queries_query_hash_idx",
+          "feature_registry_queries_savings_idx",
+          "feature_registry_queries_trace_id_idx",
+          "feature_registry_queries_user_id_idx"
+        ],
+        "schemaColumns": [
+          "chunk_ids",
+          "cluster_id",
+          "code_refs",
+          "description",
+          "feature_key",
+          "id",
+          "last_verified_at",
+          "retry_queries",
+          "source_refs",
+          "status",
+          "summary",
+          "tags",
+          "test_refs",
+          "title",
+          "trust_tier"
+        ],
+        "manualColumns": [],
+        "schemaIndexes": [
+          "feature_registry_feature_key_key"
+        ],
+        "manualIndexes": [
+          "feature_registry_queries_created_at_idx",
+          "feature_registry_queries_query_hash_idx",
+          "feature_registry_queries_savings_idx",
+          "feature_registry_queries_trace_id_idx",
+          "feature_registry_queries_user_id_idx"
+        ],
+        "columnDiffs": {
+          "onlyInA": [
+            "chunk_ids",
+            "cluster_id",
+            "code_refs",
+            "description",
+            "feature_key",
+            "id",
+            "last_verified_at",
+            "retry_queries",
+            "source_refs",
+            "status",
+            "summary",
+            "tags",
+            "test_refs",
+            "title",
+            "trust_tier"
+          ],
+          "onlyInB": []
+        },
+        "indexDiffs": {
+          "onlyInA": [
+            "feature_registry_feature_key_key"
+          ],
+          "onlyInB": [
+            "feature_registry_queries_created_at_idx",
+            "feature_registry_queries_query_hash_idx",
+            "feature_registry_queries_savings_idx",
+            "feature_registry_queries_trace_id_idx",
+            "feature_registry_queries_user_id_idx"
+          ]
+        }
+      },
+      "live": {
+        "reachable": true,
+        "tableExists": false,
+        "classification": "LIVE_TABLE_MISSING",
+        "error": null,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "columnDiffs": {
+          "onlyInA": [
+            "chunk_ids",
+            "cluster_id",
+            "code_refs",
+            "description",
+            "feature_key",
+            "id",
+            "last_verified_at",
+            "retry_queries",
+            "source_refs",
+            "status",
+            "summary",
+            "tags",
+            "test_refs",
+            "title",
+            "trust_tier"
+          ],
+          "onlyInB": []
+        },
+        "indexDiffs": {
+          "onlyInA": [
+            "feature_registry_feature_key_key",
+            "feature_registry_queries_created_at_idx",
+            "feature_registry_queries_query_hash_idx",
+            "feature_registry_queries_savings_idx",
+            "feature_registry_queries_trace_id_idx",
+            "feature_registry_queries_user_id_idx"
+          ],
+          "onlyInB": []
+        }
+      },
+      "classification": "LIVE_TABLE_MISSING",
+      "repairClass": "APPLY_EXISTING_SQL",
+      "identityFields": [
+        "id",
+        "feature_key"
+      ]
+    },
     {
       "tableName": "task_semantic_packets",
       "schemaSource": [
@@ -1868,7 +2166,7 @@
           "nes_chrom_packets_summary_trgm_idx",
           "nes_chrom_packets_tags_gin"
         ],
-        "rowCount": 0,
+        "rowCount": 1992,
         "columnDiffs": {
           "onlyInA": [],
           "onlyInB": []

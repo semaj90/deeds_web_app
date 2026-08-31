@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.agent-run-events-owner-mapping.v1",
+  "asOf": "2026-08-31",
+  "status": "MAPPING_REQUIRED_NO_NEW_TABLE",
+  "proposedTable": "agent_run_events",
+  "proposedFields": {
+    "id": "uuid",
+    "workspace_task_id": "uuid",
+    "pickup_id": "uuid",
+    "agent_name": "varchar(80)",
+    "event_type": "varchar(80)",
+    "payload": "jsonb",
+    "langfuse_trace_id": "text",
+    "observed_at": "timestamptz"
+  },
+  "existingOwners": {
+    "kanban_task_events": {
+      "bestMatch": ["task_id", "run_id", "event_type", "payload", "created_at"],
+      "missing": ["workspace_task_id", "pickup_id", "agent_name", "langfuse_trace_id"],
+      "role": "closest existing task/run event owner"
+    },
+    "trace_events": {
+      "bestMatch": ["event_type", "metadata", "created_at"],
+      "missing": ["workspace_task_id", "pickup_id", "agent_name", "langfuse_trace_id"],
+      "role": "closest generic agent-run event projection"
+    },
+    "agent_actions": {
+      "bestMatch": ["action_type", "metadata", "created_at", "session_id"],
+      "missing": ["workspace_task_id", "pickup_id", "event_type", "langfuse_trace_id"],
+      "role": "agent action audit"
+    },
+    "tool_call_events": {
+      "bestMatch": ["trace_id", "arguments", "result_summary", "called_at", "completed_at"],
+      "missing": ["workspace_task_id", "pickup_id", "agent_name", "event_type"],
+      "role": "tool execution telemetry"
+    },
+    "workflow_action_receipts": {
+      "bestMatch": ["action_key", "output_artifact_address", "producer_revision", "completed_at"],
+      "missing": ["workspace_task_id", "pickup_id", "agent_name", "event_type", "payload"],
+      "role": "durable workflow completion receipt"
+    }
+  },
+  "decision": "Do not create agent_run_events. Prefer kanban_task_events for task/run event recording; carry additional pickup/agent/trace correlation in its payload only after the correlation contract is approved.",
+  "linkageFindings": {
+    "workflowTasks": "uses uuid id/run_id and text request/trace correlation; not the proposed workspace_task_id contract",
+    "taskSemanticPackets": "uses integer workspace_task_id and integer packet/queue relationships in the active schema",
+    "agentPickupQueue": "uses text task_id plus integer workspace_task_id; not a stable uuid bridge to the proposed event table",
+    "traceEvents": "uses nullable uuid run_id and does not carry task or pickup identifiers",
+    "kanbanTaskEvents": "already provides task_id, run_id, event_type, payload, and created_at with an active task-board owner",
+    "conclusion": "No single existing table provides every proposed field, but kanban_task_events is the smallest existing owner for the core event record"
+  },
+  "writes": {
+    "database": false,
+    "migration": false
+  },
+  "nextGate": "select one event owner and prove task/pickup/trace linkage without duplicate event recording"
+}

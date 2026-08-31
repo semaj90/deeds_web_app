@@ -2,7 +2,7 @@
  * web-research-ingester.ts — Lane 3: Qdrant chunks_web_search indexer
  *
  * Normalises GitHub/Reddit/web crawl results into WebResearchChunk,
- * embeds them via Ollama embeddinggemma:latest, and upserts into the
+ * embeds them via the shared embedding executor, and upserts into the
  * `chunks_web_search` Qdrant collection.
  *
  * Also optionally enriches chunks with Gemma 4 legal semantic tags
@@ -18,8 +18,10 @@ import { createHash } from 'node:crypto';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { embedSemantic768Canonical } from '$lib/server/embedding/canonical-embed.js';
 import { chunkText, truncateForEmbed } from './research-utils.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
+import { EMBEDDING_CONTRACT } from '$lib/server/embedding/embedding-contract.js';
 
 export type ResearchSource =
   | 'github_issue'
@@ -49,7 +51,7 @@ export interface WebResearchChunk {
 
 export const RESEARCH_COLLECTION = 'chunks_web_search';
 export const RESEARCH_INGESTION_SCHEMA_REVISION = 'atlas.research-ingest:v2';
-export const RESEARCH_EMBEDDING_REVISION = 'embeddinggemma:latest:semantic_768';
+export const RESEARCH_EMBEDDING_REVISION = EMBEDDING_CONTRACT.representations.semantic_768.projection_version;
 export const RESEARCH_INGESTER_REVISION = 'web-research-ingester:v2';
 
 /** Qdrant vector config for chunks_web_search */
@@ -219,6 +221,16 @@ export function planResearchChunks(chunks: WebResearchChunk[]): ResearchChunkPla
 async function embedText(text: string): Promise<number[] | null> {
   try {
     const truncated = truncateForEmbed(text, 2000);
+    if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
+      const result = await embedSemantic768Canonical(truncated, {
+        model: ENV.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma',
+        modelArtifactRevision: ENV.EMBEDDING_MODEL_ARTIFACT_REVISION ?? '',
+        tokenizerRevision: ENV.EMBEDDING_TOKENIZER_REVISION ?? '',
+        inputPolicyRevision: ENV.EMBEDDING_INPUT_POLICY_REVISION ?? 'semantic-input-v1',
+        baseUrl: ENV.EMBEDDING_BASE_URL ?? 'http://127.0.0.1:8081',
+      });
+      return result.embedding;
+    }
     const result = await generateEmbedding(truncated);
     if (result && result.length === 768) return result;
     return null;
@@ -326,8 +338,13 @@ export async function ingestResearchChunks(
                 semantic_tags: chunk.semantic_tags ?? [],
                 content_checksum: contentChecksum,
                 embedding_model_id: 'embeddinggemma',
+                embedding_representation_id: 'semantic_768',
                 embedding_dimension: 768,
                 embedding_revision: RESEARCH_EMBEDDING_REVISION,
+                embedding_model_artifact_revision: ENV.EMBEDDING_MODEL_ARTIFACT_REVISION ?? null,
+                embedding_tokenizer_revision: ENV.EMBEDDING_TOKENIZER_REVISION ?? null,
+                embedding_input_policy_revision: ENV.EMBEDDING_INPUT_POLICY_REVISION ?? null,
+                embedding_executor_proof: 'CONFIGURED_NOT_LIVE_PROVEN',
                 ingestion_schema_revision: RESEARCH_INGESTION_SCHEMA_REVISION,
                 ingester_revision: RESEARCH_INGESTER_REVISION,
               },

@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.oak-capability-audit.v1",
+  "asOf": "2026-08-31",
+  "status": "BOUNDED_PARTIAL",
+  "capabilities": {
+    "schemaOntologyS": "UNVERIFIED_CONTRACT",
+    "operatorLibrary": "BOUNDED_15_OF_24",
+    "taskFunctionCompiler": "PROVEN_FIXTURE",
+    "taskFunctionCatalog": "PROVEN_FIXTURE_3_READ_ONLY_FUNCTIONS",
+    "queryKernelGraph": "PROVEN_FIXTURE",
+    "kernelBoundDagPlanner": "OPEN",
+    "owlHermitVerification": "OPEN",
+    "judgeRepairLoop": "OPEN",
+    "kernelManifest": "DRAFT_ONLY",
+    "oakBenchmark": "OPEN"
+  },
+  "evidence": {
+    "catalog": "packages/parent-atlas/src/core/kernel-function-catalog-symbol-repair-v0.ts",
+    "queryGraph": "packages/parent-atlas/src/core/query-kernel-graph-v1.ts",
+    "focusedTests": {
+      "testFiles": 4,
+      "tests": 18,
+      "passed": 18
+    }
+  },
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "productionActivation": false
+  },
+  "nextGate": "OAK-07_KERNEL_BOUND_DAG_PLANNER",
+  "notes": [
+    "The catalog is a registry and compiler boundary, not an executor.",
+    "OAK-07 remains blocked until the adaptive DAG circuit has a verified owner/caller.",
+    "OAK-03 cannot be marked verified without a deliberate OWL/HermiT integration decision."
+  ]
+}

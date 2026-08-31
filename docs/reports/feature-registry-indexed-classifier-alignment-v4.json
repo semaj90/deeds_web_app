@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.feature-registry-indexed-classifier-alignment.v4",
+  "asOf": "2026-08-31",
+  "status": "GROUNDED_PROMOTION_ELIGIBILITY_PROVEN_WRITER_OPEN",
+  "sequence": ["define", "retrieve_candidates", "classify", "ground", "promote"],
+  "implemented": {
+    "registry": "atlas.observation-feature-registry.v1",
+    "candidateRetrieval": "atlas.feature-candidate-retrieval.v1",
+    "candidateClassification": "atlas.feature-candidate-classification.v1",
+    "groundingEligibility": "atlas.feature-promotion-eligibility.v1",
+    "sourceRevisionMatchRequired": true,
+    "canonicalWrites": false
+  },
+  "validation": {
+    "packageTypeScriptBuild": "PASS",
+    "focusedTests": "14/14 PASS",
+    "databaseWrites": false,
+    "projectionWrites": false
+  },
+  "open": [
+    "feature_registry live migration and round-trip owner",
+    "semantic_768 retrieval adapter",
+    "held-out classifier calibration evidence",
+    "explicit authorized canonical feature writer"
+  ],
+  "guardrails": [
+    "no feature ID is invented",
+    "eligible requires exact source and source revision evidence",
+    "abstained and missing-evidence proposals remain blocked",
+    "proposal authority is false and writes performed is false"
+  ],
+  "nextGate": "FEATURE-PROMOTE-01_LIVE_ROUND_TRIP"
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.feature-registry-live-roundtrip-readiness.v1",
+  "asOf": "2026-08-31",
+  "status": "BLOCKED_LIVE_TABLE_MISSING",
+  "canonicalTarget": "public.feature_registry",
+  "liveTablePresent": false,
+  "repositoryContractPresent": true,
+  "manualProposalsPresent": true,
+  "migrationLedgers": {
+    "drizzleJournalEntries": 41,
+    "liveDrizzleLedgerEntries": 0,
+    "livePublicMigrationEntries": 0,
+    "reconciliationRequired": true
+  },
+  "checks": {
+    "featureKeyOwnerLive": false,
+    "featureIdRoundTrip": "NOT_RUN",
+    "canonicalWrites": false,
+    "migrationApplied": false
+  },
+  "evidence": "docs/reports/postgres-contract-mirrors-report.json",
+  "nextAction": "reconcile migration ledger and choose one feature_registry owner before migration",
+  "forbiddenUntilReconciled": [
+    "apply feature_registry migration",
+    "bulk feature identity backfill",
+    "canonical promotion writes"
+  ]
+}

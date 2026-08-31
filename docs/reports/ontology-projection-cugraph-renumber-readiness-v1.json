@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.ontology-projection-cugraph-renumber-readiness.v1",
+  "gate": "ONTO-PY-04B2",
+  "status": "BLOCKED_CUGRAPH_LOOKUP_API",
+  "generatedOn": "2026-08-31",
+  "backend": "cugraph",
+  "backendVersion": "26.06.00",
+  "coordinateSpace": "ProjectionOrdinal",
+  "renumber": true,
+  "attemptedOperations": [
+    "Graph.from_cudf_edgelist",
+    "lookup_internal_vertex_id",
+    "unrenumber"
+  ],
+  "failure": {
+    "code": "CUDF_RENUMBER_MAP_COLUMN_SHAPE_INCOMPATIBLE",
+    "detail": "cuGraph 26.06 lookup_internal_vertex_id fails before lookup for the bounded one-column cudf DataFrame in scalar and list-form column calls"
+  },
+  "parityProven": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "nextGate": "resolve cuGraph/cudf wrapper compatibility, then rerun external→internal→external ProjectionOrdinal proof"
+}

@@ -43,7 +43,7 @@ function pack() {
       'semanticRelevance', 'lexicalRelevance', 'astAffinity', 'graphAuthority',
       'personalizedPageRank', 'communityAffinity', 'manifold4OrientationSimilarity',
       'crossEncoderRawScore', 'crossEncoderCalibratedScore', 'domainAffinity',
-      'executionUtility', 'memoryUtility', 'latentLocalityScore',
+      'executionUtility', 'memoryUtility',
     ],
     featureValues: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),
     featurePresence: Array(PHYSICAL_ROWS * FEATURE_COUNT).fill(0),

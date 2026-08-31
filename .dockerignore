@@ -5,6 +5,7 @@
 !sveltekit-frontend/**
 !python-services/**
 !python/**
+!services/atlas-gpu-8098/**
 !tensor_services/**
 !engine-builder/**
 !training/**

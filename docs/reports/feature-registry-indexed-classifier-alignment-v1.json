@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.feature-registry-indexed-classifier-alignment.v1",
+  "asOf": "2026-08-31",
+  "status": "RETRIEVAL_CONTRACT_PROVEN_CLASSIFIER_OPEN",
+  "sequence": [
+    "define",
+    "retrieve_candidates",
+    "classify",
+    "ground",
+    "promote"
+  ],
+  "completed": {
+    "registryContract": "observation-feature-registry.v1",
+    "candidateRetrieval": "observation-feature-candidate-retrieval.v1",
+    "retrievalMode": "exact_and_deterministic_lexical",
+    "topKMaximum": 10,
+    "canonicalPromotion": false
+  },
+  "validation": {
+    "typescriptBuild": "PASS",
+    "focusedTests": "10/10 PASS",
+    "databaseWrites": false,
+    "projectionWrites": false
+  },
+  "open": [
+    "PostgreSQL/GIN/pg_trgm feature index owner",
+    "semantic_768 candidate retrieval adapter",
+    "calibrated classifier over retrieved candidates",
+    "grounded evidence promotion to canonical feature identity"
+  ],
+  "nextGate": "FEATURE-CLASSIFY-01",
+  "notes": [
+    "The matcher proposes existing registry definitions only.",
+    "It does not invent feature IDs or treat lexical score as classifier confidence.",
+    "Topology and latent-64 population remain outside this gate."
+  ]
+}

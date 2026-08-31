@@ -7,17 +7,17 @@
   "outputPath": ".tmp/atlas/tree-bound-symbol-registry-resolution-v1.ndjson",
   "counts": {
     "treeBoundInput": 353,
-    "exactCanonicalKey": 85,
+    "exactCanonicalKey": 90,
     "exactMetadataRevision": 0,
-    "registryMissing": 268,
+    "registryMissing": 263,
     "registryAmbiguous": 0,
     "symbolVersionBound": 85,
-    "symbolVersionMissing": 0,
+    "symbolVersionMissing": 5,
     "symbolVersionAmbiguous": 0,
     "sourceRevisionMismatch": 0,
     "fuzzyMatches": 0
   },
-  "registryRowsRead": 10255,
+  "registryRowsRead": 10260,
   "symbolVersionRowsRead": 285,
   "lookupPolicy": [
     "exact canonical_key",

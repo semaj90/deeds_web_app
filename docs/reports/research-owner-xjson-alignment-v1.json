@@ -1,0 +1,60 @@
+{
+  "schema": "atlas.research-owner-xjson-alignment.v1",
+  "status": "EXPERIMENT_CONTRACT_VALIDATED",
+  "canonicalOwner": "sveltekit-frontend/src/lib/server/research/web-research-ingester.ts",
+  "canonicalOwnerStatus": "LIVE_IMPLEMENTATION",
+  "atlasResearchContracts": {
+    "status": "EXPERIMENT",
+    "productionCallers": 0,
+    "tests": 6,
+    "passed": 6,
+    "localIdentityAuthority": false
+  },
+  "xjson": {
+    "typedEnvelope": "atlas.typed-evidence-envelope.v1",
+    "boundedReplay": "REPLAY_PROVEN_BOUNDED",
+    "nativeParser": true,
+    "writes": 0
+  },
+  "researchEmbeddingLineage": {
+    "currentIngesterRevision": "embeddinggemma-native-768-v1",
+    "status": "LIVE_8081_REPLAY_PROVEN",
+    "liveProof": {
+      "health": "ok",
+      "modelId": "embeddinggemma-300m-f16.gguf",
+      "requestModel": "embeddinggemma",
+      "tokenCount": 5,
+      "dimensions": 768,
+      "finite": true,
+      "f32Checksum": "f3a18fc2b20961d04cf865350db5acac0efcea572de47e12ed0e35ccf007d99f",
+      "replayRuns": 2,
+      "checksumParity": true,
+      "writes": 0
+    },
+    "required": [
+      "representationRevision",
+      "modelArtifactRevision",
+      "tokenizerRevision",
+      "inputPolicyRevision",
+      "executorRevision"
+    ]
+  },
+  "contractHardening": {
+    "externalInputStrictValidation": true,
+    "forbiddenLocalCoordinateRejection": "PROVEN",
+    "researchSuite": "6/6",
+    "liveIngesterPayload": "carries representation and configured model/tokenizer/input-policy revisions"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graph": 0
+  },
+  "nextGate": "RESEARCH-EMBEDDING-LINEAGE-01",
+  "notes": [
+    "No duplicate crawler or index writer was created.",
+    "Atlas research kernel remains parked as an experiment by operator decision.",
+    "The live :8081 executor replay is proven for the smoke request; the research ingester still needs explicit strict-executor wiring before bulk canonical lineage claims are upgraded."
+  ]
+}

@@ -145,6 +145,8 @@ async function inspectPostgres(pool, report) {
     'nes_chrom_kag_dag_hits',
     'route_runtime_packets',
     'task_semantic_packets',
+    'kanban_tasks',
+    'kanban_task_events',
     'codebase_chunk_index',
     'agent_pickup_queue',
   ];
@@ -153,13 +155,20 @@ async function inspectPostgres(pool, report) {
   for (const table of tables) {
     const count = await tableCount(pool, table);
     counts[table] = count;
+    const replacementQueuePresent = table === 'agent_pickup_queue'
+      && counts.kanban_tasks !== null
+      && counts.kanban_task_events !== null;
     addCheck(
       report,
       'postgres',
       `table:${table}`,
-      count === null ? 'fail' : 'pass',
-      count === null ? `${table} is missing` : `${table} exists with ${count} rows`,
-      { count },
+      count === null ? (replacementQueuePresent ? 'warn' : 'fail') : 'pass',
+      count === null
+        ? (replacementQueuePresent
+          ? `${table} is absent; live Kanban task/event tables provide a replacement control-plane surface, but the legacy pickup adapter is not proven migrated`
+          : `${table} is missing`)
+        : `${table} exists with ${count} rows`,
+      { count, replacementQueuePresent },
     );
   }
   report.postgres.tableCounts = counts;

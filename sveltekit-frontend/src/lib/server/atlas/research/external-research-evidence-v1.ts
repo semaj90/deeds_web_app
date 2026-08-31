@@ -57,20 +57,33 @@ export interface ExternalResearchEvidenceInputV1 {
   retrievalRevision: string;
 }
 
+const ExternalResearchEvidenceInputSchema = z.object({
+  queryId: z.string().min(1),
+  sourceKind: ExternalSourceKindSchema,
+  externalId: z.string().min(1),
+  url: z.string().url().nullable().optional(),
+  title: z.string().nullable().optional(),
+  text: z.string().min(1),
+  semanticScore: z.number().finite().min(0).max(1),
+  fetchedAt: z.string().datetime({ offset: true }).nullable().optional(),
+  retrievalRevision: z.string().min(1),
+}).strict();
+
 export function buildAtlasExternalResearchEvidenceV1(
   input: ExternalResearchEvidenceInputV1,
 ): AtlasExternalResearchEvidenceV1 {
+  const validated = ExternalResearchEvidenceInputSchema.parse(input);
   const body = {
     schema: 'atlas.external-research-evidence.v1' as const,
-    queryId: input.queryId,
-    sourceKind: input.sourceKind,
-    externalId: input.externalId,
-    url: input.url ?? null,
-    title: input.title ?? null,
-    text: input.text,
-    semanticScore: input.semanticScore,
-    fetchedAt: input.fetchedAt ?? null,
-    retrievalRevision: input.retrievalRevision,
+    queryId: validated.queryId,
+    sourceKind: validated.sourceKind,
+    externalId: validated.externalId,
+    url: validated.url ?? null,
+    title: validated.title ?? null,
+    text: validated.text,
+    semanticScore: validated.semanticScore,
+    fetchedAt: validated.fetchedAt ?? null,
+    retrievalRevision: validated.retrievalRevision,
     canonicalAuthority: false as const,
     localSourceAuthority: false as const,
     mutationAuthority: false as const,

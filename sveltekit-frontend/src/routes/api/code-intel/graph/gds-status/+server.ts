@@ -11,6 +11,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
+import { parseGdsRequest, requiresGdsApply, type GdsRequest } from '$lib/server/graph/gds-request-policy.js';
 import {
   getGdsStatus,
   getGdsExtendedStats,
@@ -35,9 +36,6 @@ async function getRedisClient() {
 }
 
 // 'd27' is read-only (getUnclassifiedFileCount), not rate-limited.
-const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'd27', 'full'] as const;
-type GdsAction = typeof VALID_ACTIONS[number];
-
 export const GET: RequestHandler = async ({ locals, url }) => {
   if (!locals.user) return json({ apocAvailable: false, gdsAvailable: false, projectionExists: false, error: 'Unauthorized' }, { status: 401 });
 
@@ -68,11 +66,15 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json().catch(() => ({})) as { action?: string };
-  const action = (body.action ?? 'full') as GdsAction;
+  const raw = await request.json().catch(() => null);
+  const parsed = parseGdsRequest(raw);
+  if (!parsed.success) {
+    return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
+  }
+  const { action, apply } = parsed.data as GdsRequest;
 
-  if (!(VALID_ACTIONS as readonly string[]).includes(action)) {
-    return json({ error: `action must be ${VALID_ACTIONS.join(' | ')}` }, { status: 400 });
+  if (requiresGdsApply(action) && !apply) {
+    return json({ error: 'Mutation-capable GDS actions require apply=true' }, { status: 409 });
   }
 
   // Rate limit full rebuilds

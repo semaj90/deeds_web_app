@@ -100,6 +100,13 @@ export class RabbitMQManager extends EventEmitter {
     chat_context: 'chat.context',
     analytics_track: 'analytics.track',
     codebase_index: 'codebase.index',
+    // WebIngestWorker (queue-worker.ts) consumes this queue directly via
+    // rabbitmq.consume('kb.ingest', ...) with no assertQueue of its own.
+    // It must be declared here so setupInfrastructure() asserts it before
+    // any consumer starts — otherwise RabbitMQ closes the channel with a
+    // 404 the first time a consumer attempts to consume from a queue that
+    // was never asserted (channel.consume on a nonexistent queue).
+    kb_ingest: 'kb.ingest',
     ace_evaluate: 'ace.evaluate',
     error_embed: 'error.embed',
     synthesis_generate: 'synthesis.generate',

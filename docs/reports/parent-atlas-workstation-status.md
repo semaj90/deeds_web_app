@@ -1,6 +1,6 @@
 # Parent Atlas Workstation Status
 
-Generated: 2026-08-02T11:07:48.530Z
+Generated: 2026-08-31T03:35:24.770Z
 
 ## Boundary
 
@@ -43,12 +43,12 @@ Legal-app runtime stores are mirrors/caches, not truth.
 
 | Table | Rows |
 |---|---:|
-| atlas_packets | 61659 |
+| atlas_packets | 61660 |
 | atlas_packet_registry | 58324 |
 | atlas_summary_layers | 18437 |
 | atlas_artifacts | 58312 |
-| codebase_chunk_index | 52417 |
-| parent_atlas_documents | 61659 |
+| codebase_chunk_index | 55853 |
+| parent_atlas_documents | 61660 |
 | atlas_feature_envelopes | 58365 |
 | atlas_retrieval_eval_times | 26 |
 | atlas_provenance_tree | missing |
@@ -57,11 +57,11 @@ Legal-app runtime stores are mirrors/caches, not truth.
 
 | Metric | Value |
 |---|---:|
-| packet_summaries | 6885 |
+| packet_summaries | 6886 |
 | summary_layers_populated | 7654 |
 | json_shaped_packet_summaries | 17 |
 | json_shaped_summary_layers | 17 |
-| missing_packet_registry_rows | 3335 |
+| missing_packet_registry_rows | 3336 |
 
 ## Next Commands
 
@@ -78,9 +78,3 @@ npm run atlas:feature-metadata:verify
 npm run atlas:qdrant-payload:verify:verbose
 npm run atlas:bitfrost-semantic-cache:audit
 ```
-
-## Coordination update — 2026-08-13
-
-See `docs/parent-atlas-workstation-gpu-runtime-backlog.md` for the separate GPU/runtime
-integration lane. Its roadmap estimate is **58% planned/integrated**. Do not use that
-estimate as a production proof or as an AST supersession condition.

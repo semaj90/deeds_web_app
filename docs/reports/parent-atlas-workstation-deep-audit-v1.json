@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.parent-atlas-workstation-deep-audit.v1",
+  "generatedAt": "2026-08-31T03:37:00Z",
+  "status": "BOUNDED_PROVEN_WITH_BLOCKERS",
+  "method": {
+    "statusModel": ["CREATED", "WIRED", "PROVEN", "DONE"],
+    "authority": "PostgreSQL canonical; Qdrant, Valkey, Neo4j, and RTX are projections or executors",
+    "writesPerformed": false,
+    "scope": "Master TOC, OpenSpec workboard, workstation discovery, live WSL2 RAPIDS capability, bounded cuVS fixtures"
+  },
+  "results": [
+    {
+      "lane": "document_governance",
+      "status": "PROVEN",
+      "evidence": [
+        "MASTER_TOC_CHECK_OK",
+        "workboard generated with dependency packages and lastUpdatedAt timestamps"
+      ],
+      "remaining": "Governance closure remains blocked by 56 incomplete OpenSpec task files"
+    },
+    {
+      "lane": "migration_safety",
+      "status": "PROVEN_BLOCKED",
+      "evidence": [
+        "PRE_APPLY_BLOCKED",
+        "Drizzle live ledger count 0",
+        "journal last 0040_kanban_task_lifecycle",
+        "feature_registry absent live"
+      ],
+      "remaining": "Migration baseline and ownership reconciliation"
+    },
+    {
+      "lane": "workstation_services",
+      "status": "PROVEN",
+      "evidence": [
+        "WORKSTATION_DISCOVERY_PROVEN",
+        "23 containers discovered",
+        "live PostgreSQL/Qdrant/Neo4j/Valkey service surfaces observed"
+      ],
+      "remaining": "Historical feature-envelope ENOBUFS is recorded as unverified current behavior; bounded materialization proof remains separate"
+    },
+    {
+      "lane": "rtx_rapids_capability",
+      "status": "PROVEN",
+      "evidence": [
+        "WSL2 RAPIDS environment present",
+        "PyTorch 2.13.0+cu130 with CUDA available",
+        "NVIDIA GeForce RTX 3060 Ti visible",
+        "cuDF 26.06.01 imported",
+        "cuGraph 26.06.00 imported",
+        "cuVS 26.06.00 imported"
+      ],
+      "remaining": "No production promotion; live cross-store parity remains separate"
+    },
+    {
+      "lane": "cuvs_exact_oracle",
+      "status": "PROVEN",
+      "evidence": [
+        "scripts/gpu/cuvs-bruteforce-smoke.py",
+        "512 rows × 768 dimensions",
+        "8 queries, top-k 10",
+        "self-match rate 1.0"
+      ],
+      "remaining": "Bounded fixture only"
+    },
+    {
+      "lane": "cuvs_cagra_executor",
+      "status": "PROVEN_NON_CANONICAL",
+      "evidence": [
+        "scripts/gpu/cuvs-cagra-persistent-smoke.py",
+        "128 rows × 768 dimensions",
+        "Recall@5 mean/min 1.0",
+        "five repeated searches",
+        "writes_attempted false"
+      ],
+      "remaining": "No Qdrant/PostgreSQL identity or production-quality parity receipt"
+    },
+    {
+      "lane": "production_readiness",
+      "status": "WARN_WITH_OPEN_ADAPTERS",
+      "evidence": [
+        "parent-atlas-production-readiness-report.json",
+        "61 checks passed",
+        "6 checks warned",
+        "agent_pickup_queue is absent, while kanban_tasks and kanban_task_events are live replacement control-plane tables"
+      ],
+      "remaining": [
+        "legacy agent_pickup_queue adapter/migration decision",
+        "active workflow route and semantic-packet callers still target the absent legacy queue",
+        "parent_atlas_documents summary column mismatch",
+        "active topology source_kind query mismatch",
+        "route-runtime LOD0 cache coverage is zero",
+        "summary batch has zero sourceRef reads and zero summaries written"
+      ]
+    }
+  ],
+  "promotion": {
+    "canonicalRetrievalPromotion": false,
+    "cuvsAnnPromotion": false,
+    "graphProjectionPromotion": false,
+    "migrationApplyAllowed": false,
+    "nextGate": "migration baseline reconciliation, then CandidateOrdinal cross-store parity"
+  },
+  "receipts": [
+    "docs/reports/parent-atlas-workstation-status.json",
+    "artifacts/parent-atlas-workstation-capabilities.json",
+    "docs/reports/schema/pre-apply-check.json",
+    "docs/reports/openspec-workboard-v1.json"
+  ]
+}

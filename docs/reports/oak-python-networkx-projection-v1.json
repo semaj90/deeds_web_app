@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.oak-python-networkx-projection.v1",
+  "status": "NETWORKX_PROJECTION_PROVEN",
+  "implementation": "python/parent_atlas_ontology/networkx_snapshot.py",
+  "focusedTests": "2/2",
+  "projectionSuite": "7 passed, 1 skipped (rdflib unavailable)",
+  "networkx": "CPU_ORACLE",
+  "naryRelations": "REIFIED_NO_CLIQUE",
+  "graphOrdinal": "DETERMINISTIC_DERIVED_MAPPING",
+  "replay": {
+    "runs": 2,
+    "identical": true
+  },
+  "bfs": {
+    "status": "CPU_ORACLE_IMPLEMENTED",
+    "depthLimit": 2,
+    "predecessors": "DETERMINISTIC",
+    "writesPerformed": false
+  },
+  "formalReasoningStatus": "UNAVAILABLE_NO_JVM",
+  "cugraph": {
+    "status": "UNAVAILABLE",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "cudfInstalled": false,
+    "cugraphInstalled": false,
+    "torchInstalled": true,
+    "parityRun": false,
+    "wslProbe": {
+      "platform": "WSL2 Linux 6.18.33.2",
+      "cudfInstalled": false,
+      "cugraphInstalled": false,
+      "torchInstalled": false,
+      "service8098": "UNREACHABLE"
+    }
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "ONTO-PY-04B-CUGRAPH-PARITY-WITH-RAPIDS-RUNTIME"
+}

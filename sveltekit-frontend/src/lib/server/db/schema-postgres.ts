@@ -735,6 +735,29 @@ export const embeddingCache = pgTable(
   (table) => [unique('embedding_cache_text_hash_unique').on(table.textHash)]
 );
 
+// Revision-qualified canonical embedding cache. This is intentionally separate
+// from the legacy text-hash-only embedding_cache table until its callers are
+// explicitly migrated.
+export const semanticEmbeddingCacheV2 = pgTable(
+  'semantic_embedding_cache_v2',
+  {
+    cacheKey: text('cache_key').primaryKey().notNull(),
+    representationId: varchar('representation_id', { length: 64 }).notNull(),
+    representationRevision: text('representation_revision').notNull(),
+    modelArtifactRevision: text('model_artifact_revision').notNull(),
+    tokenizerRevision: text('tokenizer_revision').notNull(),
+    inputPolicyRevision: text('input_policy_revision').notNull(),
+    normalizedInputChecksum: text('normalized_input_checksum').notNull(),
+    embedding: halfvec('embedding', { dimensions: 768 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('semantic_embedding_cache_v2_input_checksum_idx').on(table.normalizedInputChecksum),
+    index('semantic_embedding_cache_v2_representation_idx').on(table.representationId, table.representationRevision),
+  ],
+);
+
 // === USER AI QUERIES ===
 export const userAiQueries = pgTable(
   'user_ai_queries',

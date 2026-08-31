@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.feature-registry-owner-decision.v1",
+  "asOf": "2026-08-31",
+  "status": "DECISION_PROPOSED_NOT_APPLIED",
+  "canonicalOwnerCandidate": {
+    "kind": "drizzle_schema",
+    "path": "sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts",
+    "table": "public.feature_registry",
+    "identity": {
+      "id": "uuid",
+      "featureKey": "text unique"
+    },
+    "shape": [
+      "id",
+      "feature_key",
+      "title",
+      "description",
+      "status",
+      "summary",
+      "source_refs",
+      "chunk_ids",
+      "tags",
+      "code_refs",
+      "test_refs",
+      "retry_queries",
+      "cluster_id",
+      "trust_tier",
+      "last_verified_at"
+    ]
+  },
+  "competingDefinitions": [
+    {
+      "path": "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+      "status": "historical_journal_candidate",
+      "shapeGap": ["summary", "chunk_ids", "tags", "retry_queries"]
+    },
+    {
+      "path": "drizzle/manual/proposed_20260530_task_semantic_packets.sql",
+      "status": "unapproved_proposal",
+      "identityConflict": "feature_registry uses a different text-oriented shape and also proposes unrelated task/agent tables"
+    }
+  ],
+  "dependencyDisposition": {
+    "taskSemanticPackets": "already_live_outside_selected_feature_registry_owner; do not recreate",
+    "agentPickupQueue": "absent_in_live_catalog; legacy proposal-only surface; do not recreate until an approved adapter or replacement contract exists",
+    "workspaceTasks": "proposed_file_only; no approval to apply",
+    "taskFileLinks": "proposed_file_only; no approval to apply",
+    "taskClusterLinks": "proposed_file_only; no approval to apply",
+    "agentRunEvents": "no exact live table found; existing agent_actions, tool_call_events, trace_events, and workflow_action_receipts are competing event owners requiring semantic mapping before any new table"
+  },
+  "live": {
+    "tablePresent": false,
+    "featureRows": 0,
+    "migrationLedgersReconciled": false
+  },
+  "writes": {
+    "database": false,
+    "migration": false,
+    "registryRows": false
+  },
+  "requiredBeforeApply": [
+    "approve migration baseline",
+    "generate one journaled migration from the selected Drizzle shape",
+    "review migration SQL on a throwaway database",
+    "run bounded feature_key to feature_id round-trip readback"
+  ]
+}

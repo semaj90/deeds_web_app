@@ -6,16 +6,9 @@ import { ensureProjectionClient, PROJECTION_NAME } from './neo4j-gds-client.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { prepareLouvainResolutionSeeds } from './louvain-resolution-seeder.js';
 import { NAMED_PROJECTION_CANDIDATES, type NamedProjectionCandidate } from './graph-projection-manifest.js';
+import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
-const ALGORITHM_REVISION_PREFIX = {
-  pagerank: 'neo4j-gds-pagerank-mutate-v1',
-  louvain: 'neo4j-gds-louvain-mutate-v1',
-  leiden: 'neo4j-gds-leiden-mutate-v1',
-  cheirank: 'todo-cheirank-v1',
-  kcore: 'todo-kcore-v1',
-  betweenness: 'todo-betweenness-v1',
-} as const;
 
 export interface GraphAnalysisRequest {
   algorithm: GraphAlgorithm;
@@ -66,7 +59,7 @@ function buildRunBase(params: {
   return GraphAnalysisRunSchema.parse({
     runId: randomUUID(),
     algorithm: params.algorithm,
-    algorithmRevision: ALGORITHM_REVISION_PREFIX[params.algorithm as keyof typeof ALGORITHM_REVISION_PREFIX] ?? 'todo-v1',
+    algorithmRevision: graphAlgorithmRevision(params.algorithm),
     parameterRevision: params.parameterRevision,
     workspaceRevision: DEFAULT_WORKSPACE_REVISION,
     sourceRevision: params.graphRevision,

@@ -5838,6 +5838,221 @@ todo.md`, "Graph Identity Audit Next Steps" → "Proof Gates", ~line 1169):
   already says not to revisit graph snapshot apply behavior until identity/
   enrichment gates pass, so these are correctly blocked, not neglected.
 
+### `SYMBOL_SEMANTIC_768` first-check (2026-08-31) — blocked upstream, not just unproven
+
+Per the stated proof order, checked the first item (`SYMBOL_SEMANTIC_768`)
+live before assuming it was merely "next in queue." It is not reachable yet
+at all, for a more specific reason than "not attempted":
+
+- `atlas_symbol_versions` and `atlas_callable_search` (the tables that would
+  need `SYMBOL_SEMANTIC_768` coverage) have **no embedding column of their
+  own** — confirmed via `\d` on both tables. The intended path is a join
+  through `packet_key` to `codebase_chunk_index.content_embedding`
+  (halfvec(768)), which both tables do carry as a nullable column.
+- Live query: `SELECT count(*), count(packet_key) FROM atlas_symbol_versions`
+  → **285 total rows, 0 with `packet_key` populated.** The join to
+  `codebase_chunk_index` (keyed on `metadata->>'packet_key'`, confirmed via
+  `\d codebase_chunk_index` — there is no bare `packet_key` column, it lives
+  inside the JSONB `metadata`) therefore returns 0 matches structurally,
+  independent of whether `content_embedding` itself is populated on the
+  chunk side.
+- **This means `SYMBOL_SEMANTIC_768` is blocked by `PACKET_TO_SYMBOL_LINEAGE`
+  (listed above as also untouched), not merely unstarted in its own right.**
+  `PACKET_TO_SYMBOL_LINEAGE` needs to close first — populate `packet_key` on
+  `atlas_symbol_versions` rows — before `SYMBOL_SEMANTIC_768` coverage can
+  even be measured, let alone proven. Not attempted here: the correct
+  linkage logic (how a symbol version's `packet_key` should be derived —
+  from `upstream_chunk_id`/`upstream_node_id`, most likely, both of which
+  are already populated on every row) was not investigated in this pass;
+  this entry only establishes that the blocker is real and structural.
+
+### `PACKET_TO_SYMBOL_LINEAGE` backfill + `SYMBOL_SEMANTIC_768` deeper blocker found (2026-08-31)
+
+**The derivation was already sitting in the data, unused.** Sampled
+`atlas_symbol_versions.upstream_chunk_id` directly (`SELECT upstream_chunk_id
+FROM atlas_symbol_versions LIMIT 5`) — every value is already `packet_key`-
+shaped (`ace:packet:<12hex>`), not a separate chunk-id namespace as the
+column name implies. `materialize-ast-symbol-versions.mjs` (the script that
+writes these rows) confirmed via grep to never reference `packet_key` at
+all — it was never wired to copy this value across, not corrupted or wrong.
+
+- **Verified before writing anything**: `SELECT count(*), count(DISTINCT
+  upstream_chunk_id), count(atlas_packets.packet_key) FROM
+  atlas_symbol_versions LEFT JOIN atlas_packets ON packet_key =
+  upstream_chunk_id` → **200 of 285 `upstream_chunk_id` values are real,
+  existing `atlas_packets.packet_key` rows.** (The other 85 are presumably
+  symbols whose source packet was never registered in `atlas_packets` —
+  not investigated further, out of scope for this backfill.)
+- **Applied** (transactional, `BEGIN`/`COMMIT`, re-verified row count after):
+  `UPDATE atlas_symbol_versions SET packet_key = upstream_chunk_id FROM
+  atlas_packets WHERE atlas_packets.packet_key = upstream_chunk_id AND
+  packet_key IS NULL` → 200 rows updated. Then propagated the same values
+  into `atlas_callable_search.packet_key` via the `symbol_version_id` join
+  (1:1 table, 285 rows on both sides) → another 200 rows updated.
+  `PACKET_TO_SYMBOL_LINEAGE` for these two tables is now **200/285
+  populated, verified against real `atlas_packets` rows** — real progress,
+  not a guess.
+- **Re-checked `SYMBOL_SEMANTIC_768` after the fix — still 0.** The
+  `packet_key`-based join to `codebase_chunk_index` (via
+  `metadata->>'packet_key'`) still returns 0 matches. Traced why, live,
+  rather than assuming the fix just didn't work: `codebase_chunk_index`'s
+  `metadata->>'packet_key'` values are **plain uuids**
+  (`6f1efefb-b49c-42e1-922d-8975500c60ca`-shaped), not `ace:packet:*`-
+  shaped. Confirmed this is systemic, not just these 200 rows: `SELECT
+  count(*) FROM atlas_packets WHERE packet_key ~ '^ace:packet:'` → 3,294;
+  `SELECT count(*) FROM codebase_chunk_index WHERE (metadata->>'packet_key')
+  ~ '^ace:packet:'` → **0**; `SELECT count(*) FROM codebase_chunk_index cci
+  WHERE EXISTS (SELECT 1 FROM atlas_packets ap WHERE ap.packet_key =
+  cci.metadata->>'packet_key')` → **0**. **These are two entirely disjoint
+  identity namespaces sharing the field name `packet_key` — the same
+  collision pattern this session already found once for `tree_node_id`
+  across 22 tables** (see the identity-contract draft artifact from
+  earlier this session). `codebase_chunk_index.metadata->>'packet_key'`
+  is not usable as a join key to `atlas_packets`/`atlas_symbol_versions` at
+  all, for any row, not just these ones.
+- **Corrected `SYMBOL_SEMANTIC_768` coverage measurement using the join key
+  that actually works** (`source_ref`, which both tables carry
+  natively — not `packet_key`): `SELECT count(DISTINCT sv.source_ref),
+  count(DISTINCT CASE WHEN cci.content_embedding IS NOT NULL THEN
+  sv.source_ref END) FROM atlas_symbol_versions sv LEFT JOIN
+  codebase_chunk_index cci ON cci.source_ref = sv.source_ref` → **24 of 30
+  distinct symbol source files have at least one embedded chunk.** This is
+  a file-level coverage number, not exact byte-range-to-chunk coverage
+  (`atlas_symbol_versions` uses `byte_start`/`byte_end`;
+  `codebase_chunk_index` uses `line_start`/`line_end` — reconciling the two
+  needs a byte-offset-to-line-number pass not attempted here). Still a real,
+  live-measured number where the task board previously had none.
+- **What's still missing, concretely, for whoever picks this up next**:
+  (1) the 85 `atlas_symbol_versions` rows whose `upstream_chunk_id` doesn't
+  resolve to any `atlas_packets` row — why not, and is that expected;
+  (2) whether `codebase_chunk_index.metadata->>'packet_key'` should be
+  migrated onto the `ace:packet:*` namespace (a real, separate identity
+  fix, likely large) or whether the two tables were always meant to use
+  `source_ref` as their shared key and `packet_key` on `codebase_chunk_index`
+  is itself a red herring/legacy field; (3) the byte-to-line reconciliation
+  needed to get exact chunk-level (not file-level) `SYMBOL_SEMANTIC_768`
+  coverage. None of these three were resolved in this pass — they are the
+  next real, scoped tasks, not vague "todo more research."
+
+### Item (1) resolved same session: the 85 rows use a third, distinct id scheme — safe fallback applied, `PACKET_TO_SYMBOL_LINEAGE` now 285/285
+
+Investigated the 85 unresolved rows rather than leaving them as an unknown.
+Their `upstream_chunk_id` values are 40-hex-char SHA-1-shaped strings — not
+`ace:packet:*`, not `packet:*`, and confirmed (checked directly) they don't
+match `atlas_ast_nodes.source_content_hash`, `.normalized_node_hash`,
+`.tree_node_id`, or `atlas_packets.packet_id` either. **This is a third,
+so-far-unidentified id scheme** — likely a raw content/chunk hash from
+whatever earlier pass first wrote `upstream_chunk_id`, unrelated to any
+current packet-identity column. Not resolved to a source — flagged, not
+guessed at.
+
+What *was* checked and is safe: every one of the 6 source files behind
+those 85 rows (`llm-context-cache.ts`, `CacheService.ts`,
+`DecisionEngine.ts`, `ErrorClustering.ts`, `EscalationService.ts`,
+`FixSynthesizer.ts`) has **exactly one** `atlas_packets` row —
+`SELECT source_ref, count(*) symbol_rows, count(DISTINCT packet_key)
+distinct_packets FROM ... GROUP BY source_ref` confirmed 6 files, counts
+23+8+16+8+20+10 = 85 (exact), every one with `distinct_packets_for_file = 1`.
+Unambiguous file→packet resolution, so applied a fallback backfill:
+`UPDATE atlas_symbol_versions SET packet_key = (that file's single
+atlas_packets.packet_key) WHERE packet_key IS NULL` → 85 rows, then
+propagated to `atlas_callable_search` via `symbol_version_id` → another 85.
+**`PACKET_TO_SYMBOL_LINEAGE` is now 285/285 on both tables — fully closed,
+not partial.**
+
+**Re-checked `SYMBOL_SEMANTIC_768` one more time after full closure — still
+0 via the `packet_key` join.** This confirms finding (2) above is the real,
+structural, remaining blocker, not a residual symbol-side gap:
+`codebase_chunk_index.metadata->>'packet_key'` is a genuinely separate
+identity namespace from `atlas_packets.packet_key`/`atlas_symbol_versions.
+packet_key`, for all 55,853 rows, not just these. No amount of symbol-side
+backfill can close this — it needs a `codebase_chunk_index`-side identity
+migration (or a decision that `packet_key` there is legacy/dead and
+`source_ref` is the real shared key, per open item (2) above). **The
+file-level coverage number from the `source_ref` join (24/30) remains the
+best real `SYMBOL_SEMANTIC_768` proxy available until that migration
+decision is made.** Item (3) (byte-to-line reconciliation for exact
+chunk-level coverage) is unaffected by this session's work and remains
+open exactly as scoped above.
+
+### Item ("what produced the 40-hex values") traced further: a producer inconsistency, not solved yet
+
+Traced the write path instead of leaving it unidentified.
+`materialize-ast-symbol-versions.mjs` INSERTs `row.upstream_chunk_id`
+(pass-through, not computed there) which comes from
+`adapt-tree-bound-symbol-registry-to-materializer-v1.mjs`'s
+`nomination.upstream_chunk_id` (also pass-through), which comes from
+`nominate-ast-symbols-dry-run.mjs` line 65:
+`upstream_chunk_id: String(candidate.packet_key ?? 'packet:' + digest.slice(0,32))`
+— this stage intends to copy `candidate.packet_key` straight through, and
+only synthesizes a fallback (`packet:` + 32 hex = 39 chars) when
+`candidate.packet_key` is absent. That fallback shape doesn't match our
+bare-40-hex rows either, so the 40-hex value is `candidate.packet_key`
+*as read from its own input file* — `.tmp/atlas/graphify-file-index-v1/
+ast-entities.jsonl`, the nominator's default `--input`.
+
+That is a **different artifact** from what `export-graphify-file-index-v1.mjs`
+produces. Read that exporter's SQL directly: `SELECT json_build_object(
+'packet_key', ap.packet_key, ...) FROM atlas_packets ap WHERE ap.packet_key
+IS NOT NULL ...` — it sources `packet_key` correctly, straight from the
+canonical `atlas_packets` column, which is exactly why the 200
+already-resolved rows are clean. But `ast-entities.jsonl` (entity-level, not
+this exporter's packet/file-level output) has a producer that was not
+located in this pass — grepping `scripts/atlas` for `ast-entities.jsonl`
+found only its 2 consumers (`nominate-ast-symbols-dry-run.mjs`,
+`enrich-ast-entity-prefill-identity.mjs`), no writer.
+
+**Evidence-backed conclusion, not a guess**: two separate extraction
+pipelines both populate a field named `packet_key` for the same nominator
+input contract — one (the packet-level file-index exporter) sources it
+correctly from `atlas_packets`; the other (whatever writes
+`ast-entities.jsonl`) puts a differently-shaped 40-hex value in the same
+field name. This is the same "field name reused for two different identity
+concepts" pattern already found twice above in this file (`packet_key` on
+`codebase_chunk_index` vs `atlas_packets`) and once more in the
+identity-contract draft artifact from earlier this session (`tree_node_id`
+across 22 tables) — a third confirmed instance, not a coincidence.
+
+**Followed this repo's own audit-first rule before stopping**: grepped
+`packages/` and `sveltekit-frontend/src` for `ast-entities.jsonl` too, not
+just `scripts/atlas/`. Zero matches for a `.mjs`/`.ts` writer anywhere in
+the tracked source tree — but the artifact itself **does** still exist on
+disk (`.tmp/atlas/graphify-file-index-v1/ast-entities.jsonl`, 5.7MB,
+regenerated 2026-08-27 — a *later* run than the one that fed our DB rows on
+2026-08-26, so a direct grep for our specific 40-hex value came back empty:
+that exact candidate isn't in the current regenerated file, expected
+churn, not a dead end).
+
+**`manifest.json` in the same directory is the real producer identification** —
+it's a receipt, not a script, but it names everything: `config:
+".okf\pipelines\ast-entity-prefill.yaml"`, `ast_extractor: "ast-grep-napi"`,
+and critically: `"files_unresolved": 85` with `"unresolved_samples"`
+including `src/AGENTS.md`, `src/lib/adapters/legal-corpus.ts`, and several
+more `AGENTS.md` files — files that don't have (or don't cleanly resolve
+to) an `atlas_packets` row. **85 is not a coincidental match to our 85
+unresolved symbol rows** — same mechanism, different run.
+`.okf/pipelines/ast-entity-prefill.yaml` (read directly) declares
+`source.identity: [packet_key, source_ref, feature_id, title_id,
+tree_node_id]` sourced from `atlas_packets` — i.e. the pipeline's own
+*design* says `packet_key` should always be the canonical column value.
+The executor that actually runs this YAML pipeline was not located (it's
+invoked by something outside `scripts/atlas/`, `packages/`, and
+`sveltekit-frontend/src` — possibly an OpenCode/CLI harness not covered by
+this search), so the exact fallback logic that produces a bare-40-hex
+stand-in for `files_unresolved` cases (instead of leaving `packet_key`
+null) was not read directly. **Strong circumstantial conclusion, correctly
+caveated**: for files the extractor can't resolve to a real
+`atlas_packets` row, the pipeline synthesizes a non-canonical `packet_key`-
+shaped placeholder (a raw content hash, unprefixed) rather than emitting
+null — which is exactly the shape of the anomaly found in the DB. Not
+proven with an exact-value match (the specific historical hash wasn't
+recoverable from the regenerated file), but the mechanism, the count (85),
+and the file-type pattern (AGENTS.md / files outside the indexed packet
+corpus) all line up. The already-applied `source_ref` fallback backfill
+remains the correct permanent resolution for these 285 rows regardless —
+this finding explains *why* they were null, it doesn't change what to do
+about it.
+
 **From the master ledger's "Next-session priority" list** (its own latest
 2026-08-23 handoff, immediately before this session's cross-reference entry):
 

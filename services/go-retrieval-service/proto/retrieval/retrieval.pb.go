@@ -1226,8 +1226,12 @@ type CodebaseChunk struct {
 	SourceRevision         string `protobuf:"bytes,17,opt,name=source_revision,json=sourceRevision,proto3" json:"source_revision,omitempty"`
 	RepresentationId       string `protobuf:"bytes,18,opt,name=representation_id,json=representationId,proto3" json:"representation_id,omitempty"`
 	RepresentationRevision string `protobuf:"bytes,19,opt,name=representation_revision,json=representationRevision,proto3" json:"representation_revision,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Optional canonical retrieval identity. Empty means the projection did
+	// not carry a proven bridge and must not be inferred from Qdrant IDs.
+	CandidateId      string `protobuf:"bytes,20,opt,name=candidate_id,json=candidateId,proto3" json:"candidate_id,omitempty"`
+	CandidateOrdinal int64  `protobuf:"varint,21,opt,name=candidate_ordinal,json=candidateOrdinal,proto3" json:"candidate_ordinal,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *CodebaseChunk) Reset() {
@@ -1391,6 +1395,20 @@ func (x *CodebaseChunk) GetRepresentationRevision() string {
 		return x.RepresentationRevision
 	}
 	return ""
+}
+
+func (x *CodebaseChunk) GetCandidateId() string {
+	if x != nil {
+		return x.CandidateId
+	}
+	return ""
+}
+
+func (x *CodebaseChunk) GetCandidateOrdinal() int64 {
+	if x != nil {
+		return x.CandidateOrdinal
+	}
+	return 0
 }
 
 type GraphHopPolicy struct {
@@ -3437,7 +3455,7 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x05chunk\x18\x01 \x01(\v2\x1e.yorha.retrieval.CodebaseChunkH\x00R\x05chunk\x12@\n" +
 	"\bprogress\x18\x02 \x01(\v2\".yorha.retrieval.RetrievalProgressH\x00R\bprogress\x127\n" +
 	"\x05error\x18\x03 \x01(\v2\x1f.yorha.retrieval.RetrievalErrorH\x00R\x05errorB\a\n" +
-	"\x05event\"\xa1\x05\n" +
+	"\x05event\"\xf1\x05\n" +
 	"\rCodebaseChunk\x12\x19\n" +
 	"\bchunk_id\x18\x01 \x01(\tR\achunkId\x12\x1b\n" +
 	"\tfile_path\x18\x02 \x01(\tR\bfilePath\x12\x12\n" +
@@ -3462,7 +3480,9 @@ const file_proto_active_retrieval_proto_rawDesc = "" +
 	"\x12workspace_revision\x18\x10 \x01(\tR\x11workspaceRevision\x12'\n" +
 	"\x0fsource_revision\x18\x11 \x01(\tR\x0esourceRevision\x12+\n" +
 	"\x11representation_id\x18\x12 \x01(\tR\x10representationId\x127\n" +
-	"\x17representation_revision\x18\x13 \x01(\tR\x16representationRevision\"\x85\x01\n" +
+	"\x17representation_revision\x18\x13 \x01(\tR\x16representationRevision\x12!\n" +
+	"\fcandidate_id\x18\x14 \x01(\tR\vcandidateId\x12+\n" +
+	"\x11candidate_ordinal\x18\x15 \x01(\x03R\x10candidateOrdinal\"\x85\x01\n" +
 	"\x0eGraphHopPolicy\x12\x12\n" +
 	"\x04mode\x18\x01 \x01(\x05R\x04mode\x12$\n" +
 	"\x0emax_hop_chunks\x18\x02 \x01(\x05R\fmaxHopChunks\x129\n" +

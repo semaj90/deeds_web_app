@@ -10,11 +10,13 @@ import pg from 'pg';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../../');
-const QDRANT_URL = (process.env.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
+const env = loadRepoEnv(process.env);
+const QDRANT_URL = (env.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
 
 async function auditE2E(pool) {
   const report = {
@@ -28,7 +30,11 @@ async function auditE2E(pool) {
   report.checks.push({ name: 'Postgres atlas_packets', ok: pgCount > 0, count: pgCount });
 
   // Check 2: Qdrant has matching points
-  const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/count`);
+  const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/count`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ exact: false }),
+  });
   const qdData = await qdRes.json();
   const qdCount = qdData.result?.count || 0;
   report.checks.push({ name: 'Qdrant codebase_chunks_768', ok: qdCount > 0, count: qdCount });
@@ -52,7 +58,7 @@ async function auditE2E(pool) {
 }
 
 async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+  const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
   console.log('[phase-d] Audit Retrieval Spine End-to-End\n');
 
   try {
@@ -68,6 +74,10 @@ async function main() {
 
     console.log(`\n[summary] ${report.pass ? '✅ PASS' : '⚠️ FAIL'}`);
     console.log(`[report] ${reportPath}`);
+    // Keep the machine-readable exit status aligned with the audit result.
+    // A report containing a failed identity check must not be treated as a
+    // successful CI/agent gate merely because the receipt was written.
+    if (!report.pass) process.exitCode = 1;
   } finally {
     await pool.end();
   }

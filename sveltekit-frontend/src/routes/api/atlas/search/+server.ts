@@ -47,7 +47,7 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
+import { embedSemantic768Canonical, tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import {
@@ -217,6 +217,25 @@ function rrfScore(ranks: number[]): number {
 // ── Stage 0: Embed query ───────────────────────────────────────────────────────
 
 async function embedQuery(query: string): Promise<number[] | null> {
+  if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
+    const model = ENV.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma';
+    const modelArtifactRevision = ENV.EMBEDDING_MODEL_ARTIFACT_REVISION;
+    const tokenizerRevision = ENV.EMBEDDING_TOKENIZER_REVISION;
+    const inputPolicyRevision = ENV.EMBEDDING_INPUT_POLICY_REVISION;
+    if (!modelArtifactRevision || !tokenizerRevision || !inputPolicyRevision) {
+      throw new Error('SEMANTIC_768_STRICT_LINEAGE_CONFIGURATION_REQUIRED');
+    }
+    const embedded = await embedSemantic768Canonical(query, {
+      model,
+      modelArtifactRevision,
+      tokenizerRevision,
+      inputPolicyRevision,
+      baseUrl: ENV.EMBEDDING_BASE_URL,
+      timeoutMs: 20_000,
+    });
+    return embedded.embedding;
+  }
+
   const embedded = await tryEmbedCanonical(query.slice(0, 1024), {
     model: 'embeddinggemma:latest',
     timeoutMs: 20_000,

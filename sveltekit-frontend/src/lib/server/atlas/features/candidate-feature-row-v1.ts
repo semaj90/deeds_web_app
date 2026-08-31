@@ -33,10 +33,8 @@ export const CandidateFeatureRowV1Schema = z.object({
   domainAffinity: nullableScore,
   executionUtility: nullableScore,
   memoryUtility: nullableScore,
-  latentLocalityScore: nullableScore,
-  latent256Available: z.boolean().default(false),
 
-  laneMask: z.array(z.enum(['semantic', 'lexical', 'ast', 'graph', 'manifold4', 'cross_encoder', 'domain', 'execution', 'memory', 'latent'])),
+  laneMask: z.array(z.enum(['semantic', 'lexical', 'ast', 'graph', 'manifold4', 'cross_encoder', 'domain', 'execution', 'memory'])),
   degradedIdentity: z.boolean().default(false),
   evidenceRefs: z.array(z.string().min(1)).default([]),
 }).superRefine((row, ctx) => {
@@ -52,20 +50,6 @@ export const CandidateFeatureRowV1Schema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['crossEncoderRawScore'],
       message: 'CROSS_ENCODER_SCORE_REQUIRES_AVAILABLE=true',
-    });
-  }
-  if (row.latent256Available && row.latentLocalityScore === null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['latentLocalityScore'],
-      message: 'LATENT256_AVAILABLE_REQUIRES_LOCALITY_SCORE',
-    });
-  }
-  if (!row.latent256Available && row.latentLocalityScore !== null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['latentLocalityScore'],
-      message: 'LATENT_LOCALITY_SCORE_REQUIRES_AVAILABLE=true',
     });
   }
 });

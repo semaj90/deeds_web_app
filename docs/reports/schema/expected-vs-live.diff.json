@@ -8,11 +8,11 @@
   },
   "actual": {
     "source": "live_database",
-    "inspectedAt": "2026-08-30T20:32:35.009Z",
-    "tableCount": 525
+    "inspectedAt": "2026-08-31T01:12:14.425Z",
+    "tableCount": 526
   },
   "blockCount": 159,
-  "warnCount": 215,
+  "warnCount": 216,
   "noteCount": 160,
   "diffs": [
     {
@@ -686,6 +686,12 @@
       "category": "EXTRA_TABLE",
       "table": "atlas_identity_alias_decisions",
       "message": "Table \"atlas_identity_alias_decisions\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
+    },
+    {
+      "level": "WARN",
+      "category": "EXTRA_TABLE",
+      "table": "atlas_identity_ledger",
+      "message": "Table \"atlas_identity_ledger\" exists in live DB but not in Drizzle snapshot (manual migration, tablesFilter exclude, or out-of-band DDL)"
     },
     {
       "level": "WARN",
@@ -3480,5 +3486,5 @@
       "message": "Column \"concept_records.metadata\" in live DB but not in snapshot (may be manual or sidecar migration)"
     }
   ],
-  "generatedAt": "2026-08-30T20:35:50.531Z"
+  "generatedAt": "2026-08-31T01:18:47.648Z"
 }

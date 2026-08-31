@@ -1,6 +1,6 @@
 {
   "schema": "atlas_migration_owner_audit_v1",
-  "generatedAt": "2026-08-30T20:38:34.294Z",
+  "generatedAt": "2026-08-31T03:14:47.964Z",
   "writes": false,
   "live": {
     "reachable": true,
@@ -122,6 +122,11 @@
           "updated_at"
         ],
         "rowCount": 0
+      },
+      "feature_registry": {
+        "exists": false,
+        "columns": [],
+        "rowCount": null
       }
     }
   },
@@ -159,6 +164,11 @@
           "workspace_revision"
         ],
         "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
       },
       "drizzle": {
         "files": [],
@@ -266,6 +276,11 @@
         ],
         "expectedMissing": []
       },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
       "drizzle": {
         "files": [],
         "present": false
@@ -338,6 +353,11 @@
           "workspace_revision"
         ],
         "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
       },
       "drizzle": {
         "files": [],
@@ -439,6 +459,11 @@
         ],
         "expectedMissing": []
       },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
       "drizzle": {
         "files": [
           "src/lib/server/db/schema/atlas-observation-feature-rows.ts"
@@ -531,6 +556,11 @@
           "workspace_revision"
         ],
         "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
       },
       "drizzle": {
         "files": [],
@@ -633,6 +663,11 @@
         ],
         "expectedMissing": []
       },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
       "drizzle": {
         "files": [],
         "present": false
@@ -670,10 +705,76 @@
         "expectedMissing": []
       },
       "classification": "LIVE_SHAPE_ALIGNED"
+    },
+    {
+      "id": "feature_registry",
+      "table": "feature_registry",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0024_nebulous_mongoose.sql"
+        ],
+        "columns": [
+          "cluster_id",
+          "code_refs",
+          "description",
+          "feature_key",
+          "id",
+          "last_verified_at",
+          "source_refs",
+          "status",
+          "test_refs",
+          "title",
+          "trust_tier"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [
+          "drizzle/manual/proposed_20260530_task_semantic_packets.sql"
+        ],
+        "present": [
+          {
+            "file": "drizzle/manual/proposed_20260530_task_semantic_packets.sql",
+            "present": true
+          }
+        ],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [
+          "src/lib/server/db/schema/feature-registry.ts"
+        ],
+        "present": true
+      },
+      "manifest": {
+        "allRegistered": false,
+        "entries": [
+          {
+            "file": "drizzle/0024_nebulous_mongoose.sql",
+            "entry": null
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "id",
+          "feature_key",
+          "title",
+          "status",
+          "source_refs"
+        ]
+      },
+      "classification": "MISSING_MANIFEST_REGISTRATION"
     }
   ],
   "summary": {
-    "missingManifestRegistration": [],
+    "missingManifestRegistration": [
+      "feature_registry"
+    ],
     "sidecarUnapplied": [
       "graphify_file_search_projection"
     ],

@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20260830_semantic_embedding_cache_v2.sql",
+      "status": "planned_sidecar",
+      "reason": "Additive revision-qualified semantic_768 cache. Legacy embedding_cache remains untouched; apply only after migration-ledger review and canonical caller cutover.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='semantic_embedding_cache_v2';\""
+    },
+    {
       "file": "0999_fix-grpc-proto-alignment.sql",
       "status": "manual_sidecar",
       "reason": "Adds missing gRPC proto alignment indexes and metadata columns. The route_runtime_packets branch is guarded because the table is not present in the live schema.",

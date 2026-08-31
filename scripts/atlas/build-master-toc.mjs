@@ -61,7 +61,11 @@ const candidates = [
   // Generated projections must not become inputs to their own checksum.
   .filter((value) => {
     const path = repoPath(value);
-    return path !== repoPath(registryPath) && path !== repoPath(tocPath);
+    if (path === repoPath(registryPath) || path === repoPath(tocPath)) return false;
+    // Governance outputs are projections and must not feed their own input
+    // registry or make replay checksums depend on audit execution time.
+    if (/^docs\/reports\/document-(governance|supersession)-/.test(path)) return false;
+    return true;
   })
   .sort();
 
@@ -113,6 +117,10 @@ const toc = [
   '## Active OpenSpec task progress',
   '',
   ...openSpecs.map((r) => `- [${r.openspecChange}](${r.path.replace(/\/tasks\.md$/, '')}) — ${r.completedTasks}/${r.totalTasks} tasks (${r.progressFraction == null ? 'n/a' : `${Math.round(r.progressFraction * 100)}%`})`),
+  '',
+  '## Ordered workboard',
+  '',
+  '- [OpenSpec workboard](OPENSPEC-WORKBOARD.md) — priority-ordered open tasks with evidence-based ETA fields.',
   '',
   '## Superseded and archive candidates',
   '',

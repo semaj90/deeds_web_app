@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { GraphAlgorithmSchema, type GraphAlgorithm } from './graph-analysis-types.js';
+import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 
 export type GraphDispatcherKind =
 	| 'pagerank-adapter'
@@ -52,49 +53,49 @@ const GRAPH_DISPATCHER_REGISTRY: readonly GraphDispatcherRegistryEntry[] = [
 	{
 		algorithm: 'pagerank',
 		dispatchKind: 'pagerank-adapter',
-		algorithmRevision: 'neo4j-gds-pagerank-mutate-v1',
+		algorithmRevision: graphAlgorithmRevision('pagerank'),
 		proofState: 'wired',
 		skipReason: null,
 	},
 	{
 		algorithm: 'cheirank',
 		dispatchKind: 'cheirank-adapter',
-		algorithmRevision: 'todo-cheirank-v1',
+		algorithmRevision: graphAlgorithmRevision('cheirank'),
 		proofState: 'wired',
 		skipReason: null,
 	},
 	{
 		algorithm: 'personalized_pagerank',
 		dispatchKind: 'fail-closed',
-		algorithmRevision: 'unsupported-personalized-pagerank-v1',
+		algorithmRevision: graphAlgorithmRevision('personalized_pagerank'),
 		proofState: 'skipped',
 		skipReason: 'No live dispatcher is wired for personalized_pagerank; fail closed until a concrete adapter exists.',
 	},
 	{
 		algorithm: 'louvain',
 		dispatchKind: 'shared-community-runner',
-		algorithmRevision: 'neo4j-gds-louvain-mutate-v1',
+		algorithmRevision: graphAlgorithmRevision('louvain'),
 		proofState: 'wired',
 		skipReason: null,
 	},
 	{
 		algorithm: 'leiden',
 		dispatchKind: 'shared-community-runner',
-		algorithmRevision: 'neo4j-gds-leiden-mutate-v1',
+		algorithmRevision: graphAlgorithmRevision('leiden'),
 		proofState: 'wired',
 		skipReason: null,
 	},
 	{
 		algorithm: 'kcore',
 		dispatchKind: 'kcore-adapter',
-		algorithmRevision: 'todo-kcore-v1',
+		algorithmRevision: graphAlgorithmRevision('kcore'),
 		proofState: 'wired',
 		skipReason: null,
 	},
 	{
 		algorithm: 'betweenness',
 		dispatchKind: 'betweenness-adapter',
-		algorithmRevision: 'todo-betweenness-v1',
+		algorithmRevision: graphAlgorithmRevision('betweenness'),
 		proofState: 'wired',
 		skipReason: null,
 	},

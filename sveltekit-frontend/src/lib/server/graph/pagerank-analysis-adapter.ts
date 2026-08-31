@@ -43,8 +43,9 @@ import {
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
 import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 
-const ALGORITHM_REVISION = 'neo4j-gds-pagerank-mutate-v1';
+const ALGORITHM_REVISION = graphAlgorithmRevision('pagerank');
 const PARAMETER_REVISION_PREFIX = 'maxIter-damping';
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
 

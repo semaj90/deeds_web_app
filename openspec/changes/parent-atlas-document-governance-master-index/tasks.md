@@ -3,10 +3,10 @@
 ## 1. Registry and discovery
 
 - [ ] 1.1 Add `DocumentGovernanceRecordV1` schema with explicit status, topic ownership, supersession, OpenSpec, validation, workflow-progress-reference, and archive fields.
-- [ ] 1.2 Add read-only repository discovery for root/scoped `CLAUDE.md`, `docs/**/*.md`, OpenSpec artifacts, and `docs/reports/**/*`.
+- [x] 1.2 Add read-only repository discovery for root/scoped `CLAUDE.md`, `docs/**/*.md`, OpenSpec artifacts, and `docs/reports/**/*`.
 - [ ] 1.3 Add deterministic topic/status extraction from explicit frontmatter/status text/path conventions; semantic/LLM classification may nominate but never promote canonical state.
 - [ ] 1.4 Add one-canonical-document-per-topic validation and fail closed with `CONFLICT` when violated.
-- [ ] 1.5 Add generated registry artifact with deterministic canonical JSON checksum and replay test.
+- [x] 1.5 Add generated registry artifact with deterministic canonical JSON checksum and replay test.
 
 ## 2. CLAUDE.md supersession map
 
@@ -46,9 +46,9 @@
 
 ## 6. Master TOC generation
 
-- [ ] 6.1 Implement `scripts/atlas/build-master-toc.mjs` from the canonical registry.
+- [x] 6.1 Implement `scripts/atlas/build-master-toc.mjs` from the canonical registry.
 - [ ] 6.2 Generate `docs/MASTER-TOC.md` with canonical topics, active OpenSpec changes, progress, ETA when available, superseded docs, archive-ready docs, experiments, and conflicts.
-- [ ] 6.3 Add `--check` mode that fails when committed `MASTER-TOC.md` differs from deterministic regeneration.
+- [x] 6.3 Add `--check` mode that fails when committed `MASTER-TOC.md` differs from deterministic regeneration.
 - [ ] 6.4 Add direct pointers to canonical source docs and OpenSpec changes; do not duplicate their substantive content.
 - [ ] 6.5 Add quick-retrieval keywords/topic aliases without turning the TOC into a second semantic knowledge base.
 
@@ -62,7 +62,7 @@
 ## 8. Parent Atlas admin SSR/API
 
 - [ ] 8.1 Add read-only `/api/admin/atlas/document-governance` endpoint returning compact registry summary, topic conflicts, active OpenSpec progress, latest receipts, and archive readiness.
-- [ ] 8.2 Extend `/admin/atlas/+page.server.ts` to load the document-governance summary during SSR; browser code must not scan repository files directly.
+- [x] 8.2 Extend `/admin/atlas/+page.server.ts` to load the document-governance summary during SSR; browser code must not scan repository files directly.
 - [ ] 8.3 Add typed page-data contract for the governance summary.
 - [ ] 8.4 Add Svelte 5 runes state for filters/selection only; use `$derived` for computed counts/progress and `$effect` only for actual synchronization/side effects.
 - [ ] 8.5 Add Bits UI `Tabs` for Current / OpenSpec / Superseded / Archive Ready / Conflicts.

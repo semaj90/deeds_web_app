@@ -6,10 +6,10 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizeAstNodeKind } from './lib/ast-source-ref-key.mjs';
+import { deriveSymbolVersionIdV1 } from '../../packages/parent-atlas/dist/core/identity-v1.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -37,8 +37,12 @@ function canonicalAstSourceRef(value) {
   return String(value ?? '').replaceAll('\\', '/').replace(/^sveltekit-frontend\//, '');
 }
 
-const digest = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
 const readJsonl = async (file) => (await fs.readFile(file, 'utf8')).split(/\r?\n/).filter(Boolean).map(JSON.parse);
+const normalizeResolution = (row) => ({
+  ...row,
+  status: row.status ?? (row.registryResolution === 'EXACT_CANONICAL_KEY' ? 'CANONICAL' : null),
+  stable_symbol_id: row.stable_symbol_id ?? row.stableSymbolId ?? null,
+});
 const writeReport = async (report) => {
   const reportPath = path.resolve(ROOT, 'docs/reports/ast-symbol-version-materialization-v1.json');
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -52,7 +56,7 @@ async function main() {
     readJsonl(resolutionPath),
     readJsonl(astSnapshotPath),
   ]);
-  const resolutionByNomination = new Map(resolutions.map((row) => [row.nomination_id, row]));
+  const resolutionByNomination = new Map(resolutions.map((row) => [row.nomination_id ?? row.nominationId, normalizeResolution(row)]));
   const candidates = nominations.filter((row) => {
     const resolution = resolutionByNomination.get(row.nomination_id);
     return PROMOTABLE_KINDS.has(row.kind) && resolution?.status === 'CANONICAL' && resolution.stable_symbol_id;
@@ -100,7 +104,12 @@ async function main() {
       const resolution = resolutionByNomination.get(row.nomination_id);
       if (!activeIds.has(resolution.stable_symbol_id)) continue;
       report.rowsAttempted++;
-      const symbolVersionId = `symbol-version:${digest(`${resolution.stable_symbol_id}\0${row.source_revision}\0${row.declaration_hash}\0${row.upstream_node_id}`)}`;
+      const symbolVersionId = deriveSymbolVersionIdV1({
+        stableSymbolId: resolution.stable_symbol_id,
+        sourceRevision: row.source_revision,
+        declarationHash: row.declaration_hash,
+        upstreamNodeId: row.upstream_node_id,
+      });
       const result = await pool.query(
         `INSERT INTO atlas_symbol_versions (
            symbol_version_id, stable_symbol_id, source_ref, source_revision, workspace_revision,

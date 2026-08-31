@@ -804,6 +804,39 @@ drift. Historical references remain reference-only.
 
 **See**: `docs/P1-PACKAGE-CONSOLIDATION-IN-PROGRESS.md` for phase tracking.
 
+### Hard Rule: Audit `packages/*` Before Moving Anything From `scripts/atlas/` (Aug 30, 2026)
+
+`scripts/atlas/` (main repo, loose `.mjs`/`.mts` scripts) is mid-migration into
+`packages/atlas-core` / `packages/parent-atlas` / the `parent-atlas-*` package
+family above. **Before moving, copying, or reimplementing any file out of
+`scripts/atlas/` into a `packages/atlas-*` package, grep `packages/parent-atlas/src/core/`
+and `packages/atlas-core/src/` for an existing contract covering the same
+capability.** Do not assume the package side is empty just because the
+migration isn't finished — it already contains real, tested, canonical
+contracts for things you might expect to still be script-only.
+
+**Why this is a hard rule, not a suggestion**: during the 2026-08-30 adaptive-
+DAG-fabric pass, a search scoped to `sveltekit-frontend/src` alone concluded
+an ast-grep evidence-envelope contract ("DAG-STRUCT-01") didn't exist yet.
+It already did — `packages/parent-atlas/src/core/ast-grep-observation-adapter.ts`
+(`AstGrepObservationV1`, wired into production via `graphify-structural-
+intelligence-adapter.ts`). The mistake wasn't inventing a duplicate (caught
+before writing code), but the search scope itself: `packages/` was checked
+last, not first, even though this file has said since the consolidation
+milestone above that canonical contracts live there. See
+`openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md` (2026-08-30
+entries) for the full trace of what else this same mis-scoped search nearly
+duplicated.
+
+**Rule**: `packages/parent-atlas/src/core/` and `packages/atlas-core/src/`
+are checked **first**, before `sveltekit-frontend/src` and before
+`scripts/atlas/`, for any capability that sounds like it should be a
+canonical contract (an evidence envelope, an identity type, a validation
+schema, a checksum/revision-bound artifact). Only after that comes up empty
+does new work belong in `scripts/atlas/` (script-side, still mid-migration)
+or `sveltekit-frontend/src` (app-side consumer/bridge, per the Duplication
+Prevention section above).
+
 ---
 
 ## 🚫 Duplication Prevention — Audit Before You Build (HARD RULE, Aug 9 2026)

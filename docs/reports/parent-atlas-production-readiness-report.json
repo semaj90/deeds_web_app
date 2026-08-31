@@ -1,20 +1,20 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-23T19:37:12.706Z",
+  "generatedAt": "2026-08-31T03:43:28.855Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
       {
         "id": "report:exists",
         "status": "pass",
-        "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (146 queued)",
+        "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (500 queued)",
         "details": {
-          "rowsQueued": 146,
-          "succeeded": 146,
+          "rowsQueued": 500,
+          "succeeded": 0,
           "failed": 0,
           "exactHits": 0,
           "semanticHits": 0,
-          "llamaCalls": 146
+          "llamaCalls": 0
         }
       },
       {
@@ -27,29 +27,29 @@
       },
       {
         "id": "report:sourceRefReads",
-        "status": "pass",
-        "message": "sourceRef packet reads: 146",
+        "status": "warn",
+        "message": "sourceRef packet reads: 0",
         "details": {
-          "sourceRefPacketReads": 146
+          "sourceRefPacketReads": 0
         }
       },
       {
         "id": "report:summariesWritten",
-        "status": "pass",
-        "message": "summaries written: 146",
+        "status": "warn",
+        "message": "summaries written: 0",
         "details": {
-          "summariesWritten": 146
+          "summariesWritten": 0
         }
       },
       {
         "id": "report:cache-counters",
         "status": "pass",
-        "message": "Exact hits=0, semantic hits=0, llama calls=146",
+        "message": "Exact hits=0, semantic hits=0, llama calls=0",
         "details": {
           "exactHits": 0,
           "semanticHits": 0,
-          "llamaCalls": 146,
-          "succeeded": 146
+          "llamaCalls": 0,
+          "succeeded": 0
         }
       }
     ],
@@ -60,7 +60,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 66246,
+          "bytes": 67176,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
         }
       },
@@ -80,7 +80,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 4611,
+          "bytes": 4965,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
         }
       },
@@ -110,7 +110,7 @@
         "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 22179,
+          "bytes": 22982,
           "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
         }
       },
@@ -130,7 +130,7 @@
         "message": "simd-bridge/cpp/libtorch_graph_impl.cpp exists",
         "details": {
           "exists": true,
-          "bytes": 6851,
+          "bytes": 8574,
           "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
         }
       },
@@ -190,7 +190,7 @@
         "details": {
           "libtorchGraphImpl": {
             "exists": true,
-            "bytes": 6851,
+            "bytes": 8574,
             "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
           },
           "pytorchGraphCpp": {
@@ -243,7 +243,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 14441,
+          "bytes": 14519,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
         }
       },
@@ -317,7 +317,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
         "details": {
           "exists": true,
-          "bytes": 4555,
+          "bytes": 4931,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
         }
       },
@@ -327,7 +327,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
         "details": {
           "exists": true,
-          "bytes": 222355,
+          "bytes": 264570,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
         }
       },
@@ -479,7 +479,7 @@
         "message": "scripts/atlas/offline-parent-atlas-mapreduce.sql exists",
         "details": {
           "exists": true,
-          "bytes": 9070,
+          "bytes": 11344,
           "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
         }
       },
@@ -489,7 +489,7 @@
         "message": "scripts/atlas/gemma4-parent-atlas-summaries.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 40260,
+          "bytes": 55663,
           "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
         }
       },
@@ -509,7 +509,7 @@
         "message": "scripts/atlas/audit-hidden-packet-pathmap.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 13510,
+          "bytes": 13697,
           "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
         }
       },
@@ -519,41 +519,41 @@
         "message": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 14107,
+          "bytes": 14389,
           "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
         }
       },
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 212 NDJSON files",
+        "message": "rg -uuu found 230 NDJSON files",
         "details": {
           "sample": [
-            ".opencode\\gemma4_candidates.ndjson",
-            ".opencode\\fixes\\fixes.ndjson",
-            ".opencode\\recommendations\\tasks.ndjson",
-            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-            ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-            ".opencode\\quarantine\\invalid-cards.ndjson",
             ".opencode\\outcome-ledger.ndjson",
-            ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            ".opencode\\ace-packets_stale\\index.ndjson",
-            ".opencode\\ace-packets\\index.ndjson",
-            ".opencode\\ingest\\nodes.ndjson",
-            ".opencode\\ingest\\edges.ndjson",
-            ".opencode\\ndjson\\temporal-index.ndjson",
-            ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-            ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-            ".opencode\\ndjson\\minified-ace-index.ndjson",
-            ".opencode\\ndjson\\graph-edges.ndjson",
-            ".opencode\\ndjson\\enriched-ledger.ndjson",
-            ".opencode\\ndjson\\enriched-candidates.ndjson",
-            ".opencode\\ndjson\\cluster-summary.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-            "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-            "scripts\\atlas\\out\\synthetic-traces.ndjson",
-            "scripts\\atlas\\out\\db-usage-edges.ndjson",
-            "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson"
+            ".tmp\\dependency-graph.ndjson",
+            ".tmp\\compressed-packets.ndjson",
+            ".tmp\\colab-parent-atlas\\packet_features.ndjson",
+            ".tmp\\colab-parent-atlas\\atlas_tree_nodes.ndjson",
+            ".tmp\\colab-parent-atlas\\atlas_summary_layers.ndjson",
+            ".tmp\\colab-parent-atlas\\atlas_packets.ndjson",
+            ".tmp\\colab-parent-atlas\\atlas_feature_envelopes.ndjson",
+            ".tmp\\chunks\\feature-chunks.ndjson",
+            ".tmp\\chrom97-summary-packets.ndjson",
+            ".tmp\\calls-edges-clean.ndjson",
+            ".tmp\\addressable-packets.validated.ndjson",
+            ".tmp\\addressable-packets.topology.ndjson",
+            ".tmp\\addressable-packets.ndjson",
+            ".tmp\\addressable-packets.enriched.ndjson",
+            ".tmp\\ace-packet-assembly.ndjson",
+            ".tmp\\ace-envelope-from-gpu-retrieval.ndjson",
+            ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
+            ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
+            ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
+            ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768.ndjson",
+            ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768-valid.ndjson",
+            ".tmp\\analysis\\backfill-proposals.ndjson",
+            ".tmp\\addressable-packets.vectorized.ndjson",
+            ".tmp\\atlas-feature-recommendation-index.ndjson"
           ]
         }
       }
@@ -562,119 +562,132 @@
       {
         "id": "table:parent_atlas_documents",
         "status": "pass",
-        "message": "parent_atlas_documents exists with 5395 rows",
+        "message": "parent_atlas_documents exists with 61660 rows",
         "details": {
-          "count": 5395
+          "count": 61660,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:atlas_feature_map",
         "status": "pass",
-        "message": "atlas_feature_map exists with 19611 rows",
+        "message": "atlas_feature_map exists with 4700 rows",
         "details": {
-          "count": 19611
+          "count": 4700,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:atlas_feature_map_synthesized",
         "status": "pass",
-        "message": "atlas_feature_map_synthesized exists with 14465 rows",
+        "message": "atlas_feature_map_synthesized exists with 0 rows",
         "details": {
-          "count": 14465
+          "count": 0,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:nes_chrom_packets",
         "status": "pass",
-        "message": "nes_chrom_packets exists with 14911 rows",
+        "message": "nes_chrom_packets exists with 1992 rows",
         "details": {
-          "count": 14911
+          "count": 1992,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:nes_chrom_kag_dag_hits",
         "status": "pass",
-        "message": "nes_chrom_kag_dag_hits exists with 32 rows",
+        "message": "nes_chrom_kag_dag_hits exists with 0 rows",
         "details": {
-          "count": 32
+          "count": 0,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:route_runtime_packets",
         "status": "pass",
-        "message": "route_runtime_packets exists with 9 rows",
+        "message": "route_runtime_packets exists with 7 rows",
         "details": {
-          "count": 9
+          "count": 7,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:task_semantic_packets",
         "status": "pass",
-        "message": "task_semantic_packets exists with 314 rows",
+        "message": "task_semantic_packets exists with 0 rows",
         "details": {
-          "count": 314
+          "count": 0,
+          "replacementQueuePresent": false
+        }
+      },
+      {
+        "id": "table:kanban_tasks",
+        "status": "pass",
+        "message": "kanban_tasks exists with 0 rows",
+        "details": {
+          "count": 0,
+          "replacementQueuePresent": false
+        }
+      },
+      {
+        "id": "table:kanban_task_events",
+        "status": "pass",
+        "message": "kanban_task_events exists with 0 rows",
+        "details": {
+          "count": 0,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:codebase_chunk_index",
         "status": "pass",
-        "message": "codebase_chunk_index exists with 40754 rows",
+        "message": "codebase_chunk_index exists with 55853 rows",
         "details": {
-          "count": 40754
+          "count": 55853,
+          "replacementQueuePresent": false
         }
       },
       {
         "id": "table:agent_pickup_queue",
-        "status": "pass",
-        "message": "agent_pickup_queue exists with 135 rows",
+        "status": "warn",
+        "message": "agent_pickup_queue is absent; live Kanban task/event tables provide a replacement control-plane surface, but the legacy pickup adapter is not proven migrated",
         "details": {
-          "count": 135
+          "count": null,
+          "replacementQueuePresent": true
         }
       },
       {
-        "id": "parent_atlas_documents:sourceRef",
-        "status": "pass",
-        "message": "Parent Atlas sourceRefs: 3941/3941",
+        "id": "parent_atlas_documents:summary",
+        "status": "warn",
+        "message": "column \"summary\" does not exist",
         "details": {}
       },
       {
-        "id": "parent_atlas_documents:summaries",
-        "status": "pass",
-        "message": "Parent Atlas summaries: 3941/3941",
+        "id": "active-topology",
+        "status": "warn",
+        "message": "column pad.source_kind does not exist",
         "details": {}
-      },
-      {
-        "id": "active-production:topology",
-        "status": "pass",
-        "message": "Active production qdrant-without-SOM rows: 0",
-        "details": {
-          "raw_total": 19611,
-          "raw_with_som": 10512,
-          "raw_with_qdrant": 11427,
-          "active_total": 9599,
-          "active_with_som": 4830,
-          "active_with_qdrant": 4788,
-          "active_qdrant_no_som": 0
-        }
       },
       {
         "id": "nes-chrom:sourceRef-parent-join",
         "status": "pass",
-        "message": "NES/CHROM packets matching Parent Atlas: 10042/14911",
+        "message": "NES/CHROM packets matching Parent Atlas: 2423/2483",
         "details": {}
       },
       {
         "id": "route-runtime:sourceRefs",
         "status": "pass",
-        "message": "Runtime packets with sourceRefs: 8/9",
+        "message": "Runtime packets with sourceRefs: 7/7",
         "details": {}
       }
     ],
     "redis": [
       {
         "id": "lod0:route-runtime",
-        "status": "pass",
-        "message": "Redis LOD0 runtime packets: 1/9",
+        "status": "warn",
+        "message": "Redis LOD0 runtime packets: 0/7",
         "details": {}
       }
     ],
@@ -682,7 +695,7 @@
       {
         "id": "collection:codebase_chunks_768",
         "status": "pass",
-        "message": "Qdrant codebase_chunks_768 points: 52606",
+        "message": "Qdrant codebase_chunks_768 points: 109776",
         "details": {}
       }
     ],
@@ -690,7 +703,7 @@
       {
         "id": "contextual-tree",
         "status": "pass",
-        "message": "Neo4j CodebaseFile=20542, ParentAtlasFeature=1582",
+        "message": "Neo4j CodebaseFile=69009, ParentAtlasFeature=39485",
         "details": {}
       }
     ]
@@ -700,14 +713,14 @@
       "section": "summary-batch",
       "id": "report:exists",
       "status": "pass",
-      "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (146 queued)",
+      "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (500 queued)",
       "details": {
-        "rowsQueued": 146,
-        "succeeded": 146,
+        "rowsQueued": 500,
+        "succeeded": 0,
         "failed": 0,
         "exactHits": 0,
         "semanticHits": 0,
-        "llamaCalls": 146
+        "llamaCalls": 0
       }
     },
     {
@@ -722,31 +735,31 @@
     {
       "section": "summary-batch",
       "id": "report:sourceRefReads",
-      "status": "pass",
-      "message": "sourceRef packet reads: 146",
+      "status": "warn",
+      "message": "sourceRef packet reads: 0",
       "details": {
-        "sourceRefPacketReads": 146
+        "sourceRefPacketReads": 0
       }
     },
     {
       "section": "summary-batch",
       "id": "report:summariesWritten",
-      "status": "pass",
-      "message": "summaries written: 146",
+      "status": "warn",
+      "message": "summaries written: 0",
       "details": {
-        "summariesWritten": 146
+        "summariesWritten": 0
       }
     },
     {
       "section": "summary-batch",
       "id": "report:cache-counters",
       "status": "pass",
-      "message": "Exact hits=0, semantic hits=0, llama calls=146",
+      "message": "Exact hits=0, semantic hits=0, llama calls=0",
       "details": {
         "exactHits": 0,
         "semanticHits": 0,
-        "llamaCalls": 146,
-        "succeeded": 146
+        "llamaCalls": 0,
+        "succeeded": 0
       }
     },
     {
@@ -756,7 +769,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 66246,
+        "bytes": 67176,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       }
     },
@@ -778,7 +791,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 4611,
+        "bytes": 4965,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
       }
     },
@@ -811,7 +824,7 @@
       "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 22179,
+        "bytes": 22982,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       }
     },
@@ -833,7 +846,7 @@
       "message": "simd-bridge/cpp/libtorch_graph_impl.cpp exists",
       "details": {
         "exists": true,
-        "bytes": 6851,
+        "bytes": 8574,
         "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
       }
     },
@@ -899,7 +912,7 @@
       "details": {
         "libtorchGraphImpl": {
           "exists": true,
-          "bytes": 6851,
+          "bytes": 8574,
           "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
         },
         "pytorchGraphCpp": {
@@ -952,7 +965,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 14441,
+        "bytes": 14519,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
       }
     },
@@ -1031,7 +1044,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
       "details": {
         "exists": true,
-        "bytes": 4555,
+        "bytes": 4931,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
       }
     },
@@ -1042,7 +1055,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
       "details": {
         "exists": true,
-        "bytes": 222355,
+        "bytes": 264570,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
       }
     },
@@ -1207,7 +1220,7 @@
       "message": "scripts/atlas/offline-parent-atlas-mapreduce.sql exists",
       "details": {
         "exists": true,
-        "bytes": 9070,
+        "bytes": 11344,
         "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
       }
     },
@@ -1218,7 +1231,7 @@
       "message": "scripts/atlas/gemma4-parent-atlas-summaries.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 40260,
+        "bytes": 55663,
         "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
       }
     },
@@ -1240,7 +1253,7 @@
       "message": "scripts/atlas/audit-hidden-packet-pathmap.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 13510,
+        "bytes": 13697,
         "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
       }
     },
@@ -1251,7 +1264,7 @@
       "message": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 14107,
+        "bytes": 14389,
         "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
       }
     },
@@ -1259,34 +1272,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 212 NDJSON files",
+      "message": "rg -uuu found 230 NDJSON files",
       "details": {
         "sample": [
-          ".opencode\\gemma4_candidates.ndjson",
-          ".opencode\\fixes\\fixes.ndjson",
-          ".opencode\\recommendations\\tasks.ndjson",
-          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-          ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-          ".opencode\\quarantine\\invalid-cards.ndjson",
           ".opencode\\outcome-ledger.ndjson",
-          ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          ".opencode\\ace-packets_stale\\index.ndjson",
-          ".opencode\\ace-packets\\index.ndjson",
-          ".opencode\\ingest\\nodes.ndjson",
-          ".opencode\\ingest\\edges.ndjson",
-          ".opencode\\ndjson\\temporal-index.ndjson",
-          ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-          ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-          ".opencode\\ndjson\\minified-ace-index.ndjson",
-          ".opencode\\ndjson\\graph-edges.ndjson",
-          ".opencode\\ndjson\\enriched-ledger.ndjson",
-          ".opencode\\ndjson\\enriched-candidates.ndjson",
-          ".opencode\\ndjson\\cluster-summary.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-          "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-          "scripts\\atlas\\out\\synthetic-traces.ndjson",
-          "scripts\\atlas\\out\\db-usage-edges.ndjson",
-          "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson"
+          ".tmp\\dependency-graph.ndjson",
+          ".tmp\\compressed-packets.ndjson",
+          ".tmp\\colab-parent-atlas\\packet_features.ndjson",
+          ".tmp\\colab-parent-atlas\\atlas_tree_nodes.ndjson",
+          ".tmp\\colab-parent-atlas\\atlas_summary_layers.ndjson",
+          ".tmp\\colab-parent-atlas\\atlas_packets.ndjson",
+          ".tmp\\colab-parent-atlas\\atlas_feature_envelopes.ndjson",
+          ".tmp\\chunks\\feature-chunks.ndjson",
+          ".tmp\\chrom97-summary-packets.ndjson",
+          ".tmp\\calls-edges-clean.ndjson",
+          ".tmp\\addressable-packets.validated.ndjson",
+          ".tmp\\addressable-packets.topology.ndjson",
+          ".tmp\\addressable-packets.ndjson",
+          ".tmp\\addressable-packets.enriched.ndjson",
+          ".tmp\\ace-packet-assembly.ndjson",
+          ".tmp\\ace-envelope-from-gpu-retrieval.ndjson",
+          ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
+          ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
+          ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
+          ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768.ndjson",
+          ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768-valid.ndjson",
+          ".tmp\\analysis\\backfill-proposals.ndjson",
+          ".tmp\\addressable-packets.vectorized.ndjson",
+          ".tmp\\atlas-feature-recommendation-index.ndjson"
         ]
       }
     },
@@ -1294,214 +1307,215 @@
       "section": "postgres",
       "id": "table:parent_atlas_documents",
       "status": "pass",
-      "message": "parent_atlas_documents exists with 5395 rows",
+      "message": "parent_atlas_documents exists with 61660 rows",
       "details": {
-        "count": 5395
+        "count": 61660,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:atlas_feature_map",
       "status": "pass",
-      "message": "atlas_feature_map exists with 19611 rows",
+      "message": "atlas_feature_map exists with 4700 rows",
       "details": {
-        "count": 19611
+        "count": 4700,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:atlas_feature_map_synthesized",
       "status": "pass",
-      "message": "atlas_feature_map_synthesized exists with 14465 rows",
+      "message": "atlas_feature_map_synthesized exists with 0 rows",
       "details": {
-        "count": 14465
+        "count": 0,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:nes_chrom_packets",
       "status": "pass",
-      "message": "nes_chrom_packets exists with 14911 rows",
+      "message": "nes_chrom_packets exists with 1992 rows",
       "details": {
-        "count": 14911
+        "count": 1992,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:nes_chrom_kag_dag_hits",
       "status": "pass",
-      "message": "nes_chrom_kag_dag_hits exists with 32 rows",
+      "message": "nes_chrom_kag_dag_hits exists with 0 rows",
       "details": {
-        "count": 32
+        "count": 0,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:route_runtime_packets",
       "status": "pass",
-      "message": "route_runtime_packets exists with 9 rows",
+      "message": "route_runtime_packets exists with 7 rows",
       "details": {
-        "count": 9
+        "count": 7,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:task_semantic_packets",
       "status": "pass",
-      "message": "task_semantic_packets exists with 314 rows",
+      "message": "task_semantic_packets exists with 0 rows",
       "details": {
-        "count": 314
+        "count": 0,
+        "replacementQueuePresent": false
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:kanban_tasks",
+      "status": "pass",
+      "message": "kanban_tasks exists with 0 rows",
+      "details": {
+        "count": 0,
+        "replacementQueuePresent": false
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:kanban_task_events",
+      "status": "pass",
+      "message": "kanban_task_events exists with 0 rows",
+      "details": {
+        "count": 0,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:codebase_chunk_index",
       "status": "pass",
-      "message": "codebase_chunk_index exists with 40754 rows",
+      "message": "codebase_chunk_index exists with 55853 rows",
       "details": {
-        "count": 40754
+        "count": 55853,
+        "replacementQueuePresent": false
       }
     },
     {
       "section": "postgres",
       "id": "table:agent_pickup_queue",
-      "status": "pass",
-      "message": "agent_pickup_queue exists with 135 rows",
+      "status": "warn",
+      "message": "agent_pickup_queue is absent; live Kanban task/event tables provide a replacement control-plane surface, but the legacy pickup adapter is not proven migrated",
       "details": {
-        "count": 135
+        "count": null,
+        "replacementQueuePresent": true
       }
     },
     {
       "section": "postgres",
-      "id": "parent_atlas_documents:sourceRef",
-      "status": "pass",
-      "message": "Parent Atlas sourceRefs: 3941/3941",
+      "id": "parent_atlas_documents:summary",
+      "status": "warn",
+      "message": "column \"summary\" does not exist",
       "details": {}
     },
     {
       "section": "postgres",
-      "id": "parent_atlas_documents:summaries",
-      "status": "pass",
-      "message": "Parent Atlas summaries: 3941/3941",
+      "id": "active-topology",
+      "status": "warn",
+      "message": "column pad.source_kind does not exist",
       "details": {}
-    },
-    {
-      "section": "postgres",
-      "id": "active-production:topology",
-      "status": "pass",
-      "message": "Active production qdrant-without-SOM rows: 0",
-      "details": {
-        "raw_total": 19611,
-        "raw_with_som": 10512,
-        "raw_with_qdrant": 11427,
-        "active_total": 9599,
-        "active_with_som": 4830,
-        "active_with_qdrant": 4788,
-        "active_qdrant_no_som": 0
-      }
     },
     {
       "section": "postgres",
       "id": "nes-chrom:sourceRef-parent-join",
       "status": "pass",
-      "message": "NES/CHROM packets matching Parent Atlas: 10042/14911",
+      "message": "NES/CHROM packets matching Parent Atlas: 2423/2483",
       "details": {}
     },
     {
       "section": "postgres",
       "id": "route-runtime:sourceRefs",
       "status": "pass",
-      "message": "Runtime packets with sourceRefs: 8/9",
+      "message": "Runtime packets with sourceRefs: 7/7",
       "details": {}
     },
     {
       "section": "redis",
       "id": "lod0:route-runtime",
-      "status": "pass",
-      "message": "Redis LOD0 runtime packets: 1/9",
+      "status": "warn",
+      "message": "Redis LOD0 runtime packets: 0/7",
       "details": {}
     },
     {
       "section": "qdrant",
       "id": "collection:codebase_chunks_768",
       "status": "pass",
-      "message": "Qdrant codebase_chunks_768 points: 52606",
+      "message": "Qdrant codebase_chunks_768 points: 109776",
       "details": {}
     },
     {
       "section": "neo4j",
       "id": "contextual-tree",
       "status": "pass",
-      "message": "Neo4j CodebaseFile=20542, ParentAtlasFeature=1582",
+      "message": "Neo4j CodebaseFile=69009, ParentAtlasFeature=39485",
       "details": {}
     }
   ],
   "postgres": {
     "tableCounts": {
-      "parent_atlas_documents": 5395,
-      "atlas_feature_map": 19611,
-      "atlas_feature_map_synthesized": 14465,
-      "nes_chrom_packets": 14911,
-      "nes_chrom_kag_dag_hits": 32,
-      "route_runtime_packets": 9,
-      "task_semantic_packets": 314,
-      "codebase_chunk_index": 40754,
-      "agent_pickup_queue": 135
-    },
-    "parentAtlasDocuments": {
-      "total": 3941,
-      "with_source_ref": 3941,
-      "with_feature_id": 3941,
-      "with_summary": 3941
-    },
-    "topologyCoverage": {
-      "raw_total": 19611,
-      "raw_with_som": 10512,
-      "raw_with_qdrant": 11427,
-      "active_total": 9599,
-      "active_with_som": 4830,
-      "active_with_qdrant": 4788,
-      "active_qdrant_no_som": 0
+      "parent_atlas_documents": 61660,
+      "atlas_feature_map": 4700,
+      "atlas_feature_map_synthesized": 0,
+      "nes_chrom_packets": 1992,
+      "nes_chrom_kag_dag_hits": 0,
+      "route_runtime_packets": 7,
+      "task_semantic_packets": 0,
+      "kanban_tasks": 0,
+      "kanban_task_events": 0,
+      "codebase_chunk_index": 55853,
+      "agent_pickup_queue": null
     },
     "nesChromPackets": {
-      "total": 14911,
-      "parent_atlas_matches": 10042,
-      "with_source_ref": 14911,
-      "with_feature_id": 14911,
-      "with_qdrant_point": 1799,
-      "with_som_cluster": 16
+      "total": 2483,
+      "parent_atlas_matches": 2423,
+      "with_source_ref": 2483,
+      "with_feature_id": 2483,
+      "with_qdrant_point": 0,
+      "with_som_cluster": 0
     },
     "routeRuntimePackets": {
-      "total": 9,
-      "with_source_refs": 8,
-      "with_feature_ids": 1,
-      "with_qdrant_hits": 8,
-      "with_cluster": 1
+      "total": 7,
+      "with_source_refs": 7,
+      "with_feature_ids": 7,
+      "with_qdrant_hits": 7,
+      "with_cluster": 0
     }
   },
   "redis": {
     "available": true,
-    "latestRuntimePacketsChecked": 9,
-    "lod0Found": 1,
-    "lod0Missing": 8
+    "latestRuntimePacketsChecked": 7,
+    "lod0Found": 0,
+    "lod0Missing": 7
   },
   "qdrant": {
     "available": true,
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
-    "pointsCount": 52606,
-    "indexedVectorsCount": 156567,
+    "pointsCount": 109776,
+    "indexedVectorsCount": 109983,
     "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 50710,
-    "codebaseFiles": 20542,
-    "parentAtlasFeatures": 1582,
-    "totalRelationships": 118830,
-    "belongsToFeature": 5415,
-    "similarTopology": 12944
+    "totalNodes": 621162,
+    "codebaseFiles": 69009,
+    "parentAtlasFeatures": 39485,
+    "totalRelationships": 448817,
+    "belongsToFeature": 58843,
+    "similarTopology": 51333
   },
   "drizzle": {
     "nesChromSchema": {
@@ -1516,12 +1530,12 @@
     },
     "schemaIndex": {
       "exists": true,
-      "bytes": 4555,
+      "bytes": 4931,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
     },
     "schemaPostgres": {
       "exists": true,
-      "bytes": 222355,
+      "bytes": 264570,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
     },
     "mirrors": {
@@ -1598,12 +1612,12 @@
     },
     {
       "exists": true,
-      "bytes": 9070,
+      "bytes": 11344,
       "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
     },
     {
       "exists": true,
-      "bytes": 40260,
+      "bytes": 55663,
       "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
     },
     {
@@ -1613,58 +1627,58 @@
     },
     {
       "exists": true,
-      "bytes": 13510,
+      "bytes": 13697,
       "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
     },
     {
       "exists": true,
-      "bytes": 14107,
+      "bytes": 14389,
       "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
     }
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 212,
+    "total": 230,
     "sample": [
-      ".opencode\\gemma4_candidates.ndjson",
-      ".opencode\\fixes\\fixes.ndjson",
-      ".opencode\\recommendations\\tasks.ndjson",
-      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-      ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-      ".opencode\\quarantine\\invalid-cards.ndjson",
       ".opencode\\outcome-ledger.ndjson",
-      ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      ".opencode\\ace-packets_stale\\index.ndjson",
-      ".opencode\\ace-packets\\index.ndjson",
-      ".opencode\\ingest\\nodes.ndjson",
-      ".opencode\\ingest\\edges.ndjson",
-      ".opencode\\ndjson\\temporal-index.ndjson",
-      ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-      ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-      ".opencode\\ndjson\\minified-ace-index.ndjson",
-      ".opencode\\ndjson\\graph-edges.ndjson",
-      ".opencode\\ndjson\\enriched-ledger.ndjson",
-      ".opencode\\ndjson\\enriched-candidates.ndjson",
-      ".opencode\\ndjson\\cluster-summary.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-      "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-      "scripts\\atlas\\out\\synthetic-traces.ndjson",
-      "scripts\\atlas\\out\\db-usage-edges.ndjson",
-      "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson"
+      ".tmp\\dependency-graph.ndjson",
+      ".tmp\\compressed-packets.ndjson",
+      ".tmp\\colab-parent-atlas\\packet_features.ndjson",
+      ".tmp\\colab-parent-atlas\\atlas_tree_nodes.ndjson",
+      ".tmp\\colab-parent-atlas\\atlas_summary_layers.ndjson",
+      ".tmp\\colab-parent-atlas\\atlas_packets.ndjson",
+      ".tmp\\colab-parent-atlas\\atlas_feature_envelopes.ndjson",
+      ".tmp\\chunks\\feature-chunks.ndjson",
+      ".tmp\\chrom97-summary-packets.ndjson",
+      ".tmp\\calls-edges-clean.ndjson",
+      ".tmp\\addressable-packets.validated.ndjson",
+      ".tmp\\addressable-packets.topology.ndjson",
+      ".tmp\\addressable-packets.ndjson",
+      ".tmp\\addressable-packets.enriched.ndjson",
+      ".tmp\\ace-packet-assembly.ndjson",
+      ".tmp\\ace-envelope-from-gpu-retrieval.ndjson",
+      ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
+      ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
+      ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
+      ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768.ndjson",
+      ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-768-valid.ndjson",
+      ".tmp\\analysis\\backfill-proposals.ndjson",
+      ".tmp\\addressable-packets.vectorized.ndjson",
+      ".tmp\\atlas-feature-recommendation-index.ndjson"
     ]
   },
   "summary": {
     "counts": {
-      "pass": 66,
-      "warn": 0,
+      "pass": 61,
+      "warn": 6,
       "fail": 0
     }
   },
   "summaryBatch": {
     "path": ".tmp/gemma4-parent-atlas-summary-cache-report.json",
     "report": {
-      "timestamp": "2026-06-20T15:44:15.818Z",
-      "mode": "apply",
+      "timestamp": "2026-07-11T00:41:37.211Z",
+      "mode": "dry-run",
       "cache_mode": "phase101-summary-cache",
       "llm_backend": "unknown",
       "llm_model": "gemma4-legal-iq4xs-direct.gguf",
@@ -1673,10 +1687,22 @@
       "targetSourceRef": null,
       "limit": 500,
       "concurrency": 1,
-      "rows_queued": 146,
-      "succeeded": 146,
-      "skippedUnsupported": 0,
-      "skippedDryRun": 0,
+      "requestedConcurrency": 1,
+      "maxConcurrency": 4,
+      "workerMode": "bounded-async-cpu-lanes",
+      "safety": {
+        "deletesData": false,
+        "mutatesPacketIdentity": false,
+        "writesWhenApply": [
+          "atlas_packets.summary",
+          "atlas_summary_layers file summary rows",
+          "summary cache records"
+        ]
+      },
+      "rows_queued": 500,
+      "succeeded": 0,
+      "skippedUnsupported": 1,
+      "skippedDryRun": 499,
       "failed": 0,
       "exactCacheHits": 0,
       "semanticCacheHits": 0,
@@ -1684,249 +1710,259 @@
       "dbSummaryReuse": 0,
       "cacheRepairs": 0,
       "cacheRepairWrites": 0,
-      "cacheMisses": 146,
-      "llamaCalls": 146,
-      "wouldCallLlama": 0,
-      "llamaCallsAvoided": 0,
-      "callsAvoided": 0,
-      "summariesWritten": 146,
+      "cacheMisses": 499,
+      "llamaCalls": 0,
+      "wouldCallLlama": 499,
+      "llamaCallsAvoided": 499,
+      "callsAvoided": 499,
+      "summariesWritten": 0,
+      "summaryLayersWritten": 0,
       "skippedVendor": 0,
       "skippedFeatureBuckets": 0,
-      "avgLatencyMs": 3024.2,
-      "packetsRead": 146,
-      "sourceRefPacketReads": 146,
-      "still_missing": 0,
+      "avgLatencyMs": 195,
+      "packetsRead": 0,
+      "sourceRefPacketReads": 0,
+      "still_missing": 54185,
       "sample": [
         {
-          "source_ref": "sveltekit-frontend/src/app.d.ts",
+          "source_ref": "claude-mem/src/services/sqlite/summaries/types.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:70c376d464a90f3cbafe1c0d32285bed23050156245f89f840ceb06f7138d892",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:70c376d464a90f3c",
-          "packet_id": "sum:70c376d464a90f3c",
-          "summary_length": 107,
+          "exact_cache_key": "atlas:summary:exact:v1:36224ae331a92ee1ec0019420330b422ab265a02d8650976e6a1ad2e2189e8fa",
+          "semantic_cache_key": null,
+          "packet_id": "sum:2dbcb1f976f03a58",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 5211,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 542,
+          "success": false
         },
         {
-          "source_ref": "sveltekit-frontend/src/custom-modules.d.ts",
+          "source_ref": "claude-mem/src/services/sqlite/timeline/queries.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:58020881216106caf9f5c5cee7d41a40989aa17d18c00e0761f635d1c2742ba2",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:58020881216106ca",
-          "packet_id": "sum:58020881216106ca",
-          "summary_length": 81,
+          "exact_cache_key": "atlas:summary:exact:v1:a3a9ad46f4ce2c5533d742225cbc853dfad0a95813c13219e7c8525c1c57de97",
+          "semantic_cache_key": null,
+          "packet_id": "sum:3c4d27508c4940a2",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 3634,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 190,
+          "success": false
         },
         {
-          "source_ref": "sveltekit-frontend/src/ambient-legacy.d.ts",
+          "source_ref": "claude-mem/src/services/sqlite/Timeline.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:e151dd1afef6ed3e4423d54612f05e3480c61aaaba16b9e16d70900b7134ba78",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:e151dd1afef6ed3e",
-          "packet_id": "sum:e151dd1afef6ed3e",
-          "summary_length": 71,
+          "exact_cache_key": "atlas:summary:exact:v1:8a804cc32f7d1cb0d4bdb5bd1480d25a01706cbc59d5acf9d509e0fe2f0f95e5",
+          "semantic_cache_key": null,
+          "packet_id": "sum:6f90eea477c27a83",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 2962,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 156,
+          "success": false
         },
         {
-          "source_ref": "sveltekit-frontend/src/env.d.ts",
+          "source_ref": "claude-mem/src/services/sqlite/transactions.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:f6ea89a7abf693d3cb9488a7ab3f546b54415701a6805e3dbc471ca1885458ff",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:f6ea89a7abf693d3",
-          "packet_id": "sum:f6ea89a7abf693d3",
-          "summary_length": 55,
+          "exact_cache_key": "atlas:summary:exact:v1:f4ca7d661836faf13c82bef32b7ec36861f034ab90ce070130b07d29fe31716d",
+          "semantic_cache_key": null,
+          "packet_id": "sum:0224569464574c6c",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 3440,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 222,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/code_llm_index.ts",
+          "source_ref": "claude-mem/src/services/sqlite/types.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:9afeb81a1ac06ca4954805ff3542d4c38dd58b623cdc7c70ed72c73c8935a9f8",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:9afeb81a1ac06ca4",
-          "packet_id": "sum:9afeb81a1ac06ca4",
-          "summary_length": 40,
+          "exact_cache_key": "atlas:summary:exact:v1:13c90f22a8306161af7aacd239a77ee408f7cf654d8c9c745d395af8528b3332",
+          "semantic_cache_key": null,
+          "packet_id": "sum:5a74f7249c37a81e",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 2885,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 217,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/rag_query_log.ts",
+          "source_ref": "claude-mem/src/services/sync/ChromaMcpManager.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:870e3ea033dea1d9a284d5f56bbadcad3d123c08fff6cebf65f9d6194c594b11",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:870e3ea033dea1d9",
-          "packet_id": "sum:870e3ea033dea1d9",
-          "summary_length": 42,
+          "exact_cache_key": "atlas:summary:exact:v1:908c031dc108e531df767e8d9baaf7bd1e850a3de2441860c9f7e393bd077991",
+          "semantic_cache_key": null,
+          "packet_id": "sum:7b50a9de11fcc965",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 3490,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 168,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/fictional_cases.ts",
+          "source_ref": "claude-mem/src/services/sync/ChromaSyncState.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:9b5c1da739a4d2e6bff4e98b046a3a07b9a61222111152050e416d6584faa401",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:9b5c1da739a4d2e6",
-          "packet_id": "sum:9b5c1da739a4d2e6",
-          "summary_length": 49,
+          "exact_cache_key": "atlas:summary:exact:v1:1fb8c831e3c38200fa06fafc3a6ae24ac0d6c63beb61123c88fa8a3a6a8fac3c",
+          "semantic_cache_key": null,
+          "packet_id": "sum:4cd9b80843019351",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 3153,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 196,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/intent_eval_runs.ts",
+          "source_ref": "claude-mem/src/services/sync/ChromaSync.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:b5665428ecb4f0fea764f9a4ee80dff6cf3cd40918d2b98ae07bb20a2546afad",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:b5665428ecb4f0fe",
-          "packet_id": "sum:b5665428ecb4f0fe",
-          "summary_length": 54,
+          "exact_cache_key": "atlas:summary:exact:v1:5c316ed07859f02485277651303765b74ac5a58cf0fdbc500fb52548089f318a",
+          "semantic_cache_key": null,
+          "packet_id": "sum:8823800ce2fde3b1",
+          "summary_length": 279,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 2313,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 148,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/warden_file_locks.ts",
+          "source_ref": "claude-mem/src/services/transcripts/cli.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:055a7678d2465d2ffaaed44e926696198b368c1252bab4c40ade8f1273a2b95f",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:055a7678d2465d2f",
-          "packet_id": "sum:055a7678d2465d2f",
-          "summary_length": 75,
+          "exact_cache_key": "atlas:summary:exact:v1:717fe1fe2a9d33f6b7f1563301d95f9487bb590ac6f341fa63cc6fcf276bdd5d",
+          "semantic_cache_key": null,
+          "packet_id": "sum:7f3c9f4ffafc38df",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 3026,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 199,
+          "success": false
         },
         {
-          "source_ref": "src/lib/server/db/schema/case_note_versions.ts",
+          "source_ref": "claude-mem/src/services/transcripts/config.ts",
           "cache_mode": "miss",
-          "exact_cache_key": "atlas:summary:exact:v1:7ec333b0ba07b52d977c44f9d4f9886dd2f9e91f814d7f7fdcee07f853f5ca26",
-          "semantic_cache_key": "atlas:summary:semantic:v1:sum:7ec333b0ba07b52d",
-          "packet_id": "sum:7ec333b0ba07b52d",
-          "summary_length": 71,
+          "exact_cache_key": "atlas:summary:exact:v1:779474b88f2b716c160305a8342f3fbea581993509ca26db7c10e70221b3b240",
+          "semantic_cache_key": null,
+          "packet_id": "sum:8f39448adb2b8fbf",
+          "summary_length": 280,
           "exact_cache_hit": false,
           "semantic_cache_hit": false,
-          "sourceRefPacketRead": true,
-          "llama_called": true,
-          "would_call_llama": false,
-          "skippedDryRun": false,
-          "skipped_dry_run": false,
+          "sourceRefPacketRead": false,
+          "llama_called": false,
+          "would_call_llama": true,
+          "skippedDryRun": true,
+          "skipped_dry_run": true,
           "cache_lookup_error": null,
-          "calls_avoided": false,
-          "callsAvoided": false,
-          "latency_ms": 2700,
-          "success": true
+          "calls_avoided": true,
+          "callsAvoided": true,
+          "latency_ms": 184,
+          "success": false
+        }
+      ],
+      "failedSample": [],
+      "skippedSample": [
+        {
+          "source_ref": "llama-cpp-turboquant-gemma4/tools/server/public/bundle.js",
+          "skipped": true,
+          "skippedUnsupported": true,
+          "reason": "missing_or_empty_source"
         }
       ]
     },
     "metrics": {
-      "rowsQueued": 146,
-      "succeeded": 146,
+      "rowsQueued": 500,
+      "succeeded": 0,
       "failed": 0,
       "exactHits": 0,
       "semanticHits": 0,
-      "sourceRefPacketReads": 146,
+      "sourceRefPacketReads": 0,
       "sourceRefPacketReuse": 0,
       "dbSummaryReuse": 0,
       "cacheRepairs": 0,
       "cacheRepairWrites": 0,
-      "cacheMisses": 146,
-      "llamaCalls": 146,
-      "wouldCallLlama": 0,
-      "llamaCallsAvoided": 0,
-      "callsAvoided": 0,
-      "summariesWritten": 146,
+      "cacheMisses": 499,
+      "llamaCalls": 0,
+      "wouldCallLlama": 499,
+      "llamaCallsAvoided": 499,
+      "callsAvoided": 499,
+      "summariesWritten": 0,
       "skippedVendor": 0,
       "skippedFeatureBuckets": 0,
-      "avgLatencyMs": 3024.2,
-      "stillMissing": 0
+      "avgLatencyMs": 195,
+      "stillMissing": 54185
     }
   },
   "gpu": {
     "files": {
       "libtorchBridge": {
         "exists": true,
-        "bytes": 66246,
+        "bytes": 67176,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       },
       "pytorchGraph": {
@@ -1936,7 +1972,7 @@
       },
       "autoencoderBridge": {
         "exists": true,
-        "bytes": 4611,
+        "bytes": 4965,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
       },
       "topologyProjection": {
@@ -1951,7 +1987,7 @@
       },
       "trainAutoencoderMjs": {
         "exists": true,
-        "bytes": 22179,
+        "bytes": 22982,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       },
       "somPipeline": {
@@ -1961,7 +1997,7 @@
       },
       "libtorchGraphImpl": {
         "exists": true,
-        "bytes": 6851,
+        "bytes": 8574,
         "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
       },
       "pytorchGraphCpp": {
@@ -2007,7 +2043,7 @@
     "files": {
       "simdjsonBridge": {
         "exists": true,
-        "bytes": 14441,
+        "bytes": 14519,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
       },
       "jsonBench": {

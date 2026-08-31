@@ -27,7 +27,7 @@ function pack() {
     candidateSnapshotRevision: 'candidate:r1', ordinalMapChecksum: H('ordinal-map'), featureSnapshotChecksum: H('feature-snapshot'),
     workspaceRevision: 'workspace:r1', featureRevision: 'feature:r1', columnarChecksum: H('columnar'),
     logicalRows: 3, physicalRows: R, paddingRows: R - 3, rowAlignment: 32, featureCount: F as 13,
-    featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility','latentLocalityScore'] as const,
+    featureNames: ['semanticRelevance','lexicalRelevance','astAffinity','graphAuthority','personalizedPageRank','communityAffinity','manifold4OrientationSimilarity','crossEncoderRawScore','crossEncoderCalibratedScore','domainAffinity','executionUtility','memoryUtility'] as const,
     featureValues: Array(R * F).fill(0), featurePresence: Array(R * F).fill(0),
     validMask: [1,1,1,...Array(R - 3).fill(0)], laneMaskU16: [1,3,5,...Array(R - 3).fill(0)], degradedIdentity: [0,0,1,...Array(R - 3).fill(0)],
     featureValuesChecksum: H('feature-values'), featurePresenceChecksum: H('feature-presence'), validMaskChecksum: H('valid-mask'), laneMaskChecksum: H('lane-mask-u16'), degradedIdentityChecksum: H('degraded'), gpuPackChecksum: H('gpu-pack'),

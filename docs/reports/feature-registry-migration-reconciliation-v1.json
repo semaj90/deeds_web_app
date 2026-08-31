@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.feature-registry-migration-reconciliation.v1",
+  "asOf": "2026-08-31",
+  "status": "BLOCKED_SHAPE_CONFLICT_AND_LEDGER_DRIFT",
+  "target": "public.feature_registry",
+  "livePresent": false,
+  "owners": {
+    "drizzleSchema": "sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts",
+    "journalMigration": "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+    "manualQuerySidecar": "sveltekit-frontend/drizzle/manual/0048_feature_registry_queries.sql"
+  },
+  "shapeComparison": {
+    "schemaOnlyColumns": ["summary", "chunk_ids", "tags", "retry_queries"],
+    "journalOnlyColumns": [],
+    "sharedIdentity": ["id", "feature_key", "title", "description", "status", "source_refs", "code_refs", "test_refs", "cluster_id", "trust_tier", "last_verified_at"],
+    "querySidecarIsSeparateTable": true
+  },
+  "migrationState": {
+    "journalEntries": 41,
+    "liveDrizzleEntries": 0,
+    "livePublicMigrationEntries": 0,
+    "ledgerReconciliationRequired": true
+  },
+  "writes": {
+    "migrationApplied": false,
+    "databaseWrites": false
+  },
+  "decisionRequired": "choose the current Drizzle schema as the intended owner or explicitly amend it before generating one journaled migration",
+  "forbiddenUntilDecision": ["apply 0024", "apply manual feature registry SQL", "feature identity backfill"]
+}

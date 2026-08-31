@@ -209,6 +209,10 @@ message CodebaseChunk {
   string source_revision = 17;
   string representation_id = 18;
   string representation_revision = 19;
+  // Optional canonical retrieval identity. Empty means the projection did
+  // not carry a proven bridge and must not be inferred from Qdrant IDs.
+  string candidate_id = 20;
+  int64 candidate_ordinal = 21;
 }
 
 // ── Policies ────────────────────────────────────────────────────────────

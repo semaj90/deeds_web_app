@@ -72,6 +72,8 @@
 		etaMs: number | null;
 		etaConfidence: number | null;
 		registryChecksum: string | null;
+		supersessionEdges: number;
+		unresolvedSupersessionReferences: number;
 	};
 
 	type TaskPacketWorkflowStatus = {
@@ -942,7 +944,7 @@
 					<div class="space-y-1">
 						<div class="flex justify-between text-[0.62rem] text-[#a39f90] uppercase"><span>OpenSpec task progress</span><span>{documentGovernance.progressPercent == null ? 'UNAVAILABLE' : `${documentGovernance.progressPercent}%`}</span></div>
 						<div class="h-1.5 bg-[#34332c] overflow-hidden"><div class="h-full bg-[#8c9f7a] transition-all" style={`width: ${documentGovernance.progressPercent ?? 0}%`}></div></div>
-						<div class="text-[0.6rem] text-[#5c594c]">{documentGovernance.completedTasks}/{documentGovernance.totalTasks} tasks · ETA unavailable until a workflow receipt provides confidence.</div>
+						<div class="text-[0.6rem] text-[#5c594c]">{documentGovernance.completedTasks}/{documentGovernance.totalTasks} tasks · {documentGovernance.supersessionEdges} explicit supersession edges · {documentGovernance.unresolvedSupersessionReferences} unresolved · ETA unavailable until a workflow receipt provides confidence.</div>
 					</div>
 				{:else}
 					<div class="text-center py-3 border border-[#c25953]/25 bg-[#c25953]/5 text-[#c25953] text-[0.7rem] font-bold uppercase tracking-wider">Governance registry unavailable</div>

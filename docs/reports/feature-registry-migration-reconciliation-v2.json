@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.feature-registry-migration-reconciliation.v2",
+  "asOf": "2026-08-31",
+  "status": "BLOCKED_MIGRATION_LEDGER_DRIFT",
+  "target": "public.feature_registry",
+  "featureRegistryLive": false,
+  "audit": {
+    "status": "FAIL",
+    "blockers": 4,
+    "rootSqlFilesNotInJournal": 66,
+    "journalEntriesMissingLiveRows": 41,
+    "hashMismatches": 41,
+    "liveDrizzleMaxId": 0,
+    "journalMaxId": 41,
+    "pendingSchemaChanges": false
+  },
+  "reconciliationTooling": {
+    "safeAutomatedBaselineOwnerFound": false,
+    "diagnosticAuditOnly": true,
+    "availableActions": [
+      "--fix-hashes (mutating; not run)",
+      "register missing migration rows (mutating; not run)",
+      "move loose SQL to manual (filesystem mutation; not run)"
+    ],
+    "decision": "prepare an explicit migration inventory and baseline decision before any ledger or database mutation"
+  },
+  "shapeConflict": {
+    "drizzleSchemaExtraColumns": ["summary", "chunk_ids", "tags", "retry_queries"],
+    "journalMigration": "0024_nebulous_mongoose.sql",
+    "querySidecar": "manual/0048_feature_registry_queries.sql",
+    "resolution": "OPEN"
+  },
+  "writes": {
+    "database": false,
+    "migrationApplied": false,
+    "productionActivation": false
+  },
+  "nextAction": "record an explicit migration baseline decision, reconcile history, choose the current Drizzle feature_registry shape, then generate one journaled migration",
+  "doNotRun": ["drizzle --force", "drizzle-kit push", "apply 0024 directly", "bulk feature backfill"]
+}

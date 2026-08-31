@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-28T04:21:34.465Z",
+  "generated_at": "2026-08-31T00:37:45.675Z",
   "overall_status": "READY_WITH_GAPS",
   "tables": {
     "atlas_packets": true,
@@ -22,7 +22,7 @@
     "lexical_features": 99.98,
     "ast_symbols": 20.27,
     "entities": 19.45,
-    "content_embedding": 99.93,
+    "content_embedding": 98.78,
     "naive_bayes_predictions": 100,
     "jepa_similarity": 1.48,
     "kmeans_cluster": 100
@@ -63,7 +63,7 @@
     {
       "name": "embedding corpus",
       "status": "PASS",
-      "evidence": "99.93% content_embedding",
+      "evidence": "98.78% content_embedding",
       "target": ">=95%"
     },
     {

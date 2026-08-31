@@ -35,9 +35,10 @@ import {
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
 import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 import { NAMED_PROJECTION_CANDIDATES } from './graph-projection-manifest.js';
 
-const ALGORITHM_REVISION = 'neo4j-gds-kcore-mutate-v1';
+const ALGORITHM_REVISION = graphAlgorithmRevision('kcore');
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
 const MUTATE_PROPERTY = 'kcoreValue';
 // k-core requires an all-UNDIRECTED projection (confirmed live 2026-08-09 —

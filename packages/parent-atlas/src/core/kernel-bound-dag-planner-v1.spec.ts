@@ -26,4 +26,12 @@ describe('KernelBoundDagPlannerV1', () => {
   it('rejects a function not declared by the manifest', () => {
     expect(() => planKernelBoundDagV1({ manifest, catalog, operatorLibrary: library, functionId: 'missing', request: { planId: 'plan:2', queryId: 'query:2', plannerRevision: 'planner:v1', classificationRevision: 'class:v1', boundArguments: {}, evidenceRefs: ['evidence:1'], inputChecksum: checksum } })).toThrow('UNDECLARED_FUNCTION');
   });
+
+  it('replays the same frozen inputs to an identical plan checksum', () => {
+    const request = { planId: 'plan:replay', queryId: 'query:replay', plannerRevision: 'planner:v1', classificationRevision: 'class:v1', boundArguments: { symbol: 'foo' }, evidenceRefs: ['evidence:1'], inputChecksum: checksum };
+    const first = planKernelBoundDagV1({ manifest, catalog, operatorLibrary: library, functionId: fn.functionId, request });
+    const second = planKernelBoundDagV1({ manifest, catalog, operatorLibrary: library, functionId: fn.functionId, request: { ...request, boundArguments: { symbol: 'foo' } } });
+    expect(second).toEqual(first);
+    expect(second.planChecksum).toBe(first.planChecksum);
+  });
 });

@@ -57,6 +57,24 @@ async function main() {
   console.log(`Loaded ${recs.length} recommendations to enqueue.`);
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  if (!DRY_RUN) {
+    const { rows } = await pool.query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name = ANY($1::text[])
+    `, [['workspace_tasks', 'task_semantic_packets', 'agent_pickup_queue']]);
+    const present = new Set(rows.map((row) => row.table_name));
+    const missing = ['workspace_tasks', 'task_semantic_packets', 'agent_pickup_queue']
+      .filter((table) => !present.has(table));
+    if (missing.length > 0) {
+      await pool.end();
+      throw new Error(
+        `LEGACY_PICKUP_APPLY_BLOCKED: required legacy tables are absent: ${missing.join(', ')}; ` +
+        'use the approved Kanban/workflow adapter instead'
+      );
+    }
+  }
   const redis = DRY_RUN ? null : new Redis({
     host: REDIS_HOST,
     port: REDIS_PORT,

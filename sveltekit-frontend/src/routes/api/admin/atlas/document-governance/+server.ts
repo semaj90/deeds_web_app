@@ -24,6 +24,8 @@ const EMPTY = {
   conflicts: 0,
   etaMs: null,
   etaConfidence: null,
+  supersessionEdges: 0,
+  unresolvedSupersessionReferences: 0,
 };
 
 function registryFile(): string {
@@ -47,6 +49,12 @@ export const GET: RequestHandler = async ({ locals }) => {
     const completedTasks = tasks.reduce((sum, record) => sum + (record.completedTasks ?? 0), 0);
     const registryText = readFileSync(registryFile(), 'utf8');
     const crypto = await import('node:crypto');
+    const auditPath = join(process.cwd(), 'docs', 'reports', 'document-supersession-audit-v1.json');
+    const auditPathParent = join(process.cwd(), '..', 'docs', 'reports', 'document-supersession-audit-v1.json');
+    const resolvedAuditPath = existsSync(auditPath) ? auditPath : auditPathParent;
+    const audit = existsSync(resolvedAuditPath)
+      ? JSON.parse(readFileSync(resolvedAuditPath, 'utf8')) as { explicitEdges?: number; unresolvedReferences?: number }
+      : {};
 
     return json({
       ...EMPTY,
@@ -60,6 +68,8 @@ export const GET: RequestHandler = async ({ locals }) => {
       progressPercent: totalTasks ? Math.round((completedTasks / totalTasks) * 100) : null,
       archiveEligible: records.filter((record) => record.archiveEligible === true).length,
       conflicts: records.filter((record) => record.status === 'CONFLICT').length,
+      supersessionEdges: audit.explicitEdges ?? 0,
+      unresolvedSupersessionReferences: audit.unresolvedReferences ?? 0,
     });
   } catch {
     return json(EMPTY);

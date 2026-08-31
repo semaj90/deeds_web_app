@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.dag-xjson-readonly-replay.v1",
+  "status": "REPLAY_PROVEN_BOUNDED",
+  "artifactRef": "artifact:opencode:outcome-ledger",
+  "artifactRevision": "read-only-replay-2026-08-31",
+  "parser": "simdjson-bridge",
+  "nativeParser": true,
+  "payloadSchemaId": "atlas.opencode-outcome-ledger.record.v1",
+  "totalLines": 32,
+  "accepted": 32,
+  "rejected": 0,
+  "rejectedCodes": {},
+  "replay": {
+    "runs": 2,
+    "checksumParity": true,
+    "acceptedOrderParity": true
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "graph": 0
+  },
+  "canonicalAuthority": false,
+  "productionWiring": false,
+  "notes": [
+    "This proves bounded parser and typed-envelope replay only.",
+    "The permissive ledger-record schema is an ingestion smoke contract, not a domain evidence promotion schema.",
+    "Research owner migration and live external evidence replay remain open."
+  ]
+}

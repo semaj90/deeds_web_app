@@ -1,9 +1,9 @@
 {
   "status": "MIGRATION_SAFETY_BLOCKED",
-  "fileCount": 367,
+  "fileCount": 369,
   "blockCount": 160,
-  "warnCount": 345,
-  "noteCount": 316,
+  "warnCount": 347,
+  "noteCount": 318,
   "findings": [
     {
       "file": "drizzle\\0000_puzzling_mongu.sql",
@@ -6341,6 +6341,25 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\20260830_semantic_embedding_cache_v2.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS semantic_embedding_cache_v2 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 18,
+          "snippet": "CREATE INDEX IF NOT EXISTS semantic_embedding_cache_v2_input_checksum_idx"
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\9998_create_agent_pickup_queue.sql",
       "findings": [
         {
@@ -7148,6 +7167,25 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\kanban_task_lifecycle_baseline.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS \"kanban_tasks\" ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 65,
+          "snippet": "CREATE INDEX IF NOT EXISTS \"kanban_ready_idx\""
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\latent_256_columns.sql",
       "findings": [
         {
@@ -7473,5 +7511,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-08-30T19:50:15.001Z"
+  "generatedAt": "2026-08-31T02:46:56.777Z"
 }

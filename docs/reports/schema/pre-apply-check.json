@@ -1,9 +1,18 @@
 {
-  "status": "PRE_APPLY_CLEAR",
-  "blockCount": 0,
+  "status": "PRE_APPLY_BLOCKED",
+  "blockCount": 1,
   "warnCount": 0,
   "noteCount": 3,
-  "blocks": [],
+  "blocks": [
+    {
+      "check": "MIGRATION_LEDGER_UNRECONCILED",
+      "message": "Drizzle ledger is empty while 4 known public schema objects exist; reconcile migration ownership before migrate",
+      "details": {
+        "ledgerCount": 0,
+        "liveKnownObjectCount": 4
+      }
+    }
+  ],
   "warns": [],
   "notes": [
     {
@@ -16,8 +25,8 @@
     },
     {
       "check": "LIVE_SCHEMA_FRESH",
-      "message": "live-schema-redacted.json is 0.1h old (fresh)"
+      "message": "live-schema-redacted.json is 0.0h old (fresh)"
     }
   ],
-  "generatedAt": "2026-08-30T20:26:11.903Z"
+  "generatedAt": "2026-08-31T03:17:17.419Z"
 }

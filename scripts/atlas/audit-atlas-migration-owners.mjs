@@ -63,14 +63,34 @@ const targets = [
     drizzle: [],
     expectedColumns: ['stable_symbol_id'],
   },
+  {
+    id: 'feature_registry',
+    table: 'feature_registry',
+    sql: [
+      'drizzle/0024_nebulous_mongoose.sql',
+    ],
+    // This proposal defines a different text-oriented feature_registry shape
+    // and several unrelated task/agent tables. It is intentionally reported
+    // as competing evidence, never as an owner or migration input.
+    competingSql: ['drizzle/manual/proposed_20260530_task_semantic_packets.sql'],
+    drizzle: ['src/lib/server/db/schema/feature-registry.ts'],
+    expectedColumns: ['id', 'feature_key', 'title', 'status', 'source_refs'],
+    expectedStatus: 'active_candidate',
+  },
 ];
 
 async function readOptional(file) {
-  try {
-    return await fs.readFile(path.join(FRONTEND, file), 'utf8');
-  } catch {
-    return null;
+  // SQL sidecars are repository-level files, while Drizzle mirror files are
+  // frontend-relative. Resolve both so ownership/column audits inspect the
+  // actual SQL instead of silently treating every sidecar as empty.
+  for (const base of [ROOT, FRONTEND]) {
+    try {
+      return await fs.readFile(path.join(base, file), 'utf8');
+    } catch {
+      // Try the other repository root.
+    }
   }
+  return null;
 }
 
 function rel(file) {
@@ -81,7 +101,8 @@ function columnsFromSql(text, table) {
   if (!text) return [];
   const escaped = table.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const columns = new Set();
-  const re = new RegExp(`CREATE\\s+TABLE[^;]*?\\b${escaped}\\b\\s*\\(([^]*?)\\);`, 'ig');
+  const tableToken = `"?${escaped}"?`;
+  const re = new RegExp(`CREATE\\s+TABLE[^;]*?${tableToken}\\s*\\(([^]*?)\\);`, 'ig');
   for (const match of text.matchAll(re)) {
     for (const line of match[1].split(/\r?\n/)) {
       const column = line.trim().match(/^"?([a-zA-Z_][a-zA-Z0-9_]*)"?\s+/);
@@ -141,6 +162,7 @@ async function main() {
   const results = [];
   for (const target of targets) {
     const sqlTexts = await Promise.all(target.sql.map(readOptional));
+    const competingSqlTexts = await Promise.all((target.competingSql ?? []).map(readOptional));
     const drizzleTexts = await Promise.all(target.drizzle.map(readOptional));
     const sqlColumns = [...new Set(sqlTexts.flatMap((text) => columnsFromSql(text, target.table)))].sort();
     const drizzlePresent = drizzleTexts.some(Boolean);
@@ -154,6 +176,11 @@ async function main() {
       table: target.table,
       expectedStatus: target.expectedStatus ?? 'active_candidate',
       sql: { files: target.sql, columns: sqlColumns, expectedMissing },
+      competingDefinitions: {
+        files: target.competingSql ?? [],
+        present: competingSqlTexts.map((text, index) => ({ file: target.competingSql[index], present: Boolean(text) })),
+        excludedFromOwnership: true,
+      },
       drizzle: { files: target.drizzle.map((file) => rel(path.join(FRONTEND, file))), present: drizzlePresent },
       manifest: { allRegistered, entries: manifestEntries },
       live: { exists: table.exists, columns: table.columns, rowCount: table.rowCount, expectedMissing: liveMissing },

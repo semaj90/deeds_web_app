@@ -9,6 +9,9 @@ import {
   kanbanTaskEvents,
   kanbanTasks,
 } from '$lib/server/db/schema/kanban-tasks.js';
+import {
+  parseKanbanTaskEventCorrelationPayload,
+} from './kanban-task-event-contracts.js';
 
 type KanbanDb = typeof db;
 
@@ -260,13 +263,14 @@ async function appendKanbanTaskEvent(dbLike: KanbanDb, input: {
   createdAt?: Date;
 }): Promise<void> {
   const createdAt = input.createdAt ?? new Date();
+  const payload = parseKanbanTaskEventCorrelationPayload(input.payload ?? {});
   await dbLike
     .insert(kanbanTaskEvents)
     .values({
       taskId: input.taskId,
       runId: input.runId ?? null,
       eventType: input.eventType,
-      payload: input.payload ?? {},
+      payload,
       createdAt,
     })
     .returning();

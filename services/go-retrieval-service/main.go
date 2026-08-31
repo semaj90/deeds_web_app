@@ -588,6 +588,8 @@ type qdrantChunk struct {
 	SourceRevision         string
 	RepresentationID       string
 	RepresentationRevision string
+	CandidateID            string
+	CandidateOrdinal       *int64
 }
 
 type researchQdrantChunk struct {
@@ -882,6 +884,7 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 		"source_revision":         chunk.SourceRevision,
 		"representation_id":       chunk.RepresentationID,
 		"representation_revision": chunk.RepresentationRevision,
+		"candidate_id":            chunk.CandidateID,
 	} {
 		if value != "" {
 			identityMetadata[key] = value
@@ -1028,6 +1031,8 @@ func qdrantPointsToChunks(points []*qdrantclient.ScoredPoint, isCodebase bool) [
 			c.SourceRevision = qdrantFirstStr(payload, "source_revision", "sourceRevision")
 			c.RepresentationID = qdrantFirstStr(payload, "representation_id", "representationId")
 			c.RepresentationRevision = qdrantFirstStr(payload, "representation_revision", "representationRevision")
+			c.CandidateID = qdrantFirstStr(payload, "candidate_id", "candidateId")
+			c.CandidateOrdinal = qdrantFirstInt64Ptr(payload, "candidate_ordinal", "candidateOrdinal")
 			c.FilePath = qdrantStr(payload, "file_path")
 			c.ChunkIndex = qdrantInt32(payload, "chunk_index")
 			c.ContentPreview = truncate(qdrantStr(payload, "content"), 500)
@@ -1122,6 +1127,8 @@ func (s *retrievalServer) qdrantSearchREST(ctx context.Context, collection, vect
 				c.SourceRevision = anyStr(p["source_revision"])
 				c.RepresentationID = anyStr(p["representation_id"])
 				c.RepresentationRevision = anyStr(p["representation_revision"])
+				c.CandidateID = firstAnyStr(p, "candidate_id", "candidateId")
+				c.CandidateOrdinal = anyInt64Ptr(firstAny(p, "candidate_ordinal", "candidateOrdinal"))
 				c.FilePath = anyStr(p["file_path"])
 				c.Kind = anyStr(p["kind"])
 				c.HTTPMethod = anyStr(p["httpMethod"])
@@ -1892,6 +1899,10 @@ func (s *retrievalServer) searchCodebase(ctx context.Context, req *pb.CodebaseSe
 			SourceRevision:         c.SourceRevision,
 			RepresentationId:       c.RepresentationID,
 			RepresentationRevision: c.RepresentationRevision,
+			CandidateId:            c.CandidateID,
+		}
+		if c.CandidateOrdinal != nil {
+			protoChunks[i].CandidateOrdinal = *c.CandidateOrdinal
 		}
 	}
 
@@ -2384,11 +2395,11 @@ func (s *retrievalServer) httpSearchResearch(w http.ResponseWriter, r *http.Requ
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
-		"results":     results,
-		"lane":        "go-retrieval-research",
-		"collection":  collectionResearch,
-		"total_ms":    resp.GetTotalMs(),
-		"read_only":   true,
+		"results":            results,
+		"lane":               "go-retrieval-research",
+		"collection":         collectionResearch,
+		"total_ms":           resp.GetTotalMs(),
+		"read_only":          true,
 		"canonicalAuthority": false,
 	})
 }
@@ -2733,6 +2744,30 @@ func qdrantInt32Ptr(m map[string]*qdrantclient.Value, key string) *int32 {
 	return &value
 }
 
+func qdrantInt64(m map[string]*qdrantclient.Value, key string) int64 {
+	v, ok := m[key]
+	if !ok || v == nil {
+		return 0
+	}
+	if iv, ok := v.GetKind().(*qdrantclient.Value_IntegerValue); ok {
+		return iv.IntegerValue
+	}
+	if dv, ok := v.GetKind().(*qdrantclient.Value_DoubleValue); ok {
+		return int64(dv.DoubleValue)
+	}
+	return 0
+}
+
+func qdrantFirstInt64Ptr(m map[string]*qdrantclient.Value, keys ...string) *int64 {
+	for _, key := range keys {
+		if _, ok := m[key]; ok {
+			value := qdrantInt64(m, key)
+			return &value
+		}
+	}
+	return nil
+}
+
 func qdrantStrSlice(m map[string]*qdrantclient.Value, key string) []string {
 	v, ok := m[key]
 	if !ok || v == nil {
@@ -2761,6 +2796,19 @@ func anyStr(v any) string {
 		return s
 	}
 	return fmt.Sprintf("%v", v)
+}
+
+func firstAny(m map[string]any, keys ...string) any {
+	for _, key := range keys {
+		if value, ok := m[key]; ok && value != nil {
+			return value
+		}
+	}
+	return nil
+}
+
+func firstAnyStr(m map[string]any, keys ...string) string {
+	return anyStr(firstAny(m, keys...))
 }
 
 func anyStrSlice(v any) []string {
@@ -2804,6 +2852,34 @@ func anyInt32Ptr(v any) *int32 {
 		return nil
 	}
 	value := anyInt32(v)
+	return &value
+}
+
+func anyInt64(v any) int64 {
+	if v == nil {
+		return 0
+	}
+	switch value := v.(type) {
+	case float64:
+		return int64(value)
+	case float32:
+		return int64(value)
+	case int:
+		return int64(value)
+	case int32:
+		return int64(value)
+	case int64:
+		return value
+	default:
+		return 0
+	}
+}
+
+func anyInt64Ptr(v any) *int64 {
+	if v == nil {
+		return nil
+	}
+	value := anyInt64(v)
 	return &value
 }
 

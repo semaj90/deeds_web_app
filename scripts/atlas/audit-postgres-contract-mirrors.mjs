@@ -12,6 +12,8 @@
  * - nes_chrom_kag_dag_hits
  * - parent_atlas_documents
  * - route_runtime_packets
+ * - kanban_tasks and lifecycle tables
+ * - feature_registry
  *
  * No mutations. Live DB unavailability is reported as a warning, not a crash.
  */
@@ -32,6 +34,28 @@ const OUT_JSON = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.json')
 const OUT_MD = path.join(REPORTS_DIR, 'postgres-contract-mirrors-report.md');
 
 const TABLES = [
+  {
+    tableName: 'kanban_tasks',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'kanban-tasks.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', '0033_odd_moonstone.sql'),
+      path.join(FRONTEND_ROOT, 'drizzle', '0040_kanban_task_lifecycle.sql'),
+      path.join(FRONTEND_ROOT, 'drizzle', 'manual', 'kanban_task_lifecycle_baseline.sql'),
+    ],
+    staticIdentityFields: ['task_id', 'feature_id', 'idempotency_key'],
+  },
+  {
+    tableName: 'feature_registry',
+    schemaFiles: [
+      path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'feature-registry.ts'),
+    ],
+    manualFiles: [
+      path.join(FRONTEND_ROOT, 'drizzle', '0024_nebulous_mongoose.sql'),
+    ],
+    staticIdentityFields: ['id', 'feature_key'],
+  },
   {
     tableName: 'task_semantic_packets',
     schemaFiles: [
@@ -372,7 +396,10 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
     liveRowCount = live.rowCount ?? null;
     const filteredLiveIndexDiff = filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
     if (!tableExists) {
-      liveClassification = 'COLUMN_MISMATCH';
+      // A reachable database with no relation is not a column mismatch.
+      // Keep this distinct so missing migrations cannot be mistaken for
+      // an already-created table with drift.
+      liveClassification = 'LIVE_TABLE_MISSING';
     } else {
       const liveColumnDiff = diff(contractColumns, liveColumns);
       const liveIndexDiff = filteredLiveIndexDiff;
@@ -595,7 +622,7 @@ async function main() {
     if (table.static.classification !== 'SQL_AND_DRIZZLE_ALIGNED') {
       blockers.push(`${table.tableName}: static ${table.static.classification}`);
     }
-    if (table.classification === 'COLUMN_MISMATCH' || table.classification === 'INDEX_MISMATCH') {
+    if (table.classification === 'COLUMN_MISMATCH' || table.classification === 'INDEX_MISMATCH' || table.classification === 'LIVE_TABLE_MISSING') {
       blockers.push(`${table.tableName}: live ${table.classification}`);
     }
   }
@@ -604,6 +631,7 @@ async function main() {
     tablesChecked: tables.length,
     staticAligned: tables.filter((table) => table.static.classification === 'SQL_AND_DRIZZLE_ALIGNED').length,
     liveAligned: tables.filter((table) => table.classification === 'LIVE_DB_ALIGNED').length,
+    liveMissing: tables.filter((table) => table.classification === 'LIVE_TABLE_MISSING').length,
     liveUnavailable: tables.filter((table) => table.classification === 'LIVE_DB_UNAVAILABLE').length,
     blockers,
   };

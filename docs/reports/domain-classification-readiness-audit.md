@@ -1,6 +1,6 @@
 # Domain Classification Readiness Audit
 
-Generated: 2026-08-28T04:21:34.465Z
+Generated: 2026-08-31T00:37:45.675Z
 Status: READY_WITH_GAPS
 
 ## Coverage
@@ -10,7 +10,7 @@ Status: READY_WITH_GAPS
 | identity spine | 100% source_ref, 100% tree_node_id | >=95% | PASS |
 | feature envelope | used_concepts=96.55%, lexical=99.98%, ast=20.27% | >=95% | FAIL |
 | metric lane | nb=100%, jepa=1.48%, kmeans=100%, som=100% | >=95% | PASS |
-| embedding corpus | 99.93% content_embedding | >=95% | PASS |
+| embedding corpus | 98.78% content_embedding | >=95% | PASS |
 | retrieval mirror | 10.46% qdrant_point_id | >=95% | FAIL |
 | topology readiness | som=100%, latent_64=12.2%, pagerank=100% | >=95% | FAIL |
 | Naive Bayes lane | model present; report=present | train + apply | PASS |

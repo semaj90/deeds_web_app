@@ -2,7 +2,7 @@
   "schema": "atlas.oak-kernel-bound-planner.v1",
   "status": "CONTRACT_PROVEN",
   "implementation": "packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts",
-  "focusedTests": "5/5",
+  "focusedTests": "6/6",
   "packageBuild": "PASS",
   "guards": [
     "function must be declared by manifest",
@@ -22,5 +22,11 @@
     "queue": 0
   },
   "kernelState": "DRAFT_ONLY",
-  "nextGate": "OAK-07-READONLY-REPLAY"
+  "replay": {
+    "runs": 2,
+    "planChecksumParity": true,
+    "actionChecksumParity": true,
+    "executionPerformed": false
+  },
+  "nextGate": "OAK-CANARY-01-SCHEMA-LEDGER-READONLY"
 }

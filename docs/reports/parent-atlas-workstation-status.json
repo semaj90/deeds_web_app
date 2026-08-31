@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T11:07:48.530Z",
+  "generated_at": "2026-08-31T03:35:24.770Z",
   "database": {
     "database": "legal_ai_db",
     "username": "legal_admin",
@@ -34,22 +34,22 @@
     "rule": "Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist."
   },
   "tables": {
-    "atlas_packets": 61659,
+    "atlas_packets": 61660,
     "atlas_packet_registry": 58324,
     "atlas_summary_layers": 18437,
     "atlas_artifacts": 58312,
-    "codebase_chunk_index": 52417,
-    "parent_atlas_documents": 61659,
+    "codebase_chunk_index": 55853,
+    "parent_atlas_documents": 61660,
     "atlas_feature_envelopes": 58365,
     "atlas_retrieval_eval_times": 26,
     "atlas_provenance_tree": null
   },
   "metrics": {
-    "packetSummaries": 6885,
+    "packetSummaries": 6886,
     "summaryLayersPopulated": 7654,
     "jsonShapedPacketSummaries": 17,
     "jsonShapedSummaryLayers": 17,
-    "missingPacketRegistryRows": 3335
+    "missingPacketRegistryRows": 3336
   },
   "status": {
     "canonicalSpine": "NEEDS_REBUILD",

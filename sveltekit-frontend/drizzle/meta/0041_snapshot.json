@@ -1,6 +1,6 @@
 {
-  "id": "a97567c5-ac59-445d-9276-9e8a5b172b93",
-  "prevId": "1b6b85ee-895b-444a-9e09-47826832da76",
+  "id": "4252afb1-476a-49e1-a4e9-2856d04673e6",
+  "prevId": "a97567c5-ac59-445d-9276-9e8a5b172b93",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -24104,6 +24104,118 @@
         }
       },
       "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.semantic_embedding_cache_v2": {
+      "name": "semantic_embedding_cache_v2",
+      "schema": "",
+      "columns": {
+        "cache_key": {
+          "name": "cache_key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "representation_id": {
+          "name": "representation_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "representation_revision": {
+          "name": "representation_revision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model_artifact_revision": {
+          "name": "model_artifact_revision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokenizer_revision": {
+          "name": "tokenizer_revision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "input_policy_revision": {
+          "name": "input_policy_revision",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_input_checksum": {
+          "name": "normalized_input_checksum",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "halfvec(768)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_used_at": {
+          "name": "last_used_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "semantic_embedding_cache_v2_input_checksum_idx": {
+          "name": "semantic_embedding_cache_v2_input_checksum_idx",
+          "columns": [
+            {
+              "expression": "normalized_input_checksum",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "semantic_embedding_cache_v2_representation_idx": {
+          "name": "semantic_embedding_cache_v2_representation_idx",
+          "columns": [
+            {
+              "expression": "representation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "representation_revision",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

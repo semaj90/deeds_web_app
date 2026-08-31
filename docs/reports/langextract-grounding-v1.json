@@ -1,6 +1,6 @@
 {
   "schema": "atlas.langextract-grounding-receipt.v1",
-  "generatedAt": "2026-08-29T17:11:01.796Z",
+  "generatedAt": "2026-08-30T23:53:12.053Z",
   "mode": "READ_ONLY_SINGLE_SOURCE_PROBE",
   "postgresWrites": false,
   "qdrantWrites": false,

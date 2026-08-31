@@ -1,31 +1,31 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-23T19:37:12.706Z
+Generated: 2026-08-31T03:43:28.855Z
 
 ## Summary
 
-- PASS: 66
-- WARN: 0
+- PASS: 61
+- WARN: 6
 - FAIL: 0
 
 ## Key Signals
 
-- Parent Atlas documents: 5395
-- Atlas feature map rows: 19611
-- NES/CHROM packets: 14911
-- Route runtime packets: 9
-- Qdrant points: 52606
-- Neo4j CodebaseFile nodes: 20542
-- Redis LOD0 latest packet coverage: 1/9
+- Parent Atlas documents: 61660
+- Atlas feature map rows: 4700
+- NES/CHROM packets: 1992
+- Route runtime packets: 7
+- Qdrant points: 109776
+- Neo4j CodebaseFile nodes: 69009
+- Redis LOD0 latest packet coverage: 0/7
 - Native JSON parser: native addon path present; fallback present
-- NDJSON files discovered with rg -uuu: 212
-- Phase 101 batch summaries: 146 succeeded / 0 failed
+- NDJSON files discovered with rg -uuu: 230
+- Phase 101 batch summaries: 0 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
 ## Directory Lanes
 
 - scripts/atlas/: batch summaries validated, NDJSON/DuckDB offline indexing present, and the production readiness audit is read-only
-- scripts/atlas/gemma4-parent-atlas-summaries.mjs: latest cached batch report loaded (146 queued)
+- scripts/atlas/gemma4-parent-atlas-summaries.mjs: latest cached batch report loaded (500 queued)
 - scripts/atlas/ndjson-mapreduce-join.mjs: offline MapReduce join, cluster summaries, and graph-edge generation present
 - scripts/atlas/materialize-mapreduce-duckdb.mjs: DuckDB materialization lane present
 - sveltekit-frontend/src/lib/server/gpu/: libtorch/autoencoder/topology projection lane present; internal torch::mm GEMM is detected; generic matmul_f32 export remains absent
@@ -34,11 +34,11 @@ Generated: 2026-06-23T19:37:12.706Z
 
 ## Checks
 
-- PASS [summary-batch] report:exists: Loaded gemma4-parent-atlas-summary-cache-report.json (146 queued)
+- PASS [summary-batch] report:exists: Loaded gemma4-parent-atlas-summary-cache-report.json (500 queued)
 - PASS [summary-batch] report:passed: Failed rows: 0
-- PASS [summary-batch] report:sourceRefReads: sourceRef packet reads: 146
-- PASS [summary-batch] report:summariesWritten: summaries written: 146
-- PASS [summary-batch] report:cache-counters: Exact hits=0, semantic hits=0, llama calls=146
+- WARN [summary-batch] report:sourceRefReads: sourceRef packet reads: 0
+- WARN [summary-batch] report:summariesWritten: summaries written: 0
+- PASS [summary-batch] report:cache-counters: Exact hits=0, semantic hits=0, llama calls=0
 - PASS [gpu] libtorchBridge: sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists
 - PASS [gpu] pytorchGraph: sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts exists
 - PASS [gpu] autoencoderBridge: sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists
@@ -82,24 +82,25 @@ Generated: 2026-06-23T19:37:12.706Z
 - PASS [offline] scripts/atlas/report-compressed-semantic-geometry.mjs: scripts/atlas/report-compressed-semantic-geometry.mjs exists
 - PASS [offline] scripts/atlas/audit-hidden-packet-pathmap.mjs: scripts/atlas/audit-hidden-packet-pathmap.mjs exists
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
-- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 212 NDJSON files
-- PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5395 rows
-- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 19611 rows
-- PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows
-- PASS [postgres] table:nes_chrom_packets: nes_chrom_packets exists with 14911 rows
-- PASS [postgres] table:nes_chrom_kag_dag_hits: nes_chrom_kag_dag_hits exists with 32 rows
-- PASS [postgres] table:route_runtime_packets: route_runtime_packets exists with 9 rows
-- PASS [postgres] table:task_semantic_packets: task_semantic_packets exists with 314 rows
-- PASS [postgres] table:codebase_chunk_index: codebase_chunk_index exists with 40754 rows
-- PASS [postgres] table:agent_pickup_queue: agent_pickup_queue exists with 135 rows
-- PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3941/3941
-- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3941/3941
-- PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
-- PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
-- PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 8/9
-- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/9
-- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 52606
-- PASS [neo4j] contextual-tree: Neo4j CodebaseFile=20542, ParentAtlasFeature=1582
+- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 230 NDJSON files
+- PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 61660 rows
+- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 4700 rows
+- PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 0 rows
+- PASS [postgres] table:nes_chrom_packets: nes_chrom_packets exists with 1992 rows
+- PASS [postgres] table:nes_chrom_kag_dag_hits: nes_chrom_kag_dag_hits exists with 0 rows
+- PASS [postgres] table:route_runtime_packets: route_runtime_packets exists with 7 rows
+- PASS [postgres] table:task_semantic_packets: task_semantic_packets exists with 0 rows
+- PASS [postgres] table:kanban_tasks: kanban_tasks exists with 0 rows
+- PASS [postgres] table:kanban_task_events: kanban_task_events exists with 0 rows
+- PASS [postgres] table:codebase_chunk_index: codebase_chunk_index exists with 55853 rows
+- WARN [postgres] table:agent_pickup_queue: agent_pickup_queue is absent; live Kanban task/event tables provide a replacement control-plane surface, but the legacy pickup adapter is not proven migrated
+- WARN [postgres] parent_atlas_documents:summary: column "summary" does not exist
+- WARN [postgres] active-topology: column pad.source_kind does not exist
+- PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 2423/2483
+- PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 7/7
+- WARN [redis] lod0:route-runtime: Redis LOD0 runtime packets: 0/7
+- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 109776
+- PASS [neo4j] contextual-tree: Neo4j CodebaseFile=69009, ParentAtlasFeature=39485
 
 ## Audit Guardrails
 

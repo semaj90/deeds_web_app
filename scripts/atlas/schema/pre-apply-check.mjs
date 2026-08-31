@@ -39,6 +39,60 @@ const blocks  = [];
 const warns   = [];
 const notes   = [];
 
+function loadRepoEnv() {
+    const merged = {};
+    for (const path of [join(ROOT, '.env'), join(FRONTEND, '.env'), join(ROOT, '.env.local')]) {
+        if (!existsSync(path)) continue;
+        for (const line of readFileSync(path, 'utf8').split('\n')) {
+            if (!line.includes('=') || line.trimStart().startsWith('#')) continue;
+            const [keyPart, ...valueParts] = line.split('=');
+            const key = keyPart.trim();
+            const value = valueParts.join('=').trim().replace(/^['"]|['"]$/g, '');
+            if (key && value && !merged[key]) merged[key] = value;
+        }
+    }
+    return merged;
+}
+
+// A live database with schema objects but an empty Drizzle ledger cannot be
+// safely migrated: replaying the journal may duplicate already-applied
+// sidecars or historical DDL. This check is intentionally read-only.
+async function checkMigrationLedgerReconciliation() {
+    const repoEnv = loadRepoEnv();
+    const databaseUrl = process.env.DATABASE_URL_MIGRATOR || process.env.DATABASE_URL || repoEnv.DATABASE_URL_MIGRATOR || repoEnv.DATABASE_URL;
+    if (!databaseUrl) {
+        blocks.push({ check: 'MIGRATION_LEDGER_CONNECTION', message: 'DATABASE_URL or DATABASE_URL_MIGRATOR is not set; live migration ledger cannot be verified' });
+        return;
+    }
+    let pool;
+    try {
+        const pg = (await import('pg')).default;
+        pool = new pg.Pool({ connectionString: databaseUrl, max: 1, connectionTimeoutMillis: 5000, statement_timeout: 5000 });
+        const ledger = await pool.query('SELECT COUNT(*)::int AS count FROM drizzle.__drizzle_migrations');
+        const live = await pool.query(`
+            SELECT COUNT(*)::int AS count
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_name IN ('graphify_files', 'atlas_callable_search', 'atlas_symbol_registry', 'kanban_tasks', 'feature_registry')
+        `);
+        const ledgerCount = Number(ledger.rows[0]?.count ?? 0);
+        const liveCount = Number(live.rows[0]?.count ?? 0);
+        if (ledgerCount === 0 && liveCount > 0) {
+            blocks.push({
+                check: 'MIGRATION_LEDGER_UNRECONCILED',
+                message: `Drizzle ledger is empty while ${liveCount} known public schema objects exist; reconcile migration ownership before migrate`,
+                details: { ledgerCount, liveKnownObjectCount: liveCount },
+            });
+        } else {
+            notes.push({ check: 'MIGRATION_LEDGER_RECONCILED', message: `ledger rows=${ledgerCount}, known live objects=${liveCount}` });
+        }
+    } catch (error) {
+        blocks.push({ check: 'MIGRATION_LEDGER_CONNECTION', message: `Could not verify live migration ledger: ${error instanceof Error ? error.message : String(error)}` });
+    } finally {
+        await pool?.end().catch(() => {});
+    }
+}
+
 function loadJson(path) {
     if (!existsSync(path)) return null;
     try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return null; }
@@ -92,6 +146,8 @@ if (!journal) {
         }
     }
 }
+
+await checkMigrationLedgerReconciliation();
 
 // ---------------------------------------------------------------------------
 // Check 2: tablesFilter configured

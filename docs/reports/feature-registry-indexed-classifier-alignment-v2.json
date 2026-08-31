@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.feature-registry-indexed-classifier-alignment.v2",
+  "asOf": "2026-08-31",
+  "status": "CANDIDATE_RETRIEVAL_PROVEN_CLASSIFIER_OPEN",
+  "sequence": ["define", "retrieve_candidates", "classify", "ground", "promote"],
+  "implemented": {
+    "registry": "atlas.observation-feature-registry.v1",
+    "retrieval": "atlas.feature-candidate-retrieval.v1",
+    "retrievalMethods": ["exact_feature_id", "deterministic_lexical_overlap"],
+    "topKMaximum": 10,
+    "canonicalAuthority": false
+  },
+  "validation": {
+    "packageTypeScriptBuild": "PASS",
+    "focusedTests": "10/10 PASS",
+    "databaseWrites": false,
+    "projectionWrites": false
+  },
+  "notImplemented": [
+    "PostgreSQL GIN/pg_trgm physical index migration",
+    "semantic_768 feature retrieval adapter",
+    "calibrated NB/XGBoost/PyTorch candidate classifier",
+    "grounded feature_id promotion and live round-trip"
+  ],
+  "nextGate": "FEATURE-CLASSIFY-01",
+  "guardrails": [
+    "retrieval candidates are proposals only",
+    "lexical score is not classifier confidence",
+    "no feature identity is invented",
+    "topology and latent-64 population remain outside this gate"
+  ]
+}

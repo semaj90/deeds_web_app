@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.ontology-projection-cugraph-bounded-parity.v1",
+  "gate": "ONTO-PY-04B1",
+  "status": "CUGRAPH_PROJECTION_PASS",
+  "generatedOn": "2026-08-31",
+  "backend": "cugraph",
+  "backendVersion": "26.06.00",
+  "coordinateSpace": "ProjectionOrdinal",
+  "projectionNodes": 4,
+  "projectionEdges": 3,
+  "algorithm": "BFS",
+  "depthLimit": 2,
+  "renumber": false,
+  "expectedDistances": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 0
+  },
+  "actualDistances": {
+    "0": 1,
+    "1": 1,
+    "2": 1,
+    "3": 0
+  },
+  "reachableSetExact": true,
+  "distanceParity": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "note": "Bounded fixture proof only. ProjectionOrdinal is operational graph identity; durable GraphNodeKeyV1 and GraphOrdinal are not modified."
+}

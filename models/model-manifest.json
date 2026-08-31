@@ -57,21 +57,24 @@
     },
     {
       "id": "embeddinggemma-300m-768d",
-      "displayName": "EmbeddingGemma 300M (Ollama, semantic_768 canonical)",
-      "description": "Primary embedding model. Native 768-dimensional dense vectors — project canonical semantic representation used by codebase_chunks_768_v2.",
+      "displayName": "EmbeddingGemma 300M (llama-server, semantic_768 canonical)",
+      "description": "Primary embedding artifact. Native 768-dimensional dense vectors — project canonical semantic representation served by the dedicated llama-server embedding endpoint.",
       "role": "embedding",
-      "runtime": "ollama",
-      "pathEnv": null,
+      "runtime": "llama-server",
+      "pathEnv": "EMBED_MODEL_PATH",
       "ollamaTag": "embeddinggemma:latest",
       "localGGUF": "models/embeddinggemma-300m-f16.gguf",
-      "filename": null,
+      "filename": "embeddinggemma-300m-f16.gguf",
+      "artifactSha256": "BC843658E96D2E9CC7C3402332B158F0CC4F73E61B23CEF9A41ACEE1C0D372B7",
+      "executorRevision": "b8757-a29e4c0b7",
+      "tokenizerRevision": "embedded-in-artifact:sha256:BC843658E96D2E9CC7C3402332B158F0CC4F73E61B23CEF9A41ACEE1C0D372B7:vocab_type=1:n_vocab=262144",
       "normalize": "l2",
       "embeddingDimension": 768,
-      "endpoint": "http://127.0.0.1:11434",
-      "notes": "Ollama pulls this at embeddinggemma:latest. Native output is persisted as canonical semantic_768. Derived truncation lanes require separate representation revisions and exact-oracle proofs.",
+      "endpoint": "http://127.0.0.1:8081/v1/embeddings",
+      "notes": "Canonical runtime is the pinned local GGUF served by llama-server on :8081. The Ollama tag remains compatibility metadata only; authoritative writes require explicit artifact, tokenizer, input-policy, 2048-token, and 768-dimension proof.",
       "embeddingDim": 768,
-      "port": 11434,
-      "contextLen": null,
+      "port": 8081,
+      "contextLen": 2048,
       "quantization": "f16",
       "canonical": true,
       "tags": ["embeddings", "768d", "semantic_768", "canonical", "primary"]
@@ -268,7 +271,10 @@
         "name": "latent64",
         "dimension": 64,
         "distance": "Cosine",
-        "purpose": "coarse routing only — not canonical ANN"
+        "purpose": "legacy coarse routing only — not canonical ANN",
+        "status": "LEGACY_DERIVED_ROUTING",
+        "derivedFrom": "legacy_autoencoder_768_128_64",
+        "canonicalAuthority": false
       }
     },
 
@@ -355,14 +361,31 @@
     "autoencoder": {
       "modelPath": "models/autoencoder",
       "latentIndexPath": "models/autoencoder/autoencoder_latent_index.json",
-      "architecture": [384, 128, 64],
-      "inputDim": 384,
-      "_legacyInputDim": 768,
-      "_migrationNote": "Existing autoencoder was trained on 768-dim inputs. Rebuild against 384-dim canonical embeddings, or document as legacy routing artifact only.",
+      "status": "LEGACY_ROUTING_ARTIFACT",
+      "architecture": [768, 128, 64],
+      "inputDim": 768,
       "latentDim": 64,
-      "uses": ["som-input", "kmeans-routing", "coarse-prefiltering"],
-      "role": "routing-feature-lane",
-      "sourceOfTruth": false
+      "uses": ["historical-som-input", "historical-kmeans-routing", "historical-coarse-prefiltering"],
+      "role": "legacy-routing-feature-lane",
+      "sourceOfTruth": false,
+      "canonicalAuthority": false,
+      "notes": "The ignored 5,000-packet index is retained for historical replay only. It is not the current latent representation or an ANN authority. Do not rebuild it against 384-dimensional inputs."
+    },
+
+    "nestedSemanticAutoencoder": {
+      "metadataPath": "models/nested-semantic-autoencoder/ae_meta.json",
+      "checkpointPath": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+      "status": "DERIVED_EXPERIMENTAL_TRANSFORM",
+      "sourceRepresentation": "semantic_768",
+      "physicalRepresentation": "latent_256",
+      "derivedRepresentations": ["latent_128", "latent_64"],
+      "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "postgresColumn": "codebase_chunk_index.latent_256",
+      "qdrantCollection": "codebase_chunks_latent256",
+      "queryEncoder": false,
+      "activeRetrievalLane": false,
+      "canonicalAuthority": false,
+      "notes": "latent_256 is the physical learned bottleneck. latent_128 and latent_64 are prefix-plus-L2-normalized derived views; they do not require separate weights or storage."
     },
 
     "som": {

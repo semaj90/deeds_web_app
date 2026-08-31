@@ -44,8 +44,9 @@ import {
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
 import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { graphAlgorithmRevision } from './graph-algorithm-revision.js';
 
-const ALGORITHM_REVISION = 'neo4j-gds-cheirank-reverse-pagerank-mutate-v1';
+const ALGORITHM_REVISION = graphAlgorithmRevision('cheirank');
 const PARAMETER_REVISION_PREFIX = 'maxIter-damping';
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
 /** Distinct GDS graph catalog name — REVERSE orientation cannot be applied in-place to PROJECTION_NAME. */

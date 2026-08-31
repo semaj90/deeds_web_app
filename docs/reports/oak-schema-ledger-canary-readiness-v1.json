@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.oak-schema-ledger-canary-readiness.v1",
+  "status": "BLOCKED_MIGRATION_LEDGER_DRIFT",
+  "inspection": "LIVE_SCHEMA_INSPECTED",
+  "liveSchema": {
+    "reachable": true,
+    "tables": 526,
+    "enums": 45,
+    "views": 22,
+    "sequences": 98,
+    "fingerprint": "f16e3c3b995c6da2"
+  },
+  "migrationOwnerAudit": {
+    "writesPerformed": false,
+    "missingManifestRegistration": ["feature_registry"],
+    "sidecarUnapplied": ["graphify_file_search_projection"],
+    "liveShapeAligned": [
+      "graphify_source_inventory",
+      "callable_search_projection",
+      "observation_feature_rows_active",
+      "symbol_registry"
+    ]
+  },
+  "drizzleIntegrity": {
+    "status": "FAIL",
+    "databaseMaxId": 0,
+    "journalMaxId": 41,
+    "journalFiles": 41,
+    "sqlFilesOutsideJournal": 107,
+    "blockers": [
+      "loose SQL migration files",
+      "migration files missing database ledger rows",
+      "migration hash integrity cannot be proven",
+      "latest applied migration does not match journal"
+    ],
+    "writesPerformed": false
+  },
+  "oakCanary": {
+    "execution": "NOT_PERFORMED",
+    "schemaMutation": false,
+    "kernelFreeze": false,
+    "nextGate": "RECONCILE_MIGRATION_OWNERS_AND_LEDGER"
+  }
+}

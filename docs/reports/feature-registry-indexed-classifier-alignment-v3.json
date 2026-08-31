@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.feature-registry-indexed-classifier-alignment.v3",
+  "asOf": "2026-08-31",
+  "status": "CLASSIFIER_ADAPTER_PROVEN_LIVE_MODEL_OPEN",
+  "sequence": ["define", "retrieve_candidates", "classify", "ground", "promote"],
+  "implemented": {
+    "registry": "atlas.observation-feature-registry.v1",
+    "candidateRetrieval": "atlas.feature-candidate-retrieval.v1",
+    "candidateClassification": "atlas.feature-candidate-classification.v1",
+    "classifierBoundary": "external_calibrated_scores_only",
+    "abstention": "required_below_threshold",
+    "canonicalAuthority": false
+  },
+  "validation": {
+    "packageTypeScriptBuild": "PASS",
+    "focusedTests": "4/4 PASS",
+    "databaseWrites": false,
+    "projectionWrites": false
+  },
+  "open": [
+    "physical PostgreSQL GIN/pg_trgm index owner",
+    "semantic_768 retrieval adapter",
+    "held-out calibration evidence for a real NB/XGBoost/PyTorch model",
+    "grounded evidence promotion to canonical feature identity"
+  ],
+  "guardrails": [
+    "classifier sees retrieved candidates only",
+    "classifier probability is not identity authority",
+    "missing candidates or low confidence produce abstention",
+    "no topology or latent-64 population is implied"
+  ],
+  "nextGate": "FEATURE-PROMOTE-01"
+}

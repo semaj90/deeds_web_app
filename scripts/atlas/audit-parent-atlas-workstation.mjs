@@ -90,6 +90,7 @@ const report = {
   scripts: { inventory: {}, missing_capabilities: [] },
 
   warnings: [],
+  historical_findings: [],
   blocking_dependencies: [],
   mutations_performed: [],
 
@@ -331,20 +332,23 @@ async function inventoryScripts() {
  * Feature envelope materialization blocker
  */
 async function reportFeatureEnvelopeBlocker() {
-  log('Documenting feature envelope materialization blocker...');
+  log('Documenting historical feature envelope materialization finding...');
 
-  report.blocking_dependencies.push({
+  // This audit does not execute the materializer. Keep the prior ENOBUFS
+  // observation as historical evidence rather than presenting it as a live
+  // workstation blocker. The current script lives under sveltekit-frontend.
+  report.historical_findings.push({
     component: 'feature_envelope_materialization',
-    status: 'BLOCKED',
+    status: 'HISTORICAL_BLOCKER_UNVERIFIED_CURRENTLY',
     error_code: 'ENOBUFS',
     failure_stage: 'fetch_score_components',
-    command: 'npx tsx scripts/atlas/materialize-feature-envelopes.mts --apply',
+    command: 'npx tsx sveltekit-frontend/scripts/atlas/materialize-feature-envelopes.mts --apply',
     root_cause_class: 'synchronous_child_process_stdout_buffer',
     root_cause: 'Postgres returned excessive rows, stdout exceeded spawnSync buffer, child process received SIGTERM',
-    proven: true,
+    proven: 'historical_receipt_only',
+    currentVerification: 'NOT_RUN',
     not_proven: ['feature_envelopes_materialized', 'published_jobs_consumed', 'gemma4_summaries_generated'],
     recommended_fix: 'Replace execSync with spawn or direct Postgres client; use machine-readable psql output; stream rows; add bounded pilot mode',
-    do_not_attempt_this_phase: true,
   });
 }
 

@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { GRAPH_ALGORITHM_REVISION } from './graph-algorithm-revision.js';
 
 export const ATLAS_IMPORT_CLUSTER_UNION_FIND_V1 = 'atlas.import_cluster_union_find.v1' as const;
-export const NEO4J_GDS_LOUVAIN_MUTATE_V1 = 'neo4j-gds-louvain-mutate-v1' as const;
-export const NEO4J_GDS_LEIDEN_MUTATE_V1 = 'neo4j-gds-leiden-mutate-v1' as const;
+export const NEO4J_GDS_LOUVAIN_MUTATE_V1 = GRAPH_ALGORITHM_REVISION.louvain;
+export const NEO4J_GDS_LEIDEN_MUTATE_V1 = GRAPH_ALGORITHM_REVISION.leiden;
 export const CUGRAPH_LOUVAIN_26_06 = 'cugraph.louvain.26.06' as const;
 export const CUGRAPH_LEIDEN_26_06 = 'cugraph.leiden.26.06' as const;
 

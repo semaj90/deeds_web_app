@@ -12,41 +12,42 @@
  *   Degraded: { cached: false, topFiles: [], nodesScored: 0, message }
  *
  * Body (POST):
- *   syncQdrant?  boolean  — write pagerank_score_couchdb to Qdrant payload (default true)
+ *   syncQdrant?  boolean  — write pagerank_score_couchdb to Qdrant payload (default false)
  *   syncNeo4j?   boolean  — write f.pagerank_score_couchdb to Neo4j nodes (default false)
- *   dryRun?      boolean  — compute + log, do not write (default false)
+ *   dryRun?      boolean  — compute + log, do not write (default true)
+ *   apply?       boolean  — explicit authorization for non-dry-run writes (default false)
  *
  * Auth: requires locals.user
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { z } from 'zod';
 import {
 	runCouchDbPageRank,
 	getCachedPageRankScores,
 	ensureCouchDbDesignDoc,
 } from '$lib/server/graph/couchdb-pagerank.js';
+import {
+	parseCouchDbPageRankRequest,
+	requiresCouchDbPageRankApply,
+} from '$lib/server/graph/couchdb-pagerank-request-policy.js';
 import { ENV } from '$lib/server/env.server.js';
-
-const bodySchema = z.object({
-	syncQdrant: z.boolean().default(true),
-	syncNeo4j:  z.boolean().default(false),
-	dryRun:     z.boolean().default(false),
-});
 
 // ── POST — run PageRank pipeline ──────────────────────────────────────────
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const raw    = await request.json().catch(() => ({}));
-	const parsed = bodySchema.safeParse(raw);
-	const opts   = parsed.success ? parsed.data : bodySchema.parse({});
+	const raw    = await request.json().catch(() => null);
+	const parsed = parseCouchDbPageRankRequest(raw);
+	if (!parsed.success) {
+		return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
+	}
+	const opts = parsed.data;
+	if (requiresCouchDbPageRankApply(opts) && !opts.apply) {
+		return json({ error: 'Non-dry-run PageRank requires apply=true' }, { status: 409 });
+	}
 
 	try {
-		// Ensure design doc exists before running
-		await ensureCouchDbDesignDoc();
-
 		if (opts.dryRun) {
 			// Just validate CouchDB is reachable and design doc is in place
 			const couchUrl = process.env.COUCHDB_URL ?? 'http://localhost:5984';
@@ -68,6 +69,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					: 'CouchDB unreachable or link_matrix view missing — run graph-sync first',
 			});
 		}
+
+		// Design-doc creation is itself a mutation, so it is reached only after
+		// the explicit apply gate above.
+		await ensureCouchDbDesignDoc();
 
 		const result = await runCouchDbPageRank();
 

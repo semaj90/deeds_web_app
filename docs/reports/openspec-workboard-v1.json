@@ -1,0 +1,2185 @@
+{
+  "schema": "atlas.openspec.workboard.v1",
+  "generatedAt": "2026-08-31T03:32:38.078Z",
+  "source": "openspec/changes/*/tasks.md",
+  "summary": {
+    "completedTasks": 2280,
+    "openTasks": 1914,
+    "totalTasks": 4194,
+    "progressFraction": 0.5436337625178826,
+    "progressBar": "[#####-----]",
+    "eta": {
+      "status": "UNKNOWN",
+      "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+    }
+  },
+  "ordering": "WORK_PACKAGES_THEN_WORK_ITEMS; PRIORITY_THEN_LAST_UPDATED_DESC; INVARIANTS_SEPARATE; ETA_SORT_WHEN_RECEIPT_THROUGHPUT_EXISTS",
+  "workPackages": [
+    {
+      "id": "P10-A",
+      "title": "Migration ledger reconciliation",
+      "gates": [
+        "migration baseline",
+        "owner manifest",
+        "pre-apply guard"
+      ],
+      "dependsOn": [],
+      "state": "BLOCKED"
+    },
+    {
+      "id": "P10-B",
+      "title": "Canonical candidate identity",
+      "gates": [
+        "feature identity",
+        "packet identity",
+        "CandidateOrdinal"
+      ],
+      "dependsOn": [
+        "P10-A"
+      ],
+      "state": "OPEN"
+    },
+    {
+      "id": "P10-C",
+      "title": "Symbol lineage",
+      "gates": [
+        "stableSymbolId",
+        "symbolVersionId",
+        "treeNodeId"
+      ],
+      "dependsOn": [
+        "P10-B"
+      ],
+      "state": "OPEN"
+    },
+    {
+      "id": "P10-D",
+      "title": "Lexical identity",
+      "gates": [
+        "source revision",
+        "FTS identity",
+        "cross-store lineage"
+      ],
+      "dependsOn": [
+        "P10-B"
+      ],
+      "state": "OPEN"
+    },
+    {
+      "id": "P10-E",
+      "title": "Top-K cross-store readback",
+      "gates": [
+        "CandidateTopKV1",
+        "Qdrant parity",
+        "Go retrieval parity"
+      ],
+      "dependsOn": [
+        "P10-C",
+        "P10-D"
+      ],
+      "state": "OPEN"
+    }
+  ],
+  "invariants": [
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3364",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3364,
+      "text": "No canonical identity or source data changes during dry-run/training.",
+      "state": "OPEN",
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "NOT_APPLICABLE",
+        "method": "PERMANENT_ACCEPTANCE_INVARIANT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3365",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3365,
+      "text": "No projection occurs while model, identity, or parity gates fail.",
+      "state": "OPEN",
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "NOT_APPLICABLE",
+        "method": "PERMANENT_ACCEPTANCE_INVARIANT"
+      }
+    }
+  ],
+  "changes": [
+    {
+      "change": "ace-hyperrag-chr97-graphify-audit",
+      "completed": 4,
+      "total": 7,
+      "progressFraction": 0.5714285714285714,
+      "progressBar": "[######----]",
+      "open": 3
+    },
+    {
+      "change": "agent-branch-review-fanout-ace-centroid-aug22",
+      "completed": 17,
+      "total": 20,
+      "progressFraction": 0.85,
+      "progressBar": "[#########-]",
+      "open": 3
+    },
+    {
+      "change": "atlas-feature-intelligence",
+      "completed": 19,
+      "total": 73,
+      "progressFraction": 0.2602739726027397,
+      "progressBar": "[###-------]",
+      "open": 54
+    },
+    {
+      "change": "codereview-inference-wiring-followup-aug22",
+      "completed": 7,
+      "total": 10,
+      "progressFraction": 0.7,
+      "progressBar": "[#######---]",
+      "open": 3
+    },
+    {
+      "change": "codereview-semantic-dimension-regression-aug22",
+      "completed": 5,
+      "total": 12,
+      "progressFraction": 0.4166666666666667,
+      "progressBar": "[####------]",
+      "open": 7
+    },
+    {
+      "change": "deep-audit-code-gates-aug22",
+      "completed": 10,
+      "total": 21,
+      "progressFraction": 0.47619047619047616,
+      "progressBar": "[#####-----]",
+      "open": 11
+    },
+    {
+      "change": "docker-compose-duplication-remediation",
+      "completed": 9,
+      "total": 9,
+      "progressFraction": 1,
+      "progressBar": "[##########]",
+      "open": 0
+    },
+    {
+      "change": "feature-label-semantic-derivation",
+      "completed": 2,
+      "total": 3,
+      "progressFraction": 0.6666666666666666,
+      "progressBar": "[#######---]",
+      "open": 1
+    },
+    {
+      "change": "inference-wiring-deep-audit-aug22",
+      "completed": 46,
+      "total": 49,
+      "progressFraction": 0.9387755102040817,
+      "progressBar": "[#########-]",
+      "open": 3
+    },
+    {
+      "change": "manual-migration-reconciliation",
+      "completed": 25,
+      "total": 55,
+      "progressFraction": 0.45454545454545453,
+      "progressBar": "[#####-----]",
+      "open": 30
+    },
+    {
+      "change": "parent-atlas-ace-bitfrost-cache-correctness",
+      "completed": 2,
+      "total": 9,
+      "progressFraction": 0.2222222222222222,
+      "progressBar": "[##--------]",
+      "open": 7
+    },
+    {
+      "change": "parent-atlas-ace-rlm-bitfrost-integration",
+      "completed": 65,
+      "total": 67,
+      "progressFraction": 0.9701492537313433,
+      "progressBar": "[##########]",
+      "open": 2
+    },
+    {
+      "change": "parent-atlas-adaptive-dag-fabric",
+      "completed": 5,
+      "total": 10,
+      "progressFraction": 0.5,
+      "progressBar": "[#####-----]",
+      "open": 5
+    },
+    {
+      "change": "parent-atlas-agentic-file-compiler",
+      "completed": 10,
+      "total": 21,
+      "progressFraction": 0.47619047619047616,
+      "progressBar": "[#####-----]",
+      "open": 11
+    },
+    {
+      "change": "parent-atlas-agentic-repair-bundle-integration",
+      "completed": 18,
+      "total": 84,
+      "progressFraction": 0.21428571428571427,
+      "progressBar": "[##--------]",
+      "open": 66
+    },
+    {
+      "change": "parent-atlas-agentic-run-receipt-binding",
+      "completed": 2,
+      "total": 11,
+      "progressFraction": 0.18181818181818182,
+      "progressBar": "[##--------]",
+      "open": 9
+    },
+    {
+      "change": "parent-atlas-branch-merge-consolidation-aug20",
+      "completed": 18,
+      "total": 35,
+      "progressFraction": 0.5142857142857142,
+      "progressBar": "[#####-----]",
+      "open": 17
+    },
+    {
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "completed": 194,
+      "total": 291,
+      "progressFraction": 0.6666666666666666,
+      "progressBar": "[#######---]",
+      "open": 97
+    },
+    {
+      "change": "parent-atlas-code-ingestion-pipeline",
+      "completed": 23,
+      "total": 35,
+      "progressFraction": 0.6571428571428571,
+      "progressBar": "[#######---]",
+      "open": 12
+    },
+    {
+      "change": "parent-atlas-compiler-semantic-graph-resolution",
+      "completed": 19,
+      "total": 32,
+      "progressFraction": 0.59375,
+      "progressBar": "[######----]",
+      "open": 13
+    },
+    {
+      "change": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+      "completed": 17,
+      "total": 60,
+      "progressFraction": 0.2833333333333333,
+      "progressBar": "[###-------]",
+      "open": 43
+    },
+    {
+      "change": "parent-atlas-document-governance-master-index",
+      "completed": 5,
+      "total": 59,
+      "progressFraction": 0.0847457627118644,
+      "progressBar": "[#---------]",
+      "open": 54
+    },
+    {
+      "change": "parent-atlas-governed-compute-fabric",
+      "completed": 0,
+      "total": 155,
+      "progressFraction": 0,
+      "progressBar": "[----------]",
+      "open": 155
+    },
+    {
+      "change": "parent-atlas-gpu-graph-vector-substrate",
+      "completed": 2,
+      "total": 26,
+      "progressFraction": 0.07692307692307693,
+      "progressBar": "[#---------]",
+      "open": 24
+    },
+    {
+      "change": "parent-atlas-gpu-runtime-abi-alignment",
+      "completed": 4,
+      "total": 7,
+      "progressFraction": 0.5714285714285714,
+      "progressBar": "[######----]",
+      "open": 3
+    },
+    {
+      "change": "parent-atlas-gpu-sidecar-patch-tournament",
+      "completed": 12,
+      "total": 63,
+      "progressFraction": 0.19047619047619047,
+      "progressBar": "[##--------]",
+      "open": 51
+    },
+    {
+      "change": "parent-atlas-graph-analysis-contract",
+      "completed": 62,
+      "total": 84,
+      "progressFraction": 0.7380952380952381,
+      "progressBar": "[#######---]",
+      "open": 22
+    },
+    {
+      "change": "parent-atlas-graph-pagerank-okf-fanout-hardening",
+      "completed": 3,
+      "total": 4,
+      "progressFraction": 0.75,
+      "progressBar": "[########--]",
+      "open": 1
+    },
+    {
+      "change": "parent-atlas-graph-retrieval-proof",
+      "completed": 157,
+      "total": 284,
+      "progressFraction": 0.5528169014084507,
+      "progressBar": "[######----]",
+      "open": 127
+    },
+    {
+      "change": "parent-atlas-graph-runtime-enhancement",
+      "completed": 2,
+      "total": 8,
+      "progressFraction": 0.25,
+      "progressBar": "[###-------]",
+      "open": 6
+    },
+    {
+      "change": "parent-atlas-graph-runtime-python-consolidation",
+      "completed": 0,
+      "total": 14,
+      "progressFraction": 0,
+      "progressBar": "[----------]",
+      "open": 14
+    },
+    {
+      "change": "parent-atlas-graph-validation-fabric",
+      "completed": 8,
+      "total": 14,
+      "progressFraction": 0.5714285714285714,
+      "progressBar": "[######----]",
+      "open": 6
+    },
+    {
+      "change": "parent-atlas-graphify-recovery-proof-ladder",
+      "completed": 0,
+      "total": 9,
+      "progressFraction": 0,
+      "progressBar": "[----------]",
+      "open": 9
+    },
+    {
+      "change": "parent-atlas-kv-cache-adaptation-research",
+      "completed": 3,
+      "total": 15,
+      "progressFraction": 0.2,
+      "progressBar": "[##--------]",
+      "open": 12
+    },
+    {
+      "change": "parent-atlas-memory-architecture-freeze",
+      "completed": 14,
+      "total": 23,
+      "progressFraction": 0.6086956521739131,
+      "progressBar": "[######----]",
+      "open": 9
+    },
+    {
+      "change": "parent-atlas-native-acceleration-cabi",
+      "completed": 14,
+      "total": 62,
+      "progressFraction": 0.22580645161290322,
+      "progressBar": "[##--------]",
+      "open": 48
+    },
+    {
+      "change": "parent-atlas-neural-prefill-encoder",
+      "completed": 1135,
+      "total": 1670,
+      "progressFraction": 0.6796407185628742,
+      "progressBar": "[#######---]",
+      "open": 535
+    },
+    {
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "completed": 24,
+      "total": 53,
+      "progressFraction": 0.4528301886792453,
+      "progressBar": "[#####-----]",
+      "open": 29
+    },
+    {
+      "change": "parent-atlas-observation-routing-fabric",
+      "completed": 16,
+      "total": 26,
+      "progressFraction": 0.6153846153846154,
+      "progressBar": "[######----]",
+      "open": 10
+    },
+    {
+      "change": "parent-atlas-okf-knowledge-layers",
+      "completed": 20,
+      "total": 36,
+      "progressFraction": 0.5555555555555556,
+      "progressBar": "[######----]",
+      "open": 16
+    },
+    {
+      "change": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "completed": 0,
+      "total": 11,
+      "progressFraction": 0,
+      "progressBar": "[----------]",
+      "open": 11
+    },
+    {
+      "change": "parent-atlas-ontology-kernel",
+      "completed": 27,
+      "total": 32,
+      "progressFraction": 0.84375,
+      "progressBar": "[########--]",
+      "open": 5
+    },
+    {
+      "change": "parent-atlas-opencode-replay-proof",
+      "completed": 2,
+      "total": 19,
+      "progressFraction": 0.10526315789473684,
+      "progressBar": "[#---------]",
+      "open": 17
+    },
+    {
+      "change": "parent-atlas-pass-fabric",
+      "completed": 6,
+      "total": 43,
+      "progressFraction": 0.13953488372093023,
+      "progressBar": "[#---------]",
+      "open": 37
+    },
+    {
+      "change": "parent-atlas-policy-routing-integration",
+      "completed": 22,
+      "total": 40,
+      "progressFraction": 0.55,
+      "progressBar": "[######----]",
+      "open": 18
+    },
+    {
+      "change": "parent-atlas-query-routing-classifier",
+      "completed": 41,
+      "total": 98,
+      "progressFraction": 0.41836734693877553,
+      "progressBar": "[####------]",
+      "open": 57
+    },
+    {
+      "change": "parent-atlas-retrieval-fusion-reachability",
+      "completed": 32,
+      "total": 48,
+      "progressFraction": 0.6666666666666666,
+      "progressBar": "[#######---]",
+      "open": 16
+    },
+    {
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "completed": 42,
+      "total": 94,
+      "progressFraction": 0.44680851063829785,
+      "progressBar": "[####------]",
+      "open": 52
+    },
+    {
+      "change": "parent-atlas-semantic-512-canonicalization",
+      "completed": 23,
+      "total": 31,
+      "progressFraction": 0.7419354838709677,
+      "progressBar": "[#######---]",
+      "open": 8
+    },
+    {
+      "change": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+      "completed": 0,
+      "total": 31,
+      "progressFraction": 0,
+      "progressBar": "[----------]",
+      "open": 31
+    },
+    {
+      "change": "parent-atlas-tensor-residency-integration",
+      "completed": 13,
+      "total": 29,
+      "progressFraction": 0.4482758620689655,
+      "progressBar": "[####------]",
+      "open": 16
+    },
+    {
+      "change": "parent-atlas-topology-representation-admission",
+      "completed": 3,
+      "total": 18,
+      "progressFraction": 0.16666666666666666,
+      "progressBar": "[##--------]",
+      "open": 15
+    },
+    {
+      "change": "parent-atlas-transport-memory-boundaries",
+      "completed": 5,
+      "total": 64,
+      "progressFraction": 0.078125,
+      "progressBar": "[#---------]",
+      "open": 59
+    },
+    {
+      "change": "parent-atlas-unified-symbol-ranking",
+      "completed": 17,
+      "total": 17,
+      "progressFraction": 1,
+      "progressBar": "[##########]",
+      "open": 0
+    },
+    {
+      "change": "parent-atlas-unordered-execution-contract",
+      "completed": 7,
+      "total": 26,
+      "progressFraction": 0.2692307692307692,
+      "progressBar": "[###-------]",
+      "open": 19
+    },
+    {
+      "change": "parent-atlas-workstation-domain-classifier",
+      "completed": 17,
+      "total": 21,
+      "progressFraction": 0.8095238095238095,
+      "progressBar": "[########--]",
+      "open": 4
+    },
+    {
+      "change": "parent-atlas-xgboost-cuda-runtime-proof",
+      "completed": 12,
+      "total": 30,
+      "progressFraction": 0.4,
+      "progressBar": "[####------]",
+      "open": 18
+    },
+    {
+      "change": "route-import-infra-isolation",
+      "completed": 13,
+      "total": 16,
+      "progressFraction": 0.8125,
+      "progressBar": "[########--]",
+      "open": 3
+    }
+  ],
+  "nextTasks": [
+    {
+      "taskKey": "atlas-feature-intelligence:10",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 10,
+      "text": "FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T01:04:14.936Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "atlas-feature-intelligence:11",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 11,
+      "text": "FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.**",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T01:04:14.936Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "atlas-feature-intelligence:50",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 50,
+      "text": "FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T01:04:14.936Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "atlas-feature-intelligence:58",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 58,
+      "text": "FI-20 Add degraded-identity observability and exact promotion before fusion.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T01:04:14.936Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "atlas-feature-intelligence:90",
+      "change": "atlas-feature-intelligence",
+      "source": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "line": 90,
+      "text": "Canonical identity survives path/cluster/projection changes in live Postgres readback.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T01:04:14.936Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:92",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 92,
+      "text": "**RETRIEVAL-01 — Prove same-corpus Qdrant payload identity** only after",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:163",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 163,
+      "text": "**SOURCE-REVISION-CANARY-01 — Persist one approved Graphify canary.**",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:170",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 170,
+      "text": "**SOURCE-REVISION-OWNER-02 — Prove the owner after the canary.**",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:180",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 180,
+      "text": "**SOURCE-REVISION-DOWNSTREAM-04 — Rerun dependent gates.** After the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:1297",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 1297,
+      "text": "Measure recovery potential without relaxing identity rules or changing",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2376",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2376,
+      "text": "NE-13 Record missing-vector, duplicate-identity, stale-revision, and",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:2669",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 2669,
+      "text": "NE-29 Add Qdrant latent projection with canonical identity and revision",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3102",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3102,
+      "text": "G-13 Freeze the feature-map contract around CandidateOrdinal,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3150",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3150,
+      "text": "G-29 Keep tricubic/interpolation parameters out of topology identity;",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3186",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3186,
+      "text": "G-35C Join Qdrant points to the canonical CandidateOrdinal snapshot before",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3307",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3307,
+      "text": "NE-56 Require ACE callers to populate `ContextEvidenceIdentityV2` and",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3337",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3337,
+      "text": "Prove top-k identity coverage against Postgres before allowing the result",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:3813",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 3813,
+      "text": "Materialize revision-specific symbol versions and callable-search rows;",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:4667",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 4667,
+      "text": "Freeze one `CandidateOrdinalMapV1` and one feature matrix shared by",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:4700",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 4700,
+      "text": "Complete repo-wide `semantic_768` population and identity readback;",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:5825",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 5825,
+      "text": "`STABLE_SYMBOL_IDENTITY`, `SYMBOL_VERSION_IDENTITY`,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6629",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6629,
+      "text": "`LEXICAL-02C` — define the `AtlasLexicalProjectionV1` contract (see below) — the identity",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:6633",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 6633,
+      "text": "`LEXICAL-02E` — verify query/document encoder symmetry and identity readback (Qdrant's BM25",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7385",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 7385,
+      "text": "Full `search-postgres-fts` re-run via `audit-postgres-fts-identity-coverage.mjs` (the 8",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:7934",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 7934,
+      "text": "**Not yet done**: `AtlasLexicalProjectionV1`'s identity fields (`packetKey`, `sourceRevision`,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8042",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8042,
+      "text": "Propagate and independently read back `source_revision` and `workspace_revision` in both",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8083",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8083,
+      "text": "Do not promote the artifact's current `source_revision: workspace:0` values as canonical",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8167",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8167,
+      "text": "Require the same `workspace_revision`, `source_revision`, `content_hash`, and",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8236",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8236,
+      "text": "Keep the exact `source_ref + content_hash` PostgreSQL FTS identity join unchanged.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:8682",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 8682,
+      "text": "Revision-qualified chunk identity contract (`source_revision` /",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10049",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10049,
+      "text": "Prove one deterministic join from Neo4j node identity to the canonical",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10329",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10329,
+      "text": "Build a source-revision-qualified packet document from canonical source",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:10648",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 10648,
+      "text": "Produce a bounded follow-up receipt joining exact identity matches to",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11097",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11097,
+      "text": "Resolve the upstream workspace/source revision owner before expanding",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11130",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11130,
+      "text": "Locate and validate the existing `CandidateOrdinalMapV1` owner or",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11248",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11248,
+      "text": "Build the next preview from existing rows only: packet identity,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11321",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11321,
+      "text": "Strong identity admission failed for this sample: `0` nodes resolved",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11472",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11472,
+      "text": "Review the four exact matches against source/revision and packet grain",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11628",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11628,
+      "text": "Read the Arrow artifact back and verify row identity, vector dimensions,",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11691",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11691,
+      "text": "Add the cuVS executor adapter and prove CandidateOrdinal round-trip before",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-neural-prefill-encoder:11707",
+      "change": "parent-atlas-neural-prefill-encoder",
+      "source": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "line": 11707,
+      "text": "Prove the full CandidateOrdinal round-trip and bounded graph/feature",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-31T00:23:15.293Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:15",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 15,
+      "text": "Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:17",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 17,
+      "text": "Do not relax `atlas_graph_nodes_v2_tree_node_unique` until the split identity model is implemented and tested.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:33",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 33,
+      "text": "Identity status labels:",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:76",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 76,
+      "text": "Add proof gates for `PARSER_MANIFEST_ALIGNMENT`, `TREE_NODE_ID_STABILITY`, and `SYMBOL_VERSION_IDENTITY`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:89",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 89,
+      "text": "Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:244",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 244,
+      "text": "Python BeautifulSoup normalizer (`html_normalizer.py`) + Pydantic `HtmlExtractionEnvelope` (schema_version, source_revision, html_digest, parser/extractor identity) — location TBD: `packages/parent-atlas/python/parent_atlas/acquisition/` vs. the existing NLP sidecar, whichever is the canonical Python runtime (unconfirmed which one that is).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:245",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 245,
+      "text": "Postgres tables `atlas_web_sources` (canonical web source, unique on `final_url + source_revision`) and `atlas_web_extractions` (versioned extraction runs, unique on `web_source_id + extractor_name + extractor_version + parser_name + normalized_text_digest`), both with GIN indexes on jsonb columns — schema drafted in the operator's spec, not yet written as a manual migration.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:352",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 352,
+      "text": "**GPU** — exact cuVS brute-force KNN parity and identity-preservation through cuVS remain blocked by missing RAPIDS packages, not by a code-path failure.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:395",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 395,
+      "text": "**Not started**: the full PAW1-PAW14 ledger across capability groups A-L (active/git-diff context, recommendation supersession, validation receipts, hot/warm/cold storage, canonical envelope/identity, LangExtract/inference ownership, native GPU bridge, cuVS/PyTorch/Qdrant/SOM/KMeans/PageRank, gRPC/tensor transport, NLP/structural features, DAG/KAG/HyperGraphRAG, MCP ownership).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:629",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 629,
+      "text": "**Found, NOT fixed — smaller, separate gap**: `getTopPageRankClient()`'s identity-resolution `coalesce(n.stableKey, n.filePath, n.relativePath, n.path)` returns `null` for every top-10 `Function`-labeled result — those nodes actually carry a real `name` property (confirmed via `keys(n)`) that the coalesce chain never checks. Scores are real and correctly persisted; only the human-readable identity label is unresolvable for this node label. Not fixed this pass — a different function, smaller blast radius, flagged for a follow-up.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:692",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 692,
+      "text": "Gates still requiring real work, not just re-assessment: PAW5 (gRPC tensor row-identity map — genuinely absent, would need new code), PAW9's KAG concept-population (0 rows, needs an actual extraction pipeline run), PAW12 (needs a real generic validation-receipt contract, `validation-result-v1.ts`'s narrow scope doesn't cover it), PAW13 (needs a deliberate end-to-end fixture spanning all 6 stages in one proof run — not attempted this pass, would be a substantial dedicated slice).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:740",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 740,
+      "text": "**Recommended next bounded step, not done this pass**: (a) resolve the `compute-pagerank-neo4j.mjs` self-declared-retired-but-still-wired discrepancy with an operator decision; (b) archive `compute-pagerank-nodejs.mjs` (self-declared dead by its own author — lowest-risk candidate); (c) read `promote-pagerank-authority-from-neo4j.mjs` in full to confirm or refute overlap with `promote-neo4j-pagerank-to-postgres.mts`; (d) decide whether `atlas_packets.page_rank_score` (Postgres) should be reconciled with `pageRankScore` (Neo4j) as part of the same identity chain, or intentionally kept as a separate downstream projection.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:752",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 752,
+      "text": "Steps 3-7 (minimal sidecar: health/capabilities → exact-KNN endpoint with identity manifest → Qdrant-vs-cuVS recall@20 fixture on a 20K-row revision-qualified `semantic_768` sample → TS client → one bounded MCP op) — **not started this pass**, per the operator's own explicit sequencing and this session's context budget. This is real, substantial new-service work (HTTP server process, request/response schemas, deadline/cancellation handling, GPU memory bounds) — a dedicated next slice, not a continuation of today's verification/reconciliation work.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:773",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 773,
+      "text": "Steps 4-7 (exact-KNN endpoint with identity manifest, Qdrant-vs-cuVS recall@20 fixture on a 20K-row revision-qualified `semantic_768` sample, TypeScript client, one bounded MCP op) — **not started**. Stopping here given repeated context-budget warnings this turn; each remaining step is itself substantial (request/response schema design, a real 20K-row fixture pull from live Qdrant+Postgres, deadline/cancellation wiring, a new TS client file, MCP tool registration) and deserves its own clean run rather than a rushed continuation.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:1016",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 1016,
+      "text": "NOT done: completing GS1.9-GS1.12's read-only identity audit (the actual gate blocking `PRODUCTION_LATENT_BACKFILL_READINESS`).",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:1054",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 1054,
+      "text": "NOT done: the 9-step post-audit execution order (stable identity contracts → `ae_latent_64` versioned representation → dtype/byte-order/serialization definition → producer lineage → canonical packet-revision writes replacing the source_ref/qdrant fallback chain → staleness guards → rollback-only 1K fixture → fixture-table idempotency → 1K/5K/10K/25K benchmarks) — all deferred pending operator review of this audit's findings.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-retrieval-proof:1113",
+      "change": "parent-atlas-graph-retrieval-proof",
+      "source": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "line": 1113,
+      "text": "NOT done this pass: no DDL, no backfill, no `graphify:daily`, no Qdrant mutation. `SESSION-181-S180-6-HANDOFF.md` and `docs/reports/session-180-s180-6-task1-identity-audit.md` are preserved as correction history but must not drive further migration/schema decisions.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T23:04:26.665Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:97",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 97,
+      "text": "FANOUT-01 Normalize all semantic results to CandidateOrdinal before feature fanout.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:105",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 105,
+      "text": "REV-OWNER-GRAPH-05 Unblock FANOUT-01 only after graph snapshot revision, candidate identity, and Qdrant `semantic_768` lineage agree.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:146",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 146,
+      "text": "CE-02 Implement backend-neutral `CrossEncoderRerankerV1` preserving CandidateOrdinal.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:156",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 156,
+      "text": "PROMOTE-02 Fail promotion for unresolved/degraded canonical identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:317",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 317,
+      "text": "Prove live cuVS exact semantic parity at the representation/quality boundary; executor fixture success does not imply ranking promotion. The existing WSL `atlas-rapids-cu13` environment passes CUDA/cuGraph capability, graph parity, and the bounded 8098 PyTorch↔cuVS CandidateOrdinal round-trip. Cross-executor semantic recall/rank parity remains open.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:358",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 358,
+      "text": "GRAPH-RESOLVE-06B Bind the enrichment layer to a live authoritative LSP/compiler producer and prove target identity on the bounded unresolved-edge sample. Keep this gate split into offline snapshot/replay and later authoritative identity enrichment. The current live census is fail-closed: 85 of the 353 tree-bound nominations have exact registry and symbol-version bindings after seventeen bounded canaries, while 268 remain unresolved. Identity enrichment attempted/admitted edges remain 0. Do not create synthetic symbol versions, use fuzzy aliases, or bulk-populate structural edges from unresolved/collision-prone matches.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:361",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 361,
+      "text": "GRAPH-RESOLVE-06B.3 Resolve the 353 tree-bound rows to the existing authoritative `stable_symbol_id` registry, then revision-qualify `symbol_version_id`; remain read-only and fail closed on missing or ambiguous registry coverage. After two bounded five-row registry canaries and the separate second symbol-version tranche, the corrected proof reports `exactCanonicalKey=10`, `registryMissing=343`, `symbolVersionMissing=3`, `symbolVersionBound=7`, and `fuzzyMatches=0` across 10,180 active registry rows and 207 symbol-version rows. The earlier all-missing result was caused by a proof/planner source-namespace normalization mismatch; the proof now uses the same canonical source-reference rule as the review plan. Full reconciliation remains open: 343 rows still lack exact registry coverage and three exact registry rows still lack symbol-version bindings. No aliases, fuzzy matches, or edges were created. See `scripts/atlas/prove-tree-bound-symbol-registry-resolution-v1.mjs`, `scripts/atlas/plan-tree-bound-symbol-registry-reconciliation-v1.mjs`, `scripts/atlas/plan-current-tree-bound-symbol-registry-input-v1.mjs`, and `docs/reports/tree-bound-symbol-registry-resolution-v1.json`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:390",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 390,
+      "text": "GRAPH-RESOLVE-06B.4 Bind the enriched identity result to the live bounded producer replay; no edge writes until 06B.3/06B.4 pass.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:392",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 392,
+      "text": "GRAPH-06D Prove `GraphOrdinalMapV1` and NetworkX↔cuGraph parity from the same frozen graph snapshot; executor-local graph ordinals must not become `CandidateOrdinal`, packet identity, or canonical graph identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:525",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 525,
+      "text": "ALIGN-EVIDENCE-01 Split `collect-runtime-evidence.mjs` into an explicitly read-only evidence mode and a separately authorized apply mode. Dry-run is now the default, rejects mixed mode flags, skips all write-capable subprocesses and Postgres/Valkey connections, and was validated over 8,170 cards. Apply now performs a read-only `atlas_packets` identity preflight before any subprocess or local artifact write, and fails closed because `packet_id` is NOT NULL with no default. The apply path remains unsafe until packet identity derivation and a side-effect manifest are repaired. Do not treat apply mode as a read-only audit.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:526",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 526,
+      "text": "PACKET-ID-OWNER-01 Resolve the canonical `atlas_packets.packet_id` owner before enabling the collector apply path. The live table contains 61,660 non-null IDs, 61 IDs with UUID-shaped length, 0 64-character SHA-256 IDs, and all 61,660 rows have `packet_key`; existing producers disagree between UUID, packet-key, and truncated/full hash conventions. The live constraint census shows `packet_id` is the table primary key, while the majority of downstream foreign keys intentionally target unique `packet_key`; only packet identity-conflict/materialization-queue tables reference `packet_id`. A value census found `packet_id = packet_key` for 58,305 rows and different values for 3,355 rows, so equality cannot be assumed. By source kind, all 58,304 rows with NULL `source_kind` and the single `cluster-summary` row have equality, while all 3,294 `codebase_chunk` rows diverge with `packet_*` IDs and all 61 `rpc_method` rows diverge with UUID-shaped IDs. Source inspection points to legacy orphan-chunk registration and RPC packet producers. The current packet materializer explicitly rejects `packet_id != packet_key`, making equality a candidate active rule for new materialization but not proof that legacy rows can be rewritten. This characterizes legacy producers but does not establish a single owner. Do not derive a new ID in the collector or equate `packet_id` with `packet_key` until the registry contract and downstream expectations are reconciled.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:527",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 527,
+      "text": "PACKET-MATERIALIZER-INPUT-01 Reconcile the collector’s packet-key input contract before apply: `collect-runtime-evidence.mjs` now uses the shared `buildPacketKey(sourceRef, featureId)` helper when cards lack `packet_key`, producing the established `nes:<slug>:<sha8(source_ref)>` shape. The 8,170-card corpus contains 0 explicit `packet_key` values; a read-only full-corpus audit produced 8,170 non-empty unique keys with 0 live PostgreSQL collisions. These remain planned derived keys until apply identity ownership is approved. Do not silently rewrite existing evidence-card keys during ingestion.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:528",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 528,
+      "text": "PACKET-LINEAGE-EXCEPTIONS-01 Classify the two packet completeness anomalies before any apply path: one `codebase_chunk` row has an empty `source_ref`, and one `cluster-summary` row has no `workspace_id`. The packet contract validator now treats blank identity strings as missing and the live validation remains threshold-pass, but neither anomaly is repaired. `register-orphaned-chunks.mjs` was the admitting producer for the empty-source class; its orphan query and preparation path now reject blank `relative_path` values, and its default dry-run now prepares 58 valid registrations without that row. Keep both anomalies excluded from current Graphify/source-binding qualification until their owning producer and repair authority are proven; do not fill either field from packet keys or defaults.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:531",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 531,
+      "text": "ALIGN-SYMBOL-01 Implement the missing current-cohort `SymbolFeatureAlignmentV1` materializer. It must bind `CandidateOrdinal`, packet/chunk identity, optional symbol/observation rows, feature revisions, and evidence references without fuzzy joins, fabricated IDs, or synthetic graph revisions. Existing schema/fixture contracts do not prove this materializer exists.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:532",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 532,
+      "text": "ALIGN-FILTER-01 Define one revision-bound `EligibilitySetV1` and prove equivalent admissible CandidateOrdinals across PostgreSQL planner filters, Qdrant payload filters, and cuVS bitset filtering. PostgreSQL AIO/bitmap scans remain planner behavior and must not become a second authority.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:536",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 536,
+      "text": "ALIGN-CONTEXT-01 Make BitFrost/Valkey and ACE/ContextManifest keys revision-addressed by candidate snapshot, representation, graph, feature, and artifact checksums. Cache hits may accelerate replay but cannot bypass canonical identity or evidence closure.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:582",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 582,
+      "text": "**GRAPH-RESOLVE-06B / current symbol-feature alignment** — remains open at the",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:641",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 641,
+      "text": "**QDRANT-768-IDENTITY-RECONCILIATION** — corrected the identity audit to",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:727",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 727,
+      "text": "**GRAPH-RESOLVE-06B.3-PROMOTION-REVIEW** — blocked pending explicit review",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:747",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 747,
+      "text": "**GRAPH-RESOLVE-06B.3-MATERIALIZER-APPLY** — not authorized or proven.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:763",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 763,
+      "text": "**GRAPH-RESOLVE-06B.3-AUTHORIZED-APPLY** — still pending explicit review",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:776",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 776,
+      "text": "**GRAPH-RESOLVE-06B.3-APPLY** — remains gated by both the explicit",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:790",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 790,
+      "text": "**GRAPH-RESOLVE-06B.4-APPLY-READBACK** — pending the five-row registry",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:831",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 831,
+      "text": "**GRAPH-RESOLVE-06B.4-SYMBOL-VERSION-APPLY** — remains a separate bounded",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:862",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 862,
+      "text": "**GRAPH-RESOLVE-06B.3-SYMBOL-VERSION-APPLY** — not authorized in this",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-candidate-feature-execution-fabric:896",
+      "change": "parent-atlas-candidate-feature-execution-fabric",
+      "source": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "line": 896,
+      "text": "**LATENT-BRIDGE-01** — exact CandidateOrdinal to canonical chunk ID to",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:43:05.484Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-document-governance-master-index:29",
+      "change": "parent-atlas-document-governance-master-index",
+      "source": "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+      "line": 29,
+      "text": "4.1 Finish/reconcile `parent-atlas-agentic-run-receipt-binding` T1 against current `WorkflowActionEventV1`; reuse canonical workflow/action/sequence identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-30T22:10:04.591Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-compiler-semantic-graph-resolution:772",
+      "change": "parent-atlas-compiler-semantic-graph-resolution",
+      "source": "openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md",
+      "line": 772,
+      "text": "**GRAPH-RESOLVE-06B live target identity** — remains open and fail-closed. The bounded",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T23:02:50.646Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-graph-runtime-python-consolidation:80",
+      "change": "parent-atlas-graph-runtime-python-consolidation",
+      "source": "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+      "line": 80,
+      "text": "Create `python/atlas_graph_runtime/` with `identity.py` (promoted from",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T16:21:54.906Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:10",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 10,
+      "text": "**ACP-02** Map ACP session/task/action identifiers to existing `runId`, `taskId`, `ContextManifest` hash, and `ExecutionReceipt`; ACP must not own graph identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:21",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 21,
+      "text": "**STRUCT-05** Preserve Tree-sitter `ERROR`/`MISSING` syntax evidence in `syntaxStatus` (`CLEAN` or `RECOVERED_WITH_ERRORS`) separately from canonical identity validity. `ERROR` detection is live-proven; a dedicated `MISSING` fixture remains to be added.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:22",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 22,
+      "text": "**STRUCT-06** Evaluate `supermemoryai/code-chunk` only as a contextual chunking/reference implementation; its chunk IDs and memory graph cannot become Parent Atlas canonical identity or truth.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:23",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 23,
+      "text": "**STRUCT-07** Prove the bounded path `CST named nodes → structural evidence → GIS identity → Postgres packet → semantic_768 projection`; no direct chunker writes to Qdrant or Neo4j.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:25",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 25,
+      "text": "**CC-02** Benchmark contextual structural metadata against the current treesitter-chunker evidence on a fixed corpus; record symbol localization and repair-localization Recall@10/MRR without changing identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:27",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 27,
+      "text": "**CC-04** Feed code-chunk-style context into the existing SemanticCard compiler only after GIS identity assignment; contextualized text is representation input, never identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:31",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 31,
+      "text": "**HG-03** Preserve hyperedge participants, task/run IDs, revisions, selected packets, tests, and receipts without promoting event IDs to packet identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:37",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 37,
+      "text": "**TV-02** Map TurboVec stable external IDs/ordinals back to canonical Atlas identity; never promote TurboVec local IDs to packet identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:45",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 45,
+      "text": "**GDS-02** Run revision-qualified PageRank/community algorithms from the canonical Neo4j projection and emit derived feature records keyed by `symbol_version_id`/`workspace_revision`.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:47",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 47,
+      "text": "**GDS-04** Keep CPU Neo4j GDS and optional cuGraph comparisons on the same graph snapshot; record parity and runtime without promoting either implementation to identity ownership.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:49",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 49,
+      "text": "**LEX-01** Freeze one logical lexical lane: BM25 baseline first; BM42 is an alternative executor only after a sparse collection and sparse identity round trip exist.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-transport-memory-boundaries:50",
+      "change": "parent-atlas-transport-memory-boundaries",
+      "source": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "line": 50,
+      "text": "**TV-06B** Prove the ordinal map from TurboVec external IDs to `symbol_version_id`, `packet_key`, and `workspace_revision`; local numeric IDs never become canonical identity.",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-29T00:04:44.291Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    },
+    {
+      "taskKey": "parent-atlas-topology-representation-admission:44",
+      "change": "parent-atlas-topology-representation-admission",
+      "source": "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+      "line": 44,
+      "text": "TOPO-02A Replace the latent writer's fallback identity/update path with",
+      "state": "OPEN",
+      "kind": "WORK_ITEM",
+      "priority": 10,
+      "lastUpdatedAt": "2026-08-28T21:05:47.758Z",
+      "timestampMethod": "FILESYSTEM_MTIME",
+      "eta": {
+        "status": "UNKNOWN",
+        "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+      }
+    }
+  ],
+  "writes": {
+    "taskLedgers": 0,
+    "sourceDocuments": 0
+  }
+}
