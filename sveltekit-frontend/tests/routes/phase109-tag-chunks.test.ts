@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Unit tests for GET + POST /api/phase109/tag-chunks
  *

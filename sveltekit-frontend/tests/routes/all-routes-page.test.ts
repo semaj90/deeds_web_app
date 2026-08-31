@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 type InteractionType = 'view' | 'navigate' | 'analyze' | 'patch_apply';

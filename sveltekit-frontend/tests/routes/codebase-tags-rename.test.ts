@@ -1,3 +1,4 @@
+// @vitest-environment node
 /**
  * Unit tests for POST /api/codebase/tags/rename
  *
