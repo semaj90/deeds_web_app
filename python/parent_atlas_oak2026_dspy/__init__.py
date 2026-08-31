@@ -19,13 +19,18 @@ from .contracts import (
     validate_runtime_bounds_v1,
 )
 from .program import build_oak2026_kernel_program_v1, decode_oak2026_arguments_v1
-from .runtime import build_oak2026_gepa_optimizer_v1, require_dspy
+from .runtime import (
+    build_oak2026_gepa_feedback_metric_v1,
+    build_oak2026_gepa_optimizer_v1,
+    require_dspy,
+)
 
 __all__ = [
     "Oak2026ActionProposalV1",
     "Oak2026KernelBindingV1",
     "Oak2026ProgramBoundsV1",
     "Oak2026RuntimeCountersV1",
+    "build_oak2026_gepa_feedback_metric_v1",
     "build_oak2026_gepa_optimizer_v1",
     "build_oak2026_kernel_program_v1",
     "canonical_json_checksum_v1",
