@@ -2485,6 +2485,7 @@ export async function assembleACEContext(opts: {
         score: c.score,
         tags: [],
         sourceId: c.source,
+        ...(c.embedding ? { embedding: c.embedding } : {}),
       });
       // P5-B: Apply QLoRA quality boost to RAG chunks (proven high-quality chunks get +0.05)
       const allRag = ragChunks.map(toUnified);
@@ -4223,6 +4224,68 @@ export async function assembleACEContext(opts: {
         // Telemetry failure is non-fatal
       });
 
+      // PREFILL-CALLER-01 per-candidate wiring (ace-assembly branch).
+      // Disabled by default (ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED); when
+      // off this never builds a manifest, never embeds, never calls the
+      // decoder, never touches Redis -- finalContext is byte-for-byte
+      // unchanged. When on, this is the one path where fetchRAGChunks()'s
+      // re-attached per-chunk embeddings (RAGChunk.embedding) actually reach
+      // a compiled manifest -- the Parent Atlas preflight branch's manifest
+      // is built from codebaseContext (no embeddings available), so it stays
+      // query-only.
+      if (ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED) {
+        try {
+          const manifestRequestId = opts.traceId ?? crypto.randomUUID();
+          const manifestResult = attachContextManifestToACE(finalContext, {
+            request_id: manifestRequestId,
+            processPackets: deriveProcessPacketsFromACEContext(finalContext),
+            now: new Date(),
+          });
+          finalContext.contextManifest = manifestResult.contextManifest;
+
+          if (finalContext.contextManifest) {
+            const queryEmbeddingForShadow = await getQueryEmbedding(query);
+            const candidateEmbeddings = (finalContext.ragChunks ?? [])
+              .map((c) => c.embedding)
+              .filter((e): e is number[] => Array.isArray(e) && e.length === 768);
+
+            const { runNeuralDecoderPrefillShadowForManifest } = await import(
+              '../../../ace/neural-decoder-prefill-shadow.js'
+            );
+            finalContext.neuralDecoderPrefillShadow = await runNeuralDecoderPrefillShadowForManifest(
+              finalContext.contextManifest,
+              queryEmbeddingForShadow,
+              { requestId: manifestRequestId },
+              candidateEmbeddings,
+            );
+
+            // Truthful featurePresence upgrade: only when the decoder
+            // actually answered (HIT/MISS, not UNAVAILABLE/REJECTED/null),
+            // and only PROVEN when every packet selected into the manifest
+            // (across ALL lanes, not just ragChunks) had an embedding sent --
+            // otherwise PARTIAL, since coverage was only measured for the
+            // ragChunks dense lane. Never inferred when candidateEmbeddings
+            // is empty (nothing was actually measured).
+            const shadow = finalContext.neuralDecoderPrefillShadow;
+            const decoderAnswered = shadow?.cacheStatus === 'HIT' || shadow?.cacheStatus === 'MISS';
+            if (decoderAnswered && candidateEmbeddings.length > 0) {
+              const selectedCount = finalContext.contextManifest.selected_packet_keys?.length ?? 0;
+              const latent256State =
+                selectedCount > 0 && candidateEmbeddings.length >= selectedCount ? 'PROVEN' : 'PARTIAL';
+              finalContext.contextManifest.feature_presence = {
+                ...(finalContext.contextManifest.feature_presence ?? {}),
+                latent256: latent256State,
+              };
+            }
+          }
+        } catch (shadowErr) {
+          console.warn(
+            '[neural-decoder-prefill-shadow] ace-assembly wiring skipped:',
+            (shadowErr as Error)?.message ?? shadowErr
+          );
+        }
+      }
+
       return finalContext;
     }
   ); // end traceGraph ace-assembly
@@ -5324,6 +5387,14 @@ type RAGChunk = {
   source: string;
   filePath?: string;
   url?: string;
+  /**
+   * Transient per-chunk semantic_768 embedding, attached only when
+   * fetchRAGChunks()'s GPU-attention reranking pass computed one for this
+   * chunk's content. Not persisted, not canonical, and not guaranteed to be
+   * present -- consumers must treat absence as UNAVAILABLE, never infer a
+   * missing embedding as a zero vector or a retrieval failure.
+   */
+  embedding?: number[];
 };
 
 const KB_SOURCE_SCORE_WEIGHTS = {
@@ -5716,6 +5787,12 @@ async function fetchRAGChunks(
       return true;
     });
 
+  // Captures the transient per-chunk embeddings computed below for GPU
+  // attention reranking, keyed by exact content, so they survive the later
+  // rerank passes that otherwise remap ragChunks to a narrower {content,
+  // score, source} shape and would silently drop them.
+  const chunkContentEmbeddingMap = new Map<string, number[]>();
+
   let ragChunks = dedup([...kbChunks, ...caseChunks, ...aceChunks, ...researchChunks])
     .sort((a, b) => b.score - a.score)
     .slice(0, 15);
@@ -5780,6 +5857,15 @@ async function fetchRAGChunks(
       );
       const hasEmbeds = chunkEmbeds.some((e) => e.length > 0);
       if (hasEmbeds) {
+        // Capture content->embedding before any later rerank pass remaps
+        // ragChunks to a narrower shape. Indexed against this same
+        // `ragChunks` reference, so it's still aligned with `chunkEmbeds`.
+        for (let i = 0; i < ragChunks.length; i++) {
+          const vec = chunkEmbeds[i];
+          if (vec && vec.length === 768) {
+            chunkContentEmbeddingMap.set(ragChunks[i].content, vec);
+          }
+        }
         // H5: use FP16 path when corpus is large enough to benefit (>256 chunks)
         const attnScores = chunkEmbeds.length > 256
           ? await attentionScoreChunks_fp16(embedding, chunkEmbeds)
@@ -5894,6 +5980,18 @@ async function fetchRAGChunks(
     redis.setex(topkKey, 600, JSON.stringify(topkPayload)).catch(() => {});
   } catch {
     /* non-fatal — ACE cache lane will miss on this query, Qdrant is the fallback */
+  }
+
+  // Re-attach transient embeddings dropped by intermediate rerank passes.
+  // Best-effort by exact content match -- a chunk whose content changed (or
+  // was never embedded, e.g. only 1 chunk so the attention pass was skipped)
+  // simply has no `embedding`, which downstream consumers must treat as
+  // UNAVAILABLE, not as a zero vector.
+  if (chunkContentEmbeddingMap.size > 0) {
+    ragChunks = ragChunks.map((c) => {
+      const embedding = chunkContentEmbeddingMap.get(c.content);
+      return embedding ? { ...c, embedding } : c;
+    });
   }
 
   return { ragChunks, kbChunks, caseChunks };

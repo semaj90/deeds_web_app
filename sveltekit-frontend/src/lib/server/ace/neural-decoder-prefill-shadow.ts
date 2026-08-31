@@ -6,20 +6,27 @@ import { runNeuralDecoderPrefillCallerV1, type NeuralDecoderPrefillCallerReceipt
 import type { ContextManifest } from './context-compiler.parent-atlas.js';
 
 /**
- * PREFILL-CALLER-01 (query-only first wire): the single live seam that
- * attaches a decoder shadow receipt to a compiled ContextManifest.
+ * PREFILL-CALLER-01: the single live seam that attaches a decoder shadow
+ * receipt to a compiled ContextManifest.
  *
- * Scope, deliberately narrow for this first live wiring: the decoder runs
- * on the QUERY embedding only, not per-candidate embeddings -- ACEContext
- * does not carry per-candidate `semantic_768` vectors through to
- * manifest-build time yet (fetchRAGChunks() computes them transiently for
- * reranking and discards them). Per-candidate wiring is a separate, larger
- * change (thread embeddings through fetchRAGChunks' return shape) tracked
- * as its own follow-up in
- * openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md -- do not
- * infer per-candidate latent coverage from this receipt. It proves the real
- * end-to-end plumbing (identity -> decoder -> cache -> receipt) on live
- * traffic; it does not prove candidate-level latent_256 hydration.
+ * Originally query-only (the decoder ran on the query embedding alone,
+ * because ACEContext did not carry per-candidate `semantic_768` vectors
+ * through to manifest-build time -- fetchRAGChunks() computed them
+ * transiently for reranking and discarded them). `fetchRAGChunks()` now
+ * re-attaches those transient embeddings to `RAGChunk.embedding` (see
+ * context-assembler.ts's `chunkContentEmbeddingMap`), so a caller with a
+ * real per-candidate embedding set can pass it via `candidateEmbeddings`.
+ *
+ * `candidateEmbeddings` is OPTIONAL and additive -- omitting it preserves
+ * the original query-only behavior exactly (still the only mode the one
+ * caller with no embedded candidates, the Parent Atlas preflight branch,
+ * can honestly use). Passing it does NOT by itself upgrade any
+ * `feature_presence.latent256` value on the manifest -- the caller must
+ * still explicitly derive and set that from the actual `candidateEmbeddings`
+ * count it sent versus `manifest.selected_packet_keys.length`, and only
+ * after confirming `cacheStatus` is `HIT`/`MISS` (the decoder actually
+ * answered). This function does not do that upgrade itself, to keep a
+ * single, auditable place where "coverage" claims are computed.
  *
  * Fails open unconditionally: any error here is swallowed and returns null.
  * This function must never be able to break ACE context assembly.
@@ -58,13 +65,32 @@ export type NeuralDecoderPrefillShadowOptions = {
   decoder?: NeuralDecoderClientOptions;
 };
 
+/** Batch cap enforced by encodeNeuralLatents(); reserve slot 0 for the query embedding. */
+export const MAX_CANDIDATE_EMBEDDINGS = 31;
+
+/**
+ * Pure filter/truncate step, extracted so the batching rule (drop anything
+ * not exactly 768-dim, cap at MAX_CANDIDATE_EMBEDDINGS) is unit-testable
+ * without touching the decoder, Redis, or the ENV flag gate.
+ */
+export function selectValidCandidateEmbeddings(
+  candidateEmbeddings: ReadonlyArray<readonly number[]> | null | undefined,
+): number[][] {
+  return (candidateEmbeddings ?? [])
+    .filter((v): v is number[] => Array.isArray(v) && v.length === 768)
+    .slice(0, MAX_CANDIDATE_EMBEDDINGS);
+}
+
 export async function runNeuralDecoderPrefillShadowForManifest(
   manifest: ContextManifest,
   queryEmbedding: readonly number[] | null | undefined,
   opts: NeuralDecoderPrefillShadowOptions,
+  candidateEmbeddings?: ReadonlyArray<readonly number[]> | null,
 ): Promise<NeuralDecoderPrefillCallerReceiptV1 | null> {
   if (!ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED) return null;
   if (!queryEmbedding || queryEmbedding.length !== 768) return null;
+
+  const validCandidates = selectValidCandidateEmbeddings(candidateEmbeddings);
 
   try {
     const basePrefillIdentityChecksum = deriveBasePrefillIdentityChecksumFromManifest(manifest);
@@ -73,9 +99,13 @@ export async function runNeuralDecoderPrefillShadowForManifest(
     return await runNeuralDecoderPrefillCallerV1({
       requestId: opts.requestId,
       mode: 'SHADOW_READONLY',
-      semantic768: [queryEmbedding],
+      semantic768: [queryEmbedding, ...validCandidates],
       basePrefillIdentityChecksum,
-      decoderContractRevision: opts.decoderContractRevision ?? 'neural-decoder-prefill-shadow.query-only.v1',
+      decoderContractRevision:
+        opts.decoderContractRevision ??
+        (validCandidates.length > 0
+          ? 'neural-decoder-prefill-shadow.query-and-candidates.v1'
+          : 'neural-decoder-prefill-shadow.query-only.v1'),
       decoderPolicyRevision: opts.decoderPolicyRevision ?? 'neural-decoder-prefill-shadow.default-policy.v1',
       cache: redisNeuralDecoderFeatureCache,
       decoder: opts.decoder,

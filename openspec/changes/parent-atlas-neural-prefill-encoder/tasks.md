@@ -13764,3 +13764,81 @@ coverage or authorize semantic writes.
   corpus still contains unresolved namespace/hash and duplicate projection
   evidence. Do not materialize or backfill until an exact revision-qualified
   CandidateOrdinal map is produced.
+
+### PREFILL-CALLER-01 per-candidate wiring (item 5, 2026-08-31, same day)
+
+**Scope correction found before implementing**: item 5 above says to thread
+`fetchRAGChunks()`'s per-chunk embeddings through to
+`buildContextManifestFromACE()`'s call site. Tracing the actual code found
+this doesn't map cleanly onto reality: the *one* production call site for
+`attachContextManifestToACE()` (the "Parent Atlas mode preflight" branch,
+`context-assembler.ts` ~line 1793) builds its manifest candidates from
+`codebaseContext` (sourced from `routeQuery()`'s cached `ranked_cards`), not
+from `fetchRAGChunks()`'s `ragChunks` -- `ragChunks: []` is hardcoded in that
+exact branch. `fetchRAGChunks()` runs in the *other* branch
+(`traceGraph('ace-assembly', ...)`), which never built a manifest at all.
+Operator-confirmed direction: widen scope so that branch builds a manifest
+too, rather than force-fitting embeddings onto the wrong candidate source.
+
+- [x] `RAGChunk` (context-assembler.ts) and the canonical
+  `UnifiedRetrievalResult` (`$lib/server/types/retrieval.ts`, shared by
+  `authority-chain.ts`/`cross-encoder-reranker.ts`/`graph-informed-retrieval.ts`)
+  both gained an optional `embedding?: number[]` field, documented as
+  transient/unpersisted/not-a-canonical-storage-claim on both types.
+- [x] `fetchRAGChunks()` now captures the per-chunk embeddings it already
+  computes for GPU-attention reranking into a `chunkContentEmbeddingMap`
+  (content -> embedding) at the point they're computed, then re-attaches them
+  to the final `ragChunks` right before returning -- the later rerank passes
+  (cluster-coherence boost, experimental CUDA ranker) remap chunks to a
+  narrower `{content, score, source}` shape and would otherwise silently drop
+  the embedding. `toUnified()` now carries `embedding` through into
+  `UnifiedRetrievalResult` when present.
+- [x] `runNeuralDecoderPrefillShadowForManifest()` gained an optional 4th
+  param, `candidateEmbeddings`, purely additive -- the existing 3-arg call
+  site (Parent Atlas preflight, still query-only, `codebaseContext` still has
+  no embeddings to give it) is untouched. A new pure helper,
+  `selectValidCandidateEmbeddings()`, filters to exactly-768-dim vectors and
+  truncates to `MAX_CANDIDATE_EMBEDDINGS = 31` (reserves batch slot 0 for the
+  query embedding, decoder batch cap is 32) -- extracted specifically so this
+  rule is unit-testable without touching the decoder, Redis, or the ENV flag.
+- [x] Wired into the `ace-assembly` branch, right before `return
+  finalContext`, behind the same `ENV.NEURAL_DECODER_PREFILL_SHADOW_ENABLED`
+  flag (still defaults `false`; when off, byte-for-byte unchanged -- no
+  manifest, no embed call, no decoder call, no Redis touch). When on: builds
+  a manifest from `finalContext` (previously never built here), collects
+  `finalContext.ragChunks[].embedding` into `candidateEmbeddings`, runs the
+  shadow call with the query + candidate batch, and -- only when
+  `cacheStatus` is `HIT`/`MISS` (decoder actually answered) and
+  `candidateEmbeddings.length > 0` -- upgrades
+  `manifest.feature_presence.latent256` to `PROVEN` (candidate count covers
+  every packet in `manifest.selected_packet_keys`, across ALL lanes, not just
+  ragChunks) or `PARTIAL` (partial coverage). Never upgraded when nothing was
+  actually measured, matching this module's own "do not misrepresent
+  candidate-level coverage" rule.
+- [x] `tsc --noEmit -p tsconfig.json --skipLibCheck`: 79 repo-wide errors,
+  zero in any touched file (`context-assembler.ts`, `retrieval.ts`,
+  `neural-decoder-prefill-shadow.ts`, `neural-decoder-prefill-shadow.spec.ts`)
+  -- confirmed by grepping the full error list against the touched paths, not
+  assumed. The 79 is a higher count than this doc's earlier same-day "20
+  errors" baseline; spot-checked that all 79 are pre-existing drift in
+  unrelated files (test fixtures, `image-search.ts`, `ast-sidecar.ts`, ~30
+  files total), not caused by this change.
+- [x] 13/13 focused tests pass in `neural-decoder-prefill-shadow.spec.ts` (8
+  pre-existing + 5 new: `selectValidCandidateEmbeddings` passthrough / wrong-
+  dimensionality filtering / truncation to the cap / null-input fallback, plus
+  a fail-closed check that supplying `candidateEmbeddings` does not bypass the
+  ENV flag gate). The 6+6 adjoining `neural-decoder-client.spec.ts` /
+  `neural-decoder-prefill-caller-v1.spec.ts` tests are unaffected (unchanged
+  files).
+
+**Still open, honestly**: this is unit-tested against synthetic vectors and
+mocked fail-closed paths only -- it has NOT been run live against a real
+decoder + real Valkey + real `ragChunks` embeddings end-to-end (the
+`PREFILL-VALKEY-01`/`PREFILL-REPLAY-01` live proof above used the query-only
+path, not this one). The flag remains off everywhere. The Parent Atlas
+preflight branch is unchanged and intentionally still query-only --
+`codebaseContext` has no embedding source, so per-candidate wiring there
+would require a separate, different change (embedding `routeQuery()`'s
+`ranked_cards` content), not attempted here. `DECODER-CONTAINER-01` and
+`PREFILL-QUALITY-01`/`PREFILL-PROMOTION-01` remain exactly as open as before
+this pass.

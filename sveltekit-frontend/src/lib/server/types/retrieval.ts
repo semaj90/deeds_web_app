@@ -109,6 +109,14 @@ export interface UnifiedRetrievalResult {
   content: string;
   /** LLM-generated summary (optional; populated in ACE stage) */
   summary?: string;
+  /**
+   * Transient per-candidate semantic_768 embedding, when a retrieval lane
+   * happened to compute one (e.g. ACE's GPU-attention reranking pass) and
+   * chose to carry it forward. Not persisted, not guaranteed present, and
+   * NOT a claim of canonical embedding storage -- consumers must treat
+   * absence as unmeasured, never as a zero vector or a retrieval failure.
+   */
+  embedding?: number[];
 
   // ── Identity (upstream) ───────────────────────────────────────────────────
   /** Original document / file identifier before chunking */

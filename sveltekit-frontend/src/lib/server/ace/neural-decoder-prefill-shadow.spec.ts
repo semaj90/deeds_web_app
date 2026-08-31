@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   deriveBasePrefillIdentityChecksumFromManifest,
   runNeuralDecoderPrefillShadowForManifest,
+  selectValidCandidateEmbeddings,
+  MAX_CANDIDATE_EMBEDDINGS,
 } from './neural-decoder-prefill-shadow.js';
 import type { ContextManifest } from './context-compiler.parent-atlas.js';
 
@@ -79,5 +81,45 @@ describe('PREFILL-CALLER-01: runNeuralDecoderPrefillShadowForManifest fails clos
       { requestId: 'req-shadow-3' },
     );
     expect(receipt).toBeNull();
+  });
+
+  it('returns null when the flag is off even with per-candidate embeddings supplied (per-candidate wiring)', async () => {
+    const candidateEmbeddings = [Array.from({ length: 768 }, () => 0.02)];
+    const receipt = await runNeuralDecoderPrefillShadowForManifest(
+      manifestWithIdentity(),
+      Array.from({ length: 768 }, () => 0.01),
+      { requestId: 'req-shadow-4' },
+      candidateEmbeddings,
+    );
+    expect(receipt).toBeNull();
+  });
+});
+
+describe('PREFILL-CALLER-01 per-candidate wiring: selectValidCandidateEmbeddings', () => {
+  it('passes through valid 768-dim candidates unchanged', () => {
+    const candidates = [
+      Array.from({ length: 768 }, () => 0.1),
+      Array.from({ length: 768 }, () => 0.2),
+    ];
+    expect(selectValidCandidateEmbeddings(candidates)).toEqual(candidates);
+  });
+
+  it('drops candidates with the wrong dimensionality rather than throwing', () => {
+    const valid = Array.from({ length: 768 }, () => 0.1);
+    const wrongDim = Array.from({ length: 256 }, () => 0.1);
+    expect(selectValidCandidateEmbeddings([valid, wrongDim, valid])).toEqual([valid, valid]);
+  });
+
+  it('truncates to MAX_CANDIDATE_EMBEDDINGS, never exceeding the decoder batch cap', () => {
+    const oversized = Array.from({ length: MAX_CANDIDATE_EMBEDDINGS + 10 }, () =>
+      Array.from({ length: 768 }, () => 0.1),
+    );
+    const selected = selectValidCandidateEmbeddings(oversized);
+    expect(selected.length).toBe(MAX_CANDIDATE_EMBEDDINGS);
+  });
+
+  it('returns an empty array for null/undefined input (query-only fallback)', () => {
+    expect(selectValidCandidateEmbeddings(null)).toEqual([]);
+    expect(selectValidCandidateEmbeddings(undefined)).toEqual([]);
   });
 });
