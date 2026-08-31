@@ -14,6 +14,7 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 		expect(result.skippedReason).toMatch(/ATLAS_RAPIDS_GRAPH_SIDECAR_UNREACHABLE/);
 		expect(result.run.status).toBe('succeeded');
 		expect(result.run.backendActual).toBe('gpu-sidecar');
+		expect(result.run.parameters).toMatchObject({ selectionMode: 'TOP_K_SHADOW', canonicalMetricEligible: false });
 		vi.unstubAllGlobals();
 	});
 
@@ -29,7 +30,7 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 		vi.unstubAllGlobals();
 	});
 
-	it('writes graph_analysis_runs + graph_node_metrics transactionally when resident', async () => {
+	it('writes only pagerank_cugraph_shadow rows for bounded top-K results', async () => {
 		const fetchMock = vi.fn(async (url: string) => {
 			if (url.endsWith('/v1/graph/resident')) {
 				return new Response(JSON.stringify({
@@ -84,7 +85,15 @@ describe('cuGraph PageRank adapter (GPU backend, fail-closed)', () => {
 		expect(result.unresolvedPacketKeys).toBe(1);
 		expect(result.run.backendActual).toBe('gpu-sidecar');
 		expect(result.run.gpuAccelerated).toBe(true);
+		expect(result.run.parameters).toMatchObject({
+			selectionMode: 'TOP_K_SHADOW',
+			canonicalMetricEligible: false,
+			metricName: 'pagerank_cugraph_shadow',
+		});
 		expect(queries.map((q) => q.sql.trim().slice(0, 6))).toEqual(['BEGIN', 'INSERT', 'INSERT', 'COMMIT']);
+		const metricInsert = queries.find((q) => q.sql.includes('graph_node_metrics'));
+		expect(metricInsert?.params).toContain('pagerank_cugraph_shadow');
+		expect(metricInsert?.params).not.toContain('pagerank');
 		vi.unstubAllGlobals();
 	});
 });
