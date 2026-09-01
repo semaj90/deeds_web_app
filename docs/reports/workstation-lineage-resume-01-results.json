@@ -422,5 +422,43 @@
     "PACKET-CHUNK-LINEAGE-PROMOTION-01 -- enable the writer for future packets only after the 3-shape canary passes.",
     "BRIDGE-RECON-DRY-03 -- operate PER MEMBERSHIP (packet+chunk pair), not per packet alone. Historical rows without proven membership remain UNRESOLVED_WITH_CURRENT_EVIDENCE and excluded.",
     "RECON-CANARY-01 -- unchanged, still blocked, zero writes, until BRIDGE-RECON-DRY-03 admits a zero-ambiguity membership cohort."
-  ]
+  ],
+  "handoff_2026-09-01": {
+    "purpose": "Session boundary handoff. Everything below is committed and pushed to origin/main -- a fresh session can resume purely from git + this ledger, no conversation context required.",
+    "commitsThisProgram": [
+      "c3b8763383 -- Freeze PacketChunkMembershipV1 contract (checkpoint, zero DB writes)",
+      "b41c75e837 -- MIGRATION-01: atlas_packet_chunk_lineage proved disposable-first, uniqueness key fixed to (packet_key, canonical_chunk_id) before any live write",
+      "d39878022b -- CANARY-01: future-capture writer proof (SINGLE/FEW/MANY real writes + ORPHAN fail-closed refusal)",
+      "19e9fdd24f -- BACKFILL-DRY-01 v2: full 61,660-packet classification, row-level, 3x-reproducible checksums",
+      "48ce684cd5 -- BACKFILL-CANARY-01: 4 historical packets promoted (SINGLE/FEW/MANY/CANARY_OVERLAP), 2 real bugs found+fixed (chunk_ordinal nullability, replay-check baseline), replay-proven"
+    ],
+    "statusBlock": {
+      "WRITER-01": "PASS", "CONTRACT-01A": "PASS", "SOURCE-REVISION-OWNER-01": "PASS",
+      "BACKFILL-SCOPE-01": "PASS", "CONTRACT-01": "FROZEN (8/8, then 9/9 after chunkOrdinal.nullable() addition)",
+      "MIGRATION-01": "PASS (live table exists, uniqueness corrected pre-write)",
+      "CANARY-01": "PASS (future-capture writer proven)",
+      "BACKFILL-DRY-01": "PASS (61,660 classified, 577 admitted, 6,987 proposed, 3x-stable checksums)",
+      "BACKFILL-CANARY-01": "PASS (4 historical packets promoted, replay-proven)",
+      "PROMOTION-01": "NOT STARTED -- separate authorization needed",
+      "BACKFILL-PROMOTION-01": "NOT STARTED -- separate authorization needed",
+      "BRIDGE-RECON-DRY-03": "BLOCKED on the above two",
+      "RECON-CANARY-01": "BLOCKED, zero writes"
+    },
+    "liveDbStateAsOf_2026-09-01": {
+      "atlas_packet_chunk_lineage": "6 packets, 89 total membership rows (5 real: packet:00848415f727=1, packet:8589ed47d789=1, ace:packet:7802b2572378=2, packet:ce6dfc5484ac=5, ace:packet:0051e908c9be=30, packet:5c4e29307ca5=50). This is CANARY output only -- 4 from BACKFILL-CANARY-01, 3 from CANARY-01, with packet:ce6dfc5484ac shared/deduplicated between both (the overlap proof).",
+      "atlas_packets": "61,660 rows, unchanged by this program (no packet creation/mutation performed by any gate above)."
+    },
+    "twoRemainingAuthorizationsExplained": {
+      "PACKET-CHUNK-LINEAGE-PROMOTION-01": "Wire the corrected membership-writing logic (proven in CANARY-01) into the ACTUAL register-orphaned-chunks.mjs production path, so future packet creation captures real lineage going forward. Makes future-capture the canonical owner -- the historical gap stops growing. Does NOT touch the 577-packet historical cohort.",
+      "PACKET-CHUNK-LINEAGE-BACKFILL-PROMOTION-01": "Separately authorize applying the full 6,987-row admitted cohort from BACKFILL-DRY-01 (all 577 packets, not just the 4 canaried) to atlas_packet_chunk_lineage. Should reuse the same atomic-per-packet-set write pattern proven in BACKFILL-CANARY-01, and should re-verify BACKFILL-DRY-01's 3 checksums are still stable (re-run it fresh) before trusting the artifact, since the underlying tables could have changed since 2026-09-01.",
+      "whyKeptSeparate": "Explicit operator instruction across this whole program: future-lineage-capture and historical-reconstruction are different risk profiles and should not be authorized as one bundled action."
+    },
+    "openNonBlockingNotes": [
+      "canonical-id-hierarchy.ts's generateIDHierarchy() is dead code (zero live callers) that fabricates chunk_id/repository_id via randomUUID() -- flagged as a landmine, not deleted, not fenced with a lint rule yet.",
+      "CANARY-01's 3 original rows carry sort-derived (non-null) chunkOrdinal values assigned before the null-ordinal rule was established in BACKFILL-DRY-01. Not retroactively nulled -- valid under the now-nullable column, just inconsistent in origin. Low priority.",
+      "The 6 historically-unexplained atlas_packets.chunk_id values (populated but resolving to nothing, found early in this investigation) remain classified ORIGIN_UNPROVEN, never individually traced to a specific writer.",
+      "docs/reports/packet-chunk-lineage-backfill-dry-01-results.json is 17.2MB, committed as compact JSON. Per operator note: acceptable for this proof, but don't establish committing full row-level receipts every run as the permanent pattern -- future promotion passes should prefer compact manifests (checksums/counts/producer revision/artifact location) with large replay artifacts stored separately."
+    ],
+    "immediateNextActionWhenResumed": "Ask the operator explicitly which of PROMOTION-01 or BACKFILL-PROMOTION-01 to authorize first (or both, sequentially) -- do not infer authorization from prior turns. Do not run graphify:daily or refresh any unrelated graph state as part of this lineage program."
+  }
 }
