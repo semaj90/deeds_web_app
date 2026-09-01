@@ -16,6 +16,7 @@ import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { makePacketUlid } from '$lib/server/identity/ulid.js';
 import { buildCanonicalAcePacketEnvelope } from '$lib/server/ace/canonical-packet-envelope.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { buildHyperRagAceMetadataPatch } from '@deeds/parent-atlas/core/hyperrag-live-integration';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -221,6 +222,26 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
           },
         );
 
+        let aceHypergraphMetadata: Record<string, unknown> = {};
+        if (packet.aceHypergraph) {
+          if (!packet.packetRevision || !packet.producerRevision) {
+            throw new Error('HYPERRAG_ACE_HYPERGRAPH_REVISIONS_REQUIRED');
+          }
+          const patch = buildHyperRagAceMetadataPatch({
+            canonical_envelope: {
+              packet_key: canonicalEnvelope.packet_key,
+              source_ref: canonicalEnvelope.source_ref,
+              canonical_source_ref: canonicalEnvelope.canonical_source_ref,
+              feature_id: canonicalEnvelope.feature_id,
+              source_revision: packet.sourceRevision ?? null,
+            },
+            hypergraph: packet.aceHypergraph,
+            packet_revision: packet.packetRevision,
+            producer_revision: packet.producerRevision,
+          });
+          aceHypergraphMetadata = patch;
+        }
+
         const metadata = {
           chunkCount: packet.chunkCount,
           tokenEstimate: packet.tokenEstimate,
@@ -228,6 +249,7 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
           source: 'hyperrag-pipeline',
           traceId: packet.traceId,
           canonical_envelope: canonicalEnvelope,
+          ...aceHypergraphMetadata,
         };
 
         await (this.db as any)

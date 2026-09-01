@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `b76d0e29bf7787db7252f49c7e8d042ebf04a65ab15047af92a43fe123aad04c`
+Registry checksum: `2606cb6209b56388f4e1ea8e4f0b9aa9599f33453cad962a52ae51e10ea22dc9`
 
 ## Project instructions
 
@@ -30,7 +30,7 @@ Registry checksum: `b76d0e29bf7787db7252f49c7e8d042ebf04a65ab15047af92a43fe123aa
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 10/21 tasks (48%)
 - [docker-compose-duplication-remediation](openspec/changes/docker-compose-duplication-remediation) — 9/9 tasks (100%)
 - [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation) — 2/3 tasks (67%)
-- [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22) — 46/49 tasks (94%)
+- [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22) — 48/49 tasks (98%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 25/56 tasks (45%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 2/9 tasks (22%)
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 65/67 tasks (97%)
@@ -69,15 +69,15 @@ Registry checksum: `b76d0e29bf7787db7252f49c7e8d042ebf04a65ab15047af92a43fe123aa
 - [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 29/34 tasks (85%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
 - [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric) — 6/43 tasks (14%)
-- [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 22/40 tasks (55%)
+- [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 25/40 tasks (63%)
 - [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier) — 41/98 tasks (42%)
 - [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix) — 34/41 tasks (83%)
-- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 32/48 tasks (67%)
-- [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 42/94 tasks (45%)
+- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 35/49 tasks (71%)
+- [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 44/95 tasks (46%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
 - [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 0/0 tasks (n/a)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 0/31 tasks (0%)
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 18/49 tasks (37%)
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 21/49 tasks (43%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 3/18 tasks (17%)
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 5/64 tasks (8%)
 - [parent-atlas-unified-symbol-ranking](openspec/changes/parent-atlas-unified-symbol-ranking) — 17/17 tasks (100%)

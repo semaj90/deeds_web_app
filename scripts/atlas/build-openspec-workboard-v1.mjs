@@ -101,6 +101,30 @@ const changes = [...new Set(tasks.map((task) => task.change))].sort().map((chang
   const done = rows.filter((task) => task.state === 'DONE').length;
   return { change, completed: done, total: rows.length, progressFraction: rows.length ? done / rows.length : null, progressBar: progressBar(rows.length ? done / rows.length : null), open: rows.length - done };
 });
+const executionSteps = [
+  { id: 'STEP-01', title: 'Identity and source authority', priorities: [10], dependsOn: [], gate: 'Exact identity, source, symbol, and revision ownership' },
+  { id: 'STEP-02', title: 'Eligibility and provenance', priorities: [20], dependsOn: ['STEP-01'], gate: 'Canonical eligibility, readback, and lineage proofs' },
+  { id: 'STEP-03', title: 'Runtime and retrieval', priorities: [30], dependsOn: ['STEP-02'], gate: 'Embedding, Qdrant, Go Retrieval, and fusion execution' },
+  { id: 'STEP-04', title: 'Feature and structural context', priorities: [40], dependsOn: ['STEP-03'], gate: 'AST/CST, LSP, ontology, feature fabric, and ContextManifest' },
+  { id: 'STEP-05', title: 'Workflow and receipts', priorities: [50], dependsOn: ['STEP-04'], gate: 'Agent execution, NATS/JetStream, validation, and receipts' },
+  { id: 'STEP-06', title: 'Governance and operations', priorities: [60], dependsOn: ['STEP-05'], gate: 'Admin, Kanban, documents, supersession, and archive' },
+  { id: 'STEP-07', title: 'Unclassified supporting work', priorities: [70], dependsOn: ['STEP-01'], gate: 'Review and attach each task to an upstream gate' },
+  { id: 'STEP-08', title: 'Benchmarks and challengers', priorities: [80], dependsOn: ['STEP-03', 'STEP-04'], gate: 'Evaluation, GPU challengers, topology, and Ewin Tang' },
+].map((step) => {
+  const rows = tasks.filter((task) => step.priorities.includes(task.priority));
+  const done = rows.filter((task) => task.state === 'DONE').length;
+  const openRows = rows.filter((task) => task.state !== 'DONE');
+  return {
+    ...step,
+    total: rows.length,
+    completed: done,
+    open: rows.length - done,
+    progressFraction: rows.length ? done / rows.length : null,
+    progressBar: progressBar(rows.length ? done / rows.length : null),
+    taskKeys: rows.map((task) => task.taskKey),
+    nextOpenTasks: openRows.slice(0, 5).map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, lane: task.lane, text: task.text })),
+  };
+});
 const buildIndex = (field) => Object.fromEntries(
   [...new Set(tasks.map((task) => task[field]).filter(Boolean))].sort().map((value) => [
     value,
@@ -251,6 +275,8 @@ const result = {
     coverage: {
       sourceRefDeclared: tasks.filter((task) => task.declaredSourceRef).length,
       sourceRevisionDeclared: tasks.filter((task) => task.declaredSourceRevision).length,
+      taskLedgerSourcePointer: tasks.filter((task) => task.source && Number.isInteger(task.line)).length,
+      metadataUnclassified: tasks.filter((task) => !task.declaredSourceRef && !task.declaredSourceRevision).length,
       totalTasks: tasks.length,
     },
   },
@@ -261,6 +287,7 @@ const result = {
   consolidationInput,
   consolidationCandidates,
   workPackages,
+  executionSteps,
   invariants,
   changes,
   nextTasks: byPriority.slice(0, 100),
@@ -274,6 +301,14 @@ const markdown = [
   'ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.', '',
   '## P10 dependency work packages', '',
   ...workPackages.map((item) => `- **${item.id}** ${item.title} — ${item.state}; depends on ${item.dependsOn.join(', ') || 'none'}; gates: ${item.gates.join(', ')}`), '',
+  '## Dependency-ordered execution steps', '',
+  ...executionSteps.map((item) => `- **${item.id}** ${item.progressBar} ${item.completed}/${item.total} complete; ${item.open} open — ${item.title}; depends on ${item.dependsOn.join(', ') || 'none'}; gate: ${item.gate}`), '',
+  '### Next bounded tasks by step', '',
+  ...executionSteps.flatMap((item) => [
+    `**${item.id}**`,
+    ...item.nextOpenTasks.map((task) => `- ${task.taskKey} — ${task.lane}; ${task.text} (${task.source}:${task.line})`),
+    '',
+  ]),
   '## Permanent acceptance invariants', '',
   ...invariants.map((item) => `- **INVARIANT** [${item.change}](${item.source}#L${item.line}) ${item.text} — last updated ${item.lastUpdatedAt} (${item.timestampMethod}); ETA N/A`), '',
   '## Highest-priority open tasks', '',
@@ -281,7 +316,9 @@ const markdown = [
   '## Task indexing coverage', '',
   `- Declared source_ref: ${result.indexing.coverage.sourceRefDeclared}/${tasks.length}`,
   `- Declared source_revision: ${result.indexing.coverage.sourceRevisionDeclared}/${tasks.length}`,
-  `- Unclassified task rows remain linked to their OpenSpec file and line; no source identity was inferred.`, '',
+  `- Task ledger source pointer: ${result.indexing.coverage.taskLedgerSourcePointer}/${tasks.length} (OpenSpec file + line)`,
+  `- Metadata-unclassified rows: ${result.indexing.coverage.metadataUnclassified}/${tasks.length}; no source identity was inferred.`,
+  `- Declared source fields are optional task metadata, not a measure of repository evidence coverage.`, '',
   '## Execution lanes', '',
   ...Object.entries(laneSummary).map(([lane, stats]) => `- **${lane}** ${stats.open} open / ${stats.total} total`), '',
   '## Lane dependencies', '',

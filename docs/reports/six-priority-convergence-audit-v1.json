@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.six-priority-convergence-audit.v1",
+  "generatedAt": "2026-09-01T03:55:37.579Z",
+  "mode": "READ_ONLY_TASK_LEDGER_CENSUS",
+  "dependencyOrder": [
+    "A:parent-atlas-retrieval-lod-algorithm-taxonomy",
+    "B:parent-atlas-retrieval-fusion-reachability",
+    "C:parent-atlas-semantic-768-canonical-contract",
+    "D:parent-atlas-semantic-512-canonicalization",
+    "E:parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+    "F:parent-atlas-tensor-residency-integration"
+  ],
+  "rows": [
+    {
+      "order": "A",
+      "change": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "status": "ACTIVE_EVALUATION_FIRST",
+      "nextGate": "Freeze qrels and regression baseline before new executors.",
+      "taskPath": "openspec\\changes\\parent-atlas-retrieval-lod-algorithm-taxonomy\\tasks.md",
+      "completed": 44,
+      "open": 51,
+      "total": 95
+    },
+    {
+      "order": "B",
+      "change": "parent-atlas-retrieval-fusion-reachability",
+      "status": "ACTIVE_OWNER_CONVERGENCE",
+      "nextGate": "Finish RF5/RF6 and preserve one vote per logical lane.",
+      "taskPath": "openspec\\changes\\parent-atlas-retrieval-fusion-reachability\\tasks.md",
+      "completed": 34,
+      "open": 14,
+      "total": 48
+    },
+    {
+      "order": "C",
+      "change": "parent-atlas-semantic-768-canonical-contract",
+      "status": "ACTIVE_RECONCILIATION",
+      "nextGate": "Reconcile Qdrant projection identity; semantic_768 remains canonical.",
+      "taskPath": "openspec\\changes\\parent-atlas-semantic-768-canonical-contract\\tasks.md",
+      "completed": 0,
+      "open": 0,
+      "total": 0
+    },
+    {
+      "order": "D",
+      "change": "parent-atlas-semantic-512-canonicalization",
+      "status": "HISTORICAL_SUPERSEDED",
+      "nextGate": "No implementation; semantic_768 supersedes the older 512 policy.",
+      "taskPath": "openspec\\changes\\parent-atlas-semantic-512-canonicalization\\tasks.md",
+      "completed": 23,
+      "open": 8,
+      "total": 31
+    },
+    {
+      "order": "E",
+      "change": "parent-atlas-telemetry-lowrank-recommendation-okf-integration",
+      "status": "STALE_LEDGER_RECONCILIATION",
+      "nextGate": "Verify wired claims; keep HLL writer and promotion gates open.",
+      "taskPath": "openspec\\changes\\parent-atlas-telemetry-lowrank-recommendation-okf-integration\\tasks.md",
+      "completed": 0,
+      "open": 31,
+      "total": 31
+    },
+    {
+      "order": "F",
+      "change": "parent-atlas-tensor-residency-integration",
+      "status": "ACTIVE_SELECTIVE",
+      "nextGate": "Proceed with artifact/residency contracts; execution_utility remains unproven.",
+      "taskPath": "openspec\\changes\\parent-atlas-tensor-residency-integration\\tasks.md",
+      "completed": 21,
+      "open": 28,
+      "total": 49
+    }
+  ],
+  "policy": {
+    "doNotTreatUncheckedAsNewImplementation": true,
+    "semantic512": "historical_only",
+    "executionUtility": "must_not_be_fabricated_or_zero_filled",
+    "gpuProviders": "downstream_of_identity_and_fusion",
+    "canonicalWrites": false
+  },
+  "nextGate": "A_LOD_EVALUATION_BASELINE_THEN_B_FUSION_OWNER_CONVERGENCE",
+  "writesPerformed": false
+}

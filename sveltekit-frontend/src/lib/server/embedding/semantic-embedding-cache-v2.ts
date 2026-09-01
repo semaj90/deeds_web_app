@@ -6,8 +6,9 @@ import {
   serializeSemanticEmbeddingCacheKeyV2,
   type SemanticEmbeddingCacheKeyV2,
 } from './semantic-embedding-cache-key-v2.js';
+import { SEMANTIC_DIMENSION } from './embedding-contract-768.js';
 
-export const SEMANTIC_EMBEDDING_CACHE_V2_DIMENSIONS = 768;
+export const SEMANTIC_EMBEDDING_CACHE_V2_DIMENSIONS = SEMANTIC_DIMENSION;
 
 export function validateSemanticEmbeddingCacheVector(vector: readonly number[]): number[] {
   if (vector.length !== SEMANTIC_EMBEDDING_CACHE_V2_DIMENSIONS) {

@@ -2,6 +2,11 @@
 
 Four-layer knowledge architecture (Parent Atlas = canonical evidence, OKF = portable knowledge bundles, OpenWiki = doc synthesis, Deep Agents/LangGraph = agent runtime) so none of them silently becomes a competing source of truth. First bounded slice: `PARENT_ATLAS_KNOWLEDGE_GAP_AUDIT_V1` — design/audit only, not yet implemented.
 
+**See also**: `parent-atlas-retrieval-lod-algorithm-taxonomy` reuses this change's status vocabulary
+(`PROVEN | PARTIAL_PROVEN | NOT_PROVEN | CONTRADICTED | STALE | MOCK | STUB | MISSING | BLOCKED`)
+rather than inventing a new one, and registering that taxonomy as an actual OKF page is blocked on
+this change's `PARENT_ATLAS_KNOWLEDGE_GAP_AUDIT_V1` slice landing first.
+
 **Correction needed (found 2026-08-08, not yet reconciled)**: this "not yet implemented" claim
 conflicts with what's actually on disk. `docs/okf/parent-atlas/index.md` already exists with
 frontmatter `status: PARTIAL_PROVEN`, generated from this change's own `proposal.md`/`design.md`/

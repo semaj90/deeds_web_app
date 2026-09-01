@@ -8,6 +8,28 @@
 - Wired and tested: low-rank derived-feature contract with an explicit `semantic_768` source binding and derived low-rank feature block.
 - Not promoted here: any live Redis HLL writer, production recommendation promotion guard, or exact-baseline comparison receipt beyond the focused contract tests already in repo.
 
+## Reconciliation note (2026-08-31, doc-accuracy pass) — this doc's checklist undercounts real progress, but not by as much as it might look
+
+The MASTER-TOC 0/31 count is misleadingly low given the "Implementation evidence" note above, but
+checking Lane A's boxes wholesale off that note would overclaim. Verified individually:
+
+- `AtlasEvent` contract, `buildAtlasEvent()`/`canonicalizeAtlasEvent()`/`sortAtlasEvents()`,
+  `compileOntologyEventTuples()` all confirmed live in
+  `sveltekit-frontend/src/lib/server/analysis/event-hypergraph-contract.ts`, consumed by 2 real
+  files (`nlp-feature-compiler.ts`, `atlas/temporal/temporal-action-hypergraph-adapter.ts`) — the
+  "Add an `AtlasEvent` contract" item is genuinely done.
+- **Checked and NOT satisfied, despite the note's phrasing**: "Build a deterministic AST-to-event
+  compiler from Tree-sitter / ast-grep evidence" — grepped `nlp-feature-compiler.ts` (the file that
+  actually calls `buildAtlasEvent`) for any Tree-sitter/ast-grep reference; zero hits. The contract
+  (schema + builder functions) is wired and tested, but nothing in the repo yet compiles events
+  *from* deterministic AST evidence as this specific task requires — that's a materially different,
+  larger claim than "the contract exists." Left unchecked; do not conflate contract-wired with
+  compiler-wired.
+- The remaining Lane A items (Neo4j/cuGraph derived projection, event ordering/idempotency/replay
+  proof under a fixed source revision) were not individually re-verified this pass — left unchecked
+  rather than inferred from the top-of-file summary. Whoever picks this up next should verify each
+  one against actual call sites the way the two items above were, not trust the summary note alone.
+
 ## Lane A — deterministic event hypergraph and symbolic evidence
 
 - [ ] Add an `AtlasEvent` contract for n-ary symbolic events with explicit

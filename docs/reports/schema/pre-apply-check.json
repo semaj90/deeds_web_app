@@ -9,7 +9,13 @@
       "message": "Drizzle ledger is empty while 4 known public schema objects exist; reconcile migration ownership before migrate",
       "details": {
         "ledgerCount": 0,
-        "liveKnownObjectCount": 4
+        "liveKnownObjectCount": 4,
+        "liveKnownObjects": [
+          "atlas_callable_search",
+          "atlas_symbol_registry",
+          "graphify_files",
+          "kanban_tasks"
+        ]
       }
     }
   ],
@@ -25,8 +31,8 @@
     },
     {
       "check": "LIVE_SCHEMA_FRESH",
-      "message": "live-schema-redacted.json is 0.0h old (fresh)"
+      "message": "live-schema-redacted.json is 0.1h old (fresh)"
     }
   ],
-  "generatedAt": "2026-08-31T03:17:17.419Z"
+  "generatedAt": "2026-09-01T04:47:06.313Z"
 }

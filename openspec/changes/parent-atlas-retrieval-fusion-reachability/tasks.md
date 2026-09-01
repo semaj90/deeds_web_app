@@ -60,9 +60,11 @@
       `rrf-fusion.ts::FUSION_WEIGHTS`, `compute-rrf-score.ts::RRF_LANE_WEIGHTS`, `gpu-reranker.ts`
       inline weights, `types.ts::RRF_WEIGHTS_BY_LANE_KIND`, `rrf-contract.ts::RRF_DEFAULT_WEIGHTS` —
       no two share values or lane-name vocabulary.
-- [ ] Validation commands:
+- [x] Validation commands rerun 2026-09-01:
   - `rg -n "computeRRFScore|rrfScore|reciprocalRank" sveltekit-frontend/src/lib/server/retrieval sveltekit-frontend/src/lib/server/gpu`
   - `rg -n "combineRRFLanes" sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts` (confirm still-dead import)
+  - Focused identity/fusion regression: `search-runtime-fusion.test.ts`,
+    `rrf-canonical-identity.test.ts`, and `identity-resolution.test.ts` → **30/30 pass**.
 
 ## RF3 - Complete the inventory (RTO1 sub-part complete, 2026-08-08; remaining items open)
 
@@ -224,12 +226,61 @@ This is the highest-value fix: it protects real production traffic through
     explicit follow-up, not silently skipped. 2 new tests added (content_hash wins over source_ref;
     content_hash sits below packet_key). 25/25 tests pass across all three identity test files.
     `tsgo --noEmit`: zero new errors.
-  - **Still not run**: Neo4j and Redis legs of the round trip, and re-running the live Qdrant
-    query against this specific traced entity to confirm the `content_hash` fix actually changes
-    its resolution in practice (the fix was verified via unit tests against the confirmed schema
-    facts, not re-queried live post-fix — a live re-verification is a cheap, valuable next step).
+  - **Still not run**: Neo4j and Redis legs of the round trip.
+  - **Live re-verification done (2026-08-31)**: re-ran the flagged "cheap, valuable next step" —
+    queried Qdrant `codebase_chunks_768_v2` live for every point sharing
+    `source_ref = 'src/routes/api/reports/generate/+server.ts'`. Confirmed exactly **23 points**
+    (matching the doc's claim), and **all 23 have distinct `content_hash` values** — the
+    `content_hash` tier genuinely disambiguates this group with no collisions. The specific traced
+    entity (`8a56e975-ae96-4102-813c-894de6d8975a`) carries `content_hash = 1907d1df05c09e2f` in
+    both Qdrant's payload and Postgres's `codebase_chunk_index.content_hash` column — exact match,
+    confirming the join-back genuinely works for this entity via the `content_hash` tier, not just
+    in unit tests against synthetic data. `IDENTITY_ROUND_TRIP` can be upgraded from `PARTIAL` to
+    `PARTIAL_PROVEN_LIVE` for the Postgres↔Qdrant leg specifically (Neo4j/Redis legs still
+    unattempted, so not a full round-trip proof).
 
 ## RF6 - Per-pipeline decisions for the other 4 live fusion owners (not started, unblocked — can run parallel to RF4/RF5)
+
+- [x] RF6-INPUT-SHAPE-01 — Adapt `audit-retrieval-signal-ranking.mjs` to the existing
+      `retrieval-e2e-benchmark.json` producer shape and prove a read-only receipt. The fresh
+      run reports 5/5 answered queries, 60 dense hits, 59 lexical/tree matches, 82 graph hits,
+      and 60 reranked candidates while remaining `DEGRADED` for missing revision bindings and
+      ACE cards. No canonical writes were performed.
+
+**2026-09-01 input-shape audit:** `scripts/atlas/audit-retrieval-signal-ranking.mjs`
+defaults to `docs/reports/agentic-recommendation-workflow.json`, which is a six-row
+recommendation ledger rather than a retrieval execution receipt. Its read-only run therefore
+correctly returns `BLOCKED` with identity, lexical, dense, graph, rerank, and ACE counts all
+zero (`INPUT_NOT_EXECUTION_RECEIPT`). Do not relabel that ledger as live retrieval evidence;
+provide an actual execution receipt or keep this diagnostic gate blocked.
+
+The diagnostic now accepts the existing `docs/reports/retrieval-e2e-benchmark.json` shape as a
+read-only adapter. The current receipt reports 5/5 answered queries, 60 Qdrant hits, 100 graph
+hits, 16,255 tree/lexical matches, and 100% source-ref/feature-id coverage, but remains
+`DEGRADED` because revision bindings and ACE cards are not recorded. This proves benchmark
+coverage only; it does not close canonical identity or ContextManifest admission.
+The benchmark producer now emits per-query source/workspace/representation/graph revision
+counters and `revision_bound_count`; the audit requires every query to report a fully bound
+candidate before clearing the revision blocker. The stored benchmark must be rerun read-only
+before those new fields can be evaluated.
+
+**2026-09-01 fresh benchmark:** the producer run completed `PASS` for 5/5 queries with 60
+Qdrant hits, 59 lexical/tree matches, 82 graph hits, and 60 reranked candidates. All five
+queries reported `revision_bound_count: 0`; no ACE cards were emitted. The signal receipt is
+therefore `DEGRADED`, and the measured latency was approximately P50 9.35s / P95 11.29s, so
+sub-second retrieval is not proven (`docs/reports/retrieval-e2e-benchmark.json`).
+
+**2026-09-01 live schema check:** `public.atlas_higher_hop_index` contains packet/source/
+feature/projection fields but no source, workspace, representation, or graph revision columns;
+its JSON metadata only exposes Qdrant/SOM payload details. Therefore the benchmark cannot derive
+revision-qualified identity from this table alone. The next patch must select an explicit
+canonical join owner (for example packets plus Graphify/source bindings) and prove that join
+read-only before changing the benchmark’s `revision_bound_count` semantics.
+
+The follow-up current-workspace join audit remains blocked: 111 workspace bindings and 111
+Graphify exact sources are present, but binding-to-chunk content matches are `0` and
+packet-to-chunk exact/content matches are both `0` (`docs/reports/current-workspace-packet-chunk-join-v1.json`).
+This prevents revision hydration from being promoted into the retrieval benchmark.
 
 For each of `rrf-integration.ts`/`rrf-combiner.ts`, `rrf-fusion.ts`, `service.ts::rrfFusion`,
 `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` — decide and record one of:
@@ -243,19 +294,53 @@ one-vote-per-lane still needs a live replay receipt, and the frozen replay
 gate should not close until the live fusion-owner matrix is recorded against
 that same receipt.
 
-- [ ] `rrf-integration.ts`/`rrf-combiner.ts` (`/api/search/rrf`) — already has the correct
-      identity precedence; missing only the one-vote-per-lane enforcement from RF5. Lowest-risk
-      of the four to fix in place.
+**2026-09-01 verification note:** focused regressions passed for the canonical
+identity path and the standalone RRF implementations (`search-runtime-fusion.test.ts`,
+`rrf-canonical-identity.test.ts`, `identity-resolution.test.ts`, `rrf-fusion.test.ts`,
+  and `rrf-split.test.ts`: 61/61 assertions). The prior HyperRAG import blocker was
+  isolated to an incomplete `ENV` test mock; after adding explicit test-only runtime
+  fields, `hyperrag-fusion-service.test.ts` passes 2/2. This proves test behavior only;
+  no RF6 owner decision or production wiring was inferred from these tests.
+
+- [x] `rrf-integration.ts`/`rrf-combiner.ts` (`/api/search/rrf`) — one-vote-per-lane is now
+      enforced by `combineViaRRF`'s per-candidate/per-lane map, retaining the best-ranked
+      contribution for repeated projections. Identity normalization remains revision-aware
+      and the focused regression covers repeated same-lane hits (`rrf-canonical-identity.test.ts`).
+      Verified 2026-09-01; no production route migration was performed.
 - [ ] `rrf-fusion.ts` (`/api/retrieval/rrf`) — no identity resolution at all, trusts caller
-      `candidate_id`. Decide fix-in-place vs. legacy given this route's actual usage volume.
+      `candidate_id`. The request schema exposes only `candidate_id`, `source_ref`, and
+      `content_hash`; it does not carry `symbol_version_id`, `packet_key`, `source_revision`,
+      or `workspace_revision`. The route is admin-gated and documented as an evaluation/debug
+      endpoint, so classify it as `IDENTITY_METADATA_INSUFFICIENT` until a canonicalized request
+      envelope or explicit legacy retirement decision is adopted. Do not infer identity from
+      caller IDs or content paths. Audited 2026-09-01; no route contract change performed.
 - [ ] `service.ts::rrfFusion` (`/api/atlas/studio/search`, `/api/atlas/search`) — two-stage
       identity handling is the most architecturally confused of the four; decide whether to
       collapse to one stage in place or replace with a call into the canonical boundary once it exists.
 - [ ] `unified-orchestrator.ts`/`rrf-combiner-utils.ts::combineRRFLanes` (`/api/admin/retrieval/stream`,
       transitively `/api/retrieval/go`, `/api/retrieval/multi-vector`) — highest usage breadth
       alongside `rrf-fuse.ts` (6+ call sites incl. an MCP tool); weigh fix priority accordingly.
+      The utility now suppresses repeated same-lane contributions and retains the strongest
+      contribution, proven by the added `rrf-split.test.ts` regression. Cross-pipeline identity
+      normalization, live replay, and final owner classification remain open. The current
+      `buildRrfLaneMap` still uses Qdrant point IDs for dense hits, TurboVec IDs for the proxy
+      lane, and file:line IDs for lexical hits; Postgres enrichment happens after fusion. This
+      is `PARTIAL_PROVEN` for vote arithmetic, but `IDENTITY_METADATA_INSUFFICIENT` for
+      cross-lane canonical parity. Audited 2026-09-01; no identity fallback was added.
 - [ ] `rrf-fuse.ts` — most broadly-called fusion owner found in this whole audit (6+ callers).
-      Consider prioritizing this one by usage volume even though it's not on the canonical spine.
+      It currently keys its accumulator on `packetKey ?? id` and does not include a
+      `symbol_version_id` tier or revision-qualified identity envelope. Keep this as a
+      breadth-priority owner decision, not a completed parity fix; classify
+      `IDENTITY_METADATA_INSUFFICIENT` pending caller census and canonical boundary selection.
+
+### RF6-IDENTITY-AUDIT-01 — 2026-09-01 bounded caller review
+
+The focused source review confirms three separate statuses: the canonical identity path and
+same-lane vote arithmetic are proven by tests; `/api/retrieval/rrf` is an admin/evaluation route
+whose input envelope is too thin for canonical identity; and the unified orchestrator fuses
+projection/file IDs before its later Postgres join. No alternate identity was invented, and no
+database, Qdrant, cache, or production writes were performed. The next RF6 gate is a live,
+revision-qualified replay after the shared candidate envelope is available.
 
 ## RF7 - Long-term convergence (explicitly deferred, do not start before RF4-RF6)
 

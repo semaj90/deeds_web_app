@@ -1,6 +1,6 @@
 {
   "schema": "atlas.chunk-bridge-v1",
-  "generatedAt": "2026-08-29T16:07:58.838Z",
+  "generatedAt": "2026-09-01T04:20:06.940Z",
   "readOnly": true,
   "postgresWrites": false,
   "selection": {

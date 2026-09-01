@@ -17,6 +17,8 @@ vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     QDRANT_URL: 'http://qdrant.test',
     TURBOVEC_SIDECAR: 'http://turbovec.test',
+    ROTORQUANT_MODEL_PATH: process.env.ROTORQUANT_MODEL_PATH ?? 'C:\\test\\ornith.gguf',
+    LLAMA_SERVER_MODEL: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
   },
 }));
 

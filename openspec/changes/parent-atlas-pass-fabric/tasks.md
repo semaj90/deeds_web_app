@@ -600,6 +600,65 @@ source_revision, representation_revision, producer_revision)`. This must
 land and be proven **before** PF6/PF7 (CPU worker pool) or PF9 (incremental
 eligibility) — those assume packets already have stable identity to key off.
 
+### PF-G0 RECONCILED (2026-08-31, doc-accuracy pass — no code changed)
+
+A later session (memory: `SESSION-200-PACKET-IDENTITY-ALIAS-CONVERGENCE.md`,
+2026-08-21) ran the full P0 packet-identity audit this addendum called for
+and closed most of PF-G0's concern, though not by "locating a missing
+writer" — the finding was sharper than that. Live-verified this pass that
+both artifacts below still exist in the tree:
+
+- `sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts`
+  — `resolveCanonicalPacketKey(inputKey)`: direct-row match first, alias-table
+  fallback, throws typed `PacketIdentityUnresolvedError` on failure (no
+  silent fallback). Smoke test:
+  `sveltekit-frontend/scripts/smoke-packet-identity-resolver.mjs`.
+- `sveltekit-frontend/drizzle/manual/atlas_packet_identity_aliases.sql` —
+  live table `atlas_packet_identity_aliases`, additive, zero PK/FK mutation
+  on `atlas_packets`.
+
+**What was actually found** (supersedes the "zero INSERT/UPSERT, no
+identity-worker.ts" framing above — writers do exist, plural, and mostly
+agree): 58,304 of 61,660 live rows use `packet:<12hex>` (sha256 of
+`canonicalSourceRef(source_ref)`, truncated), written by
+`scripts/atlas/backfill-summary-layers-from-chunks.mjs::derivePacketKey()`.
+3,294 rows carried a divergent `ace:packet:<12hex>` prefix — traced to a
+**one-line typo** in `scripts/atlas/register-orphaned-chunks.mjs:91`, same
+hash algorithm, not a competing scheme. That typo is fixed going forward;
+the 3,294 already-written rows were aliased (not renamed, to avoid the
+12-table FK-cascade risk a live rename would trigger) rather than migrated.
+A full exhaustive sweep (`P0-4 residual`) found several more `*PacketKey()`
+builders in the repo, all confirmed dormant/dead (zero live rows) except two
+dry-run-only backfill scripts that have never actually been run for real.
+
+**`packet-key-builder.ts::computePacketKey()`** — the function this
+addendum names as "the canonical logical packet identity minting
+authority" — is real, has 4 live callers, but computes a **structurally
+different, node-scoped** key (hashes `source_ref + tree_node_id + title_id`)
+than the file-scoped key that's actually live in 58,304+ rows. Session 200
+deliberately did NOT collapse this discrepancy — it's frozen as an open
+product question (`CURRENT_LIVE_IDENTITY` vs `FINAL_PACKET_IDENTITY_V2 —
+NOT_YET_PROVEN`) in a doc comment on that file, not resolved. A
+mismatch-guard (`resolvePersistedPacketKey()` in
+`semantic-packet-writer.ts`) throws `PACKET_KEY_MISMATCH_CANONICAL_RESOLUTION`
+if a caller ever supplies both identity shapes' inputs together — this is a
+real, live, untriggered landmine, not inert code.
+
+**Still open, not closed by Session 200**:
+- P0-6 (historical PK rename to collapse the 3,294 aliased rows into the
+  canonical format) — deliberately deferred, low risk if ever done (only 1
+  of the 3,294 rows has a real downstream FK reference), but not done.
+- The file-scoped vs. node-scoped grain question above.
+- Whether `PF-G0: PACKET_IDENTITY_WRITER_PROVEN` should be marked done as
+  originally scoped ("prove a deterministic writer exists") is now `true` —
+  writers exist and are traced — but the broader identity-uniqueness
+  property PF6/PF7/PF9 actually need ("one packet, one key, no ambiguity")
+  is `PARTIAL_PROVEN`, not `PROVEN`, given the two points above. Treat PF-G0
+  as unblocking PF6/PF7 (worker pool has something stable to key off for the
+  dominant 58,304+ rows) but NOT as licensing PF9's eligibility query to
+  assume every `packet_key` uniquely resolves — it must route through
+  `resolveCanonicalPacketKey()`, not raw string equality, until P0-6 lands.
+
 ### Job identity key (apply to PF4 ledger + PF1 queue going forward)
 
 The review's job_identity composite is stricter than what's currently in
@@ -652,10 +711,14 @@ Cross-reference only.
 
 ### Revised priority order (supersedes "start with PF1" — PF1-3 already done)
 
-1. **PF-G0**: prove/rebuild packet identity writer (blocking, not yet started)
+1. **PF-G0**: `PARTIAL_PROVEN` as of Session 200 (2026-08-21) — writers exist
+   and are traced (see "PF-G0 RECONCILED" above); route through
+   `resolveCanonicalPacketKey()` rather than raw `packet_key` equality until
+   the file-scoped/node-scoped grain question and P0-6 rename land. No
+   longer "not yet started."
 2. PF4 follow-up: find/build `analysis_pass_results` writer (in progress, see above)
 3. PF6/PF7: CPU worker pool + move structural passes onto it
-4. PF9: incremental eligibility (needs PF-G0 + PF4 writer first)
+4. PF9: incremental eligibility (needs PF-G0 resolver wired in + PF4 writer first)
 5. PF10/PF11: NLP pass DAG + bounded Ornith
 6. PF12/PF13: tool executor + real graph multi-hop
 7. PF14: tricubic quarantine (low priority, do whenever)

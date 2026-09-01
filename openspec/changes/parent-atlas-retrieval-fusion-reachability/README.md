@@ -2,6 +2,11 @@
 
 Reachability census of the Parent Atlas retrieval/fusion subsystem. Corrects the assumption that a single RRF implementation governs search: proves 13 distinct fusion/scoring implementations exist across 5 independently-live retrieval pipelines with no shared candidate-identity boundary, identifies the true canonical production spine (`SearchRuntime`/`retrieve-candidates.ts`, not any of the `rrf-*.ts` modules), and lays out the ordered path to fix identity degradation at the actual live risk point instead of on an already-correct-but-non-canonical reference implementation.
 
+**See also**: `parent-atlas-retrieval-lod-algorithm-taxonomy` Domain 1 (Candidate Fusion) and
+Domain 5 (Ranking/Scoring) describe the *target* architecture RF6 should converge these 13
+implementations toward — that taxonomy's Domain 1/5 build items are explicitly blocked until RF6
+finishes here.
+
 ## Status (2026-08-08, paused for handoff — not blocked, just out of budget)
 
 **Done and verified**: RF1 (reachability trace), RF2 (13-implementation classification), RF3

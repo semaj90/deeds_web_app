@@ -70,18 +70,20 @@ async function checkMigrationLedgerReconciliation() {
         pool = new pg.Pool({ connectionString: databaseUrl, max: 1, connectionTimeoutMillis: 5000, statement_timeout: 5000 });
         const ledger = await pool.query('SELECT COUNT(*)::int AS count FROM drizzle.__drizzle_migrations');
         const live = await pool.query(`
-            SELECT COUNT(*)::int AS count
+            SELECT table_name
             FROM information_schema.tables
             WHERE table_schema = 'public'
               AND table_name IN ('graphify_files', 'atlas_callable_search', 'atlas_symbol_registry', 'kanban_tasks', 'feature_registry')
+            ORDER BY table_name
         `);
         const ledgerCount = Number(ledger.rows[0]?.count ?? 0);
-        const liveCount = Number(live.rows[0]?.count ?? 0);
+        const liveObjects = live.rows.map((row) => row.table_name);
+        const liveCount = liveObjects.length;
         if (ledgerCount === 0 && liveCount > 0) {
             blocks.push({
                 check: 'MIGRATION_LEDGER_UNRECONCILED',
                 message: `Drizzle ledger is empty while ${liveCount} known public schema objects exist; reconcile migration ownership before migrate`,
-                details: { ledgerCount, liveKnownObjectCount: liveCount },
+                details: { ledgerCount, liveKnownObjectCount: liveCount, liveKnownObjects: liveObjects },
             });
         } else {
             notes.push({ check: 'MIGRATION_LEDGER_RECONCILED', message: `ledger rows=${ledgerCount}, known live objects=${liveCount}` });

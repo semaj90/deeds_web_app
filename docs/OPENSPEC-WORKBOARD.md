@@ -2,7 +2,7 @@
 
 > Generated from OpenSpec task ledgers. This is a navigation/progress projection, not task authority.
 
-Overall progress: [#####-----] 2371/4338 tasks
+Overall progress: [#####-----] 2384/4340 tasks
 ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## P10 dependency work packages
@@ -13,6 +13,75 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - **P10-D** Lexical identity — OPEN; depends on P10-B; gates: source revision, FTS identity, cross-store lineage
 - **P10-E** Top-K cross-store readback — OPEN; depends on P10-C, P10-D; gates: CandidateTopKV1, Qdrant parity, Go retrieval parity
 
+## Dependency-ordered execution steps
+
+- **STEP-01** [######----] 215/364 complete; 149 open — Identity and source authority; depends on none; gate: Exact identity, source, symbol, and revision ownership
+- **STEP-02** [#####-----] 214/396 complete; 182 open — Eligibility and provenance; depends on STEP-01; gate: Canonical eligibility, readback, and lineage proofs
+- **STEP-03** [#####-----] 403/783 complete; 380 open — Runtime and retrieval; depends on STEP-02; gate: Embedding, Qdrant, Go Retrieval, and fusion execution
+- **STEP-04** [#####-----] 425/773 complete; 348 open — Feature and structural context; depends on STEP-03; gate: AST/CST, LSP, ontology, feature fabric, and ContextManifest
+- **STEP-05** [###-------] 56/175 complete; 119 open — Workflow and receipts; depends on STEP-04; gate: Agent execution, NATS/JetStream, validation, and receipts
+- **STEP-06** [####------] 22/49 complete; 27 open — Governance and operations; depends on STEP-05; gate: Admin, Kanban, documents, supersession, and archive
+- **STEP-07** [######----] 1037/1736 complete; 699 open — Unclassified supporting work; depends on STEP-01; gate: Review and attach each task to an upstream gate
+- **STEP-08** [##--------] 12/64 complete; 52 open — Benchmarks and challengers; depends on STEP-03, STEP-04; gate: Evaluation, GPU challengers, topology, and Ewin Tang
+
+### Next bounded tasks by step
+
+**STEP-01**
+- atlas-feature-intelligence:10 — GENERAL; FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner. (openspec/changes/atlas-feature-intelligence/tasks.md:10)
+- atlas-feature-intelligence:11 — GENERAL; FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.** (openspec/changes/atlas-feature-intelligence/tasks.md:11)
+- atlas-feature-intelligence:50 — RETRIEVAL_ACE; FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. (openspec/changes/atlas-feature-intelligence/tasks.md:50)
+- atlas-feature-intelligence:58 — GENERAL; FI-20 Add degraded-identity observability and exact promotion before fusion. (openspec/changes/atlas-feature-intelligence/tasks.md:58)
+- atlas-feature-intelligence:90 — GENERAL; Canonical identity survives path/cluster/projection changes in live Postgres readback. (openspec/changes/atlas-feature-intelligence/tasks.md:90)
+
+**STEP-02**
+- atlas-feature-intelligence:12 — GENERAL; FI-04 Add Postgres migrations/materializers for canonical features, evidence edges, relationships/hyperedges and state receipts. **Manual PostgreSQL 18 migration + transactional repository written; apply/readback proof pending.** (openspec/changes/atlas-feature-intelligence/tasks.md:12)
+- atlas-feature-intelligence:17 — GENERAL; FI-06 Parse Spec Kit `.specify` artifacts when present without making them canonical authority. (openspec/changes/atlas-feature-intelligence/tasks.md:17)
+- atlas-feature-intelligence:29 — GENERAL; FI-13B Persist canonical N-ary relationship/hyperedge records and member rows in Postgres. **Header/member/cardinality/evidence tables + transactional writer exist; live migration/receipt pending.** (openspec/changes/atlas-feature-intelligence/tasks.md:29)
+- atlas-feature-intelligence:31 — GENERAL; FI-13C2 Materialize pairwise/incidence graph projections and prove reconstruction/parity against canonical Postgres facts. (openspec/changes/atlas-feature-intelligence/tasks.md:31)
+- atlas-feature-intelligence:32 — GENERAL; FI-14 Project canonical graph snapshot to Neo4j and NetworkX/cuGraph with parity receipts. (openspec/changes/atlas-feature-intelligence/tasks.md:32)
+
+**STEP-03**
+- atlas-feature-intelligence:23 — GENERAL; FI-11B Materialize `atlas_evidence_entities` from AST/schema/runtime/test/OpenSpec evidence. **Table/view/query-time neighborhood migration written; extractor/backfill + live proof pending.** (openspec/changes/atlas-feature-intelligence/tasks.md:23)
+- atlas-feature-intelligence:51 — RETRIEVAL_ACE; FI-16M Add retrieval-action receipt for every `NEED_* -> DAG action -> new evidence -> sufficiency re-evaluation` loop. (openspec/changes/atlas-feature-intelligence/tasks.md:51)
+- atlas-feature-intelligence:57 — RETRIEVAL_ACE; FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; existing runtime fusion still needs adoption proof.** (openspec/changes/atlas-feature-intelligence/tasks.md:57)
+- atlas-feature-intelligence:76 — GENERAL; FI-25 Add staleness propagation from source/schema/dependency/test/runtime revisions. (openspec/changes/atlas-feature-intelligence/tasks.md:76)
+- atlas-feature-intelligence:83 — RETRIEVAL_ACE; FI-29 Seed known Atlas workstreams from existing Gate 12, PageRank, Qdrant/TurboVec, OKF and Parent Atlas scripts as evidence candidates, not completion claims. (openspec/changes/atlas-feature-intelligence/tasks.md:83)
+
+**STEP-04**
+- ace-hyperrag-chr97-graphify-audit:45 — RETRIEVAL_ACE; Ask the user (or infer from context) whether "graphify GPU indexed json packets" — now that (openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md:45)
+- ace-hyperrag-chr97-graphify-audit:51 — RETRIEVAL_ACE; Decide whether ACE's AST-blindness (context-assembler reads `codebase-graph.json`, which (openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md:51)
+- ace-hyperrag-chr97-graphify-audit:56 — RETRIEVAL_ACE; Register the resolved ownership status of each of the 6 components (validator, assembler, (openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md:56)
+- agent-branch-review-fanout-ace-centroid-aug22:24 — RETRIEVAL_ACE; 3.3 If 3.2 fails, the operator's fallback is to patch the precise optional-lane return site in the ACE context assembler (explicitly scoped narrow — "not a blanket catch around ACE", citing the assembler's existing correct fail-open behavior for cached-chunk reads as the pattern to match). Deferred until 3.2 actually runs. (openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md:24)
+- agent-branch-review-fanout-ace-centroid-aug22:25 — RETRIEVAL_ACE; 3.4 If 3.2 succeeds, the operator's stated follow-on is to leave ACE degradation alone and move to wiring proof-qualified storage/GPU capabilities into the MCP Viterbi capability registry as hard executor admission masks (replacing probabilistic Viterbi weighting for those specific capabilities). Deferred — downstream of 3.2. (openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md:25)
+
+**STEP-05**
+- manual-migration-reconciliation:19 — GENERAL; **Open adapter gap checked 2026-08-31:** active route/service code still queries `agent_pickup_queue` (`src/routes/api/tasks/packets/workflow/+server.ts`, `src/lib/server/tasks/semantic-packets.ts`) and the legacy packet script publishes `agent_pickup_queue:ready`. The table is absent, so these callers require an explicit Kanban/workflow adapter or a fail-closed deprecation path before apply mode is considered usable. (openspec/changes/manual-migration-reconciliation/tasks.md:19)
+- parent-atlas-adaptive-dag-fabric:290 — GENERAL; NATS-EVENT-01 JetStream `PARENT_ATLAS_EVENTS` shadow event stream (openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md:290)
+- parent-atlas-agentic-file-compiler:13 — GENERAL; AFC-10 Wire query classifier to the live request front door. (openspec/changes/parent-atlas-agentic-file-compiler/tasks.md:13)
+- parent-atlas-agentic-file-compiler:15 — GENERAL; AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof. (openspec/changes/parent-atlas-agentic-file-compiler/tasks.md:15)
+- parent-atlas-agentic-file-compiler:16 — GENERAL; AFC-13 Persist WorkflowActionEventV1 through the existing action/outbox writer. (openspec/changes/parent-atlas-agentic-file-compiler/tasks.md:16)
+
+**STEP-06**
+- codereview-semantic-dimension-regression-aug22:39 — GENERAL; 2.3 Still open: add or confirm an integration test that actually calls `/api/admin/atlas/synthesize`'s semantic512 branch end-to-end, so this class of always-throws regression is caught by CI next time, not by a code-review pass discovering it after the fact. Not done this pass — the dimension-choice question was the blocker for this task section; this sub-item is independent follow-up work. (openspec/changes/codereview-semantic-dimension-regression-aug22/tasks.md:39)
+- deep-audit-code-gates-aug22:17 — GENERAL; 3.3 G14 (3 fails, all scratch files): decide whether to archive `sveltekit-frontend/temp_upload.svelte`, `test-errors-validation.svelte`, `test-errors.svelte` per repo's archive-not-delete convention, or confirm they're intentionally kept as manual test fixtures. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:17)
+- deep-audit-code-gates-aug22:21 — GENERAL; 4.1 G4 (47 fails): review each `+server.ts` missing `locals.user` — some (`/api/acp/rpc`, `/api/admin/atlas/*`) may be intentionally internal/service-to-service and not need a user-session guard; don't blanket-add auth without checking intended access model per route. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:21)
+- manual-migration-reconciliation:112 — GENERAL; If genuinely additive (new concepts, not drift): apply. If duplicate: do not apply — file a follow-up to delete/archive the stale sidecar SQL instead (per Archival Rules, don't delete outright — move to `deeds_labs/archive/` with manifest entry). (openspec/changes/manual-migration-reconciliation/tasks.md:112)
+- parent-atlas-adaptive-dag-fabric:150 — GENERAL; DAG-CONTRACT-01 **Superseded in spirit by `research-kernel-contract-v1.ts` (openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md:150)
+
+**STEP-07**
+- deep-audit-code-gates-aug22:4 — GENERAL; 1.2 Re-run `npm run graphify:daily` to refresh the index (currently 33.9h stale at time of this audit) before trusting any fail count here for fixing. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:4)
+- deep-audit-code-gates-aug22:10 — GENERAL; 2.2 Reconcile this session's approximation (routeHandlers-mutating-method + hasZod===false → 47 fails) against the graph's own precomputed `gateStats.routesWithoutZod: 23` — figure out which is closer to the skill's actual intended "G5" definition, or whether both are wrong. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:10)
+- deep-audit-code-gates-aug22:15 — GENERAL; 3.1 G16 (67 fails): `npm run audit:test-stubs --filter <path>` per failing route, or in bulk. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:15)
+- deep-audit-code-gates-aug22:16 — GENERAL; 3.2 G26 (4 fails): add `// @vitest-environment node` to `tests/routes/all-routes-page.test.ts`, `cache-stats.test.ts`, `codebase-tags-rename.test.ts`, `phase109-tag-chunks.test.ts`. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:16)
+- deep-audit-code-gates-aug22:22 — GENERAL; 4.2 G5 (47 fails, pending task 2's resolution): Zod-validate request bodies on confirmed-real fails only, per CLAUDE.md's Superforms/Zod pattern. (openspec/changes/deep-audit-code-gates-aug22/tasks.md:22)
+
+**STEP-08**
+- parent-atlas-compute-rank-cache-eval-dspy-gepa:30 — GENERAL; Adapt existing `scripts/crossencoder-benchmark.py` to consume the final fused candidate set rather than only legacy XGBoost-v2 rows. (openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md:30)
+- parent-atlas-compute-rank-cache-eval-dspy-gepa:155 — GENERAL; GEPA-SHADOW-01 — run a bounded validation-only GEPA experiment with fixed seed, resumable log, and candidate checksum. (openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md:155)
+- parent-atlas-governed-compute-fabric:63 — GENERAL; 1.7 Specify that low-rank, Hilbert, quaternion, spectral, learned, SOM/KMeans, and (openspec/changes/parent-atlas-governed-compute-fabric/tasks.md:63)
+- parent-atlas-governed-compute-fabric:213 — GENERAL; 8.4 Keep BM25, BM42 experimental, Postgres FTS/trigram, and legacy sparse codecs as (openspec/changes/parent-atlas-governed-compute-fabric/tasks.md:213)
+- parent-atlas-governed-compute-fabric:307 — GENERAL; 13.2 Build one experimental stable-ABI backend using `torch::stable::*` and the (openspec/changes/parent-atlas-governed-compute-fabric/tasks.md:307)
+
 ## Permanent acceptance invariants
 
 - **INVARIANT** [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L3364) No canonical identity or source data changes during dry-run/training. — last updated 2026-08-31T23:07:41.656Z (FILESYSTEM_MTIME); ETA N/A
@@ -20,6 +89,18 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## Highest-priority open tasks
 
+- [ ] **P10** [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md#L103) Trace `search-lanes.ts` lane implementations' own identity-assignment code — where — lane RETRIEVAL_ACE; last updated 2026-09-01T04:32:22.873Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md#L310) `rrf-fusion.ts` (`/api/retrieval/rrf`) — no identity resolution at all, trusts caller — lane RETRIEVAL_ACE; last updated 2026-09-01T04:32:22.873Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L189) **LOD-02** Freeze `SemanticSnapshotV1` plus ordinal/canonical identity mapping as the immutable source: workspace/source/representation/ordinal-map revisions, rows, dimension 768, float32, normalization, ordinal, `packet_key`, optional `symbol_version_id`, and checksum. LOD transitions may evict/reload derived indexes but may not delete or rewrite canonical truth. Prefer Arrow IPC/mmap for direct tensor access; do not substitute Parquet where direct mmap is required. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L194) **LOD-07** Prove fail-open tier swaps: stale/missing hot state falls back to warm mmap/Qdrant; missing warm artifacts reconstruct from canonical sources; no cache/index artifact becomes identity truth. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L231) **TV-LOD-02** Compare TurboVec 4-bit against exact cuVS on the same corpus: Recall@10/@50, top-1 agreement, identity parity, latency, RSS, and index size. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L233) **TV-LOD-04** Verify filtered allowlist/slot-mask parity from canonical `SearchFilter` and routed ordinals; no post-search identity filtering may hide false positives. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L267) **BF-LOD-04** Prove transitions `WARM/TURBO_4BIT → HOT/FP16`, `HOT/FP16 → WARM/TURBO_4BIT`, `WARM/TURBO_4BIT → COLD/FP32_MMAP`, and stale-revision eviction. No transition may mutate `packet_key`, `symbol_version_id`, ontology links, or canonical ACE state. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L489) **DAG-5A.2 lineage join** Require canonical ID/symbol version, workspace, — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md#L57) Record domain classification as a lineage-linked navigation surface, not canonical identity. — lane RESEARCH_CHALLENGER_EWIN_TANG; last updated 2026-09-01T02:45:56.057Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md#L88) No semantic enrichment pass may overwrite canonical event identity. — lane RESEARCH_CHALLENGER_EWIN_TANG; last updated 2026-09-01T02:45:56.057Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md#L89) No telemetry-only record may overwrite canonical identity. — lane RESEARCH_CHALLENGER_EWIN_TANG; last updated 2026-09-01T02:45:56.057Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric/tasks.md#L494) PF4D — recover `source_revision`/`pass_revision` where evidence exists — lane GENERAL; last updated 2026-09-01T02:36:18.198Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L92) **RETRIEVAL-01 — Prove same-corpus Qdrant payload identity** only after — lane RETRIEVAL_ACE; last updated 2026-08-31T23:07:41.656Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L163) **SOURCE-REVISION-CANARY-01 — Persist one approved Graphify canary.** — lane GENERAL; last updated 2026-08-31T23:07:41.656Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md#L170) **SOURCE-REVISION-OWNER-02 — Prove the owner after the canary.** — lane GENERAL; last updated 2026-08-31T23:07:41.656Z (FILESYSTEM_MTIME); ETA UNKNOWN
@@ -105,34 +186,24 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [ ] **P10** [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L60) TOPO-04 Prove `ae_latent_64` numeric FP32 identity separately from its — lane GENERAL; last updated 2026-08-31T20:24:09.910Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L68) TOPO-09 Compile `CandidateEligibilityBitmapV1` by CandidateOrdinal. — lane GENERAL; last updated 2026-08-31T20:24:09.910Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md#L177) S512-16 — Exact promotion proves **current** source span + Tree-sitter structural identity + compiler-semantic evidence and resolves UNKNOWN freshness before LLM synthesis. — lane GENERAL; last updated 2026-08-31T20:24:09.902Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L96) **LOD-02** Freeze `SemanticSnapshotV1` plus ordinal/canonical identity mapping as the immutable source: workspace/source/representation/ordinal-map revisions, rows, dimension 768, float32, normalization, ordinal, `packet_key`, optional `symbol_version_id`, and checksum. LOD transitions may evict/reload derived indexes but may not delete or rewrite canonical truth. Prefer Arrow IPC/mmap for direct tensor access; do not substitute Parquet where direct mmap is required. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L101) **LOD-07** Prove fail-open tier swaps: stale/missing hot state falls back to warm mmap/Qdrant; missing warm artifacts reconstruct from canonical sources; no cache/index artifact becomes identity truth. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L138) **TV-LOD-02** Compare TurboVec 4-bit against exact cuVS on the same corpus: Recall@10/@50, top-1 agreement, identity parity, latency, RSS, and index size. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L140) **TV-LOD-04** Verify filtered allowlist/slot-mask parity from canonical `SearchFilter` and routed ordinals; no post-search identity filtering may hide false positives. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L174) **BF-LOD-04** Prove transitions `WARM/TURBO_4BIT → HOT/FP16`, `HOT/FP16 → WARM/TURBO_4BIT`, `WARM/TURBO_4BIT → COLD/FP32_MMAP`, and stale-revision eviction. No transition may mutate `packet_key`, `symbol_version_id`, ontology links, or canonical ACE state. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L396) **DAG-5A.2 lineage join** Require canonical ID/symbol version, workspace, — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.899Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier/tasks.md#L197) Require no canonical identity changes. — lane GENERAL; last updated 2026-08-31T20:24:09.897Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier/tasks.md#L223) Add an upstream trace-record identity producer carrying canonical — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.897Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric/tasks.md#L182) ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply. — lane GENERAL; last updated 2026-08-31T20:24:09.889Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L15) Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L17) Do not relax `atlas_graph_nodes_v2_tree_node_unique` until the split identity model is implemented and tested. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L33) Identity status labels: — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L76) Add proof gates for `PARSER_MANIFEST_ALIGNMENT`, `TREE_NODE_ID_STABILITY`, and `SYMBOL_VERSION_IDENTITY`. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L89) Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L244) Python BeautifulSoup normalizer (`html_normalizer.py`) + Pydantic `HtmlExtractionEnvelope` (schema_version, source_revision, html_digest, parser/extractor identity) — location TBD: `packages/parent-atlas/python/parent_atlas/acquisition/` vs. the existing NLP sidecar, whichever is the canonical Python runtime (unconfirmed which one that is). — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.862Z (FILESYSTEM_MTIME); ETA UNKNOWN
 
 ## Task indexing coverage
 
-- Declared source_ref: 1/4338
-- Declared source_revision: 2/4338
-- Unclassified task rows remain linked to their OpenSpec file and line; no source identity was inferred.
+- Declared source_ref: 1/4340
+- Declared source_revision: 2/4340
+- Task ledger source pointer: 4340/4340 (OpenSpec file + line)
+- Metadata-unclassified rows: 4337/4340; no source identity was inferred.
+- Declared source fields are optional task metadata, not a measure of repository evidence coverage.
 
 ## Execution lanes
 
 - **DAILY_GRAPHIFY_KANBAN** 5 open / 14 total
-- **GENERAL** 1443 open / 3204 total
+- **GENERAL** 1439 open / 3205 total
 - **RESEARCH_CHALLENGER_EWIN_TANG** 31 open / 32 total
-- **RETRIEVAL_ACE** 488 open / 1088 total
+- **RETRIEVAL_ACE** 481 open / 1089 total
 
 ## Lane dependencies
 
@@ -142,13 +213,13 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 ## Daily Graphify Kanban reference
 
 - Status: **STALE_SNAPSHOT**; source: docs/graph/kanban-board.json
-- Snapshot age: 58.2 days; tasks: 123; sourceRefs: 246
+- Snapshot age: 58.4 days; tasks: 123; sourceRefs: 246
 - This snapshot is a reference/input surface only; it is not canonical identity or task authority.
 
 ## Historical and consolidation task sources
 
-- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 81.8 days
-- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 0.2 days
+- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 82 days
+- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 0.1 days
 - Historical ranking reports and consolidation inputs are evidence sources only; they are not merged into the OpenSpec task count automatically.
 
 ## Current consolidation reference
@@ -179,7 +250,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22/) [#####-----] 10/21 complete; 11 open
 - [docker-compose-duplication-remediation](openspec/changes/docker-compose-duplication-remediation/) [##########] 9/9 complete; 0 open
 - [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation/) [#######---] 2/3 complete; 1 open
-- [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22/) [#########-] 46/49 complete; 3 open
+- [inference-wiring-deep-audit-aug22](openspec/changes/inference-wiring-deep-audit-aug22/) [##########] 48/49 complete; 1 open
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation/) [####------] 25/56 complete; 31 open
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/) [##--------] 2/9 complete; 7 open
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/) [##########] 65/67 complete; 2 open
@@ -216,14 +287,14 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel/) [#########-] 29/34 complete; 5 open
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof/) [#---------] 2/19 complete; 17 open
 - [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric/) [#---------] 6/43 complete; 37 open
-- [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration/) [######----] 22/40 complete; 18 open
+- [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration/) [######----] 25/40 complete; 15 open
 - [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier/) [####------] 41/98 complete; 57 open
 - [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix/) [########--] 34/41 complete; 7 open
-- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/) [#######---] 32/48 complete; 16 open
-- [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/) [####------] 42/94 complete; 52 open
+- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/) [#######---] 35/49 complete; 14 open
+- [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/) [#####-----] 44/95 complete; 51 open
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization/) [#######---] 23/31 complete; 8 open
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/) [----------] 0/31 complete; 31 open
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration/) [####------] 18/49 complete; 31 open
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration/) [####------] 21/49 complete; 28 open
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/) [##--------] 3/18 complete; 15 open
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries/) [#---------] 5/64 complete; 59 open
 - [parent-atlas-unified-symbol-ranking](openspec/changes/parent-atlas-unified-symbol-ranking/) [##########] 17/17 complete; 0 open

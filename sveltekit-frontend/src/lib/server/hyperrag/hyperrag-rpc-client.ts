@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod';
+import type { AceHypergraphPayloadV1 } from '@deeds/parent-atlas';
 import type { AtlasPacket } from '$lib/server/db/schema/atlas-packets.js';
 
 export const HyperRAGRequestSchema = z.object({
@@ -79,6 +80,11 @@ export interface HyperRAGPacketState {
   chunkCount: number;
   tokenEstimate: number;
   embeddingModel: string;
+  /** Optional validated ACE hypergraph evidence; never inferred from packet metadata. */
+  aceHypergraph?: AceHypergraphPayloadV1;
+  packetRevision?: string;
+  producerRevision?: string;
+  sourceRevision?: string;
   clusterId?: number;
   parentPacketKey?: string;
   traceId: string;

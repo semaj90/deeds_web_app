@@ -19,6 +19,7 @@
     "atlas:docs:governance:validate": "node scripts/atlas/validate-document-governance-index.mjs",
     "atlas:docs:workboard": "node scripts/atlas/build-openspec-workboard-v1.mjs",
     "atlas:docs:master-todo-crosswalk": "node scripts/atlas/build-master-feature-todo-openspec-crosswalk-v1.mjs",
+    "atlas:audit:six-priority-convergence": "node scripts/atlas/audit-six-priority-convergence-v1.mjs",
     "atlas:gpu:feat04:envelope": "npx tsx scripts/atlas/build-feat04-envelope-v1.mts",
     "atlas:convergence:census": "node scripts/atlas/audit-parent-atlas-convergence-census-v1.mjs",
     "atlas:audit:dspy-gepa-subprompts": "node scripts/atlas/audit-dspy-gepa-subprompts-v1.mjs",

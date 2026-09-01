@@ -89,6 +89,8 @@ const OPENCODE_MAX_OUTPUT_TOKENS = Number(
 );
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '../../../retrieval/cross-encoder-reranker.js';
+import { rerankCanonicalFeatureEnvelopes } from '../../../retrieval/canonical-rerank-executor.js';
+import type { AcePayload } from '$lib/server/ace/ace-payload-selector.js';
 import { applyTopologicalBoostAsync } from '../../../retrieval/topological-search.js';
 import {
   queryBmuCached,
@@ -1434,6 +1436,71 @@ async function fetchSchemaDependentsIfRelevant(
   } catch {
     // Non-blocking: if schema-dependents fails, continue without it
     return null;
+  }
+}
+
+/**
+ * ACE_CANONICAL_RERANK_ENABLED second pass — env-gated, OFF by default (unset = no-op).
+ *
+ * Reranks only the top `ACE_CANONICAL_RERANK_TOP_K` (default 12) of the already
+ * `_aceRouting.score`-sorted `acePayloads` through the canonical wrapper
+ * (`canonical-rerank-executor.ts`), leaving the tail untouched. Bounded by an
+ * independent `ACE_CANONICAL_RERANK_TIMEOUT_MS` (default 3000ms) race — the
+ * reranker's own internal fallback chain has up to 20s per-backend timeouts
+ * (see `cross-encoder-reranker.ts`), which is too slow for every ACE-assembled
+ * response's hot path if trusted directly. Fails open to the original order on
+ * any error, timeout, or shape mismatch — never throws, never blocks assembly.
+ *
+ * This is a genuinely separate second pass over the final merged multi-source
+ * list (kb+case+rag), not a replacement for `fetchCodebaseContext`'s existing
+ * raw `rerankWithCrossEncoder()` call — see design.md Open Question 2 for the
+ * double-rerank-interaction caveat this leaves open (still requires eval data
+ * before enabling in any environment with real traffic).
+ */
+export async function applyCanonicalRerankSecondPass(
+  query: string,
+  payloads: AcePayload[],
+): Promise<AcePayload[]> {
+  if (process.env.ACE_CANONICAL_RERANK_ENABLED !== 'true') return payloads;
+  if (!payloads.length) return payloads;
+
+  const topK = Number(process.env.ACE_CANONICAL_RERANK_TOP_K) || 12;
+  const timeoutMs = Number(process.env.ACE_CANONICAL_RERANK_TIMEOUT_MS) || 3000;
+
+  const head = payloads.slice(0, topK);
+  const tail = payloads.slice(topK);
+
+  try {
+    const envelopes = head.map((p) => ({
+      chunk_id: p.chunk_id,
+      packet_key: p.packet_key,
+      content: p.full_text ?? p.summary,
+      created_at: new Date(),
+    }));
+
+    const rerankPromise = rerankCanonicalFeatureEnvelopes(query, envelopes, { topK: head.length });
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('ACE_CANONICAL_RERANK_TIMEOUT')), timeoutMs);
+    });
+
+    const result = await Promise.race([rerankPromise, timeoutPromise]);
+
+    const byChunkId = new Map(head.map((p) => [p.chunk_id, p]));
+    const reordered = result.results
+      .map((r) => byChunkId.get(r.chunk_id!))
+      .filter((p): p is AcePayload => Boolean(p));
+
+    // Every head item must round-trip back by chunk_id, or fail open rather
+    // than silently drop/duplicate a candidate.
+    if (reordered.length !== head.length) return payloads;
+
+    return [...reordered, ...tail];
+  } catch (err) {
+    console.warn(
+      '[ACE routing] canonical rerank second pass failed, fail-open:',
+      (err as Error)?.message ?? err,
+    );
+    return payloads;
   }
 }
 
@@ -3406,6 +3473,14 @@ export async function assembleACEContext(opts: {
         // Sort by computed routing score but do not change semantics beyond annotation
         (finalContext.acePayloads as any[]).sort(
           (a: any, b: any) => (b._aceRouting?.score ?? 0) - (a._aceRouting?.score ?? 0)
+        );
+
+        // Env-gated second pass (ACE_CANONICAL_RERANK_ENABLED, default off/no-op).
+        // See applyCanonicalRerankSecondPass()'s own docstring for the fail-open/
+        // timeout contract; production behavior is unchanged unless explicitly enabled.
+        finalContext.acePayloads = await applyCanonicalRerankSecondPass(
+          String(query ?? ''),
+          finalContext.acePayloads as AcePayload[],
         );
 
         // Write final rank summary line

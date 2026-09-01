@@ -65,6 +65,30 @@ export function combineRRFLanes(
       }
 
       const accumulated = hitAccumulator.get(hit.id)!;
+      const existingLaneIndex = accumulated.contributions.findIndex(
+        (contribution) => contribution.lane === laneName,
+      );
+      if (existingLaneIndex >= 0) {
+        const existingLane = accumulated.contributions[existingLaneIndex]!;
+        // A repeated projection from one logical lane is one vote. Keep the
+        // strongest contribution so a worse duplicate cannot inflate or
+        // replace the lane's evidence.
+        if (hit.rrfContribution <= existingLane.rrfContribution) return;
+        accumulated.finalScore += hit.rrfContribution - existingLane.rrfContribution;
+        accumulated.contributions[existingLaneIndex] = {
+          lane: laneName,
+          laneWeight: 1.0,
+          rank: hit.rank,
+          rrfContribution: hit.rrfContribution,
+        };
+        if (hit.rrfContribution > accumulated.primaryLaneContribution) {
+          accumulated.primaryLane = laneName;
+          accumulated.primaryLaneContribution = hit.rrfContribution;
+          accumulated.metadata = hit.metadata;
+        }
+        return;
+      }
+
       accumulated.finalScore += hit.rrfContribution;
       accumulated.contributions.push({
         lane: laneName,

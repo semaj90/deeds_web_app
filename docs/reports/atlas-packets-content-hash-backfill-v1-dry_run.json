@@ -1,8 +1,8 @@
 {
   "schema": "atlas.atlas-packets-content-hash-backfill.v1",
-  "generatedAt": "2026-08-25T23:10:15.033Z",
+  "generatedAt": "2026-09-01T03:46:14.285Z",
   "mode": "DRY_RUN",
-  "limit": 1000,
+  "limit": 9,
   "status": "DRY_RUN_COMPLETE",
   "gates": {
     "CH_BF_01": {
@@ -16,13 +16,13 @@
     },
     "CH_BF_02": {
       "name": "UNAMBIGUOUS_SELECTION_DETERMINISTIC",
-      "proven": false,
+      "proven": true,
       "orderBy": [
         "packet_key"
       ],
-      "selectedCount": 0,
-      "requestedLimit": 1000,
-      "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "selectedCount": 9,
+      "requestedLimit": 9,
+      "selectionChecksum": "6c9a4d38802a9273a542d896cf8b5fd16794bb144aeb326ae0694cedabf957a5",
       "joinDefinition": "atlas_packets.source_ref = codebase_chunk_index.source_ref, count(DISTINCT codebase_chunk_index.content_hash) = 1, atlas_packets.content_hash IS NULL"
     },
     "CH_BF_03": {
@@ -44,9 +44,9 @@
       "reason": "SKIPPED_DRY_RUN"
     }
   },
-  "selectionChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "selectionChecksum": "6c9a4d38802a9273a542d896cf8b5fd16794bb144aeb326ae0694cedabf957a5",
   "counts": {
-    "selected": 0,
+    "selected": 9,
     "updated": 0,
     "alreadyPopulated": 0,
     "readbackMatched": 0

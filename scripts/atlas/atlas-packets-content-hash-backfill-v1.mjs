@@ -62,9 +62,24 @@ function gate(id, name, proven, detail) {
   return proven;
 }
 
+function assertLocalNonProductionDatabase(value) {
+  const url = new URL(value);
+  const database = decodeURIComponent(url.pathname.replace(/^\//, ''));
+  if (url.hostname !== '127.0.0.1' || url.port !== '5434' || database !== 'legal_ai_db') {
+    throw new Error(`NON_PRODUCTION_DATABASE_REQUIRED:${url.hostname}:${url.port}:${database}`);
+  }
+}
+
 const env = loadRepoEnv(process.env);
+const databaseUrl = resolveDatabaseUrl(env);
+if (MODE === 'APPLY_BOUNDED') {
+  if (env.ATLAS_AUTHORIZE_ATLAS_PACKETS_CONTENT_HASH_BACKFILL !== '1') {
+    throw new Error('EXPLICIT_ATLAS_PACKETS_CONTENT_HASH_BACKFILL_AUTHORIZATION_REQUIRED');
+  }
+  assertLocalNonProductionDatabase(databaseUrl);
+}
 const pool = new pg.Pool({
-  connectionString: resolveDatabaseUrl(env),
+  connectionString: databaseUrl,
   max: 1,
   connectionTimeoutMillis: 5000,
   statement_timeout: 60000,
@@ -130,38 +145,58 @@ try {
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
+        await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+        const lockDigest = crypto.createHash('sha256')
+          .update('atlas.atlas-packets-content-hash-backfill-v1', 'utf8')
+          .digest();
+        const lockResult = await client.query(
+          'SELECT pg_try_advisory_xact_lock($1, $2) AS acquired',
+          [lockDigest.readInt32BE(0), lockDigest.readInt32BE(4)],
+        );
+        if (lockResult.rows[0]?.acquired !== true) {
+          throw new Error('ATLAS_PACKETS_CONTENT_HASH_BACKFILL_LOCK_NOT_ACQUIRED');
+        }
         let updated = 0, alreadyPopulated = 0;
-        const updatedKeys = [];
         for (const row of selection) {
           const res = await client.query(
             `UPDATE atlas_packets SET content_hash = $1, updated_at = now()
              WHERE packet_key = $2 AND content_hash IS NULL`,
             [row.candidate_content_hash, row.packet_key],
           );
-          if (res.rowCount > 0) { updated++; updatedKeys.push(row.packet_key); }
+          if (res.rowCount > 0) { updated++; }
           else { alreadyPopulated++; }
         }
-        await client.query('COMMIT');
         receipt.counts.updated = updated;
         receipt.counts.alreadyPopulated = alreadyPopulated;
-        receipt.postgresWrites = updated > 0;
         gate('CH_BF_03', 'UPDATE_ONLY_APPLY_PROVEN', true, { updated, alreadyPopulated });
 
-        // Reuse the same client (not a fresh pool.query) for the readback — avoids a
-        // second connection-acquire round-trip immediately after COMMIT.
+        // Read back the complete frozen selection before COMMIT. Any mismatch throws,
+        // causing the surrounding transaction to roll back all updates.
         const readback = await client.query(
-          `SELECT p.packet_key, p.content_hash, c.content_hash AS expected
+          `SELECT p.packet_key, p.source_ref, p.content_hash, c.content_hash AS expected
            FROM public.atlas_packets p
            JOIN public.codebase_chunk_index c ON c.source_ref = p.source_ref
            WHERE p.packet_key = ANY($1::text[])
-           GROUP BY p.packet_key, p.content_hash, c.content_hash`,
-          [updatedKeys],
+           GROUP BY p.packet_key, p.source_ref, p.content_hash, c.content_hash`,
+          [selection.map((row) => row.packet_key)],
         );
-        const readbackMatched = readback.rows.filter((r) => r.content_hash === r.expected).length;
+        const actualByKey = new Map(readback.rows.map((row) => [row.packet_key, row]));
+        const readbackMismatches = selection
+          .filter((row) => {
+            const actual = actualByKey.get(row.packet_key);
+            return !actual || actual.source_ref !== row.source_ref || actual.content_hash !== row.candidate_content_hash || actual.expected !== row.candidate_content_hash;
+          })
+          .map((row) => row.packet_key);
+        const readbackMatched = selection.length - readbackMismatches.length;
         receipt.counts.readbackMatched = readbackMatched;
-        gate('CH_BF_04', 'INDEPENDENT_READBACK_PROVEN', readbackMatched === updatedKeys.length, {
-          expected: updatedKeys.length, actual: readbackMatched,
+        gate('CH_BF_04', 'INDEPENDENT_READBACK_PROVEN', readbackMismatches.length === 0, {
+          expected: selection.length, actual: readbackMatched, mismatches: readbackMismatches,
         });
+        if (readbackMismatches.length > 0 || readback.rows.length !== selection.length) {
+          throw new Error('ATLAS_PACKETS_CONTENT_HASH_BACKFILL_READBACK_FAILED');
+        }
+        await client.query('COMMIT');
+        receipt.postgresWrites = updated > 0;
       } catch (err) {
         await client.query('ROLLBACK');
         throw err;

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-21T06:30:50.735Z",
+  "generatedAt": "2026-09-01T04:08:18.004Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
   "projectRoot": "http://127.0.0.1:5173",
   "queries": [
@@ -7,458 +7,182 @@
       "query": "src/lib/components/agent/AutonomousInvestigator.svelte",
       "query_hash": "afb2b660a29cadf5aa5ab0bfff20165ee69af644dde9391e0c4f896fb83009bc",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 10,
-      "postgres_lookup_ms": 127,
-      "neo4j_expand_ms": 191,
-      "redis_cache_ms": 2607,
-      "gpu_rerank_ms": 252,
-      "answer_ms": 4500,
-      "total_ms": 7849,
+      "qdrant_ms": 679,
+      "postgres_lookup_ms": 1536,
+      "neo4j_expand_ms": 9957,
+      "redis_cache_ms": 600,
+      "gpu_rerank_ms": 2958,
+      "answer_ms": 3887,
+      "total_ms": 25288,
       "qdrant_hits": 12,
-      "ledger_matches": 3251,
-      "tree_matches": 3251,
+      "ledger_matches": 3,
+      "tree_matches": 3,
       "glyph_matches": 0,
-      "neo4j_matches": 3251,
+      "neo4j_matches": 0,
       "source_ref_pct": 100,
       "feature_id_pct": 100,
+      "source_revision_count": 0,
+      "workspace_revision_count": 3,
+      "representation_revision_count": 3,
+      "graph_revision_count": 0,
+      "revision_bound_count": 0,
       "graph_stage_status": "GRAPH_ENABLED",
-      "graph_hit_count": 20,
+      "graph_hit_count": 2,
       "graph_rank_contribution": 0.5,
       "traversal_path": "Concept-[:REL]->Packet",
       "graph_error": null,
-      "rerank_count": 0,
-      "answer_length": 836,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
+      "rerank_count": 12,
+      "answer_length": 314,
+      "errors": [],
+      "status": "pass",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 137,
+          "latency_ms": 5557,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 10,
+          "latency_ms": 679,
           "error": null
         },
         "postgres": {
           "ok": true,
-          "latency_ms": 127
+          "latency_ms": 1536
         },
         "redis": {
           "ok": true,
-          "latency_ms": 2607,
-          "hot_key_count": 928,
+          "latency_ms": 600,
+          "hot_key_count": 0,
           "cache_hits": 0,
           "source": "valkey",
           "namespaces": {
-            "bifrost:*": 346,
-            "bifrost:packet:*": 61,
-            "bifrost:sem:packet:*": 204,
-            "bifrost:sem:feature:*": 80,
+            "bifrost:*": 0,
+            "bifrost:packet:*": 0,
+            "bifrost:sem:packet:*": 0,
+            "bifrost:sem:feature:*": 0,
             "bifrost:sem:intent:*": 0,
-            "centroid:*": 85,
-            "som:*": 152
+            "centroid:*": 0,
+            "som:*": 0
           },
-          "legacy_karpathy_keys": 1
+          "legacy_karpathy_keys": 2
         },
         "neo4j": {
           "ok": true,
-          "latency_ms": 191,
+          "latency_ms": 9957,
           "graph_stage_status": "GRAPH_ENABLED",
-          "graph_hit_count": 20,
+          "graph_hit_count": 2,
           "graph_rank_contribution": 0.5,
           "traversal_path": "Concept-[:REL]->Packet",
           "graph_error": null,
           "rows": [
             {
-              "packet_key": "src/lib/schemas/tools/scan-repo.schema.json:433425ccf6f8f995",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
-              "graph_hit_count": 2,
+              "packet_key": "packet:0ed348991575",
+              "source_ref": "claude-mem/scripts/investigate-timestamps.ts",
+              "graph_hit_count": 1,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/mcp/zod-to-json-schema-bridge/package.json:685e749da2e11ee0",
-              "source_ref": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/package.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/langextract-batch.schema.json:39388aba1a339004",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/data/phase82-route-consolidation.json:dd64543b486953fb",
-              "source_ref": "sveltekit-frontend/src/lib/data/phase82-route-consolidation.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/0000_snapshot.json:76e1d681ec4af878",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/_journal.json:f12577784e41cfd7",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/_journal.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/chunk-embed.schema.json:f7dbebf139eea595",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/kb-search.schema.json:796f51937f9f1fca",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/ace-agent.ts:0dad0a178c7ae00c",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/llm-context-cache.test.ts:f1ce8ad50d4a0a04",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-cache-planner.ts:52502c3f2f0542df",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-cache-planner.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-assembler.ts:ebe0bc5e6bc87b26",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/user-analytics-context.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/graph-expander.ts:87f62c885fc5d0be",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/graph-expander.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/error-kag-writer.ts:b58b932fb8fd8f76",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/auto-tagger.ts:bb22963d0633859f",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/cache-keys.ts:77e814ac726b2c62",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/kag-dag-runner.ts:f65ac94629c19dc5",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
-              "graph_hit_count": 10,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/retrieval-lanes.ts:72154fd16ce3e84b",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/cluster-tag.schema.json:8a3c2b579124c2a7",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/cluster-tag.schema.json",
-              "graph_hit_count": 3,
+              "packet_key": "packet:4f168af28f3b",
+              "source_ref": "scripts/tests/test-agent-investigate.mjs",
+              "graph_hit_count": 1,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             }
           ],
-          "matches": 20,
+          "matches": 2,
           "error": null,
           "source": "live_http",
-          "httpUrl": "http://localhost:7474/db/neo4j/tx/commit"
+          "httpUrl": "http://127.0.0.1:7474/db/neo4j/tx/commit"
         },
         "gpu": {
-          "ok": false,
-          "latency_ms": 252,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023454011:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
+          "ok": true,
+          "latency_ms": 2958,
+          "source": "cpu",
+          "scores": [
+            0.7538763284683228,
+            0.7538763284683228,
+            0.7414376735687256,
+            0.7414376735687256,
+            0.7279611229896545,
+            0.7279611229896545,
+            0.7188368439674377,
+            0.7188368439674377,
+            0.7024025917053223,
+            0.7024025917053223,
+            0.7009791135787964,
+            0.7009791135787964
+          ]
         },
         "answer": {
           "ok": true,
-          "latency_ms": 4500,
+          "latency_ms": 3887,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking for information regarding the file `src/lib/components/agent/AutonomousInvestigator.svelte` using a provided, limited retrieval context.\n2.  **Analyze the Context:** The context provided contains five entries, listing `packet_key`, `source_ref`, `feature_id`, `feature_label`, and `summary`.\n    *   Entry 1: `src/lib/server/admin/retrieval-analytics-service.ts`\n    *   Entry 2: `src/lib/server/ai/contextual-tools.ts`\n    *   Entry 3: `src/lib/server/couchdb/mango-indexes.ts`\n    *   Entry 4: `src/routes/api/analytics/file-activity/+server.ts`\n    *   Entry 5: `src/mcp/server.ts#langextract:custom`\n3.  **Compare Query to Context:**\n    *   Query: `src/lib/components/agent/AutonomousInvestigator.svelte`\n    *   Context files: (See list above)\n4",
+          "answer": "The evidence is thin. The provided context only lists packet keys, source references, feature IDs/labels, and `summary=n/a` for each entry. It contains no actual content, code, or description of `src/lib/components/agent/AutonomousInvestigator.svelte`, so I cannot answer concretely about its contents or behavior.",
           "source": "turboquant"
         }
       },
       "top_packets": [
         {
-          "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "source_ref_key": null,
+          "packet_key": "ace:packet:e9d05911beff",
+          "source_ref": "src/routes/api/agent/investigate/+server.ts",
+          "source_ref_key": "src/routes/api/agent/investigate/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "2fb42c3b-1166-47f5-9cf4-c44f119df817",
+          "tree_node_id": "4bb3c28e-edbe-4ee4-9759-9ee2f53660e8",
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "bifrost:sem:feature:admin",
-              "ace:context:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "ace:feature:admin"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "feature_id": "admin",
-          "feature_label": "lib",
-          "som_cluster": 25
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": null,
+          "feature_id": "investigate",
+          "feature_label": "investigate",
+          "som_cluster": "0",
+          "source_revision": null,
+          "workspace_revision": 0,
+          "representation_revision": 0,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "source_ref": "src/lib/server/ai/contextual-tools.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
+          "packet_key": "ace:packet:bb8ac40b4416",
+          "source_ref": "src/routes/(app)/demos/investigate/+page.svelte",
+          "source_ref_key": "src/routes/(app)/demos/investigate/+page.svelte",
+          "qdrant_point_id": "1504",
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "c6d8d189-8718-4bd0-b008-ad6e41aac811",
+          "tree_node_id": "745620bd-b5d3-4411-8920-484121414733",
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "bifrost:sem:feature:ai",
-              "ace:context:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "ace:feature:ai"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "feature_id": "ai",
-          "feature_label": "lib",
-          "som_cluster": 3
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": null,
+          "feature_id": "investigate",
+          "feature_label": "investigate",
+          "som_cluster": "0",
+          "source_revision": null,
+          "workspace_revision": 0,
+          "representation_revision": 0,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
+          "packet_key": "ace:packet:afb2b660a29c",
+          "source_ref": "src/lib/components/agent/AutonomousInvestigator.svelte",
+          "source_ref_key": "src/lib/components/agent/AutonomousInvestigator.svelte",
+          "qdrant_point_id": "1957",
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "d7b35e73-dc6a-4cbb-ad14-da5999ae0ea1",
+          "tree_node_id": "ea8943cc-6f88-40b0-ab6b-f6b6cd7da0b6",
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "bifrost:sem:feature:couchdb",
-              "ace:context:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "ace:feature:couchdb"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/couchdb/mango-indexes.ts",
-          "feature_id": "couchdb",
-          "feature_label": "lib",
-          "som_cluster": 3
-        },
-        {
-          "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-          "source_ref": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "d13bacc2-f764-41e4-b708-8d22e3ed92b5",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "bifrost:sem:feature:routes",
-              "ace:context:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "ace:feature:routes"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "feature_id": "routes",
-          "feature_label": "Routes",
-          "som_cluster": 2
-        },
-        {
-          "packet_key": "1125b964826d67d7",
-          "source_ref": "src/mcp/server.ts#langextract:custom",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "fc739dec-7a15-49d0-a735-33c169681368",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "candidate_keys": [
-              "bifrost:sem:packet:1125b964826d67d7",
-              "bifrost:sem:feature:6a545f1e8ce22358",
-              "ace:context:1125b964826d67d7",
-              "ace:feature:6a545f1e8ce22358"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/mcp/server.ts#langextract:custom",
-          "feature_id": "6a545f1e8ce22358",
-          "feature_label": "6a545f1e8ce22358",
-          "som_cluster": 32
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": null,
+          "feature_id": "AutonomousInvestigator",
+          "feature_label": "AutonomousInvestigator",
+          "som_cluster": "0",
+          "source_revision": null,
+          "workspace_revision": 0,
+          "representation_revision": 0,
+          "graph_revision": null
         }
       ]
     },
@@ -466,66 +190,69 @@
       "query": "src/routes/admin/observability/+page.server.ts",
       "query_hash": "cd74afdd6647a9f7d32c7097e672787785452b393cb52c22a1ee5104e0ee1464",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 17,
-      "postgres_lookup_ms": 56,
-      "neo4j_expand_ms": 123,
-      "redis_cache_ms": 2159,
-      "gpu_rerank_ms": 239,
-      "answer_ms": 6084,
-      "total_ms": 8876,
+      "qdrant_ms": 590,
+      "postgres_lookup_ms": 37,
+      "neo4j_expand_ms": 3638,
+      "redis_cache_ms": 726,
+      "gpu_rerank_ms": 2195,
+      "answer_ms": 4023,
+      "total_ms": 11287,
       "qdrant_hits": 12,
-      "ledger_matches": 3251,
-      "tree_matches": 3251,
+      "ledger_matches": 777,
+      "tree_matches": 0,
       "glyph_matches": 0,
-      "neo4j_matches": 3251,
+      "neo4j_matches": 0,
       "source_ref_pct": 100,
       "feature_id_pct": 100,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "representation_revision_count": 0,
+      "graph_revision_count": 0,
+      "revision_bound_count": 0,
       "graph_stage_status": "GRAPH_ENABLED",
       "graph_hit_count": 20,
       "graph_rank_contribution": 0.5,
       "traversal_path": "Concept-[:REL]->Packet",
       "graph_error": null,
-      "rerank_count": 0,
-      "answer_length": 844,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
+      "rerank_count": 12,
+      "answer_length": 378,
+      "errors": [],
+      "status": "pass",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 163,
+          "latency_ms": 62,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 17,
+          "latency_ms": 590,
           "error": null
         },
         "postgres": {
           "ok": true,
-          "latency_ms": 56
+          "latency_ms": 37
         },
         "redis": {
           "ok": true,
-          "latency_ms": 2159,
-          "hot_key_count": 928,
+          "latency_ms": 726,
+          "hot_key_count": 0,
           "cache_hits": 0,
           "source": "valkey",
           "namespaces": {
-            "bifrost:*": 346,
-            "bifrost:packet:*": 61,
-            "bifrost:sem:packet:*": 204,
-            "bifrost:sem:feature:*": 80,
+            "bifrost:*": 0,
+            "bifrost:packet:*": 0,
+            "bifrost:sem:packet:*": 0,
+            "bifrost:sem:feature:*": 0,
             "bifrost:sem:intent:*": 0,
-            "centroid:*": 85,
-            "som:*": 152
+            "centroid:*": 0,
+            "som:*": 0
           },
-          "legacy_karpathy_keys": 1
+          "legacy_karpathy_keys": 2
         },
         "neo4j": {
           "ok": true,
-          "latency_ms": 123,
+          "latency_ms": 3638,
           "graph_stage_status": "GRAPH_ENABLED",
           "graph_hit_count": 20,
           "graph_rank_contribution": 0.5,
@@ -533,142 +260,142 @@
           "graph_error": null,
           "rows": [
             {
-              "packet_key": "src/lib/schemas/tools/scan-repo.schema.json:433425ccf6f8f995",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/mcp/zod-to-json-schema-bridge/package.json:685e749da2e11ee0",
-              "source_ref": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/package.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/langextract-batch.schema.json:39388aba1a339004",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/data/phase82-route-consolidation.json:dd64543b486953fb",
-              "source_ref": "sveltekit-frontend/src/lib/data/phase82-route-consolidation.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/0000_snapshot.json:76e1d681ec4af878",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/_journal.json:f12577784e41cfd7",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/_journal.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/chunk-embed.schema.json:f7dbebf139eea595",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/kb-search.schema.json:796f51937f9f1fca",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/ace-agent.ts:0dad0a178c7ae00c",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/llm-context-cache.test.ts:f1ce8ad50d4a0a04",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-cache-planner.ts:52502c3f2f0542df",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-cache-planner.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-assembler.ts:ebe0bc5e6bc87b26",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/user-analytics-context.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/graph-expander.ts:87f62c885fc5d0be",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/graph-expander.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/error-kag-writer.ts:b58b932fb8fd8f76",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/auto-tagger.ts:bb22963d0633859f",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/cache-keys.ts:77e814ac726b2c62",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/kag-dag-runner.ts:f65ac94629c19dc5",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
+              "packet_key": "packet:000fde9311af",
+              "source_ref": "src/routes/api/ai/bifrost/+server.ts",
               "graph_hit_count": 10,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/retrieval-lanes.ts:72154fd16ce3e84b",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:001789105fcc",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-06-13t15-21-32-591z.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/schemas/tools/cluster-tag.schema.json:8a3c2b579124c2a7",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/cluster-tag.schema.json",
-              "graph_hit_count": 3,
+              "packet_key": "packet:003655c2cdf4",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:003ccb8a42d2",
+              "source_ref": "sveltekit-frontend/docs/graph/repo-neo4j-graphrag-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:0046c7db4fb2",
+              "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:004ec0f69a1e",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__helpers__env-ports.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:006645136d28",
+              "source_ref": "sveltekit-frontend/src/routes/api/reports/save/+server.ts",
+              "graph_hit_count": 10,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008826e9f7c1",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T19-11-14/llm_synthesis_mapping.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008af5973d29",
+              "source_ref": "sveltekit-frontend/docs_readme/deeds_labs_archive/agentic-demo-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008b7a0156a6",
+              "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55/lane3-rerank.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008bcd9cc7d1",
+              "source_ref": "sveltekit-frontend/logs/task-output/ace-context-pack-startup.log",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008f008835fa",
+              "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-14T15-27-36-953Z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00953bcefd56",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__ai__judge.test.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00ac3359b471",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__ai__gamingaibutton.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00bbd4541233",
+              "source_ref": "sveltekit-frontend/static/fonts/ms-gothic-170.woff2",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00bda68055c2",
+              "source_ref": "sveltekit-frontend/src/routes/api/security/validate/progress/+server.ts",
+              "graph_hit_count": 10,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00dd22dcf754",
+              "source_ref": "sveltekit-frontend/memory/ingest/processed/graphify_deep_imports_2026-05-29T15-37-12-347Z.jsonl",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00e302ba764a",
+              "source_ref": "sveltekit-frontend/memory/graphify/gds/12869992bd6b.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00e4f7fd2ebf",
+              "source_ref": "sveltekit-frontend/logs/ace-intent-reward/latest.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:000b1b923bf4",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-05-13t00-19-01-475z.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             }
@@ -676,248 +403,135 @@
           "matches": 20,
           "error": null,
           "source": "live_http",
-          "httpUrl": "http://localhost:7474/db/neo4j/tx/commit"
+          "httpUrl": "http://127.0.0.1:7474/db/neo4j/tx/commit"
         },
         "gpu": {
-          "ok": false,
-          "latency_ms": 239,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023462816:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
+          "ok": true,
+          "latency_ms": 2195,
+          "source": "cpu",
+          "scores": [
+            0.7261354923248291,
+            0.7261354923248291,
+            0.7134473323822021,
+            0.7134473323822021,
+            0.7126745581626892,
+            0.7126745581626892,
+            0.702221691608429,
+            0.702221691608429,
+            0.6891239285469055,
+            0.6902925372123718,
+            0.6902925372123718,
+            0.6891239285469055
+          ]
         },
         "answer": {
           "ok": true,
-          "latency_ms": 6084,
+          "latency_ms": 4023,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking for information related to the file `src/routes/admin/observability/+page.server.ts` using the provided context.\n2.  **Analyze the Context:** I need to check if any of the provided `source_ref` or `packet_key` match or are closely related to `src/routes/admin/observability/+page.server.ts`.\n\n    *   Context 1: `source_ref=src/lib/server/admin/retrieval-analytics-service.ts` (Related to `admin`, but not the target file).\n    *   Context 2: `source_ref=src/lib/server/ai/contextual-tools.ts` (Irrelevant).\n    *   Context 3: `source_ref=src/lib/server/couchdb/mango-indexes.ts` (Irrelevant).\n    *   Context 4: `source_ref=sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts` (Related to `routes`, but not the target file).\n    *   Context ",
+          "answer": "The evidence is thin. None of the provided packets reference `src/routes/admin/observability/+page.server.ts`. The context only contains packets for unrelated API routes (e.g., `sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts`, `sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts`, etc.), with no summaries or content about the observability admin page.",
           "source": "turboquant"
         }
       },
       "top_packets": [
         {
-          "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:000fde9311af",
+          "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+          "source_ref_key": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "2fb42c3b-1166-47f5-9cf4-c44f119df817",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "bifrost:sem:feature:admin",
-              "ace:context:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "ace:feature:admin"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "feature_id": "admin",
-          "feature_label": "lib",
-          "som_cluster": 25
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "source_ref": "src/lib/server/ai/contextual-tools.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:4aa34088057f",
+          "source_ref": "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
+          "source_ref_key": "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "c6d8d189-8718-4bd0-b008-ad6e41aac811",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "bifrost:sem:feature:ai",
-              "ace:context:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "ace:feature:ai"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "feature_id": "ai",
-          "feature_label": "lib",
-          "som_cluster": 3
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:5091f576829d",
+          "source_ref": "sveltekit-frontend/src/routes/api/test/cache-demo/+server.ts",
+          "source_ref_key": "sveltekit-frontend/src/routes/api/test/cache-demo/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "d7b35e73-dc6a-4cbb-ad14-da5999ae0ea1",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "bifrost:sem:feature:couchdb",
-              "ace:context:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "ace:feature:couchdb"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/couchdb/mango-indexes.ts",
-          "feature_id": "couchdb",
-          "feature_label": "lib",
-          "som_cluster": 3
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/routes/api/test/cache-demo/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-          "source_ref": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:942f4d7af33d",
+          "source_ref": "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts",
+          "source_ref_key": "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "d13bacc2-f764-41e4-b708-8d22e3ed92b5",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "bifrost:sem:feature:routes",
-              "ace:context:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "ace:feature:routes"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "feature_id": "routes",
-          "feature_label": "Routes",
-          "som_cluster": 2
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "1125b964826d67d7",
-          "source_ref": "src/mcp/server.ts#langextract:custom",
-          "source_ref_key": null,
+          "packet_key": "packet:45cbd2cd7830",
+          "source_ref": "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts",
+          "source_ref_key": "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "fc739dec-7a15-49d0-a735-33c169681368",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "candidate_keys": [
-              "bifrost:sem:packet:1125b964826d67d7",
-              "bifrost:sem:feature:6a545f1e8ce22358",
-              "ace:context:1125b964826d67d7",
-              "ace:feature:6a545f1e8ce22358"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/mcp/server.ts#langextract:custom",
-          "feature_id": "6a545f1e8ce22358",
-          "feature_label": "6a545f1e8ce22358",
-          "som_cluster": 32
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts",
+          "feature_id": "sveltekit-frontend.+server",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         }
       ]
     },
@@ -925,40 +539,661 @@
       "query": "src/lib/components/ui/index.ts",
       "query_hash": "59ae20d7db27438fac6ff6d984cbff81fa77854c664bf0b18d48dc669087ca4a",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 9,
-      "postgres_lookup_ms": 32,
-      "neo4j_expand_ms": 137,
-      "redis_cache_ms": 2455,
-      "gpu_rerank_ms": 249,
-      "answer_ms": 6032,
-      "total_ms": 9068,
+      "qdrant_ms": 334,
+      "postgres_lookup_ms": 35,
+      "neo4j_expand_ms": 1344,
+      "redis_cache_ms": 566,
+      "gpu_rerank_ms": 797,
+      "answer_ms": 5922,
+      "total_ms": 9045,
       "qdrant_hits": 12,
-      "ledger_matches": 3251,
-      "tree_matches": 3251,
+      "ledger_matches": 121,
+      "tree_matches": 54,
       "glyph_matches": 0,
-      "neo4j_matches": 3251,
+      "neo4j_matches": 0,
       "source_ref_pct": 100,
       "feature_id_pct": 100,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "representation_revision_count": 0,
+      "graph_revision_count": 0,
+      "revision_bound_count": 0,
       "graph_stage_status": "GRAPH_ENABLED",
       "graph_hit_count": 20,
       "graph_rank_contribution": 0.5,
       "traversal_path": "Concept-[:REL]->Packet",
       "graph_error": null,
-      "rerank_count": 0,
-      "answer_length": 828,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
+      "rerank_count": 12,
+      "answer_length": 137,
+      "errors": [],
+      "status": "pass",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 119,
+          "latency_ms": 22,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 9,
+          "latency_ms": 334,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 35
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 566,
+          "hot_key_count": 0,
+          "cache_hits": 0,
+          "source": "valkey",
+          "namespaces": {
+            "bifrost:*": 0,
+            "bifrost:packet:*": 0,
+            "bifrost:sem:packet:*": 0,
+            "bifrost:sem:feature:*": 0,
+            "bifrost:sem:intent:*": 0,
+            "centroid:*": 0,
+            "som:*": 0
+          },
+          "legacy_karpathy_keys": 2
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 1344,
+          "graph_stage_status": "GRAPH_ENABLED",
+          "graph_hit_count": 20,
+          "graph_rank_contribution": 0.5,
+          "traversal_path": "Concept-[:REL]->Packet",
+          "graph_error": null,
+          "rows": [
+            {
+              "packet_key": "packet:001789105fcc",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-06-13t15-21-32-591z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:003655c2cdf4",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:003ccb8a42d2",
+              "source_ref": "sveltekit-frontend/docs/graph/repo-neo4j-graphrag-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:0046c7db4fb2",
+              "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+              "graph_hit_count": 10,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:004ec0f69a1e",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__helpers__env-ports.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:006645136d28",
+              "source_ref": "sveltekit-frontend/src/routes/api/reports/save/+server.ts",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008826e9f7c1",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T19-11-14/llm_synthesis_mapping.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008af5973d29",
+              "source_ref": "sveltekit-frontend/docs_readme/deeds_labs_archive/agentic-demo-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008b7a0156a6",
+              "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55/lane3-rerank.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008bcd9cc7d1",
+              "source_ref": "sveltekit-frontend/logs/task-output/ace-context-pack-startup.log",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008f008835fa",
+              "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-14T15-27-36-953Z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00953bcefd56",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__ai__judge.test.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00ac3359b471",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__ai__gamingaibutton.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00bbd4541233",
+              "source_ref": "sveltekit-frontend/static/fonts/ms-gothic-170.woff2",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00dd22dcf754",
+              "source_ref": "sveltekit-frontend/memory/ingest/processed/graphify_deep_imports_2026-05-29T15-37-12-347Z.jsonl",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00e302ba764a",
+              "source_ref": "sveltekit-frontend/memory/graphify/gds/12869992bd6b.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00e4f7fd2ebf",
+              "source_ref": "sveltekit-frontend/logs/ace-intent-reward/latest.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00e831088491",
+              "source_ref": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00eb16b5aabf",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__ai__error-fix-memory.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:000b1b923bf4",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-05-13t00-19-01-475z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            }
+          ],
+          "matches": 20,
+          "error": null,
+          "source": "live_http",
+          "httpUrl": "http://127.0.0.1:7474/db/neo4j/tx/commit"
+        },
+        "gpu": {
+          "ok": true,
+          "latency_ms": 797,
+          "source": "cpu",
+          "scores": [
+            0.6837483644485474,
+            0.6837483644485474,
+            0.6811251044273376,
+            0.6811251044273376,
+            0.6611326336860657,
+            0.6611326336860657,
+            0.6533992290496826,
+            0.6533992290496826,
+            0.644206702709198,
+            0.6421071887016296,
+            0.6421071887016296,
+            0.644206702709198
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 5922,
+          "model": "local",
+          "answer": "The evidence is thin. None of the five retrieved packets reference `src/lib/components/ui/index.ts`. The context contains only metadata (",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": [
+        {
+          "packet_key": "packet:50c3f6e904e3",
+          "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/distlib/index.py",
+          "source_ref_key": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/distlib/index.py",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/distlib/index.py",
+          "feature_id": "sveltekit-frontend.index",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        },
+        {
+          "packet_key": "packet:7d5677dbd8b0",
+          "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/commands/index.py",
+          "source_ref_key": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/commands/index.py",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/commands/index.py",
+          "feature_id": "sveltekit-frontend.index",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        },
+        {
+          "packet_key": "packet:49d5c1b3bfee",
+          "source_ref": "sveltekit-frontend/src/lib/server/tools/handlers/index.ts",
+          "source_ref_key": "sveltekit-frontend/src/lib/server/tools/handlers/index.ts",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/lib/server/tools/handlers/index.ts",
+          "feature_id": "sveltekit-frontend.index",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        },
+        {
+          "packet_key": "packet:dbbdd48ecee1",
+          "source_ref": "sveltekit-frontend/src/lib/index.ts",
+          "source_ref_key": "sveltekit-frontend/src/lib/index.ts",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/lib/index.ts",
+          "feature_id": "sveltekit-frontend.index",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        },
+        {
+          "packet_key": "packet:39c94fc84f14",
+          "source_ref": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/index.ts",
+          "source_ref_key": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/index.ts",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/index.ts",
+          "feature_id": "sveltekit-frontend.index",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        }
+      ]
+    },
+    {
+      "query": "src/mcp/server.ts",
+      "query_hash": "9f457d54293270cc59a8245e10ad2f90e4b1bc82b1ec74ce6b1c415924069c73",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 281,
+      "postgres_lookup_ms": 26,
+      "neo4j_expand_ms": 929,
+      "redis_cache_ms": 514,
+      "gpu_rerank_ms": 1200,
+      "answer_ms": 5411,
+      "total_ms": 8396,
+      "qdrant_hits": 12,
+      "ledger_matches": 1,
+      "tree_matches": 0,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "source_ref_pct": 100,
+      "feature_id_pct": 100,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "representation_revision_count": 0,
+      "graph_revision_count": 0,
+      "revision_bound_count": 0,
+      "graph_stage_status": "GRAPH_ENABLED",
+      "graph_hit_count": 20,
+      "graph_rank_contribution": 0.5,
+      "traversal_path": "Concept-[:REL]->Packet",
+      "graph_error": null,
+      "rerank_count": 12,
+      "answer_length": 287,
+      "errors": [],
+      "status": "pass",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 22,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 281,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 26
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 514,
+          "hot_key_count": 0,
+          "cache_hits": 0,
+          "source": "valkey",
+          "namespaces": {
+            "bifrost:*": 0,
+            "bifrost:packet:*": 0,
+            "bifrost:sem:packet:*": 0,
+            "bifrost:sem:feature:*": 0,
+            "bifrost:sem:intent:*": 0,
+            "centroid:*": 0,
+            "som:*": 0
+          },
+          "legacy_karpathy_keys": 2
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 929,
+          "graph_stage_status": "GRAPH_ENABLED",
+          "graph_hit_count": 20,
+          "graph_rank_contribution": 0.5,
+          "traversal_path": "Concept-[:REL]->Packet",
+          "graph_error": null,
+          "rows": [
+            {
+              "packet_key": "packet:0014d8ac7795",
+              "source_ref": "docs/obsidian-vault/files/src__routes__api__cases___id___persons___server.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:001789105fcc",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-06-13t15-21-32-591z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:001d9f093944",
+              "source_ref": "docs/obsidian-vault/files/src__lib__server__phase72__clustererrors.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:002b62662acc",
+              "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/embed/search/+server.ts.batch1000-backup",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:003655c2cdf4",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:003ccb8a42d2",
+              "source_ref": "sveltekit-frontend/docs/graph/repo-neo4j-graphrag-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:0046c7db4fb2",
+              "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:004ec0f69a1e",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__helpers__env-ports.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00548ef34afb",
+              "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gpu-error-processing/+server.ts",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:0055c2d04c92",
+              "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/gallery/+server.ts.disabled",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:006645136d28",
+              "source_ref": "sveltekit-frontend/src/routes/api/reports/save/+server.ts",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:0081c934df12",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__hypergraph__edge___id____server.md",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00848415f727",
+              "source_ref": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
+              "graph_hit_count": 1,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008826e9f7c1",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T19-11-14/llm_synthesis_mapping.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008af5973d29",
+              "source_ref": "sveltekit-frontend/docs_readme/deeds_labs_archive/agentic-demo-report.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008b7a0156a6",
+              "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55/lane3-rerank.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008bcd9cc7d1",
+              "source_ref": "sveltekit-frontend/logs/task-output/ace-context-pack-startup.log",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:008f008835fa",
+              "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-14T15-27-36-953Z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:00953bcefd56",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__ai__judge.test.md",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            },
+            {
+              "packet_key": "packet:000b1b923bf4",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-05-13t00-19-01-475z.json",
+              "graph_hit_count": 2,
+              "graph_rank_contribution": 0.5,
+              "traversal_path": "Concept-[:REL]->Packet"
+            }
+          ],
+          "matches": 20,
+          "error": null,
+          "source": "live_http",
+          "httpUrl": "http://127.0.0.1:7474/db/neo4j/tx/commit"
+        },
+        "gpu": {
+          "ok": true,
+          "latency_ms": 1200,
+          "source": "cpu",
+          "scores": [
+            0.6772639751434326,
+            0.6772639751434326,
+            0.6398898363113403,
+            0.640152633190155,
+            0.6391888856887817,
+            0.6391888856887817,
+            0.6359849572181702,
+            0.6398898363113403,
+            0.6377383470535278,
+            0.640152633190155,
+            0.6359849572181702,
+            0.6257432103157043
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 5411,
+          "model": "local",
+          "answer": "The evidence is thin. The provided context does not contain the contents of `src/mcp/server.ts`. The only reference points to a different file (`sveltekit-frontend/src/mcp/server-fastmcp.ts`), and even that entry has no summary or feature label (`n/a`), so there is no usable information",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": [
+        {
+          "packet_key": "packet:89ada5f1fa10",
+          "source_ref": "sveltekit-frontend/src/mcp/server-fastmcp.ts",
+          "source_ref_key": "sveltekit-frontend/src/mcp/server-fastmcp.ts",
+          "qdrant_point_id": null,
+          "qdrant_payload_key": null,
+          "content_hash": null,
+          "tree_node_id": null,
+          "glyph_record_id": null,
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/mcp/server-fastmcp.ts",
+          "feature_id": "sveltekit-frontend.server-fastmcp",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
+        }
+      ]
+    },
+    {
+      "query": "src/lib/server/db/schema/memory-registry.ts",
+      "query_hash": "bf30c64c5e32b9f2752624a47cd9bf0f16901995bc5caa2cae3e9662ae4cf811",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 201,
+      "postgres_lookup_ms": 32,
+      "neo4j_expand_ms": 1225,
+      "redis_cache_ms": 561,
+      "gpu_rerank_ms": 1949,
+      "answer_ms": 5234,
+      "total_ms": 9354,
+      "qdrant_hits": 12,
+      "ledger_matches": 10,
+      "tree_matches": 2,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "source_ref_pct": 100,
+      "feature_id_pct": 100,
+      "source_revision_count": 0,
+      "workspace_revision_count": 0,
+      "representation_revision_count": 0,
+      "graph_revision_count": 0,
+      "revision_bound_count": 0,
+      "graph_stage_status": "GRAPH_ENABLED",
+      "graph_hit_count": 20,
+      "graph_rank_contribution": 0.5,
+      "traversal_path": "Concept-[:REL]->Packet",
+      "graph_error": null,
+      "rerank_count": 12,
+      "answer_length": 324,
+      "errors": [],
+      "status": "pass",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 149,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 201,
           "error": null
         },
         "postgres": {
@@ -967,24 +1202,24 @@
         },
         "redis": {
           "ok": true,
-          "latency_ms": 2455,
-          "hot_key_count": 928,
+          "latency_ms": 561,
+          "hot_key_count": 0,
           "cache_hits": 0,
           "source": "valkey",
           "namespaces": {
-            "bifrost:*": 346,
-            "bifrost:packet:*": 61,
-            "bifrost:sem:packet:*": 204,
-            "bifrost:sem:feature:*": 80,
+            "bifrost:*": 0,
+            "bifrost:packet:*": 0,
+            "bifrost:sem:packet:*": 0,
+            "bifrost:sem:feature:*": 0,
             "bifrost:sem:intent:*": 0,
-            "centroid:*": 85,
-            "som:*": 152
+            "centroid:*": 0,
+            "som:*": 0
           },
-          "legacy_karpathy_keys": 1
+          "legacy_karpathy_keys": 2
         },
         "neo4j": {
           "ok": true,
-          "latency_ms": 137,
+          "latency_ms": 1225,
           "graph_stage_status": "GRAPH_ENABLED",
           "graph_hit_count": 20,
           "graph_rank_contribution": 0.5,
@@ -992,142 +1227,142 @@
           "graph_error": null,
           "rows": [
             {
-              "packet_key": "src/lib/schemas/tools/scan-repo.schema.json:433425ccf6f8f995",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
+              "packet_key": "packet:001789105fcc",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-06-13t15-21-32-591z.json",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/mcp/zod-to-json-schema-bridge/package.json:685e749da2e11ee0",
-              "source_ref": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/package.json",
+              "packet_key": "packet:003655c2cdf4",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/schemas/tools/langextract-batch.schema.json:39388aba1a339004",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
+              "packet_key": "packet:003ccb8a42d2",
+              "source_ref": "sveltekit-frontend/docs/graph/repo-neo4j-graphrag-report.json",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/data/phase82-route-consolidation.json:dd64543b486953fb",
-              "source_ref": "sveltekit-frontend/src/lib/data/phase82-route-consolidation.json",
+              "packet_key": "packet:0046c7db4fb2",
+              "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/db/meta/0000_snapshot.json:76e1d681ec4af878",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
-              "graph_hit_count": 3,
+              "packet_key": "packet:004ec0f69a1e",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__helpers__env-ports.md",
+              "graph_hit_count": 1,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/db/meta/_journal.json:f12577784e41cfd7",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/_journal.json",
-              "graph_hit_count": 3,
+              "packet_key": "packet:006645136d28",
+              "source_ref": "sveltekit-frontend/src/routes/api/reports/save/+server.ts",
+              "graph_hit_count": 1,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/schemas/tools/chunk-embed.schema.json:f7dbebf139eea595",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json",
+              "packet_key": "packet:008826e9f7c1",
+              "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T19-11-14/llm_synthesis_mapping.json",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/schemas/tools/kb-search.schema.json:796f51937f9f1fca",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
+              "packet_key": "packet:008af5973d29",
+              "source_ref": "sveltekit-frontend/docs_readme/deeds_labs_archive/agentic-demo-report.json",
               "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/ace-agent.ts:0dad0a178c7ae00c",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:008b7a0156a6",
+              "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55/lane3-rerank.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/llm-context-cache.test.ts:f1ce8ad50d4a0a04",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:008bcd9cc7d1",
+              "source_ref": "sveltekit-frontend/logs/task-output/ace-context-pack-startup.log",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/context-cache-planner.ts:52502c3f2f0542df",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-cache-planner.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:008f008835fa",
+              "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-14T15-27-36-953Z.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/context-assembler.ts:ebe0bc5e6bc87b26",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00953bcefd56",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__ai__judge.test.md",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/user-analytics-context.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00ac3359b471",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__ai__gamingaibutton.md",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/graph-expander.ts:87f62c885fc5d0be",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/graph-expander.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00bbd4541233",
+              "source_ref": "sveltekit-frontend/static/fonts/ms-gothic-170.woff2",
+              "graph_hit_count": 1,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/error-kag-writer.ts:b58b932fb8fd8f76",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00dd22dcf754",
+              "source_ref": "sveltekit-frontend/memory/ingest/processed/graphify_deep_imports_2026-05-29T15-37-12-347Z.jsonl",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/auto-tagger.ts:bb22963d0633859f",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00e302ba764a",
+              "source_ref": "sveltekit-frontend/memory/graphify/gds/12869992bd6b.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/cache-keys.ts:77e814ac726b2c62",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00e4f7fd2ebf",
+              "source_ref": "sveltekit-frontend/logs/ace-intent-reward/latest.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/kag-dag-runner.ts:f65ac94629c19dc5",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
-              "graph_hit_count": 10,
+              "packet_key": "packet:00e831088491",
+              "source_ref": "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/server/ace/retrieval-lanes.ts:72154fd16ce3e84b",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-              "graph_hit_count": 7,
+              "packet_key": "packet:00eb16b5aabf",
+              "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__ai__error-fix-memory.md",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             },
             {
-              "packet_key": "src/lib/schemas/tools/cluster-tag.schema.json:8a3c2b579124c2a7",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/cluster-tag.schema.json",
-              "graph_hit_count": 3,
+              "packet_key": "packet:000b1b923bf4",
+              "source_ref": "logs/task-output/pipeline-test/startup-2026-05-13t00-19-01-475z.json",
+              "graph_hit_count": 2,
               "graph_rank_contribution": 0.5,
               "traversal_path": "Concept-[:REL]->Packet"
             }
@@ -1135,1166 +1370,135 @@
           "matches": 20,
           "error": null,
           "source": "live_http",
-          "httpUrl": "http://localhost:7474/db/neo4j/tx/commit"
+          "httpUrl": "http://127.0.0.1:7474/db/neo4j/tx/commit"
         },
         "gpu": {
-          "ok": false,
-          "latency_ms": 249,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023473451:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
+          "ok": true,
+          "latency_ms": 1949,
+          "source": "cpu",
+          "scores": [
+            0.6290599703788757,
+            0.6294106841087341,
+            0.6294106841087341,
+            0.6290599703788757,
+            0.6239913105964661,
+            0.6195431351661682,
+            0.6195431351661682,
+            0.6095903515815735,
+            0.6095903515815735,
+            0.5998976230621338,
+            0.5998976230621338,
+            0.5828506350517273
+          ]
         },
         "answer": {
           "ok": true,
-          "latency_ms": 6032,
+          "latency_ms": 5234,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Query:** The user is asking for the content/information related to the file `src/lib/components/ui/index.ts`.\n2.  **Analyze the Context:** I need to check the provided `source_ref` values in the context to see if any match the query path.\n    *   Context 1: `src/lib/server/admin/retrieval-analytics-service.ts`\n    *   Context 2: `src/lib/server/ai/contextual-tools.ts`\n    *   Context 3: `src/lib/server/couchdb/mango-indexes.ts`\n    *   Context 4: `sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts`\n    *   Context 5: `src/mcp/server.ts#langextract:custom`\n3.  **Compare Query to Context:** The query (`src/lib/components/ui/index.ts`) does not match any of the provided `source_ref` values.\n4.  **Formulate the Answer:** Since no evidence exists for",
+          "answer": "The evidence is thin. None of the provided retrieval packets reference `src/lib/server/db/schema/memory-registry.ts`. The available source references concern `ai_chat.ts` (schema), `auth.ts` (schemas), a pip auth module, and a developer strategy guide—none of which contain information about the memory-registry schema file.",
           "source": "turboquant"
         }
       },
       "top_packets": [
         {
-          "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:e5f6328785c6",
+          "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/network/auth.py",
+          "source_ref_key": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/network/auth.py",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "2fb42c3b-1166-47f5-9cf4-c44f119df817",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "bifrost:sem:feature:admin",
-              "ace:context:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "ace:feature:admin"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "feature_id": "admin",
-          "feature_label": "lib",
-          "som_cluster": 25
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_internal/network/auth.py",
+          "feature_id": "sveltekit-frontend.auth",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "source_ref": "src/lib/server/ai/contextual-tools.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:c5679f3bfd53",
+          "source_ref": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
+          "source_ref_key": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "c6d8d189-8718-4bd0-b008-ad6e41aac811",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "bifrost:sem:feature:ai",
-              "ace:context:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "ace:feature:ai"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "feature_id": "ai",
-          "feature_label": "lib",
-          "som_cluster": 3
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/ai_chat.ts",
+          "feature_id": "sveltekit-frontend.ai_chat",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:8649617f7bbd",
+          "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts",
+          "source_ref_key": "sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "d7b35e73-dc6a-4cbb-ad14-da5999ae0ea1",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "bifrost:sem:feature:couchdb",
-              "ace:context:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "ace:feature:couchdb"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/couchdb/mango-indexes.ts",
-          "feature_id": "couchdb",
-          "feature_label": "lib",
-          "som_cluster": 3
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/lib/server/db/schema/ai_chat.ts",
+          "feature_id": "sveltekit-frontend.ai_chat",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-          "source_ref": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "source_ref_key": null,
+          "packet_key": "packet:a008bef58c28",
+          "source_ref": "sveltekit-frontend/src/lib/schemas/auth.ts",
+          "source_ref_key": "sveltekit-frontend/src/lib/schemas/auth.ts",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "d13bacc2-f764-41e4-b708-8d22e3ed92b5",
+          "tree_node_id": null,
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "bifrost:sem:feature:routes",
-              "ace:context:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "ace:feature:routes"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "feature_id": "routes",
-          "feature_label": "Routes",
-          "som_cluster": 2
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/src/lib/schemas/auth.ts",
+          "feature_id": "sveltekit-frontend.auth",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         },
         {
-          "packet_key": "1125b964826d67d7",
-          "source_ref": "src/mcp/server.ts#langextract:custom",
-          "source_ref_key": null,
+          "packet_key": "packet:ea51f7b3b4e2",
+          "source_ref": "sveltekit-frontend/docs/DEVELOPER_STRATEGY_GUIDE.md",
+          "source_ref_key": "sveltekit-frontend/docs/DEVELOPER_STRATEGY_GUIDE.md",
           "qdrant_point_id": null,
           "qdrant_payload_key": null,
           "content_hash": null,
-          "tree_node_id": "fc739dec-7a15-49d0-a735-33c169681368",
+          "tree_node_id": "daa9a1e2-dadc-4279-9141-9469b51af569",
           "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "candidate_keys": [
-              "bifrost:sem:packet:1125b964826d67d7",
-              "bifrost:sem:feature:6a545f1e8ce22358",
-              "ace:context:1125b964826d67d7",
-              "ace:feature:6a545f1e8ce22358"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/mcp/server.ts#langextract:custom",
-          "feature_id": "6a545f1e8ce22358",
-          "feature_label": "6a545f1e8ce22358",
-          "som_cluster": 32
-        }
-      ]
-    },
-    {
-      "query": "src/mcp/server.ts",
-      "query_hash": "9f457d54293270cc59a8245e10ad2f90e4b1bc82b1ec74ce6b1c415924069c73",
-      "retrieval_strategy": "fusion",
-      "qdrant_ms": 12,
-      "postgres_lookup_ms": 67,
-      "neo4j_expand_ms": 136,
-      "redis_cache_ms": 2294,
-      "gpu_rerank_ms": 276,
-      "answer_ms": 5880,
-      "total_ms": 8835,
-      "qdrant_hits": 12,
-      "ledger_matches": 3251,
-      "tree_matches": 3251,
-      "glyph_matches": 0,
-      "neo4j_matches": 3251,
-      "source_ref_pct": 100,
-      "feature_id_pct": 100,
-      "graph_stage_status": "GRAPH_ENABLED",
-      "graph_hit_count": 20,
-      "graph_rank_contribution": 0.5,
-      "traversal_path": "Concept-[:REL]->Packet",
-      "graph_error": null,
-      "rerank_count": 0,
-      "answer_length": 775,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": true,
-          "latency_ms": 122,
-          "model": "embeddinggemma:latest"
-        },
-        "qdrant": {
-          "ok": true,
-          "latency_ms": 12,
-          "error": null
-        },
-        "postgres": {
-          "ok": true,
-          "latency_ms": 67
-        },
-        "redis": {
-          "ok": true,
-          "latency_ms": 2294,
-          "hot_key_count": 928,
-          "cache_hits": 0,
-          "source": "valkey",
-          "namespaces": {
-            "bifrost:*": 346,
-            "bifrost:packet:*": 61,
-            "bifrost:sem:packet:*": 204,
-            "bifrost:sem:feature:*": 80,
-            "bifrost:sem:intent:*": 0,
-            "centroid:*": 85,
-            "som:*": 152
-          },
-          "legacy_karpathy_keys": 1
-        },
-        "neo4j": {
-          "ok": true,
-          "latency_ms": 136,
-          "graph_stage_status": "GRAPH_ENABLED",
-          "graph_hit_count": 20,
-          "graph_rank_contribution": 0.5,
-          "traversal_path": "Concept-[:REL]->Packet",
-          "graph_error": null,
-          "rows": [
-            {
-              "packet_key": "src/lib/schemas/tools/scan-repo.schema.json:433425ccf6f8f995",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/mcp/zod-to-json-schema-bridge/package.json:685e749da2e11ee0",
-              "source_ref": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/package.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/langextract-batch.schema.json:39388aba1a339004",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/data/phase82-route-consolidation.json:dd64543b486953fb",
-              "source_ref": "sveltekit-frontend/src/lib/data/phase82-route-consolidation.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/0000_snapshot.json:76e1d681ec4af878",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/_journal.json:f12577784e41cfd7",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/_journal.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/chunk-embed.schema.json:f7dbebf139eea595",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/kb-search.schema.json:796f51937f9f1fca",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/ace-agent.ts:0dad0a178c7ae00c",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/llm-context-cache.test.ts:f1ce8ad50d4a0a04",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-cache-planner.ts:52502c3f2f0542df",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-cache-planner.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-assembler.ts:ebe0bc5e6bc87b26",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/user-analytics-context.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/graph-expander.ts:87f62c885fc5d0be",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/graph-expander.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/error-kag-writer.ts:b58b932fb8fd8f76",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/auto-tagger.ts:bb22963d0633859f",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/cache-keys.ts:77e814ac726b2c62",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/kag-dag-runner.ts:f65ac94629c19dc5",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
-              "graph_hit_count": 10,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/retrieval-lanes.ts:72154fd16ce3e84b",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/cluster-tag.schema.json:8a3c2b579124c2a7",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/cluster-tag.schema.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            }
-          ],
-          "matches": 20,
-          "error": null,
-          "source": "live_http",
-          "httpUrl": "http://localhost:7474/db/neo4j/tx/commit"
-        },
-        "gpu": {
-          "ok": false,
-          "latency_ms": 276,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023483915:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
-        },
-        "answer": {
-          "ok": true,
-          "latency_ms": 5880,
-          "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Query:** The user is asking for information related to the file `src/mcp/server.ts`.\n2.  **Analyze the Context:** I need to scan the provided context entries for a match to `src/mcp/server.ts`.\n    *   Entry 1: `src/lib/server/admin/retrieval-analytics-service.ts` (No match)\n    *   Entry 2: `src/lib/server/ai/contextual-tools.ts` (No match)\n    *   Entry 3: `src/lib/server/couchdb/mango-indexes.ts` (No match)\n    *   Entry 4: `sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts` (No match)\n    *   Entry 5: `src/mcp/server.ts#langextract:custom` (Match found: `source_ref=src/mcp/server.ts`)\n3.  **Synthesize the Answer:** The context contains one entry directly referencing `src/mcp/server.ts`. I",
-          "source": "turboquant"
-        }
-      },
-      "top_packets": [
-        {
-          "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "2fb42c3b-1166-47f5-9cf4-c44f119df817",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "bifrost:sem:feature:admin",
-              "ace:context:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "ace:feature:admin"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "feature_id": "admin",
-          "feature_label": "lib",
-          "som_cluster": 25
-        },
-        {
-          "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "source_ref": "src/lib/server/ai/contextual-tools.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "c6d8d189-8718-4bd0-b008-ad6e41aac811",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "bifrost:sem:feature:ai",
-              "ace:context:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "ace:feature:ai"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "feature_id": "ai",
-          "feature_label": "lib",
-          "som_cluster": 3
-        },
-        {
-          "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "d7b35e73-dc6a-4cbb-ad14-da5999ae0ea1",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "bifrost:sem:feature:couchdb",
-              "ace:context:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "ace:feature:couchdb"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/couchdb/mango-indexes.ts",
-          "feature_id": "couchdb",
-          "feature_label": "lib",
-          "som_cluster": 3
-        },
-        {
-          "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-          "source_ref": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "d13bacc2-f764-41e4-b708-8d22e3ed92b5",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "bifrost:sem:feature:routes",
-              "ace:context:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "ace:feature:routes"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "feature_id": "routes",
-          "feature_label": "Routes",
-          "som_cluster": 2
-        },
-        {
-          "packet_key": "1125b964826d67d7",
-          "source_ref": "src/mcp/server.ts#langextract:custom",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "fc739dec-7a15-49d0-a735-33c169681368",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "candidate_keys": [
-              "bifrost:sem:packet:1125b964826d67d7",
-              "bifrost:sem:feature:6a545f1e8ce22358",
-              "ace:context:1125b964826d67d7",
-              "ace:feature:6a545f1e8ce22358"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/mcp/server.ts#langextract:custom",
-          "feature_id": "6a545f1e8ce22358",
-          "feature_label": "6a545f1e8ce22358",
-          "som_cluster": 32
-        }
-      ]
-    },
-    {
-      "query": "src/lib/server/db/schema/memory-registry.ts",
-      "query_hash": "bf30c64c5e32b9f2752624a47cd9bf0f16901995bc5caa2cae3e9662ae4cf811",
-      "retrieval_strategy": "fusion",
-      "qdrant_ms": 12,
-      "postgres_lookup_ms": 49,
-      "neo4j_expand_ms": 127,
-      "redis_cache_ms": 2525,
-      "gpu_rerank_ms": 237,
-      "answer_ms": 5753,
-      "total_ms": 8920,
-      "qdrant_hits": 12,
-      "ledger_matches": 3251,
-      "tree_matches": 3251,
-      "glyph_matches": 0,
-      "neo4j_matches": 3251,
-      "source_ref_pct": 100,
-      "feature_id_pct": 100,
-      "graph_stage_status": "GRAPH_ENABLED",
-      "graph_hit_count": 20,
-      "graph_rank_contribution": 0.5,
-      "traversal_path": "Concept-[:REL]->Packet",
-      "graph_error": null,
-      "rerank_count": 0,
-      "answer_length": 805,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": true,
-          "latency_ms": 172,
-          "model": "embeddinggemma:latest"
-        },
-        "qdrant": {
-          "ok": true,
-          "latency_ms": 12,
-          "error": null
-        },
-        "postgres": {
-          "ok": true,
-          "latency_ms": 49
-        },
-        "redis": {
-          "ok": true,
-          "latency_ms": 2525,
-          "hot_key_count": 928,
-          "cache_hits": 0,
-          "source": "valkey",
-          "namespaces": {
-            "bifrost:*": 346,
-            "bifrost:packet:*": 61,
-            "bifrost:sem:packet:*": 204,
-            "bifrost:sem:feature:*": 80,
-            "bifrost:sem:intent:*": 0,
-            "centroid:*": 85,
-            "som:*": 152
-          },
-          "legacy_karpathy_keys": 1
-        },
-        "neo4j": {
-          "ok": true,
-          "latency_ms": 127,
-          "graph_stage_status": "GRAPH_ENABLED",
-          "graph_hit_count": 20,
-          "graph_rank_contribution": 0.5,
-          "traversal_path": "Concept-[:REL]->Packet",
-          "graph_error": null,
-          "rows": [
-            {
-              "packet_key": "src/lib/schemas/tools/scan-repo.schema.json:433425ccf6f8f995",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/mcp/zod-to-json-schema-bridge/package.json:685e749da2e11ee0",
-              "source_ref": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/package.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/langextract-batch.schema.json:39388aba1a339004",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/data/phase82-route-consolidation.json:dd64543b486953fb",
-              "source_ref": "sveltekit-frontend/src/lib/data/phase82-route-consolidation.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/0000_snapshot.json:76e1d681ec4af878",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/db/meta/_journal.json:f12577784e41cfd7",
-              "source_ref": "sveltekit-frontend/src/lib/server/db/meta/_journal.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/chunk-embed.schema.json:f7dbebf139eea595",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/kb-search.schema.json:796f51937f9f1fca",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
-              "graph_hit_count": 2,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/ace-agent.ts:0dad0a178c7ae00c",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/llm-context-cache.test.ts:f1ce8ad50d4a0a04",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-cache-planner.ts:52502c3f2f0542df",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-cache-planner.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/context-assembler.ts:ebe0bc5e6bc87b26",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/user-analytics-context.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/graph-expander.ts:87f62c885fc5d0be",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/graph-expander.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/error-kag-writer.ts:b58b932fb8fd8f76",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/error-kag-writer.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/auto-tagger.ts:bb22963d0633859f",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/cache-keys.ts:77e814ac726b2c62",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/kag-dag-runner.ts:f65ac94629c19dc5",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts",
-              "graph_hit_count": 10,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/server/ace/retrieval-lanes.ts:72154fd16ce3e84b",
-              "source_ref": "sveltekit-frontend/src/lib/server/ace/retrieval-lanes.ts",
-              "graph_hit_count": 7,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            },
-            {
-              "packet_key": "src/lib/schemas/tools/cluster-tag.schema.json:8a3c2b579124c2a7",
-              "source_ref": "sveltekit-frontend/src/lib/schemas/tools/cluster-tag.schema.json",
-              "graph_hit_count": 3,
-              "graph_rank_contribution": 0.5,
-              "traversal_path": "Concept-[:REL]->Packet"
-            }
-          ],
-          "matches": 20,
-          "error": null,
-          "source": "live_http",
-          "httpUrl": "http://localhost:7474/db/neo4j/tx/commit"
-        },
-        "gpu": {
-          "ok": false,
-          "latency_ms": 237,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1782023494490:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
-        },
-        "answer": {
-          "ok": true,
-          "latency_ms": 5753,
-          "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user wants information about the file `src/lib/server/db/schema/memory-registry.ts` using the provided context.\n2.  **Analyze the Context:** The context contains 5 entries, listing `source_ref`, `feature_id`, `feature_label`, and `summary`.\n3.  **Scan Context for Match:** I need to check if `src/lib/server/db/schema/memory-registry.ts` appears in any `source_ref` or is otherwise represented.\n    *   Entry 1: `src/lib/server/admin/retrieval-analytics-service.ts` (No match)\n    *   Entry 2: `src/lib/server/ai/contextual-tools.ts` (No match)\n    *   Entry 3: `src/lib/server/couchdb/mango-indexes.ts` (No match)\n    *   Entry 4: `sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts` (No match)\n    *   Entry 5: `src",
-          "source": "turboquant"
-        }
-      },
-      "top_packets": [
-        {
-          "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "2fb42c3b-1166-47f5-9cf4-c44f119df817",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "admin",
-            "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-            "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-            "som_cluster": 25,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "bifrost:sem:feature:admin",
-              "ace:context:src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-              "ace:feature:admin"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "feature_id": "admin",
-          "feature_label": "lib",
-          "som_cluster": 25
-        },
-        {
-          "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "source_ref": "src/lib/server/ai/contextual-tools.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "c6d8d189-8718-4bd0-b008-ad6e41aac811",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "ai",
-            "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-            "source_ref": "src/lib/server/ai/contextual-tools.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "bifrost:sem:feature:ai",
-              "ace:context:src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-              "ace:feature:ai"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/ai/contextual-tools.ts",
-          "feature_id": "ai",
-          "feature_label": "lib",
-          "som_cluster": 3
-        },
-        {
-          "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "d7b35e73-dc6a-4cbb-ad14-da5999ae0ea1",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "couchdb",
-            "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-            "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-            "som_cluster": 3,
-            "community_id": null,
-            "feature_label": "lib",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "bifrost:sem:feature:couchdb",
-              "ace:context:src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-              "ace:feature:couchdb"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/lib/server/couchdb/mango-indexes.ts",
-          "feature_id": "couchdb",
-          "feature_label": "lib",
-          "som_cluster": 3
-        },
-        {
-          "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-          "source_ref": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "d13bacc2-f764-41e4-b708-8d22e3ed92b5",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "routes",
-            "packet_key": "src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-            "source_ref": "src/routes/api/analytics/file-activity/+server.ts",
-            "som_cluster": 2,
-            "community_id": 2,
-            "feature_label": "Routes",
-            "candidate_keys": [
-              "bifrost:sem:packet:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "bifrost:sem:feature:routes",
-              "ace:context:src/routes/api/analytics/file-activity/+server.ts:2c23b08214711f1d",
-              "ace:feature:routes"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "sveltekit-frontend/src/routes/api/analytics/file-activity/+server.ts",
-          "feature_id": "routes",
-          "feature_label": "Routes",
-          "som_cluster": 2
-        },
-        {
-          "packet_key": "1125b964826d67d7",
-          "source_ref": "src/mcp/server.ts#langextract:custom",
-          "source_ref_key": null,
-          "qdrant_point_id": null,
-          "qdrant_payload_key": null,
-          "content_hash": null,
-          "tree_node_id": "fc739dec-7a15-49d0-a735-33c169681368",
-          "glyph_record_id": null,
-          "neo4j_node": {
-            "labels": [
-              "ParentAtlasFeature"
-            ],
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "lineage_version": "higher-hop-v1"
-          },
-          "redis_hot_key": {
-            "source": "packet_spine",
-            "matched": false,
-            "feature_id": "6a545f1e8ce22358",
-            "packet_key": "1125b964826d67d7",
-            "source_ref": "src/mcp/server.ts#langextract:custom",
-            "som_cluster": 32,
-            "community_id": null,
-            "feature_label": "6a545f1e8ce22358",
-            "candidate_keys": [
-              "bifrost:sem:packet:1125b964826d67d7",
-              "bifrost:sem:feature:6a545f1e8ce22358",
-              "ace:context:1125b964826d67d7",
-              "ace:feature:6a545f1e8ce22358"
-            ],
-            "lineage_version": "higher-hop-v1"
-          },
-          "file_path": "src/mcp/server.ts#langextract:custom",
-          "feature_id": "6a545f1e8ce22358",
-          "feature_label": "6a545f1e8ce22358",
-          "som_cluster": 32
+          "neo4j_node_id": null,
+          "redis_hot_key": null,
+          "file_path": "sveltekit-frontend/docs/DEVELOPER_STRATEGY_GUIDE.md",
+          "feature_id": "sveltekit-frontend.DEVELOPER_STRATEGY_GUIDE",
+          "feature_label": null,
+          "som_cluster": null,
+          "source_revision": null,
+          "workspace_revision": null,
+          "representation_revision": null,
+          "graph_revision": null
         }
       ]
     }
@@ -2302,62 +1506,62 @@
   "services": {
     "qdrant": {
       "ok": true,
-      "latency_ms": 32,
-      "points_count": 9840,
-      "payload_fields": 2
+      "latency_ms": 117,
+      "points_count": 109776,
+      "payload_fields": 27
     },
     "trace_mcp": {
       "ok": true,
-      "health_ms": 2,
-      "tools_ms": 11,
-      "tools_count": 128,
+      "health_ms": 100,
+      "tools_ms": 279,
+      "tools_count": 175,
       "error": null
     },
     "postgres": {
       "ok": true,
       "table": "atlas_higher_hop_index",
-      "columns": 40
+      "columns": 35
     },
     "redis": {
       "ok": true
     },
     "gpu": {
-      "ok": false
+      "ok": true
     },
     "answer": {
       "ok": true
     }
   },
   "summary": {
-    "status": "PASS_WITH_WARNINGS",
+    "status": "PASS",
     "graph_proof_status": "PASS",
     "graph_stage_counts": {
       "GRAPH_ENABLED": 5
     },
     "source_ref_pct": 100,
     "feature_id_pct": 100,
-    "latency_p50_ms": 8876,
-    "latency_p95_ms": 8920,
-    "qdrant_p50_ms": 12,
-    "qdrant_p95_ms": 12,
-    "postgres_p50_ms": 56,
-    "postgres_p95_ms": 67,
-    "neo4j_p50_ms": 136,
-    "neo4j_p95_ms": 137,
-    "redis_p50_ms": 2455,
-    "redis_p95_ms": 2525,
-    "gpu_p50_ms": 249,
-    "gpu_p95_ms": 252,
-    "answer_p50_ms": 5880,
-    "answer_p95_ms": 6032,
+    "latency_p50_ms": 9354,
+    "latency_p95_ms": 11287,
+    "qdrant_p50_ms": 334,
+    "qdrant_p95_ms": 590,
+    "postgres_p50_ms": 35,
+    "postgres_p95_ms": 37,
+    "neo4j_p50_ms": 1344,
+    "neo4j_p95_ms": 3638,
+    "redis_p50_ms": 566,
+    "redis_p95_ms": 600,
+    "gpu_p50_ms": 1949,
+    "gpu_p95_ms": 2195,
+    "answer_p50_ms": 5234,
+    "answer_p95_ms": 5411,
     "queries_with_qdrant_hits": 5,
     "queries_answered": 5,
     "min_pass_threshold": 3,
     "qdrant_gate": true,
     "answer_gate": true,
     "any_ledger_matches": true,
-    "total_ledger_matches": 16255,
-    "degraded_queries": 5,
+    "total_ledger_matches": 912,
+    "degraded_queries": 0,
     "retrieval_strategy_counts": {
       "fusion": 5
     },

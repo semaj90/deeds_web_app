@@ -1,8 +1,8 @@
 {
   "schema_version": "semantic-contract-reconciliation-v1",
   "scope": "BOUNDED — TypeScript/Zod contract layer only (sveltekit-frontend/src/**/*.ts)",
-  "generated_at": "2026-08-27T22:15:34.417Z",
-  "repository_commit": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+  "generated_at": "2026-09-01T02:42:57.250Z",
+  "repository_commit": "435967f7c76bf9e47f603cfa1a3da5081a3316dc",
   "canonical_owner": {
     "file": "sveltekit-frontend/src/lib/server/embedding/embedding-contract-768.ts",
     "representationConst": "SEMANTIC_REPRESENTATION_ID",
@@ -22,10 +22,10 @@
     "768-as-dimension detection is heuristic (z.literal(768), width:/dimension:/.min(/.max( context) — may miss or over-match unrelated numeric 768 usages"
   ],
   "summary": {
-    "files_scanned": 4164,
-    "files_with_768_reference": 108,
+    "files_scanned": 4283,
+    "files_with_768_reference": 136,
     "hard_failures": 0,
-    "warnings": 286
+    "warnings": 331
   },
   "hard_failures": [],
   "warnings_top50": [
@@ -82,6 +82,13 @@
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts",
+      "line": 13,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts:13 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
       "file": "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts",
       "line": 112,
       "severity": "WARN",
@@ -121,6 +128,20 @@
       "line": 78,
       "severity": "WARN",
       "message": "sveltekit-frontend/src/lib/server/ai/langgraph-client.ts:78 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ai/onnx-server.ts",
+      "line": 51,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ai/onnx-server.ts:51 hardcodes a semantic_768/768 literal without importing the canonical constant."
+    },
+    {
+      "type": "INLINE_REPR_LITERAL_DRIFT",
+      "file": "sveltekit-frontend/src/lib/server/ai/onnx-server.ts",
+      "line": 58,
+      "severity": "WARN",
+      "message": "sveltekit-frontend/src/lib/server/ai/onnx-server.ts:58 hardcodes a semantic_768/768 literal without importing the canonical constant."
     },
     {
       "type": "INLINE_REPR_LITERAL_DRIFT",
@@ -359,28 +380,7 @@
       "line": 47,
       "severity": "WARN",
       "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:47 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
-      "line": 48,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:48 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
-      "line": 49,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:49 hardcodes a semantic_768/768 literal without importing the canonical constant."
-    },
-    {
-      "type": "INLINE_REPR_LITERAL_DRIFT",
-      "file": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts",
-      "line": 50,
-      "severity": "WARN",
-      "message": "sveltekit-frontend/src/lib/server/atlas/classification/retrieval-executor-policy-v2.ts:50 hardcodes a semantic_768/768 literal without importing the canonical constant."
     }
   ],
-  "warnings_total": 286
+  "warnings_total": 331
 }

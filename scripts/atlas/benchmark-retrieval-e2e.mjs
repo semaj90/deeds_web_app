@@ -459,6 +459,10 @@ async function higherHopLookupOnTable(pool, hits, tableName, columns) {
     columns.has('feature_id') ? 'feature_id' : 'NULL::text AS feature_id',
     columns.has('feature_label') ? 'feature_label' : 'NULL::text AS feature_label',
     columns.has('som_cluster') ? 'som_cluster' : 'NULL::text AS som_cluster',
+    columns.has('source_revision') ? 'source_revision' : 'NULL::text AS source_revision',
+    columns.has('workspace_revision') ? 'workspace_revision' : 'NULL::text AS workspace_revision',
+    columns.has('representation_revision') ? 'representation_revision' : 'NULL::text AS representation_revision',
+    columns.has('graph_revision') ? 'graph_revision' : 'NULL::text AS graph_revision',
   ];
 
   const whereParts = [];
@@ -977,6 +981,11 @@ async function runQuery(pool, columns, query) {
     neo4j_matches: 0,
     source_ref_pct: 0,
     feature_id_pct: 0,
+    source_revision_count: 0,
+    workspace_revision_count: 0,
+    representation_revision_count: 0,
+    graph_revision_count: 0,
+    revision_bound_count: 0,
     graph_stage_status: 'GRAPH_EMPTY',
     graph_hit_count: 0,
     graph_rank_contribution: 0,
@@ -1021,6 +1030,15 @@ async function runQuery(pool, columns, query) {
   entry.neo4j_matches = pgLookup.neo4j_matches;
   entry.source_ref_pct = pgLookup.row_count > 0 ? Number(((pgLookup.source_ref_count / pgLookup.row_count) * 100).toFixed(1)) : 0;
   entry.feature_id_pct = pgLookup.row_count > 0 ? Number(((pgLookup.feature_id_count / pgLookup.row_count) * 100).toFixed(1)) : 0;
+  entry.source_revision_count = pgLookup.rows.filter((row) => String(row.source_revision ?? '').trim() !== '').length;
+  entry.workspace_revision_count = pgLookup.rows.filter((row) => String(row.workspace_revision ?? '').trim() !== '').length;
+  entry.representation_revision_count = pgLookup.rows.filter((row) => String(row.representation_revision ?? '').trim() !== '').length;
+  entry.graph_revision_count = pgLookup.rows.filter((row) => String(row.graph_revision ?? '').trim() !== '').length;
+  entry.revision_bound_count = pgLookup.rows.filter((row) =>
+    String(row.source_revision ?? '').trim() !== ''
+    && String(row.workspace_revision ?? '').trim() !== ''
+    && String(row.representation_revision ?? '').trim() !== '',
+  ).length;
   entry.services.postgres = { ok: pgLookup.ok, latency_ms: pgLookup.latency_ms };
   entry.top_packets = pgLookup.rows.slice(0, 5);
 

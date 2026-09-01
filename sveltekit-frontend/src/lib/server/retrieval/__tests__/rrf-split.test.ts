@@ -82,4 +82,18 @@ describe('rrf split', () => {
     expect(fused[0]?.sources).toHaveLength(2);
     expect(fused[0]?.fusionScore).toBeGreaterThan(0);
   });
+
+  it('counts repeated projections from one lane as one contribution', async () => {
+    const { combineRRFLanes } = await import('../rrf-combiner-utils.js');
+    const fused = combineRRFLanes(new Map([
+      ['dense_768', [
+        { id: 'packet-a', rrfContribution: 1 / 61, rank: 1 },
+        { id: 'packet-a', rrfContribution: 1 / 62, rank: 2 },
+      ]],
+    ]));
+
+    expect(fused).toHaveLength(1);
+    expect(fused[0]?.sourceCount).toBe(1);
+    expect(fused[0]?.finalScore).toBeCloseTo(1 / 61);
+  });
 });

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-packet-lineage-census-v1",
-  "generatedAt": "2026-08-29T08:18:59.434Z",
+  "generatedAt": "2026-09-01T04:23:49.095Z",
   "readOnly": true,
   "postgresWrites": false,
   "packetSourceColumn": "source_ref",
@@ -26,9 +26,9 @@
   },
   "packetContentIntegrity": {
     "identity_unresolved": 1,
-    "chunk_source_missing": 57179,
-    "packet_chunk_hash_ambiguous": 4148,
-    "packet_content_hash_unavailable": 0,
+    "chunk_source_missing": 57111,
+    "packet_chunk_hash_ambiguous": 4207,
+    "packet_content_hash_unavailable": 9,
     "packet_chunk_hash_exact": 332,
     "packet_chunk_hash_mismatch": 0
   },
@@ -228,8 +228,8 @@
     },
     "packetContentIntegrity": {
       "exact": 332,
-      "unavailable": 0,
-      "ambiguous": 4148,
+      "unavailable": 9,
+      "ambiguous": 4207,
       "mismatch": 0,
       "proven": true
     },

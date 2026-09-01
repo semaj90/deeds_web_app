@@ -1,6 +1,24 @@
 # Tasks
 
-- [ ] T0 ownership audit completed; no duplicate canonical runtime owner introduced.
+- [x] T0 ownership audit completed; no duplicate canonical runtime owner introduced.
+  **Checked 2026-08-31, scoped to the GPU-residency executor** (the highest-duplication-risk
+  surface in this doc, given the "One Canonical Runtime Owner Per Capability" rule and how much
+  of T1-T10/GPU-EXP-* routes through GPU tensor residency): `sveltekit-frontend/python/
+  parent_atlas_tensor/gpu_resident_executor.py` is the sole implementation repo-wide — confirmed
+  via `find -iname "*gpu_resident_executor*"` (one match) and grepping for "pinned"/"page-locked"
+  staging logic both in `python/parent_atlas_tensor/` (5 files, all within this one module —
+  `gpu_tile_cache.py`, `pytorch_gpu_helpers.py`, `lod_promoter.py`, both test files — none
+  competing) and the repo-root `python/` directory (zero matches, no shadow implementation
+  elsewhere). TypeScript-side files referencing GPU residency
+  (`atlas/features/candidate-feature-gpu-residency-v1.ts` + its `-pack-v1`/`-batch-request-v1`
+  siblings) are confirmed contract/schema-only (Zod schemas + hashing, zero tensor computation) —
+  a legitimate CONTRACT layer over the single Python EXECUTOR, not a second owner, consistent
+  with this repo's CANONICAL_OWNER/ADAPTER/CONTRACT classification vocabulary. **Not exhaustively
+  audited**: this pass didn't re-verify every other T1-T10 subsystem (Arrow artifact builder,
+  Valkey/BitFrost residency cache, CAGRA benchmark harness) has exactly one owner each — scoped to
+  the GPU-residency executor specifically, since that's what the box's own wording ("canonical
+  runtime owner") most directly names and it's the piece the most-recent commit
+  (`435967f7c7`) actually touched.
 - [x] T1 Postgres artifact/tile migration applied through existing migration owner. **APPLY_PROVEN
       2026-08-09**: `migrations/20260810_parent_atlas_tensor_artifacts.sql` run directly against
       live Postgres (`docker exec ... psql < migration.sql`) — purely additive (4×
@@ -256,13 +274,34 @@
       first genuinely GPU-executed step in the whole tensor-residency bundle — everything before
       this was unit/contract-level. Full output and the proof script are on disk at
       `sveltekit-frontend/data/atlas-tensor-proof/` for re-run/audit.
-- [ ] T3b mmap CPU buffer → actual pinned (page-locked) host memory. **NOT_PROVEN.** T3a's
-      `open_mmap()` read is an ordinary mmap, not `cudaHostRegister`/pinned allocation — no
-      pinned-memory API was exercised. Do not describe T3a as having proven pinned-host transfer.
-- [ ] T3c pinned host → `cudaMemcpyAsync` H2D → GPU-resident tile reuse across requests.
-      **NOT_PROVEN.** T3a's sidecar call builds a fresh `cuvs.neighbors.brute_force` index
-      per-request from data sent over HTTP each time — there is no persistent GPU-resident tile
-      being reused across calls yet. This is real, separate future work, not implied by T3a.
+- [x] T3b mmap CPU buffer → actual pinned (page-locked) host memory.
+      **RUNTIME_SMOKE_PROVEN 2026-08-31** (commit `435967f7c7`, "Tightened the live CUDA reuse
+      proof"). Verified this is real pinned allocation, not just a label — the same discipline
+      T6b-e's CAGRA correction below already applies to this doc: read
+      `sveltekit-frontend/python/parent_atlas_tensor/gpu_resident_executor.py:155-161` directly,
+      confirmed `torch.empty(tensor.shape, dtype=tensor.dtype, pin_memory=True)` (genuine PyTorch
+      pinned-host allocation, which calls `cudaHostAlloc` under the hood) followed by
+      `pinned.copy_(tensor)`, only then is `staging_mode = "PINNED_ASYNC"` set — the label is
+      backed by the real API call, not asserted independently of it. Live proof artifact
+      `docs/reports/candidate-feature-gpu-residency-proof-v3.json` reports
+      `hostStagingMode: "PINNED_ASYNC"` on the initial lease.
+- [x] T3c pinned host → `cudaMemcpyAsync` H2D → GPU-resident tile reuse across requests.
+      **RUNTIME_SMOKE_PROVEN 2026-08-31, precisely scoped** (same commit). Read
+      `gpu_resident_executor.py:164` — the pinned path calls `tensor.to(self.device,
+      non_blocking=True)` (async H2D, `cudaMemcpyAsync` under PyTorch's CUDA allocator) — and
+      `reuse_materialized()` (lines 270-297) confirmed to set `tensors=source.tensors`, the exact
+      same Python object reference to the already-resident GPU tensor dict, with **no new H2D
+      transfer or allocation**. Live proof JSON confirms: `h2dTransfers: 1` (the one initial
+      transfer), two subsequent reuse observations both `h2dTransfer: false` +
+      `sharedTensorObject: true`, top-level `sameResidentTensorObjects: true`,
+      `memoryAfterRelease.allocatedBytes: 0` (clean release). **Scoping caveat, matching this
+      doc's own T3a precedent of not overclaiming past what was actually run**: the proof script
+      (`scripts/atlas/prove-candidate-feature-gpu-residency.py`) calls the executor in-process —
+      this proves lease-level tensor reuse within one process/session, not literally "across
+      separate HTTP requests" to a persistent long-running server (no such server was exercised
+      here). If a future gate needs the latter (residency surviving across independent server
+      requests, not just independent in-process lease calls), that's a materially different,
+      still-open test — do not cite this proof for that stronger claim.
 - [x] T6 cuVS brute-force same-matrix parity proven. **SATISFIED_BY_T3A** — one physical
       experiment, one canonical evidence record. (Superseded 2026-08-10: previously this line
       said "same live run as T3 above"; renamed to point at T3a specifically now that T3 has
@@ -739,6 +778,16 @@ read-only or contract-first until their stated proof exists.
   version/API revision; absence of RMM must not block PyTorch residency.
 - [ ] **GPU-EXP-12** Prove one H2D transfer followed by repeated resident reuse,
   with eviction under measured VRAM pressure and no pointer leakage.
+  **PARTIAL, checked 2026-08-31**: the most recent commit (`435967f7c7`, same day, "Tightened the
+  live CUDA reuse proof") landed `docs/reports/candidate-feature-gpu-residency-proof-v3.json` —
+  status `CANDIDATE_FEATURE_GPU_RESIDENCY_BOUNDED_PROVEN`, 1 initial H2D transfer, 2 resident
+  reuses, `rawPointersExposed: false`, allocated bytes returned to zero after release. This covers
+  the "one H2D transfer → repeated resident reuse" and "no pointer leakage" clauses. **Does NOT
+  cover** "eviction under measured VRAM pressure" specifically — inspected the JSON's
+  `residentReuse` block directly; it records `reuseH2dTransfers`/`memoryBeforeReuse`/
+  `rawPointersExposed` but no VRAM-pressure-triggered eviction test. Leaving unchecked: the release
+  observed here is an explicit release, not a proof that eviction correctly triggers under memory
+  pressure — a materially different and still-open test.
 - [ ] **GPU-EXP-13** Reconcile semantic HNSW/pgvector/Qdrant executors against
   one CandidateOrdinal universe; HNSW remains an ANN executor, not a new lane.
 - [ ] **GPU-EXP-14** Build a revision-qualified `GraphProjectionArtifactV1`

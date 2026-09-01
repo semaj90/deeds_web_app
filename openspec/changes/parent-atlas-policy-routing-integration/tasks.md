@@ -1,9 +1,29 @@
 # Tasks
 
 ## PRT0 — Ownership and prerequisite gate
-- [ ] Locate canonical workflow estimator/router and ACE materializer before integration edits.
-- [ ] Confirm Patch H remains blocked or proven truthfully; do not assume betweenness exists.
-- [ ] Confirm canonical retrieval/RRF/rerank owners remain unchanged.
+- [x] Locate canonical workflow estimator/router and ACE materializer before integration edits.
+  Found (2026-08-31, doc-accuracy pass): `runSemanticSearchWorkflow()` in
+  `sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts` is the canonical
+  workflow router — confirmed as the sole implementation called by
+  `src/routes/api/retrieval/search-unified/+server.ts` (the documented canonical retrieval
+  endpoint per root CLAUDE.md). ACE materializer is
+  `sveltekit-frontend/src/lib/server/ace/ace-materializer.ts` (has a paired `.spec.ts`).
+- [x] Confirm Patch H remains blocked or proven truthfully; do not assume betweenness exists.
+  Checked (2026-08-31): Patch H (betweenness / GA7) is **`RUNTIME_SMOKE_PROVEN`**, not blocked —
+  per `openspec/changes/parent-atlas-graph-analysis-contract/tasks.md`, 7/7 verifier gates pass,
+  `metricsWritten: 58546` matching `distinctPackets` exactly. This supersedes this change's own
+  README.md line 5 ("betweenness-dependent graph features remain blocked until Patch H is
+  proven") — that blocking condition is now satisfied. Any policy-layer graph feature gated on
+  betweenness is unblocked, though PRT8 (geometry/SOM) and PRT3 (finite policy) should still
+  independently verify their own specific feature inputs before consuming it, per this file's
+  own "no geometry-derived production feature before GA8-style ablation" caution — GA8 (the
+  per-feature ablation ground truth) is separately still an open blocker in that other change
+  (`parent-atlas-graph-analysis-contract`'s "Patch I" section), so "betweenness is computed" and
+  "betweenness is validated as a useful policy feature" are not the same claim.
+- [x] Confirm canonical retrieval/RRF/rerank owners remain unchanged.
+  Confirmed live (2026-08-31): `canonical-rerank-executor.ts` and `runtime-reranker.ts` both
+  still exist at `sveltekit-frontend/src/lib/server/retrieval/` — no ownership churn since the
+  Aug 9 audit that established them as canonical (root CLAUDE.md's "14 reranker files" finding).
 
 ## PRT1 — Policy state tensor
 - [x] Add ~30-feature `PolicyStateTensor` contract.

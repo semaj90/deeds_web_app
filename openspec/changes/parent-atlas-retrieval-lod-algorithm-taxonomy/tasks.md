@@ -9,8 +9,10 @@
 - [x] Confirm no duplication: read `parent-atlas-okf-knowledge-layers/proposal.md` (status
       vocabulary source) and `parent-atlas-graph-retrieval-proof/proposal.md` (identity-split
       blocker source) before writing, instead of re-deriving either.
-- [ ] Cross-link this change from the 3 siblings' README files (one line each, "see also"). Not yet
-      done — do this before considering T1 fully closed.
+- [x] Cross-link this change from the 3 siblings' README files (one line each, "see also"). Done
+      2026-08-31: `parent-atlas-graph-retrieval-proof/README.md` already had it. Added one-line
+      "See also" entries to `parent-atlas-retrieval-fusion-reachability/README.md` and
+      `parent-atlas-okf-knowledge-layers/README.md`. T1 fully closed.
 
 ## T2 — Domain 10 (evaluation harness) — the one domain safe to start now
 
@@ -18,9 +20,100 @@ Everything else in the taxonomy is blocked on work already in-flight in sibling 
 is not — it can be built against the *current* CPU fusion pipeline and gives RF6 (fusion-owner
 convergence) a regression harness to converge against, which RF6 doesn't currently have.
 
-- [ ] Reachability check first: confirm no existing Recall@k/NDCG/MRR harness is already live and
-      just unwired (do not assume `MISSING` from a single `Glob` pass — grep test fixtures and
-      `scripts/atlas/*eval*` too before building).
+- [x] Reachability check completed 2026-09-01: existing evaluation harnesses and reviewer pool
+      are present (`scripts/atlas/benchmark-retrieval-ndcg10.mjs`, `python/benchmark_*relevance*`,
+      `.tmp/atlas/golden-relevance-review-pool-bound-v1.ndjson`). The pool validator reports
+      60 queries / 2,433 candidates, zero structural errors, but 2,433 blank grades and zero
+      revision-bound queries/candidates. This is an input-readiness finding, not a completed
+      QRELS or baseline proof; see `docs/reports/golden-relevance-review-pool-validation-v1.json`.
+      A separate read-only exact-text binding audit matched all 60 queue queries to existing
+      `evaluation_queries` rows (`BINDINGS_COMPLETE`), but that does not supply query revisions,
+      candidate revisions, or relevance grades; see
+      `docs/reports/golden-review-query-binding-audit-v1.json` (2026-09-01).
+      A representative queue row also has `candidateSnapshotRevision: null` and
+      `ordinalMapChecksum: null`; its candidates have `candidateId`/`sourceRef` but no candidate
+      revision fields. This confirms the remaining gap is artifact binding, not query-row lookup.
+      A read-only comparison against
+      `.tmp/atlas/ordinal-bridge-source/candidate-ordinal-map-v1-rebuilt-readonly.json` found
+      2,247/2,433 exact `sourceRef` matches, zero ambiguous matches, and 186 unmatched rows.
+      None of the unique matches are promotion-qualified because the map's `sourceRevision`
+      value is `unknown`; this is `PARTIAL_REACHABILITY`, not a revision-binding pass.
+      The existing exact producer was then attempted read-only with `--limit=32` into a separate
+      temporary artifact and failed closed with `CANARY_EXACT_LINEAGE_COHORT_EMPTY`. No pool
+      rewrite or database mutation occurred; the blocker is the absence of a qualifying live
+      source/chunk/workspace cohort, not an unsafe fallback condition (2026-09-01).
+      Predicate-level read-only census: the selected workspace binding and Graphify revision join
+      has 111 exact rows; only 9 have a unique chunk hash; 0 have chunk content matching the
+      bound source digest; and 0 have packet hash readback satisfying the final join. The next
+      repair is source/chunk hash-owner reconciliation, not relaxing the exact query.
+      The broader read-only cohort receipt reports 778 exact Graphify-source rows, 43 exact
+      packet/chunk hash matches, 15 source/chunk-qualified rows, 0 graph revisions, and 0 fully
+      qualified candidates (`docs/reports/lineage-qualified-candidate-cohort-v1.json`). The
+      companion hash-authority audit records that packet, source, chunk, and artifact hashes are
+      produced from different byte domains; they must not be compared as interchangeable values.
+      Follow-up owner audits confirm the live state: `current-workspace-packet-chunk-join-v1`
+      reports 111 binding rows, 111 Graphify exact sources, and 0 binding/chunk or packet/chunk
+      content matches. `graph-revision-owner-v1` finds graph revisions in derived tables, but
+      none bound to the canonical packet/chunk cohort; the available samples use incompatible
+      workspace scopes. No graph revision was selected as a fallback.
+      The hash-authority audit identifies a bounded future repair scope: 341 packets have a
+      single distinct chunk hash, 332 are already populated, and 9 remain pending for a safe
+      explicit backfill. The remaining 4,207 ambiguous and 57,112 no-chunk-hash packets remain
+      excluded; no backfill was authorized or executed (`docs/reports/atlas-packets-content-hash-source-v1.json`).
+      The bounded backfill dry-run selected exactly 9 rows, passed `CH_BF_01` and `CH_BF_02`,
+      planned 0 updates, and performed 0 PostgreSQL writes. Apply, readback, and replay gates
+      remain unset pending explicit authorization (`docs/reports/atlas-packets-content-hash-backfill-v1-dry_run.json`).
+      A safety review of `atlas-packets-content-hash-backfill-v1.mjs` found that `--apply-bounded`
+      currently has no explicit non-production authorization or database allow-list, no
+      transaction-scoped advisory lock, and commits before its readback. Its NULL guard and
+      bounded deterministic selection are useful, but they are not sufficient for promotion.
+      Add `CH_BF_06 APPLY_AUTHORIZATION_AND_TRANSACTION_SAFETY` before any apply: require an
+      explicit local/non-production database identity, dedicated authorization, xact advisory
+      lock, repeatable-read transaction, full selected-key/hash readback, and rollback on any
+      mismatch. No apply was attempted in this audit.
+- [ ] CH_BF_06 — Verify the hardened bounded backfill apply path in a disposable non-production
+      transaction fixture; require explicit authorization, local database scoping,
+      `REPEATABLE READ`, a transaction-scoped advisory lock, full pre-commit readback, and
+      rollback on mismatch. A dry-run or syntax check does not satisfy this gate. The
+      unauthorized invocation guard is proven (exit 1 before pool creation); the transaction
+      fixture and mismatch rollback proof remain open. The previously used disposable proof
+      container is no longer present; the shared `legal-ai-postgres` database is not an
+      acceptable substitute for this write-path proof.
+      Fresh packet-hash audits still report 9 pending unique chunk-hash candidates, 4,207
+      ambiguous chunk mappings, 57,112 without chunk hash, and 0 chunk/artifact hash agreements.
+      Packet/source/chunk hash domains remain distinct; the 9-row backfill is eligible only after
+      the disposable apply proof and explicit packet/chunk granularity decision.
+      The narrower read-only chunk bridge examined 332 populated packet rows and found 15
+      `EXACT_CHUNK_IDENTITY` rows, 74 source-only ambiguous rows, and 243
+      `REVISION_UNPROVEN` rows (`docs/reports/chunk-bridge-v1.json`). Its `promotionEligible`
+      flag applies only to exact chunk identity; it does not override the missing source/
+      workspace/graph lineage required by the strict candidate materializer.
+      The strict 15-row canary was correctly invoked through `npx tsx` (plain Node rejects
+      `.mts`) and failed closed with `CANARY_EXACT_LINEAGE_COHORT_EMPTY`; no output cohort or
+      database write was produced. This is the expected blocker until the current-workspace
+      source/chunk revision bridge is repaired.
+      The source-lineage census confirms the scope: 778 packets have exact Graphify source
+      bindings, 885 source-revision bindings are available, 60,881 packets lack a Graphify
+      source match, and the source-binding gate remains unproven (`cleanForBackfill: false`).
+      Content integrity is proven only for the bounded exact subset; this does not authorize
+      broad backfill (`docs/reports/graphify-packet-lineage-census-v1.json`).
+      A separate current-source cohort audit narrows the defect: 111 rows are fully matched to
+      the current workspace revision with zero missing, mismatched, or ambiguous source rows
+      (`docs/reports/current-source-cohort-lineage-v1.json`). The remaining gap is specifically
+      source/chunk content binding, not workspace-revision availability.
+      Byte-scope reconciliation of the same 111-row cohort classified 96 as `UNPROVEN_SCOPE`
+      and 15 as `MISSING_SOURCE`; packet spans are absent and no bounded exact whole-file
+      agreement was proven. The report explicitly keeps packet backfill and projection cleanup
+      blocked (`docs/reports/atlas-byte-scope-reconciliation-v1.json`).
+      Live `codebase_chunk_index` inspection confirms it stores `line_start`, `line_end`,
+      `content`, and `content_hash`, but no UTF-8 byte-start/byte-end fields. Exact line/chunk
+      identity therefore cannot be upgraded to byte-scope proof without using the existing
+      source-byte authority or adding a separately owned derived scope artifact; no schema
+      change is authorized in this gate.
+      The existing `atlas_ast_nodes` byte-span table was checked as a possible authority, but
+      none of the 111 current Graphify source refs matched its `relative_path` or
+      `source_ref_key`, and sampled rows are stale fixture data (`widget.c`). It cannot be
+      substituted for the current source-byte/chunk bridge.
 - [ ] If genuinely missing: scope a minimal harness — fixed query set with known-good top-k
       (hand-labeled or derived from the live entity trace already done in
       `parent-atlas-retrieval-fusion-reachability`), compute Recall@k / NDCG / MRR against

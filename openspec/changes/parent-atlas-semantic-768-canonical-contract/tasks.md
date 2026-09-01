@@ -760,3 +760,28 @@ documented exceptions above. **Re-run `node scripts/atlas/reconcile-semantic-con
 trusting this count** — the repo has been under active background editing throughout this session
 (counts have fluctuated up as well as down independent of this document's own edits) — but there
 is no more known, unaddressed, mechanically-fixable production-file drift as of this writing.
+
+## Re-run, new hard failure found and fixed (2026-08-31)
+
+Per this document's own instruction above ("re-run before trusting this count"), re-ran the
+reconcile script fresh rather than trusting the 102/0 snapshot. Repo has grown to 4,283 scanned
+files (from 3,541) — confirms this repo really is under continuous background editing, as noted.
+
+**Found**: 1 new hard failure — `sveltekit-frontend/src/lib/server/embedding/
+semantic-embedding-cache-v2.ts:10` independently declared `export const
+SEMANTIC_EMBEDDING_CACHE_V2_DIMENSIONS = 768`, a second canonical-dimension owner alongside
+`embedding-contract-768.ts::SEMANTIC_DIMENSION` — exactly the pattern this whole document's sweep
+exists to prevent. This is a genuinely new file, not one this session's earlier rounds missed.
+
+**Fixed**: imported `SEMANTIC_DIMENSION` from `./embedding-contract-768.js` and aliased
+`SEMANTIC_EMBEDDING_CACHE_V2_DIMENSIONS` to it instead of redeclaring — same pattern as every
+other fix in this document. Verified: reconcile script now reports `0` hard failures (was 1),
+`331` warnings (unchanged — this file wasn't in the warning set, only the hard-fail set).
+`npx tsgo --noEmit` shows zero errors touching the file.
+
+**Not investigated this pass**: warnings grew from the last recorded 102 to 331 alongside the
+743-file scan-size increase — consistent with organic repo growth adding more literal `768`
+references, not necessarily new drift of the same kind as the fixed hard-fail. Left un-triaged;
+whoever continues this document should re-run and re-triage the current
+`semantic-contract-conflicts.ndjson` rather than assume the 102-warning breakdown above still
+matches file-for-file.

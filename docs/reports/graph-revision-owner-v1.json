@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graph-revision-owner.v1",
-  "generatedAt": "2026-08-29T09:33:22.132Z",
+  "generatedAt": "2026-09-01T03:31:37.193Z",
   "readOnly": true,
   "postgresWrites": false,
   "expectedWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",

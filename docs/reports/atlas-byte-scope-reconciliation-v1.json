@@ -1,6 +1,6 @@
 {
   "schema": "atlas.byte-scope-reconciliation.v1",
-  "generatedAt": "2026-08-29T16:06:24.328Z",
+  "generatedAt": "2026-09-01T04:26:44.555Z",
   "readOnly": true,
   "writesPerformed": false,
   "sampleLimit": 111,
@@ -13,9 +13,9 @@
     {
       "sourceRef": "CLAUDE.md",
       "sourcePath": "CLAUDE.md",
-      "sourceSizeBytes": 231954,
+      "sourceSizeBytes": 260967,
       "sourceReadError": null,
-      "filesystemSha256": "349ca8ca02773dd953c147c6c8dbe3bd9599cb3eb53c237a41348f8b9e2136c4",
+      "filesystemSha256": "349d13d1ead0734be2947b0d978a5258ce4c21cd5b8fd84b06e0b11108b87495",
       "artifactHashes": [
         "5ef4423597047f753dfece81dad9977ba655dc3d5b71dd2a50ec8e42a501e428"
       ],
@@ -209,9 +209,9 @@
     {
       "sourceRef": ".env.example",
       "sourcePath": ".env.example",
-      "sourceSizeBytes": 10302,
+      "sourceSizeBytes": 10343,
       "sourceReadError": null,
-      "filesystemSha256": "2a984e52970835ca1cc1a8bd792d0865dc37366a78908bc47af254c6908a011a",
+      "filesystemSha256": "4841d1ba02b4d0b524dbae6a404a17000a2af2224a7ddeea74f4940d1a21a0ec",
       "artifactHashes": [
         "d7d3522ab27cf60387e9d1cd86a234bd3e36989245ae73266acf046cf7bf8752"
       ],
@@ -223,9 +223,9 @@
     {
       "sourceRef": ".vscode/settings.json",
       "sourcePath": ".vscode/settings.json",
-      "sourceSizeBytes": 2617,
+      "sourceSizeBytes": 2667,
       "sourceReadError": null,
-      "filesystemSha256": "ab971b2c6a3cbfa74fc87d6494917332c100016614fba3b2ef1b95e8c3e551a7",
+      "filesystemSha256": "3bf56414852287580e7c73d6fc13cb7378024ea539b6dfe07a2ee1d797d03999",
       "artifactHashes": [
         "9e61fdefa3cb161cb597040bd7e824e1c797c7ce6dda4a9c8bf893a34b1c0076"
       ],
@@ -1063,9 +1063,9 @@
     {
       "sourceRef": ".gitignore",
       "sourcePath": ".gitignore",
-      "sourceSizeBytes": 26340,
+      "sourceSizeBytes": 26502,
       "sourceReadError": null,
-      "filesystemSha256": "1a662fd5f9d29fb7e8bf7e806b381d49b71c89f0c05fb7ba37c059c2845f8b93",
+      "filesystemSha256": "b0580e28ec28f7cc85067f6a3deae5028ec5bde156c13b8f93f8b75e45d8fdc7",
       "artifactHashes": [
         "05eb8f21ea0df6c649c6ac32a88e83ee188428940e9fdcfde59c22c71d9eff08"
       ],
