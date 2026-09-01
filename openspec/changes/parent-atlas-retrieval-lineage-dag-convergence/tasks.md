@@ -1,3 +1,13 @@
+## 0. Governance admission
+
+- [x] CONV-0B — Generate a read-only OpenSpec portfolio classification from the
+  root change store. The report records task progress, declared gate references,
+  blockers, supersession hints, and one explicit `CURRENT_AUTHORITY` for this
+  convergence change without deriving queue priority from completion percentage
+  or applying any change. See
+  `scripts/atlas/audit-openspec-portfolio-v1.mjs` and
+  `docs/reports/openspec-portfolio-v1.json`.
+
 ## 1. Lineage and semantic reader
 
 - [x] LINEAGE-01 — Prove full source namespace and source-revision authority;
@@ -67,8 +77,34 @@
   read back exact projection identity; no legacy point deletion.
 - [ ] RETRIEVAL-01L — Freeze full Qdrant projection ownership only after rollback
   and parity proof.
-- [ ] RETRIEVAL-02 — Census every Qdrant query for explicit named-vector
-  selection; do not mass-edit callers.
+- [x] RETRIEVAL-02 — Census every Qdrant query for explicit named-vector
+  selection; do not mass-edit callers. Audit-only, zero callers modified.
+  Static scan of every direct Qdrant-like `.query(`/`.search(` call site
+  under `sveltekit-frontend/src/lib/server` (excluding the 9 canonical
+  callers already covered by `RETRIEVAL-01G`/`01H`): 32 direct call sites
+  across 25 files, of which 12 already specify an explicit named-vector
+  selector (`using:` or the older `vector: { name, vector }` shape) and 19
+  confidently do not (1 additional site flagged `uncertainReceiver` — a
+  Postgres FTS call the forward-only text scanner cannot fully distinguish
+  from a Qdrant call without full AST parsing). Confirms a real,
+  previously-untracked finding: most of these 19 call direct
+  Qdrant/`QdrantClient` instances, bypassing the canonical
+  `searchCodebaseAnn`/`qdrant-search.ts` orchestration boundary entirely
+  (a `retrieval-layer-separation.md` violation), and at least one
+  (`atlas/retrieval/qdrant-semantic-scorer.ts:89`, querying the canonical
+  `QDRANT_SEMANTIC_COLLECTION` directly) carries the same missing-`using`
+  defect class that `RETRIEVAL-01G` fixed only in `qdrant-search.ts`. Per
+  this task's explicit instruction, none of the 19/20 findings were
+  remediated — this is audit evidence for a future, separate remediation
+  decision. Three real false-positive/false-negative classes were found
+  and corrected during the scan itself (Postgres `client.query()` SQL/
+  transaction-control calls misclassified as Qdrant; the older
+  `vector: { name, vector }` named-vector shape misclassified as missing
+  selection; JSDoc/comment example lines misclassified as real call sites)
+  — each documented in the report's own methodology section, not silently
+  fixed and hidden. See
+  `docs/reports/retrieval-02-qdrant-named-vector-census-v1.json` and
+  `scripts/atlas/retrieval-02-qdrant-named-vector-census.mjs`.
 
 ## 2. OaK DAG runtime convergence
 
@@ -174,8 +210,13 @@ lineage MEMBERSHIP, not 1:1 identity.
   idempotent under the corrected uniqueness key.
 - [ ] PKT-LINEAGE-08 (PROMOTION-01) — Wire the corrected membership-writing
   logic into the live `register-orphaned-chunks.mjs` production path so
-  future packet creation captures real lineage. Separate authorization
-  required; not started.
+  future packet creation captures real lineage. The path is now implemented
+  behind the explicit `--capture-lineage` opt-in: it requires the additive
+  `atlas_packet_chunk_lineage` table, reads real `codebase_chunk_index.chunk_id`
+  values plus `graphify_files.workspace_id`, and commits each packet and its
+  complete membership set transactionally. Dry-run evidence is in
+  `docs/reports/chunk-registration-report.json`; production canary/apply
+  remains separately authorized and therefore this task stays open.
 - [ ] PKT-LINEAGE-09 (BACKFILL-PROMOTION-01) — Separately authorize applying
   the full 6,987-row admitted cohort (all 577 packets) from the frozen
   `BACKFILL-DRY-01` artifact. Re-run the dry classification fresh first to
