@@ -346,5 +346,11 @@
     "sha256": "e77c6771a9c2baf8a0d49025a39ec18c09759ac83f2ea9003ad795721795c734",
     "archived": "2026-08-31",
     "reason": "Python-side CUDA proof counterpart to the same orphaned candidate-feature-gpu-resident-lease-v1.ts feature family (see that entry). Not referenced by any npm script or CI."
+  },
+  {
+    "path": "scripts/atlas/audit-openspec-portfolio-v1.mjs (root-level variant)",
+    "sha256": "9b1fabd753f48bc504c9da0432cf4f78349d14cc295590d6b6ff220e354977a0",
+    "archived": "2026-09-01",
+    "reason": "Duplicate-ownership resolution (OPENSPEC-PORTFOLIO-01 vs concurrent-session CONV-0B): a concurrent session independently built a second, uncommitted OpenSpec portfolio classifier at this root-level path (CONV-0B), overwriting docs/reports/openspec-portfolio-v1.json with a divergent report. Compared both: this variant (a) used its own keyword-inferred queueClass taxonomy (LINEAGE/RETRIEVAL/OAK/GRAPH/GPU/GENERAL) instead of the operator's explicitly specified CURRENT_AUTHORITY/ACTIVE_DEPENDENCY/FROZEN_REFERENCE/PARKED_CHALLENGER/BLOCKED_EXTERNAL/UNCLASSIFIED taxonomy, and (b) had a real bug -- it classified the archive/ and openspec/ meta-directories under openspec/changes/ as if they were changes. The canonical, already-committed sveltekit-frontend/scripts/atlas/audit-openspec-portfolio-v1.mjs (OPENSPEC-PORTFOLIO-01) is kept as CANONICAL_OWNER; its authorityCount invariant check and declaredBlockedBy/declaredSupersededBy text-extraction were adapted from this variant's genuinely useful ideas before archiving it. Restored copy: deeds_labs/archive/2026-09-01/audit-openspec-portfolio-v1-root-variant-CONV-0B.mjs.bak. Never committed to git before this archival."
   }
 ]

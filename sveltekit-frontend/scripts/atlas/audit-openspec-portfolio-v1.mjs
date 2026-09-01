@@ -313,6 +313,36 @@ function countTasks(tasksMdPath) {
   return { total, completed };
 }
 
+/**
+ * Lightweight heuristic extraction of dependency language already present in
+ * a change's own open task lines (e.g. "blocked on X-01", "superseded by
+ * some-other-change"). This is structural extraction of text the author
+ * already wrote, not queue-class inference from percentage or keywords --
+ * distinct from the CLASSIFICATION table above, which stays the sole
+ * authority for queueClass/mayGenerateNewWork. Reported as a separate
+ * `declaredBlockedBy`/`declaredSupersededBy` field so it's never confused
+ * with the manually curated `supersededBy` in CLASSIFICATION.
+ */
+function extractDeclaredDependencyLanguage(tasksMdPath) {
+  let text;
+  try {
+    text = readFileSync(tasksMdPath, 'utf8');
+  } catch {
+    return { declaredBlockedBy: [], declaredSupersededBy: [] };
+  }
+  const openLines = text
+    .split(/\r?\n/)
+    .filter((line) => /^\s*-\s*\[ \]/.test(line))
+    .join(' ');
+  const declaredBlockedBy = [...new Set(
+    [...openLines.matchAll(/\bblocked\s+(?:on|by)\s+([A-Za-z][A-Za-z0-9-]{2,})/gi)].map((m) => m[1]),
+  )];
+  const declaredSupersededBy = [...new Set(
+    [...openLines.matchAll(/\bsuperseded\s+by\s+([a-z][a-z0-9-]{2,})/gi)].map((m) => m[1]),
+  )];
+  return { declaredBlockedBy, declaredSupersededBy };
+}
+
 function main() {
   const entries = readdirSync(CHANGES_DIR, { withFileTypes: true });
   const changes = [];
@@ -333,6 +363,7 @@ function main() {
     const total = taskCounts?.total ?? 0;
     const completed = taskCounts?.completed ?? 0;
     const percent = total > 0 ? Math.round((completed / total) * 1000) / 10 : null;
+    const { declaredBlockedBy, declaredSupersededBy } = extractDeclaredDependencyLanguage(tasksPath);
 
     changes.push({
       changeId,
@@ -344,11 +375,24 @@ function main() {
       currentGateRefs: classification?.currentGateRefs ?? [],
       mayGenerateNewWork: classification?.mayGenerateNewWork ?? null,
       supersededBy: classification?.supersededBy ?? null,
+      declaredBlockedBy,
+      declaredSupersededBy,
       note: classification?.note ?? null,
     });
   }
 
   changes.sort((a, b) => a.changeId.localeCompare(b.changeId));
+
+  // Hard invariant: exactly one CURRENT_AUTHORITY must exist. A count of 0
+  // means the classification table has drifted from reality (the named
+  // authority change was renamed/archived); a count > 1 means two changes
+  // are simultaneously claiming to own dependency ordering -- both are
+  // portfolio-integrity failures this script should refuse to silently
+  // report past.
+  const authorityCount = changes.filter((c) => c.queueClass === 'CURRENT_AUTHORITY').length;
+  if (authorityCount !== 1) {
+    throw new Error(`CURRENT_AUTHORITY_COUNT_INVALID: expected exactly 1, found ${authorityCount}`);
+  }
 
   // Read-only finding, not corrected here: a second, smaller OpenSpec root
   // exists at sveltekit-frontend/openspec/changes/ (separate from the

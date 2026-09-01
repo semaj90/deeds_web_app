@@ -1,6 +1,6 @@
 {
   "schema": "openspec-portfolio-v1",
-  "generatedAt": "2026-09-01T23:04:35.842Z",
+  "generatedAt": "2026-09-01T23:50:15.825Z",
   "secondaryRootFinding": {
     "path": "sveltekit-frontend/openspec/changes",
     "changeIds": [
@@ -46,8 +46,8 @@
   ],
   "summary": {
     "totalChanges": 72,
-    "totalTasksCounted": 4433,
-    "totalTasksCompleted": 2446,
+    "totalTasksCounted": 4435,
+    "totalTasksCompleted": 2452,
     "byQueueClass": {
       "CURRENT_AUTHORITY": 1,
       "ACTIVE_DEPENDENCY": 15,
@@ -112,6 +112,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -124,6 +126,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -136,6 +140,10 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [
+        "FI-02"
+      ],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -148,6 +156,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -160,6 +170,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -172,6 +184,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -184,6 +198,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -196,6 +212,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -208,6 +226,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -220,6 +240,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -232,6 +254,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -244,6 +268,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -256,6 +282,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -268,6 +296,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -280,6 +310,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -294,6 +326,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -308,6 +342,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -322,6 +358,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -334,6 +372,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "COMPLETE (8/8). No new work."
     },
     {
@@ -346,6 +386,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "HISTORICAL. Unchecked items are not current work."
     },
     {
@@ -361,6 +403,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "291 tasks (largest raw count in this group) -- only CONV-3/CONV-4-referenced gates are current, not the full remaining count."
     },
     {
@@ -373,6 +417,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -387,6 +433,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -399,6 +447,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -411,6 +461,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -423,6 +475,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -435,6 +489,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -447,6 +503,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -459,6 +517,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "0/155. Must not become the next 155-task program just because it exists at 0% -- OaK/kernel/receipt/runtime surfaces prove the small governed read DAG first; this fabric absorbs proven patterns only after that."
     },
     {
@@ -471,6 +531,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -483,6 +545,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -495,6 +559,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -509,6 +575,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -521,6 +589,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -535,6 +605,10 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [
+        "missing"
+      ],
+      "declaredSupersededBy": [],
       "note": "284 tasks -- graph evidence gates only, consumed as a CONV-4 dependency, not an independently expanding workboard."
     },
     {
@@ -547,6 +621,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -559,6 +635,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -573,6 +651,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -585,6 +665,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -597,6 +679,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -609,6 +693,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -621,6 +707,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "EVIDENCE/REPORT (0/0 tasks). Not a workboard."
     },
     {
@@ -633,6 +721,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -645,6 +735,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -660,6 +752,11 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [
+        "pre-existing",
+        "source-lineage"
+      ],
+      "declaredSupersededBy": [],
       "note": "1,719 tasks (~43% of the counted backlog). Only exact-768/lineage-gate-referenced tasks are current; the remainder is not an active queue by virtue of existing."
     },
     {
@@ -672,6 +769,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -684,6 +783,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -696,6 +797,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -708,6 +811,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -726,6 +831,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "85% complete does not mean finish the last five tasks. Scope is exact implementationRefs -> registry proof -> deterministic receipts -> replay A/B only."
     },
     {
@@ -738,6 +845,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -750,6 +859,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -762,6 +873,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -774,6 +887,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -788,6 +903,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -803,14 +920,16 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
       "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
       "hasTasksFile": true,
-      "completed": 21,
-      "total": 42,
-      "percent": 50,
+      "completed": 27,
+      "total": 44,
+      "percent": 61.4,
       "queueClass": "CURRENT_AUTHORITY",
       "currentGateRefs": [
         "CONV-0",
@@ -823,6 +942,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "Owns dependency ordering and acceptance gates only. Does not absorb implementation-owner code."
     },
     {
@@ -837,6 +958,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -849,6 +972,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -861,6 +986,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": "parent-atlas-semantic-768-canonical-contract",
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "SUPERSEDED POLICY. Do not chase from its counted percentage to 100% -- unchecked items are not evidence 512 is unfinished current policy; see CLAUDE.md Embedding Dimensions Policy (768 canonical, 512 derived/secondary)."
     },
     {
@@ -873,6 +1000,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "CONTRACT AUTHORITY (0/0 tasks). Referenced by other changes, does not itself carry a task queue."
     },
     {
@@ -885,6 +1014,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -897,6 +1028,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -912,6 +1045,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -924,6 +1059,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -936,6 +1073,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -948,6 +1087,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": "COMPLETE (17/17). No new work."
     },
     {
@@ -962,6 +1103,8 @@
       ],
       "mayGenerateNewWork": true,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -974,6 +1117,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -986,6 +1131,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": false,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -998,6 +1145,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     },
     {
@@ -1010,6 +1159,8 @@
       "currentGateRefs": [],
       "mayGenerateNewWork": null,
       "supersededBy": null,
+      "declaredBlockedBy": [],
+      "declaredSupersededBy": [],
       "note": null
     }
   ]
