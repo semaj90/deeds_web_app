@@ -233,10 +233,46 @@
     "spec": "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.spec.ts",
     "testResult": "8/8 PASS",
     "shape": "PacketChunkMembershipV1: packetKey, canonicalChunkId, chunkRowId, sourceRef, sourceNamespace (required, non-empty), sourceRevision (nullable), membershipStatus (EXACT_SINGLE_MEMBER|EXACT_MULTI_MEMBER only -- no ambiguous/candidate statuses admitted into this table), revisionStatus (PROVEN|UNPROVEN), chunkOrdinal, lineageProducerRevision, evidenceRefs[]. .strict() Zod schema with a .refine() enforcing revisionStatus PROVEN iff sourceRevision is non-null.",
-    "relationShape": "atlas_packet_chunk_lineage (documented in-file, NOT yet migrated -- see nextGate). NOT NULL on all fields except source_revision. UNIQUE(packet_key, canonical_chunk_id, lineage_producer_revision) -- source_revision deliberately excluded from uniqueness since it is expected absent for the dominant historical case.",
+    "relationShape": "atlas_packet_chunk_lineage. NOT NULL on all fields except source_revision. UNIQUE(packet_key, canonical_chunk_id) ONLY -- see packetChunkLineageMigration01.uniquenessCorrection below for why lineage_producer_revision was deliberately removed from an earlier draft of this key.",
     "notDoneThisGate": "No schema-postgres.ts change, no Drizzle migration, no DB writes. PACKET-CHUNK-LINEAGE-MIGRATION-01 (disposable DB first) is a separate, later gate per explicit instruction.",
     "nextGate": "PACKET-CHUNK-LINEAGE-MIGRATION-01",
     "checkpointNote": "This is a deliberate semantic checkpoint: the contract is frozen and tested (8/8) while zero PostgreSQL schema/migration work has been done. DB schema writes: 0. Canonical lineage writes: 0. Historical backfill writes: 0. MIGRATION-01 is a separate, later gate -- do not combine physical migration work into this checkpoint."
+  },
+  "packetChunkLineageMigration01": {
+    "status": "PASS",
+    "migrationFile": "sveltekit-frontend/drizzle/manual/20260901_atlas_packet_chunk_lineage.sql",
+    "method": "Proved on a disposable database first (CREATE DATABASE atlas_pcl_migration_disposable in the same Postgres instance, dropped after each round), then applied identically (CREATE TABLE/INDEX IF NOT EXISTS only) to the live legal_ai_db -- purely additive, no ALTER, zero risk to existing data.",
+    "uniquenessCorrection": {
+      "originalDraft": "UNIQUE(packet_key, canonical_chunk_id, lineage_producer_revision)",
+      "problem": "Including lineage_producer_revision in the uniqueness key would let a second producer re-observing the exact same (packet, chunk) relationship insert a SECOND canonical membership row for it -- inflating downstream vote/cardinality counts (e.g. counting a packet's members would double-count a re-observed membership). Caught before any live data was written under the flawed key -- the first live application (0 rows) was dropped and redone under the corrected key before any real usage.",
+      "corrected": "UNIQUE(packet_key, canonical_chunk_id) only. lineage_producer_revision and evidence_refs are provenance ON the one canonical row, not part of membership identity. A producer re-observing an existing membership must UPSERT (ON CONFLICT (packet_key, canonical_chunk_id) DO UPDATE) against the existing row, never insert a new one. Append-only observation history, if ever needed, belongs in a separate execution-evidence table -- never conflated with this canonical membership relation.",
+      "namespaceFkAvoided": "source_namespace is plain text, deliberately not a foreign key to atlas_packets.repository_id, which is confirmed corrupted (58,365/58,365 populated values all distinct -- synthetic randomUUID()-per-row)."
+    },
+    "disposableProofBatteryV2": {
+      "population": "9 targeted insert/upsert attempts against the disposable table, under the corrected unique key",
+      "results": [
+        { "test": 1, "case": "valid PROVEN row", "expected": "SUCCESS", "actual": "SUCCESS" },
+        { "test": 2, "case": "different chunk, same packet (multi-member)", "expected": "SUCCESS", "actual": "SUCCESS" },
+        { "test": 3, "case": "PROVEN with null source_revision", "expected": "FAILURE", "actual": "FAILURE (atlas_pcl_revision_consistency_check)" },
+        { "test": 4, "case": "UNPROVEN with non-null source_revision", "expected": "FAILURE", "actual": "FAILURE (atlas_pcl_revision_consistency_check)" },
+        { "test": 5, "case": "same (packet_key, canonical_chunk_id), different producer, as a PLAIN second insert", "expected": "FAILURE", "actual": "FAILURE (atlas_pcl_membership_unique) -- proves the corrected constraint actually blocks the vote-inflation scenario" },
+        { "test": "5b", "case": "the same re-observation via explicit ON CONFLICT (packet_key, canonical_chunk_id) DO UPDATE", "expected": "SUCCESS, 1 row updated in place", "actual": "SUCCESS -- producer_revision and evidence_refs updated on the existing row, row count unchanged" },
+        { "test": 6, "case": "same canonical_chunk_id under a different packet_key", "expected": "SUCCESS at schema level (writer-level invariant, not DB-enforceable)", "actual": "SUCCESS" },
+        { "test": 7, "case": "null source_namespace", "expected": "FAILURE", "actual": "FAILURE (NOT NULL)" },
+        { "test": 8, "case": "invalid membership_status ('AMBIGUOUS')", "expected": "FAILURE", "actual": "FAILURE (atlas_pcl_membership_status_check)" }
+      ],
+      "allExpectationsMet": true,
+      "finalPersistedRowCount": 3,
+      "finalPersistedRowsMatchExpectation": "exactly test 1 (updated in place to producer v2 by test 5b), test 2, test 6 -- verified by direct SELECT"
+    },
+    "liveApplication": {
+      "database": "legal_ai_db",
+      "tableCreated": true,
+      "structureVerified": "via \\d atlas_packet_chunk_lineage -- unique index confirmed as (packet_key, canonical_chunk_id) only, matching the corrected disposable proof",
+      "rowCountAfterApply": 0,
+      "note": "Structure only. No membership data written -- that begins at PACKET-CHUNK-LINEAGE-CANARY-01 (future capture) and PACKET-CHUNK-LINEAGE-BACKFILL-CANARY-01 (historical), both still pending."
+    },
+    "nextGates": ["PACKET-CHUNK-LINEAGE-CANARY-01 (future writer, 3 shapes, must UPSERT on re-observation)", "PACKET-CHUNK-LINEAGE-BACKFILL-DRY-01 (full historical per-row classification)"]
   },
   "openDesignQuestionSurfacedByThisGate_RESOLVED_SUPERSEDED": "STATUS: RESOLVED_SUPERSEDED. The a/b/c fork below is preserved verbatim for history only -- do not reopen it. The decision was made in the very next exchange (see architecturalCorrection, reinterpretedFanOutBug, revisedCanonicalContract below): none of a/b/c as originally framed. atlas_packets stays FILE-granularity (option (b)'s premise, rejected as knowingly lossy) and chunk lineage is represented as an explicit normalized 1:N relation (closest to (c), but as a relational table -- atlas_packet_chunk_lineage -- never as an array column on atlas_packets). This is now frozen in PacketChunkMembershipV1 (packetChunkLineageContract01 below) and physically implemented in packetChunkLineageMigration01. Original superseded text: atlas_packets is currently FILE-granularity (one row per source_ref, by register-orphaned-chunks.mjs's own DISTINCT design) while codebase_chunk_index is CHUNK-granularity (many rows per source_ref for multi-chunk files). PacketChunkLineageV1's canonicalChunkId as a single string assumes a 1:1 packet-to-chunk relationship that does not match the current packet model. PACKET-CHUNK-LINEAGE-CONTRACT-01 must resolve this explicitly -- e.g. either (a) redefine packet granularity to be chunk-level going forward (breaking change to what a 'packet' means), or (b) keep packets file-level and define canonicalChunkId as 'the primary/representative chunk for this file' under an explicit, documented rule (e.g. lowest line_start), or (c) change canonicalChunkId to canonicalChunkIds: string[] and drop the single-EXACT-resolution assumption entirely. This gate surfaces the question; it does not answer it.",
   "architecturalCorrection": "The FILE-vs-chunk fork above was framed incorrectly as a-vs-b-vs-c. The correct model is closest to (c) but normalized as an explicit relational membership, not an array embedded in atlas_packets: packet identity and chunk identity are NOT the same thing -- a packet<->chunk relation is LINEAGE MEMBERSHIP (1 FILE packet contains/was-derived-from N canonical chunks), not identity equality. Do not redefine packets to chunk-granularity (large breaking migration) and do not pick a 'representative chunk' (would knowingly turn a many-chunk file into a false 1:1 identity). Preserve atlas_packets granularity as-is.",

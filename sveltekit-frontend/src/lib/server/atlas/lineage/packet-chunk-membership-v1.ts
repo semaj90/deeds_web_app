@@ -86,13 +86,27 @@ export type PacketChunkMembershipV1 = z.infer<typeof PacketChunkMembershipV1Sche
  *   source_namespace, membership_status, revision_status,
  *   lineage_producer_revision
  * NULLABLE: source_revision (absent whenever revision_status = 'UNPROVEN')
- * UNIQUE: (packet_key, canonical_chunk_id, lineage_producer_revision)
- *   -- deliberately NOT including source_revision in the uniqueness key:
- *   the dominant historical state (per BACKFILL-SCOPE-01: 60,882/61,660
- *   namespace-unproven, and revision tracks namespace 1:1 in this corpus)
- *   is expected to have source_revision absent, and a nullable column
- *   cannot usefully participate in a uniqueness constraint anyway (NULL
- *   never equals NULL in Postgres).
+ * UNIQUE: (packet_key, canonical_chunk_id) ONLY. lineage_producer_revision
+ *   and evidence_refs are PROVENANCE on the one canonical membership row,
+ *   not part of membership identity -- corrected from an earlier draft that
+ *   included lineage_producer_revision in the key, which would have let a
+ *   second producer re-observing the same (packet, chunk) relationship
+ *   insert a second canonical row for it, inflating downstream vote/
+ *   cardinality counts. A producer re-observing an existing membership must
+ *   UPSERT against the existing (packet_key, canonical_chunk_id) row, never
+ *   insert a new one. Append-only observation HISTORY, if ever needed,
+ *   belongs in a separate execution-evidence table, never conflated with
+ *   this canonical membership relation.
+ *   source_revision is also excluded from the key: the dominant historical
+ *   state (per BACKFILL-SCOPE-01: 60,882/61,660 namespace-unproven, and
+ *   revision tracks namespace 1:1 in this corpus) is expected to have
+ *   source_revision absent, and a nullable column cannot usefully
+ *   participate in a uniqueness constraint anyway (NULL never equals NULL
+ *   in Postgres).
+ * source_namespace is plain text, deliberately NOT a foreign key to
+ *   atlas_packets.repository_id -- that column is confirmed corrupted
+ *   (58,365/58,365 populated values all distinct, the same synthetic
+ *   randomUUID()-per-row pattern found in backfill-unified-id-hierarchy.mjs).
  */
 export const ATLAS_PACKET_CHUNK_LINEAGE_TABLE_NAME = 'atlas_packet_chunk_lineage';
 
