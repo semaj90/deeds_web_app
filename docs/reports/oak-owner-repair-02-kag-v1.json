@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.oak-owner-repair-02-kag.v1",
+  "updatedAt": "2026-09-01T15:25:00-07:00",
+  "status": "PROVEN_CONTRACT_HANDLER",
+  "gate": "OAK OWNER REPAIR 02",
+  "implementationRef": "parent-atlas.kag.neighbor-read.strict.v1",
+  "callable": "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsStrictV1",
+  "input": "canonicalIds[1..256]",
+  "output": "canonical-ID neighbor receipt with tuple and hyperedge counts",
+  "packetLookupAlias": false,
+  "boundedBfsAlias": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "tests": {
+    "packageBuild": "PASS",
+    "kagHandlerFocused": { "passed": 2, "failed": 0 }
+  },
+  "promotion": {
+    "kagOwnerRepair": "PROVEN",
+    "contextOwnerRepair": "OPEN",
+    "zeroWriteReplay": "BLOCKED_UNTIL_CONTEXT_AND_REMAINING_BINDINGS"
+  },
+  "likely_cause": "The strict KAG reader had no OaK operator contract matching its canonical-ID neighbor input and receipt output.",
+  "evidence": [
+    "packages/parent-atlas/src/core/oak-kag-neighbor-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.spec.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/oak-kag-neighbor-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.ts"
+  ],
+  "safe_next_command": "rg -n \"buildContextManifestFromACE|context-assembler|OAK_KAG_NEIGHBOR_READ_STRICT_V1\" packages/parent-atlas/src sveltekit-frontend/src/lib/server",
+  "smoke_command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/oak-owner-repair-02-kag-v1.json"
+}

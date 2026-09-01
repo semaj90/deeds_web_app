@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.agents-coverage-audit.v1",
+  "generatedAt": "2026-09-01T20:23:01.075Z",
+  "readOnly": true,
+  "resolution": "nearest-parent-AGENTS.md",
+  "instructionFiles": [
+    "AGENTS.md",
+    "llama-cpp-turboquant-gemma4/AGENTS.md",
+    "mcp-server-mcp/tools/instructions/AGENTS.md",
+    "sveltekit-frontend/AGENTS.md",
+    "sveltekit-frontend/scripts/AGENTS.md",
+    "sveltekit-frontend/src/lib/server/graph/AGENTS.md",
+    "sveltekit-frontend/src/mcp/AGENTS.md",
+    "tools/agentic-research/src/firecrawl/AGENTS.md"
+  ],
+  "coverage": {
+    "totalVisibleFiles": 26289,
+    "coveredFiles": 26289,
+    "uncoveredFiles": 0,
+    "percentage": 100
+  },
+  "assignmentCounts": {
+    "AGENTS.md": 9611,
+    "sveltekit-frontend/AGENTS.md": 14276,
+    "sveltekit-frontend/scripts/AGENTS.md": 2277,
+    "sveltekit-frontend/src/lib/server/graph/AGENTS.md": 76,
+    "sveltekit-frontend/src/mcp/AGENTS.md": 49
+  },
+  "uncoveredFiles": [],
+  "checksum": "sha256:1e13b7abc8c625d7cc8032be20ff32480d8c91dc959aa6228da11be2665896f7"
+}

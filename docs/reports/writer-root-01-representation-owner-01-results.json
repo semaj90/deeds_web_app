@@ -1,0 +1,483 @@
+{
+  "schema": "atlas.writer-root-01-representation-owner-01.v1",
+  "tasks": ["WRITER-ROOT-01", "REPRESENTATION-OWNER-01", "QDRANT-ID-ANOMALY-01-evidence", "BRIDGE-RECON-DRY-01-eval"],
+  "readOnly": true,
+  "writesPerformed": false,
+  "reconciliationPerformed": false,
+
+  "generation_matrix": [
+    {
+      "generation": "A",
+      "collection": "codebase_chunks_768",
+      "source_ref_convention": "src/... (repo-relative to sveltekit-frontend/)",
+      "point_id_type": "numeric (legacy incrementing, e.g. nextPointId from 1002)",
+      "representation_id_field": "MISSING (uses canonical_id for self-reference instead, not representation_id)",
+      "embedding_model": "embeddinggemma:latest",
+      "projection_revision_sample": "graphify-signature-768-v1 / graphify-content-768-v1 (per named-vector slot)",
+      "live_count": 143,
+      "referenced_by": "not directly referenced by atlas_packets/bridge in the sampled population (their references land on generation C instead)"
+    },
+    {
+      "generation": "B",
+      "collection": "codebase_chunks_768",
+      "source_ref_convention": "src/... (repo-relative)",
+      "point_id_type": "UUID (= codebase_chunk_index.id, Phase109-style)",
+      "representation_id_field": "embeddinggemma_768_native_v1 (uniform, 300/300 sampled)",
+      "embedding_model": "MISSING field, but vector_name=dense_768, workspace_id=phase108d-backfill (300/300 sampled)",
+      "projection_revision_sample": "n/a (no projection_revision field observed on this generation)",
+      "live_count": 10302,
+      "referenced_by": "the physical survivor for the whole population (10,159 UUID_ONLY + 143 dual-live) -- but NOT what atlas_packets/bridge actually reference",
+      "note": "This is literally the historical Phase 108D embeddings backfill generation (workspace_id: phase108d-backfill), documented in CLAUDE.md July 28 2026 -- not a current generation by any code-declared contract, just the one that physically survived cleanup."
+    },
+    {
+      "generation": "C",
+      "collection": "codebase_chunks_768",
+      "source_ref_convention": "sveltekit-frontend/src/... (workspace-root-relative)",
+      "point_id_type": "numeric (distinct id space from generation A)",
+      "representation_id_field": "differs from generation B for 7,711/7,773 sampled references (exact field values not further broken down this pass)",
+      "embedding_model": "not fully characterized this pass -- see limitations",
+      "projection_revision_sample": "not fully characterized this pass -- see limitations",
+      "live_count": ">=7,828 (7,773 atlas_packets refs + 55 bridge refs, some overlap likely)",
+      "referenced_by": "7,773 atlas_packets rows + 55 packet_qdrant_bridge rows -- effectively ALL of the current bridge/atlas_packets projection metadata for this population",
+      "writer": "HISTORICAL_UNRESOLVED -- repo-wide dual-alias convention (src/... and sveltekit-frontend/src/... both constructed as lookup candidates) found in 12+ scripts/atlas/*.mjs files, not attributable to one script invocation; backfill-packet-metadata-to-postgres.mjs:450 is the most direct candidate writer of the atlas_packets.qdrant_point_id value itself but not confirmed via git blame."
+    },
+    {
+      "generation": "D",
+      "collection": "codebase_chunks_768_v2",
+      "source_ref_convention": "src/... (repo-relative, clean)",
+      "point_id_type": "UUID (= postgres_id)",
+      "representation_id_field": "representation_id is NULL on every sampled point; the string value instead lives under a DIFFERENT key, representation_name='semantic_768' -- a live contract/data key-name mismatch against qdrant-semantic-projection.ts (payload.representation_id: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION)",
+      "embedding_model": "embeddinggemma",
+      "projection_revision_sample": "v2_uuid_clean",
+      "live_count": 52380,
+      "referenced_by": "ZERO atlas_packets rows AND ZERO packet_qdrant_bridge rows (confirmed live: 0/4,725 bridge rows target codebase_chunks_768_v2 -- all 4,725 target codebase_chunks_768; 0 atlas_packets rows with qdrant_collection=codebase_chunks_768_v2, 0 with qdrant_point_id LIKE card:%).",
+      "note": "THIS is the collection embedding-contract-768.ts / qdrant-semantic-projection.ts (src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts:17, QDRANT_SEMANTIC_COLLECTION = codebase_chunks_768_v2) declares as the canonical target for the semantic_768 representation contract. It is disjoint from every generation A/B/C above -- its own internal self-reference field qdrant_point_id uses a THIRD id scheme entirely (card:<source_ref>:<content_hash> strings), unrelated to any numeric or UUID id investigated in QDRANT-ID-ROOT-01/PREFIX-01."
+    }
+  ],
+
+  "writer_root_01_answers": {
+    "q1_representation_of_generation_C": "CLOSED (follow-up sample, n=500 of the 1,389 distinct generation-C point ids actually referenced by atlas_packets/bridge, fetched directly rather than only compared pairwise vs B): representation_id='semantic_768' for 429/500 (85.8%) -- this is the EXACT code-canonical representationId literal (ATLAS_CANONICAL_SEMANTIC_REPRESENTATION). embedding_model='embeddinggemma' for 429/500 (same rows). A further 68/500 (13.6%) have representation_id set to a UUID string instead of 'semantic_768' or 'embeddinggemma_768_native_v1' -- checked, that UUID does NOT equal the row's own postgres_id or appear inside its packet_key; origin unresolved, flagged not fabricated. The remaining 3/500 match generation B's scheme (representation_id='embeddinggemma_768_native_v1', workspace_id='phase108d-backfill', vector_name='dense_768') -- so 'generation C' as operationally defined (not-numeric-not-uuid third point) is NOT monolithic; it contains a majority C1 subgroup (semantic_768-labeled, richer payload schema incl. graphAuthorityScore/pagerank/community_id/tree_node_id/packet_key/canonical_source_ref/qdrant_collection -- this is the schema root CLAUDE.md calls codebase_chunks_768's 'older source contract, richer payload'), a minority C2 subgroup (uuid-valued representation_id, unresolved), and a trace contamination of B-shaped points.",
+    "q2_representation_of_UUID_generation_B": "representation_id=embeddinggemma_768_native_v1, vector_name=dense_768, workspace_id=phase108d-backfill -- uniform across a 300-point random sample. This is the Phase 108D backfill generation, not a code-declared canonical representation.",
+    "q3_writer_families": {
+      "generations_A_and_B": "scripts/atlas/phase108d-embeddings-backfill-*.mts family (documented in root CLAUDE.md, July 28 2026 section) -- both the legacy numeric writer and the Phase109-style UUID writer operated against codebase_chunks_768.",
+      "generation_C": "HISTORICAL_UNRESOLVED at the single-script level. Confirmed as a repo-wide pattern: 12+ files under scripts/atlas/ construct BOTH src/... and sveltekit-frontend/src/... as alias candidates when resolving source_ref (audit-current-source-cohort-lineage-v1.mjs, backfill-ast-symbols.mjs, compare-source-manifest-to-projections-v1.mjs, compute-louvain-neo4j.mjs, backfill-packet-metadata-to-postgres.mjs, backfill-latent-vectors.mjs, others). backfill-packet-metadata-to-postgres.mjs:450 (sveltekit-frontend/ + entry.source_ref) is the most direct candidate for the actual atlas_packets.qdrant_point_id writer, not confirmed via git blame this pass.",
+      "generation_D": "A distinct, later-generation writer targeting codebase_chunks_768_v2 under the v2_uuid_clean projection_revision label, using self-declared qdrant_point_id in a card:<path>:<hash> string format -- not yet traced to a specific script this pass."
+    },
+    "q4_currently_authoritative_representation": "By live code (src/lib/server/atlas/retrieval/qdrant-semantic-projection.ts, src/lib/server/atlas/embedding/embedding-model-manifest-v1.ts, and ~15 other files importing ATLAS_CANONICAL_SEMANTIC_REPRESENTATION): representationId literal is semantic_768, targeting collection codebase_chunks_768_v2 (52,380 points). This is DISJOINT from every generation (A/B/C) investigated in QDRANT-ID-ROOT-01 and QDRANT-ID-PREFIX-01, all of which live in codebase_chunks_768. atlas_packets and packet_qdrant_bridge reference ZERO points in the code-declared canonical collection."
+  },
+
+  "representation_owner_01_determination": {
+    "status": "PARTIAL -- code-declared authority identified; the WITHIN-_768 picture inverted from the prior turn's framing",
+    "codeDeclaredAuthoritativeRepresentationId": "semantic_768",
+    "codeDeclaredAuthoritativeCollection": "codebase_chunks_768_v2",
+    "correctionVsPriorTurn": "The prior synthesis treated generation B (the UUID-id physical survivor) as the presumptive 'current' generation and C as the stale one being wrongly referenced. The direct C sample inverts that: 429/500 (85.8%) of generation-C points self-declare representation_id='semantic_768' -- the literal code-canonical string -- while generation B uniformly self-declares 'embeddinggemma_768_native_v1', a label that does not match the canonical contract at all. So by self-declared representation label, C is CLOSER to canonical than B is, not further. This does not settle ownership by itself (a payload string is evidence, not authority, per this investigation's own standing discipline) -- but it means 'atlas_packets/bridge point at the wrong, older generation' is not the right one-line summary either. Both A and B and C1/C2 need independent verification against the actual vector representation (does the C1 point's vector match a fresh semantic_768 embedding of the same content?), not just payload self-labeling, before any of the three is trusted as authoritative within _768.",
+    "implication": "The entire A/B/C ownership question inside codebase_chunks_768 remains secondary to the larger fact: atlas_packets/packet_qdrant_bridge currently reference NOTHING in the code-declared canonical collection (_768_v2) at all -- confirmed for both tables (0/4,725 bridge rows, 0 atlas_packets rows). Freezing QDRANT_PROJECTION_OWNERSHIP around which point inside codebase_chunks_768 is correct would still leave the bridge/atlas_packets pointing at a non-canonical collection relative to the live embedding-contract-768.ts contract. This matches the CLAUDE.md-documented open finding (codebase_chunks_768 vs codebase_chunks_768_v2 both still live, NOT deduped -- 768_v2 is the EMB3A migration target referenced by 43 live files) -- confirmed here as directly relevant to, not separate from, the ownership question this whole investigation chain has been chasing.",
+    "doesNotChangeThis": "QDRANT_PROJECTION_OWNERSHIP remains NOT_FROZEN. This finding does not authorize any promotion, reconciliation, or point/payload mutation."
+  },
+
+  "qdrant_id_anomaly_01_evidence": {
+    "total": 7,
+    "subgroups": [
+      {
+        "class": "DIRECTORY_RENAME (not a workspace-prefix issue)",
+        "count": 3,
+        "distinctUnderlyingCase": 1,
+        "detail": "All 3 are duplicate atlas_packets rows for the same file: canonical source_ref src/lib/server/services/AGENTS.md vs third-generation source_ref sveltekit-frontend/src/lib/services/AGENTS.md (note: missing the server/ segment, not just the workspace prefix) -- a directory move (src/lib/services/ -> src/lib/server/services/) postdates generation C's index. thirdPointId=2233 for all 3.",
+        "contentHashCmp": "MISMATCH",
+        "representationCmp": "MISMATCH"
+      },
+      {
+        "class": "STALE_CONTENT (clean path match, content edited after generation C indexed it)",
+        "count": 4,
+        "files": [
+          "src/lib/services/error-analysis/DecisionEngine.ts (thirdPointId=2263)",
+          "src/lib/services/knowledge-search/types.ts (thirdPointId=2438)",
+          "src/lib/services/error-analysis/JSONLStorage.ts (thirdPointId=4881)",
+          "src/lib/services/error-analysis/types.ts (thirdPointId=2787)"
+        ],
+        "contentHashCmp": "MISMATCH",
+        "representationCmp": "MISMATCH"
+      }
+    ],
+    "disposition": "Left untouched, as directed. Both subgroups have a plausible, non-corruption explanation (directory rename / stale content) and should not block or complicate reconciliation design for the 7,766 understood rows."
+  },
+
+  "bridge_recon_dry_01_eval": {
+    "status": "CRITERIA_SATISFIED_BY_EXISTING_EVIDENCE (no new mutation, no new script run -- reusing QDRANT-ID-PREFIX-01 results)",
+    "population": 55,
+    "normalizedSourceExact": 55,
+    "contentHashExact": 55,
+    "representationExact": 55,
+    "targetUuidPointExists": 55,
+    "note": "All 55 packet_qdrant_bridge third-point references satisfy every BRIDGE-RECON-DRY-01 criterion: normalized source ref match, content hash match, representation/embedding_model/workspace_id match (no override fired -- classified cleanly as EXACT_SVELTEKIT_PREFIX in QDRANT-ID-PREFIX-01, meaning no downstream comparison flagged a mismatch), and every row's own-UUID-generation point is confirmed live (by construction of the population). This is evidence the canary WOULD pass if run -- it is NOT a mutation and nothing has been written. This does NOT account for whether generation B (the target these 55 would be repointed to) is itself the representation-authoritative generation -- per REPRESENTATION-OWNER-01 above, it is not (B = phase108d-backfill, not the code-declared semantic_768/_768_v2 contract).",
+    "stillNotAuthorizedFor": "Any actual bridge row update. Requires QDRANT_PROJECTION_OWNERSHIP freeze first, per the gate ladder -- and that freeze now also needs to resolve the _768 vs _768_v2 disjointness, not just the A/B/C question inside _768."
+  },
+
+  "vector_level_check_v1": {
+    "purpose": "Test whether B (embeddinggemma_768_native_v1) and C1 (semantic_768) actually carry different embeddings, or just different payload labels on the same vector -- settling this required pulling real vectors, not trusting either self-declared label.",
+    "readOnly": true,
+    "writesPerformed": false,
+    "method": "For 30 distinct SAME_NORMALIZED_SOURCE_DIFFERENT_REPRESENTATION row pairs (content_hash already confirmed MATCH), fetched both points' actual 768-dim vector.content and computed cosine similarity directly, plus one independent cross-check: embedded one point's own summary text fresh via live Ollama embeddinggemma:latest and compared against both stored vectors.",
+    "result_summary": {
+      "sampleSize": 30,
+      "vectorIdentical_cosineGte0.999999": 1,
+      "vectorDiverged_cosineLt0.99": 29,
+      "cosineRange": "0.42 to 0.93 for the diverged set",
+      "finding": "REVERSES the initial n=1 read. B and C1 carry GENUINELY DIFFERENT embeddings for 29/30 sampled pairs, not just different labels on the same vector -- the one identical case (src/lib/types/evidence.ts, cosine=1.0 exactly) was an outlier, not representative. This confirms the representation divergence is real at the vector level, not merely cosmetic relabeling."
+    },
+    "timestamp_check": {
+      "sampleSize": 2,
+      "finding": "Inconclusive, not generalized. For src/lib/types/evidence.ts: B.indexed_at=2026-05-08, C.payload_backfilled_at=2026-08-26 (later than B) -- weak support for 'C1 is a later re-embedding pass'. For src/lib/server/ai/contextual-tools.ts: C's indexed_at/atlas_enriched_at/postgres_updated_at/payload_backfilled_at are ALL undefined -- C's own payload schema is not consistently populated even within the C1 subgroup, so temporal ordering cannot be established from this field alone across the population.",
+      "doesNotEstablish": "Whether C1 (semantic_768-labeled) or B (embeddinggemma_768_native_v1-labeled) is the more recent / more authoritative embedding. The representation_id label match to the code-canonical string (C1) and the vector data itself (genuinely different, not a copy) are both real facts, but do not by themselves prove which one is correct -- that requires either reliable writer timestamps (not consistently available) or a fresh ground-truth embedding of the current file content compared against both (not yet done at scale)."
+    }
+  },
+
+  "semantic_generation_oracle_01": {
+    "gate": "SEMANTIC-768-EXECUTION-OWNER-01 -> SEMANTIC-GENERATION-ORACLE-01",
+    "readOnly": true,
+    "writesPerformed": false,
+    "executorUsed": "http://127.0.0.1:8081/v1/embeddings (llama.cpp CUDA, model embeddinggemma-300m-f16.gguf) -- traced from live code (canonical-embed.ts::embedSemantic768Canonical, called by embedding-service.ts::embedQueryForLane when ATLAS_CANONICAL_EMBEDDING_STRICT=true, which is the live env value), NOT inferred from what happened to be running. Ollama (:11434) and ONNX WebGPU were both live/available but explicitly NOT used as the oracle since neither is the code-declared owner under strict mode.",
+    "executorProvenance": "Started by the operator via `npm run dev:gpu` -> launch-embed-server.ps1 mid-investigation; confirmed live via /health and /v1/models (tokenizer vocab_type=1/n_vocab=262144 matches EMBEDDING_TOKENIZER_REVISION exactly).",
+    "inputPolicyFinding": "Postgres codebase_chunk_index.embedding_model literally reads 'embeddinggemma:latest:eg-task-prefix-v1' for every row tested -- appearing to contradict embedding-contract-768.ts's doc comment that the whole corpus was embedded PROMPT_REVISION_UNPROMPTED (raw text, no formatEmbeddingGemmaInput() prefix). Tested empirically rather than trusting either the field or the comment: raw/unprompted input reproduces generation B's stored vector far more closely (cosine 0.998-0.99998) than formatEmbeddingGemmaInput('document', text) does (cosine 0.95-0.97). CONCLUSION: the code comment is empirically correct; the embedding_model metadata field's 'eg-task-prefix-v1' suffix is itself stale/mislabeled -- another case of a self-declared payload label not matching physical reality, consistent with every other finding in this investigation chain.",
+    "testCases": [
+      {
+        "source_ref": "src/lib/types/evidence.ts",
+        "note": "the earlier n=1 outlier where cosine(B,C1)=1.0 exactly -- both generations happened to carry the identical vector for this one file, so this case does not discriminate between them.",
+        "cosine_rawFresh_vs_B": 0.9999685904658148,
+        "cosine_rawFresh_vs_C1": 0.9999685904658148
+      },
+      {
+        "source_ref": "src/lib/types/database.ts",
+        "cosine_B_vs_C1_direct": 0.46261527124089796,
+        "cosine_rawFresh_vs_B": 0.9999789573574677,
+        "cosine_rawFresh_vs_C1": 0.46314189127114996,
+        "cosine_docFormattedFresh_vs_B": 0.9743820437006033,
+        "cosine_docFormattedFresh_vs_C1": 0.49202482936436076
+      },
+      {
+        "source_ref": "src/lib/services/error-analysis/types.ts",
+        "note": "also one of the 7 QDRANT-ID-ANOMALY-01 rows (content_hash mismatch) -- included anyway since raw-text embedding uses the CURRENT file content regardless.",
+        "cosine_B_vs_C1_direct": 0.6771608023756439,
+        "cosine_rawFresh_vs_B": 0.9984036952410016,
+        "cosine_rawFresh_vs_C1": 0.6749996252824495
+      }
+    ],
+    "conclusion": "DECISIVE for the 2 genuinely-diverged test cases: generation B's stored vector matches a fresh embedding of the file's CURRENT content, computed via the actual code-declared canonical executor, at cosine >=0.998. Generation C1's stored vector does NOT match (cosine 0.46-0.68, no better than unrelated content) despite C1 self-declaring representation_id='semantic_768' -- the code-canonical LABEL -- while B self-declares the non-canonical-sounding 'embeddinggemma_768_native_v1'. This reverses the label-based hypothesis from the prior turn: a correct-looking representation_id string is not evidence of a correct vector. B is the generation whose vectors are actually current and executor-verified; C1's label is more 'correct' but its data is stale or wrong. Sample size is small (2 discriminating cases) -- reported as decisive for what was tested, not yet generalized to the full 7,711 population without a larger run.",
+    "knownBlocker": "The embed server's configured ubatch size (128, per the dev:gpu startup log) rejects inputs over ~128 tokens with HTTP 500 'input too large to process' -- this is the SAME bug already diagnosed in memory/SESSION-201-EG-GGUF-PROOF-GATES-0-2.md (EMBED_UBATCH_SIZE=128 default; -ub silently capped by -b, both need to reach EMBED_CTX=2048). Reproduced live, not fixed here (no infra restart performed) -- scaled the oracle up by filtering to short-content chunks only, staying inside the existing config rather than changing it."
+  },
+
+  "semantic_generation_oracle_01_scaled": {
+    "purpose": "Generalize the n=2 SEMANTIC-GENERATION-ORACLE-01 result across a larger bounded sample, without restarting the embed server (stayed under its existing ubatch=128 limit by filtering to short-content chunks, content.length<=400 chars as a conservative token-count proxy).",
+    "readOnly": true,
+    "writesPerformed": false,
+    "infraChanges": false,
+    "population": "2,707 distinct rows in SAME_NORMALIZED_SOURCE_DIFFERENT_REPRESENTATION with content <=400 chars (out of 7,711 total in that bucket)",
+    "sampleSize": 60,
+    "results": {
+      "valid": 59,
+      "errors": 1,
+      "errorReason": "1 row still exceeded the 128-token ubatch limit despite the 400-char filter (129 tokens) -- the char-length proxy is imperfect, not a bug in the sampling.",
+      "freshMatchesB_cosineGte0.95_BGreaterThanC1": 56,
+      "freshMatchesC1_cosineGte0.95_C1GreaterThanB": 0,
+      "freshMatchesNeither_bothLt0.95": 0,
+      "nonDiscriminating_B_equals_C1_bothMatchFresh": 3
+    },
+    "conclusion": "GENERALIZED AND STRENGTHENED. Across 56 cases where B and C1 actually carry different vectors, the fresh canonical-executor embedding of current file content matched B in 56/56 (100%) and never matched C1 better. The remaining 3 were non-discriminating (B and C1 happened to be the identical vector, both matched fresh equally -- same pattern as the earlier n=1 outlier, now understood as a small minority case, not a counterexample). Zero cases favored C1. This is no longer a 2-example spot check: generation B (embeddinggemma_768_native_v1-labeled) is the generation with current, executor-verified vectors; generation C1 (semantic_768-labeled) carries stale or wrong vectors in every discriminating case sampled, despite its more code-canonical-sounding label.",
+    "stillNotEstablished": [
+      "The full 7,711-row population beyond this 60-row sample.",
+      "Whether this finding extends to the 55 packet_qdrant_bridge EXACT_SVELTEKIT_PREFIX rows (not yet re-tested with the real oracle -- BRIDGE-RECON-DRY-01's earlier pass check was payload-label-based, which this investigation now shows is not reliable evidence on its own).",
+      "The C2 subgroup (68/500 sampled generation-C points with a UUID-valued representation_id) and generation D (codebase_chunks_768_v2) -- neither vector-checked against the oracle yet."
+    ]
+  },
+
+  "trace_mcp_startup_01": {
+    "status": "DIAGNOSED, no code change made -- self-resolved before intervention needed",
+    "readOnly": true,
+    "mechanism": "scripts/ensure-mcp-server.mjs checks /health (dependencies.mcp===true) THEN separately calls tools/list and requires 6 hardcoded REQUIRED_TOOLS names to all be present (kag.record_agent_run, kag.ingest_memory_directory, runtime.simdjson_status, runtime.sse_probe, hypergraph.explain_activation, trace.kag_search). If health passes but any required tool is missing, it logs 'healthy but missing required tools' and restarts the listener.",
+    "liveCheck": "Queried :8788/health (ok, dependencies.mcp=true) and POST :8788/mcp tools/list directly after dev:gpu settled: 175 tools returned, all 6 REQUIRED_TOOLS present, missingToolNames=[]. trace.kag_search and kb.trace_search both present.",
+    "rootCause": "NOT an obsolete-tool-name / protocol-mismatch problem -- all 6 required names are real, current, live tool names once the server fully starts. This was a startup-ordering RACE: /health flips to healthy before the full 175-tool catalog finishes registering (likely async registry loading), so a tools/list call issued in that narrow window returns a partial catalog. ensure-mcp-server's own detect-and-restart logic caught exactly this and self-corrected by restarting the listener -- which is why the state is now fully healthy with zero missing tools.",
+    "actionTaken": "None -- diagnosed only, per the instruction not to repeatedly restart the listener until the reason is known. The reason is now known (a real, transient startup race, not a config/protocol defect) and the system already self-healed. No code fix applied; a future hardening could have /health itself report tool-catalog readiness so ensure-mcp-server doesn't need a second racy check, but that's a design choice, not an active bug to patch now."
+  },
+
+  "qdrant_d_identity_01": {
+    "status": "RESOLVED",
+    "readOnly": true,
+    "finding": "codebase_chunks_768_v2 (generation D) uses postgres_id as its own Qdrant point id directly (same identity value as generation B's point id) -- so B and D are joinable 1:1 by construction, no separate mapping needed. Checked live: all 60/60 sampled candidate postgres_ids exist as live points in _768_v2. D's payload content_hash field is null for every sampled point (schema populated but not backfilled with hash values) -- so content-hash cross-verification isn't available for D, but identity join via postgres_id is unambiguous regardless."
+  },
+
+  "semantic_generation_oracle_01_bcd": {
+    "purpose": "Extend the B/C1 oracle to include D (codebase_chunks_768_v2, the code-declared canonical collection), on an exactly-joined 40-row cohort, using the same real :8081 canonical executor.",
+    "readOnly": true,
+    "writesPerformed": false,
+    "sampleSize": 40,
+    "results": {
+      "valid": 40,
+      "errors": 0,
+      "B_bestMatch_cosineGte0.95": 40,
+      "D_bestMatch_cosineGte0.95": 40,
+      "C1_bestMatch_cosineGte0.95": 1,
+      "noneMatch": 0,
+      "avgCosine_B_D_direct": 1.0
+    },
+    "conclusion": "DECISIVE, fully generalized across this cohort. B and D carry the IDENTICAL vector in all 40/40 sampled cases (cosine(B,D)=1.0 exactly, every time) -- they are the same correct data living in two different collections/writer generations. Both match a fresh canonical-executor embedding of current file content in 40/40 cases. C1 -- the generation atlas_packets and packet_qdrant_bridge actually reference for 7,773 + 55 rows -- matches in only 1/40 (the non-discriminating B==C1 case). QDRANT-D-REPRESENTATION-01 is answered: the correct, current, canonical representation already physically exists in both codebase_chunks_768 (as generation B) and codebase_chunks_768_v2 (generation D, the code-declared canonical target). The entire ownership problem reduces to: atlas_packets/packet_qdrant_bridge reference the wrong generation (C1) instead of either correct one (B or D)."
+  },
+
+  "qdrant_reader_owner_01": {
+    "status": "RESOLVED -- and it surfaces a live, active retrieval-quality problem, not just a metadata inconsistency",
+    "readOnly": true,
+    "finding": "src/lib/server/search/qdrant-search.ts (the actual ANN search function underneath the retrieval orchestrators) has a HARDCODED default `collection = 'codebase_chunks_768'` at 3 separate call sites (lines ~172, ~235, ~256, ~267) -- NOT codebase_chunks_768_v2, despite embedding-contract-768.ts declaring CANONICAL_QDRANT_COLLECTION = 'codebase_chunks_768_v2'. Live search traffic queries the SAME collection that contains generations A, B, AND C (the stale/wrong one).",
+    "filterCheck": "qdrant-search.ts applies an `atlas_enriched: true` payload filter specifically when collection==='codebase_chunks_768'. Checked live whether this filter happens to exclude C1: it does NOT -- both a sampled B point and its paired C1 point have atlas_enriched=true. The filter does not discriminate between the correct and stale generations.",
+    "implication": "This is not only a dormant atlas_packets/bridge metadata problem -- the live default search path can return C1's stale/wrong vectors as ANN results today, indistinguishable from B's correct ones by any filter currently applied. Retrieval quality is plausibly degraded right now for any query that scores closer to a stale C1 vector than the correct B vector for the same logical content. Not measured at query-result scale in this pass -- flagged as a real, actionable finding, not fabricated."
+  },
+
+  "qdrant_d_writer_01": {
+    "status": "RESOLVED -- via a pre-existing, more thorough prior audit found on disk, not re-derived from scratch",
+    "readOnly": true,
+    "finding": "docs/reports/emb3a-qdrant-lineage-audit.json (generated 2026-08-22, predates this session) already traced generation D's writer: id='768_v2_direct_backfill', path='sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs', transport='DIRECT_POSTGRES_TO_QDRANT', sha256 checksum recorded. Also lists 'qdrant_sync_payload' (src/lib/server/retrieval/qdrant-sync-payload.ts, PACKET_TO_QDRANT_SYNC) writing to codebase_chunks_768 -- a candidate B/C writer not previously identified in this investigation's own census -- and a third writer, 'legacy_projection_worker' (scripts/atlas/atlas-qdrant-projection-worker.mjs, RABBITMQ_PROJECTION_JOB), targeting a DIFFERENT collection entirely (codebase_chunks_384_hybrid), out of scope for this _768/_768_v2 investigation but noted for completeness.",
+    "priorAuditStatus": "That existing audit's own overall verdict is EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE -- a separate, already-tracked blocker on the _768-to-_768_v2 migration (EMB3A) that this investigation did not chase further; flagged as existing, relevant, unread-in-full prior work rather than duplicated.",
+    "duplicationPreventionNote": "Found via grep for the literal 'v2_uuid_clean' revision string -- should have been checked earlier per this repo's own Duplication Prevention rule (audit existing work before re-deriving). The census in this investigation (writer-root-01-representation-owner-01-results.json) independently re-verified compatible facts via live data rather than trusting this file blindly, so nothing here is invalidated -- but the existing report should be read in full before any reconciliation design work begins, not just cited."
+  },
+
+  "revised_gate_status": {
+    "SEMANTIC-768-EXECUTION-OWNER-01": "PROVEN (owner = :8081 llama.cpp/CUDA, model embeddinggemma-300m-f16.gguf, strict fallback disabled)",
+    "TRACE-MCP-STARTUP-01": "DIAGNOSED_SELF_RESOLVED (startup race between /health and tool-catalog registration; not a protocol/obsolete-tool defect; no fix needed, currently healthy)",
+    "QDRANT-D-IDENTITY-01": "RESOLVED (D keyed by postgres_id, 1:1 joinable with B, 60/60 confirmed live)",
+    "SEMANTIC-GENERATION-ORACLE-01": "DECISIVE on 40-row exact cohort: B ≡ D ≡ fresh ground truth; C1 diverges in 39/40",
+    "QDRANT-D-REPRESENTATION-01": "ANSWERED: B and D are representation-correct; C1 is not",
+    "QDRANT-READER-OWNER-01": "RESOLVED: live default reader is codebase_chunks_768 (not _768_v2); atlas_enriched filter does not exclude C1 -- active retrieval-quality risk, not just dormant metadata",
+    "QDRANT-D-WRITER-01": "RESOLVED via existing prior audit (emb3a-qdrant-lineage-audit.json, 2026-08-22): backfill-qdrant-768-v2-uuid.mjs",
+    "QDRANT_PROJECTION_OWNERSHIP": "NOT_FROZEN -- full census complete (identity, representation, reader, writer all resolved), but no promotion/reconciliation/write has been performed. The existing EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE finding in the prior audit should be read in full before any freeze/reconciliation design."
+  },
+
+  "emb3a_prior_audit_read_in_full": {
+    "source": "docs/reports/emb3a-qdrant-lineage-audit.json, generated 2026-08-22, read-only, predates this session",
+    "whatItActuallyFound": "D (codebase_chunks_768_v2) is identity-clean but lineage-poor. canonical_id/postgres_id and source_ref are EMB3A_LINEAGE_PROVEN (100% populated, correctly indexed, traced to the real Postgres owner column). But packet_key, tree_node_id, representation_id, representation_revision, embedding_model_revision/model_revision, workspace_revision, and source_revision are ALL effectively 0% populated in D's live payload.",
+    "whyBlocked_notAWriterBug": "The blocker is UPSTREAM, not in the Qdrant writer. atlas_packets.workspace_revision: populated for 0/61,660 rows. atlas_packets.source_representation_id: populated for 1/61,660 rows. atlas_packets.representation_revision: 1/61,660. atlas_packets.encoder_revision: 1/61,660. atlas_symbol_versions (the table that SHOULD own symbol_version_id/workspace_revision/source_revision): does not exist in this schema at all (exists:false). The writer (backfill-qdrant-768-v2-uuid.mjs) can't populate fields Postgres itself doesn't have data for -- this is a pre-existing, already-documented Postgres data-completeness gap, confirmed here, not introduced or discovered by this session's own investigation.",
+    "consequenceForThisInvestigation": "This session independently PROVED something the prior audit did not check: D's VECTOR content is correct (matches B, matches fresh embeddings, 40/40). Combined, the full picture is: D has correct vectors + correct identity/source linkage, but near-total absence of revision/representation lineage metadata -- not because anyone wrote it wrong, but because the Postgres columns it should read from are themselves unpopulated. A QDRANT_PROJECTION_OWNERSHIP freeze that also implies 'lineage-complete' would be premature even now that vector-correctness is proven. Repointing atlas_packets/bridge at B or D would fix the vector-correctness problem this session found, but would not by itself fix the separate, larger, upstream lineage-population gap this prior audit already found and this session did not attempt to address."
+  },
+
+  "final_synthesis": {
+    "whatThisInvestigationEstablished_newThisSession": [
+      "The 143-row 'dual-live numeric+UUID' framing undersold the scope: 10,302 rows carry a legacy numeric qdrant_id, and atlas_packets/bridge reference a third, distinct generation (C) for 7,773+55 of them -- not the numeric or UUID generation directly.",
+      "Generation C is not monolithic: a majority (C1, ~86% sampled) self-labels representation_id=semantic_768 (the code-canonical string); a minority (C2, ~14%) has an unexplained UUID-valued representation_id; a trace contaminant matches generation B exactly.",
+      "Vector-level oracle (real code-traced :8081 canonical executor, not assumed): generation B and generation D (codebase_chunks_768_v2) carry the IDENTICAL, current, correct vector in 40/40 tested cases. Generation C1 -- despite the more code-canonical-sounding label -- does not match in 39/40.",
+      "The live default search reader (qdrant-search.ts) queries codebase_chunks_768 (contains B, C1, and the rest), not _768_v2, and its atlas_enriched filter does not exclude C1 -- so this is a live retrieval-quality risk, not just dormant metadata.",
+      "TRACE MCP's 'missing required tools' warning was a real but transient startup race, not a defect -- diagnosed, not patched, since it self-resolved."
+    ],
+    "whatWasAlreadyKnownBeforeThisSession_confirmedNotDuplicated": [
+      "codebase_chunks_768 vs _768_v2 non-dedup was already flagged in root CLAUDE.md.",
+      "D's writer (backfill-qdrant-768-v2-uuid.mjs) and D's lineage-field gaps were already fully documented in emb3a-qdrant-lineage-audit.json (2026-08-22) -- found late in this investigation via grep for a specific revision string, not checked first as the repo's own Duplication Prevention rule recommends."
+    ],
+    "recommendation": "Do not proceed to reconciliation or a QDRANT_PROJECTION_OWNERSHIP freeze yet. Vector-correctness (this session's contribution) and lineage-completeness (the prior EMB3A audit's finding) are two separate, both-necessary conditions, and only the first is now well-evidenced. Populating atlas_packets.workspace_revision/representation_revision/encoder_revision/source_representation_id (currently ~0% populated across 61,660 rows) and resolving whether atlas_symbol_versions needs to be created are prerequisites larger than this investigation's read-only scope -- a separate, deliberate piece of work, not a natural continuation of this census.",
+    "canonicalWrites": false,
+    "reconciliationPerformed": false,
+    "quarantineActions": false
+  },
+
+  "qdrant_reader_fix_01": {
+    "status": "BLOCKED -- attempted, caught before shipping, reverted",
+    "readOnly": false,
+    "attemptedChange": "Imported QDRANT_SEMANTIC_COLLECTION from qdrant-semantic-projection.ts into src/lib/server/search/qdrant-search.ts, replaced 4 local 'codebase_chunks_768' default-parameter literals with the canonical import.",
+    "reasonReverted": "codebase_chunks_768_v2's payload does not carry 'content' or 'chunk_text' on ANY sampled point (payload keys checked live: postgres_id, chunk_id, source_ref, content_hash, representation_name, representation_id, embedding_model, model_revision, model_revision_state, qdrant_point_id, projection_revision, indexed_at -- no content field at all). mapQdrantPoint() reads p.content ?? p.chunk_text for the QdrantCodeResult.content field every downstream consumer relies on. Switching the default reader collection would have made every search result return content:'' -- a silent, app-wide regression worse than the duplicate-ranking defect the switch was meant to fix. QDRANT-READER-SHADOW-01 did not catch this because it only compared identity/rank/score, not payload completeness for downstream consumption.",
+    "action": "Reverted src/lib/server/search/qdrant-search.ts to its original state via direct file edit (not git checkout -- multiple live git.exe processes were holding .git/index.lock at the time; did not touch it, used Edit tool instead). File confirmed byte-identical to pre-change state.",
+    "newBlockingPredicate": "content / chunk_text -- add to the same predicate class as EMB3A-LINEAGE-BLOCKER-01's packet_key/tree_node_id/workspace_revision/source_revision findings. codebase_chunks_768_v2 cannot safely become the default reader collection until either (a) its payload is backfilled with chunk content, or (b) mapQdrantPoint()/its callers are changed to join back to Postgres via postgres_id for content when reading from _768_v2. Neither attempted -- both are real code/data changes requiring their own explicit scoping, not a continuation of this read-only investigation.",
+    "canonicalWrites": false,
+    "reconciliationPerformed": false
+  },
+
+  "qdrant_d_hydration_01": {
+    "status": "HYDRATION_EXACT",
+    "readOnly": true,
+    "writesPerformed": false,
+    "population": 7773,
+    "counters": {
+      "postgresIdExact": 7773,
+      "sourceRefExact": 7773,
+      "contentHashExact_whenBothSidesPresent": 2773,
+      "hydratedExactly": 7773,
+      "missing": 0,
+      "contentHashMismatch": 0,
+      "sourceRefMismatch": 0,
+      "chunkIdMismatch": 0
+    },
+    "oneChunkToMultipleProjections": 1,
+    "hydrationRate": 1.0,
+    "note": "Every point in the exact population atlas_packets/bridge currently mis-reference joins exactly and unambiguously to its canonical Postgres row via postgres_id, with zero content_hash disagreement wherever comparable and zero source_ref disagreement. Full results: docs/reports/qdrant-d-hydration-01-results.json.",
+    "reportFile": "docs/reports/qdrant-d-hydration-01-results.json"
+  },
+
+  "hydration_adapter_01": {
+    "status": "BUILT, not wired into production reader",
+    "filesCreated": [
+      "src/lib/server/search/projection-candidate-v1.ts (mapQdrantProjectionCandidate -- pure, fails closed to identityMissing:true rather than fabricating content for a lean D projection)",
+      "src/lib/server/search/hydrate-canonical-candidates.ts (hydrateCanonicalCandidates -- one batched Drizzle query for the whole candidate set, preserves Qdrant rank order, fails closed on CONTENT_HASH_MISMATCH / CANONICAL_ROW_NOT_FOUND / IDENTITY_MISSING)",
+      "src/lib/server/search/projection-candidate-v1.spec.ts (4 unit tests, all passing)"
+    ],
+    "duplicationCheckPerformed": "Before finishing, checked whether src/lib/server/retrieval/hydrate-candidates.ts (hydrateCandidatesWithProof) already does this job -- it does NOT duplicate: that function operates one layer up, POST-RRF-fusion, on FusedCandidate objects that fuseCandidates() requires to already carry a non-empty packetKey. A raw codebase_chunks_768_v2 Qdrant hit has no packet_key field at all (confirmed live), so it cannot enter that pipeline without first flowing through the full multi-lane retrieval/fusion stack. The new adapter occupies the lower, pre-fusion boundary: single-lane ANN hit -> content, which did not previously exist as a reusable module (qdrant-search.ts's own mapQdrantPoint() was the closest analog, and it fabricates content:'' for a lean D payload rather than hydrating).",
+    "productionReaderUnchanged": true
+  },
+
+  "qdrant_reader_shadow_02": {
+    "status": "STRONG PASS, one metric short of the stated 50/50 perfect target -- explained, not a defect",
+    "readOnly": true,
+    "writesPerformed": false,
+    "productionReaderTouched": false,
+    "method": "Real modules (mapQdrantProjectionCandidate + hydrateCanonicalCandidates) exercised end-to-end via a standalone script, same 50 frozen B-vector queries as QDRANT-READER-SHADOW-01, against codebase_chunks_768_v2 only.",
+    "results": {
+      "top1SelfMatch": "47/50 (94%)",
+      "hydrationSuccess": "50/50 (100%)",
+      "contentNonEmptyCount": "250/250 (100%) -- the exact regression QDRANT-READER-FIX-01's first attempt would have failed is now fixed",
+      "canonicalIdentityExactCount": "250/250 (100%)",
+      "missingContentCount": 0,
+      "ambiguousHydrationCount": 0,
+      "revisionMismatchCount": 0,
+      "legacyC1Count": 0
+    },
+    "top1SelfMatchMissesInvestigated": "All 3 misses checked individually: zero hydration failures on any of them (5/5 hydrated, real content, real identity every time) -- the query's own point simply ranked #2-3 instead of #1 among near-tied scores for OTHER real chunks from the SAME source file (one file, gemma4-agent.ts, contributed 2 of the 3 misses via two of its own chunks). Same class of legitimate multi-chunk-per-file behavior already noted (not fully investigated) in QDRANT-READER-SHADOW-01's D duplicate-count. Not a hydration contract defect.",
+    "latency": {
+      "avgQdrantLatencyMs": 17,
+      "avgPostgresHydrationLatencyMs": 5,
+      "avgTotalLatencyMs": 22,
+      "verdict": "No caching/optimization needed at this scale -- batched hydration adds ~5ms, well within noise. Not introducing an ACE/BitFrost cache layer per instruction (benchmark first, only cache if it materially hurts)."
+    },
+    "reportFile": "docs/reports/qdrant-reader-shadow-02-results.json"
+  },
+
+  "qdrant_reader_fix_02": {
+    "status": "SHIPPED, canary-verified end-to-end via the real wired public function",
+    "readOnly": false,
+    "writesPerformed": false,
+    "changesToProductionCode": true,
+    "fileChanged": "src/lib/server/search/qdrant-search.ts",
+    "whatChanged": [
+      "QdrantSearchBackend.search() default collection: 'codebase_chunks_768' -> QDRANT_SEMANTIC_COLLECTION (imported from qdrant-semantic-projection.ts, single canonical owner)",
+      "searchCodebaseAnn()/searchQdrantCode() top-level collection parameter: no longer has a default at all -- each backend resolves its own, so a default cannot silently leak to TurboVec",
+      "When collection === QDRANT_SEMANTIC_COLLECTION, results are now produced via mapQdrantProjectionCandidate -> hydrateCanonicalCandidates -> hydratedCandidateToQdrantCodeResult (new converter), never the old direct mapQdrantPoint() -- this is what fixes the content:'' regression QDRANT-READER-FIX-01's first attempt would have shipped",
+      "TurboVecSearchBackend.search() deliberately left untouched (its own separate 'codebase_chunks_768' literal, flagged not fixed -- TurboVec is not the active backend by default, CODEBASE_ANN_BACKEND unset)"
+    ],
+    "secondBugFoundAndFixedDuringCanary": {
+      "description": "Pre-existing, NOT introduced by this session's changes. QdrantSearchBackend's real client.query() call passed a bare `query: embedding` with no `using: <vectorName>`. Both codebase_chunks_768 AND codebase_chunks_768_v2 have 3 named vectors (content/error/signature) and no unnamed default -- Qdrant rejects this with HTTP 400 'Wrong input: Not existing vector name error', silently caught by the existing catch block and returned as an empty result array.",
+      "verifiedPreExisting": "Reproduced the identical 400 error against the OLD default collection (codebase_chunks_768) with the same bare-query shape, live, before touching anything -- this bug predates this session's changes and was only discovered because this canary is the first time this exact production code path (QdrantSearchBackend.search() via the real Qdrant client, not a raw fetch to /points/search) was actually executed end-to-end during this whole investigation.",
+      "fix": "Added `using: 'content'` to the client.query() call. One-line change, same file, documented inline.",
+      "implication": "searchCodebaseAnn()/searchQdrantCode() were plausibly returning empty results for ALL real callers before this fix -- this may be a materially bigger and more urgent finding than the collection-ownership issue this whole investigation chain was chasing. Not fully traced to production impact (which routes/features call these functions and what they do with an empty array) -- flagged, not investigated further this pass."
+    },
+    "unrelatedConcurrentAddition": "A separate, coherent addition (searchQdrantCodeStrictV1, a fail-loud 'governed OaK/DAG read seam' variant) appeared in this file mid-session, correctly reusing this fix's QDRANT_SEMANTIC_COLLECTION import and hydration wiring. Not authored by this investigation; left in place as legitimate concurrent work, not reverted.",
+    "canaryResult": {
+      "status": "FINISHED -- scaled to 50 (matching the established bar), process-exit hang fixed, clean exit code 0",
+      "method": "Called the actual wired public function searchCodebaseAnn(embedding, 5) with NO collection argument -- exactly how real application code invokes it -- for 50 real frozen queries.",
+      "sampleSize": 50,
+      "allHitsHaveContent": "50/50 (100%)",
+      "top1SelfMatchCount": "47/50 (94%) -- the EXACT SAME 3 source files as QDRANT-READER-SHADOW-02's independent measurement (detective-command/+page.ts, gemma4-agent.ts x2) -- the real wired path and the standalone pipeline measurement agree exactly, confirming this is reproducible legitimate near-tie behavior, not noise",
+      "zeroHitQueries": 0,
+      "processExitFix": "The script hung after writing its report on the first two runs (pool.end() alone wasn't enough to release whatever kept the process alive -- plausibly the Qdrant client's fetch keep-alive agent). Added an explicit process.exit(0) after all writes complete. Not a correctness issue -- the report was already written to disk correctly both times before the hang -- but the script now actually finishes rather than requiring a timeout kill.",
+      "reportFile": "docs/reports/qdrant-reader-fix-02-canary-results.json"
+    },
+    "sameBugClassFoundElsewhere_notFixed": {
+      "description": "Grepped for the same 'query: <vector> with no using' shape across src/ as a completeness check (bug CLASS, not a one-off) -- explicitly NOT fixed, out of scope for 'finish this canary before changing anything else'.",
+      "filesWithoutUsing_flaggedOnly": [
+        "src/routes/api/vector-search/+server.ts (evidence_items, legal_documents)",
+        "src/routes/api/v1/legal/compare-pdf/+server.ts (legal_documents)",
+        "src/routes/api/ai/context/+server.ts (legal_documents)",
+        "src/lib/server/ai/scenario-cache.ts (scenario_cache)",
+        "src/lib/server/ace/retrieval/evidence-lanes.ts",
+        "src/lib/server/ace/ace-agent.ts",
+        "src/lib/server/ff1/agent/tool-registry.ts",
+        "src/lib/server/ff1/agent/gemma4-repair-planner.ts",
+        "src/mcp/tools/trace-kag.tool.ts",
+        "src/mcp/tools/legal-skills.tool.ts (x2 call sites)",
+        "src/routes/api/audio/search/+server.ts",
+        "src/lib/server/adapters/service-integrations.ts"
+      ],
+      "filesConfirmedCorrect_alreadyPassUsing": [
+        "src/routes/api/codebase/search/multi-vector/+server.ts",
+        "src/routes/api/atlas/search/+server.ts",
+        "src/lib/server/ace/query-router.ts",
+        "src/lib/server/ai/langgraph-research.ts",
+        "src/mcp/trace-mcp-server.ts"
+      ],
+      "note": "Whether each of the flagged files targets a collection with only one (default/unnamed) vector -- in which case the bare form is actually fine -- was NOT individually verified. This is a discovery list, not a confirmed defect list per file; each would need the same live-verification treatment qdrant-search.ts got before being touched."
+    },
+    "testsRun": "npx vitest run src/lib/server/search/ -- 2 files, 6/6 tests passing (includes the new projection-candidate-v1.spec.ts and the pre-existing marco-reranker.spec.ts, confirming nothing else in the directory broke)",
+    "notDoneThisPass": [
+      "QDRANT_PROJECTION_OWNERSHIP has not been formally FROZEN -- the reader is fixed and canary-proven, but atlas_packets/packet_qdrant_bridge still reference the stale C1 generation; ProjectionRegistryV1 design and the bridge/atlas_packets reconciliation remain unstarted, by design (kept behind their own gate per the agreed sequencing).",
+      "TurboVecSearchBackend's parallel collection-literal bug (separate file, turbovec-search.ts) -- flagged, not fixed.",
+      "Production impact of the pre-existing bare-query bug on live traffic before this fix -- not traced to specific callers/routes."
+    ]
+  },
+
+  "qdrant_reader_impact_01": {
+    "status": "DONE",
+    "reportFile": "docs/reports/qdrant-reader-impact-01-results.json",
+    "summary": "6 real callers traced (rrf-integration.ts, mcp-tool-dispatch.ts, hybrid-search.ts, packet-stream-cache.ts, gemma4.ts, rg-atlas/qdrant-union.ts) + searchQdrantCodeStrictV1 (0 real callers, unwired). Zero whole-request failures found -- every caller either uses Promise.allSettled or relies on QdrantSearchBackend.search()'s own internal try/catch (which already returns [] rather than throwing), so the pre-existing named-vector bug's historical effect was uniformly EMPTY_RESULTS_PROPAGATED / SEMANTIC_LANE_DROPPED: MCP tool search.qdrant_topology silently always empty, hybrid-search silently lexical-only, rg-atlas union silently missing its Qdrant lane, ACE/Gemma4 context packets silently missing retrieved chunks. Silent quality degradation, not outages."
+  },
+
+  "qdrant_semantic_reader_ownership_freeze": {
+    "status": "FROZEN",
+    "scope": "semantic_768 reader only -- NOT the broader QDRANT_PROJECTION_OWNERSHIP (bridge/atlas_packets metadata reconciliation remains open, its own gate)",
+    "representation": "semantic_768",
+    "backend": "qdrant",
+    "collection": "codebase_chunks_768_v2",
+    "vectorName": "content",
+    "candidateMapping": "mapQdrantProjectionCandidate (src/lib/server/search/projection-candidate-v1.ts)",
+    "contentAuthority": "PostgreSQL, via hydrateCanonicalCandidates (src/lib/server/search/hydrate-canonical-candidates.ts) -- one batched Drizzle query per search call, never N+1, fails closed on content_hash mismatch / missing canonical row / missing identity",
+    "legacyCompatibility": "codebase_chunks_768 remains explicitly reachable for callers that pass it as an explicit collection argument (rrf-integration.ts, packet-stream-cache.ts, gemma4.ts's codebase_chunks_768 branch) -- diagnostic/compatibility only, not the default, uses the original mapQdrantPoint() direct-payload path since that collection's richer payload actually supports it.",
+    "outOfScope": "TurboVecSearchBackend -- explicitly excluded from this freeze. It has its own separate, unfixed set of 'codebase_chunks_768' literal defaults with no hydration wired in. Not the active backend by default. TURBOVEC-SEMANTIC-OWNER-01 is its own future gate.",
+    "provenBy": [
+      "docs/reports/qdrant-reader-shadow-01-results.json (58% -> 100% self-match)",
+      "docs/reports/qdrant-d-hydration-01-results.json (7,773/7,773 exact join)",
+      "docs/reports/qdrant-reader-shadow-02-results.json (100% content/identity, 0 failures, real pipeline)",
+      "docs/reports/qdrant-reader-fix-02-canary-results.json (50/50 content, 0 zero-hit, real wired public function)",
+      "docs/reports/qdrant-reader-impact-01-results.json (0 whole-request failures across all real callers)"
+    ]
+  },
+
+  "qdrant_named_vector_census_01": {
+    "status": "NOT_STARTED -- discovery list only exists (see qdrant_reader_fix_02.sameBugClassFoundElsewhere_notFixed above), per-file classification not yet done",
+    "requiredClassificationPerFile": ["UNNAMED_SINGLE_VECTOR", "NAMED_SINGLE_VECTOR", "NAMED_MULTI_VECTOR", "DYNAMIC_COLLECTION", "DEAD", "TEST"],
+    "note": "Explicitly a discovery list, not a defect list, per the standing instruction not to mass-fix. Each of the ~12 flagged files needs its target collection's vector config checked live (same treatment codebase_chunks_768/_768_v2 got) before any is touched."
+  },
+
+  "projection_registry_v1": {
+    "status": "BUILT, tested, read-only, no packet identity written",
+    "file": "src/lib/server/atlas/retrieval/projection-registry-v1.ts",
+    "specFile": "src/lib/server/atlas/retrieval/projection-registry-v1.spec.ts (4/4 passing)",
+    "contract": "ProjectionRegistryKeyV1 {canonicalPacketIdentity, representationIdentity: 'semantic_768'} -> resolveProjectionsBatch() -> ProjectionRefV1 {executor: 'qdrant', collection: codebase_chunks_768_v2, vectorName: 'content', physicalPointId, projectionRevision, modelRevision, inputPolicyRevision} | ProjectionResolutionFailureV1 {reason: UNSUPPORTED_REPRESENTATION | PROJECTION_NOT_FOUND | CANONICAL_IDENTITY_MISMATCH}",
+    "keyProperty": "physicalPointId is DERIVED AND LIVE-VALIDATED, never copied from atlas_packets.qdrant_point_id -- fetches the live Qdrant point and requires payload.postgres_id to agree with the requested canonicalPacketIdentity before resolving; fails closed to CANONICAL_IDENTITY_MISMATCH otherwise. This is the exact anti-pattern (blind copy of a self-declared, unverified point-id field) this whole investigation found broken.",
+    "scope": "semantic_768/qdrant only, per the frozen QDRANT_SEMANTIC_READER_OWNERSHIP boundary. TurboVec and any other representation/executor are out of scope -- adding one means a new resolver branch, never a change to this one.",
+    "noWrites": true
+  },
+
+  "bridge_recon_dry_02": {
+    "status": "SUPERSEDED_INVALID",
+    "supersededBy": "BRIDGE-RECON-DRY-03 (not yet built)",
+    "reason": "source_ref join fan-out caused packet-level rows to resolve against multiple chunk-level projections without ambiguity detection -- caught in RECON-CANARY-01's dry preview (same packet_key returned two different proposed values). Real distinct atlas_packets population is 1,390 (not 7,773). Of those: 635 pass only a naive source_ref-cardinality-1 check (not proven canonical yet), 755 genuinely ambiguous. See docs/reports/bridge-recon-dry-02-results.json for the full stale-marked receipt.",
+    "writesPerformed": false,
+    "previousInvalidVerdict_forRecordOnly": "DRY_RUN_EXACT -- zero ambiguity on both tables",
+    "readOnly": true,
+    "writesPerformed": false,
+    "metadataRepairPerformed": false,
+    "mappedThroughB": false,
+    "method": "atlas_packets/packet_qdrant_bridge -> canonical_packet_identity (via source_ref join to codebase_chunk_index.id) -> ProjectionRegistryV1.resolveProjectionsBatch(semantic_768) -> live-validated D projection. Recomputed fresh through the registry -- did NOT reuse the earlier census's numbers as a write plan (they match, 7,773 + 55, which is a consistency check, not the source of truth for this receipt).",
+    "atlas_packets": {
+      "population": 7773,
+      "targetExists": "7773/7773", "canonicalIdentityExact": "7773/7773", "representationExact": "7773/7773",
+      "collectionExact": "7773/7773", "vectorNameExact": "7773/7773", "projectionRevisionExact": "7773/7773",
+      "ambiguous": 0, "missing": 0, "wrongCanonicalObject": 0
+    },
+    "packet_qdrant_bridge": {
+      "population": 55,
+      "targetExists": "55/55", "canonicalIdentityExact": "55/55", "representationExact": "55/55",
+      "collectionExact": "55/55", "vectorNameExact": "55/55", "projectionRevisionExact": "55/55",
+      "ambiguous": 0, "missing": 0, "wrongCanonicalObject": 0
+    },
+    "overallReadyForWriteCanary": true,
+    "notDoneThisPass": "The tiny write canary (10-25 rows, before/proposed/write/read-back-verify/rerun-reader) -- deliberately held for a separate turn per instruction, now that this dry run has produced an exact, zero-ambiguity proposed mutation set.",
+    "reportFile": "docs/reports/bridge-recon-dry-02-results.json (includes full proposed mutation lists for both tables, not just samples)"
+  },
+
+  "limitations": [
+    "Generation C representation_id/embedding_model exact values not tabulated separately in this pass (only compared against generation B pairwise, not sampled independently).",
+    "Generation D (codebase_chunks_768_v2) writer script not traced.",
+    "Git blame / historical attribution not performed for any writer -- all writer identifications are HISTORICAL_UNRESOLVED at the single-commit level, confirmed only at the repo-pattern level."
+  ]
+}

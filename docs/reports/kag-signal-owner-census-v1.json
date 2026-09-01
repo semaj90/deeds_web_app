@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.kag-signal-owner-census.v1",
+  "status": "PROVEN_BOUNDED",
+  "checkedAt": "2026-09-01",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "liveCounts": {
+    "atlas_taxonomy_assignment_candidates": 0,
+    "atlas_ast_nodes": 11067,
+    "atlas_graph_authority_scores": 212398,
+    "graph_community_assignments": 1049522,
+    "graph_communities": 790088,
+    "ontology_edges": 252102
+  },
+  "readOnlyKeyOverlap": {
+    "authorityDistinctPacketKeys": 56980,
+    "communityDistinctPacketKeys": 59919,
+    "authorityCommunityPacketKeyOverlap": 55241,
+    "lexicalJoinStatus": "SOURCE_REF_ONLY_AMBIGUOUS",
+    "packetChunkBridge": {
+      "atlasPacketRows": 61660,
+      "packetSourceRefsWithChunkMatch": 4549,
+      "ambiguousSourceRefMatches": 4282,
+      "exactTreeNodeIdToChunkIdMatches": 0,
+      "status": "EXPLICIT_BRIDGE_PARTIAL",
+      "explicitBridge": {
+        "table": "atlas_chunk_packet_identity_links",
+        "exactRowsWithChunkId": 3018,
+        "distinctExactChunks": 3013,
+        "unambiguousExactChunks": 3008,
+        "ambiguousExactChunks": 5,
+        "canonicalPacketMinted": false,
+        "usableForReadOnlyJoin": true,
+        "applyStatus": "BLOCKED"
+      }
+    }
+  },
+  "signalOwners": {
+    "semanticScore": {
+      "candidateSurface": "atlas_taxonomy_assignment_candidates.semantic_score",
+      "status": "SCHEMA_PRESENT_EMPTY_CANDIDATE_SURFACE",
+      "revisionFields": ["semantic_revision"]
+    },
+    "lexicalSupport": {
+      "candidateSurface": "atlas_taxonomy_assignment_candidates.lexical_support",
+      "evidenceSurface": "lexical_evidence_refs",
+      "owner": "packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts",
+      "status": "OWNER_EXISTS_BRIDGE_GATED",
+      "identityRules": [
+        "source_ref + content_hash exact primary lane",
+        "atlas_chunk_packet_identity_links EXACT_CANONICAL_ID additive fallback",
+        "identity_match_count = 1 and packet_rank = 1 required"
+      ],
+      "missingPolicy": "NULL_NOT_ZERO"
+    },
+    "graphSupport": {
+      "source": "atlas_graph_authority_scores.authority_percentile",
+      "joinKeys": ["packet_key", "source_ref", "node_key"],
+      "revisionFields": ["graph_snapshot_id", "run_id", "contract_version"],
+      "status": "ARTIFACT_POPULATED_CANDIDATE_JOIN_NOT_PROVEN",
+      "missingPolicy": "NULL_NOT_ZERO"
+    },
+    "communityAffinity": {
+      "source": "graph_community_assignments plus graph_communities",
+      "joinKeys": ["packet_key", "run_id", "community_id"],
+      "revisionFields": ["graph_revision", "run_id"],
+      "status": "ARTIFACT_POPULATED_CANDIDATE_JOIN_NOT_PROVEN",
+      "missingPolicy": "NULL_NOT_ZERO"
+    }
+  },
+  "nextGates": [
+    "KAG-SIGNAL-OWNER-02 define normalized score and join receipts",
+    "KAG-07 read-only join into existing TaxonomyAssignmentCandidateV1",
+    "KAG-MAT-OWNER-01 select a real reviewed producer",
+    "KAG-MAT-REPLAY-01 deterministic producer replay"
+  ]
+}

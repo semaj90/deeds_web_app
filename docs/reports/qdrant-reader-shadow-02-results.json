@@ -1,0 +1,477 @@
+{
+  "schema": "atlas.qdrant-reader-shadow-02.v1",
+  "task": "QDRANT-READER-SHADOW-02",
+  "readOnly": true,
+  "writesPerformed": false,
+  "productionReaderTouched": false,
+  "executed": 50,
+  "results": {
+    "top1SelfMatch": "47/50",
+    "hydrationSuccess": "50/50",
+    "contentNonEmptyCount": 250,
+    "contentHashExactCount": 146,
+    "canonicalIdentityExactCount": 250,
+    "missingContentCount": 0,
+    "ambiguousHydrationCount": 0,
+    "revisionMismatchCount": 0,
+    "legacyC1Count": 0
+  },
+  "latency": {
+    "avgQdrantLatencyMs": 17,
+    "avgPostgresHydrationLatencyMs": 5,
+    "avgTotalLatencyMs": 22,
+    "note": "Postgres hydration adds one relational read per query (batched, not N+1). Not optimized/cached yet per instruction -- benchmark first, cache only if this materially hurts latency."
+  },
+  "perQuery": [
+    {
+      "source_ref": "src/lib/types/evidence.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 118,
+      "postgresLatencyMs": 30
+    },
+    {
+      "source_ref": "src/lib/server/ai/contextual-tools.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 45,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 17,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/components/cases/ContextualChatModal.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 50,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/lib/server/gpu/AGENTS.md",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 48,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/detective-command/+page.ts",
+      "top1SelfMatch": false,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 11,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/lib/components/ui/alert-dialog/types.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 72,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/server/glyph/AGENTS.md",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 25,
+      "postgresLatencyMs": 8
+    },
+    {
+      "source_ref": "src/lib/components/ai/SimpleWorkingChat.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 14,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/lib/server/db/pgvector-utils.temp.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 25,
+      "postgresLatencyMs": 9
+    },
+    {
+      "source_ref": "src/lib/components/admin/TagSelector.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 65,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 12,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 18,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-gpu-cache.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/mcp/new_tools.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 12,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/pgai/AGENTS.md",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/utils/progressive-enhancement-audit.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/shared/chr97-reader.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-timeline.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 4,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/lib/ai/client-embed.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 11,
+      "postgresLatencyMs": 7
+    },
+    {
+      "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+      "top1SelfMatch": false,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 8,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/routing/query-router-4x4.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 9,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/db/connections.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/services/error-analysis/types.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/workers/compute-pool.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 4,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/types/database.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/lib/server/ai/ollama-client.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/lib/webgpu/webgpu-similarity-service.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 7
+    },
+    {
+      "source_ref": "src/routes/(dev)/odin/AGENTS.md",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/lib/components/legal/LegalPrecedentCard.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 9,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/types/webgpu-navigator.d.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/document-search/+page.server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 6,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+      "top1SelfMatch": false,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/lib/server/workers/audio-processor.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 7,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/server/knowledge-cache.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 8,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/service-worker.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 16,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/routes/api/ai/context/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 9,
+      "postgresLatencyMs": 7
+    },
+    {
+      "source_ref": "src/routes/api/evidence/upload/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 9,
+      "postgresLatencyMs": 6
+    },
+    {
+      "source_ref": "src/routes/api/conversations/[id]/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 18,
+      "postgresLatencyMs": 7
+    },
+    {
+      "source_ref": "src/lib/components/evidence/EvidenceImageSearch.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 18,
+      "postgresLatencyMs": 3
+    },
+    {
+      "source_ref": "src/hooks.server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 15,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/routes/.well-known/llms.txt/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 15,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/chat-memory/AGENTS.md",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 16,
+      "postgresLatencyMs": 8
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/cache/+page.svelte",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 12,
+      "postgresLatencyMs": 4
+    },
+    {
+      "source_ref": "src/lib/stores/unified/evidence-store.svelte.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 5,
+      "postgresLatencyMs": 2
+    },
+    {
+      "source_ref": "src/routes/api/investigate/suggest/+server.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 6,
+      "postgresLatencyMs": 5
+    },
+    {
+      "source_ref": "src/lib/server/services/langextract-service.ts",
+      "top1SelfMatch": true,
+      "hydratedCount": 5,
+      "failureCount": 0,
+      "failures": [],
+      "qdrantLatencyMs": 9,
+      "postgresLatencyMs": 6
+    }
+  ]
+}

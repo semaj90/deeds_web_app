@@ -47,7 +47,7 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **CPU reference executor/receipt written; cuGraph/Neo4j parity + live receipt pending.**
 - [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function and TS reader written; extractor/backfill/apply/promotion workflow pending.**
 - [x] FI-16K Add executable ACE hypergraph packet fixture covering canonical entity seed + direct relationship candidate + typed evidence chain + sufficient-context synthesis gate. **Test source written; not executed in this connector session.**
-- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged.
+- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; Parent Atlas build and 5/5 hypergraph tests pass; focused SvelteKit runtime proof remains pending.**
 - [ ] FI-16M Add retrieval-action receipt for every `NEED_* -> DAG action -> new evidence -> sufficiency re-evaluation` loop.
 
 ## P1 — Retrieval reconciliation

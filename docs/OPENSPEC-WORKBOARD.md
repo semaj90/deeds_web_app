@@ -2,7 +2,7 @@
 
 > Generated from OpenSpec task ledgers. This is a navigation/progress projection, not task authority.
 
-Overall progress: [#####-----] 2384/4340 tasks
+Overall progress: [#####-----] 2385/4340 tasks
 ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## P10 dependency work packages
@@ -22,14 +22,14 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - **STEP-05** [###-------] 56/175 complete; 119 open — Workflow and receipts; depends on STEP-04; gate: Agent execution, NATS/JetStream, validation, and receipts
 - **STEP-06** [####------] 22/49 complete; 27 open — Governance and operations; depends on STEP-05; gate: Admin, Kanban, documents, supersession, and archive
 - **STEP-07** [######----] 1037/1736 complete; 699 open — Unclassified supporting work; depends on STEP-01; gate: Review and attach each task to an upstream gate
-- **STEP-08** [##--------] 12/64 complete; 52 open — Benchmarks and challengers; depends on STEP-03, STEP-04; gate: Evaluation, GPU challengers, topology, and Ewin Tang
+- **STEP-08** [##--------] 13/64 complete; 51 open — Benchmarks and challengers; depends on STEP-03, STEP-04; gate: Evaluation, GPU challengers, topology, and Ewin Tang
 
 ### Next bounded tasks by step
 
 **STEP-01**
 - atlas-feature-intelligence:10 — GENERAL; FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner. (openspec/changes/atlas-feature-intelligence/tasks.md:10)
 - atlas-feature-intelligence:11 — GENERAL; FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.** (openspec/changes/atlas-feature-intelligence/tasks.md:11)
-- atlas-feature-intelligence:50 — RETRIEVAL_ACE; FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. (openspec/changes/atlas-feature-intelligence/tasks.md:50)
+- atlas-feature-intelligence:50 — RETRIEVAL_ACE; FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; Parent Atlas build and 5/5 hypergraph tests pass; focused SvelteKit runtime proof remains pending.** (openspec/changes/atlas-feature-intelligence/tasks.md:50)
 - atlas-feature-intelligence:58 — GENERAL; FI-20 Add degraded-identity observability and exact promotion before fusion. (openspec/changes/atlas-feature-intelligence/tasks.md:58)
 - atlas-feature-intelligence:90 — GENERAL; Canonical identity survives path/cluster/projection changes in live Postgres readback. (openspec/changes/atlas-feature-intelligence/tasks.md:90)
 
@@ -89,6 +89,11 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## Highest-priority open tasks
 
+- [ ] **P10** [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence/tasks.md#L10) FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics. **Schema/repository written; live migration + identity round-trip proof pending.** Read-only contract audit on 2026-08-31 confirms `public.feature_registry` is absent. Do not apply the competing manual proposals until migration-ledger reconciliation selects one owner. — lane GENERAL; last updated 2026-09-01T16:45:34.867Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence/tasks.md#L11) FI-03 Add evidence identity normalization and canonical promotion. **Bounded proposal eligibility contract exists in `packages/parent-atlas/src/core/feature-promotion-eligibility-v1.ts`; live canonical promotion remains blocked on FI-02 and exact evidence-store ownership.** — lane GENERAL; last updated 2026-09-01T16:45:34.867Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence/tasks.md#L50) FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged. **Explicit optional `aceHypergraph` input and revision fail-closed guard are wired; Parent Atlas build and 5/5 hypergraph tests pass; focused SvelteKit runtime proof remains pending.** — lane RETRIEVAL_ACE; last updated 2026-09-01T16:45:34.867Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence/tasks.md#L58) FI-20 Add degraded-identity observability and exact promotion before fusion. — lane GENERAL; last updated 2026-09-01T16:45:34.867Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence/tasks.md#L90) Canonical identity survives path/cluster/projection changes in live Postgres readback. — lane GENERAL; last updated 2026-09-01T16:45:34.867Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md#L103) Trace `search-lanes.ts` lane implementations' own identity-assignment code — where — lane RETRIEVAL_ACE; last updated 2026-09-01T04:32:22.873Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability/tasks.md#L310) `rrf-fusion.ts` (`/api/retrieval/rrf`) — no identity resolution at all, trusts caller — lane RETRIEVAL_ACE; last updated 2026-09-01T04:32:22.873Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md#L189) **LOD-02** Freeze `SemanticSnapshotV1` plus ordinal/canonical identity mapping as the immutable source: workspace/source/representation/ordinal-map revisions, rows, dimension 768, float32, normalization, ordinal, `packet_key`, optional `symbol_version_id`, and checksum. LOD transitions may evict/reload derived indexes but may not delete or rewrite canonical truth. Prefer Arrow IPC/mmap for direct tensor access; do not substitute Parquet where direct mmap is required. — lane RETRIEVAL_ACE; last updated 2026-09-01T04:31:02.341Z (FILESYSTEM_MTIME); ETA UNKNOWN
@@ -184,11 +189,6 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [ ] **P10** [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md#L50) **TV-06B** Prove the ordinal map from TurboVec external IDs to `symbol_version_id`, `packet_key`, and `workspace_revision`; local numeric IDs never become canonical identity. — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.912Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L44) TOPO-02A Replace the latent writer's fallback identity/update path with — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.910Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L60) TOPO-04 Prove `ae_latent_64` numeric FP32 identity separately from its — lane GENERAL; last updated 2026-08-31T20:24:09.910Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/tasks.md#L68) TOPO-09 Compile `CandidateEligibilityBitmapV1` by CandidateOrdinal. — lane GENERAL; last updated 2026-08-31T20:24:09.910Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization/tasks.md#L177) S512-16 — Exact promotion proves **current** source span + Tree-sitter structural identity + compiler-semantic evidence and resolves UNKNOWN freshness before LLM synthesis. — lane GENERAL; last updated 2026-08-31T20:24:09.902Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier/tasks.md#L197) Require no canonical identity changes. — lane GENERAL; last updated 2026-08-31T20:24:09.897Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier/tasks.md#L223) Add an upstream trace-record identity producer carrying canonical — lane RETRIEVAL_ACE; last updated 2026-08-31T20:24:09.897Z (FILESYSTEM_MTIME); ETA UNKNOWN
-- [ ] **P10** [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric/tasks.md#L182) ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply. — lane GENERAL; last updated 2026-08-31T20:24:09.889Z (FILESYSTEM_MTIME); ETA UNKNOWN
 
 ## Task indexing coverage
 
@@ -201,7 +201,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 ## Execution lanes
 
 - **DAILY_GRAPHIFY_KANBAN** 5 open / 14 total
-- **GENERAL** 1439 open / 3205 total
+- **GENERAL** 1438 open / 3205 total
 - **RESEARCH_CHALLENGER_EWIN_TANG** 31 open / 32 total
 - **RETRIEVAL_ACE** 481 open / 1089 total
 
@@ -213,13 +213,13 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 ## Daily Graphify Kanban reference
 
 - Status: **STALE_SNAPSHOT**; source: docs/graph/kanban-board.json
-- Snapshot age: 58.4 days; tasks: 123; sourceRefs: 246
+- Snapshot age: 58.9 days; tasks: 123; sourceRefs: 246
 - This snapshot is a reference/input surface only; it is not canonical identity or task authority.
 
 ## Historical and consolidation task sources
 
-- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 82 days
-- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 0.1 days
+- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 82.6 days
+- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 0.7 days
 - Historical ranking reports and consolidation inputs are evidence sources only; they are not merged into the OpenSpec task count automatically.
 
 ## Current consolidation reference
@@ -294,7 +294,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/) [#####-----] 44/95 complete; 51 open
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization/) [#######---] 23/31 complete; 8 open
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/) [----------] 0/31 complete; 31 open
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration/) [####------] 21/49 complete; 28 open
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration/) [####------] 22/49 complete; 27 open
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission/) [##--------] 3/18 complete; 15 open
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries/) [#---------] 5/64 complete; 59 open
 - [parent-atlas-unified-symbol-ranking](openspec/changes/parent-atlas-unified-symbol-ranking/) [##########] 17/17 complete; 0 open

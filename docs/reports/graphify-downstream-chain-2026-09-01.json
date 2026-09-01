@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-01T01:20:56.253Z",
+  "timestamp": "2026-09-01T18:45:32.205Z",
   "mode": "dry-run",
   "dryRun": true,
   "stages": {
     "graphify_readiness_check": {
       "status": "timeout",
       "polls": 60,
-      "elapsed_ms": 183839,
+      "elapsed_ms": 171390,
       "coreStatus": "WARN"
     },
     "pagerank": {
@@ -28,6 +28,6 @@
   "summary": {
     "success": true,
     "message": "Pipeline complete",
-    "elapsed_ms": 208341
+    "elapsed_ms": 193502
   }
 }

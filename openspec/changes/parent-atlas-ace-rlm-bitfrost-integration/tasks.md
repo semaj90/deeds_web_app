@@ -1018,6 +1018,12 @@ open exactly as items 1/2/4 above describe.
 
 ## KAG-07: signal enrichment (proposed design, NOT started)
 
+**Bounded owner census rechecked 2026-09-01:** `atlas_graph_authority_scores` (212,398 rows), `graph_community_assignments` (1,049,522 rows), and `graph_communities` (790,088 rows) exist live, while `atlas_taxonomy_assignment_candidates` is empty. The nullable candidate signal columns therefore remain an unjoined surface, not evidence of enrichment. `graphSupport` and `communityAffinity` have populated source artifacts but no candidate join receipt yet; `lexicalSupport` owner remains unproven. Preserve missing evidence as `NULL`, not zero. Report: `docs/reports/kag-signal-owner-census-v1.json`.
+
+**Proven contract slice 2026-09-01:** added `atlas.taxonomy-signal-evidence.v1` with normalized score, evidence references, producer/workspace lineage, explicit source/graph revision axes, and deterministic checksum. Focused tests pass 2/2. This does not mark KAG-07 complete: live signal joins and materialization remain open. Report: `docs/reports/kag-signal-provenance-contract-v1.json`.
+
+**Lexical identity bridge census 2026-09-01:** `atlas_packets.source_ref` matched `codebase_chunk_index.source_ref` for 4,549 packet references, but 4,282 were one-to-many; exact `atlas_packets.tree_node_id` to `codebase_chunk_index.chunk_id` matched 0 rows. Keep lexical enrichment blocked until an exact packet/chunk identity bridge is proven; do not score ambiguous source-reference joins.
+
 Feeds the *same* `TaxonomyAssignmentCandidateV1` shape from established
 evidence owners — this is explicitly not a new "fusion service": no new
 service, no new orchestrator, just more producers writing into the

@@ -14033,3 +14033,114 @@ assumption; (2) rewrite both materializers to query from `codebase_chunk_index`,
 the current (defective) map before trusting it; (4) only then re-run
 `audit-qdrant-768-identity.mjs` to check whether the 57,396 stale points / 2,789 missing rows
 figure changes.
+### Semantic generation status reconciliation (2026-09-01)
+
+- [x] Recorded `SEMANTIC_B_C1_PARITY_01` as `PROVEN_BOUNDED`: the existing
+  scaled read-only oracle contains `60` sampled rows, `59` valid executions,
+  `56` discriminating cases, `56/56` fresh-B matches, and `0` fresh-C1 wins.
+- [x] Confirmed the existing report already contains a bounded D proof:
+  `QDRANT_D_IDENTITY_01` has `60/60` sampled live joins and
+  `SEMANTIC_GENERATION_ORACLE_01_BCD` has `40/40` fresh-B and `40/40` fresh-D
+  matches with direct B/D cosine `1.0`.
+- [ ] Full `52,380`-point D identity census remains optional/open; it must not
+  be inferred from the bounded sample or used to authorize a write.
+- [ ] `QDRANT_READER_OWNER_01`, `QDRANT_D_WRITER_01`, and
+  `QDRANT_PROJECTION_OWNERSHIP` remain open. No bridge, payload, collection,
+  or production mutation is authorized.
+- [x] Ran the existing read-only candidate coverage audit against both 768-D
+  collections. `codebase_chunks_768_v2` scanned `52,380` points and represents
+  `2,378/4,951` candidate ordinals (`48.031%`), with `0` v2-only candidates;
+  identity quality remains mixed. This is coverage evidence, not a full-vector
+  representation oracle. Receipt: `docs/reports/qdrant-candidate-coverage-v1.json`.
+- [x] Ran the existing v2 projection proof: Qdrant reachable, 768/Cosine
+  schema valid, sentinel exclusion and mutation guard passed; sampled identity
+  and revision payload coverage were absent and identity round-trip was not
+  proven. Receipt: `docs/reports/emb3a-qdrant-semantic-projection-proof.json`.
+- [x] Traced the checked-in v2-related scripts. Collection provisioning is
+  schema/sentinel setup, parity repair is a planner, and the configurable
+  lineage backfill is only a potential applier; none proves ownership of the
+  historical D corpus. Receipt: `docs/reports/qdrant-d-writer-owner-trace-v1.json`.
+- [x] Classified `scripts/atlas/qdrant-parity-repair.mjs` as
+  mutation-capable: `--apply` can update Qdrant payloads, and contradiction
+  handling can persist quarantine rows. Do not use its absence of `--apply` as
+  proof of a read-only run. Historical D writer attribution remains unresolved.
+- [x] Expanded the writer census: `sveltekit-frontend/scripts/atlas/
+  apply-null-content-hash-metadata-repair.mjs` is a v2 payload-only applier
+  (explicit `--apply`, no vector writes), and `sveltekit-frontend/package.json`
+  exposes v2 parity-repair/provision apply entrypoints. These are potential
+  writers, not proof of the historical corpus-producing invocation.
+- [x] Excluded the Phase 108D embedding backfills from D-writer attribution:
+  their Qdrant targets are `codebase_chunks_768` rather than
+  `codebase_chunks_768_v2`. They remain historical writers for the other 768-D
+  collection and must not be used as evidence for v2 corpus provenance.
+- [x] Identified `sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs`
+  as the direct v2 corpus-writer candidate. Its apply path is currently blocked,
+  but the implementation targets `_v2` and would upsert vectors plus payloads.
+  It selects `source_revision` as `NULL` and declares
+  `embeddinggemma:latest`; therefore historical invocation and lineage
+  completeness remain unproven and no apply is authorized.
+- [x] Correlated the existing v2 output with
+  `docs/reports/atlas-vector-manifest-v1-2026-08-04.json`: immutable
+  `52,380`-row `_v2` manifest, generated 2026-08-04, sorted by `postgres_id`,
+  and labeled `projection_revision: v2_uuid_clean`. This is strong artifact
+  correlation, not proof of the historical command invocation or lineage
+  completeness.
+- [x] Identified `scripts/atlas/project-graphify-embeddings-qdrant.mjs` as a
+  second configurable corpus-writer candidate. Its default target is the
+  non-v2 collection, but `QDRANT_CODE_COLLECTION` can select `_v2`; therefore
+  historical environment selection must be recovered before assigning it as
+  the D owner.
+- [x] Reconciled historical owner evidence: the current
+  `scripts/atlas/upsert-qdrant-packet-payload.mjs` hardcodes
+  `codebase_chunks_768`, and `upsert-full-run-v2.log` records a completed
+  `52,380`-point apply against that same non-v2 collection. An older session
+  note incorrectly labels the payload script as a v2 owner; that note is not
+  execution proof. The v2 historical invocation remains unresolved.
+- [x] Added the governed strict Qdrant read seam
+  `searchQdrantCodeStrictV1`. It validates finite non-zero `semantic_768`
+  queries, bounds `limit` to `1..100`, pins the canonical v2 collection by
+  default, and rethrows Qdrant failures instead of converting them to an
+  empty successful evidence set. Ordinary `searchQdrantCode` fail-open
+  behavior is unchanged. Live OaK DAG registration and replay remain open.
+
+Receipt: `docs/reports/semantic-b-c1-d-status-v1.json`.
+
+### OaK runtime owner reconciliation (2026-09-01)
+
+- [x] Added and focused-tested the additive strict lexical owner
+  `searchCodeLexicalStrictV1` in `sveltekit-frontend/src/lib/server/search/postgres-fts.ts`.
+  It bounds the request, validates returned rows, and distinguishes invalid input,
+  PostgreSQL failure, and result-schema rejection. The existing fail-open
+  `searchCodeLexical` path remains unchanged for ordinary retrieval callers.
+  Focused validation: `postgres-fts-strict.spec.ts`, 3/3 passed.
+- [x] Added and focused-tested the exact OaK lexical DAG handler
+  `createOakDagLexicalHandlerV1`. It binds `search_postgres_fts` to
+  `op:search_lexical`, validates bounded bound arguments, and invokes only the
+  strict read owner. Combined strict-owner and handler validation: 5/5 passed.
+- [x] Added and focused-tested the exact OaK AST evidence DAG handler
+  `createOakDagAstEvidenceHandlerV1`. It binds `atlas_ast_nodes` to the
+  persisted strict reader, requires `sourceRevision`, and caps node IDs at 100.
+  Combined lexical/AST/strict-owner validation: 7/7 passed.
+- [x] Added and focused-tested the exact OaK graph handler
+  `createOakDagGraphHandlerV1`. It binds `graph_expand_neighborhood` to the
+  existing bounded `expandAtlasGraph` adapter and requires graph/workspace
+  revision plus ordinal-map lineage. Combined validation: 9/9 passed.
+- [ ] Resolve the semantic implementation-reference mismatch before adding a
+  semantic DAG handler: `search_hybrid` is a logical lane, while
+  `searchQdrantCodeStrictV1` is a Qdrant-only callable. The handler must record
+  the actual executor and representation lineage rather than relabeling it.
+- [ ] Define the KAG/Postgres operator contract before binding
+  `readKagHypergraphNeighborsStrictV1`: its canonical-ID neighbor receipt must
+  not be presented as packet-table lookup or hypergraph member expansion.
+- [ ] Correct the context implementation reference and input contract before
+  binding `buildContextManifestFromACE`; it must consume an existing
+  `ACEContext` and options without starting a second retrieval pass.
+- [ ] Register the strict lexical, strict semantic, AST, graph, KAG, and context
+  owners behind the OaK implementation-reference registry and prove a zero-write
+  replay. Table names, source-file paths, and MCP labels are not callable owners
+  by themselves and must not be used as silent aliases.
+- [ ] Complete live read-only replay only after every binding has an exact callable
+  implementation reference, typed input/output validation, and deterministic
+  action receipts.
+
+Receipt: `docs/reports/kernel-dag-operator-owner-reconciliation-v1.json`.

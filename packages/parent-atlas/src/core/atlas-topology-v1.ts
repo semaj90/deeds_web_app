@@ -16,7 +16,12 @@ export type CandidateIdentityV1 = {
   sourceRevision: string | null;
 };
 
-export type CandidateOrdinalMapV1 = {
+/**
+ * Topology-local identity view. The canonical CandidateOrdinalMapV1 is owned by
+ * the candidate-feature contract; topology consumes this derived view and must
+ * bind to the canonical snapshot/checksum rather than creating a second axis.
+ */
+export type TopologyCandidateOrdinalViewV1 = {
   schema: typeof ATLAS_TOPOLOGY_SCHEMA;
   mapRevision: string;
   ordinalMapChecksum: string;

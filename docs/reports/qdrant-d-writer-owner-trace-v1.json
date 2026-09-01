@@ -1,0 +1,148 @@
+{
+  "schema": "atlas.qdrant-d-writer-owner-trace.v1",
+  "updatedAt": "2026-09-01T12:12:00-07:00",
+  "collection": "codebase_chunks_768_v2",
+  "status": "WRITER_ATTRIBUTION_UNRESOLVED",
+  "readOnly": true,
+  "writesPerformed": false,
+  "findings": [
+    {
+      "path": "scripts/atlas/qdrant-provision-768v2.mjs",
+      "role": "COLLECTION_PROVISIONER",
+      "writes": "SCHEMA_AND_SENTINEL_ONLY",
+      "notWriterOfCorpus": true
+    },
+    {
+      "path": "scripts/atlas/qdrant-parity-repair-core.mjs",
+      "role": "PAYLOAD_REPAIR_PLANNER",
+      "writes": "NOT_BY_ITSELF",
+      "requiresExplicitApply": true
+    },
+    {
+      "path": "scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+      "role": "POTENTIAL_VECTOR_AND_PAYLOAD_APPLIER",
+      "target": "CONFIGURABLE_COLLECTION",
+      "dWriterAttribution": "NOT_PROVEN"
+    },
+    {
+      "path": "scripts/atlas/qdrant-parity-repair.mjs",
+      "role": "PARITY_REPAIR_COORDINATOR",
+      "writes": "QDRANT_PAYLOAD_AND_QUARANTINE_DB_WHEN_APPLY_OR_CONTRADICTIONS",
+      "collectionSelection": "CLI_COLLECTION_ARGUMENT",
+      "dWriterAttribution": "NOT_PROVEN",
+      "readOnlyCaveat": "Do not classify as read-only solely because --apply is absent; quarantine persistence is reachable for contradiction rows."
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/apply-null-content-hash-metadata-repair.mjs",
+      "role": "V2_PAYLOAD_METADATA_REPAIR_APPLIER",
+      "target": "codebase_chunks_768_v2 by default",
+      "writes": "QDRANT_PAYLOAD_ONLY",
+      "requiresExplicitApply": true,
+      "dWriterAttribution": "NOT_PROVEN",
+      "vectorWrites": false
+    },
+    {
+      "path": "sveltekit-frontend/package.json",
+      "role": "APPLY_ENTRYPOINTS",
+      "writes": "EXPOSES v2 parity-repair and provision apply commands",
+      "dWriterAttribution": "NOT_PROVEN"
+    },
+    {
+      "path": "scripts/atlas/phase108d-embeddings-backfill-ndjson.mts",
+      "role": "HISTORICAL_768_BACKFILL_WRITER_CANDIDATE",
+      "target": "codebase_chunks_768",
+      "dWriterAttribution": "EXCLUDED_FROM_D",
+      "reason": "Writes the legacy/non-v2 collection."
+    },
+    {
+      "path": "scripts/atlas/phase108d-embeddings-backfill-native.mts",
+      "role": "HISTORICAL_768_BACKFILL_WRITER_CANDIDATE",
+      "target": "codebase_chunks_768",
+      "dWriterAttribution": "EXCLUDED_FROM_D",
+      "reason": "Writes the legacy/non-v2 collection."
+    },
+    {
+      "path": "scripts/atlas/phase108d-embeddings-backfill-full.mts",
+      "role": "HISTORICAL_768_BACKFILL_WRITER_CANDIDATE",
+      "target": "codebase_chunks_768",
+      "dWriterAttribution": "EXCLUDED_FROM_D",
+      "reason": "Writes the legacy/non-v2 collection and includes a legacy 384 alias lane."
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs",
+      "role": "V2_CORPUS_WRITER_CANDIDATE",
+      "target": "codebase_chunks_768_v2",
+      "writes": "QDRANT_VECTOR_AND_PAYLOAD_UPSERT",
+      "applyGuard": "ALWAYS_BLOCKED_CANDIDATE_ORDINAL_AND_SOURCE_REVISION_BRIDGE_MISSING",
+      "lineageFindings": [
+        "source_revision is selected as NULL",
+        "embedding_model is embeddinggemma:latest",
+        "representation_revision is semantic_768@v1",
+        "historical invocation is not proven"
+      ],
+      "dWriterAttribution": "LIKELY_WRITER_CANDIDATE_HISTORICAL_RUN_UNPROVEN"
+    },
+    {
+      "path": "docs/reports/atlas-vector-manifest-v1-2026-08-04.json",
+      "role": "HISTORICAL_V2_OUTPUT_ARTIFACT",
+      "collection": "codebase_chunks_768_v2",
+      "generatedAt": "2026-08-04T21:22:23.740Z",
+      "rowCount": 52380,
+      "sortKey": "postgres_id",
+      "projectionRevision": "v2_uuid_clean",
+      "evidenceStrength": "STRONG_ARTIFACT_CORRELATION_NOT_PROCESS_INVOCATION_PROOF"
+    },
+    {
+      "path": "scripts/atlas/project-graphify-embeddings-qdrant.mjs",
+      "role": "CONFIGURABLE_SEMANTIC_PROJECTION_WRITER_CANDIDATE",
+      "defaultTarget": "codebase_chunks_768",
+      "v2Possible": "QDRANT_CODE_COLLECTION can select codebase_chunks_768_v2",
+      "writes": "QDRANT_VECTOR_AND_PAYLOAD_UPSERT",
+      "sourceColumn": "content_embedding_768",
+      "dWriterAttribution": "POSSIBLE_V2_WRITER_IF_ENVIRONMENT_SELECTED_V2_HISTORICAL_INVOCATION_UNPROVEN"
+    },
+    {
+      "path": "scripts/atlas/upsert-qdrant-packet-payload.mjs",
+      "role": "HISTORICAL_PAYLOAD_WRITER",
+      "target": "codebase_chunks_768 (hardcoded in current source)",
+      "writes": "QDRANT_PAYLOAD_ONLY",
+      "dWriterAttribution": "EXCLUDED_FROM_D_BY_CURRENT_SOURCE",
+      "documentationConflict": "An older session note labels this as a v2 owner, but current source and apply logs target the non-v2 collection."
+    },
+    {
+      "path": "upsert-full-run-v2.log",
+      "role": "HISTORICAL_APPLY_LOG",
+      "target": "codebase_chunks_768",
+      "processedRows": 52417,
+      "updatedPoints": 52380,
+      "completion": "TERMINAL_LOG_PRESENT",
+      "dWriterAttribution": "EXCLUDED_FROM_D"
+    }
+  ],
+  "decision": "A direct v2 corpus-writer candidate is identified, and a second configurable projection writer can target v2. The dated immutable 52,380-row manifest strongly correlates with the UUID writer family, while the complete apply log and current payload writer are explicitly non-v2. An older owner note contradicts current source. Exact historical v2 invocation/environment and lineage completeness remain unproven. Do not run any writer or repair path until CandidateOrdinal and exact source-revision bridges are proven.",
+  "nextGate": "QDRANT_D_WRITER_01",
+  "likely_cause": "The v2 collection contract and repair helpers are present, but no checked-in invocation conclusively attributes the 52,380 corpus points to one writer.",
+  "evidence": [
+    "scripts/atlas/qdrant-provision-768v2.mjs",
+    "scripts/atlas/qdrant-parity-repair-core.mjs",
+    "scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+    "scripts/atlas/qdrant-parity-repair.mjs:147-186,471-480",
+    "sveltekit-frontend/scripts/atlas/apply-null-content-hash-metadata-repair.mjs:33,127-131,323",
+    "sveltekit-frontend/package.json:274-276",
+    "scripts/atlas/phase108d-embeddings-backfill-ndjson.mts:199-205",
+    "scripts/atlas/phase108d-embeddings-backfill-native.mts:150-157",
+    "scripts/atlas/phase108d-embeddings-backfill-full.mts:229-236",
+    "sveltekit-frontend/scripts/atlas/backfill-qdrant-768-v2-uuid.mjs:27-44,149-194",
+    "docs/reports/atlas-vector-manifest-v1-2026-08-04.json:3-21",
+    "scripts/atlas/project-graphify-embeddings-qdrant.mjs:18,72,105-114",
+    "scripts/atlas/upsert-qdrant-packet-payload.mjs:42,256-297",
+    "upsert-full-run-v2.log:1-4,52300-52317",
+    "docs/session-notes/5_20__stubstodo list.md:20-22"
+  ],
+  "patch_targets": [
+    "scripts/atlas/qdrant-d-writer-owner-trace-v1.mjs"
+  ],
+  "safe_next_command": "rg -n \"codebase_chunks_768_v2|QDRANT_COLLECTION|qdrantUrl|points\\?wait|points/payload|persistQuarantine\" scripts/atlas --glob '*.mjs' --glob '*.mts'",
+  "smoke_command": "node -e \"JSON.parse(require('fs').readFileSync('docs/reports/qdrant-d-writer-owner-trace-v1.json','utf8')); console.log('QDRANT_D_WRITER_TRACE_OK')\"",
+  "report_path": "docs/reports/qdrant-d-writer-owner-trace-v1.json"
+}

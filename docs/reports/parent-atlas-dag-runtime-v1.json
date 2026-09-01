@@ -50,7 +50,7 @@
     "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
     "semanticRevision": "semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969",
     "graphRevision": null,
-    "contextManifestChecksum": "10d279e68e17420a60fb0b2939b55ee776fd84feb15901dd965fef2f6591c59b"
+    "contextManifestChecksum": "df77188e8c37e5476c93ceb2fd02fb79e59cf4568bb5cb31ceef3a21ab7827ae"
   },
   "writes": {
     "postgresWrites": false,

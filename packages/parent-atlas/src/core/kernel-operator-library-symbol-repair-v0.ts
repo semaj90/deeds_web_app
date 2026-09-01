@@ -89,7 +89,7 @@ export function buildSymbolRepairOperatorLibraryV0(): KernelOperatorLibraryV1 {
       inputSchemaId: 'input:tree_node_id', outputSchemaId: 'output:ast_node_row',
       parameterSchemaRef: null, executorClass: 'DB_QUERY_EXECUTOR',
       requiredRevisionAxes: ['sourceRevision'], allowedArtifactKinds: ['ast_node_row'],
-      implementationRef: 'atlas_ast_nodes', implementationKind: 'postgres_table',
+      implementationRef: 'sveltekit-frontend/src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.ts#readAtlasAstEvidenceV1', implementationKind: 'source_file',
       verifiedLive: true, deterministic: true, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({
@@ -113,7 +113,7 @@ export function buildSymbolRepairOperatorLibraryV0(): KernelOperatorLibraryV1 {
       inputSchemaId: 'input:graph_node_key', outputSchemaId: 'output:neighborhood',
       parameterSchemaRef: 'param:graph-hop-bound', executorClass: 'GRAPH_TRAVERSAL_EXECUTOR',
       requiredRevisionAxes: ['graphRevision'], allowedArtifactKinds: ['graph_edge'],
-      implementationRef: 'graph_expand_neighborhood', implementationKind: 'mcp_tool',
+      implementationRef: 'sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts#expandAtlasGraph', implementationKind: 'source_file',
       verifiedLive: true, deterministic: false, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({
@@ -126,10 +126,10 @@ export function buildSymbolRepairOperatorLibraryV0(): KernelOperatorLibraryV1 {
     }),
     buildKernelOperatorV1({
       operatorId: 'op:bounded_bfs', operatorRevision: OPERATOR_REVISION, kind: 'BOUNDED_BFS',
-      inputSchemaId: 'input:hyperedge_seed', outputSchemaId: 'output:member_set',
+      inputSchemaId: 'input:canonical_ids', outputSchemaId: 'output:oak_kag_neighbor_receipt',
       parameterSchemaRef: 'param:graph-hop-bound', executorClass: 'GRAPH_TRAVERSAL_EXECUTOR',
       requiredRevisionAxes: ['graphRevision'], allowedArtifactKinds: ['hyperedge_member'],
-      implementationRef: 'hypergraph_expand_members', implementationKind: 'mcp_tool',
+      implementationRef: 'sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts#readKagHypergraphNeighborsStrictV1', implementationKind: 'source_file',
       verifiedLive: true, deterministic: false, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({
@@ -137,15 +137,15 @@ export function buildSymbolRepairOperatorLibraryV0(): KernelOperatorLibraryV1 {
       inputSchemaId: 'input:query_text', outputSchemaId: 'output:ranked_chunks',
       parameterSchemaRef: 'param:top-k', executorClass: 'SEARCH_EXECUTOR',
       requiredRevisionAxes: ['workspaceRevision'], allowedArtifactKinds: ['ranked_chunk'],
-      implementationRef: 'search_postgres_fts', implementationKind: 'mcp_tool',
+      implementationRef: 'sveltekit-frontend/src/lib/server/search/postgres-fts.ts#searchCodeLexicalStrictV1', implementationKind: 'source_file',
       verifiedLive: true, deterministic: false, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({
       operatorId: 'op:search_semantic', operatorRevision: OPERATOR_REVISION, kind: 'SEARCH_SEMANTIC',
-      inputSchemaId: 'input:query_text', outputSchemaId: 'output:ranked_chunks',
+      inputSchemaId: 'input:semantic_768_query', outputSchemaId: 'output:oak_semantic_qdrant_receipt',
       parameterSchemaRef: 'param:top-k', executorClass: 'SEARCH_EXECUTOR',
       requiredRevisionAxes: ['embeddingRevision'], allowedArtifactKinds: ['ranked_chunk'],
-      implementationRef: 'search_hybrid', implementationKind: 'mcp_tool',
+      implementationRef: 'sveltekit-frontend/src/lib/server/search/qdrant-search.ts#searchQdrantCodeStrictV1', implementationKind: 'source_file',
       verifiedLive: true, deterministic: false, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({
@@ -161,7 +161,7 @@ export function buildSymbolRepairOperatorLibraryV0(): KernelOperatorLibraryV1 {
       inputSchemaId: 'input:evidence_set', outputSchemaId: 'output:context_manifest',
       parameterSchemaRef: 'param:token-budget', executorClass: 'CONTEXT_BUILD_EXECUTOR',
       requiredRevisionAxes: [], allowedArtifactKinds: ['context_manifest'],
-      implementationRef: 'sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts', implementationKind: 'source_file',
+      implementationRef: 'parent-atlas.context-manifest.ace.v1', implementationKind: 'source_file',
       verifiedLive: true, deterministic: false, producerRevision: PRODUCER_REVISION,
     }),
     buildKernelOperatorV1({

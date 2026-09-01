@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import statistics
 import time
 
@@ -67,7 +68,9 @@ def main() -> int:
             cagra_neighbors = set(int(value) for value in cagra_idx[row].tolist() if int(value) != row)
             recalls.append(len(exact_neighbors.intersection(cagra_neighbors)) / args.top_k)
 
-    p95_index = min(len(search_ms) - 1, max(0, int(len(search_ms) * 0.95) - 1))
+    # Use the upper-rank sample for small bounded runs; with two repeats the
+    # previous floor-based formula selected the lower sample as P95.
+    p95_index = min(len(search_ms) - 1, max(0, math.ceil(len(search_ms) * 0.95) - 1))
     receipt = {
         'schema': 'atlas.cuvs-cagra-persistent-smoke.v1',
         'status': 'CAGRA_PERSISTENT_FIXTURE_PROVEN' if min(recalls) == 1.0 else 'CAGRA_RECALL_MISMATCH',

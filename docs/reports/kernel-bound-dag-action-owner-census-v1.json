@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.kernel-bound-dag-action-owner-census.v1",
+  "observedAt": "2026-09-01T17:52:00Z",
+  "status": "PROVEN_CODE_CENSUS",
+  "owners": {
+    "FETCH_POSTGRES": { "status": "PARTIAL", "owners": ["sveltekit-frontend/src/lib/server/atlas/ontology-linked-tuple-postgres.spec.ts", "sveltekit-frontend/src/lib/server/db"] },
+    "FETCH_FILE": { "status": "PARTIAL", "owners": ["sveltekit-frontend/src/lib/server/atlas/indexing", "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts"] },
+    "AST_SCAN": { "status": "WIRED_EXISTING", "owners": ["sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts", "packages/parent-atlas/src/core/structural-extraction-fabric.ts"] },
+    "GRAPH_EXPAND": { "status": "WIRED_EXISTING", "owners": ["sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts", "python/atlas_rapids_graph_runtime.py"] },
+    "BUILD_CONTEXT": { "status": "WIRED_EXISTING", "owners": ["sveltekit-frontend/src/lib/server/ace/context-assembler.ts", "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts"] },
+    "FETCH_QDRANT": { "status": "WIRED_EXISTING", "owners": ["sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts", "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"] }
+  },
+  "dag": {
+    "planner": "PROVEN",
+    "readOnlyExecutor": "PROVEN",
+    "realHandlerRegistry": "OPEN",
+    "liveReplay": "OPEN",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "nextGate": "ADAPTER_REGISTRY_READ_ONLY_REPLAY"
+}

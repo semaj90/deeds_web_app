@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.kernel-dag-owner-trace.v2",
+  "updatedAt": "2026-09-01T11:47:00-07:00",
+  "status": "PROVEN_CODE_CENSUS",
+  "owners": {
+    "AST_SCAN": {
+      "status": "EXISTING_BOUNDARY_FOUND",
+      "implementationRef": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+      "provider": "createNodeTreeSitterAstProvider",
+      "promotion": "requires sourceRevision and exact-span evidence"
+    },
+    "GRAPH_EXPAND": {
+      "status": "EXISTING_BOUNDARY_FOUND",
+      "implementationRef": "sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts",
+      "provider": "expandAtlasGraph",
+      "promotion": "requires graphRevision and ordinal-map evidence"
+    },
+    "FETCH_QDRANT": {
+      "status": "EXISTING_LOGICAL_BOUNDARY_FOUND",
+      "implementationRef": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "provider": "searchCodebaseAnn",
+      "warning": "backend may select Qdrant or another configured executor; receipt must record actual executor"
+    },
+    "BUILD_CONTEXT": {
+      "status": "EXISTING_BOUNDARY_FOUND",
+      "implementationRef": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+      "provider": "buildContextManifestFromACE",
+      "promotion": "must consume preassembled ACE context without rerunning retrieval"
+    },
+    "FETCH_POSTGRES": {
+      "status": "STRICT_SEAM_PROVEN",
+      "candidate": "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts",
+      "provider": "readKagHypergraphNeighborsStrictV1",
+      "compatibility": "readKagHypergraphNeighborsV1 remains fail-open for existing callers",
+      "proof": "focused KAG suite 6/6"
+    },
+    "FETCH_FILE": {
+      "status": "BLOCKED",
+      "candidates": [
+        "sveltekit-frontend/src/lib/server/atlas/indexing",
+        "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts"
+      ],
+      "required": "workspace-root-confined, source-revision-aware reader"
+    }
+  },
+  "dag": {
+    "planner": "PROVEN",
+    "bindingContract": "PROVEN",
+    "implementationRefRegistry": "PROVEN_CONTRACT",
+    "realHandlerRegistration": "OPEN",
+    "zeroWriteReplay": "OPEN",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "safety": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "graphWrites": false,
+    "productionWrites": false
+  },
+  "likely_cause": "The repository has real action owners, but they are not yet exposed through one strict runtime registry with operator-level identity and typed failure behavior.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+    "sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts",
+    "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+    "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy",
+    "packages/parent-atlas/src/core/kernel-bound-dag-adapter-registry-v1.ts"
+  ],
+  "safe_next_command": "rg -n --no-heading \"export async function|export function|type Atlas.*Request|interface Atlas.*Request\" sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+  "smoke_command": "npm --prefix packages/parent-atlas --workspaces=false exec -- vitest run src/core/kernel-dag-execution-binding-v1.spec.ts src/core/kernel-bound-dag-adapter-registry-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+  "report_path": "docs/reports/kernel-dag-owner-trace-v2.json"
+}

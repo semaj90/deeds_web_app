@@ -424,6 +424,27 @@ TensorRT environments are absent. Therefore RAPIDS topology capability is
 `PROVEN`, but the unified GPU pipeline remains `NOT_READY` until the intended
 8098 environment records CUDA tensor and cuVS smoke results.
 
+### Current GPU-EXP-12 workstation alignment (2026-09-01)
+
+The intended numerical proving environment is the WSL2 conda environment,
+not the Windows application `.venv` and not the ignored temporary
+`.tmp/langextract-1.6-probe` environment:
+
+- Python: `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`
+- PyTorch: `2.13.0+cu130`; CUDA available on the RTX 3060 Ti
+- Pydantic: `2.13.4` in the same environment for typed receipts/adapters
+- LDR: `ldr-mcp` health passed with four tools; research remains bounded,
+  read-only context and is not an identity or GPU authority
+- GPU-EXP-12: **PARTIAL / bounded proven** via
+  `docs/reports/candidate-feature-gpu-residency-proof-v4.json`
+
+The proof establishes pinned staging, one H2D transfer, two resident reuses,
+ordinal/feature parity, explicit release, and blocked post-release access. It
+does not establish measured VRAM-pressure eviction. PostgreSQL remains the
+canonical identity store; WSL2/PyTorch is the numerical executor; LDR/Pydantic
+are typed orchestration/evidence helpers. None of these lanes may promote
+identity, alter canonical data, or bypass the CandidateOrdinal checksums.
+
 Upstream treesitter-chunker parallel APIs make extraction concurrency an
 existing capability, not an Atlas proof. Before `GPU-16`, compare workers
 1/2/4/8 for identical sorted chunks, boundaries, metadata, edges, and

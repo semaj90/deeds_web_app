@@ -642,6 +642,80 @@ deterministic contract proof only; no action execution, schema inspection,
 or kernel freeze is claimed. The next gate is the read-only schema-ledger
 canary.
 
+**OAK EXEC BIND 00 contract proof 2026-09-01:** added the runtime-only
+`KernelDagExecutionBindingV1` bridge in
+`packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts`. It
+restores executable bound arguments, carries `functionId`, `stepId`,
+`operatorId`, `operatorKind`, and `implementationRef`, and rejects missing or
+mismatched parameter checksums plus output-schema drift. Focused tests are
+`3/3` and the package build passes. This does not change `AdaptiveDagPlanV1`,
+does not execute actions, and does not claim live-handler or replay proof.
+Receipt: `docs/reports/kernel-dag-execution-binding-v1.json`.
+
+**OAK EXEC BIND 01 remains open:** the runtime registry must be keyed by
+`implementationRef`/operator coordinates, with `DagActionKind` retained only
+for coarse scheduling. Real AST, graph, Qdrant, Postgres, and context handler
+registration plus zero-write replay remain separate gates.
+
+**OAK EXEC BIND 01 contract proof 2026-09-01:** the existing package registry
+now resolves adapters by `implementationRef`, verifies operator ID/kind and
+output-schema coordinates, and requires a checked binding for every action.
+The shared read-only executor accepts those bindings without becoming a new
+scheduler. Focused binding/registry/executor tests are `7/7` and the package
+build passes. This is package contract proof only; no live runtime owner,
+database, Qdrant, graph, or production handler was invoked. Receipt:
+`docs/reports/kernel-dag-runtime-registry-v1.json`.
+
+**OAK EXEC BIND 02 remains open:** register real read-only AST, graph, Qdrant,
+Postgres, and context owners, then run the frozen plan twice and compare
+normalized action/evidence checksums.
+
+**OAK EXEC BIND 02 owner trace 2026-09-01:** AST, graph, Qdrant logical ANN,
+and ContextManifest boundaries were found in the existing runtime. Postgres
+still needs a strict typed read seam because the current KAG reader is
+fail-open; `FETCH_FILE` remains blocked pending a confined,
+source-revision-aware reader. No runtime owner was invoked in this census.
+Receipt: `docs/reports/kernel-dag-owner-trace-v2.json`.
+
+**OAK EXEC BIND 03 strict Postgres seam 2026-09-01:** added additive
+`readKagHypergraphNeighborsStrictV1()` while preserving the existing
+fail-open `readKagHypergraphNeighborsV1()` behavior for current retrieval
+callers. The strict seam is read-only and propagates database failures for
+governed action receipts. Runtime DAG registration and live replay remain
+open.
+
+**OAK EXEC BIND 02 Svelte adapter proof 2026-09-01:** the existing bounded
+Svelte adapter now requires `KernelDagExecutionBindingV1` and resolves
+handlers by `implementationRef`; focused tests pass `2/2`. Broad
+`svelte-check` remains blocked by an unrelated nested web UI config missing
+`mdsvex`. Receipt: `docs/reports/kernel-bound-dag-svelte-adapter-v2.json`.
+
+**OAK EXEC BIND 02 input-schema proof 2026-09-01:** added revision-qualified
+input schemas for AST, graph, Postgres, Qdrant, and ContextManifest owners.
+The schemas enforce graph lineage and exactly `768` search dimensions but do
+not invoke any owner. Focused schema tests are `2/2`; live registration and
+zero-write replay remain open.
+
+**OAK EXEC BIND 02 operator-owner reconciliation 2026-09-01:** the current
+operator library contains implementation references that do not all map
+one-to-one to current runtime owners. `GET_AST_EVIDENCE` points to persisted
+`atlas_ast_nodes` while the available structural provider is Tree-sitter;
+semantic search can select multiple executors; context ownership is split
+between ACE assembly and manifest compilation. Real handler registration is
+blocked until these mappings are explicitly resolved. Receipt:
+`docs/reports/kernel-dag-operator-owner-reconciliation-v1.json`.
+
+**OAK EXEC BIND 02 AST read-owner proof 2026-09-01:** confirmed that
+`atlas_ast_nodes` is a real persisted schema/table with `tree_node_id`,
+`source_revision`, source content hash, parser language, and byte-span fields.
+Added the bounded strict read owner
+`sveltekit-frontend/src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.ts`.
+It requires an exact source revision, caps requests at 100 node IDs, validates
+the returned shape with Zod, and is unconditionally read-only. Focused tests:
+`3/3` passed. Live DAG registry wiring and zero-write replay remain open.
+Do not remap `GET_AST_EVIDENCE` to the Tree-sitter producer or invent a second
+AST identity table.
+
 **OAK-CANARY-01 readiness 2026-08-31:** live schema inspection is healthy,
 but the read-only migration checks block any schema-ledger canary. The live
 database migration maximum is `0` while the Drizzle journal reaches `41`;
@@ -1736,3 +1810,25 @@ must not be reclassified as OaK implementation failures.
 | OpenSpec workboard regeneration | **PROVEN_BOUNDED** | 58 changes, 4,228 tasks, 1,924 open |
 | Repository document governance | **BLOCKED_EXTERNAL_LEDGER** | `document-governance-validation-v1.json`, 56 `UNCHECKED_TASKS` findings |
 | OaK change closure | **OPEN** | positive live ontology semantics and broader governance closure remain pending |
+
+### OaK paper-faithful construction gates — 2026-09-01
+
+The 2026 OaK paper defines a construction lifecycle of task-schema creation,
+formal OWL/HermiT verification, graph instantiation, executable typed-function
+testing, judge feedback, bounded repair, and freezing of `S` and `F` before
+inference. Parent Atlas now has the contracts and a proven WSL2 cuGraph
+execution lane, but those facts do not by themselves prove a frozen OaK kernel.
+
+| Gate | Status | Evidence / next proof |
+|---|---|---|
+| OAK-LIVE-01A revision-bound live execution | **OPEN** | exact live Postgres/Qdrant bindings and immutable source/candidate/representation revisions required |
+| OAK-LIVE-01B graph-inclusive live execution | **READY_FOR_REPLAY** | WSL2 RAPIDS FastAPI and NetworkX/cuGraph parity proven; graph revision-bound action inputs still required |
+| OAK-FUNC-COVERAGE-01 executable function coverage | **OPEN** | add a receipt for every function admitted to task-scoped frozen `F`; repository presence is not executable proof |
+| OAK-OWL-VERIFY-01 HermiT verification | **OPEN** | existing deterministic OWL projection is proven; real HermiT reasoner receipt is still required |
+| OAK-JUDGE-LOOP-01 live judge feedback | **OPEN** | `OakJudgeFeedbackV1` contract exists; live execution failure classification and proposal-only repair remain unproven |
+| OAK-FREEZE-01 DRAFT → VERIFIED → FROZEN | **BLOCKED_BY_ABOVE** | require OWL, function coverage, replay, validator, and judge predicates; no manual promotion |
+| OAK-EXECUTION-GPU-01 WSL2 graph executor | **PROVEN_BOUNDED** | `docs/reports/graph-ordinal-cpu-gpu-parity-v1.json`, zero writes, canonical authority false |
+
+The WSL2 graph result therefore upgrades graph execution to
+`READY_FOR_REVISION_BOUND_REPLAY`; it does not promote ontology verification,
+function coverage, judge repair, or kernel freeze.

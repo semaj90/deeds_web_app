@@ -1,0 +1,101 @@
+{
+  "schema": "atlas.emb3a-lineage-blocker-01.v1",
+  "task": "EMB3A-LINEAGE-BLOCKER-01",
+  "source": "docs/reports/emb3a-qdrant-lineage-audit.json (generated 2026-08-22, read-in-full, not rerun)",
+  "readOnly": true,
+  "writesPerformed": false,
+  "backfillPerformed": false,
+  "collectionSwitchPerformed": false,
+  "metadataRepairPerformed": false,
+
+  "coreQuestionAnswered": {
+    "question": "Does the EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE verdict mean D's vectors are wrong, or that D's vectors are correct but packet/source/revision lineage is insufficient for canonical promotion?",
+    "answer": "THE LATTER, now established by combining both reports. The Aug-22 audit never measured vector content at all -- it checks payload FIELD population/lineage exclusively (canonical_id, source_ref, packet_key, tree_node_id, symbol_version_id, workspace_revision, source_revision, representation_id, representation_revision, model_revision). This session's SEMANTIC-GENERATION-ORACLE-01 measured the one thing the Aug-22 audit did not: actual vector content, via a real code-traced canonical executor, and found D's vectors match B's and match fresh ground-truth embeddings in 40/40 tested cases. The two reports are answering orthogonal questions and both are correct: D is representation-correct (this session) AND lineage-incomplete (Aug-22 audit). Neither finding contradicts or supersedes the other."
+  },
+
+  "predicateClassification": [
+    {
+      "field": "canonical_id (postgres_id)",
+      "auggClassification": "EMB3A_LINEAGE_PROVEN",
+      "coverage": "100% (52,417/52,417)",
+      "currentClassification": "STILL_SATISFIED",
+      "note": "Unaffected by anything found this session. D's own point id literally IS postgres_id -- confirmed independently in QDRANT-D-IDENTITY-01."
+    },
+    {
+      "field": "source_ref",
+      "auggClassification": "EMB3A_LINEAGE_PROVEN",
+      "coverage": "100% (61,659/61,660 via atlas_packets)",
+      "currentClassification": "STILL_SATISFIED",
+      "note": "Confirmed independently -- every D point sampled this session carried a correct, clean (non-prefixed) source_ref."
+    },
+    {
+      "field": "packet_key",
+      "auggClassification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER",
+      "coverage": "0% in D payload despite 100% upstream in atlas_packets.packet_key",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "A WRITER gap, not an upstream data gap -- the value exists in Postgres but backfill-qdrant-768-v2-uuid.mjs simply never reads/writes it. Distinct in kind from the workspace_revision/source_revision blockers below. Not touched or resolved by this session's work."
+    },
+    {
+      "field": "tree_node_id",
+      "auggClassification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER",
+      "coverage": "0% in D payload despite 100% upstream",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "Same kind of gap as packet_key -- writer-side omission, upstream data exists. Unrelated to the C1 stale-vector defect this session found; do not conflate."
+    },
+    {
+      "field": "symbol_version_id",
+      "auggClassification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE",
+      "coverage": "N/A -- atlas_symbol_versions table does not exist (exists:false)",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "A genuine upstream schema gap, not a writer or Qdrant-side problem. This is the deepest blocker in the whole set -- there is no canonical source to read from yet. Out of scope for any reader-path fix."
+    },
+    {
+      "field": "workspace_revision",
+      "auggClassification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE",
+      "coverage": "0/61,660 populated in atlas_packets.workspace_revision",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "Genuine upstream data-population gap, not touched this session."
+    },
+    {
+      "field": "source_revision",
+      "auggClassification": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE",
+      "coverage": "0/11,067 populated in atlas_ast_nodes.source_revision",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "Genuine upstream data-population gap, not touched this session."
+    },
+    {
+      "field": "representation_id",
+      "auggClassification": "EMB3A_BLOCKED_BY_PAYLOAD_POPULATION",
+      "coverage": "atlas_packets.source_representation_id populated 1/61,660 (0%)",
+      "currentClassification": "STILL_BLOCKING -- but reframed",
+      "note": "Aug-22 audit labels this a payload-population gap (builder references the field but writes nothing), but the deeper cause is the SAME as the upstream-lineage fields: the canonical source column is itself 0%-populated. This session found D's actual live payload uses a DIFFERENT key, representation_name='semantic_768' (verified live, not in the Aug-22 audit's checked field list at all) -- so the human-readable representation label IS present in D, just under a field name (representation_name) the Aug-22 audit didn't check. representation_id specifically (the schema-declared field name) remains unpopulated. This is a real, additional finding this session contributes: the audit's field list and D's actual live schema have a naming mismatch worth noting, not just a population gap."
+    },
+    {
+      "field": "representation_revision",
+      "auggClassification": "EMB3A_BLOCKED_BY_PROJECTION_BUILDER",
+      "coverage": "0% in D payload",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "Not touched this session."
+    },
+    {
+      "field": "embedding_model_revision (model_revision)",
+      "auggClassification": "EMB3A_BLOCKED_BY_PAYLOAD_POPULATION",
+      "coverage": "atlas_packets.encoder_revision populated 1/61,660",
+      "currentClassification": "STILL_BLOCKING",
+      "note": "Confirmed live: D's payload model_revision field is null in every sample this session pulled, consistent with the Aug-22 finding."
+    }
+  ],
+
+  "newPredicateNotCoveredByAug22Audit": {
+    "field": "vector content / representation correctness",
+    "classification": "NOW_PROVEN_BY_CURRENT_INVESTIGATION",
+    "finding": "D's actual 768-dim vector data matches B's and matches a fresh embedding from the real canonical executor in 40/40 tested cases (SEMANTIC-GENERATION-ORACLE-01-BCD). The Aug-22 audit never measured this axis at all -- its scope was payload field lineage only, explicitly stated in its own invariants ('vectorDimension does not synthesize representation_id')."
+  },
+
+  "writerAndReaderAssumptionsCheck": {
+    "writerAssumption_stillAccurate": "backfill-qdrant-768-v2-uuid.mjs (id=768_v2_direct_backfill) as D's writer -- STILL_ACCURATE, matches live projection_revision='v2_uuid_clean' observed in every D sample this session pulled.",
+    "readerAssumption_gap": "The Aug-22 audit's invariants list never mentions which collection live search traffic actually queries -- it audits D in isolation. This session's QDRANT-READER-OWNER-01 finding (qdrant-search.ts defaults to codebase_chunks_768, not _768_v2) is UNRELATED to and not covered by the Aug-22 audit at all -- classified UNRELATED to the lineage blocker set, but the single most retrieval-relevant fact found across both investigations."
+  },
+
+  "conclusion": "EMB3A_BLOCKED_BY_UPSTREAM_LINEAGE remains fully accurate and current for 8 of 9 audited lineage fields (only representation_id gets a minor reframe re: the representation_name key-naming mismatch). None of the Aug-22 blockers are resolved, superseded, or stale. This session's contribution is orthogonal: proving vector correctness (a question the Aug-22 audit never asked) and finding the live reader-path defect (also never asked). Both reports stay valid and complementary. Next gate per the requested sequence: QDRANT-D-COHORT-01 (identity/lineage population census for the SPECIFIC 7,773+55-row population this investigation's atlas_packets/bridge findings concern, not the audit's generic 250-sample), then QDRANT-READER-SHADOW-01."
+}

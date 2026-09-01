@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.ace-radix-01-results.v1",
+  "proofGate": "ACE-RADIX-01",
+  "openspecChange": "openspec/changes/parent-atlas-tensor-residency-integration/",
+  "runAt": "2026-09-01T16:51:26.940Z",
+  "environment": {
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "cudaToolkit": "13.0.48",
+    "driver": "580.88",
+    "arch": "sm_86"
+  },
+  "fixtureGenerator": "scripts/atlas/ace-radix-01/fixture-v1.mjs",
+  "benchmarkHarness": "native/ace-radix-01/radix_bench.cu",
+  "cuTileStatus": "ENVIRONMENT_BLOCKED",
+  "cuTileReason": "CUDA 13.0 toolkit ships only crt/cuda_tile.h compiler-intrinsic stub, no usable host cuTile API (stable at CUDA 13.2 per prior finding, this host is 13.0)",
+  "results": [
+    {
+      "n": 256,
+      "cpuMs": 0.0112,
+      "cubTotalMs": 1.7073,
+      "cubKernelMs": 0.0839,
+      "h2dMs": 0.0187,
+      "d2hMs": 0.0448,
+      "bytesMoved": 4096,
+      "cubMatchesCpuExactly": true,
+      "determinismVerdict": "PASS"
+    },
+    {
+      "n": 1000,
+      "cpuMs": 0.0381,
+      "cubTotalMs": 2.2726,
+      "cubKernelMs": 0.1024,
+      "h2dMs": 0.0378,
+      "d2hMs": 0.0399,
+      "bytesMoved": 16000,
+      "cubMatchesCpuExactly": true,
+      "determinismVerdict": "PASS"
+    },
+    {
+      "n": 4000,
+      "cpuMs": 0.1711,
+      "cubTotalMs": 1.8076,
+      "cubKernelMs": 0.2683,
+      "h2dMs": 0.0225,
+      "d2hMs": 0.026,
+      "bytesMoved": 64000,
+      "cubMatchesCpuExactly": true,
+      "determinismVerdict": "PASS"
+    },
+    {
+      "n": 16000,
+      "cpuMs": 0.7379,
+      "cubTotalMs": 1.8938,
+      "cubKernelMs": 0.3816,
+      "h2dMs": 0.0357,
+      "d2hMs": 0.0334,
+      "bytesMoved": 256000,
+      "cubMatchesCpuExactly": true,
+      "determinismVerdict": "PASS"
+    },
+    {
+      "n": 64000,
+      "cpuMs": 3.5416,
+      "cubTotalMs": 2.3429,
+      "cubKernelMs": 0.3636,
+      "h2dMs": 0.0825,
+      "d2hMs": 0.1095,
+      "bytesMoved": 1024000,
+      "cubMatchesCpuExactly": true,
+      "determinismVerdict": "PASS"
+    }
+  ],
+  "overallVerdict": "DRY_RUN_PROVEN",
+  "overallVerdictNote": "DRY_RUN_PROVEN reflects CUB-vs-CPU determinism holding at every tested N on this dev host. Per this repo status-language rules, this is NOT a production-ready claim -- it is the CUB oracle baseline half of ACE-RADIX-01. cuTile challenger half is ENVIRONMENT_BLOCKED (see cuTileReason), so full ACE-RADIX-01 (both CUB and cuTile matching) remains NOT_PROVEN until run on a CUDA 13.2+ host with a real cuTile programming API."
+}

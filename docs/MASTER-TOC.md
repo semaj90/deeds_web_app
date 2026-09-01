@@ -3,12 +3,12 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `2606cb6209b56388f4e1ea8e4f0b9aa9599f33453cad962a52ae51e10ea22dc9`
+Registry checksum: `abdceff3e3d71de40006d2c30fd98a3d2725c41a3b9f9b7f20a0fa76492c74a0`
 
 ## Project instructions
 
 - [AGENTS.md](AGENTS.md) — CANONICAL_CURRENT — `c41250dfa671`
-- [claude.md](claude.md) — CANONICAL_CURRENT — `349d13d1ead0`
+- [CLAUDE.md](CLAUDE.md) — CANONICAL_CURRENT — `0c071ff74bd6`
 - [llama-cpp-turboquant-gemma4/AGENTS.md](llama-cpp-turboquant-gemma4/AGENTS.md) — CANONICAL_CURRENT — `4e9830e84d20`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — CANONICAL_CURRENT — `d2a3fb0c935c`
@@ -77,7 +77,7 @@ Registry checksum: `2606cb6209b56388f4e1ea8e4f0b9aa9599f33453cad962a52ae51e10ea2
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
 - [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 0/0 tasks (n/a)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 0/31 tasks (0%)
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 21/49 tasks (43%)
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 22/49 tasks (45%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 3/18 tasks (17%)
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 5/64 tasks (8%)
 - [parent-atlas-unified-symbol-ranking](openspec/changes/parent-atlas-unified-symbol-ranking) — 17/17 tasks (100%)

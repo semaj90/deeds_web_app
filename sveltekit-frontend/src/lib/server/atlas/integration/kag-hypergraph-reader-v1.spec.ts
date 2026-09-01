@@ -102,6 +102,14 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     expect(result.requestedCanonicalIds).toBe(1);
   });
 
+  it('strict seam propagates database errors for governed DAG receipts', async () => {
+    queryMock.mockClear();
+    queryMock.mockRejectedValue(new Error('connection refused'));
+
+    const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readKagHypergraphNeighborsStrictV1(['packet:a'])).rejects.toThrow('connection refused');
+  });
+
   it('dedupes and caps the requested canonicalIds before querying', async () => {
     queryMock.mockClear();
     queryMock.mockResolvedValue({ rows: [] });

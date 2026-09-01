@@ -6,7 +6,7 @@
   "candidateSnapshotRevision": "corpus-snapshot:workspace-active-v1:v1",
   "ordinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
   "candidateCount": 4951,
-  "sampleSize": 1024,
+  "sampleSize": 64,
   "collections": [
     {
       "collection": "codebase_chunks_768",

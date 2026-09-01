@@ -99,6 +99,10 @@ describe('compiled prefill identity', () => {
       promptTemplateRevision: 'prompt:r2',
       instructionRevision: 'instruction:r5',
       evidenceRevisionSetHash: H('evidence-revisions'),
+      acePolicyRevision: 'ace-policy:r1',
+      bitfrostRevision: 'bitfrost:r1',
+      residencyPlanChecksum: H('residency-plan'),
+      gpuExecutionIdentity: 'gpu:rtx3060ti:cuda12.1',
     });
 
     const physicalA = buildPrefillArtifactIdentityV1({
@@ -141,5 +145,44 @@ describe('compiled prefill identity', () => {
     });
 
     expect(receipt.contentIdentity.checksumSha256).toBe(logical.checksumSha256);
+  });
+
+  it('rejects prefill content identity missing the ACE/BitFrost boundary fields', () => {
+    const manifest = H('manifest-2');
+    const base = {
+      contextManifestChecksum: manifest,
+      promptPlanChecksum: H('plan-2'),
+      canonicalPacketSetHash: H('packets-2'),
+      modelRevision: 'model:r8',
+      adapterRevision: null as string | null,
+      tokenizerRevision: 'tok:r2',
+      promptTemplateRevision: 'prompt:r3',
+      instructionRevision: 'instruction:r6',
+      evidenceRevisionSetHash: H('evidence-revisions-2'),
+    };
+
+    expect(() =>
+      buildPrefillContentIdentityV1({
+        ...base,
+        acePolicyRevision: 'ace-policy:r2',
+        bitfrostRevision: 'bitfrost:r2',
+        residencyPlanChecksum: H('residency-plan-2'),
+        gpuExecutionIdentity: 'gpu:rtx3060ti:cuda12.1',
+        // @ts-expect-error missing/extra field must be rejected by the strict schema
+        extraUnknownField: 'not-allowed',
+      }),
+    ).toThrow();
+
+    const complete = buildPrefillContentIdentityV1({
+      ...base,
+      acePolicyRevision: 'ace-policy:r2',
+      bitfrostRevision: 'bitfrost:r2',
+      residencyPlanChecksum: H('residency-plan-2'),
+      gpuExecutionIdentity: 'gpu:rtx3060ti:cuda12.1',
+    });
+    expect(complete.acePolicyRevision).toBe('ace-policy:r2');
+    expect(complete.bitfrostRevision).toBe('bitfrost:r2');
+    expect(complete.residencyPlanChecksum).toBe(H('residency-plan-2'));
+    expect(complete.gpuExecutionIdentity).toBe('gpu:rtx3060ti:cuda12.1');
   });
 });

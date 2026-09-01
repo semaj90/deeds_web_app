@@ -58,25 +58,25 @@
       "quantization_config": null
     },
     "payload_schema": {
-      "indexed_at": {
+      "postgres_id": {
         "data_type": "keyword",
         "points": 52380
       },
-      "representation_name": {
+      "embedding_model": {
         "data_type": "keyword",
         "points": 52380
       },
-      "content_hash": {
-        "data_type": "keyword",
-        "points": 45472
-      },
-      "model_revision_state": {
+      "projection_revision": {
         "data_type": "keyword",
         "points": 52380
       },
       "chunk_id": {
         "data_type": "keyword",
         "points": 16805
+      },
+      "indexed_at": {
+        "data_type": "keyword",
+        "points": 52380
       },
       "source_ref": {
         "data_type": "keyword",
@@ -86,15 +86,15 @@
         "data_type": "keyword",
         "points": 52380
       },
-      "embedding_model": {
+      "content_hash": {
+        "data_type": "keyword",
+        "points": 45472
+      },
+      "representation_name": {
         "data_type": "keyword",
         "points": 52380
       },
-      "postgres_id": {
-        "data_type": "keyword",
-        "points": 52380
-      },
-      "projection_revision": {
+      "model_revision_state": {
         "data_type": "keyword",
         "points": 52380
       }

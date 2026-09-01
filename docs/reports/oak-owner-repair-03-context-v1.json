@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.oak-owner-repair-03-context.v1",
+  "updatedAt": "2026-09-01T16:10:00-07:00",
+  "status": "PROVEN_CONTRACT_HANDLER",
+  "gate": "OAK OWNER REPAIR 03",
+  "implementationRef": "parent-atlas.context-manifest.ace.v1",
+  "callable": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts::buildContextManifestFromACE",
+  "input": "assembled ACEContext plus ACEContextManifestOptions-compatible request",
+  "retrievalReentered": false,
+  "persistencePerformed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "tests": {
+    "packageBuild": "PASS",
+    "contextHandlerFocused": { "passed": 2, "failed": 0 }
+  },
+  "promotion": {
+    "contextOwnerRepair": "PROVEN",
+    "zeroWriteReplay": "OPEN_REMAINING_BINDING_AND_RECEIPT_GATE"
+  },
+  "likely_cause": "The OaK catalog referenced a historical context assembler path instead of the current ACEContext manifest compiler and its real input contract.",
+  "evidence": [
+    "packages/parent-atlas/src/core/oak-context-manifest-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.spec.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/oak-context-manifest-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.ts"
+  ],
+  "safe_next_command": "rg -n \"implementationRef|createOakDag.*Handler|KernelDagExecutionBindingV1|executeOakDagThroughBoundedExecutorV1\" sveltekit-frontend/src/lib/server/atlas/policy packages/parent-atlas/src/core",
+  "smoke_command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/oak-owner-repair-03-context-v1.json"
+}

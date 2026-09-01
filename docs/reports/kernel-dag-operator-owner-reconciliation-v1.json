@@ -1,0 +1,120 @@
+{
+  "schema": "atlas.kernel-dag-operator-owner-reconciliation.v1",
+  "updatedAt": "2026-09-01T13:05:00-07:00",
+  "status": "OWNER_REPAIRS_STATIC_REGISTRY_AND_FIXTURE_REPLAY_PROVEN_LIVE_OPEN",
+  "findings": [
+    {
+      "operatorKind": "GET_AST_EVIDENCE",
+      "operatorImplementationRef": "sveltekit-frontend/src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.ts#readAtlasAstEvidenceV1",
+      "availableOwner": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+      "status": "STRICT_READ_OWNER_AND_DAG_HANDLER_UNIT_PROVEN",
+      "decision": "Keep atlas_ast_nodes as the persisted read owner and keep Tree-sitter/AST-grep as producers. The additive strict reader and exact OaK DAG handler are statically registered by callable reference; live replay remains open."
+    },
+    {
+      "operatorKind": "EXPAND_GRAPH",
+      "operatorImplementationRef": "sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts#expandAtlasGraph",
+      "availableOwner": "sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts",
+      "status": "STRICT_DAG_HANDLER_UNIT_PROVEN_LIVE_REPLAY_OPEN",
+      "decision": "Bind graph expansion only through the exact expandAtlasGraph callable; graph-revision and ordinal checks remain required before live replay."
+    },
+    {
+      "operatorKind": "SEARCH_SEMANTIC",
+      "operatorImplementationRef": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts#searchQdrantCodeStrictV1",
+      "availableOwner": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts::searchQdrantCodeStrictV1",
+      "status": "STRICT_SEMANTIC_OWNER_REPAIRED_UNIT_PROVEN",
+      "decision": "The strict semantic Qdrant executor now has an exact callable implementation reference. search_hybrid remains a separate logical fusion owner and is not aliased to Qdrant."
+    },
+    {
+      "operatorKind": "SEARCH_LEXICAL",
+      "operatorImplementationRef": "sveltekit-frontend/src/lib/server/search/postgres-fts.ts#searchCodeLexicalStrictV1",
+      "availableOwner": "sveltekit-frontend/src/lib/server/search/postgres-fts.ts::searchCodeLexicalStrictV1",
+      "status": "STRICT_READ_OWNER_AND_DAG_HANDLER_UNIT_PROVEN",
+      "decision": "Use the additive strict PostgreSQL FTS callable through the exact implementationRef-keyed DAG handler. The legacy fail-open searchCodeLexical wrapper remains unchanged for ordinary retrieval callers; empty results and query/DB/schema failures are not conflated."
+    },
+    {
+      "operatorKind": "BUILD_CONTEXT",
+      "operatorImplementationRef": "parent-atlas.context-manifest.ace.v1",
+      "availableOwner": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts::buildContextManifestFromACE",
+      "status": "STRICT_CONTEXT_OWNER_REPAIRED_UNIT_PROVEN",
+      "decision": "The callable builder now has a distinct exact implementation reference and adapter for assembled ACEContext plus compiler options. It does not rerun retrieval or persist manifests."
+    },
+    {
+      "operatorKind": "FETCH_POSTGRES_KAG",
+      "operatorImplementationRef": "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts#readKagHypergraphNeighborsStrictV1",
+      "availableOwner": "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsStrictV1",
+      "status": "STRICT_KAG_OWNER_REPAIRED_UNIT_PROVEN",
+      "decision": "The strict KAG reader now has an exact callable implementation reference and a distinct canonical-ID neighbor contract. It is not aliased to packet lookup or generic FETCH_POSTGRES semantics."
+    }
+  ],
+  "promotion": {
+    "realHandlerRegistration": "STATIC_EXACT_REFERENCE_REGISTRY_UNIT_PROVEN",
+    "zeroWriteReplay": "FIXTURE_REPLAY_PROVEN_LIVE_READONLY_REPLAY_OPEN",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "liveReadiness": {
+    "postgres": "TCP_AVAILABLE",
+    "qdrant": "HTTP_200",
+    "nlpSidecar": "HTTP_200",
+    "graphExecutor": "WSL2_FASTAPI_HEALTHY",
+    "graphExecutorRuntime": {
+      "provider": "WSL2",
+      "distribution": "Ubuntu",
+      "environment": "atlas-rapids-cu13",
+      "entrypoint": "python/atlas_rapids_sidecar_graph.py",
+      "url": "http://127.0.0.1:8098",
+      "health": "HTTP_200",
+      "gpu": "NVIDIA GeForce RTX 3060 Ti",
+      "torch": "2.13.0+cu130",
+      "cuvs": "26.06.00",
+      "cugraph": "26.06.00",
+      "graphCapabilities": "HTTP_200:/v1/graph/capabilities",
+      "graphParity": {
+        "status": "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN",
+        "report": "docs/reports/graph-ordinal-cpu-gpu-parity-v1.json",
+        "sameRankOrdering": true,
+        "maxAbsScoreError": 7.194331917148578e-7,
+        "renumbered": false,
+        "unknownOrdinals": 0,
+        "writesPerformed": false
+      },
+      "writesPerformed": false
+    },
+    "liveReplay": "NOT_ATTEMPTED_MISSING_GRAPH_AND_REVISION_BOUND_INPUTS",
+    "writesPerformed": false
+  },
+  "likely_cause": "The operator library records historical or coarse implementation references that do not yet map one-to-one to the current runtime owner functions.",
+  "evidence": [
+    "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
+    "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/atlas-ast-evidence-reader-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/graph/graph-expansion-adapter.ts",
+    "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+    "sveltekit-frontend/src/lib/server/search/postgres-fts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-lexical-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-lexical-handler-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-ast-evidence-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-ast-evidence-handler-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-graph-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-graph-handler-v1.spec.ts",
+    "packages/parent-atlas/src/core/oak-kag-neighbor-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-kag-neighbor-handler-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+    "packages/parent-atlas/src/core/oak-context-manifest-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.spec.ts"
+    ,"sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.ts"
+    ,"sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.spec.ts"
+    ,"sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-replay-v1.spec.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-owner-input-schemas-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.ts"
+  ],
+  "safe_next_command": "Run the same frozen plan against explicitly configured read-only live owners after verifying source, graph, and candidate revisions are available.",
+  "smoke_command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-runtime-replay-v1.spec.ts src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/kernel-dag-operator-owner-reconciliation-v1.json"
+}

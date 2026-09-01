@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.kernel-dag-execution-binding-readiness.v1",
+  "updatedAt": "2026-09-01T11:30:00-07:00",
+  "status": "PROVEN_CONTRACT",
+  "gate": "OAK EXEC BIND 00",
+  "created": true,
+  "wired": false,
+  "proven": true,
+  "done": false,
+  "implementation": "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts",
+  "tests": {
+    "command": "npm --prefix packages/parent-atlas --workspaces=false exec -- vitest run src/core/kernel-dag-execution-binding-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+    "passed": 3,
+    "failed": 0
+  },
+  "build": {
+    "command": "npm --prefix packages/parent-atlas --workspaces=false run build",
+    "status": "PASS"
+  },
+  "safety": {
+    "databaseWrites": false,
+    "projectionWrites": false,
+    "productionWrites": false,
+    "canonicalAuthority": false
+  },
+  "remaining": [
+    "implementationRef-keyed runtime registry",
+    "typed live read-only handlers",
+    "zero-write execution replay",
+    "LangGraph checkpoint/HITL integration"
+  ],
+  "likely_cause": "The planner checksum-bound arguments but AdaptiveDagPlanV1 discarded them, leaving the runtime without a verified operator-level execution binding.",
+  "evidence": [
+    "packages/parent-atlas/src/core/kernel-bound-dag-planner-v1.ts",
+    "packages/parent-atlas/src/core/adaptive-dag-plan-v1.ts",
+    "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.spec.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts",
+    "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.spec.ts",
+    "packages/parent-atlas/src/index.ts",
+    "openspec/changes/parent-atlas-ontology-kernel/tasks.md"
+  ],
+  "safe_next_command": "rg -n --no-heading \"implementationRef|operatorId|KernelDagExecutionBindingV1\" packages/parent-atlas/src sveltekit-frontend/src/lib/server/atlas",
+  "smoke_command": "npm --prefix packages/parent-atlas --workspaces=false exec -- vitest run src/core/kernel-dag-execution-binding-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+  "report_path": "docs/reports/kernel-dag-execution-binding-v1.json"
+}

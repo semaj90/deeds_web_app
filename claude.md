@@ -972,6 +972,286 @@ everything it finds — inventory first, remediate later, as its own explicit ta
 `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/specs/runtime-owner-deduplication/`
 (the spec-level requirements this governance layer enforces).
 
+### GPU-MINI-FABRIC-01 proving ground + WSL2 RAPIDS environment correction (2026-09-01)
+
+**RAPIDS/cuVS/cuGraph ARE already installed and proven — via WSL2 conda, not pip, not native
+Windows.** A same-day probe in this file's own investigation trail initially concluded "cuVS/cuGraph
+not installed" — that was **wrong**, caused by running `python3 -c "import cuvs"` in a
+non-interactive WSL2 shell that never sourced `conda.sh`, so it silently ran against the base
+system Python instead of the real environment. The real environment, verified live by invoking its
+Python by absolute path:
+
+```
+WSL2 Ubuntu → /home/james/miniforge3/envs/atlas-rapids-cu13
+  cuVS 26.06.00 · cuGraph 26.06.00 · cuDF 26.06.01 · CuPy 14.1.1 · PyTorch 2.13.0+cu130
+  GPU: NVIDIA GeForce RTX 3060 Ti, CUDA available: True
+```
+
+**Do not create a second RAPIDS environment or `pip install cuvs-cu13`/`cugraph-cu13`, and do not
+upgrade 26.06 → 26.08, without first demonstrating this environment is unusable for a specific
+reason** — an upgrade mid-series would muddy `GpuExecutionIdentityV1`-style reproducibility evidence
+across a multi-phase proof sequence. **Lesson for future probes**: in WSL2, `which conda` / a bare
+`python3 -c "import X"` from a non-interactive shell is NOT evidence an environment is absent —
+invoke the target env's Python by its absolute path (`/home/james/miniforge3/envs/<env>/bin/python`)
+or explicitly `source /home/james/miniforge3/etc/profile.d/conda.sh && conda activate <env>` first.
+
+**`GPU-MINI-FABRIC-01`** (full roadmap in `openspec/changes/parent-atlas-gpu-mini-fabric-01/`) is a
+small, synthetic, frozen-fixture GPU proving ground built specifically so that no phase — exact vs
+approximate retrieval, structural graph traversal, ACE/BitFrost residency prediction, radix
+grouping, LOD promotion, and eventually a cuTile challenger — is attempted without a CPU or
+vendor-exact oracle sitting directly next to it first. **Never touches canonical production data.**
+
+**Phase A — `SEMANTIC-EXACT-PARITY-01`: PASS** (real, run on this host's RTX 3060 Ti in
+`atlas-rapids-cu13`, not simulated). Frozen fixture: 16,384 nodes, 64-dim, K=16, 256 queries, fixed
+seed, with `nodeKey`/`projectionOrdinal`/`candidateOrdinal` deliberately kept as three distinct
+values per node specifically to catch accidental coordinate conflation. PyTorch exact GEMM+topk
+(oracle) vs cuVS brute-force (via the existing canonical `atlas_compute.cuvs_analytics.run_cuvs_exact_knn`
+— reused, not duplicated):
+
+```
+recall@16: 1.0 | rank1_match: 1.0 | node_key_identity_match: 1.0
+max_top1_score_delta: 3e-07 (tolerance 1e-4) | ordinal_conflation_hits: 0/0
+gate.RESULT: PASS
+```
+
+Code: `python/atlas_compute/gpu_mini_fabric/` (`semantic_exact_parity_fixture.py`,
+`semantic_exact_parity_01.py`). Result: `docs/reports/gpu-mini-fabric-01-semantic-exact-parity-01.json`.
+
+**Phase B — `GPU-GRAPH-ANN-01`: PARTIAL_PROVEN** (real, run on this host — not simulated). CAGRA
+(default params: `build_algo="ivf_pq"`, `itopk_size=64` — deliberately never NVIDIA's own `"ace"`
+build_algo) vs the Phase A exact oracle, sequential 16K→64K→256K→1M:
+
+```
+N=16384: PASS  recall@16=0.9746 recall@1=1.0 build=916.6ms search=7237.6ms total (28.3ms/query)
+N=65536: FAIL  recall@16=0.8289 recall@1=1.0 min_recall@16=0.5  ← crossover boundary
+256K/1M: not attempted (sequence halts on first failing tier)
+```
+
+Code: `python/atlas_compute/gpu_mini_fabric/graph_ann_fixture.py` + `graph_ann_01.py`. Result:
+`docs/reports/gpu-mini-fabric-01-graph-ann-01.json`. **Honest caveat**: the fixture is
+uniform-random 64-dim Gaussian noise with no manifold structure — harder for ANN than real
+embeddings, so this crossover boundary is specific to that synthetic difficulty + default params,
+not a general "CAGRA fails at 64K" claim. `itopk_size` retuning (CAGRA's own documented
+accuracy/speed knob) was deliberately not attempted here — that's a distinct follow-up, not a
+silent fix to force a pass.
+
+**CORRECTED (2026-09-01) — both of the research findings originally recorded here were wrong or
+overstated, verified against primary sources, not left standing**:
+1. ~~"Workspace-constrained VRAM caused the N=65536 recall drop"~~ — **falsified by a controlled
+   test** (see Phase B2-build-isolation below): rerunning the exact same default config with ~2–7x
+   more free VRAM reproduced the same low recall almost exactly. The real cause is `build_algo`
+   graph-build quality, not VRAM pressure.
+2. ~~"cuGraph's `pagerank()` silently ignoring its `dangling` parameter, per known issue
+   `rapidsai/cugraph#482`, will cause a divergence"~~ — **the citation was wrong**, found by pulling
+   #482's full comment thread directly via the GitHub API (not a search-engine summary). The issue's
+   actual, closing resolution: NetworkX had loaded the graph undirected by default while cuGraph
+   built it directed — a graph-construction-semantics mismatch, with dangling-node handling never
+   once mentioned in the thread. The underlying fact about `dangling` being a no-op is separately
+   true (verified directly against cuGraph's own docstring: *"This parameter is here for NetworkX
+   compatibility and ignored"*), but #482 doesn't demonstrate it mattering — see the `GRAPH-PAGERANK-02`
+   result below, which empirically tested it and found no measurable effect at this graph's dangling
+   density. The real, more general lesson from #482: **PageRank parity requires identical graph
+   semantics (directedness, vertex set, edge set, renumbering) between engines** — now enforced as
+   its own `GraphExecutionSemanticsV1` check, run before any PageRank comparison.
+
+**Phase B2-build-isolation — `GPU-GRAPH-ANN-02A/02B`: controlled build-algorithm isolation (the
+retry above, actually run).** Same frozen N=65536 fixture/oracle/seed as the original `GPU-GRAPH-ANN-01`
+tier, `itopk_size=64` held fixed, only `build_algo` varied, with a `CagraBuildReceiptV1` captured
+per run:
+
+```
+02A build_algo=ivf_pq:     recall@16=0.8391  worst=0.4375  freeVramBefore=1539MB (7x original headroom)
+                            internalBatchReductionObserved=true  ← fires regardless of headroom
+02B build_algo=nn_descent: recall@16=0.9980  worst=0.9375  freeVramBefore=1515MB
+                            internalBatchReductionObserved=false
+(original GPU-GRAPH-ANN-01: recall@16=0.8289, only ~200-900MB free)
+```
+
+**02A reproduces the original 0.8289 result almost exactly (0.8391) despite ~2–7x more free VRAM —
+this falsifies the VRAM-pressure hypothesis.** 02B (only `build_algo` changed, `itopk_size` left at
+default) alone jumps recall to 0.998. The recall gap is a real `ivf_pq` build-quality limitation at
+this N/dim, not a memory artifact of this host's shared GPU. Code/result:
+`graph_ann_02_build_isolation.py` / `docs/reports/gpu-mini-fabric-01-graph-ann-02-build-isolation.json`.
+
+**Phase B2 — `GPU-GRAPH-ANN-02` itopk_size sweep** (run before the build isolation above — out of
+the methodologically correct order; NVIDIA's own guidance is build-side isolation, then tune
+itopk_size, then graph_degree/intermediate_graph_degree. The sweep's data remains valid, it just
+couldn't by itself distinguish "itopk_size fixed it" from "a different build would have regardless"
+— both are now independently confirmed true). Same frozen N=65536 fixture, graph construction held
+fixed (`build_algo="ivf_pq"`), only `itopk_size` swept:
+
+```
+itopk=64:  recall@16=0.8347  worst=0.5625  p50=1.92ms  qps=351
+itopk=256: recall@16=0.9805  worst=0.8125  p50=1.91ms  qps=369  ← clears 0.95 gate
+itopk=512: recall@16=0.9980  worst=0.9375  p50=1.91ms  qps=360
+```
+
+Per-query latency is essentially flat across the whole sweep — the N=65536 FAIL was a default-param
+artifact, not a hard recall ceiling. Code/result: `graph_ann_02_itopk_sweep.py` /
+`docs/reports/gpu-mini-fabric-01-graph-ann-02-itopk-sweep.json`.
+
+**Phase B3 — `GPU-GRAPH-ANN-03` on the real semantic_768 distribution: PASS.** Real, read-only export
+of `codebase_chunk_index.content_embedding` (55,169 rows — all currently populated, not padded to
+65,536; `canonical_production_data_touched: true` / `_mutated: false` recorded explicitly, distinct
+from every synthetic-fixture phase's `false`):
+
+```
+oracle cross-check (cuVS brute-force vs PyTorch exact): 0.9993 agreement
+itopk=64  (default): recall@16=0.9905  worst_query_recall@16=0.0     ← flagged, not smoothed over
+itopk=512 (tuned):   recall@16=0.9995  worst_query_recall@16=0.9375
+```
+
+Confirms the Gaussian-64 fixture's low recall was specific to unstructured synthetic data — real
+embeddings clear 0.99 mean recall@16 even at default params. **Flagged, not investigated further
+yet**: one query got exactly 0.0 recall@16 at default `itopk=64` (likely a near-duplicate-embedding
+edge case; the tuned config already fixes the floor). Code/result:
+`export_semantic_768_fixture.py` + `graph_ann_03_semantic_768.py` /
+`docs/reports/gpu-mini-fabric-01-graph-ann-03-semantic-768.json`.
+
+**Phase D — `GPU-GRAPH-STRUCT-01` (BFS) + `STRUCT-02`/`GRAPH-PAGERANK-01` (PageRank): both PASS.**
+`GraphFixtureV1` (10K nodes, 50K typed edges) — vertex identity is the `nodeKey` string fed directly
+to both NetworkX and cuGraph, never a row index or engine-internal ID. **Relabeled per the #482
+correction above**: this fixture's zero-dangling-node property is an explicit **isolation** choice
+(removes one variable to establish basic numerical parity), not a claim that dangling nodes cause a
+bug — production graphs naturally have them.
+
+```
+STRUCT-01 BFS:       exact node-set + depth match at all 5 seeds (depth_limit=2)
+GRAPH-PAGERANK-01:   vertexSetExact=true  rankCorrelation=0.99992  topKOverlap=0.98
+                     GraphExecutionSemanticsV1 confirmed agreement (directed/vertexCount/edgeCount/
+                     ordinalMapChecksum identical both engines) BEFORE the PageRank comparison ran
+```
+
+**`GRAPH-PAGERANK-02` — empirically characterizes the dangling-parameter no-op (not assumed): NO
+MEASURABLE DIVERGENCE.** Fixture with 80/10,000 nodes (0.8%) naturally dangling — PageRank divergence
+attributable to dangling-node handling was `6.27e-6` whole-graph, `1.61e-6` on the dangling nodes
+themselves, essentially the same noise floor as `GRAPH-PAGERANK-01`'s zero-dangling baseline
+(`6.26e-6`). At this density and graph structure, cuGraph's documented no-op does not produce a
+practically measurable difference — an honest, data-driven answer rather than a forced "found a
+problem." Code/result: `graph_pagerank_02_dangling.py` /
+`docs/reports/gpu-mini-fabric-01-graph-pagerank-02-dangling.json`.
+
+**Three real bugs/mistakes found and fixed during these runs, not glossed over**: (1) `cugraph.bfs()`
+marks unreached vertices with the sentinel `distance=2147483647` (INT32_MAX), not `-1` as first
+assumed from the docstring — verified live by direct inspection before fixing the filter; the first
+attempt incorrectly counted all 10,000 nodes as "reached" per seed until this was found. (2) The
+original PageRank gate required `topKOverlap == 1.0`, which contradicted this capability's own
+"numerical tolerance, not bit-identical scores" design principle — recalibrated to `>= 0.95` (spec
+updated to match) since a hard rank-100 cutoff can legitimately flip 1-2 nodes at near-tied scores.
+(3) The #482 misattribution described above. `GraphExecutionSemanticsV1`
+(`graph_execution_semantics.py`) now gates every PageRank comparison — checks `directed`,
+`vertexCount`, `edgeCount`, `ordinalMapChecksum` agree between engines before scores are even
+computed, which is what would have actually caught #482's real bug class. Code:
+`graph_fixture.py` + `graph_struct_01_bfs.py` + `graph_struct_02_pagerank.py` +
+`graph_execution_semantics.py` + `graph_pagerank_02_dangling.py`.
+
+**Staged, not yet built** (see `tasks.md` for the full phased plan and gating order — each phase
+only starts after the prior one passes): Phase C (cuVS CAGRA→HNSW conversion, not hand-written HNSW),
+`BITFROST-SIM-01` +
+`BITFROST-LOD-01` (logical `AtlasAceResidencyV1` hot/warm/cold + LOD-ladder prediction — tested
+against actual next-query reuse, not plausibility), `SOM-CACHE-01` (SOM-neighbor-prefetch vs
+graph-neighbor vs LRU tournament — SOM stays `STEP-08 experimental` unless it beats both baselines),
+`CUTILE-ACE-01` (LEVEL 3 fused cuTile challenger, gated behind `ACE-RADIX-01`'s CUB oracle and a
+LEVEL 2 simple-SIMT proof — graph traversal is explicitly never a first cuTile target), and
+`BITFROST-L2-01` (CUDA `cudaAccessPropertyPersisting` L2 tuning, gated behind a proven logical
+residency policy — L2 reset/persistence is a physical hint layered under BitFrost, never a
+substitute for it, and has no effect on VRAM/OOM headroom).
+
+**GPU-primitive LEVEL discipline** (governs every phase above): LEVEL 1 vendor primitives (cuVS,
+cuGraph, cuBLASLt, CUB) prove architecture; LEVEL 2 simple custom CUDA/SIMT (feature scoring, key
+packing, gather/scatter, LOD masks) proves a fusion opportunity exists; LEVEL 3 cuTile fuses what
+LEVEL 2 proved worth fusing. No level is skipped, and graph traversal (irregular, variable-degree,
+divergent-path) is never a first custom-kernel target.
+
+**See**: `sveltekit-frontend/openspec/changes/parent-atlas-gpu-mini-fabric-01/` (proposal.md,
+design.md, specs/, tasks.md).
+
+### ⚠️ "ACE" naming collision with NVIDIA's own ACE (2026-09-01)
+
+NVIDIA's cuVS HNSW build API also uses the acronym **ACE (Augmented Core Extraction)** — a
+completely unrelated GPU HNSW-graph-build feature. This is NOT the same "ACE" as this repo's
+Atlas context/residency system (`ACEContext`, `ace:*` Redis keys, `assembleACEContext`, etc.).
+**Keep the two explicitly separated in code and naming going forward**: this repo's own contracts
+use names like `AtlasAceResidencyV1` (never a bare `Ace*` that could be confused with NVIDIA's
+cuVS build API), and any future cuVS HNSW integration code must use a distinct name like
+`CuvsHnswAceBuild` rather than a bare `Ace*`. When reading NVIDIA cuVS/HNSW docs or code, "ACE"
+there means their build feature, not this repo's context-assembly system — do not conflate.
+
+### GPU primitive ownership table + radix sort placement (contracts + CUB oracle DRY_RUN_PROVEN, 2026-09-01)
+
+Applying the rule above to a specific recurring question — "where does radix sort / GPU candidate
+reorganization live?" — **radix sort is a BACKEND beneath the ACE/BitFrost `CANONICAL_OWNER` for
+residency/admission, never a peer retrieval-ranking lane** alongside cuVS ANN / cuGraph / lexical
+fusion. Full contracts, design rationale, and the proof gate are in
+`openspec/changes/parent-atlas-ace-radix-residency/` — 25/26 tasks done (`openspec validate
+--strict` passes). **Still no BitFrost production wiring in this change** (per design.md's
+Non-Goals) — only the contracts below are live code; the proof-gate result is a benchmark artifact,
+not a production integration.
+
+**`ACE-RADIX-01` result (`docs/reports/ace-radix-01-results.json`, run 2026-09-01 on this dev host —
+RTX 3060 Ti, CUDA 13.0.48, driver 580.88, sm_86)**: CUB `DeviceRadixSort` matched the CPU `std::sort`
+reference **exactly** at every tested N (256/1000/4000/16000/64000) — `overallVerdict:
+"DRY_RUN_PROVEN"` for the CUB-oracle half. The cuTile challenger half is **`ENVIRONMENT_BLOCKED`**:
+verified live that this host's CUDA 13.0 toolkit ships only `include/crt/cuda_tile.h`, a bare
+compiler-intrinsic stub (`__tile_builtin__ print`), not a usable host-side cuTile programming API —
+confirms this file's own prior note that cuTile went stable on Ampere only at CUDA 13.2. Full
+`ACE-RADIX-01` (both CUB and cuTile matching) stays `NOT_PROVEN` until re-run on a CUDA 13.2+ host.
+Do not claim cuTile eligibility from this result — only the CUB-vs-CPU determinism half is proven.
+Benchmark harness (standalone, deliberately **not** wired into `simd-bridge/cpp/binding.cc` — that
+file has a documented corruption/fragility history in this file's "Key Lessons" section, and
+design.md's Non-Goals require this to stay isolated): `native/ace-radix-01/radix_bench.cu`, built
+directly via `nvcc` (no CMake/node-gyp target). Fixture generator:
+`scripts/atlas/ace-radix-01/fixture-v1.mjs` (deterministic mulberry32 PRNG,
+`node scripts/atlas/ace-radix-01/fixture-v1.test.mjs` regression-proves byte-identical regeneration).
+
+**GPU primitive ownership** (extends the GPU/CPU boundary section below):
+
+| Primitive | Owns | Notes |
+|---|---|---|
+| CUB (radix sort/partition/compact) | BitFrost cache/tensor-materialization reorganization | Required oracle baseline for `ACE-RADIX-01`; determinism vs CPU `std::sort` is the pass condition |
+| cuTile | Challenger only, gated behind CUB | Never introduced merely to have a custom kernel — must match CUB's exact output ordering to become eligible for production |
+| cuBLASLt | Dense candidate scoring / batched projection linear algebra | Not ACE ranking |
+| cuGraph | PageRank/PPR/Leiden/BFS/SSSP | Already the established parity-oracle pipeline (see NetworkX↔cuGraph correction above) — do not add a competing graph-algorithm owner |
+| cuVS | ANN semantic search (exact + CAGRA) | Existing retrieval lane, unchanged by this proposal |
+| ACE/BitFrost | Admission, residency, cache-tier promotion policy | Sole legitimate consumer of `ResidencySortKeyV1`/`PacketGlyphV1` |
+| SOM | Experimental representation/routing only | Never retrieval truth — same non-canonical treatment as `projectionOrdinal`/`gpuNodeId` |
+
+**New contracts (landed, code-live)**:
+- `PacketGlyphV1` — compact ~16-byte-packed-logical struct per candidate packet
+  (`projectionOrdinal`, `featureBits`, `lod`, `residency`, `pagerankQuantized`, `recency`,
+  `somCell`, `flags`) for cheap GPU-local scans over large candidate sets (e.g. 100K candidates in
+  ~1.6MB) before dereferencing an NES-style LOD ladder (LOD0 identity → LOD7 prompt-ready tokens).
+  Never carries `packetKey`. `ResidencySortKeyV1` — GPU-local integer sort key (`tier`, `lod`,
+  `utilityBucket`, `recencyBucket`, `projectionOrdinal`) used only inside BitFrost reorganization,
+  never substitutes for canonical packet identity. Both in
+  `sveltekit-frontend/src/lib/server/atlas/residency/packet-glyph-v1.ts`.
+- `SomCoordinateV1` — experimental 3D SOM topology coordinate (`representationRevision`,
+  `somRevision`, `x`, `y`, `z`, `quantizationError`). Representation-only; its only sanctioned use
+  is measuring whether BMU-neighbor prefetch after a BitFrost cache hit improves locality/hit-rate
+  — not visualization, not retrieval ranking. In
+  `sveltekit-frontend/src/lib/server/atlas/residency/som-coordinate-v1.ts`.
+- `PrefillReceiptV1` / `PrefillContentIdentityV1` (existing, in
+  `sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts`) gained 4 required
+  fields at the QLoRA/ACE/BitFrost boundary: `acePolicyRevision`, `bitfrostRevision`,
+  `residencyPlanChecksum`, `gpuExecutionIdentity`. QLoRA stays fully separate from ACE ranking — it
+  only meets ACE/BitFrost downstream at this receipt, never inside residency/ranking logic. The
+  `.strict()` schema extension was call-site-audited first (`rg` across `src/`, `scripts/`,
+  `python/` — exactly one real call site found, in `prefill-contracts-v1.spec.ts`, updated
+  alongside the schema).
+
+**Proof gate before any production wiring — `ACE-RADIX-01`**: a frozen `PacketGlyphV1` fixture at
+N ∈ {256, 1K, 4K, 16K, 64K}, comparing CPU `std::sort` baseline vs CUB radix (oracle) vs cuTile
+(challenger). Pass/fail criterion is exact-ordering-match determinism only — latency, kernel time,
+H2D/D2H bytes moved, cache-hit lift, and coalescing/materialization lift are recorded but
+non-gating. **CUB-vs-CPU half is `DRY_RUN_PROVEN`** (see result above); cuTile half is
+`ENVIRONMENT_BLOCKED` on this dev host. A future BitFrost integration change must cite a full
+`ACE-RADIX-01` PASS (both halves) as a prerequisite, per this file's enforced status-language rules
+(no "production-ready" from an unproven or partial benchmark).
+
+**See**: `sveltekit-frontend/openspec/changes/parent-atlas-ace-radix-residency/` (proposal.md,
+design.md, specs/, tasks.md — 25/26 tasks done, `openspec validate --strict` passes),
+`docs/reports/ace-radix-01-results.json` (the live benchmark result).
+
 ---
 
 ## 🔐 Atlas Data Persistence + Retrieval Contract (HARD RULES)

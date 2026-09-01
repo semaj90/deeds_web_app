@@ -15,6 +15,10 @@ export const PrefillContentIdentityV1Schema = z.object({
   promptTemplateRevision: revision,
   instructionRevision: revision,
   evidenceRevisionSetHash: sha256HexSchema,
+  acePolicyRevision: revision,
+  bitfrostRevision: revision,
+  residencyPlanChecksum: sha256HexSchema,
+  gpuExecutionIdentity: revision,
   checksumSha256: sha256HexSchema,
 }).strict();
 

@@ -4,6 +4,7 @@
  * are preserved as-is (not stemmed).
  */
 
+import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -34,6 +35,27 @@ export interface FTSOptions {
   topoClass?: string;
 }
 
+const StrictFTSResultSchema = z.object({
+  stable_key: z.string().min(1),
+  file_path: z.string(),
+  symbol_name: z.string().nullable(),
+  symbol_kind: z.string().nullable(),
+  language: z.string().nullable(),
+  content: z.string(),
+  tags: z.string(),
+  topo_class: z.string().nullable(),
+  graph_authority_score: z.coerce.number(),
+  lexical_score: z.coerce.number(),
+  headline: z.string(),
+}).passthrough();
+
+export class PostgresFtsReadErrorV1 extends Error {
+  constructor(readonly code: 'FTS_QUERY_INVALID' | 'FTS_QUERY_FAILED' | 'FTS_RESULT_SCHEMA_REJECTED') {
+    super(code);
+    this.name = 'PostgresFtsReadErrorV1';
+  }
+}
+
 export async function searchCodeLexical(
   query: string,
   opts: FTSOptions = {}
@@ -51,6 +73,38 @@ export async function searchCodeLexical(
   } catch {
     return [];
   }
+}
+
+/**
+ * Strict read-side owner for OaK SEARCH_LEXICAL.
+ * The legacy searchCodeLexical() contract remains fail-open for retrieval
+ * callers; governed DAG execution must distinguish a DB/query failure from
+ * an empty result and must validate the returned row shape.
+ */
+export async function searchCodeLexicalStrictV1(
+  query: string,
+  opts: FTSOptions = {},
+): Promise<FTSResult[]> {
+  const { limit = 20, topoClass = null } = opts;
+  if (!query.trim() || !Number.isInteger(limit) || limit < 1 || limit > 100) {
+    throw new PostgresFtsReadErrorV1('FTS_QUERY_INVALID');
+  }
+
+  let rows: unknown[];
+  try {
+    const result = await pool.query('SELECT * FROM search_code_lexical($1, $2, $3)', [query, limit, topoClass]);
+    rows = result.rows as unknown[];
+  } catch {
+    throw new PostgresFtsReadErrorV1('FTS_QUERY_FAILED');
+  }
+
+  const validated: FTSResult[] = [];
+  for (const row of rows) {
+    const parsed = StrictFTSResultSchema.safeParse(row);
+    if (!parsed.success) throw new PostgresFtsReadErrorV1('FTS_RESULT_SCHEMA_REJECTED');
+    validated.push(parsed.data as FTSResult);
+  }
+  return validated;
 }
 
 export interface HybridPgResult {

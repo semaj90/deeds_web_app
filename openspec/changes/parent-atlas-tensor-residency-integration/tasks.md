@@ -332,7 +332,13 @@
       current data volume") still stands, but for a narrower and more honest reason: today's
       *endpoint*, as built, always pays full index-build cost per call, which is unambiguously
       worse than exact brute-force regardless of any true persistent-index crossover point.
-- [ ] T6b-p CAGRA persistent-index benchmark: build once, warm up, search-only p50/p95.
+- [x] T6b-p CAGRA persistent-index benchmark: build once, warm up, search-only p50/p95.
+  **BOUNDED_FIXTURE_PROVEN 2026-09-01**: WSL2 `atlas-rapids-cu13`, cuVS
+  `26.06.00`, 256x64 corpus, 8 queries, K=16, 10 search repeats, seed 42.
+  Persistent CAGRA built once; build excluded from search timing; recall@K
+  minimum/mean `1.0`; search P50 `2.5037 ms`, P95 `34.9074 ms`; writes
+  attempted `false`. This closes the bounded fixture gate only; full-corpus
+  benchmark, production identity reconciliation, and promotion remain open.
       **NOT_PROVEN, not started.** Needs a sidecar change (persist the CAGRA index handle across
       requests instead of rebuilding per-call) before this can be measured. Until this exists,
       no claim about CAGRA's true crossover point (build-once-search-many) can be made — T6b-e
@@ -778,7 +784,18 @@ read-only or contract-first until their stated proof exists.
   version/API revision; absence of RMM must not block PyTorch residency.
 - [ ] **GPU-EXP-12** Prove one H2D transfer followed by repeated resident reuse,
   with eviction under measured VRAM pressure and no pointer leakage.
-  **PARTIAL, checked 2026-08-31**: the most recent commit (`435967f7c7`, same day, "Tightened the
+  **PARTIAL, rechecked 2026-09-01 on WSL2**: `atlas-rapids-cu13`
+  (`/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`), PyTorch
+  `2.13.0+cu130`, CUDA available, NVIDIA GeForce RTX 3060 Ti. Fresh receipt:
+  `docs/reports/candidate-feature-gpu-residency-proof-v4.json`; 1 initial H2D,
+  2 same-process resident reuses, content/ordinal/feature parity, post-release
+  access blocked, raw pointers not exposed, and `storeWrites: false`. This
+  supersedes the prior 2026-08-31 observation and confirms the first two
+  clauses on the intended workstation GPU path. It still does **not** cover
+  measured VRAM-pressure-triggered eviction: release was explicit and
+  `memoryAfterRelease.allocatedBytes` returned to zero. Keep this task open
+  until a bounded pressure test records an eviction event and receipt.
+  The earlier commit (`435967f7c7`, same day, "Tightened the
   live CUDA reuse proof") landed `docs/reports/candidate-feature-gpu-residency-proof-v3.json` —
   status `CANDIDATE_FEATURE_GPU_RESIDENCY_BOUNDED_PROVEN`, 1 initial H2D transfer, 2 resident
   reuses, `rawPointersExposed: false`, allocated bytes returned to zero after release. This covers

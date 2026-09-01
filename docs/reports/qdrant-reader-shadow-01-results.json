@@ -1,0 +1,1317 @@
+{
+  "schema": "atlas.qdrant-reader-shadow-01.v1",
+  "task": "QDRANT-READER-SHADOW-01",
+  "readOnly": true,
+  "writesPerformed": false,
+  "method": "Frozen query set = 50 already-proven-correct generation-B vectors (no new embedding calls). Same vector, same limit=5, submitted via /points/search against both codebase_chunks_768 (current default reader) and codebase_chunks_768_v2 (code-declared canonical), compared.",
+  "sampleSize": 50,
+  "results": {
+    "top1SelfMatch_currentReader_768": "29/50 (58%)",
+    "top1SelfMatch_canonical_768v2": "50/50 (100%)",
+    "duplicateSourceRefInTop5_768": "50/50 (100%) -- every single query returns its own source file as more than one distinct point in the top-5",
+    "duplicateSourceRefInTop5_768v2": "43/50 (86%) -- not yet distinguished from legitimate multi-chunk-per-file results; not investigated further this pass"
+  },
+  "interpretation": "ACTIVE_RETRIEVAL_RISK is now MEASURED, not just proven possible. Querying a chunk with its own exact content against the live default collection (_768) fails to return that exact chunk as the #1 result 42% of the time -- beaten out by a near-duplicate point (same source_ref, different point id, near-identical score, consistent with the C1 stale-generation contamination already found) or, in a minority of sampled cases, a genuinely different file entirely. The canonical collection (_768_v2) returns the exact self-match 100% of the time on the same queries.",
+  "fullResults": [
+    {
+      "source_ref": "src/lib/types/evidence.ts",
+      "queryPointId_B": "0417b9e4-621b-45d5-b623-f814513440ad",
+      "top1_A_id": "0417b9e4-621b-45d5-b623-f814513440ad",
+      "top1_A_score": 1.0062714,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "0417b9e4-621b-45d5-b623-f814513440ad",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/evidence.ts",
+        "sveltekit-frontend/src/lib/types/evidence.ts",
+        "src/lib/server/unified/legal-ai-service.ts",
+        "src/lib/server/unified/legal-ai-service.ts",
+        "src/lib/types/evidence.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/evidence.ts",
+        "src/lib/server/unified/legal-ai-service.ts",
+        "src/lib/types/evidence.ts",
+        "src/lib/utils/type-guards.ts",
+        "src/lib/server/storage/.phase105-backup/1768605014945-minio-service.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "queryPointId_B": "d3563b7d-89e2-46ba-badf-2b15c7f1f8e9",
+      "top1_A_id": 44232,
+      "top1_A_score": 1.0047569,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "d3563b7d-89e2-46ba-badf-2b15c7f1f8e9",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/utils/progressive-enhancement-audit.ts",
+        "src/lib/utils/progressive-enhancement-audit.ts",
+        "src/lib/types/svelte5-api-types.d.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/utils/progressive-enhancement-audit.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/components/ui/Form.svelte"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "queryPointId_B": "175ee2bd-f771-4d3f-bfbd-d6aa7aed7ad8",
+      "top1_A_id": "175ee2bd-f771-4d3f-bfbd-d6aa7aed7ad8",
+      "top1_A_score": 1.0053577,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "175ee2bd-f771-4d3f-bfbd-d6aa7aed7ad8",
+      "top1_D_score": 0.9999993,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/components/ui/modular/types.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/components/ui/modular/types.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/server/api/response-helper.ts",
+        "src/lib/types/svelte5-api-types.d.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-gpu-cache.ts",
+      "queryPointId_B": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+      "top1_A_id": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+      "top1_A_score": 1.0042896,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/services/error-analysis/types.ts",
+      "queryPointId_B": "f9975088-26ca-475f-925a-60cd5cb7ee62",
+      "top1_A_id": 52020,
+      "top1_A_score": 1.0029602,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "f9975088-26ca-475f-925a-60cd5cb7ee62",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "sveltekit-frontend/src/lib/server/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/services/error-analysis/types.ts",
+        "src/lib/server/codeintel/fix-recommender.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/workers/compute-pool.ts",
+      "queryPointId_B": "c6c66eb3-4f10-4c92-8309-eac8e62b920b",
+      "top1_A_id": "c6c66eb3-4f10-4c92-8309-eac8e62b920b",
+      "top1_A_score": 1.0086365,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "c6c66eb3-4f10-4c92-8309-eac8e62b920b",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/server/workers/compute-pool.ts",
+        "src/lib/services/error-analysis/CacheService.ts",
+        "src/lib/gpu/gpu-compute-pipeline.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/database.ts",
+      "queryPointId_B": "5623c38c-c215-40ed-98e4-54648ef2f778",
+      "top1_A_id": "5623c38c-c215-40ed-98e4-54648ef2f778",
+      "top1_A_score": 0.9924965,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "5623c38c-c215-40ed-98e4-54648ef2f778",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/server/vector/pgvector.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/database.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/server/vector/pgvector.ts",
+        "src/lib/server/vector/pgvector.ts",
+        "src/lib/types/database.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "queryPointId_B": "a13dc246-c44c-4b8e-a702-89df7f9c3235",
+      "top1_A_id": 34113,
+      "top1_A_score": 1.0067673,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "a13dc246-c44c-4b8e-a702-89df7f9c3235",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "src/lib/components/ui/gaming/types/gaming-types.ts",
+        "src/lib/components/ui/gaming/types/gaming-types.ts",
+        "src/lib/components/ui/gaming/types/gaming-types-minimal.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "src/lib/components/ui/gaming/types/gaming-types.ts",
+        "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "src/lib/components/dashboard/gamification-types.ts",
+        "src/lib/types/sharedTypes.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "queryPointId_B": "dcde23a2-ad0a-4ae7-a38c-44c1bf7a1df8",
+      "top1_A_id": 46152,
+      "top1_A_score": 0.9992733,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "dcde23a2-ad0a-4ae7-a38c-44c1bf7a1df8",
+      "top1_D_score": 0.9999999,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/server/grpc/embedding-client.ts",
+        "src/lib/server/grpc/embedding-client.ts",
+        "src/lib/server/llm/ollama-client.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/svelte5-api-types.d.ts",
+        "src/lib/server/llm/ollama-client.ts",
+        "src/lib/server/grpc/embedding-client.ts",
+        "src/lib/server/ai/caching-layer.ts",
+        "src/lib/server/ai/cached-stream.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/server/analysis/analysis-jobs.ts",
+      "queryPointId_B": "69313a0a-1be6-4fa0-acc2-8dc5adfcddf8",
+      "top1_A_id": 22733,
+      "top1_A_score": 1.006876,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "69313a0a-1be6-4fa0-acc2-8dc5adfcddf8",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/lib/server/analysis/analysis-jobs.ts",
+        "src/routes/api/evidence/upload/+server.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/services/knowledge-search/types.ts",
+      "queryPointId_B": "75242b83-6296-4395-9afd-1e23637b5e3e",
+      "top1_A_id": 25151,
+      "top1_A_score": 1.0101681,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "75242b83-6296-4395-9afd-1e23637b5e3e",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/types/qdrant.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/services/knowledge-search/types.ts",
+        "src/lib/types/qdrant.ts",
+        "src/lib/server/types/synthesis.ts",
+        "src/lib/server/llm/ollama-client.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/types/synthesis.ts",
+      "queryPointId_B": "811c84a8-fd8e-49cf-95df-d0b340296e06",
+      "top1_A_id": 27575,
+      "top1_A_score": 1.010994,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "811c84a8-fd8e-49cf-95df-d0b340296e06",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/types/synthesis.ts",
+        "src/lib/server/types/synthesis.ts",
+        "src/lib/server/ai/langgraph-client.ts",
+        "src/lib/server/ai/langgraph-client.ts",
+        "src/lib/types/chat.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/types/synthesis.ts",
+        "src/lib/server/ai/langgraph-client.ts",
+        "src/lib/types/chat.ts",
+        "src/lib/types/source-validation.ts",
+        "src/lib/types/api.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "queryPointId_B": "65e94c4f-3904-457d-b871-5f91dd79b23a",
+      "top1_A_id": "65e94c4f-3904-457d-b871-5f91dd79b23a",
+      "top1_A_score": 1.002037,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "65e94c4f-3904-457d-b871-5f91dd79b23a",
+      "top1_D_score": 0.99999994,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/graph/gpu-graph-analysis.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/graph/gpu-graph-analysis.ts",
+        "src/lib/server/gpu/libtorch-bridge.ts",
+        "src/lib/server/gpu/background-analyzer.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/stores/unified/index.svelte.ts",
+      "queryPointId_B": "5b7c4ffa-1f21-4345-85d2-cdd2895876cf",
+      "top1_A_id": "5b7c4ffa-1f21-4345-85d2-cdd2895876cf",
+      "top1_A_score": 1.0063286,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "5b7c4ffa-1f21-4345-85d2-cdd2895876cf",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/unified/index.svelte.ts",
+        "src/lib/stores/notifications.svelte.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/docling.ts",
+      "queryPointId_B": "3244460f-e32d-46be-aa64-5a0aacabfde0",
+      "top1_A_id": 11617,
+      "top1_A_score": 1.0121689,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "3244460f-e32d-46be-aa64-5a0aacabfde0",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/docling.ts",
+        "src/lib/server/docling.ts",
+        "src/lib/server/docling.ts",
+        "src/lib/server/docling.ts",
+        "src/lib/components/types.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/docling.ts",
+        "src/lib/server/docling.ts",
+        "src/lib/components/types.ts",
+        "src/lib/gpu/markdown-processor.ts",
+        "src/lib/server/docling.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/vector/multi-store.ts",
+      "queryPointId_B": "f9c3df5b-a801-42cc-813f-aa1ba76ba1c8",
+      "top1_A_id": 52072,
+      "top1_A_score": 1.0085144,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "f9c3df5b-a801-42cc-813f-aa1ba76ba1c8",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/vector/multi-store.ts",
+        "sveltekit-frontend/src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/PgVectorService.ts",
+        "src/lib/server/vector/PgVectorService.ts",
+        "src/lib/server/ai/caching-layer.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/PgVectorService.ts",
+        "src/lib/server/ai/caching-layer.ts",
+        "src/lib/server/batch-embedder.ts",
+        "src/lib/server/ml/feedback-store.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/machines/retrieval-machine.ts",
+      "queryPointId_B": "607690b1-cc5d-4463-98b1-b4df370466ae",
+      "top1_A_id": 20983,
+      "top1_A_score": 0.9997883,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "607690b1-cc5d-4463-98b1-b4df370466ae",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/codebase-context.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/server/retrieval/codebase-context.ts",
+        "src/lib/server/indexer/ast-chunker.ts",
+        "src/lib/types/pipeline.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/observability/inference-log.ts",
+      "queryPointId_B": "23d48f77-f99b-406b-bdf2-145c5e647b0a",
+      "top1_A_id": "23d48f77-f99b-406b-bdf2-145c5e647b0a",
+      "top1_A_score": 1.0077229,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "23d48f77-f99b-406b-bdf2-145c5e647b0a",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts",
+        "src/lib/server/observability/inference-log.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/global.ts",
+      "queryPointId_B": "19ed587a-ec8d-4337-8afe-0d974dd387ba",
+      "top1_A_id": "19ed587a-ec8d-4337-8afe-0d974dd387ba",
+      "top1_A_score": 1.0022335,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "19ed587a-ec8d-4337-8afe-0d974dd387ba",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/global.ts",
+        "src/lib/types/global.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/server/vector/pgvector.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/global.ts",
+        "src/lib/types/sharedTypes.ts",
+        "src/lib/server/vector/pgvector.ts",
+        "src/lib/stores/notifications.svelte.ts",
+        "src/lib/types/chat.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-test-rag.ts",
+      "queryPointId_B": "4b4588f9-2d48-450a-977f-c71e4e635d32",
+      "top1_A_id": 16687,
+      "top1_A_score": 1.0047989,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "4b4588f9-2d48-450a-977f-c71e4e635d32",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-test-rag.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "queryPointId_B": "3c104de5-bcc2-4181-b6bc-c72bc3369743",
+      "top1_A_id": "3c104de5-bcc2-4181-b6bc-c72bc3369743",
+      "top1_A_score": 1.008955,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "3c104de5-bcc2-4181-b6bc-c72bc3369743",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema/legal-cases.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema/legal-cases.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/vector/multi-store.ts",
+      "queryPointId_B": "65853348-ac5a-4c25-979b-927a3a5b7108",
+      "top1_A_id": 21993,
+      "top1_A_score": 1.0051193,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "65853348-ac5a-4c25-979b-927a3a5b7108",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/unified/legal-ai-service.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/vector/multi-store.ts",
+        "src/lib/server/unified/legal-ai-service.ts",
+        "src/lib/types/external-services.ts",
+        "src/lib/webgpu/webgpu-similarity-service.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/machines/retrieval-machine.ts",
+      "queryPointId_B": "bb77c08d-43af-445f-9965-70fe1357819e",
+      "top1_A_id": "bb77c08d-43af-445f-9965-70fe1357819e",
+      "top1_A_score": 1.0016117,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "bb77c08d-43af-445f-9965-70fe1357819e",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/codebase-context.ts",
+        "src/lib/server/retrieval/codebase-context.ts",
+        "src/lib/server/indexer/ast-chunker.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/server/retrieval/codebase-context.ts",
+        "src/lib/server/indexer/ast-chunker.ts",
+        "src/lib/machines/retrieval-machine.ts",
+        "src/lib/server/analytics/mapreduce-matrix-analysis.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/config/ollama.ts",
+      "queryPointId_B": "5ccdc361-c386-40d8-8e2e-7ec6aaf0bc3c",
+      "top1_A_id": "5ccdc361-c386-40d8-8e2e-7ec6aaf0bc3c",
+      "top1_A_score": 1.003685,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "5ccdc361-c386-40d8-8e2e-7ec6aaf0bc3c",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/config/ollama.ts",
+        "src/lib/server/config/ollama.ts",
+        "src/lib/server/config/ollama.ts",
+        "src/lib/server/config/ollama.ts",
+        "src/lib/services/error-analysis/OllamaService.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/config/ollama.ts",
+        "src/lib/server/config/ollama.ts",
+        "src/lib/services/error-analysis/OllamaService.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/llm/ollama-client.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "queryPointId_B": "1106f332-4b5c-439c-85aa-ea3268bb18c1",
+      "top1_A_id": 4729,
+      "top1_A_score": 0.9953804,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "1106f332-4b5c-439c-85aa-ea3268bb18c1",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema/codebase-intelligence.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/external-services.ts",
+      "queryPointId_B": "f9a00f44-75ce-4fb3-8644-b52fdfcf519b",
+      "top1_A_id": "f9a00f44-75ce-4fb3-8644-b52fdfcf519b",
+      "top1_A_score": 1.0011711,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "f9a00f44-75ce-4fb3-8644-b52fdfcf519b",
+      "top1_D_score": 0.9999993,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/external-services.ts",
+        "src/lib/types/external-services.ts",
+        "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "sveltekit-frontend/src/lib/server/qdrant-http.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/external-services.ts",
+        "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "src/lib/server/qdrant-http.ts",
+        "src/lib/services/error-analysis/RAGRetriever.ts",
+        "src/lib/types/external-services.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/types/kag.ts",
+      "queryPointId_B": "fd345802-60eb-44d4-8313-f6b7e3667b7c",
+      "top1_A_id": 52778,
+      "top1_A_score": 1.016428,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "fd345802-60eb-44d4-8313-f6b7e3667b7c",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/types/kag.ts",
+        "sveltekit-frontend/src/lib/server/types/kag.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/server/types/kag.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/types/kag.ts",
+        "src/lib/server/grpc/retrieval-client.ts",
+        "src/lib/server/types/kag.ts",
+        "src/lib/server/types/kag.ts",
+        "src/lib/server/retrieval/query-expander.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/gpu/background-analyzer.ts",
+      "queryPointId_B": "c43cc26b-7abf-4bcd-86bd-49452f6fe18f",
+      "top1_A_id": "c43cc26b-7abf-4bcd-86bd-49452f6fe18f",
+      "top1_A_score": 1.0059032,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "c43cc26b-7abf-4bcd-86bd-49452f6fe18f",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "packages/parent-atlas-retrieval/src/gpu/background-analyzer.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "packages/parent-atlas-retrieval/src/gpu/background-analyzer.ts",
+        "src/lib/server/gpu/background-analyzer.ts",
+        "packages/parent-atlas-retrieval/src/gpu/background-analyzer.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/legal-corpus-views.ts",
+      "queryPointId_B": "b31ccfac-af09-46d5-b47b-b6112e30076e",
+      "top1_A_id": "b31ccfac-af09-46d5-b47b-b6112e30076e",
+      "top1_A_score": 1.0128422,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "b31ccfac-af09-46d5-b47b-b6112e30076e",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/adapters/legal-corpus.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/adapters/legal-corpus.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/ai/ollama-config.ts",
+      "queryPointId_B": "74df6d5e-5130-4ded-a489-7e229ac2def4",
+      "top1_A_id": "74df6d5e-5130-4ded-a489-7e229ac2def4",
+      "top1_A_score": 1.0069122,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "74df6d5e-5130-4ded-a489-7e229ac2def4",
+      "top1_D_score": 1.0000005,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts",
+        "src/lib/server/ai/ollama-config.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/relations.ts",
+      "queryPointId_B": "5e9e93a3-707b-494e-8fee-4083b10ec8bb",
+      "top1_A_id": "5e9e93a3-707b-494e-8fee-4083b10ec8bb",
+      "top1_A_score": 1.0139198,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "5e9e93a3-707b-494e-8fee-4083b10ec8bb",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/relations.ts",
+        "src/lib/server/db/relations.ts",
+        "sveltekit-frontend/src/lib/server/db/relations.ts",
+        "src/lib/server/db/relations.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/relations.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/relations.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/legal/constitution-registry.ts",
+      "queryPointId_B": "dbb0fbce-bd6b-49c4-a655-9a9e5af7f090",
+      "top1_A_id": 45925,
+      "top1_A_score": 1.0017223,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "dbb0fbce-bd6b-49c4-a655-9a9e5af7f090",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts",
+        "sveltekit-frontend/src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts",
+        "src/lib/server/legal/constitution-registry.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/lucia.ts",
+      "queryPointId_B": "ec5bfe6e-a339-4c44-8411-ed5a1a5c086e",
+      "top1_A_id": 49191,
+      "top1_A_score": 1.0111713,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "ec5bfe6e-a339-4c44-8411-ed5a1a5c086e",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts",
+        "src/lib/server/lucia.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/poi.ts",
+      "queryPointId_B": "c638f0b1-7ec6-4d76-9fbb-b270b41017ef",
+      "top1_A_id": "c638f0b1-7ec6-4d76-9fbb-b270b41017ef",
+      "top1_A_score": 1.0023689,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "c638f0b1-7ec6-4d76-9fbb-b270b41017ef",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts",
+        "src/lib/types/poi.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-gpu-cache.ts",
+      "queryPointId_B": "68c881f9-234b-40c2-b1c1-50c18eacd7a9",
+      "top1_A_id": "68c881f9-234b-40c2-b1c1-50c18eacd7a9",
+      "top1_A_score": 1.0046024,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "68c881f9-234b-40c2-b1c1-50c18eacd7a9",
+      "top1_D_score": 1.0000001,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts",
+        "src/lib/server/db/schema-gpu-cache.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/cartridge/glyph-mappers.ts",
+      "queryPointId_B": "dfa2bd9c-f23a-47a3-8420-db56da755a2c",
+      "top1_A_id": 46700,
+      "top1_A_score": 0.99873734,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "dfa2bd9c-f23a-47a3-8420-db56da755a2c",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/cartridge/glyph-mappers.ts",
+        "src/lib/server/glyph/glyph-mappers.ts",
+        "src/lib/server/glyph/glyph-mappers.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/global.ts",
+      "queryPointId_B": "11f3f170-2e46-4c59-a500-7a0882e0f7b2",
+      "top1_A_id": "11f3f170-2e46-4c59-a500-7a0882e0f7b2",
+      "top1_A_score": 1.0009766,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "11f3f170-2e46-4c59-a500-7a0882e0f7b2",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/global.ts",
+        "src/lib/types/global.ts",
+        "src/lib/types.ts",
+        "src/lib/types.ts",
+        "src/lib/utils/type-guards.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/global.ts",
+        "src/lib/types.ts",
+        "src/lib/services/api-client.ts",
+        "src/lib/utils/type-guards.ts",
+        "src/lib/stores/unified/evidence-store.svelte.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/stores.svelte.ts",
+      "queryPointId_B": "eca286cc-f083-4c32-9dc5-834d57ac0f35",
+      "top1_A_id": "eca286cc-f083-4c32-9dc5-834d57ac0f35",
+      "top1_A_score": 1.0066395,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "eca286cc-f083-4c32-9dc5-834d57ac0f35",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores.svelte.ts",
+        "src/lib/stores/index.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema/ace-web-crawl.ts",
+      "queryPointId_B": "a51c20d5-ccec-43d6-b153-3dcf63099800",
+      "top1_A_id": 34928,
+      "top1_A_score": 1.009779,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "a51c20d5-ccec-43d6-b153-3dcf63099800",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/external-services.ts",
+      "queryPointId_B": "50e54cec-e6f6-40f0-b39b-8e50eae741cc",
+      "top1_A_id": "50e54cec-e6f6-40f0-b39b-8e50eae741cc",
+      "top1_A_score": 1.0061092,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "50e54cec-e6f6-40f0-b39b-8e50eae741cc",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/external-services.ts",
+        "src/lib/types/external-services.ts",
+        "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
+        "src/lib/server/db/qdrant-integration.ts",
+        "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/external-services.ts",
+        "src/lib/server/db/qdrant-integration.ts",
+        "src/lib/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "src/lib/types/external-services.ts",
+        "src/lib/services/knowledge-search/PostgresKnowledgeStore.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/utils/route-operation-logger.ts",
+      "queryPointId_B": "a29ce660-7175-4af7-9527-2d0e8e6fcf94",
+      "top1_A_id": "a29ce660-7175-4af7-9527-2d0e8e6fcf94",
+      "top1_A_score": 1.003479,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "a29ce660-7175-4af7-9527-2d0e8e6fcf94",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/utils/route-operation-logger.ts",
+        "src/lib/utils/route-operation-logger.ts",
+        "src/lib/server/indexer/ast-ingest-logger.ts",
+        "src/lib/server/indexer/ast-ingest-logger.ts",
+        "src/lib/utils/route-operation-logger.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/utils/route-operation-logger.ts",
+        "src/lib/server/indexer/ast-ingest-logger.ts",
+        "src/lib/utils/route-operation-logger.ts",
+        "src/lib/server/queue/rabbitmq-manager-fixed.ts",
+        "src/lib/server/concurrency/queue-manager.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/indexer/karpathy-wiki.ts",
+      "queryPointId_B": "28b23a2b-6692-406b-bf49-3b9d3bd35db3",
+      "top1_A_id": "28b23a2b-6692-406b-bf49-3b9d3bd35db3",
+      "top1_A_score": 1.0025272,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "28b23a2b-6692-406b-bf49-3b9d3bd35db3",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/retrieval/orchestrator.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/retrieval/orchestrator.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts",
+        "src/lib/server/indexer/karpathy-wiki.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/api.ts",
+      "queryPointId_B": "90b66f68-6740-400d-ae8a-ede7a6006f30",
+      "top1_A_id": "90b66f68-6740-400d-ae8a-ede7a6006f30",
+      "top1_A_score": 1.0015564,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "90b66f68-6740-400d-ae8a-ede7a6006f30",
+      "top1_D_score": 0.99999994,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/api.ts",
+        "src/lib/types/api.ts",
+        "src/lib/types/global.ts",
+        "src/lib/types/global.ts",
+        "src/lib/server/unified/legal-ai-service.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/api.ts",
+        "src/lib/types/global.ts",
+        "src/lib/server/unified/legal-ai-service.ts",
+        "src/lib/types/agent.ts",
+        "src/lib/server/db/ssr-health-check.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/config/env.server.ts",
+      "queryPointId_B": "4026160d-d733-4bca-a319-9335e8335edb",
+      "top1_A_id": "4026160d-d733-4bca-a319-9335e8335edb",
+      "top1_A_score": 0.9988575,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "4026160d-d733-4bca-a319-9335e8335edb",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/server/minio.ts",
+        "src/lib/server/minio.ts",
+        "src/lib/services/knowledge-search/MinioKnowledgeStore.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/config/env.server.ts",
+        "src/lib/server/minio.ts",
+        "src/lib/server/minio-client.ts",
+        "src/lib/services/knowledge-search/MinioKnowledgeStore.ts",
+        "src/lib/server/minio/client.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": false
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-postgres.ts",
+      "queryPointId_B": "4fc5dd43-3ef2-42db-9a41-321431f543ed",
+      "top1_A_id": 17554,
+      "top1_A_score": 1.0115166,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "4fc5dd43-3ef2-42db-9a41-321431f543ed",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/legal-corpus-views.ts",
+      "queryPointId_B": "77c57adc-1714-4d80-a59c-e09da6e8ed13",
+      "top1_A_id": 25659,
+      "top1_A_score": 1.0027504,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "77c57adc-1714-4d80-a59c-e09da6e8ed13",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "sveltekit-frontend/src/lib/adapters/legal-corpus.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/lib/adapters/legal-corpus.ts",
+        "src/lib/types/legal-corpus-views.ts",
+        "src/routes/(app)/legal-corpus/[id]/+page.svelte"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/yorha-interface.ts",
+      "queryPointId_B": "b2c3d696-8c2d-4702-9073-7dd41e8a3133",
+      "top1_A_id": 37714,
+      "top1_A_score": 1.0070381,
+      "top1_A_isSelfB": false,
+      "top1_D_id": "b2c3d696-8c2d-4702-9073-7dd41e8a3133",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/types/yorha-interface.ts",
+        "src/lib/components/ui/gaming/types/gaming-types.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-web.ts",
+      "queryPointId_B": "b72cdc35-4d10-48b6-b4a5-fc9b73301e8e",
+      "top1_A_id": "b72cdc35-4d10-48b6-b4a5-fc9b73301e8e",
+      "top1_A_score": 0.9994335,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "b72cdc35-4d10-48b6-b4a5-fc9b73301e8e",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "sveltekit-frontend/src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema-web.ts",
+        "src/lib/server/db/schema/ace-web-crawl.ts",
+        "src/lib/server/db/schema-postgres.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/types/database.ts",
+      "queryPointId_B": "583f9427-714b-48d6-aa55-d3abe02af18e",
+      "top1_A_id": "583f9427-714b-48d6-aa55-d3abe02af18e",
+      "top1_A_score": 1.0158939,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "583f9427-714b-48d6-aa55-d3abe02af18e",
+      "top1_D_score": 1.0000002,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts",
+        "src/lib/types/database.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    },
+    {
+      "source_ref": "src/lib/config/env.server.ts",
+      "queryPointId_B": "c4500063-b94d-4687-9705-566180006d1c",
+      "top1_A_id": "c4500063-b94d-4687-9705-566180006d1c",
+      "top1_A_score": 1.0044479,
+      "top1_A_isSelfB": true,
+      "top1_D_id": "c4500063-b94d-4687-9705-566180006d1c",
+      "top1_D_score": 1,
+      "top1_D_isSelfD": true,
+      "topK_A_sourceRefs": [
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.ts"
+      ],
+      "topK_D_sourceRefs": [
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/config/env.ts",
+        "src/lib/config/env.server.ts",
+        "src/lib/config/redis-config.ts"
+      ],
+      "duplicateSourceRefInTopK_A": true,
+      "duplicateSourceRefInTopK_D": true
+    }
+  ]
+}

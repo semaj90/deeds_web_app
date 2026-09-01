@@ -1,0 +1,613 @@
+{
+  "schema": "atlas.qdrant-reader-fix-02-canary.v1",
+  "task": "QDRANT-READER-FIX-02 bounded live canary",
+  "readOnly": true,
+  "writesPerformed": false,
+  "calledVia": "searchCodebaseAnn() -- the actual wired public entry point, no collection arg (default path)",
+  "sampleSize": 50,
+  "allHitsHaveContent": true,
+  "top1SelfMatchCount": 47,
+  "zeroHitQueries": 0,
+  "results": [
+    {
+      "source_ref": "src/lib/types/evidence.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "0417b9e4-621b-45d5-b623-f814513440ad",
+        "source_ref": "src/lib/types/evidence.ts",
+        "contentLength": 111,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/ai/contextual-tools.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "bb27aadf-067c-46b8-aa2a-bb54556e2503",
+        "source_ref": "src/lib/server/ai/contextual-tools.ts",
+        "contentLength": 798,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "d3563b7d-89e2-46ba-badf-2b15c7f1f8e9",
+        "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+        "contentLength": 368,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/cases/ContextualChatModal.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "d78624eb-966f-449a-a1e6-bb4f47a20d7a",
+        "source_ref": "src/lib/components/cases/ContextualChatModal.svelte",
+        "contentLength": 4000,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/gpu/AGENTS.md",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "8c76ee2c-02bd-4ed1-90e8-bf11b3877a70",
+        "source_ref": "src/lib/server/gpu/AGENTS.md",
+        "contentLength": 663,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/detective-command/+page.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "c1eebdf2-8c43-44eb-a3af-2ba23655af15",
+        "source_ref": "src/routes/(app)/admin/ai-dashboard/operator/+page.ts",
+        "contentLength": 25,
+        "semantic_score": 1,
+        "isSelfMatch": false
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/ui/alert-dialog/types.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "e3fb9b5f-cef1-4d41-bb03-f1b843f4950d",
+        "source_ref": "src/lib/components/ui/alert-dialog/types.ts",
+        "contentLength": 94,
+        "semantic_score": 1.0000002,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/glyph/AGENTS.md",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "8855eb76-5c07-406b-b26a-bc813d628c39",
+        "source_ref": "src/lib/server/glyph/AGENTS.md",
+        "contentLength": 785,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/ai/SimpleWorkingChat.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "69d32944-69dd-4d72-a741-8ae18cd39b84",
+        "source_ref": "src/lib/components/ai/SimpleWorkingChat.svelte",
+        "contentLength": 4000,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/db/pgvector-utils.temp.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "560fd203-c764-41d8-8991-d823ae925521",
+        "source_ref": "src/lib/server/db/pgvector-utils.temp.ts",
+        "contentLength": 1068,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/admin/TagSelector.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "e36bde19-b707-428b-91ca-e5d1aea0bee9",
+        "source_ref": "src/lib/components/admin/TagSelector.svelte",
+        "contentLength": 4000,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "4eb27625-447d-4460-b924-73f963ca2846",
+        "source_ref": "src/routes/api/library/documents/[documentId]/toc/+server.ts",
+        "contentLength": 2204,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "651f9be1-5669-4718-b4a2-4cd633e1d8b8",
+        "source_ref": "src/routes/(app)/admin/unified-indexing-studio/+page.svelte",
+        "contentLength": 783,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "175ee2bd-f771-4d3f-bfbd-d6aa7aed7ad8",
+        "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+        "contentLength": 256,
+        "semantic_score": 0.9999993,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-gpu-cache.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+        "source_ref": "src/lib/server/db/schema-gpu-cache.ts",
+        "contentLength": 86,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/mcp/new_tools.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "b79003b3-a35e-4fa4-a84c-6544bc364384",
+        "source_ref": "src/mcp/new_tools.ts",
+        "contentLength": 786,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/pgai/AGENTS.md",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "fd584763-eb05-49c5-8486-dc1034d75bb4",
+        "source_ref": "src/lib/server/pgai/AGENTS.md",
+        "contentLength": 734,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/utils/progressive-enhancement-audit.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "e074acfc-cdb9-4bc3-9b0a-b2ad322b7e48",
+        "source_ref": "src/lib/utils/progressive-enhancement-audit.ts",
+        "contentLength": 644,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/shared/chr97-reader.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "89fb8f6a-3130-445e-965c-94845a41e461",
+        "source_ref": "src/lib/shared/chr97-reader.ts",
+        "contentLength": 634,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/db/schema-timeline.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "a4218e45-4415-45f3-8e05-df114225da70",
+        "source_ref": "src/lib/server/db/schema-timeline.ts",
+        "contentLength": 407,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/ai/client-embed.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "a4e00a31-81e1-4b5b-ad47-518c0791ce70",
+        "source_ref": "src/lib/ai/client-embed.ts",
+        "contentLength": 672,
+        "semantic_score": 1.0000002,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "1c9f3c59-c524-4c89-b668-92e7f6a7b73a",
+        "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+        "contentLength": 777,
+        "semantic_score": 1,
+        "isSelfMatch": false
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/routing/query-router-4x4.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "32c22b8e-8d02-4ffa-b3f8-f2b787691f6c",
+        "source_ref": "src/lib/server/routing/query-router-4x4.ts",
+        "contentLength": 793,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/db/connections.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "3209267b-07b7-45a3-af76-0fab9370532e",
+        "source_ref": "src/lib/server/db/connections.ts",
+        "contentLength": 532,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/services/error-analysis/types.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "f9975088-26ca-475f-925a-60cd5cb7ee62",
+        "source_ref": "src/lib/services/error-analysis/types.ts",
+        "contentLength": 359,
+        "semantic_score": 1.0000002,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/workers/compute-pool.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "c6c66eb3-4f10-4c92-8309-eac8e62b920b",
+        "source_ref": "src/lib/server/workers/compute-pool.ts",
+        "contentLength": 108,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/types/database.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "5623c38c-c215-40ed-98e4-54648ef2f778",
+        "source_ref": "src/lib/types/database.ts",
+        "contentLength": 276,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/ai/ollama-client.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "554769aa-5274-4e5c-a956-08b984a9ff0f",
+        "source_ref": "src/lib/server/ai/ollama-client.ts",
+        "contentLength": 102,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/webgpu/webgpu-similarity-service.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "249b01bc-40c0-46e7-a023-8b02ba09c8ab",
+        "source_ref": "src/lib/webgpu/webgpu-similarity-service.ts",
+        "contentLength": 3599,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(dev)/odin/AGENTS.md",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "8a7e91e0-53e3-4124-a6da-d327205a08ac",
+        "source_ref": "src/routes/(dev)/odin/AGENTS.md",
+        "contentLength": 793,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/legal/LegalPrecedentCard.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "16c6b09e-6065-4190-8e3e-d412ad6e95c0",
+        "source_ref": "src/lib/components/legal/LegalPrecedentCard.svelte",
+        "contentLength": 4000,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "1e2750fa-5cfa-4c48-b5ff-26ab7cf0e71a",
+        "source_ref": "src/lib/server/cache/cartridge-tensor-bridge.ts",
+        "contentLength": 424,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/types/webgpu-navigator.d.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "f4eaf7fb-ee12-4936-8245-c29f0999cbc7",
+        "source_ref": "src/lib/types/webgpu-navigator.d.ts",
+        "contentLength": 4000,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/document-search/+page.server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "9da51f46-22fc-47f9-9134-a230444efd7a",
+        "source_ref": "src/routes/(app)/admin/document-search/+page.server.ts",
+        "contentLength": 770,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "514e4256-88c9-40eb-a133-3cff649ec31a",
+        "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+        "contentLength": 782,
+        "semantic_score": 1,
+        "isSelfMatch": false
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/workers/audio-processor.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "44998e54-7981-428d-8ba4-93397d5b771a",
+        "source_ref": "src/lib/server/workers/audio-processor.ts",
+        "contentLength": 4000,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/knowledge-cache.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "a8eb01d1-ae9a-44fb-b2af-643aa77fa194",
+        "source_ref": "src/lib/server/knowledge-cache.ts",
+        "contentLength": 946,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/service-worker.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "0deaadb7-0dfc-4fdf-ba56-4832bb27b193",
+        "source_ref": "src/service-worker.ts",
+        "contentLength": 791,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/api/ai/context/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "fcab8647-c7e6-449a-ba1d-015cf63b19f4",
+        "source_ref": "src/routes/api/ai/context/+server.ts",
+        "contentLength": 3097,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/api/evidence/upload/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "90a1e89f-a384-4fe2-b973-f3adf8d3cba5",
+        "source_ref": "src/routes/api/evidence/upload/+server.ts",
+        "contentLength": 786,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/api/conversations/[id]/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "50c5946d-cf15-4bf2-b505-647228ac7da5",
+        "source_ref": "src/routes/api/conversations/[id]/+server.ts",
+        "contentLength": 2105,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/evidence/EvidenceImageSearch.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "f588cb0f-0791-4bb5-bd4f-3c1a13ff9719",
+        "source_ref": "src/lib/components/evidence/EvidenceImageSearch.svelte",
+        "contentLength": 769,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/hooks.server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "8bd831f5-603d-4dea-878b-6dc6756afb63",
+        "source_ref": "src/hooks.server.ts",
+        "contentLength": 720,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/.well-known/llms.txt/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "46e8e207-4811-4fa0-ba8f-44b7ee8fb1ab",
+        "source_ref": "src/routes/.well-known/llms.txt/+server.ts",
+        "contentLength": 801,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(app)/admin/chat-memory/AGENTS.md",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "cd373695-85e5-4524-b450-25cc05ecbcab",
+        "source_ref": "src/routes/(app)/admin/chat-memory/AGENTS.md",
+        "contentLength": 798,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/(app)/demos/cache/+page.svelte",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "14f72a15-eb07-426f-8024-73d49556c25c",
+        "source_ref": "src/routes/(app)/demos/cache/+page.svelte",
+        "contentLength": 112,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/stores/unified/evidence-store.svelte.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "96f66f33-dbb4-43ae-8344-8b75d589a28e",
+        "source_ref": "src/lib/stores/unified/evidence-store.svelte.ts",
+        "contentLength": 293,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "a13dc246-c44c-4b8e-a702-89df7f9c3235",
+        "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+        "contentLength": 110,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/routes/api/investigate/suggest/+server.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "cf642e50-431b-4a79-b4f8-d7a8830d7358",
+        "source_ref": "src/routes/api/investigate/suggest/+server.ts",
+        "contentLength": 4000,
+        "semantic_score": 1,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    },
+    {
+      "source_ref": "src/lib/server/services/langextract-service.ts",
+      "hitCount": 5,
+      "top1": {
+        "stable_key": "bd2cab56-a386-437c-9c68-d28f5d28ad6a",
+        "source_ref": "src/lib/server/services/langextract-service.ts",
+        "contentLength": 979,
+        "semantic_score": 1.0000001,
+        "isSelfMatch": true
+      },
+      "allHaveContent": true
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.feature-registry-baseline-admission.v1",
+  "updatedAt": "2026-09-01T19:21:05.971Z",
+  "status": "BASELINE_PROVEN_LIVE_APPLY_BLOCKED",
+  "evidence": {
+    "disposablePostgres": {
+      "status": "DISPOSABLE_POSTGRES_PROVEN",
+      "report": "docs/reports/feature-registry-disposable-proof-v1.json"
+    },
+    "ownerDecision": {
+      "status": "DECISION_PROPOSED_NOT_APPLIED",
+      "report": "docs/reports/feature-registry-owner-decision-v1.json"
+    },
+    "liveOwnerAudit": {
+      "featureRegistry": "MISSING_MANIFEST_REGISTRATION"
+    },
+    "contractMirrors": {
+      "tablesChecked": 8,
+      "liveAligned": 3
+    }
+  },
+  "checks": {
+    "disposableHistoricalChain": true,
+    "liveFeatureRegistryAbsent": true,
+    "migrationLedgersUnreconciled": true,
+    "ownerManifestMissingRegistration": true
+  },
+  "writes": {
+    "database": false,
+    "migrationLedger": false,
+    "production": false
+  },
+  "decision": "Do not run drizzle-kit migrate, ledger repair, or feature_registry apply from this receipt.",
+  "likely_cause": "Historical migration SQL is proven in isolation, but the live migration ledger and owner manifest are not reconciled.",
+  "evidenceRefs": [
+    "docs/reports/feature-registry-disposable-proof-v1.json",
+    "docs/reports/feature-registry-owner-decision-v1.json",
+    "docs/reports/atlas-migration-owner-audit-v1.json",
+    "docs/reports/postgres-contract-mirrors-report.json"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-atlas-migration-owners.mjs",
+  "smoke_command": "node scripts/atlas/feature-registry-baseline-gate.mjs",
+  "report_path": "docs/reports/feature-registry-baseline-admission-v1.json"
+}

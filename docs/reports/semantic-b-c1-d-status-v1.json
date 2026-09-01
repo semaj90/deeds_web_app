@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.semantic-b-c1-d-status.v1",
+  "updatedAt": "2026-09-01T12:05:00-07:00",
+  "readOnly": true,
+  "writesPerformed": false,
+  "evidenceSource": "docs/reports/writer-root-01-representation-owner-01-results.json",
+  "liveCoverageEvidence": {
+    "report": "docs/reports/qdrant-candidate-coverage-v1.json",
+    "readOnly": true,
+    "codebase_chunks_768_v2": {
+      "pointsScanned": 52380,
+      "representedCandidateOrdinals": 2378,
+      "candidateCount": 4951,
+      "coveragePct": 48.031,
+      "onlyV2CandidateOrdinals": 0
+    },
+    "ownerDecision": "UNRESOLVED_COVERAGE_AND_IDENTITY_PROOF_REQUIRED"
+  },
+  "v2ProjectionProof": {
+    "report": "docs/reports/emb3a-qdrant-semantic-projection-proof.json",
+    "status": "DEGRADED_FIXTURE_OR_PAYLOAD_GAP",
+    "qdrantReachable": true,
+    "semantic768Schema": true,
+    "cosineSchema": true,
+    "identityPayloadObserved": false,
+    "revisionPayloadObserved": false,
+    "identityRoundTrip": "NOT_PROVEN_FIXTURE_NOT_INDEXED",
+    "qdrantWrites": false
+  },
+  "gates": {
+    "SEMANTIC_B_C1_PARITY_01": {
+      "status": "PROVEN_BOUNDED",
+      "population": 2707,
+      "sampleSize": 60,
+      "valid": 59,
+      "discriminating": 56,
+      "freshBWinner": 56,
+      "freshC1Winner": 0,
+      "neitherWinner": 0,
+      "nonDiscriminating": 3,
+      "scope": "short-input cohort only"
+    },
+    "QDRANT_D_IDENTITY_01": {
+      "status": "PROVEN_BOUNDED",
+      "sampleSize": 60,
+      "join": "postgres_id point id",
+      "liveMatches": 60,
+      "contentHashCrossCheck": "UNAVAILABLE_D_PAYLOAD_NULL"
+    },
+    "QDRANT_D_REPRESENTATION_01": {
+      "status": "PROVEN_BOUNDED",
+      "sampleSize": 40,
+      "freshMatchesB": 40,
+      "freshMatchesD": 40,
+      "directBDCosineExactlyOne": 40,
+      "c1FreshMatches": 1,
+      "scope": "exactly joined B/D cohort"
+    },
+    "QDRANT_READER_OWNER_01": "STRICT_SEAM_CREATED_LIVE_REPLAY_OPEN_PAYLOAD_IDENTITY_GAP",
+    "QDRANT_D_WRITER_01": "LIKELY_WRITER_CANDIDATE_FOUND_HISTORICAL_RUN_UNPROVEN",
+    "QDRANT_PROJECTION_OWNERSHIP": "OPEN_NO_MUTATION_AUTHORIZED"
+  },
+  "decision": "Do not rerun B-vs-C1 or reopen the already-proven bounded D representation question. The live coverage audit still blocks full-corpus projection ownership: D represents 2378/4951 candidate ordinals and has mixed identity quality. Next work is writer/reader attribution and coverage reconciliation—not a metadata move.",
+  "limitations": [
+    "B-vs-C1 does not generalize beyond the sampled short-input cohort.",
+    "D representation proof is bounded to 40 exact joins; the live 52,380-point scan is coverage/identity evidence, not a vector oracle for every point.",
+    "A direct v2 corpus-writer candidate is identified, but its historical invocation is unproven. Its current code selects source_revision as NULL and declares movable embeddinggemma:latest, so it cannot authorize repair or promotion without lineage reconciliation."
+  ],
+  "likely_cause": "Prior conclusions mixed a new B-vs-C1 scaled result with an older report that had already tested D on a bounded exact cohort.",
+  "evidence": [
+    "docs/reports/writer-root-01-representation-owner-01-results.json:169-190",
+    "docs/reports/writer-root-01-representation-owner-01-results.json:203-233"
+  ],
+  "patch_targets": [
+    "docs/reports/writer-root-01-representation-owner-01-results.json",
+    "docs/reports/semantic-b-c1-d-status-v1.json"
+  ],
+  "safe_next_command": "node scripts/atlas/qdrant-postgres-identity-audit.mjs",
+  "smoke_command": "node -e \"JSON.parse(require('fs').readFileSync('docs/reports/semantic-b-c1-d-status-v1.json','utf8')); console.log('SEMANTIC_B_C1_D_STATUS_OK')\"",
+  "report_path": "docs/reports/semantic-b-c1-d-status-v1.json"
+}

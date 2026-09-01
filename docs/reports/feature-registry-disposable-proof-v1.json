@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.feature-registry-disposable-postgres-proof.v1",
+  "updatedAt": "2026-09-01T11:42:00-07:00",
+  "status": "DISPOSABLE_POSTGRES_PROVEN",
+  "image": "pgvector/pgvector:pg18",
+  "container": "atlas-feature-registry-proof-55432",
+  "autoRemoved": true,
+  "historicalSql": [
+    "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+    "sveltekit-frontend/drizzle/0025_yellow_tony_stark.sql"
+  ],
+  "prerequisite": "temporary saved_citations(id uuid primary key)",
+  "readback": {
+    "featureRegistryColumns": 15,
+    "indexes": [
+      "feature_registry_feature_key_unique",
+      "feature_registry_pkey"
+    ],
+    "expectedColumnsPresent": true,
+    "summaryChunkTagsRetryQueriesPresent": true
+  },
+  "safety": {
+    "liveDatabaseTouched": false,
+    "migrationLedgerChanged": false,
+    "productionWrites": false,
+    "rollback": "container auto-removal"
+  },
+  "likely_cause": "The historical feature-registry chain needed an isolated PostgreSQL proof because the live migration ledger cannot safely be repaired or applied yet.",
+  "evidence": [
+    "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+    "sveltekit-frontend/drizzle/0025_yellow_tony_stark.sql",
+    "PostgreSQL readback: 15 columns and 2 indexes"
+  ],
+  "patch_targets": [
+    "openspec/changes/manual-migration-reconciliation/tasks.md",
+    "docs/reports/feature-registry-disposable-proof-v1.json"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-atlas-migration-owners.mjs",
+  "smoke_command": "node -e \"console.log('DISPOSABLE_POSTGRES_PROVEN receipt recorded')\"",
+  "report_path": "docs/reports/feature-registry-disposable-proof-v1.json"
+}

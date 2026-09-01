@@ -1,0 +1,265 @@
+{
+  "schema": "atlas.workstation-lineage-resume-01.v1",
+  "task": "WORKSTATION-LINEAGE-RESUME-01",
+  "readOnly": true,
+  "writesPerformed": false,
+  "purpose": "Inventory existing packet<->chunk lineage reports/scripts, tag each finding with its actual population definition and proof level, and designate the current canonical resolver owner (if any exists). Does not attempt a new join or resolver.",
+  "explicitRule": "Numbers below MUST NOT be compared across rows as if they describe the same population. Each entry carries its own population definition.",
+  "inventory": [
+    {
+      "source": "scripts/atlas/audit-packet-chunk-mapping.mjs",
+      "report": "docs/reports/packet-chunk-mapping-audit.json",
+      "generatedAt": "2026-08-28T18:29:53.544Z",
+      "population": "all atlas_packets (61,660) vs all codebase_chunk_index rows as they existed at that time (55,206)",
+      "method": "Tries every plausible direct field-join at once (source_ref, packet_key, feature_id, tree_node_id, qdrant_id), no hash comparison.",
+      "findings": {
+        "exactSourceRef_pairs": 90523,
+        "exactSourceRef_packets": 7474,
+        "packetKey_pairs": 0,
+        "featureId_pairs": 0,
+        "treeNodeId_pairs": 0,
+        "qdrantId_pairs": 1280,
+        "ambiguousMappings": 35956,
+        "unmappedPackets": 54186
+      },
+      "proofLevel": "NONE -- every direct-field join except source_ref (which fans out) resolves to zero pairs. treeNodeId here is a literal FK-value join attempt (not the atlas_ast_nodes bridge speculated in PACKET-CHUNK-RESOLVE-01A) and it also returns 0 -- independent evidence against tree_node_id as a direct resolver.",
+      "status": "WARN"
+    },
+    {
+      "source": "scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs",
+      "report": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "generatedAt": "not embedded in report; file mtime 2026-08-31T21:15",
+      "population": "111 rows bound to a specific current workspace revision (sha256:55edaaad...) -- the narrowest, most current-revision-strict population of any report in this inventory",
+      "method": "Checks whether codebase_chunk_index.content_hash (explicitly confirmed per-chunk digest, NOT a whole-source digest) agrees with a proven current-workspace Graphify binding hash for the same source.",
+      "findings": {
+        "binding_rows": 111,
+        "graphify_exact_sources": 111,
+        "packet_chunk_exact_sources": 0,
+        "packet_content_matches": 0
+      },
+      "hashGrainFinding": "codebaseChunkIndexContentHash is a per-chunk digest, not equal to a whole-source digest for multi-chunk files -- this is the load-bearing fact that makes source_ref-group-level hash agreement (see graphify-packet-lineage-census-v1 below) an unsafe proxy for row-level identity.",
+      "proofLevel": "STRICTEST CHECK IN THIS INVENTORY -- current-workspace-revision-bound, respects per-chunk hash grain. Result: zero exact resolutions.",
+      "status": "CURRENT_PACKET_CHUNK_JOIN_MISSING",
+      "canonicalAuthority": false,
+      "nextGateNamedByThisReport": "CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION"
+    },
+    {
+      "source": "scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs",
+      "report": "docs/reports/atlas-packet-content-hash-lineage-v1.json",
+      "generatedAt": "2026-09-01T04:17:36.116Z",
+      "population": "full 61,660-row atlas_packets corpus, cross-referenced against atlas_artifacts (58,312 rows) and codebase_chunk_index (55,853 rows) as independent hash authorities -- not a join, a coverage/availability survey",
+      "method": "Surveys which hash-bearing columns exist and how populated they are; does not attempt to prove hash-domain equivalence between them.",
+      "findings": {
+        "packets_content_hash_populated": 332,
+        "packets_sha256_populated": 4715,
+        "atlas_artifacts_content_hash_populated": 58305,
+        "atlas_artifacts_content_hash_total": 58312,
+        "chunks_content_hash_populated": 55816,
+        "chunk_hash_unique": 341,
+        "chunk_hash_ambiguous": 4207,
+        "chunk_artifact_hash_agreements": 0
+      },
+      "keyLead": "atlas_artifacts.content_hash is 99.99% populated -- by far the richest hash surface found anywhere in this inventory, on either side of the investigation.",
+      "proofLevel": "NONE -- own stated conclusion is REVIEW_REQUIRED: hash equivalence between atlas_artifacts.content_hash and codebase_chunk_index.content_hash is asserted as an open question, not proven. chunk_artifact_hash_agreements: 0 is itself evidence the two hash domains may not currently agree at all (though this could also mean they were never compared correctly -- domain compatibility, not just raw comparison, must be established first).",
+      "status": "REVIEW_REQUIRED"
+    },
+    {
+      "source": "scripts/atlas/audit-graphify-packet-lineage-census-v1.mjs",
+      "report": "docs/reports/graphify-packet-lineage-census-v1.json",
+      "generatedAt": "2026-09-01T04:23:49.095Z",
+      "population": "full 61,660-row atlas_packets corpus, joined to codebase_chunk_index GROUPED BY source_ref (not joined row-to-row)",
+      "method": "For each source_ref, computes count(DISTINCT lower(content_hash)) across all codebase_chunk_index rows sharing that source_ref. Only accepts a source as an 'exact' candidate when that count is exactly 1 (i.e. every chunk row for that file happens to share one hash value) AND the packet's own content_hash equals it. Explicitly refuses to pick a winner when the group has >1 distinct hash (classified ambiguous) -- this correctly avoids the earlier BRIDGE-RECON-DRY-02 fan-out bug at the GROUP level.",
+      "findings": {
+        "packet_chunk_hash_exact": 332,
+        "packet_chunk_hash_ambiguous": 4207,
+        "packet_chunk_hash_mismatch": 0,
+        "packet_content_hash_unavailable": 9,
+        "gates.packetContentIntegrity.proven": true
+      },
+      "criticalCaveat": "This 'exact: 332' and gates.packetContentIntegrity.proven=true DO NOT mean 332 rows have a proven single canonical codebase_chunk_index.id. The check is group-hash-agreement, not row identity: (a) it never selects one specific chunk row even for the 'exact' 332 (only proves the packet's hash matches whatever single hash value the whole source_ref group shares); (b) per the current-workspace-packet-chunk-join-v1 finding above, chunk-level content_hash is a per-chunk digest, so a source_ref group having only 1 distinct hash across possibly-many rows more likely means those rows are duplicate/stale re-indexations of an unchanged file, not proof of freshness; (c) it applies no workspace/revision-currency check at all, unlike current-workspace-packet-chunk-join-v1 (which DID apply that check on a stricter 111-row population and got zero). The internal 'proven: true' flag in this report's own gates block should be read as 'group-hash-agreement proven', not 'canonical packet-chunk identity proven' -- the report's naming is misleading relative to what it actually establishes.",
+      "proofLevel": "GROUP-LEVEL HASH AGREEMENT ONLY, NOT ROW IDENTITY, NOT REVISION-QUALIFIED",
+      "status": "SOURCE_LINEAGE_CENSUS_GAPS"
+    }
+  ],
+  "convergentFinding": "Four independent scripts, four different methods, overlapping-but-not-identical populations, all reach the same underlying conclusion once population and proof-level are accounted for: there is currently no populated field or join path in this Postgres corpus that resolves a packet to exactly one canonical, revision-qualified codebase_chunk_index row. The strictest check (current-workspace-packet-chunk-join-v1, current-workspace-revision-bound, per-chunk hash grain) found zero. The loosest check (graphify-packet-lineage-census-v1's 332) only proves group-level hash agreement, not row identity, and does not survive the stricter check's own more rigorous method being applied to a subset of the same underlying question. This session's own PACKET-CHUNK-RESOLVE-01A (chunk_id: 0/1390) and the 2026-08-28 packet-chunk-mapping-audit (packetKey/featureId/treeNodeId: 0 pairs each) both independently corroborate the same negative result via yet other fields.",
+  "designatedCanonicalOwner": "NONE EXISTS YET. No script in this inventory is a validated, revision-qualified, single-row packet->chunk resolver. The closest unexploited lead is atlas_artifacts.content_hash (99.99% populated, unlike every atlas_packets-local field checked in this session or prior ones) -- but its own author explicitly flagged hash-domain equivalence to codebase_chunk_index.content_hash as REVIEW_REQUIRED, unproven. This is exactly the WORKSTATION-HASH-DOMAIN-01 gate that must run before any cardinality/join work reuses this surface.",
+  "recommendedNextGate": "WORKSTATION-HASH-DOMAIN-01 -- read-only. Find and read the actual producer code for atlas_artifacts.content_hash and codebase_chunk_index.content_hash (algorithm, encoding, normalization, source-byte-range vs whole-file, truncation, revision binding) and determine whether the two hash domains are even comparable before running any cardinality check against them. Do not proceed to a join/cardinality gate until this is proven either way.",
+  "workstationHashDomain01": {
+    "status": "CLOSED_NEGATIVE",
+    "readOnly": true,
+    "writesPerformed": false,
+    "atlas_artifacts_content_hash": {
+      "producer": "sveltekit-frontend/src/lib/server/generation/artifact-logger.ts:66-69, function hashContent(), called from logArtifact()",
+      "algorithm": "sha256(Buffer.from(entry.content))",
+      "contentDomain": "entry.content is an ArtifactLogEntry.content field, typed against artifact_type: 'summary' | 'embedding' | 'latent64' | 'som_cell' | 'redis_cache' | 'markdown' | 'qdrant_payload' | 'gemma4_prompt' | 'gemma4_output' | 'feature_labels' | 'gan_report' | 'benchmark' | 'trace'. This is a dedup hash over GENERATED artifact output content (a summary string, a serialized embedding, etc.) -- never over source code chunk bytes.",
+      "purpose": "Deduplication key so logArtifact() can detect 'this exact artifact was already generated' before inserting a new atlas_artifacts row -- not an identity bridge to source content."
+    },
+    "codebase_chunk_index_content_hash": {
+      "contentDomain": "Per already-read current-workspace-packet-chunk-join-v1.json: 'per-chunk digest; not equal to a whole-source digest for multi-chunk files' -- i.e. a digest of actual source chunk bytes.",
+      "producerNotFullyTraced": "Exact writer script not pinned down in this pass (grep for INSERT/UPDATE codebase_chunk_index + createHash across scripts/ did not surface one obvious canonical writer among the candidates checked; time-boxed, not exhaustively chased since the domain-incompatibility finding below already closes the gate regardless of the exact producer)."
+    },
+    "verdict": "atlas_artifacts.content_hash and codebase_chunk_index.content_hash hash two structurally different content domains (generated-artifact output vs. source-chunk bytes) by construction, not merely by unproven-in-practice coincidence. A SHA-256 of a Gemma4 summary and a SHA-256 of the source code it summarizes have no reason to ever match except by accident. This is fully consistent with -- not contradicted by -- the already-recorded empirical finding chunk_artifact_hash_agreements: 0 in atlas-packet-content-hash-lineage-v1.json: that 0 is the expected result of comparing hashes of unrelated content, not evidence of a data gap.",
+    "conclusion": "atlas_artifacts.content_hash, despite being 99.99% populated, is CLOSED as a non-viable packet->chunk resolver. It is not a hash-domain-compatibility question that further proof could resolve -- the domains are definitionally different. This was the single most promising unexploited lead in the inventory; its closure means every candidate surfaced across all four inventoried reports, this session's own PACKET-CHUNK-RESOLVE-01A, and the 2026-08-28 packet-chunk-mapping-audit is now exhausted."
+  },
+  "epistemicCorrection": "The conclusion is NOT 'packet->chunk identity does not exist'. It is 'packet->chunk identity cannot be derived exactly from the currently inventoried and populated historical evidence'. An evidence limitation is not an ontological statement -- a future authoritative source (e.g. a historical revision checkout, or a producer log never yet inventoried) could still recover some of these. Historical rows are therefore classified UNRESOLVED_WITH_CURRENT_EVIDENCE, not permanently unresolved.",
+  "decision": "OPTION_A_SELECTED: capture canonical chunk identity at packet-creation time going forward. No synthetic/approximate backfill of historical rows. Option B (approximate historical realignment) is retained as a separate, explicitly non-canonical, optional future experiment -- see historicalRealignmentExperiment below -- never as a substitute for real lineage capture.",
+  "historicalPopulation": {
+    "population": 61660,
+    "populationDefinition": "full atlas_packets corpus",
+    "lineageStatus": {
+      "EXACT": "reserved for rows independently proven by a future authoritative source; currently 0",
+      "UNRESOLVED_WITH_CURRENT_EVIDENCE": "the default status for every row that failed every resolver attempted across this inventory -- not a claim of permanent unresolvability",
+      "CONFLICTING_EVIDENCE": "reserved for rows where two proven-independent sources disagree; not yet populated by any script in this inventory",
+      "REVISION_UNPROVEN": "reserved for rows with an otherwise-exact chunk match but no verifiable source_revision binding (matches the 243-row bucket named in the bounded canary, a different, narrower population than this 61,660 total)"
+    },
+    "syntheticIdentityCreated": false,
+    "approximateMatchPromoted": false
+  },
+  "historicalRealignmentExperiment": {
+    "name": "HISTORICAL-LINEAGE-REALIGNMENT-EXP-01",
+    "status": "OPTIONAL_NON_CANONICAL_NOT_STARTED",
+    "scope": "source reconstruction via historical revision checkout where available, deterministic re-chunk, content-span/AST alignment, candidate match confidence, evidence receipt",
+    "outputContract": "HistoricalChunkAlignmentCandidateV1 -- explicitly NOT CanonicalPacketChunkResolutionV1",
+    "hardRule": "Must never write to atlas_packets, packet_qdrant_bridge, Qdrant payloads, or any canonical lineage table merely because a similarity/confidence score is high. Only exact reconstruction against authoritative historical source bytes+revision could graduate a row out of UNRESOLVED_WITH_CURRENT_EVIDENCE, and that graduation is a separate, later, explicitly-gated decision -- not automatic from this experiment's output."
+  },
+  "canonicalContract": {
+    "name": "PacketChunkLineageV1",
+    "owner": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence (existing change -- do not create a new Workstation naming hierarchy)",
+    "shape": {
+      "packetKey": "string",
+      "canonicalChunkId": "string -- codebase_chunk_index.chunk_id (durable, content-derived, 'card:<source_ref>:<hash>' text identity) -- this is the LINEAGE identity, not the UUID row PK",
+      "chunkRowId": "string -- codebase_chunk_index.id (uuid PK) -- retained only as a physical database coordinate, never treated as canonical identity",
+      "sourceRef": "string",
+      "sourceNamespace": "string -- repoId-qualified namespace",
+      "sourceRevision": "string",
+      "lineageProducerRevision": "string"
+    },
+    "hardRule": "The packet writer MUST receive these values from an upstream canonical chunk object at creation time. It must NEVER reconstruct them after the fact from source paths, hashes, AST coordinates, Qdrant payloads, or nearest-match heuristics.",
+    "downstreamConsumerContract": "CanonicalPacketChunkResolutionV1 -- { status: 'EXACT', packetKey, canonicalChunkId, sourceRef, sourceRevision, evidenceRefs[], resolverRevision } | { status: 'AMBIGUOUS'|'REVISION_UNPROVEN'|'SOURCE_NAMESPACE_UNPROVEN'|'MISSING', packetKey, evidenceRefs[], resolverRevision }. ProjectionRegistryV1 / BRIDGE-RECON-DRY-03 / RECON-CANARY-01 may consume EXACT rows only, and must never infer packet<->chunk identity themselves."
+  },
+  "nextGateSequence": [
+    "PACKET-CHUNK-LINEAGE-WRITER-01 -- read-only. Trace every current packet producer and prove which producer(s) have the canonical chunk object (codebase_chunk_index row) in scope at packet-creation time. No writes.",
+    "PACKET-CHUNK-LINEAGE-CONTRACT-01 -- define PacketChunkLineageV1 formally (Zod schema) and reject missing canonical chunk identity for new source-derived packets going forward.",
+    "PACKET-CHUNK-LINEAGE-CANARY-01 -- create a tiny bounded set of new packets and verify packetKey<->canonicalChunkId<->sourceNamespace<->sourceRevision round-trips exactly.",
+    "PACKET-CHUNK-LINEAGE-PROMOTION-01 -- enable the writer for future packets only after the canary passes.",
+    "BRIDGE-RECON-DRY-03 -- consume only packets carrying proven PacketChunkLineageV1. Historical UNRESOLVED_WITH_CURRENT_EVIDENCE rows remain excluded.",
+    "RECON-CANARY-01 -- only then, the previously planned tiny Qdrant metadata reconciliation canary. Still zero writes until this point."
+  ],
+  "statusBlock": {
+    "WORKSTATION-LINEAGE-RESUME-01": "PASS",
+    "WORKSTATION-HASH-DOMAIN-01": "PASS (DOMAIN_INCOMPATIBLE)",
+    "historicalExactResolver": "NOT_AVAILABLE",
+    "historicalSyntheticFallback": "PROHIBITED",
+    "PACKET-CHUNK-LINEAGE-WRITER-01": "NEXT",
+    "PACKET-CHUNK-LINEAGE-CONTRACT-01": "BLOCKED on WRITER-01",
+    "PACKET-CHUNK-LINEAGE-CANARY-01": "BLOCKED",
+    "PACKET-CHUNK-LINEAGE-PROMOTION-01": "BLOCKED",
+    "ProjectionRegistryV1": "VALID",
+    "QdrantSemanticReaderOwnership": "FROZEN",
+    "PACKET-CHUNK-RESOLVE-01A": "CLOSED_NEGATIVE",
+    "PACKET-CHUNK-RESOLVE-01B": "SUPERSEDED_BY_WORKSTATION_OWNER",
+    "BRIDGE-RECON-DRY-02": "SUPERSEDED_INVALID",
+    "BRIDGE-RECON-DRY-03": "BLOCKED on proven lineage",
+    "RECON-CANARY-01": "BLOCKED, ZERO WRITES",
+    "HISTORICAL-LINEAGE-REALIGNMENT-EXP-01": "OPTIONAL_NON_CANONICAL_NOT_STARTED"
+  },
+  "treeNodeIdRuleNarrowed": {
+    "safe": "tree_node_id may remain supporting AST structural evidence",
+    "unsafe": ["NOT a sourceRevision", "NOT a graphRevision", "NOT automatically a canonical chunk ID"],
+    "conditionalFuture": "May later participate in a proven bridge only if the workstation/lineage owner explicitly proves that relation -- never invented independently by the Qdrant track."
+  },
+  "immediateNextAction": "PACKET-CHUNK-LINEAGE-WRITER-01: trace the packet creation code paths (writers of atlas_packets) to find the earliest point where codebase_chunk_index.chunk_id (durable) and source_revision are simultaneously known in scope, and fix lineage capture there. Read-only investigation, no writes.",
+  "packetChunkLineageWriter01": {
+    "status": "CLOSED",
+    "readOnly": true,
+    "writesPerformed": false,
+    "method": "grep for all scripts that both reference codebase_chunk_index AND write INSERT INTO atlas_packets, then read each candidate's actual query/insert logic.",
+    "activeProducer": {
+      "file": "scripts/atlas/register-orphaned-chunks.mjs",
+      "selfDocumented": "'40K+ chunks were indexed in Qdrant before being registered to atlas_packets. These orphans have no packet_key, directory_path, or feature_id in Postgres.' -- this IS the documented root cause of the entire lineage gap chased across all prior gates.",
+      "orphanQuery": "SELECT DISTINCT cci.relative_path as source_ref FROM codebase_chunk_index cci WHERE ... NOT IN (SELECT source_ref FROM atlas_packets ...) -- never selects cci.id or cci.chunk_id",
+      "insertColumns": ["packet_id", "packet_key", "source_ref", "directory_path", "feature_id", "domain_class", "source_kind", "created_at", "updated_at"],
+      "missingFromInsert": ["chunk_id", "content_hash", "source_revision", "any codebase_chunk_index row reference"],
+      "packetKeyDerivation": "'packet:' + sha256(sourceRef).slice(0,12) -- hashed from the file path STRING, not chunk content or a chunk row identity",
+      "rootCauseConfirmed": "The DISTINCT ON relative_path in the orphan-discovery query is the structural origin of the source_ref fan-out found in every downstream investigation (BRIDGE-RECON-DRY-02, packet-chunk-mapping-audit, this session's own census) -- it deliberately collapses N codebase_chunk_index rows into 1 atlas_packets row by construction, at the moment of packet creation, not as a later join artifact."
+    },
+    "deadDangerousCandidate": {
+      "file": "sveltekit-frontend/src/lib/server/topology/canonical-id-hierarchy.ts",
+      "function": "generateIDHierarchy() / persistIDHierarchyToPostgres()",
+      "liveCallers": "NONE found outside its own canonical-id-hierarchy.spec.ts -- confirmed dead code, not currently wired into any packet-creation path.",
+      "whyDangerous": "Presents a fully-typed CanonicalIDHierarchy contract that superficially looks like exactly the canonical PacketChunkLineageV1 contract this investigation is trying to build -- but repository_id, directory_id, file_id, module_id, symbol_id, AND chunk_id are ALL set via randomUUID(), never read from a real row. A future agent could easily mistake this for 'the contract already exists, just wire it in' and would be wiring in synthetic identity fabrication, exactly what PACKET-CHUNK-LINEAGE-CONTRACT-01's hard rule ('must NEVER reconstruct after the fact ... or nearest-match heuristics') exists to prevent.",
+      "possibleExplanation": "Plausible (not confirmed by row-level trace) source of the 6/1390 atlas_packets.chunk_id values found populated-but-unresolvable in PACKET-CHUNK-RESOLVE-01A -- consistent with a randomUUID() origin, not individually verified against those 6 specific rows.",
+      "disposition": "Leave as dead code for now (out of scope for this read-only gate); flag for archival or an explicit 'DEAD -- do not wire' marker when PACKET-CHUNK-LINEAGE-CONTRACT-01 is built, so it cannot be mistaken for the real contract."
+    },
+    "retiredCandidate": {
+      "file": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs",
+      "selfDocumented": "'Historical 384-dim migration/e2e harness. It is retained for replay only; the active Parent Atlas writer is semantic_768 via codebase_chunk_index.'",
+      "note": "Not live, but ironically had a more correct identity design than the currently-active writer -- stablePacketKey(sourceRef, chunkIndex, contentHash) incorporates chunk index and content hash into the packet key, unlike register-orphaned-chunks.mjs. A design regression, not a fix source (this script is retired and outputs to a different, non-canonical collection: codebase_chunks_384_hybrid)."
+    },
+    "fixTarget": "scripts/atlas/register-orphaned-chunks.mjs is the single, well-scoped fix point for PACKET-CHUNK-LINEAGE-CONTRACT-01 / -CANARY-01 / -PROMOTION-01: change its orphan query to select cci.id (chunkRowId) and cci.chunk_id (canonicalChunkId, durable) per matched row instead of DISTINCT relative_path, decide an explicit multi-chunk-per-file policy (this repo's atlas_packets model is currently file-granularity while codebase_chunk_index is chunk-granularity -- an open design question flagged below, not resolved by this gate), and add source_revision capture once a source_revision authority is confirmed available at this point in the pipeline (not yet checked in this pass)."
+  },
+  "openDesignQuestionSurfacedByThisGate": "atlas_packets is currently FILE-granularity (one row per source_ref, by register-orphaned-chunks.mjs's own DISTINCT design) while codebase_chunk_index is CHUNK-granularity (many rows per source_ref for multi-chunk files). PacketChunkLineageV1's canonicalChunkId as a single string assumes a 1:1 packet-to-chunk relationship that does not match the current packet model. PACKET-CHUNK-LINEAGE-CONTRACT-01 must resolve this explicitly -- e.g. either (a) redefine packet granularity to be chunk-level going forward (breaking change to what a 'packet' means), or (b) keep packets file-level and define canonicalChunkId as 'the primary/representative chunk for this file' under an explicit, documented rule (e.g. lowest line_start), or (c) change canonicalChunkId to canonicalChunkIds: string[] and drop the single-EXACT-resolution assumption entirely. This gate surfaces the question; it does not answer it.",
+  "architecturalCorrection": "The FILE-vs-chunk fork above was framed incorrectly as a-vs-b-vs-c. The correct model is closest to (c) but normalized as an explicit relational membership, not an array embedded in atlas_packets: packet identity and chunk identity are NOT the same thing -- a packet<->chunk relation is LINEAGE MEMBERSHIP (1 FILE packet contains/was-derived-from N canonical chunks), not identity equality. Do not redefine packets to chunk-granularity (large breaking migration) and do not pick a 'representative chunk' (would knowingly turn a many-chunk file into a false 1:1 identity). Preserve atlas_packets granularity as-is.",
+  "reinterpretedFanOutBug": "There were two distinct bugs conflated as one. BUG (real, this is what invalidated BRIDGE-RECON-DRY-02): a script picks one arbitrary chunk out of N candidates sharing a source_ref and treats that arbitrary choice as canonical packet identity. NOT A BUG (legitimate, once membership replaces identity-equality as the model): one FILE packet genuinely has N canonical chunk members -- an exact 37-chunk file packet is not ambiguous merely because cardinality is 37, if all 37 chunks are proven members of that exact file/revision. Every downstream gate must stop labeling every multi-chunk match as UNRESOLVED_PACKET_TO_CHUNK_AMBIGUITY on cardinality alone -- membership classification needs its own vocabulary: EXACT_SINGLE_MEMBER, EXACT_MULTI_MEMBER, SOURCE_NAMESPACE_UNPROVEN, SOURCE_REVISION_UNPROVEN, NO_MEMBER, CONFLICTING_MEMBERSHIP.",
+  "revisedCanonicalContract": {
+    "name": "PacketChunkMembershipV1 (supersedes the earlier single-canonicalChunkId PacketChunkLineageV1 shape recorded above)",
+    "shape": {
+      "packetKey": "string",
+      "canonicalChunkId": "string -- codebase_chunk_index.chunk_id (durable) of ONE member chunk",
+      "chunkRowId": "string -- codebase_chunk_index.id (uuid PK) of that same member chunk, physical coordinate only",
+      "sourceRef": "string",
+      "sourceNamespace": "string",
+      "sourceRevision": "string",
+      "chunkOrdinal": "number",
+      "lineageProducerRevision": "string",
+      "evidenceRefs": "string[]"
+    },
+    "persistenceModel": "A normalized relation, NOT an array embedded in atlas_packets: atlas_packet_chunk_lineage(packet_key, canonical_chunk_id, chunk_row_id, source_ref, source_namespace, source_revision, chunk_ordinal, lineage_producer_revision, created_at), uniqueness at minimum on (packet_key, canonical_chunk_id, source_revision) pending final revision-identity design. For a 37-chunk file: 1 atlas_packets row + 37 atlas_packet_chunk_lineage rows -- never 37 atlas_packets rows, never 1 arbitrarily-chosen chunk.",
+    "hardRule": "The writer fix for register-orphaned-chunks.mjs must NOT become SELECT cci.chunk_id LIMIT 1 or ORDER BY line_start LIMIT 1. It must preserve the file packet and write one membership row per canonical chunk retained from codebase_chunk_index, group-by canonical source identity, create the FILE packet once."
+  },
+  "downstreamProjectionImplication": "ProjectionRegistryV1 itself remains valid (it resolves a canonical REPRESENTATION identity, not packet identity). But the upstream flow must stop assuming packet<->one chunk<->one Qdrant point. Correct shape: FILE packet -> PacketChunkMembershipV1 (1:N) -> canonical chunk -> semantic_768 projection -> ProjectionRegistryV1. BRIDGE-RECON-DRY-03 must therefore operate PER MEMBERSHIP, not per packet alone -- for packet 'foo' with chunks A/B/C, the answer is 'chunk A -> projection A, chunk B -> projection B, chunk C -> projection C', never 'which of A/B/C is the real projection for packet foo'.",
+  "deadCodeFenceRequirement": "canonical-id-hierarchy.ts's generateIDHierarchy() is not to be deleted this gate, but must be marked DEAD -- NON-CANONICAL ID GENERATOR -- DO NOT USE FOR PERSISTED ATLAS IDENTITY when the contract patch lands, plus an architecture check (test or lint rule) ensuring the packet lineage writer never imports it. Governing invariant: persisted canonicalChunkId MUST originate from an existing canonical chunk record (a real codebase_chunk_index row read at write time); it MUST NOT be created via randomUUID(), a hash of source_ref, a nearest-vector match, or an AST-derived fallback. The 6 unexplained atlas_packets.chunk_id values found populated-but-unresolvable in PACKET-CHUNK-RESOLVE-01A are NOT retroactively attributed to canonical-id-hierarchy.ts without individual tracing -- they remain classified ORIGIN_UNPROVEN, not blamed on this dead module without evidence.",
+  "packetChunkLineageContract01a": {
+    "status": "PASS",
+    "readOnly": true,
+    "writesPerformed": false,
+    "script": "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-contract-01a.mts",
+    "sourceKindDistribution": {
+      "null": 58304,
+      "codebase_chunk": 3294,
+      "rpc_method": 61,
+      "cluster-summary": 1,
+      "caveat": "94.6% of the atlas_packets corpus (58,304 rows) has source_kind NULL -- the producer code for these rows was NOT individually traced in this pass (only the 3,294 codebase_chunk rows were traced back to register-orphaned-chunks.mjs). The granularity finding below covers the FULL corpus at the database level regardless, but 'which writer created the other 94.6%' remains open and is directly relevant to PACKET-SOURCE-REVISION-OWNER-01 (next gate)."
+    },
+    "codebaseChunkWriterGranularity": {
+      "total_rows": 3294,
+      "distinct_source_refs": 3294,
+      "distinct_packet_keys": 3294,
+      "verdict": "Confirmed strictly file-granularity for this specific writer: exactly 1 packet per source_ref, zero per-chunk packet creation."
+    },
+    "multiPacketPerSourceRefCorpusWide": {
+      "population": "all 61,660 atlas_packets rows with non-null source_ref",
+      "totalSourceRefsWithMultiplePackets": 0,
+      "verdict": "FILE granularity is a REPO-WIDE INVARIANT, empirically proven at the database level across the entire corpus -- not inferred from one writer's design intent, not assumed."
+    },
+    "chunkFanoutShapeOnCodebaseChunkIndexSide": {
+      "population": "4,745 distinct source_refs with at least 1 codebase_chunk_index row",
+      "exactly_1_chunk": 291,
+      "2_to_5_chunks": 1541,
+      "6_to_20_chunks": 2215,
+      "over_20_chunks": 698,
+      "max_chunks_for_one_source": 369,
+      "verdict": "93.9% of files (4,454/4,745) have more than 1 chunk -- confirming that the large majority of what prior gates classified as 'ambiguous' fan-out is very likely legitimate 1-file-to-N-chunks membership under the corrected model, not identity confusion. Not yet individually verified per-file (that is BRIDGE-RECON-DRY-03's job once the membership contract and revision authority are proven) -- this is the structural shape, not a per-row proof."
+    }
+  },
+  "revisedNextGateSequence": [
+    "PACKET-CHUNK-LINEAGE-WRITER-01 -- DONE. Root cause identified: register-orphaned-chunks.mjs.",
+    "PACKET-CHUNK-LINEAGE-CONTRACT-01A -- DONE. FILE granularity confirmed as a corpus-wide invariant.",
+    "PACKET-SOURCE-REVISION-OWNER-01 -- NEXT. Read-only. Identify the actual sourceRevision authority available at packet-creation time. Do NOT derive from tree_node_id, graph revision, updated_at, embedding_created_at, file path, or Qdrant point. If revision authority is graphify_files, AST source records, a workspace snapshot manifest, or another table, bind it explicitly. If none is authoritative at this writer boundary, the contract must say EXACT_MEMBERSHIP_REVISION_UNPROVEN rather than minting one. Also identify producers of the 94.6% NULL-source_kind packets, since revision authority may differ by producer.",
+    "PACKET-CHUNK-LINEAGE-CONTRACT-01 -- freeze PacketChunkMembershipV1 (the 1:N relation, not the earlier single-canonicalChunkId shape) and the atlas_packet_chunk_lineage table shape. No representative-chunk fallback permitted.",
+    "PACKET-CHUNK-LINEAGE-CANARY-01 -- three deliberately-chosen shapes: (A) a source with exactly 1 canonical chunk, (B) a source with 2-5 chunks, (C) a source with many chunks (one of the 698 over-20 files). Prove: packet count 1 per FILE source; membership count exactly N canonical chunks; duplicate memberships 0; foreign chunks 0; missing chunks 0; canonicalChunkId copied verbatim from cci.chunk_id; chunkRowId copied verbatim from cci.id; synthetic identity 0; namespace agreement exact; revision agreement exact-or-explicitly-UNPROVEN; transaction rollback on bounded-test-failure proven.",
+    "PACKET-CHUNK-LINEAGE-PROMOTION-01 -- enable the writer for future packets only after the 3-shape canary passes.",
+    "BRIDGE-RECON-DRY-03 -- operate PER MEMBERSHIP (packet+chunk pair), not per packet alone. Historical rows without proven membership remain UNRESOLVED_WITH_CURRENT_EVIDENCE and excluded.",
+    "RECON-CANARY-01 -- unchanged, still blocked, zero writes, until BRIDGE-RECON-DRY-03 admits a zero-ambiguity membership cohort."
+  ]
+}

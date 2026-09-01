@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.kernel-dag-owner-input-schemas-readiness.v1",
+  "updatedAt": "2026-09-01T11:53:00-07:00",
+  "status": "PROVEN_CONTRACT",
+  "owners": ["AST_SCAN", "GRAPH_EXPAND", "FETCH_POSTGRES", "FETCH_QDRANT", "BUILD_CONTEXT"],
+  "focusedTests": { "passed": 2, "failed": 0 },
+  "safety": { "databaseWrites": false, "ownerInvocations": false, "productionWrites": false },
+  "likely_cause": "Existing runtime owners require different revision and payload fields, but the DAG boundary had no shared per-owner input validation.",
+  "evidence": ["oak-dag-owner-input-schemas-v1.ts", "oak-dag-owner-input-schemas-v1.spec.ts"],
+  "patch_targets": ["sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-owner-input-schemas-v1.ts"],
+  "safe_next_command": "rg -n --no-heading \"oakDag.*InputSchema|KernelDagExecutionBindingV1|implementationRef\" sveltekit-frontend/src/lib/server/atlas/policy",
+  "smoke_command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-owner-input-schemas-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+  "report_path": "docs/reports/kernel-dag-owner-input-schemas-v1.json"
+}

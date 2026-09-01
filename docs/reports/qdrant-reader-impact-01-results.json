@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.qdrant-reader-impact-01.v1",
+  "task": "QDRANT-READER-IMPACT-01",
+  "readOnly": true,
+  "writesPerformed": false,
+  "method": "Traced every real caller of searchCodebaseAnn / searchQdrantCode / searchQdrantCodeStrictV1 across src/, read each call site directly (not inferred), classified per-caller.",
+
+  "callers": [
+    {
+      "file": "src/lib/server/retrieval/rrf-integration.ts",
+      "callSite": "searchCodebaseAnn(truncateEmbeddingForCollection(embedding, collection), denseLimit, undefined, collection) inside collections.map(...) with collections = ['codebase_chunks_768'] (hardcoded, explicit)",
+      "classification": "NOT_ACTIVE (for the ownership default change) + WAS_DIRECTLY_AFFECTED (by the named-vector bug fix, since it goes through the same client.query() using: 'content' fix)",
+      "failureMode": "SEMANTIC_LANE_DROPPED -- wrapped in Promise.allSettled per-collection; a failed/empty result for this collection just means the dense lane contributes zero entries to mergedResults (RRF), never a whole-request failure. Historical note in the file's own comments: this exact catch-all-zeroes-everything failure mode already bit this codebase once before (a dimension-mismatch bug with a since-removed legacy 384 collection) -- a different root cause than the named-vector bug found this session, but the same failure SHAPE.",
+      "afterFix": "Explicit collection stays codebase_chunks_768 (legacy mapQdrantPoint path, unaffected by the ownership switch) but now actually returns results instead of erroring on missing `using`."
+    },
+    {
+      "file": "src/lib/server/ai/mcp-tool-dispatch.ts",
+      "callSite": "tool_search_qdrant_topology(args) -> searchQdrantCode(args.queryEmbedding, limit, args.topoClass) -- NO collection arg",
+      "classification": "DIRECTLY_AFFECTED by both fixes",
+      "failureMode": "EMPTY_RESULTS_PROPAGATED, not a crash -- the MCP tool wraps the empty array in ok('search.qdrant_topology', []) and returns it as a SUCCESSFUL result with zero rows. Any agent/caller of this MCP tool would have silently received 'no matches' for every query, indistinguishable from a genuine no-results case.",
+      "caller": "MCP tool surface (search.qdrant_topology) -- read-only per this file's own header comment."
+    },
+    {
+      "file": "src/lib/server/search/hybrid-search.ts",
+      "callSite": "searchQdrantCode(queryEmbedding, limit, topoClass) inside Promise.all([...lexical/hybrid pg search..., searchQdrantCode(...)]) -- NO collection arg",
+      "classification": "DIRECTLY_AFFECTED by both fixes",
+      "failureMode": "FAILOPEN_TO_LEXICAL -- Promise.all is safe here because searchQdrantCode never rejects (internal try/catch returns [] on error), so qdrantRows silently resolved to [] while pgRows (lexical/hybrid Postgres search) continued populating merged results normally. The 'hybrid' search would have silently degraded to lexical-only for its entire operational history until this fix."
+    },
+    {
+      "file": "src/lib/server/ai/packet-stream-cache.ts",
+      "callSite": "searchQdrantCode(vector, 12, undefined, 'codebase_chunks_768') -- explicit collection",
+      "classification": "NOT_ACTIVE (ownership default) + WAS_DIRECTLY_AFFECTED (named-vector bug fix)",
+      "failureMode": "EMPTY_RESULTS_PROPAGATED -- hits=[] flows into vectorMatches=[], ranked=[] (retrieveRankedEntities on empty input), chunks=[] -- the assembled context packet this feeds would have silently carried zero retrieved chunks."
+    },
+    {
+      "file": "src/lib/server/ai/gemma4.ts",
+      "callSite": "searchQdrantCode(vector, limit, undefined, collection) where collection = pickCollectionForQuery(query) -> always explicit ('legal_documents' or 'codebase_chunks_768'), never undefined",
+      "classification": "NOT_ACTIVE (ownership default) + WAS_DIRECTLY_AFFECTED for the codebase_chunks_768 branch (named-vector bug fix). The legal_documents branch's vector-naming shape was NOT checked this pass -- flagged for QDRANT-NAMED-VECTOR-CENSUS-01, not this gate.",
+      "failureMode": "EMPTY_RESULTS_PROPAGATED into the same retrieveRankedEntities -> ranked -> topResults chain as packet-stream-cache.ts."
+    },
+    {
+      "file": "src/lib/server/rg-atlas/qdrant-union.ts",
+      "callSite": "searchQdrantCode(emb, topKPerLane) inside variants.map(...) -- NO collection arg, Stage 6 of what its own header comment calls a multi-query union pipeline",
+      "classification": "DIRECTLY_AFFECTED by both fixes",
+      "failureMode": "EMPTY_RESULTS_PROPAGATED per variant -- Promise.all is safe (searchQdrantCode never rejects), so every query variant's Qdrant lane would have silently unioned in zero hits, for the entire operational history of this pipeline stage until this fix."
+    },
+    {
+      "file": "src/lib/server/search/qdrant-search.ts (searchQdrantCodeStrictV1)",
+      "callSite": "No real callers found -- only re-exported from src/lib/server/search/index.ts",
+      "classification": "NOT_ACTIVE / newly added, unwired -- this is the concurrent 'governed OaK/DAG read seam' addition noted in qdrant-reader-fix-02. It DOES use exactVectorSearch (bypasses quantization) and strict:true (throws instead of swallowing errors), so once wired to a real caller it would surface the named-vector bug as a hard failure rather than an empty result -- but nothing calls it yet."
+    }
+  ],
+
+  "summary": {
+    "totalRealCallers": 6,
+    "directlyAffectedByOwnershipDefaultChange": 3,
+    "explicitCollectionCallers_unaffectedByOwnershipChange_butFixedForNamedVectorBug": 3,
+    "wholeRequestFailuresFound": 0,
+    "semanticLaneSilentlyDroppedFindings": 6,
+    "coreFinding": "In every traced caller, the pre-existing named-vector bug produced EMPTY_RESULTS_PROPAGATED or SEMANTIC_LANE_DROPPED -- never a whole-request crash. Every call site either wraps the Qdrant call in Promise.allSettled/Promise.all-with-internal-catch (safe by construction, since QdrantSearchBackend.search()'s own try/catch already returns [] rather than throwing) or treats an empty array as a valid 'no results' outcome. This means the historical impact was silent quality degradation (MCP tool always empty, hybrid search silently lexical-only, RG-Atlas union silently missing its Qdrant lane, ACE/Gemma4 context packets silently missing retrieved chunks) rather than outages or errors -- worse in one sense (nobody would have seen an error to investigate) but bounded in another (no cascading failures)."
+  }
+}

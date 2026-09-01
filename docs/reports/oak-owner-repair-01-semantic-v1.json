@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.oak-owner-repair-01-semantic.v1",
+  "updatedAt": "2026-09-01T14:55:00-07:00",
+  "status": "PROVEN_CONTRACT_HANDLER",
+  "gate": "OAK OWNER REPAIR 01",
+  "implementationRef": "parent-atlas.search.semantic.qdrant.strict.v1",
+  "callable": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts::searchQdrantCodeStrictV1",
+  "logicalHybridOwner": "search_hybrid",
+  "logicalHybridAliased": false,
+  "executor": "qdrant",
+  "representation": "semantic_768",
+  "collection": "codebase_chunks_768_v2",
+  "vectorName": "content",
+  "canonicalHydrationOwner": "PostgreSQL",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "tests": {
+    "packageBuild": "PASS",
+    "semanticHandlerFocused": { "passed": 2, "failed": 0 }
+  },
+  "promotion": {
+    "semanticOwnerRepair": "PROVEN",
+    "kagOwnerRepair": "OPEN",
+    "contextOwnerRepair": "OPEN",
+    "zeroWriteReplay": "BLOCKED_UNTIL_REMAINING_OWNER_REPAIRS"
+  },
+  "likely_cause": "The OaK catalog conflated a logical hybrid lane with a strict Qdrant semantic executor.",
+  "evidence": [
+    "packages/parent-atlas/src/core/oak-semantic-qdrant-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.spec.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/oak-semantic-qdrant-owner-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.ts"
+  ],
+  "safe_next_command": "rg -n \"readKagHypergraphNeighborsStrictV1|buildContextManifestFromACE|implementationRef\" packages/parent-atlas/src sveltekit-frontend/src/lib/server/atlas",
+  "smoke_command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-semantic-qdrant-handler-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/oak-owner-repair-01-semantic-v1.json"
+}

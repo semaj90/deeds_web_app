@@ -141,6 +141,7 @@ function rowsToHyperedgeV1(contractHyperedgeId: string, rows: HyperedgeMemberRow
  */
 export async function readKagHypergraphNeighborsV1(
   canonicalIds: readonly string[],
+  options: { strict?: boolean } = {},
 ): Promise<KagHypergraphNeighborsReceiptV1> {
   const uniqueIds = [...new Set(canonicalIds.filter(Boolean))].slice(0, MAX_CANONICAL_IDS);
   if (uniqueIds.length === 0) return EMPTY_RECEIPT;
@@ -203,7 +204,17 @@ export async function readKagHypergraphNeighborsV1(
       neighbors,
     };
   } catch (error) {
+    if (options.strict) throw error;
     console.warn('[kag-hypergraph-reader-v1] read failed, returning empty (fail-open):', error);
     return { ...EMPTY_RECEIPT, requestedCanonicalIds: uniqueIds.length };
   }
+}
+
+/** Strict read-only seam for governed DAG execution. Existing callers keep
+ * the historical fail-open wrapper above; this boundary preserves typed DB
+ * failures for receipts instead of converting them into empty success. */
+export async function readKagHypergraphNeighborsStrictV1(
+  canonicalIds: readonly string[],
+): Promise<KagHypergraphNeighborsReceiptV1> {
+  return readKagHypergraphNeighborsV1(canonicalIds, { strict: true });
 }

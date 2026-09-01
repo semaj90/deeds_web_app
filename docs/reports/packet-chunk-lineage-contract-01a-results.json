@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.packet-chunk-lineage-contract-01a.v1",
+  "task": "PACKET-CHUNK-LINEAGE-CONTRACT-01A",
+  "readOnly": true,
+  "writesPerformed": false,
+  "purpose": "Prove whether atlas_packets is uniformly FILE-granularity across live writers, or whether granularity is mixed/disputed, before freezing PacketChunkMembershipV1.",
+  "sourceKindDistribution": [
+    {
+      "source_kind": "(null)",
+      "n": 58304
+    },
+    {
+      "source_kind": "codebase_chunk",
+      "n": 3294
+    },
+    {
+      "source_kind": "rpc_method",
+      "n": 61
+    },
+    {
+      "source_kind": "cluster-summary",
+      "n": 1
+    }
+  ],
+  "codebaseChunkWriterGranularity": {
+    "total_rows": 3294,
+    "distinct_source_refs": 3294,
+    "distinct_packet_keys": 3294,
+    "null_packet_key": 0,
+    "interpretation": "If distinct_packet_keys ~= distinct_source_refs (both roughly equal to total_rows), register-orphaned-chunks.mjs is confirmed strictly file-granularity: one packet per source_ref, no per-chunk packet creation from this writer."
+  },
+  "multiPacketPerSourceRef": {
+    "totalSourceRefsWithMultiplePackets": 0,
+    "interpretation": "ZERO -- no source_ref has more than one atlas_packets row anywhere in the corpus. Strong evidence that FILE granularity is a REPO-WIDE INVARIANT, not just this one writer's local design choice.",
+    "samples": []
+  },
+  "packetKeyUniquenessPerSourceRefViolations": 0,
+  "chunkFanoutShape": {
+    "1": 291,
+    "2_5": 1541,
+    "6_20": 2215,
+    "20_plus": 698,
+    "total_source_refs": 4745,
+    "max_chunks_for_one_source": 369
+  }
+}

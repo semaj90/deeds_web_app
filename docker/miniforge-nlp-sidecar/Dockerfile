@@ -16,21 +16,21 @@ RUN apt-get update \
 
 RUN python -m pip install --upgrade pip setuptools wheel \
   && python -m pip install \
-    fastapi \
-    uvicorn[standard] \
-    httpx \
-    pydantic \
-    psutil \
-    beautifulsoup4 \
-    spacy \
+    fastapi==0.141.1 \
+    uvicorn[standard]==0.52.4 \
+    httpx==0.28.1 \
+    pydantic==2.13.5 \
+    psutil==7.2.2 \
+    beautifulsoup4==4.15.0 \
+    spacy==3.8.16 \
     langextract[openai]==1.6.0 \
     oaklib==0.7.4 \
-    'psycopg[binary,pool]>=3.2,<4' \
-    'networkx>=3.6,<4' \
-    treesitter-chunker \
-    tree-sitter \
-    tree-sitter-language-pack \
-    ast-grep-py \
+    'psycopg[binary,pool]==3.3.4' \
+    networkx==3.6.1 \
+    treesitter-chunker==4.0.0 \
+    tree-sitter==0.25.2 \
+    tree-sitter-language-pack==0.9.0 \
+    ast-grep-py==0.45.3 \
   && python -m pip check
 
 # Keep dependency installation independent from application source changes so

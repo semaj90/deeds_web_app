@@ -24,11 +24,12 @@ import time
 from pathlib import Path
 from typing import Any, Literal, Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import miniforge_nlp_sidecar as legacy
+import atlas_external_docs as external_docs
 from atlas_structural_provenance import (
     find_occurrence_positions,
     normalize_langextract_extraction,
@@ -71,6 +72,29 @@ class AstEvidenceResponseV2(BaseModel):
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+
+
+class WebEvidenceRequestV1(BaseModel):
+    """Bounded, read-only external evidence request for agentic repair context."""
+
+    url: str = Field(..., min_length=8, max_length=4_096)
+    provider: Literal["BEAUTIFULSOUP_HTTP", "FIRECRAWL_V2"] = "BEAUTIFULSOUP_HTTP"
+    maximum_chars: int = Field(default=3_000, ge=500, le=20_000)
+    overlap_chars: int = Field(default=300, ge=0, le=2_000)
+    maximum_chunks: int = Field(default=10, ge=1, le=40)
+
+
+class WebEvidenceResponseV1(BaseModel):
+    schema: Literal["atlas.external-web-evidence.v1"]
+    fetcher: str
+    source_id: str
+    source_revision: str
+    title: str
+    document_checksum: str
+    chunks: list[dict[str, Any]]
+    truncated: bool
+    canonical_authority: Literal[False] = False
+    writes_performed: Literal[False] = False
 
 
 app = FastAPI(
@@ -722,6 +746,57 @@ def extract_file() -> dict[str, Any]:
 @app.post("/extract/web")
 def extract_web(req: dict[str, Any]) -> dict[str, Any]:
     return legacy.extract_web(req)
+
+
+@app.post("/evidence/web", response_model=WebEvidenceResponseV1)
+def web_evidence(req: WebEvidenceRequestV1) -> WebEvidenceResponseV1:
+    """Fetch and type external documentation for bounded agent context.
+
+    BeautifulSoup is the default local provider. Firecrawl is opt-in and only
+    available when FIRECRAWL_API_KEY is explicitly configured. Neither provider
+    writes to Atlas stores or creates canonical identity.
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(req.url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise HTTPException(400, "WEB_EVIDENCE_URL_INVALID")
+
+    try:
+        if req.provider == "FIRECRAWL_V2":
+            api_key = os.getenv("FIRECRAWL_API_KEY", "").strip()
+            if not api_key:
+                raise HTTPException(503, "FIRECRAWL_NOT_CONFIGURED")
+            fetched = external_docs.fetch_firecrawl_v2(req.url, api_key=api_key)
+        else:
+            fetched = external_docs.fetch_beautifulsoup(req.url)
+
+        source_id = external_docs._sha(fetched.resolved_url)[:32]
+        source_revision = f"sha256:{fetched.normalized_checksum}"
+        chunks = external_docs.chunk_document(
+            source_id=source_id,
+            source_revision=source_revision,
+            source_url=fetched.resolved_url,
+            title=fetched.title,
+            text=fetched.markdown,
+            maximum_chars=req.maximum_chars,
+            overlap_chars=req.overlap_chars,
+        )
+        bounded = chunks[: req.maximum_chunks]
+        return WebEvidenceResponseV1(
+            schema="atlas.external-web-evidence.v1",
+            fetcher=fetched.fetcher,
+            source_id=source_id,
+            source_revision=source_revision,
+            title=fetched.title,
+            document_checksum=fetched.normalized_checksum,
+            chunks=[chunk.to_dict() for chunk in bounded],
+            truncated=len(chunks) > len(bounded),
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(502, f"WEB_EVIDENCE_FETCH_FAILED:{type(exc).__name__}") from exc
 
 
 def main() -> None:

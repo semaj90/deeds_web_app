@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.kernel-dag-runtime-registry-readiness.v1",
+  "updatedAt": "2026-09-01T13:12:00-07:00",
+  "status": "STATIC_REGISTRY_AND_FIXTURE_REPLAY_PROVEN_LIVE_OPEN",
+  "gate": "OAK EXEC BIND 01",
+  "created": true,
+  "wired": true,
+  "proven": true,
+  "done": false,
+  "changes": [
+    "implementationRef-keyed adapter registry",
+    "operatorId/operatorKind admission",
+    "binding-required execution lowering",
+    "shared read-only executor integration"
+  ],
+  "tests": {
+    "command": "npm --prefix packages/parent-atlas --workspaces=false exec -- vitest run src/core/kernel-dag-execution-binding-v1.spec.ts src/core/kernel-bound-dag-adapter-registry-v1.spec.ts src/core/kernel-bound-dag-executor-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+    "passed": 7,
+    "failed": 0
+  },
+  "frontendFixtureReplay": {
+    "command": "npm --prefix sveltekit-frontend exec -- vitest run src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.spec.ts src/lib/server/atlas/policy/oak-dag-runtime-replay-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1",
+    "passed": 3,
+    "failed": 0,
+    "deterministicChecksumEqual": true,
+    "writesPerformed": false,
+    "liveDependencies": false
+  },
+  "build": {
+    "command": "npm --prefix packages/parent-atlas --workspaces=false run build",
+    "status": "PASS"
+  },
+  "safety": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "graphWrites": false,
+    "productionWrites": false,
+    "canonicalAuthority": false
+  },
+  "remaining": [
+    "live read-only owner registration",
+    "live zero-write frozen-plan replay",
+    "LangGraph checkpoint and approval integration"
+  ],
+  "liveRuntime": {
+    "provider": "WSL2",
+    "distribution": "Ubuntu",
+    "environment": "atlas-rapids-cu13",
+    "entrypoint": "python/atlas_rapids_sidecar_graph.py",
+    "url": "http://127.0.0.1:8098",
+    "health": "HTTP_200",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "torch": "2.13.0+cu130",
+    "cuvs": "26.06.00",
+    "cugraph": "26.06.00",
+    "graphCapabilities": {
+      "available": true,
+      "backend": "cugraph.pagerank",
+      "algorithmRevision": "atlas.cugraph-pagerank.v1",
+      "maxSeeds": 64,
+      "maxResultNodes": 512,
+      "writesPerformed": false
+    },
+    "exactKnn": "RUNTIME_SMOKE_PROVEN",
+    "cagra": "RUNTIME_PROVEN_ON_TINY_FIXTURE_QUARANTINED",
+    "writesPerformed": false
+  },
+  "likely_cause": "The registry used coarse DagActionKind keys even though OaK functions distinguish operators and implementation references.",
+  "evidence": [
+    "packages/parent-atlas/src/core/kernel-bound-dag-adapter-registry-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-replay-v1.spec.ts",
+    "packages/parent-atlas/src/core/kernel-bound-dag-executor-v1.ts",
+    "packages/parent-atlas/src/core/kernel-dag-execution-binding-v1.ts"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/kernel-bound-dag-adapter-registry-v1.ts",
+    "packages/parent-atlas/src/core/kernel-bound-dag-executor-v1.ts",
+    "packages/parent-atlas/src/core/kernel-bound-dag-adapter-registry-v1.spec.ts",
+    "openspec/changes/parent-atlas-ontology-kernel/tasks.md"
+  ],
+  "safe_next_command": "rg -n --no-heading \"createNodeTreeSitterAstProvider|expandAtlasGraph|searchCodebaseAnn|buildContextManifestFromACE|readKagHypergraphNeighbors\" sveltekit-frontend/src/lib/server packages/parent-atlas/src",
+  "smoke_command": "npm --prefix packages/parent-atlas --workspaces=false exec -- vitest run src/core/kernel-dag-execution-binding-v1.spec.ts src/core/kernel-bound-dag-adapter-registry-v1.spec.ts src/core/kernel-bound-dag-executor-v1.spec.ts --pool=forks --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+  "report_path": "docs/reports/kernel-dag-runtime-registry-v1.json"
+}

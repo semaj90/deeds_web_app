@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.kernel-bound-dag-integration-readiness.v2",
+  "status": "PROVEN_BOUNDED",
+  "checkedAt": "2026-09-01",
+  "created": [
+    "OaK plan to existing bounded executor adapter",
+    "typed per-action receipt mapping",
+    "read-only action timeout enforcement"
+  ],
+  "proven": {
+    "focusedVitest": "2/2",
+    "parentAtlasPackageBuild": true,
+    "mutationActionsRejected": true,
+    "deterministicOutputChecksum": true,
+    "timeoutFailureClosed": true,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "stillOpen": [
+    "real Postgres, Qdrant, AST, graph, and ContextManifest handler registry binding",
+    "lineage fields from live request context: workspace/source/candidate/graph revisions",
+    "durable replay/checkpoint and LangGraph human approval integration",
+    "BitFrost revision-qualified cache replay",
+    "live dependency replay with writes disabled"
+  ],
+  "files": [
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.spec.ts"
+  ]
+}

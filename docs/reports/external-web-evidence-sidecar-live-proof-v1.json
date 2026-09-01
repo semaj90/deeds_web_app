@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.external-web-evidence-sidecar-live-proof.v1",
+  "observedAt": "2026-09-01",
+  "service": {
+    "container": "miniforge-nlp-sidecar",
+    "entrypoint": "python/miniforge_nlp_sidecar_oak.py",
+    "endpoint": "http://127.0.0.1:8095",
+    "health": "ok",
+    "model": "ornith-1.5-9b"
+  },
+  "proof": {
+    "request": {
+      "url": "https://example.com",
+      "provider": "BEAUTIFULSOUP_HTTP",
+      "maximumChars": 3000,
+      "overlapChars": 300,
+      "maximumChunks": 10
+    },
+    "responseSchema": "atlas.external-web-evidence.v1",
+    "fetcher": "BEAUTIFULSOUP_HTTP",
+    "chunkCount": 1,
+    "sourceRevision": "sha256:feb057ddba5ac313506909af05c17370808a81030f057346499d045c25534dbf",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "guards": {
+    "firecrawlWithoutApiKey": {
+      "httpStatus": 503,
+      "error": "FIRECRAWL_NOT_CONFIGURED"
+    },
+    "databaseWrites": false,
+    "externalProjectionWrites": false
+  },
+  "status": "PROVEN_BOUNDED_LIVE",
+  "limitations": [
+    "No Firecrawl live request was made because FIRECRAWL_API_KEY is not configured.",
+    "This proves the sidecar route, not canonical source promotion or downstream indexing.",
+    "Existing TypeScript acquisition callers remain a separate integration gate."
+  ]
+}

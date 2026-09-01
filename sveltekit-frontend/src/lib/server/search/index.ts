@@ -1,5 +1,5 @@
-export { searchCodeLexical, searchCodeHybridPg }         from './postgres-fts.js';
-export { searchQdrantCode }                              from './qdrant-search.js';
+export { searchCodeLexical, searchCodeLexicalStrictV1, searchCodeHybridPg } from './postgres-fts.js';
+export { searchQdrantCode, searchQdrantCodeStrictV1 }     from './qdrant-search.js';
 export { fetchAuthorityScores, expandNeighbours }        from './neo4j-rerank.js';
 export { rerankCandidates }                              from './gpu-rerank.js';
 export { buildRetrievalTrace, SCORE_WEIGHTS }            from './retrieval-explainer.js';

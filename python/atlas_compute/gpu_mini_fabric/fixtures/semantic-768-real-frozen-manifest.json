@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.gpu-mini-fabric.semantic-768-real-frozen-manifest.v1",
+  "source": "codebase_chunk_index.content_embedding (read-only export)",
+  "num_rows": 55169,
+  "dim": 768,
+  "dtype": "float32",
+  "vectors_file": "semantic-768-real-frozen.f32.bin",
+  "node_keys_file": "semantic-768-real-frozen-node-keys.json",
+  "vectors_checksum": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+  "canonical_production_data_touched": true,
+  "canonical_production_data_mutated": false,
+  "note": "Read-only SELECT export, frozen at export time -- not re-queried on every benchmark run. Touches real canonical data (read) but never writes/mutates it."
+}

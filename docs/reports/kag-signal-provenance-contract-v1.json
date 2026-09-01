@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.kag-signal-provenance-contract.v1",
+  "status": "CONTRACT_PROVEN",
+  "checkedAt": "2026-09-01",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "tests": {
+    "focusedVitest": "2/2",
+    "gitDiffCheck": "PASS"
+  },
+  "contract": "atlas.taxonomy-signal-evidence.v1",
+  "supportedSignals": ["semantic", "lexical", "graph", "community", "nlp"],
+  "invariants": [
+    "score is finite and normalized to [0,1]",
+    "non-null score requires at least one evidence reference",
+    "producer and workspace revisions are required",
+    "source and graph revisions are explicit nullable axes",
+    "missing signal remains NULL rather than zero",
+    "checksum covers the canonical signal evidence body"
+  ],
+  "notProven": [
+    "live producer join into atlas_taxonomy_assignment_candidates",
+    "lexical signal owner",
+    "candidate materialization or apply readback"
+  ],
+  "files": [
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/taxonomy-signal-evidence-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/taxonomy/taxonomy-signal-evidence-v1.spec.ts"
+  ]
+}

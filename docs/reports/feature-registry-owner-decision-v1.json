@@ -1,6 +1,6 @@
 {
   "schema": "atlas.feature-registry-owner-decision.v1",
-  "asOf": "2026-08-31",
+  "asOf": "2026-09-01",
   "status": "DECISION_PROPOSED_NOT_APPLIED",
   "canonicalOwnerCandidate": {
     "kind": "drizzle_schema",
@@ -51,7 +51,29 @@
   "live": {
     "tablePresent": false,
     "featureRows": 0,
-    "migrationLedgersReconciled": false
+    "migrationLedgersReconciled": false,
+    "ownerAudit": "MISSING_MANIFEST_REGISTRATION"
+  },
+  "baselineEvidence": {
+    "disposablePostgres": {
+      "status": "PROVEN",
+      "report": "docs/reports/feature-registry-disposable-proof-v1.json",
+      "columnsReadBack": 15,
+      "indexesReadBack": 2
+    },
+    "liveOwnerAudit": {
+      "status": "READ_ONLY_COMPLETED",
+      "report": "docs/reports/atlas-migration-owner-audit-v1.json",
+      "featureRegistry": "MISSING_MANIFEST_REGISTRATION"
+    },
+    "contractMirrorAudit": {
+      "status": "READ_ONLY_COMPLETED",
+      "report": "docs/reports/postgres-contract-mirrors-report.json",
+      "tablesChecked": 8,
+      "staticAligned": 3,
+      "liveAligned": 3,
+      "liveUnavailable": 0
+    }
   },
   "writes": {
     "database": false,
@@ -61,7 +83,8 @@
   "requiredBeforeApply": [
     "approve migration baseline",
     "generate one journaled migration from the selected Drizzle shape",
-    "review migration SQL on a throwaway database",
+    "review migration SQL on a throwaway database — completed for historical 0024/0025; newly generated migration still requires review",
     "run bounded feature_key to feature_id round-trip readback"
-  ]
+  ],
+  "applyDecision": "BLOCKED_UNTIL_BASELINE_APPROVAL"
 }

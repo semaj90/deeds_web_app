@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.kernel-bound-dag-executor-proof.v1",
+  "observedAt": "2026-09-01T17:35:00Z",
+  "status": "PROVEN_BOUNDED",
+  "implementation": {
+    "planner": "KernelBoundDagPlannerV1",
+    "executor": "executeKernelBoundDagReadOnlyV1",
+    "receipt": "KernelBoundDagExecutionReceiptV1",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "proofs": {
+    "dependencyOrdering": "PASS",
+    "mutationRejection": "PASS",
+    "focusedVitest": "5/5 PASS",
+    "packageTypecheck": "PASS"
+  },
+  "limitations": [
+    "Handlers are injected and read-only policy is enforced by the executor; live Postgres/Qdrant/graph adapters are not wired by this change.",
+    "The npm workspace build script has an existing --no-workspaces/--workspace configuration error; direct tsc validation passed."
+  ]
+}

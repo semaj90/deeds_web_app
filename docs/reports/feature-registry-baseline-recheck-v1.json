@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.feature-registry-baseline-recheck.v1",
+  "updatedAt": "2026-09-01T11:36:00-07:00",
+  "status": "BASELINE_UNRESOLVED",
+  "command": "node scripts/atlas/audit-atlas-migration-owners.mjs",
+  "auditStatus": "PASS_READ_ONLY_AUDIT",
+  "livePostgresReachable": true,
+  "summary": {
+    "missingManifestRegistration": ["feature_registry"],
+    "sidecarUnapplied": ["graphify_file_search_projection"],
+    "liveShapeAligned": [
+      "graphify_source_inventory",
+      "callable_search_projection",
+      "observation_feature_rows_active",
+      "symbol_registry"
+    ],
+    "superseded": ["observation_feature_rows_superseded_candidate"]
+  },
+  "disposableProof": {
+    "status": "NOT_RUN",
+    "reason": "Proposed disposable-baseline scripts are absent from this checkout"
+  },
+  "safety": {
+    "databaseWrites": false,
+    "migrationWrites": false,
+    "ledgerRepair": false,
+    "productionWrites": false
+  },
+  "likely_cause": "Migration ownership and live ledger history remain mixed, while the proposed disposable proof tooling is not available in the current checkout.",
+  "evidence": [
+    "scripts/atlas/audit-atlas-migration-owners.mjs",
+    "docs/reports/atlas-migration-owner-audit-v1.json",
+    "openspec/changes/manual-migration-reconciliation/tasks.md"
+  ],
+  "patch_targets": [
+    "openspec/changes/manual-migration-reconciliation/tasks.md"
+  ],
+  "safe_next_command": "rg --files scripts/atlas | rg \"feature.*registry|registry.*feature|baseline|disposable\"",
+  "smoke_command": "node scripts/atlas/audit-atlas-migration-owners.mjs",
+  "report_path": "docs/reports/feature-registry-baseline-recheck-v1.json"
+}
