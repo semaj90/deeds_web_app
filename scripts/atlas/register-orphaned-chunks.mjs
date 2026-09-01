@@ -21,6 +21,11 @@
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply      # apply all
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply --limit=5000
  *   node scripts/atlas/register-orphaned-chunks.mjs --apply --verbose
+ *   node scripts/atlas/register-orphaned-chunks.mjs --apply --capture-lineage --limit=1
+ *
+ * --capture-lineage is intentionally opt-in. It preserves the historical
+ * packet registration default while admitting only memberships backed by a
+ * real codebase_chunk_index.chunk_id and graphify_files.workspace_id.
  */
 
 import pg        from 'pg';
@@ -35,6 +40,7 @@ const ROOT  = path.resolve(__dir, '../..');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const APPLY     = process.argv.includes('--apply');
+const CAPTURE_LINEAGE = process.argv.includes('--capture-lineage');
 const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = !APPLY;
 const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
@@ -134,6 +140,15 @@ async function main() {
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
 
+  if (CAPTURE_LINEAGE) {
+    const { rows } = await pool.query(`
+      SELECT to_regclass('public.atlas_packet_chunk_lineage') AS lineage_table
+    `);
+    if (!rows[0]?.lineage_table) {
+      throw new Error('LINEAGE_TABLE_UNAVAILABLE: --capture-lineage requires the additive atlas_packet_chunk_lineage table; no schema change is attempted');
+    }
+  }
+
   let redis = null;
   let redisReady = false;
   try {
@@ -199,6 +214,46 @@ async function main() {
       };
     });
 
+    const lineageBySourceRef = new Map();
+    if (CAPTURE_LINEAGE) {
+      const sourceRefs = toRegister.map(row => row.source_ref);
+      const { rows: lineageRows } = await pool.query(`
+        SELECT
+          cci.relative_path AS source_ref,
+          cci.chunk_id AS canonical_chunk_id,
+          MIN(cci.id::text) AS chunk_row_id,
+          gf.workspace_id::text AS workspace_id,
+          NULLIF(BTRIM(gf.code_source_revision::text), '') AS source_revision
+        FROM codebase_chunk_index cci
+        LEFT JOIN LATERAL (
+          SELECT workspace_id, code_source_revision
+          FROM graphify_files
+          WHERE source_ref = cci.relative_path
+          ORDER BY workspace_revision DESC NULLS LAST, code_source_revision DESC NULLS LAST
+          LIMIT 1
+        ) gf ON TRUE
+        WHERE cci.relative_path = ANY($1::text[])
+          AND NULLIF(BTRIM(cci.chunk_id::text), '') IS NOT NULL
+        GROUP BY cci.relative_path, cci.chunk_id, gf.workspace_id, gf.code_source_revision
+        ORDER BY cci.relative_path, cci.chunk_id
+      `, [sourceRefs]);
+
+      for (const row of lineageRows) {
+        const list = lineageBySourceRef.get(row.source_ref) ?? [];
+        list.push(row);
+        lineageBySourceRef.set(row.source_ref, list);
+      }
+    }
+
+    const lineageStats = {
+      enabled: CAPTURE_LINEAGE,
+      sourceRefsWithNamespace: 0,
+      sourceRefsWithoutNamespace: 0,
+      membershipsPlanned: 0,
+      membershipsWritten: 0,
+      membershipsSkipped: 0,
+    };
+
     if (DRY_RUN) {
       console.log(`\n(Dry-run) Would register ${toRegister.length} chunks:`);
       if (VERBOSE && toRegister.length <= 20) {
@@ -215,7 +270,85 @@ async function main() {
         mode: 'dry-run',
         orphaned_found: toRegister.length,
         would_register: toRegister.length,
-        status: 'dry_run_complete'
+        status: 'dry_run_complete',
+        lineage: CAPTURE_LINEAGE ? buildLineagePreview(toRegister, lineageBySourceRef, lineageStats) : lineageStats,
+      });
+      return;
+    }
+
+    if (CAPTURE_LINEAGE) {
+      // The opt-in lineage path is per-source transactional: packet creation
+      // and its complete real membership set commit together. Sources without
+      // graphify_files namespace authority retain the legacy packet behavior,
+      // but receive no fabricated lineage row.
+      let registered = 0;
+      let skipped = 0;
+      for (const registration of toRegister) {
+        const candidates = lineageBySourceRef.get(registration.source_ref) ?? [];
+        const namespace = candidates.find(row => row.workspace_id);
+        if (!namespace) {
+          lineageStats.sourceRefsWithoutNamespace += 1;
+          lineageStats.membershipsSkipped += candidates.length;
+        } else {
+          lineageStats.sourceRefsWithNamespace += 1;
+          lineageStats.membershipsPlanned += candidates.length;
+        }
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+          const packetResult = await client.query(
+            `INSERT INTO atlas_packets (packet_id, packet_key, source_ref, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())
+             ON CONFLICT (packet_key) DO NOTHING`,
+            [`packet_${createHash('sha256').update(registration.packet_key).digest('hex').slice(0, 24)}`, registration.packet_key, registration.source_ref, registration.directory_path, registration.feature_id, registration.domain_class, registration.source_kind],
+          );
+          registered += packetResult.rowCount ?? 0;
+          if (namespace) {
+            const membershipStatus = candidates.length === 1 ? 'EXACT_SINGLE_MEMBER' : 'EXACT_MULTI_MEMBER';
+            for (const row of candidates) {
+              // chunk_ordinal is intentionally NULL, not the array-iteration
+              // index -- per PACKET-CHUNK-LINEAGE-CONTRACT-01 (frozen), no
+              // ordinal is invented for this field. codebase_chunk_index has
+              // no verified-unique per-file sequence signal (line_start is
+              // ~30% populated and non-unique even where present); membership
+              // identity uses the sorted, deduplicated canonicalChunkId set
+              // instead, which is order-independent by construction.
+              const result = await client.query(
+                `INSERT INTO atlas_packet_chunk_lineage
+                   (packet_key, canonical_chunk_id, chunk_row_id, source_ref, source_namespace, source_revision, membership_status, revision_status, chunk_ordinal, lineage_producer_revision, evidence_refs)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+                 ON CONFLICT (packet_key, canonical_chunk_id) DO UPDATE SET
+                   chunk_row_id = EXCLUDED.chunk_row_id,
+                   source_ref = EXCLUDED.source_ref,
+                   source_namespace = EXCLUDED.source_namespace,
+                   source_revision = EXCLUDED.source_revision,
+                   membership_status = EXCLUDED.membership_status,
+                   revision_status = EXCLUDED.revision_status,
+                   chunk_ordinal = EXCLUDED.chunk_ordinal,
+                   lineage_producer_revision = EXCLUDED.lineage_producer_revision,
+                   evidence_refs = EXCLUDED.evidence_refs`,
+                [registration.packet_key, row.canonical_chunk_id, row.chunk_row_id, registration.source_ref, `workspace:${row.workspace_id}`, row.source_revision ?? null, membershipStatus, row.source_revision ? 'PROVEN' : 'UNPROVEN', null, 'register-orphaned-chunks:lineage-capture:v1', ['scripts/atlas/register-orphaned-chunks.mjs']],
+              );
+              lineageStats.membershipsWritten += result.rowCount ?? 0;
+            }
+          }
+          await client.query('COMMIT');
+        } catch (err) {
+          await client.query('ROLLBACK');
+          skipped += 1;
+          console.error(`Source failed and was rolled back (${registration.source_ref}): ${err.message}`);
+        } finally {
+          client.release();
+        }
+      }
+      writeReport({
+        generated: new Date().toISOString(),
+        mode: 'apply',
+        lineage: lineageStats,
+        orphaned_found: toRegister.length,
+        registered,
+        skipped,
+        status: 'registration_lineage_capture_complete',
       });
       return;
     }
@@ -297,6 +430,28 @@ async function main() {
     await pool.end();
     if (redisReady && redis) await redis.quit();
   }
+}
+
+function buildLineagePreview(registrations, lineageBySourceRef, stats) {
+  const preview = registrations.map(registration => {
+    const candidates = lineageBySourceRef.get(registration.source_ref) ?? [];
+    const namespace = candidates.find(row => row.workspace_id);
+    if (namespace) {
+      stats.sourceRefsWithNamespace += 1;
+      stats.membershipsPlanned += candidates.length;
+    } else {
+      stats.sourceRefsWithoutNamespace += 1;
+      stats.membershipsSkipped += candidates.length;
+    }
+    return {
+      source_ref: registration.source_ref,
+      packet_key: registration.packet_key,
+      namespace_proven: Boolean(namespace),
+      chunk_count: candidates.length,
+      membership_write: Boolean(namespace),
+    };
+  });
+  return { ...stats, preview };
 }
 
 main();
