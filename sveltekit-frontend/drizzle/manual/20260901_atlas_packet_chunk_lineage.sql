@@ -22,7 +22,16 @@ CREATE TABLE IF NOT EXISTS atlas_packet_chunk_lineage (
   source_revision text,
   membership_status text NOT NULL,
   revision_status text NOT NULL,
-  chunk_ordinal integer NOT NULL,
+  -- NULLABLE, not NOT NULL: chunk_ordinal is only meaningful when the chunk
+  -- producer supplies a real, verified-unique sequence. codebase_chunk_index's
+  -- only candidate signal, line_start, is populated for just 30% of rows
+  -- corpus-wide and is not even reliably unique where present (verified in
+  -- PACKET-CHUNK-LINEAGE-BACKFILL-DRY-01: 50 distinct chunk_ids, 48 distinct
+  -- line_start values on one fixture). Per that gate's explicit rule, no
+  -- ordinal is invented merely to fill this column -- it is left NULL
+  -- instead, and membership-set identity uses the sorted, deduplicated
+  -- canonicalChunkId set (order-independent) rather than ordinal position.
+  chunk_ordinal integer,
   lineage_producer_revision text NOT NULL,
   evidence_refs text[] NOT NULL DEFAULT '{}',
   created_at timestamptz NOT NULL DEFAULT now(),

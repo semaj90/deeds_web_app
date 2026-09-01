@@ -62,8 +62,18 @@ export const PacketChunkMembershipV1Schema = z
     sourceRevision: nonEmptyString.nullable(),
     membershipStatus: PacketChunkMembershipStatusSchema,
     revisionStatus: PacketChunkRevisionStatusSchema,
-    /** Position of this chunk within its source file's chunk sequence, for stable ordering only -- not an identity field. */
-    chunkOrdinal: z.number().int().nonnegative(),
+    /**
+     * Position of this chunk within its source file's chunk sequence, for
+     * stable ordering only -- not an identity field. Nullable: only set when
+     * the chunk producer supplies a real, verified-unique sequence.
+     * codebase_chunk_index's only candidate signal (line_start) is populated
+     * for ~30% of rows corpus-wide and is not reliably unique even where
+     * present (verified in PACKET-CHUNK-LINEAGE-BACKFILL-DRY-01). No ordinal
+     * is invented to fill this field -- membership-set identity uses the
+     * sorted, deduplicated canonicalChunkId set instead, which is
+     * order-independent by construction.
+     */
+    chunkOrdinal: z.number().int().nonnegative().nullable(),
     /** Revision of the producer (writer script or backfill run) that wrote this row. */
     lineageProducerRevision: nonEmptyString,
     /** Report/receipt paths or run ids substantiating this membership -- not free-text notes. */

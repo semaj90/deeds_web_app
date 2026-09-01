@@ -27,6 +27,17 @@ describe('PacketChunkMembershipV1Schema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepts a null chunkOrdinal -- no ordinal is invented when the chunk producer supplies none', () => {
+    const result = PacketChunkMembershipV1Schema.safeParse({
+      ...validBase,
+      chunkOrdinal: null,
+      sourceRevision: null,
+      membershipStatus: 'EXACT_MULTI_MEMBER',
+      revisionStatus: 'UNPROVEN',
+    });
+    expect(result.success).toBe(true);
+  });
+
   it('accepts a proven membership with an honestly UNPROVEN revision (the expected common case for legacy data)', () => {
     const result = PacketChunkMembershipV1Schema.safeParse({
       ...validBase,

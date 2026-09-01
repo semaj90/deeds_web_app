@@ -32,6 +32,7 @@
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 await loadAtlasEnv();
 import { createHash } from 'node:crypto';
+import { computeMembershipSetChecksum } from './lib/packet-chunk-membership-checksum.mjs';
 
 const BASELINE = { MEMBERSHIP_EXACT_REVISION_PROVEN: 577, NAMESPACE_UNPROVEN: 4110, NO_MEMBER: 56973, CONFLICTING_MEMBERSHIP: 0 };
 
@@ -86,7 +87,7 @@ async function main() {
 
     // membershipSetChecksum: sorted, deduplicated canonicalChunkId set, order-independent.
     const uniqueSortedIds = [...new Set(members.map((m) => m.chunk_id))].sort();
-    const membershipSetChecksum = sha256(`${p.packet_key}\n${JSON.stringify(uniqueSortedIds)}`);
+    const membershipSetChecksum = computeMembershipSetChecksum(p.packet_key, uniqueSortedIds);
     if (uniqueSortedIds.length !== members.length) duplicateMembershipPairs += members.length - uniqueSortedIds.length;
 
     let membershipSetStatus: string;

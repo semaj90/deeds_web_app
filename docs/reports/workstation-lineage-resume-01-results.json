@@ -323,6 +323,42 @@
     "verdict": "PASS",
     "nextGate": "PACKET-CHUNK-LINEAGE-BACKFILL-CANARY-01"
   },
+  "packetChunkLineageBackfillCanary01": {
+    "status": "PASS",
+    "script": "sveltekit-frontend/scripts/atlas/packet-chunk-lineage-backfill-canary-01.mts",
+    "report": "docs/reports/packet-chunk-lineage-backfill-canary-01-results.json",
+    "distinctFromCanary01": "CANARY-01 proved the future-capture writer path. This gate proves PROMOTION of the frozen BACKFILL-DRY-01 artifact -- 4 complete historical packet membership sets read VERBATIM from the dry-run's proposedMembershipRows, never rediscovered from source tables here.",
+    "sharedChecksumHelper": "scripts/atlas/lib/packet-chunk-membership-checksum.mjs -- extracted and imported by BOTH BACKFILL-DRY-01 and this canary, byte-for-byte identical algorithm. Re-ran BACKFILL-DRY-01 after the extraction to confirm all 3 of its checksums were unchanged (they were) before this canary ever consumed its output.",
+    "fixtures": {
+      "SINGLE": { "packetKey": "packet:00848415f727", "proposedCount": 1, "beforeExpected": 0 },
+      "FEW": { "packetKey": "ace:packet:7802b2572378", "proposedCount": 2, "beforeExpected": 0 },
+      "MANY": { "packetKey": "ace:packet:0051e908c9be", "proposedCount": 30, "beforeExpected": 0 },
+      "CANARY_OVERLAP": { "packetKey": "packet:ce6dfc5484ac", "proposedCount": 5, "beforeExpected": 5, "note": "One of the 3 packets CANARY-01's future-capture writer already wrote for real. Proves historical reconstruction and future capture converge on the same canonical membership identity rather than creating parallel rows." }
+    },
+    "realBugsFoundAndFixedDuringThisGate": [
+      {
+        "bug": "chunk_ordinal NOT NULL constraint (both the live migration and the Zod contract) contradicted BACKFILL-DRY-01's own frozen design, which deliberately leaves chunkOrdinal null (no reliable producer ordinal exists -- see that gate's chunkOrdinalDecision). First --apply run failed on every fixture: 'null value in column chunk_ordinal violates not-null constraint'.",
+        "fix": "Made chunk_ordinal nullable in both sveltekit-frontend/drizzle/manual/20260901_atlas_packet_chunk_lineage.sql (ALTER TABLE ... DROP NOT NULL applied live, safe/additive, did not affect the 56 pre-existing CANARY-01 rows which already had real non-null values) and packet-chunk-membership-v1.ts's chunkOrdinal field (.nullable() added, 1 new spec test added, 9/9 pass).",
+        "scopeNote": "CANARY-01's own already-committed rows still carry the sort-derived ordinals it originally assigned (before this null-ordinal rule was established). Not retroactively changed -- out of scope for this gate, and those values remain valid under the now-nullable column; flagged here for visibility, not silently left inconsistent."
+      },
+      {
+        "bug": "Replay-gate logic bug (not a data problem): expectBeforeCount was hardcoded per-fixture for a truly-first run (0 for new fixtures, 5 for the pre-existing overlap). On the replay pass within the same script execution, pass 1 had already committed real rows for SINGLE/FEW/MANY, so their real beforeMembershipCount on replay was legitimately non-zero -- but the check still compared against the static 0, producing a false ROLLBACK_MISMATCH on 3 of 4 replay fixtures despite every other check (checksum, foreign/missing/duplicate/synthetic counts) being exactly correct.",
+        "fix": "expectBeforeCount is now computed per-pass: proposed.length on the replay pass (an idempotent UPSERT always leaves count == proposed.length), the original static value only on the initial pass. Reset the 3 affected fixture rows and re-ran clean to get an honest initial+replay proof under the fix, rather than trusting the first (partially-correct, partially-buggy) run's output."
+      }
+    ],
+    "finalResult": {
+      "perShapeVerdicts": { "SINGLE": "PASS", "FEW": "PASS", "MANY": "PASS", "CANARY_OVERLAP": "PASS" },
+      "replayVerdict": "PASS",
+      "overallVerdict": "PASS",
+      "missingMemberships": 0, "foreignMemberships": 0, "duplicateMemberships": 0, "syntheticIds": 0,
+      "checksumMatchesDryRunAllFixturesBothPasses": true,
+      "overlapCanonicalIdentityUnchanged": true,
+      "overlapSourceIdentityUnchanged": true,
+      "liveTableFinalState": "packet:00848415f727=1, packet:8589ed47d789=1, ace:packet:7802b2572378=2, packet:ce6dfc5484ac=5, ace:packet:0051e908c9be=30, packet:5c4e29307ca5=50 -- 6 packets, 89 total rows, unchanged by replay (no duplication)."
+    },
+    "note": "This canary wrote only 4 deliberately-chosen historical packets (33 new membership rows), NOT the full 6,987-row admitted cohort. PACKET-CHUNK-LINEAGE-BACKFILL-PROMOTION-01 is the separate, later authorization for that -- kept deliberately apart from this bounded proof.",
+    "nextGates": ["PACKET-CHUNK-LINEAGE-PROMOTION-01 (future-capture writer ownership -- the historical hole stops growing)", "PACKET-CHUNK-LINEAGE-BACKFILL-PROMOTION-01 (separate authorization to populate the full 577-packet historical cohort)"]
+  },
   "openDesignQuestionSurfacedByThisGate_RESOLVED_SUPERSEDED": "STATUS: RESOLVED_SUPERSEDED. The a/b/c fork below is preserved verbatim for history only -- do not reopen it. The decision was made in the very next exchange (see architecturalCorrection, reinterpretedFanOutBug, revisedCanonicalContract below): none of a/b/c as originally framed. atlas_packets stays FILE-granularity (option (b)'s premise, rejected as knowingly lossy) and chunk lineage is represented as an explicit normalized 1:N relation (closest to (c), but as a relational table -- atlas_packet_chunk_lineage -- never as an array column on atlas_packets). This is now frozen in PacketChunkMembershipV1 (packetChunkLineageContract01 below) and physically implemented in packetChunkLineageMigration01. Original superseded text: atlas_packets is currently FILE-granularity (one row per source_ref, by register-orphaned-chunks.mjs's own DISTINCT design) while codebase_chunk_index is CHUNK-granularity (many rows per source_ref for multi-chunk files). PacketChunkLineageV1's canonicalChunkId as a single string assumes a 1:1 packet-to-chunk relationship that does not match the current packet model. PACKET-CHUNK-LINEAGE-CONTRACT-01 must resolve this explicitly -- e.g. either (a) redefine packet granularity to be chunk-level going forward (breaking change to what a 'packet' means), or (b) keep packets file-level and define canonicalChunkId as 'the primary/representative chunk for this file' under an explicit, documented rule (e.g. lowest line_start), or (c) change canonicalChunkId to canonicalChunkIds: string[] and drop the single-EXACT-resolution assumption entirely. This gate surfaces the question; it does not answer it.",
   "architecturalCorrection": "The FILE-vs-chunk fork above was framed incorrectly as a-vs-b-vs-c. The correct model is closest to (c) but normalized as an explicit relational membership, not an array embedded in atlas_packets: packet identity and chunk identity are NOT the same thing -- a packet<->chunk relation is LINEAGE MEMBERSHIP (1 FILE packet contains/was-derived-from N canonical chunks), not identity equality. Do not redefine packets to chunk-granularity (large breaking migration) and do not pick a 'representative chunk' (would knowingly turn a many-chunk file into a false 1:1 identity). Preserve atlas_packets granularity as-is.",
   "reinterpretedFanOutBug": "There were two distinct bugs conflated as one. BUG (real, this is what invalidated BRIDGE-RECON-DRY-02): a script picks one arbitrary chunk out of N candidates sharing a source_ref and treats that arbitrary choice as canonical packet identity. NOT A BUG (legitimate, once membership replaces identity-equality as the model): one FILE packet genuinely has N canonical chunk members -- an exact 37-chunk file packet is not ambiguous merely because cardinality is 37, if all 37 chunks are proven members of that exact file/revision. Every downstream gate must stop labeling every multi-chunk match as UNRESOLVED_PACKET_TO_CHUNK_AMBIGUITY on cardinality alone -- membership classification needs its own vocabulary: EXACT_SINGLE_MEMBER, EXACT_MULTI_MEMBER, SOURCE_NAMESPACE_UNPROVEN, SOURCE_REVISION_UNPROVEN, NO_MEMBER, CONFLICTING_MEMBERSHIP.",
