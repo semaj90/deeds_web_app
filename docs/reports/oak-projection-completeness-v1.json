@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.oak-projection-completeness.v1",
+  "status": "COMBINED_ACCOUNTING_PROVEN_PROFILE_OPEN",
+  "projector": "packages/parent-atlas/src/core/ontology-projection-completeness-v1.ts",
+  "owlProfile": "REPORTED_BY_STRUCTURED_PROJECTOR",
+  "profileChecked": false,
+  "reasonerRoute": "NONE",
+  "validation": {
+    "focusedTests": "5/5 PASS",
+    "parentAtlasBuild": "PASS",
+    "databaseWrites": false,
+    "productionWrites": false,
+    "canonicalAuthority": false
+  },
+  "scope": "Combined constraint accounting is proven; formal OWL profile detection and reasoner verification remain open."
+}

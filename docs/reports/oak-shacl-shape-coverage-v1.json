@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.oak-shacl-shape-coverage.v1",
+  "status": "CARDINALITY_SHAPES_PROVEN_PARTIAL",
+  "projector": "packages/parent-atlas/src/core/ontology-shacl-projection-v1.ts",
+  "shaclSpecRevision": "W3C-SHACL-20170720",
+  "supportedIntent": ["DATA_SHAPE", "BOTH"],
+  "supportedShape": ["CARDINALITY"],
+  "explicitlyNotReasoning": true,
+  "validation": {
+    "focusedTests": "2/2 PASS",
+    "parentAtlasBuild": "PASS",
+    "databaseWrites": false,
+    "productionWrites": false,
+    "canonicalAuthority": false
+  },
+  "remainingGates": [
+    "OAK-SHACL-SHAPES-01 additional property/class/datatype shapes",
+    "OAK-SHACL-VALIDATE-01 runtime data-graph validation",
+    "OAK-PROJECTION-COMPLETENESS-01 combined OWL/SHACL accounting",
+    "OAK-PROFILE-CHECK-01 actual OWL profile checker"
+  ]
+}

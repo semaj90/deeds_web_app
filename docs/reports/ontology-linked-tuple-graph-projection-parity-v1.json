@@ -33,7 +33,7 @@
     {
       "name": "edge_roles_match_original_participant_roles",
       "ok": true,
-      "detail": "{'cause', 'effect', 'evidence'}"
+      "detail": "{'cause', 'evidence', 'effect'}"
     },
     {
       "name": "role_codes_are_stable_and_distinct",
@@ -57,6 +57,6 @@
     }
   ],
   "pass": true,
-  "durationMs": 14.4,
+  "durationMs": 0.56,
   "writesPerformed": false
 }

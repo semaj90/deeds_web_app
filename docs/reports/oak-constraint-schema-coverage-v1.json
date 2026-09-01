@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.oak-constraint-schema-coverage.v1",
+  "status": "CONTRACT_PROVEN_PROJECTION_OPEN",
+  "contract": "packages/parent-atlas/src/core/ontology-kernel-constraint-v2.ts",
+  "constraintKinds": {
+    "DISJOINT_CLASSES": "STRUCTURED",
+    "DOMAIN_RANGE": "STRUCTURED",
+    "PROPERTY_RESTRICTION": "STRUCTURED",
+    "CARDINALITY": "STRUCTURED",
+    "NARY_PARTICIPANT_ROLE": "STRUCTURED"
+  },
+  "semanticIntent": ["ONTOLOGICAL", "DATA_SHAPE", "BOTH"],
+  "compilationIntent": {
+    "owl": "explicit_by_semantics",
+    "shacl": "explicit_by_semantics",
+    "dynamicOntologyClassMinting": false,
+    "canonicalAuthority": false
+  },
+  "validation": {
+    "focusedTests": "3/3 PASS",
+    "parentAtlasBuild": "PASS",
+    "owlProjectorUpdated": false,
+    "shaclProjectorImplemented": false,
+    "profileCheckerImplemented": false,
+    "reasonerInvoked": false,
+    "databaseWrites": false,
+    "productionWrites": false
+  },
+  "remainingGates": [
+    "OAK-OWL-AXIOM-PROJECTION-02",
+    "OAK-SHACL-SHAPES-01",
+    "OAK-PROJECTION-COMPLETENESS-01",
+    "OAK-PROFILE-CHECK-01"
+  ]
+}

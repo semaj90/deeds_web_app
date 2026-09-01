@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.ontology-linked-tuple-cugraph-parity-receipt.v1",
+  "status": "ONTO_PY_GPU_PARITY_PROVEN",
+  "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "projectionChecksum": "75014df92f31f6d5d23db141dde59e5c748a1592c19a17d584756c277c09166e",
+  "nodeCount": 5,
+  "edgeCount": 4,
+  "renumbered": false,
+  "unknownOrdinals": 0,
+  "maxAbsScoreError": 1.395151487670887e-07,
+  "sameRankOrdering": true,
+  "cpuBackend": "networkx",
+  "gpuBackend": "cugraph.pagerank",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

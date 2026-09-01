@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.oak-owl-projection-completeness.v1",
+  "status": "INCOMPLETE",
+  "projectionStatus": "INCOMPLETE",
+  "owlProfile": "UNKNOWN",
+  "reasonerRoute": "NONE",
+  "producerRevision": "2026-09-01",
+  "sourceContracts": {
+    "constraintSchema": "packages/parent-atlas/src/core/ontology-kernel-schema-v1.ts",
+    "projector": "packages/parent-atlas/src/core/ontology-owl-projection-v1.ts",
+    "focusedSpec": "packages/parent-atlas/src/core/ontology-owl-projection-v1.spec.ts"
+  },
+  "constraintKindsDeclared": [
+    "DISJOINT_CLASSES",
+    "DOMAIN_RANGE",
+    "PROPERTY_RESTRICTION",
+    "CARDINALITY"
+  ],
+  "constraintSchemaShape": {
+    "fields": ["constraintId", "kind", "appliesTo", "description"],
+    "structuredDomainRangeFields": false,
+    "structuredPropertyRestrictionFields": false,
+    "structuredCardinalityFields": false,
+    "structuredParticipantRoleAxioms": false
+  },
+  "projectorCoverage": {
+    "logicalAxiomKinds": ["DISJOINT_CLASSES"],
+    "annotationOnlyKinds": [
+      "DOMAIN_RANGE",
+      "PROPERTY_RESTRICTION",
+      "CARDINALITY"
+    ],
+    "multiClassDisjointness": "ANNOTATION_ONLY",
+    "nAryParticipantRoles": "ANNOTATION_ONLY",
+    "annotationOnlyLogicalConstraints": "NONZERO_WHEN_PRESENT",
+    "unknownConstraintMappings": 0
+  },
+  "profileAssessment": {
+    "actualProfileChecker": false,
+    "profile": "UNKNOWN",
+    "currentHeuristic": "OWL2_DL_REQUIRED_WHEN_ANNOTATION_ONLY",
+    "heuristicIsNotProfileProof": true
+  },
+  "reasonerReadiness": {
+    "elk": "NOT_ADOPTED",
+    "hermit": "NOT_ADOPTED",
+    "reasonerInvocation": false,
+    "fastApiReasonerBoundary": "DEFERRED"
+  },
+  "validation": {
+    "focusedOwlAndKernelTests": "16/16 PASS",
+    "packageBuild": "PASS",
+    "databaseWrites": false,
+    "productionWrites": false,
+    "canonicalAuthority": false
+  },
+  "nextGates": [
+    "OAK-CONSTRAINT-SCHEMA-01",
+    "OAK-OWL-AXIOM-PROJECTION-02",
+    "OAK-SHACL-01",
+    "OAK-PROFILE-CHECK-01",
+    "FORMAL-REASONER-OWNER-01"
+  ],
+  "checksumPolicy": "This receipt records the current code and test census; it does not promote ontology semantics or select a reasoner."
+}

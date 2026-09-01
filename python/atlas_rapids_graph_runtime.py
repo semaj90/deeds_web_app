@@ -87,6 +87,20 @@ class PageRankRequest(BaseModel):
     parameterChecksum: str | None = None
 
 
+class BFSRequest(BaseModel):
+    graphRevision: str
+    startNodeKey: str
+    depthLimit: int = Field(default=8, ge=0, le=64)
+    expectedArtifactChecksum: str | None = None
+    expectedGraphOrdinalMapChecksum: str | None = None
+
+
+class ComponentsRequest(BaseModel):
+    graphRevision: str
+    expectedArtifactChecksum: str | None = None
+    expectedGraphOrdinalMapChecksum: str | None = None
+
+
 def normalize_seed_pairs(seeds: list[tuple[str, float]]) -> list[tuple[str, float]]:
     if not seeds:
         return []
@@ -222,7 +236,8 @@ class ResidentGraph:
         del identity_gpu
 
         t1 = time.perf_counter()
-        self.graph = cugraph.Graph(directed=True)
+        self.directed = bool(manifest.get("directed", True))
+        self.graph = cugraph.Graph(directed=self.directed)
         if self.edge_count > 0:
             self.graph.from_cudf_edgelist(
                 self.edges_df,
@@ -314,15 +329,19 @@ class ResidentGraph:
             scores_df = self._global_cache[cache_key]
             cache_hit = True
         else:
-            scores_df = cugraph.pagerank(
-                self.graph,
-                alpha=float(req.alpha),
-                personalization=personalization,
-                precomputed_vertex_out_weight=self.out_weight_df,
-                max_iter=int(req.maxIter),
-                tol=float(req.tol),
-                fail_on_nonconvergence=True,
-            )
+            pagerank_kwargs = {
+                "alpha": float(req.alpha),
+                "personalization": personalization,
+                "max_iter": int(req.maxIter),
+                "tol": float(req.tol),
+                "fail_on_nonconvergence": True,
+            }
+            # cuGraph's undirected incidence graph has no directed out-weight
+            # semantics. Let cuGraph derive the degree weights for that mode;
+            # the precomputed directed optimization remains unchanged.
+            if self.directed:
+                pagerank_kwargs["precomputed_vertex_out_weight"] = self.out_weight_df
+            scores_df = cugraph.pagerank(self.graph, **pagerank_kwargs)
             cache_hit = False
             if personalization is None:
                 self._global_cache[cache_key] = scores_df
@@ -388,6 +407,101 @@ class ResidentGraph:
             },
         }
 
+    def bfs(self, req: BFSRequest) -> dict[str, Any]:
+        if self.node_count <= 0:
+            raise ValueError("BFS requires at least one node")
+        if req.graphRevision != self.graph_revision:
+            raise LookupError(f"resident revision {self.graph_revision} != requested {req.graphRevision}")
+        if req.expectedArtifactChecksum and req.expectedArtifactChecksum != self.artifact_checksum:
+            raise LookupError("artifact checksum does not match resident graph")
+        if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != self.graph_ordinal_map_checksum:
+            raise LookupError("graph ordinal map checksum does not match resident graph")
+        try:
+            start_id = self.resolve_node_keys([req.startNodeKey], "start")[0]
+        except (KeyError, ValueError) as exc:
+            raise LookupError(f"unknown start nodeKey: {req.startNodeKey}") from exc
+        started = time.perf_counter()
+        result_df = cugraph.bfs(self.graph, start=start_id, depth_limit=int(req.depthLimit), return_predecessors=True)
+        rows = result_df.to_pandas()
+        results: list[dict[str, Any]] = []
+        for row in rows.itertuples(index=False):
+            vertex = int(row.vertex)
+            distance = int(row.distance)
+            if distance > int(req.depthLimit):
+                continue
+            predecessor = int(row.predecessor)
+            identity = self.gpu_id_to_identity[vertex]
+            results.append({
+                "gpuNodeId": vertex,
+                "nodeKey": identity["nodeKey"],
+                "packetKey": identity["packetKey"],
+                "distance": distance,
+                "predecessorGpuNodeId": None if predecessor < 0 else predecessor,
+            })
+        results.sort(key=lambda item: (item["distance"], item["gpuNodeId"]))
+        return {
+            "schema": "atlas.graph-bfs-receipt.v1",
+            "operation": "bfs",
+            "backend": "cugraph.bfs",
+            "algorithmRevision": "atlas.cugraph-bfs.v1",
+            "graphRevision": self.graph_revision,
+            "projectionRevision": self.projection_revision,
+            "artifactChecksum": self.artifact_checksum,
+            "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
+            "startNodeKey": req.startNodeKey,
+            "depthLimit": int(req.depthLimit),
+            "renumbered": False,
+            "nodeCount": self.node_count,
+            "edgeCount": self.edge_count,
+            "results": results,
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+            "timings": {"kernelMs": round((time.perf_counter() - started) * 1000, 3)},
+        }
+
+    def connected_components(self, req: ComponentsRequest) -> dict[str, Any]:
+        if self.node_count <= 0:
+            raise ValueError("connected components requires at least one node")
+        if req.graphRevision != self.graph_revision:
+            raise LookupError(f"resident revision {self.graph_revision} != requested {req.graphRevision}")
+        if req.expectedArtifactChecksum and req.expectedArtifactChecksum != self.artifact_checksum:
+            raise LookupError("artifact checksum does not match resident graph")
+        if req.expectedGraphOrdinalMapChecksum and req.expectedGraphOrdinalMapChecksum != self.graph_ordinal_map_checksum:
+            raise LookupError("artifact ordinal map checksum does not match resident graph")
+        started = time.perf_counter()
+        result_df = cugraph.connected_components(self.graph)
+        rows = result_df.to_pandas()
+        assignments = {
+            int(row.vertex): int(row.labels)
+            for row in rows.itertuples(index=False)
+        }
+        results = [
+            {
+                "gpuNodeId": vertex,
+                "nodeKey": self.gpu_id_to_identity[vertex]["nodeKey"],
+                "packetKey": self.gpu_id_to_identity[vertex]["packetKey"],
+                "componentLabel": label,
+            }
+            for vertex, label in sorted(assignments.items())
+        ]
+        return {
+            "schema": "atlas.graph-connected-components-receipt.v1",
+            "operation": "connected_components",
+            "backend": "cugraph.connected_components",
+            "algorithmRevision": "atlas.cugraph-connected-components.v1",
+            "graphRevision": self.graph_revision,
+            "projectionRevision": self.projection_revision,
+            "artifactChecksum": self.artifact_checksum,
+            "graphOrdinalMapChecksum": self.graph_ordinal_map_checksum,
+            "directed": self.directed,
+            "nodeCount": self.node_count,
+            "edgeCount": self.edge_count,
+            "results": results,
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+            "timings": {"kernelMs": round((time.perf_counter() - started) * 1000, 3)},
+        }
+
 
 class GraphRuntimeManager:
     def __init__(self, gpu_memory_reader: Callable[[], dict[str, Any] | None] | None = None) -> None:
@@ -420,6 +534,7 @@ class GraphRuntimeManager:
                     "projectionRevision": resident.projection_revision,
                     "nodeCount": resident.node_count,
                     "edgeCount": resident.edge_count,
+                    "renumbered": False,
                     "nodeTableHash": resident.node_table_hash,
                     "edgeTableHash": resident.edge_table_hash,
                     "loadedAtUnixMs": int(resident.loaded_at * 1000),
@@ -537,6 +652,36 @@ class GraphRuntimeManager:
                 _fail("PAGERANK_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
         raise AssertionError("unreachable")
 
+    def connected_components(self, req: ComponentsRequest) -> dict[str, Any]:
+        with self._lock:
+            if self._resident is None:
+                _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+            try:
+                return self._resident.connected_components(req)
+            except LookupError as exc:
+                _fail("GRAPH_REVISION_MISMATCH", str(exc), 409)
+            except ValueError as exc:
+                _fail("COMPONENTS_INVALID_REQUEST", str(exc))
+            except Exception as exc:
+                _fail("COMPONENTS_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
+        raise AssertionError("unreachable")
+
+    def bfs(self, req: BFSRequest) -> dict[str, Any]:
+        with self._lock:
+            if self._resident is None:
+                _fail("GRAPH_NOT_RESIDENT", "load a revision-qualified graph projection first", 409)
+            try:
+                return self._resident.bfs(req)
+            except KeyError as exc:
+                _fail("GRAPH_NODE_NOT_RESIDENT", str(exc))
+            except LookupError as exc:
+                _fail("GRAPH_REVISION_MISMATCH", str(exc), 409)
+            except ValueError as exc:
+                _fail("BFS_INVALID_REQUEST", str(exc))
+            except Exception as exc:
+                _fail("BFS_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
+        raise AssertionError("unreachable")
+
 
 def install_graph_routes(
     app: FastAPI,
@@ -560,6 +705,14 @@ def install_graph_routes(
     @router.post("/pagerank")
     def graph_pagerank(req: PageRankRequest) -> dict[str, Any]:
         return manager.pagerank(req)
+
+    @router.post("/bfs")
+    def graph_bfs(req: BFSRequest) -> dict[str, Any]:
+        return manager.bfs(req)
+
+    @router.post("/connected-components")
+    def graph_connected_components(req: ComponentsRequest) -> dict[str, Any]:
+        return manager.connected_components(req)
 
     app.include_router(router)
     return manager

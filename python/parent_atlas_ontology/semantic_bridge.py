@@ -51,6 +51,28 @@ from parent_atlas_ontology.models import OntologyLinkedTupleV1  # noqa: E402
 
 def ontology_linked_tuple_to_nary_relation(tuple_value: OntologyLinkedTupleV1) -> NarySemanticRelation:
     source_revision = tuple_value.provenance.sourceRevision or tuple_value.relationRevision or "unknown"
+    return _to_nary_relation(tuple_value, source_revision=source_revision)
+
+
+def ontology_linked_tuple_to_nary_relation_strict_v1(tuple_value: OntologyLinkedTupleV1) -> NarySemanticRelation:
+    """Convert only when an authoritative source revision is present.
+
+    The compatibility bridge above preserves historical fixture behavior. This
+    strict seam is the admission boundary for governed graph/GPU execution and
+    deliberately rejects relation revisions or synthetic ``unknown`` values as
+    substitutes for source authority.
+    """
+    source_revision = tuple_value.provenance.sourceRevision
+    if not source_revision:
+        raise ValueError("SOURCE_REVISION_UNPROVEN")
+    return _to_nary_relation(tuple_value, source_revision=source_revision)
+
+
+def _to_nary_relation(
+    tuple_value: OntologyLinkedTupleV1,
+    *,
+    source_revision: str,
+) -> NarySemanticRelation:
     participants = tuple(
         RelationParticipant(canonical_id=p.entityId, role=p.role, ordinal=i)
         for i, p in enumerate(tuple_value.participants)

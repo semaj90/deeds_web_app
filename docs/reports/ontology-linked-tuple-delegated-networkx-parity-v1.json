@@ -29,6 +29,11 @@
       "detail": "('vitest:ontology-kernel-end-to-end.spec.ts:pre-fix-run:4-failed-of-21',)"
     },
     {
+      "name": "strict_bridge_requires_and_preserves_authoritative_source_revision",
+      "ok": true,
+      "detail": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
       "name": "delegated_snapshot_has_correct_schema",
       "ok": true,
       "detail": "atlas.ontology-networkx-projection.v1"
@@ -60,6 +65,6 @@
     }
   ],
   "pass": true,
-  "durationMs": 1641.11,
+  "durationMs": 297.78,
   "writesPerformed": false
 }

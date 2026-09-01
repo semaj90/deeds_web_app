@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.oak-profile-check.v1",
+  "status": "ADAPTER_PROVEN_CHECKER_UNAVAILABLE",
+  "checker": "OWLAPI",
+  "parserStage": "OWLAPI RDF/XML parser → OWLOntology",
+  "checkerInstalled": false,
+  "detectedProfile": "UNKNOWN",
+  "reasonerRoute": "NONE",
+  "validation": { "focusedTests": "3/3 PASS", "parentAtlasBuild": "PASS", "databaseWrites": false, "productionWrites": false, "canonicalAuthority": false },
+  "nextAction": "Provide an isolated OWLAPI profile-check sidecar or subprocess; do not infer profile from the V1 heuristic."
+}

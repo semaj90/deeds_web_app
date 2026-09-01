@@ -120,16 +120,20 @@ def main() -> int:
     max_error = max(abs(expected_scores[key] - gpu_scores[key]) for key in expected_scores)
     cpu_order = sorted(expected_scores, key=lambda key: (-expected_scores[key], key))
     gpu_order = sorted(gpu_scores, key=lambda key: (-gpu_scores[key], key))
+    renumbered = load.get("renumbered")
+    parity_proven = max_error <= 1e-5 and cpu_order == gpu_order
+    identity_mode_proven = renumbered is False
     report = {
         "schema": "atlas.graph-ordinal-cpu-gpu-parity-receipt.v1",
-        "status": "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN" if max_error <= 1e-5 and cpu_order == gpu_order else "GRAPH_ORDINAL_CPU_GPU_PARITY_FAILED",
+        "status": "GRAPH_ORDINAL_CPU_GPU_PARITY_PROVEN" if parity_proven and identity_mode_proven else "GRAPH_ORDINAL_CPU_GPU_PARITY_UNPROVEN",
         "graphRevision": GRAPH_REVISION,
         "workspaceRevision": WORKSPACE_REVISION,
         "projectionRevision": PROJECTION_REVISION,
         "ordinalMapChecksum": digest(NODES),
         "nodeCount": len(NODES),
         "edgeCount": len(EDGES),
-        "renumbered": bool(load.get("renumbered", True)),
+        "renumbered": renumbered,
+        "identityModeProven": identity_mode_proven,
         "unknownOrdinals": 0,
         "cpuBackend": "networkx",
         "gpuBackend": gpu.get("backend", "cugraph.pagerank"),

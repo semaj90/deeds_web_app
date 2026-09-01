@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.ontology-linked-tuple-leiden-replay-receipt.v1",
+  "status": "ONTO_PY_GPU_03_PROVEN",
+  "graphRevision": "graph:ontology-linked-tuple-cugraph-algorithm-fixture-v2",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v2",
+  "topologyHash": "sha256:c7a79a30494789b4a4893d615f21822b40a5adaddb1c4a68ec1aedf3e7cb558d",
+  "vertexCount": 21,
+  "edgeCount": 16,
+  "randomState": 17,
+  "resolution": 1.0,
+  "maxIterations": 100,
+  "theta": 1.0,
+  "communityCount": 5,
+  "checks": {
+    "same_input_hash": true,
+    "same_output_hash": true,
+    "same_normalized_partition": true,
+    "parameters_frozen": true,
+    "projection_revision_preserved": true,
+    "writes_false": true,
+    "canonical_false": true
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

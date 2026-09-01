@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.oak-profile-python-boundary.v1",
+  "status": "PROVEN_BOUNDED",
+  "integrationOwner": "PYTHON_FASTAPI_8095",
+  "checkerProtocol": "OwlProfileChecker",
+  "defaultImplementation": "UnavailableOwlProfileChecker",
+  "defaultResult": {
+    "status": "UNAVAILABLE",
+    "profile": "UNKNOWN",
+    "reasonerRoute": "NONE",
+    "reasoningPerformed": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "implicitDownload": false
+  },
+  "routes": [
+    "/oak/profile-check/capabilities",
+    "/oak/profile-check"
+  ],
+  "validation": {
+    "pythonTests": "8/8 PASS",
+    "typescriptProfileAndCompletenessTests": "3/3 PASS",
+    "openspecStrictValidation": "PASS",
+    "javaOrOwlapiProvisioned": false,
+    "formalReasoningPerformed": false,
+    "databaseWrites": false,
+    "productionWrites": false
+  },
+  "nextGate": "OAK-03E live OWLAPI parser/profile execution"
+}

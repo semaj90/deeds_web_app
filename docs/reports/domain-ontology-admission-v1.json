@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.domain-ontology-admission-proof.v1",
+  "status": "DOMAIN_ONTOLOGY_ADMISSION_PROVEN",
+  "checks": {
+    "known_domain_admitted": true,
+    "unknown_domain_unmapped": true,
+    "mapping_revision_present": true,
+    "no_dynamic_class_minting": true,
+    "writes_false": true,
+    "canonical_false": true
+  },
+  "admissions": [
+    {
+      "schema": "atlas.domain-ontology-admission.v1",
+      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "domainLabel": "retrieval",
+      "classId": "atlas:RetrievalDomain",
+      "confidence": 0.95,
+      "status": "ADMITTED",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.domain-ontology-admission.v1",
+      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "domainLabel": "search",
+      "classId": "atlas:RetrievalDomain",
+      "confidence": 0.9,
+      "status": "ADMITTED",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.domain-ontology-admission.v1",
+      "mappingRevision": "sha256:0afb17760433481d41d06607d2f5be15222b0ac5db9dde3d03cfce944efe1f38",
+      "domainLabel": "unknown-label",
+      "classId": null,
+      "confidence": 1.0,
+      "status": "UNMAPPED",
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "source": "classifier evidence labels; no database or graph writes"
+}

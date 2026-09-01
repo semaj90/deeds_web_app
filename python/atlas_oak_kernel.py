@@ -21,9 +21,9 @@ import hashlib
 import json
 import os
 from functools import lru_cache
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 try:
@@ -72,6 +72,53 @@ class OakTraversalRequest(BaseModel):
     predicates: list[str] = Field(default_factory=list, max_length=16)
     limit: int = Field(default=100, ge=1, le=1000)
     max_depth: int = Field(default=2, ge=1, le=4)
+
+
+class OakProfileCheckRequest(BaseModel):
+    owl_checksum: str = Field(pattern=r"^[a-f0-9]{64}$")
+    owl_document: str = Field(min_length=1, max_length=5_000_000)
+
+
+class OwlProfileChecker(Protocol):
+    def capabilities(self) -> dict[str, Any]: ...
+
+    def check(self, *, owl_bytes: bytes, expected_checksum: str) -> dict[str, Any]: ...
+
+
+class UnavailableOwlProfileChecker:
+    """Default checker; never starts a subprocess or downloads an artifact."""
+
+    def capabilities(self) -> dict[str, Any]:
+        return {
+            "available": False,
+            "implementation": "OWLAPI_SUBPROCESS",
+            "integrationOwner": "PYTHON_FASTAPI_8095",
+            "parser": "OWLAPI_RDFXML",
+            "reasoningPerformed": False,
+            "reasonerRoute": "NONE",
+            "implicitDownload": False,
+            "canonicalAuthority": False,
+        }
+
+    def check(self, *, owl_bytes: bytes, expected_checksum: str) -> dict[str, Any]:
+        del owl_bytes
+        return {
+            "schema": "atlas.oak.profile-check.v1",
+            "status": "UNAVAILABLE",
+            "profile": "UNKNOWN",
+            "reasonerRoute": "NONE",
+            "reasoningPerformed": False,
+            "writesPerformed": False,
+            "canonicalAuthority": False,
+            "owlChecksum": expected_checksum,
+            "errorCode": "OAK_PROFILE_CHECKER_NOT_CONFIGURED",
+        }
+
+
+def get_owl_profile_checker() -> OwlProfileChecker:
+    """FastAPI dependency seam for a future explicitly provisioned checker."""
+
+    return UnavailableOwlProfileChecker()
 
 
 def _oaklib_version() -> str | None:
@@ -242,6 +289,38 @@ def oak_kernel() -> dict[str, Any]:
         "llmOntologyWritesAllowed": False,
         "canonicalAuthority": False,
     }
+
+
+@router.get("/profile")
+def oak_profile_status() -> dict[str, Any]:
+    """Expose the Python-owned OWLAPI profile boundary without invoking it."""
+
+    return {
+        "schema": "atlas.oak.profile-status.v1",
+        "adapterOwner": "python-fastapi-8095",
+        "ontologyAccess": "oaklib",
+        "profileChecker": "owlapi",
+        "parser": "owlapi-rdfxml",
+        "status": "UNAVAILABLE",
+        "detectedProfile": "UNKNOWN",
+        "reasonerRoute": "NONE",
+        "reasoningPerformed": False,
+        "implicitDownload": False,
+        "canonicalAuthority": False,
+    }
+
+
+@router.get("/profile-check/capabilities")
+def oak_profile_check_capabilities(checker: OwlProfileChecker = Depends(get_owl_profile_checker)) -> dict[str, Any]:
+    return {"schema": "atlas.oak.profile-check-capabilities.v1", **checker.capabilities()}
+
+
+@router.post("/profile-check")
+def oak_profile_check(request: OakProfileCheckRequest, checker: OwlProfileChecker = Depends(get_owl_profile_checker)) -> dict[str, Any]:
+    """Run the injected checker; the default implementation fails closed."""
+
+    response = checker.check(owl_bytes=request.owl_document.encode("utf-8"), expected_checksum=request.owl_checksum)
+    return {**response, "inputChecksum": _checksum(request.model_dump())}
 
 
 @router.post("/lookup")

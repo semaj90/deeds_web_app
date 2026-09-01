@@ -19,7 +19,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from parent_atlas_ontology.adapter import OntologyLinkedTupleAdapter  # noqa: E402
 from parent_atlas_ontology.models import OntologyLinkedTupleV1  # noqa: E402
-from parent_atlas_ontology.semantic_bridge import ontology_linked_tuple_to_nary_relation  # noqa: E402
+from parent_atlas_ontology.semantic_bridge import (  # noqa: E402
+    ontology_linked_tuple_to_nary_relation,
+    ontology_linked_tuple_to_nary_relation_strict_v1,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_PATH = REPO_ROOT / "docs" / "reports" / "fixtures" / "ontology-linked-tuple-fixture-v1.json"
@@ -38,6 +41,7 @@ def main() -> int:
 
     # Bridge conversion preserves the tuple's own identity and every participant.
     relation = ontology_linked_tuple_to_nary_relation(tuple_obj)
+    strict_relation = ontology_linked_tuple_to_nary_relation_strict_v1(tuple_obj)
     check("bridge_preserves_relation_id", relation.relation_id == tuple_obj.tupleId, relation.relation_id)
     check("bridge_preserves_relation_type_from_label", relation.relation_type == tuple_obj.label, relation.relation_type)
     check(
@@ -51,6 +55,11 @@ def main() -> int:
         str([p.role for p in relation.participants]),
     )
     check("bridge_preserves_evidence_refs", relation.evidence_refs == tuple_obj.evidenceRefs, str(relation.evidence_refs))
+    check(
+        "strict_bridge_requires_and_preserves_authoritative_source_revision",
+        strict_relation.source_revision == tuple_obj.provenance.sourceRevision,
+        str(strict_relation.source_revision),
+    )
 
     # Adapter delegates end to end.
     adapter = OntologyLinkedTupleAdapter()

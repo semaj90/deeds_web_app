@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.ontology-linked-tuple-gpu-algorithm-parity-receipt.v1",
+  "status": "ONTO_PY_GPU_02_PROVEN",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-algorithm-fixture-v2",
+  "projectionChecksum": "b68087a95c276b022b1443cce9b3a29c25f1b0d2304a13854fd439d0b07f6dee",
+  "tupleCount": 7,
+  "relationNodeCount": 7,
+  "participantNodeCount": 14,
+  "vertexCount": 21,
+  "edgeCount": 16,
+  "sourceRevisionQualifiedCount": 7,
+  "revisionUnprovenCount": 0,
+  "syntheticRevisionCount": 0,
+  "projectionOrdinalDense": true,
+  "renumbered": false,
+  "bfs": {
+    "startNodeKey": "relation:7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3:fixture-d2",
+    "cpuReachableCount": 4,
+    "gpuReachableCount": 4,
+    "nodeSetParity": true,
+    "distanceParity": true
+  },
+  "components": {
+    "cpuComponentCount": 5,
+    "gpuComponentCount": 5,
+    "nodeCoverageParity": true,
+    "normalizedPartitionParity": true
+  },
+  "pagerank": {
+    "maxAbsError": 2.086054970151796e-06,
+    "nodeSetParity": true
+  },
+  "unknownGpuOrdinals": 0,
+  "missingGpuOrdinals": 0,
+  "checks": {
+    "revision_qualified": true,
+    "synthetic_revisions_zero": true,
+    "projection_ordinal_dense": true,
+    "bfs_node_set_parity": true,
+    "bfs_distance_parity": true,
+    "component_partition_parity": true,
+    "pagerank_node_set_parity": true,
+    "pagerank_error_within_fixture_tolerance": true,
+    "renumbered_false": true,
+    "writes_false": true,
+    "canonical_false": true
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

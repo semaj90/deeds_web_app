@@ -1191,6 +1191,16 @@ projection logic a second time.
   (no `relation:` prefix in `GraphNodeKeyV1` yet). Its own standalone
   test (`onto_py_04_graph_projection_check.py`) was fixed to call
   `project_to_graph()` directly instead of through the now-redirected
+  adapter path.
+
+**Strict GPU admission correction — 2026-09-01:** added
+`ontology_linked_tuple_to_nary_relation_strict_v1()`. The compatibility bridge
+continues to support historical fixtures, but governed graph/GPU execution now
+requires `provenance.sourceRevision` and rejects `SOURCE_REVISION_UNPROVEN`;
+`relationRevision` and `unknown` cannot substitute for source authority.
+The delegated NetworkX proof passed with the strict-source check included.
+The tuple-specific cuDF/cuGraph replay remains open, and the live sidecar
+renumbering mode must be reported explicitly before that gate can be promoted.
   adapter method — preserving the concurrent process's own extension to
   that test (`operational_projection_has_one_coordinate_universe`) rather
   than breaking or silently discarding it. **Still 9/9 checks pass.**
@@ -1832,3 +1842,233 @@ execution lane, but those facts do not by themselves prove a frozen OaK kernel.
 The WSL2 graph result therefore upgrades graph execution to
 `READY_FOR_REVISION_BOUND_REPLAY`; it does not promote ontology verification,
 function coverage, judge repair, or kernel freeze.
+
+### Ontology semantics correction — 2026-09-01
+
+The current `kernelConstraintSchema` stores `kind`, `appliesTo`, and prose
+description. The OWL projector therefore emits only the two-class
+`DISJOINT_CLASSES` case as a logical axiom; `DOMAIN_RANGE`,
+`PROPERTY_RESTRICTION`, and `CARDINALITY` are currently annotation-only.
+Annotations do not contribute to OWL logical meaning. Consequently,
+`OWL2_DL_REQUIRED` in the current receipt is a conservative projection gap,
+not evidence that the intended ontology genuinely requires HermiT.
+
+The dependency order is now frozen as:
+
+```text
+OAK-CONSTRAINT-SCHEMA-01
+  structured discriminated constraint union
+        ↓
+OAK-OWL-AXIOM-PROJECTION-02
+  real domain/range/restriction/cardinality axioms or explicit rejection
+        ↓
+OAK-SHACL-01
+  RDF/application data-shape validation where appropriate
+        ↓
+OAK-PROFILE-CHECK-01
+  actual OWL profile checker
+        ↓
+OWL2_EL → ELK       OWL2_DL/non-EL → HermiT
+```
+
+| Gate | Status | Boundary |
+|---|---|---|
+| OAK-CONSTRAINT-SCHEMA-01 structured constraints | **OPEN** | replace prose-only constraint payloads with a discriminated, reference-checked union |
+| OKF-DOMAIN-ONTOLOGY-MAP-01 | **OPEN** | classifier labels are evidence signals; only an admitted revisioned mapping may yield ontology IDs |
+| ONTOLOGY-TUPLE-PARITY-01 | **OPEN** | TypeScript/Zod remains schema owner; Python tuple model is a validated execution mirror |
+| OAK-OWL-AXIOM-PROJECTION-02 | **OPEN** | no claimed logical constraint may silently downgrade to an annotation |
+| OAK-SHACL-01 | **DEFERRED** | shape/cardinality/application invariants are separate from OWL logical consistency |
+| OAK-PROFILE-CHECK-01 | **OPEN** | current `owlProfileHeuristic` is not a formal profile checker |
+| OAK-ELK-01 / OAK-HERMIT-01 | **BLOCKED_BY_PROFILE_CHECK** | select only after structured axiom projection and actual profile detection |
+
+This ontology lane remains separate from the active workstation lineage gate;
+it must not bypass unresolved source/chunk identity or revision ownership.
+
+### Projection completeness receipt — 2026-09-01
+
+The current census is recorded in
+`docs/reports/oak-owl-projection-completeness-v1.json`.
+It is **INCOMPLETE**: the actual OWL profile is **UNKNOWN** and the reasoner
+route is **NONE**. The existing `OWL2_DL_REQUIRED` value remains a heuristic
+for annotation-only projection gaps, not a HermiT requirement. ELK/HermiT
+installation and invocation remain blocked until structured constraint fields,
+complete axiom projection, and a real profile check are proven.
+
+Validation recorded by the receipt: focused OWL/kernel tests **16/16 PASS**,
+Parent Atlas package build **PASS**, database writes **NO**, production writes
+**NO**, canonical authority **false**.
+
+The additive structured contract is now implemented and proven separately in
+`packages/parent-atlas/src/core/ontology-kernel-constraint-v2.ts` with report
+`docs/reports/oak-constraint-schema-coverage-v1.json`. This closes only the
+contract sub-gate (**3/3 focused tests PASS**); V1 OWL projection remains
+unchanged and incomplete until the OWL and SHACL compiler gates are completed.
+
+The additive V2 OWL projection path is now implemented and proven for
+structured domain/range and property-restriction axioms. It emits
+`COMPLETE`/`INCOMPLETE` receipts and rejects unsupported type references rather
+than converting claimed logical constraints into comments. It does not replace
+the V1 projector, does not perform profile checking, and does not invoke a
+reasoner. SHACL projection remains a parallel open gate.
+
+The SHACL lane now has an additive projector at
+`packages/parent-atlas/src/core/ontology-shacl-projection-v1.ts`. It emits
+W3C SHACL 2017 cardinality shapes for `DATA_SHAPE`/`BOTH` constraints and
+records unsupported shape mappings explicitly. Focused tests are **2/2 PASS**;
+runtime RDF validation and broader shape coverage remain open. See
+`docs/reports/oak-shacl-shape-coverage-v1.json`.
+
+Combined OWL/SHACL accounting is now implemented at
+`packages/parent-atlas/src/core/ontology-projection-completeness-v1.ts`.
+It proves that each structured constraint has an explicit logical-axiom or
+data-shape destination, or is reported as unsupported. The focused combined
+test passed (**5/5 total in the projection tranche**). Profile checking remains
+explicitly false and reasoner routing remains `NONE`; see
+`docs/reports/oak-projection-completeness-v1.json`.
+
+The profile boundary follows the verified OWLAPI sequence: parse RDF/XML into
+`OWLOntology`, then run `OWL2ELProfile.checkOntology()` and
+`OWL2DLProfile.checkOntology()`. This is profile checking, not inference. The
+receipt records that parser stage, but the checker remains unavailable until
+an isolated OWLAPI runtime is configured.
+
+Runtime-owner audit recorded in
+`docs/reports/oak-profile-runtime-owner-audit-v1.json`: no existing OWLAPI
+profile checker, JAR, or dedicated Java ontology service was found. The Java
+Neo4j procedure module is unrelated and must not host OWLAPI. No dependency was
+downloaded; the profile adapter remains safely unconfigured.
+
+The Python-owned status surface is now exposed as `GET /oak/profile` through
+the existing `miniforge_nlp_sidecar_oak.py` 8095 composition. It reports the
+OWLAPI parser/profile boundary as unavailable, profile `UNKNOWN`, route `NONE`,
+and explicitly disables implicit downloads and reasoning. The Python OAK
+tests passed **5/5**; no new service or dependency was introduced.
+
+The reasoner-free profile-check adapter is now present at
+`packages/parent-atlas/src/core/ontology-profile-check-v1.ts`. It accepts only
+an injected OWLAPI profile result; without an isolated checker it returns
+`UNAVAILABLE`, profile `UNKNOWN`, and route `NONE`. Focused tests passed
+(**3/3**). No ELK/HermiT installation was performed. See
+`docs/reports/oak-profile-check-v1.json`.
+
+The Python boundary is now exercised through the existing 8095 OAK sidecar:
+`GET /oak/profile-check/capabilities` advertises the unavailable
+`OWLAPI_SUBPROCESS` implementation owned by `PYTHON_FASTAPI_8095`, and
+`POST /oak/profile-check` returns a typed `UNAVAILABLE`/`UNKNOWN`/`NONE`
+result with `reasoningPerformed: false` and `writesPerformed: false`. Python
+tests passed **7/7** and `py_compile` passed. No Java or OWLAPI artifact was
+downloaded.
+
+`OAK-PROFILE-PY-02` and `OAK-PROFILE-PY-03` are now proven: the Python
+`OwlProfileChecker` protocol, `UnavailableOwlProfileChecker`, and FastAPI
+dependency-injection seam are implemented. The default routes remain
+`UNAVAILABLE`/`UNKNOWN`/`NONE`; injected fixtures cannot perform reasoning or
+writes. Python tests passed **8/8**, `py_compile` passed, and strict OpenSpec
+validation passed.
+
+Route registration was independently verified on the existing OAK router:
+`/oak/profile`, `/oak/profile-check`, and
+`/oak/profile-check/capabilities` are present. This proves the Python API
+boundary is wired, not that an OWLAPI checker is live; OAK-03E remains open.
+
+### Current OWLAPI profile-check correction — 2026-09-01
+
+The authoritative current sequence supersedes older OAK-03 wording:
+
+| Gate | Current status |
+|---|---|
+| OAK-03A ConstraintV2 → OWL V2 | **PROVEN** |
+| OAK-03B SHACL projection | **PROVEN, initial cardinality scope** |
+| OAK-03C combined projection completeness | **PROVEN** |
+| OAK-03D OWLAPI profile-check boundary | **IMPLEMENTED** |
+| OAK-03E live OWLAPI parser/profile execution | **OPEN** |
+| OAK-03F formal reasoner owner selection | **BLOCKED_ON_PROFILE_RESULT** |
+| OAK-03G formal reasoning | **NOT_STARTED** |
+
+Until OAK-03E produces a real profile result, `UNKNOWN` MUST route to `NONE`
+and MUST NOT select HermiT. No Java executable, OWLAPI runtime, or profile-check
+service is configured for the Parent Atlas boundary. This does not claim that
+unrelated Neo4j infrastructure has no JVM. OAK/lib remains ontology access,
+not formal OWL reasoning. No ELK, HermiT, ROBOT, Jena, or Owlready2 dependency
+is adopted by this change.
+
+### Python adapter alignment — 2026-09-01
+
+The intended live integration owner is the existing Python 8095 NLP/OAK
+FastAPI sidecar. `oaklib==0.7.4` remains the Python ontology-access layer.
+`FormalProfileClientV1` may later invoke an explicitly provisioned OWLAPI Java
+subprocess for RDF/XML parsing and profile checks, but no JVM, JAR, ELK, or
+HermiT dependency is currently installed. TypeScript owns the artifact and
+receipt contracts; Neo4j does not host OWLAPI.
+
+The Python protocol/injection tranche is now fully regression-proven: the
+existing 8095 FastAPI sidecar exposes the unavailable checker through an
+injected `OwlProfileChecker` dependency, while the TypeScript contract remains
+reasoner-free. Python tests passed **8/8**, TypeScript profile/completeness
+tests passed **3/3**, and strict OpenSpec validation passed. The default
+implementation remains fail-closed with `UNAVAILABLE`, profile `UNKNOWN`,
+route `NONE`, `reasoningPerformed: false`, and `writesPerformed: false`.
+See `docs/reports/oak-profile-python-boundary-v1.json`.
+
+This proves the Python-owned boundary and its injection seam only. It does not
+prove OWLAPI parsing, an OWL profile result, ELK/HermiT reasoning, or any
+database/production mutation. OAK-03E remains the next live gate.
+
+### ONTO-PY-GPU-01 — tuple projection to RAPIDS parity — 2026-09-01
+
+- [x] Reused the existing `ProjectionOrdinalMapV1` and
+  `OperationalGraphEdgeV1` output to build an isolated typed Parquet fixture.
+- [x] Proved direct NetworkX → cuDF/cuGraph PageRank parity through the live
+  8098 sidecar: 5 nodes, 4 incidence edges, identical ordering, maximum
+  absolute error `1.395151487670887e-7`, `renumbered: false`, and zero unknown
+  ordinals.
+- [x] Confirmed `writesPerformed: false` and `canonicalAuthority: false`.
+  This is a bounded tuple fixture proof only; full domain-classification
+  admission, larger topology cohorts, and production graph promotion remain
+  separate gates.
+
+Evidence: `scripts/atlas/prove-ontology-linked-tuple-cugraph-parity-v1.py` and
+`docs/reports/ontology-linked-tuple-cugraph-parity-v1.json`.
+
+### ONTO-PY-GPU-02 — bounded tuple BFS — 2026-09-01
+
+- [x] Added the read-only `/v1/graph/bfs` route to the existing revision-aware
+  RAPIDS graph manager with bounded `depthLimit` and explicit ordinal receipts.
+- [x] Live RTX/cuGraph execution returned the relation node at distance `0`
+  and four participant nodes at distance `1`, with `renumbered: false`.
+- [x] Preserved `writesPerformed: false` and `canonicalAuthority: false`.
+  Larger cohorts, undirected/multi-hop policy, and promotion remain separate
+  gates.
+
+Evidence: `python/atlas_rapids_graph_runtime.py`, live `/v1/graph/bfs` response,
+and `python/tests/test_atlas_rapids_graph_runtime.py` (5/5 retained).
+- [x] ONTO-PY-DOMAIN-01 — add a revisioned, read-only `DomainOntologyMappingV1` admission boundary for classifier labels; known labels/aliases resolve to declared `atlas:` classes, unknown labels fail closed, and no classifier label dynamically mints ontology identity. Proven by `scripts/atlas/prove-domain-ontology-admission-v1.py` and `docs/reports/domain-ontology-admission-v1.json`; this is an admission proof, not ontology promotion or a database/graph write.
+
+### ONTO-PY-GPU-02 — shared incidence algorithm parity — 2026-09-01
+
+- [x] Built one shared, revision-qualified `NARY_INCIDENCE` projection from seven
+  tuples covering a four-participant relation, shared-participant relations,
+  disconnected groups, and a two-hop relation chain.
+- [x] Proved NetworkX ↔ cuGraph BFS node/distance parity, normalized connected
+  component partition parity, and PageRank node-set parity through live 8098.
+- [x] Confirmed dense `[0,V)` projection ordinals, `renumbered: false`, seven
+  source-qualified tuples, zero synthetic/unproven revisions, and zero unknown or
+  missing GPU ordinals. Writes and canonical authority remain false.
+
+Evidence: `scripts/atlas/prove-ontology-linked-tuple-cugraph-algorithm-parity-v1.py`
+and `docs/reports/ontology-linked-tuple-cugraph-algorithm-parity-v1.json`.
+This closes only the bounded projection/executor proof; canonical relationship
+promotion, GRAPH-06D, FI-13C2, FI-14, and FI-16I remain blocked.
+
+### ONTO-PY-GPU-03 — deterministic Leiden replay — 2026-09-01
+
+- [x] Reused the same shared 21-vertex/16-edge undirected incidence artifact
+  through the existing quarantined RAPIDS community sidecar.
+- [x] Replayed Leiden twice with fixed `randomState: 17`, `resolution: 1.0`,
+  `maxIterations: 100`, and `theta: 1.0`; input/output hashes and normalized
+  member partitions matched, with projection revision preserved.
+- [x] Kept `writesPerformed: false` and `canonicalAuthority: false`. Community
+  labels remain executor output and are not durable identity or promotion evidence.
+
+Evidence: `scripts/atlas/prove-ontology-linked-tuple-leiden-replay-v1.py` and
+`docs/reports/ontology-linked-tuple-leiden-replay-v1.json`.

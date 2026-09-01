@@ -8,6 +8,7 @@
   "nodeCount": 6,
   "edgeCount": 6,
   "renumbered": false,
+  "identityModeProven": true,
   "unknownOrdinals": 0,
   "cpuBackend": "networkx",
   "gpuBackend": "cugraph.pagerank",

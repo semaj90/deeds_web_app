@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.ontology-linked-tuple-bfs-receipt.v1",
+  "status": "ONTO_PY_GPU_BFS_PROVEN",
+  "graphRevision": "graph:ontology-linked-tuple-cugraph-fixture-v1",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-fixture-v1",
+  "backend": "cugraph.bfs",
+  "nodeCount": 5,
+  "edgeCount": 4,
+  "startNodeKey": "relation:7d40c3ca4cd3d5707b2a0e05643efa61381e60fb8a31606bbff462e9877294a3",
+  "depthLimit": 1,
+  "reachableNodeCount": 5,
+  "renumbered": false,
+  "unknownOrdinals": 0,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "source": "live 8098 tuple fixture replay"
+}

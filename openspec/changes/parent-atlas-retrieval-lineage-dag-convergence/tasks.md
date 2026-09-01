@@ -45,8 +45,12 @@
 - [x] DAG-RUNTIME-01B — Register strict read-only owners for semantic Qdrant,
   PostgreSQL/KAG, AST evidence, graph expansion, and context compilation in the
   exact-reference runtime registry. Registry tests passed; live replay remains open.
-- [ ] DAG-RUNTIME-01C — Retain bound arguments and require parameter-checksum
-  equality at execution admission.
+- [x] DAG-RUNTIME-01C — Retain bound arguments and require parameter-checksum
+  equality at execution admission. Existing
+  `kernel-dag-execution-binding-v1.ts` retains `boundArguments`, rejects
+  missing/mismatched checksums, and rejects output-schema mismatches. Binding
+  and registry tests passed 5/5; package build passed. Evidence:
+  `docs/reports/kernel-dag-execution-binding-v1.json`.
 - [x] DAG-RUNTIME-01C.1 — Added the exact ACE ContextManifest adapter
   `parent-atlas.context-manifest.ace.v1`. It validates an assembled ACEContext,
   accepts the actual compiler options, and performs no retrieval or persistence.

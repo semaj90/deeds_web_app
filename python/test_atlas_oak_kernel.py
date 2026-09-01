@@ -19,6 +19,50 @@ def test_oak_health_does_not_expose_unconfigured_locator(monkeypatch):
     assert "adapterLocator" not in health
 
 
+def test_oak_profile_status_is_fail_closed_without_owlapi(monkeypatch):
+    status = oak.oak_profile_status()
+    assert status["adapterOwner"] == "python-fastapi-8095"
+    assert status["profileChecker"] == "owlapi"
+    assert status["status"] == "UNAVAILABLE"
+    assert status["detectedProfile"] == "UNKNOWN"
+    assert status["reasonerRoute"] == "NONE"
+    assert status["reasoningPerformed"] is False
+    assert status["implicitDownload"] is False
+
+
+def test_oak_profile_check_capabilities_are_python_owned_and_unavailable():
+    capabilities = oak.oak_profile_check_capabilities(oak.UnavailableOwlProfileChecker())
+    assert capabilities["available"] is False
+    assert capabilities["implementation"] == "OWLAPI_SUBPROCESS"
+    assert capabilities["integrationOwner"] == "PYTHON_FASTAPI_8095"
+    assert capabilities["reasoningPerformed"] is False
+    assert capabilities["reasonerRoute"] == "NONE"
+
+
+def test_oak_profile_check_returns_typed_fail_closed_result_without_java():
+    request = oak.OakProfileCheckRequest(owl_checksum="e" * 64, owl_document="<rdf:RDF/>")
+    result = oak.oak_profile_check(request, oak.UnavailableOwlProfileChecker())
+    assert result["status"] == "UNAVAILABLE"
+    assert result["profile"] == "UNKNOWN"
+    assert result["reasonerRoute"] == "NONE"
+    assert result["reasoningPerformed"] is False
+    assert result["writesPerformed"] is False
+    assert result["errorCode"] == "OAK_PROFILE_CHECKER_NOT_CONFIGURED"
+
+
+def test_oak_profile_checker_can_be_injected_without_changing_default_policy():
+    class FixtureChecker:
+        def capabilities(self):
+            return {"available": True, "implementation": "FIXTURE", "reasoningPerformed": False, "reasonerRoute": "NONE", "implicitDownload": False, "canonicalAuthority": False}
+
+        def check(self, *, owl_bytes, expected_checksum):
+            assert owl_bytes == b"fixture"
+            return {"schema": "atlas.oak.profile-check.v1", "status": "UNAVAILABLE", "profile": "UNKNOWN", "reasonerRoute": "NONE", "reasoningPerformed": False, "writesPerformed": False, "canonicalAuthority": False, "owlChecksum": expected_checksum, "errorCode": "FIXTURE_ONLY"}
+
+    result = oak.oak_profile_check(oak.OakProfileCheckRequest(owl_checksum="f" * 64, owl_document="fixture"), FixtureChecker())
+    assert result["errorCode"] == "FIXTURE_ONLY"
+
+
 def test_oak_health_fingerprints_configured_locator(monkeypatch):
     locator = "postgresql://user:secret@db.example/atlas"
     monkeypatch.setenv("ATLAS_OAK_ADAPTER", locator)

@@ -1,0 +1,11 @@
+{
+  "graphRevision": "graph:ontology-linked-tuple-cugraph-fixture-v1",
+  "projectionRevision": "projection:ontology-linked-tuple-cugraph-fixture-v1",
+  "producerRevision": "ontology-linked-tuple-cugraph-fixture-v1",
+  "nodeCount": 5,
+  "edgeCount": 4,
+  "nodeTableHash": "096226c809576cb7afff15b677c671b121de0e2a24c5de32ca38b1b197c0508d",
+  "edgeTableHash": "b047e612c30e7f482976302135c1f8687b37fcf1ab1f624dc78d54a381ff3409",
+  "sourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "projectionChecksum": "75014df92f31f6d5d23db141dde59e5c748a1592c19a17d584756c277c09166e"
+}

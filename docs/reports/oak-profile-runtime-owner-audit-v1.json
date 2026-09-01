@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.oak-profile-runtime-owner-audit.v1",
+  "status": "NO_EXISTING_OWNER_FOUND",
+  "searchedFor": ["OWLAPI", "owlapi", "HermiT", "ELK", "profile-check", "pom.xml", "build.gradle", "reasoner JAR"],
+  "findings": {
+    "owlapiRuntime": false,
+    "profileCheckerJar": false,
+    "dedicatedJavaOntologyService": false,
+    "unrelatedJavaModules": ["parent-atlas-graph-runtime-enhancement/java/atlas-neo4j-procedures"],
+    "existingFastApiOwner": "GPU/graph sidecars only"
+  },
+  "decision": "Do not install or download a reasoner. Keep the OWLAPI profile adapter unconfigured until an isolated owner is deliberately introduced.",
+  "validation": { "databaseWrites": false, "productionWrites": false, "canonicalAuthority": false }
+}
