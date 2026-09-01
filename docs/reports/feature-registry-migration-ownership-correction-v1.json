@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.feature-registry-migration-ownership-correction.v1",
+  "status": "STATIC_CHAIN_RECONCILED_DISPOSABLE_PROOF_PENDING",
+  "canonicalDrizzleOwner": "sveltekit-frontend/src/lib/server/db/schema/feature-registry.ts",
+  "historicalMigrationChain": [
+    {
+      "path": "sveltekit-frontend/drizzle/0024_nebulous_mongoose.sql",
+      "role": "BASE_TABLE_OWNER",
+      "creates": [
+        "id",
+        "feature_key",
+        "title",
+        "description",
+        "status",
+        "source_refs",
+        "code_refs",
+        "test_refs",
+        "cluster_id",
+        "trust_tier",
+        "last_verified_at"
+      ]
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/0025_yellow_tony_stark.sql",
+      "role": "ADDITIVE_SHAPE_COMPLETION",
+      "adds": [
+        "summary",
+        "chunk_ids",
+        "tags",
+        "retry_queries"
+      ]
+    }
+  ],
+  "conclusion": "0024 plus 0025 together define the current feature_registry Drizzle shape. The earlier framing that 0024 was historically incomplete without a reconciled additive migration omitted the already-journaled 0025 migration. Do not create a redundant migration solely for summary/chunk_ids/tags/retry_queries.",
+  "excludedCompetingProposal": "drizzle/manual/proposed_20260530_task_semantic_packets.sql",
+  "liveState": {
+    "featureRegistryPresent": false,
+    "globalDrizzleMigrateAuthorized": false,
+    "reason": "The live migration ledger/baseline remains unresolved and wider live-schema drift is blocking."
+  },
+  "proofHarness": "scripts/atlas/prove-feature-registry-disposable-postgres.mjs",
+  "proofHarnessSafety": {
+    "usesPostgres18Container": true,
+    "readsDatabaseUrl": false,
+    "targetsLegalAiDb": false,
+    "publishesHostPort": false,
+    "mountsVolume": false,
+    "extractsOnlyFeatureRegistryStatements": true,
+    "insertReadbackRolledBack": true,
+    "containerRemovedByDefault": true
+  },
+  "nextGate": "Run the disposable PostgreSQL proof on the workstation. If it passes, record DISPOSABLE_POSTGRES_PROVEN while keeping live apply blocked until migration-ledger baseline reconciliation is explicitly approved."
+}
