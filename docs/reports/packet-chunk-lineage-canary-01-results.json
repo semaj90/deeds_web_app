@@ -1,0 +1,1313 @@
+{
+  "schema": "atlas.packet-chunk-lineage-canary-01.v1",
+  "task": "PACKET-CHUNK-LINEAGE-CANARY-01",
+  "mode": "APPLY",
+  "writesPerformed": true,
+  "population": 4,
+  "allNamespaceExpectationsMet": true,
+  "results": [
+    {
+      "shape": "SINGLE",
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "packetKey": "packet:8589ed47d789",
+      "packetAlreadyExists": true,
+      "distinctChunkCount": 1,
+      "namespaceProven": true,
+      "revisionProven": true,
+      "expectNamespaceProven": true,
+      "namespaceMatchesExpectation": true,
+      "decision": "WRITE_MEMBERSHIPS",
+      "membershipsPlanned": [
+        {
+          "packetKey": "packet:8589ed47d789",
+          "canonicalChunkId": "fullrepo:crates/atlas_packet_parser/build.rs:0",
+          "chunkRowId": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+          "sourceRef": "crates/atlas_packet_parser/build.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+          "membershipStatus": "EXACT_SINGLE_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 0,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        }
+      ],
+      "membershipsWritten": 1,
+      "readBack": [
+        {
+          "canonical_chunk_id": "fullrepo:crates/atlas_packet_parser/build.rs:0",
+          "chunk_row_id": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+          "membership_status": "EXACT_SINGLE_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f"
+        }
+      ],
+      "readBackCountMatchesExpected": true,
+      "noSyntheticIds": true
+    },
+    {
+      "shape": "FEW",
+      "sourceRef": "crates/omni-bridge/src/lib.rs",
+      "packetKey": "packet:ce6dfc5484ac",
+      "packetAlreadyExists": true,
+      "distinctChunkCount": 5,
+      "namespaceProven": true,
+      "revisionProven": true,
+      "expectNamespaceProven": true,
+      "namespaceMatchesExpectation": true,
+      "decision": "WRITE_MEMBERSHIPS",
+      "membershipsPlanned": [
+        {
+          "packetKey": "packet:ce6dfc5484ac",
+          "canonicalChunkId": "fullrepo:crates/omni-bridge/src/lib.rs:0",
+          "chunkRowId": "0b7c9f97-4020-4702-823c-261c10ae725b",
+          "sourceRef": "crates/omni-bridge/src/lib.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 0,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:ce6dfc5484ac",
+          "canonicalChunkId": "fullrepo:crates/omni-bridge/src/lib.rs:1",
+          "chunkRowId": "91745d4d-bacc-42d8-879b-79dbd81cf825",
+          "sourceRef": "crates/omni-bridge/src/lib.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 1,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:ce6dfc5484ac",
+          "canonicalChunkId": "fullrepo:crates/omni-bridge/src/lib.rs:2",
+          "chunkRowId": "677ae260-6470-4425-bd54-c8817d783b58",
+          "sourceRef": "crates/omni-bridge/src/lib.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 2,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:ce6dfc5484ac",
+          "canonicalChunkId": "fullrepo:crates/omni-bridge/src/lib.rs:3",
+          "chunkRowId": "b65d4287-d66e-4ea2-9fe2-b87d4fff8f3e",
+          "sourceRef": "crates/omni-bridge/src/lib.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 3,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:ce6dfc5484ac",
+          "canonicalChunkId": "fullrepo:crates/omni-bridge/src/lib.rs:4",
+          "chunkRowId": "859bfb0c-46b2-45e5-983f-81137402e1cb",
+          "sourceRef": "crates/omni-bridge/src/lib.rs",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 4,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        }
+      ],
+      "membershipsWritten": 5,
+      "readBack": [
+        {
+          "canonical_chunk_id": "fullrepo:crates/omni-bridge/src/lib.rs:0",
+          "chunk_row_id": "0b7c9f97-4020-4702-823c-261c10ae725b",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:crates/omni-bridge/src/lib.rs:1",
+          "chunk_row_id": "91745d4d-bacc-42d8-879b-79dbd81cf825",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:crates/omni-bridge/src/lib.rs:2",
+          "chunk_row_id": "677ae260-6470-4425-bd54-c8817d783b58",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:crates/omni-bridge/src/lib.rs:3",
+          "chunk_row_id": "b65d4287-d66e-4ea2-9fe2-b87d4fff8f3e",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:crates/omni-bridge/src/lib.rs:4",
+          "chunk_row_id": "859bfb0c-46b2-45e5-983f-81137402e1cb",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:01ed49dfce68fa57eb987bbfda7759d3f21dd69225e0b11b3fa188e1ee90b9fa"
+        }
+      ],
+      "readBackCountMatchesExpected": true,
+      "noSyntheticIds": true
+    },
+    {
+      "shape": "MANY",
+      "sourceRef": "docs/atlas/feature-registry.json",
+      "packetKey": "packet:5c4e29307ca5",
+      "packetAlreadyExists": true,
+      "distinctChunkCount": 50,
+      "namespaceProven": true,
+      "revisionProven": true,
+      "expectNamespaceProven": true,
+      "namespaceMatchesExpectation": true,
+      "decision": "WRITE_MEMBERSHIPS",
+      "membershipsPlanned": [
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:0",
+          "chunkRowId": "8ae6315f-f965-4b01-831f-2df82430e655",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 0,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:1",
+          "chunkRowId": "e48dbe4b-2623-4ac3-9fa0-a559731ead2e",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 1,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:10",
+          "chunkRowId": "270ac846-080b-4e66-a634-acda36f17e0c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 2,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:11",
+          "chunkRowId": "fcdffed0-25a3-4c52-8c71-6aba2e083e52",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 3,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:12",
+          "chunkRowId": "4c95c97b-4d74-4ba8-9396-973fecee5d0f",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 4,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:13",
+          "chunkRowId": "f6585281-0c29-4da3-a95e-7ac1fccd5918",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 5,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:14",
+          "chunkRowId": "c1805c72-f453-4556-923b-285a6187267c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 6,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:15",
+          "chunkRowId": "0354dc11-09bf-4c66-9c69-8034ae844241",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 7,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:16",
+          "chunkRowId": "f2f42cd5-18e9-4388-9abb-b6496b1afe27",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 8,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:17",
+          "chunkRowId": "fa363e11-f3d1-484d-bcc0-afe72cec66ba",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 9,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:18",
+          "chunkRowId": "4ab3f939-45d5-40db-8334-edfd89689bf6",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 10,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:19",
+          "chunkRowId": "8e13b81e-d673-4141-8d03-64f6f91be335",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 11,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:2",
+          "chunkRowId": "4e86772d-8165-408f-9d6c-6f30eaa0857c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 12,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:20",
+          "chunkRowId": "b8cf5730-0865-43c1-9224-2df6a7185af4",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 13,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:21",
+          "chunkRowId": "e202d3d7-7370-44f1-ae62-2e8e2aca4c45",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 14,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:22",
+          "chunkRowId": "75084e2e-51e3-421d-8ab8-2c071a5734f6",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 15,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:23",
+          "chunkRowId": "a67a97ea-0fbf-46f6-8be4-3dfa0688e76d",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 16,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:24",
+          "chunkRowId": "285c2580-a13e-4be7-bca2-dbc19d4e30e3",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 17,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:25",
+          "chunkRowId": "d819633b-4376-4863-8f45-1c7c1b9c394e",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 18,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:26",
+          "chunkRowId": "2c4be5b4-c631-4007-899f-41592055919c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 19,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:27",
+          "chunkRowId": "7db21917-abb3-4f0b-971d-31d47817ea39",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 20,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:28",
+          "chunkRowId": "8ff906e8-8dcb-4ec4-8102-e47de30277ed",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 21,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:29",
+          "chunkRowId": "bc095030-90b3-4e91-b5c1-c73a211e0459",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 22,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:3",
+          "chunkRowId": "2cc640b5-f179-4b39-bf8e-49908346f991",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 23,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:30",
+          "chunkRowId": "463b77f8-86ef-4ecb-87f7-8c45338508cf",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 24,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:31",
+          "chunkRowId": "4c6638a0-8ce7-4688-bd3b-d691eb4c7eb2",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 25,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:32",
+          "chunkRowId": "997a1de0-cac8-44d1-85b5-8fbe14e6f04a",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 26,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:33",
+          "chunkRowId": "11bbaa96-2125-4479-8108-2d09e1bc0284",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 27,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:34",
+          "chunkRowId": "48756c3e-e981-4e75-a63a-216cc622e063",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 28,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:35",
+          "chunkRowId": "e94ca1d0-1fa5-4de0-a25a-919dc296ee27",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 29,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:36",
+          "chunkRowId": "6197da84-f9e1-4d55-979e-0392fdd83d2c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 30,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:37",
+          "chunkRowId": "c0e8d7e7-07e0-426c-8c59-eb098fd7bea5",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 31,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:38",
+          "chunkRowId": "2d9e6077-a9d7-482e-bdf6-031be6976671",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 32,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:39",
+          "chunkRowId": "ea1d034c-0dbf-4dd1-8271-75a54f1ec13c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 33,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:4",
+          "chunkRowId": "b74a2ce2-2b65-4583-98e7-65f978ee4b4c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 34,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:40",
+          "chunkRowId": "282b1378-9213-4e2a-8114-2b908f78e8ff",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 35,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:41",
+          "chunkRowId": "af97bb23-c963-4121-8698-25e387ac5ab1",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 36,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:42",
+          "chunkRowId": "d0c2f8dc-7fc9-41d8-9311-25e417559cac",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 37,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:43",
+          "chunkRowId": "fa82e7fa-6d1b-4950-b38a-010b0a7a3e44",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 38,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:44",
+          "chunkRowId": "06e92568-9f17-4a53-8b4b-de86f2d49da5",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 39,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:45",
+          "chunkRowId": "ac23b188-7093-488c-9593-6388789a142c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 40,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:46",
+          "chunkRowId": "728fc404-896d-4481-a192-8148dbbe0e99",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 41,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:47",
+          "chunkRowId": "b11d71b9-0e66-446b-af53-91f23d8695f0",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 42,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:48",
+          "chunkRowId": "6fe3c862-14fd-48d0-8707-5f06e73a05d2",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 43,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:49",
+          "chunkRowId": "b0764e2c-5ad0-4a38-9a7c-54f91f1c3db3",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 44,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:5",
+          "chunkRowId": "7b606fd3-f9d4-44d0-8c41-52afa87011ce",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 45,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:6",
+          "chunkRowId": "7114e7bf-34ca-4128-ba72-e6efdc326796",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 46,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:7",
+          "chunkRowId": "9002c96e-32b3-4141-9c5f-4b5b8da2569b",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 47,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:8",
+          "chunkRowId": "8d2bae9a-2dd1-43df-8834-dcccd886117c",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 48,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        },
+        {
+          "packetKey": "packet:5c4e29307ca5",
+          "canonicalChunkId": "fullrepo:docs/atlas/feature-registry.json:9",
+          "chunkRowId": "60b2d941-7c41-4b53-9c47-fb48e3c5a614",
+          "sourceRef": "docs/atlas/feature-registry.json",
+          "sourceNamespace": "workspace:625743d2-092b-4fa8-abe0-9dc094920c80",
+          "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+          "membershipStatus": "EXACT_MULTI_MEMBER",
+          "revisionStatus": "PROVEN",
+          "chunkOrdinal": 49,
+          "lineageProducerRevision": "packet-chunk-lineage-canary-01:v1",
+          "evidenceRefs": [
+            "docs/reports/packet-chunk-lineage-canary-01-results.json"
+          ]
+        }
+      ],
+      "membershipsWritten": 50,
+      "readBack": [
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:0",
+          "chunk_row_id": "8ae6315f-f965-4b01-831f-2df82430e655",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:1",
+          "chunk_row_id": "e48dbe4b-2623-4ac3-9fa0-a559731ead2e",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:10",
+          "chunk_row_id": "270ac846-080b-4e66-a634-acda36f17e0c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:11",
+          "chunk_row_id": "fcdffed0-25a3-4c52-8c71-6aba2e083e52",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:12",
+          "chunk_row_id": "4c95c97b-4d74-4ba8-9396-973fecee5d0f",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:13",
+          "chunk_row_id": "f6585281-0c29-4da3-a95e-7ac1fccd5918",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:14",
+          "chunk_row_id": "c1805c72-f453-4556-923b-285a6187267c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:15",
+          "chunk_row_id": "0354dc11-09bf-4c66-9c69-8034ae844241",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:16",
+          "chunk_row_id": "f2f42cd5-18e9-4388-9abb-b6496b1afe27",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:17",
+          "chunk_row_id": "fa363e11-f3d1-484d-bcc0-afe72cec66ba",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:18",
+          "chunk_row_id": "4ab3f939-45d5-40db-8334-edfd89689bf6",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:19",
+          "chunk_row_id": "8e13b81e-d673-4141-8d03-64f6f91be335",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:2",
+          "chunk_row_id": "4e86772d-8165-408f-9d6c-6f30eaa0857c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:20",
+          "chunk_row_id": "b8cf5730-0865-43c1-9224-2df6a7185af4",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:21",
+          "chunk_row_id": "e202d3d7-7370-44f1-ae62-2e8e2aca4c45",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:22",
+          "chunk_row_id": "75084e2e-51e3-421d-8ab8-2c071a5734f6",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:23",
+          "chunk_row_id": "a67a97ea-0fbf-46f6-8be4-3dfa0688e76d",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:24",
+          "chunk_row_id": "285c2580-a13e-4be7-bca2-dbc19d4e30e3",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:25",
+          "chunk_row_id": "d819633b-4376-4863-8f45-1c7c1b9c394e",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:26",
+          "chunk_row_id": "2c4be5b4-c631-4007-899f-41592055919c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:27",
+          "chunk_row_id": "7db21917-abb3-4f0b-971d-31d47817ea39",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:28",
+          "chunk_row_id": "8ff906e8-8dcb-4ec4-8102-e47de30277ed",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:29",
+          "chunk_row_id": "bc095030-90b3-4e91-b5c1-c73a211e0459",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:3",
+          "chunk_row_id": "2cc640b5-f179-4b39-bf8e-49908346f991",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:30",
+          "chunk_row_id": "463b77f8-86ef-4ecb-87f7-8c45338508cf",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:31",
+          "chunk_row_id": "4c6638a0-8ce7-4688-bd3b-d691eb4c7eb2",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:32",
+          "chunk_row_id": "997a1de0-cac8-44d1-85b5-8fbe14e6f04a",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:33",
+          "chunk_row_id": "11bbaa96-2125-4479-8108-2d09e1bc0284",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:34",
+          "chunk_row_id": "48756c3e-e981-4e75-a63a-216cc622e063",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:35",
+          "chunk_row_id": "e94ca1d0-1fa5-4de0-a25a-919dc296ee27",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:36",
+          "chunk_row_id": "6197da84-f9e1-4d55-979e-0392fdd83d2c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:37",
+          "chunk_row_id": "c0e8d7e7-07e0-426c-8c59-eb098fd7bea5",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:38",
+          "chunk_row_id": "2d9e6077-a9d7-482e-bdf6-031be6976671",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:39",
+          "chunk_row_id": "ea1d034c-0dbf-4dd1-8271-75a54f1ec13c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:4",
+          "chunk_row_id": "b74a2ce2-2b65-4583-98e7-65f978ee4b4c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:40",
+          "chunk_row_id": "282b1378-9213-4e2a-8114-2b908f78e8ff",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:41",
+          "chunk_row_id": "af97bb23-c963-4121-8698-25e387ac5ab1",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:42",
+          "chunk_row_id": "d0c2f8dc-7fc9-41d8-9311-25e417559cac",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:43",
+          "chunk_row_id": "fa82e7fa-6d1b-4950-b38a-010b0a7a3e44",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:44",
+          "chunk_row_id": "06e92568-9f17-4a53-8b4b-de86f2d49da5",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:45",
+          "chunk_row_id": "ac23b188-7093-488c-9593-6388789a142c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:46",
+          "chunk_row_id": "728fc404-896d-4481-a192-8148dbbe0e99",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:47",
+          "chunk_row_id": "b11d71b9-0e66-446b-af53-91f23d8695f0",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:48",
+          "chunk_row_id": "6fe3c862-14fd-48d0-8707-5f06e73a05d2",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:49",
+          "chunk_row_id": "b0764e2c-5ad0-4a38-9a7c-54f91f1c3db3",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:5",
+          "chunk_row_id": "7b606fd3-f9d4-44d0-8c41-52afa87011ce",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:6",
+          "chunk_row_id": "7114e7bf-34ca-4128-ba72-e6efdc326796",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:7",
+          "chunk_row_id": "9002c96e-32b3-4141-9c5f-4b5b8da2569b",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:8",
+          "chunk_row_id": "8d2bae9a-2dd1-43df-8834-dcccd886117c",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        },
+        {
+          "canonical_chunk_id": "fullrepo:docs/atlas/feature-registry.json:9",
+          "chunk_row_id": "60b2d941-7c41-4b53-9c47-fb48e3c5a614",
+          "membership_status": "EXACT_MULTI_MEMBER",
+          "revision_status": "PROVEN",
+          "source_revision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+        }
+      ],
+      "readBackCountMatchesExpected": true,
+      "noSyntheticIds": true
+    },
+    {
+      "shape": "ORPHAN_NAMESPACE_UNPROVEN",
+      "sourceRef": "sveltekit-frontend/artifacts/cs_domain_hierarchy_v1.json",
+      "packetKey": "packet:85c18f8d09ac",
+      "packetAlreadyExists": false,
+      "distinctChunkCount": 22,
+      "namespaceProven": false,
+      "revisionProven": false,
+      "expectNamespaceProven": false,
+      "namespaceMatchesExpectation": true,
+      "decision": "REFUSE_MEMBERSHIP_WRITE",
+      "reason": "NAMESPACE_UNPROVEN -- no graphify_files row for this source_ref. Per the frozen contract, sourceNamespace is required non-empty; no fabricated placeholder is permitted.",
+      "membershipsWritten": 0
+    }
+  ]
+}
