@@ -16,8 +16,13 @@
 - [ ] RETRIEVAL-01G — Audit historical impact of pre-existing empty Qdrant
   results across all live readers.
 - [ ] RETRIEVAL-01H — Freeze narrow semantic reader ownership only.
-- [ ] RETRIEVAL-01I — Define `ProjectionRegistryV1` for canonical identity,
-  representation, collection, vector name, physical point, and revisions.
+- [x] RETRIEVAL-01I — `ProjectionRegistryV1` defined and frozen
+  (`src/lib/server/atlas/retrieval/projection-registry-v1.ts`, 4/4 tests):
+  fail-closed resolution of canonical packet identity + representation to a
+  live-validated Qdrant projection coordinate (collection, vector name,
+  physical point, revisions). Requires live payload `postgres_id` to match
+  the requested canonical identity before resolving — never trusts a stored
+  point-id field blindly.
 - [ ] RETRIEVAL-01J — Dry-run stale bridge reconciliation with zero ambiguous or
   missing targets.
 - [ ] RETRIEVAL-01K — Run a tiny separately-authorized reconciliation canary and
@@ -85,6 +90,66 @@
   projection ownership, and migration baseline as independent blockers.
 - [ ] PROMOTION-02 — Permit writes only through an explicit target list,
   rollback plan, readback receipt, and human authorization.
+
+## 5. Packet<->chunk lineage (historical reconstruction + future capture)
+
+Full evidence trail: `docs/reports/workstation-lineage-resume-01-results.json`
+(see `handoff_2026-09-01` for the complete commit list and status block).
+Root cause: `scripts/atlas/register-orphaned-chunks.mjs` (the active
+`atlas_packets` producer) discovers chunks via `DISTINCT relative_path`,
+never captures `codebase_chunk_index.chunk_id`/`content_hash`/revision.
+`atlas_packets` is FILE-granularity (proven corpus-wide invariant);
+`codebase_chunk_index` is chunk-granularity — the relationship is 1:N
+lineage MEMBERSHIP, not 1:1 identity.
+
+- [x] PKT-LINEAGE-01 — Trace the packet-creation writer, identify root cause
+  of the packet<->chunk fan-out (`register-orphaned-chunks.mjs`'s `DISTINCT
+  relative_path` design; also found `backfill-unified-id-hierarchy.mjs`
+  live-corrupted `chunk_id`/`repository_id` for ~58,000+ packets via
+  `randomUUID()`).
+- [x] PKT-LINEAGE-02 — Prove `atlas_packets` FILE granularity is a
+  corpus-wide invariant (0/61,660 packets have >1 `source_ref`), correcting
+  the earlier 1:1-identity framing to 1:N membership.
+- [x] PKT-LINEAGE-03 — Identify `sourceRevision`/`sourceNamespace` authority:
+  `graphify_files` (885 rows, real, 100% populated internally, but only
+  ~1.4% corpus coverage). `atlas_packets.repository_id` confirmed corrupted
+  (58,365/58,365 populated values all distinct).
+- [x] PKT-LINEAGE-04 — Read-only historical backfill scope census (aggregate,
+  then full row-level in v2): 577/61,660 packets admissible as
+  `MEMBERSHIP_EXACT_REVISION_PROVEN`; 4,110 `NAMESPACE_UNPROVEN`; 56,973
+  `NO_MEMBER`. Reproducible: 3 independent runs, identical checksums.
+- [x] PKT-LINEAGE-05 — Freeze `PacketChunkMembershipV1` contract
+  (`src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts`, 9/9 tests)
+  and `atlas_packet_chunk_lineage` migration
+  (`drizzle/manual/20260901_atlas_packet_chunk_lineage.sql`), proved
+  disposable-DB-first. `UNIQUE(packet_key, canonical_chunk_id)` only —
+  producer revision is provenance on the canonical row, never a second row.
+  `chunk_ordinal` nullable (no reliable producer ordinal signal exists).
+- [x] PKT-LINEAGE-06 — Future-capture writer canary
+  (`scripts/atlas/packet-chunk-lineage-canary-01.mts`): 3 real shapes
+  written + read-back verified, 1 orphan correctly refused (fail-closed,
+  no fabricated namespace).
+- [x] PKT-LINEAGE-07 — Historical-reconstruction canary
+  (`scripts/atlas/packet-chunk-lineage-backfill-canary-01.mts`): 4 real
+  historical packets promoted from the frozen dry-run artifact (SINGLE/FEW/
+  MANY/overlap-with-06), atomic per-packet-set writes, replay-proven
+  idempotent under the corrected uniqueness key.
+- [ ] PKT-LINEAGE-08 (PROMOTION-01) — Wire the corrected membership-writing
+  logic into the live `register-orphaned-chunks.mjs` production path so
+  future packet creation captures real lineage. Separate authorization
+  required; not started.
+- [ ] PKT-LINEAGE-09 (BACKFILL-PROMOTION-01) — Separately authorize applying
+  the full 6,987-row admitted cohort (all 577 packets) from the frozen
+  `BACKFILL-DRY-01` artifact. Re-run the dry classification fresh first to
+  confirm it's still stable before trusting it. Not started. Deliberately
+  kept separate from PKT-LINEAGE-08 (future capture vs. historical
+  reconstruction are different risk profiles).
+- [ ] PKT-LINEAGE-10 (BRIDGE-RECON-DRY-03) — Reconcile Qdrant projections per
+  packet<->chunk MEMBERSHIP (not per packet alone), consuming only rows
+  proven by PKT-LINEAGE-08/09. Blocked on both.
+- [ ] PKT-LINEAGE-11 (RECON-CANARY-01) — Tiny bounded Qdrant metadata
+  write canary. Blocked, zero writes, until PKT-LINEAGE-10 admits a
+  zero-ambiguity cohort.
 
 ## Validation record
 
